@@ -20,7 +20,7 @@ function fail(message, errors = []) {
   const codes = errors.map((error) => error.code);
   if (codes.includes(10000) || codes.includes(9109)) {
     console.log(
-      'Wskazówka: token nie ma wymaganych uprawnień. Utwórz go z szablonu „Edit Cloudflare Workers” i dodaj Account · D1 · Edit.',
+      'Wskazówka: token nie ma wymaganych uprawnień. Utwórz nowy linkiem z README (sekcja „Token API”).',
     );
   }
   if (codes.includes(7003) || codes.includes(7000)) {

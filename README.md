@@ -6,11 +6,13 @@ Stan: **Etap 0, konfiguracja.** Działa konto (rejestracja, logowanie, wylogowan
 
 ## Adres gry
 
-Gra działa pod adresem `https://wzrost.<subdomena>.workers.dev`. Po każdym wdrożeniu link jest w zakładce **Actions**, w podsumowaniu (Summary) ostatniego przebiegu „Testy i wdrożenie”.
+**https://wzrost.wzrost.workers.dev**
+
+Adres jest też w zakładce **Actions**, w podsumowaniu (Summary) każdego przebiegu „Testy i wdrożenie”.
 
 ## Jednorazowa konfiguracja z telefonu
 
-Wystarczy zrobić ją raz. Potem każda zmiana w gałęzi `main` wdraża się sama.
+Ta konfiguracja jest już zrobiona. Opis zostaje na wypadek, gdyby trzeba było założyć nowy token albo przenieść grę na inne konto. Potem każda zmiana w gałęzi `main` wdraża się sama.
 
 ### 1. Konto Cloudflare
 
@@ -31,18 +33,30 @@ Druga droga: stuknij ikonę wyszukiwania w panelu, wpisz „Copy account ID” i
 
 ### 3. Token API
 
-1. Otwórz https://dash.cloudflare.com/profile/api-tokens i stuknij **Create Token**.
-2. Przy szablonie **Edit Cloudflare Workers** stuknij **Use template**.
-3. Pod listą uprawnień stuknij **+ Add more**. W nowym wierszu wybierz kolejno **Account**, **D1** i **Edit**. Jeśli nie ma „Edit”, wybierz „Write”.
-4. W **Account Resources** zostaw swoje konto. W **Zone Resources** wybierz **All zones**.
-5. Stuknij **Continue to summary**, a potem **Create Token**.
-6. Skopiuj token. Cloudflare pokazuje go tylko raz.
+1. Zaloguj się na https://dash.cloudflare.com, a potem otwórz [formularz tokenu z gotowymi uprawnieniami](https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22account_settings%22%2C%22type%22%3A%22read%22%7D%5D&accountId=%2A&zoneId=all&name=Wzrost%20deploy).
+2. Formularz ma już trzy uprawnienia: Workers Scripts: Edit, D1: Edit i Account Settings: Read. Niczego nie zmieniaj.
+3. Przewiń w dół i stuknij **Continue to summary**, a potem **Create Token**.
+4. Skopiuj token. Cloudflare pokazuje go tylko raz.
 
 ### 4. Sekrety w GitHubie
 
-1. Otwórz https://github.com/Skrajny97/Wzrost/settings/secrets/actions. Jeśli strona się nie otwiera, włącz w menu przeglądarki „Wersja na komputer”.
-2. Stuknij **New repository secret**. W polu Name wpisz `CLOUDFLARE_API_TOKEN`, w polu Secret wklej token i stuknij **Add secret**.
-3. Powtórz to dla nazwy `CLOUDFLARE_ACCOUNT_ID`, wklejając Account ID.
+Potrzebne są dwa sekrety. Oba dodajesz na stronie https://github.com/Skrajny97/Wzrost/settings/secrets/actions. Jeśli strona się nie otwiera, włącz w menu przeglądarki „Wersja na komputer”.
+
+Pierwszy sekret, token:
+
+1. Stuknij **New repository secret**.
+2. **Name:** `CLOUDFLARE_API_TOKEN`
+3. **Secret:** token z kroku 3.
+4. Stuknij **Add secret**.
+
+Drugi sekret, Account ID:
+
+1. Stuknij **New repository secret**.
+2. **Name:** `CLOUDFLARE_ACCOUNT_ID`
+3. **Secret:** 32 znaki z kroku 2, bez ukośników i bez reszty adresu.
+4. Stuknij **Add secret**.
+
+Na liście mają być dokładnie te dwa wpisy.
 
 ### 5. Pierwsze wdrożenie
 
@@ -50,7 +64,9 @@ Druga droga: stuknij ikonę wyszukiwania w panelu, wpisz „Copy account ID” i
 2. Stuknij **Run workflow**, zostaw gałąź `main` i potwierdź przyciskiem **Run workflow**.
 3. Po 2–3 minutach otwórz przebieg. Adres gry jest w podsumowaniu.
 
-Jeśli przebieg zakończy się błędem, poproś Claude o sprawdzenie jego logu. Najczęstsza przyczyna to brak uprawnienia D1 w tokenie.
+Przy pierwszym wdrożeniu na nowej subdomenie Cloudflare potrzebuje kilku minut na certyfikat HTTPS. W tym czasie sprawdzenie po wdrożeniu kończy się ostrzeżeniem, a gra zaczyna działać chwilę później.
+
+Jeśli przebieg zakończy się błędem, poproś Claude o sprawdzenie jego logu.
 
 ## Jak działa wdrażanie
 
