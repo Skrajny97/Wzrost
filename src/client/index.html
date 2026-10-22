@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d110b">
+  <meta name="color-scheme" content="dark">
+  <title>Wzrost</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&amp;family=Chakra+Petch:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <main id="view-loading" class="screen screen--center">
+    <section class="system-panel" aria-live="polite">
+      <div class="system-message">
+        <p class="system-label">[ SYSTEM ]</p>
+        <p class="system-text" id="loading-text">Nawiązywanie połączenia…</p>
+      </div>
+      <button type="button" class="button button--system" id="retry-button" hidden>Spróbuj ponownie</button>
+    </section>
+  </main>
+
+  <main id="view-auth" class="screen" hidden>
+    <header class="hero">
+      <svg class="emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 2l8 4.5v11L12 22l-8-4.5v-11z"></path>
+        <path d="M12 7l4 2.5v5L12 17l-4-2.5v-5z"></path>
+      </svg>
+      <h1 class="hero-title">Wzrost</h1>
+      <p class="hero-tagline">Wracaj, kiedy chcesz. Puszcza poczeka.</p>
+    </header>
+
+    <section class="system-panel" aria-labelledby="auth-message">
+      <div class="system-message">
+        <p class="system-label">[ SYSTEM ]</p>
+        <p class="system-text" id="auth-message">Wykryto istotę na skraju puszczy. Potwierdź tożsamość, aby kontynuować.</p>
+      </div>
+
+      <div class="segmented" role="group" aria-label="Wybierz formularz">
+        <button type="button" class="segmented-option" data-auth-mode="login" aria-pressed="true">Logowanie</button>
+        <button type="button" class="segmented-option" data-auth-mode="register" aria-pressed="false">Nowe konto</button>
+      </div>
+
+      <form id="login-form" class="form" novalidate>
+        <div class="field">
+          <label for="login-identifier">Login lub e-mail</label>
+          <input id="login-identifier" name="identifier" type="text" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+        </div>
+        <div class="field">
+          <label for="login-password">Hasło</label>
+          <div class="password">
+            <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+            <button type="button" class="password-toggle" aria-controls="login-password" aria-label="Pokaż hasło">Pokaż</button>
+          </div>
+        </div>
+        <p class="form-error" role="alert" hidden></p>
+        <button type="submit" class="button button--system" data-busy-label="Łączenie…">Zaloguj się</button>
+      </form>
+
+      <form id="register-form" class="form" novalidate hidden>
+        <div class="field">
+          <label for="register-login">Login</label>
+          <input id="register-login" name="login" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="24" aria-describedby="register-login-hint" required>
+          <p class="field-hint" id="register-login-hint">3–24 znaki: litery bez polskich znaków, cyfry oraz _ . -</p>
+        </div>
+        <div class="field">
+          <label for="register-email">E-mail <span class="optional">(opcjonalnie)</span></label>
+          <input id="register-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" aria-describedby="register-email-hint">
+          <p class="field-hint" id="register-email-hint">Możesz logować się nim zamiast loginu.</p>
+        </div>
+        <div class="field">
+          <label for="register-password">Hasło</label>
+          <div class="password">
+            <input id="register-password" name="password" type="password" autocomplete="new-password" aria-describedby="register-password-hint" required>
+            <button type="button" class="password-toggle" aria-controls="register-password" aria-label="Pokaż hasło">Pokaż</button>
+          </div>
+          <p class="field-hint" id="register-password-hint">Co najmniej 8 znaków.</p>
+        </div>
+        <p class="form-error" role="alert" hidden></p>
+        <button type="submit" class="button button--system" data-busy-label="Zakładanie konta…">Załóż konto</button>
+      </form>
+    </section>
+
+    <p class="version">Wersja <span data-version>—</span></p>
+  </main>
+
+  <div id="view-home" hidden>
+    <header class="topbar">
+      <span class="badge badge--system">Wzrost</span>
+      <span class="badge badge--world" data-user-login></span>
+    </header>
+
+    <main class="screen">
+      <div class="page-heading">
+        <h1 class="page-title" id="home-title" tabindex="-1">Skraj Puszczy</h1>
+        <p class="page-subtitle">Tu zacznie się Twoja wyprawa.</p>
+      </div>
+
+      <section class="system-panel" aria-label="Komunikat Systemu">
+        <div class="system-message">
+          <p class="system-label">[ SYSTEM ]</p>
+          <p class="system-text">Tożsamość potwierdzona: <strong data-user-login></strong>. Inicjalizacja postaci zostanie udostępniona w kolejnej aktualizacji.</p>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="status-title">
+        <h2 class="card-title" id="status-title">Stan połączenia</h2>
+        <dl class="status-list">
+          <div class="status-row">
+            <dt>Serwer</dt>
+            <dd data-status-server>sprawdzanie…</dd>
+          </div>
+          <div class="status-row">
+            <dt>Baza danych</dt>
+            <dd data-status-database>sprawdzanie…</dd>
+          </div>
+          <div class="status-row">
+            <dt>Czas serwera</dt>
+            <dd data-server-time>—</dd>
+          </div>
+          <div class="status-row">
+            <dt>Wersja gry</dt>
+            <dd data-version>—</dd>
+          </div>
+          <div class="status-row">
+            <dt>Konto założone</dt>
+            <dd data-user-created>—</dd>
+          </div>
+        </dl>
+      </section>
+
+      <p class="form-error" id="logout-error" role="alert" hidden></p>
+      <button type="button" class="button button--world" id="logout-button">Wyloguj się</button>
+    </main>
+  </div>
+</body>
+</html>

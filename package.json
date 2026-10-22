@@ -1,0 +1,16 @@
+{
+  "name": "wzrost",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "wrangler d1 migrations apply DB --local && wrangler dev",
+    "test": "node --test --test-reporter=spec 'test/**/*.test.js'"
+  },
+  "devDependencies": {
+    "wrangler": "4.151.3"
+  }
+}

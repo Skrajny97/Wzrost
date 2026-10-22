@@ -1,0 +1,429 @@
+/* Two visual layers from the design document: the organic world (parchment,
+   bark, moss, Alegreya) and the cold System (ice-blue panels, sharp edges,
+   Chakra Petch). Mobile first, designed at about 390 px wide. */
+
+:root {
+  color-scheme: dark;
+  --bg: #12170f;
+  --bg-deep: #0d110b;
+  --surface: #182014;
+  --line: #2a3322;
+  --bark: #2b2219;
+  --bark-line: #4a3d2c;
+  --text: #e7dcc2;
+  --text-muted: #b9ae94;
+  --leaf: #a7c47f;
+  --danger: #ef9a85;
+  --system: #8fe3ef;
+  --system-text: #d6f6fa;
+  --system-line: rgba(143, 227, 239, 0.55);
+  --system-fill: rgba(143, 227, 239, 0.07);
+  --font-world: 'Alegreya', Georgia, serif;
+  --font-system: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif;
+  --gutter: 16px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(120% 70% at 50% 0%, rgba(143, 227, 239, 0.05), transparent 60%),
+    repeating-linear-gradient(125deg, transparent 0 6px, rgba(37, 48, 31, 0.45) 6px 7px);
+  color: var(--text);
+  font-family: var(--font-world);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+:focus-visible {
+  outline: 2px solid var(--system);
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.screen {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: max(24px, env(safe-area-inset-top)) var(--gutter) max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.screen--center {
+  min-height: 100vh;
+  min-height: 100dvh;
+  justify-content: center;
+}
+
+/* World layer */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.emblem {
+  width: 52px;
+  height: 52px;
+  color: var(--system);
+}
+
+.hero-title {
+  margin: 8px 0 0;
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.hero-tagline {
+  margin: 0;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.page-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.page-title:focus {
+  outline: none;
+}
+
+.page-subtitle {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.status-list {
+  margin: 0;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.status-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.status-row dt {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.status-row dd {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.status-ok {
+  color: var(--leaf);
+}
+
+.status-error {
+  color: var(--danger);
+}
+
+/* System layer */
+
+.system-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid var(--system-line);
+  /* Ice-blue tint over a mostly opaque base, so the forest hatch stays faint. */
+  background: linear-gradient(var(--system-fill), var(--system-fill)), rgba(18, 23, 15, 0.85);
+  font-family: var(--font-system);
+}
+
+.system-message {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.system-label {
+  margin: 0;
+  color: var(--system);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+.system-text {
+  margin: 0;
+  color: var(--system-text);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--system-line);
+}
+
+.segmented-option {
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.segmented-option + .segmented-option {
+  border-left: 1px solid var(--system-line);
+}
+
+.segmented-option[aria-pressed='true'] {
+  background: rgba(143, 227, 239, 0.14);
+  color: var(--system-text);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.optional {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--bark-line);
+  border-radius: 0;
+  background: var(--bg-deep);
+  color: var(--text);
+  /* 16 px keeps iOS from zooming in on focus. */
+  font-family: var(--font-system);
+  font-size: 16px;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: var(--system);
+  box-shadow: 0 0 0 1px var(--system);
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.password {
+  position: relative;
+}
+
+.password input {
+  padding-right: 80px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  min-width: 68px;
+  padding: 0 10px;
+  border: 0;
+  border-left: 1px solid var(--bark-line);
+  background: transparent;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.form-error {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(239, 154, 133, 0.6);
+  background: rgba(239, 154, 133, 0.08);
+  color: var(--danger);
+  font-family: var(--font-system);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.button {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border-radius: 0;
+  font-family: var(--font-system);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.button--system {
+  border: 1px solid var(--system);
+  background: rgba(143, 227, 239, 0.16);
+  color: var(--system-text);
+}
+
+.button--system:active:not(:disabled) {
+  background: rgba(143, 227, 239, 0.26);
+}
+
+.button--world {
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: var(--bark);
+  color: var(--text);
+  font-family: var(--font-world);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.button--world:active:not(:disabled) {
+  background: #3a2e22;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 56px;
+  padding: max(8px, env(safe-area-inset-top)) var(--gutter) 8px;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--line);
+}
+
+.badge {
+  padding: 5px 8px;
+  border: 1px solid;
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.badge--system {
+  border-color: var(--system-line);
+  color: var(--system);
+  text-transform: uppercase;
+}
+
+.badge--world {
+  max-width: 60%;
+  overflow: hidden;
+  border-color: var(--bark-line);
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.version {
+  margin: 0;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
