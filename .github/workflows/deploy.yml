@@ -49,8 +49,11 @@ jobs:
           elif [ -z "$TOKEN" ] && [ -z "$ACCOUNT" ]; then
             echo "::warning title=Wdrożenie pominięte::Brak sekretów CLOUDFLARE_API_TOKEN i CLOUDFLARE_ACCOUNT_ID. Dodaj je według README i uruchom workflow ponownie."
             echo "ready=false" >> "$GITHUB_OUTPUT"
+          elif [ -z "$TOKEN" ]; then
+            echo "::error::Brakuje sekretu CLOUDFLARE_API_TOKEN (sekret z Account ID jest ustawiony)."
+            exit 1
           else
-            echo "::error::Ustawiony jest tylko jeden z sekretów CLOUDFLARE_API_TOKEN i CLOUDFLARE_ACCOUNT_ID. Potrzebne są oba."
+            echo "::error::Brakuje sekretu CLOUDFLARE_ACCOUNT_ID (sekret z tokenem jest ustawiony)."
             exit 1
           fi
 

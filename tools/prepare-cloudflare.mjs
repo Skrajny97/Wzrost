@@ -83,6 +83,12 @@ async function ensureDatabase(name) {
 if (!token || !accountId) {
   fail('Brakuje sekretów CLOUDFLARE_API_TOKEN lub CLOUDFLARE_ACCOUNT_ID (instrukcja w README).');
 }
+if (!/^[0-9a-f]{32}$/i.test(accountId)) {
+  fail(
+    `Sekret CLOUDFLARE_ACCOUNT_ID ma ${accountId.length} znaków, a Account ID to 32 cyfry i litery a–f. Wklej go ponownie z adresu panelu Cloudflare.`,
+  );
+}
+if (/\s/.test(token)) fail('Sekret CLOUDFLARE_API_TOKEN zawiera spacje lub złamania wiersza. Wklej token ponownie.');
 
 const config = readFileSync(CONFIG_FILE, 'utf8');
 const name = config.match(/"database_name":\s*"([^"]+)"/)?.[1];
