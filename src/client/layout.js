@@ -30,6 +30,7 @@ export function buildTopbar(onSettings) {
   const gold = h('span', { class: 'gold-value' });
   const hp = meter({ label: 'HP', value: 0, max: 0, kind: 'hp' });
   const mana = meter({ label: 'MANA', value: 0, max: 0, kind: 'mana' });
+  const xp = meter({ label: 'XP', value: 0, max: 0, kind: 'xp' });
   const activityLabel = h('span', { class: 'activity-label' });
   const activityTime = h('span', { class: 'activity-time' });
   const activity = h('a', { class: 'activity', href: '#/walka' }, activityLabel, activityTime);
@@ -47,10 +48,10 @@ export function buildTopbar(onSettings) {
         h('button', { type: 'button', class: 'icon-button', 'aria-label': 'Ustawienia', onClick: onSettings }, icon('gear')),
       ),
     ),
-    h('div', { class: 'meters' }, hp.element, mana.element),
+    h('div', { class: 'meters' }, hp.element, mana.element, xp.element),
     activity,
   );
-  topbar = { level, classLevel, gold, hp, mana, activity, activityLabel, activityTime };
+  topbar = { level, classLevel, gold, hp, mana, xp, activity, activityLabel, activityTime };
   updateTopbar();
 }
 
@@ -62,6 +63,7 @@ export function updateTopbar(now = serverNow()) {
   topbar.gold.textContent = formatNumber(character.gold);
   topbar.hp.set(currentHp(character, now), character.maxHp);
   topbar.mana.set(character.mana, character.maxMana);
+  topbar.xp.set(character.xp, character.xpToNext);
 
   const activity = character.activity;
   const { activityLabel, activityTime } = topbar;

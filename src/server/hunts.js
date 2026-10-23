@@ -1,7 +1,7 @@
 // Hunts on server time: the start stores the start time, length and seed; the
 // claim after the end runs the engine with that seed and saves the report.
 
-import { applyHunt, estimateThreat, huntDurations, huntReport, simulateHunt } from '../engine/index.js';
+import { applyHunt, estimateThreat, huntDurations, huntReport, simulateHunt, threatSamples } from '../engine/index.js';
 import { content } from './content.js';
 import {
   characterView,
@@ -14,18 +14,40 @@ import {
 } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
+import { KEPT_REPORTS } from './reports.js';
 
+// Sample fights for the threat level depend only on the build, so the Worker
+// keeps them in memory while the build stays the same.
+const samplesCache = new Map();
+const SAMPLES_CACHE_SIZE = 200;
+
+function cachedSamples(player, character, equipped, regionId) {
+  const ids = equipped.map((item) => item.id).sort((a, b) => a - b);
+  const key = JSON.stringify([player.row.id, regionId, character.level, character.classLevel, character.points, ids]);
+  let samples = samplesCache.get(key);
+  if (!samples) {
+    samples = threatSamples({ character, equipped, regionId }, content);
+    if (samplesCache.size >= SAMPLES_CACHE_SIZE) samplesCache.delete(samplesCache.keys().next().value);
+    samplesCache.set(key, samples);
+  }
+  return samples;
+}
+
+// ?region=… asks for one region only, which keeps each request within the CPU limit.
 export async function huntOptions(context) {
   const { player } = await requirePlayer(context);
   const character = engineCharacter(player.row);
   const equipped = equippedItems(player);
   const { hp, maxHp } = currentHp(player, context.now);
+  const only = new URL(context.request.url).searchParams.get('region');
+  if (only !== null && !content.regionsById[only]) throw new ApiError(400, 'invalid_region', 'Nie ma takiego regionu.');
+  const regions = only === null ? content.regions : [content.regionsById[only]];
   return json({
     hp,
     maxHp,
-    regions: content.regions.map((region) => ({
+    regions: regions.map((region) => ({
       id: region.id,
-      threat: estimateThreat({ character, equipped, hp, regionId: region.id }, content),
+      threat: estimateThreat({ character, equipped, hp, regionId: region.id }, content, cachedSamples(player, character, equipped, region.id)),
     })),
   });
 }
@@ -130,6 +152,10 @@ export async function claimHunt(context) {
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, `${row.id}:${activity.started_at}`, 'hunt', now, JSON.stringify(summary), JSON.stringify(report)),
+      // A report keeps every fight (about 40 KB for 4 hours), so only those the journal shows stay.
+      db
+        .prepare('DELETE FROM reports WHERE character_id = ? AND id NOT IN (SELECT id FROM reports WHERE character_id = ? ORDER BY id DESC LIMIT ?)')
+        .bind(row.id, row.id, KEPT_REPORTS),
       ...hunt.items.map((item) => insertItem.bind(row.id, JSON.stringify(item), now)),
       db
         .prepare(

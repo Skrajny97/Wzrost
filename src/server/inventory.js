@@ -1,7 +1,8 @@
 // Wearing, taking off and throwing away items.
 
+import { combatValues } from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, loadPlayer, requireIdlePlayer } from './characters.js';
+import { characterView, engineCharacter, equippedItems, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
 import { ApiError, json } from './http.js';
 
 function findItem(player, id) {
@@ -45,4 +46,28 @@ export async function discardItem(context) {
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
   await context.env.DB.prepare('DELETE FROM items WHERE id = ? AND character_id = ?').bind(item.id, player.row.id).run();
   return respond(context, session);
+}
+
+// What wearing the item (or taking it off) would change: the combat values the
+// stats screen shows, now and after.
+export async function previewItem(context) {
+  const { player } = await requirePlayer(context);
+  const item = findItem(player, context.params.id);
+  const character = engineCharacter(player.row);
+  const worn = equippedItems(player);
+  const after = item.equippedSlot
+    ? worn.filter((candidate) => candidate.id !== item.id)
+    : [...worn.filter((candidate) => candidate.equippedSlot !== item.slot), item];
+  const view = (equipped) => {
+    const values = combatValues(character, equipped, content);
+    return {
+      damage: `${values.damageMin}–${values.damageMax}`,
+      damageAverage: Math.round(values.damage * 10) / 10,
+      reduction: Math.round(values.reduction * 100),
+      maxHp: values.maxHp,
+      dodge: Math.round(values.dodge * 1000) / 10,
+      crit: Math.round(values.crit * 1000) / 10,
+    };
+  };
+  return json({ itemId: item.id, equipped: Boolean(item.equippedSlot), now: view(worn), after: view(after) });
 }

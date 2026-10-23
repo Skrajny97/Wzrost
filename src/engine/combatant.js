@@ -1,14 +1,14 @@
 // Combatants: the player character and monsters reduced to the same shape, so
 // the combat code treats both alike (and later companions or other players).
 
-import { cappedChance, maxHp, speed, weaponDamage } from './formulas.js';
+import { budget, cappedChance, maxHp, speed, weaponDamage } from './formulas.js';
 import { computeStats } from './stats.js';
 
 export function playerCombatant({ character, equipped, hp, name, region, id = 'a0', side = 'ally' }, content) {
   const balance = content.balance;
   const { totals, bonuses } = computeStats(character, equipped, content);
   const weaponItem = equipped.find((item) => item.slot === 'weapon');
-  const weapon = weaponItem ? itemWeapon(weaponItem, content) : unarmed(balance);
+  const weapon = weaponItem ? itemWeapon(weaponItem, content) : unarmed(character.level, content);
   let armor = bonuses.armor + totals.endurance * balance.combat.armorPerEndurance;
   if (region?.trait.frontArmorBonus && character.position === 'front') armor *= 1 + region.trait.frontArmorBonus;
   const cls = content.classesById[character.classId];
@@ -41,11 +41,15 @@ export function playerCombatant({ character, equipped, hp, name, region, id = 'a
   };
 }
 
+// How a strike looks in the fight animation: a blow, an arrow or a spell.
+const strikeOf = (strike, category) => strike ?? (category === 'magical' ? 'magic' : 'melee');
+
 function itemWeapon(item, content) {
   const base = content.basesById[item.base];
   return {
     attackName: base.attackName,
     category: base.category,
+    strike: strikeOf(base.strike, base.category),
     element: item.element,
     scaling: base.scaling,
     min: item.damage.min,
@@ -53,9 +57,14 @@ function itemWeapon(item, content) {
   };
 }
 
-function unarmed(balance) {
-  const { attackName, min, max } = balance.combat.unarmed;
-  return { attackName, category: 'physical', scaling: 'strength', min, max };
+// Without a weapon the character fights with its fists, which hit like a weak
+// common weapon of its level.
+function unarmed(level, content) {
+  const balance = content.balance;
+  const { attackName, damageFactor, variance } = balance.combat.unarmed;
+  const average = weaponDamage(budget(level, content.rarities[0].budget, balance), damageFactor, balance);
+  const min = Math.max(1, Math.round(average * (1 - variance)));
+  return { attackName, category: 'physical', strike: 'melee', scaling: 'strength', min, max: Math.max(min, Math.round(average * (1 + variance))) };
 }
 
 // `groupFactor` weakens each member of a group, so two or three monsters are
@@ -91,6 +100,7 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
     weapon: {
       attackName: monster.attack.name,
       category: monster.attack.category,
+      strike: strikeOf(monster.attack.strike, monster.attack.category),
       element: monster.attack.element,
       scaling: monster.attack.scaling,
       min: average * (1 - monster.attack.variance),
@@ -126,6 +136,8 @@ export function combatantView(unit, opponentLevel, content) {
     maxHp: unit.maxHp,
     hp: unit.hp,
     attack: unit.weapon.attackName,
+    strike: unit.weapon.strike,
+    element: unit.weapon.element ?? null,
     damage: `${Math.round(unit.weapon.min * scale)}–${Math.round(unit.weapon.max * scale)}`,
     armor: unit.armor,
     dodge: percent(cappedChance(unit.dodgeRating, opponentLevel, balance.combat.dodgeCap, balance)),

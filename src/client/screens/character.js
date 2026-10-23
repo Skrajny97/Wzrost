@@ -2,7 +2,7 @@
 // an eye that hides the slots, and the bag with items that are not worn.
 
 import { fill, h, icon } from '../dom.js';
-import { formatHours, formatNumber, plural } from '../format.js';
+import { formatDecimal, formatHours, formatNumber, plural } from '../format.js';
 import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { portrait } from '../portraits.js';
 import { call, isUnlocked, state, unlockInfo } from '../state.js';
@@ -146,46 +146,85 @@ export function mountCharacter(container) {
     );
   }
 
-  function itemSheet(item, { equipped }) {
-    const character = state.character;
-    const busy = Boolean(character.activity);
-    const worn = equipped ? null : character.equipment[item.slot];
-    const act = (path) => async (event) =>
-      withButton(event.currentTarget, async () => {
-        await call('POST', `/api/items/${item.id}/${path}`);
-        closeSheet();
-      });
-
-    const discard = async (event) => {
-      const button = event.currentTarget;
-      const sure = await confirmAction({
-        title: 'Wyrzucić przedmiot?',
-        text: `${item.name} zniknie na zawsze.`,
-        confirmLabel: 'Wyrzuć',
-        danger: true,
-      });
-      if (sure) await withButton(button, () => call('POST', `/api/items/${item.id}/discard`));
-    };
-
-    openSheet(
-      itemDetails(item),
-      worn && h('div', { class: 'compare' }, h('p', { class: 'compare-title', text: 'Założony teraz' }), itemDetails(worn, { small: true })),
-      busy && h('p', { class: 'muted', text: 'Postać jest na polowaniu. Ekwipunek zmienisz po jej powrocie.' }),
-      h(
-        'div',
-        { class: 'sheet-actions' },
-        equipped
-          ? h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: 'Zdejmij' })
-          : [
-              h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: discard, text: 'Wyrzuć' }),
-              h('button', { type: 'button', class: 'button button--system', disabled: busy, onClick: act('equip'), text: 'Załóż' }),
-            ],
-      ),
-    );
-  }
-
   render();
   return { update: render };
+}
+
+// An item from the bag or the equipment: its properties, what wearing it
+// changes, and the actions.
+export function itemSheet(item, { equipped }) {
+  const character = state.character;
+  const busy = Boolean(character.activity);
+  const worn = equipped ? null : character.equipment[item.slot];
+  const act = (path) => async (event) =>
+    withButton(event.currentTarget, async () => {
+      await call('POST', `/api/items/${item.id}/${path}`);
+      closeSheet();
+    });
+
+  const discard = async (event) => {
+    const button = event.currentTarget;
+    const sure = await confirmAction({
+      title: 'Wyrzucić przedmiot?',
+      text: `${item.name} zniknie na zawsze.`,
+      confirmLabel: 'Wyrzuć',
+      danger: true,
+    });
+    if (sure) await withButton(button, () => call('POST', `/api/items/${item.id}/discard`));
+  };
+
+  const preview = h('div', { class: 'preview', 'aria-live': 'polite' }, h('p', { class: 'muted', text: 'Liczenie zmian…' }));
+  openSheet(
+    itemDetails(item),
+    preview,
+    worn && h('div', { class: 'compare' }, h('p', { class: 'compare-title', text: 'Założony teraz' }), itemDetails(worn, { small: true })),
+    busy && h('p', { class: 'muted', text: 'Postać jest na polowaniu. Ekwipunek zmienisz po jej powrocie.' }),
+    h(
+      'div',
+      { class: 'sheet-actions' },
+      equipped
+        ? h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: 'Zdejmij' })
+        : [
+            h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: discard, text: 'Wyrzuć' }),
+            h('button', { type: 'button', class: 'button button--system', disabled: busy, onClick: act('equip'), text: 'Załóż' }),
+          ],
+    ),
+  );
+  showPreview(preview, item, equipped);
+}
+
+// What wearing (or taking off) the item changes, counted by the server.
+async function showPreview(box, item, equipped) {
+  try {
+    const { now, after } = await call('GET', `/api/items/${item.id}/preview`);
+    const rows = [
+      ['Obrażenia', now.damage, after.damage, after.damageAverage - now.damageAverage],
+      ['Redukcja obrażeń', `${now.reduction}%`, `${after.reduction}%`, after.reduction - now.reduction],
+      ['Maks. HP', now.maxHp, after.maxHp, after.maxHp - now.maxHp],
+      ['Unik', `${formatDecimal(now.dodge)}%`, `${formatDecimal(after.dodge)}%`, after.dodge - now.dodge],
+      ['Trafienie krytyczne', `${formatDecimal(now.crit)}%`, `${formatDecimal(after.crit)}%`, after.crit - now.crit],
+    ].filter(([, , , change]) => Math.abs(change) > 1e-9);
+    fill(
+      box,
+      h('p', { class: 'compare-title', text: equipped ? 'Po zdjęciu' : 'Po założeniu' }),
+      rows.length === 0
+        ? h('p', { class: 'muted', text: 'Bez zmian w obrażeniach, redukcji, HP, uniku i krytykach.' })
+        : h(
+            'ul',
+            { class: 'preview-list' },
+            rows.map(([label, before, then, change]) =>
+              h(
+                'li',
+                { class: change > 0 ? 'preview-up' : 'preview-down' },
+                h('span', { text: label }),
+                h('span', { class: 'num', text: `${before} → ${then}` }),
+              ),
+            ),
+          ),
+    );
+  } catch {
+    fill(box);
+  }
 }
 
 export function itemSummary(item) {

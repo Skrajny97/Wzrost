@@ -44,6 +44,7 @@ export function publicContent() {
       description,
       position,
     })),
+    elements: content.elements.map(({ id, name, color }) => ({ id, name, color })),
     slots: content.slots,
     rarities: content.rarities.map(({ id, name, color }) => ({ id, name, color })),
     regions: content.regions.map(({ id, land, name, minLevel, maxLevel, safe, description, trait }) => ({

@@ -6,7 +6,7 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "name", "role", "gentleStart", "description", "position", "baseStats", "growth", "autoPoints", "recovery", "startingItems"],
+    "required": ["id", "name", "role", "gentleStart", "description", "position", "baseStats", "growth", "autoPoints", "recovery", "weapons"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
       "name": { "type": "string", "minLength": 1 },
@@ -26,14 +26,11 @@
           "perWisdom": { "type": "number", "minimum": 0, "maximum": 0.05 }
         }
       },
-      "startingItems": {
+      "weapons": {
+        "description": "Bazy broni klasy. Dopóki postać nie ma broni, łup w slocie broni jest jedną z nich.",
         "type": "array",
-        "items": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["base"],
-          "properties": { "base": { "type": "string" }, "element": { "type": "string" } }
-        }
+        "minItems": 1,
+        "items": { "type": "string" }
       }
     }
   },

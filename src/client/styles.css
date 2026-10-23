@@ -25,6 +25,8 @@
   --hp-track: #2a1c17;
   --mana: #4f8fc0;
   --mana-track: #172231;
+  --xp: #d9b45a;
+  --xp-track: #2a2414;
   --icon-muted: #6f6656;
   --src-class: #7d9a5a;
   --src-character: #e7dcc2;
@@ -493,8 +495,8 @@ button {
 
 .meters {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .meter {
@@ -539,6 +541,23 @@ button {
 
 .meter--mana .meter-fill {
   background: var(--mana);
+}
+
+.meter--xp .meter-track {
+  background: var(--xp-track);
+}
+
+.meter--xp .meter-fill {
+  background: var(--xp);
+}
+
+.meter-label {
+  white-space: nowrap;
+}
+
+.meter-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .activity {
@@ -1790,64 +1809,124 @@ a.segmented-option {
   opacity: 0.4;
 }
 
-.unit--lunge-down {
-  animation: lunge-down 0.35s ease;
+.unit--down::after {
+  content: '✕';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--danger);
+  font-size: 30px;
+  font-weight: 700;
+  pointer-events: none;
 }
 
-.unit--lunge-up {
-  animation: lunge-up 0.35s ease;
+/* The attacker is drawn above the others while it lunges. */
+.unit--acting {
+  z-index: 3;
 }
 
-.unit--hit {
-  animation: hit 0.4s ease;
+.arena {
+  position: relative;
+  touch-action: pan-y;
 }
 
-.unit--tick {
-  animation: tick 0.4s ease;
+.arena-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: visible;
+  pointer-events: none;
 }
 
-@keyframes lunge-down {
-  40% {
-    transform: translateY(12px);
-  }
+.projectile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
 }
 
-@keyframes lunge-up {
-  40% {
-    transform: translateY(-12px);
-  }
+.projectile--arrow {
+  width: 26px;
+  height: 2px;
+  margin: -1px 0 0 -13px;
+  background: linear-gradient(90deg, rgba(231, 220, 194, 0), #e7dcc2 40%, #e7dcc2);
 }
 
-@keyframes hit {
-  20% {
-    transform: translateX(-4px);
-    border-color: var(--hp);
-    background: rgba(200, 85, 61, 0.35);
-  }
-  60% {
-    transform: translateX(4px);
-  }
+.projectile--arrow::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  right: -2px;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 7px solid #e7dcc2;
 }
 
-@keyframes tick {
-  30% {
-    border-color: var(--gold);
-    background: rgba(217, 180, 90, 0.25);
-  }
+.projectile--magic {
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0, var(--fx, #8fe3ef) 45%, rgba(0, 0, 0, 0) 72%);
+  box-shadow: 0 0 14px 4px var(--fx, #8fe3ef);
+}
+
+.slash {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  pointer-events: none;
+}
+
+.slash::before,
+.slash::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  right: 4px;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 2px;
+  background: #ffd8cc;
+  box-shadow: 0 0 6px rgba(239, 154, 133, 0.9);
+  transform: rotate(-35deg);
+}
+
+/* One cut for a hit, two parallel cuts for a critical one; a cross would look
+   like the mark of a fallen unit. */
+.slash::after {
+  display: none;
+}
+
+.slash--strong::before,
+.slash--strong::after {
+  height: 4px;
+  background: #ffe2a8;
+  box-shadow: 0 0 10px rgba(224, 160, 60, 0.95);
+}
+
+.slash--strong::before {
+  margin-top: -7px;
+}
+
+.slash--strong::after {
+  display: block;
+  margin-top: 4px;
+  opacity: 0.75;
 }
 
 .float {
   position: absolute;
-  top: 30%;
-  left: 50%;
-  z-index: 2;
+  z-index: 5;
   font-family: var(--font-system);
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   pointer-events: none;
-  text-shadow: 0 1px 2px #000;
+  text-shadow: 0 1px 3px #000;
   white-space: nowrap;
-  animation: float-up 1s ease-out forwards;
 }
 
 .float--hit {
@@ -1856,29 +1935,228 @@ a.segmented-option {
 
 .float--crit {
   color: var(--gold);
-  font-size: 19px;
+  font-size: 22px;
 }
 
 .float--tick,
 .float--effect {
-  color: var(--gold);
-  font-size: 12px;
+  color: #c5e38f;
+  font-size: 13px;
 }
 
 .float--dodge {
   color: var(--system);
+  font-size: 14px;
+}
+
+.arena-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 6;
+  padding: 8px 16px;
+  border: 1px solid var(--system-line);
+  background: rgba(13, 17, 11, 0.92);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.9);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.arena-banner--shown {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.arena-banner[data-result='true'] {
+  border-color: rgba(167, 196, 127, 0.7);
+  color: var(--leaf);
+}
+
+.arena-banner[data-result='false'] {
+  border-color: rgba(239, 154, 133, 0.7);
+  color: var(--danger);
+}
+
+.fight-view {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fight-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 2px var(--gutter) 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.fight-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.fight-tab {
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--bark-line);
+  border-bottom: 3px solid var(--leaf);
+  background: var(--bg-deep);
+  color: var(--text);
+  font-family: var(--font-system);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.fight-tab--false {
+  border-bottom-color: var(--danger);
+}
+
+.fight-tab--null {
+  border-bottom-color: var(--gold);
+}
+
+.fight-tab[aria-selected='true'] {
+  border-color: var(--system);
+  background: rgba(143, 227, 239, 0.14);
+  color: var(--system-text);
+}
+
+.fight-tab-key {
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  color: var(--gold);
+  font-size: 10px;
+}
+
+.fight-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fight-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.fight-meta,
+.fight-outcome {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.fight-outcome {
+  font-family: var(--font-system);
   font-size: 12px;
 }
 
-@keyframes float-up {
-  from {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-50%, -26px);
-  }
+.fight-outcome--true {
+  color: var(--leaf);
+}
+
+.fight-outcome--false {
+  color: var(--danger);
+}
+
+.fight-pager {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fight-pager .button {
+  width: 100%;
+}
+
+.chip--key {
+  border-color: rgba(217, 180, 90, 0.6);
+  color: var(--gold);
+  font-size: 11px;
+}
+
+.chip--elite {
+  border-color: rgba(224, 160, 60, 0.7);
+  color: #e0a03c;
+  font-size: 11px;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  border-bottom: 1px dashed currentColor;
+  background: none;
+  font: inherit;
+  text-align: right;
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--system-line);
+  background: var(--system-fill);
+}
+
+.preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-system);
+  font-size: 14px;
+  list-style: none;
+}
+
+.preview-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.preview-up .num {
+  color: var(--leaf);
+}
+
+.preview-down .num {
+  color: var(--danger);
+}
+
+.toggle {
+  min-width: 112px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--bark-line);
+  background: var(--bg-deep);
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.toggle[aria-checked='true'] {
+  border-color: var(--system);
+  background: rgba(143, 227, 239, 0.14);
+  color: var(--system-text);
 }
 
 .arena-controls {
@@ -2077,12 +2355,17 @@ a.segmented-option {
   letter-spacing: 0.08em;
 }
 
+/* With reduced motion the pulsing and sliding stop; the fight playback stays,
+   in a calmer form (see arena.js). */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  .activity--done {
+    animation: none;
+  }
+
+  .meter-fill,
+  .bar-fill,
+  .portrait-art,
+  .arena-banner {
+    transition: none;
   }
 }

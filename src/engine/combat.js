@@ -51,7 +51,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       damage(unit, amount, dot.source);
       dot.ticks -= 1;
       const vars = { target: unit.name, effect: dot.name, damage: amount };
-      log({ t, kind: 'tick', target: unit.id, effect: dot.name, damage: amount, hp: unit.hp, text: say(texts, 'effectTick', actions, vars) });
+      log({ t, kind: 'tick', target: unit.id, effect: dot.name, element: dot.element, damage: amount, hp: unit.hp, text: say(texts, 'effectTick', actions, vars) });
       if (unit.hp === 0) log({ t, kind: 'kill', target: unit.id, hp: 0, text: say(texts, 'kill', actions, vars) });
     }
     unit.dots = unit.dots.filter((dot) => dot.ticks > 0);
@@ -102,7 +102,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
             source: actor.id,
           });
         }
-        log({ t, kind: 'effect', actor: actor.id, target: target.id, effect: effect.name, hp: target.hp, text: say(texts, 'effectApplied', actions, { ...vars, effect: effect.name }) });
+        log({ t, kind: 'effect', actor: actor.id, target: target.id, effect: effect.name, element: effect.element, hp: target.hp, text: say(texts, 'effectApplied', actions, { ...vars, effect: effect.name }) });
       }
     }
   };

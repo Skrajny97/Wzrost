@@ -1,9 +1,9 @@
 [
-  { "id": "common", "name": "pospolity", "affixes": 0, "color": "#a39e8e", "dropWeight": 700, "budget": 1.0 },
-  { "id": "rare", "name": "rzadki", "affixes": 1, "color": "#7fae5c", "dropWeight": 220, "budget": 1.2 },
-  { "id": "unique", "name": "unikalny", "affixes": 2, "color": "#5fa3d6", "dropWeight": 60, "budget": 1.45 },
-  { "id": "epic", "name": "epicki", "affixes": 3, "color": "#a87fd6", "dropWeight": 16, "budget": 1.75 },
-  { "id": "legendary", "name": "legendarny", "affixes": 4, "color": "#e0a03c", "dropWeight": 3, "budget": 2.1 },
-  { "id": "mythic", "name": "mityczny", "affixes": 5, "color": "#d64561", "dropWeight": 0.5, "budget": 2.5 },
-  { "id": "divine", "name": "boski", "affixes": 6, "color": "#f2d675", "dropWeight": 0.1, "budget": 3.0 }
+  { "id": "common", "name": "pospolity", "affixes": 0, "color": "#9b9b9b", "dropWeight": 700, "budget": 1.0 },
+  { "id": "rare", "name": "rzadki", "affixes": 1, "color": "#7fae5c", "dropWeight": 220, "budget": 1.35 },
+  { "id": "unique", "name": "unikalny", "affixes": 2, "color": "#5fa3d6", "dropWeight": 60, "budget": 1.7 },
+  { "id": "epic", "name": "epicki", "affixes": 3, "color": "#a87fd6", "dropWeight": 16, "budget": 2.1 },
+  { "id": "legendary", "name": "legendarny", "affixes": 4, "color": "#e0a03c", "dropWeight": 3, "budget": 2.6 },
+  { "id": "mythic", "name": "mityczny", "affixes": 5, "color": "#d64561", "dropWeight": 0.5, "budget": 3.2 },
+  { "id": "divine", "name": "boski", "affixes": 6, "color": "#f2d675", "dropWeight": 0.1, "budget": 4.0 }
 ]

@@ -10,34 +10,53 @@ import { fileURLToPath } from 'node:url';
 import * as engine from '../src/engine/index.js';
 import { loadData } from './validate-data.mjs';
 
-const DEFAULT_SLOTS = { head: 'hood', hands: 'gloves', feet: 'boots', amulet: 'amulet', ring: 'ring', talisman: 'talisman' };
-const HEAVY_SLOTS = { head: 'helmet' };
+// Gear a typical character has: a character starts with nothing, finds about
+// two items an hour and loot favours empty slots, so slots fill in this order
+// over the first levels (common items of the level before). From level 6 on
+// every slot is filled, and rare items with the class's main stat replace the
+// common ones slot by slot until level 11.
+const KIT = {
+  warrior: { chest: 'chainmail', offhand: 'shield', head: 'helmet' },
+  archer: { chest: 'tunic', offhand: 'quiver', head: 'hood' },
+  mage: { chest: 'robe', offhand: 'focus', head: 'hood' },
+  cleric: { chest: 'robe', offhand: 'shield', head: 'hood' },
+  shadow: { chest: 'tunic', offhand: 'quiver', head: 'hood' },
+};
+const SLOT_ORDER = ['weapon', 'chest', 'offhand', 'head', 'feet', 'hands', 'amulet', 'ring', 'talisman'];
+const SLOTS_BY_LEVEL = [0, 0, 1, 3, 5, 7];
+const OTHER_BASES = { feet: 'boots', hands: 'gloves', amulet: 'amulet', ring: 'ring', talisman: 'talisman' };
 
-// A level-L character as a typical player would have it: points spent by class,
-// class level a little behind, and rare items of level L-1 in every slot, each
-// with the affix of the class's main stat (only the starting items at level 1).
 export function typicalCharacter(classId, level, content) {
   const cls = content.classesById[classId];
-  const classLevel = Math.max(1, Math.round(level * 0.9));
+  const classLevel = typicalClassLevel(level, content);
   const character = { classId, level, classLevel, points: {}, position: cls.position, xp: 0, classXp: 0 };
   character.points = engine.autoDistribute(character, content);
   const mainStat = Object.entries(cls.autoPoints).sort((a, b) => b[1] - a[1])[0][0];
   const affixIds = [content.prefixes.find((affix) => affix.stat === mainStat).id];
   const rng = engine.createRng(`gear:${classId}:${level}`);
-  const item = (baseId, element) =>
-    level === 1
-      ? engine.generateItem({ baseId, level: 1, element }, rng, content)
-      : engine.generateItem({ baseId, level: level - 1, rarityId: 'rare', element, affixIds }, rng, content);
-
-  const equipped = cls.startingItems.map((start) => item(start.base, start.element));
-  if (level > 1) {
-    const taken = new Set(equipped.map((equippedItem) => equippedItem.slot));
-    const extra = { ...DEFAULT_SLOTS, ...(cls.position === 'front' ? HEAVY_SLOTS : {}) };
-    for (const [slot, baseId] of Object.entries(extra)) {
-      if (!taken.has(slot)) equipped.push(item(baseId));
-    }
-  }
+  const itemLevel = Math.max(1, level - 1);
+  const bases = { weapon: cls.weapons[0], ...KIT[classId], ...OTHER_BASES };
+  const slots = SLOT_ORDER.slice(0, SLOTS_BY_LEVEL[level] ?? SLOT_ORDER.length);
+  const rareSlots = Math.round(SLOT_ORDER.length * Math.min(1, Math.max(0, level - 5) / 6));
+  const equipped = slots.map((slot, index) =>
+    index < rareSlots
+      ? engine.generateItem({ baseId: bases[slot], level: itemLevel, rarityId: 'rare', affixIds }, rng, content)
+      : engine.generateItem({ baseId: bases[slot], level: itemLevel }, rng, content),
+  );
   return { character, equipped };
+}
+
+// The class level a character usually has at a character level: class levels
+// need less XP, so they run ahead. Found by adding up the XP of both tables.
+export function typicalClassLevel(level, content) {
+  let total = 0;
+  for (let l = 1; l < level; l++) total += engine.xpToNext(l, content);
+  let classLevel = 1;
+  while (total >= engine.classXpToNext(classLevel, content)) {
+    total -= engine.classXpToNext(classLevel, content);
+    classLevel += 1;
+  }
+  return classLevel;
 }
 
 // Regions from the data, plus generated stand-ins for levels without content
@@ -85,7 +104,7 @@ export function simulateMany({ classId, level, minutes, hunts }, content) {
     itemsPerHour: totals.items / hours,
     endHp: totals.endHp / hunts,
     hoursToLevel: engine.xpToNext(level, content) / Math.max(1e-9, netXpPerHour),
-    targetHours: level ** content.balance.progression.hoursExponent,
+    targetHours: engine.huntingHours(level, content),
   };
 }
 

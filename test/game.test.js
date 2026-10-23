@@ -31,6 +31,7 @@ describe('content', () => {
     assert.equal(data.regions[0].name, 'Wiatrołomy');
     assert.equal(data.stats.length, 8);
     assert.equal(data.unlocks.find((unlock) => unlock.id === 'professions').level, 6);
+    assert.match(data.elements.find((element) => element.id === 'fire').color, /^#[0-9a-f]{6}$/);
   });
 });
 
@@ -47,7 +48,7 @@ describe('character creation', () => {
     assert.equal((await call('GET', '/api/character')).status, 401);
   });
 
-  test('creates a level 1 character with full HP and starting gear on', async () => {
+  test('creates a level 1 character with full HP and no items', async () => {
     const { status, data } = await newCharacter(cookie, 'warrior', '  Mira   z Boru ');
     assert.equal(status, 201);
     const character = data.character;
@@ -56,13 +57,23 @@ describe('character creation', () => {
     assert.equal(character.level, 1);
     assert.equal(character.hp, character.maxHp);
     assert.equal(character.freePoints, 0);
-    assert.equal(character.equipment.weapon.name, 'Miecz');
-    assert.equal(character.equipment.core, null);
-    assert.equal(Object.values(character.equipment).filter(Boolean).length, 6);
+    assert.deepEqual(Object.values(character.equipment).filter(Boolean), []);
     assert.deepEqual(character.bag, []);
+    assert.match(character.combat.damage, /^\d+–\d+$/);
     assert.equal(character.stats.find((stat) => stat.id === 'strength').sources.class, 8);
     assert.equal(character.stats.find((stat) => stat.id === 'vitality').perPoint.maxHp, 5);
-    assert.ok(character.hoursToNext > 0.9 && character.hoursToNext <= 1);
+    assert.ok(character.hoursToNext > 0.4 && character.hoursToNext < 0.7);
+  });
+
+  test('"Zacznij od nowa" removes the character, so a new one can be made', async () => {
+    await newCharacter(cookie, 'mage');
+    await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 5 } });
+    const removed = await call('DELETE', '/api/character', { cookie });
+    assert.equal(removed.status, 200);
+    assert.equal((await call('GET', '/api/character', { cookie })).data.error.code, 'no_character');
+    const rows = await (await db()).prepare('SELECT (SELECT COUNT(*) FROM characters) AS c, (SELECT COUNT(*) FROM activities) AS a').first();
+    assert.deepEqual(rows, { c: 0, a: 0 });
+    assert.equal((await newCharacter(cookie, 'archer', 'Druga')).status, 201);
   });
 
   test('allows one character per account and checks the input', async () => {
@@ -117,34 +128,50 @@ describe('free points', () => {
 describe('equipment', () => {
   let cookie;
   let bagItemId;
+  let swordId;
+  let mailId;
+  const addItem = async (item) => {
+    const result = await (await db())
+      .prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters')
+      .bind(JSON.stringify(item))
+      .run();
+    return result.meta.last_row_id;
+  };
   beforeEach(async () => {
     cookie = await signUp();
     await newCharacter(cookie, 'warrior');
-    const item = { base: 'axe', slot: 'weapon', level: 2, rarity: 'rare', affixes: [{ id: 'bear', kind: 'prefix', stat: 'strength', value: 3 }], damage: { min: 8, max: 14 } };
-    const result = await (await db())
-      .prepare("INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters")
-      .bind(JSON.stringify(item))
-      .run();
-    bagItemId = result.meta.last_row_id;
+    swordId = await addItem({ base: 'sword', slot: 'weapon', level: 1, rarity: 'common', affixes: [], damage: { min: 7, max: 10 } });
+    mailId = await addItem({ base: 'chainmail', slot: 'chest', level: 1, rarity: 'common', affixes: [], armor: 15 });
+    bagItemId = await addItem({ base: 'axe', slot: 'weapon', level: 2, rarity: 'rare', affixes: [{ id: 'bear', kind: 'prefix', stat: 'strength', value: 3 }], damage: { min: 8, max: 14 } });
   });
 
   test('wearing an item puts the previous one in the bag', async () => {
+    await call('POST', `/api/items/${swordId}/equip`, { cookie });
     const { data } = await call('POST', `/api/items/${bagItemId}/equip`, { cookie });
     assert.equal(data.character.equipment.weapon.name, 'Niedźwiedzi Topór');
     assert.equal(data.character.equipment.weapon.rarityName, 'rzadki');
-    assert.deepEqual(data.character.bag.map((item) => item.name), ['Miecz']);
+    assert.deepEqual(data.character.bag.map((item) => item.name), ['Kolczuga', 'Miecz']);
     const strength = data.character.stats.find((stat) => stat.id === 'strength');
     assert.equal(strength.sources.equipment, 3);
   });
 
   test('taking off and throwing away', async () => {
-    const worn = (await call('GET', '/api/character', { cookie })).data.character.equipment.chest;
+    const worn = (await call('POST', `/api/items/${mailId}/equip`, { cookie })).data.character.equipment.chest;
     const off = await call('POST', `/api/items/${worn.id}/unequip`, { cookie });
     assert.equal(off.data.character.equipment.chest, null);
     assert.equal((await call('POST', `/api/items/${worn.id}/discard`, { cookie })).status, 200);
-    const sword = (await call('GET', '/api/character', { cookie })).data.character.equipment.weapon;
-    assert.equal((await call('POST', `/api/items/${sword.id}/discard`, { cookie })).data.error.code, 'equipped');
+    await call('POST', `/api/items/${swordId}/equip`, { cookie });
+    assert.equal((await call('POST', `/api/items/${swordId}/discard`, { cookie })).data.error.code, 'equipped');
     assert.equal((await call('POST', '/api/items/99999/equip', { cookie })).status, 404);
+  });
+
+  test('a preview shows what wearing an item changes', async () => {
+    const { data } = await call('GET', `/api/items/${mailId}/preview`, { cookie });
+    assert.equal(data.equipped, false);
+    assert.ok(data.after.reduction > data.now.reduction);
+    assert.equal(data.after.damage, data.now.damage);
+    const weapon = (await call('GET', `/api/items/${bagItemId}/preview`, { cookie })).data;
+    assert.ok(weapon.after.damageAverage > weapon.now.damageAverage);
   });
 
   test("another player's items are out of reach", async () => {
@@ -168,6 +195,11 @@ describe('hunts and reports', () => {
     assert.deepEqual(Object.keys(data.regions[0].threat), ['5', '15', '30', '60', '120', '240']);
     assert.equal(data.regions[0].threat['5'], 'low');
     assert.equal(data.regions[1].threat['240'], 'very-high');
+
+    const one = await call('GET', '/api/hunts/options?region=windfalls', { cookie });
+    assert.deepEqual(one.data.regions.map((region) => region.id), ['windfalls']);
+    assert.deepEqual(one.data.regions[0].threat, data.regions[0].threat);
+    assert.equal((await call('GET', '/api/hunts/options?region=moon', { cookie })).status, 400);
   });
 
   test('a hunt runs on server time and pays out once, after it ends', async () => {
@@ -196,7 +228,8 @@ describe('hunts and reports', () => {
     assert.equal(report.regionName, 'Wiatrołomy');
     assert.ok(['success', 'escaped'].includes(report.result));
     assert.ok(report.summary.xp > 0);
-    assert.ok(report.keyFight.events.length > 0);
+    assert.ok(report.fights[report.keyFight.index].events.length > 0);
+    assert.ok(report.fights.every((fight) => fight.allies.length === 1 && fight.enemies.length >= 1));
     assert.equal(character.activity, null);
     assert.equal(character.gold, report.summary.gold);
     assert.equal(character.bag.length, report.items.length);
@@ -210,6 +243,25 @@ describe('hunts and reports', () => {
     assert.deepEqual(again.data.report.summary, report.summary);
     assert.equal((await call('GET', '/api/reports/999999', { cookie })).status, 404);
     assert.equal((await call('POST', '/api/hunts/claim', { cookie })).data.error.code, 'no_activity');
+  });
+
+  test('the claim keeps only the 50 newest reports', async () => {
+    const database = await db();
+    await database
+      .prepare(
+        `WITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM n WHERE i < 55)
+         INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data)
+         SELECT (SELECT id FROM characters), 'old:' || i, 'hunt', i, '{}', '{}' FROM n`,
+      )
+      .run();
+    await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 5 } });
+    await finishHunt();
+    const { data } = await call('POST', '/api/hunts/claim', { cookie });
+    const rows = await database.prepare('SELECT COUNT(*) AS count, MAX(id) AS newest, MIN(created_at) AS oldest FROM reports').first();
+    assert.equal(rows.count, 50);
+    assert.equal(rows.newest, data.report.id);
+    // The 49 newest of the old ones stay: 7 to 55.
+    assert.equal(rows.oldest, 7);
   });
 
   test('level 1 hunts are short; long ones open at level 2', async () => {

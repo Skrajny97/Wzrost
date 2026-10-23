@@ -1,10 +1,10 @@
 [
-  { "id": "fire", "name": "ogień", "resistance": "Odporność na ogień" },
-  { "id": "frost", "name": "mróz", "resistance": "Odporność na mróz" },
-  { "id": "water", "name": "woda", "resistance": "Odporność na wodę" },
-  { "id": "lightning", "name": "elektryczność", "resistance": "Odporność na elektryczność" },
-  { "id": "earth", "name": "ziemia", "resistance": "Odporność na ziemię" },
-  { "id": "nature", "name": "natura", "resistance": "Odporność na naturę" },
-  { "id": "poison", "name": "trucizna", "resistance": "Odporność na truciznę" },
-  { "id": "sacred", "name": "sakrum", "resistance": "Odporność na sakrum" }
+  { "id": "fire", "name": "ogień", "resistance": "Odporność na ogień", "color": "#ff8a3d" },
+  { "id": "frost", "name": "mróz", "resistance": "Odporność na mróz", "color": "#8fd3ff" },
+  { "id": "water", "name": "woda", "resistance": "Odporność na wodę", "color": "#4fa3e0" },
+  { "id": "lightning", "name": "elektryczność", "resistance": "Odporność na elektryczność", "color": "#f2e36b" },
+  { "id": "earth", "name": "ziemia", "resistance": "Odporność na ziemię", "color": "#c49a6c" },
+  { "id": "nature", "name": "natura", "resistance": "Odporność na naturę", "color": "#8bc34a" },
+  { "id": "poison", "name": "trucizna", "resistance": "Odporność na truciznę", "color": "#9ccc65" },
+  { "id": "sacred", "name": "sakrum", "resistance": "Odporność na sakrum", "color": "#f2d675" }
 ]

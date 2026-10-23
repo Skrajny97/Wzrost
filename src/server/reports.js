@@ -3,14 +3,15 @@
 import { requirePlayer } from './characters.js';
 import { ApiError, json } from './http.js';
 
-const PAGE_SIZE = 50;
+// The journal shows the newest reports, and the claim of a hunt removes older ones.
+export const KEPT_REPORTS = 50;
 
 export async function listReports(context) {
   const { player } = await requirePlayer(context);
   const { results } = await context.env.DB.prepare(
     'SELECT id, created_at, summary FROM reports WHERE character_id = ? ORDER BY id DESC LIMIT ?',
   )
-    .bind(player.row.id, PAGE_SIZE)
+    .bind(player.row.id, KEPT_REPORTS)
     .all();
   return json({
     reports: results.map((row) => ({ id: row.id, createdAt: row.created_at, ...JSON.parse(row.summary) })),

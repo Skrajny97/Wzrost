@@ -33,13 +33,20 @@ export function mountCombat(container, { navigate }) {
   let progress = null;
   let shownFinished = null;
 
+  // One region per request, one after another, so each stays within the
+  // server's CPU limit.
   async function loadOptions() {
-    const key = `${state.character.level}:${state.character.hp}:${state.character.maxHp}`;
+    const character = state.character;
+    const key = `${character.level}:${character.hp}:${character.maxHp}:${JSON.stringify(character.stats.map((stat) => stat.total))}`;
     if (optionsFor === key) return;
     optionsFor = key;
     try {
-      options = await call('GET', '/api/hunts/options');
-      render();
+      for (const region of state.content.regions) {
+        const { regions } = await call('GET', `/api/hunts/options?region=${encodeURIComponent(region.id)}`);
+        if (optionsFor !== key) return;
+        options = { regions: [...(options?.regions ?? []).filter((known) => known.id !== region.id), ...regions] };
+        render();
+      }
     } catch (error) {
       toast(error.message);
     }
@@ -140,10 +147,16 @@ export function mountCombat(container, { navigate }) {
 
   function huntList(character) {
     const first = character.level === 1 && character.xp === 0 && character.gold === 0;
+    const unarmed = !character.equipment.weapon;
     return h(
       'div',
       { class: 'stack' },
-      first && systemPanel('Wiatrołomy są bezpieczne na start. Wybierz czas i wyrusz. Raport przeczytasz po powrocie.'),
+      first
+        ? systemPanel(
+            'Wiatrołomy to najbezpieczniejsze miejsce na start. Wybierz czas i wyrusz. Raport przeczytasz po powrocie.',
+            'Nie masz jeszcze ekwipunku. Pierwszy pokonany przeciwnik zostawi broń Twojej klasy.',
+          )
+        : unarmed && systemPanel('Walczysz gołymi rękami. Załóż broń z plecaka w zakładce Postać, jeśli już ją masz.'),
       state.content.regions.map((region) => regionCard(region, character)),
     );
   }

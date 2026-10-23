@@ -1,6 +1,8 @@
 // Items: a base plus affixes that share a stat budget set by the item level
-// and rarity. Names follow the Gladiatus pattern "Prefix Base Suffix", with the
-// prefix agreeing with the base's grammatical gender.
+// and rarity. The base always gets the budget of the lowest rarity, so a rarer
+// item is never weaker at its core; the affixes share what the rarity adds.
+// Names follow the Gladiatus pattern "Prefix Base Suffix", with the prefix
+// agreeing with the base's grammatical gender.
 
 import { budget, weaponDamage } from './formulas.js';
 
@@ -10,7 +12,7 @@ export function generateItem({ baseId, level, rarityId = 'common', element, affi
   const rarity = content.raritiesById[rarityId];
   const tuning = content.balance.items;
   const total = budget(level, rarity.budget, content.balance);
-  const baseShare = total / (1 + tuning.affixWeight * rarity.affixes);
+  const baseShare = budget(level, content.rarities[0].budget, content.balance);
   const affixShare = rarity.affixes > 0 ? (total - baseShare) / rarity.affixes : 0;
 
   const item = { base: base.id, slot: base.slot, level, rarity: rarity.id, affixes: [] };
@@ -57,8 +59,18 @@ export function rollRarity(rng, content, bonus = 1) {
   return rng.weighted(content.rarities, (rarity) => rarity.dropWeight * (rarity.affixes > 0 ? bonus : 1)).id;
 }
 
-export function randomItem(level, rng, content, { rarityBonus = 1 } = {}) {
-  const base = rng.pick(content.bases);
+// Loot favours the slots the character has empty, and while it has no weapon
+// a weapon is always one of its class. `filled` is the set of slots already
+// covered (worn, or found earlier in the same hunt); found items are added.
+export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId } = {}) {
+  let base;
+  if (filled && classId && !filled.has('weapon')) {
+    base = content.basesById[rng.pick(content.classesById[classId].weapons)];
+  } else {
+    const weight = content.balance.items.emptySlotWeight;
+    base = rng.weighted(content.bases, (candidate) => (filled && !filled.has(candidate.slot) ? weight : 1));
+  }
+  filled?.add(base.slot);
   return generateItem({ baseId: base.id, level, rarityId: rollRarity(rng, content, rarityBonus) }, rng, content);
 }
 

@@ -2,7 +2,7 @@
 
 Solowa, casualowa gra przeglądarkowa litRPG na telefon, oparta na timerach. Jedynym źródłem prawdy o projekcie jest [dokument projektowy](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX). Założenia przyjęte w trakcie budowy są w [DECISIONS.md](DECISIONS.md).
 
-Stan: **Etap 1, rdzeń.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, statystyki z wolnymi punktami, ekwipunek i plecak, polowania na czasie serwera w dwóch regionach Skraju Puszczy, walka do trzech na trzech, raport z animacją najważniejszej walki, omdlenie i Dziennik.
+Stan: **Etap 1, rdzeń, po pierwszych uwagach autora.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, statystyki z wolnymi punktami, ekwipunek i plecak z podglądem zmian, polowania na czasie serwera w dwóch regionach Skraju Puszczy, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik i „Zacznij od nowa”.
 
 ## Adres gry
 
@@ -119,20 +119,22 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/auth/login` | logowanie: `identifier` (login lub e-mail), `password` |
 | POST | `/api/auth/logout` | wylogowanie |
 | GET | `/api/me` | zalogowany gracz |
-| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości i regionów, czasy polowań, odblokowania |
+| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości, żywiołów i regionów, czasy polowań, odblokowania |
 | GET | `/api/character` | pełny widok postaci (404 `no_character`, gdy jej nie ma) |
 | POST | `/api/character` | nowa postać: `name`, `classId` |
+| DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami i wyprawą |
 | POST | `/api/character/points` | rozdanie punktów: `points`, np. `{ "strength": 2 }` |
 | POST | `/api/character/points/auto` | „Rozdaj według klasy” |
 | POST | `/api/character/points/reset` | darmowe zerowanie punktów (do poziomu 10) |
+| GET | `/api/items/:id/preview` | wartości bojowe teraz i po założeniu (albo zdjęciu) przedmiotu |
 | POST | `/api/items/:id/equip` | załóż przedmiot z plecaka |
 | POST | `/api/items/:id/unequip` | zdejmij przedmiot do plecaka |
 | POST | `/api/items/:id/discard` | wyrzuć przedmiot z plecaka |
-| GET | `/api/hunts/options` | poziom zagrożenia dla każdego regionu i czasu |
+| GET | `/api/hunts/options` | poziom zagrożenia dla każdego regionu i czasu; `?region=<id>` liczy tylko jeden region |
 | POST | `/api/hunts` | wyrusz: `regionId`, `minutes` |
 | POST | `/api/hunts/cancel` | przerwij trwające polowanie |
 | POST | `/api/hunts/claim` | odbierz raport zakończonego polowania |
-| GET | `/api/reports` | 50 ostatnich raportów (Dziennik) |
+| GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |
 | GET | `/api/reports/:id` | pełny raport |
 
 Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie `message` jest po polsku.

@@ -12,8 +12,9 @@ import { mountJournal } from './screens/journal.js';
 import { lockedScreen } from './screens/locked.js';
 import { mountReport } from './screens/report.js';
 import { mountStats } from './screens/stats.js';
+import { playSound, setSoundEnabled, soundEnabled, unlockSound } from './sound.js';
 import { call, handleSessionLost, onCharacterChange, serverNow, state } from './state.js';
-import { closeSheet, initSheet, openSheet, toast } from './ui.js';
+import { closeSheet, confirmAction, initSheet, openSheet, toast } from './ui.js';
 
 const views = {
   loading: $('#view-loading'),
@@ -155,6 +156,18 @@ window.addEventListener('hashchange', route);
 
 function openSettings() {
   const version = h('dd', { text: '…' });
+  const soundToggle = h('button', {
+    type: 'button',
+    class: 'toggle',
+    role: 'switch',
+    'aria-checked': soundEnabled(),
+    onClick: () => {
+      setSoundEnabled(!soundEnabled());
+      soundToggle.setAttribute('aria-checked', String(soundEnabled()));
+      soundToggle.textContent = soundEnabled() ? 'Włączony' : 'Wyłączony';
+    },
+    text: soundEnabled() ? 'Włączony' : 'Wyłączony',
+  });
   openSheet(
     h('h2', { class: 'sheet-title', text: 'Ustawienia' }),
     h(
@@ -162,10 +175,13 @@ function openSettings() {
       { class: 'status-list' },
       h('div', { class: 'status-row' }, h('dt', { text: 'Konto' }), h('dd', { text: state.user.login })),
       h('div', { class: 'status-row' }, h('dt', { text: 'Postać' }), h('dd', { text: state.character.name })),
+      h('div', { class: 'status-row' }, h('dt', { id: 'sound-label', text: 'Dźwięk' }), h('dd', {}, soundToggle)),
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
     ),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
+    h('button', { type: 'button', class: 'button button--danger', onClick: startOver, text: 'Zacznij od nowa' }),
   );
+  soundToggle.setAttribute('aria-labelledby', 'sound-label');
   request('GET', '/api/health')
     .then((health) => {
       version.textContent = health.version;
@@ -184,6 +200,28 @@ async function logout(event) {
   } catch (error) {
     toast(error.message);
     button.disabled = false;
+  }
+}
+
+// Removes the character after a question; the account stays.
+async function startOver() {
+  const sure = await confirmAction({
+    title: 'Zacząć od nowa?',
+    text: `${state.character.name} zniknie na zawsze razem z przedmiotami, złotem i raportami. Konto zostaje, a zaraz potem stworzysz nową postać.`,
+    confirmLabel: 'Usuń postać',
+    danger: true,
+  });
+  if (!sure) return;
+  try {
+    await call('DELETE', '/api/character');
+    clearInterval(ticker);
+    current?.screen.unmount?.();
+    current = null;
+    state.character = null;
+    history.replaceState(null, '', HOME);
+    await enterGame();
+  } catch (error) {
+    toast(error.message);
   }
 }
 
@@ -275,6 +313,20 @@ bindForm($('#login-form'), (data) => request('POST', '/api/auth/login', data));
 bindForm($('#register-form'), (data) => request('POST', '/api/auth/register', data));
 
 $('#retry-button').addEventListener('click', start);
+
+// Sound: unlocked by the first touch, then a soft tap for buttons and a
+// different one for changing tabs.
+document.addEventListener('pointerdown', unlockSound, { capture: true });
+document.addEventListener(
+  'click',
+  (event) => {
+    const target = event.target.closest('button, a');
+    if (!target || target.disabled || target.closest('.arena')) return;
+    const tab = target.matches('.nav-item, .segmented-option, [role="tab"]');
+    playSound(tab ? 'tab' : 'tap');
+  },
+  { capture: true },
+);
 
 initSheet();
 start();

@@ -1,29 +1,58 @@
-// The key fight of a report, played back: enemies in a line at the top, the
-// party at the bottom, fields labelled przód, środek and tył. Strikes are
-// simple animations between the portraits; the text log runs underneath and
-// "+" opens the participants' stats.
+// A fight of a report, played back: enemies in a line at the top, the party
+// at the bottom, fields labelled przód, środek and tył. Every strike travels
+// between the portraits: a blow lunges at the target, an arrow or a spell
+// flies to it, and the hit flashes with the damage. The text log runs
+// underneath and "+" opens the participants' stats.
 
 import { h, icon } from './dom.js';
 import { CLASS_ICONS } from './icons.js';
+import { playSound } from './sound.js';
+import { state } from './state.js';
 
 const FIELDS = [
   ['front', 'przód'],
   ['middle', 'środek'],
   ['back', 'tył'],
 ];
-const DELAYS = { hit: 700, crit: 850, dodge: 650, effect: 500, tick: 500, kill: 550 };
+const RESULTS = { true: 'Zwycięstwo', false: 'Porażka', null: 'Odwrót' };
+const SPEED_KEY = 'wzrost.fight-speed';
+const HIT_COLOR = 'rgba(239, 154, 133, 0.95)';
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export function createArena(fight) {
+function loadSpeed() {
+  try {
+    return localStorage.getItem(SPEED_KEY) === '2' ? 2 : 1;
+  } catch {
+    return 1;
+  }
+}
+
+function saveSpeed(speed) {
+  try {
+    localStorage.setItem(SPEED_KEY, String(speed));
+  } catch {
+    // Without storage the tempo is forgotten with the page.
+  }
+}
+
+const elementColor = (id) => state.content?.elements?.find((element) => element.id === id)?.color ?? '#8fe3ef';
+
+export function createArena(fight, { autoplay = 'visible' } = {}) {
   const units = [...fight.enemies, ...fight.allies];
+  const byId = new Map(units.map((unit) => [unit.id, unit]));
   const cards = new Map();
-  let timer = null;
+  const running = new Set();
+  let run = 0;
   let index = 0;
+  let speed = loadSpeed();
 
+  const fx = h('div', { class: 'arena-fx', 'aria-hidden': 'true' });
+  const banner = h('div', { class: 'arena-banner', 'aria-hidden': 'true' });
   const log = h('ol', { class: 'fight-log', 'aria-label': 'Przebieg walki' });
   const controls = h('div', { class: 'arena-controls' });
-  const statsBox = h('div', { class: 'participants', hidden: true });
+  const statsBox = h('div', { class: 'participants', hidden: true }, participantsTable(units));
 
   function unitCard(unit) {
     const hpFill = h('div', { class: 'unit-hp-fill' });
@@ -43,7 +72,7 @@ export function createArena(fight) {
       hpText,
       status,
     );
-    cards.set(unit.id, { card, hpFill, hpText, status, unit, hp: unit.hp });
+    cards.set(unit.id, { card, hpFill, hpText, status, unit });
     return card;
   }
 
@@ -62,94 +91,318 @@ export function createArena(fight) {
     );
   }
 
-  const arena = h('div', { class: 'arena' }, row('enemy', fight.enemies), row('ally', fight.allies));
+  const arena = h('div', { class: 'arena' }, row('enemy', fight.enemies), row('ally', fight.allies), fx, banner);
+
+  // Animations through the Web Animations API, so they can all be cancelled.
+  function animate(element, keyframes, options) {
+    const animation = element.animate(keyframes, { ...options, duration: options.duration / speed });
+    running.add(animation);
+    return animation.finished.catch(() => {}).finally(() => running.delete(animation));
+  }
+
+  function centerOf(element) {
+    const box = element.getBoundingClientRect();
+    const frame = arena.getBoundingClientRect();
+    return { x: box.left - frame.left + box.width / 2, y: box.top - frame.top + box.height / 2 };
+  }
 
   function setHp(id, hp) {
     const entry = cards.get(id);
     if (!entry) return;
-    entry.hp = hp;
     entry.hpFill.style.width = `${Math.max(0, (hp / entry.unit.maxHp) * 100)}%`;
     entry.hpText.textContent = `${hp} / ${entry.unit.maxHp}`;
-    entry.card.classList.toggle('unit--down', hp <= 0);
   }
 
-  function flash(element, className) {
-    element.classList.remove(className);
-    // Reading the size restarts the CSS animation.
-    void element.offsetWidth;
-    element.classList.add(className);
+  function setDown(id, down) {
+    cards.get(id)?.card.classList.toggle('unit--down', down);
   }
 
   function float(id, text, kind) {
     const entry = cards.get(id);
-    if (!entry || reducedMotion()) return;
+    if (!entry) return;
+    const { x, y } = centerOf(entry.card);
     const bubble = h('span', { class: `float float--${kind}`, text });
-    entry.card.append(bubble);
-    setTimeout(() => bubble.remove(), 1100);
+    bubble.style.left = `${x}px`;
+    bubble.style.top = `${y - 18}px`;
+    fx.append(bubble);
+    animate(
+      bubble,
+      [
+        { transform: 'translate(-50%, 0) scale(0.7)', opacity: 0 },
+        { transform: 'translate(-50%, -8px) scale(1.15)', opacity: 1, offset: 0.2 },
+        { transform: 'translate(-50%, -34px) scale(1)', opacity: 0 },
+      ],
+      { duration: 1000, easing: 'ease-out' },
+    ).then(() => bubble.remove());
   }
 
-  function apply(event, animate) {
-    const target = cards.get(event.target);
-    const actor = cards.get(event.actor);
-    if (animate && actor && (event.kind === 'hit' || event.kind === 'crit' || event.kind === 'dodge')) {
-      flash(actor.card, actor.unit.side === 'enemy' ? 'unit--lunge-down' : 'unit--lunge-up');
+  function flash(id, color, background = 'rgba(200, 85, 61, 0.45)') {
+    const entry = cards.get(id);
+    if (!entry) return Promise.resolve();
+    return animate(
+      entry.card,
+      [
+        { boxShadow: '0 0 0 0 transparent', backgroundColor: 'rgba(13, 17, 11, 0.9)' },
+        { boxShadow: `0 0 0 3px ${color}`, backgroundColor: background, offset: 0.3 },
+        { boxShadow: '0 0 0 0 transparent', backgroundColor: 'rgba(13, 17, 11, 0.9)' },
+      ],
+      { duration: 420 },
+    );
+  }
+
+  function shake(id, distance) {
+    const entry = cards.get(id);
+    if (!entry || reducedMotion()) return Promise.resolve();
+    return animate(
+      entry.card,
+      [
+        { transform: 'translateX(0)' },
+        { transform: `translateX(${-distance}px)` },
+        { transform: `translateX(${distance * 0.8}px)` },
+        { transform: `translateX(${-distance * 0.4}px)` },
+        { transform: 'translateX(0)' },
+      ],
+      { duration: 300 },
+    );
+  }
+
+  function slash(id, strong) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    const { x, y } = centerOf(entry.card);
+    const mark = h('span', { class: `slash${strong ? ' slash--strong' : ''}` });
+    mark.style.left = `${x}px`;
+    mark.style.top = `${y}px`;
+    fx.append(mark);
+    animate(
+      mark,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.4) rotate(-20deg)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1.1) rotate(0deg)', opacity: 1, offset: 0.35 },
+        { transform: 'translate(-50%, -50%) scale(1.25) rotate(8deg)', opacity: 0 },
+      ],
+      { duration: 360, easing: 'ease-out' },
+    ).then(() => mark.remove());
+  }
+
+  // The attacker reaches the target: a lunge for blows, a projectile otherwise.
+  // A strike cut short (Pomiń, Powtórz) lands nowhere: the arena already shows
+  // another moment of the fight.
+  async function strike(actor, target, onImpact) {
+    const id = run;
+    const from = cards.get(actor.id).card;
+    const to = cards.get(target.id).card;
+    const a = centerOf(from);
+    const b = centerOf(to);
+    if (actor.strike === 'melee') {
+      const reach = reducedMotion() ? 0.3 : 0.62;
+      const dx = (b.x - a.x) * reach;
+      const dy = (b.y - a.y) * reach;
+      from.classList.add('unit--acting');
+      playSound('swing');
+      const out = from.animate(
+        [{ transform: 'translate(0, 0) scale(1)' }, { transform: `translate(${dx}px, ${dy}px) scale(1.07)` }],
+        { duration: 190 / speed, easing: 'cubic-bezier(0.5, 0, 0.75, 0.4)', fill: 'forwards' },
+      );
+      // The lunge holds its end until the way back has finished; cancelling
+      // everything (Pomiń) also cancels it, so the card never stays out.
+      running.add(out);
+      await out.finished.catch(() => {});
+      if (id !== run) return;
+      onImpact();
+      await Promise.all([
+        animate(from, [{ transform: `translate(${dx}px, ${dy}px) scale(1.07)` }, { transform: 'translate(0, 0) scale(1)' }], {
+          duration: 240,
+          easing: 'ease-out',
+        }).then(() => {
+          out.cancel();
+          running.delete(out);
+        }),
+        wait(260 / speed),
+      ]);
+      if (id === run) from.classList.remove('unit--acting');
+      return;
     }
-    if (event.kind === 'hit' || event.kind === 'crit' || event.kind === 'tick') {
-      if (animate && target) flash(target.card, event.kind === 'tick' ? 'unit--tick' : 'unit--hit');
-      if (animate) float(event.target, `−${event.damage}${event.kind === 'crit' ? '!' : ''}`, event.kind);
+
+    const magic = actor.strike === 'magic';
+    playSound(magic ? 'magic' : 'arrow');
+    await animate(from, [{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 160 });
+    if (id !== run) return;
+    const bolt = h('span', { class: `projectile projectile--${magic ? 'magic' : 'arrow'}` });
+    if (magic) bolt.style.setProperty('--fx', elementColor(actor.element));
+    fx.append(bolt);
+    const angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+    await animate(
+      bolt,
+      [
+        { transform: `translate(${a.x}px, ${a.y}px) rotate(${angle}deg) scale(0.6)`, opacity: 0 },
+        { opacity: 1, offset: 0.15 },
+        { transform: `translate(${b.x}px, ${b.y}px) rotate(${angle}deg) scale(1)`, opacity: 1 },
+      ],
+      { duration: magic ? 340 : 260, easing: 'ease-in' },
+    );
+    bolt.remove();
+    if (id !== run) return;
+    onImpact();
+    await wait(300 / speed);
+  }
+
+  async function show(event) {
+    const target = byId.get(event.target);
+    const actor = byId.get(event.actor);
+    const line = () => {
+      log.append(h('li', { class: `log-line log-line--${event.kind}`, text: event.text }));
+      log.scrollTop = log.scrollHeight;
+    };
+
+    if (event.kind === 'hit' || event.kind === 'crit') {
+      const strong = event.kind === 'crit';
+      await strike(actor, target, () => {
+        playSound(strong ? 'crit' : 'hit');
+        setHp(target.id, event.hp);
+        flash(target.id, strong ? '#e0a03c' : HIT_COLOR, strong ? 'rgba(224, 160, 60, 0.45)' : undefined);
+        shake(target.id, strong ? 8 : 5);
+        slash(target.id, strong);
+        float(target.id, strong ? `−${event.damage}!` : `−${event.damage}`, strong ? 'crit' : 'hit');
+        line();
+      });
+      return;
     }
-    if (event.kind === 'dodge' && animate) float(event.target, 'unik', 'dodge');
-    if (event.kind === 'effect' && target) {
-      target.status.textContent = event.effect;
-      if (animate) float(event.target, event.effect, 'effect');
+    if (event.kind === 'dodge') {
+      await strike(actor, target, () => {
+        playSound('dodge');
+        float(target.id, 'unik', 'dodge');
+        const card = cards.get(target.id).card;
+        if (!reducedMotion()) {
+          animate(card, [{ transform: 'translateX(0)' }, { transform: 'translateX(16px)' }, { transform: 'translateX(0)' }], {
+            duration: 300,
+            easing: 'ease-out',
+          });
+        } else {
+          flash(target.id, '#8fe3ef', 'rgba(143, 227, 239, 0.25)');
+        }
+        line();
+      });
+      return;
     }
-    if (event.hp !== undefined && target) setHp(event.target, event.hp);
+    if (event.kind === 'effect') {
+      const color = elementColor(event.element);
+      playSound('effect');
+      cards.get(target.id).status.textContent = event.effect;
+      float(target.id, event.effect, 'effect');
+      line();
+      await flash(target.id, color, 'rgba(156, 204, 101, 0.25)');
+      return;
+    }
+    if (event.kind === 'tick') {
+      const color = elementColor(event.element);
+      playSound('tick');
+      setHp(target.id, event.hp);
+      float(target.id, `−${event.damage}`, 'tick');
+      line();
+      await flash(target.id, color, 'rgba(156, 204, 101, 0.3)');
+      return;
+    }
+    if (event.kind === 'kill') {
+      const id = run;
+      playSound('kill');
+      setHp(target.id, 0);
+      line();
+      const card = cards.get(target.id).card;
+      await animate(
+        card,
+        [
+          { opacity: 1, filter: 'grayscale(0)', transform: 'scale(1)' },
+          { opacity: 0.4, filter: 'grayscale(1)', transform: 'scale(0.93)' },
+        ],
+        { duration: 420, easing: 'ease-in' },
+      );
+      if (id === run) setDown(target.id, true);
+      return;
+    }
+    line();
+  }
+
+  // The state right after an event, without animation (for "Pomiń").
+  function applyQuietly(event) {
+    if (event.hp !== undefined && byId.has(event.target)) setHp(event.target, event.hp);
+    if (event.kind === 'effect') cards.get(event.target).status.textContent = event.effect;
+    if (event.kind === 'kill') setDown(event.target, true);
     log.append(h('li', { class: `log-line log-line--${event.kind}`, text: event.text }));
-    if (animate) log.scrollTop = log.scrollHeight;
+  }
+
+  function cancelAll() {
+    run += 1;
+    for (const animation of running) animation.cancel();
+    running.clear();
+    fx.replaceChildren();
+    for (const { card } of cards.values()) card.classList.remove('unit--acting');
   }
 
   function reset() {
-    clearTimeout(timer);
+    cancelAll();
     index = 0;
     log.replaceChildren();
+    banner.classList.remove('arena-banner--shown');
     for (const unit of units) {
       setHp(unit.id, unit.hp);
+      setDown(unit.id, unit.hp <= 0);
       cards.get(unit.id).status.textContent = '';
     }
   }
 
-  function step() {
-    if (index >= fight.events.length) {
-      finish();
-      return;
-    }
-    const event = fight.events[index++];
-    apply(event, true);
-    timer = setTimeout(step, DELAYS[event.kind] ?? 600);
+  function showResult(withSound) {
+    banner.textContent = RESULTS[String(fight.won)];
+    banner.dataset.result = String(fight.won);
+    banner.classList.add('arena-banner--shown');
+    if (withSound) playSound(fight.won === true ? 'victory' : 'defeat');
   }
 
-  function finish() {
-    clearTimeout(timer);
-    while (index < fight.events.length) apply(fight.events[index++], false);
-    log.scrollTop = log.scrollHeight;
+  async function play() {
+    reset();
+    const id = run;
+    setControls('playing');
+    await wait(250);
+    while (index < fight.events.length) {
+      if (id !== run) return;
+      const event = fight.events[index];
+      index += 1;
+      await show(event);
+      if (id !== run) return;
+      await wait(140 / speed);
+    }
+    if (id !== run) return;
+    showResult(true);
     setControls('done');
   }
 
-  function play() {
+  // Shows the end at once: back to the start, then every event without animation.
+  function skip() {
     reset();
-    if (reducedMotion()) {
-      finish();
-      return;
-    }
-    setControls('playing');
-    step();
+    for (const event of fight.events) applyQuietly(event);
+    index = fight.events.length;
+    log.scrollTop = log.scrollHeight;
+    showResult(false);
+    setControls('done');
   }
 
   function setControls(mode) {
     controls.replaceChildren(
       mode === 'playing'
-        ? h('button', { type: 'button', class: 'button button--world button--small', onClick: finish, text: 'Pomiń' })
+        ? h('button', { type: 'button', class: 'button button--world button--small', onClick: skip, text: 'Pomiń' })
         : h('button', { type: 'button', class: 'button button--world button--small', onClick: play, text: 'Powtórz' }),
+      h('button', {
+        type: 'button',
+        class: 'button button--world button--small',
+        'aria-label': `Tempo animacji: ${speed}×`,
+        text: `Tempo ${speed}×`,
+        onClick: (event) => {
+          speed = speed === 1 ? 2 : 1;
+          saveSpeed(speed);
+          event.currentTarget.textContent = `Tempo ${speed}×`;
+          event.currentTarget.setAttribute('aria-label', `Tempo animacji: ${speed}×`);
+        },
+      }),
       h(
         'button',
         {
@@ -167,14 +420,15 @@ export function createArena(fight) {
     );
   }
 
-  statsBox.append(participantsTable(units));
   const element = h('div', { class: 'arena-wrap' }, arena, controls, log, statsBox);
   reset();
   setControls('done');
 
-  // Starts when the arena scrolls into view; stops when the report closes.
+  // Starts when the arena scrolls into view, or at once when asked to.
   let observer = null;
-  if ('IntersectionObserver' in window) {
+  if (autoplay === 'now') {
+    requestAnimationFrame(() => play());
+  } else if ('IntersectionObserver' in window) {
     observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) {
@@ -191,8 +445,9 @@ export function createArena(fight) {
 
   return {
     element,
+    arena,
     stop() {
-      clearTimeout(timer);
+      cancelAll();
       observer?.disconnect();
     },
   };

@@ -15,13 +15,13 @@
     },
     "encounters": [
       { "weight": 25, "monsters": ["wolf"] },
-      { "weight": 12, "monsters": ["wolf", "wolf"] },
-      { "weight": 14, "monsters": ["boar"] },
-      { "weight": 10, "monsters": ["crow", "crow"] },
+      { "weight": 12, "monsters": ["wolf", "wolf"], "minLevel": 2 },
+      { "weight": 14, "monsters": ["boar"], "minLevel": 2 },
+      { "weight": 10, "monsters": ["crow", "crow"], "minLevel": 2 },
       { "weight": 14, "monsters": ["viper"] },
       { "weight": 12, "monsters": ["badger"] },
-      { "weight": 8, "monsters": ["wolf", "crow"] },
-      { "weight": 5, "monsters": ["viper", "crow"] }
+      { "weight": 8, "monsters": ["wolf", "crow"], "minLevel": 2 },
+      { "weight": 5, "monsters": ["viper", "crow"], "minLevel": 2 }
     ],
     "elite": "wisp"
   },

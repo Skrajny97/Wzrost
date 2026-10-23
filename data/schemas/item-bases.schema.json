@@ -20,7 +20,11 @@
       "variance": { "type": "number", "minimum": 0, "maximum": 0.9 },
       "armorFactor": { "type": "number", "exclusiveMinimum": 0 },
       "stat": { "type": "string" },
-      "statFactor": { "type": "number", "exclusiveMinimum": 0 }
+      "statFactor": { "type": "number", "exclusiveMinimum": 0 },
+      "strike": {
+        "description": "Wygląd ciosu w animacji walki. Bez tego pola broń fizyczna uderza wręcz, a magiczna wystrzeliwuje pocisk.",
+        "enum": ["melee", "arrow", "magic"]
+      }
     },
     "allOf": [
       {

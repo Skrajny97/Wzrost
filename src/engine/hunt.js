@@ -23,8 +23,12 @@ export function rollEncounter(region, rng, content, characterLevel, { allowElite
   if (allowElite && rng.chance(content.balance.hunt.eliteChancePerFight)) {
     return eliteEncounter(region, content, characterLevel);
   }
-  return regularEncounter(rng.weighted(region.encounters), region, rng, content, characterLevel);
+  return regularEncounter(rng.weighted(encountersFor(region, characterLevel)), region, rng, content, characterLevel);
 }
+
+// Some encounters (groups in the tutorial region) appear only from a level on.
+export const encountersFor = (region, characterLevel) =>
+  region.encounters.filter((encounter) => characterLevel >= (encounter.minLevel ?? 1));
 
 // The local elite: a level above the character, within the region's range plus one.
 export function eliteEncounter(region, content, characterLevel) {
@@ -77,7 +81,12 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
   const player = playerCombatant({ character, equipped, hp, name, region }, content);
   const durationMs = minutes * 60000;
 
-  const fightCount = Math.max(1, countEvents(minutes / tuning.fightIntervalMinutes, rng));
+  // Every hunt has at least one fight. When a hunt is shorter than the usual
+  // time between fights, that fight pays only its share, so short hunts never
+  // give more per hour than long ones.
+  const expectedFights = minutes / tuning.fightIntervalMinutes;
+  const fightCount = Math.max(1, countEvents(expectedFights, rng));
+  const share = Math.min(1, expectedFights);
   const findCount = countEvents(minutes / tuning.findIntervalMinutes, rng);
   const timeline = [
     ...spread(fightCount, durationMs, rng).map((t) => ({ t, type: 'fight' })),
@@ -85,6 +94,9 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
   ].sort((a, b) => a.t - b.t);
 
   const findLevel = clamp(character.level, region.minLevel, region.maxLevel);
+  // Slots covered by worn items or earlier finds, for loot that fills the gaps.
+  const filled = new Set(equipped.map((item) => item.slot));
+  const loot = { filled, classId: character.classId };
   let hpNow = player.hp;
   let result = 'success';
   let xp = 0;
@@ -101,7 +113,7 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
         gold += amount;
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findGold', step, { gold: amount }) });
       } else {
-        const item = randomItem(findLevel, rng, content);
+        const item = randomItem(findLevel, rng, content, loot);
         items.push(item);
         entries.push({ t: event.t, type: 'find', item: items.length - 1, text: say(texts, 'findItem', step, { item: itemName(item, content) }) });
       }
@@ -115,6 +127,7 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
     const hpBefore = hpNow;
     hpNow = fight.units.find((unit) => unit.id === ally.id).hp;
 
+    // Every fight keeps what its playback needs: the sides and the events.
     const summary = {
       index: fights.length,
       t: event.t,
@@ -127,21 +140,16 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
       gold: 0,
       loot: [],
       recovered: 0,
+      allies: [combatantView(ally, enemies[0].level, content)],
+      enemiesView: enemies.map((enemy) => combatantView(enemy, ally.level, content)),
+      events: fight.events,
     };
     fights.push(summary);
 
-    // The fight shown as an animation: the one that ended the hunt, otherwise
+    // The fight the report opens with: the one that ended the hunt, otherwise
     // an elite fight, otherwise the toughest group.
     const score = fight.won !== true ? 3e9 : (encounter.elite ? 2e9 : 0) + enemies.reduce((sum, e) => sum + e.maxHp, 0);
-    if (!key || score > key.score) {
-      key = {
-        score,
-        index: summary.index,
-        allies: [combatantView(ally, enemies[0].level, content)],
-        enemies: enemies.map((enemy) => combatantView(enemy, ally.level, content)),
-        events: fight.events,
-      };
-    }
+    if (!key || score > key.score) key = { score, index: summary.index };
 
     const enemyList = enemies.map((enemy) => `${enemy.name} (poz. ${enemy.level})`).join(', ');
     const lines = [say(texts, encounter.elite ? 'eliteStart' : 'fightStart', step, { enemies: enemyList })];
@@ -152,15 +160,17 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
         const monster = content.monstersById[enemy.monsterId];
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(character.level, enemy.level, content);
-        const goldFactor = (monster.elite ? rewards.eliteGoldMultiplier : 1) * enemy.groupFactor;
+        const goldFactor = (monster.elite ? rewards.eliteGoldMultiplier : 1) * enemy.groupFactor * share;
         summary.gold += Math.round(rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * goldFactor);
-        if (monster.elite || rng.chance(rewards.itemDropChance * enemy.groupFactor)) {
+        // A character without a weapon always gets one of its class from the first opponent it beats.
+        const needsWeapon = !filled.has('weapon');
+        if (monster.elite || needsWeapon || rng.chance(rewards.itemDropChance * enemy.groupFactor * share)) {
           const rarityBonus = monster.elite ? rewards.eliteRarityBonus : 1;
-          items.push(randomItem(enemy.level, rng, content, { rarityBonus }));
+          items.push(randomItem(enemy.level, rng, content, { ...loot, rarityBonus }));
           summary.loot.push(items.length - 1);
         }
       }
-      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus));
+      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share);
       xp += summary.xp;
       gold += summary.gold;
       summary.recovered = Math.round((player.maxHp - hpNow) * player.recovery);
@@ -199,7 +209,7 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
     maxHp: player.maxHp,
     fights,
     entries,
-    keyFight: key && { index: key.index, allies: key.allies, enemies: key.enemies, events: key.events },
+    keyFight: key && { index: key.index },
   };
 }
 
@@ -224,8 +234,11 @@ export function applyHunt(character, hunt, content) {
     messages.push(say(content.texts, 'levelUp', level, { level, points: pointsPerLevel }), ...unlockMessages(level, content));
   }
   const className = content.classesById[character.classId].name;
+  // Class levels come first, so their points can wait for the Stats screen.
+  const unlockLevel = content.unlocksById.stats.level;
+  const textId = next.level < unlockLevel ? 'classLevelUpLocked' : 'classLevelUp';
   for (let level = character.classLevel + 1; level <= nextClass.level; level++) {
-    messages.push(say(content.texts, 'classLevelUp', level, { className, level, points: Math.floor(pointsPerLevel / 4) }));
+    messages.push(say(content.texts, textId, level, { className, level, points: Math.floor(pointsPerLevel / 4), unlockLevel }));
   }
   if (penalty > 0) messages.push(say(content.texts, 'faintPenalty', 0, { xp: penalty }));
 
@@ -271,16 +284,18 @@ export function huntReport({ hunt, applied, character, regionId, startedAt, ends
     },
     system: applied.messages,
     items: hunt.items.map((item) => itemView(item, content)),
-    fights: hunt.fights.map(({ t, elite, enemies, won, hpBefore, hpAfter, xp, gold, loot }) => ({
-      t,
-      elite,
-      enemies: enemies.map(({ name, level }) => ({ name, level })),
-      won,
-      hpBefore,
-      hpAfter,
-      xp,
-      gold,
-      loot: loot.length,
+    fights: hunt.fights.map((fight) => ({
+      t: fight.t,
+      elite: fight.elite,
+      won: fight.won,
+      hpBefore: fight.hpBefore,
+      hpAfter: fight.hpAfter,
+      xp: fight.xp,
+      gold: fight.gold,
+      loot: fight.loot.length,
+      allies: fight.allies,
+      enemies: fight.enemiesView,
+      events: fight.events,
     })),
     keyFight: hunt.keyFight,
     entries: hunt.entries,

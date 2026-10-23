@@ -98,6 +98,11 @@
               "items": {
                 "type": "string"
               }
+            },
+            "minLevel": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Poziom postaci, od którego spotkanie się pojawia."
             }
           }
         }

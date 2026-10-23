@@ -1,12 +1,16 @@
 // Experience, levels, the fainting penalty and HP regeneration between hunts.
 
 // The level length is measured in hours of hunting at that level:
-// about 1 hour at level 1 and about 48 hours at level 50 (hours = level^0.99).
-// XP per hour grows like monster XP (level^xpExponent); xpPerHourScale is set
-// from the balance simulation (tools/simulate.mjs).
+// hoursBase × level^hoursExponent, about 35 minutes at level 1 and about two
+// days at level 50. XP per hour grows like monster XP (level^xpExponent);
+// xpPerHourScale is set from the balance simulation (tools/simulate.mjs).
+export function huntingHours(level, content) {
+  const { hoursBase, hoursExponent } = content.balance.progression;
+  return hoursBase * level ** hoursExponent;
+}
+
 export function xpToNext(level, content) {
-  const { progression, rewards } = content.balance;
-  return Math.max(1, Math.round(progression.xpPerHourScale * level ** rewards.xpExponent * level ** progression.hoursExponent));
+  return Math.max(1, Math.round(xpPerHour(level, content) * huntingHours(level, content)));
 }
 
 // XP per hour of hunting at a level, in a region that suits it: the scale the

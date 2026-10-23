@@ -1,20 +1,50 @@
-// A hunt report: the summary at the top, the key fight played back below it,
-// a short line for every other fight, the finds, and the full text account
-// on request.
+// A hunt report: the summary at the top, then every fight of the hunt to play
+// back (tabs, or a swipe on the arena), the finds, and the full text account
+// on request. The report opens on its key fight.
 
 import { createArena } from '../arena.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
+import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, state } from '../state.js';
 import { openSheet, systemPanel, withButton } from '../ui.js';
-import { itemDetails, itemSummary } from './character.js';
+import { itemDetails, itemSheet, itemSummary } from './character.js';
 
 const RESULT_CLASS = { success: 'result--success', fainted: 'result--fainted', escaped: 'result--escaped' };
+const FIGHT_RESULTS = { true: 'wygrana', false: 'przegrana', null: 'odwrót' };
+const SWIPE_DISTANCE = 60;
+
+// A report keeps copies of its finds; the same item in the bag has an id.
+const sameItem = (a, b) =>
+  a.name === b.name && a.level === b.level && a.rarityName === b.rarityName && a.properties.join('|') === b.properties.join('|');
+
+function ownedItem(item) {
+  const character = state.character;
+  const inBag = character.bag.find((candidate) => sameItem(candidate, item));
+  if (inBag) return { item: inBag, equipped: false };
+  const worn = Object.values(character.equipment).find((candidate) => candidate && sameItem(candidate, item));
+  return worn ? { item: worn, equipped: true } : null;
+}
+
+// Playback data of a fight. Reports from before every fight was kept have it
+// only for the key fight.
+function playable(report, index) {
+  const fight = report.fights?.[index];
+  if (fight?.events) return { allies: fight.allies, enemies: fight.enemies, events: fight.events, won: fight.won };
+  if (report.keyFight?.index === index && report.keyFight.events) {
+    return { ...report.keyFight, won: fight?.won ?? report.result === 'success' };
+  }
+  return null;
+}
 
 export function mountReport(container, { params, navigate }) {
   let arena = null;
   let report = reportCache.get(params.id) ?? null;
+  let selected = null;
+  let firstPlayback = true;
   const actionBox = h('div', { class: 'stack' });
+  const fightBox = h('div', { class: 'fight-view' });
+  const tabList = h('div', { class: 'fight-tabs', role: 'tablist', 'aria-label': 'Walki wyprawy' });
 
   async function load() {
     try {
@@ -23,7 +53,8 @@ export function mountReport(container, { params, navigate }) {
       reportCache.set(params.id, report);
       render();
     } catch (error) {
-      fill(container,
+      fill(
+        container,
         h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Raport' })),
         systemPanel(error.message),
       );
@@ -31,15 +62,15 @@ export function mountReport(container, { params, navigate }) {
   }
 
   function render() {
-    arena?.stop();
-    arena = null;
     if (!report) {
       fill(container, h('p', { class: 'muted', text: 'Wczytywanie raportu…' }));
       return;
     }
-    arena = report.keyFight ? createArena(report.keyFight) : null;
+    const count = report.fights?.length ?? 0;
+    selected ??= report.keyFight?.index ?? 0;
 
-    fill(container,
+    fill(
+      container,
       h(
         'div',
         { class: 'page-heading' },
@@ -51,19 +82,133 @@ export function mountReport(container, { params, navigate }) {
       ),
       summaryCard(report),
       report.system.length > 0 && systemPanel(...report.system),
-      arena &&
+      count > 0 &&
         h(
           'section',
-          { class: 'report-section', 'aria-labelledby': 'key-fight-title' },
-          h('h2', { class: 'section-title', id: 'key-fight-title', text: 'Najważniejsza walka' }),
-          arena.element,
+          { class: 'report-section', 'aria-labelledby': 'fights-title' },
+          h('h2', { class: 'section-title', id: 'fights-title', text: `Walki (${count})` }),
+          count > 1 && tabList,
+          fightBox,
         ),
-      fightsSection(report),
       itemsSection(report),
       accountSection(report),
       actionBox,
     );
+    renderTabs();
+    showFight(selected);
     renderActions();
+    if (report.system.length > 0 && firstPlayback) playSound('system');
+  }
+
+  function renderTabs() {
+    const count = report.fights?.length ?? 0;
+    fill(
+      tabList,
+      Array.from({ length: count }, (_, index) => {
+        const fight = report.fights[index];
+        const isKey = report.keyFight?.index === index;
+        return h(
+          'button',
+          {
+            type: 'button',
+            class: `fight-tab fight-tab--${String(fight.won)}`,
+            role: 'tab',
+            'aria-selected': index === selected,
+            'aria-label': `Walka ${index + 1}: ${FIGHT_RESULTS[String(fight.won)]}${isKey ? ', najważniejsza' : ''}`,
+            onClick: () => select(index),
+          },
+          h('span', { text: index + 1 }),
+          isKey && h('span', { class: 'fight-tab-key', 'aria-hidden': 'true', text: '★' }),
+        );
+      }),
+    );
+    tabList.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }
+
+  function select(index) {
+    const count = report.fights?.length ?? 0;
+    if (index < 0 || index >= count || index === selected) return;
+    selected = index;
+    renderTabs();
+    showFight(index, { autoplay: 'now' });
+  }
+
+  function showFight(index, { autoplay } = {}) {
+    arena?.stop();
+    arena = null;
+    const fight = report.fights?.[index];
+    if (!fight) {
+      fill(fightBox);
+      return;
+    }
+    const count = report.fights.length;
+    const data = playable(report, index);
+    const enemies = (fight.enemies ?? []).map((enemy) => `${enemy.name} (${enemy.level})`).join(', ');
+    const outcome =
+      fight.won === true
+        ? `HP ${fight.hpBefore} → ${fight.hpAfter} · +${formatNumber(fight.xp)} XP · +${formatNumber(fight.gold)} złota${fight.loot ? ` · łup: ${fight.loot}` : ''}`
+        : `HP ${fight.hpBefore} → ${fight.hpAfter} · ${FIGHT_RESULTS[String(fight.won)]}`;
+    const header = h(
+      'div',
+      { class: 'fight-header' },
+      h(
+        'p',
+        { class: 'fight-title' },
+        `Walka ${index + 1} z ${count}`,
+        report.keyFight?.index === index && h('span', { class: 'chip chip--key', text: 'najważniejsza' }),
+        fight.elite && h('span', { class: 'chip chip--elite', text: 'elita' }),
+      ),
+      h('p', { class: 'fight-meta', text: `${formatOffset(fight.t)} · ${enemies}` }),
+      h('p', { class: `fight-outcome fight-outcome--${String(fight.won)}`, text: outcome }),
+    );
+
+    const pager =
+      count > 1 &&
+      h(
+        'div',
+        { class: 'fight-pager' },
+        h('button', {
+          type: 'button',
+          class: 'button button--world button--small',
+          disabled: index === 0,
+          onClick: () => select(index - 1),
+          text: '‹ Poprzednia',
+        }),
+        h('button', {
+          type: 'button',
+          class: 'button button--world button--small',
+          disabled: index === count - 1,
+          onClick: () => select(index + 1),
+          text: 'Następna ›',
+        }),
+      );
+
+    if (!data) {
+      fill(fightBox, header, systemPanel('Ta walka nie ma zapisu do odtworzenia: raport powstał przed tą aktualizacją gry.'), pager);
+      return;
+    }
+    arena = createArena(data, { autoplay: autoplay ?? (firstPlayback ? 'visible' : 'now') });
+    firstPlayback = false;
+    swipe(arena.arena);
+    fill(fightBox, header, arena.element, pager);
+  }
+
+  // A horizontal swipe on the arena moves to the next or previous fight.
+  function swipe(element) {
+    let start = null;
+    element.addEventListener('pointerdown', (event) => {
+      start = { x: event.clientX, y: event.clientY };
+    });
+    element.addEventListener('pointerup', (event) => {
+      if (!start) return;
+      const dx = event.clientX - start.x;
+      const dy = event.clientY - start.y;
+      start = null;
+      if (Math.abs(dx) > SWIPE_DISTANCE && Math.abs(dx) > Math.abs(dy) * 2) select(selected + (dx < 0 ? 1 : -1));
+    });
+    element.addEventListener('pointercancel', () => {
+      start = null;
+    });
   }
 
   function summaryCard(report) {
@@ -75,6 +220,7 @@ export function mountReport(container, { params, navigate }) {
       ['Walki', formatNumber(summary.fights)],
       ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
     ].filter(Boolean);
+    const best = summary.bestFind;
     return h(
       'section',
       { class: 'card report-summary', 'aria-label': 'Podsumowanie' },
@@ -90,8 +236,18 @@ export function mountReport(container, { params, navigate }) {
           h(
             'dd',
             {},
-            summary.bestFind
-              ? h('span', { class: 'item-name', vars: { '--rarity': summary.bestFind.color }, text: summary.bestFind.name })
+            best
+              ? h(
+                  'button',
+                  {
+                    type: 'button',
+                    class: 'link-button item-name',
+                    vars: { '--rarity': best.color },
+                    'aria-label': `${best.name}: pokaż przedmiot`,
+                    onClick: () => findSheet(best),
+                  },
+                  best.name,
+                )
               : 'brak',
           ),
         ),
@@ -99,33 +255,15 @@ export function mountReport(container, { params, navigate }) {
     );
   }
 
-  function fightsSection(report) {
-    const others = (report.fights ?? []).filter((_, index) => index !== report.keyFight?.index);
-    if (others.length === 0) return null;
-    return h(
-      'section',
-      { class: 'report-section', 'aria-labelledby': 'fights-title' },
-      h('h2', { class: 'section-title', id: 'fights-title', text: 'Pozostałe walki' }),
-      h(
-        'ul',
-        { class: 'fight-list' },
-        others.map((fight) =>
-          h(
-            'li',
-            { class: `fight-item${fight.won === true ? '' : ' fight-item--lost'}` },
-            h('span', { class: 'fight-time', text: formatOffset(fight.t) }),
-            h(
-              'span',
-              { class: 'fight-enemies', text: fight.enemies.map((enemy) => `${enemy.name} (${enemy.level})`).join(', ') },
-            ),
-            h(
-              'span',
-              { class: 'fight-result', text: fight.won === true ? `+${fight.xp} XP · HP ${fight.hpBefore} → ${fight.hpAfter}` : 'przegrana' },
-            ),
-          ),
-        ),
-      ),
-    );
+  // A find the character still has opens like in the bag: with what wearing
+  // it changes and the buttons.
+  function findSheet(item) {
+    const owned = ownedItem(item);
+    if (owned) {
+      itemSheet(owned.item, { equipped: owned.equipped });
+      return;
+    }
+    openSheet(itemDetails(item), h('p', { class: 'muted', text: 'Tego przedmiotu nie ma już w plecaku ani w ekwipunku.' }));
   }
 
   function itemsSection(report) {
@@ -141,21 +279,7 @@ export function mountReport(container, { params, navigate }) {
           h(
             'li',
             {},
-            h(
-              'button',
-              {
-                type: 'button',
-                class: 'item-row',
-                onClick: () =>
-                  openSheet(
-                    itemDetails(item),
-                    h('p', { class: 'muted', text: 'Przedmiot jest w plecaku, chyba że go już wyrzucono.' }),
-                    h('div', { class: 'sheet-actions' }, h('a', { class: 'button button--world', href: '#/postac', text: 'Przejdź do plecaka' })),
-                  ),
-              },
-              itemSummary(item),
-              icon('chevron', { size: 18 }),
-            ),
+            h('button', { type: 'button', class: 'item-row', onClick: () => findSheet(item) }, itemSummary(item), icon('chevron', { size: 18 })),
           ),
         ),
       ),
@@ -198,12 +322,12 @@ export function mountReport(container, { params, navigate }) {
           }),
       });
     const waiting = character.activity && activityFinished(character.activity);
-    fill(actionBox,
-      ...[
-        again,
-        waiting && h('a', { class: 'button button--system', href: '#/walka', text: 'Kolejny raport czeka na odbiór' }),
-        h('a', { class: 'button button--world', href: '#/dziennik', text: 'Dziennik' }),
-      ].filter(Boolean),
+    fill(
+      actionBox,
+      again,
+      waiting && h('a', { class: 'button button--system', href: '#/walka', text: 'Kolejny raport czeka na odbiór' }),
+      h('a', { class: 'button button--world', href: '#/postac', text: 'Postać i plecak' }),
+      h('a', { class: 'button button--world', href: '#/dziennik', text: 'Dziennik' }),
     );
   }
 

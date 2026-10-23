@@ -108,18 +108,10 @@ function checkReferences(data) {
     if (autoSum !== data.stats.length) {
       errors.push(`classes.json: ${cls.id} rozdaje ${autoSum} punktów, a poziom daje ${data.stats.length}`);
     }
-    const usedSlots = new Set();
-    for (const item of cls.startingItems) {
-      const base = basesById.get(item.base);
-      if (!base) {
-        errors.push(`classes.json: ${cls.id} ma nieznany przedmiot startowy "${item.base}"`);
-        continue;
-      }
-      if (usedSlots.has(base.slot)) errors.push(`classes.json: ${cls.id} ma dwa przedmioty startowe w slocie ${base.slot}`);
-      usedSlots.add(base.slot);
-      if (item.element && !(base.elements ?? []).includes(item.element)) {
-        errors.push(`classes.json: ${cls.id} ma żywioł "${item.element}", którego ${base.id} nie obsługuje`);
-      }
+    for (const id of cls.weapons) {
+      const base = basesById.get(id);
+      if (!base) errors.push(`classes.json: ${cls.id} ma nieznaną broń "${id}"`);
+      else if (base.slot !== 'weapon') errors.push(`classes.json: ${cls.id} ma w broniach "${id}", który nie jest bronią`);
     }
   }
 

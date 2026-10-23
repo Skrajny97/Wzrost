@@ -46,6 +46,7 @@
   "loot": ["Łup: {item}."],
   "levelUp": ["Osiągnięto poziom {level}. Wolne punkty statystyk: +{points}."],
   "classLevelUp": ["{className}: poziom klasy {level}. Wolne punkty statystyk: +{points}."],
+  "classLevelUpLocked": ["{className}: poziom klasy {level}. Wolne punkty statystyk: +{points}. Rozdasz je od poziomu {unlockLevel}."],
   "faintPenalty": ["Omdlenie. Utracone doświadczenie: {xp}."],
   "result": {
     "success": "Wyprawa zakończona.",

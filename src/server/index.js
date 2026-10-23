@@ -2,11 +2,11 @@
 // Assets before this code runs; only /api/* and unknown paths reach the Worker.
 
 import { login, logout, me, register } from './accounts.js';
-import { autoPoints, createCharacter, getCharacter, resetPoints, spendPoints } from './characters.js';
+import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
 import { ApiError, errorResponse, json } from './http.js';
 import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
-import { discardItem, equipItem, unequipItem } from './inventory.js';
+import { discardItem, equipItem, previewItem, unequipItem } from './inventory.js';
 import { getReport, listReports } from './reports.js';
 
 const routes = [
@@ -18,12 +18,14 @@ const routes = [
   ['GET', '/api/content', () => json(publicContent())],
   ['GET', '/api/character', getCharacter],
   ['POST', '/api/character', createCharacter],
+  ['DELETE', '/api/character', deleteCharacter],
   ['POST', '/api/character/points', spendPoints],
   ['POST', '/api/character/points/auto', autoPoints],
   ['POST', '/api/character/points/reset', resetPoints],
   ['POST', '/api/items/:id/equip', equipItem],
   ['POST', '/api/items/:id/unequip', unequipItem],
   ['POST', '/api/items/:id/discard', discardItem],
+  ['GET', '/api/items/:id/preview', previewItem],
   ['GET', '/api/hunts/options', huntOptions],
   ['POST', '/api/hunts', startHunt],
   ['POST', '/api/hunts/cancel', cancelHunt],

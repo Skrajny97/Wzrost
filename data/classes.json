@@ -10,7 +10,7 @@
     "growth": { "strength": 2, "vitality": 2, "endurance": 2 },
     "autoPoints": { "strength": 3, "vitality": 2, "endurance": 2, "will": 1 },
     "recovery": { "base": 0, "perWisdom": 0 },
-    "startingItems": [{ "base": "sword" }, { "base": "shield" }, { "base": "chainmail" }, { "base": "helmet" }, { "base": "gloves" }, { "base": "boots" }]
+    "weapons": ["sword", "axe"]
   },
   {
     "id": "archer",
@@ -23,7 +23,7 @@
     "growth": { "dexterity": 2, "perception": 1, "vitality": 1 },
     "autoPoints": { "dexterity": 4, "perception": 2, "vitality": 2 },
     "recovery": { "base": 0, "perWisdom": 0 },
-    "startingItems": [{ "base": "bow" }, { "base": "quiver" }, { "base": "tunic" }, { "base": "hood" }, { "base": "gloves" }, { "base": "boots" }]
+    "weapons": ["bow"]
   },
   {
     "id": "mage",
@@ -36,7 +36,7 @@
     "growth": { "intellect": 2, "wisdom": 1, "vitality": 1 },
     "autoPoints": { "intellect": 4, "vitality": 2, "wisdom": 1, "will": 1 },
     "recovery": { "base": 0, "perWisdom": 0 },
-    "startingItems": [{ "base": "staff", "element": "fire" }, { "base": "focus" }, { "base": "robe" }, { "base": "hood" }, { "base": "gloves" }, { "base": "boots" }]
+    "weapons": ["staff"]
   },
   {
     "id": "cleric",
@@ -49,7 +49,7 @@
     "growth": { "wisdom": 2, "intellect": 1, "vitality": 1 },
     "autoPoints": { "intellect": 3, "wisdom": 2, "vitality": 2, "endurance": 1 },
     "recovery": { "base": 0.07, "perWisdom": 0.002 },
-    "startingItems": [{ "base": "aspergillum" }, { "base": "shield" }, { "base": "robe" }, { "base": "hood" }, { "base": "gloves" }, { "base": "boots" }]
+    "weapons": ["aspergillum"]
   },
   {
     "id": "shadow",
@@ -62,6 +62,6 @@
     "growth": { "dexterity": 2, "perception": 1, "strength": 1 },
     "autoPoints": { "dexterity": 4, "perception": 2, "vitality": 2 },
     "recovery": { "base": 0, "perWisdom": 0 },
-    "startingItems": [{ "base": "dagger" }, { "base": "tunic" }, { "base": "hood" }, { "base": "gloves" }, { "base": "boots" }]
+    "weapons": ["dagger"]
   }
 ]

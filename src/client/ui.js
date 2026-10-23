@@ -2,6 +2,7 @@
 // confirmation questions.
 
 import { $, append, clear, h, icon } from './dom.js';
+import { playSound } from './sound.js';
 
 // A message from the System: the cold, ice-blue panel with the [ SYSTEM ] header.
 export function systemPanel(...lines) {
@@ -41,7 +42,10 @@ export function openSheet(...children) {
       children,
     ),
   ]);
-  if (!dialog.open) dialog.showModal();
+  if (!dialog.open) {
+    dialog.showModal();
+    playSound('open');
+  }
   return dialog;
 }
 
@@ -122,9 +126,13 @@ export function meter({ label, value, max, kind }) {
     h('div', { class: 'meter-label' }, h('span', { text: label }), text),
     h('div', { class: 'meter-track' }, fill),
   );
+  // Long numbers (XP later on) are shown as a percentage, so the bar stays readable.
   const set = (current, total) => {
-    text.textContent = `${current} / ${total}`;
-    fill.style.width = `${total > 0 ? Math.max(0, Math.min(100, (current / total) * 100)) : 0}%`;
+    const share = total > 0 ? Math.max(0, Math.min(1, current / total)) : 0;
+    const exact = `${current} / ${total}`;
+    text.textContent = exact.length > 11 ? `${Math.floor(share * 100)}%` : exact;
+    element.title = exact;
+    fill.style.width = `${share * 100}%`;
   };
   set(value, max);
   return { element, set };

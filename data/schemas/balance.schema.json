@@ -135,23 +135,25 @@
           "additionalProperties": false,
           "required": [
             "attackName",
-            "min",
-            "max"
+            "damageFactor",
+            "variance"
           ],
           "properties": {
             "attackName": {
               "type": "string",
               "minLength": 1
             },
-            "min": {
+            "damageFactor": {
               "type": "number",
-              "minimum": 0
+              "exclusiveMinimum": 0
             },
-            "max": {
+            "variance": {
               "type": "number",
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 0.9
             }
-          }
+          },
+          "description": "Walka bez broni: obrażenia rosną z poziomem jak u broni pospolitej, z mnożnikiem damageFactor."
         }
       }
     },
@@ -194,7 +196,7 @@
       "required": [
         "budgetBase",
         "budgetPerLevel",
-        "affixWeight",
+        "emptySlotWeight",
         "damageBase",
         "damagePerBudget",
         "armorPerBudget",
@@ -210,9 +212,10 @@
           "type": "number",
           "minimum": 0
         },
-        "affixWeight": {
+        "emptySlotWeight": {
           "type": "number",
-          "minimum": 0
+          "minimum": 1,
+          "description": "Ile razy częściej łup trafia w slot, który postać ma pusty."
         },
         "damageBase": {
           "type": "number",
@@ -406,6 +409,7 @@
       "additionalProperties": false,
       "required": [
         "maxLevel",
+        "hoursBase",
         "hoursExponent",
         "xpPerHourScale",
         "classXpFactor",
@@ -416,6 +420,11 @@
         "maxLevel": {
           "type": "number",
           "minimum": 0
+        },
+        "hoursBase": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Godziny polowania na poziom 1. Poziom L trwa hoursBase × L^hoursExponent godzin."
         },
         "hoursExponent": {
           "type": "number",

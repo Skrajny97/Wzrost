@@ -6,9 +6,7 @@ import {
   classXpToNext,
   combatValues,
   computeStats,
-  createRng,
   freePoints,
-  generateItem,
   hoursToNext,
   huntDurations,
   itemView,
@@ -166,6 +164,7 @@ export async function getCharacter(context) {
   return json({ character: characterView(player, context.now) });
 }
 
+// A new character starts with nothing: its first gear comes from the hunts.
 export async function createCharacter(context) {
   const session = await requireSession(context);
   const body = await readJson(context.request);
@@ -178,29 +177,35 @@ export async function createCharacter(context) {
   if (await loadPlayer(db, session.userId)) throw exists();
 
   const character = { classId: cls.id, level: 1, classLevel: 1, points: {}, position: cls.position };
-  const rng = createRng(crypto.randomUUID());
-  const items = cls.startingItems.map((start) =>
-    generateItem({ baseId: start.base, level: 1, element: start.element }, rng, content),
-  );
-  const hp = playerCombatant({ character, equipped: items, name }, content).maxHp;
+  const hp = playerCombatant({ character, equipped: [], name }, content).maxHp;
   const now = context.now;
-  const insertItem = db.prepare(
-    "INSERT INTO items (character_id, slot, data, created_at) SELECT id, ?, ?, ? FROM characters WHERE user_id = ? AND role = 'player'",
-  );
   try {
-    await db.batch([
-      db
-        .prepare(
-          "INSERT INTO characters (user_id, role, name, class_id, position, hp, hp_at, created_at) VALUES (?, 'player', ?, ?, ?, ?, ?, ?)",
-        )
-        .bind(session.userId, name, cls.id, cls.position, hp, now, now),
-      ...items.map((item) => insertItem.bind(item.slot, JSON.stringify(item), now, session.userId)),
-    ]);
+    await db
+      .prepare(
+        "INSERT INTO characters (user_id, role, name, class_id, position, hp, hp_at, created_at) VALUES (?, 'player', ?, ?, ?, ?, ?, ?)",
+      )
+      .bind(session.userId, name, cls.id, cls.position, hp, now, now)
+      .run();
   } catch (error) {
     if (String(error?.message).includes('UNIQUE')) throw exists();
     throw error;
   }
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
+}
+
+// "Zacznij od nowa": the character, its items, hunt and reports are removed;
+// the account stays and a new character can be created.
+export async function deleteCharacter(context) {
+  const { player } = await requirePlayer(context);
+  const db = context.env.DB;
+  const id = player.row.id;
+  await db.batch([
+    db.prepare('DELETE FROM reports WHERE character_id = ?').bind(id),
+    db.prepare('DELETE FROM activities WHERE character_id = ?').bind(id),
+    db.prepare('DELETE FROM items WHERE character_id = ?').bind(id),
+    db.prepare('DELETE FROM characters WHERE id = ?').bind(id),
+  ]);
+  return json({ ok: true });
 }
 
 async function savePoints(context, player, points) {
