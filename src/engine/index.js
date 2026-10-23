@@ -12,4 +12,5 @@ export { simulateFight } from './combat.js';
 export * from './hunt.js';
 export * from './threat.js';
 export * from './unlocks.js';
+export * from './camp.js';
 export * from './preview.js';

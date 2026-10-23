@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Budynki obozu",
+  "description": "Budynki, które gracz rozbudowuje w obozie równolegle do czynności postaci. Każdy poziom kosztuje więcej i buduje się dłużej. Naraz trwa jedna budowa.",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "name", "description", "maxLevel", "effect", "costs", "minutes"],
+    "properties": {
+      "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+      "name": { "type": "string", "minLength": 1 },
+      "description": { "type": "string", "minLength": 1 },
+      "maxLevel": { "type": "integer", "minimum": 1 },
+      "effect": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "perLevel", "unit", "text"],
+        "properties": {
+          "kind": {
+            "enum": ["restSpeed", "bagSlots", "sellPrice"],
+            "description": "restSpeed: szybszy odpoczynek między wyprawami (ułamek), bagSlots: miejsca w plecaku, sellPrice: wyższe ceny u złomiarza (ułamek)."
+          },
+          "perLevel": { "type": "number", "exclusiveMinimum": 0 },
+          "unit": { "enum": ["percent", "count"], "description": "Jak pokazać wartość: percent mnoży ułamek przez 100 i dodaje %." },
+          "text": { "type": "string", "pattern": "\\{value\\}", "description": "Opis premii z miejscem na wartość: {value}." }
+        }
+      },
+      "costs": {
+        "type": "array",
+        "minItems": 1,
+        "description": "Koszt poziomu L: base × growth^(L − fromLevel), od poziomu fromLevel (domyślnie 1). Zasób gold to złoto.",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["resource", "base", "growth"],
+          "properties": {
+            "resource": { "type": "string", "minLength": 1 },
+            "base": { "type": "number", "exclusiveMinimum": 0 },
+            "growth": { "type": "number", "minimum": 1 },
+            "fromLevel": { "type": "integer", "minimum": 1 }
+          }
+        }
+      },
+      "minutes": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["base", "growth"],
+        "description": "Czas budowy poziomu L w minutach: base × growth^(L − 1), co najmniej 1.",
+        "properties": {
+          "base": { "type": "number", "exclusiveMinimum": 0 },
+          "growth": { "type": "number", "minimum": 1 }
+        }
+      }
+    }
+  }
+}

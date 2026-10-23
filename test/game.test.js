@@ -3,7 +3,9 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
+import { createRng, generateItem } from '../src/engine/index.js';
 import { skipTime } from '../src/server/testing.js';
+import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
 const { call, db } = useServer();
@@ -414,5 +416,132 @@ describe('hunts and reports', () => {
     await (await db()).prepare('UPDATE characters SET hp_at = ?').bind(Date.now() - 600000).run();
     const rested = (await call('GET', '/api/character', { cookie })).data.character;
     assert.ok(rested.hp > 1 + 9 * wounded.regen.perMinute);
+  });
+});
+
+describe('camp', () => {
+  let cookie;
+  beforeEach(async () => {
+    cookie = await signUp();
+    await newCharacter(cookie, 'warrior');
+  });
+
+  const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
+  const build = (buildingId) => call('POST', '/api/camp/build', { cookie, body: { buildingId } });
+  const finishBuilding = async () => (await db()).prepare('UPDATE buildings SET ends_at = ?').bind(Date.now() - 1).run();
+  // Items straight into the bag, as if found earlier.
+  async function fillBag(count, { baseId = 'helmet', rarityId = 'common', level = 3 } = {}) {
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    const rng = createRng('bag');
+    for (let i = 0; i < count; i++) {
+      const item = generateItem({ baseId, level, rarityId }, rng, content);
+      await database.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)').bind(id, JSON.stringify(item), i).run();
+    }
+  }
+
+  test('starts with three buildings at level 0, no resources and a bag of 20', async () => {
+    const start = await character();
+    assert.deepEqual(start.camp.buildings.map((building) => [building.id, building.level]), [['campfire', 0], ['loot-shed', 0], ['scrap-bench', 0]]);
+    assert.equal(start.camp.construction, null);
+    assert.deepEqual(start.camp.buildings[0].next, { level: 1, effect: 'Odpoczynek między wyprawami szybszy o 10%', minutes: 1, cost: { gold: 10 } });
+    assert.deepEqual(start.resources, { wood: 0, stone: 0, 'iron-ore': 0 });
+    assert.equal(start.bagCapacity, 20);
+    const { data } = await call('GET', '/api/content');
+    assert.deepEqual(data.resources.map((resource) => resource.name), ['Drewno', 'Kamień', 'Ruda żelaza']);
+    assert.deepEqual(data.buildings.map((building) => building.name), ['Ognisko', 'Szałas na łupy', 'Stół złomiarza']);
+  });
+
+  test('a building is paid in gold and resources, takes time, and one is built at a time', async () => {
+    assert.equal((await build('campfire')).data.error.code, 'not_enough');
+    assert.equal((await build('tower')).data.error.code, 'invalid_building');
+    await (await db()).prepare(`UPDATE characters SET gold = 100, resources = '{"wood": 10, "stone": 2}'`).run();
+    const before = await character();
+
+    const started = await build('campfire');
+    assert.equal(started.status, 201);
+    const running = started.data.character.camp.construction;
+    assert.deepEqual([running.buildingId, running.name, running.level, running.endsAt - running.startedAt], ['campfire', 'Ognisko', 1, 60000]);
+    assert.equal(started.data.character.gold, 90);
+    // Until the end the building keeps its old level, and nothing else can be built.
+    assert.equal(started.data.character.camp.buildings[0].level, 0);
+    assert.equal((await build('loot-shed')).data.error.code, 'camp_busy');
+    assert.equal((await build('campfire')).data.error.code, 'camp_busy');
+
+    await finishBuilding();
+    const done = await character();
+    assert.equal(done.camp.construction, null);
+    assert.equal(done.camp.buildings[0].level, 1);
+    assert.equal(done.camp.buildings[0].effect, 'Odpoczynek między wyprawami szybszy o 10%');
+    // Ognisko: resting 10% faster from the end of the upgrade on, which came
+    // after the HP saved at its start.
+    assert.equal(done.regen.perMinute, before.regen.perMinute);
+    assert.ok(Math.abs(done.regen.change.perMinute / before.regen.perMinute - 1.1) < 1e-6);
+
+    // Level 2 also takes wood.
+    const second = await build('campfire');
+    assert.equal(second.status, 201);
+    assert.equal(second.data.character.gold, 71);
+    assert.deepEqual(second.data.character.resources, { wood: 4, stone: 2, 'iron-ore': 0 });
+    assert.equal(second.data.character.camp.construction.endsAt - second.data.character.camp.construction.startedAt, 2 * 60000);
+  });
+
+  test('building goes on during an exploration', async () => {
+    await (await db()).prepare('UPDATE characters SET gold = 100').run();
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
+    const started = await build('loot-shed');
+    assert.equal(started.status, 201);
+    assert.equal(started.data.character.activity.areaId, 'windfalls-edge');
+  });
+
+  test('"Pomiń czas" in test mode finishes the upgrade', async () => {
+    await (await db()).prepare('UPDATE characters SET gold = 100').run();
+    await build('loot-shed');
+    const skipped = await call('POST', '/api/test/skip-build', { cookie });
+    assert.equal(skipped.status, 200);
+    assert.equal(skipped.data.character.camp.construction, null);
+    assert.equal(skipped.data.character.bagCapacity, 25);
+  });
+
+  test('a full bag: the scrapper buys the weakest items, and nothing can be taken off', async () => {
+    await fillBag(21, { rarityId: 'common', level: 3 });
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 15 } });
+    await finishHunt();
+    const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
+    assert.equal(after.bag.length, 20);
+    assert.ok(report.system.some((line) => line.startsWith('Plecak był pełny (20 miejsc).')));
+    // The first weapon went into the hand; with a full bag it cannot be taken off.
+    const weapon = after.equipment.weapon;
+    assert.ok(weapon);
+    const off = await call('POST', `/api/items/${weapon.id}/unequip`, { cookie });
+    assert.equal(off.status, 409);
+    assert.equal(off.data.error.code, 'bag_full');
+  });
+
+  test('Stół złomiarza raises the prices', async () => {
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    await database
+      .prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) VALUES (?, 'scrap-bench', 5, 0, 1)")
+      .bind(id)
+      .run();
+    await fillBag(1, { rarityId: 'common', level: 10 });
+    const view = await character();
+    // Level 10, common: 10 gold, and 50% more at level 5.
+    assert.equal(view.bag[0].price, 15);
+    const sold = await call('POST', '/api/items/sell', { cookie, body: { maxRarity: 'common' } });
+    assert.deepEqual(sold.data.sold, { count: 1, gold: 15 });
+    assert.equal(sold.data.character.gold, 15);
+  });
+
+  test('resources found on an exploration go to the camp', async () => {
+    await (await db()).prepare('UPDATE characters SET level = 2, class_level = 2').run();
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 240 } });
+    await finishHunt();
+    const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
+    const found = report.summary.resources;
+    assert.ok(Object.values(found).some((amount) => amount > 0));
+    for (const [resource, amount] of Object.entries(after.resources)) assert.equal(amount, found[resource] ?? 0);
+    assert.ok(report.entries.some((entry) => /\+\d+\.$/.test(entry.text) && entry.type === 'find'));
   });
 });

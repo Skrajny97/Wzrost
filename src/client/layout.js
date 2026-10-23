@@ -1,10 +1,12 @@
 // The frame around every game screen: the fixed top bar (levels, HP and mana,
-// character and class XP, gold, current activity) and the two bottom bars,
-// the main menu and the character bar with its own background.
+// character and class XP, gold with the camp's resources, the camp, current
+// activity) and the two bottom bars, the main menu and the character bar with
+// its own background.
 
 import { $, fill, h, icon } from './dom.js';
 import { formatCountdown, formatMinutes, formatNumber } from './format.js';
-import { activityFinished, currentHp, isUnlocked, serverNow, state, unlockInfo } from './state.js';
+import { RESOURCE_ICONS } from './icons.js';
+import { activityFinished, currentHp, isUnlocked, restRate, serverNow, state, unlockInfo, walletEntries } from './state.js';
 import { meter } from './ui.js';
 
 const MAIN_TABS = [
@@ -28,6 +30,23 @@ export function buildTopbar(onSettings) {
   const level = h('span', { class: 'badge badge--system' });
   const classLevel = h('span', { class: 'badge badge--world' });
   const gold = h('span', { class: 'gold-value' });
+  // Tapping the gold shows the resources under it.
+  const wallet = h('ul', { class: 'wallet-list', id: 'wallet-list', hidden: true });
+  const goldButton = h(
+    'button',
+    {
+      type: 'button',
+      class: 'gold',
+      'aria-label': 'Złoto i zasoby',
+      'aria-expanded': 'false',
+      'aria-controls': 'wallet-list',
+      onClick: () => showWallet(wallet.hidden),
+    },
+    icon('coin', { size: 18 }),
+    gold,
+  );
+  const campLabel = h('span', { class: 'camp-label' });
+  const camp = h('a', { class: 'camp-button', href: '#/oboz', 'aria-label': 'Obóz' }, icon('tent'), campLabel);
   const hp = meter({ label: 'HP', value: 0, max: 0, kind: 'hp' });
   const mana = meter({ label: 'MANA', value: 0, max: 0, kind: 'mana' });
   const xp = meter({ label: 'XP POSTACI', value: 0, max: 0, kind: 'xp' });
@@ -45,17 +64,58 @@ export function buildTopbar(onSettings) {
       h(
         'div',
         { class: 'topbar-right' },
-        h('span', { class: 'gold', 'aria-label': 'Złoto' }, icon('coin', { size: 18 }), gold),
+        goldButton,
+        camp,
         h('button', { type: 'button', class: 'icon-button', 'aria-label': 'Ustawienia', onClick: onSettings }, icon('gear')),
       ),
     ),
+    wallet,
     // Two rows: HP over mana, character XP over class XP.
     h('div', { class: 'meters' }, hp.element, xp.element, mana.element, classXp.element),
     activity,
   );
-  topbar = { level, classLevel, gold, hp, mana, xp, classXp, activity, activityLabel, activityTime };
+  topbar = { level, classLevel, gold, goldButton, wallet, camp, campLabel, hp, mana, xp, classXp, activity, activityLabel, activityTime };
   updateTopbar();
 }
+
+function walletRows() {
+  return walletEntries().map((entry) =>
+    h(
+      'li',
+      { class: 'wallet-item' },
+      icon(RESOURCE_ICONS[entry.id] ?? 'unknown', { size: 18 }),
+      h('span', { class: 'wallet-name', text: entry.name }),
+      h('span', { class: 'wallet-amount', text: formatNumber(entry.amount) }),
+    ),
+  );
+}
+
+// Opens or closes the list of resources under the gold.
+export function showWallet(open) {
+  if (!topbar) return;
+  topbar.wallet.hidden = !open;
+  topbar.goldButton.setAttribute('aria-expanded', String(open));
+  topbar.walletKey = null;
+  if (open) refreshWallet();
+}
+
+// Redrawn only when an amount changes, not on every tick.
+function refreshWallet() {
+  const key = JSON.stringify(walletEntries().map((entry) => entry.amount));
+  if (key === topbar.walletKey) return;
+  topbar.walletKey = key;
+  fill(topbar.wallet, ...walletRows());
+}
+
+// A tap anywhere else, or Escape, closes the list.
+document.addEventListener('click', (event) => {
+  if (topbar && !topbar.wallet.hidden && !topbar.wallet.contains(event.target) && !topbar.goldButton.contains(event.target)) {
+    showWallet(false);
+  }
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && topbar && !topbar.wallet.hidden) showWallet(false);
+});
 
 export function updateTopbar(now = serverNow()) {
   const character = state.character;
@@ -63,6 +123,13 @@ export function updateTopbar(now = serverNow()) {
   topbar.level.textContent = `POZ. ${character.level}`;
   topbar.classLevel.textContent = `${character.className.toUpperCase()} ${character.classLevel}`;
   topbar.gold.textContent = formatNumber(character.gold);
+  if (!topbar.wallet.hidden) refreshWallet();
+  // The camp shows the time left of the building being upgraded.
+  const building = character.camp.construction;
+  const busy = Boolean(building) && now < building.endsAt;
+  topbar.camp.classList.toggle('camp-button--busy', busy);
+  topbar.campLabel.textContent = busy ? formatCountdown(building.endsAt - now) : 'Obóz';
+  topbar.camp.setAttribute('aria-label', busy ? `Obóz, budowa: ${building.name}` : 'Obóz');
   topbar.hp.set(currentHp(character, now), character.maxHp);
   topbar.mana.set(character.mana, character.maxMana);
   topbar.xp.set(character.xp, character.xpToNext);
@@ -80,7 +147,7 @@ export function updateTopbar(now = serverNow()) {
     activityTime.textContent =
       hpNow >= character.maxHp
         ? 'PEŁNE HP'
-        : `PEŁNE HP ZA ${formatMinutes(Math.ceil((character.maxHp - hpNow) / character.regen.perMinute))}`.toUpperCase();
+        : `PEŁNE HP ZA ${formatMinutes(Math.ceil((character.maxHp - hpNow) / restRate(character)))}`.toUpperCase();
   }
 }
 

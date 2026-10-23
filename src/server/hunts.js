@@ -7,10 +7,15 @@ import {
   areaUnlocked,
   areaUnlockLevel,
   autoEquip,
+  bagCapacity,
+  bagOverflow,
+  campBonus,
+  campLevels,
   durationsUpTo,
   estimateThreat,
   huntDurations,
   huntReport,
+  sellPrice,
   simulateHunt,
   threatSamples,
 } from '../engine/index.js';
@@ -26,7 +31,11 @@ import {
 } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
+import { soldGold } from './inventory.js';
 import { KEPT_REPORTS } from './reports.js';
+
+// A JSON path for a resource id with a hyphen ("iron-ore").
+const resourcePath = (id) => `$."${id}"`;
 
 // Sample fights for the threat level depend only on the build, so the Worker
 // keeps them in memory while the build stays the same.
@@ -155,10 +164,32 @@ export async function claimHunt(context) {
     content,
   );
   const applied = applyHunt(character, hunt, content);
+  const now = context.now;
   // A find for a slot with nothing in it is worn at once.
   const autoEquipped = autoEquip(equippedItems(player), hunt.items, content, row.class_id);
+  // The rest goes to the bag. When it does not fit, the scrapper buys the
+  // weakest items, old or new, at the camp's price.
+  const levels = campLevels(player.buildings, now, content);
+  const capacity = bagCapacity(levels, content);
+  const sellBonus = campBonus(levels, 'sellPrice', content);
+  const bag = player.items.filter((item) => !item.equippedSlot);
+  const toBag = hunt.items.map((item, index) => index).filter((index) => !autoEquipped.includes(index));
+  const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
+  const sold = bagOverflow(candidates, capacity, row.class_id, content);
+  const soldStored = sold.filter((index) => index < bag.length).map((index) => bag[index].id);
+  const soldFound = sold.filter((index) => index >= bag.length).map((index) => toBag[index - bag.length]);
+  const soldFoundGold = soldFound.reduce((sum, index) => sum + sellPrice(hunt.items[index], content, sellBonus), 0);
+  const overflow =
+    sold.length > 0
+      ? {
+          capacity,
+          count: sold.length,
+          gold: sold.reduce((sum, index) => sum + sellPrice(candidates[index], content, sellBonus), 0),
+          sold: soldFound,
+        }
+      : null;
   const report = huntReport(
-    { hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped },
+    { hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped, overflow },
     content,
   );
   const summary = {
@@ -172,14 +203,19 @@ export async function claimHunt(context) {
     penalty: report.summary.penalty,
     gold: report.summary.gold,
     itemsFound: report.summary.itemsFound,
+    resources: report.summary.resources,
     bestFind: report.summary.bestFind && { name: report.summary.bestFind.name, color: report.summary.bestFind.color },
     levelAfter: applied.level,
     system: report.system,
   };
 
   const db = context.env.DB;
-  const now = context.now;
   const insertItem = db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, ?)');
+  const storedPrice = soldStored.length > 0 ? soldGold(row.id, soldStored, sellBonus) : { sql: '0', binds: [] };
+  const found = Object.entries(hunt.resources);
+  const setResources = found.length
+    ? `, resources = json_set(resources, ${found.map(() => '?, COALESCE(json_extract(resources, ?), 0) + ?').join(', ')})`
+    : '';
   let results;
   try {
     results = await db.batch([
@@ -191,16 +227,31 @@ export async function claimHunt(context) {
       db
         .prepare('DELETE FROM reports WHERE character_id = ? AND id NOT IN (SELECT id FROM reports WHERE character_id = ? ORDER BY id DESC LIMIT ?)')
         .bind(row.id, row.id, KEPT_REPORTS),
-      ...hunt.items.map((item, index) =>
-        insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now),
+      ...hunt.items.flatMap((item, index) =>
+        soldFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)],
       ),
       db
         .prepare(
-          `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ?,
+          `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ? + ${storedPrice.sql}${setResources},
              hp = ?, hp_at = ?, version = version + 1
            WHERE id = ?`,
         )
-        .bind(applied.level, applied.xp, applied.classLevel, applied.classXp, hunt.gold, hunt.hpEnd, activity.ends_at, row.id),
+        .bind(
+          applied.level,
+          applied.xp,
+          applied.classLevel,
+          applied.classXp,
+          hunt.gold + soldFoundGold,
+          ...storedPrice.binds,
+          ...found.flatMap(([id, amount]) => [resourcePath(id), resourcePath(id), amount]),
+          hunt.hpEnd,
+          activity.ends_at,
+          row.id,
+        ),
+      // Bag items the scrapper bought: paid for above, while they were still there.
+      ...(soldStored.length > 0
+        ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${soldStored.map(() => '?').join(', ')})`).bind(row.id, ...soldStored)]
+        : []),
       db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(row.id, activity.started_at),
     ]);
   } catch (error) {

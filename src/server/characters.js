@@ -4,7 +4,12 @@
 import {
   areaFor,
   autoDistribute,
+  bagCapacity,
+  campBonus,
+  campLevels,
   classXpToNext,
+  construction,
+  effectText,
   combatValues,
   computeStats,
   freePoints,
@@ -13,10 +18,13 @@ import {
   itemView,
   playerCombatant,
   regenPerMinute,
+  restBonus,
   restedHp,
   spentPoints,
   statEffects,
   unlockedFeatures,
+  upgradeCost,
+  upgradeMinutes,
   xpToNext,
 } from '../engine/index.js';
 import { content } from './content.js';
@@ -36,16 +44,30 @@ export function validateName(value) {
 export async function loadPlayer(db, userId) {
   const row = await db.prepare("SELECT * FROM characters WHERE user_id = ? AND role = 'player'").bind(userId).first();
   if (!row) return null;
-  const [items, activities] = await db.batch([
+  const [items, activities, buildings] = await db.batch([
     db.prepare('SELECT id, slot, data FROM items WHERE character_id = ? ORDER BY id').bind(row.id),
     db.prepare('SELECT * FROM activities WHERE character_id = ?').bind(row.id),
+    db.prepare('SELECT building_id, level, started_at, ends_at FROM buildings WHERE character_id = ?').bind(row.id),
   ]);
   return {
     row,
     // equippedSlot is where the item is worn (null in the bag); item.slot is where it can go.
     items: items.results.map((item) => ({ id: item.id, equippedSlot: item.slot, ...JSON.parse(item.data) })),
     activity: activities.results[0] ?? null,
+    // { campfire: { level, startedAt, endsAt } }: see camp.js in the engine.
+    buildings: Object.fromEntries(
+      buildings.results.map((building) => [
+        building.building_id,
+        { level: building.level, startedAt: building.started_at, endsAt: building.ends_at },
+      ]),
+    ),
   };
+}
+
+// Gold and resources together, as building costs name them.
+export function walletOf(row) {
+  const stored = JSON.parse(row.resources ?? '{}');
+  return { gold: row.gold, ...Object.fromEntries(content.resources.map((resource) => [resource.id, stored[resource.id] ?? 0])) };
 }
 
 export async function requirePlayer(context) {
@@ -81,15 +103,53 @@ export function engineCharacter(row) {
 
 export const equippedItems = (player) => player.items.filter((item) => item.equippedSlot);
 
-// HP now: frozen at the start of an activity, otherwise rested since hp_at.
+// HP now: frozen at the start of an activity, otherwise rested since hp_at,
+// faster with the camp's Ognisko.
 export function currentHp(player, now) {
   const character = engineCharacter(player.row);
   const { totals } = computeStats(character, equippedItems(player), content);
   const combatant = playerCombatant({ character, equipped: equippedItems(player), name: player.row.name }, content);
+  const rest = restBonus(player.buildings, player.row.hp_at, now, content);
   const hp = player.activity
     ? player.activity.hp_at_start
-    : restedHp({ hp: player.row.hp, since: player.row.hp_at, now, maxHp: combatant.maxHp, vitality: totals.vitality }, content);
-  return { hp: Math.min(hp, combatant.maxHp), maxHp: combatant.maxHp, vitality: totals.vitality, combatant };
+    : restedHp(
+        { hp: player.row.hp, since: player.row.hp_at, now, maxHp: combatant.maxHp, vitality: totals.vitality, ...rest },
+        content,
+      );
+  return { hp: Math.min(hp, combatant.maxHp), maxHp: combatant.maxHp, vitality: totals.vitality, combatant, rest };
+}
+
+// The camp as the page shows it: each building with its level and, below
+// its highest level, what the next one gives, costs and takes.
+function campView(player, levels, now) {
+  const running = construction(player.buildings, now);
+  return {
+    construction: running && {
+      buildingId: running.buildingId,
+      name: content.buildingsById[running.buildingId].name,
+      level: running.level,
+      startedAt: running.startedAt,
+      endsAt: running.endsAt,
+    },
+    buildings: content.buildings.map((building) => {
+      const level = levels[building.id];
+      const next = level < building.maxLevel ? level + 1 : null;
+      return {
+        id: building.id,
+        name: building.name,
+        description: building.description,
+        level,
+        maxLevel: building.maxLevel,
+        effect: level > 0 ? effectText(building, level) : null,
+        next: next && {
+          level: next,
+          effect: effectText(building, next),
+          minutes: upgradeMinutes(building, next),
+          cost: upgradeCost(building, next),
+        },
+      };
+    }),
+  };
 }
 
 // Where an activity takes place. region_id holds the inner region, or a whole
@@ -104,10 +164,13 @@ export function characterView(player, now) {
   const character = engineCharacter(row);
   const equipped = equippedItems(player);
   const { totals, sources } = computeStats(character, equipped, content);
-  const { hp, maxHp, combatant } = currentHp(player, now);
+  const { hp, maxHp, combatant, rest } = currentHp(player, now);
   const values = combatValues(character, equipped, content);
   const perPoint = statEffects(character, equipped, content);
-  const toItem = (item) => ({ id: item.id, ...itemView(item, content) });
+  const levels = campLevels(player.buildings, now, content);
+  const sellBonus = campBonus(levels, 'sellPrice', content);
+  const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus }) });
+  const { gold, ...resources } = walletOf(row);
   const weapon = combatant.weapon;
 
   return {
@@ -121,12 +184,21 @@ export function characterView(player, now) {
     classLevel: row.class_level,
     classXp: row.class_xp,
     classXpToNext: classXpToNext(row.class_level, content),
-    gold: row.gold,
+    gold,
+    resources,
     position: row.position,
     hp,
     maxHp,
-    // While resting, the page counts HP up the same way the server does.
-    regen: activity ? null : { hp: row.hp, since: row.hp_at, perMinute: regenPerMinute(maxHp, totals.vitality, content) },
+    // While resting, the page counts HP up the same way the server does. A
+    // camp upgrade that sped up resting since hp_at changes the pace at `at`.
+    regen: activity
+      ? null
+      : {
+          hp: row.hp,
+          since: row.hp_at,
+          perMinute: regenPerMinute(maxHp, totals.vitality, content, rest.bonus),
+          change: rest.change && { at: rest.change.at, perMinute: regenPerMinute(maxHp, totals.vitality, content, rest.change.bonus) },
+        },
     mana: values.mana,
     maxMana: values.mana,
     features: unlockedFeatures(row.level, content),
@@ -154,6 +226,8 @@ export function characterView(player, now) {
       }),
     ),
     bag: items.filter((item) => !item.equippedSlot).reverse().map(toItem),
+    bagCapacity: bagCapacity(levels, content),
+    camp: campView(player, levels, now),
     activity: activity && {
       kind: activity.kind,
       ...activityPlace(activity, row.level),
@@ -210,6 +284,7 @@ export async function deleteCharacter(context) {
     db.prepare('DELETE FROM reports WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM activities WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM items WHERE character_id = ?').bind(id),
+    db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM characters WHERE id = ?').bind(id),
   ]);
   return json({ ok: true });

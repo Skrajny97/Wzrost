@@ -15,6 +15,8 @@ import slots from '../../data/slots.json' with { type: 'json' };
 import stats from '../../data/stats.json' with { type: 'json' };
 import texts from '../../data/texts.json' with { type: 'json' };
 import unlocks from '../../data/unlocks.json' with { type: 'json' };
+import resources from '../../data/resources.json' with { type: 'json' };
+import buildings from '../../data/buildings.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -30,6 +32,8 @@ export const content = buildContent({
   balance,
   texts,
   unlocks,
+  resources,
+  buildings,
 });
 
 // What the page needs to label things; no balance numbers.
@@ -68,6 +72,8 @@ export function publicContent() {
     durations: { min: content.balance.hunt.minMinutes, step: content.balance.hunt.stepMinutes, max: content.balance.hunt.maxMinutes },
     lengths: content.texts.lengths,
     unlocks: content.unlocks.map(({ id, name, level, condition }) => ({ id, name, level, condition })),
+    resources: content.resources.map(({ id, name, description }) => ({ id, name, description })),
+    buildings: content.buildings.map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
     freeResetMaxLevel: content.balance.progression.freeResetMaxLevel,
     classEvolutionLevel: content.balance.progression.classEvolutionLevel,
   };

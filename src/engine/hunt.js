@@ -162,13 +162,15 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
   const { maxLevel } = content.balance.progression;
   let reached = { level: character.level, xp: character.xp ?? 0 };
   const items = [];
+  const resources = {}; // { wood: 12, … } found for the camp
   const fights = [];
   const entries = [];
   let key = null;
 
   for (const [step, event] of timeline.entries()) {
     if (event.type === 'find') {
-      // A find is gold, an item of the place's level or nothing of interest.
+      // A find is gold, an item of the place's level, a resource for the camp
+      // (by the region's weights) or nothing of interest.
       const findLevel = areaLevel(area, rng, content);
       const outcome = rng.weighted(Object.entries(rewards.findOutcomes), ([, weight]) => weight)[0];
       if (outcome === 'gold') {
@@ -179,6 +181,12 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
         const item = randomItem(findLevel, rng, content, loot);
         items.push(item);
         entries.push({ t: event.t, type: 'find', item: items.length - 1, text: say(texts, 'findItem', step, { item: itemName(item, content) }) });
+      } else if (outcome === 'resource') {
+        const [resourceId] = rng.weighted(Object.entries(area.resources), ([, weight]) => weight);
+        const amount = Math.max(1, Math.round(rewards.findResourcePerLevel * findLevel * rng.float(0.5, 1.5)));
+        resources[resourceId] = (resources[resourceId] ?? 0) + amount;
+        const resource = content.resourcesById[resourceId].name.toLowerCase();
+        entries.push({ t: event.t, type: 'find', text: say(texts, 'findResource', step, { resource, amount }) });
       } else {
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findNothing', step) });
       }
@@ -283,6 +291,7 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
     result,
     xp,
     gold,
+    resources,
     items,
     hpStart: player.hp,
     hpEnd: hpNow,
@@ -333,7 +342,9 @@ export function applyHunt(character, hunt, content) {
 }
 
 // `autoEquipped`: indices of the finds that went straight into empty slots.
-export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt, autoEquipped = [] }, content) {
+// `overflow`: what the scrapper bought because the bag was full
+// ({ capacity, count, gold, sold: indices of the finds among them }).
+export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt, autoEquipped = [], overflow = null }, content) {
   const area = content.areasById[areaId];
   const best = hunt.items.reduce(
     (top, item) => (top === null || itemRank(item, content) > itemRank(top, content) ? item : top),
@@ -357,6 +368,7 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       classXp: hunt.xp,
       penalty: applied.penalty,
       gold: hunt.gold,
+      resources: hunt.resources,
       fights: hunt.fights.length,
       itemsFound: hunt.items.length,
       bestFind: best && itemView(best, content),
@@ -374,8 +386,9 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
         const item = hunt.items[index];
         return say(content.texts, 'autoEquip', i, { item: itemName(item, content), slot: content.slotsById[item.slot].name });
       }),
+      ...(overflow && overflow.count > 0 ? [say(content.texts, 'bagOverflow', 0, overflow)] : []),
     ],
-    items: hunt.items.map((item) => itemView(item, content)),
+    items: hunt.items.map((item, index) => ({ ...itemView(item, content), ...(overflow?.sold.includes(index) && { sold: true }) })),
     fights: hunt.fights.map((fight) => ({
       t: fight.t,
       elite: fight.elite,

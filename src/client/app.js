@@ -4,7 +4,8 @@
 
 import { ApiError, request } from './api.js';
 import { $, $$, clear, h } from './dom.js';
-import { buildTopbar, updateNav, updateTopbar } from './layout.js';
+import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
+import { mountCamp } from './screens/camp.js';
 import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
 import { renderCreate } from './screens/create.js';
@@ -34,6 +35,8 @@ const ROUTES = [
   { pattern: /^#\/osada$/, nav: 'main', tab: 'osada', mount: lockedScreen('settlement', 'Osada') },
   { pattern: /^#\/dziennik(?:\/(?<tab>system))?$/, nav: 'main', tab: 'dziennik', mount: mountJournal },
   { pattern: /^#\/raport\/(?<id>\d+)$/, nav: 'main', tab: null, mount: mountReport },
+  // The camp opens from the top bar.
+  { pattern: /^#\/oboz$/, nav: 'main', tab: null, mount: mountCamp },
 ];
 const HOME = '#/walka';
 
@@ -93,7 +96,21 @@ function openGame() {
     const now = serverNow();
     updateTopbar(now);
     current?.screen.tick?.(now);
+    watchConstruction(now);
   }, 1000);
+}
+
+// When a camp upgrade ends, the character is fetched again (new levels,
+// faster rest, a bigger bag) and a short message says so.
+let campRetryAt = 0;
+function watchConstruction(now) {
+  const building = state.character?.camp.construction;
+  if (!building || now < building.endsAt + 1000 || now < campRetryAt) return;
+  // Without a connection it tries again every 30 seconds.
+  campRetryAt = now + 30000;
+  call('GET', '/api/character')
+    .then(() => toast(`${building.name}: poziom ${building.level} gotowy.`))
+    .catch((error) => toast(error.message));
 }
 
 function route() {
@@ -107,6 +124,7 @@ function route() {
   const { candidate, match } = found;
   current?.screen.unmount?.();
   closeSheet();
+  showWallet(false);
 
   if (candidate.nav === 'main') {
     lastMainHash = hash;

@@ -10,6 +10,7 @@ const DATA_DIR = new URL('../data/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
+  'resources', 'buildings',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['long-hunts', 'stats', 'skills', 'professions', 'training', 'settlement', 'dungeons', 'core'];
@@ -61,6 +62,8 @@ function checkReferences(data) {
   uniqueIds(errors, 'classes', data.classes);
   uniqueIds(errors, 'affixes', [...data.affixes.prefixes, ...data.affixes.suffixes]);
   const unlocks = uniqueIds(errors, 'unlocks', data.unlocks);
+  const resources = uniqueIds(errors, 'resources', data.resources);
+  uniqueIds(errors, 'buildings', data.buildings);
   for (const id of REQUIRED_UNLOCKS) {
     if (!unlocks.has(id)) errors.push(`unlocks.json: brak wpisu "${id}", którego używa kod gry`);
   }
@@ -161,9 +164,25 @@ function checkReferences(data) {
       }
     }
     if (next !== region.maxLevel + 1) errors.push(`regions.json: regiony wewnętrzne ${region.id} nie kończą się na poziomie ${region.maxLevel}`);
+    for (const id of Object.keys(region.resources)) {
+      if (!resources.has(id)) errors.push(`regions.json: ${region.id} ma nieznany zasób "${id}"`);
+    }
     const elite = monstersById.get(region.elite);
     if (!elite) errors.push(`regions.json: ${region.id} ma nieznaną elitę "${region.elite}"`);
     else if (!elite.elite) errors.push(`regions.json: elita ${region.id} ("${region.elite}") nie jest oznaczona jako elite`);
+  }
+
+  // A building is paid in gold and resources; the first level needs no
+  // resources, because a new character has none yet.
+  for (const building of data.buildings) {
+    for (const cost of building.costs) {
+      if (cost.resource !== 'gold' && !resources.has(cost.resource)) {
+        errors.push(`buildings.json: ${building.id} kosztuje nieznany zasób "${cost.resource}"`);
+      }
+      if (cost.resource !== 'gold' && (cost.fromLevel ?? 1) < 2) {
+        errors.push(`buildings.json: ${building.id} wymaga zasobu "${cost.resource}" już na poziomie 1`);
+      }
+    }
   }
 
   for (const position of Object.keys(data.balance.combat.targetWeights)) {

@@ -89,7 +89,11 @@ export function mountCharacter(container) {
   }
 
   function bagSection(bag) {
-    const count = h('span', { class: 'section-count', text: `(${formatNumber(bag.length)})` });
+    const capacity = state.character.bagCapacity;
+    const count = h('span', {
+      class: `section-count${bag.length >= capacity ? ' section-count--full' : ''}`,
+      text: `(${formatNumber(bag.length)}/${formatNumber(capacity)})`,
+    });
     return h(
       'section',
       { class: 'bag', 'aria-labelledby': 'bag-title' },

@@ -1,9 +1,24 @@
 // Wearing, taking off, throwing away and selling items.
 
-import { canUse, combatValues, sellPrice } from '../engine/index.js';
+import { bagCapacity, campBonus, campLevels, canUse, combatValues, sellPrice } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, engineCharacter, equippedItems, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
+
+// The scrapper's price for the stored items `ids`, counted in SQL from the
+// items still there, so an item sold twice at the same moment pays once.
+// `bonus` is the camp's Stół złomiarza (sellPrice() in the engine).
+export function soldGold(characterId, ids, bonus) {
+  const list = ids.map(() => '?').join(', ');
+  const multiplier = `CASE json_extract(data, '$.rarity') ${content.rarities.map((rarity) => `WHEN '${rarity.id}' THEN ${Number(rarity.sell)}`).join(' ')} END`;
+  return {
+    sql: `(SELECT COALESCE(SUM(MAX(1, ROUND(json_extract(data, '$.level') * ? * ${multiplier} * ?))), 0)
+           FROM items WHERE character_id = ? AND id IN (${list}))`,
+    binds: [content.balance.items.sellGoldPerLevel, 1 + bonus, characterId, ...ids],
+  };
+}
+
+const sellBonusOf = (player, now) => campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
 
 function findItem(player, id) {
   const item = player.items.find((candidate) => String(candidate.id) === id);
@@ -37,6 +52,10 @@ export async function unequipItem(context) {
   const { session, player } = await requireIdlePlayer(context);
   const item = findItem(player, context.params.id);
   if (!item.equippedSlot) throw new ApiError(409, 'not_equipped', 'Ten przedmiot nie jest założony.');
+  const capacity = bagCapacity(campLevels(player.buildings, context.now, content), content);
+  if (player.items.filter((candidate) => !candidate.equippedSlot).length >= capacity) {
+    throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
+  }
   await context.env.DB.prepare('UPDATE items SET slot = NULL WHERE id = ? AND character_id = ?')
     .bind(item.id, player.row.id)
     .run();
@@ -65,22 +84,17 @@ export async function sellItems(context) {
     // they go, so a second tap at the same moment pays nothing twice.
     const db = context.env.DB;
     const ids = sold.map((item) => item.id);
-    const list = ids.map(() => '?').join(', ');
-    const multiplier = `CASE json_extract(data, '$.rarity') ${content.rarities.map((rarity) => `WHEN '${rarity.id}' THEN ${Number(rarity.sell)}`).join(' ')} END`;
+    const price = soldGold(player.row.id, ids, sellBonusOf(player, context.now));
     const results = await db.batch([
       db
-        .prepare(
-          `UPDATE characters SET gold = gold + (
-             SELECT COALESCE(SUM(MAX(1, ROUND(json_extract(data, '$.level') * ? * ${multiplier}))), 0)
-             FROM items WHERE character_id = ? AND id IN (${list})
-           ), version = version + 1 WHERE id = ?`,
-        )
-        .bind(content.balance.items.sellGoldPerLevel, player.row.id, ...ids, player.row.id),
-      db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${list})`).bind(player.row.id, ...ids),
+        .prepare(`UPDATE characters SET gold = gold + ${price.sql}, version = version + 1 WHERE id = ?`)
+        .bind(...price.binds, player.row.id),
+      db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${ids.map(() => '?').join(', ')})`).bind(player.row.id, ...ids),
     ]);
     count = results[1].meta.changes;
   }
-  const gold = count === sold.length ? sold.reduce((sum, item) => sum + sellPrice(item, content), 0) : 0;
+  const bonus = sellBonusOf(player, context.now);
+  const gold = count === sold.length ? sold.reduce((sum, item) => sum + sellPrice(item, content, bonus), 0) : 0;
   return json({
     sold: { count, gold },
     character: characterView(await loadPlayer(context.env.DB, session.userId), context.now),

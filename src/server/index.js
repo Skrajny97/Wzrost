@@ -2,13 +2,14 @@
 // Assets before this code runs; only /api/* and unknown paths reach the Worker.
 
 import { login, logout, me, register } from './accounts.js';
+import { startBuilding } from './camp.js';
 import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
 import { ApiError, errorResponse, json } from './http.js';
 import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItems, unequipItem } from './inventory.js';
 import { getReport, listReports } from './reports.js';
-import { skipTime, testMode } from './testing.js';
+import { skipBuilding, skipTime, testMode } from './testing.js';
 
 const routes = [
   ['GET', '/api/health', health],
@@ -32,9 +33,11 @@ const routes = [
   ['POST', '/api/hunts', startHunt],
   ['POST', '/api/hunts/cancel', cancelHunt],
   ['POST', '/api/hunts/claim', claimHunt],
+  ['POST', '/api/camp/build', startBuilding],
   ['GET', '/api/reports', listReports],
   ['GET', '/api/reports/:id', getReport],
   ['POST', '/api/test/skip-time', skipTime],
+  ['POST', '/api/test/skip-build', skipBuilding],
 ].map(([method, pattern, handler]) => ({ method, parts: pattern.split('/'), handler }));
 
 // Returns the :params of a matching pattern, or null.

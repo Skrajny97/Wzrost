@@ -214,6 +214,14 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     });
   }
 
+  // "Drewno +6 · Kamień +3", in the order of the content; none before the camp.
+  function resourcesRow(found = {}) {
+    const parts = state.content.resources
+      .filter((resource) => found[resource.id] > 0)
+      .map((resource) => `${resource.name} +${formatNumber(found[resource.id])}`);
+    return parts.length > 0 && ['Zasoby', parts.join(' · ')];
+  }
+
   function summaryCard(report) {
     const summary = report.summary;
     const rows = [
@@ -222,6 +230,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       // Reports from before the split have no classXp: the class got the same XP.
       ['XP klasy', `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
       ['Złoto', `+${formatNumber(summary.gold)}`],
+      resourcesRow(summary.resources),
       ['Walki', formatNumber(summary.fights)],
       ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
     ].filter(Boolean);
@@ -331,7 +340,14 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           h(
             'li',
             {},
-            h('button', { type: 'button', class: 'item-row', onClick: () => findSheet(item) }, itemSummary(item), icon('chevron', { size: 18 })),
+            h(
+              'button',
+              { type: 'button', class: 'item-row', onClick: () => findSheet(item) },
+              itemSummary(item),
+              // Bought by the scrapper at once, because the bag was full.
+              item.sold && h('span', { class: 'chip chip--dashed', text: 'sprzedany' }),
+              icon('chevron', { size: 18 }),
+            ),
           ),
         ),
       ),

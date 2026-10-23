@@ -6,6 +6,18 @@ import {
   areaFor,
   autoDistribute,
   autoEquip,
+  bagCapacity,
+  bagOverflow,
+  buildingLevel,
+  campBonus,
+  campLevels,
+  construction,
+  effectText,
+  missingFor,
+  regenPerMinute,
+  restBonus,
+  upgradeCost,
+  upgradeMinutes,
   canUse,
   computeStats,
   createRng,
@@ -22,6 +34,7 @@ import {
   hoursToNext,
   huntDurations,
   huntingHours,
+  huntReport,
   itemName,
   itemProperties,
   lowLevelMultiplier,
@@ -446,6 +459,15 @@ describe('progression', () => {
     assert.ok(classXpToNext(1, content) < xpToNext(1, content));
   });
 
+  test('levels 2 to 5 need the same XP, and later ones more', () => {
+    // In the first inner region monsters are mostly of levels 1–2, so levels
+    // 2–5 need the same, smaller XP (earlyXpFactors): about 5 minutes each.
+    const needed = [1, 2, 3, 4, 5, 6, 7].map((level) => xpToNext(level, content));
+    assert.deepEqual(needed.slice(1, 5), [needed[1], needed[1], needed[1], needed[1]]);
+    for (let i = 1; i < needed.length; i++) assert.ok(needed[i] >= needed[i - 1], `level ${i + 1}`);
+    assert.ok(needed[5] > needed[4]);
+  });
+
   test('worn gear lags behind the level by at most 45 minutes of exploring', () => {
     assert.equal(gearLevel(1, content), 1);
     const lag = content.balance.monsters.gearLagMinutes;
@@ -624,4 +646,108 @@ test('the threat estimate for one inner region stays well within the CPU budget'
     for (const { character, equipped } of cases) faintChances({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content);
   }
   assert.ok((performance.now() - started) / 30 < 6, 'the average estimate took too long');
+});
+
+describe('camp', () => {
+  const campfire = content.buildingsById.campfire;
+
+  test('each level costs more and takes longer; the first takes gold only', () => {
+    assert.deepEqual(upgradeCost(campfire, 1), { gold: 10 });
+    assert.deepEqual(upgradeCost(campfire, 2), { gold: 19, wood: 6 });
+    assert.deepEqual(Object.keys(upgradeCost(campfire, 4)), ['gold', 'wood', 'stone']);
+    const minutes = Array.from({ length: campfire.maxLevel }, (_, i) => upgradeMinutes(campfire, i + 1));
+    assert.deepEqual(minutes.slice(0, 4), [1, 2, 5, 11]);
+    for (let i = 1; i < minutes.length; i++) assert.ok(minutes[i] > minutes[i - 1]);
+    // The last level of Ognisko builds for most of a day.
+    assert.ok(minutes.at(-1) > 16 * 60 && minutes.at(-1) < 24 * 60);
+    for (const building of content.buildings) {
+      for (let level = 2; level <= building.maxLevel; level++) {
+        assert.ok(upgradeCost(building, level).gold > upgradeCost(building, level - 1).gold);
+      }
+    }
+  });
+
+  test('an upgrade counts once it ends, and one runs at a time', () => {
+    const stored = { campfire: { level: 2, startedAt: 1000, endsAt: 5000 } };
+    assert.equal(buildingLevel(stored.campfire, 4999), 1);
+    assert.equal(buildingLevel(stored.campfire, 5000), 2);
+    assert.equal(buildingLevel(undefined, 5000), 0);
+    assert.deepEqual(campLevels(stored, 4000, content), { campfire: 1, 'loot-shed': 0, 'scrap-bench': 0 });
+    assert.equal(construction(stored, 4000).buildingId, 'campfire');
+    assert.equal(construction(stored, 5000), null);
+    assert.deepEqual(missingFor({ gold: 19, wood: 6 }, { gold: 20, wood: 2 }), [{ resource: 'wood', amount: 4 }]);
+  });
+
+  test('buildings speed up resting, enlarge the bag and raise the prices', () => {
+    const levels = { campfire: 3, 'loot-shed': 2, 'scrap-bench': 5 };
+    assert.ok(Math.abs(campBonus(levels, 'restSpeed', content) - 0.3) < 1e-9);
+    assert.equal(bagCapacity(levels, content), content.balance.items.bagSlots + 10);
+    assert.equal(bagCapacity({}, content), 20);
+    assert.ok(Math.abs(campBonus(levels, 'sellPrice', content) - 0.5) < 1e-9);
+    assert.equal(effectText(campfire, 3), 'Odpoczynek między wyprawami szybszy o 30%');
+    assert.equal(effectText(content.buildingsById['loot-shed'], 2), 'Plecak większy o 10 miejsc');
+    const item = generateItem({ baseId: 'sword', level: 10, rarityId: 'common' }, createRng('price'), content);
+    assert.equal(sellPrice(item, content, 0.5), Math.round(sellPrice(item, content) * 1.5));
+  });
+
+  test('an Ognisko finished during the rest speeds it up from then on', () => {
+    const stored = { campfire: { level: 1, startedAt: 0, endsAt: 30 * 60000 } };
+    const rest = restBonus(stored, 10 * 60000, 50 * 60000, content);
+    assert.deepEqual(rest, { bonus: 0, change: { at: 30 * 60000, bonus: 0.1 } });
+    // Far from full HP, so the cap does not hide the difference.
+    const base = { hp: 0, since: 10 * 60000, now: 50 * 60000, maxHp: 100000, vitality: 0 };
+    const plain = restedHp(base, content);
+    const faster = restedHp({ ...base, ...rest }, content);
+    // Half the time at the old pace, half 10% faster: 5% more in total.
+    assert.ok(Math.abs(faster / plain - 1.05) < 0.01);
+    assert.ok(Math.abs(regenPerMinute(100, 5, content, 0.1) / regenPerMinute(100, 5, content) - 1.1) < 1e-9);
+    // Built before the rest started: the whole rest is faster.
+    assert.deepEqual(restBonus(stored, 40 * 60000, 60 * 60000, content), { bonus: 0.1 });
+  });
+
+  test('a full bag sells the weakest items, new finds before old ones', () => {
+    const rng = createRng('bag');
+    const make = (baseId, rarityId, level, id) => ({ ...generateItem({ baseId, level, rarityId }, rng, content), ...(id && { id }) });
+    const bag = [make('sword', 'rare', 5, 1), make('staff', 'rare', 9, 2), make('sword', 'common', 3, 3)];
+    const finds = [make('sword', 'common', 3), make('helmet', 'unique', 4)];
+    // A warrior cannot use the staff, so it goes first; then the new common sword.
+    assert.deepEqual(bagOverflow([...bag, ...finds], 3, 'warrior', content), [1, 3]);
+    assert.deepEqual(bagOverflow(bag, 3, 'warrior', content), []);
+  });
+});
+
+describe('resources', () => {
+  test('explorations find resources of the region, instead of most empty finds', () => {
+    const character = newCharacter('warrior', { level: 10, classLevel: 11 });
+    const totals = {};
+    let empty = 0;
+    let finds = 0;
+    for (let i = 0; i < 40; i++) {
+      const hunt = simulateHunt(
+        { character, equipped: kit('warrior'), hp: 9999, name: 'Mira', areaId: 'fox-ravines', minutes: 240, seed: `res:${i}` },
+        content,
+      );
+      for (const [id, amount] of Object.entries(hunt.resources)) totals[id] = (totals[id] ?? 0) + amount;
+      for (const entry of hunt.entries.filter((candidate) => candidate.type === 'find')) {
+        finds += 1;
+        if (content.texts.findNothing.includes(entry.text)) empty += 1;
+      }
+    }
+    assert.deepEqual(Object.keys(totals).sort(), ['iron-ore', 'stone', 'wood']);
+    // Wiatrołomy: more wood than stone, more stone than ore.
+    assert.ok(totals.wood > totals.stone && totals.stone > totals['iron-ore']);
+    assert.ok(empty / finds < 0.12, `${empty} of ${finds} empty`);
+    const report = huntReport(
+      {
+        hunt: simulateHunt({ character, equipped: kit('warrior'), hp: 9999, name: 'Mira', areaId: 'fox-ravines', minutes: 240, seed: 'res:0' }, content),
+        applied: { penalty: 0, level: 10, classLevel: 11, messages: [] },
+        character,
+        areaId: 'fox-ravines',
+        startedAt: 0,
+        endsAt: 1,
+      },
+      content,
+    );
+    assert.equal(typeof report.summary.resources, 'object');
+  });
 });

@@ -501,14 +501,85 @@ button {
   flex-shrink: 0;
 }
 
+/* The gold is a button: it opens the camp's resources under it. */
 .gold {
   display: flex;
   align-items: center;
   gap: 6px;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: none;
   color: var(--gold);
   font-family: var(--font-system);
   font-size: 14px;
   font-weight: 600;
+}
+
+.gold[aria-expanded='true'] {
+  background: var(--bark-active);
+}
+
+.wallet-list {
+  position: absolute;
+  top: calc(max(8px, env(safe-area-inset-top)) + 48px);
+  right: var(--gutter);
+  z-index: 30;
+  min-width: 210px;
+  margin: 0;
+  padding: 4px 12px;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+}
+
+.wallet-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.wallet-item + .wallet-item {
+  border-top: 1px solid var(--line);
+}
+
+.wallet-name {
+  flex: 1;
+  color: var(--text);
+}
+
+.wallet-amount {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* The camp in the top right corner, with the time left of an upgrade. */
+.camp-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 48px;
+  height: 44px;
+  padding: 0 4px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.camp-button--busy {
+  color: var(--system);
 }
 
 .icon-button {
@@ -2691,4 +2762,86 @@ a.segmented-option {
   .arena-banner {
     transition: none;
   }
+}
+
+/* Obóz: gold and resources, the upgrade in progress and the buildings. */
+.camp-wallet {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.camp-wallet-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid var(--bark-line);
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.camp-wallet-name {
+  flex: 1;
+  min-width: 0;
+  color: var(--text);
+}
+
+.camp-wallet-item strong {
+  color: var(--gold);
+}
+
+.building-card {
+  gap: 10px;
+}
+
+.building-effect,
+.building-next,
+.building-time {
+  margin: 0;
+  font-size: 15px;
+}
+
+.building-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+}
+
+.cost-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--bark-line);
+  color: var(--text);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.cost strong {
+  color: var(--leaf);
+}
+
+.cost--missing strong {
+  color: var(--danger);
+}
+
+.section-count--full {
+  color: var(--danger);
 }

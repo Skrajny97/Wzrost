@@ -87,9 +87,32 @@ export function randomItem(level, rng, content, { rarityBonus = 1, filled, class
 }
 
 // Gold from the scrapper: level × goldPerLevel × the rarity's multiplier.
-export function sellPrice(item, content) {
+// `bonus`: the share the camp adds to the scrapper's prices (Stół złomiarza).
+export function sellPrice(item, content, bonus = 0) {
   const rarity = content.raritiesById[item.rarity];
-  return Math.max(1, Math.round(item.level * content.balance.items.sellGoldPerLevel * rarity.sell));
+  return Math.max(1, Math.round(item.level * content.balance.items.sellGoldPerLevel * rarity.sell * (1 + bonus)));
+}
+
+// When the bag holds more than its places, the scrapper buys the weakest
+// items: those the class cannot use first, then by rarity and level, a new
+// find before an item already in the bag (it has an id). Returns the indices
+// of the items to sell.
+export function bagOverflow(items, capacity, classId, content) {
+  const extra = items.length - capacity;
+  if (extra <= 0) return [];
+  const usable = (item) => (canUse(item.base, classId, content) ? 1 : 0);
+  const kept = (item) => (item.id === undefined ? 0 : 1);
+  return items
+    .map((item, index) => ({ item, index }))
+    .sort(
+      (a, b) =>
+        usable(a.item) - usable(b.item) ||
+        itemRank(a.item, content) - itemRank(b.item, content) ||
+        kept(a.item) - kept(b.item) ||
+        a.index - b.index,
+    )
+    .slice(0, extra)
+    .map(({ index }) => index);
 }
 
 export function itemName(item, content) {
@@ -145,7 +168,7 @@ export function autoEquip(equipped, items, content, classId) {
   return [...best.values()].sort((a, b) => a - b);
 }
 
-export function itemView(item, content) {
+export function itemView(item, content, { sellBonus = 0 } = {}) {
   const rarity = content.raritiesById[item.rarity];
   const classIds = baseClasses(item.base, content);
   return {
@@ -161,6 +184,6 @@ export function itemView(item, content) {
     // null: any class can use it.
     classIds,
     classNames: classIds && classIds.map((id) => content.classesById[id].name),
-    price: sellPrice(item, content),
+    price: sellPrice(item, content, sellBonus),
   };
 }

@@ -36,6 +36,13 @@ export const ICONS = {
   close: [path('M6 6l12 12M18 6L6 18')],
   hourglass: [path('M7 3h10M7 21h10'), path('M8 3c0 5 8 5.5 8 9s-8 4-8 9M16 3c0 5-8 5.5-8 9s8 4 8 9')],
   chevron: [path('M9 5l7 7-7 7')],
+  tent: [path('M2.5 20L12 4l9.5 16'), path('M2.5 20h19'), path('M9 20l3-6 3 6'), path('M12 4l1.5-2')],
+  hammer: [path('M13 4.5l6.5 6.5-2.5 2.5L10.5 7z'), path('M12 9L4 17l3 3 8-8')],
+
+  // Camp resources (gold has the coin)
+  logs: [circle(7.5, 16, 3.5), circle(16.5, 16, 3.5), circle(12, 8.5, 3.5), circle(12, 8.5, 1), circle(7.5, 16, 1), circle(16.5, 16, 1)],
+  stone: [path('M3.5 18.5l2.5-7 5.5-5 6 2.5 3 6-1.5 3.5z'), path('M6 11.5l5 3.5 9-0.5')],
+  ore: [path('M3.5 18.5l2.5-7 5.5-5 6 2.5 3 6-1.5 3.5z'), circle(10, 12.5, 1.2), circle(14.5, 10, 1.2), circle(13.5, 15.5, 1.2)],
 
   // Equipment slots
   head: [path('M4 16c0-5 3.6-9 8-9s8 4 8 9'), path('M4 16h16v3H4z'), path('M12 7V4')],
@@ -91,3 +98,10 @@ export const CLASS_ICONS = {
 
 // The icon of an item: its base when it has its own, otherwise its slot.
 export const itemIcon = (item) => (ICONS[item.base] ? item.base : SLOT_ICONS[item.slot] ?? 'unknown');
+
+export const RESOURCE_ICONS = {
+  gold: 'coin',
+  wood: 'logs',
+  stone: 'stone',
+  'iron-ore': 'ore',
+};

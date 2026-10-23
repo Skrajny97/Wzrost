@@ -13,6 +13,7 @@
       "recoveryBonus": 0.05
     },
     "elite": "wisp",
+    "resources": { "wood": 5, "stone": 3, "iron-ore": 2 },
     "areas": [
       {
         "id": "windfalls-edge",
@@ -130,6 +131,7 @@
       "frontArmorBonus": 0.05
     },
     "elite": "likho",
+    "resources": { "wood": 3, "stone": 5, "iron-ore": 2 },
     "areas": [
       {
         "id": "mossy-boulders",

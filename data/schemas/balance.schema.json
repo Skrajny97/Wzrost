@@ -203,7 +203,8 @@
         "armorPerBudget",
         "statPerBudget",
         "resistancePerBudget",
-        "sellGoldPerLevel"
+        "sellGoldPerLevel",
+        "bagSlots"
       ],
       "properties": {
         "budgetBase": {
@@ -243,6 +244,11 @@
           "type": "number",
           "minimum": 0,
           "description": "Cena u złomiarza: poziom przedmiotu × ta wartość × mnożnik rzadkości (sell w rarities.json)."
+        },
+        "bagSlots": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Miejsca w plecaku bez Szałasu na łupy. Założone przedmioty się nie liczą."
         }
       }
     },
@@ -412,7 +418,8 @@
         "toughRarityBonus",
         "toughDropMultiplier",
         "findOutcomes",
-        "findGoldPerLevel"
+        "findGoldPerLevel",
+        "findResourcePerLevel"
       ],
       "properties": {
         "xpBase": {
@@ -455,11 +462,12 @@
         },
         "findOutcomes": {
           "type": "object",
-          "description": "Wagi wyniku znaleziska: złoto, przedmiot albo nic ciekawego.",
+          "description": "Wagi wyniku znaleziska: złoto, przedmiot, zasób (resources.json, według wag regionu) albo nic ciekawego.",
           "additionalProperties": false,
           "required": [
             "gold",
             "item",
+            "resource",
             "nothing"
           ],
           "properties": {
@@ -468,6 +476,10 @@
               "minimum": 0
             },
             "item": {
+              "type": "number",
+              "minimum": 0
+            },
+            "resource": {
               "type": "number",
               "minimum": 0
             },
@@ -480,6 +492,11 @@
         "findGoldPerLevel": {
           "type": "number",
           "minimum": 0
+        },
+        "findResourcePerLevel": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Ilość zasobu ze znaleziska: poziom znaleziska × ta wartość × losowo 0,5–1,5, co najmniej 1."
         }
       }
     },
@@ -511,6 +528,7 @@
         "levelTimeExponent",
         "xpPerHourScale",
         "classXpFactor",
+        "earlyXpFactors",
         "freeResetMaxLevel",
         "classEvolutionLevel"
       ],
@@ -535,6 +553,11 @@
         "xpPerHourScale": {
           "type": "number",
           "minimum": 0
+        },
+        "earlyXpFactors": {
+          "type": "array",
+          "items": { "type": "number", "exclusiveMinimum": 0 },
+          "description": "Mnożniki XP potrzebnego na pierwsze poziomy (od poziomu 1). W pierwszym regionie wewnętrznym potwory mają głównie poziomy 1–2, więc bez nich poziomy 3–5 trwałyby 8–16 minut zamiast ok. 5. Poziomy 2–5 wymagają po tyle samo XP."
         },
         "classXpFactor": {
           "type": "number",

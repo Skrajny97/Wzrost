@@ -16,6 +16,7 @@ function areasOf(region) {
     safe: region.safe,
     trait: region.trait,
     elite: region.elite,
+    resources: area.resources ?? region.resources,
   }));
 }
 
@@ -50,5 +51,9 @@ export function buildContent(raw) {
     texts: raw.texts,
     unlocks: raw.unlocks,
     unlocksById: byId(raw.unlocks),
+    resources: raw.resources,
+    resourcesById: byId(raw.resources),
+    buildings: raw.buildings,
+    buildingsById: byId(raw.buildings),
   };
 }

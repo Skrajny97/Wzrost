@@ -43,8 +43,12 @@ export function gearLevel(level, content) {
   return table[Math.min(level, table.length - 1)];
 }
 
+// The first levels need less XP (earlyXpFactors): in the first inner region
+// the monsters are mostly of levels 1–2, so a level 3–5 character earns less
+// than the curve assumes.
 export function xpToNext(level, content) {
-  return Math.max(1, Math.round(xpPerHour(level, content) * huntingHours(level, content)));
+  const factor = content.balance.progression.earlyXpFactors[level - 1] ?? 1;
+  return Math.max(1, Math.round(xpPerHour(level, content) * huntingHours(level, content) * factor));
 }
 
 // XP per hour of hunting at a level, in a region that suits it: the scale the
@@ -91,13 +95,19 @@ export function lowLevelMultiplier(characterLevel, monsterLevel, content) {
   return levelsBelow <= 0 ? 1 : Math.max(hunt.lowLevelMinMultiplier, 1 - hunt.lowLevelStepPenalty * levelsBelow);
 }
 
-export function regenPerMinute(maxHp, vitality, content) {
+// `bonus`: the share the camp adds to resting (Ognisko).
+export function regenPerMinute(maxHp, vitality, content, bonus = 0) {
   const regen = content.balance.regen;
-  return maxHp * (regen.perMinute + regen.perVitalityPerMinute * vitality);
+  return maxHp * (regen.perMinute + regen.perVitalityPerMinute * vitality) * (1 + bonus);
 }
 
-// HP after resting from `since` to `now` (both server times in ms).
-export function restedHp({ hp, since, now, maxHp, vitality }, content) {
-  const minutes = Math.max(0, now - since) / 60000;
-  return Math.min(maxHp, Math.floor(hp + regenPerMinute(maxHp, vitality, content) * minutes));
+// HP after resting from `since` to `now` (both server times in ms). `change`
+// ({ at, bonus }) is a new camp bonus from the time `at` on.
+export function restedHp({ hp, since, now, maxHp, vitality, bonus = 0, change }, content) {
+  const minutes = (from, to) => Math.max(0, to - from) / 60000;
+  const switchAt = change ? Math.min(Math.max(change.at, since), now) : now;
+  const gained =
+    regenPerMinute(maxHp, vitality, content, bonus) * minutes(since, switchAt) +
+    (change ? regenPerMinute(maxHp, vitality, content, change.bonus) * minutes(switchAt, now) : 0);
+  return Math.min(maxHp, Math.floor(hp + gained));
 }

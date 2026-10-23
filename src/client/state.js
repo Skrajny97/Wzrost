@@ -50,11 +50,25 @@ export async function call(method, path, body) {
 }
 
 // HP right now: while resting it grows exactly as the server counts it.
+// The same as restedHp() in the engine: a camp upgrade can change the pace at
+// `change.at`.
 export function currentHp(character = state.character, now = serverNow()) {
   if (!character.regen) return character.hp;
-  const { hp, since, perMinute } = character.regen;
-  return Math.min(character.maxHp, Math.floor(hp + (perMinute * Math.max(0, now - since)) / 60000));
+  const { hp, since, perMinute, change } = character.regen;
+  const minutes = (from, to) => Math.max(0, to - from) / 60000;
+  const at = change ? Math.min(Math.max(change.at, since), now) : now;
+  const gained = perMinute * minutes(since, at) + (change ? change.perMinute * minutes(at, now) : 0);
+  return Math.min(character.maxHp, Math.floor(hp + gained));
 }
+
+// HP a minute while resting now.
+export const restRate = (character = state.character) => character.regen?.change?.perMinute ?? character.regen?.perMinute ?? 0;
+
+// Gold and the camp's resources, with their names, in the order to show them.
+export const walletEntries = (character = state.character) => [
+  { id: 'gold', name: 'Złoto', amount: character.gold },
+  ...state.content.resources.map((resource) => ({ id: resource.id, name: resource.name, amount: character.resources[resource.id] ?? 0 })),
+];
 
 // A second of slack, so the page never asks for a report before the server has it.
 export const activityFinished = (activity, now = serverNow()) => Boolean(activity) && now >= activity.endsAt + 1000;

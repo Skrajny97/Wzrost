@@ -16,5 +16,6 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `threat.js` | poziom zagrożenia przed wyprawą |
 | `preview.js` | wartości bojowe i skutek jednego punktu statystyki |
 | `unlocks.js` | kolejność odblokowań samouczka, długości wypraw i regiony wewnętrzne otwierane poziomem klasy |
+| `camp.js` | obóz: poziomy budynków w czasie, koszty i czasy budowy, premie (odpoczynek, plecak, ceny złomiarza) |
 
 Na razie silnik działa tylko na serwerze (DECISIONS.md, Etap 1, punkt 28). Każde wywołanie musi zmieścić się w limicie 10 ms CPU.

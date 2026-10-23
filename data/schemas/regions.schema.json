@@ -16,6 +16,7 @@
       "description",
       "trait",
       "elite",
+      "resources",
       "areas"
     ],
     "properties": {
@@ -78,6 +79,12 @@
       },
       "elite": {
         "type": "string"
+      },
+      "resources": {
+        "type": "object",
+        "description": "Wagi zasobów (resources.json) w znaleziskach: im większa, tym częściej ten zasób.",
+        "minProperties": 1,
+        "additionalProperties": { "type": "number", "minimum": 0 }
       },
       "areas": {
         "type": "array",
