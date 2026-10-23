@@ -48,6 +48,7 @@
   "classLevelUp": ["{className}: poziom klasy {level}. Wolne punkty statystyk: +{points}."],
   "classLevelUpLocked": ["{className}: poziom klasy {level}. Wolne punkty statystyk: +{points}. Rozdasz je od poziomu {unlockLevel}."],
   "faintPenalty": ["Omdlenie. Utracone doświadczenie: {xp}."],
+  "autoEquip": ["Założono od razu: {item} ({slot}), bo ten slot był pusty."],
   "result": {
     "success": "Wyprawa zakończona.",
     "fainted": "Omdlenie.",

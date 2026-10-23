@@ -119,7 +119,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/auth/login` | logowanie: `identifier` (login lub e-mail), `password` |
 | POST | `/api/auth/logout` | wylogowanie |
 | GET | `/api/me` | zalogowany gracz |
-| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości, żywiołów i regionów, zakres czasu polowań, odblokowania |
+| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości, żywiołów i regionów, zakres czasu polowań, odblokowania, `testMode` |
 | GET | `/api/character` | pełny widok postaci (404 `no_character`, gdy jej nie ma) |
 | POST | `/api/character` | nowa postać: `name`, `classId` |
 | DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami i wyprawą |
@@ -136,5 +136,10 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/hunts/claim` | odbierz raport zakończonego polowania |
 | GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |
 | GET | `/api/reports/:id` | pełny raport |
+| POST | `/api/test/skip-time` | tylko w trybie testowym: kończy od razu wyprawę albo odpoczynek („Pomiń czas”) |
 
 Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie `message` jest po polsku.
+
+## Tryb testowy
+
+Dopóki grę testujemy, `TEST_MODE` w `wrangler.jsonc` ma wartość `"on"`, a zakładka Walka ma przycisk „Pomiń czas”. Kończy on od razu trwającą wyprawę, bez zmiany wyniku, albo odpoczynek. Po testach wystarczy ustawić `"off"` i wdrożyć.

@@ -1,7 +1,16 @@
 // Hunts on server time: the start stores the start time, length and seed; the
 // claim after the end runs the engine with that seed and saves the report.
 
-import { applyHunt, durationsUpTo, estimateThreat, huntDurations, huntReport, simulateHunt, threatSamples } from '../engine/index.js';
+import {
+  applyHunt,
+  autoEquip,
+  durationsUpTo,
+  estimateThreat,
+  huntDurations,
+  huntReport,
+  simulateHunt,
+  threatSamples,
+} from '../engine/index.js';
 import { content } from './content.js';
 import {
   characterView,
@@ -125,8 +134,10 @@ export async function claimHunt(context) {
     content,
   );
   const applied = applyHunt(character, hunt, content);
+  // A find for a slot with nothing in it is worn at once.
+  const autoEquipped = autoEquip(equippedItems(player), hunt.items, content);
   const report = huntReport(
-    { hunt, applied, character, regionId: activity.region_id, startedAt: activity.started_at, endsAt: activity.ends_at },
+    { hunt, applied, character, regionId: activity.region_id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped },
     content,
   );
   const summary = {
@@ -145,7 +156,7 @@ export async function claimHunt(context) {
 
   const db = context.env.DB;
   const now = context.now;
-  const insertItem = db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)');
+  const insertItem = db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, ?)');
   let results;
   try {
     results = await db.batch([
@@ -157,7 +168,9 @@ export async function claimHunt(context) {
       db
         .prepare('DELETE FROM reports WHERE character_id = ? AND id NOT IN (SELECT id FROM reports WHERE character_id = ? ORDER BY id DESC LIMIT ?)')
         .bind(row.id, row.id, KEPT_REPORTS),
-      ...hunt.items.map((item) => insertItem.bind(row.id, JSON.stringify(item), now)),
+      ...hunt.items.map((item, index) =>
+        insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now),
+      ),
       db
         .prepare(
           `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ?,

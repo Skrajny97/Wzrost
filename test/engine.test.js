@@ -4,6 +4,7 @@ import { describe, test } from 'node:test';
 import {
   applyHunt,
   autoDistribute,
+  autoEquip,
   computeStats,
   createRng,
   earnedPoints,
@@ -325,6 +326,16 @@ describe('progression', () => {
     assert.ok(at(10) > 10 && at(10) < 100);
     assert.equal(at(10000), 100);
   });
+});
+
+test('finds go straight into empty slots, the best one for each', () => {
+  const rng = createRng('auto');
+  const item = (baseId, rarityId = 'common', level = 1) => generateItem({ baseId, level, rarityId }, rng, content);
+  const finds = [item('sword'), item('helmet'), item('axe', 'rare'), item('boots'), item('hood', 'common', 2)];
+  // Nothing worn: the rare axe beats the sword, the level 2 hood beats the helmet.
+  assert.deepEqual(autoEquip([], finds, content), [2, 3, 4]);
+  // A worn weapon keeps every weapon in the bag.
+  assert.deepEqual(autoEquip([item('dagger')], finds, content), [3, 4]);
 });
 
 describe('tutorial unlocks', () => {

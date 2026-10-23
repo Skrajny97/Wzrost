@@ -104,7 +104,7 @@ export function renderCreate(container, onCreated) {
     ),
     systemPanel(
       'Wykryto nową istotę na skraju puszczy. Wybierz ścieżkę klasy i podaj imię.',
-      'Zaczynasz bez ekwipunku. Broń swojej klasy zdobędziesz w pierwszej wygranej walce.',
+      'Zaczynasz bez ekwipunku. Broń swojej klasy zdobędziesz w pierwszej wygranej walce, a postać od razu ją założy.',
       'Klasy oznaczone jako „łagodniejszy start” rzadziej mdleją na długich wyprawach.',
     ),
     form,

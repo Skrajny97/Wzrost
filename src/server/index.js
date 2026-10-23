@@ -8,6 +8,7 @@ import { ApiError, errorResponse, json } from './http.js';
 import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, unequipItem } from './inventory.js';
 import { getReport, listReports } from './reports.js';
+import { skipTime, testMode } from './testing.js';
 
 const routes = [
   ['GET', '/api/health', health],
@@ -15,7 +16,7 @@ const routes = [
   ['POST', '/api/auth/login', login],
   ['POST', '/api/auth/logout', logout],
   ['GET', '/api/me', me],
-  ['GET', '/api/content', () => json(publicContent())],
+  ['GET', '/api/content', ({ env }) => json({ ...publicContent(), testMode: testMode(env) })],
   ['GET', '/api/character', getCharacter],
   ['POST', '/api/character', createCharacter],
   ['DELETE', '/api/character', deleteCharacter],
@@ -32,6 +33,7 @@ const routes = [
   ['POST', '/api/hunts/claim', claimHunt],
   ['GET', '/api/reports', listReports],
   ['GET', '/api/reports/:id', getReport],
+  ['POST', '/api/test/skip-time', skipTime],
 ].map(([method, pattern, handler]) => ({ method, parts: pattern.split('/'), handler }));
 
 // Returns the :params of a matching pattern, or null.

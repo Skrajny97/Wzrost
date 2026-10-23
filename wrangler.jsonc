@@ -21,7 +21,10 @@
   ],
   "vars": {
     // Overridden on deploy with the short commit SHA.
-    "APP_VERSION": "dev"
+    "APP_VERSION": "dev",
+    // "on" while the game is being tested: the Walka tab gets "Pomiń czas",
+    // which ends the current hunt or rest at once. "off" removes it.
+    "TEST_MODE": "on"
   },
   "observability": {
     "enabled": true

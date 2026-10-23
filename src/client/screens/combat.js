@@ -33,6 +33,7 @@ export function mountCombat(container, { navigate }) {
   let countdown = null;
   let progress = null;
   let shownFinished = null;
+  let shownSkip = null;
 
   // HP in tenths of the maximum: resting moves the threat now and then.
   const hpStep = (character, now) => Math.floor((currentHp(character, now) / character.maxHp) * 10);
@@ -70,6 +71,7 @@ export function mountCombat(container, { navigate }) {
     const character = state.character;
     const activity = character.activity;
     shownFinished = activityFinished(activity);
+    shownSkip = skipKind(character);
     countdown = null;
     progress = null;
     threatViews.length = 0;
@@ -77,9 +79,39 @@ export function mountCombat(container, { navigate }) {
     fill(container,
       h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Walka' })),
       modeTabs(),
+      testTools(),
       activity ? activityCard(activity) : huntList(character),
     );
     if (!activity) loadOptions();
+  }
+
+  // What "Pomiń czas" would skip now: the hunt, the rest, or nothing.
+  function skipKind(character, now = serverNow()) {
+    if (!state.content.testMode) return null;
+    if (character.activity) return activityFinished(character.activity, now) ? null : 'hunt';
+    return currentHp(character, now) < character.maxHp ? 'rest' : null;
+  }
+
+  // Test mode only: one button that ends the current wait.
+  function testTools() {
+    if (!shownSkip) return null;
+    return h(
+      'div',
+      { class: 'test-tools' },
+      h('p', {
+        class: 'test-tools-text',
+        text:
+          shownSkip === 'hunt'
+            ? 'Tryb testowy: wyprawa skończy się od razu, z tym samym wynikiem.'
+            : 'Tryb testowy: HP wróci od razu do pełna.',
+      }),
+      h('button', {
+        type: 'button',
+        class: 'button button--test',
+        text: 'Pomiń czas',
+        onClick: (event) => withButton(event.currentTarget, () => call('POST', '/api/test/skip-time')),
+      }),
+    );
   }
 
   function modeTabs() {
@@ -169,7 +201,7 @@ export function mountCombat(container, { navigate }) {
       first
         ? systemPanel(
             'Wiatrołomy to najbezpieczniejsze miejsce na start. Wybierz czas i wyrusz. Raport przeczytasz po powrocie.',
-            'Nie masz jeszcze ekwipunku. Pierwszy pokonany przeciwnik zostawi broń Twojej klasy.',
+            'Nie masz jeszcze ekwipunku. Pierwszy pokonany przeciwnik zostawi broń Twojej klasy, a postać od razu ją założy.',
           )
         : unarmed && systemPanel('Walczysz gołymi rękami. Załóż broń z plecaka w zakładce Postać, jeśli już ją masz.'),
       state.content.regions.map((region) => regionCard(region, character)),
@@ -299,6 +331,10 @@ export function mountCombat(container, { navigate }) {
 
   function tick(now) {
     const activity = state.character.activity;
+    if (skipKind(state.character, now) !== shownSkip) {
+      render();
+      return;
+    }
     if (!activity) {
       loadOptions(now);
       return;

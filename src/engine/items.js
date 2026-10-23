@@ -113,6 +113,19 @@ export function itemRank(item, content) {
   return content.rarities.findIndex((rarity) => rarity.id === item.rarity) * 1000 + item.level;
 }
 
+// Finds that go straight into empty slots: for each slot nothing is worn in,
+// the best item found for it. Returns their indices in `items`, in order.
+export function autoEquip(equipped, items, content) {
+  const worn = new Set(equipped.map((item) => item.slot));
+  const best = new Map();
+  items.forEach((item, index) => {
+    if (worn.has(item.slot)) return;
+    const chosen = best.get(item.slot);
+    if (chosen === undefined || itemRank(item, content) > itemRank(items[chosen], content)) best.set(item.slot, index);
+  });
+  return [...best.values()].sort((a, b) => a - b);
+}
+
 export function itemView(item, content) {
   const rarity = content.raritiesById[item.rarity];
   return {

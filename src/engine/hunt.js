@@ -252,7 +252,8 @@ export function applyHunt(character, hunt, content) {
   };
 }
 
-export function huntReport({ hunt, applied, character, regionId, startedAt, endsAt }, content) {
+// `autoEquipped`: indices of the finds that went straight into empty slots.
+export function huntReport({ hunt, applied, character, regionId, startedAt, endsAt, autoEquipped = [] }, content) {
   const region = content.regionsById[regionId];
   const best = hunt.items.reduce(
     (top, item) => (top === null || itemRank(item, content) > itemRank(top, content) ? item : top),
@@ -282,7 +283,13 @@ export function huntReport({ hunt, applied, character, regionId, startedAt, ends
       hpEnd: hunt.hpEnd,
       maxHp: hunt.maxHp,
     },
-    system: applied.messages,
+    system: [
+      ...applied.messages,
+      ...autoEquipped.map((index, i) => {
+        const item = hunt.items[index];
+        return say(content.texts, 'autoEquip', i, { item: itemName(item, content), slot: content.slotsById[item.slot].name });
+      }),
+    ],
     items: hunt.items.map((item) => itemView(item, content)),
     fights: hunt.fights.map((fight) => ({
       t: fight.t,

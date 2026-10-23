@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
+import { skipTime } from '../src/server/testing.js';
 import { useServer } from './helpers/server.js';
 
 const { call, db } = useServer();
@@ -239,7 +240,11 @@ describe('hunts and reports', () => {
     assert.ok(report.fights.every((fight) => fight.allies.length === 1 && fight.enemies.length >= 1));
     assert.equal(character.activity, null);
     assert.equal(character.gold, report.summary.gold);
-    assert.equal(character.bag.length, report.items.length);
+    // The first weapon goes straight into the empty slot, the rest into the bag.
+    assert.ok(character.equipment.weapon);
+    const worn = Object.values(character.equipment).filter(Boolean).length;
+    assert.equal(character.bag.length + worn, report.items.length);
+    assert.ok(report.system.some((line) => line.startsWith('Założono od razu: ')));
     assert.equal(character.level > 1 || character.xp === report.summary.xp, true);
     assert.equal(report.fights.length, report.summary.fights);
 
@@ -269,6 +274,28 @@ describe('hunts and reports', () => {
     assert.equal(rows.newest, data.report.id);
     // The 49 newest of the old ones stay: 7 to 55.
     assert.equal(rows.oldest, 7);
+  });
+
+  test('"Pomiń czas" in test mode ends the hunt at once, then the rest', async () => {
+    assert.equal((await call('GET', '/api/content')).data.testMode, true);
+    await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 45 } });
+    const skipped = await call('POST', '/api/test/skip-time', { cookie });
+    assert.equal(skipped.status, 200);
+    const activity = skipped.data.character.activity;
+    assert.equal(activity.finished, true);
+    assert.equal(activity.endsAt - activity.startedAt, 45 * 60000);
+    const claim = await call('POST', '/api/hunts/claim', { cookie });
+    assert.equal(claim.status, 200);
+    assert.equal(claim.data.report.minutes, 45);
+
+    // Without a hunt it fills HP.
+    await (await db()).prepare('UPDATE characters SET hp = 1, hp_at = ?').bind(Date.now()).run();
+    const rested = await call('POST', '/api/test/skip-time', { cookie });
+    assert.equal(rested.data.character.hp, rested.data.character.maxHp);
+  });
+
+  test('without test mode "Pomiń czas" does not exist', async () => {
+    await assert.rejects(skipTime({ env: { TEST_MODE: 'off' } }), (error) => error.status === 404);
   });
 
   test('level 1 hunts are short; long ones open at level 2', async () => {
