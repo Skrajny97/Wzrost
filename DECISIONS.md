@@ -6,6 +6,13 @@ Tu zapisujemy decyzje, których nie rozstrzyga [dokument projektowy](https://cla
 
 1. **Maksymalny czas polowania: 4 godziny**, z myślą o krótkim AFK. Minimum zostaje 5 minut, jak w przykładzie z dokumentu.
 2. **Wolne punkty statystyk.** Każdy poziom postaci daje tyle wolnych punktów, ile jest statystyk (dziś 8). Każdy poziom klasy daje ¼ tej liczby (dziś 2).
+3. **Rodzaje obrażeń.** Są trzy rodzaje obrażeń:
+   - fizyczne: broń, kły, pazury, upadki,
+   - magiczne: każde ma żywioł,
+   - okresowe: zadawane co turę przez kilka tur, każde ma żywioł (zatrucie, oparzenie, wychłodzenie).
+
+   Żywioły to ogień, mróz, woda, elektryczność, ziemia, natura i trucizna. Światła i cienia nie ma. Jedno trafienie może zadać obrażenia i dodatkowo nałożyć efekt okresowy. Przykład: ukąszenie żmii zadaje obrażenia fizyczne i może wywołać zatrucie.
+4. **Obrona przed obrażeniami (założenie Claude).** Pancerz zmniejsza obrażenia fizyczne. Odporność na żywioł zmniejsza obrażenia magiczne i okresowe tego żywiołu. Wola zmniejsza szansę, że efekt okresowy się nałoży. Wszystkie trzy działają według wzoru z malejącym zwrotem z dokumentu.
 
 ## Etap 0 — konfiguracja (22.10.2026)
 
