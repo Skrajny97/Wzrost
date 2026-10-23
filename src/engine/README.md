@@ -8,11 +8,11 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `content.js` | zamienia pliki z `data/` na słowniki używane przez silnik |
 | `formulas.js` | wspólne wzory, m.in. malejący zwrot P / (P + K) |
 | `stats.js` | statystyki i ich źródła, wolne punkty, „Rozdaj według klasy” |
-| `items.js` | przedmioty: budżet, afiksy, nazwy, opis właściwości |
+| `items.js` | przedmioty: budżet, afiksy, nazwy, klasy, cena u złomiarza, zakładanie do pustych slotów |
 | `combatant.js` | postać i potwór w tej samej postaci do walki |
 | `combat.js` | automatyczna walka do trzech na trzech |
-| `hunt.js` | polowanie: walki, znaleziska, odpoczynek, omdlenie, raport |
-| `progression.js` | doświadczenie, poziomy, kara za omdlenie, regeneracja HP |
+| `hunt.js` | eksploracja: tempo walk, spotkania zwykłe, wymagające i elita, znaleziska, odpoczynek, omdlenie, raport |
+| `progression.js` | doświadczenie, poziomy, poziom noszonego ekwipunku, kara za omdlenie, regeneracja HP |
 | `threat.js` | poziom zagrożenia przed wyprawą |
 | `preview.js` | wartości bojowe i skutek jednego punktu statystyki |
 | `unlocks.js` | kolejność odblokowań samouczka |

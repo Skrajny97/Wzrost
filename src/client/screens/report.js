@@ -7,7 +7,7 @@ import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, state } from '../state.js';
-import { openSheet, systemPanel, withButton } from '../ui.js';
+import { confirmAction, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { itemDetails, itemSheet, itemSummary } from './character.js';
 
 const RESULT_CLASS = { success: 'result--success', fainted: 'result--fainted', escaped: 'result--escaped' };
@@ -159,6 +159,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         `Walka ${index + 1} z ${count}`,
         report.keyFight?.index === index && h('span', { class: 'chip chip--key', text: 'najważniejsza' }),
         fight.elite && h('span', { class: 'chip chip--elite', text: 'elita' }),
+        fight.tough && h('span', { class: 'chip chip--tough', text: 'wymagająca' }),
       ),
       h('p', { class: 'fight-meta', text: `${formatOffset(fight.t)} · ${enemies}` }),
       h('p', { class: `fight-outcome fight-outcome--${String(fight.won)}`, text: outcome }),
@@ -268,6 +269,53 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     openSheet(itemDetails(item), h('p', { class: 'muted', text: 'Tego przedmiotu nie ma już w plecaku ani w ekwipunku.' }));
   }
 
+  // The scrapper buys what is in the bag, up to a rarity; worn items stay.
+  function scrapperSheet() {
+    const bag = state.character.bag;
+    const rarities = state.content.rarities;
+    const rank = (item) => rarities.findIndex((rarity) => rarity.id === item.rarity);
+    openSheet(
+      h('h2', { class: 'sheet-title', text: 'Złomiarz' }),
+      h('p', { class: 'sheet-text', text: 'Sprzedaj przedmioty z plecaka o rzadkości niższej lub równej:' }),
+      h(
+        'div',
+        { class: 'scrap-options' },
+        rarities.map((rarity, index) => {
+          const items = bag.filter((item) => rank(item) <= index);
+          const gold = items.reduce((sum, item) => sum + item.price, 0);
+          const amount = countOf(items.length, 'przedmiot', 'przedmioty', 'przedmiotów');
+          return h(
+            'button',
+            {
+              type: 'button',
+              class: 'button button--world scrap-option',
+              disabled: items.length === 0,
+              onClick: () => sell(rarity, amount, gold),
+            },
+            h('span', { class: 'item-name', vars: { '--rarity': rarity.color }, text: rarity.name }),
+            h('span', { class: 'scrap-detail', text: items.length > 0 ? `${amount} · ${formatNumber(gold)} złota` : 'nic do sprzedania' }),
+          );
+        }),
+      ),
+      h('p', { class: 'muted', text: 'Założone przedmioty zostają na postaci.' }),
+    );
+  }
+
+  async function sell(rarity, amount, gold) {
+    const sure = await confirmAction({
+      title: 'Sprzedać przedmioty?',
+      text: `Złomiarz kupi ${amount} (do rzadkości: ${rarity.name}) za ${formatNumber(gold)} złota.`,
+      confirmLabel: 'Sprzedaj',
+    });
+    if (!sure) return;
+    try {
+      const { sold } = await call('POST', '/api/items/sell', { maxRarity: rarity.id });
+      toast(`Sprzedano: ${countOf(sold.count, 'przedmiot', 'przedmioty', 'przedmiotów')} za ${formatNumber(sold.gold)} złota.`);
+    } catch (error) {
+      toast(error.message);
+    }
+  }
+
   function itemsSection(report) {
     if (report.items.length === 0) return null;
     return h(
@@ -324,9 +372,14 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           }),
       });
     const waiting = character.activity && activityFinished(character.activity);
+    const scrap =
+      idle &&
+      character.bag.length > 0 &&
+      h('button', { type: 'button', class: 'button button--world', onClick: scrapperSheet, text: 'Sprzedaj zbędne przedmioty u złomiarza' });
     fill(
       actionBox,
       again,
+      scrap,
       waiting && h('a', { class: 'button button--system', href: '#/walka', text: 'Kolejny raport czeka na odbiór' }),
       h('a', { class: 'button button--world', href: '#/postac', text: 'Postać i plecak' }),
       h('a', { class: 'button button--world', href: '#/dziennik', text: 'Dziennik' }),

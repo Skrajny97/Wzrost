@@ -59,19 +59,37 @@ export function rollRarity(rng, content, bonus = 1) {
   return rng.weighted(content.rarities, (rarity) => rarity.dropWeight * (rarity.affixes > 0 ? bonus : 1)).id;
 }
 
-// Loot favours the slots the character has empty, and while it has no weapon
-// a weapon is always one of its class. `filled` is the set of slots already
-// covered (worn, or found earlier in the same hunt); found items are added.
+// Weapons and off-hands belong to classes (classes.json); everything else
+// fits anyone. Returns the classes that can use a base, or null for all.
+export function baseClasses(baseId, content) {
+  const base = content.basesById[baseId];
+  const key = base.slot === 'weapon' ? 'weapons' : base.slot === 'offhand' ? 'offhands' : null;
+  return key && content.classes.filter((cls) => cls[key].includes(baseId)).map((cls) => cls.id);
+}
+
+export const canUse = (baseId, classId, content) => baseClasses(baseId, content)?.includes(classId) ?? true;
+
+// Loot favours the slots the character has empty, only ever holds weapons and
+// off-hands of its class, and while it has no weapon a weapon is always one of
+// its class. `filled` is the set of slots already covered (worn, or found
+// earlier in the same hunt); found items are added.
 export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId } = {}) {
   let base;
   if (filled && classId && !filled.has('weapon')) {
     base = content.basesById[rng.pick(content.classesById[classId].weapons)];
   } else {
     const weight = content.balance.items.emptySlotWeight;
-    base = rng.weighted(content.bases, (candidate) => (filled && !filled.has(candidate.slot) ? weight : 1));
+    const bases = classId ? content.bases.filter((candidate) => canUse(candidate.id, classId, content)) : content.bases;
+    base = rng.weighted(bases, (candidate) => (filled && !filled.has(candidate.slot) ? weight : 1));
   }
   filled?.add(base.slot);
   return generateItem({ baseId: base.id, level, rarityId: rollRarity(rng, content, rarityBonus) }, rng, content);
+}
+
+// Gold from the scrapper: level × goldPerLevel × the rarity's multiplier.
+export function sellPrice(item, content) {
+  const rarity = content.raritiesById[item.rarity];
+  return Math.max(1, Math.round(item.level * content.balance.items.sellGoldPerLevel * rarity.sell));
 }
 
 export function itemName(item, content) {
@@ -114,12 +132,13 @@ export function itemRank(item, content) {
 }
 
 // Finds that go straight into empty slots: for each slot nothing is worn in,
-// the best item found for it. Returns their indices in `items`, in order.
-export function autoEquip(equipped, items, content) {
+// the best item found for it that the class can use. Returns their indices in
+// `items`, in order.
+export function autoEquip(equipped, items, content, classId) {
   const worn = new Set(equipped.map((item) => item.slot));
   const best = new Map();
   items.forEach((item, index) => {
-    if (worn.has(item.slot)) return;
+    if (worn.has(item.slot) || (classId && !canUse(item.base, classId, content))) return;
     const chosen = best.get(item.slot);
     if (chosen === undefined || itemRank(item, content) > itemRank(items[chosen], content)) best.set(item.slot, index);
   });
@@ -128,6 +147,7 @@ export function autoEquip(equipped, items, content) {
 
 export function itemView(item, content) {
   const rarity = content.raritiesById[item.rarity];
+  const classIds = baseClasses(item.base, content);
   return {
     name: itemName(item, content),
     base: item.base,
@@ -138,5 +158,9 @@ export function itemView(item, content) {
     rarityName: rarity.name,
     color: rarity.color,
     properties: itemProperties(item, content),
+    // null: any class can use it.
+    classIds,
+    classNames: classIds && classIds.map((id) => content.classesById[id].name),
+    price: sellPrice(item, content),
   };
 }

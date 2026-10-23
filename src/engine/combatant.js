@@ -1,7 +1,8 @@
 // Combatants: the player character and monsters reduced to the same shape, so
 // the combat code treats both alike (and later companions or other players).
 
-import { budget, cappedChance, maxHp, speed, weaponDamage } from './formulas.js';
+import { budget, cappedChance, damageScale, maxHp, speed, weaponDamage } from './formulas.js';
+import { gearLevel } from './progression.js';
 import { computeStats } from './stats.js';
 
 export function playerCombatant({ character, equipped, hp, name, region, id = 'a0', side = 'ally' }, content) {
@@ -27,6 +28,7 @@ export function playerCombatant({ character, equipped, hp, name, region, id = 'a
     hp: Math.min(hp ?? hpMax, hpMax),
     weapon,
     scalingValue: totals[weapon.scaling],
+    damageScale: damageScale(totals[weapon.scaling], character.level, balance),
     armor: Math.round(armor),
     resist: { ...bonuses.resist },
     dodgeRating: totals.dexterity * balance.combat.dodgePerDexterity,
@@ -73,9 +75,10 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   const balance = content.balance;
   const monster = content.monstersById[monsterId];
   const stat = (key) => (monster.stats.base[key] ?? 0) + (monster.stats.growth[key] ?? 0) * (level - 1);
-  // Monsters use smaller flat bases than players, which mostly softens the
-  // lowest levels, where a new character has only its starting items.
-  const hide = balance.monsters.budgetBase + balance.items.budgetPerLevel * level;
+  // A monster's natural weapon and hide match the items a character usually
+  // wears at its level (gearLevel), so at the fast first levels they lag
+  // behind like the character's.
+  const hide = balance.monsters.budgetBase + balance.items.budgetPerLevel * gearLevel(level, content);
   const average = weaponDamage(hide, monster.attack.damageFactor, balance) * balance.monsters.damageMultiplier * groupFactor;
   const resist = {};
   for (const [element, value] of Object.entries(monster.resistances ?? {})) {
@@ -108,6 +111,7 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
       dot: monster.attack.dot,
     },
     scalingValue: stat(monster.attack.scaling),
+    damageScale: damageScale(stat(monster.attack.scaling), level, balance),
     armor: Math.round(hide * balance.items.armorPerBudget * monster.armorFactor + stat('endurance') * balance.combat.armorPerEndurance),
     resist,
     dodgeRating: stat('dexterity') * balance.combat.dodgePerDexterity,
@@ -121,7 +125,7 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
 // What the report shows when a participant's stats are expanded with "+".
 export function combatantView(unit, opponentLevel, content) {
   const balance = content.balance;
-  const scale = 1 + unit.scalingValue * balance.combat.scalingPerPoint;
+  const scale = unit.damageScale;
   const percent = (value) => Math.round(value * 100);
   return {
     id: unit.id,

@@ -63,7 +63,7 @@ export function mountStats(container) {
         h('span', { class: 'badge badge--system badge--tall', text: `WOLNE PUNKTY: ${formatNumber(free)}` }),
       ),
       levelsCard(character),
-      busy && systemPanel('Postać jest na polowaniu. Punkty rozdzielisz po jej powrocie.'),
+      busy && systemPanel('Postać jest na wyprawie. Punkty rozdzielisz po jej powrocie.'),
       actions(character, busy, pendingTotal),
       h(
         'div',
@@ -89,7 +89,7 @@ export function mountStats(container) {
       'section',
       { class: 'card levels', 'aria-label': 'Poziomy' },
       levelRow('Poziom postaci', character.level, character.xp, character.xpToNext, 'level',
-        `DO POZ. ${character.level + 1}: OK. ${formatHours(character.hoursToNext).toUpperCase()} POLOWANIA`),
+        `DO POZ. ${character.level + 1}: OK. ${formatHours(character.hoursToNext).toUpperCase()} EKSPLORACJI`),
       levelRow(`Klasa · ${character.className}`, character.classLevel, character.classXp, character.classXpToNext, 'class',
         character.classLevel < evolution ? `PIERWSZA EWOLUCJA: POZ. KLASY ${evolution}` : 'EWOLUCJA KLASY: WKRÓTCE'),
       h(

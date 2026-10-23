@@ -95,7 +95,7 @@ export function mountCharacter(container) {
       { class: 'bag', 'aria-labelledby': 'bag-title' },
       h('h2', { class: 'section-title', id: 'bag-title' }, 'Plecak ', count),
       bag.length === 0
-        ? h('p', { class: 'muted', text: 'Plecak jest pusty. Łupy z polowań trafiają tutaj.' })
+        ? h('p', { class: 'muted', text: 'Plecak jest pusty. Łupy z wypraw trafiają tutaj.' })
         : h(
             'ul',
             { class: 'bag-grid' },
@@ -155,6 +155,7 @@ export function mountCharacter(container) {
 export function itemSheet(item, { equipped }) {
   const character = state.character;
   const busy = Boolean(character.activity);
+  const usable = !item.classIds || item.classIds.includes(character.classId);
   const worn = equipped ? null : character.equipment[item.slot];
   const act = (path) => async (event) =>
     withButton(event.currentTarget, async () => {
@@ -178,7 +179,8 @@ export function itemSheet(item, { equipped }) {
     itemDetails(item),
     preview,
     worn && h('div', { class: 'compare' }, h('p', { class: 'compare-title', text: 'Założony teraz' }), itemDetails(worn, { small: true })),
-    busy && h('p', { class: 'muted', text: 'Postać jest na polowaniu. Ekwipunek zmienisz po jej powrocie.' }),
+    busy && h('p', { class: 'muted', text: 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.' }),
+    !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
     h(
       'div',
       { class: 'sheet-actions' },
@@ -186,7 +188,7 @@ export function itemSheet(item, { equipped }) {
         ? h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: 'Zdejmij' })
         : [
             h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: discard, text: 'Wyrzuć' }),
-            h('button', { type: 'button', class: 'button button--system', disabled: busy, onClick: act('equip'), text: 'Załóż' }),
+            h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable, onClick: act('equip'), text: 'Załóż' }),
           ],
     ),
   );
@@ -246,16 +248,18 @@ export function itemDetails(item, { small = false } = {}) {
       'ul',
       { class: 'item-properties' },
       item.properties.map((line) => h('li', { text: line })),
+      item.classNames && h('li', { class: 'item-classes', text: `${item.classNames.length > 1 ? 'Dla klas' : 'Dla klasy'}: ${item.classNames.join(', ')}` }),
+      item.price !== undefined && h('li', { class: 'item-price', text: `U złomiarza: ${formatNumber(item.price)} złota` }),
     ),
   );
 }
 
 function characterMessage(character, busy) {
-  if (busy) return 'Postać jest na polowaniu. Ekwipunek zmienisz po jej powrocie.';
+  if (busy) return 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.';
   if (character.freePoints > 0 && isUnlocked('stats')) {
     return `Masz ${formatNumber(character.freePoints)} ${plural(character.freePoints, 'wolny punkt', 'wolne punkty', 'wolnych punktów')} statystyk. Rozdziel je w Statystykach.`;
   }
   return `Doświadczenie: ${formatNumber(character.xp)} / ${formatNumber(character.xpToNext)}. Do poziomu ${
     character.level + 1
-  } zostało ok. ${formatHours(character.hoursToNext)} polowania.`;
+  } zostało ok. ${formatHours(character.hoursToNext)} eksploracji.`;
 }

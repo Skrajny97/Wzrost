@@ -1,105 +1,164 @@
-// Threat level shown before a hunt, from the region, its length, current HP
-// and the party. Sample fights against every kind of encounter of the region,
-// its elite included, show how much HP each kind costs. They use the same
-// combatant as the hunt itself (stats, equipment, and later skills and
-// companions), so the rating follows the whole character, not its level
-// alone. The chance of fainting then follows from how likely each HP level is
-// before every next fight, with the encounters' odds and the rest after each
-// won fight, as in a real hunt. HP is counted in steps of 2% of the maximum.
+// Threat level shown before an exploration, from the region, its length,
+// current HP and the party. Sample fights against every kind of encounter of
+// the region (regular, demanding and the elite) show how much HP each kind
+// costs. They use the same combatant as the exploration itself (stats,
+// equipment, and later skills and companions), so the rating follows the whole
+// character, not its level alone. The chance of fainting then follows from how
+// likely each HP level is before every next fight, with the odds of each kind
+// for that length and the rest after each won fight, as in a real
+// exploration. HP is counted in steps of 4% of the maximum.
 
 import { playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
-import { eliteEncounter, encounterCombatants, encountersFor, regularEncounter } from './hunt.js';
+import {
+  eliteEncounter,
+  encounterCombatants,
+  encountersFor,
+  explorationPace,
+  regularEncounter,
+  toughEncountersFor,
+} from './hunt.js';
 import { createRng } from './rng.js';
 import { durationsUpTo } from './unlocks.js';
 
-const SAMPLES_PER_KIND = 6;
-const STEPS = 50;
+// Sample fights per kind of encounter: each encounter of the region and the
+// elite. Kinds whose outcome is in doubt (some fights lost, or a close one)
+// then share more fights, in proportion to how often they are met, so one
+// unlucky fight decides less. A character that loses 15% or more of the
+// regular fights is in very high danger on any exploration, so more fights
+// would change nothing. The elite is met in at most one exploration in nine
+// and its fights are long, so it keeps the first few.
+const SAMPLES = 3;
+const MORE_SAMPLES = { regular: 27, tough: 18, elite: 0 };
+const STEPS = 25;
+const LOST = STEPS + 1;
 export const THREAT_LEVELS = ['low', 'moderate', 'high', 'very-high'];
 // Highest chance of fainting for "low", "moderate" and "high".
 const LIMITS = [0.01, 0.05, 0.15];
 
-const fightsIn = (minutes, tuning) => Math.max(1, Math.round(minutes / tuning.fightIntervalMinutes));
+// One kind of encounter: how many of its sample fights cost each amount of HP,
+// in steps, and how many were lost (the last bin).
+const sampleKind = (build, weight) => ({ build, weight, counts: new Array(LOST + 1).fill(0), fought: 0, lost: 0, worst: 0 });
+
+// A fight that drags on ends the exploration without fainting, so it is left out.
+function fightSamples(kind, times, player, rng, content) {
+  for (let i = 0; i < times; i++) {
+    const fight = simulateFight({ allies: [{ ...player }], enemies: encounterCombatants(kind.build(), content), rng, content });
+    if (fight.won === null) continue;
+    kind.fought += 1;
+    if (!fight.won) {
+      kind.counts[LOST] += 1;
+      kind.lost += 1;
+      continue;
+    }
+    const left = fight.units.find((unit) => unit.id === player.id).hp;
+    const steps = Math.round(((player.maxHp - left) / player.maxHp) * STEPS);
+    kind.counts[steps] += 1;
+    kind.worst = Math.max(kind.worst, steps);
+  }
+}
+
+const inDoubt = (kind) => kind.lost < kind.fought && (kind.lost > 0 || kind.worst >= STEPS * 0.6);
+
+// Weighted mix of the kinds' shares of fights, by HP lost in steps.
+function mix(kinds) {
+  const total = kinds.reduce((sum, kind) => sum + kind.weight, 0);
+  const shares = new Array(LOST + 1).fill(0);
+  for (const kind of kinds) {
+    if (kind.fought === 0) continue;
+    for (let steps = 0; steps <= LOST; steps++) shares[steps] += (kind.counts[steps] / kind.fought) * (kind.weight / total);
+  }
+  return shares;
+}
 
 // The expensive part: sample fights for the character's current build. It
-// does not depend on HP, so the server can keep it until the build changes.
+// does not depend on HP or the length, so the server can keep it until the
+// build changes.
 export function threatSamples({ character, equipped, regionId }, content) {
   const region = content.regionsById[regionId];
-  const tuning = content.balance.hunt;
   const player = playerCombatant({ character, equipped, name: 'próba', region }, content);
   const rng = createRng(`threat:${regionId}:${character.level}`);
-  const encounters = encountersFor(region, character.level);
-  const totalWeight = encounters.reduce((sum, encounter) => sum + encounter.weight, 0);
-  const kinds = [
-    ...encounters.map((encounter) => ({
-      odds: ((1 - tuning.eliteChancePerFight) * encounter.weight) / totalWeight,
-      build: () => regularEncounter(encounter, region, rng, content, character.level),
-    })),
-    { odds: tuning.eliteChancePerFight, elite: true, build: () => eliteEncounter(region, content, character.level) },
-  ];
-
-  // HP lost in each sample fight, in steps, with summed odds. A lost fight
-  // takes everything. Against the elite of a safe region running out of HP
-  // means a retreat, not fainting ("safe"); a fight that drags on ends the
-  // hunt without fainting, so it is left out.
-  const lossOdds = new Map();
-  for (const kind of kinds) {
-    const safe = Boolean(kind.elite && region.safe);
-    for (let i = 0; i < SAMPLES_PER_KIND; i++) {
-      const fight = simulateFight({ allies: [{ ...player }], enemies: encounterCombatants(kind.build(), content), rng, content });
-      if (fight.won === null) continue;
-      const hpLeft = fight.won ? fight.units.find((unit) => unit.id === player.id).hp : 0;
-      const steps = fight.won ? Math.round(((player.maxHp - hpLeft) / player.maxHp) * STEPS) : STEPS + 1;
-      const key = `${steps}:${safe}`;
-      const entry = lossOdds.get(key) ?? { steps, safe, odds: 0 };
-      entry.odds += kind.odds / SAMPLES_PER_KIND;
-      lossOdds.set(key, entry);
+  const kinds = (encounters, options) =>
+    encounters.map((encounter) =>
+      sampleKind(() => regularEncounter(encounter, region, rng, content, character.level, options), encounter.weight),
+    );
+  const groups = {
+    regular: kinds(encountersFor(region, character.level)),
+    tough: kinds(toughEncountersFor(region, character.level), { tough: true }),
+    elite: [sampleKind(() => eliteEncounter(region, content, character.level), 1)],
+  };
+  for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content);
+  if (mix(groups.regular)[LOST] < LIMITS.at(-1)) {
+    for (const [group, list] of Object.entries(groups)) {
+      const total = list.reduce((sum, kind) => sum + kind.weight, 0);
+      for (const kind of list.filter(inDoubt)) {
+        fightSamples(kind, Math.ceil((MORE_SAMPLES[group] * kind.weight) / total), player, rng, content);
+      }
     }
   }
-  const entries = [...lossOdds.values()];
   return {
     maxHp: player.maxHp,
     recovery: player.recovery,
-    losses: entries.map((entry) => entry.steps),
-    odds: entries.map((entry) => entry.odds),
-    safe: entries.map((entry) => entry.safe),
+    regular: mix(groups.regular),
+    tough: groups.tough.length > 0 ? mix(groups.tough) : null,
+    elite: mix(groups.elite),
+    // Against the elite of a safe region running out of HP is a retreat.
+    eliteSafe: Boolean(region.safe),
   };
 }
 
-// Chance of fainting for every hunt length, between 0 and 1.
+// Chance of fainting for every exploration length, between 0 and 1.
 export function faintChances({ character, equipped, hp, regionId }, content, samples) {
-  const tuning = content.balance.hunt;
-  const { maxHp, recovery, losses, odds, safe } = samples ?? threatSamples({ character, equipped, regionId }, content);
-
+  const { maxHp, recovery, regular, tough, elite, eliteSafe } = samples ?? threatSamples({ character, equipped, regionId }, content);
   // HP after the rest that follows a won fight, for each HP left after it.
   const rested = Array.from({ length: STEPS + 1 }, (_, left) => Math.round(left + (STEPS - left) * recovery));
-  // chances[step]: how likely the next fight starts with step × 2% HP.
+  const start = Math.round((Math.min(hp, maxHp) / maxHp) * STEPS);
   let chances = new Float64Array(STEPS + 1);
   let next = new Float64Array(STEPS + 1);
-  chances[Math.round((Math.min(hp, maxHp) / maxHp) * STEPS)] = 1;
-  const faintedAt = [];
-  for (let fight = 0; fight < fightsIn(tuning.maxMinutes, tuning); fight++) {
-    next.fill(0);
-    let fainted = 0;
-    for (let step = 0; step <= STEPS; step++) {
-      const chance = chances[step];
-      if (chance === 0) continue;
-      for (let i = 0; i < losses.length; i++) {
-        const left = step - losses[i];
-        if (left > 0) next[rested[left]] += chance * odds[i];
-        else if (!safe[i]) fainted += chance * odds[i];
-      }
-    }
-    faintedAt.push(fainted);
-    [chances, next] = [next, chances];
-  }
+  // Per length: the share of fights by HP lost, all kinds mixed by their odds,
+  // and the chance that a fight begun with some HP ends in fainting.
+  const shares = new Float64Array(LOST + 1);
+  const faintFrom = new Float64Array(STEPS + 1);
 
-  return Object.fromEntries(
-    durationsUpTo(tuning.maxMinutes, content).map((minutes) => {
-      const fainted = faintedAt.slice(0, fightsIn(minutes, tuning)).reduce((sum, chance) => sum + chance, 0);
-      return [minutes, Math.min(1, fainted)];
-    }),
-  );
+  const result = {};
+  for (const minutes of durationsUpTo(content.balance.hunt.maxMinutes, content)) {
+    const pace = explorationPace(minutes, content);
+    const eliteShare = pace.eliteChance;
+    const toughShare = tough ? pace.toughChance : 0;
+    const losses = [];
+    for (let steps = 0; steps <= LOST; steps++) {
+      const fight = regular[steps] * (1 - toughShare) + (toughShare > 0 ? tough[steps] * toughShare : 0);
+      shares[steps] = (1 - eliteShare) * fight + eliteShare * elite[steps];
+      if (steps < LOST && shares[steps] > 0) losses.push(steps);
+    }
+    // A lost fight, or one that takes all the HP left, ends in fainting, except
+    // against the elite of a safe region.
+    const fainting = (steps) => shares[steps] - (eliteSafe ? eliteShare * elite[steps] : 0);
+    let tail = fainting(LOST);
+    for (let steps = STEPS; steps >= 0; steps--) {
+      tail += fainting(steps);
+      faintFrom[steps] = tail;
+    }
+
+    chances.fill(0);
+    chances[start] = 1;
+    let fainted = 0;
+    for (let fight = 0; fight < pace.fights; fight++) {
+      next.fill(0);
+      for (let step = 0; step <= STEPS; step++) {
+        const chance = chances[step];
+        if (chance === 0) continue;
+        fainted += chance * faintFrom[step];
+        for (const loss of losses) {
+          if (loss >= step) break;
+          next[rested[step - loss]] += chance * shares[loss];
+        }
+      }
+      [chances, next] = [next, chances];
+    }
+    result[minutes] = Math.min(1, fainted);
+  }
+  return result;
 }
 
 export function threatLevel(chance) {

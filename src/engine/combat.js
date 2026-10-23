@@ -1,7 +1,9 @@
 // Automatic combat, up to three against three.
 // Initiative is a timeline: the time to a unit's next move is inversely
 // proportional to its speed, and the unit whose time comes first acts. One
-// unit may act at most `maxConsecutiveMoves` times in a row.
+// unit may act at most `maxConsecutiveMoves` times in a row. The party
+// finishes off the opponent it can defeat fastest; monsters pick their target
+// at random, front positions more often.
 
 import { cappedChance, reduction } from './formulas.js';
 import { say } from './text.js';
@@ -26,8 +28,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
   let lastActor = null;
   let streak = 0;
 
+  // Events and their texts are built only for a fight that is recorded: the
+  // threat estimate runs many fights that nobody reads.
   const log = (event) => {
-    if (record) events.push(event);
+    if (record) events.push(event());
   };
   const earliest = (list) =>
     list.reduce((best, unit) => {
@@ -51,10 +55,27 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       damage(unit, amount, dot.source);
       dot.ticks -= 1;
       const vars = { target: unit.name, effect: dot.name, damage: amount };
-      log({ t, kind: 'tick', target: unit.id, effect: dot.name, element: dot.element, damage: amount, hp: unit.hp, text: say(texts, 'effectTick', actions, vars) });
-      if (unit.hp === 0) log({ t, kind: 'kill', target: unit.id, hp: 0, text: say(texts, 'kill', actions, vars) });
+      log(() => ({ t, kind: 'tick', target: unit.id, effect: dot.name, element: dot.element, damage: amount, hp: unit.hp, text: say(texts, 'effectTick', actions, vars) }));
+      if (unit.hp === 0) log(() => ({ t, kind: 'kill', target: unit.id, hp: 0, text: say(texts, 'kill', actions, vars) }));
     }
     unit.dots = unit.dots.filter((dot) => dot.ticks > 0);
+  };
+
+  // The opponent that needs the fewest expected hits, against its defence.
+  const quickestKill = (actor, opponents) => {
+    const weapon = actor.weapon;
+    const average = ((weapon.min + weapon.max) / 2) * actor.damageScale;
+    let best = null;
+    let fewest = Infinity;
+    for (const unit of opponents) {
+      const defense = weapon.category === 'physical' ? unit.armor : (unit.resist[weapon.element] ?? 0);
+      const hits = unit.hp / Math.max(1, average * (1 - reduction(defense, actor.level, balance)));
+      if (hits < fewest) {
+        best = unit;
+        fewest = hits;
+      }
+    }
+    return best;
   };
 
   const strike = (actor, target, t) => {
@@ -63,11 +84,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
     if (weapon.category === 'physical') {
       const dodge = cappedChance(target.dodgeRating, actor.level, tuning.dodgeCap, balance);
       if (rng.chance(dodge)) {
-        log({ t, kind: 'dodge', actor: actor.id, target: target.id, hp: target.hp, text: say(texts, 'dodge', actions, vars) });
+        log(() => ({ t, kind: 'dodge', actor: actor.id, target: target.id, hp: target.hp, text: say(texts, 'dodge', actions, vars) }));
         return;
       }
     }
-    const raw = rng.float(weapon.min, weapon.max) * (1 + actor.scalingValue * tuning.scalingPerPoint);
+    const raw = rng.float(weapon.min, weapon.max) * actor.damageScale;
     const critical = rng.chance(cappedChance(actor.critRating, target.level, tuning.critCap, balance));
     const defense = weapon.category === 'physical' ? target.armor : (target.resist[weapon.element] ?? 0);
     const amount = Math.max(
@@ -76,9 +97,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
     );
     damage(target, amount, actor.id);
     const kind = critical ? 'crit' : 'hit';
-    log({ t, kind, actor: actor.id, target: target.id, damage: amount, hp: target.hp, text: say(texts, kind, actions, { ...vars, damage: amount }) });
+    log(() => ({ t, kind, actor: actor.id, target: target.id, damage: amount, hp: target.hp, text: say(texts, kind, actions, { ...vars, damage: amount }) }));
     if (target.hp === 0) {
-      log({ t, kind: 'kill', target: target.id, hp: 0, text: say(texts, 'kill', actions, vars) });
+      log(() => ({ t, kind: 'kill', target: target.id, hp: 0, text: say(texts, 'kill', actions, vars) }));
       return;
     }
 
@@ -102,7 +123,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
             source: actor.id,
           });
         }
-        log({ t, kind: 'effect', actor: actor.id, target: target.id, effect: effect.name, element: effect.element, hp: target.hp, text: say(texts, 'effectApplied', actions, { ...vars, effect: effect.name }) });
+        log(() => ({ t, kind: 'effect', actor: actor.id, target: target.id, effect: effect.name, element: effect.element, hp: target.hp, text: say(texts, 'effectApplied', actions, { ...vars, effect: effect.name }) }));
       }
     }
   };
@@ -137,7 +158,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
     if (actor.hp <= 0) continue;
 
     const opponents = alive.filter((unit) => unit.side !== actor.side && unit.hp > 0);
-    const target = rng.weighted(opponents, (unit) => tuning.targetWeights[unit.position]);
+    const target =
+      actor.side === 'ally' ? quickestKill(actor, opponents) : rng.weighted(opponents, (unit) => tuning.targetWeights[unit.position]);
     strike(actor, target, t);
   }
 }

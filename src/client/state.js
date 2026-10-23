@@ -64,3 +64,27 @@ export const unlockInfo = (id) => state.content.unlocks.find((unlock) => unlock.
 
 // Reports fetched or just claimed, so opening one again needs no request.
 export const reportCache = new Map();
+
+// Test mode ("Pomiń czas" and other test tools) can be turned off in the
+// settings while the server allows it; the choice is kept in this browser.
+const TEST_MODE_KEY = 'wzrost.test-mode';
+let testMode = readTestMode();
+
+function readTestMode() {
+  try {
+    return localStorage.getItem(TEST_MODE_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
+
+export const testModeOn = () => testMode;
+
+export function setTestMode(value) {
+  testMode = value;
+  try {
+    localStorage.setItem(TEST_MODE_KEY, value ? 'on' : 'off');
+  } catch {
+    // Without storage the choice lasts until the page is closed.
+  }
+}

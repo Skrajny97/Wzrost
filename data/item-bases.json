@@ -10,7 +10,7 @@
   { "id": "focus", "name": "Fokus", "gender": "m", "slot": "offhand", "kind": "implicit", "stat": "intellect", "statFactor": 0.8 },
   { "id": "hood", "name": "Kaptur", "gender": "m", "slot": "head", "kind": "armor", "armorFactor": 0.4 },
   { "id": "helmet", "name": "Hełm", "gender": "m", "slot": "head", "kind": "armor", "armorFactor": 0.7 },
-  { "id": "tunic", "name": "Kurta", "gender": "f", "slot": "chest", "kind": "armor", "armorFactor": 0.7 },
+  { "id": "tunic", "name": "Kurtka", "gender": "f", "slot": "chest", "kind": "armor", "armorFactor": 0.7 },
   { "id": "chainmail", "name": "Kolczuga", "gender": "f", "slot": "chest", "kind": "armor", "armorFactor": 1.1 },
   { "id": "robe", "name": "Szata", "gender": "f", "slot": "chest", "kind": "armor", "armorFactor": 0.6 },
   { "id": "gloves", "name": "Rękawice", "gender": "pl", "slot": "hands", "kind": "armor", "armorFactor": 0.4 },

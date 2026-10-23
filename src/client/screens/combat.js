@@ -1,9 +1,10 @@
-// The Walka tab: hunts (regions, length, threat level, the running timer and
-// the report to claim). Dungeons and training appear here once unlocked.
+// The Walka tab: explorations (regions, length, threat level, the running
+// timer and the report to claim). Dungeons and training appear here once
+// unlocked. The code calls explorations hunts.
 
 import { fill, h } from '../dom.js';
 import { formatCountdown, formatMinutes, timeFormat } from '../format.js';
-import { activityFinished, call, currentHp, isUnlocked, reportCache, serverNow, state, unlockInfo } from '../state.js';
+import { activityFinished, call, currentHp, isUnlocked, reportCache, serverNow, state, testModeOn, unlockInfo } from '../state.js';
 import { confirmAction, lockLabel, systemPanel, toast, withButton } from '../ui.js';
 
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -24,6 +25,9 @@ function saveChoice(choice) {
     // Without storage the page simply forgets the last choice.
   }
 }
+
+// "bardzo krótka", "krótka"… for a length, from the content.
+const lengthName = (minutes) => (state.content.lengths.find((length) => length.upTo === undefined || minutes <= length.upTo) ?? {}).name ?? '';
 
 export function mountCombat(container, { navigate }) {
   let options = null; // threat levels from the server, per region and duration
@@ -87,7 +91,7 @@ export function mountCombat(container, { navigate }) {
 
   // What "Pomiń czas" would skip now: the hunt, the rest, or nothing.
   function skipKind(character, now = serverNow()) {
-    if (!state.content.testMode) return null;
+    if (!state.content.testMode || !testModeOn()) return null;
     if (character.activity) return activityFinished(character.activity, now) ? null : 'hunt';
     return currentHp(character, now) < character.maxHp ? 'rest' : null;
   }
@@ -133,7 +137,7 @@ export function mountCombat(container, { navigate }) {
     return h(
       'div',
       { class: 'segmented segmented--three', role: 'group', 'aria-label': 'Rodzaj walki' },
-      tab('Polowania'),
+      tab('Eksploracja'),
       tab('Trening', 'training'),
       tab('Lochy', 'dungeons'),
     );
@@ -156,7 +160,7 @@ export function mountCombat(container, { navigate }) {
       return h(
         'div',
         { class: 'stack' },
-        systemPanel(`Polowanie zakończone: ${region.name}, ${formatMinutes(activity.minutes)}.`, 'Raport czeka na odbiór.', claim),
+        systemPanel(`Eksploracja zakończona: ${region.name}, ${formatMinutes(activity.minutes)}.`, 'Raport czeka na odbiór.', claim),
       );
     }
 
@@ -165,11 +169,11 @@ export function mountCombat(container, { navigate }) {
     const cancel = h('button', {
       type: 'button',
       class: 'button button--world',
-      text: 'Przerwij polowanie',
+      text: 'Przerwij eksplorację',
       onClick: async (event) => {
         const button = event.currentTarget;
         const sure = await confirmAction({
-          title: 'Przerwać polowanie?',
+          title: 'Przerwać eksplorację?',
           text: 'Postać wróci od razu, bez doświadczenia, złota i łupów.',
           confirmLabel: 'Przerwij',
           danger: true,
@@ -181,7 +185,7 @@ export function mountCombat(container, { navigate }) {
       'div',
       { class: 'stack' },
       systemPanel(
-        `Polowanie w toku: ${region.name}, ${formatMinutes(activity.minutes)}.`,
+        `Eksploracja w toku: ${region.name}, ${formatMinutes(activity.minutes)}.`,
         countdown,
         h('div', { class: 'bar bar--system' }, progress),
         h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
@@ -205,21 +209,18 @@ export function mountCombat(container, { navigate }) {
           )
         : unarmed && systemPanel('Walczysz gołymi rękami. Załóż broń z plecaka w zakładce Postać, jeśli już ją masz.'),
       state.content.regions.map((region) => regionCard(region, character)),
-      h('p', {
-        class: 'muted threat-note',
-        text: 'Zagrożenie to szansa omdlenia na wyprawie. Gra liczy je z próbnych walk Twojej postaci z potworami regionu, więc liczą się jej statystyki, ekwipunek i aktualne HP, a nie sam poziom.',
-      }),
+      h('p', { class: 'muted threat-note', text: 'Zagrożenie to szansa omdlenia na wyprawie.' }),
     );
   }
 
   function regionCard(region, character) {
     const allowed = character.huntDurations;
-    const shortest = allowed[0];
-    const longest = allowed.at(-1);
-    const { step, max } = state.content.durations;
+    const { max } = state.content.durations;
     const longLevel = unlockInfo('long-hunts').level;
-    let minutes = choice[region.id];
-    if (!allowed.includes(minutes)) minutes = allowed.includes(15) ? 15 : shortest;
+    // The slider moves over the allowed lengths (1, 5, 10… minutes).
+    let index = allowed.indexOf(choice[region.id]);
+    if (index === -1) index = Math.max(0, allowed.indexOf(15));
+    let minutes = allowed[index];
 
     const threatValue = h('strong', {});
     const threatLine = h('p', { class: 'threat' }, 'Zagrożenie: ', threatValue);
@@ -237,16 +238,17 @@ export function mountCombat(container, { navigate }) {
           ? h('p', { class: 'region-warning', text: 'Ten region jest już dla Ciebie za łatwy: dostaniesz mniej doświadczenia.' })
           : null;
 
-    // A slider in steps of 5 minutes, with buttons for one step at a time.
+    // A slider with buttons for one step at a time, and the length's name.
     const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
+    const kind = h('span', { class: 'duration-kind' });
     const slider = h('input', {
       type: 'range',
       class: 'duration-slider',
-      min: shortest,
-      max: longest,
-      step,
-      value: minutes,
-      'aria-label': `Czas polowania: ${region.name}`,
+      min: 0,
+      max: allowed.length - 1,
+      step: 1,
+      value: index,
+      'aria-label': `Czas wyprawy: ${region.name}`,
       onInput: () => set(Number(slider.value)),
       onChange: () => remember(),
     });
@@ -254,10 +256,10 @@ export function mountCombat(container, { navigate }) {
       h('button', {
         type: 'button',
         class: 'button button--world duration-step',
-        'aria-label': `${label} o ${step} minut`,
+        'aria-label': label,
         text: sign < 0 ? '−' : '+',
         onClick: () => {
-          set(minutes + sign * step);
+          set(index + sign);
           remember();
         },
       });
@@ -268,29 +270,31 @@ export function mountCombat(container, { navigate }) {
       saveChoice(choice);
     };
     function set(next) {
-      minutes = Math.min(longest, Math.max(shortest, Math.round(next / step) * step));
-      slider.value = String(minutes);
-      slider.setAttribute('aria-valuetext', formatMinutes(minutes));
-      slider.style.setProperty('--fill', `${((minutes - shortest) / Math.max(1, longest - shortest)) * 100}%`);
+      index = Math.min(allowed.length - 1, Math.max(0, next));
+      minutes = allowed[index];
+      slider.value = String(index);
+      slider.setAttribute('aria-valuetext', `${formatMinutes(minutes)}, ${lengthName(minutes)}`);
+      slider.style.setProperty('--fill', `${(index / Math.max(1, allowed.length - 1)) * 100}%`);
       value.textContent = formatMinutes(minutes);
-      less.disabled = minutes <= shortest;
-      more.disabled = minutes >= longest;
+      kind.textContent = lengthName(minutes);
+      less.disabled = index === 0;
+      more.disabled = index === allowed.length - 1;
       showThreat();
     }
-    set(minutes);
+    set(index);
 
     const durations = h(
       'div',
       { class: 'duration-picker' },
-      h('p', { class: 'duration-head' }, h('span', { text: 'Czas wyprawy' }), value),
+      h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, 'Czas wyprawy', kind), value),
       h('div', { class: 'duration-row' }, less, slider, more),
       h(
         'p',
         { class: 'duration-scale', 'aria-hidden': 'true' },
-        h('span', { text: formatMinutes(shortest) }),
-        h('span', { text: formatMinutes(longest) }),
+        h('span', { text: formatMinutes(allowed[0]) }),
+        h('span', { text: formatMinutes(allowed.at(-1)) }),
       ),
-      longest < max && h('p', { class: 'duration-lock', text: `Dłuższe wyprawy, do ${formatMinutes(max)}, od poziomu ${longLevel}.` }),
+      allowed.at(-1) < max && h('p', { class: 'duration-lock', text: `Dłuższe wyprawy, do ${formatMinutes(max)}, od poziomu ${longLevel}.` }),
     );
 
     const start = h('button', {

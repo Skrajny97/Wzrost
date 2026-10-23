@@ -4,7 +4,7 @@
     "land": "Skraj Puszczy",
     "name": "Wiatrołomy",
     "minLevel": 1,
-    "maxLevel": 5,
+    "maxLevel": 25,
     "safe": true,
     "levelSpread": 0,
     "description": "Pas powalonych drzew na skraju puszczy. Wilki, dziki i kruki, a w gęstwinie błędne światło.",
@@ -15,13 +15,19 @@
     },
     "encounters": [
       { "weight": 25, "monsters": ["wolf"] },
-      { "weight": 12, "monsters": ["wolf", "wolf"], "minLevel": 2 },
-      { "weight": 14, "monsters": ["boar"], "minLevel": 2 },
-      { "weight": 10, "monsters": ["crow", "crow"], "minLevel": 2 },
+      { "weight": 12, "monsters": ["wolf", "wolf"], "minLevel": 5 },
+      { "weight": 14, "monsters": ["boar"], "minLevel": 5 },
+      { "weight": 10, "monsters": ["crow", "crow"], "minLevel": 5 },
       { "weight": 14, "monsters": ["viper"] },
       { "weight": 12, "monsters": ["badger"] },
-      { "weight": 8, "monsters": ["wolf", "crow"], "minLevel": 2 },
-      { "weight": 5, "monsters": ["viper", "crow"], "minLevel": 2 }
+      { "weight": 8, "monsters": ["wolf", "crow"], "minLevel": 5 },
+      { "weight": 5, "monsters": ["viper", "crow"], "minLevel": 5 }
+    ],
+    "tough": [
+      { "weight": 10, "monsters": ["wolf", "wolf", "wolf"], "minLevel": 10 },
+      { "weight": 8, "monsters": ["boar", "boar"], "minLevel": 10 },
+      { "weight": 6, "monsters": ["wolf", "wolf", "crow"], "minLevel": 10 },
+      { "weight": 6, "monsters": ["viper", "viper", "crow"], "minLevel": 10 }
     ],
     "elite": "wisp"
   },
@@ -29,8 +35,8 @@
     "id": "stone-glade",
     "land": "Skraj Puszczy",
     "name": "Uroczysko Kamieni",
-    "minLevel": 6,
-    "maxLevel": 10,
+    "minLevel": 26,
+    "maxLevel": 50,
     "safe": false,
     "description": "Polana z kręgiem omszałych głazów, za którą zaczyna się prawdziwa puszcza. Rysie, krzyżaki i watahy z basiorem.",
     "trait": {
@@ -50,6 +56,13 @@
       { "weight": 8, "monsters": ["alpha-wolf", "wolf"] },
       { "weight": 8, "monsters": ["lynx", "crow"] },
       { "weight": 8, "monsters": ["badger", "spider"] }
+    ],
+    "tough": [
+      { "weight": 10, "monsters": ["alpha-wolf", "wolf", "wolf"] },
+      { "weight": 8, "monsters": ["alpha-wolf", "alpha-wolf"] },
+      { "weight": 8, "monsters": ["lynx", "lynx"] },
+      { "weight": 6, "monsters": ["spider", "spider", "viper"] },
+      { "weight": 6, "monsters": ["boar", "boar", "boar"] }
     ],
     "elite": "likho"
   }

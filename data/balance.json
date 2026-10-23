@@ -2,7 +2,7 @@
   "combat": {
     "kBase": 40,
     "kPerLevel": 20,
-    "scalingPerPoint": 0.03,
+    "scalingMax": 2.5,
     "armorPerEndurance": 3,
     "dodgePerDexterity": 2,
     "dodgeCap": 0.3,
@@ -30,7 +30,8 @@
   "monsters": {
     "hpBase": 2,
     "budgetBase": 0,
-    "damageMultiplier": 2.2
+    "damageMultiplier": 1.4,
+    "gearLagMinutes": 45
   },
   "items": {
     "budgetBase": 10,
@@ -40,15 +41,19 @@
     "damagePerBudget": 0.35,
     "armorPerBudget": 1.0,
     "statPerBudget": 0.5,
-    "resistancePerBudget": 1.0
+    "resistancePerBudget": 1.0,
+    "sellGoldPerLevel": 1
   },
   "hunt": {
-    "minMinutes": 5,
+    "minMinutes": 1,
     "stepMinutes": 5,
     "maxMinutes": 240,
     "shortHuntMaxMinutes": 45,
-    "fightIntervalMinutes": 12,
-    "findIntervalMinutes": 20,
+    "fightsByMinutes": [[1, 1], [5, 2], [15, 3], [60, 4], [240, 5]],
+    "minutesPerFightReference": 12,
+    "toughChanceByMinutes": [[1, 0], [10, 0.05], [30, 0.15], [120, 0.3], [240, 0.4]],
+    "toughLevelBonus": 1,
+    "findIntervalMinutes": 10,
     "monsterLevelSpread": 1,
     "groupFactors": [1, 0.7, 0.55],
     "eliteChancePerFight": 0.006,
@@ -62,13 +67,15 @@
     "hpAfterFaint": 0.1
   },
   "rewards": {
-    "xpBase": 10,
+    "xpBase": 100,
     "xpExponent": 1.1,
     "eliteXpMultiplier": 3,
     "goldPerLevel": 2,
     "eliteGoldMultiplier": 3,
     "itemDropChance": 0.1,
     "eliteRarityBonus": 3,
+    "toughRarityBonus": 2,
+    "toughDropMultiplier": 1.5,
     "findGoldChance": 0.5,
     "findGoldPerLevel": 4
   },
@@ -77,10 +84,11 @@
     "perVitalityPerMinute": 0.0002
   },
   "progression": {
-    "maxLevel": 100,
-    "hoursBase": 0.48,
-    "hoursExponent": 1.17,
-    "xpPerHourScale": 65,
+    "maxLevel": 500,
+    "firstLevelMinutes": 4,
+    "flatLevels": 5,
+    "levelTimeExponent": 1.3,
+    "xpPerHourScale": 650,
     "classXpFactor": 0.6,
     "freeResetMaxLevel": 10,
     "classEvolutionLevel": 25

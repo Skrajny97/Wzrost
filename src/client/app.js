@@ -13,7 +13,7 @@ import { lockedScreen } from './screens/locked.js';
 import { mountReport } from './screens/report.js';
 import { mountStats } from './screens/stats.js';
 import { playSound, setSoundEnabled, soundEnabled, unlockSound } from './sound.js';
-import { call, handleSessionLost, onCharacterChange, serverNow, state } from './state.js';
+import { call, handleSessionLost, onCharacterChange, serverNow, setTestMode, state, testModeOn } from './state.js';
 import { closeSheet, confirmAction, initSheet, openSheet, toast } from './ui.js';
 
 const views = {
@@ -172,6 +172,23 @@ function openSettings() {
     },
     text: soundEnabled() ? 'Włączony' : 'Wyłączony',
   });
+  // Shown only while the server allows test mode ("Pomiń czas" and the like).
+  const testToggle =
+    state.content.testMode &&
+    h('button', {
+      type: 'button',
+      class: 'toggle',
+      role: 'switch',
+      'aria-checked': testModeOn(),
+      'aria-labelledby': 'test-mode-label',
+      onClick: () => {
+        setTestMode(!testModeOn());
+        testToggle.setAttribute('aria-checked', String(testModeOn()));
+        testToggle.textContent = testModeOn() ? 'Włączony' : 'Wyłączony';
+        current?.screen.update?.();
+      },
+      text: testModeOn() ? 'Włączony' : 'Wyłączony',
+    });
   openSheet(
     h('h2', { class: 'sheet-title', text: 'Ustawienia' }),
     h(
@@ -180,6 +197,7 @@ function openSettings() {
       h('div', { class: 'status-row' }, h('dt', { text: 'Konto' }), h('dd', { text: state.user.login })),
       h('div', { class: 'status-row' }, h('dt', { text: 'Postać' }), h('dd', { text: state.character.name })),
       h('div', { class: 'status-row' }, h('dt', { id: 'sound-label', text: 'Dźwięk' }), h('dd', {}, soundToggle)),
+      testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
     ),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),

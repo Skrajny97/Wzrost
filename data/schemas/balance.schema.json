@@ -20,7 +20,7 @@
       "required": [
         "kBase",
         "kPerLevel",
-        "scalingPerPoint",
+        "scalingMax",
         "armorPerEndurance",
         "dodgePerDexterity",
         "dodgeCap",
@@ -47,9 +47,10 @@
           "type": "number",
           "minimum": 0
         },
-        "scalingPerPoint": {
+        "scalingMax": {
           "type": "number",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Najwyższa premia do obrażeń ze statystyki broni (2,5 to +250%). Rośnie z malejącym zwrotem P / (P + K), gdzie K zależy od poziomu atakującego."
         },
         "armorPerEndurance": {
           "type": "number",
@@ -201,7 +202,8 @@
         "damagePerBudget",
         "armorPerBudget",
         "statPerBudget",
-        "resistancePerBudget"
+        "resistancePerBudget",
+        "sellGoldPerLevel"
       ],
       "properties": {
         "budgetBase": {
@@ -236,6 +238,11 @@
         "resistancePerBudget": {
           "type": "number",
           "minimum": 0
+        },
+        "sellGoldPerLevel": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Cena u złomiarza: poziom przedmiotu × ta wartość × mnożnik rzadkości (sell w rarities.json)."
         }
       }
     },
@@ -247,7 +254,10 @@
         "stepMinutes",
         "maxMinutes",
         "shortHuntMaxMinutes",
-        "fightIntervalMinutes",
+        "fightsByMinutes",
+        "minutesPerFightReference",
+        "toughChanceByMinutes",
+        "toughLevelBonus",
         "findIntervalMinutes",
         "monsterLevelSpread",
         "eliteChancePerFight",
@@ -265,26 +275,54 @@
         "minMinutes": {
           "type": "integer",
           "minimum": 1,
-          "description": "Najkrótsze polowanie w minutach."
+          "description": "Najkrótsza wyprawa w minutach."
         },
         "stepMinutes": {
           "type": "integer",
           "minimum": 1,
-          "description": "Krok suwaka czasu polowania w minutach."
+          "description": "Krok suwaka czasu wyprawy w minutach (po najkrótszej)."
         },
         "maxMinutes": {
           "type": "integer",
           "minimum": 1,
-          "description": "Najdłuższe polowanie w minutach, po odblokowaniu długich polowań."
+          "description": "Najdłuższa wyprawa w minutach, po odblokowaniu długich eksploracji."
         },
         "shortHuntMaxMinutes": {
           "type": "number",
           "minimum": 0,
-          "description": "Najdłuższe polowanie dostępne przed odblokowaniem długich polowań (unlocks.json, long-hunts)."
+          "description": "Najdłuższa wyprawa dostępna przed odblokowaniem długich eksploracji (unlocks.json, long-hunts)."
         },
-        "fightIntervalMinutes": {
+        "fightsByMinutes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": { "type": "number", "minimum": 0 }
+          },
+          "description": "Pary [minuty, walki]: wyprawa ma tyle walk, ile podaje para o największej liczbie minut nie większej niż jej czas."
+        },
+        "minutesPerFightReference": {
           "type": "number",
-          "minimum": 0
+          "exclusiveMinimum": 0,
+          "description": "Ile minut wyprawy stanowi jedna walka przy pełnej nagrodzie. Walka dłuższej wyprawy daje odpowiednio więcej XP, złota i szans na łup."
+        },
+        "toughChanceByMinutes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": { "type": "number", "minimum": 0 }
+          },
+          "description": "Pary [minuty, szansa]: szansa, że walka jest wymagającym spotkaniem; między parami rośnie z logarytmem czasu."
+        },
+        "toughLevelBonus": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "O ile poziomów wymagające spotkanie przewyższa zwykłe."
         },
         "findIntervalMinutes": {
           "type": "number",
@@ -353,6 +391,8 @@
         "eliteGoldMultiplier",
         "itemDropChance",
         "eliteRarityBonus",
+        "toughRarityBonus",
+        "toughDropMultiplier",
         "findGoldChance",
         "findGoldPerLevel"
       ],
@@ -384,6 +424,16 @@
         "eliteRarityBonus": {
           "type": "number",
           "minimum": 0
+        },
+        "toughRarityBonus": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Mnożnik szansy na wyższą rzadkość łupu z wymagającego spotkania."
+        },
+        "toughDropMultiplier": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Mnożnik szansy na łup z wymagającego spotkania."
         },
         "findGoldChance": {
           "type": "number",
@@ -418,8 +468,9 @@
       "additionalProperties": false,
       "required": [
         "maxLevel",
-        "hoursBase",
-        "hoursExponent",
+        "firstLevelMinutes",
+        "flatLevels",
+        "levelTimeExponent",
         "xpPerHourScale",
         "classXpFactor",
         "freeResetMaxLevel",
@@ -430,12 +481,16 @@
           "type": "number",
           "minimum": 0
         },
-        "hoursBase": {
+        "firstLevelMinutes": {
           "type": "number",
           "exclusiveMinimum": 0,
-          "description": "Godziny polowania na poziom 1. Poziom L trwa hoursBase × L^hoursExponent godzin."
+          "description": "Minuty eksploracji na każdy z pierwszych poziomów. Poziom L trwa firstLevelMinutes × max(1, L / flatLevels)^levelTimeExponent minut."
         },
-        "hoursExponent": {
+        "flatLevels": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "levelTimeExponent": {
           "type": "number",
           "minimum": 0
         },
@@ -464,7 +519,8 @@
       "required": [
         "hpBase",
         "budgetBase",
-        "damageMultiplier"
+        "damageMultiplier",
+        "gearLagMinutes"
       ],
       "properties": {
         "hpBase": {
@@ -478,6 +534,11 @@
         "damageMultiplier": {
           "type": "number",
           "exclusiveMinimum": 0
+        },
+        "gearLagMinutes": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Naturalne uzbrojenie potwora odpowiada przedmiotom z poziomu, który postać miała tyle minut eksploracji wcześniej."
         }
       }
     }

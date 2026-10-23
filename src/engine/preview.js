@@ -13,7 +13,7 @@ export function combatValues(character, equipped, content) {
   const unit = playerCombatant({ character, equipped, name: '' }, content);
   const { totals } = computeStats(character, equipped, content);
   const level = character.level;
-  const scale = 1 + unit.scalingValue * tuning.scalingPerPoint;
+  const scale = unit.damageScale;
   return {
     damageMin: Math.round(unit.weapon.min * scale),
     damageMax: Math.round(unit.weapon.max * scale),

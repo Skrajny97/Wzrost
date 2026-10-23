@@ -5,13 +5,17 @@ import {
   applyHunt,
   autoDistribute,
   autoEquip,
+  canUse,
   computeStats,
   createRng,
+  damageScale,
   earnedPoints,
   estimateThreat,
+  explorationPace,
   faintChances,
   faintPenalty,
   freePoints,
+  gearLevel,
   generateItem,
   classXpToNext,
   hoursToNext,
@@ -22,8 +26,10 @@ import {
   lowLevelMultiplier,
   monsterCombatant,
   playerCombatant,
+  randomItem,
   reduction,
   restedHp,
+  sellPrice,
   simulateFight,
   simulateHunt,
   statEffects,
@@ -123,6 +129,30 @@ describe('items', () => {
     assert.match(lines[0], /^Obrażenia: \d+–\d+ \(magiczne, mróz\)$/);
     assert.match(lines[1], /^Odporność na ogień: \+\d+$/);
   });
+
+  test('weapons and off-hands belong to classes, the rest fits anyone', () => {
+    assert.equal(canUse('staff', 'mage', content), true);
+    assert.equal(canUse('staff', 'shadow', content), false);
+    assert.equal(canUse('shield', 'cleric', content), true);
+    assert.equal(canUse('quiver', 'mage', content), false);
+    for (const classId of ['warrior', 'archer', 'mage', 'cleric', 'shadow']) assert.equal(canUse('helmet', classId, content), true);
+    // Loot only ever holds weapons and off-hands of the character's class.
+    const rng = createRng('łup');
+    for (let i = 0; i < 300; i++) {
+      const item = randomItem(10, rng, content, { classId: 'shadow', filled: new Set(['weapon']) });
+      assert.ok(canUse(item.base, 'shadow', content), item.base);
+    }
+  });
+
+  test('the scrapper pays by level and rarity', () => {
+    const rng = createRng('złom');
+    const price = (rarityId, level) => sellPrice(generateItem({ baseId: 'ring', level, rarityId }, rng, content), content);
+    const perLevel = content.balance.items.sellGoldPerLevel;
+    assert.equal(price('common', 10), 10 * perLevel);
+    assert.equal(price('rare', 10), 2 * price('common', 10));
+    assert.equal(price('divine', 10), 64 * price('common', 10));
+    assert.ok(price('common', 1) >= 1);
+  });
 });
 
 describe('combat', () => {
@@ -177,6 +207,29 @@ describe('combat', () => {
     assert.ok(Math.min(...hits(mage).map((e) => e.damage)) > 3);
   });
 
+  test('the party finishes off the enemy it can defeat fastest', () => {
+    const player = { ...playerCombatant({ character: newCharacter('warrior', { level: 5 }), equipped: kit('warrior'), name: 'Mira' }, content), maxHp: 9000, hp: 9000 };
+    const boar = (id, hp) => ({ ...monsterCombatant({ monsterId: 'boar', level: 5, id }, content), hp, maxHp: 400 });
+    const result = fight('cel', [player], [boar('e0', 400), boar('e1', 40)]);
+    const blows = result.events.filter((event) => event.actor === player.id && event.target);
+    const down = result.events.findIndex((event) => event.kind === 'kill' && event.target === 'e1');
+    assert.ok(down > 0);
+    // Every blow goes to the wounded boar until it is down.
+    assert.ok(blows.length > 0);
+    for (const blow of blows.filter((event) => result.events.indexOf(event) < down)) assert.equal(blow.target, 'e1');
+  });
+
+  test('the damage bonus of a stat flattens out, so fights last alike at every level', () => {
+    const { balance } = content;
+    assert.equal(damageScale(0, 10, balance), 1);
+    assert.ok(damageScale(1e9, 10, balance) < 1 + balance.combat.scalingMax);
+    // The same stat counts for less at a higher level, and a stat that grows
+    // with the level keeps the bonus.
+    assert.ok(damageScale(100, 50, balance) < damageScale(100, 5, balance));
+    const k = (level) => balance.combat.kBase + balance.combat.kPerLevel * level;
+    assert.ok(Math.abs(damageScale(k(5), 5, balance) - damageScale(k(500), 500, balance)) < 1e-9);
+  });
+
   test('armor follows P / (P + K) and never reaches 100%', () => {
     assert.equal(reduction(0, 5, content.balance), 0);
     assert.ok(Math.abs(reduction(140, 5, content.balance) - 0.5) < 1e-9);
@@ -197,11 +250,25 @@ describe('hunts', () => {
     assert.notDeepEqual(hunt(), hunt({ seed: 'inne' }));
   });
 
-  test('longer hunts have more fights and rewards', () => {
-    const short = hunt({ minutes: 15 });
-    const long = hunt({ minutes: 240 });
-    assert.ok(long.fights.length >= 15 && short.fights.length <= 2);
-    assert.ok(long.xp > short.xp * 5);
+  test('fights grow slowly with the length, rewards with the time', () => {
+    // 1 minute: 1 fight, 5 minutes: 2, 15: 3, an hour: 4, 4 hours: 5.
+    assert.deepEqual([1, 5, 15, 60, 240].map((minutes) => hunt({ minutes }).fights.length), [1, 2, 3, 4, 5]);
+    assert.ok(hunt({ minutes: 240 }).xp > hunt({ minutes: 15 }).xp * 5);
+    const pace = (minutes) => explorationPace(minutes, content);
+    assert.equal(pace(240).timeFactor, 240 / 5 / content.balance.hunt.minutesPerFightReference);
+    // Longer explorations meet demanding encounters and the elite more often.
+    assert.equal(pace(1).toughChance, 0);
+    assert.ok(pace(30).toughChance < pace(120).toughChance && pace(120).toughChance < pace(240).toughChance);
+    assert.ok(pace(15).eliteChance < pace(240).eliteChance);
+  });
+
+  test('demanding encounters are stronger and bring better loot', () => {
+    const level = 20;
+    const always = { ...content, balance: { ...content.balance, hunt: { ...content.balance.hunt, toughChanceByMinutes: [[1, 1]] } } };
+    const character = typicalCharacter('warrior', level, content);
+    const result = simulateHunt({ ...character, hp: 9999, name: 'Mira', regionId: 'windfalls', minutes: 60, seed: 'trudne' }, always);
+    assert.ok(result.fights.every((fight) => fight.tough));
+    assert.ok(result.fights.every((fight) => fight.enemies.every((enemy) => enemy.level === level + content.balance.hunt.toughLevelBonus)));
   });
 
   test('HP carries over between fights and is only partly restored', () => {
@@ -260,6 +327,16 @@ describe('hunts', () => {
     assert.ok(per(5) < per(60) * 1.25, `5 min: ${per(5)} XP/h, 60 min: ${per(60)} XP/h`);
   });
 
+  test('short explorations still earn gold: fractions add up before rounding', () => {
+    const beginner = typicalCharacter('shadow', 1, content);
+    let gold = 0;
+    for (let i = 0; i < 40; i++) {
+      const result = simulateHunt({ ...beginner, name: 'Cień', regionId: 'windfalls', minutes: 5, seed: `grosz:${i}` }, content);
+      gold += result.fights.reduce((sum, fight) => sum + fight.gold, 0);
+    }
+    assert.ok(gold / 40 > 0.5, `${gold / 40} gold from fights per 5 minutes`);
+  });
+
   test('a 4-hour hunt stays well within the CPU budget', () => {
     const strong = typicalCharacter('cleric', 10, content);
     const started = performance.now();
@@ -271,12 +348,29 @@ describe('hunts', () => {
 });
 
 describe('progression', () => {
-  test('level 1 takes about half an hour of hunting, level 50 about two days', () => {
+  test('the first levels take minutes, level 500 about a day', () => {
     assert.ok(xpToNext(2, content) > xpToNext(1, content));
-    assert.ok(huntingHours(1, content) > 0.4 && huntingHours(1, content) < 0.7);
-    assert.ok(Math.abs(huntingHours(50, content) - 48) < 3);
+    // A 5-minute exploration is enough for each of the first levels.
+    for (const level of [1, 2, 3, 4, 5]) assert.ok(huntingHours(level, content) * 60 <= 5);
+    assert.ok(huntingHours(100, content) > 2 && huntingHours(100, content) < 5);
+    assert.ok(huntingHours(500, content) > 20 && huntingHours(500, content) < 30);
+    assert.equal(content.balance.progression.maxLevel, 500);
     // Class levels need less XP, so they come faster.
     assert.ok(classXpToNext(1, content) < xpToNext(1, content));
+  });
+
+  test('worn gear lags behind the level by at most 45 minutes of exploring', () => {
+    assert.equal(gearLevel(1, content), 1);
+    const lag = content.balance.monsters.gearLagMinutes;
+    for (const level of [5, 20, 100, 300, 500]) {
+      const gear = gearLevel(level, content);
+      assert.ok(gear <= level);
+      let minutes = 0;
+      for (let l = gear; l < level; l++) minutes += huntingHours(l, content) * 60;
+      assert.ok(minutes <= lag + huntingHours(gear, content) * 60, `level ${level}: ${minutes} min`);
+    }
+    // High up a level takes longer than the lag, so the gear is at most one level behind.
+    assert.ok(gearLevel(500, content) >= 499);
   });
 
   test('fainting costs half a level of XP but never the level', () => {
@@ -302,10 +396,10 @@ describe('progression', () => {
     assert.equal(early.level, 1);
     assert.deepEqual(early.messages, ['Kleryk: poziom klasy 2. Wolne punkty statystyk: +2. Rozdasz je od poziomu 2.']);
 
-    const fainted = applyHunt({ ...character, level: 3, xp: 100 }, { xp: 0, result: 'fainted' }, content);
+    const fainted = applyHunt({ ...character, level: 3, xp: 10 }, { xp: 0, result: 'fainted' }, content);
     assert.equal(fainted.level, 3);
     assert.equal(fainted.xp, 0);
-    assert.equal(fainted.penalty, 100);
+    assert.equal(fainted.penalty, 10);
   });
 
   test('hunting far below your level gives clearly less XP', () => {
@@ -336,15 +430,18 @@ test('finds go straight into empty slots, the best one for each', () => {
   assert.deepEqual(autoEquip([], finds, content), [2, 3, 4]);
   // A worn weapon keeps every weapon in the bag.
   assert.deepEqual(autoEquip([item('dagger')], finds, content), [3, 4]);
+  // A mage puts on neither the sword nor the axe.
+  assert.deepEqual(autoEquip([], finds, content, 'mage'), [3, 4]);
+  assert.deepEqual(autoEquip([], [item('staff'), ...finds], content, 'mage'), [0, 4, 5]);
 });
 
 describe('tutorial unlocks', () => {
   test('level 1 hunts last up to 45 minutes; level 2 opens long hunts and stats', () => {
-    // The slider moves in steps of 5 minutes.
-    assert.deepEqual(huntDurations(1, content), [5, 10, 15, 20, 25, 30, 35, 40, 45]);
+    // The slider starts at 1 minute, then moves in steps of 5 minutes.
+    assert.deepEqual(huntDurations(1, content), [1, 5, 10, 15, 20, 25, 30, 35, 40, 45]);
     const long = huntDurations(2, content);
-    assert.equal(long.length, 48);
-    assert.deepEqual([long[0], long[1], long.at(-1)], [5, 10, 240]);
+    assert.equal(long.length, 49);
+    assert.deepEqual([long[0], long[1], long[2], long.at(-1)], [1, 5, 10, 240]);
     assert.deepEqual(unlockedFeatures(1, content), []);
     assert.deepEqual(unlockedFeatures(2, content), ['long-hunts', 'stats']);
     assert.ok(unlockedFeatures(10, content).includes('settlement'));
@@ -373,7 +470,7 @@ describe('stat previews', () => {
 });
 
 test('the threat level rises with hunt length and falls with HP', () => {
-  const { character, equipped } = typicalCharacter('mage', 6, content);
+  const { character, equipped } = typicalCharacter('mage', 26, content);
   const order = ['low', 'moderate', 'high', 'very-high'];
   const full = estimateThreat({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content);
   const wounded = estimateThreat({ character, equipped, hp: 20, regionId: 'stone-glade' }, content);
@@ -386,8 +483,8 @@ test('the threat level rises with hunt length and falls with HP', () => {
 });
 
 test('the threat level follows the whole character, not its level alone', () => {
-  // The same level 6 mage, with and without equipment, in the first unsafe region.
-  const { character, equipped } = typicalCharacter('mage', 6, content);
+  // The same level 26 mage, with and without equipment, in the first unsafe region.
+  const { character, equipped } = typicalCharacter('mage', 26, content);
   const hp = 9999;
   const geared = faintChances({ character, equipped, hp, regionId: 'stone-glade' }, content);
   const bare = faintChances({ character, equipped: [], hp, regionId: 'stone-glade' }, content);
@@ -399,15 +496,15 @@ test('the threat level follows the whole character, not its level alone', () => 
 });
 
 test('the threat level follows the simulated chance of fainting', () => {
-  // A level 8 mage on a 4-hour hunt in the first unsafe region faints now and then.
-  const { character, equipped } = typicalCharacter('mage', 8, content);
+  // A level 30 mage on a 4-hour exploration in the first unsafe region faints now and then.
+  const { character, equipped } = typicalCharacter('mage', 30, content);
   const estimated = faintChances({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content)[240];
-  const simulated = simulateMany({ classId: 'mage', level: 8, minutes: 240, hunts: 300 }, content).faintRate;
+  const simulated = simulateMany({ classId: 'mage', level: 30, minutes: 240, hunts: 300 }, content).faintRate;
   assert.ok(simulated > 0.05, `simulated ${simulated}`);
   assert.ok(Math.abs(estimated - simulated) < 0.1, `estimated ${estimated}, simulated ${simulated}`);
   assert.ok(['high', 'very-high'].includes(estimateThreat({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content)[240]));
 
-  // A region far above the character needs no sample fights.
+  // A region far above the character is hopeless, by sample fights too.
   const beginner = typicalCharacter('cleric', 1, content);
   assert.deepEqual(new Set(Object.values(estimateThreat({ ...beginner, hp: 9999, regionId: 'stone-glade' }, content))), new Set(['very-high']));
 
@@ -415,4 +512,15 @@ test('the threat level follows the simulated chance of fainting', () => {
   const warrior = typicalCharacter('warrior', 3, content);
   const safe = estimateThreat({ ...warrior, hp: 9999, regionId: 'windfalls' }, content);
   assert.deepEqual(new Set(Object.values(safe)), new Set(['low']));
+});
+
+test('the threat estimate for one region stays well within the CPU budget', () => {
+  // Below the region's levels many kinds of fights are in doubt: the costliest case.
+  const cases = [['shadow', 20], ['warrior', 15], ['mage', 26]].map(([classId, level]) => typicalCharacter(classId, level, content));
+  for (const { character, equipped } of cases) faintChances({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content);
+  const started = performance.now();
+  for (let i = 0; i < 10; i++) {
+    for (const { character, equipped } of cases) faintChances({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content);
+  }
+  assert.ok((performance.now() - started) / 30 < 6, 'the average estimate took too long');
 });

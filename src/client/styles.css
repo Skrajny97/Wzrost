@@ -27,6 +27,8 @@
   --mana-track: #172231;
   --xp: #d9b45a;
   --xp-track: #2a2414;
+  --class-xp: #a986e8;
+  --class-xp-track: #241c33;
   --icon-muted: #6f6656;
   --src-class: #7d9a5a;
   --src-character: #e7dcc2;
@@ -523,8 +525,8 @@ button {
 
 .meters {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
 }
 
 .meter {
@@ -577,6 +579,14 @@ button {
 
 .meter--xp .meter-fill {
   background: var(--xp);
+}
+
+.meter--class-xp .meter-track {
+  background: var(--class-xp-track);
+}
+
+.meter--class-xp .meter-fill {
+  background: var(--class-xp);
 }
 
 .meter-label {
@@ -1627,6 +1637,21 @@ a.segmented-option {
   letter-spacing: 0.04em;
 }
 
+.duration-title {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+
+/* The length's name: "bardzo krótka", "średnia"… */
+.duration-kind {
+  color: var(--system);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .duration-value {
   color: var(--system-text);
   font-size: 20px;
@@ -1743,6 +1768,41 @@ a.segmented-option {
   border: 1px dashed var(--gold);
   background: rgba(224, 160, 60, 0.12);
   color: var(--gold);
+}
+
+/* The scrapper: one button per rarity, with what it would sell. */
+.scrap-options {
+  display: grid;
+  gap: 8px;
+}
+
+.scrap-option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+}
+
+.scrap-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.scrap-detail {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.chip--tough {
+  border-color: var(--system-line);
+  color: var(--system);
+}
+
+.item-classes,
+.item-price {
+  color: var(--text-muted);
 }
 
 .threat-note {

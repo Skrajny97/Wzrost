@@ -6,7 +6,7 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "name", "role", "gentleStart", "description", "position", "baseStats", "growth", "autoPoints", "recovery", "weapons"],
+    "required": ["id", "name", "role", "gentleStart", "description", "position", "baseStats", "growth", "autoPoints", "recovery", "weapons", "offhands"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
       "name": { "type": "string", "minLength": 1 },
@@ -28,6 +28,12 @@
       },
       "weapons": {
         "description": "Bazy broni klasy. Dopóki postać nie ma broni, łup w slocie broni jest jedną z nich.",
+        "type": "array",
+        "minItems": 1,
+        "items": { "type": "string" }
+      },
+      "offhands": {
+        "description": "Bazy drugiej ręki, których klasa może używać.",
         "type": "array",
         "minItems": 1,
         "items": { "type": "string" }

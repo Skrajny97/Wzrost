@@ -72,7 +72,7 @@ export async function startHunt(context) {
   if (!huntDurations(player.row.level, content).includes(body.minutes)) {
     const level = content.unlocksById['long-hunts'].level;
     const longest = content.balance.hunt.shortHuntMaxMinutes;
-    throw new ApiError(403, 'duration_locked', `Na razie polowanie trwa najwyżej ${longest} minut. Dłuższe odblokują się na poziomie ${level}.`);
+    throw new ApiError(403, 'duration_locked', `Na razie eksploracja trwa najwyżej ${longest} minut. Dłuższe odblokują się na poziomie ${level}.`);
   }
 
   const now = context.now;
@@ -135,7 +135,7 @@ export async function claimHunt(context) {
   );
   const applied = applyHunt(character, hunt, content);
   // A find for a slot with nothing in it is worn at once.
-  const autoEquipped = autoEquip(equippedItems(player), hunt.items, content);
+  const autoEquipped = autoEquip(equippedItems(player), hunt.items, content, row.class_id);
   const report = huntReport(
     { hunt, applied, character, regionId: activity.region_id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped },
     content,

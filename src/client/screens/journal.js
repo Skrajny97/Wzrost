@@ -35,7 +35,7 @@ export function mountJournal(container, { params }) {
   }
 
   function reportList() {
-    if (reports.length === 0) return h('p', { class: 'muted', text: 'Brak raportów. Wyrusz na pierwsze polowanie w zakładce Walka.' });
+    if (reports.length === 0) return h('p', { class: 'muted', text: 'Brak raportów. Wyrusz na pierwszą eksplorację w zakładce Walka.' });
     return h(
       'ul',
       { class: 'report-list' },

@@ -15,6 +15,13 @@ export function cappedChance(rating, opponentLevel, cap, balance) {
   return cap * reduction(rating, opponentLevel, balance);
 }
 
+// Damage multiplier from the stat a weapon or attack uses. The bonus has the
+// same diminishing return against the attacker's own level, so damage grows
+// like HP with the level and fights last about as long at level 5 as at 500.
+export function damageScale(stat, level, balance) {
+  return 1 + balance.combat.scalingMax * reduction(stat, level, balance);
+}
+
 export function speed(dexterity, level, balance) {
   const { speedMax, speedKBase, speedKPerLevel } = balance.combat;
   return 1 + ((speedMax - 1) * dexterity) / (dexterity + speedKBase + speedKPerLevel * level);

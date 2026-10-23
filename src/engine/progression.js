@@ -1,12 +1,46 @@
 // Experience, levels, the fainting penalty and HP regeneration between hunts.
 
-// The level length is measured in hours of hunting at that level:
-// hoursBase × level^hoursExponent, about 35 minutes at level 1 and about two
-// days at level 50. XP per hour grows like monster XP (level^xpExponent);
-// xpPerHourScale is set from the balance simulation (tools/simulate.mjs).
+// The level length is measured in hours of exploring at that level. The first
+// levels take firstLevelMinutes each (a 5-minute exploration is enough), then
+// the time grows like (level / flatLevels)^levelTimeExponent: about 10 minutes
+// at level 10, 3 hours at level 100 and a day at level 500. XP per hour grows
+// like monster XP (level^xpExponent); xpPerHourScale is set from the balance
+// simulation (tools/simulate.mjs).
 export function huntingHours(level, content) {
-  const { hoursBase, hoursExponent } = content.balance.progression;
-  return hoursBase * level ** hoursExponent;
+  const { firstLevelMinutes, flatLevels, levelTimeExponent } = content.balance.progression;
+  return (firstLevelMinutes / 60) * Math.max(1, level / flatLevels) ** levelTimeExponent;
+}
+
+// The level a character had `minutes` of exploring before reaching `level`.
+export function levelBefore(level, minutes, content) {
+  let left = minutes / 60;
+  let before = level;
+  while (before > 1 && left >= huntingHours(before - 1, content)) {
+    left -= huntingHours(before - 1, content);
+    before -= 1;
+  }
+  return before;
+}
+
+// The level of the items a character usually wears at a level: found half its
+// exploring time ago, but at most gearLagMinutes ago. Monsters' natural weapons
+// and hides follow it, so gear lags alike on both sides. Computed once per
+// content for every level.
+const gearTables = new WeakMap();
+export function gearLevel(level, content) {
+  let table = gearTables.get(content);
+  if (!table) {
+    const { maxLevel } = content.balance.progression;
+    const lag = content.balance.monsters.gearLagMinutes;
+    table = [1];
+    let minutes = 0;
+    for (let l = 1; l <= maxLevel + 5; l++) {
+      table[l] = levelBefore(l, Math.min(lag, minutes / 2), content);
+      minutes += huntingHours(l, content) * 60;
+    }
+    gearTables.set(content, table);
+  }
+  return table[Math.min(level, table.length - 1)];
 }
 
 export function xpToNext(level, content) {

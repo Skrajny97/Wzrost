@@ -58,6 +58,7 @@ export function publicContent() {
       trait: { name: trait.name, description: trait.description },
     })),
     durations: { min: content.balance.hunt.minMinutes, step: content.balance.hunt.stepMinutes, max: content.balance.hunt.maxMinutes },
+    lengths: content.texts.lengths,
     unlocks: content.unlocks.map(({ id, name, level, condition }) => ({ id, name, level, condition })),
     freeResetMaxLevel: content.balance.progression.freeResetMaxLevel,
     classEvolutionLevel: content.balance.progression.classEvolutionLevel,

@@ -11,11 +11,14 @@ export function unlockedFeatures(level, content) {
   return content.unlocks.filter((unlock) => isUnlocked(unlock.id, level, content)).map((unlock) => unlock.id);
 }
 
-// Hunt lengths go from the shortest up to `longest` in equal steps (the slider's).
+// Exploration lengths: the shortest, then every step of the slider up to
+// `longest` (1, 5, 10, 15… minutes).
 export function durationsUpTo(longest, content) {
   const { minMinutes, stepMinutes } = content.balance.hunt;
-  const durations = [];
-  for (let minutes = minMinutes; minutes <= longest; minutes += stepMinutes) durations.push(minutes);
+  const durations = [minMinutes];
+  for (let minutes = (Math.floor(minMinutes / stepMinutes) + 1) * stepMinutes; minutes <= longest; minutes += stepMinutes) {
+    durations.push(minutes);
+  }
   return durations;
 }
 

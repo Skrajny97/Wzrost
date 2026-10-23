@@ -113,6 +113,11 @@ function checkReferences(data) {
       if (!base) errors.push(`classes.json: ${cls.id} ma nieznaną broń "${id}"`);
       else if (base.slot !== 'weapon') errors.push(`classes.json: ${cls.id} ma w broniach "${id}", który nie jest bronią`);
     }
+    for (const id of cls.offhands) {
+      const base = basesById.get(id);
+      if (!base) errors.push(`classes.json: ${cls.id} ma nieznaną drugą rękę "${id}"`);
+      else if (base.slot !== 'offhand') errors.push(`classes.json: ${cls.id} ma w drugiej ręce "${id}", który nie pasuje do tego slotu`);
+    }
   }
 
   const monstersById = new Map(data.monsters.map((monster) => [monster.id, monster]));
@@ -133,7 +138,7 @@ function checkReferences(data) {
 
   for (const region of data.regions) {
     if (region.minLevel > region.maxLevel) errors.push(`regions.json: ${region.id} ma minLevel większy niż maxLevel`);
-    for (const encounter of region.encounters) {
+    for (const encounter of [...region.encounters, ...(region.tough ?? [])]) {
       for (const id of encounter.monsters) {
         const monster = monstersById.get(id);
         if (!monster) errors.push(`regions.json: ${region.id} ma nieznanego potwora "${id}"`);
@@ -152,8 +157,14 @@ function checkReferences(data) {
   if (minMinutes > shortHuntMaxMinutes || shortHuntMaxMinutes > maxMinutes) {
     errors.push('balance.json: czasy polowań muszą spełniać minMinutes ≤ shortHuntMaxMinutes ≤ maxMinutes');
   }
+  // The slider goes minMinutes, then every multiple of stepMinutes.
   for (const [name, minutes] of [['shortHuntMaxMinutes', shortHuntMaxMinutes], ['maxMinutes', maxMinutes]]) {
-    if ((minutes - minMinutes) % stepMinutes !== 0) errors.push(`balance.json: ${name} nie wypada na kroku suwaka (stepMinutes)`);
+    if (minutes !== minMinutes && minutes % stepMinutes !== 0) errors.push(`balance.json: ${name} nie wypada na kroku suwaka (stepMinutes)`);
+  }
+  const fights = data.balance.hunt.fightsByMinutes;
+  if (fights[0][0] > minMinutes) errors.push('balance.json: fightsByMinutes nie obejmuje najkrótszej wyprawy');
+  for (let i = 1; i < fights.length; i++) {
+    if (fights[i][0] <= fights[i - 1][0] || fights[i][1] < fights[i - 1][1]) errors.push('balance.json: fightsByMinutes musi rosnąć');
   }
   if (monsters.size === 0 || bases.size === 0) errors.push('Brak potworów lub przedmiotów.');
   return errors;

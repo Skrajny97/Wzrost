@@ -10,7 +10,8 @@
     "growth": { "strength": 2, "vitality": 2, "endurance": 2 },
     "autoPoints": { "strength": 3, "vitality": 2, "endurance": 2, "will": 1 },
     "recovery": { "base": 0, "perWisdom": 0 },
-    "weapons": ["sword", "axe"]
+    "weapons": ["sword", "axe"],
+    "offhands": ["shield"]
   },
   {
     "id": "archer",
@@ -23,7 +24,8 @@
     "growth": { "dexterity": 2, "perception": 1, "vitality": 1 },
     "autoPoints": { "dexterity": 4, "perception": 2, "vitality": 2 },
     "recovery": { "base": 0, "perWisdom": 0 },
-    "weapons": ["bow"]
+    "weapons": ["bow"],
+    "offhands": ["quiver"]
   },
   {
     "id": "mage",
@@ -36,7 +38,8 @@
     "growth": { "intellect": 2, "wisdom": 1, "vitality": 1 },
     "autoPoints": { "intellect": 4, "vitality": 2, "wisdom": 1, "will": 1 },
     "recovery": { "base": 0, "perWisdom": 0 },
-    "weapons": ["staff"]
+    "weapons": ["staff"],
+    "offhands": ["focus"]
   },
   {
     "id": "cleric",
@@ -49,7 +52,8 @@
     "growth": { "wisdom": 2, "intellect": 1, "vitality": 1 },
     "autoPoints": { "intellect": 3, "wisdom": 2, "vitality": 2, "endurance": 1 },
     "recovery": { "base": 0.07, "perWisdom": 0.002 },
-    "weapons": ["aspergillum"]
+    "weapons": ["aspergillum"],
+    "offhands": ["shield", "focus"]
   },
   {
     "id": "shadow",
@@ -62,6 +66,7 @@
     "growth": { "dexterity": 2, "perception": 1, "strength": 1 },
     "autoPoints": { "dexterity": 4, "perception": 2, "vitality": 2 },
     "recovery": { "base": 0, "perWisdom": 0 },
-    "weapons": ["dagger"]
+    "weapons": ["dagger"],
+    "offhands": ["quiver"]
   }
 ]

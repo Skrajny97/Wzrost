@@ -1,9 +1,9 @@
 [
   {
     "id": "long-hunts",
-    "name": "Długie polowania",
+    "name": "Długie eksploracje",
     "level": 2,
-    "message": "Odblokowano długie polowania, do 4 godzin."
+    "message": "Odblokowano długie eksploracje, do 4 godzin."
   },
   {
     "id": "stats",

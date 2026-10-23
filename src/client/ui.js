@@ -130,7 +130,7 @@ export function meter({ label, value, max, kind }) {
   const set = (current, total) => {
     const share = total > 0 ? Math.max(0, Math.min(1, current / total)) : 0;
     const exact = `${current} / ${total}`;
-    text.textContent = exact.length > 11 ? `${Math.floor(share * 100)}%` : exact;
+    text.textContent = exact.length > 15 ? `${Math.floor(share * 100)}%` : exact;
     element.title = exact;
     fill.style.width = `${share * 100}%`;
   };

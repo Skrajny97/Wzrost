@@ -2,7 +2,7 @@
 
 Solowa, casualowa gra przeglądarkowa litRPG na telefon, oparta na timerach. Jedynym źródłem prawdy o projekcie jest [dokument projektowy](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX). Założenia przyjęte w trakcie budowy są w [DECISIONS.md](DECISIONS.md).
 
-Stan: **Etap 1, rdzeń, po pierwszych uwagach autora.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, statystyki z wolnymi punktami, ekwipunek i plecak z podglądem zmian, polowania na czasie serwera w dwóch regionach Skraju Puszczy z suwakiem czasu, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik i „Zacznij od nowa”.
+Stan: **Etap 1, rdzeń, po uwagach autora i zmianie skali.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, poziomy do 500, statystyki z wolnymi punktami, ekwipunek przypisany do klas i plecak z podglądem zmian, złomiarz, eksploracje na czasie serwera w dwóch regionach Skraju Puszczy z suwakiem czasu i spotkaniami wymagającymi, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik i „Zacznij od nowa”. Spis klas, przedmiotów, potworów i regionów jest w [encyklopedii](https://claude.ai/artifact/EDt6uk8X5rRU9JCTLKsnXw).
 
 ## Adres gry
 
@@ -84,8 +84,8 @@ Push na inną gałąź uruchamia tylko testy.
 ## Struktura repozytorium
 
 ```
-src/engine/   silnik gry: czyste, deterministyczne funkcje (walka, polowania, przedmioty, progresja)
-src/server/   Worker: API, logowanie, sesje, postać, ekwipunek, polowania, raporty
+src/engine/   silnik gry: czyste, deterministyczne funkcje (walka, eksploracje, przedmioty, progresja)
+src/server/   Worker: API, logowanie, sesje, postać, ekwipunek, eksploracje, raporty
 src/client/   strona gry: HTML, CSS i moduły ES, bez kroku budowania
 data/         treść gry w JSON i schematy w data/schemas
 migrations/   schemat bazy D1
@@ -119,7 +119,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/auth/login` | logowanie: `identifier` (login lub e-mail), `password` |
 | POST | `/api/auth/logout` | wylogowanie |
 | GET | `/api/me` | zalogowany gracz |
-| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości, żywiołów i regionów, zakres czasu polowań, odblokowania, `testMode` |
+| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości, żywiołów i regionów, zakres czasu i nazwy długości wypraw, odblokowania, `testMode` |
 | GET | `/api/character` | pełny widok postaci (404 `no_character`, gdy jej nie ma) |
 | POST | `/api/character` | nowa postać: `name`, `classId` |
 | DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami i wyprawą |
@@ -130,10 +130,11 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/items/:id/equip` | załóż przedmiot z plecaka |
 | POST | `/api/items/:id/unequip` | zdejmij przedmiot do plecaka |
 | POST | `/api/items/:id/discard` | wyrzuć przedmiot z plecaka |
+| POST | `/api/items/sell` | złomiarz: sprzedaj przedmioty z plecaka o rzadkości do `maxRarity` włącznie |
 | GET | `/api/hunts/options` | poziom zagrożenia dla każdego regionu i czasu; `?region=<id>` liczy tylko jeden region |
-| POST | `/api/hunts` | wyrusz: `regionId`, `minutes` (co 5 minut, od 5 do 45 na poziomie 1 i do 240 od poziomu 2) |
-| POST | `/api/hunts/cancel` | przerwij trwające polowanie |
-| POST | `/api/hunts/claim` | odbierz raport zakończonego polowania |
+| POST | `/api/hunts` | wyrusz na eksplorację: `regionId`, `minutes` (1, potem co 5 minut, do 45 na poziomie 1 i do 240 od poziomu 2) |
+| POST | `/api/hunts/cancel` | przerwij trwającą eksplorację |
+| POST | `/api/hunts/claim` | odbierz raport zakończonej eksploracji |
 | GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |
 | GET | `/api/reports/:id` | pełny raport |
 | POST | `/api/test/skip-time` | tylko w trybie testowym: kończy od razu wyprawę albo odpoczynek („Pomiń czas”) |
@@ -142,4 +143,4 @@ Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie 
 
 ## Tryb testowy
 
-Dopóki grę testujemy, `TEST_MODE` w `wrangler.jsonc` ma wartość `"on"`, a zakładka Walka ma przycisk „Pomiń czas”. Kończy on od razu trwającą wyprawę, bez zmiany wyniku, albo odpoczynek. Po testach wystarczy ustawić `"off"` i wdrożyć.
+Dopóki grę testujemy, `TEST_MODE` w `wrangler.jsonc` ma wartość `"on"`, a zakładka Walka ma przycisk „Pomiń czas”. Kończy on od razu trwającą wyprawę, bez zmiany wyniku, albo odpoczynek. Przełącznik „Tryb testowy” w Ustawieniach chowa i pokazuje ten przycisk w danej przeglądarce. Po testach wystarczy ustawić `"off"` i wdrożyć.

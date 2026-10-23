@@ -10,11 +10,12 @@ import { fileURLToPath } from 'node:url';
 import * as engine from '../src/engine/index.js';
 import { loadData } from './validate-data.mjs';
 
-// Gear a typical character has: a character starts with nothing, finds about
-// two items an hour and loot favours empty slots, so slots fill in this order
-// over the first levels (common items of the level before). From level 6 on
-// every slot is filled, and rare items with the class's main stat replace the
-// common ones slot by slot until level 11.
+// Gear a typical character has, from the hours it has explored: it starts
+// with nothing, gets its weapon in the first fight, finds about two items an
+// hour and loot favours empty slots, so slots fill in this order. Worn items
+// have the level gearLevel gives (found half the exploring time ago, at most
+// 45 minutes), and rare ones with the class's main stat replace common ones
+// slot by slot, one per 3 hours.
 const KIT = {
   warrior: { chest: 'chainmail', offhand: 'shield', head: 'helmet' },
   archer: { chest: 'tunic', offhand: 'quiver', head: 'hood' },
@@ -23,8 +24,23 @@ const KIT = {
   shadow: { chest: 'tunic', offhand: 'quiver', head: 'hood' },
 };
 const SLOT_ORDER = ['weapon', 'chest', 'offhand', 'head', 'feet', 'hands', 'amulet', 'ring', 'talisman'];
-const SLOTS_BY_LEVEL = [0, 0, 1, 3, 5, 7];
 const OTHER_BASES = { feet: 'boots', hands: 'gloves', amulet: 'amulet', ring: 'ring', talisman: 'talisman' };
+
+// Hours of exploring it takes to reach a level.
+export function hoursToReach(level, content) {
+  let hours = 0;
+  for (let l = 1; l < level; l++) hours += engine.huntingHours(l, content);
+  return hours;
+}
+
+
+// Items an hour: finds that are items, and loot from about five fights' worth
+// of time an hour, one monster each on average.
+export function itemsPerHour(content) {
+  const { hunt, rewards } = content.balance;
+  const fightsPerHour = 60 / hunt.minutesPerFightReference;
+  return (60 / hunt.findIntervalMinutes) * (1 - rewards.findGoldChance) + fightsPerHour * rewards.itemDropChance;
+}
 
 export function typicalCharacter(classId, level, content) {
   const cls = content.classesById[classId];
@@ -34,10 +50,12 @@ export function typicalCharacter(classId, level, content) {
   const mainStat = Object.entries(cls.autoPoints).sort((a, b) => b[1] - a[1])[0][0];
   const affixIds = [content.prefixes.find((affix) => affix.stat === mainStat).id];
   const rng = engine.createRng(`gear:${classId}:${level}`);
-  const itemLevel = Math.max(1, level - 1);
+  const hours = hoursToReach(level, content);
+  const itemLevel = Math.max(1, Math.min(level - 1, engine.gearLevel(level, content)));
   const bases = { weapon: cls.weapons[0], ...KIT[classId], ...OTHER_BASES };
-  const slots = SLOT_ORDER.slice(0, SLOTS_BY_LEVEL[level] ?? SLOT_ORDER.length);
-  const rareSlots = Math.round(SLOT_ORDER.length * Math.min(1, Math.max(0, level - 5) / 6));
+  // Three of four finds land in a new slot; the rest are duplicates for the scrapper.
+  const slots = level === 1 ? [] : SLOT_ORDER.slice(0, Math.min(SLOT_ORDER.length, 1 + Math.floor(0.75 * itemsPerHour(content) * hours)));
+  const rareSlots = Math.min(slots.length, Math.floor(hours / 3));
   const equipped = slots.map((slot, index) =>
     index < rareSlots
       ? engine.generateItem({ baseId: bases[slot], level: itemLevel, rarityId: 'rare', affixIds }, rng, content)
@@ -126,12 +144,12 @@ function main() {
   const options = parseArgs(process.argv.slice(2));
   const content = engine.buildContent(loadData());
   const classes = list(options.classes, content.classes.map((cls) => cls.id));
-  const levels = list(options.levels, ['1', '3', '5', '8', '10']).map(Number);
-  const minutesList = list(options.minutes, ['30', '45', '60', '240']).map(Number);
+  const levels = list(options.levels, ['1', '5', '10', '20', '26', '35', '50']).map(Number);
+  const minutesList = list(options.minutes, ['5', '30', '120', '240']).map(Number);
 
   if (options.calibrate) {
-    // Levels above the existing regions use generated stand-ins, so keep to the first public version (up to ~30).
-    const calibrationLevels = list(options.levels, ['1', '2', '3', '5', '8', '10', '15', '20', '30']).map(Number);
+    // Levels above the existing regions use generated stand-ins, so keep to the regions there are (up to 50).
+    const calibrationLevels = list(options.levels, ['1', '3', '5', '10', '20', '30', '40', '50']).map(Number);
     const hunts = Number(options.hunts ?? 300);
     const ratios = [];
     for (const level of calibrationLevels) {

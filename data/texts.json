@@ -9,6 +9,10 @@
     "Powietrze gęstnieje. Lokalna elita: {enemies}.",
     "Las milknie. Lokalna elita: {enemies}."
   ],
+  "toughStart": [
+    "Głębiej w puszczy czeka wymagające spotkanie: {enemies}.",
+    "Ślady prowadzą do silniejszej grupy: {enemies}."
+  ],
   "hit": [
     "{actor}: {attack}. {target} traci {damage} HP.",
     "{actor} atakuje ({attack}). {target} traci {damage} HP.",
@@ -49,6 +53,12 @@
   "classLevelUpLocked": ["{className}: poziom klasy {level}. Wolne punkty statystyk: +{points}. Rozdasz je od poziomu {unlockLevel}."],
   "faintPenalty": ["Omdlenie. Utracone doświadczenie: {xp}."],
   "autoEquip": ["Założono od razu: {item} ({slot}), bo ten slot był pusty."],
+  "lengths": [
+    { "upTo": 10, "name": "bardzo krótka" },
+    { "upTo": 30, "name": "krótka" },
+    { "upTo": 120, "name": "średnia" },
+    { "name": "długa" }
+  ],
   "result": {
     "success": "Wyprawa zakończona.",
     "fainted": "Omdlenie.",

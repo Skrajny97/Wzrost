@@ -1,6 +1,6 @@
-// The frame around every game screen: the fixed top bar (levels, HP, mana,
-// gold, current activity) and the two bottom bars, the main menu and the
-// character bar with its own background.
+// The frame around every game screen: the fixed top bar (levels, HP and mana,
+// character and class XP, gold, current activity) and the two bottom bars,
+// the main menu and the character bar with its own background.
 
 import { $, fill, h, icon } from './dom.js';
 import { formatCountdown, formatMinutes, formatNumber } from './format.js';
@@ -30,7 +30,8 @@ export function buildTopbar(onSettings) {
   const gold = h('span', { class: 'gold-value' });
   const hp = meter({ label: 'HP', value: 0, max: 0, kind: 'hp' });
   const mana = meter({ label: 'MANA', value: 0, max: 0, kind: 'mana' });
-  const xp = meter({ label: 'XP', value: 0, max: 0, kind: 'xp' });
+  const xp = meter({ label: 'XP POSTACI', value: 0, max: 0, kind: 'xp' });
+  const classXp = meter({ label: 'XP KLASY', value: 0, max: 0, kind: 'class-xp' });
   const activityLabel = h('span', { class: 'activity-label' });
   const activityTime = h('span', { class: 'activity-time' });
   const activity = h('a', { class: 'activity', href: '#/walka' }, activityLabel, activityTime);
@@ -48,10 +49,11 @@ export function buildTopbar(onSettings) {
         h('button', { type: 'button', class: 'icon-button', 'aria-label': 'Ustawienia', onClick: onSettings }, icon('gear')),
       ),
     ),
-    h('div', { class: 'meters' }, hp.element, mana.element, xp.element),
+    // Two rows: HP over mana, character XP over class XP.
+    h('div', { class: 'meters' }, hp.element, xp.element, mana.element, classXp.element),
     activity,
   );
-  topbar = { level, classLevel, gold, hp, mana, xp, activity, activityLabel, activityTime };
+  topbar = { level, classLevel, gold, hp, mana, xp, classXp, activity, activityLabel, activityTime };
   updateTopbar();
 }
 
@@ -64,12 +66,13 @@ export function updateTopbar(now = serverNow()) {
   topbar.hp.set(currentHp(character, now), character.maxHp);
   topbar.mana.set(character.mana, character.maxMana);
   topbar.xp.set(character.xp, character.xpToNext);
+  topbar.classXp.set(character.classXp, character.classXpToNext);
 
   const activity = character.activity;
   const { activityLabel, activityTime } = topbar;
   topbar.activity.classList.toggle('activity--done', activityFinished(activity, now));
   if (activity) {
-    activityLabel.textContent = `POLOWANIE · ${activity.regionName}`;
+    activityLabel.textContent = `EKSPLORACJA · ${activity.regionName}`;
     activityTime.textContent = activityFinished(activity, now) ? 'RAPORT GOTOWY' : formatCountdown(activity.endsAt - now);
   } else {
     const hpNow = currentHp(character, now);
