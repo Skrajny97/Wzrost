@@ -5,13 +5,13 @@ import { budget, cappedChance, damageScale, maxHp, speed, weaponDamage } from '.
 import { gearLevel } from './progression.js';
 import { computeStats } from './stats.js';
 
-export function playerCombatant({ character, equipped, hp, name, region, id = 'a0', side = 'ally' }, content) {
+export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally' }, content) {
   const balance = content.balance;
   const { totals, bonuses } = computeStats(character, equipped, content);
   const weaponItem = equipped.find((item) => item.slot === 'weapon');
   const weapon = weaponItem ? itemWeapon(weaponItem, content) : unarmed(character.level, content);
   let armor = bonuses.armor + totals.endurance * balance.combat.armorPerEndurance;
-  if (region?.trait.frontArmorBonus && character.position === 'front') armor *= 1 + region.trait.frontArmorBonus;
+  if (area?.trait.frontArmorBonus && character.position === 'front') armor *= 1 + area.trait.frontArmorBonus;
   const cls = content.classesById[character.classId];
   const hpMax = maxHp(totals.vitality, character.level, balance);
   return {
@@ -39,7 +39,7 @@ export function playerCombatant({ character, equipped, hp, name, region, id = 'a
       balance.hunt.recoveryAfterFight +
       cls.recovery.base +
       cls.recovery.perWisdom * totals.wisdom +
-      (region?.trait.recoveryBonus ?? 0),
+      (area?.trait.recoveryBonus ?? 0),
   };
 }
 

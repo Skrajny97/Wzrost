@@ -6,6 +6,7 @@ import { call, state } from '../state.js';
 import { systemPanel } from '../ui.js';
 
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
+const START_BADGES = { gentle: 'łagodniejszy start', hard: 'trudniejszy start' };
 
 export function renderCreate(container, onCreated) {
   let selected = null;
@@ -39,7 +40,7 @@ export function renderCreate(container, onCreated) {
         { class: 'class-card-head' },
         h('span', { class: 'class-icon' }, icon(CLASS_ICONS[cls.id] ?? 'person', { size: 26 })),
         h('span', { class: 'class-name', text: cls.name }),
-        cls.gentleStart && h('span', { class: 'badge badge--gentle', text: 'łagodniejszy start' }),
+        START_BADGES[cls.start] && h('span', { class: `badge badge--${cls.start}`, text: START_BADGES[cls.start] }),
       ),
       h('span', { class: 'class-meta', text: `${cls.role} · pozycja: ${POSITION_NAMES[cls.position]}` }),
       h('span', { class: 'class-description', text: cls.description }),
@@ -102,11 +103,7 @@ export function renderCreate(container, onCreated) {
       h('h1', { class: 'hero-title', tabindex: '-1', text: 'Nowa postać' }),
       h('p', { class: 'hero-tagline', text: 'Skraj Puszczy. Tu wszystko się zaczyna.' }),
     ),
-    systemPanel(
-      'Wykryto nową istotę na skraju puszczy. Wybierz ścieżkę klasy i podaj imię.',
-      'Zaczynasz bez ekwipunku. Broń swojej klasy zdobędziesz w pierwszej wygranej walce, a postać od razu ją założy.',
-      'Klasy oznaczone jako „łagodniejszy start” rzadziej mdleją na długich wyprawach.',
-    ),
+    systemPanel('Wykryto nową istotę na skraju puszczy. Wybierz ścieżkę klasy i podaj imię.'),
     form,
   );
   $('.hero-title', container).focus();

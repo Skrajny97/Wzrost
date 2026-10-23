@@ -259,7 +259,6 @@
         "toughChanceByMinutes",
         "toughLevelBonus",
         "findIntervalMinutes",
-        "monsterLevelSpread",
         "eliteChancePerFight",
         "eliteLevelBonus",
         "recoveryAfterFight",
@@ -269,7 +268,10 @@
         "lowLevelMinMultiplier",
         "faintXpPenalty",
         "hpAfterFaint",
-        "groupFactors"
+        "groupFactors",
+        "monsterLevelWeights",
+        "beginnerLevel",
+        "areaUnlockLead"
       ],
       "properties": {
         "minMinutes": {
@@ -324,13 +326,29 @@
           "minimum": 0,
           "description": "O ile poziomów wymagające spotkanie przewyższa zwykłe."
         },
+        "monsterLevelWeights": {
+          "type": "array",
+          "description": "Wagi poziomów potworów w regionie wewnętrznym, od najniższego: niższe poziomy trafiają się częściej.",
+          "minItems": 1,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "beginnerLevel": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Do tego poziomu postaci przeciwnicy mają najniższy poziom regionu wewnętrznego (pierwsze minuty gry, pierwsza walka bez broni)."
+        },
+        "areaUnlockLead": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Region wewnętrzny otwiera się, gdy poziom klasy dojdzie do jego najniższego poziomu minus tyle. Przy 1 klasa na poziomie 5 może iść do miejsca z poziomami 6–10."
+        },
         "findIntervalMinutes": {
           "type": "number",
-          "minimum": 0
-        },
-        "monsterLevelSpread": {
-          "type": "number",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Średni odstęp między znaleziskami w minutach wyprawy."
         },
         "eliteChancePerFight": {
           "type": "number",
@@ -393,7 +411,7 @@
         "eliteRarityBonus",
         "toughRarityBonus",
         "toughDropMultiplier",
-        "findGoldChance",
+        "findOutcomes",
         "findGoldPerLevel"
       ],
       "properties": {
@@ -435,9 +453,29 @@
           "minimum": 0,
           "description": "Mnożnik szansy na łup z wymagającego spotkania."
         },
-        "findGoldChance": {
-          "type": "number",
-          "minimum": 0
+        "findOutcomes": {
+          "type": "object",
+          "description": "Wagi wyniku znaleziska: złoto, przedmiot albo nic ciekawego.",
+          "additionalProperties": false,
+          "required": [
+            "gold",
+            "item",
+            "nothing"
+          ],
+          "properties": {
+            "gold": {
+              "type": "number",
+              "minimum": 0
+            },
+            "item": {
+              "type": "number",
+              "minimum": 0
+            },
+            "nothing": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
         },
         "findGoldPerLevel": {
           "type": "number",

@@ -1,6 +1,6 @@
-// Threat level shown before an exploration, from the region, its length,
+// Threat level shown before an exploration, from the inner region, its length,
 // current HP and the party. Sample fights against every kind of encounter of
-// the region (regular, demanding and the elite) show how much HP each kind
+// the inner region (regular, demanding and the elite) show how much HP each kind
 // costs. They use the same combatant as the exploration itself (stats,
 // equipment, and later skills and companions), so the rating follows the whole
 // character, not its level alone. The chance of fainting then follows from how
@@ -21,7 +21,7 @@ import {
 import { createRng } from './rng.js';
 import { durationsUpTo } from './unlocks.js';
 
-// Sample fights per kind of encounter: each encounter of the region and the
+// Sample fights per kind of encounter: each encounter of the inner region and the
 // elite. Kinds whose outcome is in doubt (some fights lost, or a close one)
 // then share more fights, in proportion to how often they are met, so one
 // unlucky fight decides less. A character that loses 15% or more of the
@@ -74,18 +74,18 @@ function mix(kinds) {
 // The expensive part: sample fights for the character's current build. It
 // does not depend on HP or the length, so the server can keep it until the
 // build changes.
-export function threatSamples({ character, equipped, regionId }, content) {
-  const region = content.regionsById[regionId];
-  const player = playerCombatant({ character, equipped, name: 'próba', region }, content);
-  const rng = createRng(`threat:${regionId}:${character.level}`);
+export function threatSamples({ character, equipped, areaId }, content) {
+  const area = content.areasById[areaId];
+  const player = playerCombatant({ character, equipped, name: 'próba', area }, content);
+  const rng = createRng(`threat:${areaId}:${character.level}`);
   const kinds = (encounters, options) =>
     encounters.map((encounter) =>
-      sampleKind(() => regularEncounter(encounter, region, rng, content, character.level, options), encounter.weight),
+      sampleKind(() => regularEncounter(encounter, area, rng, content, { ...options, characterLevel: character.level }), encounter.weight),
     );
   const groups = {
-    regular: kinds(encountersFor(region, character.level)),
-    tough: kinds(toughEncountersFor(region, character.level), { tough: true }),
-    elite: [sampleKind(() => eliteEncounter(region, content, character.level), 1)],
+    regular: kinds(encountersFor(area, character.level)),
+    tough: kinds(toughEncountersFor(area, character.level), { tough: true }),
+    elite: [sampleKind(() => eliteEncounter(area, content), 1)],
   };
   for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content);
   if (mix(groups.regular)[LOST] < LIMITS.at(-1)) {
@@ -103,13 +103,13 @@ export function threatSamples({ character, equipped, regionId }, content) {
     tough: groups.tough.length > 0 ? mix(groups.tough) : null,
     elite: mix(groups.elite),
     // Against the elite of a safe region running out of HP is a retreat.
-    eliteSafe: Boolean(region.safe),
+    eliteSafe: Boolean(area.safe),
   };
 }
 
 // Chance of fainting for every exploration length, between 0 and 1.
-export function faintChances({ character, equipped, hp, regionId }, content, samples) {
-  const { maxHp, recovery, regular, tough, elite, eliteSafe } = samples ?? threatSamples({ character, equipped, regionId }, content);
+export function faintChances({ character, equipped, hp, areaId }, content, samples) {
+  const { maxHp, recovery, regular, tough, elite, eliteSafe } = samples ?? threatSamples({ character, equipped, areaId }, content);
   // HP after the rest that follows a won fight, for each HP left after it.
   const rested = Array.from({ length: STEPS + 1 }, (_, left) => Math.round(left + (STEPS - left) * recovery));
   const start = Math.round((Math.min(hp, maxHp) / maxHp) * STEPS);

@@ -3,6 +3,7 @@ import { describe, test } from 'node:test';
 
 import {
   applyHunt,
+  areaFor,
   autoDistribute,
   autoEquip,
   canUse,
@@ -34,6 +35,8 @@ import {
   simulateHunt,
   statEffects,
   unlockedFeatures,
+  areaUnlocked,
+  areaUnlockLevel,
   xpToNext,
 } from '../src/engine/index.js';
 import { simulateMany, typicalCharacter } from '../tools/simulate.mjs';
@@ -241,7 +244,7 @@ describe('hunts', () => {
   const warrior = typicalCharacter('warrior', 3, content);
   const hunt = (overrides = {}) =>
     simulateHunt(
-      { ...warrior, hp: 9999, name: 'Mira', regionId: 'windfalls', minutes: 60, seed: 'polowanie', ...overrides },
+      { ...warrior, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed: 'polowanie', ...overrides },
       content,
     );
 
@@ -253,7 +256,10 @@ describe('hunts', () => {
   test('fights grow slowly with the length, rewards with the time', () => {
     // 1 minute: 1 fight, 5 minutes: 2, 15: 3, an hour: 4, 4 hours: 5.
     assert.deepEqual([1, 5, 15, 60, 240].map((minutes) => hunt({ minutes }).fights.length), [1, 2, 3, 4, 5]);
-    assert.ok(hunt({ minutes: 240 }).xp > hunt({ minutes: 15 }).xp * 5);
+    // A character that does not outgrow the place earns with the time.
+    const settled = typicalCharacter('warrior', 43, content);
+    const xp = (minutes) => simulateHunt({ ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes, seed: 'czas' }, content).xp;
+    assert.ok(xp(240) > xp(15) * 5);
     const pace = (minutes) => explorationPace(minutes, content);
     assert.equal(pace(240).timeFactor, 240 / 5 / content.balance.hunt.minutesPerFightReference);
     // Longer explorations meet demanding encounters and the elite more often.
@@ -266,9 +272,11 @@ describe('hunts', () => {
     const level = 20;
     const always = { ...content, balance: { ...content.balance, hunt: { ...content.balance.hunt, toughChanceByMinutes: [[1, 1]] } } };
     const character = typicalCharacter('warrior', level, content);
-    const result = simulateHunt({ ...character, hp: 9999, name: 'Mira', regionId: 'windfalls', minutes: 60, seed: 'trudne' }, always);
+    const result = simulateHunt({ ...character, hp: 9999, name: 'Mira', areaId: 'viper-heaps', minutes: 60, seed: 'trudne' }, always);
     assert.ok(result.fights.every((fight) => fight.tough));
-    assert.ok(result.fights.every((fight) => fight.enemies.every((enemy) => enemy.level === level + content.balance.hunt.toughLevelBonus)));
+    // Monsters of the place (16–20), some levels higher.
+    const bonus = content.balance.hunt.toughLevelBonus;
+    assert.ok(result.fights.every((fight) => fight.enemies.every((enemy) => enemy.level >= 16 + bonus && enemy.level <= 20 + bonus)));
   });
 
   test('HP carries over between fights and is only partly restored', () => {
@@ -282,16 +290,17 @@ describe('hunts', () => {
 
   test('a lost fight ends the hunt with fainting', () => {
     const weak = { ...newCharacter('mage'), level: 1 };
-    const result = simulateHunt({ character: weak, equipped: [], hp: 5, name: 'Pech', regionId: 'stone-glade', minutes: 60, seed: 'pech' }, content);
+    const result = simulateHunt({ character: weak, equipped: [], hp: 5, name: 'Pech', areaId: 'mossy-boulders', minutes: 60, seed: 'pech' }, content);
     assert.equal(result.result, 'fainted');
     assert.equal(result.fights.at(-1).won, false);
     assert.equal(result.hpEnd, Math.round(result.maxHp * content.balance.hunt.hpAfterFaint));
   });
 
   test('losing to the elite in a safe region wounds but does not faint', () => {
-    const elite = { ...content.balance.hunt, eliteChancePerFight: 1 };
+    // Every fight is the elite.
+    const elite = { ...content.balance.hunt, eliteChancePerFight: 100 };
     const always = { ...content, balance: { ...content.balance, hunt: elite } };
-    const result = simulateHunt({ character: newCharacter('shadow'), equipped: [], hp: 10, name: 'Cień', regionId: 'windfalls', minutes: 15, seed: 'elita' }, always);
+    const result = simulateHunt({ character: newCharacter('shadow'), equipped: [], hp: 10, name: 'Cień', areaId: 'windfalls-edge', minutes: 15, seed: 'elita' }, always);
     assert.equal(result.result, 'escaped');
     assert.ok(result.fights[0].elite);
   });
@@ -311,7 +320,7 @@ describe('hunts', () => {
   test('a character without a weapon finds one of its class first', () => {
     const naked = typicalCharacter('mage', 1, content);
     assert.equal(naked.equipped.length, 0);
-    const result = simulateHunt({ ...naked, hp: 9999, name: 'Mira', regionId: 'windfalls', minutes: 30, seed: 'pierwsza' }, content);
+    const result = simulateHunt({ ...naked, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 30, seed: 'pierwsza' }, content);
     assert.equal(result.result, 'success');
     assert.equal(result.items[0].base, 'staff');
     // Further loot favours the other empty slots, so one hunt brings no second weapon.
@@ -319,19 +328,63 @@ describe('hunts', () => {
   });
 
   test('a short hunt pays for its share of time, not for a whole fight', () => {
+    // A level 43 warrior in an inner region of its level does not outgrow it in an hour.
+    const settled = typicalCharacter('warrior', 43, content);
     const per = (minutes) => {
       let xp = 0;
-      for (let i = 0; i < 200; i++) xp += hunt({ minutes, seed: `udział:${minutes}:${i}` }).xp;
+      for (let i = 0; i < 200; i++) {
+        xp += simulateHunt({ ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes, seed: `udział:${minutes}:${i}` }, content).xp;
+      }
       return (xp / 200 / minutes) * 60;
     };
     assert.ok(per(5) < per(60) * 1.25, `5 min: ${per(5)} XP/h, 60 min: ${per(60)} XP/h`);
+  });
+
+  test('a long exploration in one place gives fewer levels than moving on', () => {
+    // XP from monsters far below the character's level drops as the level rises.
+    const beginner = typicalCharacter('warrior', 2, content);
+    const levelsAfter = (minutes) => {
+      let total = 0;
+      for (let i = 0; i < 40; i++) {
+        const result = simulateHunt({ ...beginner, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes, seed: `daleko:${i}` }, content);
+        total += applyHunt(beginner.character, result, content).level;
+      }
+      return total / 40;
+    };
+    const short = levelsAfter(30);
+    const long = levelsAfter(240);
+    assert.ok(long - 2 < (short - 2) * 3, `30 min: ${short}, 4 h: ${long}`);
+    assert.ok(long < 11, `4 h: level ${long}`);
+  });
+
+  test('finds are rarer and sometimes empty', () => {
+    const result = hunt({ minutes: 240, seed: 'puste' });
+    const finds = result.entries.filter((entry) => entry.type === 'find');
+    assert.ok(finds.length >= 6 && finds.length <= 18, `${finds.length} finds`);
+    let empty = 0;
+    let items = 0;
+    for (let i = 0; i < 50; i++) {
+      const long = hunt({ minutes: 240, seed: `puste:${i}` });
+      empty += long.entries.filter((entry) => entry.type === 'find' && entry.item === undefined && !/złota/.test(entry.text)).length;
+      items += long.items.length;
+    }
+    assert.ok(empty > 0);
+    assert.ok(items / 50 < 8, `${items / 50} items in 4 hours`);
+  });
+
+  test('monsters have the levels of the place, not of the character', () => {
+    const beginner = typicalCharacter('warrior', 3, content);
+    const result = simulateHunt({ ...beginner, hp: 99999, name: 'Mira', areaId: 'fox-ravines', minutes: 240, seed: 'jary' }, content);
+    for (const fight of result.fights) {
+      for (const enemy of fight.enemies) assert.ok(enemy.level >= 6 && enemy.level <= 11, `${enemy.name}: ${enemy.level}`);
+    }
   });
 
   test('short explorations still earn gold: fractions add up before rounding', () => {
     const beginner = typicalCharacter('shadow', 1, content);
     let gold = 0;
     for (let i = 0; i < 40; i++) {
-      const result = simulateHunt({ ...beginner, name: 'Cień', regionId: 'windfalls', minutes: 5, seed: `grosz:${i}` }, content);
+      const result = simulateHunt({ ...beginner, name: 'Cień', areaId: 'windfalls-edge', minutes: 5, seed: `grosz:${i}` }, content);
       gold += result.fights.reduce((sum, fight) => sum + fight.gold, 0);
     }
     assert.ok(gold / 40 > 0.5, `${gold / 40} gold from fights per 5 minutes`);
@@ -341,9 +394,43 @@ describe('hunts', () => {
     const strong = typicalCharacter('cleric', 10, content);
     const started = performance.now();
     for (let i = 0; i < 20; i++) {
-      simulateHunt({ ...strong, hp: 9999, name: 'Test', regionId: 'stone-glade', minutes: 240, seed: `cpu${i}` }, content);
+      simulateHunt({ ...strong, hp: 9999, name: 'Test', areaId: 'mossy-boulders', minutes: 240, seed: `cpu${i}` }, content);
     }
     assert.ok((performance.now() - started) / 20 < 8, 'average hunt took too long');
+  });
+});
+
+describe('inner regions', () => {
+  test('every region has five inner regions of five levels that take its trait, elite and safety', () => {
+    for (const region of content.regions) {
+      assert.equal(region.areas.length, 5);
+      assert.equal(region.areas[0].minLevel, region.minLevel);
+      assert.equal(region.areas.at(-1).maxLevel, region.maxLevel);
+      for (const area of region.areas) {
+        assert.equal(area.maxLevel - area.minLevel, 4);
+        assert.equal(area.regionId, region.id);
+        assert.equal(area.elite, region.elite);
+        assert.equal(area.safe, region.safe);
+        assert.deepEqual(area.trait, region.trait);
+      }
+    }
+  });
+
+  test('monsters keep to the levels of the inner region', () => {
+    const strong = typicalCharacter('warrior', 12, content);
+    const result = simulateHunt({ ...strong, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed: 'skraj' }, content);
+    for (const fight of result.fights) {
+      for (const enemy of fight.enemies) assert.ok(enemy.level <= (fight.elite ? 6 : 5), `${enemy.name}: ${enemy.level}`);
+    }
+  });
+
+  test('an id from before inner regions means the inner region for the level', () => {
+    assert.equal(areaFor('windfalls', 1, content).id, 'windfalls-edge');
+    assert.equal(areaFor('windfalls', 12, content).id, 'raven-hollows');
+    assert.equal(areaFor('windfalls', 40, content).id, 'boar-thicket');
+    assert.equal(areaFor('stone-glade', 3, content).id, 'mossy-boulders');
+    assert.equal(areaFor('lynx-ridge', 3, content).id, 'lynx-ridge');
+    assert.equal(areaFor('moon', 3, content), undefined);
   });
 });
 
@@ -444,8 +531,22 @@ describe('tutorial unlocks', () => {
     assert.deepEqual([long[0], long[1], long[2], long.at(-1)], [1, 5, 10, 240]);
     assert.deepEqual(unlockedFeatures(1, content), []);
     assert.deepEqual(unlockedFeatures(2, content), ['long-hunts', 'stats']);
-    assert.ok(unlockedFeatures(10, content).includes('settlement'));
+    // A module for each inner region of Wiatrołomy: 5, 10, 15, 20 and 25.
+    assert.deepEqual(
+      ['skills', 'professions', 'training', 'settlement', 'dungeons'].map((id) => content.unlocksById[id].level),
+      [5, 10, 15, 20, 25],
+    );
+    assert.ok(!unlockedFeatures(19, content).includes('settlement'));
+    assert.ok(unlockedFeatures(20, content).includes('settlement'));
     assert.ok(!unlockedFeatures(100, content).includes('core'));
+  });
+
+  test('an inner region opens when the class reaches the level before its lowest one', () => {
+    assert.deepEqual(content.areas.map((area) => areaUnlockLevel(area, content)), [1, 5, 10, 15, 20, 25, 30, 35, 40, 45]);
+    // A class at level 5 may go to the places of levels 1–5 and 6–10, not further.
+    const open = content.areas.filter((area) => areaUnlocked(area, 5, content)).map((area) => area.id);
+    assert.deepEqual(open, ['windfalls-edge', 'fox-ravines']);
+    assert.ok(areaUnlocked(content.areasById['windfalls-edge'], 500, content));
   });
 });
 
@@ -472,8 +573,8 @@ describe('stat previews', () => {
 test('the threat level rises with hunt length and falls with HP', () => {
   const { character, equipped } = typicalCharacter('mage', 26, content);
   const order = ['low', 'moderate', 'high', 'very-high'];
-  const full = estimateThreat({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content);
-  const wounded = estimateThreat({ character, equipped, hp: 20, regionId: 'stone-glade' }, content);
+  const full = estimateThreat({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content);
+  const wounded = estimateThreat({ character, equipped, hp: 20, areaId: 'mossy-boulders' }, content);
   const durations = huntDurations(2, content);
   assert.deepEqual(Object.keys(full).map(Number), durations);
   for (let i = 1; i < durations.length; i++) {
@@ -483,44 +584,44 @@ test('the threat level rises with hunt length and falls with HP', () => {
 });
 
 test('the threat level follows the whole character, not its level alone', () => {
-  // The same level 26 mage, with and without equipment, in the first unsafe region.
+  // The same level 26 mage, with and without equipment, in the first unsafe inner region.
   const { character, equipped } = typicalCharacter('mage', 26, content);
   const hp = 9999;
-  const geared = faintChances({ character, equipped, hp, regionId: 'stone-glade' }, content);
-  const bare = faintChances({ character, equipped: [], hp, regionId: 'stone-glade' }, content);
+  const geared = faintChances({ character, equipped, hp, areaId: 'mossy-boulders' }, content);
+  const bare = faintChances({ character, equipped: [], hp, areaId: 'mossy-boulders' }, content);
   assert.ok(bare[60] > geared[60] + 0.1);
-  // A region far above the character is judged by sample fights too.
+  // An inner region far above the character is judged by sample fights too.
   const novice = newCharacter('warrior');
-  const above = faintChances({ character: novice, equipped: [], hp, regionId: 'stone-glade' }, content);
+  const above = faintChances({ character: novice, equipped: [], hp, areaId: 'mossy-boulders' }, content);
   assert.ok(above[5] > 0.5);
 });
 
 test('the threat level follows the simulated chance of fainting', () => {
-  // A level 30 mage on a 4-hour exploration in the first unsafe region faints now and then.
+  // A level 30 mage on a 4-hour exploration in the first unsafe inner region faints now and then.
   const { character, equipped } = typicalCharacter('mage', 30, content);
-  const estimated = faintChances({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content)[240];
+  const estimated = faintChances({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content)[240];
   const simulated = simulateMany({ classId: 'mage', level: 30, minutes: 240, hunts: 300 }, content).faintRate;
   assert.ok(simulated > 0.05, `simulated ${simulated}`);
   assert.ok(Math.abs(estimated - simulated) < 0.1, `estimated ${estimated}, simulated ${simulated}`);
-  assert.ok(['high', 'very-high'].includes(estimateThreat({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content)[240]));
+  assert.ok(['high', 'very-high'].includes(estimateThreat({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content)[240]));
 
-  // A region far above the character is hopeless, by sample fights too.
+  // An inner region far above the character is hopeless, by sample fights too.
   const beginner = typicalCharacter('cleric', 1, content);
-  assert.deepEqual(new Set(Object.values(estimateThreat({ ...beginner, hp: 9999, regionId: 'stone-glade' }, content))), new Set(['very-high']));
+  assert.deepEqual(new Set(Object.values(estimateThreat({ ...beginner, hp: 9999, areaId: 'mossy-boulders' }, content))), new Set(['very-high']));
 
-  // The tutorial region stays safe for a character of its level.
+  // The first inner region stays safe for a character of its level.
   const warrior = typicalCharacter('warrior', 3, content);
-  const safe = estimateThreat({ ...warrior, hp: 9999, regionId: 'windfalls' }, content);
+  const safe = estimateThreat({ ...warrior, hp: 9999, areaId: 'windfalls-edge' }, content);
   assert.deepEqual(new Set(Object.values(safe)), new Set(['low']));
 });
 
-test('the threat estimate for one region stays well within the CPU budget', () => {
-  // Below the region's levels many kinds of fights are in doubt: the costliest case.
+test('the threat estimate for one inner region stays well within the CPU budget', () => {
+  // Below the levels of the place many kinds of fights are in doubt: the costliest case.
   const cases = [['shadow', 20], ['warrior', 15], ['mage', 26]].map(([classId, level]) => typicalCharacter(classId, level, content));
-  for (const { character, equipped } of cases) faintChances({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content);
+  for (const { character, equipped } of cases) faintChances({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content);
   const started = performance.now();
   for (let i = 0; i < 10; i++) {
-    for (const { character, equipped } of cases) faintChances({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content);
+    for (const { character, equipped } of cases) faintChances({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content);
   }
   assert.ok((performance.now() - started) / 30 < 6, 'the average estimate took too long');
 });

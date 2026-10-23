@@ -49,7 +49,7 @@ export function mountJournal(container, { params }) {
             h(
               'span',
               { class: 'report-row-main' },
-              h('span', { class: 'report-row-title', text: `${report.regionName} · ${formatMinutes(report.minutes)}` }),
+              h('span', { class: 'report-row-title', text: `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)}` }),
               h(
                 'span',
                 { class: 'report-row-meta' },

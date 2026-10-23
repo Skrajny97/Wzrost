@@ -32,11 +32,17 @@ describe('content', () => {
     const { status, data } = await call('GET', '/api/content');
     assert.equal(status, 200);
     assert.deepEqual(data.classes.map((cls) => cls.id), ['warrior', 'archer', 'mage', 'cleric', 'shadow']);
-    assert.deepEqual(data.classes.filter((cls) => cls.gentleStart).map((cls) => cls.name), ['Wojownik', 'Kleryk']);
+    assert.deepEqual(data.classes.filter((cls) => cls.start === 'gentle').map((cls) => cls.name), ['Wojownik', 'Kleryk']);
+    assert.deepEqual(data.classes.filter((cls) => cls.start === 'hard').map((cls) => cls.name), ['Mag']);
     assert.deepEqual(data.durations, { min: 1, step: 5, max: 240 });
     assert.equal(data.regions[0].name, 'Wiatrołomy');
+    assert.deepEqual(data.regions[0].areas.map((area) => [area.minLevel, area.maxLevel]), [[1, 5], [6, 10], [11, 15], [16, 20], [21, 25]]);
+    assert.equal(data.regions[0].areas[0].name, 'Skraj Wiatrołomów');
+    // An inner region opens at the class level just below its lowest one.
+    assert.deepEqual(data.regions[0].areas.map((area) => area.unlockClassLevel), [1, 5, 10, 15, 20]);
+    assert.equal(data.regions[1].areas[0].unlockClassLevel, 25);
     assert.equal(data.stats.length, 8);
-    assert.equal(data.unlocks.find((unlock) => unlock.id === 'professions').level, 6);
+    assert.equal(data.unlocks.find((unlock) => unlock.id === 'professions').level, 10);
     assert.match(data.elements.find((element) => element.id === 'fire').color, /^#[0-9a-f]{6}$/);
   });
 });
@@ -74,7 +80,7 @@ describe('character creation', () => {
 
   test('"Zacznij od nowa" removes the character, so a new one can be made', async () => {
     await newCharacter(cookie, 'mage');
-    await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 5 } });
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
     const removed = await call('DELETE', '/api/character', { cookie });
     assert.equal(removed.status, 200);
     assert.equal((await call('GET', '/api/character', { cookie })).data.error.code, 'no_character');
@@ -120,13 +126,13 @@ describe('free points', () => {
     }
   });
 
-  test('"Rozdaj według klasy" spends everything and reset is free up to level 10', async () => {
+  test('"Rozdaj według klasy" spends everything and reset is free up to level 20', async () => {
     const auto = await call('POST', '/api/character/points/auto', { cookie });
     assert.equal(auto.data.character.freePoints, 0);
     assert.equal(auto.data.character.canResetPoints, true);
     const reset = await call('POST', '/api/character/points/reset', { cookie });
     assert.equal(reset.data.character.freePoints, 18);
-    await (await db()).prepare('UPDATE characters SET level = 11').run();
+    await (await db()).prepare('UPDATE characters SET level = 21').run();
     const locked = await call('POST', '/api/character/points/reset', { cookie });
     assert.equal(locked.status, 403);
   });
@@ -226,31 +232,54 @@ describe('hunts and reports', () => {
     await newCharacter(cookie, 'cleric');
   });
 
-  test('options show a threat level for every region and duration', async () => {
+  test('options show a threat level for every open inner region and duration', async () => {
+    // Without a choice: the inner region of each region that fits the level, if it is open.
     const { status, data } = await call('GET', '/api/hunts/options', { cookie });
     assert.equal(status, 200);
-    assert.deepEqual(data.regions.map((region) => region.id), ['windfalls', 'stone-glade']);
-    const steps = Object.keys(data.regions[0].threat);
+    assert.deepEqual(data.areas.map((area) => area.id), ['windfalls-edge']);
+    const steps = Object.keys(data.areas[0].threat);
     assert.equal(steps.length, 49);
     assert.deepEqual([steps[0], steps[1], steps[2], steps.at(-1)], ['1', '5', '10', '240']);
-    assert.equal(data.regions[0].threat['5'], 'low');
-    assert.equal(data.regions[1].threat['240'], 'very-high');
+    assert.equal(data.areas[0].threat['5'], 'low');
 
-    const one = await call('GET', '/api/hunts/options?region=windfalls', { cookie });
-    assert.deepEqual(one.data.regions.map((region) => region.id), ['windfalls']);
-    assert.deepEqual(one.data.regions[0].threat, data.regions[0].threat);
-    assert.equal((await call('GET', '/api/hunts/options?region=moon', { cookie })).status, 400);
+    const one = await call('GET', '/api/hunts/options?area=windfalls-edge', { cookie });
+    assert.deepEqual(one.data.areas.map((area) => area.id), ['windfalls-edge']);
+    assert.deepEqual(one.data.areas[0].threat, data.areas[0].threat);
+    assert.equal((await call('GET', '/api/hunts/options?area=moon', { cookie })).status, 400);
+    const locked = await call('GET', '/api/hunts/options?area=boar-thicket', { cookie });
+    assert.equal(locked.status, 403);
+    assert.equal(locked.data.error.code, 'area_locked');
+
+    // The class level opens places above the character's level too.
+    await (await db()).prepare('UPDATE characters SET class_level = 20').run();
+    const far = await call('GET', '/api/hunts/options?area=boar-thicket', { cookie });
+    assert.equal(far.data.areas[0].threat['1'], 'very-high');
+  });
+
+  test('inner regions open with the class level, lower ones stay open', async () => {
+    const locked = await call('POST', '/api/hunts', { cookie, body: { areaId: 'fox-ravines', minutes: 5 } });
+    assert.equal(locked.status, 403);
+    assert.equal(locked.data.error.code, 'area_locked');
+    assert.equal(locked.data.error.message, 'To miejsce odblokujesz na poziomie klasy 5.');
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'mossy-boulders', minutes: 5 } })).status, 403);
+
+    // A level 20 character with class level 22 may go to the first place of all.
+    await (await db()).prepare('UPDATE characters SET level = 20, class_level = 22').run();
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'mossy-boulders', minutes: 5 } })).status, 403);
+    const easy = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.equal(easy.status, 201);
+    assert.equal(easy.data.character.activity.areaId, 'windfalls-edge');
   });
 
   test('a hunt runs on server time and pays out once, after it ends', async () => {
-    const start = await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 30 } });
+    const start = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
     assert.equal(start.status, 201);
     const activity = start.data.character.activity;
-    assert.equal(activity.regionName, 'Wiatrołomy');
+    assert.deepEqual([activity.areaName, activity.regionName], ['Skraj Wiatrołomów', 'Wiatrołomy']);
     assert.equal(activity.endsAt - activity.startedAt, 30 * 60000);
     assert.equal(activity.finished, false);
 
-    assert.equal((await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 5 } })).data.error.code, 'busy');
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } })).data.error.code, 'busy');
     assert.equal((await call('POST', '/api/character/points/auto', { cookie })).data.error.code, 'busy');
     assert.equal((await call('POST', '/api/hunts/claim', { cookie })).data.error.code, 'not_finished');
 
@@ -265,9 +294,10 @@ describe('hunts and reports', () => {
     assert.ok(['already_claimed', 'no_activity'].includes(claims[1].data.error.code));
 
     const { report, character } = claims[0].data;
-    assert.equal(report.regionName, 'Wiatrołomy');
+    assert.deepEqual([report.areaId, report.areaName, report.regionName], ['windfalls-edge', 'Skraj Wiatrołomów', 'Wiatrołomy']);
     assert.ok(['success', 'escaped'].includes(report.result));
     assert.ok(report.summary.xp > 0);
+    assert.equal(report.summary.classXp, report.summary.xp);
     assert.ok(report.fights[report.keyFight.index].events.length > 0);
     assert.ok(report.fights.every((fight) => fight.allies.length === 1 && fight.enemies.length >= 1));
     assert.equal(character.activity, null);
@@ -298,7 +328,7 @@ describe('hunts and reports', () => {
          SELECT (SELECT id FROM characters), 'old:' || i, 'hunt', i, '{}', '{}' FROM n`,
       )
       .run();
-    await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 5 } });
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
     await finishHunt();
     const { data } = await call('POST', '/api/hunts/claim', { cookie });
     const rows = await database.prepare('SELECT COUNT(*) AS count, MAX(id) AS newest, MIN(created_at) AS oldest FROM reports').first();
@@ -310,7 +340,7 @@ describe('hunts and reports', () => {
 
   test('"Pomiń czas" in test mode ends the hunt at once, then the rest', async () => {
     assert.equal((await call('GET', '/api/content')).data.testMode, true);
-    await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 45 } });
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 45 } });
     const skipped = await call('POST', '/api/test/skip-time', { cookie });
     assert.equal(skipped.status, 200);
     const activity = skipped.data.character.activity;
@@ -334,7 +364,7 @@ describe('hunts and reports', () => {
     const before = (await call('GET', '/api/character', { cookie })).data.character;
     assert.deepEqual([before.huntDurations[0], before.huntDurations[1], before.huntDurations.at(-1)], [1, 5, 45]);
     assert.deepEqual(before.features, []);
-    const locked = await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 50 } });
+    const locked = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 50 } });
     assert.equal(locked.status, 403);
     assert.equal(locked.data.error.code, 'duration_locked');
 
@@ -342,11 +372,11 @@ describe('hunts and reports', () => {
     const after = (await call('GET', '/api/character', { cookie })).data.character;
     assert.deepEqual([after.huntDurations[0], after.huntDurations[1], after.huntDurations.at(-1)], [1, 5, 240]);
     assert.deepEqual(after.features, ['long-hunts', 'stats']);
-    assert.equal((await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 85 } })).status, 201);
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 85 } })).status, 201);
   });
 
   test('a hunt can be called off early, without rewards', async () => {
-    await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 30 } });
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
     const cancel = await call('POST', '/api/hunts/cancel', { cookie });
     assert.equal(cancel.status, 200);
     assert.equal(cancel.data.character.activity, null);
@@ -354,14 +384,26 @@ describe('hunts and reports', () => {
     assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).data.error.code, 'no_activity');
   });
 
-  test('checks the region and the duration', async () => {
-    const region = await call('POST', '/api/hunts', { cookie, body: { regionId: 'moon', minutes: 60 } });
-    assert.equal(region.data.error.code, 'invalid_region');
+  test('checks the place and the duration', async () => {
+    const place = await call('POST', '/api/hunts', { cookie, body: { areaId: 'moon', minutes: 60 } });
+    assert.equal(place.data.error.code, 'invalid_area');
     // Only steps of the slider: 5, 10, 15… up to 4 hours.
     for (const minutes of [7, 0, 245, '30']) {
-      const wrong = await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes } });
+      const wrong = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes } });
       assert.equal(wrong.data.error.code, 'invalid_duration');
     }
+  });
+
+  test('an exploration from before inner regions finishes in the inner region for the level', async () => {
+    // "Wyrusz ponownie" from an old report sends the whole region.
+    const start = await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 5 } });
+    assert.equal(start.data.character.activity.areaId, 'windfalls-edge');
+    // The previous version stored the whole region with the activity.
+    await (await db()).prepare("UPDATE activities SET region_id = 'windfalls'").run();
+    assert.equal((await call('GET', '/api/character', { cookie })).data.character.activity.areaName, 'Skraj Wiatrołomów');
+    await finishHunt();
+    const { report } = (await call('POST', '/api/hunts/claim', { cookie })).data;
+    assert.equal(report.areaId, 'windfalls-edge');
   });
 
   test('HP lost on a hunt comes back with time', async () => {

@@ -54,3 +54,10 @@ test('index.html loads the entry module and the screens it needs exist', () => {
     assert.match(html, new RegExp(`id="${id}"`), `index.html has no #${id}`);
   }
 });
+
+test('every inner region has its picture', async () => {
+  const { areaArtIds } = await import('../src/client/area-art.js');
+  const regions = JSON.parse(readFileSync(new URL('../data/regions.json', import.meta.url), 'utf8'));
+  const areas = regions.flatMap((region) => region.areas.map((area) => area.id));
+  assert.deepEqual(areas.filter((id) => !areaArtIds.includes(id)), []);
+});

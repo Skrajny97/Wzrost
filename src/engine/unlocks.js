@@ -29,6 +29,14 @@ export function huntDurations(level, content) {
   return durationsUpTo(long ? tuning.maxMinutes : tuning.shortHuntMaxMinutes, content);
 }
 
+// An inner region opens when the class reaches the level just before its
+// lowest one (areaUnlockLead in balance.json): a class at level 5 may explore
+// the inner region of levels 6–10. The character chooses freely among the open
+// ones, lower ones included.
+export const areaUnlockLevel = (area, content) => Math.max(1, area.minLevel - content.balance.hunt.areaUnlockLead);
+
+export const areaUnlocked = (area, classLevel, content) => classLevel >= areaUnlockLevel(area, content);
+
 // System messages for the modules that open exactly at this level.
 export function unlockMessages(level, content) {
   return content.unlocks.filter((unlock) => unlock.level === level && unlock.message).map((unlock) => unlock.message);

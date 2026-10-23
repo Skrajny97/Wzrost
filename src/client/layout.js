@@ -72,7 +72,7 @@ export function updateTopbar(now = serverNow()) {
   const { activityLabel, activityTime } = topbar;
   topbar.activity.classList.toggle('activity--done', activityFinished(activity, now));
   if (activity) {
-    activityLabel.textContent = `EKSPLORACJA · ${activity.regionName}`;
+    activityLabel.textContent = `EKSPLORACJA · ${activity.areaName}`;
     activityTime.textContent = activityFinished(activity, now) ? 'RAPORT GOTOWY' : formatCountdown(activity.endsAt - now);
   } else {
     const hpNow = currentHp(character, now);

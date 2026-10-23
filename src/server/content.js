@@ -1,7 +1,7 @@
 // Game content bundled into the Worker from data/ (validated against
 // data/schemas before every deploy).
 
-import { buildContent } from '../engine/index.js';
+import { areaUnlockLevel, buildContent } from '../engine/index.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
 import classes from '../../data/classes.json' with { type: 'json' };
@@ -36,18 +36,18 @@ export const content = buildContent({
 export function publicContent() {
   return {
     stats: content.stats.map(({ id, name, combat }) => ({ id, name, effect: combat })),
-    classes: content.classes.map(({ id, name, role, gentleStart, description, position }) => ({
+    classes: content.classes.map(({ id, name, role, start, description, position }) => ({
       id,
       name,
       role,
-      gentleStart,
+      start,
       description,
       position,
     })),
     elements: content.elements.map(({ id, name, color }) => ({ id, name, color })),
     slots: content.slots,
     rarities: content.rarities.map(({ id, name, color }) => ({ id, name, color })),
-    regions: content.regions.map(({ id, land, name, minLevel, maxLevel, safe, description, trait }) => ({
+    regions: content.regions.map(({ id, land, name, minLevel, maxLevel, safe, description, trait, areas }) => ({
       id,
       land,
       name,
@@ -56,6 +56,14 @@ export function publicContent() {
       safe,
       description,
       trait: { name: trait.name, description: trait.description },
+      areas: areas.map((area) => ({
+        id: area.id,
+        name: area.name,
+        minLevel: area.minLevel,
+        maxLevel: area.maxLevel,
+        description: area.description,
+        unlockClassLevel: areaUnlockLevel(area, content),
+      })),
     })),
     durations: { min: content.balance.hunt.minMinutes, step: content.balance.hunt.stepMinutes, max: content.balance.hunt.maxMinutes },
     lengths: content.texts.lengths,

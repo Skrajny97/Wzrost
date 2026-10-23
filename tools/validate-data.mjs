@@ -136,15 +136,31 @@ function checkReferences(data) {
     }
   }
 
+  const areaIds = new Set();
   for (const region of data.regions) {
     if (region.minLevel > region.maxLevel) errors.push(`regions.json: ${region.id} ma minLevel większy niż maxLevel`);
-    for (const encounter of [...region.encounters, ...(region.tough ?? [])]) {
-      for (const id of encounter.monsters) {
-        const monster = monstersById.get(id);
-        if (!monster) errors.push(`regions.json: ${region.id} ma nieznanego potwora "${id}"`);
-        else if (monster.elite) errors.push(`regions.json: ${region.id} ma elitę "${id}" w zwykłym spotkaniu`);
+    // Inner regions follow one another without gaps and cover the region's levels.
+    let next = region.minLevel;
+    for (const area of region.areas) {
+      if (areaIds.has(area.id) || data.regions.some((other) => other.id === area.id)) {
+        errors.push(`regions.json: identyfikator ${area.id} się powtarza`);
+      }
+      areaIds.add(area.id);
+      if (area.minLevel !== next) errors.push(`regions.json: ${area.id} powinien zaczynać się od poziomu ${next}`);
+      if (area.minLevel > area.maxLevel) errors.push(`regions.json: ${area.id} ma minLevel większy niż maxLevel`);
+      next = area.maxLevel + 1;
+      for (const encounter of [...area.encounters, ...(area.tough ?? [])]) {
+        for (const id of encounter.monsters) {
+          const monster = monstersById.get(id);
+          if (!monster) errors.push(`regions.json: ${area.id} ma nieznanego potwora "${id}"`);
+          else if (monster.elite) errors.push(`regions.json: ${area.id} ma elitę "${id}" w zwykłym spotkaniu`);
+        }
+      }
+      if (!area.encounters.some((encounter) => (encounter.minLevel ?? 1) <= area.minLevel)) {
+        errors.push(`regions.json: ${area.id} nie ma spotkania od swojego pierwszego poziomu`);
       }
     }
+    if (next !== region.maxLevel + 1) errors.push(`regions.json: regiony wewnętrzne ${region.id} nie kończą się na poziomie ${region.maxLevel}`);
     const elite = monstersById.get(region.elite);
     if (!elite) errors.push(`regions.json: ${region.id} ma nieznaną elitę "${region.elite}"`);
     else if (!elite.elite) errors.push(`regions.json: elita ${region.id} ("${region.elite}") nie jest oznaczona jako elite`);

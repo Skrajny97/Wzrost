@@ -81,7 +81,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
 
     fill(
       container,
-      heading('Raport z wyprawy', `${report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
+      heading('Raport z wyprawy', `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
       summaryCard(report),
       report.system.length > 0 && systemPanel(...report.system),
       count > 0 &&
@@ -217,8 +217,10 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
   function summaryCard(report) {
     const summary = report.summary;
     const rows = [
-      ['Doświadczenie', `+${formatNumber(summary.xp)} XP`],
-      summary.penalty > 0 && ['Kara za omdlenie', `−${formatNumber(summary.penalty)} XP`],
+      ['XP postaci', `+${formatNumber(summary.xp)} XP`],
+      summary.penalty > 0 && ['Kara za omdlenie', `−${formatNumber(summary.penalty)} XP postaci`],
+      // Reports from before the split have no classXp: the class got the same XP.
+      ['XP klasy', `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
       ['Złoto', `+${formatNumber(summary.gold)}`],
       ['Walki', formatNumber(summary.fights)],
       ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
@@ -364,10 +366,10 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       h('button', {
         type: 'button',
         class: 'button button--system',
-        text: `Wyrusz ponownie: ${report.regionName}, ${formatMinutes(report.minutes)}`,
+        text: `Wyrusz ponownie: ${report.areaName ?? report.regionName}, ${formatMinutes(report.minutes)}`,
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
-            await call('POST', '/api/hunts', { regionId: report.regionId, minutes: report.minutes });
+            await call('POST', '/api/hunts', { areaId: report.areaId ?? report.regionId, minutes: report.minutes });
             navigate('#/walka');
           }),
       });

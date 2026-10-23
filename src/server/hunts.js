@@ -3,6 +3,9 @@
 
 import {
   applyHunt,
+  areaFor,
+  areaUnlocked,
+  areaUnlockLevel,
   autoEquip,
   durationsUpTo,
   estimateThreat,
@@ -30,33 +33,46 @@ import { KEPT_REPORTS } from './reports.js';
 const samplesCache = new Map();
 const SAMPLES_CACHE_SIZE = 200;
 
-function cachedSamples(player, character, equipped, regionId) {
+function cachedSamples(player, character, equipped, areaId) {
   const ids = equipped.map((item) => item.id).sort((a, b) => a - b);
-  const key = JSON.stringify([player.row.id, regionId, character.level, character.classLevel, character.points, ids]);
+  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, ids]);
   let samples = samplesCache.get(key);
   if (!samples) {
-    samples = threatSamples({ character, equipped, regionId }, content);
+    samples = threatSamples({ character, equipped, areaId }, content);
     if (samplesCache.size >= SAMPLES_CACHE_SIZE) samplesCache.delete(samplesCache.keys().next().value);
     samplesCache.set(key, samples);
   }
   return samples;
 }
 
-// ?region=… asks for one region only, which keeps each request within the CPU limit.
+// Inner regions open with the class level (areaUnlockLevel).
+const areaLocked = (area) =>
+  new ApiError(403, 'area_locked', `To miejsce odblokujesz na poziomie klasy ${areaUnlockLevel(area, content)}.`);
+
+// ?area=… asks for one inner region, which keeps each request within the CPU
+// limit. Without it the answer covers the inner region of each region that fits
+// the character's level, if it is open.
 export async function huntOptions(context) {
   const { player } = await requirePlayer(context);
   const character = engineCharacter(player.row);
   const equipped = equippedItems(player);
   const { hp, maxHp } = currentHp(player, context.now);
-  const only = new URL(context.request.url).searchParams.get('region');
-  if (only !== null && !content.regionsById[only]) throw new ApiError(400, 'invalid_region', 'Nie ma takiego regionu.');
-  const regions = only === null ? content.regions : [content.regionsById[only]];
+  const params = new URL(context.request.url).searchParams;
+  const only = params.get('area') ?? params.get('region');
+  const area = only !== null && areaFor(only, character.level, content);
+  if (only !== null && !area) throw new ApiError(400, 'invalid_area', 'Nie ma takiego miejsca.');
+  if (area && !areaUnlocked(area, character.classLevel, content)) throw areaLocked(area);
+  const areas = area
+    ? [area]
+    : content.regions
+        .map((region) => areaFor(region.id, character.level, content))
+        .filter((candidate) => areaUnlocked(candidate, character.classLevel, content));
   return json({
     hp,
     maxHp,
-    regions: regions.map((region) => ({
-      id: region.id,
-      threat: estimateThreat({ character, equipped, hp, regionId: region.id }, content, cachedSamples(player, character, equipped, region.id)),
+    areas: areas.map(({ id }) => ({
+      id,
+      threat: estimateThreat({ character, equipped, hp, areaId: id }, content, cachedSamples(player, character, equipped, id)),
     })),
   });
 }
@@ -64,8 +80,11 @@ export async function huntOptions(context) {
 export async function startHunt(context) {
   const { session, player } = await requireIdlePlayer(context);
   const body = await readJson(context.request);
-  const region = typeof body.regionId === 'string' ? content.regionsById[body.regionId] : undefined;
-  if (!region) throw new ApiError(400, 'invalid_region', 'Wybierz region.');
+  // regionId: "Wyrusz ponownie" from a report made before inner regions.
+  const id = body.areaId ?? body.regionId;
+  const area = typeof id === 'string' ? areaFor(id, player.row.level, content) : undefined;
+  if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
+  if (!areaUnlocked(area, player.row.class_level, content)) throw areaLocked(area);
   if (!durationsUpTo(content.balance.hunt.maxMinutes, content).includes(body.minutes)) {
     throw new ApiError(400, 'invalid_duration', 'Wybierz czas wyprawy.');
   }
@@ -85,7 +104,7 @@ export async function startHunt(context) {
         .prepare(
           'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         )
-        .bind(player.row.id, 'hunt', region.id, body.minutes, now, now + body.minutes * 60000, seed, hp),
+        .bind(player.row.id, 'hunt', area.id, body.minutes, now, now + body.minutes * 60000, seed, hp),
       // The HP rested so far is saved now, so it is not counted again later.
       db.prepare('UPDATE characters SET hp = ?, hp_at = ?, version = version + 1 WHERE id = ?').bind(hp, now, player.row.id),
     ]);
@@ -121,13 +140,15 @@ export async function claimHunt(context) {
 
   const row = player.row;
   const character = engineCharacter(row);
+  // region_id holds the inner region (or a whole region, from before them).
+  const area = areaFor(activity.region_id, row.level, content);
   const hunt = simulateHunt(
     {
       character,
       equipped: equippedItems(player),
       hp: activity.hp_at_start,
       name: row.name,
-      regionId: activity.region_id,
+      areaId: area.id,
       minutes: activity.minutes,
       seed: activity.seed,
     },
@@ -137,15 +158,17 @@ export async function claimHunt(context) {
   // A find for a slot with nothing in it is worn at once.
   const autoEquipped = autoEquip(equippedItems(player), hunt.items, content, row.class_id);
   const report = huntReport(
-    { hunt, applied, character, regionId: activity.region_id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped },
+    { hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped },
     content,
   );
   const summary = {
+    areaName: report.areaName,
     regionName: report.regionName,
     minutes: report.minutes,
     result: report.result,
     resultText: report.resultText,
     xp: report.summary.xp,
+    classXp: report.summary.classXp,
     penalty: report.summary.penalty,
     gold: report.summary.gold,
     itemsFound: report.summary.itemsFound,

@@ -47,6 +47,7 @@
   "recover": ["Odpoczynek: +{hp} HP.", "Krótki oddech: +{hp} HP."],
   "findGold": ["W trawie leży sakiewka: {gold} złota.", "Znaleziono {gold} złota.", "Pod kamieniem błyszczą monety: {gold} złota."],
   "findItem": ["Znaleziono: {item}.", "Pod korzeniami: {item}.", "W porzuconym tobołku: {item}."],
+  "findNothing": ["Okolica nie skrywa nic ciekawego.", "Ślady prowadzą donikąd.", "Pod korzeniami tylko mech i ziemia.", "Wśród powalonych pni nie ma nic cennego."],
   "loot": ["Łup: {item}."],
   "levelUp": ["Osiągnięto poziom {level}. Wolne punkty statystyk: +{points}."],
   "classLevelUp": ["{className}: poziom klasy {level}. Wolne punkty statystyk: +{points}."],

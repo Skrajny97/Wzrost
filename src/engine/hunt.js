@@ -1,14 +1,16 @@
 // An exploration (called a hunt in the code): fights and finds spread over the
-// chosen time. Fights grow slowly with time (1 minute: 1 fight, an hour: 4),
-// but each stands for its share of the time, so XP, gold and loot follow the
-// time spent. Longer explorations meet demanding encounters more often, with
-// better loot, and have more finds. HP carries over between fights and
+// chosen time in one inner region (an area). Fights grow slowly with time
+// (1 minute: 1 fight, an hour: 4), but each stands for its share of the time,
+// so XP, gold and loot follow the time spent. Longer explorations meet
+// demanding encounters more often, with better loot, and have more finds, some
+// of them empty. Monsters have the levels of the place, not of the character,
+// and XP from monsters far below the character's level drops as the character
+// levels up during the exploration. HP carries over between fights and
 // recovers only partly. A lost fight ends the exploration with fainting (or,
 // against the local elite in a safe region, with a wounded retreat).
 
 import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
-import { clamp } from './formulas.js';
 import { itemName, itemRank, itemView, randomItem } from './items.js';
 import {
   classXpToNext,
@@ -51,41 +53,54 @@ export function explorationPace(minutes, content) {
   };
 }
 
-export function rollEncounter(region, rng, content, characterLevel, pace) {
-  if (rng.chance(pace.eliteChance)) return eliteEncounter(region, content, characterLevel);
-  const tough = toughEncountersFor(region, characterLevel);
+export function rollEncounter(area, rng, content, characterLevel, pace) {
+  if (rng.chance(pace.eliteChance)) return eliteEncounter(area, content);
+  const tough = toughEncountersFor(area, characterLevel);
   if (tough.length > 0 && rng.chance(pace.toughChance)) {
-    return regularEncounter(rng.weighted(tough), region, rng, content, characterLevel, { tough: true });
+    return regularEncounter(rng.weighted(tough), area, rng, content, { tough: true, characterLevel });
   }
-  return regularEncounter(rng.weighted(encountersFor(region, characterLevel)), region, rng, content, characterLevel);
+  return regularEncounter(rng.weighted(encountersFor(area, characterLevel)), area, rng, content, { characterLevel });
 }
 
-// Some encounters (groups in the tutorial region) appear only from a level on.
-export const encountersFor = (region, characterLevel) =>
-  region.encounters.filter((encounter) => characterLevel >= (encounter.minLevel ?? 1));
-
-export const toughEncountersFor = (region, characterLevel) =>
-  (region.tough ?? []).filter((encounter) => characterLevel >= (encounter.minLevel ?? 1));
-
-// The local elite: a level above the character, within the region's range plus one.
-export function eliteEncounter(region, content, characterLevel) {
-  const level = clamp(characterLevel + content.balance.hunt.eliteLevelBonus, region.minLevel + 1, region.maxLevel + 1);
-  return { elite: true, members: [{ monsterId: region.elite, level }] };
+// The inner region for an id. Activities and reports from before inner regions
+// name a whole region: they get its inner region for the character's level.
+export function areaFor(id, characterLevel, content) {
+  const area = content.areasById[id];
+  if (area) return area;
+  const region = content.regionsById[id];
+  return region && (region.areas.find((candidate) => characterLevel <= candidate.maxLevel) ?? region.areas.at(-1));
 }
 
-// Monsters are around the character's level, within the region's range. A
-// demanding encounter is some levels above that, past the range if needed.
-export function regularEncounter(encounter, region, rng, content, characterLevel, { tough = false } = {}) {
-  const spread = region.levelSpread ?? content.balance.hunt.monsterLevelSpread;
-  const bonus = tough ? (encounter.levelBonus ?? content.balance.hunt.toughLevelBonus) : 0;
-  return {
-    elite: false,
-    tough,
-    members: encounter.monsters.map((monsterId) => ({
-      monsterId,
-      level: clamp(characterLevel + rng.int(-spread, spread), region.minLevel, region.maxLevel) + bonus,
-    })),
-  };
+// Some encounters (pairs at the end of the first area) appear only from a level on.
+export const encountersFor = (area, characterLevel) =>
+  area.encounters.filter((encounter) => characterLevel >= (encounter.minLevel ?? 1));
+
+export const toughEncountersFor = (area, characterLevel) =>
+  (area.tough ?? []).filter((encounter) => characterLevel >= (encounter.minLevel ?? 1));
+
+// The local elite: above the strongest monsters of the place.
+export function eliteEncounter(area, content) {
+  return { elite: true, members: [{ monsterId: area.elite, level: area.maxLevel + content.balance.hunt.eliteLevelBonus }] };
+}
+
+// A level from the place's range, whatever the character's level. Lower
+// levels come more often (monsterLevelWeights), so a character at the start of
+// an inner region is not outmatched in every fight.
+export function areaLevel(area, rng, content) {
+  const weights = content.balance.hunt.monsterLevelWeights;
+  const offsets = Array.from({ length: area.maxLevel - area.minLevel + 1 }, (_, i) => i);
+  return area.minLevel + rng.weighted(offsets, (i) => weights[Math.min(i, weights.length - 1)]);
+}
+
+// Monsters have the levels of the place: a group shares one level. A
+// demanding encounter is some levels above that. Only a new character (up to
+// beginnerLevel, the first minutes of the game, still without a weapon at the
+// start) meets the lowest level of the place.
+export function regularEncounter(encounter, area, rng, content, { tough = false, characterLevel } = {}) {
+  const { toughLevelBonus, beginnerLevel } = content.balance.hunt;
+  const bonus = tough ? (encounter.levelBonus ?? toughLevelBonus) : 0;
+  const level = characterLevel <= beginnerLevel ? area.minLevel : areaLevel(area, rng, content);
+  return { elite: false, tough, members: encounter.monsters.map((monsterId) => ({ monsterId, level: level + bonus })) };
 }
 
 // Repeated monsters get numbers: "Wilk 1", "Wilk 2".
@@ -112,13 +127,14 @@ function spread(count, durationMs, rng) {
   return Array.from({ length: count }, (_, i) => Math.round(((i + rng.float(0.2, 0.8)) / count) * durationMs));
 }
 
-export function simulateHunt({ character, equipped, hp, name, regionId, minutes, seed }, content) {
+export function simulateHunt({ character, equipped, hp, name, areaId, minutes, seed }, content) {
   const rng = createRng(seed);
   const tuning = content.balance.hunt;
   const rewards = content.balance.rewards;
   const texts = content.texts;
-  const region = content.regionsById[regionId];
-  const player = playerCombatant({ character, equipped, hp, name, region }, content);
+  const area = content.areasById[areaId];
+  let worn = equipped;
+  let player = playerCombatant({ character, equipped: worn, hp, name, area }, content);
   const durationMs = minutes * 60000;
 
   // Each fight pays for the time it stands for (`share`), so every length
@@ -132,7 +148,6 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
     ...spread(findCount, durationMs, rng).map((t) => ({ t, type: 'find' })),
   ].sort((a, b) => a.t - b.t);
 
-  const findLevel = clamp(character.level, region.minLevel, region.maxLevel);
   // Slots covered by worn items or earlier finds, for loot that fills the gaps.
   const filled = new Set(equipped.map((item) => item.slot));
   const loot = { filled, classId: character.classId };
@@ -143,6 +158,9 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
   // Gold from fights before rounding: a short exploration earns fractions per
   // fight, and only the running total is rounded.
   let fightGold = 0;
+  // The level as it rises during the exploration, for the XP of later fights.
+  const { maxLevel } = content.balance.progression;
+  let reached = { level: character.level, xp: character.xp ?? 0 };
   const items = [];
   const fights = [];
   const entries = [];
@@ -150,19 +168,24 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
 
   for (const [step, event] of timeline.entries()) {
     if (event.type === 'find') {
-      if (rng.chance(rewards.findGoldChance)) {
+      // A find is gold, an item of the place's level or nothing of interest.
+      const findLevel = areaLevel(area, rng, content);
+      const outcome = rng.weighted(Object.entries(rewards.findOutcomes), ([, weight]) => weight)[0];
+      if (outcome === 'gold') {
         const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * rng.float(0.5, 1.5)));
         gold += amount;
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findGold', step, { gold: amount }) });
-      } else {
+      } else if (outcome === 'item') {
         const item = randomItem(findLevel, rng, content, loot);
         items.push(item);
         entries.push({ t: event.t, type: 'find', item: items.length - 1, text: say(texts, 'findItem', step, { item: itemName(item, content) }) });
+      } else {
+        entries.push({ t: event.t, type: 'find', text: say(texts, 'findNothing', step) });
       }
       continue;
     }
 
-    const encounter = rollEncounter(region, rng, content, character.level, pace);
+    const encounter = rollEncounter(area, rng, content, character.level, pace);
     const enemies = encounterCombatants(encounter, content);
     const ally = { ...player, hp: hpNow };
     const fight = simulateFight({ allies: [ally], enemies, rng, content, record: true });
@@ -207,7 +230,7 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
       for (const enemy of enemies) {
         const monster = content.monstersById[enemy.monsterId];
         fightXp +=
-          monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(character.level, enemy.level, content);
+          monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const goldFactor = (monster.elite ? rewards.eliteGoldMultiplier : 1) * enemy.groupFactor * share;
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * goldFactor;
         // A character without a weapon always gets one of its class from the first opponent it beats.
@@ -215,13 +238,20 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
         const dropChance = rewards.itemDropChance * enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1);
         if (monster.elite || needsWeapon || rng.chance(dropChance)) {
           const rarityBonus = monster.elite ? rewards.eliteRarityBonus : encounter.tough ? rewards.toughRarityBonus : 1;
-          items.push(randomItem(enemy.level, rng, content, { ...loot, rarityBonus }));
+          const item = randomItem(enemy.level, rng, content, { ...loot, rarityBonus });
+          items.push(item);
           summary.loot.push(items.length - 1);
+          // The first weapon goes into the hand at once, for the rest of the exploration.
+          if (needsWeapon) {
+            worn = [...worn, item];
+            player = playerCombatant({ character, equipped: worn, hp: hpNow, name, area }, content);
+          }
         }
       }
       summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share);
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
       xp += summary.xp;
+      reached = gainXp(reached.level, reached.xp, summary.xp, (level) => xpToNext(level, content), maxLevel);
       gold += summary.gold;
       summary.recovered = Math.round((player.maxHp - hpNow) * player.recovery);
       hpNow += summary.recovered;
@@ -234,7 +264,7 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
     }
 
     if (fight.won === false) {
-      result = encounter.elite && region.safe ? 'escaped' : 'fainted';
+      result = encounter.elite && area.safe ? 'escaped' : 'fainted';
       hpNow = Math.max(1, Math.round(player.maxHp * tuning.hpAfterFaint));
       lines.push(say(texts, result === 'fainted' ? 'defeat' : 'escape', step, { target: player.name }));
     } else {
@@ -248,7 +278,7 @@ export function simulateHunt({ character, equipped, hp, name, regionId, minutes,
   }
 
   return {
-    regionId,
+    areaId,
     minutes,
     result,
     xp,
@@ -303,23 +333,28 @@ export function applyHunt(character, hunt, content) {
 }
 
 // `autoEquipped`: indices of the finds that went straight into empty slots.
-export function huntReport({ hunt, applied, character, regionId, startedAt, endsAt, autoEquipped = [] }, content) {
-  const region = content.regionsById[regionId];
+export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt, autoEquipped = [] }, content) {
+  const area = content.areasById[areaId];
   const best = hunt.items.reduce(
     (top, item) => (top === null || itemRank(item, content) > itemRank(top, content) ? item : top),
     null,
   );
   return {
     kind: 'hunt',
-    regionId,
-    regionName: region.name,
+    areaId,
+    areaName: area.name,
+    regionId: area.regionId,
+    regionName: area.regionName,
     minutes: hunt.minutes,
     startedAt,
     endsAt,
     result: hunt.result,
     resultText: content.texts.result[hunt.result],
     summary: {
+      // Fights give the same XP to the character and the class (solo); the
+      // fainting penalty takes only character XP.
       xp: hunt.xp,
+      classXp: hunt.xp,
       penalty: applied.penalty,
       gold: hunt.gold,
       fights: hunt.fights.length,

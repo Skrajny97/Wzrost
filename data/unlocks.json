@@ -14,27 +14,27 @@
   {
     "id": "skills",
     "name": "Umiejętności",
-    "level": 4
+    "level": 5
   },
   {
     "id": "professions",
     "name": "Profesje zbierackie",
-    "level": 6
+    "level": 10
   },
   {
     "id": "training",
     "name": "Trening",
-    "level": 8
+    "level": 15
   },
   {
     "id": "settlement",
     "name": "Osada",
-    "level": 10
+    "level": 20
   },
   {
     "id": "dungeons",
     "name": "Lochy",
-    "level": 12
+    "level": 25
   },
   {
     "id": "core",

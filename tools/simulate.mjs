@@ -39,7 +39,8 @@ export function hoursToReach(level, content) {
 export function itemsPerHour(content) {
   const { hunt, rewards } = content.balance;
   const fightsPerHour = 60 / hunt.minutesPerFightReference;
-  return (60 / hunt.findIntervalMinutes) * (1 - rewards.findGoldChance) + fightsPerHour * rewards.itemDropChance;
+  const outcomes = Object.values(rewards.findOutcomes).reduce((sum, weight) => sum + weight, 0);
+  return (60 / hunt.findIntervalMinutes) * (rewards.findOutcomes.item / outcomes) + fightsPerHour * rewards.itemDropChance;
 }
 
 export function typicalCharacter(classId, level, content) {
@@ -77,24 +78,24 @@ export function typicalClassLevel(level, content) {
   return classLevel;
 }
 
-// Regions from the data, plus generated stand-ins for levels without content
-// yet, so the XP table can be checked up to level 100.
-export function regionForLevel(level, content) {
-  const real = content.regions.find((region) => level >= region.minLevel && level <= region.maxLevel);
+// Inner regions from the data, plus generated stand-ins for levels without
+// content yet, so the XP table can be checked up to level 500.
+export function areaForLevel(level, content) {
+  const real = content.areas.find((area) => level >= area.minLevel && level <= area.maxLevel);
   if (real) return real;
-  const template = content.regions[content.regions.length - 1];
+  const template = content.areas[content.areas.length - 1];
   return { ...template, id: `generated-${level}`, minLevel: Math.max(1, level - 2), maxLevel: level + 2, safe: false };
 }
 
 export function simulateMany({ classId, level, minutes, hunts }, content) {
   const { character, equipped } = typicalCharacter(classId, level, content);
-  const region = regionForLevel(level, content);
-  const local = region.id in content.regionsById ? content : { ...content, regionsById: { ...content.regionsById, [region.id]: region } };
-  const maxHp = engine.playerCombatant({ character, equipped, name: 'Symulacja', region }, local).maxHp;
+  const area = areaForLevel(level, content);
+  const local = area.id in content.areasById ? content : { ...content, areasById: { ...content.areasById, [area.id]: area } };
+  const maxHp = engine.playerCombatant({ character, equipped, name: 'Symulacja', area }, local).maxHp;
   const totals = { fainted: 0, escaped: 0, xp: 0, penalty: 0, gold: 0, items: 0, fights: 0, endHp: 0 };
   for (let i = 0; i < hunts; i++) {
     const hunt = engine.simulateHunt(
-      { character, equipped, hp: maxHp, name: 'Symulacja', regionId: region.id, minutes, seed: `sim:${classId}:${level}:${minutes}:${i}` },
+      { character, equipped, hp: maxHp, name: 'Symulacja', areaId: area.id, minutes, seed: `sim:${classId}:${level}:${minutes}:${i}` },
       local,
     );
     if (hunt.result === 'fainted') {

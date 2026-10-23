@@ -6,30 +6,115 @@
     "minLevel": 1,
     "maxLevel": 25,
     "safe": true,
-    "levelSpread": 0,
     "description": "Pas powalonych drzew na skraju puszczy. Wilki, dziki i kruki, a w gęstwinie błędne światło.",
     "trait": {
       "name": "Święty gaj",
       "description": "Odpoczynek między walkami przywraca o 5% więcej HP.",
       "recoveryBonus": 0.05
     },
-    "encounters": [
-      { "weight": 25, "monsters": ["wolf"] },
-      { "weight": 12, "monsters": ["wolf", "wolf"], "minLevel": 5 },
-      { "weight": 14, "monsters": ["boar"], "minLevel": 5 },
-      { "weight": 10, "monsters": ["crow", "crow"], "minLevel": 5 },
-      { "weight": 14, "monsters": ["viper"] },
-      { "weight": 12, "monsters": ["badger"] },
-      { "weight": 8, "monsters": ["wolf", "crow"], "minLevel": 5 },
-      { "weight": 5, "monsters": ["viper", "crow"], "minLevel": 5 }
-    ],
-    "tough": [
-      { "weight": 10, "monsters": ["wolf", "wolf", "wolf"], "minLevel": 10 },
-      { "weight": 8, "monsters": ["boar", "boar"], "minLevel": 10 },
-      { "weight": 6, "monsters": ["wolf", "wolf", "crow"], "minLevel": 10 },
-      { "weight": 6, "monsters": ["viper", "viper", "crow"], "minLevel": 10 }
-    ],
-    "elite": "wisp"
+    "elite": "wisp",
+    "areas": [
+      {
+        "id": "windfalls-edge",
+        "name": "Skraj Wiatrołomów",
+        "minLevel": 1,
+        "maxLevel": 5,
+        "description": "Rzadki zagajnik przy pierwszych powalonych pniach. Pojedyncze wilki, lisy, żmije i borsuki.",
+        "encounters": [
+          { "weight": 25, "monsters": ["wolf"] },
+          { "weight": 12, "monsters": ["fox"] },
+          { "weight": 14, "monsters": ["viper"] },
+          { "weight": 12, "monsters": ["badger"] },
+          { "weight": 8, "monsters": ["wolf", "wolf"], "minLevel": 5 },
+          { "weight": 6, "monsters": ["fox", "fox"], "minLevel": 5 }
+        ]
+      },
+      {
+        "id": "fox-ravines",
+        "name": "Lisie Jary",
+        "minLevel": 6,
+        "maxLevel": 10,
+        "description": "Piaszczyste jary pełne nor. Lisy polują tu parami, a borsuki bronią swoich kryjówek.",
+        "encounters": [
+          { "weight": 18, "monsters": ["fox"] },
+          { "weight": 14, "monsters": ["badger"] },
+          { "weight": 14, "monsters": ["wolf"] },
+          { "weight": 10, "monsters": ["boar"] },
+          { "weight": 12, "monsters": ["fox", "fox"] },
+          { "weight": 10, "monsters": ["wolf", "fox"] },
+          { "weight": 8, "monsters": ["wolf", "wolf"] },
+          { "weight": 6, "monsters": ["badger", "fox"] }
+        ]
+      },
+      {
+        "id": "raven-hollows",
+        "name": "Krucze Wykroty",
+        "minLevel": 11,
+        "maxLevel": 15,
+        "description": "Wywrócone drzewa z korzeniami do nieba. Gnieżdżą się na nich kruki, a o zmierzchu poluje puszczyk.",
+        "encounters": [
+          { "weight": 16, "monsters": ["crow", "crow"] },
+          { "weight": 14, "monsters": ["wolf", "crow"] },
+          { "weight": 12, "monsters": ["owl"] },
+          { "weight": 12, "monsters": ["wolf"] },
+          { "weight": 8, "monsters": ["viper", "crow"] },
+          { "weight": 8, "monsters": ["owl", "crow"] },
+          { "weight": 8, "monsters": ["boar"] },
+          { "weight": 6, "monsters": ["fox", "crow"] }
+        ],
+        "tough": [
+          { "weight": 10, "monsters": ["crow", "crow", "crow"] },
+          { "weight": 8, "monsters": ["wolf", "wolf", "crow"] },
+          { "weight": 6, "monsters": ["owl", "owl", "crow"] }
+        ]
+      },
+      {
+        "id": "viper-heaps",
+        "name": "Żmijowe Zwalisko",
+        "minLevel": 16,
+        "maxLevel": 20,
+        "description": "Nagrzane słońcem stosy pni. Na każdym kamieniu wygrzewa się żmija.",
+        "encounters": [
+          { "weight": 18, "monsters": ["viper"] },
+          { "weight": 12, "monsters": ["viper", "viper"] },
+          { "weight": 10, "monsters": ["viper", "crow"] },
+          { "weight": 10, "monsters": ["badger"] },
+          { "weight": 10, "monsters": ["boar"] },
+          { "weight": 8, "monsters": ["wolf", "viper"] },
+          { "weight": 6, "monsters": ["fox", "viper"] }
+        ],
+        "tough": [
+          { "weight": 10, "monsters": ["viper", "viper", "crow"] },
+          { "weight": 6, "monsters": ["viper", "viper", "viper"] },
+          { "weight": 6, "monsters": ["boar", "viper", "viper"] }
+        ]
+      },
+      {
+        "id": "boar-thicket",
+        "name": "Dzicza Głusza",
+        "minLevel": 21,
+        "maxLevel": 25,
+        "description": "Najgęstsza część Wiatrołomów. Zryta ziemia zdradza dziki, a nocą słychać wilki.",
+        "encounters": [
+          { "weight": 12, "monsters": ["boar"] },
+          { "weight": 8, "monsters": ["wolf"] },
+          { "weight": 6, "monsters": ["fox"] },
+          { "weight": 6, "monsters": ["viper"] },
+          { "weight": 8, "monsters": ["wolf", "wolf"] },
+          { "weight": 10, "monsters": ["wolf", "crow"] },
+          { "weight": 8, "monsters": ["badger"] },
+          { "weight": 6, "monsters": ["boar", "boar"] },
+          { "weight": 6, "monsters": ["boar", "fox"] },
+          { "weight": 4, "monsters": ["badger", "boar"] }
+        ],
+        "tough": [
+          { "weight": 4, "monsters": ["wolf", "wolf", "wolf"] },
+          { "weight": 6, "monsters": ["boar", "boar"] },
+          { "weight": 6, "monsters": ["wolf", "wolf", "crow"] },
+          { "weight": 3, "monsters": ["boar", "boar", "wolf"] }
+        ]
+      }
+    ]
   },
   {
     "id": "stone-glade",
@@ -44,26 +129,118 @@
       "description": "Postać na przedzie ma o 5% więcej pancerza.",
       "frontArmorBonus": 0.05
     },
-    "encounters": [
-      { "weight": 12, "monsters": ["alpha-wolf"] },
-      { "weight": 12, "monsters": ["wolf", "wolf"] },
-      { "weight": 5, "monsters": ["wolf", "wolf", "wolf"] },
-      { "weight": 8, "monsters": ["boar"] },
-      { "weight": 5, "monsters": ["boar", "boar"] },
-      { "weight": 12, "monsters": ["lynx"] },
-      { "weight": 12, "monsters": ["spider"] },
-      { "weight": 8, "monsters": ["spider", "viper"] },
-      { "weight": 8, "monsters": ["alpha-wolf", "wolf"] },
-      { "weight": 8, "monsters": ["lynx", "crow"] },
-      { "weight": 8, "monsters": ["badger", "spider"] }
-    ],
-    "tough": [
-      { "weight": 10, "monsters": ["alpha-wolf", "wolf", "wolf"] },
-      { "weight": 8, "monsters": ["alpha-wolf", "alpha-wolf"] },
-      { "weight": 8, "monsters": ["lynx", "lynx"] },
-      { "weight": 6, "monsters": ["spider", "spider", "viper"] },
-      { "weight": 6, "monsters": ["boar", "boar", "boar"] }
-    ],
-    "elite": "likho"
+    "elite": "likho",
+    "areas": [
+      {
+        "id": "mossy-boulders",
+        "name": "Omszałe Głazy",
+        "minLevel": 26,
+        "maxLevel": 30,
+        "description": "Zewnętrzny krąg kamieni porośniętych mchem. Krzyżaki rozpinają sieci między głazami.",
+        "encounters": [
+          { "weight": 14, "monsters": ["spider"] },
+          { "weight": 12, "monsters": ["wolf", "wolf"] },
+          { "weight": 12, "monsters": ["badger"] },
+          { "weight": 10, "monsters": ["boar"] },
+          { "weight": 10, "monsters": ["badger", "spider"] },
+          { "weight": 8, "monsters": ["spider", "viper"] },
+          { "weight": 8, "monsters": ["lynx"] },
+          { "weight": 6, "monsters": ["alpha-wolf"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["spider", "spider", "viper"] },
+          { "weight": 6, "monsters": ["boar", "boar", "boar"] },
+          { "weight": 6, "monsters": ["lynx", "lynx"] }
+        ]
+      },
+      {
+        "id": "spider-gully",
+        "name": "Pajęczy Parów",
+        "minLevel": 31,
+        "maxLevel": 35,
+        "description": "Wąski parów zasnuty pajęczyną. Krzyżaki i żmije czekają w cieniu.",
+        "encounters": [
+          { "weight": 14, "monsters": ["spider"] },
+          { "weight": 12, "monsters": ["spider", "viper"] },
+          { "weight": 10, "monsters": ["spider", "spider"] },
+          { "weight": 8, "monsters": ["viper", "viper"] },
+          { "weight": 8, "monsters": ["badger", "spider"] },
+          { "weight": 8, "monsters": ["lynx"] },
+          { "weight": 6, "monsters": ["alpha-wolf"] }
+        ],
+        "tough": [
+          { "weight": 10, "monsters": ["spider", "spider", "viper"] },
+          { "weight": 6, "monsters": ["spider", "spider", "spider"] },
+          { "weight": 6, "monsters": ["spider", "viper", "viper"] }
+        ]
+      },
+      {
+        "id": "lynx-ridge",
+        "name": "Rysia Grań",
+        "minLevel": 36,
+        "maxLevel": 40,
+        "description": "Skalny grzbiet nad polaną. Rysie czają się na półkach i spadają na ofiarę z góry.",
+        "encounters": [
+          { "weight": 16, "monsters": ["lynx"] },
+          { "weight": 12, "monsters": ["lynx", "crow"] },
+          { "weight": 8, "monsters": ["lynx", "owl"] },
+          { "weight": 8, "monsters": ["owl"] },
+          { "weight": 10, "monsters": ["wolf", "wolf"] },
+          { "weight": 8, "monsters": ["boar"] },
+          { "weight": 8, "monsters": ["spider"] }
+        ],
+        "tough": [
+          { "weight": 10, "monsters": ["lynx", "lynx"] },
+          { "weight": 6, "monsters": ["lynx", "lynx", "owl"] },
+          { "weight": 6, "monsters": ["alpha-wolf", "wolf", "wolf"] }
+        ]
+      },
+      {
+        "id": "wolf-circles",
+        "name": "Wilcze Kręgi",
+        "minLevel": 41,
+        "maxLevel": 45,
+        "description": "Polany, na których wyją watahy. Prowadzi je basior.",
+        "encounters": [
+          { "weight": 10, "monsters": ["alpha-wolf"] },
+          { "weight": 12, "monsters": ["wolf"] },
+          { "weight": 10, "monsters": ["wolf", "wolf"] },
+          { "weight": 6, "monsters": ["alpha-wolf", "wolf"] },
+          { "weight": 10, "monsters": ["lynx"] },
+          { "weight": 8, "monsters": ["boar"] },
+          { "weight": 8, "monsters": ["badger"] },
+          { "weight": 6, "monsters": ["wolf", "crow"] }
+        ],
+        "tough": [
+          { "weight": 6, "monsters": ["alpha-wolf", "wolf", "wolf"] },
+          { "weight": 4, "monsters": ["alpha-wolf", "alpha-wolf"] },
+          { "weight": 4, "monsters": ["wolf", "wolf", "wolf"] }
+        ]
+      },
+      {
+        "id": "glade-heart",
+        "name": "Serce Uroczyska",
+        "minLevel": 46,
+        "maxLevel": 50,
+        "description": "Środek kamiennego kręgu. Wszystko jest tu większe i groźniejsze, a w gąszczu mieszka niedźwiedź.",
+        "encounters": [
+          { "weight": 8, "monsters": ["bear"] },
+          { "weight": 8, "monsters": ["alpha-wolf"] },
+          { "weight": 10, "monsters": ["lynx"] },
+          { "weight": 10, "monsters": ["wolf", "wolf"] },
+          { "weight": 6, "monsters": ["alpha-wolf", "wolf"] },
+          { "weight": 6, "monsters": ["boar", "boar"] },
+          { "weight": 10, "monsters": ["spider", "viper"] },
+          { "weight": 8, "monsters": ["lynx", "crow"] },
+          { "weight": 8, "monsters": ["badger"] }
+        ],
+        "tough": [
+          { "weight": 6, "monsters": ["bear", "wolf"] },
+          { "weight": 6, "monsters": ["alpha-wolf", "wolf", "wolf"] },
+          { "weight": 3, "monsters": ["bear", "bear"] },
+          { "weight": 6, "monsters": ["lynx", "lynx"] }
+        ]
+      }
+    ]
   }
 ]

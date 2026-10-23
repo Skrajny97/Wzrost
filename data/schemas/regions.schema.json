@@ -15,8 +15,8 @@
       "safe",
       "description",
       "trait",
-      "encounters",
-      "elite"
+      "elite",
+      "areas"
     ],
     "properties": {
       "id": {
@@ -76,81 +76,117 @@
           }
         }
       },
-      "encounters": {
+      "elite": {
+        "type": "string"
+      },
+      "areas": {
         "type": "array",
+        "description": "Regiony wewnętrzne: po kolei, bez przerw, każdy z własnym zakresem poziomów i spotkaniami. Cecha, elita i bezpieczeństwo pochodzą z regionu.",
         "minItems": 1,
         "items": {
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "weight",
-            "monsters"
+            "id",
+            "name",
+            "minLevel",
+            "maxLevel",
+            "description",
+            "encounters"
           ],
           "properties": {
-            "weight": {
-              "type": "number",
-              "exclusiveMinimum": 0
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
             },
-            "monsters": {
-              "type": "array",
-              "minItems": 1,
-              "maxItems": 3,
-              "items": {
-                "type": "string"
-              }
+            "name": {
+              "type": "string",
+              "minLength": 1
             },
             "minLevel": {
               "type": "integer",
               "minimum": 1,
-              "description": "Poziom postaci, od którego spotkanie się pojawia."
-            }
-          }
-        }
-      },
-      "tough": {
-        "type": "array",
-        "description": "Wymagające spotkania: trudniejsze, z lepszym łupem. Im dłuższa wyprawa, tym częściej się zdarzają.",
-        "minItems": 0,
-        "items": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "weight",
-            "monsters"
-          ],
-          "properties": {
-            "weight": {
-              "type": "number",
-              "exclusiveMinimum": 0
+              "maximum": 500
             },
-            "monsters": {
-              "type": "array",
-              "minItems": 1,
-              "maxItems": 3,
-              "items": {
-                "type": "string"
-              }
-            },
-            "levelBonus": {
-              "type": "integer",
-              "minimum": 0,
-              "description": "O ile poziomów wyżej niż zwykle; domyślnie toughLevelBonus z balance.json."
-            },
-            "minLevel": {
+            "maxLevel": {
               "type": "integer",
               "minimum": 1,
-              "description": "Poziom postaci, od którego spotkanie się pojawia."
+              "maximum": 500
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            },
+            "encounters": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "weight",
+                  "monsters"
+                ],
+                "properties": {
+                  "weight": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "monsters": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "minLevel": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Poziom postaci, od którego spotkanie się pojawia."
+                  }
+                }
+              }
+            },
+            "tough": {
+              "type": "array",
+              "description": "Wymagające spotkania: trudniejsze, z lepszym łupem. Im dłuższa wyprawa, tym częściej się zdarzają.",
+              "minItems": 0,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "weight",
+                  "monsters"
+                ],
+                "properties": {
+                  "weight": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "monsters": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "levelBonus": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "O ile poziomów wyżej niż zwykle; domyślnie toughLevelBonus z balance.json."
+                  },
+                  "minLevel": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Poziom postaci, od którego spotkanie się pojawia."
+                  }
+                }
+              }
             }
           }
         }
-      },
-      "elite": {
-        "type": "string"
-      },
-      "levelSpread": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 3
       }
     }
   }

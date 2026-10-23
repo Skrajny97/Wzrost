@@ -2,6 +2,7 @@
 // stat points.
 
 import {
+  areaFor,
   autoDistribute,
   classXpToNext,
   combatValues,
@@ -91,6 +92,13 @@ export function currentHp(player, now) {
   return { hp: Math.min(hp, combatant.maxHp), maxHp: combatant.maxHp, vitality: totals.vitality, combatant };
 }
 
+// Where an activity takes place. region_id holds the inner region, or a whole
+// region for an activity started before inner regions.
+function activityPlace(activity, level) {
+  const area = areaFor(activity.region_id, level, content);
+  return { areaId: area.id, areaName: area.name, regionId: area.regionId, regionName: area.regionName };
+}
+
 export function characterView(player, now) {
   const { row, items, activity } = player;
   const character = engineCharacter(row);
@@ -148,8 +156,7 @@ export function characterView(player, now) {
     bag: items.filter((item) => !item.equippedSlot).reverse().map(toItem),
     activity: activity && {
       kind: activity.kind,
-      regionId: activity.region_id,
-      regionName: content.regionsById[activity.region_id].name,
+      ...activityPlace(activity, row.level),
       minutes: activity.minutes,
       startedAt: activity.started_at,
       endsAt: activity.ends_at,

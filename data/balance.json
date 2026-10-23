@@ -53,8 +53,10 @@
     "minutesPerFightReference": 12,
     "toughChanceByMinutes": [[1, 0], [10, 0.05], [30, 0.15], [120, 0.3], [240, 0.4]],
     "toughLevelBonus": 1,
-    "findIntervalMinutes": 10,
-    "monsterLevelSpread": 1,
+    "monsterLevelWeights": [8, 4, 2, 1, 1],
+    "beginnerLevel": 1,
+    "areaUnlockLead": 1,
+    "findIntervalMinutes": 20,
     "groupFactors": [1, 0.7, 0.55],
     "eliteChancePerFight": 0.006,
     "eliteLevelBonus": 1,
@@ -72,11 +74,11 @@
     "eliteXpMultiplier": 3,
     "goldPerLevel": 2,
     "eliteGoldMultiplier": 3,
-    "itemDropChance": 0.1,
+    "itemDropChance": 0.06,
     "eliteRarityBonus": 3,
     "toughRarityBonus": 2,
     "toughDropMultiplier": 1.5,
-    "findGoldChance": 0.5,
+    "findOutcomes": { "gold": 0.4, "item": 0.3, "nothing": 0.3 },
     "findGoldPerLevel": 4
   },
   "regen": {
@@ -90,7 +92,7 @@
     "levelTimeExponent": 1.3,
     "xpPerHourScale": 650,
     "classXpFactor": 0.6,
-    "freeResetMaxLevel": 10,
-    "classEvolutionLevel": 25
+    "freeResetMaxLevel": 20,
+    "classEvolutionLevel": 30
   }
 }
