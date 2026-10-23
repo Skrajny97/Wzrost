@@ -1,19 +1,20 @@
 // Threat level shown before a hunt, from the region, its length, current HP
 // and the party. Sample fights against every kind of encounter of the region,
-// its elite included, show how much HP each kind costs. The chance of
-// fainting then follows from how likely each HP level is before every next
-// fight, with the encounters' odds and the rest after each won fight, as in a
-// real hunt. HP is counted in steps of 2% of the maximum.
+// its elite included, show how much HP each kind costs. They use the same
+// combatant as the hunt itself (stats, equipment, and later skills and
+// companions), so the rating follows the whole character, not its level
+// alone. The chance of fainting then follows from how likely each HP level is
+// before every next fight, with the encounters' odds and the rest after each
+// won fight, as in a real hunt. HP is counted in steps of 2% of the maximum.
 
 import { playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { eliteEncounter, encounterCombatants, encountersFor, regularEncounter } from './hunt.js';
 import { createRng } from './rng.js';
+import { durationsUpTo } from './unlocks.js';
 
 const SAMPLES_PER_KIND = 6;
 const STEPS = 50;
-// A region this many levels away from the character is judged without fights.
-const FAR_LEVELS = 3;
 export const THREAT_LEVELS = ['low', 'moderate', 'high', 'very-high'];
 // Highest chance of fainting for "low", "moderate" and "high".
 const LIMITS = [0.01, 0.05, 0.15];
@@ -26,10 +27,6 @@ export function threatSamples({ character, equipped, regionId }, content) {
   const region = content.regionsById[regionId];
   const tuning = content.balance.hunt;
   const player = playerCombatant({ character, equipped, name: 'próba', region }, content);
-  const samples = { maxHp: player.maxHp, recovery: player.recovery, losses: [], odds: [], safe: [] };
-  if (character.level < region.minLevel - FAR_LEVELS) return { ...samples, far: 'above' };
-  if (character.level > region.maxLevel + FAR_LEVELS) return { ...samples, far: 'below' };
-
   const rng = createRng(`threat:${regionId}:${character.level}`);
   const encounters = encountersFor(region, character.level);
   const totalWeight = encounters.reduce((sum, encounter) => sum + encounter.weight, 0);
@@ -61,7 +58,8 @@ export function threatSamples({ character, equipped, regionId }, content) {
   }
   const entries = [...lossOdds.values()];
   return {
-    ...samples,
+    maxHp: player.maxHp,
+    recovery: player.recovery,
     losses: entries.map((entry) => entry.steps),
     odds: entries.map((entry) => entry.odds),
     safe: entries.map((entry) => entry.safe),
@@ -71,8 +69,7 @@ export function threatSamples({ character, equipped, regionId }, content) {
 // Chance of fainting for every hunt length, between 0 and 1.
 export function faintChances({ character, equipped, hp, regionId }, content, samples) {
   const tuning = content.balance.hunt;
-  const { maxHp, recovery, losses, odds, safe, far } = samples ?? threatSamples({ character, equipped, regionId }, content);
-  if (far) return Object.fromEntries(tuning.durations.map((minutes) => [minutes, far === 'above' ? 1 : 0]));
+  const { maxHp, recovery, losses, odds, safe } = samples ?? threatSamples({ character, equipped, regionId }, content);
 
   // HP after the rest that follows a won fight, for each HP left after it.
   const rested = Array.from({ length: STEPS + 1 }, (_, left) => Math.round(left + (STEPS - left) * recovery));
@@ -81,7 +78,7 @@ export function faintChances({ character, equipped, hp, regionId }, content, sam
   let next = new Float64Array(STEPS + 1);
   chances[Math.round((Math.min(hp, maxHp) / maxHp) * STEPS)] = 1;
   const faintedAt = [];
-  for (let fight = 0; fight < fightsIn(Math.max(...tuning.durations), tuning); fight++) {
+  for (let fight = 0; fight < fightsIn(tuning.maxMinutes, tuning); fight++) {
     next.fill(0);
     let fainted = 0;
     for (let step = 0; step <= STEPS; step++) {
@@ -98,7 +95,7 @@ export function faintChances({ character, equipped, hp, regionId }, content, sam
   }
 
   return Object.fromEntries(
-    tuning.durations.map((minutes) => {
+    durationsUpTo(tuning.maxMinutes, content).map((minutes) => {
       const fainted = faintedAt.slice(0, fightsIn(minutes, tuning)).reduce((sum, chance) => sum + chance, 0);
       return [minutes, Math.min(1, fainted)];
     }),

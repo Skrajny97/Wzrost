@@ -328,9 +328,12 @@ describe('progression', () => {
 });
 
 describe('tutorial unlocks', () => {
-  test('level 1 has only short hunts; level 2 opens long hunts and stats', () => {
-    assert.deepEqual(huntDurations(1, content), [5, 15, 30]);
-    assert.deepEqual(huntDurations(2, content), content.balance.hunt.durations);
+  test('level 1 hunts last up to 45 minutes; level 2 opens long hunts and stats', () => {
+    // The slider moves in steps of 5 minutes.
+    assert.deepEqual(huntDurations(1, content), [5, 10, 15, 20, 25, 30, 35, 40, 45]);
+    const long = huntDurations(2, content);
+    assert.equal(long.length, 48);
+    assert.deepEqual([long[0], long[1], long.at(-1)], [5, 10, 240]);
     assert.deepEqual(unlockedFeatures(1, content), []);
     assert.deepEqual(unlockedFeatures(2, content), ['long-hunts', 'stats']);
     assert.ok(unlockedFeatures(10, content).includes('settlement'));
@@ -363,11 +366,25 @@ test('the threat level rises with hunt length and falls with HP', () => {
   const order = ['low', 'moderate', 'high', 'very-high'];
   const full = estimateThreat({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content);
   const wounded = estimateThreat({ character, equipped, hp: 20, regionId: 'stone-glade' }, content);
-  const durations = content.balance.hunt.durations;
+  const durations = huntDurations(2, content);
+  assert.deepEqual(Object.keys(full).map(Number), durations);
   for (let i = 1; i < durations.length; i++) {
     assert.ok(order.indexOf(full[durations[i]]) >= order.indexOf(full[durations[i - 1]]));
   }
   assert.ok(order.indexOf(wounded[5]) > order.indexOf(full[5]));
+});
+
+test('the threat level follows the whole character, not its level alone', () => {
+  // The same level 6 mage, with and without equipment, in the first unsafe region.
+  const { character, equipped } = typicalCharacter('mage', 6, content);
+  const hp = 9999;
+  const geared = faintChances({ character, equipped, hp, regionId: 'stone-glade' }, content);
+  const bare = faintChances({ character, equipped: [], hp, regionId: 'stone-glade' }, content);
+  assert.ok(bare[60] > geared[60] + 0.1);
+  // A region far above the character is judged by sample fights too.
+  const novice = newCharacter('warrior');
+  const above = faintChances({ character: novice, equipped: [], hp, regionId: 'stone-glade' }, content);
+  assert.ok(above[5] > 0.5);
 });
 
 test('the threat level follows the simulated chance of fainting', () => {

@@ -37,7 +37,7 @@ function playable(report, index) {
   return null;
 }
 
-export function mountReport(container, { params, navigate }) {
+export function mountReport(container, { params, navigate, backHash = '#/walka' }) {
   let arena = null;
   let report = reportCache.get(params.id) ?? null;
   let selected = null;
@@ -46,6 +46,20 @@ export function mountReport(container, { params, navigate }) {
   const fightBox = h('div', { class: 'fight-view' });
   const tabList = h('div', { class: 'fight-tabs', role: 'tablist', 'aria-label': 'Walki wyprawy' });
 
+  // "Powrót" leads back to the tab the report was opened from: Walka or Dziennik.
+  const heading = (title, subtitle) =>
+    h(
+      'div',
+      { class: 'page-heading page-heading--back' },
+      h(
+        'div',
+        { class: 'page-heading-text' },
+        h('h1', { class: 'page-title', tabindex: '-1', text: title }),
+        subtitle && h('p', { class: 'page-subtitle', text: subtitle }),
+      ),
+      h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
+    );
+
   async function load() {
     try {
       const data = await call('GET', `/api/reports/${params.id}`);
@@ -53,17 +67,13 @@ export function mountReport(container, { params, navigate }) {
       reportCache.set(params.id, report);
       render();
     } catch (error) {
-      fill(
-        container,
-        h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Raport' })),
-        systemPanel(error.message),
-      );
+      fill(container, heading('Raport'), systemPanel(error.message));
     }
   }
 
   function render() {
     if (!report) {
-      fill(container, h('p', { class: 'muted', text: 'Wczytywanie raportu…' }));
+      fill(container, heading('Raport z wyprawy'), h('p', { class: 'muted', text: 'Wczytywanie raportu…' }));
       return;
     }
     const count = report.fights?.length ?? 0;
@@ -71,15 +81,7 @@ export function mountReport(container, { params, navigate }) {
 
     fill(
       container,
-      h(
-        'div',
-        { class: 'page-heading' },
-        h('h1', { class: 'page-title', tabindex: '-1', text: 'Raport z wyprawy' }),
-        h('p', {
-          class: 'page-subtitle',
-          text: `${report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
-        }),
-      ),
+      heading('Raport z wyprawy', `${report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
       summaryCard(report),
       report.system.length > 0 && systemPanel(...report.system),
       count > 0 &&

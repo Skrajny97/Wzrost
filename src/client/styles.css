@@ -131,6 +131,34 @@ button {
   gap: 2px;
 }
 
+/* A report: the title on the left, a large "Powrót" on the right. */
+.page-heading--back {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.page-heading-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* After .button in specificity, so the button keeps its own width. */
+.page-heading--back .back-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  min-height: 52px;
+  padding: 0 18px 0 12px;
+  font-size: 16px;
+  text-decoration: none;
+}
+
 .page-title {
   margin: 0;
   font-size: 28px;
@@ -1582,42 +1610,122 @@ a.segmented-option {
   color: var(--gold);
 }
 
-.durations {
+/* Hunt length: a slider in 5-minute steps with a button for one step on each side. */
+.duration-picker {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 6px;
 }
 
-.duration {
+.duration-head {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  padding: 4px;
-  border: 1px solid var(--bark-line);
-  background: var(--bg-deep);
-  color: var(--text);
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
   font-family: var(--font-system);
   font-size: 14px;
-  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
-.duration[aria-checked='true'] {
-  border-color: var(--system);
-  background: rgba(143, 227, 239, 0.14);
+.duration-value {
   color: var(--system-text);
+  font-size: 20px;
+  font-weight: 700;
 }
 
-.duration:disabled {
+.duration-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: 10px;
+}
+
+.duration-step {
+  min-height: 48px;
+  padding: 0;
+  font-family: var(--font-system);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.duration-step:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.4;
+}
+
+.duration-slider {
+  --fill: 0%;
+  width: 100%;
+  height: 48px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.duration-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--system) var(--fill), var(--bark-line) var(--fill));
+}
+
+.duration-slider::-webkit-slider-thumb {
+  width: 28px;
+  height: 28px;
+  margin-top: -11px;
+  border: 2px solid var(--system);
+  border-radius: 50%;
+  background: var(--bg-deep);
+  box-shadow: 0 0 10px rgba(143, 227, 239, 0.45);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.duration-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bark-line);
+}
+
+.duration-slider::-moz-range-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--system);
+}
+
+.duration-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--system);
+  border-radius: 50%;
+  background: var(--bg-deep);
+  box-shadow: 0 0 10px rgba(143, 227, 239, 0.45);
+}
+
+.duration-slider:focus-visible {
+  outline: 2px solid var(--system);
+  outline-offset: 2px;
+}
+
+.duration-scale {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 58px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
 }
 
 .duration-lock {
+  margin: 0;
   color: var(--text-muted);
-  font-size: 10px;
-  font-weight: 400;
+  font-size: 14px;
+}
+
+.threat-note {
+  margin: 0;
+  font-size: 14px;
 }
 
 .threat {

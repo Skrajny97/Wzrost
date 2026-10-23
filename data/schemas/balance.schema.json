@@ -243,7 +243,9 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "durations",
+        "minMinutes",
+        "stepMinutes",
+        "maxMinutes",
         "shortHuntMaxMinutes",
         "fightIntervalMinutes",
         "findIntervalMinutes",
@@ -260,13 +262,20 @@
         "groupFactors"
       ],
       "properties": {
-        "durations": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "integer",
-            "minimum": 1
-          }
+        "minMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Najkrótsze polowanie w minutach."
+        },
+        "stepMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Krok suwaka czasu polowania w minutach."
+        },
+        "maxMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Najdłuższe polowanie w minutach, po odblokowaniu długich polowań."
         },
         "shortHuntMaxMinutes": {
           "type": "number",

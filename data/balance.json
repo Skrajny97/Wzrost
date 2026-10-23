@@ -43,8 +43,10 @@
     "resistancePerBudget": 1.0
   },
   "hunt": {
-    "durations": [5, 15, 30, 60, 120, 240],
-    "shortHuntMaxMinutes": 30,
+    "minMinutes": 5,
+    "stepMinutes": 5,
+    "maxMinutes": 240,
+    "shortHuntMaxMinutes": 45,
     "fightIntervalMinutes": 12,
     "findIntervalMinutes": 20,
     "monsterLevelSpread": 1,

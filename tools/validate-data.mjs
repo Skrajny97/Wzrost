@@ -148,9 +148,12 @@ function checkReferences(data) {
   for (const position of Object.keys(data.balance.combat.targetWeights)) {
     if (!POSITIONS.includes(position)) errors.push(`balance.json: nieznana pozycja "${position}"`);
   }
-  const durations = data.balance.hunt.durations;
-  if (!durations.some((minutes) => minutes <= data.balance.hunt.shortHuntMaxMinutes)) {
-    errors.push('balance.json: na poziomie 1 nie ma żadnego krótkiego polowania');
+  const { minMinutes, stepMinutes, maxMinutes, shortHuntMaxMinutes } = data.balance.hunt;
+  if (minMinutes > shortHuntMaxMinutes || shortHuntMaxMinutes > maxMinutes) {
+    errors.push('balance.json: czasy polowań muszą spełniać minMinutes ≤ shortHuntMaxMinutes ≤ maxMinutes');
+  }
+  for (const [name, minutes] of [['shortHuntMaxMinutes', shortHuntMaxMinutes], ['maxMinutes', maxMinutes]]) {
+    if ((minutes - minMinutes) % stepMinutes !== 0) errors.push(`balance.json: ${name} nie wypada na kroku suwaka (stepMinutes)`);
   }
   if (monsters.size === 0 || bases.size === 0) errors.push('Brak potworów lub przedmiotów.');
   return errors;

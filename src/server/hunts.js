@@ -1,7 +1,7 @@
 // Hunts on server time: the start stores the start time, length and seed; the
 // claim after the end runs the engine with that seed and saves the report.
 
-import { applyHunt, estimateThreat, huntDurations, huntReport, simulateHunt, threatSamples } from '../engine/index.js';
+import { applyHunt, durationsUpTo, estimateThreat, huntDurations, huntReport, simulateHunt, threatSamples } from '../engine/index.js';
 import { content } from './content.js';
 import {
   characterView,
@@ -57,12 +57,13 @@ export async function startHunt(context) {
   const body = await readJson(context.request);
   const region = typeof body.regionId === 'string' ? content.regionsById[body.regionId] : undefined;
   if (!region) throw new ApiError(400, 'invalid_region', 'Wybierz region.');
-  if (!content.balance.hunt.durations.includes(body.minutes)) {
+  if (!durationsUpTo(content.balance.hunt.maxMinutes, content).includes(body.minutes)) {
     throw new ApiError(400, 'invalid_duration', 'Wybierz czas wyprawy.');
   }
   if (!huntDurations(player.row.level, content).includes(body.minutes)) {
     const level = content.unlocksById['long-hunts'].level;
-    throw new ApiError(403, 'duration_locked', `Dłuższe polowania odblokują się na poziomie ${level}.`);
+    const longest = content.balance.hunt.shortHuntMaxMinutes;
+    throw new ApiError(403, 'duration_locked', `Na razie polowanie trwa najwyżej ${longest} minut. Dłuższe odblokują się na poziomie ${level}.`);
   }
 
   const now = context.now;

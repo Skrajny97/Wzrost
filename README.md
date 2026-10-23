@@ -2,7 +2,7 @@
 
 Solowa, casualowa gra przeglądarkowa litRPG na telefon, oparta na timerach. Jedynym źródłem prawdy o projekcie jest [dokument projektowy](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX). Założenia przyjęte w trakcie budowy są w [DECISIONS.md](DECISIONS.md).
 
-Stan: **Etap 1, rdzeń, po pierwszych uwagach autora.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, statystyki z wolnymi punktami, ekwipunek i plecak z podglądem zmian, polowania na czasie serwera w dwóch regionach Skraju Puszczy, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik i „Zacznij od nowa”.
+Stan: **Etap 1, rdzeń, po pierwszych uwagach autora.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, statystyki z wolnymi punktami, ekwipunek i plecak z podglądem zmian, polowania na czasie serwera w dwóch regionach Skraju Puszczy z suwakiem czasu, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik i „Zacznij od nowa”.
 
 ## Adres gry
 
@@ -119,7 +119,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/auth/login` | logowanie: `identifier` (login lub e-mail), `password` |
 | POST | `/api/auth/logout` | wylogowanie |
 | GET | `/api/me` | zalogowany gracz |
-| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości, żywiołów i regionów, czasy polowań, odblokowania |
+| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości, żywiołów i regionów, zakres czasu polowań, odblokowania |
 | GET | `/api/character` | pełny widok postaci (404 `no_character`, gdy jej nie ma) |
 | POST | `/api/character` | nowa postać: `name`, `classId` |
 | DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami i wyprawą |
@@ -131,7 +131,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/items/:id/unequip` | zdejmij przedmiot do plecaka |
 | POST | `/api/items/:id/discard` | wyrzuć przedmiot z plecaka |
 | GET | `/api/hunts/options` | poziom zagrożenia dla każdego regionu i czasu; `?region=<id>` liczy tylko jeden region |
-| POST | `/api/hunts` | wyrusz: `regionId`, `minutes` |
+| POST | `/api/hunts` | wyrusz: `regionId`, `minutes` (co 5 minut, od 5 do 45 na poziomie 1 i do 240 od poziomu 2) |
 | POST | `/api/hunts/cancel` | przerwij trwające polowanie |
 | POST | `/api/hunts/claim` | odbierz raport zakończonego polowania |
 | GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |

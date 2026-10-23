@@ -28,7 +28,12 @@ export function plural(count, one, few, many) {
 export const countOf = (count, one, few, many) => `${formatNumber(count)} ${plural(count, one, few, many)}`;
 
 // "5 min", "1 h", "4 h".
-export const formatMinutes = (minutes) => (minutes < 60 ? `${minutes} min` : `${formatDecimal(minutes / 60)} h`);
+// "45 min", "2 h", "1 h 25 min".
+export function formatMinutes(minutes) {
+  if (minutes < 60) return `${minutes} min`;
+  const rest = minutes % 60;
+  return rest === 0 ? `${minutes / 60} h` : `${Math.floor(minutes / 60)} h ${rest} min`;
+}
 
 // "mm:ss", or "h:mm:ss" from an hour up.
 export function formatCountdown(ms) {

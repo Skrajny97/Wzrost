@@ -11,11 +11,19 @@ export function unlockedFeatures(level, content) {
   return content.unlocks.filter((unlock) => isUnlocked(unlock.id, level, content)).map((unlock) => unlock.id);
 }
 
+// Hunt lengths go from the shortest up to `longest` in equal steps (the slider's).
+export function durationsUpTo(longest, content) {
+  const { minMinutes, stepMinutes } = content.balance.hunt;
+  const durations = [];
+  for (let minutes = minMinutes; minutes <= longest; minutes += stepMinutes) durations.push(minutes);
+  return durations;
+}
+
 // Before long hunts open, only the short durations can be chosen.
 export function huntDurations(level, content) {
   const tuning = content.balance.hunt;
   const long = isUnlocked('long-hunts', level, content);
-  return tuning.durations.filter((minutes) => long || minutes <= tuning.shortHuntMaxMinutes);
+  return durationsUpTo(long ? tuning.maxMinutes : tuning.shortHuntMaxMinutes, content);
 }
 
 // System messages for the modules that open exactly at this level.

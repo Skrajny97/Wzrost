@@ -16,9 +16,14 @@ async function newCharacter(cookie, classId = 'warrior', name = 'Mira') {
   return call('POST', '/api/character', { cookie, body: { name, classId } });
 }
 
-// Moves the current hunt into the past, as if its time had passed.
+// Moves the current hunt into the past, as if its time had passed. The seed is
+// fixed, so the outcome is always the same: a random one now and then starts
+// with the elite and brings no XP.
 async function finishHunt() {
-  await (await db()).prepare('UPDATE activities SET started_at = started_at - 86400000, ends_at = ?').bind(Date.now() - 1).run();
+  await (await db())
+    .prepare("UPDATE activities SET started_at = started_at - 86400000, ends_at = ?, seed = 'test-seed'")
+    .bind(Date.now() - 1)
+    .run();
 }
 
 describe('content', () => {
@@ -27,7 +32,7 @@ describe('content', () => {
     assert.equal(status, 200);
     assert.deepEqual(data.classes.map((cls) => cls.id), ['warrior', 'archer', 'mage', 'cleric', 'shadow']);
     assert.deepEqual(data.classes.filter((cls) => cls.gentleStart).map((cls) => cls.name), ['Wojownik', 'Kleryk']);
-    assert.deepEqual(data.durations, [5, 15, 30, 60, 120, 240]);
+    assert.deepEqual(data.durations, { min: 5, step: 5, max: 240 });
     assert.equal(data.regions[0].name, 'Wiatrołomy');
     assert.equal(data.stats.length, 8);
     assert.equal(data.unlocks.find((unlock) => unlock.id === 'professions').level, 6);
@@ -192,7 +197,9 @@ describe('hunts and reports', () => {
     const { status, data } = await call('GET', '/api/hunts/options', { cookie });
     assert.equal(status, 200);
     assert.deepEqual(data.regions.map((region) => region.id), ['windfalls', 'stone-glade']);
-    assert.deepEqual(Object.keys(data.regions[0].threat), ['5', '15', '30', '60', '120', '240']);
+    const steps = Object.keys(data.regions[0].threat);
+    assert.equal(steps.length, 48);
+    assert.deepEqual([steps[0], steps[1], steps.at(-1)], ['5', '10', '240']);
     assert.equal(data.regions[0].threat['5'], 'low');
     assert.equal(data.regions[1].threat['240'], 'very-high');
 
@@ -266,17 +273,17 @@ describe('hunts and reports', () => {
 
   test('level 1 hunts are short; long ones open at level 2', async () => {
     const before = (await call('GET', '/api/character', { cookie })).data.character;
-    assert.deepEqual(before.huntDurations, [5, 15, 30]);
+    assert.deepEqual([before.huntDurations[0], before.huntDurations.at(-1)], [5, 45]);
     assert.deepEqual(before.features, []);
-    const locked = await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 60 } });
+    const locked = await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 50 } });
     assert.equal(locked.status, 403);
     assert.equal(locked.data.error.code, 'duration_locked');
 
     await (await db()).prepare('UPDATE characters SET level = 2').run();
     const after = (await call('GET', '/api/character', { cookie })).data.character;
-    assert.deepEqual(after.huntDurations, [5, 15, 30, 60, 120, 240]);
+    assert.deepEqual([after.huntDurations[0], after.huntDurations.at(-1)], [5, 240]);
     assert.deepEqual(after.features, ['long-hunts', 'stats']);
-    assert.equal((await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 240 } })).status, 201);
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 85 } })).status, 201);
   });
 
   test('a hunt can be called off early, without rewards', async () => {
@@ -291,8 +298,11 @@ describe('hunts and reports', () => {
   test('checks the region and the duration', async () => {
     const region = await call('POST', '/api/hunts', { cookie, body: { regionId: 'moon', minutes: 60 } });
     assert.equal(region.data.error.code, 'invalid_region');
-    const minutes = await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes: 7 } });
-    assert.equal(minutes.data.error.code, 'invalid_duration');
+    // Only steps of the slider: 5, 10, 15… up to 4 hours.
+    for (const minutes of [7, 0, 245, '30']) {
+      const wrong = await call('POST', '/api/hunts', { cookie, body: { regionId: 'windfalls', minutes } });
+      assert.equal(wrong.data.error.code, 'invalid_duration');
+    }
   });
 
   test('HP lost on a hunt comes back with time', async () => {

@@ -3,7 +3,7 @@
 
 import { fill, h } from '../dom.js';
 import { formatCountdown, formatMinutes, timeFormat } from '../format.js';
-import { activityFinished, call, isUnlocked, reportCache, serverNow, state, unlockInfo } from '../state.js';
+import { activityFinished, call, currentHp, isUnlocked, reportCache, serverNow, state, unlockInfo } from '../state.js';
 import { confirmAction, lockLabel, systemPanel, toast, withButton } from '../ui.js';
 
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -29,23 +29,37 @@ export function mountCombat(container, { navigate }) {
   let options = null; // threat levels from the server, per region and duration
   let optionsFor = null; // character version the options were computed for
   const choice = loadChoice(); // { [regionId]: minutes }
+  const threatViews = []; // redraw each region's threat for its chosen length
   let countdown = null;
   let progress = null;
   let shownFinished = null;
 
+  // HP in tenths of the maximum: resting moves the threat now and then.
+  const hpStep = (character, now) => Math.floor((currentHp(character, now) / character.maxHp) * 10);
+
   // One region per request, one after another, so each stays within the
-  // server's CPU limit.
-  async function loadOptions() {
+  // server's CPU limit. The rating follows the whole character, so a change
+  // of level, class level, stats, equipment or HP asks again. Until the new
+  // answer comes, a new build shows "…", while resting keeps the old rating.
+  async function loadOptions(now = serverNow()) {
     const character = state.character;
-    const key = `${character.level}:${character.hp}:${character.maxHp}:${JSON.stringify(character.stats.map((stat) => stat.total))}`;
+    const build = JSON.stringify([
+      character.level,
+      character.classLevel,
+      character.maxHp,
+      character.stats.map((stat) => stat.total),
+      Object.values(character.equipment).map((item) => item?.id ?? null),
+    ]);
+    const key = `${build}|${hpStep(character, now)}`;
     if (optionsFor === key) return;
+    if (optionsFor?.split('|')[0] !== build) options = null;
     optionsFor = key;
     try {
       for (const region of state.content.regions) {
         const { regions } = await call('GET', `/api/hunts/options?region=${encodeURIComponent(region.id)}`);
         if (optionsFor !== key) return;
         options = { regions: [...(options?.regions ?? []).filter((known) => known.id !== region.id), ...regions] };
-        render();
+        for (const view of threatViews) view();
       }
     } catch (error) {
       toast(error.message);
@@ -58,6 +72,7 @@ export function mountCombat(container, { navigate }) {
     shownFinished = activityFinished(activity);
     countdown = null;
     progress = null;
+    threatViews.length = 0;
 
     fill(container,
       h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Walka' })),
@@ -158,22 +173,31 @@ export function mountCombat(container, { navigate }) {
           )
         : unarmed && systemPanel('Walczysz gołymi rękami. Załóż broń z plecaka w zakładce Postać, jeśli już ją masz.'),
       state.content.regions.map((region) => regionCard(region, character)),
+      h('p', {
+        class: 'muted threat-note',
+        text: 'Zagrożenie to szansa omdlenia na wyprawie. Gra liczy je z próbnych walk Twojej postaci z potworami regionu, więc liczą się jej statystyki, ekwipunek i aktualne HP, a nie sam poziom.',
+      }),
     );
   }
 
   function regionCard(region, character) {
     const allowed = character.huntDurations;
+    const shortest = allowed[0];
+    const longest = allowed.at(-1);
+    const { step, max } = state.content.durations;
     const longLevel = unlockInfo('long-hunts').level;
     let minutes = choice[region.id];
-    if (!allowed.includes(minutes)) minutes = allowed.includes(15) ? 15 : allowed[0];
+    if (!allowed.includes(minutes)) minutes = allowed.includes(15) ? 15 : shortest;
 
-    const threat = options?.regions.find((candidate) => candidate.id === region.id)?.threat[minutes];
-    const threatLine = h(
-      'p',
-      { class: `threat threat--${threat ?? 'unknown'}` },
-      'Zagrożenie: ',
-      h('strong', { text: threat ? THREAT_NAMES[threat] : '…' }),
-    );
+    const threatValue = h('strong', {});
+    const threatLine = h('p', { class: 'threat' }, 'Zagrożenie: ', threatValue);
+    const showThreat = () => {
+      const threat = options?.regions.find((candidate) => candidate.id === region.id)?.threat[minutes];
+      threatLine.className = `threat threat--${threat ?? 'unknown'}`;
+      threatValue.textContent = threat ? THREAT_NAMES[threat] : '…';
+    };
+    threatViews.push(showThreat);
+
     const levelNote =
       character.level < region.minLevel
         ? h('p', { class: 'region-warning', text: `Przeciwnicy mają tu poziom ${region.minLevel}–${region.maxLevel}, wyżej niż Twoja postać.` })
@@ -181,30 +205,60 @@ export function mountCombat(container, { navigate }) {
           ? h('p', { class: 'region-warning', text: 'Ten region jest już dla Ciebie za łatwy: dostaniesz mniej doświadczenia.' })
           : null;
 
+    // A slider in steps of 5 minutes, with buttons for one step at a time.
+    const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
+    const slider = h('input', {
+      type: 'range',
+      class: 'duration-slider',
+      min: shortest,
+      max: longest,
+      step,
+      value: minutes,
+      'aria-label': `Czas polowania: ${region.name}`,
+      onInput: () => set(Number(slider.value)),
+      onChange: () => remember(),
+    });
+    const stepButton = (sign, label) =>
+      h('button', {
+        type: 'button',
+        class: 'button button--world duration-step',
+        'aria-label': `${label} o ${step} minut`,
+        text: sign < 0 ? '−' : '+',
+        onClick: () => {
+          set(minutes + sign * step);
+          remember();
+        },
+      });
+    const less = stepButton(-1, 'Krócej');
+    const more = stepButton(1, 'Dłużej');
+    const remember = () => {
+      choice[region.id] = minutes;
+      saveChoice(choice);
+    };
+    function set(next) {
+      minutes = Math.min(longest, Math.max(shortest, Math.round(next / step) * step));
+      slider.value = String(minutes);
+      slider.setAttribute('aria-valuetext', formatMinutes(minutes));
+      slider.style.setProperty('--fill', `${((minutes - shortest) / Math.max(1, longest - shortest)) * 100}%`);
+      value.textContent = formatMinutes(minutes);
+      less.disabled = minutes <= shortest;
+      more.disabled = minutes >= longest;
+      showThreat();
+    }
+    set(minutes);
+
     const durations = h(
       'div',
-      { class: 'durations', role: 'radiogroup', 'aria-label': `Czas polowania: ${region.name}` },
-      state.content.durations.map((value) => {
-        const locked = !allowed.includes(value);
-        return h(
-          'button',
-          {
-            type: 'button',
-            class: 'duration',
-            role: 'radio',
-            'aria-checked': value === minutes,
-            disabled: locked,
-            'aria-label': locked ? `${formatMinutes(value)}, od poziomu ${longLevel}` : formatMinutes(value),
-            onClick: () => {
-              choice[region.id] = value;
-              saveChoice(choice);
-              render();
-            },
-          },
-          formatMinutes(value),
-          locked && h('span', { class: 'duration-lock', text: `poz. ${longLevel}` }),
-        );
-      }),
+      { class: 'duration-picker' },
+      h('p', { class: 'duration-head' }, h('span', { text: 'Czas wyprawy' }), value),
+      h('div', { class: 'duration-row' }, less, slider, more),
+      h(
+        'p',
+        { class: 'duration-scale', 'aria-hidden': 'true' },
+        h('span', { text: formatMinutes(shortest) }),
+        h('span', { text: formatMinutes(longest) }),
+      ),
+      longest < max && h('p', { class: 'duration-lock', text: `Dłuższe wyprawy, do ${formatMinutes(max)}, od poziomu ${longLevel}.` }),
     );
 
     const start = h('button', {
@@ -245,7 +299,10 @@ export function mountCombat(container, { navigate }) {
 
   function tick(now) {
     const activity = state.character.activity;
-    if (!activity) return;
+    if (!activity) {
+      loadOptions(now);
+      return;
+    }
     if (activityFinished(activity, now) !== shownFinished) {
       render();
       return;

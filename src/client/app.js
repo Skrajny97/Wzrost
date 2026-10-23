@@ -39,6 +39,7 @@ const HOME = '#/walka';
 let current = null; // { route, screen }
 let lastMainHash = HOME;
 let lastMainTab = 'walka';
+let lastTabHash = HOME; // the last tab of the main menu, where a report's "Powrót" leads
 let ticker = null;
 
 function show(name) {
@@ -108,14 +109,17 @@ function route() {
 
   if (candidate.nav === 'main') {
     lastMainHash = hash;
-    if (candidate.tab) lastMainTab = candidate.tab;
+    if (candidate.tab) {
+      lastMainTab = candidate.tab;
+      lastTabHash = hash;
+    }
   }
   // Every screen gets its own element, so a late answer meant for the
   // previous screen can only draw into a detached one.
   const container = h('div', { class: 'screen-body' });
   clear($('#screen')).append(container);
   window.scrollTo(0, 0);
-  const screen = candidate.mount(container, { params: match.groups ?? {}, navigate }) ?? {};
+  const screen = candidate.mount(container, { params: match.groups ?? {}, navigate, backHash: lastTabHash }) ?? {};
   current = { route: candidate, screen };
   renderNav();
   $('.page-title', container)?.focus({ preventScroll: true });

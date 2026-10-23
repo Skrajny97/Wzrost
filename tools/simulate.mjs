@@ -127,7 +127,7 @@ function main() {
   const content = engine.buildContent(loadData());
   const classes = list(options.classes, content.classes.map((cls) => cls.id));
   const levels = list(options.levels, ['1', '3', '5', '8', '10']).map(Number);
-  const minutesList = list(options.minutes, ['30', '60', '240']).map(Number);
+  const minutesList = list(options.minutes, ['30', '45', '60', '240']).map(Number);
 
   if (options.calibrate) {
     // Levels above the existing regions use generated stand-ins, so keep to the first public version (up to ~30).
