@@ -1,0 +1,56 @@
+[
+  {
+    "id": "windfalls",
+    "land": "Skraj Puszczy",
+    "name": "Wiatrołomy",
+    "minLevel": 1,
+    "maxLevel": 5,
+    "safe": true,
+    "levelSpread": 0,
+    "description": "Pas powalonych drzew na skraju puszczy. Wilki, dziki i kruki, a w gęstwinie błędne światło.",
+    "trait": {
+      "name": "Święty gaj",
+      "description": "Odpoczynek między walkami przywraca o 5% więcej HP.",
+      "recoveryBonus": 0.05
+    },
+    "encounters": [
+      { "weight": 25, "monsters": ["wolf"] },
+      { "weight": 12, "monsters": ["wolf", "wolf"] },
+      { "weight": 14, "monsters": ["boar"] },
+      { "weight": 10, "monsters": ["crow", "crow"] },
+      { "weight": 14, "monsters": ["viper"] },
+      { "weight": 12, "monsters": ["badger"] },
+      { "weight": 8, "monsters": ["wolf", "crow"] },
+      { "weight": 5, "monsters": ["viper", "crow"] }
+    ],
+    "elite": "wisp"
+  },
+  {
+    "id": "stone-glade",
+    "land": "Skraj Puszczy",
+    "name": "Uroczysko Kamieni",
+    "minLevel": 6,
+    "maxLevel": 10,
+    "safe": false,
+    "description": "Polana z kręgiem omszałych głazów, za którą zaczyna się prawdziwa puszcza. Rysie, krzyżaki i watahy z basiorem.",
+    "trait": {
+      "name": "Kamienny krąg",
+      "description": "Postać na przedzie ma o 5% więcej pancerza.",
+      "frontArmorBonus": 0.05
+    },
+    "encounters": [
+      { "weight": 12, "monsters": ["alpha-wolf"] },
+      { "weight": 12, "monsters": ["wolf", "wolf"] },
+      { "weight": 5, "monsters": ["wolf", "wolf", "wolf"] },
+      { "weight": 8, "monsters": ["boar"] },
+      { "weight": 5, "monsters": ["boar", "boar"] },
+      { "weight": 12, "monsters": ["lynx"] },
+      { "weight": 12, "monsters": ["spider"] },
+      { "weight": 8, "monsters": ["spider", "viper"] },
+      { "weight": 8, "monsters": ["alpha-wolf", "wolf"] },
+      { "weight": 8, "monsters": ["lynx", "crow"] },
+      { "weight": 8, "monsters": ["badger", "spider"] }
+    ],
+    "elite": "likho"
+  }
+]

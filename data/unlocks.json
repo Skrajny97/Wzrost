@@ -1,0 +1,44 @@
+[
+  {
+    "id": "long-hunts",
+    "name": "Długie polowania",
+    "level": 2,
+    "message": "Odblokowano długie polowania, do 4 godzin."
+  },
+  {
+    "id": "stats",
+    "name": "Wolne punkty i ekran statystyk",
+    "level": 2,
+    "message": "Odblokowano ekran Statystyki. Wolne punkty rozdzielisz w zakładce Postać."
+  },
+  {
+    "id": "skills",
+    "name": "Umiejętności",
+    "level": 4
+  },
+  {
+    "id": "professions",
+    "name": "Profesje zbierackie",
+    "level": 6
+  },
+  {
+    "id": "training",
+    "name": "Trening",
+    "level": 8
+  },
+  {
+    "id": "settlement",
+    "name": "Osada",
+    "level": 10
+  },
+  {
+    "id": "dungeons",
+    "name": "Lochy",
+    "level": 12
+  },
+  {
+    "id": "core",
+    "name": "Rdzeń",
+    "condition": "po pokonaniu pierwszego bossa lochu"
+  }
+]

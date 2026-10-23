@@ -1,0 +1,32 @@
+{
+  "prefixes": [
+    { "id": "bear", "forms": { "m": "Niedźwiedzi", "f": "Niedźwiedzia", "n": "Niedźwiedzie", "pl": "Niedźwiedzie" }, "stat": "strength", "weight": 10 },
+    { "id": "wolf", "forms": { "m": "Wilczy", "f": "Wilcza", "n": "Wilcze", "pl": "Wilcze" }, "stat": "strength", "weight": 6 },
+    { "id": "nimble", "forms": { "m": "Zwinny", "f": "Zwinna", "n": "Zwinne", "pl": "Zwinne" }, "stat": "dexterity", "weight": 10 },
+    { "id": "oak", "forms": { "m": "Dębowy", "f": "Dębowa", "n": "Dębowe", "pl": "Dębowe" }, "stat": "vitality", "weight": 10 },
+    { "id": "stone", "forms": { "m": "Kamienny", "f": "Kamienna", "n": "Kamienne", "pl": "Kamienne" }, "stat": "endurance", "weight": 10 },
+    { "id": "crystal", "forms": { "m": "Kryształowy", "f": "Kryształowa", "n": "Kryształowe", "pl": "Kryształowe" }, "stat": "intellect", "weight": 10 },
+    { "id": "owl", "forms": { "m": "Sowi", "f": "Sowia", "n": "Sowie", "pl": "Sowie" }, "stat": "wisdom", "weight": 10 },
+    { "id": "lynx", "forms": { "m": "Rysi", "f": "Rysia", "n": "Rysie", "pl": "Rysie" }, "stat": "perception", "weight": 10 },
+    { "id": "steadfast", "forms": { "m": "Nieugięty", "f": "Nieugięta", "n": "Nieugięte", "pl": "Nieugięte" }, "stat": "will", "weight": 10 },
+    { "id": "iron", "forms": { "m": "Żelazny", "f": "Żelazna", "n": "Żelazne", "pl": "Żelazne" }, "stat": "armor", "weight": 8 }
+  ],
+  "suffixes": [
+    { "id": "aurochs", "text": "Tura", "stat": "strength", "weight": 10 },
+    { "id": "mist", "text": "Mgły", "stat": "dexterity", "weight": 10 },
+    { "id": "roots", "text": "Korzeni", "stat": "vitality", "weight": 10 },
+    { "id": "fortress", "text": "Twierdzy", "stat": "armor", "weight": 8 },
+    { "id": "spark", "text": "Iskry", "stat": "intellect", "weight": 10 },
+    { "id": "leshy", "text": "Leszego", "stat": "wisdom", "weight": 10 },
+    { "id": "raven", "text": "Kruka", "stat": "perception", "weight": 10 },
+    { "id": "silence", "text": "Ciszy", "stat": "will", "weight": 10 },
+    { "id": "embers", "text": "Żaru", "stat": "resist.fire", "weight": 5 },
+    { "id": "hoarfrost", "text": "Szronu", "stat": "resist.frost", "weight": 5 },
+    { "id": "mire", "text": "Topieli", "stat": "resist.water", "weight": 5 },
+    { "id": "storm", "text": "Burzy", "stat": "resist.lightning", "weight": 5 },
+    { "id": "rocks", "text": "Skał", "stat": "resist.earth", "weight": 5 },
+    { "id": "moss", "text": "Mchu", "stat": "resist.nature", "weight": 5 },
+    { "id": "venom", "text": "Jadu", "stat": "resist.poison", "weight": 5 },
+    { "id": "shrine", "text": "Kapliczki", "stat": "resist.sacred", "weight": 5 }
+  ]
+}

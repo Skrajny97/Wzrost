@@ -1,0 +1,345 @@
+import assert from 'node:assert/strict';
+import { describe, test } from 'node:test';
+
+import {
+  applyHunt,
+  autoDistribute,
+  computeStats,
+  createRng,
+  earnedPoints,
+  estimateThreat,
+  faintChances,
+  faintPenalty,
+  freePoints,
+  generateItem,
+  hoursToNext,
+  huntDurations,
+  itemName,
+  itemProperties,
+  lowLevelMultiplier,
+  monsterCombatant,
+  playerCombatant,
+  reduction,
+  restedHp,
+  simulateFight,
+  simulateHunt,
+  statEffects,
+  unlockedFeatures,
+  xpToNext,
+} from '../src/engine/index.js';
+import { simulateMany, typicalCharacter } from '../tools/simulate.mjs';
+import { content, newCharacter } from './helpers/content.js';
+
+const starting = (classId, seed = 'start') => {
+  const rng = createRng(seed);
+  return content.classesById[classId].startingItems.map((item) =>
+    generateItem({ baseId: item.base, level: 1, element: item.element }, rng, content),
+  );
+};
+
+describe('random numbers', () => {
+  test('the same seed gives the same sequence', () => {
+    const a = createRng('ziarno');
+    const b = createRng('ziarno');
+    const c = createRng('inne ziarno');
+    const first = Array.from({ length: 5 }, () => a.next());
+    assert.deepEqual(first, Array.from({ length: 5 }, () => b.next()));
+    assert.notDeepEqual(first, Array.from({ length: 5 }, () => c.next()));
+  });
+
+  test('helpers stay in range and follow the weights', () => {
+    const rng = createRng('zakres');
+    const counts = { rare: 0, common: 0 };
+    for (let i = 0; i < 4000; i++) {
+      const value = rng.int(3, 5);
+      assert.ok(value >= 3 && value <= 5 && Number.isInteger(value));
+      counts[rng.weighted([{ id: 'common', weight: 3 }, { id: 'rare', weight: 1 }]).id] += 1;
+    }
+    assert.ok(Math.abs(counts.common / 4000 - 0.75) < 0.03);
+  });
+});
+
+describe('statistics', () => {
+  test('show where every point comes from', () => {
+    const character = newCharacter('warrior', { level: 3, classLevel: 2, points: { strength: 5 } });
+    const sword = generateItem({ baseId: 'sword', level: 2, rarityId: 'rare', affixIds: ['bear'] }, createRng('x'), content);
+    const { totals, sources } = computeStats(character, [sword], content);
+    const base = content.classesById.warrior.baseStats.strength + content.classesById.warrior.growth.strength;
+    assert.deepEqual(sources.strength, { class: base, character: 5, professions: 0, equipment: sword.affixes[0].value, core: 0 });
+    assert.equal(totals.strength, base + 5 + sword.affixes[0].value);
+  });
+
+  test('a level gives 8 points and a class level 2', () => {
+    const character = newCharacter('mage', { level: 4, classLevel: 3, points: { intellect: 10 } });
+    assert.equal(earnedPoints(character, content), 8 * 3 + 2 * 2);
+    assert.equal(freePoints(character, content), 18);
+  });
+
+  test('"Rozdaj według klasy" spends every free point by the class weights', () => {
+    const character = newCharacter('archer', { level: 3, classLevel: 2, points: { vitality: 1 } });
+    const points = autoDistribute(character, content);
+    assert.equal(freePoints({ ...character, points }, content), 0);
+    assert.ok(points.dexterity > points.perception && points.perception >= points.vitality - 1);
+  });
+});
+
+describe('items', () => {
+  test('rarity sets the number of affixes and the budget grows with it', () => {
+    const rng = createRng('rzadkość');
+    for (const rarity of content.rarities) {
+      const item = generateItem({ baseId: 'sword', level: 10, rarityId: rarity.id }, rng, content);
+      assert.equal(item.affixes.length, rarity.affixes);
+      assert.equal(new Set(item.affixes.map((affix) => affix.id)).size, rarity.affixes);
+    }
+    const common = generateItem({ baseId: 'ring', level: 10 }, rng, content);
+    const divine = generateItem({ baseId: 'ring', level: 10, rarityId: 'divine' }, rng, content);
+    const total = (item) => item.implicit.value + item.affixes.reduce((sum, affix) => sum + affix.value, 0);
+    assert.ok(total(divine) > 2 * total(common));
+  });
+
+  test('names agree with the grammatical gender of the base', () => {
+    const rng = createRng('nazwy');
+    const named = (baseId, affixIds) => itemName(generateItem({ baseId, level: 1, rarityId: 'unique', affixIds }, rng, content), content);
+    assert.equal(named('sword', ['wolf', 'mist']), 'Wilczy Miecz Mgły');
+    assert.equal(named('shield', ['wolf', 'mist']), 'Wilcza Tarcza Mgły');
+    assert.equal(named('aspergillum', ['wolf', 'mist']), 'Wilcze Kropidło Mgły');
+    assert.equal(named('boots', ['oak', 'leshy']), 'Dębowe Buty Leszego');
+    assert.equal(itemName(generateItem({ baseId: 'bow', level: 1 }, rng, content), content), 'Łuk');
+  });
+
+  test('properties are described in Polish', () => {
+    const rng = createRng('opis');
+    const staff = generateItem({ baseId: 'staff', level: 3, rarityId: 'rare', element: 'frost', affixIds: ['embers'] }, rng, content);
+    const lines = itemProperties(staff, content);
+    assert.match(lines[0], /^Obrażenia: \d+–\d+ \(magiczne, mróz\)$/);
+    assert.match(lines[1], /^Odporność na ogień: \+\d+$/);
+  });
+});
+
+describe('combat', () => {
+  const fight = (seed, allies, enemies) =>
+    simulateFight({ allies, enemies, rng: createRng(seed), content, record: true });
+
+  test('is fully determined by the seed', () => {
+    const player = playerCombatant({ character: newCharacter('warrior'), equipped: starting('warrior'), name: 'Mira' }, content);
+    const wolves = () => [0, 1].map((i) => monsterCombatant({ monsterId: 'wolf', level: 1, id: `e${i}`, name: `Wilk ${i + 1}` }, content));
+    assert.deepEqual(fight('walka', [player], wolves()), fight('walka', [player], wolves()));
+  });
+
+  test('works three against three and ends with one side down', () => {
+    const allies = ['warrior', 'cleric', 'archer'].map((classId, i) => ({
+      ...playerCombatant({ character: newCharacter(classId, { level: 5 }), equipped: starting(classId), name: classId }, content),
+      id: `a${i}`,
+    }));
+    const enemies = ['wolf', 'viper', 'crow'].map((monsterId, i) => monsterCombatant({ monsterId, level: 5, id: `e${i}` }, content));
+    const result = fight('3v3', allies, enemies);
+    const alive = (side) => result.units.filter((unit) => unit.id.startsWith(side) && unit.hp > 0).length;
+    assert.ok(result.won === true ? alive('e') === 0 : alive('a') === 0);
+    assert.ok(result.events.some((event) => event.kind === 'kill'));
+  });
+
+  test('a unit never acts more than three times in a row', () => {
+    const fast = { ...playerCombatant({ character: newCharacter('archer'), equipped: starting('archer'), name: 'Szybki' }, content), speed: 50 };
+    const boar = monsterCombatant({ monsterId: 'boar', level: 3, id: 'e0' }, content);
+    const result = fight('tempo', [fast], [{ ...boar, maxHp: 5000, hp: 5000 }]);
+    let streak = 0;
+    let last = null;
+    for (const event of result.events.filter((e) => e.actor)) {
+      streak = event.actor === last ? streak + 1 : 1;
+      last = event.actor;
+      assert.ok(streak <= content.balance.combat.maxConsecutiveMoves);
+    }
+  });
+
+  test('a viper bite can poison, and poison ticks every turn', () => {
+    const target = { ...playerCombatant({ character: newCharacter('mage'), equipped: [], name: 'Cel' }, content), maxHp: 5000, hp: 5000, willRating: 0 };
+    const viper = monsterCombatant({ monsterId: 'viper', level: 3, id: 'e0' }, content);
+    const events = fight('jad', [target], [viper]).events;
+    assert.ok(events.some((event) => event.kind === 'effect' && event.effect === 'Zatrucie'));
+    assert.ok(events.some((event) => event.kind === 'tick' && event.target === target.id && event.damage > 0));
+  });
+
+  test('magic ignores armor and dodge, physical attacks do not', () => {
+    const wall = { ...monsterCombatant({ monsterId: 'boar', level: 5, id: 'e0' }, content), armor: 100000, dodgeRating: 0, hp: 100000, maxHp: 100000 };
+    const mage = playerCombatant({ character: newCharacter('mage'), equipped: starting('mage'), name: 'Mag' }, content);
+    const warrior = playerCombatant({ character: newCharacter('warrior'), equipped: starting('warrior'), name: 'Woj' }, content);
+    const hits = (attacker) => fight('mur', [attacker], [wall]).events.filter((e) => e.actor === attacker.id && e.kind !== 'dodge');
+    assert.ok(Math.min(...hits(warrior).map((e) => e.damage)) <= 1);
+    assert.ok(Math.min(...hits(mage).map((e) => e.damage)) > 3);
+  });
+
+  test('armor follows P / (P + K) and never reaches 100%', () => {
+    assert.equal(reduction(0, 5, content.balance), 0);
+    assert.ok(Math.abs(reduction(140, 5, content.balance) - 0.5) < 1e-9);
+    assert.ok(reduction(1e9, 1, content.balance) < 1);
+  });
+});
+
+describe('hunts', () => {
+  const warrior = typicalCharacter('warrior', 3, content);
+  const hunt = (overrides = {}) =>
+    simulateHunt(
+      { ...warrior, hp: 9999, name: 'Mira', regionId: 'windfalls', minutes: 60, seed: 'polowanie', ...overrides },
+      content,
+    );
+
+  test('the same seed always gives the same hunt', () => {
+    assert.deepEqual(hunt(), hunt());
+    assert.notDeepEqual(hunt(), hunt({ seed: 'inne' }));
+  });
+
+  test('longer hunts have more fights and rewards', () => {
+    const short = hunt({ minutes: 15 });
+    const long = hunt({ minutes: 240 });
+    assert.ok(long.fights.length >= 15 && short.fights.length <= 2);
+    assert.ok(long.xp > short.xp * 5);
+  });
+
+  test('HP carries over between fights and is only partly restored', () => {
+    const result = hunt({ minutes: 240 });
+    for (let i = 1; i < result.fights.length; i++) {
+      const previous = result.fights[i - 1];
+      assert.equal(result.fights[i].hpBefore, previous.hpAfter + previous.recovered);
+      assert.ok(previous.recovered <= result.maxHp - previous.hpAfter);
+    }
+  });
+
+  test('a lost fight ends the hunt with fainting', () => {
+    const weak = { ...newCharacter('mage'), level: 1 };
+    const result = simulateHunt({ character: weak, equipped: [], hp: 5, name: 'Pech', regionId: 'stone-glade', minutes: 60, seed: 'pech' }, content);
+    assert.equal(result.result, 'fainted');
+    assert.equal(result.fights.at(-1).won, false);
+    assert.equal(result.hpEnd, Math.round(result.maxHp * content.balance.hunt.hpAfterFaint));
+  });
+
+  test('losing to the elite in a safe region wounds but does not faint', () => {
+    const elite = { ...content.balance.hunt, eliteChancePerFight: 1 };
+    const always = { ...content, balance: { ...content.balance, hunt: elite } };
+    const result = simulateHunt({ character: newCharacter('shadow'), equipped: [], hp: 10, name: 'Cień', regionId: 'windfalls', minutes: 15, seed: 'elita' }, always);
+    assert.equal(result.result, 'escaped');
+    assert.ok(result.fights[0].elite);
+  });
+
+  test('the key fight comes with its events for the animation', () => {
+    const result = hunt({ minutes: 120 });
+    assert.ok(result.keyFight.events.length > 0);
+    assert.equal(result.keyFight.allies[0].name, 'Mira');
+    assert.ok(result.entries.every((entry, i, all) => i === 0 || all[i - 1].t <= entry.t));
+  });
+
+  test('a 4-hour hunt stays well within the CPU budget', () => {
+    const strong = typicalCharacter('cleric', 10, content);
+    const started = performance.now();
+    for (let i = 0; i < 20; i++) {
+      simulateHunt({ ...strong, hp: 9999, name: 'Test', regionId: 'stone-glade', minutes: 240, seed: `cpu${i}` }, content);
+    }
+    assert.ok((performance.now() - started) / 20 < 8, 'average hunt took too long');
+  });
+});
+
+describe('progression', () => {
+  test('level 1 needs about an hour, level 50 about two days of hunting', () => {
+    assert.ok(xpToNext(2, content) > xpToNext(1, content));
+    const hours = (level) => xpToNext(level, content) / xpToNext(1, content) / level ** content.balance.rewards.xpExponent;
+    assert.ok(Math.abs(hours(50) - 48) < 1);
+  });
+
+  test('fainting costs half a level of XP but never the level', () => {
+    const needed = xpToNext(4, content);
+    assert.equal(faintPenalty(4, needed - 1, content), Math.floor(needed / 2));
+    assert.equal(faintPenalty(4, 10, content), 10);
+  });
+
+  test('applying a hunt levels up and keeps XP and class XP apart', () => {
+    const character = newCharacter('cleric', { level: 1, xp: 0, classLevel: 1, classXp: 0 });
+    const applied = applyHunt(character, { xp: xpToNext(1, content) + 5, result: 'success' }, content);
+    assert.equal(applied.level, 2);
+    assert.equal(applied.xp, 5);
+    assert.equal(applied.classLevel, 1);
+    assert.match(applied.messages[0], /^Osiągnięto poziom 2\. Wolne punkty statystyk: \+8\.$/);
+    // Level 2 opens long hunts and the stats screen, and the System says so.
+    assert.deepEqual(applied.messages.slice(1), content.unlocks.filter((u) => u.level === 2).map((u) => u.message));
+
+    const fainted = applyHunt({ ...character, level: 3, xp: 100 }, { xp: 0, result: 'fainted' }, content);
+    assert.equal(fainted.level, 3);
+    assert.equal(fainted.xp, 0);
+    assert.equal(fainted.penalty, 100);
+  });
+
+  test('hunting far below your level gives clearly less XP', () => {
+    assert.equal(lowLevelMultiplier(5, 3, content), 1);
+    assert.equal(lowLevelMultiplier(8, 5, content), 0.75);
+    assert.equal(lowLevelMultiplier(20, 1, content), content.balance.hunt.lowLevelMinMultiplier);
+  });
+
+  test('the stats screen estimates the hours of hunting left to the next level', () => {
+    assert.ok(Math.abs(hoursToNext(1, 0, content) - 1) < 0.01);
+    assert.ok(Math.abs(hoursToNext(10, xpToNext(10, content) / 2, content) - 10 ** 0.99 / 2) < 0.01);
+    assert.equal(hoursToNext(content.balance.progression.maxLevel, 0, content), 0);
+  });
+
+  test('HP regenerates over time between hunts', () => {
+    const at = (minutes) => restedHp({ hp: 10, since: 0, now: minutes * 60000, maxHp: 100, vitality: 10 }, content);
+    assert.equal(at(0), 10);
+    assert.ok(at(10) > 10 && at(10) < 100);
+    assert.equal(at(10000), 100);
+  });
+});
+
+describe('tutorial unlocks', () => {
+  test('level 1 has only short hunts; level 2 opens long hunts and stats', () => {
+    assert.deepEqual(huntDurations(1, content), [5, 15, 30]);
+    assert.deepEqual(huntDurations(2, content), content.balance.hunt.durations);
+    assert.deepEqual(unlockedFeatures(1, content), []);
+    assert.deepEqual(unlockedFeatures(2, content), ['long-hunts', 'stats']);
+    assert.ok(unlockedFeatures(10, content).includes('settlement'));
+    assert.ok(!unlockedFeatures(100, content).includes('core'));
+  });
+});
+
+describe('stat previews', () => {
+  test('show in numbers what one more point gives', () => {
+    const warrior = statEffects(newCharacter('warrior'), starting('warrior'), content);
+    assert.equal(warrior.vitality.maxHp, content.balance.character.hpPerVitality);
+    assert.ok(warrior.vitality.regen > 0);
+    assert.ok(warrior.strength.damage > 0.02 && warrior.strength.damage < 0.03);
+    assert.ok(warrior.dexterity.dodge > 0 && warrior.dexterity.speed > 0);
+    assert.ok(warrior.endurance.reduction > 0);
+    assert.ok(warrior.perception.crit > 0);
+    assert.ok(warrior.will.effectResist > 0);
+    assert.equal(warrior.intellect.damage, undefined);
+
+    const mage = statEffects(newCharacter('mage'), starting('mage'), content);
+    assert.ok(mage.intellect.damage > 0);
+    assert.equal(mage.strength.damage, undefined);
+    const cleric = statEffects(newCharacter('cleric'), starting('cleric'), content);
+    assert.ok(cleric.wisdom.recovery > 0 && cleric.wisdom.mana > 0);
+  });
+});
+
+test('the threat level rises with hunt length and falls with HP', () => {
+  const { character, equipped } = typicalCharacter('mage', 6, content);
+  const order = ['low', 'moderate', 'high', 'very-high'];
+  const full = estimateThreat({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content);
+  const wounded = estimateThreat({ character, equipped, hp: 20, regionId: 'stone-glade' }, content);
+  const durations = content.balance.hunt.durations;
+  for (let i = 1; i < durations.length; i++) {
+    assert.ok(order.indexOf(full[durations[i]]) >= order.indexOf(full[durations[i - 1]]));
+  }
+  assert.ok(order.indexOf(wounded[5]) > order.indexOf(full[5]));
+});
+
+test('the threat level follows the simulated chance of fainting', () => {
+  // A level 6 mage on a 4-hour hunt in the first unsafe region faints often.
+  const { character, equipped } = typicalCharacter('mage', 6, content);
+  const estimated = faintChances({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content)[240];
+  const simulated = simulateMany({ classId: 'mage', level: 6, minutes: 240, hunts: 300 }, content).faintRate;
+  assert.ok(simulated > 0.1, `simulated ${simulated}`);
+  assert.ok(Math.abs(estimated - simulated) < 0.15, `estimated ${estimated}, simulated ${simulated}`);
+  assert.ok(['high', 'very-high'].includes(estimateThreat({ character, equipped, hp: 9999, regionId: 'stone-glade' }, content)[240]));
+
+  // The tutorial region stays safe for a character of its level.
+  const warrior = typicalCharacter('warrior', 3, content);
+  const safe = estimateThreat({ ...warrior, hp: 9999, regionId: 'windfalls' }, content);
+  assert.deepEqual(new Set(Object.values(safe)), new Set(['low']));
+});

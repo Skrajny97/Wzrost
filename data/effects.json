@@ -1,0 +1,5 @@
+[
+  { "id": "poisoned", "name": "Zatrucie", "element": "poison" },
+  { "id": "burning", "name": "Oparzenie", "element": "fire" },
+  { "id": "chilled", "name": "Wychłodzenie", "element": "frost" }
+]

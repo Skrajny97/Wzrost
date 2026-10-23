@@ -1,0 +1,467 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Stałe balansu",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "combat",
+    "character",
+    "monsters",
+    "items",
+    "hunt",
+    "rewards",
+    "regen",
+    "progression"
+  ],
+  "properties": {
+    "combat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kBase",
+        "kPerLevel",
+        "scalingPerPoint",
+        "armorPerEndurance",
+        "dodgePerDexterity",
+        "dodgeCap",
+        "critPerPerception",
+        "critCap",
+        "critMultiplier",
+        "willPerPoint",
+        "willCap",
+        "speedMax",
+        "speedKBase",
+        "speedKPerLevel",
+        "moveTime",
+        "maxConsecutiveMoves",
+        "maxActions",
+        "targetWeights",
+        "unarmed"
+      ],
+      "properties": {
+        "kBase": {
+          "type": "number",
+          "minimum": 0
+        },
+        "kPerLevel": {
+          "type": "number",
+          "minimum": 0
+        },
+        "scalingPerPoint": {
+          "type": "number",
+          "minimum": 0
+        },
+        "armorPerEndurance": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dodgePerDexterity": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dodgeCap": {
+          "type": "number",
+          "minimum": 0
+        },
+        "critPerPerception": {
+          "type": "number",
+          "minimum": 0
+        },
+        "critCap": {
+          "type": "number",
+          "minimum": 0
+        },
+        "critMultiplier": {
+          "type": "number",
+          "minimum": 0
+        },
+        "willPerPoint": {
+          "type": "number",
+          "minimum": 0
+        },
+        "willCap": {
+          "type": "number",
+          "minimum": 0
+        },
+        "speedMax": {
+          "type": "number",
+          "minimum": 0
+        },
+        "speedKBase": {
+          "type": "number",
+          "minimum": 0
+        },
+        "speedKPerLevel": {
+          "type": "number",
+          "minimum": 0
+        },
+        "moveTime": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maxConsecutiveMoves": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maxActions": {
+          "type": "number",
+          "minimum": 0
+        },
+        "targetWeights": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "front",
+            "middle",
+            "back"
+          ],
+          "properties": {
+            "front": {
+              "type": "number",
+              "minimum": 0
+            },
+            "middle": {
+              "type": "number",
+              "minimum": 0
+            },
+            "back": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "unarmed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "attackName",
+            "min",
+            "max"
+          ],
+          "properties": {
+            "attackName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "min": {
+              "type": "number",
+              "minimum": 0
+            },
+            "max": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "character": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hpBase",
+        "hpPerVitality",
+        "hpPerLevel",
+        "manaBase",
+        "manaPerWisdom"
+      ],
+      "properties": {
+        "hpBase": {
+          "type": "number",
+          "minimum": 0
+        },
+        "hpPerVitality": {
+          "type": "number",
+          "minimum": 0
+        },
+        "hpPerLevel": {
+          "type": "number",
+          "minimum": 0
+        },
+        "manaBase": {
+          "type": "number",
+          "minimum": 0
+        },
+        "manaPerWisdom": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "budgetBase",
+        "budgetPerLevel",
+        "affixWeight",
+        "damageBase",
+        "damagePerBudget",
+        "armorPerBudget",
+        "statPerBudget",
+        "resistancePerBudget"
+      ],
+      "properties": {
+        "budgetBase": {
+          "type": "number",
+          "minimum": 0
+        },
+        "budgetPerLevel": {
+          "type": "number",
+          "minimum": 0
+        },
+        "affixWeight": {
+          "type": "number",
+          "minimum": 0
+        },
+        "damageBase": {
+          "type": "number",
+          "minimum": 0
+        },
+        "damagePerBudget": {
+          "type": "number",
+          "minimum": 0
+        },
+        "armorPerBudget": {
+          "type": "number",
+          "minimum": 0
+        },
+        "statPerBudget": {
+          "type": "number",
+          "minimum": 0
+        },
+        "resistancePerBudget": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "hunt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "durations",
+        "shortHuntMaxMinutes",
+        "fightIntervalMinutes",
+        "findIntervalMinutes",
+        "monsterLevelSpread",
+        "eliteChancePerFight",
+        "eliteLevelBonus",
+        "recoveryAfterFight",
+        "soloXpBonus",
+        "lowLevelFreeDiff",
+        "lowLevelStepPenalty",
+        "lowLevelMinMultiplier",
+        "faintXpPenalty",
+        "hpAfterFaint",
+        "groupFactors"
+      ],
+      "properties": {
+        "durations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "shortHuntMaxMinutes": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Najdłuższe polowanie dostępne przed odblokowaniem długich polowań (unlocks.json, long-hunts)."
+        },
+        "fightIntervalMinutes": {
+          "type": "number",
+          "minimum": 0
+        },
+        "findIntervalMinutes": {
+          "type": "number",
+          "minimum": 0
+        },
+        "monsterLevelSpread": {
+          "type": "number",
+          "minimum": 0
+        },
+        "eliteChancePerFight": {
+          "type": "number",
+          "minimum": 0
+        },
+        "eliteLevelBonus": {
+          "type": "number",
+          "minimum": 0
+        },
+        "recoveryAfterFight": {
+          "type": "number",
+          "minimum": 0
+        },
+        "soloXpBonus": {
+          "type": "number",
+          "minimum": 0
+        },
+        "lowLevelFreeDiff": {
+          "type": "number",
+          "minimum": 0
+        },
+        "lowLevelStepPenalty": {
+          "type": "number",
+          "minimum": 0
+        },
+        "lowLevelMinMultiplier": {
+          "type": "number",
+          "minimum": 0
+        },
+        "faintXpPenalty": {
+          "type": "number",
+          "minimum": 0
+        },
+        "hpAfterFaint": {
+          "type": "number",
+          "minimum": 0
+        },
+        "groupFactors": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "rewards": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "xpBase",
+        "xpExponent",
+        "eliteXpMultiplier",
+        "goldPerLevel",
+        "eliteGoldMultiplier",
+        "itemDropChance",
+        "eliteRarityBonus",
+        "findGoldChance",
+        "findGoldPerLevel"
+      ],
+      "properties": {
+        "xpBase": {
+          "type": "number",
+          "minimum": 0
+        },
+        "xpExponent": {
+          "type": "number",
+          "minimum": 0
+        },
+        "eliteXpMultiplier": {
+          "type": "number",
+          "minimum": 0
+        },
+        "goldPerLevel": {
+          "type": "number",
+          "minimum": 0
+        },
+        "eliteGoldMultiplier": {
+          "type": "number",
+          "minimum": 0
+        },
+        "itemDropChance": {
+          "type": "number",
+          "minimum": 0
+        },
+        "eliteRarityBonus": {
+          "type": "number",
+          "minimum": 0
+        },
+        "findGoldChance": {
+          "type": "number",
+          "minimum": 0
+        },
+        "findGoldPerLevel": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "regen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "perMinute",
+        "perVitalityPerMinute"
+      ],
+      "properties": {
+        "perMinute": {
+          "type": "number",
+          "minimum": 0
+        },
+        "perVitalityPerMinute": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "progression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxLevel",
+        "hoursExponent",
+        "xpPerHourScale",
+        "classXpFactor",
+        "freeResetMaxLevel",
+        "classEvolutionLevel"
+      ],
+      "properties": {
+        "maxLevel": {
+          "type": "number",
+          "minimum": 0
+        },
+        "hoursExponent": {
+          "type": "number",
+          "minimum": 0
+        },
+        "xpPerHourScale": {
+          "type": "number",
+          "minimum": 0
+        },
+        "classXpFactor": {
+          "type": "number",
+          "minimum": 0
+        },
+        "freeResetMaxLevel": {
+          "type": "number",
+          "minimum": 0
+        },
+        "classEvolutionLevel": {
+          "type": "integer",
+          "minimum": 2,
+          "description": "Poziom klasy pierwszej ewolucji."
+        }
+      }
+    },
+    "monsters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hpBase",
+        "budgetBase",
+        "damageMultiplier"
+      ],
+      "properties": {
+        "hpBase": {
+          "type": "number",
+          "minimum": 0
+        },
+        "budgetBase": {
+          "type": "number",
+          "minimum": 0
+        },
+        "damageMultiplier": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    }
+  }
+}

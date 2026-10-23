@@ -2,43 +2,16 @@
 // fresh local D1 database per test, built from wrangler.jsonc and migrations/.
 
 import assert from 'node:assert/strict';
-import { after, before, beforeEach, describe, test } from 'node:test';
-import { createTestHarness } from 'wrangler';
+import { beforeEach, describe, test } from 'node:test';
 
 import { MAX_FAILURES } from '../src/server/throttle.js';
+import { useServer } from './helpers/server.js';
 
-const server = createTestHarness({ workers: [{ configPath: './wrangler.jsonc' }] });
+const { server, call, db } = useServer();
 const DAY_MS = 24 * 60 * 60 * 1000;
-
-before(() => server.listen());
-beforeEach(async () => {
-  await server.reset();
-  await server.getWorker().applyD1Migrations('DB');
-});
-after(() => server.close());
-
-async function call(method, path, { body, cookie, origin } = {}) {
-  const headers = {};
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
-  if (cookie) headers.Cookie = cookie;
-  if (origin) headers.Origin = origin;
-  const response = await server.fetch(path, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  const setCookie = response.headers.get('Set-Cookie');
-  return {
-    status: response.status,
-    headers: response.headers,
-    data: await response.json(),
-    cookie: setCookie ? setCookie.split(';')[0] : null,
-  };
-}
 
 const register = (body) => call('POST', '/api/auth/register', { body });
 const login = (identifier, password) => call('POST', '/api/auth/login', { body: { identifier, password } });
-const db = async () => (await server.getWorker().getEnv()).DB;
 
 describe('health', () => {
   test('reports server time and version', async () => {

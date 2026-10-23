@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Klasy",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "name", "role", "gentleStart", "description", "position", "baseStats", "growth", "autoPoints", "recovery", "startingItems"],
+    "properties": {
+      "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+      "name": { "type": "string", "minLength": 1 },
+      "role": { "type": "string", "minLength": 1 },
+      "gentleStart": { "type": "boolean" },
+      "description": { "type": "string", "minLength": 1 },
+      "position": { "enum": ["front", "middle", "back"] },
+      "baseStats": { "$ref": "#/definitions/statMap" },
+      "growth": { "$ref": "#/definitions/statMap" },
+      "autoPoints": { "$ref": "#/definitions/statMap" },
+      "recovery": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["base", "perWisdom"],
+        "properties": {
+          "base": { "type": "number", "minimum": 0, "maximum": 1 },
+          "perWisdom": { "type": "number", "minimum": 0, "maximum": 0.05 }
+        }
+      },
+      "startingItems": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["base"],
+          "properties": { "base": { "type": "string" }, "element": { "type": "string" } }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "statMap": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } }
+  }
+}

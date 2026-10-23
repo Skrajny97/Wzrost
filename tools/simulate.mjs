@@ -1,0 +1,150 @@
+// Balance simulation: many hunts for typical characters of each class.
+// Measures fainting chance, XP, gold and items per hour, and how many hours
+// of hunting a level takes with the current XP table.
+//
+//   node tools/simulate.mjs                      summary table (10 000 hunts)
+//   node tools/simulate.mjs --hunts 2000 --levels 1,5,10 --minutes 30,60,240
+//   node tools/simulate.mjs --calibrate          suggests xpPerHourScale
+
+import { fileURLToPath } from 'node:url';
+import * as engine from '../src/engine/index.js';
+import { loadData } from './validate-data.mjs';
+
+const DEFAULT_SLOTS = { head: 'hood', hands: 'gloves', feet: 'boots', amulet: 'amulet', ring: 'ring', talisman: 'talisman' };
+const HEAVY_SLOTS = { head: 'helmet' };
+
+// A level-L character as a typical player would have it: points spent by class,
+// class level a little behind, and rare items of level L-1 in every slot, each
+// with the affix of the class's main stat (only the starting items at level 1).
+export function typicalCharacter(classId, level, content) {
+  const cls = content.classesById[classId];
+  const classLevel = Math.max(1, Math.round(level * 0.9));
+  const character = { classId, level, classLevel, points: {}, position: cls.position, xp: 0, classXp: 0 };
+  character.points = engine.autoDistribute(character, content);
+  const mainStat = Object.entries(cls.autoPoints).sort((a, b) => b[1] - a[1])[0][0];
+  const affixIds = [content.prefixes.find((affix) => affix.stat === mainStat).id];
+  const rng = engine.createRng(`gear:${classId}:${level}`);
+  const item = (baseId, element) =>
+    level === 1
+      ? engine.generateItem({ baseId, level: 1, element }, rng, content)
+      : engine.generateItem({ baseId, level: level - 1, rarityId: 'rare', element, affixIds }, rng, content);
+
+  const equipped = cls.startingItems.map((start) => item(start.base, start.element));
+  if (level > 1) {
+    const taken = new Set(equipped.map((equippedItem) => equippedItem.slot));
+    const extra = { ...DEFAULT_SLOTS, ...(cls.position === 'front' ? HEAVY_SLOTS : {}) };
+    for (const [slot, baseId] of Object.entries(extra)) {
+      if (!taken.has(slot)) equipped.push(item(baseId));
+    }
+  }
+  return { character, equipped };
+}
+
+// Regions from the data, plus generated stand-ins for levels without content
+// yet, so the XP table can be checked up to level 100.
+export function regionForLevel(level, content) {
+  const real = content.regions.find((region) => level >= region.minLevel && level <= region.maxLevel);
+  if (real) return real;
+  const template = content.regions[content.regions.length - 1];
+  return { ...template, id: `generated-${level}`, minLevel: Math.max(1, level - 2), maxLevel: level + 2, safe: false };
+}
+
+export function simulateMany({ classId, level, minutes, hunts }, content) {
+  const { character, equipped } = typicalCharacter(classId, level, content);
+  const region = regionForLevel(level, content);
+  const local = region.id in content.regionsById ? content : { ...content, regionsById: { ...content.regionsById, [region.id]: region } };
+  const maxHp = engine.playerCombatant({ character, equipped, name: 'Symulacja', region }, local).maxHp;
+  const totals = { fainted: 0, escaped: 0, xp: 0, penalty: 0, gold: 0, items: 0, fights: 0, endHp: 0 };
+  for (let i = 0; i < hunts; i++) {
+    const hunt = engine.simulateHunt(
+      { character, equipped, hp: maxHp, name: 'Symulacja', regionId: region.id, minutes, seed: `sim:${classId}:${level}:${minutes}:${i}` },
+      local,
+    );
+    if (hunt.result === 'fainted') {
+      totals.fainted += 1;
+      totals.penalty += engine.faintPenalty(level, engine.xpToNext(level, content), content);
+    }
+    if (hunt.result === 'escaped') totals.escaped += 1;
+    totals.xp += hunt.xp;
+    totals.gold += hunt.gold;
+    totals.items += hunt.items.length;
+    totals.fights += hunt.fights.length;
+    totals.endHp += hunt.hpEnd / hunt.maxHp;
+  }
+  const hours = (hunts * minutes) / 60;
+  const netXpPerHour = (totals.xp - totals.penalty) / hours;
+  return {
+    classId,
+    level,
+    minutes,
+    faintRate: totals.fainted / hunts,
+    escapeRate: totals.escaped / hunts,
+    xpPerHour: totals.xp / hours,
+    netXpPerHour,
+    goldPerHour: totals.gold / hours,
+    itemsPerHour: totals.items / hours,
+    endHp: totals.endHp / hunts,
+    hoursToLevel: engine.xpToNext(level, content) / Math.max(1e-9, netXpPerHour),
+    targetHours: level ** content.balance.progression.hoursExponent,
+  };
+}
+
+function parseArgs(argv) {
+  const options = {};
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i].startsWith('--')) {
+      const name = argv[i].slice(2);
+      const next = argv[i + 1];
+      options[name] = next === undefined || next.startsWith('--') ? true : (i++, next);
+    }
+  }
+  return options;
+}
+
+const list = (value, fallback) => (typeof value === 'string' ? value.split(',') : fallback);
+
+function main() {
+  const options = parseArgs(process.argv.slice(2));
+  const content = engine.buildContent(loadData());
+  const classes = list(options.classes, content.classes.map((cls) => cls.id));
+  const levels = list(options.levels, ['1', '3', '5', '8', '10']).map(Number);
+  const minutesList = list(options.minutes, ['30', '60', '240']).map(Number);
+
+  if (options.calibrate) {
+    // Levels above the existing regions use generated stand-ins, so keep to the first public version (up to ~30).
+    const calibrationLevels = list(options.levels, ['1', '2', '3', '5', '8', '10', '15', '20', '30']).map(Number);
+    const hunts = Number(options.hunts ?? 300);
+    const ratios = [];
+    for (const level of calibrationLevels) {
+      const rates = classes.map((classId) => simulateMany({ classId, level, minutes: 60, hunts }, content).netXpPerHour);
+      const mean = rates.reduce((sum, rate) => sum + rate, 0) / rates.length;
+      ratios.push(mean / level ** content.balance.rewards.xpExponent);
+      console.log(`poziom ${level}: średnio ${mean.toFixed(0)} XP/h netto`);
+    }
+    const scale = ratios.reduce((sum, ratio) => sum + ratio, 0) / ratios.length;
+    console.log(`Proponowane xpPerHourScale: ${scale.toFixed(1)} (obecnie ${content.balance.progression.xpPerHourScale})`);
+    return;
+  }
+
+  // Only the hunt lengths a character of that level can choose (level 1 has only short hunts).
+  const allowed = (level) => minutesList.filter((minutes) => engine.huntDurations(level, content).includes(minutes));
+  const combos = classes.length * levels.reduce((sum, level) => sum + allowed(level).length, 0);
+  const hunts = Number(options.hunts ?? Math.ceil(10000 / combos));
+  console.log(`${hunts} wypraw na wiersz, razem ${hunts * combos}.`);
+  console.log('klasa     poz  min  omdlenia  odwrót  XP/h  netto  złoto/h  przedm./h  HP na końcu  godz. do poz. (cel)');
+  for (const classId of classes) {
+    for (const level of levels) {
+      for (const minutes of allowed(level)) {
+        const r = simulateMany({ classId, level, minutes, hunts }, content);
+        const pct = (value) => `${(value * 100).toFixed(1)}%`.padStart(8);
+        console.log(
+          `${classId.padEnd(9)} ${String(level).padStart(3)} ${String(minutes).padStart(4)} ${pct(r.faintRate)} ${pct(r.escapeRate)}` +
+            ` ${r.xpPerHour.toFixed(0).padStart(5)} ${r.netXpPerHour.toFixed(0).padStart(6)} ${r.goldPerHour.toFixed(0).padStart(8)}` +
+            ` ${r.itemsPerHour.toFixed(2).padStart(10)} ${pct(r.endHp).padStart(12)} ${r.hoursToLevel.toFixed(1).padStart(9)} (${r.targetHours.toFixed(1)})`,
+        );
+      }
+    }
+  }
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) main();

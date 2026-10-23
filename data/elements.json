@@ -1,0 +1,10 @@
+[
+  { "id": "fire", "name": "ogień", "resistance": "Odporność na ogień" },
+  { "id": "frost", "name": "mróz", "resistance": "Odporność na mróz" },
+  { "id": "water", "name": "woda", "resistance": "Odporność na wodę" },
+  { "id": "lightning", "name": "elektryczność", "resistance": "Odporność na elektryczność" },
+  { "id": "earth", "name": "ziemia", "resistance": "Odporność na ziemię" },
+  { "id": "nature", "name": "natura", "resistance": "Odporność na naturę" },
+  { "id": "poison", "name": "trucizna", "resistance": "Odporność na truciznę" },
+  { "id": "sacred", "name": "sakrum", "resistance": "Odporność na sakrum" }
+]

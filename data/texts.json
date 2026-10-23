@@ -1,0 +1,55 @@
+{
+  "fightStart": [
+    "Przeciwnicy: {enemies}.",
+    "Na drodze: {enemies}.",
+    "Z zarośli wychodzą: {enemies}.",
+    "Między drzewami czają się: {enemies}."
+  ],
+  "eliteStart": [
+    "Powietrze gęstnieje. Lokalna elita: {enemies}.",
+    "Las milknie. Lokalna elita: {enemies}."
+  ],
+  "hit": [
+    "{actor}: {attack}. {target} traci {damage} HP.",
+    "{actor} atakuje ({attack}). {target} traci {damage} HP.",
+    "{actor} trafia ({attack}). {target} traci {damage} HP."
+  ],
+  "crit": [
+    "{actor} trafia krytycznie ({attack})! {target} traci {damage} HP.",
+    "Cios krytyczny! {actor}: {attack}. {target} traci {damage} HP."
+  ],
+  "dodge": [
+    "{target} unika ciosu.",
+    "{actor} chybia, {target} odskakuje.",
+    "{target} schodzi z linii ataku."
+  ],
+  "effectApplied": [
+    "{target}: {effect}.",
+    "{target} odczuwa skutki: {effect}."
+  ],
+  "effectTick": [
+    "{target} cierpi ({effect}) i traci {damage} HP.",
+    "{effect}: {target} traci {damage} HP."
+  ],
+  "kill": [
+    "{target} pada.",
+    "{target} nie wstaje.",
+    "{target} osuwa się na mech."
+  ],
+  "victory": ["Zwycięstwo.", "Walka skończona. Wygrana."],
+  "defeat": ["{target} traci przytomność.", "Ciemność. {target} traci przytomność."],
+  "escape": ["{target} ledwo uchodzi z życiem.", "{target} wycofuje się, zanim będzie za późno."],
+  "draw": ["Walka się przeciąga. {target} wycofuje się."],
+  "recover": ["Odpoczynek: +{hp} HP.", "Krótki oddech: +{hp} HP."],
+  "findGold": ["W trawie leży sakiewka: {gold} złota.", "Znaleziono {gold} złota.", "Pod kamieniem błyszczą monety: {gold} złota."],
+  "findItem": ["Znaleziono: {item}.", "Pod korzeniami: {item}.", "W porzuconym tobołku: {item}."],
+  "loot": ["Łup: {item}."],
+  "levelUp": ["Osiągnięto poziom {level}. Wolne punkty statystyk: +{points}."],
+  "classLevelUp": ["{className}: poziom klasy {level}. Wolne punkty statystyk: +{points}."],
+  "faintPenalty": ["Omdlenie. Utracone doświadczenie: {xp}."],
+  "result": {
+    "success": "Wyprawa zakończona.",
+    "fainted": "Omdlenie.",
+    "escaped": "Odwrót."
+  }
+}

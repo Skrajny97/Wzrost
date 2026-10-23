@@ -1,0 +1,12 @@
+[
+  { "id": "head", "name": "Hełm", "column": "left" },
+  { "id": "amulet", "name": "Amulet", "column": "left" },
+  { "id": "chest", "name": "Pancerz", "column": "left" },
+  { "id": "hands", "name": "Rękawice", "column": "left" },
+  { "id": "feet", "name": "Buty", "column": "left" },
+  { "id": "weapon", "name": "Broń", "column": "right" },
+  { "id": "offhand", "name": "Druga ręka", "column": "right" },
+  { "id": "ring", "name": "Pierścień", "column": "right" },
+  { "id": "talisman", "name": "Talizman", "column": "right" },
+  { "id": "core", "name": "Rdzeń", "column": "right", "locked": true }
+]

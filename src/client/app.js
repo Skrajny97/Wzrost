@@ -1,21 +1,44 @@
-// Game page: checks the session on start, then shows the login screen or the
-// signed-in screen. All visible texts are in Polish.
+// Game page: checks the session on start, then shows the login screen, the
+// character creation or the game. Screens are chosen by the address after #,
+// so the static file server needs no routes. All visible texts are in Polish.
 
 import { ApiError, request } from './api.js';
-
-const $ = (selector, root = document) => root.querySelector(selector);
-const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+import { $, $$, clear, h } from './dom.js';
+import { buildTopbar, updateNav, updateTopbar } from './layout.js';
+import { mountCharacter } from './screens/character.js';
+import { mountCombat } from './screens/combat.js';
+import { renderCreate } from './screens/create.js';
+import { mountJournal } from './screens/journal.js';
+import { lockedScreen } from './screens/locked.js';
+import { mountReport } from './screens/report.js';
+import { mountStats } from './screens/stats.js';
+import { call, handleSessionLost, onCharacterChange, serverNow, state } from './state.js';
+import { closeSheet, initSheet, openSheet, toast } from './ui.js';
 
 const views = {
   loading: $('#view-loading'),
   auth: $('#view-auth'),
-  home: $('#view-home'),
+  create: $('#view-create'),
+  game: $('#view-game'),
 };
 
-const timeFormat = new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-const dateFormat = new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
+const ROUTES = [
+  { pattern: /^#\/walka$/, nav: 'main', tab: 'walka', mount: mountCombat },
+  { pattern: /^#\/postac$/, nav: 'character', tab: 'equipment', mount: mountCharacter },
+  { pattern: /^#\/postac\/statystyki$/, nav: 'character', tab: 'stats', mount: mountStats },
+  { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', mount: lockedScreen('skills', 'Umiejętności') },
+  { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: lockedScreen('core', 'Rdzeń') },
+  { pattern: /^#\/profesje$/, nav: 'main', tab: 'profesje', mount: lockedScreen('professions', 'Profesje') },
+  { pattern: /^#\/osada$/, nav: 'main', tab: 'osada', mount: lockedScreen('settlement', 'Osada') },
+  { pattern: /^#\/dziennik(?:\/(?<tab>system))?$/, nav: 'main', tab: 'dziennik', mount: mountJournal },
+  { pattern: /^#\/raport\/(?<id>\d+)$/, nav: 'main', tab: null, mount: mountReport },
+];
+const HOME = '#/walka';
 
-let clockTimer = null;
+let current = null; // { route, screen }
+let lastMainHash = HOME;
+let lastMainTab = 'walka';
+let ticker = null;
 
 function show(name) {
   for (const [key, view] of Object.entries(views)) view.hidden = key !== name;
@@ -25,10 +48,10 @@ async function start() {
   show('loading');
   $('#loading-text').textContent = 'Nawiązywanie połączenia…';
   $('#retry-button').hidden = true;
-  refreshStatus();
   try {
     const { user } = await request('GET', '/api/me');
-    enterHome(user);
+    state.user = user;
+    await enterGame();
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
       enterAuth();
@@ -39,41 +62,146 @@ async function start() {
   }
 }
 
-// Server health, version and clock. The clock shows server time, corrected
-// for the request round trip, because the server decides about all timers.
-async function refreshStatus() {
-  const serverStatus = $('[data-status-server]');
-  const databaseStatus = $('[data-status-database]');
+async function enterGame() {
+  state.content ??= await request('GET', '/api/content');
   try {
-    const sentAt = Date.now();
-    const health = await request('GET', '/api/health');
-    const offset = health.time - (sentAt + Date.now()) / 2;
-    for (const element of $$('[data-version]')) element.textContent = health.version;
-    setStatus(serverStatus, true, 'działa');
-    setStatus(databaseStatus, true, 'działa');
-    startClock(offset);
+    await call('GET', '/api/character');
   } catch (error) {
-    const reachable = error instanceof ApiError && error.status !== 0;
-    setStatus(serverStatus, reachable, reachable ? 'działa' : 'brak połączenia');
-    setStatus(databaseStatus, false, 'niedostępna');
+    if (error instanceof ApiError && error.code === 'no_character') {
+      show('create');
+      renderCreate($('#create-screen'), () => {
+        // A new character starts on the Walka tab.
+        history.replaceState(null, '', HOME);
+        openGame();
+      });
+      return;
+    }
+    throw error;
+  }
+  openGame();
+}
+
+function openGame() {
+  show('game');
+  buildTopbar(openSettings);
+  route();
+  clearInterval(ticker);
+  ticker = setInterval(() => {
+    const now = serverNow();
+    updateTopbar(now);
+    current?.screen.tick?.(now);
+  }, 1000);
+}
+
+function route() {
+  if (!state.character) return;
+  const hash = location.hash || HOME;
+  const found = ROUTES.map((candidate) => ({ candidate, match: candidate.pattern.exec(hash) })).find(({ match }) => match);
+  if (!found) {
+    location.replace(HOME);
+    return;
+  }
+  const { candidate, match } = found;
+  current?.screen.unmount?.();
+  closeSheet();
+
+  if (candidate.nav === 'main') {
+    lastMainHash = hash;
+    if (candidate.tab) lastMainTab = candidate.tab;
+  }
+  // Every screen gets its own element, so a late answer meant for the
+  // previous screen can only draw into a detached one.
+  const container = h('div', { class: 'screen-body' });
+  clear($('#screen')).append(container);
+  window.scrollTo(0, 0);
+  const screen = candidate.mount(container, { params: match.groups ?? {}, navigate }) ?? {};
+  current = { route: candidate, screen };
+  renderNav();
+  $('.page-title', container)?.focus({ preventScroll: true });
+}
+
+function renderNav() {
+  if (!current) return;
+  const { route: active } = current;
+  updateNav({
+    kind: active.nav,
+    active: active.nav === 'main' ? active.tab ?? lastMainTab : active.tab,
+    // "Powrót": from stats, skills or the Core to the equipment, from there to the main menu.
+    onBack: () => navigate(active.tab === 'equipment' ? lastMainHash : '#/postac'),
+  });
+}
+
+function navigate(hash) {
+  if (location.hash === hash) route();
+  else location.hash = hash;
+}
+
+onCharacterChange(() => {
+  if (views.game.hidden || !current) return;
+  updateTopbar();
+  renderNav();
+  current.screen.update?.();
+});
+
+// Coming back to the page (for example after the hunt timer ran out) refreshes
+// the character, so timers and HP follow the server again.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && state.character && !views.game.hidden) {
+    call('GET', '/api/character').catch((error) => toast(error.message));
+  }
+});
+
+window.addEventListener('hashchange', route);
+
+function openSettings() {
+  const version = h('dd', { text: '…' });
+  openSheet(
+    h('h2', { class: 'sheet-title', text: 'Ustawienia' }),
+    h(
+      'dl',
+      { class: 'status-list' },
+      h('div', { class: 'status-row' }, h('dt', { text: 'Konto' }), h('dd', { text: state.user.login })),
+      h('div', { class: 'status-row' }, h('dt', { text: 'Postać' }), h('dd', { text: state.character.name })),
+      h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
+    ),
+    h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
+  );
+  request('GET', '/api/health')
+    .then((health) => {
+      version.textContent = health.version;
+    })
+    .catch(() => {
+      version.textContent = 'brak połączenia';
+    });
+}
+
+async function logout(event) {
+  const button = event.currentTarget;
+  button.disabled = true;
+  try {
+    await request('POST', '/api/auth/logout');
+    leaveGame();
+  } catch (error) {
+    toast(error.message);
+    button.disabled = false;
   }
 }
 
-function setStatus(element, ok, text) {
-  element.textContent = text;
-  element.classList.toggle('status-ok', ok);
-  element.classList.toggle('status-error', !ok);
+function leaveGame() {
+  closeSheet();
+  clearInterval(ticker);
+  current?.screen.unmount?.();
+  current = null;
+  state.user = null;
+  state.character = null;
+  enterAuth();
 }
 
-function startClock(offset) {
-  clearInterval(clockTimer);
-  const element = $('[data-server-time]');
-  const tick = () => {
-    element.textContent = timeFormat.format(new Date(Date.now() + offset));
-  };
-  tick();
-  clockTimer = setInterval(tick, 1000);
-}
+handleSessionLost(() => {
+  if (state.user) leaveGame();
+});
+
+// Login and registration
 
 function enterAuth() {
   for (const form of [$('#login-form'), $('#register-form')]) {
@@ -83,14 +211,11 @@ function enterAuth() {
   for (const toggle of $$('.password-toggle')) setPasswordVisible(toggle, false);
   setAuthMode('login');
   show('auth');
-}
-
-function enterHome(user) {
-  for (const element of $$('[data-user-login]')) element.textContent = user.login;
-  $('[data-user-created]').textContent = dateFormat.format(new Date(user.createdAt));
-  $('#logout-error').hidden = true;
-  show('home');
-  $('#home-title').focus();
+  request('GET', '/api/health')
+    .then((health) => {
+      for (const element of $$('[data-version]')) element.textContent = health.version;
+    })
+    .catch(() => {});
 }
 
 function setAuthMode(mode) {
@@ -123,7 +248,8 @@ function bindForm(form, submit) {
     try {
       const { user } = await submit(Object.fromEntries(new FormData(form)));
       form.reset();
-      enterHome(user);
+      state.user = user;
+      await enterGame();
     } catch (error) {
       errorBox.textContent = error.message;
       errorBox.hidden = false;
@@ -150,18 +276,5 @@ bindForm($('#register-form'), (data) => request('POST', '/api/auth/register', da
 
 $('#retry-button').addEventListener('click', start);
 
-$('#logout-button').addEventListener('click', async () => {
-  const button = $('#logout-button');
-  button.disabled = true;
-  try {
-    await request('POST', '/api/auth/logout');
-    enterAuth();
-  } catch (error) {
-    $('#logout-error').textContent = error.message;
-    $('#logout-error').hidden = false;
-  } finally {
-    button.disabled = false;
-  }
-});
-
+initSheet();
 start();

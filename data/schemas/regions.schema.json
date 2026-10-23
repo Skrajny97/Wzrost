@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Regiony",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "land",
+      "name",
+      "minLevel",
+      "maxLevel",
+      "safe",
+      "description",
+      "trait",
+      "encounters",
+      "elite"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "land": {
+        "type": "string",
+        "minLength": 1
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minLevel": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100
+      },
+      "maxLevel": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100
+      },
+      "safe": {
+        "type": "boolean"
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1
+      },
+      "trait": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "recoveryBonus": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 0.2
+          },
+          "frontArmorBonus": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 0.2
+          }
+        }
+      },
+      "encounters": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "weight",
+            "monsters"
+          ],
+          "properties": {
+            "weight": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "monsters": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 3,
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "elite": {
+        "type": "string"
+      },
+      "levelSpread": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 3
+      }
+    }
+  }
+}

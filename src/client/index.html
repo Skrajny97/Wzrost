@@ -88,54 +88,18 @@
     <p class="version">Wersja <span data-version>—</span></p>
   </main>
 
-  <div id="view-home" hidden>
-    <header class="topbar">
-      <span class="badge badge--system">Wzrost</span>
-      <span class="badge badge--world" data-user-login></span>
-    </header>
+  <main id="view-create" hidden>
+    <div class="screen" id="create-screen"></div>
+  </main>
 
-    <main class="screen">
-      <div class="page-heading">
-        <h1 class="page-title" id="home-title" tabindex="-1">Skraj Puszczy</h1>
-        <p class="page-subtitle">Tu zacznie się Twoja wyprawa.</p>
-      </div>
-
-      <section class="system-panel" aria-label="Komunikat Systemu">
-        <div class="system-message">
-          <p class="system-label">[ SYSTEM ]</p>
-          <p class="system-text">Tożsamość potwierdzona: <strong data-user-login></strong>. Inicjalizacja postaci zostanie udostępniona w kolejnej aktualizacji.</p>
-        </div>
-      </section>
-
-      <section class="card" aria-labelledby="status-title">
-        <h2 class="card-title" id="status-title">Stan połączenia</h2>
-        <dl class="status-list">
-          <div class="status-row">
-            <dt>Serwer</dt>
-            <dd data-status-server>sprawdzanie…</dd>
-          </div>
-          <div class="status-row">
-            <dt>Baza danych</dt>
-            <dd data-status-database>sprawdzanie…</dd>
-          </div>
-          <div class="status-row">
-            <dt>Czas serwera</dt>
-            <dd data-server-time>—</dd>
-          </div>
-          <div class="status-row">
-            <dt>Wersja gry</dt>
-            <dd data-version>—</dd>
-          </div>
-          <div class="status-row">
-            <dt>Konto założone</dt>
-            <dd data-user-created>—</dd>
-          </div>
-        </dl>
-      </section>
-
-      <p class="form-error" id="logout-error" role="alert" hidden></p>
-      <button type="button" class="button button--world" id="logout-button">Wyloguj się</button>
-    </main>
+  <div id="view-game" hidden>
+    <header class="topbar" id="topbar"></header>
+    <main class="screen screen--game" id="screen"></main>
+    <nav class="nav nav--main" id="nav-main" aria-label="Menu główne"></nav>
+    <nav class="nav nav--character" id="nav-character" aria-label="Nawigacja postaci" hidden></nav>
   </div>
+
+  <dialog class="sheet" id="sheet" aria-label="Szczegóły"></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

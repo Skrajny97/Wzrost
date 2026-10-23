@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bazy przedmiotów",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "type": "object",
+    "required": ["id", "name", "gender", "slot", "kind"],
+    "properties": {
+      "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+      "name": { "type": "string", "minLength": 1 },
+      "gender": { "enum": ["m", "f", "n", "pl"] },
+      "slot": { "type": "string" },
+      "kind": { "enum": ["weapon", "armor", "implicit"] },
+      "attackName": { "type": "string", "minLength": 1 },
+      "category": { "enum": ["physical", "magical"] },
+      "scaling": { "type": "string" },
+      "elements": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+      "damageFactor": { "type": "number", "exclusiveMinimum": 0 },
+      "variance": { "type": "number", "minimum": 0, "maximum": 0.9 },
+      "armorFactor": { "type": "number", "exclusiveMinimum": 0 },
+      "stat": { "type": "string" },
+      "statFactor": { "type": "number", "exclusiveMinimum": 0 }
+    },
+    "allOf": [
+      {
+        "if": { "properties": { "kind": { "const": "weapon" } } },
+        "then": {
+          "required": ["attackName", "category", "scaling", "damageFactor", "variance"],
+          "if": { "properties": { "category": { "const": "magical" } } },
+          "then": { "required": ["elements"] }
+        }
+      },
+      { "if": { "properties": { "kind": { "const": "armor" } } }, "then": { "required": ["armorFactor"] } },
+      { "if": { "properties": { "kind": { "const": "implicit" } } }, "then": { "required": ["stat", "statFactor"] } }
+    ]
+  }
+}

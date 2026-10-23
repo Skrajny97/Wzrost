@@ -1,0 +1,131 @@
+// Shared pieces of the interface: System messages, bottom sheets, a toast and
+// confirmation questions.
+
+import { $, append, clear, h, icon } from './dom.js';
+
+// A message from the System: the cold, ice-blue panel with the [ SYSTEM ] header.
+export function systemPanel(...lines) {
+  return h(
+    'section',
+    { class: 'system-panel', 'aria-label': 'Komunikat Systemu' },
+    h('div', { class: 'system-message' }, h('p', { class: 'system-label', text: '[ SYSTEM ]' }), lines.map(systemLine)),
+  );
+}
+
+const systemLine = (line) => (line instanceof Node ? line : h('p', { class: 'system-text', text: line }));
+
+export function pageHeading(title, subtitle) {
+  return h(
+    'div',
+    { class: 'page-heading' },
+    h('h1', { class: 'page-title', tabindex: '-1', text: title }),
+    subtitle && h('p', { class: 'page-subtitle', text: subtitle }),
+  );
+}
+
+export function lockLabel(text) {
+  return h('span', { class: 'lock-label' }, icon('lock', { size: 14 }), text);
+}
+
+// Bottom sheet built on <dialog>: focus stays inside and Escape closes it.
+const sheet = () => $('#sheet');
+
+export function openSheet(...children) {
+  const dialog = sheet();
+  clear(dialog);
+  append(dialog, [
+    h(
+      'div',
+      { class: 'sheet-body' },
+      h('button', { type: 'button', class: 'sheet-close', 'aria-label': 'Zamknij', onClick: closeSheet }, icon('close')),
+      children,
+    ),
+  ]);
+  if (!dialog.open) dialog.showModal();
+  return dialog;
+}
+
+export function closeSheet() {
+  const dialog = sheet();
+  if (dialog.open) dialog.close();
+}
+
+export function initSheet() {
+  const dialog = sheet();
+  // A tap on the dimmed backdrop (outside the sheet body) closes it.
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) closeSheet();
+  });
+  dialog.addEventListener('close', () => clear(dialog));
+}
+
+// Asks before something that cannot be undone. Resolves to true or false.
+export function confirmAction({ title, text, confirmLabel, danger = false }) {
+  return new Promise((resolve) => {
+    let answered = false;
+    const answer = (value) => {
+      if (answered) return;
+      answered = true;
+      closeSheet();
+      resolve(value);
+    };
+    const dialog = openSheet(
+      h('h2', { class: 'sheet-title', text: title }),
+      h('p', { class: 'sheet-text', text }),
+      h(
+        'div',
+        { class: 'sheet-actions' },
+        h('button', { type: 'button', class: 'button button--world', onClick: () => answer(false), text: 'Anuluj' }),
+        h('button', {
+          type: 'button',
+          class: danger ? 'button button--danger' : 'button button--system',
+          onClick: () => answer(true),
+          text: confirmLabel,
+        }),
+      ),
+    );
+    dialog.addEventListener('close', () => answer(false), { once: true });
+  });
+}
+
+let toastTimer = null;
+
+export function toast(message) {
+  const element = $('#toast');
+  element.textContent = message;
+  element.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    element.hidden = true;
+  }, 4500);
+}
+
+// Runs an action from a button: disables it meanwhile and shows errors as a toast.
+export async function withButton(button, action) {
+  if (button.disabled) return;
+  button.disabled = true;
+  try {
+    await action();
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    if (button.isConnected) button.disabled = false;
+  }
+}
+
+export function meter({ label, value, max, kind }) {
+  const fill = h('div', { class: 'meter-fill' });
+  const text = h('span', { class: 'meter-value' });
+  const element = h(
+    'div',
+    { class: `meter meter--${kind}` },
+    h('div', { class: 'meter-label' }, h('span', { text: label }), text),
+    h('div', { class: 'meter-track' }, fill),
+  );
+  const set = (current, total) => {
+    text.textContent = `${current} / ${total}`;
+    fill.style.width = `${total > 0 ? Math.max(0, Math.min(100, (current / total) * 100)) : 0}%`;
+  };
+  set(value, max);
+  return { element, set };
+}

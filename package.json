@@ -8,9 +8,12 @@
   },
   "scripts": {
     "dev": "wrangler d1 migrations apply DB --local && wrangler dev",
-    "test": "node --test --test-reporter=spec 'test/**/*.test.js'"
+    "test": "node --test --test-reporter=spec 'test/**/*.test.js'",
+    "validate": "node tools/validate-data.mjs",
+    "simulate": "node tools/simulate.mjs"
   },
   "devDependencies": {
+    "ajv": "8.20.0",
     "wrangler": "4.151.3"
   }
 }

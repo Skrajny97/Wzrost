@@ -1,0 +1,85 @@
+{
+  "combat": {
+    "kBase": 40,
+    "kPerLevel": 20,
+    "scalingPerPoint": 0.03,
+    "armorPerEndurance": 3,
+    "dodgePerDexterity": 2,
+    "dodgeCap": 0.3,
+    "critPerPerception": 2,
+    "critCap": 0.5,
+    "critMultiplier": 1.5,
+    "willPerPoint": 2,
+    "willCap": 0.6,
+    "speedMax": 3,
+    "speedKBase": 100,
+    "speedKPerLevel": 10,
+    "moveTime": 100,
+    "maxConsecutiveMoves": 3,
+    "maxActions": 300,
+    "targetWeights": { "front": 50, "middle": 30, "back": 20 },
+    "unarmed": { "attackName": "Cios pięścią", "min": 1, "max": 3 }
+  },
+  "character": {
+    "hpBase": 30,
+    "hpPerVitality": 5,
+    "hpPerLevel": 5,
+    "manaBase": 20,
+    "manaPerWisdom": 5
+  },
+  "monsters": {
+    "hpBase": 10,
+    "budgetBase": 6,
+    "damageMultiplier": 1.4
+  },
+  "items": {
+    "budgetBase": 10,
+    "budgetPerLevel": 4,
+    "affixWeight": 0.25,
+    "damageBase": 2,
+    "damagePerBudget": 0.35,
+    "armorPerBudget": 1.0,
+    "statPerBudget": 0.5,
+    "resistancePerBudget": 1.0
+  },
+  "hunt": {
+    "durations": [5, 15, 30, 60, 120, 240],
+    "shortHuntMaxMinutes": 30,
+    "fightIntervalMinutes": 12,
+    "findIntervalMinutes": 30,
+    "monsterLevelSpread": 1,
+    "groupFactors": [1, 0.7, 0.55],
+    "eliteChancePerFight": 0.006,
+    "eliteLevelBonus": 1,
+    "recoveryAfterFight": 0.3,
+    "soloXpBonus": 0.1,
+    "lowLevelFreeDiff": 2,
+    "lowLevelStepPenalty": 0.25,
+    "lowLevelMinMultiplier": 0.1,
+    "faintXpPenalty": 0.5,
+    "hpAfterFaint": 0.1
+  },
+  "rewards": {
+    "xpBase": 10,
+    "xpExponent": 1.1,
+    "eliteXpMultiplier": 3,
+    "goldPerLevel": 2,
+    "eliteGoldMultiplier": 3,
+    "itemDropChance": 0.08,
+    "eliteRarityBonus": 3,
+    "findGoldChance": 0.65,
+    "findGoldPerLevel": 4
+  },
+  "regen": {
+    "perMinute": 0.02,
+    "perVitalityPerMinute": 0.0002
+  },
+  "progression": {
+    "maxLevel": 100,
+    "hoursExponent": 0.99,
+    "xpPerHourScale": 65,
+    "classXpFactor": 1.25,
+    "freeResetMaxLevel": 10,
+    "classEvolutionLevel": 25
+  }
+}

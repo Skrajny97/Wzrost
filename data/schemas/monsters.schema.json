@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Potwory",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "name", "family", "position", "stats", "attack", "hpFactor", "armorFactor", "reward"],
+    "properties": {
+      "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+      "name": { "type": "string", "minLength": 1 },
+      "family": { "type": "string", "minLength": 1 },
+      "position": { "enum": ["front", "middle", "back"] },
+      "elite": { "type": "boolean" },
+      "stats": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["base", "growth"],
+        "properties": {
+          "base": { "$ref": "#/definitions/statMap" },
+          "growth": { "$ref": "#/definitions/statMap" }
+        }
+      },
+      "attack": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "category", "scaling", "damageFactor", "variance"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "category": { "enum": ["physical", "magical"] },
+          "element": { "type": "string" },
+          "scaling": { "type": "string" },
+          "damageFactor": { "type": "number", "exclusiveMinimum": 0 },
+          "variance": { "type": "number", "minimum": 0, "maximum": 0.9 },
+          "dot": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["effect", "chance", "power", "ticks"],
+            "properties": {
+              "effect": { "type": "string" },
+              "chance": { "type": "number", "minimum": 0, "maximum": 1 },
+              "power": { "type": "number", "exclusiveMinimum": 0 },
+              "ticks": { "type": "integer", "minimum": 1, "maximum": 10 }
+            }
+          }
+        },
+        "if": { "properties": { "category": { "const": "magical" } } },
+        "then": { "required": ["element"] }
+      },
+      "hpFactor": { "type": "number", "exclusiveMinimum": 0 },
+      "armorFactor": { "type": "number", "minimum": 0 },
+      "resistances": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["base", "perLevel"],
+          "properties": { "base": { "type": "number", "minimum": 0 }, "perLevel": { "type": "number", "minimum": 0 } }
+        }
+      },
+      "reward": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["xp", "gold"],
+        "properties": { "xp": { "type": "number", "minimum": 0 }, "gold": { "type": "number", "minimum": 0 } }
+      }
+    }
+  },
+  "definitions": {
+    "statMap": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } }
+  }
+}

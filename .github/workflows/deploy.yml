@@ -29,6 +29,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Walidacja danych gry
+        run: npm run validate
       - run: npm test
 
   configuration:

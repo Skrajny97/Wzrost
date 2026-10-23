@@ -1,0 +1,117 @@
+// Items: a base plus affixes that share a stat budget set by the item level
+// and rarity. Names follow the Gladiatus pattern "Prefix Base Suffix", with the
+// prefix agreeing with the base's grammatical gender.
+
+import { budget, weaponDamage } from './formulas.js';
+
+// `affixIds` picks the affixes instead of rolling them (tests, simulations).
+export function generateItem({ baseId, level, rarityId = 'common', element, affixIds }, rng, content) {
+  const base = content.basesById[baseId];
+  const rarity = content.raritiesById[rarityId];
+  const tuning = content.balance.items;
+  const total = budget(level, rarity.budget, content.balance);
+  const baseShare = total / (1 + tuning.affixWeight * rarity.affixes);
+  const affixShare = rarity.affixes > 0 ? (total - baseShare) / rarity.affixes : 0;
+
+  const item = { base: base.id, slot: base.slot, level, rarity: rarity.id, affixes: [] };
+  if (base.kind === 'weapon') {
+    const average = weaponDamage(baseShare, base.damageFactor, content.balance);
+    const min = Math.max(1, Math.round(average * (1 - base.variance)));
+    item.damage = { min, max: Math.max(min, Math.round(average * (1 + base.variance))) };
+    if (base.elements) item.element = element ?? rng.pick(base.elements);
+  } else if (base.kind === 'armor') {
+    item.armor = Math.max(1, Math.round(baseShare * tuning.armorPerBudget * base.armorFactor));
+  } else {
+    const value = Math.max(1, Math.round(baseShare * tuning.statPerBudget * base.statFactor));
+    item.implicit = { stat: base.stat, value };
+  }
+
+  if (affixIds) {
+    for (const id of affixIds.slice(0, rarity.affixes)) {
+      const affix = content.affixesById[id];
+      const kind = content.prefixes.includes(affix) ? 'prefix' : 'suffix';
+      item.affixes.push({ id, kind, stat: affix.stat, value: affixValue(affix.stat, affixShare, tuning) });
+    }
+    return item;
+  }
+
+  let kind = rng.chance(0.5) ? 'prefix' : 'suffix';
+  const used = new Set();
+  for (let i = 0; i < rarity.affixes; i++) {
+    const pool = (kind === 'prefix' ? content.prefixes : content.suffixes).filter((affix) => !used.has(affix.id));
+    const affix = rng.weighted(pool);
+    used.add(affix.id);
+    item.affixes.push({ id: affix.id, kind, stat: affix.stat, value: affixValue(affix.stat, affixShare, tuning) });
+    kind = kind === 'prefix' ? 'suffix' : 'prefix';
+  }
+  return item;
+}
+
+function affixValue(stat, share, tuning) {
+  const perBudget =
+    stat === 'armor' ? tuning.armorPerBudget : stat.startsWith('resist.') ? tuning.resistancePerBudget : tuning.statPerBudget;
+  return Math.max(1, Math.round(share * perBudget));
+}
+
+export function rollRarity(rng, content, bonus = 1) {
+  return rng.weighted(content.rarities, (rarity) => rarity.dropWeight * (rarity.affixes > 0 ? bonus : 1)).id;
+}
+
+export function randomItem(level, rng, content, { rarityBonus = 1 } = {}) {
+  const base = rng.pick(content.bases);
+  return generateItem({ baseId: base.id, level, rarityId: rollRarity(rng, content, rarityBonus) }, rng, content);
+}
+
+export function itemName(item, content) {
+  const base = content.basesById[item.base];
+  const prefix = item.affixes.find((affix) => affix.kind === 'prefix');
+  const suffix = item.affixes.find((affix) => affix.kind === 'suffix');
+  return [
+    prefix && content.affixesById[prefix.id].forms[base.gender],
+    base.name,
+    suffix && content.affixesById[suffix.id].text,
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+export function propertyName(stat, content) {
+  if (stat === 'armor') return 'Pancerz';
+  if (stat.startsWith('resist.')) return content.elementsById[stat.slice('resist.'.length)].resistance;
+  return content.statsById[stat].name;
+}
+
+export function itemProperties(item, content) {
+  const lines = [];
+  if (item.damage) {
+    const base = content.basesById[item.base];
+    const kind =
+      base.category === 'physical' ? 'fizyczne' : `magiczne, ${content.elementsById[item.element].name}`;
+    lines.push(`Obrażenia: ${item.damage.min}–${item.damage.max} (${kind})`);
+  }
+  if (item.armor) lines.push(`Pancerz: +${item.armor}`);
+  for (const { stat, value } of [...(item.implicit ? [item.implicit] : []), ...item.affixes]) {
+    lines.push(`${propertyName(stat, content)}: +${value}`);
+  }
+  return lines;
+}
+
+// Higher rarity first, then higher level: used to pick the best find of a hunt.
+export function itemRank(item, content) {
+  return content.rarities.findIndex((rarity) => rarity.id === item.rarity) * 1000 + item.level;
+}
+
+export function itemView(item, content) {
+  const rarity = content.raritiesById[item.rarity];
+  return {
+    name: itemName(item, content),
+    base: item.base,
+    slot: item.slot,
+    slotName: content.slotsById[item.slot].name,
+    level: item.level,
+    rarity: rarity.id,
+    rarityName: rarity.name,
+    color: rarity.color,
+    properties: itemProperties(item, content),
+  };
+}

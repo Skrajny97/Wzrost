@@ -1,0 +1,67 @@
+[
+  {
+    "id": "warrior",
+    "name": "Wojownik",
+    "role": "obrona",
+    "gentleStart": true,
+    "description": "Walczy na przedzie ciężką bronią i tarczą. Dużo wytrzymuje i rzadko mdleje, ale zabija wolniej.",
+    "position": "front",
+    "baseStats": { "strength": 8, "dexterity": 4, "vitality": 8, "endurance": 8, "intellect": 2, "wisdom": 2, "perception": 3, "will": 4 },
+    "growth": { "strength": 2, "vitality": 2, "endurance": 2 },
+    "autoPoints": { "strength": 3, "vitality": 2, "endurance": 2, "will": 1 },
+    "recovery": { "base": 0, "perWisdom": 0 },
+    "startingItems": [{ "base": "sword" }, { "base": "shield" }, { "base": "chainmail" }, { "base": "helmet" }, { "base": "gloves" }, { "base": "boots" }]
+  },
+  {
+    "id": "archer",
+    "name": "Łucznik",
+    "role": "dystans",
+    "gentleStart": false,
+    "description": "Strzela z tylnej linii. Jest szybki i celny, ale słabo znosi ciosy.",
+    "position": "back",
+    "baseStats": { "strength": 3, "dexterity": 8, "vitality": 6, "endurance": 4, "intellect": 2, "wisdom": 3, "perception": 7, "will": 4 },
+    "growth": { "dexterity": 2, "perception": 1, "vitality": 1 },
+    "autoPoints": { "dexterity": 4, "perception": 2, "vitality": 2 },
+    "recovery": { "base": 0, "perWisdom": 0 },
+    "startingItems": [{ "base": "bow" }, { "base": "quiver" }, { "base": "tunic" }, { "base": "hood" }, { "base": "gloves" }, { "base": "boots" }]
+  },
+  {
+    "id": "mage",
+    "name": "Mag",
+    "role": "magia",
+    "gentleStart": false,
+    "description": "Rzuca zaklęcia żywiołów z tylnej linii. Magii nie da się uniknąć ani zatrzymać pancerzem, ale mag jest kruchy.",
+    "position": "back",
+    "baseStats": { "strength": 1, "dexterity": 4, "vitality": 7, "endurance": 3, "intellect": 9, "wisdom": 5, "perception": 4, "will": 4 },
+    "growth": { "intellect": 2, "wisdom": 1, "vitality": 1 },
+    "autoPoints": { "intellect": 4, "vitality": 2, "wisdom": 1, "will": 1 },
+    "recovery": { "base": 0, "perWisdom": 0 },
+    "startingItems": [{ "base": "staff", "element": "fire" }, { "base": "focus" }, { "base": "robe" }, { "base": "hood" }, { "base": "gloves" }, { "base": "boots" }]
+  },
+  {
+    "id": "cleric",
+    "name": "Kleryk",
+    "role": "wsparcie",
+    "gentleStart": true,
+    "description": "Włada sakrum. Lepiej odpoczywa między walkami, więc bezpieczniej znosi długie wyprawy.",
+    "position": "middle",
+    "baseStats": { "strength": 3, "dexterity": 3, "vitality": 5, "endurance": 5, "intellect": 6, "wisdom": 8, "perception": 3, "will": 4 },
+    "growth": { "wisdom": 2, "intellect": 1, "vitality": 1 },
+    "autoPoints": { "intellect": 3, "wisdom": 2, "vitality": 2, "endurance": 1 },
+    "recovery": { "base": 0.07, "perWisdom": 0.002 },
+    "startingItems": [{ "base": "aspergillum" }, { "base": "shield" }, { "base": "robe" }, { "base": "hood" }, { "base": "gloves" }, { "base": "boots" }]
+  },
+  {
+    "id": "shadow",
+    "name": "Cień",
+    "role": "zwinność",
+    "gentleStart": false,
+    "description": "Zwinny i nieuchwytny. Często trafia krytycznie i unika ciosów, ale ma mało HP.",
+    "position": "middle",
+    "baseStats": { "strength": 4, "dexterity": 8, "vitality": 7, "endurance": 5, "intellect": 2, "wisdom": 1, "perception": 7, "will": 3 },
+    "growth": { "dexterity": 2, "perception": 1, "strength": 1 },
+    "autoPoints": { "dexterity": 4, "perception": 2, "vitality": 2 },
+    "recovery": { "base": 0, "perWisdom": 0 },
+    "startingItems": [{ "base": "dagger" }, { "base": "tunic" }, { "base": "hood" }, { "base": "gloves" }, { "base": "boots" }]
+  }
+]

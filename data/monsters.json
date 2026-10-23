@@ -1,0 +1,178 @@
+[
+  {
+    "id": "wolf",
+    "name": "Wilk",
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 5, "vitality": 3, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 3, "will": 2 },
+      "growth": { "strength": 2.5, "dexterity": 1.5, "vitality": 2.5, "endurance": 1.5, "perception": 1, "will": 0.5 }
+    },
+    "attack": { "name": "Ugryzienie", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.2 },
+    "hpFactor": 0.6,
+    "armorFactor": 0.3,
+    "reward": { "xp": 1.0, "gold": 0.8 }
+  },
+  {
+    "id": "boar",
+    "name": "Dzik",
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 6, "dexterity": 2, "vitality": 5, "endurance": 5, "intellect": 1, "wisdom": 1, "perception": 2, "will": 3 },
+      "growth": { "strength": 2.5, "dexterity": 0.5, "vitality": 3, "endurance": 2.5, "perception": 0.5, "will": 1 }
+    },
+    "attack": { "name": "Szarża", "category": "physical", "scaling": "strength", "damageFactor": 0.65, "variance": 0.3 },
+    "hpFactor": 0.7,
+    "armorFactor": 0.5,
+    "reward": { "xp": 1.2, "gold": 0.8 }
+  },
+  {
+    "id": "crow",
+    "name": "Kruk",
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 7, "vitality": 2, "endurance": 1, "intellect": 2, "wisdom": 2, "perception": 5, "will": 2 },
+      "growth": { "strength": 1, "dexterity": 2.5, "vitality": 1.5, "endurance": 0.5, "perception": 1.5, "will": 0.5 }
+    },
+    "attack": { "name": "Dziobnięcie", "category": "physical", "scaling": "dexterity", "damageFactor": 0.4, "variance": 0.2 },
+    "hpFactor": 0.4,
+    "armorFactor": 0.1,
+    "reward": { "xp": 0.6, "gold": 0.4 }
+  },
+  {
+    "id": "viper",
+    "name": "Żmija",
+    "family": "snake",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 3, "dexterity": 6, "vitality": 2, "endurance": 2, "intellect": 1, "wisdom": 1, "perception": 4, "will": 2 },
+      "growth": { "strength": 1.5, "dexterity": 2, "vitality": 2, "endurance": 1, "perception": 1, "will": 0.5 }
+    },
+    "attack": {
+      "name": "Ukąszenie",
+      "category": "physical",
+      "scaling": "dexterity",
+      "damageFactor": 0.45,
+      "variance": 0.2,
+      "dot": { "effect": "poisoned", "chance": 0.4, "power": 0.35, "ticks": 3 }
+    },
+    "hpFactor": 0.45,
+    "armorFactor": 0.2,
+    "resistances": { "poison": { "base": 10, "perLevel": 3 } },
+    "reward": { "xp": 0.9, "gold": 0.5 }
+  },
+  {
+    "id": "badger",
+    "name": "Borsuk",
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 3, "vitality": 4, "endurance": 6, "intellect": 1, "wisdom": 1, "perception": 2, "will": 3 },
+      "growth": { "strength": 2, "dexterity": 1, "vitality": 2.5, "endurance": 2.5, "perception": 0.5, "will": 1 }
+    },
+    "attack": { "name": "Pazury", "category": "physical", "scaling": "strength", "damageFactor": 0.55, "variance": 0.2 },
+    "hpFactor": 0.6,
+    "armorFactor": 0.6,
+    "reward": { "xp": 1.0, "gold": 0.7 }
+  },
+  {
+    "id": "lynx",
+    "name": "Ryś",
+    "family": "beast",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 8, "vitality": 3, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 7, "will": 3 },
+      "growth": { "strength": 2, "dexterity": 2.5, "vitality": 2, "endurance": 1, "perception": 2, "will": 0.5 }
+    },
+    "attack": { "name": "Cios łapą", "category": "physical", "scaling": "dexterity", "damageFactor": 0.6, "variance": 0.25 },
+    "hpFactor": 0.5,
+    "armorFactor": 0.25,
+    "reward": { "xp": 1.2, "gold": 0.9 }
+  },
+  {
+    "id": "spider",
+    "name": "Krzyżak",
+    "family": "spider",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 3, "dexterity": 5, "vitality": 3, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 4, "will": 2 },
+      "growth": { "strength": 1.5, "dexterity": 2, "vitality": 2, "endurance": 1.5, "perception": 1, "will": 0.5 }
+    },
+    "attack": {
+      "name": "Jadowite ukąszenie",
+      "category": "physical",
+      "scaling": "dexterity",
+      "damageFactor": 0.4,
+      "variance": 0.2,
+      "dot": { "effect": "poisoned", "chance": 0.5, "power": 0.4, "ticks": 3 }
+    },
+    "hpFactor": 0.5,
+    "armorFactor": 0.3,
+    "resistances": { "poison": { "base": 15, "perLevel": 3 } },
+    "reward": { "xp": 1.0, "gold": 0.6 }
+  },
+  {
+    "id": "alpha-wolf",
+    "name": "Basior",
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 7, "dexterity": 6, "vitality": 5, "endurance": 4, "intellect": 1, "wisdom": 1, "perception": 4, "will": 3 },
+      "growth": { "strength": 3, "dexterity": 1.5, "vitality": 3, "endurance": 2, "perception": 1, "will": 1 }
+    },
+    "attack": { "name": "Kły basiora", "category": "physical", "scaling": "strength", "damageFactor": 0.7, "variance": 0.2 },
+    "hpFactor": 0.75,
+    "armorFactor": 0.35,
+    "reward": { "xp": 1.5, "gold": 1.0 }
+  },
+  {
+    "id": "wisp",
+    "name": "Błędnica",
+    "family": "spirit",
+    "position": "back",
+    "elite": true,
+    "stats": {
+      "base": { "strength": 1, "dexterity": 6, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 6, "perception": 5, "will": 6 },
+      "growth": { "dexterity": 1.5, "vitality": 3, "intellect": 3, "wisdom": 1, "will": 1.5 }
+    },
+    "attack": {
+      "name": "Błędny ogień",
+      "category": "magical",
+      "element": "fire",
+      "scaling": "intellect",
+      "damageFactor": 0.5,
+      "variance": 0.25,
+      "dot": { "effect": "burning", "chance": 0.35, "power": 0.3, "ticks": 3 }
+    },
+    "hpFactor": 1.0,
+    "armorFactor": 0.2,
+    "resistances": { "fire": { "base": 20, "perLevel": 4 } },
+    "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "likho",
+    "name": "Licho",
+    "family": "spirit",
+    "position": "middle",
+    "elite": true,
+    "stats": {
+      "base": { "strength": 6, "dexterity": 5, "vitality": 6, "endurance": 5, "intellect": 7, "wisdom": 4, "perception": 5, "will": 6 },
+      "growth": { "strength": 2, "dexterity": 1.5, "vitality": 3.5, "endurance": 2, "intellect": 2.5, "will": 1.5 }
+    },
+    "attack": {
+      "name": "Mroźny dotyk",
+      "category": "magical",
+      "element": "frost",
+      "scaling": "intellect",
+      "damageFactor": 0.55,
+      "variance": 0.2,
+      "dot": { "effect": "chilled", "chance": 0.35, "power": 0.3, "ticks": 3 }
+    },
+    "hpFactor": 1.1,
+    "armorFactor": 0.4,
+    "resistances": { "frost": { "base": 25, "perLevel": 4 } },
+    "reward": { "xp": 1.0, "gold": 1.0 }
+  }
+]

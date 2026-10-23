@@ -2,7 +2,7 @@
 
 Solowa, casualowa gra przeglądarkowa litRPG na telefon, oparta na timerach. Jedynym źródłem prawdy o projekcie jest [dokument projektowy](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX). Założenia przyjęte w trakcie budowy są w [DECISIONS.md](DECISIONS.md).
 
-Stan: **Etap 0, konfiguracja.** Działa konto (rejestracja, logowanie, wylogowanie), serwer z bazą D1 i automatyczne wdrażanie.
+Stan: **Etap 1, rdzeń.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, statystyki z wolnymi punktami, ekwipunek i plecak, polowania na czasie serwera w dwóch regionach Skraju Puszczy, walka do trzech na trzech, raport z animacją najważniejszej walki, omdlenie i Dziennik.
 
 ## Adres gry
 
@@ -84,15 +84,17 @@ Push na inną gałąź uruchamia tylko testy.
 ## Struktura repozytorium
 
 ```
-src/engine/   silnik gry: czyste, deterministyczne funkcje (od etapu 1)
-src/server/   Worker: API, logowanie, sesje
+src/engine/   silnik gry: czyste, deterministyczne funkcje (walka, polowania, przedmioty, progresja)
+src/server/   Worker: API, logowanie, sesje, postać, ekwipunek, polowania, raporty
 src/client/   strona gry: HTML, CSS i moduły ES, bez kroku budowania
-data/         treść gry w JSON (od etapu 1)
+data/         treść gry w JSON i schematy w data/schemas
 migrations/   schemat bazy D1
-tools/        skrypty wdrożenia, później symulacje balansu i walidacja danych
+tools/        wdrożenie, walidacja danych, symulacja balansu
 test/         testy: node:test i lokalne środowisko Workers z bazą D1
 DECISIONS.md  rejestr założeń
 ```
+
+Treść gry (klasy, potwory, regiony, przedmioty, afiksy, teksty raportów, kolejność odblokowań) zmienia się w plikach `data/*.json`, bez dotykania kodu. Walidacja sprawdza je przy każdym pushu.
 
 ## Praca lokalna
 
@@ -100,9 +102,13 @@ Wymaga Node.js 22 lub nowszego.
 
 ```sh
 npm ci
-npm test       # testy jednostkowe i testy API na lokalnej bazie D1
-npm run dev    # gra pod http://localhost:8787 z lokalną bazą D1
+npm test           # testy silnika, danych, strony i API na lokalnej bazie D1
+npm run validate   # sprawdzenie plików data/ schematami i odwołań między nimi
+npm run simulate   # symulacja 10 000 wypraw: omdlenia, XP, złoto i przedmioty na godzinę
+npm run dev        # gra pod http://localhost:8787 z lokalną bazą D1
 ```
+
+Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 60,240 --hunts 2000` albo `npm run simulate -- --calibrate` (propozycja stałej krzywej XP).
 
 ## API
 
@@ -113,5 +119,20 @@ npm run dev    # gra pod http://localhost:8787 z lokalną bazą D1
 | POST | `/api/auth/login` | logowanie: `identifier` (login lub e-mail), `password` |
 | POST | `/api/auth/logout` | wylogowanie |
 | GET | `/api/me` | zalogowany gracz |
+| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości i regionów, czasy polowań, odblokowania |
+| GET | `/api/character` | pełny widok postaci (404 `no_character`, gdy jej nie ma) |
+| POST | `/api/character` | nowa postać: `name`, `classId` |
+| POST | `/api/character/points` | rozdanie punktów: `points`, np. `{ "strength": 2 }` |
+| POST | `/api/character/points/auto` | „Rozdaj według klasy” |
+| POST | `/api/character/points/reset` | darmowe zerowanie punktów (do poziomu 10) |
+| POST | `/api/items/:id/equip` | załóż przedmiot z plecaka |
+| POST | `/api/items/:id/unequip` | zdejmij przedmiot do plecaka |
+| POST | `/api/items/:id/discard` | wyrzuć przedmiot z plecaka |
+| GET | `/api/hunts/options` | poziom zagrożenia dla każdego regionu i czasu |
+| POST | `/api/hunts` | wyrusz: `regionId`, `minutes` |
+| POST | `/api/hunts/cancel` | przerwij trwające polowanie |
+| POST | `/api/hunts/claim` | odbierz raport zakończonego polowania |
+| GET | `/api/reports` | 50 ostatnich raportów (Dziennik) |
+| GET | `/api/reports/:id` | pełny raport |
 
 Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie `message` jest po polsku.
