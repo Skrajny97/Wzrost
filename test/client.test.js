@@ -116,7 +116,7 @@ test('the narrator knows when and where each of its lines shows', () => {
     const beat = new RegExp(`(?:^|\\s)'?${line.id}'?: \\{([^}]*)\\}`).exec(beats);
     assert.ok(beat, `narrator.js has no beat for ${line.id}`);
     // A pointer or a tap needs its place.
-    if (line.kind !== 'card') assert.match(beat[1], /guide:|selector:/, `${line.id} has no place to point at`);
+    if (line.kind !== 'card') assert.match(beat[1], /place:/, `${line.id} has no place to point at`);
   }
 });
 

@@ -737,7 +737,7 @@ describe('Time Points and the narrator', () => {
     assert.deepEqual(view.tutorial, []);
     const { data } = await call('GET', '/api/content');
     const cards = data.tutorial.lines.filter((line) => line.kind === 'card').map((line) => line.id);
-    assert.deepEqual(cards, ['intro', 'time', 'skip', 'report', 'character', 'camp', 'ending']);
+    assert.deepEqual(cards, ['intro', 'purpose', 'test', 'trial', 'skip', 'report', 'character', 'stats', 'camp', 'ending']);
     assert.equal(data.tutorial.startTimePoints, start);
     assert.equal(data.tutorial.$comment, undefined);
   });
@@ -797,12 +797,13 @@ describe('Time Points and the narrator', () => {
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     assert.deepEqual((await see({ card: 'intro' })).data.character.tutorial, ['intro']);
     assert.deepEqual((await see({ card: 'intro' })).data.character.tutorial, ['intro']);
-    assert.deepEqual((await see({ card: 'time' })).data.character.tutorial, ['intro', 'time']);
-    assert.deepEqual((await see({ card: 'report-summary' })).data.character.tutorial, ['intro', 'time', 'report-summary']);
+    assert.deepEqual((await see({ card: 'purpose' })).data.character.tutorial, ['intro', 'purpose']);
+    assert.deepEqual((await see({ card: 'report-summary' })).data.character.tutorial, ['intro', 'purpose', 'report-summary']);
     assert.equal((await see({ card: 'dragon' })).data.error.code, 'invalid_card');
-    // A tap is done when the game moves on, so it is not kept.
+    // A lead or a tap is done when the game moves on, so it is not kept.
     assert.equal((await see({ card: 'tap-region' })).data.error.code, 'invalid_card');
-    const once = (await call('GET', '/api/content')).data.tutorial.lines.filter((line) => line.kind !== 'tap');
+    assert.equal((await see({ card: 'lead-camp' })).data.error.code, 'invalid_card');
+    const once = (await call('GET', '/api/content')).data.tutorial.lines.filter((line) => line.kind === 'card' || line.kind === 'point');
     assert.deepEqual((await see({ skip: true })).data.character.tutorial, once.map((line) => line.id));
 
     // A character from before the introduction never sees it.

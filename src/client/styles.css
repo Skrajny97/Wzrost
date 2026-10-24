@@ -3645,11 +3645,18 @@ a.segmented-option {
   pointer-events: none;
 }
 
+/* One shade over the whole screen, with a hole for each lit place
+   (clip-path, set in narrator.js): taps in a hole reach the game. */
 .guide-shade {
   position: fixed;
+  inset: 0;
   background: rgba(5, 8, 4, 0.62);
   pointer-events: auto;
   touch-action: none;
+}
+
+.guide-shade--see-through {
+  pointer-events: none;
 }
 
 .guide-ring {
@@ -3751,6 +3758,66 @@ a.segmented-option {
 .guide-note--above .guide-bubble::before {
   bottom: -10px;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+/* The narrator with a small scroll beside the lit place. */
+.guide-note--scroll {
+  align-items: flex-start;
+}
+
+.guide-scroll {
+  display: grid;
+  flex: 1;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
+  pointer-events: auto;
+}
+
+.guide-scroll .narrator-rod {
+  height: 10px;
+  margin: 0 -6px;
+  border-radius: 5px;
+}
+
+.guide-scroll .narrator-rod::before,
+.guide-scroll .narrator-rod::after {
+  top: -2px;
+  width: 8px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.guide-scroll .narrator-rod::before {
+  left: -6px;
+}
+
+.guide-scroll .narrator-rod::after {
+  right: -6px;
+}
+
+.guide-sheet {
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 250, 235, 0.55), transparent 70%),
+    linear-gradient(#ece2c8, #dfd0ab);
+  box-shadow:
+    inset 0 8px 8px -7px rgba(60, 40, 20, 0.45),
+    inset 0 -8px 8px -7px rgba(60, 40, 20, 0.45);
+}
+
+.guide-page {
+  display: grid;
+  gap: 8px;
+  max-height: 45vh;
+  padding: 10px 14px;
+  overflow-y: auto;
+  color: #33281c;
+  font-family: var(--font-world);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.guide-page p {
+  margin: 0;
 }
 
 .guide-skip {

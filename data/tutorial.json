@@ -1,5 +1,5 @@
 {
-  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei. card: narrator czyta z pergaminu, który rozwija się przed kwestią i zwija po niej. point: sam narrator przy podświetlonym miejscu mówi kwestię i czeka na „Dalej”. tap: sam narrator przy podświetlonym miejscu, które trzeba stuknąć. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest.",
+  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest.",
   "skipLabel": "Pomiń wprowadzenie",
   "nextLabel": "Dalej",
   "lines": [
@@ -8,64 +8,122 @@
       "kind": "card",
       "text": [
         "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę.",
-        "Ja opowiadam tę historię, a Ty ją prowadzisz: przygotowujesz postać, wysyłasz ją w las i czytasz, co tam zaszło."
+        "Witaj, przybyszu."
       ]
     },
+    { "id": "purpose", "kind": "card", "text": ["Znalazłeś się w miejscu, którego celem jest rozwój. Liczę na to, że osiągniesz szczyty."] },
     {
-      "id": "time",
+      "id": "test",
       "kind": "card",
-      "text": [
-        "Czas płynie tu naprawdę: wyprawa trwa tyle, ile wybierzesz. Ale to moja opowieść, więc daję Ci {points} Punktów Czasu. Każdy z nich przewija jedną minutę.",
-        "Wybierz Wiatrołomy i wyślij postać na 30 minut. Kiedy wyruszy, przewiniemy ten czas razem."
-      ]
+      "text": ["Na początku drobny test dla Ciebie. Jedno z najbezpieczniejszych wyzwań, jakie Cię czekają. Udaj się na wyprawę na Skraj Wiatrołomów."]
     },
     { "id": "tap-region", "kind": "tap", "text": ["Stuknij Wiatrołomy."] },
     { "id": "tap-area", "kind": "tap", "text": ["Wybierz Skraj Wiatrołomów."] },
+    { "id": "trial", "kind": "card", "text": ["Nie jesteś jeszcze gotów na dłuższe wyprawy. Zacznijmy od półgodzinnej próby."] },
     { "id": "tap-start", "kind": "tap", "text": ["Suwak stoi na 30 minutach. Stuknij „Wyrusz”."] },
     {
       "id": "skip",
       "kind": "card",
       "text": [
-        "Postać jest już w lesie. Możesz poczekać albo stuknąć „Przewiń” i od razu zobaczyć, co się wydarzyło.",
-        "Punktów Czasu nie da się kupić. Kolejne przychodzą z każdym poziomem postaci i klasy, a czasem można je znaleźć w puszczy."
+        "Jesteś już w lesie. Czas jest nieubłagany… gdyby nie pomoc Systemu. Punkty Czasu pozwolą Ci przyspieszyć eksplorację. Proszę – oto {points} jednostek na start. Potraktuj to… jako drogocenny prezent."
       ]
     },
     { "id": "tap-skip", "kind": "tap", "text": ["Przewiń czas Punktami Czasu."] },
     { "id": "tap-claim", "kind": "tap", "text": ["Odbierz raport."] },
-    { "id": "report", "kind": "card", "text": ["Każda wyprawa kończy się raportem. Pokażę Ci, gdzie patrzeć."] },
-    { "id": "report-summary", "kind": "point", "text": ["Na górze masz wynik wyprawy. Widać tu, co postać zdobyła i ile HP jej zostało."] },
-    { "id": "report-system", "kind": "point", "text": ["Tu odzywa się System. Mówi krótko i podaje same liczby."] },
-    { "id": "report-fights", "kind": "point", "text": ["Tu są walki z tej wyprawy. Stuknij którąś, a zobaczysz ją cios po ciosie. Gwiazdka oznacza najważniejszą."] },
-    { "id": "report-items", "kind": "point", "text": ["Wszystko, co postać znalazła, jest już w plecaku. Tu widzisz, co to było."] },
-    { "id": "report-account", "kind": "point", "text": ["Pełna relacja opowiada całą wyprawę, minuta po minucie."] },
-    { "id": "tap-character", "kind": "tap", "text": ["Zajrzyj do Postaci."] },
+    {
+      "id": "report",
+      "kind": "card",
+      "text": ["Twoja wyprawa zakończyła się sukcesem, ale by poznać jego wagę… pozwól, że przeprowadzę Cię przez raport podróży."]
+    },
+    { "id": "report-summary", "kind": "point", "text": ["Na samej górze raportu możesz zobaczyć najważniejsze informacje."] },
+    {
+      "id": "report-system",
+      "kind": "point",
+      "text": ["To domena Systemu. Nikt ostatecznie nie rozwikłał tajemnic wspomnianego. Jego użyteczność jednak – masz podaną jak na dłoni."]
+    },
+    {
+      "id": "report-fights",
+      "kind": "point",
+      "text": [
+        "System rejestruje potyczki, które stoczyłeś w trakcie eksploracji. Możesz je przejrzeć, wybierając z zakładek. Gwiazdka przy zakładce oznacza najważniejszą z walk."
+      ]
+    },
+    { "id": "report-items", "kind": "point", "text": ["To wszystko, co znalazłeś podczas wyprawy. Wylądowało już w Twoim plecaku."] },
+    { "id": "report-account", "kind": "point", "text": ["A jeśli interesuje Cię przebieg całej wyprawy – System dokładnie opisuje ją w tym miejscu."] },
+    { "id": "lead-character", "kind": "lead", "text": ["Zajrzyjmy jeszcze do okienka Postaci, którą przyszło Ci kierować."] },
     {
       "id": "character",
       "kind": "card",
       "text": [
-        "Tu widać, co postać ma na sobie. Pierwszą broń zdobywa w walce i od razu bierze ją do ręki.",
-        "Każdy poziom daje wolne punkty. Rozdasz je w Statystykach, a jeśli nie chcesz liczyć, wystarczy „Rozdaj według klasy”."
+        "W tym oknie Systemu możesz przejrzeć swój ekwipunek. Podczas wyprawy zdobyłeś broń i jak widzisz – System ułatwił sprawę i pozwolił Ci jej dobyć bez Twojej ingerencji."
       ]
     },
-    { "id": "tap-stats", "kind": "tap", "text": ["Otwórz Statystyki."] },
-    { "id": "tap-points", "kind": "tap", "text": ["Rozdaj wolne punkty jednym stuknięciem."] },
-    { "id": "tap-camp", "kind": "tap", "text": ["Teraz obóz, w prawym górnym rogu."] },
+    {
+      "id": "lead-stats",
+      "kind": "lead",
+      "text": ["Zdobycie poziomów w wyniku wypraw – czy to klasy, czy postaci – daje Ci również punkty statystyk do rozdysponowania. Zajrzyjmy do nich."]
+    },
+    {
+      "id": "stats",
+      "kind": "card",
+      "text": [
+        "System ułatwia sprawę, dzięki czemu nie musisz głowić się nad tymi wszystkimi liczbami. Możesz rozdysponować zdobyte punkty tak, by najlepiej pasowały do Twojej klasy. Ale! Możesz budować swoją postać również wedle własnego uznania."
+      ]
+    },
+    { "id": "free-points", "kind": "tap", "text": ["Rozdaj wolne punkty."] },
+    {
+      "id": "lead-camp",
+      "kind": "lead",
+      "text": ["Żadna szanująca się postać nie pozbawi siebie opcji budowania obozu, a kto wie, może z czasem i całej wioski. Zajrzyjmy do Twojego obozu."]
+    },
     {
       "id": "camp",
       "kind": "card",
-      "text": ["Ktoś już kiedyś obozował na tej polanie. Zostawił trochę drewna, kamieni i kilka monet. Teraz to wszystko należy do Ciebie."]
+      "text": ["Na tej polanie ktoś już kiedyś obozował. Dobrze dla Ciebie! Wygląda na to, że zostawił trochę drewna, kamieni i kilka monet. Znalezione – niekradzione."]
     },
-    { "id": "camp-sawmill", "kind": "point", "text": ["Tu da się postawić tartak. Kiedy stanie, sam będzie ciął drewno."] },
-    { "id": "tap-plot", "kind": "tap", "text": ["Ale zacznij od ogniska. Przy ogniu postać szybciej wraca do sił."] },
+    {
+      "id": "camp-sawmill",
+      "kind": "point",
+      "text": [
+        "To dobre miejsce na zbudowanie tartaku. System wspomaga nas w codziennym funkcjonowaniu, także i produkcja drewna w takowym odbywa się automatycznie. Będziesz musiał jedynie zbierać wyprodukowane drewno."
+      ]
+    },
+    {
+      "id": "camp-quarry",
+      "kind": "point",
+      "text": ["Podobna zasada stosuje się do Kamieniołomu, który wydobędzie dla Ciebie kamienie, i Kopalni, z której uzyskasz rudę żelaza."]
+    },
+    {
+      "id": "camp-anvil",
+      "kind": "point",
+      "text": ["A gdy zapragniesz wzmocnić posiadane przedmioty – możesz zastanowić się nad postawieniem i rozwojem Kowadła. Pozwoli Ci ulepszyć swój ekwipunek."]
+    },
+    {
+      "id": "lead-campfire",
+      "kind": "lead",
+      "text": [
+        "Teraz zajmijmy się jednak Twoim powrotem do zdrowia, byś mógł szybciej wyruszyć na kolejną wyprawę. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko."
+      ]
+    },
     { "id": "tap-build", "kind": "tap", "text": ["Zbuduj Ognisko."] },
-    { "id": "camp-countdown", "kind": "point", "text": ["Budowa trochę potrwa. Obóz rośnie także wtedy, gdy postać jest na wyprawie."] },
+    {
+      "id": "camp-countdown",
+      "kind": "point",
+      "text": [
+        "Budowa musi zawsze trochę potrwać, szczególnie jeśli chodzi o rozbudowę. Na szczęście i w tym System Cię wyręczy. Podczas budowy możesz wykonywać wszelkie inne dostępne aktywności."
+      ]
+    },
+    {
+      "id": "settings",
+      "kind": "point",
+      "text": [
+        "Dla Twojej wygody możesz również zajrzeć do części ustawień samego Systemu i ustawić je tak, jak Ci się żywnie podoba. Jeśli stwierdzisz, że popełniłeś za dużo błędów – możesz nawet zacząć od nowa."
+      ]
+    },
     {
       "id": "ending",
       "kind": "card",
-      "text": [
-        "Tyle na początek. Puszcza to dopiero pierwszy krok drogi, która prowadzi dalej, niż sięga wzrok.",
-        "Reszty dowiesz się w swoim czasie."
-      ]
+      "text": ["Tyle na początek. Resztę funkcjonalności Systemu, swój cel i upodobania – będziesz musiał poznać sam. Powodzenia."]
     }
   ]
 }

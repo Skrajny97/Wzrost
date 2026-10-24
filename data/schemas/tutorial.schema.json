@@ -36,9 +36,11 @@
           "id": {
             "enum": [
               "intro",
-              "time",
+              "purpose",
+              "test",
               "tap-region",
               "tap-area",
+              "trial",
               "tap-start",
               "skip",
               "tap-skip",
@@ -49,16 +51,20 @@
               "report-fights",
               "report-items",
               "report-account",
-              "tap-character",
+              "lead-character",
               "character",
-              "tap-stats",
-              "tap-points",
-              "tap-camp",
+              "lead-stats",
+              "stats",
+              "free-points",
+              "lead-camp",
               "camp",
               "camp-sawmill",
-              "tap-plot",
+              "camp-quarry",
+              "camp-anvil",
+              "lead-campfire",
               "tap-build",
               "camp-countdown",
+              "settings",
               "ending"
             ]
           },
@@ -66,9 +72,10 @@
             "enum": [
               "card",
               "point",
+              "lead",
               "tap"
             ],
-            "description": "card: pergamin, który narrator czyta. point: sam narrator przy podświetlonym miejscu, z przyciskiem „Dalej”. tap: sam narrator przy miejscu, które trzeba stuknąć."
+            "description": "card: pergamin na środku ekranu. point: pergamin przy podświetlonym miejscu, z przyciskiem „Dalej”. lead: pergamin przy miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć."
           },
           "text": {
             "type": "array",

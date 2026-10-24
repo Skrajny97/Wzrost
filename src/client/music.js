@@ -29,6 +29,8 @@ let touched = false; // browsers play sound only after a touch
 let audio = null;
 let level = null; // gain: the player's volume
 let fade = null; // gain: the end of a track and the change of tracks
+let duck = null; // gain: lower while the narrator speaks
+let ducked = false;
 let fading = false; // the end of the track is fading out
 let restart = null; // the pause between two plays of a track
 let switching = false;
@@ -129,9 +131,24 @@ function setUp() {
   if (context) {
     level = context.createGain();
     fade = context.createGain();
-    context.createMediaElementSource(audio).connect(fade).connect(level).connect(context.destination);
+    duck = context.createGain();
+    duck.gain.value = ducked ? DUCK_LEVEL : 1;
+    context.createMediaElementSource(audio).connect(fade).connect(level).connect(duck).connect(context.destination);
   }
   applyVolume();
+}
+
+// While the narrator speaks, the music steps back to a quarter of its level,
+// and comes back slowly after.
+const DUCK_LEVEL = 0.25;
+
+export function duckMusic(down) {
+  ducked = down;
+  if (!duck) return;
+  const now = duck.context.currentTime;
+  duck.gain.cancelScheduledValues(now);
+  duck.gain.setValueAtTime(duck.gain.value, now);
+  duck.gain.linearRampToValueAtTime(down ? DUCK_LEVEL : 1, now + (down ? 0.4 : 1.2));
 }
 
 function applyVolume() {

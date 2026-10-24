@@ -223,19 +223,30 @@ function loadRecordings() {
   if (!recordings || !context) return;
   const voices = Object.values(recordings.voices).flatMap((voice) => Object.values(voice));
   const all = [...Object.values(recordings.sounds), ...Object.values(recordings.effects ?? {}), ...voices];
-  for (const file of new Set(all.flatMap((sound) => sound.files))) {
-    if (buffers.has(file)) continue;
-    const loading = fetch(`/${file}`)
-      .then((response) => {
-        if (!response.ok) throw new Error(`sound ${response.status}`);
-        return response.arrayBuffer();
-      })
-      // The callback form also works in older Safari.
-      .then((data) => new Promise((resolve, reject) => context.decodeAudioData(data, resolve, reject)))
-      .then((buffer) => buffers.set(file, buffer))
-      .catch(() => buffers.delete(file));
-    buffers.set(file, loading);
-  }
+  for (const file of new Set(all.flatMap((sound) => sound.files))) decode(file);
+}
+
+// A recording decoded once: the sound, or the promise of it (null when it
+// cannot be had).
+function decode(file) {
+  if (buffers.has(file)) return buffers.get(file);
+  const loading = fetch(`/${file}`)
+    .then((response) => {
+      if (!response.ok) throw new Error(`sound ${response.status}`);
+      return response.arrayBuffer();
+    })
+    // The callback form also works in older Safari.
+    .then((data) => new Promise((resolve, reject) => context.decodeAudioData(data, resolve, reject)))
+    .then((buffer) => {
+      buffers.set(file, buffer);
+      return buffer;
+    })
+    .catch(() => {
+      buffers.delete(file);
+      return null;
+    });
+  buffers.set(file, loading);
+  return loading;
 }
 
 // Plays one of a sound's recordings, a little higher or lower each time.
@@ -254,6 +265,48 @@ function playRecording(sound, { gain = 1, delay = 0 } = {}) {
 }
 
 const canPlay = () => volume > 0 && context && context.state === 'running';
+
+// The narrator's voice (narrator.js): one line at a time, a little louder
+// than the effects it plays with. `onEnd` follows its end or its stop.
+const NARRATION_GAIN = 2.2;
+let narration = null; // { source, stopped, onEnd } of the line being read
+
+export function playNarration(file, { onEnd } = {}) {
+  stopNarration();
+  if (!canPlay()) return;
+  const current = { source: null, stopped: false, onEnd };
+  narration = current;
+  Promise.resolve(decode(file)).then((buffer) => {
+    if (current.stopped || narration !== current) return;
+    if (!buffer) {
+      stopNarration();
+      return;
+    }
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+    const amplitude = context.createGain();
+    amplitude.gain.value = NARRATION_GAIN;
+    source.connect(amplitude).connect(master);
+    source.onended = () => {
+      if (narration === current) stopNarration();
+    };
+    current.source = source;
+    source.start();
+  });
+}
+
+export function stopNarration() {
+  if (!narration) return;
+  const current = narration;
+  narration = null;
+  current.stopped = true;
+  try {
+    current.source?.stop();
+  } catch {
+    // Already over.
+  }
+  current.onEnd?.();
+}
 
 // A blow lands: the recording of the attack's kind (weapon or monster), with
 // a heavier layer for a critical hit.
