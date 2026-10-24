@@ -267,13 +267,42 @@ function playRecording(sound, { gain = 1, delay = 0 } = {}) {
 const canPlay = () => volume > 0 && context && context.state === 'running';
 
 // The narrator's voice (narrator.js): one line at a time, a little louder
-// than the effects it plays with. `onEnd` follows its end or its stop.
+// than the effects it plays with. `onEnd` follows its end or its stop, and
+// comes at once for a line that cannot be heard.
 const NARRATION_GAIN = 2.2;
 let narration = null; // { source, stopped, onEnd } of the line being read
 
+// "Głos narratora" on the creation screen and in the settings, kept in this
+// browser. Switched off, it silences the line being read.
+const VOICE_KEY = 'insight.narratorVoice';
+let voiceOn = readVoice();
+
+function readVoice() {
+  try {
+    return localStorage.getItem(VOICE_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
+
+export const narratorVoiceOn = () => voiceOn;
+
+export function setNarratorVoice(on) {
+  voiceOn = on;
+  try {
+    localStorage.setItem(VOICE_KEY, on ? 'on' : 'off');
+  } catch {
+    // Without storage the choice lasts until the page is closed.
+  }
+  if (!on) stopNarration();
+}
+
 export function playNarration(file, { onEnd } = {}) {
   stopNarration();
-  if (!canPlay()) return;
+  if (!voiceOn || !canPlay()) {
+    onEnd?.();
+    return;
+  }
   const current = { source: null, stopped: false, onEnd };
   narration = current;
   Promise.resolve(decode(file)).then((buffer) => {

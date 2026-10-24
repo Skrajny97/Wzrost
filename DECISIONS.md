@@ -811,6 +811,11 @@ Autor odrzucił wszystkie cztery szkice głosu i poprosił o kilka zmian w wprow
     - Zmieniają się tylko końcówki, a wersja żeńska ma własne nagranie (`<id>-female.mp3`, ok. 1,4 tys. kredytów).
     - Zmiana wyglądu w ustawieniach zmienia też wersję kolejnych kwestii.
     - Wersja żeńska bez nagrania nie dostaje głosu męskiego, żeby głos nie mówił czego innego niż tekst.
+12. **Głos narratora do wyłączenia** (prośba autora: ktoś może go nie chcieć). Przełącznik „Głos narratora” jest:
+    - na ekranie tworzenia postaci, zanim narrator się odezwie (domyślnie włączony),
+    - w ustawieniach, pod „Efektami dźwiękowymi”.
+
+    Wybór zostaje w tej przeglądarce, tak jak głośność muzyki i efektów. Wyłączenie od razu ucisza czytaną kwestię. Przy wyłączonym głosie gra nie pobiera nagrań, a muzyka nie przycicha. Pergaminy i polecenia zostają bez zmian. Przy okazji muzyka nie zostaje już przyciszona na stałe, gdy kwestii nie słychać, np. przy efektach na 0%.
 
 ## Unikalne imiona postaci (24.10.2026)
 

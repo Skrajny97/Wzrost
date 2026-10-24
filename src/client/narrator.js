@@ -15,7 +15,7 @@
 import { narratorSprite } from './art.js';
 import { $, fill, h } from './dom.js';
 import { duckMusic } from './music.js';
-import { playNarration, playSound, preloadNarration, stopNarration } from './sound.js';
+import { narratorVoiceOn, playNarration, playSound, preloadNarration, stopNarration } from './sound.js';
 import { activityFinished, call, isUnlocked, state } from './state.js';
 import { toast } from './ui.js';
 
@@ -173,6 +173,7 @@ const words = (line) => told(line).text.map((text) => text.replaceAll('{points}'
 // The line's recording, over quieter music. The next line's recording is
 // fetched meanwhile, so it starts on time.
 function speak(line) {
+  if (!narratorVoiceOn()) return;
   const lines = state.content.tutorial.lines;
   const following = lines
     .slice(lines.indexOf(line) + 1)
@@ -223,7 +224,7 @@ function openCard(line) {
   document.body.append(dialog);
   scroll = { dialog, sheet, line, busy: true };
   const { voice } = told(line);
-  if (voice) preloadNarration(voice);
+  if (voice && narratorVoiceOn()) preloadNarration(voice);
   write(line);
   dialog.showModal();
   playSound('open');

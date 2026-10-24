@@ -19,7 +19,7 @@ import { musicVolume, setMusicConfig, setMusicPlace, setMusicVolume, startMusic 
 import { narrate } from './narrator.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, handleSessionLost, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
-import { closeSheet, confirmAction, initSheet, openSheet, toast, withButton } from './ui.js';
+import { closeSheet, confirmAction, initSheet, openSheet, toast, voiceSwitch, withButton } from './ui.js';
 
 const views = {
   loading: $('#view-loading'),
@@ -382,6 +382,7 @@ function openSettings() {
       googleRow(),
       volumeRow('music-volume', 'Muzyka', musicVolume(), setMusicVolume),
       volumeRow('effects-volume', 'Efekty dźwiękowe', effectsVolume(), setEffectsVolume, () => playSound('system')),
+      h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: 'Głos narratora' }), h('dd', {}, voiceSwitch('voice-label'))),
       testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
     ),

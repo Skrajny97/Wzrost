@@ -1,11 +1,12 @@
-// Creating the character: a look, one of five classes and a name.
+// Creating the character: a look, one of five classes and a name, and
+// whether the narrator who comes next reads aloud.
 
 import { portraitSprite } from '../art.js';
 import { classArt } from '../class-art.js';
 import { $, fill, h, icon } from '../dom.js';
 import { CLASS_ICONS } from '../icons.js';
 import { call, state } from '../state.js';
-import { systemPanel } from '../ui.js';
+import { systemPanel, voiceSwitch } from '../ui.js';
 
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 const START_BADGES = { gentle: 'łagodniejszy start', hard: 'trudniejszy start' };
@@ -101,6 +102,13 @@ export function renderCreate(container, onCreated) {
       h('label', { for: 'character-name', text: 'Imię postaci' }),
       nameInput,
       h('p', { class: 'field-hint', id: 'character-name-hint', text: 'Od 2 do 20 liter. Może zawierać spacje, myślniki i apostrofy.' }),
+    ),
+    h(
+      'div',
+      { class: 'field field--switch' },
+      h('span', { class: 'field-label', id: 'create-voice-label', text: 'Głos narratora' }),
+      voiceSwitch('create-voice-label'),
+      h('p', { class: 'field-hint', text: 'Narrator czyta wprowadzenie na głos. Zmienisz to też w ustawieniach.' }),
     ),
     error,
     submit,

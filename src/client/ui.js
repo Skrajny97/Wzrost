@@ -2,7 +2,7 @@
 // confirmation questions.
 
 import { $, append, clear, h, icon } from './dom.js';
-import { playSound } from './sound.js';
+import { narratorVoiceOn, playSound, setNarratorVoice } from './sound.js';
 
 // A message from the System: the cold, ice-blue panel with the [ SYSTEM ] header.
 export function systemPanel(...lines) {
@@ -142,4 +142,19 @@ export function meter({ label, value, max, kind }) {
   };
   set(value, max);
   return { element, set };
+}
+
+// "Głos narratora": the switch on the creation screen and in the settings.
+export function voiceSwitch(labelId) {
+  const button = h('button', { type: 'button', class: 'toggle', role: 'switch', 'aria-labelledby': labelId });
+  const show = () => {
+    button.setAttribute('aria-checked', String(narratorVoiceOn()));
+    button.textContent = narratorVoiceOn() ? 'Włączony' : 'Wyłączony';
+  };
+  button.addEventListener('click', () => {
+    setNarratorVoice(!narratorVoiceOn());
+    show();
+  });
+  show();
+  return button;
 }

@@ -309,6 +309,10 @@ button {
   gap: 6px;
 }
 
+.field--switch .toggle {
+  align-self: flex-start;
+}
+
 .field label,
 .field-label {
   color: var(--text-muted);
