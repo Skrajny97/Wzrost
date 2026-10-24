@@ -1,0 +1,758 @@
+
+> insight@0.0.0 dev
+> wrangler d1 migrations apply DB --local && wrangler dev --var TEST_LOGINS:
+
+
+ ⛅️ wrangler 4.151.3
+────────────────────
+Resource location: local 
+
+Use --remote if you want to access the remote instance.
+
+Migrations to be applied:
+┌──────────────────────────────────┐
+│ name                             │
+├──────────────────────────────────┤
+│ 0001_accounts.sql                │
+├──────────────────────────────────┤
+│ 0002_characters.sql              │
+├──────────────────────────────────┤
+│ 0003_camp.sql                    │
+├──────────────────────────────────┤
+│ 0004_production.sql              │
+├──────────────────────────────────┤
+│ 0005_system_points.sql           │
+├──────────────────────────────────┤
+│ 0006_appearance.sql              │
+├──────────────────────────────────┤
+│ 0007_google.sql                  │
+├──────────────────────────────────┤
+│ 0008_time_points.sql             │
+├──────────────────────────────────┤
+│ 0009_unique_names.sql            │
+├──────────────────────────────────┤
+│ 0010_fresh_start.sql             │
+├──────────────────────────────────┤
+│ 0011_character_system_points.sql │
+├──────────────────────────────────┤
+│ 0012_class_armour.sql            │
+└──────────────────────────────────┘
+? About to apply 12 migration(s)
+Your database may not be available to serve requests during the migration, continue?
+🤖 Using fallback value in non-interactive context: yes
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 6 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ 🕒️    │
+└──────────────────────────────────┴────────┘
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 9 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ 🕒️    │
+└──────────────────────────────────┴────────┘
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 3 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ 🕒️    │
+└──────────────────────────────────┴────────┘
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 2 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ 🕒️    │
+└──────────────────────────────────┴────────┘
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 2 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ 🕒️    │
+└──────────────────────────────────┴────────┘
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 2 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ 🕒️    │
+└──────────────────────────────────┴────────┘
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 3 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ 🕒️    │
+└──────────────────────────────────┴────────┘
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 3 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ 🕒️    │
+└──────────────────────────────────┴────────┘
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 5 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ 🕒️    │
+└──────────────────────────────────┴────────┘
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 6 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ 🕒️    │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ 🕒️    │
+└──────────────────────────────────┴────────┘
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 4 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ 🕒️    │
+└──────────────────────────────────┴────────┘
+🌀 Executing on local database DB (00000000-0000-0000-0000-000000000000) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 2 commands executed successfully.
+┌──────────────────────────────────┬────────┐
+│ name                             │ status │
+├──────────────────────────────────┼────────┤
+│ 0001_accounts.sql                │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0002_characters.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0003_camp.sql                    │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0004_production.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0005_system_points.sql           │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0006_appearance.sql              │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0007_google.sql                  │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0008_time_points.sql             │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0009_unique_names.sql            │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0010_fresh_start.sql             │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0011_character_system_points.sql │ ✅     │
+├──────────────────────────────────┼────────┤
+│ 0012_class_armour.sql            │ ✅     │
+└──────────────────────────────────┴────────┘
+
+ ⛅️ wrangler 4.151.3 (update available 4.152.0)
+───────────────────────────────────────────────
+
+Cloudflare collects anonymous telemetry about your usage of Wrangler. Learn more at https://github.com/cloudflare/workers-sdk/tree/main/packages/wrangler/telemetry.md
+Your Worker has access to the following bindings:
+Binding                                                     Resource                  Mode
+env.DB (wzrost)                                             D1 Database               local
+env.APP_VERSION ("dev")                                     Environment Variable      local
+env.TEST_MODE ("on")                                        Environment Variable      local
+env.TEST_LOGINS ("(hidden)")                                Environment Variable      local
+env.GOOGLE_HOSTS ("insightrpg.com,www.insightrpg.com")      Environment Variable      local
+
+⎔ Starting local server...
+[wrangler:info] ✨ Parsed 1 valid header rule.
+[wrangler:info] Ready on http://localhost:8787
+[wrangler:info] GET /api/health 200 OK (17ms)
+[wrangler:info] GET /api/health 200 OK (6ms)
+[wrangler:info] GET / 200 OK (8ms)
+[wrangler:info] GET /manifest.webmanifest 200 OK (4ms)
+[wrangler:info] GET /styles.css 200 OK (15ms)
+[wrangler:info] GET /app.js 200 OK (13ms)
+[wrangler:info] GET /google-g.svg 200 OK (6ms)
+[wrangler:info] GET /api.js 200 OK (13ms)
+[wrangler:info] GET /dom.js 200 OK (12ms)
+[wrangler:info] GET /layout.js 200 OK (18ms)
+[wrangler:info] GET /screens/camp.js 200 OK (18ms)
+[wrangler:info] GET /art.js 200 OK (22ms)
+[wrangler:info] GET /install.js 200 OK (21ms)
+[wrangler:info] GET /screens/character.js 200 OK (28ms)
+[wrangler:info] GET /screens/combat.js 200 OK (32ms)
+[wrangler:info] GET /screens/create.js 200 OK (14ms)
+[wrangler:info] GET /screens/locked.js 200 OK (22ms)
+[wrangler:info] GET /screens/report.js 200 OK (22ms)
+[wrangler:info] GET /screens/journal.js 200 OK (24ms)
+[wrangler:info] GET /music.js 200 OK (25ms)
+[wrangler:info] GET /camera.js 200 OK (28ms)
+[wrangler:info] GET /screens/stats.js 200 OK (31ms)
+[wrangler:info] GET /narrator.js 200 OK (31ms)
+[wrangler:info] GET /sound.js 200 OK (35ms)
+[wrangler:info] GET /motion.js 200 OK (36ms)
+[wrangler:info] GET /ui.js 200 OK (25ms)
+[wrangler:info] GET /icons.js 200 OK (28ms)
+[wrangler:info] GET /state.js 200 OK (29ms)
+[wrangler:info] GET /camp-art.js 200 OK (23ms)
+[wrangler:info] GET /history.js 200 OK (28ms)
+[wrangler:info] GET /format.js 200 OK (28ms)
+[wrangler:info] GET /class-art.js 200 OK (21ms)
+[wrangler:info] GET /portraits.js 200 OK (21ms)
+[wrangler:info] GET /time.js 200 OK (21ms)
+[wrangler:info] GET /area-art.js 200 OK (15ms)
+[wrangler:info] GET /arena.js 200 OK (20ms)
+[wrangler:info] GET /api/content 200 OK (12ms)
+[wrangler:info] GET /api/me 401 Unauthorized (15ms)
+[wrangler:info] GET /art/portraits/warrior-female.png 200 OK (20ms)
+[wrangler:info] GET /api/health 200 OK (17ms)
+[wrangler:info] GET /audio/music/background-v1.mp3 200 OK (14ms)
+[wrangler:info] GET /art/portraits/warrior-male.png 200 OK (11ms)
+[wrangler:info] GET /api/health 200 OK (13ms)
+[wrangler:info] GET /art/portraits/archer-female.png 200 OK (12ms)
+[wrangler:info] GET /art/portraits/archer-male.png 200 OK (5ms)
+[wrangler:info] GET /art/portraits/mage-female.png 200 OK (4ms)
+[wrangler:info] GET /art/portraits/mage-male.png 200 OK (8ms)
+[wrangler:info] GET /art/portraits/shadow-female.png 200 OK (9ms)
+[wrangler:info] GET /art/portraits/shadow-male.png 200 OK (10ms)
+[wrangler:info] GET /art/portraits/cleric-female.png 200 OK (11ms)
+[wrangler:info] GET /art/portraits/cleric-male.png 200 OK (11ms)
+[wrangler:info] GET /sw.js 200 OK (10ms)
+[wrangler:info] GET /offline 200 OK (12ms)
+[wrangler:info] GET /styles.css 200 OK (17ms)
+[wrangler:info] GET /favicon.svg 200 OK (18ms)
+[wrangler:info] GET / 200 OK (5ms)
+[wrangler:info] GET /manifest.webmanifest 200 OK (8ms)
+[wrangler:info] GET /app.js 200 OK (14ms)
+[wrangler:info] GET /styles.css 200 OK (13ms)
+[wrangler:info] GET /google-g.svg 200 OK (5ms)
+[wrangler:info] GET /layout.js 200 OK (20ms)
+[wrangler:info] GET /screens/camp.js 200 OK (28ms)
+[wrangler:info] GET /api.js 200 OK (29ms)
+[wrangler:info] GET /dom.js 200 OK (29ms)
+[wrangler:info] GET /art.js 200 OK (30ms)
+[wrangler:info] GET /install.js 200 OK (29ms)
+[wrangler:info] GET /screens/character.js 200 OK (19ms)
+[wrangler:info] GET /screens/locked.js 200 OK (31ms)
+[wrangler:info] GET /screens/report.js 200 OK (33ms)
+[wrangler:info] GET /screens/combat.js 200 OK (34ms)
+[wrangler:info] GET /screens/create.js 200 OK (34ms)
+[wrangler:info] GET /screens/journal.js 200 OK (34ms)
+[wrangler:info] GET /screens/stats.js 200 OK (18ms)
+[wrangler:info] GET /music.js 200 OK (13ms)
+[wrangler:info] GET /camera.js 200 OK (15ms)
+[wrangler:info] GET /motion.js 200 OK (16ms)
+[wrangler:info] GET /sound.js 200 OK (17ms)
+[wrangler:info] GET /state.js 200 OK (13ms)
+[wrangler:info] GET /narrator.js 200 OK (19ms)
+[wrangler:info] GET /ui.js 200 OK (8ms)
+[wrangler:info] GET /icons.js 200 OK (11ms)
+[wrangler:info] GET /camp-art.js 200 OK (14ms)
+[wrangler:info] GET /history.js 200 OK (14ms)
+[wrangler:info] GET /format.js 200 OK (17ms)
+[wrangler:info] GET /portraits.js 200 OK (21ms)
+[wrangler:info] GET /arena.js 200 OK (11ms)
+[wrangler:info] GET /time.js 200 OK (21ms)
+[wrangler:info] GET /area-art.js 200 OK (13ms)
+[wrangler:info] GET /class-art.js 200 OK (13ms)
+[wrangler:info] GET /api/content 200 OK (9ms)
+[wrangler:info] GET /api/me 401 Unauthorized (25ms)
+[wrangler:info] GET /art/portraits/warrior-male.png 200 OK (22ms)
+[wrangler:info] GET /art/portraits/archer-female.png 200 OK (21ms)
+[wrangler:info] GET /art/portraits/warrior-female.png 200 OK (26ms)
+[wrangler:info] GET /api/health 200 OK (26ms)
+[wrangler:info] GET /art/portraits/archer-male.png 200 OK (18ms)
+[wrangler:info] GET /audio/music/background-v1.mp3 200 OK (20ms)
+[wrangler:info] GET /art/portraits/cleric-female.png 200 OK (28ms)
+[wrangler:info] GET /art/portraits/cleric-male.png 200 OK (27ms)
+[wrangler:info] GET /art/portraits/mage-female.png 200 OK (33ms)
+[wrangler:info] GET /art/portraits/mage-male.png 200 OK (33ms)
+[wrangler:info] GET /art/portraits/shadow-female.png 200 OK (27ms)
+[wrangler:info] GET /art/portraits/shadow-male.png 200 OK (23ms)
+[wrangler:info] GET /api/health 200 OK (25ms)
+[wrangler:info] GET /audio/sfx/blade-1.mp3 200 OK (22ms)
+[wrangler:info] GET /audio/sfx/blade-2.mp3 200 OK (22ms)
+[wrangler:info] GET /audio/sfx/fist-1.mp3 200 OK (25ms)
+[wrangler:info] GET /audio/sfx/fist-2.mp3 200 OK (25ms)
+[wrangler:info] GET /audio/sfx/axe-1.mp3 200 OK (30ms)
+[wrangler:info] GET /audio/sfx/axe-2.mp3 200 OK (25ms)
+[wrangler:info] GET /audio/sfx/bite-1.mp3 200 OK (17ms)
+[wrangler:info] GET /audio/sfx/bite-2.mp3 200 OK (12ms)
+[wrangler:info] GET /audio/sfx/charge-1.mp3 200 OK (15ms)
+[wrangler:info] GET /audio/sfx/charge-2.mp3 200 OK (16ms)
+[wrangler:info] GET /audio/sfx/claw-1.mp3 200 OK (18ms)
+[wrangler:info] GET /audio/sfx/claw-2.mp3 200 OK (18ms)
+[wrangler:info] GET /audio/sfx/peck-1.mp3 200 OK (13ms)
+[wrangler:info] GET /audio/sfx/peck-2.mp3 200 OK (13ms)
+[wrangler:info] GET /audio/sfx/arrow-1.mp3 200 OK (11ms)
+[wrangler:info] GET /audio/sfx/arrow-2.mp3 200 OK (8ms)
+[wrangler:info] GET /audio/sfx/dodge-1.mp3 200 OK (18ms)
+[wrangler:info] GET /audio/sfx/dodge-2.mp3 200 OK (25ms)
+[wrangler:info] GET /audio/sfx/crit-1.mp3 200 OK (25ms)
+[wrangler:info] GET /audio/sfx/crit-2.mp3 200 OK (26ms)
+[wrangler:info] GET /audio/sfx/fall-1.mp3 200 OK (33ms)
+[wrangler:info] GET /audio/sfx/fall-2.mp3 200 OK (34ms)
+[wrangler:info] GET /audio/sfx/tab-1.mp3 200 OK (17ms)
+[wrangler:info] GET /audio/sfx/tab-2.mp3 200 OK (12ms)
+[wrangler:info] GET /audio/sfx/swing-1.mp3 200 OK (26ms)
+[wrangler:info] GET /audio/sfx/swing-2.mp3 200 OK (25ms)
+[wrangler:info] GET /audio/sfx/magic-2.mp3 200 OK (28ms)
+[wrangler:info] GET /audio/sfx/wolf-hurt-1.mp3 200 OK (28ms)
+[wrangler:info] GET /audio/sfx/magic-1.mp3 200 OK (28ms)
+[wrangler:info] GET /audio/sfx/wolf-death-1.mp3 200 OK (26ms)
+[wrangler:info] GET /audio/sfx/wolf-death-2.mp3 200 OK (24ms)
+[wrangler:info] GET /audio/sfx/wolf-hurt-2.mp3 200 OK (37ms)
+[wrangler:info] GET /audio/sfx/alpha-wolf-hurt-2.mp3 200 OK (40ms)
+[wrangler:info] GET /audio/sfx/alpha-wolf-death-1.mp3 200 OK (40ms)
+[wrangler:info] GET /audio/sfx/alpha-wolf-hurt-1.mp3 200 OK (41ms)
+[wrangler:info] GET /audio/sfx/fox-hurt-1.mp3 200 OK (32ms)
+[wrangler:info] GET /audio/sfx/fox-hurt-2.mp3 200 OK (38ms)
+[wrangler:info] GET /audio/sfx/alpha-wolf-death-2.mp3 200 OK (39ms)
+[wrangler:info] GET /audio/sfx/lynx-hurt-1.mp3 200 OK (35ms)
+[wrangler:info] GET /audio/sfx/lynx-hurt-2.mp3 200 OK (27ms)
+[wrangler:info] GET /audio/sfx/fox-death-1.mp3 200 OK (37ms)
+[wrangler:info] GET /audio/sfx/fox-death-2.mp3 200 OK (36ms)
+[wrangler:info] GET /audio/sfx/lynx-death-1.mp3 200 OK (45ms)
+[wrangler:info] GET /audio/sfx/lynx-death-2.mp3 200 OK (37ms)
+[wrangler:info] GET /audio/sfx/bear-hurt-1.mp3 200 OK (21ms)
+[wrangler:info] GET /audio/sfx/bear-death-1.mp3 200 OK (45ms)
+[wrangler:info] GET /audio/sfx/bear-death-2.mp3 200 OK (51ms)
+[wrangler:info] GET /audio/sfx/bear-hurt-2.mp3 200 OK (52ms)
+[wrangler:info] GET /audio/sfx/boar-hurt-1.mp3 200 OK (54ms)
+[wrangler:info] GET /audio/sfx/boar-hurt-2.mp3 200 OK (54ms)
+[wrangler:info] GET /audio/sfx/boar-death-1.mp3 200 OK (57ms)
+[wrangler:info] GET /audio/sfx/badger-death-1.mp3 200 OK (28ms)
+[wrangler:info] GET /audio/sfx/badger-death-2.mp3 200 OK (36ms)
+[wrangler:info] GET /audio/sfx/boar-death-2.mp3 200 OK (56ms)
+[wrangler:info] GET /audio/sfx/badger-hurt-1.mp3 200 OK (57ms)
+[wrangler:info] GET /audio/sfx/badger-hurt-2.mp3 200 OK (56ms)
+[wrangler:info] GET /audio/sfx/crow-hurt-1.mp3 200 OK (31ms)
+[wrangler:info] GET /audio/sfx/crow-hurt-2.mp3 200 OK (18ms)
+[wrangler:info] GET /audio/sfx/crow-death-1.mp3 200 OK (17ms)
+[wrangler:info] GET /audio/sfx/owl-hurt-2.mp3 200 OK (28ms)
+[wrangler:info] GET /audio/sfx/owl-death-1.mp3 200 OK (26ms)
+[wrangler:info] GET /audio/sfx/crow-death-2.mp3 200 OK (32ms)
+[wrangler:info] GET /audio/sfx/owl-hurt-1.mp3 200 OK (32ms)
+[wrangler:info] GET /audio/sfx/owl-death-2.mp3 200 OK (43ms)
+[wrangler:info] GET /audio/sfx/viper-hurt-1.mp3 200 OK (37ms)
+[wrangler:info] GET /audio/sfx/viper-hurt-2.mp3 200 OK (22ms)
+[wrangler:info] GET /audio/sfx/viper-death-2.mp3 200 OK (42ms)
+[wrangler:info] GET /audio/sfx/spider-hurt-1.mp3 200 OK (42ms)
+[wrangler:info] GET /audio/sfx/viper-death-1.mp3 200 OK (42ms)
+[wrangler:info] GET /audio/sfx/spider-hurt-2.mp3 200 OK (25ms)
+[wrangler:info] GET /audio/sfx/spider-death-1.mp3 200 OK (23ms)
+[wrangler:info] GET /audio/sfx/spider-death-2.mp3 200 OK (27ms)
+[wrangler:info] GET /audio/sfx/wisp-death-2.mp3 200 OK (30ms)
+[wrangler:info] GET /audio/sfx/likho-hurt-1.mp3 200 OK (30ms)
+[wrangler:info] GET /audio/sfx/wisp-hurt-1.mp3 200 OK (30ms)
+[wrangler:info] GET /audio/sfx/wisp-hurt-2.mp3 200 OK (31ms)
+[wrangler:info] GET /audio/sfx/wisp-death-1.mp3 200 OK (32ms)
+[wrangler:info] GET /audio/sfx/likho-death-1.mp3 200 OK (17ms)
+[wrangler:info] GET /audio/sfx/likho-death-2.mp3 200 OK (16ms)
+[wrangler:info] GET /audio/sfx/female-death-2.mp3 200 OK (42ms)
+[wrangler:info] GET /audio/sfx/male-hurt-1.mp3 200 OK (42ms)
+[wrangler:info] GET /audio/sfx/female-hurt-1.mp3 200 OK (43ms)
+[wrangler:info] GET /audio/sfx/female-hurt-2.mp3 200 OK (44ms)
+[wrangler:info] GET /audio/sfx/female-death-1.mp3 200 OK (44ms)
+[wrangler:info] GET /audio/sfx/male-hurt-2.mp3 200 OK (24ms)
+[wrangler:info] GET /audio/sfx/male-death-1.mp3 200 OK (13ms)
+[wrangler:info] GET /icon-192.png 200 OK (22ms)
+[wrangler:info] GET /sw.js 200 OK (26ms)
+[wrangler:info] GET /audio/sfx/male-death-2.mp3 200 OK (32ms)
+[wrangler:info] POST /api/auth/register 201 Created (42ms)
+[wrangler:info] GET /api/character 401 Unauthorized (10ms)
+[wrangler:info] GET /api/health 200 OK (16ms)
+[wrangler:info] GET / 200 OK (8ms)
+[wrangler:info] GET /manifest.webmanifest 200 OK (18ms)
+[wrangler:info] GET /styles.css 200 OK (14ms)
+[wrangler:info] GET /app.js 200 OK (15ms)
+[wrangler:info] GET /google-g.svg 200 OK (17ms)
+[wrangler:info] GET /api.js 200 OK (20ms)
+[wrangler:info] GET /dom.js 200 OK (38ms)
+[wrangler:info] GET /art.js 200 OK (28ms)
+[wrangler:info] GET /install.js 200 OK (40ms)
+[wrangler:info] GET /layout.js 200 OK (42ms)
+[wrangler:info] GET /screens/camp.js 200 OK (40ms)
+[wrangler:info] GET /screens/character.js 200 OK (34ms)
+[wrangler:info] GET /screens/combat.js 200 OK (30ms)
+[wrangler:info] GET /screens/create.js 200 OK (16ms)
+[wrangler:info] GET /screens/journal.js 200 OK (15ms)
+[wrangler:info] GET /screens/locked.js 200 OK (17ms)
+[wrangler:info] GET /screens/report.js 200 OK (14ms)
+[wrangler:info] GET /screens/stats.js 200 OK (21ms)
+[wrangler:info] GET /music.js 200 OK (14ms)
+[wrangler:info] GET /motion.js 200 OK (19ms)
+[wrangler:info] GET /narrator.js 200 OK (18ms)
+[wrangler:info] GET /camera.js 200 OK (19ms)
+[wrangler:info] GET /state.js 200 OK (22ms)
+[wrangler:info] GET /ui.js 200 OK (22ms)
+[wrangler:info] GET /sound.js 200 OK (30ms)
+[wrangler:info] GET /format.js 200 OK (34ms)
+[wrangler:info] GET /camp-art.js 200 OK (35ms)
+[wrangler:info] GET /icons.js 200 OK (35ms)
+[wrangler:info] GET /time.js 200 OK (13ms)
+[wrangler:info] GET /history.js 200 OK (14ms)
+[wrangler:info] GET /portraits.js 200 OK (23ms)
+[wrangler:info] GET /class-art.js 200 OK (12ms)
+[wrangler:info] GET /area-art.js 200 OK (17ms)
+[wrangler:info] GET /arena.js 200 OK (17ms)
+[wrangler:info] GET /api/content 200 OK (15ms)
+[wrangler:info] GET /api/me 401 Unauthorized (32ms)
+[wrangler:info] GET /art/portraits/warrior-male.png 200 OK (33ms)
+[wrangler:info] GET /art/portraits/archer-female.png 200 OK (33ms)
+[wrangler:info] GET /art/portraits/warrior-female.png 200 OK (35ms)
+[wrangler:info] GET /api/health 200 OK (36ms)
+[wrangler:info] GET /art/portraits/archer-male.png 200 OK (40ms)
+[wrangler:info] GET /audio/music/background-v1.mp3 200 OK (28ms)
+[wrangler:info] GET /art/portraits/cleric-female.png 200 OK (53ms)
+[wrangler:info] GET /art/portraits/cleric-male.png 200 OK (53ms)
+[wrangler:info] GET /art/portraits/mage-female.png 200 OK (56ms)
+[wrangler:info] GET /art/portraits/mage-male.png 200 OK (56ms)
+[wrangler:info] GET /api/health 200 OK (52ms)
+[wrangler:info] GET /art/portraits/shadow-female.png 200 OK (28ms)
+[wrangler:info] GET /art/portraits/shadow-male.png 200 OK (26ms)
+[wrangler:info] GET /sw.js 200 OK (11ms)
+[wrangler:info] GET /styles.css 200 OK (13ms)
+[wrangler:info] GET /favicon.svg 200 OK (13ms)
+[wrangler:info] GET /offline 200 OK (14ms)
+[wrangler:info] GET /audio/sfx/blade-1.mp3 200 OK (28ms)
+[wrangler:info] GET /audio/sfx/blade-2.mp3 200 OK (24ms)
+[wrangler:info] GET /audio/sfx/fist-1.mp3 200 OK (23ms)
+[wrangler:info] GET /audio/sfx/fist-2.mp3 200 OK (28ms)
+[wrangler:info] GET /audio/sfx/axe-1.mp3 200 OK (39ms)
+[wrangler:info] GET /audio/sfx/axe-2.mp3 200 OK (38ms)
+[wrangler:info] GET /audio/sfx/bite-2.mp3 200 OK (37ms)
+[wrangler:info] GET /audio/sfx/bite-1.mp3 200 OK (37ms)
+[wrangler:info] GET /audio/sfx/claw-1.mp3 200 OK (23ms)
+[wrangler:info] GET /audio/sfx/charge-1.mp3 200 OK (25ms)
+[wrangler:info] GET /audio/sfx/charge-2.mp3 200 OK (25ms)
+[wrangler:info] GET /audio/sfx/claw-2.mp3 200 OK (25ms)
+[wrangler:info] GET /audio/sfx/peck-1.mp3 200 OK (22ms)
+[wrangler:info] GET /audio/sfx/peck-2.mp3 200 OK (17ms)
+[wrangler:info] GET /audio/sfx/arrow-1.mp3 200 OK (19ms)
+[wrangler:info] GET /audio/sfx/crit-1.mp3 200 OK (19ms)
+[wrangler:info] GET /audio/sfx/crit-2.mp3 200 OK (19ms)
+[wrangler:info] GET /audio/sfx/arrow-2.mp3 200 OK (20ms)
+[wrangler:info] GET /audio/sfx/dodge-1.mp3 200 OK (20ms)
+[wrangler:info] GET /audio/sfx/dodge-2.mp3 200 OK (17ms)
+[wrangler:info] GET /audio/sfx/fall-1.mp3 200 OK (17ms)
+[wrangler:info] GET /audio/sfx/fall-2.mp3 200 OK (20ms)
+[wrangler:info] GET /audio/sfx/tab-1.mp3 200 OK (30ms)
+[wrangler:info] GET /audio/sfx/tab-2.mp3 200 OK (32ms)
+[wrangler:info] GET /audio/sfx/swing-2.mp3 200 OK (33ms)
+[wrangler:info] GET /audio/sfx/magic-1.mp3 200 OK (33ms)
+[wrangler:info] GET /audio/sfx/swing-1.mp3 200 OK (33ms)
+[wrangler:info] GET /audio/sfx/magic-2.mp3 200 OK (40ms)
+[wrangler:info] GET /audio/sfx/wolf-hurt-1.mp3 200 OK (34ms)
+[wrangler:info] GET /audio/sfx/wolf-hurt-2.mp3 200 OK (33ms)
+[wrangler:info] GET /audio/sfx/wolf-death-2.mp3 200 OK (42ms)
+[wrangler:info] GET /audio/sfx/alpha-wolf-hurt-1.mp3 200 OK (42ms)
+[wrangler:info] GET /audio/sfx/wolf-death-1.mp3 200 OK (43ms)
+[wrangler:info] GET /audio/sfx/alpha-wolf-death-1.mp3 200 OK (42ms)
+[wrangler:info] GET /audio/sfx/alpha-wolf-death-2.mp3 200 OK (42ms)
+[wrangler:info] GET /audio/sfx/alpha-wolf-hurt-2.mp3 200 OK (46ms)
+[wrangler:info] GET /audio/sfx/fox-hurt-2.mp3 200 OK (86ms)
+[wrangler:info] GET /audio/sfx/fox-death-1.mp3 200 OK (86ms)
+[wrangler:info] GET /audio/sfx/fox-hurt-1.mp3 200 OK (86ms)
+[wrangler:info] GET /audio/sfx/lynx-hurt-1.mp3 200 OK (74ms)
+[wrangler:info] GET /audio/sfx/lynx-hurt-2.mp3 200 OK (75ms)
+[wrangler:info] GET /audio/sfx/fox-death-2.mp3 200 OK (76ms)
+[wrangler:info] GET /audio/sfx/lynx-death-1.mp3 200 OK (32ms)
+[wrangler:info] GET /audio/sfx/lynx-death-2.mp3 200 OK (22ms)
+[wrangler:info] GET /audio/sfx/bear-hurt-1.mp3 200 OK (23ms)
+[wrangler:info] GET /audio/sfx/bear-hurt-2.mp3 200 OK (37ms)
+[wrangler:info] GET /audio/sfx/bear-death-1.mp3 200 OK (32ms)
+[wrangler:info] GET /audio/sfx/boar-hurt-1.mp3 200 OK (32ms)
+[wrangler:info] GET /audio/sfx/boar-hurt-2.mp3 200 OK (35ms)
+[wrangler:info] GET /audio/sfx/bear-death-2.mp3 200 OK (40ms)
+[wrangler:info] GET /audio/sfx/boar-death-1.mp3 200 OK (34ms)
+[wrangler:info] GET /audio/sfx/boar-death-2.mp3 200 OK (40ms)
+[wrangler:info] GET /audio/sfx/badger-hurt-1.mp3 200 OK (39ms)
+[wrangler:info] GET /audio/sfx/badger-hurt-2.mp3 200 OK (22ms)
+[wrangler:info] GET /audio/sfx/badger-death-2.mp3 200 OK (26ms)
+[wrangler:info] GET /audio/sfx/crow-hurt-1.mp3 200 OK (34ms)
+[wrangler:info] GET /audio/sfx/badger-death-1.mp3 200 OK (44ms)
+[wrangler:info] GET /audio/sfx/crow-death-1.mp3 200 OK (40ms)
+[wrangler:info] GET /audio/sfx/crow-death-2.mp3 200 OK (43ms)
+[wrangler:info] GET /audio/sfx/crow-hurt-2.mp3 200 OK (50ms)
+[wrangler:info] GET /audio/sfx/owl-hurt-2.mp3 200 OK (29ms)
+[wrangler:info] GET /audio/sfx/owl-death-1.mp3 200 OK (36ms)
+[wrangler:info] GET /audio/sfx/owl-hurt-1.mp3 200 OK (44ms)
+[wrangler:info] GET /audio/sfx/viper-hurt-1.mp3 200 OK (37ms)
+[wrangler:info] GET /audio/sfx/viper-hurt-2.mp3 200 OK (36ms)
+[wrangler:info] GET /audio/sfx/owl-death-2.mp3 200 OK (45ms)
+[wrangler:info] GET /audio/sfx/viper-death-1.mp3 200 OK (26ms)
+[wrangler:info] GET /audio/sfx/viper-death-2.mp3 200 OK (17ms)
+[wrangler:info] GET /audio/sfx/spider-hurt-1.mp3 200 OK (42ms)
+[wrangler:info] GET /audio/sfx/wisp-hurt-1.mp3 200 OK (40ms)
+[wrangler:info] GET /audio/sfx/wisp-hurt-2.mp3 200 OK (44ms)
+[wrangler:info] GET /audio/sfx/spider-hurt-2.mp3 200 OK (46ms)
+[wrangler:info] GET /audio/sfx/spider-death-1.mp3 200 OK (46ms)
+[wrangler:info] GET /audio/sfx/spider-death-2.mp3 200 OK (45ms)
+[wrangler:info] GET /audio/sfx/wisp-death-1.mp3 200 OK (34ms)
+[wrangler:info] GET /audio/sfx/wisp-death-2.mp3 200 OK (22ms)
+[wrangler:info] GET /audio/sfx/likho-death-2.mp3 200 OK (18ms)
+[wrangler:info] GET /audio/sfx/female-hurt-1.mp3 200 OK (20ms)
+[wrangler:info] GET /audio/sfx/likho-hurt-1.mp3 200 OK (35ms)
+[wrangler:info] GET /audio/sfx/likho-death-1.mp3 200 OK (35ms)
+[wrangler:info] GET /audio/sfx/female-hurt-2.mp3 200 OK (37ms)
+[wrangler:info] GET /audio/sfx/female-death-1.mp3 200 OK (30ms)
+[wrangler:info] GET /audio/sfx/female-death-2.mp3 200 OK (28ms)
+[wrangler:info] GET /audio/sfx/male-hurt-1.mp3 200 OK (45ms)
+[wrangler:info] GET /audio/sfx/male-hurt-2.mp3 200 OK (29ms)
+[wrangler:info] GET /audio/sfx/male-death-1.mp3 200 OK (31ms)
+[wrangler:info] GET /audio/sfx/male-death-2.mp3 200 OK (21ms)
+[wrangler:info] POST /api/auth/register 201 Created (41ms)
+[wrangler:info] GET /icon-192.png 200 OK (48ms)
+[wrangler:info] GET /api/character 401 Unauthorized (8ms)
+[wrangler:info] GET /api/health 200 OK (18ms)
