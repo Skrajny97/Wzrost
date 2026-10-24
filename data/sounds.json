@@ -13,5 +13,71 @@
     "kill": { "files": ["audio/sfx/fall-1.mp3", "audio/sfx/fall-2.mp3"], "gain": 0.9 }
   },
   "synth": ["magic"],
-  "voices": {}
+  "voices": {
+    "wolf": {
+      "hurt": { "files": ["audio/sfx/wolf-hurt-1.mp3", "audio/sfx/wolf-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/wolf-death-1.mp3", "audio/sfx/wolf-death-2.mp3"], "gain": 0.7 }
+    },
+    "alpha-wolf": {
+      "hurt": { "files": ["audio/sfx/alpha-wolf-hurt-1.mp3", "audio/sfx/alpha-wolf-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/alpha-wolf-death-1.mp3", "audio/sfx/alpha-wolf-death-2.mp3"], "gain": 0.7 }
+    },
+    "fox": {
+      "hurt": { "files": ["audio/sfx/fox-hurt-1.mp3", "audio/sfx/fox-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/fox-death-1.mp3", "audio/sfx/fox-death-2.mp3"], "gain": 0.7 }
+    },
+    "lynx": {
+      "hurt": { "files": ["audio/sfx/lynx-hurt-1.mp3", "audio/sfx/lynx-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/lynx-death-1.mp3", "audio/sfx/lynx-death-2.mp3"], "gain": 0.7 }
+    },
+    "bear": {
+      "hurt": { "files": ["audio/sfx/bear-hurt-1.mp3", "audio/sfx/bear-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/bear-death-1.mp3", "audio/sfx/bear-death-2.mp3"], "gain": 0.7 }
+    },
+    "boar": {
+      "hurt": { "files": ["audio/sfx/boar-hurt-1.mp3", "audio/sfx/boar-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/boar-death-1.mp3", "audio/sfx/boar-death-2.mp3"], "gain": 0.7 }
+    },
+    "badger": {
+      "hurt": { "files": ["audio/sfx/badger-hurt-1.mp3", "audio/sfx/badger-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/badger-death-1.mp3", "audio/sfx/badger-death-2.mp3"], "gain": 0.7 }
+    },
+    "crow": {
+      "hurt": { "files": ["audio/sfx/crow-hurt-1.mp3", "audio/sfx/crow-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/crow-death-1.mp3", "audio/sfx/crow-death-2.mp3"], "gain": 0.7 }
+    },
+    "owl": {
+      "hurt": { "files": ["audio/sfx/owl-hurt-1.mp3", "audio/sfx/owl-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/owl-death-1.mp3", "audio/sfx/owl-death-2.mp3"], "gain": 0.7 }
+    },
+    "viper": {
+      "hurt": { "files": ["audio/sfx/viper-hurt-1.mp3", "audio/sfx/viper-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/viper-death-1.mp3", "audio/sfx/viper-death-2.mp3"], "gain": 0.7 }
+    },
+    "spider": {
+      "hurt": { "files": ["audio/sfx/spider-hurt-1.mp3", "audio/sfx/spider-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/spider-death-1.mp3", "audio/sfx/spider-death-2.mp3"], "gain": 0.7 }
+    },
+    "wisp": {
+      "hurt": { "files": ["audio/sfx/wisp-hurt-1.mp3", "audio/sfx/wisp-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/wisp-death-1.mp3", "audio/sfx/wisp-death-2.mp3"], "gain": 0.7 }
+    },
+    "likho": {
+      "hurt": { "files": ["audio/sfx/likho-hurt-1.mp3", "audio/sfx/likho-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/likho-death-1.mp3", "audio/sfx/likho-death-2.mp3"], "gain": 0.7 }
+    },
+    "female": {
+      "hurt": { "files": ["audio/sfx/female-hurt-1.mp3", "audio/sfx/female-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/female-death-1.mp3", "audio/sfx/female-death-2.mp3"], "gain": 0.7 }
+    },
+    "male": {
+      "hurt": { "files": ["audio/sfx/male-hurt-1.mp3", "audio/sfx/male-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/male-death-1.mp3", "audio/sfx/male-death-2.mp3"], "gain": 0.7 }
+    }
+  },
+  "effects": {
+    "tab": { "files": ["audio/sfx/tab-1.mp3", "audio/sfx/tab-2.mp3"], "gain": 0.5 },
+    "swing": { "files": ["audio/sfx/swing-1.mp3", "audio/sfx/swing-2.mp3"], "gain": 0.5 },
+    "magic": { "files": ["audio/sfx/magic-1.mp3", "audio/sfx/magic-2.mp3"], "gain": 0.6 }
+  }
 }

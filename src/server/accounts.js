@@ -1,5 +1,6 @@
 // Account endpoints: registration, login, logout and the current user.
 
+import { googleConfigured } from './google.js';
 import { ApiError, json, readJson } from './http.js';
 import { hashPassword, needsRehash, verifyPassword } from './passwords.js';
 import { testModeFor } from './test-mode.js';
@@ -127,6 +128,11 @@ export async function login({ request, env, now }) {
   }
 
   await clearLoginFailures(db, throttleKey);
+  // An account with test mode, once linked to Google, opens only with Google
+  // while Google sign-in works, so its test tools stay with its owner.
+  if (user.google_sub !== null && testModeFor(env, user.login) && googleConfigured(env)) {
+    throw new ApiError(403, 'google_only', 'To konto otwiera się tylko przez Google. Stuknij „Zaloguj się przez Google”.');
+  }
   if (needsRehash(user.password_hash)) {
     await db
       .prepare('UPDATE users SET password_hash = ? WHERE id = ?')

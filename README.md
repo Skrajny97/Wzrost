@@ -183,10 +183,10 @@ Muzyka w tle jest w `src/client/audio/music/`, a `data/music.json` mówi, który
 2. Dopisz go do `tracks` w `data/music.json`, a miejsce i id utworu do `places` (albo wynik wyprawy do `reports`).
 3. `npm run validate` sprawdzi, że plik i miejsce istnieją.
 
-Ciosy, uniki i upadki w walce to nagrania z paczek Kenney (CC0) w `src/client/audio/sfx/`, przypisane w `data/sounds.json` do rodzajów broni i ataków potworów (pole `sound` w `data/item-bases.json` i `data/monsters.json`). Przerabia je dla głośnika telefonu `tools/build-sfx.py` (Python i ffmpeg). Głosy stworów i postaci przy trafieniu i pokonaniu (`voices`) nagrywa przebieg **Dźwięki (szkice)** z generatorem ElevenLabs:
+Ciosy, uniki i upadki w walce to nagrania z paczek Kenney (CC0) w `src/client/audio/sfx/`, przypisane w `data/sounds.json` do rodzajów broni i ataków potworów (pole `sound` w `data/item-bases.json` i `data/monsters.json`). Przerabia je dla głośnika telefonu `tools/build-sfx.py` (Python i ffmpeg). Głosy stworów i postaci przy trafieniu i pokonaniu (`voices`) oraz nagrania dźwięków wołanych po nazwie (`effects`, np. `tab`: zmiana zakładki, `swing`: zamach) pochodzą z generatora ElevenLabs. Nagrywa je przebieg **Dźwięki (szkice)**:
 
 1. Na github.com otwórz repozytorium, zakładkę **Actions** i przebieg **Dźwięki (szkice)**.
-2. Stuknij **Run workflow**, wybierz rodzaj (`voices` albo `effects`), wpisz identyfikatory po przecinku albo `all` i limit kredytów, a potem stuknij zielone **Run workflow**.
+2. Stuknij **Run workflow**, wybierz rodzaj (`voices`, `effects` albo `ui`), wpisz identyfikatory po przecinku albo `all` i limit kredytów, a potem stuknij zielone **Run workflow**.
 3. Szkice trafią na gałąź `art-drafts`, do folderu `audio/drafts/`.
 
-Przebieg potrzebuje sekretu repozytorium `ELEVENLABS_API_KEY`. Opisy dźwięków są w `audio/prompts.json`; dźwięk trwa tyle, ile podaje `seconds`, i kosztuje 20 kredytów na sekundę.
+Przebieg potrzebuje sekretu repozytorium `ELEVENLABS_API_KEY`. Opisy dźwięków są w `audio/prompts.json`; dźwięk trwa tyle, ile podaje `seconds`, i kosztuje 20 kredytów na sekundę. Kolejny przebieg czeka, aż skończy się poprzedni, ale GitHub trzyma w kolejce tylko jeden czekający, więc trzeci uruchomiony od razu anuluje drugi. Wybrane szkice przerabia dla telefonu `tools/build-drafts.py` (Python z numpy i ffmpeg): przycina je od pierwszego dźwięku do wybrzmienia, wycina bas, którego telefon nie gra, i wyrównuje głośność. Poziom w grze ustawia `gain` w `data/sounds.json`.

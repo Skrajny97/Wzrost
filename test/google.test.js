@@ -16,6 +16,8 @@ const { server, call, db } = useServer({
   GOOGLE_CLIENT_SECRET: 'test-secret',
   GOOGLE_TOKEN_URL: google.url,
   GOOGLE_HOSTS: 'insightrpg.com,localhost,127.0.0.1',
+  // Only this account has test mode here.
+  TEST_LOGINS: 'szef',
 });
 
 async function fakeGoogle() {
@@ -194,6 +196,34 @@ describe('Google sign-in', () => {
     const signedOut = await signIn(codeFor(claims('nowe')), { mode: 'link' });
     assert.equal(signedOut.location, '/?google=expired');
     assert.equal((await users()).length, 2);
+  });
+
+  test('an account with test mode opens only with Google once linked, and its other sessions end', async () => {
+    const first = await call('POST', '/api/auth/register', { body: { login: 'szef', password: 'tajnehaslo1' } });
+    const second = await call('POST', '/api/auth/login', { body: { identifier: 'szef', password: 'tajnehaslo1' } });
+    assert.equal(first.data.user.testMode, true);
+    const link = await signIn(codeFor(claims('google-szef')), { cookie: first.cookie, mode: 'link' });
+    assert.equal(link.location, '/?google=linked');
+    assert.equal((await call('GET', '/api/me', { cookie: first.cookie })).status, 200);
+    assert.equal((await call('GET', '/api/me', { cookie: second.cookie })).status, 401);
+
+    const password = await call('POST', '/api/auth/login', { body: { identifier: 'szef', password: 'tajnehaslo1' } });
+    assert.equal(password.status, 403);
+    assert.equal(password.data.error.code, 'google_only');
+    assert.equal(password.cookie, null);
+    // A wrong password gets the usual answer, so it tells nothing.
+    assert.equal((await call('POST', '/api/auth/login', { body: { identifier: 'szef', password: 'zlehaslo12' } })).status, 401);
+
+    const google = await signIn(codeFor(claims('google-szef')));
+    const me = await call('GET', '/api/me', { cookie: google.session });
+    assert.equal(me.data.user.login, 'szef');
+    assert.equal(me.data.user.testMode, true);
+
+    // Other accounts keep their password after linking.
+    const player = await call('POST', '/api/auth/register', { body: { login: 'gracz2', password: 'tajnehaslo1' } });
+    await signIn(codeFor(claims('google-gracz2')), { cookie: player.cookie, mode: 'link' });
+    assert.equal((await call('POST', '/api/auth/login', { body: { identifier: 'gracz2', password: 'tajnehaslo1' } })).status, 200);
+    assert.equal((await call('GET', '/api/me', { cookie: player.cookie })).status, 200);
   });
 
   test('a return without the flow cookie, with another state or a refusal signs nobody in', async () => {

@@ -15,6 +15,8 @@
 import { clampVolume, unlockSound, volumeGain } from './sound.js';
 
 const VOLUME_KEY = 'insight.musicVolume';
+// 100% at first: with effects at 40% the author found the two best balanced.
+const DEFAULT_VOLUME = 100;
 // Even at 100% the music stays below the effects, which are short and need
 // the room (half the signal, −6 dB).
 const MUSIC_LEVEL = 0.5;
@@ -36,9 +38,9 @@ const positions = new Map(); // track id → the second it stopped at
 function readVolume() {
   try {
     const stored = localStorage.getItem(VOLUME_KEY);
-    return stored !== null && Number.isFinite(Number(stored)) ? clampVolume(Number(stored)) : 50;
+    return stored !== null && Number.isFinite(Number(stored)) ? clampVolume(Number(stored)) : DEFAULT_VOLUME;
   } catch {
-    return 50;
+    return DEFAULT_VOLUME;
   }
 }
 

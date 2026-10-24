@@ -14,6 +14,7 @@
 
 import { fromBase64Url, toBase64Url } from './encoding.js';
 import { createSession, deleteSession, getSession, readCookie, sessionCookie } from './sessions.js';
+import { testModeFor } from './test-mode.js';
 
 const AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 // Tests point GOOGLE_TOKEN_URL at a stand-in for Google.
@@ -73,7 +74,7 @@ export async function googleCallback({ request, env, now }) {
     const session = await getSession(db, request, now);
     if (flow.mode === 'link') {
       if (!session) return finish('/?google=expired');
-      return finish(`/?google=${await linkGoogle(db, session.userId, identity.sub)}`);
+      return finish(`/?google=${await linkGoogle(db, env, session, identity.sub)}`);
     }
 
     let user = await userByGoogle(db, identity.sub);
@@ -176,15 +177,20 @@ async function createGoogleUser(db, identity, now) {
 }
 
 // Links the Google account to the player's account; returns how it went.
-async function linkGoogle(db, userId, sub) {
+async function linkGoogle(db, env, session, sub) {
   const owner = await userByGoogle(db, sub);
-  if (owner && owner.id !== userId) return 'taken';
+  if (owner && owner.id !== session.userId) return 'taken';
   try {
-    await db.prepare('UPDATE users SET google_sub = ? WHERE id = ?').bind(sub, userId).run();
+    await db.prepare('UPDATE users SET google_sub = ? WHERE id = ?').bind(sub, session.userId).run();
   } catch (error) {
     // Linked to another account a moment ago.
     if (String(error?.message).includes('users.google_sub')) return 'taken';
     throw error;
+  }
+  // An account with test mode opens only with Google from now on
+  // (accounts.js), so its other sessions, opened with the password, end.
+  if (testModeFor(env, session.user.login)) {
+    await db.prepare('DELETE FROM sessions WHERE user_id = ? AND id != ?').bind(session.userId, session.id).run();
   }
   return 'linked';
 }

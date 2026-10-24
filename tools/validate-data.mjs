@@ -242,7 +242,11 @@ function checkReferences(data) {
   // Combat sounds: files that exist, and weapons and attacks with a known kind.
   const sounds = data.sounds;
   const kinds = new Set([...Object.keys(sounds.sounds), ...sounds.synth]);
-  const soundFiles = [...Object.values(sounds.sounds), ...Object.values(sounds.voices).flatMap((voice) => Object.values(voice))].flatMap((sound) => sound.files);
+  const soundFiles = [
+    ...Object.values(sounds.sounds),
+    ...Object.values(sounds.effects),
+    ...Object.values(sounds.voices).flatMap((voice) => Object.values(voice)),
+  ].flatMap((sound) => sound.files);
   for (const file of new Set(soundFiles)) {
     if (!existsSync(new URL(file, CLIENT_DIR))) errors.push(`sounds.json: brak pliku src/client/${file}`);
   }

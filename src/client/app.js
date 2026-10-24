@@ -57,6 +57,8 @@ function show(name) {
 // /?google=<result> (src/server/google.js).
 const GOOGLE_NOTES = {
   linked: 'Połączono konto Google. Możesz już logować się przyciskiem Google.',
+  // An account with test mode (src/server/accounts.js).
+  linkedOnly: 'Połączono konto Google. To konto otwiera się teraz tylko przez Google.',
   taken: 'To konto Google jest już połączone z innym kontem w grze.',
   exists: 'Konto w grze z tym adresem e-mail już istnieje. Zaloguj się loginem i hasłem, a potem połącz Google w Ustawieniach.',
   cancelled: 'Logowanie przez Google zostało przerwane.',
@@ -79,18 +81,18 @@ function googleHint() {
 }
 
 // Reads the result once and removes it from the address.
-function takeGoogleNote() {
+function takeGoogleResult() {
   const params = new URLSearchParams(location.search);
   const result = params.get('google');
   if (result === null) return null;
   params.delete('google');
   const query = params.toString();
   history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
-  return GOOGLE_NOTES[result] ?? GOOGLE_NOTES.failed;
+  return result in GOOGLE_NOTES ? result : 'failed';
 }
 
 async function start() {
-  const googleNote = takeGoogleNote();
+  const googleResult = takeGoogleResult();
   // The music plays from the start screen on, after the first touch, and
   // the recorded fight sounds load then too.
   loadContent()
@@ -114,10 +116,10 @@ async function start() {
     const { user } = await request('GET', '/api/me');
     state.user = user;
     await enterGame();
-    if (googleNote) toast(googleNote);
+    if (googleResult) toast(GOOGLE_NOTES[googleResult === 'linked' && user.testMode ? 'linkedOnly' : googleResult]);
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
-      enterAuth(googleNote);
+      enterAuth(googleResult && GOOGLE_NOTES[googleResult]);
       return;
     }
     $('#loading-text').textContent = error.message;
@@ -324,12 +326,26 @@ function googleRow() {
         ? h('span', { class: 'status-ok', text: 'Połączone' })
         : h(
             'a',
-            { class: 'google-button google-button--small', href: '/api/auth/google/start?mode=link' },
+            { class: 'google-button google-button--small', href: '/api/auth/google/start?mode=link', onClick: confirmGoogleOnly },
             h('img', { class: 'google-logo', src: '/google-g.svg', alt: '', width: 18, height: 18 }),
             'Połącz z Google',
           ),
     ),
   );
+}
+
+// An account with test mode opens only with Google once linked, so the
+// player is asked first.
+async function confirmGoogleOnly(event) {
+  if (!state.user.testMode) return;
+  event.preventDefault();
+  const { href } = event.currentTarget;
+  const sure = await confirmAction({
+    title: 'Połączyć z Google?',
+    text: 'To konto ma tryb testowy. Po połączeniu otworzy się już tylko przez Google, bez hasła, a na innych urządzeniach się wyloguje.',
+    confirmLabel: 'Połącz',
+  });
+  if (sure) location.href = href;
 }
 
 function openSettings() {

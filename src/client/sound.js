@@ -1,12 +1,15 @@
-// Sound effects. Taps, tab changes, the System and the camp are made with
-// the Web Audio API. Blows, dodges and falls in the fight playback are short
-// recordings (data/sounds.json, CC0 packs by Kenney), and creatures and
-// characters can have voices; whatever has no recording is synthesized. The
+// Sound effects. Taps, the System and the camp are made with the Web Audio
+// API. Blows, dodges and falls in the fight playback are short recordings
+// (data/sounds.json, CC0 packs by Kenney), creatures and characters can have
+// voices, and a sound played by name (a tab change, say) can have a
+// recording in "effects"; whatever has no recording is synthesized. The
 // volume is set in the settings and kept in this browser. The same audio
 // context plays the background music (music.js).
 
 const VOLUME_KEY = 'insight.effectsVolume';
 const OLD_SWITCH_KEY = 'wzrost.sound'; // the earlier on/off switch
+// 40% at first: with the music at 100% the author found the two best balanced.
+const DEFAULT_VOLUME = 40;
 let context = null;
 let master = null;
 let noiseBuffer = null;
@@ -18,9 +21,9 @@ function readVolume() {
   try {
     const stored = localStorage.getItem(VOLUME_KEY);
     if (stored !== null && Number.isFinite(Number(stored))) return clampVolume(Number(stored));
-    return localStorage.getItem(OLD_SWITCH_KEY) === 'off' ? 0 : 100;
+    return localStorage.getItem(OLD_SWITCH_KEY) === 'off' ? 0 : DEFAULT_VOLUME;
   } catch {
-    return 100;
+    return DEFAULT_VOLUME;
   }
 }
 
@@ -152,7 +155,8 @@ const SOUNDS = {
     tone({ type: 'triangle', from: 330, duration: 0.22, gain: 0.05, lowpass: 1600 });
     tone({ type: 'triangle', from: 497, duration: 0.18, gain: 0.035, lowpass: 1600 });
   },
-  arrow: () => {
+  // An arrow leaves the bow (its hit is the recording "arrow").
+  shot: () => {
     noise({ duration: 0.16, gain: 0.09, filter: 'bandpass', from: 1700, to: 500, q: 2.4 });
     knock({ from: 200, gain: 0.07, delay: 0.14 });
   },
@@ -200,7 +204,8 @@ const SOUNDS = {
 export function playSound(name) {
   if (volume === 0 || !context || context.state !== 'running') return;
   try {
-    SOUNDS[name]?.();
+    const recorded = recordings?.effects?.[name];
+    if (!recorded || !playRecording(recorded)) SOUNDS[name]?.();
   } catch {
     // Sound is a nicety; a failure never stops the game.
   }
@@ -217,7 +222,8 @@ export function setRecordings(sounds) {
 function loadRecordings() {
   if (!recordings || !context) return;
   const voices = Object.values(recordings.voices).flatMap((voice) => Object.values(voice));
-  for (const file of new Set([...Object.values(recordings.sounds), ...voices].flatMap((sound) => sound.files))) {
+  const all = [...Object.values(recordings.sounds), ...Object.values(recordings.effects ?? {}), ...voices];
+  for (const file of new Set(all.flatMap((sound) => sound.files))) {
     if (buffers.has(file)) continue;
     const loading = fetch(`/${file}`)
       .then((response) => {

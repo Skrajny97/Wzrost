@@ -219,6 +219,12 @@ describe('request checks', () => {
 });
 
 describe('Google sign-in without its secrets', () => {
+  test('an account with test mode keeps its password', async () => {
+    await register({ login: 'szef', password: 'tajnehaslo1' });
+    await (await db()).prepare("UPDATE users SET google_sub = 'sub-1' WHERE login = 'szef'").run();
+    assert.equal((await login('szef', 'tajnehaslo1')).status, 200);
+  });
+
   test('sends the player back to the start screen', async () => {
     for (const path of ['/api/auth/google/start', '/api/auth/google/callback?code=x&state=y']) {
       const response = await server.fetch(path, { redirect: 'manual' });

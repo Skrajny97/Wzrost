@@ -240,7 +240,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     }
 
     const magic = actor.strike === 'magic';
-    playSound(magic ? 'magic' : 'arrow');
+    playSound(magic ? 'magic' : 'shot');
     await animate(from, [{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 160 });
     if (id !== run) return;
     const bolt = h('span', { class: `projectile projectile--${magic ? 'magic' : 'arrow'}` });

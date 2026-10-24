@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Dźwięki walki",
-  "description": "Nagrane dźwięki walki (src/client/audio/sfx). Broń (sound w item-bases.json) i atak potwora (attack.sound w monsters.json) mają rodzaj dźwięku: nagrany z sounds albo grany z syntezatora (synth). crit gra się dodatkowo przy trafieniu krytycznym, dodge przy uniku, a kill przy pokonaniu. voices: głosy przy trafieniu (hurt) i pokonaniu (death), dla id potwora albo wyglądu postaci (female, male).",
+  "description": "Nagrane dźwięki walki (src/client/audio/sfx). Broń (sound w item-bases.json) i atak potwora (attack.sound w monsters.json) mają rodzaj dźwięku: nagrany z sounds albo grany z syntezatora (synth). crit gra się dodatkowo przy trafieniu krytycznym, dodge przy uniku, a kill przy pokonaniu. voices: głosy przy trafieniu (hurt) i pokonaniu (death), dla id potwora albo wyglądu postaci (female, male). effects: nagrania dźwięków gry wołanych po nazwie (np. tab: zmiana zakładki); nazwa bez nagrania gra z syntezatora.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["sounds", "synth", "voices"],
+  "required": ["sounds", "synth", "voices", "effects"],
   "definitions": {
     "sound": {
       "type": "object",
@@ -31,6 +31,12 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "Rodzaje grane z syntezatora w src/client/sound.js."
+    },
+    "effects": {
+      "type": "object",
+      "description": "Nazwa dźwięku z src/client/sound.js (SOUNDS) → jego nagranie.",
+      "propertyNames": { "enum": ["tap", "tab", "open", "swing", "shot", "magic", "effect", "tick", "victory", "defeat", "system", "build", "collect", "done"] },
+      "additionalProperties": { "$ref": "#/definitions/sound" }
     },
     "voices": {
       "type": "object",
