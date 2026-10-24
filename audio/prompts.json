@@ -91,24 +91,34 @@
         "Brian": "nPczCjzI2devNBz1zQrb",
         "George": "JBFqnCBsd6RMkjVDRZzb",
         "Lily": "pFZP5JQG7iQjIQuC4Bku"
-      }
+      },
+      "remixCreditsPerCharacter": 3,
+      "remixGuidance": 2
     },
     "prompts": {
-      "intro-river": {
-        "voice": "River",
-        "line": "intro"
-      },
-      "intro-brian": {
-        "voice": "Brian",
-        "line": "intro"
-      },
-      "intro-george": {
+      "trial-slow": {
+        "line": "intro",
         "voice": "George",
-        "line": "intro"
+        "settings": {
+          "stability": 0.4,
+          "similarity_boost": 0.8,
+          "style": 0.45,
+          "speed": 0.7,
+          "use_speaker_boost": true
+        }
       },
-      "intro-lily": {
-        "voice": "Lily",
-        "line": "intro"
+      "trial-v3": {
+        "line": "intro",
+        "voice": "George",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        }
+      },
+      "trial-remix": {
+        "line": "intro",
+        "voice": "George",
+        "remix": "Make the voice much deeper, older and raspier, a little hoarse, like an old storyteller by a campfire at night. Slow, calm and natural, warm, with pauses between sentences."
       }
     }
   }

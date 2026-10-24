@@ -9,7 +9,10 @@
 // and stops before it would spend more than --max-credits.
 // A kind with `tts` is speech instead (ElevenLabs text to speech): a prompt is
 // {voice, text} or {voice, line}, a line of the narrator's introduction from
-// data/tutorial.json, and it costs credits for each character read.
+// data/tutorial.json, and it costs credits for each character read. A prompt
+// may name its own `model` and `settings`, or ask for a `remix`: the voice
+// changed as described (ElevenLabs Voice Remixing), which comes back as a few
+// previews reading the text.
 
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
@@ -67,8 +70,11 @@ const prompt = (id) => {
   if (tts) return { ...entry, text: spokenText(entry) };
   return typeof entry === 'string' ? { text: entry, seconds: kind.seconds } : entry;
 };
-const credits = (id) =>
-  tts ? Math.ceil(prompt(id).text.length * (tts.creditsPerCharacter ?? 1)) : Math.ceil(prompt(id).seconds * CREDITS_PER_SECOND);
+const credits = (id) => {
+  if (!tts) return Math.ceil(prompt(id).seconds * CREDITS_PER_SECOND);
+  const perCharacter = prompt(id).remix ? (tts.remixCreditsPerCharacter ?? 3) : (tts.creditsPerCharacter ?? 1);
+  return Math.ceil(prompt(id).text.length * perCharacter);
+};
 const size = (id) => (tts ? `${prompt(id).text.length} znaków` : `${prompt(id).seconds} s`);
 const total = ids.reduce((sum, id) => sum + credits(id) * variants, 0);
 const lines = [`| Dźwięk | Wynik |`, `| --- | --- |`];
@@ -104,21 +110,33 @@ async function voiceIds() {
 }
 const voices = tts && !values['dry-run'] ? await voiceIds() : {};
 
-// One request: a sound of a set length, or speech in the prompt's voice.
+// One request: a sound of a set length, speech in the prompt's voice, or a
+// remix of that voice reading the text.
 function requestFor(id) {
-  const { text, seconds, voice } = prompt(id);
+  const { text, seconds, voice, model, settings, remix } = prompt(id);
   if (!tts) {
     return { url: `${API}/sound-generation?output_format=mp3_44100_64`, payload: { text, duration_seconds: seconds, prompt_influence: kind.influence ?? 0.5 } };
   }
   const voiceId = voices[voice.toLowerCase()];
   if (!voiceId) throw new Error(`nieznany głos ${voice}`);
-  return { url: `${API}/text-to-speech/${voiceId}?output_format=mp3_44100_128`, payload: { text, model_id: tts.model, voice_settings: tts.settings } };
+  if (remix) {
+    return {
+      url: `${API}/text-to-voice/${voiceId}/remix?output_format=mp3_44100_128`,
+      payload: { voice_description: remix, text, guidance_scale: tts.remixGuidance ?? 2 },
+      previews: true,
+    };
+  }
+  return {
+    url: `${API}/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
+    payload: { text, model_id: model ?? tts.model, voice_settings: settings ?? tts.settings },
+  };
 }
 
 // One sound, recorded `variants` times; each take is a separate request.
 async function record(id) {
-  const { url, payload } = requestFor(id);
+  const { url, payload, previews } = requestFor(id);
   const files = [];
+  const generated = []; // a remix's voices, which can be kept as a voice of the account
   for (let take = 0; take < variants; take++) {
     const response = await fetch(url, {
       method: 'POST',
@@ -129,13 +147,28 @@ async function record(id) {
       const detail = await response.text().catch(() => '');
       throw new Error(`ElevenLabs odpowiedział ${response.status}: ${detail.slice(0, 300)}`);
     }
+    spent += credits(id);
+    if (previews) {
+      // A remix answers with a few voices, each reading the text.
+      const answer = await response.json();
+      for (const [index, preview] of (answer.previews ?? []).entries()) {
+        const file = `${outDir}/${id}-${stamp}-${take}-${index}.mp3`;
+        writeFileSync(file, Buffer.from(preview.audio_base_64, 'base64'));
+        files.push(file);
+        generated.push({ file, generatedVoiceId: preview.generated_voice_id });
+      }
+      continue;
+    }
     const file = `${outDir}/${id}-${stamp}-${take}.mp3`;
     writeFileSync(file, Buffer.from(await response.arrayBuffer()));
     files.push(file);
-    spent += credits(id);
   }
-  writeFileSync(`${outDir}/${id}-${stamp}.json`, `${JSON.stringify({ id, payload, files, credits: credits(id) * files.length }, null, 2)}\n`);
-  lines.push(`| ${id} | ${files.length} nagrania, ${credits(id) * files.length} kredytów |`);
+  const takes = previews ? variants : files.length;
+  writeFileSync(
+    `${outDir}/${id}-${stamp}.json`,
+    `${JSON.stringify({ id, payload, files, ...(previews && { generated }), credits: credits(id) * takes }, null, 2)}\n`,
+  );
+  lines.push(`| ${id} | ${files.length} nagrania, ${credits(id) * takes} kredytów |`);
 }
 
 // Each sound on its own: a failed one does not lose the ones already paid for.
