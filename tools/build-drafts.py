@@ -40,15 +40,19 @@ SOUNDS = {
     'magic-1': ('effects/magic-20261024T1252-0.mp3', 'spark'),
     'magic-2': ('effects/magic-20261024T1252-1.mp3', 'spark'),
 }
-# Voices, when their drafts are there: <id>-1 and <id>-2 from takes 0 and 1
-# of the newest draft of each id.
+# The takes kept from the newest draft of a voice that has more than two,
+# chosen by measure: no rumble, no hiss, a clear start.
+TAKES = {}
+
+# Voices, when their drafts are there: <id>-1 and <id>-2 from the newest
+# draft of each id (takes 0 and 1, or the ones in TAKES).
 VOICES = os.path.join(SRC, 'voices')
 if os.path.isdir(VOICES):
     for meta in sorted(f for f in os.listdir(VOICES) if f.endswith('.json')):
         draft = json.load(open(os.path.join(VOICES, meta)))
-        for take, path in enumerate(draft['files']):
-            kind = 'cry' if draft['id'].endswith('-hurt') else 'dying'
-            SOUNDS[f"{draft['id']}-{take + 1}"] = (os.path.relpath(path, 'audio/drafts'), kind)
+        kind = 'cry' if draft['id'].endswith('-hurt') else 'dying'
+        for number, take in enumerate(TAKES.get(draft['id'], [0, 1])):
+            SOUNDS[f"{draft['id']}-{number + 1}"] = (os.path.relpath(draft['files'][take], 'audio/drafts'), kind)
 
 
 def run(args, **kwargs):
