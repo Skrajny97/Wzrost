@@ -96,9 +96,54 @@
       "remixGuidance": 2,
       "previewCreditsPerCharacter": 3,
       "designModel": "eleven_ttv_v3",
-      "designGuidance": 3
+      "designGuidance": 3,
+      "languageCode": "pl"
     },
-    "prompts": {},
+    "prompts": {
+      "try-plain": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "line": "purpose"
+      },
+      "try-dots": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "text": "Znalazłeś się w miejscu, którego celem jest rozwój. Liczę na to, że osiągniesz szczyty…"
+      },
+      "try-pause": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "text": "Znalazłeś się w miejscu, którego celem jest rozwój. Liczę na to, że osiągniesz szczyty. [pauses]"
+      },
+      "try-ending": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "line": "purpose",
+        "ending": "\n\nTak."
+      },
+      "try-context": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "line": "purpose",
+        "previousText": "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę. Witaj, przybyszu.",
+        "nextText": "Na początku drobny test dla Ciebie. Jedno z najbezpieczniejszych wyzwań, jakie Cię czekają. Udaj się na wyprawę na Skraj Wiatrołomów."
+      }
+    },
     "allLines": {
       "voice": "Narrator",
       "model": "eleven_v3",

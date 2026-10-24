@@ -14,7 +14,8 @@
 // (ElevenLabs Voice Remixing, only for the account's own voices) or for a
 // `design`: a new voice from a description, optionally after a `reference`
 // recording (ElevenLabs Voice Design). A remix or a design comes back as a
-// few previews reading the text.
+// few previews reading the text. Speech can also take the text around it
+// (`previousText`, `nextText`) and an `ending` read after it, then cut off.
 
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
@@ -52,14 +53,17 @@ const balance = tts && JSON.parse(readFileSync('data/balance.json', 'utf8'));
 const tutorial = tts && JSON.parse(readFileSync('data/tutorial.json', 'utf8'));
 
 // `allLines` makes a prompt of every line of the narrator's introduction,
-// named by the line's id, and of its female version, `<id>-female`.
+// named by the line's id, and of its female version, `<id>-female`. An entry
+// of the same name in `prompts` adds to it: say, what the voice reads when
+// the parchment would be misread.
+const own = (id) => kind.prompts?.[id] ?? {};
 const prompts = {
   ...kind.prompts,
   ...(kind.allLines &&
     Object.fromEntries(
       tutorial.lines.flatMap((line) => [
-        [line.id, { ...kind.allLines, line: line.id }],
-        ...(line.female ? [[`${line.id}-female`, { ...kind.allLines, line: line.id, variant: 'female' }]] : []),
+        [line.id, { ...kind.allLines, line: line.id, ...own(line.id) }],
+        ...(line.female ? [[`${line.id}-female`, { ...kind.allLines, line: line.id, variant: 'female', ...own(`${line.id}-female`) }]] : []),
       ]),
     )),
 };
@@ -71,8 +75,14 @@ const maxCredits = Number(values['max-credits']);
 if (!(maxCredits > 0)) fail('--max-credits musi być dodatnią liczbą kredytów.');
 
 // What a speech prompt reads: its own text, or a narrator's line with the
-// starting Time Points filled in, as the game shows it.
+// starting Time Points filled in, as the game shows it. An `ending` is read
+// after it and cut off later (eleven_v3 tends to clip the last syllable of
+// what it reads, so the clipped part is not the line's).
 function spokenText(entry) {
+  return mainText(entry) + (entry.ending ?? '');
+}
+
+function mainText(entry) {
   if (entry.text) return entry.text;
   const line = tutorial.lines.find((candidate) => candidate.id === entry.line);
   if (!line) fail(`Brak kwestii ${entry.line} w data/tutorial.json.`);
@@ -144,6 +154,18 @@ async function voiceIds() {
 }
 const voices = tts && !values['dry-run'] ? await voiceIds() : {};
 
+// The credits left on the account, when the key may read them.
+async function creditsLeft() {
+  try {
+    const response = await fetch(`${API}/user/subscription`, { headers: { 'xi-api-key': token } });
+    if (!response.ok) return null;
+    const { character_count: used, character_limit: limit } = await response.json();
+    return `${limit - used} z ${limit}`;
+  } catch {
+    return null;
+  }
+}
+
 // One request: a sound of a set length, speech in the prompt's voice, or a
 // remix of that voice reading the text.
 function requestFor(id) {
@@ -166,15 +188,26 @@ function requestFor(id) {
       previews: true,
     };
   }
+  // With an ending, the answer also gives when each character is read, so
+  // the ending can be cut off where the line ends.
+  const { previousText, nextText, ending } = prompt(id);
   return {
-    url: `${API}/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
-    payload: { text, model_id: model ?? tts.model, voice_settings: settings ?? tts.settings },
+    url: `${API}/text-to-speech/${voiceId}${ending ? '/with-timestamps' : ''}?output_format=mp3_44100_128`,
+    payload: {
+      text,
+      model_id: model ?? tts.model,
+      voice_settings: settings ?? tts.settings,
+      ...(tts.languageCode && { language_code: tts.languageCode }),
+      ...(previousText && { previous_text: previousText }),
+      ...(nextText && { next_text: nextText }),
+    },
+    timed: Boolean(ending),
   };
 }
 
 // One sound, recorded `variants` times; each take is a separate request.
 async function record(id) {
-  const { url, payload, sent = payload, previews } = requestFor(id);
+  const { url, payload, sent = payload, previews, timed } = requestFor(id);
   const files = [];
   const generated = []; // a remix's voices, which can be kept as a voice of the account
   for (let take = 0; take < variants; take++) {
@@ -200,13 +233,20 @@ async function record(id) {
       continue;
     }
     const file = `${outDir}/${id}-${stamp}-${take}.mp3`;
-    writeFileSync(file, Buffer.from(await response.arrayBuffer()));
+    if (timed) {
+      const { audio_base64: audio, alignment } = await response.json();
+      writeFileSync(file, Buffer.from(audio, 'base64'));
+      writeFileSync(file.replace(/\.mp3$/, '.timing.json'), `${JSON.stringify(alignment)}\n`);
+    } else {
+      writeFileSync(file, Buffer.from(await response.arrayBuffer()));
+    }
     files.push(file);
   }
   const takes = previews ? variants : files.length;
+  const { ending } = prompt(id);
   writeFileSync(
     `${outDir}/${id}-${stamp}.json`,
-    `${JSON.stringify({ id, payload, files, ...(previews && { generated }), credits: credits(id) * takes }, null, 2)}\n`,
+    `${JSON.stringify({ id, payload, ...(ending && { ending }), files, ...(previews && { generated }), credits: credits(id) * takes }, null, 2)}\n`,
   );
   lines.push(`| ${id} | ${files.length} nagrania, ${credits(id) * takes} kredytów |`);
 }
@@ -221,5 +261,7 @@ for (const id of ids) {
     process.exitCode = 1;
   }
 }
-summary([`Wydano: ${spent} kredytów.`, '', ...lines].join('\n'));
-console.log(`Wydano: ${spent} kredytów.`);
+const left = await creditsLeft();
+const spentLine = `Wydano: ${spent} kredytów.${left ? ` Na koncie zostało ${left}.` : ''}`;
+summary([spentLine, '', ...lines].join('\n'));
+console.log(spentLine);
