@@ -80,31 +80,35 @@
       "model": "eleven_multilingual_v2",
       "creditsPerCharacter": 1,
       "settings": {
-        "stability": 0.5,
+        "stability": 0.6,
         "similarity_boost": 0.75,
-        "style": 0.3,
+        "style": 0.2,
+        "speed": 0.92,
         "use_speaker_boost": true
       },
       "voices": {
-        "George": "JBFqnCBsd6RMkjVDRZzb",
-        "Bill": "pqHfZKP75CvOlQylNhV4",
+        "River": "SAz9YHcvj6GT2YYXdXww",
         "Brian": "nPczCjzI2devNBz1zQrb",
-        "Matilda": "XrExE9yKIg1WjnnlVkGX",
+        "George": "JBFqnCBsd6RMkjVDRZzb",
         "Lily": "pFZP5JQG7iQjIQuC4Bku"
       }
     },
     "prompts": {
+      "intro-river": {
+        "card": "intro",
+        "voice": "River"
+      },
+      "intro-brian": {
+        "card": "intro",
+        "voice": "Brian"
+      },
       "intro-george": {
         "card": "intro",
         "voice": "George"
       },
-      "intro-bill": {
+      "intro-lily": {
         "card": "intro",
-        "voice": "Bill"
-      },
-      "intro-matilda": {
-        "card": "intro",
-        "voice": "Matilda"
+        "voice": "Lily"
       }
     }
   }
