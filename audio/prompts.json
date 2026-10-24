@@ -5,7 +5,7 @@
     "prompts": {
       "wolf-hurt": "a wolf yelps in pain from a hit, single short yelp, close up, dry, no music",
       "wolf-death": "a wolf whimpers and collapses, dying whine, close up, dry, no music",
-      "alpha-wolf-hurt": "a huge wolf snarls in pain from a hit, deep and angry, close up, dry, no music",
+      "alpha-wolf-hurt": "a huge wolf yelps and snarls in pain from a hit, sharp and loud, mid-pitched, close up, dry, no music",
       "alpha-wolf-death": "a huge wolf lets out a long dying howl that fades, close up, dry, no music",
       "fox-hurt": "a fox gives a sharp high yelp of pain, close up, dry, no music",
       "fox-death": "a fox whimpers weakly and falls silent, close up, dry, no music",
@@ -25,8 +25,8 @@
       "viper-death": "a snake gives a long fading hiss, close up, dry, no music",
       "spider-hurt": "a giant spider chitters and hisses from a hit, short, close up, dry, no music",
       "spider-death": "a giant spider screeches and its legs click as it curls up, close up, dry, no music",
-      "wisp-hurt": "a ghostly flame spirit flickers with an eerie whispering wail, short, close up, no music",
-      "wisp-death": "a ghostly flame spirit fades out with a soft eerie sigh, close up, no music",
+      "wisp-hurt": "a ghostly flame spirit lets out a short high eerie whispering wail, airy and hissing, close up, no music",
+      "wisp-death": "a ghostly flame spirit fades away with a high airy whispering sigh and a soft fizzle, close up, no music",
       "likho-hurt": "a gaunt forest demon shrieks in pain, raspy and inhuman, short, close up, dry, no music",
       "likho-death": "a gaunt forest demon lets out a long rattling death shriek, close up, dry, no music",
       "male-hurt": "a young man grunts in pain from a blow in a fight, short, no words, close up, dry, no music",
@@ -39,8 +39,8 @@
     "seconds": 1.5,
     "prompts": {
       "swing": "a quick whoosh of a sword swung through the air, single swing, dry, no music",
-      "bow": "a wooden longbow string releases an arrow with a twang, single shot, dry, no music",
-      "magic": "a small magic fire bolt flies and bursts on impact, short, fantasy, no music",
+      "bow": "a crisp wooden bow string twang as an arrow is released, sharp and bright, single shot, close up, dry, no music",
+      "magic": "a short crackling magic spark spell, a bright fizzing whoosh with a sparkle, fantasy, close up, no music",
       "holy": "a short bright holy magic chime with a shimmering burst, fantasy, no music",
       "victory": "a short triumphant fantasy horn fanfare, no drums",
       "defeat": "a short low mournful fantasy horn note fading out, no drums"
