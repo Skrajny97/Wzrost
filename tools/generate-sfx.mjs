@@ -47,16 +47,22 @@ if (!token) fail('Brak sekretu ELEVENLABS_API_KEY. Dodaj klucz ElevenLabs w usta
 const config = JSON.parse(readFileSync('audio/prompts.json', 'utf8'));
 const kind = config[values.kind];
 if (!kind || values.kind === '$comment') fail(`Nieznany rodzaj dźwięków: ${values.kind}. Dostępne: ${Object.keys(config).filter((key) => key !== '$comment').join(', ')}.`);
-const ids = values.ids === 'all' ? Object.keys(kind.prompts) : values.ids.split(',').map((id) => id.trim()).filter(Boolean);
-const unknown = ids.filter((id) => !kind.prompts[id]);
+const tts = kind.tts ?? null;
+const balance = tts && JSON.parse(readFileSync('data/balance.json', 'utf8'));
+const tutorial = tts && JSON.parse(readFileSync('data/tutorial.json', 'utf8'));
+
+// `allLines` makes a prompt of every line of the narrator's introduction,
+// named by the line's id.
+const prompts = {
+  ...kind.prompts,
+  ...(kind.allLines && Object.fromEntries(tutorial.lines.map((line) => [line.id, { ...kind.allLines, line: line.id }]))),
+};
+const ids = values.ids === 'all' ? Object.keys(prompts) : values.ids.split(',').map((id) => id.trim()).filter(Boolean);
+const unknown = ids.filter((id) => !prompts[id]);
 if (unknown.length) fail(`Brak opisu w audio/prompts.json dla: ${unknown.join(', ')}.`);
 const variants = Math.max(1, Math.min(4, Number(values.variants) || 1));
 const maxCredits = Number(values['max-credits']);
 if (!(maxCredits > 0)) fail('--max-credits musi być dodatnią liczbą kredytów.');
-
-const tts = kind.tts ?? null;
-const balance = tts && JSON.parse(readFileSync('data/balance.json', 'utf8'));
-const tutorial = tts && JSON.parse(readFileSync('data/tutorial.json', 'utf8'));
 
 // What a speech prompt reads: its own text, or a narrator's line with the
 // starting Time Points filled in, as the game shows it.
@@ -68,7 +74,7 @@ function spokenText(entry) {
 }
 
 const prompt = (id) => {
-  const entry = kind.prompts[id];
+  const entry = prompts[id];
   if (tts) return { ...entry, text: spokenText(entry) };
   return typeof entry === 'string' ? { text: entry, seconds: kind.seconds } : entry;
 };
@@ -98,7 +104,9 @@ const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 13);
 let spent = 0;
 
 // Voice ids by name: from the account's list when the key may read it,
-// otherwise the ids written down in audio/prompts.json.
+// otherwise the ids written down in audio/prompts.json. A voice in `saved`
+// is a chosen preview of a design: the first run keeps it as a voice of the
+// account under its name, and later runs find it on the list.
 async function voiceIds() {
   const ids = Object.fromEntries(Object.entries(tts.voices ?? {}).map(([name, id]) => [name.toLowerCase(), id]));
   try {
@@ -108,6 +116,22 @@ async function voiceIds() {
     }
   } catch {
     // The list is only a help; the written-down ids are enough.
+  }
+  const kept = {};
+  for (const [name, saved] of Object.entries(tts.saved ?? {})) {
+    if (ids[name.toLowerCase()]) continue;
+    const response = await fetch(`${API}/text-to-voice`, {
+      method: 'POST',
+      headers: { 'xi-api-key': token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ voice_name: name, voice_description: saved.description, generated_voice_id: saved.generatedVoiceId }),
+    });
+    if (!response.ok) fail(`Nie udało się zapisać głosu ${name}: ${response.status} ${(await response.text().catch(() => '')).slice(0, 300)}`);
+    ids[name.toLowerCase()] = (await response.json()).voice_id;
+    kept[name] = ids[name.toLowerCase()];
+  }
+  if (Object.keys(kept).length) {
+    writeFileSync(`${outDir}/voices-${stamp}.json`, `${JSON.stringify(kept, null, 2)}\n`);
+    summary(`Zapisane głosy: ${Object.entries(kept).map(([name, id]) => `${name} (${id})`).join(', ')}.`);
   }
   return ids;
 }
