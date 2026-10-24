@@ -27,26 +27,30 @@ page.setDefaultTimeout(20000);
 
 const steps = [];
 const complaints = [];
-page.on('pageerror', (error) => complaints.push(`błąd strony: ${error.message}`));
+// Each complaint names the step it came in.
+let current = 'start';
+const complain = (line) => complaints.push(`${line} (krok: ${current})`);
+page.on('pageerror', (error) => complain(`błąd strony: ${error.message}`));
 // A failed request shows once, as its response; the console only repeats it.
 // The service worker cannot start on the local server's own certificate.
 page.on('console', (message) => {
   const text = message.text();
   if (message.type() === 'error' && !text.startsWith('Failed to load resource') && !/SSL certificate error occurred when fetching the script/.test(text)) {
-    complaints.push(`konsola: ${text}`);
+    complain(`konsola: ${text}`);
   }
 });
 page.on('response', (response) => {
   // Expected: no session before signing in, no character before creating
   // one, and the refused name.
   if (response.status() >= 400 && !/\/api\/(me|character)$/.test(new URL(response.url()).pathname)) {
-    complaints.push(`odpowiedź ${response.status()}: ${response.url()}`);
+    complain(`odpowiedź ${response.status()}: ${response.url()}`);
   }
 });
 
 let shots = 0;
 // A step: its action, then a screenshot of the screen it leaves.
 async function step(name, action) {
+  current = name;
   const started = Date.now();
   const file = `${String(++shots).padStart(2, '0')}.png`;
   let error = null;
@@ -224,7 +228,10 @@ await step('Instalacja na iPhonie', async () => {
 // A second player picks the same name: the page must say it is taken.
 const context2 = await browser.newContext(options);
 const second = await context2.newPage();
-second.on('pageerror', (error) => complaints.push(`błąd strony (druga postać): ${error.message}`));
+second.on('pageerror', (error) => complain(`błąd strony (druga postać): ${error.message}`));
+second.on('console', (message) => {
+  if (message.type() === 'error' && !message.text().startsWith('Failed to load resource')) complain(`konsola (druga postać): ${message.text()}`);
+});
 let taken = '';
 await step('Drugi gracz: to samo imię', async () => {
   await second.goto(BASE);
