@@ -6,9 +6,9 @@ Stan: **Etap 2a, plansza obozu.** Działa konto, tworzenie postaci z wyborem jed
 
 ## Adres gry
 
-**https://wzrost.wzrost.workers.dev**
+**https://insightrpg.com**
 
-Adres zawiera jeszcze dawną roboczą nazwę „Wzrost”. Zmieni się po podłączeniu własnej domeny.
+Gra działa też pod https://www.insightrpg.com. Zapasowy adres https://wzrost.wzrost.workers.dev prowadzi do tej samej gry i bazy, a zawiera dawną roboczą nazwę „Wzrost”.
 
 Adres jest też w zakładce **Actions**, w podsumowaniu (Summary) każdego przebiegu „Testy i wdrożenie”.
 

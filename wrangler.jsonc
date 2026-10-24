@@ -3,8 +3,14 @@
   "name": "wzrost",
   "main": "src/server/index.js",
   "compatibility_date": "2026-10-19",
+  // The game's own domain, registered in Cloudflare: the main address and
+  // www. The workers.dev address stays as a spare one.
   "workers_dev": true,
   "preview_urls": false,
+  "routes": [
+    { "pattern": "insightrpg.com", "custom_domain": true },
+    { "pattern": "www.insightrpg.com", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./src/client",
     "run_worker_first": ["/api/*"]
