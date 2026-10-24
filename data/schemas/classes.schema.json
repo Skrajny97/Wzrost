@@ -6,7 +6,7 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "name", "role", "start", "description", "position", "baseStats", "growth", "autoPoints", "recovery", "weapons", "offhands"],
+    "required": ["id", "name", "role", "start", "description", "position", "baseStats", "growth", "autoPoints", "recovery", "weapons", "offhands", "armor"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
       "name": { "type": "string", "minLength": 1 },
@@ -36,6 +36,11 @@
         "description": "Bazy drugiej ręki, których klasa może używać.",
         "type": "array",
         "minItems": 1,
+        "items": { "type": "string" }
+      },
+      "armor": {
+        "description": "Pancerze klasy: bazy hełmu i pancerza, które może nosić. Pancerz, którego nie wymienia żadna klasa (rękawice, buty), nosi każdy.",
+        "type": "array",
         "items": { "type": "string" }
       }
     }

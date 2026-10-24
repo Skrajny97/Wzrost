@@ -885,7 +885,6 @@ Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach i poprosił
 5. **Instalacja na iPhonie** (uwaga testerki). W nowym Safari „Udostępnij” jest w menu strony, pod kreseczkami obok adresu, a nie pod „…”. Instrukcja wymienia teraz kreseczki, a trzy kropki zostały jako wariant ze starszych wersji. Tak samo przy nazwie pozycji: „Do ekranu początkowego” albo „Dodaj do ekranu początkowego”.
 6. **Następne miejsce czeka na koniec poprzedniego.** Po „Dalej” gra zapisuje przeczytany pergamin, a odpowiedź serwera wywoływała następne miejsce, zanim pergamin się zwinął. Stąd skok podświetlenia i ekranu, wyraźniejszy przy wolnej sieci w telefonie. Zwijający się pergamin sam teraz uruchamia następną kwestię.
 
-
 ## Kamera narratora i przełącznik animacji (24.10.2026)
 
 1. **Animacje według gry, nie telefonu** (uwaga autora: w raporcie nic nie jedzie, wszystko przeskakuje). Przyczyną było ograniczanie ruchu w ustawieniach telefonu autora. Przy nim gra wyłączała przejazd ekranu, wędrujące podświetlenie, rozwijanie pergaminu i pulsowanie ramek. To samo ustawienie było wcześniej przyczyną niedziałającego „Powtórz” w walce. Teraz o ruchu decyduje przełącznik „Animacje” w Ustawieniach gry, domyślnie włączony, a ustawienie telefonu nie ma znaczenia. Wyłączony przełącznik daje dawny spokojny tryb:
@@ -905,3 +904,19 @@ Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach i poprosił
 
     W próbie na wymiarach telefonu, z ograniczaniem ruchu włączonym w przeglądarce, kamera jechała w każdym przejściu wprowadzenia. Podświetlenie przesuwało się płynnie, najwyżej o 13 px na klatkę.
 3. **Dziennik walki nie przesuwa raportu.** Dziennik pod areną rósł w trakcie walki linijka po linijce i przesuwał w dół wszystko pod sobą. Narrator stał wtedy przy uciekającym miejscu, a podświetlenie skakało. Teraz dziennik od początku ma wysokość całej walki, nadal najwyżej 200 px.
+
+## Tła w walce, pancerz klas i imiona (24.10.2026)
+
+1. **Bez tła za naszymi postaciami w walce** (prośba autora). Popiersia drużyny na arenie miały ciemnozielone tło w ramce, a stwory nie. Teraz stoją na karcie jak stwory, a dół popiersia łagodnie zanika zamiast kończyć się prostą krawędzią.
+2. **Pancerz też należy do klas** (prośba autora: Łucznik mógł założyć szatę, a ta ma być tylko dla Maga). Hełm i pancerz noszą tylko klasy, które je wymieniają (`armor` w `data/classes.json`):
+    - Wojownik i Kleryk: hełm i kolczuga,
+    - Łucznik i Cień: kaptur i kurtka,
+    - Mag: kaptur i szata.
+
+    Rękawice, buty, amulet, pierścień i talizman nosi każdy, jak dotąd. Łupy i znaleziska mają tylko to, co postać może założyć. Pancerz innej klasy, który postać już nosiła, migracja `0012_class_armour.sql` odkłada do plecaka. Gdy plecak się przepełni, złomiarz kupuje go pierwszego. Kleryk dostał kolczugę i hełm, bo nosi tarczę, a szata ma być tylko dla Maga. Symulacja balansu ubierała go dotąd w szatę i kaptur, więc to jest pytanie do autora. Punkt zmienia, za prośbą autora, zdanie „Resztę nosi każdy” w dokumencie projektowym i punkt 12 Etapu 1.
+3. **Imię nie odpada po cichu** (uwaga testerki: na iPhonie nie przeszło nawet „Justi”). Serwer przyjmuje „Justi”, także według dawnej zasady, więc przyczyną było raczej zajęte imię, niewidoczny znak z klawiatury albo krótkie okno wdrożenia, gdy postacie były usuwane. Teraz:
+    - niewidoczne znaki znikają,
+    - litera i jej akcent wpisane osobno łączą się w jedną literę,
+    - klawiatura iPhone'a nie poprawia imienia (`autocorrect="off"`),
+    - komunikat mówi wprost, co jest nie tak: długość, konkretny niedozwolony znak, pierwsza albo ostatnia litera, a przy zajętym imieniu „To imię nosi już inna postać w grze. Wybierz inne.”
+4. **Kolumny usuwać w osobnym wdrożeniu.** Migracje idą przed nowym kodem, więc przez kilka sekund wdrożenia działa stary kod na nowej bazie. Migracja `0011` usunęła kolumnę, z której korzystał stary kod, i przez tę chwilę tworzenie postaci mogło kończyć się błędem. Kolumnę, której kod już nie używa, usuwa się dopiero w kolejnym wdrożeniu.

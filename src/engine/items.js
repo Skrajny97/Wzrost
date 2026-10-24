@@ -60,19 +60,22 @@ export function rollRarity(rng, content, bonus = 1) {
   return rng.weighted(content.rarities, (rarity) => rarity.dropWeight * (rarity.affixes > 0 ? bonus : 1)).id;
 }
 
-// Weapons and off-hands belong to classes (classes.json); everything else
-// fits anyone. Returns the classes that can use a base, or null for all.
+// Weapons, off-hands and the armour of the head and chest belong to classes
+// (weapons, offhands and armor in classes.json); what no class lists, such as
+// gloves, boots and jewellery, fits anyone. Returns the classes that can use
+// a base, or null for all.
+const GEAR = ['weapons', 'offhands', 'armor'];
+
 export function baseClasses(baseId, content) {
-  const base = content.basesById[baseId];
-  const key = base.slot === 'weapon' ? 'weapons' : base.slot === 'offhand' ? 'offhands' : null;
-  return key && content.classes.filter((cls) => cls[key].includes(baseId)).map((cls) => cls.id);
+  const classes = content.classes.filter((cls) => GEAR.some((key) => cls[key].includes(baseId)));
+  return classes.length > 0 ? classes.map((cls) => cls.id) : null;
 }
 
 export const canUse = (baseId, classId, content) => baseClasses(baseId, content)?.includes(classId) ?? true;
 
-// Loot favours the slots the character has empty, only ever holds weapons and
-// off-hands of its class, and while it has no weapon a weapon is always one of
-// its class. `filled` is the set of slots already covered (worn, or found
+// Loot favours the slots the character has empty, only ever holds what its
+// class can use, and while it has no weapon a weapon is always one of its
+// class. `filled` is the set of slots already covered (worn, or found
 // earlier in the same hunt); found items are added.
 export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId } = {}) {
   let base;

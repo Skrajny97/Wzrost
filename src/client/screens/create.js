@@ -21,6 +21,8 @@ export function renderCreate(container, onCreated) {
     type: 'text',
     autocomplete: 'off',
     autocapitalize: 'words',
+    // iPhone's keyboard would otherwise "correct" a name into another word.
+    autocorrect: 'off',
     spellcheck: 'false',
     maxlength: '20',
     required: true,

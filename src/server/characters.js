@@ -34,19 +34,31 @@ import { ApiError, json, readJson } from './http.js';
 import { requireSession } from './sessions.js';
 
 // 2 to 20 characters: letters and digits, spaces, hyphens, apostrophes and
-// underscores ("Justi_725"), from a letter to a letter or a digit. A phone's
-// curly apostrophe counts as the straight one.
-const NAME_PATTERN = /^\p{L}[\p{L}\p{N}_' -]{0,18}[\p{L}\p{N}]$/u;
+// underscores ("Justi_725"), from a letter to a letter or a digit. What a
+// phone's keyboard adds unseen goes: invisible marks, letters split from
+// their accents (joined again), a curly apostrophe (made straight). The
+// message names what is wrong.
+const NAME_CHARACTER = /[\p{L}\p{N}_' -]/u;
+const ALLOWED_TEXT = 'Mogą być litery, cyfry, spacje, myślniki, apostrofy i podkreślniki.';
 
 export function validateName(value) {
-  const name = typeof value === 'string' ? value.trim().replace(/\s+/g, ' ').replace(/[\u2018\u2019\u02bc]/g, "'") : '';
-  if (!NAME_PATTERN.test(name)) {
-    throw new ApiError(
-      400,
-      'invalid_name',
-      'Imię postaci musi mieć od 2 do 20 znaków i zaczynać się od litery. Może zawierać litery, cyfry, spacje, myślniki, apostrofy i podkreślniki.',
-    );
-  }
+  const name =
+    typeof value === 'string'
+      ? value.normalize('NFC').replace(/\p{Cf}/gu, '').trim().replace(/\s+/g, ' ').replace(/[\u2018\u2019\u02bc]/g, "'")
+      : '';
+  const characters = [...name];
+  const wrong = characters.find((character) => !NAME_CHARACTER.test(character));
+  const problem =
+    characters.length < 2 || characters.length > 20
+      ? 'Imię postaci musi mieć od 2 do 20 znaków.'
+      : wrong
+        ? `Imię postaci nie może zawierać znaku „${wrong}”. ${ALLOWED_TEXT}`
+        : !/^\p{L}/u.test(name)
+          ? 'Imię postaci musi zaczynać się od litery.'
+          : !/[\p{L}\p{N}]$/u.test(name)
+            ? 'Imię postaci musi kończyć się literą albo cyfrą.'
+            : null;
+  if (problem) throw new ApiError(400, 'invalid_name', problem);
   return name;
 }
 
@@ -315,7 +327,7 @@ export async function createCharacter(context) {
       .run();
   } catch (error) {
     const message = String(error?.message);
-    if (message.includes('name_key')) throw new ApiError(409, 'name_taken', 'To imię jest już zajęte. Wybierz inne.');
+    if (message.includes('name_key')) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');
     if (message.includes('UNIQUE')) throw exists();
     throw error;
   }

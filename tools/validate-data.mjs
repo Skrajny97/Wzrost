@@ -122,6 +122,19 @@ function checkReferences(data) {
       if (!base) errors.push(`classes.json: ${cls.id} ma nieznaną drugą rękę "${id}"`);
       else if (base.slot !== 'offhand') errors.push(`classes.json: ${cls.id} ma w drugiej ręce "${id}", który nie pasuje do tego slotu`);
     }
+    for (const id of cls.armor) {
+      const base = basesById.get(id);
+      if (!base) errors.push(`classes.json: ${cls.id} ma nieznany pancerz "${id}"`);
+      else if (base.kind !== 'armor' || base.slot === 'offhand') errors.push(`classes.json: ${cls.id} ma w pancerzach "${id}", który nie jest pancerzem`);
+    }
+  }
+  // Every class has something for each slot its armour fills: a class
+  // without a helmet of its own would leave the slot empty for good.
+  const armourSlots = new Set(data.classes.flatMap((cls) => cls.armor.map((id) => basesById.get(id)?.slot)));
+  for (const cls of data.classes) {
+    for (const slot of armourSlots) {
+      if (!cls.armor.some((id) => basesById.get(id)?.slot === slot)) errors.push(`classes.json: ${cls.id} nie ma pancerza na slot "${slot}"`);
+    }
   }
 
   const monstersById = new Map(data.monsters.map((monster) => [monster.id, monster]));

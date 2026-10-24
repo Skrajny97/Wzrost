@@ -3437,11 +3437,14 @@ a.segmented-option {
   object-position: 50% 0;
 }
 
+/* Our characters stand on the card like the creatures, without a backdrop
+   of their own (the author's request); the bust fades out at the bottom
+   instead of ending in a hard cut. */
 .unit-art .sprite--bust {
   width: 72px;
   height: 72px;
-  border-radius: 4px;
-  background: linear-gradient(#24301f, #141b11);
+  -webkit-mask-image: linear-gradient(#000 72%, transparent);
+  mask-image: linear-gradient(#000 72%, transparent);
 }
 
 .class-icon .sprite--bust {

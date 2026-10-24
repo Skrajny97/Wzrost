@@ -11,7 +11,8 @@
     "autoPoints": { "strength": 3, "vitality": 2, "endurance": 2, "will": 1 },
     "recovery": { "base": 0, "perWisdom": 0 },
     "weapons": ["sword", "axe"],
-    "offhands": ["shield"]
+    "offhands": ["shield"],
+    "armor": ["helmet", "chainmail"]
   },
   {
     "id": "archer",
@@ -25,7 +26,8 @@
     "autoPoints": { "dexterity": 4, "perception": 2, "vitality": 2 },
     "recovery": { "base": 0, "perWisdom": 0 },
     "weapons": ["bow"],
-    "offhands": ["quiver"]
+    "offhands": ["quiver"],
+    "armor": ["hood", "tunic"]
   },
   {
     "id": "mage",
@@ -39,7 +41,8 @@
     "autoPoints": { "intellect": 4, "vitality": 2, "wisdom": 1, "will": 1 },
     "recovery": { "base": 0, "perWisdom": 0 },
     "weapons": ["staff"],
-    "offhands": ["focus"]
+    "offhands": ["focus"],
+    "armor": ["hood", "robe"]
   },
   {
     "id": "cleric",
@@ -53,7 +56,8 @@
     "autoPoints": { "intellect": 3, "wisdom": 2, "vitality": 2, "endurance": 1 },
     "recovery": { "base": 0.07, "perWisdom": 0.002 },
     "weapons": ["aspergillum"],
-    "offhands": ["shield", "focus"]
+    "offhands": ["shield", "focus"],
+    "armor": ["helmet", "chainmail"]
   },
   {
     "id": "shadow",
@@ -67,6 +71,7 @@
     "autoPoints": { "dexterity": 4, "perception": 2, "vitality": 2 },
     "recovery": { "base": 0, "perWisdom": 0 },
     "weapons": ["dagger"],
-    "offhands": ["quiver"]
+    "offhands": ["quiver"],
+    "armor": ["hood", "tunic"]
   }
 ]

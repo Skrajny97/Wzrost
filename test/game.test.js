@@ -133,12 +133,25 @@ describe('character creation', () => {
     assert.equal((await newCharacter(other, 'mage', 'D\u2019Artagnan')).data.character.name, "D'Artagnan");
   });
 
+  test("what a phone's keyboard adds unseen does not stop a name, and a wrong one says why", async () => {
+    // An invisible mark after the name, and an accent typed apart from its letter.
+    assert.equal((await newCharacter(cookie, 'cleric', 'Justi\u200b')).data.character.name, 'Justi');
+    const other = await signUp('inny');
+    assert.equal((await newCharacter(other, 'mage', 'Zos\u0301ka')).data.character.name, 'Zośka');
+    const third = await signUp('trzeci');
+    const message = async (name) => (await newCharacter(third, 'warrior', name)).data.error.message;
+    assert.equal(await message('X'), 'Imię postaci musi mieć od 2 do 20 znaków.');
+    assert.equal(await message('Bob<script>'), 'Imię postaci nie może zawierać znaku „<”. Mogą być litery, cyfry, spacje, myślniki, apostrofy i podkreślniki.');
+    assert.equal(await message('725'), 'Imię postaci musi zaczynać się od litery.');
+    assert.equal(await message('Justi_'), 'Imię postaci musi kończyć się literą albo cyfrą.');
+  });
+
   test('a name belongs to one player in the whole game, whatever the letter case', async () => {
     assert.equal((await newCharacter(cookie, 'warrior', 'Łucja')).status, 201);
     const other = await signUp('inny');
     const taken = await newCharacter(other, 'mage', 'ŁUCJA');
     assert.equal(taken.status, 409);
-    assert.deepEqual(taken.data.error, { code: 'name_taken', message: 'To imię jest już zajęte. Wybierz inne.' });
+    assert.deepEqual(taken.data.error, { code: 'name_taken', message: 'To imię nosi już inna postać w grze. Wybierz inne.' });
     // "Zacznij od nowa" frees the name.
     await call('DELETE', '/api/character', { cookie });
     assert.equal((await newCharacter(other, 'mage', 'łucja')).status, 201);
@@ -288,15 +301,53 @@ describe('equipment', () => {
     assert.ok(weapon.after.damageAverage > weapon.now.damageAverage);
   });
 
-  test('a weapon of another class cannot be worn', async () => {
+  test('a weapon or armour of another class cannot be worn, and gloves fit anyone', async () => {
     const staffId = await addItem({ base: 'staff', slot: 'weapon', level: 1, rarity: 'common', element: 'fire', affixes: [], damage: { min: 6, max: 9 } });
-    const { status, data } = await call('POST', `/api/items/${staffId}/equip`, { cookie });
-    assert.equal(status, 403);
-    assert.equal(data.error.code, 'wrong_class');
+    const robeId = await addItem({ base: 'robe', slot: 'chest', level: 1, rarity: 'common', affixes: [], armor: 8 });
+    const glovesId = await addItem({ base: 'gloves', slot: 'hands', level: 1, rarity: 'common', affixes: [], armor: 5 });
+    for (const id of [staffId, robeId]) {
+      const { status, data } = await call('POST', `/api/items/${id}/equip`, { cookie });
+      assert.equal(status, 403);
+      assert.equal(data.error.code, 'wrong_class');
+    }
     const bag = (await call('GET', '/api/character', { cookie })).data.character.bag;
-    const staff = bag.find((item) => item.id === staffId);
-    assert.deepEqual(staff.classNames, ['Mag']);
-    assert.equal(bag.find((item) => item.id === mailId).classIds, null);
+    assert.deepEqual(bag.find((item) => item.id === staffId).classNames, ['Mag']);
+    assert.deepEqual(bag.find((item) => item.id === robeId).classNames, ['Mag']);
+    assert.deepEqual(bag.find((item) => item.id === mailId).classNames, ['Wojownik', 'Kleryk']);
+    assert.equal(bag.find((item) => item.id === glovesId).classIds, null);
+    assert.equal((await call('POST', `/api/items/${glovesId}/equip`, { cookie })).status, 200);
+  });
+
+  test('with armour bound to classes, what a character wore against its class goes back to the bag', async () => {
+    const other = await signUp('lucznik');
+    await newCharacter(other, 'archer', 'Iga');
+    const database = await db();
+    const archer = await database.prepare("SELECT id FROM characters WHERE class_id = 'archer'").first();
+    const wear = async (characterId, base, slot) =>
+      database
+        .prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, 0)')
+        .bind(characterId, slot, JSON.stringify({ base, slot, level: 1, rarity: 'common', affixes: [], armor: 6 }))
+        .run();
+    // As before migrations/0012: an archer in a robe and a helmet, with a
+    // hood in the bag and gloves on; the warrior in its own chainmail.
+    await wear(archer.id, 'robe', 'chest');
+    await wear(archer.id, 'helmet', 'head');
+    await wear(archer.id, 'gloves', 'hands');
+    await call('POST', `/api/items/${mailId}/equip`, { cookie });
+    const migration = readFileSync('migrations/0012_class_armour.sql', 'utf8')
+      .replace(/--.*$/gm, '')
+      .split(';')
+      .map((statement) => statement.trim())
+      .filter(Boolean);
+    await database.batch(migration.map((statement) => database.prepare(statement)));
+
+    const archerView = (await call('GET', '/api/character', { cookie: other })).data.character;
+    assert.equal(archerView.equipment.chest, null);
+    assert.equal(archerView.equipment.head, null);
+    assert.equal(archerView.equipment.hands.name, 'Rękawice');
+    assert.deepEqual(archerView.bag.map((item) => item.name).sort(), ['Hełm', 'Szata']);
+    const warriorView = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.equal(warriorView.equipment.chest.name, 'Kolczuga');
   });
 
   test('the scrapper buys bag items up to the chosen rarity', async () => {
