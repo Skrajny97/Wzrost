@@ -812,6 +812,17 @@ button {
   padding-bottom: calc(var(--nav-height) + 96px + env(safe-area-inset-bottom));
 }
 
+/* The narrator's camera (camera.js) zooms the screen from its top left
+   corner; meanwhile the page around it keeps its size and does not scroll
+   sideways. */
+.screen--game {
+  transform-origin: 0 0;
+}
+
+.filming {
+  overflow: clip;
+}
+
 .nav {
   position: fixed;
   right: 0;
@@ -3909,29 +3920,21 @@ a.segmented-option {
   pointer-events: auto;
 }
 
-/* With reduced motion the pulsing and sliding stop; the fight playback stays,
-   in a calmer form (see arena.js). Last in the file, so it wins over the
-   rules it calms. */
-@media (prefers-reduced-motion: reduce) {
-  .activity--done,
-  .camp-bubble--full {
-    animation: none;
-  }
+/* With the animations off in the settings (motion.js) the pulsing and
+   sliding stop; the fight playback stays, in a calmer form (see arena.js).
+   Last in the file, so it wins over the rules it calms. */
+.calm .activity--done,
+.calm .camp-bubble--full,
+.calm .guide-ring,
+.calm .guide-ring--nudge,
+.calm .guide-note .sprite--narrator {
+  animation: none;
+}
 
-  .camp-plot-art {
-    transition: none;
-  }
-
-  .meter-fill,
-  .bar-fill,
-  .portrait-art,
-  .arena-banner {
-    transition: none;
-  }
-
-  .guide-ring,
-  .guide-ring--nudge,
-  .guide-note .sprite--narrator {
-    animation: none;
-  }
+.calm .camp-plot-art,
+.calm .meter-fill,
+.calm .bar-fill,
+.calm .portrait-art,
+.calm .arena-banner {
+  transition: none;
 }

@@ -885,3 +885,23 @@ Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach i poprosił
 5. **Instalacja na iPhonie** (uwaga testerki). W nowym Safari „Udostępnij” jest w menu strony, pod kreseczkami obok adresu, a nie pod „…”. Instrukcja wymienia teraz kreseczki, a trzy kropki zostały jako wariant ze starszych wersji. Tak samo przy nazwie pozycji: „Do ekranu początkowego” albo „Dodaj do ekranu początkowego”.
 6. **Następne miejsce czeka na koniec poprzedniego.** Po „Dalej” gra zapisuje przeczytany pergamin, a odpowiedź serwera wywoływała następne miejsce, zanim pergamin się zwinął. Stąd skok podświetlenia i ekranu, wyraźniejszy przy wolnej sieci w telefonie. Zwijający się pergamin sam teraz uruchamia następną kwestię.
 
+
+## Kamera narratora i przełącznik animacji (24.10.2026)
+
+1. **Animacje według gry, nie telefonu** (uwaga autora: w raporcie nic nie jedzie, wszystko przeskakuje). Przyczyną było ograniczanie ruchu w ustawieniach telefonu autora. Przy nim gra wyłączała przejazd ekranu, wędrujące podświetlenie, rozwijanie pergaminu i pulsowanie ramek. To samo ustawienie było wcześniej przyczyną niedziałającego „Powtórz” w walce. Teraz o ruchu decyduje przełącznik „Animacje” w Ustawieniach gry, domyślnie włączony, a ustawienie telefonu nie ma znaczenia. Wyłączony przełącznik daje dawny spokojny tryb:
+    - ekran przeskakuje od razu,
+    - pergaminy się nie rozwijają,
+    - ramki nie pulsują,
+    - walka gra spokojniej.
+
+    Wybór pamięta przeglądarka. Gdzie wcześniejsze punkty mówią o ograniczonym ruchu w telefonie, chodzi teraz o ten przełącznik.
+2. **Kamera narratora** (prośba autora: „używaj zoomu czasem, przejeżdżaj po ekranie, niech kamera pracuje”). Do każdego miejsca narratora jedzie kamera (`src/client/camera.js`). Górny i dolny pasek stoją w miejscu.
+    - Między dwoma miejscami na tym samym ekranie kamera się oddala, w połowie drogi do 86–95% (bardziej przy dłuższej drodze). Potem płynnie jedzie do następnego miejsca przez 1,1–2,4 s.
+    - Przy małym miejscu, takim jak broń w ekwipunku, plac w obozie czy suwak długości wyprawy, kamera się zbliża, najwyżej 1,25 raza. Miejsca szerokiego jak ekran, np. części raportu, nie przybliża, bo jego ramka wyszłaby poza ekran.
+    - Kamera kadruje miejsce tak, żeby pod nim zmieścił się pergamin. Wysokie miejsce pokazuje od góry.
+    - Podświetlenie jedzie razem z kamerą. Dopiero potem wchodzi narrator i rozwija się pergamin.
+    - Przy miejscu na pasku (np. „Postać” w menu) i przed kartą na środku ekranu kamera wraca do zwykłego widoku. Na innym ekranie zaczyna od zwykłego widoku.
+    - Przy rozdawaniu wolnych punktów kamera nie przybliża. Gdy widać pasek rozdanych punktów, tylko przewija.
+
+    W próbie na wymiarach telefonu, z ograniczaniem ruchu włączonym w przeglądarce, kamera jechała w każdym przejściu wprowadzenia. Podświetlenie przesuwało się płynnie, najwyżej o 13 px na klatkę.
+3. **Dziennik walki nie przesuwa raportu.** Dziennik pod areną rósł w trakcie walki linijka po linijce i przesuwał w dół wszystko pod sobą. Narrator stał wtedy przy uciekającym miejscu, a podświetlenie skakało. Teraz dziennik od początku ma wysokość całej walki, nadal najwyżej 200 px.

@@ -8,6 +8,7 @@ import { monsterSprite, portraitSprite } from './art.js';
 import { classArt } from './class-art.js';
 import { h, icon } from './dom.js';
 import { CLASS_ICONS } from './icons.js';
+import { motionOn } from './motion.js';
 import { playHit, playMoment, playSound, playVoice } from './sound.js';
 import { state } from './state.js';
 
@@ -20,7 +21,7 @@ const RESULTS = { true: 'Zwycięstwo', false: 'Porażka', null: 'Odwrót' };
 const SPEED_KEY = 'wzrost.fight-speed';
 const HIT_COLOR = 'rgba(239, 154, 133, 0.95)';
 
-const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reducedMotion = () => !motionOn();
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function loadSpeed() {
@@ -262,11 +263,27 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     await wait(300 / speed);
   }
 
+  const logLine = (event) => h('li', { class: `log-line log-line--${event.kind}`, text: event.text });
+
+  // The log has the height of the whole fight from the start, so what lies
+  // below the arena (and the narrator's place there) does not move down line
+  // by line while the fight plays. Measured once the arena is on the page.
+  function reserveLog(tries = 10) {
+    if (!log.isConnected) {
+      if (tries > 0) requestAnimationFrame(() => reserveLog(tries - 1));
+      return;
+    }
+    const shown = [...log.children];
+    log.replaceChildren(...fight.events.map(logLine));
+    log.style.minHeight = `${log.offsetHeight}px`;
+    log.replaceChildren(...shown);
+  }
+
   async function show(event) {
     const target = byId.get(event.target);
     const actor = byId.get(event.actor);
     const line = () => {
-      log.append(h('li', { class: `log-line log-line--${event.kind}`, text: event.text }));
+      log.append(logLine(event));
       log.scrollTop = log.scrollHeight;
     };
 
@@ -346,7 +363,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (event.hp !== undefined && byId.has(event.target)) setHp(event.target, event.hp);
     if (event.kind === 'effect') cards.get(event.target).status.textContent = event.effect;
     if (event.kind === 'kill') setDown(event.target, true);
-    log.append(h('li', { class: `log-line log-line--${event.kind}`, text: event.text }));
+    log.append(logLine(event));
   }
 
   function cancelAll() {
@@ -441,6 +458,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
   const element = h('div', { class: 'arena-wrap' }, arena, controls, log, statsBox);
   reset();
   setControls('done');
+  reserveLog();
 
   // Starts when the arena scrolls into view, or at once when asked to.
   let observer = null;

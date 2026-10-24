@@ -16,10 +16,12 @@ import { lockedScreen } from './screens/locked.js';
 import { mountReport } from './screens/report.js';
 import { mountStats } from './screens/stats.js';
 import { musicVolume, setMusicConfig, setMusicPlace, setMusicVolume, startMusic } from './music.js';
+import { resetCamera } from './camera.js';
+import { applyMotion } from './motion.js';
 import { narrate } from './narrator.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, handleSessionLost, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
-import { closeSheet, confirmAction, initSheet, openSheet, toast, voiceSwitch, withButton } from './ui.js';
+import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, toast, voiceSwitch, withButton } from './ui.js';
 
 const views = {
   loading: $('#view-loading'),
@@ -201,6 +203,8 @@ function route() {
   // Every screen gets its own element, so a late answer meant for the
   // previous screen can only draw into a detached one.
   const container = h('div', { class: 'screen-body' });
+  // The narrator's camera leaves the screen before the next one is drawn.
+  resetCamera();
   clear($('#screen')).append(container);
   window.scrollTo(0, 0);
   const params = match.groups ?? {};
@@ -385,6 +389,7 @@ function openSettings() {
       volumeRow('music-volume', 'Muzyka', musicVolume(), setMusicVolume),
       volumeRow('effects-volume', 'Efekty dźwiękowe', effectsVolume(), setEffectsVolume, () => playSound('system')),
       h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: 'Głos narratora' }), h('dd', {}, voiceSwitch('voice-label'))),
+      h('div', { class: 'status-row' }, h('dt', { id: 'motion-label', text: 'Animacje' }), h('dd', {}, motionSwitch('motion-label'))),
       testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
     ),
@@ -566,5 +571,6 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
 }
 
+applyMotion();
 initSheet();
 start();

@@ -47,6 +47,14 @@ test('relative imports name existing files and exports', () => {
   }
 });
 
+// The phone's setting for less motion used to stop the narrator's camera and
+// parchment on the author's phone; the game's own switch decides (motion.js).
+test("animations follow the game's switch, not the phone's setting", () => {
+  for (const file of [...files, join(CLIENT, 'styles.css')]) {
+    assert.doesNotMatch(readFileSync(file, 'utf8'), /prefers-reduced-motion/, `${relative(CLIENT, file)} follows the phone's setting`);
+  }
+});
+
 test('index.html loads the entry module and the screens it needs exist', () => {
   const html = readFileSync(join(CLIENT, 'index.html'), 'utf8');
   assert.match(html, /<script type="module" src="\/app\.js"><\/script>/);

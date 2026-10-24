@@ -2,6 +2,7 @@
 // confirmation questions.
 
 import { $, append, clear, h, icon } from './dom.js';
+import { motionOn, setMotion } from './motion.js';
 import { narratorVoiceOn, playSound, setNarratorVoice } from './sound.js';
 
 // A message from the System: the cold, ice-blue panel with the [ SYSTEM ] header.
@@ -145,14 +146,19 @@ export function meter({ label, value, max, kind }) {
 }
 
 // "Głos narratora": the switch on the creation screen and in the settings.
-export function voiceSwitch(labelId) {
+export const voiceSwitch = (labelId) => switchButton(labelId, narratorVoiceOn, setNarratorVoice, ['Włączony', 'Wyłączony']);
+
+// "Animacje" in the settings (motion.js).
+export const motionSwitch = (labelId) => switchButton(labelId, motionOn, setMotion, ['Włączone', 'Wyłączone']);
+
+function switchButton(labelId, read, write, [onText, offText]) {
   const button = h('button', { type: 'button', class: 'toggle', role: 'switch', 'aria-labelledby': labelId });
   const show = () => {
-    button.setAttribute('aria-checked', String(narratorVoiceOn()));
-    button.textContent = narratorVoiceOn() ? 'Włączony' : 'Wyłączony';
+    button.setAttribute('aria-checked', String(read()));
+    button.textContent = read() ? onText : offText;
   };
   button.addEventListener('click', () => {
-    setNarratorVoice(!narratorVoiceOn());
+    write(!read());
     show();
   });
   show();
