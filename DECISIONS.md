@@ -672,3 +672,8 @@ Autor zapytał, czy da się dodać logowanie kontem Google.
     - pokonanie Żmii trwa 0,7 s zamiast sekundy, bez góry powyżej 6 kHz (środek pasma przy 5,5 kHz zamiast 8 kHz).
 
     Koszt: 360 kredytów. Wybór wersji jest w `TAKES` w `tools/build-drafts.py`, a długość opisu może być własna (`{text, seconds}` w `audio/prompts.json`).
+10. **Druga runda odsłuchu.** Autor odrzucił jeszcze raz trafienie Wilka i pokonanie Żmii:
+    - Wilk przy trafieniu warczy przez zęby, zamiast skowyczeć jak pies (dwie z czterech wersji, środek pasma ok. 0,85 kHz zamiast 1 kHz).
+    - Na umierającą żmiję ElevenLabs dawał same syki (trzy podejścia, dziesięć nagrań). Jej pokonanie powstaje więc z jej syku przy trafieniu, który autor zostawił: o 20% niżej i wolniej, bez góry powyżej 6 kHz, wygasające przez 0,8 s (`DERIVED` w `tools/build-drafts.py`). Gdyby i to nie pasowało, Żmija może nie mieć głosu przy pokonaniu, a zostanie sam odgłos upadku.
+
+    Strona odsłuchu ma teraz przy zaznaczonym dźwięku pole „Co nie gra?”, zapisywane razem z zaznaczeniem (`note`). Koszt: 112 kredytów.
