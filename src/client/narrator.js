@@ -308,6 +308,23 @@ function inView(element) {
   return !top || element.contains(top) || top.contains(element);
 }
 
+// What a place covers on the screen, with whatever hangs out of it, such as
+// a camp plot's name tag, unless the place clips it.
+function boxOf(element) {
+  const rect = element.getBoundingClientRect();
+  const box = { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right };
+  if (getComputedStyle(element).overflow !== 'visible') return box;
+  for (const child of element.children) {
+    const part = child.getBoundingClientRect();
+    if (part.width === 0 || part.height === 0) continue;
+    box.top = Math.min(box.top, part.top);
+    box.bottom = Math.max(box.bottom, part.bottom);
+    box.left = Math.min(box.left, part.left);
+    box.right = Math.max(box.right, part.right);
+  }
+  return box;
+}
+
 // The light: a shade with a hole for each place, which takes every other
 // tap, a ring around each place and the narrator beside them. A tap on the
 // shade nudges the rings.
@@ -390,7 +407,7 @@ function startLight(line) {
     // them), the shade has no holes and the narrator waits by the first.
     const seen = found.filter(inView);
     const boxes = (seen.length > 0 ? seen : found.slice(0, 1)).map((element) => {
-      const rect = element.getBoundingClientRect();
+      const rect = boxOf(element);
       return {
         top: Math.max(0, rect.top - pad),
         bottom: Math.min(height, rect.bottom + pad),

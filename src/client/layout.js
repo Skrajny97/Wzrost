@@ -189,6 +189,10 @@ function navButton(tab, active, onBack) {
 }
 
 export function updateNav({ kind, active, onBack }) {
+  // The camp's tab is the tent in the top bar.
+  const camp = $('.camp-button');
+  if (active === 'oboz') camp?.setAttribute('aria-current', 'page');
+  else camp?.removeAttribute('aria-current');
   const main = $('#nav-main');
   const character = $('#nav-character');
   main.hidden = kind !== 'main';

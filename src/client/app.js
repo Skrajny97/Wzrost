@@ -40,7 +40,9 @@ const ROUTES = [
   { pattern: /^#\/dziennik(?:\/(?<tab>system))?$/, nav: 'main', tab: 'dziennik', mount: mountJournal },
   { pattern: /^#\/raport\/(?<id>\d+)$/, nav: 'main', tab: null, mount: mountReport },
   // The camp opens from the top bar: the board, or one building.
-  { pattern: /^#\/oboz(?:\/(?<building>[a-z0-9-]+))?$/, nav: 'main', tab: null, mount: mountCamp },
+  // The camp is a tab of its own, in the top bar (`lit`), but not one to
+  // come back to with "Powrót".
+  { pattern: /^#\/oboz(?:\/(?<building>[a-z0-9-]+))?$/, nav: 'main', tab: null, lit: 'oboz', mount: mountCamp },
 ];
 const HOME = '#/walka';
 
@@ -222,7 +224,7 @@ function renderNav() {
   const { route: active } = current;
   updateNav({
     kind: active.nav,
-    active: active.nav === 'main' ? active.tab ?? lastMainTab : active.tab,
+    active: active.nav === 'main' ? active.lit ?? active.tab ?? lastMainTab : active.tab,
     // "Powrót": from stats, skills or the Core to the equipment, from there to the main menu.
     onBack: () => navigate(active.tab === 'equipment' ? lastMainHash : '#/postac'),
   });

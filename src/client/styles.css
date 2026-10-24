@@ -620,6 +620,14 @@ button {
   color: var(--system);
 }
 
+/* In the camp the tent is lit like the current tab of the bottom bar. */
+.camp-button[aria-current='page'] {
+  background: rgba(143, 227, 239, 0.08);
+  box-shadow: inset 0 -2px 0 var(--system);
+  color: var(--system-text);
+  font-weight: 700;
+}
+
 /* A full store waits in the camp: a gold dot on the tent. */
 .camp-button--ready {
   position: relative;

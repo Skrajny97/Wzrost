@@ -826,3 +826,19 @@ Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach i poprosił
 3. **„Zacznij od nowa” zwalnia imię.** Po usunięciu postaci jej imię może wziąć ktokolwiek, także ten sam gracz.
 4. **Postacie sprzed tej zasady zachowują imiona** (`migrations/0009_unique_names.sql`). Gdy dwie mają to samo imię, obie je zachowują. Nowa postać nie weźmie tego imienia, dopóki istnieje starsza z nich.
 5. **Tylko gracze.** Zasada dotyczy postaci graczy. Imiona towarzyszy z Etapu 5 mogą się powtarzać.
+
+## Poprawki nagrań narratora i obozu (24.10.2026)
+
+1. **Nowe nagrania 18 kwestii** według uwag autora ze strony odsłuchu („Do wymiany”):
+    - **Urwane końcówki.** Model Eleven v3 ucina ostatnią sylabę w 33 z 41 nagrań. Próbne nagrania jednej kwestii porównały cztery sposoby:
+        - wielokropek nie pomaga,
+        - `previous_text` model odrzuca,
+        - znacznik `[pauses]` na końcu daje pełne wybrzmienie, a po nim ciszę.
+
+      Każda kwestia czyta się teraz z `[pauses]` (`ending` w `audio/prompts.json`). Nagranie przycina się tam, gdzie według znaczników czasu ElevenLabs kończy się tekst, z naturalnym wygaśnięciem. Wersje, których końcówka mimo to nie wygasa, odpadają.
+    - **Wymowa.** Głos ma wymuszony polski (`languageCode`). Pary `say` w `audio/prompts.json` zmieniają to, co czyta głos, a pergamin zostaje bez zmian, np. „broń,” z przecinkiem, żeby wybrzmiało „ń”. „Suwak stoi na trzydziestu minutach.” ma liczbę słowem także na pergaminie (prośba autora).
+    - **Wybór wersji.** Każda kwestia ma 2–4 wersje. Do gry trafia ta, której wysokość głosu (na początku i w całej kwestii) i tempo są najbliższe zatwierdzonym kwestiom. Pozostałe wersje i stare nagranie są na stronie odsłuchu, gdzie autor może wybrać inną („Do gry”).
+    - **Koszt.** Ok. 6,5 tys. kredytów razem z próbą. Uwagi autora zostały przy kwestiach na stronie odsłuchu jako „Twoja uwaga”.
+2. **Ramka obejmuje nazwę placu** (uwaga autora). Podświetlenie obejmuje także to, co wystaje z miejsca, np. nazwę placu pod nim. Wyjątkiem jest miejsce, które przycina swoją zawartość, jak lista zakładek walk.
+3. **Obóz jako zakładka** (uwaga autora). W obozie namiot w górnym pasku świeci się jak bieżąca zakładka, a Walka gaśnie. „Powrót” z obozu prowadzi, jak dotąd, do ostatniej zakładki z dolnego paska.
+
