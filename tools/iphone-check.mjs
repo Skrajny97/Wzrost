@@ -27,9 +27,16 @@ page.setDefaultTimeout(20000);
 
 const steps = [];
 const complaints = [];
-// Each complaint names the step it came in.
+// Each complaint names the step it came in. While a screenshot is taken,
+// Playwright prepares the page with a style of its own, which the game's
+// policy refuses in WebKit: those refusals are the tool's, only counted.
 let current = 'start';
-const complain = (line) => complaints.push(`${line} (krok: ${current})`);
+let shooting = false;
+let toolRefusals = 0;
+const complain = (line) => {
+  if (shooting && /Refused to apply a stylesheet/.test(line)) toolRefusals += 1;
+  else complaints.push(`${line} (krok: ${current})`);
+};
 page.on('pageerror', (error) => complain(`błąd strony: ${error.message}`));
 // A failed request shows once, as its response; the console only repeats it.
 // The service worker cannot start on the local server's own certificate.
@@ -59,11 +66,10 @@ async function step(name, action) {
   } catch (failure) {
     error = failure.message.split('\n')[0];
   }
-  // What comes while the screenshot is taken is the screenshot's own (it
-  // prepares the page with a style of Playwright's).
-  current = `${name}, zrzut`;
+  shooting = true;
   await page.screenshot({ path: join(OUT, file), caret: 'initial' }).catch(() => {});
   await page.waitForTimeout(100);
+  shooting = false;
   steps.push({ name, ok: !error, seconds: (Date.now() - started) / 1000, file, error });
   console.log(`${error ? '✖' : '✔'} ${name}${error ? ` — ${error}` : ''}`);
   return !error;
@@ -248,7 +254,10 @@ await step('Drugi gracz: to samo imię', async () => {
   await second.click('#create-screen button[type="submit"]');
   await second.waitForSelector('#create-screen .form-error:not([hidden])');
   taken = await second.locator('#create-screen .form-error').innerText();
+  shooting = true;
   await second.screenshot({ path: join(OUT, 'zajete-imie.png'), caret: 'initial' });
+  await second.waitForTimeout(100);
+  shooting = false;
   if (!/inna postać/.test(taken)) throw new Error(`komunikat: ${taken}`);
 });
 
@@ -266,6 +275,8 @@ const report = [
   '## Uwagi strony',
   '',
   ...(complaints.length ? [...new Set(complaints)].map((line) => `- ${line}`) : ['Brak.']),
+  '',
+  `Odmowy stylu Playwrighta przy robieniu zrzutów (narzędzie, nie gra): ${toolRefusals}.`,
   '',
 ].join('\n');
 writeFileSync(join(OUT, 'report.md'), report);
