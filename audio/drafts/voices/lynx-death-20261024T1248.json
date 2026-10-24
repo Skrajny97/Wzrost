@@ -1,0 +1,13 @@
+{
+  "id": "lynx-death",
+  "payload": {
+    "text": "a big wild cat gives a dying growl, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/lynx-death-20261024T1248-0.mp3",
+    "audio/drafts/voices/lynx-death-20261024T1248-1.mp3"
+  ],
+  "credits": 40
+}

@@ -1,0 +1,13 @@
+{
+  "id": "bear-hurt",
+  "payload": {
+    "text": "a brown bear roars in pain from a hit, short deep roar, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bear-hurt-20261024T1248-0.mp3",
+    "audio/drafts/voices/bear-hurt-20261024T1248-1.mp3"
+  ],
+  "credits": 40
+}

@@ -1,0 +1,13 @@
+{
+  "id": "spider-death",
+  "payload": {
+    "text": "a giant spider screeches and its legs click as it curls up, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/spider-death-20261024T1248-0.mp3",
+    "audio/drafts/voices/spider-death-20261024T1248-1.mp3"
+  ],
+  "credits": 40
+}

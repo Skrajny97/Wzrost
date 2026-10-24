@@ -1,0 +1,13 @@
+{
+  "id": "female-death",
+  "payload": {
+    "text": "a young woman groans and falls to the ground exhausted, no words, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/female-death-20261024T1248-0.mp3",
+    "audio/drafts/voices/female-death-20261024T1248-1.mp3"
+  ],
+  "credits": 40
+}

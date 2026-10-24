@@ -1,0 +1,13 @@
+{
+  "id": "crow-death",
+  "payload": {
+    "text": "a raven croaks weakly and falls with a flutter of feathers, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/crow-death-20261024T1248-0.mp3",
+    "audio/drafts/voices/crow-death-20261024T1248-1.mp3"
+  ],
+  "credits": 40
+}

@@ -1,0 +1,13 @@
+{
+  "id": "crow-hurt",
+  "payload": {
+    "text": "a raven gives a harsh croak of pain and flaps its wings, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/crow-hurt-20261024T1248-0.mp3",
+    "audio/drafts/voices/crow-hurt-20261024T1248-1.mp3"
+  ],
+  "credits": 40
+}
