@@ -364,10 +364,11 @@ export function mountCombat(container, { params, navigate }) {
     const longer = character.huntNext;
     // The slider moves over the allowed lengths (1, 5, 10… minutes). The last
     // length is kept for each inner region (before them: for each region).
-    let index = allowed.indexOf(choice[area.id] ?? choice[region.id]);
-    // The narrator sends the first exploration out for the longest time.
+    // The narrator sends the first exploration out for the longest time,
+    // whatever this browser remembers from an earlier character.
     const first = character.tutorial && !character.tutorial.includes('skip') && character.xp === 0 && character.level === 1;
-    if (index === -1) index = first ? allowed.length - 1 : Math.max(0, allowed.indexOf(15));
+    let index = first ? allowed.length - 1 : allowed.indexOf(choice[area.id] ?? choice[region.id]);
+    if (index === -1) index = Math.max(0, allowed.indexOf(15));
     let minutes = allowed[index];
     shownArea = area.id;
 
