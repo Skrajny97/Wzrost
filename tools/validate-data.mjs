@@ -274,7 +274,9 @@ function checkReferences(data) {
     if (!lines.has(id)) errors.push(`tutorial.json: brak kwestii ${id}`);
   }
   for (const line of data.tutorial.lines) {
-    if (line.voice && !existsSync(new URL(line.voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${line.voice}`);
+    for (const voice of [line.voice, line.female?.voice]) {
+      if (voice && !existsSync(new URL(voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${voice}`);
+    }
   }
   return errors;
 }

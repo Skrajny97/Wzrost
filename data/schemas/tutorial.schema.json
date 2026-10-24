@@ -91,6 +91,31 @@
             "type": "string",
             "pattern": "^audio/narration/[a-z0-9-]+\\.mp3$",
             "description": "Nagranie kwestii, gdy już jest."
+          },
+          "female": {
+            "type": "object",
+            "description": "Kwestia dla postaci o wyglądzie kobiecym, gdy narrator mówi do gracza w rodzaju męskim: ten sam tekst z żeńskimi końcówkami i jego nagranie.",
+            "additionalProperties": false,
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 3,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                }
+              },
+              "voice": {
+                "type": "string",
+                "pattern": "^audio/narration/[a-z0-9-]+\\.mp3$",
+                "description": "Nagranie kwestii, gdy już jest."
+              }
+            }
           }
         }
       }

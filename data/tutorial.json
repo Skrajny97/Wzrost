@@ -10,7 +10,13 @@
         "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę.",
         "Witaj, przybyszu."
       ],
-      "voice": "audio/narration/intro.mp3"
+      "voice": "audio/narration/intro.mp3",
+      "female": {
+        "text": [
+          "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę.",
+          "Witaj, przybyszko."
+        ]
+      }
     },
     {
       "id": "purpose",
@@ -18,7 +24,12 @@
       "text": [
         "Znalazłeś się w miejscu, którego celem jest rozwój. Liczę na to, że osiągniesz szczyty."
       ],
-      "voice": "audio/narration/purpose.mp3"
+      "voice": "audio/narration/purpose.mp3",
+      "female": {
+        "text": [
+          "Znalazłaś się w miejscu, którego celem jest rozwój. Liczę na to, że osiągniesz szczyty."
+        ]
+      }
     },
     {
       "id": "test",
@@ -50,7 +61,12 @@
       "text": [
         "Nie jesteś jeszcze gotów na dłuższe wyprawy. Zacznijmy od półgodzinnej próby."
       ],
-      "voice": "audio/narration/trial.mp3"
+      "voice": "audio/narration/trial.mp3",
+      "female": {
+        "text": [
+          "Nie jesteś jeszcze gotowa na dłuższe wyprawy. Zacznijmy od półgodzinnej próby."
+        ]
+      }
     },
     {
       "id": "tap-start",
@@ -114,7 +130,12 @@
       "text": [
         "System rejestruje potyczki, które stoczyłeś w trakcie eksploracji. Możesz je przejrzeć, wybierając z zakładek. Gwiazdka przy zakładce oznacza najważniejszą z walk."
       ],
-      "voice": "audio/narration/report-fights.mp3"
+      "voice": "audio/narration/report-fights.mp3",
+      "female": {
+        "text": [
+          "System rejestruje potyczki, które stoczyłaś w trakcie eksploracji. Możesz je przejrzeć, wybierając z zakładek. Gwiazdka przy zakładce oznacza najważniejszą z walk."
+        ]
+      }
     },
     {
       "id": "report-items",
@@ -122,7 +143,12 @@
       "text": [
         "To wszystko, co znalazłeś podczas wyprawy. Wylądowało już w Twoim plecaku."
       ],
-      "voice": "audio/narration/report-items.mp3"
+      "voice": "audio/narration/report-items.mp3",
+      "female": {
+        "text": [
+          "To wszystko, co znalazłaś podczas wyprawy. Wylądowało już w Twoim plecaku."
+        ]
+      }
     },
     {
       "id": "report-account",
@@ -146,7 +172,12 @@
       "text": [
         "W tym oknie Systemu możesz przejrzeć swój ekwipunek. Podczas wyprawy zdobyłeś broń i jak widzisz – System ułatwił sprawę i pozwolił Ci jej dobyć bez Twojej ingerencji."
       ],
-      "voice": "audio/narration/character.mp3"
+      "voice": "audio/narration/character.mp3",
+      "female": {
+        "text": [
+          "W tym oknie Systemu możesz przejrzeć swój ekwipunek. Podczas wyprawy zdobyłaś broń i jak widzisz – System ułatwił sprawę i pozwolił Ci jej dobyć bez Twojej ingerencji."
+        ]
+      }
     },
     {
       "id": "lead-stats",
@@ -194,7 +225,12 @@
       "text": [
         "To dobre miejsce na zbudowanie tartaku. System wspomaga nas w codziennym funkcjonowaniu, także i produkcja drewna w takowym odbywa się automatycznie. Będziesz musiał jedynie zbierać wyprodukowane drewno."
       ],
-      "voice": "audio/narration/camp-sawmill.mp3"
+      "voice": "audio/narration/camp-sawmill.mp3",
+      "female": {
+        "text": [
+          "To dobre miejsce na zbudowanie tartaku. System wspomaga nas w codziennym funkcjonowaniu, także i produkcja drewna w takowym odbywa się automatycznie. Będziesz musiała jedynie zbierać wyprodukowane drewno."
+        ]
+      }
     },
     {
       "id": "camp-quarry",
@@ -218,7 +254,12 @@
       "text": [
         "Teraz zajmijmy się jednak Twoim powrotem do zdrowia, byś mógł szybciej wyruszyć na kolejną wyprawę. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko."
       ],
-      "voice": "audio/narration/lead-campfire.mp3"
+      "voice": "audio/narration/lead-campfire.mp3",
+      "female": {
+        "text": [
+          "Teraz zajmijmy się jednak Twoim powrotem do zdrowia, byś mogła szybciej wyruszyć na kolejną wyprawę. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko."
+        ]
+      }
     },
     {
       "id": "tap-build",
@@ -242,7 +283,12 @@
       "text": [
         "Dla Twojej wygody możesz również zajrzeć do części ustawień samego Systemu i ustawić je tak, jak Ci się żywnie podoba. Jeśli stwierdzisz, że popełniłeś za dużo błędów – możesz nawet zacząć od nowa."
       ],
-      "voice": "audio/narration/settings.mp3"
+      "voice": "audio/narration/settings.mp3",
+      "female": {
+        "text": [
+          "Dla Twojej wygody możesz również zajrzeć do części ustawień samego Systemu i ustawić je tak, jak Ci się żywnie podoba. Jeśli stwierdzisz, że popełniłaś za dużo błędów – możesz nawet zacząć od nowa."
+        ]
+      }
     },
     {
       "id": "ending",
@@ -250,7 +296,12 @@
       "text": [
         "Tyle na początek. Resztę funkcjonalności Systemu, swój cel i upodobania – będziesz musiał poznać sam. Powodzenia."
       ],
-      "voice": "audio/narration/ending.mp3"
+      "voice": "audio/narration/ending.mp3",
+      "female": {
+        "text": [
+          "Tyle na początek. Resztę funkcjonalności Systemu, swój cel i upodobania – będziesz musiała poznać sama. Powodzenia."
+        ]
+      }
     }
   ]
 }

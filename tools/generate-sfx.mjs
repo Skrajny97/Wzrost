@@ -52,10 +52,16 @@ const balance = tts && JSON.parse(readFileSync('data/balance.json', 'utf8'));
 const tutorial = tts && JSON.parse(readFileSync('data/tutorial.json', 'utf8'));
 
 // `allLines` makes a prompt of every line of the narrator's introduction,
-// named by the line's id.
+// named by the line's id, and of its female version, `<id>-female`.
 const prompts = {
   ...kind.prompts,
-  ...(kind.allLines && Object.fromEntries(tutorial.lines.map((line) => [line.id, { ...kind.allLines, line: line.id }]))),
+  ...(kind.allLines &&
+    Object.fromEntries(
+      tutorial.lines.flatMap((line) => [
+        [line.id, { ...kind.allLines, line: line.id }],
+        ...(line.female ? [[`${line.id}-female`, { ...kind.allLines, line: line.id, variant: 'female' }]] : []),
+      ]),
+    )),
 };
 const ids = values.ids === 'all' ? Object.keys(prompts) : values.ids.split(',').map((id) => id.trim()).filter(Boolean);
 const unknown = ids.filter((id) => !prompts[id]);
@@ -70,7 +76,8 @@ function spokenText(entry) {
   if (entry.text) return entry.text;
   const line = tutorial.lines.find((candidate) => candidate.id === entry.line);
   if (!line) fail(`Brak kwestii ${entry.line} w data/tutorial.json.`);
-  return line.text.join(' ').replaceAll('{points}', String(balance.timePoints.start));
+  const told = entry.variant === 'female' ? line.female : line;
+  return told.text.join(' ').replaceAll('{points}', String(balance.timePoints.start));
 }
 
 const prompt = (id) => {
