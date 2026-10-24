@@ -1,8 +1,9 @@
 // The camp the player builds up alongside the character's activity
 // (data/buildings.json). A building has levels; each level costs more gold and
 // resources and takes longer to build. One building is upgraded at a time.
-// A stored building is { level, startedAt, endsAt }: the level it has once
-// the last upgrade has ended. The server passes the time.
+// A stored building is { level, startedAt, endsAt, collectedAt }: the level it
+// has once the last upgrade has ended, and for a production building the time
+// its store started filling. The server passes the time.
 
 // The level a stored building has at `now`: an upgrade counts once it ends.
 export function buildingLevel(stored, now) {
@@ -68,9 +69,36 @@ export function restBonus(stored, since, now, content) {
   return { bonus: bonus(since), change: { at: Math.max(...ended), bonus: bonus(now) } };
 }
 
-// The effect of a building at a level, as the page shows it: "o 20%".
+// The effect of a building at a level, as the page shows it: "o 20%", or
+// for a production building "6 drewna na godzinę… na 1 h".
 export function effectText(building, level) {
-  const value = building.effect.perLevel * level;
-  const shown = building.effect.unit === 'percent' ? `${Math.round(value * 100)}%` : String(Math.round(value));
-  return building.effect.text.replace('{value}', shown);
+  const { effect } = building;
+  const value = effect.perLevel * level;
+  const shown = effect.unit === 'percent' ? `${Math.round(value * 100)}%` : String(Math.round(value));
+  return effect.text.replace('{value}', shown).replace('{hours}', `${effect.storageHours * level}\u00a0h`);
+}
+
+const HOUR = 3600000;
+
+// A production building's store at `now`. It fills from `since` (the end of
+// the last upgrade, or what the last collection left), `perLevel` an hour for
+// each level, up to `storageHours` hours of it for each level; a full store
+// stops production. An upgrade in progress keeps `since` at its end, so the
+// building does not produce until then.
+export function production(building, stored, now) {
+  if (building.effect.kind !== 'production' || !stored) return null;
+  const perHour = building.effect.perLevel * stored.level;
+  const capacity = perHour * building.effect.storageHours * stored.level;
+  const since = stored.collectedAt ?? stored.endsAt;
+  const amount = Math.floor(Math.min(capacity, (Math.max(0, now - since) / HOUR) * perHour));
+  return { resource: building.effect.resource, perHour, capacity, amount, since, fullAt: since + (capacity / perHour) * HOUR };
+}
+
+// Collecting the store: what it gives, and the new start of production. The
+// part of a unit already made is kept, unless the store was full and stood.
+export function collect(building, stored, now) {
+  const store = production(building, stored, now);
+  if (!store || store.amount < 1) return null;
+  const collectedAt = store.amount >= store.capacity ? now : store.since + Math.round((store.amount / store.perHour) * HOUR);
+  return { resource: store.resource, amount: store.amount, collectedAt };
 }

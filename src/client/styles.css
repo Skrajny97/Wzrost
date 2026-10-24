@@ -582,6 +582,30 @@ button {
   color: var(--system);
 }
 
+/* A full store waits in the camp: a gold dot on the tent. */
+.camp-button--ready {
+  position: relative;
+  color: var(--gold);
+}
+
+.camp-button--ready::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--bg-deep);
+}
+
+.wallet-item--system .wallet-name,
+.wallet-item--system .wallet-amount,
+.wallet-item--system svg {
+  color: var(--system);
+}
+
 .icon-button {
   display: flex;
   align-items: center;
@@ -2844,4 +2868,52 @@ a.segmented-option {
 
 .section-count--full {
   color: var(--danger);
+}
+
+.camp-wallet-item--system {
+  grid-column: 1 / -1;
+  border-color: var(--system-line);
+  background: var(--system-fill);
+}
+
+.camp-wallet-item--system .camp-wallet-name,
+.camp-wallet-item--system strong,
+.camp-wallet-item--system svg {
+  color: var(--system);
+}
+
+/* The store of a production building. */
+.store {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--bark-line);
+}
+
+.store-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.store-head span {
+  flex: 1;
+}
+
+.store-head strong {
+  color: var(--gold);
+}
+
+.store-hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.bar-fill--gold {
+  background: var(--gold);
+  transition: width 1s linear;
 }

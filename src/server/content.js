@@ -72,7 +72,7 @@ export function publicContent() {
     durations: { min: content.balance.hunt.minMinutes, step: content.balance.hunt.stepMinutes, max: content.balance.hunt.maxMinutes },
     lengths: content.texts.lengths,
     unlocks: content.unlocks.map(({ id, name, level, condition }) => ({ id, name, level, condition })),
-    resources: content.resources.map(({ id, name, description }) => ({ id, name, description })),
+    resources: content.resources.map(({ id, name, description, system }) => ({ id, name, description, system: Boolean(system) })),
     buildings: content.buildings.map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
     freeResetMaxLevel: content.balance.progression.freeResetMaxLevel,
     classEvolutionLevel: content.balance.progression.classEvolutionLevel,

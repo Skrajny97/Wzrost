@@ -2,7 +2,7 @@
 // Assets before this code runs; only /api/* and unknown paths reach the Worker.
 
 import { login, logout, me, register } from './accounts.js';
-import { startBuilding } from './camp.js';
+import { collectProduction, startBuilding } from './camp.js';
 import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
 import { ApiError, errorResponse, json } from './http.js';
@@ -34,6 +34,7 @@ const routes = [
   ['POST', '/api/hunts/cancel', cancelHunt],
   ['POST', '/api/hunts/claim', claimHunt],
   ['POST', '/api/camp/build', startBuilding],
+  ['POST', '/api/camp/collect', collectProduction],
   ['GET', '/api/reports', listReports],
   ['GET', '/api/reports/:id', getReport],
   ['POST', '/api/test/skip-time', skipTime],

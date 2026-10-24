@@ -63,6 +63,10 @@ function checkReferences(data) {
   uniqueIds(errors, 'affixes', [...data.affixes.prefixes, ...data.affixes.suffixes]);
   const unlocks = uniqueIds(errors, 'unlocks', data.unlocks);
   const resources = uniqueIds(errors, 'resources', data.resources);
+  // System resources (Punkty Systemu) never trade for gold, items or
+  // materials (design doc), so no find gives them and no building makes or
+  // costs them.
+  const systemResources = new Set(data.resources.filter((resource) => resource.system).map((resource) => resource.id));
   uniqueIds(errors, 'buildings', data.buildings);
   for (const id of REQUIRED_UNLOCKS) {
     if (!unlocks.has(id)) errors.push(`unlocks.json: brak wpisu "${id}", którego używa kod gry`);
@@ -166,6 +170,7 @@ function checkReferences(data) {
     if (next !== region.maxLevel + 1) errors.push(`regions.json: regiony wewnętrzne ${region.id} nie kończą się na poziomie ${region.maxLevel}`);
     for (const id of Object.keys(region.resources)) {
       if (!resources.has(id)) errors.push(`regions.json: ${region.id} ma nieznany zasób "${id}"`);
+      if (systemResources.has(id)) errors.push(`regions.json: ${region.id} daje w znaleziskach zasób Systemu "${id}"`);
     }
     const elite = monstersById.get(region.elite);
     if (!elite) errors.push(`regions.json: ${region.id} ma nieznaną elitę "${region.elite}"`);
@@ -175,10 +180,19 @@ function checkReferences(data) {
   // A building is paid in gold and resources; the first level needs no
   // resources, because a new character has none yet.
   for (const building of data.buildings) {
+    const { effect } = building;
+    if (effect.kind === 'production') {
+      if (!resources.has(effect.resource)) errors.push(`buildings.json: ${building.id} wytwarza nieznany zasób "${effect.resource}"`);
+      if (!effect.storageHours) errors.push(`buildings.json: ${building.id} wytwarza zasób, ale nie ma storageHours`);
+      if (systemResources.has(effect.resource)) errors.push(`buildings.json: ${building.id} wytwarza zasób Systemu "${effect.resource}"`);
+    } else if (effect.resource || effect.storageHours) {
+      errors.push(`buildings.json: ${building.id} ma resource albo storageHours, choć niczego nie wytwarza`);
+    }
     for (const cost of building.costs) {
       if (cost.resource !== 'gold' && !resources.has(cost.resource)) {
         errors.push(`buildings.json: ${building.id} kosztuje nieznany zasób "${cost.resource}"`);
       }
+      if (systemResources.has(cost.resource)) errors.push(`buildings.json: ${building.id} kosztuje zasób Systemu "${cost.resource}"`);
       if (cost.resource !== 'gold' && (cost.fromLevel ?? 1) < 2) {
         errors.push(`buildings.json: ${building.id} wymaga zasobu "${cost.resource}" już na poziomie 1`);
       }

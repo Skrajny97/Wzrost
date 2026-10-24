@@ -6,7 +6,7 @@
 import { $, fill, h, icon } from './dom.js';
 import { formatCountdown, formatMinutes, formatNumber } from './format.js';
 import { RESOURCE_ICONS } from './icons.js';
-import { activityFinished, currentHp, isUnlocked, restRate, serverNow, state, unlockInfo, walletEntries } from './state.js';
+import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, unlockInfo, walletEntries } from './state.js';
 import { meter } from './ui.js';
 
 const MAIN_TABS = [
@@ -82,7 +82,7 @@ function walletRows() {
   return walletEntries().map((entry) =>
     h(
       'li',
-      { class: 'wallet-item' },
+      { class: `wallet-item${entry.system ? ' wallet-item--system' : ''}` },
       icon(RESOURCE_ICONS[entry.id] ?? 'unknown', { size: 18 }),
       h('span', { class: 'wallet-name', text: entry.name }),
       h('span', { class: 'wallet-amount', text: formatNumber(entry.amount) }),
@@ -127,9 +127,13 @@ export function updateTopbar(now = serverNow()) {
   // The camp shows the time left of the building being upgraded.
   const building = character.camp.construction;
   const busy = Boolean(building) && now < building.endsAt;
+  // A dot when a production building's store is full and waits.
+  const ready = fullStores(character, now).length > 0;
   topbar.camp.classList.toggle('camp-button--busy', busy);
+  topbar.camp.classList.toggle('camp-button--ready', ready);
   topbar.campLabel.textContent = busy ? formatCountdown(building.endsAt - now) : 'Obóz';
-  topbar.camp.setAttribute('aria-label', busy ? `Obóz, budowa: ${building.name}` : 'Obóz');
+  const labels = [busy && `budowa: ${building.name}`, ready && 'pełny magazyn'].filter(Boolean);
+  topbar.camp.setAttribute('aria-label', labels.length > 0 ? `Obóz, ${labels.join(', ')}` : 'Obóz');
   topbar.hp.set(currentHp(character, now), character.maxHp);
   topbar.mana.set(character.mana, character.maxMana);
   topbar.xp.set(character.xp, character.xpToNext);

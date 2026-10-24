@@ -440,16 +440,24 @@ describe('camp', () => {
     }
   }
 
-  test('starts with three buildings at level 0, no resources and a bag of 20', async () => {
+  test('starts with six buildings at level 0, no resources and a bag of 30', async () => {
     const start = await character();
-    assert.deepEqual(start.camp.buildings.map((building) => [building.id, building.level]), [['campfire', 0], ['loot-shed', 0], ['scrap-bench', 0]]);
+    assert.deepEqual(
+      start.camp.buildings.map((building) => [building.id, building.level]),
+      [['sawmill', 0], ['quarry', 0], ['mine', 0], ['campfire', 0], ['loot-shed', 0], ['scrap-bench', 0]],
+    );
     assert.equal(start.camp.construction, null);
-    assert.deepEqual(start.camp.buildings[0].next, { level: 1, effect: 'Odpoczynek między wyprawami szybszy o 10%', minutes: 1, cost: { gold: 10 } });
-    assert.deepEqual(start.resources, { wood: 0, stone: 0, 'iron-ore': 0 });
-    assert.equal(start.bagCapacity, 20);
+    const campfire = start.camp.buildings.find((building) => building.id === 'campfire');
+    assert.deepEqual(campfire.next, { level: 1, effect: 'Odpoczynek między wyprawami szybszy o 10%', minutes: 1, cost: { gold: 10 } });
+    assert.equal(campfire.production, null);
+    assert.deepEqual(start.resources, { wood: 0, stone: 0, 'iron-ore': 0, 'system-points': 0 });
+    assert.equal(start.bagCapacity, 30);
     const { data } = await call('GET', '/api/content');
-    assert.deepEqual(data.resources.map((resource) => resource.name), ['Drewno', 'Kamień', 'Ruda żelaza']);
-    assert.deepEqual(data.buildings.map((building) => building.name), ['Ognisko', 'Szałas na łupy', 'Stół złomiarza']);
+    assert.deepEqual(data.resources.map((resource) => resource.name), ['Drewno', 'Kamień', 'Ruda żelaza', 'Punkty Systemu']);
+    assert.deepEqual(
+      data.buildings.map((building) => building.name),
+      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Ognisko', 'Szałas na łupy', 'Stół złomiarza'],
+    );
   });
 
   test('a building is paid in gold and resources, takes time, and one is built at a time', async () => {
@@ -464,15 +472,16 @@ describe('camp', () => {
     assert.deepEqual([running.buildingId, running.name, running.level, running.endsAt - running.startedAt], ['campfire', 'Ognisko', 1, 60000]);
     assert.equal(started.data.character.gold, 90);
     // Until the end the building keeps its old level, and nothing else can be built.
-    assert.equal(started.data.character.camp.buildings[0].level, 0);
+    const campfire = (view) => view.camp.buildings.find((building) => building.id === 'campfire');
+    assert.equal(campfire(started.data.character).level, 0);
     assert.equal((await build('loot-shed')).data.error.code, 'camp_busy');
     assert.equal((await build('campfire')).data.error.code, 'camp_busy');
 
     await finishBuilding();
     const done = await character();
     assert.equal(done.camp.construction, null);
-    assert.equal(done.camp.buildings[0].level, 1);
-    assert.equal(done.camp.buildings[0].effect, 'Odpoczynek między wyprawami szybszy o 10%');
+    assert.equal(campfire(done).level, 1);
+    assert.equal(campfire(done).effect, 'Odpoczynek między wyprawami szybszy o 10%');
     // Ognisko: resting 10% faster from the end of the upgrade on, which came
     // after the HP saved at its start.
     assert.equal(done.regen.perMinute, before.regen.perMinute);
@@ -482,7 +491,7 @@ describe('camp', () => {
     const second = await build('campfire');
     assert.equal(second.status, 201);
     assert.equal(second.data.character.gold, 71);
-    assert.deepEqual(second.data.character.resources, { wood: 4, stone: 2, 'iron-ore': 0 });
+    assert.deepEqual(second.data.character.resources, { wood: 4, stone: 2, 'iron-ore': 0, 'system-points': 0 });
     assert.equal(second.data.character.camp.construction.endsAt - second.data.character.camp.construction.startedAt, 2 * 60000);
   });
 
@@ -500,22 +509,67 @@ describe('camp', () => {
     const skipped = await call('POST', '/api/test/skip-build', { cookie });
     assert.equal(skipped.status, 200);
     assert.equal(skipped.data.character.camp.construction, null);
-    assert.equal(skipped.data.character.bagCapacity, 25);
+    assert.equal(skipped.data.character.bagCapacity, 35);
   });
 
   test('a full bag: the scrapper buys the weakest items, and nothing can be taken off', async () => {
-    await fillBag(21, { rarityId: 'common', level: 3 });
+    await fillBag(31, { rarityId: 'common', level: 3 });
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 15 } });
     await finishHunt();
     const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
-    assert.equal(after.bag.length, 20);
-    assert.ok(report.system.some((line) => line.startsWith('Plecak był pełny (20 miejsc).')));
+    assert.equal(after.bag.length, 30);
+    assert.ok(report.system.some((line) => line.startsWith('Plecak był pełny (30 miejsc).')));
     // The first weapon went into the hand; with a full bag it cannot be taken off.
     const weapon = after.equipment.weapon;
     assert.ok(weapon);
     const off = await call('POST', `/api/items/${weapon.id}/unequip`, { cookie });
     assert.equal(off.status, 409);
     assert.equal(off.data.error.code, 'bag_full');
+  });
+
+  test('a production building fills its store, which the player collects', async () => {
+    await (await db()).prepare('UPDATE characters SET gold = 200').run();
+    const built = await build('sawmill');
+    const store = (view) => view.camp.buildings.find((building) => building.id === 'sawmill').production;
+    // The store comes with the building.
+    assert.equal(store(built.data.character), null);
+    await call('POST', '/api/test/skip-build', { cookie });
+    const ready = await character();
+    assert.deepEqual([store(ready).paused, store(ready).perHour, store(ready).capacity], [false, 6, 6]);
+    assert.equal((await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'sawmill' } })).data.error.code, 'nothing_to_collect');
+    assert.equal((await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'campfire' } })).data.error.code, 'invalid_building');
+
+    // With nothing being built, "Pomiń czas" fills the stores.
+    const full = await call('POST', '/api/test/skip-build', { cookie });
+    assert.equal(store(full.data.character).amount, 6);
+    const collected = await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'sawmill' } });
+    assert.equal(collected.status, 200);
+    assert.deepEqual(collected.data.collected, { resource: 'wood', amount: 6 });
+    assert.equal(collected.data.character.resources.wood, 6);
+    assert.equal((await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'sawmill' } })).data.error.code, 'nothing_to_collect');
+
+    // An upgrade first collects the store: level 2 costs 29 gold and 6 wood.
+    await call('POST', '/api/test/skip-build', { cookie });
+    const upgraded = await build('sawmill');
+    assert.equal(upgraded.status, 201);
+    assert.equal(upgraded.data.character.resources.wood, 6 + 6 - 6);
+    assert.equal(upgraded.data.character.gold, 200 - 15 - 29);
+    assert.deepEqual([store(upgraded.data.character).paused, store(upgraded.data.character).amount], [true, 0]);
+  });
+
+  test('two taps on "Zbierz" collect once', async () => {
+    await (await db()).prepare('UPDATE characters SET gold = 200').run();
+    await build('sawmill');
+    await finishBuilding();
+    // Half an hour of 6 wood an hour: 3 wood, the store not full.
+    await (await db()).prepare("UPDATE buildings SET collected_at = ? WHERE building_id = 'sawmill'").bind(Date.now() - 31 * 60000).run();
+    const taps = await Promise.all([
+      call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'sawmill' } }),
+      call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'sawmill' } }),
+    ]);
+    const [won, lost] = taps.sort((a, b) => a.status - b.status);
+    assert.deepEqual([won.status, won.data.collected.amount, lost.status], [200, 3, 409]);
+    assert.equal((await character()).resources.wood, 3);
   });
 
   test('Stół złomiarza raises the prices', async () => {

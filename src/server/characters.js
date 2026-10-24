@@ -17,6 +17,7 @@ import {
   huntDurations,
   itemView,
   playerCombatant,
+  production,
   regenPerMinute,
   restBonus,
   restedHp,
@@ -47,18 +48,18 @@ export async function loadPlayer(db, userId) {
   const [items, activities, buildings] = await db.batch([
     db.prepare('SELECT id, slot, data FROM items WHERE character_id = ? ORDER BY id').bind(row.id),
     db.prepare('SELECT * FROM activities WHERE character_id = ?').bind(row.id),
-    db.prepare('SELECT building_id, level, started_at, ends_at FROM buildings WHERE character_id = ?').bind(row.id),
+    db.prepare('SELECT building_id, level, started_at, ends_at, collected_at FROM buildings WHERE character_id = ?').bind(row.id),
   ]);
   return {
     row,
     // equippedSlot is where the item is worn (null in the bag); item.slot is where it can go.
     items: items.results.map((item) => ({ id: item.id, equippedSlot: item.slot, ...JSON.parse(item.data) })),
     activity: activities.results[0] ?? null,
-    // { campfire: { level, startedAt, endsAt } }: see camp.js in the engine.
+    // { campfire: { level, startedAt, endsAt, collectedAt } }: see camp.js in the engine.
     buildings: Object.fromEntries(
       buildings.results.map((building) => [
         building.building_id,
-        { level: building.level, startedAt: building.started_at, endsAt: building.ends_at },
+        { level: building.level, startedAt: building.started_at, endsAt: building.ends_at, collectedAt: building.collected_at },
       ]),
     ),
   };
@@ -134,6 +135,10 @@ function campView(player, levels, now) {
     buildings: content.buildings.map((building) => {
       const level = levels[building.id];
       const next = level < building.maxLevel ? level + 1 : null;
+      const stored = player.buildings[building.id];
+      // A production building's store, once the building stands: the page
+      // counts it up from `since`.
+      const store = level > 0 ? production(building, stored, now) : null;
       return {
         id: building.id,
         name: building.name,
@@ -141,6 +146,14 @@ function campView(player, levels, now) {
         level,
         maxLevel: building.maxLevel,
         effect: level > 0 ? effectText(building, level) : null,
+        production: store && {
+          resource: store.resource,
+          perHour: store.perHour,
+          capacity: store.capacity,
+          amount: store.amount,
+          since: store.since,
+          paused: stored.endsAt > now,
+        },
         next: next && {
           level: next,
           effect: effectText(building, next),

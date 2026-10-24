@@ -64,11 +64,26 @@ export function currentHp(character = state.character, now = serverNow()) {
 // HP a minute while resting now.
 export const restRate = (character = state.character) => character.regen?.change?.perMinute ?? character.regen?.perMinute ?? 0;
 
-// Gold and the camp's resources, with their names, in the order to show them.
+// Gold and the resources, with their names, in the order to show them.
 export const walletEntries = (character = state.character) => [
   { id: 'gold', name: 'Złoto', amount: character.gold },
-  ...state.content.resources.map((resource) => ({ id: resource.id, name: resource.name, amount: character.resources[resource.id] ?? 0 })),
+  ...state.content.resources.map((resource) => ({
+    id: resource.id,
+    name: resource.name,
+    amount: character.resources[resource.id] ?? 0,
+    system: Boolean(resource.system),
+  })),
 ];
+
+// What a production building's store holds at `now`, as production() in the
+// engine counts it.
+export const storeAmount = (store, now = serverNow()) =>
+  Math.floor(Math.min(store.capacity, (Math.max(0, now - store.since) / 3600000) * store.perHour));
+export const storeFullAt = (store) => store.since + (store.capacity / store.perHour) * 3600000;
+
+// A store that is full and stands, so the player has something to collect.
+export const fullStores = (character = state.character, now = serverNow()) =>
+  character.camp.buildings.filter((building) => building.production && !building.production.paused && storeAmount(building.production, now) >= building.production.capacity);
 
 // A second of slack, so the page never asks for a report before the server has it.
 export const activityFinished = (activity, now = serverNow()) => Boolean(activity) && now >= activity.endsAt + 1000;

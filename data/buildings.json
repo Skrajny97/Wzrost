@@ -1,5 +1,44 @@
 [
   {
+    "id": "sawmill",
+    "name": "Tartak",
+    "description": "Piła i kozioł pod wiatą. Powoli zamienia powalone pnie w drewno.",
+    "maxLevel": 10,
+    "effect": { "kind": "production", "resource": "wood", "perLevel": 6, "storageHours": 1, "unit": "count", "text": "Wytwarza {value} drewna na godzinę, magazyn na {hours} produkcji" },
+    "costs": [
+      { "resource": "gold", "base": 15, "growth": 1.9 },
+      { "resource": "wood", "base": 6, "growth": 1.8, "fromLevel": 2 },
+      { "resource": "stone", "base": 4, "growth": 1.8, "fromLevel": 3 }
+    ],
+    "minutes": { "base": 1, "growth": 2.2 }
+  },
+  {
+    "id": "quarry",
+    "name": "Kamieniołom",
+    "description": "Odkrywka przy omszałych głazach. Powoli wydobywa kamień.",
+    "maxLevel": 10,
+    "effect": { "kind": "production", "resource": "stone", "perLevel": 4, "storageHours": 1, "unit": "count", "text": "Wydobywa {value} kamienia na godzinę, magazyn na {hours} produkcji" },
+    "costs": [
+      { "resource": "gold", "base": 15, "growth": 1.9 },
+      { "resource": "wood", "base": 6, "growth": 1.8, "fromLevel": 2 },
+      { "resource": "iron-ore", "base": 3, "growth": 1.8, "fromLevel": 4 }
+    ],
+    "minutes": { "base": 1, "growth": 2.2 }
+  },
+  {
+    "id": "mine",
+    "name": "Kopalnia",
+    "description": "Sztolnia pod korzeniami starych drzew. Powoli wydobywa rudę żelaza.",
+    "maxLevel": 10,
+    "effect": { "kind": "production", "resource": "iron-ore", "perLevel": 3, "storageHours": 1, "unit": "count", "text": "Wydobywa {value} rudy żelaza na godzinę, magazyn na {hours} produkcji" },
+    "costs": [
+      { "resource": "gold", "base": 20, "growth": 1.9 },
+      { "resource": "wood", "base": 8, "growth": 1.8, "fromLevel": 2 },
+      { "resource": "stone", "base": 5, "growth": 1.8, "fromLevel": 3 }
+    ],
+    "minutes": { "base": 1, "growth": 2.2 }
+  },
+  {
     "id": "campfire",
     "name": "Ognisko",
     "description": "Ciepło, strawa i sen przy ogniu. Postać szybciej odzyskuje HP między wyprawami.",

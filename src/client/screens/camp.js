@@ -1,18 +1,20 @@
 // The camp: buildings the player upgrades alongside the character's
 // activity, paid with gold and the resources found on explorations. One
 // building is upgraded at a time; the upgrade counts once its time has passed.
-// Opened with the camp button in the top bar.
+// Production buildings fill a store the player collects. Opened with the camp
+// button in the top bar.
 
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { RESOURCE_ICONS } from '../icons.js';
-import { call, serverNow, state, testModeOn, walletEntries } from '../state.js';
-import { systemPanel, withButton } from '../ui.js';
+import { call, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
+import { systemPanel, toast, withButton } from '../ui.js';
 
 export function mountCamp(container, { backHash = '#/walka' }) {
   let countdown = null;
   let progress = null;
   let shownBuild = null;
+  let stores = []; // production stores on the screen, counted up every second
 
   function render() {
     const character = state.character;
@@ -20,6 +22,7 @@ export function mountCamp(container, { backHash = '#/walka' }) {
     shownBuild = running && running.endsAt > serverNow() ? running.endsAt : null;
     countdown = null;
     progress = null;
+    stores = [];
     fill(
       container,
       h(
@@ -41,13 +44,18 @@ export function mountCamp(container, { backHash = '#/walka' }) {
     tick(serverNow());
   }
 
-  // Test mode only: the building being upgraded is ready at once.
+  // Test mode only: the building being upgraded is ready at once, and with
+  // nothing being built the stores fill at once.
   function testTools() {
-    if (!state.content.testMode || !testModeOn() || !shownBuild) return null;
+    const producing = state.character.camp.buildings.some((building) => building.production);
+    if (!state.content.testMode || !testModeOn() || (!shownBuild && !producing)) return null;
     return h(
       'div',
       { class: 'test-tools' },
-      h('p', { class: 'test-tools-text', text: 'Tryb testowy: budowa skończy się od razu.' }),
+      h('p', {
+        class: 'test-tools-text',
+        text: shownBuild ? 'Tryb testowy: budowa skończy się od razu.' : 'Tryb testowy: magazyny zapełnią się od razu.',
+      }),
       h('button', {
         type: 'button',
         class: 'button button--test',
@@ -64,7 +72,7 @@ export function mountCamp(container, { backHash = '#/walka' }) {
       walletEntries().map((entry) =>
         h(
           'li',
-          { class: 'camp-wallet-item' },
+          { class: `camp-wallet-item${entry.system ? ' camp-wallet-item--system' : ''}` },
           icon(RESOURCE_ICONS[entry.id] ?? 'unknown', { size: 18 }),
           h('span', { class: 'camp-wallet-name', text: entry.name }),
           h('strong', { text: formatNumber(entry.amount) }),
@@ -116,6 +124,7 @@ export function mountCamp(container, { backHash = '#/walka' }) {
       ),
       h('p', { class: 'region-description', text: building.description }),
       building.effect && h('p', { class: 'building-effect' }, h('strong', { text: 'Teraz: ' }), building.effect),
+      building.production && storeView(building),
       next
         ? [
             h('p', { class: 'building-next' }, h('strong', { text: `Poziom ${next.level}: ` }), next.effect),
@@ -145,7 +154,61 @@ export function mountCamp(container, { backHash = '#/walka' }) {
     );
   }
 
+  // The store of a production building: how full it is, when it fills up,
+  // and "Zbierz".
+  function storeView(building) {
+    const store = building.production;
+    const names = Object.fromEntries(walletEntries().map((entry) => [entry.id, entry.name]));
+    const amount = h('strong', {});
+    const fillBar = h('div', { class: 'bar-fill bar-fill--gold' });
+    const hint = h('p', { class: 'store-hint' });
+    let collecting = false; // the tick must not enable the button mid-request
+    const button = h('button', {
+      type: 'button',
+      class: 'button button--world',
+      text: 'Zbierz',
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          collecting = true;
+          try {
+            const { collected } = await call('POST', '/api/camp/collect', { buildingId: building.id });
+            toast(`Zebrano: ${names[collected.resource].toLowerCase()} +${formatNumber(collected.amount)}.`);
+          } finally {
+            collecting = false;
+          }
+        }),
+    });
+    const show = (now) => {
+      const held = storeAmount(store, now);
+      amount.textContent = `${formatNumber(held)} / ${formatNumber(store.capacity)}`;
+      fillBar.style.width = `${(held / store.capacity) * 100}%`;
+      hint.textContent = store.paused
+        ? 'Rozbudowa: produkcja ruszy po jej końcu.'
+        : held >= store.capacity
+          ? 'Magazyn pełny: produkcja stoi do zebrania.'
+          : `Pełny za ${formatCountdown(storeFullAt(store) - now)}.`;
+      button.disabled = collecting || held < 1;
+    };
+    stores.push(show);
+    show(serverNow());
+    return h(
+      'div',
+      { class: 'store' },
+      h(
+        'p',
+        { class: 'store-head' },
+        icon(RESOURCE_ICONS[store.resource] ?? 'unknown', { size: 18 }),
+        h('span', { text: `Magazyn: ${names[store.resource] ?? store.resource}` }),
+        amount,
+      ),
+      h('div', { class: 'bar' }, fillBar),
+      hint,
+      button,
+    );
+  }
+
   function tick(now) {
+    for (const show of stores) show(now);
     const running = state.character.camp.construction;
     const endsAt = running && running.endsAt > now ? running.endsAt : null;
     // The upgrade ended: the page asks for the character again (app.js).

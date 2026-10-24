@@ -19,12 +19,14 @@
         "required": ["kind", "perLevel", "unit", "text"],
         "properties": {
           "kind": {
-            "enum": ["restSpeed", "bagSlots", "sellPrice"],
-            "description": "restSpeed: szybszy odpoczynek między wyprawami (ułamek), bagSlots: miejsca w plecaku, sellPrice: wyższe ceny u złomiarza (ułamek)."
+            "enum": ["restSpeed", "bagSlots", "sellPrice", "production"],
+            "description": "restSpeed: szybszy odpoczynek między wyprawami (ułamek), bagSlots: miejsca w plecaku, sellPrice: wyższe ceny u złomiarza (ułamek), production: budynek wytwarza zasób (resource)."
           },
-          "perLevel": { "type": "number", "exclusiveMinimum": 0 },
+          "perLevel": { "type": "number", "exclusiveMinimum": 0, "description": "Premia za poziom; przy production zasób na godzinę za poziom." },
+          "resource": { "type": "string", "minLength": 1, "description": "Tylko production: wytwarzany zasób (resources.json)." },
+          "storageHours": { "type": "number", "exclusiveMinimum": 0, "description": "Tylko production: na ile godzin produkcji starcza magazyn za każdy poziom. Pełny magazyn zatrzymuje produkcję." },
           "unit": { "enum": ["percent", "count"], "description": "Jak pokazać wartość: percent mnoży ułamek przez 100 i dodaje %." },
-          "text": { "type": "string", "pattern": "\\{value\\}", "description": "Opis premii z miejscem na wartość: {value}." }
+          "text": { "type": "string", "pattern": "\\{value\\}", "description": "Opis premii z miejscem na wartość: {value}, a przy production także {hours}." }
         }
       },
       "costs": {

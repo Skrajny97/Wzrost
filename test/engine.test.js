@@ -14,6 +14,8 @@ import {
   construction,
   effectText,
   missingFor,
+  collect,
+  production,
   regenPerMinute,
   restBonus,
   upgradeCost,
@@ -672,7 +674,7 @@ describe('camp', () => {
     assert.equal(buildingLevel(stored.campfire, 4999), 1);
     assert.equal(buildingLevel(stored.campfire, 5000), 2);
     assert.equal(buildingLevel(undefined, 5000), 0);
-    assert.deepEqual(campLevels(stored, 4000, content), { campfire: 1, 'loot-shed': 0, 'scrap-bench': 0 });
+    assert.deepEqual(campLevels(stored, 4000, content), { sawmill: 0, quarry: 0, mine: 0, campfire: 1, 'loot-shed': 0, 'scrap-bench': 0 });
     assert.equal(construction(stored, 4000).buildingId, 'campfire');
     assert.equal(construction(stored, 5000), null);
     assert.deepEqual(missingFor({ gold: 19, wood: 6 }, { gold: 20, wood: 2 }), [{ resource: 'wood', amount: 4 }]);
@@ -682,7 +684,7 @@ describe('camp', () => {
     const levels = { campfire: 3, 'loot-shed': 2, 'scrap-bench': 5 };
     assert.ok(Math.abs(campBonus(levels, 'restSpeed', content) - 0.3) < 1e-9);
     assert.equal(bagCapacity(levels, content), content.balance.items.bagSlots + 10);
-    assert.equal(bagCapacity({}, content), 20);
+    assert.equal(bagCapacity({}, content), 30);
     assert.ok(Math.abs(campBonus(levels, 'sellPrice', content) - 0.5) < 1e-9);
     assert.equal(effectText(campfire, 3), 'Odpoczynek między wyprawami szybszy o 30%');
     assert.equal(effectText(content.buildingsById['loot-shed'], 2), 'Plecak większy o 10 miejsc');
@@ -713,6 +715,38 @@ describe('camp', () => {
     // A warrior cannot use the staff, so it goes first; then the new common sword.
     assert.deepEqual(bagOverflow([...bag, ...finds], 3, 'warrior', content), [1, 3]);
     assert.deepEqual(bagOverflow(bag, 3, 'warrior', content), []);
+  });
+});
+
+describe('production', () => {
+  const sawmill = content.buildingsById.sawmill;
+  const hour = 3600000;
+
+  test('a store holds an hour of production for each level and then stops', () => {
+    const first = { level: 1, startedAt: 0, endsAt: 0, collectedAt: 0 };
+    assert.deepEqual(production(sawmill, first, hour / 2), { resource: 'wood', perHour: 6, capacity: 6, amount: 3, since: 0, fullAt: hour });
+    assert.equal(production(sawmill, first, 5 * hour).amount, 6);
+    const top = { level: 10, startedAt: 0, endsAt: 0, collectedAt: 0 };
+    const store = production(sawmill, top, 20 * hour);
+    assert.deepEqual([store.perHour, store.capacity, store.amount, store.fullAt], [60, 600, 600, 10 * hour]);
+    assert.equal(effectText(sawmill, 10), 'Wytwarza 60 drewna na godzinę, magazyn na 10\u00a0h produkcji');
+    assert.equal(production(content.buildingsById.campfire, first, hour), null);
+    assert.equal(production(sawmill, undefined, hour), null);
+  });
+
+  test('nothing is made during an upgrade, and collecting keeps what is half made', () => {
+    // An upgrade to level 2 running until 2 h: the store starts filling then.
+    const upgrading = { level: 2, startedAt: hour, endsAt: 2 * hour, collectedAt: 2 * hour };
+    assert.equal(production(sawmill, upgrading, 1.5 * hour).amount, 0);
+    // 12 an hour: after 25 minutes 5 are made and a sixth is on its way.
+    const store = { level: 2, startedAt: 0, endsAt: 0, collectedAt: 0 };
+    const now = (25 / 60) * hour;
+    const gathered = collect(sawmill, store, now);
+    assert.deepEqual([gathered.resource, gathered.amount], ['wood', 5]);
+    assert.equal(gathered.collectedAt, Math.round((5 / 12) * hour));
+    // A full store stood still, so production starts again now.
+    assert.equal(collect(sawmill, store, 10 * hour).collectedAt, 10 * hour);
+    assert.equal(collect(sawmill, store, 1000), null);
   });
 });
 

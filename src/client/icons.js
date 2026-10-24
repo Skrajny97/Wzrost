@@ -104,4 +104,5 @@ export const RESOURCE_ICONS = {
   wood: 'logs',
   stone: 'stone',
   'iron-ore': 'ore',
+  'system-points': 'core',
 };
