@@ -533,7 +533,9 @@ bindForm($('#register-form'), (data) => request('POST', '/api/auth/register', da
 $('#retry-button').addEventListener('click', start);
 
 // Sound effects and music start with a touch (browsers allow sound only
-// after one); then buttons give a soft tap and tabs a different one.
+// after one). Then every move to another screen clicks like a tab (the
+// menus, a link in the game such as a camp plot or a report, "Powrót"),
+// and a button that does something gives a soft tap.
 function touched() {
   unlockSound();
   startMusic();
@@ -545,8 +547,8 @@ document.addEventListener(
     touched();
     const target = event.target.closest('button, a');
     if (!target || target.disabled || target.closest('.arena')) return;
-    const tab = target.matches('.nav-item, .segmented-option, [role="tab"]');
-    playSound(tab ? 'tab' : 'tap');
+    const move = target.matches('.nav-item, .segmented-option, [role="tab"], .back-button, a[href^="#/"]');
+    playSound(move ? 'tab' : 'tap');
   },
   { capture: true },
 );
