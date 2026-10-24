@@ -1,0 +1,25 @@
+{
+  "id": "shadow-male",
+  "payload": {
+    "prompt": "young man rogue standing, full body from head to feet, black hood and a mask over the mouth, holding two daggers, facing the viewer, three-quarter view, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 853647125,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792840278,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 47.58,
+    "request_id": "0afa0d13-56c7-44eb-8373-1ce57832a678",
+    "outputs_retained_until": 1792926578
+  }
+}
