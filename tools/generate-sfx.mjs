@@ -10,9 +10,11 @@
 // A kind with `tts` is speech instead (ElevenLabs text to speech): a prompt is
 // {voice, text} or {voice, line}, a line of the narrator's introduction from
 // data/tutorial.json, and it costs credits for each character read. A prompt
-// may name its own `model` and `settings`, or ask for a `remix`: the voice
-// changed as described (ElevenLabs Voice Remixing), which comes back as a few
-// previews reading the text.
+// may name its own `model` and `settings`, ask for a `remix` of its voice
+// (ElevenLabs Voice Remixing, only for the account's own voices) or for a
+// `design`: a new voice from a description, optionally after a `reference`
+// recording (ElevenLabs Voice Design). A remix or a design comes back as a
+// few previews reading the text.
 
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
@@ -72,7 +74,8 @@ const prompt = (id) => {
 };
 const credits = (id) => {
   if (!tts) return Math.ceil(prompt(id).seconds * CREDITS_PER_SECOND);
-  const perCharacter = prompt(id).remix ? (tts.remixCreditsPerCharacter ?? 3) : (tts.creditsPerCharacter ?? 1);
+  const previews = prompt(id).remix || prompt(id).design;
+  const perCharacter = previews ? (tts.previewCreditsPerCharacter ?? 3) : (tts.creditsPerCharacter ?? 1);
   return Math.ceil(prompt(id).text.length * perCharacter);
 };
 const size = (id) => (tts ? `${prompt(id).text.length} znaków` : `${prompt(id).seconds} s`);
@@ -113,9 +116,15 @@ const voices = tts && !values['dry-run'] ? await voiceIds() : {};
 // One request: a sound of a set length, speech in the prompt's voice, or a
 // remix of that voice reading the text.
 function requestFor(id) {
-  const { text, seconds, voice, model, settings, remix } = prompt(id);
+  const { text, seconds, voice, model, settings, remix, design, reference, promptStrength } = prompt(id);
   if (!tts) {
     return { url: `${API}/sound-generation?output_format=mp3_44100_64`, payload: { text, duration_seconds: seconds, prompt_influence: kind.influence ?? 0.5 } };
+  }
+  if (design) {
+    const payload = { voice_description: design, text, model_id: tts.designModel ?? 'eleven_ttv_v3', guidance_scale: tts.designGuidance ?? 3 };
+    // The recording to start from goes as base64; the drafts note only its file.
+    const sent = reference ? { ...payload, reference_audio_base64: readFileSync(reference).toString('base64'), prompt_strength: promptStrength ?? 0.4 } : payload;
+    return { url: `${API}/text-to-voice/design?output_format=mp3_44100_128`, payload: reference ? { ...payload, reference } : payload, sent, previews: true };
   }
   const voiceId = voices[voice.toLowerCase()];
   if (!voiceId) throw new Error(`nieznany głos ${voice}`);
@@ -134,14 +143,14 @@ function requestFor(id) {
 
 // One sound, recorded `variants` times; each take is a separate request.
 async function record(id) {
-  const { url, payload, previews } = requestFor(id);
+  const { url, payload, sent = payload, previews } = requestFor(id);
   const files = [];
   const generated = []; // a remix's voices, which can be kept as a voice of the account
   for (let take = 0; take < variants; take++) {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'xi-api-key': token, 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(sent),
     });
     if (!response.ok) {
       const detail = await response.text().catch(() => '');
