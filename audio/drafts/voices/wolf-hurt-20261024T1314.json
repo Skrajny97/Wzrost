@@ -1,0 +1,15 @@
+{
+  "id": "wolf-hurt",
+  "payload": {
+    "text": "a wolf snarls in pain when hit, a short fierce growl through bared teeth, not a yelp, video game creature hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wolf-hurt-20261024T1314-0.mp3",
+    "audio/drafts/voices/wolf-hurt-20261024T1314-1.mp3",
+    "audio/drafts/voices/wolf-hurt-20261024T1314-2.mp3",
+    "audio/drafts/voices/wolf-hurt-20261024T1314-3.mp3"
+  ],
+  "credits": 48
+}

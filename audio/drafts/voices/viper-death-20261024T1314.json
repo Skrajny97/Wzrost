@@ -1,0 +1,15 @@
+{
+  "id": "viper-death",
+  "payload": {
+    "text": "a dying snake lets out a last short weak hiss that fades into silence, with a faint dry scrape of scales on the ground, video game creature death sound, close up, dry, no music",
+    "duration_seconds": 0.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/viper-death-20261024T1314-0.mp3",
+    "audio/drafts/voices/viper-death-20261024T1314-1.mp3",
+    "audio/drafts/voices/viper-death-20261024T1314-2.mp3",
+    "audio/drafts/voices/viper-death-20261024T1314-3.mp3"
+  ],
+  "credits": 64
+}
