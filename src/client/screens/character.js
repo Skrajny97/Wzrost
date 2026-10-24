@@ -1,6 +1,7 @@
 // The character screen: a 3:4 portrait with five equipment slots on each side,
 // an eye that hides the slots, and the bag with items that are not worn.
 
+import { itemSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatNumber, plural } from '../format.js';
 import { SLOT_ICONS, itemIcon } from '../icons.js';
@@ -84,7 +85,7 @@ export function mountCharacter(container) {
         'aria-label': `${slot.name}: ${item.name}, ${item.rarityName}`,
         onClick: () => itemSheet(item, { equipped: true }),
       },
-      icon(itemIcon(item), { size: 24 }),
+      itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
     );
   }
 
@@ -116,7 +117,7 @@ export function mountCharacter(container) {
                     'aria-label': `${item.name}, ${item.rarityName}, ${item.slotName}, poziom ${item.level}`,
                     onClick: () => itemSheet(item, { equipped: false }),
                   },
-                  icon(itemIcon(item), { size: 24 }),
+                  itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
                 ),
               ),
             ),
@@ -234,20 +235,25 @@ async function showPreview(box, item, equipped) {
 }
 
 export function itemSummary(item) {
-  return h(
+  const text = h(
     'span',
     { class: 'item-summary' },
     h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: item.name }),
     h('span', { class: 'item-meta', text: `${item.rarityName} · ${item.slotName} · poz. ${item.level}` }),
   );
+  const art = itemSprite(item);
+  return art ? h('span', { class: 'item-summary-art' }, art, text) : text;
 }
 
 export function itemDetails(item, { small = false } = {}) {
+  const title = h(small ? 'p' : 'h2', { class: 'item-title', vars: { '--rarity': item.color }, text: item.name });
+  const meta = h('p', { class: 'item-meta', text: `${item.rarityName} · ${item.slotName} · poz. ${item.level}` });
+  // The card of an item shows its sprite large, on a frame in its rarity colour.
+  const art = !small && itemSprite(item);
   return h(
     'div',
     { class: `item-details${small ? ' item-details--small' : ''}` },
-    h(small ? 'p' : 'h2', { class: 'item-title', vars: { '--rarity': item.color }, text: item.name }),
-    h('p', { class: 'item-meta', text: `${item.rarityName} · ${item.slotName} · poz. ${item.level}` }),
+    art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art', vars: { '--rarity': item.color } }, art), h('div', {}, title, meta)) : [title, meta],
     h(
       'ul',
       { class: 'item-properties' },

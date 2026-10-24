@@ -3,6 +3,7 @@
 // on request. The report opens on its key fight.
 
 import { createArena } from '../arena.js';
+import { itemSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { playSound } from '../sound.js';
@@ -260,6 +261,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
                     'aria-label': `${best.name}: pokaż przedmiot`,
                     onClick: () => findSheet(best),
                   },
+                  itemSprite(best),
                   best.name,
                 )
               : 'brak',

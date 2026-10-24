@@ -85,6 +85,23 @@ test('every building has its picture and a plot on the camp board, apart from th
   assert.deepEqual([1, 3, 4, 7, 8, 10].map(art.buildingTier), [1, 1, 2, 2, 3, 3]);
 });
 
+test('every sprite on the list has its file at its size, and every class has its bust', async () => {
+  const { SPRITES } = await import('../src/client/art.js');
+  const { classArtIds } = await import('../src/client/class-art.js');
+  const data = (name) => JSON.parse(readFileSync(new URL(`../data/${name}.json`, import.meta.url), 'utf8'));
+  const known = { monsters: data('monsters').map((monster) => monster.id), items: data('item-bases').map((base) => base.id) };
+  for (const [kind, { size, ids }] of Object.entries(SPRITES)) {
+    assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);
+    for (const id of ids) {
+      const file = join(CLIENT, 'art', kind, `${id}.png`);
+      assert.ok(existsSync(file), `${file} is missing`);
+      const png = readFileSync(file);
+      assert.equal(`${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`, `${size}x${size}`, file);
+    }
+  }
+  assert.deepEqual(data('classes').map((cls) => cls.id).filter((id) => !classArtIds.includes(id)), []);
+});
+
 test('the page can be added to the home screen as an app', () => {
   const html = readFileSync(join(CLIENT, 'index.html'), 'utf8');
   assert.match(html, /<link rel="manifest" href="\/manifest\.webmanifest">/);

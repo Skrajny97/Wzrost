@@ -1,5 +1,6 @@
 // Creating the character: one of five classes and a name.
 
+import { classArt } from '../class-art.js';
 import { $, fill, h, icon } from '../dom.js';
 import { CLASS_ICONS } from '../icons.js';
 import { call, state } from '../state.js';
@@ -38,7 +39,7 @@ export function renderCreate(container, onCreated) {
       h(
         'span',
         { class: 'class-card-head' },
-        h('span', { class: 'class-icon' }, icon(CLASS_ICONS[cls.id] ?? 'person', { size: 26 })),
+        h('span', { class: 'class-icon' }, classArt(cls.id) ?? icon(CLASS_ICONS[cls.id] ?? 'person', { size: 26 })),
         h('span', { class: 'class-name', text: cls.name }),
         START_BADGES[cls.start] && h('span', { class: `badge badge--${cls.start}`, text: START_BADGES[cls.start] }),
       ),

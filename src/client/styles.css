@@ -1181,10 +1181,18 @@ a.segmented-option {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
   border: 1px solid var(--bark-line);
+  border-radius: 4px;
   color: var(--text);
+}
+
+.class-icon .class-art {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .class-name {
@@ -1293,6 +1301,18 @@ a.segmented-option {
   opacity: 0.55;
 }
 
+/* An item's sprite sits on a glow in its rarity colour. */
+.slot:not(.slot--empty, .slot--core) {
+  background:
+    radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--rarity, transparent) 24%, transparent), transparent 70%),
+    rgba(13, 17, 11, 0.85);
+}
+
+.slot .sprite--item {
+  width: 40px;
+  height: 40px;
+}
+
 /* The number in the corner is the upgrade level (from the upgrades stage on). */
 .slot-level {
   position: absolute;
@@ -1341,6 +1361,12 @@ a.segmented-option {
 }
 
 /* Items */
+
+/* Pixel-art sprites (src/client/art.js) keep their pixels sharp. */
+.sprite {
+  display: block;
+  image-rendering: pixelated;
+}
 
 .item-details {
   display: flex;
@@ -1433,6 +1459,50 @@ a.segmented-option {
 .item-name {
   color: var(--rarity, var(--text));
   font-weight: 700;
+}
+
+.item-summary-art {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.item-summary-art .sprite {
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+/* The item card: the sprite large, on a frame in the rarity colour. */
+.item-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 44px;
+}
+
+.item-head .item-title {
+  padding-right: 0;
+}
+
+.item-art {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border: 1.5px solid var(--rarity, var(--bark-line));
+  border-radius: 6px;
+  background:
+    radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--rarity, transparent) 26%, transparent), transparent 70%),
+    var(--bg-deep);
+}
+
+.item-art .sprite {
+  width: 64px;
+  height: 64px;
 }
 
 /* Stats screen */
@@ -2211,6 +2281,35 @@ a.segmented-option {
   color: var(--text);
 }
 
+/* The class bust or the monster's sprite, with the level in its corner. */
+.unit-art {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.unit-art .sprite--monster,
+.unit-art .class-art {
+  display: block;
+  width: 100%;
+  max-width: 72px;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.unit-art .class-art {
+  border-radius: 4px;
+}
+
+.unit-art .unit-level {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0 3px;
+  border-radius: 3px;
+  background: rgba(13, 17, 11, 0.85);
+}
+
 .unit-name {
   font-size: 13px;
   font-weight: 700;
@@ -2559,6 +2658,17 @@ a.segmented-option {
   background: none;
   font: inherit;
   text-align: right;
+}
+
+.link-button:has(.sprite) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.link-button .sprite {
+  width: 32px;
+  height: 32px;
 }
 
 .preview {

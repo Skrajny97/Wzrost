@@ -4,6 +4,8 @@
 // flies to it, and the hit flashes with the damage. The text log runs
 // underneath and "+" opens the participants' stats.
 
+import { monsterSprite } from './art.js';
+import { classArt } from './class-art.js';
 import { h, icon } from './dom.js';
 import { CLASS_ICONS } from './icons.js';
 import { playSound } from './sound.js';
@@ -58,15 +60,21 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     const hpFill = h('div', { class: 'unit-hp-fill' });
     const hpText = h('span', { class: 'unit-hp-text' });
     const status = h('span', { class: 'unit-status' });
+    const level = h('span', { class: 'unit-level', text: `poz. ${unit.level}` });
+    // The class bust or the monster's sprite, with the level in its corner;
+    // without one, the old line icon beside the level.
+    const art = unit.side === 'ally' ? classArt(unit.classId) : monsterSprite(unit.monsterId);
     const card = h(
       'div',
       { class: `unit unit--${unit.side}${unit.elite ? ' unit--elite' : ''}`, role: 'group', 'aria-label': `${unit.name}, poziom ${unit.level}` },
-      h(
-        'span',
-        { class: 'unit-top' },
-        h('span', { class: 'unit-icon' }, icon(unit.side === 'ally' ? CLASS_ICONS[unit.classId] ?? 'person' : unit.family, { size: 24 })),
-        h('span', { class: 'unit-level', text: `poz. ${unit.level}` }),
-      ),
+      art
+        ? h('span', { class: 'unit-art' }, art, level)
+        : h(
+            'span',
+            { class: 'unit-top' },
+            h('span', { class: 'unit-icon' }, icon(unit.side === 'ally' ? CLASS_ICONS[unit.classId] ?? 'person' : unit.family, { size: 24 })),
+            level,
+          ),
       h('span', { class: 'unit-name', text: unit.name }),
       h('div', { class: 'unit-hp' }, hpFill),
       hpText,
