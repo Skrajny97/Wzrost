@@ -1,0 +1,14 @@
+{
+  "id": "male-death",
+  "payload": {
+    "text": "a young man lets out one pained groan and collapses to the ground, no words, no speech, video game character death sound, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/male-death-20261024T1306-0.mp3",
+    "audio/drafts/voices/male-death-20261024T1306-1.mp3",
+    "audio/drafts/voices/male-death-20261024T1306-2.mp3"
+  ],
+  "credits": 60
+}

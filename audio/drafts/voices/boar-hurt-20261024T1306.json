@@ -1,0 +1,14 @@
+{
+  "id": "boar-hurt",
+  "payload": {
+    "text": "a single short angry grunt and squeal of a wild boar hit by a blow, quick, video game creature hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/boar-hurt-20261024T1306-0.mp3",
+    "audio/drafts/voices/boar-hurt-20261024T1306-1.mp3",
+    "audio/drafts/voices/boar-hurt-20261024T1306-2.mp3"
+  ],
+  "credits": 36
+}

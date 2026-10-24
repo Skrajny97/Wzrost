@@ -1,0 +1,14 @@
+{
+  "id": "spider-death",
+  "payload": {
+    "text": "a giant spider gives a fading chittering screech as its legs curl up with a few dry clicks, video game monster death sound, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/spider-death-20261024T1306-0.mp3",
+    "audio/drafts/voices/spider-death-20261024T1306-1.mp3",
+    "audio/drafts/voices/spider-death-20261024T1306-2.mp3"
+  ],
+  "credits": 60
+}
