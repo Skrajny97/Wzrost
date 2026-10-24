@@ -3360,3 +3360,8 @@ a.segmented-option {
 .status-row--look .segmented {
   min-width: 210px;
 }
+
+.class-icons {
+  display: flex;
+  gap: 6px;
+}

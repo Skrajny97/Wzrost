@@ -41,7 +41,7 @@ export function renderCreate(container, onCreated) {
       h(
         'span',
         { class: 'class-card-head' },
-        h('span', { class: 'class-icon' }, classIcon(cls.id)),
+        h('span', { class: 'class-icons' }, classIcons(cls.id)),
         h('span', { class: 'class-name', text: cls.name }),
         START_BADGES[cls.start] && h('span', { class: `badge badge--${cls.start}`, text: START_BADGES[cls.start] }),
       ),
@@ -50,9 +50,13 @@ export function renderCreate(container, onCreated) {
     ),
   );
 
-  // The class cards show the figure of the chosen look, the vector bust before.
-  function classIcon(classId) {
-    return (look && portraitSprite(classId, look, { bust: true })) ?? classArt(classId) ?? icon(CLASS_ICONS[classId] ?? 'person', { size: 26 });
+  // The class cards show the figure in the chosen look, and both looks side
+  // by side before the choice; the vector bust only without portraits.
+  function classIcons(classId) {
+    const looks = look ? [look] : state.content.appearances.map((appearance) => appearance.id);
+    const busts = looks.map((id) => portraitSprite(classId, id, { bust: true })).filter(Boolean);
+    const art = busts.length > 0 ? busts : [classArt(classId) ?? icon(CLASS_ICONS[classId] ?? 'person', { size: 26 })];
+    return art.map((picture) => h('span', { class: 'class-icon' }, picture));
   }
 
   function select(classId) {
@@ -71,7 +75,7 @@ export function renderCreate(container, onCreated) {
       onClick: () => {
         look = appearance.id;
         for (const button of looks) button.setAttribute('aria-pressed', String(button.dataset.look === look));
-        for (const card of cards) fill($('.class-icon', card), classIcon(card.dataset.classId));
+        for (const card of cards) fill($('.class-icons', card), classIcons(card.dataset.classId));
         error.hidden = true;
       },
     }),

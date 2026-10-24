@@ -42,7 +42,7 @@ export function setEffectsVolume(value) {
   } catch {
     // Without storage the choice lasts until the page is closed.
   }
-  if (master) master.gain.value = 0.5 * volumeGain(volume);
+  if (master) master.gain.value = volumeGain(volume);
 }
 
 // Browsers play sound only after the player has touched the page. Returns
@@ -53,8 +53,15 @@ export function unlockSound() {
     if (!AudioContext) return null;
     context = new AudioContext();
     master = context.createGain();
-    master.gain.value = 0.5 * volumeGain(volume);
-    master.connect(context.destination);
+    master.gain.value = volumeGain(volume);
+    // A limiter, so loud effects together never clip on a phone.
+    const limiter = context.createDynamicsCompressor();
+    limiter.threshold.value = -12;
+    limiter.knee.value = 6;
+    limiter.ratio.value = 8;
+    limiter.attack.value = 0.002;
+    limiter.release.value = 0.15;
+    master.connect(limiter).connect(context.destination);
     loadRecordings();
   }
   // Safari also has the state "interrupted", e.g. after a phone call.

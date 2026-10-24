@@ -172,7 +172,7 @@ Muzyka w tle jest w `src/client/audio/music/`, a `data/music.json` mówi, który
 2. Dopisz go do `tracks` w `data/music.json`, a miejsce i id utworu do `places`.
 3. `npm run validate` sprawdzi, że plik i miejsce istnieją.
 
-Ciosy, uniki i upadki w walce to nagrania z paczek Kenney (CC0) w `src/client/audio/sfx/`, przypisane w `data/sounds.json` do rodzajów broni i ataków potworów (pole `sound` w `data/item-bases.json` i `data/monsters.json`). Głosy stworów i postaci przy trafieniu i pokonaniu (`voices`) nagrywa przebieg **Dźwięki (szkice)** z generatorem ElevenLabs:
+Ciosy, uniki i upadki w walce to nagrania z paczek Kenney (CC0) w `src/client/audio/sfx/`, przypisane w `data/sounds.json` do rodzajów broni i ataków potworów (pole `sound` w `data/item-bases.json` i `data/monsters.json`). Przerabia je dla głośnika telefonu `tools/build-sfx.py` (Python i ffmpeg). Głosy stworów i postaci przy trafieniu i pokonaniu (`voices`) nagrywa przebieg **Dźwięki (szkice)** z generatorem ElevenLabs:
 
 1. Na github.com otwórz repozytorium, zakładkę **Actions** i przebieg **Dźwięki (szkice)**.
 2. Stuknij **Run workflow**, wybierz rodzaj (`voices` albo `effects`), wpisz identyfikatory po przecinku albo `all` i limit kredytów, a potem stuknij zielone **Run workflow**.

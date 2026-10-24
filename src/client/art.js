@@ -58,3 +58,12 @@ export function portraitSprite(classId, appearance, { bust = false } = {}) {
     draggable: 'false',
   });
 }
+
+// Fetches every portrait ahead, so the class cards show them at once.
+export function preloadPortraits() {
+  for (const id of SPRITES.portraits.ids) {
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = `/art/portraits/${id}.png`;
+  }
+}

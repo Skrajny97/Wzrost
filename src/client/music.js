@@ -13,6 +13,9 @@ import { clampVolume, unlockSound, volumeGain } from './sound.js';
 
 const VOLUME_KEY = 'insight.musicVolume';
 const SWITCH_SECONDS = 1.5; // from one track to another
+// Even at 100% the music stays below the effects, which are short and need
+// the room (half the signal, −6 dB).
+const MUSIC_LEVEL = 0.5;
 
 let config = null; // content.music
 let volume = readVolume();
@@ -119,13 +122,13 @@ function setUp() {
 
 function applyVolume() {
   if (!audio) return;
-  if (level) level.gain.value = volumeGain(volume);
-  else audio.volume = volumeGain(volume);
+  if (level) level.gain.value = MUSIC_LEVEL * volumeGain(volume);
+  else audio.volume = MUSIC_LEVEL * volumeGain(volume);
 }
 
 function setFade(value, seconds = 0) {
   if (!fade) {
-    audio.volume = volumeGain(volume) * value;
+    audio.volume = MUSIC_LEVEL * volumeGain(volume) * value;
     return;
   }
   const now = fade.context.currentTime;
@@ -196,7 +199,7 @@ function fadeOutNearEnd() {
     setFade(0, left);
   } else {
     // Without the audio context the volume follows each update.
-    audio.volume = volumeGain(volume) * Math.min(1, left / config.fadeOutSeconds);
+    audio.volume = MUSIC_LEVEL * volumeGain(volume) * Math.min(1, left / config.fadeOutSeconds);
   }
 }
 

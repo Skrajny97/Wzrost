@@ -4,6 +4,7 @@
 
 import { ApiError, request } from './api.js';
 import { $, $$, clear, h } from './dom.js';
+import { preloadPortraits } from './art.js';
 import { installBlock, installButton } from './install.js';
 import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { mountCamp } from './screens/camp.js';
@@ -59,6 +60,13 @@ async function start() {
     .then((content) => {
       setMusicConfig(content.music);
       setRecordings(content.sounds);
+    })
+    .catch(() => {});
+  preloadPortraits();
+  // The version this page runs, to notice a newer one later.
+  request('GET', '/api/health')
+    .then((health) => {
+      loadedVersion ??= health.version;
     })
     .catch(() => {});
   show('loading');
@@ -181,6 +189,19 @@ onCharacterChange(() => {
   updateTopbar();
   renderNav();
   current.screen.update?.();
+});
+
+// Coming back to the page after a new version of the game was deployed
+// reloads it, so an open page (or the installed app) never runs old code.
+// Everything that matters is on the server; only the music starts anew.
+let loadedVersion = null;
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !loadedVersion) return;
+  request('GET', '/api/health')
+    .then((health) => {
+      if (health.version !== loadedVersion) location.reload();
+    })
+    .catch(() => {});
 });
 
 // Coming back to the page (for example after the hunt timer ran out) refreshes
