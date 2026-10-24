@@ -71,7 +71,9 @@ export function initSheet() {
 }
 
 // Asks before something that cannot be undone. Resolves to true or false.
-export function confirmAction({ title, text, confirmLabel, danger = false }) {
+// With `typed`, the confirm button waits until that word is typed in, as the
+// account's login before deleting the account.
+export function confirmAction({ title, text, confirmLabel, danger = false, typed = null }) {
   return new Promise((resolve) => {
     let answered = false;
     const answer = (value) => {
@@ -80,20 +82,31 @@ export function confirmAction({ title, text, confirmLabel, danger = false }) {
       closeSheet();
       resolve(value);
     };
+    const confirm = h('button', {
+      type: 'button',
+      class: danger ? 'button button--danger' : 'button button--system',
+      disabled: Boolean(typed),
+      onClick: () => answer(true),
+      text: confirmLabel,
+    });
+    const input =
+      typed &&
+      h('input', {
+        id: 'confirm-typed',
+        type: 'text',
+        autocomplete: 'off',
+        autocapitalize: 'none',
+        autocorrect: 'off',
+        spellcheck: 'false',
+        onInput: (event) => {
+          confirm.disabled = event.currentTarget.value.trim().toLowerCase() !== typed.toLowerCase();
+        },
+      });
     const dialog = openSheet(
       h('h2', { class: 'sheet-title', text: title }),
       h('p', { class: 'sheet-text', text }),
-      h(
-        'div',
-        { class: 'sheet-actions' },
-        h('button', { type: 'button', class: 'button button--world', onClick: () => answer(false), text: 'Anuluj' }),
-        h('button', {
-          type: 'button',
-          class: danger ? 'button button--danger' : 'button button--system',
-          onClick: () => answer(true),
-          text: confirmLabel,
-        }),
-      ),
+      input && h('div', { class: 'field' }, h('label', { for: 'confirm-typed', text: `Wpisz „${typed}”, żeby potwierdzić.` }), input),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: () => answer(false), text: 'Anuluj' }), confirm),
     );
     dialog.addEventListener('close', () => answer(false), { once: true });
   });

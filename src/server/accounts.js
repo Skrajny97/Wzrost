@@ -163,6 +163,33 @@ export async function logout({ request, env }) {
   return json({ ok: true }, 200, { 'Set-Cookie': clearedSessionCookie() });
 }
 
+// "Usuń konto" in the settings: the account goes for good, with its
+// character and everything the character has, its sessions and its link to
+// Google. Typing the login again confirms it. Google Play asks apps where
+// one makes an account for this path inside the app.
+export async function deleteAccount(context) {
+  const session = await requireSession(context);
+  const body = await readJson(context.request);
+  const typed = typeof body.login === 'string' ? body.login.trim().toLowerCase() : '';
+  const { login, email } = session.user;
+  if (typed !== login.toLowerCase()) {
+    throw new ApiError(400, 'login_mismatch', 'Wpisz swój login, żeby potwierdzić usunięcie konta.');
+  }
+  const db = context.env.DB;
+  const id = session.userId;
+  const characters = 'SELECT id FROM characters WHERE user_id = ?';
+  await db.batch([
+    ...['reports', 'activities', 'items', 'buildings'].map((table) =>
+      db.prepare(`DELETE FROM ${table} WHERE character_id IN (${characters})`).bind(id),
+    ),
+    db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),
+    db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
+    db.prepare('DELETE FROM login_failures WHERE identifier IN (?, ?)').bind(login.toLowerCase(), email ?? ''),
+    db.prepare('DELETE FROM users WHERE id = ?').bind(id),
+  ]);
+  return json({ ok: true }, 200, { 'Set-Cookie': clearedSessionCookie() });
+}
+
 export async function me(context) {
   const session = await requireSession(context);
   const expiresAt = await refreshSession(context.env.DB, session, context.now);

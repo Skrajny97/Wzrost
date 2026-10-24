@@ -138,6 +138,37 @@ describe('login and logout', () => {
   });
 });
 
+describe('deleting the account', () => {
+  test('takes the account with its character, sessions and everything else, after the login is typed', async () => {
+    const { cookie } = await register({ login: 'Znikam', password: 'tajnehaslo1' });
+    await call('POST', '/api/character', { cookie, body: { name: 'Ulotna', classId: 'mage', appearance: 'female' } });
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    await login('znikam', 'zle-haslo');
+    const other = await register({ login: 'Zostaje', password: 'tajnehaslo1' });
+
+    const wrong = await call('DELETE', '/api/me', { cookie, body: { login: 'ktos' } });
+    assert.equal(wrong.status, 400);
+    assert.equal(wrong.data.error.code, 'login_mismatch');
+    const deleted = await call('DELETE', '/api/me', { cookie, body: { login: ' ZNIKAM ' } });
+    assert.equal(deleted.status, 200);
+    assert.match(deleted.headers.get('Set-Cookie'), /Max-Age=0/);
+    assert.equal((await call('GET', '/api/me', { cookie })).status, 401);
+
+    const database = await db();
+    const left = await database
+      .prepare(
+        `SELECT (SELECT COUNT(*) FROM users) AS users, (SELECT COUNT(*) FROM characters) AS characters,
+                (SELECT COUNT(*) FROM activities) AS activities, (SELECT COUNT(*) FROM buildings) AS buildings,
+                (SELECT COUNT(*) FROM sessions) AS sessions, (SELECT COUNT(*) FROM login_failures) AS failures`,
+      )
+      .first();
+    assert.deepEqual(left, { users: 1, characters: 0, activities: 0, buildings: 0, sessions: 1, failures: 0 });
+    // The other player is untouched, and the login is free again.
+    assert.equal((await call('GET', '/api/me', { cookie: other.cookie })).status, 200);
+    assert.equal((await register({ login: 'znikam', password: 'tajnehaslo1' })).status, 201);
+  });
+});
+
 describe('sessions', () => {
   let cookie;
   beforeEach(async () => {

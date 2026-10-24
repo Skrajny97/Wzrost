@@ -920,3 +920,16 @@ Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach i poprosił
     - klawiatura iPhone'a nie poprawia imienia (`autocorrect="off"`),
     - komunikat mówi wprost, co jest nie tak: długość, konkretny niedozwolony znak, pierwsza albo ostatnia litera, a przy zajętym imieniu „To imię nosi już inna postać w grze. Wybierz inne.”
 4. **Kolumny usuwać w osobnym wdrożeniu.** Migracje idą przed nowym kodem, więc przez kilka sekund wdrożenia działa stary kod na nowej bazie. Migracja `0011` usunęła kolumnę, z której korzystał stary kod, i przez tę chwilę tworzenie postaci mogło kończyć się błędem. Kolumnę, której kod już nie używa, usuwa się dopiero w kolejnym wdrożeniu.
+
+## Przygotowanie do Sklepu Play (24.10.2026, czeka na wdrożenie)
+
+Autor zlecił przygotowanie do Sklepu Play „na przyszłość”. Te zmiany są na gałęzi roboczej i trafią do gry dopiero na polecenie autora. Plan, teksty i decyzje są w dokumencie [Insight — droga do Sklepu Play](https://claude.ai/artifact/JmVkJMPqQg2MNZmXtHxv5r).
+
+1. **Usuwanie konta.** Google Play wymaga, żeby aplikacja, w której zakłada się konto, pozwalała je usunąć w środku aplikacji. RODO daje to prawo i tak. W Ustawieniach pod „Zacznij od nowa” jest „Usuń konto”. Karta pyta, czy na pewno, a przycisk działa dopiero po wpisaniu własnego loginu. Serwer (`DELETE /api/me`) usuwa od razu:
+    - konto,
+    - postać z przedmiotami, raportami, wyprawą i obozem,
+    - wszystkie sesje,
+    - liczniki nieudanych logowań.
+
+    Wraz z kontem znika też połączenie z Google. Potem strona wraca do logowania. Kopie zapasowe bazy (Time Travel) znikają po 30 dniach.
+2. **Czcionki na serwerze gry.** Alegreya i Chakra Petch leżą w `src/client/fonts/` (licencja SIL Open Font License, jej teksty są obok), w zestawach łacińskim i łacińskim rozszerzonym, które obejmują polskie litery. Gra nie pobiera już niczego z Google Fonts, więc otwarcie gry nie wysyła adresu IP do Google, a polityka bezpieczeństwa strony dopuszcza style i czcionki tylko z serwera gry.

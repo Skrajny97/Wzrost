@@ -1,7 +1,7 @@
 // Worker entry point. Static files from src/client are served by Workers Static
 // Assets before this code runs; only /api/* and unknown paths reach the Worker.
 
-import { login, logout, me, register } from './accounts.js';
+import { deleteAccount, login, logout, me, register } from './accounts.js';
 import { collectProduction, startBuilding } from './camp.js';
 import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
@@ -22,6 +22,7 @@ const routes = [
   ['GET', '/api/auth/google/start', startGoogle],
   ['GET', '/api/auth/google/callback', googleCallback],
   ['GET', '/api/me', me],
+  ['DELETE', '/api/me', deleteAccount],
   ['GET', '/api/content', () => json(publicContent())],
   ['GET', '/api/character', getCharacter],
   ['POST', '/api/character', createCharacter],

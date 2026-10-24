@@ -396,6 +396,7 @@ function openSettings() {
     installButton(),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
     h('button', { type: 'button', class: 'button button--danger', onClick: startOver, text: 'Zacznij od nowa' }),
+    h('button', { type: 'button', class: 'button button--danger', onClick: deleteAccount, text: 'Usuń konto' }),
   );
   request('GET', '/api/health')
     .then((health) => {
@@ -415,6 +416,27 @@ async function logout(event) {
   } catch (error) {
     toast(error.message);
     button.disabled = false;
+  }
+}
+
+// Removes the account for good after its login is typed in, and goes back to
+// signing in (Google Play asks for this path inside the app).
+async function deleteAccount() {
+  const { login } = state.user;
+  const sure = await confirmAction({
+    title: 'Usunąć konto?',
+    text: `Konto ${login} zniknie na zawsze razem z postacią, przedmiotami, raportami i obozem. Tego nie da się cofnąć.`,
+    confirmLabel: 'Usuń konto',
+    danger: true,
+    typed: login,
+  });
+  if (!sure) return;
+  try {
+    await request('DELETE', '/api/me', { login });
+    leaveGame();
+    toast('Konto zostało usunięte.');
+  } catch (error) {
+    toast(error.message);
   }
 }
 
