@@ -3,9 +3,15 @@
   "voices": {
     "seconds": 1,
     "prompts": {
-      "wolf-hurt": "a wolf yelps in pain from a hit, single short yelp, close up, dry, no music",
+      "wolf-hurt": {
+        "text": "a single short sharp yelp of pain from a wolf hit by a blow, quick, video game creature hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
       "wolf-death": "a wolf whimpers and collapses, dying whine, close up, dry, no music",
-      "alpha-wolf-hurt": "a huge wolf yelps and snarls in pain from a hit, sharp and loud, mid-pitched, close up, dry, no music",
+      "alpha-wolf-hurt": {
+        "text": "a single short deep snarling yelp of a huge wolf hit by a blow, quick and fierce, video game creature hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
       "alpha-wolf-death": "a huge wolf lets out a long dying howl that fades, close up, dry, no music",
       "fox-hurt": "a fox gives a sharp high yelp of pain, close up, dry, no music",
       "fox-death": "a fox whimpers weakly and falls silent, close up, dry, no music",
@@ -13,7 +19,10 @@
       "lynx-death": "a big wild cat gives a dying growl, close up, dry, no music",
       "bear-hurt": "a brown bear roars in pain from a hit, short deep roar, close up, dry, no music",
       "bear-death": "a brown bear groans deeply and collapses heavily, close up, dry, no music",
-      "boar-hurt": "a wild boar squeals in pain from a hit, short, close up, dry, no music",
+      "boar-hurt": {
+        "text": "a single short angry grunt and squeal of a wild boar hit by a blow, quick, video game creature hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
       "boar-death": "a wild boar grunts and squeals weakly as it dies, close up, dry, no music",
       "badger-hurt": "a badger hisses and chatters angrily from a hit, close up, dry, no music",
       "badger-death": "a badger gives a weak dying hiss, close up, dry, no music",
@@ -22,15 +31,21 @@
       "owl-hurt": "an owl screeches in pain from a hit, short, close up, dry, no music",
       "owl-death": "an owl gives a fading screech and falls with a flutter, close up, dry, no music",
       "viper-hurt": "a snake hisses sharply in pain, short, close up, dry, no music",
-      "viper-death": "a snake gives a long fading hiss, close up, dry, no music",
-      "spider-hurt": "a giant spider chitters and hisses from a hit, short, close up, dry, no music",
-      "spider-death": "a giant spider screeches and its legs click as it curls up, close up, dry, no music",
+      "viper-death": "a snake lets out a weak rasping gurgling hiss that fades away, soft, video game creature death sound, close up, dry, no music",
+      "spider-hurt": {
+        "text": "a single short wet chittering screech of a giant spider hit by a blow, quick, video game monster hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
+      "spider-death": "a giant spider gives a fading chittering screech as its legs curl up with a few dry clicks, video game monster death sound, close up, dry, no music",
       "wisp-hurt": "a ghostly flame spirit lets out a short high eerie whispering wail, airy and hissing, close up, no music",
       "wisp-death": "a ghostly flame spirit fades away with a high airy whispering sigh and a soft fizzle, close up, no music",
-      "likho-hurt": "a gaunt forest demon shrieks in pain, raspy and inhuman, short, close up, dry, no music",
+      "likho-hurt": {
+        "text": "a single short raspy inhuman shriek of a gaunt forest demon hit by a blow, quick, video game monster hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
       "likho-death": "a gaunt forest demon lets out a long rattling death shriek, close up, dry, no music",
       "male-hurt": "a young man grunts in pain from a blow in a fight, short, no words, close up, dry, no music",
-      "male-death": "a young man groans and falls to the ground exhausted, no words, close up, dry, no music",
+      "male-death": "a young man lets out one pained groan and collapses to the ground, no words, no speech, video game character death sound, close up, dry, no music",
       "female-hurt": "a young woman grunts in pain from a blow in a fight, short, no words, close up, dry, no music",
       "female-death": "a young woman groans and falls to the ground exhausted, no words, close up, dry, no music"
     }

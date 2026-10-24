@@ -3,9 +3,10 @@
 // branch for review:
 //   node tools/generate-sfx.mjs --kind voices --ids wolf-hurt,wolf-death --max-credits 200
 //     [--variants 2] [--dry-run]
-// Prompts and lengths are in audio/prompts.json. A sound of a set length costs
-// 20 credits a second, so the run counts the credits before it starts and
-// stops before it would spend more than --max-credits.
+// Prompts and lengths are in audio/prompts.json; a prompt is its text, or
+// {text, seconds} when it needs a length of its own. A sound of a set length
+// costs 20 credits a second, so the run counts the credits before it starts
+// and stops before it would spend more than --max-credits.
 
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
@@ -45,16 +46,17 @@ const variants = Math.max(1, Math.min(4, Number(values.variants) || 1));
 const maxCredits = Number(values['max-credits']);
 if (!(maxCredits > 0)) fail('--max-credits musi być dodatnią liczbą kredytów.');
 
-const perSound = Math.ceil(kind.seconds * CREDITS_PER_SECOND);
-const total = perSound * variants * ids.length;
+const prompt = (id) => (typeof kind.prompts[id] === 'string' ? { text: kind.prompts[id], seconds: kind.seconds } : kind.prompts[id]);
+const credits = (id) => Math.ceil(prompt(id).seconds * CREDITS_PER_SECOND);
+const total = ids.reduce((sum, id) => sum + credits(id) * variants, 0);
 const lines = [`| Dźwięk | Wynik |`, `| --- | --- |`];
 if (total > maxCredits) {
   summary(`Wycena: ${total} kredytów, więcej niż limit ${maxCredits}. Nic nie nagrano.`);
   fail(`Te dźwięki kosztowałyby ${total} kredytów, a limit to ${maxCredits}.`);
 }
 if (values['dry-run']) {
-  for (const id of ids) lines.push(`| ${id} | wycena ${perSound * variants} kredytów |`);
-  summary([`Wycena razem: ${total} kredytów (${kind.seconds} s na dźwięk).`, '', ...lines].join('\n'));
+  for (const id of ids) lines.push(`| ${id} | wycena ${credits(id) * variants} kredytów (${prompt(id).seconds} s) |`);
+  summary([`Wycena razem: ${total} kredytów.`, '', ...lines].join('\n'));
   console.log(`Wycena razem: ${total} kredytów.`);
   process.exit(0);
 }
@@ -66,7 +68,8 @@ let spent = 0;
 
 // One sound, recorded `variants` times; each take is a separate request.
 async function record(id) {
-  const payload = { text: kind.prompts[id], duration_seconds: kind.seconds, prompt_influence: kind.influence ?? 0.5 };
+  const { text, seconds } = prompt(id);
+  const payload = { text, duration_seconds: seconds, prompt_influence: kind.influence ?? 0.5 };
   const files = [];
   for (let take = 0; take < variants; take++) {
     const response = await fetch(`${API}/sound-generation?output_format=mp3_44100_64`, {
@@ -81,10 +84,10 @@ async function record(id) {
     const file = `${outDir}/${id}-${stamp}-${take}.mp3`;
     writeFileSync(file, Buffer.from(await response.arrayBuffer()));
     files.push(file);
-    spent += perSound;
+    spent += credits(id);
   }
-  writeFileSync(`${outDir}/${id}-${stamp}.json`, `${JSON.stringify({ id, payload, files, credits: perSound * files.length }, null, 2)}\n`);
-  lines.push(`| ${id} | ${files.length} nagrania, ${perSound * files.length} kredytów |`);
+  writeFileSync(`${outDir}/${id}-${stamp}.json`, `${JSON.stringify({ id, payload, files, credits: credits(id) * files.length }, null, 2)}\n`);
+  lines.push(`| ${id} | ${files.length} nagrania, ${credits(id) * files.length} kredytów |`);
 }
 
 // Each sound on its own: a failed one does not lose the ones already paid for.
