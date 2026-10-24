@@ -67,8 +67,9 @@ jobs:
           args=(--kind "$KIND" --ids "$IDS" --variants "$VARIANTS" --style "$STYLE" --max-cost "$MAX_COST")
           if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
           node tools/generate-art.mjs "${args[@]}"
+      # Also after a failed drawing: the drafts already paid for are kept.
       - name: Zapis na gałęzi art-drafts
-        if: ${{ !inputs.dry_run }}
+        if: ${{ always() && !inputs.dry_run }}
         env:
           KIND: ${{ inputs.kind }}
           IDS: ${{ inputs.ids }}

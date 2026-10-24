@@ -63,7 +63,7 @@ async function request(method, url, body) {
     body: body && JSON.stringify(body),
   });
   const data = await response.json().catch(() => null);
-  if (!response.ok) fail(`Retro Diffusion odpowiedział ${response.status}: ${JSON.stringify(data ?? {}).slice(0, 400)}`);
+  if (!response.ok) throw new Error(`Retro Diffusion odpowiedział ${response.status}: ${JSON.stringify(data ?? {}).slice(0, 400)}`);
   return data;
 }
 
@@ -72,11 +72,11 @@ async function settle(data) {
   if (!data?.task_id || data.base64_images || data.balance_cost !== undefined) return data;
   for (let attempt = 0; attempt < POLL_LIMIT; attempt++) {
     const task = await request('GET', `${API}/tasks/${data.task_id}`);
-    if (task.status === 'failed') fail(`Generowanie nie powiodło się: ${task.error ?? 'bez opisu'}`);
+    if (task.status === 'failed') throw new Error(`generowanie nie powiodło się: ${task.error ?? 'bez opisu'}`);
     if (task.status !== 'pending' && task.status !== 'running') return task.result ?? task;
     await new Promise((resolve) => setTimeout(resolve, POLL_MS));
   }
-  fail('Generowanie trwa zbyt długo.');
+  throw new Error('generowanie trwa zbyt długo');
 }
 
 // The approved sprites of this kind, as style references (not for themselves).
@@ -90,10 +90,12 @@ const outDir = `art/drafts/${values.kind}`;
 mkdirSync(outDir, { recursive: true });
 const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 13);
 const lines = [];
+const failed = [];
 let spent = 0;
 let balance = null;
 
-for (const id of ids) {
+// One drawing: priced, then drawn and saved with what came back.
+async function draw(id) {
   const seed = values.seed ? Number(values.seed) : Math.floor(Math.random() * 1e9);
   const payload = {
     prompt: kind.prompts[id],
@@ -113,12 +115,12 @@ for (const id of ids) {
   balance = quote.remaining_balance ?? balance;
   if (spent + cost > maxCost) {
     lines.push(`| ${id} | pominięte: przekroczyłoby limit ${maxCost} USD | | |`);
-    continue;
+    return;
   }
   if (values['dry-run']) {
     spent += cost;
     lines.push(`| ${id} | wycena ${cost.toFixed(3)} USD | ${style} | ${refs.length} |`);
-    continue;
+    return;
   }
 
   const result = await settle(await request('POST', API, payload));
@@ -136,6 +138,16 @@ for (const id of ids) {
   lines.push(`| ${id} | ${files.length} obrazki, ${Number(result.balance_cost ?? cost).toFixed(3)} USD | ${style} | ${refs.length} |`);
 }
 
+// A failed drawing does not stop the others, so the paid ones are kept.
+for (const id of ids) {
+  try {
+    await draw(id);
+  } catch (error) {
+    failed.push(id);
+    lines.push(`| ${id} | błąd: ${error.message} | | |`);
+  }
+}
+
 const balanceNote = balance === null ? '' : `, saldo: ${Number(balance).toFixed(2)} USD`;
 const total = values['dry-run'] ? `Wycena razem: ${spent.toFixed(3)} USD${balanceNote}.` : `Wydano: ${spent.toFixed(3)} USD${balanceNote}.`;
 summary(
@@ -151,3 +163,7 @@ summary(
 );
 console.log(lines.join('\n'));
 console.log(total);
+if (failed.length) {
+  console.log(`::error::Nie udało się: ${failed.join(', ')}.`);
+  process.exitCode = 1;
+}
