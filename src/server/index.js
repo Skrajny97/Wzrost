@@ -5,6 +5,7 @@ import { login, logout, me, register } from './accounts.js';
 import { collectProduction, startBuilding } from './camp.js';
 import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
+import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
 import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
@@ -16,6 +17,8 @@ const routes = [
   ['POST', '/api/auth/register', register],
   ['POST', '/api/auth/login', login],
   ['POST', '/api/auth/logout', logout],
+  ['GET', '/api/auth/google/start', startGoogle],
+  ['GET', '/api/auth/google/callback', googleCallback],
   ['GET', '/api/me', me],
   ['GET', '/api/content', () => json(publicContent())],
   ['GET', '/api/character', getCharacter],
@@ -91,7 +94,8 @@ export default {
 
 async function health({ env, now }) {
   await env.DB.prepare('SELECT 1').first();
-  return json({ ok: true, time: now, version: env.APP_VERSION });
+  // `google`: whether the Google sign-in buttons can show.
+  return json({ ok: true, time: now, version: env.APP_VERSION, google: googleConfigured(env) });
 }
 
 // Browsers always send Origin with POST requests made by fetch; a foreign one is refused.

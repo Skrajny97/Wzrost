@@ -1179,6 +1179,84 @@ a.segmented-option {
   font-size: 14px;
 }
 
+/* Google sign-in, after Google's rules for its button on a dark page: the
+   four-colour G on a near-black fill, a grey edge and light grey text. */
+.google-block {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.google-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 16px;
+  border: 1px solid #8e918f;
+  border-radius: 4px;
+  background: #131314;
+  color: #e3e3e3;
+  font-family: Roboto, 'Segoe UI', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.google-button:active {
+  background: #2a2a2c;
+}
+
+.google-button--small {
+  width: auto;
+  min-height: 40px;
+  padding: 8px 12px;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.google-logo {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.google-button--small .google-logo {
+  width: 18px;
+  height: 18px;
+}
+
+.google-hint {
+  margin: 0;
+  color: var(--gold);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--line);
+}
+
+.status-row--google {
+  align-items: center;
+}
+
 .sheet-actions {
   display: grid;
   grid-auto-columns: minmax(0, 1fr);

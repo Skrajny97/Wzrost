@@ -22,3 +22,8 @@ export async function sha256Hex(text) {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return toHex(new Uint8Array(digest));
 }
+
+export function fromBase64Url(text) {
+  const base64 = text.replaceAll('-', '+').replaceAll('_', '/');
+  return fromBase64(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='));
+}

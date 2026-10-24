@@ -5,7 +5,7 @@
 import { ApiError, request } from './api.js';
 import { $, $$, clear, h } from './dom.js';
 import { preloadPortraits } from './art.js';
-import { installBlock, installButton } from './install.js';
+import { inAppBrowser, installBlock, installButton } from './install.js';
 import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { mountCamp } from './screens/camp.js';
 import { mountCharacter } from './screens/character.js';
@@ -53,7 +53,44 @@ function show(name) {
   for (const [key, view] of Object.entries(views)) view.hidden = key !== name;
 }
 
+// How a return from Google sign-in went: the server sends the browser to
+// /?google=<result> (src/server/google.js).
+const GOOGLE_NOTES = {
+  linked: 'Połączono konto Google. Możesz już logować się przyciskiem Google.',
+  taken: 'To konto Google jest już połączone z innym kontem w grze.',
+  exists: 'Konto w grze z tym adresem e-mail już istnieje. Zaloguj się loginem i hasłem, a potem połącz Google w Ustawieniach.',
+  cancelled: 'Logowanie przez Google zostało przerwane.',
+  expired: 'Logowanie przez Google trwało za długo albo sesja wygasła. Spróbuj ponownie.',
+  failed: 'Nie udało się zalogować przez Google. Spróbuj ponownie za chwilę.',
+  unavailable: 'Logowanie przez Google jest teraz niedostępne.',
+};
+
+// Why Google sign-in cannot work here, or null. Google refuses browsers
+// built into other apps, and a game added to the iPhone home screen keeps its
+// cookies apart from Safari, where the sign-in would end.
+function googleHint() {
+  if (inAppBrowser()) {
+    return 'Google nie pozwala logować się w przeglądarce wbudowanej w inną aplikację. Aby zalogować się przez Google, wybierz w jej menu „Otwórz w przeglądarce”.';
+  }
+  if (navigator.standalone === true) {
+    return 'Na iPhonie logowanie przez Google działa w Safari, ale jeszcze nie w grze z ekranu początkowego. Tutaj zaloguj się loginem i hasłem.';
+  }
+  return null;
+}
+
+// Reads the result once and removes it from the address.
+function takeGoogleNote() {
+  const params = new URLSearchParams(location.search);
+  const result = params.get('google');
+  if (result === null) return null;
+  params.delete('google');
+  const query = params.toString();
+  history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
+  return GOOGLE_NOTES[result] ?? GOOGLE_NOTES.failed;
+}
+
 async function start() {
+  const googleNote = takeGoogleNote();
   // The music plays from the start screen on, after the first touch, and
   // the recorded fight sounds load then too.
   loadContent()
@@ -67,6 +104,7 @@ async function start() {
   request('GET', '/api/health')
     .then((health) => {
       loadedVersion ??= health.version;
+      state.googleLogin = health.google === true;
     })
     .catch(() => {});
   show('loading');
@@ -76,9 +114,10 @@ async function start() {
     const { user } = await request('GET', '/api/me');
     state.user = user;
     await enterGame();
+    if (googleNote) toast(googleNote);
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
-      enterAuth();
+      enterAuth(googleNote);
       return;
     }
     $('#loading-text').textContent = error.message;
@@ -266,6 +305,28 @@ function lookRow() {
   );
 }
 
+// Google sign-in for this account: linked, or a button that links it.
+function googleRow() {
+  if (!state.user.google && (!state.googleLogin || googleHint())) return null;
+  return h(
+    'div',
+    { class: 'status-row status-row--google' },
+    h('dt', { text: 'Google' }),
+    h(
+      'dd',
+      {},
+      state.user.google
+        ? h('span', { class: 'status-ok', text: 'Połączone' })
+        : h(
+            'a',
+            { class: 'google-button google-button--small', href: '/api/auth/google/start?mode=link' },
+            h('img', { class: 'google-logo', src: '/google-g.svg', alt: '', width: 18, height: 18 }),
+            'Połącz z Google',
+          ),
+    ),
+  );
+}
+
 function openSettings() {
   const version = h('dd', { text: '…' });
   // Shown only while the server allows test mode ("Pomiń czas" and the like).
@@ -293,6 +354,7 @@ function openSettings() {
       h('div', { class: 'status-row' }, h('dt', { text: 'Konto' }), h('dd', { text: state.user.login })),
       h('div', { class: 'status-row' }, h('dt', { text: 'Postać' }), h('dd', { text: state.character.name })),
       lookRow(),
+      googleRow(),
       volumeRow('music-volume', 'Muzyka', musicVolume(), setMusicVolume),
       volumeRow('effects-volume', 'Efekty dźwiękowe', effectsVolume(), setEffectsVolume, () => playSound('system')),
       testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
@@ -361,7 +423,11 @@ handleSessionLost(() => {
 
 // Login and registration
 
-function enterAuth() {
+// `note`: how a return from Google went, if the page opened after one.
+function enterAuth(note = null) {
+  const googleNote = $('#google-note');
+  googleNote.textContent = note ?? '';
+  googleNote.hidden = !note;
   for (const form of [$('#login-form'), $('#register-form')]) {
     form.reset();
     $('.form-error', form).hidden = true;
@@ -377,6 +443,11 @@ function enterAuth() {
   request('GET', '/api/health')
     .then((health) => {
       for (const element of $$('[data-version]')) element.textContent = health.version;
+      state.googleLogin = health.google === true;
+      const hint = state.googleLogin ? googleHint() : null;
+      $('#google-block').hidden = !state.googleLogin || hint !== null;
+      $('#google-hint').textContent = hint ?? '';
+      $('#google-hint').hidden = hint === null;
     })
     .catch(() => {});
 }

@@ -84,7 +84,7 @@ export async function register({ request, env, now }) {
   }
 
   const session = await createSession(db, userId, now);
-  return json({ user: { login, email, createdAt: now, testMode: testModeFor(env, login) } }, 201, {
+  return json({ user: { login, email, createdAt: now, google: false, testMode: testModeFor(env, login) } }, 201, {
     'Set-Cookie': sessionCookie(session.token, session.expiresAt, now),
   });
 }
@@ -118,8 +118,8 @@ export async function login({ request, env, now }) {
   }
 
   const query = identifier.includes('@')
-    ? 'SELECT id, login, email, password_hash, created_at FROM users WHERE email = ?'
-    : 'SELECT id, login, email, password_hash, created_at FROM users WHERE login = ?';
+    ? 'SELECT id, login, email, password_hash, google_sub, created_at FROM users WHERE email = ?'
+    : 'SELECT id, login, email, password_hash, google_sub, created_at FROM users WHERE login = ?';
   const user = await db.prepare(query).bind(identifier).first();
   if (!user || !(await verifyPassword(password, user.password_hash))) {
     await recordLoginFailure(db, throttleKey, now);
@@ -137,7 +137,15 @@ export async function login({ request, env, now }) {
 
   const session = await createSession(db, user.id, now);
   return json(
-    { user: { login: user.login, email: user.email, createdAt: user.created_at, testMode: testModeFor(env, user.login) } },
+    {
+      user: {
+        login: user.login,
+        email: user.email,
+        createdAt: user.created_at,
+        google: user.google_sub !== null,
+        testMode: testModeFor(env, user.login),
+      },
+    },
     200,
     { 'Set-Cookie': sessionCookie(session.token, session.expiresAt, now) },
   );

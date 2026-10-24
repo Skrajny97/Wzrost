@@ -20,6 +20,8 @@ describe('health', () => {
     assert.equal(status, 200);
     assert.equal(data.ok, true);
     assert.equal(data.version, 'dev');
+    // Without the Google client secrets the Google buttons stay hidden.
+    assert.equal(data.google, false);
     assert.ok(data.time >= before - 1000 && data.time <= Date.now() + 1000);
     assert.equal(headers.get('Cache-Control'), 'no-store');
   });
@@ -33,7 +35,8 @@ describe('registration', () => {
       password: 'tajnehaslo1',
     });
     assert.equal(status, 201);
-    assert.deepEqual(Object.keys(data.user).sort(), ['createdAt', 'email', 'login', 'testMode']);
+    assert.deepEqual(Object.keys(data.user).sort(), ['createdAt', 'email', 'google', 'login', 'testMode']);
+    assert.equal(data.user.google, false);
     // In tests every account has test mode (test/helpers/server.js).
     assert.equal(data.user.testMode, true);
     assert.equal(data.user.login, 'Karol_97');
@@ -212,6 +215,16 @@ describe('request checks', () => {
     const wrongMethod = await call('GET', '/api/auth/login');
     assert.equal(wrongMethod.status, 405);
     assert.equal(wrongMethod.headers.get('Allow'), 'POST');
+  });
+});
+
+describe('Google sign-in without its secrets', () => {
+  test('sends the player back to the start screen', async () => {
+    for (const path of ['/api/auth/google/start', '/api/auth/google/callback?code=x&state=y']) {
+      const response = await server.fetch(path, { redirect: 'manual' });
+      assert.equal(response.status, 302, path);
+      assert.equal(response.headers.get('Location'), '/?google=unavailable', path);
+    }
   });
 });
 

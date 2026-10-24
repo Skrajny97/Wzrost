@@ -2,7 +2,7 @@
 
 Solowa, casualowa gra przeglądarkowa litRPG na telefon, oparta na timerach. Jedynym źródłem prawdy o projekcie jest [dokument projektowy](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX). Założenia przyjęte w trakcie budowy są w [DECISIONS.md](DECISIONS.md).
 
-Stan: **Etap 2a, plansza obozu.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, poziomy do 500, statystyki z wolnymi punktami, ekwipunek przypisany do klas i plecak z podglądem zmian, złomiarz, eksploracje na czasie serwera w dwóch regionach Skraju Puszczy, każdy z pięcioma regionami wewnętrznymi otwieranymi poziomem klasy, z suwakiem czasu, który wydłuża się z poziomem (30 minut na start, 4 godziny od poziomu 50), i spotkaniami wymagającymi, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik, „Zacznij od nowa” oraz obóz jako plansza w stylu Plemion z placem na każdy z siedmiu budynków na timerach: Tartak, Kamieniołom i Kopalnia wytwarzają zasoby do magazynu, Ognisko, Szałas na łupy i Stół złomiarza dają premie, a Kowadło pozwala ulepszać przedmioty do +10. Stwory, przedmioty i postacie (kobieta i mężczyzna w każdej klasie) mają sprite'y w pixel-arcie. W tle gra muzyka, ciosy w walce to nagrania, a grę można zainstalować na telefonie przyciskiem „Zainstaluj jako aplikację”. Zasoby (drewno, kamień, ruda żelaza) postać znajduje też na eksploracjach. Punkty Systemu, przyszła waluta premium na kosmetykę, należą do konta i są w górnym pasku obok złota. Spis klas, przedmiotów, potworów i regionów jest w [encyklopedii](https://claude.ai/artifact/EDt6uk8X5rRU9JCTLKsnXw).
+Stan: **Etap 2a, plansza obozu.** Działa konto (także logowanie przez Google, gdy są jego klucze), tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, poziomy do 500, statystyki z wolnymi punktami, ekwipunek przypisany do klas i plecak z podglądem zmian, złomiarz, eksploracje na czasie serwera w dwóch regionach Skraju Puszczy, każdy z pięcioma regionami wewnętrznymi otwieranymi poziomem klasy, z suwakiem czasu, który wydłuża się z poziomem (30 minut na start, 4 godziny od poziomu 50), i spotkaniami wymagającymi, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik, „Zacznij od nowa” oraz obóz jako plansza w stylu Plemion z placem na każdy z siedmiu budynków na timerach: Tartak, Kamieniołom i Kopalnia wytwarzają zasoby do magazynu, Ognisko, Szałas na łupy i Stół złomiarza dają premie, a Kowadło pozwala ulepszać przedmioty do +10. Stwory, przedmioty i postacie (kobieta i mężczyzna w każdej klasie) mają sprite'y w pixel-arcie. W tle gra muzyka, ciosy w walce to nagrania, a grę można zainstalować na telefonie przyciskiem „Zainstaluj jako aplikację”. Zasoby (drewno, kamień, ruda żelaza) postać znajduje też na eksploracjach. Punkty Systemu, przyszła waluta premium na kosmetykę, należą do konta i są w górnym pasku obok złota. Spis klas, przedmiotów, potworów i regionów jest w [encyklopedii](https://claude.ai/artifact/EDt6uk8X5rRU9JCTLKsnXw).
 
 ## Adres gry
 
@@ -78,7 +78,7 @@ Każdy push do `main` uruchamia workflow „Testy i wdrożenie” (`.github/work
 2. Sprawdzenie sekretów Cloudflare. Bez nich wdrożenie jest pomijane z ostrzeżeniem.
 3. Założenie subdomeny workers.dev i bazy D1 `wzrost`, jeśli ich jeszcze nie ma (`tools/prepare-cloudflare.mjs`).
 4. Migracje bazy z katalogu `migrations/`.
-5. Wdrożenie Workera razem z plikami strony.
+5. Wdrożenie Workera razem z plikami strony i kluczami logowania Google, jeśli są w sekretach repozytorium.
 6. Sprawdzenie, czy nowa wersja odpowiada (`tools/smoke-test.mjs`).
 
 Push na inną gałąź uruchamia tylko testy.
@@ -118,11 +118,13 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 
 | Metoda | Ścieżka | Opis |
 |---|---|---|
-| GET | `/api/health` | stan serwera i bazy, czas serwera, wersja |
+| GET | `/api/health` | stan serwera i bazy, czas serwera, wersja; `google` mówi, czy działa logowanie przez Google |
 | POST | `/api/auth/register` | rejestracja: `login`, `email` (opcjonalnie), `password` |
 | POST | `/api/auth/login` | logowanie: `identifier` (login lub e-mail), `password` |
 | POST | `/api/auth/logout` | wylogowanie |
-| GET | `/api/me` | zalogowany gracz; `testMode` mówi, czy jego konto ma tryb testowy |
+| GET | `/api/auth/google/start` | przejście do Google; `?mode=link` łączy Google z zalogowanym kontem |
+| GET | `/api/auth/google/callback` | powrót z Google: logowanie, nowe konto albo połączenie, potem przejście do `/` albo `/?google=<wynik>` |
+| GET | `/api/me` | zalogowany gracz; `google` mówi, czy konto ma połączone Google, a `testMode`, czy ma tryb testowy |
 | GET | `/api/content` | nazwy klas, wyglądów, statystyk, slotów, rzadkości, żywiołów, regionów i regionów wewnętrznych (z poziomem klasy, który je otwiera), zakres czasu i nazwy długości wypraw, odblokowania, poziomy ewolucji klas, muzyka i dźwięki walki; bez logowania |
 | GET | `/api/character` | pełny widok postaci z zasobami, Punktami Systemu konta (`systemPoints`), pojemnością plecaka i obozem (404 `no_character`, gdy jej nie ma) |
 | POST | `/api/character` | nowa postać: `name`, `classId`, `appearance` (`female` albo `male`) |
@@ -149,6 +151,15 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/test/skip-build` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu budowę w obozie, a gdy nic się nie buduje, zapełnia magazyny |
 
 Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie `message` jest po polsku.
+
+## Logowanie przez Google
+
+Na ekranie startowym jest „Zaloguj się przez Google”, a w Ustawieniach „Połącz z Google”. Oba przyciski pojawiają się dopiero wtedy, gdy Worker ma klucze klienta Google. Klucze są w sekretach repozytorium `GOOGLE_CLIENT_ID` i `GOOGLE_CLIENT_SECRET`, a wdrożenie przekazuje je Workerowi. Klienta zakłada się w Google Cloud Console (Google Auth Platform → Clients, typ „Web application”) z adresami powrotu:
+
+- `https://insightrpg.com/api/auth/google/callback`
+- `https://www.insightrpg.com/api/auth/google/callback`
+
+Te adresy wymienia `GOOGLE_HOSTS` w `wrangler.jsonc`. Zasady łączenia kont są w `DECISIONS.md`, w części „Logowanie przez Google”. Lokalnie logowanie Google wymaga własnego klienta z adresem `http://localhost:8787/api/auth/google/callback` i uruchomienia `npx wrangler dev --local-upstream localhost:8787 --var GOOGLE_HOSTS: --var GOOGLE_CLIENT_ID:… --var GOOGLE_CLIENT_SECRET:…`. Bez `--local-upstream` Worker widzi adres `insightrpg.com` zamiast `localhost`.
 
 ## Tryb testowy
 

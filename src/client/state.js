@@ -9,6 +9,8 @@ export const state = {
   character: null,
   // Server time minus local time, so timers follow the server clock.
   offset: 0,
+  // Whether the server offers Google sign-in (/api/health).
+  googleLogin: false,
 };
 
 const listeners = new Set();

@@ -83,10 +83,30 @@ jobs:
         run: node tools/prepare-cloudflare.mjs
       - name: Migracje bazy D1
         run: npx wrangler d1 migrations apply DB --remote
+      # Google sign-in needs both GitHub secrets; they go to the Worker as its
+      # secrets with the deploy. Without them the Google buttons stay hidden.
+      - name: Klucze logowania Google
+        shell: bash
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        run: |
+          if [ -n "$GOOGLE_CLIENT_ID" ] && [ -n "$GOOGLE_CLIENT_SECRET" ]; then
+            node -e 'const fs = require("fs"); fs.writeFileSync(process.argv[1], JSON.stringify({ GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET }), { mode: 0o600 });' "$RUNNER_TEMP/worker-secrets.json"
+            echo "EXPECT_GOOGLE=true" >> "$GITHUB_ENV"
+            echo "Logowanie Google: klucze trafią do Workera."
+          elif [ -n "$GOOGLE_CLIENT_ID$GOOGLE_CLIENT_SECRET" ]; then
+            echo "::warning title=Logowanie Google::Brakuje jednego z sekretów GOOGLE_CLIENT_ID i GOOGLE_CLIENT_SECRET, więc logowanie Google zostaje bez zmian."
+          else
+            echo "Logowanie Google: brak sekretów, przycisk Google zostaje ukryty."
+          fi
       - name: Wdrożenie Workera
         shell: bash
         run: |
           echo "APP_VERSION=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
-          npx wrangler deploy --var "APP_VERSION:${GITHUB_SHA::7}" | tee deploy.log
+          secrets=()
+          if [ -f "$RUNNER_TEMP/worker-secrets.json" ]; then secrets=(--secrets-file "$RUNNER_TEMP/worker-secrets.json"); fi
+          npx wrangler deploy --var "APP_VERSION:${GITHUB_SHA::7}" "${secrets[@]}" | tee deploy.log
+          rm -f "$RUNNER_TEMP/worker-secrets.json"
       - name: Sprawdzenie działania gry
         run: node tools/smoke-test.mjs deploy.log "$APP_VERSION"

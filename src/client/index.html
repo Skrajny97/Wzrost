@@ -45,6 +45,19 @@
         <p class="system-text" id="auth-message">Wykryto istotę na skraju puszczy. Potwierdź tożsamość, aby kontynuować.</p>
       </div>
 
+      <!-- How the return from Google went (app.js). -->
+      <p class="form-error" id="google-note" role="alert" hidden></p>
+      <!-- Shown when the server has a Google client (/api/health). -->
+      <div class="google-block" id="google-block" hidden>
+        <a class="google-button" href="/api/auth/google/start">
+          <img class="google-logo" src="/google-g.svg" alt="" width="20" height="20">
+          <span>Zaloguj się przez Google</span>
+        </a>
+        <p class="auth-divider">albo</p>
+      </div>
+      <!-- In place of the button where Google sign-in cannot work. -->
+      <p class="google-hint" id="google-hint" hidden></p>
+
       <div class="segmented" role="group" aria-label="Wybierz formularz">
         <button type="button" class="segmented-option" data-auth-mode="login" aria-pressed="true">Logowanie</button>
         <button type="button" class="segmented-option" data-auth-mode="register" aria-pressed="false">Nowe konto</button>

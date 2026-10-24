@@ -70,6 +70,10 @@ for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
     const data = await response.json().catch(() => null);
     if (response.ok && data?.ok === true && data.version === expectedVersion) {
       console.log(`Gra działa: ${url} (wersja ${data.version}, czas serwera ${new Date(data.time).toISOString()}).`);
+      summary(`Logowanie Google: ${data.google ? 'włączone' : 'wyłączone (brak sekretów GOOGLE_CLIENT_ID i GOOGLE_CLIENT_SECRET)'}.`);
+      if (process.env.EXPECT_GOOGLE === 'true' && !data.google) {
+        console.log('::warning::Klucze Google były w sekretach, ale gra ich nie widzi.');
+      }
       await checkContent();
       await checkDomains();
       process.exit(0);

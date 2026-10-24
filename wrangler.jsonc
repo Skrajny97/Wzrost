@@ -33,7 +33,13 @@
     "TEST_MODE": "on",
     // The accounts that get test mode in the live game (comma-separated, any
     // case); empty gives it to everyone. Tests and `npm run dev` empty it.
-    "TEST_LOGINS": "Skrajny"
+    "TEST_LOGINS": "Skrajny",
+    // The addresses whose Google sign-in return address
+    // (https://<address>/api/auth/google/callback) is registered in Google
+    // Cloud Console; a sign-in started elsewhere moves to the first one.
+    // The Google client id and secret are Worker secrets, set by the deploy
+    // workflow from the GitHub secrets.
+    "GOOGLE_HOSTS": "insightrpg.com,www.insightrpg.com"
   },
   "observability": {
     "enabled": true

@@ -33,7 +33,7 @@ export async function getSession(db, request, now) {
   const id = await sha256Hex(token);
   const row = await db
     .prepare(
-      `SELECT s.expires_at, u.id AS user_id, u.login, u.email, u.created_at
+      `SELECT s.expires_at, u.id AS user_id, u.login, u.email, u.created_at, u.google_sub
        FROM sessions s JOIN users u ON u.id = s.user_id
        WHERE s.id = ?`,
     )
@@ -49,7 +49,7 @@ export async function getSession(db, request, now) {
     token,
     expiresAt: row.expires_at,
     userId: row.user_id,
-    user: { login: row.login, email: row.email, createdAt: row.created_at },
+    user: { login: row.login, email: row.email, createdAt: row.created_at, google: row.google_sub !== null },
   };
 }
 

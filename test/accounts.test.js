@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { describe, test } from 'node:test';
 
 import { validateEmail, validateLogin, validatePassword } from '../src/server/accounts.js';
+import { identityFromIdToken, loginBase } from '../src/server/google.js';
 import { ApiError } from '../src/server/http.js';
 import { clearedSessionCookie, readCookie, sessionCookie } from '../src/server/sessions.js';
 
@@ -57,4 +58,47 @@ test('reads one cookie out of a Cookie header', () => {
   assert.equal(readCookie(request, '__Host-sid'), 'abc=def');
   assert.equal(readCookie(request, 'missing'), null);
   assert.equal(readCookie(new Request('https://example.com'), '__Host-sid'), null);
+});
+
+describe('Google ID tokens', () => {
+  const CLIENT_ID = 'insight-test.apps.googleusercontent.com';
+  const now = Date.now();
+  const encode = (value) => Buffer.from(JSON.stringify(value)).toString('base64url');
+  const token = (extra) =>
+    `${encode({ alg: 'RS256' })}.${encode({
+      iss: 'https://accounts.google.com',
+      aud: CLIENT_ID,
+      azp: CLIENT_ID,
+      sub: 'sub-1',
+      email: 'sub-1@gmail.com',
+      email_verified: true,
+      exp: Math.floor(now / 1000) + 3600,
+      ...extra,
+    })}.signature`;
+  const identity = (extra) => identityFromIdToken(token(extra), CLIENT_ID, now);
+
+  test('keep the user id and a confirmed e-mail only', () => {
+    assert.deepEqual(identity({ email: 'Ala@Gmail.com' }), { sub: 'sub-1', email: 'ala@gmail.com' });
+    assert.equal(identity({ email_verified: 'true' }).email, 'sub-1@gmail.com');
+    assert.equal(identity({ email_verified: false }).email, null);
+    assert.equal(identity({ iss: 'accounts.google.com' }).sub, 'sub-1');
+    assert.equal(identity({ aud: [CLIENT_ID, 'other'] }).sub, 'sub-1');
+  });
+
+  test('refuse other issuers and audiences, old tokens and broken ones', () => {
+    assert.throws(() => identity({ iss: 'https://evil.example' }), /issuer/);
+    assert.throws(() => identity({ aud: 'other' }), /audience/);
+    assert.throws(() => identity({ azp: 'other' }), /audience/);
+    assert.throws(() => identity({ exp: Math.floor(now / 1000) - 1 }), /expired/);
+    assert.throws(() => identity({ sub: '' }), /user id/);
+    assert.throws(() => identityFromIdToken('not-a-token', CLIENT_ID, now), /unreadable/);
+  });
+
+  test('a new account gets its login from the name part of the e-mail', () => {
+    assert.equal(loginBase('jan.kowalski@gmail.com'), 'jan.kowalski');
+    assert.equal(loginBase('Zażółć+gra@example.com'), 'Zazocgra');
+    assert.equal(loginBase('a.verylongnamethatgoesonandon@gmail.com'), 'a.verylongnamethatgo');
+    assert.equal(loginBase('ab@gmail.com'), 'gracz');
+    assert.equal(loginBase(null), 'gracz');
+  });
 });
