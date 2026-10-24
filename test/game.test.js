@@ -350,7 +350,7 @@ describe('hunts and reports', () => {
   });
 
   test('"Pomiń czas" in test mode ends the hunt at once, then the rest', async () => {
-    assert.equal((await call('GET', '/api/content')).data.testMode, true);
+    assert.equal((await call('GET', '/api/me', { cookie })).data.user.testMode, true);
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 45 } });
     const skipped = await call('POST', '/api/test/skip-time', { cookie });
     assert.equal(skipped.status, 200);

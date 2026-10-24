@@ -1,0 +1,14 @@
+// Test mode (TEST_MODE "on" in wrangler.jsonc): a way to try the game without
+// waiting. TEST_LOGINS limits it to the listed accounts (comma-separated, any
+// case); empty gives it to every account, as in tests and `npm run dev`.
+
+export const testMode = (env) => env.TEST_MODE === 'on';
+
+export function testModeFor(env, login) {
+  if (!testMode(env)) return false;
+  const logins = String(env.TEST_LOGINS ?? '')
+    .split(',')
+    .map((entry) => entry.trim().toLowerCase())
+    .filter(Boolean);
+  return logins.length === 0 || logins.includes(String(login).toLowerCase());
+}

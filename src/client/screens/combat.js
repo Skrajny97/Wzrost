@@ -167,7 +167,7 @@ export function mountCombat(container, { params, navigate }) {
 
   // What "Pomiń czas" would skip now: the hunt, the rest, or nothing.
   function skipKind(character, now = serverNow()) {
-    if (!state.content.testMode || !testModeOn()) return null;
+    if (!state.user.testMode || !testModeOn()) return null;
     if (character.activity) return activityFinished(character.activity, now) ? null : 'hunt';
     return currentHp(character, now) < character.maxHp ? 'rest' : null;
   }

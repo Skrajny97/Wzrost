@@ -120,8 +120,8 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/auth/register` | rejestracja: `login`, `email` (opcjonalnie), `password` |
 | POST | `/api/auth/login` | logowanie: `identifier` (login lub e-mail), `password` |
 | POST | `/api/auth/logout` | wylogowanie |
-| GET | `/api/me` | zalogowany gracz |
-| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości, żywiołów, regionów i regionów wewnętrznych (z poziomem klasy, który je otwiera), zakres czasu i nazwy długości wypraw, odblokowania, `testMode` |
+| GET | `/api/me` | zalogowany gracz; `testMode` mówi, czy jego konto ma tryb testowy |
+| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości, żywiołów, regionów i regionów wewnętrznych (z poziomem klasy, który je otwiera), zakres czasu i nazwy długości wypraw, odblokowania |
 | GET | `/api/character` | pełny widok postaci z zasobami, Punktami Systemu konta (`systemPoints`), pojemnością plecaka i obozem (404 `no_character`, gdy jej nie ma) |
 | POST | `/api/character` | nowa postać: `name`, `classId` |
 | DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami, wyprawą i obozem; Punkty Systemu zostają na koncie |
@@ -141,11 +141,11 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/hunts/claim` | odbierz raport zakończonej eksploracji |
 | GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |
 | GET | `/api/reports/:id` | pełny raport |
-| POST | `/api/test/skip-time` | tylko w trybie testowym: kończy od razu wyprawę albo odpoczynek („Pomiń czas”) |
-| POST | `/api/test/skip-build` | tylko w trybie testowym: kończy od razu budowę w obozie, a gdy nic się nie buduje, zapełnia magazyny |
+| POST | `/api/test/skip-time` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wyprawę albo odpoczynek („Pomiń czas”) |
+| POST | `/api/test/skip-build` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu budowę w obozie, a gdy nic się nie buduje, zapełnia magazyny |
 
 Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie `message` jest po polsku.
 
 ## Tryb testowy
 
-Dopóki grę testujemy, `TEST_MODE` w `wrangler.jsonc` ma wartość `"on"`, a zakładka Walka ma przycisk „Pomiń czas”. Kończy on od razu trwającą wyprawę, bez zmiany wyniku, albo odpoczynek. Przełącznik „Tryb testowy” w Ustawieniach chowa i pokazuje ten przycisk w danej przeglądarce. Po testach wystarczy ustawić `"off"` i wdrożyć.
+Dopóki grę testujemy, `TEST_MODE` w `wrangler.jsonc` ma wartość `"on"`, a zakładka Walka ma przycisk „Pomiń czas”. Kończy on od razu trwającą wyprawę, bez zmiany wyniku, albo odpoczynek. W grze tryb testowy mają tylko konta z `TEST_LOGINS` (dziś konto autora), a reszta graczy go nie widzi. Testy i `npm run dev` dają go każdemu kontu. Przełącznik „Tryb testowy” w Ustawieniach chowa i pokazuje ten przycisk w danej przeglądarce. Po testach wystarczy ustawić `"off"` i wdrożyć.

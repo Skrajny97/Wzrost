@@ -9,7 +9,7 @@ import { ApiError, errorResponse, json } from './http.js';
 import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItems, unequipItem } from './inventory.js';
 import { getReport, listReports } from './reports.js';
-import { skipBuilding, skipTime, testMode } from './testing.js';
+import { skipBuilding, skipTime } from './testing.js';
 
 const routes = [
   ['GET', '/api/health', health],
@@ -17,7 +17,7 @@ const routes = [
   ['POST', '/api/auth/login', login],
   ['POST', '/api/auth/logout', logout],
   ['GET', '/api/me', me],
-  ['GET', '/api/content', ({ env }) => json({ ...publicContent(), testMode: testMode(env) })],
+  ['GET', '/api/content', () => json(publicContent())],
   ['GET', '/api/character', getCharacter],
   ['POST', '/api/character', createCharacter],
   ['DELETE', '/api/character', deleteCharacter],

@@ -1,19 +1,21 @@
-// Test mode (TEST_MODE "on" in wrangler.jsonc): a way to try the game without
-// waiting. With test mode off, these routes do not exist.
+// "Pomiń czas" in test mode (test-mode.js). For an account without test mode,
+// and with test mode off, these routes do not exist.
 
 import { construction } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, currentHp, loadPlayer, requirePlayer } from './characters.js';
 import { ApiError, json } from './http.js';
+import { testMode, testModeFor } from './test-mode.js';
 
-export const testMode = (env) => env.TEST_MODE === 'on';
+const notFound = () => new ApiError(404, 'not_found', 'Nie znaleziono.');
 
 // "Pomiń czas": the current wait ends now. A hunt is moved into the past, so
 // its report can be claimed at once; its result still comes from the seed
 // saved at the start. Without a hunt, HP is full again.
 export async function skipTime(context) {
-  if (!testMode(context.env)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  if (!testMode(context.env)) throw notFound();
   const { session, player } = await requirePlayer(context);
+  if (!testModeFor(context.env, session.user.login)) throw notFound();
   const db = context.env.DB;
   const now = context.now;
   const activity = player.activity;
@@ -37,8 +39,9 @@ export async function skipTime(context) {
 // "Pomiń czas" in the camp: the building being upgraded is ready now. With
 // nothing being built, the stores of the production buildings are full.
 export async function skipBuilding(context) {
-  if (!testMode(context.env)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  if (!testMode(context.env)) throw notFound();
   const { session, player } = await requirePlayer(context);
+  if (!testModeFor(context.env, session.user.login)) throw notFound();
   const db = context.env.DB;
   const now = context.now;
   const running = construction(player.buildings, now);

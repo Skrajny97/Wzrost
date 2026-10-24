@@ -33,7 +33,9 @@ describe('registration', () => {
       password: 'tajnehaslo1',
     });
     assert.equal(status, 201);
-    assert.deepEqual(Object.keys(data.user).sort(), ['createdAt', 'email', 'login']);
+    assert.deepEqual(Object.keys(data.user).sort(), ['createdAt', 'email', 'login', 'testMode']);
+    // In tests every account has test mode (test/helpers/server.js).
+    assert.equal(data.user.testMode, true);
     assert.equal(data.user.login, 'Karol_97');
     assert.equal(data.user.email, 'karol@example.com');
     assert.match(cookie, /^__Host-sid=[A-Za-z0-9_-]{43}$/);

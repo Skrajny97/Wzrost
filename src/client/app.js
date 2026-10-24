@@ -193,7 +193,7 @@ function openSettings() {
   });
   // Shown only while the server allows test mode ("Pomiń czas" and the like).
   const testToggle =
-    state.content.testMode &&
+    state.user.testMode &&
     h('button', {
       type: 'button',
       class: 'toggle',

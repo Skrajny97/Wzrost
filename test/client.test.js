@@ -84,3 +84,21 @@ test('every building has its picture and a plot on the camp board, apart from th
   // The look grows with the level: levels 1–3, 4–7 and 8–10.
   assert.deepEqual([1, 3, 4, 7, 8, 10].map(art.buildingTier), [1, 1, 2, 2, 3, 3]);
 });
+
+test('the page can be added to the home screen as an app', () => {
+  const html = readFileSync(join(CLIENT, 'index.html'), 'utf8');
+  assert.match(html, /<link rel="manifest" href="\/manifest\.webmanifest">/);
+  const manifest = JSON.parse(readFileSync(join(CLIENT, 'manifest.webmanifest'), 'utf8'));
+  assert.equal(manifest.name, 'Insight');
+  assert.equal(manifest.display, 'standalone');
+  assert.equal(manifest.start_url, '/');
+  // Chrome needs a 192 and a 512 px icon; each file has the size it claims.
+  const pngSize = (file) => {
+    const png = readFileSync(join(CLIENT, file));
+    return `${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`;
+  };
+  for (const icon of manifest.icons) assert.equal(pngSize(icon.src.slice(1)), icon.sizes, icon.src);
+  assert.deepEqual(manifest.icons.map((icon) => icon.sizes).sort(), ['192x192', '512x512', '512x512']);
+  assert.ok(manifest.icons.some((icon) => icon.purpose === 'maskable'));
+  assert.equal(pngSize('apple-touch-icon.png'), '180x180');
+});

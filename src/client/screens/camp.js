@@ -57,7 +57,7 @@ function heading(title, subtitle, back) {
 // nothing being built the stores fill at once.
 function testTools(building) {
   const producing = state.character.camp.buildings.some((candidate) => candidate.production);
-  if (!state.content.testMode || !testModeOn() || (!building && !producing)) return null;
+  if (!state.user.testMode || !testModeOn() || (!building && !producing)) return null;
   return h(
     'div',
     { class: 'test-tools' },
