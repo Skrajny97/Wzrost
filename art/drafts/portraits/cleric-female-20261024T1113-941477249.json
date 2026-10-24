@@ -1,0 +1,25 @@
+{
+  "id": "cleric-female",
+  "payload": {
+    "prompt": "young woman cleric standing, small full body figure from head to feet with empty space above the head, white and gold robe with a holy symbol, holding a silver aspergillum and a round shield, facing the viewer, three-quarter view, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 941477249,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792840490,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 47.22,
+    "request_id": "63e40658-aad8-4ddd-9665-a44016402d78",
+    "outputs_retained_until": 1792926795
+  }
+}
