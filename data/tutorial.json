@@ -15,7 +15,8 @@
         "text": [
           "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę.",
           "Witaj, przybyszko."
-        ]
+        ],
+        "voice": "audio/narration/intro-female.mp3"
       }
     },
     {
@@ -28,7 +29,8 @@
       "female": {
         "text": [
           "Znalazłaś się w miejscu, którego celem jest rozwój. Liczę na to, że osiągniesz szczyty."
-        ]
+        ],
+        "voice": "audio/narration/purpose-female.mp3"
       }
     },
     {
@@ -65,7 +67,8 @@
       "female": {
         "text": [
           "Nie jesteś jeszcze gotowa na dłuższe wyprawy. Zacznijmy od półgodzinnej próby."
-        ]
+        ],
+        "voice": "audio/narration/trial-female.mp3"
       }
     },
     {
@@ -134,7 +137,8 @@
       "female": {
         "text": [
           "System rejestruje potyczki, które stoczyłaś w trakcie eksploracji. Możesz je przejrzeć, wybierając z zakładek. Gwiazdka przy zakładce oznacza najważniejszą z walk."
-        ]
+        ],
+        "voice": "audio/narration/report-fights-female.mp3"
       }
     },
     {
@@ -147,7 +151,8 @@
       "female": {
         "text": [
           "To wszystko, co znalazłaś podczas wyprawy. Wylądowało już w Twoim plecaku."
-        ]
+        ],
+        "voice": "audio/narration/report-items-female.mp3"
       }
     },
     {
@@ -176,7 +181,8 @@
       "female": {
         "text": [
           "W tym oknie Systemu możesz przejrzeć swój ekwipunek. Podczas wyprawy zdobyłaś broń i jak widzisz – System ułatwił sprawę i pozwolił Ci jej dobyć bez Twojej ingerencji."
-        ]
+        ],
+        "voice": "audio/narration/character-female.mp3"
       }
     },
     {
@@ -229,7 +235,8 @@
       "female": {
         "text": [
           "To dobre miejsce na zbudowanie tartaku. System wspomaga nas w codziennym funkcjonowaniu, także i produkcja drewna w takowym odbywa się automatycznie. Będziesz musiała jedynie zbierać wyprodukowane drewno."
-        ]
+        ],
+        "voice": "audio/narration/camp-sawmill-female.mp3"
       }
     },
     {
@@ -258,7 +265,8 @@
       "female": {
         "text": [
           "Teraz zajmijmy się jednak Twoim powrotem do zdrowia, byś mogła szybciej wyruszyć na kolejną wyprawę. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko."
-        ]
+        ],
+        "voice": "audio/narration/lead-campfire-female.mp3"
       }
     },
     {
@@ -287,7 +295,8 @@
       "female": {
         "text": [
           "Dla Twojej wygody możesz również zajrzeć do części ustawień samego Systemu i ustawić je tak, jak Ci się żywnie podoba. Jeśli stwierdzisz, że popełniłaś za dużo błędów – możesz nawet zacząć od nowa."
-        ]
+        ],
+        "voice": "audio/narration/settings-female.mp3"
       }
     },
     {
@@ -300,7 +309,8 @@
       "female": {
         "text": [
           "Tyle na początek. Resztę funkcjonalności Systemu, swój cel i upodobania – będziesz musiała poznać sama. Powodzenia."
-        ]
+        ],
+        "voice": "audio/narration/ending-female.mp3"
       }
     }
   ]

@@ -806,3 +806,8 @@ Autor odrzucił wszystkie cztery szkice głosu i poprosił o kilka zmian w wprow
     - Nagrania są przycięte z ciszy, wyrównane do −18 LUFS i zapisane w mono 56 kb/s: razem 4,4 min i 1,9 MB w `src/client/audio/narration/`.
     - Gdy narrator czyta kwestię, następne nagranie pobiera się w tle.
     - Wszystkie nagrania są na stronie odsłuchu, z „Do wymiany” przy każdej kwestii.
+11. **Wersje żeńskie** (decyzja autora, zamyka pytanie z punktu 8). Narrator mówi do gracza zgodnie z wyglądem postaci wybranym przy jej tworzeniu.
+    - Dziesięć kwestii ma wersję żeńską (`female` w `data/tutorial.json`): „Znalazłaś”, „gotowa”, „stoczyłaś”, „znalazłaś”, „zdobyłaś”, „Będziesz musiała”, „byś mogła”, „popełniłaś”, „będziesz musiała poznać sama” i „Witaj, przybyszko”.
+    - Zmieniają się tylko końcówki, a wersja żeńska ma własne nagranie (`<id>-female.mp3`, ok. 1,4 tys. kredytów).
+    - Zmiana wyglądu w ustawieniach zmienia też wersję kolejnych kwestii.
+    - Wersja żeńska bez nagrania nie dostaje głosu męskiego, żeby głos nie mówił czego innego niż tekst.

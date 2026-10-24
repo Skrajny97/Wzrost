@@ -165,17 +165,24 @@ function skipAll() {
     .catch((error) => toast(error.message));
 }
 
-const words = (line) => line.text.map((text) => text.replaceAll('{points}', String(state.content.tutorial.startTimePoints)));
+// A line as told to this character: for a female look its female version,
+// with that version's own recording (none until it is recorded).
+const told = (line) => (line.female && state.character?.appearance === 'female' ? { ...line, text: line.female.text, voice: line.female.voice } : line);
+const words = (line) => told(line).text.map((text) => text.replaceAll('{points}', String(state.content.tutorial.startTimePoints)));
 
 // The line's recording, over quieter music. The next line's recording is
 // fetched meanwhile, so it starts on time.
 function speak(line) {
   const lines = state.content.tutorial.lines;
-  const following = lines.slice(lines.indexOf(line) + 1).find((candidate) => candidate.voice);
+  const following = lines
+    .slice(lines.indexOf(line) + 1)
+    .map(told)
+    .find((candidate) => candidate.voice);
   if (following) preloadNarration(following.voice);
-  if (!line.voice) return;
+  const { voice } = told(line);
+  if (!voice) return;
   duckMusic(true);
-  playNarration(line.voice, { onEnd: () => duckMusic(false) });
+  playNarration(voice, { onEnd: () => duckMusic(false) });
 }
 
 // Parchment between two rods grows from nothing to its height, or back.
@@ -215,7 +222,8 @@ function openCard(line) {
   dialog.append(h('div', { class: 'narrator-art' }, narratorSprite()), h('div', { class: 'narrator-scroll' }, rod(), sheet, rod()));
   document.body.append(dialog);
   scroll = { dialog, sheet, line, busy: true };
-  if (line.voice) preloadNarration(line.voice);
+  const { voice } = told(line);
+  if (voice) preloadNarration(voice);
   write(line);
   dialog.showModal();
   playSound('open');
