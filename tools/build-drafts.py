@@ -29,6 +29,9 @@ KINDS = {
     # stays short, since blows come fast; a dying cry may last a second.
     'cry': {'longest': 0.6, 'chain': VOICE_CHAIN, 'tail': 35, 'rms': -15},
     'dying': {'longest': 1.0, 'chain': VOICE_CHAIN, 'tail': 40, 'rms': -15},
+    # A dying hiss: shorter and without the sharp top, which on its own
+    # sounds like noise.
+    'hiss': {'longest': 0.7, 'chain': VOICE_CHAIN.replace('lowpass=f=10000', 'lowpass=f=6000,lowpass=f=6000'), 'tail': 35, 'rms': -15},
 }
 
 # Output name: (draft file under SRC, kind).
@@ -41,18 +44,33 @@ SOUNDS = {
     'magic-2': ('effects/magic-20261024T1252-1.mp3', 'spark'),
 }
 # The takes kept from the newest draft of a voice that has more than two,
-# chosen by measure: no rumble, no hiss, a clear start.
-TAKES = {}
+# chosen by measure: the least rumble below 300 Hz, the fewest clicks (a cry,
+# not speech), the softest top. Likho has one: its other takes were rumble.
+TAKES = {
+    'wolf-hurt': [2, 0],
+    'alpha-wolf-hurt': [0, 2],
+    'boar-hurt': [2, 1],
+    'likho-hurt': [1],
+    'spider-hurt': [2, 0],
+    'spider-death': [1, 2],
+    'male-death': [1, 2],
+    'viper-death': [2, 1],
+}
+# Voices built another way than their kind.
+VOICE_KINDS = {'viper-death': 'hiss'}
 
 # Voices, when their drafts are there: <id>-1 and <id>-2 from the newest
 # draft of each id (takes 0 and 1, or the ones in TAKES).
 VOICES = os.path.join(SRC, 'voices')
 if os.path.isdir(VOICES):
+    newest = {}  # id → its newest draft (the names sort by time)
     for meta in sorted(f for f in os.listdir(VOICES) if f.endswith('.json')):
         draft = json.load(open(os.path.join(VOICES, meta)))
-        kind = 'cry' if draft['id'].endswith('-hurt') else 'dying'
-        for number, take in enumerate(TAKES.get(draft['id'], [0, 1])):
-            SOUNDS[f"{draft['id']}-{number + 1}"] = (os.path.relpath(draft['files'][take], 'audio/drafts'), kind)
+        newest[draft['id']] = draft
+    for id, draft in newest.items():
+        kind = VOICE_KINDS.get(id, 'cry' if id.endswith('-hurt') else 'dying')
+        for number, take in enumerate(TAKES.get(id, [0, 1])):
+            SOUNDS[f'{id}-{number + 1}'] = (os.path.relpath(draft['files'][take], 'audio/drafts'), kind)
 
 
 def run(args, **kwargs):

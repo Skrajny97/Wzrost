@@ -63,7 +63,7 @@
       "death": { "files": ["audio/sfx/wisp-death-1.mp3", "audio/sfx/wisp-death-2.mp3"], "gain": 0.7 }
     },
     "likho": {
-      "hurt": { "files": ["audio/sfx/likho-hurt-1.mp3", "audio/sfx/likho-hurt-2.mp3"], "gain": 0.6 },
+      "hurt": { "files": ["audio/sfx/likho-hurt-1.mp3"], "gain": 0.6 },
       "death": { "files": ["audio/sfx/likho-death-1.mp3", "audio/sfx/likho-death-2.mp3"], "gain": 0.7 }
     },
     "female": {
