@@ -1,0 +1,30 @@
+{
+  "id": "trial-deeper",
+  "payload": {
+    "voice_description": "The same voice as the reference, but much deeper, older and raspier, slightly hoarse. He speaks Polish slowly and calmly, naturally, like an old storyteller by a campfire at night, with pauses between sentences.",
+    "text": "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę. Witaj, przybyszu.",
+    "model_id": "eleven_ttv_v3",
+    "guidance_scale": 3,
+    "reference": "audio/references/george-slow.mp3"
+  },
+  "files": [
+    "audio/drafts/narration/trial-deeper-20261024T1613-0-0.mp3",
+    "audio/drafts/narration/trial-deeper-20261024T1613-0-1.mp3",
+    "audio/drafts/narration/trial-deeper-20261024T1613-0-2.mp3"
+  ],
+  "generated": [
+    {
+      "file": "audio/drafts/narration/trial-deeper-20261024T1613-0-0.mp3",
+      "generatedVoiceId": "2kxCgQaT3api3ekAojFp"
+    },
+    {
+      "file": "audio/drafts/narration/trial-deeper-20261024T1613-0-1.mp3",
+      "generatedVoiceId": "KDVn9XkRaGurlpxwC8GI"
+    },
+    {
+      "file": "audio/drafts/narration/trial-deeper-20261024T1613-0-2.mp3",
+      "generatedVoiceId": "cCsrrx7FvQnKH2r4PiRj"
+    }
+  ],
+  "credits": 531
+}
