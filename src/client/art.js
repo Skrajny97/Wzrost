@@ -6,7 +6,7 @@ import { h } from './dom.js';
 
 // The ids with a sprite file, and the size it was drawn at.
 export const SPRITES = {
-  monsters: { size: 48, ids: [] },
+  monsters: { size: 48, ids: ['wolf'] },
   items: { size: 32, ids: [] },
 };
 
