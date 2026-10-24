@@ -2,6 +2,8 @@
   "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest.",
   "skipLabel": "Pomiń wprowadzenie",
   "nextLabel": "Dalej",
+  "hideLabel": "Ukryj",
+  "showLabel": "Pokaż pergamin",
   "lines": [
     {
       "id": "intro",
@@ -59,7 +61,7 @@
     },
     {
       "id": "trial",
-      "kind": "card",
+      "kind": "point",
       "text": [
         "Nie jesteś jeszcze gotów na dłuższe wyprawy. Zacznijmy od półgodzinnej próby."
       ],
@@ -81,7 +83,7 @@
     },
     {
       "id": "skip",
-      "kind": "card",
+      "kind": "point",
       "text": [
         "Jesteś już w lesie. Czas jest nieubłagany… gdyby nie pomoc Systemu. Punkty Czasu pozwolą Ci przyspieszyć eksplorację. Proszę – oto {points} jednostek na start. Potraktuj to… jako drogocenny prezent."
       ],
@@ -173,7 +175,7 @@
     },
     {
       "id": "character",
-      "kind": "card",
+      "kind": "point",
       "text": [
         "W tym oknie Systemu możesz przejrzeć swój ekwipunek. Podczas wyprawy zdobyłeś broń i jak widzisz – System ułatwił sprawę i pozwolił Ci jej dobyć bez Twojej ingerencji."
       ],
@@ -195,7 +197,7 @@
     },
     {
       "id": "stats",
-      "kind": "card",
+      "kind": "point",
       "text": [
         "System ułatwia sprawę, dzięki czemu nie musisz głowić się nad tymi wszystkimi liczbami. Możesz rozdysponować zdobyte punkty tak, by najlepiej pasowały do Twojej klasy. Ale! Możesz budować swoją postać również wedle własnego uznania."
       ],
@@ -219,7 +221,7 @@
     },
     {
       "id": "camp",
-      "kind": "card",
+      "kind": "point",
       "text": [
         "Na tej polanie ktoś już kiedyś obozował. Dobrze dla Ciebie! Wygląda na to, że zostawił trochę drewna, kamieni i kilka monet. Znalezione – niekradzione."
       ],

@@ -3601,11 +3601,82 @@ a.segmented-option {
   line-height: 1.5;
 }
 
-.narrator-actions {
+.narrator-actions,
+.guide-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+/* "Narrator" in the middle, "Ukryj" at the side. */
+.narrator-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.narrator-head .narrator-label {
+  grid-column: 2;
+}
+
+.narrator-head .narrator-hide {
+  grid-column: 3;
+  justify-self: end;
+}
+
+/* "Ukryj": the parchment rolls up to show the screen behind it. */
+.narrator-hide {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 40px;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: #7a5c34;
+  font-family: var(--font-world);
+  font-size: 15px;
+}
+
+/* "Pokaż pergamin", at the bottom while the parchment is hidden. */
+.narrator-show {
+  display: none;
+  position: fixed;
+  bottom: calc(88px + env(safe-area-inset-bottom));
+  left: 50%;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  padding: 10px 18px;
+  transform: translateX(-50%);
+  border: 1px solid #6d5233;
+  border-radius: 4px;
+  background: #3b2c1d;
+  color: #f3e8cf;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  font-family: var(--font-world);
+  font-size: 16px;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.narrator--hidden .narrator-show,
+.guide-show {
+  display: inline-flex;
+}
+
+.narrator--hidden::backdrop {
+  background: transparent;
+}
+
+.narrator--hidden .narrator-art,
+.narrator--hidden .narrator-scroll,
+.guide-note--hidden,
+.guide-note--waiting {
+  visibility: hidden;
 }
 
 .narrator-skip {

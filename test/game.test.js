@@ -777,8 +777,11 @@ describe('Time Points and the narrator', () => {
     assert.equal(view.timePoints, start);
     assert.deepEqual(view.tutorial, []);
     const { data } = await call('GET', '/api/content');
+    // Only the general parchments stand in the middle of the screen; the
+    // others stand by the place they speak of.
     const cards = data.tutorial.lines.filter((line) => line.kind === 'card').map((line) => line.id);
-    assert.deepEqual(cards, ['intro', 'purpose', 'test', 'trial', 'skip', 'report', 'character', 'stats', 'camp', 'ending']);
+    assert.deepEqual(cards, ['intro', 'purpose', 'test', 'report', 'ending']);
+    assert.deepEqual([data.tutorial.hideLabel, data.tutorial.showLabel], ['Ukryj', 'Pokaż pergamin']);
     assert.equal(data.tutorial.startTimePoints, start);
     assert.equal(data.tutorial.$comment, undefined);
   });

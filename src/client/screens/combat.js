@@ -387,6 +387,7 @@ export function mountCombat(container, { params, navigate }) {
     const slider = h('input', {
       type: 'range',
       class: 'duration-slider',
+      'data-guide': 'duration',
       min: 0,
       max: allowed.length - 1,
       step: 1,

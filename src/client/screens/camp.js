@@ -126,7 +126,7 @@ function mountBoard(container, backHash) {
         h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
       ),
       testTools(running),
-      materials(),
+      guided(materials(), 'camp-stock'),
       h(
         'div',
         { class: 'camp-board', role: 'group', 'aria-label': 'Plansza obozu' },

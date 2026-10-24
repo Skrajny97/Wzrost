@@ -13,7 +13,7 @@
 // wprowadzenie" ends the whole introduction.
 
 import { narratorSprite } from './art.js';
-import { $, fill, h } from './dom.js';
+import { $, fill, h, icon } from './dom.js';
 import { duckMusic } from './music.js';
 import { narratorVoiceOn, playNarration, playSound, preloadNarration, stopNarration } from './sound.js';
 import { activityFinished, call, isUnlocked, state } from './state.js';
@@ -52,9 +52,9 @@ const BEATS = {
   test: { when: () => true },
   'tap-region': { place: mark('region-windfalls'), when: (hash, read) => hash === '#/walka' && firstTrip(read) },
   'tap-area': { place: mark('area-windfalls-edge'), when: (hash, read) => hash === '#/walka/windfalls' && firstTrip(read) },
-  trial: { when: (hash, read) => hash === '#/walka/windfalls/windfalls-edge' && firstTrip(read) },
+  trial: { place: mark('duration'), when: (hash, read) => hash === '#/walka/windfalls/windfalls-edge' && firstTrip(read) },
   'tap-start': { place: mark('start'), when: (hash, read) => hash === '#/walka/windfalls/windfalls-edge' && firstTrip(read) },
-  skip: { when: (hash) => hash.startsWith('#/walka') && running() },
+  skip: { place: mark('skip-activity'), when: (hash) => hash.startsWith('#/walka') && running() },
   'tap-skip': { place: mark('skip-activity'), when: (hash, read) => hash.startsWith('#/walka') && running() && !read.has('report') },
   'tap-claim': { place: mark('claim'), when: (hash, read) => hash.startsWith('#/walka') && finished() && !read.has('report') },
   report: { when: onReport },
@@ -67,12 +67,12 @@ const BEATS = {
     place: '.nav-item[href="#/postac"]',
     when: (hash, read) => read.has('report') && !read.has('character') && !hash.startsWith('#/postac'),
   },
-  character: { when: (hash) => hash === '#/postac' },
+  character: { place: mark('slot-weapon'), when: (hash) => hash === '#/postac' },
   'lead-stats': {
     place: '.nav-item[href="#/postac/statystyki"]',
     when: (hash, read) => hash === '#/postac' && read.has('character') && !read.has('stats') && isUnlocked('stats'),
   },
-  stats: { when: (hash, read) => hash === '#/postac/statystyki' && read.has('character') },
+  stats: { place: mark('auto-points'), when: (hash, read) => hash === '#/postac/statystyki' && read.has('character') },
   'free-points': {
     place: `${mark('auto-points')}, .stat-add, .pending-bar`,
     free: true,
@@ -83,7 +83,7 @@ const BEATS = {
     place: '.camp-button',
     when: (hash, read) => read.has('character') && !read.has('camp') && !freePoints() && !hash.startsWith('#/oboz'),
   },
-  camp: { delay: 3000, when: onBoard },
+  camp: { place: mark('camp-stock'), delay: 3000, when: onBoard },
   'camp-sawmill': { place: mark('plot-sawmill'), when: (hash) => onBoard(hash) && !campStarted() },
   'camp-quarry': { place: `${mark('plot-quarry')}, ${mark('plot-mine')}`, when: (hash) => onBoard(hash) && !campStarted() },
   'camp-anvil': { place: mark('plot-anvil'), when: (hash) => onBoard(hash) && !campStarted() },
@@ -220,9 +220,10 @@ function openCard(line) {
     next();
   });
   const sheet = h('div', { class: 'narrator-sheet' });
-  dialog.append(h('div', { class: 'narrator-art' }, narratorSprite()), h('div', { class: 'narrator-scroll' }, rod(), sheet, rod()));
+  const show = h('button', { type: 'button', class: 'button narrator-show', onClick: showCard }, icon('eye', { size: 18 }), state.content.tutorial.showLabel);
+  dialog.append(h('div', { class: 'narrator-art' }, narratorSprite()), h('div', { class: 'narrator-scroll' }, rod(), sheet, rod()), show);
   document.body.append(dialog);
-  scroll = { dialog, sheet, line, busy: true };
+  scroll = { dialog, sheet, line, busy: true, hidden: false };
   const { voice } = told(line);
   if (voice && narratorVoiceOn()) preloadNarration(voice);
   write(line);
@@ -238,7 +239,12 @@ function write(line) {
     h(
       'div',
       { class: 'narrator-page' },
-      h('p', { class: 'narrator-label', id: 'narrator-label', text: 'Narrator' }),
+      h(
+        'div',
+        { class: 'narrator-head' },
+        h('p', { class: 'narrator-label', id: 'narrator-label', text: 'Narrator' }),
+        h('button', { type: 'button', class: 'narrator-hide', onClick: hideCard }, icon('eye-off', { size: 16 }), tutorial.hideLabel),
+      ),
       h('div', { class: 'narrator-text' }, words(line).map((text) => h('p', { text }))),
       h(
         'div',
@@ -262,12 +268,35 @@ async function unrollCard() {
   speak(line);
 }
 
+// "Ukryj": the scroll rolls up and the screen behind it shows, while the
+// narrator reads on; "Pokaż pergamin" unrolls it again.
+async function hideCard() {
+  if (!scroll || scroll.busy || scroll.hidden) return;
+  const current = scroll;
+  current.hidden = true;
+  await roll(current.sheet, false);
+  if (scroll !== current || !current.hidden) return;
+  current.dialog.classList.add('narrator--hidden');
+  $('.narrator-show', current.dialog)?.focus();
+}
+
+async function showCard() {
+  if (!scroll || !scroll.hidden) return;
+  const current = scroll;
+  current.hidden = false;
+  current.dialog.classList.remove('narrator--hidden');
+  await roll(current.sheet, true);
+  if (scroll === current && !current.hidden) $('.narrator-next', current.sheet)?.focus();
+}
+
 // "Dalej": the scroll rolls up, and unrolls again for the next card, or the
 // game goes on.
 async function next() {
   if (!scroll || scroll.busy) return;
   const current = scroll;
   current.busy = true;
+  current.hidden = false;
+  current.dialog.classList.remove('narrator--hidden');
   stopNarration();
   markRead(current.line.id);
   await roll(current.sheet, false);
@@ -306,6 +335,34 @@ function inView(element) {
   if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) return false;
   const top = document.elementsFromPoint(x, y).find((hit) => !hit.closest('.guide'));
   return !top || element.contains(top) || top.contains(element);
+}
+
+// The screen moves to a place slowly, like a camera, so the player sees
+// where it goes: from 0.5 to 1.4 s by the distance, or at once with less
+// motion asked for in the phone's settings.
+function glide(element) {
+  const rect = element.getBoundingClientRect();
+  const most = document.documentElement.scrollHeight - window.innerHeight;
+  const target = Math.max(0, Math.min(most, window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2));
+  const from = window.scrollY;
+  const distance = target - from;
+  if (Math.abs(distance) < 8) return Promise.resolve();
+  if (calm()) {
+    window.scrollTo(0, target);
+    return Promise.resolve();
+  }
+  const duration = Math.min(1400, 500 + Math.abs(distance) * 0.9);
+  return new Promise((resolve) => {
+    const start = performance.now();
+    const step = (now) => {
+      const done = Math.min(1, (now - start) / duration);
+      const eased = done < 0.5 ? 4 * done ** 3 : 1 - (-2 * done + 2) ** 3 / 2;
+      window.scrollTo(0, from + distance * eased);
+      if (done < 1) requestAnimationFrame(step);
+      else resolve();
+    };
+    requestAnimationFrame(step);
+  });
 }
 
 // What a place covers on the screen, with whatever hangs out of it, such as
@@ -361,9 +418,14 @@ function startLight(line) {
   const skip = h('button', { type: 'button', class: 'guide-skip', text: tutorial.skipLabel, onClick: skipAll });
   const root = h('div', { class: 'guide' }, shade, rings, note.element, skip);
   document.body.append(root);
-  places(line)[0].scrollIntoView({ block: 'center' });
   light = { line, root, note, frame: 0, closing: false };
-  note.open();
+  // The narrator steps in once the screen has glided to the place.
+  note.element.classList.add('guide-note--waiting');
+  glide(places(line)[0]).then(() => {
+    if (light?.line !== line) return;
+    note.element.classList.remove('guide-note--waiting');
+    note.open();
+  });
 
   // A tap on a place goes through to the game. After a lead or a tap the
   // next line follows the screen or the character it changes; a free light
@@ -488,10 +550,36 @@ function scrollNote(line) {
       'div',
       { class: 'guide-page', role: 'status' },
       words(line).map((text) => h('p', { text })),
-      h('button', { type: 'button', class: 'button guide-next', text: tutorial.nextLabel, onClick: pointer ? onward : go }),
+      h(
+        'div',
+        { class: 'guide-actions' },
+        h('button', { type: 'button', class: 'narrator-hide', onClick: hide }, icon('eye-off', { size: 16 }), tutorial.hideLabel),
+        h('button', { type: 'button', class: 'button guide-next', text: tutorial.nextLabel, onClick: pointer ? onward : go }),
+      ),
     ),
   );
   const element = h('div', { class: 'guide-note guide-note--scroll' }, narratorSprite(), h('div', { class: 'guide-scroll' }, rod(), sheet, rod()));
+  const show = h('button', { type: 'button', class: 'button narrator-show guide-show', onClick: unhide }, icon('eye', { size: 18 }), tutorial.showLabel);
+  // "Ukryj": the parchment rolls up and the lit places stay; the narrator
+  // reads on. "Pokaż pergamin" brings it back.
+  let hidden = false;
+  async function hide() {
+    if (hidden || !light || light.line !== line || light.closing) return;
+    hidden = true;
+    await roll(sheet, false);
+    if (!hidden || light?.line !== line) return;
+    element.classList.add('guide-note--hidden');
+    light.root.append(show);
+    show.focus({ preventScroll: true });
+  }
+  async function unhide() {
+    if (!hidden) return;
+    hidden = false;
+    show.remove();
+    element.classList.remove('guide-note--hidden');
+    await roll(sheet, true);
+    if (!hidden && light?.line === line) $('.guide-next', sheet)?.focus({ preventScroll: true });
+  }
   // The rods and the whole parchment, whether rolled or not, so the
   // narrator does not jump while it unrolls.
   const height = () => Math.max(element.offsetHeight, sheet.scrollHeight + 24);

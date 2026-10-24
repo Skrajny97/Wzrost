@@ -7,6 +7,8 @@
   "required": [
     "skipLabel",
     "nextLabel",
+    "hideLabel",
+    "showLabel",
     "lines"
   ],
   "properties": {
@@ -20,6 +22,16 @@
     "nextLabel": {
       "type": "string",
       "minLength": 1
+    },
+    "hideLabel": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Zwija pergamin, żeby odsłonić ekran; narrator czyta dalej."
+    },
+    "showLabel": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Rozwija ukryty pergamin z powrotem."
     },
     "lines": {
       "type": "array",
@@ -75,7 +87,7 @@
               "lead",
               "tap"
             ],
-            "description": "card: pergamin na środku ekranu. point: pergamin przy podświetlonym miejscu, z przyciskiem „Dalej”. lead: pergamin przy miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć."
+            "description": "card: pergamin na środku ekranu, dla kwestii ogólnych. point: pergamin przy podświetlonym miejscu, o którym mówi kwestia, z przyciskiem „Dalej”. lead: pergamin przy miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć."
           },
           "text": {
             "type": "array",

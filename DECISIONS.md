@@ -842,3 +842,19 @@ Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach i poprosił
 2. **Ramka obejmuje nazwę placu** (uwaga autora). Podświetlenie obejmuje także to, co wystaje z miejsca, np. nazwę placu pod nim. Wyjątkiem jest miejsce, które przycina swoją zawartość, jak lista zakładek walk.
 3. **Obóz jako zakładka** (uwaga autora). W obozie namiot w górnym pasku świeci się jak bieżąca zakładka, a Walka gaśnie. „Powrót” z obozu prowadzi, jak dotąd, do ostatniej zakładki z dolnego paska.
 
+## Pergaminy przy miejscach, „Ukryj” i przejazd ekranu (24.10.2026)
+
+1. **Pergamin przy tym, o czym mówi** (uwaga autora). Na karcie Postaci pergamin zasłaniał prawie cały ekran, choć narrator mówi, że widać zdobytą broń. Na środku ekranu zostają tylko kwestie ogólne: powitanie, cel, test, wstęp do raportu i zakończenie. Pięć pergaminów stoi teraz przy podświetlonym miejscu, z „Dalej”:
+    - „Nie jesteś jeszcze gotów…” przy suwaku czasu,
+    - „Jesteś już w lesie…” przy „Przewiń” Punktami Czasu,
+    - „W tym oknie Systemu…” przy broni w ekwipunku,
+    - „System ułatwia sprawę…” przy „Rozdaj według klasy”,
+    - „Na tej polanie…” przy zapasach drewna, kamienia i rudy w obozie.
+2. **„Ukryj”** (prośba autora). Każdy pergamin ma „Ukryj”. Pergamin zwija się i odsłania ekran, a narrator czyta dalej. „Pokaż pergamin” na dole ekranu rozwija go z powrotem. Przy pergaminie przy miejscu podświetlenie zostaje. Napisy są w `data/tutorial.json` (`hideLabel`, `showLabel`).
+3. **Przejazd ekranu** (prośba autora). Między miejscami ekran nie przeskakuje:
+    - pergamin się zwija,
+    - ekran płynnie jedzie do następnego miejsca (od 0,5 do 1,4 s, zależnie od odległości),
+    - dopiero potem pergamin się rozwija i narrator mówi.
+
+    Przy ograniczonym ruchu w ustawieniach telefonu ekran przeskakuje od razu.
+

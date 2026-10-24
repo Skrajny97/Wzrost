@@ -70,6 +70,7 @@ export function mountCharacter(container) {
         {
           type: 'button',
           class: 'slot slot--core slot--locked',
+          'data-guide': `slot-${slot.id}`,
           'aria-label': `${slot.name}: zablokowany`,
           onClick: () =>
             openSheet(
@@ -83,7 +84,7 @@ export function mountCharacter(container) {
     if (!item) {
       return h(
         'button',
-        { type: 'button', class: 'slot slot--empty', 'aria-label': `${slot.name}: pusty slot`, onClick: () => emptySlotSheet(slot) },
+        { type: 'button', class: 'slot slot--empty', 'data-guide': `slot-${slot.id}`, 'aria-label': `${slot.name}: pusty slot`, onClick: () => emptySlotSheet(slot) },
         icon(SLOT_ICONS[slot.id], { size: 24 }),
       );
     }
@@ -92,6 +93,7 @@ export function mountCharacter(container) {
       {
         type: 'button',
         class: 'slot',
+        'data-guide': `slot-${slot.id}`,
         vars: { '--rarity': item.color },
         'aria-label': `${slot.name}: ${itemTitle(item)}, ${item.rarityName}`,
         onClick: () => itemSheet(item, { equipped: true }),
