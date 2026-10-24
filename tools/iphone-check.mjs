@@ -59,9 +59,11 @@ async function step(name, action) {
   } catch (failure) {
     error = failure.message.split('\n')[0];
   }
-  // caret: 'initial': hiding the caret takes a style of Playwright's own,
-  // which the game's policy refuses in WebKit.
+  // What comes while the screenshot is taken is the screenshot's own (it
+  // prepares the page with a style of Playwright's).
+  current = `${name}, zrzut`;
   await page.screenshot({ path: join(OUT, file), caret: 'initial' }).catch(() => {});
+  await page.waitForTimeout(100);
   steps.push({ name, ok: !error, seconds: (Date.now() - started) / 1000, file, error });
   console.log(`${error ? '✖' : '✔'} ${name}${error ? ` — ${error}` : ''}`);
   return !error;
