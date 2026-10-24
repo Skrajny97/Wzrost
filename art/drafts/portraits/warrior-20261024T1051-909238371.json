@@ -1,0 +1,25 @@
+{
+  "id": "warrior",
+  "payload": {
+    "prompt": "portrait of a young warrior in a dented iron helmet and chainmail, holding a round wooden shield and a sword, waist-up, facing the viewer, determined look, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 909238371,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792839158,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.2,
+    "request_id": "45f30862-af9f-46cb-9bfa-72520f96da9e",
+    "outputs_retained_until": 1792925514
+  }
+}
