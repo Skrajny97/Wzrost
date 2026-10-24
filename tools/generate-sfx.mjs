@@ -7,6 +7,9 @@
 // {text, seconds} when it needs a length of its own. A sound of a set length
 // costs 20 credits a second, so the run counts the credits before it starts
 // and stops before it would spend more than --max-credits.
+// A kind with `tts` is speech instead (ElevenLabs text to speech): a prompt is
+// {voice, text} or {voice, card}, a card of the narrator's introduction from
+// data/tutorial.json, and it costs credits for each character read.
 
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
@@ -46,8 +49,27 @@ const variants = Math.max(1, Math.min(4, Number(values.variants) || 1));
 const maxCredits = Number(values['max-credits']);
 if (!(maxCredits > 0)) fail('--max-credits musi być dodatnią liczbą kredytów.');
 
-const prompt = (id) => (typeof kind.prompts[id] === 'string' ? { text: kind.prompts[id], seconds: kind.seconds } : kind.prompts[id]);
-const credits = (id) => Math.ceil(prompt(id).seconds * CREDITS_PER_SECOND);
+const tts = kind.tts ?? null;
+const balance = tts && JSON.parse(readFileSync('data/balance.json', 'utf8'));
+const tutorial = tts && JSON.parse(readFileSync('data/tutorial.json', 'utf8'));
+
+// What a speech prompt reads: its own text, or a narrator's card with the
+// starting Time Points filled in, as the game shows it.
+function spokenText(entry) {
+  if (entry.text) return entry.text;
+  const card = tutorial.cards.find((candidate) => candidate.id === entry.card);
+  if (!card) fail(`Brak karty ${entry.card} w data/tutorial.json.`);
+  return card.text.join(' ').replaceAll('{points}', String(balance.timePoints.start));
+}
+
+const prompt = (id) => {
+  const entry = kind.prompts[id];
+  if (tts) return { ...entry, text: spokenText(entry) };
+  return typeof entry === 'string' ? { text: entry, seconds: kind.seconds } : entry;
+};
+const credits = (id) =>
+  tts ? Math.ceil(prompt(id).text.length * (tts.creditsPerCharacter ?? 1)) : Math.ceil(prompt(id).seconds * CREDITS_PER_SECOND);
+const size = (id) => (tts ? `${prompt(id).text.length} znaków` : `${prompt(id).seconds} s`);
 const total = ids.reduce((sum, id) => sum + credits(id) * variants, 0);
 const lines = [`| Dźwięk | Wynik |`, `| --- | --- |`];
 if (total > maxCredits) {
@@ -55,7 +77,7 @@ if (total > maxCredits) {
   fail(`Te dźwięki kosztowałyby ${total} kredytów, a limit to ${maxCredits}.`);
 }
 if (values['dry-run']) {
-  for (const id of ids) lines.push(`| ${id} | wycena ${credits(id) * variants} kredytów (${prompt(id).seconds} s) |`);
+  for (const id of ids) lines.push(`| ${id} | wycena ${credits(id) * variants} kredytów (${size(id)}) |`);
   summary([`Wycena razem: ${total} kredytów.`, '', ...lines].join('\n'));
   console.log(`Wycena razem: ${total} kredytów.`);
   process.exit(0);
@@ -66,13 +88,39 @@ mkdirSync(outDir, { recursive: true });
 const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 13);
 let spent = 0;
 
+// Voice ids by name: from the account's list when the key may read it,
+// otherwise the ids written down in audio/prompts.json.
+async function voiceIds() {
+  const ids = Object.fromEntries(Object.entries(tts.voices ?? {}).map(([name, id]) => [name.toLowerCase(), id]));
+  try {
+    const response = await fetch(`${API}/voices`, { headers: { 'xi-api-key': token } });
+    if (response.ok) {
+      for (const voice of (await response.json()).voices ?? []) ids[voice.name.split(/[\s-]/)[0].toLowerCase()] = voice.voice_id;
+    }
+  } catch {
+    // The list is only a help; the written-down ids are enough.
+  }
+  return ids;
+}
+const voices = tts && !values['dry-run'] ? await voiceIds() : {};
+
+// One request: a sound of a set length, or speech in the prompt's voice.
+function requestFor(id) {
+  const { text, seconds, voice } = prompt(id);
+  if (!tts) {
+    return { url: `${API}/sound-generation?output_format=mp3_44100_64`, payload: { text, duration_seconds: seconds, prompt_influence: kind.influence ?? 0.5 } };
+  }
+  const voiceId = voices[voice.toLowerCase()];
+  if (!voiceId) throw new Error(`nieznany głos ${voice}`);
+  return { url: `${API}/text-to-speech/${voiceId}?output_format=mp3_44100_128`, payload: { text, model_id: tts.model, voice_settings: tts.settings } };
+}
+
 // One sound, recorded `variants` times; each take is a separate request.
 async function record(id) {
-  const { text, seconds } = prompt(id);
-  const payload = { text, duration_seconds: seconds, prompt_influence: kind.influence ?? 0.5 };
+  const { url, payload } = requestFor(id);
   const files = [];
   for (let take = 0; take < variants; take++) {
-    const response = await fetch(`${API}/sound-generation?output_format=mp3_44100_64`, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'xi-api-key': token, 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

@@ -1,0 +1,53 @@
+{
+  "$comment": "Wprowadzenie narratora: karty na pergaminie, które nowa postać widzi przy pierwszych krokach. Kolejność i chwilę pokazania karty wyznacza kod według jej id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start).",
+  "skipLabel": "Pomiń opowieść",
+  "nextLabel": "Dalej",
+  "cards": [
+    {
+      "id": "intro",
+      "text": [
+        "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę.",
+        "Ja opowiadam tę historię, a Ty ją prowadzisz: przygotowujesz postać, wysyłasz ją w las i czytasz, co tam zaszło."
+      ]
+    },
+    {
+      "id": "time",
+      "text": [
+        "Czas płynie tu naprawdę: wyprawa trwa tyle, ile wybierzesz. Ale to moja opowieść, więc daję Ci {points} Punktów Czasu. Każdy z nich przewija jedną minutę.",
+        "Wybierz Wiatrołomy i wyślij postać na 30 minut. Kiedy wyruszy, przewiniemy ten czas razem."
+      ]
+    },
+    {
+      "id": "skip",
+      "text": [
+        "Postać jest już w lesie. Możesz poczekać albo stuknąć „Przewiń” i od razu zobaczyć, co się wydarzyło.",
+        "Punktów Czasu nie da się kupić. Kolejne przychodzą z każdym poziomem postaci i klasy, a czasem można je znaleźć w puszczy."
+      ]
+    },
+    {
+      "id": "report",
+      "text": [
+        "Tak kończy się każda wyprawa: raportem. Możesz obejrzeć każdą walkę po kolei, a niżej sprawdzić łupy i całą relację.",
+        "Ten chłodny głos w niebieskiej ramce to nie ja, tylko System. Mówi krótko, liczbami, i nie zawsze mówi wszystko. Zajrzyj jeszcze do Postaci i do obozu."
+      ]
+    },
+    {
+      "id": "character",
+      "text": [
+        "Tu widać, co postać ma na sobie. Pierwszą broń zdobywa w walce i od razu bierze ją do ręki.",
+        "Każdy poziom daje wolne punkty. Rozdasz je w Statystykach, a jeśli nie chcesz liczyć, wystarczy „Rozdaj według klasy”."
+      ]
+    },
+    {
+      "id": "camp",
+      "text": [
+        "Ktoś już kiedyś obozował na tej polanie. Zostawił trochę drewna, kamieni i kilka monet. Teraz to wszystko należy do Ciebie.",
+        "Dotknij pustego placu, żeby coś zbudować. Budowa trwa, ale obóz rośnie także wtedy, gdy postać jest na wyprawie."
+      ]
+    },
+    {
+      "id": "ending",
+      "text": ["Tyle na początek. Reszty dowiesz się w swoim czasie."]
+    }
+  ]
+}

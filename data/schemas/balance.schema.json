@@ -11,6 +11,8 @@
     "upgrades",
     "hunt",
     "rewards",
+    "timePoints",
+    "startingSupply",
     "regen",
     "progression"
   ],
@@ -485,13 +487,14 @@
         },
         "findOutcomes": {
           "type": "object",
-          "description": "Wagi wyniku znaleziska: złoto, przedmiot, zasób (resources.json, według wag regionu) albo nic ciekawego.",
+          "description": "Wagi wyniku znaleziska: złoto, przedmiot, zasób (resources.json, według wag regionu), nic ciekawego albo odłamek czasu (Punkty Czasu, timePoints.find).",
           "additionalProperties": false,
           "required": [
             "gold",
             "item",
             "resource",
-            "nothing"
+            "nothing",
+            "time"
           ],
           "properties": {
             "gold": {
@@ -507,6 +510,10 @@
               "minimum": 0
             },
             "nothing": {
+              "type": "number",
+              "minimum": 0
+            },
+            "time": {
               "type": "number",
               "minimum": 0
             }
@@ -526,6 +533,28 @@
           "minimum": 0,
           "description": "Zasoby zbierane po drodze: średni poziom miejsca × ta wartość × godziny eksploracji, podzielone według wag regionu."
         }
+      }
+    },
+    "timePoints": {
+      "type": "object",
+      "description": "Punkty Czasu postaci: 1 punkt przewija 1 minutę czynności, odpoczynku albo budowy. Zdobywa się je tylko grą, nigdy za pieniądze.",
+      "additionalProperties": false,
+      "required": ["start", "perLevel", "perClassLevel", "find"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 0, "description": "Punkty nowej postaci, które daje narrator we wprowadzeniu." },
+        "perLevel": { "type": "integer", "minimum": 0, "description": "Za każdy nowy poziom postaci." },
+        "perClassLevel": { "type": "integer", "minimum": 0, "description": "Za każdy nowy poziom klasy." },
+        "find": { "type": "integer", "minimum": 0, "description": "Za odłamek czasu, rzadkie znalezisko na wyprawie." }
+      }
+    },
+    "startingSupply": {
+      "type": "object",
+      "description": "Zapas nowej postaci z porzuconego obozu: złoto i zasoby z resources.json.",
+      "additionalProperties": false,
+      "required": ["gold", "resources"],
+      "properties": {
+        "gold": { "type": "integer", "minimum": 0 },
+        "resources": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } }
       }
     },
     "regen": {

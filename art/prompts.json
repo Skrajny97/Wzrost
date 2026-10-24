@@ -65,5 +65,19 @@
       "ring": "gold ring with a small gemstone, single inventory item icon",
       "talisman": "carved wooden talisman with a leaf rune on a cord, single inventory item icon"
     }
+  },
+  "narrator": {
+    "style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "references": [
+      "cleric-male",
+      "mage-female"
+    ],
+    "prompts": {
+      "narrator-hooded": "mysterious storyteller in a long hooded grey-brown wool cloak, the face hidden in the soft shadow of the hood, sitting on a mossy tree stump, holding an unrolled parchment scroll with both hands and reading it aloud, full body from head to feet, warm candle light, old slavic forest folk tale, facing the viewer, three-quarter view",
+      "narrator-elder": "old storyteller with long grey hair, a grey beard and a kind wrinkled face, plain linen tunic and a brown wool cloak, sitting on a mossy tree stump, holding an unrolled parchment scroll with both hands and reading it aloud, full body from head to feet, warm candle light, old slavic forest folk tale, facing the viewer, three-quarter view",
+      "narrator-crone": "old woman storyteller with a linen headscarf and a kind wrinkled face, embroidered folk dress and a brown wool shawl, sitting on a mossy tree stump, holding an unrolled parchment scroll with both hands and reading it aloud, full body from head to feet, warm candle light, old slavic forest folk tale, facing the viewer, three-quarter view"
+    }
   }
 }

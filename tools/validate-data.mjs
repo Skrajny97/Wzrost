@@ -11,7 +11,7 @@ const CLIENT_DIR = new URL('../src/client/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
-  'resources', 'buildings', 'music', 'sounds', 'appearances',
+  'resources', 'buildings', 'music', 'sounds', 'appearances', 'tutorial',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'training', 'settlement', 'dungeons', 'core'];
@@ -260,6 +260,16 @@ function checkReferences(data) {
   if (!appearances.has('male')) errors.push('appearances.json: brak wyglądu male, domyślnego dla dawnych postaci (migrations/0006)');
   for (const id of Object.keys(sounds.voices)) {
     if (!monsters.has(id) && !appearances.has(id)) errors.push(`sounds.json: głos dla nieznanego ${id}`);
+  }
+
+  // The new character's supply: resources that exist. The narrator's cards:
+  // each once, with recordings that exist.
+  for (const id of Object.keys(data.balance.startingSupply.resources)) {
+    if (!resources.has(id)) errors.push(`balance.json: startingSupply ma nieznany zasób "${id}"`);
+  }
+  uniqueIds(errors, 'tutorial', data.tutorial.cards);
+  for (const card of data.tutorial.cards) {
+    if (card.voice && !existsSync(new URL(card.voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${card.voice}`);
   }
   return errors;
 }
