@@ -72,7 +72,10 @@ async function settle(data) {
   if (!data?.task_id || data.base64_images || data.balance_cost !== undefined) return data;
   for (let attempt = 0; attempt < POLL_LIMIT; attempt++) {
     const task = await request('GET', `${API}/tasks/${data.task_id}`);
-    if (task.status === 'failed') throw new Error(`generowanie nie powiodło się: ${task.error ?? 'bez opisu'}`);
+    if (task.status === 'failed') {
+      const reason = typeof task.error === 'string' ? task.error : JSON.stringify(task.error ?? 'bez opisu');
+      throw new Error(`generowanie nie powiodło się: ${reason.slice(0, 300)}`);
+    }
     if (task.status !== 'pending' && task.status !== 'running') return task.result ?? task;
     await new Promise((resolve) => setTimeout(resolve, POLL_MS));
   }
