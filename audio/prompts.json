@@ -158,6 +158,58 @@
             "[calmly] Teraz zajmijmy"
           ]
         ]
+      },
+      "character-female-calm": {
+        "line": "character",
+        "variant": "female",
+        "say": [
+          [
+            "W tym oknie",
+            "[calmly] W tym oknie"
+          ],
+          [
+            "broń i",
+            "broń, i"
+          ]
+        ]
+      },
+      "character-female-caps": {
+        "line": "character",
+        "variant": "female",
+        "say": [
+          [
+            "W tym oknie",
+            "[calmly] W tym oknie"
+          ],
+          [
+            "broń i",
+            "BROŃ, i"
+          ]
+        ]
+      },
+      "character-female-pause": {
+        "line": "character",
+        "variant": "female",
+        "say": [
+          [
+            "W tym oknie",
+            "[calmly] W tym oknie"
+          ],
+          [
+            "broń i",
+            "broń… i"
+          ]
+        ]
+      },
+      "settings-female-calm": {
+        "line": "settings",
+        "variant": "female",
+        "say": [
+          [
+            "Dla Twojej wygody",
+            "[calmly] Dla Twojej wygody"
+          ]
+        ]
       }
     },
     "allLines": {
