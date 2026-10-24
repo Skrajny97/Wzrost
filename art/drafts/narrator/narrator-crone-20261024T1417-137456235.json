@@ -1,0 +1,25 @@
+{
+  "id": "narrator-crone",
+  "payload": {
+    "prompt": "old woman storyteller with a linen headscarf and a kind wrinkled face, embroidered folk dress and a brown wool shawl, sitting on a mossy tree stump, holding an unrolled parchment scroll with both hands and reading it aloud, full body from head to feet, warm candle light, old slavic forest folk tale, facing the viewer, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 137456235,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 2
+  },
+  "result": {
+    "created_at": 1792851733,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 46.68,
+    "request_id": "abc6185a-c3c7-4ac0-98a2-011d9711cc2c",
+    "outputs_retained_until": 1792938061
+  }
+}
