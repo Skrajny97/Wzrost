@@ -1,0 +1,25 @@
+{
+  "id": "narrator-elder",
+  "payload": {
+    "prompt": "old storyteller with long grey hair, a grey beard and a kind wrinkled face, plain linen tunic and a brown wool cloak, sitting on a mossy tree stump, holding an unrolled parchment scroll with both hands and reading it aloud, full body from head to feet, warm candle light, old slavic forest folk tale, facing the viewer, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 10727473,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 2
+  },
+  "result": {
+    "created_at": 1792852065,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 45.96,
+    "request_id": "5cf9c8d5-2ea3-4007-afe7-4e28ce8bb9c9",
+    "outputs_retained_until": 1792938396
+  }
+}

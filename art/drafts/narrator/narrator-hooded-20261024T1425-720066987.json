@@ -1,0 +1,25 @@
+{
+  "id": "narrator-hooded",
+  "payload": {
+    "prompt": "mysterious storyteller in a long hooded grey-brown wool cloak, the face hidden in the soft shadow of the hood, sitting on a mossy tree stump, holding an unrolled parchment scroll with both hands and reading it aloud, full body from head to feet, warm candle light, old slavic forest folk tale, facing the viewer, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 720066987,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 2
+  },
+  "result": {
+    "created_at": 1792851994,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 46.32,
+    "request_id": "bf099919-a773-4267-bab5-1d822b0b3fbd",
+    "outputs_retained_until": 1792938327
+  }
+}
