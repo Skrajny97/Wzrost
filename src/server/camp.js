@@ -14,9 +14,15 @@ const path = (id) => `$."${id}"`;
 export async function startBuilding(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
-  const building = typeof body.buildingId === 'string' ? content.buildingsById[body.buildingId] : undefined;
+  await beginBuilding(context.env.DB, player, body.buildingId, context.now);
+  return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) }, 201);
+}
+
+// The next level of a building, from now on, paid at once. The skipped
+// introduction builds the Ognisko this way too (tutorial.js).
+export async function beginBuilding(db, player, buildingId, now) {
+  const building = typeof buildingId === 'string' ? content.buildingsById[buildingId] : undefined;
   if (!building) throw new ApiError(400, 'invalid_building', 'Nie ma takiego budynku.');
-  const now = context.now;
   if (construction(player.buildings, now)) throw new ApiError(409, 'camp_busy', 'W obozie trwa już budowa.');
   const level = buildingLevel(player.buildings[building.id], now);
   if (level >= building.maxLevel) throw new ApiError(409, 'max_level', 'Ten budynek ma już najwyższy poziom.');
@@ -37,7 +43,6 @@ export async function startBuilding(context) {
   const gathered = producing ? collect(building, stored, now) : null;
   const changes = Object.fromEntries(resources.map((id) => [id, -cost[id]]));
   if (gathered) changes[gathered.resource] = (changes[gathered.resource] ?? 0) + gathered.amount;
-  const db = context.env.DB;
   // The upgrade starts only if nothing is being built, the building is as
   // seen here (level and store) and the cost is still there; the payment only
   // if the upgrade started. So two taps at once start and pay one upgrade.
@@ -85,7 +90,24 @@ export async function startBuilding(context) {
   if (started.meta.changes !== 1) {
     throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
   }
-  return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
+}
+
+// The upgrade in progress is ready now: two seconds back, as the page counts
+// a second after the end. A production building waiting for the end of the
+// upgrade starts producing with it. For "Pomiń czas" in test mode and the
+// skipped introduction.
+export async function completeBuilding(db, player, now) {
+  const running = construction(player.buildings, now);
+  if (!running) return;
+  const shift = Math.max(0, running.endsAt - (now - 2000));
+  await db
+    .prepare(
+      `UPDATE buildings SET started_at = started_at - ?, ends_at = ends_at - ?,
+         collected_at = CASE WHEN collected_at = ends_at THEN collected_at - ? ELSE collected_at END
+       WHERE character_id = ? AND building_id = ?`,
+    )
+    .bind(shift, shift, shift, player.row.id, running.buildingId)
+    .run();
 }
 
 // "Zbierz": what a production building's store holds goes to the resources,

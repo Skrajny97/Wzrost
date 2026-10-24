@@ -273,6 +273,14 @@ function checkReferences(data) {
   for (const id of knownLines) {
     if (!lines.has(id)) errors.push(`tutorial.json: brak kwestii ${id}`);
   }
+  // The first steps the skipped introduction plays: a place and a building that exist.
+  const { firstSteps } = data.tutorial;
+  if (!data.regions.some((region) => region.areas.some((area) => area.id === firstSteps.areaId))) {
+    errors.push(`tutorial.json: firstSteps ma nieznane miejsce "${firstSteps.areaId}"`);
+  }
+  if (!data.buildings.some((building) => building.id === firstSteps.buildingId)) {
+    errors.push(`tutorial.json: firstSteps ma nieznany budynek "${firstSteps.buildingId}"`);
+  }
   for (const line of data.tutorial.lines) {
     for (const voice of [line.voice, line.female?.voice]) {
       if (voice && !existsSync(new URL(voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${voice}`);

@@ -46,6 +46,9 @@ export const content = buildContent({
 // kept.
 export const tutorialLines = tutorial.lines.filter((line) => line.kind === 'card' || line.kind === 'point').map((line) => line.id);
 
+// The first steps of the introduction, which a skipped one plays for the player.
+export const firstSteps = tutorial.firstSteps;
+
 // What the page needs to label things; no balance numbers.
 export function publicContent() {
   return {

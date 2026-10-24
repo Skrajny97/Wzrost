@@ -18,11 +18,15 @@ const nothing = (message) => new ApiError(409, 'nothing_to_skip', message);
 export async function skipWithTimePoints(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
-  const row = player.row;
-  if (row.time_points < 1) throw new ApiError(409, 'no_time_points', 'Nie masz Punktów Czasu.');
-  const now = context.now;
-  const db = context.env.DB;
-  const plan = { activity: skipActivity, rest: skipRest, build: skipBuild }[body.target];
+  const spent = await spendTimePoints(context.env.DB, player, body.target, context.now);
+  return json({ spent, character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
+}
+
+// Points for the minutes left of a wait (`target`: activity, rest or build).
+// The skipped introduction pays for its first exploration this way too.
+export async function spendTimePoints(db, player, target, now) {
+  if (player.row.time_points < 1) throw new ApiError(409, 'no_time_points', 'Nie masz Punktów Czasu.');
+  const plan = { activity: skipActivity, rest: skipRest, build: skipBuild }[target];
   if (!plan) throw new ApiError(400, 'invalid_target', 'Nie wiadomo, co przewinąć.');
   const { spent, statements } = plan(db, player, now);
   // The first statement pays, only if the character and the wait are as seen
@@ -30,7 +34,7 @@ export async function skipWithTimePoints(context) {
   // pay and skip once.
   const [paid] = await db.batch(statements);
   if (paid.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
-  return json({ spent, character: characterView(await loadPlayer(db, session.userId), now) });
+  return spent;
 }
 
 // Minutes the points buy, and how far the wait moves back.

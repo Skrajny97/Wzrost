@@ -859,3 +859,15 @@ Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach i poprosił
     Przy ograniczonym ruchu w ustawieniach telefonu ekran przeskakuje od razu.
 4. **Zatwierdzone przez autora.** „Witaj, przybyszko.” zostaje, a polecenie „Rozdaj wolne punkty.” jest zatwierdzone (zamyka punkt 8 „Scenariusza narratora autora”). Wątek ikonki z poprzedniej rundy dotyczył koloru złota i jest zamknięty.
 
+## Ten sam start po pominięciu i spokojniejsze pergaminy (24.10.2026)
+
+1. **„Pomiń wprowadzenie” daje ten sam start** (prośba autora). Serwer robi za gracza pierwsze kroki z wprowadzenia (`firstSteps` w `data/tutorial.json`):
+    - pierwsza wyprawa na Skraj Wiatrołomów, najdłuższa dostępna na starcie (30 minut), przewinięta Punktami Czasu tak, jak każe narrator,
+    - odebrany raport: poziomy, Punkty Czasu za nie i pierwsza broń, założona od razu; raport jest w Dzienniku,
+    - Ognisko poziomu 1, zbudowane od razu. Budowa trwa minutę, więc gracz z wprowadzenia ma je chwilę później.
+
+    Serwer robi tylko kroki, których gracz jeszcze nie zrobił. Po pominięciu w trakcie wyprawy przewija i odbiera właśnie ją. Wolne punkty statystyk zostają do rozdania. Gdy któryś krok się nie uda (np. konflikt), wprowadzenie i tak się kończy. Komunikat po pominięciu (`skippedText`): „Wprowadzenie pominięte. Pierwsza wyprawa jest już za Tobą, a Ognisko zbudowane. Raport znajdziesz w Dzienniku.” W próbie obie drogi skończyły się na poziomie 2, z klasą na poziomie 2 i 35 Punktami Czasu (60 − 30 + 5 za poziomy).
+2. **Pergamin pojawia się powoli** (prośba autora). Po przejeździe ekranu narrator wchodzi powoli (0,5 s), a pergamin rozwija się wolniej niż na środku ekranu: przez 1 s zamiast 0,7 s. Po „Dalej” pergamin się zwija, narrator znika (0,25 s) i dopiero wtedy ekran rusza.
+3. **Ograniczony ruch.** Gdy w telefonie włączone jest ograniczanie ruchu, ramki znów nie pulsują, narrator się nie unosi, a obóz nie ma animacji. Reguły, które je wyłączały, stały w arkuszu przed tymi, które je włączają, więc nie działały. Teraz są na końcu arkusza.
+4. **Nagrania.** Dwie wersje żeńskie (Postać i Ustawienia) są nagrane jeszcze raz, ze spokojnym, niższym początkiem (`[calmly]`). W Postaci są trzy zapisy „broń” do wyboru: z przecinkiem, wielkimi literami i z pauzą. Do gry trafiły też wersje wybrane przez autora: obóz, powitanie, podsumowanie raportu, suwak i test. Koszt: ok. 1,6 tys. kredytów.
+

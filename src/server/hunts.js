@@ -91,15 +91,22 @@ export async function huntOptions(context) {
 export async function startHunt(context) {
   const { session, player } = await requireIdlePlayer(context);
   const body = await readJson(context.request);
+  await beginHunt(context.env.DB, player, body, context.now);
+  return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) }, 201);
+}
+
+// An exploration of `minutes` in an inner region, from now on. The skipped
+// introduction sends the first one this way too (tutorial.js).
+export async function beginHunt(db, player, { areaId, regionId, minutes } = {}, now) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
-  const id = body.areaId ?? body.regionId;
+  const id = areaId ?? regionId;
   const area = typeof id === 'string' ? areaFor(id, player.row.level, content) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
   if (!areaUnlocked(area, player.row.class_level, content)) throw areaLocked(area);
-  if (!durationsUpTo(content.balance.hunt.maxMinutes, content).includes(body.minutes)) {
+  if (!durationsUpTo(content.balance.hunt.maxMinutes, content).includes(minutes)) {
     throw new ApiError(400, 'invalid_duration', 'Wybierz czas wyprawy.');
   }
-  if (!huntDurations(player.row.level, content).includes(body.minutes)) {
+  if (!huntDurations(player.row.level, content).includes(minutes)) {
     const longest = longestHunt(player.row.level, content);
     const next = nextHuntUnlock(player.row.level, content);
     throw new ApiError(
@@ -109,17 +116,15 @@ export async function startHunt(context) {
     );
   }
 
-  const now = context.now;
   const { hp } = currentHp(player, now);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const db = context.env.DB;
   try {
     await db.batch([
       db
         .prepare(
           'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         )
-        .bind(player.row.id, 'hunt', area.id, body.minutes, now, now + body.minutes * 60000, seed, hp),
+        .bind(player.row.id, 'hunt', area.id, minutes, now, now + minutes * 60000, seed, hp),
       // The HP rested so far is saved now, so it is not counted again later.
       db.prepare('UPDATE characters SET hp = ?, hp_at = ?, version = version + 1 WHERE id = ?').bind(hp, now, player.row.id),
     ]);
@@ -129,7 +134,6 @@ export async function startHunt(context) {
     }
     throw error;
   }
-  return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
 }
 
 // Calling the character back early gives nothing and costs nothing.
@@ -149,9 +153,20 @@ export async function cancelHunt(context) {
 
 export async function claimHunt(context) {
   const { session, player } = await requirePlayer(context);
+  const now = context.now;
+  const { id, report } = await finishHunt(context.env.DB, player, now);
+  return json({
+    report: { id, createdAt: now, ...report },
+    character: characterView(await loadPlayer(context.env.DB, session.userId), now),
+  });
+}
+
+// The report of a finished exploration: the engine runs it with the seed
+// saved at its start, and the character gets what it brought.
+export async function finishHunt(db, player, now) {
   const activity = player.activity;
   if (!activity) throw new ApiError(409, 'no_activity', 'Postać nie jest na wyprawie.');
-  if (activity.ends_at > context.now) throw new ApiError(409, 'not_finished', 'Wyprawa jeszcze trwa.');
+  if (activity.ends_at > now) throw new ApiError(409, 'not_finished', 'Wyprawa jeszcze trwa.');
 
   const row = player.row;
   const character = engineCharacter(row);
@@ -170,7 +185,6 @@ export async function claimHunt(context) {
     content,
   );
   const applied = applyHunt(character, hunt, content);
-  const now = context.now;
   // A find for a slot with nothing in it is worn at once.
   const autoEquipped = autoEquip(equippedItems(player), hunt.items, content, row.class_id);
   // The rest goes to the bag. When it does not fit, the scrapper buys the
@@ -216,7 +230,6 @@ export async function claimHunt(context) {
     system: report.system,
   };
 
-  const db = context.env.DB;
   const insertItem = db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, ?)');
   const storedPrice = soldStored.length > 0 ? soldGold(row.id, soldStored, sellBonus) : { sql: '0', binds: [] };
   const found = Object.entries(hunt.resources);
@@ -269,9 +282,5 @@ export async function claimHunt(context) {
     throw error;
   }
 
-  const id = results[0].meta.last_row_id;
-  return json({
-    report: { id, createdAt: now, ...report },
-    character: characterView(await loadPlayer(db, session.userId), now),
-  });
+  return { id: results[0].meta.last_row_id, report };
 }

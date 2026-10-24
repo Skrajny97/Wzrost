@@ -3091,32 +3091,6 @@ a.segmented-option {
   letter-spacing: 0.08em;
 }
 
-/* With reduced motion the pulsing and sliding stop; the fight playback stays,
-   in a calmer form (see arena.js). */
-@media (prefers-reduced-motion: reduce) {
-  .activity--done,
-  .camp-bubble--full {
-    animation: none;
-  }
-
-  .camp-plot-art {
-    transition: none;
-  }
-
-  .meter-fill,
-  .bar-fill,
-  .portrait-art,
-  .arena-banner {
-    transition: none;
-  }
-
-  .guide-ring,
-  .guide-ring--nudge,
-  .guide-note .sprite--narrator {
-    animation: none;
-  }
-}
-
 /* Obóz: the materials, the board with a plot for each building, and a
    building's screen. */
 .camp-materials {
@@ -3679,6 +3653,24 @@ a.segmented-option {
   visibility: hidden;
 }
 
+/* After the screen glides to a place the narrator steps in, and steps away
+   after "Dalej". */
+@keyframes guide-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.guide-note--arriving {
+  animation: guide-arrive 0.5s ease-out;
+}
+
+.guide-note--leaving {
+  opacity: 0;
+  transition: opacity 0.25s ease-in;
+}
+
 .narrator-skip {
   padding: 10px 0;
   border: none;
@@ -3915,4 +3907,31 @@ a.segmented-option {
   font-family: var(--font-world);
   font-size: 14px;
   pointer-events: auto;
+}
+
+/* With reduced motion the pulsing and sliding stop; the fight playback stays,
+   in a calmer form (see arena.js). Last in the file, so it wins over the
+   rules it calms. */
+@media (prefers-reduced-motion: reduce) {
+  .activity--done,
+  .camp-bubble--full {
+    animation: none;
+  }
+
+  .camp-plot-art {
+    transition: none;
+  }
+
+  .meter-fill,
+  .bar-fill,
+  .portrait-art,
+  .arena-banner {
+    transition: none;
+  }
+
+  .guide-ring,
+  .guide-ring--nudge,
+  .guide-note .sprite--narrator {
+    animation: none;
+  }
 }

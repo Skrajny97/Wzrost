@@ -160,8 +160,10 @@ function skipAll() {
   closeCard();
   stopLight();
   state.character.tutorial = state.content.tutorial.lines.filter(kept).map((line) => line.id);
+  // The server plays the first steps meanwhile (an exploration, its report
+  // and the Ognisko), and the screen draws the character it sends back.
   call('POST', '/api/tutorial', { skip: true })
-    .then(() => toast('Wprowadzenie pominięte.'))
+    .then(() => toast(state.content.tutorial.skippedText))
     .catch((error) => toast(error.message));
 }
 
@@ -186,13 +188,15 @@ function speak(line) {
   playNarration(voice, { onEnd: () => duckMusic(false) });
 }
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 // Parchment between two rods grows from nothing to its height, or back.
-async function roll(sheet, open) {
+async function roll(sheet, open, duration = open ? 700 : 380) {
   if (calm()) return;
   rolls.get(sheet)?.cancel();
   const frames = open ? [{ height: '0px' }, { height: `${sheet.scrollHeight}px` }] : [{ height: `${sheet.offsetHeight}px` }, { height: '0px' }];
   const animation = sheet.animate(frames, {
-    duration: open ? 700 : 380,
+    duration,
     easing: open ? 'cubic-bezier(0.2, 0.7, 0.2, 1)' : 'cubic-bezier(0.5, 0, 0.8, 0.4)',
     fill: 'forwards',
   });
@@ -419,11 +423,17 @@ function startLight(line) {
   const root = h('div', { class: 'guide' }, shade, rings, note.element, skip);
   document.body.append(root);
   light = { line, root, note, frame: 0, closing: false };
-  // The narrator steps in once the screen has glided to the place.
+  // Once the screen has glided to the place, the narrator steps in and then
+  // the parchment unrolls, slowly.
   note.element.classList.add('guide-note--waiting');
-  glide(places(line)[0]).then(() => {
+  glide(places(line)[0]).then(async () => {
     if (light?.line !== line) return;
     note.element.classList.remove('guide-note--waiting');
+    if (!calm()) {
+      note.element.classList.add('guide-note--arriving');
+      await wait(300);
+      if (light?.line !== line) return;
+    }
     note.open();
   });
 
@@ -584,18 +594,23 @@ function scrollNote(line) {
   // narrator does not jump while it unrolls.
   const height = () => Math.max(element.offsetHeight, sheet.scrollHeight + 24);
   const open = async () => {
-    await roll(sheet, true);
+    await roll(sheet, true, 1000);
     if (light?.line !== line || light.closing) return;
     $('.guide-next', sheet)?.focus({ preventScroll: true });
     speak(line);
   };
-  // "Dalej": the parchment rolls up, then the next line.
+  // "Dalej": the parchment rolls up and the narrator steps away, then the
+  // next line.
   async function onward() {
     if (!light || light.line !== line || light.closing) return;
     light.closing = true;
     stopNarration();
     markRead(line.id);
     await roll(sheet, false);
+    if (!calm()) {
+      element.classList.add('guide-note--leaving');
+      await wait(250);
+    }
     stopLight();
     narrate();
   }

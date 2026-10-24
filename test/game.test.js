@@ -837,6 +837,39 @@ describe('Time Points and the narrator', () => {
     assert.equal((await skip('rest')).data.error.code, 'busy');
   });
 
+  test('"Pomiń wprowadzenie" plays the first steps for the player: the same start either way', async () => {
+    const skipped = await call('POST', '/api/tutorial', { cookie, body: { skip: true } });
+    assert.equal(skipped.status, 200);
+    const view = skipped.data.character;
+    const reports = (await call('GET', '/api/reports', { cookie })).data.reports;
+    // The first exploration, as long as the start allows, in Skraj Wiatrołomów:
+    // skipped with Time Points as the narrator asks, its report claimed.
+    assert.equal(reports.length, 1);
+    assert.equal(reports[0].areaName, 'Skraj Wiatrołomów');
+    assert.equal(reports[0].minutes, 30);
+    assert.equal(view.activity, null);
+    assert.equal(view.timePoints, start - 30 + reports[0].timePoints);
+    assert.equal(view.level, reports[0].levelAfter);
+    // The first weapon is worn and the Ognisko is built.
+    assert.ok(view.equipment.weapon);
+    assert.equal(view.camp.buildings.find((building) => building.id === 'campfire').level, 1);
+    assert.equal(view.camp.construction, null);
+    // Skipped once more, nothing else happens.
+    assert.equal((await call('POST', '/api/tutorial', { cookie, body: { skip: true } })).data.character.timePoints, view.timePoints);
+    assert.equal((await call('GET', '/api/reports', { cookie })).data.reports.length, 1);
+  });
+
+  test('skipped halfway, only the first steps not done yet are played', async () => {
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    const view = (await call('POST', '/api/tutorial', { cookie, body: { skip: true } })).data.character;
+    const reports = (await call('GET', '/api/reports', { cookie })).data.reports;
+    // The exploration already under way is the first one: skipped and claimed.
+    assert.equal(reports.length, 1);
+    assert.equal(reports[0].minutes, 5);
+    assert.equal(view.timePoints, start - 5 + reports[0].timePoints);
+    assert.equal(view.camp.buildings.find((building) => building.id === 'campfire').level, 1);
+  });
+
   test('the narrator remembers the cards and pointers read, and "Pomiń wprowadzenie" marks them all', async () => {
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     assert.deepEqual((await see({ card: 'intro' })).data.character.tutorial, ['intro']);

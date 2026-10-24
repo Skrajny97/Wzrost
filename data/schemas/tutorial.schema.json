@@ -9,6 +9,8 @@
     "nextLabel",
     "hideLabel",
     "showLabel",
+    "skippedText",
+    "firstSteps",
     "lines"
   ],
   "properties": {
@@ -32,6 +34,30 @@
       "type": "string",
       "minLength": 1,
       "description": "Rozwija ukryty pergamin z powrotem."
+    },
+    "skippedText": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Komunikat po „Pomiń wprowadzenie”."
+    },
+    "firstSteps": {
+      "type": "object",
+      "description": "Co narrator każe zrobić na początku: pierwsza wyprawa (najdłuższa dostępna na starcie, przewinięta Punktami Czasu) i pierwszy budynek. Po „Pomiń wprowadzenie” serwer robi to za gracza, żeby obie drogi dawały ten sam start.",
+      "additionalProperties": false,
+      "required": [
+        "areaId",
+        "buildingId"
+      ],
+      "properties": {
+        "areaId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "buildingId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     },
     "lines": {
       "type": "array",

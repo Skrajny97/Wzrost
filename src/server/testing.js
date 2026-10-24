@@ -3,6 +3,7 @@
 
 import { construction } from '../engine/index.js';
 import { content } from './content.js';
+import { completeBuilding } from './camp.js';
 import { characterView, currentHp, loadPlayer, requirePlayer } from './characters.js';
 import { ApiError, json } from './http.js';
 import { testMode, testModeFor } from './test-mode.js';
@@ -44,19 +45,8 @@ export async function skipBuilding(context) {
   if (!testModeFor(context.env, session.user.login)) throw notFound();
   const db = context.env.DB;
   const now = context.now;
-  const running = construction(player.buildings, now);
-  if (running) {
-    // Two seconds into the past, like the hunt above; a production building
-    // waiting for the end of the upgrade starts with it.
-    const shift = Math.max(0, running.endsAt - (now - 2000));
-    await db
-      .prepare(
-        `UPDATE buildings SET started_at = started_at - ?, ends_at = ends_at - ?,
-           collected_at = CASE WHEN collected_at = ends_at THEN collected_at - ? ELSE collected_at END
-         WHERE character_id = ? AND building_id = ?`,
-      )
-      .bind(shift, shift, shift, player.row.id, running.buildingId)
-      .run();
+  if (construction(player.buildings, now)) {
+    await completeBuilding(db, player, now);
   } else {
     const filling = content.buildings.filter((building) => building.effect.kind === 'production' && player.buildings[building.id]);
     if (filling.length > 0) {
