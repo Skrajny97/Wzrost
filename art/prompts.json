@@ -27,11 +27,16 @@
     "height": 128,
     "references": [],
     "prompts": {
-      "warrior": "young warrior standing, full body from head to feet, dented iron helmet and chainmail, a round wooden shield and a sword, facing the viewer, three-quarter view, forest fantasy",
-      "archer": "young archer standing, full body from head to feet, dark green hood and leather jacket, holding a longbow, a quiver of arrows on the back, facing the viewer, three-quarter view, forest fantasy",
-      "mage": "young mage standing, full body from head to feet, long blue robe, holding a gnarled staff with a glowing cyan crystal, facing the viewer, three-quarter view, forest fantasy",
-      "cleric": "young cleric standing, full body from head to feet, white and gold robe with a holy symbol, holding a silver aspergillum and a round shield, facing the viewer, three-quarter view, forest fantasy",
-      "shadow": "young rogue standing, full body from head to feet, black hood and a mask over the mouth, holding two daggers, facing the viewer, three-quarter view, forest fantasy"
+      "warrior-male": "young man warrior standing, full body from head to feet, dented iron helmet and chainmail, a round wooden shield and a sword, facing the viewer, three-quarter view, forest fantasy",
+      "warrior-female": "young woman warrior standing, full body from head to feet, dented iron helmet and chainmail, a round wooden shield and a sword, facing the viewer, three-quarter view, forest fantasy",
+      "archer-male": "young man archer standing, full body from head to feet, dark green hood and leather jacket, holding a longbow, a quiver of arrows on the back, facing the viewer, three-quarter view, forest fantasy",
+      "archer-female": "young woman archer standing, full body from head to feet, dark green hood and leather jacket, holding a longbow, a quiver of arrows on the back, facing the viewer, three-quarter view, forest fantasy",
+      "mage-male": "young man mage standing, full body from head to feet, long blue robe, holding a gnarled staff with a glowing cyan crystal, facing the viewer, three-quarter view, forest fantasy",
+      "mage-female": "young woman mage standing, full body from head to feet, long blue robe, holding a gnarled staff with a glowing cyan crystal, facing the viewer, three-quarter view, forest fantasy",
+      "cleric-male": "young man cleric standing, full body from head to feet, white and gold robe with a holy symbol, holding a silver aspergillum and a round shield, facing the viewer, three-quarter view, forest fantasy",
+      "cleric-female": "young woman cleric standing, full body from head to feet, white and gold robe with a holy symbol, holding a silver aspergillum and a round shield, facing the viewer, three-quarter view, forest fantasy",
+      "shadow-male": "young man rogue standing, full body from head to feet, black hood and a mask over the mouth, holding two daggers, facing the viewer, three-quarter view, forest fantasy",
+      "shadow-female": "young woman rogue standing, full body from head to feet, black hood and a mask over the mouth, holding two daggers, facing the viewer, three-quarter view, forest fantasy"
     }
   },
   "items": {
