@@ -677,3 +677,64 @@ Autor zapytał, czy da się dodać logowanie kontem Google.
     - Na umierającą żmiję ElevenLabs dawał same syki (trzy podejścia, dziesięć nagrań). Jej pokonanie powstaje więc z jej syku przy trafieniu, który autor zostawił: o 20% niżej i wolniej, bez góry powyżej 6 kHz, wygasające przez 0,8 s (`DERIVED` w `tools/build-drafts.py`). Gdyby i to nie pasowało, Żmija może nie mieć głosu przy pokonaniu, a zostanie sam odgłos upadku.
 
     Strona odsłuchu ma teraz przy zaznaczonym dźwięku pole „Co nie gra?”, zapisywane razem z zaznaczeniem (`note`). Koszt: 112 kredytów.
+
+## Wprowadzenie narratora i Punkty Czasu (24.10.2026)
+
+Autor uznał pierwszą godzinę gry za zbyt powolną. Chciał wprowadzenia, które nie prowadzi za rękę, tylko jak narrator opowieści przedstawia pierwsze funkcje i kończy zdaniem „Reszty dowiesz się w swoim czasie”. Odpowiedzi A–L autora są poniżej.
+
+### Narrator
+
+1. **Kto mówi.** Narrator to eteryczna, wszechmogąca postać bez płci i bez twarzy: granatowy płaszcz pełen gwiazd, świecące oczy i zwój, który czyta graczowi. Grafika jest z Retro Diffusion (szkic `narrator-stars`, 96×128 px, `src/client/art/narrator/narrator.png`). Autor odrzucił szkic starszej kobiety. Narrator mówi do gracza na „Ty”, bez form rodzajowych. System dalej mówi w swojej niebieskiej ramce, krótko i liczbami.
+2. **Karty.** Siedem kart na pergaminie (`data/tutorial.json`), każda w swoim momencie:
+    - `intro` i `time` zaraz po stworzeniu postaci,
+    - `skip` w trakcie pierwszej eksploracji,
+    - `report` w pierwszym raporcie,
+    - `character` w Postaci,
+    - `camp` w obozie,
+    - `ending` po pierwszej budowie (albo gdy nie stać na Ognisko), z ostatnim zdaniem „Reszty dowiesz się w swoim czasie.”
+
+    Karta pokazuje się raz. „Dalej” przechodzi do następnej, a „Pomiń wprowadzenie” kończy całe wprowadzenie. Ten przycisk jest na każdej karcie oprócz ostatniej i przy każdym podświetleniu. Serwer pamięta przeczytane karty (`characters.tutorial`, lista JSON, `POST /api/tutorial`), więc odświeżenie strony albo inne urządzenie wraca w to samo miejsce.
+3. **Podświetlenia.** Na pierwszych krokach reszta ekranu jest przyciemniona i nie przyjmuje stuknięć. Jedno miejsce ma złotą obwódkę i podpowiedź:
+    - Wiatrołomy, potem Skraj Wiatrołomów,
+    - „Wyrusz”, „Przewiń” i „Odbierz raport”,
+    - Postać, Statystyki i „Rozdaj według klasy”,
+    - obóz, plac Ogniska i „Zbuduj”.
+
+    Stuknięcie w cień porusza obwódką. Kroki wynikają ze stanu postaci i ekranu, więc nie potrzebują osobnego zapisu. Podpowiedzi są w `hints` w `data/tutorial.json`.
+4. **Pierwsza eksploracja.** Na pierwszej wyprawie suwak stoi na najdłuższym czasie, czyli 30 minutach. Narrator proponuje przewinąć ją Punktami Czasu, ale gracz może też poczekać.
+5. **Stare postacie.** Postać sprzed wprowadzenia ma `tutorial` równe NULL i nie widzi kart (odpowiedź D: postacie testowe i tak będą usunięte). Nowa postać, także po „Zacznij od nowa”, dostaje wprowadzenie.
+6. **Zapas na start.** W porzuconym obozie nowa postać znajduje 15 złota, 15 drewna i 3 kamienie (`startingSupply` w `data/balance.json`), więc od razu może zbudować Ognisko (odpowiedź C). Ekwipunku na start dalej nie ma.
+7. **Głos.** Autor chce spróbować głosu narratora (odpowiedź E). Szkice czyta ElevenLabs Text to Speech (`eleven_multilingual_v2`, 1 kredyt za znak, rodzaj `narration` w `audio/prompts.json`, przebieg „Dźwięki (szkice)”). Pierwszą kartę przeczytały cztery głosy z katalogu ElevenLabs, nieco wolniej niż zwykle (tempo 0,92):
+    - River, spokojny i neutralny, bez wyraźnej płci, jak narrator,
+    - Brian, głęboki i niski,
+    - George, ciepły gawędziarz,
+    - Lily, miękki i aksamitny.
+
+    Każdy głos jest na stronie odsłuchu w dwóch wersjach: czystej i z lekkim pogłosem dla eterycznego brzmienia (pogłos ok. 12 dB ciszej od głosu, ok. 2,5 s). Autor wybiera jeden przyciskiem „Ten głos”, a wybór trafia do bazy strony (`picks/narrator`). Szkice kosztowały 1088 kredytów. Wszystkie siedem kart w wybranym głosie to ok. 1600 kredytów. Wtedy karta dostanie pole `voice` z plikiem nagrania.
+
+### Punkty Czasu
+
+8. **Waluta.** Punkty Czasu to trzecia waluta obok złota i Punktów Systemu: 1 punkt skraca o 1 minutę eksplorację, odpoczynek albo budowę w obozie. Należą do postaci, jak złoto (odpowiedź J, `characters.time_points`, migracja `0008_time_points.sql`), więc „Zacznij od nowa” je zeruje. Nigdy nie są na sprzedaż (odpowiedź G). Ikona to klepsydra (odpowiedź K). Punktów Czasu nie ma w górnym pasku: są w portfelu, który otwiera stuknięcie złota.
+9. **Skąd się biorą** (odpowiedzi H i I):
+    - 60 od narratora na start,
+    - 3 za każdy poziom postaci i 2 za każdy poziom klasy,
+    - rzadkie znalezisko „odłamek czasu”, warte 5 (`findOutcomes.time` 0.05 i `timePoints` w `data/balance.json`).
+
+    Komunikaty Systemu o awansie podają też Punkty Czasu, a podsumowanie raportu ma wiersz „Punkty Czasu”.
+10. **Przewijanie.** Przycisk „Przewiń” z liczbą punktów jest przy trwającej eksploracji, przy odpoczynku (pod linią zagrożenia) i przy budowie w obozie (odpowiedź L). Przed wydaniem punktów pyta o zgodę.
+    - Gdy punktów jest mniej niż minut, oczekiwanie skraca się o tyle minut, ile jest punktów („Przewiń o 10 min”).
+    - Pełne przewinięcie przesuwa koniec 2 sekundy w przeszłość, jak „Pomiń czas” w trybie testowym.
+    - Wynik eksploracji się nie zmienia, bo pochodzi z ziarna zapisanego przy wyjściu.
+    - Przewinięty odpoczynek dodaje tyle HP, ile dałyby te minuty w obecnym tempie (z Ogniskiem). W trakcie wyprawy odpoczynku nie da się przewinąć.
+    - Budynek produkcyjny po przewiniętej rozbudowie produkuje od nowego końca budowy.
+
+    Płatność i przesunięcie idą jedną transakcją, więc dwa stuknięcia naraz płacą raz (`POST /api/time/skip`, `src/server/time.js`).
+
+### Świat i portfel
+
+11. **Dalej niż puszcza.** Konflikt natury z Systemem jest na początek. Dalsze poziomy mogą prowadzić do niebios, w kosmos, na inne planety albo do wirtualnych światów. Słowiański folklor jest pierwszym światem gry, nie jedynym. Ostatnia karta narratora mówi: „Puszcza to dopiero pierwszy krok drogi, która prowadzi dalej, niż sięga wzrok.”
+12. **Kolory walut.** W rozwiniętym portfelu każda waluta ma swój kolor:
+    - Złoto jest złote, o co prosił autor,
+    - Punkty Systemu mają niebieski Systemu,
+    - Punkty Czasu i przycisk „Przewiń” mają bursztyn piasku w klepsydrze (`--time`), żeby nie myliły się ze złotem.
+13. **Klepsydra.** Autor zauważył, że ikona Punktów Czasu wygląda jak DNA: dwie skrzyżowane fale. Nowa klepsydra ma proste ścianki zwężające się do szyjki, ramki u góry i u dołu oraz piasek w obu częściach, wypełniony kolorem. Wyraźnie widać ją także przy 12 px. Ta sama ikona jest przy czasie budowy i na zegarze placu w obozie.

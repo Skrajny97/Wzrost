@@ -98,7 +98,7 @@ test/         testy: node:test i lokalne środowisko Workers z bazą D1
 DECISIONS.md  rejestr założeń
 ```
 
-Treść gry (klasy, wygląd postaci, potwory, regiony, przedmioty, afiksy, teksty raportów, kolejność odblokowań, zasoby i budynki obozu, muzyka i dźwięki walki) zmienia się w plikach `data/*.json`, bez dotykania kodu. Walidacja sprawdza je przy każdym pushu.
+Treść gry (klasy, wygląd postaci, potwory, regiony, przedmioty, afiksy, teksty raportów, kolejność odblokowań, zasoby i budynki obozu, muzyka i dźwięki walki, karty narratora) zmienia się w plikach `data/*.json`, bez dotykania kodu. Walidacja sprawdza je przy każdym pushu.
 
 ## Praca lokalna
 
@@ -125,9 +125,9 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | GET | `/api/auth/google/start` | przejście do Google; `?mode=link` łączy Google z zalogowanym kontem |
 | GET | `/api/auth/google/callback` | powrót z Google: logowanie, nowe konto albo połączenie, potem przejście do `/` albo `/?google=<wynik>` |
 | GET | `/api/me` | zalogowany gracz; `google` mówi, czy konto ma połączone Google, a `testMode`, czy ma tryb testowy |
-| GET | `/api/content` | nazwy klas, wyglądów, statystyk, slotów, rzadkości, żywiołów, regionów i regionów wewnętrznych (z poziomem klasy, który je otwiera), zakres czasu i nazwy długości wypraw, odblokowania, poziomy ewolucji klas, muzyka i dźwięki walki; bez logowania |
-| GET | `/api/character` | pełny widok postaci z zasobami, Punktami Systemu konta (`systemPoints`), pojemnością plecaka i obozem (404 `no_character`, gdy jej nie ma) |
-| POST | `/api/character` | nowa postać: `name`, `classId`, `appearance` (`female` albo `male`) |
+| GET | `/api/content` | nazwy klas, wyglądów, statystyk, slotów, rzadkości, żywiołów, regionów i regionów wewnętrznych (z poziomem klasy, który je otwiera), zakres czasu i nazwy długości wypraw, odblokowania, poziomy ewolucji klas, muzyka i dźwięki walki, wprowadzenie narratora z Punktami Czasu na start; bez logowania |
+| GET | `/api/character` | pełny widok postaci z zasobami, Punktami Systemu konta (`systemPoints`), Punktami Czasu (`timePoints`), przeczytanymi kartami narratora (`tutorial`, `null` dla postaci sprzed wprowadzenia), pojemnością plecaka i obozem (404 `no_character`, gdy jej nie ma) |
+| POST | `/api/character` | nowa postać: `name`, `classId`, `appearance` (`female` albo `male`); dostaje zapas na start i Punkty Czasu od narratora |
 | POST | `/api/character/appearance` | zmiana wyglądu: `appearance`; działa też podczas eksploracji |
 | DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami, wyprawą i obozem; Punkty Systemu zostają na koncie |
 | POST | `/api/character/points` | rozdanie punktów: `points`, np. `{ "strength": 2 }` |
@@ -147,6 +147,8 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/hunts/claim` | odbierz raport zakończonej eksploracji |
 | GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |
 | GET | `/api/reports/:id` | pełny raport |
+| POST | `/api/time/skip` | „Przewiń”: `target` (`activity`, `rest` albo `build`); 1 Punkt Czasu za minutę, przy za małej liczbie punktów skraca o tyle minut, ile ich jest; zwraca `spent` (409 `no_time_points`, `nothing_to_skip`, `busy`) |
+| POST | `/api/tutorial` | karta narratora przeczytana: `card`, albo `skip: true` dla „Pomiń wprowadzenie” (409 `no_tutorial` dla postaci sprzed wprowadzenia) |
 | POST | `/api/test/skip-time` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wyprawę albo odpoczynek („Pomiń czas”) |
 | POST | `/api/test/skip-build` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu budowę w obozie, a gdy nic się nie buduje, zapełnia magazyny |
 
