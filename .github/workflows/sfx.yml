@@ -16,6 +16,7 @@ on:
         options:
           - voices
           - effects
+          - ui
       ids:
         description: Identyfikatory po przecinku albo all
         required: true

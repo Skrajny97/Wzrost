@@ -1,5 +1,5 @@
 {
-  "$comment": "Prompts for tools/generate-sfx.mjs (ElevenLabs Sound Effects). Each kind has a length in seconds (20 credits a second); an approved draft goes to src/client/audio/sfx/<id>.mp3 and into data/sounds.json.",
+  "$comment": "Prompts for tools/generate-sfx.mjs (ElevenLabs Sound Effects). Each kind has a length in seconds (20 credits a second) and may set how closely the sound follows the prompt (influence, 0–1, 0.5 when left out); an approved draft goes to src/client/audio/sfx/<id>.mp3 and into data/sounds.json.",
   "voices": {
     "seconds": 1,
     "prompts": {
@@ -44,6 +44,17 @@
       "holy": "a short bright holy magic chime with a shimmering burst, fantasy, no music",
       "victory": "a short triumphant fantasy horn fanfare, no drums",
       "defeat": "a short low mournful fantasy horn note fading out, no drums"
+    }
+  },
+  "ui": {
+    "seconds": 0.5,
+    "influence": 0.7,
+    "prompts": {
+      "tab-wood": "a single soft click of a small wooden toggle switch, warm and muted, very short, close up, dry, no reverb, no music",
+      "tab-bead": "a single small wooden bead tapping a wooden table once, soft and warm, very short, close up, dry, no reverb, no music",
+      "tab-pebble": "two small smooth pebbles touching once, a soft gentle click, very short, close up, dry, no reverb, no music",
+      "tab-book": "a single soft tap of a fingertip on a hardcover book, warm and muted, very short, close up, dry, no reverb, no music",
+      "tab-glass": "a tiny soft muted glass tick, gentle and warm, a quiet user interface click, very short, no reverb, no music"
     }
   }
 }

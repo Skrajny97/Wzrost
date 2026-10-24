@@ -66,7 +66,7 @@ let spent = 0;
 
 // One sound, recorded `variants` times; each take is a separate request.
 async function record(id) {
-  const payload = { text: kind.prompts[id], duration_seconds: kind.seconds, prompt_influence: 0.5 };
+  const payload = { text: kind.prompts[id], duration_seconds: kind.seconds, prompt_influence: kind.influence ?? 0.5 };
   const files = [];
   for (let take = 0; take < variants; take++) {
     const response = await fetch(`${API}/sound-generation?output_format=mp3_44100_64`, {
