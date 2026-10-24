@@ -1,4 +1,4 @@
-# Wzrost
+# Insight
 
 Solowa, casualowa gra przeglądarkowa litRPG na telefon, oparta na timerach. Jedynym źródłem prawdy o projekcie jest [dokument projektowy](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX). Założenia przyjęte w trakcie budowy są w [DECISIONS.md](DECISIONS.md).
 
@@ -7,6 +7,8 @@ Stan: **Etap 2a, plansza obozu.** Działa konto, tworzenie postaci z wyborem jed
 ## Adres gry
 
 **https://wzrost.wzrost.workers.dev**
+
+Adres zawiera jeszcze dawną roboczą nazwę „Wzrost”. Zmieni się po podłączeniu własnej domeny.
 
 Adres jest też w zakładce **Actions**, w podsumowaniu (Summary) każdego przebiegu „Testy i wdrożenie”.
 

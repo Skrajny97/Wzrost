@@ -1,4 +1,4 @@
-# Wzrost: wskazówki dla sesji budowania
+# Insight: wskazówki dla sesji budowania
 
 - Przed zmianą kodu przeczytaj w całości [dokument projektowy](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX) i `DECISIONS.md`. Decyzje z dokumentu są ustalone: zmianę proponuj autorowi jako pytanie.
 - Brakujący szczegół rozstrzygnij najprostszym rozwiązaniem zgodnym z filarami gry i dopisz go do `DECISIONS.md`.
