@@ -21,6 +21,13 @@ test('the validator catches broken references and schema errors', () => {
   gap.regions[0].areas[1].minLevel = 7;
   assert.deepEqual(validateData(gap), ['regions.json: fox-ravines powinien zaczynać się od poziomu 6']);
 
+  // A report's music must be a known track, for a known result.
+  const music = structuredClone(loadData());
+  music.music.reports.success = 'fanfare';
+  assert.deepEqual(validateData(music), ['music.json: raport success ma nieznany utwór fanfare']);
+  music.music.reports = { draw: 'victory-v1' };
+  assert.match(validateData(music)[0], /^music\.json\/reports: must be equal to one of the allowed values/);
+
   const broken = structuredClone(loadData());
   broken.rarities[0].color = 'grey';
   assert.match(validateData(broken)[0], /^rarities\.json\/0\/color: must match pattern/);

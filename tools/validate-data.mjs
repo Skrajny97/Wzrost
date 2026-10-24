@@ -224,7 +224,8 @@ function checkReferences(data) {
   if (evolutions.some((level, i) => i > 0 && level <= evolutions[i - 1])) errors.push('balance.json: classEvolutionLevels musi rosnąć');
   if (evolutions.at(-1) > data.balance.progression.maxLevel) errors.push('balance.json: ewolucja klasy powyżej maxLevel');
 
-  // Music: files that exist, and places that are regions, inner regions or the camp.
+  // Music: files that exist, places that are regions, inner regions or the
+  // camp, and report tracks that exist.
   const tracks = uniqueIds(errors, 'music', data.music.tracks);
   for (const track of data.music.tracks) {
     if (!existsSync(new URL(track.file, CLIENT_DIR))) errors.push(`music.json: brak pliku src/client/${track.file}`);
@@ -234,6 +235,9 @@ function checkReferences(data) {
   for (const [place, track] of Object.entries(data.music.places)) {
     if (!places.has(place)) errors.push(`music.json: nieznane miejsce ${place}`);
     if (!tracks.has(track)) errors.push(`music.json: ${place} ma nieznany utwór ${track}`);
+  }
+  for (const [result, track] of Object.entries(data.music.reports)) {
+    if (!tracks.has(track)) errors.push(`music.json: raport ${result} ma nieznany utwór ${track}`);
   }
   // Combat sounds: files that exist, and weapons and attacks with a known kind.
   const sounds = data.sounds;

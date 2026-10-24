@@ -17,7 +17,7 @@ import { mountReport } from './screens/report.js';
 import { mountStats } from './screens/stats.js';
 import { musicVolume, setMusicConfig, setMusicPlace, setMusicVolume, startMusic } from './music.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
-import { call, handleSessionLost, loadContent, onCharacterChange, serverNow, setTestMode, state, testModeOn } from './state.js';
+import { call, handleSessionLost, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
 import { closeSheet, confirmAction, initSheet, openSheet, toast, withButton } from './ui.js';
 
 const views = {
@@ -202,7 +202,12 @@ function route() {
   const screen = candidate.mount(container, { params, navigate, backHash: lastTabHash }) ?? {};
   current = { route: candidate, screen };
   // An inner region or a region can have its own music, and so can the camp.
-  setMusicPlace(candidate.mount === mountCamp ? ['camp'] : [params.area, params.region].filter(Boolean));
+  // A report opened right after its exploration plays the music of its
+  // result once; opened again, from the Dziennik say, it keeps the usual one.
+  const fresh = candidate.mount === mountReport && params.id === state.freshReport;
+  if (!fresh) state.freshReport = null;
+  const places = candidate.mount === mountCamp ? ['camp'] : [params.area, params.region].filter(Boolean);
+  setMusicPlace(places, fresh ? reportCache.get(params.id)?.result : null);
   renderNav();
   $('.page-title', container)?.focus({ preventScroll: true });
 }
@@ -414,6 +419,7 @@ function leaveGame() {
   current = null;
   state.user = null;
   state.character = null;
+  state.freshReport = null;
   enterAuth();
 }
 

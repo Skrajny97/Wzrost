@@ -11,6 +11,9 @@ export const state = {
   offset: 0,
   // Whether the server offers Google sign-in (/api/health).
   googleLogin: false,
+  // The report just claimed, until the player leaves it: it has the music
+  // of its result (data/music.json "reports").
+  freshReport: null,
 };
 
 const listeners = new Set();

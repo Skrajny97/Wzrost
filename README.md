@@ -177,10 +177,10 @@ Przebieg potrzebuje sekretu repozytorium `RETRO_DIFFUSION_API_KEY` z kluczem API
 
 ## Muzyka i dźwięki
 
-Muzyka w tle jest w `src/client/audio/music/`, a `data/music.json` mówi, który utwór gra domyślnie, a który w danym miejscu (`places`: id regionu, regionu wewnętrznego albo `camp`). Utwór cichnie przez ostatnie 5 sekund i po krótkiej pauzie gra od nowa. Kolejny utwór dodaje się tak:
+Muzyka w tle jest w `src/client/audio/music/`, a `data/music.json` mówi, który utwór gra domyślnie, a który w danym miejscu (`places`: id regionu, regionu wewnętrznego albo `camp`). Raport otwarty zaraz po wyprawie gra raz utwór swojego wyniku (`reports`: `success` dla wygranej, `fainted` dla omdlenia, `escaped` dla ucieczki), a ten sam raport z Dziennika zwykłą muzykę. Zmiana utworu wycisza jeden i pogłaśnia drugi (`switchSeconds`), a utwór, który wraca, gra od miejsca, w którym ucichł. Utwór cichnie przez ostatnie 5 sekund i po krótkiej pauzie gra od nowa. Kolejny utwór dodaje się tak:
 
 1. Wgraj plik MP3 do `src/client/audio/music/` (nazwa małymi literami, z myślnikami).
-2. Dopisz go do `tracks` w `data/music.json`, a miejsce i id utworu do `places`.
+2. Dopisz go do `tracks` w `data/music.json`, a miejsce i id utworu do `places` (albo wynik wyprawy do `reports`).
 3. `npm run validate` sprawdzi, że plik i miejsce istnieją.
 
 Ciosy, uniki i upadki w walce to nagrania z paczek Kenney (CC0) w `src/client/audio/sfx/`, przypisane w `data/sounds.json` do rodzajów broni i ataków potworów (pole `sound` w `data/item-bases.json` i `data/monsters.json`). Przerabia je dla głośnika telefonu `tools/build-sfx.py` (Python i ffmpeg). Głosy stworów i postaci przy trafieniu i pokonaniu (`voices`) nagrywa przebieg **Dźwięki (szkice)** z generatorem ElevenLabs:

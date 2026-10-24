@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Muzyka w tle",
-  "description": "Utwory grane w tle. Domyślny gra na wszystkich ekranach, a miejsca (region, region wewnętrzny albo obóz: camp) mogą dostać własny. Utwór cichnie przez ostatnie fadeOutSeconds sekund, a po pauzie pauseSeconds zaczyna się od nowa.",
+  "description": "Utwory grane w tle. Domyślny gra na wszystkich ekranach, a miejsca (region, region wewnętrzny albo obóz: camp) mogą dostać własny, tak samo raport otwarty zaraz po wyprawie, według jej wyniku. Utwór cichnie przez ostatnie fadeOutSeconds sekund, a po pauzie pauseSeconds zaczyna się od nowa. Zmiana utworu to wyciszenie i pogłośnienie, każde przez switchSeconds sekund.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["tracks", "default", "places", "fadeOutSeconds", "pauseSeconds"],
+  "required": ["tracks", "default", "places", "reports", "fadeOutSeconds", "pauseSeconds", "switchSeconds"],
   "properties": {
     "tracks": {
       "type": "array",
@@ -26,7 +26,14 @@
       "description": "Id miejsca (regionu, regionu wewnętrznego albo camp) → id utworu. Region wewnętrzny bez wpisu gra utwór swojego regionu.",
       "additionalProperties": { "type": "string" }
     },
+    "reports": {
+      "type": "object",
+      "description": "Wynik wyprawy (success: wygrana, fainted: omdlenie, escaped: ucieczka) → id utworu, który gra raz, gdy raport otwiera się zaraz po odebraniu. Raport otwarty z Dziennika gra zwykłą muzykę. Taki utwór zaczyna się zawsze od początku, a poprzedni wraca w miejscu, w którym ucichł.",
+      "propertyNames": { "enum": ["success", "fainted", "escaped"] },
+      "additionalProperties": { "type": "string" }
+    },
     "fadeOutSeconds": { "type": "number", "minimum": 0 },
-    "pauseSeconds": { "type": "number", "minimum": 0 }
+    "pauseSeconds": { "type": "number", "minimum": 0 },
+    "switchSeconds": { "type": "number", "minimum": 0, "maximum": 10 }
   }
 }

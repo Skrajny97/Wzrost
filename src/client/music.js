@@ -1,8 +1,11 @@
 // Background music from data/music.json. For now one track plays on every
 // screen; a region, an inner region or the camp can get its own, and the
-// music then changes with the screen. A track fades out over its last
-// seconds and starts again after a short pause. The volume is set in the
-// settings and kept in this browser.
+// music then changes with the screen. A report opened right after its
+// exploration plays the track of its result once (a win, a faint). A change
+// of tracks fades one out and the next in, and a track that comes back goes
+// on from where it stopped. A track fades out over its last seconds and
+// starts again after a short pause. The volume is set in the settings and
+// kept in this browser.
 //
 // A track is downloaded whole and played from memory: Safari plays sound
 // files only from servers that send them in parts, which the game's static
@@ -12,7 +15,6 @@
 import { clampVolume, unlockSound, volumeGain } from './sound.js';
 
 const VOLUME_KEY = 'insight.musicVolume';
-const SWITCH_SECONDS = 1.5; // from one track to another
 // Even at 100% the music stays below the effects, which are short and need
 // the room (half the signal, −6 dB).
 const MUSIC_LEVEL = 0.5;
@@ -25,10 +27,11 @@ let touched = false; // browsers play sound only after a touch
 let audio = null;
 let level = null; // gain: the player's volume
 let fade = null; // gain: the end of a track and the change of tracks
-let fading = false;
+let fading = false; // the end of the track is fading out
 let restart = null; // the pause between two plays of a track
 let switching = false;
 const sources = new Map(); // track id → a promise of its file in memory
+const positions = new Map(); // track id → the second it stopped at
 
 function readVolume() {
   try {
@@ -61,13 +64,22 @@ export function setMusicConfig(music) {
 }
 
 // The places of the screen on show, the most specific first, e.g.
-// [inner region, region] or ['camp']; none for the other screens.
-export function setMusicPlace(places) {
+// [inner region, region] or ['camp']; none for the other screens. `report`:
+// the result of a report just claimed (success, fainted, escaped), whose
+// track goes first.
+export function setMusicPlace(places, report = null) {
   if (!config) return;
-  const track = places.map((place) => config.places[place]).find(Boolean) ?? config.default;
+  const track = (report && config.reports[report]) || places.map((place) => config.places[place]).find(Boolean) || config.default;
   if (track === wanted) return;
   wanted = track;
   update();
+}
+
+// The report tracks load while an exploration lasts, so the music can change
+// as soon as its report opens.
+export function preloadReportMusic() {
+  if (!config || volume === 0) return;
+  for (const id of new Set(Object.values(config.reports))) source(id).catch(() => {});
 }
 
 // Called on every touch until the music plays.
@@ -143,10 +155,16 @@ function play() {
   unlockSound();
   fading = false;
   if (audio.ended) audio.currentTime = 0;
-  if (audio.currentTime < 1) setFade(1);
-  audio.play().catch(() => {
-    // Not allowed yet: the next touch tries again.
-  });
+  const id = playing;
+  audio
+    .play()
+    .then(() => {
+      // A track that starts or comes back fades in from silence.
+      if (playing === id && !switching && !fading) setFade(1, config.switchSeconds);
+    })
+    .catch(() => {
+      // Not allowed yet: the next touch tries again.
+    });
 }
 
 function pause() {
@@ -156,14 +174,19 @@ function pause() {
   if (audio && !audio.paused) audio.pause();
 }
 
-// Fades the track out (if one plays), then starts the wanted one.
+// Fades the track out (if one plays), then the wanted one in: a report's
+// track from its beginning, any other from where it stopped.
 async function changeTrack() {
   if (switching) return;
   switching = true;
+  clearTimeout(restart);
+  restart = null;
   try {
+    // The next file loads while the old track fades out.
+    source(wanted).catch(() => {});
     if (playing && !audio.paused) {
-      setFade(0, SWITCH_SECONDS);
-      await new Promise((resolve) => setTimeout(resolve, SWITCH_SECONDS * 1000));
+      setFade(0, config.switchSeconds);
+      await new Promise((resolve) => setTimeout(resolve, config.switchSeconds * 1000));
     }
     let id;
     let url;
@@ -171,15 +194,30 @@ async function changeTrack() {
       id = wanted;
       url = await source(id);
     } while (id !== wanted);
-    playing = id;
-    audio.src = url;
-    const track = config.tracks.find((candidate) => candidate.id === id);
-    if ('mediaSession' in navigator && 'MediaMetadata' in window) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: track.name,
-        artist: 'Insight',
-        artwork: [{ src: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
-      });
+    // Back to the same track within the fade: it simply fades in again.
+    if (id !== playing) {
+      if (playing) keepPosition();
+      playing = id;
+      setFade(0);
+      audio.src = url;
+      const at = Object.values(config.reports).includes(id) ? 0 : positions.get(id) ?? 0;
+      if (at > 0) {
+        audio.addEventListener(
+          'loadedmetadata',
+          () => {
+            if (playing === id) audio.currentTime = at;
+          },
+          { once: true },
+        );
+      }
+      const track = config.tracks.find((candidate) => candidate.id === id);
+      if ('mediaSession' in navigator && 'MediaMetadata' in window) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: track.name,
+          artist: 'Insight',
+          artwork: [{ src: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
+        });
+      }
     }
   } catch {
     // The download failed: the next touch tries again.
@@ -187,6 +225,12 @@ async function changeTrack() {
     switching = false;
   }
   if (playing === wanted && touched && volume > 0 && !document.hidden) play();
+}
+
+// Where the leaving track stopped. From its fading end it would start over.
+function keepPosition() {
+  const left = audio.duration - audio.currentTime;
+  positions.set(playing, audio.ended || !(left > config.fadeOutSeconds + 1) ? 0 : audio.currentTime);
 }
 
 // The last seconds of a track grow quiet, also when it resumes there.

@@ -9,6 +9,7 @@ import { areaArt } from '../area-art.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, timeFormat } from '../format.js';
+import { preloadReportMusic } from '../music.js';
 import { activityFinished, call, currentHp, isUnlocked, reportCache, serverNow, state, testModeOn, unlockInfo } from '../state.js';
 import { confirmAction, lockLabel, systemPanel, toast, withButton } from '../ui.js';
 
@@ -220,6 +221,7 @@ export function mountCombat(container, { params, navigate }) {
   }
 
   function activityCard(activity) {
+    preloadReportMusic();
     if (activityFinished(activity)) {
       const claim = h('button', {
         type: 'button',
@@ -229,6 +231,7 @@ export function mountCombat(container, { params, navigate }) {
           withButton(event.currentTarget, async () => {
             const { report } = await call('POST', '/api/hunts/claim');
             reportCache.set(String(report.id), report);
+            state.freshReport = String(report.id);
             navigate(`#/raport/${report.id}`);
           }),
       });
