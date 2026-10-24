@@ -10,7 +10,10 @@ export const SPRITES = {
     size: 48,
     ids: ['wolf', 'alpha-wolf', 'fox', 'lynx', 'bear', 'boar', 'badger', 'crow', 'owl', 'viper', 'spider', 'wisp', 'likho'],
   },
-  items: { size: 32, ids: [] },
+  items: {
+    size: 32,
+    ids: ['sword', 'axe', 'dagger', 'bow', 'staff', 'aspergillum', 'shield', 'quiver', 'focus', 'hood', 'helmet', 'tunic', 'chainmail', 'robe', 'gloves', 'boots', 'amulet', 'ring', 'talisman'],
+  },
 };
 
 const available = Object.fromEntries(Object.entries(SPRITES).map(([kind, { ids }]) => [kind, new Set(ids)]));
