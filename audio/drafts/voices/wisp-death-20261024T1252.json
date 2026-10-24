@@ -1,0 +1,13 @@
+{
+  "id": "wisp-death",
+  "payload": {
+    "text": "a ghostly flame spirit fades away with a high airy whispering sigh and a soft fizzle, close up, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wisp-death-20261024T1252-0.mp3",
+    "audio/drafts/voices/wisp-death-20261024T1252-1.mp3"
+  ],
+  "credits": 40
+}

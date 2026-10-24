@@ -1,0 +1,13 @@
+{
+  "id": "alpha-wolf-hurt",
+  "payload": {
+    "text": "a huge wolf yelps and snarls in pain from a hit, sharp and loud, mid-pitched, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/alpha-wolf-hurt-20261024T1252-0.mp3",
+    "audio/drafts/voices/alpha-wolf-hurt-20261024T1252-1.mp3"
+  ],
+  "credits": 40
+}

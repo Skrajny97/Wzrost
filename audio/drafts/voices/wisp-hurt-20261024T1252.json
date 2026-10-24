@@ -1,0 +1,13 @@
+{
+  "id": "wisp-hurt",
+  "payload": {
+    "text": "a ghostly flame spirit lets out a short high eerie whispering wail, airy and hissing, close up, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wisp-hurt-20261024T1252-0.mp3",
+    "audio/drafts/voices/wisp-hurt-20261024T1252-1.mp3"
+  ],
+  "credits": 40
+}
