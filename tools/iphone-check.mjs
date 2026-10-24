@@ -2,8 +2,9 @@
 // WebKit) at an iPhone 13's size, against the game running locally over
 // https (Safari keeps the login cookie, which is Secure, only from an https
 // page: `wrangler dev --local-protocol https`). It goes through the whole introduction, the main screens,
-// the settings with the install steps, and names a second character with a
-// name already taken. Every step leaves a screenshot, and report.md lists
+// the settings with the install steps, names a second character with a name
+// already taken, and removes the first account, which frees the name. Every
+// step leaves a screenshot, and report.md lists
 // the steps with what the page complained about. Run by the "iPhone (WebKit)"
 // workflow; at a computer:
 //
@@ -259,6 +260,29 @@ await step('Drugi gracz: to samo imię', async () => {
   await second.waitForTimeout(100);
   shooting = false;
   if (!/inna postać/.test(taken)) throw new Error(`komunikat: ${taken}`);
+});
+
+// The first player removes the account: the button waits for the login, the
+// game goes back to signing in, and the name is free for the second player.
+const danger = '#sheet .sheet-actions .button--danger';
+await step('Usuń konto: pytanie o login', async () => {
+  await page.click('#sheet .sheet-close');
+  await page.waitForTimeout(400);
+  await page.click('.topbar .icon-button[aria-label="Ustawienia"]');
+  await page.click('#sheet .button--danger:has-text("Usuń konto")');
+  await page.waitForSelector('#confirm-typed');
+  if (!(await page.locator(danger).isDisabled())) throw new Error('przycisk działa bez loginu');
+  await page.fill('#confirm-typed', `IPHONE${stamp}`);
+  if (await page.locator(danger).isDisabled()) throw new Error('przycisk nie działa po wpisaniu loginu');
+});
+await step('Usuń konto', async () => {
+  await page.click(danger);
+  await page.waitForSelector('[data-auth-mode="register"]');
+  await page.waitForTimeout(500);
+});
+await step('Drugi gracz: imię znów wolne', async () => {
+  await second.click('#create-screen button[type="submit"]');
+  await second.waitForSelector('.narrator[open] .narrator-next');
 });
 
 await browser.close();
