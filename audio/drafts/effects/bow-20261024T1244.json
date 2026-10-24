@@ -1,0 +1,13 @@
+{
+  "id": "bow",
+  "payload": {
+    "text": "a wooden longbow string releases an arrow with a twang, single shot, dry, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/bow-20261024T1244-0.mp3",
+    "audio/drafts/effects/bow-20261024T1244-1.mp3"
+  ],
+  "credits": 60
+}
