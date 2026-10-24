@@ -33,12 +33,19 @@ import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
 import { requireSession } from './sessions.js';
 
-const NAME_PATTERN = /^\p{L}[\p{L}' -]{0,18}\p{L}$/u;
+// 2 to 20 characters: letters and digits, spaces, hyphens, apostrophes and
+// underscores ("Justi_725"), from a letter to a letter or a digit. A phone's
+// curly apostrophe counts as the straight one.
+const NAME_PATTERN = /^\p{L}[\p{L}\p{N}_' -]{0,18}[\p{L}\p{N}]$/u;
 
 export function validateName(value) {
-  const name = typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : '';
+  const name = typeof value === 'string' ? value.trim().replace(/\s+/g, ' ').replace(/[\u2018\u2019\u02bc]/g, "'") : '';
   if (!NAME_PATTERN.test(name)) {
-    throw new ApiError(400, 'invalid_name', 'Imię postaci musi mieć od 2 do 20 liter. Może zawierać spacje, myślniki i apostrofy.');
+    throw new ApiError(
+      400,
+      'invalid_name',
+      'Imię postaci musi mieć od 2 do 20 znaków i zaczynać się od litery. Może zawierać litery, cyfry, spacje, myślniki, apostrofy i podkreślniki.',
+    );
   }
   return name;
 }

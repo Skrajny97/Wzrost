@@ -70,8 +70,10 @@ async function install() {
 function showGuide() {
   const steps = onIphone()
     ? [
-        'Otwórz grę w Safari i stuknij „Udostępnij”: kwadrat ze strzałką w górę. Jeśli go nie widać, najpierw stuknij „…”.',
-        'Przewiń listę i wybierz „Do ekranu początkowego”.',
+        // In the newer Safari "Udostępnij" sits in the page menu: the little
+        // lines by the address (a tester looked for "…" in vain).
+        'Otwórz grę w Safari i stuknij „Udostępnij”: kwadrat ze strzałką w górę. Jeśli go nie widać, najpierw stuknij kreseczki obok adresu strony (czasem są to trzy kropki „…”).',
+        'Przewiń listę i wybierz „Do ekranu początkowego” albo „Dodaj do ekranu początkowego”.',
         'Stuknij „Dodaj”. Na ekranie pojawi się ikona Insight.',
       ]
     : [

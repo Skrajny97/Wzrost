@@ -105,6 +105,7 @@ let scroll = null; // the open card: { dialog, sheet, line, busy }
 let light = null; // { line, root, note, frame, tapped, closing } while a place is lit
 let waiting = null; // the timer looking for the place of the next line
 let pause = null; // { id, at, timer } of a line waiting for its delay
+let lastSpot = null; // { hash, box, at }: where the last pointer's light stood, on the page
 const rolls = new WeakMap(); // parchment → its running animation
 
 // Called after every screen is drawn and every change of the character.
@@ -115,8 +116,10 @@ export function narrate(hash = place) {
     stopLight();
     return;
   }
-  // An open card goes on by itself.
-  if (scroll) return;
+  // An open card goes on by itself, and so does a pointer rolling up after
+  // "Dalej": a change of the character meanwhile (its read line saved, say)
+  // must not start the next line under it.
+  if (scroll || light?.closing) return;
   const line = nextLine();
   if (pause && pause.id !== line?.id) {
     clearTimeout(pause.timer);
@@ -342,32 +345,48 @@ function inView(element) {
 }
 
 // The screen moves to a place slowly, like a camera, so the player sees
-// where it goes: from 0.5 to 1.4 s by the distance, or at once with less
-// motion asked for in the phone's settings.
-function glide(element) {
+// where it goes: from 0.9 to 2.2 s by the distance, gently at both ends, or
+// at once with less motion asked for in the phone's settings.
+const ease = (done) => (1 - Math.cos(Math.PI * done)) / 2;
+
+function glidePlan(element) {
   const rect = element.getBoundingClientRect();
   const most = document.documentElement.scrollHeight - window.innerHeight;
-  const target = Math.max(0, Math.min(most, window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2));
   const from = window.scrollY;
-  const distance = target - from;
-  if (Math.abs(distance) < 8) return Promise.resolve();
+  const to = Math.max(0, Math.min(most, from + rect.top + rect.height / 2 - window.innerHeight / 2));
+  const distance = Math.abs(to - from);
+  return { from, to, duration: distance < 8 ? 0 : Math.min(2200, 900 + distance * 1.1) };
+}
+
+function glide({ from, to, duration }) {
+  if (duration === 0) return Promise.resolve();
   if (calm()) {
-    window.scrollTo(0, target);
+    window.scrollTo(0, to);
     return Promise.resolve();
   }
-  const duration = Math.min(1400, 500 + Math.abs(distance) * 0.9);
   return new Promise((resolve) => {
     const start = performance.now();
     const step = (now) => {
       const done = Math.min(1, (now - start) / duration);
-      const eased = done < 0.5 ? 4 * done ** 3 : 1 - (-2 * done + 2) ** 3 / 2;
-      window.scrollTo(0, from + distance * eased);
+      window.scrollTo(0, from + (to - from) * ease(done));
       if (done < 1) requestAnimationFrame(step);
       else resolve();
     };
     requestAnimationFrame(step);
   });
 }
+
+// One box around a few, or between two at `done` (0 to 1) of the way.
+const union = (boxes) =>
+  boxes.reduce((all, box) => ({
+    top: Math.min(all.top, box.top),
+    bottom: Math.max(all.bottom, box.bottom),
+    left: Math.min(all.left, box.left),
+    right: Math.max(all.right, box.right),
+  }));
+const between = (from, to, done) =>
+  Object.fromEntries(['top', 'bottom', 'left', 'right'].map((side) => [side, from[side] + (to[side] - from[side]) * done]));
+const shifted = (box, y) => ({ ...box, top: box.top + y, bottom: box.bottom + y });
 
 // What a place covers on the screen, with whatever hangs out of it, such as
 // a camp plot's name tag, unless the place clips it.
@@ -423,10 +442,15 @@ function startLight(line) {
   const root = h('div', { class: 'guide' }, shade, rings, note.element, skip);
   document.body.append(root);
   light = { line, root, note, frame: 0, closing: false };
-  // Once the screen has glided to the place, the narrator steps in and then
-  // the parchment unrolls, slowly.
+  // The screen glides to the place. On the same screen as the pointer
+  // before, the light glides there too, from where it stood. Then the
+  // narrator steps in and the parchment unrolls, slowly.
+  const plan = glidePlan(places(line)[0]);
+  const spot = lastSpot?.hash === place && performance.now() - lastSpot.at < 3000 && !calm() ? lastSpot.box : null;
+  lastSpot = null;
+  light.slide = spot && { from: spot, start: performance.now(), duration: Math.max(plan.duration, 700) };
   note.element.classList.add('guide-note--waiting');
-  glide(places(line)[0]).then(async () => {
+  Promise.all([glide(plan), wait(light.slide?.duration ?? 0)]).then(async () => {
     if (light?.line !== line) return;
     note.element.classList.remove('guide-note--waiting');
     if (!calm()) {
@@ -477,19 +501,30 @@ function startLight(line) {
     const height = window.innerHeight;
     // While the places are out of sight (the screen still scrolling to
     // them), the shade has no holes and the narrator waits by the first.
-    const seen = found.filter(inView);
-    const boxes = (seen.length > 0 ? seen : found.slice(0, 1)).map((element) => {
-      const rect = boxOf(element);
-      return {
-        top: Math.max(0, rect.top - pad),
-        bottom: Math.min(height, rect.bottom + pad),
-        left: Math.max(0, rect.left - pad),
-        right: Math.min(width, rect.right + pad),
-      };
+    const fit = (box) => ({
+      top: Math.max(0, box.top),
+      bottom: Math.min(height, box.bottom),
+      left: Math.max(0, box.left),
+      right: Math.min(width, box.right),
     });
-    const holes = seen.length > 0 ? boxes.map((box) => `M${box.left} ${box.top}H${box.right}V${box.bottom}H${box.left}Z`).join('') : '';
+    const padded = (element) => {
+      const rect = boxOf(element);
+      return { top: rect.top - pad, bottom: rect.bottom + pad, left: rect.left - pad, right: rect.right + pad };
+    };
+    // While the light glides from the last pointer, it moves on the page
+    // with the screen; otherwise it stands only on places in sight.
+    const slide = light.slide;
+    const done = slide ? Math.min(1, (performance.now() - slide.start) / slide.duration) : 1;
+    if (slide && done >= 1) light.slide = null;
+    const seen = found.filter(inView);
+    const gliding = slide && done < 1;
+    const boxes = gliding
+      ? found.map((element) => fit(shifted(between(slide.from, shifted(padded(element), window.scrollY), ease(done)), -window.scrollY)))
+      : (seen.length > 0 ? seen : found.slice(0, 1)).map((element) => fit(padded(element)));
+    const lit = gliding ? boxes.length : seen.length > 0 ? boxes.length : 0;
+    const holes = boxes.slice(0, lit).map((box) => `M${box.left} ${box.top}H${box.right}V${box.bottom}H${box.left}Z`).join('');
     shade.style.clipPath = `path(evenodd, 'M0 0H${width}V${height}H0Z${holes}')`;
-    const lit = seen.length > 0 ? boxes.length : 0;
+    light.drawn = boxes.slice(0, lit);
     while (rings.children.length < lit) rings.append(h('div', { class: 'guide-ring' }));
     while (rings.children.length > lit) rings.lastChild.remove();
     boxes.slice(0, lit).forEach((box, index) => {
@@ -611,6 +646,8 @@ function scrollNote(line) {
       element.classList.add('guide-note--leaving');
       await wait(250);
     }
+    // The next pointer's light glides from here.
+    if (light?.drawn?.length) lastSpot = { hash: place, box: shifted(union(light.drawn), window.scrollY), at: performance.now() };
     stopLight();
     narrate();
   }

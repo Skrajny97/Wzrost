@@ -122,7 +122,15 @@ describe('character creation', () => {
     const other = await signUp('inny');
     assert.equal((await newCharacter(other, 'warrior', 'X')).data.error.code, 'invalid_name');
     assert.equal((await newCharacter(other, 'warrior', 'Bob<script>')).data.error.code, 'invalid_name');
+    assert.equal((await newCharacter(other, 'warrior', '725')).data.error.code, 'invalid_name');
+    assert.equal((await newCharacter(other, 'warrior', 'Justi_')).data.error.code, 'invalid_name');
     assert.equal((await newCharacter(other, 'necromancer')).data.error.code, 'invalid_class');
+  });
+
+  test('a name may have digits and underscores, as players like it, and a curly apostrophe', async () => {
+    assert.equal((await newCharacter(cookie, 'warrior', 'Justi_725')).data.character.name, 'Justi_725');
+    const other = await signUp('inny');
+    assert.equal((await newCharacter(other, 'mage', 'D\u2019Artagnan')).data.character.name, "D'Artagnan");
   });
 
   test('a name belongs to one player in the whole game, whatever the letter case', async () => {

@@ -101,7 +101,7 @@ export function renderCreate(container, onCreated) {
       { class: 'field' },
       h('label', { for: 'character-name', text: 'Imię postaci' }),
       nameInput,
-      h('p', { class: 'field-hint', id: 'character-name-hint', text: 'Od 2 do 20 liter. Może zawierać spacje, myślniki i apostrofy.' }),
+      h('p', { class: 'field-hint', id: 'character-name-hint', text: 'Od 2 do 20 znaków, na początku litera. Mogą być cyfry, spacje, myślniki, apostrofy i podkreślniki.' }),
     ),
     h(
       'div',
