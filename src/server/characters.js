@@ -43,6 +43,10 @@ export function validateName(value) {
   return name;
 }
 
+// No two players share a name, whatever the letter case
+// (migrations/0009_unique_names.sql).
+const nameKey = (name) => name.toLowerCase();
+
 export async function loadPlayer(db, userId) {
   // Punkty Systemu belong to the account (users), not the character.
   const row = await db
@@ -298,16 +302,18 @@ export async function createCharacter(context) {
   try {
     await db
       .prepare(
-        `INSERT INTO characters (user_id, role, name, class_id, appearance, position, hp, hp_at, created_at, gold, resources, time_points, tutorial)
-         VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]')`,
+        `INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, position, hp, hp_at, created_at, gold, resources, time_points, tutorial)
+         VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]')`,
       )
       .bind(
-        session.userId, name, cls.id, appearance, cls.position, hp, now, now,
+        session.userId, name, nameKey(name), cls.id, appearance, cls.position, hp, now, now,
         supply.gold, JSON.stringify(supply.resources), content.balance.timePoints.start,
       )
       .run();
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE')) throw exists();
+    const message = String(error?.message);
+    if (message.includes('name_key')) throw new ApiError(409, 'name_taken', 'To imię jest już zajęte. Wybierz inne.');
+    if (message.includes('UNIQUE')) throw exists();
     throw error;
   }
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);

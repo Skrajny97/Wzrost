@@ -1,6 +1,7 @@
 // Character, items, hunts and reports through the API.
 
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
 import { createRng, generateItem } from '../src/engine/index.js';
@@ -122,6 +123,46 @@ describe('character creation', () => {
     assert.equal((await newCharacter(other, 'warrior', 'X')).data.error.code, 'invalid_name');
     assert.equal((await newCharacter(other, 'warrior', 'Bob<script>')).data.error.code, 'invalid_name');
     assert.equal((await newCharacter(other, 'necromancer')).data.error.code, 'invalid_class');
+  });
+
+  test('a name belongs to one player in the whole game, whatever the letter case', async () => {
+    assert.equal((await newCharacter(cookie, 'warrior', 'Łucja')).status, 201);
+    const other = await signUp('inny');
+    const taken = await newCharacter(other, 'mage', 'ŁUCJA');
+    assert.equal(taken.status, 409);
+    assert.deepEqual(taken.data.error, { code: 'name_taken', message: 'To imię jest już zajęte. Wybierz inne.' });
+    // "Zacznij od nowa" frees the name.
+    await call('DELETE', '/api/character', { cookie });
+    assert.equal((await newCharacter(other, 'mage', 'łucja')).status, 201);
+  });
+
+  test('players made before unique names keep them, and nobody new takes them', async () => {
+    const others = [await signUp('inny'), await signUp('trzeci')];
+    await newCharacter(cookie, 'warrior', 'Ola');
+    await newCharacter(others[0], 'mage', 'Ewa');
+    await newCharacter(others[1], 'archer', 'Iga');
+    // The database as it was before migrations/0009: two players share a name.
+    const database = await db();
+    await database.batch([
+      database.prepare('DROP INDEX characters_unique_name'),
+      database.prepare('ALTER TABLE characters DROP COLUMN name_key'),
+      database.prepare("UPDATE characters SET name = 'Łucja' WHERE name = 'Ola'"),
+      database.prepare("UPDATE characters SET name = 'ŁUCJA' WHERE name = 'Ewa'"),
+    ]);
+    const migration = readFileSync('migrations/0009_unique_names.sql', 'utf8')
+      .replace(/--.*$/gm, '')
+      .split(';')
+      .map((statement) => statement.trim())
+      .filter(Boolean);
+    await database.batch(migration.map((statement) => database.prepare(statement)));
+
+    const { results } = await database.prepare('SELECT id, name, name_key FROM characters ORDER BY id').all();
+    assert.deepEqual(results.map((row) => row.name_key), ['łucja', `łucja#${results[1].id}`, 'iga']);
+    assert.equal((await call('GET', '/api/character', { cookie: others[0] })).data.character.name, 'ŁUCJA');
+    const late = await signUp('czwarty');
+    assert.equal((await newCharacter(late, 'cleric', 'łucja')).data.error.code, 'name_taken');
+    assert.equal((await newCharacter(late, 'cleric', 'IGA')).data.error.code, 'name_taken');
+    assert.equal((await newCharacter(late, 'cleric', 'Ola')).status, 201);
   });
 });
 
