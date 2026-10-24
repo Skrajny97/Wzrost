@@ -738,3 +738,28 @@ Autor uznał pierwszą godzinę gry za zbyt powolną. Chciał wprowadzenia, któ
     - Punkty Systemu mają niebieski Systemu,
     - Punkty Czasu i przycisk „Przewiń” mają bursztyn piasku w klepsydrze (`--time`), żeby nie myliły się ze złotem.
 13. **Klepsydra.** Autor zauważył, że ikona Punktów Czasu wygląda jak DNA: dwie skrzyżowane fale. Nowa klepsydra ma proste ścianki zwężające się do szyjki, ramki u góry i u dołu oraz piasek w obu częściach, wypełniony kolorem. Wyraźnie widać ją także przy 12 px. Ta sama ikona jest przy czasie budowy i na zegarze placu w obozie.
+
+## Narrator: pergamin, wskazania i raport (24.10.2026)
+
+Autor odrzucił wszystkie cztery szkice głosu i poprosił o kilka zmian w wprowadzeniu.
+
+1. **Kwestie po kolei.** `data/tutorial.json` ma jedną listę kwestii w kolejności z gry (`lines`). Każda kwestia ma swój rodzaj:
+    - `card`: narrator czyta z pergaminu,
+    - `point`: sam narrator, w pixel-arcie i bez pergaminu, stoi przy podświetlonym miejscu, mówi kwestię w dymku i czeka na „Dalej”,
+    - `tap`: sam narrator przy miejscu, które trzeba stuknąć.
+
+    Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (`BEATS` w `src/client/narrator.js`). Serwer zapisuje przeczytane karty i wskazania. Polecenie do stuknięcia jest wykonane, gdy gra pójdzie dalej, więc serwer go nie zapisuje. Test pilnuje, żeby kod znał moment i miejsce każdej kwestii z danych.
+2. **Pergamin się rozwija i zwija.** Pergamin wisi między dwoma drewnianymi wałkami, a figura narratora stoi na górnym. Przed kwestią pergamin rozwija się w dół (0,7 s), a po „Dalej” zwija się (0,4 s) i rozwija z następną kartą. Przy ograniczonym ruchu w ustawieniach telefonu kwestie zmieniają się bez animacji.
+3. **Narrator wskazuje sam** (prośba autora). Przy każdym podświetleniu stoi mała figura narratora z dymkiem, którego ogonek wskazuje miejsce. Figura lekko się unosi. Dymek staje pod miejscem albo nad nim, gdzie jest więcej miejsca, i nigdy nie wychodzi poza ekran. Podświetlenie leży nad dymkami gry, więc żaden komunikat nie zasłania „Dalej”.
+4. **Przez raport** (prośba autora). Po karcie raportu narrator wskazuje po kolei:
+    - podsumowanie,
+    - ramkę Systemu,
+    - zakładki walk albo tytuł jedynej walki,
+    - łupy,
+    - „Pełną relację”.
+
+    Wskazanie miejsca, którego na ekranie nie ma, np. łupów z wyprawy bez znalezisk, pomija się samo.
+5. **Obóz na mapie.** Karta obozu jest krótsza. Narrator wskazuje plac Tartaku, a po rozpoczęciu budowy Ogniska jej odliczanie. Treść dawnej karty przeszła do tych wskazań.
+6. **Teksty do zatwierdzenia.** Autor widzi w tekstach narratora naleciałości AI i sam je poprawia. Teksty czytane głosem trafiają do autora przed nagraniem, żeby nie wydawać kredytów ElevenLabs na wersje do wymiany. Obecne teksty są szkicem: cały scenariusz (kwestie 1–25) czeka na poprawki autora.
+7. **Głos.** Żaden z czterech głosów (River, Brian, George, Lily) nie pasuje. Najbliżej jest George, ale ma mówić o wiele wolniej, niżej i bardziej chrapliwie, naturalnie, jak przy ognisku. Po zatwierdzeniu tekstów będzie jedna runda prób na pierwszej kwestii, a potem nagranie kwestii, które autor wskaże. Punkt zastępuje wybór głosu z punktu 7 „Wprowadzenia narratora i Punktów Czasu”.
+8. **Na później.** Imiona postaci mają być unikalne w całej grze. Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach.

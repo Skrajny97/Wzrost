@@ -13,7 +13,7 @@ import { RESOURCE_ICONS } from '../icons.js';
 import { playSound } from '../sound.js';
 import { call, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
 import { skipControl } from '../time.js';
-import { systemPanel, toast, withButton } from '../ui.js';
+import { guided, systemPanel, toast, withButton } from '../ui.js';
 
 const CAMP = '#/oboz';
 const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
@@ -92,11 +92,14 @@ function constructionPanel(running, ticks) {
   return h(
     'div',
     { class: 'stack' },
-    systemPanel(
-      `Budowa: ${running.name}, poziom ${running.level}.`,
-      countdown,
-      h('div', { class: 'bar bar--system' }, progress),
-      h('p', { class: 'system-hint', text: `Gotowe o ${timeFormat.format(new Date(running.endsAt))}.` }),
+    guided(
+      systemPanel(
+        `Budowa: ${running.name}, poziom ${running.level}.`,
+        countdown,
+        h('div', { class: 'bar bar--system' }, progress),
+        h('p', { class: 'system-hint', text: `Gotowe o ${timeFormat.format(new Date(running.endsAt))}.` }),
+      ),
+      'build-countdown',
     ),
     skipper.element,
   );

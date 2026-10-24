@@ -262,14 +262,19 @@ function checkReferences(data) {
     if (!monsters.has(id) && !appearances.has(id)) errors.push(`sounds.json: głos dla nieznanego ${id}`);
   }
 
-  // The new character's supply: resources that exist. The narrator's cards:
-  // each once, with recordings that exist.
+  // The new character's supply: resources that exist. The narrator's lines:
+  // every one the code knows (the schema's list), each once, with recordings
+  // that exist.
   for (const id of Object.keys(data.balance.startingSupply.resources)) {
     if (!resources.has(id)) errors.push(`balance.json: startingSupply ma nieznany zasób "${id}"`);
   }
-  uniqueIds(errors, 'tutorial', data.tutorial.cards);
-  for (const card of data.tutorial.cards) {
-    if (card.voice && !existsSync(new URL(card.voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${card.voice}`);
+  const lines = uniqueIds(errors, 'tutorial', data.tutorial.lines);
+  const knownLines = readJson('schemas/tutorial.schema.json').properties.lines.items.properties.id.enum;
+  for (const id of knownLines) {
+    if (!lines.has(id)) errors.push(`tutorial.json: brak kwestii ${id}`);
+  }
+  for (const line of data.tutorial.lines) {
+    if (line.voice && !existsSync(new URL(line.voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${line.voice}`);
   }
   return errors;
 }

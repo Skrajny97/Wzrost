@@ -41,8 +41,9 @@ export const content = buildContent({
   appearances,
 });
 
-// The narrator's cards by id, in their order.
-export const tutorialCards = tutorial.cards.map((card) => card.id);
+// The narrator's lines that are read once, in their order: cards and
+// pointers. A tap is done when the game moves on, so it is not kept.
+export const tutorialLines = tutorial.lines.filter((line) => line.kind !== 'tap').map((line) => line.id);
 
 // What the page needs to label things; no balance numbers.
 export function publicContent() {

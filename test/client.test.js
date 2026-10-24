@@ -109,6 +109,17 @@ test('every sprite on the list has its file at its size, and every class has its
   assert.deepEqual(data('classes').map((cls) => cls.id).filter((id) => !classArtIds.includes(id)), []);
 });
 
+test('the narrator knows when and where each of its lines shows', () => {
+  const tutorial = JSON.parse(readFileSync(new URL('../data/tutorial.json', import.meta.url), 'utf8'));
+  const beats = /const BEATS = \{([\s\S]*?)\n\};/.exec(readFileSync(join(CLIENT, 'narrator.js'), 'utf8'))[1];
+  for (const line of tutorial.lines) {
+    const beat = new RegExp(`(?:^|\\s)'?${line.id}'?: \\{([^}]*)\\}`).exec(beats);
+    assert.ok(beat, `narrator.js has no beat for ${line.id}`);
+    // A pointer or a tap needs its place.
+    if (line.kind !== 'card') assert.match(beat[1], /guide:|selector:/, `${line.id} has no place to point at`);
+  }
+});
+
 test('the page can be added to the home screen as an app', () => {
   const html = readFileSync(join(CLIENT, 'index.html'), 'utf8');
   assert.match(html, /<link rel="manifest" href="\/manifest\.webmanifest">/);

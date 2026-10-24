@@ -8,7 +8,7 @@ import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, state } from '../state.js';
-import { confirmAction, openSheet, systemPanel, toast, withButton } from '../ui.js';
+import { confirmAction, guided, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { itemDetails, itemSheet, itemSummary } from './character.js';
 
 const RESULT_CLASS = { success: 'result--success', fainted: 'result--fainted', escaped: 'result--escaped' };
@@ -45,7 +45,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
   let firstPlayback = true;
   const actionBox = h('div', { class: 'stack' });
   const fightBox = h('div', { class: 'fight-view' });
-  const tabList = h('div', { class: 'fight-tabs', role: 'tablist', 'aria-label': 'Walki wyprawy' });
+  // The narrator points at the tabs, or at the title of a single fight.
+  const tabList = h('div', { class: 'fight-tabs', role: 'tablist', 'aria-label': 'Walki wyprawy', 'data-guide': 'report-fights' });
 
   // "Powrót" leads back to the tab the report was opened from: Walka or Dziennik.
   const heading = (title, subtitle) =>
@@ -84,12 +85,12 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       container,
       heading('Raport z wyprawy', `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
       summaryCard(report),
-      report.system.length > 0 && systemPanel(...report.system),
+      report.system.length > 0 && guided(systemPanel(...report.system), 'report-system'),
       count > 0 &&
         h(
           'section',
           { class: 'report-section', 'aria-labelledby': 'fights-title' },
-          h('h2', { class: 'section-title', id: 'fights-title', text: `Walki (${count})` }),
+          h('h2', { class: 'section-title', id: 'fights-title', 'data-guide': count === 1 && 'report-fights', text: `Walki (${count})` }),
           count > 1 && tabList,
           fightBox,
         ),
@@ -239,7 +240,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const best = summary.bestFind;
     return h(
       'section',
-      { class: 'card report-summary', 'aria-label': 'Podsumowanie' },
+      { class: 'card report-summary', 'aria-label': 'Podsumowanie', 'data-guide': 'report-summary' },
       h('p', { class: `result ${RESULT_CLASS[report.result] ?? ''}`, text: report.resultText }),
       h(
         'dl',
@@ -335,7 +336,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     if (report.items.length === 0) return null;
     return h(
       'section',
-      { class: 'report-section', 'aria-labelledby': 'items-title' },
+      { class: 'report-section', 'aria-labelledby': 'items-title', 'data-guide': 'report-items' },
       h('h2', { class: 'section-title', id: 'items-title', text: `Łupy i znaleziska (${report.items.length})` }),
       h(
         'ul',
@@ -367,6 +368,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const toggle = h('button', {
       type: 'button',
       class: 'button button--world',
+      'data-guide': 'report-account',
       'aria-expanded': false,
       text: `Pełna relacja (${countOf(report.entries.length, 'wpis', 'wpisy', 'wpisów')})`,
       onClick: () => {

@@ -736,10 +736,8 @@ describe('Time Points and the narrator', () => {
     assert.equal(view.timePoints, start);
     assert.deepEqual(view.tutorial, []);
     const { data } = await call('GET', '/api/content');
-    assert.deepEqual(
-      data.tutorial.cards.map((card) => card.id),
-      ['intro', 'time', 'skip', 'report', 'character', 'camp', 'ending'],
-    );
+    const cards = data.tutorial.lines.filter((line) => line.kind === 'card').map((line) => line.id);
+    assert.deepEqual(cards, ['intro', 'time', 'skip', 'report', 'character', 'camp', 'ending']);
     assert.equal(data.tutorial.startTimePoints, start);
     assert.equal(data.tutorial.$comment, undefined);
   });
@@ -795,13 +793,17 @@ describe('Time Points and the narrator', () => {
     assert.equal((await skip('rest')).data.error.code, 'busy');
   });
 
-  test('the narrator remembers the cards read, and "Pomiń opowieść" marks them all', async () => {
+  test('the narrator remembers the cards and pointers read, and "Pomiń wprowadzenie" marks them all', async () => {
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     assert.deepEqual((await see({ card: 'intro' })).data.character.tutorial, ['intro']);
     assert.deepEqual((await see({ card: 'intro' })).data.character.tutorial, ['intro']);
     assert.deepEqual((await see({ card: 'time' })).data.character.tutorial, ['intro', 'time']);
+    assert.deepEqual((await see({ card: 'report-summary' })).data.character.tutorial, ['intro', 'time', 'report-summary']);
     assert.equal((await see({ card: 'dragon' })).data.error.code, 'invalid_card');
-    assert.equal((await see({ skip: true })).data.character.tutorial.length, 7);
+    // A tap is done when the game moves on, so it is not kept.
+    assert.equal((await see({ card: 'tap-region' })).data.error.code, 'invalid_card');
+    const once = (await call('GET', '/api/content')).data.tutorial.lines.filter((line) => line.kind !== 'tap');
+    assert.deepEqual((await see({ skip: true })).data.character.tutorial, once.map((line) => line.id));
 
     // A character from before the introduction never sees it.
     await (await db()).prepare('UPDATE characters SET tutorial = NULL').run();

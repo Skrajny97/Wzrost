@@ -15,6 +15,12 @@ export function systemPanel(...lines) {
 
 const systemLine = (line) => (line instanceof Node ? line : h('p', { class: 'system-text', text: line }));
 
+// A place the narrator can point at (narrator.js).
+export function guided(element, guide) {
+  element.dataset.guide = guide;
+  return element;
+}
+
 export function pageHeading(title, subtitle) {
   return h(
     'div',

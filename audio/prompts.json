@@ -95,20 +95,20 @@
     },
     "prompts": {
       "intro-river": {
-        "card": "intro",
-        "voice": "River"
+        "voice": "River",
+        "line": "intro"
       },
       "intro-brian": {
-        "card": "intro",
-        "voice": "Brian"
+        "voice": "Brian",
+        "line": "intro"
       },
       "intro-george": {
-        "card": "intro",
-        "voice": "George"
+        "voice": "George",
+        "line": "intro"
       },
       "intro-lily": {
-        "card": "intro",
-        "voice": "Lily"
+        "voice": "Lily",
+        "line": "intro"
       }
     }
   }

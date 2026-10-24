@@ -1,10 +1,11 @@
 {
-  "$comment": "Wprowadzenie narratora: karty na pergaminie, które nowa postać widzi przy pierwszych krokach, i podpowiedzi przy podświetlonych miejscach, które trzeba stuknąć. Chwilę pokazania karty i podświetlenia wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start).",
+  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei. card: narrator czyta z pergaminu, który rozwija się przed kwestią i zwija po niej. point: sam narrator przy podświetlonym miejscu mówi kwestię i czeka na „Dalej”. tap: sam narrator przy podświetlonym miejscu, które trzeba stuknąć. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest.",
   "skipLabel": "Pomiń wprowadzenie",
   "nextLabel": "Dalej",
-  "cards": [
+  "lines": [
     {
       "id": "intro",
+      "kind": "card",
       "text": [
         "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę.",
         "Ja opowiadam tę historię, a Ty ją prowadzisz: przygotowujesz postać, wysyłasz ją w las i czytasz, co tam zaszło."
@@ -12,58 +13,59 @@
     },
     {
       "id": "time",
+      "kind": "card",
       "text": [
         "Czas płynie tu naprawdę: wyprawa trwa tyle, ile wybierzesz. Ale to moja opowieść, więc daję Ci {points} Punktów Czasu. Każdy z nich przewija jedną minutę.",
         "Wybierz Wiatrołomy i wyślij postać na 30 minut. Kiedy wyruszy, przewiniemy ten czas razem."
       ]
     },
+    { "id": "tap-region", "kind": "tap", "text": ["Stuknij Wiatrołomy."] },
+    { "id": "tap-area", "kind": "tap", "text": ["Wybierz Skraj Wiatrołomów."] },
+    { "id": "tap-start", "kind": "tap", "text": ["Suwak stoi na 30 minutach. Stuknij „Wyrusz”."] },
     {
       "id": "skip",
+      "kind": "card",
       "text": [
         "Postać jest już w lesie. Możesz poczekać albo stuknąć „Przewiń” i od razu zobaczyć, co się wydarzyło.",
         "Punktów Czasu nie da się kupić. Kolejne przychodzą z każdym poziomem postaci i klasy, a czasem można je znaleźć w puszczy."
       ]
     },
-    {
-      "id": "report",
-      "text": [
-        "Tak kończy się każda wyprawa: raportem. Możesz obejrzeć każdą walkę po kolei, a niżej sprawdzić łupy i całą relację.",
-        "Ten chłodny głos w niebieskiej ramce to nie ja, tylko System. Mówi krótko, liczbami, i nie zawsze mówi wszystko. Zajrzyj jeszcze do Postaci i do obozu."
-      ]
-    },
+    { "id": "tap-skip", "kind": "tap", "text": ["Przewiń czas Punktami Czasu."] },
+    { "id": "tap-claim", "kind": "tap", "text": ["Odbierz raport."] },
+    { "id": "report", "kind": "card", "text": ["Każda wyprawa kończy się raportem. Pokażę Ci, gdzie patrzeć."] },
+    { "id": "report-summary", "kind": "point", "text": ["Na górze masz wynik wyprawy. Widać tu, co postać zdobyła i ile HP jej zostało."] },
+    { "id": "report-system", "kind": "point", "text": ["Tu odzywa się System. Mówi krótko i podaje same liczby."] },
+    { "id": "report-fights", "kind": "point", "text": ["Tu są walki z tej wyprawy. Stuknij którąś, a zobaczysz ją cios po ciosie. Gwiazdka oznacza najważniejszą."] },
+    { "id": "report-items", "kind": "point", "text": ["Wszystko, co postać znalazła, jest już w plecaku. Tu widzisz, co to było."] },
+    { "id": "report-account", "kind": "point", "text": ["Pełna relacja opowiada całą wyprawę, minuta po minucie."] },
+    { "id": "tap-character", "kind": "tap", "text": ["Zajrzyj do Postaci."] },
     {
       "id": "character",
+      "kind": "card",
       "text": [
         "Tu widać, co postać ma na sobie. Pierwszą broń zdobywa w walce i od razu bierze ją do ręki.",
         "Każdy poziom daje wolne punkty. Rozdasz je w Statystykach, a jeśli nie chcesz liczyć, wystarczy „Rozdaj według klasy”."
       ]
     },
+    { "id": "tap-stats", "kind": "tap", "text": ["Otwórz Statystyki."] },
+    { "id": "tap-points", "kind": "tap", "text": ["Rozdaj wolne punkty jednym stuknięciem."] },
+    { "id": "tap-camp", "kind": "tap", "text": ["Teraz obóz, w prawym górnym rogu."] },
     {
       "id": "camp",
-      "text": [
-        "Ktoś już kiedyś obozował na tej polanie. Zostawił trochę drewna, kamieni i kilka monet. Teraz to wszystko należy do Ciebie.",
-        "Dotknij pustego placu, żeby coś zbudować. Budowa trwa, ale obóz rośnie także wtedy, gdy postać jest na wyprawie."
-      ]
+      "kind": "card",
+      "text": ["Ktoś już kiedyś obozował na tej polanie. Zostawił trochę drewna, kamieni i kilka monet. Teraz to wszystko należy do Ciebie."]
     },
+    { "id": "camp-sawmill", "kind": "point", "text": ["Tu da się postawić tartak. Kiedy stanie, sam będzie ciął drewno."] },
+    { "id": "tap-plot", "kind": "tap", "text": ["Ale zacznij od ogniska. Przy ogniu postać szybciej wraca do sił."] },
+    { "id": "tap-build", "kind": "tap", "text": ["Zbuduj Ognisko."] },
+    { "id": "camp-countdown", "kind": "point", "text": ["Budowa trochę potrwa. Obóz rośnie także wtedy, gdy postać jest na wyprawie."] },
     {
       "id": "ending",
+      "kind": "card",
       "text": [
         "Tyle na początek. Puszcza to dopiero pierwszy krok drogi, która prowadzi dalej, niż sięga wzrok.",
         "Reszty dowiesz się w swoim czasie."
       ]
     }
-  ],
-  "hints": {
-    "region": "Stuknij Wiatrołomy.",
-    "area": "Wybierz Skraj Wiatrołomów.",
-    "start": "Suwak stoi na 30 minutach. Stuknij „Wyrusz”.",
-    "skip": "Przewiń czas Punktami Czasu.",
-    "claim": "Odbierz raport.",
-    "character": "Zajrzyj do Postaci.",
-    "stats": "Otwórz Statystyki.",
-    "points": "Rozdaj wolne punkty jednym stuknięciem.",
-    "camp": "Teraz obóz, w prawym górnym rogu.",
-    "plot": "Stuknij plac Ogniska.",
-    "build": "Zbuduj Ognisko."
-  }
+  ]
 }

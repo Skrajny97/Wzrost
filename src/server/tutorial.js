@@ -1,9 +1,10 @@
-// The narrator's introduction (data/tutorial.json): the page shows a card at
-// its moment and tells the server once it has been read, so it is not shown
-// again on another device. "Pomiń wprowadzenie" marks every card as read.
+// The narrator's introduction (data/tutorial.json): the page shows a card or
+// a pointer at its moment and tells the server once it has been read, so it
+// is not shown again on another device. "Pomiń wprowadzenie" marks them all
+// as read.
 
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
-import { tutorialCards } from './content.js';
+import { tutorialLines } from './content.js';
 import { ApiError, json, readJson } from './http.js';
 
 export async function seeTutorial(context) {
@@ -13,9 +14,9 @@ export async function seeTutorial(context) {
   if (row.tutorial === null) throw new ApiError(409, 'no_tutorial', 'Ta postać nie ma wprowadzenia.');
   const db = context.env.DB;
   if (body.skip === true) {
-    await db.prepare('UPDATE characters SET tutorial = ? WHERE id = ?').bind(JSON.stringify(tutorialCards), row.id).run();
+    await db.prepare('UPDATE characters SET tutorial = ? WHERE id = ?').bind(JSON.stringify(tutorialLines), row.id).run();
   } else {
-    if (!tutorialCards.includes(body.card)) throw new ApiError(400, 'invalid_card', 'Nie ma takiej karty narratora.');
+    if (!tutorialLines.includes(body.card)) throw new ApiError(400, 'invalid_card', 'Nie ma takiej kwestii narratora.');
     // Added in the database, so two cards read at once are both kept.
     await db
       .prepare(

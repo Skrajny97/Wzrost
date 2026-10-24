@@ -1,14 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Wprowadzenie narratora",
-  "description": "Karty narratora dla nowej postaci i podpowiedzi przy podświetleniach. Kod pokazuje kartę i podświetlenie według id, więc każda z siedmiu kart i każda podpowiedź musi być dokładnie raz.",
+  "description": "Kwestie narratora dla nowej postaci, po kolei. Kod wie, kiedy i gdzie pokazać kwestię o danym id, więc każde id jest dokładnie raz (sprawdza to też walidacja).",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "skipLabel",
     "nextLabel",
-    "cards",
-    "hints"
+    "lines"
   ],
   "properties": {
     "$comment": {
@@ -22,15 +21,15 @@
       "type": "string",
       "minLength": 1
     },
-    "cards": {
+    "lines": {
       "type": "array",
-      "minItems": 7,
-      "maxItems": 7,
+      "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "id",
+          "kind",
           "text"
         ],
         "properties": {
@@ -38,12 +37,38 @@
             "enum": [
               "intro",
               "time",
+              "tap-region",
+              "tap-area",
+              "tap-start",
               "skip",
+              "tap-skip",
+              "tap-claim",
               "report",
+              "report-summary",
+              "report-system",
+              "report-fights",
+              "report-items",
+              "report-account",
+              "tap-character",
               "character",
+              "tap-stats",
+              "tap-points",
+              "tap-camp",
               "camp",
+              "camp-sawmill",
+              "tap-plot",
+              "tap-build",
+              "camp-countdown",
               "ending"
             ]
+          },
+          "kind": {
+            "enum": [
+              "card",
+              "point",
+              "tap"
+            ],
+            "description": "card: pergamin, który narrator czyta. point: sam narrator przy podświetlonym miejscu, z przyciskiem „Dalej”. tap: sam narrator przy miejscu, które trzeba stuknąć."
           },
           "text": {
             "type": "array",
@@ -58,83 +83,8 @@
           "voice": {
             "type": "string",
             "pattern": "^audio/narration/[a-z0-9-]+\\.mp3$",
-            "description": "Nagranie głosu narratora, gdy już jest."
+            "description": "Nagranie kwestii, gdy już jest."
           }
-        }
-      }
-    },
-    "hints": {
-      "type": "object",
-      "description": "Krótkie zdanie przy podświetlonym miejscu, które gracz ma stuknąć.",
-      "additionalProperties": false,
-      "required": [
-        "region",
-        "area",
-        "start",
-        "skip",
-        "claim",
-        "character",
-        "stats",
-        "points",
-        "camp",
-        "plot",
-        "build"
-      ],
-      "properties": {
-        "region": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "area": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "start": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "skip": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "claim": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "character": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "stats": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "points": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "camp": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "plot": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "build": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
         }
       }
     }

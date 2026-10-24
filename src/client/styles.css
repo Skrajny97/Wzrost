@@ -3099,7 +3099,8 @@ a.segmented-option {
   }
 
   .guide-ring,
-  .guide-ring--nudge {
+  .guide-ring--nudge,
+  .guide-note .sprite--narrator {
     animation: none;
   }
 }
@@ -3487,12 +3488,13 @@ a.segmented-option {
   letter-spacing: 0.04em;
 }
 
-/* The narrator: a card of parchment in front of the game, with the ethereal
-   figure reading its scroll above the text (narrator.js). */
+/* The narrator: the ethereal figure above a scroll of parchment between two
+   wooden rods. The parchment unrolls before the words and rolls up after
+   them (narrator.js). */
 .narrator {
   width: min(360px, calc(100vw - 2 * var(--gutter)));
   max-width: none;
-  max-height: calc(100dvh - 32px);
+  max-height: calc(100dvh - 16px);
   padding: 0;
   border: none;
   background: transparent;
@@ -3504,29 +3506,71 @@ a.segmented-option {
   background: rgba(5, 8, 4, 0.72);
 }
 
-.narrator-card {
-  display: grid;
-  gap: 8px;
-  max-height: calc(100dvh - 32px);
-  padding: 14px 18px 14px;
-  overflow-y: auto;
-  border: 1px solid #b59a6a;
-  border-radius: 6px;
-  background:
-    radial-gradient(120% 90% at 50% 0%, rgba(255, 250, 235, 0.55), transparent 70%),
-    linear-gradient(#ece2c8, #dfd0ab);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 4px rgba(122, 92, 52, 0.12);
-  font-family: var(--font-world);
-}
-
+/* The figure stands on the upper rod. */
 .narrator-art {
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
+  margin-bottom: -10px;
 }
 
 .sprite--narrator {
   width: 192px;
   height: 256px;
+}
+
+.narrator-scroll {
+  display: grid;
+  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.55));
+}
+
+.narrator-rod {
+  position: relative;
+  height: 14px;
+  margin: 0 -10px;
+  border-radius: 7px;
+  background: linear-gradient(#a27b49, #6b4c2b 55%, #45301b);
+  box-shadow: inset 0 1px 0 rgba(255, 236, 200, 0.35);
+}
+
+/* The knobs at both ends of a rod. */
+.narrator-rod::before,
+.narrator-rod::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  width: 12px;
+  height: 20px;
+  border-radius: 5px;
+  background: linear-gradient(#80603a, #3b2a17);
+}
+
+.narrator-rod::before {
+  left: -9px;
+}
+
+.narrator-rod::after {
+  right: -9px;
+}
+
+.narrator-sheet {
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 250, 235, 0.55), transparent 70%),
+    linear-gradient(#ece2c8, #dfd0ab);
+  box-shadow:
+    inset 0 10px 10px -8px rgba(60, 40, 20, 0.45),
+    inset 0 -10px 10px -8px rgba(60, 40, 20, 0.45);
+}
+
+.narrator-page {
+  display: grid;
+  gap: 8px;
+  max-height: calc(100dvh - 300px);
+  padding: 14px 18px;
+  overflow-y: auto;
+  font-family: var(--font-world);
 }
 
 .narrator-label {
@@ -3562,7 +3606,8 @@ a.segmented-option {
   text-decoration: underline;
 }
 
-.narrator-next {
+.narrator-next,
+.guide-next {
   width: auto;
   margin-left: auto;
   padding: 10px 24px;
@@ -3577,20 +3622,26 @@ a.segmented-option {
   text-transform: none;
 }
 
-/* On short screens the figure keeps its own size. */
+/* On short screens the figure is smaller and the page has more room. */
 @media (max-height: 739px) {
   .sprite--narrator {
     width: 96px;
     height: 128px;
   }
+
+  .narrator-page {
+    max-height: calc(100dvh - 172px);
+  }
 }
 
 /* The light of the first steps: shades take every tap but the one on the
-   lit place, the ring pulses around it and the hint says what to do. */
+   lit place, the ring pulses around it and the narrator stands beside it,
+   with the line in a bubble. */
+/* Above the toasts, so that none covers the narrator's "Dalej". */
 .guide {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 60;
   pointer-events: none;
 }
 
@@ -3631,21 +3682,75 @@ a.segmented-option {
   }
 }
 
-.guide-hint {
+/* The narrator alone, without the scroll: the figure and the bubble. */
+.guide-note {
   position: fixed;
   right: var(--gutter);
   left: var(--gutter);
-  max-width: 340px;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  max-width: 380px;
   margin: 0 auto;
+}
+
+.guide-note .sprite--narrator {
+  flex: none;
+  width: 72px;
+  height: 96px;
+  animation: narrator-float 3.2s ease-in-out infinite;
+}
+
+@keyframes narrator-float {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.guide-bubble {
+  position: relative;
+  display: grid;
+  flex: 1;
+  gap: 8px;
   padding: 10px 14px;
   border: 1px solid #b59a6a;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #eadfc3;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   color: #33281c;
   font-family: var(--font-world);
   font-size: 16px;
-  text-align: center;
+  line-height: 1.4;
+  pointer-events: auto;
+}
+
+.guide-bubble p {
+  margin: 0;
+}
+
+.guide-next {
+  padding: 8px 20px;
+  font-size: 16px;
+}
+
+/* The tail of the bubble, toward the lit place. */
+.guide-bubble::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--tail-x, 50%) - 8px);
+  width: 16px;
+  height: 10px;
+  background: #eadfc3;
+}
+
+.guide-note--below .guide-bubble::before {
+  top: -10px;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.guide-note--above .guide-bubble::before {
+  bottom: -10px;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
 }
 
 .guide-skip {

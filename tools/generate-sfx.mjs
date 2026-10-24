@@ -8,7 +8,7 @@
 // costs 20 credits a second, so the run counts the credits before it starts
 // and stops before it would spend more than --max-credits.
 // A kind with `tts` is speech instead (ElevenLabs text to speech): a prompt is
-// {voice, text} or {voice, card}, a card of the narrator's introduction from
+// {voice, text} or {voice, line}, a line of the narrator's introduction from
 // data/tutorial.json, and it costs credits for each character read.
 
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -53,13 +53,13 @@ const tts = kind.tts ?? null;
 const balance = tts && JSON.parse(readFileSync('data/balance.json', 'utf8'));
 const tutorial = tts && JSON.parse(readFileSync('data/tutorial.json', 'utf8'));
 
-// What a speech prompt reads: its own text, or a narrator's card with the
+// What a speech prompt reads: its own text, or a narrator's line with the
 // starting Time Points filled in, as the game shows it.
 function spokenText(entry) {
   if (entry.text) return entry.text;
-  const card = tutorial.cards.find((candidate) => candidate.id === entry.card);
-  if (!card) fail(`Brak karty ${entry.card} w data/tutorial.json.`);
-  return card.text.join(' ').replaceAll('{points}', String(balance.timePoints.start));
+  const line = tutorial.lines.find((candidate) => candidate.id === entry.line);
+  if (!line) fail(`Brak kwestii ${entry.line} w data/tutorial.json.`);
+  return line.text.join(' ').replaceAll('{points}', String(balance.timePoints.start));
 }
 
 const prompt = (id) => {

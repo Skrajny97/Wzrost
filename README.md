@@ -148,7 +148,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |
 | GET | `/api/reports/:id` | pełny raport |
 | POST | `/api/time/skip` | „Przewiń”: `target` (`activity`, `rest` albo `build`); 1 Punkt Czasu za minutę, przy za małej liczbie punktów skraca o tyle minut, ile ich jest; zwraca `spent` (409 `no_time_points`, `nothing_to_skip`, `busy`) |
-| POST | `/api/tutorial` | karta narratora przeczytana: `card`, albo `skip: true` dla „Pomiń wprowadzenie” (409 `no_tutorial` dla postaci sprzed wprowadzenia) |
+| POST | `/api/tutorial` | kwestia narratora przeczytana, karta albo wskazanie: `card` (jej id), albo `skip: true` dla „Pomiń wprowadzenie” (409 `no_tutorial` dla postaci sprzed wprowadzenia) |
 | POST | `/api/test/skip-time` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wyprawę albo odpoczynek („Pomiń czas”) |
 | POST | `/api/test/skip-build` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu budowę w obozie, a gdy nic się nie buduje, zapełnia magazyny |
 
