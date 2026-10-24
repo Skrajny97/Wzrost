@@ -282,9 +282,10 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     openSheet(itemDetails(item), h('p', { class: 'muted', text: 'Tego przedmiotu nie ma już w plecaku ani w ekwipunku.' }));
   }
 
-  // The scrapper buys what is in the bag, up to a rarity; worn items stay.
+  // The scrapper buys what is in the bag, up to a rarity; worn and upgraded
+  // items stay.
   function scrapperSheet() {
-    const bag = state.character.bag;
+    const bag = state.character.bag.filter((item) => !(item.upgrade > 0));
     const rarities = state.content.rarities;
     const rank = (item) => rarities.findIndex((rarity) => rarity.id === item.rarity);
     openSheet(
@@ -310,7 +311,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           );
         }),
       ),
-      h('p', { class: 'muted', text: 'Założone przedmioty zostają na postaci.' }),
+      h('p', { class: 'muted', text: 'Założone i ulepszone przedmioty zostają.' }),
     );
   }
 

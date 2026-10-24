@@ -1,15 +1,23 @@
 // The character screen: a 3:4 portrait with five equipment slots on each side,
 // an eye that hides the slots, and the bag with items that are not worn.
+// The item card also upgrades the item on the camp's Kowadło.
 
 import { itemSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatNumber, plural } from '../format.js';
-import { SLOT_ICONS, itemIcon } from '../icons.js';
+import { RESOURCE_ICONS, SLOT_ICONS, itemIcon } from '../icons.js';
 import { portrait } from '../portraits.js';
-import { call, isUnlocked, state, unlockInfo } from '../state.js';
-import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, withButton } from '../ui.js';
+import { playSound } from '../sound.js';
+import { call, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
+import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
+
+// An item's name with its upgrade, e.g. "Miecz Mgły +3".
+export const itemTitle = (item) => (item.upgrade > 0 ? `${item.name} +${item.upgrade}` : item.name);
+
+// The number in the corner of a slot: the upgrade level.
+const upgradeBadge = (item) => item.upgrade > 0 && h('span', { class: 'slot-level', text: `+${item.upgrade}` });
 
 // The eye toggle is remembered while the page is open.
 let gearHidden = false;
@@ -82,10 +90,11 @@ export function mountCharacter(container) {
         type: 'button',
         class: 'slot',
         vars: { '--rarity': item.color },
-        'aria-label': `${slot.name}: ${item.name}, ${item.rarityName}`,
+        'aria-label': `${slot.name}: ${itemTitle(item)}, ${item.rarityName}`,
         onClick: () => itemSheet(item, { equipped: true }),
       },
       itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
+      upgradeBadge(item),
     );
   }
 
@@ -114,10 +123,11 @@ export function mountCharacter(container) {
                     type: 'button',
                     class: 'slot slot--bag',
                     vars: { '--rarity': item.color },
-                    'aria-label': `${item.name}, ${item.rarityName}, ${item.slotName}, poziom ${item.level}`,
+                    'aria-label': `${itemTitle(item)}, ${item.rarityName}, ${item.slotName}, poziom ${item.level}`,
                     onClick: () => itemSheet(item, { equipped: false }),
                   },
                   itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
+                  upgradeBadge(item),
                 ),
               ),
             ),
@@ -172,7 +182,7 @@ export function itemSheet(item, { equipped }) {
     const button = event.currentTarget;
     const sure = await confirmAction({
       title: 'Wyrzucić przedmiot?',
-      text: `${item.name} zniknie na zawsze.`,
+      text: `${itemTitle(item)} zniknie na zawsze.`,
       confirmLabel: 'Wyrzuć',
       danger: true,
     });
@@ -184,6 +194,7 @@ export function itemSheet(item, { equipped }) {
     itemDetails(item),
     preview,
     worn && h('div', { class: 'compare' }, h('p', { class: 'compare-title', text: 'Założony teraz' }), itemDetails(worn, { small: true })),
+    anvilSection(item, busy),
     busy && h('p', { class: 'muted', text: 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.' }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
     h(
@@ -198,6 +209,93 @@ export function itemSheet(item, { equipped }) {
     ),
   );
   showPreview(preview, item, equipped);
+}
+
+// Where an item is now: in the bag or worn.
+function ownedItem(id) {
+  const character = state.character;
+  const inBag = character.bag.find((candidate) => candidate.id === id);
+  if (inBag) return { item: inBag, equipped: false };
+  const worn = Object.values(character.equipment).find((candidate) => candidate?.id === id);
+  return worn ? { item: worn, equipped: true } : null;
+}
+
+const percent = (share) => `${formatDecimal(share * 100)}%`;
+
+// The Kowadło part of the item card: the next upgrade with its price, chance
+// and risk, or why there is none. The server rolls the outcome.
+function anvilSection(item, busy) {
+  const anvil = item.anvil;
+  if (!anvil) return null;
+  const title = h('p', { class: 'compare-title', text: 'Kowadło' });
+  if (anvil.level >= anvil.max) {
+    return h('div', { class: 'compare' }, title, h('p', { class: 'muted', text: `Przedmiot ma najwyższe ulepszenie: +${anvil.max}.` }));
+  }
+  const { next } = anvil;
+  if (!next) {
+    const hint =
+      anvil.cap === 0
+        ? 'Zbuduj Kowadło w obozie, żeby ulepszać przedmioty.'
+        : `Kowadło na poziomie ${anvil.cap} ulepsza do +${anvil.cap}. Rozbuduj je w obozie, żeby iść wyżej.`;
+    return h('div', { class: 'compare' }, title, h('p', { class: 'system-hint', text: hint }));
+  }
+  const have = Object.fromEntries(walletEntries().map((entry) => [entry.id, entry]));
+  const missing = Object.entries(next.cost).some(([resource, amount]) => (have[resource]?.amount ?? 0) < amount);
+  const risk =
+    anvil.level === 0
+      ? 'Porażka zabiera tylko złoto i rudę.'
+      : `Porażka zabiera złoto i rudę, a przedmiot spada do +${anvil.level - 1}${
+          next.breakChance > 0 ? `. Z szansą ${percent(next.breakChance)} przedmiot rozpada się` : ''
+        }.`;
+  const upgrade = (event) =>
+    withButton(event.currentTarget, async () => {
+      const { upgrade: done } = await call('POST', `/api/items/${item.id}/upgrade`);
+      if (done.result === 'success') {
+        playSound('done');
+        toast(`Udało się: ${done.name} +${done.to}.`);
+      } else {
+        playSound('defeat');
+        toast(
+          done.result === 'broken'
+            ? `Przedmiot rozpadł się na kowadle: ${done.name} +${done.from}.`
+            : done.to < done.from
+              ? `Nie udało się: ${done.name} spada do +${done.to}.`
+              : `Nie udało się: ${done.name} zostaje na +0.`,
+        );
+      }
+      const owned = ownedItem(done.itemId);
+      if (owned) itemSheet(owned.item, { equipped: owned.equipped });
+      else closeSheet();
+    });
+  return h(
+    'div',
+    { class: 'compare anvil' },
+    title,
+    h('p', { class: 'anvil-step', text: `Ulepszenie +${anvil.level} → +${next.level}` }),
+    h('ul', { class: 'preview-list' }, next.properties.map((line) => h('li', { class: 'preview-up', text: line }))),
+    h('p', { class: 'anvil-chance', text: `Szansa powodzenia: ${percent(next.chance)}` }),
+    h(
+      'ul',
+      { class: 'cost-list', 'aria-label': 'Koszt ulepszenia' },
+      Object.entries(next.cost).map(([resource, amount]) =>
+        h(
+          'li',
+          { class: `cost${(have[resource]?.amount ?? 0) < amount ? ' cost--missing' : ''}` },
+          icon(RESOURCE_ICONS[resource] ?? 'unknown', { size: 16 }),
+          h('span', { text: have[resource]?.name ?? resource }),
+          h('strong', { text: `${formatNumber(have[resource]?.amount ?? 0)} / ${formatNumber(amount)}` }),
+        ),
+      ),
+    ),
+    h('p', { class: 'muted', text: risk }),
+    h('button', {
+      type: 'button',
+      class: 'button button--system',
+      disabled: busy || missing,
+      onClick: upgrade,
+      text: missing ? 'Brakuje złota albo rudy żelaza' : `Ulepsz do +${next.level}`,
+    }),
+  );
 }
 
 // What wearing (or taking off) the item changes, counted by the server.
@@ -238,7 +336,7 @@ export function itemSummary(item) {
   const text = h(
     'span',
     { class: 'item-summary' },
-    h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: item.name }),
+    h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: itemTitle(item) }),
     h('span', { class: 'item-meta', text: `${item.rarityName} · ${item.slotName} · poz. ${item.level}` }),
   );
   const art = itemSprite(item);
@@ -246,7 +344,7 @@ export function itemSummary(item) {
 }
 
 export function itemDetails(item, { small = false } = {}) {
-  const title = h(small ? 'p' : 'h2', { class: 'item-title', vars: { '--rarity': item.color }, text: item.name });
+  const title = h(small ? 'p' : 'h2', { class: 'item-title', vars: { '--rarity': item.color }, text: itemTitle(item) });
   const meta = h('p', { class: 'item-meta', text: `${item.rarityName} · ${item.slotName} · poz. ${item.level}` });
   // The card of an item shows its sprite large, on a frame in its rarity colour.
   const art = !small && itemSprite(item);

@@ -82,5 +82,19 @@
       { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 3 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
+  },
+  {
+    "id": "anvil",
+    "name": "Kowadło",
+    "description": "Kowadło na pniu, a z czasem kuźnia z paleniskiem. Każdy poziom pozwala ulepszać przedmioty o jedno ulepszenie wyżej, aż do +10.",
+    "maxLevel": 10,
+    "effect": { "kind": "upgradeCap", "perLevel": 1, "unit": "count", "text": "Ulepszanie przedmiotów do +{value}" },
+    "costs": [
+      { "resource": "gold", "base": 15, "growth": 2.0 },
+      { "resource": "wood", "base": 6, "growth": 1.9 },
+      { "resource": "stone", "base": 4, "growth": 1.9 },
+      { "resource": "iron-ore", "base": 4, "growth": 1.9 }
+    ],
+    "minutes": { "base": 1, "growth": 2.2 }
   }
 ]

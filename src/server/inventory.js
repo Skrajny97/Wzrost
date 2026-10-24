@@ -1,8 +1,21 @@
-// Wearing, taking off, throwing away and selling items.
+// Wearing, taking off, throwing away, selling and upgrading items.
 
-import { bagCapacity, campBonus, campLevels, canUse, combatValues, sellPrice } from '../engine/index.js';
+import {
+  bagCapacity,
+  campBonus,
+  campLevels,
+  canUse,
+  combatValues,
+  createRng,
+  itemName,
+  missingFor,
+  rollUpgrade,
+  sellPrice,
+  upgradeView,
+} from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, engineCharacter, equippedItems, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
+import { characterView, engineCharacter, equippedItems, loadPlayer, requireIdlePlayer, requirePlayer, walletOf } from './characters.js';
+import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 
 // The scrapper's price for the stored items `ids`, counted in SQL from the
@@ -77,7 +90,8 @@ export async function sellItems(context) {
   const limit = content.rarities.findIndex((rarity) => rarity.id === body.maxRarity);
   if (limit === -1) throw new ApiError(400, 'invalid_rarity', 'Wybierz rzadkość.');
   const rank = (item) => content.rarities.findIndex((rarity) => rarity.id === item.rarity);
-  const sold = player.items.filter((item) => !item.equippedSlot && rank(item) <= limit);
+  // Upgraded items are not sold by the handful: too much went into them.
+  const sold = player.items.filter((item) => !item.equippedSlot && !(item.upgrade > 0) && rank(item) <= limit);
   let count = 0;
   if (sold.length > 0) {
     // One transaction: the gold is counted from the items still there, then
@@ -123,4 +137,63 @@ export async function previewItem(context) {
     };
   };
   return json({ itemId: item.id, equipped: Boolean(item.equippedSlot), now: view(worn), after: view(after) });
+}
+
+// One try at upgrading an item on the camp's Kowadło, paid in gold and iron
+// ore and rolled with a fresh seed (rollUpgrade in the engine). A failure takes
+// the payment and a level, and from +7 on may break the item.
+export async function upgradeItem(context) {
+  const { session, player } = await requireIdlePlayer(context);
+  const item = findItem(player, context.params.id);
+  const cap = campBonus(campLevels(player.buildings, context.now, content), 'upgradeCap', content);
+  const view = upgradeView(item, cap, content);
+  if (view.level >= view.max) throw new ApiError(409, 'max_upgrade', 'Ten przedmiot ma już najwyższe ulepszenie.');
+  if (!view.next) {
+    throw new ApiError(
+      409,
+      'anvil_level',
+      view.cap === 0 ? 'Najpierw zbuduj Kowadło w obozie.' : `Kowadło na poziomie ${view.cap} ulepsza tylko do +${view.cap}.`,
+    );
+  }
+  const { cost } = view.next;
+  if (missingFor(cost, walletOf(player.row)).length > 0) {
+    throw new ApiError(409, 'not_enough', 'Brakuje złota albo rudy żelaza na to ulepszenie.');
+  }
+
+  const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
+  const outcome = rollUpgrade(item, createRng(roll), content);
+  const row = player.row;
+  const ore = '$."iron-ore"';
+  const db = context.env.DB;
+  // The item changes only if it is as seen here (its level and last roll) and
+  // the price is still there; the payment only if this roll was saved, and a
+  // broken item goes after that. So two taps at once make and pay one try.
+  const statements = [
+    db
+      .prepare(
+        `UPDATE items SET data = json_set(data, '$.upgrade', ?, '$.lastRoll', ?)
+         WHERE id = ? AND character_id = ?
+           AND COALESCE(json_extract(data, '$.upgrade'), 0) = ? AND COALESCE(json_extract(data, '$.lastRoll'), '') = ?
+           AND (SELECT gold FROM characters WHERE id = ?) >= ?
+           AND COALESCE(json_extract((SELECT resources FROM characters WHERE id = ?), ?), 0) >= ?`,
+      )
+      .bind(outcome.upgrade, roll, item.id, row.id, view.level, item.lastRoll ?? '', row.id, cost.gold, row.id, ore, cost['iron-ore']),
+    db
+      .prepare(
+        `UPDATE characters SET gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?), version = version + 1
+         WHERE id = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
+      )
+      .bind(cost.gold, ore, ore, cost['iron-ore'], row.id, item.id, roll),
+  ];
+  if (outcome.result === 'broken') {
+    statements.push(db.prepare("DELETE FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?").bind(item.id, roll));
+  }
+  const results = await db.batch(statements);
+  if (results[0].meta.changes !== 1) {
+    throw new ApiError(409, 'item_changed', 'Przedmiot albo zapasy zmieniły się w międzyczasie. Spróbuj jeszcze raz.');
+  }
+  return json({
+    upgrade: { itemId: item.id, name: itemName(item, content), result: outcome.result, from: view.level, to: outcome.upgrade, cost },
+    character: characterView(await loadPlayer(db, session.userId), context.now),
+  });
 }

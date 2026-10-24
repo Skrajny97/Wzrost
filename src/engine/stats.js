@@ -1,6 +1,8 @@
 // Character statistics: where each point comes from, free points and
 // distributing them by class.
 
+import { upgradedItem } from './items.js';
+
 // Totals and their sources (the segments of the source bar on the stats screen).
 export function computeStats(character, equipped, content) {
   const cls = content.classesById[character.classId];
@@ -13,7 +15,8 @@ export function computeStats(character, equipped, content) {
   }
 
   const bonuses = { armor: 0, resist: {} };
-  for (const item of equipped) {
+  for (const worn of equipped) {
+    const item = upgradedItem(worn, content);
     if (item.armor) bonuses.armor += item.armor;
     const properties = [...(item.implicit ? [item.implicit] : []), ...item.affixes];
     for (const { stat, value } of properties) {

@@ -34,6 +34,7 @@ export const CAMP_PLOTS = {
   campfire: { x: 180, y: 192 },
   'loot-shed': { x: 70, y: 236 },
   'scrap-bench': { x: 290, y: 214 },
+  anvil: { x: 180, y: 64 },
 };
 
 // The size of a building's drawing at a level.
@@ -52,6 +53,11 @@ const flame = (x, y, size) =>
   `<ellipse cx="${x}" cy="${y + size * 0.15}" rx="${size * 1.6}" ry="${size * 0.55}" fill="${FIRE}" opacity="0.12"></ellipse>` +
   `<path d="M${x} ${y - size * 1.4} C${x + size * 0.9} ${y - size * 0.6} ${x + size * 0.8} ${y - size * 0.1} ${x + size * 0.45} ${y} L${x - size * 0.45} ${y} C${x - size * 0.8} ${y - size * 0.15} ${x - size * 0.7} ${y - size * 0.8} ${x} ${y - size * 1.4} Z" fill="${FIRE}"></path>` +
   `<path d="M${x} ${y - size * 0.8} C${x + size * 0.4} ${y - size * 0.4} ${x + size * 0.35} ${y - size * 0.1} ${x + size * 0.2} ${y} L${x - size * 0.2} ${y} C${x - size * 0.35} ${y - size * 0.1} ${x - size * 0.3} ${y - size * 0.45} ${x} ${y - size * 0.8} Z" fill="${EMBER}"></path>`;
+// An anvil whose base stands at y, its horn to the left.
+const anvil = (x, y, size = 1) => `<g transform="translate(${x} ${y - 5 * size}) scale(${size})">
+<path d="M-17 -6 Q-12 -8.5 -8 -8.5 H14 V-3 H8 L6 2 H10 V5 H-10 V2 H-6 L-8 -3 H-10 Q-14 -3 -17 -6 Z" fill="#4f5550" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M-8 -7.8 H13.4" stroke="${METAL}" stroke-width="1"></path>
+</g>`;
 const tufts = (spots) =>
   spots.map(([x, y]) => `<path d="M${x - 3} ${y} l1.5 -4 l1.5 4 l1.5 -5 l1.5 5" stroke="#5f7a3f" stroke-width="1" fill="none"></path>`).join('');
 
@@ -241,7 +247,46 @@ ${pole(36, 40, 48, 36, 1.6, WOOD_LIGHT)}<rect x="46" y="32" width="7" height="5"
 <ellipse cx="10" cy="56" rx="4" ry="3" fill="${EMBER}"></ellipse><ellipse cx="10" cy="56" rx="8" ry="6" fill="${FIRE}" opacity="0.16"></ellipse>
 <path d="M80 68 L84 58 L90 60 L93 52 L98 60 L98 68 Z" fill="${STONE_DARK}" stroke="${LINE}" stroke-width="0.8"></path>`,
   ],
+  // An anvil on a stump with a hammer and a bucket; then a stone hearth with
+  // bellows and tongs; then a smithy under a roof, with a chimney and a barrel.
+  anvil: [
+  () => `<rect x="38" y="50" width="24" height="17" fill="${WOOD}" stroke="${LINE}" stroke-width="0.8"></rect>
+<ellipse cx="50" cy="50" rx="12" ry="3.6" fill="${PLANK}" stroke="${LINE}" stroke-width="0.8"></ellipse>
+${anvil(50, 50)}
+${pole(66, 68, 74, 52, 1.8, WOOD_LIGHT)}<rect x="70" y="47" width="9" height="5" rx="1" fill="${METAL}" stroke="${LINE}" stroke-width="0.6" transform="rotate(-25 74.5 49.5)"></rect>
+<path d="M18 68 L20 56 H32 L34 68 Z" fill="${WOOD_DARK}" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M19 61 H33" stroke="${METAL}" stroke-width="1"></path>
+<ellipse cx="26" cy="56" rx="6" ry="1.6" fill="#2e4b52" stroke="${LINE}" stroke-width="0.6"></ellipse>`,
+  () => `<path d="M6 68 V44 Q6 36 18 36 Q30 36 30 44 V68 Z" fill="${STONE}" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M10 50 Q18 42 26 50 V60 H10 Z" fill="${HOLE}"></path>
+<ellipse cx="18" cy="55" rx="10" ry="7" fill="${FIRE}" opacity="0.16"></ellipse>
+<ellipse cx="18" cy="58" rx="6" ry="2.6" fill="${EMBER}"></ellipse>${flame(18, 58, 4)}
+<path d="M30 58 L40 53 L43 59 L33 64 Z" fill="#6b4a30" stroke="${LINE}" stroke-width="0.7"></path>
+<path d="M40 53 L46 50" stroke="${WOOD_LIGHT}" stroke-width="1.4" stroke-linecap="round"></path>
+<rect x="44" y="52" width="22" height="15" fill="${WOOD}" stroke="${LINE}" stroke-width="0.8"></rect>
+<ellipse cx="55" cy="52" rx="11" ry="3.2" fill="${PLANK}" stroke="${LINE}" stroke-width="0.7"></ellipse>
+${anvil(56, 52)}
+${pole(78, 68, 78, 36, 2)}${pole(92, 68, 92, 36, 2)}<path d="M76 40 H94" stroke="${WOOD_LIGHT}" stroke-width="2" stroke-linecap="round"></path>
+<path d="M81 40 v12 M83 40 v12 M88 40 v9 M86 49 h4" stroke="${METAL}" stroke-width="1"></path>`,
+  () => `${pole(6, 68, 6, 26, 2.4)}${pole(94, 68, 94, 26, 2.4)}
+<rect x="15" y="6" width="10" height="16" fill="${STONE_DARK}" stroke="${LINE}" stroke-width="0.7"></rect>
+<path d="M20 6 q-4 -2 -1 -5" stroke="${CLOTH}" stroke-width="1.2" fill="none" opacity="0.55"></path>
+<path d="M0 27 L50 12 L100 27 V31 H0 Z" fill="${WOOD_DARK}" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M12 29 v-4 M26 25 v-6 M40 21 v-7 M60 21 v-7 M74 25 v-6 M88 29 v-4" stroke="${WOOD}" stroke-width="1.2"></path>
+<path d="M8 68 V46 Q8 38 20 38 Q32 38 32 46 V68 Z" fill="${STONE}" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M12 52 Q20 44 28 52 V62 H12 Z" fill="${HOLE}"></path>
+<ellipse cx="20" cy="57" rx="11" ry="8" fill="${FIRE}" opacity="0.18"></ellipse>
+<ellipse cx="20" cy="60" rx="6" ry="2.6" fill="${EMBER}"></ellipse>${flame(20, 60, 5)}
+<rect x="44" y="52" width="22" height="15" fill="${WOOD}" stroke="${LINE}" stroke-width="0.8"></rect>
+<ellipse cx="55" cy="52" rx="11" ry="3.2" fill="${PLANK}" stroke="${LINE}" stroke-width="0.7"></ellipse>
+${anvil(56, 52, 1.1)}
+<circle cx="63" cy="37" r="0.9" fill="${FIRE}"></circle><circle cx="67" cy="34" r="0.7" fill="${FIRE}"></circle><circle cx="59" cy="35" r="0.6" fill="${FIRE}"></circle>
+<rect x="76" y="52" width="14" height="16" rx="2" fill="${WOOD}" stroke="${LINE}" stroke-width="0.8"></rect>
+<path d="M76 57 h14 M76 63 h14" stroke="${METAL}" stroke-width="0.9"></path>
+<ellipse cx="83" cy="52" rx="7" ry="2" fill="#2e4b52" stroke="${LINE}" stroke-width="0.6"></ellipse>`,
+],
 };
+
 
 // Stakes and a rope round the ground of a plot nobody has built on yet.
 const EMPTY_PLOT = `<ellipse cx="50" cy="66" rx="45" ry="12" fill="#262116"></ellipse>
@@ -266,7 +311,7 @@ const TREES = [
 ];
 
 // Firs between the trees: [x, y, size]; boulders by the quarry and the mine: [x, y, radius].
-const FIRS = [[96, 24, 20], [190, 20, 22], [250, 26, 18], [18, 116, 18], [16, 230, 20], [344, 128, 18], [348, 238, 20], [70, 396, 18], [330, 392, 20]];
+const FIRS = [[96, 24, 20], [250, 26, 18], [18, 116, 18], [16, 230, 20], [344, 128, 18], [348, 238, 20], [70, 396, 18], [330, 392, 20]];
 const BOULDERS = [[318, 38, 14], [342, 60, 10], [296, 30, 8], [244, 42, 9], [232, 362, 7], [336, 334, 8], [300, 372, 6]];
 
 const BOARD = `<defs><radialGradient id="camp-glade" cx="0.5" cy="0.52" r="0.62">
@@ -280,8 +325,8 @@ ${BOULDERS.map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 
 <ellipse cx="88" cy="352" rx="10" ry="2.5" fill="#8fe3ef" opacity="0.07"></ellipse>
 <path d="M30 340 q2 -10 0 -16 M34 344 q3 -9 2 -14 M112 352 q2 -9 0 -15 M116 348 q3 -8 1 -13" stroke="#5f7a3f" stroke-width="1.2" fill="none"></path>
 <g fill="none" stroke-linecap="round">
-<path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338" stroke="#2a2218" stroke-width="16"></path>
-<path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338" stroke="#352b1f" stroke-width="10"></path>
+<path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96" stroke="#2a2218" stroke-width="16"></path>
+<path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96" stroke="#352b1f" stroke-width="10"></path>
 </g>
 ${tufts([[128, 70], [232, 120], [140, 304], [326, 176], [36, 186], [212, 372], [118, 156], [252, 196], [150, 110], [40, 300], [320, 260]])}
 <ellipse cx="128" cy="320" rx="16" ry="5" fill="${WOOD}" stroke="${LINE}" stroke-width="0.6" opacity="0.8" transform="rotate(-18 128 320)"></ellipse>

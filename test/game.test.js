@@ -452,11 +452,11 @@ describe('camp', () => {
     }
   }
 
-  test('starts with six buildings at level 0, no resources and a bag of 30', async () => {
+  test('starts with seven buildings at level 0, no resources and a bag of 30', async () => {
     const start = await character();
     assert.deepEqual(
       start.camp.buildings.map((building) => [building.id, building.level]),
-      [['sawmill', 0], ['quarry', 0], ['mine', 0], ['campfire', 0], ['loot-shed', 0], ['scrap-bench', 0]],
+      [['sawmill', 0], ['quarry', 0], ['mine', 0], ['campfire', 0], ['loot-shed', 0], ['scrap-bench', 0], ['anvil', 0]],
     );
     assert.equal(start.camp.construction, null);
     const campfire = start.camp.buildings.find((building) => building.id === 'campfire');
@@ -469,7 +469,7 @@ describe('camp', () => {
     assert.deepEqual(data.resources.map((resource) => resource.name), ['Drewno', 'Kamień', 'Ruda żelaza']);
     assert.deepEqual(
       data.buildings.map((building) => building.name),
-      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Ognisko', 'Szałas na łupy', 'Stół złomiarza'],
+      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Ognisko', 'Szałas na łupy', 'Stół złomiarza', 'Kowadło'],
     );
   });
 
@@ -615,3 +615,82 @@ describe('camp', () => {
     assert.ok(report.entries.some((entry) => /\+\d+\.$/.test(entry.text) && entry.type === 'find'));
   });
 });
+
+describe('upgrades on the Kowadło', () => {
+  let cookie;
+  let itemId;
+  beforeEach(async () => {
+    cookie = await signUp();
+    await newCharacter(cookie, 'warrior');
+    const database = await db();
+    const item = { base: 'chainmail', slot: 'chest', level: 5, rarity: 'common', affixes: [], armor: 15 };
+    itemId = (
+      await database
+        .prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters')
+        .bind(JSON.stringify(item))
+        .run()
+    ).meta.last_row_id;
+  });
+
+  const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
+  const stock = async (gold, resources) =>
+    (await db()).prepare('UPDATE characters SET gold = ?, resources = ?').bind(gold, JSON.stringify(resources)).run();
+  const upgrade = () => call('POST', `/api/items/${itemId}/upgrade`, { cookie });
+  const anvilAt = async (level) =>
+    (await db())
+      .prepare(
+        'INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, ?, ?, 0, 1 FROM characters WHERE true ON CONFLICT (character_id, building_id) DO UPDATE SET level = excluded.level',
+      )
+      .bind('anvil', level)
+      .run();
+
+  test('without the Kowadło an item cannot be upgraded', async () => {
+    const bag = (await character()).bag;
+    assert.deepEqual(bag[0].anvil, { level: 0, cap: 0, max: 10, next: null });
+    const { status, data } = await upgrade();
+    assert.equal(status, 409);
+    assert.equal(data.error.code, 'anvil_level');
+  });
+
+  test('a try is paid in gold and iron ore, and moves the item a level up or keeps it at +0', async () => {
+    await anvilAt(2);
+    await stock(100, { wood: 0, stone: 0, 'iron-ore': 10 });
+    const { status, data } = await upgrade();
+    assert.equal(status, 200);
+    assert.deepEqual(data.upgrade.cost, { gold: 8, 'iron-ore': 2 });
+    assert.equal(data.character.gold, 92);
+    assert.equal(data.character.resources['iron-ore'], 8);
+    const item = data.character.bag.find((candidate) => candidate.id === itemId);
+    if (data.upgrade.result === 'success') {
+      assert.equal(item.upgrade, 1);
+      assert.equal(item.name, 'Kolczuga');
+      assert.deepEqual(item.properties, ['Pancerz: +16']);
+    } else {
+      assert.equal(data.upgrade.result, 'failure');
+      assert.equal(item.upgrade, 0);
+    }
+  });
+
+  test('the Kowadło caps the upgrade at its level, and the price must be there', async () => {
+    await anvilAt(1);
+    await (await db()).prepare("UPDATE items SET data = json_set(data, '$.upgrade', 1)").run();
+    await stock(1000, { wood: 0, stone: 0, 'iron-ore': 100 });
+    const capped = await upgrade();
+    assert.equal(capped.data.error.code, 'anvil_level');
+    assert.match(capped.data.error.message, /\+1/);
+    await anvilAt(5);
+    await stock(1, { wood: 0, stone: 0, 'iron-ore': 0 });
+    assert.equal((await upgrade()).data.error.code, 'not_enough');
+  });
+
+  test('nothing is upgraded during an exploration, and the scrapper does not sell upgraded items by the handful', async () => {
+    await anvilAt(3);
+    await (await db()).prepare("UPDATE items SET data = json_set(data, '$.upgrade', 2)").run();
+    const sale = await call('POST', '/api/items/sell', { cookie, body: { maxRarity: 'divine' } });
+    assert.equal(sale.data.sold.count, 0);
+    await stock(1000, { wood: 0, stone: 0, 'iron-ore': 100 });
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.equal((await upgrade()).data.error.code, 'busy');
+  });
+});
+

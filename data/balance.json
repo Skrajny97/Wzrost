@@ -45,6 +45,16 @@
     "sellGoldPerLevel": 1,
     "bagSlots": 30
   },
+  "upgrades": {
+    "bonusPerLevel": 0.06,
+    "chances": [0.95, 0.9, 0.85, 0.75, 0.65, 0.55, 0.45, 0.35, 0.25, 0.15],
+    "breakFrom": 7,
+    "breakChance": 0.1,
+    "goldPerItemLevel": 1.5,
+    "oreBase": 1,
+    "orePerItemLevel": 0.15,
+    "costGrowth": 1.6
+  },
   "hunt": {
     "minMinutes": 1,
     "stepMinutes": 5,

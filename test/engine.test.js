@@ -8,6 +8,7 @@ import {
   autoEquip,
   bagCapacity,
   bagOverflow,
+  breakChance,
   buildingLevel,
   campBonus,
   campLevels,
@@ -18,8 +19,12 @@ import {
   production,
   regenPerMinute,
   restBonus,
+  upgradeChance,
   upgradeCost,
   upgradeMinutes,
+  upgradeView,
+  upgradedItem,
+  rollUpgrade,
   canUse,
   computeStats,
   createRng,
@@ -38,6 +43,7 @@ import {
   huntingHours,
   huntReport,
   itemName,
+  itemUpgradeCost,
   itemProperties,
   lowLevelMultiplier,
   monsterCombatant,
@@ -678,7 +684,7 @@ describe('camp', () => {
     assert.equal(buildingLevel(stored.campfire, 4999), 1);
     assert.equal(buildingLevel(stored.campfire, 5000), 2);
     assert.equal(buildingLevel(undefined, 5000), 0);
-    assert.deepEqual(campLevels(stored, 4000, content), { sawmill: 0, quarry: 0, mine: 0, campfire: 1, 'loot-shed': 0, 'scrap-bench': 0 });
+    assert.deepEqual(campLevels(stored, 4000, content), { sawmill: 0, quarry: 0, mine: 0, campfire: 1, 'loot-shed': 0, 'scrap-bench': 0, anvil: 0 });
     assert.equal(construction(stored, 4000).buildingId, 'campfire');
     assert.equal(construction(stored, 5000), null);
     assert.deepEqual(missingFor({ gold: 19, wood: 6 }, { gold: 20, wood: 2 }), [{ resource: 'wood', amount: 4 }]);
@@ -810,3 +816,75 @@ describe('resources', () => {
     assert.equal(short.entries.filter((entry) => entry.type === 'gather').length, 0);
   });
 });
+
+describe('upgrades', () => {
+  const sword = { base: 'sword', slot: 'weapon', level: 20, rarity: 'rare', element: undefined, affixes: [{ id: 'bear', kind: 'prefix', stat: 'strength', value: 10 }], damage: { min: 30, max: 45 } };
+  const mail = { base: 'chainmail', slot: 'chest', level: 5, rarity: 'common', affixes: [], armor: 15 };
+  // Scripted rolls: the next value in turn for each chance() call.
+  const rolls = (...values) => ({ chance: (probability) => values.shift() < probability });
+
+  test('each level of upgrade adds 6% of every base number, rounded', () => {
+    assert.equal(upgradedItem(sword, content), sword);
+    const plus5 = upgradedItem({ ...sword, upgrade: 5 }, content);
+    assert.deepEqual(plus5.damage, { min: 39, max: 59 });
+    assert.equal(plus5.affixes[0].value, 13);
+    assert.equal(upgradedItem({ ...mail, upgrade: 10 }, content).armor, 24);
+    // The card shows the upgraded numbers; the stored item keeps its own.
+    assert.deepEqual(itemProperties({ ...mail, upgrade: 10 }, content), ['Pancerz: +24']);
+    assert.equal(mail.armor, 15);
+  });
+
+  test('worn upgraded items count with their upgraded numbers', () => {
+    const character = { classId: 'warrior', classLevel: 1, level: 1, points: {} };
+    const plain = computeStats(character, [mail, sword], content);
+    const upgraded = computeStats(character, [{ ...mail, upgrade: 10 }, { ...sword, upgrade: 10 }], content);
+    assert.equal(upgraded.bonuses.armor - plain.bonuses.armor, 9);
+    assert.equal(upgraded.sources.strength.equipment - plain.sources.strength.equipment, 6);
+  });
+
+  test('the price grows with the item level, its rarity and each level of upgrade', () => {
+    assert.deepEqual(itemUpgradeCost(mail, 1, content), { gold: 8, 'iron-ore': 2 });
+    assert.deepEqual(itemUpgradeCost(mail, 2, content), { gold: 12, 'iron-ore': 3 });
+    assert.deepEqual(itemUpgradeCost(mail, 10, content), { gold: 515, 'iron-ore': 120 });
+    const common = itemUpgradeCost({ ...sword, rarity: 'common' }, 3, content);
+    const rare = itemUpgradeCost(sword, 3, content);
+    assert.ok(rare.gold > common.gold && rare['iron-ore'] > common['iron-ore']);
+  });
+
+  test('the chance falls from 95% to 15%, and from +7 a failure may break the item', () => {
+    assert.deepEqual([1, 2, 5, 10].map((target) => upgradeChance(target, content)), [0.95, 0.9, 0.65, 0.15]);
+    assert.deepEqual([0, 6, 7, 9].map((level) => breakChance(level, content)), [0, 0, 0.1, 0.1]);
+  });
+
+  test('a roll succeeds, fails a level, or from +7 breaks the item', () => {
+    assert.deepEqual(rollUpgrade({ ...mail, upgrade: 2 }, rolls(0.5), content), { result: 'success', upgrade: 3 });
+    assert.deepEqual(rollUpgrade({ ...mail, upgrade: 2 }, rolls(0.99, 0), content), { result: 'failure', upgrade: 1 });
+    // At +0 a failure costs only the payment.
+    assert.deepEqual(rollUpgrade(mail, rolls(0.99, 0), content), { result: 'failure', upgrade: 0 });
+    assert.deepEqual(rollUpgrade({ ...mail, upgrade: 7 }, rolls(0.99, 0.05), content), { result: 'broken', upgrade: 7 });
+    assert.deepEqual(rollUpgrade({ ...mail, upgrade: 7 }, rolls(0.99, 0.5), content), { result: 'failure', upgrade: 6 });
+    // On real random numbers: at +8, about 25% success and 7.5% broken.
+    const rng = createRng('anvil');
+    const counts = { success: 0, failure: 0, broken: 0 };
+    for (let i = 0; i < 20000; i++) counts[rollUpgrade({ ...mail, upgrade: 8 }, rng, content).result]++;
+    assert.ok(Math.abs(counts.success / 20000 - 0.25) < 0.02, JSON.stringify(counts));
+    assert.ok(Math.abs(counts.broken / 20000 - 0.075) < 0.015, JSON.stringify(counts));
+  });
+
+  test('the Kowadło allows as many levels as its own level, up to +10', () => {
+    assert.equal(upgradeView(mail, 0, content).next, null);
+    const view = upgradeView({ ...mail, upgrade: 2 }, 3, content);
+    assert.deepEqual([view.level, view.cap, view.max, view.next.level], [2, 3, 10, 3]);
+    assert.deepEqual(view.next.properties, ['Pancerz: +18']);
+    assert.equal(upgradeView({ ...mail, upgrade: 3 }, 3, content).next, null);
+    assert.equal(upgradeView({ ...mail, upgrade: 10 }, 10, content).next, null);
+    assert.equal(campBonus({ anvil: 4 }, 'upgradeCap', content), 4);
+  });
+
+  test('a full bag sells upgraded items last', () => {
+    const plain = { ...mail, id: 1, rarity: 'rare' };
+    const upgraded = { ...mail, id: 2, upgrade: 3 };
+    assert.deepEqual(bagOverflow([upgraded, plain], 1, 'warrior', content), [1]);
+  });
+});
+

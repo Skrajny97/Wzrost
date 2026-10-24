@@ -494,3 +494,26 @@ Zmiany poniżej wynikają z kolejnej wiadomości autora. Najważniejsze: budynki
    Do czasu grafik gra pokazuje dotychczasowe ikony. Wektorowe popiersia klas z podglądu zostają wstępnie i wejdą do walki razem ze sprite'ami.
 9. **Jak powstają grafiki.** Opisy, style i rozmiary są w `art/prompts.json`. Przebieg „Grafiki (szkice)” (`.github/workflows/art.yml`), uruchamiany ręcznie, woła `tools/generate-art.mjs` z sekretem repozytorium `RETRO_DIFFUSION_API_KEY`. Skrypt najpierw darmowo wycenia każde zapytanie i nie wydaje więcej niż limit przebiegu, domyślnie 2 USD. Szkice z przezroczystym tłem trafiają na osobną gałąź `art-drafts`, której workflow gry nie testuje ani nie wdraża. Zatwierdzone sprite'y trafią do `src/client/art/`, a wybrane z nich, jako wzorce stylu dla kolejnych, do `art/references/`.
 
+## Kowadło i ulepszanie przedmiotów (24.10.2026)
+
+Zmiany poniżej wynikają z kolejnej wiadomości autora. Najważniejsze: w obozie stoi Kowadło, które pozwala ulepszać przedmioty od +1 do +10, a każdy jego poziom pozwala iść o jedno ulepszenie wyżej.
+
+1. **Kowadło.** Zgodnie z życzeniem autora obóz ma siódmy budynek, Kowadło, z 10 poziomami (`data/buildings.json`, premia `upgradeCap`). Kowadło na poziomie L pozwala ulepszać przedmioty do +L, więc na poziomie 10 do +10. Poziom 1 kosztuje 15 złota, 6 drewna, 4 kamienia i 4 rudy żelaza. Złoto rośnie dwukrotnie z każdym poziomem, a zasoby 1,9 raza, czasy są jak w innych budynkach. Na planszy Kowadło stoi u góry, między Tartakiem a Kamieniołomem, a prowadzi do niego ścieżka od Ogniska. Jego rysunki to kowadło na pniu (poziomy 1–3), palenisko z miechem (4–7) i kuźnia pod dachem z kominem (8–10).
+2. **Od początku gry.** Zgodnie z odpowiedzią autora Kowadło można zbudować od pierwszego poziomu postaci, jak inne budynki obozu. Ulepszanie nie czeka już na poziom 25 i Etap 6, a tabela odblokowań w dokumencie projektowym zostawia na poziomie 25 same lochy. Zasady z dokumentu zostają bez zmian:
+   - ulepszanie od +1 do +10, z rosnącym kosztem i rosnącą szansą porażki,
+   - porażka zabiera materiały i obniża ulepszenie o jeden, a na +0 kosztuje tylko materiały,
+   - od +7 porażka może zniszczyć przedmiot.
+
+   Ochronny zwój z profesji dojdzie razem z profesjami.
+3. **Co daje ulepszenie.** Każdy poziom podnosi wszystkie liczby przedmiotu o 6% ich wartości bazowej, z zaokrągleniem: obrażenia broni, pancerz, cechy i odporności (`bonusPerLevel` w `data/balance.json`). Ulepszenie +10 daje więc 60% więcej. Małe liczby rosną później: cecha +3 zmienia się dopiero przy +3. Karta przedmiotu, ekran statystyk, walka i zagrożenie liczą przedmiot z ulepszeniem. Cena u złomiarza się nie zmienia.
+4. **Koszt.** Ulepszenie kosztuje złoto i rudę żelaza i rośnie 1,6 raza z każdym poziomem (`upgrades` w `data/balance.json`):
+   - złoto: poziom przedmiotu × 1,5 × mnożnik budżetu rzadkości (od 1 dla pospolitych do 4 dla boskich),
+   - ruda: (1 + poziom przedmiotu × 0,15) × ten sam mnożnik.
+
+   Pospolity przedmiot z poziomu 5 kosztuje na +1 8 złota i 2 rudy, a na +10 515 złota i 120 rudy. Z poziomu 20 to 30 złota i 4 rudy na +1 oraz 2062 złota i 275 rudy na +10. Godzina eksploracji na poziomie 20 daje ok. 200 złota, więc pierwsze ulepszenie kosztuje ok. 9 minut zarobku, a próba +10 ok. 10 godzin.
+5. **Szanse.** Szansa powodzenia na kolejne poziomy to 95, 90, 85, 75, 65, 55, 45, 35, 25 i 15%. Dokument mówi „od +7 wzwyż”, więc szansę zniszczenia ma przedmiot, który ma już +7 albo więcej: porażka niszczy go wtedy z szansą 10%. Próba +8 z +7 kończy się więc zniszczeniem w ok. 6,5% przypadków, a próba +10 z +9 w ok. 8,5%.
+6. **Ulepszanie od razu.** Próba nie ma timera: serwer losuje wynik nowym ziarnem i od razu go zapisuje. Ulepszyć nie da się podczas eksploracji, tak jak zmienić ekwipunek, bo założone przedmioty liczą się do wyniku wyprawy.
+7. **Wygląd.** Karta przedmiotu ma część „Kowadło”: ulepszenie przed i po próbie, liczby po ulepszeniu, szansę, koszt z tym, co gracz ma, skutek porażki i przycisk „Ulepsz do +N”. Gdy Kowadła nie ma albo jest za niskie, karta mówi, co zbudować. Nazwa przedmiotu ma ulepszenie na końcu, np. „Kolczuga +3”, a róg slotu pokazuje „+3”, jak zapowiadał dokument. Wynik pokazuje krótki komunikat, z dzwonkiem przy powodzeniu i niskim tonem przy porażce.
+8. **Ochrona ulepszonych przedmiotów.** Złomiarz nie kupuje ich hurtem przyciskiem w raporcie, a gdy plecak się przepełnia, sprzedaje je na końcu.
+9. **API i baza.** `POST /api/items/:id/upgrade` próbuje ulepszyć przedmiot i zwraca wynik (`success`, `failure` albo `broken`), poziom przed i po próbie oraz koszt. Błędy to `anvil_level` (brak Kowadła albo za niski poziom), `max_upgrade`, `not_enough`, `busy` i `item_changed`. Przedmiot w API ma pola `upgrade` i `anvil` (poziom, najwyższe ulepszenie Kowadła i następna próba z kosztem, szansami i liczbami). Poziom ulepszenia i ziarno ostatniej próby są w danych przedmiotu (`upgrade`, `lastRoll`), więc nie trzeba migracji. Zapis, zapłata i ewentualne usunięcie przedmiotu idą w jednej transakcji, warunkowanej tym, co serwer widział, więc dwa dotknięcia naraz to jedna próba.
+

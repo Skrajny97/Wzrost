@@ -7,7 +7,7 @@ import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints
 import { publicContent } from './content.js';
 import { ApiError, errorResponse, json } from './http.js';
 import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
-import { discardItem, equipItem, previewItem, sellItems, unequipItem } from './inventory.js';
+import { discardItem, equipItem, previewItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { getReport, listReports } from './reports.js';
 import { skipBuilding, skipTime } from './testing.js';
 
@@ -28,6 +28,7 @@ const routes = [
   ['POST', '/api/items/:id/unequip', unequipItem],
   ['POST', '/api/items/:id/discard', discardItem],
   ['GET', '/api/items/:id/preview', previewItem],
+  ['POST', '/api/items/:id/upgrade', upgradeItem],
   ['POST', '/api/items/sell', sellItems],
   ['GET', '/api/hunts/options', huntOptions],
   ['POST', '/api/hunts', startHunt],

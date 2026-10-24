@@ -186,7 +186,9 @@ export function characterView(player, now) {
   const perPoint = statEffects(character, equipped, content);
   const levels = campLevels(player.buildings, now, content);
   const sellBonus = campBonus(levels, 'sellPrice', content);
-  const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus }) });
+  // The Kowadło's level is the highest upgrade it allows.
+  const upgradeCap = campBonus(levels, 'upgradeCap', content);
+  const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap }) });
   const { gold, ...resources } = walletOf(row);
   const weapon = combatant.weapon;
 

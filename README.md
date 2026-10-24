@@ -133,6 +133,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/items/:id/equip` | załóż przedmiot z plecaka |
 | POST | `/api/items/:id/unequip` | zdejmij przedmiot do plecaka |
 | POST | `/api/items/:id/discard` | wyrzuć przedmiot z plecaka |
+| POST | `/api/items/:id/upgrade` | Kowadło: jedna próba ulepszenia przedmiotu o poziom, za złoto i rudę żelaza |
 | POST | `/api/items/sell` | złomiarz: sprzedaj przedmioty z plecaka o rzadkości do `maxRarity` włącznie (cena z premią Stołu złomiarza) |
 | POST | `/api/camp/build` | zacznij budowę następnego poziomu budynku obozu: `buildingId`; naraz jedna budowa; budynek produkcyjny najpierw oddaje zawartość magazynu |
 | POST | `/api/camp/collect` | zbierz magazyn budynku produkcyjnego: `buildingId`; zwraca `collected` (409 `nothing_to_collect`, gdy magazyn jest pusty) |

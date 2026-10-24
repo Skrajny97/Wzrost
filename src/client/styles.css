@@ -1425,6 +1425,23 @@ a.segmented-option {
   text-transform: uppercase;
 }
 
+/* The Kowadło part of the item card. */
+.anvil-step,
+.anvil-chance {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.anvil-step {
+  font-weight: 600;
+}
+
+.anvil .preview-list li {
+  color: var(--leaf);
+}
+
 .item-list {
   display: flex;
   flex-direction: column;

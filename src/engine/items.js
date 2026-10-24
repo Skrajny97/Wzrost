@@ -2,7 +2,8 @@
 // and rarity. The base always gets the budget of the lowest rarity, so a rarer
 // item is never weaker at its core; the affixes share what the rarity adds.
 // Names follow the Gladiatus pattern "Prefix Base Suffix", with the prefix
-// agreeing with the base's grammatical gender.
+// agreeing with the base's grammatical gender. The Kowadło in the camp
+// upgrades an item from +1 to +10, which raises all of its numbers.
 
 import { budget, weaponDamage } from './formulas.js';
 
@@ -94,19 +95,21 @@ export function sellPrice(item, content, bonus = 0) {
 }
 
 // When the bag holds more than its places, the scrapper buys the weakest
-// items: those the class cannot use first, then by rarity and level, a new
-// find before an item already in the bag (it has an id). Returns the indices
-// of the items to sell.
+// items: those the class cannot use first, upgraded ones last, then by rarity
+// and level, a new find before an item already in the bag (it has an id).
+// Returns the indices of the items to sell.
 export function bagOverflow(items, capacity, classId, content) {
   const extra = items.length - capacity;
   if (extra <= 0) return [];
   const usable = (item) => (canUse(item.base, classId, content) ? 1 : 0);
+  const upgraded = (item) => (item.upgrade > 0 ? 1 : 0);
   const kept = (item) => (item.id === undefined ? 0 : 1);
   return items
     .map((item, index) => ({ item, index }))
     .sort(
       (a, b) =>
         usable(a.item) - usable(b.item) ||
+        upgraded(a.item) - upgraded(b.item) ||
         itemRank(a.item, content) - itemRank(b.item, content) ||
         kept(a.item) - kept(b.item) ||
         a.index - b.index,
@@ -134,7 +137,81 @@ export function propertyName(stat, content) {
   return content.statsById[stat].name;
 }
 
-export function itemProperties(item, content) {
+// The numbers of an upgraded item: each level of upgrade adds bonusPerLevel
+// of every base number (damage, armor, stats), rounded.
+export function upgradedItem(item, content) {
+  const level = item.upgrade ?? 0;
+  if (!level) return item;
+  const factor = 1 + content.balance.upgrades.bonusPerLevel * level;
+  const scale = (value) => Math.round(value * factor);
+  const upgraded = { ...item, affixes: item.affixes.map((affix) => ({ ...affix, value: scale(affix.value) })) };
+  if (item.damage) {
+    const min = scale(item.damage.min);
+    upgraded.damage = { min, max: Math.max(min, scale(item.damage.max)) };
+  }
+  if (item.armor) upgraded.armor = scale(item.armor);
+  if (item.implicit) upgraded.implicit = { ...item.implicit, value: scale(item.implicit.value) };
+  return upgraded;
+}
+
+export const maxUpgrade = (content) => content.balance.upgrades.chances.length;
+
+// The price of upgrading to `target`: gold and iron ore, more for a higher
+// item level, a rarer item and each level further.
+export function itemUpgradeCost(item, target, content) {
+  const tuning = content.balance.upgrades;
+  const factor = content.raritiesById[item.rarity].budget * tuning.costGrowth ** (target - 1);
+  return {
+    gold: Math.max(1, Math.round(item.level * tuning.goldPerItemLevel * factor)),
+    'iron-ore': Math.max(1, Math.round((tuning.oreBase + item.level * tuning.orePerItemLevel) * factor)),
+  };
+}
+
+export const upgradeChance = (target, content) => content.balance.upgrades.chances[target - 1];
+
+// From breakFrom on, a failed upgrade may also break the item.
+export function breakChance(current, content) {
+  const tuning = content.balance.upgrades;
+  return current >= tuning.breakFrom ? tuning.breakChance : 0;
+}
+
+// One try at the next level, with the server's random numbers. A failure takes
+// the payment and one level (none below +0), and from breakFrom on may break
+// the item instead.
+export function rollUpgrade(item, rng, content) {
+  const current = item.upgrade ?? 0;
+  if (rng.chance(upgradeChance(current + 1, content))) return { result: 'success', upgrade: current + 1 };
+  if (rng.chance(breakChance(current, content))) return { result: 'broken', upgrade: current };
+  return { result: 'failure', upgrade: Math.max(0, current - 1) };
+}
+
+// What the item card shows about upgrading: the level, the highest one the
+// Kowadło allows (`cap`, its level), and the next level with its price,
+// chances and the item's numbers after it.
+export function upgradeView(item, cap, content) {
+  const level = item.upgrade ?? 0;
+  const max = maxUpgrade(content);
+  const reach = Math.min(cap, max);
+  const target = level + 1;
+  return {
+    level,
+    cap: reach,
+    max,
+    next:
+      target <= reach
+        ? {
+            level: target,
+            cost: itemUpgradeCost(item, target, content),
+            chance: upgradeChance(target, content),
+            breakChance: breakChance(level, content),
+            properties: itemProperties({ ...item, upgrade: target }, content),
+          }
+        : null,
+  };
+}
+
+export function itemProperties(raw, content) {
+  const item = upgradedItem(raw, content);
   const lines = [];
   if (item.damage) {
     const base = content.basesById[item.base];
@@ -168,7 +245,9 @@ export function autoEquip(equipped, items, content, classId) {
   return [...best.values()].sort((a, b) => a - b);
 }
 
-export function itemView(item, content, { sellBonus = 0 } = {}) {
+// `upgradeCap`: the level of the camp's Kowadło, for the upgrade part of the
+// item card; left out where the card cannot upgrade (a report).
+export function itemView(item, content, { sellBonus = 0, upgradeCap } = {}) {
   const rarity = content.raritiesById[item.rarity];
   const classIds = baseClasses(item.base, content);
   return {
@@ -177,6 +256,7 @@ export function itemView(item, content, { sellBonus = 0 } = {}) {
     slot: item.slot,
     slotName: content.slotsById[item.slot].name,
     level: item.level,
+    upgrade: item.upgrade ?? 0,
     rarity: rarity.id,
     rarityName: rarity.name,
     color: rarity.color,
@@ -185,5 +265,6 @@ export function itemView(item, content, { sellBonus = 0 } = {}) {
     classIds,
     classNames: classIds && classIds.map((id) => content.classesById[id].name),
     price: sellPrice(item, content, sellBonus),
+    ...(upgradeCap === undefined ? {} : { anvil: upgradeView(item, upgradeCap, content) }),
   };
 }

@@ -2,6 +2,7 @@
 // the combat code treats both alike (and later companions or other players).
 
 import { budget, cappedChance, damageScale, maxHp, speed, weaponDamage } from './formulas.js';
+import { upgradedItem } from './items.js';
 import { gearLevel } from './progression.js';
 import { computeStats } from './stats.js';
 
@@ -46,7 +47,8 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
 // How a strike looks in the fight animation: a blow, an arrow or a spell.
 const strikeOf = (strike, category) => strike ?? (category === 'magical' ? 'magic' : 'melee');
 
-function itemWeapon(item, content) {
+function itemWeapon(worn, content) {
+  const item = upgradedItem(worn, content);
   const base = content.basesById[item.base];
   return {
     attackName: base.attackName,

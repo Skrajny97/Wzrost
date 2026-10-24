@@ -19,8 +19,8 @@
         "required": ["kind", "perLevel", "unit", "text"],
         "properties": {
           "kind": {
-            "enum": ["restSpeed", "bagSlots", "sellPrice", "production"],
-            "description": "restSpeed: szybszy odpoczynek między wyprawami (ułamek), bagSlots: miejsca w plecaku, sellPrice: wyższe ceny u złomiarza (ułamek), production: budynek wytwarza zasób (resource)."
+            "enum": ["restSpeed", "bagSlots", "sellPrice", "production", "upgradeCap"],
+            "description": "restSpeed: szybszy odpoczynek między wyprawami (ułamek), bagSlots: miejsca w plecaku, sellPrice: wyższe ceny u złomiarza (ułamek), production: budynek wytwarza zasób (resource), upgradeCap: najwyższe ulepszenie przedmiotów (Kowadło)."
           },
           "perLevel": { "type": "number", "exclusiveMinimum": 0, "description": "Premia za poziom; przy production zasób na godzinę za poziom." },
           "resource": { "type": "string", "minLength": 1, "description": "Tylko production: wytwarzany zasób (resources.json)." },
