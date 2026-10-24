@@ -351,15 +351,15 @@ describe('hunts and reports', () => {
 
   test('"Pomiń czas" in test mode ends the hunt at once, then the rest', async () => {
     assert.equal((await call('GET', '/api/me', { cookie })).data.user.testMode, true);
-    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 45 } });
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
     const skipped = await call('POST', '/api/test/skip-time', { cookie });
     assert.equal(skipped.status, 200);
     const activity = skipped.data.character.activity;
     assert.equal(activity.finished, true);
-    assert.equal(activity.endsAt - activity.startedAt, 45 * 60000);
+    assert.equal(activity.endsAt - activity.startedAt, 30 * 60000);
     const claim = await call('POST', '/api/hunts/claim', { cookie });
     assert.equal(claim.status, 200);
-    assert.equal(claim.data.report.minutes, 45);
+    assert.equal(claim.data.report.minutes, 30);
 
     // Without a hunt it fills HP.
     await (await db()).prepare('UPDATE characters SET hp = 1, hp_at = ?').bind(Date.now()).run();
@@ -371,19 +371,21 @@ describe('hunts and reports', () => {
     await assert.rejects(skipTime({ env: { TEST_MODE: 'off' } }), (error) => error.status === 404);
   });
 
-  test('level 1 hunts are short; long ones open at level 2', async () => {
+  test('hunts last up to 30 minutes at first; longer ones open at levels 25, 35 and 50', async () => {
     const before = (await call('GET', '/api/character', { cookie })).data.character;
-    assert.deepEqual([before.huntDurations[0], before.huntDurations[1], before.huntDurations.at(-1)], [1, 5, 45]);
+    assert.deepEqual([before.huntDurations[0], before.huntDurations[1], before.huntDurations.at(-1)], [1, 5, 30]);
+    assert.deepEqual(before.huntNext, { level: 25, minutes: 60 });
     assert.deepEqual(before.features, []);
-    const locked = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 50 } });
+    const locked = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 35 } });
     assert.equal(locked.status, 403);
     assert.equal(locked.data.error.code, 'duration_locked');
+    assert.match(locked.data.error.message, /30 minut.*poziomie 25/);
 
-    await (await db()).prepare('UPDATE characters SET level = 2').run();
+    await (await db()).prepare('UPDATE characters SET level = 25').run();
     const after = (await call('GET', '/api/character', { cookie })).data.character;
-    assert.deepEqual([after.huntDurations[0], after.huntDurations[1], after.huntDurations.at(-1)], [1, 5, 240]);
-    assert.deepEqual(after.features, ['long-hunts', 'stats']);
-    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 85 } })).status, 201);
+    assert.equal(after.huntDurations.at(-1), 60);
+    assert.deepEqual(after.huntNext, { level: 35, minutes: 120 });
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 60 } })).status, 201);
   });
 
   test('a hunt can be called off early, without rewards', async () => {
@@ -605,7 +607,8 @@ describe('camp', () => {
   });
 
   test('resources found on an exploration go to the camp', async () => {
-    await (await db()).prepare('UPDATE characters SET level = 2, class_level = 2').run();
+    // Four-hour explorations open at level 50.
+    await (await db()).prepare('UPDATE characters SET level = 50, class_level = 2').run();
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 240 } });
     await finishHunt();
     const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;

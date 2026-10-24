@@ -94,7 +94,7 @@ Tu zapisujemy decyzje, których nie rozstrzyga [dokument projektowy](https://cla
 
 28. **Silnik liczy tylko serwer.** Serwer przysyła gotowy widok: statystyki, wartości bojowe, skutki punktów i zagrożenie. To najprostsze rozwiązanie z punktu 11 Etapu 0, bez kopiowania plików przy wdrożeniu. Silnik w przeglądarce dodamy, gdy jakiś podgląd będzie musiał działać bez serwera.
 29. **Nawigacja.** Po zalogowaniu gra otwiera zakładkę Walka. „Powrót” z widoku ekwipunku wraca do ostatnio otwartej zakładki menu głównego.
-30. **Odblokowania.** Tabela z dokumentu jest w `data/unlocks.json`. Zablokowane zakładki i przyciski pokazują poziom odblokowania. Moduły, które jeszcze nie powstały (Profesje, Osada, Umiejętności, Rdzeń, Trening, Lochy), pokazują komunikat Systemu. Komunikat po awansie dopisujemy do tabeli dopiero wtedy, gdy moduł istnieje. Dziś są dwa, oba na poziomie 2: długie polowania i ekran Statystyki.
+30. **Odblokowania.** Tabela z dokumentu jest w `data/unlocks.json`. Zablokowane zakładki i przyciski pokazują poziom odblokowania. Moduły, które jeszcze nie powstały (Profesje, Osada, Umiejętności, Rdzeń, Trening, Lochy), pokazują komunikat Systemu. Komunikat po awansie dopisujemy do tabeli dopiero wtedy, gdy moduł istnieje. Dziś są dwa, oba na poziomie 2: długie polowania i ekran Statystyki. *Długie polowania na poziomie 2 są nieaktualne: zob. „Drabinka eksploracji i lochy”, punkt 1.*
 31. **Raport.** Kolejność jest taka:
     1. podsumowanie,
     2. komunikaty Systemu (awans, odblokowania, kara),
@@ -231,7 +231,7 @@ Zmiany poniżej wynikają z kolejnych uwag autora po testach na telefonie i zast
    - średnia: 31–120 minut,
    - długa: ponad 2 godziny.
 
-   Nazwy są tylko podpowiedzią, bo o wszystkim decyduje czas. Punkt zastępuje minimum 5 minut z punktu 1 „Odpowiedzi autora na otwarte kwestie” i zakres suwaka z punktu 20 „Odpowiedzi autora po wdrożeniu”.
+   Nazwy są tylko podpowiedzią, bo o wszystkim decyduje czas. Punkt zastępuje minimum 5 minut z punktu 1 „Odpowiedzi autora na otwarte kwestie” i zakres suwaka z punktu 20 „Odpowiedzi autora po wdrożeniu”. *Zakres suwaka jest nieaktualny: zob. „Drabinka eksploracji i lochy”, punkt 1.*
 10. **Złoto z krótkich wypraw.** Złoto z walk sumujemy bez zaokrągleń i zaokrąglamy dopiero wynik. Wcześniej przy 5-minutowej wyprawie każdy przeciwnik dawał ułamek złota zaokrąglany do zera.
 
 ### Walka i przedmioty
@@ -312,7 +312,7 @@ Zmiany poniżej wynikają z trzech kolejnych wiadomości autora i zastępują ws
     - osada na poziomie 20 (wcześniej 10),
     - lochy na poziomie 25 (wcześniej 12).
 
-    Darmowe zerowanie statystyk działa do poziomu 20 (wcześniej 10), a pierwsza ewolucja klasy jest na poziomie klasy 30 (wcześniej 25). Dokument projektowy ma nową tabelę odblokowań. Punkt zastępuje poziomy odblokowań z punktu 1 „Nowej skali i eksploracji” i próg zerowania z punktu 6 Etapu 1.
+    Darmowe zerowanie statystyk działa do poziomu 20 (wcześniej 10), a pierwsza ewolucja klasy jest na poziomie klasy 30 (wcześniej 25). Dokument projektowy ma nową tabelę odblokowań. Punkt zastępuje poziomy odblokowań z punktu 1 „Nowej skali i eksploracji” i próg zerowania z punktu 6 Etapu 1. *Lochy są teraz na poziomie 50: zob. „Drabinka eksploracji i lochy”, punkt 3.*
 11. **Mag: trudniejszy start.** Zgodnie z odpowiedzią autora Mag zostaje trudniejszą klasą na starcie. Ekran tworzenia postaci pokazuje przy nim znacznik „trudniejszy start”, a przy Wojowniku i Kleryku dalej „łagodniejszy start” (pole `start` w `data/classes.json`: `gentle`, `normal` albo `hard`). Opis Maga kończy się zdaniem „Pierwsze kroki są trudne, a magia z czasem się odwdzięcza.” Łatwiej ma mu być później dzięki umiejętnościom i ewolucji klasy (Etap 3), co zapisuje dokument projektowy. Dziś Mag ma największe ryzyko na długich wyprawach (punkt 17).
 12. **Mniej prowadzenia za rękę.** Zgodnie z uwagą autora komunikat Systemu w zakładce Walka mówi tylko: „Wiatrołomy to najbezpieczniejsze miejsce na start. Wybierz czas eksploracji i wyrusz.” Tak samo skróciliśmy komunikat przy tworzeniu postaci do „Wykryto nową istotę na skraju puszczy. Wybierz ścieżkę klasy i podaj imię.” Gra nie mówi już na starcie, że postać nie ma broni, ani co znaczą znaczniki startu. Punkt zastępuje zdanie o komunikatach z punktu 1 „Uwag autora po Etapie 1”.
 
@@ -491,7 +491,7 @@ Zmiany poniżej wynikają z kolejnej wiadomości autora. Najważniejsze: budynki
    - stwory: sprite 48×48 w całej postaci, w walce w polu ok. 72×72 px, bo karta ma na typowym telefonie ok. 82 px szerokości,
    - przedmioty: 32×32, w slotach ekwipunku 40 px, a w karcie przedmiotu 64 px.
 
-   Do czasu grafik gra pokazuje dotychczasowe ikony. Wektorowe popiersia klas z podglądu zostają wstępnie i wejdą do walki razem ze sprite'ami.
+   Do czasu grafik gra pokazuje dotychczasowe ikony. Wektorowe popiersia klas z podglądu zostają wstępnie i wejdą do walki razem ze sprite'ami. *Grafiki są już w grze: zob. „Drabinka eksploracji i lochy”, punkt 6.*
 9. **Jak powstają grafiki.** Opisy, style i rozmiary są w `art/prompts.json`. Przebieg „Grafiki (szkice)” (`.github/workflows/art.yml`), uruchamiany ręcznie, woła `tools/generate-art.mjs` z sekretem repozytorium `RETRO_DIFFUSION_API_KEY`. Skrypt najpierw darmowo wycenia każde zapytanie i nie wydaje więcej niż limit przebiegu, domyślnie 2 USD. Szkice z przezroczystym tłem trafiają na osobną gałąź `art-drafts`, której workflow gry nie testuje ani nie wdraża. Zatwierdzone sprite'y trafią do `src/client/art/`, a wybrane z nich, jako wzorce stylu dla kolejnych, do `art/references/`.
 
 ## Kowadło i ulepszanie przedmiotów (24.10.2026)
@@ -499,7 +499,7 @@ Zmiany poniżej wynikają z kolejnej wiadomości autora. Najważniejsze: budynki
 Zmiany poniżej wynikają z kolejnej wiadomości autora. Najważniejsze: w obozie stoi Kowadło, które pozwala ulepszać przedmioty od +1 do +10, a każdy jego poziom pozwala iść o jedno ulepszenie wyżej.
 
 1. **Kowadło.** Zgodnie z życzeniem autora obóz ma siódmy budynek, Kowadło, z 10 poziomami (`data/buildings.json`, premia `upgradeCap`). Kowadło na poziomie L pozwala ulepszać przedmioty do +L, więc na poziomie 10 do +10. Poziom 1 kosztuje 15 złota, 6 drewna, 4 kamienia i 4 rudy żelaza. Złoto rośnie dwukrotnie z każdym poziomem, a zasoby 1,9 raza, czasy są jak w innych budynkach. Na planszy Kowadło stoi u góry, między Tartakiem a Kamieniołomem, a prowadzi do niego ścieżka od Ogniska. Jego rysunki to kowadło na pniu (poziomy 1–3), palenisko z miechem (4–7) i kuźnia pod dachem z kominem (8–10).
-2. **Od początku gry.** Zgodnie z odpowiedzią autora Kowadło można zbudować od pierwszego poziomu postaci, jak inne budynki obozu. Ulepszanie nie czeka już na poziom 25 i Etap 6, a tabela odblokowań w dokumencie projektowym zostawia na poziomie 25 same lochy. Zasady z dokumentu zostają bez zmian:
+2. **Od początku gry.** Zgodnie z odpowiedzią autora Kowadło można zbudować od pierwszego poziomu postaci, jak inne budynki obozu. Ulepszanie nie czeka już na poziom 25 i Etap 6, a tabela odblokowań w dokumencie projektowym zostawia na poziomie 25 same lochy (*nieaktualne: zob. „Drabinka eksploracji i lochy”, punkt 3*). Zasady z dokumentu zostają bez zmian:
    - ulepszanie od +1 do +10, z rosnącym kosztem i rosnącą szansą porażki,
    - porażka zabiera materiały i obniża ulepszenie o jeden, a na +0 kosztuje tylko materiały,
    - od +7 porażka może zniszczyć przedmiot.
@@ -517,3 +517,31 @@ Zmiany poniżej wynikają z kolejnej wiadomości autora. Najważniejsze: w obozi
 8. **Ochrona ulepszonych przedmiotów.** Złomiarz nie kupuje ich hurtem przyciskiem w raporcie, a gdy plecak się przepełnia, sprzedaje je na końcu.
 9. **API i baza.** `POST /api/items/:id/upgrade` próbuje ulepszyć przedmiot i zwraca wynik (`success`, `failure` albo `broken`), poziom przed i po próbie oraz koszt. Błędy to `anvil_level` (brak Kowadła albo za niski poziom), `max_upgrade`, `not_enough`, `busy` i `item_changed`. Przedmiot w API ma pola `upgrade` i `anvil` (poziom, najwyższe ulepszenie Kowadła i następna próba z kosztem, szansami i liczbami). Poziom ulepszenia i ziarno ostatniej próby są w danych przedmiotu (`upgrade`, `lastRoll`), więc nie trzeba migracji. Zapis, zapłata i ewentualne usunięcie przedmiotu idą w jednej transakcji, warunkowanej tym, co serwer widział, więc dwa dotknięcia naraz to jedna próba.
 
+
+## Drabinka eksploracji i lochy (24.10.2026)
+
+Zmiany poniżej wynikają z kolejnej wiadomości autora i jego odpowiedzi. Najważniejsze: eksploracje wydłużają się stopniowo, od 30 minut na starcie do 4 godzin na poziomie 50, a lochy otwierają się na poziomie 50. Sprite'y z generatora są już w grze.
+
+### Eksploracje i lochy
+
+1. **Drabinka długości.** Autor chce, żeby nowy gracz pierwszego dnia sporo klikał: do poziomu 25 eksploracja trwa najwyżej 30 minut, a poziom 50 odblokowuje najdłuższą. Z dwóch zaproponowanych rozwiązań autor wybrał drabinkę:
+   - poziomy 1–24: do 30 minut,
+   - od poziomu 25: do 1 godziny,
+   - od poziomu 35: do 2 godzin,
+   - od poziomu 50: do 4 godzin.
+
+   Progi są w `data/unlocks.json` (wpisy `hunts-1h`, `hunts-2h` i `hunts-4h` z polem `huntMinutes`), a limit na start to `shortHuntMaxMinutes` 30 w `data/balance.json` (wcześniej 45). Dłuższe eksploracje otwiera poziom postaci, jak inne odblokowania. Punkt zastępuje zakres suwaka z punktu 9 „Nowej skali i eksploracji” i długie polowania na poziomie 2 z punktu 30 Etapu 1.
+2. **Tempo.** Według krzywej dojście do poziomu 25 zajmuje ok. 5,8 godziny eksploracji, do 35 ok. 12,5 godziny, a do 50 ok. 28,4 godziny. Pierwszy dzień gry to więc kilkanaście wypraw po najwyżej 30 minut, każda z raportem. Całe Wiatrołomy (poziomy 1–25) przechodzi się w takich wyprawach, a przy tej długości ryzyko omdlenia wynosi tam najwyżej ok. 3% (punkt 17 „Regionów wewnętrznych i obozu”). Godzinne wyprawy przychodzą tuż przed Uroczyskiem Kamieni, 2-godzinne w jego połowie, a 4-godzinne pod jego koniec. Jeden poziom trwa na poziomie 25 ok. 32 minut, na 35 ok. 50 minut, a na 50 ok. 80 minut, więc od poziomu 20 najdłuższa wyprawa daje ok. 1–3 poziomów.
+3. **Lochy od poziomu 50.** Zgodnie z życzeniem autora lochy otwierają się na poziomie 50 (wcześniej 25), razem z 4-godzinnymi eksploracjami. Zakładka Lochy w Walce podaje ten poziom. W tabeli odblokowań dokumentu projektowego poziom 25 ma teraz eksploracje do 1 godziny. Punkt zastępuje poziom lochów z punktu 10 „Regionów wewnętrznych i obozu” i zdanie o tabeli z punktu 2 „Kowadła i ulepszania przedmiotów”.
+4. **Podpowiedzi i serwer.** Pod suwakiem jest zdanie o następnym progu, np. „Dłuższe wyprawy, do 1 h, od poziomu 25.”, a awans na próg pokazuje komunikat Systemu, np. „Odblokowano eksploracje do 1 godziny.” Postać w API ma pole `huntNext`: poziom i długość następnego progu albo `null` po ostatnim. Serwer odrzuca za długą wyprawę (403 `duration_locked`) i podaje obecny limit oraz poziom następnego progu. `npm run validate` sprawdza, że każdy próg wydłuża eksploracje, wypada na kroku suwaka, a ostatni sięga `maxMinutes`.
+5. **Istniejące postacie.** Postacie poniżej poziomu 25 mają od wdrożenia najwyżej 30 minut. Wyprawa rozpoczęta wcześniej kończy się normalnie, a suwak z zapamiętanym zbyt długim czasem wraca na 15 minut.
+
+### Grafiki w grze
+
+6. **Sprite'y w grze.** Gra ma sprite'y wszystkich 13 stworów i 19 baz przedmiotów w stylu fantasy (`rd_pro__fantasy`), bez wzorców stylu. Zgodnie z życzeniem autora każdy powstał w jednej wersji, żeby nie marnować salda. Pokazują je:
+   - karty przeciwników w walce, w polu ok. 72 px, z poziomem w rogu,
+   - sloty ekwipunku i plecaka (40 px), listy przedmiotów (32 px), karta przedmiotu (64 px) i najlepsze znalezisko w raporcie.
+
+   Postać i sojusznicy mają w walce wektorowe popiersie klasy, tak samo jak karty klas przy tworzeniu postaci. Stwór albo przedmiot bez sprite'a, np. nowa baza, ma dalej ikonę. Testy sprawdzają, że każdy sprite z listy w `src/client/art.js` ma plik o właściwym rozmiarze. Wszystkie grafiki kosztowały ok. 5,8 USD, a dwa wilki pokryło darmowe saldo na start. Punkt uzupełnia punkt 8 „Budowy za zasoby, dźwięków i grafik”.
+7. **Czyszczenie tła.** Mimo usuwania tła (`remove_bg`) generator zostawił pod 6 stworami i pod fokusem kafel podłoża. Usunęliśmy go przy przeglądzie szkiców: wypełnieniem od brzegów obrazka po kolorach, które zajmują co najmniej 6% brzegu (tolerancja 24), i usunięciem samotnych pikseli. Przy dziku trzeba było usunąć kolor kafla w całym obrazku, a przy borsuku także szare piksele tła o niskim nasyceniu. Przy kolejnych grafikach warto zacząć od tego samego.
+8. **Szata.** Pierwszy szkic szaty pokazywał maga, który ją nosi. Opis w `art/prompts.json` mówi teraz „an empty garment with nobody wearing it”, a druga wersja to sama szata.

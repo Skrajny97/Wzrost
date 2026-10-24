@@ -22,11 +22,24 @@ export function durationsUpTo(longest, content) {
   return durations;
 }
 
-// Before long hunts open, only the short durations can be chosen.
-export function huntDurations(level, content) {
-  const tuning = content.balance.hunt;
-  const long = isUnlocked('long-hunts', level, content);
-  return durationsUpTo(long ? tuning.maxMinutes : tuning.shortHuntMaxMinutes, content);
+// Hunts grow longer in steps (huntMinutes in unlocks.json): up to
+// shortHuntMaxMinutes at first, then up to the longest step unlocked.
+export function longestHunt(level, content) {
+  return content.unlocks.reduce(
+    (longest, unlock) => (unlock.huntMinutes && isUnlocked(unlock.id, level, content) ? Math.max(longest, unlock.huntMinutes) : longest),
+    content.balance.hunt.shortHuntMaxMinutes,
+  );
+}
+
+export const huntDurations = (level, content) => durationsUpTo(longestHunt(level, content), content);
+
+// The next longer step and the level it opens at, or null at the longest.
+export function nextHuntUnlock(level, content) {
+  const longest = longestHunt(level, content);
+  const next = content.unlocks
+    .filter((unlock) => unlock.huntMinutes > longest && unlock.level !== undefined)
+    .sort((a, b) => a.level - b.level)[0];
+  return next ? { level: next.level, minutes: next.huntMinutes } : null;
 }
 
 // An inner region opens when the class reaches the level just before its

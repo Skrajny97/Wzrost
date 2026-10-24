@@ -15,6 +15,8 @@ import {
   estimateThreat,
   huntDurations,
   huntReport,
+  longestHunt,
+  nextHuntUnlock,
   sellPrice,
   simulateHunt,
   threatSamples,
@@ -98,9 +100,13 @@ export async function startHunt(context) {
     throw new ApiError(400, 'invalid_duration', 'Wybierz czas wyprawy.');
   }
   if (!huntDurations(player.row.level, content).includes(body.minutes)) {
-    const level = content.unlocksById['long-hunts'].level;
-    const longest = content.balance.hunt.shortHuntMaxMinutes;
-    throw new ApiError(403, 'duration_locked', `Na razie eksploracja trwa najwyżej ${longest} minut. Dłuższe odblokują się na poziomie ${level}.`);
+    const longest = longestHunt(player.row.level, content);
+    const next = nextHuntUnlock(player.row.level, content);
+    throw new ApiError(
+      403,
+      'duration_locked',
+      `Na razie eksploracja trwa najwyżej ${longest} minut. Dłuższe odblokują się na poziomie ${next?.level ?? player.row.level}.`,
+    );
   }
 
   const now = context.now;

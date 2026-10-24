@@ -315,12 +315,12 @@
         "maxMinutes": {
           "type": "integer",
           "minimum": 1,
-          "description": "Najdłuższa wyprawa w minutach, po odblokowaniu długich eksploracji."
+          "description": "Najdłuższa wyprawa w minutach, po odblokowaniu wszystkich długości (unlocks.json, huntMinutes)."
         },
         "shortHuntMaxMinutes": {
           "type": "number",
           "minimum": 0,
-          "description": "Najdłuższa wyprawa dostępna przed odblokowaniem długich eksploracji (unlocks.json, long-hunts)."
+          "description": "Najdłuższa wyprawa na start, zanim wpisy z huntMinutes w unlocks.json odblokują dłuższe."
         },
         "fightsByMinutes": {
           "type": "array",

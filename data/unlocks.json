@@ -1,11 +1,5 @@
 [
   {
-    "id": "long-hunts",
-    "name": "Długie eksploracje",
-    "level": 2,
-    "message": "Odblokowano długie eksploracje, do 4 godzin."
-  },
-  {
     "id": "stats",
     "name": "Wolne punkty i ekran statystyk",
     "level": 2,
@@ -32,9 +26,30 @@
     "level": 20
   },
   {
+    "id": "hunts-1h",
+    "name": "Eksploracje do 1 godziny",
+    "level": 25,
+    "huntMinutes": 60,
+    "message": "Odblokowano eksploracje do 1 godziny."
+  },
+  {
+    "id": "hunts-2h",
+    "name": "Eksploracje do 2 godzin",
+    "level": 35,
+    "huntMinutes": 120,
+    "message": "Odblokowano eksploracje do 2 godzin."
+  },
+  {
+    "id": "hunts-4h",
+    "name": "Eksploracje do 4 godzin",
+    "level": 50,
+    "huntMinutes": 240,
+    "message": "Odblokowano eksploracje do 4 godzin."
+  },
+  {
     "id": "dungeons",
     "name": "Lochy",
-    "level": 25
+    "level": 50
   },
   {
     "id": "core",

@@ -13,7 +13,7 @@ export const DATA_FILES = [
   'resources', 'buildings',
 ];
 // Unlocks the code refers to by id.
-const REQUIRED_UNLOCKS = ['long-hunts', 'stats', 'skills', 'professions', 'training', 'settlement', 'dungeons', 'core'];
+const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'training', 'settlement', 'dungeons', 'core'];
 const POSITIONS = ['front', 'middle', 'back'];
 
 function readJson(path) {
@@ -200,6 +200,17 @@ function checkReferences(data) {
   for (const [name, minutes] of [['shortHuntMaxMinutes', shortHuntMaxMinutes], ['maxMinutes', maxMinutes]]) {
     if (minutes !== minMinutes && minutes % stepMinutes !== 0) errors.push(`balance.json: ${name} nie wypada na kroku suwaka (stepMinutes)`);
   }
+  // Longer hunts open in steps: each longer than the one before, on the
+  // slider, and the last one reaching maxMinutes.
+  const steps = data.unlocks.filter((unlock) => unlock.huntMinutes !== undefined).sort((a, b) => a.level - b.level);
+  let previous = shortHuntMaxMinutes;
+  for (const step of steps) {
+    if (step.level === undefined) errors.push(`unlocks.json: ${step.id} z huntMinutes musi mieć poziom`);
+    if (step.huntMinutes <= previous) errors.push(`unlocks.json: ${step.id} musi wydłużać eksploracje względem poprzedniego progu`);
+    if (step.huntMinutes > maxMinutes || step.huntMinutes % stepMinutes !== 0) errors.push(`unlocks.json: ${step.id} ma czas spoza suwaka`);
+    previous = step.huntMinutes;
+  }
+  if (previous !== maxMinutes) errors.push('unlocks.json: ostatni próg huntMinutes musi odblokować maxMinutes z balance.json');
   const fights = data.balance.hunt.fightsByMinutes;
   if (fights[0][0] > minMinutes) errors.push('balance.json: fightsByMinutes nie obejmuje najkrótszej wyprawy');
   for (let i = 1; i < fights.length; i++) {

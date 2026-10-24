@@ -40,6 +40,8 @@ import {
   classXpToNext,
   hoursToNext,
   huntDurations,
+  unlockMessages,
+  nextHuntUnlock,
   huntingHours,
   huntReport,
   itemName,
@@ -554,18 +556,22 @@ test('finds go straight into empty slots, the best one for each', () => {
 });
 
 describe('tutorial unlocks', () => {
-  test('level 1 hunts last up to 45 minutes; level 2 opens long hunts and stats', () => {
+  test('hunts last up to 30 minutes, then grow to 1 h at level 25, 2 h at 35 and 4 h at 50', () => {
     // The slider starts at 1 minute, then moves in steps of 5 minutes.
-    assert.deepEqual(huntDurations(1, content), [1, 5, 10, 15, 20, 25, 30, 35, 40, 45]);
-    const long = huntDurations(2, content);
-    assert.equal(long.length, 49);
-    assert.deepEqual([long[0], long[1], long[2], long.at(-1)], [1, 5, 10, 240]);
+    assert.deepEqual(huntDurations(1, content), [1, 5, 10, 15, 20, 25, 30]);
+    assert.deepEqual(huntDurations(24, content).at(-1), 30);
+    assert.deepEqual([25, 34, 35, 49, 50, 500].map((level) => huntDurations(level, content).at(-1)), [60, 60, 120, 120, 240, 240]);
+    assert.equal(huntDurations(50, content).length, 49);
+    assert.deepEqual(nextHuntUnlock(1, content), { level: 25, minutes: 60 });
+    assert.deepEqual(nextHuntUnlock(35, content), { level: 50, minutes: 240 });
+    assert.equal(nextHuntUnlock(50, content), null);
     assert.deepEqual(unlockedFeatures(1, content), []);
-    assert.deepEqual(unlockedFeatures(2, content), ['long-hunts', 'stats']);
-    // A module for each inner region of Wiatrołomy: 5, 10, 15, 20 and 25.
+    assert.deepEqual(unlockedFeatures(2, content), ['stats']);
+    // Each step has its System message, and dungeons open with the longest hunts.
+    assert.deepEqual(unlockMessages(25, content), ['Odblokowano eksploracje do 1 godziny.']);
     assert.deepEqual(
       ['skills', 'professions', 'training', 'settlement', 'dungeons'].map((id) => content.unlocksById[id].level),
-      [5, 10, 15, 20, 25],
+      [5, 10, 15, 20, 50],
     );
     assert.ok(!unlockedFeatures(19, content).includes('settlement'));
     assert.ok(unlockedFeatures(20, content).includes('settlement'));
@@ -606,7 +612,7 @@ test('the threat level rises with hunt length and falls with HP', () => {
   const order = ['low', 'moderate', 'high', 'very-high'];
   const full = estimateThreat({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content);
   const wounded = estimateThreat({ character, equipped, hp: 20, areaId: 'mossy-boulders' }, content);
-  const durations = huntDurations(2, content);
+  const durations = huntDurations(50, content);
   assert.deepEqual(Object.keys(full).map(Number), durations);
   for (let i = 1; i < durations.length; i++) {
     assert.ok(order.indexOf(full[durations[i]]) >= order.indexOf(full[durations[i - 1]]));

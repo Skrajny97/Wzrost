@@ -351,8 +351,7 @@ export function mountCombat(container, { params, navigate }) {
   // Step three: the length, the threat level and the start.
   function areaView(character) {
     const allowed = character.huntDurations;
-    const { max } = state.content.durations;
-    const longLevel = unlockInfo('long-hunts').level;
+    const longer = character.huntNext;
     // The slider moves over the allowed lengths (1, 5, 10… minutes). The last
     // length is kept for each inner region (before them: for each region).
     let index = allowed.indexOf(choice[area.id] ?? choice[region.id]);
@@ -425,7 +424,7 @@ export function mountCombat(container, { params, navigate }) {
         h('span', { text: formatMinutes(allowed[0]) }),
         h('span', { text: formatMinutes(allowed.at(-1)) }),
       ),
-      allowed.at(-1) < max && h('p', { class: 'duration-lock', text: `Dłuższe wyprawy, do ${formatMinutes(max)}, od poziomu ${longLevel}.` }),
+      longer && h('p', { class: 'duration-lock', text: `Dłuższe wyprawy, do ${formatMinutes(longer.minutes)}, od poziomu ${longer.level}.` }),
     );
 
     const start = h('button', {
