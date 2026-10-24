@@ -48,11 +48,7 @@ export function validateName(value) {
 const nameKey = (name) => name.toLowerCase();
 
 export async function loadPlayer(db, userId) {
-  // Punkty Systemu belong to the account (users), not the character.
-  const row = await db
-    .prepare("SELECT characters.*, users.system_points FROM characters JOIN users ON users.id = characters.user_id WHERE characters.user_id = ? AND characters.role = 'player'")
-    .bind(userId)
-    .first();
+  const row = await db.prepare("SELECT * FROM characters WHERE user_id = ? AND role = 'player'").bind(userId).first();
   if (!row) return null;
   const [items, activities, buildings] = await db.batch([
     db.prepare('SELECT id, slot, data FROM items WHERE character_id = ? ORDER BY id').bind(row.id),

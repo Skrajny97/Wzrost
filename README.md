@@ -126,10 +126,10 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | GET | `/api/auth/google/callback` | powrót z Google: logowanie, nowe konto albo połączenie, potem przejście do `/` albo `/?google=<wynik>` |
 | GET | `/api/me` | zalogowany gracz; `google` mówi, czy konto ma połączone Google, a `testMode`, czy ma tryb testowy |
 | GET | `/api/content` | nazwy klas, wyglądów, statystyk, slotów, rzadkości, żywiołów, regionów i regionów wewnętrznych (z poziomem klasy, który je otwiera), zakres czasu i nazwy długości wypraw, odblokowania, poziomy ewolucji klas, muzyka i dźwięki walki, wprowadzenie narratora z Punktami Czasu na start; bez logowania |
-| GET | `/api/character` | pełny widok postaci z zasobami, Punktami Systemu konta (`systemPoints`), Punktami Czasu (`timePoints`), przeczytanymi kartami narratora (`tutorial`, `null` dla postaci sprzed wprowadzenia), pojemnością plecaka i obozem (404 `no_character`, gdy jej nie ma) |
+| GET | `/api/character` | pełny widok postaci z zasobami, Punktami Systemu (`systemPoints`), Punktami Czasu (`timePoints`), przeczytanymi kartami narratora (`tutorial`, `null` dla postaci sprzed wprowadzenia), pojemnością plecaka i obozem (404 `no_character`, gdy jej nie ma) |
 | POST | `/api/character` | nowa postać: `name`, `classId`, `appearance` (`female` albo `male`); dostaje zapas na start i Punkty Czasu od narratora (409 `name_taken`, gdy imię nosi już inna postać, bez względu na wielkość liter) |
 | POST | `/api/character/appearance` | zmiana wyglądu: `appearance`; działa też podczas eksploracji |
-| DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami, wyprawą i obozem; Punkty Systemu zostają na koncie |
+| DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami, wyprawą, obozem i Punktami Systemu |
 | POST | `/api/character/points` | rozdanie punktów: `points`, np. `{ "strength": 2 }` |
 | POST | `/api/character/points/auto` | „Rozdaj według klasy” |
 | POST | `/api/character/points/reset` | darmowe zerowanie punktów (do poziomu 20) |

@@ -107,13 +107,13 @@ describe('character creation', () => {
     assert.equal((await newCharacter(cookie, 'archer', 'Druga')).status, 201);
   });
 
-  test('Punkty Systemu belong to the account and stay after "Zacznij od nowa"', async () => {
+  test('Punkty Systemu belong to the character and go with "Zacznij od nowa"', async () => {
     await newCharacter(cookie, 'mage');
-    await (await db()).prepare('UPDATE users SET system_points = 25').run();
+    await (await db()).prepare('UPDATE characters SET system_points = 25').run();
     assert.equal((await call('GET', '/api/character', { cookie })).data.character.systemPoints, 25);
     await call('DELETE', '/api/character', { cookie });
     await newCharacter(cookie, 'archer', 'Druga');
-    assert.equal((await call('GET', '/api/character', { cookie })).data.character.systemPoints, 25);
+    assert.equal((await call('GET', '/api/character', { cookie })).data.character.systemPoints, 0);
   });
 
   test('allows one character per account and checks the input', async () => {
@@ -134,6 +134,32 @@ describe('character creation', () => {
     // "Zacznij od nowa" frees the name.
     await call('DELETE', '/api/character', { cookie });
     assert.equal((await newCharacter(other, 'mage', 'łucja')).status, 201);
+  });
+
+  test('the fresh start removes every character with its Punkty Systemu, and the accounts stay', async () => {
+    const other = await signUp('inny');
+    await newCharacter(cookie, 'warrior', 'Ola');
+    await newCharacter(other, 'mage', 'Ewa');
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    const database = await db();
+    await database.prepare('UPDATE characters SET system_points = 7').run();
+    const migration = readFileSync('migrations/0010_fresh_start.sql', 'utf8')
+      .replace(/--.*$/gm, '')
+      .split(';')
+      .map((statement) => statement.trim())
+      .filter(Boolean);
+    await database.batch(migration.map((statement) => database.prepare(statement)));
+
+    const left = await database
+      .prepare('SELECT (SELECT COUNT(*) FROM characters) AS characters, (SELECT COUNT(*) FROM activities) AS activities, (SELECT COUNT(*) FROM users) AS users')
+      .first();
+    assert.deepEqual(left, { characters: 0, activities: 0, users: 2 });
+    assert.equal((await call('GET', '/api/character', { cookie })).data.error.code, 'no_character');
+    // A new character starts with the introduction, and the name is free again.
+    const again = await newCharacter(cookie, 'archer', 'Ewa');
+    assert.equal(again.status, 201);
+    assert.deepEqual(again.data.character.tutorial, []);
+    assert.equal(again.data.character.systemPoints, 0);
   });
 
   test('players made before unique names keep them, and nobody new takes them', async () => {
