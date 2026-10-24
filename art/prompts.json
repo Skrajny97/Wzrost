@@ -70,14 +70,11 @@
     "style": "rd_pro__fantasy",
     "width": 96,
     "height": 128,
-    "references": [
-      "cleric-male",
-      "mage-female"
-    ],
+    "references": [],
     "prompts": {
-      "narrator-hooded": "mysterious storyteller in a long hooded grey-brown wool cloak, the face hidden in the soft shadow of the hood, sitting on a mossy tree stump, holding an unrolled parchment scroll with both hands and reading it aloud, full body from head to feet, warm candle light, old slavic forest folk tale, facing the viewer, three-quarter view",
-      "narrator-elder": "old storyteller with long grey hair, a grey beard and a kind wrinkled face, plain linen tunic and a brown wool cloak, sitting on a mossy tree stump, holding an unrolled parchment scroll with both hands and reading it aloud, full body from head to feet, warm candle light, old slavic forest folk tale, facing the viewer, three-quarter view",
-      "narrator-crone": "old woman storyteller with a linen headscarf and a kind wrinkled face, embroidered folk dress and a brown wool shawl, sitting on a mossy tree stump, holding an unrolled parchment scroll with both hands and reading it aloud, full body from head to feet, warm candle light, old slavic forest folk tale, facing the viewer, three-quarter view"
+      "narrator-light": "ethereal almighty narrator, a tall genderless figure woven from soft golden and white light, a long flowing robe of light with a deep hood, no visible face, only a gentle glow inside the hood, motes of light drifting around, holding an unrolled glowing parchment scroll in front of it and reading from it, floating above the ground, full body, otherworldly, facing the viewer",
+      "narrator-stars": "ethereal almighty narrator, a genderless hooded figure whose translucent robe is a piece of the night sky full of stars and a faint violet nebula, no visible face, two soft white lights for eyes, tiny sparkles around, holding an unrolled glowing parchment scroll in front of it and reading from it, floating above the ground, full body, otherworldly, facing the viewer",
+      "narrator-dawn": "ethereal almighty narrator, a serene genderless figure of pale gold and rose light like the first light of dawn, a softly glowing translucent robe, long flowing hair made of light, eyes closed, small leaves and motes of light around, holding an unrolled glowing parchment scroll in front of it and reading from it, floating above the ground, full body, otherworldly, facing the viewer"
     }
   }
 }
