@@ -21,6 +21,7 @@
       "armorFactor": { "type": "number", "exclusiveMinimum": 0 },
       "stat": { "type": "string" },
       "statFactor": { "type": "number", "exclusiveMinimum": 0 },
+      "sound": { "type": "string", "description": "Rodzaj dźwięku trafienia z sounds.json." },
       "strike": {
         "description": "Wygląd ciosu w animacji walki. Bez tego pola broń fizyczna uderza wręcz, a magiczna wystrzeliwuje pocisk.",
         "enum": ["melee", "arrow", "magic"]

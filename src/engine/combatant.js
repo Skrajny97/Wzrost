@@ -21,6 +21,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     name,
     isPlayer: true,
     classId: character.classId,
+    appearance: character.appearance,
     family: 'player',
     elite: false,
     position: character.position,
@@ -54,6 +55,7 @@ function itemWeapon(worn, content) {
     attackName: base.attackName,
     category: base.category,
     strike: strikeOf(base.strike, base.category),
+    sound: base.sound,
     element: item.element,
     scaling: base.scaling,
     min: item.damage.min,
@@ -68,7 +70,7 @@ function unarmed(level, content) {
   const { attackName, damageFactor, variance } = balance.combat.unarmed;
   const average = weaponDamage(budget(level, content.rarities[0].budget, balance), damageFactor, balance);
   const min = Math.max(1, Math.round(average * (1 - variance)));
-  return { attackName, category: 'physical', strike: 'melee', scaling: 'strength', min, max: Math.max(min, Math.round(average * (1 + variance))) };
+  return { attackName, category: 'physical', strike: 'melee', sound: 'fist', scaling: 'strength', min, max: Math.max(min, Math.round(average * (1 + variance))) };
 }
 
 // `groupFactor` weakens each member of a group, so two or three monsters are
@@ -106,6 +108,7 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
       attackName: monster.attack.name,
       category: monster.attack.category,
       strike: strikeOf(monster.attack.strike, monster.attack.category),
+      sound: monster.attack.sound,
       element: monster.attack.element,
       scaling: monster.attack.scaling,
       min: average * (1 - monster.attack.variance),
@@ -137,12 +140,16 @@ export function combatantView(unit, opponentLevel, content) {
     position: unit.position,
     family: unit.family,
     classId: unit.classId,
+    // A character's look: its portrait and voice in the playback.
+    appearance: unit.appearance,
     monsterId: unit.monsterId,
     elite: unit.elite,
     maxHp: unit.maxHp,
     hp: unit.hp,
     attack: unit.weapon.attackName,
     strike: unit.weapon.strike,
+    // The kind of hit sound (data/sounds.json).
+    sound: unit.weapon.sound ?? null,
     element: unit.weapon.element ?? null,
     damage: `${Math.round(unit.weapon.min * scale)}–${Math.round(unit.weapon.max * scale)}`,
     armor: unit.armor,

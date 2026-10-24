@@ -83,7 +83,7 @@ export function mountStats(container) {
   }
 
   function levelsCard(character) {
-    const evolution = state.content.classEvolutionLevel;
+    const evolution = state.content.classEvolutionLevels[0];
     const professions = unlockInfo('professions');
     return h(
       'section',

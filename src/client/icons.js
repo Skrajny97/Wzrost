@@ -38,6 +38,8 @@ export const ICONS = {
   chevron: [path('M9 5l7 7-7 7')],
   tent: [path('M2.5 20L12 4l9.5 16'), path('M2.5 20h19'), path('M9 20l3-6 3 6'), path('M12 4l1.5-2')],
   hammer: [path('M13 4.5l6.5 6.5-2.5 2.5L10.5 7z'), path('M12 9L4 17l3 3 8-8')],
+  // A phone with an arrow into it: install as an app.
+  install: [['rect', { x: 6, y: 2.5, width: 12, height: 19, rx: 2 }], path('M12 6.5v8M8.8 11.5l3.2 3.2 3.2-3.2'), path('M10.5 18.5h3')],
 
   // Camp resources (gold has the coin)
   logs: [circle(7.5, 16, 3.5), circle(16.5, 16, 3.5), circle(12, 8.5, 3.5), circle(12, 8.5, 1), circle(7.5, 16, 1), circle(16.5, 16, 1)],

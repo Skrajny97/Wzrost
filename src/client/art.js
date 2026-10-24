@@ -1,6 +1,7 @@
 // Pixel-art sprites drawn with Retro Diffusion (prompts in art/prompts.json):
-// one for each monster and item base listed below, in /art/<kind>/<id>.png.
-// Whatever has no sprite yet keeps its line icon.
+// one for each monster and item base listed below, in /art/<kind>/<id>.png,
+// and a full-figure portrait for each class and look. Whatever has no sprite
+// yet keeps its line icon or vector art.
 
 import { h } from './dom.js';
 
@@ -9,6 +10,12 @@ export const SPRITES = {
   monsters: {
     size: 48,
     ids: ['wolf', 'alpha-wolf', 'fox', 'lynx', 'bear', 'boar', 'badger', 'crow', 'owl', 'viper', 'spider', 'wisp', 'likho'],
+  },
+  // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved.
+  portraits: {
+    width: 96,
+    height: 128,
+    ids: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
   },
   items: {
     size: 32,
@@ -34,3 +41,20 @@ function sprite(kind, id, className) {
 
 export const monsterSprite = (monsterId) => sprite('monsters', monsterId, 'sprite--monster');
 export const itemSprite = (item) => sprite('items', item.base, 'sprite--item');
+
+// A class's figure for a look. `bust` shows the head and shoulders at the
+// image's own size, cut by the box it sits in (the arena, the class cards).
+export function portraitSprite(classId, appearance, { bust = false } = {}) {
+  const id = `${classId}-${appearance}`;
+  if (!available.portraits.has(id)) return null;
+  const { width, height } = SPRITES.portraits;
+  return h('img', {
+    src: `/art/portraits/${id}.png`,
+    alt: '',
+    width,
+    height,
+    class: `sprite sprite--portrait${bust ? ' sprite--bust' : ''}`,
+    decoding: 'async',
+    draggable: 'false',
+  });
+}

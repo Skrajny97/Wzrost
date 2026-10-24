@@ -25,6 +25,20 @@ export function setCharacter(character) {
   for (const listener of listeners) listener(character);
 }
 
+// The content labels, asked for once: the start screen needs them for the
+// music, the game for everything else.
+let contentRequest = null;
+export function loadContent() {
+  contentRequest ??= request('GET', '/api/content').then(
+    (content) => (state.content = content),
+    (error) => {
+      contentRequest = null;
+      throw error;
+    },
+  );
+  return contentRequest;
+}
+
 // Called when the server no longer knows the session (it expired or was
 // ended on another device).
 let onSessionLost = () => {};

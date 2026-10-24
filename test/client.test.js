@@ -89,14 +89,19 @@ test('every sprite on the list has its file at its size, and every class has its
   const { SPRITES } = await import('../src/client/art.js');
   const { classArtIds } = await import('../src/client/class-art.js');
   const data = (name) => JSON.parse(readFileSync(new URL(`../data/${name}.json`, import.meta.url), 'utf8'));
-  const known = { monsters: data('monsters').map((monster) => monster.id), items: data('item-bases').map((base) => base.id) };
-  for (const [kind, { size, ids }] of Object.entries(SPRITES)) {
+  const looks = data('appearances').map((look) => look.id);
+  const known = {
+    monsters: data('monsters').map((monster) => monster.id),
+    items: data('item-bases').map((base) => base.id),
+    portraits: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
+  };
+  for (const [kind, { size, width = size, height = size, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);
     for (const id of ids) {
       const file = join(CLIENT, 'art', kind, `${id}.png`);
       assert.ok(existsSync(file), `${file} is missing`);
       const png = readFileSync(file);
-      assert.equal(`${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`, `${size}x${size}`, file);
+      assert.equal(`${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`, `${width}x${height}`, file);
     }
   }
   assert.deepEqual(data('classes').map((cls) => cls.id).filter((id) => !classArtIds.includes(id)), []);
@@ -118,4 +123,20 @@ test('the page can be added to the home screen as an app', () => {
   assert.deepEqual(manifest.icons.map((icon) => icon.sizes).sort(), ['192x192', '512x512', '512x512']);
   assert.ok(manifest.icons.some((icon) => icon.purpose === 'maskable'));
   assert.equal(pngSize('apple-touch-icon.png'), '180x180');
+});
+
+test('a service worker makes the game installable and shows a page offline', () => {
+  const app = readFileSync(join(CLIENT, 'app.js'), 'utf8');
+  assert.match(app, /navigator\.serviceWorker\.register\('\/sw\.js'\)/);
+  const worker = readFileSync(join(CLIENT, 'sw.js'), 'utf8');
+  // Chrome opens its install dialog only for a worker with a real fetch handler.
+  assert.match(worker, /addEventListener\('fetch'/);
+  assert.match(worker, /respondWith/);
+  // The offline page is asked for as /offline: the static files redirect /offline.html there.
+  assert.match(worker, /const OFFLINE_PAGE = '\/offline';/);
+  const files = JSON.parse(/const OFFLINE_FILES = (\[[^\]]*\])/.exec(worker)[1].replace(/OFFLINE_PAGE/, "'/offline.html'").replaceAll("'", '"'));
+  for (const file of files) assert.ok(existsSync(join(CLIENT, file)), `${file} is missing`);
+  const offline = readFileSync(join(CLIENT, 'offline.html'), 'utf8');
+  assert.match(offline, /href="\/styles\.css"/);
+  assert.match(offline, /href="\/">Spróbuj ponownie</);
 });

@@ -2,15 +2,16 @@
 // checks references between files, e.g. that regions name existing monsters.
 // Run: node tools/validate-data.mjs   (exits with 1 when something is wrong)
 
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import Ajv from 'ajv';
 
 const DATA_DIR = new URL('../data/', import.meta.url);
+const CLIENT_DIR = new URL('../src/client/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
-  'resources', 'buildings',
+  'resources', 'buildings', 'music', 'sounds', 'appearances',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'training', 'settlement', 'dungeons', 'core'];
@@ -217,6 +218,41 @@ function checkReferences(data) {
     if (fights[i][0] <= fights[i - 1][0] || fights[i][1] < fights[i - 1][1]) errors.push('balance.json: fightsByMinutes musi rosnąć');
   }
   if (monsters.size === 0 || bases.size === 0) errors.push('Brak potworów lub przedmiotów.');
+
+  // Class evolutions: rising class levels within the level cap.
+  const evolutions = data.balance.progression.classEvolutionLevels;
+  if (evolutions.some((level, i) => i > 0 && level <= evolutions[i - 1])) errors.push('balance.json: classEvolutionLevels musi rosnąć');
+  if (evolutions.at(-1) > data.balance.progression.maxLevel) errors.push('balance.json: ewolucja klasy powyżej maxLevel');
+
+  // Music: files that exist, and places that are regions, inner regions or the camp.
+  const tracks = uniqueIds(errors, 'music', data.music.tracks);
+  for (const track of data.music.tracks) {
+    if (!existsSync(new URL(track.file, CLIENT_DIR))) errors.push(`music.json: brak pliku src/client/${track.file}`);
+  }
+  if (!tracks.has(data.music.default)) errors.push(`music.json: nieznany utwór domyślny ${data.music.default}`);
+  const places = new Set(['camp', ...data.regions.flatMap((region) => [region.id, ...region.areas.map((area) => area.id)])]);
+  for (const [place, track] of Object.entries(data.music.places)) {
+    if (!places.has(place)) errors.push(`music.json: nieznane miejsce ${place}`);
+    if (!tracks.has(track)) errors.push(`music.json: ${place} ma nieznany utwór ${track}`);
+  }
+  // Combat sounds: files that exist, and weapons and attacks with a known kind.
+  const sounds = data.sounds;
+  const kinds = new Set([...Object.keys(sounds.sounds), ...sounds.synth]);
+  const soundFiles = [...Object.values(sounds.sounds), ...Object.values(sounds.voices).flatMap((voice) => Object.values(voice))].flatMap((sound) => sound.files);
+  for (const file of new Set(soundFiles)) {
+    if (!existsSync(new URL(file, CLIENT_DIR))) errors.push(`sounds.json: brak pliku src/client/${file}`);
+  }
+  for (const base of data['item-bases']) {
+    if (base.kind === 'weapon' && !kinds.has(base.sound)) errors.push(`item-bases.json: ${base.id} ma nieznany dźwięk ${base.sound}`);
+  }
+  for (const monster of data.monsters) {
+    if (!kinds.has(monster.attack.sound)) errors.push(`monsters.json: ${monster.id} ma nieznany dźwięk ataku ${monster.attack.sound}`);
+  }
+  const appearances = uniqueIds(errors, 'appearances', data.appearances);
+  if (!appearances.has('male')) errors.push('appearances.json: brak wyglądu male, domyślnego dla dawnych postaci (migrations/0006)');
+  for (const id of Object.keys(sounds.voices)) {
+    if (!monsters.has(id) && !appearances.has(id)) errors.push(`sounds.json: głos dla nieznanego ${id}`);
+  }
   return errors;
 }
 

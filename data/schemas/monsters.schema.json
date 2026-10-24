@@ -33,7 +33,8 @@
           "scaling": { "type": "string" },
           "damageFactor": { "type": "number", "exclusiveMinimum": 0 },
           "variance": { "type": "number", "minimum": 0, "maximum": 0.9 },
-          "strike": { "enum": ["melee", "arrow", "magic"] },
+          "sound": { "type": "string", "description": "Rodzaj dźwięku trafienia z sounds.json." },
+        "strike": { "enum": ["melee", "arrow", "magic"] },
           "dot": {
             "type": "object",
             "additionalProperties": false,

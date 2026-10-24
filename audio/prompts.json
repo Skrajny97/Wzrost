@@ -1,0 +1,49 @@
+{
+  "$comment": "Prompts for tools/generate-sfx.mjs (ElevenLabs Sound Effects). Each kind has a length in seconds (20 credits a second); an approved draft goes to src/client/audio/sfx/<id>.mp3 and into data/sounds.json.",
+  "voices": {
+    "seconds": 1,
+    "prompts": {
+      "wolf-hurt": "a wolf yelps in pain from a hit, single short yelp, close up, dry, no music",
+      "wolf-death": "a wolf whimpers and collapses, dying whine, close up, dry, no music",
+      "alpha-wolf-hurt": "a huge wolf snarls in pain from a hit, deep and angry, close up, dry, no music",
+      "alpha-wolf-death": "a huge wolf lets out a long dying howl that fades, close up, dry, no music",
+      "fox-hurt": "a fox gives a sharp high yelp of pain, close up, dry, no music",
+      "fox-death": "a fox whimpers weakly and falls silent, close up, dry, no music",
+      "lynx-hurt": "a lynx hisses and snarls in pain from a hit, close up, dry, no music",
+      "lynx-death": "a big wild cat gives a dying growl, close up, dry, no music",
+      "bear-hurt": "a brown bear roars in pain from a hit, short deep roar, close up, dry, no music",
+      "bear-death": "a brown bear groans deeply and collapses heavily, close up, dry, no music",
+      "boar-hurt": "a wild boar squeals in pain from a hit, short, close up, dry, no music",
+      "boar-death": "a wild boar grunts and squeals weakly as it dies, close up, dry, no music",
+      "badger-hurt": "a badger hisses and chatters angrily from a hit, close up, dry, no music",
+      "badger-death": "a badger gives a weak dying hiss, close up, dry, no music",
+      "crow-hurt": "a raven gives a harsh croak of pain and flaps its wings, close up, dry, no music",
+      "crow-death": "a raven croaks weakly and falls with a flutter of feathers, close up, dry, no music",
+      "owl-hurt": "an owl screeches in pain from a hit, short, close up, dry, no music",
+      "owl-death": "an owl gives a fading screech and falls with a flutter, close up, dry, no music",
+      "viper-hurt": "a snake hisses sharply in pain, short, close up, dry, no music",
+      "viper-death": "a snake gives a long fading hiss, close up, dry, no music",
+      "spider-hurt": "a giant spider chitters and hisses from a hit, short, close up, dry, no music",
+      "spider-death": "a giant spider screeches and its legs click as it curls up, close up, dry, no music",
+      "wisp-hurt": "a ghostly flame spirit flickers with an eerie whispering wail, short, close up, no music",
+      "wisp-death": "a ghostly flame spirit fades out with a soft eerie sigh, close up, no music",
+      "likho-hurt": "a gaunt forest demon shrieks in pain, raspy and inhuman, short, close up, dry, no music",
+      "likho-death": "a gaunt forest demon lets out a long rattling death shriek, close up, dry, no music",
+      "male-hurt": "a young man grunts in pain from a blow in a fight, short, no words, close up, dry, no music",
+      "male-death": "a young man groans and falls to the ground exhausted, no words, close up, dry, no music",
+      "female-hurt": "a young woman grunts in pain from a blow in a fight, short, no words, close up, dry, no music",
+      "female-death": "a young woman groans and falls to the ground exhausted, no words, close up, dry, no music"
+    }
+  },
+  "effects": {
+    "seconds": 1.5,
+    "prompts": {
+      "swing": "a quick whoosh of a sword swung through the air, single swing, dry, no music",
+      "bow": "a wooden longbow string releases an arrow with a twang, single shot, dry, no music",
+      "magic": "a small magic fire bolt flies and bursts on impact, short, fantasy, no music",
+      "holy": "a short bright holy magic chime with a shimmering burst, fantasy, no music",
+      "victory": "a short triumphant fantasy horn fanfare, no drums",
+      "defeat": "a short low mournful fantasy horn note fading out, no drums"
+    }
+  }
+}

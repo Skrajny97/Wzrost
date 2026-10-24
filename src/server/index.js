@@ -3,7 +3,7 @@
 
 import { login, logout, me, register } from './accounts.js';
 import { collectProduction, startBuilding } from './camp.js';
-import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, spendPoints } from './characters.js';
+import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
 import { ApiError, errorResponse, json } from './http.js';
 import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
@@ -24,6 +24,7 @@ const routes = [
   ['POST', '/api/character/points', spendPoints],
   ['POST', '/api/character/points/auto', autoPoints],
   ['POST', '/api/character/points/reset', resetPoints],
+  ['POST', '/api/character/appearance', setAppearance],
   ['POST', '/api/items/:id/equip', equipItem],
   ['POST', '/api/items/:id/unequip', unequipItem],
   ['POST', '/api/items/:id/discard', discardItem],

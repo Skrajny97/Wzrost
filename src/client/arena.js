@@ -4,11 +4,11 @@
 // flies to it, and the hit flashes with the damage. The text log runs
 // underneath and "+" opens the participants' stats.
 
-import { monsterSprite } from './art.js';
+import { monsterSprite, portraitSprite } from './art.js';
 import { classArt } from './class-art.js';
 import { h, icon } from './dom.js';
 import { CLASS_ICONS } from './icons.js';
-import { playSound } from './sound.js';
+import { playHit, playMoment, playSound, playVoice } from './sound.js';
 import { state } from './state.js';
 
 const FIELDS = [
@@ -41,6 +41,9 @@ function saveSpeed(speed) {
 
 const elementColor = (id) => state.content?.elements?.find((element) => element.id === id)?.color ?? '#8fe3ef';
 
+// Whose voice a unit has (data/sounds.json): a creature's own, a character's by its look.
+const voiceOf = (unit) => unit.monsterId ?? unit.appearance ?? null;
+
 export function createArena(fight, { autoplay = 'visible' } = {}) {
   const units = [...fight.enemies, ...fight.allies];
   const byId = new Map(units.map((unit) => [unit.id, unit]));
@@ -61,9 +64,13 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     const hpText = h('span', { class: 'unit-hp-text' });
     const status = h('span', { class: 'unit-status' });
     const level = h('span', { class: 'unit-level', text: `poz. ${unit.level}` });
-    // The class bust or the monster's sprite, with the level in its corner;
-    // without one, the old line icon beside the level.
-    const art = unit.side === 'ally' ? classArt(unit.classId) : monsterSprite(unit.monsterId);
+    // The character's head and shoulders (older reports have no look: male)
+    // or the monster's sprite, with the level in its corner; without one, the
+    // vector bust or the old line icon beside the level.
+    const art =
+      unit.side === 'ally'
+        ? portraitSprite(unit.classId, unit.appearance ?? 'male', { bust: true }) ?? classArt(unit.classId)
+        : monsterSprite(unit.monsterId);
     const card = h(
       'div',
       { class: `unit unit--${unit.side}${unit.elite ? ' unit--elite' : ''}`, role: 'group', 'aria-label': `${unit.name}, poziom ${unit.level}` },
@@ -266,7 +273,9 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (event.kind === 'hit' || event.kind === 'crit') {
       const strong = event.kind === 'crit';
       await strike(actor, target, () => {
-        playSound(strong ? 'crit' : 'hit');
+        playHit(actor.sound, strong);
+        // Not every blow draws a cry: every critical one, half of the others.
+        if (strong || Math.random() < 0.5) playVoice(voiceOf(target), 'hurt');
         setHp(target.id, event.hp);
         flash(target.id, strong ? '#e0a03c' : HIT_COLOR, strong ? 'rgba(224, 160, 60, 0.45)' : undefined);
         shake(target.id, strong ? 8 : 5);
@@ -278,7 +287,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     }
     if (event.kind === 'dodge') {
       await strike(actor, target, () => {
-        playSound('dodge');
+        playMoment('dodge');
         float(target.id, 'unik', 'dodge');
         const card = cards.get(target.id).card;
         if (!reducedMotion()) {
@@ -313,7 +322,8 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     }
     if (event.kind === 'kill') {
       const id = run;
-      playSound('kill');
+      playMoment('kill');
+      playVoice(voiceOf(target), 'death');
       setHp(target.id, 0);
       line();
       const card = cards.get(target.id).card;

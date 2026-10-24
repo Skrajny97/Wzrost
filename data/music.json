@@ -1,0 +1,9 @@
+{
+  "tracks": [
+    { "id": "background-v1", "name": "Background v1", "file": "audio/music/background-v1.mp3" }
+  ],
+  "default": "background-v1",
+  "places": {},
+  "fadeOutSeconds": 5,
+  "pauseSeconds": 2.5
+}

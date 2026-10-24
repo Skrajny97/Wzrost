@@ -9,7 +9,7 @@ const { call } = useServer({ TEST_LOGINS: 'Skrajny' });
 
 async function player(login, name) {
   const registered = await call('POST', '/api/auth/register', { body: { login, password: 'tajnehaslo1' } });
-  await call('POST', '/api/character', { cookie: registered.cookie, body: { name, classId: 'warrior' } });
+  await call('POST', '/api/character', { cookie: registered.cookie, body: { name, classId: 'warrior', appearance: 'male' } });
   return registered;
 }
 

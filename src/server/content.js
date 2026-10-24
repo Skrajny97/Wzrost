@@ -17,6 +17,9 @@ import texts from '../../data/texts.json' with { type: 'json' };
 import unlocks from '../../data/unlocks.json' with { type: 'json' };
 import resources from '../../data/resources.json' with { type: 'json' };
 import buildings from '../../data/buildings.json' with { type: 'json' };
+import appearances from '../../data/appearances.json' with { type: 'json' };
+import music from '../../data/music.json' with { type: 'json' };
+import sounds from '../../data/sounds.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -34,6 +37,7 @@ export const content = buildContent({
   unlocks,
   resources,
   buildings,
+  appearances,
 });
 
 // What the page needs to label things; no balance numbers.
@@ -74,7 +78,12 @@ export function publicContent() {
     unlocks: content.unlocks.map(({ id, name, level, condition }) => ({ id, name, level, condition })),
     resources: content.resources.map(({ id, name, description, system }) => ({ id, name, description, system: Boolean(system) })),
     buildings: content.buildings.map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
+    appearances: content.appearances,
     freeResetMaxLevel: content.balance.progression.freeResetMaxLevel,
-    classEvolutionLevel: content.balance.progression.classEvolutionLevel,
+    classEvolutionLevels: content.balance.progression.classEvolutionLevels,
+    // Background music: the client plays it on every screen (music.js).
+    music,
+    // Recorded combat sounds and voices (sound.js).
+    sounds,
   };
 }

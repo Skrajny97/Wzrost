@@ -2,7 +2,7 @@
 
 Solowa, casualowa gra przeglądarkowa litRPG na telefon, oparta na timerach. Jedynym źródłem prawdy o projekcie jest [dokument projektowy](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX). Założenia przyjęte w trakcie budowy są w [DECISIONS.md](DECISIONS.md).
 
-Stan: **Etap 2a, plansza obozu.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, poziomy do 500, statystyki z wolnymi punktami, ekwipunek przypisany do klas i plecak z podglądem zmian, złomiarz, eksploracje na czasie serwera w dwóch regionach Skraju Puszczy, każdy z pięcioma regionami wewnętrznymi otwieranymi poziomem klasy, z suwakiem czasu, który wydłuża się z poziomem (30 minut na start, 4 godziny od poziomu 50), i spotkaniami wymagającymi, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik, „Zacznij od nowa” oraz obóz jako plansza w stylu Plemion z placem na każdy z siedmiu budynków na timerach: Tartak, Kamieniołom i Kopalnia wytwarzają zasoby do magazynu, Ognisko, Szałas na łupy i Stół złomiarza dają premie, a Kowadło pozwala ulepszać przedmioty do +10. Stwory i przedmioty mają sprite'y w pixel-arcie. Zasoby (drewno, kamień, ruda żelaza) postać znajduje też na eksploracjach. Punkty Systemu, przyszła waluta premium na kosmetykę, należą do konta i są w górnym pasku obok złota. Spis klas, przedmiotów, potworów i regionów jest w [encyklopedii](https://claude.ai/artifact/EDt6uk8X5rRU9JCTLKsnXw).
+Stan: **Etap 2a, plansza obozu.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, poziomy do 500, statystyki z wolnymi punktami, ekwipunek przypisany do klas i plecak z podglądem zmian, złomiarz, eksploracje na czasie serwera w dwóch regionach Skraju Puszczy, każdy z pięcioma regionami wewnętrznymi otwieranymi poziomem klasy, z suwakiem czasu, który wydłuża się z poziomem (30 minut na start, 4 godziny od poziomu 50), i spotkaniami wymagającymi, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik, „Zacznij od nowa” oraz obóz jako plansza w stylu Plemion z placem na każdy z siedmiu budynków na timerach: Tartak, Kamieniołom i Kopalnia wytwarzają zasoby do magazynu, Ognisko, Szałas na łupy i Stół złomiarza dają premie, a Kowadło pozwala ulepszać przedmioty do +10. Stwory, przedmioty i postacie (kobieta i mężczyzna w każdej klasie) mają sprite'y w pixel-arcie. W tle gra muzyka, ciosy w walce to nagrania, a grę można zainstalować na telefonie przyciskiem „Zainstaluj jako aplikację”. Zasoby (drewno, kamień, ruda żelaza) postać znajduje też na eksploracjach. Punkty Systemu, przyszła waluta premium na kosmetykę, należą do konta i są w górnym pasku obok złota. Spis klas, przedmiotów, potworów i regionów jest w [encyklopedii](https://claude.ai/artifact/EDt6uk8X5rRU9JCTLKsnXw).
 
 ## Adres gry
 
@@ -91,13 +91,14 @@ src/server/   Worker: API, logowanie, sesje, postać, ekwipunek, eksploracje, ra
 src/client/   strona gry: HTML, CSS i moduły ES, bez kroku budowania
 data/         treść gry w JSON i schematy w data/schemas
 migrations/   schemat bazy D1
-tools/        wdrożenie, walidacja danych, symulacja balansu, generowanie grafik
+tools/        wdrożenie, walidacja danych, symulacja balansu, generowanie grafik i dźwięków
 art/          opisy grafik dla generatora pixel-artu i wzorce stylu
+audio/        opisy dźwięków dla generatora ElevenLabs
 test/         testy: node:test i lokalne środowisko Workers z bazą D1
 DECISIONS.md  rejestr założeń
 ```
 
-Treść gry (klasy, potwory, regiony, przedmioty, afiksy, teksty raportów, kolejność odblokowań, zasoby i budynki obozu) zmienia się w plikach `data/*.json`, bez dotykania kodu. Walidacja sprawdza je przy każdym pushu.
+Treść gry (klasy, wygląd postaci, potwory, regiony, przedmioty, afiksy, teksty raportów, kolejność odblokowań, zasoby i budynki obozu, muzyka i dźwięki walki) zmienia się w plikach `data/*.json`, bez dotykania kodu. Walidacja sprawdza je przy każdym pushu.
 
 ## Praca lokalna
 
@@ -122,13 +123,14 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/auth/login` | logowanie: `identifier` (login lub e-mail), `password` |
 | POST | `/api/auth/logout` | wylogowanie |
 | GET | `/api/me` | zalogowany gracz; `testMode` mówi, czy jego konto ma tryb testowy |
-| GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości, żywiołów, regionów i regionów wewnętrznych (z poziomem klasy, który je otwiera), zakres czasu i nazwy długości wypraw, odblokowania |
+| GET | `/api/content` | nazwy klas, wyglądów, statystyk, slotów, rzadkości, żywiołów, regionów i regionów wewnętrznych (z poziomem klasy, który je otwiera), zakres czasu i nazwy długości wypraw, odblokowania, poziomy ewolucji klas, muzyka i dźwięki walki; bez logowania |
 | GET | `/api/character` | pełny widok postaci z zasobami, Punktami Systemu konta (`systemPoints`), pojemnością plecaka i obozem (404 `no_character`, gdy jej nie ma) |
-| POST | `/api/character` | nowa postać: `name`, `classId` |
+| POST | `/api/character` | nowa postać: `name`, `classId`, `appearance` (`female` albo `male`) |
+| POST | `/api/character/appearance` | zmiana wyglądu: `appearance`; działa też podczas eksploracji |
 | DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami, wyprawą i obozem; Punkty Systemu zostają na koncie |
 | POST | `/api/character/points` | rozdanie punktów: `points`, np. `{ "strength": 2 }` |
 | POST | `/api/character/points/auto` | „Rozdaj według klasy” |
-| POST | `/api/character/points/reset` | darmowe zerowanie punktów (do poziomu 10) |
+| POST | `/api/character/points/reset` | darmowe zerowanie punktów (do poziomu 20) |
 | GET | `/api/items/:id/preview` | wartości bojowe teraz i po założeniu (albo zdjęciu) przedmiotu |
 | POST | `/api/items/:id/equip` | załóż przedmiot z plecaka |
 | POST | `/api/items/:id/unequip` | zdejmij przedmiot do plecaka |
@@ -138,7 +140,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/camp/build` | zacznij budowę następnego poziomu budynku obozu: `buildingId`; naraz jedna budowa; budynek produkcyjny najpierw oddaje zawartość magazynu |
 | POST | `/api/camp/collect` | zbierz magazyn budynku produkcyjnego: `buildingId`; zwraca `collected` (409 `nothing_to_collect`, gdy magazyn jest pusty) |
 | GET | `/api/hunts/options` | poziom zagrożenia dla każdego czasu w otwartym regionie wewnętrznym dla poziomu postaci; `?area=<id>` liczy jeden wybrany region wewnętrzny |
-| POST | `/api/hunts` | wyrusz na eksplorację: `areaId` (otwarty region wewnętrzny), `minutes` (1, potem co 5 minut, do 45 na poziomie 1 i do 240 od poziomu 2) |
+| POST | `/api/hunts` | wyrusz na eksplorację: `areaId` (otwarty region wewnętrzny), `minutes` (1, potem co 5 minut: do 30, od poziomu 25 do 60, od 35 do 120, od 50 do 240) |
 | POST | `/api/hunts/cancel` | przerwij trwającą eksplorację |
 | POST | `/api/hunts/claim` | odbierz raport zakończonej eksploracji |
 | GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |
@@ -162,3 +164,18 @@ Sprite'y stworów (48×48) i przedmiotów (32×32) powstają w generatorze pixel
 
 Przebieg potrzebuje sekretu repozytorium `RETRO_DIFFUSION_API_KEY` z kluczem API Retro Diffusion. Skrypt najpierw darmowo wycenia każde zapytanie i nie wydaje więcej niż limit. Zatwierdzone sprite'y trafiają do `src/client/art/` i na listę w `src/client/art.js`, a wzorce stylu dla kolejnych do `art/references/`. Gdy pod stworem albo przedmiotem zostaje kafel podłoża, przed wstawieniem do gry trzeba go wyciąć (zob. `DECISIONS.md`, „Drabinka eksploracji i lochy”, punkt 7).
 
+## Muzyka i dźwięki
+
+Muzyka w tle jest w `src/client/audio/music/`, a `data/music.json` mówi, który utwór gra domyślnie, a który w danym miejscu (`places`: id regionu, regionu wewnętrznego albo `camp`). Utwór cichnie przez ostatnie 5 sekund i po krótkiej pauzie gra od nowa. Kolejny utwór dodaje się tak:
+
+1. Wgraj plik MP3 do `src/client/audio/music/` (nazwa małymi literami, z myślnikami).
+2. Dopisz go do `tracks` w `data/music.json`, a miejsce i id utworu do `places`.
+3. `npm run validate` sprawdzi, że plik i miejsce istnieją.
+
+Ciosy, uniki i upadki w walce to nagrania z paczek Kenney (CC0) w `src/client/audio/sfx/`, przypisane w `data/sounds.json` do rodzajów broni i ataków potworów (pole `sound` w `data/item-bases.json` i `data/monsters.json`). Głosy stworów i postaci przy trafieniu i pokonaniu (`voices`) nagrywa przebieg **Dźwięki (szkice)** z generatorem ElevenLabs:
+
+1. Na github.com otwórz repozytorium, zakładkę **Actions** i przebieg **Dźwięki (szkice)**.
+2. Stuknij **Run workflow**, wybierz rodzaj (`voices` albo `effects`), wpisz identyfikatory po przecinku albo `all` i limit kredytów, a potem stuknij zielone **Run workflow**.
+3. Szkice trafią na gałąź `art-drafts`, do folderu `audio/drafts/`.
+
+Przebieg potrzebuje sekretu repozytorium `ELEVENLABS_API_KEY`. Opisy dźwięków są w `audio/prompts.json`; dźwięk trwa tyle, ile podaje `seconds`, i kosztuje 20 kredytów na sekundę.

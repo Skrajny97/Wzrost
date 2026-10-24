@@ -8,7 +8,7 @@
       "base": { "strength": 5, "dexterity": 5, "vitality": 3, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 3, "will": 2 },
       "growth": { "strength": 2.5, "dexterity": 1.5, "vitality": 2.5, "endurance": 1.5, "perception": 1, "will": 0.5 }
     },
-    "attack": { "name": "Ugryzienie", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.2 },
+    "attack": { "name": "Ugryzienie", "sound": "bite", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.2 },
     "hpFactor": 0.6,
     "armorFactor": 0.3,
     "reward": { "xp": 1.0, "gold": 0.8 }
@@ -22,7 +22,7 @@
       "base": { "strength": 6, "dexterity": 2, "vitality": 5, "endurance": 5, "intellect": 1, "wisdom": 1, "perception": 2, "will": 3 },
       "growth": { "strength": 2.5, "dexterity": 0.5, "vitality": 3, "endurance": 2.5, "perception": 0.5, "will": 1 }
     },
-    "attack": { "name": "Szarża", "category": "physical", "scaling": "strength", "damageFactor": 0.55, "variance": 0.3 },
+    "attack": { "name": "Szarża", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 0.55, "variance": 0.3 },
     "hpFactor": 0.7,
     "armorFactor": 0.5,
     "reward": { "xp": 1.2, "gold": 0.8 }
@@ -36,7 +36,7 @@
       "base": { "strength": 2, "dexterity": 7, "vitality": 2, "endurance": 1, "intellect": 2, "wisdom": 2, "perception": 5, "will": 2 },
       "growth": { "strength": 1, "dexterity": 2.5, "vitality": 1.5, "endurance": 0.5, "perception": 1.5, "will": 0.5 }
     },
-    "attack": { "name": "Dziobnięcie", "category": "physical", "scaling": "dexterity", "damageFactor": 0.4, "variance": 0.2 },
+    "attack": { "name": "Dziobnięcie", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.4, "variance": 0.2 },
     "hpFactor": 0.4,
     "armorFactor": 0.1,
     "reward": { "xp": 0.6, "gold": 0.4 }
@@ -51,7 +51,7 @@
       "growth": { "strength": 1.5, "dexterity": 2, "vitality": 2, "endurance": 1, "perception": 1, "will": 0.5 }
     },
     "attack": {
-      "name": "Ukąszenie",
+      "name": "Ukąszenie", "sound": "bite",
       "category": "physical",
       "scaling": "dexterity",
       "damageFactor": 0.45,
@@ -72,7 +72,7 @@
       "base": { "strength": 5, "dexterity": 3, "vitality": 4, "endurance": 6, "intellect": 1, "wisdom": 1, "perception": 2, "will": 3 },
       "growth": { "strength": 2, "dexterity": 1, "vitality": 2.5, "endurance": 2.5, "perception": 0.5, "will": 1 }
     },
-    "attack": { "name": "Pazury", "category": "physical", "scaling": "strength", "damageFactor": 0.55, "variance": 0.2 },
+    "attack": { "name": "Pazury", "sound": "claw", "category": "physical", "scaling": "strength", "damageFactor": 0.55, "variance": 0.2 },
     "hpFactor": 0.6,
     "armorFactor": 0.6,
     "reward": { "xp": 1.0, "gold": 0.7 }
@@ -86,7 +86,7 @@
       "base": { "strength": 5, "dexterity": 8, "vitality": 3, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 7, "will": 3 },
       "growth": { "strength": 2, "dexterity": 2.5, "vitality": 2, "endurance": 1, "perception": 2, "will": 0.5 }
     },
-    "attack": { "name": "Cios łapą", "category": "physical", "scaling": "dexterity", "damageFactor": 0.6, "variance": 0.25 },
+    "attack": { "name": "Cios łapą", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.6, "variance": 0.25 },
     "hpFactor": 0.5,
     "armorFactor": 0.25,
     "reward": { "xp": 1.2, "gold": 0.9 }
@@ -101,7 +101,7 @@
       "growth": { "strength": 1.5, "dexterity": 2, "vitality": 2, "endurance": 1.5, "perception": 1, "will": 0.5 }
     },
     "attack": {
-      "name": "Jadowite ukąszenie",
+      "name": "Jadowite ukąszenie", "sound": "bite",
       "category": "physical",
       "scaling": "dexterity",
       "damageFactor": 0.4,
@@ -122,7 +122,7 @@
       "base": { "strength": 7, "dexterity": 6, "vitality": 5, "endurance": 4, "intellect": 1, "wisdom": 1, "perception": 4, "will": 3 },
       "growth": { "strength": 3, "dexterity": 1.5, "vitality": 3, "endurance": 2, "perception": 1, "will": 1 }
     },
-    "attack": { "name": "Kły basiora", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.2 },
+    "attack": { "name": "Kły basiora", "sound": "bite", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.2 },
     "hpFactor": 0.75,
     "armorFactor": 0.35,
     "reward": { "xp": 1.5, "gold": 1.0 }
@@ -136,7 +136,7 @@
       "base": { "strength": 3, "dexterity": 7, "vitality": 3, "endurance": 2, "intellect": 2, "wisdom": 1, "perception": 5, "will": 2 },
       "growth": { "strength": 1.5, "dexterity": 2.5, "vitality": 2, "endurance": 1, "perception": 1.5, "will": 0.5 }
     },
-    "attack": { "name": "Kąśnięcie", "category": "physical", "scaling": "dexterity", "damageFactor": 0.5, "variance": 0.2 },
+    "attack": { "name": "Kąśnięcie", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.5, "variance": 0.2 },
     "hpFactor": 0.5,
     "armorFactor": 0.2,
     "reward": { "xp": 0.9, "gold": 0.7 }
@@ -150,7 +150,7 @@
       "base": { "strength": 2, "dexterity": 6, "vitality": 3, "endurance": 1, "intellect": 2, "wisdom": 3, "perception": 7, "will": 3 },
       "growth": { "strength": 1, "dexterity": 2, "vitality": 1.5, "endurance": 0.5, "perception": 2, "will": 0.5 }
     },
-    "attack": { "name": "Uderzenie szponów", "category": "physical", "scaling": "dexterity", "damageFactor": 0.45, "variance": 0.25 },
+    "attack": { "name": "Uderzenie szponów", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.45, "variance": 0.25 },
     "hpFactor": 0.45,
     "armorFactor": 0.1,
     "reward": { "xp": 0.8, "gold": 0.5 }
@@ -164,7 +164,7 @@
       "base": { "strength": 9, "dexterity": 2, "vitality": 8, "endurance": 7, "intellect": 1, "wisdom": 2, "perception": 3, "will": 4 },
       "growth": { "strength": 3, "dexterity": 0.5, "vitality": 3.5, "endurance": 2.5, "perception": 0.5, "will": 1 }
     },
-    "attack": { "name": "Zamach łapą", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.3 },
+    "attack": { "name": "Zamach łapą", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.3 },
     "hpFactor": 0.9,
     "armorFactor": 0.6,
     "reward": { "xp": 1.8, "gold": 1.2 }
@@ -180,7 +180,7 @@
       "growth": { "dexterity": 1.5, "vitality": 3, "intellect": 3, "wisdom": 1, "will": 1.5 }
     },
     "attack": {
-      "name": "Błędny ogień",
+      "name": "Błędny ogień", "sound": "magic",
       "category": "magical",
       "element": "fire",
       "scaling": "intellect",
@@ -204,7 +204,7 @@
       "growth": { "strength": 2, "dexterity": 1.5, "vitality": 3.5, "endurance": 2, "intellect": 2.5, "will": 1.5 }
     },
     "attack": {
-      "name": "Mroźny dotyk",
+      "name": "Mroźny dotyk", "sound": "magic",
       "category": "magical",
       "element": "frost",
       "scaling": "intellect",

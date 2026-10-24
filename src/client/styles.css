@@ -307,7 +307,8 @@ button {
   gap: 6px;
 }
 
-.field label {
+.field label,
+.field-label {
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 600;
@@ -1126,6 +1127,56 @@ a.segmented-option {
 
 .sheet-text {
   margin: 0;
+}
+
+/* "Zainstaluj jako aplikację" (install.js) */
+
+#install-slot:empty {
+  display: none;
+}
+
+.install-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.install-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.install-button svg {
+  flex: none;
+  color: var(--system);
+}
+
+.install-hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.install-steps {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.install-warning {
+  color: var(--gold);
+}
+
+.install-note {
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
 .sheet-actions {
@@ -3235,4 +3286,77 @@ a.segmented-option {
 .bar-fill--gold {
   background: var(--gold);
   transition: width 1s linear;
+}
+
+/* Volume sliders in the settings */
+
+.status-row--volume {
+  align-items: center;
+}
+
+.status-row--volume dt {
+  flex: none;
+}
+
+.status-row--volume dd {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  max-width: 230px;
+}
+
+.volume-slider {
+  flex: 1;
+  min-width: 0;
+}
+
+.volume-value {
+  min-width: 42px;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: right;
+}
+
+/* Pixel-art portraits: the full figure over the forest on the character
+   screen, and the head and shoulders at the image's own size elsewhere. */
+
+.portrait-art .portrait-svg {
+  position: absolute;
+  inset: 0;
+}
+
+.portrait-art .sprite--portrait {
+  position: absolute;
+  inset: 4% 0 0;
+  width: 100%;
+  height: 96%;
+  object-fit: contain;
+  object-position: 50% 100%;
+}
+
+.sprite--bust {
+  width: 100%;
+  height: 100%;
+  object-fit: none;
+  object-position: 50% 0;
+}
+
+.unit-art .sprite--bust {
+  width: 72px;
+  height: 72px;
+  border-radius: 4px;
+  background: linear-gradient(#24301f, #141b11);
+}
+
+.class-icon .sprite--bust {
+  background: linear-gradient(#24301f, #141b11);
+}
+
+.status-row--look {
+  align-items: center;
+}
+
+.status-row--look .segmented {
+  min-width: 210px;
 }

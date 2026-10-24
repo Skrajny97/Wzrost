@@ -100,13 +100,13 @@
   },
   "progression": {
     "maxLevel": 500,
-    "firstLevelMinutes": 4,
-    "flatLevels": 5,
+    "firstLevelMinutes": 20,
+    "flatLevels": 17.24,
     "levelTimeExponent": 1.3,
     "xpPerHourScale": 650,
     "earlyXpFactors": [1, 0.861, 0.551, 0.402, 0.314],
     "classXpFactor": 0.6,
     "freeResetMaxLevel": 20,
-    "classEvolutionLevel": 30
+    "classEvolutionLevels": [50, 100, 200, 300, 400, 500]
   }
 }

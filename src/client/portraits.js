@@ -1,6 +1,7 @@
-// Vector stand-ins for the class portraits (3:4), in the style of the
-// character screen mockup: a hooded figure among trees, with the weapon of
-// the class. The author will replace them with their own artwork.
+// The forest behind the portrait on the character screen (3:4). Over it
+// stands the class's pixel-art figure (art.js); a class without one still
+// gets the vector stand-in from the character screen mockup: a hooded
+// figure among trees, with the weapon of the class.
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -55,13 +56,13 @@ const WEAPONS = {
 <path d="M140 120 C150 100 186 100 196 120" stroke="#060805" stroke-width="10" fill="none"></path>`,
 };
 
-export function portrait(classId) {
+export function portrait(classId, { figure = true } = {}) {
   const svg = document.createElementNS(SVG_NS, 'svg');
   svg.setAttribute('viewBox', '0 0 336 448');
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('focusable', 'false');
   svg.setAttribute('class', 'portrait-svg');
   // Fixed markup from this file only; no game data goes into it.
-  svg.innerHTML = BACKGROUND + FIGURE + (WEAPONS[classId] ?? '');
+  svg.innerHTML = BACKGROUND + (figure ? FIGURE + (WEAPONS[classId] ?? '') : '');
   return svg;
 }

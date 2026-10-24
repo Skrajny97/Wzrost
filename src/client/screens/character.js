@@ -2,7 +2,7 @@
 // an eye that hides the slots, and the bag with items that are not worn.
 // The item card also upgrades the item on the camp's Kowadło.
 
-import { itemSprite } from '../art.js';
+import { itemSprite, portraitSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatNumber, plural } from '../format.js';
 import { RESOURCE_ICONS, SLOT_ICONS, itemIcon } from '../icons.js';
@@ -49,7 +49,10 @@ export function mountCharacter(container) {
         { class: `slots slots--${side}` },
         slots.filter((slot) => slot.column === side).map((slot) => slotButton(slot, character.equipment[slot.id])),
       );
-    frame.append(h('div', { class: 'portrait-art' }, portrait(character.classId)), column('left'), column('right'), eye);
+    // The forest, and over it the class's figure in the character's look.
+    const figure = portraitSprite(character.classId, character.appearance);
+    const art = figure ? [portrait(character.classId, { figure: false }), figure] : [portrait(character.classId)];
+    frame.append(h('div', { class: 'portrait-art' }, art), column('left'), column('right'), eye);
 
     fill(container,
       pageHeading(character.name, `${character.className} · ${POSITION_NAMES[character.position]} · solo`),

@@ -342,17 +342,23 @@ export function applyHunt(character, hunt, content) {
   );
   const penalty = hunt.result === 'fainted' ? faintPenalty(next.level, next.xp, content) : 0;
 
+  // A few levels at once make one line each for the character and the class,
+  // with all their points, so the report's System panel stays short.
   const pointsPerLevel = content.statIds.length;
   const messages = [];
-  for (let level = character.level + 1; level <= next.level; level++) {
-    messages.push(say(content.texts, 'levelUp', level, { level, points: pointsPerLevel }), ...unlockMessages(level, content));
+  const levels = next.level - character.level;
+  if (levels > 0) {
+    messages.push(say(content.texts, 'levelUp', next.level, { level: next.level, points: pointsPerLevel * levels }));
+    for (let level = character.level + 1; level <= next.level; level++) messages.push(...unlockMessages(level, content));
   }
   const className = content.classesById[character.classId].name;
   // Class levels come first, so their points can wait for the Stats screen.
   const unlockLevel = content.unlocksById.stats.level;
   const textId = next.level < unlockLevel ? 'classLevelUpLocked' : 'classLevelUp';
-  for (let level = character.classLevel + 1; level <= nextClass.level; level++) {
-    messages.push(say(content.texts, textId, level, { className, level, points: Math.floor(pointsPerLevel / 4), unlockLevel }));
+  const classLevels = nextClass.level - character.classLevel;
+  if (classLevels > 0) {
+    const points = Math.floor(pointsPerLevel / 4) * classLevels;
+    messages.push(say(content.texts, textId, nextClass.level, { className, level: nextClass.level, points, unlockLevel }));
   }
   if (penalty > 0) messages.push(say(content.texts, 'faintPenalty', 0, { xp: penalty }));
 

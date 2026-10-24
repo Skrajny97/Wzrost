@@ -15,8 +15,8 @@ async function signUp(login = 'karol') {
   return cookie;
 }
 
-async function newCharacter(cookie, classId = 'warrior', name = 'Mira') {
-  return call('POST', '/api/character', { cookie, body: { name, classId } });
+async function newCharacter(cookie, classId = 'warrior', name = 'Mira', appearance = 'female') {
+  return call('POST', '/api/character', { cookie, body: { name, classId, appearance } });
 }
 
 // Moves the current hunt into the past, as if its time had passed. The seed is
@@ -62,12 +62,24 @@ describe('character creation', () => {
     assert.equal((await call('GET', '/api/character')).status, 401);
   });
 
+  test('a character has a look, chosen at the start and changed at any time', async () => {
+    const missing = await call('POST', '/api/character', { cookie, body: { name: 'Mira', classId: 'archer' } });
+    assert.equal(missing.status, 400);
+    assert.equal(missing.data.error.code, 'invalid_appearance');
+    assert.equal((await newCharacter(cookie, 'archer', 'Mira', 'male')).data.character.appearance, 'male');
+    const changed = await call('POST', '/api/character/appearance', { cookie, body: { appearance: 'female' } });
+    assert.equal(changed.status, 200);
+    assert.equal(changed.data.character.appearance, 'female');
+    assert.equal((await call('POST', '/api/character/appearance', { cookie, body: { appearance: 'troll' } })).status, 400);
+  });
+
   test('creates a level 1 character with full HP and no items', async () => {
     const { status, data } = await newCharacter(cookie, 'warrior', '  Mira   z Boru ');
     assert.equal(status, 201);
     const character = data.character;
     assert.equal(character.name, 'Mira z Boru');
     assert.equal(character.className, 'Wojownik');
+    assert.equal(character.appearance, 'female');
     assert.equal(character.level, 1);
     assert.equal(character.hp, character.maxHp);
     assert.equal(character.freePoints, 0);
@@ -77,7 +89,8 @@ describe('character creation', () => {
     assert.equal(character.stats.find((stat) => stat.id === 'strength').sources.class, 8);
     assert.equal(character.stats.find((stat) => stat.id === 'vitality').perPoint.maxHp, 5);
     // The first level takes about 4 minutes of exploring.
-    assert.ok(character.hoursToNext * 60 > 3 && character.hoursToNext * 60 <= 5);
+    // The first levels take about 20 minutes of exploring each.
+    assert.ok(character.hoursToNext * 60 > 15 && character.hoursToNext * 60 <= 25);
   });
 
   test('"Zacznij od nowa" removes the character, so a new one can be made', async () => {

@@ -377,7 +377,8 @@ describe('hunts', () => {
     };
     const short = levelsAfter(30);
     const long = levelsAfter(240);
-    assert.ok(long - 2 < (short - 2) * 3, `30 min: ${short}, 4 h: ${long}`);
+    // Four hours give clearly less than eight half-hours would at the same pace.
+    assert.ok(long - 2 < (short - 2) * 8 * 0.75, `30 min: ${short}, 4 h: ${long}`);
     assert.ok(long < 11, `4 h: level ${long}`);
   });
 
@@ -459,10 +460,11 @@ describe('inner regions', () => {
 });
 
 describe('progression', () => {
-  test('the first levels take minutes, level 500 about a day', () => {
+  test('the first levels take about 20 minutes, level 500 about a day', () => {
     assert.ok(xpToNext(2, content) > xpToNext(1, content));
-    // A 5-minute exploration is enough for each of the first levels.
-    for (const level of [1, 2, 3, 4, 5]) assert.ok(huntingHours(level, content) * 60 <= 5);
+    // A slow burn: a 30-minute exploration gives one or two levels at first.
+    for (const level of [1, 2, 5, 10, 17]) assert.ok(Math.abs(huntingHours(level, content) * 60 - 20) < 0.5, `level ${level}`);
+    assert.ok(huntingHours(25, content) * 60 > 30);
     assert.ok(huntingHours(100, content) > 2 && huntingHours(100, content) < 5);
     assert.ok(huntingHours(500, content) > 20 && huntingHours(500, content) < 30);
     assert.equal(content.balance.progression.maxLevel, 500);
@@ -472,7 +474,7 @@ describe('progression', () => {
 
   test('levels 2 to 5 need the same XP, and later ones more', () => {
     // In the first inner region monsters are mostly of levels 1–2, so levels
-    // 2–5 need the same, smaller XP (earlyXpFactors): about 5 minutes each.
+    // 2–5 need the same, smaller XP (earlyXpFactors): about 20 minutes each.
     const needed = [1, 2, 3, 4, 5, 6, 7].map((level) => xpToNext(level, content));
     assert.deepEqual(needed.slice(1, 5), [needed[1], needed[1], needed[1], needed[1]]);
     for (let i = 1; i < needed.length; i++) assert.ok(needed[i] >= needed[i - 1], `level ${i + 1}`);
@@ -515,6 +517,15 @@ describe('progression', () => {
     const early = applyHunt(character, { xp: classXpToNext(1, content), result: 'success' }, content);
     assert.equal(early.level, 1);
     assert.deepEqual(early.messages, ['Kleryk: poziom klasy 2. Wolne punkty statystyk: +2. Rozdasz je od poziomu 2.']);
+
+    // Several levels at once make one line for the character and one for the class.
+    const xp = [1, 2, 3].reduce((sum, level) => sum + xpToNext(level, content), 0);
+    const many = applyHunt(character, { xp, result: 'success' }, content);
+    assert.equal(many.level, 4);
+    assert.equal(many.messages.filter((message) => message.startsWith('Osiągnięto poziom')).length, 1);
+    assert.equal(many.messages[0], 'Osiągnięto poziom 4. Wolne punkty statystyk: +24.');
+    assert.equal(many.messages.filter((message) => message.startsWith('Kleryk: poziom klasy')).length, 1);
+    assert.match(many.messages.at(-1), new RegExp(`^Kleryk: poziom klasy ${many.classLevel}\\. Wolne punkty statystyk: \\+${2 * (many.classLevel - 1)}\\.$`));
 
     const fainted = applyHunt({ ...character, level: 3, xp: 10 }, { xp: 0, result: 'fainted' }, content);
     assert.equal(fainted.level, 3);

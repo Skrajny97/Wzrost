@@ -4,6 +4,7 @@
 
 import { ApiError, request } from './api.js';
 import { $, $$, clear, h } from './dom.js';
+import { installBlock, installButton } from './install.js';
 import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { mountCamp } from './screens/camp.js';
 import { mountCharacter } from './screens/character.js';
@@ -13,9 +14,10 @@ import { mountJournal } from './screens/journal.js';
 import { lockedScreen } from './screens/locked.js';
 import { mountReport } from './screens/report.js';
 import { mountStats } from './screens/stats.js';
-import { playSound, setSoundEnabled, soundEnabled, unlockSound } from './sound.js';
-import { call, handleSessionLost, onCharacterChange, serverNow, setTestMode, state, testModeOn } from './state.js';
-import { closeSheet, confirmAction, initSheet, openSheet, toast } from './ui.js';
+import { musicVolume, setMusicConfig, setMusicPlace, setMusicVolume, startMusic } from './music.js';
+import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
+import { call, handleSessionLost, loadContent, onCharacterChange, serverNow, setTestMode, state, testModeOn } from './state.js';
+import { closeSheet, confirmAction, initSheet, openSheet, toast, withButton } from './ui.js';
 
 const views = {
   loading: $('#view-loading'),
@@ -51,6 +53,14 @@ function show(name) {
 }
 
 async function start() {
+  // The music plays from the start screen on, after the first touch, and
+  // the recorded fight sounds load then too.
+  loadContent()
+    .then((content) => {
+      setMusicConfig(content.music);
+      setRecordings(content.sounds);
+    })
+    .catch(() => {});
   show('loading');
   $('#loading-text').textContent = 'Nawiązywanie połączenia…';
   $('#retry-button').hidden = true;
@@ -69,7 +79,7 @@ async function start() {
 }
 
 async function enterGame() {
-  state.content ??= await request('GET', '/api/content');
+  await loadContent();
   try {
     await call('GET', '/api/character');
   } catch (error) {
@@ -141,8 +151,11 @@ function route() {
   const container = h('div', { class: 'screen-body' });
   clear($('#screen')).append(container);
   window.scrollTo(0, 0);
-  const screen = candidate.mount(container, { params: match.groups ?? {}, navigate, backHash: lastTabHash }) ?? {};
+  const params = match.groups ?? {};
+  const screen = candidate.mount(container, { params, navigate, backHash: lastTabHash }) ?? {};
   current = { route: candidate, screen };
+  // An inner region or a region can have its own music, and so can the camp.
+  setMusicPlace(candidate.mount === mountCamp ? ['camp'] : [params.area, params.region].filter(Boolean));
   renderNav();
   $('.page-title', container)?.focus({ preventScroll: true });
 }
@@ -180,20 +193,60 @@ document.addEventListener('visibilitychange', () => {
 
 window.addEventListener('hashchange', route);
 
+// A volume slider for the settings, from 0 (silence) to 100%. `preview`
+// plays a sample when the finger lets go.
+function volumeRow(id, label, value, change, preview) {
+  const output = h('output', { class: 'volume-value', for: id });
+  const slider = h('input', {
+    type: 'range',
+    id,
+    class: 'duration-slider volume-slider',
+    min: 0,
+    max: 100,
+    step: 5,
+    value,
+    onInput: () => {
+      change(Number(slider.value));
+      show();
+    },
+    onChange: () => preview?.(),
+  });
+  const show = () => {
+    output.textContent = slider.value === '0' ? 'wył.' : `${slider.value}%`;
+    slider.setAttribute('aria-valuetext', slider.value === '0' ? 'wyłączone' : `${slider.value}%`);
+    slider.style.setProperty('--fill', `${slider.value}%`);
+  };
+  show();
+  return h('div', { class: 'status-row status-row--volume' }, h('dt', {}, h('label', { for: id, text: label })), h('dd', {}, slider, output));
+}
+
+// The look of the character: a free change of its portrait and voice.
+function lookRow() {
+  const buttons = state.content.appearances.map((appearance) =>
+    h('button', {
+      type: 'button',
+      class: 'segmented-option',
+      'aria-pressed': String(state.character.appearance === appearance.id),
+      text: appearance.name,
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          await call('POST', '/api/character/appearance', { appearance: appearance.id });
+          for (const [index, button] of buttons.entries()) {
+            button.setAttribute('aria-pressed', String(state.content.appearances[index].id === state.character.appearance));
+          }
+        }),
+    }),
+  );
+  return h(
+    'div',
+    { class: 'status-row status-row--look' },
+    h('dt', { id: 'look-label', text: 'Wygląd' }),
+    h('dd', {}, h('div', { class: 'segmented', role: 'group', 'aria-labelledby': 'look-label' }, buttons)),
+  );
+}
+
 function openSettings() {
   const version = h('dd', { text: '…' });
-  const soundToggle = h('button', {
-    type: 'button',
-    class: 'toggle',
-    role: 'switch',
-    'aria-checked': soundEnabled(),
-    onClick: () => {
-      setSoundEnabled(!soundEnabled());
-      soundToggle.setAttribute('aria-checked', String(soundEnabled()));
-      soundToggle.textContent = soundEnabled() ? 'Włączony' : 'Wyłączony';
-    },
-    text: soundEnabled() ? 'Włączony' : 'Wyłączony',
-  });
   // Shown only while the server allows test mode ("Pomiń czas" and the like).
   const testToggle =
     state.user.testMode &&
@@ -218,14 +271,16 @@ function openSettings() {
       { class: 'status-list' },
       h('div', { class: 'status-row' }, h('dt', { text: 'Konto' }), h('dd', { text: state.user.login })),
       h('div', { class: 'status-row' }, h('dt', { text: 'Postać' }), h('dd', { text: state.character.name })),
-      h('div', { class: 'status-row' }, h('dt', { id: 'sound-label', text: 'Dźwięk' }), h('dd', {}, soundToggle)),
+      lookRow(),
+      volumeRow('music-volume', 'Muzyka', musicVolume(), setMusicVolume),
+      volumeRow('effects-volume', 'Efekty dźwiękowe', effectsVolume(), setEffectsVolume, () => playSound('system')),
       testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
     ),
+    installButton(),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
     h('button', { type: 'button', class: 'button button--danger', onClick: startOver, text: 'Zacznij od nowa' }),
   );
-  soundToggle.setAttribute('aria-labelledby', 'sound-label');
   request('GET', '/api/health')
     .then((health) => {
       version.textContent = health.version;
@@ -292,6 +347,11 @@ function enterAuth() {
   }
   for (const toggle of $$('.password-toggle')) setPasswordVisible(toggle, false);
   setAuthMode('login');
+  setMusicPlace([]);
+  const installSlot = $('#install-slot');
+  clear(installSlot);
+  const install = installBlock();
+  if (install) installSlot.append(install);
   show('auth');
   request('GET', '/api/health')
     .then((health) => {
@@ -358,12 +418,17 @@ bindForm($('#register-form'), (data) => request('POST', '/api/auth/register', da
 
 $('#retry-button').addEventListener('click', start);
 
-// Sound: unlocked by the first touch, then a soft tap for buttons and a
-// different one for changing tabs.
-document.addEventListener('pointerdown', unlockSound, { capture: true });
+// Sound effects and music start with a touch (browsers allow sound only
+// after one); then buttons give a soft tap and tabs a different one.
+function touched() {
+  unlockSound();
+  startMusic();
+}
+document.addEventListener('pointerdown', touched, { capture: true });
 document.addEventListener(
   'click',
   (event) => {
+    touched();
     const target = event.target.closest('button, a');
     if (!target || target.disabled || target.closest('.arena')) return;
     const tab = target.matches('.nav-item, .segmented-option, [role="tab"]');
@@ -371,6 +436,12 @@ document.addEventListener(
   },
   { capture: true },
 );
+
+// The service worker makes the game installable and shows a page when there
+// is no connection (sw.js).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+}
 
 initSheet();
 start();

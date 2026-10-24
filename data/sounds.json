@@ -1,0 +1,17 @@
+{
+  "sounds": {
+    "blade": { "files": ["audio/sfx/blade-1.mp3", "audio/sfx/blade-2.mp3"], "gain": 0.65 },
+    "axe": { "files": ["audio/sfx/axe-1.mp3"], "gain": 0.75 },
+    "fist": { "files": ["audio/sfx/fist-1.mp3", "audio/sfx/fist-2.mp3"], "gain": 0.7 },
+    "bite": { "files": ["audio/sfx/bite-1.mp3", "audio/sfx/bite-2.mp3"], "gain": 0.8 },
+    "claw": { "files": ["audio/sfx/heavy-1.mp3", "audio/sfx/heavy-2.mp3"], "gain": 0.6 },
+    "charge": { "files": ["audio/sfx/heavy-3.mp3", "audio/sfx/heavy-1.mp3"], "gain": 0.85 },
+    "peck": { "files": ["audio/sfx/peck-1.mp3", "audio/sfx/peck-2.mp3"], "gain": 0.6 },
+    "arrow": { "files": ["audio/sfx/arrow-1.mp3", "audio/sfx/arrow-2.mp3"], "gain": 0.6 },
+    "crit": { "files": ["audio/sfx/heavy-2.mp3", "audio/sfx/heavy-3.mp3", "audio/sfx/metal-1.mp3"], "gain": 0.55 },
+    "dodge": { "files": ["audio/sfx/dodge-1.mp3", "audio/sfx/dodge-2.mp3", "audio/sfx/dodge-3.mp3"], "gain": 0.55 },
+    "kill": { "files": ["audio/sfx/fall-1.mp3", "audio/sfx/fall-2.mp3"], "gain": 0.75 }
+  },
+  "synth": ["magic"],
+  "voices": {}
+}

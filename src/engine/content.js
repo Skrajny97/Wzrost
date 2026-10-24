@@ -55,5 +55,7 @@ export function buildContent(raw) {
     resourcesById: byId(raw.resources),
     buildings: raw.buildings,
     buildingsById: byId(raw.buildings),
+    appearances: raw.appearances ?? [],
+    appearancesById: byId(raw.appearances ?? []),
   };
 }

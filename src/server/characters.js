@@ -104,6 +104,7 @@ export function engineCharacter(row) {
     classXp: row.class_xp,
     points: JSON.parse(row.points),
     position: row.position,
+    appearance: row.appearance,
   };
 }
 
@@ -197,6 +198,8 @@ export function characterView(player, now) {
     name: row.name,
     classId: row.class_id,
     className: content.classesById[row.class_id].name,
+    // The look: the portrait and the voice in fights.
+    appearance: row.appearance,
     level: row.level,
     xp: row.xp,
     xpToNext: xpToNext(row.level, content),
@@ -275,6 +278,7 @@ export async function createCharacter(context) {
   const name = validateName(body.name);
   const cls = typeof body.classId === 'string' ? content.classesById[body.classId] : undefined;
   if (!cls) throw new ApiError(400, 'invalid_class', 'Wybierz klasę postaci.');
+  const appearance = validAppearance(body.appearance);
 
   const db = context.env.DB;
   const exists = () => new ApiError(409, 'character_exists', 'Masz już postać.');
@@ -286,15 +290,31 @@ export async function createCharacter(context) {
   try {
     await db
       .prepare(
-        "INSERT INTO characters (user_id, role, name, class_id, position, hp, hp_at, created_at) VALUES (?, 'player', ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO characters (user_id, role, name, class_id, appearance, position, hp, hp_at, created_at) VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?)",
       )
-      .bind(session.userId, name, cls.id, cls.position, hp, now, now)
+      .bind(session.userId, name, cls.id, appearance, cls.position, hp, now, now)
       .run();
   } catch (error) {
     if (String(error?.message).includes('UNIQUE')) throw exists();
     throw error;
   }
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
+}
+
+const validAppearance = (id) => {
+  if (typeof id !== 'string' || !content.appearancesById[id]) throw new ApiError(400, 'invalid_appearance', 'Wybierz wygląd postaci.');
+  return id;
+};
+
+// The look can change at any time, also during an exploration: it changes
+// nothing but the portrait and the voice.
+export async function setAppearance(context) {
+  const { player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  const appearance = validAppearance(body.appearance);
+  await context.env.DB.prepare('UPDATE characters SET appearance = ?, version = version + 1 WHERE id = ?').bind(appearance, player.row.id).run();
+  const updated = { ...player, row: { ...player.row, appearance, version: player.row.version + 1 } };
+  return json({ character: characterView(updated, context.now) });
 }
 
 // "Zacznij od nowa": the character, its items, hunt and reports are removed;
