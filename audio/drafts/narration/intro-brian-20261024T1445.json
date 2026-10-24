@@ -1,0 +1,18 @@
+{
+  "id": "intro-brian",
+  "payload": {
+    "text": "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę. Ja opowiadam tę historię, a Ty ją prowadzisz: przygotowujesz postać, wysyłasz ją w las i czytasz, co tam zaszło.",
+    "model_id": "eleven_multilingual_v2",
+    "voice_settings": {
+      "stability": 0.6,
+      "similarity_boost": 0.75,
+      "style": 0.2,
+      "speed": 0.92,
+      "use_speaker_boost": true
+    }
+  },
+  "files": [
+    "audio/drafts/narration/intro-brian-20261024T1445-0.mp3"
+  ],
+  "credits": 272
+}
