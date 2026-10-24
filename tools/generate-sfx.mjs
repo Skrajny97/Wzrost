@@ -3,6 +3,7 @@
 // branch for review:
 //   node tools/generate-sfx.mjs --kind voices --ids wolf-hurt,wolf-death --max-credits 200
 //     [--variants 2] [--dry-run]
+// An id can ask for its own number of takes: --ids intro:3,purpose.
 // Prompts and lengths are in audio/prompts.json; a prompt is its text, or
 // {text, seconds} when it needs a length of its own. A sound of a set length
 // costs 20 credits a second, so the run counts the credits before it starts
@@ -54,11 +55,13 @@ const tutorial = tts && JSON.parse(readFileSync('data/tutorial.json', 'utf8'));
 
 // `allLines` makes a prompt of every line of the narrator's introduction,
 // named by the line's id, and of its female version, `<id>-female`. An entry
-// of the same name in `prompts` adds to it: say, what the voice reads when
-// the parchment would be misread.
+// of the same name in `prompts` adds to it, and so does any other entry that
+// reads a line: say, words the voice reads differently from the parchment.
 const own = (id) => kind.prompts?.[id] ?? {};
 const prompts = {
-  ...kind.prompts,
+  ...Object.fromEntries(
+    Object.entries(kind.prompts ?? {}).map(([id, entry]) => [id, entry.line && kind.allLines ? { ...kind.allLines, ...entry } : entry]),
+  ),
   ...(kind.allLines &&
     Object.fromEntries(
       tutorial.lines.flatMap((line) => [
@@ -67,10 +70,15 @@ const prompts = {
       ]),
     )),
 };
-const ids = values.ids === 'all' ? Object.keys(prompts) : values.ids.split(',').map((id) => id.trim()).filter(Boolean);
+const variants = Math.max(1, Math.min(4, Number(values.variants) || 1));
+const asked = values.ids === 'all' ? Object.keys(prompts) : values.ids.split(',').map((id) => id.trim()).filter(Boolean);
+const takesOf = Object.fromEntries(asked.map((item) => {
+  const [id, count] = item.split(':');
+  return [id, count ? Math.max(1, Math.min(4, Number(count) || 1)) : variants];
+}));
+const ids = Object.keys(takesOf);
 const unknown = ids.filter((id) => !prompts[id]);
 if (unknown.length) fail(`Brak opisu w audio/prompts.json dla: ${unknown.join(', ')}.`);
-const variants = Math.max(1, Math.min(4, Number(values.variants) || 1));
 const maxCredits = Number(values['max-credits']);
 if (!(maxCredits > 0)) fail('--max-credits musi być dodatnią liczbą kredytów.');
 
@@ -87,7 +95,13 @@ function mainText(entry) {
   const line = tutorial.lines.find((candidate) => candidate.id === entry.line);
   if (!line) fail(`Brak kwestii ${entry.line} w data/tutorial.json.`);
   const told = entry.variant === 'female' ? line.female : line;
-  return told.text.join(' ').replaceAll('{points}', String(balance.timePoints.start));
+  let text = told.text.join(' ').replaceAll('{points}', String(balance.timePoints.start));
+  // `say`: [written, read] pairs, e.g. a comma that helps the voice end "broń".
+  for (const [written, read] of entry.say ?? []) {
+    if (!text.includes(written)) fail(`Kwestia ${entry.line} nie zawiera już „${written}” (say w audio/prompts.json).`);
+    text = text.replace(written, read);
+  }
+  return text;
 }
 
 const prompt = (id) => {
@@ -102,14 +116,14 @@ const credits = (id) => {
   return Math.ceil(prompt(id).text.length * perCharacter);
 };
 const size = (id) => (tts ? `${prompt(id).text.length} znaków` : `${prompt(id).seconds} s`);
-const total = ids.reduce((sum, id) => sum + credits(id) * variants, 0);
+const total = ids.reduce((sum, id) => sum + credits(id) * takesOf[id], 0);
 const lines = [`| Dźwięk | Wynik |`, `| --- | --- |`];
 if (total > maxCredits) {
   summary(`Wycena: ${total} kredytów, więcej niż limit ${maxCredits}. Nic nie nagrano.`);
   fail(`Te dźwięki kosztowałyby ${total} kredytów, a limit to ${maxCredits}.`);
 }
 if (values['dry-run']) {
-  for (const id of ids) lines.push(`| ${id} | wycena ${credits(id) * variants} kredytów (${size(id)}) |`);
+  for (const id of ids) lines.push(`| ${id} | wycena ${credits(id) * takesOf[id]} kredytów (${size(id)}, ${takesOf[id]}×) |`);
   summary([`Wycena razem: ${total} kredytów.`, '', ...lines].join('\n'));
   console.log(`Wycena razem: ${total} kredytów.`);
   process.exit(0);
@@ -205,12 +219,12 @@ function requestFor(id) {
   };
 }
 
-// One sound, recorded `variants` times; each take is a separate request.
+// One sound, recorded as many times as asked; each take is a separate request.
 async function record(id) {
   const { url, payload, sent = payload, previews, timed } = requestFor(id);
   const files = [];
   const generated = []; // a remix's voices, which can be kept as a voice of the account
-  for (let take = 0; take < variants; take++) {
+  for (let take = 0; take < takesOf[id]; take++) {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'xi-api-key': token, 'Content-Type': 'application/json' },
@@ -242,7 +256,7 @@ async function record(id) {
     }
     files.push(file);
   }
-  const takes = previews ? variants : files.length;
+  const takes = previews ? takesOf[id] : files.length;
   const { ending } = prompt(id);
   writeFileSync(
     `${outDir}/${id}-${stamp}.json`,

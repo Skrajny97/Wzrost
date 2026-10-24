@@ -100,48 +100,64 @@
       "languageCode": "pl"
     },
     "prompts": {
-      "try-plain": {
-        "voice": "Narrator",
-        "model": "eleven_v3",
-        "settings": {
-          "stability": 0.5
-        },
-        "line": "purpose"
+      "character": {
+        "say": [
+          [
+            "broń i",
+            "broń, i"
+          ]
+        ]
       },
-      "try-dots": {
-        "voice": "Narrator",
-        "model": "eleven_v3",
-        "settings": {
-          "stability": 0.5
-        },
-        "text": "Znalazłeś się w miejscu, którego celem jest rozwój. Liczę na to, że osiągniesz szczyty…"
+      "character-female": {
+        "say": [
+          [
+            "broń i",
+            "broń, i"
+          ]
+        ]
       },
-      "try-pause": {
-        "voice": "Narrator",
-        "model": "eleven_v3",
+      "tap-claim": {
         "settings": {
-          "stability": 0.5
-        },
-        "text": "Znalazłeś się w miejscu, którego celem jest rozwój. Liczę na to, że osiągniesz szczyty. [pauses]"
+          "stability": 0.5,
+          "speed": 0.85
+        }
       },
-      "try-ending": {
-        "voice": "Narrator",
-        "model": "eleven_v3",
-        "settings": {
-          "stability": 0.5
-        },
-        "line": "purpose",
-        "ending": "\n\nTak."
+      "test-lower": {
+        "line": "test",
+        "say": [
+          [
+            "na Skraj",
+            "na skraj"
+          ]
+        ]
       },
-      "try-context": {
-        "voice": "Narrator",
-        "model": "eleven_v3",
-        "settings": {
-          "stability": 0.5
-        },
-        "line": "purpose",
-        "previousText": "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę. Witaj, przybyszu.",
-        "nextText": "Na początku drobny test dla Ciebie. Jedno z najbezpieczniejszych wyzwań, jakie Cię czekają. Udaj się na wyprawę na Skraj Wiatrołomów."
+      "camp-calm": {
+        "line": "camp",
+        "say": [
+          [
+            "Na tej polanie",
+            "[calmly] Na tej polanie"
+          ]
+        ]
+      },
+      "lead-campfire-calm": {
+        "line": "lead-campfire",
+        "say": [
+          [
+            "Teraz zajmijmy",
+            "[calmly] Teraz zajmijmy"
+          ]
+        ]
+      },
+      "lead-campfire-female-calm": {
+        "line": "lead-campfire",
+        "variant": "female",
+        "say": [
+          [
+            "Teraz zajmijmy",
+            "[calmly] Teraz zajmijmy"
+          ]
+        ]
       }
     },
     "allLines": {
@@ -149,7 +165,8 @@
       "model": "eleven_v3",
       "settings": {
         "stability": 0.5
-      }
+      },
+      "ending": " [pauses]"
     }
   }
 }

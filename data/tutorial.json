@@ -75,7 +75,7 @@
       "id": "tap-start",
       "kind": "tap",
       "text": [
-        "Suwak stoi na 30 minutach. Stuknij „Wyrusz”."
+        "Suwak stoi na trzydziestu minutach. Stuknij „Wyrusz”."
       ],
       "voice": "audio/narration/tap-start.mp3"
     },
