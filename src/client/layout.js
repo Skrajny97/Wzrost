@@ -92,7 +92,7 @@ function walletRows() {
       h('span', { class: 'wallet-amount', text: formatNumber(amount) }),
     );
   return [
-    row('coin', gold.name, gold.amount),
+    row('coin', gold.name, gold.amount, 'gold'),
     row(SYSTEM_POINTS_ICON, 'Punkty Systemu', state.character.systemPoints, 'system'),
     row('hourglass', 'Punkty Czasu', state.character.timePoints, 'time'),
     ...materials.map((entry, index) => row(RESOURCE_ICONS[entry.id] ?? 'unknown', entry.name, entry.amount, index === 0 && 'materials')),

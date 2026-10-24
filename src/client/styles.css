@@ -21,6 +21,8 @@
   --bark-active: #3a2e22;
   --accent: #c9a14a;
   --gold: #d9b45a;
+  /* Punkty Czasu: the amber of an hourglass's sand. */
+  --time: #e39b5b;
   --hp: #c8553d;
   --hp-track: #2a1c17;
   --mana: #4f8fc0;
@@ -632,17 +634,22 @@ button {
   box-shadow: 0 0 0 2px var(--bg-deep);
 }
 
+/* Each currency in its own color: gold, the System's blue and amber time. */
+.wallet-item--gold .wallet-name,
+.wallet-item--gold svg {
+  color: var(--gold);
+}
+
 .wallet-item--system .wallet-name,
 .wallet-item--system .wallet-amount,
 .wallet-item--system svg {
   color: var(--system);
 }
 
-/* Punkty Czasu: the gold of the hourglass. */
 .wallet-item--time .wallet-name,
 .wallet-item--time .wallet-amount,
 .wallet-item--time svg {
-  color: var(--gold);
+  color: var(--time);
 }
 
 /* The materials under the currencies. */
@@ -3463,13 +3470,13 @@ a.segmented-option {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 1px solid var(--gold);
-  background: rgba(217, 180, 90, 0.12);
-  color: var(--gold);
+  border: 1px solid var(--time);
+  background: rgba(227, 155, 91, 0.12);
+  color: var(--time);
 }
 
 .button--time:active:not(:disabled) {
-  background: rgba(217, 180, 90, 0.22);
+  background: rgba(227, 155, 91, 0.22);
 }
 
 .time-cost {
