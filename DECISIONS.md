@@ -763,3 +763,35 @@ Autor odrzucił wszystkie cztery szkice głosu i poprosił o kilka zmian w wprow
 6. **Teksty do zatwierdzenia.** Autor widzi w tekstach narratora naleciałości AI i sam je poprawia. Teksty czytane głosem trafiają do autora przed nagraniem, żeby nie wydawać kredytów ElevenLabs na wersje do wymiany. Obecne teksty są szkicem: cały scenariusz (kwestie 1–25) czeka na poprawki autora.
 7. **Głos.** Żaden z czterech głosów (River, Brian, George, Lily) nie pasuje. Najbliżej jest George, ale ma mówić o wiele wolniej, niżej i bardziej chrapliwie, naturalnie, jak przy ognisku. Po zatwierdzeniu tekstów będzie jedna runda prób na pierwszej kwestii, a potem nagranie kwestii, które autor wskaże. Punkt zastępuje wybór głosu z punktu 7 „Wprowadzenia narratora i Punktów Czasu”.
 8. **Na później.** Imiona postaci mają być unikalne w całej grze. Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach.
+
+## Scenariusz narratora autora (24.10.2026)
+
+1. **Tekst autora.** Autor napisał cały scenariusz od nowa: 31 kwestii w `data/tutorial.json`. W grze są słowo w słowo. Poprawione są tylko literówki („ze” na „że”, „stosuję” na „stosuje”, „dzieki”) i interpunkcja (przecinki, półpauzy zamiast łączników, wielokropki). Narrator nie daje już Punktów Czasu na początku, tylko w lesie, przy pierwszej wyprawie. Ostatnie zdanie jest teraz autora („Tyle na początek… Powodzenia.”). Punkt zastępuje tekst kart z punktów 2 i 7 „Wprowadzenia narratora i Punktów Czasu”.
+2. **Cztery rodzaje kwestii:**
+    - `card`: pergamin na środku ekranu,
+    - `point`: pergamin przy podświetlonym miejscu, z „Dalej”,
+    - `lead`: pergamin przy miejscu, które trzeba stuknąć, np. „Zajrzyjmy jeszcze do okienka Postaci…” przy Postaci,
+    - `tap`: sam narrator z poleceniem w dymku.
+
+    Każdy pergamin, także ten przy miejscu, rozwija się przed kwestią i zwija po niej.
+3. **Kilka miejsc naraz.** Cień ma osobny otwór na każde miejsce, więc Kamieniołom i Kopalnię narrator wskazuje razem. Podświetlone jest tylko to, co widać i da się stuknąć, czyli nic pod dolnym paskiem.
+4. **Punkty bez przymusu** (prośba autora). Po pergaminie o statystykach świecą się „Rozdaj według klasy”, wszystkie plusy i pasek z „Zatwierdź”. Gracz rozdaje punkty, jak chce. Krok trwa, aż nie zostanie żaden wolny punkt. Ekran można wtedy przewijać, a stuknięcia poza podświetlonymi miejscami są zatrzymywane.
+5. **Obóz.** Po wejściu do obozu narrator czeka 3 sekundy (prośba autora), a potem wskazuje po kolei:
+    - plac Tartaku,
+    - Kamieniołom z Kopalnią,
+    - Kowadło,
+    - Ognisko,
+    - „Zbuduj”,
+    - odliczanie budowy,
+    - zębatkę ustawień.
+6. **Głos w grze.** Autor chce głosu dla wszystkich pergaminów i poleceń. Kwestia z nagraniem (`voice`) gra po rozwinięciu pergaminu, przez łańcuch efektów, 2,2 raza głośniej od zwykłego efektu. Muzyka przycicha wtedy do ćwierci, a „Dalej” przerywa nagranie.
+7. **Druga runda głosu.** ElevenLabs nie przerabia gotowych głosów z biblioteki („Only your own custom voices can be remixed”), więc George'a nie da się remiksować. Na stronie odsłuchu jest 10 prób pierwszego pergaminu:
+    - George wolniej (tempo 0,7),
+    - George wolniej i niżej (o 2 półtony, z zachowaną barwą),
+    - George na modelu Eleven v3,
+    - George na v3, wolniej i niżej,
+    - trzy nowe głosy zaprojektowane przez ElevenLabs z nagrania George'a jako niższe, starsze i chrapliwe (Voice Design z nagraniem wzorcowym, `audio/references/george-slow.mp3`),
+    - trzy głosy z samego opisu starego gawędziarza.
+
+    Wybrany głos zaprojektowany trzeba jeszcze zapisać na koncie ElevenLabs (`generated_voice_id` w szkicach), zanim przeczyta resztę kwestii. Próby kosztowały 354 kredyty, a projektowanie według szacunku narzędzia ok. 1060.
+8. **Otwarte.** W tekstach autora są formy męskie („Znalazłeś”, „gotów”, „przybyszu”, „będziesz musiał”), a gra ma postacie kobiece. Pytanie do autora: formy zostają, czy zależą od wyglądu postaci. Nowe jest jedno polecenie bez zatwierdzenia autora: „Rozdaj wolne punkty.”.
