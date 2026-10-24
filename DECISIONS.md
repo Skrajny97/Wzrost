@@ -795,3 +795,14 @@ Autor odrzucił wszystkie cztery szkice głosu i poprosił o kilka zmian w wprow
 
     Wybrany głos zaprojektowany trzeba jeszcze zapisać na koncie ElevenLabs (`generated_voice_id` w szkicach), zanim przeczyta resztę kwestii. Próby kosztowały 354 kredyty, a projektowanie według szacunku narzędzia ok. 1060.
 8. **Otwarte.** W tekstach autora są formy męskie („Znalazłeś”, „gotów”, „przybyszu”, „będziesz musiał”), a gra ma postacie kobiece. Pytanie do autora: formy zostają, czy zależą od wyglądu postaci. Nowe jest jedno polecenie bez zatwierdzenia autora: „Rozdaj wolne punkty.”.
+9. **Pomijanie pojedynczych pergaminów** (prośba autora). Każdy pergamin ma „Dalej”:
+    - na środku ekranu przycisk działa od razu, także gdy pergamin się rozwija, i przerywa czytanie,
+    - przy miejscu przechodzi do następnej kwestii,
+    - przy pergaminie prowadzącym robi to samo co stuknięcie we wskazane miejsce.
+
+    „Pomiń wprowadzenie” dalej kończy całe wprowadzenie. Polecenie w dymku mija, gdy gracz stuknie wskazane miejsce.
+10. **Głos narratora.** Autor wybrał „Gawędziarz 1”, głos zaprojektowany z opisu starego gawędziarza przy ognisku. Na koncie ElevenLabs nazywa się „Narrator” (`voices.Narrator` w `audio/prompts.json`).
+    - Wszystkie 31 kwestii nagrał model Eleven v3, na którym ten głos powstał (`allLines`). Kosztowało to ok. 3,5 tys. kredytów.
+    - Nagrania są przycięte z ciszy, wyrównane do −18 LUFS i zapisane w mono 56 kb/s: razem 4,4 min i 1,9 MB w `src/client/audio/narration/`.
+    - Gdy narrator czyta kwestię, następne nagranie pobiera się w tle.
+    - Wszystkie nagrania są na stronie odsłuchu, z „Do wymiany” przy każdej kwestii.

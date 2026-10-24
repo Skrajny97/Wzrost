@@ -9,121 +9,248 @@
       "text": [
         "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę.",
         "Witaj, przybyszu."
-      ]
+      ],
+      "voice": "audio/narration/intro.mp3"
     },
-    { "id": "purpose", "kind": "card", "text": ["Znalazłeś się w miejscu, którego celem jest rozwój. Liczę na to, że osiągniesz szczyty."] },
+    {
+      "id": "purpose",
+      "kind": "card",
+      "text": [
+        "Znalazłeś się w miejscu, którego celem jest rozwój. Liczę na to, że osiągniesz szczyty."
+      ],
+      "voice": "audio/narration/purpose.mp3"
+    },
     {
       "id": "test",
       "kind": "card",
-      "text": ["Na początku drobny test dla Ciebie. Jedno z najbezpieczniejszych wyzwań, jakie Cię czekają. Udaj się na wyprawę na Skraj Wiatrołomów."]
+      "text": [
+        "Na początku drobny test dla Ciebie. Jedno z najbezpieczniejszych wyzwań, jakie Cię czekają. Udaj się na wyprawę na Skraj Wiatrołomów."
+      ],
+      "voice": "audio/narration/test.mp3"
     },
-    { "id": "tap-region", "kind": "tap", "text": ["Stuknij Wiatrołomy."] },
-    { "id": "tap-area", "kind": "tap", "text": ["Wybierz Skraj Wiatrołomów."] },
-    { "id": "trial", "kind": "card", "text": ["Nie jesteś jeszcze gotów na dłuższe wyprawy. Zacznijmy od półgodzinnej próby."] },
-    { "id": "tap-start", "kind": "tap", "text": ["Suwak stoi na 30 minutach. Stuknij „Wyrusz”."] },
+    {
+      "id": "tap-region",
+      "kind": "tap",
+      "text": [
+        "Stuknij Wiatrołomy."
+      ],
+      "voice": "audio/narration/tap-region.mp3"
+    },
+    {
+      "id": "tap-area",
+      "kind": "tap",
+      "text": [
+        "Wybierz Skraj Wiatrołomów."
+      ],
+      "voice": "audio/narration/tap-area.mp3"
+    },
+    {
+      "id": "trial",
+      "kind": "card",
+      "text": [
+        "Nie jesteś jeszcze gotów na dłuższe wyprawy. Zacznijmy od półgodzinnej próby."
+      ],
+      "voice": "audio/narration/trial.mp3"
+    },
+    {
+      "id": "tap-start",
+      "kind": "tap",
+      "text": [
+        "Suwak stoi na 30 minutach. Stuknij „Wyrusz”."
+      ],
+      "voice": "audio/narration/tap-start.mp3"
+    },
     {
       "id": "skip",
       "kind": "card",
       "text": [
         "Jesteś już w lesie. Czas jest nieubłagany… gdyby nie pomoc Systemu. Punkty Czasu pozwolą Ci przyspieszyć eksplorację. Proszę – oto {points} jednostek na start. Potraktuj to… jako drogocenny prezent."
-      ]
+      ],
+      "voice": "audio/narration/skip.mp3"
     },
-    { "id": "tap-skip", "kind": "tap", "text": ["Przewiń czas Punktami Czasu."] },
-    { "id": "tap-claim", "kind": "tap", "text": ["Odbierz raport."] },
+    {
+      "id": "tap-skip",
+      "kind": "tap",
+      "text": [
+        "Przewiń czas Punktami Czasu."
+      ],
+      "voice": "audio/narration/tap-skip.mp3"
+    },
+    {
+      "id": "tap-claim",
+      "kind": "tap",
+      "text": [
+        "Odbierz raport."
+      ],
+      "voice": "audio/narration/tap-claim.mp3"
+    },
     {
       "id": "report",
       "kind": "card",
-      "text": ["Twoja wyprawa zakończyła się sukcesem, ale by poznać jego wagę… pozwól, że przeprowadzę Cię przez raport podróży."]
+      "text": [
+        "Twoja wyprawa zakończyła się sukcesem, ale by poznać jego wagę… pozwól, że przeprowadzę Cię przez raport podróży."
+      ],
+      "voice": "audio/narration/report.mp3"
     },
-    { "id": "report-summary", "kind": "point", "text": ["Na samej górze raportu możesz zobaczyć najważniejsze informacje."] },
+    {
+      "id": "report-summary",
+      "kind": "point",
+      "text": [
+        "Na samej górze raportu możesz zobaczyć najważniejsze informacje."
+      ],
+      "voice": "audio/narration/report-summary.mp3"
+    },
     {
       "id": "report-system",
       "kind": "point",
-      "text": ["To domena Systemu. Nikt ostatecznie nie rozwikłał tajemnic wspomnianego. Jego użyteczność jednak – masz podaną jak na dłoni."]
+      "text": [
+        "To domena Systemu. Nikt ostatecznie nie rozwikłał tajemnic wspomnianego. Jego użyteczność jednak – masz podaną jak na dłoni."
+      ],
+      "voice": "audio/narration/report-system.mp3"
     },
     {
       "id": "report-fights",
       "kind": "point",
       "text": [
         "System rejestruje potyczki, które stoczyłeś w trakcie eksploracji. Możesz je przejrzeć, wybierając z zakładek. Gwiazdka przy zakładce oznacza najważniejszą z walk."
-      ]
+      ],
+      "voice": "audio/narration/report-fights.mp3"
     },
-    { "id": "report-items", "kind": "point", "text": ["To wszystko, co znalazłeś podczas wyprawy. Wylądowało już w Twoim plecaku."] },
-    { "id": "report-account", "kind": "point", "text": ["A jeśli interesuje Cię przebieg całej wyprawy – System dokładnie opisuje ją w tym miejscu."] },
-    { "id": "lead-character", "kind": "lead", "text": ["Zajrzyjmy jeszcze do okienka Postaci, którą przyszło Ci kierować."] },
+    {
+      "id": "report-items",
+      "kind": "point",
+      "text": [
+        "To wszystko, co znalazłeś podczas wyprawy. Wylądowało już w Twoim plecaku."
+      ],
+      "voice": "audio/narration/report-items.mp3"
+    },
+    {
+      "id": "report-account",
+      "kind": "point",
+      "text": [
+        "A jeśli interesuje Cię przebieg całej wyprawy – System dokładnie opisuje ją w tym miejscu."
+      ],
+      "voice": "audio/narration/report-account.mp3"
+    },
+    {
+      "id": "lead-character",
+      "kind": "lead",
+      "text": [
+        "Zajrzyjmy jeszcze do okienka Postaci, którą przyszło Ci kierować."
+      ],
+      "voice": "audio/narration/lead-character.mp3"
+    },
     {
       "id": "character",
       "kind": "card",
       "text": [
         "W tym oknie Systemu możesz przejrzeć swój ekwipunek. Podczas wyprawy zdobyłeś broń i jak widzisz – System ułatwił sprawę i pozwolił Ci jej dobyć bez Twojej ingerencji."
-      ]
+      ],
+      "voice": "audio/narration/character.mp3"
     },
     {
       "id": "lead-stats",
       "kind": "lead",
-      "text": ["Zdobycie poziomów w wyniku wypraw – czy to klasy, czy postaci – daje Ci również punkty statystyk do rozdysponowania. Zajrzyjmy do nich."]
+      "text": [
+        "Zdobycie poziomów w wyniku wypraw – czy to klasy, czy postaci – daje Ci również punkty statystyk do rozdysponowania. Zajrzyjmy do nich."
+      ],
+      "voice": "audio/narration/lead-stats.mp3"
     },
     {
       "id": "stats",
       "kind": "card",
       "text": [
         "System ułatwia sprawę, dzięki czemu nie musisz głowić się nad tymi wszystkimi liczbami. Możesz rozdysponować zdobyte punkty tak, by najlepiej pasowały do Twojej klasy. Ale! Możesz budować swoją postać również wedle własnego uznania."
-      ]
+      ],
+      "voice": "audio/narration/stats.mp3"
     },
-    { "id": "free-points", "kind": "tap", "text": ["Rozdaj wolne punkty."] },
+    {
+      "id": "free-points",
+      "kind": "tap",
+      "text": [
+        "Rozdaj wolne punkty."
+      ],
+      "voice": "audio/narration/free-points.mp3"
+    },
     {
       "id": "lead-camp",
       "kind": "lead",
-      "text": ["Żadna szanująca się postać nie pozbawi siebie opcji budowania obozu, a kto wie, może z czasem i całej wioski. Zajrzyjmy do Twojego obozu."]
+      "text": [
+        "Żadna szanująca się postać nie pozbawi siebie opcji budowania obozu, a kto wie, może z czasem i całej wioski. Zajrzyjmy do Twojego obozu."
+      ],
+      "voice": "audio/narration/lead-camp.mp3"
     },
     {
       "id": "camp",
       "kind": "card",
-      "text": ["Na tej polanie ktoś już kiedyś obozował. Dobrze dla Ciebie! Wygląda na to, że zostawił trochę drewna, kamieni i kilka monet. Znalezione – niekradzione."]
+      "text": [
+        "Na tej polanie ktoś już kiedyś obozował. Dobrze dla Ciebie! Wygląda na to, że zostawił trochę drewna, kamieni i kilka monet. Znalezione – niekradzione."
+      ],
+      "voice": "audio/narration/camp.mp3"
     },
     {
       "id": "camp-sawmill",
       "kind": "point",
       "text": [
         "To dobre miejsce na zbudowanie tartaku. System wspomaga nas w codziennym funkcjonowaniu, także i produkcja drewna w takowym odbywa się automatycznie. Będziesz musiał jedynie zbierać wyprodukowane drewno."
-      ]
+      ],
+      "voice": "audio/narration/camp-sawmill.mp3"
     },
     {
       "id": "camp-quarry",
       "kind": "point",
-      "text": ["Podobna zasada stosuje się do Kamieniołomu, który wydobędzie dla Ciebie kamienie, i Kopalni, z której uzyskasz rudę żelaza."]
+      "text": [
+        "Podobna zasada stosuje się do Kamieniołomu, który wydobędzie dla Ciebie kamienie, i Kopalni, z której uzyskasz rudę żelaza."
+      ],
+      "voice": "audio/narration/camp-quarry.mp3"
     },
     {
       "id": "camp-anvil",
       "kind": "point",
-      "text": ["A gdy zapragniesz wzmocnić posiadane przedmioty – możesz zastanowić się nad postawieniem i rozwojem Kowadła. Pozwoli Ci ulepszyć swój ekwipunek."]
+      "text": [
+        "A gdy zapragniesz wzmocnić posiadane przedmioty – możesz zastanowić się nad postawieniem i rozwojem Kowadła. Pozwoli Ci ulepszyć swój ekwipunek."
+      ],
+      "voice": "audio/narration/camp-anvil.mp3"
     },
     {
       "id": "lead-campfire",
       "kind": "lead",
       "text": [
         "Teraz zajmijmy się jednak Twoim powrotem do zdrowia, byś mógł szybciej wyruszyć na kolejną wyprawę. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko."
-      ]
+      ],
+      "voice": "audio/narration/lead-campfire.mp3"
     },
-    { "id": "tap-build", "kind": "tap", "text": ["Zbuduj Ognisko."] },
+    {
+      "id": "tap-build",
+      "kind": "tap",
+      "text": [
+        "Zbuduj Ognisko."
+      ],
+      "voice": "audio/narration/tap-build.mp3"
+    },
     {
       "id": "camp-countdown",
       "kind": "point",
       "text": [
         "Budowa musi zawsze trochę potrwać, szczególnie jeśli chodzi o rozbudowę. Na szczęście i w tym System Cię wyręczy. Podczas budowy możesz wykonywać wszelkie inne dostępne aktywności."
-      ]
+      ],
+      "voice": "audio/narration/camp-countdown.mp3"
     },
     {
       "id": "settings",
       "kind": "point",
       "text": [
         "Dla Twojej wygody możesz również zajrzeć do części ustawień samego Systemu i ustawić je tak, jak Ci się żywnie podoba. Jeśli stwierdzisz, że popełniłeś za dużo błędów – możesz nawet zacząć od nowa."
-      ]
+      ],
+      "voice": "audio/narration/settings.mp3"
     },
     {
       "id": "ending",
       "kind": "card",
-      "text": ["Tyle na początek. Resztę funkcjonalności Systemu, swój cel i upodobania – będziesz musiał poznać sam. Powodzenia."]
+      "text": [
+        "Tyle na początek. Resztę funkcjonalności Systemu, swój cel i upodobania – będziesz musiał poznać sam. Powodzenia."
+      ],
+      "voice": "audio/narration/ending.mp3"
     }
   ]
 }

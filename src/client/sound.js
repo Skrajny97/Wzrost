@@ -295,6 +295,11 @@ export function playNarration(file, { onEnd } = {}) {
   });
 }
 
+// A line's recording, fetched and decoded ahead of its turn.
+export function preloadNarration(file) {
+  if (context) decode(file);
+}
+
 export function stopNarration() {
   if (!narration) return;
   const current = narration;

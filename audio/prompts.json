@@ -90,18 +90,13 @@
         "River": "SAz9YHcvj6GT2YYXdXww",
         "Brian": "nPczCjzI2devNBz1zQrb",
         "George": "JBFqnCBsd6RMkjVDRZzb",
-        "Lily": "pFZP5JQG7iQjIQuC4Bku"
+        "Lily": "pFZP5JQG7iQjIQuC4Bku",
+        "Narrator": "EzVQa2PYE48LG3dn30Fa"
       },
       "remixGuidance": 2,
       "previewCreditsPerCharacter": 3,
       "designModel": "eleven_ttv_v3",
-      "designGuidance": 3,
-      "saved": {
-        "Narrator": {
-          "generatedVoiceId": "EzVQa2PYE48LG3dn30Fa",
-          "description": "Insight: stary gawędziarz przy ognisku, niski, chrapliwy, ciepły głos, mówi powoli i naturalnie."
-        }
-      }
+      "designGuidance": 3
     },
     "prompts": {},
     "allLines": {

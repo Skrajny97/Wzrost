@@ -15,7 +15,7 @@
 import { narratorSprite } from './art.js';
 import { $, fill, h } from './dom.js';
 import { duckMusic } from './music.js';
-import { playNarration, playSound, stopNarration } from './sound.js';
+import { playNarration, playSound, preloadNarration, stopNarration } from './sound.js';
 import { activityFinished, call, isUnlocked, state } from './state.js';
 import { toast } from './ui.js';
 
@@ -167,8 +167,12 @@ function skipAll() {
 
 const words = (line) => line.text.map((text) => text.replaceAll('{points}', String(state.content.tutorial.startTimePoints)));
 
-// The line's recording, over quieter music.
+// The line's recording, over quieter music. The next line's recording is
+// fetched meanwhile, so it starts on time.
 function speak(line) {
+  const lines = state.content.tutorial.lines;
+  const following = lines.slice(lines.indexOf(line) + 1).find((candidate) => candidate.voice);
+  if (following) preloadNarration(following.voice);
   if (!line.voice) return;
   duckMusic(true);
   playNarration(line.voice, { onEnd: () => duckMusic(false) });
@@ -211,6 +215,7 @@ function openCard(line) {
   dialog.append(h('div', { class: 'narrator-art' }, narratorSprite()), h('div', { class: 'narrator-scroll' }, rod(), sheet, rod()));
   document.body.append(dialog);
   scroll = { dialog, sheet, line, busy: true };
+  if (line.voice) preloadNarration(line.voice);
   write(line);
   dialog.showModal();
   playSound('open');
@@ -236,13 +241,16 @@ function write(line) {
   );
 }
 
+// The card unrolls and then is read. "Dalej" works at once, also while the
+// parchment unrolls.
 async function unrollCard() {
   const current = scroll;
-  await roll(current.sheet, true);
-  if (scroll !== current) return;
+  const line = current.line;
   current.busy = false;
+  await roll(current.sheet, true);
+  if (scroll !== current || current.line !== line || current.busy) return;
   $('.narrator-next', current.sheet)?.focus();
-  speak(current.line);
+  speak(line);
 }
 
 // "Dalej": the scroll rolls up, and unrolls again for the next card, or the
@@ -442,9 +450,11 @@ function bubbleNote(line) {
 }
 
 // A pointer or a lead: the narrator with a small scroll that unrolls.
+// "Dalej" passes a pointer; on a lead it does what a tap on the place does.
 function scrollNote(line) {
   const tutorial = state.content.tutorial;
   const pointer = line.kind === 'point';
+  const go = () => (places(line).find(inView) ?? places(line)[0])?.click();
   const sheet = h(
     'div',
     { class: 'guide-sheet' },
@@ -452,7 +462,7 @@ function scrollNote(line) {
       'div',
       { class: 'guide-page', role: 'status' },
       words(line).map((text) => h('p', { text })),
-      pointer && h('button', { type: 'button', class: 'button guide-next', text: tutorial.nextLabel, onClick: onward }),
+      h('button', { type: 'button', class: 'button guide-next', text: tutorial.nextLabel, onClick: pointer ? onward : go }),
     ),
   );
   const element = h('div', { class: 'guide-note guide-note--scroll' }, narratorSprite(), h('div', { class: 'guide-scroll' }, rod(), sheet, rod()));
@@ -461,8 +471,8 @@ function scrollNote(line) {
   const height = () => Math.max(element.offsetHeight, sheet.scrollHeight + 24);
   const open = async () => {
     await roll(sheet, true);
-    if (light?.line !== line) return;
-    if (pointer) $('.guide-next', sheet)?.focus({ preventScroll: true });
+    if (light?.line !== line || light.closing) return;
+    $('.guide-next', sheet)?.focus({ preventScroll: true });
     speak(line);
   };
   // "Dalej": the parchment rolls up, then the next line.
