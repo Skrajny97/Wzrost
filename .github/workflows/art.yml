@@ -15,6 +15,7 @@ on:
         options:
           - monsters
           - items
+          - portraits
       ids:
         description: Identyfikatory po przecinku albo all
         required: true

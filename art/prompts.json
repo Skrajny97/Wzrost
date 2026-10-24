@@ -21,6 +21,19 @@
       "likho": "Likho, a gaunt one-eyed Slavic forest demon with grey skin, a single huge eye, long claws and tattered rags, hunched, full body, three-quarter view"
     }
   },
+  "portraits": {
+    "style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "references": [],
+    "prompts": {
+      "warrior": "portrait of a young warrior in a dented iron helmet and chainmail, holding a round wooden shield and a sword, waist-up, facing the viewer, determined look, forest fantasy",
+      "archer": "portrait of a young archer in a dark green hood and leather jacket, a longbow over the shoulder and a quiver of arrows, waist-up, facing the viewer, calm look, forest fantasy",
+      "mage": "portrait of a young mage in a long blue robe, holding a gnarled staff with a glowing cyan crystal, waist-up, facing the viewer, focused look, forest fantasy",
+      "cleric": "portrait of a young cleric in a white and gold robe with a holy symbol, holding a silver aspergillum, waist-up, facing the viewer, gentle look, forest fantasy",
+      "shadow": "portrait of a young rogue in a black hood and a mask over the mouth, holding two daggers, waist-up, facing the viewer, sharp look, forest fantasy"
+    }
+  },
   "items": {
     "style": "rd_pro__fantasy",
     "width": 32,
