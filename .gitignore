@@ -6,3 +6,5 @@ deploy.log
 # Drafts live on the art-drafts branch only.
 art/drafts/
 audio/drafts/
+# Walkthrough screenshots live on the iphone-checks branch only.
+checks/

@@ -1,0 +1,63 @@
+# Plays the game as a new player in Safari's engine (Playwright WebKit) at an
+# iPhone's size (tools/iphone-check.mjs): the whole introduction, the main
+# screens, the install steps and a name already taken. The game runs locally
+# in the job, so nothing touches the live game. Run by hand from the Actions
+# tab or the API; the screenshots and report.md go to the iphone-checks
+# branch.
+
+name: iPhone (WebKit)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: iphone-checks
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Przejście gry
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: WebKit
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps webkit
+      - name: Gra na miejscu
+        run: |
+          npm run dev > "$RUNNER_TEMP/dev.log" 2>&1 &
+          for i in $(seq 1 120); do curl -s -o /dev/null http://127.0.0.1:8787/api/health && break; sleep 1; done
+          curl -sf http://127.0.0.1:8787/api/health
+      - name: Przejście gry
+        env:
+          BROWSER: webkit
+          OUT: checks/iphone
+        run: node tools/iphone-check.mjs
+      # Also after a failed step: its screenshot shows what went wrong.
+      - name: Zapis na gałęzi iphone-checks
+        if: ${{ always() }}
+        run: |
+          [ -d checks/iphone ] || exit 0
+          mkdir -p "$RUNNER_TEMP/checks" && cp -r checks/iphone/. "$RUNNER_TEMP/checks/"
+          cp "$RUNNER_TEMP/dev.log" "$RUNNER_TEMP/checks/dev.log" || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git fetch --depth=1 origin iphone-checks; then
+            git checkout -f -B iphone-checks FETCH_HEAD
+          else
+            git checkout --orphan iphone-checks
+            git rm -rf --quiet .
+          fi
+          rm -rf checks/iphone && mkdir -p checks/iphone && cp -r "$RUNNER_TEMP/checks/." checks/iphone/
+          git add -f checks/iphone
+          git commit -m "Przejście gry w WebKit: ${GITHUB_SHA::7}" || exit 0
+          git push origin iphone-checks
