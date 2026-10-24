@@ -1,0 +1,13 @@
+{
+  "id": "tab-bead",
+  "payload": {
+    "text": "a single small wooden bead tapping a wooden table once, soft and warm, very short, close up, dry, no reverb, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/ui/tab-bead-20261024T1244-0.mp3",
+    "audio/drafts/ui/tab-bead-20261024T1244-1.mp3"
+  ],
+  "credits": 20
+}
