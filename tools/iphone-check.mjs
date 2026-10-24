@@ -55,7 +55,9 @@ async function step(name, action) {
   } catch (failure) {
     error = failure.message.split('\n')[0];
   }
-  await page.screenshot({ path: join(OUT, file) }).catch(() => {});
+  // caret: 'initial': hiding the caret takes a style of Playwright's own,
+  // which the game's policy refuses in WebKit.
+  await page.screenshot({ path: join(OUT, file), caret: 'initial' }).catch(() => {});
   steps.push({ name, ok: !error, seconds: (Date.now() - started) / 1000, file, error });
   console.log(`${error ? '✖' : '✔'} ${name}${error ? ` — ${error}` : ''}`);
   return !error;
@@ -237,7 +239,7 @@ await step('Drugi gracz: to samo imię', async () => {
   await second.click('#create-screen button[type="submit"]');
   await second.waitForSelector('#create-screen .form-error:not([hidden])');
   taken = await second.locator('#create-screen .form-error').innerText();
-  await second.screenshot({ path: join(OUT, 'zajete-imie.png') });
+  await second.screenshot({ path: join(OUT, 'zajete-imie.png'), caret: 'initial' });
   if (!/inna postać/.test(taken)) throw new Error(`komunikat: ${taken}`);
 });
 
