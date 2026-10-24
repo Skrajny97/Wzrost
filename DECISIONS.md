@@ -857,4 +857,5 @@ Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach i poprosił
     - dopiero potem pergamin się rozwija i narrator mówi.
 
     Przy ograniczonym ruchu w ustawieniach telefonu ekran przeskakuje od razu.
+4. **Zatwierdzone przez autora.** „Witaj, przybyszko.” zostaje, a polecenie „Rozdaj wolne punkty.” jest zatwierdzone (zamyka punkt 8 „Scenariusza narratora autora”). Wątek ikonki z poprzedniej rundy dotyczył koloru złota i jest zamknięty.
 
