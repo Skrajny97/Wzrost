@@ -1,0 +1,89 @@
+# Draws sprite drafts with Retro Diffusion (tools/generate-art.mjs) and keeps
+# them on the art-drafts branch for review. Run by hand from the Actions tab or
+# the API; it never deploys anything. Needs the RETRO_DIFFUSION_API_KEY secret.
+
+name: Grafiki (szkice)
+
+on:
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: Rodzaj grafik
+        required: true
+        default: monsters
+        type: choice
+        options:
+          - monsters
+          - items
+      ids:
+        description: Identyfikatory po przecinku albo all
+        required: true
+        default: all
+      variants:
+        description: Ile wersji każdej grafiki (1–4)
+        required: true
+        default: '1'
+      style:
+        description: Styl Retro Diffusion (puste = z art/prompts.json)
+        required: false
+        default: ''
+      max_cost:
+        description: Najwięcej dolarów na ten przebieg
+        required: true
+        default: '2'
+      dry_run:
+        description: Tylko wycena, bez generowania
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: art-drafts
+  cancel-in-progress: false
+
+jobs:
+  drafts:
+    name: Szkice
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Generowanie
+        env:
+          RETRO_DIFFUSION_API_KEY: ${{ secrets.RETRO_DIFFUSION_API_KEY }}
+          KIND: ${{ inputs.kind }}
+          IDS: ${{ inputs.ids }}
+          VARIANTS: ${{ inputs.variants }}
+          STYLE: ${{ inputs.style }}
+          MAX_COST: ${{ inputs.max_cost }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          args=(--kind "$KIND" --ids "$IDS" --variants "$VARIANTS" --style "$STYLE" --max-cost "$MAX_COST")
+          if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+          node tools/generate-art.mjs "${args[@]}"
+      - name: Zapis na gałęzi art-drafts
+        if: ${{ !inputs.dry_run }}
+        env:
+          KIND: ${{ inputs.kind }}
+          IDS: ${{ inputs.ids }}
+        run: |
+          [ -d art/drafts ] || exit 0
+          mkdir -p "$RUNNER_TEMP/drafts" && cp -r art/drafts/. "$RUNNER_TEMP/drafts/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git fetch --depth=1 origin art-drafts; then
+            git checkout -f -B art-drafts FETCH_HEAD
+          else
+            git checkout --orphan art-drafts
+            git rm -rf --quiet .
+          fi
+          mkdir -p art/drafts && cp -r "$RUNNER_TEMP/drafts/." art/drafts/
+          git add -f art/drafts
+          git commit -m "Szkice grafik: $KIND ($IDS)" || exit 0
+          git push origin art-drafts

@@ -10,6 +10,7 @@ import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { leaveView, openView } from '../history.js';
 import { RESOURCE_ICONS } from '../icons.js';
+import { playSound } from '../sound.js';
 import { call, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
 import { systemPanel, toast, withButton } from '../ui.js';
 
@@ -36,6 +37,7 @@ const resourceName = (id) => walletEntries().find((entry) => entry.id === id)?.n
 
 async function collectStore(building) {
   const { collected } = await call('POST', '/api/camp/collect', { buildingId: building.id });
+  playSound('collect');
   toast(`Zebrano: ${resourceName(collected.resource).toLowerCase()} +${formatNumber(collected.amount)}.`);
 }
 
@@ -119,7 +121,8 @@ function mountBoard(container, backHash) {
         boardArt(),
         character.camp.buildings.map((building) => plot(building, running)),
       ),
-      nothingBuilt && h('p', { class: 'system-hint camp-hint', text: 'Dotknij pustego placu, żeby postawić pierwszy budynek.' }),
+      nothingBuilt &&
+        h('p', { class: 'system-hint camp-hint', text: 'Dotknij pustego placu, żeby zobaczyć koszt budowy. Zasoby znajdziesz na eksploracjach.' }),
       running && constructionPanel(running, ticks),
     );
     tick(serverNow());
@@ -349,8 +352,17 @@ function mountBuilding(container, id) {
         class: 'button button--system',
         disabled: Boolean(running) || missing,
         text: label,
-        onClick: (event) => withButton(event.currentTarget, () => call('POST', '/api/camp/build', { buildingId: building.id })),
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            await call('POST', '/api/camp/build', { buildingId: building.id });
+            playSound('build');
+          }),
       }),
+      missing &&
+        h('p', {
+          class: 'system-hint',
+          text: 'Złoto i zasoby zdobędziesz na eksploracjach. Tartak, Kamieniołom i Kopalnia wytwarzają zasoby w obozie.',
+        }),
     );
   }
 

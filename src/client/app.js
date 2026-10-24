@@ -109,7 +109,10 @@ function watchConstruction(now) {
   // Without a connection it tries again every 30 seconds.
   campRetryAt = now + 30000;
   call('GET', '/api/character')
-    .then(() => toast(`${building.name}: poziom ${building.level} gotowy.`))
+    .then(() => {
+      toast(`${building.name}: poziom ${building.level} gotowy.`);
+      playSound('done');
+    })
     .catch((error) => toast(error.message));
 }
 

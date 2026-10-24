@@ -438,6 +438,9 @@ describe('camp', () => {
   const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
   const build = (buildingId) => call('POST', '/api/camp/build', { cookie, body: { buildingId } });
   const finishBuilding = async () => (await db()).prepare('UPDATE buildings SET ends_at = ?').bind(Date.now() - 1).run();
+  // Gold and resources for building, as if gathered on explorations.
+  const stock = async (gold, resources) =>
+    (await db()).prepare('UPDATE characters SET gold = ?, resources = ?').bind(gold, JSON.stringify(resources)).run();
   // Items straight into the bag, as if found earlier.
   async function fillBag(count, { baseId = 'helmet', rarityId = 'common', level = 3 } = {}) {
     const database = await db();
@@ -457,7 +460,7 @@ describe('camp', () => {
     );
     assert.equal(start.camp.construction, null);
     const campfire = start.camp.buildings.find((building) => building.id === 'campfire');
-    assert.deepEqual(campfire.next, { level: 1, effect: 'Odpoczynek między wyprawami szybszy o 10%', minutes: 1, cost: { gold: 10 } });
+    assert.deepEqual(campfire.next, { level: 1, effect: 'Odpoczynek między wyprawami szybszy o 10%', minutes: 1, cost: { gold: 5, wood: 4 } });
     assert.equal(campfire.production, null);
     assert.deepEqual(start.resources, { wood: 0, stone: 0, 'iron-ore': 0 });
     assert.equal(start.systemPoints, 0);
@@ -473,14 +476,15 @@ describe('camp', () => {
   test('a building is paid in gold and resources, takes time, and one is built at a time', async () => {
     assert.equal((await build('campfire')).data.error.code, 'not_enough');
     assert.equal((await build('tower')).data.error.code, 'invalid_building');
-    await (await db()).prepare(`UPDATE characters SET gold = 100, resources = '{"wood": 10, "stone": 2}'`).run();
+    await stock(100, { wood: 20, stone: 5 });
     const before = await character();
 
     const started = await build('campfire');
     assert.equal(started.status, 201);
     const running = started.data.character.camp.construction;
     assert.deepEqual([running.buildingId, running.name, running.level, running.endsAt - running.startedAt], ['campfire', 'Ognisko', 1, 60000]);
-    assert.equal(started.data.character.gold, 90);
+    assert.equal(started.data.character.gold, 95);
+    assert.deepEqual(started.data.character.resources, { wood: 16, stone: 5, 'iron-ore': 0 });
     // Until the end the building keeps its old level, and nothing else can be built.
     const campfire = (view) => view.camp.buildings.find((building) => building.id === 'campfire');
     assert.equal(campfire(started.data.character).level, 0);
@@ -497,16 +501,16 @@ describe('camp', () => {
     assert.equal(done.regen.perMinute, before.regen.perMinute);
     assert.ok(Math.abs(done.regen.change.perMinute / before.regen.perMinute - 1.1) < 1e-6);
 
-    // Level 2 also takes wood.
+    // Level 2 takes more gold and wood, and stone too.
     const second = await build('campfire');
     assert.equal(second.status, 201);
-    assert.equal(second.data.character.gold, 71);
-    assert.deepEqual(second.data.character.resources, { wood: 4, stone: 2, 'iron-ore': 0 });
+    assert.equal(second.data.character.gold, 85);
+    assert.deepEqual(second.data.character.resources, { wood: 8, stone: 2, 'iron-ore': 0 });
     assert.equal(second.data.character.camp.construction.endsAt - second.data.character.camp.construction.startedAt, 2 * 60000);
   });
 
   test('building goes on during an exploration', async () => {
-    await (await db()).prepare('UPDATE characters SET gold = 100').run();
+    await stock(100, { wood: 20 });
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
     const started = await build('loot-shed');
     assert.equal(started.status, 201);
@@ -514,7 +518,7 @@ describe('camp', () => {
   });
 
   test('"Pomiń czas" in test mode finishes the upgrade', async () => {
-    await (await db()).prepare('UPDATE characters SET gold = 100').run();
+    await stock(100, { wood: 20 });
     await build('loot-shed');
     const skipped = await call('POST', '/api/test/skip-build', { cookie });
     assert.equal(skipped.status, 200);
@@ -538,7 +542,7 @@ describe('camp', () => {
   });
 
   test('a production building fills its store, which the player collects', async () => {
-    await (await db()).prepare('UPDATE characters SET gold = 200').run();
+    await stock(200, { wood: 6 });
     const built = await build('sawmill');
     const store = (view) => view.camp.buildings.find((building) => building.id === 'sawmill').production;
     // The store comes with the building.
@@ -556,19 +560,21 @@ describe('camp', () => {
     assert.equal(collected.status, 200);
     assert.deepEqual(collected.data.collected, { resource: 'wood', amount: 6 });
     assert.equal(collected.data.character.resources.wood, 6);
+    assert.equal(collected.data.character.gold, 200 - 8);
     assert.equal((await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'sawmill' } })).data.error.code, 'nothing_to_collect');
 
-    // An upgrade first collects the store: level 2 costs 29 gold and 6 wood.
+    // An upgrade first collects the store: level 2 costs 16 gold, 11 wood and 3 stone.
+    await stock(192, { wood: 11, stone: 3 });
     await call('POST', '/api/test/skip-build', { cookie });
     const upgraded = await build('sawmill');
     assert.equal(upgraded.status, 201);
-    assert.equal(upgraded.data.character.resources.wood, 6 + 6 - 6);
-    assert.equal(upgraded.data.character.gold, 200 - 15 - 29);
+    assert.deepEqual(upgraded.data.character.resources, { wood: 11 + 6 - 11, stone: 0, 'iron-ore': 0 });
+    assert.equal(upgraded.data.character.gold, 192 - 16);
     assert.deepEqual([store(upgraded.data.character).paused, store(upgraded.data.character).amount], [true, 0]);
   });
 
   test('two taps on "Zbierz" collect once', async () => {
-    await (await db()).prepare('UPDATE characters SET gold = 200').run();
+    await stock(200, { wood: 6 });
     await build('sawmill');
     await finishBuilding();
     // Half an hour of 6 wood an hour: 3 wood, the store not full.

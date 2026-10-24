@@ -81,7 +81,8 @@
     "toughDropMultiplier": 1.5,
     "findOutcomes": { "gold": 0.35, "item": 0.3, "resource": 0.3, "nothing": 0.05 },
     "findGoldPerLevel": 4,
-    "findResourcePerLevel": 4
+    "findResourcePerLevel": 4,
+    "gatherPerLevelHour": 2
   },
   "regen": {
     "perMinute": 0.02,

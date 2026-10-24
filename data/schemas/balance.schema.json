@@ -419,7 +419,8 @@
         "toughDropMultiplier",
         "findOutcomes",
         "findGoldPerLevel",
-        "findResourcePerLevel"
+        "findResourcePerLevel",
+        "gatherPerLevelHour"
       ],
       "properties": {
         "xpBase": {
@@ -496,7 +497,12 @@
         "findResourcePerLevel": {
           "type": "number",
           "minimum": 0,
-          "description": "Ilość zasobu ze znaleziska: poziom znaleziska × ta wartość × losowo 0,5–1,5, co najmniej 1."
+          "description": "Ilość zasobów ze znaleziska: poziom znaleziska × ta wartość × losowo 0,5–1,5, podzielona według wag regionu, co najmniej 1."
+        },
+        "gatherPerLevelHour": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Zasoby zbierane po drodze: średni poziom miejsca × ta wartość × godziny eksploracji, podzielone według wag regionu."
         }
       }
     },

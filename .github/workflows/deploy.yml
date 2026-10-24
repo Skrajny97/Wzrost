@@ -1,10 +1,14 @@
-# Tests run on every push. A push to main also deploys the game to Cloudflare
-# (D1 database, migrations, Worker), once the two Cloudflare secrets exist.
+# Tests run on every push, except to the art-drafts branch. A push to main also
+# deploys the game to Cloudflare (D1 database, migrations, Worker), once the two
+# Cloudflare secrets exist.
 
 name: Testy i wdrożenie
 
 on:
   push:
+    # Sprite drafts from the "Grafiki (szkice)" workflow are not the game.
+    branches-ignore:
+      - art-drafts
   workflow_dispatch:
 
 permissions:

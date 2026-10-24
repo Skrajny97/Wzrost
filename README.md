@@ -91,7 +91,8 @@ src/server/   Worker: API, logowanie, sesje, postać, ekwipunek, eksploracje, ra
 src/client/   strona gry: HTML, CSS i moduły ES, bez kroku budowania
 data/         treść gry w JSON i schematy w data/schemas
 migrations/   schemat bazy D1
-tools/        wdrożenie, walidacja danych, symulacja balansu
+tools/        wdrożenie, walidacja danych, symulacja balansu, generowanie grafik
+art/          opisy grafik dla generatora pixel-artu i wzorce stylu
 test/         testy: node:test i lokalne środowisko Workers z bazą D1
 DECISIONS.md  rejestr założeń
 ```
@@ -149,3 +150,14 @@ Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie 
 ## Tryb testowy
 
 Dopóki grę testujemy, `TEST_MODE` w `wrangler.jsonc` ma wartość `"on"`, a zakładka Walka ma przycisk „Pomiń czas”. Kończy on od razu trwającą wyprawę, bez zmiany wyniku, albo odpoczynek. W grze tryb testowy mają tylko konta z `TEST_LOGINS` (dziś konto autora), a reszta graczy go nie widzi. Testy i `npm run dev` dają go każdemu kontu. Przełącznik „Tryb testowy” w Ustawieniach chowa i pokazuje ten przycisk w danej przeglądarce. Po testach wystarczy ustawić `"off"` i wdrożyć.
+
+## Grafiki
+
+Sprite'y stworów (48×48) i przedmiotów (32×32) powstają w generatorze pixel-artu [Retro Diffusion](https://www.retrodiffusion.ai). Opisy, style i rozmiary są w `art/prompts.json`. Generowanie uruchamia się ręcznie:
+
+1. Na github.com otwórz repozytorium, zakładkę **Actions** i przebieg **Grafiki (szkice)**.
+2. Stuknij **Run workflow**, wybierz rodzaj (`monsters` albo `items`), wpisz identyfikatory po przecinku albo `all` i limit dolarów, a potem stuknij zielone **Run workflow**.
+3. Szkice z przezroczystym tłem trafią na gałąź `art-drafts`, do folderu `art/drafts/`. Podsumowanie przebiegu podaje koszt i stan salda.
+
+Przebieg potrzebuje sekretu repozytorium `RETRO_DIFFUSION_API_KEY` z kluczem API Retro Diffusion. Skrypt najpierw darmowo wycenia każde zapytanie i nie wydaje więcej niż limit. Zatwierdzone sprite'y trafiają do `src/client/art/`, a wzorce stylu dla kolejnych do `art/references/`.
+

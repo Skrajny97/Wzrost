@@ -1,0 +1,147 @@
+// Draws sprite drafts with Retro Diffusion, a pixel-art image generator.
+// Run by the "Grafiki (szkice)" workflow, which keeps the drafts on the
+// art-drafts branch for review:
+//   node tools/generate-art.mjs --kind monsters --ids wolf,boar --variants 2 --max-cost 2
+//     [--style rd_pro__fantasy] [--seed 7] [--dry-run]
+// Prompts, styles and sizes are in art/prompts.json. The approved sprites listed
+// there as references (art/references/<kind>/<id>.png) keep the style of the new
+// ones consistent. Every request is priced first (free), and the run stops
+// before it would spend more than --max-cost dollars.
+
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
+import { parseArgs } from 'node:util';
+
+const API = 'https://api.retrodiffusion.ai/v2/inferences';
+const POLL_MS = 3000;
+const POLL_LIMIT = 100;
+
+const { values } = parseArgs({
+  options: {
+    kind: { type: 'string' },
+    ids: { type: 'string', default: 'all' },
+    variants: { type: 'string', default: '1' },
+    style: { type: 'string', default: '' },
+    seed: { type: 'string', default: '' },
+    'max-cost': { type: 'string', default: '2' },
+    'dry-run': { type: 'boolean', default: false },
+  },
+});
+
+function fail(message) {
+  console.log(`::error::${message}`);
+  process.exit(1);
+}
+
+function summary(markdown) {
+  if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${markdown}\n`);
+}
+
+const token = process.env.RETRO_DIFFUSION_API_KEY;
+if (!token) fail('Brak sekretu RETRO_DIFFUSION_API_KEY. Dodaj klucz Retro Diffusion w ustawieniach repozytorium.');
+
+const config = JSON.parse(readFileSync('art/prompts.json', 'utf8'));
+const kind = config[values.kind];
+if (!kind) fail(`Nieznany rodzaj grafik: ${values.kind}. Dostępne: ${Object.keys(config).filter((key) => key !== '$comment').join(', ')}.`);
+const ids = values.ids === 'all' ? Object.keys(kind.prompts) : values.ids.split(',').map((id) => id.trim()).filter(Boolean);
+const unknown = ids.filter((id) => !kind.prompts[id]);
+if (unknown.length) fail(`Brak opisu w art/prompts.json dla: ${unknown.join(', ')}.`);
+const variants = Math.max(1, Math.min(4, Number(values.variants) || 1));
+const maxCost = Number(values['max-cost']);
+if (!(maxCost > 0)) fail('--max-cost musi być dodatnią kwotą w dolarach.');
+const style = values.style || kind.style;
+
+const headers = { 'X-RD-Token': token, 'Content-Type': 'application/json' };
+
+async function request(method, url, body) {
+  const response = await fetch(url, {
+    method,
+    headers: method === 'POST' ? { ...headers, 'Idempotency-Key': randomUUID() } : headers,
+    body: body && JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => null);
+  if (!response.ok) fail(`Retro Diffusion odpowiedział ${response.status}: ${JSON.stringify(data ?? {}).slice(0, 400)}`);
+  return data;
+}
+
+// A queued request is polled until it ends; an immediate answer is returned as is.
+async function settle(data) {
+  if (!data?.task_id || data.base64_images || data.balance_cost !== undefined) return data;
+  for (let attempt = 0; attempt < POLL_LIMIT; attempt++) {
+    const task = await request('GET', `${API}/tasks/${data.task_id}`);
+    if (task.status === 'failed') fail(`Generowanie nie powiodło się: ${task.error ?? 'bez opisu'}`);
+    if (task.status !== 'pending' && task.status !== 'running') return task.result ?? task;
+    await new Promise((resolve) => setTimeout(resolve, POLL_MS));
+  }
+  fail('Generowanie trwa zbyt długo.');
+}
+
+// The approved sprites of this kind, as style references (not for themselves).
+const references = (id) =>
+  (kind.references ?? [])
+    .filter((ref) => ref !== id && existsSync(`art/references/${values.kind}/${ref}.png`))
+    .slice(0, 9)
+    .map((ref) => readFileSync(`art/references/${values.kind}/${ref}.png`).toString('base64'));
+
+const outDir = `art/drafts/${values.kind}`;
+mkdirSync(outDir, { recursive: true });
+const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 13);
+const lines = [];
+let spent = 0;
+let balance = null;
+
+for (const id of ids) {
+  const seed = values.seed ? Number(values.seed) : Math.floor(Math.random() * 1e9);
+  const payload = {
+    prompt: kind.prompts[id],
+    prompt_style: style,
+    width: kind.width,
+    height: kind.height,
+    num_images: variants,
+    seed,
+    remove_bg: true,
+    return_non_bg_removed: true,
+  };
+  const refs = references(id);
+  if (refs.length) payload.reference_images = refs;
+
+  const quote = await settle(await request('POST', API, { ...payload, check_cost: true }));
+  const cost = Number(quote.balance_cost ?? quote.cost ?? 0);
+  if (spent + cost > maxCost) {
+    lines.push(`| ${id} | pominięte: przekroczyłoby limit ${maxCost} USD | | |`);
+    continue;
+  }
+  if (values['dry-run']) {
+    spent += cost;
+    lines.push(`| ${id} | wycena ${cost.toFixed(3)} USD | ${style} | ${refs.length} |`);
+    continue;
+  }
+
+  const result = await settle(await request('POST', API, payload));
+  spent += Number(result.balance_cost ?? cost);
+  balance = result.remaining_balance ?? balance;
+  const images = result.base64_images ?? [];
+  const files = images.map((image, index) => {
+    const file = `${outDir}/${id}-${stamp}-${seed}-${index}.png`;
+    writeFileSync(file, Buffer.from(image, 'base64'));
+    return file;
+  });
+  // What came back besides the images, to see the shape of the answer.
+  const extra = Object.fromEntries(Object.entries(result).filter(([key]) => key !== 'base64_images'));
+  writeFileSync(`${outDir}/${id}-${stamp}-${seed}.json`, `${JSON.stringify({ id, payload: { ...payload, reference_images: refs.length }, result: extra }, null, 2)}\n`);
+  lines.push(`| ${id} | ${files.length} obrazki, ${Number(result.balance_cost ?? cost).toFixed(3)} USD | ${style} | ${refs.length} |`);
+}
+
+summary(
+  [
+    `## Szkice grafik: ${values.kind}${values['dry-run'] ? ' (tylko wycena)' : ''}`,
+    '',
+    '| Grafika | Wynik | Styl | Wzorce |',
+    '| --- | --- | --- | --- |',
+    ...lines,
+    '',
+    `Wydano: ${spent.toFixed(3)} USD${balance === null ? '' : `, zostało ${Number(balance).toFixed(2)} USD`}.`,
+  ].join('\n'),
+);
+console.log(lines.join('\n'));
+console.log(`Wydano ${spent.toFixed(3)} USD${balance === null ? '' : `, zostało ${balance} USD`}.`);

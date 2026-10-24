@@ -127,6 +127,18 @@ function spread(count, durationMs, rng) {
   return Array.from({ length: count }, (_, i) => Math.round(((i + rng.float(0.2, 0.8)) / count) * durationMs));
 }
 
+// A resource find: `total` units split by the region's weights, so every kind
+// comes in small, steady amounts rather than in rare, large ones. At least
+// one unit of the most common kind.
+export function resourceBundle(area, total) {
+  const weights = Object.entries(area.resources).filter(([, weight]) => weight > 0);
+  const sum = weights.reduce((acc, [, weight]) => acc + weight, 0);
+  const found = weights.map(([id, weight]) => [id, Math.round((total * weight) / sum)]).filter(([, amount]) => amount > 0);
+  if (found.length > 0) return found;
+  const [top] = weights.reduce((best, entry) => (entry[1] > best[1] ? entry : best));
+  return [[top, 1]];
+}
+
 export function simulateHunt({ character, equipped, hp, name, areaId, minutes, seed }, content) {
   const rng = createRng(seed);
   const tuning = content.balance.hunt;
@@ -153,6 +165,7 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
   const loot = { filled, classId: character.classId };
   let hpNow = player.hp;
   let result = 'success';
+  let endedAt = durationMs; // a faint or an escape ends the exploration early
   let xp = 0;
   let gold = 0;
   // Gold from fights before rounding: a short exploration earns fractions per
@@ -169,8 +182,8 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
 
   for (const [step, event] of timeline.entries()) {
     if (event.type === 'find') {
-      // A find is gold, an item of the place's level, a resource for the camp
-      // (by the region's weights) or nothing of interest.
+      // A find is gold, an item of the place's level, resources for the camp
+      // or nothing of interest.
       const findLevel = areaLevel(area, rng, content);
       const outcome = rng.weighted(Object.entries(rewards.findOutcomes), ([, weight]) => weight)[0];
       if (outcome === 'gold') {
@@ -182,11 +195,10 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
         items.push(item);
         entries.push({ t: event.t, type: 'find', item: items.length - 1, text: say(texts, 'findItem', step, { item: itemName(item, content) }) });
       } else if (outcome === 'resource') {
-        const [resourceId] = rng.weighted(Object.entries(area.resources), ([, weight]) => weight);
-        const amount = Math.max(1, Math.round(rewards.findResourcePerLevel * findLevel * rng.float(0.5, 1.5)));
-        resources[resourceId] = (resources[resourceId] ?? 0) + amount;
-        const resource = content.resourcesById[resourceId].name.toLowerCase();
-        entries.push({ t: event.t, type: 'find', text: say(texts, 'findResource', step, { resource, amount }) });
+        const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * rng.float(0.5, 1.5));
+        for (const [id, amount] of found) resources[id] = (resources[id] ?? 0) + amount;
+        const list = found.map(([id, amount]) => `${content.resourcesById[id].name.toLowerCase()} +${amount}`).join(', ');
+        entries.push({ t: event.t, type: 'find', text: say(texts, 'findResource', step, { resources: list }) });
       } else {
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findNothing', step) });
       }
@@ -275,14 +287,27 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
       result = encounter.elite && area.safe ? 'escaped' : 'fainted';
       hpNow = Math.max(1, Math.round(player.maxHp * tuning.hpAfterFaint));
       lines.push(say(texts, result === 'fainted' ? 'defeat' : 'escape', step, { target: player.name }));
+      endedAt = event.t;
     } else {
       result = 'escaped';
       hpNow = Math.max(1, hpNow);
       lines.push(say(texts, 'draw', step, { target: player.name }));
+      endedAt = event.t;
     }
     summary.hpAfter = hpNow;
     entries.push({ t: event.t, type: 'fight', fight: summary.index, text: lines.join(' ') });
     break;
+  }
+
+  // On the way the character also gathers a little of the region's resources:
+  // a steady amount for the time explored, at the place's middle level, so
+  // the camp does not wait for lucky finds.
+  const gatheredTotal = rewards.gatherPerLevelHour * ((area.minLevel + area.maxLevel) / 2) * (endedAt / 3600000);
+  if (gatheredTotal >= 0.5) {
+    const gathered = resourceBundle(area, gatheredTotal);
+    for (const [id, amount] of gathered) resources[id] = (resources[id] ?? 0) + amount;
+    const list = gathered.map(([id, amount]) => `${content.resourcesById[id].name.toLowerCase()} +${amount}`).join(', ');
+    entries.push({ t: endedAt, type: 'gather', text: say(texts, 'gathered', timeline.length, { resources: list }) });
   }
 
   return {

@@ -47,6 +47,7 @@ import {
   restedHp,
   sellPrice,
   simulateFight,
+  resourceBundle,
   simulateHunt,
   statEffects,
   unlockedFeatures,
@@ -653,18 +654,21 @@ test('the threat estimate for one inner region stays well within the CPU budget'
 describe('camp', () => {
   const campfire = content.buildingsById.campfire;
 
-  test('each level costs more and takes longer; the first takes gold only', () => {
-    assert.deepEqual(upgradeCost(campfire, 1), { gold: 10 });
-    assert.deepEqual(upgradeCost(campfire, 2), { gold: 19, wood: 6 });
-    assert.deepEqual(Object.keys(upgradeCost(campfire, 4)), ['gold', 'wood', 'stone']);
+  test('each level costs more gold and resources and takes longer, from the first one on', () => {
+    assert.deepEqual(upgradeCost(campfire, 1), { gold: 5, wood: 4 });
+    assert.deepEqual(upgradeCost(campfire, 2), { gold: 10, wood: 8, stone: 3 });
+    assert.deepEqual(Object.keys(upgradeCost(campfire, 4)), ['gold', 'wood', 'stone', 'iron-ore']);
     const minutes = Array.from({ length: campfire.maxLevel }, (_, i) => upgradeMinutes(campfire, i + 1));
     assert.deepEqual(minutes.slice(0, 4), [1, 2, 5, 11]);
     for (let i = 1; i < minutes.length; i++) assert.ok(minutes[i] > minutes[i - 1]);
     // The last level of Ognisko builds for most of a day.
     assert.ok(minutes.at(-1) > 16 * 60 && minutes.at(-1) < 24 * 60);
     for (const building of content.buildings) {
+      // Every level needs more than gold: the resources come from explorations.
+      assert.ok(Object.keys(upgradeCost(building, 1)).length >= 2, building.id);
       for (let level = 2; level <= building.maxLevel; level++) {
-        assert.ok(upgradeCost(building, level).gold > upgradeCost(building, level - 1).gold);
+        const [cost, before] = [upgradeCost(building, level), upgradeCost(building, level - 1)];
+        for (const [resource, amount] of Object.entries(before)) assert.ok(cost[resource] > amount, `${building.id} ${level} ${resource}`);
       }
     }
   });
@@ -783,5 +787,26 @@ describe('resources', () => {
       content,
     );
     assert.equal(typeof report.summary.resources, 'object');
+  });
+
+  test('a resource find is a bundle split by the region weights, at least one unit', () => {
+    const windfalls = content.areasById['windfalls-edge'];
+    assert.deepEqual(resourceBundle(windfalls, 10), [['wood', 5], ['stone', 3], ['iron-ore', 2]]);
+    assert.deepEqual(resourceBundle(windfalls, 0.6), [['wood', 1]]);
+    assert.deepEqual(resourceBundle(content.areasById['mossy-boulders'], 20), [['wood', 6], ['stone', 10], ['iron-ore', 4]]);
+  });
+
+  test('on the way the character gathers a steady bundle for the time explored', () => {
+    const character = newCharacter('warrior', { level: 3, classLevel: 3 });
+    // Skraj Wiatrołomów (levels 1–5, middle 3): 2 × 3 = 6 units an hour.
+    const hunt = simulateHunt({ character, equipped: kit('warrior'), hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed: 'gather' }, content);
+    const gathered = hunt.entries.filter((entry) => entry.type === 'gather');
+    assert.equal(gathered.length, 1);
+    assert.equal(gathered[0].t, 60 * 60000);
+    assert.match(gathered[0].text, /drewno \+3, kamień \+2, ruda żelaza \+1/);
+    assert.ok(hunt.resources.wood >= 3 && hunt.resources.stone >= 2 && hunt.resources['iron-ore'] >= 1);
+    // A minute is too short to gather anything.
+    const short = simulateHunt({ character, equipped: kit('warrior'), hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 1, seed: 'gather' }, content);
+    assert.equal(short.entries.filter((entry) => entry.type === 'gather').length, 0);
   });
 });

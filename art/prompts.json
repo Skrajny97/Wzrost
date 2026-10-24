@@ -1,0 +1,51 @@
+{
+  "$comment": "Prompts for tools/generate-art.mjs (Retro Diffusion). Each kind has its style, size and the approved sprites used as style references (art/references/<kind>/<id>.png). Approved sprites go to src/client/art/<kind>/<id>.png.",
+  "monsters": {
+    "style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "references": [],
+    "prompts": {
+      "wolf": "lean grey wolf with amber eyes, snarling, full body, three-quarter view",
+      "alpha-wolf": "huge dark grey alpha wolf with a scarred muzzle, glowing red eyes and raised hackles, full body, three-quarter view",
+      "fox": "red fox with a bushy white-tipped tail and black legs, full body, three-quarter view",
+      "lynx": "Eurasian lynx with tufted ears, spotted tawny fur and a short black-tipped tail, crouching to pounce, full body, three-quarter view",
+      "bear": "massive brown bear on all fours, mouth open in a roar, full body, three-quarter view",
+      "boar": "wild boar with dark bristly fur and curved white tusks, head lowered to charge, full body, three-quarter view",
+      "badger": "European badger with a black and white striped face and grey fur, full body, three-quarter view",
+      "crow": "black raven with ruffled feathers and a heavy beak, wings half spread, full body, three-quarter view",
+      "owl": "tawny owl with big dark eyes and mottled brown feathers, perched on a short branch, full body, front view",
+      "viper": "coiled European adder with a dark zigzag stripe, head raised and forked tongue out, full body",
+      "spider": "large European garden spider with a white cross on its brown abdomen and eight hairy legs, full body, top-down three-quarter view",
+      "wisp": "will-o'-the-wisp, a floating pale cyan ghost flame with two faint eyes, glowing, trailing wisps of light",
+      "likho": "Likho, a gaunt one-eyed Slavic forest demon with grey skin, a single huge eye, long claws and tattered rags, hunched, full body, three-quarter view"
+    }
+  },
+  "items": {
+    "style": "rd_pro__default",
+    "width": 32,
+    "height": 32,
+    "references": [],
+    "prompts": {
+      "sword": "steel longsword with a leather-wrapped grip and a brass crossguard, diagonal, single inventory item icon",
+      "axe": "iron battle axe with a wooden haft, diagonal, single inventory item icon",
+      "dagger": "short steel dagger with a dark leather grip, diagonal, single inventory item icon",
+      "bow": "wooden hunting longbow with a taut string, diagonal, single inventory item icon",
+      "staff": "gnarled wooden mage staff topped with a glowing cyan crystal, diagonal, single inventory item icon",
+      "aspergillum": "aspergillum, a holy water sprinkler: a short wooden handle with a perforated silver ball, diagonal, single inventory item icon",
+      "shield": "round wooden shield with an iron rim and boss, single inventory item icon",
+      "quiver": "leather quiver full of feathered arrows, single inventory item icon",
+      "focus": "glowing crystal orb in a small bronze holder, magic focus, single inventory item icon",
+      "hood": "dark green cloth hood, single inventory item icon",
+      "helmet": "iron nasal helmet, single inventory item icon",
+      "tunic": "brown leather jacket with laces, single inventory item icon",
+      "chainmail": "chainmail shirt, single inventory item icon",
+      "robe": "long blue wizard robe with wide sleeves, single inventory item icon",
+      "gloves": "pair of leather gloves, single inventory item icon",
+      "boots": "pair of brown leather boots, single inventory item icon",
+      "amulet": "silver amulet with a round gemstone on a chain, single inventory item icon",
+      "ring": "gold ring with a small gemstone, single inventory item icon",
+      "talisman": "carved wooden talisman with a leaf rune on a cord, single inventory item icon"
+    }
+  }
+}

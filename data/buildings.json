@@ -6,9 +6,10 @@
     "maxLevel": 10,
     "effect": { "kind": "production", "resource": "wood", "perLevel": 6, "storageHours": 1, "unit": "count", "text": "Wytwarza {value} drewna na godzinę, magazyn na {hours} produkcji" },
     "costs": [
-      { "resource": "gold", "base": 15, "growth": 1.9 },
-      { "resource": "wood", "base": 6, "growth": 1.8, "fromLevel": 2 },
-      { "resource": "stone", "base": 4, "growth": 1.8, "fromLevel": 3 }
+      { "resource": "gold", "base": 8, "growth": 2.0 },
+      { "resource": "wood", "base": 6, "growth": 1.9 },
+      { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 2 },
+      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 4 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -19,9 +20,10 @@
     "maxLevel": 10,
     "effect": { "kind": "production", "resource": "stone", "perLevel": 4, "storageHours": 1, "unit": "count", "text": "Wydobywa {value} kamienia na godzinę, magazyn na {hours} produkcji" },
     "costs": [
-      { "resource": "gold", "base": 15, "growth": 1.9 },
-      { "resource": "wood", "base": 6, "growth": 1.8, "fromLevel": 2 },
-      { "resource": "iron-ore", "base": 3, "growth": 1.8, "fromLevel": 4 }
+      { "resource": "gold", "base": 8, "growth": 2.0 },
+      { "resource": "wood", "base": 8, "growth": 1.9 },
+      { "resource": "stone", "base": 3, "growth": 1.9 },
+      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 3 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -32,9 +34,10 @@
     "maxLevel": 10,
     "effect": { "kind": "production", "resource": "iron-ore", "perLevel": 3, "storageHours": 1, "unit": "count", "text": "Wydobywa {value} rudy żelaza na godzinę, magazyn na {hours} produkcji" },
     "costs": [
-      { "resource": "gold", "base": 20, "growth": 1.9 },
-      { "resource": "wood", "base": 8, "growth": 1.8, "fromLevel": 2 },
-      { "resource": "stone", "base": 5, "growth": 1.8, "fromLevel": 3 }
+      { "resource": "gold", "base": 12, "growth": 2.0 },
+      { "resource": "wood", "base": 9, "growth": 1.9 },
+      { "resource": "stone", "base": 4, "growth": 1.9 },
+      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 3 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -45,9 +48,10 @@
     "maxLevel": 10,
     "effect": { "kind": "restSpeed", "perLevel": 0.1, "unit": "percent", "text": "Odpoczynek między wyprawami szybszy o {value}" },
     "costs": [
-      { "resource": "gold", "base": 10, "growth": 1.9 },
-      { "resource": "wood", "base": 6, "growth": 1.8, "fromLevel": 2 },
-      { "resource": "stone", "base": 6, "growth": 1.8, "fromLevel": 4 }
+      { "resource": "gold", "base": 5, "growth": 2.0 },
+      { "resource": "wood", "base": 4, "growth": 1.9 },
+      { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 2 },
+      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 4 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -58,9 +62,10 @@
     "maxLevel": 10,
     "effect": { "kind": "bagSlots", "perLevel": 5, "unit": "count", "text": "Plecak większy o {value} miejsc" },
     "costs": [
-      { "resource": "gold", "base": 15, "growth": 1.9 },
-      { "resource": "wood", "base": 8, "growth": 1.8, "fromLevel": 2 },
-      { "resource": "stone", "base": 4, "growth": 1.8, "fromLevel": 3 }
+      { "resource": "gold", "base": 10, "growth": 2.0 },
+      { "resource": "wood", "base": 8, "growth": 1.9 },
+      { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 2 },
+      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 4 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -71,9 +76,10 @@
     "maxLevel": 10,
     "effect": { "kind": "sellPrice", "perLevel": 0.1, "unit": "percent", "text": "Złomiarz płaci więcej o {value}" },
     "costs": [
-      { "resource": "gold", "base": 20, "growth": 1.9 },
-      { "resource": "wood", "base": 6, "growth": 1.8, "fromLevel": 2 },
-      { "resource": "iron-ore", "base": 4, "growth": 1.8, "fromLevel": 3 }
+      { "resource": "gold", "base": 12, "growth": 2.0 },
+      { "resource": "wood", "base": 4, "growth": 1.9 },
+      { "resource": "iron-ore", "base": 3, "growth": 1.9 },
+      { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 3 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   }

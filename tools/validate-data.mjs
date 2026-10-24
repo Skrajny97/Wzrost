@@ -172,8 +172,8 @@ function checkReferences(data) {
     else if (!elite.elite) errors.push(`regions.json: elita ${region.id} ("${region.elite}") nie jest oznaczona jako elite`);
   }
 
-  // A building is paid in gold and resources; the first level needs no
-  // resources, because a new character has none yet.
+  // A building is paid in gold and resources, from the first level on: the
+  // resources come from explorations.
   for (const building of data.buildings) {
     const { effect } = building;
     if (effect.kind === 'production') {
@@ -185,9 +185,6 @@ function checkReferences(data) {
     for (const cost of building.costs) {
       if (cost.resource !== 'gold' && !resources.has(cost.resource)) {
         errors.push(`buildings.json: ${building.id} kosztuje nieznany zasób "${cost.resource}"`);
-      }
-      if (cost.resource !== 'gold' && (cost.fromLevel ?? 1) < 2) {
-        errors.push(`buildings.json: ${building.id} wymaga zasobu "${cost.resource}" już na poziomie 1`);
       }
     }
   }
