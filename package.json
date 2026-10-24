@@ -10,7 +10,8 @@
     "dev": "wrangler d1 migrations apply DB --local && wrangler dev --var TEST_LOGINS:",
     "test": "node --test --test-reporter=spec 'test/**/*.test.js'",
     "validate": "node tools/validate-data.mjs",
-    "simulate": "node tools/simulate.mjs"
+    "simulate": "node tools/simulate.mjs",
+    "progression": "node tools/progression/run.mjs"
   },
   "devDependencies": {
     "ajv": "8.20.0",

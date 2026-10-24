@@ -109,10 +109,11 @@ npm ci
 npm test           # testy silnika, danych, strony i API na lokalnej bazie D1
 npm run validate   # sprawdzenie plików data/ schematami i odwołań między nimi
 npm run simulate   # symulacja 10 000 wypraw: omdlenia, XP, złoto i przedmioty na godzinę
+npm run progression # postacie od poziomu 1 do 50 na prawdziwych łupach, z obozem
 npm run dev        # gra pod http://localhost:8787 z lokalną bazą D1
 ```
 
-Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 60,240 --hunts 2000` albo `npm run simulate -- --calibrate` (propozycja stałej krzywej XP).
+Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 60,240 --hunts 2000` albo `npm run simulate -- --calibrate` (propozycja stałej krzywej XP). Daje typowej postaci sprzęt, jaki zakłada krzywa, więc nie widzi, że prawdziwy sprzęt jest starszy. To widać w `npm run progression` (`tools/progression/`): po 100 postaci każdej klasy przechodzi grę od poziomu 1 do 50 na prawdziwych łupach, z odpoczynkiem i obozem, także z proponowanymi zmianami danych. Wynik trafia do `checks/progression/` (około 2,5 minuty), a pojedyncze zmiany sprawdza `node tools/progression/variants.mjs 40 baseline lag240`.
 
 ## API
 
