@@ -4,7 +4,7 @@
     "seconds": 1,
     "prompts": {
       "wolf-hurt": {
-        "text": "a single short sharp yelp of pain from a wolf hit by a blow, quick, video game creature hurt sound, close up, dry, no music",
+        "text": "a wolf snarls in pain when hit, a short fierce growl through bared teeth, not a yelp, video game creature hurt sound, close up, dry, no music",
         "seconds": 0.6
       },
       "wolf-death": "a wolf whimpers and collapses, dying whine, close up, dry, no music",
@@ -31,7 +31,10 @@
       "owl-hurt": "an owl screeches in pain from a hit, short, close up, dry, no music",
       "owl-death": "an owl gives a fading screech and falls with a flutter, close up, dry, no music",
       "viper-hurt": "a snake hisses sharply in pain, short, close up, dry, no music",
-      "viper-death": "a snake lets out a weak rasping gurgling hiss that fades away, soft, video game creature death sound, close up, dry, no music",
+      "viper-death": {
+        "text": "a dying snake lets out a last short weak hiss that fades into silence, with a faint dry scrape of scales on the ground, video game creature death sound, close up, dry, no music",
+        "seconds": 0.8
+      },
       "spider-hurt": {
         "text": "a single short wet chittering screech of a giant spider hit by a blow, quick, video game monster hurt sound, close up, dry, no music",
         "seconds": 0.6
