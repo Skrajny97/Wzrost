@@ -1,0 +1,17 @@
+{
+  "id": "report-items-female",
+  "payload": {
+    "text": "To wszystko, co znalazłaś podczas wyprawy. Wylądowało już w Twoim plecaku. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/report-items-female-20261024T1745-0.mp3",
+    "audio/drafts/narration/report-items-female-20261024T1745-1.mp3"
+  ],
+  "credits": 166
+}
