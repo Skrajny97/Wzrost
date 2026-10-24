@@ -1,0 +1,25 @@
+{
+  "id": "narrator-stars",
+  "payload": {
+    "prompt": "ethereal almighty narrator, a genderless hooded figure whose translucent robe is a piece of the night sky full of stars and a faint violet nebula, no visible face, two soft white lights for eyes, tiny sparkles around, holding an unrolled glowing parchment scroll in front of it and reading from it, floating above the ground, full body, otherworldly, facing the viewer",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 108253297,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792852220,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 45.24,
+    "request_id": "e334dbf9-0b72-45f2-a75d-510081754546",
+    "outputs_retained_until": 1792938567
+  }
+}

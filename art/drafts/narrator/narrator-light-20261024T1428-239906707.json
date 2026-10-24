@@ -1,0 +1,25 @@
+{
+  "id": "narrator-light",
+  "payload": {
+    "prompt": "ethereal almighty narrator, a tall genderless figure woven from soft golden and white light, a long flowing robe of light with a deep hood, no visible face, only a gentle glow inside the hood, motes of light drifting around, holding an unrolled glowing parchment scroll in front of it and reading from it, floating above the ground, full body, otherworldly, facing the viewer",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 239906707,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792852165,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 45.6,
+    "request_id": "17d8587f-d440-4930-96c3-86677a7c62d7",
+    "outputs_retained_until": 1792938514
+  }
+}
