@@ -1,0 +1,25 @@
+{
+  "id": "talisman",
+  "payload": {
+    "prompt": "carved wooden talisman with a leaf rune on a cord, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 882258679,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792835616,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.56,
+    "request_id": "0873168e-66c1-46e9-99d5-61e475aa991b",
+    "outputs_retained_until": 1792921967
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "aspergillum",
+  "payload": {
+    "prompt": "aspergillum, a holy water sprinkler: a short wooden handle with a perforated silver ball, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 911455757,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792834974,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 51.9,
+    "request_id": "3b369a65-ce98-4c0e-ae80-cd8a43356fd3",
+    "outputs_retained_until": 1792921329
+  }
+}

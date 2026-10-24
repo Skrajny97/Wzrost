@@ -1,0 +1,25 @@
+{
+  "id": "axe",
+  "payload": {
+    "prompt": "iron battle axe with a wooden haft, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 806206648,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792834822,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 52.62,
+    "request_id": "79230395-d2da-4300-9759-56093a641a67",
+    "outputs_retained_until": 1792921165
+  }
+}

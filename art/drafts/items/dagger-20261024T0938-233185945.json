@@ -1,0 +1,25 @@
+{
+  "id": "dagger",
+  "payload": {
+    "prompt": "short steel dagger with a dark leather grip, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 233185945,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792834853,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 52.44,
+    "request_id": "f3807a2a-e2c9-4207-883c-c4b18945eebc",
+    "outputs_retained_until": 1792921225
+  }
+}

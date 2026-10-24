@@ -1,0 +1,25 @@
+{
+  "id": "hood",
+  "payload": {
+    "prompt": "dark green cloth hood, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 744555171,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792835147,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 51.18,
+    "request_id": "3ca5715a-753d-42e2-9ea7-fcd32eb29bc7",
+    "outputs_retained_until": 1792921508
+  }
+}

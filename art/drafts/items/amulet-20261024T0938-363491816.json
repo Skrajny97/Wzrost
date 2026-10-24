@@ -1,0 +1,25 @@
+{
+  "id": "amulet",
+  "payload": {
+    "prompt": "silver amulet with a round gemstone on a chain, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 363491816,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792835505,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.92,
+    "request_id": "8633d56f-2b0f-4c95-9967-ae90f4f752a3",
+    "outputs_retained_until": 1792921860
+  }
+}

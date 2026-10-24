@@ -1,0 +1,25 @@
+{
+  "id": "shield",
+  "payload": {
+    "prompt": "round wooden shield with an iron rim and boss, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 278272666,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792835003,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 51.72,
+    "request_id": "b6f1689f-4bbe-4f59-b3a4-8da4549610cb",
+    "outputs_retained_until": 1792921376
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "tunic",
+  "payload": {
+    "prompt": "brown leather jacket with laces, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 445509393,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792835244,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 50.82,
+    "request_id": "300d2c6e-d4de-4fdb-8e8a-cf15998b839c",
+    "outputs_retained_until": 1792921599
+  }
+}
