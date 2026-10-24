@@ -32,11 +32,14 @@ jobs:
         run: |
           npm install --no-save playwright@1.56.1
           npx playwright install --with-deps webkit
+      # Over https, as on insightrpg.com: Safari keeps the Secure login
+      # cookie only from an https page.
       - name: Gra na miejscu
         run: |
-          npm run dev > "$RUNNER_TEMP/dev.log" 2>&1 &
-          for i in $(seq 1 120); do curl -s -o /dev/null http://127.0.0.1:8787/api/health && break; sleep 1; done
-          curl -sf http://127.0.0.1:8787/api/health
+          npx wrangler d1 migrations apply DB --local
+          npx wrangler dev --local-protocol https --var TEST_LOGINS: > "$RUNNER_TEMP/dev.log" 2>&1 &
+          for i in $(seq 1 120); do curl -sk -o /dev/null https://127.0.0.1:8787/api/health && break; sleep 1; done
+          curl -skf https://127.0.0.1:8787/api/health
       - name: Przejście gry
         env:
           BROWSER: webkit

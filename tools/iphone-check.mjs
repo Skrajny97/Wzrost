@@ -1,24 +1,27 @@
 // Plays the game as a new player on an iPhone: Safari's engine (Playwright
-// WebKit) at an iPhone 13's size, against the game running locally
-// (`npm run dev`). It goes through the whole introduction, the main screens,
+// WebKit) at an iPhone 13's size, against the game running locally over
+// https (Safari keeps the login cookie, which is Secure, only from an https
+// page: `wrangler dev --local-protocol https`). It goes through the whole introduction, the main screens,
 // the settings with the install steps, and names a second character with a
 // name already taken. Every step leaves a screenshot, and report.md lists
 // the steps with what the page complained about. Run by the "iPhone (WebKit)"
 // workflow; at a computer:
 //
-//   BROWSER=chromium PLAYWRIGHT=/path/to/playwright/index.mjs node tools/iphone-check.mjs
+//   BROWSER=chromium PLAYWRIGHT=/path/to/playwright/index.mjs BASE=https://127.0.0.1:8787 node tools/iphone-check.mjs
 
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const { chromium, devices, webkit } = await import(process.env.PLAYWRIGHT ?? 'playwright');
-const BASE = process.env.BASE ?? 'http://127.0.0.1:8787';
+const BASE = process.env.BASE ?? 'https://127.0.0.1:8787';
 const OUT = process.env.OUT ?? 'checks/iphone';
 const browserType = process.env.BROWSER === 'chromium' ? chromium : webkit;
 mkdirSync(OUT, { recursive: true });
 
 const browser = await browserType.launch();
-const context = await browser.newContext({ ...devices['iPhone 13'], locale: 'pl-PL', timezoneId: 'Europe/Warsaw' });
+// The local server's certificate is its own.
+const options = { ...devices['iPhone 13'], locale: 'pl-PL', timezoneId: 'Europe/Warsaw', ignoreHTTPSErrors: true };
+const context = await browser.newContext(options);
 const page = await context.newPage();
 page.setDefaultTimeout(20000);
 
@@ -26,8 +29,12 @@ const steps = [];
 const complaints = [];
 page.on('pageerror', (error) => complaints.push(`błąd strony: ${error.message}`));
 // A failed request shows once, as its response; the console only repeats it.
+// The service worker cannot start on the local server's own certificate.
 page.on('console', (message) => {
-  if (message.type() === 'error' && !message.text().startsWith('Failed to load resource')) complaints.push(`konsola: ${message.text()}`);
+  const text = message.text();
+  if (message.type() === 'error' && !text.startsWith('Failed to load resource') && !/SSL certificate error occurred when fetching the script/.test(text)) {
+    complaints.push(`konsola: ${text}`);
+  }
 });
 page.on('response', (response) => {
   // Expected: no session before signing in, no character before creating
@@ -213,7 +220,7 @@ await step('Instalacja na iPhonie', async () => {
 });
 
 // A second player picks the same name: the page must say it is taken.
-const context2 = await browser.newContext({ ...devices['iPhone 13'], locale: 'pl-PL' });
+const context2 = await browser.newContext(options);
 const second = await context2.newPage();
 second.on('pageerror', (error) => complaints.push(`błąd strony (druga postać): ${error.message}`));
 let taken = '';
