@@ -1,0 +1,14 @@
+{
+  "id": "lead-stats",
+  "payload": {
+    "text": "Zdobycie poziomów w wyniku wypraw – czy to klasy, czy postaci – daje Ci również punkty statystyk do rozdysponowania. Zajrzyjmy do nich.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    }
+  },
+  "files": [
+    "audio/drafts/narration/lead-stats-20261024T1621-0.mp3"
+  ],
+  "credits": 135
+}

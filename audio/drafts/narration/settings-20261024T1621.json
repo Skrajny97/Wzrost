@@ -1,0 +1,14 @@
+{
+  "id": "settings",
+  "payload": {
+    "text": "Dla Twojej wygody możesz również zajrzeć do części ustawień samego Systemu i ustawić je tak, jak Ci się żywnie podoba. Jeśli stwierdzisz, że popełniłeś za dużo błędów – możesz nawet zacząć od nowa.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    }
+  },
+  "files": [
+    "audio/drafts/narration/settings-20261024T1621-0.mp3"
+  ],
+  "credits": 197
+}

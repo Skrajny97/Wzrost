@@ -1,0 +1,14 @@
+{
+  "id": "skip",
+  "payload": {
+    "text": "Jesteś już w lesie. Czas jest nieubłagany… gdyby nie pomoc Systemu. Punkty Czasu pozwolą Ci przyspieszyć eksplorację. Proszę – oto 60 jednostek na start. Potraktuj to… jako drogocenny prezent.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    }
+  },
+  "files": [
+    "audio/drafts/narration/skip-20261024T1621-0.mp3"
+  ],
+  "credits": 192
+}

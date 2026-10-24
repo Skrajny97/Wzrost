@@ -1,0 +1,14 @@
+{
+  "id": "tap-claim",
+  "payload": {
+    "text": "Odbierz raport.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    }
+  },
+  "files": [
+    "audio/drafts/narration/tap-claim-20261024T1621-0.mp3"
+  ],
+  "credits": 15
+}

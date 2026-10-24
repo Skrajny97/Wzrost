@@ -1,0 +1,14 @@
+{
+  "id": "lead-camp",
+  "payload": {
+    "text": "Żadna szanująca się postać nie pozbawi siebie opcji budowania obozu, a kto wie, może z czasem i całej wioski. Zajrzyjmy do Twojego obozu.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    }
+  },
+  "files": [
+    "audio/drafts/narration/lead-camp-20261024T1621-0.mp3"
+  ],
+  "credits": 137
+}

@@ -1,0 +1,14 @@
+{
+  "id": "stats",
+  "payload": {
+    "text": "System ułatwia sprawę, dzięki czemu nie musisz głowić się nad tymi wszystkimi liczbami. Możesz rozdysponować zdobyte punkty tak, by najlepiej pasowały do Twojej klasy. Ale! Możesz budować swoją postać również wedle własnego uznania.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    }
+  },
+  "files": [
+    "audio/drafts/narration/stats-20261024T1621-0.mp3"
+  ],
+  "credits": 232
+}
