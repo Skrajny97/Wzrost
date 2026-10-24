@@ -1,0 +1,13 @@
+{
+  "id": "magic",
+  "payload": {
+    "text": "a short crackling magic spark spell, a bright fizzing whoosh with a sparkle, fantasy, close up, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/magic-20261024T1252-0.mp3",
+    "audio/drafts/effects/magic-20261024T1252-1.mp3"
+  ],
+  "credits": 60
+}
