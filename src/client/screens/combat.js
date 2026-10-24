@@ -10,7 +10,8 @@ import { leaveView as leaveHistoryView, openView as openHistoryView } from '../h
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, timeFormat } from '../format.js';
 import { preloadReportMusic } from '../music.js';
-import { activityFinished, call, currentHp, isUnlocked, reportCache, serverNow, state, testModeOn, unlockInfo } from '../state.js';
+import { activityFinished, call, currentHp, isUnlocked, reportCache, restRate, serverNow, state, testModeOn, unlockInfo } from '../state.js';
+import { skipControl } from '../time.js';
 import { confirmAction, lockLabel, systemPanel, toast, withButton } from '../ui.js';
 
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -75,6 +76,8 @@ export function mountCombat(container, { params, navigate }) {
   let progress = null;
   let shownFinished = null;
   let shownSkip = null;
+  // "Przewiń" for the exploration or the rest on the screen, kept right every second.
+  let skipper = null;
 
   // HP in tenths of the maximum: resting moves the threat now and then.
   const hpStep = (character, now) => Math.floor((currentHp(character, now) / character.maxHp) * 10);
@@ -118,6 +121,7 @@ export function mountCombat(container, { params, navigate }) {
     shownSkip = skipKind(character);
     countdown = null;
     progress = null;
+    skipper = null;
     shownArea = null;
     showThreat = null;
 
@@ -226,6 +230,7 @@ export function mountCombat(container, { params, navigate }) {
       const claim = h('button', {
         type: 'button',
         class: 'button button--system',
+        'data-guide': 'claim',
         text: 'Odbierz raport',
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
@@ -259,6 +264,7 @@ export function mountCombat(container, { params, navigate }) {
         if (sure) await withButton(button, () => call('POST', '/api/hunts/cancel'));
       },
     });
+    skipper = skipControl('activity', (now) => activity.endsAt - now, 'Eksploracja');
     const card = h(
       'div',
       { class: 'stack' },
@@ -268,6 +274,7 @@ export function mountCombat(container, { params, navigate }) {
         h('div', { class: 'bar bar--system' }, progress),
         h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
       ),
+      skipper.element,
       cancel,
     );
     tick(serverNow());
@@ -276,7 +283,7 @@ export function mountCombat(container, { params, navigate }) {
 
   // Step one: the regions.
   function regionList(character) {
-    const first = character.level === 1 && character.xp === 0 && character.gold === 0;
+    const first = character.level === 1 && character.xp === 0;
     const unarmed = !character.equipment.weapon;
     return h(
       'div',
@@ -293,7 +300,7 @@ export function mountCombat(container, { params, navigate }) {
     const open = candidate.areas.filter((place) => areaOpen(place, character)).length;
     return h(
       'a',
-      { class: 'card region-card region-link', href: hash, onClick: (event) => openView(event, hash) },
+      { class: 'card region-card region-link', href: hash, 'data-guide': `region-${candidate.id}`, onClick: (event) => openView(event, hash) },
       h(
         'div',
         { class: 'region-head' },
@@ -344,7 +351,7 @@ export function mountCombat(container, { params, navigate }) {
     const hash = `${regionHash}/${place.id}`;
     return h(
       'a',
-      { class: 'area-tile', href: hash, onClick: (event) => openView(event, hash) },
+      { class: 'area-tile', href: hash, 'data-guide': `area-${place.id}`, onClick: (event) => openView(event, hash) },
       circle,
       h('span', { class: 'area-tile-name', text: place.name }),
       h('span', { class: 'area-levels', text: `poz. ${place.minLevel}–${place.maxLevel}` }),
@@ -358,7 +365,9 @@ export function mountCombat(container, { params, navigate }) {
     // The slider moves over the allowed lengths (1, 5, 10… minutes). The last
     // length is kept for each inner region (before them: for each region).
     let index = allowed.indexOf(choice[area.id] ?? choice[region.id]);
-    if (index === -1) index = Math.max(0, allowed.indexOf(15));
+    // The narrator sends the first exploration out for the longest time.
+    const first = character.tutorial && !character.tutorial.includes('skip') && character.xp === 0 && character.level === 1;
+    if (index === -1) index = first ? allowed.length - 1 : Math.max(0, allowed.indexOf(15));
     let minutes = allowed[index];
     shownArea = area.id;
 
@@ -433,6 +442,7 @@ export function mountCombat(container, { params, navigate }) {
     const start = h('button', {
       type: 'button',
       class: 'button button--system',
+      'data-guide': 'start',
       text: 'Wyrusz',
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
@@ -470,10 +480,18 @@ export function mountCombat(container, { params, navigate }) {
         levelNote,
         durations,
         threatLine,
+        restSkip(character),
         start,
       ),
       h('p', { class: 'muted threat-note', text: 'Zagrożenie to szansa omdlenia na wyprawie.' }),
     );
+  }
+
+  // Resting before the start can be skipped with Punkty Czasu.
+  function restSkip(character) {
+    const left = (now) => ((character.maxHp - currentHp(state.character, now)) / Math.max(1e-9, restRate(state.character))) * 60000;
+    skipper = skipControl('rest', left, 'Odpoczynek');
+    return skipper.element;
   }
 
   function tick(now) {
@@ -482,6 +500,7 @@ export function mountCombat(container, { params, navigate }) {
       render();
       return;
     }
+    skipper?.update(now);
     if (!activity) {
       loadOptions();
       return;

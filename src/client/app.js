@@ -16,6 +16,7 @@ import { lockedScreen } from './screens/locked.js';
 import { mountReport } from './screens/report.js';
 import { mountStats } from './screens/stats.js';
 import { musicVolume, setMusicConfig, setMusicPlace, setMusicVolume, startMusic } from './music.js';
+import { narrate } from './narrator.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, handleSessionLost, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
 import { closeSheet, confirmAction, initSheet, openSheet, toast, withButton } from './ui.js';
@@ -212,6 +213,8 @@ function route() {
   setMusicPlace(places, fresh ? reportCache.get(params.id)?.result : null);
   renderNav();
   $('.page-title', container)?.focus({ preventScroll: true });
+  // A new character's narrator: a card or the place to tap on this screen.
+  narrate(hash);
 }
 
 function renderNav() {
@@ -235,6 +238,7 @@ onCharacterChange(() => {
   updateTopbar();
   renderNav();
   current.screen.update?.();
+  narrate();
 });
 
 // Coming back to the page after a new version of the game was deployed

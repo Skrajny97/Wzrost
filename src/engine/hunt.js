@@ -168,6 +168,7 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
   let endedAt = durationMs; // a faint or an escape ends the exploration early
   let xp = 0;
   let gold = 0;
+  let timePoints = 0; // from time shards, a rare find
   // Gold from fights before rounding: a short exploration earns fractions per
   // fight, and only the running total is rounded.
   let fightGold = 0;
@@ -182,8 +183,8 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
 
   for (const [step, event] of timeline.entries()) {
     if (event.type === 'find') {
-      // A find is gold, an item of the place's level, resources for the camp
-      // or nothing of interest.
+      // A find is gold, an item of the place's level, resources for the camp,
+      // nothing of interest or, rarely, a shard of time (Time Points).
       const findLevel = areaLevel(area, rng, content);
       const outcome = rng.weighted(Object.entries(rewards.findOutcomes), ([, weight]) => weight)[0];
       if (outcome === 'gold') {
@@ -199,6 +200,10 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
         for (const [id, amount] of found) resources[id] = (resources[id] ?? 0) + amount;
         const list = found.map(([id, amount]) => `${content.resourcesById[id].name.toLowerCase()} +${amount}`).join(', ');
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findResource', step, { resources: list }) });
+      } else if (outcome === 'time') {
+        const amount = content.balance.timePoints.find;
+        timePoints += amount;
+        entries.push({ t: event.t, type: 'find', text: say(texts, 'findTime', step, { time: amount }) });
       } else {
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findNothing', step) });
       }
@@ -317,6 +322,7 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
     xp,
     gold,
     resources,
+    timePoints,
     items,
     hpStart: player.hp,
     hpEnd: hpNow,
@@ -343,12 +349,14 @@ export function applyHunt(character, hunt, content) {
   const penalty = hunt.result === 'fainted' ? faintPenalty(next.level, next.xp, content) : 0;
 
   // A few levels at once make one line each for the character and the class,
-  // with all their points, so the report's System panel stays short.
+  // with all their points, so the report's System panel stays short. Every
+  // level also brings Time Points, and so do the time shards found.
   const pointsPerLevel = content.statIds.length;
+  const time = content.balance.timePoints;
   const messages = [];
   const levels = next.level - character.level;
   if (levels > 0) {
-    messages.push(say(content.texts, 'levelUp', next.level, { level: next.level, points: pointsPerLevel * levels }));
+    messages.push(say(content.texts, 'levelUp', next.level, { level: next.level, points: pointsPerLevel * levels, time: time.perLevel * levels }));
     for (let level = character.level + 1; level <= next.level; level++) messages.push(...unlockMessages(level, content));
   }
   const className = content.classesById[character.classId].name;
@@ -358,7 +366,9 @@ export function applyHunt(character, hunt, content) {
   const classLevels = nextClass.level - character.classLevel;
   if (classLevels > 0) {
     const points = Math.floor(pointsPerLevel / 4) * classLevels;
-    messages.push(say(content.texts, textId, nextClass.level, { className, level: nextClass.level, points, unlockLevel }));
+    messages.push(
+      say(content.texts, textId, nextClass.level, { className, level: nextClass.level, points, unlockLevel, time: time.perClassLevel * classLevels }),
+    );
   }
   if (penalty > 0) messages.push(say(content.texts, 'faintPenalty', 0, { xp: penalty }));
 
@@ -368,6 +378,7 @@ export function applyHunt(character, hunt, content) {
     classLevel: nextClass.level,
     classXp: nextClass.xp,
     penalty,
+    timePoints: time.perLevel * levels + time.perClassLevel * classLevels + (hunt.timePoints ?? 0),
     messages,
   };
 }
@@ -400,6 +411,7 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       penalty: applied.penalty,
       gold: hunt.gold,
       resources: hunt.resources,
+      timePoints: applied.timePoints,
       fights: hunt.fights.length,
       itemsFound: hunt.items.length,
       bestFind: best && itemView(best, content),

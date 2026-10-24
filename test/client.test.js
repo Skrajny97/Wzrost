@@ -94,6 +94,8 @@ test('every sprite on the list has its file at its size, and every class has its
     monsters: data('monsters').map((monster) => monster.id),
     items: data('item-bases').map((base) => base.id),
     portraits: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
+    // The introduction's one narrator (narrator.js).
+    narrator: ['narrator'],
   };
   for (const [kind, { size, width = size, height = size, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);

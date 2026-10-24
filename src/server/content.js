@@ -20,6 +20,7 @@ import buildings from '../../data/buildings.json' with { type: 'json' };
 import appearances from '../../data/appearances.json' with { type: 'json' };
 import music from '../../data/music.json' with { type: 'json' };
 import sounds from '../../data/sounds.json' with { type: 'json' };
+import tutorial from '../../data/tutorial.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -39,6 +40,9 @@ export const content = buildContent({
   buildings,
   appearances,
 });
+
+// The narrator's cards by id, in their order.
+export const tutorialCards = tutorial.cards.map((card) => card.id);
 
 // What the page needs to label things; no balance numbers.
 export function publicContent() {
@@ -85,5 +89,8 @@ export function publicContent() {
     music,
     // Recorded combat sounds and voices (sound.js).
     sounds,
+    // The narrator's introduction for a new character (narrator.js), with
+    // the Time Points the narrator gives.
+    tutorial: { ...tutorial, $comment: undefined, startTimePoints: content.balance.timePoints.start },
   };
 }

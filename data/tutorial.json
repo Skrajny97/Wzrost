@@ -1,6 +1,6 @@
 {
-  "$comment": "Wprowadzenie narratora: karty na pergaminie, które nowa postać widzi przy pierwszych krokach. Kolejność i chwilę pokazania karty wyznacza kod według jej id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start).",
-  "skipLabel": "Pomiń opowieść",
+  "$comment": "Wprowadzenie narratora: karty na pergaminie, które nowa postać widzi przy pierwszych krokach, i podpowiedzi przy podświetlonych miejscach, które trzeba stuknąć. Chwilę pokazania karty i podświetlenia wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start).",
+  "skipLabel": "Pomiń wprowadzenie",
   "nextLabel": "Dalej",
   "cards": [
     {
@@ -47,7 +47,23 @@
     },
     {
       "id": "ending",
-      "text": ["Tyle na początek. Reszty dowiesz się w swoim czasie."]
+      "text": [
+        "Tyle na początek. Puszcza to dopiero pierwszy krok drogi, która prowadzi dalej, niż sięga wzrok.",
+        "Reszty dowiesz się w swoim czasie."
+      ]
     }
-  ]
+  ],
+  "hints": {
+    "region": "Stuknij Wiatrołomy.",
+    "area": "Wybierz Skraj Wiatrołomów.",
+    "start": "Suwak stoi na 30 minutach. Stuknij „Wyrusz”.",
+    "skip": "Przewiń czas Punktami Czasu.",
+    "claim": "Odbierz raport.",
+    "character": "Zajrzyj do Postaci.",
+    "stats": "Otwórz Statystyki.",
+    "points": "Rozdaj wolne punkty jednym stuknięciem.",
+    "camp": "Teraz obóz, w prawym górnym rogu.",
+    "plot": "Stuknij plac Ogniska.",
+    "build": "Zbuduj Ognisko."
+  }
 }

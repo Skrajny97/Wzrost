@@ -12,6 +12,7 @@ import { leaveView, openView } from '../history.js';
 import { RESOURCE_ICONS } from '../icons.js';
 import { playSound } from '../sound.js';
 import { call, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
+import { skipControl } from '../time.js';
 import { systemPanel, toast, withButton } from '../ui.js';
 
 const CAMP = '#/oboz';
@@ -76,20 +77,28 @@ function testTools(building) {
   );
 }
 
-// The upgrade in progress: what, how long, and a bar. `ticks` gets its update.
+// The upgrade in progress: what, how long, a bar and "Przewiń" for Punkty
+// Czasu. `ticks` gets its update.
 function constructionPanel(running, ticks) {
   const countdown = h('p', { class: 'countdown', 'aria-live': 'off' });
   const progress = h('div', { class: 'bar-fill bar-fill--system' });
+  const skipper = skipControl('build', (now) => running.endsAt - now, `Budowa: ${running.name}`);
   ticks.push((now) => {
     countdown.textContent = formatCountdown(running.endsAt - now);
     const done = (now - running.startedAt) / (running.endsAt - running.startedAt);
     progress.style.width = `${Math.min(100, Math.max(0, done * 100))}%`;
+    skipper.update(now);
   });
-  return systemPanel(
-    `Budowa: ${running.name}, poziom ${running.level}.`,
-    countdown,
-    h('div', { class: 'bar bar--system' }, progress),
-    h('p', { class: 'system-hint', text: `Gotowe o ${timeFormat.format(new Date(running.endsAt))}.` }),
+  return h(
+    'div',
+    { class: 'stack' },
+    systemPanel(
+      `Budowa: ${running.name}, poziom ${running.level}.`,
+      countdown,
+      h('div', { class: 'bar bar--system' }, progress),
+      h('p', { class: 'system-hint', text: `Gotowe o ${timeFormat.format(new Date(running.endsAt))}.` }),
+    ),
+    skipper.element,
   );
 }
 
@@ -157,6 +166,7 @@ function mountBoard(container, backHash) {
       {
         class: `camp-plot${empty ? ' camp-plot--empty' : ''}`,
         href: hash,
+        'data-guide': `plot-${building.id}`,
         'aria-label': said.filter(Boolean).join(', '),
         onClick: (event) => openView(event, hash, HISTORY_KEY),
       },
@@ -350,6 +360,7 @@ function mountBuilding(container, id) {
       h('button', {
         type: 'button',
         class: 'button button--system',
+        'data-guide': 'build',
         disabled: Boolean(running) || missing,
         text: label,
         onClick: (event) =>

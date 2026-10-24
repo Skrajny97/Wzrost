@@ -508,29 +508,39 @@ describe('progression', () => {
     assert.equal(applied.xp, 5);
     assert.equal(applied.classLevel, 2);
     assert.equal(applied.classXp, xpToNext(1, content) + 5 - classXpToNext(1, content));
-    assert.match(applied.messages[0], /^Osiągnięto poziom 2\. Wolne punkty statystyk: \+8\.$/);
+    assert.match(applied.messages[0], /^Osiągnięto poziom 2\. Wolne punkty statystyk: \+8\. Punkty Czasu: \+3\.$/);
     // Level 2 opens long hunts and the stats screen, and the System says so.
     const unlocks = content.unlocks.filter((u) => u.level === 2).map((u) => u.message);
     assert.deepEqual(applied.messages.slice(1, 1 + unlocks.length), unlocks);
-    assert.match(applied.messages.at(-1), /^Kleryk: poziom klasy 2\. Wolne punkty statystyk: \+2\.$/);
+    assert.match(applied.messages.at(-1), /^Kleryk: poziom klasy 2\. Wolne punkty statystyk: \+2\. Punkty Czasu: \+2\.$/);
+    // A level and a class level: 3 and 2 Time Points (data/balance.json).
+    assert.equal(applied.timePoints, 5);
     // A class level before character level 2 says when its points can be spent.
     const early = applyHunt(character, { xp: classXpToNext(1, content), result: 'success' }, content);
     assert.equal(early.level, 1);
-    assert.deepEqual(early.messages, ['Kleryk: poziom klasy 2. Wolne punkty statystyk: +2. Rozdasz je od poziomu 2.']);
+    assert.deepEqual(early.messages, ['Kleryk: poziom klasy 2. Wolne punkty statystyk: +2, rozdasz je od poziomu 2. Punkty Czasu: +2.']);
+    assert.equal(early.timePoints, 2);
 
     // Several levels at once make one line for the character and one for the class.
     const xp = [1, 2, 3].reduce((sum, level) => sum + xpToNext(level, content), 0);
     const many = applyHunt(character, { xp, result: 'success' }, content);
     assert.equal(many.level, 4);
     assert.equal(many.messages.filter((message) => message.startsWith('Osiągnięto poziom')).length, 1);
-    assert.equal(many.messages[0], 'Osiągnięto poziom 4. Wolne punkty statystyk: +24.');
+    assert.equal(many.messages[0], 'Osiągnięto poziom 4. Wolne punkty statystyk: +24. Punkty Czasu: +9.');
     assert.equal(many.messages.filter((message) => message.startsWith('Kleryk: poziom klasy')).length, 1);
-    assert.match(many.messages.at(-1), new RegExp(`^Kleryk: poziom klasy ${many.classLevel}\\. Wolne punkty statystyk: \\+${2 * (many.classLevel - 1)}\\.$`));
+    assert.match(
+      many.messages.at(-1),
+      new RegExp(`^Kleryk: poziom klasy ${many.classLevel}\\. Wolne punkty statystyk: \\+${2 * (many.classLevel - 1)}\\. Punkty Czasu: \\+${2 * (many.classLevel - 1)}\\.$`),
+    );
+    assert.equal(many.timePoints, 9 + 2 * (many.classLevel - 1));
 
     const fainted = applyHunt({ ...character, level: 3, xp: 10 }, { xp: 0, result: 'fainted' }, content);
     assert.equal(fainted.level, 3);
     assert.equal(fainted.xp, 0);
     assert.equal(fainted.penalty, 10);
+    assert.equal(fainted.timePoints, 0);
+    // Time shards found on the way count too.
+    assert.equal(applyHunt(character, { xp: 0, result: 'success', timePoints: 5 }, content).timePoints, 5);
   });
 
   test('hunting far below your level gives clearly less XP', () => {
@@ -810,6 +820,26 @@ describe('resources', () => {
       content,
     );
     assert.equal(typeof report.summary.resources, 'object');
+  });
+
+  test('a rare find is a shard of time, worth Time Points', () => {
+    const character = newCharacter('warrior', { level: 10, classLevel: 11 });
+    let shards = 0;
+    let points = 0;
+    let finds = 0;
+    for (let i = 0; i < 40; i++) {
+      const hunt = simulateHunt(
+        { character, equipped: kit('warrior'), hp: 9999, name: 'Mira', areaId: 'fox-ravines', minutes: 240, seed: `time:${i}` },
+        content,
+      );
+      const found = hunt.entries.filter((entry) => entry.type === 'find');
+      finds += found.length;
+      shards += found.filter((entry) => entry.text.includes('odłamek czasu')).length;
+      points += hunt.timePoints;
+    }
+    assert.equal(points, shards * content.balance.timePoints.find);
+    // About one find in twenty (data/balance.json: findOutcomes.time).
+    assert.ok(shards > 0 && shards / finds < 0.1, `${shards} of ${finds}`);
   });
 
   test('a resource find is a bundle split by the region weights, at least one unit', () => {

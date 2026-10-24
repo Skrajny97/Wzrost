@@ -232,6 +232,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       ['XP klasy', `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
       ['Złoto', `+${formatNumber(summary.gold)}`],
       resourcesRow(summary.resources),
+      summary.timePoints > 0 && ['Punkty Czasu', `+${formatNumber(summary.timePoints)}`],
       ['Walki', formatNumber(summary.fights)],
       ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
     ].filter(Boolean);

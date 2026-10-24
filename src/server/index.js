@@ -11,6 +11,8 @@ import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { getReport, listReports } from './reports.js';
 import { skipBuilding, skipTime } from './testing.js';
+import { skipWithTimePoints } from './time.js';
+import { seeTutorial } from './tutorial.js';
 
 const routes = [
   ['GET', '/api/health', health],
@@ -42,6 +44,8 @@ const routes = [
   ['POST', '/api/camp/collect', collectProduction],
   ['GET', '/api/reports', listReports],
   ['GET', '/api/reports/:id', getReport],
+  ['POST', '/api/time/skip', skipWithTimePoints],
+  ['POST', '/api/tutorial', seeTutorial],
   ['POST', '/api/test/skip-time', skipTime],
   ['POST', '/api/test/skip-build', skipBuilding],
 ].map(([method, pattern, handler]) => ({ method, parts: pattern.split('/'), handler }));

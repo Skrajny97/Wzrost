@@ -21,6 +21,12 @@ export const SPRITES = {
     size: 32,
     ids: ['sword', 'axe', 'dagger', 'bow', 'staff', 'aspergillum', 'shield', 'quiver', 'focus', 'hood', 'helmet', 'tunic', 'chainmail', 'robe', 'gloves', 'boots', 'amulet', 'ring', 'talisman'],
   },
+  // The ethereal narrator of the introduction, reading its scroll (narrator.js).
+  narrator: {
+    width: 96,
+    height: 128,
+    ids: ['narrator'],
+  },
 };
 
 const available = Object.fromEntries(Object.entries(SPRITES).map(([kind, { ids }]) => [kind, new Set(ids)]));
@@ -54,6 +60,19 @@ export function portraitSprite(classId, appearance, { bust = false } = {}) {
     width,
     height,
     class: `sprite sprite--portrait${bust ? ' sprite--bust' : ''}`,
+    decoding: 'async',
+    draggable: 'false',
+  });
+}
+
+export function narratorSprite() {
+  const { width, height } = SPRITES.narrator;
+  return h('img', {
+    src: '/art/narrator/narrator.png',
+    alt: '',
+    width,
+    height,
+    class: 'sprite sprite--narrator',
     decoding: 'async',
     draggable: 'false',
   });

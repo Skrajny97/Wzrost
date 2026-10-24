@@ -119,6 +119,7 @@ export function mountStats(container) {
     const auto = h('button', {
       type: 'button',
       class: 'button button--world button--small',
+      'data-guide': 'auto-points',
       disabled: busy || character.freePoints === 0,
       text: 'Rozdaj według klasy',
       onClick: (event) =>

@@ -80,7 +80,7 @@ export function buildTopbar(onSettings) {
   updateTopbar();
 }
 
-// Gold and Punkty Systemu first, then the materials.
+// Gold, Punkty Systemu and Punkty Czasu first, then the materials.
 function walletRows() {
   const [gold, ...materials] = walletEntries();
   const row = (iconName, name, amount, kind) =>
@@ -94,6 +94,7 @@ function walletRows() {
   return [
     row('coin', gold.name, gold.amount),
     row(SYSTEM_POINTS_ICON, 'Punkty Systemu', state.character.systemPoints, 'system'),
+    row('hourglass', 'Punkty Czasu', state.character.timePoints, 'time'),
     ...materials.map((entry, index) => row(RESOURCE_ICONS[entry.id] ?? 'unknown', entry.name, entry.amount, index === 0 && 'materials')),
   ];
 }
@@ -109,7 +110,7 @@ export function showWallet(open) {
 
 // Redrawn only when an amount changes, not on every tick.
 function refreshWallet() {
-  const key = JSON.stringify([state.character.systemPoints, ...walletEntries().map((entry) => entry.amount)]);
+  const key = JSON.stringify([state.character.systemPoints, state.character.timePoints, ...walletEntries().map((entry) => entry.amount)]);
   if (key === topbar.walletKey) return;
   topbar.walletKey = key;
   fill(topbar.wallet, ...walletRows());

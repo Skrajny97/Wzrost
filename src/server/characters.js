@@ -209,6 +209,8 @@ export function characterView(player, now) {
     classXpToNext: classXpToNext(row.class_level, content),
     gold,
     systemPoints: row.system_points,
+    // Punkty Czasu: 1 point skips 1 minute of a wait (time.js).
+    timePoints: row.time_points,
     resources,
     position: row.position,
     hp,
@@ -254,6 +256,9 @@ export function characterView(player, now) {
     bag: items.filter((item) => !item.equippedSlot).reverse().map(toItem),
     bagCapacity: bagCapacity(levels, content),
     camp: campView(player, levels, now),
+    // The narrator's cards seen so far, or null for a character made before
+    // the introduction (tutorial.js).
+    tutorial: row.tutorial === null ? null : JSON.parse(row.tutorial),
     activity: activity && {
       kind: activity.kind,
       ...activityPlace(activity, row.level),
@@ -271,7 +276,9 @@ export async function getCharacter(context) {
   return json({ character: characterView(player, context.now) });
 }
 
-// A new character starts with nothing: its first gear comes from the hunts.
+// A new character starts without gear: its first comes from the hunts. The
+// narrator gives it Time Points, and an abandoned camp some gold and wood
+// (data/balance.json: timePoints.start, startingSupply).
 export async function createCharacter(context) {
   const session = await requireSession(context);
   const body = await readJson(context.request);
@@ -287,12 +294,17 @@ export async function createCharacter(context) {
   const character = { classId: cls.id, level: 1, classLevel: 1, points: {}, position: cls.position };
   const hp = playerCombatant({ character, equipped: [], name }, content).maxHp;
   const now = context.now;
+  const supply = content.balance.startingSupply;
   try {
     await db
       .prepare(
-        "INSERT INTO characters (user_id, role, name, class_id, appearance, position, hp, hp_at, created_at) VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?)",
+        `INSERT INTO characters (user_id, role, name, class_id, appearance, position, hp, hp_at, created_at, gold, resources, time_points, tutorial)
+         VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]')`,
       )
-      .bind(session.userId, name, cls.id, appearance, cls.position, hp, now, now)
+      .bind(
+        session.userId, name, cls.id, appearance, cls.position, hp, now, now,
+        supply.gold, JSON.stringify(supply.resources), content.balance.timePoints.start,
+      )
       .run();
   } catch (error) {
     if (String(error?.message).includes('UNIQUE')) throw exists();

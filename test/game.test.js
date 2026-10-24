@@ -9,6 +9,8 @@ import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
 const { call, db } = useServer();
+// What a new character finds in the abandoned camp (data/balance.json).
+const supply = content.balance.startingSupply;
 
 async function signUp(login = 'karol') {
   const { cookie } = await call('POST', '/api/auth/register', { body: { login, password: 'tajnehaslo1' } });
@@ -325,7 +327,9 @@ describe('hunts and reports', () => {
     assert.ok(report.fights[report.keyFight.index].events.length > 0);
     assert.ok(report.fights.every((fight) => fight.allies.length === 1 && fight.enemies.length >= 1));
     assert.equal(character.activity, null);
-    assert.equal(character.gold, report.summary.gold);
+    assert.equal(character.gold, supply.gold + report.summary.gold);
+    // Levels and class levels bring Time Points, on top of the narrator's.
+    assert.equal(character.timePoints, content.balance.timePoints.start + report.summary.timePoints);
     // The first weapon goes straight into the empty slot, the rest into the bag.
     assert.ok(character.equipment.weapon);
     const worn = Object.values(character.equipment).filter(Boolean).length;
@@ -406,7 +410,7 @@ describe('hunts and reports', () => {
     const cancel = await call('POST', '/api/hunts/cancel', { cookie });
     assert.equal(cancel.status, 200);
     assert.equal(cancel.data.character.activity, null);
-    assert.equal(cancel.data.character.gold, 0);
+    assert.equal(cancel.data.character.gold, supply.gold);
     assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).data.error.code, 'no_activity');
   });
 
@@ -467,7 +471,7 @@ describe('camp', () => {
     }
   }
 
-  test('starts with seven buildings at level 0, no resources and a bag of 30', async () => {
+  test("starts with seven buildings at level 0, the abandoned camp's supply and a bag of 30", async () => {
     const start = await character();
     assert.deepEqual(
       start.camp.buildings.map((building) => [building.id, building.level]),
@@ -477,7 +481,8 @@ describe('camp', () => {
     const campfire = start.camp.buildings.find((building) => building.id === 'campfire');
     assert.deepEqual(campfire.next, { level: 1, effect: 'Odpoczynek między wyprawami szybszy o 10%', minutes: 1, cost: { gold: 5, wood: 4 } });
     assert.equal(campfire.production, null);
-    assert.deepEqual(start.resources, { wood: 0, stone: 0, 'iron-ore': 0 });
+    assert.deepEqual(start.resources, { wood: 15, stone: 3, 'iron-ore': 0 });
+    assert.equal(start.gold, 15);
     assert.equal(start.systemPoints, 0);
     assert.equal(start.bagCapacity, 30);
     const { data } = await call('GET', '/api/content');
@@ -489,6 +494,7 @@ describe('camp', () => {
   });
 
   test('a building is paid in gold and resources, takes time, and one is built at a time', async () => {
+    await stock(0, {});
     assert.equal((await build('campfire')).data.error.code, 'not_enough');
     assert.equal((await build('tower')).data.error.code, 'invalid_building');
     await stock(100, { wood: 20, stone: 5 });
@@ -616,7 +622,7 @@ describe('camp', () => {
     assert.equal(view.bag[0].price, 15);
     const sold = await call('POST', '/api/items/sell', { cookie, body: { maxRarity: 'common' } });
     assert.deepEqual(sold.data.sold, { count: 1, gold: 15 });
-    assert.equal(sold.data.character.gold, 15);
+    assert.equal(sold.data.character.gold, supply.gold + 15);
   });
 
   test('resources found on an exploration go to the camp', async () => {
@@ -627,7 +633,9 @@ describe('camp', () => {
     const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
     const found = report.summary.resources;
     assert.ok(Object.values(found).some((amount) => amount > 0));
-    for (const [resource, amount] of Object.entries(after.resources)) assert.equal(amount, found[resource] ?? 0);
+    for (const [resource, amount] of Object.entries(after.resources)) {
+      assert.equal(amount, (found[resource] ?? 0) + (supply.resources[resource] ?? 0));
+    }
     assert.ok(report.entries.some((entry) => /\+\d+\.$/.test(entry.text) && entry.type === 'find'));
   });
 });
@@ -710,3 +718,94 @@ describe('upgrades on the Kowadło', () => {
   });
 });
 
+
+describe('Time Points and the narrator', () => {
+  let cookie;
+  beforeEach(async () => {
+    cookie = await signUp();
+    await newCharacter(cookie, 'warrior');
+  });
+
+  const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
+  const skip = (target) => call('POST', '/api/time/skip', { cookie, body: { target } });
+  const setPoints = async (points) => (await db()).prepare('UPDATE characters SET time_points = ?').bind(points).run();
+  const start = content.balance.timePoints.start;
+
+  test('a new character gets the Time Points of the narrator and the introduction', async () => {
+    const view = await character();
+    assert.equal(view.timePoints, start);
+    assert.deepEqual(view.tutorial, []);
+    const { data } = await call('GET', '/api/content');
+    assert.deepEqual(
+      data.tutorial.cards.map((card) => card.id),
+      ['intro', 'time', 'skip', 'report', 'character', 'camp', 'ending'],
+    );
+    assert.equal(data.tutorial.startTimePoints, start);
+    assert.equal(data.tutorial.$comment, undefined);
+  });
+
+  test('the points skip the whole exploration, and its report is the same as after waiting', async () => {
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
+    const skipped = await skip('activity');
+    assert.equal(skipped.status, 200);
+    assert.equal(skipped.data.spent, 30);
+    assert.equal(skipped.data.character.timePoints, start - 30);
+    assert.ok(skipped.data.character.activity.endsAt <= Date.now());
+    assert.equal(skipped.data.character.activity.finished, true);
+    const claim = await call('POST', '/api/hunts/claim', { cookie });
+    assert.equal(claim.status, 200);
+    assert.equal(claim.data.character.timePoints, start - 30 + claim.data.report.summary.timePoints);
+    assert.equal((await skip('activity')).data.error.code, 'nothing_to_skip');
+  });
+
+  test('fewer points than minutes make the wait that much shorter', async () => {
+    await setPoints(10);
+    const started = (await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } })).data.character;
+    const skipped = await skip('activity');
+    assert.equal(skipped.data.spent, 10);
+    const activity = skipped.data.character.activity;
+    assert.equal(started.activity.endsAt - activity.endsAt, 10 * 60000);
+    assert.equal(activity.finished, false);
+    assert.equal(skipped.data.character.timePoints, 0);
+    assert.equal((await skip('activity')).data.error.code, 'no_time_points');
+  });
+
+  test('the points skip resting and a camp upgrade', async () => {
+    const view = await character();
+    await (await db()).prepare('UPDATE characters SET hp = 1, hp_at = ?').bind(Date.now()).run();
+    const rested = await skip('rest');
+    assert.equal(rested.status, 200);
+    assert.ok(rested.data.spent > 0 && rested.data.spent <= start);
+    assert.equal(rested.data.character.hp, view.maxHp);
+    assert.equal(rested.data.character.timePoints, start - rested.data.spent);
+    assert.equal((await skip('rest')).data.error.code, 'nothing_to_skip');
+
+    // Ognisko level 1 takes a minute, paid from the abandoned camp's supply.
+    assert.equal((await call('POST', '/api/camp/build', { cookie, body: { buildingId: 'campfire' } })).status, 201);
+    const built = await skip('build');
+    assert.equal(built.data.spent, 1);
+    assert.equal(built.data.character.camp.construction, null);
+    assert.equal(built.data.character.camp.buildings.find((building) => building.id === 'campfire').level, 1);
+    assert.equal((await skip('build')).data.error.code, 'nothing_to_skip');
+    assert.equal((await skip('everything')).data.error.code, 'invalid_target');
+  });
+
+  test('resting cannot be skipped during an exploration', async () => {
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.equal((await skip('rest')).data.error.code, 'busy');
+  });
+
+  test('the narrator remembers the cards read, and "Pomiń opowieść" marks them all', async () => {
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    assert.deepEqual((await see({ card: 'intro' })).data.character.tutorial, ['intro']);
+    assert.deepEqual((await see({ card: 'intro' })).data.character.tutorial, ['intro']);
+    assert.deepEqual((await see({ card: 'time' })).data.character.tutorial, ['intro', 'time']);
+    assert.equal((await see({ card: 'dragon' })).data.error.code, 'invalid_card');
+    assert.equal((await see({ skip: true })).data.character.tutorial.length, 7);
+
+    // A character from before the introduction never sees it.
+    await (await db()).prepare('UPDATE characters SET tutorial = NULL').run();
+    assert.equal((await character()).tutorial, null);
+    assert.equal((await see({ card: 'intro' })).data.error.code, 'no_tutorial');
+  });
+});

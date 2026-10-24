@@ -638,7 +638,14 @@ button {
   color: var(--system);
 }
 
-/* The materials under the two currencies. */
+/* Punkty Czasu: the gold of the hourglass. */
+.wallet-item--time .wallet-name,
+.wallet-item--time .wallet-amount,
+.wallet-item--time svg {
+  color: var(--gold);
+}
+
+/* The materials under the currencies. */
 .wallet-item + .wallet-item--materials {
   border-top-color: var(--bark-line);
 }
@@ -3083,6 +3090,11 @@ a.segmented-option {
   .arena-banner {
     transition: none;
   }
+
+  .guide-ring,
+  .guide-ring--nudge {
+    animation: none;
+  }
 }
 
 /* Obóz: the materials, the board with a plot for each building, and a
@@ -3442,4 +3454,203 @@ a.segmented-option {
 .class-icons {
   display: flex;
   gap: 6px;
+}
+
+/* "Przewiń": Punkty Czasu skip a wait (time.js). Gold like the hourglass,
+   with the points it would use. */
+.button--time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--gold);
+  background: rgba(217, 180, 90, 0.12);
+  color: var(--gold);
+}
+
+.button--time:active:not(:disabled) {
+  background: rgba(217, 180, 90, 0.22);
+}
+
+.time-cost {
+  padding: 1px 7px;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+/* The narrator: a card of parchment in front of the game, with the ethereal
+   figure reading its scroll above the text (narrator.js). */
+.narrator {
+  width: min(360px, calc(100vw - 2 * var(--gutter)));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #33281c;
+  overflow: visible;
+}
+
+.narrator::backdrop {
+  background: rgba(5, 8, 4, 0.72);
+}
+
+.narrator-card {
+  display: grid;
+  gap: 8px;
+  max-height: calc(100dvh - 32px);
+  padding: 14px 18px 14px;
+  overflow-y: auto;
+  border: 1px solid #b59a6a;
+  border-radius: 6px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 250, 235, 0.55), transparent 70%),
+    linear-gradient(#ece2c8, #dfd0ab);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 4px rgba(122, 92, 52, 0.12);
+  font-family: var(--font-world);
+}
+
+.narrator-art {
+  display: grid;
+  place-items: center;
+}
+
+.sprite--narrator {
+  width: 192px;
+  height: 256px;
+}
+
+.narrator-label {
+  margin: 0;
+  color: #7a5c34;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.narrator-text p {
+  margin: 0 0 8px;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.narrator-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.narrator-skip {
+  padding: 10px 0;
+  border: none;
+  background: none;
+  color: #7a5c34;
+  font-family: var(--font-world);
+  font-size: 15px;
+  text-decoration: underline;
+}
+
+.narrator-next {
+  width: auto;
+  margin-left: auto;
+  padding: 10px 24px;
+  border: 1px solid #6d5233;
+  border-radius: 4px;
+  background: #3b2c1d;
+  color: #f3e8cf;
+  font-family: var(--font-world);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* On short screens the figure keeps its own size. */
+@media (max-height: 739px) {
+  .sprite--narrator {
+    width: 96px;
+    height: 128px;
+  }
+}
+
+/* The light of the first steps: shades take every tap but the one on the
+   lit place, the ring pulses around it and the hint says what to do. */
+.guide {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.guide-shade {
+  position: fixed;
+  background: rgba(5, 8, 4, 0.62);
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.guide-ring {
+  position: fixed;
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  box-shadow: 0 0 0 4px rgba(217, 180, 90, 0.25), 0 0 18px rgba(217, 180, 90, 0.55);
+  animation: guide-pulse 1.6s ease-in-out infinite;
+}
+
+.guide-ring--nudge {
+  animation:
+    guide-nudge 0.4s ease-in-out 1,
+    guide-pulse 1.6s ease-in-out 0.4s infinite;
+}
+
+@keyframes guide-pulse {
+  50% {
+    box-shadow: 0 0 0 7px rgba(217, 180, 90, 0.18), 0 0 26px rgba(217, 180, 90, 0.7);
+  }
+}
+
+@keyframes guide-nudge {
+  25% {
+    transform: translateX(-6px);
+  }
+
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+.guide-hint {
+  position: fixed;
+  right: var(--gutter);
+  left: var(--gutter);
+  max-width: 340px;
+  margin: 0 auto;
+  padding: 10px 14px;
+  border: 1px solid #b59a6a;
+  border-radius: 6px;
+  background: #eadfc3;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  color: #33281c;
+  font-family: var(--font-world);
+  font-size: 16px;
+  text-align: center;
+}
+
+.guide-skip {
+  position: fixed;
+  top: calc(max(8px, env(safe-area-inset-top)) + 4px);
+  left: var(--gutter);
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: rgba(18, 23, 15, 0.92);
+  color: var(--text-muted);
+  font-family: var(--font-world);
+  font-size: 14px;
+  pointer-events: auto;
 }
