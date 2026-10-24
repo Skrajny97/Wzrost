@@ -53,10 +53,13 @@ const style = values.style || kind.style;
 
 const headers = { 'X-RD-Token': token, 'Content-Type': 'application/json' };
 
+// A generation carries an idempotency key, so a retried request is not paid
+// twice; the API refuses one on a price check, which answers at once.
 async function request(method, url, body) {
+  const queued = method === 'POST' && !body.check_cost;
   const response = await fetch(url, {
     method,
-    headers: method === 'POST' ? { ...headers, 'Idempotency-Key': randomUUID() } : headers,
+    headers: queued ? { ...headers, 'Idempotency-Key': randomUUID() } : headers,
     body: body && JSON.stringify(body),
   });
   const data = await response.json().catch(() => null);
@@ -107,6 +110,7 @@ for (const id of ids) {
 
   const quote = await settle(await request('POST', API, { ...payload, check_cost: true }));
   const cost = Number(quote.balance_cost ?? quote.cost ?? 0);
+  balance = quote.remaining_balance ?? balance;
   if (spent + cost > maxCost) {
     lines.push(`| ${id} | pominięte: przekroczyłoby limit ${maxCost} USD | | |`);
     continue;
@@ -132,6 +136,8 @@ for (const id of ids) {
   lines.push(`| ${id} | ${files.length} obrazki, ${Number(result.balance_cost ?? cost).toFixed(3)} USD | ${style} | ${refs.length} |`);
 }
 
+const balanceNote = balance === null ? '' : `, saldo: ${Number(balance).toFixed(2)} USD`;
+const total = values['dry-run'] ? `Wycena razem: ${spent.toFixed(3)} USD${balanceNote}.` : `Wydano: ${spent.toFixed(3)} USD${balanceNote}.`;
 summary(
   [
     `## Szkice grafik: ${values.kind}${values['dry-run'] ? ' (tylko wycena)' : ''}`,
@@ -140,8 +146,8 @@ summary(
     '| --- | --- | --- | --- |',
     ...lines,
     '',
-    `Wydano: ${spent.toFixed(3)} USD${balance === null ? '' : `, zostało ${Number(balance).toFixed(2)} USD`}.`,
+    total,
   ].join('\n'),
 );
 console.log(lines.join('\n'));
-console.log(`Wydano ${spent.toFixed(3)} USD${balance === null ? '' : `, zostało ${balance} USD`}.`);
+console.log(total);
