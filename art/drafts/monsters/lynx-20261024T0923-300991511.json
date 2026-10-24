@@ -1,0 +1,25 @@
+{
+  "id": "lynx",
+  "payload": {
+    "prompt": "Eurasian lynx with tufted ears, spotted tawny fur and a short black-tipped tail, crouching to pounce, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 300991511,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792834039,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 54.6,
+    "request_id": "d80d019e-23e6-48b9-a1e2-f03eb34b9e44",
+    "outputs_retained_until": 1792920334
+  }
+}

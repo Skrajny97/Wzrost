@@ -1,0 +1,25 @@
+{
+  "id": "bear",
+  "payload": {
+    "prompt": "massive brown bear on all fours, mouth open in a roar, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 658417117,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792834122,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 54.42,
+    "request_id": "5ee19e8e-45c4-48ec-99a6-e031540db778",
+    "outputs_retained_until": 1792920440
+  }
+}

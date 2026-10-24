@@ -1,0 +1,25 @@
+{
+  "id": "wisp",
+  "payload": {
+    "prompt": "will-o'-the-wisp, a floating pale cyan ghost flame with two faint eyes, glowing, trailing wisps of light",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 537993053,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792834485,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 53.16,
+    "request_id": "62627ece-997c-47fe-b9f2-5bb4de22413c",
+    "outputs_retained_until": 1792920824
+  }
+}

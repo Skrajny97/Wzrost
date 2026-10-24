@@ -1,0 +1,25 @@
+{
+  "id": "crow",
+  "payload": {
+    "prompt": "black raven with ruffled feathers and a heavy beak, wings half spread, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 66892942,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792834278,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 53.88,
+    "request_id": "c375ed29-a575-42c3-af00-eab953fe3fb8",
+    "outputs_retained_until": 1792920623
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "boar",
+  "payload": {
+    "prompt": "wild boar with dark bristly fur and curved white tusks, head lowered to charge, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 820986058,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792834188,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 54.24,
+    "request_id": "63bcb54f-54a5-4c69-8d8c-3d81f873b4f4",
+    "outputs_retained_until": 1792920523
+  }
+}

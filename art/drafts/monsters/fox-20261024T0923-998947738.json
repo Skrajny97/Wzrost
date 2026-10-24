@@ -1,0 +1,25 @@
+{
+  "id": "fox",
+  "payload": {
+    "prompt": "red fox with a bushy white-tipped tail and black legs, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 998947738,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792833931,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 54.78,
+    "request_id": "b611b2bc-9e46-4633-8aaa-7e0f1d20232c",
+    "outputs_retained_until": 1792920234
+  }
+}
