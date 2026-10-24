@@ -82,7 +82,7 @@ function testTools(building) {
 function constructionPanel(running, ticks) {
   const countdown = h('p', { class: 'countdown', 'aria-live': 'off' });
   const progress = h('div', { class: 'bar-fill bar-fill--system' });
-  const skipper = skipControl('build', (now) => running.endsAt - now, `Budowa: ${running.name}`);
+  const skipper = skipControl('build', (now) => running.endsAt - now, `${running.name}, poziom ${running.level}`);
   ticks.push((now) => {
     countdown.textContent = formatCountdown(running.endsAt - now);
     const done = (now - running.startedAt) / (running.endsAt - running.startedAt);

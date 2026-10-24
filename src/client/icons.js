@@ -3,6 +3,8 @@
 
 const path = (d) => ['path', { d }];
 const circle = (cx, cy, r) => ['circle', { cx, cy, r }];
+// A solid shape, e.g. the sand in the hourglass.
+const solid = (d) => ['path', { d, fill: 'currentColor' }];
 
 export const ICONS = {
   unknown: [circle(12, 12, 8)],
@@ -34,7 +36,13 @@ export const ICONS = {
   lock: [['rect', { x: 5, y: 11, width: 14, height: 10, rx: 1 }], path('M8 11V8a4 4 0 0 1 8 0v3')],
   plus: [path('M12 5v14M5 12h14')],
   close: [path('M6 6l12 12M18 6L6 18')],
-  hourglass: [path('M7 3h10M7 21h10'), path('M8 3c0 5 8 5.5 8 9s-8 4-8 9M16 3c0 5-8 5.5-8 9s8 4 8 9')],
+  // Straight glass narrowing to the neck, with sand above and below.
+  hourglass: [
+    path('M6 3h12M6 21h12'),
+    path('M8 3v3.5L12 12l-4 5.5V21M16 3v3.5L12 12l4 5.5V21'),
+    solid('M10.2 8h3.6L12 10.4z'),
+    solid('M9.5 20h5L12 17.2z'),
+  ],
   chevron: [path('M9 5l7 7-7 7')],
   tent: [path('M2.5 20L12 4l9.5 16'), path('M2.5 20h19'), path('M9 20l3-6 3 6'), path('M12 4l1.5-2')],
   hammer: [path('M13 4.5l6.5 6.5-2.5 2.5L10.5 7z'), path('M12 9L4 17l3 3 8-8')],
