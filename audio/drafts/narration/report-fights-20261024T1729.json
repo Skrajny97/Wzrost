@@ -1,0 +1,17 @@
+{
+  "id": "report-fights",
+  "payload": {
+    "text": "System rejestruje potyczki, które stoczyłeś w trakcie eksploracji. Możesz je przejrzeć, wybierając z zakładek. Gwiazdka przy zakładce oznacza najważniejszą z walk. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/report-fights-20261024T1729-0.mp3",
+    "audio/drafts/narration/report-fights-20261024T1729-1.mp3"
+  ],
+  "credits": 344
+}

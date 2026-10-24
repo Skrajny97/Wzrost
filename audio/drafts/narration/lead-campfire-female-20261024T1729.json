@@ -1,0 +1,17 @@
+{
+  "id": "lead-campfire-female",
+  "payload": {
+    "text": "Teraz zajmijmy się jednak Twoim powrotem do zdrowia, byś mogła szybciej wyruszyć na kolejną wyprawę. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/lead-campfire-female-20261024T1729-0.mp3",
+    "audio/drafts/narration/lead-campfire-female-20261024T1729-1.mp3"
+  ],
+  "credits": 344
+}

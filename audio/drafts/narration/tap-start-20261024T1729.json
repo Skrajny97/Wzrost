@@ -1,0 +1,18 @@
+{
+  "id": "tap-start",
+  "payload": {
+    "text": "Suwak stoi na trzydziestu minutach. Stuknij „Wyrusz”. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/tap-start-20261024T1729-0.mp3",
+    "audio/drafts/narration/tap-start-20261024T1729-1.mp3",
+    "audio/drafts/narration/tap-start-20261024T1729-2.mp3"
+  ],
+  "credits": 186
+}
