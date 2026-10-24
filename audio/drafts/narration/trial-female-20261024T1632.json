@@ -1,0 +1,14 @@
+{
+  "id": "trial-female",
+  "payload": {
+    "text": "Nie jesteś jeszcze gotowa na dłuższe wyprawy. Zacznijmy od półgodzinnej próby.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    }
+  },
+  "files": [
+    "audio/drafts/narration/trial-female-20261024T1632-0.mp3"
+  ],
+  "credits": 78
+}

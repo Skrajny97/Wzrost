@@ -1,0 +1,14 @@
+{
+  "id": "intro-female",
+  "payload": {
+    "text": "Na skraju puszczy, tam gdzie wiatr łamie stare drzewa, budzi się ktoś, kogo las jeszcze nie zna. Za plecami nie ma żadnej drogi, a przed sobą ma tylko puszczę. Witaj, przybyszko.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    }
+  },
+  "files": [
+    "audio/drafts/narration/intro-female-20261024T1632-0.mp3"
+  ],
+  "credits": 178
+}
