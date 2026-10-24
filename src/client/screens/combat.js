@@ -6,6 +6,7 @@
 // inner regions areas.
 
 import { areaArt } from '../area-art.js';
+import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, timeFormat } from '../format.js';
 import { activityFinished, call, currentHp, isUnlocked, reportCache, serverNow, state, testModeOn, unlockInfo } from '../state.js';
@@ -48,21 +49,10 @@ const areaOpen = (area, character) => character.classLevel >= area.unlockClassLe
 
 const chip = (text, className = '') => h('span', { class: `chip ${className}`.trim(), text });
 
-// The region and inner region views go on the browser history with their
-// depth below the main view, so "Powrót" and the phone's back button lead to
-// the same place, and starting an exploration returns to the main view.
-const depth = () => history.state?.walka ?? 0;
-
-function openView(event, hash) {
-  event.preventDefault();
-  history.pushState({ walka: depth() + 1 }, '', hash);
-  window.dispatchEvent(new HashChangeEvent('hashchange'));
-}
-
-function leaveView(hash, levels) {
-  if (depth() >= levels) history.go(-levels);
-  else location.replace(hash);
-}
+// The region and inner region views go on the browser history (history.js),
+// and starting an exploration returns to the main view.
+const openView = (event, hash) => openHistoryView(event, hash, 'walka');
+const leaveView = (hash, levels) => leaveHistoryView(hash, levels, 'walka');
 
 export function mountCombat(container, { params, navigate }) {
   const region = params.region && state.content.regions.find((candidate) => candidate.id === params.region);

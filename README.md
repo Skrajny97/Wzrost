@@ -2,7 +2,7 @@
 
 Solowa, casualowa gra przeglądarkowa litRPG na telefon, oparta na timerach. Jedynym źródłem prawdy o projekcie jest [dokument projektowy](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX). Założenia przyjęte w trakcie budowy są w [DECISIONS.md](DECISIONS.md).
 
-Stan: **Etap 2a, obóz z produkcją.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, poziomy do 500, statystyki z wolnymi punktami, ekwipunek przypisany do klas i plecak z podglądem zmian, złomiarz, eksploracje na czasie serwera w dwóch regionach Skraju Puszczy, każdy z pięcioma regionami wewnętrznymi otwieranymi poziomem klasy, z suwakiem czasu i spotkaniami wymagającymi, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik, „Zacznij od nowa” oraz obóz z sześcioma budynkami na timerach: Tartak, Kamieniołom i Kopalnia wytwarzają zasoby do magazynu, a Ognisko, Szałas na łupy i Stół złomiarza dają premie. Zasoby (drewno, kamień, ruda żelaza) postać znajduje też na eksploracjach, a Punkty Systemu czekają na swoją rolę. Spis klas, przedmiotów, potworów i regionów jest w [encyklopedii](https://claude.ai/artifact/EDt6uk8X5rRU9JCTLKsnXw).
+Stan: **Etap 2a, plansza obozu.** Działa konto, tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, poziomy do 500, statystyki z wolnymi punktami, ekwipunek przypisany do klas i plecak z podglądem zmian, złomiarz, eksploracje na czasie serwera w dwóch regionach Skraju Puszczy, każdy z pięcioma regionami wewnętrznymi otwieranymi poziomem klasy, z suwakiem czasu i spotkaniami wymagającymi, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik, „Zacznij od nowa” oraz obóz jako plansza w stylu Plemion z placem na każdy z sześciu budynków na timerach: Tartak, Kamieniołom i Kopalnia wytwarzają zasoby do magazynu, a Ognisko, Szałas na łupy i Stół złomiarza dają premie. Zasoby (drewno, kamień, ruda żelaza) postać znajduje też na eksploracjach. Punkty Systemu, przyszła waluta premium na kosmetykę, należą do konta i są w górnym pasku obok złota. Spis klas, przedmiotów, potworów i regionów jest w [encyklopedii](https://claude.ai/artifact/EDt6uk8X5rRU9JCTLKsnXw).
 
 ## Adres gry
 
@@ -120,9 +120,9 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/auth/logout` | wylogowanie |
 | GET | `/api/me` | zalogowany gracz |
 | GET | `/api/content` | nazwy klas, statystyk, slotów, rzadkości, żywiołów, regionów i regionów wewnętrznych (z poziomem klasy, który je otwiera), zakres czasu i nazwy długości wypraw, odblokowania, `testMode` |
-| GET | `/api/character` | pełny widok postaci z zasobami, pojemnością plecaka i obozem (404 `no_character`, gdy jej nie ma) |
+| GET | `/api/character` | pełny widok postaci z zasobami, Punktami Systemu konta (`systemPoints`), pojemnością plecaka i obozem (404 `no_character`, gdy jej nie ma) |
 | POST | `/api/character` | nowa postać: `name`, `classId` |
-| DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami i wyprawą |
+| DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami, wyprawą i obozem; Punkty Systemu zostają na koncie |
 | POST | `/api/character/points` | rozdanie punktów: `points`, np. `{ "strength": 2 }` |
 | POST | `/api/character/points/auto` | „Rozdaj według klasy” |
 | POST | `/api/character/points/reset` | darmowe zerowanie punktów (do poziomu 10) |

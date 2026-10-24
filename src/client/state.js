@@ -64,15 +64,10 @@ export function currentHp(character = state.character, now = serverNow()) {
 // HP a minute while resting now.
 export const restRate = (character = state.character) => character.regen?.change?.perMinute ?? character.regen?.perMinute ?? 0;
 
-// Gold and the resources, with their names, in the order to show them.
+// Gold and the camp's materials, with their names, in the order to show them.
 export const walletEntries = (character = state.character) => [
   { id: 'gold', name: 'Złoto', amount: character.gold },
-  ...state.content.resources.map((resource) => ({
-    id: resource.id,
-    name: resource.name,
-    amount: character.resources[resource.id] ?? 0,
-    system: Boolean(resource.system),
-  })),
+  ...state.content.resources.map((resource) => ({ id: resource.id, name: resource.name, amount: character.resources[resource.id] ?? 0 })),
 ];
 
 // What a production building's store holds at `now`, as production() in the

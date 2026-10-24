@@ -1,11 +1,11 @@
 // The frame around every game screen: the fixed top bar (levels, HP and mana,
-// character and class XP, gold with the camp's resources, the camp, current
-// activity) and the two bottom bars, the main menu and the character bar with
-// its own background.
+// character and class XP, gold and Punkty Systemu with the camp's materials,
+// the camp, current activity) and the two bottom bars, the main menu and the
+// character bar with its own background.
 
 import { $, fill, h, icon } from './dom.js';
-import { formatCountdown, formatMinutes, formatNumber } from './format.js';
-import { RESOURCE_ICONS } from './icons.js';
+import { formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
+import { RESOURCE_ICONS, SYSTEM_POINTS_ICON } from './icons.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, unlockInfo, walletEntries } from './state.js';
 import { meter } from './ui.js';
 
@@ -30,20 +30,22 @@ export function buildTopbar(onSettings) {
   const level = h('span', { class: 'badge badge--system' });
   const classLevel = h('span', { class: 'badge badge--world' });
   const gold = h('span', { class: 'gold-value' });
-  // Tapping the gold shows the resources under it.
+  const points = h('span', { class: 'points-value' });
+  // Gold and Punkty Systemu in one line; a tap shows the materials under them.
   const wallet = h('ul', { class: 'wallet-list', id: 'wallet-list', hidden: true });
   const goldButton = h(
     'button',
     {
       type: 'button',
       class: 'gold',
-      'aria-label': 'Złoto i zasoby',
+      'aria-label': 'Złoto, Punkty Systemu i zasoby',
       'aria-expanded': 'false',
       'aria-controls': 'wallet-list',
       onClick: () => showWallet(wallet.hidden),
     },
     icon('coin', { size: 18 }),
     gold,
+    h('span', { class: 'points' }, icon(SYSTEM_POINTS_ICON, { size: 16 }), points),
   );
   const campLabel = h('span', { class: 'camp-label' });
   const camp = h('a', { class: 'camp-button', href: '#/oboz', 'aria-label': 'Obóz' }, icon('tent'), campLabel);
@@ -74,20 +76,26 @@ export function buildTopbar(onSettings) {
     h('div', { class: 'meters' }, hp.element, xp.element, mana.element, classXp.element),
     activity,
   );
-  topbar = { level, classLevel, gold, goldButton, wallet, camp, campLabel, hp, mana, xp, classXp, activity, activityLabel, activityTime };
+  topbar = { level, classLevel, gold, points, goldButton, wallet, camp, campLabel, hp, mana, xp, classXp, activity, activityLabel, activityTime };
   updateTopbar();
 }
 
+// Gold and Punkty Systemu first, then the materials.
 function walletRows() {
-  return walletEntries().map((entry) =>
+  const [gold, ...materials] = walletEntries();
+  const row = (iconName, name, amount, kind) =>
     h(
       'li',
-      { class: `wallet-item${entry.system ? ' wallet-item--system' : ''}` },
-      icon(RESOURCE_ICONS[entry.id] ?? 'unknown', { size: 18 }),
-      h('span', { class: 'wallet-name', text: entry.name }),
-      h('span', { class: 'wallet-amount', text: formatNumber(entry.amount) }),
-    ),
-  );
+      { class: `wallet-item${kind ? ` wallet-item--${kind}` : ''}` },
+      icon(iconName, { size: 18 }),
+      h('span', { class: 'wallet-name', text: name }),
+      h('span', { class: 'wallet-amount', text: formatNumber(amount) }),
+    );
+  return [
+    row('coin', gold.name, gold.amount),
+    row(SYSTEM_POINTS_ICON, 'Punkty Systemu', state.character.systemPoints, 'system'),
+    ...materials.map((entry, index) => row(RESOURCE_ICONS[entry.id] ?? 'unknown', entry.name, entry.amount, index === 0 && 'materials')),
+  ];
 }
 
 // Opens or closes the list of resources under the gold.
@@ -101,7 +109,7 @@ export function showWallet(open) {
 
 // Redrawn only when an amount changes, not on every tick.
 function refreshWallet() {
-  const key = JSON.stringify(walletEntries().map((entry) => entry.amount));
+  const key = JSON.stringify([state.character.systemPoints, ...walletEntries().map((entry) => entry.amount)]);
   if (key === topbar.walletKey) return;
   topbar.walletKey = key;
   fill(topbar.wallet, ...walletRows());
@@ -122,7 +130,12 @@ export function updateTopbar(now = serverNow()) {
   if (!topbar || !character) return;
   topbar.level.textContent = `POZ. ${character.level}`;
   topbar.classLevel.textContent = `${character.className.toUpperCase()} ${character.classLevel}`;
-  topbar.gold.textContent = formatNumber(character.gold);
+  topbar.gold.textContent = formatShort(character.gold);
+  topbar.points.textContent = formatShort(character.systemPoints);
+  topbar.goldButton.setAttribute(
+    'aria-label',
+    `Złoto: ${formatNumber(character.gold)}, Punkty Systemu: ${formatNumber(character.systemPoints)}. Zasoby`,
+  );
   if (!topbar.wallet.hidden) refreshWallet();
   // The camp shows the time left of the building being upgraded.
   const building = character.camp.construction;

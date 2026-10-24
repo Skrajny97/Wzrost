@@ -13,11 +13,5 @@
     "id": "iron-ore",
     "name": "Ruda żelaza",
     "description": "Rdzawe bryły spod korzeni i ze skał. Na okucia i narzędzia."
-  },
-  {
-    "id": "system-points",
-    "name": "Punkty Systemu",
-    "description": "Nagroda Systemu za osiągnięcia, na kosmetykę. Na razie nie ma ich skąd zdobyć ani na co wydać.",
-    "system": true
   }
 ]

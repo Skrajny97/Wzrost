@@ -91,6 +91,15 @@ describe('character creation', () => {
     assert.equal((await newCharacter(cookie, 'archer', 'Druga')).status, 201);
   });
 
+  test('Punkty Systemu belong to the account and stay after "Zacznij od nowa"', async () => {
+    await newCharacter(cookie, 'mage');
+    await (await db()).prepare('UPDATE users SET system_points = 25').run();
+    assert.equal((await call('GET', '/api/character', { cookie })).data.character.systemPoints, 25);
+    await call('DELETE', '/api/character', { cookie });
+    await newCharacter(cookie, 'archer', 'Druga');
+    assert.equal((await call('GET', '/api/character', { cookie })).data.character.systemPoints, 25);
+  });
+
   test('allows one character per account and checks the input', async () => {
     assert.equal((await newCharacter(cookie)).status, 201);
     assert.equal((await newCharacter(cookie)).data.error.code, 'character_exists');
@@ -450,10 +459,11 @@ describe('camp', () => {
     const campfire = start.camp.buildings.find((building) => building.id === 'campfire');
     assert.deepEqual(campfire.next, { level: 1, effect: 'Odpoczynek między wyprawami szybszy o 10%', minutes: 1, cost: { gold: 10 } });
     assert.equal(campfire.production, null);
-    assert.deepEqual(start.resources, { wood: 0, stone: 0, 'iron-ore': 0, 'system-points': 0 });
+    assert.deepEqual(start.resources, { wood: 0, stone: 0, 'iron-ore': 0 });
+    assert.equal(start.systemPoints, 0);
     assert.equal(start.bagCapacity, 30);
     const { data } = await call('GET', '/api/content');
-    assert.deepEqual(data.resources.map((resource) => resource.name), ['Drewno', 'Kamień', 'Ruda żelaza', 'Punkty Systemu']);
+    assert.deepEqual(data.resources.map((resource) => resource.name), ['Drewno', 'Kamień', 'Ruda żelaza']);
     assert.deepEqual(
       data.buildings.map((building) => building.name),
       ['Tartak', 'Kamieniołom', 'Kopalnia', 'Ognisko', 'Szałas na łupy', 'Stół złomiarza'],
@@ -491,7 +501,7 @@ describe('camp', () => {
     const second = await build('campfire');
     assert.equal(second.status, 201);
     assert.equal(second.data.character.gold, 71);
-    assert.deepEqual(second.data.character.resources, { wood: 4, stone: 2, 'iron-ore': 0, 'system-points': 0 });
+    assert.deepEqual(second.data.character.resources, { wood: 4, stone: 2, 'iron-ore': 0 });
     assert.equal(second.data.character.camp.construction.endsAt - second.data.character.camp.construction.startedAt, 2 * 60000);
   });
 

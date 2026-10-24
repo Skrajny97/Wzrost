@@ -61,3 +61,26 @@ test('every inner region has its picture', async () => {
   const areas = regions.flatMap((region) => region.areas.map((area) => area.id));
   assert.deepEqual(areas.filter((id) => !areaArtIds.includes(id)), []);
 });
+
+test('every building has its picture and a plot on the camp board, apart from the others', async () => {
+  const art = await import('../src/client/camp-art.js');
+  const buildings = JSON.parse(readFileSync(new URL('../data/buildings.json', import.meta.url), 'utf8')).map((building) => building.id);
+  assert.deepEqual(buildings.filter((id) => !art.campArtIds.includes(id)), []);
+  assert.deepEqual(buildings.filter((id) => !art.CAMP_PLOTS[id]), []);
+  // Plots stay on the board and their pictures do not overlap.
+  const boxes = buildings.map((id) => {
+    const { x, y } = art.CAMP_PLOTS[id];
+    return { id, left: x - art.PLOT_WIDTH / 2, right: x + art.PLOT_WIDTH / 2, top: y - art.PLOT_HEIGHT / 2, bottom: y + art.PLOT_HEIGHT / 2 };
+  });
+  for (const box of boxes) {
+    assert.ok(box.left >= 0 && box.right <= art.BOARD_WIDTH && box.top >= 0 && box.bottom <= art.BOARD_HEIGHT, `${box.id} leaves the board`);
+  }
+  for (const [i, a] of boxes.entries()) {
+    for (const b of boxes.slice(i + 1)) {
+      const apart = a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top;
+      assert.ok(apart, `${a.id} overlaps ${b.id}`);
+    }
+  }
+  // The look grows with the level: levels 1–3, 4–7 and 8–10.
+  assert.deepEqual([1, 3, 4, 7, 8, 10].map(art.buildingTier), [1, 1, 2, 2, 3, 3]);
+});

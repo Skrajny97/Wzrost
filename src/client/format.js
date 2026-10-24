@@ -13,6 +13,9 @@ export const dateTimeFormat = new Intl.DateTimeFormat('pl-PL', {
 });
 
 export const formatNumber = (value) => integerFormat.format(value);
+// For the narrow top bar: from a million on, "1,2 mln".
+const shortFormat = new Intl.NumberFormat('pl-PL', { notation: 'compact', maximumFractionDigits: 1 });
+export const formatShort = (value) => (Math.abs(value) >= 1e6 ? shortFormat.format(value) : integerFormat.format(value));
 export const formatDecimal = (value) => decimalFormat.format(value);
 export const formatPrecise = (value) => preciseFormat.format(value);
 

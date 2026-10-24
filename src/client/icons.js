@@ -104,5 +104,7 @@ export const RESOURCE_ICONS = {
   wood: 'logs',
   stone: 'stone',
   'iron-ore': 'ore',
-  'system-points': 'core',
 };
+
+// Punkty Systemu, the premium currency of the account.
+export const SYSTEM_POINTS_ICON = 'core';
