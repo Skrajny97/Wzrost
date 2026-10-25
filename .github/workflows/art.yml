@@ -18,6 +18,7 @@ on:
           - portraits
           - materials
           - narrator
+          - skills
       ids:
         description: Identyfikatory po przecinku albo all
         required: true

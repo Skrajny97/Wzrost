@@ -126,5 +126,28 @@
       "shadow-male": "young man rogue standing, full body from head to feet, black hood and a mask over the mouth, holding two daggers, facing the viewer, three-quarter view, forest fantasy",
       "shadow-female": "young woman rogue standing, full body from head to feet, black hood and a mask over the mouth, holding two daggers, facing the viewer, three-quarter view, forest fantasy"
     }
+  },
+  "skills": {
+    "style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "references": [],
+    "prompts": {
+      "power-strike": "heavy steel sword swung down in a powerful arc with a bright white impact flash, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "wide-sweep": "wide horizontal sword sweep leaving a curved silver trail, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "unyielding": "battered round wooden shield braced firmly, a faint golden glow around its rim, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "aimed-shot": "single arrow flying straight into a red and white bullseye, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "arrow-rain": "many arrows raining down from above in a wide fan, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "pinning-shot": "arrow pinning a leather boot to the ground, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "fireball": "blazing orange fireball with a trail of sparks, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "frost-gust": "swirling gust of icy wind with snowflakes and frost shards, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "mana-shield": "shimmering translucent blue bubble shield with faint arcane runes, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "prayer-of-health": "two hands clasped in prayer with soft green healing light, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "exorcism": "burst of radiant golden holy light with glowing drops of holy water, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "blessing": "open hand raised in blessing under a warm golden halo, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "backstab": "dagger striking out of dark smoke from behind, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "poisoned-blade": "dagger blade dripping bright green venom, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+      "shadow-dance": "hooded figure blurring into several dark shadow afterimages, square fantasy RPG skill icon, bold readable shape, dark forest green background"
+    }
   }
 }
