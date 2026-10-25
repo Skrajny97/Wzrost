@@ -78,6 +78,7 @@
   "effects": {
     "tab": { "files": ["audio/sfx/tab-1.mp3", "audio/sfx/tab-2.mp3"], "gain": 0.5 },
     "swing": { "files": ["audio/sfx/swing-1.mp3", "audio/sfx/swing-2.mp3"], "gain": 0.5 },
-    "magic": { "files": ["audio/sfx/magic-1.mp3", "audio/sfx/magic-2.mp3"], "gain": 0.6 }
+    "magic": { "files": ["audio/sfx/magic-1.mp3", "audio/sfx/magic-2.mp3"], "gain": 0.6 },
+    "chest": { "files": ["audio/sfx/chest-1.mp3"], "gain": 0.6 }
   }
 }

@@ -176,6 +176,8 @@ export async function finishHunt(db, player, now) {
   const character = engineCharacter(row);
   // region_id holds the inner region (or a whole region, from before them).
   const area = areaFor(activity.region_id, row.level, content);
+  // The very first exploration, before any report, goes one way (simulateHunt).
+  const first = !(await db.prepare('SELECT 1 AS found FROM reports WHERE character_id = ? LIMIT 1').bind(row.id).first());
   const hunt = simulateHunt(
     {
       character,
@@ -185,6 +187,7 @@ export async function finishHunt(db, player, now) {
       areaId: area.id,
       minutes: activity.minutes,
       seed: activity.seed,
+      first,
     },
     content,
   );

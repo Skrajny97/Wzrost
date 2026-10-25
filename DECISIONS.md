@@ -1099,3 +1099,24 @@ Autor: narrator codziennie i co tydzień zleca zadania z nagrodami, na początku
 7. **Kwestia narratora.** Nowy pergamin przed końcowym wskazuje twarz w górnym pasku: „Codziennie będę Ci zlecał zadania, w taki sposób utrzymamy naszą, mam nadzieję, owocną relację. Będę na Ciebie czekał tutaj.” Tekst zatwierdził autor. Ma jedną wersję, bo nie ma form zależnych od płci gracza. Postacie, które skończyły wprowadzenie przed tą kwestią, usłyszą ją raz, po wejściu do gry, bez przycisku „Pomiń wprowadzenie” (`late` w `src/client/narrator.js`).
 8. **Kwestia przy Ognisku.** Ma tekst zatwierdzony przez autora: „Teraz zadbajmy o odpoczynek po kolejnych wyprawach. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko.” Wersja żeńska nie jest już potrzebna.
 9. **Nagrania.** Obie kwestie są nagrane w dwóch wersjach (ok. 500 kredytów ElevenLabs). W grze jest wersja bliższa dotychczasowemu głosowi narratora, a obie są na stronie odsłuchu, gdzie autor może wybrać inną.
+
+## Pierwsza wyprawa i rzadsze skrzynie (25.10.2026)
+
+Autor: z pierwszej, 30-minutowej wyprawy po starcie od nowa przyszły 3 przedmioty, w tym rzadka broń. Pierwsza wyprawa ma być liniowa i dać z łupów tylko broń, czyli jedną skrzynię skarbów. Na zwykłych wyprawach skrzyń ma być mniej: dwie na półgodzinnej wyprawie mają być sporym fartem.
+
+1. **Pierwsza wyprawa.** To wyprawa postaci, która nie odebrała jeszcze żadnego raportu: serwer to sprawdza i przekazuje silnikowi (`first` w `simulateHunt`). Wyprawa idzie jednym torem:
+    - tylko zwykłe spotkania, bez wymagających i bez elity,
+    - znaleziska nie dają skrzyń,
+    - jedynym przedmiotem jest skrzynia z bronią klasy po pierwszej wygranej walce, zawsze pospolitą.
+
+    W 400 próbach każdej klasy pierwsza wyprawa kończy się sukcesem i daje dokładnie tę jedną broń. Złoto, zasoby, odłamki czasu i materiały ze stworów przychodzą jak zwykle.
+2. **Rzadsze skrzynie.** Waga skrzyni wśród znalezisk spadła z 0,44 do 0,2 (`findOutcomes` w `data/balance.json`). Skrzynia to teraz ok. 21% znalezisk zamiast 37%. Półgodzinna wyprawa postaci na poziomie 5 daje średnio 0,36 skrzyni:
+    - żadnej w 67% wypraw,
+    - jedną w 30%,
+    - dwie w ok. 3% (wcześniej w ok. 10%).
+
+    Godzina wypraw daje średnio ok. 0,8 przedmiotu zamiast ok. 1,25. Pozostałe znaleziska (złoto, zasoby, odłamek czasu, nic ciekawego) wypadają odpowiednio częściej.
+3. **Napis pod zadaniami.** Pod zadaniami dziennymi stoi „Skrzynia dziennych zadań dostarcza +30 Punktów Czasu i +5 Punktów Systemu.”, a pod tygodniowymi „Skrzynia tygodniowych zadań dostarcza losowy przedmiot, +120 Punktów Czasu i +20 Punktów Systemu.” Napisy są w danych (`chest.text` w `data/quests.json`), a walidacja pilnuje, żeby ich liczby zgadzały się ze skrzynią.
+4. **Dźwięk skrzyni.** Otwarcie skrzyni zadań gra nagranie monet wysypujących się z otwieranej skrzyni (ElevenLabs, `effects.chest` w `data/sounds.json`). Na stronie odsłuchu jest sześć wersji: dwie takie, dwie z magicznym dźwiękiem nagrody na koniec i dwie z garścią monet rozsypaną na stole. Autor może tam wybrać inną.
+5. **„Ogniu” przy Ognisku.** Głos czytał „przy ognu”. Nowe nagrania dostały dla głosu zapis „ogńu” albo „ognju” (`say` w `audio/prompts.json`), a tekst w grze się nie zmienił. W grze jest pierwsza wersja z „ogńu”, a wszystkie cztery są na stronie odsłuchu.
+

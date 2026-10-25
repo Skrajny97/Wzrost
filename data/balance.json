@@ -87,7 +87,7 @@
     "eliteGoldMultiplier": 3,
     "eliteRarityBonus": 3,
     "toughDropMultiplier": 1.5,
-    "findOutcomes": { "gold": 0.35, "chest": 0.44, "resource": 0.3, "nothing": 0.05, "time": 0.05 },
+    "findOutcomes": { "gold": 0.35, "chest": 0.2, "resource": 0.3, "nothing": 0.05, "time": 0.05 },
     "findGoldPerLevel": 4,
     "findResourcePerLevel": 4,
     "gatherPerLevelHour": 2,

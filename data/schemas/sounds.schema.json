@@ -35,7 +35,7 @@
     "effects": {
       "type": "object",
       "description": "Nazwa dźwięku z src/client/sound.js (SOUNDS) → jego nagranie.",
-      "propertyNames": { "enum": ["tap", "tab", "open", "swing", "shot", "magic", "effect", "tick", "victory", "defeat", "system", "build", "collect", "done"] },
+      "propertyNames": { "enum": ["tap", "tab", "open", "swing", "shot", "magic", "effect", "tick", "victory", "defeat", "system", "build", "collect", "done", "chest"] },
       "additionalProperties": { "$ref": "#/definitions/sound" }
     },
     "voices": {

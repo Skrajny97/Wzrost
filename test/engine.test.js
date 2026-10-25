@@ -1085,13 +1085,32 @@ describe('materials and chests', () => {
     assert.equal(materialsText({ 'wolf-pelt:common': 2, 'crow-feather:unique': 1, 'boar-tusk:unique': 1 }, content), 'skóra wilka ×2, unikalne pióro kruka, unikalny kieł dzika');
   });
 
-  test('treasure chests bring about as many items an hour as monsters and finds did before', () => {
+  test('treasure chests are a rare find: about three in four hours, and two on a half-hour trip are luck', () => {
     const character = geared('warrior', 8);
     let items = 0;
     for (let i = 0; i < 200; i++) {
       items += simulateHunt({ ...character, hp: 99999, name: 'Mira', areaId: 'fox-ravines', minutes: 60, seed: `skrzynie:${i}` }, content).items.length;
     }
-    assert.ok(items / 200 > 1.05 && items / 200 < 1.45, `${items / 200} an hour`);
+    assert.ok(items / 200 > 0.55 && items / 200 < 1, `${items / 200} an hour`);
+    const five = geared('archer', 5);
+    const trips = Array.from({ length: 600 }, (_, i) => simulateHunt({ ...five, hp: 99999, name: 'Mira', areaId: 'windfalls-edge', minutes: 30, seed: `pół:${i}` }, content));
+    const lucky = trips.filter((hunt) => hunt.items.length >= 2).length / trips.length;
+    assert.ok(lucky > 0 && lucky < 0.06, `${lucky} of half-hour trips bring two chests`);
+  });
+
+  test("a character's very first exploration goes one way: one plain weapon of its class and nothing else to wear", () => {
+    for (const classId of ['warrior', 'archer', 'mage', 'cleric', 'shadow']) {
+      for (let i = 0; i < 40; i++) {
+        const hunt = simulateHunt({ character: newCharacter(classId), equipped: [], name: 'Mira', areaId: 'windfalls-edge', minutes: 30, seed: `pierwsza:${classId}:${i}`, first: true }, content);
+        assert.equal(hunt.result, 'success');
+        assert.equal(hunt.items.length, 1, `${classId} ${i}`);
+        const [weapon] = hunt.items;
+        assert.equal(weapon.slot, 'weapon');
+        assert.equal(weapon.rarity, 'common');
+        assert.ok(content.classesById[classId].weapons.includes(weapon.base));
+        assert.ok(hunt.fights.every((fight) => !fight.tough && !fight.elite));
+      }
+    }
   });
 
   test('a beaten elite leaves a chest', () => {

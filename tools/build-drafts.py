@@ -32,6 +32,9 @@ KINDS = {
     # A dying hiss: the cry when hit, 20% lower and slower, without the
     # sharp top, fading out.
     'hiss-low': {'longest': 0.8, 'chain': f'asetrate={round(SR * 0.8)},aresample={SR},' + VOICE_CHAIN.replace('lowpass=f=10000', 'lowpass=f=6000,lowpass=f=6000'), 'tail': 35, 'rms': -16},
+    # Coins spilling from a chest: the whole jingle, quieter in the file, as
+    # its many sharp peaks would otherwise hit full scale.
+    'coins': {'longest': 2.5, 'chain': 'highpass=f=150,lowpass=f=14000', 'tail': 40, 'rms': -21},
 }
 
 # Output name: (draft file under SRC, kind).
@@ -42,6 +45,8 @@ SOUNDS = {
     'swing-2': ('effects/swing-20261024T1244-0.mp3', 'whoosh'),
     'magic-1': ('effects/magic-20261024T1252-0.mp3', 'spark'),
     'magic-2': ('effects/magic-20261024T1252-1.mp3', 'spark'),
+    # The chest of the narrator's quests (quests.js).
+    'chest-1': ('effects/chest-coins-20261025T1130-1.mp3', 'coins'),
 }
 # The takes kept from the newest draft of a voice that has more than two,
 # chosen by measure: the least rumble below 300 Hz, the fewest clicks (a cry,

@@ -162,7 +162,7 @@ function draw(now = serverNow()) {
       period.quests.length > 0
         ? h('ul', { class: 'quests-list' }, period.quests.map((quest) => questRow(tab, quest)))
         : h('p', { class: 'quests-empty', text: 'Na razie nie mam dla Ciebie zadań.' }),
-      h('p', { class: 'quests-note', text: `Za wszystkie: skrzynia, a w niej ${chestText(period.chest)}.` }),
+      h('p', { class: 'quests-note', text: period.chest.text }),
     ),
     h('div', { class: 'narrator-actions' }, h('button', { type: 'button', class: 'button narrator-next', text: 'Zwiń', onClick: () => showQuests(false) })),
   );
@@ -200,7 +200,8 @@ async function openChest(periodId, period) {
     return;
   }
   const { chest } = await call('POST', '/api/quests/chest', { period: periodId });
-  playSound('done');
+  // Coins spilling from the chest (data/sounds.json).
+  playSound('chest');
   const item = chest.item ? `${chest.item.name}, ` : '';
   toast(`Skrzynia otwarta: ${item}${timePoints(chest.timePoints)}, ${systemPoints(chest.systemPoints)}.`);
 }

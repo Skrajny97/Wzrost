@@ -199,6 +199,8 @@ const SOUNDS = {
     tone({ type: 'triangle', from: 440, duration: 0.18, gain: 0.05, delay: 0.13, lowpass: 1400 });
   },
   done: () => bell(330, { gain: 0.07, length: 0.9 }),
+  // A quest chest, when its recording of coins cannot play: a few bright bells.
+  chest: () => [0, 0.07, 0.15, 0.24].forEach((delay, index) => bell(660 + index * 110, { gain: 0.04, delay, length: 0.5 })),
 };
 
 export function playSound(name) {

@@ -1475,3 +1475,19 @@ describe('Zadania od narratora', () => {
     assert.ok((await stored()).weekly.period);
   });
 });
+
+describe('Pierwsza wyprawa', () => {
+  test('the first exploration brings one plain weapon of the class, worn at once, and nothing else to wear', async () => {
+    const cookie = await signUp();
+    await newCharacter(cookie, 'mage');
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
+    await finishHunt();
+    const { report, character } = (await call('POST', '/api/hunts/claim', { cookie })).data;
+    assert.equal(report.result, 'success');
+    assert.equal(report.summary.itemsFound, 1);
+    assert.equal(character.equipment.weapon.rarity, 'common');
+    assert.ok(content.classesById.mage.weapons.includes(character.equipment.weapon.base));
+    assert.deepEqual(character.bag, []);
+    assert.ok(report.fights.every((fight) => !fight.elite && !fight.tough));
+  });
+});

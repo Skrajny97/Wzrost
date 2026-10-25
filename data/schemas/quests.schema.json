@@ -106,11 +106,12 @@
         "chest": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["timePoints", "systemPoints", "item"],
+          "required": ["timePoints", "systemPoints", "item", "text"],
           "properties": {
             "timePoints": { "type": "integer", "minimum": 0 },
             "systemPoints": { "type": "integer", "minimum": 0 },
-            "item": { "type": "boolean", "description": "Czy w skrzyni jest też przedmiot." }
+            "item": { "type": "boolean", "description": "Czy w skrzyni jest też przedmiot." },
+            "text": { "type": "string", "minLength": 1, "description": "Napis pod zadaniami okresu: co daje skrzynia." }
           }
         }
       }

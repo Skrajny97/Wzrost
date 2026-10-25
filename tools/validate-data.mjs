@@ -359,6 +359,12 @@ function checkQuests(data, { resources, rarities }) {
     errors.push(`quests.json: nieznana strefa czasu "${quests.timeZone}"`);
   }
   uniqueIds(errors, 'quests', quests.kinds);
+  // The note under a period's quests names what its chest gives.
+  for (const [periodId, { chest }] of Object.entries(quests.periods)) {
+    for (const amount of [chest.timePoints, chest.systemPoints]) {
+      if (!chest.text.includes(`+${amount} `)) errors.push(`quests.json: napis skrzyni ${periodId} nie podaje +${amount}`);
+    }
+  }
   for (const kind of quests.kinds) {
     if (kind.id !== 'kill' && !kind.counted) errors.push(`quests.json: rodzaj ${kind.id} nie ma counted`);
     if (kind.counted && !kind.text.includes('{noun}')) errors.push(`quests.json: tekst rodzaju ${kind.id} nie ma {noun}`);

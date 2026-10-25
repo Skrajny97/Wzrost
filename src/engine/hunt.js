@@ -158,7 +158,10 @@ export function resourceBundle(area, total) {
   return [[top, 1]];
 }
 
-export function simulateHunt({ character, equipped, hp, name, areaId, minutes, seed }, content) {
+// `first`: the character's very first exploration, which goes one way:
+// regular encounters only, no chests among the finds, and the one treasure
+// is a plain weapon of its class after the first won fight.
+export function simulateHunt({ character, equipped, hp, name, areaId, minutes, seed, first = false }, content) {
   const rng = createRng(seed);
   const tuning = content.balance.hunt;
   const rewards = content.balance.rewards;
@@ -170,7 +173,7 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
 
   // Each fight pays for the time it stands for (`share`), so every length
   // gives about the same per hour.
-  const pace = explorationPace(minutes, content);
+  const pace = first ? { ...explorationPace(minutes, content), toughChance: 0, eliteChance: 0 } : explorationPace(minutes, content);
   const fightCount = pace.fights;
   const share = pace.timeFactor;
   const findCount = countEvents(pace.finds, rng);
@@ -218,7 +221,8 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
       // resources for the camp, nothing of interest or, rarely, a shard of
       // time (Time Points).
       const findLevel = areaLevel(area, rng, content);
-      const outcome = rng.weighted(Object.entries(rewards.findOutcomes), ([, weight]) => weight)[0];
+      const outcomes = Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest'));
+      const outcome = rng.weighted(outcomes, ([, weight]) => weight)[0];
       if (outcome === 'gold') {
         const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * rng.float(0.5, 1.5)));
         gold += amount;
@@ -299,7 +303,10 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
       // gives a weapon while none is found). A beaten elite leaves a chest,
       // often with a rarer item.
       const chests = [];
-      if (!filled.has('weapon')) chests.push([randomItem(enemies[0].level, rng, content, loot), 'firstChest']);
+      if (!filled.has('weapon')) {
+        const weapon = randomItem(enemies[0].level, rng, content, first ? { ...loot, rarityId: content.rarities[0].id } : loot);
+        chests.push([weapon, 'firstChest']);
+      }
       if (encounter.elite) {
         chests.push([randomItem(enemies[0].level, rng, content, { ...loot, rarityBonus: rewards.eliteRarityBonus }), 'eliteChest']);
       }
