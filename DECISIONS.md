@@ -1225,3 +1225,14 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - Narrator pojawia się od następnej karty.
 5. **Wielkość widoku.** Autor: przyciski „−” i „+” wystarczą w Ustawieniach. Zostają tylko tam.
 6. **Leczenie Punktami Czasu na ekranie Walki.** Autor: na ekranie Walki ma się dać uleczyć postać Punktami Czasu. Pasek „Odpoczynek: pełne HP za …” z przyciskiem „Przewiń” stoi teraz na górze każdego ekranu Walki: listy regionów, regionu i miejsca przed wyruszeniem (dotąd był tylko na tym ostatnim). Działa jak dotąd: punkt na minutę odpoczynku, z pytaniem o zgodę. Znika przy pełnym HP i bez punktów.
+
+## Reszta obozu we wprowadzeniu (25.10.2026)
+
+1. **Trzy nowe kwestie narratora.** Autor: „warto by w Samouczku opisać resztę nowych i nienowych lokacji, których nie opisaliśmy”, czyli miejsc w obozie (potwierdzone przez autora). Narrator mówi teraz o każdym budynku. Po Kowadle, a przed „Teraz zadbajmy o odpoczynek…”, stoją trzy pergaminy przy miejscach (`data/tutorial.json`):
+    - `camp-loot-shed`, przy Szałasie na łupy i Skupie złomu naraz, tak jak Kamieniołom z Kopalnią: „Zdobycze z wypraw trafiają do plecaka. Szałas na łupy go powiększy, a Skup złomu sprawi, że złomiarz zapłaci Ci więcej za to, czego nie potrzebujesz.”
+    - `camp-craft-table`, przy Stole rzemieślniczym: „Przy Stole rzemieślniczym przerobisz materiały ze stworów na części. Możesz tam też rozebrać zbędne przedmioty. Części przydadzą się, gdy poznasz profesje.”
+    - `camp-level`, przy „Rozwiń poziom obozu”: „Rozwijać możesz także sam obóz. Kosztuje to tylko złoto, a każdy poziom obozu przyspiesza wszystkie budowy. Budowy możesz też ustawiać w kolejce, do trzech naraz.” Ostatnie zdanie, o kolejce, jest dopisane na prośbę autora.
+2. **Teksty zatwierdzone przed nagraniem.** Nie mają form zależnych od płci, więc nie mają wersji żeńskich.
+3. **Nagrania.** ElevenLabs nagrał po trzy wersje każdej kwestii tym samym głosem i modelem co resztę wprowadzenia (`allLines` w `audio/prompts.json`), za 1479 kredytów. Dwie wersje urywały ostatnie słowo i odpadły, a pozostałe siedem (2, 2 i 3) jest na stronie odsłuchu, przycięte i wyrównane jak reszta. Kwestia dostaje głos w grze dopiero po wyborze autora. Do tego czasu jej pergamin jest bez głosu.
+4. **Kto je zobaczy.** Tak jak pozostałe pergaminy obozu: postać, która jest w obozie przed pierwszą budową. Postacie, które już coś budują albo skończyły wprowadzenie, ich nie dostaną.
+5. **Sprawdzone na telefonie.** Na 390 × 844, na 360 × 740 bez animacji i na 390 × 844 przy widoku 125% ramka obejmuje miejsca, a narrator i „Pomiń wprowadzenie” ich nie zasłaniają.
