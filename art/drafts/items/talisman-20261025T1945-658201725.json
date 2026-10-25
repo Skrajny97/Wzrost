@@ -1,0 +1,25 @@
+{
+  "id": "talisman",
+  "payload": {
+    "prompt": "smooth grey river stone with a natural hole through it, hung on a leather cord with two small wooden beads, plain folk charm, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 658201725,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792957573,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 28.68,
+    "request_id": "e9dda609-9302-40f7-bb2d-97b0cc73cf04",
+    "outputs_retained_until": 1793043932
+  }
+}
