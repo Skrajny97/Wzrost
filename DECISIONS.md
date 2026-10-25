@@ -1118,7 +1118,7 @@ Autor: z pierwszej, 30-minutowej wyprawy po starcie od nowa przyszły 3 przedmio
     Godzina wypraw daje średnio ok. 0,8 przedmiotu zamiast ok. 1,25. Pozostałe znaleziska (złoto, zasoby, odłamek czasu, nic ciekawego) wypadają odpowiednio częściej.
 3. **Napis pod zadaniami.** Pod zadaniami dziennymi stoi „Skrzynia dziennych zadań dostarcza +30 Punktów Czasu i +5 Punktów Systemu.”, a pod tygodniowymi „Skrzynia tygodniowych zadań dostarcza losowy przedmiot, +120 Punktów Czasu i +20 Punktów Systemu.” Napisy są w danych (`chest.text` w `data/quests.json`), a walidacja pilnuje, żeby ich liczby zgadzały się ze skrzynią.
 4. **Dźwięk skrzyni.** Otwarcie skrzyni zadań gra nagranie monet wysypujących się z otwieranej skrzyni (ElevenLabs, `effects.chest` w `data/sounds.json`). Na stronie odsłuchu jest sześć wersji: dwie takie, dwie z magicznym dźwiękiem nagrody na koniec i dwie z garścią monet rozsypaną na stole. Autor może tam wybrać inną.
-5. **„Ogniu” przy Ognisku.** Głos czytał „przy ognu”. Nowe nagrania dostały dla głosu zapis „ogńu” albo „ognju” (`say` w `audio/prompts.json`), a tekst w grze się nie zmienił. W grze jest pierwsza wersja z „ogńu”, a wszystkie cztery są na stronie odsłuchu.
+5. **„Ogniu” przy Ognisku.** Głos czytał „przy ognu”. Nowe nagrania dostały dla głosu zapis „ogńu” albo „ognju” (`say` w `audio/prompts.json`), a tekst w grze się nie zmienił. W grze jest pierwsza wersja z „ogńu”, a wszystkie cztery są na stronie odsłuchu. *W grze jest teraz wersja 3, z „ognju”: zob. „Wybór autora na stronie odsłuchu”.*
 
 
 ## Propozycje umiejętności, profesji i spotkań (25.10.2026)
@@ -1135,3 +1135,8 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
 
     Nic z niego nie wchodzi do gry przed odpowiedziami autora. Propozycje z 24.10.2026 zostają nieaktualne (punkt 2 „Balansu i nowych zakładek”).
 3. **Poprawki w dokumencie projektowym.** Sekcje o eksploracji, Punktach Systemu, górnym pasku i wprowadzeniu narratora mówią teraz to samo co gra: pierwsza wyprawa jest liniowa, skrzynie są rzadkie, Punkty Systemu należą do postaci i stoją pod złotem, a ostatnia karta narratora kończy się słowem „Powodzenia.”
+
+## Wybór autora na stronie odsłuchu (25.10.2026)
+
+1. **Kwestia przy Ognisku.** Autor wybrał wersję 3, nagraną z zapisem „ognju”, i ona jest teraz w grze (`src/client/audio/narration/lead-campfire.mp3`). Punkt zastępuje wersję z punktu 5 „Pierwszej wyprawy i rzadszych skrzyń”.
+2. **Bez zmian.** Dźwięk skrzyni zadań i kwestia przy zadaniach zostają w wersjach 1, które już były w grze.
