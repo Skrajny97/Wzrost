@@ -1,0 +1,17 @@
+{
+  "id": "lead-campfire",
+  "payload": {
+    "text": "Teraz zadbajmy o odpoczynek po kolejnych wyprawach. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/lead-campfire-20261025T1044-0.mp3",
+    "audio/drafts/narration/lead-campfire-20261025T1044-1.mp3"
+  ],
+  "credits": 246
+}

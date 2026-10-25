@@ -1,0 +1,17 @@
+{
+  "id": "quests",
+  "payload": {
+    "text": "Codziennie będę Ci zlecał zadania, w taki sposób utrzymamy naszą, mam nadzieję, owocną relację. Będę na Ciebie czekał tutaj. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/quests-20261025T1044-0.mp3",
+    "audio/drafts/narration/quests-20261025T1044-1.mp3"
+  ],
+  "credits": 266
+}
