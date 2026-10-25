@@ -933,3 +933,8 @@ Autor zlecił przygotowanie do Sklepu Play „na przyszłość”, a 25.10.2026 
 
     Wraz z kontem znika też połączenie z Google. Potem strona wraca do logowania. Kopie zapasowe bazy (Time Travel) znikają po 30 dniach.
 2. **Czcionki na serwerze gry.** Alegreya i Chakra Petch leżą w `src/client/fonts/` (licencja SIL Open Font License, jej teksty są obok), w zestawach łacińskim i łacińskim rozszerzonym, które obejmują polskie litery. Gra nie pobiera już niczego z Google Fonts, więc otwarcie gry nie wysyła adresu IP do Google, a polityka bezpieczeństwa strony dopuszcza style i czcionki tylko z serwera gry.
+
+## Balans i nowe zakładki: najpierw rozmowa z autorem (25.10.2026)
+
+1. **Trudności walki nie stroimy przed umiejętnościami, treningiem i towarzyszami.** Autor: bez umiejętności gra ma prawo być trudna, a wkrótce dojdą umiejętności, trening i być może werbunek drugiej postaci do drużyny. [Dokument o balansie](https://claude.ai/artifact/S3PbhSWFPG1v4w93biGPPR) mierzy grę bez tych systemów, więc jego zmiany walki czekają. Symulację (`tools/progression/`) powtórzymy, gdy te systemy będą w grze.
+2. **Umiejętności, profesje i trening autor przedstawia krok po kroku.** Nie przygotowujemy gotowych planów tych zakładek, a propozycje z 24.10.2026 są nieaktualne. Zasada od autora: umiejętności nie otwierają się wszystkie do poziomu 50, skoro postać może dojść do poziomu 500.
