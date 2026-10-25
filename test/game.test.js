@@ -312,8 +312,8 @@ describe('equipment', () => {
     }
     const bag = (await call('GET', '/api/character', { cookie })).data.character.bag;
     assert.deepEqual(bag.find((item) => item.id === staffId).classNames, ['Mag']);
-    assert.deepEqual(bag.find((item) => item.id === robeId).classNames, ['Mag']);
-    assert.deepEqual(bag.find((item) => item.id === mailId).classNames, ['Wojownik', 'Kleryk']);
+    assert.deepEqual(bag.find((item) => item.id === robeId).classNames, ['Mag', 'Kleryk']);
+    assert.deepEqual(bag.find((item) => item.id === mailId).classNames, ['Wojownik']);
     assert.equal(bag.find((item) => item.id === glovesId).classIds, null);
     assert.equal((await call('POST', `/api/items/${glovesId}/equip`, { cookie })).status, 200);
   });
@@ -346,6 +346,38 @@ describe('equipment', () => {
     assert.equal(archerView.equipment.head, null);
     assert.equal(archerView.equipment.hands.name, 'Rękawice');
     assert.deepEqual(archerView.bag.map((item) => item.name).sort(), ['Hełm', 'Szata']);
+    const warriorView = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.equal(warriorView.equipment.chest.name, 'Kolczuga');
+  });
+
+  test('the cleric now wears what the mage wears: its helmet and chainmail go back to the bag', async () => {
+    const other = await signUp('kleryk');
+    await newCharacter(other, 'cleric', 'Jagna');
+    const database = await db();
+    const cleric = await database.prepare("SELECT id FROM characters WHERE class_id = 'cleric'").first();
+    const wear = async (base, slot) =>
+      database
+        .prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, 0)')
+        .bind(cleric.id, slot, JSON.stringify({ base, slot, level: 1, rarity: 'common', affixes: [], armor: 6 }))
+        .run();
+    // As before migrations/0013: a cleric in chainmail and a helmet, with
+    // gloves on; the warrior in its own chainmail.
+    await wear('chainmail', 'chest');
+    await wear('helmet', 'head');
+    await wear('gloves', 'hands');
+    await call('POST', `/api/items/${mailId}/equip`, { cookie });
+    const migration = readFileSync('migrations/0013_cleric_armour.sql', 'utf8')
+      .replace(/--.*$/gm, '')
+      .split(';')
+      .map((statement) => statement.trim())
+      .filter(Boolean);
+    await database.batch(migration.map((statement) => database.prepare(statement)));
+
+    const clericView = (await call('GET', '/api/character', { cookie: other })).data.character;
+    assert.equal(clericView.equipment.chest, null);
+    assert.equal(clericView.equipment.head, null);
+    assert.equal(clericView.equipment.hands.name, 'Rękawice');
+    assert.deepEqual(clericView.bag.map((item) => item.name).sort(), ['Hełm', 'Kolczuga']);
     const warriorView = (await call('GET', '/api/character', { cookie })).data.character;
     assert.equal(warriorView.equipment.chest.name, 'Kolczuga');
   });

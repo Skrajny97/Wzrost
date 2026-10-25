@@ -909,11 +909,11 @@ Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach i poprosił
 
 1. **Bez tła za naszymi postaciami w walce** (prośba autora). Popiersia drużyny na arenie miały ciemnozielone tło w ramce, a stwory nie. Teraz stoją na karcie jak stwory, a dół popiersia łagodnie zanika zamiast kończyć się prostą krawędzią.
 2. **Pancerz też należy do klas** (prośba autora: Łucznik mógł założyć szatę, a ta ma być tylko dla Maga). Hełm i pancerz noszą tylko klasy, które je wymieniają (`armor` w `data/classes.json`):
-    - Wojownik i Kleryk: hełm i kolczuga,
+    - Wojownik: hełm i kolczuga,
     - Łucznik i Cień: kaptur i kurtka,
-    - Mag: kaptur i szata.
+    - Mag i Kleryk: kaptur i szata.
 
-    Rękawice, buty, amulet, pierścień i talizman nosi każdy, jak dotąd. Łupy i znaleziska mają tylko to, co postać może założyć. Pancerz innej klasy, który postać już nosiła, migracja `0012_class_armour.sql` odkłada do plecaka. Gdy plecak się przepełni, złomiarz kupuje go pierwszego. Kleryk dostał kolczugę i hełm, bo nosi tarczę, a szata ma być tylko dla Maga. Symulacja balansu ubierała go dotąd w szatę i kaptur, więc to jest pytanie do autora. Punkt zmienia, za prośbą autora, zdanie „Resztę nosi każdy” w dokumencie projektowym i punkt 12 Etapu 1.
+    Rękawice, buty, amulet, pierścień i talizman nosi każdy, jak dotąd. Łupy i znaleziska mają tylko to, co postać może założyć. Pancerz innej klasy, który postać już nosiła, migracja `0012_class_armour.sql` odkłada do plecaka. Gdy plecak się przepełni, złomiarz kupuje go pierwszego. Kleryk nosił najpierw kolczugę i hełm, ale 25.10.2026 autor zdecydował, że ma nosić to co Mag. Jego hełm i kolczugę migracja `0013_cleric_armour.sql` odkłada do plecaka. Autor chciałby kiedyś osobnych zestawów dla Kleryka. Rękawice, buty i biżuteria zostają dla wszystkich klas, także z decyzji autora. Punkt zmienia, za prośbą autora, zdanie „Resztę nosi każdy” w dokumencie projektowym i punkt 12 Etapu 1.
 3. **Imię nie odpada po cichu** (uwaga testerki: na iPhonie nie przeszło nawet „Justi”). Serwer przyjmuje „Justi”, także według dawnej zasady, więc przyczyną było raczej zajęte imię, niewidoczny znak z klawiatury albo krótkie okno wdrożenia, gdy postacie były usuwane. Teraz:
     - niewidoczne znaki znikają,
     - litera i jej akcent wpisane osobno łączą się w jedną literę,
@@ -921,9 +921,9 @@ Autor zauważył dwie postacie o tym samym imieniu na dwóch kontach i poprosił
     - komunikat mówi wprost, co jest nie tak: długość, konkretny niedozwolony znak, pierwsza albo ostatnia litera, a przy zajętym imieniu „To imię nosi już inna postać w grze. Wybierz inne.”
 4. **Kolumny usuwać w osobnym wdrożeniu.** Migracje idą przed nowym kodem, więc przez kilka sekund wdrożenia działa stary kod na nowej bazie. Migracja `0011` usunęła kolumnę, z której korzystał stary kod, i przez tę chwilę tworzenie postaci mogło kończyć się błędem. Kolumnę, której kod już nie używa, usuwa się dopiero w kolejnym wdrożeniu.
 
-## Przygotowanie do Sklepu Play (24.10.2026, czeka na wdrożenie)
+## Przygotowanie do Sklepu Play (24.10.2026, wdrożone 25.10.2026)
 
-Autor zlecił przygotowanie do Sklepu Play „na przyszłość”. Te zmiany są na gałęzi roboczej i trafią do gry dopiero na polecenie autora. Plan, teksty i decyzje są w dokumencie [Insight — droga do Sklepu Play](https://claude.ai/artifact/JmVkJMPqQg2MNZmXtHxv5r).
+Autor zlecił przygotowanie do Sklepu Play „na przyszłość”, a 25.10.2026 wdrożenie dwóch zmian poniżej. Sklepem Play zajmiemy się po kolejnych etapach: adres kontaktowy na stronę prywatności i opłata za konto deweloperskie czekają do tego czasu. Plan, teksty i decyzje są w dokumencie [Insight — droga do Sklepu Play](https://claude.ai/artifact/JmVkJMPqQg2MNZmXtHxv5r).
 
 1. **Usuwanie konta.** Google Play wymaga, żeby aplikacja, w której zakłada się konto, pozwalała je usunąć w środku aplikacji. RODO daje to prawo i tak. W Ustawieniach pod „Zacznij od nowa” jest „Usuń konto”. Karta pyta, czy na pewno, a przycisk działa dopiero po wpisaniu własnego loginu. Serwer (`DELETE /api/me`) usuwa od razu:
     - konto,

@@ -57,7 +57,7 @@
     "recovery": { "base": 0.07, "perWisdom": 0.002 },
     "weapons": ["aspergillum"],
     "offhands": ["shield", "focus"],
-    "armor": ["helmet", "chainmail"]
+    "armor": ["hood", "robe"]
   },
   {
     "id": "shadow",
