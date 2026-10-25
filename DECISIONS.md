@@ -1003,3 +1003,7 @@ Autor: łupy z bronią i przedmiotami mają być zdarzeniami losowymi, np. skrzy
 9. **Części czekają na profesje.** Wyrób przedmiotów z części przyjdzie razem z profesjami.
 10. **Na planszy** Stół rzemieślniczy stoi na dole po lewej, przy ścieżce. Staw przesunął się bliżej rogu. Rysunek stołu ma trzy wielkości, jak inne budynki.
 11. **Zapis.** Migracja `0015_materials.sql` dodaje postaci materiały, części i kolejkę stołu (JSON, jak zasoby). Nowe API: `POST /api/craft/materials`, `POST /api/items/:id/salvage` i w trybie testowym `POST /api/test/skip-craft`. Zlecenia zapisują się tylko wtedy, gdy postać jest taka, jak przy odczycie (`version`), więc dwa dotknięcia naraz dają jedno zlecenie.
+
+## Podgląd przedmiotu: sama zmiana (25.10.2026)
+
+Autor: po założeniu albo zdjęciu przedmiotu karta ma pokazywać po prostu plus albo minus, bo tak jest czytelniej. Podgląd pokazuje więc różnicę, np. „Średnie obrażenia −4,5”, „Maks. HP +12”, „Unik +0,5%”, zamiast „9–13 → 5–8”. Obrażenia porównują średnią, bo zakres zmienia oba końce naraz. Zmiany mniejsze niż 0,05 się nie pokazują.
