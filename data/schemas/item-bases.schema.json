@@ -28,7 +28,7 @@
         "pattern": "^[a-z][a-z0-9-]*$"
       },
       "classLevel": {
-        "description": "Poziom klasy, od którego postać może używać tej bazy i od którego ta baza wypada. Tylko dla dalszych baz kategorii (z polem family).",
+        "description": "Poziom klasy, od którego postać może używać tej bazy. Na wyprawach baza wypada tylko tam, gdzie zakres poziomów miejsca sięga tego poziomu, a w cotygodniowej skrzyni od tego poziomu klasy postaci. Tylko dla dalszych baz kategorii (z polem family).",
         "type": "integer",
         "minimum": 2
       },

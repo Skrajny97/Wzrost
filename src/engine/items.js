@@ -91,12 +91,13 @@ export const canUse = (baseId, classId, content, classLevel) =>
 // Loot favours the slots the character has empty, only ever holds what its
 // class can use, and while it has no weapon a weapon is always one of its
 // class. It picks a family, as often as if each had one base, and then one
-// of the family's bases its class level allows (none given: the first only),
-// so a family with more bases drops no more often. `filled` is the
-// set of slots already covered (worn, or found earlier in the same hunt);
-// found items are added. `rarityId` gives the rarity instead of a roll (the
-// weekly quest chest).
-export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId, classLevel = 1, rarityId } = {}) {
+// of the family's bases that ask for a class level up to `maxClassLevel`
+// (on an exploration the top level of the place, in the weekly chest the
+// class level; none given: the first base only), so a family with more bases
+// drops no more often. `filled` is the set of slots already covered (worn,
+// or found earlier in the same hunt); found items are added. `rarityId`
+// gives the rarity instead of a roll (the weekly quest chest).
+export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId, maxClassLevel = 1, rarityId } = {}) {
   let family;
   if (filled && classId && !filled.has('weapon')) {
     family = rng.pick(content.classesById[classId].weapons);
@@ -105,7 +106,7 @@ export function randomItem(level, rng, content, { rarityBonus = 1, filled, class
     const firsts = content.bases.filter((candidate) => baseFamily(candidate) === candidate.id && (!classId || canUse(candidate.id, classId, content)));
     family = rng.weighted(firsts, (candidate) => (filled && !filled.has(candidate.slot) ? weight : 1)).id;
   }
-  const bases = content.bases.filter((candidate) => baseFamily(candidate) === family && baseClassLevel(candidate.id, content) <= classLevel);
+  const bases = content.bases.filter((candidate) => baseFamily(candidate) === family && baseClassLevel(candidate.id, content) <= maxClassLevel);
   // Only a real choice draws, so loot without one stays as it was.
   const base = bases.length === 1 ? bases[0] : rng.pick(bases);
   filled?.add(base.slot);

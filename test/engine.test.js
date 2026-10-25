@@ -191,22 +191,22 @@ describe('items', () => {
     assert.equal(itemName(generateItem({ baseId: 'bow', level: 1 }, rng, content), content), 'Łuk');
   });
 
-  test('a later talisman of the family drops and fits from its class level, and is stronger', () => {
+  test('a later talisman of the family drops up to its class level, fits from it, and is stronger', () => {
     const rng = createRng('talizmany');
-    const talismans = (classLevel, count = 400) => {
+    const talismans = (maxClassLevel, count = 400) => {
       const found = [];
       for (let index = 0; index < count; index++) {
-        const item = randomItem(20, rng, content, { classId: 'mage', classLevel });
+        const item = randomItem(20, rng, content, { classId: 'mage', maxClassLevel });
         if (item.slot === 'talisman') found.push(item.base);
       }
       return found;
     };
-    const young = talismans(14);
-    assert.ok(young.length > 0 && young.every((base) => base === 'talisman'), 'no Otoczak before class level 15');
-    const grown = talismans(15);
-    assert.ok(grown.includes('talisman') && grown.includes('holed-stone'), 'both talismans from class level 15');
+    const below = talismans(14);
+    assert.ok(below.length > 0 && below.every((base) => base === 'talisman'), 'no Otoczak below class level 15');
+    const from = talismans(15);
+    assert.ok(from.includes('talisman') && from.includes('holed-stone'), 'both talismans from class level 15');
     // A family with two bases drops no more often than one with a single base.
-    assert.ok(Math.abs(grown.length - young.length) < 30, `${young.length} and ${grown.length} talismans`);
+    assert.ok(Math.abs(from.length - below.length) < 30, `${below.length} and ${from.length} talismans`);
     assert.equal(canUse('holed-stone', 'mage', content, 14), false);
     assert.equal(canUse('holed-stone', 'warrior', content, 15), true);
     assert.equal(canUse('holed-stone', 'mage', content), true);
@@ -442,6 +442,26 @@ describe('hunts', () => {
     assert.equal(result.items[0].base, 'staff');
     // Further loot favours the other empty slots, so one hunt brings no second weapon.
     assert.ok(result.items.slice(1).every((item) => item.slot !== 'weapon'));
+  });
+
+  test('the Otoczak is found where the place reaches class level 15, whatever the class level', () => {
+    // Every find is a treasure chest, one a minute.
+    const hunt = { ...content.balance.hunt, findIntervalMinutes: 1 };
+    const rewards = { ...content.balance.rewards, findOutcomes: { chest: 1 } };
+    const chests = { ...content, balance: { ...content.balance, hunt, rewards } };
+    const talismans = (character, equipped, areaId) =>
+      Array.from({ length: 4 }, (_, i) => simulateHunt({ character, equipped, hp: 9999, name: 'Mira', areaId, minutes: 60, seed: `otoczak:${areaId}:${i}` }, chests))
+        .flatMap((result) => result.items)
+        .filter((item) => item.slot === 'talisman')
+        .map((item) => item.base);
+    // Class level 20 in Skraj Wiatrołomów (levels 1–5): the wooden Talizman only.
+    const strong = typicalCharacter('warrior', 30, content);
+    const edge = talismans({ ...strong.character, classLevel: 20 }, strong.equipped, 'windfalls-edge');
+    assert.ok(edge.length > 0 && edge.every((base) => base === 'talisman'), edge.join());
+    // Class level 10 in Krucze Wykroty (11–15): the Otoczak too, worn from 15.
+    const young = typicalCharacter('warrior', 14, content);
+    const hollows = talismans({ ...young.character, classLevel: 10 }, young.equipped, 'raven-hollows');
+    assert.ok(hollows.includes('holed-stone') && hollows.includes('talisman'), hollows.join());
   });
 
   test('a short hunt pays for its share of time, not for a whole fight', () => {
@@ -1523,6 +1543,16 @@ describe('quests from the narrator', () => {
     assert.deepEqual(Object.keys(counts).sort(), Object.keys(questLevel(12, content).chestRarities).sort());
     const late = chestItem({ level: 120, classId: 'warrior' }, [], createRng('późno'), content);
     assert.ok(Object.keys(questLevel(120, content).chestRarities).includes(late.rarity));
+  });
+
+  test('the weekly chest may hold the Otoczak from class level 15, wherever the character explores', () => {
+    const worn = content.slots.map((slot) => slot.id).filter((id) => id !== 'talisman');
+    const talismans = (classLevel) =>
+      Array.from({ length: 300 }, (_, i) => chestItem({ level: 12, classId: 'mage', classLevel }, worn, createRng(`tydzień-${i}`), content))
+        .filter((item) => item.slot === 'talisman')
+        .map((item) => item.base);
+    assert.ok(!talismans(14).includes('holed-stone'));
+    assert.ok(talismans(15).includes('holed-stone'));
   });
 
   test('quests read in Polish, with the noun to go with the number', () => {

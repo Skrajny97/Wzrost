@@ -183,8 +183,12 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
   ].sort((a, b) => a.t - b.t);
 
   // Slots covered by worn items or earlier finds, for loot that fills the gaps.
+  // A later base of a family drops where the levels of the place reach the
+  // class level it asks for, whatever the character's own: the Otoczak (from
+  // class level 15) not in Skraj Wiatrołomów (1–5), but from Krucze Wykroty
+  // (11–15) on.
   const filled = new Set(equipped.map((item) => item.slot));
-  const loot = { filled, classId: character.classId, classLevel: character.classLevel };
+  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel };
   const hpStart = player.hp;
   let hpNow = player.hp;
   let result = 'success';
