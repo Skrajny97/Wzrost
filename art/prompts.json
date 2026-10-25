@@ -1,5 +1,5 @@
 {
-  "$comment": "Prompts for tools/generate-art.mjs (Retro Diffusion). Each kind has its style, size and the approved sprites used as style references (art/references/<kind>/<id>.png). Approved sprites go to src/client/art/<kind>/<id>.png. The portraits are the starting look: plain clothes and empty hands, as characters start with nothing. portraits-evolved holds the prompts of the earlier, well-equipped portraits, kept in art/evolution/portraits/ for the look after the first class evolution.",
+  "$comment": "Prompts for tools/generate-art.mjs (Retro Diffusion). Each kind has its style, size and the approved sprites used as style references (art/references/<kind>/<id>.png). Approved sprites go to src/client/art/<kind>/<id>.png. The portraits are the starting look: plain clothes and empty hands, as characters start with nothing. portraits-evolved holds the prompts of the earlier, well-equipped portraits, kept in art/evolution/portraits/ for the look after the first class evolution. materials holds the materials left by creatures, the parts made on the Stół rzemieślniczy and the treasure chest (data/materials.json).",
   "monsters": {
     "style": "rd_pro__fantasy",
     "width": 48,
@@ -66,6 +66,35 @@
       "amulet": "silver amulet with a round gemstone on a chain, single inventory item icon",
       "ring": "gold ring with a small gemstone, single inventory item icon",
       "talisman": "carved wooden talisman with a leaf rune on a cord, single inventory item icon"
+    }
+  },
+  "materials": {
+    "style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "references": [],
+    "prompts": {
+      "wolf-pelt": "folded grey wolf pelt with coarse fur, single inventory item icon",
+      "fox-pelt": "folded red fox pelt with a bushy white-tipped tail, single inventory item icon",
+      "badger-claws": "three short black badger claws tied together with a cord, single inventory item icon",
+      "viper-scales": "small patch of dark grey snake skin with a black zigzag pattern, single inventory item icon",
+      "boar-tusk": "curved ivory boar tusk, diagonal, single inventory item icon",
+      "crow-feather": "single glossy black crow feather with a blue sheen, diagonal, single inventory item icon",
+      "owl-feather": "single soft speckled brown owl feather, diagonal, single inventory item icon",
+      "lynx-fur": "folded golden brown lynx fur with dark spots, single inventory item icon",
+      "spider-silk": "ball of white sticky spider silk thread, single inventory item icon",
+      "alpha-fang": "large white wolf fang, long and sharp, diagonal, single inventory item icon",
+      "bear-hide": "thick folded dark brown bear hide with dense fur, single inventory item icon",
+      "wisp-flame": "small glowing orange will-o'-the-wisp flame inside a tiny glass jar with a cork, single inventory item icon",
+      "likho-eye": "single pale eerie eye with a frosty blue iris, glowing faintly, single inventory item icon",
+      "scraps": "small pile of leather scraps, bone bits and feathers, single inventory item icon",
+      "straps": "coiled brown leather straps, single inventory item icon",
+      "fittings": "handful of iron buckles, rivets and small metal fittings, single inventory item icon",
+      "runes": "three small grey stones carved with glowing blue runes, single inventory item icon",
+      "amber": "polished golden amber nugget, glowing warmly, single inventory item icon",
+      "bloodstone": "dark red bloodstone gem with darker veins, single inventory item icon",
+      "star-shard": "small glittering pale gold crystal shard of a fallen star, glowing, single inventory item icon",
+      "chest": "small closed wooden treasure chest with iron bands and a lock, single inventory item icon"
     }
   },
   "narrator": {
