@@ -1,0 +1,25 @@
+{
+  "id": "recurve-bow",
+  "payload": {
+    "prompt": "short dark recurve bow with limbs curling forward at both tips, horn and wood with leather wrapping at the grip, taut string, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 26874658,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792967881,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 24.9,
+    "request_id": "512b15ad-a69b-423d-a470-0d5e5ffb2b19",
+    "outputs_retained_until": 1793054214
+  }
+}

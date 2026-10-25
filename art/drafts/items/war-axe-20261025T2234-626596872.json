@@ -1,0 +1,25 @@
+{
+  "id": "war-axe",
+  "payload": {
+    "prompt": "light war axe on a long slim wooden haft with a narrow crescent iron head and a small hammer back, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 626596872,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792967776,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 25.26,
+    "request_id": "8b456c20-6427-4863-ad64-46773b9a79da",
+    "outputs_retained_until": 1793054126
+  }
+}

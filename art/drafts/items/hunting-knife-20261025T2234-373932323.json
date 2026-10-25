@@ -1,0 +1,25 @@
+{
+  "id": "hunting-knife",
+  "payload": {
+    "prompt": "long single-edged hunting knife with a slightly curved steel blade, a short brass guard and a bone handle, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 373932323,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792967811,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 25.08,
+    "request_id": "f1c60bff-f5c1-4b41-b707-eea7cfdb2762",
+    "outputs_retained_until": 1793054179
+  }
+}

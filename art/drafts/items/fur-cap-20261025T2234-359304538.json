@@ -1,0 +1,25 @@
+{
+  "id": "fur-cap",
+  "payload": {
+    "prompt": "round fur hat with a dark red felt crown, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 359304538,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792968138,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 23.82,
+    "request_id": "cbc681a3-80a5-4a77-af10-1a26daedcf0c",
+    "outputs_retained_until": 1793054487
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "pavise",
+  "payload": {
+    "prompt": "tall rectangular wooden pavise shield with a raised vertical ridge in the middle, an iron rim and a painted red stripe, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 774494022,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792968000,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 24.36,
+    "request_id": "df137e6d-21af-4b1f-a66a-5401636f6f25",
+    "outputs_retained_until": 1793054371
+  }
+}

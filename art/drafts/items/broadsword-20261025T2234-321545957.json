@@ -1,0 +1,25 @@
+{
+  "id": "broadsword",
+  "payload": {
+    "prompt": "heavy broad straight sword with a wide steel blade, a simple steel crossguard bent toward the blade and a dark leather grip, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 321545957,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792967723,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 25.44,
+    "request_id": "e74da717-6246-4167-b8df-8a049e37b6b0",
+    "outputs_retained_until": 1793054079
+  }
+}

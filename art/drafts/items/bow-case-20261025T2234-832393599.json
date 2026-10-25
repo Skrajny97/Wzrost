@@ -1,0 +1,25 @@
+{
+  "id": "bow-case",
+  "payload": {
+    "prompt": "leather bow case with brass studs and a quiver of feathered arrows attached to it, worn at the belt, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 832393599,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792968054,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 24.18,
+    "request_id": "44c1b80c-b9e1-4b00-8ee9-995013cda24d",
+    "outputs_retained_until": 1793054403
+  }
+}

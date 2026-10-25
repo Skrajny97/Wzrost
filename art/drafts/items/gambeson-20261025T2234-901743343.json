@@ -1,0 +1,25 @@
+{
+  "id": "gambeson",
+  "payload": {
+    "prompt": "thick quilted cream linen gambeson jacket with vertical stitched padding, an empty garment with nobody wearing it, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 901743343,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792968349,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 23.46,
+    "request_id": "896c17d1-99cf-4a69-a24a-4ac2e3c1e925",
+    "outputs_retained_until": 1793054697
+  }
+}

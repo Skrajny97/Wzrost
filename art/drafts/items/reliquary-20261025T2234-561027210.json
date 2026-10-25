@@ -1,0 +1,25 @@
+{
+  "id": "reliquary",
+  "payload": {
+    "prompt": "small silver reliquary box pendant with an engraved lid, hung on a leather cord, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 561027210,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792968612,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 22.38,
+    "request_id": "6f41df62-6568-4f34-9af9-4b100b4e781c",
+    "outputs_retained_until": 1793054959
+  }
+}
