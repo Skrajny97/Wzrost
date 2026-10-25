@@ -1120,3 +1120,18 @@ Autor: z pierwszej, 30-minutowej wyprawy po starcie od nowa przyszły 3 przedmio
 4. **Dźwięk skrzyni.** Otwarcie skrzyni zadań gra nagranie monet wysypujących się z otwieranej skrzyni (ElevenLabs, `effects.chest` w `data/sounds.json`). Na stronie odsłuchu jest sześć wersji: dwie takie, dwie z magicznym dźwiękiem nagrody na koniec i dwie z garścią monet rozsypaną na stole. Autor może tam wybrać inną.
 5. **„Ogniu” przy Ognisku.** Głos czytał „przy ognu”. Nowe nagrania dostały dla głosu zapis „ogńu” albo „ognju” (`say` w `audio/prompts.json`), a tekst w grze się nie zmienił. W grze jest pierwsza wersja z „ogńu”, a wszystkie cztery są na stronie odsłuchu.
 
+
+## Propozycje umiejętności, profesji i spotkań (25.10.2026)
+
+Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy umiejętności i profesji przy limicie poziomów 500 i pomyśleć o zdarzeniach na eksploracjach.
+
+1. **Zdarzenia bez przedłużania wypraw.** Decyzja autora: na razie żadne zdarzenie nie przedłuża eksploracji. Zdarzenia z wyborem to spotkania z ludźmi na końcu wyprawy, a gracz decyduje, co z nimi zrobić: pomóc, odpuścić, walczyć albo coś innego. Wybór rozstrzyga się od razu. Sekcje „Zdarzenia” i „Technologia” dokumentu projektowego mówią to już od dziś. Pytania 6 i 40 z dokumentu pytań do Etapu 2, o dodatkowy czas z wyboru, są przez to nieaktualne.
+2. **Dokument z propozycjami.** [Insight — propozycje umiejętności, profesji i spotkań na wyprawach](https://claude.ai/artifact/TYXTowMKEzDM7mTpVGhzN2) zawiera:
+    - rytm 14 umiejętności do poziomu klasy 500, zasady many, poziomów i ulepszeń umiejętności oraz trening,
+    - listy 65 umiejętności i 10 cech pierwszych ewolucji,
+    - profesje do poziomu 500 z warsztatami w obozie,
+    - zasady i 8 przykładów spotkań na końcu wyprawy,
+    - 21 pytań do autora z zaleceniami.
+
+    Nic z niego nie wchodzi do gry przed odpowiedziami autora. Propozycje z 24.10.2026 zostają nieaktualne (punkt 2 „Balansu i nowych zakładek”).
+3. **Poprawki w dokumencie projektowym.** Sekcje o eksploracji, Punktach Systemu, górnym pasku i wprowadzeniu narratora mówią teraz to samo co gra: pierwsza wyprawa jest liniowa, skrzynie są rzadkie, Punkty Systemu należą do postaci i stoją pod złotem, a ostatnia karta narratora kończy się słowem „Powodzenia.”
