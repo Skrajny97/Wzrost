@@ -221,7 +221,7 @@ export const withChest = (quests, periodId) => ({ ...quests, [periodId]: { ...qu
 // The item in the weekly chest: of the character's level, for its class and
 // class level and favouring its empty slots, of a rarity drawn by the level's
 // band. Besides explorations in places of its level, this is the one way to
-// a later base of a family (the Otoczak from class level 15), whatever place
+// a later base of a family (the Otoczak from class level 10), whatever place
 // the character explores.
 export function chestItem({ level, classId, classLevel }, wornSlots, rng, content) {
   const [rarityId] = rng.weighted(Object.entries(questLevel(level, content).chestRarities), ([, weight]) => weight);

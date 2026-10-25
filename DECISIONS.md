@@ -1261,15 +1261,25 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
 
 1. **Bez godła.** Autor: ikonka talizmanu musi być uniwersalna, bo liść na niej mylił („Talizman Lisa” nie ma nic wspólnego z liściem). Retro Diffusion narysował 4 szkice bez godła: dwa kamienie z dziurką na rzemyku i dwa drewniane krążki (0,72 USD). W kamieniach biała plamka w miejscu dziurki stała się przezroczysta.
 2. **System przedmiotów jak w Metin2** (wyjaśnienie autora, z dodatkiem afiksów zależnych od rzadkości). Kategoria, np. sztylety albo talizmany, to nie jeden przedmiot. Ma wiele baz: zwykły Sztylet, a dalej np. Kordelas od 15. poziomu klasy, z inną ikonką i mocniejszymi liczbami. Każda baza dostaje afiksy swojej rzadkości jak dotąd, a lista baz będzie duża.
-    - W danych dalsza baza kategorii ma `family` (id pierwszej bazy, np. `talisman`) i `classLevel`, poziom klasy, od którego postać może jej używać (`data/item-bases.json`). Mocniejsze liczby daje jej własny współczynnik (`statFactor`, `armorFactor`, `damageFactor`). Pole `category` zostaje przy broniach dla rodzaju obrażeń.
+    - W danych dalsza baza kategorii ma `family` (id pierwszej bazy, np. `talisman`) i `classLevel`, poziom klasy, od którego postać może jej używać (`data/item-bases.json`). Mocniejsze liczby daje jej premia `bonus` (punkt 4), a współczynnik ma taki sam jak pierwsza baza. Pole `category` zostaje przy broniach dla rodzaju obrażeń.
     - Klasy w `classes.json` wymieniają kategorie (pierwsze bazy), więc np. Kordelas należałby do tych samych klas co Sztylet.
     - Łup losuje najpierw kategorię, tak samo często jak dotąd, a potem jedną z jej baz. Kategoria z większą liczbą baz nie wypada więc częściej (`randomItem` w `src/engine/items.js`).
-    - **Gdzie wypada dalsza baza** (autor). Na wyprawach wypada tylko tam, gdzie zakres poziomów miejsca sięga jej poziomu klasy. Otoczak (od 15. poziomu klasy) nie wypada więc w Skraju Wiatrołomów (1–5) ani w Lisich Jarach (6–10). Wypada od Kruczych Wykrotów (11–15) wzwyż.
-        - Decyduje miejsce, nie poziom klasy postaci. Postać z 10. poziomem klasy może znaleźć Otoczaka w Kruczych Wykrotach i założy go od 15. poziomu. Postać z 20. poziomem klasy nie znajdzie go w Skraju Wiatrołomów.
+    - **Gdzie wypada dalsza baza** (autor). Na wyprawach wypada tylko tam, gdzie zakres poziomów miejsca sięga jej poziomu klasy. Otoczak (od 10. poziomu klasy) nie wypada więc w Skraju Wiatrołomów (1–5). Wypada od Lisich Jarów (6–10) wzwyż.
+        - Decyduje miejsce, nie poziom klasy postaci. Postać z 5. poziomem klasy może znaleźć Otoczaka w Lisich Jarach i założy go od 10. poziomu. Postać z 20. poziomem klasy nie znajdzie go w Skraju Wiatrołomów.
         - Reguła obejmuje skrzynie ze znalezisk, skrzynie z elity i skrzynię pierwszej broni.
-    - Poza wyprawami dalszą bazę daje tylko cotygodniowa skrzynia zadań (codzienna nie ma przedmiotu). Tu decyduje poziom klasy postaci, a nie miejsce wypraw, więc przedmiot od razu pasuje. Postać z 15. poziomem klasy może dostać w niej Otoczaka, nawet gdy chodzi tylko po Skraju Wiatrołomów.
+    - Poza wyprawami dalszą bazę daje tylko cotygodniowa skrzynia zadań (codzienna nie ma przedmiotu). Tu decyduje poziom klasy postaci, a nie miejsce wypraw, więc przedmiot od razu pasuje. Postać z 10. poziomem klasy może dostać w niej Otoczaka, nawet gdy chodzi tylko po Skraju Wiatrołomów.
     - Przedmiotu z bazy wymagającej wyższego poziomu nie da się założyć: karta przedmiotu mówi „Od poziomu klasy N”, a serwer odpowiada „Ten przedmiot założysz od poziomu klasy N.”
 3. **Dwa talizmany.** Wybór autora z arkusza szkiców: kamień z dziurką (nr 2) i drewniany krążek (nr 4).
     - **Talizman**, drewniany krążek ze słojami, jest pierwszą bazą kategorii, dla każdego od początku: Witalność ×0,3, bez zmian. Dotychczasowe talizmany graczy wyglądają teraz tak.
-    - **Otoczak**, kamień z dziurką, to dalsza baza od 15. poziomu klasy: Witalność ×0,4, czyli o jedną trzecią więcej. Nazwę, poziom i współczynnik dobrano najprościej, na wzór Kordelasa z przykładu autora, i łatwo je zmienić w danych.
+    - **Otoczak**, kamień z dziurką, to dalsza baza od 10. poziomu klasy (autor zmienił z 15.): Witalność jak u Talizmanu i do tego +2–4. Nazwę dobrano na wzór Kordelasa z przykładu autora i łatwo ją zmienić w danych.
     - Stary obrazek z liściem wypadł z gry.
+4. **Premia +x zamiast mnożnika** (autor). Mnożnik przy zwykłym przedmiocie robi zbyt dużą różnicę na wyższych poziomach. Mnożniki i duże wzrosty procentowe zostają dla bardzo rzadkich przedmiotów.
+    - Dalsza baza kategorii ma ten sam współczynnik co pierwsza i stałą premię `bonus` (`{ "min", "max" }` w `data/item-bases.json`). Premia losuje się raz, przy powstaniu przedmiotu, i dodaje do obrażeń broni (min i max), pancerza albo statystyki. Przewaga nad pierwszą bazą jest więc taka sama na każdym poziomie przedmiotu.
+    - Zakres dobieramy jako około 30–50% liczby zwykłego przedmiotu pierwszej bazy na poziomie przedmiotu równym poziomowi klasy bazy. Przy broni to 25–40% średnich obrażeń. Dla Otoczaka: Talizman na 10. poziomie ma Witalność +8, więc premia to +2–4.
+    - Walidator pilnuje, żeby dalsza baza miała premię i ten sam współczynnik co pierwsza, a pierwsza baza nie miała premii.
+    - Otoczaki znalezione przed tą zmianą zachowują swoje liczby, bo przedmiot pamięta je od znalezienia.
+5. **Retro Diffusion oszczędnie** (autor). Przy kolejnych przedmiotach robimy jeden szkic na przedmiot, a drugi tylko dla odrzuconych. Arkusz czterech szkiców zostaje dla wyjątków, np. gdy pierwszy pomysł na wygląd nie pasuje.
+
+## Umiejętności: wybór jednej z trzech na 10. poziomie klasy (25.10.2026)
+
+Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umiejętności. Kolejne poziomy umiejętności i ich ewolucje projektujemy później. Tym razem autor poprosił o gotową propozycję, więc zasada z „Balans i nowe zakładki”, punkt 2, nie dotyczy tego kroku. Propozycja do poprawek autora: [Umiejętności klas i przedmioty od 10. poziomu klasy](https://claude.ai/artifact/HhMWeUEZSkCqPH52bJoXz1). Wdrożenie czeka na poprawki.

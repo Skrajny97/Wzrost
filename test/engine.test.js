@@ -201,22 +201,26 @@ describe('items', () => {
       }
       return found;
     };
-    const below = talismans(14);
-    assert.ok(below.length > 0 && below.every((base) => base === 'talisman'), 'no Otoczak below class level 15');
-    const from = talismans(15);
-    assert.ok(from.includes('talisman') && from.includes('holed-stone'), 'both talismans from class level 15');
+    const below = talismans(9);
+    assert.ok(below.length > 0 && below.every((base) => base === 'talisman'), 'no Otoczak below class level 10');
+    const from = talismans(10);
+    assert.ok(from.includes('talisman') && from.includes('holed-stone'), 'both talismans from class level 10');
     // A family with two bases drops no more often than one with a single base.
     assert.ok(Math.abs(from.length - below.length) < 30, `${below.length} and ${from.length} talismans`);
-    assert.equal(canUse('holed-stone', 'mage', content, 14), false);
-    assert.equal(canUse('holed-stone', 'warrior', content, 15), true);
+    assert.equal(canUse('holed-stone', 'mage', content, 9), false);
+    assert.equal(canUse('holed-stone', 'warrior', content, 10), true);
     assert.equal(canUse('holed-stone', 'mage', content), true);
+    assert.equal(itemView(generateItem({ baseId: 'holed-stone', level: 10 }, rng, content), content).classLevel, 10);
+    assert.equal(itemView(generateItem({ baseId: 'talisman', level: 10 }, rng, content), content).classLevel, null);
+    // Stronger by a flat +2–4 Witalność, the same at any item level.
+    for (const level of [6, 10, 100, 400]) {
+      const charm = generateItem({ baseId: 'talisman', level }, rng, content).implicit.value;
+      const leads = Array.from({ length: 40 }, () => generateItem({ baseId: 'holed-stone', level }, rng, content).implicit.value - charm);
+      assert.deepEqual([...new Set(leads)].sort(), [2, 3, 4], `level ${level}`);
+    }
     const stone = generateItem({ baseId: 'holed-stone', level: 10 }, rng, content);
-    const charm = generateItem({ baseId: 'talisman', level: 10 }, rng, content);
-    assert.ok(stone.implicit.value > charm.implicit.value);
-    assert.equal(itemView(stone, content).classLevel, 15);
-    assert.equal(itemView(charm, content).classLevel, null);
-    assert.deepEqual(autoEquip([], [stone], content, 'mage', 10), []);
-    assert.deepEqual(autoEquip([], [stone], content, 'mage', 15), [0]);
+    assert.deepEqual(autoEquip([], [stone], content, 'mage', 9), []);
+    assert.deepEqual(autoEquip([], [stone], content, 'mage', 10), [0]);
   });
 
   test('properties are described in Polish', () => {
@@ -444,7 +448,7 @@ describe('hunts', () => {
     assert.ok(result.items.slice(1).every((item) => item.slot !== 'weapon'));
   });
 
-  test('the Otoczak is found where the place reaches class level 15, whatever the class level', () => {
+  test('the Otoczak is found where the place reaches class level 10, whatever the class level', () => {
     // Every find is a treasure chest, one a minute.
     const hunt = { ...content.balance.hunt, findIntervalMinutes: 1 };
     const rewards = { ...content.balance.rewards, findOutcomes: { chest: 1 } };
@@ -458,10 +462,10 @@ describe('hunts', () => {
     const strong = typicalCharacter('warrior', 30, content);
     const edge = talismans({ ...strong.character, classLevel: 20 }, strong.equipped, 'windfalls-edge');
     assert.ok(edge.length > 0 && edge.every((base) => base === 'talisman'), edge.join());
-    // Class level 10 in Krucze Wykroty (11–15): the Otoczak too, worn from 15.
-    const young = typicalCharacter('warrior', 14, content);
-    const hollows = talismans({ ...young.character, classLevel: 10 }, young.equipped, 'raven-hollows');
-    assert.ok(hollows.includes('holed-stone') && hollows.includes('talisman'), hollows.join());
+    // Class level 5 in Lisie Jary (6–10): the Otoczak too, worn from 10.
+    const young = typicalCharacter('warrior', 8, content);
+    const ravines = talismans({ ...young.character, classLevel: 5 }, young.equipped, 'fox-ravines');
+    assert.ok(ravines.includes('holed-stone') && ravines.includes('talisman'), ravines.join());
   });
 
   test('a short hunt pays for its share of time, not for a whole fight', () => {
@@ -1545,14 +1549,14 @@ describe('quests from the narrator', () => {
     assert.ok(Object.keys(questLevel(120, content).chestRarities).includes(late.rarity));
   });
 
-  test('the weekly chest may hold the Otoczak from class level 15, wherever the character explores', () => {
+  test('the weekly chest may hold the Otoczak from class level 10, wherever the character explores', () => {
     const worn = content.slots.map((slot) => slot.id).filter((id) => id !== 'talisman');
     const talismans = (classLevel) =>
       Array.from({ length: 300 }, (_, i) => chestItem({ level: 12, classId: 'mage', classLevel }, worn, createRng(`tydzień-${i}`), content))
         .filter((item) => item.slot === 'talisman')
         .map((item) => item.base);
-    assert.ok(!talismans(14).includes('holed-stone'));
-    assert.ok(talismans(15).includes('holed-stone'));
+    assert.ok(!talismans(9).includes('holed-stone'));
+    assert.ok(talismans(10).includes('holed-stone'));
   });
 
   test('quests read in Polish, with the noun to go with the number', () => {

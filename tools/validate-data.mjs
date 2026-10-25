@@ -126,14 +126,20 @@ function checkReferences(data) {
     }
     // A family (a category in the game, as the talismans) is named by its
     // first base, of the same slot and kind; only its later bases ask for a
-    // class level.
+    // class level, and they are stronger by a flat bonus on the first base's
+    // numbers, not by a factor of their own.
     if (base.family !== undefined) {
       const first = basesById.get(base.family);
       if (!first || first.family !== undefined) errors.push(`item-bases.json: ${base.id} ma rodzinę "${base.family}", która nie jest pierwszą bazą kategorii`);
       else if (first.slot !== base.slot || first.kind !== base.kind) errors.push(`item-bases.json: ${base.id} ma inny slot albo rodzaj niż kategoria "${base.family}"`);
+      else if (['damageFactor', 'armorFactor', 'statFactor'].some((key) => base[key] !== first[key])) {
+        errors.push(`item-bases.json: ${base.id} ma inny współczynnik niż kategoria "${base.family}" (mocniejsza jest premią bonus)`);
+      }
       if (base.classLevel === undefined) errors.push(`item-bases.json: ${base.id} w kategorii "${base.family}" nie ma poziomu klasy (classLevel)`);
-    } else if (base.classLevel !== undefined) {
-      errors.push(`item-bases.json: ${base.id} jest pierwszą bazą kategorii i nie może wymagać poziomu klasy`);
+      if (base.bonus === undefined) errors.push(`item-bases.json: ${base.id} w kategorii "${base.family}" nie ma premii (bonus)`);
+      else if (base.bonus.max < base.bonus.min) errors.push(`item-bases.json: ${base.id} ma premię z max mniejszym niż min`);
+    } else if (base.classLevel !== undefined || base.bonus !== undefined) {
+      errors.push(`item-bases.json: ${base.id} jest pierwszą bazą kategorii i nie może wymagać poziomu klasy ani mieć premii`);
     }
   }
 

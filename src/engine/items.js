@@ -17,15 +17,19 @@ export function generateItem({ baseId, level, rarityId = 'common', element, affi
   const affixShare = rarity.affixes > 0 ? (total - baseShare) / rarity.affixes : 0;
 
   const item = { base: base.id, slot: base.slot, level, rarity: rarity.id, affixes: [] };
+  // A later base of a family is stronger by a flat bonus drawn once
+  // (`bonus` in data/item-bases.json), so its lead stays the same at any
+  // item level instead of growing with it.
+  const bonus = base.bonus ? rng.int(base.bonus.min, base.bonus.max) : 0;
   if (base.kind === 'weapon') {
     const average = weaponDamage(baseShare, base.damageFactor, content.balance);
-    const min = Math.max(1, Math.round(average * (1 - base.variance)));
-    item.damage = { min, max: Math.max(min, Math.round(average * (1 + base.variance))) };
+    const min = Math.max(1, Math.round(average * (1 - base.variance))) + bonus;
+    item.damage = { min, max: Math.max(min, Math.round(average * (1 + base.variance)) + bonus) };
     if (base.elements) item.element = element ?? rng.pick(base.elements);
   } else if (base.kind === 'armor') {
-    item.armor = Math.max(1, Math.round(baseShare * tuning.armorPerBudget * base.armorFactor));
+    item.armor = Math.max(1, Math.round(baseShare * tuning.armorPerBudget * base.armorFactor)) + bonus;
   } else {
-    const value = Math.max(1, Math.round(baseShare * tuning.statPerBudget * base.statFactor));
+    const value = Math.max(1, Math.round(baseShare * tuning.statPerBudget * base.statFactor)) + bonus;
     item.implicit = { stat: base.stat, value };
   }
 

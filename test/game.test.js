@@ -324,13 +324,13 @@ describe('equipment', () => {
     const early = await call('POST', `/api/items/${stoneId}/equip`, { cookie });
     assert.equal(early.status, 403);
     assert.equal(early.data.error.code, 'class_level');
-    assert.equal(early.data.error.message, 'Ten przedmiot założysz od poziomu klasy 15.');
+    assert.equal(early.data.error.message, 'Ten przedmiot założysz od poziomu klasy 10.');
     const bag = (await call('GET', '/api/character', { cookie })).data.character.bag;
-    assert.equal(bag.find((item) => item.id === stoneId).classLevel, 15);
+    assert.equal(bag.find((item) => item.id === stoneId).classLevel, 10);
     assert.equal(bag.find((item) => item.id === stoneId).name, 'Otoczak');
     assert.equal(bag.find((item) => item.id === charmId).classLevel, null);
     assert.equal((await call('POST', `/api/items/${charmId}/equip`, { cookie })).status, 200);
-    await (await db()).prepare('UPDATE characters SET class_level = 15').run();
+    await (await db()).prepare('UPDATE characters SET class_level = 10').run();
     assert.equal((await call('POST', `/api/items/${stoneId}/equip`, { cookie })).data.character.equipment.talisman.name, 'Otoczak');
   });
 

@@ -32,6 +32,16 @@
         "type": "integer",
         "minimum": 2
       },
+      "bonus": {
+        "description": "Premia +x dalszej bazy kategorii: stała liczba losowana z zakresu przy znalezieniu i dodawana do liczb pierwszej bazy (obrażeń broni, pancerza albo statystyki). Dalsza baza ma ten sam współczynnik co pierwsza, więc przewaga nie rośnie z poziomem przedmiotu.",
+        "type": "object",
+        "required": ["min", "max"],
+        "additionalProperties": false,
+        "properties": {
+          "min": { "type": "integer", "minimum": 1 },
+          "max": { "type": "integer", "minimum": 1 }
+        }
+      },
       "strike": {
         "description": "Wygląd ciosu w animacji walki. Bez tego pola broń fizyczna uderza wręcz, a magiczna wystrzeliwuje pocisk.",
         "enum": ["melee", "arrow", "magic"]
