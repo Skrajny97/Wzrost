@@ -1,0 +1,13 @@
+{
+  "id": "chest-sparkle",
+  "payload": {
+    "text": "a treasure chest lid creaks open, gold coins pour out jingling and scattering, then a soft magical sparkle chime, fantasy game reward, close up, no music",
+    "duration_seconds": 3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/chest-sparkle-20261025T1130-0.mp3",
+    "audio/drafts/effects/chest-sparkle-20261025T1130-1.mp3"
+  ],
+  "credits": 120
+}

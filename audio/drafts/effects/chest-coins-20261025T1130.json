@@ -1,0 +1,13 @@
+{
+  "id": "chest-coins",
+  "payload": {
+    "text": "a small wooden treasure chest opens and a handful of gold coins spill out and scatter across a wooden table, bright metallic jingling, close up, no music",
+    "duration_seconds": 2.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/chest-coins-20261025T1130-0.mp3",
+    "audio/drafts/effects/chest-coins-20261025T1130-1.mp3"
+  ],
+  "credits": 100
+}

@@ -1,0 +1,13 @@
+{
+  "id": "coins-scatter",
+  "payload": {
+    "text": "a handful of gold coins dropped onto a wooden table, scattering and settling with bright metallic jingles, close up, dry, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/coins-scatter-20261025T1130-0.mp3",
+    "audio/drafts/effects/coins-scatter-20261025T1130-1.mp3"
+  ],
+  "credits": 80
+}
