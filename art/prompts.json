@@ -1,5 +1,5 @@
 {
-  "$comment": "Prompts for tools/generate-art.mjs (Retro Diffusion). Each kind has its style, size and the approved sprites used as style references (art/references/<kind>/<id>.png). Approved sprites go to src/client/art/<kind>/<id>.png.",
+  "$comment": "Prompts for tools/generate-art.mjs (Retro Diffusion). Each kind has its style, size and the approved sprites used as style references (art/references/<kind>/<id>.png). Approved sprites go to src/client/art/<kind>/<id>.png. The portraits are the starting look: plain clothes and empty hands, as characters start with nothing. portraits-evolved holds the prompts of the earlier, well-equipped portraits, kept in art/evolution/portraits/ for the look after the first class evolution.",
   "monsters": {
     "style": "rd_pro__fantasy",
     "width": 48,
@@ -27,16 +27,16 @@
     "height": 128,
     "references": [],
     "prompts": {
-      "warrior-male": "young man warrior standing, full body from head to feet, dented iron helmet and chainmail, a round wooden shield and a sword, facing the viewer, three-quarter view, forest fantasy",
-      "warrior-female": "young woman warrior standing, full body from head to feet, dented iron helmet and chainmail, a round wooden shield and a sword, facing the viewer, three-quarter view, forest fantasy",
-      "archer-male": "young man archer standing, full body from head to feet, dark green hood and leather jacket, holding a longbow, a quiver of arrows on the back, facing the viewer, three-quarter view, forest fantasy",
-      "archer-female": "young woman archer standing, full body from head to feet, dark green hood and leather jacket, holding a longbow, a quiver of arrows on the back, facing the viewer, three-quarter view, forest fantasy",
-      "mage-male": "young man mage standing, full body from head to feet, long blue robe, holding a gnarled staff with a glowing cyan crystal, facing the viewer, three-quarter view, forest fantasy",
-      "mage-female": "young woman mage standing, full body from head to feet, long blue robe, holding a gnarled staff with a glowing cyan crystal, facing the viewer, three-quarter view, forest fantasy",
-      "cleric-male": "young man cleric standing, full body from head to feet, white and gold robe with a holy symbol, holding a silver aspergillum and a round shield, facing the viewer, three-quarter view, forest fantasy",
-      "cleric-female": "young woman cleric standing in the middle of the image, small full body figure from the top of the head to the leather boots, empty space above the head and below the feet, white and gold robe reaching the ankles with a holy symbol, holding a silver aspergillum and a round shield, facing the viewer, three-quarter view, forest fantasy",
-      "shadow-male": "young man rogue standing, full body from head to feet, black hood and a mask over the mouth, holding two daggers, facing the viewer, three-quarter view, forest fantasy",
-      "shadow-female": "young woman rogue standing, full body from head to feet, black hood and a mask over the mouth, holding two daggers, facing the viewer, three-quarter view, forest fantasy"
+      "warrior-male": "young man villager, sturdy and broad-shouldered, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a plain undyed linen shirt with rolled sleeves, a rope belt, patched brown trousers and cloth-wrapped feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy",
+      "warrior-female": "young woman villager, sturdy and broad-shouldered, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a plain undyed linen shirt with rolled sleeves, a rope belt, patched brown trousers and cloth-wrapped feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy",
+      "archer-male": "young man forager, lean, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a faded green linen shirt, a short patched hooded cape, worn trousers and soft leather wraps on the feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy",
+      "archer-female": "young woman forager, lean, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a faded green linen shirt, a short patched hooded cape, worn trousers and soft leather wraps on the feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy",
+      "mage-male": "young man apprentice, thin, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a faded blue patched wool tunic down to the knees, a rope belt and cloth-wrapped feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy",
+      "mage-female": "young woman apprentice, thin, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a faded blue patched wool tunic down to the knees, a rope belt and cloth-wrapped feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy",
+      "cleric-male": "young man novice, calm, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a simple undyed cream linen tunic down to the ankles, a rope belt, a small wooden pendant on a cord and cloth-wrapped feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy",
+      "cleric-female": "young woman novice, calm, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a simple undyed cream linen tunic down to the ankles, a rope belt, a small wooden pendant on a cord and cloth-wrapped feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy",
+      "shadow-male": "young man vagabond, wiry, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a ragged dark grey tunic, a frayed scarf pulled over the mouth, worn trousers and cloth-wrapped feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy",
+      "shadow-female": "young woman vagabond, wiry, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a ragged dark grey tunic, a frayed scarf pulled over the mouth, worn trousers and cloth-wrapped feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy"
     }
   },
   "items": {
@@ -77,6 +77,24 @@
       "narrator-light": "ethereal almighty narrator, a tall genderless figure woven from soft golden and white light, a long flowing robe of light with a deep hood, no visible face, only a gentle glow inside the hood, motes of light drifting around, holding an unrolled glowing parchment scroll in front of it and reading from it, floating above the ground, full body, otherworldly, facing the viewer",
       "narrator-stars": "ethereal almighty narrator, a genderless hooded figure whose translucent robe is a piece of the night sky full of stars and a faint violet nebula, no visible face, two soft white lights for eyes, tiny sparkles around, holding an unrolled glowing parchment scroll in front of it and reading from it, floating above the ground, full body, otherworldly, facing the viewer",
       "narrator-dawn": "ethereal almighty narrator, a serene genderless figure of pale gold and rose light like the first light of dawn, a softly glowing translucent robe, long flowing hair made of light, eyes closed, small leaves and motes of light around, holding an unrolled glowing parchment scroll in front of it and reading from it, floating above the ground, full body, otherworldly, facing the viewer"
+    }
+  },
+  "portraits-evolved": {
+    "style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "references": [],
+    "prompts": {
+      "warrior-male": "young man warrior standing, full body from head to feet, dented iron helmet and chainmail, a round wooden shield and a sword, facing the viewer, three-quarter view, forest fantasy",
+      "warrior-female": "young woman warrior standing, full body from head to feet, dented iron helmet and chainmail, a round wooden shield and a sword, facing the viewer, three-quarter view, forest fantasy",
+      "archer-male": "young man archer standing, full body from head to feet, dark green hood and leather jacket, holding a longbow, a quiver of arrows on the back, facing the viewer, three-quarter view, forest fantasy",
+      "archer-female": "young woman archer standing, full body from head to feet, dark green hood and leather jacket, holding a longbow, a quiver of arrows on the back, facing the viewer, three-quarter view, forest fantasy",
+      "mage-male": "young man mage standing, full body from head to feet, long blue robe, holding a gnarled staff with a glowing cyan crystal, facing the viewer, three-quarter view, forest fantasy",
+      "mage-female": "young woman mage standing, full body from head to feet, long blue robe, holding a gnarled staff with a glowing cyan crystal, facing the viewer, three-quarter view, forest fantasy",
+      "cleric-male": "young man cleric standing, full body from head to feet, white and gold robe with a holy symbol, holding a silver aspergillum and a round shield, facing the viewer, three-quarter view, forest fantasy",
+      "cleric-female": "young woman cleric standing in the middle of the image, small full body figure from the top of the head to the leather boots, empty space above the head and below the feet, white and gold robe reaching the ankles with a holy symbol, holding a silver aspergillum and a round shield, facing the viewer, three-quarter view, forest fantasy",
+      "shadow-male": "young man rogue standing, full body from head to feet, black hood and a mask over the mouth, holding two daggers, facing the viewer, three-quarter view, forest fantasy",
+      "shadow-female": "young woman rogue standing, full body from head to feet, black hood and a mask over the mouth, holding two daggers, facing the viewer, three-quarter view, forest fantasy"
     }
   }
 }
