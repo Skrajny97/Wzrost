@@ -1171,7 +1171,7 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
 2. **Pytanie przed wprowadzeniem.** Pierwszy pergamin pyta słowami autora: „Czy chcesz przejść Wprowadzenie? Pomoże ono zaznajomić Ci się z Systemem, ale jeśli z niego zrezygnujesz – nie stracisz żadnych uzyskanych w Samouczku zasobów.” Myślnik autora stał się półpauzą, jak w innych kwestiach narratora.
     - „Wprowadź mnie” prowadzi dalej, a pod nim mniejszą czcionką stoi „zalecane”.
     - „Pomiń wprowadzenie” kończy wprowadzenie z tym samym startem, co przejście go (zob. „Ten sam start po pominięciu i spokojniejsze pergaminy”).
-    - Pergamin nie ma jeszcze nagrania: autor zdecyduje, czy go nagrać.
+    - Pergamin nie ma jeszcze nagrania: autor zdecyduje, czy go nagrać. *Decyzja autora: to pergamin autora, nie narratora, więc bez nagrania i bez postaci narratora: zob. „Panel autora i pergamin od autora”.*
 3. **„???” w zadaniach.** Autor: stwór, którego postać jeszcze nie spotkała, ma w zadaniu „???” zamiast nazwy, tak jak sylwetki w „Czyhających niebezpieczeństwach”. Nazwa pokazuje się po pierwszym spotkaniu.
 4. **Ekran należy do narratora.** Autor: w trakcie Samouczka gracz nie może przewijać ekranu ani nic robić, także w krótkich przerwach, jakby dotyk był wyłączony. Od pierwszego pergaminu do ostatniego nad grą leży przezroczysta warstwa (`narrator-hold` w `src/client/narrator.js`), a przewijanie palcem, kółkiem i klawiszami jest zablokowane.
     - Stuknięcia trafiają tylko do przycisków narratora, do miejsca, które narrator każe stuknąć, i do okien, które gra otwiera po drodze, np. pytania przy „Przewiń”.
@@ -1199,3 +1199,23 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - Ekran budynku pokazuje też jego poziomy czekające w kolejce, z godziną startu.
     - Pod planszą obozu stoi lista „Kolejka budowy: 2 z 3” z godzinami startu, a nad placem czekającego budynku napis „w kolejce”.
 7. **Bez wycofywania.** Na razie budowy z kolejki nie da się wycofać, bo to najprostsze rozwiązanie. Jeśli autor chce przycisk „Anuluj” ze zwrotem kosztu, dodamy go.
+
+## Panel autora i pergamin od autora (25.10.2026)
+
+1. **Panel autora.** Autor zapytał o zawsze dostępną listę kont i postaci z imionami i podpiętymi adresami e-mail albo kontami Google. Zgodził się na panel w grze, widoczny tylko dla swojego konta.
+    - Ustawienia konta autora mają przycisk „Panel autora”, który otwiera ekran `#/autor` (`src/client/screens/author.js`).
+    - Na górze ekranu są liczby: konta (i nowe w ostatnich 24 h), postacie (i nowe w ostatnich 24 h) oraz konta połączone z Google.
+    - Pod nimi jest każde konto, od najnowszego: login, adres e-mail, znaczek „Google”, postać z klasą i poziomami oraz data założenia konta. Lista mieści do 1000 kont.
+    - Dane czyta serwer przy każdym wejściu i po „Odśwież” (`GET /api/author`, `src/server/author.js`), więc są zawsze aktualne, bez czekania na godzinę.
+2. **Tylko konto autora.** Panel widzi konto z listy `AUTHOR_LOGINS` w `wrangler.jsonc` (teraz „Skrajny”), i tylko wtedy, gdy jest połączone z Google. Takie konto ma tryb testowy, więc otwiera się już tylko przez Google, nie hasłem. Każdy inny dostaje „nie znaleziono”, a strona nie pokazuje mu przycisku.
+3. **Adresy e-mail.** Gra nie zna imion graczy: zna loginy, imiona postaci i adresy e-mail.
+    - Konto założone przez Google ma adres, który Google potwierdził.
+    - Od teraz konto, które połączyło Google później, dostaje ten adres przy łączeniu albo przy najbliższym logowaniu przez Google, jeśli nie miało żadnego, a żadne inne konto go nie ma (`keepEmail` w `src/server/google.js`).
+    - Adres wpisany przy rejestracji zostaje bez zmian.
+    - Lista nie wychodzi poza grę: dane innych osób zostają za logowaniem autora.
+4. **Pergamin od autora.** Autor: pierwszy pergamin nie jest pergaminem narratora, tylko autora. Nie trzeba go nagrywać ani stawiać przy nim postaci narratora.
+    - Karta ma w danych `speaker: "author"` (`data/tutorial.json`).
+    - W miejscu „Narrator” jest podpisana „Autor” (`authorLabel`) i nie ma nad nią postaci narratora.
+    - Walidacja pilnuje, żeby taka karta nie miała nagrania ani wersji żeńskiej.
+    - Narrator pojawia się od następnej karty.
+5. **Wielkość widoku.** Autor: przyciski „−” i „+” wystarczą w Ustawieniach. Zostają tylko tam.

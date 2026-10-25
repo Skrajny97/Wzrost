@@ -4,6 +4,7 @@ import { googleConfigured } from './google.js';
 import { ApiError, json, readJson } from './http.js';
 import { hashPassword, needsRehash, verifyPassword } from './passwords.js';
 import { testModeFor } from './test-mode.js';
+import { isAuthor } from './author.js';
 import {
   clearedSessionCookie,
   createSession,
@@ -85,7 +86,7 @@ export async function register({ request, env, now }) {
   }
 
   const session = await createSession(db, userId, now);
-  return json({ user: { login, email, createdAt: now, google: false, testMode: testModeFor(env, login) } }, 201, {
+  return json({ user: { login, email, createdAt: now, google: false, testMode: testModeFor(env, login), author: false } }, 201, {
     'Set-Cookie': sessionCookie(session.token, session.expiresAt, now),
   });
 }
@@ -150,6 +151,7 @@ export async function login({ request, env, now }) {
         createdAt: user.created_at,
         google: user.google_sub !== null,
         testMode: testModeFor(env, user.login),
+        author: isAuthor(env, { login: user.login, google: user.google_sub !== null }),
       },
     },
     200,
@@ -194,5 +196,6 @@ export async function me(context) {
   const session = await requireSession(context);
   const expiresAt = await refreshSession(context.env.DB, session, context.now);
   const headers = expiresAt ? { 'Set-Cookie': sessionCookie(session.token, expiresAt, context.now) } : {};
-  return json({ user: { ...session.user, testMode: testModeFor(context.env, session.user.login) } }, 200, headers);
+  const user = { ...session.user, testMode: testModeFor(context.env, session.user.login), author: isAuthor(context.env, session.user) };
+  return json({ user }, 200, headers);
 }

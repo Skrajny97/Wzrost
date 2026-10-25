@@ -1056,6 +1056,9 @@ describe('Time Points and the narrator', () => {
     assert.deepEqual(cards, ['ask', 'intro', 'purpose', 'test', 'report', 'ending']);
     // The first card asks whether to go through the introduction.
     assert.deepEqual([data.tutorial.startLabel, data.tutorial.recommendedLabel, data.tutorial.skipLabel], ['Wprowadź mnie', 'zalecane', 'Pomiń wprowadzenie']);
+    // The first card is the author's: signed so, with no narrator and no recording.
+    const ask = data.tutorial.lines[0];
+    assert.deepEqual([ask.id, ask.speaker, ask.voice ?? null, data.tutorial.authorLabel], ['ask', 'author', null, 'Autor']);
     assert.deepEqual([data.tutorial.hideLabel, data.tutorial.showLabel], ['Ukryj', 'Pokaż pergamin']);
     assert.equal(data.tutorial.startTimePoints, start);
     assert.equal(data.tutorial.$comment, undefined);

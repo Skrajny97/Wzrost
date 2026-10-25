@@ -9,6 +9,7 @@
     "nextLabel",
     "startLabel",
     "recommendedLabel",
+    "authorLabel",
     "hideLabel",
     "showLabel",
     "skippedText",
@@ -36,6 +37,11 @@
       "type": "string",
       "minLength": 1,
       "description": "Mniejszy napis pod startLabel."
+    },
+    "authorLabel": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Podpis karty od autora gry (speaker: author) w miejscu „Narrator”."
     },
     "hideLabel": {
       "type": "string",
@@ -143,6 +149,10 @@
             "type": "string",
             "pattern": "^audio/narration/[a-z0-9-]+\\.mp3$",
             "description": "Nagranie kwestii, gdy już jest."
+          },
+          "speaker": {
+            "const": "author",
+            "description": "Karta od autora gry, nie od narratora: bez postaci narratora i bez nagrania."
           },
           "female": {
             "type": "object",

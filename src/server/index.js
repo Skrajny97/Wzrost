@@ -2,6 +2,7 @@
 // Assets before this code runs; only /api/* and unknown paths reach the Worker.
 
 import { deleteAccount, login, logout, me, register } from './accounts.js';
+import { authorPanel } from './author.js';
 import { collectProduction, startBuilding } from './camp.js';
 import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
 import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, spendPoints } from './characters.js';
@@ -25,6 +26,7 @@ const routes = [
   ['GET', '/api/auth/google/callback', googleCallback],
   ['GET', '/api/me', me],
   ['DELETE', '/api/me', deleteAccount],
+  ['GET', '/api/author', authorPanel],
   ['GET', '/api/content', () => json(publicContent())],
   ['GET', '/api/character', getCharacter],
   ['POST', '/api/character', createCharacter],

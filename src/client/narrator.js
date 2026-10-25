@@ -307,7 +307,8 @@ function speak(line) {
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// The card: the figure above a scroll in the middle of the screen.
+// The card: the figure above a scroll in the middle of the screen. A card
+// from the author of the game (speaker "author") has no figure.
 function openCard(line) {
   const dialog = h('dialog', { class: 'narrator', 'aria-labelledby': 'narrator-label' });
   // Escape passes the card, like "Dalej".
@@ -317,10 +318,11 @@ function openCard(line) {
   });
   const sheet = h('div', { class: 'narrator-sheet' });
   const show = h('button', { type: 'button', class: 'button narrator-show', onClick: showCard }, icon('eye', { size: 18 }), state.content.tutorial.showLabel);
-  dialog.append(h('div', { class: 'narrator-art' }, narratorSprite()), h('div', { class: 'narrator-scroll' }, rod(), sheet, rod()), show);
+  const art = h('div', { class: 'narrator-art' }, narratorSprite());
+  dialog.append(art, h('div', { class: 'narrator-scroll' }, rod(), sheet, rod()), show);
   document.body.append(dialog);
   hold();
-  scroll = { dialog, sheet, line, busy: true, hidden: false };
+  scroll = { dialog, sheet, art, line, busy: true, hidden: false };
   const { voice } = told(line);
   if (voice && narratorVoiceOn()) preloadNarration(voice);
   write(line);
@@ -331,6 +333,8 @@ function openCard(line) {
 
 function write(line) {
   const tutorial = state.content.tutorial;
+  const author = line.speaker === 'author';
+  scroll.art.hidden = author;
   fill(
     scroll.sheet,
     h(
@@ -339,7 +343,7 @@ function write(line) {
       h(
         'div',
         { class: 'narrator-head' },
-        h('p', { class: 'narrator-label', id: 'narrator-label', text: 'Narrator' }),
+        h('p', { class: 'narrator-label', id: 'narrator-label', text: author ? tutorial.authorLabel : 'Narrator' }),
         h('button', { type: 'button', class: 'narrator-hide', onClick: hideCard }, icon('eye-off', { size: 16 }), tutorial.hideLabel),
       ),
       h('div', { class: 'narrator-text' }, words(line).map((text) => h('p', { text }))),

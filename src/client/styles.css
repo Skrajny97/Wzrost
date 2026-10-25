@@ -4923,3 +4923,77 @@ a.segmented-option {
 .calm .arena-banner {
   transition: none;
 }
+
+/* The author's panel (screens/author.js): the counts in tiles, then every
+   account as a card, newest first. */
+.author-counts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.author-count {
+  display: grid;
+  gap: 2px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  text-align: center;
+}
+
+.author-count strong {
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 22px;
+}
+
+.author-count-label,
+.author-count-note {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.author-accounts {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.author-account p {
+  margin: 0;
+}
+
+.author-account {
+  display: grid;
+  gap: 4px;
+}
+
+.author-account-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.author-google {
+  padding: 1px 6px;
+  border: 1px solid var(--system-line);
+  border-radius: 4px;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 12px;
+}
+
+.author-account-mail {
+  overflow-wrap: anywhere;
+}
+
+.author-account-date {
+  color: var(--text-muted);
+  font-size: 13px;
+}

@@ -34,6 +34,9 @@
     // The accounts that get test mode in the live game (comma-separated, any
     // case); empty gives it to everyone. Tests and `npm run dev` empty it.
     "TEST_LOGINS": "Skrajny",
+    // The accounts that see the author's panel (comma-separated, any case),
+    // once bound to Google (src/server/author.js). Empty: nobody.
+    "AUTHOR_LOGINS": "Skrajny",
     // The addresses whose Google sign-in return address
     // (https://<address>/api/auth/google/callback) is registered in Google
     // Cloud Console; a sign-in started elsewhere moves to the first one.

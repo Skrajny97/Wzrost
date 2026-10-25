@@ -16,8 +16,9 @@ const { server, call, db } = useServer({
   GOOGLE_CLIENT_SECRET: 'test-secret',
   GOOGLE_TOKEN_URL: google.url,
   GOOGLE_HOSTS: 'insightrpg.com,localhost,127.0.0.1',
-  // Only this account has test mode here.
+  // Only this account has test mode here, and the author's panel.
   TEST_LOGINS: 'szef',
+  AUTHOR_LOGINS: 'szef',
 });
 
 async function fakeGoogle() {
@@ -224,6 +225,35 @@ describe('Google sign-in', () => {
     await signIn(codeFor(claims('google-gracz2')), { cookie: player.cookie, mode: 'link' });
     assert.equal((await call('POST', '/api/auth/login', { body: { identifier: 'gracz2', password: 'tajnehaslo1' } })).status, 200);
     assert.equal((await call('GET', '/api/me', { cookie: player.cookie })).status, 200);
+  });
+
+  test("the author's panel: only the author's account bound to Google sees every account with its e-mail", async () => {
+    const author = await call('POST', '/api/auth/register', { body: { login: 'szef', password: 'tajnehaslo1' } });
+    // Not yet bound to Google: a password alone does not open it.
+    assert.equal((await call('GET', '/api/me', { cookie: author.cookie })).data.user.author, false);
+    assert.equal((await call('GET', '/api/author', { cookie: author.cookie })).status, 404);
+    await signIn(codeFor(claims('google-szef')), { cookie: author.cookie, mode: 'link' });
+    assert.equal((await call('GET', '/api/me', { cookie: author.cookie })).data.user.author, true);
+
+    const player = await call('POST', '/api/auth/register', { body: { login: 'gracz', password: 'tajnehaslo1' } });
+    await call('POST', '/api/character', { cookie: player.cookie, body: { name: 'Wędrowiec', classId: 'mage', appearance: 'female' } });
+    await signIn(codeFor(claims('nowy-gracz')));
+    // Another player sees nothing.
+    assert.equal((await call('GET', '/api/author', { cookie: player.cookie })).status, 404);
+    assert.equal((await call('GET', '/api/me', { cookie: player.cookie })).data.user.author, false);
+
+    const panel = (await call('GET', '/api/author', { cookie: author.cookie })).data;
+    assert.deepEqual(panel.counts, { accounts: 3, google: 2, newAccounts: 3, characters: 1, newCharacters: 1 });
+    assert.deepEqual(
+      panel.accounts.map((account) => [account.login, account.email, account.google, account.character?.name ?? null]),
+      [
+        ['nowy-gracz', 'nowy-gracz@gmail.com', true, null],
+        ['gracz', null, false, 'Wędrowiec'],
+        // The e-mail Google confirmed is kept when Google is linked.
+        ['szef', 'google-szef@gmail.com', true, null],
+      ],
+    );
+    assert.deepEqual(panel.accounts[1].character, { ...panel.accounts[1].character, className: 'Mag', level: 1, classLevel: 1 });
   });
 
   test('a return without the flow cookie, with another state or a refusal signs nobody in', async () => {

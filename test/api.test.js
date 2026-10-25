@@ -35,7 +35,8 @@ describe('registration', () => {
       password: 'tajnehaslo1',
     });
     assert.equal(status, 201);
-    assert.deepEqual(Object.keys(data.user).sort(), ['createdAt', 'email', 'google', 'login', 'testMode']);
+    assert.deepEqual(Object.keys(data.user).sort(), ['author', 'createdAt', 'email', 'google', 'login', 'testMode']);
+    assert.equal(data.user.author, false);
     assert.equal(data.user.google, false);
     // In tests every account has test mode (test/helpers/server.js).
     assert.equal(data.user.testMode, true);

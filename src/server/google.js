@@ -74,10 +74,11 @@ export async function googleCallback({ request, env, now }) {
     const session = await getSession(db, request, now);
     if (flow.mode === 'link') {
       if (!session) return finish('/?google=expired');
-      return finish(`/?google=${await linkGoogle(db, env, session, identity.sub)}`);
+      return finish(`/?google=${await linkGoogle(db, env, session, identity)}`);
     }
 
     let user = await userByGoogle(db, identity.sub);
+    if (user) await keepEmail(db, user.id, identity.email);
     if (!user) {
       // An account with the same e-mail may belong to the same person, who
       // signs in with the password and links Google in the settings. It is
@@ -177,7 +178,7 @@ async function createGoogleUser(db, identity, now) {
 }
 
 // Links the Google account to the player's account; returns how it went.
-async function linkGoogle(db, env, session, sub) {
+async function linkGoogle(db, env, session, { sub, email }) {
   const owner = await userByGoogle(db, sub);
   if (owner && owner.id !== session.userId) return 'taken';
   try {
@@ -187,6 +188,7 @@ async function linkGoogle(db, env, session, sub) {
     if (String(error?.message).includes('users.google_sub')) return 'taken';
     throw error;
   }
+  await keepEmail(db, session.userId, email);
   // An account with test mode opens only with Google from now on
   // (accounts.js), so its other sessions, opened with the password, end.
   if (testModeFor(env, session.user.login)) {
@@ -196,6 +198,17 @@ async function linkGoogle(db, env, session, sub) {
 }
 
 const userByGoogle = (db, sub) => db.prepare('SELECT id FROM users WHERE google_sub = ?').bind(sub).first();
+
+// The e-mail Google confirmed, kept for an account that has none yet (one
+// linked to Google after it was made), unless another account has it. The
+// author's panel shows it (author.js).
+async function keepEmail(db, userId, email) {
+  if (!email) return;
+  await db
+    .prepare('UPDATE users SET email = ? WHERE id = ? AND email IS NULL AND NOT EXISTS (SELECT 1 FROM users WHERE email = ?)')
+    .bind(email, userId, email)
+    .run();
+}
 
 function registeredHosts(env) {
   return String(env.GOOGLE_HOSTS ?? '')

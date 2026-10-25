@@ -9,6 +9,7 @@ import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
 import { buildTopbar, showPouch, showWallet, updateNav, updateTopbar } from './layout.js';
 import { showQuests, watchQuests } from './quests.js';
+import { mountAuthor } from './screens/author.js';
 import { mountCamp } from './screens/camp.js';
 import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
@@ -48,6 +49,8 @@ const ROUTES = [
   // The camp is a tab of its own, in the top bar (`lit`), but not one to
   // come back to with "Powrót".
   { pattern: /^#\/oboz(?:\/(?<building>[a-z0-9-]+))?$/, nav: 'main', tab: null, lit: 'oboz', mount: mountCamp },
+  // The author's panel, from the settings of the author's account.
+  { pattern: /^#\/autor$/, nav: 'main', tab: null, mount: mountAuthor },
 ];
 const HOME = '#/walka';
 
@@ -442,6 +445,7 @@ function openSettings() {
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
     ),
     installButton(),
+    state.user.author && h('a', { class: 'button button--system', href: '#/autor', onClick: closeSheet, text: 'Panel autora' }),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
     h('button', { type: 'button', class: 'button button--danger', onClick: startOver, text: 'Zacznij od nowa' }),
     h('button', { type: 'button', class: 'button button--danger', onClick: deleteAccount, text: 'Usuń konto' }),

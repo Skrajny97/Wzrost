@@ -351,6 +351,8 @@ function checkReferences(data) {
     errors.push(`tutorial.json: firstSteps ma nieznany budynek "${firstSteps.buildingId}"`);
   }
   for (const line of data.tutorial.lines) {
+    // A card from the author is read by nobody.
+    if (line.speaker === 'author' && (line.voice || line.female)) errors.push(`tutorial.json: ${line.id} jest od autora i nie ma nagrania ani wersji żeńskiej`);
     for (const voice of [line.voice, line.female?.voice]) {
       if (voice && !existsSync(new URL(voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${voice}`);
     }
