@@ -142,10 +142,10 @@ describe('items', () => {
   test('names agree with the grammatical gender of the base', () => {
     const rng = createRng('nazwy');
     const named = (baseId, affixIds) => itemName(generateItem({ baseId, level: 1, rarityId: 'unique', affixIds }, rng, content), content);
-    assert.equal(named('sword', ['wolf', 'mist']), 'Wilczy Miecz Mgły');
-    assert.equal(named('shield', ['wolf', 'mist']), 'Wilcza Tarcza Mgły');
-    assert.equal(named('aspergillum', ['wolf', 'mist']), 'Wilcze Kropidło Mgły');
-    assert.equal(named('boots', ['oak', 'leshy']), 'Dębowe Buty Leszego');
+    assert.equal(named('sword', ['wolf', 'mist']), 'Wilczy Miecz Rysia');
+    assert.equal(named('shield', ['wolf', 'mist']), 'Wilcza Tarcza Rysia');
+    assert.equal(named('aspergillum', ['wolf', 'mist']), 'Wilcze Kropidło Rysia');
+    assert.equal(named('boots', ['oak', 'leshy']), 'Dzicze Buty Puszczyka');
     assert.equal(itemName(generateItem({ baseId: 'bow', level: 1 }, rng, content), content), 'Łuk');
   });
 

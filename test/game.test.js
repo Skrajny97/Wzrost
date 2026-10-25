@@ -410,7 +410,7 @@ describe('equipment', () => {
     await database.batch(migration.map((statement) => database.prepare(statement)));
 
     const clericView = (await call('GET', '/api/character', { cookie: cleric.owner })).data.character;
-    assert.equal(clericView.equipment.head.name, 'Sowia Kapuza');
+    assert.equal(clericView.equipment.head.name, 'Puszczykowa Kapuza');
     assert.equal(clericView.equipment.chest.name, 'Komża');
     assert.deepEqual(clericView.equipment.chest.classNames, ['Kleryk']);
     assert.deepEqual(clericView.bag.map((item) => item.name), ['Komża']);

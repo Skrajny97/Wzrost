@@ -13,7 +13,7 @@ import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, 
 
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 
-// An item's name with its upgrade, e.g. "Miecz Mgły +3".
+// An item's name with its upgrade, e.g. "Miecz Rysia +3".
 export const itemTitle = (item) => (item.upgrade > 0 ? `${item.name} +${item.upgrade}` : item.name);
 
 // The number in the corner of a slot: the upgrade level.

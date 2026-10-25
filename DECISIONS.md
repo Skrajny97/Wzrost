@@ -939,3 +939,29 @@ Przygotowanie do Sklepu Play było zleceniem „na przyszłość”, a dwie zmia
 
 1. **Trudności walki nie stroimy przed umiejętnościami, treningiem i towarzyszami.** Autor: bez umiejętności gra ma prawo być trudna, a wkrótce dojdą umiejętności, trening i być może werbunek drugiej postaci do drużyny. [Dokument o balansie](https://claude.ai/artifact/S3PbhSWFPG1v4w93biGPPR) mierzy grę bez tych systemów, więc jego zmiany walki czekają. Symulację (`tools/progression/`) powtórzymy, gdy te systemy będą w grze.
 2. **Umiejętności, profesje i trening autor przedstawia krok po kroku.** Nie przygotowujemy gotowych planów tych zakładek, a propozycje z 24.10.2026 są nieaktualne. Zasada od autora: umiejętności nie otwierają się wszystkie do poziomu 50, skoro postać może dojść do poziomu 500.
+
+## Afiksy od potworów (25.10.2026)
+
+Autor: afiksy mają nawiązywać do potworów, z których wypadają, a nie polujemy na sowy, więc bez „Sowich” przedmiotów. Na razie zmieniają się tylko nazwy w `data/affixes.json`. Identyfikatory, statystyki i wagi zostają, więc przedmioty, które gracze już mają, same dostają nowe nazwy. Statystyka pasuje do zwierzęcia:
+
+| Było | Teraz | Daje |
+| --- | --- | --- |
+| Zwinny | Lisi | Zręczność |
+| Dębowy | Dziczy | Witalność |
+| Kamienny | Borsuczy | Wytrzymałość |
+| Kryształowy | Kruczy | Intelekt |
+| Sowi | Puszczykowy | Mądrość |
+| Nieugięty | Żmijowy | Wola |
+| Żelazny | Pajęczy (od Krzyżaka) | Pancerz |
+| Tura | Basiora | Siła |
+| Mgły | Rysia | Zręczność |
+| Korzeni | Niedźwiedzia | Witalność |
+| Twierdzy | Borsuka | Pancerz |
+| Iskry | Lisa | Intelekt |
+| Leszego | Puszczyka | Mądrość |
+| Ciszy | Dzika | Wola |
+| Żaru | Błędnicy | Odporność na ogień |
+| Szronu | Licha | Odporność na mróz |
+| Jadu | Żmii | Odporność na truciznę |
+
+Niedźwiedzi, Wilczy, Rysi i Kruka już nosiły nazwy potworów i zostają. Pięć przyrostków odporności (Topieli, Burzy, Skał, Mchu, Kapliczki) zostaje, dopóki nie pojawią się potwory wody, elektryczności, ziemi, natury i sakrum. Afiksy nadal losują się z całej listy, bez względu na potwora z walki.
