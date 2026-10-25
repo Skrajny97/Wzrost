@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, generateItem, itemName, questPeriod, xpToNext } from '../src/engine/index.js';
+import { createRng, generateItem, itemName, questPeriod, upgradeCost, xpToNext } from '../src/engine/index.js';
 import { skipTime } from '../src/server/testing.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -832,6 +832,46 @@ describe('camp', () => {
     // Its store was full (2 hours, 12 wood) when the upgrade started, and went to the resources.
     assert.equal(later.resources.wood, wood + 12);
     assert.deepEqual([find(later, 'sawmill').level, find(later, 'craft-table').level], [2, 2]);
+  });
+
+  test('"Anuluj" gives a waiting build its whole cost back, with the higher levels that need it', async () => {
+    await stock(1000, { wood: 200, stone: 100, 'iron-ore': 50 });
+    const cost = (id, level) => upgradeCost(content.buildingsById[id], level);
+    await build('sawmill');
+    await build('sawmill');
+    const before = (await build('quarry')).data.character;
+    const [sawmill, quarry] = before.camp.queue;
+    assert.deepEqual([sawmill.cost, quarry.cost], [cost('sawmill', 2), cost('quarry', 1)]);
+    // The Tartak's level 2 called off: what it cost comes back, and the
+    // Kamieniołom moves up to start as the build under way ends.
+    const cancelled = await call('POST', '/api/camp/cancel', { cookie, body: { buildingId: 'sawmill', level: 2 } });
+    assert.equal(cancelled.status, 200);
+    assert.deepEqual(cancelled.data.refund, cost('sawmill', 2));
+    const after = cancelled.data.character;
+    assert.equal(after.gold, before.gold + cost('sawmill', 2).gold);
+    assert.deepEqual(after.resources, { wood: before.resources.wood + cost('sawmill', 2).wood, stone: before.resources.stone + cost('sawmill', 2).stone, 'iron-ore': 50 });
+    assert.deepEqual(after.camp.queue.map((entry) => [entry.buildingId, entry.level, entry.startsAt]), [['quarry', 1, before.camp.construction.endsAt]]);
+    assert.equal(find(after, 'sawmill').next.level, 2);
+    assert.equal((await call('POST', '/api/camp/cancel', { cookie, body: { buildingId: 'sawmill', level: 2 } })).data.error.code, 'not_queued');
+    // A level with a higher one waiting after it takes that one along.
+    await build('quarry');
+    const both = (await call('POST', '/api/camp/cancel', { cookie, body: { buildingId: 'quarry', level: 1 } })).data;
+    assert.deepEqual(both.cancelled, [{ buildingId: 'quarry', level: 1 }, { buildingId: 'quarry', level: 2 }]);
+    assert.deepEqual(both.refund, { gold: cost('quarry', 1).gold + cost('quarry', 2).gold, wood: cost('quarry', 1).wood + cost('quarry', 2).wood, stone: cost('quarry', 1).stone + cost('quarry', 2).stone });
+    assert.deepEqual(both.character.camp.queue, []);
+    assert.equal(both.character.gold, 1000 - cost('sawmill', 1).gold);
+  });
+
+  test('a camp level called off makes the builds after it slow again', async () => {
+    await stock(3000, { wood: 100, stone: 50 });
+    await build('craft-table');
+    await call('POST', '/api/test/skip-build', { cookie });
+    await build('sawmill');
+    await build('camp');
+    const fast = (await build('craft-table')).data.character.camp.queue[1];
+    assert.equal(fast.endsAt - fast.startsAt, 9 * 60000);
+    const slow = (await call('POST', '/api/camp/cancel', { cookie, body: { buildingId: 'camp', level: 2 } })).data.character.camp.queue[0];
+    assert.deepEqual([slow.buildingId, slow.level, slow.endsAt - slow.startsAt], ['craft-table', 2, 10 * 60000]);
   });
 
   test('a full queue in a growing camp: the camp too can wait in the queue', async () => {

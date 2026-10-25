@@ -72,8 +72,9 @@ export function initSheet() {
 
 // Asks before something that cannot be undone. Resolves to true or false.
 // With `typed`, the confirm button waits until that word is typed in, as the
-// account's login before deleting the account.
-export function confirmAction({ title, text, confirmLabel, danger = false, typed = null }) {
+// account's login before deleting the account. `cancelLabel` names the way
+// back when "Anuluj" is the thing asked about.
+export function confirmAction({ title, text, confirmLabel, cancelLabel = 'Anuluj', danger = false, typed = null }) {
   return new Promise((resolve) => {
     let answered = false;
     const answer = (value) => {
@@ -106,7 +107,7 @@ export function confirmAction({ title, text, confirmLabel, danger = false, typed
       h('h2', { class: 'sheet-title', text: title }),
       h('p', { class: 'sheet-text', text }),
       input && h('div', { class: 'field' }, h('label', { for: 'confirm-typed', text: `Wpisz „${typed}”, żeby potwierdzić.` }), input),
-      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: () => answer(false), text: 'Anuluj' }), confirm),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: () => answer(false), text: cancelLabel }), confirm),
     );
     dialog.addEventListener('close', () => answer(false), { once: true });
   });

@@ -15,7 +15,7 @@ import { RESOURCE_ICONS } from '../icons.js';
 import { playSound } from '../sound.js';
 import { call, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
 import { skipControl } from '../time.js';
-import { guided, systemPanel, toast, withButton } from '../ui.js';
+import { confirmAction, guided, systemPanel, toast, withButton } from '../ui.js';
 
 const CAMP = '#/oboz';
 const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
@@ -51,7 +51,38 @@ function moment(ms) {
 // The builds the camp has now: the one under way and the waiting ones.
 const underWay = () => (runningBuild() ? 1 : 0) + state.character.camp.queue.length;
 
-// The builds waiting after the one under way, each with the time it starts.
+// "Anuluj" by a waiting build: after a question, it leaves the queue with
+// the higher levels of the same building after it, and its cost comes back.
+async function cancelBuild(entry) {
+  const later = state.character.camp.queue.filter((other) => other.buildingId === entry.buildingId && other.level > entry.level);
+  const cost = entry.cost && Object.entries(entry.cost).map(([id, amount]) => `${resourceName(id).toLowerCase()} ${formatNumber(amount)}`);
+  const sure = await confirmAction({
+    title: 'Anulować budowę?',
+    text: [
+      `${entry.name}, poziom ${entry.level}: koszt wróci w całości${cost ? ` (${cost.join(', ')})` : ''}.`,
+      later.length > 0 && `Z kolejki wypadnie też ${later.map((other) => `poziom ${other.level}`).join(' i ')}, bo go potrzebuje, i jego koszt również wróci.`,
+    ]
+      .filter(Boolean)
+      .join(' '),
+    confirmLabel: 'Anuluj budowę',
+    cancelLabel: 'Zostaw',
+  });
+  if (!sure) return;
+  await call('POST', '/api/camp/cancel', { buildingId: entry.buildingId, level: entry.level });
+  toast(`Anulowano: ${entry.name}, poziom ${entry.level}. Koszt wrócił.`);
+}
+
+const cancelButton = (entry) =>
+  h('button', {
+    type: 'button',
+    class: 'build-queue-cancel',
+    text: 'Anuluj',
+    'aria-label': `Anuluj: ${entry.name}, poziom ${entry.level}`,
+    onClick: (event) => withButton(event.currentTarget, () => cancelBuild(entry)),
+  });
+
+// The builds waiting after the one under way, each with the time it starts
+// and "Anuluj".
 function queuePanel() {
   const { queue, queueSize } = state.character.camp;
   if (queue.length === 0) return null;
@@ -66,8 +97,8 @@ function queuePanel() {
         h(
           'li',
           { class: 'build-queue-item' },
-          h('span', { text: `${entry.name}, poziom ${entry.level}` }),
-          h('span', { class: 'build-queue-time', text: `start ${moment(entry.startsAt)}` }),
+          h('span', { class: 'build-queue-what' }, h('span', { text: `${entry.name}, poziom ${entry.level}` }), h('span', { class: 'build-queue-time', text: `start ${moment(entry.startsAt)}` })),
+          cancelButton(entry),
         ),
       ),
     ),
@@ -391,11 +422,16 @@ function mountBuilding(container, id) {
     );
   }
 
-  // This building's levels waiting in the queue, with the times they start.
+  // This building's levels waiting in the queue, with the times they start
+  // and "Anuluj".
   function waitingNote(id) {
     const waiting = state.character.camp.queue.filter((entry) => entry.buildingId === id);
     if (waiting.length === 0) return null;
-    return systemPanel(...waiting.map((entry) => `W kolejce: poziom ${entry.level}, start ${moment(entry.startsAt)}.`));
+    return systemPanel(
+      ...waiting.map((entry) =>
+        h('div', { class: 'build-queue-item' }, h('p', { class: 'system-text', text: `W kolejce: poziom ${entry.level}, start ${moment(entry.startsAt)}.` }), cancelButton(entry)),
+      ),
+    );
   }
 
   // The level after those under way and waiting. With a build under way it

@@ -3666,18 +3666,38 @@ a.segmented-option {
   display: grid;
   gap: 6px;
   margin: 0;
-  padding-left: 22px;
-}
-
-.build-queue-item::marker {
-  color: var(--text-muted);
+  padding: 0;
+  list-style: none;
 }
 
 .build-queue-item {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 2px 12px;
+  gap: 8px 12px;
+}
+
+.build-queue-what {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+
+.build-queue-cancel {
+  flex: none;
+  min-height: 36px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-world);
+  font-size: 15px;
+}
+
+.build-queue-cancel:active:not(:disabled) {
+  border-color: var(--text-muted);
+  color: var(--text);
 }
 
 .build-queue-time {

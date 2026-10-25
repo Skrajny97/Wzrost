@@ -1189,7 +1189,7 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
 
 ## Kolejka budów w obozie (25.10.2026)
 
-1. **Do trzech budów naraz.** Autor: „Powinna być też możliwość kolejkowania max 3 budów w obozie, jeśli zasoby na to pozwalają graczowi.” Przyjęte: naraz są najwyżej 3 budowy, licząc tę w toku (`queue` w `data/camp.json`). Jeśli autorowi chodziło o 3 czekające obok tej w toku, wystarczy zmienić tę liczbę na 4.
+1. **Do trzech budów naraz.** Autor: „Powinna być też możliwość kolejkowania max 3 budów w obozie, jeśli zasoby na to pozwalają graczowi.” Przyjęte: naraz są najwyżej 3 budowy, licząc tę w toku (`queue` w `data/camp.json`). Autor potwierdził, że tak ma zostać.
 2. **Płaci się od razu.** Budowa dodana, gdy coś już się buduje, czeka w kolejce. Gracz płaci za nią przy dodaniu cały koszt, więc dodać ją można tylko wtedy, gdy starcza złota i zasobów.
 3. **Rusza sama.** Czekająca budowa zaczyna się, gdy skończy się poprzednia, także gdy gracza nie ma w grze. Serwer uruchamia ją przy najbliższym wczytaniu postaci, z czasem, w którym powinna była ruszyć (`settleBuilds` w `src/server/characters.js`). Magazyn budynku produkcyjnego trafia wtedy do zasobów, a odpoczynek liczy się do tej chwili, jak przy budowie zaczętej ręcznie. Kolejka jest zapisana przy postaci (`build_queue`, migracja 0020).
 4. **Kolejne poziomy.** W kolejce może stać ten sam budynek kilka razy, kolejnymi poziomami, a także rozwój obozu. Następny poziom na ekranie budynku i jego koszt liczą się po wszystkich budowach z kolejki. Czas liczy się w obozie, jaki te budowy zostawią: np. Stół rzemieślniczy na poziom 2 po rozwoju obozu do poziomu 2 buduje się 9 minut zamiast 10.
@@ -1198,7 +1198,12 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - Gdy coś się buduje, przycisk na ekranie budynku mówi „Dodaj do kolejki: poziom N”, a przy pełnej kolejce „Kolejka budowy pełna”, z wyjaśnieniem pod spodem.
     - Ekran budynku pokazuje też jego poziomy czekające w kolejce, z godziną startu.
     - Pod planszą obozu stoi lista „Kolejka budowy: 2 z 3” z godzinami startu, a nad placem czekającego budynku napis „w kolejce”.
-7. **Bez wycofywania.** Na razie budowy z kolejki nie da się wycofać, bo to najprostsze rozwiązanie. Jeśli autor chce przycisk „Anuluj” ze zwrotem kosztu, dodamy go.
+7. **„Anuluj” ze zwrotem kosztu.** Na prośbę autora każda budowa czekająca w kolejce ma przycisk „Anuluj”, na liście pod planszą i na ekranie budynku.
+    - Gra najpierw pyta („Zostaw” albo „Anuluj budowę”) i podaje, co wróci.
+    - Budowa wypada z kolejki, a gracz dostaje z powrotem cały jej koszt, dokładnie ten zapłacony: kolejka trzyma go przy budowie (`cost`).
+    - Razem z nią wypadają, też ze zwrotem, wyższe poziomy tego samego budynku czekające po niej, bo jej potrzebują.
+    - Reszta kolejki przesuwa się wcześniej, a jej czasy liczą się od nowa (`replanQueue` w `src/engine/camp.js`). Po anulowaniu poziomu obozu dalsze budowy wracają więc do wolniejszego tempa.
+    - Budowy w toku nie da się anulować: zaczęła się, zebrała magazyn i trwa. Jeśli autor chce to zmienić, trzeba będzie ustalić, ile kosztu wraca.
 
 ## Panel autora, pergamin od autora i leczenie na ekranie Walki (25.10.2026)
 

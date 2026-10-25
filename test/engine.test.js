@@ -27,8 +27,10 @@ import {
   buildMinutes,
   buildSpeed,
   buildsUnderWay,
+  cancelFromQueue,
   plannedLevel,
   queueEnd,
+  replanQueue,
   shiftQueue,
   campEffectText,
   campLevel,
@@ -837,6 +839,23 @@ describe('camp', () => {
     );
     assert.equal(plannedLevel(content.buildingsById.mine, stored, queue), 0);
     assert.deepEqual(shiftQueue(queue, 60).map((entry) => [entry.startsAt, entry.endsAt]), [[40, 440], [440, 740]]);
+  });
+
+  test('a waiting build called off goes with the higher levels that need it, and the rest is laid out again', () => {
+    const minute = 60000;
+    const stored = { sawmill: { level: 1, startedAt: 0, endsAt: minute }, 'craft-table': { level: 1, startedAt: 0, endsAt: -1 } };
+    const queue = [
+      { buildingId: 'camp', level: 2, startsAt: minute, endsAt: 241 * minute },
+      { buildingId: 'craft-table', level: 2, startsAt: 241 * minute, endsAt: 250 * minute },
+      { buildingId: 'camp', level: 3, startsAt: 250 * minute, endsAt: 730 * minute },
+    ];
+    const { cancelled, kept } = cancelFromQueue(queue, 'camp', 2);
+    assert.deepEqual(cancelled.map((entry) => entry.level), [2, 3]);
+    // Without the camp's level 2 the table starts as the Tartak ends and
+    // takes its full 10 minutes.
+    assert.deepEqual(replanQueue(stored, kept, 0, content).map((entry) => [entry.buildingId, entry.startsAt, entry.endsAt]), [['craft-table', minute, 11 * minute]]);
+    // Laid out as it was, nothing moves.
+    assert.deepEqual(replanQueue(stored, queue, 0, content).map((entry) => [entry.startsAt, entry.endsAt]), queue.map((entry) => [entry.startsAt, entry.endsAt]));
   });
 
   test('an upgrade counts once it ends, and one runs at a time', () => {

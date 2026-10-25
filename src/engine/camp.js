@@ -66,6 +66,32 @@ export function plannedLevel(building, stored, queue) {
 // skipped by as much.
 export const shiftQueue = (queue, by) => queue.map((entry) => ({ ...entry, startsAt: entry.startsAt - by, endsAt: entry.endsAt - by }));
 
+// A waiting build called off ("Anuluj"): it leaves the queue with the higher
+// levels of the same building after it, which need it. Returns the builds
+// that go, whose cost comes back, and those that stay.
+export function cancelFromQueue(queue, buildingId, level) {
+  const gone = (entry) => entry.buildingId === buildingId && entry.level >= level;
+  return { cancelled: queue.filter(gone), kept: queue.filter((entry) => !gone(entry)) };
+}
+
+// The waiting builds laid out again one after another from the end of the
+// build under way, each in the camp the builds before it leave behind: after
+// one is called off the rest come sooner, and with a camp level called off
+// the later ones build at the slower pace again.
+export function replanQueue(stored, queue, now, content) {
+  let at = construction(stored, now)?.endsAt ?? now;
+  const planned = [];
+  for (const entry of queue) {
+    const building = content.buildingsById[entry.buildingId];
+    const minutes = building
+      ? buildMinutes(building, entry.level, plannedLevel(content.camp, stored, planned), content)
+      : Math.round((entry.endsAt - entry.startsAt) / 60000);
+    planned.push({ ...entry, startsAt: at, endsAt: at + minutes * 60000 });
+    at += minutes * 60000;
+  }
+  return planned;
+}
+
 // The camp's own level (data/camp.json): it starts at its first level
 // without building, and an upgrade counts once it ends.
 export function campLevel(stored, now, content) {

@@ -10,11 +10,13 @@ import {
   buildingLevel,
   buildsUnderWay,
   campLevel,
+  cancelFromQueue,
   collect,
   construction,
   missingFor,
   plannedLevel,
   queueEnd,
+  replanQueue,
   shiftQueue,
   upgradeCost,
 } from '../engine/index.js';
@@ -135,7 +137,8 @@ async function queueBuilding(db, player, building, queue, now) {
   if (missingFor(cost, walletOf(player.row)).length > 0) throw shortOf(building);
   const startsAt = queueEnd(player.buildings, queue, now);
   const minutes = buildMinutes(building, target, plannedLevel(camp, player.buildings, queue), content);
-  const waiting = [...queue, { buildingId: building.id, level: target, startsAt, endsAt: startsAt + minutes * 60000 }];
+  // The cost paid is kept with the build: "Anuluj" gives back exactly that.
+  const waiting = [...queue, { buildingId: building.id, level: target, startsAt, endsAt: startsAt + minutes * 60000, cost }];
   const row = player.row;
   const running = construction(player.buildings, now);
   const gold = cost.gold ?? 0;
@@ -160,6 +163,48 @@ async function queueBuilding(db, player, building, queue, now) {
     )
     .run();
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
+}
+
+// "Anuluj" by a waiting build: it leaves the queue with the higher levels of
+// the same building after it, their whole cost comes back, and the rest of
+// the queue comes sooner. Saved only if the character is as seen here.
+export async function cancelBuilding(context) {
+  const { session, player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  const queue = buildQueue(player.row);
+  const level = Number(body.level);
+  if (!queue.some((entry) => entry.buildingId === body.buildingId && entry.level === level)) {
+    throw new ApiError(409, 'not_queued', 'Tej budowy nie ma już w kolejce.');
+  }
+  const { cancelled, kept } = cancelFromQueue(queue, body.buildingId, level);
+  const back = {};
+  for (const entry of cancelled) {
+    const building = content.buildingsById[entry.buildingId];
+    const cost = entry.cost ?? (building ? upgradeCost(building, entry.level) : {});
+    for (const [id, amount] of Object.entries(cost)) back[id] = (back[id] ?? 0) + amount;
+  }
+  const now = context.now;
+  const row = player.row;
+  const resources = Object.keys(back).filter((id) => id !== 'gold');
+  const give = resources.length
+    ? `, resources = json_set(resources, ${resources.map(() => '?, COALESCE(json_extract(resources, ?), 0) + ?').join(', ')})`
+    : '';
+  const result = await context.env.DB
+    .prepare(`UPDATE characters SET gold = gold + ?${give}, build_queue = ?, version = version + 1 WHERE id = ? AND version = ?`)
+    .bind(
+      back.gold ?? 0,
+      ...resources.flatMap((id) => [path(id), path(id), back[id]]),
+      JSON.stringify(replanQueue(player.buildings, kept, now, content)),
+      row.id,
+      row.version,
+    )
+    .run();
+  if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
+  return json({
+    cancelled: cancelled.map((entry) => ({ buildingId: entry.buildingId, level: entry.level })),
+    refund: back,
+    character: characterView(await loadPlayer(context.env.DB, session.userId), now),
+  });
 }
 
 // The upgrade in progress is ready now: two seconds back, as the page counts
