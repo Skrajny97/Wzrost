@@ -1,0 +1,25 @@
+{
+  "id": "alpha-fang",
+  "payload": {
+    "prompt": "large white wolf fang, long and sharp, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 490696719,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792918050,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 31.56,
+    "request_id": "24ec3d0b-57e4-4d5a-ab1e-520eaa95c19e",
+    "outputs_retained_until": 1793004402
+  }
+}

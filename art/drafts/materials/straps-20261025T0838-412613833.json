@@ -1,0 +1,25 @@
+{
+  "id": "straps",
+  "payload": {
+    "prompt": "coiled brown leather straps, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 412613833,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792918289,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 30.66,
+    "request_id": "e478d258-4bc4-4702-8094-cb152150eb51",
+    "outputs_retained_until": 1793004660
+  }
+}

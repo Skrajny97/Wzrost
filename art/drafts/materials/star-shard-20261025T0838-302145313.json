@@ -1,0 +1,25 @@
+{
+  "id": "star-shard",
+  "payload": {
+    "prompt": "small glittering pale gold crystal shard of a fallen star, glowing, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 302145313,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792918540,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 29.76,
+    "request_id": "0bbb8f54-540c-4689-96c4-5beab3708f7f",
+    "outputs_retained_until": 1793004884
+  }
+}

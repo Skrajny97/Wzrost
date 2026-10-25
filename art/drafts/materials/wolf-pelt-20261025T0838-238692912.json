@@ -1,0 +1,25 @@
+{
+  "id": "wolf-pelt",
+  "payload": {
+    "prompt": "folded grey wolf pelt with coarse fur, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 238692912,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792917560,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 33.18,
+    "request_id": "14279f54-bde4-4425-ae1a-8c8175b3618b",
+    "outputs_retained_until": 1793003909
+  }
+}

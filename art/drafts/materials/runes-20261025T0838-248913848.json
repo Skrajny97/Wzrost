@@ -1,0 +1,25 @@
+{
+  "id": "runes",
+  "payload": {
+    "prompt": "three small grey stones carved with glowing blue runes, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 248913848,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792918383,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 30.3,
+    "request_id": "4c9cab59-8033-4d7e-a574-8d60b2b9deaa",
+    "outputs_retained_until": 1793004724
+  }
+}

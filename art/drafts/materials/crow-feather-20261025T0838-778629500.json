@@ -1,0 +1,25 @@
+{
+  "id": "crow-feather",
+  "payload": {
+    "prompt": "single glossy black crow feather with a blue sheen, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 778629500,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792917835,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 32.28,
+    "request_id": "06542bcb-0f78-46b1-a83e-86184d93dc63",
+    "outputs_retained_until": 1793004201
+  }
+}
