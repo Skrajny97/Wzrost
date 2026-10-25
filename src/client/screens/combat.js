@@ -324,6 +324,7 @@ export function mountCombat(container, { params, navigate }) {
     return h(
       'div',
       { class: 'stack' },
+      restSkip(character),
       first
         ? systemPanel('Wiatrołomy to najbezpieczniejsze miejsce na start. Wybierz czas eksploracji i wyrusz.')
         : unarmed && systemPanel('Walczysz gołymi rękami. Załóż broń z plecaka w zakładce Postać, jeśli już ją masz.'),
@@ -366,6 +367,7 @@ export function mountCombat(container, { params, navigate }) {
     return h(
       'div',
       { class: 'stack' },
+      restSkip(character),
       h('p', { class: 'region-description', text: region.description }),
       h('p', { class: 'region-trait' }, h('strong', { text: `${region.trait.name}. ` }), region.trait.description),
       h('div', { class: 'area-grid' }, region.areas.map((place) => areaTile(place, character))),
@@ -533,9 +535,9 @@ export function mountCombat(container, { params, navigate }) {
     );
   }
 
-  // Resting before the start can be skipped with Punkty Czasu: at the top,
-  // by what it shortens, so it does not read as part of the exploration.
-  // Hidden once HP is full.
+  // Resting can be skipped with Punkty Czasu on every Walka screen, from the
+  // regions to the start: at the top, by what it shortens, so it does not
+  // read as part of the exploration. Hidden once HP is full.
   function restSkip(character) {
     const left = (now) => ((character.maxHp - currentHp(state.character, now)) / Math.max(1e-9, restRate(state.character))) * 60000;
     const control = skipControl('rest', left, 'Odpoczynek');

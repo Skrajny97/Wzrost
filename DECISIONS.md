@@ -1171,7 +1171,7 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
 2. **Pytanie przed wprowadzeniem.** Pierwszy pergamin pyta słowami autora: „Czy chcesz przejść Wprowadzenie? Pomoże ono zaznajomić Ci się z Systemem, ale jeśli z niego zrezygnujesz – nie stracisz żadnych uzyskanych w Samouczku zasobów.” Myślnik autora stał się półpauzą, jak w innych kwestiach narratora.
     - „Wprowadź mnie” prowadzi dalej, a pod nim mniejszą czcionką stoi „zalecane”.
     - „Pomiń wprowadzenie” kończy wprowadzenie z tym samym startem, co przejście go (zob. „Ten sam start po pominięciu i spokojniejsze pergaminy”).
-    - Pergamin nie ma jeszcze nagrania: autor zdecyduje, czy go nagrać. *Decyzja autora: to pergamin autora, nie narratora, więc bez nagrania i bez postaci narratora: zob. „Panel autora i pergamin od autora”.*
+    - Pergamin nie ma jeszcze nagrania: autor zdecyduje, czy go nagrać. *Decyzja autora: to pergamin autora, nie narratora, więc bez nagrania i bez postaci narratora: zob. „Panel autora, pergamin od autora i leczenie na ekranie Walki”.*
 3. **„???” w zadaniach.** Autor: stwór, którego postać jeszcze nie spotkała, ma w zadaniu „???” zamiast nazwy, tak jak sylwetki w „Czyhających niebezpieczeństwach”. Nazwa pokazuje się po pierwszym spotkaniu.
 4. **Ekran należy do narratora.** Autor: w trakcie Samouczka gracz nie może przewijać ekranu ani nic robić, także w krótkich przerwach, jakby dotyk był wyłączony. Od pierwszego pergaminu do ostatniego nad grą leży przezroczysta warstwa (`narrator-hold` w `src/client/narrator.js`), a przewijanie palcem, kółkiem i klawiszami jest zablokowane.
     - Stuknięcia trafiają tylko do przycisków narratora, do miejsca, które narrator każe stuknąć, i do okien, które gra otwiera po drodze, np. pytania przy „Przewiń”.
@@ -1200,7 +1200,7 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - Pod planszą obozu stoi lista „Kolejka budowy: 2 z 3” z godzinami startu, a nad placem czekającego budynku napis „w kolejce”.
 7. **Bez wycofywania.** Na razie budowy z kolejki nie da się wycofać, bo to najprostsze rozwiązanie. Jeśli autor chce przycisk „Anuluj” ze zwrotem kosztu, dodamy go.
 
-## Panel autora i pergamin od autora (25.10.2026)
+## Panel autora, pergamin od autora i leczenie na ekranie Walki (25.10.2026)
 
 1. **Panel autora.** Autor zapytał o zawsze dostępną listę kont i postaci z imionami i podpiętymi adresami e-mail albo kontami Google. Zgodził się na panel w grze, widoczny tylko dla swojego konta.
     - Ustawienia konta autora mają przycisk „Panel autora”, który otwiera ekran `#/autor` (`src/client/screens/author.js`).
@@ -1219,3 +1219,4 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - Walidacja pilnuje, żeby taka karta nie miała nagrania ani wersji żeńskiej.
     - Narrator pojawia się od następnej karty.
 5. **Wielkość widoku.** Autor: przyciski „−” i „+” wystarczą w Ustawieniach. Zostają tylko tam.
+6. **Leczenie Punktami Czasu na ekranie Walki.** Autor: na ekranie Walki ma się dać uleczyć postać Punktami Czasu. Pasek „Odpoczynek: pełne HP za …” z przyciskiem „Przewiń” stoi teraz na górze każdego ekranu Walki: listy regionów, regionu i miejsca przed wyruszeniem (dotąd był tylko na tym ostatnim). Działa jak dotąd: punkt na minutę odpoczynku, z pytaniem o zgodę. Znika przy pełnym HP i bez punktów.
