@@ -344,13 +344,14 @@ function anvilSection(item, busy) {
 async function showPreview(box, item, equipped) {
   try {
     const { now, after } = await call('GET', `/api/items/${item.id}/preview`);
+    // Only the change, as the author asked: "+2,5", "−4", "+1%".
     const rows = [
-      ['Obrażenia', now.damage, after.damage, after.damageAverage - now.damageAverage],
-      ['Redukcja obrażeń', `${now.reduction}%`, `${after.reduction}%`, after.reduction - now.reduction],
-      ['Maks. HP', now.maxHp, after.maxHp, after.maxHp - now.maxHp],
-      ['Unik', `${formatDecimal(now.dodge)}%`, `${formatDecimal(after.dodge)}%`, after.dodge - now.dodge],
-      ['Trafienie krytyczne', `${formatDecimal(now.crit)}%`, `${formatDecimal(after.crit)}%`, after.crit - now.crit],
-    ].filter(([, , , change]) => Math.abs(change) > 1e-9);
+      ['Średnie obrażenia', after.damageAverage - now.damageAverage, ''],
+      ['Redukcja obrażeń', after.reduction - now.reduction, '%'],
+      ['Maks. HP', after.maxHp - now.maxHp, ''],
+      ['Unik', after.dodge - now.dodge, '%'],
+      ['Trafienie krytyczne', after.crit - now.crit, '%'],
+    ].filter(([, change]) => Math.abs(change) >= 0.05);
     fill(
       box,
       h('p', { class: 'compare-title', text: equipped ? 'Po zdjęciu' : 'Po założeniu' }),
@@ -359,12 +360,12 @@ async function showPreview(box, item, equipped) {
         : h(
             'ul',
             { class: 'preview-list' },
-            rows.map(([label, before, then, change]) =>
+            rows.map(([label, change, unit]) =>
               h(
                 'li',
                 { class: change > 0 ? 'preview-up' : 'preview-down' },
                 h('span', { text: label }),
-                h('span', { class: 'num', text: `${before} → ${then}` }),
+                h('span', { class: 'num', text: `${change > 0 ? '+' : '−'}${formatDecimal(Math.abs(change))}${unit}` }),
               ),
             ),
           ),

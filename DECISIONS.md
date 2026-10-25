@@ -977,3 +977,29 @@ Niedźwiedzi, Wilczy, Rysi i Kruka już nosiły nazwy potworów i zostają. Pię
 ## Przewijanie odpoczynku nad wyprawą (25.10.2026)
 
 Autor: przycisk „Przewiń” stał na ekranie wyprawy tuż nad „Wyrusz”, choć przewija odpoczynek, a nie wyprawę, i to myliło. Stoi teraz na górze ekranu, w pasku „Odpoczynek: pełne HP za … min”, nad kartą miejsca, i znika, gdy HP jest pełne.
+
+## Materiały ze stworów, skrzynie skarbów i Stół rzemieślniczy (25.10.2026)
+
+Autor: łupy z bronią i przedmiotami mają być zdarzeniami losowymi, np. skrzynią skarbów znalezioną w lesie, a z potworów wypadają tylko materiały, które w obozie przerabia się na części, jak przy rozbiórce w Diablo 3.
+
+1. **Każdy stwór ma swój materiał** (`data/materials.json`): Skóra wilka, Skóra lisa, Pazury borsuka, Łuska żmii, Kieł dzika, Pióro kruka, Pióro puszczyka, Futro rysia, Jedwab krzyżaka, Kieł basiora, Skóra niedźwiedzia, Ognik błędnicy i Oko licha. Walidacja pilnuje, żeby każdy stwór miał dokładnie jeden.
+2. **Rzadkość z gatunku, czasem wyższa.** Zgodnie z wyborem autora rzadkość wynika z gatunku:
+    - pospolite: Wilk, Lis, Borsuk, Żmija,
+    - rzadkie: Dzik, Kruk, Puszczyk,
+    - unikalne: Ryś, Krzyżak, Basior,
+    - epickie: Niedźwiedź, legendarne: Błędnica, mityczne: Licho.
+
+    Wyższy poziom stwora czasem podnosi rzadkość o jeden stopień: 0,5% za poziom, najwyżej 25% (`rewards.materialRarityUpPerLevel` i `materialRarityUpMax` w `data/balance.json`). Na poziomie 1 to 0,5%, a na poziomie 25 już 12,5%. Taki materiał nazywa się np. „rzadka skóra wilka”, dlatego rzadkości mają formy dla rodzajów (`forms` w `data/rarities.json`).
+3. **Szansa na materiał** to 30% dla pospolitych, potem 20, 14, 10, 7, 5 i 3% (`materialChance` w `data/rarities.json`), za każdego pokonanego stwora. Liczy się, jak dotąd przy łupie, udział walki w czasie wyprawy, wielkość grupy i wymagające spotkanie (×1,5). Wyprawa daje więc tyle samo materiałów na godzinę bez względu na długość: w Wiatrołomach ok. 1,5–2 na godzinę.
+4. **Skrzynie skarbów.** Przedmioty dają już tylko skrzynie. Znaleziska są co 18 minut zamiast co 20, a skrzynia ma wagę 0,44 tam, gdzie przedmiot miał 0,3. Przedmiotów jest więc ok. 1,25 na godzinę, jak dotąd z walk i znalezisk razem (wybór autora: „jak dziś łupy”). Złota, zasobów i odłamków czasu ze znalezisk jest na godzinę o ok. 2% mniej.
+5. **Pierwsza broń i elita.** Postać bez broni po pierwszej wygranej walce znajduje skrzynię z bronią swojej klasy i od razu ją trzyma. Broń z wcześniejszej skrzyni też trafia od razu do ręki. Pokonana elita zostawia skrzynię z przedmiotem, który częściej jest rzadszy (`rewards.eliteRarityBonus`). Wymagające spotkania dają teraz więcej materiałów zamiast rzadszych przedmiotów, a `itemDropChance` i `toughRarityBonus` zniknęły z `data/balance.json`.
+6. **Stół rzemieślniczy** (`craft-table`) to nowy budynek obozu, bardzo tani na start: 3 złota i 3 drewna, minuta budowy. Za darmo przerabia materiał na jedną część tej samej rzadkości. Części nazwał autor: Ścinki, Rzemienie, Okucia, Runy, Bursztyn, Krwawnik i Gwiezdny odprysk.
+    - Część zajmuje stołowi 5, 8, 12, 20, 30, 45 albo 60 minut, zależnie od rzadkości (`craftMinutes` w `data/rarities.json`).
+    - Każdy poziom stołu przyspiesza pracę o 10% (`craftSpeed`): poziom 1 pracuje 1,1 raza szybciej, poziom 10 dwa razy.
+    - Zlecenia idą po kolei, najwyżej 10 naraz (`crafting.queueLimit`), także podczas wyprawy. „Przerób” bierze cały stos materiału, a „Przerób wszystko” każdy stos.
+    - Części przybywają same, gdy zlecenie się skończy. Nie trzeba ich odbierać.
+7. **Rozbiórka przedmiotu.** Przedmiot z plecaka można rozebrać na stole na 2 + poziom/10 (w dół) części jego rzadkości i jedną więcej za każde ulepszenie (`crafting.salvageBase` i `salvageLevelStep`). Rzadki przedmiot poziomu 25 daje 4 Rzemienie. Rozbiórka, jak sprzedaż, czeka na powrót postaci z wyprawy. Złomiarz dalej kupuje przedmioty za złoto.
+8. **Skup złomu.** Na prośbę autora Stół złomiarza nazywa się teraz Skup złomu. Jego opis mówi o skupie, bo rozbieranie przeszło do Stołu rzemieślniczego. Narrator tej nazwy nie wypowiada, więc nagrania zostają.
+9. **Części czekają na profesje.** Wyrób przedmiotów z części przyjdzie razem z profesjami.
+10. **Na planszy** Stół rzemieślniczy stoi na dole po lewej, przy ścieżce. Staw przesunął się bliżej rogu. Rysunek stołu ma trzy wielkości, jak inne budynki.
+11. **Zapis.** Migracja `0015_materials.sql` dodaje postaci materiały, części i kolejkę stołu (JSON, jak zasoby). Nowe API: `POST /api/craft/materials`, `POST /api/items/:id/salvage` i w trybie testowym `POST /api/test/skip-craft`. Zlecenia zapisują się tylko wtedy, gdy postać jest taka, jak przy odczycie (`version`), więc dwa dotknięcia naraz dają jedno zlecenie.

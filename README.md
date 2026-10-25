@@ -2,7 +2,7 @@
 
 Solowa, casualowa gra przeglądarkowa litRPG na telefon, oparta na timerach. Jedynym źródłem prawdy o projekcie jest [dokument projektowy](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX). Założenia przyjęte w trakcie budowy są w [DECISIONS.md](DECISIONS.md).
 
-Stan: **Etap 2a, plansza obozu.** Działa konto (także logowanie przez Google, gdy są jego klucze), tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, poziomy do 500, statystyki z wolnymi punktami, ekwipunek przypisany do klas i plecak z podglądem zmian, złomiarz, eksploracje na czasie serwera w dwóch regionach Skraju Puszczy, każdy z pięcioma regionami wewnętrznymi otwieranymi poziomem klasy, z suwakiem czasu, który wydłuża się z poziomem (30 minut na start, 4 godziny od poziomu 50), i spotkaniami wymagającymi, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik, „Zacznij od nowa” oraz obóz jako plansza w stylu Plemion z placem na każdy z siedmiu budynków na timerach: Tartak, Kamieniołom i Kopalnia wytwarzają zasoby do magazynu, Ognisko, Szałas na łupy i Stół złomiarza dają premie, a Kowadło pozwala ulepszać przedmioty do +10. Stwory, przedmioty i postacie (kobieta i mężczyzna w każdej klasie) mają sprite'y w pixel-arcie. W tle gra muzyka, ciosy w walce to nagrania, a grę można zainstalować na telefonie przyciskiem „Zainstaluj jako aplikację”. Zasoby (drewno, kamień, ruda żelaza) postać znajduje też na eksploracjach. Punkty Systemu, przyszła waluta premium na kosmetykę, należą do konta i są w górnym pasku obok złota. Spis klas, przedmiotów, potworów i regionów jest w [encyklopedii](https://claude.ai/artifact/EDt6uk8X5rRU9JCTLKsnXw).
+Stan: **Etap 2a, plansza obozu i materiały.** Działa konto (także logowanie przez Google, gdy są jego klucze), tworzenie postaci z wyborem jednej z pięciu klas, start bez ekwipunku, poziomy do 500, statystyki z wolnymi punktami, ekwipunek przypisany do klas i plecak z podglądem zmian, złomiarz, eksploracje na czasie serwera w dwóch regionach Skraju Puszczy, każdy z pięcioma regionami wewnętrznymi otwieranymi poziomem klasy, z suwakiem czasu, który wydłuża się z poziomem (30 minut na start, 4 godziny od poziomu 50), i spotkaniami wymagającymi, walka do trzech na trzech, raport z animacją każdej walki, efekty dźwiękowe, omdlenie, Dziennik, „Zacznij od nowa” oraz obóz jako plansza w stylu Plemion z placem na każdy z ośmiu budynków na timerach: Tartak, Kamieniołom i Kopalnia wytwarzają zasoby do magazynu, Ognisko, Szałas na łupy i Skup złomu dają premie, Kowadło pozwala ulepszać przedmioty do +10, a Stół rzemieślniczy przerabia materiały i rozebrane przedmioty na części. Stwory zostawiają materiały, każdy swój, a przedmioty przynoszą skrzynie skarbów. Stwory, przedmioty i postacie (kobieta i mężczyzna w każdej klasie) mają sprite'y w pixel-arcie. W tle gra muzyka, ciosy w walce to nagrania, a grę można zainstalować na telefonie przyciskiem „Zainstaluj jako aplikację”. Zasoby (drewno, kamień, ruda żelaza) postać znajduje też na eksploracjach. Punkty Systemu, przyszła waluta premium na kosmetykę, należą do konta i są w górnym pasku obok złota. Spis klas, przedmiotów, potworów i regionów jest w [encyklopedii](https://claude.ai/artifact/EDt6uk8X5rRU9JCTLKsnXw).
 
 ## Adres gry
 
@@ -139,7 +139,9 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/items/:id/unequip` | zdejmij przedmiot do plecaka |
 | POST | `/api/items/:id/discard` | wyrzuć przedmiot z plecaka |
 | POST | `/api/items/:id/upgrade` | Kowadło: jedna próba ulepszenia przedmiotu o poziom, za złoto i rudę żelaza |
-| POST | `/api/items/sell` | złomiarz: sprzedaj przedmioty z plecaka o rzadkości do `maxRarity` włącznie (cena z premią Stołu złomiarza) |
+| POST | `/api/items/sell` | złomiarz: sprzedaj przedmioty z plecaka o rzadkości do `maxRarity` włącznie (cena z premią Skupu złomu) |
+| POST | `/api/items/:id/salvage` | rozbierz przedmiot z plecaka na Stole rzemieślniczym: znika od razu, a jego części przybędą, gdy skończy się zlecenie; zwraca `salvage` (409 `no_table`, `queue_full`, `equipped`) |
+| POST | `/api/craft/materials` | Stół rzemieślniczy: całe stosy materiałów do kolejki, `keys` (np. `["wolf-pelt:common"]`) albo `all: true`; zwraca `ordered` (409 `no_table`, `queue_full`, `no_materials`) |
 | POST | `/api/camp/build` | zacznij budowę następnego poziomu budynku obozu: `buildingId`; naraz jedna budowa; budynek produkcyjny najpierw oddaje zawartość magazynu |
 | POST | `/api/camp/collect` | zbierz magazyn budynku produkcyjnego: `buildingId`; zwraca `collected` (409 `nothing_to_collect`, gdy magazyn jest pusty) |
 | GET | `/api/hunts/options` | poziom zagrożenia dla każdego czasu w otwartym regionie wewnętrznym dla poziomu postaci; `?area=<id>` liczy jeden wybrany region wewnętrzny |
@@ -152,6 +154,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/tutorial` | kwestia narratora przeczytana, karta albo wskazanie: `card` (jej id), albo `skip: true` dla „Pomiń wprowadzenie”, które robi za gracza pierwsze kroki: wyprawę przewiniętą Punktami Czasu, jej raport i Ognisko (`firstSteps`; 409 `no_tutorial` dla postaci sprzed wprowadzenia) |
 | POST | `/api/test/skip-time` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wyprawę albo odpoczynek („Pomiń czas”) |
 | POST | `/api/test/skip-build` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu budowę w obozie, a gdy nic się nie buduje, zapełnia magazyny |
+| POST | `/api/test/skip-craft` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wszystkie zlecenia Stołu rzemieślniczego |
 
 Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie `message` jest po polsku.
 
@@ -176,7 +179,7 @@ Sprite'y stworów (48×48) i przedmiotów (32×32) powstają w generatorze pixel
 2. Stuknij **Run workflow**, wybierz rodzaj (`monsters` albo `items`), wpisz identyfikatory po przecinku albo `all` i limit dolarów, a potem stuknij zielone **Run workflow**.
 3. Szkice z przezroczystym tłem trafią na gałąź `art-drafts`, do folderu `art/drafts/`. Podsumowanie przebiegu podaje koszt i stan salda.
 
-Przebieg potrzebuje sekretu repozytorium `RETRO_DIFFUSION_API_KEY` z kluczem API Retro Diffusion. Skrypt najpierw darmowo wycenia każde zapytanie i nie wydaje więcej niż limit. Zatwierdzone sprite'y trafiają do `src/client/art/` i na listę w `src/client/art.js`, a wzorce stylu dla kolejnych do `art/references/`. Gdy pod stworem albo przedmiotem zostaje kafel podłoża, przed wstawieniem do gry trzeba go wyciąć (zob. `DECISIONS.md`, „Drabinka eksploracji i lochy”, punkt 7).
+Przebieg potrzebuje sekretu repozytorium `RETRO_DIFFUSION_API_KEY` z kluczem API Retro Diffusion. Skrypt najpierw darmowo wycenia każde zapytanie i nie wydaje więcej niż limit. Zatwierdzone sprite'y trafiają do `src/client/art/` i na listę w `src/client/art.js`, a wzorce stylu dla kolejnych do `art/references/`. Gdy pod stworem albo przedmiotem zostaje kafel podłoża, przed wstawieniem do gry trzeba go wyciąć (zob. `DECISIONS.md`, „Drabinka eksploracji i lochy”, punkt 7). Nowe portrety klas wyrównuje do jednej wielkości postaci `python3 tools/normalize-portraits.py src/client/art/portraits/*.png` (Python z Pillow).
 
 ## Muzyka i dźwięki
 
