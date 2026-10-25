@@ -61,7 +61,19 @@
       "magic": "a short crackling magic spark spell, a bright fizzing whoosh with a sparkle, fantasy, close up, no music",
       "holy": "a short bright holy magic chime with a shimmering burst, fantasy, no music",
       "victory": "a short triumphant fantasy horn fanfare, no drums",
-      "defeat": "a short low mournful fantasy horn note fading out, no drums"
+      "defeat": "a short low mournful fantasy horn note fading out, no drums",
+      "chest-coins": {
+        "text": "a small wooden treasure chest opens and a handful of gold coins spill out and scatter across a wooden table, bright metallic jingling, close up, no music",
+        "seconds": 2.5
+      },
+      "chest-sparkle": {
+        "text": "a treasure chest lid creaks open, gold coins pour out jingling and scattering, then a soft magical sparkle chime, fantasy game reward, close up, no music",
+        "seconds": 3
+      },
+      "coins-scatter": {
+        "text": "a handful of gold coins dropped onto a wooden table, scattering and settling with bright metallic jingles, close up, dry, no music",
+        "seconds": 2
+      }
     }
   },
   "ui": {
@@ -137,6 +149,24 @@
           [
             "Na tej polanie",
             "[calmly] Na tej polanie"
+          ]
+        ]
+      },
+      "lead-campfire-ogniu": {
+        "line": "lead-campfire",
+        "say": [
+          [
+            "ogniu",
+            "ogńu"
+          ]
+        ]
+      },
+      "lead-campfire-ognju": {
+        "line": "lead-campfire",
+        "say": [
+          [
+            "ogniu",
+            "ognju"
           ]
         ]
       },
