@@ -251,12 +251,26 @@ export function autoEquip(equipped, items, content, classId) {
 
 // `upgradeCap`: the level of the camp's Kowadło, for the upgrade part of the
 // item card; left out where the card cannot upgrade (a report).
+// A base with a few looks (`looks` in data/item-bases.json: the talisman is a
+// holed stone or a wooden charm) gives each of its items one of them. The
+// look follows from what never changes on the item, so it is the same in a
+// report, in the bag and after the Kowadło.
+export function itemLook(item, content) {
+  const looks = content.basesById[item.base].looks;
+  if (!looks) return item.base;
+  const key = [item.level, item.rarity, ...item.affixes.map((affix) => affix.id)].join('|');
+  let hash = 2166136261;
+  for (let index = 0; index < key.length; index++) hash = Math.imul(hash ^ key.charCodeAt(index), 16777619) >>> 0;
+  return looks[hash % looks.length];
+}
+
 export function itemView(item, content, { sellBonus = 0, upgradeCap } = {}) {
   const rarity = content.raritiesById[item.rarity];
   const classIds = baseClasses(item.base, content);
   return {
     name: itemName(item, content),
     base: item.base,
+    look: itemLook(item, content),
     slot: item.slot,
     slotName: content.slotsById[item.slot].name,
     level: item.level,

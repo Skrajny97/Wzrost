@@ -100,7 +100,7 @@ test('every sprite on the list has its file at its size, and every class has its
   const looks = data('appearances').map((look) => look.id);
   const known = {
     monsters: data('monsters').map((monster) => monster.id),
-    items: data('item-bases').map((base) => base.id),
+    items: data('item-bases').flatMap((base) => base.looks ?? [base.id]),
     portraits: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     // The introduction's one narrator (narrator.js).
     narrator: ['narrator'],

@@ -1256,3 +1256,12 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - „Wolne punkty” na ekranie statystyk świecą na złoto.
 
     Po rozdaniu punktów podświetlenie gaśnie.
+
+## Talizman w dwóch wyglądach (25.10.2026)
+
+1. **Bez godła.** Autor: ikonka talizmanu musi być uniwersalna, bo liść na niej mylił („Talizman Lisa” nie ma nic wspólnego z liściem). Retro Diffusion narysował 4 szkice bez godła: dwa kamienie z dziurką na rzemyku i dwa drewniane krążki (0,72 USD). W kamieniach biała plamka w miejscu dziurki stała się przezroczysta.
+2. **Dwa wyglądy.** Wybór autora: oba szkice, kamień z dziurką (nr 2) i drewniany krążek ze słojami (nr 4).
+    - Talizman zostaje jedną bazą, z tą samą nazwą i Witalnością, a w danych ma dwa wyglądy (`looks` w `data/item-bases.json`, obrazki `talisman-stone` i `talisman-wood`).
+    - Każdy talizman dostaje jeden z nich, liczony z tego, co się w nim nie zmienia: poziomu, rzadkości i afiksów (`itemLook` w `src/engine/items.js`). Ten sam talizman wygląda więc tak samo w raporcie, w plecaku, na postaci i po ulepszeniu w Kowadle.
+    - Wygląd nic nie mówi o przedmiocie. Jeśli talizmany mają się różnić także nazwą albo cechą, trzeba będzie zrobić z nich dwie bazy.
+3. **Stary obrazek z liściem** wypadł z gry.

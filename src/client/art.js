@@ -23,7 +23,7 @@ export const SPRITES = {
   },
   items: {
     size: 32,
-    ids: ['sword', 'axe', 'dagger', 'bow', 'staff', 'aspergillum', 'shield', 'quiver', 'focus', 'hood', 'helmet', 'tunic', 'chainmail', 'robe', 'cowl', 'surplice', 'gloves', 'boots', 'amulet', 'ring', 'talisman'],
+    ids: ['sword', 'axe', 'dagger', 'bow', 'staff', 'aspergillum', 'shield', 'quiver', 'focus', 'hood', 'helmet', 'tunic', 'chainmail', 'robe', 'cowl', 'surplice', 'gloves', 'boots', 'amulet', 'ring', 'talisman-stone', 'talisman-wood'],
   },
   // Materials left by creatures, the parts the Stół rzemieślniczy makes and
   // the treasure chest, 32×32.
@@ -56,7 +56,8 @@ function sprite(kind, id, className) {
 }
 
 export const monsterSprite = (monsterId) => sprite('monsters', monsterId, 'sprite--monster');
-export const itemSprite = (item) => sprite('items', item.base, 'sprite--item');
+// An item's own look when its base has a few (the talisman), else its base.
+export const itemSprite = (item) => sprite('items', item.look ?? item.base, 'sprite--item');
 // A material, a part ("scraps") or the chest ("chest").
 export const materialSprite = (id) => sprite('materials', id, 'sprite--item');
 

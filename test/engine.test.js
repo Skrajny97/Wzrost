@@ -62,6 +62,8 @@ import {
   huntingHours,
   huntReport,
   itemName,
+  itemLook,
+  itemView,
   itemUpgradeCost,
   itemProperties,
   lowLevelMultiplier,
@@ -188,6 +190,25 @@ describe('items', () => {
     assert.equal(named('aspergillum', ['wolf', 'mist']), 'Wilcze Kropidło Rysia');
     assert.equal(named('boots', ['oak', 'leshy']), 'Dzicze Buty Puszczyka');
     assert.equal(itemName(generateItem({ baseId: 'bow', level: 1 }, rng, content), content), 'Łuk');
+  });
+
+  test('a talisman has one of its two looks, the same wherever it is seen', () => {
+    const rng = createRng('talizmany');
+    const seen = new Set();
+    for (let level = 1; level <= 30; level++) {
+      for (const rarityId of ['common', 'rare', 'unique']) {
+        const item = generateItem({ baseId: 'talisman', level, rarityId }, rng, content);
+        const look = itemLook(item, content);
+        assert.ok(['talisman-stone', 'talisman-wood'].includes(look), look);
+        // The report's view, the bag's and the upgraded one show the same look.
+        assert.equal(itemView(item, content).look, look);
+        assert.equal(itemView({ ...item, upgrade: 4 }, content).look, look);
+        seen.add(look);
+      }
+    }
+    assert.deepEqual([...seen].sort(), ['talisman-stone', 'talisman-wood']);
+    // A base with one look keeps its own picture.
+    assert.equal(itemView(generateItem({ baseId: 'bow', level: 1 }, rng, content), content).look, 'bow');
   });
 
   test('properties are described in Polish', () => {

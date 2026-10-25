@@ -22,7 +22,17 @@
       "stat": { "type": "string" },
       "statFactor": { "type": "number", "exclusiveMinimum": 0 },
       "sound": { "type": "string", "description": "Rodzaj dźwięku trafienia z sounds.json." },
-      "strike": {
+      "looks": {
+      "description": "Kilka wyglądów jednej bazy (obrazki src/client/art/items/<id>.png). Każdy przedmiot tej bazy ma jeden z nich, zawsze ten sam.",
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      }
+    },
+    "strike": {
         "description": "Wygląd ciosu w animacji walki. Bez tego pola broń fizyczna uderza wręcz, a magiczna wystrzeliwuje pocisk.",
         "enum": ["melee", "arrow", "magic"]
       }

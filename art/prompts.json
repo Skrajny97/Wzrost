@@ -65,8 +65,8 @@
       "boots": "pair of brown leather boots, single inventory item icon",
       "amulet": "silver amulet with a round gemstone on a chain, single inventory item icon",
       "ring": "gold ring with a small gemstone, single inventory item icon",
-      "talisman": "smooth grey river stone with a natural hole through it, hung on a leather cord with two small wooden beads, plain folk charm, single inventory item icon",
-      "talisman-disc": "round carved wooden charm with a plain smooth face and a simple notched rim, hung on a leather cord, single inventory item icon"
+      "talisman-stone": "smooth grey river stone with a natural hole through it, hung on a leather cord with two small wooden beads, plain folk charm, single inventory item icon",
+      "talisman-wood": "round carved wooden charm with a plain smooth face and a simple notched rim, hung on a leather cord, single inventory item icon"
     }
   },
   "materials": {
