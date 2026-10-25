@@ -1,6 +1,7 @@
 // The camp the player builds up alongside the character's activity
 // (data/buildings.json). A building has levels; each level costs more gold and
-// resources and takes longer to build. One building is upgraded at a time.
+// resources and takes longer to build. One building is upgraded at a time,
+// and a few more can wait in the queue.
 // A stored building is { level, startedAt, endsAt, collectedAt }: the level it
 // has once the last upgrade has ended, and for a production building the time
 // its store started filling. The server passes the time.
@@ -39,6 +40,31 @@ export function upgradeMinutes(building, level) {
   const { levels, base, growth } = building.minutes;
   return Math.max(1, Math.round(levels ? levels[level - 1] : base * growth ** (level - 1)));
 }
+
+// The builds waiting after the one under way (data/camp.json: queue counts
+// them all, the one under way too). Each starts when the one before it ends
+// and is paid when it is queued. A waiting build is
+// { buildingId, level, startsAt, endsAt }.
+
+// How many builds the camp has at `now`: the one under way and the waiting ones.
+export const buildsUnderWay = (stored, queue, now) => (construction(stored, now) ? 1 : 0) + queue.length;
+
+// When a build queued at `now` starts: as the last one ends, or at once.
+export function queueEnd(stored, queue, now) {
+  if (queue.length > 0) return queue[queue.length - 1].endsAt;
+  return construction(stored, now)?.endsAt ?? now;
+}
+
+// The level a building has once the build under way and the waiting ones end.
+export function plannedLevel(building, stored, queue) {
+  const waiting = queue.filter((entry) => entry.buildingId === building.id);
+  if (waiting.length > 0) return waiting[waiting.length - 1].level;
+  return Math.max(building.startLevel ?? 0, stored[building.id]?.level ?? 0);
+}
+
+// The waiting builds `by` milliseconds sooner, after the one under way was
+// skipped by as much.
+export const shiftQueue = (queue, by) => queue.map((entry) => ({ ...entry, startsAt: entry.startsAt - by, endsAt: entry.endsAt - by }));
 
 // The camp's own level (data/camp.json): it starts at its first level
 // without building, and an upgrade counts once it ends.

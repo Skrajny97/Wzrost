@@ -1,11 +1,25 @@
 // The camp: buildings the player upgrades alongside the character's activity,
 // even during an exploration, paid in gold and resources. One building is
-// upgraded at a time and the upgrade counts once its time has passed.
-// Production buildings fill a store that the player collects.
+// upgraded at a time and the upgrade counts once its time has passed; a few
+// more builds wait in the queue, paid when queued, and start one after
+// another (characters.js: settleBuilds). Production buildings fill a store
+// that the player collects.
 
-import { buildMinutes, buildingLevel, campLevel, collect, construction, missingFor, upgradeCost } from '../engine/index.js';
+import {
+  buildMinutes,
+  buildingLevel,
+  buildsUnderWay,
+  campLevel,
+  collect,
+  construction,
+  missingFor,
+  plannedLevel,
+  queueEnd,
+  shiftQueue,
+  upgradeCost,
+} from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, currentHp, loadPlayer, requirePlayer, walletOf } from './characters.js';
+import { buildQueue, characterView, currentHp, loadPlayer, requirePlayer, walletOf } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
@@ -18,24 +32,29 @@ export async function startBuilding(context) {
   return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) }, 201);
 }
 
-// The next level of a building, from now on, paid at once. The skipped
-// introduction builds the Ognisko this way too (tutorial.js). The camp's own
-// level (buildingId "camp") grows the same way, from its first level, which
-// it has without building.
+const atTop = (building) => new ApiError(409, 'max_level', building.id === content.camp.id ? 'Obóz ma już najwyższy poziom.' : 'Ten budynek ma już najwyższy poziom.');
+const shortOf = (building) =>
+  new ApiError(409, 'not_enough', building.id === content.camp.id ? 'Brakuje złota na rozwój obozu.' : 'Brakuje złota albo zasobów na tę budowę.');
+
+// The next level of a building, from now on, paid at once; while another
+// build is under way, it goes to the queue. The skipped introduction builds
+// the Ognisko this way too (tutorial.js). The camp's own level (buildingId
+// "camp") grows the same way, from its first level, which it has without
+// building.
 export async function beginBuilding(db, player, buildingId, now) {
   const building = typeof buildingId === 'string' ? content.buildingsById[buildingId] : undefined;
   if (!building) throw new ApiError(400, 'invalid_building', 'Nie ma takiego budynku.');
-  if (construction(player.buildings, now)) throw new ApiError(409, 'camp_busy', 'W obozie trwa już budowa.');
+  const queue = buildQueue(player.row);
+  if (buildsUnderWay(player.buildings, queue, now) > 0) {
+    await queueBuilding(db, player, building, queue, now);
+    return;
+  }
   const built = buildingLevel(player.buildings[building.id], now);
   const level = Math.max(building.startLevel ?? 0, built);
-  if (level >= building.maxLevel) {
-    throw new ApiError(409, 'max_level', building.id === content.camp.id ? 'Obóz ma już najwyższy poziom.' : 'Ten budynek ma już najwyższy poziom.');
-  }
+  if (level >= building.maxLevel) throw atTop(building);
   const target = level + 1;
   const cost = upgradeCost(building, target);
-  if (missingFor(cost, walletOf(player.row)).length > 0) {
-    throw new ApiError(409, 'not_enough', building.id === content.camp.id ? 'Brakuje złota na rozwój obozu.' : 'Brakuje złota albo zasobów na tę budowę.');
-  }
+  if (missingFor(cost, walletOf(player.row)).length > 0) throw shortOf(building);
 
   const row = player.row;
   const stored = player.buildings[building.id];
@@ -97,22 +116,73 @@ export async function beginBuilding(db, player, buildingId, now) {
   }
 }
 
+// A build while another is under way: the level after those under way and
+// waiting, paid now, from the end of the last one, in the camp they leave
+// behind. It is saved only if the character and the build under way are as
+// seen here, so two taps at once queue and pay once.
+async function queueBuilding(db, player, building, queue, now) {
+  const { camp } = content;
+  if (buildsUnderWay(player.buildings, queue, now) >= camp.queue) {
+    throw new ApiError(409, 'queue_full', 'Kolejka budowy jest pełna.');
+  }
+  const level = plannedLevel(building, player.buildings, queue);
+  if (level >= building.maxLevel) {
+    if (buildingLevel(player.buildings[building.id], now) >= building.maxLevel) throw atTop(building);
+    throw new ApiError(409, 'max_level', 'Najwyższy poziom jest już w kolejce.');
+  }
+  const target = level + 1;
+  const cost = upgradeCost(building, target);
+  if (missingFor(cost, walletOf(player.row)).length > 0) throw shortOf(building);
+  const startsAt = queueEnd(player.buildings, queue, now);
+  const minutes = buildMinutes(building, target, plannedLevel(camp, player.buildings, queue), content);
+  const waiting = [...queue, { buildingId: building.id, level: target, startsAt, endsAt: startsAt + minutes * 60000 }];
+  const row = player.row;
+  const running = construction(player.buildings, now);
+  const gold = cost.gold ?? 0;
+  const resources = Object.keys(cost).filter((id) => id !== 'gold');
+  const spend = resources.length
+    ? `, resources = json_set(resources, ${resources.map(() => '?, COALESCE(json_extract(resources, ?), 0) - ?').join(', ')})`
+    : '';
+  const result = await db
+    .prepare(
+      `UPDATE characters SET gold = gold - ?${spend}, build_queue = ?, version = version + 1
+       WHERE id = ? AND version = ? AND gold >= ?
+         ${resources.map(() => 'AND COALESCE(json_extract(resources, ?), 0) >= ?').join(' ')}
+         ${running ? 'AND EXISTS (SELECT 1 FROM buildings WHERE character_id = ? AND building_id = ? AND ends_at = ?)' : ''}`,
+    )
+    .bind(
+      gold,
+      ...resources.flatMap((id) => [path(id), path(id), cost[id]]),
+      JSON.stringify(waiting),
+      row.id, row.version, gold,
+      ...resources.flatMap((id) => [path(id), cost[id]]),
+      ...(running ? [row.id, running.buildingId, running.endsAt] : []),
+    )
+    .run();
+  if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
+}
+
 // The upgrade in progress is ready now: two seconds back, as the page counts
 // a second after the end. A production building waiting for the end of the
-// upgrade starts producing with it. For "Pomiń czas" in test mode and the
-// skipped introduction.
+// upgrade starts producing with it, and the waiting builds come as much
+// sooner. For "Pomiń czas" in test mode and the skipped introduction.
 export async function completeBuilding(db, player, now) {
   const running = construction(player.buildings, now);
   if (!running) return;
   const shift = Math.max(0, running.endsAt - (now - 2000));
-  await db
-    .prepare(
-      `UPDATE buildings SET started_at = started_at - ?, ends_at = ends_at - ?,
-         collected_at = CASE WHEN collected_at = ends_at THEN collected_at - ? ELSE collected_at END
-       WHERE character_id = ? AND building_id = ?`,
-    )
-    .bind(shift, shift, shift, player.row.id, running.buildingId)
-    .run();
+  const queue = buildQueue(player.row);
+  await db.batch([
+    db
+      .prepare(
+        `UPDATE buildings SET started_at = started_at - ?, ends_at = ends_at - ?,
+           collected_at = CASE WHEN collected_at = ends_at THEN collected_at - ? ELSE collected_at END
+         WHERE character_id = ? AND building_id = ?`,
+      )
+      .bind(shift, shift, shift, player.row.id, running.buildingId),
+    db
+      .prepare('UPDATE characters SET build_queue = ? WHERE id = ? AND build_queue = ?')
+      .bind(JSON.stringify(shiftQueue(queue, shift)), player.row.id, player.row.build_queue ?? '[]'),
+  ]);
 }
 
 // "Zbierz": what a production building's store holds goes to the resources,

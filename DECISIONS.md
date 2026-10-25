@@ -1164,7 +1164,7 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - Rozwój kosztuje samo złoto: 500 za poziom 2, a każdy następny dwa razy więcej, aż do 128 000 za poziom 10. Razem to 255 500 złota. Przy ok. 25 złota na godzinę wypraw na poziomach 3–5 poziom 2 kosztuje ok. 20 godzin wypraw, a 128 000 to ok. 175 godzin wypraw postaci na poziomie 50 (ok. 725 złota na godzinę).
     - Rozwój trwa 4, 8, 12, 18, 24, 36, 48, 60 i 72 godziny. Razem to 282 godziny, prawie 12 dni.
     - Każdy poziom ponad pierwszy przyspiesza budowy pozostałych budynków o 10%: ich czas dzieli się przez 1 + 0,1 × (poziom obozu − 1). Na poziomie 10 budowy trwają 1,9 raza krócej. Sam obóz rośnie we własnym tempie.
-    - Rozwój obozu zajmuje jedyne miejsce budowy, jak każda budowa, a „Przewiń” Punktami Czasu działa tak samo.
+    - Rozwój obozu zajmuje jedyne miejsce budowy, jak każda budowa, a „Przewiń” Punktami Czasu działa tak samo. *Obok budowy w toku mogą teraz czekać dwie kolejne: zob. „Kolejka budów w obozie”.*
     - Przycisk otwiera ekran obozu (`#/oboz/camp`) z następnym poziomem, kosztem i czasem rozwoju. Gdy obóz rośnie, licznik wisi pod przyciskiem, a na wąskim widoku napis jest mniejszy, żeby nie zasłaniać Kowadła.
     - Gdy brakuje złota, przycisk mówi „Brakuje złota”, bez „zasobów”.
     - Na poziomie 10 ekran obozu mówi: „Na najwyższym poziomie obóz będzie mógł stać się Wioską. Wioska przyjdzie później.”
@@ -1186,3 +1186,16 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - Wybór pamięta przeglądarka (`insight.zoom`), więc działa w całej grze, także na ekranie logowania.
     - Gra układa się wtedy dla szerszego albo węższego ekranu, a telefon ją skaluje (znacznik viewport w `src/client/zoom.js`). Dzięki temu okna, pasek i kamera narratora liczą wszystko jak zwykle.
     - Przeglądarka na komputerze pomija ten znacznik i ma własne powiększanie (Ctrl i + albo −), więc wiersz jest tylko na ekranach dotykowych.
+
+## Kolejka budów w obozie (25.10.2026)
+
+1. **Do trzech budów naraz.** Autor: „Powinna być też możliwość kolejkowania max 3 budów w obozie, jeśli zasoby na to pozwalają graczowi.” Przyjęte: naraz są najwyżej 3 budowy, licząc tę w toku (`queue` w `data/camp.json`). Jeśli autorowi chodziło o 3 czekające obok tej w toku, wystarczy zmienić tę liczbę na 4.
+2. **Płaci się od razu.** Budowa dodana, gdy coś już się buduje, czeka w kolejce. Gracz płaci za nią przy dodaniu cały koszt, więc dodać ją można tylko wtedy, gdy starcza złota i zasobów.
+3. **Rusza sama.** Czekająca budowa zaczyna się, gdy skończy się poprzednia, także gdy gracza nie ma w grze. Serwer uruchamia ją przy najbliższym wczytaniu postaci, z czasem, w którym powinna była ruszyć (`settleBuilds` w `src/server/characters.js`). Magazyn budynku produkcyjnego trafia wtedy do zasobów, a odpoczynek liczy się do tej chwili, jak przy budowie zaczętej ręcznie. Kolejka jest zapisana przy postaci (`build_queue`, migracja 0020).
+4. **Kolejne poziomy.** W kolejce może stać ten sam budynek kilka razy, kolejnymi poziomami, a także rozwój obozu. Następny poziom na ekranie budynku i jego koszt liczą się po wszystkich budowach z kolejki. Czas liczy się w obozie, jaki te budowy zostawią: np. Stół rzemieślniczy na poziom 2 po rozwoju obozu do poziomu 2 buduje się 9 minut zamiast 10.
+5. **Przewijanie.** „Przewiń” Punktami Czasu i „Pomiń czas” w trybie testowym skracają budowę w toku, a cała kolejka przesuwa się o tyle samo.
+6. **Na ekranie.**
+    - Gdy coś się buduje, przycisk na ekranie budynku mówi „Dodaj do kolejki: poziom N”, a przy pełnej kolejce „Kolejka budowy pełna”, z wyjaśnieniem pod spodem.
+    - Ekran budynku pokazuje też jego poziomy czekające w kolejce, z godziną startu.
+    - Pod planszą obozu stoi lista „Kolejka budowy: 2 z 3” z godzinami startu, a nad placem czekającego budynku napis „w kolejce”.
+7. **Bez wycofywania.** Na razie budowy z kolejki nie da się wycofać, bo to najprostsze rozwiązanie. Jeśli autor chce przycisk „Anuluj” ze zwrotem kosztu, dodamy go.

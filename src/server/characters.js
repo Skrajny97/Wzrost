@@ -5,9 +5,11 @@ import {
   areaFor,
   autoDistribute,
   bagCapacity,
+  buildsUnderWay,
   campBonus,
   campLevels,
   classXpToNext,
+  collect,
   combatValues,
   computeStats,
   construction,
@@ -24,6 +26,7 @@ import {
   itemView,
   materialView,
   nextHuntUnlock,
+  plannedLevel,
   playerCombatant,
   production,
   questsStale,
@@ -112,9 +115,86 @@ export async function requirePlayer(context) {
   const session = await requireSession(context);
   const player = await loadPlayer(context.env.DB, session.userId);
   if (!player) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
+  await settleBuilds(context.env.DB, player, context.now);
   await settleTimePoints(context.env.DB, player.row, context.now);
   await settleQuests(context.env.DB, player, context.now);
   return { session, player };
+}
+
+// The character as it is now, with the builds whose time has come started:
+// for an answer after something moved the camp's time (a skipped build).
+export async function loadSettled(db, userId, now) {
+  const player = await loadPlayer(db, userId);
+  await settleBuilds(db, player, now);
+  return player;
+}
+
+// The camp's waiting builds (camp.js in the engine), as the row keeps them.
+export const buildQueue = (row) => JSON.parse(row.build_queue ?? '[]');
+
+const path = (id) => `$."${id}"`;
+
+// The waiting builds whose time has come start, one after another, each as
+// if it had started at its own time, as a build started by hand does
+// (camp.js: beginBuilding): a production building's store goes to the
+// resources then, and the HP rested by then is saved. Each start saves only
+// if the character is as seen here; when another request moved first, the
+// character is read again and its queue goes on from there.
+async function settleBuilds(db, player, now) {
+  for (let tries = 0; tries < 10; tries++) {
+    const [entry, ...rest] = buildQueue(player.row);
+    if (!entry || entry.startsAt > now) return;
+    const { row } = player;
+    const at = entry.startsAt;
+    const building = content.buildingsById[entry.buildingId];
+    const producing = building?.effect.kind === 'production';
+    const gathered = producing ? collect(building, player.buildings[building.id], at) : null;
+    const resting = !player.activity;
+    const hp = resting ? currentHp(player, at).hp : null;
+    const statements = [
+      db
+        .prepare(
+          `UPDATE characters SET build_queue = ?${gathered ? ', resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) + ?)' : ''}${resting ? ', hp = ?, hp_at = ?' : ''}, version = version + 1
+           WHERE id = ? AND version = ?`,
+        )
+        .bind(
+          JSON.stringify(rest),
+          ...(gathered ? [path(gathered.resource), path(gathered.resource), gathered.amount] : []),
+          ...(resting ? [hp, at] : []),
+          row.id,
+          row.version,
+        ),
+    ];
+    // A build of a building the game no longer has only leaves the queue.
+    if (building) {
+      statements.push(
+        db
+          .prepare(
+            `INSERT INTO buildings (character_id, building_id, level, started_at, ends_at, collected_at)
+             SELECT ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ?)
+             ON CONFLICT (character_id, building_id) DO UPDATE
+               SET level = excluded.level, started_at = excluded.started_at, ends_at = excluded.ends_at, collected_at = excluded.collected_at`,
+          )
+          .bind(row.id, building.id, entry.level, at, entry.endsAt, producing ? entry.endsAt : null, row.id, row.version + 1),
+      );
+    }
+    const [moved] = await db.batch(statements);
+    if (moved.meta.changes !== 1) {
+      Object.assign(player, await loadPlayer(db, row.user_id));
+      continue;
+    }
+    row.build_queue = JSON.stringify(rest);
+    row.version += 1;
+    if (gathered) {
+      const resources = JSON.parse(row.resources ?? '{}');
+      resources[gathered.resource] = (resources[gathered.resource] ?? 0) + gathered.amount;
+      row.resources = JSON.stringify(resources);
+    }
+    if (resting) Object.assign(row, { hp, hp_at: at });
+    if (building) {
+      player.buildings[building.id] = { level: entry.level, startedAt: at, endsAt: entry.endsAt, collectedAt: producing ? entry.endsAt : null };
+    }
+  }
 }
 
 // The Punkty Czasu that came with time since time_points_at join the stored
@@ -203,9 +283,14 @@ export function currentHp(player, now) {
 // takes in a camp of this level.
 function campView(player, levels, now) {
   const running = construction(player.buildings, now);
+  const queue = buildQueue(player.row);
   const { camp } = content;
   const own = campLevel(player.buildings, now, content);
-  const following = own < camp.maxLevel ? own + 1 : null;
+  // The next level of each building comes after the builds under way and
+  // waiting, and builds in the camp they leave behind.
+  const campThen = plannedLevel(camp, player.buildings, queue);
+  const following = campThen < camp.maxLevel ? campThen + 1 : null;
+  const queued = (id) => queue.filter((entry) => entry.buildingId === id).map((entry) => entry.level);
   return {
     level: {
       id: camp.id,
@@ -219,9 +304,10 @@ function campView(player, levels, now) {
       next: following && {
         level: following,
         effect: campEffectText(following, content),
-        minutes: buildMinutes(camp, following, own, content),
+        minutes: buildMinutes(camp, following, campThen, content),
         cost: upgradeCost(camp, following),
       },
+      queued: queued(camp.id),
     },
     construction: running && {
       buildingId: running.buildingId,
@@ -230,9 +316,15 @@ function campView(player, levels, now) {
       startedAt: running.startedAt,
       endsAt: running.endsAt,
     },
+    // The builds waiting after it, each with the time it starts, and how
+    // many builds the camp has at most, the one under way too.
+    queue: queue.map((entry) => ({ ...entry, name: content.buildingsById[entry.buildingId]?.name ?? entry.buildingId })),
+    queueSize: camp.queue,
+    underWay: buildsUnderWay(player.buildings, queue, now),
     buildings: content.buildings.map((building) => {
       const level = levels[building.id];
-      const next = level < building.maxLevel ? level + 1 : null;
+      const planned = plannedLevel(building, player.buildings, queue);
+      const next = planned < building.maxLevel ? planned + 1 : null;
       const stored = player.buildings[building.id];
       // A production building's store, once the building stands: the page
       // counts it up from `since`.
@@ -257,9 +349,10 @@ function campView(player, levels, now) {
         next: next && {
           level: next,
           effect: effectText(building, next, content),
-          minutes: buildMinutes(building, next, own, content),
+          minutes: buildMinutes(building, next, campThen, content),
           cost: upgradeCost(building, next),
         },
+        queued: queued(building.id),
       };
     }),
   };

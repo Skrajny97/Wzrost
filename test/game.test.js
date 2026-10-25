@@ -701,9 +701,12 @@ describe('camp', () => {
     const running = started.data.character.camp.construction;
     assert.deepEqual([running.buildingId, running.name, running.level, running.endsAt - running.startedAt], ['camp', 'Obóz', 2, 4 * 3600000]);
     assert.equal(started.data.character.gold, 20);
-    // It takes the one place for building, like a building does.
+    // It is a build like a building's: the Ognisko now waits for its end.
     await stock(100, { wood: 20 });
-    assert.equal((await build('campfire')).data.error.code, 'camp_busy');
+    const queued = await build('campfire');
+    assert.equal(queued.status, 201);
+    assert.deepEqual(queued.data.character.camp.queue.map((entry) => [entry.buildingId, entry.level, entry.startsAt]), [['campfire', 1, running.endsAt]]);
+    await (await db()).prepare("UPDATE characters SET build_queue = '[]'").run();
     await finishBuilding();
     const grown = await character();
     assert.deepEqual([grown.camp.level.level, grown.camp.level.effect, grown.camp.level.next.cost], [2, 'Budowy szybsze o 10%', { gold: 1000 }]);
@@ -720,7 +723,7 @@ describe('camp', () => {
     assert.equal((await build('camp')).data.error.code, 'max_level');
   });
 
-  test('a building is paid in gold and resources, takes time, and one is built at a time', async () => {
+  test('a building is paid in gold and resources and takes time', async () => {
     await stock(0, {});
     assert.equal((await build('campfire')).data.error.code, 'not_enough');
     assert.equal((await build('tower')).data.error.code, 'invalid_building');
@@ -733,11 +736,9 @@ describe('camp', () => {
     assert.deepEqual([running.buildingId, running.name, running.level, running.endsAt - running.startedAt], ['campfire', 'Ognisko', 1, 60000]);
     assert.equal(started.data.character.gold, 95);
     assert.deepEqual(started.data.character.resources, { wood: 16, stone: 5, 'iron-ore': 0 });
-    // Until the end the building keeps its old level, and nothing else can be built.
+    // Until the end the building keeps its old level.
     const campfire = (view) => view.camp.buildings.find((building) => building.id === 'campfire');
     assert.equal(campfire(started.data.character).level, 0);
-    assert.equal((await build('loot-shed')).data.error.code, 'camp_busy');
-    assert.equal((await build('campfire')).data.error.code, 'camp_busy');
 
     await finishBuilding();
     const done = await character();
@@ -755,6 +756,92 @@ describe('camp', () => {
     assert.equal(second.data.character.gold, 85);
     assert.deepEqual(second.data.character.resources, { wood: 8, stone: 2, 'iron-ore': 0 });
     assert.equal(second.data.character.camp.construction.endsAt - second.data.character.camp.construction.startedAt, 2 * 60000);
+  });
+
+  // Time passes for the camp: the builds, their stores and the queue move back.
+  async function travel(ms) {
+    const database = await db();
+    await database
+      .prepare('UPDATE buildings SET started_at = started_at - ?, ends_at = ends_at - ?, collected_at = collected_at - ?')
+      .bind(ms, ms, ms)
+      .run();
+    const { build_queue: queue } = await database.prepare('SELECT build_queue FROM characters').first();
+    const moved = JSON.parse(queue).map((entry) => ({ ...entry, startsAt: entry.startsAt - ms, endsAt: entry.endsAt - ms }));
+    await database.prepare('UPDATE characters SET build_queue = ?').bind(JSON.stringify(moved)).run();
+  }
+  const find = (view, id) => view.camp.buildings.find((building) => building.id === id);
+
+  test('up to three builds at once: the others wait in the queue, paid at once, and start one after another', async () => {
+    await stock(1000, { wood: 200, stone: 100, 'iron-ore': 50 });
+    const first = await build('sawmill');
+    const running = first.data.character.camp.construction;
+    assert.equal((await build('quarry')).status, 201);
+    const third = await build('sawmill');
+    assert.equal(third.status, 201);
+    const { camp } = third.data.character;
+    assert.deepEqual(camp.queue.map((entry) => [entry.buildingId, entry.name, entry.level]), [['quarry', 'Kamieniołom', 1], ['sawmill', 'Tartak', 2]]);
+    assert.equal(camp.queue[0].startsAt, running.endsAt);
+    assert.equal(camp.queue[1].startsAt, camp.queue[0].endsAt);
+    assert.deepEqual([camp.underWay, camp.queueSize], [3, 3]);
+    // Each was paid when it was queued: the Tartak twice and the Kamieniołom once.
+    assert.equal(third.data.character.gold, 1000 - 8 - 8 - 16);
+    assert.deepEqual(third.data.character.resources, { wood: 200 - 6 - 8 - 11, stone: 100 - 3 - 3, 'iron-ore': 50 });
+    // The Tartak's next level comes after the queue.
+    assert.deepEqual([find(third.data.character, 'sawmill').next.level, find(third.data.character, 'sawmill').queued], [3, [2]]);
+    // A fourth build does not fit, and a waiting one cannot be paid twice.
+    const fourth = await build('mine');
+    assert.equal(fourth.data.error.code, 'queue_full');
+    assert.equal((await character()).gold, 968);
+
+    // The build under way skipped ("Pomiń czas"): the next one starts at once.
+    const skipped = (await call('POST', '/api/test/skip-build', { cookie })).data.character;
+    assert.equal(skipped.camp.construction.buildingId, 'quarry');
+    assert.deepEqual(skipped.camp.queue.map((entry) => [entry.buildingId, entry.level]), [['sawmill', 2]]);
+    assert.equal(skipped.camp.queue[0].startsAt, skipped.camp.construction.endsAt);
+    assert.equal(find(skipped, 'sawmill').level, 1);
+    // There is room again.
+    assert.equal((await build('mine')).status, 201);
+
+    // Hours later everything has started and ended by itself.
+    await travel(3 * 3600000);
+    const later = await character();
+    assert.equal(later.camp.construction, null);
+    assert.deepEqual(later.camp.queue, []);
+    assert.deepEqual(['sawmill', 'quarry', 'mine'].map((id) => find(later, id).level), [2, 1, 1]);
+  });
+
+  test('a waiting build starts at its own time: the store made until then goes to the resources', async () => {
+    await stock(3000, { wood: 100, stone: 50 });
+    for (const id of ['craft-table', 'sawmill']) {
+      await build(id);
+      await call('POST', '/api/test/skip-build', { cookie });
+    }
+    // The Tartak works while the camp grows for 4 hours, then its upgrade starts.
+    assert.equal((await build('camp')).status, 201);
+    await build('sawmill');
+    const queued = (await build('craft-table')).data.character;
+    const [upgrade, table] = queued.camp.queue;
+    assert.deepEqual([upgrade.buildingId, upgrade.level, upgrade.startsAt], ['sawmill', 2, queued.camp.construction.endsAt]);
+    // They build in the camp the growth leaves behind: the table's 10 minutes take 9.
+    assert.deepEqual([table.buildingId, table.level, table.endsAt - table.startsAt], ['craft-table', 2, 9 * 60000]);
+    const wood = queued.resources.wood;
+    await travel(4 * 3600000 + 30 * 60000);
+    const later = await character();
+    assert.equal(later.camp.level.level, 2);
+    assert.equal(later.camp.construction?.buildingId ?? null, null);
+    // Its store was full (2 hours, 12 wood) when the upgrade started, and went to the resources.
+    assert.equal(later.resources.wood, wood + 12);
+    assert.deepEqual([find(later, 'sawmill').level, find(later, 'craft-table').level], [2, 2]);
+  });
+
+  test('a full queue in a growing camp: the camp too can wait in the queue', async () => {
+    await stock(5000, { wood: 100, stone: 50 });
+    await build('campfire');
+    assert.equal((await build('camp')).status, 201);
+    const view = (await build('camp')).data.character;
+    assert.deepEqual(view.camp.queue.map((entry) => [entry.buildingId, entry.level]), [['camp', 2], ['camp', 3]]);
+    assert.deepEqual([view.camp.level.next.level, view.camp.level.queued], [4, [2, 3]]);
+    assert.equal(view.gold, 5000 - 5 - 500 - 1000);
   });
 
   test('building goes on during an exploration', async () => {

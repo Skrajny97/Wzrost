@@ -1,14 +1,15 @@
 // The camp: a board with a plot for each building, like a village in a
 // browser strategy game, and a screen for each building. Buildings are
 // upgraded alongside the character's activity, paid with gold and the
-// materials, one at a time; an upgrade counts once its time has passed.
+// materials, one at a time, with a few more waiting in the queue; an upgrade
+// counts once its time has passed.
 // Production buildings fill a store the player collects, from a bubble on the
 // board or on the building's screen. Opened with the camp button in the top bar.
 
 import { BOARD_HEIGHT, BOARD_WIDTH, CAMP_PLOTS, PLOT_HEIGHT, PLOT_WIDTH, boardArt, plotArt } from '../camp-art.js';
 import { craftTableSection } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
-import { formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
+import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { leaveView, openView } from '../history.js';
 import { RESOURCE_ICONS } from '../icons.js';
 import { playSound } from '../sound.js';
@@ -40,6 +41,38 @@ function runningBuild(now = serverNow()) {
 }
 
 const resourceName = (id) => walletEntries().find((entry) => entry.id === id)?.name ?? id;
+
+// "o 21:10" today, "26 paź, 01:10" on another day.
+function moment(ms) {
+  const date = new Date(ms);
+  return date.toDateString() === new Date(serverNow()).toDateString() ? `o ${timeFormat.format(date)}` : dateTimeFormat.format(date);
+}
+
+// The builds the camp has now: the one under way and the waiting ones.
+const underWay = () => (runningBuild() ? 1 : 0) + state.character.camp.queue.length;
+
+// The builds waiting after the one under way, each with the time it starts.
+function queuePanel() {
+  const { queue, queueSize } = state.character.camp;
+  if (queue.length === 0) return null;
+  return h(
+    'section',
+    { class: 'card build-queue', 'aria-labelledby': 'build-queue-title' },
+    h('h2', { class: 'card-title', id: 'build-queue-title', text: `Kolejka budowy: ${underWay()} z ${queueSize}` }),
+    h(
+      'ol',
+      { class: 'build-queue-list' },
+      queue.map((entry) =>
+        h(
+          'li',
+          { class: 'build-queue-item' },
+          h('span', { text: `${entry.name}, poziom ${entry.level}` }),
+          h('span', { class: 'build-queue-time', text: `start ${moment(entry.startsAt)}` }),
+        ),
+      ),
+    ),
+  );
+}
 
 async function collectStore(building) {
   const { collected } = await call('POST', '/api/camp/collect', { buildingId: building.id });
@@ -102,7 +135,7 @@ function constructionPanel(running, ticks) {
         `Budowa: ${running.name}, poziom ${running.level}.`,
         countdown,
         h('div', { class: 'bar bar--system' }, progress),
-        h('p', { class: 'system-hint', text: `Gotowe o ${timeFormat.format(new Date(running.endsAt))}.` }),
+        h('p', { class: 'system-hint', text: `Gotowe ${moment(running.endsAt)}.` }),
       ),
       'build-countdown',
     ),
@@ -143,6 +176,7 @@ function mountBoard(container, backHash) {
       nothingBuilt &&
         h('p', { class: 'system-hint camp-hint', text: 'Dotknij pustego placu, żeby zobaczyć koszt budowy. Zasoby znajdziesz na eksploracjach.' }),
       running && constructionPanel(running, ticks),
+      queuePanel(),
     );
     tick(serverNow());
   }
@@ -185,9 +219,10 @@ function mountBoard(container, backHash) {
   function plot(building, running) {
     const spot = CAMP_PLOTS[building.id] ?? { x: BOARD_WIDTH / 2, y: BOARD_HEIGHT / 2 };
     const underway = running?.buildingId === building.id;
+    const waiting = !underway && building.queued.length > 0;
     const empty = building.level === 0;
     const hash = `${CAMP}/${building.id}`;
-    const said = [empty ? `Pusty plac: ${building.name}` : `${building.name}, poziom ${building.level}`, underway && 'trwa budowa'];
+    const said = [empty ? `Pusty plac: ${building.name}` : `${building.name}, poziom ${building.level}`, underway && 'trwa budowa', waiting && 'w kolejce'];
     const link = h(
       'a',
       {
@@ -217,6 +252,7 @@ function mountBoard(container, backHash) {
       },
       link,
       underway && timer(running),
+      waiting && h('span', { class: 'camp-plot-timer camp-plot-timer--queued', 'aria-hidden': 'true' }, icon('hourglass', { size: 12 }), 'w kolejce'),
       building.production && !building.production.paused && bubble(building),
     );
   }
@@ -300,7 +336,8 @@ function mountBuilding(container, id) {
       ),
       building.crafts && craftTableSection(ticks),
       underway && constructionPanel(running, ticks),
-      nextLevel(building, running),
+      waitingNote(id),
+      nextLevel(building),
     );
     tick(serverNow());
   }
@@ -354,29 +391,40 @@ function mountBuilding(container, id) {
     );
   }
 
-  function nextLevel(building, running) {
+  // This building's levels waiting in the queue, with the times they start.
+  function waitingNote(id) {
+    const waiting = state.character.camp.queue.filter((entry) => entry.buildingId === id);
+    if (waiting.length === 0) return null;
+    return systemPanel(...waiting.map((entry) => `W kolejce: poziom ${entry.level}, start ${moment(entry.startsAt)}.`));
+  }
+
+  // The level after those under way and waiting. With a build under way it
+  // joins the queue, as long as there is room in it.
+  function nextLevel(building) {
     const next = building.next;
     const own = building.id === campOf().id;
-    if (!next) return h('p', { class: 'muted', text: building.evolution ?? 'Najwyższy poziom.' });
+    if (!next) return h('p', { class: 'muted', text: building.evolution ?? (building.queued.length > 0 ? 'Najwyższy poziom jest już w kolejce.' : 'Najwyższy poziom.') });
     const have = Object.fromEntries(walletEntries().map((entry) => [entry.id, entry.amount]));
     const missing = Object.entries(next.cost).some(([resource, amount]) => (have[resource] ?? 0) < amount);
-    const label = running
-      ? running.buildingId === building.id
-        ? 'Trwa budowa'
-        : `Trwa budowa: ${running.name}`
+    const busy = underWay();
+    const full = busy >= state.character.camp.queueSize;
+    const label = full
+      ? 'Kolejka budowy pełna'
       : missing
         ? own
           ? 'Brakuje złota'
           : 'Brakuje złota albo zasobów'
-        : own
-          ? `Rozwiń obóz do poziomu ${next.level}`
-          : building.level === 0
-            ? 'Zbuduj'
-            : `Ulepsz do poziomu ${next.level}`;
+        : busy > 0
+          ? `Dodaj do kolejki: poziom ${next.level}`
+          : own
+            ? `Rozwiń obóz do poziomu ${next.level}`
+            : building.level === 0
+              ? 'Zbuduj'
+              : `Ulepsz do poziomu ${next.level}`;
     return h(
       'section',
       { class: 'card building-next-card', 'aria-labelledby': 'building-next' },
-      h('h2', { class: 'card-title', id: 'building-next', text: building.level === 0 ? 'Budowa' : `Poziom ${next.level}` }),
+      h('h2', { class: 'card-title', id: 'building-next', text: next.level === 1 ? 'Budowa' : `Poziom ${next.level}` }),
       h('p', { class: 'building-next', text: next.effect }),
       h(
         'ul',
@@ -396,7 +444,7 @@ function mountBuilding(container, id) {
         type: 'button',
         class: 'button button--system',
         'data-guide': 'build',
-        disabled: Boolean(running) || missing,
+        disabled: full || missing,
         text: label,
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
@@ -404,7 +452,13 @@ function mountBuilding(container, id) {
             playSound('build');
           }),
       }),
-      missing &&
+      full &&
+        h('p', {
+          class: 'system-hint',
+          text: `Naraz można mieć ${countOf(state.character.camp.queueSize, 'budowę', 'budowy', 'budów')}: trwającą i czekające w kolejce. Kolejna zmieści się, gdy któraś się skończy.`,
+        }),
+      !full &&
+        missing &&
         h('p', {
           class: 'system-hint',
           text: own

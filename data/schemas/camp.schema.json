@@ -4,7 +4,7 @@
   "description": "Poziom samego obozu: od startLevel do maxLevel, za samo złoto, a każdy poziom ponad pierwszy przyspiesza budowy budynków.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "description", "startLevel", "maxLevel", "effect", "costs", "minutes", "evolution"],
+  "required": ["id", "name", "description", "startLevel", "maxLevel", "effect", "costs", "minutes", "evolution", "queue"],
   "properties": {
     "$comment": { "type": "string" },
     "id": { "const": "camp" },
@@ -54,6 +54,7 @@
         }
       }
     },
-    "evolution": { "type": "string", "minLength": 1, "description": "Zapowiedź ewolucji po najwyższym poziomie." }
+    "evolution": { "type": "string", "minLength": 1, "description": "Zapowiedź ewolucji po najwyższym poziomie." },
+    "queue": { "type": "integer", "minimum": 1, "maximum": 10, "description": "Ile budów obóz ma naraz, razem z trwającą; reszta czeka w kolejce." }
   }
 }

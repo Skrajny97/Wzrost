@@ -5,9 +5,9 @@
 // sold. With fewer points than minutes left, the wait gets as much shorter
 // as the points allow.
 
-import { construction, regenPerMinute } from '../engine/index.js';
+import { construction, regenPerMinute, shiftQueue } from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, currentHp, loadPlayer, requirePlayer } from './characters.js';
+import { buildQueue, characterView, currentHp, loadSettled, requirePlayer } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
 
 const MINUTE = 60000;
@@ -21,7 +21,8 @@ export async function skipWithTimePoints(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const spent = await spendTimePoints(context.env.DB, player, body.target, context.now);
-  return json({ spent, character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
+  // A build skipped to its end lets the next waiting one start at once.
+  return json({ spent, character: characterView(await loadSettled(context.env.DB, session.userId, context.now), context.now) });
 }
 
 // Points for the minutes left of a wait (`target`: activity, rest or build).
@@ -96,8 +97,9 @@ function skipRest(db, player, now) {
   };
 }
 
-// The upgrade moves into the past. A production building waiting for the end
-// of its upgrade starts producing with it, as in skipBuilding (testing.js).
+// The upgrade moves into the past, and the waiting builds as much sooner. A
+// production building waiting for the end of its upgrade starts producing
+// with it, as in skipBuilding (testing.js).
 function skipBuild(db, player, now) {
   const { row } = player;
   const running = construction(player.buildings, now);
@@ -108,11 +110,11 @@ function skipBuild(db, player, now) {
     statements: [
       db
         .prepare(
-          `UPDATE characters SET time_points = time_points - ?, version = version + 1
+          `UPDATE characters SET time_points = time_points - ?, build_queue = ?, version = version + 1
            WHERE id = ? AND version = ? AND time_points >= ?
              AND EXISTS (SELECT 1 FROM buildings WHERE character_id = ? AND building_id = ? AND ends_at = ?)`,
         )
-        .bind(spent, row.id, row.version, spent, row.id, running.buildingId, running.endsAt),
+        .bind(spent, JSON.stringify(shiftQueue(buildQueue(row), shift)), row.id, row.version, spent, row.id, running.buildingId, running.endsAt),
       db
         .prepare(
           `UPDATE buildings SET started_at = started_at - ?, ends_at = ends_at - ?,

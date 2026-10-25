@@ -26,6 +26,10 @@ import {
   upgradeMinutes,
   buildMinutes,
   buildSpeed,
+  buildsUnderWay,
+  plannedLevel,
+  queueEnd,
+  shiftQueue,
   campEffectText,
   campLevel,
   upgradeView,
@@ -812,6 +816,27 @@ describe('camp', () => {
         for (const [resource, amount] of Object.entries(before)) assert.ok(cost[resource] > amount, `${building.id} ${level} ${resource}`);
       }
     }
+  });
+
+  test('the queue: builds wait one after another, and the levels come after them', () => {
+    const { camp } = content;
+    const sawmill = content.buildingsById.sawmill;
+    const stored = { sawmill: { level: 2, startedAt: 0, endsAt: 100 } };
+    const queue = [
+      { buildingId: 'camp', level: 2, startsAt: 100, endsAt: 500 },
+      { buildingId: 'sawmill', level: 3, startsAt: 500, endsAt: 800 },
+    ];
+    assert.equal(content.camp.queue, 3);
+    assert.deepEqual([buildsUnderWay(stored, queue, 50), buildsUnderWay(stored, [], 50), buildsUnderWay(stored, [], 150)], [3, 1, 0]);
+    assert.deepEqual([queueEnd(stored, queue, 50), queueEnd(stored, [], 50), queueEnd(stored, [], 150)], [800, 100, 150]);
+    // The level after everything under way and waiting: the Tartak's 2 under
+    // way, then 3 waiting; the camp's 2 waiting; nothing yet for the mine.
+    assert.deepEqual(
+      [plannedLevel(sawmill, stored, queue), plannedLevel(sawmill, stored, []), plannedLevel(camp, stored, queue), plannedLevel(camp, stored, [])],
+      [3, 2, 2, 1],
+    );
+    assert.equal(plannedLevel(content.buildingsById.mine, stored, queue), 0);
+    assert.deepEqual(shiftQueue(queue, 60).map((entry) => [entry.startsAt, entry.endsAt]), [[40, 440], [440, 740]]);
   });
 
   test('an upgrade counts once it ends, and one runs at a time', () => {

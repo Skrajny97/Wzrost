@@ -3653,6 +3653,38 @@ a.segmented-option {
   pointer-events: none;
 }
 
+/* A building waiting in the queue: the same tag, quieter. */
+.camp-plot-timer--queued {
+  border-color: var(--line);
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* The camp's queue under the build in progress (camp.js). */
+.build-queue-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 22px;
+}
+
+.build-queue-item::marker {
+  color: var(--text-muted);
+}
+
+.build-queue-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
+}
+
+.build-queue-time {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 /* What a production building's store holds: a tap collects it. */
 .camp-bubble {
   position: absolute;

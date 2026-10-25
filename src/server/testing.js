@@ -4,7 +4,7 @@
 import { construction } from '../engine/index.js';
 import { content } from './content.js';
 import { completeBuilding } from './camp.js';
-import { characterView, currentHp, loadPlayer, requirePlayer } from './characters.js';
+import { characterView, currentHp, loadPlayer, loadSettled, requirePlayer } from './characters.js';
 import { ApiError, json } from './http.js';
 import { testMode, testModeFor } from './test-mode.js';
 
@@ -59,5 +59,6 @@ export async function skipBuilding(context) {
       );
     }
   }
-  return json({ character: characterView(await loadPlayer(db, session.userId), now) });
+  // The next waiting build starts at once.
+  return json({ character: characterView(await loadSettled(db, session.userId, now), now) });
 }
