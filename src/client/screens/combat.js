@@ -6,13 +6,14 @@
 // inner regions areas.
 
 import { areaArt } from '../area-art.js';
+import { monsterSprite } from '../art.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, timeFormat } from '../format.js';
 import { preloadReportMusic } from '../music.js';
 import { activityFinished, call, currentHp, isUnlocked, reportCache, restRate, serverNow, state, testModeOn, unlockInfo } from '../state.js';
 import { skipControl } from '../time.js';
-import { confirmAction, lockLabel, systemPanel, toast, withButton } from '../ui.js';
+import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
 
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
 const CHOICE_KEY = 'wzrost.hunt-choice';
@@ -50,6 +51,37 @@ const lengthName = (minutes) => (state.content.lengths.find((length) => length.u
 const areaOpen = (area, character) => character.classLevel >= area.unlockClassLevel;
 
 const chip = (text, className = '') => h('span', { class: `chip ${className}`.trim(), text });
+
+// "Czyhające niebezpieczeństwa": the creatures of an inner region with the
+// levels they come at. One the character has not met in a fight yet is only
+// a shadow with "???"; its levels show from the start.
+function dangersSheet(place) {
+  const met = new Set(state.character.met ?? []);
+  openSheet(
+    h('h2', { class: 'sheet-title', text: 'Czyhające niebezpieczeństwa' }),
+    h('p', { class: 'sheet-text', text: place.name }),
+    h(
+      'ul',
+      { class: 'danger-list' },
+      place.dangers.map((danger) => {
+        const known = met.has(danger.monsterId);
+        const levels = danger.minLevel === danger.maxLevel ? `poz. ${danger.minLevel}` : `poz. ${danger.minLevel}–${danger.maxLevel}`;
+        return h(
+          'li',
+          { class: `danger-row${known ? '' : ' danger-row--unknown'}`, 'aria-label': `${known ? danger.name : 'Nieznany stwór'}, ${levels}${danger.elite ? ', elita' : ''}` },
+          h('span', { class: 'danger-art' }, monsterSprite(danger.monsterId) ?? icon(danger.family, { size: 28 })),
+          h(
+            'span',
+            { class: 'danger-text' },
+            h('span', { class: 'danger-name', text: known ? danger.name : '???' }),
+            h('span', { class: 'danger-meta', text: danger.elite ? `${levels} · elita` : levels }),
+          ),
+        );
+      }),
+    ),
+    h('p', { class: 'muted', text: 'Stwór, którego postać jeszcze nie spotkała, jest tylko cieniem. Pierwsza walka zdradza, kim jest.' }),
+  );
+}
 
 // The region and inner region views go on the browser history (history.js),
 // and starting an exploration returns to the main view.
@@ -480,6 +512,14 @@ export function mountCombat(container, { params, navigate }) {
           ),
         ),
         h('p', { class: 'region-description', text: area.description }),
+        area.dangers?.length > 0 &&
+          h(
+            'button',
+            { type: 'button', class: 'danger-link', onClick: () => dangersSheet(area) },
+            icon('beast', { size: 20 }),
+            h('span', { text: 'Czyhające niebezpieczeństwa' }),
+            icon('chevron', { size: 18 }),
+          ),
         levelNote,
         durations,
         threatLine,

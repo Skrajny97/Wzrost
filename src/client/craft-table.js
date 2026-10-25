@@ -19,9 +19,10 @@ export function materialIcon(materialId, size = 24) {
 }
 
 async function craft(body) {
-  const { ordered } = await call('POST', '/api/craft/materials', body);
+  const { ordered, skipped } = await call('POST', '/api/craft/materials', body);
   playSound('build');
-  toast(ordered === 1 ? 'Materiał trafił na stół.' : `Na stole: ${countOf(ordered, 'zlecenie', 'zlecenia', 'zleceń')}.`);
+  const waiting = skipped > 0 ? ` Na wyższy poziom stołu ${skipped === 1 ? 'czeka' : 'czekają'}: ${countOf(skipped, 'materiał', 'materiały', 'materiałów')}.` : '';
+  toast(`${ordered === 1 ? 'Materiał trafił na stół.' : `Na stole: ${countOf(ordered, 'zlecenie', 'zlecenia', 'zleceń')}.`}${waiting}`);
 }
 
 // What materials are, while there are none yet (the author's sentence).
@@ -30,6 +31,7 @@ export const MATERIALS_HINT = 'Z pokonanych stworów zdobędziesz różne materi
 function materialsCard(crafting, built, full) {
   const blocked = !built || full;
   const none = crafting.materials.length === 0;
+  const anyTaken = crafting.materials.some((material) => material.needs === null);
   return h(
     'section',
     { class: 'card craft-card', 'aria-labelledby': 'craft-materials' },
@@ -50,7 +52,11 @@ function materialsCard(crafting, built, full) {
                 h('span', { class: 'item-name', vars: { '--rarity': material.color }, text: `${material.name} ×${formatNumber(material.count)}` }),
                 h('span', {
                   class: 'item-meta',
-                  text: [material.rarityName, `daje: ${material.part} ×${formatNumber(material.count)}`, built && formatMinutes(material.minutes)]
+                  text: [
+                    material.rarityName,
+                    `daje: ${material.part} ×${formatNumber(material.count)}`,
+                    material.needs ? `od poziomu ${material.needs} stołu` : built && formatMinutes(material.minutes),
+                  ]
                     .filter(Boolean)
                     .join(' · '),
                 }),
@@ -58,7 +64,7 @@ function materialsCard(crafting, built, full) {
               h('button', {
                 type: 'button',
                 class: 'button button--world button--small',
-                disabled: blocked,
+                disabled: blocked || material.needs !== null,
                 text: 'Przerób',
                 'aria-label': `Przerób: ${material.name} ×${material.count}`,
                 onClick: (event) => withButton(event.currentTarget, () => craft({ keys: [material.key] })),
@@ -70,7 +76,7 @@ function materialsCard(crafting, built, full) {
       h('button', {
         type: 'button',
         class: 'button button--system',
-        disabled: blocked,
+        disabled: blocked || !anyTaken,
         text: 'Przerób wszystko',
         onClick: (event) => withButton(event.currentTarget, () => craft({ all: true })),
       }),

@@ -4,6 +4,7 @@
 
 import { ApiError, request } from './api.js';
 import { $, $$, clear, h } from './dom.js';
+import { countOf } from './format.js';
 import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
 import { buildTopbar, showPouch, showWallet, updateNav, updateTopbar } from './layout.js';
@@ -190,7 +191,8 @@ function watchCrafting(now) {
   craftRetryAt = now + 30000;
   call('GET', '/api/character')
     .then(() => {
-      toast(`Stół rzemieślniczy skończył: ${order.part} ×${order.parts}.`);
+      const extra = order.bonus > 0 ? ` i ${countOf(order.bonus, 'dodatkowa część', 'dodatkowe części', 'dodatkowych części')}` : '';
+      toast(`Stół rzemieślniczy skończył: ${order.part} ×${order.parts}${extra}.`);
       playSound('done');
     })
     .catch((error) => toast(error.message));

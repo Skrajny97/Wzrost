@@ -239,6 +239,9 @@ export async function finishHunt(db, player, now) {
     : '';
   // Materials from beaten creatures, by stack ("wolf-pelt:common").
   const left = Object.entries(hunt.materials);
+  // The creatures of every fight join those the character has met
+  // ("Czyhające niebezpieczeństwa" shows them by name from now on).
+  const met = [...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))])];
   const setMaterials = left.length
     ? `, materials = json_set(materials, ${left.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})`
     : '';
@@ -259,7 +262,7 @@ export async function finishHunt(db, player, now) {
       db
         .prepare(
           `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ? + ${storedPrice.sql}${setResources}${setMaterials},
-             time_points = time_points + ?, hp = ?, hp_at = ?, version = version + 1
+             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, version = version + 1
            WHERE id = ?`,
         )
         .bind(
@@ -274,6 +277,7 @@ export async function finishHunt(db, player, now) {
           applied.timePoints,
           hunt.hpEnd,
           activity.ends_at,
+          JSON.stringify(met),
           row.id,
         ),
       // Bag items the scrapper bought: paid for above, while they were still there.

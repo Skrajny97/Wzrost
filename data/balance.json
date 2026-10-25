@@ -101,8 +101,8 @@
   },
   "timePoints": {
     "start": 60,
-    "perLevel": 3,
-    "perClassLevel": 2,
+    "perLevel": 2,
+    "perClassLevel": 1,
     "find": 5,
     "generateMinutes": 30
   },

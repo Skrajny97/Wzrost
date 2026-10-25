@@ -86,6 +86,28 @@ export function eliteEncounter(area, content) {
   return { elite: true, members: [{ monsterId: area.elite, level: area.maxLevel + content.balance.hunt.eliteLevelBonus }] };
 }
 
+// The creatures that may meet a character in an inner region ("Czyhające
+// niebezpieczeństwa"), each with the levels it can come at: the place's range
+// in the usual encounters, some levels above it in the demanding ones, and
+// the elite above the strongest. In the order of the place's encounters, the
+// elite last.
+export function areaDangers(area, content) {
+  const { toughLevelBonus, eliteLevelBonus } = content.balance.hunt;
+  const dangers = new Map();
+  const add = (monsterId, minLevel, maxLevel, elite = false) => {
+    const known = dangers.get(monsterId);
+    if (!known) dangers.set(monsterId, { monsterId, minLevel, maxLevel, elite });
+    else Object.assign(known, { minLevel: Math.min(known.minLevel, minLevel), maxLevel: Math.max(known.maxLevel, maxLevel), elite: known.elite || elite });
+  };
+  for (const encounter of area.encounters) for (const monsterId of encounter.monsters) add(monsterId, area.minLevel, area.maxLevel);
+  for (const encounter of area.tough ?? []) {
+    const bonus = encounter.levelBonus ?? toughLevelBonus;
+    for (const monsterId of encounter.monsters) add(monsterId, area.minLevel + bonus, area.maxLevel + bonus);
+  }
+  if (area.elite) add(area.elite, area.maxLevel + eliteLevelBonus, area.maxLevel + eliteLevelBonus, true);
+  return [...dangers.values()];
+}
+
 // A level from the place's range, whatever the character's level. Lower
 // levels come more often (monsterLevelWeights), so a character at the start of
 // an inner region is not outmatched in every fight.

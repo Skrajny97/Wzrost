@@ -71,11 +71,18 @@ export function restBonus(stored, since, now, content) {
 
 // The effect of a building at a level, as the page shows it: "o 20%", or
 // for a production building "6 drewna na godzinę… na 1 h".
-export function effectText(building, level) {
+export function effectText(building, level, content) {
   const { effect } = building;
   const value = effect.perLevel * level;
   const shown = effect.unit === 'percent' ? `${Math.round(value * 100)}%` : String(Math.round(value));
-  return effect.text.replace('{value}', shown).replace('{hours}', `${effect.storageHours * level}\u00a0h`);
+  const text = effect.text.replace('{value}', shown).replace('{hours}', `${effect.storageHours * level}\u00a0h`);
+  if (!effect.rarities) return text;
+  // The Stół rzemieślniczy also names the highest rarity it takes and, from
+  // a level on, the chance of an extra part.
+  const all = level >= effect.rarities.length;
+  const cap = all ? 'Wszystkie rzadkości' : `Najwyższa rzadkość: ${content.raritiesById[effect.rarities[level - 1]].forms.f}`;
+  const bonus = level >= effect.bonusFromLevel ? `, szansa na dodatkową część: ${Math.round((level - effect.bonusFromLevel + 1) * effect.bonusPerLevel * 100)}%` : '';
+  return `${cap}, ${text.charAt(0).toLowerCase()}${text.slice(1)}${bonus}`;
 }
 
 const HOUR = 3600000;

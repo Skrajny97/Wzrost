@@ -391,6 +391,99 @@ button {
   color: var(--system-text);
 }
 
+/* "Czyhające niebezpieczeństwa" on an inner region's card, and its list. */
+.danger-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: none;
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 14px;
+  text-align: left;
+}
+
+.danger-link span {
+  flex: 1;
+}
+
+.danger-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.danger-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+}
+
+.danger-row + .danger-row {
+  border-top: 1px solid var(--line);
+}
+
+.danger-art {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  color: var(--text);
+}
+
+.danger-art .sprite {
+  width: 48px;
+  height: 48px;
+}
+
+/* Not met yet: the creature's shape in black, and no name. */
+.danger-row--unknown .danger-art {
+  color: #000;
+}
+
+.danger-row--unknown .sprite {
+  filter: brightness(0);
+}
+
+.danger-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.danger-name {
+  font-weight: 700;
+}
+
+.danger-row--unknown .danger-name {
+  color: var(--text-muted);
+  letter-spacing: 0.2em;
+}
+
+.danger-meta {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+}
+
+/* The lock and its level always under the name, whatever the name's length. */
+.segmented-option .lock-label {
+  display: flex;
+  justify-content: center;
+  margin-top: 3px;
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -1734,6 +1827,17 @@ a.segmented-option {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* Przedmioty and Materiały above the bag's slots. */
+.bag-tabs {
+  margin: 2px 0 4px;
+}
+
+.bag-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 /* Items */

@@ -3,7 +3,8 @@
 // The item card also upgrades the item on the camp's Kowadło and takes a bag
 // item apart on the Stół rzemieślniczy.
 
-import { itemSprite, portraitSprite } from '../art.js';
+import { itemSprite, materialSprite, portraitSprite } from '../art.js';
+import { MATERIALS_HINT, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatMinutes, formatNumber, plural, timeFormat } from '../format.js';
 import { RESOURCE_ICONS, SLOT_ICONS, itemIcon } from '../icons.js';
@@ -22,6 +23,12 @@ const upgradeBadge = (item) => item.upgrade > 0 && h('span', { class: 'slot-leve
 
 // The eye toggle is remembered while the page is open.
 let gearHidden = false;
+// Which half of the backpack shows: the items, or the materials, which take
+// no room in it. Remembered while the page is open too.
+let bagTab = 'items';
+
+// "Rzadka skóra wilka" for a stack above its species' rarity.
+const materialTitle = (material) => material.label.charAt(0).toUpperCase() + material.label.slice(1);
 
 export function mountCharacter(container) {
   function render() {
@@ -106,38 +113,111 @@ export function mountCharacter(container) {
 
   function bagSection(bag) {
     const capacity = state.character.bagCapacity;
+    const { materials } = state.character.crafting;
     const count = h('span', {
       class: `section-count${bag.length >= capacity ? ' section-count--full' : ''}`,
       text: `(${formatNumber(bag.length)}/${formatNumber(capacity)})`,
     });
+    const tab = (id, label) =>
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'segmented-option',
+          'aria-pressed': bagTab === id,
+          onClick: () => {
+            bagTab = id;
+            render();
+          },
+        },
+        label,
+      );
+    const stacked = materials.reduce((sum, material) => sum + material.count, 0);
     return h(
       'section',
       { class: 'bag', 'aria-labelledby': 'bag-title' },
       h('h2', { class: 'section-title', id: 'bag-title' }, 'Plecak ', count),
-      bag.length === 0
-        ? h('p', { class: 'muted', text: 'Plecak jest pusty. Łupy z wypraw trafiają tutaj.' })
-        : h(
-            'ul',
-            { class: 'bag-grid' },
-            bag.map((item) =>
-              h(
-                'li',
-                {},
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: 'slot slot--bag',
-                    vars: { '--rarity': item.color },
-                    'aria-label': `${itemTitle(item)}, ${item.rarityName}, ${item.slotName}, poziom ${item.level}`,
-                    onClick: () => itemSheet(item, { equipped: false }),
-                  },
-                  itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
-                  upgradeBadge(item),
-                ),
-              ),
+      h(
+        'div',
+        { class: 'segmented bag-tabs', role: 'group', 'aria-label': 'Zawartość plecaka' },
+        tab('items', 'Przedmioty'),
+        tab('materials', stacked > 0 ? `Materiały (${formatNumber(stacked)})` : 'Materiały'),
+      ),
+      bagTab === 'materials' ? materialsGrid(materials) : itemsGrid(bag),
+    );
+  }
+
+  // The materials from beaten creatures, a slot for each stack, outside the bag's room.
+  function materialsGrid(materials) {
+    if (materials.length === 0) return h('p', { class: 'muted', text: MATERIALS_HINT });
+    return [
+      h('p', { class: 'bag-note', text: 'Materiały nie zajmują miejsca w plecaku.' }),
+      h(
+        'ul',
+        { class: 'bag-grid' },
+        materials.map((material) =>
+          h(
+            'li',
+            {},
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'slot slot--bag',
+                vars: { '--rarity': material.color },
+                'aria-label': `${materialTitle(material)}, ${material.rarityName}, ${formatNumber(material.count)}`,
+                onClick: () => materialSheet(material),
+              },
+              materialIcon(material.materialId),
+              h('span', { class: 'slot-level', text: formatNumber(material.count) }),
             ),
           ),
+        ),
+      ),
+    ];
+  }
+
+  function materialSheet(material) {
+    const description = state.content.materials?.find((candidate) => candidate.id === material.materialId)?.description;
+    const table = state.character.camp.buildings.find((building) => building.crafts);
+    const art = materialSprite(material.materialId);
+    const title = h('h2', { class: 'item-title', vars: { '--rarity': material.color }, text: materialTitle(material) });
+    const meta = h('p', { class: 'item-meta', text: `${material.rarityName} · ${formatNumber(material.count)} szt.` });
+    openSheet(
+      h(
+        'div',
+        { class: 'item-details' },
+        art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art', vars: { '--rarity': material.color } }, art), h('div', {}, title, meta)) : [title, meta],
+        description && h('p', { class: 'sheet-text', text: description }),
+        h('p', { class: 'sheet-text', text: `Stół rzemieślniczy zrobi z tego: ${material.part} ×${formatNumber(material.count)}.` }),
+      ),
+      table && h('a', { class: 'button button--world', href: `#/oboz/${table.id}`, onClick: closeSheet, text: table.level > 0 ? 'Do stołu rzemieślniczego' : 'Zbuduj stół w obozie' }),
+    );
+  }
+
+  function itemsGrid(bag) {
+    if (bag.length === 0) return h('p', { class: 'muted', text: 'Plecak jest pusty. Łupy z wypraw trafiają tutaj.' });
+    return h(
+      'ul',
+      { class: 'bag-grid' },
+      bag.map((item) =>
+        h(
+          'li',
+          {},
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'slot slot--bag',
+              vars: { '--rarity': item.color },
+              'aria-label': `${itemTitle(item)}, ${item.rarityName}, ${item.slotName}, poziom ${item.level}`,
+              onClick: () => itemSheet(item, { equipped: false }),
+            },
+            itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
+            upgradeBadge(item),
+          ),
+        ),
+      ),
     );
   }
 
@@ -236,7 +316,9 @@ function salvageSection(item, busy) {
   if (!salvage) return null;
   const { crafting, camp } = state.character;
   const table = camp.buildings.find((building) => building.crafts);
-  const built = salvage.minutes !== null;
+  const built = crafting.pace > 0;
+  // A rarity above what the table takes yet: the level it needs.
+  const needs = salvage.needs;
   const full = crafting.queue.length >= crafting.limit;
   const takeApart = async (event) => {
     const button = event.currentTarget;
@@ -257,10 +339,11 @@ function salvageSection(item, busy) {
     'div',
     { class: 'compare' },
     h('p', { class: 'compare-title', text: table?.name ?? 'Stół rzemieślniczy' }),
-    h('p', { class: 'anvil-step' }, 'Rozbiórka: ', h('span', { class: 'item-name', vars: { '--rarity': salvage.color }, text: `${salvage.part} ×${salvage.parts}` }), built ? ` · ${formatMinutes(salvage.minutes)}` : ''),
+    h('p', { class: 'anvil-step' }, 'Rozbiórka: ', h('span', { class: 'item-name', vars: { '--rarity': salvage.color }, text: `${salvage.part} ×${salvage.parts}` }), salvage.minutes !== null ? ` · ${formatMinutes(salvage.minutes)}` : ''),
     !built && h('p', { class: 'muted', text: 'Zbuduj w obozie Stół rzemieślniczy, żeby rozbierać przedmioty na części.' }),
-    built && full && h('p', { class: 'muted', text: 'Kolejka stołu jest pełna. Poczekaj, aż skończy się pierwsze zlecenie.' }),
-    h('button', { type: 'button', class: 'button button--world', disabled: busy || !built || full, onClick: takeApart, text: 'Rozbierz' }),
+    needs && h('p', { class: 'muted', text: `Ta rzadkość wymaga Stołu rzemieślniczego na poziomie ${needs}.` }),
+    built && !needs && full && h('p', { class: 'muted', text: 'Kolejka stołu jest pełna. Poczekaj, aż skończy się pierwsze zlecenie.' }),
+    h('button', { type: 'button', class: 'button button--world', disabled: busy || !built || Boolean(needs) || full, onClick: takeApart, text: 'Rozbierz' }),
   );
 }
 

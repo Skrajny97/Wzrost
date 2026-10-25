@@ -29,7 +29,7 @@ export const SPRITES = {
   // the treasure chest, 32×32.
   materials: {
     size: 32,
-    ids: ['wolf-pelt', 'fox-pelt', 'badger-claws', 'viper-scales', 'boar-tusk', 'crow-feather', 'owl-feather', 'lynx-fur', 'spider-silk', 'alpha-fang', 'bear-hide', 'wisp-flame', 'likho-eye', 'scraps', 'straps', 'fittings', 'runes', 'amber', 'bloodstone', 'star-shard', 'chest'],
+    ids: ['wolf-pelt', 'fox-pelt', 'badger-claws', 'viper-scales', 'boar-tusk', 'crow-feather', 'owl-feather', 'lynx-fur', 'spider-silk', 'alpha-fang', 'bear-hide', 'wisp-flame', 'likho-eye', 'scraps', 'straps', 'fittings', 'shards', 'amber', 'bloodstone', 'star-shard', 'chest'],
   },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
   narrator: {

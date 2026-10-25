@@ -3,6 +3,7 @@ import { describe, test } from 'node:test';
 
 import {
   applyHunt,
+  areaDangers,
   areaFor,
   autoDistribute,
   autoEquip,
@@ -27,8 +28,10 @@ import {
   rollUpgrade,
   canUse,
   computeStats,
+  craftLevelFor,
   craftMinutes,
   craftPace,
+  craftTable,
   createRng,
   damageScale,
   earnedPoints,
@@ -62,6 +65,7 @@ import {
   rarityUpChance,
   reduction,
   restedHp,
+  rollEncounter,
   sellPrice,
   simulateFight,
   resourceBundle,
@@ -542,31 +546,31 @@ describe('progression', () => {
     assert.equal(applied.xp, 5);
     assert.equal(applied.classLevel, 2);
     assert.equal(applied.classXp, xpToNext(1, content) + 5 - classXpToNext(1, content));
-    assert.match(applied.messages[0], /^Osiągnięto poziom 2\. Wolne punkty statystyk: \+8\. Punkty Czasu: \+3\.$/);
+    assert.match(applied.messages[0], /^Osiągnięto poziom 2\. Wolne punkty statystyk: \+8\. Punkty Czasu: \+2\.$/);
     // Level 2 opens long hunts and the stats screen, and the System says so.
     const unlocks = content.unlocks.filter((u) => u.level === 2).map((u) => u.message);
     assert.deepEqual(applied.messages.slice(1, 1 + unlocks.length), unlocks);
-    assert.match(applied.messages.at(-1), /^Kleryk: poziom klasy 2\. Wolne punkty statystyk: \+2\. Punkty Czasu: \+2\.$/);
-    // A level and a class level: 3 and 2 Time Points (data/balance.json).
-    assert.equal(applied.timePoints, 5);
+    assert.match(applied.messages.at(-1), /^Kleryk: poziom klasy 2\. Wolne punkty statystyk: \+2\. Punkty Czasu: \+1\.$/);
+    // A level and a class level: 2 and 1 Time Points (data/balance.json).
+    assert.equal(applied.timePoints, 3);
     // A class level before character level 2 says when its points can be spent.
     const early = applyHunt(character, { xp: classXpToNext(1, content), result: 'success' }, content);
     assert.equal(early.level, 1);
-    assert.deepEqual(early.messages, ['Kleryk: poziom klasy 2. Wolne punkty statystyk: +2, rozdasz je od poziomu 2. Punkty Czasu: +2.']);
-    assert.equal(early.timePoints, 2);
+    assert.deepEqual(early.messages, ['Kleryk: poziom klasy 2. Wolne punkty statystyk: +2, rozdasz je od poziomu 2. Punkty Czasu: +1.']);
+    assert.equal(early.timePoints, 1);
 
     // Several levels at once make one line for the character and one for the class.
     const xp = [1, 2, 3].reduce((sum, level) => sum + xpToNext(level, content), 0);
     const many = applyHunt(character, { xp, result: 'success' }, content);
     assert.equal(many.level, 4);
     assert.equal(many.messages.filter((message) => message.startsWith('Osiągnięto poziom')).length, 1);
-    assert.equal(many.messages[0], 'Osiągnięto poziom 4. Wolne punkty statystyk: +24. Punkty Czasu: +9.');
+    assert.equal(many.messages[0], 'Osiągnięto poziom 4. Wolne punkty statystyk: +24. Punkty Czasu: +6.');
     assert.equal(many.messages.filter((message) => message.startsWith('Kleryk: poziom klasy')).length, 1);
     assert.match(
       many.messages.at(-1),
-      new RegExp(`^Kleryk: poziom klasy ${many.classLevel}\\. Wolne punkty statystyk: \\+${2 * (many.classLevel - 1)}\\. Punkty Czasu: \\+${2 * (many.classLevel - 1)}\\.$`),
+      new RegExp(`^Kleryk: poziom klasy ${many.classLevel}\\. Wolne punkty statystyk: \\+${2 * (many.classLevel - 1)}\\. Punkty Czasu: \\+${many.classLevel - 1}\\.$`),
     );
-    assert.equal(many.timePoints, 9 + 2 * (many.classLevel - 1));
+    assert.equal(many.timePoints, 6 + (many.classLevel - 1));
 
     const fainted = applyHunt({ ...character, level: 3, xp: 10 }, { xp: 0, result: 'fainted' }, content);
     assert.equal(fainted.level, 3);
@@ -1083,6 +1087,9 @@ describe('materials and chests', () => {
 describe('Stół rzemieślniczy', () => {
   const MINUTE = 60000;
   const empty = { materials: {}, parts: {}, queue: [] };
+  // A table that takes every rarity, at pace 1 and without extra parts.
+  const plain = { level: 5, pace: 1, maxRarity: content.rarities.length - 1, bonusChance: 0 };
+  const rng = () => createRng('stół');
 
   test('without the table nothing is made, and each level makes it faster', () => {
     assert.equal(craftPace({}, content), 0);
@@ -1092,9 +1099,44 @@ describe('Stół rzemieślniczy', () => {
     assert.equal(craftMinutes('common', 3, 2, content), 8);
   });
 
+  test('levels 1 to 5 open the rarities, the levels after add extra parts', () => {
+    const rarity = (level) => content.rarities[craftTable({ 'craft-table': level }, content).maxRarity].id;
+    assert.deepEqual([1, 2, 3, 4, 5, 6, 10].map(rarity), ['rare', 'unique', 'epic', 'legendary', 'divine', 'divine', 'divine']);
+    assert.deepEqual(['common', 'rare', 'unique', 'epic', 'legendary', 'mythic', 'divine'].map((id) => craftLevelFor(id, content)), [1, 1, 2, 3, 4, 5, 5]);
+    const chance = (level) => Math.round(craftTable({ 'craft-table': level }, content).bonusChance * 100);
+    assert.deepEqual([1, 5, 6, 8, 10].map(chance), [0, 0, 5, 15, 25]);
+    assert.deepEqual(craftTable({}, content), { level: 0, pace: 0, maxRarity: -1, bonusChance: 0 });
+  });
+
+  test('a stack of a rarity the table does not take yet stays, the others go', () => {
+    const table = craftTable({ 'craft-table': 1 }, content);
+    const state = { ...empty, materials: { 'wolf-pelt:common': 2, 'lynx-fur:unique': 1, 'boar-tusk:rare': 1 } };
+    const { state: next, ordered, tooRare } = orderMaterials(state, Object.keys(state.materials), table, 0, rng(), content);
+    assert.deepEqual([ordered, tooRare], [2, 1]);
+    assert.deepEqual(next.materials, { 'lynx-fur:unique': 1 });
+  });
+
+  test('from level 6 an order may bring extra parts, decided when it starts', () => {
+    const table = craftTable({ 'craft-table': 10 }, content);
+    let extra = 0;
+    let made = 0;
+    for (let i = 0; i < 200; i++) {
+      const { state } = orderMaterials({ ...empty, materials: { 'wolf-pelt:common': 4 } }, ['wolf-pelt:common'], table, 0, createRng(`premia-${i}`), content);
+      const [order] = state.queue;
+      assert.equal(order.parts, 4);
+      extra += order.bonus;
+      made += settleCrafting(state, order.endsAt).parts.scraps;
+    }
+    // A quarter of a part for each of the 4: about 1 extra part an order.
+    assert.ok(extra > 160 && extra < 240, `extra parts: ${extra}`);
+    assert.equal(made, 200 * 4 + extra);
+    const { state } = orderMaterials({ ...empty, materials: { 'wolf-pelt:common': 4 } }, ['wolf-pelt:common'], craftTable({ 'craft-table': 5 }, content), 0, rng(), content);
+    assert.equal(state.queue[0].bonus, 0);
+  });
+
   test('materials become parts of their rarity, one order after another, for free', () => {
     const state = { ...empty, materials: { 'wolf-pelt:common': 3, 'boar-tusk:rare': 1 } };
-    const { state: next, ordered } = orderMaterials(state, ['wolf-pelt:common', 'boar-tusk:rare', 'fox-pelt:common'], 1, 0, content);
+    const { state: next, ordered } = orderMaterials(state, ['wolf-pelt:common', 'boar-tusk:rare', 'fox-pelt:common'], plain, 0, rng(), content);
     assert.equal(ordered, 2);
     assert.deepEqual(next.materials, {});
     assert.deepEqual(next.queue.map((order) => [order.startsAt / MINUTE, order.endsAt / MINUTE, order.partId, order.parts]), [
@@ -1109,7 +1151,7 @@ describe('Stół rzemieślniczy', () => {
 
   test('a new order waits for the last one, and the queue has a limit', () => {
     const materials = Object.fromEntries(content.materials.map((material) => [`${material.id}:${material.rarity}`, 1]));
-    const { state, ordered } = orderMaterials({ ...empty, materials }, Object.keys(materials), 1, 0, content);
+    const { state, ordered } = orderMaterials({ ...empty, materials }, Object.keys(materials), plain, 0, rng(), content);
     assert.equal(ordered, content.balance.crafting.queueLimit);
     assert.equal(Object.keys(state.materials).length, content.materials.length - ordered);
     for (let i = 1; i < state.queue.length; i++) assert.equal(state.queue[i].startsAt, state.queue[i - 1].endsAt);
@@ -1119,10 +1161,46 @@ describe('Stół rzemieślniczy', () => {
     assert.deepEqual(salvageYield({ rarity: 'common', level: 3 }, content), { partId: 'scraps', count: 2 });
     assert.deepEqual(salvageYield({ rarity: 'rare', level: 25, upgrade: 2 }, content), { partId: 'straps', count: 6 });
     const item = generateItem({ baseId: 'sword', level: 12, rarityId: 'epic' }, createRng('rozbiórka'), content);
-    const state = orderSalvage(empty, item, itemName(item, content), 2, 10 * MINUTE, content);
+    const state = orderSalvage(empty, item, itemName(item, content), { ...plain, pace: 2 }, 10 * MINUTE, rng(), content);
     assert.deepEqual(state.queue.map((order) => [order.kind, order.partId, order.parts, order.startsAt / MINUTE, order.endsAt / MINUTE]), [
-      ['item', 'runes', 3, 10, 40],
+      ['item', 'shards', 3, 10, 40],
     ]);
-    assert.deepEqual(settleCrafting(state, 40 * MINUTE).parts, { runes: 3 });
+    assert.deepEqual(settleCrafting(state, 40 * MINUTE).parts, { shards: 3 });
+  });
+});
+
+describe('Czyhające niebezpieczeństwa', () => {
+  test('an inner region lists its creatures with the levels they come at, the elite last', () => {
+    const edge = areaDangers(content.areasById['windfalls-edge'], content);
+    assert.deepEqual(
+      edge.map(({ monsterId, minLevel, maxLevel, elite }) => [monsterId, minLevel, maxLevel, elite]),
+      [
+        ['wolf', 1, 5, false],
+        ['fox', 1, 5, false],
+        ['viper', 1, 5, false],
+        ['badger', 1, 5, false],
+        ['wisp', 6, 6, true],
+      ],
+    );
+    // A demanding encounter brings its creatures some levels above the place.
+    const hollows = areaDangers(content.areasById['raven-hollows'], content);
+    const crow = hollows.find((danger) => danger.monsterId === 'crow');
+    assert.deepEqual([crow.minLevel, crow.maxLevel], [11, 15 + content.balance.hunt.toughLevelBonus]);
+    assert.equal(hollows.find((danger) => danger.monsterId === 'boar').maxLevel, 15);
+  });
+
+  test('every creature an inner region can roll is on its list, within its levels', () => {
+    for (const area of Object.values(content.areasById)) {
+      const dangers = new Map(areaDangers(area, content).map((danger) => [danger.monsterId, danger]));
+      const rng = createRng(`niebezpieczeństwa-${area.id}`);
+      for (let i = 0; i < 300; i++) {
+        const encounter = rollEncounter(area, rng, content, area.maxLevel, { eliteChance: 0.1, toughChance: 0.3 });
+        for (const member of encounter.members) {
+          const danger = dangers.get(member.monsterId);
+          assert.ok(danger, `${area.id}: ${member.monsterId} is missing`);
+          assert.ok(member.level >= danger.minLevel && member.level <= danger.maxLevel, `${area.id}: ${member.monsterId} at ${member.level}`);
+        }
+      }
+    }
   });
 });

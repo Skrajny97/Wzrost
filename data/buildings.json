@@ -102,7 +102,15 @@
     "name": "Stół rzemieślniczy",
     "description": "Prosty stół z narzędziami. Za darmo, z upływem czasu przerabia materiały ze stworów i rozebrane przedmioty na części do wyrobu przedmiotów.",
     "maxLevel": 10,
-    "effect": { "kind": "craftSpeed", "perLevel": 0.1, "unit": "percent", "text": "Przeróbka szybsza o {value}" },
+    "effect": {
+      "kind": "craftSpeed",
+      "perLevel": 0.1,
+      "unit": "percent",
+      "text": "Przeróbka szybsza o {value}",
+      "rarities": ["rare", "unique", "epic", "legendary", "divine"],
+      "bonusFromLevel": 6,
+      "bonusPerLevel": 0.05
+    },
     "costs": [
       { "resource": "gold", "base": 3, "growth": 2.0 },
       { "resource": "wood", "base": 3, "growth": 1.9 },

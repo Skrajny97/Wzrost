@@ -717,7 +717,7 @@ Autor uznał pierwszą godzinę gry za zbyt powolną. Chciał wprowadzenia, któ
 8. **Waluta.** Punkty Czasu to trzecia waluta obok złota i Punktów Systemu: 1 punkt skraca o 1 minutę eksplorację, odpoczynek albo budowę w obozie. Należą do postaci, jak złoto (odpowiedź J, `characters.time_points`, migracja `0008_time_points.sql`), więc „Zacznij od nowa” je zeruje. Nigdy nie są na sprzedaż (odpowiedź G). Ikona to klepsydra (odpowiedź K). Punktów Czasu nie ma w górnym pasku: są w portfelu, który otwiera stuknięcie złota.
 9. **Skąd się biorą** (odpowiedzi H i I):
     - 60 od narratora na start,
-    - 3 za każdy poziom postaci i 2 za każdy poziom klasy,
+    - 2 za każdy poziom postaci i 1 za każdy poziom klasy (od 25.10.2026, wcześniej 3 i 2, zob. „Poziomy stołu, Odłamki i niebezpieczeństwa”),
     - rzadkie znalezisko „odłamek czasu”, warte 5 (`findOutcomes.time` 0.05 i `timePoints` w `data/balance.json`).
 
     Komunikaty Systemu o awansie podają też Punkty Czasu, a podsumowanie raportu ma wiersz „Punkty Czasu”.
@@ -993,7 +993,7 @@ Autor: łupy z bronią i przedmiotami mają być zdarzeniami losowymi, np. skrzy
 3. **Szansa na materiał** to 30% dla pospolitych, potem 20, 14, 10, 7, 5 i 3% (`materialChance` w `data/rarities.json`), za każdego pokonanego stwora. Liczy się, jak dotąd przy łupie, udział walki w czasie wyprawy, wielkość grupy i wymagające spotkanie (×1,5). Wyprawa daje więc tyle samo materiałów na godzinę bez względu na długość: w Wiatrołomach ok. 1,5–2 na godzinę.
 4. **Skrzynie skarbów.** Przedmioty dają już tylko skrzynie. Znaleziska są co 18 minut zamiast co 20, a skrzynia ma wagę 0,44 tam, gdzie przedmiot miał 0,3. Przedmiotów jest więc ok. 1,25 na godzinę, jak dotąd z walk i znalezisk razem (wybór autora: „jak dziś łupy”). Złota, zasobów i odłamków czasu ze znalezisk jest na godzinę o ok. 2% mniej.
 5. **Pierwsza broń i elita.** Postać bez broni po pierwszej wygranej walce znajduje skrzynię z bronią swojej klasy i od razu ją trzyma. Broń z wcześniejszej skrzyni też trafia od razu do ręki. Pokonana elita zostawia skrzynię z przedmiotem, który częściej jest rzadszy (`rewards.eliteRarityBonus`). Wymagające spotkania dają teraz więcej materiałów zamiast rzadszych przedmiotów, a `itemDropChance` i `toughRarityBonus` zniknęły z `data/balance.json`.
-6. **Stół rzemieślniczy** (`craft-table`) to nowy budynek obozu, bardzo tani na start: 3 złota i 3 drewna, minuta budowy. Za darmo przerabia materiał na jedną część tej samej rzadkości. Części nazwał autor: Ścinki, Rzemienie, Okucia, Runy, Bursztyn, Krwawnik i Gwiezdny odprysk.
+6. **Stół rzemieślniczy** (`craft-table`) to nowy budynek obozu, bardzo tani na start: 3 złota i 3 drewna, minuta budowy. Za darmo przerabia materiał na jedną część tej samej rzadkości. Części nazwał autor: Ścinki, Rzemienie, Okucia, Odłamki (najpierw Runy), Bursztyn, Krwawnik i Gwiezdny odprysk.
     - Część zajmuje stołowi 5, 8, 12, 20, 30, 45 albo 60 minut, zależnie od rzadkości (`craftMinutes` w `data/rarities.json`).
     - Każdy poziom stołu przyspiesza pracę o 10% (`craftSpeed`): poziom 1 pracuje 1,1 raza szybciej, poziom 10 dwa razy.
     - Zlecenia idą po kolei, najwyżej 10 naraz (`crafting.queueLimit`), także podczas wyprawy. „Przerób” bierze cały stos materiału, a „Przerób wszystko” każdy stos.
@@ -1033,3 +1033,28 @@ Autor: w walce wojownik zasłaniał napis „Przód”, a Cień napis „Środek
 2. **Wynik walki.** „Zwycięstwo”, „Porażka” albo „Odwrót” pokazuje się na środku rzędu przeciwników. Wcześniej stało na środku areny i zasłaniało napis „Środek” w rzędzie drużyny.
 3. **Twarz na środku.** Postacie są narysowane w trzech czwartych, więc głowa bywa przesunięta względem tułowia: u wojownika o 2 piksele, u Cienia o 3, u łucznika o 4. Cała postać na karcie postaci zostaje wyśrodkowana według sylwetki. Popiersia w walce i na kartach klas ustawiają się według twarzy. `tools/normalize-portraits.py` wypisuje, gdzie jest twarz, a liczby trafiają do `faces` w `src/client/art.js`.
 4. **Włosy Cienia.** Generator uciął Cieniowi czubek głowy. Brakujące rzędy włosów są dorysowane ręcznie w kolorach jego fryzury, a biała plamka we włosach usunięta. Narzędzie do wyrównania nie skaluje już postaci, która stoi na swojej linii i ma do 8 dorysowanych rzędów nad głową. Ponowne uruchomienie nic nie zmienia. W pozostałych portretach nic nie było ucięte.
+
+## Poziomy stołu, Odłamki i niebezpieczeństwa (25.10.2026)
+
+Uwagi autora po wdrożeniu sakwy i Punktów Czasu co pół godziny.
+
+1. **Ikony.** Nad Skórą niedźwiedzia wisiał niebieskawy kształt jak ostrze, a za Okuciami został kawałek brązowego tła. Oba są wycięte ręcznie.
+2. **Odłamki zamiast Run.** Runy pojawią się w grze później jako coś innego, więc epicka część nazywa się Odłamki (`shards`): „Ostre okruchy kryształu, twardsze od stali.” Ikona to fioletowe kryształy z Retro Diffusion, najlepszy z trzech szkiców. Migracja `0017_shards.sql` zamienia zebrane Runy i zlecenia na stole na Odłamki.
+3. **Mniej Punktów Czasu za poziomy.** Skoro punkty przybywają same, awans postaci daje 2, a awans klasy 1 (wcześniej 3 i 2).
+4. **Poziomy Stołu rzemieślniczego.** Pierwsze poziomy otwierają kolejne rzadkości materiałów i przedmiotów, a dopiero poziom 5 wszystkie:
+    - poziom 1: pospolite i rzadkie,
+    - poziom 2: do unikalnych,
+    - poziom 3: do epickich,
+    - poziom 4: do legendarnych,
+    - poziom 5: wszystkie, z mitycznymi i boskimi.
+
+    Poziomy 6–10 dają szansę na dodatkowe części: 5% na każdą robioną część za każdy poziom od 6, czyli 25% na poziomie 10. Liczba dodatkowych części zapada przy zleceniu, a stół mówi o nich, gdy skończy. Każdy poziom nadal przyspiesza przeróbkę o 10%, bo tak było do tej pory, a autor tego nie zmienił. Za rzadki materiał czeka na liście z dopiskiem „od poziomu N stołu”. Za rzadki przedmiot nie da się rozebrać, a karta mówi, jakiego poziomu stołu potrzeba (dane: `rarities`, `bonusFromLevel` i `bonusPerLevel` w efekcie stołu w `data/buildings.json`).
+5. **Materiały w plecaku, sakwa z częściami.** Materiałów będzie z czasem bardzo dużo, więc sakwa w górnym pasku pokazuje już tylko części do rzemiosła. Materiały mają własną zakładkę w plecaku obok przedmiotów i nie zajmują w nim miejsca. Stuknięcie stosu pokazuje opis materiału, to, co zrobi z niego stół, i drogę do stołu. Zastępuje to punkt 1 „Sakwy z materiałami”.
+6. **Czyhające niebezpieczeństwa.** Karta każdego regionu wewnętrznego ma pod opisem przycisk „Czyhające niebezpieczeństwa”. Otwiera on listę stworów, które można tam spotkać, z zakresem ich poziomów:
+    - w zwykłych spotkaniach to poziomy miejsca,
+    - w wymagających o poziom wyżej,
+    - elita ma jeden poziom ponad najsilniejszymi i jest tak podpisana.
+
+    Lista powstaje z danych spotkań regionu (`areaDangers` w silniku), więc nowy stwór w `data/regions.json` sam na nią trafia. Stwór, którego postać jeszcze nie spotkała w walce, to czarny cień z „???” zamiast imienia, a poziomy widać od razu. Walka, także przegrana, odkrywa go po odebraniu raportu. Spotkane stwory zapisuje kolumna `characters.met` (migracja `0018_met_monsters.sql`). Postacie sprzed zmiany znają stwory z raportów, które jeszcze mają.
+7. **Zakładka Lochy.** Kłódka z poziomem stoi pod nazwą zakładki, jak przy Treningu, bez względu na długość nazwy.
+

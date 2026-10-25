@@ -1,11 +1,9 @@
 // The frame around every game screen: the fixed top bar (levels, HP and mana,
 // character and class XP, gold and Punkty Systemu with the camp's resources,
-// the camp, current activity with the pouch of materials and parts beside it)
-// and the two bottom bars, the main menu and the character bar with its own
-// background.
+// the camp, current activity with the pouch of parts beside it) and the two
+// bottom bars, the main menu and the character bar with its own background.
 
 import { materialSprite } from './art.js';
-import { MATERIALS_HINT, materialIcon } from './craft-table.js';
 import { $, fill, h, icon } from './dom.js';
 import { countOf, formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
 import { RESOURCE_ICONS, SYSTEM_POINTS_ICON } from './icons.js';
@@ -38,14 +36,15 @@ export function buildTopbar(onSettings) {
   const wallet = h('ul', { class: 'wallet-list', id: 'wallet-list', hidden: true });
   // When the next Punkt Czasu comes, under its row.
   const timeNote = h('span', { class: 'wallet-note' });
-  // The materials and parts apart from the wallet, by the current activity.
+  // The parts for crafting apart from the wallet, by the current activity;
+  // the materials have their own tab in the backpack.
   const pouch = h('div', { class: 'pouch-panel', id: 'pouch-panel', hidden: true });
   const pouchButton = h(
     'button',
     {
       type: 'button',
       class: 'pouch-button',
-      'aria-label': 'Materiały i części',
+      'aria-label': 'Części do rzemiosła',
       'aria-expanded': 'false',
       'aria-controls': 'pouch-panel',
       onClick: () => showPouch(pouch.hidden),
@@ -139,7 +138,7 @@ function refreshWallet(now = serverNow()) {
   fill(topbar.wallet, ...walletRows(points));
 }
 
-// The materials by rarity and the parts made, with the way to the table.
+// The parts made, with the way to the table.
 function pouchRows(character) {
   const { crafting } = character;
   const table = character.camp.buildings.find((building) => building.crafts);
@@ -152,8 +151,6 @@ function pouchRows(character) {
       h('span', { class: 'wallet-name', vars: { '--rarity': color }, text: name }),
       h('span', { class: 'wallet-amount', text: formatNumber(count) }),
     );
-  // "Rzadka skóra wilka" for a stack above its species' rarity.
-  const label = (material) => material.label.charAt(0).toUpperCase() + material.label.slice(1);
   const tableText =
     crafting.queue.length > 0
       ? `Na stole: ${countOf(crafting.queue.length, 'zlecenie', 'zlecenia', 'zleceń')}`
@@ -161,15 +158,7 @@ function pouchRows(character) {
         ? 'Stół rzemieślniczy'
         : 'Zbuduj Stół rzemieślniczy w obozie';
   return [
-    h('p', { class: 'pouch-title', id: 'pouch-materials', text: 'Materiały' }),
-    crafting.materials.length === 0
-      ? h('p', { class: 'pouch-empty', text: MATERIALS_HINT })
-      : h(
-          'ul',
-          { class: 'pouch-list', 'aria-labelledby': 'pouch-materials' },
-          crafting.materials.map((material) => row(materialIcon(material.materialId), label(material), material.color, material.count)),
-        ),
-    h('p', { class: 'pouch-title', id: 'pouch-parts', text: 'Części' }),
+    h('p', { class: 'pouch-title', id: 'pouch-parts', text: 'Części do rzemiosła' }),
     parts.length === 0
       ? h('p', { class: 'pouch-empty', text: 'Stół rzemieślniczy robi je z materiałów i rozebranych przedmiotów.' })
       : h(
@@ -181,7 +170,7 @@ function pouchRows(character) {
   ];
 }
 
-// Opens or closes the materials and parts under the pouch; the wallet closes.
+// Opens or closes the parts under the pouch; the wallet closes.
 export function showPouch(open) {
   if (!topbar) return;
   if (open) showWallet(false);
@@ -196,12 +185,7 @@ function refreshPouch() {
   const character = state.character;
   const { crafting } = character;
   const table = character.camp.buildings.find((building) => building.crafts);
-  const key = JSON.stringify([
-    crafting.materials.map((material) => [material.key, material.count]),
-    crafting.parts.map((part) => part.count),
-    crafting.queue.length,
-    table?.level,
-  ]);
+  const key = JSON.stringify([crafting.parts.map((part) => part.count), crafting.queue.length, table?.level]);
   if (key === topbar.pouchKey) return;
   topbar.pouchKey = key;
   fill(topbar.pouch, ...pouchRows(character));

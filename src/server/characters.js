@@ -11,8 +11,10 @@ import {
   combatValues,
   computeStats,
   construction,
+  craftLevelFor,
   craftMinutes,
-  craftPace,
+  craftTable,
+  craftTakes,
   effectText,
   freePoints,
   gainedTimePoints,
@@ -194,7 +196,7 @@ function campView(player, levels, now) {
         maxLevel: building.maxLevel,
         // The Stół rzemieślniczy: its screen shows the table (crafting).
         crafts: building.effect.kind === 'craftSpeed',
-        effect: level > 0 ? effectText(building, level) : null,
+        effect: level > 0 ? effectText(building, level, content) : null,
         production: store && {
           resource: store.resource,
           perHour: store.perHour,
@@ -205,7 +207,7 @@ function campView(player, levels, now) {
         },
         next: next && {
           level: next,
-          effect: effectText(building, next),
+          effect: effectText(building, next, content),
           minutes: upgradeMinutes(building, next),
           cost: upgradeCost(building, next),
         },
@@ -223,15 +225,27 @@ const rarityIndex = (id) => content.rarities.findIndex((rarity) => rarity.id ===
 
 // The table as the page shows it, settled at `now`. `pace` 0: no table yet.
 function craftingView(row, levels, now) {
-  const pace = craftPace(levels, content);
+  const table = craftTable(levels, content);
+  const { pace } = table;
   const { materials, parts, queue } = settleCrafting(craftingState(row), now);
   return {
     pace,
+    // The table's level, the highest rarity it takes and the chance of an
+    // extra part for each part made.
+    level: table.level,
+    maxRarity: table.maxRarity < 0 ? null : content.rarities[table.maxRarity].id,
+    bonusChance: table.bonusChance,
     limit: content.balance.crafting.queueLimit,
     materials: Object.entries(materials)
       .map(([key, count]) => {
         const view = materialView(key, count, content);
-        return { ...view, minutes: pace > 0 ? craftMinutes(view.rarity, count, pace, content) : null };
+        // `needs`: the table's level that takes this rarity, when it is not built up to it yet.
+        const takes = pace > 0 && craftTakes(table, view.rarity, content);
+        return {
+          ...view,
+          minutes: takes ? craftMinutes(view.rarity, count, pace, content) : null,
+          needs: pace > 0 && !takes ? craftLevelFor(view.rarity, content) : null,
+        };
       })
       .sort((a, b) => rarityIndex(a.rarity) - rarityIndex(b.rarity) || a.name.localeCompare(b.name, 'pl')),
     parts: content.parts.map((part) => ({
@@ -255,6 +269,8 @@ function craftingView(row, levels, now) {
         color: content.raritiesById[rarity].color,
         part: content.partsById[order.partId].name,
         parts: order.parts,
+        // Extra parts from the table's later levels, told when the order ends.
+        bonus: order.bonus ?? 0,
         startsAt: order.startsAt,
         endsAt: order.endsAt,
       };
@@ -281,12 +297,20 @@ export function characterView(player, now) {
   const sellBonus = campBonus(levels, 'sellPrice', content);
   // The Kowadło's level is the highest upgrade it allows.
   const upgradeCap = campBonus(levels, 'upgradeCap', content);
-  // What the Stół rzemieślniczy makes of an item taken apart, and how long it takes.
-  const pace = craftPace(levels, content);
+  // What the Stół rzemieślniczy makes of an item taken apart and how long it
+  // takes, or the table's level its rarity needs.
+  const table = craftTable(levels, content);
   const salvage = (item) => {
     const { partId, count } = salvageYield(item, content);
     const part = content.partsById[partId];
-    return { part: part.name, color: content.raritiesById[part.rarity].color, parts: count, minutes: pace > 0 ? craftMinutes(item.rarity, count, pace, content) : null };
+    const takes = table.pace > 0 && craftTakes(table, item.rarity, content);
+    return {
+      part: part.name,
+      color: content.raritiesById[part.rarity].color,
+      parts: count,
+      minutes: takes ? craftMinutes(item.rarity, count, table.pace, content) : null,
+      needs: table.pace > 0 && !takes ? craftLevelFor(item.rarity, content) : null,
+    };
   };
   const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap }), salvage: salvage(item) });
   const { gold, ...resources } = walletOf(row);
@@ -358,6 +382,9 @@ export function characterView(player, now) {
     camp: campView(player, levels, now),
     // The Stół rzemieślniczy: materials, parts and the queue (crafting.js).
     crafting: craftingView(row, levels, now),
+    // The creatures met in fights, by id: the others are shadows on the
+    // lists of an inner region's dangers.
+    met: JSON.parse(row.met ?? '[]'),
     // The narrator's cards seen so far, or null for a character made before
     // the introduction (tutorial.js).
     tutorial: row.tutorial === null ? null : JSON.parse(row.tutorial),

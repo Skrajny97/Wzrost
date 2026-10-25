@@ -1,23 +1,30 @@
 // The Stół rzemieślniczy in the camp: materials from beaten creatures and
 // taken-apart items become parts, for free, in a queue that takes time
-// (crafting.js in the engine). The queue works on its own, also while the
-// character is away. Every change first settles the queue at the present
-// time and is saved only if the character is as read (its version), so two
-// taps at once make one change.
+// (crafting.js in the engine). The table's level sets the highest rarity it
+// takes and, later, the chance of extra parts. The queue works on its own,
+// also while the character is away. Every change first settles the queue at
+// the present time and is saved only if the character is as read (its
+// version), so two taps at once make one change.
 
-import { campLevels, craftPace, itemName, orderMaterials, orderSalvage, settleCrafting } from '../engine/index.js';
+import { campLevels, craftLevelFor, craftTable, craftTakes, createRng, itemName, orderMaterials, orderSalvage, settleCrafting } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, craftingState, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { testMode, testModeFor } from './test-mode.js';
 
-// The table's pace, or an error without one.
-function paceOf(player, now) {
-  const pace = craftPace(campLevels(player.buildings, now, content), content);
-  if (pace === 0) throw new ApiError(409, 'no_table', 'Najpierw zbuduj Stół rzemieślniczy w obozie.');
-  return pace;
+// The table at the camp's levels, or an error without one.
+function tableOf(player, now) {
+  const table = craftTable(campLevels(player.buildings, now, content), content);
+  if (table.pace === 0) throw new ApiError(409, 'no_table', 'Najpierw zbuduj Stół rzemieślniczy w obozie.');
+  return table;
 }
+
+const tooRare = (rarityId) =>
+  new ApiError(409, 'too_rare', `Ta rzadkość wymaga Stołu rzemieślniczego na poziomie ${craftLevelFor(rarityId, content)}. Rozbuduj go w obozie.`);
+
+// The roll of extra parts for a new order.
+const newRng = () => createRng(toHex(crypto.getRandomValues(new Uint8Array(16))));
 
 function checkRoom(queue) {
   const { queueLimit } = content.balance.crafting;
@@ -44,17 +51,21 @@ export async function craftMaterials(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const now = context.now;
-  const pace = paceOf(player, now);
+  const table = tableOf(player, now);
   const settled = settleCrafting(craftingState(player.row), now);
   const keys = body.all === true ? Object.keys(settled.materials) : Array.isArray(body.keys) ? body.keys.filter((key) => typeof key === 'string') : [];
   if (keys.length === 0) throw new ApiError(400, 'invalid_materials', 'Wybierz materiały do przeróbki.');
   checkRoom(settled.queue);
-  const { state, ordered } = orderMaterials(settled, keys, pace, now, content);
+  const { state, ordered, tooRare: rare } = orderMaterials(settled, keys, table, now, newRng(), content);
+  if (ordered === 0 && rare > 0) {
+    const rarities = keys.filter((key) => settled.materials[key] > 0).map((key) => key.slice(key.lastIndexOf(':') + 1));
+    throw tooRare(rarities.sort((a, b) => craftLevelFor(a, content) - craftLevelFor(b, content))[0]);
+  }
   if (ordered === 0) throw new ApiError(409, 'no_materials', 'Nie masz tych materiałów.');
   const db = context.env.DB;
   const result = await saveState(db, player.row, withIds(settled.queue.length, state)).run();
   if (result.meta.changes !== 1) throw changed();
-  return json({ ordered, character: characterView(await loadPlayer(db, session.userId), now) });
+  return json({ ordered, skipped: rare, character: characterView(await loadPlayer(db, session.userId), now) });
 }
 
 // An item from the bag taken apart on the table: it goes now, and its parts
@@ -65,10 +76,11 @@ export async function salvageItem(context) {
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
   const now = context.now;
-  const pace = paceOf(player, now);
+  const table = tableOf(player, now);
+  if (!craftTakes(table, item.rarity, content)) throw tooRare(item.rarity);
   const settled = settleCrafting(craftingState(player.row), now);
   checkRoom(settled.queue);
-  const state = withIds(settled.queue.length, orderSalvage(settled, item, itemName(item, content), pace, now, content));
+  const state = withIds(settled.queue.length, orderSalvage(settled, item, itemName(item, content), table, now, newRng(), content));
   const order = state.queue.at(-1);
   const db = context.env.DB;
   const row = player.row;

@@ -218,6 +218,20 @@ function checkReferences(data) {
   if (!data.buildings.some((building) => building.effect.kind === 'craftSpeed')) {
     errors.push('buildings.json: brak budynku z craftSpeed (Stół rzemieślniczy), bez którego nie ma przeróbki materiałów');
   }
+  // The table takes higher rarities with its first levels, every one in the
+  // end, and later levels add extra parts.
+  const rarityOrder = data.rarities.map((rarity) => rarity.id);
+  for (const building of data.buildings.filter((candidate) => candidate.effect.kind === 'craftSpeed')) {
+    const { rarities: caps = [], bonusFromLevel, bonusPerLevel } = building.effect;
+    const indexes = caps.map((id) => rarityOrder.indexOf(id));
+    if (caps.length === 0 || indexes.includes(-1)) errors.push(`buildings.json: ${building.id} musi mieć rarities ze znanych rzadkości`);
+    else if (indexes.some((index, i) => i > 0 && index <= indexes[i - 1])) errors.push(`buildings.json: rarities w ${building.id} muszą rosnąć z poziomem`);
+    else if (indexes.at(-1) !== rarityOrder.length - 1) errors.push(`buildings.json: ostatnia z rarities w ${building.id} musi być najwyższą rzadkością`);
+    if (caps.length > building.maxLevel) errors.push(`buildings.json: ${building.id} ma więcej rarities niż poziomów`);
+    if (!bonusFromLevel || !bonusPerLevel || bonusFromLevel > building.maxLevel) {
+      errors.push(`buildings.json: ${building.id} potrzebuje bonusFromLevel (do maxLevel) i bonusPerLevel`);
+    }
+  }
   for (const building of data.buildings) {
     const { effect } = building;
     if (effect.kind === 'production') {
