@@ -1,0 +1,25 @@
+{
+  "id": "archer-male",
+  "payload": {
+    "prompt": "young man forager, lean, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a faded green linen shirt, a short patched hooded cape, worn trousers and soft leather wraps on the feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 691880950,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792912314,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 41.28,
+    "request_id": "8d020d42-9f49-4950-92c8-a7d4c7955988",
+    "outputs_retained_until": 1792998634
+  }
+}

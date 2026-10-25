@@ -1,0 +1,25 @@
+{
+  "id": "warrior-male",
+  "payload": {
+    "prompt": "young man villager, sturdy and broad-shouldered, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a plain undyed linen shirt with rolled sleeves, a rope belt, patched brown trousers and cloth-wrapped feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 778740814,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792912168,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 42.72,
+    "request_id": "fd4d5dae-b8fc-405f-9c4a-9b755ca5e2c3",
+    "outputs_retained_until": 1792998499
+  }
+}
