@@ -1,7 +1,9 @@
 // Punkty Czasu (Time Points): 1 point skips 1 minute of the current wait, an
-// exploration, resting or a camp upgrade. They come only from playing (the
-// narrator, levels and rare finds) and are never sold. With fewer points than
-// minutes left, the wait gets as much shorter as the points allow.
+// exploration, resting or a camp upgrade. One comes every half an hour by
+// itself, also while the player is away (characters.js: settleTimePoints),
+// and more from playing (the narrator, levels and rare finds); they are never
+// sold. With fewer points than minutes left, the wait gets as much shorter
+// as the points allow.
 
 import { construction, regenPerMinute } from '../engine/index.js';
 import { content } from './content.js';

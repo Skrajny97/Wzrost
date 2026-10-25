@@ -15,6 +15,7 @@ import {
   craftPace,
   effectText,
   freePoints,
+  gainedTimePoints,
   hoursToNext,
   huntDurations,
   itemView,
@@ -104,7 +105,23 @@ export async function requirePlayer(context) {
   const session = await requireSession(context);
   const player = await loadPlayer(context.env.DB, session.userId);
   if (!player) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
+  await settleTimePoints(context.env.DB, player.row, context.now);
   return { session, player };
+}
+
+// The Punkty Czasu that came with time since time_points_at join the stored
+// ones (gainedTimePoints), and `row` shows them. The version stays: a change
+// sent at the same moment still saves, and the condition on time_points_at
+// adds each point once.
+async function settleTimePoints(db, row, now) {
+  const { points, since } = gainedTimePoints(row.time_points_at, now, content);
+  if (points === 0) return;
+  const result = await db
+    .prepare('UPDATE characters SET time_points = time_points + ?, time_points_at = ? WHERE id = ? AND time_points_at = ?')
+    .bind(points, since, row.id, row.time_points_at)
+    .run();
+  if (result.meta.changes === 1) Object.assign(row, { time_points: row.time_points + points, time_points_at: since });
+  else Object.assign(row, await db.prepare('SELECT time_points, time_points_at FROM characters WHERE id = ?').bind(row.id).first());
 }
 
 // For changes that need the character at home.
@@ -290,8 +307,10 @@ export function characterView(player, now) {
     classXpToNext: classXpToNext(row.class_level, content),
     gold,
     systemPoints: row.system_points,
-    // Punkty Czasu: 1 point skips 1 minute of a wait (time.js).
+    // Punkty Czasu: 1 point skips 1 minute of a wait (time.js). One more
+    // comes every `minutes` from `since`; the page counts them up the same way.
     timePoints: row.time_points,
+    timePointsGain: { since: row.time_points_at, minutes: content.balance.timePoints.generateMinutes },
     resources,
     position: row.position,
     hp,
@@ -381,12 +400,12 @@ export async function createCharacter(context) {
   try {
     await db
       .prepare(
-        `INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, position, hp, hp_at, created_at, gold, resources, time_points, tutorial)
-         VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]')`,
+        `INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, position, hp, hp_at, created_at, gold, resources, time_points, time_points_at, tutorial)
+         VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]')`,
       )
       .bind(
         session.userId, name, nameKey(name), cls.id, appearance, cls.position, hp, now, now,
-        supply.gold, JSON.stringify(supply.resources), content.balance.timePoints.start,
+        supply.gold, JSON.stringify(supply.resources), content.balance.timePoints.start, now,
       )
       .run();
   } catch (error) {

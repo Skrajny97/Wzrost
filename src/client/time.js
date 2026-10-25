@@ -5,17 +5,19 @@
 import { h, icon } from './dom.js';
 import { countOf, formatMinutes } from './format.js';
 import { playSound } from './sound.js';
-import { call, serverNow, state } from './state.js';
+import { call, serverNow, state, timePointsNow } from './state.js';
 import { confirmAction, toast, withButton } from './ui.js';
 
 const MINUTE = 60000;
 
 export const timePoints = (count) => countOf(count, 'Punkt Czasu', 'Punkty Czasu', 'Punktów Czasu');
 
-// The points a wait of `ms` would take now: all its minutes, or as many as there are.
-function plan(ms) {
+// The points a wait of `ms` would take at `now`: all its minutes, or as many
+// as there are.
+function plan(ms, now) {
   const minutes = Math.ceil(Math.max(0, ms) / MINUTE);
-  return { minutes, spend: Math.min(minutes, state.character.timePoints) };
+  const { points } = timePointsNow(state.character, now);
+  return { minutes, points, spend: Math.min(minutes, points) };
 }
 
 // A button for one kind of wait (target: activity, rest or build). `left`
@@ -38,7 +40,7 @@ export function skipControl(target, left, name) {
     cost,
   );
   const update = (now = serverNow()) => {
-    const { minutes, spend } = plan(left(now));
+    const { minutes, spend } = plan(left(now), now);
     element.hidden = spend < 1;
     label.textContent = spend < minutes ? `Przewiń o ${formatMinutes(spend)}` : 'Przewiń';
     cost.textContent = String(spend);
@@ -49,11 +51,12 @@ export function skipControl(target, left, name) {
 }
 
 async function skip(target, left, name) {
-  const { minutes, spend } = plan(left(serverNow()));
+  const now = serverNow();
+  const { minutes, points, spend } = plan(left(now), now);
   if (spend < 1) return;
   const sure = await confirmAction({
     title: 'Przewinąć czas?',
-    text: `${name}: ${spend < minutes ? `krócej o ${formatMinutes(spend)}` : 'od razu do końca'}. To kosztuje ${timePoints(spend)}, zostanie ${state.character.timePoints - spend}.`,
+    text: `${name}: ${spend < minutes ? `krócej o ${formatMinutes(spend)}` : 'od razu do końca'}. To kosztuje ${timePoints(spend)}, zostanie ${points - spend}.`,
     confirmLabel: 'Przewiń',
   });
   if (!sure) return;

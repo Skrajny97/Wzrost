@@ -1007,3 +1007,29 @@ Autor: łupy z bronią i przedmiotami mają być zdarzeniami losowymi, np. skrzy
 ## Podgląd przedmiotu: sama zmiana (25.10.2026)
 
 Autor: po założeniu albo zdjęciu przedmiotu karta ma pokazywać po prostu plus albo minus, bo tak jest czytelniej. Podgląd pokazuje więc różnicę, np. „Średnie obrażenia −4,5”, „Maks. HP +12”, „Unik +0,5%”, zamiast „9–13 → 5–8”. Obrażenia porównują średnią, bo zakres zmienia oba końce naraz. Zmiany mniejsze niż 0,05 się nie pokazują.
+
+## Punkty Czasu co pół godziny (25.10.2026)
+
+Autor: mimo powolnego tempa gra ma dać graczowi trochę ulgi. Co pół godziny przybywa 1 Punkt Czasu, bez względu na to, czy gracz gra, czy nie, bez górnej granicy. To mechanika samego Systemu, bez budynku. Uzupełnia to punkt 9 „Wprowadzenia narratora i Punktów Czasu”.
+
+1. **Zegar.** Kolumna `characters.time_points_at` (migracja `0016_time_points_clock.sql`) mówi, od kiedy liczy się następny punkt. Co `timePoints.generateMinutes` (30) minut od tej chwili przybywa jeden punkt (`gainedTimePoints` w silniku). Zegar przesuwa się o pełne półgodziny, więc rozpoczęta połowa godziny się nie gubi. Nowa postać zaczyna liczyć od stworzenia, a postacie sprzed zmiany od wdrożenia migracji, bez wyrównania za czas wcześniej.
+2. **Dopisywanie.** Serwer dopisuje zebrane punkty przy każdym żądaniu gracza, zanim cokolwiek policzy, więc punkty, które przyszły pod nieobecność, można od razu wydać. Zapis zmienia tylko liczbę punktów i zegar, nie wersję postaci, więc zmiana wysłana w tej samej chwili się nie gubi. Warunek na `time_points_at` sprawia, że dwa żądania naraz dopisują punkty raz.
+3. **Na ekranie.** Strona liczy przybywające punkty sama, tak samo jak serwer (`timePointsGain` w widoku postaci). Portfel pod złotem pokazuje przy Punktach Czasu odliczanie „+1 za 12:34”, a przycisk „Przewiń” od razu widzi nowy punkt.
+4. **Bez limitu.** Punkty zbierają się bez końca, także przez tygodnie nieobecności. Gdyby to kiedyś psuło tempo gry, prostą zmianą będzie górna granica tylko dla punktów z zegara, ale autor jej teraz nie chce.
+
+## Sakwa z materiałami (25.10.2026)
+
+Autor: materiały rzemieślnicze mają być widoczne na ekranie głównym, w rozwijanej liście jak drewno i kamień, ale osobno, w innym miejscu, i z symbolami graficznymi.
+
+1. **Miejsce.** Przycisk z sakwą stoi w górnym pasku na lewo od paska odpoczynku albo wyprawy. Stuknięcie rozwija pod nim listę: materiały według rzadkości i części, które już są, każde z ikoną i liczbą. Na dole jest przejście do Stołu rzemieślniczego z liczbą zleceń w kolejce, a przed budową napis „Zbuduj Stół rzemieślniczy w obozie”. Portfel ze złotem i zasobami zostaje po prawej, a otwarcie jednej listy zamyka drugą. Najpierw sakwa stała obok poziomów, ale przy dużej ilości złota ucinała nazwę klasy, więc przeszła niżej, gdzie jest miejsce.
+2. **Symbole.** Ikony materiałów, części i skrzyni to rysunki 32 × 32 z Retro Diffusion, jak przedmioty. Trzy z nich przyszły z czarnym kwadratem w tle. Kwadrat został wycięty ręcznie, a obrys zachowany. Sama sakwa w pasku to ikona wektorowa, jak klepsydra przy Punktach Czasu.
+3. **Opis.** Gdy materiałów jeszcze nie ma, karta „Materiały” na Stole rzemieślniczym i sakwa mówią jednym zdaniem autora: „Z pokonanych stworów zdobędziesz różne materiały, które można przerobić na części do rzemiosła.” Na stole zdanie ma niebieskawy kolor wskazówek Systemu.
+
+## Pola walki i popiersia (25.10.2026)
+
+Autor: w walce wojownik zasłaniał napis „Przód”, a Cień napis „Środek”, i obaj nie stali na środku. Cień miał też ucięte włosy.
+
+1. **Napisy pól.** Napis pola stoi teraz nad kartami, a nie pod nimi, i dzieli go od karty odstęp. Żadna karta w spoczynku go nie zakryje, także przy powiększonym tekście w telefonie. Wypad do ciosu nadal na chwilę przesuwa kartę ku celowi.
+2. **Wynik walki.** „Zwycięstwo”, „Porażka” albo „Odwrót” pokazuje się na środku rzędu przeciwników. Wcześniej stało na środku areny i zasłaniało napis „Środek” w rzędzie drużyny.
+3. **Twarz na środku.** Postacie są narysowane w trzech czwartych, więc głowa bywa przesunięta względem tułowia: u wojownika o 2 piksele, u Cienia o 3, u łucznika o 4. Cała postać na karcie postaci zostaje wyśrodkowana według sylwetki. Popiersia w walce i na kartach klas ustawiają się według twarzy. `tools/normalize-portraits.py` wypisuje, gdzie jest twarz, a liczby trafiają do `faces` w `src/client/art.js`.
+4. **Włosy Cienia.** Generator uciął Cieniowi czubek głowy. Brakujące rzędy włosów są dorysowane ręcznie w kolorach jego fryzury, a biała plamka we włosach usunięta. Narzędzie do wyrównania nie skaluje już postaci, która stoi na swojej linii i ma do 8 dorysowanych rzędów nad głową. Ponowne uruchomienie nic nie zmienia. W pozostałych portretach nic nie było ucięte.

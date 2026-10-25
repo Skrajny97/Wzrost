@@ -80,6 +80,16 @@ export function currentHp(character = state.character, now = serverNow()) {
   return Math.min(character.maxHp, Math.floor(hp + gained));
 }
 
+// Punkty Czasu right now: one more every `minutes` since `since`, as the
+// server adds them (gainedTimePoints in the engine). `nextAt` is when the
+// next one comes.
+export function timePointsNow(character = state.character, now = serverNow()) {
+  const { since, minutes } = character.timePointsGain;
+  const every = minutes * 60000;
+  const gained = Math.max(0, Math.floor((now - since) / every));
+  return { points: character.timePoints + gained, nextAt: since + (gained + 1) * every };
+}
+
 // HP a minute while resting now.
 export const restRate = (character = state.character) => character.regen?.change?.perMinute ?? character.regen?.perMinute ?? 0;
 

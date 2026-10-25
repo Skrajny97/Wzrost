@@ -613,6 +613,7 @@ button {
   flex-shrink: 0;
 }
 
+
 /* The gold is a button: it opens the camp's resources under it. */
 .gold {
   display: flex;
@@ -691,6 +692,14 @@ button {
   font-weight: 600;
 }
 
+/* The time to the next Punkt Czasu, under its name. */
+.wallet-note {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
 /* The camp in the top right corner, with the time left of an upgrade. */
 .camp-button {
   display: flex;
@@ -761,6 +770,75 @@ button {
 /* The materials under the currencies. */
 .wallet-item + .wallet-item--materials {
   border-top-color: var(--bark-line);
+}
+
+/* The pouch's materials and parts, under the activity, apart from the wallet. */
+.pouch-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  width: min(300px, calc(100vw - 2 * var(--gutter)));
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  padding: 4px 12px;
+  background: var(--surface);
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+}
+
+.pouch-title {
+  margin: 10px 0 2px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pouch-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pouch-item .wallet-name {
+  color: var(--rarity, var(--text));
+}
+
+.pouch-art {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.pouch-art .sprite {
+  width: 32px;
+  height: 32px;
+}
+
+.pouch-empty {
+  margin: 4px 0 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.pouch-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 6px;
+  border-top: 1px solid var(--bark-line);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+  text-decoration: none;
 }
 
 .icon-button {
@@ -850,11 +928,38 @@ button {
   text-overflow: ellipsis;
 }
 
+/* The current activity, and the pouch with the materials before it. */
+.activity-row {
+  position: relative;
+  display: flex;
+  gap: 6px;
+}
+
+.pouch-button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 32px;
+  padding: 0;
+  border: 1px solid var(--bark-line);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.pouch-button[aria-expanded='true'] {
+  background: var(--bark-active);
+  color: var(--text);
+}
+
 .activity {
   display: flex;
+  flex: 1;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   min-height: 32px;
   padding: 6px 10px;
   border: 1px solid var(--system-line);
@@ -2547,25 +2652,23 @@ a.segmented-option {
   gap: 6px;
 }
 
+/* The label stands above the cards in the flow, so no card at rest covers
+   it, whatever the phone's text size. */
 .arena-field {
-  position: relative;
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-height: 92px;
-  padding: 18px 3px 3px;
+  padding: 3px;
   border: 1px dashed rgba(74, 61, 44, 0.7);
 }
 
 .arena-field-label {
-  position: absolute;
-  top: 3px;
-  right: 0;
-  left: 0;
   color: var(--text-muted);
   font-family: var(--font-system);
   font-size: 10px;
   letter-spacing: 0.12em;
+  line-height: 1.2;
   text-align: center;
   text-transform: uppercase;
 }
@@ -2817,6 +2920,11 @@ a.segmented-option {
 .float--dodge {
   color: var(--system);
   font-size: 14px;
+}
+
+/* The result over the middle of the enemies' row, clear of our labels. */
+.arena-row--enemy {
+  position: relative;
 }
 
 .arena-banner {

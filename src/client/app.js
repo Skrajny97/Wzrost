@@ -6,7 +6,7 @@ import { ApiError, request } from './api.js';
 import { $, $$, clear, h } from './dom.js';
 import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
-import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
+import { buildTopbar, showPouch, showWallet, updateNav, updateTopbar } from './layout.js';
 import { mountCamp } from './screens/camp.js';
 import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
@@ -208,6 +208,7 @@ function route() {
   current?.screen.unmount?.();
   closeSheet();
   showWallet(false);
+  showPouch(false);
 
   if (candidate.nav === 'main') {
     lastMainHash = hash;

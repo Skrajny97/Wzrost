@@ -1,4 +1,5 @@
-// Experience, levels, the fainting penalty and HP regeneration between hunts.
+// Experience, levels, the fainting penalty, HP regeneration between hunts and
+// the Punkty Czasu that come with time.
 
 // The level length is measured in hours of exploring at that level. The first
 // levels take firstLevelMinutes each (a 5-minute exploration is enough), then
@@ -110,4 +111,13 @@ export function restedHp({ hp, since, now, maxHp, vitality, bonus = 0, change },
     regenPerMinute(maxHp, vitality, content, bonus) * minutes(since, switchAt) +
     (change ? regenPerMinute(maxHp, vitality, content, change.bonus) * minutes(switchAt, now) : 0);
   return Math.min(maxHp, Math.floor(hp + gained));
+}
+
+// Punkty Czasu that time alone brings: one every generateMinutes since
+// `since`, also while the player is away, with no limit. `since` moves on by
+// whole intervals, so the time towards the next point carries on.
+export function gainedTimePoints(since, now, content) {
+  const every = content.balance.timePoints.generateMinutes * 60000;
+  const points = Math.max(0, Math.floor((now - since) / every));
+  return { points, since: since + points * every };
 }

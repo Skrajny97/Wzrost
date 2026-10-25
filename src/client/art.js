@@ -12,10 +12,14 @@ export const SPRITES = {
     ids: ['wolf', 'alpha-wolf', 'fox', 'lynx', 'bear', 'boar', 'badger', 'crow', 'owl', 'viper', 'spider', 'wisp', 'likho'],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved.
+  // `faces`: where the face is across, when not in the middle (a head turned
+  // in three quarters), as tools/normalize-portraits.py prints it. Busts
+  // centre on the face; the whole figure stays centred.
   portraits: {
     width: 96,
     height: 128,
     ids: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
+    faces: { 'archer-female': 49, 'archer-male': 52, 'cleric-male': 49, 'shadow-male': 51, 'warrior-male': 50 },
   },
   items: {
     size: 32,
@@ -61,13 +65,15 @@ export const materialSprite = (id) => sprite('materials', id, 'sprite--item');
 export function portraitSprite(classId, appearance, { bust = false } = {}) {
   const id = `${classId}-${appearance}`;
   if (!available.portraits.has(id)) return null;
-  const { width, height } = SPRITES.portraits;
+  const { width, height, faces } = SPRITES.portraits;
+  const off = bust ? (faces[id] ?? width / 2) - width / 2 : 0;
   return h('img', {
     src: `/art/portraits/${id}.png`,
     alt: '',
     width,
     height,
     class: `sprite sprite--portrait${bust ? ' sprite--bust' : ''}`,
+    style: off ? { objectPosition: `calc(50% - ${off}px) 0` } : undefined,
     decoding: 'async',
     draggable: 'false',
   });

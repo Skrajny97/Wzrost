@@ -1,12 +1,15 @@
 // The frame around every game screen: the fixed top bar (levels, HP and mana,
-// character and class XP, gold and Punkty Systemu with the camp's materials,
-// the camp, current activity) and the two bottom bars, the main menu and the
-// character bar with its own background.
+// character and class XP, gold and Punkty Systemu with the camp's resources,
+// the camp, current activity with the pouch of materials and parts beside it)
+// and the two bottom bars, the main menu and the character bar with its own
+// background.
 
+import { materialSprite } from './art.js';
+import { MATERIALS_HINT, materialIcon } from './craft-table.js';
 import { $, fill, h, icon } from './dom.js';
-import { formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
+import { countOf, formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
 import { RESOURCE_ICONS, SYSTEM_POINTS_ICON } from './icons.js';
-import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, unlockInfo, walletEntries } from './state.js';
+import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
 import { meter } from './ui.js';
 
 const MAIN_TABS = [
@@ -33,6 +36,22 @@ export function buildTopbar(onSettings) {
   const points = h('span', { class: 'points-value' });
   // Gold and Punkty Systemu in one line; a tap shows the materials under them.
   const wallet = h('ul', { class: 'wallet-list', id: 'wallet-list', hidden: true });
+  // When the next Punkt Czasu comes, under its row.
+  const timeNote = h('span', { class: 'wallet-note' });
+  // The materials and parts apart from the wallet, by the current activity.
+  const pouch = h('div', { class: 'pouch-panel', id: 'pouch-panel', hidden: true });
+  const pouchButton = h(
+    'button',
+    {
+      type: 'button',
+      class: 'pouch-button',
+      'aria-label': 'Materiały i części',
+      'aria-expanded': 'false',
+      'aria-controls': 'pouch-panel',
+      onClick: () => showPouch(pouch.hidden),
+    },
+    icon('pouch', { size: 24 }),
+  );
   const goldButton = h(
     'button',
     {
@@ -74,27 +93,27 @@ export function buildTopbar(onSettings) {
     wallet,
     // Two rows: HP over mana, character XP over class XP.
     h('div', { class: 'meters' }, hp.element, xp.element, mana.element, classXp.element),
-    activity,
+    h('div', { class: 'activity-row' }, pouchButton, activity, pouch),
   );
-  topbar = { level, classLevel, gold, points, goldButton, wallet, camp, campLabel, hp, mana, xp, classXp, activity, activityLabel, activityTime };
+  topbar = { level, classLevel, gold, points, goldButton, wallet, timeNote, pouch, pouchButton, camp, campLabel, hp, mana, xp, classXp, activity, activityLabel, activityTime };
   updateTopbar();
 }
 
 // Gold, Punkty Systemu and Punkty Czasu first, then the materials.
-function walletRows() {
+function walletRows(timePoints) {
   const [gold, ...materials] = walletEntries();
-  const row = (iconName, name, amount, kind) =>
+  const row = (iconName, name, amount, kind, note) =>
     h(
       'li',
       { class: `wallet-item${kind ? ` wallet-item--${kind}` : ''}` },
       icon(iconName, { size: 18 }),
-      h('span', { class: 'wallet-name', text: name }),
+      h('span', { class: 'wallet-name' }, name, note),
       h('span', { class: 'wallet-amount', text: formatNumber(amount) }),
     );
   return [
     row('coin', gold.name, gold.amount, 'gold'),
     row(SYSTEM_POINTS_ICON, 'Punkty Systemu', state.character.systemPoints, 'system'),
-    row('hourglass', 'Punkty Czasu', state.character.timePoints, 'time'),
+    row('hourglass', 'Punkty Czasu', timePoints, 'time', topbar.timeNote),
     ...materials.map((entry, index) => row(RESOURCE_ICONS[entry.id] ?? 'unknown', entry.name, entry.amount, index === 0 && 'materials')),
   ];
 }
@@ -102,18 +121,90 @@ function walletRows() {
 // Opens or closes the list of resources under the gold.
 export function showWallet(open) {
   if (!topbar) return;
+  if (open) showPouch(false);
   topbar.wallet.hidden = !open;
   topbar.goldButton.setAttribute('aria-expanded', String(open));
   topbar.walletKey = null;
   if (open) refreshWallet();
 }
 
-// Redrawn only when an amount changes, not on every tick.
-function refreshWallet() {
-  const key = JSON.stringify([state.character.systemPoints, state.character.timePoints, ...walletEntries().map((entry) => entry.amount)]);
+// Redrawn only when an amount changes, not on every tick; the time to the
+// next Punkt Czasu counts down on its own.
+function refreshWallet(now = serverNow()) {
+  const { points, nextAt } = timePointsNow(state.character, now);
+  topbar.timeNote.textContent = `+1 za ${formatCountdown(nextAt - now)}`;
+  const key = JSON.stringify([state.character.systemPoints, points, ...walletEntries().map((entry) => entry.amount)]);
   if (key === topbar.walletKey) return;
   topbar.walletKey = key;
-  fill(topbar.wallet, ...walletRows());
+  fill(topbar.wallet, ...walletRows(points));
+}
+
+// The materials by rarity and the parts made, with the way to the table.
+function pouchRows(character) {
+  const { crafting } = character;
+  const table = character.camp.buildings.find((building) => building.crafts);
+  const parts = crafting.parts.filter((part) => part.count > 0);
+  const row = (art, name, color, count) =>
+    h(
+      'li',
+      { class: 'wallet-item pouch-item' },
+      h('span', { class: 'pouch-art' }, art),
+      h('span', { class: 'wallet-name', vars: { '--rarity': color }, text: name }),
+      h('span', { class: 'wallet-amount', text: formatNumber(count) }),
+    );
+  // "Rzadka skóra wilka" for a stack above its species' rarity.
+  const label = (material) => material.label.charAt(0).toUpperCase() + material.label.slice(1);
+  const tableText =
+    crafting.queue.length > 0
+      ? `Na stole: ${countOf(crafting.queue.length, 'zlecenie', 'zlecenia', 'zleceń')}`
+      : table?.level > 0
+        ? 'Stół rzemieślniczy'
+        : 'Zbuduj Stół rzemieślniczy w obozie';
+  return [
+    h('p', { class: 'pouch-title', id: 'pouch-materials', text: 'Materiały' }),
+    crafting.materials.length === 0
+      ? h('p', { class: 'pouch-empty', text: MATERIALS_HINT })
+      : h(
+          'ul',
+          { class: 'pouch-list', 'aria-labelledby': 'pouch-materials' },
+          crafting.materials.map((material) => row(materialIcon(material.materialId), label(material), material.color, material.count)),
+        ),
+    h('p', { class: 'pouch-title', id: 'pouch-parts', text: 'Części' }),
+    parts.length === 0
+      ? h('p', { class: 'pouch-empty', text: 'Stół rzemieślniczy robi je z materiałów i rozebranych przedmiotów.' })
+      : h(
+          'ul',
+          { class: 'pouch-list', 'aria-labelledby': 'pouch-parts' },
+          parts.map((part) => row(materialSprite(part.id) ?? icon('hammer', { size: 24 }), part.name, part.color, part.count)),
+        ),
+    table && h('a', { class: 'pouch-link', href: `#/oboz/${table.id}`, onClick: () => showPouch(false) }, h('span', { text: tableText }), icon('chevron', { size: 16 })),
+  ];
+}
+
+// Opens or closes the materials and parts under the pouch; the wallet closes.
+export function showPouch(open) {
+  if (!topbar) return;
+  if (open) showWallet(false);
+  topbar.pouch.hidden = !open;
+  topbar.pouchButton.setAttribute('aria-expanded', String(open));
+  topbar.pouchKey = null;
+  if (open) refreshPouch();
+}
+
+// Redrawn only when a count or the queue changes.
+function refreshPouch() {
+  const character = state.character;
+  const { crafting } = character;
+  const table = character.camp.buildings.find((building) => building.crafts);
+  const key = JSON.stringify([
+    crafting.materials.map((material) => [material.key, material.count]),
+    crafting.parts.map((part) => part.count),
+    crafting.queue.length,
+    table?.level,
+  ]);
+  if (key === topbar.pouchKey) return;
+  topbar.pouchKey = key;
+  fill(topbar.pouch, ...pouchRows(character));
 }
 
 // A tap anywhere else, or Escape, closes the list.
@@ -121,9 +212,14 @@ document.addEventListener('click', (event) => {
   if (topbar && !topbar.wallet.hidden && !topbar.wallet.contains(event.target) && !topbar.goldButton.contains(event.target)) {
     showWallet(false);
   }
+  if (topbar && !topbar.pouch.hidden && !topbar.pouch.contains(event.target) && !topbar.pouchButton.contains(event.target)) {
+    showPouch(false);
+  }
 });
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && topbar && !topbar.wallet.hidden) showWallet(false);
+  if (event.key !== 'Escape' || !topbar) return;
+  if (!topbar.wallet.hidden) showWallet(false);
+  if (!topbar.pouch.hidden) showPouch(false);
 });
 
 export function updateTopbar(now = serverNow()) {
@@ -137,7 +233,8 @@ export function updateTopbar(now = serverNow()) {
     'aria-label',
     `Złoto: ${formatNumber(character.gold)}, Punkty Systemu: ${formatNumber(character.systemPoints)}. Zasoby`,
   );
-  if (!topbar.wallet.hidden) refreshWallet();
+  if (!topbar.wallet.hidden) refreshWallet(now);
+  if (!topbar.pouch.hidden) refreshPouch();
   // The camp shows the time left of the building being upgraded.
   const building = character.camp.construction;
   const busy = Boolean(building) && now < building.endsAt;

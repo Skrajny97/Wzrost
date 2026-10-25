@@ -552,14 +552,15 @@
     },
     "timePoints": {
       "type": "object",
-      "description": "Punkty Czasu postaci: 1 punkt przewija 1 minutę czynności, odpoczynku albo budowy. Zdobywa się je tylko grą, nigdy za pieniądze.",
+      "description": "Punkty Czasu postaci: 1 punkt przewija 1 minutę czynności, odpoczynku albo budowy. Przybywają same z upływem czasu i za grę, nigdy za pieniądze.",
       "additionalProperties": false,
-      "required": ["start", "perLevel", "perClassLevel", "find"],
+      "required": ["start", "perLevel", "perClassLevel", "find", "generateMinutes"],
       "properties": {
         "start": { "type": "integer", "minimum": 0, "description": "Punkty nowej postaci, które daje narrator we wprowadzeniu." },
         "perLevel": { "type": "integer", "minimum": 0, "description": "Za każdy nowy poziom postaci." },
         "perClassLevel": { "type": "integer", "minimum": 0, "description": "Za każdy nowy poziom klasy." },
-        "find": { "type": "integer", "minimum": 0, "description": "Za odłamek czasu, rzadkie znalezisko na wyprawie." }
+        "find": { "type": "integer", "minimum": 0, "description": "Za odłamek czasu, rzadkie znalezisko na wyprawie." },
+        "generateMinutes": { "type": "integer", "minimum": 1, "description": "Co tyle minut przybywa 1 punkt, sam z siebie, także gdy gracz nie gra. Bez górnej granicy." }
       }
     },
     "startingSupply": {

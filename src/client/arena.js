@@ -107,7 +107,9 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     );
   }
 
-  const arena = h('div', { class: 'arena' }, row('enemy', fight.enemies), row('ally', fight.allies), fx, banner);
+  const enemies = row('enemy', fight.enemies);
+  enemies.append(banner);
+  const arena = h('div', { class: 'arena' }, enemies, row('ally', fight.allies), fx);
 
   // Animations through the Web Animations API, so they can all be cancelled.
   function animate(element, keyframes, options) {

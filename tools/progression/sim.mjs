@@ -197,6 +197,8 @@ export function runCharacter(classId, runIndex, content, policyIn = {}) {
   let equipped = [];
   let timePoints = content.balance.timePoints.start;
   let now = 0; // wall clock (exploring + resting), ms
+  // With the ones the half-hour clock brought on the wall clock.
+  const timePointsNow = () => timePoints + engine.gainedTimePoints(0, now, content).points;
   let exploreMs = 0;
   let restMs = 0;
   let hp = engine.playerCombatant({ character, equipped, name: 'S' }, content).maxHp;
@@ -226,7 +228,7 @@ export function runCharacter(classId, runIndex, content, policyIn = {}) {
       goldEarned: totals.goldHunts + totals.goldSales,
       goldSpentCamp: campLog.spent.gold ?? 0,
       goldSpentAnvil: totals.goldAnvil,
-      timePoints,
+      timePoints: timePointsNow(),
       slotsFilled: filled,
       gearItemLevel: avg((item) => item.level),
       gearEqLevel: avg((item) => commonEquivalentLevel(item, content)),
@@ -486,7 +488,7 @@ export function runCharacter(classId, runIndex, content, policyIn = {}) {
     slotFirst,
     totals,
     camp: { log: campLog, finalLevels: camp.levels(now), wallet: { ...wallet } },
-    timePoints,
+    timePoints: timePointsNow(),
     exploreHours: exploreMs / HOUR,
     totalHours: now / HOUR,
     restHours: restMs / HOUR,

@@ -117,6 +117,11 @@ test('every sprite on the list has its file at its size, and every class has its
     }
   }
   assert.deepEqual(data('classes').map((cls) => cls.id).filter((id) => !classArtIds.includes(id)), []);
+  // A bust centres on a face inside the portrait.
+  for (const [id, face] of Object.entries(SPRITES.portraits.faces)) {
+    assert.ok(SPRITES.portraits.ids.includes(id), `faces: no portrait ${id}`);
+    assert.ok(face > 24 && face < SPRITES.portraits.width - 24, `faces: ${id} at ${face}`);
+  }
 });
 
 test('the narrator knows when and where each of its lines shows', () => {

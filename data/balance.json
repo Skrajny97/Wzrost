@@ -103,7 +103,8 @@
     "start": 60,
     "perLevel": 3,
     "perClassLevel": 2,
-    "find": 5
+    "find": 5,
+    "generateMinutes": 30
   },
   "startingSupply": {
     "gold": 15,

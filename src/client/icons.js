@@ -46,6 +46,13 @@ export const ICONS = {
   chevron: [path('M9 5l7 7-7 7')],
   tent: [path('M2.5 20L12 4l9.5 16'), path('M2.5 20h19'), path('M9 20l3-6 3 6'), path('M12 4l1.5-2')],
   hammer: [path('M13 4.5l6.5 6.5-2.5 2.5L10.5 7z'), path('M12 9L4 17l3 3 8-8')],
+  // A tied pouch: the materials and parts of the Stół rzemieślniczy.
+  pouch: [
+    path('M9.5 7.5L8 4h8l-1.5 3.5'),
+    path('M8.5 7.5h7'),
+    path('M9.5 7.5C6 9.5 4 13 4 16.5 4 19.5 7 21 12 21s8-1.5 8-4.5c0-3.5-2-7-5.5-9'),
+    path('M12 7.5v2.5'),
+  ],
   // A phone with an arrow into it: install as an app.
   install: [['rect', { x: 6, y: 2.5, width: 12, height: 19, rx: 2 }], path('M12 6.5v8M8.8 11.5l3.2 3.2 3.2-3.2'), path('M10.5 18.5h3')],
 

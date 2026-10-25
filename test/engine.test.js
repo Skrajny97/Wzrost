@@ -37,6 +37,7 @@ import {
   faintChances,
   faintPenalty,
   freePoints,
+  gainedTimePoints,
   gearLevel,
   generateItem,
   classXpToNext,
@@ -593,6 +594,19 @@ describe('progression', () => {
     assert.equal(at(0), 10);
     assert.ok(at(10) > 10 && at(10) < 100);
     assert.equal(at(10000), 100);
+  });
+
+  test('a Punkt Czasu comes every half an hour, with no limit, and the rest of an interval carries on', () => {
+    const minute = 60000;
+    assert.equal(content.balance.timePoints.generateMinutes, 30);
+    assert.deepEqual(gainedTimePoints(0, 29 * minute, content), { points: 0, since: 0 });
+    assert.deepEqual(gainedTimePoints(0, 30 * minute, content), { points: 1, since: 30 * minute });
+    // 95 minutes: three points, and the next one 25 minutes on.
+    assert.deepEqual(gainedTimePoints(1000, 1000 + 95 * minute, content), { points: 3, since: 1000 + 90 * minute });
+    // A month away: every point, none lost.
+    assert.equal(gainedTimePoints(0, 30 * 24 * 60 * minute, content).points, 30 * 48);
+    // A clock behind the start gives nothing.
+    assert.deepEqual(gainedTimePoints(5000, 0, content), { points: 0, since: 5000 });
   });
 });
 

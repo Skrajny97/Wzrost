@@ -985,6 +985,49 @@ describe('Time Points and the narrator', () => {
     assert.equal((await skip('everything')).data.error.code, 'invalid_target');
   });
 
+  test('a Punkt Czasu comes every half an hour by itself, also while away, and counts once', async () => {
+    const view = await character();
+    assert.equal(view.timePointsGain.minutes, 30);
+    assert.ok(Math.abs(view.timePointsGain.since - Date.now()) < 60000);
+    // 95 minutes away: three points, and the next one 25 minutes on. Two
+    // requests at once add them once.
+    const database = await db();
+    const since = Date.now() - 95 * 60000;
+    await database.prepare('UPDATE characters SET time_points_at = ?').bind(since).run();
+    for (const seen of await Promise.all([character(), character()])) {
+      assert.equal(seen.timePoints, start + 3);
+      assert.equal(seen.timePointsGain.since, since + 90 * 60000);
+    }
+    assert.deepEqual(await database.prepare('SELECT time_points, time_points_at FROM characters').first(), {
+      time_points: start + 3,
+      time_points_at: since + 90 * 60000,
+    });
+    assert.equal((await character()).timePoints, start + 3);
+  });
+
+  test('a point that came while away can be spent at once', async () => {
+    await setPoints(0);
+    await (await db()).prepare('UPDATE characters SET time_points_at = ?').bind(Date.now() - 31 * 60000).run();
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
+    const skipped = await skip('activity');
+    assert.equal(skipped.data.spent, 1);
+    assert.equal(skipped.data.character.timePoints, 0);
+  });
+
+  test('characters made before the half-hour points start counting at the migration', async () => {
+    const database = await db();
+    await database.prepare('ALTER TABLE characters DROP COLUMN time_points_at').run();
+    const migration = readFileSync('migrations/0016_time_points_clock.sql', 'utf8')
+      .replace(/--.*$/gm, '')
+      .split(';')
+      .map((statement) => statement.trim())
+      .filter(Boolean);
+    await database.batch(migration.map((statement) => database.prepare(statement)));
+    const view = await character();
+    assert.equal(view.timePoints, start);
+    assert.ok(Math.abs(view.timePointsGain.since - Date.now()) < 5000);
+  });
+
   test('resting cannot be skipped during an exploration', async () => {
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
     assert.equal((await skip('rest')).data.error.code, 'busy');

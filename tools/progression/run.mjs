@@ -95,7 +95,7 @@ const results = {
       points: 'autoDistribute ("Rozdaj według klasy") after every hunt from level 2',
       loot: 'server autoEquip into empty slots, then a find replaces the worn item if offence x defence from combatValues rises; everything else sold to the scrapper at once',
       camp: 'at every hunt end, hunt start and build completion: collect stores; if nothing is being built, start the affordable next level with the lowest gold cost',
-      timePoints: 'counted, never spent (the tutorial would spend 30 on the first hunt)',
+      timePoints: 'counted, never spent (the tutorial would spend 30 on the first hunt), with one every half an hour of the wall clock',
     },
     fields: {
       exploreHours: 'exploring hours (sum of hunt timers) when the XP crossed the level inside the hunt',

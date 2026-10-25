@@ -24,14 +24,18 @@ async function craft(body) {
   toast(ordered === 1 ? 'Materiał trafił na stół.' : `Na stole: ${countOf(ordered, 'zlecenie', 'zlecenia', 'zleceń')}.`);
 }
 
+// What materials are, while there are none yet (the author's sentence).
+export const MATERIALS_HINT = 'Z pokonanych stworów zdobędziesz różne materiały, które można przerobić na części do rzemiosła.';
+
 function materialsCard(crafting, built, full) {
   const blocked = !built || full;
+  const none = crafting.materials.length === 0;
   return h(
     'section',
     { class: 'card craft-card', 'aria-labelledby': 'craft-materials' },
     h('h2', { class: 'card-title', id: 'craft-materials', text: 'Materiały' }),
-    crafting.materials.length === 0
-      ? h('p', { class: 'muted', text: 'Pokonane stwory zostawiają materiały, każdy swój. Na razie nie ma tu żadnych.' })
+    none
+      ? h('p', { class: 'system-hint', text: MATERIALS_HINT })
       : h(
           'ul',
           { class: 'craft-list' },
@@ -70,7 +74,7 @@ function materialsCard(crafting, built, full) {
         text: 'Przerób wszystko',
         onClick: (event) => withButton(event.currentTarget, () => craft({ all: true })),
       }),
-    !built && h('p', { class: 'system-hint', text: 'Zbuduj stół, żeby przerabiać materiały i rozbierać przedmioty. Budowa jest tania.' }),
+    !built && !none && h('p', { class: 'system-hint', text: 'Zbuduj stół, żeby przerabiać materiały i rozbierać przedmioty. Budowa jest tania.' }),
     built && full && h('p', { class: 'system-hint', text: `Kolejka jest pełna (${crafting.limit} zleceń). Poczekaj, aż skończy się pierwsze.` }),
   );
 }
