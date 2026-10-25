@@ -3,7 +3,7 @@
 // on request. The report opens on its key fight.
 
 import { createArena } from '../arena.js';
-import { itemSprite } from '../art.js';
+import { itemSprite, materialSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { playSound } from '../sound.js';
@@ -348,11 +348,12 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       'section',
       { class: 'report-section', 'aria-labelledby': 'items-title', 'data-guide': 'report-items' },
       // Before materials, monsters also dropped items.
-      h('h2', {
-        class: 'section-title',
-        id: 'items-title',
-        text: `${report.summary.materials ? 'Skrzynie skarbów' : 'Łupy i znaleziska'} (${report.items.length})`,
-      }),
+      h(
+        'h2',
+        { class: 'section-title section-title--art', id: 'items-title' },
+        report.summary.materials && materialSprite('chest'),
+        `${report.summary.materials ? 'Skrzynie skarbów' : 'Łupy i znaleziska'} (${report.items.length})`,
+      ),
       h(
         'ul',
         { class: 'item-list' },

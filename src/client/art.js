@@ -22,10 +22,10 @@ export const SPRITES = {
     ids: ['sword', 'axe', 'dagger', 'bow', 'staff', 'aspergillum', 'shield', 'quiver', 'focus', 'hood', 'helmet', 'tunic', 'chainmail', 'robe', 'cowl', 'surplice', 'gloves', 'boots', 'amulet', 'ring', 'talisman'],
   },
   // Materials left by creatures, the parts the Stół rzemieślniczy makes and
-  // the treasure chest, 32×32, filled in as they are drawn.
+  // the treasure chest, 32×32.
   materials: {
     size: 32,
-    ids: [],
+    ids: ['wolf-pelt', 'fox-pelt', 'badger-claws', 'viper-scales', 'boar-tusk', 'crow-feather', 'owl-feather', 'lynx-fur', 'spider-silk', 'alpha-fang', 'bear-hide', 'wisp-flame', 'likho-eye', 'scraps', 'straps', 'fittings', 'runes', 'amber', 'bloodstone', 'star-shard', 'chest'],
   },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
   narrator: {

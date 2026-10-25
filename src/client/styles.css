@@ -1054,6 +1054,17 @@ a.button {
   font-weight: 700;
 }
 
+.section-title--art {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title--art .sprite {
+  width: 28px;
+  height: 28px;
+}
+
 .section-count {
   color: var(--text-muted);
   font-size: 16px;
