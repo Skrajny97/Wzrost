@@ -13,6 +13,7 @@ import {
   campLevels,
   durationsUpTo,
   estimateThreat,
+  hpAfterHunt,
   huntDurations,
   huntReport,
   longestHunt,
@@ -239,6 +240,9 @@ export async function finishHunt(db, player, now) {
     : '';
   // Materials from beaten creatures, by stack ("wolf-pelt:common").
   const left = Object.entries(hunt.materials);
+  // A new level heals fully, with the finds worn from now on (hpAfterHunt).
+  const worn = [...equippedItems(player), ...autoEquipped.map((index) => hunt.items[index])];
+  const hp = hpAfterHunt({ character, applied, hunt, equipped: worn, name: row.name }, content);
   // The creatures of every fight join those the character has met
   // ("Czyhające niebezpieczeństwa" shows them by name from now on).
   const met = [...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))])];
@@ -275,7 +279,7 @@ export async function finishHunt(db, player, now) {
           ...found.flatMap(([id, amount]) => [resourcePath(id), resourcePath(id), amount]),
           ...left.flatMap(([key, count]) => [resourcePath(key), resourcePath(key), count]),
           applied.timePoints,
-          hunt.hpEnd,
+          hp,
           activity.ends_at,
           JSON.stringify(met),
           row.id,

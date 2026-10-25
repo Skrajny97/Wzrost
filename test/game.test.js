@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, generateItem, itemName } from '../src/engine/index.js';
+import { createRng, generateItem, itemName, xpToNext } from '../src/engine/index.js';
 import { skipTime } from '../src/server/testing.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -1307,5 +1307,20 @@ describe('Czyhające niebezpieczeństwa', () => {
     await database.batch(migration.map((statement) => database.prepare(statement)));
     const { character } = (await call('GET', '/api/character', { cookie })).data;
     assert.deepEqual([...character.met].sort(), fought(report));
+  });
+});
+
+describe('Awans', () => {
+  test('a new character or class level heals fully when the report is claimed', async () => {
+    const cookie = await signUp();
+    await newCharacter(cookie, 'warrior');
+    // One XP short of level 2: the fights hurt, and the level heals.
+    await (await db()).prepare('UPDATE characters SET xp = ?').bind(xpToNext(1, content) - 1).run();
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    await finishHunt();
+    const { report, character } = (await call('POST', '/api/hunts/claim', { cookie })).data;
+    assert.ok(character.level >= 2);
+    assert.equal(character.hp, character.maxHp);
+    assert.ok(report.system.includes('Awans odnawia HP i manę do pełna.'));
   });
 });

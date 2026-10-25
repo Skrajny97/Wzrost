@@ -1058,3 +1058,11 @@ Uwagi autora po wdrożeniu sakwy i Punktów Czasu co pół godziny.
     Lista powstaje z danych spotkań regionu (`areaDangers` w silniku), więc nowy stwór w `data/regions.json` sam na nią trafia. Stwór, którego postać jeszcze nie spotkała w walce, to czarny cień z „???” zamiast imienia, a poziomy widać od razu. Pod listą stoi zdanie autora: „Zobaczysz tutaj pełne informacje jedynie o stworach, z którymi stoczyłeś potyczkę.”, a dla postaci kobiecej „stoczyłaś”, jak w kwestiach narratora. Walka, także przegrana, odkrywa go po odebraniu raportu. Spotkane stwory zapisuje kolumna `characters.met` (migracja `0018_met_monsters.sql`). Postacie sprzed zmiany znają stwory z raportów, które jeszcze mają.
 7. **Zakładka Lochy.** Kłódka z poziomem stoi pod nazwą zakładki, jak przy Treningu, bez względu na długość nazwy.
 
+
+## Awans odnawia HP i manę (25.10.2026)
+
+Autor: wbicie poziomu postaci albo klasy odnawia HP i manę do pełna.
+
+1. **Przy odbiorze raportu.** Gdy wyprawa przynosi nowy poziom postaci albo klasy, postać ma po odebraniu raportu pełne HP nowego poziomu, z ekwipunkiem, który nosi po wyprawie (`hpAfterHunt` w silniku). Komunikaty Systemu w raporcie mówią raz: „Awans odnawia HP i manę do pełna.”, także gdy przyszły oba awanse naraz. Tak samo jest przy omdleniu, jeśli walki przed nim dały awans.
+2. **Mana.** Na razie nic jej nie wydaje, więc zawsze jest pełna. Gdy umiejętności zaczną ją zużywać, awans też ją odnowi.
+3. **Pierwsza wyprawa.** Zawsze daje awans, więc postać wraca z niej z pełnym HP. Kwestia narratora przy Ognisku („Teraz zajmijmy się jednak Twoim powrotem do zdrowia…”) mówi o ranach, których teraz nie ma. Zmiana tego tekstu czeka na decyzję autora, bo kwestie czytane głosem zatwierdza autor.

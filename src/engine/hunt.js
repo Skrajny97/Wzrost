@@ -405,6 +405,9 @@ export function applyHunt(character, hunt, content) {
       say(content.texts, textId, nextClass.level, { className, level: nextClass.level, points, unlockLevel, time: time.perClassLevel * classLevels }),
     );
   }
+  // A new level of either kind heals fully (hpAfterHunt).
+  const levelled = levels > 0 || classLevels > 0;
+  if (levelled) messages.push(say(content.texts, 'levelHeal', 0, {}));
   if (penalty > 0) messages.push(say(content.texts, 'faintPenalty', 0, { xp: penalty }));
 
   return {
@@ -413,9 +416,19 @@ export function applyHunt(character, hunt, content) {
     classLevel: nextClass.level,
     classXp: nextClass.xp,
     penalty,
+    levelled,
     timePoints: time.perLevel * levels + time.perClassLevel * classLevels + (hunt.timePoints ?? 0),
     messages,
   };
+}
+
+// HP when the report is claimed: a new character or class level heals the
+// character fully at its new level, with the gear it wears then (and will
+// refill mana once something spends it); otherwise what the exploration left.
+export function hpAfterHunt({ character, applied, hunt, equipped, name }, content) {
+  if (!applied.levelled) return hunt.hpEnd;
+  const levelled = { ...character, level: applied.level, xp: applied.xp, classLevel: applied.classLevel, classXp: applied.classXp };
+  return playerCombatant({ character: levelled, equipped, name }, content).maxHp;
 }
 
 // `autoEquipped`: indices of the finds that went straight into empty slots.

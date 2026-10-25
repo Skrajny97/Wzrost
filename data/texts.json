@@ -56,6 +56,7 @@
   "firstChest": ["Tuż obok, pod paprocią, leży stara skrzynia. W środku: {item}."],
   "levelUp": ["Osiągnięto poziom {level}. Wolne punkty statystyk: +{points}. Punkty Czasu: +{time}."],
   "classLevelUp": ["{className}: poziom klasy {level}. Wolne punkty statystyk: +{points}. Punkty Czasu: +{time}."],
+  "levelHeal": ["Awans odnawia HP i manę do pełna."],
   "classLevelUpLocked": ["{className}: poziom klasy {level}. Wolne punkty statystyk: +{points}, rozdasz je od poziomu {unlockLevel}. Punkty Czasu: +{time}."],
   "faintPenalty": ["Omdlenie. Utracone doświadczenie: {xp}."],
   "bagOverflow": ["Plecak był pełny ({capacity} miejsc). Złomiarz kupił najsłabsze przedmioty: {count} za {gold} złota."],

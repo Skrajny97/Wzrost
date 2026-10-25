@@ -3,6 +3,7 @@ import { describe, test } from 'node:test';
 
 import {
   applyHunt,
+  hpAfterHunt,
   areaDangers,
   areaFor,
   autoDistribute,
@@ -550,13 +551,16 @@ describe('progression', () => {
     // Level 2 opens long hunts and the stats screen, and the System says so.
     const unlocks = content.unlocks.filter((u) => u.level === 2).map((u) => u.message);
     assert.deepEqual(applied.messages.slice(1, 1 + unlocks.length), unlocks);
-    assert.match(applied.messages.at(-1), /^Kleryk: poziom klasy 2\. Wolne punkty statystyk: \+2\. Punkty Czasu: \+1\.$/);
+    assert.match(applied.messages.at(-2), /^Kleryk: poziom klasy 2\. Wolne punkty statystyk: \+2\. Punkty Czasu: \+1\.$/);
+    // A new level of either kind heals fully, and the System says so once.
+    assert.equal(applied.messages.at(-1), 'Awans odnawia HP i manę do pełna.');
+    assert.equal(applied.levelled, true);
     // A level and a class level: 2 and 1 Time Points (data/balance.json).
     assert.equal(applied.timePoints, 3);
     // A class level before character level 2 says when its points can be spent.
     const early = applyHunt(character, { xp: classXpToNext(1, content), result: 'success' }, content);
     assert.equal(early.level, 1);
-    assert.deepEqual(early.messages, ['Kleryk: poziom klasy 2. Wolne punkty statystyk: +2, rozdasz je od poziomu 2. Punkty Czasu: +1.']);
+    assert.deepEqual(early.messages, ['Kleryk: poziom klasy 2. Wolne punkty statystyk: +2, rozdasz je od poziomu 2. Punkty Czasu: +1.', 'Awans odnawia HP i manę do pełna.']);
     assert.equal(early.timePoints, 1);
 
     // Several levels at once make one line for the character and one for the class.
@@ -567,18 +571,31 @@ describe('progression', () => {
     assert.equal(many.messages[0], 'Osiągnięto poziom 4. Wolne punkty statystyk: +24. Punkty Czasu: +6.');
     assert.equal(many.messages.filter((message) => message.startsWith('Kleryk: poziom klasy')).length, 1);
     assert.match(
-      many.messages.at(-1),
+      many.messages.at(-2),
       new RegExp(`^Kleryk: poziom klasy ${many.classLevel}\\. Wolne punkty statystyk: \\+${2 * (many.classLevel - 1)}\\. Punkty Czasu: \\+${many.classLevel - 1}\\.$`),
     );
     assert.equal(many.timePoints, 6 + (many.classLevel - 1));
 
     const fainted = applyHunt({ ...character, level: 3, xp: 10 }, { xp: 0, result: 'fainted' }, content);
+    assert.equal(fainted.levelled, false);
     assert.equal(fainted.level, 3);
     assert.equal(fainted.xp, 0);
     assert.equal(fainted.penalty, 10);
     assert.equal(fainted.timePoints, 0);
     // Time shards found on the way count too.
     assert.equal(applyHunt(character, { xp: 0, result: 'success', timePoints: 5 }, content).timePoints, 5);
+  });
+
+  test('a new level heals fully at the new level; without one the HP after the exploration stays', () => {
+    const character = newCharacter('warrior', { level: 1, xp: 0, classLevel: 1, classXp: 0 });
+    const hunt = { xp: xpToNext(1, content) + 5, result: 'success', hpEnd: 3 };
+    const applied = applyHunt(character, hunt, content);
+    const before = playerCombatant({ character, equipped: [], name: 'A' }, content).maxHp;
+    const healed = hpAfterHunt({ character, applied, hunt, equipped: [], name: 'A' }, content);
+    assert.ok(healed > before, `${healed} > ${before}`);
+    assert.equal(healed, playerCombatant({ character: { ...character, level: 2, classLevel: applied.classLevel }, equipped: [], name: 'A' }, content).maxHp);
+    const calm = { xp: 1, result: 'success', hpEnd: 3 };
+    assert.equal(hpAfterHunt({ character, applied: applyHunt(character, calm, content), hunt: calm, equipped: [], name: 'A' }, content), 3);
   });
 
   test('hunting far below your level gives clearly less XP', () => {
