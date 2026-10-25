@@ -278,21 +278,24 @@
       "kind": "point",
       "text": [
         "Zdobycze z wypraw trafiają do plecaka. Szałas na łupy go powiększy, a Skup złomu sprawi, że złomiarz zapłaci Ci więcej za to, czego nie potrzebujesz."
-      ]
+      ],
+      "voice": "audio/narration/camp-loot-shed.mp3"
     },
     {
       "id": "camp-craft-table",
       "kind": "point",
       "text": [
         "Przy Stole rzemieślniczym przerobisz materiały ze stworów na części. Możesz tam też rozebrać zbędne przedmioty. Części przydadzą się, gdy poznasz profesje."
-      ]
+      ],
+      "voice": "audio/narration/camp-craft-table.mp3"
     },
     {
       "id": "camp-level",
       "kind": "point",
       "text": [
         "Rozwijać możesz także sam obóz. Kosztuje to tylko złoto, a każdy poziom obozu przyspiesza wszystkie budowy. Budowy możesz też ustawiać w kolejce, do trzech naraz."
-      ]
+      ],
+      "voice": "audio/narration/camp-level.mp3"
     },
     {
       "id": "lead-campfire",
