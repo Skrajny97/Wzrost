@@ -1,0 +1,25 @@
+{
+  "id": "frost-gust",
+  "payload": {
+    "prompt": "swirling gust of icy wind with snowflakes and frost shards, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 223792005,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792964200,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 26.88,
+    "request_id": "a506e2e0-87b4-4551-9a32-2776ac2fae43",
+    "outputs_retained_until": 1793050530
+  }
+}

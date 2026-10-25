@@ -1,0 +1,25 @@
+{
+  "id": "poisoned-blade",
+  "payload": {
+    "prompt": "dagger blade dripping bright green venom, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 483847267,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792964516,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 25.8,
+    "request_id": "04dc3b12-08b9-4e10-bf0f-66059f039f57",
+    "outputs_retained_until": 1793050876
+  }
+}

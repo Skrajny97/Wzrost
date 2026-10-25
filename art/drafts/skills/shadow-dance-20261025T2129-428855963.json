@@ -1,0 +1,25 @@
+{
+  "id": "shadow-dance",
+  "payload": {
+    "prompt": "hooded figure blurring into several dark shadow afterimages, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 428855963,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792964574,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 25.62,
+    "request_id": "26524842-bc88-4e09-8577-2c9d153146a2",
+    "outputs_retained_until": 1793050920
+  }
+}

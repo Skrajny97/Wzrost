@@ -1,0 +1,25 @@
+{
+  "id": "pinning-shot",
+  "payload": {
+    "prompt": "arrow pinning a leather boot to the ground, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 951028034,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792964075,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 27.24,
+    "request_id": "36a67085-1abb-4df2-90bd-b77ae6a043b1",
+    "outputs_retained_until": 1793050424
+  }
+}

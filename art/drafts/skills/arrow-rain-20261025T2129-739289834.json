@@ -1,0 +1,25 @@
+{
+  "id": "arrow-rain",
+  "payload": {
+    "prompt": "many arrows raining down from above in a wide fan, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 739289834,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792964021,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 27.42,
+    "request_id": "383a566e-1c0d-496e-bade-4a5d7c337d2a",
+    "outputs_retained_until": 1793050343
+  }
+}

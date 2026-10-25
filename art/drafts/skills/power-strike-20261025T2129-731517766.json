@@ -1,0 +1,25 @@
+{
+  "id": "power-strike",
+  "payload": {
+    "prompt": "heavy steel sword swung down in a powerful arc with a bright white impact flash, square fantasy RPG skill icon, bold readable shape, dark forest green background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 731517766,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792963808,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 28.14,
+    "request_id": "75173c53-f885-4ecc-aa9e-f57b5d20e891",
+    "outputs_retained_until": 1793050166
+  }
+}
