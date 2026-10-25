@@ -135,6 +135,15 @@ test('the narrator knows when and where each of its lines shows', () => {
   }
 });
 
+test("the narrator's quests sit in the top bar, where his line points", () => {
+  const layout = readFileSync(join(CLIENT, 'layout.js'), 'utf8');
+  assert.match(layout, /'data-guide': 'quests'/);
+  // Between the levels and the gold.
+  assert.match(layout, /h\('div', \{ class: 'topbar-badges' \}, level, classLevel\),\s*quests,/);
+  const quests = readFileSync(join(CLIENT, 'quests.js'), 'utf8');
+  for (const path of ['/api/quests/claim', '/api/quests/chest']) assert.ok(quests.includes(`'${path}'`), path);
+});
+
 test('the page can be added to the home screen as an app', () => {
   const html = readFileSync(join(CLIENT, 'index.html'), 'utf8');
   assert.match(html, /<link rel="manifest" href="\/manifest\.webmanifest">/);

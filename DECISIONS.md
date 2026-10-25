@@ -1065,4 +1065,37 @@ Autor: wbicie poziomu postaci albo klasy odnawia HP i manę do pełna.
 
 1. **Przy odbiorze raportu.** Gdy wyprawa przynosi nowy poziom postaci albo klasy, postać ma po odebraniu raportu pełne HP nowego poziomu, z ekwipunkiem, który nosi po wyprawie (`hpAfterHunt` w silniku). Komunikaty Systemu w raporcie mówią raz: „Awans odnawia HP i manę do pełna.”, także gdy przyszły oba awanse naraz. Tak samo jest przy omdleniu, jeśli walki przed nim dały awans.
 2. **Mana.** Na razie nic jej nie wydaje, więc zawsze jest pełna. Gdy umiejętności zaczną ją zużywać, awans też ją odnowi.
-3. **Pierwsza wyprawa.** Zawsze daje awans, więc postać wraca z niej z pełnym HP. Kwestia narratora przy Ognisku („Teraz zajmijmy się jednak Twoim powrotem do zdrowia…”) mówi o ranach, których teraz nie ma. Zmiana tego tekstu czeka na decyzję autora, bo kwestie czytane głosem zatwierdza autor.
+3. **Pierwsza wyprawa.** Zawsze daje awans, więc postać wraca z niej z pełnym HP. Kwestia narratora przy Ognisku („Teraz zajmijmy się jednak Twoim powrotem do zdrowia…”) mówiła o ranach, których teraz nie ma. Autor zatwierdził jej nowy tekst (punkt 8 „Zadań od narratora”).
+
+## Zadania od narratora (25.10.2026)
+
+Autor: narrator codziennie i co tydzień zleca zadania z nagrodami, na początku oparte na eksploracji: pokonanie konkretnych stworów, przerobienie materiałów. Treści zadań autor dopisze później.
+
+1. **Miejsce.** Twarz narratora, wycięta z jego rysunku, stoi w okrągłej ramce w górnym pasku między poziomami a złotem. Złota kropka znaczy, że czeka nagroda albo skrzynia. Żeby twarz zmieściła się na wąskim telefonie także przy dużych liczbach, złoto i Punkty Systemu stoją teraz jedno nad drugim, jak poziomy po drugiej stronie. Na najwęższych telefonach (do 340 px) twarz jest trochę mniejsza, a przycisk ustawień węższy.
+2. **Pergamin.** Stuknięcie twarzy rozwija pergamin, taki jak u narratora:
+    - na górze zakładki „Dzienne” i „Tygodniowe”, a w prawym górnym rogu skrzynia,
+    - pod zakładkami licznik do nowych zadań, według zegara serwera,
+    - przy każdym zadaniu obrazek (stwór, który pozostaje cieniem, dopóki postać go nie spotka), tekst, pasek postępu, nagroda i „Odbierz”.
+
+    Pergamin otwiera się na zakładce, w której coś czeka. „Zwiń”, stuknięcie obok albo Escape go zwija. Gdy licznik dobiegnie końca przy otwartym pergaminie, nowe zadania wczytują się same.
+3. **Okresy.** Dzienne zmieniają się o północy czasu polskiego, a tygodniowe w nocy z niedzieli na poniedziałek. Strefa to `Europe/Warsaw` z czasem letnim, więc doba zmiany czasu ma 23 albo 25 godzin. Zadania okresu losują się przy pierwszym żądaniu po jego początku, z ziarna postaci i okresu. Zapisują się od razu (kolumna `characters.quests`, migracja `0019_quests.sql`), więc w ciągu dnia się nie zmieniają, nawet po awansie. Nieodebrane nagrody i nieotwarta skrzynia przepadają z końcem okresu. To najprostsza zasada, a kropka na twarzy narratora przypomina o nagrodach.
+4. **Rodzaje zadań** (`kinds` w `data/quests.json`):
+    - „Pokonaj N stworów”: stwory z najnowszego regionu wewnętrznego otwartego dla klasy postaci, w liczbie, którą średnio przynosi tam 5–8 walk (dzienne) albo 25–40 walk (tygodniowe). Stwór, którego tyle walk nie przynosi średnio ani razu, trafia tylko do tygodniowych, np. kruki w Wilczych Kręgach. Liczą się stwory z wygranych walk, po odebraniu raportu.
+    - „Spędź na wyprawach łącznie N minut”: 30–90 minut dziennie, 5–10 godzin tygodniowo.
+    - „Przerób na Stole rzemieślniczym N materiałów”: 2–4 albo 10–20, tylko gdy stół stoi.
+    - „Rozbierz na Stole rzemieślniczym N przedmiotów”: 1–2 albo 5–10, tylko gdy stół stoi.
+
+    Każdy rodzaj trafia się raz na okres, a każdy gatunek stwora raz. Waga rodzaju dzieli się między jego warianty, więc na początku zwykle wychodzą cztery stwory i wyprawy, a ze stołem dwa, trzy stwory, wyprawy i praca przy stole. Teksty, liczby i wagi są w danych. Nowy rodzaj zadania potrzebuje kodu, który liczy jego postęp. Stwory mają w `data/monsters.json` formy nazwy do liczby (`counted`: „wilka”, „wilki”, „wilków”), żeby tekst brzmiał „Pokonaj 3 wilki”.
+5. **Nagroda za zadanie** (`rewards`). Losuje się złoto, zasób albo części, w ilości bazowej powiększonej o dodatek za poziom postaci, ±20%:
+    - dzienne: złoto 10 + 4 za poziom, zasób 5 + 2 za poziom, części 2,
+    - tygodniowe: złoto 40 + 16 za poziom, zasób 20 + 8 za poziom, części 6.
+
+    Kamienia wypada 60% tej ilości, a rudy 40%. Zadanie dzienne daje mniej więcej tyle, co kwadrans wypraw, a tygodniowe tyle, co godzina. Części zależą od poziomu postaci (`levels`): do 24 Ścinki, od 25 Rzemienie, od 50 Okucia, od 100 Odłamki, od 200 Bursztyn, od 300 Krwawnik, od 400 Gwiezdny odprysk.
+6. **Skrzynie.** Skrzynia otwiera się, gdy wszystkie zadania okresu są wykonane, bez względu na to, czy nagrody za nie już odebrano.
+    - Dzienna: +30 Punktów Czasu i +5 Punktów Systemu.
+    - Tygodniowa: przedmiot, +120 Punktów Czasu i +20 Punktów Systemu.
+
+    Przedmiot ma poziom postaci i pasuje do jej klasy. Jak łupy, częściej trafia na puste miejsca ekwipunku. Rzadkość losuje się według progu poziomu (`levels.chestRarities`): do poziomu 24 rzadki 70%, unikalny 25%, epicki 5%, a z kolejnymi progami coraz wyżej, aż po boskie. Przedmiot trafia do plecaka, więc tygodniowa skrzynia czeka, aż będzie w nim miejsce. Ten sam tydzień daje zawsze ten sam przedmiot, kiedy by go nie otworzyć.
+7. **Kwestia narratora.** Nowy pergamin przed końcowym wskazuje twarz w górnym pasku: „Codziennie będę Ci zlecał zadania, w taki sposób utrzymamy naszą, mam nadzieję, owocną relację. Będę na Ciebie czekał tutaj.” Tekst zatwierdził autor. Ma jedną wersję, bo nie ma form zależnych od płci gracza. Postacie, które skończyły wprowadzenie przed tą kwestią, usłyszą ją raz, po wejściu do gry, bez przycisku „Pomiń wprowadzenie” (`late` w `src/client/narrator.js`).
+8. **Kwestia przy Ognisku.** Ma tekst zatwierdzony przez autora: „Teraz zadbajmy o odpoczynek po kolejnych wyprawach. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko.” Wersja żeńska nie jest już potrzebna.
+9. **Nagrania.** Obie kwestie są nagrane w dwóch wersjach (ok. 500 kredytów ElevenLabs). W grze jest wersja bliższa dotychczasowemu głosowi narratora, a obie są na stronie odsłuchu, gdzie autor może wybrać inną.

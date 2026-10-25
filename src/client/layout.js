@@ -1,12 +1,14 @@
-// The frame around every game screen: the fixed top bar (levels, HP and mana,
-// character and class XP, gold and Punkty Systemu with the camp's resources,
-// the camp, current activity with the pouch of parts beside it) and the two
-// bottom bars, the main menu and the character bar with its own background.
+// The frame around every game screen: the fixed top bar (levels, the
+// narrator's quests, HP and mana, character and class XP, gold and Punkty
+// Systemu with the camp's resources, the camp, current activity with the
+// pouch of parts beside it) and the two bottom bars, the main menu and the
+// character bar with its own background.
 
-import { materialSprite } from './art.js';
+import { materialSprite, narratorFace } from './art.js';
 import { $, fill, h, icon } from './dom.js';
 import { countOf, formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
 import { RESOURCE_ICONS, SYSTEM_POINTS_ICON } from './icons.js';
+import { anyClaimable, showQuests } from './quests.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
 import { meter } from './ui.js';
 
@@ -32,7 +34,8 @@ export function buildTopbar(onSettings) {
   const classLevel = h('span', { class: 'badge badge--world' });
   const gold = h('span', { class: 'gold-value' });
   const points = h('span', { class: 'points-value' });
-  // Gold and Punkty Systemu in one line; a tap shows the materials under them.
+  // Gold over Punkty Systemu, like the levels on the other side, so the
+  // narrator's face fits between them; a tap shows the materials under them.
   const wallet = h('ul', { class: 'wallet-list', id: 'wallet-list', hidden: true });
   // When the next Punkt Czasu comes, under its row.
   const timeNote = h('span', { class: 'wallet-note' });
@@ -61,9 +64,22 @@ export function buildTopbar(onSettings) {
       'aria-controls': 'wallet-list',
       onClick: () => showWallet(wallet.hidden),
     },
-    icon('coin', { size: 18 }),
-    gold,
+    h('span', { class: 'gold-row' }, icon('coin', { size: 16 }), gold),
     h('span', { class: 'points' }, icon(SYSTEM_POINTS_ICON, { size: 16 }), points),
+  );
+  // The narrator waits with his quests between the levels and the gold.
+  const quests = h(
+    'button',
+    {
+      type: 'button',
+      class: 'quest-button',
+      'data-guide': 'quests',
+      'aria-label': 'Zadania od narratora',
+      'aria-haspopup': 'dialog',
+      'aria-expanded': 'false',
+      onClick: () => showQuests(),
+    },
+    narratorFace(),
   );
   const campLabel = h('span', { class: 'camp-label' });
   const camp = h('a', { class: 'camp-button', href: '#/oboz', 'aria-label': 'Obóz' }, icon('tent'), campLabel);
@@ -81,6 +97,7 @@ export function buildTopbar(onSettings) {
       'div',
       { class: 'topbar-row' },
       h('div', { class: 'topbar-badges' }, level, classLevel),
+      quests,
       h(
         'div',
         { class: 'topbar-right' },
@@ -94,7 +111,7 @@ export function buildTopbar(onSettings) {
     h('div', { class: 'meters' }, hp.element, xp.element, mana.element, classXp.element),
     h('div', { class: 'activity-row' }, pouchButton, activity, pouch),
   );
-  topbar = { level, classLevel, gold, points, goldButton, wallet, timeNote, pouch, pouchButton, camp, campLabel, hp, mana, xp, classXp, activity, activityLabel, activityTime };
+  topbar = { level, classLevel, quests, gold, points, goldButton, wallet, timeNote, pouch, pouchButton, camp, campLabel, hp, mana, xp, classXp, activity, activityLabel, activityTime };
   updateTopbar();
 }
 
@@ -219,6 +236,10 @@ export function updateTopbar(now = serverNow()) {
   );
   if (!topbar.wallet.hidden) refreshWallet(now);
   if (!topbar.pouch.hidden) refreshPouch();
+  // A dot when a quest's reward or a chest waits.
+  const waiting = anyClaimable(character);
+  topbar.quests.classList.toggle('quest-button--ready', waiting);
+  topbar.quests.setAttribute('aria-label', waiting ? 'Zadania od narratora, nagrody do odebrania' : 'Zadania od narratora');
   // The camp shows the time left of the building being upgraded.
   const building = character.camp.construction;
   const busy = Boolean(building) && now < building.endsAt;

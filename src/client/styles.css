@@ -707,11 +707,14 @@ button {
 }
 
 
-/* The gold is a button: it opens the camp's resources under it. */
+/* The gold is a button: it opens the camp's resources under it. Gold over
+   Punkty Systemu, as the levels stand one over the other. */
 .gold {
   display: flex;
-  align-items: center;
-  gap: 4px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2px;
   min-height: 44px;
   padding: 0 4px;
   border: 0;
@@ -720,18 +723,24 @@ button {
   font-family: var(--font-system);
   font-size: 14px;
   font-weight: 600;
+  line-height: 1.2;
+}
+
+.gold-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .gold[aria-expanded='true'] {
   background: var(--bark-active);
 }
 
-/* Punkty Systemu next to the gold, in the System's colours. */
+/* Punkty Systemu under the gold, in the System's colours. */
 .points {
   display: flex;
   align-items: center;
-  gap: 3px;
-  margin-left: 6px;
+  gap: 4px;
   color: var(--system);
 }
 
@@ -4345,6 +4354,367 @@ a.segmented-option {
   pointer-events: auto;
 }
 
+/* The narrator's quests: his hooded face between the levels and the gold,
+   with a gold dot while a reward or a chest waits (quests.js). */
+.quest-button {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--bark-line);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 38%, #2b3956, #10141d 72%);
+}
+
+.quest-button[aria-expanded='true'] {
+  border-color: var(--system-line);
+}
+
+.narrator-face {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: none;
+  object-position: -29px -5px;
+  image-rendering: pixelated;
+}
+
+/* The narrowest phones: a smaller face, so the class keeps its name. */
+@media (max-width: 340px) {
+  .topbar-row {
+    gap: 4px;
+  }
+
+  .quest-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .narrator-face {
+    width: 30px;
+    height: 30px;
+    object-position: -31px -7px;
+  }
+
+  .topbar-right .icon-button {
+    width: 38px;
+  }
+}
+
+.quest-button--ready {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(217, 180, 90, 0.35);
+}
+
+.quest-button--ready::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--bg-deep);
+}
+
+/* The parchment of quests unrolls under the top bar. */
+.quests {
+  width: min(420px, calc(100vw - 2 * var(--gutter)));
+  max-width: none;
+  max-height: calc(100dvh - 16px);
+  margin: calc(max(8px, env(safe-area-inset-top)) + 54px) auto auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #33281c;
+  overflow: visible;
+}
+
+.quests::backdrop {
+  background: rgba(5, 8, 4, 0.62);
+}
+
+.quests-page {
+  gap: 10px;
+  max-height: calc(100dvh - 120px - env(safe-area-inset-top));
+  padding: 12px 16px 14px;
+}
+
+/* The tabs on top, the chest in the top right corner. */
+.quests-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.quests-tabs {
+  display: flex;
+  flex: 1;
+  align-self: center;
+  overflow: hidden;
+  border: 1px solid #a88c5c;
+  border-radius: 4px;
+}
+
+.quests-tab {
+  position: relative;
+  flex: 1;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: #6b5233;
+  font-family: var(--font-world);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.quests-tab + .quests-tab {
+  border-left: 1px solid #a88c5c;
+}
+
+.quests-tab[aria-selected='true'] {
+  background: #3b2c1d;
+  color: #f3e8cf;
+}
+
+.quests-tab--ready::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c8952e;
+}
+
+.quest-chest {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  width: 56px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #6b5233;
+  font-family: var(--font-system);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.quest-chest-art {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+}
+
+.quest-chest-art .sprite {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.quest-chest--locked .quest-chest-art {
+  filter: grayscale(0.8) brightness(0.85);
+  opacity: 0.75;
+}
+
+@keyframes chest-ready {
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 6px rgba(242, 214, 117, 0.9));
+  }
+}
+
+.quest-chest--ready {
+  color: #8a5c12;
+}
+
+.quest-chest--ready .quest-chest-art {
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(242, 214, 117, 0.55), transparent 70%);
+  animation: chest-ready 1.6s ease-in-out infinite;
+}
+
+.quest-chest--opened .quest-chest-art {
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+
+.quests-panel {
+  display: grid;
+  gap: 8px;
+}
+
+.quests-reset,
+.quests-note,
+.quests-empty {
+  margin: 0;
+  color: #7a5c34;
+  font-size: 15px;
+}
+
+.quests-timer {
+  font-family: var(--font-system);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.quests-note {
+  font-size: 14px;
+  font-style: italic;
+}
+
+.quests-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quest {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.quest + .quest {
+  border-top: 1px solid rgba(107, 82, 51, 0.3);
+}
+
+.quest-art {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  color: #5b4429;
+}
+
+.quest-art .sprite {
+  width: 48px;
+  height: 48px;
+}
+
+/* A creature not met yet is its shape in black, as among the dangers. */
+.quest-art--unknown .sprite {
+  filter: brightness(0);
+}
+
+.quest-text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.quest--claimed .quest-text {
+  color: #8a7656;
+}
+
+.quest-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.quest-track {
+  flex: 1;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgba(91, 68, 41, 0.22);
+}
+
+.quest-fill {
+  height: 100%;
+  background: #8a6a3a;
+}
+
+.quest--done .quest-fill {
+  background: #5d8a35;
+}
+
+.quest-count {
+  color: #6b5233;
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.quest-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+/* The reward in darker colours than on the dark screens, so they read on
+   the parchment. */
+.quest-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #4a3a22;
+  font-family: var(--font-system);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.quest-reward-art {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+}
+
+.quest-reward-art .sprite {
+  width: 24px;
+  height: 24px;
+}
+
+.quest-reward--gold {
+  color: #8a6514;
+}
+
+.quest-reward--part {
+  color: #4f5a2a;
+}
+
+.quest-claim {
+  width: auto;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid #44602a;
+  border-radius: 4px;
+  background: #3d5a22;
+  color: #f3e8cf;
+  font-family: var(--font-world);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.quest-taken {
+  color: #5d7a35;
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: 600;
+}
+
 /* With the animations off in the settings (motion.js) the pulsing and
    sliding stop; the fight playback stays, in a calmer form (see arena.js).
    Last in the file, so it wins over the rules it calms. */
@@ -4352,7 +4722,8 @@ a.segmented-option {
 .calm .camp-bubble--full,
 .calm .guide-ring,
 .calm .guide-ring--nudge,
-.calm .guide-note .sprite--narrator {
+.calm .guide-note .sprite--narrator,
+.calm .quest-chest--ready .quest-chest-art {
   animation: none;
 }
 

@@ -18,6 +18,7 @@ import { aim } from './camera.js';
 import { $, fill, h, icon } from './dom.js';
 import { motionOn } from './motion.js';
 import { duckMusic } from './music.js';
+import { rod, roll, stopRoll } from './parchment.js';
 import { narratorVoiceOn, playNarration, playSound, preloadNarration, stopNarration } from './sound.js';
 import { activityFinished, call, isUnlocked, state } from './state.js';
 import { toast } from './ui.js';
@@ -111,7 +112,6 @@ let light = null; // { line, root, note, frame, tapped, closing } while a place 
 let waiting = null; // the timer looking for the place of the next line
 let pause = null; // { id, at, timer } of a line waiting for its delay
 let lastSpot = null; // { hash, line, at }: the last pointer, whose places the next light comes from
-const rolls = new WeakMap(); // parchment → its running animation
 
 // Called after every screen is drawn and every change of the character.
 export function narrate(hash = place) {
@@ -206,31 +206,6 @@ function speak(line) {
 }
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Parchment between two rods grows from nothing to its height, or back.
-async function roll(sheet, open, duration = open ? 700 : 380) {
-  if (calm()) return;
-  rolls.get(sheet)?.cancel();
-  const frames = open ? [{ height: '0px' }, { height: `${sheet.scrollHeight}px` }] : [{ height: `${sheet.offsetHeight}px` }, { height: '0px' }];
-  const animation = sheet.animate(frames, {
-    duration,
-    easing: open ? 'cubic-bezier(0.2, 0.7, 0.2, 1)' : 'cubic-bezier(0.5, 0, 0.8, 0.4)',
-    fill: 'forwards',
-  });
-  rolls.set(sheet, animation);
-  try {
-    await animation.finished;
-  } catch {
-    // Cancelled by the next roll or by closing.
-  }
-  // Unrolled, the parchment takes its natural height again.
-  if (open && rolls.get(sheet) === animation) {
-    animation.cancel();
-    rolls.delete(sheet);
-  }
-}
-
-const rod = () => h('div', { class: 'narrator-rod', 'aria-hidden': 'true' });
 
 // The card: the figure above a scroll in the middle of the screen.
 function openCard(line) {
@@ -336,7 +311,7 @@ async function next() {
 function closeCard() {
   if (!scroll) return;
   stopNarration();
-  rolls.get(scroll.sheet)?.cancel();
+  stopRoll(scroll.sheet);
   if (scroll.dialog.open) scroll.dialog.close();
   scroll.dialog.remove();
   scroll = null;

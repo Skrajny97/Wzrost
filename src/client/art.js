@@ -79,6 +79,19 @@ export function portraitSprite(classId, appearance, { bust = false } = {}) {
   });
 }
 
+// The narrator's hooded face, for the quests in the top bar (quests.js).
+export function narratorFace() {
+  return h('img', {
+    src: '/art/narrator/narrator.png',
+    alt: '',
+    width: SPRITES.narrator.width,
+    height: SPRITES.narrator.height,
+    class: 'sprite narrator-face',
+    decoding: 'async',
+    draggable: 'false',
+  });
+}
+
 export function narratorSprite() {
   const { width, height } = SPRITES.narrator;
   return h('img', {

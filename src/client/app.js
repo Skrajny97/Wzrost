@@ -8,6 +8,7 @@ import { countOf } from './format.js';
 import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
 import { buildTopbar, showPouch, showWallet, updateNav, updateTopbar } from './layout.js';
+import { showQuests, watchQuests } from './quests.js';
 import { mountCamp } from './screens/camp.js';
 import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
@@ -163,6 +164,7 @@ function openGame() {
     current?.screen.tick?.(now);
     watchConstruction(now);
     watchCrafting(now);
+    watchQuests(now);
   }, 1000);
 }
 
@@ -211,6 +213,7 @@ function route() {
   closeSheet();
   showWallet(false);
   showPouch(false);
+  showQuests(false);
 
   if (candidate.nav === 'main') {
     lastMainHash = hash;
