@@ -216,6 +216,8 @@ export function narrate(hash = place) {
   place = hash;
   const read = state.character?.tutorial;
   if (!read || !state.content?.tutorial) {
+    // Without a character, as after "Zacznij od nowa", its lines go too.
+    if (!state.character) passedHere.clear();
     closeCard();
     stopLight();
     aim([]);
@@ -234,7 +236,7 @@ export function narrate(hash = place) {
   if (!line) {
     stopLight();
     aim([]);
-    release(read.includes('ending') ? 0 : HOLD);
+    release(readNow().has('ending') ? 0 : HOLD);
     return;
   }
   // A line with a delay waits on its screen for a moment first.
@@ -256,11 +258,18 @@ export function narrate(hash = place) {
   } else lightUp(line);
 }
 
+// The lines passed on this page. Each "Dalej" is saved on its own, and its
+// answer can come late, after the next "Dalej": the list in it then lacks
+// the line just passed, which must not show again (its parchment would
+// unroll a second time). They go with the character.
+const passedHere = new Set();
+const readNow = () => new Set([...state.character.tutorial, ...passedHere]);
+
 // The first line in the order that is due: a lead or a tap whenever its
 // moment holds, a card or a pointer only until it is read. After the ending
 // only a late line is left.
 function nextLine() {
-  const read = new Set(state.character.tutorial);
+  const read = readNow();
   const over = read.has('ending');
   return state.content.tutorial.lines.find(
     (line) => (!kept(line) || !read.has(line.id)) && (!over || BEATS[line.id]?.late) && BEATS[line.id]?.when(place, read),
@@ -270,6 +279,7 @@ function nextLine() {
 // A line is read as soon as it is passed: the page counts it at once, and
 // the server keeps it.
 function markRead(id) {
+  passedHere.add(id);
   if (!state.character.tutorial.includes(id)) state.character.tutorial = [...state.character.tutorial, id];
   call('POST', '/api/tutorial', { card: id }).catch(() => {});
 }
@@ -280,6 +290,7 @@ function skipAll() {
   aim([]);
   release(0);
   state.character.tutorial = state.content.tutorial.lines.filter(kept).map((line) => line.id);
+  for (const id of state.character.tutorial) passedHere.add(id);
   // The server plays the first steps meanwhile (an exploration, its report
   // and the Ognisko), and the screen draws the character it sends back.
   call('POST', '/api/tutorial', { skip: true })
@@ -419,7 +430,7 @@ async function next() {
   markRead(current.line.id);
   await roll(current.sheet, false);
   if (scroll !== current) return;
-  const after = state.character.tutorial.includes('ending') ? null : nextLine();
+  const after = readNow().has('ending') ? null : nextLine();
   if (after?.kind === 'card' && !BEATS[after.id].delay) {
     current.line = after;
     write(after);
@@ -544,7 +555,7 @@ function startLight(line) {
   const rings = h('div', { class: 'guide-rings', 'aria-hidden': 'true' });
   const note = line.kind === 'tap' ? bubbleNote(line) : scrollNote(line);
   // A late line after the ending has no introduction left to skip.
-  const skip = !state.character.tutorial.includes('ending') && h('button', { type: 'button', class: 'guide-skip', text: tutorial.skipLabel, onClick: skipAll });
+  const skip = !readNow().has('ending') && h('button', { type: 'button', class: 'guide-skip', text: tutorial.skipLabel, onClick: skipAll });
   const root = h('div', { class: 'guide' }, shade, rings, note.element, skip);
   document.body.append(root);
   light = { line, root, note, frame: 0, closing: false, nudge };
