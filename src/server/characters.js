@@ -25,6 +25,7 @@ import {
   regenPerMinute,
   restBonus,
   restedHp,
+  salvageYield,
   settleCrafting,
   spentPoints,
   statEffects,
@@ -174,6 +175,8 @@ function campView(player, levels, now) {
         description: building.description,
         level,
         maxLevel: building.maxLevel,
+        // The Stół rzemieślniczy: its screen shows the table (crafting).
+        crafts: building.effect.kind === 'craftSpeed',
         effect: level > 0 ? effectText(building, level) : null,
         production: store && {
           resource: store.resource,
@@ -223,11 +226,13 @@ function craftingView(row, levels, now) {
       count: parts[part.id] ?? 0,
     })),
     queue: queue.map((order) => {
-      const rarity = order.kind === 'material' ? materialView(order.key, order.count, content).rarity : order.rarity;
+      const material = order.kind === 'material' ? materialView(order.key, order.count, content) : null;
+      const rarity = material ? material.rarity : order.rarity;
       return {
         id: order.id,
         kind: order.kind,
-        name: order.kind === 'material' ? content.materialsById[order.key.slice(0, order.key.lastIndexOf(':'))].name : order.name,
+        materialId: material?.materialId ?? null,
+        name: material ? material.name : order.name,
         count: order.kind === 'material' ? order.count : 1,
         rarity,
         color: content.raritiesById[rarity].color,
@@ -259,7 +264,14 @@ export function characterView(player, now) {
   const sellBonus = campBonus(levels, 'sellPrice', content);
   // The Kowadło's level is the highest upgrade it allows.
   const upgradeCap = campBonus(levels, 'upgradeCap', content);
-  const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap }) });
+  // What the Stół rzemieślniczy makes of an item taken apart, and how long it takes.
+  const pace = craftPace(levels, content);
+  const salvage = (item) => {
+    const { partId, count } = salvageYield(item, content);
+    const part = content.partsById[partId];
+    return { part: part.name, color: content.raritiesById[part.rarity].color, parts: count, minutes: pace > 0 ? craftMinutes(item.rarity, count, pace, content) : null };
+  };
+  const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap }), salvage: salvage(item) });
   const { gold, ...resources } = walletOf(row);
   const weapon = combatant.weapon;
 

@@ -20,7 +20,7 @@ import { ApiError, json, readJson } from './http.js';
 
 // The scrapper's price for the stored items `ids`, counted in SQL from the
 // items still there, so an item sold twice at the same moment pays once.
-// `bonus` is the camp's Stół złomiarza (sellPrice() in the engine).
+// `bonus` is the camp's Skup złomu (sellPrice() in the engine).
 export function soldGold(characterId, ids, bonus) {
   const list = ids.map(() => '?').join(', ');
   const multiplier = `CASE json_extract(data, '$.rarity') ${content.rarities.map((rarity) => `WHEN '${rarity.id}' THEN ${Number(rarity.sell)}`).join(' ')} END`;

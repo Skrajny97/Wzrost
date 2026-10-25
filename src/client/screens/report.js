@@ -9,7 +9,12 @@ import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } fr
 import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, state } from '../state.js';
 import { confirmAction, guided, openSheet, systemPanel, toast, withButton } from '../ui.js';
+import { materialIcon } from '../craft-table.js';
 import { itemDetails, itemSheet, itemSummary } from './character.js';
+
+// "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
+const materialsText = (materials) => materials.map((material) => (material.count > 1 ? `${material.label} ×${material.count}` : material.label)).join(', ');
+const capitalized = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 
 const RESULT_CLASS = { success: 'result--success', fainted: 'result--fainted', escaped: 'result--escaped' };
 const FIGHT_RESULTS = { true: 'wygrana', false: 'przegrana', null: 'odwrót' };
@@ -95,6 +100,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           fightBox,
         ),
       itemsSection(report),
+      materialsSection(report),
       accountSection(report),
       actionBox,
     );
@@ -148,9 +154,12 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const count = report.fights.length;
     const data = playable(report, index);
     const enemies = (fight.enemies ?? []).map((enemy) => `${enemy.name} (${enemy.level})`).join(', ');
+    // Reports from before materials count the items dropped (`loot`).
+    const left = fight.materials?.length > 0 ? ` · łup: ${materialsText(fight.materials)}` : fight.loot ? ` · łup: ${fight.loot}` : '';
+    const chest = fight.chests > 0 ? ` · ${fight.chests === 1 ? 'skrzynia' : `skrzynie: ${fight.chests}`}` : '';
     const outcome =
       fight.won === true
-        ? `HP ${fight.hpBefore} → ${fight.hpAfter} · +${formatNumber(fight.xp)} XP · +${formatNumber(fight.gold)} złota${fight.loot ? ` · łup: ${fight.loot}` : ''}`
+        ? `HP ${fight.hpBefore} → ${fight.hpAfter} · +${formatNumber(fight.xp)} XP · +${formatNumber(fight.gold)} złota${left}${chest}`
         : `HP ${fight.hpBefore} → ${fight.hpAfter} · ${FIGHT_RESULTS[String(fight.won)]}`;
     const header = h(
       'div',
@@ -233,6 +242,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       ['XP klasy', `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
       ['Złoto', `+${formatNumber(summary.gold)}`],
       resourcesRow(summary.resources),
+      summary.materials?.length > 0 && ['Materiały', capitalized(materialsText(summary.materials))],
       summary.timePoints > 0 && ['Punkty Czasu', `+${formatNumber(summary.timePoints)}`],
       ['Walki', formatNumber(summary.fights)],
       ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
@@ -337,7 +347,12 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     return h(
       'section',
       { class: 'report-section', 'aria-labelledby': 'items-title', 'data-guide': 'report-items' },
-      h('h2', { class: 'section-title', id: 'items-title', text: `Łupy i znaleziska (${report.items.length})` }),
+      // Before materials, monsters also dropped items.
+      h('h2', {
+        class: 'section-title',
+        id: 'items-title',
+        text: `${report.summary.materials ? 'Skrzynie skarbów' : 'Łupy i znaleziska'} (${report.items.length})`,
+      }),
       h(
         'ul',
         { class: 'item-list' },
@@ -356,6 +371,41 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           ),
         ),
       ),
+    );
+  }
+
+  // What beaten creatures left, and the way to the Stół rzemieślniczy.
+  function materialsSection(report) {
+    const materials = report.summary.materials ?? [];
+    if (materials.length === 0) return null;
+    const table = state.character.camp.buildings.find((building) => building.crafts);
+    return h(
+      'section',
+      { class: 'report-section', 'aria-labelledby': 'materials-title' },
+      h('h2', { class: 'section-title', id: 'materials-title', text: `Materiały (${materials.reduce((sum, material) => sum + material.count, 0)})` }),
+      h(
+        'ul',
+        { class: 'craft-list' },
+        materials.map((material) =>
+          h(
+            'li',
+            { class: 'craft-row' },
+            h('span', { class: 'craft-art' }, materialIcon(material.materialId)),
+            h(
+              'span',
+              { class: 'craft-text' },
+              h('span', { class: 'item-name', vars: { '--rarity': material.color }, text: `${material.name} ×${formatNumber(material.count)}` }),
+              h('span', { class: 'item-meta', text: `${material.rarityName} · daje: ${material.part} ×${formatNumber(material.count)}` }),
+            ),
+          ),
+        ),
+      ),
+      table &&
+        h(
+          'a',
+          { class: 'button button--world', href: `#/oboz/${table.id}` },
+          table.level > 0 ? `Przerób na stole: ${table.name}` : `Zbuduj w obozie: ${table.name}`,
+        ),
     );
   }
 

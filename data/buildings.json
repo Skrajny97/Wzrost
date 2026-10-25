@@ -71,8 +71,8 @@
   },
   {
     "id": "scrap-bench",
-    "name": "Stół złomiarza",
-    "description": "Pień z narzędziami do rozbierania łupów. Złomiarz płaci więcej za sprzedane przedmioty.",
+    "name": "Skup złomu",
+    "description": "Zadaszony skup, w którym złomiarz bierze zbędne przedmioty. Im lepiej urządzony, tym więcej płaci.",
     "maxLevel": 10,
     "effect": { "kind": "sellPrice", "perLevel": 0.1, "unit": "percent", "text": "Złomiarz płaci więcej o {value}" },
     "costs": [

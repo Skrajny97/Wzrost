@@ -161,6 +161,7 @@ function openGame() {
     updateTopbar(now);
     current?.screen.tick?.(now);
     watchConstruction(now);
+    watchCrafting(now);
   }, 1000);
 }
 
@@ -175,6 +176,21 @@ function watchConstruction(now) {
   call('GET', '/api/character')
     .then(() => {
       toast(`${building.name}: poziom ${building.level} gotowy.`);
+      playSound('done');
+    })
+    .catch((error) => toast(error.message));
+}
+
+// When an order on the Stół rzemieślniczy ends, the character is fetched
+// again, with the parts made, and a short message says what is ready.
+let craftRetryAt = 0;
+function watchCrafting(now) {
+  const order = state.character?.crafting?.queue[0];
+  if (!order || now < order.endsAt + 1000 || now < craftRetryAt) return;
+  craftRetryAt = now + 30000;
+  call('GET', '/api/character')
+    .then(() => {
+      toast(`Stół rzemieślniczy skończył: ${order.part} ×${order.parts}.`);
       playSound('done');
     })
     .catch((error) => toast(error.message));

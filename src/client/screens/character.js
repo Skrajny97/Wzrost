@@ -1,10 +1,11 @@
 // The character screen: a 3:4 portrait with five equipment slots on each side,
 // an eye that hides the slots, and the bag with items that are not worn.
-// The item card also upgrades the item on the camp's Kowadło.
+// The item card also upgrades the item on the camp's Kowadło and takes a bag
+// item apart on the Stół rzemieślniczy.
 
 import { itemSprite, portraitSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
-import { formatDecimal, formatHours, formatNumber, plural } from '../format.js';
+import { formatDecimal, formatHours, formatMinutes, formatNumber, plural, timeFormat } from '../format.js';
 import { RESOURCE_ICONS, SLOT_ICONS, itemIcon } from '../icons.js';
 import { portrait } from '../portraits.js';
 import { playSound } from '../sound.js';
@@ -200,6 +201,7 @@ export function itemSheet(item, { equipped }) {
     preview,
     worn && h('div', { class: 'compare' }, h('p', { class: 'compare-title', text: 'Założony teraz' }), itemDetails(worn, { small: true })),
     anvilSection(item, busy),
+    !equipped && salvageSection(item, busy),
     busy && h('p', { class: 'muted', text: 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.' }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
     h(
@@ -226,6 +228,41 @@ function ownedItem(id) {
 }
 
 const percent = (share) => `${formatDecimal(share * 100)}%`;
+
+// The Stół rzemieślniczy part of a bag item's card: the parts that taking it
+// apart gives and how long it takes, or that the table is still to be built.
+function salvageSection(item, busy) {
+  const { salvage } = item;
+  if (!salvage) return null;
+  const { crafting, camp } = state.character;
+  const table = camp.buildings.find((building) => building.crafts);
+  const built = salvage.minutes !== null;
+  const full = crafting.queue.length >= crafting.limit;
+  const takeApart = async (event) => {
+    const button = event.currentTarget;
+    const sure = await confirmAction({
+      title: 'Rozebrać przedmiot?',
+      text: `${itemTitle(item)} zniknie, a stół zrobi z niego: ${salvage.part} ×${salvage.parts}, w ${formatMinutes(salvage.minutes)}.`,
+      confirmLabel: 'Rozbierz',
+    });
+    if (!sure) return;
+    await withButton(button, async () => {
+      const { salvage: order } = await call('POST', `/api/items/${item.id}/salvage`);
+      closeSheet();
+      playSound('build');
+      toast(`Na stole: ${order.name}. ${order.part} ×${order.parts} będą gotowe o ${timeFormat.format(new Date(order.endsAt))}.`);
+    });
+  };
+  return h(
+    'div',
+    { class: 'compare' },
+    h('p', { class: 'compare-title', text: table?.name ?? 'Stół rzemieślniczy' }),
+    h('p', { class: 'anvil-step' }, 'Rozbiórka: ', h('span', { class: 'item-name', vars: { '--rarity': salvage.color }, text: `${salvage.part} ×${salvage.parts}` }), built ? ` · ${formatMinutes(salvage.minutes)}` : ''),
+    !built && h('p', { class: 'muted', text: 'Zbuduj w obozie Stół rzemieślniczy, żeby rozbierać przedmioty na części.' }),
+    built && full && h('p', { class: 'muted', text: 'Kolejka stołu jest pełna. Poczekaj, aż skończy się pierwsze zlecenie.' }),
+    h('button', { type: 'button', class: 'button button--world', disabled: busy || !built || full, onClick: takeApart, text: 'Rozbierz' }),
+  );
+}
 
 // The Kowadło part of the item card: the next upgrade with its price, chance
 // and risk, or why there is none. The server rolls the outcome.

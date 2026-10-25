@@ -683,7 +683,7 @@ describe('camp', () => {
     assert.deepEqual(data.resources.map((resource) => resource.name), ['Drewno', 'Kamień', 'Ruda żelaza']);
     assert.deepEqual(
       data.buildings.map((building) => building.name),
-      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Ognisko', 'Szałas na łupy', 'Stół złomiarza', 'Kowadło', 'Stół rzemieślniczy'],
+      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Ognisko', 'Szałas na łupy', 'Skup złomu', 'Kowadło', 'Stół rzemieślniczy'],
     );
   });
 
@@ -803,7 +803,7 @@ describe('camp', () => {
     assert.equal((await character()).resources.wood, 3);
   });
 
-  test('Stół złomiarza raises the prices', async () => {
+  test('Skup złomu raises the prices', async () => {
     const database = await db();
     const { id } = await database.prepare('SELECT id FROM characters').first();
     await database

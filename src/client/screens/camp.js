@@ -6,6 +6,7 @@
 // board or on the building's screen. Opened with the camp button in the top bar.
 
 import { BOARD_HEIGHT, BOARD_WIDTH, CAMP_PLOTS, PLOT_HEIGHT, PLOT_WIDTH, boardArt, plotArt } from '../camp-art.js';
+import { craftTableSection } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { leaveView, openView } from '../history.js';
@@ -239,8 +240,9 @@ function mountBoard(container, backHash) {
   return { update: render, tick };
 }
 
-// A building's screen: its picture, what it gives now, its store, and the
-// next level with the cost and "Zbuduj" or "Ulepsz".
+// A building's screen: its picture, what it gives now, its store (the
+// Stół rzemieślniczy: its materials, queue and parts), and the next level
+// with the cost and "Zbuduj" or "Ulepsz".
 function mountBuilding(container, id) {
   let ticks = [];
   let shownBuild = null;
@@ -272,6 +274,7 @@ function mountBuilding(container, id) {
         building.effect && h('p', { class: 'building-effect' }, h('strong', { text: 'Teraz: ' }), building.effect),
         building.production && storeView(building),
       ),
+      building.crafts && craftTableSection(ticks),
       underway && constructionPanel(running, ticks),
       nextLevel(building, running),
     );

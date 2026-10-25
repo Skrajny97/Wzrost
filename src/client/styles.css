@@ -3477,6 +3477,82 @@ a.segmented-option {
   transition: width 1s linear;
 }
 
+/* The Stół rzemieślniczy: materials, the queue and parts, also in the report. */
+.craft-card {
+  display: grid;
+  gap: 10px;
+}
+
+.craft-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.craft-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+
+.craft-row--none {
+  opacity: 0.55;
+}
+
+.craft-art {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--text-muted);
+}
+
+.craft-art .sprite {
+  width: 32px;
+  height: 32px;
+}
+
+.craft-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.craft-count {
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 16px;
+}
+
+.craft-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.craft-progress .bar {
+  flex: 1;
+}
+
+.craft-countdown {
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Volume sliders in the settings */
 
 .status-row--volume {

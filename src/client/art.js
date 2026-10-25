@@ -21,6 +21,12 @@ export const SPRITES = {
     size: 32,
     ids: ['sword', 'axe', 'dagger', 'bow', 'staff', 'aspergillum', 'shield', 'quiver', 'focus', 'hood', 'helmet', 'tunic', 'chainmail', 'robe', 'cowl', 'surplice', 'gloves', 'boots', 'amulet', 'ring', 'talisman'],
   },
+  // Materials left by creatures, the parts the Stół rzemieślniczy makes and
+  // the treasure chest, 32×32, filled in as they are drawn.
+  materials: {
+    size: 32,
+    ids: [],
+  },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
   narrator: {
     width: 96,
@@ -47,6 +53,8 @@ function sprite(kind, id, className) {
 
 export const monsterSprite = (monsterId) => sprite('monsters', monsterId, 'sprite--monster');
 export const itemSprite = (item) => sprite('items', item.base, 'sprite--item');
+// A material, a part ("scraps") or the chest ("chest").
+export const materialSprite = (id) => sprite('materials', id, 'sprite--item');
 
 // A class's figure for a look. `bust` shows the head and shoulders at the
 // image's own size, cut by the box it sits in (the arena, the class cards).

@@ -91,7 +91,7 @@ export function randomItem(level, rng, content, { rarityBonus = 1, filled, class
 }
 
 // Gold from the scrapper: level × goldPerLevel × the rarity's multiplier.
-// `bonus`: the share the camp adds to the scrapper's prices (Stół złomiarza).
+// `bonus`: the share the camp adds to the scrapper's prices (Skup złomu).
 export function sellPrice(item, content, bonus = 0) {
   const rarity = content.raritiesById[item.rarity];
   return Math.max(1, Math.round(item.level * content.balance.items.sellGoldPerLevel * rarity.sell * (1 + bonus)));

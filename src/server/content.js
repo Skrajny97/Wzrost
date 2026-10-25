@@ -89,7 +89,15 @@ export function publicContent() {
     unlocks: content.unlocks.map(({ id, name, level, condition }) => ({ id, name, level, condition })),
     resources: content.resources.map(({ id, name, description, system }) => ({ id, name, description, system: Boolean(system) })),
     buildings: content.buildings.map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
-    materials: content.materials.map(({ id, name, gender, rarity, description }) => ({ id, name, gender, rarity, description })),
+    // With the family of the creature that leaves it, for its icon.
+    materials: content.materials.map(({ id, name, gender, rarity, description, monster }) => ({
+      id,
+      name,
+      gender,
+      rarity,
+      description,
+      family: content.monstersById[monster].family,
+    })),
     parts: content.parts.map(({ id, name, rarity, description }) => ({ id, name, rarity, description })),
     appearances: content.appearances,
     freeResetMaxLevel: content.balance.progression.freeResetMaxLevel,

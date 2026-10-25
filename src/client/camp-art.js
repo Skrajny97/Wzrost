@@ -20,6 +20,8 @@ const CLOTH = '#a89676';
 const FIRE = '#d9b45a';
 const EMBER = '#c46a2b';
 const RUST = '#a0522d';
+const HIDE = '#8c6a48';
+const HIDE_DARK = '#6e5238';
 
 // The board is 360 × 400; each plot's art box is 104 × 83, centred at x, y.
 export const BOARD_WIDTH = 360;
@@ -35,6 +37,7 @@ export const CAMP_PLOTS = {
   'loot-shed': { x: 70, y: 236 },
   'scrap-bench': { x: 290, y: 214 },
   anvil: { x: 180, y: 64 },
+  'craft-table': { x: 112, y: 322 },
 };
 
 // The size of a building's drawing at a level.
@@ -285,6 +288,53 @@ ${anvil(56, 52, 1.1)}
 <path d="M76 57 h14 M76 63 h14" stroke="${METAL}" stroke-width="0.9"></path>
 <ellipse cx="83" cy="52" rx="7" ry="2" fill="#2e4b52" stroke="${LINE}" stroke-width="0.6"></ellipse>`,
 ],
+  // A plank on two trestles with a hide and a knife, and a basket of scraps;
+  // then a workbench with a vice and a hide on a stretching frame; then a
+  // workshop under a roof, with hides drying on a line and a lantern.
+  'craft-table': [
+  () => `<rect x="20" y="44" width="58" height="5" fill="${WOOD_LIGHT}" stroke="${LINE}" stroke-width="0.8"></rect>
+${pole(28, 49, 23, 68, 2.2, WOOD)}${pole(28, 49, 33, 68, 2.2, WOOD)}${pole(70, 49, 65, 68, 2.2, WOOD)}${pole(70, 49, 75, 68, 2.2, WOOD)}
+<path d="M27 44 q3 -6 10 -5 q6 -4 11 0 q5 -2 9 5 Z" fill="${HIDE}" stroke="${LINE}" stroke-width="0.7"></path>
+<path d="M33 42 q6 -2 12 0" stroke="${HIDE_DARK}" stroke-width="0.8" fill="none"></path>
+<path d="M60 42 l9 -3" stroke="${METAL}" stroke-width="1.4" stroke-linecap="round"></path>
+<path d="M69 39 l5 -1.6" stroke="${WOOD_LIGHT}" stroke-width="2" stroke-linecap="round"></path>
+<path d="M80 68 q0 -10 8 -10 q8 0 8 10 Z" fill="${WOOD_DARK}" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M81 63 h14" stroke="${PLANK}" stroke-width="0.8"></path>
+<path d="M84 58 l2 -4 M88 58 l1 -5 M92 58 l-1 -4" stroke="${CLOTH}" stroke-width="1"></path>`,
+  () => `${pole(8, 70, 8, 26, 2)}${pole(28, 70, 28, 26, 2)}
+<path d="M5 29 H31 M5 62 H31" stroke="${WOOD_LIGHT}" stroke-width="2" stroke-linecap="round"></path>
+<path d="M11 33 q7 -3 14 0 q2 12 0 25 q-7 3 -14 0 q-2 -13 0 -25 Z" fill="${HIDE}" stroke="${LINE}" stroke-width="0.7"></path>
+<path d="M8 35 l3 1 M8 45 h3 M8 55 l3 -1 M28 35 l-3 1 M28 45 h-3 M28 55 l-3 -1" stroke="${CLOTH}" stroke-width="0.7"></path>
+<rect x="36" y="42" width="56" height="6" fill="${WOOD_LIGHT}" stroke="${LINE}" stroke-width="0.8"></rect>
+<rect x="40" y="48" width="4" height="20" fill="${WOOD}" stroke="${LINE}" stroke-width="0.7"></rect>
+<rect x="84" y="48" width="4" height="20" fill="${WOOD}" stroke="${LINE}" stroke-width="0.7"></rect>
+<rect x="44" y="58" width="40" height="3" fill="${WOOD}" stroke="${LINE}" stroke-width="0.6"></rect>
+<rect x="80" y="35" width="9" height="7" fill="${METAL}" stroke="${LINE}" stroke-width="0.6"></rect>
+<path d="M84.5 35 v-4 M80 31 h9" stroke="${METAL}" stroke-width="1.2"></path>
+<path d="M46 40 q5 -5 12 -2 q4 -3 8 1 l-1 3 Z" fill="${HIDE_DARK}" stroke="${LINE}" stroke-width="0.6"></path>
+<path d="M66 40 l8 -3" stroke="${METAL}" stroke-width="1.3" stroke-linecap="round"></path>
+<path d="M50 56 h6 M60 56 h5 M70 56 h7" stroke="${CLOTH}" stroke-width="1.6"></path>`,
+  () => `${pole(6, 68, 6, 24, 2.4)}${pole(94, 68, 94, 24, 2.4)}
+<path d="M0 25 L50 10 L100 25 V29 H0 Z" fill="${WOOD_DARK}" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M12 27 v-4 M26 23 v-6 M40 19 v-6 M60 19 v-6 M74 23 v-6 M88 27 v-4" stroke="${WOOD}" stroke-width="1.2"></path>
+<path d="M6 34 Q50 41 94 34" stroke="${CLOTH}" stroke-width="0.8" fill="none"></path>
+<path d="M14 35.5 h10 v11 q-5 3 -10 0 Z" fill="${HIDE}" stroke="${LINE}" stroke-width="0.6"></path>
+<path d="M30 37 h9 v10 q-4.5 3 -9 0 Z" fill="#7c7a64" stroke="${LINE}" stroke-width="0.6"></path>
+<path d="M70 37 h9 v12 q-4.5 3 -9 0 Z" fill="${HIDE_DARK}" stroke="${LINE}" stroke-width="0.6"></path>
+<path d="M50 29 v6" stroke="${METAL}" stroke-width="0.9"></path>
+<rect x="46.5" y="35" width="7" height="8" rx="1.5" fill="${FIRE}" stroke="${LINE}" stroke-width="0.6"></rect>
+<ellipse cx="50" cy="39" rx="9" ry="7" fill="${FIRE}" opacity="0.14"></ellipse>
+<rect x="18" y="50" width="62" height="6" fill="${WOOD_LIGHT}" stroke="${LINE}" stroke-width="0.8"></rect>
+<rect x="22" y="56" width="4" height="12" fill="${WOOD}" stroke="${LINE}" stroke-width="0.7"></rect>
+<rect x="72" y="56" width="4" height="12" fill="${WOOD}" stroke="${LINE}" stroke-width="0.7"></rect>
+<rect x="74" y="43" width="9" height="7" fill="${METAL}" stroke="${LINE}" stroke-width="0.6"></rect>
+<path d="M30 48 q5 -5 12 -2 q4 -3 8 1 l-1 3 Z" fill="${HIDE}" stroke="${LINE}" stroke-width="0.6"></path>
+<path d="M54 48 l9 -3" stroke="${METAL}" stroke-width="1.3" stroke-linecap="round"></path>
+<rect x="84" y="50" width="12" height="18" rx="2" fill="${WOOD}" stroke="${LINE}" stroke-width="0.8"></rect>
+<path d="M84 56 h12 M84 62 h12" stroke="${METAL}" stroke-width="0.9"></path>
+<path d="M2 68 q0 -9 7 -9 q7 0 7 9 Z" fill="${WOOD_DARK}" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M5 59 l1 -4 M9 59 l0 -5 M13 59 l-1 -4" stroke="${CLOTH}" stroke-width="1"></path>`,
+],
 };
 
 
@@ -320,16 +370,16 @@ const BOARD = `<defs><radialGradient id="camp-glade" cx="0.5" cy="0.52" r="0.62"
 <rect width="360" height="400" fill="url(#camp-glade)"></rect>
 <path d="M212 400 Q236 300 300 286 Q340 280 360 296 V400 Z" fill="#1b2417"></path>
 ${BOULDERS.map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.72}" fill="${STONE_DARK}" stroke="#2a3322" stroke-width="1"></ellipse><ellipse cx="${x - r * 0.2}" cy="${y - r * 0.28}" rx="${r * 0.55}" ry="${r * 0.3}" fill="${STONE}" opacity="0.7"></ellipse>`).join('')}
-<ellipse cx="74" cy="346" rx="44" ry="22" fill="#16242a" stroke="#28393d" stroke-width="1.5"></ellipse>
-<ellipse cx="64" cy="342" rx="16" ry="4" fill="#8fe3ef" opacity="0.08"></ellipse>
-<ellipse cx="88" cy="352" rx="10" ry="2.5" fill="#8fe3ef" opacity="0.07"></ellipse>
-<path d="M30 340 q2 -10 0 -16 M34 344 q3 -9 2 -14 M112 352 q2 -9 0 -15 M116 348 q3 -8 1 -13" stroke="#5f7a3f" stroke-width="1.2" fill="none"></path>
+<ellipse cx="34" cy="356" rx="28" ry="13" fill="#16242a" stroke="#28393d" stroke-width="1.5"></ellipse>
+<ellipse cx="27" cy="353" rx="10" ry="2.8" fill="#8fe3ef" opacity="0.08"></ellipse>
+<ellipse cx="44" cy="360" rx="6" ry="2" fill="#8fe3ef" opacity="0.07"></ellipse>
+<path d="M8 354 q2 -10 0 -16 M12 358 q3 -9 2 -14 M60 362 q2 -9 0 -15" stroke="#5f7a3f" stroke-width="1.2" fill="none"></path>
 <g fill="none" stroke-linecap="round">
-<path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96" stroke="#2a2218" stroke-width="16"></path>
-<path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96" stroke="#352b1f" stroke-width="10"></path>
+<path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96 M171 332 Q150 330 128 340" stroke="#2a2218" stroke-width="16"></path>
+<path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96 M171 332 Q150 330 128 340" stroke="#352b1f" stroke-width="10"></path>
 </g>
 ${tufts([[128, 70], [232, 120], [140, 304], [326, 176], [36, 186], [212, 372], [118, 156], [252, 196], [150, 110], [40, 300], [320, 260]])}
-<ellipse cx="128" cy="320" rx="16" ry="5" fill="${WOOD}" stroke="${LINE}" stroke-width="0.6" opacity="0.8" transform="rotate(-18 128 320)"></ellipse>
+<ellipse cx="128" cy="388" rx="16" ry="5" fill="${WOOD}" stroke="${LINE}" stroke-width="0.6" opacity="0.8" transform="rotate(-12 128 388)"></ellipse>
 <ellipse cx="330" cy="146" rx="7" ry="4" fill="${PLANK}" stroke="${LINE}" stroke-width="0.6" opacity="0.8"></ellipse>
 ${FIRS.map(([x, y, size]) => `<path d="M${x} ${y - size} L${x + size * 0.55} ${y + size * 0.2} L${x + size * 0.3} ${y + size * 0.2} L${x + size * 0.7} ${y + size * 0.9} L${x - size * 0.7} ${y + size * 0.9} L${x - size * 0.3} ${y + size * 0.2} L${x - size * 0.55} ${y + size * 0.2} Z" fill="#132013" stroke="#1d2a19" stroke-width="1"></path>`).join('')}
 ${TREES.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#101710"></circle><circle cx="${x - r * 0.25}" cy="${y - r * 0.25}" r="${r * 0.7}" fill="#162114"></circle><circle cx="${x - r * 0.4}" cy="${y - r * 0.4}" r="${r * 0.3}" fill="#1d2a19"></circle>`).join('')}
