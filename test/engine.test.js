@@ -27,6 +27,8 @@ import {
   rollUpgrade,
   canUse,
   computeStats,
+  craftMinutes,
+  craftPace,
   createRng,
   damageScale,
   earnedPoints,
@@ -48,14 +50,22 @@ import {
   itemUpgradeCost,
   itemProperties,
   lowLevelMultiplier,
+  materialDrops,
+  materialView,
+  materialsText,
   monsterCombatant,
+  orderMaterials,
+  orderSalvage,
   playerCombatant,
   randomItem,
+  rarityUpChance,
   reduction,
   restedHp,
   sellPrice,
   simulateFight,
   resourceBundle,
+  salvageYield,
+  settleCrafting,
   simulateHunt,
   statEffects,
   unlockedFeatures,
@@ -306,15 +316,24 @@ describe('hunts', () => {
     assert.ok(pace(15).eliteChance < pace(240).eliteChance);
   });
 
-  test('demanding encounters are stronger and bring better loot', () => {
+  test('demanding encounters are stronger and leave more materials', () => {
     const level = 20;
-    const always = { ...content, balance: { ...content.balance, hunt: { ...content.balance.hunt, toughChanceByMinutes: [[1, 1]] } } };
+    const withTough = (chance) => ({ ...content, balance: { ...content.balance, hunt: { ...content.balance.hunt, toughChanceByMinutes: [[1, chance]] } } });
     const character = typicalCharacter('warrior', level, content);
-    const result = simulateHunt({ ...character, hp: 9999, name: 'Mira', areaId: 'viper-heaps', minutes: 60, seed: 'trudne' }, always);
+    const result = simulateHunt({ ...character, hp: 9999, name: 'Mira', areaId: 'viper-heaps', minutes: 60, seed: 'trudne' }, withTough(1));
     assert.ok(result.fights.every((fight) => fight.tough));
     // Monsters of the place (16–20), some levels higher.
     const bonus = content.balance.hunt.toughLevelBonus;
     assert.ok(result.fights.every((fight) => fight.enemies.every((enemy) => enemy.level >= 16 + bonus && enemy.level <= 20 + bonus)));
+    const materials = (chance) => {
+      let total = 0;
+      for (let i = 0; i < 60; i++) {
+        const hunt = simulateHunt({ ...character, hp: 9999, name: 'Mira', areaId: 'viper-heaps', minutes: 60, seed: `trudne:${i}` }, withTough(chance));
+        total += Object.values(hunt.materials).reduce((sum, count) => sum + count, 0);
+      }
+      return total;
+    };
+    assert.ok(materials(1) > materials(0) * 1.2, `${materials(1)} vs ${materials(0)}`);
   });
 
   test('HP carries over between fights and is only partly restored', () => {
@@ -725,7 +744,16 @@ describe('camp', () => {
     assert.equal(buildingLevel(stored.campfire, 4999), 1);
     assert.equal(buildingLevel(stored.campfire, 5000), 2);
     assert.equal(buildingLevel(undefined, 5000), 0);
-    assert.deepEqual(campLevels(stored, 4000, content), { sawmill: 0, quarry: 0, mine: 0, campfire: 1, 'loot-shed': 0, 'scrap-bench': 0, anvil: 0 });
+    assert.deepEqual(campLevels(stored, 4000, content), {
+      sawmill: 0,
+      quarry: 0,
+      mine: 0,
+      campfire: 1,
+      'loot-shed': 0,
+      'scrap-bench': 0,
+      anvil: 0,
+      'craft-table': 0,
+    });
     assert.equal(construction(stored, 4000).buildingId, 'campfire');
     assert.equal(construction(stored, 5000), null);
     assert.deepEqual(missingFor({ gold: 19, wood: 6 }, { gold: 20, wood: 2 }), [{ resource: 'wood', amount: 4 }]);
@@ -949,3 +977,138 @@ describe('upgrades', () => {
   });
 });
 
+
+describe('materials and chests', () => {
+  const geared = (classId, level) => typicalCharacter(classId, level, content);
+
+  test('beaten creatures leave their own material, and items come only in chests', () => {
+    const character = geared('warrior', 13);
+    for (let i = 0; i < 20; i++) {
+      const hunt = simulateHunt({ ...character, hp: 99999, name: 'Mira', areaId: 'raven-hollows', minutes: 60, seed: `materiały:${i}` }, content);
+      const fromChests = new Set([
+        ...hunt.entries.filter((entry) => entry.type === 'find' && entry.item !== undefined).map((entry) => entry.item),
+        ...hunt.fights.flatMap((fight) => fight.chests),
+      ]);
+      assert.equal(fromChests.size, hunt.items.length);
+      for (const fight of hunt.fights) {
+        const monsters = new Set(fight.enemies.map((enemy) => enemy.monsterId));
+        for (const key of Object.keys(fight.materials)) {
+          assert.ok(monsters.has(content.materialsById[key.split(':')[0]].monster), `${key} from ${[...monsters]}`);
+        }
+      }
+    }
+  });
+
+  test('the commonest material comes about 30% of the time, rarer ones less often', () => {
+    const rng = createRng('łup');
+    const average = (monsterId) => {
+      let total = 0;
+      for (let i = 0; i < 20000; i++) total += Object.values(materialDrops(monsterId, 1, 1, rng, content)).reduce((sum, count) => sum + count, 0);
+      return total / 20000;
+    };
+    assert.ok(Math.abs(average('wolf') - 0.3) < 0.015);
+    assert.ok(Math.abs(average('boar') - 0.2) < 0.015);
+    assert.ok(Math.abs(average('likho') - 0.05) < 0.01);
+    // A fight that stands for four of the reference length leaves more.
+    const long = Object.values(materialDrops('wolf', 1, 4, createRng('długo'), content)).reduce((sum, count) => sum + count, 0);
+    assert.ok(long === 1 || long === 2, `${long}`);
+  });
+
+  test('a higher level sometimes gives the material one rarity higher, never two', () => {
+    assert.equal(rarityUpChance(1, content), 0.005);
+    assert.equal(rarityUpChance(30, content), 0.15);
+    assert.equal(rarityUpChance(400, content), content.balance.rewards.materialRarityUpMax);
+    const rng = createRng('rzadkość');
+    const seen = {};
+    for (let i = 0; i < 4000; i++) {
+      for (const [key, count] of Object.entries(materialDrops('wolf', 30, 1, rng, content))) seen[key] = (seen[key] ?? 0) + count;
+    }
+    assert.deepEqual(Object.keys(seen).sort(), ['wolf-pelt:common', 'wolf-pelt:rare']);
+    const share = seen['wolf-pelt:rare'] / (seen['wolf-pelt:common'] + seen['wolf-pelt:rare']);
+    assert.ok(Math.abs(share - 0.15) < 0.04, `${share}`);
+  });
+
+  test('names say the rarity only when it is above the species', () => {
+    assert.equal(materialView('wolf-pelt:common', 1, content).label, 'skóra wilka');
+    assert.equal(materialView('wolf-pelt:rare', 1, content).label, 'rzadka skóra wilka');
+    assert.equal(materialView('badger-claws:rare', 1, content).part, 'Rzemienie');
+    assert.equal(materialsText({ 'wolf-pelt:common': 2, 'crow-feather:unique': 1, 'boar-tusk:unique': 1 }, content), 'skóra wilka ×2, unikalne pióro kruka, unikalny kieł dzika');
+  });
+
+  test('treasure chests bring about as many items an hour as monsters and finds did before', () => {
+    const character = geared('warrior', 8);
+    let items = 0;
+    for (let i = 0; i < 200; i++) {
+      items += simulateHunt({ ...character, hp: 99999, name: 'Mira', areaId: 'fox-ravines', minutes: 60, seed: `skrzynie:${i}` }, content).items.length;
+    }
+    assert.ok(items / 200 > 1.05 && items / 200 < 1.45, `${items / 200} an hour`);
+  });
+
+  test('a beaten elite leaves a chest', () => {
+    const elite = { ...content, balance: { ...content.balance, hunt: { ...content.balance.hunt, eliteChancePerFight: 100 } } };
+    const hunt = simulateHunt({ ...geared('warrior', 23), hp: 99999, name: 'Mira', areaId: 'windfalls-edge', minutes: 15, seed: 'elita' }, elite);
+    const won = hunt.fights.filter((fight) => fight.won === true);
+    assert.ok(won.length > 0 && won.every((fight) => fight.elite && fight.chests.length === 1));
+    assert.ok(hunt.entries.filter((entry) => entry.type === 'fight').every((entry) => /stoi skrzynia/.test(entry.text)));
+  });
+
+  test('the report lists the materials of each fight and of the whole exploration', () => {
+    const character = geared('archer', 13);
+    const hunt = simulateHunt({ ...character, hp: 99999, name: 'Mira', areaId: 'raven-hollows', minutes: 240, seed: 'raport' }, content);
+    const report = huntReport(
+      { hunt, applied: applyHunt(character.character, hunt, content), character: character.character, areaId: 'raven-hollows', startedAt: 0, endsAt: 1 },
+      content,
+    );
+    const total = (list) => list.reduce((sum, material) => sum + material.count, 0);
+    assert.equal(total(report.summary.materials), Object.values(hunt.materials).reduce((sum, count) => sum + count, 0));
+    assert.equal(total(report.fights.flatMap((fight) => fight.materials)), total(report.summary.materials));
+    assert.ok(total(report.summary.materials) > 0);
+  });
+});
+
+describe('Stół rzemieślniczy', () => {
+  const MINUTE = 60000;
+  const empty = { materials: {}, parts: {}, queue: [] };
+
+  test('without the table nothing is made, and each level makes it faster', () => {
+    assert.equal(craftPace({}, content), 0);
+    assert.ok(Math.abs(craftPace({ 'craft-table': 1 }, content) - 1.1) < 1e-9);
+    assert.ok(Math.abs(craftPace({ 'craft-table': 10 }, content) - 2) < 1e-9);
+    assert.equal(craftMinutes('common', 3, 1, content), 15);
+    assert.equal(craftMinutes('common', 3, 2, content), 8);
+  });
+
+  test('materials become parts of their rarity, one order after another, for free', () => {
+    const state = { ...empty, materials: { 'wolf-pelt:common': 3, 'boar-tusk:rare': 1 } };
+    const { state: next, ordered } = orderMaterials(state, ['wolf-pelt:common', 'boar-tusk:rare', 'fox-pelt:common'], 1, 0, content);
+    assert.equal(ordered, 2);
+    assert.deepEqual(next.materials, {});
+    assert.deepEqual(next.queue.map((order) => [order.startsAt / MINUTE, order.endsAt / MINUTE, order.partId, order.parts]), [
+      [0, 15, 'scraps', 3],
+      [15, 23, 'straps', 1],
+    ]);
+    assert.deepEqual(settleCrafting(next, 14 * MINUTE).parts, {});
+    assert.deepEqual(settleCrafting(next, 15 * MINUTE).parts, { scraps: 3 });
+    const later = settleCrafting(next, 23 * MINUTE);
+    assert.deepEqual([later.parts, later.queue.length, later.done.length], [{ scraps: 3, straps: 1 }, 0, 2]);
+  });
+
+  test('a new order waits for the last one, and the queue has a limit', () => {
+    const materials = Object.fromEntries(content.materials.map((material) => [`${material.id}:${material.rarity}`, 1]));
+    const { state, ordered } = orderMaterials({ ...empty, materials }, Object.keys(materials), 1, 0, content);
+    assert.equal(ordered, content.balance.crafting.queueLimit);
+    assert.equal(Object.keys(state.materials).length, content.materials.length - ordered);
+    for (let i = 1; i < state.queue.length; i++) assert.equal(state.queue[i].startsAt, state.queue[i - 1].endsAt);
+  });
+
+  test('taking an item apart gives more parts for a higher level and each upgrade', () => {
+    assert.deepEqual(salvageYield({ rarity: 'common', level: 3 }, content), { partId: 'scraps', count: 2 });
+    assert.deepEqual(salvageYield({ rarity: 'rare', level: 25, upgrade: 2 }, content), { partId: 'straps', count: 6 });
+    const item = generateItem({ baseId: 'sword', level: 12, rarityId: 'epic' }, createRng('rozbiórka'), content);
+    const state = orderSalvage(empty, item, itemName(item, content), 2, 10 * MINUTE, content);
+    assert.deepEqual(state.queue.map((order) => [order.kind, order.partId, order.parts, order.startsAt / MINUTE, order.endsAt / MINUTE]), [
+      ['item', 'runes', 3, 10, 40],
+    ]);
+    assert.deepEqual(settleCrafting(state, 40 * MINUTE).parts, { runes: 3 });
+  });
+});

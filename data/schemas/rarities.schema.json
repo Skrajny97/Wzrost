@@ -6,15 +6,29 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "name", "affixes", "color", "dropWeight", "budget", "sell"],
+    "required": ["id", "name", "forms", "affixes", "color", "dropWeight", "budget", "sell", "materialChance", "craftMinutes"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
       "name": { "type": "string", "minLength": 1 },
+      "forms": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["m", "f", "n", "pl"],
+        "description": "Nazwa zgodna z rodzajem nazwy materiału, np. „rzadka skóra wilka”.",
+        "properties": {
+          "m": { "type": "string", "minLength": 1 },
+          "f": { "type": "string", "minLength": 1 },
+          "n": { "type": "string", "minLength": 1 },
+          "pl": { "type": "string", "minLength": 1 }
+        }
+      },
       "affixes": { "type": "integer", "minimum": 0, "maximum": 6 },
       "color": { "type": "string", "pattern": "^#[0-9a-f]{6}$" },
       "dropWeight": { "type": "number", "exclusiveMinimum": 0 },
       "budget": { "type": "number", "exclusiveMinimum": 0 },
-      "sell": { "type": "number", "minimum": 0, "description": "Mnożnik ceny u złomiarza." }
+      "sell": { "type": "number", "minimum": 0, "description": "Mnożnik ceny u złomiarza." },
+      "materialChance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa, że pokonany stwór zostawi swój materiał, gdy gatunek ma tę rzadkość (materials.json). Liczy się za każdego pokonanego, razem z udziałem walki w czasie wyprawy." },
+      "craftMinutes": { "type": "number", "exclusiveMinimum": 0, "description": "Minuty pracy Stołu rzemieślniczego nad jedną częścią tej rzadkości, przed premią z poziomu stołu." }
     }
   }
 }

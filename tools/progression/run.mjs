@@ -49,7 +49,7 @@ const PROPOSALS = [
   ['P1-4', 'weapon2+lag240+groups+xp=520+early=0.85'],
   ['P5_woodGrowth', 'woodcost'],
   ['package_P1-5', 'weapon2+lag240+groups+xp=520+early=0.85+woodcost'],
-  ['package_P1-5_plus_drop10', 'weapon2+lag240+groups+xp=520+early=0.85+woodcost+drop=0.1'],
+  ['package_P1-5_plus_chest60', 'weapon2+lag240+groups+xp=520+early=0.85+woodcost+chest=0.6'],
   ['xp520_alone', 'xp=520+early=0.85'],
   ['camp_alt_wood_region_and_sawmill', 'wood+sawmill'],
 ];

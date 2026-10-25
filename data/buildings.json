@@ -96,5 +96,19 @@
       { "resource": "iron-ore", "base": 4, "growth": 1.9 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
+  },
+  {
+    "id": "craft-table",
+    "name": "Stół rzemieślniczy",
+    "description": "Prosty stół z narzędziami. Za darmo, z upływem czasu przerabia materiały ze stworów i rozebrane przedmioty na części do wyrobu przedmiotów.",
+    "maxLevel": 10,
+    "effect": { "kind": "craftSpeed", "perLevel": 0.1, "unit": "percent", "text": "Przeróbka szybsza o {value}" },
+    "costs": [
+      { "resource": "gold", "base": 3, "growth": 2.0 },
+      { "resource": "wood", "base": 3, "growth": 1.9 },
+      { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 2 },
+      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 4 }
+    ],
+    "minutes": { "base": 1, "growth": 2.2 }
   }
 ]

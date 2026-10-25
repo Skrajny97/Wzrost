@@ -11,6 +11,7 @@
     "upgrades",
     "hunt",
     "rewards",
+    "crafting",
     "timePoints",
     "startingSupply",
     "regen",
@@ -437,14 +438,14 @@
         "eliteXpMultiplier",
         "goldPerLevel",
         "eliteGoldMultiplier",
-        "itemDropChance",
         "eliteRarityBonus",
-        "toughRarityBonus",
         "toughDropMultiplier",
         "findOutcomes",
         "findGoldPerLevel",
         "findResourcePerLevel",
-        "gatherPerLevelHour"
+        "gatherPerLevelHour",
+        "materialRarityUpPerLevel",
+        "materialRarityUpMax"
       ],
       "properties": {
         "xpBase": {
@@ -467,31 +468,23 @@
           "type": "number",
           "minimum": 0
         },
-        "itemDropChance": {
-          "type": "number",
-          "minimum": 0
-        },
         "eliteRarityBonus": {
           "type": "number",
-          "minimum": 0
-        },
-        "toughRarityBonus": {
-          "type": "number",
           "minimum": 0,
-          "description": "Mnożnik szansy na wyższą rzadkość łupu z wymagającego spotkania."
+          "description": "Mnożnik szansy na wyższą rzadkość przedmiotu ze skrzyni, którą zostawia pokonana elita."
         },
         "toughDropMultiplier": {
           "type": "number",
           "minimum": 0,
-          "description": "Mnożnik szansy na łup z wymagającego spotkania."
+          "description": "Mnożnik szansy na materiał ze stworów wymagającego spotkania."
         },
         "findOutcomes": {
           "type": "object",
-          "description": "Wagi wyniku znaleziska: złoto, przedmiot, zasób (resources.json, według wag regionu), nic ciekawego albo odłamek czasu (Punkty Czasu, timePoints.find).",
+          "description": "Wagi wyniku znaleziska: złoto, skrzynia skarbów z przedmiotem, zasób (resources.json, według wag regionu), nic ciekawego albo odłamek czasu (Punkty Czasu, timePoints.find). Przedmioty dają tylko skrzynie, nie stwory.",
           "additionalProperties": false,
           "required": [
             "gold",
-            "item",
+            "chest",
             "resource",
             "nothing",
             "time"
@@ -501,7 +494,7 @@
               "type": "number",
               "minimum": 0
             },
-            "item": {
+            "chest": {
               "type": "number",
               "minimum": 0
             },
@@ -532,7 +525,29 @@
           "type": "number",
           "minimum": 0,
           "description": "Zasoby zbierane po drodze: średni poziom miejsca × ta wartość × godziny eksploracji, podzielone według wag regionu."
+        },
+        "materialRarityUpPerLevel": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Szansa za każdy poziom stwora, że jego materiał będzie o jedną rzadkość wyższy niż rzadkość gatunku."
+        },
+        "materialRarityUpMax": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Najwyższa szansa na materiał o rzadkość wyższy, bez względu na poziom stwora."
         }
+      }
+    },
+    "crafting": {
+      "type": "object",
+      "description": "Stół rzemieślniczy w obozie: przeróbka materiałów i rozbiórka przedmiotów na części, za darmo, w kolejce na czas (craftMinutes w rarities.json).",
+      "additionalProperties": false,
+      "required": ["salvageBase", "salvageLevelStep", "queueLimit"],
+      "properties": {
+        "salvageBase": { "type": "integer", "minimum": 1, "description": "Części z rozebranego przedmiotu: salvageBase + poziom przedmiotu / salvageLevelStep (w dół) + jego ulepszenie." },
+        "salvageLevelStep": { "type": "integer", "minimum": 1 },
+        "queueLimit": { "type": "integer", "minimum": 1, "description": "Najwięcej zleceń naraz w kolejce stołu." }
       }
     },
     "timePoints": {

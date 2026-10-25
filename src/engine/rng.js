@@ -37,6 +37,12 @@ export function createRng(seed) {
   };
 }
 
+// An expected count like 2.4 becomes 2 or 3, with the right average.
+export function countEvents(expected, rng) {
+  const whole = Math.floor(expected);
+  return whole + (rng.chance(expected - whole) ? 1 : 0);
+}
+
 function cyrb128(text) {
   let h1 = 1779033703;
   let h2 = 3144134277;

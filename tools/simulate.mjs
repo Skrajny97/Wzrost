@@ -34,13 +34,12 @@ export function hoursToReach(level, content) {
 }
 
 
-// Items an hour: finds that are items, and loot from about five fights' worth
-// of time an hour, one monster each on average.
+// Items an hour: finds that are treasure chests. Creatures leave only
+// materials, and the elite's chest is too rare to count.
 export function itemsPerHour(content) {
   const { hunt, rewards } = content.balance;
-  const fightsPerHour = 60 / hunt.minutesPerFightReference;
   const outcomes = Object.values(rewards.findOutcomes).reduce((sum, weight) => sum + weight, 0);
-  return (60 / hunt.findIntervalMinutes) * (rewards.findOutcomes.item / outcomes) + fightsPerHour * rewards.itemDropChance;
+  return (60 / hunt.findIntervalMinutes) * (rewards.findOutcomes.chest / outcomes);
 }
 
 export function typicalCharacter(classId, level, content) {

@@ -1,9 +1,11 @@
 // An exploration (called a hunt in the code): fights and finds spread over the
 // chosen time in one inner region (an area). Fights grow slowly with time
 // (1 minute: 1 fight, an hour: 4), but each stands for its share of the time,
-// so XP, gold and loot follow the time spent. Longer explorations meet
-// demanding encounters more often, with better loot, and have more finds, some
-// of them empty. Monsters have the levels of the place, not of the character,
+// so XP, gold and materials follow the time spent. Beaten creatures leave
+// materials, never items: items come in treasure chests, found on the way,
+// left by a beaten elite, and, for a character without a weapon, right after
+// its first won fight. Longer explorations meet demanding encounters more
+// often, with more materials, and have more finds, some of them empty. Monsters have the levels of the place, not of the character,
 // and XP from monsters far below the character's level drops as the character
 // levels up during the exploration. HP carries over between fights and
 // recovers only partly. A lost fight ends the exploration with fainting (or,
@@ -11,6 +13,7 @@
 
 import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
+import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { itemName, itemRank, itemView, randomItem } from './items.js';
 import {
   classXpToNext,
@@ -20,7 +23,7 @@ import {
   monsterXp,
   xpToNext,
 } from './progression.js';
-import { createRng } from './rng.js';
+import { countEvents, createRng } from './rng.js';
 import { say } from './text.js';
 import { unlockMessages } from './unlocks.js';
 
@@ -117,12 +120,6 @@ export function encounterCombatants(encounter, content) {
   });
 }
 
-// An expected count like 2.4 becomes 2 or 3, with the right average.
-function countEvents(expected, rng) {
-  const whole = Math.floor(expected);
-  return whole + (rng.chance(expected - whole) ? 1 : 0);
-}
-
 function spread(count, durationMs, rng) {
   return Array.from({ length: count }, (_, i) => Math.round(((i + rng.float(0.2, 0.8)) / count) * durationMs));
 }
@@ -163,6 +160,7 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
   // Slots covered by worn items or earlier finds, for loot that fills the gaps.
   const filled = new Set(equipped.map((item) => item.slot));
   const loot = { filled, classId: character.classId };
+  const hpStart = player.hp;
   let hpNow = player.hp;
   let result = 'success';
   let endedAt = durationMs; // a faint or an escape ends the exploration early
@@ -177,24 +175,35 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
   let reached = { level: character.level, xp: character.xp ?? 0 };
   const items = [];
   const resources = {}; // { wood: 12, … } found for the camp
+  let materials = {}; // { "wolf-pelt:common": 2, … } from beaten creatures
   const fights = [];
   const entries = [];
   let key = null;
+  // An item from a chest. A character without a weapon holds a found one at
+  // once, for the rest of the exploration.
+  const take = (item) => {
+    items.push(item);
+    if (item.slot === 'weapon' && !worn.some((held) => held.slot === 'weapon')) {
+      worn = [...worn, item];
+      player = playerCombatant({ character, equipped: worn, hp: hpNow, name, area }, content);
+    }
+    return items.length - 1;
+  };
 
   for (const [step, event] of timeline.entries()) {
     if (event.type === 'find') {
-      // A find is gold, an item of the place's level, resources for the camp,
-      // nothing of interest or, rarely, a shard of time (Time Points).
+      // A find is gold, a treasure chest with an item of the place's level,
+      // resources for the camp, nothing of interest or, rarely, a shard of
+      // time (Time Points).
       const findLevel = areaLevel(area, rng, content);
       const outcome = rng.weighted(Object.entries(rewards.findOutcomes), ([, weight]) => weight)[0];
       if (outcome === 'gold') {
         const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * rng.float(0.5, 1.5)));
         gold += amount;
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findGold', step, { gold: amount }) });
-      } else if (outcome === 'item') {
+      } else if (outcome === 'chest') {
         const item = randomItem(findLevel, rng, content, loot);
-        items.push(item);
-        entries.push({ t: event.t, type: 'find', item: items.length - 1, text: say(texts, 'findItem', step, { item: itemName(item, content) }) });
+        entries.push({ t: event.t, type: 'find', item: take(item), text: say(texts, 'findChest', step, { item: itemName(item, content) }) });
       } else if (outcome === 'resource') {
         const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * rng.float(0.5, 1.5));
         for (const [id, amount] of found) resources[id] = (resources[id] ?? 0) + amount;
@@ -229,7 +238,8 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
       hpAfter: hpNow,
       xp: 0,
       gold: 0,
-      loot: [],
+      materials: {},
+      chests: [],
       recovered: 0,
       allies: [combatantView(ally, enemies[0].level, content)],
       enemiesView: enemies.map((enemy) => combatantView(enemy, ally.level, content)),
@@ -258,21 +268,20 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const goldFactor = (monster.elite ? rewards.eliteGoldMultiplier : 1) * enemy.groupFactor * share;
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * goldFactor;
-        // A character without a weapon always gets one of its class from the first opponent it beats.
-        const needsWeapon = !filled.has('weapon');
-        const dropChance = rewards.itemDropChance * enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1);
-        if (monster.elite || needsWeapon || rng.chance(dropChance)) {
-          const rarityBonus = monster.elite ? rewards.eliteRarityBonus : encounter.tough ? rewards.toughRarityBonus : 1;
-          const item = randomItem(enemy.level, rng, content, { ...loot, rarityBonus });
-          items.push(item);
-          summary.loot.push(items.length - 1);
-          // The first weapon goes into the hand at once, for the rest of the exploration.
-          if (needsWeapon) {
-            worn = [...worn, item];
-            player = playerCombatant({ character, equipped: worn, hp: hpNow, name, area }, content);
-          }
-        }
+        const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1);
+        summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, rng, content));
       }
+      materials = addCounts(materials, summary.materials);
+      // A character without a weapon, and with none found yet, finds a chest
+      // with one of its class right after its first won fight (randomItem
+      // gives a weapon while none is found). A beaten elite leaves a chest,
+      // often with a rarer item.
+      const chests = [];
+      if (!filled.has('weapon')) chests.push([randomItem(enemies[0].level, rng, content, loot), 'firstChest']);
+      if (encounter.elite) {
+        chests.push([randomItem(enemies[0].level, rng, content, { ...loot, rarityBonus: rewards.eliteRarityBonus }), 'eliteChest']);
+      }
+      for (const [item] of chests) summary.chests.push(take(item));
       summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share);
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
       xp += summary.xp;
@@ -282,7 +291,10 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
       hpNow += summary.recovered;
 
       lines.push(say(texts, 'victory', step), `HP: ${hpBefore} → ${summary.hpAfter}. +${summary.xp} XP, +${summary.gold} złota.`);
-      for (const index of summary.loot) lines.push(say(texts, 'loot', step, { item: itemName(items[index], content) }));
+      if (Object.keys(summary.materials).length > 0) {
+        lines.push(say(texts, 'materials', step, { materials: materialsText(summary.materials, content) }));
+      }
+      for (const [item, text] of chests) lines.push(say(texts, text, step, { item: itemName(item, content) }));
       if (summary.recovered > 0) lines.push(say(texts, 'recover', step, { hp: summary.recovered }));
       entries.push({ t: event.t, type: 'fight', fight: summary.index, text: lines.join(' ') });
       continue;
@@ -322,9 +334,10 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
     xp,
     gold,
     resources,
+    materials,
     timePoints,
     items,
-    hpStart: player.hp,
+    hpStart,
     hpEnd: hpNow,
     maxHp: player.maxHp,
     fights,
@@ -415,6 +428,7 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       fights: hunt.fights.length,
       itemsFound: hunt.items.length,
       bestFind: best && itemView(best, content),
+      materials: Object.entries(hunt.materials ?? {}).map(([key, count]) => materialView(key, count, content)),
       levelBefore: character.level,
       levelAfter: applied.level,
       classLevelBefore: character.classLevel,
@@ -441,7 +455,8 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       hpAfter: fight.hpAfter,
       xp: fight.xp,
       gold: fight.gold,
-      loot: fight.loot.length,
+      materials: Object.entries(fight.materials).map(([key, count]) => materialView(key, count, content)),
+      chests: fight.chests.length,
       allies: fight.allies,
       enemies: fight.enemiesView,
       events: fight.events,

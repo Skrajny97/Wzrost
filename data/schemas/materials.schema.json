@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Materiały i części",
+  "description": "Materiały zostawiają pokonane stwory, każdy stwór swój. Stół rzemieślniczy w obozie przerabia materiał na jedną część tej samej rzadkości, a rozebrany przedmiot na kilka części jego rzadkości. Części posłużą do wyrobu przedmiotów w profesjach.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["materials", "parts"],
+  "properties": {
+    "materials": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "gender", "monster", "rarity", "description"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "name": { "type": "string", "minLength": 1 },
+          "gender": { "enum": ["m", "f", "n", "pl"], "description": "Rodzaj gramatyczny nazwy, do „rzadka skóra wilka”." },
+          "monster": { "type": "string", "minLength": 1, "description": "Stwór z monsters.json, który zostawia ten materiał. Każdy stwór ma dokładnie jeden." },
+          "rarity": { "type": "string", "minLength": 1, "description": "Rzadkość gatunku (rarities.json). Wyznacza szansę na materiał, a wyższy poziom stwora czasem podnosi ją o stopień." },
+          "description": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Po jednej części na każdą rzadkość z rarities.json.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "gender", "rarity", "description"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "name": { "type": "string", "minLength": 1 },
+          "gender": { "enum": ["m", "f", "n", "pl"] },
+          "rarity": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

@@ -1,9 +1,9 @@
 [
-  { "id": "common", "name": "pospolity", "affixes": 0, "color": "#9b9b9b", "dropWeight": 700, "budget": 1.0, "sell": 1 },
-  { "id": "rare", "name": "rzadki", "affixes": 1, "color": "#7fae5c", "dropWeight": 220, "budget": 1.35, "sell": 2 },
-  { "id": "unique", "name": "unikalny", "affixes": 2, "color": "#5fa3d6", "dropWeight": 60, "budget": 1.7, "sell": 4 },
-  { "id": "epic", "name": "epicki", "affixes": 3, "color": "#a87fd6", "dropWeight": 16, "budget": 2.1, "sell": 8 },
-  { "id": "legendary", "name": "legendarny", "affixes": 4, "color": "#e0a03c", "dropWeight": 3, "budget": 2.6, "sell": 16 },
-  { "id": "mythic", "name": "mityczny", "affixes": 5, "color": "#d64561", "dropWeight": 0.5, "budget": 3.2, "sell": 32 },
-  { "id": "divine", "name": "boski", "affixes": 6, "color": "#f2d675", "dropWeight": 0.1, "budget": 4.0, "sell": 64 }
+  { "id": "common", "name": "pospolity", "forms": { "m": "pospolity", "f": "pospolita", "n": "pospolite", "pl": "pospolite" }, "affixes": 0, "color": "#9b9b9b", "dropWeight": 700, "budget": 1.0, "sell": 1, "materialChance": 0.3, "craftMinutes": 5 },
+  { "id": "rare", "name": "rzadki", "forms": { "m": "rzadki", "f": "rzadka", "n": "rzadkie", "pl": "rzadkie" }, "affixes": 1, "color": "#7fae5c", "dropWeight": 220, "budget": 1.35, "sell": 2, "materialChance": 0.2, "craftMinutes": 8 },
+  { "id": "unique", "name": "unikalny", "forms": { "m": "unikalny", "f": "unikalna", "n": "unikalne", "pl": "unikalne" }, "affixes": 2, "color": "#5fa3d6", "dropWeight": 60, "budget": 1.7, "sell": 4, "materialChance": 0.14, "craftMinutes": 12 },
+  { "id": "epic", "name": "epicki", "forms": { "m": "epicki", "f": "epicka", "n": "epickie", "pl": "epickie" }, "affixes": 3, "color": "#a87fd6", "dropWeight": 16, "budget": 2.1, "sell": 8, "materialChance": 0.1, "craftMinutes": 20 },
+  { "id": "legendary", "name": "legendarny", "forms": { "m": "legendarny", "f": "legendarna", "n": "legendarne", "pl": "legendarne" }, "affixes": 4, "color": "#e0a03c", "dropWeight": 3, "budget": 2.6, "sell": 16, "materialChance": 0.07, "craftMinutes": 30 },
+  { "id": "mythic", "name": "mityczny", "forms": { "m": "mityczny", "f": "mityczna", "n": "mityczne", "pl": "mityczne" }, "affixes": 5, "color": "#d64561", "dropWeight": 0.5, "budget": 3.2, "sell": 32, "materialChance": 0.05, "craftMinutes": 45 },
+  { "id": "divine", "name": "boski", "forms": { "m": "boski", "f": "boska", "n": "boskie", "pl": "boskie" }, "affixes": 6, "color": "#f2d675", "dropWeight": 0.1, "budget": 4.0, "sell": 64, "materialChance": 0.03, "craftMinutes": 60 }
 ]

@@ -67,7 +67,7 @@
     "monsterLevelWeights": [8, 4, 2, 1, 1],
     "beginnerLevel": 1,
     "areaUnlockLead": 1,
-    "findIntervalMinutes": 20,
+    "findIntervalMinutes": 18,
     "groupFactors": [1, 0.7, 0.55],
     "eliteChancePerFight": 0.006,
     "eliteLevelBonus": 1,
@@ -85,14 +85,19 @@
     "eliteXpMultiplier": 3,
     "goldPerLevel": 2,
     "eliteGoldMultiplier": 3,
-    "itemDropChance": 0.06,
     "eliteRarityBonus": 3,
-    "toughRarityBonus": 2,
     "toughDropMultiplier": 1.5,
-    "findOutcomes": { "gold": 0.35, "item": 0.3, "resource": 0.3, "nothing": 0.05, "time": 0.05 },
+    "findOutcomes": { "gold": 0.35, "chest": 0.44, "resource": 0.3, "nothing": 0.05, "time": 0.05 },
     "findGoldPerLevel": 4,
     "findResourcePerLevel": 4,
-    "gatherPerLevelHour": 2
+    "gatherPerLevelHour": 2,
+    "materialRarityUpPerLevel": 0.005,
+    "materialRarityUpMax": 0.25
+  },
+  "crafting": {
+    "salvageBase": 2,
+    "salvageLevelStep": 10,
+    "queueLimit": 10
   },
   "timePoints": {
     "start": 60,

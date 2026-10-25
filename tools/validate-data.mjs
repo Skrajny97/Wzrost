@@ -11,7 +11,7 @@ const CLIENT_DIR = new URL('../src/client/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
-  'resources', 'buildings', 'music', 'sounds', 'appearances', 'tutorial',
+  'resources', 'buildings', 'music', 'sounds', 'appearances', 'tutorial', 'materials',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'training', 'settlement', 'dungeons', 'core'];
@@ -55,7 +55,7 @@ function checkReferences(data) {
   const stats = uniqueIds(errors, 'stats', data.stats);
   const elements = uniqueIds(errors, 'elements', data.elements);
   const effects = uniqueIds(errors, 'effects', data.effects);
-  uniqueIds(errors, 'rarities', data.rarities);
+  const rarities = uniqueIds(errors, 'rarities', data.rarities);
   const slots = uniqueIds(errors, 'slots', data.slots);
   const bases = uniqueIds(errors, 'item-bases', data['item-bases']);
   const monsters = uniqueIds(errors, 'monsters', data.monsters);
@@ -87,6 +87,33 @@ function checkReferences(data) {
   const rarityAffixes = data.rarities.map((rarity) => rarity.affixes);
   if (rarityAffixes.some((count, i) => i > 0 && count <= rarityAffixes[i - 1])) {
     errors.push('rarities.json: liczba afiksów musi rosnąć z rzadkością');
+  }
+  // Rarer materials drop less often.
+  const chances = data.rarities.map((rarity) => rarity.materialChance);
+  if (chances.some((chance, i) => i > 0 && chance > chances[i - 1])) {
+    errors.push('rarities.json: materialChance nie może rosnąć z rzadkością');
+  }
+
+  // Every creature leaves one material of its own, and every rarity has one
+  // part that the Stół rzemieślniczy makes.
+  const { materials, parts } = data.materials;
+  uniqueIds(errors, 'materials', [...materials, ...parts]);
+  for (const material of materials) {
+    if (!data.monsters.some((monster) => monster.id === material.monster)) {
+      errors.push(`materials.json: ${material.id} ma nieznanego stwora "${material.monster}"`);
+    }
+    if (!rarities.has(material.rarity)) errors.push(`materials.json: ${material.id} ma nieznaną rzadkość "${material.rarity}"`);
+  }
+  for (const monster of data.monsters) {
+    const count = materials.filter((material) => material.monster === monster.id).length;
+    if (count !== 1) errors.push(`materials.json: stwór ${monster.id} ma ${count} materiałów zamiast jednego`);
+  }
+  for (const rarity of data.rarities) {
+    const count = parts.filter((part) => part.rarity === rarity.id).length;
+    if (count !== 1) errors.push(`materials.json: rzadkość ${rarity.id} ma ${count} części zamiast jednej`);
+  }
+  for (const part of parts) {
+    if (!rarities.has(part.rarity)) errors.push(`materials.json: część ${part.id} ma nieznaną rzadkość "${part.rarity}"`);
   }
 
   const basesById = new Map(data['item-bases'].map((base) => [base.id, base]));
@@ -188,6 +215,9 @@ function checkReferences(data) {
 
   // A building is paid in gold and resources, from the first level on: the
   // resources come from explorations.
+  if (!data.buildings.some((building) => building.effect.kind === 'craftSpeed')) {
+    errors.push('buildings.json: brak budynku z craftSpeed (Stół rzemieślniczy), bez którego nie ma przeróbki materiałów');
+  }
   for (const building of data.buildings) {
     const { effect } = building;
     if (effect.kind === 'production') {

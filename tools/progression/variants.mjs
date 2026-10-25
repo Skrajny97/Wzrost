@@ -20,7 +20,7 @@ export const VARIANTS = {
   free4: { describe: 'balance.hunt.lowLevelFreeDiff 2 -> 4', apply(raw) { raw.balance.hunt.lowLevelFreeDiff = 4; } },
   xp520: { describe: 'progression.xpPerHourScale 650 -> 520', apply(raw) { raw.balance.progression.xpPerHourScale = 520; } },
   xp500: { describe: 'progression.xpPerHourScale 650 -> 500', apply(raw) { raw.balance.progression.xpPerHourScale = 500; } },
-  drop10: { describe: 'rewards.itemDropChance 0.06 -> 0.10', apply(raw) { raw.balance.rewards.itemDropChance = 0.1; } },
+  chest60: { describe: 'rewards.findOutcomes.chest 0.44 -> 0.60', apply(raw) { raw.balance.rewards.findOutcomes.chest = 0.6; } },
   wood: {
     describe: 'Uroczysko Kamieni resources wood 3 / stone 5 -> wood 5 / stone 3',
     apply(raw) { raw.regions.find((r) => r.id === 'stone-glade').resources = { wood: 5, stone: 3, 'iron-ore': 2 }; },
@@ -79,13 +79,13 @@ export const VARIANTS = {
 };
 
 // Several variants combined: "lag240+xp520".
-// Parametric variants: xp=480, lag=240, free=3, gf=0.6/0.45, drop=0.1, dmg=1.3
+// Parametric variants: xp=480, lag=240, free=3, gf=0.6/0.45, chest=0.6, dmg=1.3
 const PARAMETRIC = {
   xp: (v) => ({ describe: `progression.xpPerHourScale 650 -> ${v}`, apply(raw) { raw.balance.progression.xpPerHourScale = Number(v); } }),
   lag: (v) => ({ describe: `monsters.gearLagMinutes 45 -> ${v}`, apply(raw) { raw.balance.monsters.gearLagMinutes = Number(v); } }),
   free: (v) => ({ describe: `hunt.lowLevelFreeDiff 2 -> ${v}`, apply(raw) { raw.balance.hunt.lowLevelFreeDiff = Number(v); } }),
   gf: (v) => ({ describe: `hunt.groupFactors -> [1, ${v.split('/').join(', ')}]`, apply(raw) { raw.balance.hunt.groupFactors = [1, ...v.split('/').map(Number)]; } }),
-  drop: (v) => ({ describe: `rewards.itemDropChance 0.06 -> ${v}`, apply(raw) { raw.balance.rewards.itemDropChance = Number(v); } }),
+  chest: (v) => ({ describe: `rewards.findOutcomes.chest 0.44 -> ${v}`, apply(raw) { raw.balance.rewards.findOutcomes.chest = Number(v); } }),
   dmg: (v) => ({ describe: `monsters.damageMultiplier 1.4 -> ${v}`, apply(raw) { raw.balance.monsters.damageMultiplier = Number(v); } }),
   // early=0.85: earlyXpFactors for levels 6-20 set to 0.85 (flat); ramp=0.75: from 0.75 at level 6 up to 1 at level 21
   early: (v) => ({ describe: `progression.earlyXpFactors: levels 6-20 x${v}`, apply(raw) { const f = raw.balance.progression.earlyXpFactors.slice(0, 5); for (let L = 6; L <= 20; L++) f.push(Number(v)); raw.balance.progression.earlyXpFactors = f; } }),

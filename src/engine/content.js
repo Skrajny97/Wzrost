@@ -55,6 +55,14 @@ export function buildContent(raw) {
     resourcesById: byId(raw.resources),
     buildings: raw.buildings,
     buildingsById: byId(raw.buildings),
+    // What creatures leave (one material each) and the parts the Stół
+    // rzemieślniczy makes from materials and from taken-apart items, one per rarity.
+    materials: raw.materials.materials,
+    materialsById: byId(raw.materials.materials),
+    materialsByMonster: Object.fromEntries(raw.materials.materials.map((material) => [material.monster, material])),
+    parts: raw.materials.parts,
+    partsById: byId(raw.materials.parts),
+    partsByRarity: Object.fromEntries(raw.materials.parts.map((part) => [part.rarity, part])),
     appearances: raw.appearances ?? [],
     appearancesById: byId(raw.appearances ?? []),
   };
