@@ -1,0 +1,25 @@
+{
+  "id": "mage-male",
+  "payload": {
+    "prompt": "young man apprentice, thin, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, humble threadbare clothes: a faded blue patched wool tunic down to the knees, a rope belt and cloth-wrapped feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 732609270,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792913474,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 34.08,
+    "request_id": "f0feab12-99a2-4540-8391-4a3f1224432d",
+    "outputs_retained_until": 1792999844
+  }
+}
