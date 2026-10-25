@@ -464,6 +464,7 @@ export function mountCombat(container, { params, navigate }) {
     return h(
       'div',
       { class: 'stack' },
+      restSkip(character),
       h(
         'article',
         { class: 'card area-card', 'aria-label': area.name },
@@ -482,18 +483,28 @@ export function mountCombat(container, { params, navigate }) {
         levelNote,
         durations,
         threatLine,
-        restSkip(character),
         start,
       ),
       h('p', { class: 'muted threat-note', text: 'Zagrożenie to szansa omdlenia na wyprawie.' }),
     );
   }
 
-  // Resting before the start can be skipped with Punkty Czasu.
+  // Resting before the start can be skipped with Punkty Czasu: at the top,
+  // by what it shortens, so it does not read as part of the exploration.
+  // Hidden once HP is full.
   function restSkip(character) {
     const left = (now) => ((character.maxHp - currentHp(state.character, now)) / Math.max(1e-9, restRate(state.character))) * 60000;
-    skipper = skipControl('rest', left, 'Odpoczynek');
-    return skipper.element;
+    const control = skipControl('rest', left, 'Odpoczynek');
+    const text = h('p', { class: 'rest-skip-text' });
+    const panel = h('div', { class: 'rest-skip', 'aria-live': 'off' }, text, control.element);
+    const update = (now = serverNow()) => {
+      control.update(now);
+      panel.hidden = control.element.hidden;
+      text.textContent = `Odpoczynek: pełne HP za ${formatMinutes(Math.max(1, Math.ceil(left(now) / 60000)))}.`;
+    };
+    update();
+    skipper = { element: panel, update };
+    return panel;
   }
 
   function tick(now) {

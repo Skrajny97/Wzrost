@@ -972,3 +972,8 @@ Niedźwiedzi, Wilczy, Rysi i Kruka już nosiły nazwy potworów i zostają. Pię
 2. **Dawne portrety czekają na ewolucję.** Leżą w `art/evolution/portraits/`, a ich opisy są w rodzaju `portraits-evolved` w `art/prompts.json`. Gra pokaże je razem z ewolucjami klas, bo zmiana wizerunku ma być częścią ewolucji.
 3. **Opisy dla generatora.** W pierwszej próbie generator narysował kilka szkiców Maga i Wojownika w leśnej scenie albo przyciętych u góry. Opisy proszą teraz o postać na gładkim tle (`isolated figure on a plain background`), a Wojownik nie ma już szerokich barków, przez które wypełniał cały kadr. Szkice z poprawkami kosztowały 10,08 USD, a na koncie Retro Diffusion zostało 33,36 USD.
 4. **Wycinek w walce.** Postać zajmuje teraz mniejszą część obrazka, więc w polu 72×72 px na arenie widać głowę i tors mniejszej postaci niż dotąd. Ekran postaci pokazuje ją w całości jak wcześniej.
+5. **Postacie tej samej wielkości.** Autor zauważył, że wojowniczka zajmuje prawie całą ramkę, a wojownik obok niej wygląda na podrostka. Generator narysował postacie w różnej skali: od 105 do 128 px wysokości. `tools/normalize-portraits.py` skaluje teraz każdą postać bez wygładzania do 118 px, stawia ją stopami na tej samej linii i ustawia na środku. Popiersia w walce i na kartach klas pokazują dzięki temu głowy podobnej wielkości. Skalowanie bez wygładzania zostawia ostre piksele. Próbka z wygładzaniem i powrotem do kolorów obrazka rozmywała twarze.
+
+## Przewijanie odpoczynku nad wyprawą (25.10.2026)
+
+Autor: przycisk „Przewiń” stał na ekranie wyprawy tuż nad „Wyrusz”, choć przewija odpoczynek, a nie wyprawę, i to myliło. Stoi teraz na górze ekranu, w pasku „Odpoczynek: pełne HP za … min”, nad kartą miejsca, i znika, gdy HP jest pełne.

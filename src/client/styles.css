@@ -2421,6 +2421,35 @@ a.segmented-option {
   font-size: 14px;
 }
 
+/* "Przewiń" for resting, above the exploration it is not part of. */
+.rest-skip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+
+.rest-skip[hidden] {
+  display: none;
+}
+
+.rest-skip-text {
+  margin: 0;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.rest-skip .button--time {
+  width: auto;
+  flex: none;
+}
+
 .threat {
   margin: 0;
   font-family: var(--font-system);
