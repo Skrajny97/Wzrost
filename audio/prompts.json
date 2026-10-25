@@ -140,25 +140,6 @@
           ]
         ]
       },
-      "lead-campfire-calm": {
-        "line": "lead-campfire",
-        "say": [
-          [
-            "Teraz zajmijmy",
-            "[calmly] Teraz zajmijmy"
-          ]
-        ]
-      },
-      "lead-campfire-female-calm": {
-        "line": "lead-campfire",
-        "variant": "female",
-        "say": [
-          [
-            "Teraz zajmijmy",
-            "[calmly] Teraz zajmijmy"
-          ]
-        ]
-      },
       "report-hard": {
         "line": "report",
         "say": [

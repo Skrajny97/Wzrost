@@ -266,15 +266,8 @@
       "id": "lead-campfire",
       "kind": "lead",
       "text": [
-        "Teraz zajmijmy się jednak Twoim powrotem do zdrowia, byś mógł szybciej wyruszyć na kolejną wyprawę. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko."
-      ],
-      "voice": "audio/narration/lead-campfire.mp3",
-      "female": {
-        "text": [
-          "Teraz zajmijmy się jednak Twoim powrotem do zdrowia, byś mogła szybciej wyruszyć na kolejną wyprawę. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko."
-        ],
-        "voice": "audio/narration/lead-campfire-female.mp3"
-      }
+        "Teraz zadbajmy o odpoczynek po kolejnych wyprawach. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko."
+      ]
     },
     {
       "id": "tap-build",
@@ -305,6 +298,13 @@
         ],
         "voice": "audio/narration/settings-female.mp3"
       }
+    },
+    {
+      "id": "quests",
+      "kind": "point",
+      "text": [
+        "Codziennie będę Ci zlecał zadania, w taki sposób utrzymamy naszą, mam nadzieję, owocną relację. Będę na Ciebie czekał tutaj."
+      ]
     },
     {
       "id": "ending",

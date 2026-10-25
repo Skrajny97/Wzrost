@@ -48,7 +48,8 @@ const campDone = (hash, read) => read.has('camp') && (campStarted() || !affordab
 // light. A line shows when it is the first in the order that is due. `free`
 // leaves the lit places to the player until the moment passes, `above` puts
 // the narrator above the first of them, and `delay` lets the screen be seen
-// first.
+// first. A `late` line is told also after the ending, once, to a character
+// that finished the introduction before the line was written.
 const BEATS = {
   intro: { when: () => true },
   purpose: { when: () => true },
@@ -100,6 +101,7 @@ const BEATS = {
   },
   'camp-countdown': { place: mark('build-countdown'), when: (hash) => hash.startsWith('#/oboz') && campStarted() },
   settings: { place: '.topbar .icon-button[aria-label="Ustawienia"]', when: campDone },
+  quests: { place: mark('quests'), late: true, when: campDone },
   ending: { when: campDone },
 };
 
@@ -115,7 +117,7 @@ const rolls = new WeakMap(); // parchment → its running animation
 export function narrate(hash = place) {
   place = hash;
   const read = state.character?.tutorial;
-  if (!read || read.includes('ending') || !state.content?.tutorial) {
+  if (!read || !state.content?.tutorial) {
     stopLight();
     aim([]);
     return;
@@ -153,10 +155,14 @@ export function narrate(hash = place) {
 }
 
 // The first line in the order that is due: a lead or a tap whenever its
-// moment holds, a card or a pointer only until it is read.
+// moment holds, a card or a pointer only until it is read. After the ending
+// only a late line is left.
 function nextLine() {
   const read = new Set(state.character.tutorial);
-  return state.content.tutorial.lines.find((line) => (!kept(line) || !read.has(line.id)) && BEATS[line.id]?.when(place, read));
+  const over = read.has('ending');
+  return state.content.tutorial.lines.find(
+    (line) => (!kept(line) || !read.has(line.id)) && (!over || BEATS[line.id]?.late) && BEATS[line.id]?.when(place, read),
+  );
 }
 
 // A line is read as soon as it is passed: the page counts it at once, and
@@ -417,7 +423,8 @@ function startLight(line) {
   const shade = h('div', { class: 'guide-shade', onClick: nudge });
   const rings = h('div', { class: 'guide-rings', 'aria-hidden': 'true' });
   const note = line.kind === 'tap' ? bubbleNote(line) : scrollNote(line);
-  const skip = h('button', { type: 'button', class: 'guide-skip', text: tutorial.skipLabel, onClick: skipAll });
+  // A late line after the ending has no introduction left to skip.
+  const skip = !state.character.tutorial.includes('ending') && h('button', { type: 'button', class: 'guide-skip', text: tutorial.skipLabel, onClick: skipAll });
   const root = h('div', { class: 'guide' }, shade, rings, note.element, skip);
   document.body.append(root);
   light = { line, root, note, frame: 0, closing: false };
