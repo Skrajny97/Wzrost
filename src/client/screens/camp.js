@@ -21,13 +21,17 @@ const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
 
 export function mountCamp(container, { params, backHash = '#/walka' }) {
   const id = params.building;
-  // An unknown building in the address leads back to the board.
-  if (id && !state.character.camp.buildings.some((building) => building.id === id)) {
+  // An unknown building in the address leads back to the board. The camp's
+  // own level has a screen like a building's.
+  if (id && id !== campOf().id && !state.character.camp.buildings.some((building) => building.id === id)) {
     location.replace(CAMP);
     return {};
   }
   return id ? mountBuilding(container, id) : mountBoard(container, backHash);
 }
+
+// The camp's own level, which grows like a building but stands on no plot.
+const campOf = () => state.character.camp.level;
 
 // The upgrade in progress, if its time has not passed yet.
 function runningBuild(now = serverNow()) {
@@ -43,14 +47,14 @@ async function collectStore(building) {
   toast(`Zebrano: ${resourceName(collected.resource).toLowerCase()} +${formatNumber(collected.amount)}.`);
 }
 
-function heading(title, subtitle, back) {
+function heading(title, subtitle, back, badge = null) {
   return h(
     'div',
     { class: 'page-heading page-heading--back' },
     h(
       'div',
       { class: 'page-heading-text' },
-      h('h1', { class: 'page-title', tabindex: '-1', text: title }),
+      h('div', { class: 'page-title-row' }, h('h1', { class: 'page-title', tabindex: '-1', text: title }), badge),
       h('p', { class: 'page-subtitle', text: subtitle }),
     ),
     back,
@@ -125,6 +129,7 @@ function mountBoard(container, backHash) {
         'Obóz',
         'Polana na skraju puszczy',
         h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
+        h('span', { class: 'camp-level-badge', text: `Poziom ${campOf().level}` }),
       ),
       testTools(running),
       guided(materials(), 'camp-stock'),
@@ -133,6 +138,7 @@ function mountBoard(container, backHash) {
         { class: 'camp-board', role: 'group', 'aria-label': 'Plansza obozu' },
         boardArt(),
         character.camp.buildings.map((building) => plot(building, running)),
+        campLevelButton(running),
       ),
       nothingBuilt &&
         h('p', { class: 'system-hint camp-hint', text: 'Dotknij pustego placu, żeby zobaczyć koszt budowy. Zasoby znajdziesz na eksploracjach.' }),
@@ -156,6 +162,23 @@ function mountBoard(container, backHash) {
           h('strong', { text: formatNumber(entry.amount) }),
         ),
       ),
+    );
+  }
+
+  // "Rozwiń poziom obozu" in the board's top left corner leads to the
+  // camp's own screen, with the time left while the camp grows.
+  function campLevelButton(running) {
+    const hash = `${CAMP}/${campOf().id}`;
+    return h(
+      'a',
+      {
+        class: 'button button--system camp-level-button',
+        href: hash,
+        'data-guide': 'camp-level',
+        onClick: (event) => openView(event, hash, HISTORY_KEY),
+      },
+      'Rozwiń poziom obozu',
+      running?.buildingId === campOf().id && timer(running),
     );
   }
 
@@ -248,7 +271,8 @@ function mountBuilding(container, id) {
   let shownBuild = null;
 
   function render() {
-    const building = state.character.camp.buildings.find((candidate) => candidate.id === id);
+    const own = id === campOf().id;
+    const building = own ? campOf() : state.character.camp.buildings.find((candidate) => candidate.id === id);
     const running = runningBuild();
     shownBuild = running?.endsAt ?? null;
     ticks = [];
@@ -269,7 +293,7 @@ function mountBuilding(container, id) {
       h(
         'article',
         { class: 'card building-view', 'aria-label': building.name },
-        h('div', { class: 'building-art' }, plotArt(id, { level: building.level, building: underway })),
+        !own && h('div', { class: 'building-art' }, plotArt(id, { level: building.level, building: underway })),
         h('p', { class: 'region-description', text: building.description }),
         building.effect && h('p', { class: 'building-effect' }, h('strong', { text: 'Teraz: ' }), building.effect),
         building.production && storeView(building),
@@ -332,7 +356,8 @@ function mountBuilding(container, id) {
 
   function nextLevel(building, running) {
     const next = building.next;
-    if (!next) return h('p', { class: 'muted', text: 'Najwyższy poziom.' });
+    const own = building.id === campOf().id;
+    if (!next) return h('p', { class: 'muted', text: building.evolution ?? 'Najwyższy poziom.' });
     const have = Object.fromEntries(walletEntries().map((entry) => [entry.id, entry.amount]));
     const missing = Object.entries(next.cost).some(([resource, amount]) => (have[resource] ?? 0) < amount);
     const label = running
@@ -340,10 +365,14 @@ function mountBuilding(container, id) {
         ? 'Trwa budowa'
         : `Trwa budowa: ${running.name}`
       : missing
-        ? 'Brakuje złota albo zasobów'
-        : building.level === 0
-          ? 'Zbuduj'
-          : `Ulepsz do poziomu ${next.level}`;
+        ? own
+          ? 'Brakuje złota'
+          : 'Brakuje złota albo zasobów'
+        : own
+          ? `Rozwiń obóz do poziomu ${next.level}`
+          : building.level === 0
+            ? 'Zbuduj'
+            : `Ulepsz do poziomu ${next.level}`;
     return h(
       'section',
       { class: 'card building-next-card', 'aria-labelledby': 'building-next' },
@@ -362,7 +391,7 @@ function mountBuilding(container, id) {
           ),
         ),
       ),
-      h('p', { class: 'building-time' }, icon('hourglass', { size: 16 }), `Czas budowy: ${formatMinutes(next.minutes)}`),
+      h('p', { class: 'building-time' }, icon('hourglass', { size: 16 }), `${own ? 'Czas rozwoju' : 'Czas budowy'}: ${formatMinutes(next.minutes)}`),
       h('button', {
         type: 'button',
         class: 'button button--system',
@@ -378,7 +407,9 @@ function mountBuilding(container, id) {
       missing &&
         h('p', {
           class: 'system-hint',
-          text: 'Złoto i zasoby zdobędziesz na eksploracjach. Tartak, Kamieniołom i Kopalnia wytwarzają zasoby w obozie.',
+          text: own
+            ? 'Złoto zdobędziesz na eksploracjach.'
+            : 'Złoto i zasoby zdobędziesz na eksploracjach. Tartak, Kamieniołom i Kopalnia wytwarzają zasoby w obozie.',
         }),
     );
   }

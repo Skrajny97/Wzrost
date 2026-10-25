@@ -233,17 +233,20 @@ export function countedForm(count, [one, few, many]) {
   return last >= 2 && last <= 4 && (tens < 12 || tens > 14) ? few : many;
 }
 
-// A quest's text: its kind's, with the count and the noun to go with it.
-export function questText(quest, content) {
+// A quest's text: its kind's, with the count and the noun to go with it. A
+// creature the character has not met yet is "???", as on the list of
+// dangers: `met` holds the ids of those met.
+export function questText(quest, content, met = null) {
   const kind = content.quests.kinds.find((candidate) => candidate.id === quest.kind);
+  const unknown = quest.kind === 'kill' && met && !met.includes(quest.target);
   const forms = quest.kind === 'kill' ? content.monstersById[quest.target].counted : kind.counted;
-  return kind.text.replace('{count}', String(quest.count)).replace('{noun}', countedForm(quest.count, forms));
+  return kind.text.replace('{count}', String(quest.count)).replace('{noun}', unknown ? '???' : countedForm(quest.count, forms));
 }
 
 // The quests as the page shows them: each period with its name, its end,
 // its quests (`index`: the place to claim it by) and its chest. A quest of a
 // kind or a creature no longer in the data is left out.
-export function questsView(quests, now, content) {
+export function questsView(quests, now, content, met = null) {
   const known = (quest) =>
     content.quests.kinds.some((kind) => kind.id === quest.kind) && (quest.kind !== 'kill' || Boolean(content.monstersById[quest.target]));
   return Object.fromEntries(
@@ -262,7 +265,7 @@ export function questsView(quests, now, content) {
                     index,
                     kind: quest.kind,
                     ...(quest.target && { monsterId: quest.target }),
-                    text: questText(quest, content),
+                    text: questText(quest, content, met),
                     progress: quest.progress,
                     count: quest.count,
                     done: questDone(quest),

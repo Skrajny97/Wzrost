@@ -11,7 +11,7 @@ const CLIENT_DIR = new URL('../src/client/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
-  'resources', 'buildings', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests',
+  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'training', 'settlement', 'dungeons', 'core'];
@@ -232,6 +232,13 @@ function checkReferences(data) {
       errors.push(`buildings.json: ${building.id} potrzebuje bonusFromLevel (do maxLevel) i bonusPerLevel`);
     }
   }
+  // The camp's own levels: a time for each, each longer than the last.
+  const campMinutes = data.camp.minutes.levels;
+  if (campMinutes.length !== data.camp.maxLevel || campMinutes.some((minutes, i) => i > 0 && minutes <= campMinutes[i - 1])) {
+    errors.push(`camp.json: minutes.levels muszą mieć po jednym czasie na poziom (${data.camp.maxLevel}) i rosnąć`);
+  }
+  if (data.camp.startLevel >= data.camp.maxLevel) errors.push('camp.json: startLevel musi być niższy niż maxLevel');
+  if (data.buildings.some((building) => building.id === data.camp.id)) errors.push(`buildings.json: id "${data.camp.id}" należy do obozu`);
   for (const building of data.buildings) {
     const { effect } = building;
     // A list of build times has one for each level, each longer than the last.
@@ -401,5 +408,5 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     for (const error of errors) console.log(`::error::${error}`);
     process.exit(1);
   }
-  console.log(`Dane gry są poprawne (${DATA_FILES.length} plików).`);
+  console.log(`Dane gry są poprawne (plików: ${DATA_FILES.length}).`);
 }

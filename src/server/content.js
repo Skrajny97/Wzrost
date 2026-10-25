@@ -17,6 +17,7 @@ import texts from '../../data/texts.json' with { type: 'json' };
 import unlocks from '../../data/unlocks.json' with { type: 'json' };
 import resources from '../../data/resources.json' with { type: 'json' };
 import buildings from '../../data/buildings.json' with { type: 'json' };
+import camp from '../../data/camp.json' with { type: 'json' };
 import appearances from '../../data/appearances.json' with { type: 'json' };
 import music from '../../data/music.json' with { type: 'json' };
 import sounds from '../../data/sounds.json' with { type: 'json' };
@@ -40,6 +41,7 @@ export const content = buildContent({
   unlocks,
   resources,
   buildings,
+  camp,
   appearances,
   materials,
   quests,

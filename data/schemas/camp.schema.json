@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Poziom obozu",
+  "description": "Poziom samego obozu: od startLevel do maxLevel, za samo złoto, a każdy poziom ponad pierwszy przyspiesza budowy budynków.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "description", "startLevel", "maxLevel", "effect", "costs", "minutes", "evolution"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "id": { "const": "camp" },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "startLevel": { "type": "integer", "minimum": 1 },
+    "maxLevel": { "type": "integer", "minimum": 2 },
+    "effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "perLevel", "unit", "text", "startText"],
+      "properties": {
+        "kind": { "const": "buildSpeed" },
+        "perLevel": { "type": "number", "exclusiveMinimum": 0 },
+        "unit": { "const": "percent" },
+        "text": { "type": "string", "pattern": "\\{value\\}", "description": "Skutek od drugiego poziomu; {value}: o ile szybsze są budowy." },
+        "startText": { "type": "string", "minLength": 1, "description": "Skutek na poziomie startowym, bez przyspieszenia." }
+      }
+    },
+    "costs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "description": "Samo złoto: inne zasoby nie są potrzebne.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["resource", "base", "growth", "fromLevel"],
+        "properties": {
+          "resource": { "const": "gold" },
+          "base": { "type": "number", "exclusiveMinimum": 0 },
+          "growth": { "type": "number", "minimum": 1 },
+          "fromLevel": { "type": "integer", "minimum": 2 }
+        }
+      }
+    },
+    "minutes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["levels"],
+      "properties": {
+        "levels": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "number", "minimum": 1 },
+          "description": "Minuty rozwoju do poziomu 1, 2, … aż do maxLevel; poziom startowy obóz ma od razu."
+        }
+      }
+    },
+    "evolution": { "type": "string", "minLength": 1, "description": "Zapowiedź ewolucji po najwyższym poziomie." }
+  }
+}

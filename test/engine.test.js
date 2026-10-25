@@ -24,6 +24,10 @@ import {
   upgradeChance,
   upgradeCost,
   upgradeMinutes,
+  buildMinutes,
+  buildSpeed,
+  campEffectText,
+  campLevel,
   upgradeView,
   upgradedItem,
   rollUpgrade,
@@ -786,6 +790,20 @@ describe('camp', () => {
     assert.deepEqual(tableMinutes.slice(0, 3), [1, 10, 30]);
     assert.equal(tableMinutes.at(-1), 24 * 60);
     for (let i = 1; i < tableMinutes.length; i++) assert.ok(tableMinutes[i] > tableMinutes[i - 1] && tableMinutes[i] >= minutes[i]);
+    // The camp's own level is on no plot, costs gold alone and grows slowly:
+    // 4 hours to level 2, from level 1, which the camp has from the start.
+    const { camp } = content;
+    assert.equal(campLevel({}, 0, content), 1);
+    assert.equal(campLevel({ camp: { level: 3, startedAt: 0, endsAt: 10 } }, 5, content), 2);
+    assert.deepEqual([upgradeCost(camp, 2), upgradeCost(camp, 3), upgradeCost(camp, 10)], [{ gold: 500 }, { gold: 1000 }, { gold: 128000 }]);
+    assert.equal(buildMinutes(camp, 2, 1, content), 240);
+    assert.equal(buildMinutes(camp, 3, 2, content), 480);
+    assert.ok(!content.buildings.some((building) => building.id === camp.id));
+    // Each camp level above the first makes the buildings build 10% faster.
+    assert.deepEqual([1, 2, 10].map((level) => buildSpeed(level, content)), [0, 0.1, 0.9]);
+    assert.equal(buildMinutes(campfire, 10, 1, content), minutes.at(-1));
+    assert.equal(buildMinutes(campfire, 10, 10, content), Math.round(minutes.at(-1) / 1.9));
+    assert.deepEqual([campEffectText(1, content), campEffectText(4, content)], ['Budowy w zwykłym tempie', 'Budowy szybsze o 30%']);
     for (const building of content.buildings) {
       // Every level needs more than gold: the resources come from explorations.
       assert.ok(Object.keys(upgradeCost(building, 1)).length >= 2, building.id);
@@ -1446,6 +1464,10 @@ describe('quests from the narrator', () => {
     assert.equal(text({ kind: 'process', count: 2 }), 'Przerób na Stole rzemieślniczym 2 materiały.');
     assert.equal(text({ kind: 'salvage', count: 1 }), 'Rozbierz na Stole rzemieślniczym 1 przedmiot.');
     for (const monster of Object.values(content.monstersById)) assert.equal(monster.counted.length, 3, monster.id);
+    // A creature the character has not met yet keeps its secret, as on the list of dangers.
+    assert.equal(questText({ kind: 'kill', target: 'viper', count: 1, progress: 0 }, content, ['wolf']), 'Pokonaj 1 ???.');
+    assert.equal(questText({ kind: 'kill', target: 'wolf', count: 3, progress: 0 }, content, ['wolf']), 'Pokonaj 3 wilki.');
+    assert.equal(questText({ kind: 'explore', count: 45, progress: 0 }, content, []), 'Spędź na wyprawach łącznie 45 minut.');
   });
 
   test('the page gets each period with its end, its quests and its chest', () => {

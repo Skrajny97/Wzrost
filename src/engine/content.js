@@ -54,7 +54,10 @@ export function buildContent(raw) {
     resources: raw.resources,
     resourcesById: byId(raw.resources),
     buildings: raw.buildings,
-    buildingsById: byId(raw.buildings),
+    // The camp's own level (camp.json) builds like a building, so it is found
+    // by its id too, but it has no plot on the board.
+    camp: raw.camp,
+    buildingsById: byId([...raw.buildings, ...(raw.camp ? [raw.camp] : [])]),
     // What creatures leave (one material each) and the parts the Stół
     // rzemieślniczy makes from materials and from taken-apart items, one per rarity.
     materials: raw.materials.materials,

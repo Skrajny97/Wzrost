@@ -3,7 +3,7 @@
 // so the static file server needs no routes. All visible texts are in Polish.
 
 import { ApiError, request } from './api.js';
-import { $, $$, clear, h } from './dom.js';
+import { $, $$, clear, h, icon } from './dom.js';
 import { countOf } from './format.js';
 import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
@@ -20,6 +20,7 @@ import { mountStats } from './screens/stats.js';
 import { musicVolume, setMusicConfig, setMusicPlace, setMusicVolume, startMusic } from './music.js';
 import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
+import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
 import { narrate } from './narrator.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, handleSessionLost, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
@@ -319,6 +320,30 @@ function volumeRow(id, label, value, change, preview) {
   return h('div', { class: 'status-row status-row--volume' }, h('dt', {}, h('label', { for: id, text: label })), h('dd', {}, slider, output));
 }
 
+// The size of the game on the screen (zoom.js): "−" takes it farther, "+"
+// closer, 5% at a time.
+function zoomRow() {
+  const output = h('output', { class: 'zoom-value', 'aria-live': 'polite' });
+  const step = (direction) => {
+    stepZoom(direction);
+    show();
+  };
+  const farther = h('button', { type: 'button', class: 'zoom-button', 'aria-label': 'Oddal widok', onClick: () => step(-1) }, icon('minus', { size: 20 }));
+  const closer = h('button', { type: 'button', class: 'zoom-button', 'aria-label': 'Przybliż widok', onClick: () => step(1) }, icon('plus', { size: 20 }));
+  const show = () => {
+    output.textContent = `${zoomLevel()}%`;
+    farther.disabled = zoomLevel() <= ZOOM_MIN;
+    closer.disabled = zoomLevel() >= ZOOM_MAX;
+  };
+  show();
+  return h(
+    'div',
+    { class: 'status-row status-row--zoom' },
+    h('dt', { id: 'zoom-label', text: 'Widok' }),
+    h('dd', {}, h('div', { class: 'zoom-control', role: 'group', 'aria-labelledby': 'zoom-label' }, farther, output, closer)),
+  );
+}
+
 // The look of the character: a free change of its portrait and voice.
 function lookRow() {
   const buttons = state.content.appearances.map((appearance) =>
@@ -412,6 +437,7 @@ function openSettings() {
       volumeRow('effects-volume', 'Efekty dźwiękowe', effectsVolume(), setEffectsVolume, () => playSound('system')),
       h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: 'Głos narratora' }), h('dd', {}, voiceSwitch('voice-label'))),
       h('div', { class: 'status-row' }, h('dt', { id: 'motion-label', text: 'Animacje' }), h('dd', {}, motionSwitch('motion-label'))),
+      zoomOffered() && zoomRow(),
       testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
     ),
@@ -477,6 +503,7 @@ async function startOver() {
     current?.screen.unmount?.();
     current = null;
     state.character = null;
+    narrate();
     history.replaceState(null, '', HOME);
     await enterGame();
   } catch (error) {
@@ -492,6 +519,8 @@ function leaveGame() {
   state.user = null;
   state.character = null;
   state.freshReport = null;
+  // The narrator leaves with the character, and gives the screen back.
+  narrate();
   enterAuth();
 }
 
@@ -615,6 +644,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
 }
 
+applyZoom();
 applyMotion();
 initSheet();
 start();

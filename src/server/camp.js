@@ -3,7 +3,7 @@
 // upgraded at a time and the upgrade counts once its time has passed.
 // Production buildings fill a store that the player collects.
 
-import { buildingLevel, collect, construction, missingFor, upgradeCost, upgradeMinutes } from '../engine/index.js';
+import { buildMinutes, buildingLevel, campLevel, collect, construction, missingFor, upgradeCost } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, currentHp, loadPlayer, requirePlayer, walletOf } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
@@ -19,24 +19,29 @@ export async function startBuilding(context) {
 }
 
 // The next level of a building, from now on, paid at once. The skipped
-// introduction builds the Ognisko this way too (tutorial.js).
+// introduction builds the Ognisko this way too (tutorial.js). The camp's own
+// level (buildingId "camp") grows the same way, from its first level, which
+// it has without building.
 export async function beginBuilding(db, player, buildingId, now) {
   const building = typeof buildingId === 'string' ? content.buildingsById[buildingId] : undefined;
   if (!building) throw new ApiError(400, 'invalid_building', 'Nie ma takiego budynku.');
   if (construction(player.buildings, now)) throw new ApiError(409, 'camp_busy', 'W obozie trwa już budowa.');
-  const level = buildingLevel(player.buildings[building.id], now);
-  if (level >= building.maxLevel) throw new ApiError(409, 'max_level', 'Ten budynek ma już najwyższy poziom.');
+  const built = buildingLevel(player.buildings[building.id], now);
+  const level = Math.max(building.startLevel ?? 0, built);
+  if (level >= building.maxLevel) {
+    throw new ApiError(409, 'max_level', building.id === content.camp.id ? 'Obóz ma już najwyższy poziom.' : 'Ten budynek ma już najwyższy poziom.');
+  }
   const target = level + 1;
   const cost = upgradeCost(building, target);
   if (missingFor(cost, walletOf(player.row)).length > 0) {
-    throw new ApiError(409, 'not_enough', 'Brakuje złota albo zasobów na tę budowę.');
+    throw new ApiError(409, 'not_enough', building.id === content.camp.id ? 'Brakuje złota na rozwój obozu.' : 'Brakuje złota albo zasobów na tę budowę.');
   }
 
   const row = player.row;
   const stored = player.buildings[building.id];
   const gold = cost.gold ?? 0;
   const resources = Object.keys(cost).filter((id) => id !== 'gold');
-  const endsAt = now + upgradeMinutes(building, target) * 60000;
+  const endsAt = now + buildMinutes(building, target, campLevel(player.buildings, now, content), content) * 60000;
   // A production building stops during the upgrade: what its store holds goes
   // to the resources now, and it fills again from the end of the upgrade.
   const producing = building.effect.kind === 'production';
@@ -61,7 +66,7 @@ export async function beginBuilding(db, player, buildingId, now) {
     .bind(
       row.id, building.id, target, now, endsAt, producing ? endsAt : null,
       row.id, now,
-      row.id, building.id, level,
+      row.id, building.id, built,
       row.id, building.id, stored ? stored.collectedAt ?? stored.endsAt : 0,
       row.id, gold,
       ...resources.flatMap((id) => [row.id, path(id), cost[id]]),

@@ -11,7 +11,8 @@
 // waits under a shade. Cards and pointers are read once and the server keeps
 // them (src/server/tutorial.js), so a reload or another device goes on from
 // there; a lead or a tap is done when the game has moved on. "Pomiń
-// wprowadzenie" ends the whole introduction.
+// wprowadzenie" ends the whole introduction. Meanwhile the screen is the
+// narrator's: it neither scrolls nor takes a tap, also between the lines.
 
 import { narratorSprite } from './art.js';
 import { aim } from './camera.js';
@@ -50,9 +51,13 @@ const campDone = (hash, read) => read.has('camp') && (campStarted() || !affordab
 // leaves the lit places to the player until the moment passes, `above` puts
 // the narrator above the first of them, `whole` lights them all in one ring,
 // which the camera takes in whole even if it has to draw back, `unfold`
-// opens what folds there first, and `delay` lets the screen be seen first. A `late` line is told also after the ending, once, to a character
-// that finished the introduction before the line was written.
+// opens what folds there first, and `delay` lets the screen be seen first.
+// `survey` has the camera take in the whole of a place for a moment before
+// the light, with nothing lit: the camp's board before its plots. A `late`
+// line is told also after the ending, once, to a character that finished
+// the introduction before the line was written.
 const BEATS = {
+  ask: { when: (hash, read) => read.size === 0 },
   intro: { when: () => true },
   purpose: { when: () => true },
   test: { when: () => true },
@@ -90,7 +95,7 @@ const BEATS = {
     when: (hash, read) => read.has('character') && !read.has('camp') && !freePoints() && !hash.startsWith('#/oboz'),
   },
   camp: { place: mark('camp-stock'), delay: 3000, when: onBoard },
-  'camp-sawmill': { place: mark('plot-sawmill'), when: (hash) => onBoard(hash) && !campStarted() },
+  'camp-sawmill': { place: mark('plot-sawmill'), survey: '.camp-board', when: (hash) => onBoard(hash) && !campStarted() },
   'camp-quarry': { place: `${mark('plot-quarry')}, ${mark('plot-mine')}`, when: (hash) => onBoard(hash) && !campStarted() },
   'camp-anvil': { place: mark('plot-anvil'), when: (hash) => onBoard(hash) && !campStarted() },
   'lead-campfire': {
@@ -113,20 +118,111 @@ let light = null; // { line, root, note, frame, tapped, closing } while a place 
 let waiting = null; // the timer looking for the place of the next line
 let pause = null; // { id, at, timer } of a line waiting for its delay
 let lastSpot = null; // { hash, line, at }: the last pointer, whose places the next light comes from
+let surveying = null; // the line whose light waits while the camera takes in the whole of a place
+const surveyed = new Set(); // the lines whose survey was seen on this page
+let missed = null; // { id, hash }: a lead or a tap whose place this screen lacked
+
+// While the introduction lasts the screen is the narrator's, also in the
+// short pauses between the lines: it neither scrolls nor takes a tap, as if
+// touch were off. Taps reach only the narrator, the places a lead or a tap
+// asks for and a dialog the game opens meanwhile; a free light leaves its
+// places and the scrolling to the player. A moment after the narrator has
+// nothing more to show (a place this screen lacks, say) the player has the
+// screen back, so the game never stops dead.
+const HOLD = 2500;
+const SURVEY = 1800;
+const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End', ' ']);
+const blocker = h('div', { class: 'narrator-hold', hidden: true, 'aria-hidden': 'true', onClick: () => light?.nudge() });
+let held = false;
+let letGo = null; // the timer that gives the screen back
+
+const freeLight = () => Boolean(light && BEATS[light.line.id].free);
+// What may take a tap while the screen is held: the narrator, a dialog and
+// the lit places of a lead or a tap.
+const reachable = (target) =>
+  Boolean(target.closest?.('.guide, dialog[open]')) ||
+  Boolean(light && light.line.kind !== 'point' && places(light.line).some((element) => element.contains(target)));
+
+function hold() {
+  clearTimeout(letGo);
+  letGo = null;
+  if (!held) {
+    held = true;
+    document.addEventListener('touchmove', still, { capture: true, passive: false });
+    document.addEventListener('wheel', still, { capture: true, passive: false });
+  }
+  if (!blocker.isConnected) document.body.append(blocker);
+  blocker.hidden = freeLight();
+}
+
+// The screen back to the player, at once or after a moment unless the
+// narrator shows something meanwhile.
+function release(after = HOLD) {
+  clearTimeout(letGo);
+  letGo = null;
+  if (!held) return;
+  if (after > 0) {
+    letGo = setTimeout(() => release(0), after);
+    return;
+  }
+  held = false;
+  blocker.hidden = true;
+  blocker.style.clipPath = '';
+  document.removeEventListener('touchmove', still, { capture: true });
+  document.removeEventListener('wheel', still, { capture: true });
+}
+
+// The page keeps still. A dialog of the game scrolls on its own, and so does
+// a parchment too long for its words (styles.css keeps the page out of it).
+function still(event) {
+  if (freeLight() || event.target.closest?.('dialog[open]:not(.narrator)')) return;
+  const page = event.target.closest?.('.narrator-page, .guide-page');
+  if (page && page.scrollHeight > page.clientHeight) return;
+  if (event.cancelable) event.preventDefault();
+}
+
+// A tap from the keyboard, or one that slips past the layer, reaches only
+// what is open; the narrator's own clicks (a lead's "Dalej") always do.
+document.addEventListener(
+  'click',
+  (event) => {
+    if (!held || !event.isTrusted || freeLight() || event.target === blocker || reachable(event.target)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  },
+  true,
+);
+document.addEventListener(
+  'keydown',
+  (event) => {
+    if (!held || freeLight() || reachable(event.target) || (event.key !== 'Tab' && event.key !== 'Enter' && !SCROLL_KEYS.has(event.key))) return;
+    event.preventDefault();
+  },
+  true,
+);
+document.addEventListener(
+  'contextmenu',
+  (event) => {
+    if (held && !freeLight()) event.preventDefault();
+  },
+  true,
+);
 
 // Called after every screen is drawn and every change of the character.
 export function narrate(hash = place) {
   place = hash;
   const read = state.character?.tutorial;
   if (!read || !state.content?.tutorial) {
+    closeCard();
     stopLight();
     aim([]);
+    release(0);
     return;
   }
   // An open card goes on by itself, and so does a pointer rolling up after
-  // "Dalej": a change of the character meanwhile (its read line saved, say)
-  // must not start the next line under it.
-  if (scroll || light?.closing) return;
+  // "Dalej" and a survey: a change of the character meanwhile (its read line
+  // saved, say) must not start the next line under it.
+  if (scroll || light?.closing || surveying) return;
   const line = nextLine();
   if (pause && pause.id !== line?.id) {
     clearTimeout(pause.timer);
@@ -135,6 +231,7 @@ export function narrate(hash = place) {
   if (!line) {
     stopLight();
     aim([]);
+    release(read.includes('ending') ? 0 : HOLD);
     return;
   }
   // A line with a delay waits on its screen for a moment first.
@@ -143,6 +240,7 @@ export function narrate(hash = place) {
     if (!pause) {
       stopLight();
       aim([]);
+      hold();
       pause = { id: line.id, at: Date.now() + delay, timer: setTimeout(() => narrate(), delay) };
       return;
     }
@@ -177,6 +275,7 @@ function skipAll() {
   closeCard();
   stopLight();
   aim([]);
+  release(0);
   state.character.tutorial = state.content.tutorial.lines.filter(kept).map((line) => line.id);
   // The server plays the first steps meanwhile (an exploration, its report
   // and the Ognisko), and the screen draws the character it sends back.
@@ -220,6 +319,7 @@ function openCard(line) {
   const show = h('button', { type: 'button', class: 'button narrator-show', onClick: showCard }, icon('eye', { size: 18 }), state.content.tutorial.showLabel);
   dialog.append(h('div', { class: 'narrator-art' }, narratorSprite()), h('div', { class: 'narrator-scroll' }, rod(), sheet, rod()), show);
   document.body.append(dialog);
+  hold();
   scroll = { dialog, sheet, line, busy: true, hidden: false };
   const { voice } = told(line);
   if (voice && narratorVoiceOn()) preloadNarration(voice);
@@ -243,13 +343,27 @@ function write(line) {
         h('button', { type: 'button', class: 'narrator-hide', onClick: hideCard }, icon('eye-off', { size: 16 }), tutorial.hideLabel),
       ),
       h('div', { class: 'narrator-text' }, words(line).map((text) => h('p', { text }))),
-      h(
-        'div',
-        { class: 'narrator-actions' },
-        line.id !== 'ending' && h('button', { type: 'button', class: 'narrator-skip', text: tutorial.skipLabel, onClick: skipAll }),
-        h('button', { type: 'button', class: 'button narrator-next', text: tutorial.nextLabel, onClick: next }),
-      ),
+      line.id === 'ask'
+        ? choice(tutorial)
+        : h(
+            'div',
+            { class: 'narrator-actions' },
+            line.id !== 'ending' && h('button', { type: 'button', class: 'narrator-skip', text: tutorial.skipLabel, onClick: skipAll }),
+            h('button', { type: 'button', class: 'button narrator-next', text: tutorial.nextLabel, onClick: next }),
+          ),
     ),
+  );
+}
+
+// The first card asks whether to go through the introduction at all:
+// "Wprowadź mnie", the recommended way, goes on like "Dalej".
+function choice(tutorial) {
+  return h(
+    'div',
+    { class: 'narrator-choice' },
+    h('button', { type: 'button', class: 'button narrator-next', text: tutorial.startLabel, onClick: next }),
+    h('span', { class: 'narrator-recommended', text: tutorial.recommendedLabel }),
+    h('button', { type: 'button', class: 'button narrator-pass', text: tutorial.skipLabel, onClick: skipAll }),
   );
 }
 
@@ -330,7 +444,7 @@ function inView(element) {
   const x = (rect.left + rect.right) / 2;
   const y = (rect.top + rect.bottom) / 2;
   if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) return false;
-  const top = document.elementsFromPoint(x, y).find((hit) => !hit.closest('.guide'));
+  const top = document.elementsFromPoint(x, y).find((hit) => !hit.closest('.guide') && hit !== blocker);
   return !top || element.contains(top) || top.contains(element);
 }
 
@@ -372,11 +486,15 @@ function boxOf(element) {
 function lightUp(line) {
   if (light?.line === line) return;
   stopLight();
+  // A place this screen lacked is looked for again without holding it.
+  if (missed?.id !== line.id || missed.hash !== place) hold();
   let tries = 0;
   const look = () => {
     waiting = null;
     if (places(line).length > 0) {
-      startLight(line);
+      missed = null;
+      if (BEATS[line.id].survey && !surveyed.has(line.id)) survey(line);
+      else startLight(line);
       return;
     }
     // The screen may still be drawing.
@@ -384,13 +502,32 @@ function lightUp(line) {
       waiting = setTimeout(look, 100);
       return;
     }
-    // A pointer at a place this screen does not have is passed over.
+    // A pointer at a place this screen does not have is passed over; for a
+    // lead or a tap the player has the screen back.
     if (line.kind === 'point') {
       markRead(line.id);
       narrate();
+      return;
     }
+    missed = { id: line.id, hash: place };
+    release(0);
   };
   look();
+}
+
+// The camera takes in the whole of a place for a moment, with nothing lit,
+// and then the line's light follows.
+async function survey(line) {
+  const whole = [...document.querySelectorAll(BEATS[line.id].survey)].filter((element) => element.getClientRects().length > 0);
+  surveying = line;
+  surveyed.add(line.id);
+  lastSpot = null;
+  hold();
+  await aim(whole, { travel: true, whole: true }).done;
+  await wait(SURVEY);
+  if (surveying !== line) return;
+  surveying = null;
+  narrate();
 }
 
 function startLight(line) {
@@ -403,7 +540,9 @@ function startLight(line) {
   const skip = !state.character.tutorial.includes('ending') && h('button', { type: 'button', class: 'guide-skip', text: tutorial.skipLabel, onClick: skipAll });
   const root = h('div', { class: 'guide' }, shade, rings, note.element, skip);
   document.body.append(root);
-  light = { line, root, note, frame: 0, closing: false };
+  light = { line, root, note, frame: 0, closing: false, nudge };
+  hold();
+  const corners = skip && skipCorners(skip);
   // The camera goes to the place, framing it with room for the narrator
   // (beside it on a bar, the camera goes home). On the same screen as the
   // pointer before, it travels from there and the light travels with it.
@@ -441,14 +580,14 @@ function startLight(line) {
   // shade, which only dims it; taps outside the places are held back here.
   if (beat.free) {
     shade.classList.add('guide-shade--see-through');
-    const hold = (event) => {
+    const holdBack = (event) => {
       if (event.target.closest('.guide') || places(line).some((element) => element.contains(event.target))) return;
       event.preventDefault();
       event.stopPropagation();
       nudge();
     };
-    document.addEventListener('click', hold, true);
-    light.hold = hold;
+    document.addEventListener('click', holdBack, true);
+    light.holdBack = holdBack;
   }
 
   const follow = () => {
@@ -492,6 +631,8 @@ function startLight(line) {
     const lit = gliding ? boxes.length : seen.length > 0 ? boxes.length : 0;
     const holes = boxes.slice(0, lit).map((box) => `M${box.left} ${box.top}H${box.right}V${box.bottom}H${box.left}Z`).join('');
     shade.style.clipPath = `path(evenodd, 'M0 0H${width}V${height}H0Z${holes}')`;
+    // The held screen lets taps through only to the places of a lead or a tap.
+    blocker.style.clipPath = line.kind === 'point' || beat.free ? '' : shade.style.clipPath;
     light.drawn = boxes.slice(0, lit);
     while (rings.children.length < lit) rings.append(h('div', { class: 'guide-ring' }));
     while (rings.children.length > lit) rings.lastChild.remove();
@@ -529,6 +670,7 @@ function startLight(line) {
       const middle = (anchor.left + anchor.right) / 2 - box.left;
       note.tail.style.setProperty('--tail-x', `${Math.min(box.width - 18, Math.max(18, middle))}px`);
     }
+    if (corners) keepClear(skip, corners, [...boxes.slice(0, lit), element.getBoundingClientRect()]);
     light.frame = requestAnimationFrame(follow);
   };
   follow();
@@ -629,7 +771,30 @@ function stopLight() {
   stopNarration();
   cancelAnimationFrame(light.frame);
   document.removeEventListener('click', light.tapped, true);
-  if (light.hold) document.removeEventListener('click', light.hold, true);
+  if (light.holdBack) document.removeEventListener('click', light.holdBack, true);
   light.root.remove();
   light = null;
+  blocker.style.clipPath = '';
+  blocker.hidden = !held;
+}
+
+// "Pomiń wprowadzenie" keeps to a corner clear of the lit places and the
+// narrator: the top left one, or else the bottom left, the top right or the
+// bottom right. The corners are measured once for each light.
+const CORNERS = ['', 'guide-skip--bottom', 'guide-skip--right', 'guide-skip--bottom guide-skip--right'];
+
+function skipCorners(skip) {
+  const corners = CORNERS.map((name) => {
+    skip.className = `guide-skip ${name}`.trim();
+    return { name: skip.className, box: skip.getBoundingClientRect() };
+  });
+  skip.className = corners[0].name;
+  return corners;
+}
+
+const overlap = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+
+function keepClear(skip, corners, taken) {
+  const corner = corners.find(({ box }) => !taken.some((other) => overlap(box, other))) ?? corners[0];
+  if (skip.className !== corner.name) skip.className = corner.name;
 }

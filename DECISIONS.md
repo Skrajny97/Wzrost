@@ -1156,3 +1156,33 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - 20 h na poziomie 10.
 
     Punkt zastępuje godzinę za poziom z punktu 2 „Produkcji w obozie”.
+
+## Poziom obozu, pytanie na start, ekran narratora i wielkość widoku (25.10.2026)
+
+1. **Poziom obozu.** Autor: poziom obozu stoi obok tytułu „Obóz”, a przycisk „Rozwiń poziom obozu” w lewym górnym rogu planszy. Rozwój przyspiesza budowanie budynków i jest bardzo drogi w złocie, bez innych zasobów. Z poziomu 1, od którego obóz startuje, na 2 trwa 4 godziny. Najwyższy poziom to 10, a po nim przyjdzie ewolucja w Wioskę, którą zostawiamy na później. Ustalone szczegóły są w `data/camp.json`:
+    - Obóz ma poziom 1 od razu, bez budowania.
+    - Rozwój kosztuje samo złoto: 500 za poziom 2, a każdy następny dwa razy więcej, aż do 128 000 za poziom 10. Razem to 255 500 złota. Przy ok. 25 złota na godzinę wypraw na poziomach 3–5 poziom 2 kosztuje ok. 20 godzin wypraw, a 128 000 to ok. 175 godzin wypraw postaci na poziomie 50 (ok. 725 złota na godzinę).
+    - Rozwój trwa 4, 8, 12, 18, 24, 36, 48, 60 i 72 godziny. Razem to 282 godziny, prawie 12 dni.
+    - Każdy poziom ponad pierwszy przyspiesza budowy pozostałych budynków o 10%: ich czas dzieli się przez 1 + 0,1 × (poziom obozu − 1). Na poziomie 10 budowy trwają 1,9 raza krócej. Sam obóz rośnie we własnym tempie.
+    - Rozwój obozu zajmuje jedyne miejsce budowy, jak każda budowa, a „Przewiń” Punktami Czasu działa tak samo.
+    - Przycisk otwiera ekran obozu (`#/oboz/camp`) z następnym poziomem, kosztem i czasem rozwoju. Gdy obóz rośnie, licznik wisi pod przyciskiem, a na wąskim widoku napis jest mniejszy, żeby nie zasłaniać Kowadła.
+    - Gdy brakuje złota, przycisk mówi „Brakuje złota”, bez „zasobów”.
+    - Na poziomie 10 ekran obozu mówi: „Na najwyższym poziomie obóz będzie mógł stać się Wioską. Wioska przyjdzie później.”
+2. **Pytanie przed wprowadzeniem.** Pierwszy pergamin pyta słowami autora: „Czy chcesz przejść Wprowadzenie? Pomoże ono zaznajomić Ci się z Systemem, ale jeśli z niego zrezygnujesz – nie stracisz żadnych uzyskanych w Samouczku zasobów.” Myślnik autora stał się półpauzą, jak w innych kwestiach narratora.
+    - „Wprowadź mnie” prowadzi dalej, a pod nim mniejszą czcionką stoi „zalecane”.
+    - „Pomiń wprowadzenie” kończy wprowadzenie z tym samym startem, co przejście go (zob. „Ten sam start po pominięciu i spokojniejsze pergaminy”).
+    - Pergamin nie ma jeszcze nagrania: autor zdecyduje, czy go nagrać.
+3. **„???” w zadaniach.** Autor: stwór, którego postać jeszcze nie spotkała, ma w zadaniu „???” zamiast nazwy, tak jak sylwetki w „Czyhających niebezpieczeństwach”. Nazwa pokazuje się po pierwszym spotkaniu.
+4. **Ekran należy do narratora.** Autor: w trakcie Samouczka gracz nie może przewijać ekranu ani nic robić, także w krótkich przerwach, jakby dotyk był wyłączony. Od pierwszego pergaminu do ostatniego nad grą leży przezroczysta warstwa (`narrator-hold` w `src/client/narrator.js`), a przewijanie palcem, kółkiem i klawiszami jest zablokowane.
+    - Stuknięcia trafiają tylko do przycisków narratora, do miejsca, które narrator każe stuknąć, i do okien, które gra otwiera po drodze, np. pytania przy „Przewiń”.
+    - Miejsca, które narrator tylko wskazuje, świecą się, ale już nie reagują. Wcześniej stuknięcie w nie przechodziło do gry.
+    - Przy „Rozdaj wolne punkty” ekran dalej się przewija, a działają przyciski punktów, jak dotąd.
+    - Gdy narrator przez 2,5 s nie ma nic do pokazania albo nie znajduje miejsca na ekranie, gracz odzyskuje ekran, żeby gra nigdy nie stanęła. Wraca on do narratora, gdy ten pokaże kolejną kwestię.
+    - Systemowy przycisk wstecz w Androidzie działa dalej.
+5. **Kamera pokazuje cały obóz.** Autor: przy pokazywaniu obozu kamera ma sama zjechać w dół przed kolejnym pergaminem, żeby widać było cały obóz. Po kwestii o zapasach, a przed pergaminem o Tartaku, kamera obejmuje całą planszę obozu. Stoi tak bez przyciemnienia przez 1,8 s, a potem jedzie do Tartaku (`survey` w narratorze). Przy wyłączonych animacjach zmienia widok od razu.
+6. **„Pomiń wprowadzenie” w wolnym rogu.** Autor: przycisk zasłaniał twarz narratora z zadaniami. Przy podświetleniu przycisk wybiera róg, w którym nie zasłania świecącego miejsca ani narratora: lewy górny, a jeśli tam zasłania, to lewy dolny, prawy górny albo prawy dolny.
+7. **Wielkość widoku.** Autor: plus i minus mają oddalać i przybliżać widok całej gry od 75 do 125%, o 5% na stuknięcie.
+    - W Ustawieniach jest wiersz „Widok”: „−”, wielkość w procentach i „+”. Przyciski stoją tam, a nie na każdym ekranie, żeby niczego nie zasłaniały. Jeśli autor chce je mieć zawsze pod ręką, dodamy je.
+    - Wybór pamięta przeglądarka (`insight.zoom`), więc działa w całej grze, także na ekranie logowania.
+    - Gra układa się wtedy dla szerszego albo węższego ekranu, a telefon ją skaluje (znacznik viewport w `src/client/zoom.js`). Dzięki temu okna, pasek i kamera narratora liczą wszystko jak zwykle.
+    - Przeglądarka na komputerze pomija ten znacznik i ma własne powiększanie (Ctrl i + albo −), więc wiersz jest tylko na ekranach dotykowych.

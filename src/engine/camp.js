@@ -40,6 +40,30 @@ export function upgradeMinutes(building, level) {
   return Math.max(1, Math.round(levels ? levels[level - 1] : base * growth ** (level - 1)));
 }
 
+// The camp's own level (data/camp.json): it starts at its first level
+// without building, and an upgrade counts once it ends.
+export function campLevel(stored, now, content) {
+  return Math.max(content.camp.startLevel, buildingLevel(stored[content.camp.id], now));
+}
+
+// How much faster the buildings build in a camp of `level`: nothing on the
+// first level.
+export const buildSpeed = (level, content) => content.camp.effect.perLevel * (level - content.camp.startLevel);
+
+// How long an upgrade to `level` takes in a camp of level `camp`: the camp
+// itself grows at its own pace, the buildings faster with each camp level.
+export function buildMinutes(building, level, camp, content) {
+  const minutes = upgradeMinutes(building, level);
+  if (building.id === content.camp.id) return minutes;
+  return Math.max(1, Math.round(minutes / (1 + buildSpeed(camp, content))));
+}
+
+// The camp level's effect as the page shows it.
+export function campEffectText(level, content) {
+  const { effect, startLevel } = content.camp;
+  return level <= startLevel ? effect.startText : effect.text.replace('{value}', `${Math.round(buildSpeed(level, content) * 100)}%`);
+}
+
 // What is missing to pay a cost from a wallet of gold and resources.
 export function missingFor(cost, wallet) {
   return Object.entries(cost)

@@ -1,7 +1,9 @@
 {
-  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest.",
+  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. Pierwsza karta (ask) pyta, czy przejść wprowadzenie: startLabel (z recommendedLabel pod spodem) idzie dalej, a skipLabel pomija całość. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest.",
   "skipLabel": "Pomiń wprowadzenie",
   "nextLabel": "Dalej",
+  "startLabel": "Wprowadź mnie",
+  "recommendedLabel": "zalecane",
   "hideLabel": "Ukryj",
   "showLabel": "Pokaż pergamin",
   "skippedText": "Wprowadzenie pominięte. Pierwsza wyprawa jest już za Tobą, a Ognisko zbudowane. Raport znajdziesz w Dzienniku.",
@@ -10,6 +12,13 @@
     "buildingId": "campfire"
   },
   "lines": [
+    {
+      "id": "ask",
+      "kind": "card",
+      "text": [
+        "Czy chcesz przejść Wprowadzenie? Pomoże ono zaznajomić Ci się z Systemem, ale jeśli z niego zrezygnujesz – nie stracisz żadnych uzyskanych w Samouczku zasobów."
+      ]
+    },
     {
       "id": "intro",
       "kind": "card",

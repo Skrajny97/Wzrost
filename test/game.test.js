@@ -687,6 +687,39 @@ describe('camp', () => {
     );
   });
 
+  test('the camp grows for gold alone, slowly, one level at a time up to 10, and then builds faster', async () => {
+    const start = (await character()).camp.level;
+    assert.deepEqual([start.id, start.name, start.level, start.maxLevel, start.effect], ['camp', 'Obóz', 1, 10, 'Budowy w zwykłym tempie']);
+    assert.deepEqual(start.next, { level: 2, effect: 'Budowy szybsze o 10%', minutes: 240, cost: { gold: 500 } });
+    assert.equal(start.evolution, null);
+    // Gold alone: wood or stone do not help.
+    await stock(499, { wood: 999, stone: 999, 'iron-ore': 999 });
+    assert.equal((await build('camp')).data.error.code, 'not_enough');
+    await stock(520, {});
+    const started = await build('camp');
+    assert.equal(started.status, 201);
+    const running = started.data.character.camp.construction;
+    assert.deepEqual([running.buildingId, running.name, running.level, running.endsAt - running.startedAt], ['camp', 'Obóz', 2, 4 * 3600000]);
+    assert.equal(started.data.character.gold, 20);
+    // It takes the one place for building, like a building does.
+    await stock(100, { wood: 20 });
+    assert.equal((await build('campfire')).data.error.code, 'camp_busy');
+    await finishBuilding();
+    const grown = await character();
+    assert.deepEqual([grown.camp.level.level, grown.camp.level.effect, grown.camp.level.next.cost], [2, 'Budowy szybsze o 10%', { gold: 1000 }]);
+    // The buildings build 10% faster: the crafting table's 10 minutes to level 2 take 9.
+    const table = (view) => view.camp.buildings.find((building) => building.id === 'craft-table');
+    await (await db()).prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'craft-table', 1, 0, 1 FROM characters").run();
+    assert.equal(table(await character()).next.minutes, 9);
+    // The highest level leaves only the village to come.
+    await (await db()).prepare("UPDATE buildings SET level = 10 WHERE building_id = 'camp'").run();
+    const top = (await character()).camp.level;
+    assert.deepEqual([top.level, top.next, top.effect], [10, null, 'Budowy szybsze o 90%']);
+    assert.match(top.evolution, /Wioską/);
+    await stock(10 ** 9, {});
+    assert.equal((await build('camp')).data.error.code, 'max_level');
+  });
+
   test('a building is paid in gold and resources, takes time, and one is built at a time', async () => {
     await stock(0, {});
     assert.equal((await build('campfire')).data.error.code, 'not_enough');
@@ -933,7 +966,9 @@ describe('Time Points and the narrator', () => {
     // Only the general parchments stand in the middle of the screen; the
     // others stand by the place they speak of.
     const cards = data.tutorial.lines.filter((line) => line.kind === 'card').map((line) => line.id);
-    assert.deepEqual(cards, ['intro', 'purpose', 'test', 'report', 'ending']);
+    assert.deepEqual(cards, ['ask', 'intro', 'purpose', 'test', 'report', 'ending']);
+    // The first card asks whether to go through the introduction.
+    assert.deepEqual([data.tutorial.startLabel, data.tutorial.recommendedLabel, data.tutorial.skipLabel], ['Wprowadź mnie', 'zalecane', 'Pomiń wprowadzenie']);
     assert.deepEqual([data.tutorial.hideLabel, data.tutorial.showLabel], ['Ukryj', 'Pokaż pergamin']);
     assert.equal(data.tutorial.startTimePoints, start);
     assert.equal(data.tutorial.$comment, undefined);

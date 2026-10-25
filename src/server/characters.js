@@ -37,7 +37,9 @@ import {
   statEffects,
   unlockedFeatures,
   upgradeCost,
-  upgradeMinutes,
+  buildMinutes,
+  campEffectText,
+  campLevel,
   xpToNext,
 } from '../engine/index.js';
 import { content } from './content.js';
@@ -196,11 +198,31 @@ export function currentHp(player, now) {
   return { hp: Math.min(hp, combatant.maxHp), maxHp: combatant.maxHp, vitality: totals.vitality, combatant, rest };
 }
 
-// The camp as the page shows it: each building with its level and, below
-// its highest level, what the next one gives, costs and takes.
+// The camp as the page shows it: its own level, and each building with its
+// level and, below its highest level, what the next one gives, costs and
+// takes in a camp of this level.
 function campView(player, levels, now) {
   const running = construction(player.buildings, now);
+  const { camp } = content;
+  const own = campLevel(player.buildings, now, content);
+  const following = own < camp.maxLevel ? own + 1 : null;
   return {
+    level: {
+      id: camp.id,
+      name: camp.name,
+      description: camp.description,
+      level: own,
+      maxLevel: camp.maxLevel,
+      effect: campEffectText(own, content),
+      // At the highest level only the evolution to come is left.
+      evolution: following ? null : camp.evolution,
+      next: following && {
+        level: following,
+        effect: campEffectText(following, content),
+        minutes: buildMinutes(camp, following, own, content),
+        cost: upgradeCost(camp, following),
+      },
+    },
     construction: running && {
       buildingId: running.buildingId,
       name: content.buildingsById[running.buildingId].name,
@@ -235,7 +257,7 @@ function campView(player, levels, now) {
         next: next && {
           level: next,
           effect: effectText(building, next, content),
-          minutes: upgradeMinutes(building, next),
+          minutes: buildMinutes(building, next, own, content),
           cost: upgradeCost(building, next),
         },
       };
@@ -413,7 +435,7 @@ export function characterView(player, now) {
     // lists of an inner region's dangers.
     met: JSON.parse(row.met ?? '[]'),
     // The narrator's daily and weekly quests (quests.js).
-    quests: questsView(questsNow(player, now), now, content),
+    quests: questsView(questsNow(player, now), now, content, JSON.parse(row.met ?? '[]')),
     // The narrator's cards seen so far, or null for a character made before
     // the introduction (tutorial.js).
     tutorial: row.tutorial === null ? null : JSON.parse(row.tutorial),
