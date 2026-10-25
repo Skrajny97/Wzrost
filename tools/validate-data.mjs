@@ -11,7 +11,7 @@ const CLIENT_DIR = new URL('../src/client/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
-  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests',
+  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'training', 'settlement', 'dungeons', 'core'];
@@ -172,6 +172,45 @@ function checkReferences(data) {
       else if (base.kind !== 'armor' || base.slot === 'offhand') errors.push(`classes.json: ${cls.id} ma w pancerzach "${id}", który nie jest pancerzem`);
     }
   }
+  // Skills: of a known class, rarity, effect and element, with the numbers
+  // their kind needs and an effect text naming only numbers they have. Each
+  // choice (a class at one class level) offers at least two skills.
+  const SKILL_NEEDS = {
+    strike: ['power'],
+    sweep: ['power'],
+    heal: ['below', 'heal', 'wisdomPerHp'],
+    guard: ['below', 'heal', 'reduction', 'hits'],
+    buff: ['armor', 'resist', 'damage'],
+    coat: ['dotEffect', 'dotChance', 'dotPower', 'dotTicks'],
+    shield: ['below', 'cost'],
+    evade: ['below', 'dodge', 'counter', 'hits'],
+  };
+  const classIds = new Set(data.classes.map((cls) => cls.id));
+  const effectIds = new Set(data.effects.map((effect) => effect.id));
+  const skillChoices = new Map();
+  for (const skill of data.skills) {
+    const where = `skills.json: ${skill.id}`;
+    const params = skill.params;
+    if (!classIds.has(skill.classId)) errors.push(`${where} ma nieznaną klasę "${skill.classId}"`);
+    if (!rarities.has(skill.rarity)) errors.push(`${where} ma nieznaną rzadkość "${skill.rarity}"`);
+    for (const key of SKILL_NEEDS[skill.kind]) {
+      if (params[key] === undefined) errors.push(`${where} nie ma liczby "${key}", której potrzebuje rodzaj ${skill.kind}`);
+    }
+    if (['strike', 'sweep', 'heal'].includes(skill.kind) && skill.cooldown === undefined) errors.push(`${where} nie ma odnowienia (cooldown)`);
+    if (params.dotEffect !== undefined && !effectIds.has(params.dotEffect)) errors.push(`${where} ma nieznany efekt "${params.dotEffect}"`);
+    if (params.element !== undefined && !elements.has(params.element)) errors.push(`${where} ma nieznany żywioł "${params.element}"`);
+    if (params.category !== undefined && !['physical', 'magical'].includes(params.category)) errors.push(`${where} ma nieznany rodzaj obrażeń "${params.category}"`);
+    if (params.target !== undefined && params.target !== 'back') errors.push(`${where} ma nieznany cel "${params.target}"`);
+    for (const [, name] of skill.effect.matchAll(/\{(\w+)(?:%\.1|%| pp|\.1)?\}/g)) {
+      if (!(name in params) && name !== 'cooldown' && name !== 'critPower') errors.push(`${where} ma w opisie skutku nieznaną liczbę "${name}"`);
+    }
+    const choice = `${skill.classId}, poziom klasy ${skill.classLevel}`;
+    skillChoices.set(choice, (skillChoices.get(choice) ?? 0) + 1);
+  }
+  for (const [choice, count] of skillChoices) {
+    if (count < 2) errors.push(`skills.json: wybór (${choice}) ma tylko jedną umiejętność`);
+  }
+
   // Every class has something for each slot its armour fills: a class
   // without a helmet of its own would leave the slot empty for good.
   const armourSlots = new Set(data.classes.flatMap((cls) => cls.armor.map((id) => basesById.get(id)?.slot)));

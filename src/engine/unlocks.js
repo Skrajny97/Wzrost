@@ -1,14 +1,16 @@
 // The order in which the game opens up during the tutorial (data/unlocks.json).
-// An entry with a level opens at that character level; an entry with only a
-// condition (the Core) stays closed until its own module opens it.
+// An entry with a level opens at that character level, one with a classLevel
+// at that class level (the skills); an entry with only a condition (the Core)
+// stays closed until its own module opens it.
 
-export function isUnlocked(id, level, content) {
+export function isUnlocked(id, level, content, classLevel = 0) {
   const unlock = content.unlocksById[id];
-  return unlock.level !== undefined && level >= unlock.level;
+  if (unlock.level !== undefined) return level >= unlock.level;
+  return unlock.classLevel !== undefined && classLevel >= unlock.classLevel;
 }
 
-export function unlockedFeatures(level, content) {
-  return content.unlocks.filter((unlock) => isUnlocked(unlock.id, level, content)).map((unlock) => unlock.id);
+export function unlockedFeatures(level, content, classLevel = 0) {
+  return content.unlocks.filter((unlock) => isUnlocked(unlock.id, level, content, classLevel)).map((unlock) => unlock.id);
 }
 
 // Exploration lengths: the shortest, then every step of the slider up to
@@ -53,4 +55,9 @@ export const areaUnlocked = (area, classLevel, content) => classLevel >= areaUnl
 // System messages for the modules that open exactly at this level.
 export function unlockMessages(level, content) {
   return content.unlocks.filter((unlock) => unlock.level === level && unlock.message).map((unlock) => unlock.message);
+}
+
+// The same for the modules a class level opens.
+export function classUnlockMessages(classLevel, content) {
+  return content.unlocks.filter((unlock) => unlock.classLevel === classLevel && unlock.message).map((unlock) => unlock.message);
 }

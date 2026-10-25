@@ -6,6 +6,7 @@
 // Google has it from the start, one linked later from the link or its next
 // Google sign-in (google.js).
 
+import { skillDemo } from '../engine/index.js';
 import { content } from './content.js';
 import { ApiError, json } from './http.js';
 import { requireSession } from './sessions.js';
@@ -67,4 +68,21 @@ export async function authorPanel(context) {
       },
     })),
   });
+}
+
+// The author's preview of the skills: every skill with its class, and a short
+// recorded fight that shows one of them (skill-demo.js), for the arena.
+export async function authorSkills(context) {
+  const session = await requireSession(context);
+  if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  return json({
+    skills: content.skills.map((skill) => ({ id: skill.id, name: skill.name, style: skill.style, className: content.classesById[skill.classId].name })),
+  });
+}
+
+export async function authorSkillDemo(context) {
+  const session = await requireSession(context);
+  if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  if (!content.skillsById[context.params.id]) throw new ApiError(404, 'not_found', 'Nie ma takiej umiejętności.');
+  return json({ fight: skillDemo(context.params.id, content) });
 }

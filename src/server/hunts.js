@@ -50,7 +50,7 @@ const SAMPLES_CACHE_SIZE = 200;
 
 function cachedSamples(player, character, equipped, areaId) {
   const ids = equipped.map((item) => item.id).sort((a, b) => a - b);
-  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, ids]);
+  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, ids]);
   let samples = samplesCache.get(key);
   if (!samples) {
     samples = threatSamples({ character, equipped, areaId }, content);

@@ -2,7 +2,7 @@
 // Assets before this code runs; only /api/* and unknown paths reach the Worker.
 
 import { deleteAccount, login, logout, me, register } from './accounts.js';
-import { authorPanel } from './author.js';
+import { authorPanel, authorSkillDemo, authorSkills } from './author.js';
 import { cancelBuilding, collectProduction, startBuilding } from './camp.js';
 import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
 import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, spendPoints } from './characters.js';
@@ -13,6 +13,7 @@ import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { claimQuest, openChest } from './quests.js';
 import { getReport, listReports } from './reports.js';
+import { learnSkill, raiseSkill } from './skills.js';
 import { skipBuilding, skipTime } from './testing.js';
 import { skipWithTimePoints } from './time.js';
 import { seeTutorial } from './tutorial.js';
@@ -27,6 +28,8 @@ const routes = [
   ['GET', '/api/me', me],
   ['DELETE', '/api/me', deleteAccount],
   ['GET', '/api/author', authorPanel],
+  ['GET', '/api/author/skills', authorSkills],
+  ['GET', '/api/author/skills/:id', authorSkillDemo],
   ['GET', '/api/content', () => json(publicContent())],
   ['GET', '/api/character', getCharacter],
   ['POST', '/api/character', createCharacter],
@@ -35,6 +38,8 @@ const routes = [
   ['POST', '/api/character/points/auto', autoPoints],
   ['POST', '/api/character/points/reset', resetPoints],
   ['POST', '/api/character/appearance', setAppearance],
+  ['POST', '/api/skills/learn', learnSkill],
+  ['POST', '/api/skills/raise', raiseSkill],
   ['POST', '/api/items/:id/equip', equipItem],
   ['POST', '/api/items/:id/unequip', unequipItem],
   ['POST', '/api/items/:id/discard', discardItem],

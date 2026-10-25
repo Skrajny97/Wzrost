@@ -1,0 +1,353 @@
+// How skills look in a fight's playback (arena.js): the skill's name pops up
+// over its user, a sweep crosses the whole enemy row before its blows land
+// (a blade's arc, an icy gust, columns of holy light, falling arrows),
+// a skill blow lands with its own impact (a heavy crack, a fiery burst, a
+// strike out of the shadows), a heal rises in green sparks, and a blessing,
+// a shield or a dance of shadows wraps the character in its aura. Each skill
+// has a look below, by its id in data/skills.json.
+
+import { h } from './dom.js';
+import { playSound } from './sound.js';
+
+// cast: what plays when the skill wakes or a sweep starts; impact: extra
+// on the target of the skill's own blow; color: its light.
+export const SKILL_LOOKS = {
+  'power-strike': { color: '#f6ecd6', impact: 'heavy' },
+  'wide-sweep': { color: '#dfe7ea', cast: 'sweep' },
+  unyielding: { color: '#d9b45a', cast: 'guard' },
+  'aimed-shot': { color: '#ef9a85', impact: 'aim', glow: true },
+  'arrow-rain': { color: '#e3cf98', cast: 'rain' },
+  'pinning-shot': { color: '#c49a6c', impact: 'pin', glow: true },
+  fireball: { color: '#ff8a3d', impact: 'fire', big: true },
+  'frost-gust': { color: '#8fd3ff', cast: 'frost' },
+  'mana-shield': { color: '#6fb6ff', cast: 'shield' },
+  'prayer-of-health': { color: '#a7c47f', cast: 'heal' },
+  exorcism: { color: '#f2d675', cast: 'holy' },
+  blessing: { color: '#f2d675', cast: 'bless' },
+  backstab: { color: '#a690e8', impact: 'shadow', teleport: true },
+  'poisoned-blade': { color: '#9ccc65', cast: 'poison' },
+  'shadow-dance': { color: '#a690e8', cast: 'dance' },
+};
+
+const DEFAULT_LOOK = { color: '#8fe3ef' };
+export const lookOf = (event) => SKILL_LOOKS[event.skill] ?? DEFAULT_LOOK;
+
+// `kit` is what the arena shares: its cards, its effects layer and its
+// animation helpers, so every animation here can be cancelled with the rest.
+export function skillEffects(kit) {
+  const { animate, centerOf, cards, fx, row, reduced, wait } = kit;
+
+  // A small element in the effects layer at a point, removed when done.
+  function spark(className, { x, y }, style = {}) {
+    const element = h('span', { class: className });
+    element.style.left = `${x}px`;
+    element.style.top = `${y}px`;
+    for (const [key, value] of Object.entries(style)) element.style.setProperty(key, value);
+    fx.append(element);
+    return element;
+  }
+
+  // The skill's name over its user, kept inside the arena by its edges.
+  function callout(id, text, color) {
+    const entry = cards.get(id);
+    if (!entry) return Promise.resolve();
+    const { x, y } = centerOf(entry.card);
+    const label = spark('skill-callout', { x, y: y - entry.card.offsetHeight / 2 }, { '--fx': color });
+    label.textContent = text;
+    const half = label.offsetWidth / 2;
+    label.style.left = `${Math.min(Math.max(x, half + 4), kit.arena.clientWidth - half - 4)}px`;
+    return animate(
+      label,
+      [
+        { transform: 'translate(-50%, 0) scale(0.6)', opacity: 0 },
+        { transform: 'translate(-50%, -10px) scale(1.08)', opacity: 1, offset: 0.2 },
+        { transform: 'translate(-50%, -14px) scale(1)', opacity: 1, offset: 0.75 },
+        { transform: 'translate(-50%, -22px) scale(1)', opacity: 0 },
+      ],
+      { duration: 1300, easing: 'ease-out' },
+    ).then(() => label.remove());
+  }
+
+  // A glow that pulses around a card.
+  function aura(id, color, pulses = 2) {
+    const entry = cards.get(id);
+    if (!entry) return Promise.resolve();
+    return animate(
+      entry.card,
+      [
+        { boxShadow: '0 0 0 0 transparent' },
+        { boxShadow: `0 0 18px 6px ${color}`, offset: 0.5 },
+        { boxShadow: '0 0 0 0 transparent' },
+      ],
+      { duration: 520, iterations: pulses },
+    );
+  }
+
+  // A ring of light that grows from a card's middle.
+  function ring(id, color, size = 90, duration = 520) {
+    const entry = cards.get(id);
+    if (!entry) return Promise.resolve();
+    const mark = spark('fx-ring', centerOf(entry.card), { '--fx': color, '--size': `${size}px` });
+    return animate(
+      mark,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.2)', opacity: 0.95 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
+      ],
+      { duration, easing: 'ease-out' },
+    ).then(() => mark.remove());
+  }
+
+  // A burst of light, bigger and brighter than a plain hit's.
+  function burst(id, color, size = 70) {
+    const entry = cards.get(id);
+    if (!entry) return Promise.resolve();
+    const mark = spark('fx-burst', centerOf(entry.card), { '--fx': color, '--size': `${size}px` });
+    return animate(
+      mark,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 1, offset: 0.3 },
+        { transform: 'translate(-50%, -50%) scale(1.35)', opacity: 0 },
+      ],
+      { duration: 480, easing: 'ease-out' },
+    ).then(() => mark.remove());
+  }
+
+  // Specks rising (a heal) or dripping (venom) over a card.
+  function specks(id, color, { count = 7, rise = true } = {}) {
+    const entry = cards.get(id);
+    if (!entry) return Promise.resolve();
+    const box = entry.card.getBoundingClientRect();
+    const { x, y } = centerOf(entry.card);
+    const all = Array.from({ length: count }, (_, index) => {
+      const dx = ((index + 0.5) / count - 0.5) * box.width * 0.8;
+      const mark = spark('fx-speck', { x: x + dx, y: y + (rise ? box.height * 0.3 : -box.height * 0.3) }, { '--fx': color });
+      const travel = (rise ? -1 : 1) * (box.height * 0.5 + (index % 3) * 6);
+      return animate(
+        mark,
+        [
+          { transform: 'translate(-50%, -50%) scale(0.6)', opacity: 0 },
+          { transform: `translate(-50%, calc(-50% + ${travel * 0.3}px)) scale(1)`, opacity: 1, offset: 0.25 },
+          { transform: `translate(-50%, calc(-50% + ${travel}px)) scale(0.7)`, opacity: 0 },
+        ],
+        { duration: 760, delay: index * 50, easing: 'ease-out', fill: 'backwards' },
+      ).then(() => mark.remove());
+    });
+    return Promise.all(all);
+  }
+
+  // A box over the enemy row that clips what moves inside it, so nothing
+  // reaches past the arena's edge and the page never scrolls sideways.
+  function overRow() {
+    const target = row('enemy');
+    if (!target) return null;
+    const frame = kit.arena.getBoundingClientRect();
+    const box = target.getBoundingClientRect();
+    const clip = spark('fx-clip', { x: box.left - frame.left, y: box.top - frame.top });
+    clip.style.width = `${box.width}px`;
+    clip.style.height = `${box.height}px`;
+    return clip;
+  }
+
+  // A blade's arc drawn over the whole enemy row, left to right.
+  function arc(color) {
+    const clip = overRow();
+    if (!clip) return Promise.resolve();
+    const blade = h('span', { class: 'fx-arc' });
+    blade.style.setProperty('--fx', color);
+    clip.append(blade);
+    const keyframes = reduced()
+      ? [{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }]
+      : [
+          { transform: 'scaleX(0.08)', opacity: 0 },
+          { transform: 'scaleX(1)', opacity: 1, offset: 0.5 },
+          { transform: 'scaleX(1) translateY(8px)', opacity: 0 },
+        ];
+    return animate(blade, keyframes, { duration: 560, easing: 'ease-out' }).then(() => clip.remove());
+  }
+
+  // An icy gust that blows over the enemy row, and frost settling on each foe.
+  function gust(color, targets) {
+    const clip = overRow();
+    if (!clip) return Promise.resolve();
+    const wind = h('span', { class: 'fx-gust' });
+    wind.style.setProperty('--fx', color);
+    clip.append(wind);
+    const blow = reduced()
+      ? animate(wind, [{ opacity: 0 }, { opacity: 0.8 }, { opacity: 0 }], { duration: 500 })
+      : animate(
+          wind,
+          [
+            { transform: 'translateX(-60%)', opacity: 0 },
+            { transform: 'translateX(-10%)', opacity: 0.9, offset: 0.5 },
+            { transform: 'translateX(30%)', opacity: 0 },
+          ],
+          { duration: 720, easing: 'ease-out' },
+        );
+    return Promise.all([blow.then(() => clip.remove()), ...targets.map((id) => specks(id, '#e4f5ff', { count: 5, rise: false }))]);
+  }
+
+  // A column of holy light falling on each foe.
+  function beams(color, targets) {
+    return Promise.all(
+      targets.map((id, index) => {
+        const entry = cards.get(id);
+        if (!entry) return null;
+        const beam = spark('fx-beam', centerOf(entry.card), { '--fx': color });
+        beam.style.height = `${entry.card.offsetHeight + 20}px`;
+        return animate(
+          beam,
+          [
+            { transform: 'translate(-50%, -50%) scaleY(0)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) scaleY(1)', opacity: 1, offset: 0.35 },
+            { transform: 'translate(-50%, -50%) scale(1.5, 1)', opacity: 0 },
+          ],
+          { duration: 680, delay: index * 80, easing: 'ease-out', fill: 'backwards' },
+        ).then(() => beam.remove());
+      }),
+    );
+  }
+
+  // Arrows falling on every enemy at once.
+  function rain(color, targets) {
+    return Promise.all(
+      targets.map((id, index) => {
+        const entry = cards.get(id);
+        if (!entry) return null;
+        const { x, y } = centerOf(entry.card);
+        return Promise.all(
+          [-12, 0, 12].map((dx, arrow) => {
+            const mark = spark('projectile projectile--arrow projectile--fall projectile--glow', { x: x + dx, y }, { '--fx': color });
+            return animate(
+              mark,
+              [
+                { transform: 'translate(0, -70px) rotate(90deg)', opacity: 0 },
+                { opacity: 1, offset: 0.3 },
+                { transform: 'translate(0, -6px) rotate(90deg)', opacity: 1 },
+              ],
+              { duration: 300, delay: index * 60 + arrow * 40, easing: 'ease-in', fill: 'backwards' },
+            ).then(() => mark.remove());
+          }),
+        );
+      }),
+    );
+  }
+
+  // Faint copies of a card that drift aside and fade: a dance of shadows.
+  function ghosts(id, color) {
+    const entry = cards.get(id);
+    if (!entry || reduced()) return aura(id, color, 1);
+    return Promise.all(
+      [-18, 18].map((dx) => {
+        const copy = entry.card.cloneNode(true);
+        copy.classList.add('fx-ghost');
+        copy.removeAttribute('aria-label');
+        copy.style.setProperty('--fx', color);
+        const box = entry.card.getBoundingClientRect();
+        const frame = kit.arena.getBoundingClientRect();
+        copy.style.left = `${box.left - frame.left}px`;
+        copy.style.top = `${box.top - frame.top}px`;
+        copy.style.width = `${box.width}px`;
+        copy.style.height = `${box.height}px`;
+        fx.append(copy);
+        return animate(
+          copy,
+          [
+            { transform: 'translateX(0)', opacity: 0.6 },
+            { transform: `translateX(${dx}px)`, opacity: 0 },
+          ],
+          { duration: 620, easing: 'ease-out' },
+        ).then(() => copy.remove());
+      }),
+    );
+  }
+
+  // A blue bubble around a card, kept while the shield holds.
+  function bubble(id, color) {
+    const entry = cards.get(id);
+    if (!entry) return Promise.resolve();
+    entry.card.classList.add('unit--shielded');
+    entry.card.style.setProperty('--shield', color);
+    return ring(id, color, 120, 700);
+  }
+
+  // What plays when a skill wakes (a 'skill' event), or when a sweep starts.
+  async function cast(event) {
+    const look = lookOf(event);
+    playSound(look.cast === 'sweep' ? 'swing' : look.cast === 'rain' ? 'shot' : 'magic');
+    callout(event.actor, event.skillName, look.color);
+    const targets = event.targets ?? [];
+    switch (look.cast) {
+      case 'sweep':
+        await arc(look.color);
+        break;
+      case 'frost':
+        await gust(look.color, targets);
+        break;
+      case 'holy':
+        await beams(look.color, targets);
+        break;
+      case 'rain':
+        await rain(look.color, targets);
+        break;
+      case 'bless':
+        await Promise.all([ring(event.actor, look.color, 130, 760), aura(event.actor, look.color, 2)]);
+        break;
+      case 'poison':
+        await Promise.all([specks(event.actor, look.color, { rise: false }), aura(event.actor, look.color, 1)]);
+        break;
+      case 'shield':
+        await bubble(event.actor, look.color);
+        break;
+      case 'dance':
+        await ghosts(event.actor, look.color);
+        break;
+      default:
+        await aura(event.actor, look.color, 1);
+    }
+    await wait(120);
+  }
+
+  // A heal: green sparks and the HP that came back.
+  async function heal(event) {
+    const look = lookOf(event);
+    playSound('effect');
+    callout(event.actor, event.skillName, look.color);
+    kit.setHp(event.target, event.hp);
+    kit.float(event.target, `+${event.amount}`, 'heal');
+    if (look.cast === 'guard') status(event.target, event.skillName);
+    await Promise.all([specks(event.target, look.cast === 'guard' ? '#d9b45a' : '#a7c47f'), aura(event.target, look.color, 1)]);
+  }
+
+  // Before a skill's own blow travels: its name, and a mark on the target.
+  function before(event) {
+    const look = lookOf(event);
+    callout(event.actor, event.skillName, look.color);
+    if (look.impact === 'aim') ring(event.target, look.color, 70, 420);
+  }
+
+  // When a skill's own blow lands, on top of the plain hit.
+  function impact(event) {
+    const look = lookOf(event);
+    if (look.impact === 'heavy') {
+      burst(event.target, look.color, 90);
+      ring(event.target, look.color, 110, 420);
+    } else if (look.impact === 'fire') {
+      burst(event.target, look.color, 100);
+      specks(event.target, look.color, { count: 6 });
+    } else if (look.impact === 'shadow') {
+      burst(event.target, look.color, 80);
+    } else {
+      burst(event.target, look.color, 60);
+    }
+  }
+
+  // A pinned or slowed foe shows it on its card.
+  function status(id, text) {
+    const entry = cards.get(id);
+    if (entry) entry.status.textContent = text;
+  }
+
+  return { cast, heal, before, impact, status, ring, callout };
+}

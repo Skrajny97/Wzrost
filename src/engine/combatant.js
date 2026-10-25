@@ -1,9 +1,10 @@
 // Combatants: the player character and monsters reduced to the same shape, so
 // the combat code treats both alike (and later companions or other players).
 
-import { budget, cappedChance, damageScale, maxHp, speed, weaponDamage } from './formulas.js';
+import { budget, cappedChance, damageScale, maxHp, maxMana, speed, weaponDamage } from './formulas.js';
 import { upgradedItem } from './items.js';
 import { gearLevel } from './progression.js';
+import { learnedSkills } from './skills.js';
 import { computeStats } from './stats.js';
 
 export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally' }, content) {
@@ -37,6 +38,11 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     critRating: totals.perception * balance.combat.critPerPerception,
     willRating: totals.will * balance.combat.willPerPoint,
     speed: speed(totals.dexterity, character.level, balance),
+    // Skills and the mana they spend, full at the start of every fight;
+    // Wisdom also strengthens healing.
+    maxMana: maxMana(totals.wisdom, character.level, balance),
+    wisdom: totals.wisdom,
+    skills: learnedSkills(character, content),
     recovery:
       balance.hunt.recoveryAfterFight +
       cls.recovery.base +

@@ -1282,4 +1282,48 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
 
 ## Umiejętności: wybór jednej z trzech na 10. poziomie klasy (25.10.2026)
 
-Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umiejętności. Kolejne poziomy umiejętności i ich ewolucje projektujemy później. Tym razem autor poprosił o gotową propozycję, więc zasada z „Balans i nowe zakładki”, punkt 2, nie dotyczy tego kroku. Propozycja do poprawek autora: [Umiejętności klas i przedmioty od 10. poziomu klasy](https://claude.ai/artifact/HhMWeUEZSkCqPH52bJoXz1). Wdrożenie czeka na poprawki.
+Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umiejętności. Kolejne poziomy umiejętności i ich ewolucje projektujemy później. Tym razem autor poprosił o gotową propozycję, więc zasada z „Balans i nowe zakładki”, punkt 2, nie dotyczy tego kroku. Propozycja do poprawek autora: [Umiejętności klas i przedmioty od 10. poziomu klasy](https://claude.ai/artifact/HhMWeUEZSkCqPH52bJoXz1).
+
+**Wdrożenie** (autor: „Umiejętności są okey”). Autor dodał, że każdą umiejętność da się wzmacniać Punktami Umiejętności, do 20 poziomu. Bonusy mogą więc startować niżej i rosnąć powoli. Pytań z końca propozycji autor nie zmienił, więc wchodzą odpowiedzi domyślne: wybór na stałe, pełna mana w każdej walce, Kula ognia zawsze jest ogniem, a przedmioty przychodzą później.
+
+1. **Dane.** 15 umiejętności, po 3 na klasę, jest w `data/skills.json` (schemat `data/schemas/skills.schema.json`). Liczba umiejętności to stała wartość albo para [poziom 1, poziom 20], a między nimi rośnie po równo z poziomem. Przykład: Potężny cios bije za 140% obrażeń i pomija 20% pancerza na 1. poziomie, a na 20. bije za 200% i pomija 40%.
+    - Opis skutku na karcie podstawia liczby obecnego poziomu, a „Na poziomie N+1” liczby następnego. Test pilnuje, żeby każdy kolejny poziom różnił się na karcie, więc żaden punkt nie znika bez śladu. Do tego doszedł format `{nazwa%.1}`, czyli procent z jednym miejscem po przecinku.
+2. **Punkty Umiejętności.** Każdy poziom klasy po 10. daje 1 punkt (`balance.skills`). Wybrana umiejętność startuje z 1. poziomu, a każdy punkt podnosi ją o poziom, do 20. Pełne 20 poziomów wypada więc na 29. poziomie klasy. Punkty zebrane przed wyborem czekają.
+3. **Wybór na stałe.** Dokument projektowy zapowiada, że zmiana ścieżki będzie bardzo kosztowna. Zanim powstanie, wyboru nie da się cofnąć, a ekran pyta „Wybrać: …?”.
+4. **Mana.** Każda walka zaczyna się z pełną maną: 20, plus 5 za punkt Mądrości i 2 za poziom postaci (nowe `character.manaPerLevel`). W walce mana nie wraca. Bez many postać bije zwykłymi ciosami.
+5. **Postać używa umiejętności sama:**
+    - ciosy i ataki na grupę zastępują zwykły cios, gdy minęło odnowienie i starcza many;
+    - Modlitwa o zdrowie leczy w ruchu kleryka, gdy HP spadnie poniżej 60%;
+    - Błogosławieństwo i Zatrute ostrze działają od początku walki i nie zabierają ruchu;
+    - Nieugięty, Osłona many i Taniec cieni budzą się raz na walkę, gdy HP spadnie poniżej progu.
+6. **Cios w plecy** uderza wroga, który stoi najdalej z tyłu (dokument projektowy), a przy równych wybiera tego, którego zabije najszybciej.
+7. **Zakładka Umiejętności** otwiera się na 10. poziomie klasy. W `data/unlocks.json` odblokowanie może teraz zależeć od poziomu klasy (`classLevel`).
+    - Raport wyprawy podaje odblokowanie i zdobyte Punkty Umiejętności.
+    - Postać, która ma już 10. poziom klasy, od razu widzi złotą kropkę przy zakładce i czekające punkty.
+    - Na wyprawie umiejętności się nie zmienia, tak jak statystyk.
+8. **Balans z symulacji postępu** (`tools/progression`, 100 przebiegów na wariant, nowa polityka `skill=0/1/2`). Pierwsza wersja liczb była nierówna:
+    - Modlitwa o zdrowie skracała drogę kleryka do 50. poziomu o 41%, bo dodatek „1 HP za punkt Mądrości” przy Mądrości 93 na 20. poziomie dawał ponad 30% maks. HP na jedną modlitwę;
+    - Osłona many skracała drogę maga o 35%, bo duża mana maga zatrzymywała więcej obrażeń, niż mag ma HP;
+    - Taniec cieni dawał cieniowi tylko 8%.
+
+    Po poprawkach:
+    - Modlitwa leczy 3–6% maks. HP i dodatkowo 1 HP za każde 10 punktów Mądrości;
+    - każdy punkt obrażeń pochłonięty przez Osłonę many kosztuje 3,5 many na 1. poziomie i 1,6 na 20.;
+    - Taniec cieni budzi się poniżej 50% HP, trwa 5 ciosów wrogów, a unik rośnie o 40–60 pkt proc. z kontrą za 80–120%.
+
+    Godziny wypraw do 50. poziomu bez umiejętności i z każdą z trzech (różnice do około 2 h to szum):
+
+    | Klasa | Bez | Pierwsza | Druga | Trzecia |
+    | --- | --- | --- | --- | --- |
+    | Wojownik | 42,1 | Potężny cios 39,1 (−7%) | Szeroki zamach 40,0 (−5%) | Nieugięty 37,9 (−10%) |
+    | Łucznik | 54,7 | Celny strzał 48,8 (−11%) | Grad strzał 49,5 (−9%) | Przyszpilenie 48,5 (−11%) |
+    | Mag | 63,1 | Kula ognia 53,7 (−15%) | Mroźny podmuch 57,1 (−10%) | Osłona many 53,7 (−15%) |
+    | Kleryk | 61,8 | Modlitwa o zdrowie 52,4 (−15%) | Egzorcyzm 55,6 (−10%) | Błogosławieństwo 53,8 (−13%) |
+    | Cień | 59,8 | Cios w plecy 52,6 (−12%) | Zatrute ostrze 52,5 (−12%) | Taniec cieni 51,3 (−14%) |
+
+    Umiejętność skraca drogę do 50. poziomu o 5–15%, a słabszym klasom pomaga trochę bardziej. Trzy wybory jednej klasy różnią się najwyżej o około 5 punktów procentowych.
+9. **Ikony** są szkicami Retro Diffusion, po jednym na umiejętność (0,18 USD za szkic, razem 2,70 USD). Weszły tymczasowo, do oceny autora. Przy części z nich wycinanie tła zostawiło ciemny kwadrat ze ściętymi rogami.
+10. **Animacje.** W odtwarzaniu walki nad postacią pojawia się nazwa umiejętności, a każda umiejętność ma własny efekt (`src/client/skill-fx.js`): łuk ostrza, podmuch mrozu, słupy świętego światła, deszcz strzał, wielką kulę ognia, bańkę osłony, cienie tańca i aurę błogosławieństwa.
+    - Efekty mieszczą się w arenie, więc strona nie przewija się w bok.
+    - Panel autora ma „Podgląd umiejętności”. To krótka walka postaci 20. poziomu z umiejętnością na 10. poziomie, przeciw stworom dobranym tak, żeby umiejętność się pokazała. Graczom ten podgląd się nie pokazuje.
+11. **Wydajność.** Walka, w której nikt nie ma umiejętności, liczy się tak jak przedtem i losuje te same liczby. Kod umiejętności działa tylko w walkach, w których ktoś ją ma, więc szacowanie zagrożenia mieści się w limicie czasu procesora.

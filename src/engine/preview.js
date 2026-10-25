@@ -24,7 +24,7 @@ export function combatValues(character, equipped, content) {
     effectResist: cappedChance(unit.willRating, level, tuning.willCap, balance),
     speed: unit.speed,
     maxHp: unit.maxHp,
-    mana: maxMana(totals.wisdom, balance),
+    mana: maxMana(totals.wisdom, level, balance),
     regen: regenPerMinute(unit.maxHp, totals.vitality, content),
     recovery: unit.recovery,
   };

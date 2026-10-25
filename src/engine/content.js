@@ -70,5 +70,8 @@ export function buildContent(raw) {
     appearancesById: byId(raw.appearances ?? []),
     // The narrator's daily and weekly quests (quests.js).
     quests: raw.quests,
+    // The skills the classes choose from (skills.js).
+    skills: raw.skills ?? [],
+    skillsById: byId(raw.skills ?? []),
   };
 }

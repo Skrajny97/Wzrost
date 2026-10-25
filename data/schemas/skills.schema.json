@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Umiejętności klas",
+  "description": "Umiejętności, które postać wybiera na progach poziomu klasy: z umiejętności jednej klasy o tym samym classLevel postać uczy się jednej. Punkty Umiejętności podnoszą poziom umiejętności od 1 do maxLevel z balance.json.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "classId", "classLevel", "name", "style", "rarity", "description", "effect", "kind", "mana", "params"],
+    "properties": {
+      "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+      "classId": { "type": "string" },
+      "classLevel": { "type": "integer", "minimum": 1, "description": "Poziom klasy, od którego postać wybiera jedną z umiejętności swojej klasy z tym samym poziomem." },
+      "name": { "type": "string", "minLength": 1 },
+      "style": { "type": "string", "minLength": 1, "description": "Krótki podpis stylu gry na karcie, np. atak, grupa, obrona." },
+      "rarity": { "type": "string" },
+      "description": { "type": "string", "minLength": 1 },
+      "effect": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Skutek na karcie. {nazwa} wstawia parametr jako liczbę całkowitą, {nazwa%} jako procent, {nazwa%.1} jako procent z jednym miejscem po przecinku, {nazwa pp} jako punkty procentowe, {nazwa.1} z jednym miejscem po przecinku, {cooldown} odnowienie, a {critPower%} moc razy mnożnik krytyka."
+      },
+      "kind": {
+        "enum": ["strike", "sweep", "heal", "guard", "buff", "coat", "shield", "evade"],
+        "description": "strike i sweep zastępują zwykły cios (jeden wróg albo wszyscy), heal leczy w ruchu postaci, guard, shield i evade włączają się raz na walkę, gdy HP spadnie poniżej progu, a buff i coat działają od początku walki."
+      },
+      "mana": { "type": "integer", "minimum": 0 },
+      "cooldown": { "type": "integer", "minimum": 1, "description": "Najwyżej co który ruch postaci (dla strike, sweep i heal)." },
+      "params": {
+        "type": "object",
+        "description": "Liczby umiejętności: stała wartość albo para [poziom 1, poziom maksymalny], między którymi wartość rośnie równo z poziomem.",
+        "additionalProperties": {
+          "anyOf": [
+            { "type": "number" },
+            { "type": "boolean" },
+            { "type": "string" },
+            { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }
+          ]
+        }
+      }
+    }
+  }
+}

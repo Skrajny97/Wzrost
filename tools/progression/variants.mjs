@@ -92,6 +92,23 @@ const PARAMETRIC = {
   ramp: (v) => ({ describe: `progression.earlyXpFactors: levels 6-20 from ${v} rising to 1`, apply(raw) { const f = raw.balance.progression.earlyXpFactors.slice(0, 5); const f0 = Number(v); for (let L = 6; L <= 20; L++) f.push(Math.round((f0 + (1 - f0) * (L - 6) / 15) * 1000) / 1000); raw.balance.progression.earlyXpFactors = f; } }),
   mlw: (v) => ({ describe: `hunt.monsterLevelWeights [8, 4, 2, 1, 1] -> [${v.split('/').join(', ')}]`, apply(raw) { raw.balance.hunt.monsterLevelWeights = v.split('/').map(Number); } }),
   xpbase: (v) => ({ describe: `rewards.xpBase 100 -> ${v}`, apply(raw) { raw.balance.rewards.xpBase = Number(v); } }),
+  // skill=0: the first of the class's three skills, learned and raised (sim.mjs)
+  skill: (v) => ({ describe: `policy: skill number ${v} of the class, every Skill Point into it`, policy: { skill: Number(v) }, apply() {} }),
+  // sk=prayer-of-health:heal:0.08/0.15: a number of a skill in skills.json, its
+  // mana, cooldown or one of its params; a pair is [level 1, level 20]
+  sk: (v) => {
+    const [id, field, value] = v.split(':');
+    const parsed = value.includes('/') ? value.split('/').map(Number) : Number(value);
+    return {
+      describe: `skills.json ${id} ${field} -> ${value}`,
+      apply(raw) {
+        const skill = raw.skills.find((s) => s.id === id);
+        if (!skill) throw new Error(`unknown skill ${id}`);
+        if (field === 'mana' || field === 'cooldown') skill[field] = parsed;
+        else skill.params[field] = parsed;
+      },
+    };
+  },
 };
 
 export function variantFor(name) {

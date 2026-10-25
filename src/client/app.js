@@ -17,6 +17,7 @@ import { renderCreate } from './screens/create.js';
 import { mountJournal } from './screens/journal.js';
 import { lockedScreen } from './screens/locked.js';
 import { mountReport } from './screens/report.js';
+import { mountSkills } from './screens/skills.js';
 import { mountStats } from './screens/stats.js';
 import { musicVolume, setMusicConfig, setMusicPlace, setMusicVolume, startMusic } from './music.js';
 import { resetCamera } from './camera.js';
@@ -39,7 +40,7 @@ const ROUTES = [
   { pattern: /^#\/walka(?:\/(?<region>[a-z0-9-]+)(?:\/(?<area>[a-z0-9-]+))?)?$/, nav: 'main', tab: 'walka', mount: mountCombat },
   { pattern: /^#\/postac$/, nav: 'character', tab: 'equipment', mount: mountCharacter },
   { pattern: /^#\/postac\/statystyki$/, nav: 'character', tab: 'stats', mount: mountStats },
-  { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', mount: lockedScreen('skills', 'Umiejętności') },
+  { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', mount: mountSkills },
   { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: lockedScreen('core', 'Rdzeń') },
   { pattern: /^#\/profesje$/, nav: 'main', tab: 'profesje', mount: lockedScreen('professions', 'Profesje') },
   { pattern: /^#\/osada$/, nav: 'main', tab: 'osada', mount: lockedScreen('settlement', 'Osada') },

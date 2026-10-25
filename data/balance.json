@@ -25,7 +25,13 @@
     "hpPerVitality": 5,
     "hpPerLevel": 5,
     "manaBase": 20,
-    "manaPerWisdom": 5
+    "manaPerWisdom": 5,
+    "manaPerLevel": 2
+  },
+  "skills": {
+    "unlockClassLevel": 10,
+    "maxLevel": 20,
+    "pointsPerClassLevel": 1
   },
   "monsters": {
     "hpBase": 2,

@@ -31,6 +31,11 @@ export const SPRITES = {
     size: 32,
     ids: ['wolf-pelt', 'fox-pelt', 'badger-claws', 'viper-scales', 'boar-tusk', 'crow-feather', 'owl-feather', 'lynx-fur', 'spider-silk', 'alpha-fang', 'bear-hide', 'wisp-flame', 'likho-eye', 'scraps', 'straps', 'fittings', 'shards', 'amber', 'bloodstone', 'star-shard', 'chest'],
   },
+  // The skills of the classes (data/skills.json), 48×48.
+  skills: {
+    size: 48,
+    ids: ['power-strike', 'wide-sweep', 'unyielding', 'aimed-shot', 'arrow-rain', 'pinning-shot', 'fireball', 'frost-gust', 'mana-shield', 'prayer-of-health', 'exorcism', 'blessing', 'backstab', 'poisoned-blade', 'shadow-dance'],
+  },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
   narrator: {
     width: 96,
@@ -59,6 +64,7 @@ export const monsterSprite = (monsterId) => sprite('monsters', monsterId, 'sprit
 export const itemSprite = (item) => sprite('items', item.base, 'sprite--item');
 // A material, a part ("scraps") or the chest ("chest").
 export const materialSprite = (id) => sprite('materials', id, 'sprite--item');
+export const skillSprite = (id) => sprite('skills', id, 'sprite--skill');
 
 // A class's figure for a look. `bust` shows the head and shoulders at the
 // image's own size, cut by the box it sits in (the arena, the class cards).

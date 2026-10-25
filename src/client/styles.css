@@ -5043,3 +5043,282 @@ a.segmented-option {
   color: var(--text-muted);
   font-size: 13px;
 }
+
+/* The Umiejętności tab: three cards to choose from, then the learned skills
+   as a grid of tiles; a tile with a Skill Point to spend glows gold. */
+.skill-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skill-card {
+  gap: 8px;
+}
+
+.skill-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.skill-name {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.skill-style,
+.skill-subtitle {
+  margin: 0;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.skill-subtitle {
+  margin-top: 6px;
+}
+
+.skill-description {
+  margin: 0;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.skill-effect {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.skill-effect--next {
+  color: var(--leaf);
+}
+
+.skill-cost {
+  margin: 0;
+  color: #9cc3e6;
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.skill-icon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--system-line);
+  border-radius: 6px;
+  background: radial-gradient(circle at 50% 40%, rgba(143, 227, 239, 0.16), rgba(13, 17, 11, 0.92));
+}
+
+.skill-icon--large {
+  width: 64px;
+  height: 64px;
+}
+
+.skill-icon .sprite--skill {
+  width: 56px;
+  height: 56px;
+}
+
+.skill-letter {
+  color: var(--system-text);
+  font-family: var(--font-world);
+  font-size: 30px;
+}
+
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 10px;
+}
+
+.skill-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.skill-tile-name {
+  font-size: 15px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.skill-tile-level {
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.skill-tile--ready {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(217, 180, 90, 0.35);
+}
+
+.skill-tile--ready .skill-tile-level {
+  color: var(--gold);
+}
+
+/* Skills in a fight's playback (skill-fx.js): the name over its user, rings,
+   bursts and specks of its light, a blade's arc, an icy gust and holy beams
+   over the foes, falling arrows, shadow copies and the bubble of a mana
+   shield. */
+.skill-callout {
+  position: absolute;
+  z-index: 3;
+  padding: 2px 8px;
+  border: 1px solid var(--fx, var(--system));
+  border-radius: 3px;
+  background: rgba(13, 17, 11, 0.88);
+  color: var(--fx, var(--system));
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  pointer-events: none;
+  text-shadow: 0 0 8px var(--fx, var(--system));
+}
+
+.fx-ring,
+.fx-burst {
+  position: absolute;
+  width: var(--size, 80px);
+  height: var(--size, 80px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.fx-ring {
+  border: 3px solid var(--fx, var(--system));
+  box-shadow: 0 0 14px var(--fx, var(--system));
+}
+
+.fx-burst {
+  background: radial-gradient(circle, #fff 0, var(--fx, var(--system)) 35%, rgba(0, 0, 0, 0) 70%);
+  mix-blend-mode: screen;
+}
+
+.fx-speck {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fx, var(--leaf));
+  box-shadow: 0 0 8px var(--fx, var(--leaf));
+  pointer-events: none;
+}
+
+.fx-clip {
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* A crescent: only the bottom edge of an ellipse, thickest in its middle. */
+.fx-arc {
+  position: absolute;
+  top: 18%;
+  left: 2%;
+  width: 96%;
+  height: 58%;
+  border-bottom: 5px solid var(--fx);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 6px var(--fx)) drop-shadow(0 0 2px #fff);
+  transform-origin: left center;
+}
+
+.fx-gust {
+  position: absolute;
+  inset: 8% 0;
+  border-radius: 40%;
+  background:
+    repeating-linear-gradient(100deg, rgba(255, 255, 255, 0) 0 16px, rgba(228, 245, 255, 0.65) 16px 18px, rgba(255, 255, 255, 0) 18px 30px),
+    linear-gradient(90deg, rgba(143, 211, 255, 0), rgba(143, 211, 255, 0.35) 35%, rgba(214, 240, 255, 0.55) 70%, rgba(143, 211, 255, 0));
+  mix-blend-mode: screen;
+}
+
+.fx-beam {
+  position: absolute;
+  width: 30px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 250, 228, 0.95) 30%, var(--fx) 75%, rgba(0, 0, 0, 0));
+  box-shadow: 0 0 18px 4px var(--fx);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transform-origin: 50% 0;
+}
+
+.projectile--fall {
+  position: absolute;
+}
+
+.projectile--glow {
+  filter: drop-shadow(0 0 5px var(--fx, var(--system)));
+}
+
+.projectile--glow,
+.projectile--glow::after {
+  background-color: var(--fx);
+  border-left-color: var(--fx);
+}
+
+.projectile--big {
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  box-shadow: 0 0 22px 8px var(--fx, var(--system));
+}
+
+.fx-ghost {
+  position: absolute;
+  margin: 0;
+  filter: drop-shadow(0 0 8px var(--fx)) saturate(0.2);
+  pointer-events: none;
+}
+
+.unit--shielded {
+  box-shadow: 0 0 0 2px var(--shield, #6fb6ff), 0 0 16px var(--shield, #6fb6ff);
+}
+
+.float--heal {
+  color: #b6e388;
+  font-size: 18px;
+}
+
+.float--absorb {
+  color: #9cc3e6;
+  font-size: 13px;
+}
+
+/* The author's preview of the skills: buttons by class, the arena below. */
+.author-skills {
+  gap: 10px;
+}
+
+.author-skill-class,
+.author-skill-title {
+  margin: 4px 0;
+  font-size: 17px;
+}
+
+.author-skill-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.author-skill-preview:empty {
+  display: none;
+}

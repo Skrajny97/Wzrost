@@ -32,8 +32,11 @@ export function maxHp(vitality, level, balance) {
   return Math.round(hpBase + hpPerVitality * vitality + hpPerLevel * level);
 }
 
-export function maxMana(wisdom, balance) {
-  return Math.round(balance.character.manaBase + balance.character.manaPerWisdom * wisdom);
+// Mana grows with Wisdom and, so that every class can use its skills, a
+// little with each character level.
+export function maxMana(wisdom, level, balance) {
+  const { manaBase, manaPerWisdom, manaPerLevel } = balance.character;
+  return Math.round(manaBase + manaPerWisdom * wisdom + manaPerLevel * level);
 }
 
 // Stat budget of an item (or of a monster's natural weapon and hide) at a level.

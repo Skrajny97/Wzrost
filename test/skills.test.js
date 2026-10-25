@@ -1,0 +1,193 @@
+import assert from 'node:assert/strict';
+import { describe, test } from 'node:test';
+
+import {
+  createRng,
+  learnBlock,
+  monsterCombatant,
+  playerCombatant,
+  raiseBlock,
+  simulateFight,
+  skillParams,
+  skillPoints,
+  skillView,
+  skillsView,
+} from '../src/engine/index.js';
+import { typicalCharacter } from '../tools/simulate.mjs';
+import { content } from './helpers/content.js';
+
+// A character of a class at class level 10 or more with one skill learned.
+function withSkill(classId, skillId, { level = 12, skillLevel = 1, hpShare } = {}) {
+  const { character, equipped } = typicalCharacter(classId, level, content);
+  const skilled = { ...character, classLevel: Math.max(character.classLevel, 10), skills: skillId ? { [skillId]: skillLevel } : {} };
+  const unit = playerCombatant({ character: skilled, equipped, name: 'Mira' }, content);
+  return hpShare === undefined ? unit : { ...unit, hp: Math.round(unit.maxHp * hpShare) };
+}
+const foe = (monsterId, level, id, extra = {}) => ({ ...monsterCombatant({ monsterId, level, id, name: `Wróg ${id}`, ...extra }, content) });
+// A foe that does not fall quickly, so a fight lasts many moves.
+const sturdy = (monsterId, level, id, extra) => ({ ...foe(monsterId, level, id, extra), hp: 5000, maxHp: 5000 });
+const fight = (seed, allies, enemies) => simulateFight({ allies, enemies, rng: createRng(seed), content, record: true });
+// The player's moves in order: each is one blow (or a heal) it made.
+const moves = (result) => result.events.filter((event) => event.actor === 'a0' && ['hit', 'crit', 'dodge', 'heal'].includes(event.kind) && !event.counter);
+
+describe('skills', () => {
+  test('a skill grows evenly from level 1 to 20', () => {
+    const strike = content.skillsById['power-strike'];
+    assert.equal(skillParams(strike, 1, content).power, 1.4);
+    assert.ok(Math.abs(skillParams(strike, 20, content).power - 2.0) < 1e-9);
+    assert.ok(Math.abs(skillParams(strike, 10, content).power - (1.4 + 0.6 * (9 / 19))) < 1e-9);
+    assert.ok(Math.abs(skillParams(strike, 99, content).power - 2.0) < 1e-9);
+    assert.equal(skillParams(strike, 5, content).armorIgnore > skillParams(strike, 4, content).armorIgnore, true);
+  });
+
+  test('every Skill Point shows on the card: each next level reads differently', () => {
+    for (const skill of content.skills) {
+      for (let level = 1; level < content.balance.skills.maxLevel; level++) {
+        const view = skillView(skill, level, content);
+        assert.notEqual(view.next, view.effect, `${skill.id}, poziom ${level}`);
+      }
+    }
+  });
+
+  test('a mana shield costs its mana per point of damage it stops', () => {
+    const result = fight('osłona-koszt', [withSkill('mage', 'mana-shield', { hpShare: 0.45 })], [sturdy('boar', 12, 'e0')]);
+    const mage = withSkill('mage', 'mana-shield');
+    const absorbed = result.events.filter((event) => event.target === 'a0' && event.absorbed > 0).reduce((sum, event) => sum + event.absorbed, 0);
+    const cost = skillParams(content.skillsById['mana-shield'], 1, content).cost;
+    assert.ok(absorbed > 0);
+    assert.ok(absorbed <= (mage.maxMana - content.skillsById['mana-shield'].mana) / cost);
+  });
+
+  test('Skill Points come with each class level after the tenth, one per level of a skill', () => {
+    assert.deepEqual(skillPoints({ classLevel: 10, skills: {} }, content), { earned: 0, spent: 0, free: 0 });
+    assert.equal(skillPoints({ classLevel: 15, skills: {} }, content).free, 5);
+    assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3 } }, content), { earned: 5, spent: 2, free: 3 });
+  });
+
+  test('a class picks one of its three skills at class level 10, for good', () => {
+    const warrior = (classLevel, skills = {}) => ({ classId: 'warrior', classLevel, skills });
+    assert.equal(learnBlock(warrior(9), 'power-strike', content).code, 'class_level');
+    assert.equal(learnBlock(warrior(10), 'fireball', content).code, 'unknown_skill');
+    assert.equal(learnBlock(warrior(10), 'power-strike', content), null);
+    assert.equal(learnBlock(warrior(30, { 'wide-sweep': 1 }), 'power-strike', content).code, 'chosen');
+    assert.equal(raiseBlock(warrior(10, { 'power-strike': 1 }), 'power-strike', content).code, 'no_points');
+    assert.equal(raiseBlock(warrior(12, { 'power-strike': 1 }), 'power-strike', content), null);
+    assert.equal(raiseBlock(warrior(40, { 'power-strike': 20 }), 'power-strike', content).code, 'max_level');
+    assert.equal(raiseBlock(warrior(40), 'power-strike', content).code, 'not_learned');
+
+    const open = skillsView(warrior(10), content);
+    assert.equal(open.ready, true);
+    assert.deepEqual(open.pools[0].options.map((skill) => skill.name), ['Potężny cios', 'Szeroki zamach', 'Nieugięty']);
+    assert.match(open.pools[0].options[0].effect, /^Cios za 140% obrażeń, który pomija 20% pancerza celu\.$/);
+    assert.equal(open.pools[0].options[0].cost, 'Koszt: 10 many, najwyżej co 3. ruch.');
+    const chosen = skillsView(warrior(12, { 'power-strike': 2 }), content);
+    assert.equal(chosen.pools[0].chosen, 'power-strike');
+    assert.equal(chosen.points, 1);
+    assert.equal(chosen.ready, true);
+    assert.match(chosen.pools[0].options[0].next, /^Cios za 14\d% obrażeń/);
+    assert.equal(skillsView(warrior(11, { 'power-strike': 2 }), content).ready, false);
+    assert.equal(skillsView(warrior(9), content).ready, false);
+  });
+
+  test('mana grows with each character level, so every class can use its skills', () => {
+    const warrior = (level) => playerCombatant({ character: { classId: 'warrior', level, classLevel: 1, points: {}, position: 'front' }, equipped: [], name: 'Mira' }, content);
+    assert.equal(warrior(11).maxMana - warrior(10).maxMana, content.balance.character.manaPerLevel);
+  });
+
+  test('a ready strike skill replaces a blow, then waits for its cooldown', () => {
+    const result = fight('zamach', [withSkill('warrior', 'power-strike')], [sturdy('boar', 12, 'e0')]);
+    const used = moves(result).map((event) => event.skill === 'power-strike');
+    assert.equal(used[0], true, 'the first move');
+    for (let i = 1; i < used.length; i++) {
+      if (used[i]) assert.ok(!used[i - 1] && !used[i - 2], `move ${i}: the cooldown is 3 moves`);
+    }
+    const unit = withSkill('warrior', 'power-strike');
+    assert.ok(used.filter(Boolean).length <= Math.floor(unit.maxMana / content.skillsById['power-strike'].mana), 'mana runs out');
+    assert.ok(used.filter(Boolean).length >= 2);
+    assert.match(moves(result)[0].text, /Potężny cios/);
+  });
+
+  test('a sweep hits every enemy, a lone one harder', () => {
+    const three = fight('grad', [withSkill('archer', 'arrow-rain')], [0, 1, 2].map((i) => sturdy('wolf', 12, `e${i}`)));
+    const start = three.events.findIndex((event) => event.kind === 'skill' && event.skill === 'arrow-rain');
+    assert.ok(start >= 0);
+    const blows = three.events.slice(start + 1, start + 4);
+    assert.deepEqual(blows.map((event) => event.target).sort(), ['e0', 'e1', 'e2']);
+    assert.ok(blows.every((event) => event.t === three.events[start].t && event.skill === 'arrow-rain'));
+  });
+
+  test('a prayer heals the wounded cleric on its move', () => {
+    const result = fight('modlitwa', [withSkill('cleric', 'prayer-of-health', { hpShare: 0.3 })], [sturdy('boar', 12, 'e0')]);
+    const prayer = result.events.find((event) => event.kind === 'heal' && event.skill === 'prayer-of-health');
+    assert.ok(prayer && prayer.amount > 0);
+    assert.match(prayer.text, /Modlitwa o zdrowie/);
+  });
+
+  test('a guard wakes once, when HP falls below 40%', () => {
+    let woke = 0;
+    for (let i = 0; i < 6; i++) {
+      const result = fight(`tarcza:${i}`, [withSkill('warrior', 'unyielding', { hpShare: 0.45 })], [sturdy('boar', 14, 'e0')]);
+      const guards = result.events.filter((event) => event.skill === 'unyielding');
+      assert.ok(guards.length <= 1);
+      woke += guards.length;
+    }
+    assert.ok(woke > 0);
+  });
+
+  test('a mana shield takes blows for mana', () => {
+    const result = fight('osłona', [withSkill('mage', 'mana-shield', { hpShare: 0.55 })], [sturdy('boar', 12, 'e0')]);
+    const on = result.events.findIndex((event) => event.kind === 'skill' && event.skill === 'mana-shield');
+    assert.ok(on >= 0);
+    assert.ok(result.events.slice(on).some((event) => event.target === 'a0' && event.absorbed > 0));
+  });
+
+  test('the dance of shadows dodges more and strikes back', () => {
+    let counters = 0;
+    for (let i = 0; i < 8; i++) {
+      const result = fight(`taniec:${i}`, [withSkill('shadow', 'shadow-dance', { hpShare: 0.45 })], [sturdy('wolf', 12, 'e0')]);
+      counters += result.events.filter((event) => event.counter && event.actor === 'a0').length;
+    }
+    assert.ok(counters > 0);
+  });
+
+  test('a blessing and a coated blade work from the start', () => {
+    const blessed = fight('błogosławieństwo', [withSkill('cleric', 'blessing')], [sturdy('boar', 12, 'e0')]);
+    assert.equal(blessed.events[0].kind, 'skill');
+    assert.equal(blessed.events[0].skill, 'blessing');
+    assert.equal(blessed.events[0].t, 0);
+    const coated = fight('jad', [withSkill('shadow', 'poisoned-blade')], [sturdy('boar', 12, 'e0')]);
+    assert.equal(coated.events[0].skill, 'poisoned-blade');
+    assert.ok(coated.events.some((event) => event.kind === 'effect' && event.actor === 'a0' && event.effect === 'Zatrucie'));
+  });
+
+  test('a pinning shot takes a move, a frost gust slows everyone', () => {
+    const pinned = fight('szpila', [withSkill('archer', 'pinning-shot')], [sturdy('wolf', 12, 'e0')]);
+    assert.ok(pinned.events.some((event) => event.kind === 'stun' && event.target === 'e0'));
+    const frozen = fight('mróz', [withSkill('mage', 'frost-gust')], [0, 1].map((i) => sturdy('wolf', 12, `e${i}`)));
+    const slow = frozen.events.find((event) => event.kind === 'slow');
+    assert.deepEqual(slow.targets, ['e0', 'e1']);
+  });
+
+  test('a fireball burns with fire whatever the staff', () => {
+    let burnt = 0;
+    for (let i = 0; i < 6; i++) {
+      const result = fight(`ogień:${i}`, [withSkill('mage', 'fireball')], [sturdy('boar', 12, 'e0')]);
+      burnt += result.events.filter((event) => event.kind === 'effect' && event.actor === 'a0' && event.effect === 'Oparzenie').length;
+    }
+    assert.ok(burnt > 0);
+  });
+
+  test('a backstab strikes the enemy standing furthest back, always critically', () => {
+    const enemies = [sturdy('wolf', 12, 'e0', { position: 'front' }), sturdy('wolf', 12, 'e1', { position: 'back' })];
+    const result = fight('plecy', [withSkill('shadow', 'backstab')], enemies);
+    const stab = result.events.find((event) => event.skill === 'backstab');
+    assert.equal(stab.target, 'e1');
+    assert.ok(stab.kind === 'crit' || stab.kind === 'dodge');
+  });
+
+  test('without a skill the fight is the same as before skills', () => {
+    const plain = withSkill('warrior', null);
+    const bare = { ...plain, skills: undefined };
+    assert.deepEqual(fight('bez', [plain], [foe('wolf', 12, 'e0')]), fight('bez', [bare], [foe('wolf', 12, 'e0')]));
+  });
+});

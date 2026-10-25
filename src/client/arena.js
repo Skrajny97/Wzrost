@@ -9,6 +9,7 @@ import { classArt } from './class-art.js';
 import { h, icon } from './dom.js';
 import { CLASS_ICONS } from './icons.js';
 import { motionOn } from './motion.js';
+import { lookOf, skillEffects } from './skill-fx.js';
 import { playHit, playMoment, playSound, playVoice } from './sound.js';
 import { state } from './state.js';
 
@@ -109,11 +110,12 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
 
   const enemies = row('enemy', fight.enemies);
   enemies.append(banner);
-  const arena = h('div', { class: 'arena' }, enemies, row('ally', fight.allies), fx);
+  const party = row('ally', fight.allies);
+  const arena = h('div', { class: 'arena' }, enemies, party, fx);
 
   // Animations through the Web Animations API, so they can all be cancelled.
   function animate(element, keyframes, options) {
-    const animation = element.animate(keyframes, { ...options, duration: options.duration / speed });
+    const animation = element.animate(keyframes, { ...options, duration: options.duration / speed, delay: (options.delay ?? 0) / speed });
     running.add(animation);
     return animation.finished.catch(() => {}).finally(() => running.delete(animation));
   }
@@ -206,12 +208,23 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
   // The attacker reaches the target: a lunge for blows, a projectile otherwise.
   // A strike cut short (Pomiń, Powtórz) lands nowhere: the arena already shows
   // another moment of the fight.
-  async function strike(actor, target, onImpact) {
+  async function strike(actor, target, onImpact, style = {}) {
     const id = run;
     const from = cards.get(actor.id).card;
     const to = cards.get(target.id).card;
     const a = centerOf(from);
     const b = centerOf(to);
+    // A strike out of the shadows: the attacker fades and the blow lands
+    // from nowhere.
+    if (style.teleport && !reducedMotion()) {
+      playSound('swing');
+      await animate(from, [{ opacity: 1 }, { opacity: 0.15 }], { duration: 220 });
+      if (id !== run) return;
+      onImpact();
+      await animate(from, [{ opacity: 0.15 }, { opacity: 1 }], { duration: 260 });
+      await wait(200 / speed);
+      return;
+    }
     if (actor.strike === 'melee') {
       const reach = reducedMotion() ? 0.3 : 0.62;
       const dx = (b.x - a.x) * reach;
@@ -246,8 +259,10 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     playSound(magic ? 'magic' : 'shot');
     await animate(from, [{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 160 });
     if (id !== run) return;
-    const bolt = h('span', { class: `projectile projectile--${magic ? 'magic' : 'arrow'}` });
-    if (magic) bolt.style.setProperty('--fx', elementColor(actor.element));
+    const bolt = h('span', {
+      class: ['projectile', `projectile--${magic ? 'magic' : 'arrow'}`, style.big && 'projectile--big', style.glow && 'projectile--glow'].filter(Boolean).join(' '),
+    });
+    if (magic || style.color) bolt.style.setProperty('--fx', style.color ?? elementColor(actor.element));
     fx.append(bolt);
     const angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
     await animate(
@@ -264,6 +279,19 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     onImpact();
     await wait(300 / speed);
   }
+
+  const skills = skillEffects({
+    animate,
+    centerOf,
+    cards,
+    fx,
+    arena,
+    row: (side) => (side === 'enemy' ? enemies : party),
+    reduced: reducedMotion,
+    wait: (ms) => wait(ms / speed),
+    setHp,
+    float,
+  });
 
   const logLine = (event) => h('li', { class: `log-line log-line--${event.kind}`, text: event.text });
 
@@ -289,23 +317,67 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       log.scrollTop = log.scrollHeight;
     };
 
+    if (event.kind === 'skill') {
+      // A skill wakes: a sweep's wave over the foes, or an aura on its user.
+      if (!event.targets) skills.status(event.actor, event.skillName);
+      await skills.cast(event);
+      line();
+      return;
+    }
+    if (event.kind === 'heal') {
+      await skills.heal(event);
+      line();
+      return;
+    }
+    if (event.kind === 'stun') {
+      skills.status(event.target, 'przyszpilony');
+      float(event.target, 'traci ruch', 'effect');
+      line();
+      await flash(event.target, '#c49a6c', 'rgba(196, 154, 108, 0.3)');
+      return;
+    }
+    if (event.kind === 'slow') {
+      for (const id of event.targets) {
+        skills.status(id, 'spowolniony');
+        flash(id, '#8fd3ff', 'rgba(143, 211, 255, 0.25)');
+      }
+      line();
+      await wait(320 / speed);
+      return;
+    }
+    // A skill's blow shows its look; a sweep's blows land at once, as its
+    // wave has already crossed the foes.
+    const look = event.skill ? lookOf(event) : null;
+    const style = look ? { color: look.color, big: look.big, glow: look.glow, teleport: look.teleport } : {};
+    const land = async (onImpact) => {
+      if (event.sweep) {
+        onImpact();
+        await wait(240 / speed);
+        return;
+      }
+      if (event.counter) skills.callout(actor.id, 'Kontra', '#a690e8');
+      if (look) skills.before(event);
+      await strike(actor, target, onImpact, style);
+    };
     if (event.kind === 'hit' || event.kind === 'crit') {
       const strong = event.kind === 'crit';
-      await strike(actor, target, () => {
+      await land(() => {
         playHit(actor.sound, strong);
         // Not every blow draws a cry: every critical one, half of the others.
         if (strong || Math.random() < 0.5) playVoice(voiceOf(target), 'hurt');
         setHp(target.id, event.hp);
         flash(target.id, strong ? '#e0a03c' : HIT_COLOR, strong ? 'rgba(224, 160, 60, 0.45)' : undefined);
-        shake(target.id, strong ? 8 : 5);
+        shake(target.id, strong || look?.impact === 'heavy' ? 8 : 5);
         slash(target.id, strong);
+        if (look && !event.sweep) skills.impact(event);
         float(target.id, strong ? `−${event.damage}!` : `−${event.damage}`, strong ? 'crit' : 'hit');
+        if (event.absorbed) float(target.id, `osłona ${event.absorbed}`, 'absorb');
         line();
       });
       return;
     }
     if (event.kind === 'dodge') {
-      await strike(actor, target, () => {
+      await land(() => {
         playMoment('dodge');
         float(target.id, 'unik', 'dodge');
         const card = cards.get(target.id).card;
@@ -365,6 +437,10 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (event.hp !== undefined && byId.has(event.target)) setHp(event.target, event.hp);
     if (event.kind === 'effect') cards.get(event.target).status.textContent = event.effect;
     if (event.kind === 'kill') setDown(event.target, true);
+    if (event.kind === 'skill' && !event.targets) cards.get(event.actor).status.textContent = event.skillName;
+    if (event.kind === 'skill' && event.skill === 'mana-shield') cards.get(event.actor).card.classList.add('unit--shielded');
+    if (event.kind === 'stun') cards.get(event.target).status.textContent = 'przyszpilony';
+    if (event.kind === 'slow') for (const id of event.targets) cards.get(id).status.textContent = 'spowolniony';
     log.append(logLine(event));
   }
 
@@ -385,6 +461,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       setHp(unit.id, unit.hp);
       setDown(unit.id, unit.hp <= 0);
       cards.get(unit.id).status.textContent = '';
+      cards.get(unit.id).card.classList.remove('unit--shielded');
     }
   }
 

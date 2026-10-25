@@ -6,6 +6,7 @@
   "required": [
     "combat",
     "character",
+    "skills",
     "monsters",
     "items",
     "upgrades",
@@ -170,7 +171,8 @@
         "hpPerVitality",
         "hpPerLevel",
         "manaBase",
-        "manaPerWisdom"
+        "manaPerWisdom",
+        "manaPerLevel"
       ],
       "properties": {
         "hpBase": {
@@ -192,6 +194,35 @@
         "manaPerWisdom": {
           "type": "number",
           "minimum": 0
+        },
+        "manaPerLevel": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Mana za każdy poziom postaci, żeby każda klasa mogła używać umiejętności."
+        }
+      }
+    },
+    "skills": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Umiejętności: od unlockClassLevel postać wybiera jedną z trzech umiejętności klasy. Każdy kolejny poziom klasy daje pointsPerClassLevel Punktów Umiejętności, a punkt podnosi umiejętność o poziom, najwyżej do maxLevel.",
+      "required": [
+        "unlockClassLevel",
+        "maxLevel",
+        "pointsPerClassLevel"
+      ],
+      "properties": {
+        "unlockClassLevel": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxLevel": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "pointsPerClassLevel": {
+          "type": "integer",
+          "minimum": 1
         }
       }
     },

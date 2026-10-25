@@ -25,7 +25,8 @@ import {
 } from './progression.js';
 import { countEvents, createRng } from './rng.js';
 import { say } from './text.js';
-import { unlockMessages } from './unlocks.js';
+import { classUnlockMessages, unlockMessages } from './unlocks.js';
+import { skillPoints } from './skills.js';
 
 // Value of [minutes, value] pairs at `minutes`, rising with the logarithm of
 // the time between pairs.
@@ -415,6 +416,10 @@ export function applyHunt(character, hunt, content) {
     messages.push(
       say(content.texts, textId, nextClass.level, { className, level: nextClass.level, points, unlockLevel, time: time.perClassLevel * classLevels }),
     );
+    for (let level = character.classLevel + 1; level <= nextClass.level; level++) messages.push(...classUnlockMessages(level, content));
+    // Skill Points from the class levels after the skills open.
+    const skillGain = skillPoints({ classLevel: nextClass.level }, content).earned - skillPoints({ classLevel: character.classLevel }, content).earned;
+    if (skillGain > 0) messages.push(say(content.texts, 'skillPoints', nextClass.level, { points: skillGain }));
   }
   // A new level of either kind heals fully (hpAfterHunt).
   const levelled = levels > 0 || classLevels > 0;

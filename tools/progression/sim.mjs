@@ -15,7 +15,10 @@
 // - camp: at every hunt end, hunt start and build completion, collect the
 //   stores and, if nothing is being built, start the next level that costs the
 //   least gold among those affordable;
-// - Time Points are counted, never spent.
+// - Time Points are counted, never spent;
+// - skills: none, unless the policy names one by its place among the three of
+//   the class (skill: 0, 1 or 2): learned at the class level that opens them,
+//   and every Skill Point goes into it at once.
 
 import * as engine from '../../src/engine/index.js';
 import { loadData } from '../validate-data.mjs';
@@ -38,6 +41,7 @@ export const DEFAULT_POLICY = {
   stepDownFaints: 2,
   stepDownHunts: 2,
   anvil: false,
+  skill: null,
   maxHunts: 3000,
 };
 
@@ -325,6 +329,14 @@ export function runCharacter(classId, runIndex, content, policyIn = {}) {
     for (const item of hunt.items) {
       totals.foundBySlot[item.slot] = (totals.foundBySlot[item.slot] ?? 0) + 1;
       totals.rarityFound[item.rarity] = (totals.rarityFound[item.rarity] ?? 0) + 1;
+    }
+
+    // The skill the policy names, learned once it opens and raised with every
+    // Skill Point (skills.js in the server).
+    if (policy.skill !== null) {
+      const skill = engine.skillsOfClass(classId, content)[Number(policy.skill)];
+      if (!character.skills && !engine.learnBlock(character, skill.id, content)) character.skills = { [skill.id]: 1 };
+      while (character.skills && !engine.raiseBlock(character, skill.id, content)) character.skills = { [skill.id]: character.skills[skill.id] + 1 };
     }
 
     // Finds into empty slots, as the server does.

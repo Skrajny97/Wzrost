@@ -36,6 +36,7 @@ import {
   restedHp,
   salvageYield,
   settleCrafting,
+  skillsView,
   spentPoints,
   statEffects,
   unlockedFeatures,
@@ -257,6 +258,8 @@ export function engineCharacter(row) {
     points: JSON.parse(row.points),
     position: row.position,
     appearance: row.appearance,
+    // The skills learned and their levels (skills.js).
+    skills: JSON.parse(row.skills ?? '{}'),
   };
 }
 
@@ -493,11 +496,13 @@ export function characterView(player, now) {
         },
     mana: values.mana,
     maxMana: values.mana,
-    features: unlockedFeatures(row.level, content),
+    features: unlockedFeatures(row.level, content, row.class_level),
     huntDurations: huntDurations(row.level, content),
     // The next longer exploration and its level, for the hint under the slider.
     huntNext: nextHuntUnlock(row.level, content),
     freePoints: freePoints(character, content),
+    // The Umiejętności tab: the choices, the skills learned and the Skill Points.
+    skills: skillsView(character, content),
     canResetPoints: row.level <= content.balance.progression.freeResetMaxLevel && spentPoints(character) > 0,
     stats: content.stats.map((stat) => ({
       id: stat.id,

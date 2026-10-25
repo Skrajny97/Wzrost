@@ -1,0 +1,53 @@
+// The author's preview of a skill's animation: a short recorded fight of a
+// character of its class, at level 20 with the skill at level 10, against
+// foes that show the skill off. It is never part of the game: the author's
+// panel plays it to check how each skill looks.
+
+import { simulateFight } from './combat.js';
+import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
+import { generateItem } from './items.js';
+import { createRng } from './rng.js';
+import { WOUND_KINDS } from './skills.js';
+import { autoDistribute } from './stats.js';
+
+const LEVEL = 20;
+const SKILL_LEVEL = 10;
+
+// Who the skill is shown against: a group for a sweep, a front and a back
+// foe for a blow aimed at the back, a single strong foe otherwise.
+function foesFor(skill, content) {
+  const groupFactors = content.balance.hunt.groupFactors;
+  const foe = (monsterId, index, count, level = LEVEL - 2) =>
+    monsterCombatant({ monsterId, level, id: `e${index}`, groupFactor: groupFactors[count - 1] }, content);
+  if (skill.kind === 'sweep') return ['wolf', 'wolf', 'fox'].map((id, index) => foe(id, index, 3));
+  if (skill.params.target === 'back') return [foe('wolf', 0, 2), foe('crow', 1, 2)];
+  if (WOUND_KINDS.has(skill.kind) || skill.kind === 'heal') return [foe('boar', 0, 1, LEVEL + 2)];
+  return [foe('boar', 0, 1)];
+}
+
+export function skillDemo(skillId, content) {
+  const skill = content.skillsById[skillId];
+  const cls = content.classesById[skill.classId];
+  const character = { classId: cls.id, level: LEVEL, classLevel: LEVEL, points: {}, position: cls.position, appearance: 'male', skills: { [skillId]: SKILL_LEVEL } };
+  character.points = autoDistribute(character, content);
+  const gear = createRng(`demo-gear:${cls.id}`);
+  const bases = [cls.weapons[0], cls.offhands[0], ...cls.armor];
+  const equipped = bases.map((baseId) => generateItem({ baseId, level: LEVEL - 4 }, gear, content));
+  // A wound skill wakes below its mark, so the character starts just above it.
+  const below = WOUND_KINDS.has(skill.kind) ? skill.params.below + 0.1 : skill.kind === 'heal' ? skill.params.below - 0.1 : 1;
+  const full = playerCombatant({ character, equipped, name: cls.name }, content);
+  const player = { ...full, hp: Math.max(1, Math.round(full.maxHp * Math.min(1, below))) };
+  let result = null;
+  let enemies = null;
+  for (let attempt = 0; attempt < 30; attempt++) {
+    enemies = foesFor(skill, content);
+    result = simulateFight({ allies: [player], enemies, rng: createRng(`demo:${skillId}:${attempt}`), content, record: true });
+    if (result.events.some((event) => event.skill === skillId)) break;
+  }
+  return {
+    allies: [combatantView(player, enemies[0].level, content)],
+    enemies: enemies.map((enemy) => combatantView(enemy, player.level, content)),
+    events: result.events,
+    won: result.won,
+  };
+}

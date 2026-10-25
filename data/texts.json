@@ -40,6 +40,53 @@
     "{target} nie wstaje.",
     "{target} osuwa się na mech."
   ],
+  "skillHit": [
+    "{actor} używa umiejętności {skill}. {target} traci {damage} HP.",
+    "{actor}: {skill}! {target} traci {damage} HP."
+  ],
+  "skillCrit": [
+    "{actor} używa umiejętności {skill} i trafia krytycznie! {target} traci {damage} HP.",
+    "{actor}: {skill}, trafienie krytyczne! {target} traci {damage} HP."
+  ],
+  "skillDodge": [
+    "{actor} używa umiejętności {skill}, ale {target} unika ciosu.",
+    "{actor}: {skill}! {target} schodzi z linii ataku."
+  ],
+  "skillUse": [
+    "{actor} używa umiejętności {skill}.",
+    "{actor}: {skill}!"
+  ],
+  "skillHeal": [
+    "{actor} używa umiejętności {skill} i odzyskuje {amount} HP.",
+    "{actor}: {skill}. Wraca {amount} HP."
+  ],
+  "stun": [
+    "{target} traci najbliższy ruch.",
+    "{target} nie może się ruszyć."
+  ],
+  "slow": [
+    "Wrogowie zwalniają.",
+    "Przeciwnicy ruszają się wolniej."
+  ],
+  "slowOne": [
+    "{target} zwalnia.",
+    "{target} rusza się wolniej."
+  ],
+  "absorbed": [
+    "Osłona pochłania {absorbed}.",
+    "Osłona bierze na siebie {absorbed}."
+  ],
+  "counter": [
+    "{actor} kontruje. {target} traci {damage} HP.",
+    "{actor} odpowiada ciosem. {target} traci {damage} HP."
+  ],
+  "counterCrit": [
+    "{actor} kontruje krytycznie! {target} traci {damage} HP."
+  ],
+  "skillPoints": ["Punkty Umiejętności: +{points}. Dodasz je w zakładce Umiejętności."],
+  "skillCostActive": ["Koszt: {mana} many, najwyżej co {cooldown}. ruch."],
+  "skillCostStart": ["Koszt: {mana} many, na początku walki."],
+  "skillCostOnce": ["Koszt: {mana} many, raz na walkę."],
   "victory": ["Zwycięstwo.", "Walka skończona. Wygrana."],
   "defeat": ["{target} traci przytomność.", "Ciemność. {target} traci przytomność."],
   "escape": ["{target} ledwo uchodzi z życiem.", "{target} wycofuje się, zanim będzie za późno."],

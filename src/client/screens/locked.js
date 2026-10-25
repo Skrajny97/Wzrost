@@ -12,7 +12,9 @@ export function lockedScreen(unlockId, title) {
         ? `Moduł ${unlock.name} pojawi się w jednej z kolejnych aktualizacji gry.`
         : unlock.level
           ? `Dostęp zablokowany. ${unlock.name}: od poziomu postaci ${unlock.level}. Twój poziom: ${state.character.level}.`
-          : `Dostęp zablokowany. ${unlock.name} odblokuje się ${unlock.condition}.`;
+          : unlock.classLevel
+            ? `Dostęp zablokowany. ${unlock.name}: od poziomu klasy ${unlock.classLevel}. Twój poziom klasy: ${state.character.classLevel}.`
+            : `Dostęp zablokowany. ${unlock.name} odblokuje się ${unlock.condition}.`;
       fill(container,
         h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: title })),
         systemPanel(message),

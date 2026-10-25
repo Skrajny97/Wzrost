@@ -1,8 +1,10 @@
 // The author's panel (src/server/author.js), opened from the settings of the
 // author's account: how many accounts and characters the game has, and every
 // account, newest first, with its e-mail and its character. It is read anew
-// on every visit and with "Odśwież".
+// on every visit and with "Odśwież". On top, the preview of the skills: a
+// tap plays a short fight that shows one skill, in the report's arena.
 
+import { createArena } from '../arena.js';
 import { fill, h, icon } from '../dom.js';
 import { dateTimeFormat, formatNumber } from '../format.js';
 import { call, state } from '../state.js';
@@ -15,15 +17,63 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
   }
   let panel = null;
   let error = null;
+  let skills = null;
+  let arena = null;
+  const preview = h('div', { class: 'author-skill-preview', 'aria-live': 'polite' });
 
   async function load() {
     try {
       panel = await call('GET', '/api/author');
+      skills = (await call('GET', '/api/author/skills')).skills;
       error = null;
     } catch (failure) {
       error = failure.message;
     }
     render();
+  }
+
+  // One skill's fight, played at once; the one before stops.
+  async function play(skill) {
+    const { fight } = await call('GET', `/api/author/skills/${skill.id}`);
+    arena?.stop();
+    arena = createArena(fight, { autoplay: 'now' });
+    fill(preview, h('h3', { class: 'author-skill-title', text: `${skill.name} · ${skill.className}` }), arena.element);
+    // Just below the top bar, which stays over the page and would hide the foes.
+    const top = document.getElementById('topbar')?.getBoundingClientRect().bottom ?? 0;
+    window.scrollTo({ top: window.scrollY + preview.getBoundingClientRect().top - top - 8, behavior: 'smooth' });
+  }
+
+  function skillsPreview() {
+    if (!skills) return null;
+    const classes = [...new Set(skills.map((skill) => skill.className))];
+    return h(
+      'section',
+      { class: 'card author-skills', 'aria-label': 'Podgląd umiejętności' },
+      h('h2', { class: 'card-title', text: 'Podgląd umiejętności' }),
+      h('p', { class: 'muted', text: 'Stuknij umiejętność: krótka walka pokazowa postaci na poziomie 20, z umiejętnością na poziomie 10.' }),
+      classes.map((className) =>
+        h(
+          'div',
+          { class: 'author-skill-group' },
+          h('h3', { class: 'author-skill-class', text: className }),
+          h(
+            'div',
+            { class: 'author-skill-buttons' },
+            skills
+              .filter((skill) => skill.className === className)
+              .map((skill) =>
+                h('button', {
+                  type: 'button',
+                  class: 'button button--world button--small',
+                  text: skill.name,
+                  onClick: (event) => withButton(event.currentTarget, () => play(skill)),
+                }),
+              ),
+          ),
+        ),
+      ),
+      preview,
+    );
   }
 
   function render() {
@@ -35,7 +85,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
         h('div', { class: 'page-heading-text' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Panel autora' }), h('p', { class: 'page-subtitle', text: 'Konta i postacie w grze' })),
         h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
       ),
-      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [counts(panel.counts), accounts(panel.accounts)],
+      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [skillsPreview(), counts(panel.counts), accounts(panel.accounts)],
       h('button', {
         type: 'button',
         class: 'button button--world',
@@ -83,5 +133,9 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
 
   render();
   load();
-  return {};
+  return {
+    unmount() {
+      arena?.stop();
+    },
+  };
 }

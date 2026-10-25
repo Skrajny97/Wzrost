@@ -8,7 +8,8 @@
   {
     "id": "skills",
     "name": "Umiejętności",
-    "level": 5
+    "classLevel": 10,
+    "message": "Odblokowano Umiejętności. Wybierz jedną z trzech w zakładce Postać, w Umiejętnościach."
   },
   {
     "id": "professions",

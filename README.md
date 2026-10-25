@@ -113,7 +113,7 @@ npm run progression # postacie od poziomu 1 do 50 na prawdziwych łupach, z oboz
 npm run dev        # gra pod http://localhost:8787 z lokalną bazą D1
 ```
 
-Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 60,240 --hunts 2000` albo `npm run simulate -- --calibrate` (propozycja stałej krzywej XP). Daje typowej postaci sprzęt, jaki zakłada krzywa, więc nie widzi, że prawdziwy sprzęt jest starszy. To widać w `npm run progression` (`tools/progression/`): po 100 postaci każdej klasy przechodzi grę od poziomu 1 do 50 na prawdziwych łupach, z odpoczynkiem i obozem, także z proponowanymi zmianami danych. Wynik trafia do `checks/progression/` (około 2,5 minuty), a pojedyncze zmiany sprawdza `node tools/progression/variants.mjs 40 baseline lag240`.
+Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 60,240 --hunts 2000` albo `npm run simulate -- --calibrate` (propozycja stałej krzywej XP). Daje typowej postaci sprzęt, jaki zakłada krzywa, więc nie widzi, że prawdziwy sprzęt jest starszy. To widać w `npm run progression` (`tools/progression/`): po 100 postaci każdej klasy przechodzi grę od poziomu 1 do 50 na prawdziwych łupach, z odpoczynkiem i obozem, także z proponowanymi zmianami danych. Wynik trafia do `checks/progression/` (około 2,5 minuty), a pojedyncze zmiany sprawdza `node tools/progression/variants.mjs 40 baseline lag240`. Umiejętności sprawdzają warianty `skill=0`, `skill=1` i `skill=2` (pierwsza, druga albo trzecia umiejętność klasy), a ich liczby np. `skill=0+sk=fireball:power:1.3/1.9` (para to poziom 1 i 20).
 
 ## API
 
