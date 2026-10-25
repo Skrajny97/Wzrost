@@ -66,7 +66,27 @@
       "amulet": "silver amulet with a round gemstone on a chain, single inventory item icon",
       "ring": "gold ring with a small gemstone, single inventory item icon",
       "talisman": "round carved wooden charm with a plain smooth face and a simple notched rim, hung on a leather cord, single inventory item icon",
-      "holed-stone": "smooth grey river stone with a natural hole through it, hung on a leather cord with two small wooden beads, plain folk charm, single inventory item icon"
+      "holed-stone": "smooth grey river stone with a natural hole through it, hung on a leather cord with two small wooden beads, plain folk charm, single inventory item icon",
+      "broadsword": "heavy broad straight sword with a wide steel blade, a simple steel crossguard bent toward the blade and a dark leather grip, diagonal, single inventory item icon",
+      "war-axe": "light war axe on a long slim wooden haft with a narrow crescent iron head and a small hammer back, diagonal, single inventory item icon",
+      "hunting-knife": "long single-edged hunting knife with a slightly curved steel blade, a short brass guard and a bone handle, diagonal, single inventory item icon",
+      "recurve-bow": "short dark recurve bow with limbs curling forward at both tips, horn and wood with leather wrapping at the grip, taut string, diagonal, single inventory item icon",
+      "rune-staff": "straight dark wooden staff carved with small glowing blue runes along its length, an iron cap on top, diagonal, single inventory item icon",
+      "censer": "brass censer, a round pierced incense burner hanging on a short chain, with a thin wisp of smoke, single inventory item icon",
+      "pavise": "tall rectangular wooden pavise shield with a raised vertical ridge in the middle, an iron rim and a painted red stripe, single inventory item icon",
+      "bow-case": "leather bow case with brass studs and a quiver of feathered arrows attached to it, worn at the belt, single inventory item icon",
+      "tome": "old thick book bound in brown leather with brass corners and a clasp, single inventory item icon",
+      "fur-cap": "round fur hat with a dark red felt crown, single inventory item icon",
+      "peaked-helmet": "iron helmet with a short peak at the front, a sliding nose bar, ear flaps and a segmented neck guard, single inventory item icon",
+      "biretta": "square black clerical biretta cap with three ridges on top and a small tassel, single inventory item icon",
+      "gambeson": "thick quilted cream linen gambeson jacket with vertical stitched padding, an empty garment with nobody wearing it, single inventory item icon",
+      "brigandine": "brigandine vest of dark red cloth over leather, studded with rows of brass rivets that hold steel plates inside, an empty garment with nobody wearing it, single inventory item icon",
+      "cloak": "long dark blue woolen travel cloak with a hood and a bronze clasp, an empty garment with nobody wearing it, single inventory item icon",
+      "chasuble": "white liturgical chasuble, a sleeveless vestment with a gold-embroidered cross band down the front, an empty garment with nobody wearing it, single inventory item icon",
+      "bracers": "pair of brown leather bracers reinforced with iron strips, single inventory item icon",
+      "pointed-shoes": "pair of soft brown leather shoes with long pointed toes, medieval poulaines, single inventory item icon",
+      "reliquary": "small silver reliquary box pendant with an engraved lid, hung on a leather cord, single inventory item icon",
+      "signet-ring": "heavy gold signet ring with a flat engraved crest face, single inventory item icon"
     }
   },
   "materials": {
