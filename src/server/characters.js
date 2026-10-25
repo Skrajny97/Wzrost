@@ -11,17 +11,21 @@ import {
   combatValues,
   computeStats,
   construction,
+  craftMinutes,
+  craftPace,
   effectText,
   freePoints,
   hoursToNext,
   huntDurations,
   itemView,
+  materialView,
   nextHuntUnlock,
   playerCombatant,
   production,
   regenPerMinute,
   restBonus,
   restedHp,
+  settleCrafting,
   spentPoints,
   statEffects,
   unlockedFeatures,
@@ -190,6 +194,52 @@ function campView(player, levels, now) {
   };
 }
 
+// What the character row keeps: materials, parts and the queue, as JSON.
+export function craftingState(row) {
+  return { materials: JSON.parse(row.materials ?? '{}'), parts: JSON.parse(row.parts ?? '{}'), queue: JSON.parse(row.crafting ?? '[]') };
+}
+
+const rarityIndex = (id) => content.rarities.findIndex((rarity) => rarity.id === id);
+
+// The table as the page shows it, settled at `now`. `pace` 0: no table yet.
+function craftingView(row, levels, now) {
+  const pace = craftPace(levels, content);
+  const { materials, parts, queue } = settleCrafting(craftingState(row), now);
+  return {
+    pace,
+    limit: content.balance.crafting.queueLimit,
+    materials: Object.entries(materials)
+      .map(([key, count]) => {
+        const view = materialView(key, count, content);
+        return { ...view, minutes: pace > 0 ? craftMinutes(view.rarity, count, pace, content) : null };
+      })
+      .sort((a, b) => rarityIndex(a.rarity) - rarityIndex(b.rarity) || a.name.localeCompare(b.name, 'pl')),
+    parts: content.parts.map((part) => ({
+      id: part.id,
+      name: part.name,
+      description: part.description,
+      rarity: part.rarity,
+      color: content.raritiesById[part.rarity].color,
+      count: parts[part.id] ?? 0,
+    })),
+    queue: queue.map((order) => {
+      const rarity = order.kind === 'material' ? materialView(order.key, order.count, content).rarity : order.rarity;
+      return {
+        id: order.id,
+        kind: order.kind,
+        name: order.kind === 'material' ? content.materialsById[order.key.slice(0, order.key.lastIndexOf(':'))].name : order.name,
+        count: order.kind === 'material' ? order.count : 1,
+        rarity,
+        color: content.raritiesById[rarity].color,
+        part: content.partsById[order.partId].name,
+        parts: order.parts,
+        startsAt: order.startsAt,
+        endsAt: order.endsAt,
+      };
+    }),
+  };
+}
+
 // Where an activity takes place. region_id holds the inner region, or a whole
 // region for an activity started before inner regions.
 function activityPlace(activity, level) {
@@ -275,6 +325,8 @@ export function characterView(player, now) {
     bag: items.filter((item) => !item.equippedSlot).reverse().map(toItem),
     bagCapacity: bagCapacity(levels, content),
     camp: campView(player, levels, now),
+    // The Stół rzemieślniczy: materials, parts and the queue (crafting.js).
+    crafting: craftingView(row, levels, now),
     // The narrator's cards seen so far, or null for a character made before
     // the introduction (tutorial.js).
     tutorial: row.tutorial === null ? null : JSON.parse(row.tutorial),

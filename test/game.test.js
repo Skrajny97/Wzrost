@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, generateItem } from '../src/engine/index.js';
+import { createRng, generateItem, itemName } from '../src/engine/index.js';
 import { skipTime } from '../src/server/testing.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -665,11 +665,11 @@ describe('camp', () => {
     }
   }
 
-  test("starts with seven buildings at level 0, the abandoned camp's supply and a bag of 30", async () => {
+  test("starts with eight buildings at level 0, the abandoned camp's supply and a bag of 30", async () => {
     const start = await character();
     assert.deepEqual(
       start.camp.buildings.map((building) => [building.id, building.level]),
-      [['sawmill', 0], ['quarry', 0], ['mine', 0], ['campfire', 0], ['loot-shed', 0], ['scrap-bench', 0], ['anvil', 0]],
+      [['sawmill', 0], ['quarry', 0], ['mine', 0], ['campfire', 0], ['loot-shed', 0], ['scrap-bench', 0], ['anvil', 0], ['craft-table', 0]],
     );
     assert.equal(start.camp.construction, null);
     const campfire = start.camp.buildings.find((building) => building.id === 'campfire');
@@ -683,7 +683,7 @@ describe('camp', () => {
     assert.deepEqual(data.resources.map((resource) => resource.name), ['Drewno', 'Kamień', 'Ruda żelaza']);
     assert.deepEqual(
       data.buildings.map((building) => building.name),
-      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Ognisko', 'Szałas na łupy', 'Stół złomiarza', 'Kowadło'],
+      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Ognisko', 'Szałas na łupy', 'Stół złomiarza', 'Kowadło', 'Stół rzemieślniczy'],
     );
   });
 
@@ -1040,5 +1040,139 @@ describe('Time Points and the narrator', () => {
     await (await db()).prepare('UPDATE characters SET tutorial = NULL').run();
     assert.equal((await character()).tutorial, null);
     assert.equal((await see({ card: 'intro' })).data.error.code, 'no_tutorial');
+  });
+});
+
+describe('Stół rzemieślniczy', () => {
+  let cookie;
+  beforeEach(async () => {
+    cookie = await signUp();
+    await newCharacter(cookie, 'warrior');
+  });
+
+  const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
+  const craft = (body) => call('POST', '/api/craft/materials', { cookie, body });
+  const salvage = (id) => call('POST', `/api/items/${id}/salvage`, { cookie });
+  const tableAt = async (level) =>
+    (await db())
+      .prepare(
+        "INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'craft-table', ?, 0, 1 FROM characters WHERE true ON CONFLICT (character_id, building_id) DO UPDATE SET level = excluded.level",
+      )
+      .bind(level)
+      .run();
+  const stockMaterials = async (materials) => (await db()).prepare('UPDATE characters SET materials = ?').bind(JSON.stringify(materials)).run();
+  // The table's queue moved `minutes` into the past, as if they had passed.
+  async function wait(minutes) {
+    const database = await db();
+    const { crafting } = await database.prepare('SELECT crafting FROM characters').first();
+    const shift = (order) => ({ ...order, startsAt: order.startsAt - minutes * 60000, endsAt: order.endsAt - minutes * 60000 });
+    await database.prepare('UPDATE characters SET crafting = ?').bind(JSON.stringify(JSON.parse(crafting).map(shift))).run();
+  }
+  async function bagItem(rarityId = 'rare', level = 25) {
+    const item = generateItem({ baseId: 'helmet', level, rarityId }, createRng('rozbiórka'), content);
+    const { meta } = await (await db())
+      .prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters')
+      .bind(JSON.stringify(item))
+      .run();
+    return { id: meta.last_row_id, item };
+  }
+  const parts = (view, id) => view.crafting.parts.find((part) => part.id === id).count;
+
+  test('creatures leave materials, which wait at the table', async () => {
+    // Four-hour explorations open at level 50.
+    await (await db()).prepare('UPDATE characters SET level = 50, class_level = 2').run();
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 240 } });
+    await finishHunt();
+    const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
+    const found = report.summary.materials.map(({ key, count }) => [key, count]).sort();
+    assert.ok(found.length > 0);
+    assert.deepEqual(after.crafting.materials.map(({ key, count }) => [key, count]).sort(), found);
+    assert.equal(after.crafting.pace, 0);
+    // The fights name their materials, and items came only in chests.
+    assert.deepEqual(report.fights.flatMap((fight) => fight.materials.map(({ key, count }) => [key, count])).length > 0, true);
+    assert.ok(report.entries.some((entry) => /skrzyni|skrzynk|kuferek/.test(entry.text)));
+  });
+
+  test('without the table nothing is made; with it, materials become parts in time, for free', async () => {
+    await stockMaterials({ 'wolf-pelt:common': 3, 'boar-tusk:rare': 1 });
+    const none = await craft({ all: true });
+    assert.deepEqual([none.status, none.data.error.code], [409, 'no_table']);
+    await tableAt(1);
+    const before = await character();
+    const { status, data } = await craft({ keys: ['wolf-pelt:common'] });
+    assert.deepEqual([status, data.ordered], [200, 1]);
+    const view = data.character.crafting;
+    assert.deepEqual(view.materials.map((material) => material.key), ['boar-tusk:rare']);
+    // Three parts of 5 minutes, 10% faster at level 1: 14 minutes.
+    const [order] = view.queue;
+    assert.deepEqual([order.name, order.count, order.part, order.parts, (order.endsAt - order.startsAt) / 60000], ['Skóra wilka', 3, 'Ścinki', 3, 14]);
+    assert.deepEqual([data.character.gold, data.character.resources], [before.gold, before.resources]);
+    assert.equal(parts(data.character, 'scraps'), 0);
+    await wait(14);
+    const later = await character();
+    assert.deepEqual([later.crafting.queue.length, parts(later, 'scraps')], [0, 3]);
+    // The next order counts from now, and the parts made stay.
+    await craft({ all: true });
+    await wait(8);
+    const last = await character();
+    assert.deepEqual([parts(last, 'scraps'), parts(last, 'straps'), last.crafting.materials.length], [3, 1, 0]);
+  });
+
+  test('"Przerób wszystko" takes every stack while the queue has room', async () => {
+    await tableAt(1);
+    await stockMaterials(Object.fromEntries(content.materials.map((material) => [`${material.id}:${material.rarity}`, 2])));
+    const { data } = await craft({ all: true });
+    const limit = content.balance.crafting.queueLimit;
+    assert.equal(data.ordered, limit);
+    assert.equal(data.character.crafting.materials.length, content.materials.length - limit);
+    const full = await craft({ all: true });
+    assert.deepEqual([full.status, full.data.error.code], [409, 'queue_full']);
+  });
+
+  test('an item from the bag is taken apart into parts of its rarity', async () => {
+    await tableAt(1);
+    const { id, item } = await bagItem('rare', 25);
+    const { status, data } = await salvage(id);
+    assert.equal(status, 200);
+    // 2 + 25 / 10: 4 Rzemienie, 8 minutes each, 10% faster.
+    assert.deepEqual([data.salvage.name, data.salvage.part, data.salvage.parts], [itemName(item, content), 'Rzemienie', 4]);
+    assert.equal(data.character.bag.length, 0);
+    assert.equal(data.character.crafting.queue[0].endsAt - data.character.crafting.queue[0].startsAt, 29 * 60000);
+    assert.equal((await salvage(id)).status, 404);
+    await wait(29);
+    assert.equal(parts(await character(), 'straps'), 4);
+  });
+
+  test('two taps on "Rozbierz" make one order', async () => {
+    await tableAt(1);
+    const { id } = await bagItem();
+    const taps = await Promise.all([salvage(id), salvage(id)]);
+    const [won, lost] = taps.sort((a, b) => a.status - b.status);
+    assert.equal(won.status, 200);
+    assert.ok([404, 409].includes(lost.status), `${lost.status}`);
+    const view = await character();
+    assert.equal(view.crafting.queue.length, 1);
+    assert.equal(view.bag.length, 0);
+  });
+
+  test('a worn item, or anything during an exploration, cannot be taken apart; the table works on', async () => {
+    await tableAt(1);
+    const { id } = await bagItem('common', 3);
+    await call('POST', `/api/items/${id}/equip`, { cookie });
+    assert.equal((await salvage(id)).data.error.code, 'equipped');
+    await call('POST', `/api/items/${id}/unequip`, { cookie });
+    await stockMaterials({ 'fox-pelt:common': 1 });
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
+    assert.equal((await salvage(id)).data.error.code, 'busy');
+    assert.equal((await craft({ all: true })).status, 200);
+  });
+
+  test('"Pomiń czas" at the table in test mode ends every order', async () => {
+    await tableAt(1);
+    await stockMaterials({ 'wolf-pelt:common': 2, 'fox-pelt:rare': 1 });
+    await craft({ all: true });
+    const skipped = await call('POST', '/api/test/skip-craft', { cookie });
+    assert.equal(skipped.status, 200);
+    assert.deepEqual([skipped.data.character.crafting.queue.length, parts(skipped.data.character, 'scraps'), parts(skipped.data.character, 'straps')], [0, 2, 1]);
   });
 });

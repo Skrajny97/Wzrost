@@ -224,6 +224,7 @@ export async function finishHunt(db, player, now) {
     gold: report.summary.gold,
     itemsFound: report.summary.itemsFound,
     resources: report.summary.resources,
+    materials: report.summary.materials.map(({ name, label, color, count }) => ({ name, label, color, count })),
     timePoints: report.summary.timePoints,
     bestFind: report.summary.bestFind && { name: report.summary.bestFind.name, color: report.summary.bestFind.color },
     levelAfter: applied.level,
@@ -235,6 +236,11 @@ export async function finishHunt(db, player, now) {
   const found = Object.entries(hunt.resources);
   const setResources = found.length
     ? `, resources = json_set(resources, ${found.map(() => '?, COALESCE(json_extract(resources, ?), 0) + ?').join(', ')})`
+    : '';
+  // Materials from beaten creatures, by stack ("wolf-pelt:common").
+  const left = Object.entries(hunt.materials);
+  const setMaterials = left.length
+    ? `, materials = json_set(materials, ${left.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})`
     : '';
   let results;
   try {
@@ -252,7 +258,7 @@ export async function finishHunt(db, player, now) {
       ),
       db
         .prepare(
-          `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ? + ${storedPrice.sql}${setResources},
+          `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ? + ${storedPrice.sql}${setResources}${setMaterials},
              time_points = time_points + ?, hp = ?, hp_at = ?, version = version + 1
            WHERE id = ?`,
         )
@@ -264,6 +270,7 @@ export async function finishHunt(db, player, now) {
           hunt.gold + soldFoundGold,
           ...storedPrice.binds,
           ...found.flatMap(([id, amount]) => [resourcePath(id), resourcePath(id), amount]),
+          ...left.flatMap(([key, count]) => [resourcePath(key), resourcePath(key), count]),
           applied.timePoints,
           hunt.hpEnd,
           activity.ends_at,

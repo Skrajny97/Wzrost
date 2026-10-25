@@ -21,6 +21,7 @@ import appearances from '../../data/appearances.json' with { type: 'json' };
 import music from '../../data/music.json' with { type: 'json' };
 import sounds from '../../data/sounds.json' with { type: 'json' };
 import tutorial from '../../data/tutorial.json' with { type: 'json' };
+import materials from '../../data/materials.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -39,6 +40,7 @@ export const content = buildContent({
   resources,
   buildings,
   appearances,
+  materials,
 });
 
 // The narrator's lines that are read once, in their order: cards and
@@ -63,7 +65,7 @@ export function publicContent() {
     })),
     elements: content.elements.map(({ id, name, color }) => ({ id, name, color })),
     slots: content.slots,
-    rarities: content.rarities.map(({ id, name, color }) => ({ id, name, color })),
+    rarities: content.rarities.map(({ id, name, forms, color }) => ({ id, name, forms, color })),
     regions: content.regions.map(({ id, land, name, minLevel, maxLevel, safe, description, trait, areas }) => ({
       id,
       land,
@@ -87,6 +89,8 @@ export function publicContent() {
     unlocks: content.unlocks.map(({ id, name, level, condition }) => ({ id, name, level, condition })),
     resources: content.resources.map(({ id, name, description, system }) => ({ id, name, description, system: Boolean(system) })),
     buildings: content.buildings.map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
+    materials: content.materials.map(({ id, name, gender, rarity, description }) => ({ id, name, gender, rarity, description })),
+    parts: content.parts.map(({ id, name, rarity, description }) => ({ id, name, rarity, description })),
     appearances: content.appearances,
     freeResetMaxLevel: content.balance.progression.freeResetMaxLevel,
     classEvolutionLevels: content.balance.progression.classEvolutionLevels,

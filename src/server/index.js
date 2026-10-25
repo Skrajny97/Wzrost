@@ -3,6 +3,7 @@
 
 import { deleteAccount, login, logout, me, register } from './accounts.js';
 import { collectProduction, startBuilding } from './camp.js';
+import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
 import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
@@ -37,6 +38,8 @@ const routes = [
   ['GET', '/api/items/:id/preview', previewItem],
   ['POST', '/api/items/:id/upgrade', upgradeItem],
   ['POST', '/api/items/sell', sellItems],
+  ['POST', '/api/items/:id/salvage', salvageItem],
+  ['POST', '/api/craft/materials', craftMaterials],
   ['GET', '/api/hunts/options', huntOptions],
   ['POST', '/api/hunts', startHunt],
   ['POST', '/api/hunts/cancel', cancelHunt],
@@ -49,6 +52,7 @@ const routes = [
   ['POST', '/api/tutorial', seeTutorial],
   ['POST', '/api/test/skip-time', skipTime],
   ['POST', '/api/test/skip-build', skipBuilding],
+  ['POST', '/api/test/skip-craft', skipCrafting],
 ].map(([method, pattern, handler]) => ({ method, parts: pattern.split('/'), handler }));
 
 // Returns the :params of a matching pattern, or null.
