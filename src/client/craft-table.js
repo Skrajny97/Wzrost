@@ -80,7 +80,7 @@ function materialsCard(crafting, built, full) {
         text: 'Przerób wszystko',
         onClick: (event) => withButton(event.currentTarget, () => craft({ all: true })),
       }),
-    !built && !none && h('p', { class: 'system-hint', text: 'Zbuduj stół, żeby przerabiać materiały i rozbierać przedmioty. Budowa jest tania.' }),
+    !built && !none && h('p', { class: 'system-hint', text: 'Zbuduj stół, żeby przerabiać materiały i rozbierać przedmioty.' }),
     built && full && h('p', { class: 'system-hint', text: `Kolejka jest pełna (${crafting.limit} zleceń). Poczekaj, aż skończy się pierwsze.` }),
   );
 }

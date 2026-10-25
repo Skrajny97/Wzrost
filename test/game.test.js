@@ -764,17 +764,17 @@ describe('camp', () => {
     assert.equal(store(built.data.character), null);
     await call('POST', '/api/test/skip-build', { cookie });
     const ready = await character();
-    assert.deepEqual([store(ready).paused, store(ready).perHour, store(ready).capacity], [false, 6, 6]);
+    assert.deepEqual([store(ready).paused, store(ready).perHour, store(ready).capacity], [false, 6, 12]);
     assert.equal((await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'sawmill' } })).data.error.code, 'nothing_to_collect');
     assert.equal((await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'campfire' } })).data.error.code, 'invalid_building');
 
     // With nothing being built, "Pomiń czas" fills the stores.
     const full = await call('POST', '/api/test/skip-build', { cookie });
-    assert.equal(store(full.data.character).amount, 6);
+    assert.equal(store(full.data.character).amount, 12);
     const collected = await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'sawmill' } });
     assert.equal(collected.status, 200);
-    assert.deepEqual(collected.data.collected, { resource: 'wood', amount: 6 });
-    assert.equal(collected.data.character.resources.wood, 6);
+    assert.deepEqual(collected.data.collected, { resource: 'wood', amount: 12 });
+    assert.equal(collected.data.character.resources.wood, 12);
     assert.equal(collected.data.character.gold, 200 - 8);
     assert.equal((await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'sawmill' } })).data.error.code, 'nothing_to_collect');
 
@@ -783,7 +783,7 @@ describe('camp', () => {
     await call('POST', '/api/test/skip-build', { cookie });
     const upgraded = await build('sawmill');
     assert.equal(upgraded.status, 201);
-    assert.deepEqual(upgraded.data.character.resources, { wood: 11 + 6 - 11, stone: 0, 'iron-ore': 0 });
+    assert.deepEqual(upgraded.data.character.resources, { wood: 11 + 12 - 11, stone: 0, 'iron-ore': 0 });
     assert.equal(upgraded.data.character.gold, 192 - 16);
     assert.deepEqual([store(upgraded.data.character).paused, store(upgraded.data.character).amount], [true, 0]);
   });

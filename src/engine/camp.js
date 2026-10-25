@@ -33,8 +33,11 @@ export function upgradeCost(building, level) {
   return cost;
 }
 
+// How long reaching `level` takes: the building's own list, level by level,
+// or base × growth^(level − 1).
 export function upgradeMinutes(building, level) {
-  return Math.max(1, Math.round(building.minutes.base * building.minutes.growth ** (level - 1)));
+  const { levels, base, growth } = building.minutes;
+  return Math.max(1, Math.round(levels ? levels[level - 1] : base * growth ** (level - 1)));
 }
 
 // What is missing to pay a cost from a wallet of gold and resources.

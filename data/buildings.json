@@ -4,7 +4,7 @@
     "name": "Tartak",
     "description": "Piła i kozioł pod wiatą. Powoli zamienia powalone pnie w drewno.",
     "maxLevel": 10,
-    "effect": { "kind": "production", "resource": "wood", "perLevel": 6, "storageHours": 1, "unit": "count", "text": "Wytwarza {value} drewna na godzinę, magazyn na {hours} produkcji" },
+    "effect": { "kind": "production", "resource": "wood", "perLevel": 6, "storageHours": 2, "unit": "count", "text": "Wytwarza {value} drewna na godzinę, magazyn na {hours} produkcji" },
     "costs": [
       { "resource": "gold", "base": 8, "growth": 2.0 },
       { "resource": "wood", "base": 6, "growth": 1.9 },
@@ -18,7 +18,7 @@
     "name": "Kamieniołom",
     "description": "Odkrywka przy omszałych głazach. Powoli wydobywa kamień.",
     "maxLevel": 10,
-    "effect": { "kind": "production", "resource": "stone", "perLevel": 4, "storageHours": 1, "unit": "count", "text": "Wydobywa {value} kamienia na godzinę, magazyn na {hours} produkcji" },
+    "effect": { "kind": "production", "resource": "stone", "perLevel": 4, "storageHours": 2, "unit": "count", "text": "Wydobywa {value} kamienia na godzinę, magazyn na {hours} produkcji" },
     "costs": [
       { "resource": "gold", "base": 8, "growth": 2.0 },
       { "resource": "wood", "base": 8, "growth": 1.9 },
@@ -32,7 +32,7 @@
     "name": "Kopalnia",
     "description": "Sztolnia pod korzeniami starych drzew. Powoli wydobywa rudę żelaza.",
     "maxLevel": 10,
-    "effect": { "kind": "production", "resource": "iron-ore", "perLevel": 3, "storageHours": 1, "unit": "count", "text": "Wydobywa {value} rudy żelaza na godzinę, magazyn na {hours} produkcji" },
+    "effect": { "kind": "production", "resource": "iron-ore", "perLevel": 3, "storageHours": 2, "unit": "count", "text": "Wydobywa {value} rudy żelaza na godzinę, magazyn na {hours} produkcji" },
     "costs": [
       { "resource": "gold", "base": 12, "growth": 2.0 },
       { "resource": "wood", "base": 9, "growth": 1.9 },
@@ -117,6 +117,6 @@
       { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 2 },
       { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 4 }
     ],
-    "minutes": { "base": 1, "growth": 2.2 }
+    "minutes": { "levels": [1, 10, 30, 60, 120, 240, 360, 600, 960, 1440] }
   }
 ]

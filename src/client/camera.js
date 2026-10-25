@@ -4,11 +4,14 @@
 // a little, and at the place it comes closer, up to 1.25 times for a small
 // one. It frames the place with room for the narrator below it, stays while
 // the narrator speaks, and goes home (the screen as it is) when the narrator
-// leaves the screen. With the animations off it only scrolls, at once.
+// leaves the screen. A place to be seen whole that does not fit with the
+// narrator makes it draw back, down to 0.6 times. With the animations off it
+// only scrolls, at once, and draws back at once too.
 
 import { motionOn } from './motion.js';
 
 const CLOSEST = 1.25;
+const FARTHEST = 0.6;
 // A smaller zoom is not worth the slightly softer letters.
 const SLIGHTEST = 1.06;
 // Kept clear around a framed place, from the bars and from the sides, so
@@ -78,9 +81,9 @@ export function resetCamera() {
 // Goes to the places (elements on the screen), or home with none of them on
 // the screen, and says when the move started, how long it takes and when it
 // is done. `zoom` lets the camera come closer, `travel` marks the way from
-// one place to another, and `keep` is the room the narrator needs below the
-// place.
-export function aim(elements, { zoom = true, travel = false, keep = 0 } = {}) {
+// one place to another, `keep` is the room the narrator needs below the
+// place, and `whole` frames all the places together, drawing back if need be.
+export function aim(elements, { zoom = true, travel = false, keep = 0, whole = false } = {}) {
   halt();
   const start = performance.now();
   const element = screen();
@@ -105,6 +108,8 @@ export function aim(elements, { zoom = true, travel = false, keep = 0 } = {}) {
   // top when both do not fit; as far as the page scrolls, and closer if it
   // is small.
   const to = { z: 1 };
+  // Drawing back to take in a whole place: a cut with the animations off.
+  let back = false;
   if (inside.length === 0) {
     to.point = from.point;
     to.scroll = clamp(at.top + to.point.y - middle);
@@ -120,14 +125,20 @@ export function aim(elements, { zoom = true, travel = false, keep = 0 } = {}) {
       right: Math.max(all.right, part.right),
       bottom: Math.max(all.bottom, part.bottom),
     }));
-    if (box.bottom - box.top > height && boxes.length > 1) box = boxes[0];
+    if (!whole && box.bottom - box.top > height && boxes.length > 1) box = boxes[0];
     const half = { x: Math.max(1, (box.right - box.left) / 2), y: Math.max(1, (box.bottom - box.top) / 2) };
     to.point = { x: box.left + half.x, y: box.top + half.y };
     const across = natural(to.point, 0).x;
     let z = 1;
-    if (zoom && motionOn() && !element.querySelector(PINNED)) {
-      z = Math.min(CLOSEST, (across - SIDE) / half.x, (bars.width - SIDE - across) / half.x, (height - keep - 2 * ROOM) / (2 * half.y));
-      if (z < SLIGHTEST) z = 1;
+    if (zoom && !element.querySelector(PINNED)) {
+      const fits = (height - keep - 2 * ROOM) / (2 * half.y);
+      const most = Math.min((across - SIDE) / half.x, (bars.width - SIDE - across) / half.x, fits);
+      back = whole && fits < 1;
+      if (back) z = Math.max(FARTHEST, most);
+      else if (motionOn()) {
+        z = Math.min(CLOSEST, most);
+        if (z < SLIGHTEST) z = 1;
+      }
     }
     const block = 2 * half.y * z + keep;
     const room = height - 2 * ROOM;
@@ -136,7 +147,7 @@ export function aim(elements, { zoom = true, travel = false, keep = 0 } = {}) {
     // Where the page stops short, the zoom keeps clear of the bars.
     const stands = natural(to.point, to.scroll).y;
     z = Math.min(z, (stands - bars.top - ROOM) / half.y, (bars.bottom - ROOM - stands) / half.y);
-    to.z = z >= SLIGHTEST ? z : 1;
+    to.z = back || z >= SLIGHTEST ? z : 1;
   }
   to.eye = natural(to.point, to.scroll);
 
@@ -161,7 +172,7 @@ export function aim(elements, { zoom = true, travel = false, keep = 0 } = {}) {
   let duration = way < 8 && closer < 0.01 && !travel ? 0 : Math.min(2400, 900 + way * 1.1 + closer * 1500);
   if (travel) duration = Math.max(duration, 1100);
   if (duration === 0 || !motionOn()) {
-    if (!motionOn()) to.z = 1;
+    if (!motionOn() && !back) to.z = 1;
     frame(1);
     return { start, duration: 0, done: Promise.resolve() };
   }

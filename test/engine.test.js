@@ -779,6 +779,13 @@ describe('camp', () => {
     for (let i = 1; i < minutes.length; i++) assert.ok(minutes[i] > minutes[i - 1]);
     // The last level of Ognisko builds for most of a day.
     assert.ok(minutes.at(-1) > 16 * 60 && minutes.at(-1) < 24 * 60);
+    // The crafting table sets up in a minute, but its next levels take
+    // longer than the other buildings': 10 minutes, half an hour, a day at last.
+    const table = content.buildingsById['craft-table'];
+    const tableMinutes = Array.from({ length: table.maxLevel }, (_, i) => upgradeMinutes(table, i + 1));
+    assert.deepEqual(tableMinutes.slice(0, 3), [1, 10, 30]);
+    assert.equal(tableMinutes.at(-1), 24 * 60);
+    for (let i = 1; i < tableMinutes.length; i++) assert.ok(tableMinutes[i] > tableMinutes[i - 1] && tableMinutes[i] >= minutes[i]);
     for (const building of content.buildings) {
       // Every level needs more than gold: the resources come from explorations.
       assert.ok(Object.keys(upgradeCost(building, 1)).length >= 2, building.id);
@@ -851,14 +858,15 @@ describe('production', () => {
   const sawmill = content.buildingsById.sawmill;
   const hour = 3600000;
 
-  test('a store holds an hour of production for each level and then stops', () => {
+  test('a store holds two hours of production for each level and then stops', () => {
     const first = { level: 1, startedAt: 0, endsAt: 0, collectedAt: 0 };
-    assert.deepEqual(production(sawmill, first, hour / 2), { resource: 'wood', perHour: 6, capacity: 6, amount: 3, since: 0, fullAt: hour });
-    assert.equal(production(sawmill, first, 5 * hour).amount, 6);
+    assert.deepEqual(production(sawmill, first, hour / 2), { resource: 'wood', perHour: 6, capacity: 12, amount: 3, since: 0, fullAt: 2 * hour });
+    assert.equal(production(sawmill, first, 5 * hour).amount, 12);
+    assert.equal(effectText(sawmill, 1), 'Wytwarza 6 drewna na godzinę, magazyn na 2\u00a0h produkcji');
     const top = { level: 10, startedAt: 0, endsAt: 0, collectedAt: 0 };
-    const store = production(sawmill, top, 20 * hour);
-    assert.deepEqual([store.perHour, store.capacity, store.amount, store.fullAt], [60, 600, 600, 10 * hour]);
-    assert.equal(effectText(sawmill, 10), 'Wytwarza 60 drewna na godzinę, magazyn na 10\u00a0h produkcji');
+    const store = production(sawmill, top, 30 * hour);
+    assert.deepEqual([store.perHour, store.capacity, store.amount, store.fullAt], [60, 1200, 1200, 20 * hour]);
+    assert.equal(effectText(sawmill, 10), 'Wytwarza 60 drewna na godzinę, magazyn na 20\u00a0h produkcji');
     assert.equal(production(content.buildingsById.campfire, first, hour), null);
     assert.equal(production(sawmill, undefined, hour), null);
   });

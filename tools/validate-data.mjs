@@ -234,6 +234,11 @@ function checkReferences(data) {
   }
   for (const building of data.buildings) {
     const { effect } = building;
+    // A list of build times has one for each level, each longer than the last.
+    const { levels } = building.minutes;
+    if (levels && (levels.length !== building.maxLevel || levels.some((minutes, i) => i > 0 && minutes <= levels[i - 1]))) {
+      errors.push(`buildings.json: minutes.levels w ${building.id} muszą mieć po jednym czasie na poziom (${building.maxLevel}) i rosnąć`);
+    }
     if (effect.kind === 'production') {
       if (!resources.has(effect.resource)) errors.push(`buildings.json: ${building.id} wytwarza nieznany zasób "${effect.resource}"`);
       if (!effect.storageHours) errors.push(`buildings.json: ${building.id} wytwarza zasób, ale nie ma storageHours`);

@@ -56,11 +56,17 @@
       "minutes": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["base", "growth"],
-        "description": "Czas budowy poziomu L w minutach: base × growth^(L − 1), co najmniej 1.",
+        "description": "Czas budowy poziomu L w minutach: base × growth^(L − 1), co najmniej 1, albo lista levels z czasem każdego poziomu po kolei.",
+        "oneOf": [{ "required": ["base", "growth"] }, { "required": ["levels"] }],
         "properties": {
           "base": { "type": "number", "exclusiveMinimum": 0 },
-          "growth": { "type": "number", "minimum": 1 }
+          "growth": { "type": "number", "minimum": 1 },
+          "levels": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "number", "minimum": 1 },
+            "description": "Minuty budowy poziomu 1, 2, … aż do maxLevel."
+          }
         }
       }
     }

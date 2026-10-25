@@ -382,7 +382,7 @@ Zmiany poniżej wynikają z dwóch wiadomości autora. Najważniejsze: trzy budy
    - Kopalnia: 3 rudy żelaza na godzinę za każdy poziom.
 
    Autor nie określił tempa, więc rośnie ono z poziomem, jak premie pozostałych budynków. Proporcje są takie jak wagi zasobów w Wiatrołomach: drewna najwięcej, rudy najmniej. Godzina eksploracji w Skraju Wiatrołomów daje ok. 3,4 drewna, a Tartak na poziomie 1 do 6. W Kruczych Wykrotach (poziom 13) eksploracja daje ok. 23 drewna na godzinę, czyli prawie tyle, ile Tartak na poziomie 4 (24). Tartak na poziomie 10 wytwarza 60 drewna na godzinę, a eksploracja w Sercu Uroczyska ok. 47. Na ekranie obozu budynki produkcyjne stoją przed pozostałymi.
-2. **Magazyn na godzinę za każdy poziom.** Zgodnie z życzeniem autora magazyn budynku na poziomie 1 mieści godzinę produkcji, a na poziomie 10 dziesięć godzin (`storageHours` 1 za poziom). Pojemność rośnie więc szybciej niż tempo:
+2. **Magazyn na godzinę za każdy poziom.** Zgodnie z życzeniem autora magazyn budynku na poziomie 1 mieści godzinę produkcji, a na poziomie 10 dziesięć godzin (`storageHours` 1 za poziom). *Teraz dwie godziny na poziom: zob. „Ramki w raporcie, wolniejszy Stół rzemieślniczy i większe magazyny”, punkt 5.* Pojemność rośnie więc szybciej niż tempo:
    - Tartak na poziomie 1 wytwarza 6 drewna na godzinę i mieści 6,
    - na poziomie 2 wytwarza 12 i mieści 24,
    - na poziomie 10 wytwarza 60 i mieści 600.
@@ -993,7 +993,7 @@ Autor: łupy z bronią i przedmiotami mają być zdarzeniami losowymi, np. skrzy
 3. **Szansa na materiał** to 30% dla pospolitych, potem 20, 14, 10, 7, 5 i 3% (`materialChance` w `data/rarities.json`), za każdego pokonanego stwora. Liczy się, jak dotąd przy łupie, udział walki w czasie wyprawy, wielkość grupy i wymagające spotkanie (×1,5). Wyprawa daje więc tyle samo materiałów na godzinę bez względu na długość: w Wiatrołomach ok. 1,5–2 na godzinę.
 4. **Skrzynie skarbów.** Przedmioty dają już tylko skrzynie. Znaleziska są co 18 minut zamiast co 20, a skrzynia ma wagę 0,44 tam, gdzie przedmiot miał 0,3. Przedmiotów jest więc ok. 1,25 na godzinę, jak dotąd z walk i znalezisk razem (wybór autora: „jak dziś łupy”). Złota, zasobów i odłamków czasu ze znalezisk jest na godzinę o ok. 2% mniej.
 5. **Pierwsza broń i elita.** Postać bez broni po pierwszej wygranej walce znajduje skrzynię z bronią swojej klasy i od razu ją trzyma. Broń z wcześniejszej skrzyni też trafia od razu do ręki. Pokonana elita zostawia skrzynię z przedmiotem, który częściej jest rzadszy (`rewards.eliteRarityBonus`). Wymagające spotkania dają teraz więcej materiałów zamiast rzadszych przedmiotów, a `itemDropChance` i `toughRarityBonus` zniknęły z `data/balance.json`.
-6. **Stół rzemieślniczy** (`craft-table`) to nowy budynek obozu, bardzo tani na start: 3 złota i 3 drewna, minuta budowy. Za darmo przerabia materiał na jedną część tej samej rzadkości. Części nazwał autor: Ścinki, Rzemienie, Okucia, Odłamki (najpierw Runy), Bursztyn, Krwawnik i Gwiezdny odprysk.
+6. **Stół rzemieślniczy** (`craft-table`) to nowy budynek obozu, bardzo tani na start: 3 złota i 3 drewna, minuta budowy. *Dalsze poziomy budują się dłużej: zob. „Ramki w raporcie, wolniejszy Stół rzemieślniczy i większe magazyny”, punkt 4.* Za darmo przerabia materiał na jedną część tej samej rzadkości. Części nazwał autor: Ścinki, Rzemienie, Okucia, Odłamki (najpierw Runy), Bursztyn, Krwawnik i Gwiezdny odprysk.
     - Część zajmuje stołowi 5, 8, 12, 20, 30, 45 albo 60 minut, zależnie od rzadkości (`craftMinutes` w `data/rarities.json`).
     - Każdy poziom stołu przyspiesza pracę o 10% (`craftSpeed`): poziom 1 pracuje 1,1 raza szybciej, poziom 10 dwa razy.
     - Zlecenia idą po kolei, najwyżej 10 naraz (`crafting.queueLimit`), także podczas wyprawy. „Przerób” bierze cały stos materiału, a „Przerób wszystko” każdy stos.
@@ -1140,3 +1140,19 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
 
 1. **Kwestia przy Ognisku.** Autor wybrał wersję 3, nagraną z zapisem „ognju”, i ona jest teraz w grze (`src/client/audio/narration/lead-campfire.mp3`). Punkt zastępuje wersję z punktu 5 „Pierwszej wyprawy i rzadszych skrzyń”.
 2. **Bez zmian.** Dźwięk skrzyni zadań i kwestia przy zadaniach zostają w wersjach 1, które już były w grze.
+
+## Ramki w raporcie, wolniejszy Stół rzemieślniczy i większe magazyny (25.10.2026)
+
+1. **Walki w ramce razem z areną.** Autor: przy kwestii narratora o walkach złota ramka i kamera mają objąć i zakładki, i toczącą się walkę. Pergamin `report-fights` świeci teraz jedną ramką wokół zakładek (przy jednej walce wokół tytułu), nagłówka walki i areny z oboma rzędami (`whole` w `src/client/narrator.js`, `data-guide="report-fight"` na arenie). Przyciski odtwarzania i opis walki pod areną zostają poza ramką.
+    - Gdy ramka z pergaminem nie mieści się między paskami, kamera odsuwa się, najdalej do 0,6 (`whole` w `src/client/camera.js`).
+    - Na telefonie 390 × 844 odsuwa się do ok. 0,71, na 412 × 915 do ok. 0,9, a na 360 × 740 do 0,6, z pergaminem nad ramką.
+    - Przy wyłączonych animacjach kamera odsuwa się od razu, bez ruchu, a w pozostałych miejscach tylko przewija, jak dotąd.
+2. **Pełna relacja rozwinięta i w ramce.** Przy kwestii „A jeśli interesuje Cię przebieg całej wyprawy…” narrator sam rozwija pełną relację, a ramka obejmuje przycisk i wszystkie wpisy (`unfold` w narratorze, zdarzenie `unfold` na przycisku w `src/client/screens/report.js`). Po tej kwestii relacja zostaje rozwinięta.
+3. **Bez „Budowa jest tania.”** Na prośbę autora wskazówka na ekranie Stołu rzemieślniczego przed jego zbudowaniem mówi już tylko: „Zbuduj stół, żeby przerabiać materiały i rozbierać przedmioty.”
+4. **Wolniejsza rozbudowa Stołu rzemieślniczego.** Autor: poziom 1 zostaje, poziom 2 ma trwać 10 minut, poziom 3 pół godziny, a dalsze mają być trudniej dostępne. Czasy stołu stoją teraz w danych poziom po poziomie (`minutes.levels` w `data/buildings.json`): 1 min, 10 min, 30 min, 1 h, 2 h, 4 h, 6 h, 10 h, 16 h i 24 h. Pozostałe budynki dalej liczą czas ze wzoru, a koszty stołu się nie zmieniły. Walidacja pilnuje, żeby lista miała czas na każdy poziom i rosła.
+5. **Magazyny na 2 godziny produkcji za poziom.** Autor: magazyny drewna, kamienia i rudy żelaza mają na poziomie 1 mieścić 2 godziny produkcji i rosnąć z czasem. Każdy poziom daje teraz 2 godziny (`storageHours` 2):
+    - 2 h na poziomie 1, np. 12 drewna w Tartaku,
+    - 10 h na poziomie 5,
+    - 20 h na poziomie 10.
+
+    Punkt zastępuje godzinę za poziom z punktu 2 „Produkcji w obozie”.

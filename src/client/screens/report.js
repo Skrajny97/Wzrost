@@ -203,6 +203,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     }
     arena = createArena(data, { autoplay: autoplay ?? (firstPlayback ? 'visible' : 'now') });
     firstPlayback = false;
+    // The narrator lights the fight playing here together with the tabs.
+    arena.arena.dataset.guide = 'report-fight';
     swipe(arena.arena);
     fill(fightBox, header, arena.element, pager);
   }
@@ -410,23 +412,27 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     );
   }
 
+  // The narrator lights the button with the whole account under it, and
+  // unfolds the account first ("unfold").
   function accountSection(report) {
     const list = h(
       'ol',
-      { class: 'account', hidden: true },
+      { class: 'account', hidden: true, 'data-guide': 'report-account' },
       report.entries.map((entry) => h('li', {}, h('span', { class: 'account-time', text: formatOffset(entry.t) }), h('span', { text: entry.text }))),
     );
+    const show = (open) => {
+      list.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+    };
     const toggle = h('button', {
       type: 'button',
       class: 'button button--world',
       'data-guide': 'report-account',
       'aria-expanded': false,
       text: `Pełna relacja (${countOf(report.entries.length, 'wpis', 'wpisy', 'wpisów')})`,
-      onClick: () => {
-        list.hidden = !list.hidden;
-        toggle.setAttribute('aria-expanded', String(!list.hidden));
-      },
+      onClick: () => show(list.hidden),
     });
+    toggle.addEventListener('unfold', () => show(true));
     return h('section', { class: 'report-section' }, toggle, list);
   }
 

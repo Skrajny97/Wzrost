@@ -48,8 +48,9 @@ const campDone = (hash, read) => read.has('camp') && (campStarted() || !affordab
 // read) and, for all but a card, its place: a selector of the elements to
 // light. A line shows when it is the first in the order that is due. `free`
 // leaves the lit places to the player until the moment passes, `above` puts
-// the narrator above the first of them, and `delay` lets the screen be seen
-// first. A `late` line is told also after the ending, once, to a character
+// the narrator above the first of them, `whole` lights them all in one ring,
+// which the camera takes in whole even if it has to draw back, `unfold`
+// opens what folds there first, and `delay` lets the screen be seen first. A `late` line is told also after the ending, once, to a character
 // that finished the introduction before the line was written.
 const BEATS = {
   intro: { when: () => true },
@@ -65,9 +66,9 @@ const BEATS = {
   report: { when: onReport },
   'report-summary': { place: mark('report-summary'), when: onReport },
   'report-system': { place: mark('report-system'), when: onReport },
-  'report-fights': { place: mark('report-fights'), when: onReport },
+  'report-fights': { place: `${mark('report-fights')}, ${mark('report-fight')}`, whole: true, when: onReport },
   'report-items': { place: mark('report-items'), when: onReport },
-  'report-account': { place: mark('report-account'), when: onReport },
+  'report-account': { place: mark('report-account'), whole: true, unfold: true, when: onReport },
   'lead-character': {
     place: '.nav-item[href="#/postac"]',
     when: (hash, read) => read.has('report') && !read.has('character') && !hash.startsWith('#/postac'),
@@ -409,7 +410,8 @@ function startLight(line) {
   // Then the narrator steps in and the parchment unrolls, slowly.
   const before = lastSpot?.hash === place && performance.now() - lastSpot.at < 3000 && !calm() ? lastSpot.line : null;
   lastSpot = null;
-  const shot = aim(places(line), { zoom: !beat.free, travel: Boolean(before), keep: beat.above ? 0 : note.height() + 20 });
+  if (beat.unfold) for (const element of places(line)) element.dispatchEvent(new Event('unfold'));
+  const shot = aim(places(line), { zoom: !beat.free, travel: Boolean(before), keep: beat.above ? 0 : note.height() + 20, whole: beat.whole });
   light.slide = before && { from: before, start: shot.start, duration: Math.max(shot.duration, 700) };
   note.element.classList.add('guide-note--waiting');
   Promise.all([shot.done, wait(light.slide?.duration ?? 0)]).then(async () => {
@@ -482,9 +484,11 @@ function startLight(line) {
     const seen = found.filter(inView);
     const left = slide && done < 1 ? places(slide.from).map(padded) : [];
     const gliding = left.length > 0;
+    // A whole light is one ring around all its places.
+    const ringed = (elements) => (beat.whole ? [union(elements.map(padded))] : elements.map(padded));
     const boxes = gliding
-      ? found.map((element) => fit(between(union(left), padded(element), ease(done))))
-      : (seen.length > 0 ? seen : found.slice(0, 1)).map((element) => fit(padded(element)));
+      ? ringed(found).map((box) => fit(between(union(left), box, ease(done))))
+      : ringed(seen.length > 0 ? seen : found.slice(0, 1)).map(fit);
     const lit = gliding ? boxes.length : seen.length > 0 ? boxes.length : 0;
     const holes = boxes.slice(0, lit).map((box) => `M${box.left} ${box.top}H${box.right}V${box.bottom}H${box.left}Z`).join('');
     shade.style.clipPath = `path(evenodd, 'M0 0H${width}V${height}H0Z${holes}')`;
