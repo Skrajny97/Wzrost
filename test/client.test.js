@@ -177,3 +177,61 @@ test('a service worker makes the game installable and shows a page offline', () 
   assert.match(offline, /href="\/styles\.css"/);
   assert.match(offline, /href="\/">Spróbuj ponownie</);
 });
+
+// The server's answers as a phone may get them: turned down, lost, or late.
+test('the page asks for the character again when an action finds it out of date', async () => {
+  const { call, state } = await import('../src/client/state.js');
+  const saved = globalThis.fetch;
+  const asked = [];
+  const answers = [];
+  globalThis.fetch = (path, options) => {
+    asked.push(`${options.method} ${path}`);
+    return answers.shift()();
+  };
+  const answer = (status, body) => () => Promise.resolve(new Response(JSON.stringify(body), { status }));
+  const settled = () => new Promise((resolve) => setTimeout(resolve, 0));
+  const home = { name: 'Ala', activity: null, serverTime: 1 };
+  const away = { name: 'Ala', activity: { areaId: 'windfalls-edge' }, serverTime: 2 };
+  try {
+    state.character = home;
+    // "Wyrusz" again after the first answer was lost: the server says the
+    // character is away, and the page catches up.
+    answers.push(answer(409, { error: { code: 'busy', message: 'Postać jest na wyprawie. Poczekaj na jej koniec.' } }), answer(200, { character: away }));
+    await assert.rejects(call('POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 30 }), { code: 'busy' });
+    await settled();
+    assert.deepEqual(asked, ['POST /api/hunts', 'GET /api/character']);
+    assert.deepEqual(state.character, away);
+
+    // A lost answer does the same.
+    state.character = home;
+    asked.length = 0;
+    answers.push(() => Promise.reject(new TypeError('Failed to fetch')), answer(200, { character: away }));
+    await assert.rejects(call('POST', '/api/hunts', {}), { code: 'network' });
+    await settled();
+    assert.deepEqual(asked, ['POST /api/hunts', 'GET /api/character']);
+    assert.deepEqual(state.character, away);
+
+    // A read sent before an action's answer, back after it, leaves it shown.
+    state.character = home;
+    let late;
+    answers.push(() => new Promise((resolve) => (late = resolve)), answer(200, { character: away }));
+    const read = call('GET', '/api/character');
+    await call('POST', '/api/hunts', {});
+    late(new Response(JSON.stringify({ character: home }), { status: 200 }));
+    await read;
+    assert.deepEqual(state.character, away);
+
+    // A read turned down, or a page without a character, asks for nothing more.
+    asked.length = 0;
+    answers.push(answer(409, { error: { code: 'conflict', message: '…' } }));
+    await assert.rejects(call('GET', '/api/quests'));
+    state.character = null;
+    answers.push(answer(409, { error: { code: 'name_taken', message: '…' } }));
+    await assert.rejects(call('POST', '/api/character', {}));
+    await settled();
+    assert.deepEqual(asked, ['GET /api/quests', 'POST /api/character']);
+  } finally {
+    globalThis.fetch = saved;
+    state.character = null;
+  }
+});

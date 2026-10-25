@@ -51,17 +51,31 @@ export const handleSessionLost = (handler) => {
   onSessionLost = handler;
 };
 
+// Answers to actions (all but GET) shown so far. A read sent before the
+// last of them may come back after it, with the character as it was before.
+let actionsShown = 0;
+
 // An API call; a character in the answer replaces the one the page shows.
 export async function call(method, path, body) {
   const sentAt = Date.now();
+  const action = method !== 'GET';
+  const shownBefore = actionsShown;
   let data;
   try {
     data = await request(method, path, body);
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) onSessionLost();
+    // The server says the character is not as this page shows it (409), or
+    // the answer was lost on the way, as when the phone puts the browser in
+    // the background: the page asks for the character again, so the screen
+    // and the narrator catch up by themselves.
+    else if (action && state.character && error instanceof ApiError && (error.status === 409 || error.status === 0)) {
+      call('GET', '/api/character').catch(() => {});
+    }
     throw error;
   }
-  if (data?.character) {
+  if (data?.character && (action || actionsShown === shownBefore)) {
+    if (action) actionsShown += 1;
     state.offset = data.character.serverTime - (sentAt + Date.now()) / 2;
     setCharacter(data.character);
   }
