@@ -71,7 +71,7 @@ const KITS = {
   warrior: ['sword', 'shield', 'chainmail', 'helmet'],
   archer: ['bow', 'quiver', 'tunic', 'hood'],
   mage: ['staff', 'focus', 'robe', 'hood'],
-  cleric: ['aspergillum', 'shield', 'robe', 'hood'],
+  cleric: ['aspergillum', 'shield', 'surplice', 'cowl'],
   shadow: ['dagger', 'tunic', 'hood'],
 };
 const kit = (classId, seed = 'kit') => {
@@ -162,15 +162,17 @@ describe('items', () => {
     assert.equal(canUse('staff', 'shadow', content), false);
     assert.equal(canUse('shield', 'cleric', content), true);
     assert.equal(canUse('quiver', 'mage', content), false);
-    // Chainmail and the helmet are the warrior's alone, the robe is for the
-    // mage and the cleric, the jacket for the archer and the shadow, and the
-    // hood for everyone but the warrior.
+    // Chainmail and the helmet are the warrior's alone, the robe the mage's,
+    // the Kapuza and the Komża the cleric's, the jacket is for the archer and
+    // the shadow, and the hood for them and the mage.
     const wearers = (baseId) => ['warrior', 'archer', 'mage', 'cleric', 'shadow'].filter((classId) => canUse(baseId, classId, content));
-    assert.deepEqual(wearers('robe'), ['mage', 'cleric']);
+    assert.deepEqual(wearers('robe'), ['mage']);
     assert.deepEqual(wearers('chainmail'), ['warrior']);
     assert.deepEqual(wearers('helmet'), ['warrior']);
+    assert.deepEqual(wearers('cowl'), ['cleric']);
+    assert.deepEqual(wearers('surplice'), ['cleric']);
     assert.deepEqual(wearers('tunic'), ['archer', 'shadow']);
-    assert.deepEqual(wearers('hood'), ['archer', 'mage', 'cleric', 'shadow']);
+    assert.deepEqual(wearers('hood'), ['archer', 'mage', 'shadow']);
     for (const baseId of ['gloves', 'boots', 'amulet', 'ring', 'talisman']) assert.equal(wearers(baseId).length, 5, baseId);
     // Loot only ever holds what the character's class can use.
     const rng = createRng('łup');

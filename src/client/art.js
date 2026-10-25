@@ -19,7 +19,7 @@ export const SPRITES = {
   },
   items: {
     size: 32,
-    ids: ['sword', 'axe', 'dagger', 'bow', 'staff', 'aspergillum', 'shield', 'quiver', 'focus', 'hood', 'helmet', 'tunic', 'chainmail', 'robe', 'gloves', 'boots', 'amulet', 'ring', 'talisman'],
+    ids: ['sword', 'axe', 'dagger', 'bow', 'staff', 'aspergillum', 'shield', 'quiver', 'focus', 'hood', 'helmet', 'tunic', 'chainmail', 'robe', 'cowl', 'surplice', 'gloves', 'boots', 'amulet', 'ring', 'talisman'],
   },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
   narrator: {

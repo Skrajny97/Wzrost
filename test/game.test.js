@@ -312,7 +312,7 @@ describe('equipment', () => {
     }
     const bag = (await call('GET', '/api/character', { cookie })).data.character.bag;
     assert.deepEqual(bag.find((item) => item.id === staffId).classNames, ['Mag']);
-    assert.deepEqual(bag.find((item) => item.id === robeId).classNames, ['Mag', 'Kleryk']);
+    assert.deepEqual(bag.find((item) => item.id === robeId).classNames, ['Mag']);
     assert.deepEqual(bag.find((item) => item.id === mailId).classNames, ['Wojownik']);
     assert.equal(bag.find((item) => item.id === glovesId).classIds, null);
     assert.equal((await call('POST', `/api/items/${glovesId}/equip`, { cookie })).status, 200);
@@ -380,6 +380,42 @@ describe('equipment', () => {
     assert.deepEqual(clericView.bag.map((item) => item.name).sort(), ['Hełm', 'Kolczuga']);
     const warriorView = (await call('GET', '/api/character', { cookie })).data.character;
     assert.equal(warriorView.equipment.chest.name, 'Kolczuga');
+  });
+
+  test("with a set of its own, the cleric's hood and robe become a Kapuza and a Komża", async () => {
+    const database = await db();
+    const characterOf = async (login, classId, name) => {
+      const owner = await signUp(login);
+      await newCharacter(owner, classId, name);
+      return { owner, id: (await database.prepare('SELECT id FROM characters WHERE name = ?').bind(name).first()).id };
+    };
+    const cleric = await characterOf('kleryk', 'cleric', 'Jagna');
+    const mage = await characterOf('mag', 'mage', 'Wanda');
+    const give = async (characterId, base, slot, worn, affixes = []) =>
+      database
+        .prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, 0)')
+        .bind(characterId, worn ? slot : null, JSON.stringify({ base, slot, level: 1, rarity: affixes.length ? 'rare' : 'common', affixes, armor: 4 }))
+        .run();
+    // As before migrations/0014: a cleric in an owl hood and a robe, with
+    // another robe in the bag; the mage in its own robe.
+    await give(cleric.id, 'hood', 'head', true, [{ id: 'owl', kind: 'prefix', stat: 'wisdom', value: 2 }]);
+    await give(cleric.id, 'robe', 'chest', true);
+    await give(cleric.id, 'robe', 'chest', false);
+    await give(mage.id, 'robe', 'chest', true);
+    const migration = readFileSync('migrations/0014_cleric_set.sql', 'utf8')
+      .replace(/--.*$/gm, '')
+      .split(';')
+      .map((statement) => statement.trim())
+      .filter(Boolean);
+    await database.batch(migration.map((statement) => database.prepare(statement)));
+
+    const clericView = (await call('GET', '/api/character', { cookie: cleric.owner })).data.character;
+    assert.equal(clericView.equipment.head.name, 'Sowia Kapuza');
+    assert.equal(clericView.equipment.chest.name, 'Komża');
+    assert.deepEqual(clericView.equipment.chest.classNames, ['Kleryk']);
+    assert.deepEqual(clericView.bag.map((item) => item.name), ['Komża']);
+    const mageView = (await call('GET', '/api/character', { cookie: mage.owner })).data.character;
+    assert.equal(mageView.equipment.chest.name, 'Szata');
   });
 
   test('the scrapper buys bag items up to the chosen rarity', async () => {
