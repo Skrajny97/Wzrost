@@ -1,0 +1,25 @@
+{
+  "id": "surplice",
+  "payload": {
+    "prompt": "white linen surplice, a loose knee-length liturgical tunic with wide sleeves and a gold-embroidered hem, an empty garment with nobody wearing it, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 4,
+    "seed": 282379004,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1792910816,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 43.44,
+    "request_id": "84fb50a2-ad9b-4192-a4ab-82b602737cf6",
+    "outputs_retained_until": 1792997165
+  }
+}
