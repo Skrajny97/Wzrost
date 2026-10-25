@@ -1236,3 +1236,11 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
 3. **Nagrania.** ElevenLabs nagrał po trzy wersje każdej kwestii tym samym głosem i modelem co resztę wprowadzenia (`allLines` w `audio/prompts.json`), za 1479 kredytów. Dwie wersje urywały ostatnie słowo i odpadły, a pozostałe siedem (2, 2 i 3) jest na stronie odsłuchu, przycięte i wyrównane jak reszta. Wybór autora ze strony odsłuchu jest już w grze (`src/client/audio/narration/`): przy Szałasie i Skupie wersja 2, przy Stole wersja 1, a przy poziomie obozu wersja 3.
 4. **Kto je zobaczy.** Tak jak pozostałe pergaminy obozu: postać, która jest w obozie przed pierwszą budową. Postacie, które już coś budują albo skończyły wprowadzenie, ich nie dostaną.
 5. **Sprawdzone na telefonie.** Na 390 × 844, na 360 × 740 bez animacji i na 390 × 844 przy widoku 125% ramka obejmuje miejsca, a narrator i „Pomiń wprowadzenie” ich nie zasłaniają.
+
+## Strona nadąża za serwerem i budowa na górze ekranu budynku (25.10.2026)
+
+1. **Zawieszenie po zminimalizowaniu.** Autor: po zminimalizowaniu przeglądarki w trakcie wprowadzenia samouczek się zawiesił. Odpowiedź na „Wyrusz” zginęła po drodze, więc strona i narrator dalej czekały na „Wyrusz”, a kolejne stuknięcie mówiło już tylko „Postać jest na wyprawie”. Pomogło dopiero ponowne zminimalizowanie. Propozycja autora: automatyczne odświeżenie w takiej sytuacji.
+    - Gdy serwer odrzuca czynność jako nieaktualną (409) albo odpowiedź na nią ginie po drodze, strona sama pobiera postać jeszcze raz (`call` w `src/client/state.js`). Ekran i narrator idą wtedy dalej same, bez przeładowania strony.
+    - Odpowiedź na wcześniejsze odczytanie, która wraca po odpowiedzi na czynność, nie wstawia już na ekran starszego stanu postaci.
+    - Sprawdzone w przeglądarce: po zgubionej odpowiedzi na „Wyrusz” strona pokazuje trwającą wyprawę, a narrator przechodzi do „Jesteś już w lesie…”.
+2. **Budowa na górze ekranu budynku.** Autor: „Budowa i rozbudowa powinna zawsze być na samym szczycie danej lokacji obozu.” Na ekranie każdego budynku i samego obozu zaraz pod nagłówkiem stoją: budowa w toku, poziomy czekające w kolejce i następny poziom z kosztem oraz „Zbuduj” albo „Ulepsz”. Obraz budynku, opis, magazyn i listy Stołu rzemieślniczego są pod nimi.
