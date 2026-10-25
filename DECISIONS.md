@@ -1244,3 +1244,15 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - Odpowiedź na wcześniejsze odczytanie, która wraca po odpowiedzi na czynność, nie wstawia już na ekran starszego stanu postaci.
     - Sprawdzone w przeglądarce: po zgubionej odpowiedzi na „Wyrusz” strona pokazuje trwającą wyprawę, a narrator przechodzi do „Jesteś już w lesie…”.
 2. **Budowa na górze ekranu budynku.** Autor: „Budowa i rozbudowa powinna zawsze być na samym szczycie danej lokacji obozu.” Na ekranie każdego budynku i samego obozu zaraz pod nagłówkiem stoją: budowa w toku, poziomy czekające w kolejce i następny poziom z kosztem oraz „Zbuduj” albo „Ulepsz”. Obraz budynku, opis, magazyn i listy Stołu rzemieślniczego są pod nimi.
+
+## Narrator bez powtórek i złota kropka przy wolnych punktach (25.10.2026)
+
+1. **Pergamin rozwijany dwa razy.** Autor: czasem po „Dalej” pergamin próbuje się rozwinąć dwukrotnie.
+    - Przyczyna: każde „Dalej” zapisuje kwestię na serwerze osobno, a odpowiedź może przyjść dopiero po następnym „Dalej”. Lista przeczytanych kwestii w takiej odpowiedzi nie miała jeszcze kwestii przed chwilą minionej, więc narrator pokazywał ją jeszcze raz.
+    - Teraz kwestia minięta na stronie zostaje minięta, choćby przyszła starsza lista (`passedHere` w `src/client/narrator.js`). Te kwestie odchodzą razem z postacią: po „Zacznij od nowa” i po wylogowaniu.
+    - Sprawdzone przy odpowiedziach spóźnionych o 2,5 s: karty idą po kolei bez powtórek, a nowa postać o tym samym imieniu zaczyna od pierwszej karty.
+2. **Wolne punkty statystyk.** Autor: przy wolnych punktach podświetlenie jak przy gotowym zadaniu. Dopóki postać ma wolne punkty, a Statystyki są odblokowane:
+    - „Postać” na dolnym pasku i „Statystyki” na pasku postaci mają złotą kropkę, jak twarz narratora, gdy czeka nagroda,
+    - „Wolne punkty” na ekranie statystyk świecą na złoto.
+
+    Po rozdaniu punktów podświetlenie gaśnie.

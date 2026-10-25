@@ -60,7 +60,7 @@ export function mountStats(container) {
         'div',
         { class: 'title-row' },
         h('h1', { class: 'page-title', tabindex: '-1', text: 'Statystyki' }),
-        h('span', { class: 'badge badge--system badge--tall', text: `WOLNE PUNKTY: ${formatNumber(free)}` }),
+        h('span', { class: `badge badge--system badge--tall${free > 0 ? ' badge--ready' : ''}`, text: `WOLNE PUNKTY: ${formatNumber(free)}` }),
       ),
       levelsCard(character),
       busy && systemPanel('Postać jest na wyprawie. Punkty rozdzielisz po jej powrocie.'),

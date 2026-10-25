@@ -272,19 +272,25 @@ export function updateTopbar(now = serverNow()) {
 }
 
 // Builds a bottom bar; `active` is the id of the highlighted tab.
+// Free stat points light Postać and Statystyki with a gold dot, as a quest's
+// reward lights the narrator's face in the top bar, until they are spent.
+const POINTS_TABS = new Set(['postac', 'stats']);
+const pointsWaiting = () => (state.character?.freePoints ?? 0) > 0 && isUnlocked('stats');
+
 function navButton(tab, active, onBack) {
   const unlocked = !tab.unlock || isUnlocked(tab.unlock);
   const unlock = tab.unlock && unlockInfo(tab.unlock);
   const lockText = unlocked ? null : unlock.level ? `poz. ${unlock.level}` : 'zablokowane';
+  const ready = POINTS_TABS.has(tab.id) && pointsWaiting();
   const children = [
     h('span', { class: 'nav-icon' }, icon(tab.icon), !unlocked && icon('lock', { size: 12, className: 'nav-lock' })),
     h('span', { class: 'nav-label', text: tab.label }),
     lockText && h('span', { class: 'nav-hint', text: lockText }),
   ];
   const props = {
-    class: ['nav-item', tab.system && 'nav-item--system', !unlocked && 'nav-item--locked'].filter(Boolean).join(' '),
+    class: ['nav-item', tab.system && 'nav-item--system', !unlocked && 'nav-item--locked', ready && 'nav-item--ready'].filter(Boolean).join(' '),
     'aria-current': tab.id === active ? 'page' : undefined,
-    'aria-label': lockText ? `${tab.label}, zablokowane (${lockText})` : tab.label,
+    'aria-label': lockText ? `${tab.label}, zablokowane (${lockText})` : ready ? `${tab.label}, wolne punkty do rozdania` : tab.label,
   };
   if (tab.id === 'back') return h('button', { ...props, type: 'button', onClick: onBack }, children);
   return h('a', { ...props, href: tab.href }, children);
