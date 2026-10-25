@@ -70,7 +70,7 @@ export async function openChest(context) {
     }
     // The same week's chest holds the same item, whenever it is opened.
     const rng = createRng(`${row.id}:${periodId}:${period.period}:chest`);
-    item = chestItem({ level: row.level, classId: row.class_id }, equippedItems(player).map((worn) => worn.slot), rng, content);
+    item = chestItem({ level: row.level, classId: row.class_id, classLevel: row.class_level }, equippedItems(player).map((worn) => worn.slot), rng, content);
   }
   const [opened] = await db.batch([
     db

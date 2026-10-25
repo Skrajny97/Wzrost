@@ -257,6 +257,8 @@ export function itemSheet(item, { equipped }) {
   const character = state.character;
   const busy = Boolean(character.activity);
   const usable = !item.classIds || item.classIds.includes(character.classId);
+  // A later base of its kind waits for its class level (a Metin2-like tier).
+  const early = usable && item.classLevel !== null && character.classLevel < item.classLevel;
   const worn = equipped ? null : character.equipment[item.slot];
   const act = (path) => async (event) =>
     withButton(event.currentTarget, async () => {
@@ -284,6 +286,7 @@ export function itemSheet(item, { equipped }) {
     !equipped && salvageSection(item, busy),
     busy && h('p', { class: 'muted', text: 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.' }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
+    early && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
     h(
       'div',
       { class: 'sheet-actions' },
@@ -291,7 +294,7 @@ export function itemSheet(item, { equipped }) {
         ? h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: 'Zdejmij' })
         : [
             h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: discard, text: 'Wyrzuć' }),
-            h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable, onClick: act('equip'), text: 'Załóż' }),
+            h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early, onClick: act('equip'), text: 'Załóż' }),
           ],
     ),
   );
@@ -483,6 +486,7 @@ export function itemDetails(item, { small = false } = {}) {
       { class: 'item-properties' },
       item.properties.map((line) => h('li', { text: line })),
       item.classNames && h('li', { class: 'item-classes', text: `${item.classNames.length > 1 ? 'Dla klas' : 'Dla klasy'}: ${item.classNames.join(', ')}` }),
+      item.classLevel && h('li', { class: 'item-classes', text: `Od poziomu klasy ${item.classLevel}` }),
       item.price !== undefined && h('li', { class: 'item-price', text: `U złomiarza: ${formatNumber(item.price)} złota` }),
     ),
   );

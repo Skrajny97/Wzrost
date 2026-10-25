@@ -193,7 +193,7 @@ export async function finishHunt(db, player, now) {
   );
   const applied = applyHunt(character, hunt, content);
   // A find for a slot with nothing in it is worn at once.
-  const autoEquipped = autoEquip(equippedItems(player), hunt.items, content, row.class_id);
+  const autoEquipped = autoEquip(equippedItems(player), hunt.items, content, row.class_id, row.class_level);
   // The rest goes to the bag. When it does not fit, the scrapper buys the
   // weakest items, old or new, at the camp's price.
   const levels = campLevels(player.buildings, now, content);

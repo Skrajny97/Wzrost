@@ -328,7 +328,7 @@ export function runCharacter(classId, runIndex, content, policyIn = {}) {
     }
 
     // Finds into empty slots, as the server does.
-    const auto = engine.autoEquip(equipped, hunt.items, content, classId);
+    const auto = engine.autoEquip(equipped, hunt.items, content, classId, character.classLevel);
     equipped = [...equipped, ...auto.map((i) => hunt.items[i])];
     const bag = hunt.items.filter((_, i) => !auto.includes(i));
     // The stats screen opens at level 2; points are spent before judging gear.
@@ -339,7 +339,7 @@ export function runCharacter(classId, runIndex, content, policyIn = {}) {
     const sorted = [...bag].sort((a, b) => engine.itemRank(b, content) - engine.itemRank(a, content));
     const toSell = [];
     for (const item of sorted) {
-      if (!engine.canUse(item.base, classId, content)) {
+      if (!engine.canUse(item.base, classId, content, character.classLevel)) {
         toSell.push(item);
         continue;
       }

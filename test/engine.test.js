@@ -62,7 +62,6 @@ import {
   huntingHours,
   huntReport,
   itemName,
-  itemLook,
   itemView,
   itemUpgradeCost,
   itemProperties,
@@ -192,23 +191,32 @@ describe('items', () => {
     assert.equal(itemName(generateItem({ baseId: 'bow', level: 1 }, rng, content), content), 'Łuk');
   });
 
-  test('a talisman has one of its two looks, the same wherever it is seen', () => {
+  test('a later talisman of the family drops and fits from its class level, and is stronger', () => {
     const rng = createRng('talizmany');
-    const seen = new Set();
-    for (let level = 1; level <= 30; level++) {
-      for (const rarityId of ['common', 'rare', 'unique']) {
-        const item = generateItem({ baseId: 'talisman', level, rarityId }, rng, content);
-        const look = itemLook(item, content);
-        assert.ok(['talisman-stone', 'talisman-wood'].includes(look), look);
-        // The report's view, the bag's and the upgraded one show the same look.
-        assert.equal(itemView(item, content).look, look);
-        assert.equal(itemView({ ...item, upgrade: 4 }, content).look, look);
-        seen.add(look);
+    const talismans = (classLevel, count = 400) => {
+      const found = [];
+      for (let index = 0; index < count; index++) {
+        const item = randomItem(20, rng, content, { classId: 'mage', classLevel });
+        if (item.slot === 'talisman') found.push(item.base);
       }
-    }
-    assert.deepEqual([...seen].sort(), ['talisman-stone', 'talisman-wood']);
-    // A base with one look keeps its own picture.
-    assert.equal(itemView(generateItem({ baseId: 'bow', level: 1 }, rng, content), content).look, 'bow');
+      return found;
+    };
+    const young = talismans(14);
+    assert.ok(young.length > 0 && young.every((base) => base === 'talisman'), 'no Otoczak before class level 15');
+    const grown = talismans(15);
+    assert.ok(grown.includes('talisman') && grown.includes('holed-stone'), 'both talismans from class level 15');
+    // A family with two bases drops no more often than one with a single base.
+    assert.ok(Math.abs(grown.length - young.length) < 30, `${young.length} and ${grown.length} talismans`);
+    assert.equal(canUse('holed-stone', 'mage', content, 14), false);
+    assert.equal(canUse('holed-stone', 'warrior', content, 15), true);
+    assert.equal(canUse('holed-stone', 'mage', content), true);
+    const stone = generateItem({ baseId: 'holed-stone', level: 10 }, rng, content);
+    const charm = generateItem({ baseId: 'talisman', level: 10 }, rng, content);
+    assert.ok(stone.implicit.value > charm.implicit.value);
+    assert.equal(itemView(stone, content).classLevel, 15);
+    assert.equal(itemView(charm, content).classLevel, null);
+    assert.deepEqual(autoEquip([], [stone], content, 'mage', 10), []);
+    assert.deepEqual(autoEquip([], [stone], content, 'mage', 15), [0]);
   });
 
   test('properties are described in Polish', () => {

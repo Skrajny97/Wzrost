@@ -219,10 +219,11 @@ export const withClaimed = (quests, periodId, index) => ({
 export const withChest = (quests, periodId) => ({ ...quests, [periodId]: { ...quests[periodId], chest: true } });
 
 // The item in the weekly chest: of the character's level, for its class and
-// favouring its empty slots, of a rarity drawn by the level's band.
-export function chestItem({ level, classId }, wornSlots, rng, content) {
+// class level and favouring its empty slots, of a rarity drawn by the level's
+// band.
+export function chestItem({ level, classId, classLevel }, wornSlots, rng, content) {
   const [rarityId] = rng.weighted(Object.entries(questLevel(level, content).chestRarities), ([, weight]) => weight);
-  return randomItem(level, rng, content, { rarityId, filled: new Set(wornSlots), classId });
+  return randomItem(level, rng, content, { rarityId, filled: new Set(wornSlots), classId, classLevel });
 }
 
 // A noun after a number, in Polish: 1, then 2–4 (but not 12–14), then the rest.

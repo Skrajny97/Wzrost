@@ -318,6 +318,22 @@ describe('equipment', () => {
     assert.equal((await call('POST', `/api/items/${glovesId}/equip`, { cookie })).status, 200);
   });
 
+  test('a later talisman waits for its class level, the first fits from the start', async () => {
+    const stoneId = await addItem({ base: 'holed-stone', slot: 'talisman', level: 1, rarity: 'common', affixes: [], implicit: { stat: 'vitality', value: 2 } });
+    const charmId = await addItem({ base: 'talisman', slot: 'talisman', level: 1, rarity: 'common', affixes: [], implicit: { stat: 'vitality', value: 1 } });
+    const early = await call('POST', `/api/items/${stoneId}/equip`, { cookie });
+    assert.equal(early.status, 403);
+    assert.equal(early.data.error.code, 'class_level');
+    assert.equal(early.data.error.message, 'Ten przedmiot założysz od poziomu klasy 15.');
+    const bag = (await call('GET', '/api/character', { cookie })).data.character.bag;
+    assert.equal(bag.find((item) => item.id === stoneId).classLevel, 15);
+    assert.equal(bag.find((item) => item.id === stoneId).name, 'Otoczak');
+    assert.equal(bag.find((item) => item.id === charmId).classLevel, null);
+    assert.equal((await call('POST', `/api/items/${charmId}/equip`, { cookie })).status, 200);
+    await (await db()).prepare('UPDATE characters SET class_level = 15').run();
+    assert.equal((await call('POST', `/api/items/${stoneId}/equip`, { cookie })).data.character.equipment.talisman.name, 'Otoczak');
+  });
+
   test('with armour bound to classes, what a character wore against its class goes back to the bag', async () => {
     const other = await signUp('lucznik');
     await newCharacter(other, 'archer', 'Iga');

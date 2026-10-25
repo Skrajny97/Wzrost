@@ -184,7 +184,7 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
 
   // Slots covered by worn items or earlier finds, for loot that fills the gaps.
   const filled = new Set(equipped.map((item) => item.slot));
-  const loot = { filled, classId: character.classId };
+  const loot = { filled, classId: character.classId, classLevel: character.classLevel };
   const hpStart = player.hp;
   let hpNow = player.hp;
   let result = 'success';

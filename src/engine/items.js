@@ -60,33 +60,54 @@ export function rollRarity(rng, content, bonus = 1) {
   return rng.weighted(content.rarities, (rarity) => rarity.dropWeight * (rarity.affixes > 0 ? bonus : 1)).id;
 }
 
+// A family holds the bases of one kind of item, a category in the game, as
+// in Metin2: the first for anyone, the next from a class level on
+// (`classLevel`), each with its own picture and stronger numbers, all with
+// the affixes of their rarity. A base names its family (`family` in
+// data/item-bases.json) unless it is the family's first base, which goes by
+// its own id. (`category` there is the kind of damage of a weapon.)
+export const baseFamily = (base) => base.family ?? base.id;
+
 // Weapons, off-hands and the armour of the head and chest belong to classes
-// (weapons, offhands and armor in classes.json); what no class lists, such as
-// gloves, boots and jewellery, fits anyone. Returns the classes that can use
-// a base, or null for all.
+// (weapons, offhands and armor in classes.json, by family); what no class
+// lists, such as gloves, boots and jewellery, fits anyone. Returns the
+// classes that can use a base, or null for all.
 const GEAR = ['weapons', 'offhands', 'armor'];
 
 export function baseClasses(baseId, content) {
-  const classes = content.classes.filter((cls) => GEAR.some((key) => cls[key].includes(baseId)));
+  const family = baseFamily(content.basesById[baseId]);
+  const classes = content.classes.filter((cls) => GEAR.some((key) => cls[key].includes(family)));
   return classes.length > 0 ? classes.map((cls) => cls.id) : null;
 }
 
-export const canUse = (baseId, classId, content) => baseClasses(baseId, content)?.includes(classId) ?? true;
+// The class level a base asks for (1 when it asks for none).
+export const baseClassLevel = (baseId, content) => content.basesById[baseId].classLevel ?? 1;
+
+// Whether a class can use a base: by its class, and, when the class level is
+// given, by the level the base asks for.
+export const canUse = (baseId, classId, content, classLevel) =>
+  (baseClasses(baseId, content)?.includes(classId) ?? true) && (classLevel === undefined || classLevel >= baseClassLevel(baseId, content));
 
 // Loot favours the slots the character has empty, only ever holds what its
 // class can use, and while it has no weapon a weapon is always one of its
-// class. `filled` is the set of slots already covered (worn, or found
-// earlier in the same hunt); found items are added. `rarityId` gives the
-// rarity instead of a roll (the weekly quest chest).
-export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId, rarityId } = {}) {
-  let base;
+// class. It picks a family, as often as if each had one base, and then one
+// of the family's bases its class level allows (none given: the first only),
+// so a family with more bases drops no more often. `filled` is the
+// set of slots already covered (worn, or found earlier in the same hunt);
+// found items are added. `rarityId` gives the rarity instead of a roll (the
+// weekly quest chest).
+export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId, classLevel = 1, rarityId } = {}) {
+  let family;
   if (filled && classId && !filled.has('weapon')) {
-    base = content.basesById[rng.pick(content.classesById[classId].weapons)];
+    family = rng.pick(content.classesById[classId].weapons);
   } else {
     const weight = content.balance.items.emptySlotWeight;
-    const bases = classId ? content.bases.filter((candidate) => canUse(candidate.id, classId, content)) : content.bases;
-    base = rng.weighted(bases, (candidate) => (filled && !filled.has(candidate.slot) ? weight : 1));
+    const firsts = content.bases.filter((candidate) => baseFamily(candidate) === candidate.id && (!classId || canUse(candidate.id, classId, content)));
+    family = rng.weighted(firsts, (candidate) => (filled && !filled.has(candidate.slot) ? weight : 1)).id;
   }
+  const bases = content.bases.filter((candidate) => baseFamily(candidate) === family && baseClassLevel(candidate.id, content) <= classLevel);
+  // Only a real choice draws, so loot without one stays as it was.
+  const base = bases.length === 1 ? bases[0] : rng.pick(bases);
   filled?.add(base.slot);
   return generateItem({ baseId: base.id, level, rarityId: rarityId ?? rollRarity(rng, content, rarityBonus) }, rng, content);
 }
@@ -238,11 +259,11 @@ export function itemRank(item, content) {
 // Finds that go straight into empty slots: for each slot nothing is worn in,
 // the best item found for it that the class can use. Returns their indices in
 // `items`, in order.
-export function autoEquip(equipped, items, content, classId) {
+export function autoEquip(equipped, items, content, classId, classLevel) {
   const worn = new Set(equipped.map((item) => item.slot));
   const best = new Map();
   items.forEach((item, index) => {
-    if (worn.has(item.slot) || (classId && !canUse(item.base, classId, content))) return;
+    if (worn.has(item.slot) || (classId && !canUse(item.base, classId, content, classLevel))) return;
     const chosen = best.get(item.slot);
     if (chosen === undefined || itemRank(item, content) > itemRank(items[chosen], content)) best.set(item.slot, index);
   });
@@ -251,26 +272,13 @@ export function autoEquip(equipped, items, content, classId) {
 
 // `upgradeCap`: the level of the camp's Kowadło, for the upgrade part of the
 // item card; left out where the card cannot upgrade (a report).
-// A base with a few looks (`looks` in data/item-bases.json: the talisman is a
-// holed stone or a wooden charm) gives each of its items one of them. The
-// look follows from what never changes on the item, so it is the same in a
-// report, in the bag and after the Kowadło.
-export function itemLook(item, content) {
-  const looks = content.basesById[item.base].looks;
-  if (!looks) return item.base;
-  const key = [item.level, item.rarity, ...item.affixes.map((affix) => affix.id)].join('|');
-  let hash = 2166136261;
-  for (let index = 0; index < key.length; index++) hash = Math.imul(hash ^ key.charCodeAt(index), 16777619) >>> 0;
-  return looks[hash % looks.length];
-}
-
 export function itemView(item, content, { sellBonus = 0, upgradeCap } = {}) {
   const rarity = content.raritiesById[item.rarity];
   const classIds = baseClasses(item.base, content);
+  const classLevel = baseClassLevel(item.base, content);
   return {
     name: itemName(item, content),
     base: item.base,
-    look: itemLook(item, content),
     slot: item.slot,
     slotName: content.slotsById[item.slot].name,
     level: item.level,
@@ -282,6 +290,8 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap } = {}) {
     // null: any class can use it.
     classIds,
     classNames: classIds && classIds.map((id) => content.classesById[id].name),
+    // The class level it asks for, or null when it asks for none.
+    classLevel: classLevel > 1 ? classLevel : null,
     price: sellPrice(item, content, sellBonus),
     ...(upgradeCap === undefined ? {} : { anvil: upgradeView(item, upgradeCap, content) }),
   };

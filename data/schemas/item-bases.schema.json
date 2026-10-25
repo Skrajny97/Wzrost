@@ -22,17 +22,17 @@
       "stat": { "type": "string" },
       "statFactor": { "type": "number", "exclusiveMinimum": 0 },
       "sound": { "type": "string", "description": "Rodzaj dźwięku trafienia z sounds.json." },
-      "looks": {
-      "description": "Kilka wyglądów jednej bazy (obrazki src/client/art/items/<id>.png). Każdy przedmiot tej bazy ma jeden z nich, zawsze ten sam.",
-      "type": "array",
-      "minItems": 2,
-      "uniqueItems": true,
-      "items": {
+      "family": {
+        "description": "Kategoria przedmiotu w grze, jak w Metin2 (np. talizmany): id pierwszej bazy tej kategorii, z tym samym miejscem i rodzajem. Pierwsza baza kategorii nie ma tego pola.",
         "type": "string",
         "pattern": "^[a-z][a-z0-9-]*$"
-      }
-    },
-    "strike": {
+      },
+      "classLevel": {
+        "description": "Poziom klasy, od którego postać może używać tej bazy i od którego ta baza wypada. Tylko dla dalszych baz kategorii (z polem family).",
+        "type": "integer",
+        "minimum": 2
+      },
+      "strike": {
         "description": "Wygląd ciosu w animacji walki. Bez tego pola broń fizyczna uderza wręcz, a magiczna wystrzeliwuje pocisk.",
         "enum": ["melee", "arrow", "magic"]
       }

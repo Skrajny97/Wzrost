@@ -124,6 +124,17 @@ function checkReferences(data) {
     for (const element of base.elements ?? []) {
       if (!elements.has(element)) errors.push(`item-bases.json: ${base.id} ma nieznany żywioł "${element}"`);
     }
+    // A family (a category in the game, as the talismans) is named by its
+    // first base, of the same slot and kind; only its later bases ask for a
+    // class level.
+    if (base.family !== undefined) {
+      const first = basesById.get(base.family);
+      if (!first || first.family !== undefined) errors.push(`item-bases.json: ${base.id} ma rodzinę "${base.family}", która nie jest pierwszą bazą kategorii`);
+      else if (first.slot !== base.slot || first.kind !== base.kind) errors.push(`item-bases.json: ${base.id} ma inny slot albo rodzaj niż kategoria "${base.family}"`);
+      if (base.classLevel === undefined) errors.push(`item-bases.json: ${base.id} w kategorii "${base.family}" nie ma poziomu klasy (classLevel)`);
+    } else if (base.classLevel !== undefined) {
+      errors.push(`item-bases.json: ${base.id} jest pierwszą bazą kategorii i nie może wymagać poziomu klasy`);
+    }
   }
 
   const affixStat = (stat) => stats.has(stat) || stat === 'armor' || (stat.startsWith('resist.') && elements.has(stat.slice(7)));

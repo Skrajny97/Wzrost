@@ -2,6 +2,7 @@
 
 import {
   bagCapacity,
+  baseClassLevel,
   campBonus,
   campLevels,
   canUse,
@@ -50,6 +51,9 @@ export async function equipItem(context) {
   if (content.slotsById[item.slot].locked) throw new ApiError(403, 'slot_locked', 'Ten slot jest jeszcze zablokowany.');
   if (!canUse(item.base, player.row.class_id, content)) {
     throw new ApiError(403, 'wrong_class', 'Twoja klasa nie może używać tego przedmiotu.');
+  }
+  if (!canUse(item.base, player.row.class_id, content, player.row.class_level)) {
+    throw new ApiError(403, 'class_level', `Ten przedmiot założysz od poziomu klasy ${baseClassLevel(item.base, content)}.`);
   }
 
   // Whatever was in the slot goes back to the bag first.

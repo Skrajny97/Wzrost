@@ -19,5 +19,6 @@
   { "id": "boots", "name": "Buty", "gender": "pl", "slot": "feet", "kind": "armor", "armorFactor": 0.4 },
   { "id": "amulet", "name": "Amulet", "gender": "m", "slot": "amulet", "kind": "implicit", "stat": "will", "statFactor": 0.3 },
   { "id": "ring", "name": "Pierścień", "gender": "m", "slot": "ring", "kind": "implicit", "stat": "perception", "statFactor": 0.3 },
-  { "id": "talisman", "name": "Talizman", "gender": "m", "slot": "talisman", "kind": "implicit", "stat": "vitality", "statFactor": 0.3, "looks": ["talisman-stone", "talisman-wood"] }
+  { "id": "talisman", "name": "Talizman", "gender": "m", "slot": "talisman", "kind": "implicit", "stat": "vitality", "statFactor": 0.3 },
+  { "id": "holed-stone", "name": "Otoczak", "gender": "m", "slot": "talisman", "kind": "implicit", "stat": "vitality", "statFactor": 0.4, "family": "talisman", "classLevel": 15 }
 ]

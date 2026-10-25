@@ -1257,11 +1257,15 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
 
     Po rozdaniu punktów podświetlenie gaśnie.
 
-## Talizman w dwóch wyglądach (25.10.2026)
+## Kategorie przedmiotów jak w Metin2 i drugi talizman (25.10.2026)
 
 1. **Bez godła.** Autor: ikonka talizmanu musi być uniwersalna, bo liść na niej mylił („Talizman Lisa” nie ma nic wspólnego z liściem). Retro Diffusion narysował 4 szkice bez godła: dwa kamienie z dziurką na rzemyku i dwa drewniane krążki (0,72 USD). W kamieniach biała plamka w miejscu dziurki stała się przezroczysta.
-2. **Dwa wyglądy.** Wybór autora: oba szkice, kamień z dziurką (nr 2) i drewniany krążek ze słojami (nr 4).
-    - Talizman zostaje jedną bazą, z tą samą nazwą i Witalnością, a w danych ma dwa wyglądy (`looks` w `data/item-bases.json`, obrazki `talisman-stone` i `talisman-wood`).
-    - Każdy talizman dostaje jeden z nich, liczony z tego, co się w nim nie zmienia: poziomu, rzadkości i afiksów (`itemLook` w `src/engine/items.js`). Ten sam talizman wygląda więc tak samo w raporcie, w plecaku, na postaci i po ulepszeniu w Kowadle.
-    - Wygląd nic nie mówi o przedmiocie. Jeśli talizmany mają się różnić także nazwą albo cechą, trzeba będzie zrobić z nich dwie bazy.
-3. **Stary obrazek z liściem** wypadł z gry.
+2. **System przedmiotów jak w Metin2** (wyjaśnienie autora, z dodatkiem afiksów zależnych od rzadkości). Kategoria, np. sztylety albo talizmany, to nie jeden przedmiot. Ma wiele baz: zwykły Sztylet, a dalej np. Kordelas od 15. poziomu klasy, z inną ikonką i mocniejszymi liczbami. Każda baza dostaje afiksy swojej rzadkości jak dotąd, a lista baz będzie duża.
+    - W danych dalsza baza kategorii ma `family` (id pierwszej bazy, np. `talisman`) i `classLevel`, poziom klasy, od którego postać może jej używać (`data/item-bases.json`). Mocniejsze liczby daje jej własny współczynnik (`statFactor`, `armorFactor`, `damageFactor`). Pole `category` zostaje przy broniach dla rodzaju obrażeń.
+    - Klasy w `classes.json` wymieniają kategorie (pierwsze bazy), więc np. Kordelas należałby do tych samych klas co Sztylet.
+    - Łup losuje najpierw kategorię, tak samo często jak dotąd, a potem jedną z jej baz, na które pozwala poziom klasy postaci. Kategoria z większą liczbą baz nie wypada więc częściej, a baza z poziomem wyższym niż postać nie wypada wcale (`randomItem` w `src/engine/items.js`). Dotyczy to też skrzyń, skrzyni zadań i skrzyni pierwszej broni.
+    - Przedmiotu z bazy wymagającej wyższego poziomu nie da się założyć: karta przedmiotu mówi „Od poziomu klasy N”, a serwer odpowiada „Ten przedmiot założysz od poziomu klasy N.”
+3. **Dwa talizmany.** Wybór autora z arkusza szkiców: kamień z dziurką (nr 2) i drewniany krążek (nr 4).
+    - **Talizman**, drewniany krążek ze słojami, jest pierwszą bazą kategorii, dla każdego od początku: Witalność ×0,3, bez zmian. Dotychczasowe talizmany graczy wyglądają teraz tak.
+    - **Otoczak**, kamień z dziurką, to dalsza baza od 15. poziomu klasy: Witalność ×0,4, czyli o jedną trzecią więcej. Nazwę, poziom i współczynnik dobrano najprościej, na wzór Kordelasa z przykładu autora, i łatwo je zmienić w danych.
+    - Stary obrazek z liściem wypadł z gry.
