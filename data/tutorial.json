@@ -267,7 +267,8 @@
       "kind": "lead",
       "text": [
         "Teraz zadbajmy o odpoczynek po kolejnych wyprawach. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko."
-      ]
+      ],
+      "voice": "audio/narration/lead-campfire.mp3"
     },
     {
       "id": "tap-build",
@@ -304,7 +305,8 @@
       "kind": "point",
       "text": [
         "Codziennie będę Ci zlecał zadania, w taki sposób utrzymamy naszą, mam nadzieję, owocną relację. Będę na Ciebie czekał tutaj."
-      ]
+      ],
+      "voice": "audio/narration/quests.mp3"
     },
     {
       "id": "ending",

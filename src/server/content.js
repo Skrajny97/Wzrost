@@ -22,6 +22,7 @@ import music from '../../data/music.json' with { type: 'json' };
 import sounds from '../../data/sounds.json' with { type: 'json' };
 import tutorial from '../../data/tutorial.json' with { type: 'json' };
 import materials from '../../data/materials.json' with { type: 'json' };
+import quests from '../../data/quests.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -41,6 +42,7 @@ export const content = buildContent({
   buildings,
   appearances,
   materials,
+  quests,
 });
 
 // The narrator's lines that are read once, in their order: cards and

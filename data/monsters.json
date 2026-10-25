@@ -2,6 +2,7 @@
   {
     "id": "wolf",
     "name": "Wilk",
+    "counted": ["wilka", "wilki", "wilków"],
     "family": "beast",
     "position": "front",
     "stats": {
@@ -16,6 +17,7 @@
   {
     "id": "boar",
     "name": "Dzik",
+    "counted": ["dzika", "dziki", "dzików"],
     "family": "beast",
     "position": "front",
     "stats": {
@@ -30,6 +32,7 @@
   {
     "id": "crow",
     "name": "Kruk",
+    "counted": ["kruka", "kruki", "kruków"],
     "family": "bird",
     "position": "back",
     "stats": {
@@ -44,6 +47,7 @@
   {
     "id": "viper",
     "name": "Żmija",
+    "counted": ["żmiję", "żmije", "żmij"],
     "family": "snake",
     "position": "middle",
     "stats": {
@@ -66,6 +70,7 @@
   {
     "id": "badger",
     "name": "Borsuk",
+    "counted": ["borsuka", "borsuki", "borsuków"],
     "family": "beast",
     "position": "front",
     "stats": {
@@ -80,6 +85,7 @@
   {
     "id": "lynx",
     "name": "Ryś",
+    "counted": ["rysia", "rysie", "rysiów"],
     "family": "beast",
     "position": "middle",
     "stats": {
@@ -94,6 +100,7 @@
   {
     "id": "spider",
     "name": "Krzyżak",
+    "counted": ["krzyżaka", "krzyżaki", "krzyżaków"],
     "family": "spider",
     "position": "middle",
     "stats": {
@@ -116,6 +123,7 @@
   {
     "id": "alpha-wolf",
     "name": "Basior",
+    "counted": ["basiora", "basiory", "basiorów"],
     "family": "beast",
     "position": "front",
     "stats": {
@@ -130,6 +138,7 @@
   {
     "id": "fox",
     "name": "Lis",
+    "counted": ["lisa", "lisy", "lisów"],
     "family": "beast",
     "position": "middle",
     "stats": {
@@ -144,6 +153,7 @@
   {
     "id": "owl",
     "name": "Puszczyk",
+    "counted": ["puszczyka", "puszczyki", "puszczyków"],
     "family": "bird",
     "position": "back",
     "stats": {
@@ -158,6 +168,7 @@
   {
     "id": "bear",
     "name": "Niedźwiedź",
+    "counted": ["niedźwiedzia", "niedźwiedzie", "niedźwiedzi"],
     "family": "beast",
     "position": "front",
     "stats": {
@@ -172,6 +183,7 @@
   {
     "id": "wisp",
     "name": "Błędnica",
+    "counted": ["błędnicę", "błędnice", "błędnic"],
     "family": "spirit",
     "position": "back",
     "elite": true,
@@ -196,6 +208,7 @@
   {
     "id": "likho",
     "name": "Licho",
+    "counted": ["licho", "licha", "lich"],
     "family": "spirit",
     "position": "middle",
     "elite": true,

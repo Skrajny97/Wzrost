@@ -6,10 +6,17 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "name", "family", "position", "stats", "attack", "hpFactor", "armorFactor", "reward"],
+    "required": ["id", "name", "counted", "family", "position", "stats", "attack", "hpFactor", "armorFactor", "reward"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
       "name": { "type": "string", "minLength": 1 },
+      "counted": {
+        "type": "array",
+        "description": "Nazwa po liczbie, w bierniku, do zadań narratora: 1 (wilka), 2–4 (wilki), 5 i więcej (wilków).",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": { "type": "string", "minLength": 1 }
+      },
       "family": { "type": "string", "minLength": 1 },
       "position": { "enum": ["front", "middle", "back"] },
       "elite": { "type": "boolean" },

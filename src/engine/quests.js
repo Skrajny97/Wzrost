@@ -1,0 +1,280 @@
+// The narrator's daily and weekly quests (data/quests.json). Days and weeks
+// follow the clock of quests.timeZone (Polish time): a day starts at
+// midnight, a week at the midnight between Sunday and Monday. A period's
+// quests are drawn when it comes, from a seed of the character and the
+// period, so a period always gets the same ones: creatures of the newest
+// inner region open to the character's class and, once the Stół
+// rzemieślniczy stands, its work, each with a reward of gold, a resource or
+// parts. Claimed explorations and the table's orders move them on; a quest
+// done gives its reward when claimed, and all of a period's quests done open
+// its chest.
+
+import { encountersFor } from './hunt.js';
+import { randomItem } from './items.js';
+import { createRng } from './rng.js';
+import { areaUnlocked } from './unlocks.js';
+
+export const QUEST_PERIODS = ['daily', 'weekly'];
+
+// The zone's wall clock. Intl knows the zone's rules (summer time), so the
+// days turn at the zone's midnight all year.
+const clocks = new Map();
+
+function zoneClock(ms, timeZone) {
+  let clock = clocks.get(timeZone);
+  if (!clock) {
+    clock = new Intl.DateTimeFormat('en-GB', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+    });
+    clocks.set(timeZone, clock);
+  }
+  const parts = {};
+  for (const { type, value } of clock.formatToParts(ms)) if (type !== 'literal') parts[type] = Number(value);
+  return parts;
+}
+
+// How far the zone's clock is ahead of UTC at `ms`.
+function zoneOffset(ms, timeZone) {
+  const { year, month, day, hour, minute, second } = zoneClock(ms, timeZone);
+  return Date.UTC(year, month - 1, day, hour, minute, second) - Math.floor(ms / 1000) * 1000;
+}
+
+// The moment the zone's clock shows midnight `days` after the day it shows
+// at `ms`. The offset is taken near that moment, and again at it, so a
+// change of time on that day is on the right side.
+function zoneMidnight(ms, timeZone, days) {
+  const { year, month, day } = zoneClock(ms, timeZone);
+  const wall = Date.UTC(year, month - 1, day + days);
+  return wall - zoneOffset(wall - zoneOffset(wall, timeZone), timeZone);
+}
+
+// Days since Monday on the zone's clock at `ms`.
+function sinceMonday(ms, timeZone) {
+  const { year, month, day } = zoneClock(ms, timeZone);
+  return (new Date(Date.UTC(year, month - 1, day)).getUTCDay() + 6) % 7;
+}
+
+// The period around `now`: its key (the date it starts on, on the zone's
+// clock), its start and its end.
+export function questPeriod(periodId, now, content) {
+  const { timeZone } = content.quests;
+  const weekly = periodId === 'weekly';
+  const back = weekly ? sinceMonday(now, timeZone) : 0;
+  const startsAt = zoneMidnight(now, timeZone, -back);
+  const endsAt = zoneMidnight(now, timeZone, (weekly ? 7 : 1) - back);
+  const { year, month, day } = zoneClock(startsAt, timeZone);
+  const key = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  return { key, startsAt, endsAt };
+}
+
+// The newest inner region open to the character's class: its creatures are
+// the ones to beat.
+export function questArea(character, content) {
+  return content.areas
+    .filter((area) => areaUnlocked(area, character.classLevel, content))
+    .reduce((newest, area) => (area.minLevel > newest.minLevel ? area : newest));
+}
+
+// How many of each creature a fight there brings on average, among the
+// regular encounters at the character's level.
+function creaturesPerFight(area, level) {
+  const encounters = encountersFor(area, level);
+  const total = encounters.reduce((sum, encounter) => sum + encounter.weight, 0);
+  const shares = new Map();
+  for (const encounter of encounters) {
+    for (const monsterId of encounter.monsters) shares.set(monsterId, (shares.get(monsterId) ?? 0) + encounter.weight / total);
+  }
+  return shares;
+}
+
+// What can be drawn: each kind once for each of its variants (kill: each
+// creature that the period's most fights bring at least once on average),
+// the kind's weight shared among them.
+function questOptions(periodId, { character, hasTable }, content) {
+  return content.quests.kinds.flatMap((kind) => {
+    if (kind.table && !hasTable) return [];
+    const variants =
+      kind.id === 'kill'
+        ? [...creaturesPerFight(questArea(character, content), character.level)]
+            .filter(([, perFight]) => perFight * kind[periodId].fights[1] >= 1)
+            .map(([target, perFight]) => ({ target, perFight }))
+        : [{}];
+    return variants.map((variant) => ({ kind, weight: kind.weight / variants.length, ...variant }));
+  });
+}
+
+// How much a quest asks for: for creatures, as many as `fights` fights
+// bring on average.
+function questCount({ kind, perFight }, periodId, rng) {
+  const tuning = kind[periodId];
+  if (kind.id === 'kill') return Math.max(1, Math.round(rng.int(...tuning.fights) * perFight));
+  const [min, max] = tuning.count;
+  const step = tuning.step ?? 1;
+  return min + step * rng.int(0, Math.floor((max - min) / step));
+}
+
+// The band of levels the character is in (levels in quests.json).
+export const questLevel = (level, content) => content.quests.levels.findLast((band) => band.fromLevel <= level);
+
+// A quest's reward: gold, a resource or parts, more at a higher level.
+function questReward(periodId, level, rng, content) {
+  const { rewards } = content.quests;
+  const [kind] = rng.weighted(Object.entries(rewards.weights), ([, weight]) => weight);
+  const { base, perLevel } = rewards[periodId][kind];
+  const spread = rng.float(1 - rewards.spread, 1 + rewards.spread);
+  const amount = (share = 1) => Math.max(1, Math.round((base + perLevel * level) * share * spread));
+  if (kind === 'gold') return { kind, amount: amount() };
+  if (kind === 'resource') {
+    const [id, share] = rng.pick(Object.entries(rewards.resources));
+    return { kind, id, amount: amount(share) };
+  }
+  return { kind, id: questLevel(level, content).part, amount: amount() };
+}
+
+// A period's quests, drawn from `seed` for the character as it is: no
+// option twice, in the order of the kinds.
+export function drawQuests(periodId, { character, hasTable, seed }, content) {
+  const rng = createRng(seed);
+  let options = questOptions(periodId, { character, hasTable }, content);
+  const drawn = [];
+  while (drawn.length < content.quests.periods[periodId].count && options.length > 0) {
+    const option = rng.weighted(options);
+    options = options.filter((other) => other !== option);
+    drawn.push(option);
+  }
+  const { kinds } = content.quests;
+  return drawn
+    .sort((a, b) => kinds.indexOf(a.kind) - kinds.indexOf(b.kind))
+    .map((option) => ({
+      kind: option.kind.id,
+      ...(option.target && { target: option.target }),
+      count: questCount(option, periodId, rng),
+      progress: 0,
+      reward: questReward(periodId, character.level, rng, content),
+      claimed: false,
+    }));
+}
+
+// Both periods' quests at `now`: those kept while their period lasts, new
+// ones once it has passed. `seed` is the character's.
+export function currentQuests(stored, { character, hasTable, seed }, now, content) {
+  return Object.fromEntries(
+    QUEST_PERIODS.map((periodId) => {
+      const { key } = questPeriod(periodId, now, content);
+      const kept = stored?.[periodId];
+      if (kept?.period === key) return [periodId, kept];
+      const quests = drawQuests(periodId, { character, hasTable, seed: `${seed}:${periodId}:${key}` }, content);
+      return [periodId, { period: key, quests, chest: false }];
+    }),
+  );
+}
+
+export const questsStale = (stored, now, content) =>
+  QUEST_PERIODS.some((periodId) => stored?.[periodId]?.period !== questPeriod(periodId, now, content).key);
+
+// The creatures beaten in an exploration's won fights, by id.
+export function huntKills(hunt) {
+  const kills = {};
+  for (const fight of hunt.fights) {
+    if (fight.won !== true) continue;
+    for (const enemy of fight.enemies) kills[enemy.monsterId] = (kills[enemy.monsterId] ?? 0) + 1;
+  }
+  return kills;
+}
+
+// What claimed explorations and the table's orders add: creatures beaten
+// (`kills` by id), `minutes` explored, materials `processed` and items
+// `salvaged`. A quest stops at its count.
+export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0 }) {
+  const gain = { kill: (quest) => kills[quest.target] ?? 0, explore: () => minutes, process: () => processed, salvage: () => salvaged };
+  return Object.fromEntries(
+    Object.entries(quests).map(([periodId, period]) => [
+      periodId,
+      {
+        ...period,
+        quests: period.quests.map((quest) => ({ ...quest, progress: Math.min(quest.count, quest.progress + (gain[quest.kind]?.(quest) ?? 0)) })),
+      },
+    ]),
+  );
+}
+
+export const questDone = (quest) => quest.progress >= quest.count;
+
+// A period's chest opens once all its quests are done, their rewards
+// claimed or not.
+export const chestReady = (period) => period.quests.length > 0 && period.quests.every(questDone);
+
+export const withClaimed = (quests, periodId, index) => ({
+  ...quests,
+  [periodId]: { ...quests[periodId], quests: quests[periodId].quests.map((quest, at) => (at === index ? { ...quest, claimed: true } : quest)) },
+});
+
+export const withChest = (quests, periodId) => ({ ...quests, [periodId]: { ...quests[periodId], chest: true } });
+
+// The item in the weekly chest: of the character's level, for its class and
+// favouring its empty slots, of a rarity drawn by the level's band.
+export function chestItem({ level, classId }, wornSlots, rng, content) {
+  const [rarityId] = rng.weighted(Object.entries(questLevel(level, content).chestRarities), ([, weight]) => weight);
+  return randomItem(level, rng, content, { rarityId, filled: new Set(wornSlots), classId });
+}
+
+// A noun after a number, in Polish: 1, then 2–4 (but not 12–14), then the rest.
+export function countedForm(count, [one, few, many]) {
+  if (count === 1) return one;
+  const last = count % 10;
+  const tens = count % 100;
+  return last >= 2 && last <= 4 && (tens < 12 || tens > 14) ? few : many;
+}
+
+// A quest's text: its kind's, with the count and the noun to go with it.
+export function questText(quest, content) {
+  const kind = content.quests.kinds.find((candidate) => candidate.id === quest.kind);
+  const forms = quest.kind === 'kill' ? content.monstersById[quest.target].counted : kind.counted;
+  return kind.text.replace('{count}', String(quest.count)).replace('{noun}', countedForm(quest.count, forms));
+}
+
+// The quests as the page shows them: each period with its name, its end,
+// its quests (`index`: the place to claim it by) and its chest. A quest of a
+// kind or a creature no longer in the data is left out.
+export function questsView(quests, now, content) {
+  const known = (quest) =>
+    content.quests.kinds.some((kind) => kind.id === quest.kind) && (quest.kind !== 'kill' || Boolean(content.monstersById[quest.target]));
+  return Object.fromEntries(
+    QUEST_PERIODS.map((periodId) => {
+      const period = quests[periodId];
+      const { name, chest } = content.quests.periods[periodId];
+      return [
+        periodId,
+        {
+          name,
+          endsAt: questPeriod(periodId, now, content).endsAt,
+          quests: period.quests.flatMap((quest, index) =>
+            known(quest)
+              ? [
+                  {
+                    index,
+                    kind: quest.kind,
+                    ...(quest.target && { monsterId: quest.target }),
+                    text: questText(quest, content),
+                    progress: quest.progress,
+                    count: quest.count,
+                    done: questDone(quest),
+                    claimed: quest.claimed,
+                    reward: quest.reward,
+                  },
+                ]
+              : [],
+          ),
+          chest: { ...chest, ready: chestReady(period), opened: period.chest },
+        },
+      ];
+    }),
+  );
+}

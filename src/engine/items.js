@@ -76,8 +76,9 @@ export const canUse = (baseId, classId, content) => baseClasses(baseId, content)
 // Loot favours the slots the character has empty, only ever holds what its
 // class can use, and while it has no weapon a weapon is always one of its
 // class. `filled` is the set of slots already covered (worn, or found
-// earlier in the same hunt); found items are added.
-export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId } = {}) {
+// earlier in the same hunt); found items are added. `rarityId` gives the
+// rarity instead of a roll (the weekly quest chest).
+export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId, rarityId } = {}) {
   let base;
   if (filled && classId && !filled.has('weapon')) {
     base = content.basesById[rng.pick(content.classesById[classId].weapons)];
@@ -87,7 +88,7 @@ export function randomItem(level, rng, content, { rarityBonus = 1, filled, class
     base = rng.weighted(bases, (candidate) => (filled && !filled.has(candidate.slot) ? weight : 1));
   }
   filled?.add(base.slot);
-  return generateItem({ baseId: base.id, level, rarityId: rollRarity(rng, content, rarityBonus) }, rng, content);
+  return generateItem({ baseId: base.id, level, rarityId: rarityId ?? rollRarity(rng, content, rarityBonus) }, rng, content);
 }
 
 // Gold from the scrapper: level × goldPerLevel × the rarity's multiplier.

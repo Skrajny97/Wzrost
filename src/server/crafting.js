@@ -6,9 +6,20 @@
 // the present time and is saved only if the character is as read (its
 // version), so two taps at once make one change.
 
-import { campLevels, craftLevelFor, craftTable, craftTakes, createRng, itemName, orderMaterials, orderSalvage, settleCrafting } from '../engine/index.js';
+import {
+  addQuestProgress,
+  campLevels,
+  craftLevelFor,
+  craftTable,
+  craftTakes,
+  createRng,
+  itemName,
+  orderMaterials,
+  orderSalvage,
+  settleCrafting,
+} from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, craftingState, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
+import { characterView, craftingState, loadPlayer, questsNow, requireIdlePlayer, requirePlayer } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { testMode, testModeFor } from './test-mode.js';
@@ -37,11 +48,22 @@ function checkRoom(queue) {
 const newId = () => toHex(crypto.getRandomValues(new Uint8Array(8)));
 const withIds = (before, state) => ({ ...state, queue: state.queue.map((order, index) => (index < before ? order : { id: newId(), ...order })) });
 
-// `condition` adds to the WHERE clause, with its own `binds`.
-const saveState = (db, row, state, condition = '', binds = []) =>
+// `quests`: the narrator's quests moved on by the order. `condition` adds to
+// the WHERE clause, with its own `binds`.
+const saveState = (db, row, state, { quests, condition = '', binds = [] } = {}) =>
   db
-    .prepare(`UPDATE characters SET materials = ?, parts = ?, crafting = ?, version = version + 1 WHERE id = ? AND version = ?${condition}`)
-    .bind(JSON.stringify(state.materials), JSON.stringify(state.parts), JSON.stringify(state.queue), row.id, row.version, ...binds);
+    .prepare(
+      `UPDATE characters SET materials = ?, parts = ?, crafting = ?${quests ? ', quests = ?' : ''}, version = version + 1 WHERE id = ? AND version = ?${condition}`,
+    )
+    .bind(
+      JSON.stringify(state.materials),
+      JSON.stringify(state.parts),
+      JSON.stringify(state.queue),
+      ...(quests ? [JSON.stringify(quests)] : []),
+      row.id,
+      row.version,
+      ...binds,
+    );
 
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 
@@ -62,8 +84,11 @@ export async function craftMaterials(context) {
     throw tooRare(rarities.sort((a, b) => craftLevelFor(a, content) - craftLevelFor(b, content))[0]);
   }
   if (ordered === 0) throw new ApiError(409, 'no_materials', 'Nie masz tych materiałów.');
+  // Every material handed to the table counts for the narrator's quests.
+  const processed = Object.entries(settled.materials).reduce((sum, [key, count]) => sum + count - (state.materials[key] ?? 0), 0);
+  const quests = addQuestProgress(questsNow(player, now), { processed });
   const db = context.env.DB;
-  const result = await saveState(db, player.row, withIds(settled.queue.length, state)).run();
+  const result = await saveState(db, player.row, withIds(settled.queue.length, state), { quests }).run();
   if (result.meta.changes !== 1) throw changed();
   return json({ ordered, skipped: rare, character: characterView(await loadPlayer(db, session.userId), now) });
 }
@@ -86,8 +111,13 @@ export async function salvageItem(context) {
   const row = player.row;
   // The order is saved only while the item is still in the bag, and the item
   // goes only if that order was saved: two taps make one order.
+  const quests = addQuestProgress(questsNow(player, now), { salvaged: 1 });
   const [saved] = await db.batch([
-    saveState(db, row, state, ' AND EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ? AND slot IS NULL)', [item.id, row.id]),
+    saveState(db, row, state, {
+      quests,
+      condition: ' AND EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ? AND slot IS NULL)',
+      binds: [item.id, row.id],
+    }),
     db
       .prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND instr(crafting, ?) > 0)')
       .bind(item.id, row.id, row.id, `"id":"${order.id}"`),

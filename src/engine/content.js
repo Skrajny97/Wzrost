@@ -65,5 +65,7 @@ export function buildContent(raw) {
     partsByRarity: Object.fromEntries(raw.materials.parts.map((part) => [part.rarity, part])),
     appearances: raw.appearances ?? [],
     appearancesById: byId(raw.appearances ?? []),
+    // The narrator's daily and weekly quests (quests.js).
+    quests: raw.quests,
   };
 }

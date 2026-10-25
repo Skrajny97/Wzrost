@@ -1,0 +1,75 @@
+{
+  "$comment": "Zadania dzienne i tygodniowe od narratora (src/engine/quests.js). Dzienne odnawiają się o północy, tygodniowe w nocy z niedzieli na poniedziałek, według zegara strefy timeZone. Każdy okres ma swoją liczbę zadań (count) i skrzynię za wykonanie wszystkich. Rodzaje zadań (kinds) losują się bez powtórzeń: waga rodzaju (weight) dzieli się między jego warianty, np. różne stwory. Postęp liczy kod według id rodzaju: kill – stwory pokonane na wyprawach, explore – minuty wypraw, process – materiały oddane do przeróbki na Stole rzemieślniczym, salvage – przedmioty oddane tam do rozebrania. table: rodzaj tylko z postawionym Stołem rzemieślniczym. Ile trzeba zrobić, losuje się z zakresu okresu (count, co step), a w kill z liczby walk (fights): tyle danych stworów, ile średnio przynosi tyle walk w najnowszym miejscu wypraw otwartym dla postaci. W tekście {count} to ta liczba, a {noun} rzeczownik w formie do niej (counted: 1, 2–4, 5 i więcej; w kill z monsters.json). Nagroda za zadanie losuje się z rewards.weights: złoto, zasób albo części, w ilości base + perLevel × poziom postaci, ± spread; zasób razy swój udział (resources), części według levels. levels: od którego poziomu postaci jaka część jest nagrodą i z jakimi wagami losuje się rzadkość przedmiotu ze skrzyni tygodniowej.",
+  "timeZone": "Europe/Warsaw",
+  "periods": {
+    "daily": {
+      "name": "Dzienne",
+      "count": 5,
+      "chest": { "timePoints": 30, "systemPoints": 5, "item": false }
+    },
+    "weekly": {
+      "name": "Tygodniowe",
+      "count": 5,
+      "chest": { "timePoints": 120, "systemPoints": 20, "item": true }
+    }
+  },
+  "kinds": [
+    {
+      "id": "kill",
+      "text": "Pokonaj {count} {noun}.",
+      "weight": 3,
+      "daily": { "fights": [5, 8] },
+      "weekly": { "fights": [25, 40] }
+    },
+    {
+      "id": "explore",
+      "text": "Spędź na wyprawach łącznie {count} {noun}.",
+      "counted": ["minutę", "minuty", "minut"],
+      "weight": 1,
+      "daily": { "count": [30, 90], "step": 15 },
+      "weekly": { "count": [300, 600], "step": 60 }
+    },
+    {
+      "id": "process",
+      "text": "Przerób na Stole rzemieślniczym {count} {noun}.",
+      "counted": ["materiał", "materiały", "materiałów"],
+      "table": true,
+      "weight": 1,
+      "daily": { "count": [2, 4] },
+      "weekly": { "count": [10, 20] }
+    },
+    {
+      "id": "salvage",
+      "text": "Rozbierz na Stole rzemieślniczym {count} {noun}.",
+      "counted": ["przedmiot", "przedmioty", "przedmiotów"],
+      "table": true,
+      "weight": 1,
+      "daily": { "count": [1, 2] },
+      "weekly": { "count": [5, 10] }
+    }
+  ],
+  "rewards": {
+    "weights": { "gold": 2, "resource": 2, "part": 1 },
+    "spread": 0.2,
+    "daily": {
+      "gold": { "base": 10, "perLevel": 4 },
+      "resource": { "base": 5, "perLevel": 2 },
+      "part": { "base": 2, "perLevel": 0 }
+    },
+    "weekly": {
+      "gold": { "base": 40, "perLevel": 16 },
+      "resource": { "base": 20, "perLevel": 8 },
+      "part": { "base": 6, "perLevel": 0 }
+    },
+    "resources": { "wood": 1, "stone": 0.6, "iron-ore": 0.4 }
+  },
+  "levels": [
+    { "fromLevel": 1, "part": "scraps", "chestRarities": { "rare": 70, "unique": 25, "epic": 5 } },
+    { "fromLevel": 25, "part": "straps", "chestRarities": { "rare": 40, "unique": 45, "epic": 13, "legendary": 2 } },
+    { "fromLevel": 50, "part": "fittings", "chestRarities": { "unique": 55, "epic": 33, "legendary": 10, "mythic": 2 } },
+    { "fromLevel": 100, "part": "shards", "chestRarities": { "epic": 55, "legendary": 33, "mythic": 10, "divine": 2 } },
+    { "fromLevel": 200, "part": "amber", "chestRarities": { "legendary": 55, "mythic": 35, "divine": 10 } },
+    { "fromLevel": 300, "part": "bloodstone", "chestRarities": { "mythic": 70, "divine": 30 } },
+    { "fromLevel": 400, "part": "star-shard", "chestRarities": { "mythic": 40, "divine": 60 } }
+  ]
+}

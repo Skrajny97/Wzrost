@@ -2,6 +2,7 @@
 // claim after the end runs the engine with that seed and saves the report.
 
 import {
+  addQuestProgress,
   applyHunt,
   areaFor,
   areaUnlocked,
@@ -15,6 +16,7 @@ import {
   estimateThreat,
   hpAfterHunt,
   huntDurations,
+  huntKills,
   huntReport,
   longestHunt,
   nextHuntUnlock,
@@ -29,6 +31,7 @@ import {
   engineCharacter,
   equippedItems,
   loadPlayer,
+  questsNow,
   requireIdlePlayer,
   requirePlayer,
 } from './characters.js';
@@ -246,6 +249,9 @@ export async function finishHunt(db, player, now) {
   // The creatures of every fight join those the character has met
   // ("Czyhające niebezpieczeństwa" shows them by name from now on).
   const met = [...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))])];
+  // The narrator's quests count the creatures beaten and the minutes. They
+  // are saved only as read, so a reward claimed meanwhile is not undone.
+  const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills: huntKills(hunt), minutes: activity.minutes }));
   const setMaterials = left.length
     ? `, materials = json_set(materials, ${left.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})`
     : '';
@@ -266,7 +272,8 @@ export async function finishHunt(db, player, now) {
       db
         .prepare(
           `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ? + ${storedPrice.sql}${setResources}${setMaterials},
-             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, version = version + 1
+             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END,
+             version = version + 1
            WHERE id = ?`,
         )
         .bind(
@@ -282,6 +289,8 @@ export async function finishHunt(db, player, now) {
           hp,
           activity.ends_at,
           JSON.stringify(met),
+          row.quests,
+          quests,
           row.id,
         ),
       // Bag items the scrapper bought: paid for above, while they were still there.

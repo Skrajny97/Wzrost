@@ -15,6 +15,7 @@ import {
   craftMinutes,
   craftTable,
   craftTakes,
+  currentQuests,
   effectText,
   freePoints,
   gainedTimePoints,
@@ -25,6 +26,8 @@ import {
   nextHuntUnlock,
   playerCombatant,
   production,
+  questsStale,
+  questsView,
   regenPerMinute,
   restBonus,
   restedHp,
@@ -108,6 +111,7 @@ export async function requirePlayer(context) {
   const player = await loadPlayer(context.env.DB, session.userId);
   if (!player) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
   await settleTimePoints(context.env.DB, player.row, context.now);
+  await settleQuests(context.env.DB, player, context.now);
   return { session, player };
 }
 
@@ -124,6 +128,29 @@ async function settleTimePoints(db, row, now) {
     .run();
   if (result.meta.changes === 1) Object.assign(row, { time_points: row.time_points + points, time_points_at: since });
   else Object.assign(row, await db.prepare('SELECT time_points, time_points_at FROM characters WHERE id = ?').bind(row.id).first());
+}
+
+// What a period's quests are drawn from: the character as it is, whether its
+// Stół rzemieślniczy stands, and its id for the seed (quests.js).
+export const questContext = (player, now) => ({
+  character: engineCharacter(player.row),
+  hasTable: craftTable(campLevels(player.buildings, now, content), content).pace > 0,
+  seed: player.row.id,
+});
+
+// The quests of both periods at `now`.
+export const questsNow = (player, now) => currentQuests(JSON.parse(player.row.quests ?? '{}'), questContext(player, now), now, content);
+
+// A new day or week draws its quests and saves them at once, so they stay
+// the same however the character changes that day. As with the Punkty
+// Czasu, the version stays, and only the first of two requests at once
+// saves them.
+export async function settleQuests(db, player, now) {
+  const { row } = player;
+  if (!questsStale(JSON.parse(row.quests ?? '{}'), now, content)) return;
+  const quests = JSON.stringify(questsNow(player, now));
+  const result = await db.prepare('UPDATE characters SET quests = ? WHERE id = ? AND quests = ?').bind(quests, row.id, row.quests).run();
+  row.quests = result.meta.changes === 1 ? quests : (await db.prepare('SELECT quests FROM characters WHERE id = ?').bind(row.id).first()).quests;
 }
 
 // For changes that need the character at home.
@@ -385,6 +412,8 @@ export function characterView(player, now) {
     // The creatures met in fights, by id: the others are shadows on the
     // lists of an inner region's dangers.
     met: JSON.parse(row.met ?? '[]'),
+    // The narrator's daily and weekly quests (quests.js).
+    quests: questsView(questsNow(player, now), now, content),
     // The narrator's cards seen so far, or null for a character made before
     // the introduction (tutorial.js).
     tutorial: row.tutorial === null ? null : JSON.parse(row.tutorial),
@@ -441,7 +470,9 @@ export async function createCharacter(context) {
     if (message.includes('UNIQUE')) throw exists();
     throw error;
   }
-  return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
+  const player = await loadPlayer(db, session.userId);
+  await settleQuests(db, player, now);
+  return json({ character: characterView(player, now) }, 201);
 }
 
 const validAppearance = (id) => {

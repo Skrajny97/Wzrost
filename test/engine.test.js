@@ -78,6 +78,21 @@ import {
   areaUnlocked,
   areaUnlockLevel,
   xpToNext,
+  addQuestProgress,
+  chestItem,
+  chestReady,
+  countedForm,
+  currentQuests,
+  drawQuests,
+  huntKills,
+  questArea,
+  questLevel,
+  questPeriod,
+  questText,
+  questsStale,
+  questsView,
+  withChest,
+  withClaimed,
 } from '../src/engine/index.js';
 import { simulateMany, typicalCharacter } from '../tools/simulate.mjs';
 import { content, newCharacter } from './helpers/content.js';
@@ -1219,5 +1234,207 @@ describe('Czyhające niebezpieczeństwa', () => {
         }
       }
     }
+  });
+});
+
+describe('quests from the narrator', () => {
+  const at = (iso) => Date.parse(iso);
+  const iso = (ms) => new Date(ms).toISOString();
+
+  test('a day starts at midnight Polish time and a week on Monday, also when the clocks change', () => {
+    // 25 October 2026: the clocks go back an hour, so the day has 25 hours.
+    const sunday = questPeriod('daily', at('2026-10-25T10:00:00Z'), content);
+    assert.deepEqual([sunday.key, iso(sunday.startsAt), iso(sunday.endsAt)], ['2026-10-25', '2026-10-24T22:00:00.000Z', '2026-10-25T23:00:00.000Z']);
+    const week = questPeriod('weekly', at('2026-10-25T10:00:00Z'), content);
+    assert.deepEqual([week.key, iso(week.startsAt), iso(week.endsAt)], ['2026-10-19', '2026-10-18T22:00:00.000Z', '2026-10-25T23:00:00.000Z']);
+    // Half past midnight on Monday is a new day and a new week.
+    const monday = at('2026-10-25T23:30:00Z');
+    assert.equal(questPeriod('daily', monday, content).key, '2026-10-26');
+    assert.equal(questPeriod('weekly', monday, content).key, '2026-10-26');
+    assert.equal(questPeriod('daily', at('2026-10-25T22:59:59Z'), content).key, '2026-10-25');
+    // Summer time: midnight is at 22:00 UTC.
+    assert.equal(questPeriod('daily', at('2026-07-15T21:59:59Z'), content).key, '2026-07-15');
+    assert.equal(questPeriod('daily', at('2026-07-15T22:00:00Z'), content).key, '2026-07-16');
+    // 29 March 2026: the clocks go forward, so the day has 23 hours.
+    const spring = questPeriod('daily', at('2026-03-29T12:00:00Z'), content);
+    assert.deepEqual([iso(spring.startsAt), iso(spring.endsAt)], ['2026-03-28T23:00:00.000Z', '2026-03-29T22:00:00.000Z']);
+    // A week over the turn of a month.
+    assert.equal(questPeriod('weekly', at('2026-11-01T12:00:00Z'), content).key, '2026-10-26');
+  });
+
+  test('a new character gets five quests a period: creatures of its place and the time explored', () => {
+    const character = newCharacter('warrior');
+    const area = questArea(character, content);
+    assert.equal(area.id, 'windfalls-edge');
+    const prey = new Set(area.encounters.flatMap((encounter) => encounter.monsters));
+    for (const periodId of ['daily', 'weekly']) {
+      for (let seed = 0; seed < 30; seed++) {
+        const quests = drawQuests(periodId, { character, hasTable: false, seed }, content);
+        assert.equal(quests.length, content.quests.periods[periodId].count);
+        const kills = quests.filter((quest) => quest.kind === 'kill');
+        assert.ok(kills.every((quest) => prey.has(quest.target) && quest.count >= 1));
+        assert.equal(new Set(kills.map((quest) => quest.target)).size, kills.length, 'a creature twice');
+        // Nothing for the Stół rzemieślniczy before it stands.
+        assert.ok(quests.every((quest) => ['kill', 'explore'].includes(quest.kind)));
+        assert.ok(quests.every((quest) => quest.progress === 0 && !quest.claimed && quest.reward.amount >= 1));
+      }
+    }
+    // The same character and period always get the same quests.
+    assert.deepEqual(drawQuests('daily', { character, hasTable: true, seed: 'a:daily:2026-10-25' }, content), drawQuests('daily', { character, hasTable: true, seed: 'a:daily:2026-10-25' }, content));
+    assert.notDeepEqual(drawQuests('daily', { character, hasTable: true, seed: 'a:daily:2026-10-25' }, content), drawQuests('daily', { character, hasTable: true, seed: 'a:daily:2026-10-26' }, content));
+  });
+
+  test('with the table built, its work comes into the draw', () => {
+    const character = newCharacter('archer', { level: 12, classLevel: 10 });
+    const kinds = new Set();
+    for (let seed = 0; seed < 40; seed++) for (const quest of drawQuests('daily', { character, hasTable: true, seed }, content)) kinds.add(quest.kind);
+    assert.deepEqual([...kinds].sort(), ['explore', 'kill', 'process', 'salvage']);
+  });
+
+  test('a quest asks for as many creatures as its fights bring, and rare ones only for the week', () => {
+    // Skraj Wiatrołomów at level 1: wolves come in 25 fights of 63, badgers in 12.
+    const character = newCharacter('mage');
+    const shares = { wolf: 25 / 63, fox: 12 / 63, viper: 14 / 63, badger: 12 / 63 };
+    for (const periodId of ['daily', 'weekly']) {
+      const [fewest, most] = content.quests.kinds.find((kind) => kind.id === 'kill')[periodId].fights;
+      for (let seed = 0; seed < 30; seed++) {
+        for (const quest of drawQuests(periodId, { character, hasTable: false, seed }, content).filter((candidate) => candidate.kind === 'kill')) {
+          const share = shares[quest.target];
+          assert.ok(quest.count >= Math.max(1, Math.round(fewest * share)) && quest.count <= Math.round(most * share), `${periodId} ${quest.target} ${quest.count}`);
+        }
+      }
+    }
+    // In Wilcze Kręgi crows come in few fights: never a daily quest, sometimes a weekly one.
+    const later = newCharacter('mage', { level: 42, classLevel: 40 });
+    assert.equal(questArea(later, content).id, 'wolf-circles');
+    const targets = (periodId) => new Set(Array.from({ length: 60 }, (_, seed) => drawQuests(periodId, { character: later, hasTable: false, seed }, content)).flat().map((quest) => quest.target));
+    assert.ok(!targets('daily').has('crow'));
+    assert.ok(targets('weekly').has('crow'));
+  });
+
+  test('rewards: gold, resources and parts, more for a higher level and for the week', () => {
+    const rewards = (periodId, level) =>
+      Array.from({ length: 60 }, (_, seed) => drawQuests(periodId, { character: newCharacter('warrior', { level, classLevel: level }), hasTable: true, seed }, content))
+        .flat()
+        .map((quest) => quest.reward);
+    const daily = rewards('daily', 10);
+    const weekly = rewards('weekly', 10);
+    assert.deepEqual([...new Set(daily.map((reward) => reward.kind))].sort(), ['gold', 'part', 'resource']);
+    const gold = (list) => list.filter((reward) => reward.kind === 'gold').map((reward) => reward.amount);
+    assert.ok(Math.min(...gold(weekly)) > Math.max(...gold(daily)), 'a weekly quest pays more');
+    assert.ok(Math.min(...gold(rewards('daily', 40))) > Math.max(...gold(daily)), 'a higher level pays more');
+    for (const reward of daily.filter((candidate) => candidate.kind === 'resource')) assert.ok(content.resourcesById[reward.id]);
+    // Parts by the level's band: Ścinki at first, Rzemienie from level 25.
+    assert.ok(daily.filter((reward) => reward.kind === 'part').every((reward) => reward.id === 'scraps'));
+    assert.ok(rewards('daily', 30).filter((reward) => reward.kind === 'part').every((reward) => reward.id === 'straps'));
+    assert.equal(questLevel(1, content).part, 'scraps');
+    assert.equal(questLevel(499, content).fromLevel, 400);
+  });
+
+  test('a period keeps its quests until midnight, then new ones come', () => {
+    const context = { character: newCharacter('cleric'), hasTable: false, seed: 5 };
+    const morning = at('2026-10-21T06:00:00Z');
+    const stored = currentQuests({}, context, morning, content);
+    assert.equal(stored.daily.period, '2026-10-21');
+    assert.equal(stored.weekly.period, '2026-10-19');
+    const busy = addQuestProgress(stored, { minutes: 15 });
+    // Later that day the quests and their progress stay, also for a stronger character.
+    const evening = currentQuests(busy, { ...context, character: newCharacter('cleric', { level: 9, classLevel: 8 }) }, at('2026-10-21T21:59:00Z'), content);
+    assert.deepEqual(evening, busy);
+    assert.ok(!questsStale(busy, at('2026-10-21T21:59:00Z'), content));
+    // After midnight the day's quests are new and the week's stay.
+    const next = currentQuests(busy, context, at('2026-10-21T22:00:00Z'), content);
+    assert.ok(questsStale(busy, at('2026-10-21T22:00:00Z'), content));
+    assert.equal(next.daily.period, '2026-10-22');
+    assert.ok(next.daily.quests.every((quest) => quest.progress === 0));
+    assert.equal(next.weekly, busy.weekly);
+  });
+
+  test('beaten creatures, minutes and the table move the quests on, up to their count', () => {
+    const quests = {
+      daily: {
+        period: '2026-10-25',
+        chest: false,
+        quests: [
+          { kind: 'kill', target: 'wolf', count: 3, progress: 1, reward: { kind: 'gold', amount: 9 }, claimed: false },
+          { kind: 'kill', target: 'fox', count: 2, progress: 0, reward: { kind: 'gold', amount: 9 }, claimed: false },
+          { kind: 'explore', count: 30, progress: 25, reward: { kind: 'gold', amount: 9 }, claimed: false },
+          { kind: 'process', count: 4, progress: 0, reward: { kind: 'gold', amount: 9 }, claimed: false },
+          { kind: 'salvage', count: 1, progress: 0, reward: { kind: 'gold', amount: 9 }, claimed: false },
+        ],
+      },
+      weekly: { period: '2026-10-19', chest: false, quests: [] },
+    };
+    const after = addQuestProgress(quests, { kills: { wolf: 5, viper: 2 }, minutes: 10 });
+    assert.deepEqual(after.daily.quests.map((quest) => quest.progress), [3, 0, 30, 0, 0]);
+    const table = addQuestProgress(after, { processed: 3, salvaged: 1 });
+    assert.deepEqual(table.daily.quests.map((quest) => quest.progress), [3, 0, 30, 3, 1]);
+    assert.ok(!chestReady(table.daily));
+    const done = addQuestProgress(table, { kills: { fox: 2 }, processed: 9 });
+    assert.ok(chestReady(done.daily));
+    assert.ok(!chestReady(done.weekly), 'no quests, no chest');
+    const claimed = withChest(withClaimed(done, 'daily', 1), 'daily');
+    assert.deepEqual(claimed.daily.quests.map((quest) => quest.claimed), [false, true, false, false, false]);
+    assert.equal(claimed.daily.chest, true);
+    assert.equal(done.daily.chest, false);
+  });
+
+  test('only the creatures of won fights count as beaten', () => {
+    const kills = huntKills({
+      fights: [
+        { won: true, enemies: [{ monsterId: 'wolf' }, { monsterId: 'wolf' }] },
+        { won: true, enemies: [{ monsterId: 'fox' }] },
+        { won: false, enemies: [{ monsterId: 'bear' }] },
+      ],
+    });
+    assert.deepEqual(kills, { wolf: 2, fox: 1 });
+    const hunt = simulateHunt({ character: newCharacter('warrior'), equipped: [], name: 'Test', areaId: 'windfalls-edge', minutes: 30, seed: 'zadania' }, content);
+    const beaten = Object.values(huntKills(hunt)).reduce((sum, count) => sum + count, 0);
+    const won = hunt.fights.filter((fight) => fight.won === true).reduce((sum, fight) => sum + fight.enemies.length, 0);
+    assert.equal(beaten, won);
+  });
+
+  test('the weekly chest holds an item of the level for the class, its rarity by the level', () => {
+    const counts = {};
+    for (let i = 0; i < 300; i++) {
+      const item = chestItem({ level: 12, classId: 'mage' }, ['weapon', 'chest'], createRng(`skrzynia-${i}`), content);
+      assert.equal(item.level, 12);
+      assert.ok(canUse(item.base, 'mage', content));
+      counts[item.rarity] = (counts[item.rarity] ?? 0) + 1;
+    }
+    assert.deepEqual(Object.keys(counts).sort(), Object.keys(questLevel(12, content).chestRarities).sort());
+    const late = chestItem({ level: 120, classId: 'warrior' }, [], createRng('późno'), content);
+    assert.ok(Object.keys(questLevel(120, content).chestRarities).includes(late.rarity));
+  });
+
+  test('quests read in Polish, with the noun to go with the number', () => {
+    assert.deepEqual([1, 2, 4, 5, 11, 12, 14, 21, 22, 25, 102, 112].map((count) => countedForm(count, ['wilka', 'wilki', 'wilków'])), [
+      'wilka', 'wilki', 'wilki', 'wilków', 'wilków', 'wilków', 'wilków', 'wilków', 'wilki', 'wilków', 'wilki', 'wilków',
+    ]);
+    const text = (quest) => questText({ progress: 0, ...quest }, content);
+    assert.equal(text({ kind: 'kill', target: 'wolf', count: 3 }), 'Pokonaj 3 wilki.');
+    assert.equal(text({ kind: 'kill', target: 'viper', count: 1 }), 'Pokonaj 1 żmiję.');
+    assert.equal(text({ kind: 'kill', target: 'lynx', count: 5 }), 'Pokonaj 5 rysiów.');
+    assert.equal(text({ kind: 'explore', count: 45 }), 'Spędź na wyprawach łącznie 45 minut.');
+    assert.equal(text({ kind: 'process', count: 2 }), 'Przerób na Stole rzemieślniczym 2 materiały.');
+    assert.equal(text({ kind: 'salvage', count: 1 }), 'Rozbierz na Stole rzemieślniczym 1 przedmiot.');
+    for (const monster of Object.values(content.monstersById)) assert.equal(monster.counted.length, 3, monster.id);
+  });
+
+  test('the page gets each period with its end, its quests and its chest', () => {
+    const now = at('2026-10-25T10:00:00Z');
+    const quests = currentQuests({}, { character: newCharacter('shadow'), hasTable: false, seed: 1 }, now, content);
+    const view = questsView(addQuestProgress(quests, { minutes: 240 }), now, content);
+    assert.deepEqual(Object.keys(view), ['daily', 'weekly']);
+    assert.equal(view.daily.name, 'Dzienne');
+    assert.equal(iso(view.daily.endsAt), '2026-10-25T23:00:00.000Z');
+    assert.deepEqual(view.weekly.chest, { ...content.quests.periods.weekly.chest, ready: false, opened: false });
+    const explore = view.daily.quests.find((quest) => quest.kind === 'explore');
+    assert.ok(explore.done && !explore.claimed && explore.progress === explore.count);
+    assert.deepEqual(view.daily.quests.map((quest) => quest.index), [0, 1, 2, 3, 4]);
+    assert.ok(view.daily.quests.filter((quest) => quest.kind === 'kill').every((quest) => quest.monsterId && quest.text.startsWith('Pokonaj')));
+    // A quest of a creature no longer in the data is left out, the others keep their places.
+    const gone = { ...quests, daily: { ...quests.daily, quests: [{ ...quests.daily.quests[0], kind: 'kill', target: 'dragon' }, ...quests.daily.quests.slice(1)] } };
+    assert.deepEqual(questsView(gone, now, content).daily.quests.map((quest) => quest.index), [1, 2, 3, 4]);
   });
 });

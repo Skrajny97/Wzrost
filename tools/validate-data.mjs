@@ -11,7 +11,7 @@ const CLIENT_DIR = new URL('../src/client/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
-  'resources', 'buildings', 'music', 'sounds', 'appearances', 'tutorial', 'materials',
+  'resources', 'buildings', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'training', 'settlement', 'dungeons', 'core'];
@@ -343,6 +343,44 @@ function checkReferences(data) {
       if (voice && !existsSync(new URL(voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${voice}`);
     }
   }
+  errors.push(...checkQuests(data, { resources, rarities }));
+  return errors;
+}
+
+// The quests: a time zone the clock knows, each kind once with what its count
+// needs, rewards of resources and parts that exist, and level bands from
+// level 1 up with rarities that exist.
+function checkQuests(data, { resources, rarities }) {
+  const errors = [];
+  const { quests } = data;
+  try {
+    new Intl.DateTimeFormat('en-GB', { timeZone: quests.timeZone });
+  } catch {
+    errors.push(`quests.json: nieznana strefa czasu "${quests.timeZone}"`);
+  }
+  uniqueIds(errors, 'quests', quests.kinds);
+  for (const kind of quests.kinds) {
+    if (kind.id !== 'kill' && !kind.counted) errors.push(`quests.json: rodzaj ${kind.id} nie ma counted`);
+    if (kind.counted && !kind.text.includes('{noun}')) errors.push(`quests.json: tekst rodzaju ${kind.id} nie ma {noun}`);
+    for (const period of ['daily', 'weekly']) {
+      const range = kind.id === 'kill' ? kind[period].fights : kind[period].count;
+      if (!range) errors.push(`quests.json: rodzaj ${kind.id} nie ma ${kind.id === 'kill' ? 'fights' : 'count'} w ${period}`);
+      else if (range[0] > range[1]) errors.push(`quests.json: rodzaj ${kind.id} ma odwrócony zakres w ${period}`);
+    }
+  }
+  for (const id of Object.keys(quests.rewards.resources)) {
+    if (!resources.has(id)) errors.push(`quests.json: nagroda z nieznanym zasobem "${id}"`);
+  }
+  if (!Object.values(quests.rewards.weights).some((weight) => weight > 0)) errors.push('quests.json: żadna nagroda nie ma wagi');
+  const parts = new Set(data.materials.parts.map((part) => part.id));
+  if (quests.levels[0].fromLevel !== 1) errors.push('quests.json: levels musi zaczynać się od poziomu 1');
+  quests.levels.forEach((band, index) => {
+    if (index > 0 && band.fromLevel <= quests.levels[index - 1].fromLevel) errors.push('quests.json: fromLevel w levels musi rosnąć');
+    if (!parts.has(band.part)) errors.push(`quests.json: nieznana część "${band.part}" od poziomu ${band.fromLevel}`);
+    for (const id of Object.keys(band.chestRarities)) {
+      if (!rarities.has(id)) errors.push(`quests.json: nieznana rzadkość "${id}" od poziomu ${band.fromLevel}`);
+    }
+  });
   return errors;
 }
 

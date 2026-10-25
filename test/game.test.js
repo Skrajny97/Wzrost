@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, generateItem, itemName, xpToNext } from '../src/engine/index.js';
+import { createRng, generateItem, itemName, questPeriod, xpToNext } from '../src/engine/index.js';
 import { skipTime } from '../src/server/testing.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -1322,5 +1322,156 @@ describe('Awans', () => {
     assert.ok(character.level >= 2);
     assert.equal(character.hp, character.maxHp);
     assert.ok(report.system.includes('Awans odnawia HP i manę do pełna.'));
+  });
+});
+
+describe('Zadania od narratora', () => {
+  let cookie;
+  beforeEach(async () => {
+    cookie = await signUp();
+    await newCharacter(cookie, 'warrior');
+  });
+
+  const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
+  const claim = (period, index) => call('POST', '/api/quests/claim', { cookie, body: { period, index } });
+  const chest = (period) => call('POST', '/api/quests/chest', { cookie, body: { period } });
+  const stored = async () => JSON.parse((await (await db()).prepare('SELECT quests FROM characters').first()).quests);
+  const store = async (quests) => (await db()).prepare('UPDATE characters SET quests = ?').bind(JSON.stringify(quests)).run();
+  // Every quest of a period done, as if its work had been done.
+  async function finishAll(periodId) {
+    const quests = await stored();
+    quests[periodId].quests = quests[periodId].quests.map((quest) => ({ ...quest, progress: quest.count }));
+    await store(quests);
+  }
+
+  test('a new character gets five daily and five weekly quests, which end at midnight Polish time', async () => {
+    const created = await newCharacter(await signUp('ola'), 'mage', 'Ola');
+    assert.equal(created.data.character.quests.daily.quests.length, 5);
+    const view = (await character()).quests;
+    const now = Date.now();
+    for (const periodId of ['daily', 'weekly']) {
+      assert.equal(view[periodId].quests.length, content.quests.periods[periodId].count);
+      assert.equal(view[periodId].endsAt, questPeriod(periodId, now, content).endsAt);
+      assert.ok(view[periodId].quests.every((quest) => quest.progress === 0 && !quest.done && !quest.claimed && quest.text.endsWith('.')));
+      assert.deepEqual(view[periodId].chest, { ...content.quests.periods[periodId].chest, ready: false, opened: false });
+    }
+    assert.deepEqual([view.daily.name, view.weekly.name], ['Dzienne', 'Tygodniowe']);
+    // Drawn once and saved: the next request shows the same quests.
+    assert.equal((await stored()).daily.period, questPeriod('daily', now, content).key);
+    assert.deepEqual((await character()).quests, view);
+  });
+
+  test('the creatures beaten and the minutes of a claimed exploration move the quests on', async () => {
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
+    await finishHunt();
+    const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
+    const beaten = {};
+    for (const fight of report.fights.filter((candidate) => candidate.won === true)) {
+      for (const enemy of fight.enemies) beaten[enemy.monsterId] = (beaten[enemy.monsterId] ?? 0) + 1;
+    }
+    for (const quest of [...after.quests.daily.quests, ...after.quests.weekly.quests]) {
+      const expected = quest.kind === 'kill' ? (beaten[quest.monsterId] ?? 0) : quest.kind === 'explore' ? 30 : 0;
+      assert.equal(quest.progress, Math.min(quest.count, expected), quest.text);
+    }
+  });
+
+  test("the table's work counts: materials handed over and items taken apart", async () => {
+    const quests = await stored();
+    const quest = (kind, count) => ({ kind, count, progress: 0, reward: { kind: 'gold', amount: 5 }, claimed: false });
+    quests.daily.quests = [quest('process', 4), quest('salvage', 1)];
+    await store(quests);
+    const database = await db();
+    await database
+      .prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'craft-table', 1, 0, 1 FROM characters")
+      .run();
+    await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ 'wolf-pelt:common': 3 })).run();
+    const item = generateItem({ baseId: 'helmet', level: 3, rarityId: 'common' }, createRng('zadanie'), content);
+    const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(item)).run();
+    await call('POST', '/api/craft/materials', { cookie, body: { all: true } });
+    const after = (await call('POST', `/api/items/${meta.last_row_id}/salvage`, { cookie })).data.character;
+    assert.deepEqual(after.quests.daily.quests.map((entry) => [entry.progress, entry.done]), [[3, false], [1, true]]);
+  });
+
+  test('a quest done gives its reward once: gold, a resource or parts', async () => {
+    const quests = await stored();
+    const rewards = [{ kind: 'resource', id: 'iron-ore', amount: 7 }, { kind: 'gold', amount: 40 }, { kind: 'part', id: 'scraps', amount: 2 }];
+    quests.daily.quests = quests.daily.quests.map((quest, index) => ({ ...quest, progress: index < 3 ? quest.count : 0, reward: rewards[index] ?? quest.reward }));
+    await store(quests);
+    const before = await character();
+    assert.equal((await claim('daily', 3)).data.error.code, 'not_done');
+    const ore = await claim('daily', 0);
+    assert.equal(ore.status, 200);
+    assert.deepEqual(ore.data.reward, rewards[0]);
+    assert.equal(ore.data.character.resources['iron-ore'], before.resources['iron-ore'] + 7);
+    assert.equal((await claim('daily', 0)).data.error.code, 'claimed');
+    assert.equal((await claim('daily', 1)).data.character.gold, before.gold + 40);
+    const parts = (await claim('daily', 2)).data.character.crafting.parts.find((part) => part.id === 'scraps').count;
+    assert.equal(parts, 2);
+    const after = await character();
+    assert.deepEqual(after.quests.daily.quests.map((quest) => quest.claimed), [true, true, true, false, false]);
+    assert.equal((await claim('monthly', 0)).status, 400);
+    assert.equal((await claim('daily', 9)).status, 404);
+    assert.equal((await claim('daily', '0')).status, 404);
+  });
+
+  test('all the daily quests done open the chest: Punkty Czasu and Punkty Systemu, once', async () => {
+    const before = await character();
+    assert.equal((await chest('daily')).data.error.code, 'not_ready');
+    await finishAll('daily');
+    assert.equal((await character()).quests.daily.chest.ready, true);
+    const opened = await chest('daily');
+    assert.equal(opened.status, 200);
+    assert.deepEqual(opened.data.chest, { timePoints: 30, systemPoints: 5, item: null });
+    assert.equal(opened.data.character.timePoints, before.timePoints + 30);
+    assert.equal(opened.data.character.systemPoints, before.systemPoints + 5);
+    assert.equal(opened.data.character.quests.daily.chest.opened, true);
+    assert.equal((await chest('daily')).data.error.code, 'opened');
+    // The quests' own rewards wait to be claimed.
+    assert.ok(opened.data.character.quests.daily.quests.every((quest) => quest.done && !quest.claimed));
+  });
+
+  test('the weekly chest also holds an item of the level for the class, with room in the backpack', async () => {
+    await (await db()).prepare('UPDATE characters SET level = 14, class_level = 12').run();
+    await finishAll('weekly');
+    const database = await db();
+    const filler = JSON.stringify(generateItem({ baseId: 'ring', level: 1 }, createRng('pełno'), content));
+    await database.batch(
+      Array.from({ length: content.balance.items.bagSlots }, () => database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(filler)),
+    );
+    assert.equal((await chest('weekly')).data.error.code, 'bag_full');
+    await database.prepare('DELETE FROM items WHERE id = (SELECT MIN(id) FROM items)').run();
+    const before = await character();
+    const opened = await chest('weekly');
+    assert.equal(opened.status, 200);
+    const { chest: inside, character: after } = opened.data;
+    assert.equal(after.timePoints, before.timePoints + 120);
+    assert.equal(after.systemPoints, before.systemPoints + 20);
+    const found = after.bag.find((item) => item.name === inside.item.name && item.level === 14);
+    assert.ok(found, 'the item is in the backpack');
+    assert.ok(Object.keys(content.quests.levels[0].chestRarities).includes(found.rarity));
+    assert.ok(found.classIds === null || found.classIds.includes('warrior'));
+    assert.equal(after.bag.length, content.balance.items.bagSlots);
+  });
+
+  test('two taps on the chest open it once', async () => {
+    await finishAll('daily');
+    const before = await character();
+    const taps = await Promise.all([chest('daily'), chest('daily')]);
+    assert.deepEqual(taps.map((tap) => tap.status).sort(), [200, 409]);
+    assert.equal((await character()).systemPoints, before.systemPoints + 5);
+  });
+
+  test("a new day draws new quests and keeps the week's; old characters get theirs on the first request", async () => {
+    const quests = await stored();
+    const week = quests.weekly;
+    await store({ ...quests, daily: { ...quests.daily, period: '2000-01-01', quests: quests.daily.quests.map((quest) => ({ ...quest, progress: quest.count })) } });
+    const view = (await character()).quests;
+    assert.ok(view.daily.quests.every((quest) => quest.progress === 0));
+    const now = await stored();
+    assert.equal(now.daily.period, questPeriod('daily', Date.now(), content).key);
+    assert.deepEqual(now.weekly, week);
+    await (await db()).prepare("UPDATE characters SET quests = '{}'").run();
+    assert.equal((await character()).quests.weekly.quests.length, 5);
+    assert.ok((await stored()).weekly.period);
   });
 });
