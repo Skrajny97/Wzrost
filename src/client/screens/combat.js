@@ -79,7 +79,11 @@ function dangersSheet(place) {
         );
       }),
     ),
-    h('p', { class: 'muted', text: 'Stwór, którego postać jeszcze nie spotkała, jest tylko cieniem. Pierwsza walka zdradza, kim jest.' }),
+    // The author's sentence, in the feminine for a woman, like the narrator's lines.
+    h('p', {
+      class: 'muted',
+      text: `Zobaczysz tutaj pełne informacje jedynie o stworach, z którymi ${state.character.appearance === 'female' ? 'stoczyłaś' : 'stoczyłeś'} potyczkę.`,
+    }),
   );
 }
 

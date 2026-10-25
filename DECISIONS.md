@@ -1055,6 +1055,6 @@ Uwagi autora po wdrożeniu sakwy i Punktów Czasu co pół godziny.
     - w wymagających o poziom wyżej,
     - elita ma jeden poziom ponad najsilniejszymi i jest tak podpisana.
 
-    Lista powstaje z danych spotkań regionu (`areaDangers` w silniku), więc nowy stwór w `data/regions.json` sam na nią trafia. Stwór, którego postać jeszcze nie spotkała w walce, to czarny cień z „???” zamiast imienia, a poziomy widać od razu. Walka, także przegrana, odkrywa go po odebraniu raportu. Spotkane stwory zapisuje kolumna `characters.met` (migracja `0018_met_monsters.sql`). Postacie sprzed zmiany znają stwory z raportów, które jeszcze mają.
+    Lista powstaje z danych spotkań regionu (`areaDangers` w silniku), więc nowy stwór w `data/regions.json` sam na nią trafia. Stwór, którego postać jeszcze nie spotkała w walce, to czarny cień z „???” zamiast imienia, a poziomy widać od razu. Pod listą stoi zdanie autora: „Zobaczysz tutaj pełne informacje jedynie o stworach, z którymi stoczyłeś potyczkę.”, a dla postaci kobiecej „stoczyłaś”, jak w kwestiach narratora. Walka, także przegrana, odkrywa go po odebraniu raportu. Spotkane stwory zapisuje kolumna `characters.met` (migracja `0018_met_monsters.sql`). Postacie sprzed zmiany znają stwory z raportów, które jeszcze mają.
 7. **Zakładka Lochy.** Kłódka z poziomem stoi pod nazwą zakładki, jak przy Treningu, bez względu na długość nazwy.
 
