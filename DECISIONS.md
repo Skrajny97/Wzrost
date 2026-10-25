@@ -965,3 +965,10 @@ Autor: afiksy mają nawiązywać do potworów, z których wypadają, a nie poluj
 | Jadu | Żmii | Odporność na truciznę |
 
 Niedźwiedzi, Wilczy, Rysi i Kruka już nosiły nazwy potworów i zostają. Pięć przyrostków odporności (Topieli, Burzy, Skał, Mchu, Kapliczki) zostaje, dopóki nie pojawią się potwory wody, elektryczności, ziemi, natury i sakrum. Afiksy nadal losują się z całej listy, bez względu na potwora z walki.
+
+## Skromne portrety na start (25.10.2026)
+
+1. **Postać zaczyna w skromnym ubraniu.** Autor: dotychczasowe portrety wyglądały jak po pierwszej ewolucji klasy, a postać startuje z niczym. Nowe portrety pokazują postać w prostym, połatanym ubraniu i z pustymi rękami. Generator dał 4 szkice na każdy wygląd, a autor wybrał (kobieta, mężczyzna): Wojownik 2 i 1, Łucznik 2 i 1, Mag 2 i 1, Kleryk 3 i 2, Cień 1 i 1.
+2. **Dawne portrety czekają na ewolucję.** Leżą w `art/evolution/portraits/`, a ich opisy są w rodzaju `portraits-evolved` w `art/prompts.json`. Gra pokaże je razem z ewolucjami klas, bo zmiana wizerunku ma być częścią ewolucji.
+3. **Opisy dla generatora.** W pierwszej próbie generator narysował kilka szkiców Maga i Wojownika w leśnej scenie albo przyciętych u góry. Opisy proszą teraz o postać na gładkim tle (`isolated figure on a plain background`), a Wojownik nie ma już szerokich barków, przez które wypełniał cały kadr. Szkice z poprawkami kosztowały 10,08 USD, a na koncie Retro Diffusion zostało 33,36 USD.
+4. **Wycinek w walce.** Postać zajmuje teraz mniejszą część obrazka, więc w polu 72×72 px na arenie widać głowę i tors mniejszej postaci niż dotąd. Ekran postaci pokazuje ją w całości jak wcześniej.
