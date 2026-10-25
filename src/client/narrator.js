@@ -98,6 +98,9 @@ const BEATS = {
   'camp-sawmill': { place: mark('plot-sawmill'), survey: '.camp-board', when: (hash) => onBoard(hash) && !campStarted() },
   'camp-quarry': { place: `${mark('plot-quarry')}, ${mark('plot-mine')}`, when: (hash) => onBoard(hash) && !campStarted() },
   'camp-anvil': { place: mark('plot-anvil'), when: (hash) => onBoard(hash) && !campStarted() },
+  'camp-loot-shed': { place: `${mark('plot-loot-shed')}, ${mark('plot-scrap-bench')}`, when: (hash) => onBoard(hash) && !campStarted() },
+  'camp-craft-table': { place: mark('plot-craft-table'), when: (hash) => onBoard(hash) && !campStarted() },
+  'camp-level': { place: mark('camp-level'), when: (hash) => onBoard(hash) && !campStarted() },
   'lead-campfire': {
     place: mark('plot-campfire'),
     when: (hash, read) => onBoard(hash) && read.has('camp') && !campStarted() && affordable('campfire'),
