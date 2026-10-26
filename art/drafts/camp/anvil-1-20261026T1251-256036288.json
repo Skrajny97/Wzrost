@@ -1,0 +1,25 @@
+{
+  "id": "anvil-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a small black iron anvil on a tree stump with a hammer resting on it and a few orange sparks",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 256036288,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019118,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 64.18,
+    "request_id": "3be749f1-b8bb-4ea2-af96-ce99bab35036",
+    "outputs_retained_until": 1793105495
+  }
+}
