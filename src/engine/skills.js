@@ -1,9 +1,14 @@
 // Skills (data/skills.json). At a class level milestone (classLevel, today
 // only 10) the character learns one of the skills of its class there, for
-// good. Every class level after balance.skills.unlockClassLevel brings Skill
-// Points, and each point raises a learned skill by a level, up to maxLevel.
-// A skill's numbers grow evenly from level 1 to the top level ([from, to] in
-// its params). The fight (combat.js) uses learned skills by their kind.
+// good: its main development path (each skill's `path`), which will decide
+// the class's evolutions. From balance.skills.secondClassLevel it may learn
+// one more of them for a Skill Point, and the path left closes: of the three
+// it knows at most balance.skills.paths. The first learned stays first in
+// `character.skills` (keys keep the order they were added in). Every class
+// level after unlockClassLevel brings Skill Points, and each point raises a
+// learned skill by a level, up to maxLevel. A skill's numbers grow evenly
+// from level 1 to the top level ([from, to] in its params). The fight
+// (combat.js) uses learned skills by their kind.
 
 // Kinds used instead of a plain blow on the character's move, at the start of
 // a fight, and the moment its HP falls below the skill's mark.
@@ -24,13 +29,21 @@ export function skillParams(skill, level, content) {
 }
 
 // Skill Points: earned from the class levels after the first milestone,
-// spent one per level above 1 of each learned skill.
+// spent one per level of each learned skill, but for the first level of the
+// first one, which the milestone gives.
 export function skillPoints(character, content) {
   const { unlockClassLevel, pointsPerClassLevel } = content.balance.skills;
   const earned = Math.max(0, character.classLevel - unlockClassLevel) * pointsPerClassLevel;
-  const spent = Object.values(character.skills ?? {}).reduce((sum, level) => sum + level - 1, 0);
+  const levels = Object.values(character.skills ?? {});
+  const spent = Math.max(0, levels.reduce((sum, level) => sum + level, 0) - (levels.length > 0 ? 1 : 0));
   return { earned, spent, free: Math.max(0, earned - spent) };
 }
+
+// The skills of a milestone the character knows, in the order it learned them.
+const knownOf = (pool, learned) =>
+  Object.keys(learned)
+    .map((id) => pool.find((skill) => skill.id === id))
+    .filter(Boolean);
 
 // The skills a character learned, with their numbers at their levels.
 export function learnedSkills(character, content) {
@@ -38,12 +51,14 @@ export function learnedSkills(character, content) {
     .filter(([id]) => content.skillsById[id])
     .map(([id, level]) => {
       const def = content.skillsById[id];
-      return { id, name: def.name, kind: def.kind, mana: def.mana, cooldown: def.cooldown ?? 1, level, params: skillParams(def, level, content) };
+      return { id, name: def.name, kind: def.kind, mana: def.mana, cooldown: def.cooldown ?? 1, once: def.once === true, level, params: skillParams(def, level, content) };
     });
 }
 
 // Why a character cannot learn a skill, or null when it can: it must be of
-// its class, at the milestone's class level, and the only one of that pool.
+// its class and at the milestone's class level. The first of a milestone is
+// free; another one waits for secondClassLevel and takes a Skill Point, and
+// no more than `paths` of a milestone can be known.
 export function learnBlock(character, skillId, content) {
   const skill = content.skillsById[skillId];
   if (!skill || skill.classId !== character.classId) return { code: 'unknown_skill', message: 'Twoja klasa nie ma takiej umiejętności.' };
@@ -51,8 +66,17 @@ export function learnBlock(character, skillId, content) {
     return { code: 'class_level', message: `Tę umiejętność wybierzesz od poziomu klasy ${skill.classLevel}.` };
   }
   const learned = character.skills ?? {};
+  if (learned[skill.id]) return { code: 'known', message: 'Tę umiejętność już znasz.' };
+  const { paths, secondClassLevel } = content.balance.skills;
   const pool = skillsOfClass(skill.classId, content).filter((other) => other.classLevel === skill.classLevel);
-  if (pool.some((other) => learned[other.id])) return { code: 'chosen', message: 'Umiejętność z tego wyboru jest już wybrana.' };
+  const known = knownOf(pool, learned);
+  if (known.length >= paths) return { code: 'chosen', message: 'Masz już dwie ścieżki tego wyboru. Trzecia jest zamknięta.' };
+  if (known.length > 0) {
+    if (character.classLevel < secondClassLevel) {
+      return { code: 'class_level', message: `Drugą umiejętność dobierzesz od poziomu klasy ${secondClassLevel}.` };
+    }
+    if (skillPoints(character, content).free < 1) return { code: 'no_points', message: 'Druga umiejętność kosztuje 1 Punkt Umiejętności.' };
+  }
   return null;
 }
 
@@ -84,9 +108,11 @@ export function skillText(template, skill, params, content) {
   }).replace('proc..', 'proc.');
 }
 
-// The line about the cost and how often the skill works.
+// The line about the cost and how often the skill works; a mana shield
+// costs its share of mana, and a skill marked `once` works once a fight.
 export function skillCost(skill, content) {
-  const key = ACTIVE_KINDS.has(skill.kind) ? 'skillCostActive' : START_KINDS.has(skill.kind) ? 'skillCostStart' : 'skillCostOnce';
+  if (typeof skill.params.pool === 'number') return content.texts.skillCostPool[0].replace('{pool}', `${Math.round(skill.params.pool * 100)}%`);
+  const key = skill.once ? 'skillCostOnce' : ACTIVE_KINDS.has(skill.kind) ? 'skillCostActive' : START_KINDS.has(skill.kind) ? 'skillCostStart' : 'skillCostOnce';
   return content.texts[key][0].replace('{mana}', String(skill.mana)).replace('{cooldown}', String(skill.cooldown ?? 1));
 }
 
@@ -97,6 +123,7 @@ export function skillView(skill, level, content) {
   return {
     id: skill.id,
     name: skill.name,
+    path: skill.path,
     style: skill.style,
     rarity: skill.rarity,
     classLevel: skill.classLevel,
@@ -110,28 +137,44 @@ export function skillView(skill, level, content) {
   };
 }
 
-// The Umiejętności tab: the choices of each milestone of the class, the
-// skills learned and the free points. `ready` is true when there is
-// something to do there (a choice open or a point to spend).
+// The Umiejętności tab: the paths of each milestone of the class, each with
+// its skill, the skills learned and the free points. A path's `state`: main
+// or second (learned, in that order), pick (can be learned now), soon (the
+// second waits for its class level), points (the second waits for a free
+// Skill Point), closed (two are known, this one is shut) or locked (the
+// milestone's class level is not reached). `ready` is true when there is
+// something to do there: a path to pick or a point to spend.
 export function skillsView(character, content) {
   const learned = character.skills ?? {};
   const points = skillPoints(character, content);
+  const { maxLevel, paths, secondClassLevel } = content.balance.skills;
   const levels = [...new Set(skillsOfClass(character.classId, content).map((skill) => skill.classLevel))].sort((a, b) => a - b);
   const pools = levels.map((classLevel) => {
     const options = skillsOfClass(character.classId, content).filter((skill) => skill.classLevel === classLevel);
-    const chosen = options.find((skill) => learned[skill.id]);
+    const known = knownOf(options, learned).map((skill) => skill.id);
+    const stateOf = (skill) => {
+      if (known[0] === skill.id) return 'main';
+      if (known.includes(skill.id)) return 'second';
+      const block = learnBlock(character, skill.id, content);
+      if (!block) return 'pick';
+      if (block.code === 'chosen') return 'closed';
+      if (block.code === 'no_points') return 'points';
+      return known.length > 0 ? 'soon' : 'locked';
+    };
     return {
       classLevel,
       open: character.classLevel >= classLevel,
-      chosen: chosen?.id ?? null,
-      options: options.map((skill) => skillView(skill, learned[skill.id] ?? 0, content)),
+      chosen: known,
+      options: options.map((skill) => ({ ...skillView(skill, learned[skill.id] ?? 0, content), state: stateOf(skill) })),
     };
   });
-  const raisable = Object.entries(learned).some(([id, level]) => content.skillsById[id] && level < content.balance.skills.maxLevel);
+  const raisable = Object.entries(learned).some(([id, level]) => content.skillsById[id] && level < maxLevel);
   return {
     unlockLevel: content.balance.skills.unlockClassLevel,
+    secondLevel: secondClassLevel,
+    paths,
     points: points.free,
     pools,
-    ready: pools.some((pool) => pool.open && !pool.chosen) || (points.free > 0 && raisable),
+    ready: pools.some((pool) => pool.options.some((skill) => skill.state === 'pick')) || (points.free > 0 && raisable),
   };
 }

@@ -17,8 +17,9 @@ const MAIN_TABS = [
   { id: 'walka', label: 'Walka', icon: 'swords', href: '#/walka' },
   { id: 'profesje', label: 'Profesje', icon: 'leaf', href: '#/profesje', unlock: 'professions' },
   { id: 'osada', label: 'Osada', icon: 'house', href: '#/osada', unlock: 'settlement' },
-  { id: 'dziennik', label: 'Dziennik', icon: 'book', href: '#/dziennik' },
 ];
+// The Dziennik is at the top of the settings (app.js), so the bar keeps room
+// for tabs to come.
 
 const CHARACTER_TABS = [
   { id: 'back', label: 'Powrót', icon: 'back' },

@@ -79,6 +79,21 @@
     "tab": { "files": ["audio/sfx/tab-1.mp3", "audio/sfx/tab-2.mp3"], "gain": 0.5 },
     "swing": { "files": ["audio/sfx/swing-1.mp3", "audio/sfx/swing-2.mp3"], "gain": 0.5 },
     "magic": { "files": ["audio/sfx/magic-1.mp3", "audio/sfx/magic-2.mp3"], "gain": 0.6 },
-    "chest": { "files": ["audio/sfx/chest-1.mp3"], "gain": 0.6 }
+    "chest": { "files": ["audio/sfx/chest-1.mp3"], "gain": 0.6 },
+    "skill-power-strike": { "files": ["audio/sfx/skill-power-strike-1.mp3"], "gain": 0.7 },
+    "skill-wide-sweep": { "files": ["audio/sfx/skill-wide-sweep-1.mp3"], "gain": 0.7 },
+    "skill-unyielding": { "files": ["audio/sfx/skill-unyielding-1.mp3"], "gain": 0.7 },
+    "skill-aimed-shot": { "files": ["audio/sfx/skill-aimed-shot-1.mp3"], "gain": 0.7 },
+    "skill-arrow-rain": { "files": ["audio/sfx/skill-arrow-rain-1.mp3"], "gain": 0.7 },
+    "skill-pinning-shot": { "files": ["audio/sfx/skill-pinning-shot-1.mp3"], "gain": 0.7 },
+    "skill-fireball": { "files": ["audio/sfx/skill-fireball-1.mp3"], "gain": 0.7 },
+    "skill-frost-gust": { "files": ["audio/sfx/skill-frost-gust-1.mp3"], "gain": 0.7 },
+    "skill-mana-shield": { "files": ["audio/sfx/skill-mana-shield-1.mp3"], "gain": 0.7 },
+    "skill-prayer-of-health": { "files": ["audio/sfx/skill-prayer-of-health-1.mp3"], "gain": 0.7 },
+    "skill-exorcism": { "files": ["audio/sfx/skill-exorcism-1.mp3"], "gain": 0.7 },
+    "skill-blessing": { "files": ["audio/sfx/skill-blessing-1.mp3"], "gain": 0.7 },
+    "skill-backstab": { "files": ["audio/sfx/skill-backstab-1.mp3"], "gain": 0.7 },
+    "skill-poisoned-blade": { "files": ["audio/sfx/skill-poisoned-blade-1.mp3"], "gain": 0.7 },
+    "skill-shadow-dance": { "files": ["audio/sfx/skill-shadow-dance-1.mp3"], "gain": 0.7 }
   }
 }

@@ -11,6 +11,7 @@ import {
   skillParams,
   skillPoints,
   skillView,
+  sharedBonus,
   skillsView,
 } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
@@ -49,27 +50,45 @@ describe('skills', () => {
     }
   });
 
-  test('a mana shield costs its mana per point of damage it stops', () => {
+  test('a mana shield takes its share of mana at once and holds what that makes', () => {
     const result = fight('osłona-koszt', [withSkill('mage', 'mana-shield', { hpShare: 0.45 })], [sturdy('boar', 12, 'e0')]);
     const mage = withSkill('mage', 'mana-shield');
+    const { pool, ratio } = skillParams(content.skillsById['mana-shield'], 1, content);
+    const points = Math.round(Math.round(mage.maxMana * pool) * ratio);
+    const on = result.events.find((event) => event.kind === 'skill' && event.skill === 'mana-shield');
+    assert.equal(on.shield, points);
     const absorbed = result.events.filter((event) => event.target === 'a0' && event.absorbed > 0).reduce((sum, event) => sum + event.absorbed, 0);
-    const cost = skillParams(content.skillsById['mana-shield'], 1, content).cost;
-    assert.ok(absorbed > 0);
-    assert.ok(absorbed <= (mage.maxMana - content.skillsById['mana-shield'].mana) / cost);
+    assert.ok(absorbed > 0 && absorbed <= points);
+    assert.equal(skillView(content.skillsById['mana-shield'], 1, content).cost, `Koszt: ${Math.round(pool * 100)}% maks. many, raz na walkę.`);
   });
 
-  test('Skill Points come with each class level after the tenth, one per level of a skill', () => {
+  test('Skill Points come with each class level after the tenth, one per level of a skill but the first', () => {
     assert.deepEqual(skillPoints({ classLevel: 10, skills: {} }, content), { earned: 0, spent: 0, free: 0 });
     assert.equal(skillPoints({ classLevel: 15, skills: {} }, content).free, 5);
     assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3 } }, content), { earned: 5, spent: 2, free: 3 });
+    // The second skill's first level takes a point too.
+    assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3, unyielding: 1 } }, content), { earned: 5, spent: 3, free: 2 });
   });
 
-  test('a class picks one of its three skills at class level 10, for good', () => {
+  test('a class picks its main path at class level 10, may add a second from 11 for a point, and the third closes', () => {
     const warrior = (classLevel, skills = {}) => ({ classId: 'warrior', classLevel, skills });
     assert.equal(learnBlock(warrior(9), 'power-strike', content).code, 'class_level');
     assert.equal(learnBlock(warrior(10), 'fireball', content).code, 'unknown_skill');
     assert.equal(learnBlock(warrior(10), 'power-strike', content), null);
-    assert.equal(learnBlock(warrior(30, { 'wide-sweep': 1 }), 'power-strike', content).code, 'chosen');
+    assert.equal(learnBlock(warrior(30, { 'power-strike': 1 }), 'power-strike', content).code, 'known');
+    assert.equal(learnBlock(warrior(10, { 'power-strike': 1 }), 'wide-sweep', content).code, 'class_level');
+    assert.equal(learnBlock(warrior(11, { 'power-strike': 2 }), 'wide-sweep', content).code, 'no_points');
+    assert.equal(learnBlock(warrior(12, { 'power-strike': 1 }), 'wide-sweep', content), null);
+    assert.equal(learnBlock(warrior(30, { 'wide-sweep': 1 }), 'power-strike', content), null);
+    assert.equal(learnBlock(warrior(30, { 'power-strike': 1, unyielding: 1 }), 'wide-sweep', content).code, 'chosen');
+    const states = (character) => skillsView(character, content).pools[0].options.map((skill) => skill.state);
+    assert.deepEqual(states(warrior(10)), ['pick', 'pick', 'pick']);
+    assert.deepEqual(states(warrior(10, { 'power-strike': 1 })), ['main', 'soon', 'soon']);
+    assert.deepEqual(states(warrior(11, { 'power-strike': 2 })), ['main', 'points', 'points']);
+    assert.deepEqual(states(warrior(12, { 'power-strike': 1 })), ['main', 'pick', 'pick']);
+    // The first learned is the main path, whatever its place on the list.
+    assert.deepEqual(states(warrior(30, { unyielding: 1, 'power-strike': 4 })), ['second', 'closed', 'main']);
+    assert.deepEqual(skillsView(warrior(10), content).pools[0].options.map((skill) => skill.path), ['Barbarzyńca', 'Gladiator', 'Strażnik']);
     assert.equal(raiseBlock(warrior(10, { 'power-strike': 1 }), 'power-strike', content).code, 'no_points');
     assert.equal(raiseBlock(warrior(12, { 'power-strike': 1 }), 'power-strike', content), null);
     assert.equal(raiseBlock(warrior(40, { 'power-strike': 20 }), 'power-strike', content).code, 'max_level');
@@ -81,7 +100,7 @@ describe('skills', () => {
     assert.match(open.pools[0].options[0].effect, /^Cios za 140% obrażeń, który pomija 20% pancerza celu\.$/);
     assert.equal(open.pools[0].options[0].cost, 'Koszt: 10 many, najwyżej co 3. ruch.');
     const chosen = skillsView(warrior(12, { 'power-strike': 2 }), content);
-    assert.equal(chosen.pools[0].chosen, 'power-strike');
+    assert.deepEqual(chosen.pools[0].chosen, ['power-strike']);
     assert.equal(chosen.points, 1);
     assert.equal(chosen.ready, true);
     assert.match(chosen.pools[0].options[0].next, /^Cios za 14\d% obrażeń/);
@@ -116,22 +135,57 @@ describe('skills', () => {
     assert.ok(blows.every((event) => event.t === three.events[start].t && event.skill === 'arrow-rain'));
   });
 
-  test('a prayer heals the wounded cleric on its move', () => {
-    const result = fight('modlitwa', [withSkill('cleric', 'prayer-of-health', { hpShare: 0.3 })], [sturdy('boar', 12, 'e0')]);
-    const prayer = result.events.find((event) => event.kind === 'heal' && event.skill === 'prayer-of-health');
-    assert.ok(prayer && prayer.amount > 0);
-    assert.match(prayer.text, /Modlitwa o zdrowie/);
+  test('a prayer heals the wounded cleric a lot on its move, once a fight', () => {
+    const cleric = withSkill('cleric', 'prayer-of-health', { hpShare: 0.3 });
+    const result = fight('modlitwa', [cleric], [sturdy('boar', 12, 'e0')]);
+    const prayers = result.events.filter((event) => event.kind === 'heal' && event.skill === 'prayer-of-health');
+    assert.equal(prayers.length, 1);
+    const { heal } = skillParams(content.skillsById['prayer-of-health'], 1, content);
+    assert.ok(prayers[0].amount >= Math.round(heal * cleric.maxHp));
+    assert.match(prayers[0].text, /Modlitwa o zdrowie/);
+    assert.equal(skillView(content.skillsById['prayer-of-health'], 1, content).cost, 'Koszt: 14 many, raz na walkę.');
+    // It heals more than the warrior's guard, which gives armour instead.
+    assert.ok(heal > skillParams(content.skillsById.unyielding, 20, content).heal * 2);
   });
 
-  test('a guard wakes once, when HP falls below 40%', () => {
+  test('a guard wakes once below its mark: a little HP back and much more armour for a few of its moves', () => {
     let woke = 0;
+    let faded = 0;
+    const { heal, armor, turns } = skillParams(content.skillsById.unyielding, 1, content);
     for (let i = 0; i < 6; i++) {
-      const result = fight(`tarcza:${i}`, [withSkill('warrior', 'unyielding', { hpShare: 0.45 })], [sturdy('boar', 14, 'e0')]);
-      const guards = result.events.filter((event) => event.skill === 'unyielding');
+      const warrior = withSkill('warrior', 'unyielding', { hpShare: 0.45 });
+      const result = fight(`tarcza:${i}`, [warrior], [sturdy('boar', 14, 'e0')]);
+      const guards = result.events.filter((event) => event.skill === 'unyielding' && event.kind === 'heal');
       assert.ok(guards.length <= 1);
       woke += guards.length;
+      if (guards.length === 0) continue;
+      const [guard] = guards;
+      assert.ok(guard.amount <= Math.round(heal * warrior.maxHp));
+      assert.deepEqual([guard.armor, guard.turns], [Math.round(armor * 100), Math.round(turns)]);
+      const fade = result.events.findIndex((event) => event.kind === 'fade' && event.skill === 'unyielding');
+      if (fade < 0) continue;
+      faded += 1;
+      // It fades as the warrior's move after its last guarded one begins.
+      const start = result.events.indexOf(guard);
+      const own = result.events.slice(start, fade).filter((event) => event.actor === 'a0' && ['hit', 'crit', 'dodge'].includes(event.kind) && !event.counter);
+      assert.equal(own.length, Math.round(turns));
     }
-    assert.ok(woke > 0);
+    assert.ok(woke > 0 && faded > 0);
+  });
+
+  test('an exorcism may paralyse, a fireball burns for 2 moves, then 3', () => {
+    let paralysed = 0;
+    for (let i = 0; i < 6; i++) {
+      const result = fight(`egzorcyzm:${i}`, [withSkill('cleric', 'exorcism', { level: 20, skillLevel: 20 })], [0, 1, 2].map((j) => sturdy('wolf', 18, `e${j}`)));
+      paralysed += result.events.filter((event) => event.kind === 'stun' && event.label === 'sparaliżowany').length;
+    }
+    assert.ok(paralysed > 0);
+    const fireball = content.skillsById.fireball;
+    assert.deepEqual([1, 10, 11, 20].map((level) => Math.round(skillParams(fireball, level, content).dotTicks)), [2, 2, 3, 3]);
+  });
+
+  test('a blessing shares its bonus out over the party', () => {
+    assert.deepEqual([1, 2, 3].map((members) => sharedBonus(members, content.skillsById.blessing.params.crowd)), [1, 2 / 3, 0.5]);
   });
 
   test('a mana shield takes blows for mana, and every blow tells what it can still take', () => {

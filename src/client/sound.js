@@ -213,6 +213,14 @@ export function playSound(name) {
   }
 }
 
+// A skill's own recording (effects "skill-<id>" in data/sounds.json), or the
+// sound named `instead` while it has none.
+export function playSkill(skillId, instead) {
+  const name = `skill-${skillId}`;
+  const sound = recordings?.effects?.[name] ? name : instead;
+  if (sound) playSound(sound);
+}
+
 // Recordings
 
 export function setRecordings(sounds) {

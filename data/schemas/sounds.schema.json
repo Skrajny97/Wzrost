@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Dźwięki walki",
-  "description": "Nagrane dźwięki walki (src/client/audio/sfx). Broń (sound w item-bases.json) i atak potwora (attack.sound w monsters.json) mają rodzaj dźwięku: nagrany z sounds albo grany z syntezatora (synth). crit gra się dodatkowo przy trafieniu krytycznym, dodge przy uniku, a kill przy pokonaniu. voices: głosy przy trafieniu (hurt) i pokonaniu (death), dla id potwora albo wyglądu postaci (female, male). effects: nagrania dźwięków gry wołanych po nazwie (np. tab: zmiana zakładki); nazwa bez nagrania gra z syntezatora.",
+  "description": "Nagrane dźwięki walki (src/client/audio/sfx). Broń (sound w item-bases.json) i atak potwora (attack.sound w monsters.json) mają rodzaj dźwięku: nagrany z sounds albo grany z syntezatora (synth). crit gra się dodatkowo przy trafieniu krytycznym, dodge przy uniku, a kill przy pokonaniu. voices: głosy przy trafieniu (hurt) i pokonaniu (death), dla id potwora albo wyglądu postaci (female, male). effects: nagrania dźwięków gry wołanych po nazwie (np. tab: zmiana zakładki, skill-<id umiejętności>: umiejętność w walce); nazwa bez nagrania gra z syntezatora, a umiejętność bez nagrania gra zwykły dźwięk ataku albo czaru.",
   "type": "object",
   "additionalProperties": false,
   "required": ["sounds", "synth", "voices", "effects"],
@@ -34,8 +34,13 @@
     },
     "effects": {
       "type": "object",
-      "description": "Nazwa dźwięku z src/client/sound.js (SOUNDS) → jego nagranie.",
-      "propertyNames": { "enum": ["tap", "tab", "open", "swing", "shot", "magic", "effect", "tick", "victory", "defeat", "system", "build", "collect", "done", "chest"] },
+      "description": "Nazwa dźwięku z src/client/sound.js (SOUNDS) albo skill-<id umiejętności> → jego nagranie.",
+      "propertyNames": {
+        "anyOf": [
+          { "enum": ["tap", "tab", "open", "swing", "shot", "magic", "effect", "tick", "victory", "defeat", "system", "build", "collect", "done", "chest"] },
+          { "pattern": "^skill-[a-z][a-z0-9-]*$" }
+        ]
+      },
       "additionalProperties": { "$ref": "#/definitions/sound" }
     },
     "voices": {

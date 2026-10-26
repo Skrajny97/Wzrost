@@ -7,7 +7,7 @@
 // has a look below, by its id in data/skills.json.
 
 import { h } from './dom.js';
-import { playSound } from './sound.js';
+import { playSkill, playSound } from './sound.js';
 
 // cast: what plays when the skill wakes or a sweep starts; impact: extra
 // on the target of the skill's own blow; color: its light.
@@ -272,10 +272,19 @@ export function skillEffects(kit) {
     return ring(id, color, 120, 700);
   }
 
-  // What plays when a skill wakes (a 'skill' event), or when a sweep starts.
+  // A round flash over a whole card, then a ring around it.
+  function flashAround(id, color) {
+    const entry = cards.get(id);
+    if (!entry) return Promise.resolve();
+    const size = Math.round(Math.hypot(entry.card.offsetWidth, entry.card.offsetHeight));
+    return Promise.all([burst(id, color, size), ring(id, color, Math.round(size * 1.25), 700)]);
+  }
+
+  // What plays when a skill wakes (a 'skill' event), or when a sweep starts:
+  // the skill's own sound, or a plain one while it has none.
   async function cast(event) {
     const look = lookOf(event);
-    playSound(look.cast === 'sweep' ? 'swing' : look.cast === 'rain' ? 'shot' : 'magic');
+    playSkill(event.skill, look.cast === 'sweep' ? 'swing' : look.cast === 'rain' ? 'shot' : 'magic');
     callout(event.actor, event.skillName, look.color);
     const targets = event.targets ?? [];
     switch (look.cast) {
@@ -309,20 +318,27 @@ export function skillEffects(kit) {
     await wait(120);
   }
 
-  // A heal: green sparks and the HP that came back.
+  // A heal: green sparks and the HP that came back. A guard instead flashes
+  // round the whole card, with the armour it gives.
   async function heal(event) {
     const look = lookOf(event);
-    playSound('effect');
+    playSkill(event.skill, 'effect');
     callout(event.actor, event.skillName, look.color);
     kit.setHp(event.target, event.hp);
     kit.float(event.target, `+${event.amount}`, 'heal');
-    if (look.cast === 'guard') status(event.target, event.skillName);
-    await Promise.all([specks(event.target, look.cast === 'guard' ? '#d9b45a' : '#a7c47f'), aura(event.target, look.color, 1)]);
+    if (look.cast === 'guard') {
+      if (event.armor) kit.float(event.target, `pancerz +${event.armor}%`, 'guard', 380);
+      await flashAround(event.target, look.color);
+      return;
+    }
+    await Promise.all([specks(event.target, '#a7c47f'), aura(event.target, look.color, 1)]);
   }
 
-  // Before a skill's own blow travels: its name, and a mark on the target.
+  // Before a skill's own blow travels: its sound and name, and a mark on the
+  // target.
   function before(event) {
     const look = lookOf(event);
+    playSkill(event.skill);
     callout(event.actor, event.skillName, look.color);
     if (look.impact === 'aim') ring(event.target, look.color, 70, 420);
   }

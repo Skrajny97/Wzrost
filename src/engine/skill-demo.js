@@ -37,12 +37,24 @@ export function skillDemo(skillId, content) {
   const below = WOUND_KINDS.has(skill.kind) ? skill.params.below + 0.1 : skill.kind === 'heal' ? skill.params.below - 0.1 : 1;
   const full = playerCombatant({ character, equipped, name: cls.name }, content);
   const player = { ...full, hp: Math.max(1, Math.round(full.maxHp * Math.min(1, below))) };
+  // The first fight that shows the skill whole: what it may cause by chance
+  // (a burn, a paralysis) and a guard's end too; else the first that shows
+  // the skill at all.
+  const used = (events) => events.some((event) => event.skill === skillId);
+  const whole = (events) =>
+    used(events) &&
+    (!skill.params.dotEffect || events.some((event) => event.kind === 'effect')) &&
+    (!skill.params.stunChance || events.some((event) => event.kind === 'stun')) &&
+    (skill.kind !== 'guard' || events.some((event) => event.kind === 'fade'));
   let result = null;
   let enemies = null;
+  let fallback = null;
   for (let attempt = 0; attempt < 30; attempt++) {
     enemies = foesFor(skill, content);
     result = simulateFight({ allies: [player], enemies, rng: createRng(`demo:${skillId}:${attempt}`), content, record: true });
-    if (result.events.some((event) => event.skill === skillId)) break;
+    if (whole(result.events)) break;
+    if (!fallback && used(result.events)) fallback = { result, enemies };
+    if (attempt === 29 && fallback) ({ result, enemies } = fallback);
   }
   return {
     allies: [combatantView(player, enemies[0].level, content)],

@@ -94,6 +94,11 @@ const PARAMETRIC = {
   xpbase: (v) => ({ describe: `rewards.xpBase 100 -> ${v}`, apply(raw) { raw.balance.rewards.xpBase = Number(v); } }),
   // skill=0: the first of the class's three skills, learned and raised (sim.mjs)
   skill: (v) => ({ describe: `policy: skill number ${v} of the class, every Skill Point into it`, policy: { skill: Number(v) }, apply() {} }),
+  // two=0/2: skill 0 first, skill 2 second, the points split evenly (sim.mjs)
+  two: (v) => {
+    const [first, second] = v.split('/').map(Number);
+    return { describe: `policy: skill ${first} first, skill ${second} second, points to the lower`, policy: { skill: first, second }, apply() {} };
+  },
   // sk=prayer-of-health:heal:0.08/0.15: a number of a skill in skills.json, its
   // mana, cooldown or one of its params; a pair is [level 1, level 20]
   sk: (v) => {

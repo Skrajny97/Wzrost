@@ -8,7 +8,7 @@ export * from './stats.js';
 export * from './items.js';
 export * from './progression.js';
 export * from './combatant.js';
-export { simulateFight } from './combat.js';
+export { sharedBonus, simulateFight } from './combat.js';
 export * from './hunt.js';
 export * from './threat.js';
 export * from './unlocks.js';

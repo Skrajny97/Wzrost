@@ -181,10 +181,10 @@ function checkReferences(data) {
     strike: ['power'],
     sweep: ['power'],
     heal: ['below', 'heal', 'wisdomPerHp'],
-    guard: ['below', 'heal', 'reduction', 'hits'],
+    guard: ['below', 'heal', 'armor', 'turns'],
     buff: ['armor', 'resist', 'damage'],
     coat: ['dotEffect', 'dotChance', 'dotPower', 'dotTicks'],
-    shield: ['below', 'cost'],
+    shield: ['below', 'pool', 'ratio'],
     evade: ['below', 'dodge', 'counter', 'hits'],
   };
   const classIds = new Set(data.classes.map((cls) => cls.id));
@@ -198,7 +198,9 @@ function checkReferences(data) {
     for (const key of SKILL_NEEDS[skill.kind]) {
       if (params[key] === undefined) errors.push(`${where} nie ma liczby "${key}", której potrzebuje rodzaj ${skill.kind}`);
     }
-    if (['strike', 'sweep', 'heal'].includes(skill.kind) && skill.cooldown === undefined) errors.push(`${where} nie ma odnowienia (cooldown)`);
+    if (['strike', 'sweep', 'heal'].includes(skill.kind) && skill.cooldown === undefined && !skill.once) errors.push(`${where} nie ma odnowienia (cooldown ani once)`);
+    if (skill.cooldown !== undefined && skill.once) errors.push(`${where} ma i odnowienie, i once: zostaw jedno`);
+    if (skill.once && !['strike', 'sweep', 'heal'].includes(skill.kind)) errors.push(`${where}: once jest tylko dla strike, sweep i heal, inne rodzaje mają swój rytm`);
     if (params.dotEffect !== undefined && !effectIds.has(params.dotEffect)) errors.push(`${where} ma nieznany efekt "${params.dotEffect}"`);
     if (params.element !== undefined && !elements.has(params.element)) errors.push(`${where} ma nieznany żywioł "${params.element}"`);
     if (params.category !== undefined && !['physical', 'magical'].includes(params.category)) errors.push(`${where} ma nieznany rodzaj obrażeń "${params.category}"`);
@@ -211,6 +213,18 @@ function checkReferences(data) {
   }
   for (const [choice, count] of skillChoices) {
     if (count < 2) errors.push(`skills.json: wybór (${choice}) ma tylko jedną umiejętność`);
+    if (count <= data.balance.skills.paths) errors.push(`skills.json: wybór (${choice}) ma ${count} umiejętności, a postać może poznać ${data.balance.skills.paths}, więc żadna ścieżka się nie zamknie`);
+  }
+  // A skill's own sound names a skill there is.
+  for (const name of Object.keys(data.sounds.effects)) {
+    if (name.startsWith('skill-') && !data.skills.some((skill) => `skill-${skill.id}` === name)) errors.push(`sounds.json: effects ma dźwięk "${name}" nieznanej umiejętności`);
+  }
+  // Each skill's path has its own name within its class.
+  const pathNames = new Set();
+  for (const skill of data.skills) {
+    const key = `${skill.classId}:${skill.path}`;
+    if (pathNames.has(key)) errors.push(`skills.json: ścieżka "${skill.path}" powtarza się w klasie ${skill.classId}`);
+    pathNames.add(key);
   }
 
   // Every class has something for each slot its armour fills: a class

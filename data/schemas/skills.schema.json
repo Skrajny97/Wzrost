@@ -1,14 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Umiejętności klas",
-  "description": "Umiejętności, które postać wybiera na progach poziomu klasy: z umiejętności jednej klasy o tym samym classLevel postać uczy się jednej. Punkty Umiejętności podnoszą poziom umiejętności od 1 do maxLevel z balance.json.",
+  "description": "Umiejętności, które postać wybiera na progach poziomu klasy. Każda umiejętność to też ścieżka rozwoju postaci (path), która zdecyduje o ewolucjach klasy. Z umiejętności jednej klasy o tym samym classLevel postać poznaje najwyżej skills.paths z balance.json: pierwszą za darmo, kolejną za Punkt Umiejętności. Punkty Umiejętności podnoszą poziom umiejętności od 1 do maxLevel.",
   "type": "array",
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "classId", "classLevel", "name", "style", "rarity", "description", "effect", "kind", "mana", "params"],
+    "required": ["id", "path", "classId", "classLevel", "name", "style", "rarity", "description", "effect", "kind", "mana", "params"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+      "path": { "type": "string", "minLength": 1, "description": "Nazwa ścieżki rozwoju postaci, którą otwiera ta umiejętność, np. Strażnik. Stoi nad umiejętnością w zakładce." },
       "classId": { "type": "string" },
       "classLevel": { "type": "integer", "minimum": 1, "description": "Poziom klasy, od którego postać wybiera jedną z umiejętności swojej klasy z tym samym poziomem." },
       "name": { "type": "string", "minLength": 1 },
@@ -26,6 +27,7 @@
       },
       "mana": { "type": "integer", "minimum": 0 },
       "cooldown": { "type": "integer", "minimum": 1, "description": "Najwyżej co który ruch postaci (dla strike, sweep i heal)." },
+      "once": { "const": true, "description": "Zamiast odnowienia: umiejętność działa raz na walkę (dla strike, sweep i heal)." },
       "params": {
         "type": "object",
         "description": "Liczby umiejętności: stała wartość albo para [poziom 1, poziom maksymalny], między którymi wartość rośnie równo z poziomem.",

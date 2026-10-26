@@ -1136,8 +1136,10 @@ button {
   border-top: 1px solid;
 }
 
+/* As many equal columns as the bar has tabs. */
 .nav--main {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
   background: var(--bg-deep);
   border-top-color: var(--line);
 }
@@ -2897,6 +2899,25 @@ a.segmented-option {
 .unit-hp-fill {
   height: 5px;
   background: var(--hp);
+  transition: width 0.35s ease;
+}
+
+/* A mana shield's points under the HP bar, while the shield holds. */
+.unit-shield {
+  height: 4px;
+  margin-top: 2px;
+  background: rgba(111, 182, 255, 0.18);
+}
+
+.unit-shield[hidden] {
+  display: none;
+}
+
+.unit-shield-fill {
+  width: 100%;
+  height: 4px;
+  background: #6fb6ff;
+  box-shadow: 0 0 6px rgba(111, 182, 255, 0.7);
   transition: width 0.35s ease;
 }
 
@@ -5074,12 +5095,46 @@ a.camp-level-button {
   font-size: 13px;
 }
 
-/* The Umiejętności tab: three cards to choose from, then the learned skills
-   as a grid of tiles; a tile with a Skill Point to spend glows gold. */
-.skill-choice {
+/* The Umiejętności tab: the three paths of a milestone, each name over its
+   skill: a card to choose from, the learned skill's row, or a closed path,
+   dimmed. A row with a Skill Point to spend glows gold. */
+.skill-paths {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+}
+
+.skill-path {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skill-path-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.skill-path-label {
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.skill-path--main .skill-path-label {
+  color: var(--gold);
+}
+
+.skill-path--closed {
+  opacity: 0.55;
 }
 
 .skill-card {
@@ -5159,44 +5214,59 @@ a.camp-level-button {
   font-size: 30px;
 }
 
-.skill-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
-  gap: 10px;
+.skill-icon--row {
+  width: 48px;
+  height: 48px;
 }
 
-.skill-tile {
+.skill-icon--row .sprite--skill {
+  width: 42px;
+  height: 42px;
+}
+
+.skill-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 10px 6px;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 4px;
   background: var(--surface);
   color: var(--text);
   font: inherit;
+  text-align: left;
+}
+
+button.skill-row {
   cursor: pointer;
 }
 
-.skill-tile-name {
-  font-size: 15px;
-  line-height: 1.2;
-  text-align: center;
+.skill-row-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
-.skill-tile-level {
+.skill-row-name {
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.skill-row-level {
   color: var(--system);
   font-family: var(--font-system);
-  font-size: 13px;
+  font-size: 15px;
 }
 
-.skill-tile--ready {
+.skill-row--ready {
   border-color: var(--gold);
   box-shadow: 0 0 10px rgba(217, 180, 90, 0.35);
 }
 
-.skill-tile--ready .skill-tile-level {
+.skill-row--ready .skill-row-level {
   color: var(--gold);
 }
 
@@ -5330,6 +5400,11 @@ a.camp-level-button {
 .float--absorb {
   color: #9cc3e6;
   font-size: 13px;
+}
+
+.float--guard {
+  color: var(--gold);
+  font-size: 15px;
 }
 
 /* The author's preview of the skills: buttons by class, the arena below. */

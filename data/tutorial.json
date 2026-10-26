@@ -7,7 +7,7 @@
   "authorLabel": "Autor",
   "hideLabel": "Ukryj",
   "showLabel": "Pokaż pergamin",
-  "skippedText": "Wprowadzenie pominięte. Pierwsza wyprawa jest już za Tobą, a Ognisko zbudowane. Raport znajdziesz w Dzienniku.",
+  "skippedText": "Wprowadzenie pominięte. Pierwsza wyprawa jest już za Tobą, a Ognisko zbudowane. Raport znajdziesz w Dzienniku, na górze ustawień pod zębatką.",
   "firstSteps": {
     "areaId": "windfalls-edge",
     "buildingId": "campfire"

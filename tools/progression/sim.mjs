@@ -17,8 +17,10 @@
 //   least gold among those affordable;
 // - Time Points are counted, never spent;
 // - skills: none, unless the policy names one by its place among the three of
-//   the class (skill: 0, 1 or 2): learned at the class level that opens them,
-//   and every Skill Point goes into it at once.
+//   the class (skill: 0, 1 or 2): learned at the class level that opens them.
+//   A second one (second: 0, 1 or 2) is learned as soon as it may be, for a
+//   point. Every Skill Point goes at once into the learned skill with the
+//   lower level, the first one on a tie.
 
 import * as engine from '../../src/engine/index.js';
 import { loadData } from '../validate-data.mjs';
@@ -42,6 +44,7 @@ export const DEFAULT_POLICY = {
   stepDownHunts: 2,
   anvil: false,
   skill: null,
+  second: null,
   maxHunts: 3000,
 };
 
@@ -331,12 +334,22 @@ export function runCharacter(classId, runIndex, content, policyIn = {}) {
       totals.rarityFound[item.rarity] = (totals.rarityFound[item.rarity] ?? 0) + 1;
     }
 
-    // The skill the policy names, learned once it opens and raised with every
-    // Skill Point (skills.js in the server).
+    // The skills the policy names, learned once they open and raised with
+    // every Skill Point (skills.js in the server).
     if (policy.skill !== null) {
-      const skill = engine.skillsOfClass(classId, content)[Number(policy.skill)];
-      if (!character.skills && !engine.learnBlock(character, skill.id, content)) character.skills = { [skill.id]: 1 };
-      while (character.skills && !engine.raiseBlock(character, skill.id, content)) character.skills = { [skill.id]: character.skills[skill.id] + 1 };
+      const ofClass = engine.skillsOfClass(classId, content);
+      const first = ofClass[Number(policy.skill)];
+      const second = policy.second === null ? null : ofClass[Number(policy.second)];
+      if (!character.skills && !engine.learnBlock(character, first.id, content)) character.skills = { [first.id]: 1 };
+      if (character.skills && second && !character.skills[second.id] && !engine.learnBlock(character, second.id, content)) {
+        character.skills = { ...character.skills, [second.id]: 1 };
+      }
+      for (;;) {
+        const raisable = Object.keys(character.skills ?? {}).filter((id) => !engine.raiseBlock(character, id, content));
+        if (raisable.length === 0) break;
+        const lowest = raisable.reduce((best, id) => (character.skills[id] < character.skills[best] ? id : best));
+        character.skills = { ...character.skills, [lowest]: character.skills[lowest] + 1 };
+      }
     }
 
     // Finds into empty slots, as the server does.

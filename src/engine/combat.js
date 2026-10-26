@@ -10,8 +10,10 @@
 // a prayer heals on the unit's move when it is wounded, a blessing or a
 // coated blade works from the start of the fight, and a guard, a mana shield
 // or a dance of shadows wakes once a fight, the moment HP falls below its
-// mark. Every fight starts with full mana. A fight without skills draws the
-// same random numbers as before skills existed.
+// mark. A guard's armour lasts a few of the unit's own moves, a mana shield
+// takes a share of mana at once and holds until its points are spent. Every
+// fight starts with full mana. A fight without skills draws the same random
+// numbers as before skills existed.
 
 import { cappedChance, reduction } from './formulas.js';
 import { ACTIVE_KINDS, START_KINDS, WOUND_KINDS } from './skills.js';
@@ -32,17 +34,21 @@ function wordsFor(kind, move) {
   return move.own ? SKILL_WORDS[kind] : kind;
 }
 
-// A mana shield takes what it can of a blow or a tick: each point of damage
-// it stops costs `cost` mana. Returns the damage it took.
+// A mana shield takes what it can of a blow or a tick, out of its points.
+// Returns the damage it took.
 function absorb(target, amount) {
-  if (!target.shield || target.mana <= 0 || amount <= 0) return 0;
-  const absorbed = Math.min(amount, Math.floor(target.mana / target.shield.cost));
-  target.mana = Math.max(0, target.mana - Math.ceil(absorbed * target.shield.cost));
+  if (!target.shield || target.shield.points <= 0 || amount <= 0) return 0;
+  const absorbed = Math.min(amount, target.shield.points);
+  target.shield.points -= absorbed;
   return absorbed;
 }
 
-// What a mana shield can still take: the points of damage its mana pays for.
-const shieldLeft = (unit) => (unit.shield ? Math.floor(unit.mana / unit.shield.cost) : undefined);
+// What a mana shield can still take; a spent one says 0.
+const shieldLeft = (unit) => (unit.shield ? unit.shield.points : undefined);
+
+// A bonus shared out over `members` of a party: each one more takes `crowd`
+// of a share (a blessing: 2/3 of it each for two, half for three).
+export const sharedBonus = (members, crowd = 0) => 1 / (1 + crowd * (members - 1));
 
 function heal(unit, amount) {
   const healed = Math.max(0, Math.min(unit.maxHp - unit.hp, Math.round(amount)));
@@ -63,7 +69,9 @@ function blowOf(skill, extra) {
     category: p.category,
     element: p.element,
     stun: p.stun,
-    dot: p.dotEffect && skill.kind === 'strike' ? { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks: p.dotTicks } : undefined,
+    stunChance: p.stunChance,
+    stunLabel: p.stunLabel,
+    dot: p.dotEffect && skill.kind === 'strike' ? { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks: Math.round(p.dotTicks) } : undefined,
     ...extra,
   };
 }
@@ -134,11 +142,29 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       const vars = { actor: unit.name, skill: skill.name };
       const base = { t, actor: unit.id, target: unit.id, skill: skill.id, skillName: skill.name };
       if (skill.kind === 'guard') {
+        // A little HP back, and armour for the unit's next few moves.
         const amount = heal(unit, skill.params.heal * unit.maxHp);
-        unit.guard = { hits: skill.params.hits, reduction: skill.params.reduction };
-        log(() => ({ ...base, kind: 'heal', amount, hp: unit.hp, text: say(texts, 'skillHeal', actions, { ...vars, amount }) }));
+        const turns = Math.round(skill.params.turns);
+        const armor = Math.round(unit.armor * skill.params.armor);
+        unit.armor += armor;
+        unit.guard = { armor, until: unit.moves + turns, skill };
+        const percent = Math.round(skill.params.armor * 100);
+        log(() => ({
+          ...base,
+          kind: 'heal',
+          amount,
+          armor: percent,
+          turns,
+          hp: unit.hp,
+          text: `${say(texts, 'skillHeal', actions, { ...vars, amount })} ${say(texts, 'guardArmor', actions, { armor: percent, turns })}`,
+        }));
       } else {
-        if (skill.kind === 'shield') unit.shield = { cost: skill.params.cost };
+        if (skill.kind === 'shield') {
+          // A share of the unit's mana at once makes the shield's points.
+          const taken = Math.min(unit.mana, Math.round((unit.maxMana ?? 0) * skill.params.pool));
+          unit.mana -= taken;
+          unit.shield = { points: Math.round(taken * skill.params.ratio) };
+        }
         if (skill.kind === 'evade') unit.evade = { hits: skill.params.hits, dodge: skill.params.dodge, counter: skill.params.counter };
         log(() => ({ ...base, kind: 'skill', hp: unit.hp, shield: shieldLeft(unit), text: say(texts, 'skillUse', actions, vars) }));
       }
@@ -155,7 +181,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       damage(unit, amount, dot.source);
       dot.ticks -= 1;
       const vars = { target: unit.name, effect: dot.name, damage: amount };
-      log(() => ({ t, kind: 'tick', target: unit.id, effect: dot.name, element: dot.element, damage: amount, absorbed: absorbed || undefined, shield: shieldLeft(unit), hp: unit.hp, text: say(texts, 'effectTick', actions, vars) }));
+      log(() => ({ t, kind: 'tick', target: unit.id, effect: dot.name, element: dot.element, damage: amount, absorbed: absorbed || undefined, shield: shieldLeft(unit), left: dot.ticks, hp: unit.hp, text: say(texts, 'effectTick', actions, vars) }));
       if (unit.hp === 0) log(() => ({ t, kind: 'kill', target: unit.id, hp: 0, text: say(texts, 'kill', actions, vars) }));
       else if (unit.skills.length > 0) wounded(unit, t);
     }
@@ -231,10 +257,6 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
     const critical = move.alwaysCrit || rng.chance(Math.min(1, cappedChance(actor.critRating, target.level, tuning.critCap, balance) + (move.critBonus ?? 0)));
     const defense = category === 'physical' ? target.armor * (1 - (move.armorIgnore ?? 0)) : (target.resist[element] ?? 0);
     let amount = Math.max(1, Math.round(raw * (critical ? tuning.critMultiplier : 1) * (1 - reduction(defense, actor.level, balance))));
-    if (target.guard && target.guard.hits > 0) {
-      target.guard.hits -= 1;
-      amount = Math.max(1, Math.round(amount * (1 - target.guard.reduction)));
-    }
     const absorbed = target.shield ? absorb(target, amount) : 0;
     amount -= absorbed;
     damage(target, amount, actor.id);
@@ -258,9 +280,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
 
     const dot = move.dot ?? weapon.dot;
     if (dot) applyDot(actor, target, dot, raw, t, vars);
-    if (move.stun) {
+    if (move.stun || (move.stunChance && rng.chance(move.stunChance))) {
       target.next += target.interval;
-      log(() => ({ t, kind: 'stun', target: target.id, hp: target.hp, ...marks, text: say(texts, 'stun', actions, vars) }));
+      log(() => ({ t, kind: 'stun', target: target.id, label: move.stunLabel, hp: target.hp, ...marks, text: say(texts, 'stun', actions, vars) }));
     }
     if (target.skills.length > 0) wounded(target, t);
   };
@@ -271,14 +293,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
     return pickTarget(actor, opponents.filter((unit) => (DEPTH[unit.position] ?? 0) === depth));
   };
 
-  // A ready skill used on the actor's move instead of a plain blow.
+  // A ready skill used on the actor's move instead of a plain blow; one
+  // marked `once` (the prayer) works once a fight.
   const useSkill = (actor, opponents, t) => {
     if (!skilled || actor.skills.length === 0) return false;
     for (const skill of actor.skills) {
-      if (!ACTIVE_KINDS.has(skill.kind) || actor.moves < skill.ready || actor.mana < skill.mana) continue;
+      if (!ACTIVE_KINDS.has(skill.kind) || skill.used || actor.moves < skill.ready || actor.mana < skill.mana) continue;
       if (skill.kind === 'heal' && actor.hp >= skill.params.below * actor.maxHp) continue;
       actor.mana -= skill.mana;
       skill.ready = actor.moves + skill.cooldown;
+      skill.used = skill.once === true;
       const vars = { actor: actor.name, skill: skill.name };
       const base = { t, actor: actor.id, skill: skill.id, skillName: skill.name };
       if (skill.kind === 'heal') {
@@ -318,11 +342,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       skill.used = true;
       const p = skill.params;
       if (skill.kind === 'buff') {
-        unit.armor = Math.round(unit.armor * (1 + p.armor));
-        unit.resist = Object.fromEntries(Object.entries(unit.resist).map(([element, value]) => [element, Math.round(value * (1 + p.resist))]));
-        unit.damageBonus += p.damage;
+        // The whole side; each one more shares the bonus out (crowd).
+        const party = units.filter((other) => other.side === unit.side);
+        const share = sharedBonus(party.length, p.crowd);
+        for (const member of party) {
+          member.armor = Math.round(member.armor * (1 + p.armor * share));
+          member.resist = Object.fromEntries(Object.entries(member.resist).map(([element, value]) => [element, Math.round(value * (1 + p.resist * share))]));
+          member.damageBonus += p.damage * share;
+        }
       } else {
-        unit.weapon = { ...unit.weapon, dot: { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks: p.dotTicks } };
+        unit.weapon = { ...unit.weapon, dot: { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks: Math.round(p.dotTicks) } };
       }
       log(() => ({ t: 0, kind: 'skill', actor: unit.id, target: unit.id, skill: skill.id, skillName: skill.name, text: say(texts, 'skillUse', actions, { actor: unit.name, skill: skill.name }) }));
     }
@@ -356,6 +385,12 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
 
     tickEffects(actor, t);
     if (actor.hp <= 0) continue;
+    if (actor.guard && actor.moves >= actor.guard.until) {
+      const { skill } = actor.guard;
+      actor.armor -= actor.guard.armor;
+      actor.guard = null;
+      log(() => ({ t, kind: 'fade', actor: actor.id, target: actor.id, skill: skill.id, skillName: skill.name, text: say(texts, 'skillEnd', actions, { actor: actor.name, skill: skill.name }) }));
+    }
 
     const opponents = alive.filter((unit) => unit.side !== actor.side && unit.hp > 0);
     if (!skilled) strike(actor, pickTarget(actor, opponents), t);

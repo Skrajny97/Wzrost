@@ -31,7 +31,9 @@
   "skills": {
     "unlockClassLevel": 10,
     "maxLevel": 20,
-    "pointsPerClassLevel": 1
+    "pointsPerClassLevel": 1,
+    "paths": 2,
+    "secondClassLevel": 11
   },
   "monsters": {
     "hpBase": 2,

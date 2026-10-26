@@ -35,6 +35,9 @@ KINDS = {
     # Coins spilling from a chest: the whole jingle, quieter in the file, as
     # its many sharp peaks would otherwise hit full scale.
     'coins': {'longest': 2.5, 'chain': 'highpass=f=150,lowpass=f=14000', 'tail': 40, 'rms': -21},
+    # A skill as it wakes or strikes: up to 1.4 s, without the rumble a phone
+    # cannot play, lifted where it plays, a little quieter than a blow.
+    'skill': {'longest': 1.4, 'chain': 'highpass=f=150,highpass=f=150,equalizer=f=1500:t=q:w=1.2:g=4,equalizer=f=3500:t=q:w=1:g=2,lowpass=f=13000', 'tail': 35, 'rms': -17},
 }
 
 # Output name: (draft file under SRC, kind).
@@ -60,6 +63,33 @@ TAKES = {
     'spider-death': [1, 2],
     'male-death': [1, 2],
 }
+# The skills' sounds (effects/skill-<id>-<time>-<take>.mp3): skill-<id>-1 is
+# in the game, skill-<id>-2 on the listening page to choose from. Chosen by
+# measure: the least energy below 300 Hz, a clean fade. The four drafts of
+# 26.10 07:02 were recorded again, brighter, as the first ones were mostly
+# rumble.
+SKILL_TAKES = {
+    'power-strike': ['0650-1', '0650-0'],
+    'wide-sweep': ['0650-1', '0650-0'],
+    'unyielding': ['0650-0', '0650-1'],
+    'aimed-shot': ['0650-0', '0650-1'],
+    'arrow-rain': ['0650-1', '0650-0'],
+    'pinning-shot': ['0650-0', '0650-1'],
+    'fireball': ['0702-1', '0650-1'],
+    'frost-gust': ['0650-1', '0650-0'],
+    'mana-shield': ['0702-1', '0702-0'],
+    'prayer-of-health': ['0650-1', '0650-0'],
+    'exorcism': ['0650-0', '0650-1'],
+    'blessing': ['0650-0', '0650-1'],
+    'backstab': ['0702-0', '0650-1'],
+    'poisoned-blade': ['0650-0', '0650-1'],
+    'shadow-dance': ['0702-0', '0702-1'],
+}
+for id, takes in SKILL_TAKES.items():
+    for number, take in enumerate(takes):
+        time, index = take.split('-')
+        SOUNDS[f'skill-{id}-{number + 1}'] = (f'effects/skill-{id}-20261026T{time}-{index}.mp3', 'skill')
+
 # A voice made from another voice's drafts. ElevenLabs gave only sharp
 # hisses for a dying viper (three tries, ten takes, all turned down), so its
 # death is its cry when hit, which the author kept, lower and fading.

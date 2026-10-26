@@ -1390,3 +1390,62 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
     - Liczba maleje z każdym pochłoniętym ciosem. Gdy dojdzie do zera, napis i niebieska poświata znikają.
     - To mana, która została, podzielona przez koszt punktu obrażeń, w dół do całości. Silnik zapisuje tę liczbę w zdarzeniach walki (`shield`), więc widać ją też w podglądzie autora i w powtórce.
     - Raporty sprzed tej zmiany nie mają tej liczby, więc karta pokazuje w nich samą nazwę osłony.
+
+## Ścieżki rozwoju, druga umiejętność i poprawki umiejętności (26.10.2026)
+
+1. **Dziennik tylko w ustawieniach** (autor: „szkoda na niego miejsca na dole zakładek, będziemy mieli zapas”).
+    - Dolny pasek głównych ekranów ma cztery równe zakładki: Postać, Walka, Profesje i Osada. Kolejne zakładki zmieszczą się bez przestawiania.
+    - Wprowadzenie szuka zakładek po ich adresach, a nie po miejscu w pasku. Złota obwódka trafia w Postać, Statystyki i zębatkę przy szerokości ekranu 360 i 412 px.
+    - Napis po pominięciu wprowadzenia mówi, że Dziennik jest na górze ustawień pod zębatką. Kwestia narratora o ustawieniach nie wspomina Dziennika. Dopisanie go wymaga nowego nagrania, więc czeka na decyzję autora.
+2. **Ścieżki rozwoju** (autor). Każda z trzech umiejętności klasy otwiera nazwaną ścieżkę rozwoju (`path` w `data/skills.json`). Nazwa stoi w zakładce nad umiejętnością. Nazwy to propozycja do zmiany przez autora:
+
+    | Klasa | Ścieżki (umiejętność → ścieżka) |
+    | --- | --- |
+    | Wojownik | Potężny cios → Barbarzyńca, Szeroki zamach → Gladiator, Nieugięty → Strażnik |
+    | Łucznik | Celny strzał → Snajper, Grad strzał → Strzelec Burzy, Przyszpilenie → Łowca |
+    | Mag | Kula ognia → Elementalista, Mroźny podmuch → Druid, Osłona many → Arkanista |
+    | Kleryk | Modlitwa o zdrowie → Uzdrowiciel, Egzorcyzm → Inkwizytor, Błogosławieństwo → Kapłan |
+    | Cień | Cios w plecy → Skrytobójca, Zatrute ostrze → Truciciel, Taniec cieni → Nocny Tancerz |
+
+    - Pierwsza wybrana umiejętność to ścieżka główna: wybór na stałe i za darmo. Serwer rozpoznaje ją po kolejności w `character.skills`, bo pierwsza poznana zostaje tam pierwsza, więc baza nie potrzebuje nowej kolumny.
+    - Od następnego poziomu klasy, czyli 11. (`balance.skills.secondClassLevel`), postać może dobrać drugą umiejętność za 1 Punkt Umiejętności. Trzecia ścieżka zamyka się wtedy na stałe (`balance.skills.paths` = 2). Zakładka pyta o to przed wyborem i nazywa ścieżkę, która się zamknie.
+    - Autor pisze o drugiej umiejętności „lub kiedykolwiek, do 50 lvl – później”. Granica 50. poziomu i to, co się dzieje po niej, czekają na projekt ewolucji. Na razie drugą umiejętność da się dobrać w każdej chwili od 11. poziomu klasy.
+    - Punkty Umiejętności: dalej po jednym za każdy poziom klasy po 10. Druga umiejętność zaczyna od 1. poziomu i kosztuje punkt, a kolejne punkty podnoszą obie, każdą do 20. Obie na 20. poziomie wypadają na 49. poziomie klasy.
+    - Ewolucje (dokument projektowy): po trzy na klasę, jedna na ścieżkę. Postać zna najwyżej dwie ścieżki, więc ma do wyboru najwyżej dwie ewolucje. Ich szczegóły projektujemy później.
+3. **Poprawki umiejętności z testu autora.** Każda liczba to wartość na 1. i na 20. poziomie umiejętności.
+    - **Nieugięty** leczy odrobinę, a za to mocno twardnieje. Było: 15–30% maks. HP i 30–50% mniej obrażeń przez 3 ciosy wrogów. Jest: 8–12% maks. HP i pancerz większy o 150–250% na 3–4 ruchy wojownika, poniżej 50% HP (było 40%).
+        - W walce nad postacią wyskakuje nazwa umiejętności i „pancerz +150%”, a karta pokazuje „pancerz +150%”, dopóki pancerz działa.
+        - Animacja to okrągły rozbłysk wokół całej karty.
+        - Gdy pancerz słabnie, napis znika, a opis walki mówi np. „Nieugięty przestaje działać.”
+    - **Kula ognia** już wcześniej podpalała, z szansą 40–70% na trafienie. Oparzenie trwa teraz 2 ruchy wroga do 10. poziomu umiejętności i 3 od 11. (zawsze były 3). Napis „Oparzenie” znika po ostatnim ruchu oparzenia i gdy wróg padnie.
+    - **Mroźny podmuch** zadaje mniej: 40–60% obrażeń zamiast 60–90%. Za to mocniej spowalnia: następny ruch każdego trafionego wroga przychodzi o całą zwykłą przerwę później, a nie o połowę.
+        - Z samym cięciem obrażeń był najsłabszą ścieżką maga: drogę do 50. poziomu skracał o 5%, a dwie pozostałe o 14–16%.
+        - Spowolnienie to jego rola, więc ono nadrabia różnicę.
+    - **Modlitwa o zdrowie** leczy dużo, raz na walkę: 25–40% maks. HP (było 3–6% co 4. ruch), dalej z dodatkiem 1 HP za każde 10 punktów Mądrości, gdy HP spadnie poniżej 60%.
+        - Symulacja pokazała, że duże leczenie z odnowieniem 6, 12 czy nawet 15 ruchów skraca klerykowi drogę do 50. poziomu o 27–37%. Inne umiejętności skracają ją o 3–16%. Stąd raz na walkę, z kosztem „14 many, raz na walkę”.
+        - Leczy teraz mniej więcej trzy razy więcej niż Nieugięty.
+        - Modlitwa w dwóch ruchach (najpierw modlitwa, potem leczenie) nie była potrzebna. Może wrócić jako pomysł na ewolucję.
+        - W danych to nowe pole `once` dla umiejętności używanych w ruchu postaci.
+    - **Egzorcyzm** zadaje mniej: 50–75% obrażeń każdemu wrogowi (było 65–95%), a jednemu wrogowi 90–125% (było 110–155%). Każdy trafiony ma 10–20% szans na paraliż. Sparaliżowany traci swój najbliższy ruch, a karta pisze „sparaliżowany”.
+    - **Błogosławieństwo** obejmuje całą drużynę, ale premia się dzieli (`crowd` = 0,5). Sam kleryk dostaje całą premię, we dwoje każdy dostaje 2/3, a we troje połowę. Dziś kleryk walczy sam, więc działa to dopiero w drużynie.
+    - **Osłona many** bierze raz 30% maks. many i robi z niej osłonę za 100–180% tej many. Budzi się raz na walkę, poniżej 50% HP.
+        - Osłona przyjmuje obrażenia, aż się wyczerpie. Reszta many zostaje na drugą umiejętność.
+        - Pod portretem maga stoi niebieski pasek osłony, a karta pisze, ile osłona jeszcze przyjmie, np. „Osłona many · 94”.
+    - **Cień** bez zmian. Ikona Tańca cieni jest jaśniejsza (rozjaśnienie gammą 0,5, bez nowego szkicu), bo w walce była prawie czarna.
+4. **Balans z symulacji postępu** (80 przebiegów na wariant, te same losowania dla każdego wariantu). Nowa polityka `two=A/B` to umiejętność A jako główna i B jako druga od 11. poziomu klasy, a punkty idą do tej na niższym poziomie. Godziny wypraw do 50. poziomu postaci:
+
+    | Klasa | Bez | Pierwsza | Druga | Trzecia | Dwie |
+    | --- | --- | --- | --- | --- | --- |
+    | Wojownik | 41,4 | Potężny cios 40,3 (−3%) | Szeroki zamach 38,5 (−7%) | Nieugięty 40,0 (−3%) | 37,3–39,3 (−5 do −10%) |
+    | Łucznik | 53,8 | Celny strzał 46,1 (−14%) | Grad strzał 50,4 (−6%) | Przyszpilenie 46,6 (−13%) | 45,3–47,8 (−11 do −16%) |
+    | Mag | 61,1 | Kula ognia 51,4 (−16%) | Mroźny podmuch 53,5 (−12%) | Osłona many 52,7 (−14%) | 46,6–50,6 (−17 do −24%) |
+    | Kleryk | 59,1 | Modlitwa o zdrowie 54,1 (−8%) | Egzorcyzm 54,9 (−7%) | Błogosławieństwo 53,4 (−10%) | 47,4–52,4 (−11 do −20%) |
+    | Cień | 59,2 | Cios w plecy 52,3 (−12%) | Zatrute ostrze 53,5 (−10%) | Taniec cieni 50,4 (−15%) | 48,5–52,7 (−11 do −18%) |
+
+    - Wojownik zyskuje najmniej, ale i tak jest najszybszy. Mag zyskuje najwięcej, a jest najwolniejszy.
+    - Grad strzał daje łucznikowi mniej niż dwie pozostałe ścieżki. Tych liczb nie było w uwagach autora, więc zostały.
+5. **Własne dźwięki umiejętności** (autor). Każda z 15 umiejętności ma nagranie z ElevenLabs (`skill-<id>` w `effects` w `data/sounds.json`, pliki `src/client/audio/sfx/skill-*.mp3`). Gra je, gdy umiejętność budzi się albo leci jej cios.
+    - Z dwóch ujęć w grze jest pierwsze. Oba są na stronie odsłuchu w grupie „Umiejętności”.
+    - Cztery szkice miały prawie sam bas (Kula ognia, Osłona many, Taniec cieni, Cios w plecy), więc dostały nowe, jaśniejsze opisy.
+    - Koszt: około 1030 kredytów ElevenLabs (812 za pierwsze nagrania i 220 za cztery poprawki).
+    - Umiejętność bez własnego nagrania gra dawny dźwięk ataku albo czaru.

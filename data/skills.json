@@ -1,6 +1,7 @@
 [
   {
     "id": "power-strike",
+    "path": "Barbarzyńca",
     "classId": "warrior",
     "classLevel": 10,
     "name": "Potężny cios",
@@ -15,6 +16,7 @@
   },
   {
     "id": "wide-sweep",
+    "path": "Gladiator",
     "classId": "warrior",
     "classLevel": 10,
     "name": "Szeroki zamach",
@@ -29,19 +31,21 @@
   },
   {
     "id": "unyielding",
+    "path": "Strażnik",
     "classId": "warrior",
     "classLevel": 10,
     "name": "Nieugięty",
     "style": "obrona",
     "rarity": "common",
     "description": "Kiedy robi się groźnie, wojownik zapiera się za tarczą i nie cofa się ani o krok.",
-    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, odzyskuje {heal%} maks. HP. Przez {hits} następne ciosy wrogów dostaje o {reduction%} mniej obrażeń.",
+    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, odzyskuje {heal%} maks. HP i na {turns} swoje ruchy zyskuje {armor%} pancerza więcej.",
     "kind": "guard",
     "mana": 12,
-    "params": { "below": 0.4, "heal": [0.15, 0.3], "reduction": [0.3, 0.5], "hits": 3 }
+    "params": { "below": 0.5, "heal": [0.08, 0.12], "armor": [1.5, 2.5], "turns": [3, 4] }
   },
   {
     "id": "aimed-shot",
+    "path": "Snajper",
     "classId": "archer",
     "classLevel": 10,
     "name": "Celny strzał",
@@ -56,6 +60,7 @@
   },
   {
     "id": "arrow-rain",
+    "path": "Strzelec Burzy",
     "classId": "archer",
     "classLevel": 10,
     "name": "Grad strzał",
@@ -70,6 +75,7 @@
   },
   {
     "id": "pinning-shot",
+    "path": "Łowca",
     "classId": "archer",
     "classLevel": 10,
     "name": "Przyszpilenie",
@@ -80,10 +86,11 @@
     "kind": "strike",
     "mana": 12,
     "cooldown": 4,
-    "params": { "power": [1.0, 1.4], "stun": true }
+    "params": { "power": [1.0, 1.4], "stun": true, "stunLabel": "przyszpilony" }
   },
   {
     "id": "fireball",
+    "path": "Elementalista",
     "classId": "mage",
     "classLevel": 10,
     "name": "Kula ognia",
@@ -101,79 +108,85 @@
       "dotEffect": "burning",
       "dotChance": [0.4, 0.7],
       "dotPower": [0.15, 0.2],
-      "dotTicks": 3
+      "dotTicks": [2, 3]
     }
   },
   {
     "id": "frost-gust",
+    "path": "Druid",
     "classId": "mage",
     "classLevel": 10,
     "name": "Mroźny podmuch",
     "style": "grupa",
     "rarity": "common",
     "description": "Lodowaty wiatr smaga wszystkich wrogów i sztywni im stawy.",
-    "effect": "Zaklęcie mrozu na wszystkich wrogów za {power%} obrażeń. Każdy trafiony wykona swój następny ruch później, o połowę zwykłej przerwy.",
+    "effect": "Zaklęcie mrozu na wszystkich wrogów za {power%} obrażeń. Każdy trafiony wykona swój następny ruch później, o całą zwykłą przerwę.",
     "kind": "sweep",
     "mana": 14,
     "cooldown": 3,
-    "params": { "power": [0.6, 0.9], "category": "magical", "element": "frost", "delay": 0.5 }
+    "params": { "power": [0.4, 0.6], "category": "magical", "element": "frost", "delay": 1 }
   },
   {
     "id": "mana-shield",
+    "path": "Arkanista",
     "classId": "mage",
     "classLevel": 10,
     "name": "Osłona many",
     "style": "obrona",
     "rarity": "common",
     "description": "Mag otacza się migotliwą osłoną, którą podtrzymuje własną maną.",
-    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, osłona zaczyna pochłaniać obrażenia. Każdy pochłonięty punkt obrażeń kosztuje {cost.1} many, aż mana się skończy albo walka.",
+    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, bierze {pool%} maks. many i zamienia ją w osłonę o sile {ratio%} tej many. Osłona przyjmuje obrażenia, aż się wyczerpie, a reszta many zostaje na inne umiejętności.",
     "kind": "shield",
-    "mana": 10,
-    "params": { "below": 0.5, "cost": [3.5, 1.6] }
+    "mana": 0,
+    "params": { "below": 0.5, "pool": 0.3, "ratio": [1.0, 1.8] }
   },
   {
     "id": "prayer-of-health",
+    "path": "Uzdrowiciel",
     "classId": "cleric",
     "classLevel": 10,
     "name": "Modlitwa o zdrowie",
     "style": "leczenie",
     "rarity": "common",
     "description": "Kleryk szepcze modlitwę, a rany zaczynają się zasklepiać.",
-    "effect": "Gdy HP spadnie poniżej {below%}, leczy {heal%.1} maks. HP i dodatkowo 1 HP za każde {wisdomPerHp} punktów Mądrości.",
+    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, leczy {heal%.1} maks. HP i dodatkowo 1 HP za każde {wisdomPerHp} punktów Mądrości.",
     "kind": "heal",
     "mana": 14,
-    "cooldown": 4,
-    "params": { "below": 0.6, "heal": [0.03, 0.06], "wisdomPerHp": 10 }
+    "once": true,
+    "params": { "below": 0.6, "heal": [0.25, 0.4], "wisdomPerHp": 10 }
   },
   {
     "id": "exorcism",
+    "path": "Inkwizytor",
     "classId": "cleric",
     "classLevel": 10,
     "name": "Egzorcyzm",
     "style": "grupa",
     "rarity": "common",
     "description": "Kleryk wypowiada słowa egzorcyzmu i sakrum smaga wszystkich wrogów.",
-    "effect": "Przy kilku wrogach zaklęcie sakrum trafia każdego za {power%} obrażeń. Przy jednym wrogu to zaklęcie za {single%}.",
+    "effect": "Przy kilku wrogach zaklęcie sakrum trafia każdego za {power%} obrażeń, a przy jednym wrogu za {single%}. Każdy trafiony ma {stunChance%} szans na paraliż i traci wtedy swój najbliższy ruch.",
     "kind": "sweep",
     "mana": 12,
     "cooldown": 3,
-    "params": { "power": [0.65, 0.95], "single": [1.1, 1.55], "category": "magical", "element": "sacred" }
+    "params": { "power": [0.5, 0.75], "single": [0.9, 1.25], "category": "magical", "element": "sacred", "stunChance": [0.1, 0.2], "stunLabel": "sparaliżowany" }
   },
   {
     "id": "blessing",
+    "path": "Kapłan",
     "classId": "cleric",
     "classLevel": 10,
     "name": "Błogosławieństwo",
     "style": "wzmocnienie",
     "rarity": "common",
     "description": "Kleryk kreśli znak nad sobą i towarzyszami. Ciosy wrogów tracą impet.",
-    "effect": "Na początku walki, do jej końca: pancerz i odporności +{armor%}, obrażenia +{damage%}. Gdy dojdą towarzysze, obejmie całą drużynę.",
+    "effect": "Na początku walki, do jej końca: pancerz i odporności +{armor%}, obrażenia +{damage%}. Obejmuje całą drużynę, ale premia dzieli się na nią: we dwoje każdy dostaje 2/3 premii, we troje połowę.",
     "kind": "buff",
     "mana": 15,
-    "params": { "armor": [0.2, 0.4], "resist": [0.2, 0.4], "damage": [0.08, 0.2] }
+    "params": { "armor": [0.2, 0.4], "resist": [0.2, 0.4], "damage": [0.08, 0.2], "crowd": 0.5 }
   },
   {
     "id": "backstab",
+    "path": "Skrytobójca",
     "classId": "shadow",
     "classLevel": 10,
     "name": "Cios w plecy",
@@ -188,6 +201,7 @@
   },
   {
     "id": "poisoned-blade",
+    "path": "Truciciel",
     "classId": "shadow",
     "classLevel": 10,
     "name": "Zatrute ostrze",
@@ -201,6 +215,7 @@
   },
   {
     "id": "shadow-dance",
+    "path": "Nocny Tancerz",
     "classId": "shadow",
     "classLevel": 10,
     "name": "Taniec cieni",

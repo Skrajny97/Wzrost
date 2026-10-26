@@ -76,6 +76,14 @@
     "Osłona pochłania {absorbed}.",
     "Osłona bierze na siebie {absorbed}."
   ],
+  "guardArmor": [
+    "Pancerz rośnie o {armor}% na {turns} ruchy.",
+    "Pancerz twardnieje: +{armor}% na {turns} ruchy."
+  ],
+  "skillEnd": [
+    "{skill} przestaje działać.",
+    "{actor}: {skill} słabnie."
+  ],
   "counter": [
     "{actor} kontruje. {target} traci {damage} HP.",
     "{actor} odpowiada ciosem. {target} traci {damage} HP."
@@ -87,6 +95,7 @@
   "skillCostActive": ["Koszt: {mana} many, najwyżej co {cooldown}. ruch."],
   "skillCostStart": ["Koszt: {mana} many, na początku walki."],
   "skillCostOnce": ["Koszt: {mana} many, raz na walkę."],
+  "skillCostPool": ["Koszt: {pool} maks. many, raz na walkę."],
   "victory": ["Zwycięstwo.", "Walka skończona. Wygrana."],
   "defeat": ["{target} traci przytomność.", "Ciemność. {target} traci przytomność."],
   "escape": ["{target} ledwo uchodzi z życiem.", "{target} wycofuje się, zanim będzie za późno."],

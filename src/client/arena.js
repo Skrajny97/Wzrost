@@ -67,6 +67,9 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     const hpFill = h('div', { class: 'unit-hp-fill' });
     const hpText = h('span', { class: 'unit-hp-text' });
     const status = h('span', { class: 'unit-status' });
+    // A mana shield's points, under the HP while the shield holds.
+    const shieldFill = h('div', { class: 'unit-shield-fill' });
+    const shieldBar = h('div', { class: 'unit-shield', hidden: true }, shieldFill);
     const level = h('span', { class: 'unit-level', text: `poz. ${unit.level}` });
     // The character's head and shoulders (older reports have no look: male)
     // or the monster's sprite, with the level in its corner; without one, the
@@ -88,10 +91,11 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
           ),
       h('span', { class: 'unit-name', text: unit.name }),
       h('div', { class: 'unit-hp' }, hpFill),
+      shieldBar,
       hpText,
       status,
     );
-    cards.set(unit.id, { card, hpFill, hpText, status, unit });
+    cards.set(unit.id, { card, hpFill, hpText, status, shieldBar, shieldFill, unit });
     return card;
   }
 
@@ -139,7 +143,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     cards.get(id)?.card.classList.toggle('unit--down', down);
   }
 
-  function float(id, text, kind) {
+  function float(id, text, kind, delay = 0) {
     const entry = cards.get(id);
     if (!entry) return;
     const { x, y } = centerOf(entry.card);
@@ -154,7 +158,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
         { transform: 'translate(-50%, -8px) scale(1.15)', opacity: 1, offset: 0.2 },
         { transform: 'translate(-50%, -34px) scale(1)', opacity: 0 },
       ],
-      { duration: 1000, easing: 'ease-out' },
+      { duration: 1000, delay, easing: 'ease-out', fill: 'backwards' },
     ).then(() => bubble.remove());
   }
 
@@ -330,23 +334,61 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (status.textContent === entry.text) status.textContent = entry.before;
   }
 
-  // A mana shield's card shows how much damage it can still take; spent, the
-  // shield goes out.
-  const shields = new Map(); // unit id → the skill's name
+  // A mana shield's card shows how much damage it can still take, in words
+  // and as a bar under the HP; spent, the shield goes out.
+  const shields = new Map(); // unit id → { name, full }
   function shieldUp(event) {
-    shields.set(event.actor, event.skillName);
-    if (event.shield > 0) cards.get(event.actor).status.textContent = `${event.skillName} · ${event.shield}`;
+    const entry = cards.get(event.actor);
+    shields.set(event.actor, { name: event.skillName, full: Math.max(1, event.shield) });
+    shieldLeft(event.actor, event.shield);
+    if (event.shield > 0) entry.shieldBar.hidden = false;
   }
   function shieldLeft(id, left) {
     const entry = cards.get(id);
-    if (!shields.has(id) || !entry || left === undefined) return;
+    const shield = shields.get(id);
+    if (!shield || !entry || left === undefined) return;
     if (left > 0) {
-      entry.status.textContent = `${shields.get(id)} · ${left}`;
+      entry.status.textContent = `${shield.name} · ${left}`;
+      entry.shieldFill.style.width = `${Math.min(100, (left / shield.full) * 100)}%`;
       return;
     }
     shields.delete(id);
     entry.status.textContent = '';
+    entry.shieldBar.hidden = true;
     entry.card.classList.remove('unit--shielded');
+  }
+
+  // A guard's armour shows in the status line until it fades; the line is
+  // short, so it fits a narrow card (the skill's name was called out over it).
+  const guards = new Map(); // unit id → the text it shows
+  function guardUp(event) {
+    const text = `pancerz +${event.armor}%`;
+    guards.set(event.target, text);
+    cards.get(event.target).status.textContent = text;
+  }
+  function guardDown(event) {
+    const text = guards.get(event.target);
+    guards.delete(event.target);
+    const entry = cards.get(event.target);
+    if (entry && entry.status.textContent === text) entry.status.textContent = '';
+  }
+
+  // A fallen unit keeps no status: no burn, pin or shield on its card.
+  function fallen(id) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    held.delete(id);
+    guards.delete(id);
+    shields.delete(id);
+    entry.status.textContent = '';
+    entry.shieldBar.hidden = true;
+    entry.card.classList.remove('unit--shielded');
+  }
+
+  // An effect over time leaves the card with its last tick.
+  function effectOver(event) {
+    const entry = cards.get(event.target);
+    if (event.left === 0 && entry?.status.textContent === event.effect) entry.status.textContent = '';
   }
 
   async function show(event) {
@@ -367,12 +409,19 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       return;
     }
     if (event.kind === 'heal') {
+      if (event.armor) guardUp(event);
       await skills.heal(event);
       line();
       return;
     }
+    if (event.kind === 'fade') {
+      guardDown(event);
+      line();
+      await wait(200 / speed);
+      return;
+    }
     if (event.kind === 'stun') {
-      hold(event.target, 'przyszpilony');
+      hold(event.target, event.label ?? 'przyszpilony');
       float(event.target, 'traci ruch', 'effect');
       line();
       await flash(event.target, '#c49a6c', 'rgba(196, 154, 108, 0.3)');
@@ -452,6 +501,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       float(target.id, `−${event.damage}`, 'tick');
       if (event.absorbed) float(target.id, `osłona ${event.absorbed}`, 'absorb');
       shieldLeft(target.id, event.shield);
+      effectOver(event);
       line();
       await flash(target.id, color, 'rgba(156, 204, 101, 0.3)');
       return;
@@ -461,6 +511,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       playMoment('kill');
       playVoice(voiceOf(target), 'death');
       setHp(target.id, 0);
+      fallen(target.id);
       line();
       const card = cards.get(target.id).card;
       await animate(
@@ -482,12 +533,18 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     release(event);
     if (event.hp !== undefined && byId.has(event.target)) setHp(event.target, event.hp);
     if (event.kind === 'effect') cards.get(event.target).status.textContent = event.effect;
-    if (event.kind === 'kill') setDown(event.target, true);
+    if (event.kind === 'kill') {
+      setDown(event.target, true);
+      fallen(event.target);
+    }
     if (event.kind === 'skill' && !event.targets) cards.get(event.actor).status.textContent = event.skillName;
     if (event.kind === 'skill' && event.skill === 'mana-shield') cards.get(event.actor).card.classList.add('unit--shielded');
     if (event.kind === 'skill' && event.shield !== undefined) shieldUp(event);
     if (event.kind === 'hit' || event.kind === 'crit' || event.kind === 'tick') shieldLeft(event.target, event.shield);
-    if (event.kind === 'stun') hold(event.target, 'przyszpilony');
+    if (event.kind === 'tick') effectOver(event);
+    if (event.kind === 'heal' && event.armor) guardUp(event);
+    if (event.kind === 'fade') guardDown(event);
+    if (event.kind === 'stun') hold(event.target, event.label ?? 'przyszpilony');
     if (event.kind === 'slow') for (const id of event.targets) hold(id, 'spowolniony');
     log.append(logLine(event));
   }
@@ -504,6 +561,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     cancelAll();
     held.clear();
     shields.clear();
+    guards.clear();
     index = 0;
     log.replaceChildren();
     banner.classList.remove('arena-banner--shown');
@@ -511,6 +569,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       setHp(unit.id, unit.hp);
       setDown(unit.id, unit.hp <= 0);
       cards.get(unit.id).status.textContent = '';
+      cards.get(unit.id).shieldBar.hidden = true;
       cards.get(unit.id).card.classList.remove('unit--shielded');
     }
   }
