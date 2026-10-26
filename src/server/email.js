@@ -43,7 +43,7 @@ export async function sendLink(env, { userId, login, email }, origin, now) {
     .first();
   if (recent.last !== null && now - recent.last < RESEND_MS) {
     const seconds = Math.ceil((RESEND_MS - (now - recent.last)) / 1000);
-    throw new ApiError(429, 'email_wait', `Link poszedł przed chwilą. Sprawdź skrzynkę, także folder spam, albo spróbuj ponownie za ${seconds} s.`, {
+    throw new ApiError(429, 'email_wait', `Link został już wysłany. Sprawdź skrzynkę, także folder spam, albo spróbuj ponownie za ${seconds} s.`, {
       'Retry-After': String(seconds),
     });
   }
