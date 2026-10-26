@@ -1749,6 +1749,7 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
     - Kwestia `wallet` stoi tuż przed kwestią o ustawieniach. Podświetla złoto i Punkty Systemu w górnym pasku, a stuknięcie w nie albo „Dalej” rozwija listę. Lista zostaje na ekranie 2,5 sekundy, zanim przyjdzie kwestia o ustawieniach (`delay`).
     - Postać o wyglądzie kobiecym słyszy „Sama zobacz.”. Przy wpisaniu: półpauzy w miejscu dywizów i kropka na końcu.
     - Stuknięcie nie zmienia ekranu, więc ta kwestia „lead” zostaje zapamiętana jak karta (`once` w `data/tutorial.json`). Pokazuje się tylko we wprowadzeniu, nie postaciom, które już je skończyły.
+    - Nagranie: po trzy wersje obu kwestii z tym samym głosem i modelem co reszta wprowadzenia (930 kredytów ElevenLabs), przycięte i wyrównane jak reszta (−18 LUFS, mono 56 kb/s). Żadna nie urywa ostatniego słowa. W grze są wersja 1 kwestii męskiej i wersja 3 żeńskiej, najbliższe tonem i tempem kwestiom już nagranym. Pozostałe czekają na gałęzi `art-drafts`.
 
 ## Wersja testowa i Zielarstwo (26.10.2026)
 

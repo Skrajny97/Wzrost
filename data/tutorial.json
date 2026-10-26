@@ -334,8 +334,10 @@
       "kind": "lead",
       "once": true,
       "text": ["Przy okazji – w tym miejscu możesz sprawdzić swój stan złota i Punkty Systemu, a po kliknięciu – resztę zasobów wraz z Punktami Czasu. Sam zobacz."],
+      "voice": "audio/narration/wallet.mp3",
       "female": {
-        "text": ["Przy okazji – w tym miejscu możesz sprawdzić swój stan złota i Punkty Systemu, a po kliknięciu – resztę zasobów wraz z Punktami Czasu. Sama zobacz."]
+        "text": ["Przy okazji – w tym miejscu możesz sprawdzić swój stan złota i Punkty Systemu, a po kliknięciu – resztę zasobów wraz z Punktami Czasu. Sama zobacz."],
+        "voice": "audio/narration/wallet-female.mp3"
       }
     },
     {
