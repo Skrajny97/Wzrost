@@ -1,0 +1,25 @@
+{
+  "id": "campfire-3",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a big round stone hearth with tall bright magical flames forming a friendly fire spirit with a face and arms, carved log benches around it and floating glowing sparks",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 534843607,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019456,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 63.7,
+    "request_id": "d9977cc8-06c7-4544-99c6-d605da66b7ec",
+    "outputs_retained_until": 1793105823
+  }
+}

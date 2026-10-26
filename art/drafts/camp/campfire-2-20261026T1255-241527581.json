@@ -1,0 +1,25 @@
+{
+  "id": "campfire-2",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a campfire in a stone ring with a cooking pot on an iron tripod, two log benches and bright orange flames with a tiny smiling fire spirit face",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 241527581,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019422,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 63.76,
+    "request_id": "e71b191a-d963-445a-8268-d6ff7eb3a141",
+    "outputs_retained_until": 1793105771
+  }
+}
