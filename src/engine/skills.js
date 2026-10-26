@@ -73,9 +73,9 @@ export function learnBlock(character, skillId, content) {
   if (known.length >= paths) return { code: 'chosen', message: 'Masz już dwie ścieżki tego wyboru. Trzecia jest zamknięta.' };
   if (known.length > 0) {
     if (character.classLevel < secondClassLevel) {
-      return { code: 'class_level', message: `Drugą umiejętność dobierzesz od poziomu klasy ${secondClassLevel}.` };
+      return { code: 'class_level', message: `Ścieżkę poboczną dobierzesz od poziomu klasy ${secondClassLevel}.` };
     }
-    if (skillPoints(character, content).free < 1) return { code: 'no_points', message: 'Druga umiejętność kosztuje 1 Punkt Umiejętności.' };
+    if (skillPoints(character, content).free < 1) return { code: 'no_points', message: 'Ścieżka poboczna kosztuje 1 Punkt Umiejętności.' };
   }
   return null;
 }
