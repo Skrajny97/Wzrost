@@ -99,7 +99,7 @@
         "seconds": 1.0
       },
       "skill-fireball": {
-        "text": "a fireball spell, a roaring rush of flame thrown forward and a crackling fiery burst, fantasy magic, no music",
+        "text": "a fireball spell: a bright crackling whoosh of flame with hissing, popping sparks, high and sharp, fantasy magic, no deep rumble, no music",
         "seconds": 1.5
       },
       "skill-frost-gust": {
@@ -107,7 +107,7 @@
         "seconds": 1.5
       },
       "skill-mana-shield": {
-        "text": "a magic energy shield forming around a mage, a deep humming arcane bubble rising with a soft crystalline shimmer, fantasy, no music",
+        "text": "a magic shield forms around a mage: a bright crystalline shimmer and a rising glassy chime, airy and high, fantasy, no deep hum, no music",
         "seconds": 1.5
       },
       "skill-prayer-of-health": {
@@ -123,7 +123,7 @@
         "seconds": 1.5
       },
       "skill-backstab": {
-        "text": "a stealthy dagger strike from the shadows, a quick soft swish and a sharp stab, close up, dry, no music",
+        "text": "a stealthy dagger stab: a fast thin high swish and a sharp metallic stab, close up, dry, no thump, no bass, no music",
         "seconds": 1.0
       },
       "skill-poisoned-blade": {
@@ -131,7 +131,7 @@
         "seconds": 1.2
       },
       "skill-shadow-dance": {
-        "text": "shadow magic, a figure blurring into shadows with quick airy whooshes and a dark whispery swirl, fantasy, no music",
+        "text": "shadow magic: quick light airy whooshes and a soft whispery swish, high and breathy, fantasy, no deep rumble, no music",
         "seconds": 1.5
       }
     }
