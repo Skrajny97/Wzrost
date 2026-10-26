@@ -26,7 +26,7 @@ import {
 import { countEvents, createRng } from './rng.js';
 import { say } from './text.js';
 import { classUnlockMessages, unlockMessages } from './unlocks.js';
-import { skillPoints } from './skills.js';
+import { evolutionBlock, skillPoints } from './skills.js';
 
 // Value of [minutes, value] pairs at `minutes`, rising with the logarithm of
 // the time between pairs.
@@ -382,17 +382,21 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
 
 // Applies the hunt's XP to the character. Solo, all of the combat contribution
 // is the player's, so class XP equals the XP from fights. Fainting costs only
-// character XP, never a level, and never class XP.
-export function applyHunt(character, hunt, content) {
+// character XP, never a level, and never class XP. The class waits at its
+// first evolution level while the skills are not ready for it (the second
+// path and the Skill Points, evolutionBlock), and its XP adds up there until
+// then. `evolutionGate: false` lets the progression simulator measure a skill
+// alone, past the level where a player would need a second one.
+export function applyHunt(character, hunt, content, { evolutionGate = true } = {}) {
   const maxLevel = content.balance.progression.maxLevel;
+  const evolution = content.balance.progression.classEvolutionLevels[0];
+  const block = evolutionGate ? evolutionBlock(character, content) : null;
+  const waits = Boolean(block);
   const next = gainXp(character.level, character.xp, hunt.xp, (level) => xpToNext(level, content), maxLevel);
-  const nextClass = gainXp(
-    character.classLevel,
-    character.classXp,
-    hunt.xp,
-    (level) => classXpToNext(level, content),
-    maxLevel,
-  );
+  const toNextClass = (level) => classXpToNext(level, content);
+  const nextClass = gainXp(character.classLevel, character.classXp, hunt.xp, toNextClass, waits ? evolution : maxLevel, waits);
+  // The class had XP for a level past its evolution level and waits instead.
+  const held = waits && gainXp(character.classLevel, character.classXp, hunt.xp, toNextClass, maxLevel).level > nextClass.level;
   const penalty = hunt.result === 'fainted' ? faintPenalty(next.level, next.xp, content) : 0;
 
   // A few levels at once make one line each for the character and the class,
@@ -421,6 +425,7 @@ export function applyHunt(character, hunt, content) {
     const skillGain = skillPoints({ classLevel: nextClass.level }, content).earned - skillPoints({ classLevel: character.classLevel }, content).earned;
     if (skillGain > 0) messages.push(say(content.texts, 'skillPoints', nextClass.level, { points: skillGain }));
   }
+  if (held) messages.push(say(content.texts, block.code === 'second_path' ? 'classWaitsPath' : 'classWaitsPoints', 0, { className, level: evolution }));
   // A new level of either kind heals fully (hpAfterHunt).
   const levelled = levels > 0 || classLevels > 0;
   if (levelled) messages.push(say(content.texts, 'levelHeal', 0, {}));

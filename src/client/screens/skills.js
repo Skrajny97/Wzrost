@@ -2,9 +2,10 @@
 // three skills of its class, for good: its main development path. From the
 // next class level it may add a second one for a Skill Point, which closes
 // the path left. Each path's name stands over its skill. Skill Points from
-// later class levels raise the learned skills, up to level 20. The server
-// sends every card ready to show (skillsView in the engine); a tap on a
-// learned skill opens its card.
+// later class levels raise the learned skills, up to level 20. Both paths and
+// the points are due by the first evolution (class level 50): until then the
+// class waits there. The server sends every card ready to show (skillsView
+// in the engine); a tap on a learned skill opens its card.
 
 import { fill, h } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
@@ -38,9 +39,15 @@ export function mountSkills(container) {
       return;
     }
     const busy = Boolean(character.activity);
+    const evolution = view.evolution ?? {};
+    const waiting = evolution.need && character.classLevel >= evolution.level;
     fill(
       container,
       heading,
+      waiting &&
+        systemPanel(
+          `Klasa czeka na ${evolution.level}. poziomie, u progu ewolucji. Urośnie dalej, gdy ${evolution.need === 'second_path' ? 'wybierzesz drugą ścieżkę' : 'rozdasz Punkty Umiejętności'}. Zdobyte XP klasy nie przepada.`,
+        ),
       busy && systemPanel('Postać jest na wyprawie. Umiejętności zmienisz po jej powrocie.'),
       view.pools.map((pool) => poolSection(pool, view, busy)),
     );
@@ -65,12 +72,17 @@ export function mountSkills(container) {
             : secondOpen
               ? `Drugą ścieżkę dobierzesz od poziomu klasy ${view.secondLevel} za 1 Punkt Umiejętności. Wtedy ostatnia ścieżka się zamknie.`
               : null;
+    // The deadline, while the second path is open and the class not yet
+    // waiting for it.
+    const evolutionLevel = view.evolution?.level;
+    const deadline =
+      secondOpen && evolutionLevel && state.character.classLevel < evolutionLevel && `Drugą ścieżkę wybierz najpóźniej na ${evolutionLevel}. poziomie klasy, przed ewolucją.`;
     // Points to spend, told unless the line above already tells them.
     const pointsNote = known > 0 && view.points > 0 && raisable && !(secondNow && view.points > 0);
     return h(
       'section',
       { class: 'skill-paths', 'aria-label': 'Ścieżki rozwoju' },
-      intro && systemPanel(intro),
+      intro && systemPanel(deadline ? `${intro} ${deadline}` : intro),
       pointsNote && systemPanel(`Masz ${skillPoints(view.points)}. Dotknij umiejętności, żeby dodać punkt.`),
       pool.options.map((skill) => pathSection(skill, pool, view, busy)),
     );

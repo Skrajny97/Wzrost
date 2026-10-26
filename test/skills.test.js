@@ -2,7 +2,10 @@ import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
 import {
+  applyHunt,
+  classXpToNext,
   createRng,
+  evolutionBlock,
   learnBlock,
   monsterCombatant,
   playerCombatant,
@@ -106,6 +109,51 @@ describe('skills', () => {
     assert.match(chosen.pools[0].options[0].next, /^Cios za 14\d% obrażeń/);
     assert.equal(skillsView(warrior(11, { 'power-strike': 2 }), content).ready, false);
     assert.equal(skillsView(warrior(9), content).ready, false);
+  });
+
+  test('by class level 50, the first evolution, both paths are chosen and the Skill Points spent; until then the class waits there and keeps its XP', () => {
+    const warrior = (classLevel, skills, classXp = 0) => ({ classId: 'warrior', level: 50, xp: 0, classLevel, classXp, points: {}, skills });
+    assert.equal(evolutionBlock(warrior(12, {}), content).code, 'second_path');
+    assert.equal(evolutionBlock(warrior(30, { 'power-strike': 20 }), content).code, 'second_path');
+    assert.equal(evolutionBlock(warrior(30, { 'power-strike': 10, unyielding: 1 }), content).code, 'skill_points');
+    // Counted with the points of level 50: at 48 with none left, those of 49
+    // and 50 are still due.
+    assert.equal(skillPoints(warrior(48, { 'power-strike': 20, unyielding: 19 }), content).free, 0);
+    assert.equal(evolutionBlock(warrior(48, { 'power-strike': 20, unyielding: 19 }), content).code, 'skill_points');
+    // A point that no skill can take (both at 20) does not hold the class,
+    // and a class already past 50 waits for nothing.
+    assert.equal(evolutionBlock(warrior(50, { 'power-strike': 20, unyielding: 20 }), content), null);
+    assert.equal(evolutionBlock(warrior(60, { 'power-strike': 20 }), content), null);
+
+    const toNext = (level) => classXpToNext(level, content);
+    const alone = warrior(49, { 'power-strike': 20 });
+    const gained = toNext(49) + toNext(50) + toNext(51) + 7;
+    const held = applyHunt(alone, { xp: gained, result: 'success' }, content);
+    assert.equal(held.classLevel, 50);
+    assert.equal(held.classXp, gained - toNext(49));
+    assert.ok(held.messages.includes('Wojownik: klasa czeka na 50. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach wybierzesz drugą ścieżkę. Zdobyte XP klasy nie przepada.'));
+    assert.deepEqual(skillsView({ ...alone, classLevel: 50 }, content).evolution, { level: 50, need: 'second_path' });
+    // Waiting, it keeps adding up and says so after each exploration.
+    const still = applyHunt({ ...alone, classLevel: 50, classXp: held.classXp }, { xp: 100, result: 'success' }, content);
+    assert.equal(still.classLevel, 50);
+    assert.equal(still.classXp, held.classXp + 100);
+    assert.ok(still.messages.some((message) => message.includes('klasa czeka')));
+    // Ready, the XP it kept carries it on with the next exploration.
+    const ready = { ...alone, classLevel: 50, classXp: held.classXp, skills: { 'power-strike': 20, unyielding: 20 } };
+    assert.deepEqual(skillsView(ready, content).evolution, { level: 50, need: null });
+    const after = applyHunt(ready, { xp: 0, result: 'success' }, content);
+    assert.equal(after.classLevel, 52);
+    assert.equal(after.classXp, 7);
+    assert.ok(!after.messages.some((message) => message.includes('klasa czeka')));
+    // The points: the same wait, with its own words.
+    const points = applyHunt(warrior(49, { 'power-strike': 20, unyielding: 10 }), { xp: toNext(49) + toNext(50), result: 'success' }, content);
+    assert.equal(points.classLevel, 50);
+    assert.ok(points.messages.some((message) => message.includes('gdy w Umiejętnościach rozdasz Punkty Umiejętności')));
+    // Below 50 a class grows as before, and one past it is not held.
+    assert.equal(applyHunt(warrior(30, { 'power-strike': 20 }), { xp: toNext(30), result: 'success' }, content).classLevel, 31);
+    assert.equal(applyHunt(warrior(60, { 'power-strike': 20 }), { xp: toNext(60), result: 'success' }, content).classLevel, 61);
+    // The progression simulator may measure a skill alone, without the wait.
+    assert.equal(applyHunt(alone, { xp: gained, result: 'success' }, content, { evolutionGate: false }).classLevel, 52);
   });
 
   test('mana grows with each character level, so every class can use its skills', () => {

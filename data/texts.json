@@ -96,6 +96,8 @@
   "skillCostStart": ["Koszt: {mana} many, na początku walki."],
   "skillCostOnce": ["Koszt: {mana} many, raz na walkę."],
   "skillCostPool": ["Koszt: {pool} maks. many, raz na walkę."],
+  "classWaitsPath": ["{className}: klasa czeka na {level}. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach wybierzesz drugą ścieżkę. Zdobyte XP klasy nie przepada."],
+  "classWaitsPoints": ["{className}: klasa czeka na {level}. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach rozdasz Punkty Umiejętności. Zdobyte XP klasy nie przepada."],
   "victory": ["Zwycięstwo.", "Walka skończona. Wygrana."],
   "defeat": ["{target} traci przytomność.", "Ciemność. {target} traci przytomność."],
   "escape": ["{target} ledwo uchodzi z życiem.", "{target} wycofuje się, zanim będzie za późno."],

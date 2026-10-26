@@ -82,6 +82,16 @@ export function mountStats(container) {
     );
   }
 
+  // Before the first evolution, after it, or the class waiting at it for
+  // its skills (evolutionBlock in the engine).
+  function evolutionHint(character, evolution) {
+    if (character.classLevel < evolution) return `PIERWSZA EWOLUCJA: POZ. KLASY ${evolution}`;
+    const need = character.skills?.evolution?.need;
+    if (need === 'second_path') return 'KLASA CZEKA: WYBIERZ DRUGĄ ŚCIEŻKĘ';
+    if (need === 'skill_points') return 'KLASA CZEKA: ROZDAJ PUNKTY UMIEJĘTNOŚCI';
+    return 'EWOLUCJA KLASY: WKRÓTCE';
+  }
+
   function levelsCard(character) {
     const evolution = state.content.classEvolutionLevels[0];
     const professions = unlockInfo('professions');
@@ -90,8 +100,7 @@ export function mountStats(container) {
       { class: 'card levels', 'aria-label': 'Poziomy' },
       levelRow('Poziom postaci', character.level, character.xp, character.xpToNext, 'level',
         `DO POZ. ${character.level + 1}: OK. ${formatHours(character.hoursToNext).toUpperCase()} EKSPLORACJI`),
-      levelRow(`Klasa · ${character.className}`, character.classLevel, character.classXp, character.classXpToNext, 'class',
-        character.classLevel < evolution ? `PIERWSZA EWOLUCJA: POZ. KLASY ${evolution}` : 'EWOLUCJA KLASY: WKRÓTCE'),
+      levelRow(`Klasa · ${character.className}`, character.classLevel, character.classXp, character.classXpToNext, 'class', evolutionHint(character, evolution)),
       h(
         'div',
         { class: 'level-professions' },

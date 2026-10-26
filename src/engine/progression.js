@@ -68,7 +68,10 @@ export function classXpToNext(level, content) {
   return Math.round(xpToNext(level, content) * content.balance.progression.classXpFactor);
 }
 
-export function gainXp(level, xp, gained, toNext, maxLevel) {
+// `hold`: at maxLevel the XP keeps adding up instead of ending at 0, so a
+// class waiting at its evolution level loses none of it: the levels come
+// with the next XP after the wait.
+export function gainXp(level, xp, gained, toNext, maxLevel, hold = false) {
   let levels = 0;
   let current = xp + gained;
   while (level < maxLevel && current >= toNext(level)) {
@@ -76,7 +79,7 @@ export function gainXp(level, xp, gained, toNext, maxLevel) {
     level += 1;
     levels += 1;
   }
-  return { level, xp: level >= maxLevel ? 0 : current, levels };
+  return { level, xp: level >= maxLevel && !hold ? 0 : current, levels };
 }
 
 // Half of the XP needed for the current level, but never below the start of it.

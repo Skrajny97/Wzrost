@@ -4,7 +4,7 @@
   "type": "object",
   "required": [
     "fightStart", "eliteStart", "toughStart", "hit", "crit", "dodge", "effectApplied", "effectTick", "kill", "skillHit", "skillCrit", "skillDodge", "skillUse", "skillHeal", "stun", "slow", "slowOne", "absorbed", "counter", "counterCrit", "skillPoints", "skillCostActive", "skillCostStart", "skillCostOnce", "victory", "defeat",
-    "escape", "draw", "recover", "findGold", "findChest", "findResource", "gathered", "findNothing", "findTime", "materials", "eliteChest", "firstChest", "levelUp", "classLevelUp", "classLevelUpLocked", "levelHeal", "faintPenalty", "bagOverflow", "autoEquip", "lengths", "result"
+    "escape", "draw", "recover", "findGold", "findChest", "findResource", "gathered", "findNothing", "findTime", "materials", "eliteChest", "firstChest", "levelUp", "classLevelUp", "classLevelUpLocked", "classWaitsPath", "classWaitsPoints", "levelHeal", "faintPenalty", "bagOverflow", "autoEquip", "lengths", "result"
   ],
   "properties": {
     "lengths": {

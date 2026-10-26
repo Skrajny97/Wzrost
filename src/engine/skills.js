@@ -80,6 +80,31 @@ export function learnBlock(character, skillId, content) {
   return null;
 }
 
+// What the skills still need before the class's first evolution (the first
+// of balance.progression.classEvolutionLevels), or null when nothing: every
+// milestone below it with `paths` skills known (code second_path), and no
+// Skill Point left that a known skill could take (skill_points). Counted with
+// the points the character has at that level, so a report of several class
+// levels cannot slip past it. Until then the class waits at that level
+// (applyHunt); a class already past it waits for nothing.
+export function evolutionBlock(character, content) {
+  const level = content.balance.progression.classEvolutionLevels[0];
+  if (character.classLevel > level) return null;
+  const { maxLevel, paths } = content.balance.skills;
+  const learned = character.skills ?? {};
+  const pools = [...new Set(skillsOfClass(character.classId, content).map((skill) => skill.classLevel))].filter((classLevel) => classLevel < level);
+  for (const classLevel of pools) {
+    const pool = skillsOfClass(character.classId, content).filter((skill) => skill.classLevel === classLevel);
+    if (knownOf(pool, learned).length < Math.min(paths, pool.length)) {
+      return { code: 'second_path' };
+    }
+  }
+  const { free } = skillPoints({ ...character, classLevel: Math.max(character.classLevel, level) }, content);
+  const raisable = Object.entries(learned).some(([id, skillLevel]) => content.skillsById[id] && skillLevel < maxLevel);
+  if (free > 0 && raisable) return { code: 'skill_points' };
+  return null;
+}
+
 // Why a learned skill cannot take a point, or null when it can.
 export function raiseBlock(character, skillId, content) {
   const level = character.skills?.[skillId];
@@ -143,7 +168,9 @@ export function skillView(skill, level, content) {
 // second waits for its class level), points (the second waits for a free
 // Skill Point), closed (two are known, this one is shut) or locked (the
 // milestone's class level is not reached). `ready` is true when there is
-// something to do there: a path to pick or a point to spend.
+// something to do there: a path to pick or a point to spend. `evolution`:
+// the first evolution's class level and `need`, what the skills still need
+// before it (evolutionBlock's code, or null).
 export function skillsView(character, content) {
   const learned = character.skills ?? {};
   const points = skillPoints(character, content);
@@ -169,10 +196,12 @@ export function skillsView(character, content) {
     };
   });
   const raisable = Object.entries(learned).some(([id, level]) => content.skillsById[id] && level < maxLevel);
+  const block = evolutionBlock(character, content);
   return {
     unlockLevel: content.balance.skills.unlockClassLevel,
     secondLevel: secondClassLevel,
     paths,
+    evolution: { level: content.balance.progression.classEvolutionLevels[0], need: block?.code ?? null },
     points: points.free,
     pools,
     ready: pools.some((pool) => pool.options.some((skill) => skill.state === 'pick')) || (points.free > 0 && raisable),

@@ -1497,7 +1497,7 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
     - walka będzie musiała przyjmować przywołane stwory na wolne miejsca drużyny.
 
     Zapis jest w dokumencie projektowym, przy ewolucjach.
-4. **Druga ścieżka bez górnej granicy.** Pytanie o granicę 50. poziomu okazało się niejasne, więc zostaje najprostsze rozwiązanie: drugą umiejętność można dobrać w każdej chwili od 11. poziomu klasy.
+4. **Druga ścieżka bez górnej granicy.** Pytanie o granicę 50. poziomu okazało się niejasne, więc zostaje najprostsze rozwiązanie: drugą umiejętność można dobrać w każdej chwili od 11. poziomu klasy. (Zmienione niżej, w sekcji „Umiejętności gotowe przed pierwszą ewolucją”.)
 
 ## Drugi wybór dźwięków (26.10.2026)
 
@@ -1508,3 +1508,17 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
 2. **Celny strzał nagrany raz jeszcze** (autor: „Brzmi jak pisk”). To teraz samo głuche uderzenie strzały w tarczę, bez świstu.
     - Przy wersji z 07:43 świst brzmiał jak pisk: jej dźwięk skupiał się wokół 3 kHz. Nowa skupia się wokół 0,7–0,9 kHz.
     - W grze jest wersja 5, a na stronie odsłuchu są 5 i 6. Koszt: 40 kredytów ElevenLabs.
+
+## Umiejętności gotowe przed pierwszą ewolucją (26.10.2026)
+
+Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez ewolucję. Dlatego najpóźniej na 50. poziomie trzeba wybrać drugą umiejętność i rozdać zaległe Punkty Umiejętności. Ta zasada zastępuje punkt 4 z sekcji o Dzienniku.
+
+1. **Klasa czeka na 50. poziomie** (`evolutionBlock` w `src/engine/skills.js`, `applyHunt`). Klasa nie przechodzi 50. poziomu, dopóki postać nie ma drugiej ścieżki albo ma punkty, które przyjęłaby znana umiejętność.
+    - Zdobyte XP klasy nie przepada, tylko odkłada się na 50. poziomie. Gdy umiejętności są gotowe, następna wyprawa przenosi klasę o wszystkie odłożone poziomy. To najprostsze rozwiązanie, które nie karze gracza za jedną długą wyprawę.
+    - Punkty liczą się tak, jak na 50. poziomie. Postać na 48. poziomie bez wolnych punktów i tak zatrzyma się na 50., żeby rozdać punkty z 49. i 50. poziomu. Jedna wyprawa nie przeskoczy więc progu.
+    - Punkt, którego nie przyjmie żadna umiejętność, nie zatrzymuje klasy. Tak zostaje jeden punkt z 50. poziomu, gdy obie umiejętności mają 20. poziom.
+    - Klasa, która już przeszła 50. poziom, nie czeka.
+2. **Gracz wie o tym wcześniej.**
+    - Dopóki druga ścieżka jest otwarta, w Umiejętnościach stoi: „Drugą ścieżkę wybierz najpóźniej na 50. poziomie klasy, przed ewolucją.”
+    - Gdy klasa czeka, mówią o tym trzy miejsca: panel Systemu w Umiejętnościach, wiersz klasy w Statystykach („KLASA CZEKA: WYBIERZ DRUGĄ ŚCIEŻKĘ” albo „KLASA CZEKA: ROZDAJ PUNKTY UMIEJĘTNOŚCI”) i komunikat Systemu w każdym raporcie z wyprawy (`classWaitsPath`, `classWaitsPoints` w `data/texts.json`).
+3. **Symulator postępów** stosuje tę zasadę do wariantów z dwiema umiejętnościami. Warianty z jedną umiejętnością albo bez nich mierzą samą umiejętność, bez czekania. Na 80 przebiegach pary mają te same czasy co przed zmianą: wojownik 37,3–39,3 h, łucznik 45,3–48,0 h do 50. poziomu postaci.

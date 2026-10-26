@@ -20,7 +20,9 @@
 //   the class (skill: 0, 1 or 2): learned at the class level that opens them.
 //   A second one (second: 0, 1 or 2) is learned as soon as it may be, for a
 //   point. Every Skill Point goes at once into the learned skill with the
-//   lower level, the first one on a tie.
+//   lower level, the first one on a tie. The class waits at its first
+//   evolution level for the second path only when the policy names one: one
+//   skill or none measures the skill alone (applyHunt's evolutionGate).
 
 import * as engine from '../../src/engine/index.js';
 import { loadData } from '../validate-data.mjs';
@@ -317,7 +319,7 @@ export function runCharacter(classId, runIndex, content, policyIn = {}) {
     camp.advanceTo(now, character);
 
     // ---- claim (finishHunt)
-    const applied = engine.applyHunt(character, hunt, content);
+    const applied = engine.applyHunt(character, hunt, content, { evolutionGate: policy.second !== null });
     character.level = applied.level;
     character.xp = applied.xp;
     character.classLevel = applied.classLevel;
