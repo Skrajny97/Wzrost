@@ -1,0 +1,25 @@
+{
+  "id": "sawmill-3",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a large two-storey timber sawmill with a big blue water wheel, a red shingle roof, a long saw frame cutting a log, tall stacks of golden planks and a loaded cart",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 375830404,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019536,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 63.52,
+    "request_id": "9e01aeb4-459e-41a7-ac6e-bd6079973f7b",
+    "outputs_retained_until": 1793105915
+  }
+}

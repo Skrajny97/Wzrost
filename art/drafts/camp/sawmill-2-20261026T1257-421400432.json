@@ -1,0 +1,25 @@
+{
+  "id": "sawmill-2",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a small open sawmill shed built of fresh pale yellow pine planks with a green turf roof, a saw bench with a log and neat stacks of yellow planks",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 421400432,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019514,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 63.58,
+    "request_id": "2c612d33-4e08-4869-8db2-7e0386172507",
+    "outputs_retained_until": 1793105888
+  }
+}
