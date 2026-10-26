@@ -204,6 +204,50 @@ describe('items', () => {
     assert.equal(itemName(generateItem({ baseId: 'bow', level: 1 }, rng, content), content), 'Łuk');
   });
 
+  test('the creatures living where an item was found name its affixes', () => {
+    const rng = createRng('afiksy miejsca');
+    for (const area of content.areas) {
+      const living = new Set(areaDangers(area, content).map((danger) => danger.monsterId));
+      for (let i = 0; i < 200; i++) {
+        const item = randomItem(area.maxLevel, rng, content, { rarityId: 'legendary', area });
+        for (const affix of item.affixes) assert.ok(living.has(affix.monster), `${area.name}: ${affix.monster}`);
+      }
+    }
+    // The author's find: no Fokus Puszczyka from Skraj Wiatrołomów, where no
+    // tawny owl lives.
+    const edge = content.areasById['windfalls-edge'];
+    const names = Array.from({ length: 400 }, () => itemName(generateItem({ baseId: 'focus', level: 5, rarityId: 'unique', area: edge }, rng, content), content));
+    assert.ok(!names.some((name) => name.includes('Puszczyk')));
+    assert.ok(names.some((name) => name.includes('Wilka')));
+  });
+
+  test('the place only names the affixes: what they give rolls as anywhere', () => {
+    for (const area of content.areas) {
+      const anywhere = generateItem({ baseId: 'ring', level: 20, rarityId: 'divine' }, createRng(`ten sam ${area.id}`), content);
+      const here = generateItem({ baseId: 'ring', level: 20, rarityId: 'divine', area }, createRng(`ten sam ${area.id}`), content);
+      assert.deepEqual(
+        here.affixes.map(({ monster, ...affix }) => affix),
+        anywhere.affixes,
+      );
+    }
+  });
+
+  test('a creature names one affix of an item while the place has others', () => {
+    const rng = createRng('jeden stwór');
+    const edge = content.areasById['windfalls-edge'];
+    for (let i = 0; i < 400; i++) {
+      const item = generateItem({ baseId: 'helmet', level: 5, rarityId: 'epic', area: edge }, rng, content);
+      const creatures = item.affixes.map((affix) => affix.monster);
+      assert.equal(new Set(creatures).size, creatures.length);
+    }
+  });
+
+  test('an item found before keeps the names of its affixes', () => {
+    const old = (affixes) => itemName({ base: 'focus', affixes: affixes.map(([id, kind]) => ({ id, kind, stat: 'wisdom', value: 3 })) }, content);
+    assert.equal(old([['owl', 'prefix'], ['leshy', 'suffix']]), 'Puszczykowy Fokus Puszczyka');
+    assert.equal(old([['mire', 'suffix']]), 'Fokus Topieli');
+  });
+
   test('a later talisman of the family drops up to its class level, fits from it, and is stronger', () => {
     const rng = createRng('talizmany');
     const talismans = (maxClassLevel, count = 400) => {
@@ -1823,6 +1867,20 @@ describe('quests from the narrator', () => {
         .map((item) => item.base);
     assert.ok(!talismans(9).includes('holed-stone'));
     assert.ok(talismans(10).includes('holed-stone'));
+  });
+
+  test('the creatures of the place the quests are about name the affixes in the weekly chest', () => {
+    const area = questArea({ classLevel: 1 }, content);
+    const living = new Set(areaDangers(area, content).map((danger) => danger.monsterId));
+    let affixes = 0;
+    for (let i = 0; i < 200; i++) {
+      const item = chestItem({ level: 30, classId: 'cleric', classLevel: 1 }, [], createRng(`skrzynia-miejsca-${i}`), content);
+      for (const affix of item.affixes) {
+        assert.ok(living.has(affix.monster), affix.monster);
+        affixes += 1;
+      }
+    }
+    assert.ok(affixes > 100);
   });
 
   test('quests read in Polish, with the noun to go with the number', () => {

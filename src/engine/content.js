@@ -22,9 +22,24 @@ function areasOf(region) {
   }));
 }
 
+// The creatures living in an area, as on its list of dangers (areaDangers):
+// those of its encounters, its elite and its champion.
+const creaturesOf = (area) =>
+  new Set([...area.encounters, ...area.tough].flatMap((encounter) => encounter.monsters).concat(area.elite ?? [], area.champion ?? []));
+
 export function buildContent(raw) {
-  const { prefixes, suffixes } = raw.affixes;
-  const regions = raw.regions.map((region) => ({ ...region, areas: areasOf(region) }));
+  const { prefixes, suffixes, names } = raw.affixes;
+  // An item found in an area takes the names of its affixes from the
+  // creatures living there: a prefix from those with an adjective, a suffix
+  // from any of them.
+  const affixNames = (creatures) => {
+    const here = names.filter((name) => creatures.has(name.monster));
+    return { prefix: here.filter((name) => name.prefix), suffix: here };
+  };
+  const regions = raw.regions.map((region) => ({
+    ...region,
+    areas: areasOf(region).map((area) => ({ ...area, affixNames: affixNames(creaturesOf(area)) })),
+  }));
   const areas = regions.flatMap((region) => region.areas);
   return {
     stats: raw.stats,
@@ -45,6 +60,7 @@ export function buildContent(raw) {
     prefixes,
     suffixes,
     affixesById: byId([...prefixes, ...suffixes]),
+    affixNamesByMonster: Object.fromEntries(names.map((name) => [name.monster, name])),
     monstersById: byId(raw.monsters),
     regions,
     regionsById: byId(regions),

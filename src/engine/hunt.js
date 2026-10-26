@@ -213,9 +213,10 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
   // A later base of a family drops where the levels of the place reach the
   // class level it asks for, whatever the character's own: the Otoczak (from
   // class level 10) not in Skraj Wiatrołomów (1–5), but from Lisie Jary
-  // (6–10) on.
+  // (6–10) on. The place's creatures name the affixes: no Puszczyka in
+  // Skraj Wiatrołomów, where no tawny owl lives.
   const filled = new Set(equipped.map((item) => item.slot));
-  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel };
+  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area };
   const hpStart = player.hp;
   let hpNow = player.hp;
   let result = 'success';

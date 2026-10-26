@@ -2,13 +2,17 @@
 // and rarity. The base always gets the budget of the lowest rarity, so a rarer
 // item is never weaker at its core; the affixes share what the rarity adds.
 // Names follow the Gladiatus pattern "Prefix Base Suffix", with the prefix
-// agreeing with the base's grammatical gender. The Kowadło in the camp
+// agreeing with the base's grammatical gender. The names of the affixes come
+// from the creatures living where the item was found, and only name them:
+// what an affix gives rolls the same anywhere. The Kowadło in the camp
 // upgrades an item from +1 to +10, which raises all of its numbers.
 
 import { budget, weaponDamage } from './formulas.js';
 
 // `affixIds` picks the affixes instead of rolling them (tests, simulations).
-export function generateItem({ baseId, level, rarityId = 'common', element, affixIds }, rng, content) {
+// `area` is the inner region the item was found in: its creatures name the
+// affixes (nameAffixes). Without one, an affix goes by its own creature.
+export function generateItem({ baseId, level, rarityId = 'common', element, affixIds, area }, rng, content) {
   const base = content.basesById[baseId];
   const rarity = content.raritiesById[rarityId];
   const tuning = content.balance.items;
@@ -39,6 +43,7 @@ export function generateItem({ baseId, level, rarityId = 'common', element, affi
       const kind = content.prefixes.includes(affix) ? 'prefix' : 'suffix';
       item.affixes.push({ id, kind, stat: affix.stat, value: affixValue(affix.stat, affixShare, tuning) });
     }
+    if (area) nameAffixes(item.affixes, area, rng);
     return item;
   }
 
@@ -51,7 +56,22 @@ export function generateItem({ baseId, level, rarityId = 'common', element, affi
     item.affixes.push({ id: affix.id, kind, stat: affix.stat, value: affixValue(affix.stat, affixShare, tuning) });
     kind = kind === 'prefix' ? 'suffix' : 'prefix';
   }
+  if (area) nameAffixes(item.affixes, area, rng);
   return item;
+}
+
+// Each affix gets a creature of the place to name it (`monster`), after the
+// numbers are drawn, so they stay as they would be anywhere: a prefix one
+// with an adjective, a suffix any. A creature names one affix of an item
+// while others are left, so there is no "Lisi Hełm Lisa".
+function nameAffixes(affixes, area, rng) {
+  const named = new Set();
+  for (const affix of affixes) {
+    const names = area.affixNames[affix.kind];
+    const fresh = names.filter((name) => !named.has(name.monster));
+    affix.monster = rng.pick(fresh.length > 0 ? fresh : names).monster;
+    named.add(affix.monster);
+  }
 }
 
 function affixValue(stat, share, tuning) {
@@ -100,8 +120,9 @@ export const canUse = (baseId, classId, content, classLevel) =>
 // class level; none given: the first base only), so a family with more bases
 // drops no more often. `filled` is the set of slots already covered (worn,
 // or found earlier in the same hunt); found items are added. `rarityId`
-// gives the rarity instead of a roll (the weekly quest chest).
-export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId, maxClassLevel = 1, rarityId } = {}) {
+// gives the rarity instead of a roll (the weekly quest chest), and `area`
+// the place whose creatures name the affixes (generateItem).
+export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId, maxClassLevel = 1, rarityId, area } = {}) {
   let family;
   if (filled && classId && !filled.has('weapon')) {
     family = rng.pick(content.classesById[classId].weapons);
@@ -114,7 +135,7 @@ export function randomItem(level, rng, content, { rarityBonus = 1, filled, class
   // Only a real choice draws, so loot without one stays as it was.
   const base = bases.length === 1 ? bases[0] : rng.pick(bases);
   filled?.add(base.slot);
-  return generateItem({ baseId: base.id, level, rarityId: rarityId ?? rollRarity(rng, content, rarityBonus) }, rng, content);
+  return generateItem({ baseId: base.id, level, rarityId: rarityId ?? rollRarity(rng, content, rarityBonus), area }, rng, content);
 }
 
 // Gold from the scrapper: level × goldPerLevel × the rarity's multiplier.
@@ -148,15 +169,21 @@ export function bagOverflow(items, capacity, classId, content) {
     .map(({ index }) => index);
 }
 
+// An affix's word in a name: from the creature that named it, and on an item
+// found before creatures of the place named affixes, from the affix's own
+// creature, or its text (the five resistances named after no creature).
+function affixWord(affix, gender, content) {
+  const { monster = content.affixesById[affix.id].monster, kind } = affix;
+  if (monster === undefined) return content.affixesById[affix.id].text;
+  const name = content.affixNamesByMonster[monster];
+  return kind === 'prefix' ? name.prefix[gender] : name.suffix;
+}
+
 export function itemName(item, content) {
   const base = content.basesById[item.base];
   const prefix = item.affixes.find((affix) => affix.kind === 'prefix');
   const suffix = item.affixes.find((affix) => affix.kind === 'suffix');
-  return [
-    prefix && content.affixesById[prefix.id].forms[base.gender],
-    base.name,
-    suffix && content.affixesById[suffix.id].text,
-  ]
+  return [prefix && affixWord(prefix, base.gender, content), base.name, suffix && affixWord(suffix, base.gender, content)]
     .filter(Boolean)
     .join(' ');
 }

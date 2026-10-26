@@ -149,6 +149,33 @@ function checkReferences(data) {
   for (const affix of [...data.affixes.prefixes, ...data.affixes.suffixes]) {
     if (!affixStat(affix.stat)) errors.push(`affixes.json: ${affix.id} ma nieznaną właściwość "${affix.stat}"`);
   }
+  // Affix names come from the creatures of the place an item is found in:
+  // every creature has a name for suffixes, some an adjective for prefixes
+  // too, and every place has a creature to name a prefix. An affix names an
+  // item from before that (no creature stored on it) by its own creature,
+  // or by its text.
+  const names = new Map();
+  for (const name of data.affixes.names) {
+    if (!monsters.has(name.monster)) errors.push(`affixes.json: nazwa ma nieznanego stwora "${name.monster}"`);
+    if (names.has(name.monster)) errors.push(`affixes.json: stwór ${name.monster} ma więcej niż jedną nazwę`);
+    names.set(name.monster, name);
+  }
+  for (const monster of data.monsters) {
+    if (!names.has(monster.id)) errors.push(`affixes.json: stwór ${monster.id} nie ma nazwy do afiksów`);
+  }
+  for (const affix of data.affixes.prefixes) {
+    if (!names.get(affix.monster)?.prefix) errors.push(`affixes.json: przedrostek ${affix.id} ma stwora bez przedrostka "${affix.monster}"`);
+  }
+  for (const affix of data.affixes.suffixes) {
+    if ((affix.monster === undefined) === (affix.text === undefined)) errors.push(`affixes.json: przyrostek ${affix.id} ma mieć stwora albo tekst`);
+    else if (affix.monster !== undefined && !names.has(affix.monster)) errors.push(`affixes.json: przyrostek ${affix.id} ma stwora bez nazwy "${affix.monster}"`);
+  }
+  for (const region of data.regions) {
+    for (const area of region.areas) {
+      const living = [...area.encounters, ...(area.tough ?? [])].flatMap((encounter) => encounter.monsters).concat(area.elite ?? region.elite ?? [], area.champion ?? []);
+      if (!living.some((id) => names.get(id)?.prefix)) errors.push(`affixes.json: w ${area.id} nie żyje żaden stwór z przedrostkiem`);
+    }
+  }
 
   for (const cls of data.classes) {
     statKeys('classes', cls.id, cls.baseStats, { all: true });

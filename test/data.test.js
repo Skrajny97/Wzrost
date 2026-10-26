@@ -28,6 +28,13 @@ test('the validator catches broken references and schema errors', () => {
   music.music.reports = { draw: 'victory-v1' };
   assert.match(validateData(music)[0], /^music\.json\/reports: must be equal to one of the allowed values/);
 
+  // Every creature has a name for affixes, and a suffix of an older item has
+  // a creature or a text to go by.
+  const affixes = structuredClone(loadData());
+  affixes.affixes.names = affixes.affixes.names.filter((name) => name.monster !== 'stag');
+  affixes.affixes.suffixes.find((affix) => affix.id === 'mire').monster = 'wolf';
+  assert.deepEqual(validateData(affixes), ['affixes.json: stwór stag nie ma nazwy do afiksów', 'affixes.json: przyrostek mire ma mieć stwora albo tekst']);
+
   const broken = structuredClone(loadData());
   broken.rarities[0].color = 'grey';
   assert.match(validateData(broken)[0], /^rarities\.json\/0\/color: must match pattern/);
