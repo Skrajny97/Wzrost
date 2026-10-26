@@ -457,9 +457,10 @@ const ART_SIZES = [0.64, 0.82, 1];
 // A picture sits into the board: its colours a little muted, its edges soft
 // and a faint blur of it around them. Each plot has its own filter, as each
 // is its own SVG.
+// A plot not built yet shows its building greyed out.
 let filters = 0;
-const blend = (id) => `<filter id="${id}" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
-<feColorMatrix type="saturate" values="0.78" result="muted"></feColorMatrix>
+const blend = (id, grey = false) => `<filter id="${id}" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+<feColorMatrix type="saturate" values="${grey ? 0 : 0.78}" result="muted"></feColorMatrix>
 <feGaussianBlur in="SourceAlpha" stdDeviation="0.9" result="edge"></feGaussianBlur>
 <feComposite in="muted" in2="edge" operator="in" result="body"></feComposite>
 <feGaussianBlur in="muted" stdDeviation="1.5" result="blur"></feGaussianBlur>
@@ -470,7 +471,7 @@ const blend = (id) => `<filter id="${id}" x="-10%" y="-10%" width="120%" height=
 // A building's look: its picture, standing on the bottom of the plot over its
 // shadow, or its vector stand-in. The picture's address is one of the fixed
 // ones in art.js.
-function look(buildingId, tier) {
+function look(buildingId, tier, grey = false) {
   const src = campArt(buildingId, tier);
   if (!src) return (BUILDINGS[buildingId] ?? BUILDINGS.campfire)[tier - 1]();
   const size = ART_SIZES[tier - 1];
@@ -478,16 +479,17 @@ function look(buildingId, tier) {
   const height = 78 * size;
   filters += 1;
   const id = `camp-blend-${filters}`;
-  return `${blend(id)}<ellipse cx="50" cy="75" rx="${(width * 0.42).toFixed(1)}" ry="${(3 + 3 * size).toFixed(1)}" fill="#0b0f09" opacity="0.45"></ellipse>
+  return `${blend(id, grey)}<ellipse cx="50" cy="75" rx="${(width * 0.42).toFixed(1)}" ry="${(3 + 3 * size).toFixed(1)}" fill="#0b0f09" opacity="0.45"></ellipse>
 <image href="${src}" x="${((100 - width) / 2).toFixed(1)}" y="${(78 - height).toFixed(1)}" width="${width.toFixed(1)}" height="${height.toFixed(1)}" preserveAspectRatio="xMidYMax meet" filter="url(#${id})"></image>`;
 }
 
 // The markup of a plot: the building at its level, an empty plot with a faint
-// outline of what will stand there, or either behind scaffolding. A picture
-// stands on its shadow; a vector drawing on the trodden earth.
+// grey picture of what will stand there, or either behind scaffolding. A
+// picture stands on its shadow; a vector drawing on the trodden earth.
 export function plotMarkup(buildingId, { level, building = false }) {
   if (level <= 0) {
-    return `${EMPTY_PLOT}<g opacity="${building ? 0.45 : 0.22}">${look(buildingId, 1)}</g>${building ? SCAFFOLD : ''}`;
+    const faint = campArt(buildingId, 1) ? (building ? 0.7 : 0.5) : building ? 0.45 : 0.22;
+    return `${EMPTY_PLOT}<g opacity="${faint}">${look(buildingId, 1, true)}</g>${building ? SCAFFOLD : ''}`;
   }
   const tier = buildingTier(level);
   return `${campArt(buildingId, tier) ? '' : GROUND}${look(buildingId, tier)}${building ? SCAFFOLD : ''}`;
