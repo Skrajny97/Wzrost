@@ -3,7 +3,8 @@
 // e-mail is confirmed with a link from a mail that Cloudflare Email Service
 // sends (the EMAIL binding in wrangler.jsonc). Accounts made before play on
 // and are invited to confirm for Punkty Systemu; an account bound to Google
-// counts as confirmed, because Google confirmed its owner (sessions.js).
+// counts as confirmed, because Google confirmed its owner (sessions.js), and
+// gets the same Punkty Systemu (google.js), once an account.
 //
 // The link's token is random, and D1 keeps only its SHA-256 hash, the
 // address it confirms and when it stops working. The page learns how the
@@ -96,10 +97,37 @@ export async function requestLink(context) {
   return json({ sent: true, email });
 }
 
+// Punkty Systemu for a confirmed account, once an account
+// (`email_rewarded_at`): to its character, or to the first character made
+// when there is none yet. Statements for one batch with the rest of the
+// change, so two at once pay once. With `email`, only while the account
+// still has that address.
+export function rewardStatements(db, userId, now, email = null) {
+  const points = content.balance.account.emailSystemPoints;
+  const account = email === null ? 'id = ?' : 'id = ? AND email = ?';
+  const keys = email === null ? [userId] : [userId, email];
+  return [
+    db
+      .prepare(
+        `UPDATE characters SET system_points = system_points + ?, version = version + 1
+         WHERE user_id = ? AND role = 'player' AND EXISTS (SELECT 1 FROM users WHERE ${account} AND email_rewarded_at IS NULL)`,
+      )
+      .bind(points, userId, ...keys),
+    db
+      .prepare(
+        `UPDATE users SET
+           system_points_waiting = system_points_waiting
+             + CASE WHEN email_rewarded_at IS NULL AND NOT EXISTS (SELECT 1 FROM characters WHERE user_id = users.id AND role = 'player') THEN ? ELSE 0 END,
+           email_rewarded_at = COALESCE(email_rewarded_at, ?)
+         WHERE ${account}`,
+      )
+      .bind(points, now, ...keys),
+  ];
+}
+
 // The link from the mail. It confirms the address while the account still
-// has it, and the first time gives Punkty Systemu: to the character, or to
-// the first character made when there is none yet. All in one batch, so a
-// link opened twice at once pays once.
+// has it, and the first time gives Punkty Systemu (rewardStatements). All
+// in one batch, so a link opened twice at once pays once.
 export async function confirmEmail({ request, env, now }) {
   const token = new URL(request.url).searchParams.get('token') ?? '';
   if (!TOKEN_PATTERN.test(token)) return redirect('/?email=expired');
@@ -109,22 +137,9 @@ export async function confirmEmail({ request, env, now }) {
   const before = await db.prepare('SELECT email_confirmed_at FROM users WHERE id = ? AND email = ?').bind(link.user_id, link.email).first();
   if (!before) return redirect('/?email=expired');
 
-  const points = content.balance.account.emailSystemPoints;
-  const owed = 'SELECT 1 FROM users WHERE id = ? AND email = ? AND email_rewarded_at IS NULL';
   await db.batch([
-    db
-      .prepare(`UPDATE characters SET system_points = system_points + ?, version = version + 1 WHERE user_id = ? AND role = 'player' AND EXISTS (${owed})`)
-      .bind(points, link.user_id, link.user_id, link.email),
-    db
-      .prepare(
-        `UPDATE users SET
-           system_points_waiting = system_points_waiting
-             + CASE WHEN email_rewarded_at IS NULL AND NOT EXISTS (SELECT 1 FROM characters WHERE user_id = users.id AND role = 'player') THEN ? ELSE 0 END,
-           email_rewarded_at = COALESCE(email_rewarded_at, ?),
-           email_confirmed_at = COALESCE(email_confirmed_at, ?)
-         WHERE id = ? AND email = ?`,
-      )
-      .bind(points, now, now, link.user_id, link.email),
+    ...rewardStatements(db, link.user_id, now, link.email),
+    db.prepare('UPDATE users SET email_confirmed_at = COALESCE(email_confirmed_at, ?) WHERE id = ? AND email = ?').bind(now, link.user_id, link.email),
     db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(link.user_id),
   ]);
   return redirect(before.email_confirmed_at === null ? '/?email=confirmed' : '/?email=already');

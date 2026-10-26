@@ -2,8 +2,8 @@
 // Initiative is a timeline: the time to a unit's next move is inversely
 // proportional to its speed, and the unit whose time comes first acts. One
 // unit may act at most `maxConsecutiveMoves` times in a row. The party
-// finishes off the opponent it can defeat fastest; monsters pick their target
-// at random, front positions more often.
+// finishes off the opponent it can defeat fastest, the front first; monsters
+// pick their target at random, front positions more often.
 //
 // Skills (skills.js) work by their kind: a strike or a sweep replaces a plain
 // blow when it is ready (its cooldown has passed and there is mana for it),
@@ -195,7 +195,13 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
     unit.dots = unit.dots.filter((dot) => dot.ticks > 0);
   };
 
-  // The opponent that needs the fewest expected hits, against its defence.
+  // The opponent that needs the fewest expected hits, against its defence,
+  // with the front drawing the blows as it draws the monsters' (the author:
+  // "Przód najczęściej ściąga aggro, później Środek, a później Tył"): the
+  // hits count divided by the position's target weight, so the middle goes
+  // first when it needs at most 60% of the front's hits and the back at
+  // most 40%. The choice holds until the target falls, so blows do not
+  // scatter.
   const quickestKill = (actor, opponents) => {
     const weapon = actor.weapon;
     const average = ((weapon.min + weapon.max) / 2) * actor.damageScale;
@@ -203,7 +209,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
     let fewest = Infinity;
     for (const unit of opponents) {
       const defense = weapon.category === 'physical' ? unit.armor : (unit.resist[weapon.element] ?? 0);
-      const hits = unit.hp / Math.max(1, average * (1 - reduction(defense, actor.level, balance)));
+      const hits = unit.hp / Math.max(1, average * (1 - reduction(defense, actor.level, balance))) / tuning.targetWeights[unit.position];
       if (hits < fewest) {
         best = unit;
         fewest = hits;

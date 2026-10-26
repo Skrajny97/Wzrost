@@ -3,13 +3,14 @@
 // midnight, a week at the midnight between Sunday and Monday. A period's
 // quests are drawn when it comes, from a seed of the character and the
 // period, so a period always gets the same ones: creatures of the newest
-// inner region open to the character's class and, once the Stół
+// inner region open to the character's class, never of a place too easy
+// for the character, and, once the Stół
 // rzemieślniczy stands, its work, each with a reward of gold, a resource or
 // parts. Claimed explorations and the table's orders move them on; a quest
 // done gives its reward when claimed, and all of a period's quests done open
 // its chest.
 
-import { encountersFor } from './hunt.js';
+import { easyPlace, encountersFor } from './hunt.js';
 import { randomItem } from './items.js';
 import { createRng } from './rng.js';
 import { areaUnlocked } from './unlocks.js';
@@ -96,13 +97,18 @@ function creaturesPerFight(area, level) {
 
 // What can be drawn: each kind once for each of its variants (kill: each
 // creature that the period's most fights bring at least once on average),
-// the kind's weight shared among them.
+// the kind's weight shared among them. No creatures of a place too easy
+// for the character (the author: "by ktoś z wyższym levelem nie był
+// wysyłany na niskolevelowe potwory"): when its class opens nothing
+// harder, or it has outgrown every place, the other kinds remain.
 function questOptions(periodId, { character, hasTable }, content) {
+  const area = questArea(character, content);
   return content.quests.kinds.flatMap((kind) => {
     if (kind.table && !hasTable) return [];
+    if (kind.id === 'kill' && easyPlace(character.level, area, content)) return [];
     const variants =
       kind.id === 'kill'
-        ? [...creaturesPerFight(questArea(character, content), character.level)]
+        ? [...creaturesPerFight(area, character.level)]
             .filter(([, perFight]) => perFight * kind[periodId].fights[1] >= 1)
             .map(([target, perFight]) => ({ target, perFight }))
         : [{}];

@@ -114,7 +114,7 @@ export function threatSamples({ character, equipped, areaId }, content) {
 }
 
 // Chance of fainting for every exploration length, between 0 and 1.
-export function faintChances({ character, equipped, hp, areaId, avoidRare = false, seekRare = false }, content, samples) {
+export function faintChances({ character, equipped, hp, areaId, avoidRare = false, seekRare = false, catchUp = null }, content, samples) {
   const { maxHp, recovery, regular, tough, elite, champion, safe } = samples ?? threatSamples({ character, equipped, areaId }, content);
   // HP after the rest that follows a won fight, for each HP left after it.
   const rested = Array.from({ length: STEPS + 1 }, (_, left) => Math.round(left + (STEPS - left) * recovery));
@@ -128,7 +128,7 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
 
   const result = {};
   for (const minutes of durationsUpTo(content.balance.hunt.maxMinutes, content)) {
-    const pace = withRareOdds(explorationPace(minutes, content), { avoidRare, seekRare }, content);
+    const pace = withRareOdds(explorationPace(minutes, content), { avoidRare, seekRare, catchUp }, content);
     // The champion is drawn first, then the elite (rollEncounter); a
     // character who avoids them meets neither, one who seeks them both more
     // often.

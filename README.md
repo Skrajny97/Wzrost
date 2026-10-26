@@ -124,7 +124,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/auth/login` | logowanie: `identifier` (login lub e-mail), `password` |
 | POST | `/api/auth/logout` | wylogowanie |
 | GET | `/api/auth/google/start` | przejście do Google; `?mode=link` łączy Google z zalogowanym kontem |
-| GET | `/api/auth/google/callback` | powrót z Google: logowanie, nowe konto albo połączenie, potem przejście do `/` albo `/?google=<wynik>` |
+| GET | `/api/auth/google/callback` | powrót z Google: logowanie, nowe konto albo połączenie, potem przejście do `/` albo `/?google=<wynik>` (`created`: nowe konto, `rewarded`: połączenie z Punktami Systemu) |
 | GET | `/api/auth/confirm` | link z maila (`?token=`): potwierdza adres, za pierwszym razem z Punktami Systemu, potem przejście do `/?email=<wynik>` |
 | POST | `/api/auth/email` | nowy link: `email` (nowy adres, opcjonalnie), dopóki adres nie jest potwierdzony; najwyżej co minutę i 5 na dobę (429) |
 | GET | `/api/me` | zalogowany gracz; `google` mówi, czy konto ma połączone Google, `testMode`, czy ma tryb testowy, `emailConfirmed`, czy e-mail jest potwierdzony, a `emailRequired`, czy gra czeka na to potwierdzenie |
@@ -185,7 +185,7 @@ Te adresy wymienia `GOOGLE_HOSTS` w `wrangler.jsonc`. Zasady łączenia kont są
 
 ## Potwierdzanie e-maila
 
-Konto zakładane loginem i hasłem musi podać e-mail. Serwer wysyła na niego link przez Cloudflare Email Service (wiązanie `EMAIL`, czyli `send_email` w `wrangler.jsonc`, nadawca `no-reply@insightrpg.com`), a gra otwiera się dopiero po kliknięciu linku. Konta sprzed tej zmiany grają dalej, a dopóki nie potwierdzą adresu, widzą pergamin z zachętą: 10 Punktów Systemu za potwierdzenie (`balance.account.emailSystemPoints`). Konto Google liczy się jako potwierdzone. Treść maila jest w `data/texts.json` (`emailConfirm…`), a zasady w `DECISIONS.md`, w części „Potwierdzanie e-maila”. Domena insightrpg.com jest włączona w panelu Cloudflare: Compute → Email Service → Email Sending.
+Konto zakładane loginem i hasłem musi podać e-mail. Serwer wysyła na niego link przez Cloudflare Email Service (wiązanie `EMAIL`, czyli `send_email` w `wrangler.jsonc`, nadawca `no-reply@insightrpg.com`), a gra otwiera się dopiero po kliknięciu linku. Konta sprzed tej zmiany grają dalej, a dopóki nie potwierdzą adresu, widzą pergamin z zachętą: 10 Punktów Systemu za potwierdzenie (`balance.account.emailSystemPoints`). Konto Google liczy się jako potwierdzone i dostaje te same Punkty Systemu, raz na konto: nowe przy założeniu, a istniejące przy połączeniu z Google. Treść maila jest w `data/texts.json` (`emailConfirm…`), a zasady w `DECISIONS.md`, w części „Potwierdzanie e-maila”. Domena insightrpg.com jest włączona w panelu Cloudflare: Compute → Email Service → Email Sending.
 
 Lokalnie mail nie wychodzi: `npx wrangler dev` wypisuje go w konsoli i zapisuje w pliku, którego ścieżkę podaje. Link z takiego maila prowadzi do `insightrpg.com`, chyba że serwer działa z `--local-upstream localhost:8787`.
 

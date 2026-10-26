@@ -2,6 +2,7 @@
 // server that answers each code with an ID token of chosen claims.
 
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { after, describe, test } from 'node:test';
 
@@ -112,7 +113,7 @@ describe('Google sign-in', () => {
   test('the first sign-in makes an account without a password and signs in', async () => {
     const { callback, location, session } = await signIn(codeFor(claims('jan.kowalski')));
     assert.equal(callback.status, 302);
-    assert.equal(location, '/');
+    assert.equal(location, '/?google=created');
     assert.match(session, /^__Host-sid=[A-Za-z0-9_-]{43}$/);
     assert.ok(callback.headers.getSetCookie().some((line) => line.startsWith('__Host-google=;') && line.includes('Max-Age=0')));
 
@@ -137,6 +138,63 @@ describe('Google sign-in', () => {
     // No password opens that account.
     const login = await call('POST', '/api/auth/login', { body: { identifier: 'jan.kowalski', password: 'google' } });
     assert.equal(login.status, 401);
+
+    // The Punkty Systemu of a confirmed e-mail wait for the first character.
+    const made = await call('POST', '/api/character', { cookie: session, body: { name: 'Jan', classId: 'warrior', appearance: 'male' } });
+    assert.equal(made.status, 201);
+    assert.equal(made.data.character.systemPoints, 10);
+    const again = await signIn(codeFor(claims('jan.kowalski')));
+    assert.equal(again.location, '/');
+    assert.equal((await call('GET', '/api/character', { cookie: again.session })).data.character.systemPoints, 10);
+  });
+
+  test('linking Google gives the Punkty Systemu once an account, also after a confirmed e-mail', async () => {
+    const database = await db();
+    const points = async (login) =>
+      (await database.prepare('SELECT COALESCE(SUM(c.system_points), 0) + u.system_points_waiting AS points FROM users u LEFT JOIN characters c ON c.user_id = u.id WHERE u.login = ? GROUP BY u.id').bind(login).first()).points;
+    // A player with a character: the points go to it.
+    const player = await signUp('bartek');
+    assert.equal((await call('POST', '/api/character', { cookie: player.cookie, body: { name: 'Bartek', classId: 'mage', appearance: 'male' } })).status, 201);
+    const link = await signIn(codeFor(claims('google-bartek')), { cookie: player.cookie, mode: 'link' });
+    assert.equal(link.location, '/?google=rewarded');
+    assert.equal((await call('GET', '/api/character', { cookie: player.cookie })).data.character.systemPoints, 10);
+    // Rewarded for the e-mail already: nothing more.
+    const rewarded = await signUp('ewa');
+    await database.prepare("UPDATE users SET email_rewarded_at = 1, system_points_waiting = 10 WHERE login = 'ewa'").run();
+    const second = await signIn(codeFor(claims('google-ewa')), { cookie: rewarded.cookie, mode: 'link' });
+    assert.equal(second.location, '/?google=linked');
+    assert.equal(await points('ewa'), 10);
+  });
+
+  test('migration 0029 gives the Punkty Systemu to accounts bound to Google before', async () => {
+    const database = await db();
+    const add = (login, google, rewarded = null) =>
+      database.prepare("INSERT INTO users (login, email, password_hash, created_at, google_sub, email_rewarded_at) VALUES (?, NULL, 'google', 0, ?, ?)").bind(login, google, rewarded).run();
+    await add('z_postacia', 'sub-1');
+    await add('bez_postaci', 'sub-2');
+    await add('nagrodzony', 'sub-3', 5);
+    await add('haslo', null);
+    for (const login of ['z_postacia', 'nagrodzony', 'haslo']) {
+      await database
+        .prepare("INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, position, hp, hp_at, created_at) SELECT id, 'player', ?, ?, 'warrior', 'female', 'front', 10, 0, 0 FROM users WHERE login = ?")
+        .bind(login, login, login)
+        .run();
+    }
+    const migration = readFileSync(new URL('../migrations/0029_google_reward.sql', import.meta.url), 'utf8');
+    const statements = migration.split(';').map((part) => part.replace(/^\s*--.*$/gm, '').trim()).filter(Boolean);
+    // Twice, as a check that it pays once.
+    for (const statement of [...statements, ...statements]) await database.prepare(statement).run();
+    const rows = (
+      await database
+        .prepare('SELECT u.login, u.system_points_waiting AS waiting, c.system_points AS points, u.email_rewarded_at IS NOT NULL AS rewarded FROM users u LEFT JOIN characters c ON c.user_id = u.id ORDER BY u.login')
+        .all()
+    ).results;
+    assert.deepEqual(rows, [
+      { login: 'bez_postaci', waiting: 10, points: null, rewarded: 1 },
+      { login: 'haslo', waiting: 0, points: 0, rewarded: 0 },
+      { login: 'nagrodzony', waiting: 0, points: 0, rewarded: 1 },
+      { login: 'z_postacia', waiting: 0, points: 10, rewarded: 1 },
+    ]);
   });
 
   test('the verifier sent to Google matches the challenge from the start', async () => {
@@ -175,7 +233,7 @@ describe('Google sign-in', () => {
 
     // Signed in with the password, the player links Google in the settings.
     const link = await signIn(codeFor(claims('google-karol', { email: 'karol@gmail.com' })), { cookie: registered.cookie, mode: 'link' });
-    assert.equal(link.location, '/?google=linked');
+    assert.equal(link.location, '/?google=rewarded');
     assert.equal(link.session, null);
     assert.equal((await call('GET', '/api/me', { cookie: registered.cookie })).data.user.google, true);
 
@@ -202,7 +260,7 @@ describe('Google sign-in', () => {
     const second = await call('POST', '/api/auth/login', { body: { identifier: 'szef', password: 'tajnehaslo1' } });
     assert.equal(first.data.user.testMode, true);
     const link = await signIn(codeFor(claims('google-szef')), { cookie: first.cookie, mode: 'link' });
-    assert.equal(link.location, '/?google=linked');
+    assert.equal(link.location, '/?google=rewarded');
     assert.equal((await call('GET', '/api/me', { cookie: first.cookie })).status, 200);
     assert.equal((await call('GET', '/api/me', { cookie: second.cookie })).status, 401);
 

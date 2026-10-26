@@ -23,6 +23,7 @@ import {
   lowerThreat,
   nextHuntUnlock,
   questCreatures,
+  rareCatchUp,
   sellPrice,
   simulateHunt,
   threatSamples,
@@ -87,15 +88,20 @@ export async function huntOptions(context) {
         .filter((candidate) => areaUnlocked(candidate, character.classLevel, content));
   // threatAvoiding and threatSeeking: the same exploration with the elite and
   // the champion avoided or sought, from the same sample fights; the first is
-  // never above the threat without them, the second never below it.
+  // never above the threat without them, the second never below it. In a
+  // place too easy for the character, the elite and the champion it has not
+  // met come far more often (rareCatchUp).
+  const met = JSON.parse(player.row.met ?? '[]');
   return json({
     hp,
     maxHp,
-    areas: areas.map(({ id }) => {
+    areas: areas.map((place) => {
+      const { id } = place;
       const samples = cachedSamples(player, character, equipped, id);
-      const threat = estimateThreat({ character, equipped, hp, areaId: id }, content, samples);
+      const catchUp = rareCatchUp(character.level, place, met, content);
+      const threat = estimateThreat({ character, equipped, hp, areaId: id, catchUp }, content, samples);
       const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true }, content, samples);
-      const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true }, content, samples);
+      const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true, catchUp }, content, samples);
       return { id, threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat) };
     }),
   });
@@ -208,6 +214,9 @@ export async function finishHunt(db, player, now) {
       avoidRare: activity.avoid_rare === 1,
       seekRare: activity.seek_rare === 1,
       tracked: JSON.parse(activity.tracked ?? '[]'),
+      // The creatures met before this exploration: it changes them only
+      // when claimed, so the report comes out the same every time.
+      met: JSON.parse(row.met ?? '[]'),
     },
     content,
   );

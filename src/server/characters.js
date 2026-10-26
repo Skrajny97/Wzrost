@@ -377,7 +377,8 @@ function campView(player, levels, now) {
 }
 
 // The fire spirit's trade at the Ognisko's level: what a trade gives and
-// costs, the trades left today, and the same at the next level.
+// costs, the trades left today, and the price and the trades of the next
+// level.
 function fireView(building, level, row, now) {
   const trade = fireTrade(level, content);
   const made = fireTradesMade({ day: row.fire_day, count: row.fire_trades }, now, content);
@@ -391,7 +392,7 @@ function fireView(building, level, row, now) {
     unitGold: trade.unitGold,
     perDay: trade.perDay,
     left: Math.max(0, trade.perDay - made),
-    next: next && { level: level + 1, amount: next.amount, gold: next.gold, perDay: next.perDay },
+    next: next && { level: level + 1, unitGold: next.unitGold, perDay: next.perDay },
   };
 }
 

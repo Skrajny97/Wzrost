@@ -10,8 +10,13 @@
 // token that comes straight from Google over TLS, so the token's claims are
 // checked without its signature (OpenID Connect Core 3.1.3.7). An account is
 // found by its Google user id, never by e-mail: e-mails in the game are not
-// confirmed. The page learns how it went from /?google=… (app.js).
+// confirmed. The page learns how it went from /?google=… (app.js). An
+// account made with Google, or linked to it, gets the Punkty Systemu of a
+// confirmed e-mail, once an account (the author: "Niech rejestracja/podpięcie
+// konta Google też daje ten bonus 10 Punktów Systemu").
 
+import { content } from './content.js';
+import { rewardStatements } from './email.js';
 import { fromBase64Url, toBase64Url } from './encoding.js';
 import { createSession, deleteSession, getSession, readCookie, sessionCookie } from './sessions.js';
 import { testModeFor } from './test-mode.js';
@@ -74,10 +79,11 @@ export async function googleCallback({ request, env, now }) {
     const session = await getSession(db, request, now);
     if (flow.mode === 'link') {
       if (!session) return finish('/?google=expired');
-      return finish(`/?google=${await linkGoogle(db, env, session, identity)}`);
+      return finish(`/?google=${await linkGoogle(db, env, session, identity, now)}`);
     }
 
     let user = await userByGoogle(db, identity.sub);
+    const made = !user;
     if (user) await keepEmail(db, user.id, identity.email);
     if (!user) {
       // An account with the same e-mail may belong to the same person, who
@@ -91,7 +97,8 @@ export async function googleCallback({ request, env, now }) {
     if (session) await deleteSession(db, session.id);
     await db.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(now).run();
     const created = await createSession(db, user.id, now);
-    return finish('/', sessionCookie(created.token, created.expiresAt, now));
+    // A new account hears of its Punkty Systemu.
+    return finish(made ? '/?google=created' : '/', sessionCookie(created.token, created.expiresAt, now));
   } catch (error) {
     console.error(error);
     return finish('/?google=failed');
@@ -154,7 +161,8 @@ export function loginBase(email) {
   return name.length >= 3 ? name : 'gracz';
 }
 
-// A new account for the Google account. A taken login gets 4 digits.
+// A new account for the Google account, with the Punkty Systemu for the
+// first character it makes. A taken login gets 4 digits.
 async function createGoogleUser(db, identity, now) {
   const base = loginBase(identity.email);
   for (let attempt = 0; attempt < 10; attempt++) {
@@ -162,8 +170,8 @@ async function createGoogleUser(db, identity, now) {
     if (await db.prepare('SELECT 1 FROM users WHERE login = ?').bind(login).first()) continue;
     try {
       const result = await db
-        .prepare('INSERT INTO users (login, email, password_hash, google_sub, created_at) VALUES (?, ?, ?, ?, ?)')
-        .bind(login, identity.email, NO_PASSWORD, identity.sub, now)
+        .prepare('INSERT INTO users (login, email, password_hash, google_sub, created_at, system_points_waiting, email_rewarded_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+        .bind(login, identity.email, NO_PASSWORD, identity.sub, now, content.balance.account.emailSystemPoints, now)
         .run();
       return { id: result.meta.last_row_id };
     } catch (error) {
@@ -177,12 +185,15 @@ async function createGoogleUser(db, identity, now) {
   throw new Error('Google sign-in: no free login');
 }
 
-// Links the Google account to the player's account; returns how it went.
-async function linkGoogle(db, env, session, { sub, email }) {
+// Links the Google account to the player's account, with the Punkty
+// Systemu the account has not had yet (rewardStatements); returns how it
+// went: "rewarded" when it brought them.
+async function linkGoogle(db, env, session, { sub, email }, now) {
   const owner = await userByGoogle(db, sub);
   if (owner && owner.id !== session.userId) return 'taken';
+  const before = await db.prepare('SELECT email_rewarded_at FROM users WHERE id = ?').bind(session.userId).first();
   try {
-    await db.prepare('UPDATE users SET google_sub = ? WHERE id = ?').bind(sub, session.userId).run();
+    await db.batch([db.prepare('UPDATE users SET google_sub = ? WHERE id = ?').bind(sub, session.userId), ...rewardStatements(db, session.userId, now)]);
   } catch (error) {
     // Linked to another account a moment ago.
     if (String(error?.message).includes('users.google_sub')) return 'taken';
@@ -194,7 +205,7 @@ async function linkGoogle(db, env, session, { sub, email }) {
   if (testModeFor(env, session.user.login)) {
     await db.prepare('DELETE FROM sessions WHERE user_id = ? AND id != ?').bind(session.userId, session.id).run();
   }
-  return 'linked';
+  return before?.email_rewarded_at === null ? 'rewarded' : 'linked';
 }
 
 const userByGoogle = (db, sub) => db.prepare('SELECT id FROM users WHERE google_sub = ?').bind(sub).first();

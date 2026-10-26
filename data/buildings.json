@@ -65,8 +65,9 @@
       "title": "Duch ognia",
       "text": "Możesz wrzucić swoje złoto do ogniska i dzięki duchowi ognia wymienić je na potrzebne Ci zasoby.",
       "resources": ["wood", "stone", "iron-ore"],
-      "unitsPerLevel": 5,
+      "units": 50,
       "goldPerUnit": 10,
+      "cheaperEvery": 2,
       "tradesPerDay": 4,
       "moreTradesEvery": 2
     },

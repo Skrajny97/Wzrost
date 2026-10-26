@@ -1024,7 +1024,7 @@ describe('camp', () => {
     assert.deepEqual([store(upgraded.data.character).paused, store(upgraded.data.character).amount], [true, 0]);
   });
 
-  test('the fire spirit trades gold for resources a few times a day, more with each level', async () => {
+  test('the fire spirit trades gold for resources a few times a day, cheaper with each level', async () => {
     const trade = (resource, amount) => call('POST', '/api/camp/trade', { cookie, body: { resource, amount } });
     const fire = (view) => view.camp.buildings.find((building) => building.id === 'campfire').trade;
     await stock(1000, {});
@@ -1034,37 +1034,37 @@ describe('camp', () => {
     const database = await db();
     const { id } = await database.prepare('SELECT id FROM characters').first();
     await database.prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) VALUES (?, 'campfire', 3, 0, 1)").bind(id).run();
-    // Level 3: 15 of a resource for 150 gold, 5 trades a day.
+    // Level 3: up to 50 of a resource at 9 gold each, 5 trades a day.
     const open = fire(await character());
-    assert.deepEqual([open.title, open.resources, open.amount, open.gold, open.perDay, open.left], ['Duch ognia', ['wood', 'stone', 'iron-ore'], 15, 150, 5, 5]);
-    assert.deepEqual(open.next, { level: 4, amount: 20, gold: 200, perDay: 5 });
+    assert.deepEqual([open.title, open.resources, open.amount, open.unitGold, open.gold, open.perDay, open.left], ['Duch ognia', ['wood', 'stone', 'iron-ore'], 50, 9, 450, 5, 5]);
+    assert.deepEqual(open.next, { level: 4, unitGold: 8, perDay: 5 });
     assert.equal((await trade('gold')).status, 400);
     const first = await trade('wood');
     assert.equal(first.status, 200);
-    assert.deepEqual(first.data.traded, { resource: 'wood', amount: 15, gold: 150 });
-    assert.deepEqual([first.data.character.gold, first.data.character.resources.wood, fire(first.data.character).left], [850, 15, 4]);
+    assert.deepEqual(first.data.traded, { resource: 'wood', amount: 50, gold: 450 });
+    assert.deepEqual([first.data.character.gold, first.data.character.resources.wood, fire(first.data.character).left], [550, 50, 4]);
     // Two taps at once: each trade made is paid and counted once.
-    const taps = await Promise.all([trade('stone'), trade('stone')]);
+    const taps = await Promise.all([trade('stone', 10), trade('stone', 10)]);
     const made = taps.filter((tap) => tap.status === 200).length;
     const tapped = await character();
     assert.ok(made >= 1);
-    assert.deepEqual([tapped.gold, tapped.resources.stone, fire(tapped).left], [850 - 150 * made, 15 * made, 4 - made]);
-    while (fire(await character()).left > 0) assert.equal((await trade('iron-ore')).status, 200);
+    assert.deepEqual([tapped.gold, tapped.resources.stone, fire(tapped).left], [550 - 90 * made, 10 * made, 4 - made]);
+    while (fire(await character()).left > 0) assert.equal((await trade('iron-ore', 10)).status, 200);
     const spent = await character();
     const got = Object.values(spent.resources).reduce((sum, amount) => sum + amount, 0);
-    assert.deepEqual([spent.gold, got], [1000 - 5 * 150, 5 * 15]);
-    assert.equal((await trade('wood')).data.error.code, 'no_trades');
+    assert.deepEqual([spent.gold, got], [550 - 4 * 90, 50 + 4 * 10]);
+    assert.equal((await trade('wood', 1)).data.error.code, 'no_trades');
     // A new day brings the trades back; without the gold there is none.
     await database.prepare("UPDATE characters SET fire_day = '2000-01-01'").run();
     assert.equal(fire(await character()).left, 5);
-    await stock(149, {});
+    await stock(449, {});
     assert.equal((await trade('wood')).data.error.code, 'not_enough');
-    // The slider: 5 pieces for 50 gold, and it is one of the day's trades.
+    // The slider: 5 pieces for 45 gold, and it is one of the day's trades.
     const small = await trade('wood', 5);
-    assert.deepEqual(small.data.traded, { resource: 'wood', amount: 5, gold: 50 });
-    assert.deepEqual([small.data.character.gold, fire(small.data.character).left], [99, 4]);
-    assert.equal((await trade('wood', 16)).data.error.code, 'invalid_amount');
-    assert.equal((await trade('wood', 10)).data.error.code, 'not_enough');
+    assert.deepEqual(small.data.traded, { resource: 'wood', amount: 5, gold: 45 });
+    assert.deepEqual([small.data.character.gold, fire(small.data.character).left], [404, 4]);
+    assert.equal((await trade('wood', 51)).data.error.code, 'invalid_amount');
+    assert.equal((await trade('wood', 45)).data.error.code, 'not_enough');
   });
 
   test('the scrap dealer sells parts for gold, rarer and cheaper ones with each level of the Skup złomu', async () => {
