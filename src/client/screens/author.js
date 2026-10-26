@@ -1,8 +1,10 @@
 // The author's panel (src/server/author.js), opened from the settings of the
 // author's account: how many accounts and characters the game has, and every
 // account, newest first, with its e-mail and its character. It is read anew
-// on every visit and with "Odśwież". On top, the preview of the skills: a
-// tap plays a short fight that shows one skill, in the report's arena.
+// on every visit and with "Odśwież". The preview of the skills opens with its
+// own button, so the accounts show without scrolling (the author: "schowaj
+// pod osobnym przyciskiem"): a tap on a skill plays a short fight that shows
+// it, in the report's arena.
 
 import { createArena } from '../arena.js';
 import { fill, h, icon } from '../dom.js';
@@ -18,13 +20,13 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
   let panel = null;
   let error = null;
   let skills = null;
+  let skillsOpen = false;
   let arena = null;
   const preview = h('div', { class: 'author-skill-preview', 'aria-live': 'polite' });
 
   async function load() {
     try {
       panel = await call('GET', '/api/author');
-      skills = (await call('GET', '/api/author/skills')).skills;
       error = null;
     } catch (failure) {
       error = failure.message;
@@ -43,8 +45,30 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
     window.scrollTo({ top: window.scrollY + preview.getBoundingClientRect().top - top - 8, behavior: 'smooth' });
   }
 
+  // The skills are read the first time the preview opens.
+  async function toggleSkills() {
+    if (!skillsOpen && !skills) skills = (await call('GET', '/api/author/skills')).skills;
+    skillsOpen = !skillsOpen;
+    if (!skillsOpen) {
+      arena?.stop();
+      arena = null;
+      fill(preview);
+    }
+    render();
+  }
+
+  function skillsToggle() {
+    return h('button', {
+      type: 'button',
+      class: 'button button--world button--small author-skills-toggle',
+      'aria-expanded': String(skillsOpen),
+      text: skillsOpen ? 'Zwiń podgląd umiejętności' : 'Podgląd umiejętności',
+      onClick: (event) => withButton(event.currentTarget, toggleSkills),
+    });
+  }
+
   function skillsPreview() {
-    if (!skills) return null;
+    if (!skillsOpen || !skills) return null;
     const classes = [...new Set(skills.map((skill) => skill.className))];
     return h(
       'section',
@@ -85,7 +109,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
         h('div', { class: 'page-heading-text' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Panel autora' }), h('p', { class: 'page-subtitle', text: 'Konta i postacie w grze' })),
         h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
       ),
-      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [skillsPreview(), counts(panel.counts), accounts(panel.accounts)],
+      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [skillsToggle(), skillsPreview(), counts(panel.counts), accounts(panel.accounts)],
       h('button', {
         type: 'button',
         class: 'button button--world',
