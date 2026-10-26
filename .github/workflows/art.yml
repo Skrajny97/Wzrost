@@ -21,6 +21,7 @@ on:
           - skills
           - areas
           - lands
+          - logo
       ids:
         description: Identyfikatory po przecinku albo all
         required: true

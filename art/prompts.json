@@ -199,5 +199,18 @@
       "windfalls": "pixel art landscape, a long belt of fallen and toppled trees at the edge of a primeval forest, upturned roots, a faint will-o-the-wisp light glowing in the thicket, dusk, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and browns, no text, no border, no people, no animals in front",
       "stone-glade": "pixel art landscape, a forest glade with a ring of moss-covered standing stones, the dark primeval forest rising beyond it, light mist, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and browns, no text, no border, no people, no animals in front"
     }
+  },
+  "logo": {
+    "style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "removeBackground": false,
+    "references": [],
+    "prompts": {
+      "eye": "game logo emblem, a glowing cyan hexagonal frame carved with faint runes, inside it one wise open eye with a bright cyan iris looking straight out, small pine tree silhouettes along the bottom inside the frame, mystical blue-green glow, centered and symmetric, dark near-black forest background, bold simple shapes readable as a small app icon, no text, no letters",
+      "campfire": "game logo emblem, a hexagonal crest of dark wood and stone with a small campfire burning at its center, a sword and a woodcutter axe crossed behind it, tall pine trees on both sides, a thin glowing cyan outline around the hexagon, centered and symmetric, dark near-black forest background, bold simple shapes readable as a small app icon, no text, no letters",
+      "narrator": "game logo emblem, a hooded mysterious figure from the chest up inside a glowing cyan hexagon, no visible face, only two small glowing cyan eyes deep in the dark hood, a faint glowing parchment scroll below, pine forest silhouette behind, centered and symmetric, dark near-black background, bold simple shapes readable as a small app icon, no text, no letters",
+      "tree": "game logo emblem, an ancient gnarled tree growing inside a glowing cyan hexagonal frame, its roots wrapping around the bottom of the frame, a tiny warm campfire light at its base, a few fireflies, centered and symmetric, dark forest green background, bold simple shapes readable as a small app icon, no text, no letters"
+    }
   }
 }
