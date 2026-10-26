@@ -1,0 +1,23 @@
+{
+  "id": "windfalls",
+  "payload": {
+    "prompt": "pixel art landscape, a long belt of fallen and toppled trees at the edge of a primeval forest, upturned roots, a faint will-o-the-wisp light glowing in the thicket, dusk, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and browns, no text, no border, no people, no animals in front",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 1,
+    "seed": 295004016,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793005503,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 19.68,
+    "request_id": "63065e8d-657f-47b8-bb1c-51e21073a4c1",
+    "outputs_retained_until": 1793091859
+  }
+}

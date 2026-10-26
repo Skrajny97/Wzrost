@@ -1,0 +1,23 @@
+{
+  "id": "stone-glade",
+  "payload": {
+    "prompt": "pixel art landscape, a forest glade with a ring of moss-covered standing stones, the dark primeval forest rising beyond it, light mist, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and browns, no text, no border, no people, no animals in front",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 1,
+    "seed": 518780296,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793005550,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 19.5,
+    "request_id": "73eeae51-a894-4066-89c6-816e9991f698",
+    "outputs_retained_until": 1793091906
+  }
+}
