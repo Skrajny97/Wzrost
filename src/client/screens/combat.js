@@ -1,8 +1,8 @@
 // The Walka tab: explorations in three steps. The main view lists the regions
 // (or shows the running exploration and the report to claim). A region shows
 // its inner regions as circles, open from the class level each needs. An
-// inner region shows the length, the threat level and the start. Dungeons and
-// training appear here once unlocked. The code calls explorations hunts and
+// inner region shows the length, the threat level and the start. Dungeons
+// appear here once unlocked. The code calls explorations hunts and
 // inner regions areas.
 
 import { areaArt } from '../area-art.js';
@@ -254,9 +254,8 @@ export function mountCombat(container, { params, navigate }) {
     };
     return h(
       'div',
-      { class: 'segmented segmented--three', role: 'group', 'aria-label': 'Rodzaj walki' },
+      { class: 'segmented', role: 'group', 'aria-label': 'Rodzaj walki' },
       tab('Eksploracja'),
-      tab('Trening', 'training'),
       tab('Lochy', 'dungeons'),
     );
   }

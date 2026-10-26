@@ -288,6 +288,19 @@
             "zakonczyła"
           ]
         ]
+      },
+      "report-calm": {
+        "line": "report",
+        "say": [
+          [
+            "Twoja wyprawa",
+            "[calmly] Twoja wyprawa"
+          ],
+          [
+            "zakończyła",
+            "zakonczyła"
+          ]
+        ]
       }
     },
     "allLines": {

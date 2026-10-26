@@ -1385,10 +1385,6 @@ a.button {
   text-transform: none;
 }
 
-.segmented--three {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
 a.segmented-option {
   display: flex;
   align-items: center;

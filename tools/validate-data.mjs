@@ -14,7 +14,7 @@ export const DATA_FILES = [
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills',
 ];
 // Unlocks the code refers to by id.
-const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'training', 'settlement', 'dungeons', 'core'];
+const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'settlement', 'dungeons', 'core'];
 const POSITIONS = ['front', 'middle', 'back'];
 
 function readJson(path) {
