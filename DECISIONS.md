@@ -1619,3 +1619,36 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
 ## Nowe stwory i czempioni (26.10.2026)
 
 1. **Zablokowane Profesje** (autor: „ma nie być napisane »profesje zbierackie«, a po prostu »profesje«, bo będą różne”). Komunikat Systemu na zablokowanej zakładce brzmi teraz „Dostęp zablokowany. Profesje: od poziomu postaci 10.” (`name` w `data/unlocks.json`). Które profesje otworzą się na tym poziomie, rozstrzygnie projekt profesji.
+2. **Nowe stwory Wiatrołomów** (autor: „3 zwykłe, 1 elitę i 1 czempiona do Wiatrołomów”). Nazwy, wygląd i liczby to moja propozycja, którą autor może zmienić w danych:
+    - **Jeleń** (przód, cios porożem): Krucze Wykroty i Dzicza Głusza. Materiał: Poroże jelenia, rzadkie.
+    - **Kuna** (środek, szybka i zwinna): Lisie Jary i Krucze Wykroty. Materiał: Futro kuny, rzadkie.
+    - **Rój szerszeni** (tył, żądła z trucizną): Żmijowe Zwalisko i Dzicza Głusza. Materiał: Żądło szerszenia, pospolite. Nowa rodzina stworów `insect` ma własną ikonkę na wypadek braku grafiki.
+    - **Płanetnik** (elita, tył): słowiański duch burzy i gradu, uderza piorunem (magia, żywioł elektryczność) i jest na niego odporny. Jest elitą Żmijowego Zwaliska i Dziczej Głuszy, a Błędnica zostaje elitą trzech pierwszych regionów wewnętrznych. Region wewnętrzny może więc mieć własną elitę (`elite` w `data/regions.json`). Materiał: Bryłka gradu, legendarna, jak Ognik błędnicy.
+    - **Odyniec** (czempion, przód): ogromny stary dzik z Dziczej Głuszy. Materiał: Szable odyńca, mityczne, czyli rzadsze niż cokolwiek innego w Wiatrołomach.
+    - Skraj Wiatrołomów zostaje bez zmian, żeby nie ruszać tempa pierwszych poziomów.
+3. **Czempioni** (autor: najsilniejsze stwory krainy, w Wiatrołomach tylko w ostatnim regionie wewnętrznym; pokonany daje prawie zawsze najrzadsze materiały i szansę na przedmiot epicki, na wyższych poziomach nawet rzadszy).
+    - Czempion mieszka w jednym regionie wewnętrznym (`champion` w `data/regions.json`): Odyniec w Dziczej Głuszy, Bazyliszek w Sercu Uroczyska. Ma poziom o 2 wyższy niż najwyższy poziom tego miejsca (`championLevelBonus`), czyli o 1 wyższy niż elita.
+    - Trafia się jak elita, z szansą rosnącą z czasem walki: 1,2% na każde 12 minut wyprawy (`championChancePerFight`), dwa razy częściej niż elita. To ok. 6% na godzinę wypraw w jego miejscu. Gra losuje go przed elitą i tylko tam, gdzie mieszka, więc inne miejsca losują walki tak jak dotąd.
+    - Daje pięć razy więcej XP i złota niż zwykły stwór (elita: trzy razy).
+    - Prawie zawsze zostawia swój materiał: z szansą 90% jedną sztukę, bez względu na długość wyprawy (`championMaterialChance`). Jak u innych stworów, wyższy poziom czasem podnosi rzadkość o stopień.
+    - Z szansą 50% zostawia też skrzynię z przedmiotem (`championItemChance`). Rzadkość zależy od poziomu czempiona (`championItems`): do 49. poziomu zawsze epicki, od 50. epicki albo legendarny, a od 100., 200., 300. i 400. coraz rzadszy, aż po boski.
+    - W bezpiecznym regionie, jak Wiatrołomy, przegrana z czempionem kończy się odwrotem bez kary, tak jak z elitą. W Uroczysku przegrana oznacza omdlenie. Poziom zagrożenia przed wyprawą liczy czempiona tak samo jak elitę.
+    - Raport otwiera się na walce z czempionem, a ma ona znacznik „czempion”. Karta czempiona w walce ma jasnozłotą ramkę. Na liście „Czyhające niebezpieczeństwa” czempion stoi ostatni, z dopiskiem „czempion”. Do czasu spotkania jest, jak inne stwory, cieniem z „???”.
+    - Zadania narratora nigdy nie każą pokonać elity ani czempiona.
+    - Trudność według symulacji: typowa postać pokonuje Odyńca (poziom 27) w 4% walk na 22. poziomie, w 44% na 25. i w 96% na 27. Bazyliszka (poziom 52) pokonuje w 26% na 47. poziomie, w 40% na 50., w 63% na 52. i prawie zawsze na 55. Pierwsza wersja Bazyliszka była za silna: na 58. poziomie przegrywała z nim większość klas, więc ma słabsze spojrzenie (0,55 zamiast 0,75) i wolniej rośnie mu Intelekt.
+4. **Uroczysko Kamieni ma własne stwory** (autor: w nowych krainach, już w Uroczysku, potwory mają być prawie całkiem inne niż w Wiatrołomach).
+    - Zostają Krzyżak, Ryś, Basior i Niedźwiedź, które były tylko w Uroczysku, oraz elita Licho. Stwory z Wiatrołomów zastąpiły nowe:
+        - **Wadera** (przód) zamiast wilka. Wadery polują w watahach z basiorem. Materiał: Futro wadery, unikalne.
+        - **Kamiennik** (przód, bardzo twardy) zamiast borsuka i dzika: omszały stwór z głazów, który budzi się w kręgu kamieni. Materiał: Rdzeń kamiennika, epicki.
+        - **Gacek** (tył) zamiast kruka i żmii. Materiał: Skrzydło gacka, rzadkie.
+        - **Puchacz** (tył) zamiast puszczyka. Materiał: Pióro puchacza, unikalne.
+    - **Bazyliszek** (czempion, środek) z polskiej legendy: wąż z głową koguta, którego spojrzenie zamienia w kamień (magia, żywioł ziemia). Mieszka w Sercu Uroczyska, gdzie między głazami stoją kamienne zwierzęta. Materiał: Łuska bazyliszka, boska.
+    - W Uroczysku nie ma już żadnego stwora z Wiatrołomów. Opisy miejsc mówią teraz o nowych stworach. Test pilnuje, żeby żaden stwór Wiatrołomów nie wrócił do Uroczyska.
+    - Zadania wylosowane wcześniej mogą jeszcze prosić o stwory, których w Uroczysku już nie ma. Wszystkie żyją dalej w Wiatrołomach, więc da się je wykonać.
+5. **Bilans po zmianach** (symulacja `tools/simulate.mjs`, przed zmianą i po niej). W Wiatrołomach XP na godzinę i szansa omdlenia się nie zmieniły. W Dziczej Głuszy doszło 1–5% odwrotów przed Odyńcem, bez kary. W Uroczysku XP na godzinę zmieniło się o najwyżej kilka procent. W Sercu Uroczyska typowa postać 48. poziomu mdleje na godzinnej wyprawie w ok. 5–7% wypraw zamiast 0–3%, bo spotyka Bazyliszka. Tak ma być w najniebezpieczniejszym miejscu regionu, a poziom zagrożenia to pokazuje.
+6. **Grafiki i głosy nowych stworów.** Każdy nowy stwór i materiał ma jeden szkic z Retro Diffusion (`art/prompts.json`), a każdy stwór dwa nagrania krzyku przy trafieniu i dwa przy pokonaniu z ElevenLabs (`audio/prompts.json`, `data/sounds.json`). Do czasu spotkania stwór jest na liście niebezpieczeństw cieniem swojej grafiki.
+    - Jeleń i Rój szerszeni dostały drugi szkic, bo pierwszy miał tło. Drugi szkic jelenia wyszedł dobrze. Szerszenie miały tło także w drugim, więc w grze jest pierwszy szkic z usuniętym białym tłem i jasną obwódką, bez trzeciego szkicu.
+    - Łuska bazyliszka miała czarne tło. Jest usunięte, a łuska dostała ciemny kontur jak inne ikony.
+    - Gacek należy do rodziny zwierząt (`beast`), bo to ssak. Nowa rodzina `insect` (Rój szerszeni) ma własną ikonkę na wypadek braku grafiki.
+7. **Raport pokazuje znacznik „czempion”.** Walka z czempionem ma w raporcie znacznik „czempion” obok „najważniejsza”, tak jak walka z elitą ma „elita”. Test pilnuje, żeby raport go nie gubił.
+8. **Koszt.** Retro Diffusion: 10 szkiców stworów, 10 materiałów i 2 poprawki po 0,18 USD, razem ok. 4 USD. ElevenLabs: 20 nagrań głosów, ok. 640 kredytów.

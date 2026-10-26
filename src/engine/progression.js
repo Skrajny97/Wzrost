@@ -89,7 +89,8 @@ export function faintPenalty(level, xp, content) {
 
 export function monsterXp(monster, level, content) {
   const rewards = content.balance.rewards;
-  return rewards.xpBase * level ** rewards.xpExponent * monster.reward.xp * (monster.elite ? rewards.eliteXpMultiplier : 1);
+  const rank = monster.champion ? rewards.championXpMultiplier : monster.elite ? rewards.eliteXpMultiplier : 1;
+  return rewards.xpBase * level ** rewards.xpExponent * monster.reward.xp * rank;
 }
 
 // Hunting far below your level gives clearly less XP.

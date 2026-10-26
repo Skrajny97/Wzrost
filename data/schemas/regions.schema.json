@@ -88,7 +88,7 @@
       },
       "areas": {
         "type": "array",
-        "description": "Regiony wewnętrzne: po kolei, bez przerw, każdy z własnym zakresem poziomów i spotkaniami. Cecha, elita i bezpieczeństwo pochodzą z regionu.",
+        "description": "Regiony wewnętrzne: po kolei, bez przerw, każdy z własnym zakresem poziomów i spotkaniami. Cecha i bezpieczeństwo pochodzą z regionu, a elita też, chyba że region wewnętrzny ma własną.",
         "minItems": 1,
         "items": {
           "type": "object",
@@ -123,6 +123,14 @@
             "description": {
               "type": "string",
               "minLength": 1
+            },
+            "elite": {
+              "type": "string",
+              "description": "Elita tego regionu wewnętrznego zamiast elity regionu."
+            },
+            "champion": {
+              "type": "string",
+              "description": "Czempion regionu: najsilniejszy stwór (monsters.json, champion: true), spotykany tylko tutaj. W Wiatrołomach i Uroczysku stoi w ostatnim regionie wewnętrznym."
             },
             "encounters": {
               "type": "array",

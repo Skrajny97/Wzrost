@@ -270,7 +270,17 @@ function checkReferences(data) {
           const monster = monstersById.get(id);
           if (!monster) errors.push(`regions.json: ${area.id} ma nieznanego potwora "${id}"`);
           else if (monster.elite) errors.push(`regions.json: ${area.id} ma elitę "${id}" w zwykłym spotkaniu`);
+          else if (monster.champion) errors.push(`regions.json: ${area.id} ma czempiona "${id}" w zwykłym spotkaniu`);
         }
+      }
+      // An inner region's own elite, and the champion, met only there.
+      if (area.elite) {
+        const own = monstersById.get(area.elite);
+        if (!own?.elite) errors.push(`regions.json: elita ${area.id} ("${area.elite}") nie jest znaną elitą`);
+      }
+      if (area.champion) {
+        const champion = monstersById.get(area.champion);
+        if (!champion?.champion) errors.push(`regions.json: czempion ${area.id} ("${area.champion}") nie jest znanym czempionem`);
       }
       if (!area.encounters.some((encounter) => (encounter.minLevel ?? 1) <= area.minLevel)) {
         errors.push(`regions.json: ${area.id} nie ma spotkania od swojego pierwszego poziomu`);
@@ -283,6 +293,14 @@ function checkReferences(data) {
     const elite = monstersById.get(region.elite);
     if (!elite) errors.push(`regions.json: ${region.id} ma nieznaną elitę "${region.elite}"`);
     else if (!elite.elite) errors.push(`regions.json: elita ${region.id} ("${region.elite}") nie jest oznaczona jako elite`);
+    if (region.areas.filter((area) => area.champion).length > 1) errors.push(`regions.json: ${region.id} może mieć czempiona tylko w jednym regionie wewnętrznym`);
+  }
+  // A creature is an elite or a champion, never both, and every champion has its place.
+  for (const monster of data.monsters) {
+    if (monster.elite && monster.champion) errors.push(`monsters.json: ${monster.id} nie może być naraz elitą i czempionem`);
+    if (monster.champion && !data.regions.some((region) => region.areas.some((area) => area.champion === monster.id))) {
+      errors.push(`monsters.json: czempion ${monster.id} nie ma miejsca w regions.json`);
+    }
   }
 
   // A building is paid in gold and resources, from the first level on: the

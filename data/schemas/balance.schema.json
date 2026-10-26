@@ -335,6 +335,8 @@
         "findIntervalMinutes",
         "eliteChancePerFight",
         "eliteLevelBonus",
+        "championChancePerFight",
+        "championLevelBonus",
         "recoveryAfterFight",
         "soloXpBonus",
         "lowLevelFreeDiff",
@@ -432,6 +434,16 @@
           "type": "number",
           "minimum": 0
         },
+        "championChancePerFight": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Szansa na czempiona w walce trwającej minutesPerFightReference minut, tylko w regionie wewnętrznym, który ma czempiona (regions.json: champion). Jak przy elicie rośnie z czasem, który walka zajmuje."
+        },
+        "championLevelBonus": {
+          "type": "number",
+          "minimum": 0,
+          "description": "O ile poziomów czempion przewyższa najwyższy poziom swojego regionu wewnętrznego."
+        },
         "recoveryAfterFight": {
           "type": "number",
           "minimum": 0
@@ -482,6 +494,11 @@
         "goldPerLevel",
         "eliteGoldMultiplier",
         "eliteRarityBonus",
+        "championXpMultiplier",
+        "championGoldMultiplier",
+        "championMaterialChance",
+        "championItemChance",
+        "championItems",
         "toughDropMultiplier",
         "findOutcomes",
         "findGoldPerLevel",
@@ -515,6 +532,34 @@
           "type": "number",
           "minimum": 0,
           "description": "Mnożnik szansy na wyższą rzadkość przedmiotu ze skrzyni, którą zostawia pokonana elita."
+        },
+        "championXpMultiplier": { "type": "number", "minimum": 0 },
+        "championGoldMultiplier": { "type": "number", "minimum": 0 },
+        "championMaterialChance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Szansa, że pokonany czempion zostawi swój materiał (najrzadszy w regionie), niezależnie od długości wyprawy."
+        },
+        "championItemChance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Szansa na skrzynię z przedmiotem po pokonaniu czempiona. Rzadkość losuje się z championItems."
+        },
+        "championItems": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Wagi rzadkości przedmiotu od czempiona według jego poziomu: obowiązuje próg o najwyższym fromLevel nie większym niż poziom czempiona.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["fromLevel", "rarities"],
+            "properties": {
+              "fromLevel": { "type": "integer", "minimum": 1 },
+              "rarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 } }
+            }
+          }
         },
         "toughDropMultiplier": {
           "type": "number",

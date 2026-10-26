@@ -229,5 +229,161 @@
     "armorFactor": 0.4,
     "resistances": { "frost": { "base": 25, "perLevel": 4 } },
     "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "stag",
+    "name": "Jeleń",
+    "counted": ["jelenia", "jelenie", "jeleni"],
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 6, "dexterity": 4, "vitality": 5, "endurance": 4, "intellect": 1, "wisdom": 1, "perception": 3, "will": 3 },
+      "growth": { "strength": 2.5, "dexterity": 1, "vitality": 3, "endurance": 2, "perception": 0.5, "will": 1 }
+    },
+    "attack": { "name": "Cios porożem", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.25 },
+    "hpFactor": 0.7,
+    "armorFactor": 0.4,
+    "reward": { "xp": 1.2, "gold": 0.8 }
+  },
+  {
+    "id": "marten",
+    "name": "Kuna",
+    "counted": ["kunę", "kuny", "kun"],
+    "family": "beast",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 3, "dexterity": 8, "vitality": 3, "endurance": 2, "intellect": 1, "wisdom": 1, "perception": 6, "will": 2 },
+      "growth": { "strength": 1.5, "dexterity": 2.5, "vitality": 2, "endurance": 1, "perception": 1.5, "will": 0.5 }
+    },
+    "attack": { "name": "Kąśnięcie w kark", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.5, "variance": 0.2 },
+    "hpFactor": 0.45,
+    "armorFactor": 0.2,
+    "reward": { "xp": 0.9, "gold": 0.7 }
+  },
+  {
+    "id": "hornets",
+    "name": "Rój szerszeni",
+    "counted": ["rój szerszeni", "roje szerszeni", "rojów szerszeni"],
+    "family": "insect",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 7, "vitality": 2, "endurance": 1, "intellect": 1, "wisdom": 1, "perception": 5, "will": 2 },
+      "growth": { "strength": 1, "dexterity": 2.5, "vitality": 1.5, "endurance": 0.5, "perception": 1.5, "will": 0.5 }
+    },
+    "attack": { "name": "Żądła", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.35, "variance": 0.2, "dot": { "effect": "poisoned", "chance": 0.35, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.4,
+    "armorFactor": 0.05,
+    "resistances": { "poison": { "base": 10, "perLevel": 3 } },
+    "reward": { "xp": 0.8, "gold": 0.3 }
+  },
+  {
+    "id": "planetnik",
+    "name": "Płanetnik",
+    "counted": ["płanetnika", "płanetniki", "płanetników"],
+    "family": "spirit",
+    "position": "back",
+    "elite": true,
+    "stats": {
+      "base": { "strength": 2, "dexterity": 6, "vitality": 5, "endurance": 3, "intellect": 8, "wisdom": 6, "perception": 5, "will": 6 },
+      "growth": { "dexterity": 1.5, "vitality": 3, "intellect": 3, "wisdom": 1, "will": 1.5 }
+    },
+    "attack": { "name": "Piorun", "sound": "magic", "category": "magical", "element": "lightning", "scaling": "intellect", "damageFactor": 0.6, "variance": 0.3 },
+    "hpFactor": 1.0,
+    "armorFactor": 0.25,
+    "resistances": { "lightning": { "base": 20, "perLevel": 4 } },
+    "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "tusker",
+    "name": "Odyniec",
+    "counted": ["odyńca", "odyńce", "odyńców"],
+    "family": "beast",
+    "position": "front",
+    "champion": true,
+    "stats": {
+      "base": { "strength": 10, "dexterity": 3, "vitality": 10, "endurance": 8, "intellect": 1, "wisdom": 2, "perception": 4, "will": 6 },
+      "growth": { "strength": 3.5, "dexterity": 0.5, "vitality": 4, "endurance": 3, "perception": 0.5, "will": 1.5 }
+    },
+    "attack": { "name": "Szarża odyńca", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 0.7, "variance": 0.3 },
+    "hpFactor": 1.6,
+    "armorFactor": 0.7,
+    "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "stoneling",
+    "name": "Kamiennik",
+    "counted": ["kamiennika", "kamienniki", "kamienników"],
+    "family": "stone",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 7, "dexterity": 1, "vitality": 7, "endurance": 9, "intellect": 1, "wisdom": 2, "perception": 2, "will": 5 },
+      "growth": { "strength": 2.5, "dexterity": 0.5, "vitality": 3, "endurance": 3.5, "perception": 0.5, "will": 1.5 }
+    },
+    "attack": { "name": "Kamienna pięść", "sound": "fist", "category": "physical", "scaling": "strength", "damageFactor": 0.55, "variance": 0.25 },
+    "hpFactor": 0.8,
+    "armorFactor": 0.8,
+    "reward": { "xp": 1.4, "gold": 1.0 }
+  },
+  {
+    "id": "bat",
+    "name": "Gacek",
+    "counted": ["gacka", "gacki", "gacków"],
+    "family": "beast",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 8, "vitality": 2, "endurance": 1, "intellect": 1, "wisdom": 2, "perception": 6, "will": 2 },
+      "growth": { "strength": 1, "dexterity": 2.5, "vitality": 1.5, "endurance": 0.5, "perception": 1.5, "will": 0.5 }
+    },
+    "attack": { "name": "Ugryzienie", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.4, "variance": 0.2 },
+    "hpFactor": 0.4,
+    "armorFactor": 0.1,
+    "reward": { "xp": 0.7, "gold": 0.4 }
+  },
+  {
+    "id": "eagle-owl",
+    "name": "Puchacz",
+    "counted": ["puchacza", "puchacze", "puchaczy"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 3, "dexterity": 6, "vitality": 3, "endurance": 2, "intellect": 2, "wisdom": 3, "perception": 7, "will": 3 },
+      "growth": { "strength": 1.5, "dexterity": 2, "vitality": 2, "endurance": 0.5, "perception": 2, "will": 0.5 }
+    },
+    "attack": { "name": "Szpony puchacza", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.5, "variance": 0.25 },
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "reward": { "xp": 1.0, "gold": 0.6 }
+  },
+  {
+    "id": "she-wolf",
+    "name": "Wadera",
+    "counted": ["waderę", "wadery", "wader"],
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 4, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 4, "will": 3 },
+      "growth": { "strength": 2.5, "dexterity": 2, "vitality": 2.5, "endurance": 1.5, "perception": 1, "will": 0.5 }
+    },
+    "attack": { "name": "Kły wadery", "sound": "bite", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.2 },
+    "hpFactor": 0.65,
+    "armorFactor": 0.3,
+    "reward": { "xp": 1.1, "gold": 0.9 }
+  },
+  {
+    "id": "basilisk",
+    "name": "Bazyliszek",
+    "counted": ["bazyliszka", "bazyliszki", "bazyliszków"],
+    "family": "snake",
+    "position": "middle",
+    "champion": true,
+    "stats": {
+      "base": { "strength": 6, "dexterity": 5, "vitality": 9, "endurance": 8, "intellect": 9, "wisdom": 6, "perception": 6, "will": 8 },
+      "growth": { "strength": 2, "dexterity": 1, "vitality": 4, "endurance": 3, "intellect": 2.5, "wisdom": 1, "will": 2 }
+    },
+    "attack": { "name": "Kamieniejące spojrzenie", "sound": "magic", "category": "magical", "element": "earth", "scaling": "intellect", "damageFactor": 0.55, "variance": 0.25 },
+    "hpFactor": 1.7,
+    "armorFactor": 0.7,
+    "resistances": { "earth": { "base": 25, "perLevel": 4 }, "poison": { "base": 20, "perLevel": 3 } },
+    "reward": { "xp": 1.0, "gold": 1.0 }
   }
 ]

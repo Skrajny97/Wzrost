@@ -110,6 +110,8 @@ test('every sprite on the list has its file at its size, and every class has its
     // The inner regions' circles and the lands' cards on the Walka screen.
     areas: data('regions').flatMap((region) => region.areas.map((area) => area.id)),
     lands: data('regions').map((region) => region.id),
+    // The camp's buildings at their three looks.
+    camp: data('buildings').flatMap((building) => [1, 2, 3].map((tier) => `${building.id}-${tier}`)),
   };
   for (const [kind, { size, width = size, height = size, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);

@@ -12,7 +12,17 @@
     { "id": "alpha-fang", "name": "Kieł basiora", "gender": "m", "monster": "alpha-wolf", "rarity": "unique", "description": "Kieł przywódcy watahy, dłuższy niż palec." },
     { "id": "bear-hide", "name": "Skóra niedźwiedzia", "gender": "f", "monster": "bear", "rarity": "epic", "description": "Ciężka, gruba skóra z brunatnym futrem." },
     { "id": "wisp-flame", "name": "Ognik błędnicy", "gender": "m", "monster": "wisp", "rarity": "legendary", "description": "Drobny płomyk, który nie gaśnie i nie parzy." },
-    { "id": "likho-eye", "name": "Oko licha", "gender": "n", "monster": "likho", "rarity": "mythic", "description": "Mętne, zimne oko. Wciąż patrzy." }
+    { "id": "likho-eye", "name": "Oko licha", "gender": "n", "monster": "likho", "rarity": "mythic", "description": "Mętne, zimne oko. Wciąż patrzy." },
+    { "id": "stag-antler", "name": "Poroże jelenia", "gender": "n", "monster": "stag", "rarity": "rare", "description": "Rozłożyste poroże o wielu odnogach, twarde jak kość." },
+    { "id": "marten-fur", "name": "Futro kuny", "gender": "n", "monster": "marten", "rarity": "rare", "description": "Miękkie, ciemnobrązowe futro z kremową plamą na piersi." },
+    { "id": "hornet-sting", "name": "Żądło szerszenia", "gender": "n", "monster": "hornets", "rarity": "common", "description": "Ostre żądło z kroplą jadu na czubku." },
+    { "id": "hailstone", "name": "Bryłka gradu", "gender": "f", "monster": "planetnik", "rarity": "legendary", "description": "Lodowa kulka z burzy płanetnika. Nie topnieje i lekko iskrzy." },
+    { "id": "tusker-tusks", "name": "Szable odyńca", "gender": "pl", "monster": "tusker", "rarity": "mythic", "description": "Długie, zakrzywione kły starego odyńca, ostre jak szable." },
+    { "id": "stone-heart", "name": "Rdzeń kamiennika", "gender": "m", "monster": "stoneling", "rarity": "epic", "description": "Omszały kamień z wnętrza kamiennika. Wciąż jest ciepły." },
+    { "id": "bat-wing", "name": "Skrzydło gacka", "gender": "n", "monster": "bat", "rarity": "rare", "description": "Cienka, skórzasta błona rozpięta na delikatnych kościach." },
+    { "id": "eagle-owl-feather", "name": "Pióro puchacza", "gender": "n", "monster": "eagle-owl", "rarity": "unique", "description": "Duże, płowe pióro w ciemne prążki." },
+    { "id": "she-wolf-fur", "name": "Futro wadery", "gender": "n", "monster": "she-wolf", "rarity": "unique", "description": "Jasnoszare futro o białych końcówkach włosa." },
+    { "id": "basilisk-scale", "name": "Łuska bazyliszka", "gender": "f", "monster": "basilisk", "rarity": "divine", "description": "Mieniąca się łuska. Kto patrzy na nią za długo, czuje chłód kamienia." }
   ],
   "parts": [
     { "id": "scraps", "name": "Ścinki", "gender": "pl", "rarity": "common", "description": "Skrawki skóry, kości i piór, oczyszczone i przycięte." },

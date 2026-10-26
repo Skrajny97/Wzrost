@@ -5,7 +5,8 @@ const byId = (list) => Object.fromEntries(list.map((item) => [item.id, item]));
 
 // Each region is split into inner regions (areas) of a few levels. An area is
 // what a character explores: it has its own levels and encounters, and takes
-// the safety, trait and elite of its region.
+// the safety and trait of its region, and its elite unless it has its own.
+// The region's champion lives in one area only.
 function areasOf(region) {
   return region.areas.map((area) => ({
     ...area,
@@ -15,7 +16,8 @@ function areasOf(region) {
     land: region.land,
     safe: region.safe,
     trait: region.trait,
-    elite: region.elite,
+    elite: area.elite ?? region.elite,
+    champion: area.champion ?? null,
     resources: area.resources ?? region.resources,
   }));
 }

@@ -20,6 +20,7 @@
       "family": { "type": "string", "minLength": 1 },
       "position": { "enum": ["front", "middle", "back"] },
       "elite": { "type": "boolean" },
+      "champion": { "type": "boolean", "description": "Czempion: najsilniejszy stwór regionu. Spotyka się go tylko w regionie wewnętrznym, który go wskazuje (champion w regions.json)." },
       "stats": {
         "type": "object",
         "additionalProperties": false,

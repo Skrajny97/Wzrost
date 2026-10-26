@@ -9,6 +9,10 @@
     "Powietrze gęstnieje. Lokalna elita: {enemies}.",
     "Las milknie. Lokalna elita: {enemies}."
   ],
+  "championStart": [
+    "Ziemia drży pod ciężkimi krokami. Czempion tych stron: {enemies}.",
+    "Cały las cichnie i czeka. Wychodzi czempion: {enemies}."
+  ],
   "toughStart": [
     "Głębiej w puszczy czeka wymagające spotkanie: {enemies}.",
     "Ślady prowadzą do silniejszej grupy: {enemies}."
@@ -116,6 +120,7 @@
   "findTime": ["Wśród korzeni lśni odłamek czasu. Punkty Czasu: +{time}.", "W mchu tkwi drobny odłamek czasu. Punkty Czasu: +{time}."],
   "materials": ["Łup: {materials}."],
   "eliteChest": ["Tam, gdzie padła elita, stoi skrzynia. W środku: {item}."],
+  "championChest": ["Przy pokonanym czempionie leży skrzynia. W środku: {item}."],
   "firstChest": ["Tuż obok, pod paprocią, leży stara skrzynia. W środku: {item}."],
   "levelUp": ["Osiągnięto poziom {level}. Wolne punkty statystyk: +{points}. Punkty Czasu: +{time}."],
   "classLevelUp": ["{className}: poziom klasy {level}. Wolne punkty statystyk: +{points}. Punkty Czasu: +{time}."],

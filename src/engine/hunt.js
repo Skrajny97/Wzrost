@@ -9,7 +9,10 @@
 // and XP from monsters far below the character's level drops as the character
 // levels up during the exploration. HP carries over between fights and
 // recovers only partly. A lost fight ends the exploration with fainting (or,
-// against the local elite in a safe region, with a wounded retreat).
+// against the local elite or the champion in a safe region, with a wounded
+// retreat). The champion, the strongest creature of a region, waits in one
+// inner region: it almost always leaves its material, the rarest of the
+// region, and sometimes a chest with an epic or rarer item.
 
 import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
@@ -42,7 +45,8 @@ function byMinutes(pairs, minutes) {
 
 // How an exploration of this length goes: the number of fights (the pair
 // with the most minutes not above its time), the time each fight stands for
-// against the reference, and the odds of a demanding encounter or the elite.
+// against the reference, and the odds of a demanding encounter, the elite
+// and, where it lives, the champion.
 export function explorationPace(minutes, content) {
   const tuning = content.balance.hunt;
   const fights = tuning.fightsByMinutes.filter(([from]) => from <= minutes).at(-1)?.[1] ?? 1;
@@ -51,13 +55,17 @@ export function explorationPace(minutes, content) {
     fights,
     timeFactor,
     toughChance: byMinutes(tuning.toughChanceByMinutes, minutes),
-    // The elite keeps its rate per hour, so each fight of a long exploration meets it more often.
+    // The elite and the champion keep their rate per hour, so each fight of a
+    // long exploration meets them more often.
     eliteChance: Math.min(1, tuning.eliteChancePerFight * timeFactor),
+    championChance: Math.min(1, tuning.championChancePerFight * timeFactor),
     finds: minutes / tuning.findIntervalMinutes,
   };
 }
 
+// The champion is drawn only where it lives, so other places keep their draws.
 export function rollEncounter(area, rng, content, characterLevel, pace) {
+  if (area.champion && rng.chance(pace.championChance)) return championEncounter(area, content);
   if (rng.chance(pace.eliteChance)) return eliteEncounter(area, content);
   const tough = toughEncountersFor(area, characterLevel);
   if (tough.length > 0 && rng.chance(pace.toughChance)) {
@@ -87,25 +95,31 @@ export function eliteEncounter(area, content) {
   return { elite: true, members: [{ monsterId: area.elite, level: area.maxLevel + content.balance.hunt.eliteLevelBonus }] };
 }
 
+// The region's champion, alone and above the elite.
+export function championEncounter(area, content) {
+  return { elite: false, champion: true, members: [{ monsterId: area.champion, level: area.maxLevel + content.balance.hunt.championLevelBonus }] };
+}
+
 // The creatures that may meet a character in an inner region ("Czyhające
 // niebezpieczeństwa"), each with the levels it can come at: the place's range
-// in the usual encounters, some levels above it in the demanding ones, and
-// the elite above the strongest. In the order of the place's encounters, the
-// elite last.
+// in the usual encounters, some levels above it in the demanding ones, the
+// elite above the strongest and the champion above the elite. In the order
+// of the place's encounters, then the elite and the champion.
 export function areaDangers(area, content) {
-  const { toughLevelBonus, eliteLevelBonus } = content.balance.hunt;
+  const { toughLevelBonus, eliteLevelBonus, championLevelBonus } = content.balance.hunt;
   const dangers = new Map();
-  const add = (monsterId, minLevel, maxLevel, elite = false) => {
+  const add = (monsterId, minLevel, maxLevel, kind = {}) => {
     const known = dangers.get(monsterId);
-    if (!known) dangers.set(monsterId, { monsterId, minLevel, maxLevel, elite });
-    else Object.assign(known, { minLevel: Math.min(known.minLevel, minLevel), maxLevel: Math.max(known.maxLevel, maxLevel), elite: known.elite || elite });
+    if (!known) dangers.set(monsterId, { monsterId, minLevel, maxLevel, elite: false, champion: false, ...kind });
+    else Object.assign(known, { minLevel: Math.min(known.minLevel, minLevel), maxLevel: Math.max(known.maxLevel, maxLevel) }, kind);
   };
   for (const encounter of area.encounters) for (const monsterId of encounter.monsters) add(monsterId, area.minLevel, area.maxLevel);
   for (const encounter of area.tough ?? []) {
     const bonus = encounter.levelBonus ?? toughLevelBonus;
     for (const monsterId of encounter.monsters) add(monsterId, area.minLevel + bonus, area.maxLevel + bonus);
   }
-  if (area.elite) add(area.elite, area.maxLevel + eliteLevelBonus, area.maxLevel + eliteLevelBonus, true);
+  if (area.elite) add(area.elite, area.maxLevel + eliteLevelBonus, area.maxLevel + eliteLevelBonus, { elite: true });
+  if (area.champion) add(area.champion, area.maxLevel + championLevelBonus, area.maxLevel + championLevelBonus, { champion: true });
   return [...dangers.values()];
 }
 
@@ -127,6 +141,14 @@ export function regularEncounter(encounter, area, rng, content, { tough = false,
   const bonus = tough ? (encounter.levelBonus ?? toughLevelBonus) : 0;
   const level = characterLevel <= beginnerLevel ? area.minLevel : areaLevel(area, rng, content);
   return { elite: false, tough, members: encounter.monsters.map((monsterId) => ({ monsterId, level: level + bonus })) };
+}
+
+// The rarity of the item a beaten champion of `level` leaves: the weights
+// of the highest championItems step its level has reached.
+export function championItemRarity(level, rng, content) {
+  const steps = content.balance.rewards.championItems;
+  const step = steps.filter((candidate) => candidate.fromLevel <= level).at(-1) ?? steps[0];
+  return rng.weighted(Object.entries(step.rarities), ([, weight]) => weight)[0];
 }
 
 // Repeated monsters get numbers: "Wilk 1", "Wilk 2".
@@ -174,7 +196,7 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
 
   // Each fight pays for the time it stands for (`share`), so every length
   // gives about the same per hour.
-  const pace = first ? { ...explorationPace(minutes, content), toughChance: 0, eliteChance: 0 } : explorationPace(minutes, content);
+  const pace = first ? { ...explorationPace(minutes, content), toughChance: 0, eliteChance: 0, championChance: 0 } : explorationPace(minutes, content);
   const fightCount = pace.fights;
   const share = pace.timeFactor;
   const findCount = countEvents(pace.finds, rng);
@@ -262,6 +284,7 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
       index: fights.length,
       t: event.t,
       elite: encounter.elite,
+      champion: encounter.champion ?? false,
       tough: encounter.tough ?? false,
       enemies: enemies.map((enemy) => ({ name: enemy.name, level: enemy.level, monsterId: enemy.monsterId })),
       won: fight.won,
@@ -279,15 +302,16 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
     fights.push(summary);
 
     // The fight the report opens with: the one that ended the hunt, otherwise
-    // an elite fight, then a demanding one, otherwise the toughest group.
+    // the champion, an elite fight, then a demanding one, otherwise the
+    // toughest group.
     const score =
       fight.won !== true
         ? 4e9
-        : (encounter.elite ? 2e9 : encounter.tough ? 1e9 : 0) + enemies.reduce((sum, e) => sum + e.maxHp, 0);
+        : (encounter.champion ? 3e9 : encounter.elite ? 2e9 : encounter.tough ? 1e9 : 0) + enemies.reduce((sum, e) => sum + e.maxHp, 0);
     if (!key || score > key.score) key = { score, index: summary.index };
 
     const enemyList = enemies.map((enemy) => `${enemy.name} (poz. ${enemy.level})`).join(', ');
-    const start = encounter.elite ? 'eliteStart' : encounter.tough ? 'toughStart' : 'fightStart';
+    const start = encounter.champion ? 'championStart' : encounter.elite ? 'eliteStart' : encounter.tough ? 'toughStart' : 'fightStart';
     const lines = [say(texts, start, step, { enemies: enemyList })];
 
     if (fight.won === true) {
@@ -297,7 +321,8 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
         const monster = content.monstersById[enemy.monsterId];
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
-        const goldFactor = (monster.elite ? rewards.eliteGoldMultiplier : 1) * enemy.groupFactor * share;
+        const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
+        const goldFactor = rank * enemy.groupFactor * share;
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * goldFactor;
         const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1);
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, rng, content));
@@ -306,7 +331,8 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
       // A character without a weapon, and with none found yet, finds a chest
       // with one of its class right after its first won fight (randomItem
       // gives a weapon while none is found). A beaten elite leaves a chest,
-      // often with a rarer item.
+      // often with a rarer item, and a beaten champion sometimes one with an
+      // epic or rarer item.
       const chests = [];
       if (!filled.has('weapon')) {
         const weapon = randomItem(enemies[0].level, rng, content, first ? { ...loot, rarityId: content.rarities[0].id } : loot);
@@ -314,6 +340,10 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
       }
       if (encounter.elite) {
         chests.push([randomItem(enemies[0].level, rng, content, { ...loot, rarityBonus: rewards.eliteRarityBonus }), 'eliteChest']);
+      }
+      if (encounter.champion && rng.chance(rewards.championItemChance)) {
+        const rarityId = championItemRarity(enemies[0].level, rng, content);
+        chests.push([randomItem(enemies[0].level, rng, content, { ...loot, rarityId }), 'championChest']);
       }
       for (const [item] of chests) summary.chests.push(take(item));
       summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share);
@@ -335,7 +365,7 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
     }
 
     if (fight.won === false) {
-      result = encounter.elite && area.safe ? 'escaped' : 'fainted';
+      result = (encounter.elite || encounter.champion) && area.safe ? 'escaped' : 'fainted';
       hpNow = Math.max(1, Math.round(player.maxHp * tuning.hpAfterFaint));
       lines.push(say(texts, result === 'fainted' ? 'defeat' : 'escape', step, { target: player.name }));
       endedAt = event.t;
@@ -505,6 +535,7 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
     fights: hunt.fights.map((fight) => ({
       t: fight.t,
       elite: fight.elite,
+      champion: fight.champion ?? false,
       tough: fight.tough,
       won: fight.won,
       hpBefore: fight.hpBefore,

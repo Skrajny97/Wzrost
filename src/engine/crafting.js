@@ -49,12 +49,15 @@ function nextRarity(rarityId, content) {
 // is its part of the fight: the share of the exploration's time the fight
 // stands for, the group factor and a demanding encounter. So the material
 // comes at the same rate per hour whatever the length, and a fight that
-// stands for many can leave more than one.
+// stands for many can leave more than one. A champion is a trophy: it
+// leaves its own material almost always, one piece, whatever the length.
 export function materialDrops(monsterId, level, weight, rng, content) {
   const material = content.materialsByMonster[monsterId];
   const found = {};
   if (!material) return found;
-  const count = countEvents(content.raritiesById[material.rarity].materialChance * weight, rng);
+  const count = content.monstersById[monsterId]?.champion
+    ? Number(rng.chance(content.balance.rewards.championMaterialChance))
+    : countEvents(content.raritiesById[material.rarity].materialChance * weight, rng);
   const up = rarityUpChance(level, content);
   for (let i = 0; i < count; i++) {
     const key = stackKey(material.id, rng.chance(up) ? nextRarity(material.rarity, content) : material.rarity);

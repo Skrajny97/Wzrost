@@ -66,15 +66,16 @@ function dangersSheet(place) {
       place.dangers.map((danger) => {
         const known = met.has(danger.monsterId);
         const levels = danger.minLevel === danger.maxLevel ? `poz. ${danger.minLevel}` : `poz. ${danger.minLevel}–${danger.maxLevel}`;
+        const rank = danger.champion ? 'czempion' : danger.elite ? 'elita' : null;
         return h(
           'li',
-          { class: `danger-row${known ? '' : ' danger-row--unknown'}`, 'aria-label': `${known ? danger.name : 'Nieznany stwór'}, ${levels}${danger.elite ? ', elita' : ''}` },
+          { class: `danger-row${known ? '' : ' danger-row--unknown'}`, 'aria-label': `${known ? danger.name : 'Nieznany stwór'}, ${levels}${rank ? `, ${rank}` : ''}` },
           h('span', { class: 'danger-art' }, monsterSprite(danger.monsterId) ?? icon(danger.family, { size: 28 })),
           h(
             'span',
             { class: 'danger-text' },
             h('span', { class: 'danger-name', text: known ? danger.name : '???' }),
-            h('span', { class: 'danger-meta', text: danger.elite ? `${levels} · elita` : levels }),
+            h('span', { class: 'danger-meta', text: rank ? `${levels} · ${rank}` : levels }),
           ),
         );
       }),

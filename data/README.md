@@ -7,3 +7,5 @@ Każdy plik ma schemat w `schemas/`. Polecenie `npm run validate` sprawdza schem
 Teksty w `texts.json` mają po kilka wariantów, bo raporty czyta się setki razy. Wariant wybiera silnik, a w nawiasach klamrowych są wstawiane wartości, np. `{target}` albo `{damage}`.
 
 Teksty zadań w `quests.json` mają `{count}` (ile) i `{noun}` (rzeczownik w formie do tej liczby: 1, 2–4, 5 i więcej). Stwór w zadaniu bierze formy ze swojego `counted` w `monsters.json`, np. „wilka”, „wilki”, „wilków”.
+
+Region ma swoją elitę (`elite` w `regions.json`), a region wewnętrzny może mieć własną elitę i czempiona (`champion`). Elita i czempion to potwory z `elite: true` albo `champion: true` w `monsters.json`. Walidator pilnuje, żeby czempion mieszkał najwyżej w jednym regionie wewnętrznym każdego regionu i nie trafiał do zwykłych spotkań.

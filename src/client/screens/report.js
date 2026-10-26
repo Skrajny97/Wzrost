@@ -169,6 +169,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         { class: 'fight-title' },
         `Walka ${index + 1} z ${count}`,
         report.keyFight?.index === index && h('span', { class: 'chip chip--key', text: 'najważniejsza' }),
+        fight.champion && h('span', { class: 'chip chip--champion', text: 'czempion' }),
         fight.elite && h('span', { class: 'chip chip--elite', text: 'elita' }),
         fight.tough && h('span', { class: 'chip chip--tough', text: 'wymagająca' }),
       ),

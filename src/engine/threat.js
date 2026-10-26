@@ -1,6 +1,7 @@
 // Threat level shown before an exploration, from the inner region, its length,
 // current HP and the party. Sample fights against every kind of encounter of
-// the inner region (regular, demanding and the elite) show how much HP each kind
+// the inner region (regular, demanding, the elite and, where it lives, the
+// champion) show how much HP each kind
 // costs. They use the same combatant as the exploration itself (stats,
 // equipment, and later skills and companions), so the rating follows the whole
 // character, not its level alone. The chance of fainting then follows from how
@@ -11,6 +12,7 @@
 import { playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import {
+  championEncounter,
   eliteEncounter,
   encounterCombatants,
   encountersFor,
@@ -27,9 +29,9 @@ import { durationsUpTo } from './unlocks.js';
 // unlucky fight decides less. A character that loses 15% or more of the
 // regular fights is in very high danger on any exploration, so more fights
 // would change nothing. The elite is met in at most one exploration in nine
-// and its fights are long, so it keeps the first few.
+// and its fights are long, so it keeps the first few, as does the champion.
 const SAMPLES = 3;
-const MORE_SAMPLES = { regular: 27, tough: 18, elite: 0 };
+const MORE_SAMPLES = { regular: 27, tough: 18, elite: 0, champion: 0 };
 const STEPS = 25;
 const LOST = STEPS + 1;
 export const THREAT_LEVELS = ['low', 'moderate', 'high', 'very-high'];
@@ -86,6 +88,7 @@ export function threatSamples({ character, equipped, areaId }, content) {
     regular: kinds(encountersFor(area, character.level)),
     tough: kinds(toughEncountersFor(area, character.level), { tough: true }),
     elite: [sampleKind(() => eliteEncounter(area, content), 1)],
+    champion: area.champion ? [sampleKind(() => championEncounter(area, content), 1)] : [],
   };
   for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content);
   if (mix(groups.regular)[LOST] < LIMITS.at(-1)) {
@@ -102,14 +105,16 @@ export function threatSamples({ character, equipped, areaId }, content) {
     regular: mix(groups.regular),
     tough: groups.tough.length > 0 ? mix(groups.tough) : null,
     elite: mix(groups.elite),
-    // Against the elite of a safe region running out of HP is a retreat.
-    eliteSafe: Boolean(area.safe),
+    champion: groups.champion.length > 0 ? mix(groups.champion) : null,
+    // Against the elite or the champion of a safe region running out of HP
+    // is a retreat.
+    safe: Boolean(area.safe),
   };
 }
 
 // Chance of fainting for every exploration length, between 0 and 1.
 export function faintChances({ character, equipped, hp, areaId }, content, samples) {
-  const { maxHp, recovery, regular, tough, elite, eliteSafe } = samples ?? threatSamples({ character, equipped, areaId }, content);
+  const { maxHp, recovery, regular, tough, elite, champion, safe } = samples ?? threatSamples({ character, equipped, areaId }, content);
   // HP after the rest that follows a won fight, for each HP left after it.
   const rested = Array.from({ length: STEPS + 1 }, (_, left) => Math.round(left + (STEPS - left) * recovery));
   const start = Math.round((Math.min(hp, maxHp) / maxHp) * STEPS);
@@ -123,17 +128,21 @@ export function faintChances({ character, equipped, hp, areaId }, content, sampl
   const result = {};
   for (const minutes of durationsUpTo(content.balance.hunt.maxMinutes, content)) {
     const pace = explorationPace(minutes, content);
-    const eliteShare = pace.eliteChance;
+    // The champion is drawn first, then the elite (rollEncounter).
+    const championShare = champion ? pace.championChance : 0;
+    const eliteShare = (1 - championShare) * pace.eliteChance;
     const toughShare = tough ? pace.toughChance : 0;
     const losses = [];
+    // The elite's and the champion's share of fights that cost `steps`.
+    const rare = (steps) => eliteShare * elite[steps] + (champion ? championShare * champion[steps] : 0);
     for (let steps = 0; steps <= LOST; steps++) {
       const fight = regular[steps] * (1 - toughShare) + (toughShare > 0 ? tough[steps] * toughShare : 0);
-      shares[steps] = (1 - eliteShare) * fight + eliteShare * elite[steps];
+      shares[steps] = (1 - eliteShare - championShare) * fight + rare(steps);
       if (steps < LOST && shares[steps] > 0) losses.push(steps);
     }
     // A lost fight, or one that takes all the HP left, ends in fainting, except
-    // against the elite of a safe region.
-    const fainting = (steps) => shares[steps] - (eliteSafe ? eliteShare * elite[steps] : 0);
+    // against the elite or the champion of a safe region.
+    const fainting = (steps) => shares[steps] - (safe ? rare(steps) : 0);
     let tail = fainting(LOST);
     for (let steps = STEPS; steps >= 0; steps--) {
       tail += fainting(steps);

@@ -2894,6 +2894,12 @@ img.area-art {
   border-color: #e0a03c;
 }
 
+/* The champion, the strongest creature of a region: a brighter gold frame. */
+.unit--champion {
+  border-color: #f2d675;
+  box-shadow: 0 0 12px rgba(242, 214, 117, 0.35);
+}
+
 .unit-top {
   display: flex;
   justify-content: space-between;
@@ -3297,6 +3303,12 @@ img.area-art {
 .chip--elite {
   border-color: rgba(224, 160, 60, 0.7);
   color: #e0a03c;
+  font-size: 11px;
+}
+
+.chip--champion {
+  border-color: rgba(242, 214, 117, 0.8);
+  color: #f2d675;
   font-size: 11px;
 }
 
@@ -3723,6 +3735,11 @@ a.camp-level-button {
   width: 100%;
   aspect-ratio: 100 / 80;
   transition: transform 0.12s ease;
+}
+
+/* A building's pixel-art picture, on the board and on its own screen. */
+.camp-plot-art image {
+  image-rendering: pixelated;
 }
 
 .camp-plot:active .camp-plot-art {

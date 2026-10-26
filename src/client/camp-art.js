@@ -1,8 +1,10 @@
-// Vector stand-ins for the camp board: the glade with its paths, and each
-// building at three sizes (levels 1–3, 4–7 and 8–10), as an empty plot and
-// under construction. Drawn in the colours of the inner regions' scenes; the
-// author will replace them with their own artwork. Fixed markup only: no game
-// data goes into these strings.
+// The camp board: the glade with its paths, and each building at three looks
+// (levels 1–3, 4–7 and 8–10), as an empty plot and under construction. A look
+// with a Retro Diffusion picture (SPRITES.camp in art.js) shows it; the others
+// keep the vector stand-ins below, drawn in the colours of the inner regions'
+// scenes. Fixed markup only: no game data goes into these strings.
+
+import { campArt } from './art.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -430,14 +432,23 @@ function svgElement(viewBox, className, markup) {
   return svg;
 }
 
+// A building's look: its picture, standing on the bottom of the plot, or its
+// vector stand-in. The picture's address is one of the fixed ones in art.js.
+function look(buildingId, tier) {
+  const src = campArt(buildingId, tier);
+  if (src) return `<image href="${src}" width="100" height="80" preserveAspectRatio="xMidYMax meet"></image>`;
+  return (BUILDINGS[buildingId] ?? BUILDINGS.campfire)[tier - 1]();
+}
+
 // The markup of a plot: the building at its level, an empty plot with a faint
-// outline of what will stand there, or either behind scaffolding.
+// outline of what will stand there, or either behind scaffolding. A picture
+// brings its own ground; a vector drawing stands on the trodden earth.
 export function plotMarkup(buildingId, { level, building = false }) {
-  const tiers = BUILDINGS[buildingId] ?? BUILDINGS.campfire;
   if (level <= 0) {
-    return `${EMPTY_PLOT}<g opacity="${building ? 0.45 : 0.22}">${tiers[0]()}</g>${building ? SCAFFOLD : ''}`;
+    return `${EMPTY_PLOT}<g opacity="${building ? 0.45 : 0.22}">${look(buildingId, 1)}</g>${building ? SCAFFOLD : ''}`;
   }
-  return `${GROUND}${tiers[buildingTier(level) - 1]()}${building ? SCAFFOLD : ''}`;
+  const tier = buildingTier(level);
+  return `${campArt(buildingId, tier) ? '' : GROUND}${look(buildingId, tier)}${building ? SCAFFOLD : ''}`;
 }
 
 export const boardMarkup = () => BOARD;

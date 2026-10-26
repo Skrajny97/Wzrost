@@ -6,7 +6,7 @@
     "minLevel": 1,
     "maxLevel": 25,
     "safe": true,
-    "description": "Pas powalonych drzew na skraju puszczy. Wilki, dziki i kruki, a w gęstwinie błędne światło.",
+    "description": "Pas powalonych drzew na skraju puszczy. Wilki, dziki, jelenie i kruki, a w gęstwinie błędne światło i burzowy płanetnik.",
     "trait": {
       "name": "Święty gaj",
       "description": "Odpoczynek między walkami przywraca o 5% więcej HP.",
@@ -35,7 +35,7 @@
         "name": "Lisie Jary",
         "minLevel": 6,
         "maxLevel": 10,
-        "description": "Piaszczyste jary pełne nor. Lisy polują tu parami, a borsuki bronią swoich kryjówek.",
+        "description": "Piaszczyste jary pełne nor. Lisy polują tu parami, borsuki bronią swoich kryjówek, a po drzewach skaczą kuny.",
         "encounters": [
           { "weight": 18, "monsters": ["fox"] },
           { "weight": 14, "monsters": ["badger"] },
@@ -44,7 +44,9 @@
           { "weight": 12, "monsters": ["fox", "fox"] },
           { "weight": 10, "monsters": ["wolf", "fox"] },
           { "weight": 8, "monsters": ["wolf", "wolf"] },
-          { "weight": 6, "monsters": ["badger", "fox"] }
+          { "weight": 6, "monsters": ["badger", "fox"] },
+          { "weight": 10, "monsters": ["marten"] },
+          { "weight": 6, "monsters": ["marten", "fox"] }
         ]
       },
       {
@@ -52,7 +54,7 @@
         "name": "Krucze Wykroty",
         "minLevel": 11,
         "maxLevel": 15,
-        "description": "Wywrócone drzewa z korzeniami do nieba. Gnieżdżą się na nich kruki, a o zmierzchu poluje puszczyk.",
+        "description": "Wywrócone drzewa z korzeniami do nieba. Gnieżdżą się na nich kruki, o zmierzchu poluje puszczyk, a między wykrotami pasą się jelenie.",
         "encounters": [
           { "weight": 16, "monsters": ["crow", "crow"] },
           { "weight": 14, "monsters": ["wolf", "crow"] },
@@ -61,12 +63,15 @@
           { "weight": 8, "monsters": ["viper", "crow"] },
           { "weight": 8, "monsters": ["owl", "crow"] },
           { "weight": 8, "monsters": ["boar"] },
-          { "weight": 6, "monsters": ["fox", "crow"] }
+          { "weight": 6, "monsters": ["fox", "crow"] },
+          { "weight": 8, "monsters": ["stag"] },
+          { "weight": 6, "monsters": ["marten", "crow"] }
         ],
         "tough": [
           { "weight": 10, "monsters": ["crow", "crow", "crow"] },
           { "weight": 8, "monsters": ["wolf", "wolf", "crow"] },
-          { "weight": 6, "monsters": ["owl", "owl", "crow"] }
+          { "weight": 6, "monsters": ["owl", "owl", "crow"] },
+          { "weight": 6, "monsters": ["stag", "crow", "crow"] }
         ]
       },
       {
@@ -74,7 +79,7 @@
         "name": "Żmijowe Zwalisko",
         "minLevel": 16,
         "maxLevel": 20,
-        "description": "Nagrzane słońcem stosy pni. Na każdym kamieniu wygrzewa się żmija.",
+        "description": "Nagrzane słońcem stosy pni. Na każdym kamieniu wygrzewa się żmija, a w spróchniałych pniach brzęczą szerszenie.",
         "encounters": [
           { "weight": 18, "monsters": ["viper"] },
           { "weight": 12, "monsters": ["viper", "viper"] },
@@ -82,20 +87,24 @@
           { "weight": 10, "monsters": ["badger"] },
           { "weight": 10, "monsters": ["boar"] },
           { "weight": 8, "monsters": ["wolf", "viper"] },
-          { "weight": 6, "monsters": ["fox", "viper"] }
+          { "weight": 6, "monsters": ["fox", "viper"] },
+          { "weight": 10, "monsters": ["hornets"] },
+          { "weight": 8, "monsters": ["hornets", "viper"] }
         ],
         "tough": [
           { "weight": 10, "monsters": ["viper", "viper", "crow"] },
           { "weight": 6, "monsters": ["viper", "viper", "viper"] },
-          { "weight": 6, "monsters": ["boar", "viper", "viper"] }
-        ]
+          { "weight": 6, "monsters": ["boar", "viper", "viper"] },
+          { "weight": 6, "monsters": ["hornets", "hornets", "viper"] }
+        ],
+        "elite": "planetnik"
       },
       {
         "id": "boar-thicket",
         "name": "Dzicza Głusza",
         "minLevel": 21,
         "maxLevel": 25,
-        "description": "Najgęstsza część Wiatrołomów. Zryta ziemia zdradza dziki, a nocą słychać wilki.",
+        "description": "Najgęstsza część Wiatrołomów. Zryta ziemia zdradza dziki, a nocą słychać wilki. Na pniach widać ślady kłów wyżej, niż sięga człowiek.",
         "encounters": [
           { "weight": 12, "monsters": ["boar"] },
           { "weight": 8, "monsters": ["wolf"] },
@@ -106,14 +115,20 @@
           { "weight": 8, "monsters": ["badger"] },
           { "weight": 6, "monsters": ["boar", "boar"] },
           { "weight": 6, "monsters": ["boar", "fox"] },
-          { "weight": 4, "monsters": ["badger", "boar"] }
+          { "weight": 4, "monsters": ["badger", "boar"] },
+          { "weight": 8, "monsters": ["stag"] },
+          { "weight": 6, "monsters": ["stag", "boar"] },
+          { "weight": 6, "monsters": ["hornets", "wolf"] }
         ],
         "tough": [
           { "weight": 4, "monsters": ["wolf", "wolf", "wolf"] },
           { "weight": 6, "monsters": ["boar", "boar"] },
           { "weight": 6, "monsters": ["wolf", "wolf", "crow"] },
-          { "weight": 3, "monsters": ["boar", "boar", "wolf"] }
-        ]
+          { "weight": 3, "monsters": ["boar", "boar", "wolf"] },
+          { "weight": 4, "monsters": ["stag", "stag", "crow"] }
+        ],
+        "elite": "planetnik",
+        "champion": "tusker"
       }
     ]
   },
@@ -124,7 +139,7 @@
     "minLevel": 26,
     "maxLevel": 50,
     "safe": false,
-    "description": "Polana z kręgiem omszałych głazów, za którą zaczyna się prawdziwa puszcza. Rysie, krzyżaki i watahy z basiorem.",
+    "description": "Polana z kręgiem omszałych głazów, za którą zaczyna się prawdziwa puszcza. Kamienniki, rysie, krzyżaki i watahy wader z basiorem.",
     "trait": {
       "name": "Kamienny krąg",
       "description": "Postać na przedzie ma o 5% więcej pancerza.",
@@ -138,20 +153,20 @@
         "name": "Omszałe Głazy",
         "minLevel": 26,
         "maxLevel": 30,
-        "description": "Zewnętrzny krąg kamieni porośniętych mchem. Krzyżaki rozpinają sieci między głazami.",
+        "description": "Zewnętrzny krąg kamieni porośniętych mchem. Krzyżaki rozpinają sieci między głazami, a niektóre głazy budzą się do życia.",
         "encounters": [
           { "weight": 14, "monsters": ["spider"] },
-          { "weight": 12, "monsters": ["wolf", "wolf"] },
-          { "weight": 12, "monsters": ["badger"] },
-          { "weight": 10, "monsters": ["boar"] },
-          { "weight": 10, "monsters": ["badger", "spider"] },
-          { "weight": 8, "monsters": ["spider", "viper"] },
+          { "weight": 12, "monsters": ["she-wolf", "she-wolf"] },
+          { "weight": 12, "monsters": ["stoneling"] },
+          { "weight": 10, "monsters": ["bat", "bat"] },
+          { "weight": 10, "monsters": ["stoneling", "spider"] },
+          { "weight": 8, "monsters": ["spider", "bat"] },
           { "weight": 8, "monsters": ["lynx"] },
           { "weight": 6, "monsters": ["alpha-wolf"] }
         ],
         "tough": [
-          { "weight": 8, "monsters": ["spider", "spider", "viper"] },
-          { "weight": 6, "monsters": ["boar", "boar", "boar"] },
+          { "weight": 8, "monsters": ["spider", "spider", "bat"] },
+          { "weight": 6, "monsters": ["stoneling", "stoneling"] },
           { "weight": 6, "monsters": ["lynx", "lynx"] }
         ]
       },
@@ -160,20 +175,20 @@
         "name": "Pajęczy Parów",
         "minLevel": 31,
         "maxLevel": 35,
-        "description": "Wąski parów zasnuty pajęczyną. Krzyżaki i żmije czekają w cieniu.",
+        "description": "Wąski parów zasnuty pajęczyną. Krzyżaki czekają w cieniu, a pod skalnym nawisem wiszą gacki.",
         "encounters": [
           { "weight": 14, "monsters": ["spider"] },
-          { "weight": 12, "monsters": ["spider", "viper"] },
+          { "weight": 12, "monsters": ["spider", "bat"] },
           { "weight": 10, "monsters": ["spider", "spider"] },
-          { "weight": 8, "monsters": ["viper", "viper"] },
-          { "weight": 8, "monsters": ["badger", "spider"] },
+          { "weight": 8, "monsters": ["bat", "bat"] },
+          { "weight": 8, "monsters": ["stoneling", "spider"] },
           { "weight": 8, "monsters": ["lynx"] },
           { "weight": 6, "monsters": ["alpha-wolf"] }
         ],
         "tough": [
-          { "weight": 10, "monsters": ["spider", "spider", "viper"] },
+          { "weight": 10, "monsters": ["spider", "spider", "bat"] },
           { "weight": 6, "monsters": ["spider", "spider", "spider"] },
-          { "weight": 6, "monsters": ["spider", "viper", "viper"] }
+          { "weight": 6, "monsters": ["spider", "bat", "bat"] }
         ]
       },
       {
@@ -181,20 +196,20 @@
         "name": "Rysia Grań",
         "minLevel": 36,
         "maxLevel": 40,
-        "description": "Skalny grzbiet nad polaną. Rysie czają się na półkach i spadają na ofiarę z góry.",
+        "description": "Skalny grzbiet nad polaną. Rysie czają się na półkach i spadają na ofiarę z góry, a nad nimi krąży puchacz.",
         "encounters": [
           { "weight": 16, "monsters": ["lynx"] },
-          { "weight": 12, "monsters": ["lynx", "crow"] },
-          { "weight": 8, "monsters": ["lynx", "owl"] },
-          { "weight": 8, "monsters": ["owl"] },
-          { "weight": 10, "monsters": ["wolf", "wolf"] },
-          { "weight": 8, "monsters": ["boar"] },
+          { "weight": 12, "monsters": ["lynx", "bat"] },
+          { "weight": 8, "monsters": ["lynx", "eagle-owl"] },
+          { "weight": 8, "monsters": ["eagle-owl"] },
+          { "weight": 10, "monsters": ["she-wolf", "she-wolf"] },
+          { "weight": 8, "monsters": ["stoneling"] },
           { "weight": 8, "monsters": ["spider"] }
         ],
         "tough": [
           { "weight": 10, "monsters": ["lynx", "lynx"] },
-          { "weight": 6, "monsters": ["lynx", "lynx", "owl"] },
-          { "weight": 6, "monsters": ["alpha-wolf", "wolf", "wolf"] }
+          { "weight": 6, "monsters": ["lynx", "lynx", "eagle-owl"] },
+          { "weight": 6, "monsters": ["alpha-wolf", "she-wolf", "she-wolf"] }
         ]
       },
       {
@@ -202,21 +217,21 @@
         "name": "Wilcze Kręgi",
         "minLevel": 41,
         "maxLevel": 45,
-        "description": "Polany, na których wyją watahy. Prowadzi je basior.",
+        "description": "Polany, na których wyją watahy. Wadery polują razem, a prowadzi je basior.",
         "encounters": [
           { "weight": 10, "monsters": ["alpha-wolf"] },
-          { "weight": 12, "monsters": ["wolf"] },
-          { "weight": 10, "monsters": ["wolf", "wolf"] },
-          { "weight": 6, "monsters": ["alpha-wolf", "wolf"] },
+          { "weight": 12, "monsters": ["she-wolf"] },
+          { "weight": 10, "monsters": ["she-wolf", "she-wolf"] },
+          { "weight": 6, "monsters": ["alpha-wolf", "she-wolf"] },
           { "weight": 10, "monsters": ["lynx"] },
-          { "weight": 8, "monsters": ["boar"] },
-          { "weight": 8, "monsters": ["badger"] },
-          { "weight": 6, "monsters": ["wolf", "crow"] }
+          { "weight": 8, "monsters": ["stoneling"] },
+          { "weight": 8, "monsters": ["eagle-owl"] },
+          { "weight": 6, "monsters": ["she-wolf", "bat"] }
         ],
         "tough": [
-          { "weight": 6, "monsters": ["alpha-wolf", "wolf", "wolf"] },
+          { "weight": 6, "monsters": ["alpha-wolf", "she-wolf", "she-wolf"] },
           { "weight": 4, "monsters": ["alpha-wolf", "alpha-wolf"] },
-          { "weight": 4, "monsters": ["wolf", "wolf", "wolf"] }
+          { "weight": 4, "monsters": ["she-wolf", "she-wolf", "she-wolf"] }
         ]
       },
       {
@@ -224,24 +239,25 @@
         "name": "Serce Uroczyska",
         "minLevel": 46,
         "maxLevel": 50,
-        "description": "Środek kamiennego kręgu. Wszystko jest tu większe i groźniejsze, a w gąszczu mieszka niedźwiedź.",
+        "description": "Środek kamiennego kręgu. Wszystko jest tu większe i groźniejsze, a w gąszczu mieszka niedźwiedź. Między głazami stoją kamienne zwierzęta, których nikt nie wyrzeźbił.",
         "encounters": [
           { "weight": 8, "monsters": ["bear"] },
           { "weight": 8, "monsters": ["alpha-wolf"] },
           { "weight": 10, "monsters": ["lynx"] },
-          { "weight": 10, "monsters": ["wolf", "wolf"] },
-          { "weight": 6, "monsters": ["alpha-wolf", "wolf"] },
-          { "weight": 6, "monsters": ["boar", "boar"] },
-          { "weight": 10, "monsters": ["spider", "viper"] },
-          { "weight": 8, "monsters": ["lynx", "crow"] },
-          { "weight": 8, "monsters": ["badger"] }
+          { "weight": 10, "monsters": ["she-wolf", "she-wolf"] },
+          { "weight": 6, "monsters": ["alpha-wolf", "she-wolf"] },
+          { "weight": 6, "monsters": ["stoneling", "stoneling"] },
+          { "weight": 10, "monsters": ["spider", "bat"] },
+          { "weight": 8, "monsters": ["lynx", "eagle-owl"] },
+          { "weight": 8, "monsters": ["stoneling"] }
         ],
         "tough": [
-          { "weight": 6, "monsters": ["bear", "wolf"] },
-          { "weight": 6, "monsters": ["alpha-wolf", "wolf", "wolf"] },
+          { "weight": 6, "monsters": ["bear", "she-wolf"] },
+          { "weight": 6, "monsters": ["alpha-wolf", "she-wolf", "she-wolf"] },
           { "weight": 3, "monsters": ["bear", "bear"] },
           { "weight": 6, "monsters": ["lynx", "lynx"] }
-        ]
+        ],
+        "champion": "basilisk"
       }
     ]
   }

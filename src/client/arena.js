@@ -84,7 +84,11 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
         : monsterSprite(unit.monsterId);
     const card = h(
       'div',
-      { class: `unit unit--${unit.side}${unit.elite ? ' unit--elite' : ''}`, role: 'group', 'aria-label': `${unit.name}, poziom ${unit.level}` },
+      {
+        class: `unit unit--${unit.side}${unit.champion ? ' unit--champion' : unit.elite ? ' unit--elite' : ''}`,
+        role: 'group',
+        'aria-label': `${unit.name}, poziom ${unit.level}${unit.champion ? ', czempion' : unit.elite ? ', elita' : ''}`,
+      },
       art
         ? h('span', { class: 'unit-art' }, art, level)
         : h(

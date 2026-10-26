@@ -3,6 +3,9 @@ import { describe, test } from 'node:test';
 
 import {
   applyHunt,
+  championEncounter,
+  championItemRarity,
+  monsterXp,
   fireDay,
   fireTrade,
   fireTradeBlock,
@@ -588,11 +591,26 @@ describe('inner regions', () => {
       for (const area of region.areas) {
         assert.equal(area.maxLevel - area.minLevel, 4);
         assert.equal(area.regionId, region.id);
-        assert.equal(area.elite, region.elite);
+        assert.ok(content.monstersById[area.elite].elite, area.id);
         assert.equal(area.safe, region.safe);
         assert.deepEqual(area.trait, region.trait);
       }
+      // The champion lives in the last inner region only.
+      assert.deepEqual(region.areas.slice(0, -1).map((area) => area.champion), [null, null, null, null]);
+      assert.ok(content.monstersById[region.areas.at(-1).champion].champion, region.id);
     }
+    // Wiatrołomy: Błędnica in the first three inner regions, Płanetnik deeper.
+    assert.deepEqual(content.regionsById.windfalls.areas.map((area) => area.elite), ['wisp', 'wisp', 'wisp', 'planetnik', 'planetnik']);
+    assert.deepEqual(content.regions.map((region) => region.areas.at(-1).champion), ['tusker', 'basilisk']);
+  });
+
+  test('Uroczysko Kamieni has its own creatures, none from Wiatrołomy', () => {
+    const roster = (region) => new Set(region.areas.flatMap((area) => [...area.encounters, ...area.tough].flatMap((encounter) => encounter.monsters)));
+    const windfalls = roster(content.regionsById.windfalls);
+    const glade = roster(content.regionsById['stone-glade']);
+    assert.deepEqual([...glade].filter((id) => windfalls.has(id)), []);
+    for (const id of ['stag', 'marten', 'hornets']) assert.ok(windfalls.has(id), id);
+    for (const id of ['stoneling', 'bat', 'eagle-owl', 'she-wolf']) assert.ok(glade.has(id), id);
   });
 
   test('monsters keep to the levels of the inner region', () => {
@@ -1252,6 +1270,91 @@ describe('upgrades', () => {
 });
 
 
+describe('champions', () => {
+  const geared = (classId, level) => typicalCharacter(classId, level, content);
+  // The same game in which every fight of a champion's inner region meets the champion.
+  const always = (rewards = {}) => ({
+    ...content,
+    balance: {
+      ...content.balance,
+      hunt: { ...content.balance.hunt, championChancePerFight: 100 },
+      rewards: { ...content.balance.rewards, ...rewards },
+    },
+  });
+
+  test('the champion lives in the last inner region, two levels above it, and is listed last', () => {
+    const thicket = content.areasById['boar-thicket'];
+    assert.deepEqual(championEncounter(thicket, content), { elite: false, champion: true, members: [{ monsterId: 'tusker', level: 27 }] });
+    const dangers = areaDangers(thicket, content);
+    assert.deepEqual(dangers.at(-1), { monsterId: 'tusker', minLevel: 27, maxLevel: 27, elite: false, champion: true });
+    assert.deepEqual(dangers.find((danger) => danger.elite), { monsterId: 'planetnik', minLevel: 26, maxLevel: 26, elite: true, champion: false });
+    assert.ok(!areaDangers(content.areasById['viper-heaps'], content).some((danger) => danger.champion));
+    // Elsewhere no draw is spent on it, so other places explore as before.
+    assert.equal(explorationPace(60, content).championChance, 0.012 * explorationPace(60, content).timeFactor);
+  });
+
+  test('a beaten champion pays five times the XP and gold, leaves its material almost always and sometimes an epic item', () => {
+    const tusker = content.monstersById.tusker;
+    assert.equal(monsterXp(tusker, 27, content), monsterXp({ ...tusker, champion: false }, 27, content) * 5);
+    // One piece at most, whatever share of the time the fight stands for.
+    const rng = createRng('kły');
+    let pieces = 0;
+    for (let i = 0; i < 2000; i++) {
+      const found = Object.values(materialDrops('tusker', 27, 4, rng, content)).reduce((sum, count) => sum + count, 0);
+      assert.ok(found <= 1);
+      pieces += found;
+    }
+    assert.ok(Math.abs(pieces / 2000 - 0.9) < 0.03, pieces);
+    // Every fight in Dzicza Głusza is the champion here; a strong character beats it.
+    const game = always({ championItemChance: 1 });
+    const hero = geared('warrior', 45);
+    const hunt = simulateHunt({ ...hero, hp: 99999, name: 'Mira', areaId: 'boar-thicket', minutes: 60, seed: 'odyniec' }, game);
+    assert.ok(hunt.fights.length > 0 && hunt.fights.every((fight) => fight.champion && fight.won === true));
+    for (const fight of hunt.fights) {
+      assert.deepEqual(fight.enemies.map((enemy) => [enemy.monsterId, enemy.level]), [['tusker', 27]]);
+      assert.equal(fight.chests.length, 1);
+      assert.equal(hunt.items[fight.chests[0]].rarity, 'epic');
+      for (const key of Object.keys(fight.materials)) assert.ok(key.startsWith('tusker-tusks:'), key);
+    }
+    assert.ok(hunt.entries.some((entry) => /czempion/i.test(entry.text)));
+    // The report marks the champion's fights for their chip.
+    const report = huntReport(
+      { hunt, applied: { penalty: 0, level: 45, classLevel: 45, messages: [] }, character: hero.character, areaId: 'boar-thicket', startedAt: 0, endsAt: 1 },
+      game,
+    );
+    assert.ok(report.fights.every((fight) => fight.champion === true && fight.elite === false));
+  });
+
+  test('higher champions bring rarer items', () => {
+    const rng = createRng('skrzynie');
+    const rarities = (level) => new Set(Array.from({ length: 400 }, () => championItemRarity(level, rng, content)));
+    assert.deepEqual([...rarities(27)], ['epic']);
+    assert.deepEqual([...rarities(52)].sort(), ['epic', 'legendary']);
+    assert.deepEqual([...rarities(450)].sort(), ['divine', 'mythic']);
+  });
+
+  test('losing to the champion of a safe region is a retreat, elsewhere a faint', () => {
+    const game = always();
+    const weak = geared('mage', 12);
+    const windfalls = simulateHunt({ ...weak, hp: 99999, name: 'Mira', areaId: 'boar-thicket', minutes: 30, seed: 'ucieczka' }, game);
+    assert.equal(windfalls.result, 'escaped');
+    const glade = simulateHunt({ ...weak, hp: 99999, name: 'Mira', areaId: 'glade-heart', minutes: 30, seed: 'omdlenie' }, game);
+    assert.equal(glade.result, 'fainted');
+    assert.deepEqual(glade.fights[0].enemies.map((enemy) => enemy.monsterId), ['basilisk']);
+  });
+
+  test('the threat estimate counts the champion: a retreat in a safe region, fainting elsewhere', () => {
+    const weak = geared('mage', 24);
+    const input = { ...weak, hp: 99999, areaId: 'boar-thicket' };
+    const usual = faintChances(input, content);
+    const met = faintChances(input, always());
+    // In Wiatrołomy a lost champion fight ends the exploration without fainting.
+    assert.ok(met[60] <= usual[60] + 1e-9, `${met[60]} vs ${usual[60]}`);
+    const glade = { ...geared('mage', 49), hp: 99999, areaId: 'glade-heart' };
+    assert.ok(faintChances(glade, always())[60] > faintChances(glade, content)[60]);
+  });
+});
+
 describe('materials and chests', () => {
   const geared = (classId, level) => typicalCharacter(classId, level, content);
 
@@ -1547,12 +1650,16 @@ describe('quests from the narrator', () => {
         }
       }
     }
-    // In Wilcze Kręgi crows come in few fights: never a daily quest, sometimes a weekly one.
+    // In Wilcze Kręgi bats come in few fights: never a daily quest, sometimes a weekly one.
     const later = newCharacter('mage', { level: 42, classLevel: 40 });
     assert.equal(questArea(later, content).id, 'wolf-circles');
-    const targets = (periodId) => new Set(Array.from({ length: 60 }, (_, seed) => drawQuests(periodId, { character: later, hasTable: false, seed }, content)).flat().map((quest) => quest.target));
-    assert.ok(!targets('daily').has('crow'));
-    assert.ok(targets('weekly').has('crow'));
+    const targets = (periodId, who = later) => new Set(Array.from({ length: 60 }, (_, seed) => drawQuests(periodId, { character: who, hasTable: false, seed }, content)).flat().map((quest) => quest.target));
+    assert.ok(!targets('daily').has('bat'));
+    assert.ok(targets('weekly').has('bat'));
+    // The champion is never a quest's target.
+    const last = newCharacter('mage', { level: 23, classLevel: 22 });
+    assert.equal(questArea(last, content).id, 'boar-thicket');
+    assert.ok(!targets('weekly', last).has('tusker'));
   });
 
   test('rewards: gold, resources and parts, more for a higher level and for the week', () => {

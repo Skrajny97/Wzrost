@@ -9,7 +9,11 @@ import { h } from './dom.js';
 export const SPRITES = {
   monsters: {
     size: 48,
-    ids: ['wolf', 'alpha-wolf', 'fox', 'lynx', 'bear', 'boar', 'badger', 'crow', 'owl', 'viper', 'spider', 'wisp', 'likho'],
+    ids: [
+      'wolf', 'alpha-wolf', 'fox', 'lynx', 'bear', 'boar', 'badger', 'crow', 'owl', 'viper', 'spider', 'wisp', 'likho',
+      // Wiatrołomy and Uroczysko Kamieni from 26.10.2026, with their champions.
+      'stag', 'marten', 'hornets', 'planetnik', 'tusker', 'stoneling', 'bat', 'eagle-owl', 'she-wolf', 'basilisk',
+    ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved.
   // `faces`: where the face is across, when not in the middle (a head turned
@@ -34,7 +38,12 @@ export const SPRITES = {
   // the treasure chest, 32×32.
   materials: {
     size: 32,
-    ids: ['wolf-pelt', 'fox-pelt', 'badger-claws', 'viper-scales', 'boar-tusk', 'crow-feather', 'owl-feather', 'lynx-fur', 'spider-silk', 'alpha-fang', 'bear-hide', 'wisp-flame', 'likho-eye', 'scraps', 'straps', 'fittings', 'shards', 'amber', 'bloodstone', 'star-shard', 'chest'],
+    ids: [
+      'wolf-pelt', 'fox-pelt', 'badger-claws', 'viper-scales', 'boar-tusk', 'crow-feather', 'owl-feather', 'lynx-fur', 'spider-silk', 'alpha-fang', 'bear-hide', 'wisp-flame', 'likho-eye',
+      'scraps', 'straps', 'fittings', 'shards', 'amber', 'bloodstone', 'star-shard', 'chest',
+      // The creatures of 26.10.2026.
+      'stag-antler', 'marten-fur', 'hornet-sting', 'hailstone', 'tusker-tusks', 'stone-heart', 'bat-wing', 'eagle-owl-feather', 'she-wolf-fur', 'basilisk-scale',
+    ],
   },
   // The skills of the classes (data/skills.json), 48×48.
   skills: {
@@ -58,6 +67,14 @@ export const SPRITES = {
     width: 192,
     height: 96,
     ids: ['windfalls', 'stone-glade'],
+  },
+  // The camp's buildings, <building>-<look> for the looks of levels 1–3, 4–7
+  // and 8–10, 128×96 (camp-art.js keeps a vector drawing for a look without
+  // one).
+  camp: {
+    width: 128,
+    height: 96,
+    ids: [],
   },
 };
 
@@ -85,6 +102,9 @@ export const skillSprite = (id) => sprite('skills', id, 'sprite--skill');
 export const areaSprite = (areaId) => sprite('areas', areaId, 'area-art');
 // The address of a land's background, or null while it has none.
 export const landArt = (regionId) => (available.lands.has(regionId) ? `/art/lands/${regionId}.png` : null);
+// The address of a camp building's picture at a look (1–3), or null while it
+// has none.
+export const campArt = (buildingId, tier) => (available.camp.has(`${buildingId}-${tier}`) ? `/art/camp/${buildingId}-${tier}.png` : null);
 
 // A class's figure for a look. `bust` shows the head and shoulders at the
 // image's own size, cut by the box it sits in (the arena, the class cards).
