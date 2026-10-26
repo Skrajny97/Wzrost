@@ -1296,7 +1296,7 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
 
 1. **Dane.** 15 umiejętności, po 3 na klasę, jest w `data/skills.json` (schemat `data/schemas/skills.schema.json`). Liczba umiejętności to stała wartość albo para [poziom 1, poziom 20], a między nimi rośnie po równo z poziomem. Przykład: Potężny cios bije za 140% obrażeń i pomija 20% pancerza na 1. poziomie, a na 20. bije za 200% i pomija 40%.
     - Opis skutku na karcie podstawia liczby obecnego poziomu, a „Na poziomie N+1” liczby następnego. Test pilnuje, żeby każdy kolejny poziom różnił się na karcie, więc żaden punkt nie znika bez śladu. Do tego doszedł format `{nazwa%.1}`, czyli procent z jednym miejscem po przecinku.
-2. **Punkty Umiejętności.** Każdy poziom klasy po 10. daje 1 punkt (`balance.skills`). Wybrana umiejętność startuje z 1. poziomu, a każdy punkt podnosi ją o poziom, do 20. Pełne 20 poziomów wypada więc na 29. poziomie klasy. Punkty zebrane przed wyborem czekają.
+2. **Punkty Umiejętności.** Każdy poziom klasy po 10. daje 1 punkt (`balance.skills`). Wybrana umiejętność startuje z 1. poziomu, a każdy punkt podnosi ją o poziom, do 20. Pełne 20 poziomów wypada więc na 29. poziomie klasy. Punkty zebrane przed wyborem czekają. Od 26.10.2026 punkt daje też 10. poziom klasy, a wybór umiejętności go kosztuje (zob. „Punkty Umiejętności od 10. poziomu klasy”).
 3. **Wybór na stałe.** Dokument projektowy zapowiada, że zmiana ścieżki będzie bardzo kosztowna. Zanim powstanie, wyboru nie da się cofnąć, a ekran pyta „Wybrać: …?”.
 4. **Mana.** Każda walka zaczyna się z pełną maną: 20, plus 5 za punkt Mądrości i 2 za poziom postaci (nowe `character.manaPerLevel`). W walce mana nie wraca. Bez many postać bije zwykłymi ciosami.
 5. **Postać używa umiejętności sama:**
@@ -1723,3 +1723,9 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
     - Wybór zostaje na telefonie (`localStorage`), także dla „Wyrusz ponownie”. Karta trwającej wyprawy mówi „Postać tropi stwory z zadań.”
     - Poziom zagrożenia liczy walki jak bez tropienia, bo mieszanka spotkań zmienia się niewiele.
 2. **Podgląd umiejętności w Panelu autora pod przyciskiem** (autor: „schowaj pod osobnym przyciskiem, bo muszę specjalnie scrollować, by sprawdzić aktualne konta i postaci”). Na górze panelu jest przycisk „Podgląd umiejętności”, a zaraz pod nim liczby i konta. Lista umiejętności wczytuje się dopiero przy pierwszym otwarciu.
+
+## Punkty Umiejętności od 10. poziomu klasy (26.10.2026)
+
+1. **Punkt także za 10. poziom klasy** (autor: „dalej mam punkt do rozdania – po prostu wyświetlało, że mam tylko jeden […] – do poprawy”). Dotąd 10. poziom dawał darmowy wybór ścieżki głównej, a punkty przychodziły od 11. poziomu. Na 11. poziomie zakładka pokazywała więc przed wyborem „PUNKTY: 1”, choć postać miała do wydania dwa: darmowy wybór i punkt. Teraz punkt daje każdy poziom klasy od 10. wzwyż, a nauka każdej umiejętności kosztuje punkt, także ścieżki głównej. Na 11. poziomie przed wyborem zakładka pokazuje 2. Tak mówi też tekst Systemu od autora: „Od 10. poziomu wzrost poziomu klasy pozwala Ci uzyskać 1 Punkt Umiejętności”.
+    - Bilans się nie zmienia. Postać z wybraną ścieżką ma tyle samo wolnych punktów co wcześniej. Pełne 20 poziomów jednej umiejętności dalej wypada na 29. poziomie klasy, a obu na 49. Zmieniają się tylko licznik przed pierwszym wyborem i raport 10. poziomu klasy, który podaje teraz „Zdobyto Punkty Umiejętności: +1”. Migracja nie jest potrzebna, bo punkty liczą się z poziomu klasy i znanych umiejętności.
+    - Okno wyboru ścieżki głównej mówi, że kosztuje ona 1 Punkt Umiejętności. Od 11. poziomu klasy dodaje, że ścieżkę poboczną postać dobierze za kolejny punkt.

@@ -1,14 +1,14 @@
-// Skills (data/skills.json). At a class level milestone (classLevel, today
-// only 10) the character learns one of the skills of its class there, for
+// Skills (data/skills.json). Every class level from unlockClassLevel on
+// brings Skill Points. At a class level milestone (classLevel, today only 10)
+// the character learns one of the skills of its class there for a point, for
 // good: its main development path (each skill's `path`), which will decide
 // the class's evolutions. From balance.skills.secondClassLevel it may learn
-// one more of them for a Skill Point, and the path left closes: of the three
-// it knows at most balance.skills.paths. The first learned stays first in
-// `character.skills` (keys keep the order they were added in). Every class
-// level after unlockClassLevel brings Skill Points, and each point raises a
-// learned skill by a level, up to maxLevel. A skill's numbers grow evenly
-// from level 1 to the top level ([from, to] in its params). The fight
-// (combat.js) uses learned skills by their kind.
+// one more of them for a point, and the path left closes: of the three it
+// knows at most balance.skills.paths. The first learned stays first in
+// `character.skills` (keys keep the order they were added in). Each point
+// after that raises a learned skill by a level, up to maxLevel. A skill's
+// numbers grow evenly from level 1 to the top level ([from, to] in its
+// params). The fight (combat.js) uses learned skills by their kind.
 
 // Kinds used instead of a plain blow on the character's move, at the start of
 // a fight, and the moment its HP falls below the skill's mark.
@@ -28,14 +28,13 @@ export function skillParams(skill, level, content) {
   );
 }
 
-// Skill Points: earned from the class levels after the first milestone,
-// spent one per level of each learned skill, but for the first level of the
-// first one, which the milestone gives.
+// Skill Points: earned from the class level of the first milestone on, so 2
+// at class level 11 (the author), and spent one per level of each learned
+// skill, its first level, the learning, included.
 export function skillPoints(character, content) {
   const { unlockClassLevel, pointsPerClassLevel } = content.balance.skills;
-  const earned = Math.max(0, character.classLevel - unlockClassLevel) * pointsPerClassLevel;
-  const levels = Object.values(character.skills ?? {});
-  const spent = Math.max(0, levels.reduce((sum, level) => sum + level, 0) - (levels.length > 0 ? 1 : 0));
+  const earned = Math.max(0, character.classLevel - unlockClassLevel + 1) * pointsPerClassLevel;
+  const spent = Object.values(character.skills ?? {}).reduce((sum, level) => sum + level, 0);
   return { earned, spent, free: Math.max(0, earned - spent) };
 }
 
@@ -56,9 +55,9 @@ export function learnedSkills(character, content) {
 }
 
 // Why a character cannot learn a skill, or null when it can: it must be of
-// its class and at the milestone's class level. The first of a milestone is
-// free; another one waits for secondClassLevel and takes a Skill Point, and
-// no more than `paths` of a milestone can be known.
+// its class and at the milestone's class level, and each one takes a Skill
+// Point. Another one of a milestone waits for secondClassLevel, and no more
+// than `paths` of a milestone can be known.
 export function learnBlock(character, skillId, content) {
   const skill = content.skillsById[skillId];
   if (!skill || skill.classId !== character.classId) return { code: 'unknown_skill', message: 'Twoja klasa nie ma takiej umiejętności.' };
@@ -71,11 +70,11 @@ export function learnBlock(character, skillId, content) {
   const pool = skillsOfClass(skill.classId, content).filter((other) => other.classLevel === skill.classLevel);
   const known = knownOf(pool, learned);
   if (known.length >= paths) return { code: 'chosen', message: 'Masz już dwie ścieżki tego wyboru. Trzecia jest zamknięta.' };
-  if (known.length > 0) {
-    if (character.classLevel < secondClassLevel) {
-      return { code: 'class_level', message: `Ścieżkę poboczną dobierzesz od poziomu klasy ${secondClassLevel}.` };
-    }
-    if (skillPoints(character, content).free < 1) return { code: 'no_points', message: 'Ścieżka poboczna kosztuje 1 Punkt Umiejętności.' };
+  if (known.length > 0 && character.classLevel < secondClassLevel) {
+    return { code: 'class_level', message: `Ścieżkę poboczną dobierzesz od poziomu klasy ${secondClassLevel}.` };
+  }
+  if (skillPoints(character, content).free < 1) {
+    return { code: 'no_points', message: known.length > 0 ? 'Ścieżka poboczna kosztuje 1 Punkt Umiejętności.' : 'Ta ścieżka kosztuje 1 Punkt Umiejętności.' };
   }
   return null;
 }

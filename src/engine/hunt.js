@@ -476,7 +476,7 @@ export function levelUpMessages(character, { level, classLevel = character.class
   const perLevel = content.statIds.length;
   const time = content.balance.timePoints;
   const unlockLevel = content.unlocksById.stats.level;
-  // Skill Points come from the class levels after the skills open.
+  // Skill Points come with each class level from the one the skills open at.
   const skillGain = skillPoints({ classLevel }, content).earned - skillPoints({ classLevel: character.classLevel }, content).earned;
   const messages = [];
   if (levels > 0) messages.push(say(texts, 'levelUp', 0, { level }));
