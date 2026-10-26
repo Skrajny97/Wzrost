@@ -1,0 +1,25 @@
+{
+  "id": "anvil-2",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a small open smithy: an iron anvil beside a stone forge with glowing red coals, leather bellows and a water barrel",
+    "prompt_style": "rd_pro__isometric",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 261240546,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793018958,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 64.42,
+    "request_id": "093e0c4c-c038-4156-9333-027c2eba9307",
+    "outputs_retained_until": 1793105301
+  }
+}
