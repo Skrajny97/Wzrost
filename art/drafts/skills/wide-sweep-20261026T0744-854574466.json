@@ -1,0 +1,25 @@
+{
+  "id": "wide-sweep",
+  "payload": {
+    "prompt": "spinning whirlwind attack: a steel greatsword lying flat across the middle, inside a full closed ring of swirling golden-orange motion streaks that circles all around it, no crescent, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 854574466,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793000773,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 21.66,
+    "request_id": "6eb7a878-8a04-4c68-9122-832e2097ca22",
+    "outputs_retained_until": 1793087074
+  }
+}
