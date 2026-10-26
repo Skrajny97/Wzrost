@@ -120,14 +120,16 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | Metoda | Ścieżka | Opis |
 |---|---|---|
 | GET | `/api/health` | stan serwera i bazy, czas serwera, wersja; `google` mówi, czy działa logowanie przez Google |
-| POST | `/api/auth/register` | rejestracja: `login`, `email` (opcjonalnie), `password` |
+| POST | `/api/auth/register` | rejestracja: `login`, `email`, `password`; wysyła link potwierdzający (`emailSent`), a gra czeka, aż konto go otworzy |
 | POST | `/api/auth/login` | logowanie: `identifier` (login lub e-mail), `password` |
 | POST | `/api/auth/logout` | wylogowanie |
 | GET | `/api/auth/google/start` | przejście do Google; `?mode=link` łączy Google z zalogowanym kontem |
 | GET | `/api/auth/google/callback` | powrót z Google: logowanie, nowe konto albo połączenie, potem przejście do `/` albo `/?google=<wynik>` |
-| GET | `/api/me` | zalogowany gracz; `google` mówi, czy konto ma połączone Google, a `testMode`, czy ma tryb testowy |
+| GET | `/api/auth/confirm` | link z maila (`?token=`): potwierdza adres, za pierwszym razem z Punktami Systemu, potem przejście do `/?email=<wynik>` |
+| POST | `/api/auth/email` | nowy link: `email` (nowy adres, opcjonalnie), dopóki adres nie jest potwierdzony; najwyżej co minutę i 5 na dobę (429) |
+| GET | `/api/me` | zalogowany gracz; `google` mówi, czy konto ma połączone Google, `testMode`, czy ma tryb testowy, `emailConfirmed`, czy e-mail jest potwierdzony, a `emailRequired`, czy gra czeka na to potwierdzenie |
 | GET | `/api/content` | nazwy klas, wyglądów, statystyk, slotów, rzadkości, żywiołów, regionów i regionów wewnętrznych (z poziomem klasy, który je otwiera, i stworami, które tam czyhają, z ich poziomami: `dangers`), zakres czasu i nazwy długości wypraw, odblokowania, poziomy ewolucji klas, muzyka i dźwięki walki, wprowadzenie narratora z Punktami Czasu na start; bez logowania |
-| GET | `/api/character` | pełny widok postaci z zasobami, Punktami Systemu (`systemPoints`), Punktami Czasu (`timePoints`, a w `timePointsGain` `since` i `minutes`: od kiedy i co ile minut przybywa kolejny), przeczytanymi kartami narratora (`tutorial`, `null` dla postaci sprzed wprowadzenia), pojemnością plecaka, obozem, Stołem rzemieślniczym (`crafting`: poziom, najwyższa rzadkość, szansa na dodatkową część, materiały z poziomem stołu, którego potrzebują, `needs`), stworami spotkanymi w walce (`met`) i zadaniami narratora (`quests`: dla `daily` i `weekly` nazwa, koniec okresu `endsAt`, zadania z tekstem, postępem i nagrodą oraz skrzynia) (404 `no_character`, gdy jej nie ma) |
+| GET | `/api/character` | pełny widok postaci z zasobami, Punktami Systemu (`systemPoints`), Punktami Czasu (`timePoints`, a w `timePointsGain` `since` i `minutes`: od kiedy i co ile minut przybywa kolejny), przeczytanymi kartami narratora (`tutorial`, `null` dla postaci sprzed wprowadzenia), pojemnością plecaka, obozem, Stołem rzemieślniczym (`crafting`: poziom, najwyższa rzadkość, szansa na dodatkową część, materiały z poziomem stołu, którego potrzebują, `needs`), stworami spotkanymi w walce (`met`) i zadaniami narratora (`quests`: dla `daily` i `weekly` nazwa, koniec okresu `endsAt`, zadania z tekstem, postępem i nagrodą oraz skrzynia) (404 `no_character`, gdy jej nie ma, a 403 `email_unconfirmed`, gdy konto czeka na potwierdzenie e-maila) |
 | POST | `/api/character` | nowa postać: `name`, `classId`, `appearance` (`female` albo `male`); dostaje zapas na start i Punkty Czasu od narratora (409 `name_taken`, gdy imię nosi już inna postać, bez względu na wielkość liter) |
 | POST | `/api/character/appearance` | zmiana wyglądu: `appearance`; działa też podczas eksploracji |
 | DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami, wyprawą, obozem i Punktami Systemu |
@@ -180,6 +182,12 @@ Na ekranie startowym jest „Zaloguj się przez Google”, a w Ustawieniach „P
 - `https://www.insightrpg.com/api/auth/google/callback`
 
 Te adresy wymienia `GOOGLE_HOSTS` w `wrangler.jsonc`. Zasady łączenia kont są w `DECISIONS.md`, w części „Logowanie przez Google”. Lokalnie logowanie Google wymaga własnego klienta z adresem `http://localhost:8787/api/auth/google/callback` i uruchomienia `npx wrangler dev --local-upstream localhost:8787 --var GOOGLE_HOSTS: --var GOOGLE_CLIENT_ID:… --var GOOGLE_CLIENT_SECRET:…`. Bez `--local-upstream` Worker widzi adres `insightrpg.com` zamiast `localhost`.
+
+## Potwierdzanie e-maila
+
+Konto zakładane loginem i hasłem musi podać e-mail. Serwer wysyła na niego link przez Cloudflare Email Service (wiązanie `EMAIL`, czyli `send_email` w `wrangler.jsonc`, nadawca `no-reply@insightrpg.com`), a gra otwiera się dopiero po kliknięciu linku. Konta sprzed tej zmiany grają dalej, a dopóki nie potwierdzą adresu, widzą pergamin z zachętą: 10 Punktów Systemu za potwierdzenie (`balance.account.emailSystemPoints`). Konto Google liczy się jako potwierdzone. Treść maila jest w `data/texts.json` (`emailConfirm…`), a zasady w `DECISIONS.md`, w części „Potwierdzanie e-maila”. Domena insightrpg.com jest włączona w panelu Cloudflare: Compute → Email Service → Email Sending.
+
+Lokalnie mail nie wychodzi: `npx wrangler dev` wypisuje go w konsoli i zapisuje w pliku, którego ścieżkę podaje. Link z takiego maila prowadzi do `insightrpg.com`, chyba że serwer działa z `--local-upstream localhost:8787`.
 
 ## Tryb testowy
 

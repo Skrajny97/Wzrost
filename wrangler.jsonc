@@ -44,6 +44,11 @@
     // workflow from the GitHub secrets.
     "GOOGLE_HOSTS": "insightrpg.com,www.insightrpg.com"
   },
+  // Cloudflare Email Service: the mail with the link that confirms an
+  // account's e-mail (src/server/email.js), from the insightrpg.com domain
+  // onboarded in the dashboard. Locally the mail is not sent, only shown in
+  // the console.
+  "send_email": [{ "name": "EMAIL" }],
   // Every minute the server sends the phone notifications whose time has
   // come (src/server/push.js).
   "triggers": {

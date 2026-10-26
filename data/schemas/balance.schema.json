@@ -17,7 +17,7 @@
     "startingSupply",
     "regen",
     "progression"
-  ],
+  , "account"],
   "properties": {
     "combat": {
       "type": "object",
@@ -778,6 +778,15 @@
           "minimum": 0,
           "description": "Naturalne uzbrojenie potwora odpowiada przedmiotom z poziomu, który postać miała tyle minut eksploracji wcześniej."
         }
+      }
+    },
+    "account": {
+      "type": "object",
+      "description": "Konto gracza, poza postacią.",
+      "additionalProperties": false,
+      "required": ["emailSystemPoints"],
+      "properties": {
+        "emailSystemPoints": { "type": "integer", "minimum": 0, "description": "Punkty Systemu za potwierdzenie adresu e-mail linkiem z maila, raz na konto. Trafiają do postaci, a konto bez postaci dostaje je z pierwszą postacią." }
       }
     }
   }

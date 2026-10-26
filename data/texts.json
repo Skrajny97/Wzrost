@@ -138,6 +138,12 @@
   "pushBuildBody": ["{building}: poziom {level} gotowy."],
   "pushStoreTitle": ["Pełny magazyn"],
   "pushStoreBody": ["{buildings}: produkcja stoi do zebrania."],
+  "emailConfirmSubject": ["Potwierdź adres e-mail w grze Insight"],
+  "emailConfirmIntro": ["Cześć, {login}! Kliknij przycisk niżej, żeby potwierdzić ten adres e-mail w grze Insight."],
+  "emailConfirmButton": ["Potwierdź adres e-mail"],
+  "emailConfirmReward": ["Za potwierdzenie dostaniesz {points} Punktów Systemu. Link działa przez dobę."],
+  "emailConfirmLink": ["Jeśli przycisk nie działa, otwórz ten adres:"],
+  "emailConfirmIgnore": ["Jeśli to nie Ty, po prostu zignoruj tę wiadomość."],
   "lengths": [
     { "upTo": 10, "name": "bardzo krótka" },
     { "upTo": 30, "name": "krótka" },

@@ -1,0 +1,135 @@
+// E-mail confirmation (the author: "Grać można tylko po potwierdzeniu
+// rejestracji"). An account made with a password from now on plays once its
+// e-mail is confirmed with a link from a mail that Cloudflare Email Service
+// sends (the EMAIL binding in wrangler.jsonc). Accounts made before play on
+// and are invited to confirm for Punkty Systemu; an account bound to Google
+// counts as confirmed, because Google confirmed its owner (sessions.js).
+//
+// The link's token is random, and D1 keeps only its SHA-256 hash, the
+// address it confirms and when it stops working. The page learns how the
+// link went from /?email=… (app.js).
+
+import { confirmationEmail } from '../engine/index.js';
+import { validateEmail } from './accounts.js';
+import { content } from './content.js';
+import { sha256Hex, toBase64Url } from './encoding.js';
+import { ApiError, json, readJson } from './http.js';
+import { requireSession } from './sessions.js';
+
+const SENDER = { email: 'no-reply@insightrpg.com', name: 'Insight' };
+const CONFIRM_PATH = '/api/auth/confirm';
+const LINK_TTL_MS = 24 * 3600000;
+// A new link at most once a minute and five a day for one account.
+const RESEND_MS = 60000;
+const LINKS_PER_DAY = 5;
+const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
+
+// Why a mail did not go, in the player's words, by Email Service's error code.
+const SEND_ERRORS = {
+  E_RATE_LIMIT_EXCEEDED: () => new ApiError(503, 'email_busy', 'Poczta gry jest teraz zajęta. Spróbuj ponownie za kilka minut.'),
+  E_DAILY_LIMIT_EXCEEDED: () => new ApiError(503, 'email_busy', 'Poczta gry wysłała już dziś wszystko, co mogła. Spróbuj ponownie jutro.'),
+  E_RECIPIENT_SUPPRESSED: () => new ApiError(400, 'email_rejected', 'Ten adres nie przyjmuje poczty. Sprawdź go albo podaj inny.'),
+  E_VALIDATION_ERROR: () => new ApiError(400, 'email_rejected', 'Ten adres nie przyjmuje poczty. Sprawdź go albo podaj inny.'),
+};
+const sendFailed = () => new ApiError(503, 'email_failed', 'Nie udało się wysłać maila. Spróbuj ponownie za chwilę.');
+
+// Sends a new link to `email`, the account's address. Throws an ApiError when
+// it cannot: too soon after the last one, too many today, or the mail failed.
+export async function sendLink(env, { userId, login, email }, origin, now) {
+  const db = env.DB;
+  const recent = await db
+    .prepare('SELECT COUNT(*) AS count, MAX(created_at) AS last FROM email_links WHERE user_id = ? AND created_at > ?')
+    .bind(userId, now - LINK_TTL_MS)
+    .first();
+  if (recent.last !== null && now - recent.last < RESEND_MS) {
+    const seconds = Math.ceil((RESEND_MS - (now - recent.last)) / 1000);
+    throw new ApiError(429, 'email_wait', `Link poszedł przed chwilą. Sprawdź skrzynkę, także folder spam, albo spróbuj ponownie za ${seconds} s.`, {
+      'Retry-After': String(seconds),
+    });
+  }
+  if (recent.count >= LINKS_PER_DAY) {
+    throw new ApiError(429, 'email_limit', 'Na dziś to już wszystkie linki. Sprawdź skrzynkę, także folder spam, albo spróbuj ponownie jutro.');
+  }
+
+  const token = toBase64Url(crypto.getRandomValues(new Uint8Array(32)));
+  const id = await sha256Hex(token);
+  await db.batch([
+    db.prepare('DELETE FROM email_links WHERE expires_at <= ?').bind(now),
+    db
+      .prepare('INSERT INTO email_links (id, user_id, email, created_at, expires_at) VALUES (?, ?, ?, ?, ?)')
+      .bind(id, userId, email, now, now + LINK_TTL_MS),
+  ]);
+  const message = confirmationEmail({ login, link: `${origin}${CONFIRM_PATH}?token=${token}` }, content);
+  try {
+    if (!env.EMAIL) throw Object.assign(new Error('No EMAIL binding'), { code: 'E_NO_BINDING' });
+    await env.EMAIL.send({ to: email, from: SENDER, ...message });
+  } catch (error) {
+    console.error('Confirmation mail not sent:', error?.code, error?.message);
+    // A mail that did not go out does not count toward the limits.
+    await db.prepare('DELETE FROM email_links WHERE id = ?').bind(id).run();
+    throw (SEND_ERRORS[error?.code] ?? sendFailed)();
+  }
+}
+
+// "Wyślij link": a link to the account's e-mail, or to a new address given
+// (an account without one, or a mistyped one), while it is not confirmed.
+export async function requestLink(context) {
+  const session = await requireSession(context);
+  const { user, userId } = session;
+  if (user.emailConfirmed) throw new ApiError(409, 'email_confirmed', 'Ten adres e-mail jest już potwierdzony.');
+  const body = await readJson(context.request);
+  const email = body.email === undefined ? user.email : validateEmail(body.email);
+  if (!email) throw new ApiError(400, 'email_required', 'Podaj adres e-mail, a wyślemy na niego link.');
+
+  const db = context.env.DB;
+  if (email !== user.email) {
+    const taken = () => new ApiError(409, 'email_taken', 'Ten e-mail jest już przypisany do innego konta.');
+    if (await db.prepare('SELECT 1 FROM users WHERE email = ? AND id != ?').bind(email, userId).first()) throw taken();
+    try {
+      await db.prepare('UPDATE users SET email = ? WHERE id = ? AND email_confirmed_at IS NULL').bind(email, userId).run();
+    } catch (error) {
+      if (String(error?.message).includes('users.email')) throw taken();
+      throw error;
+    }
+  }
+  await sendLink(context.env, { userId, login: user.login, email }, new URL(context.request.url).origin, context.now);
+  return json({ sent: true, email });
+}
+
+// The link from the mail. It confirms the address while the account still
+// has it, and the first time gives Punkty Systemu: to the character, or to
+// the first character made when there is none yet. All in one batch, so a
+// link opened twice at once pays once.
+export async function confirmEmail({ request, env, now }) {
+  const token = new URL(request.url).searchParams.get('token') ?? '';
+  if (!TOKEN_PATTERN.test(token)) return redirect('/?email=expired');
+  const db = env.DB;
+  const link = await db.prepare('SELECT user_id, email, expires_at FROM email_links WHERE id = ?').bind(await sha256Hex(token)).first();
+  if (!link || link.expires_at <= now) return redirect('/?email=expired');
+  const before = await db.prepare('SELECT email_confirmed_at FROM users WHERE id = ? AND email = ?').bind(link.user_id, link.email).first();
+  if (!before) return redirect('/?email=expired');
+
+  const points = content.balance.account.emailSystemPoints;
+  const owed = 'SELECT 1 FROM users WHERE id = ? AND email = ? AND email_rewarded_at IS NULL';
+  await db.batch([
+    db
+      .prepare(`UPDATE characters SET system_points = system_points + ?, version = version + 1 WHERE user_id = ? AND role = 'player' AND EXISTS (${owed})`)
+      .bind(points, link.user_id, link.user_id, link.email),
+    db
+      .prepare(
+        `UPDATE users SET
+           system_points_waiting = system_points_waiting
+             + CASE WHEN email_rewarded_at IS NULL AND NOT EXISTS (SELECT 1 FROM characters WHERE user_id = users.id AND role = 'player') THEN ? ELSE 0 END,
+           email_rewarded_at = COALESCE(email_rewarded_at, ?),
+           email_confirmed_at = COALESCE(email_confirmed_at, ?)
+         WHERE id = ? AND email = ?`,
+      )
+      .bind(points, now, now, link.user_id, link.email),
+    db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(link.user_id),
+  ]);
+  return redirect(before.email_confirmed_at === null ? '/?email=confirmed' : '/?email=already');
+}
+
+function redirect(location) {
+  return new Response(null, { status: 302, headers: { Location: location, 'Cache-Control': 'no-store' } });
+}

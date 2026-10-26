@@ -38,7 +38,7 @@ export async function authorPanel(context) {
       )
       .bind(since, since),
     db.prepare(
-      `SELECT u.login, u.email, u.google_sub IS NOT NULL AS google, u.created_at,
+      `SELECT u.login, u.email, u.google_sub IS NOT NULL AS google, u.email_confirmed_at IS NOT NULL AS email_confirmed, u.created_at,
          c.name, c.class_id, c.level, c.class_level, c.created_at AS character_created_at
        FROM users u LEFT JOIN characters c ON c.user_id = u.id AND c.role = 'player'
        ORDER BY u.created_at DESC, u.id DESC
@@ -58,6 +58,8 @@ export async function authorPanel(context) {
       login: row.login,
       email: row.email,
       google: Boolean(row.google),
+      // Confirmed with the link, or by Google (sessions.js).
+      emailConfirmed: Boolean(row.google) || Boolean(row.email_confirmed),
       createdAt: row.created_at,
       character: row.name && {
         name: row.name,

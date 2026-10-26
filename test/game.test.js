@@ -9,12 +9,12 @@ import { skipTime } from '../src/server/testing.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
-const { call, db } = useServer();
+const { call, db, signUp: account } = useServer();
 // What a new character finds in the abandoned camp (data/balance.json).
 const supply = content.balance.startingSupply;
 
 async function signUp(login = 'karol') {
-  const { cookie } = await call('POST', '/api/auth/register', { body: { login, password: 'tajnehaslo1' } });
+  const { cookie } = await account(login);
   return cookie;
 }
 

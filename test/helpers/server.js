@@ -34,5 +34,13 @@ export function useServer(vars = {}) {
 
   const db = async () => (await server.getWorker().getEnv()).DB;
 
-  return { server, call, db };
+  // An account made with a password, its e-mail confirmed as after the link
+  // from its mail (src/server/email.js); `confirmed: false` leaves it waiting.
+  async function signUp(login, { email = `${login.toLowerCase()}@example.com`, confirmed = true } = {}) {
+    const answer = await call('POST', '/api/auth/register', { body: { login, email, password: 'tajnehaslo1' } });
+    if (confirmed) await (await db()).prepare('UPDATE users SET email_confirmed_at = created_at WHERE login = ?').bind(login).run();
+    return answer;
+  }
+
+  return { server, call, db, signUp };
 }

@@ -5,10 +5,10 @@ import { testModeFor } from '../src/server/test-mode.js';
 import { useServer } from './helpers/server.js';
 
 // As in the live game: test mode only for the listed account.
-const { call } = useServer({ TEST_LOGINS: 'Skrajny' });
+const { call, signUp } = useServer({ TEST_LOGINS: 'Skrajny' });
 
 async function player(login, name) {
-  const registered = await call('POST', '/api/auth/register', { body: { login, password: 'tajnehaslo1' } });
+  const registered = await signUp(login);
   await call('POST', '/api/character', { cookie: registered.cookie, body: { name, classId: 'warrior', appearance: 'male' } });
   return registered;
 }

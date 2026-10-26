@@ -5,6 +5,7 @@ import { deleteAccount, login, logout, me, register } from './accounts.js';
 import { authorPanel, authorSkillDemo, authorSkills } from './author.js';
 import { buyParts, cancelBuilding, collectProduction, startBuilding, tradeAtFire } from './camp.js';
 import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
+import { confirmEmail, requestLink } from './email.js';
 import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
@@ -26,6 +27,8 @@ const routes = [
   ['POST', '/api/auth/logout', logout],
   ['GET', '/api/auth/google/start', startGoogle],
   ['GET', '/api/auth/google/callback', googleCallback],
+  ['GET', '/api/auth/confirm', confirmEmail],
+  ['POST', '/api/auth/email', requestLink],
   ['GET', '/api/me', me],
   ['DELETE', '/api/me', deleteAccount],
   ['GET', '/api/author', authorPanel],

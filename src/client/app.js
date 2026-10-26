@@ -4,6 +4,7 @@
 
 import { ApiError, request } from './api.js';
 import { $, $$, clear, h, icon } from './dom.js';
+import { emailRow, inviteToConfirm, mustConfirm, renderConfirm, takeEmailResult } from './email.js';
 import { countOf } from './format.js';
 import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
@@ -33,6 +34,7 @@ const views = {
   loading: $('#view-loading'),
   auth: $('#view-auth'),
   create: $('#view-create'),
+  confirm: $('#view-confirm'),
   game: $('#view-game'),
 };
 
@@ -106,6 +108,8 @@ function takeGoogleResult() {
 
 async function start() {
   const googleResult = takeGoogleResult();
+  // How a link from the confirmation mail went (email.js).
+  const emailResult = takeEmailResult();
   // The music plays from the start screen on, after the first touch, and
   // the recorded fight sounds load then too.
   loadContent()
@@ -130,9 +134,10 @@ async function start() {
     state.user = user;
     await enterGame();
     if (googleResult) toast(GOOGLE_NOTES[googleResult === 'linked' && user.testMode ? 'linkedOnly' : googleResult]);
+    if (emailResult) toast(emailResult);
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
-      enterAuth(googleResult && GOOGLE_NOTES[googleResult]);
+      enterAuth((googleResult && GOOGLE_NOTES[googleResult]) || (emailResult && `${emailResult} Zaloguj się, żeby grać.`));
       return;
     }
     $('#loading-text').textContent = error.message;
@@ -141,12 +146,22 @@ async function start() {
 }
 
 async function enterGame() {
+  await loadContent();
+  // A new account plays once its e-mail is confirmed (email.js).
+  if (mustConfirm(state.user)) {
+    showConfirm();
+    return;
+  }
   // The phone's notifications follow the account signed in (push.js).
   syncPush();
-  await loadContent();
   try {
     await call('GET', '/api/character');
   } catch (error) {
+    if (error instanceof ApiError && error.code === 'email_unconfirmed') {
+      state.user = { ...state.user, emailConfirmed: false, emailRequired: true };
+      showConfirm();
+      return;
+    }
     if (error instanceof ApiError && error.code === 'no_character') {
       show('create');
       renderCreate($('#create-screen'), () => {
@@ -161,10 +176,22 @@ async function enterGame() {
   openGame();
 }
 
+// The screen of a new account that waits for the link from its mail.
+let emailUnsent = false; // the mail after the registration did not go out
+function showConfirm() {
+  setMusicPlace([]);
+  show('confirm');
+  renderConfirm($('#confirm-panel'), { onConfirmed: () => enterGame(), onLogout: signOut, unsent: emailUnsent });
+  emailUnsent = false;
+}
+
 function openGame() {
   show('game');
   buildTopbar(openSettings);
   route();
+  // An older account without a confirmed e-mail is invited to confirm it,
+  // once the narrator is done (email.js).
+  setTimeout(inviteToConfirm, 1500);
   clearInterval(ticker);
   ticker = setInterval(() => {
     const now = serverNow();
@@ -276,6 +303,8 @@ onCharacterChange(() => {
   renderNav();
   current.screen.update?.();
   narrate();
+  // The narrator's lines read: the invitation may come once he is done.
+  setTimeout(inviteToConfirm, 1500);
 });
 
 // Coming back to the page after a new version of the game was deployed
@@ -441,6 +470,7 @@ function openSettings() {
       'dl',
       { class: 'status-list' },
       h('div', { class: 'status-row' }, h('dt', { text: 'Konto' }), h('dd', { text: state.user.login })),
+      emailRow(),
       h('div', { class: 'status-row' }, h('dt', { text: 'Postać' }), h('dd', { text: state.character.name })),
       lookRow(),
       googleRow(),
@@ -472,13 +502,22 @@ async function logout(event) {
   const button = event.currentTarget;
   button.disabled = true;
   try {
+    await signOut(true);
+  } catch {
+    button.disabled = false;
+  }
+}
+
+// `rethrow`: the button that asked for it is enabled again on a failure.
+async function signOut(rethrow = false) {
+  try {
     // This phone stops getting the account's notifications.
     await stopPush();
     await request('POST', '/api/auth/logout');
     leaveGame();
   } catch (error) {
     toast(error.message);
-    button.disabled = false;
+    if (rethrow === true) throw error;
   }
 }
 
@@ -629,7 +668,11 @@ for (const toggle of $$('.password-toggle')) {
 }
 
 bindForm($('#login-form'), (data) => request('POST', '/api/auth/login', data));
-bindForm($('#register-form'), (data) => request('POST', '/api/auth/register', data));
+bindForm($('#register-form'), async (data) => {
+  const answer = await request('POST', '/api/auth/register', data);
+  emailUnsent = answer.emailSent === false;
+  return answer;
+});
 
 $('#retry-button').addEventListener('click', start);
 

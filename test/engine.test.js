@@ -3,6 +3,7 @@ import { describe, test } from 'node:test';
 
 import {
   applyHunt,
+  confirmationEmail,
   championEncounter,
   championItemRarity,
   monsterXp,
@@ -2001,5 +2002,20 @@ describe('quests from the narrator', () => {
     // A quest of a creature no longer in the data is left out, the others keep their places.
     const gone = { ...quests, daily: { ...quests.daily, quests: [{ ...quests.daily.quests[0], kind: 'kill', target: 'dragon' }, ...quests.daily.quests.slice(1)] } };
     assert.deepEqual(questsView(gone, now, content).daily.quests.map((quest) => quest.index), [1, 2, 3, 4]);
+  });
+});
+
+describe('the confirmation mail', () => {
+  test('names the player, the link and the Punkty Systemu, as text and as a page', () => {
+    const link = 'https://insightrpg.com/api/auth/confirm?token=abc&x=<y>';
+    const mail = confirmationEmail({ login: 'Karol_97', link }, content);
+    assert.equal(mail.subject, 'Potwierdź adres e-mail w grze Insight');
+    assert.match(mail.text, /^Cześć, Karol_97!/);
+    assert.ok(mail.text.includes(`\n\n${link}\n\n`));
+    assert.match(mail.text, /dostaniesz 10 Punktów Systemu/);
+    // The page escapes what it shows, the link too.
+    assert.ok(mail.html.includes('href="https://insightrpg.com/api/auth/confirm?token=abc&amp;x=&lt;y&gt;"'));
+    assert.ok(!mail.html.includes('<y>'));
+    assert.match(mail.html, />Potwierdź adres e-mail</);
   });
 });

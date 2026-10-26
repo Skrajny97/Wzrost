@@ -93,9 +93,9 @@
           <p class="field-hint" id="register-login-hint">3–24 znaki: litery bez polskich znaków, cyfry oraz _ . -</p>
         </div>
         <div class="field">
-          <label for="register-email">E-mail <span class="optional">(opcjonalnie)</span></label>
-          <input id="register-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" aria-describedby="register-email-hint">
-          <p class="field-hint" id="register-email-hint">Możesz logować się nim zamiast loginu.</p>
+          <label for="register-email">E-mail</label>
+          <input id="register-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="254" aria-describedby="register-email-hint" required>
+          <p class="field-hint" id="register-email-hint">Wyślemy na niego link, który otworzy konto. Możesz też logować się nim zamiast loginu.</p>
         </div>
         <div class="field">
           <label for="register-password">Hasło</label>
@@ -115,6 +115,11 @@
 
   <main id="view-create" hidden>
     <div class="screen" id="create-screen"></div>
+  </main>
+
+  <!-- A new account waits here for the link from its mail (email.js). -->
+  <main id="view-confirm" class="screen screen--center" hidden>
+    <section class="system-panel" id="confirm-panel" aria-labelledby="confirm-text"></section>
   </main>
 
   <div id="view-game" hidden>
