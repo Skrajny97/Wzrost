@@ -4059,7 +4059,9 @@ a.camp-level-button {
   justify-content: center;
   gap: 6px;
   padding-inline: 6px;
-  white-space: nowrap;
+  /* "Ruda żelaza +10" breaks into two lines rather than past the edge. */
+  line-height: 1.15;
+  text-align: center;
 }
 
 /* The Skup złomu's counter: crafting parts for gold. */
@@ -5859,6 +5861,24 @@ button.herb-tile[aria-pressed='true'] {
 .report-row-herbs {
   color: var(--text-muted);
   font-size: 13px;
+}
+
+/* The fire spirit's slider: how many pieces, and their price beside it. */
+.fire-trade-pick {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.fire-trade-amount {
+  min-width: 9.5em;
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: right;
+}
 
 /* E-mail confirmation (email.js): the invitation on a parchment and the
    address in the settings. */

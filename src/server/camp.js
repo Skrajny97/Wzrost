@@ -252,9 +252,12 @@ export async function tradeAtFire(context) {
   const row = player.row;
   const level = buildingLevel(player.buildings[fireBuilding(content)?.id], now);
   const made = fireTradesMade({ day: row.fire_day, count: row.fire_trades }, now, content);
-  const block = fireTradeBlock({ level, gold: row.gold, made, resource: body.resource }, content);
-  if (block) throw new ApiError(block.code === 'invalid_resource' ? 400 : 409, block.code, block.message);
-  const { amount, gold } = fireTrade(level, content);
+  // `amount`: the pieces the slider picked, a full trade without it.
+  const block = fireTradeBlock({ level, gold: row.gold, made, resource: body.resource, amount: body.amount }, content);
+  if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
+  const trade = fireTrade(level, content);
+  const amount = body.amount ?? trade.amount;
+  const gold = amount * trade.unitGold;
   const db = context.env.DB;
   const result = await db
     .prepare(

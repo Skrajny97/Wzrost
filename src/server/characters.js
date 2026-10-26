@@ -402,6 +402,7 @@ function fireView(building, level, row, now) {
     resources: trade.resources,
     amount: trade.amount,
     gold: trade.gold,
+    unitGold: trade.unitGold,
     perDay: trade.perDay,
     left: Math.max(0, trade.perDay - made),
     next: next && { level: level + 1, amount: next.amount, gold: next.gold, perDay: next.perDay },
