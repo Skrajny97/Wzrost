@@ -1,0 +1,25 @@
+{
+  "id": "alchemy",
+  "payload": {
+    "prompt": "a round glass flask of bubbling glowing red potion beside a small brass alembic, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 363288618,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793028848,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 61.54,
+    "request_id": "ce5db9af-584d-4f94-a506-2f731cd62033",
+    "outputs_retained_until": 1793115218
+  }
+}
