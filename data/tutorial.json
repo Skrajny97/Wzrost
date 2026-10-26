@@ -266,6 +266,13 @@
       "voice": "audio/narration/camp-quarry.mp3"
     },
     {
+      "id": "camp-lake",
+      "kind": "point",
+      "text": [
+        "W Jeziorze Midasa zalega złoto. Misa traperska sama je odsącza – niewiele, ale bez przerwy."
+      ]
+    },
+    {
       "id": "camp-anvil",
       "kind": "point",
       "text": [
@@ -301,7 +308,7 @@
       "id": "lead-campfire",
       "kind": "lead",
       "text": [
-        "Teraz zadbajmy o odpoczynek po kolejnych wyprawach. Przy ogniu Twoja postać szybciej wraca do sił. Zbuduj Ognisko."
+        "Teraz zadbajmy o odpoczynek po kolejnych wyprawach. Przy ogniu Twoja postać szybciej wraca do sił, a duch ognia przyjmie Twoje złoto i odda za nie zasoby. Zbuduj Ognisko."
       ],
       "voice": "audio/narration/lead-campfire.mp3"
     },
