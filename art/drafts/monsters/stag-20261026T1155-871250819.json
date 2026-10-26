@@ -1,0 +1,25 @@
+{
+  "id": "stag",
+  "payload": {
+    "prompt": "red deer stag with large branching antlers, head lowered to charge, full body, three-quarter view, isolated figure on a plain background, no scenery and no ground",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 871250819,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793015788,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 15,
+    "request_id": "34a5f4d2-8502-469b-8aaa-4a23ef95047d",
+    "outputs_retained_until": 1793102101
+  }
+}
