@@ -1244,10 +1244,13 @@ describe('upgrades on the Kowadło', () => {
   });
 
   test('the scrapper buys one item from its card, an upgraded one too, but not a worn one', async () => {
+    const plain = (await character()).bag.find((item) => item.id === itemId).price;
     await (await db()).prepare("UPDATE items SET data = json_set(data, '$.upgrade', 2)").run();
     await stock(10, { wood: 0, stone: 0, 'iron-ore': 0 });
     const before = await character();
     const price = before.bag.find((item) => item.id === itemId).price;
+    // Half the gold its upgrades cost comes on top.
+    assert.ok(price > plain);
     const sold = await call('POST', `/api/items/${itemId}/sell`, { cookie });
     assert.equal(sold.status, 200);
     assert.deepEqual(sold.data.sold, { count: 1, gold: price });

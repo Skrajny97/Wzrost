@@ -62,7 +62,8 @@
     "goldPerItemLevel": 1.5,
     "oreBase": 1,
     "orePerItemLevel": 0.15,
-    "costGrowth": 1.6
+    "costGrowth": 1.6,
+    "sellRefund": 0.5
   },
   "hunt": {
     "minMinutes": 1,

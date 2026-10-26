@@ -19,16 +19,20 @@ import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, r
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 
-// The scrapper's price for the stored items `ids`, counted in SQL from the
-// items still there, so an item sold twice at the same moment pays once.
-// `bonus` is the camp's Skup złomu (sellPrice() in the engine).
-export function soldGold(characterId, ids, bonus) {
-  const list = ids.map(() => '?').join(', ');
-  const multiplier = `CASE json_extract(data, '$.rarity') ${content.rarities.map((rarity) => `WHEN '${rarity.id}' THEN ${Number(rarity.sell)}`).join(' ')} END`;
+// The scrapper's price for the stored `items`, summed in SQL over the items
+// still there, so an item sold twice at the same moment pays once. Each price
+// is sellPrice() in the engine, written into the query as a whole number (it
+// keeps the bound values under D1's limit); `bonus` is the camp's Skup złomu.
+export function soldGold(characterId, items, bonus) {
+  const whole = (value) => {
+    if (!Number.isSafeInteger(value)) throw new Error(`Not a whole number: ${value}`);
+    return value;
+  };
+  const prices = items.map((item) => `WHEN ${whole(item.id)} THEN ${whole(sellPrice(item, content, bonus))}`).join(' ');
   return {
-    sql: `(SELECT COALESCE(SUM(MAX(1, ROUND(json_extract(data, '$.level') * ? * ${multiplier} * ?))), 0)
-           FROM items WHERE character_id = ? AND id IN (${list}))`,
-    binds: [content.balance.items.sellGoldPerLevel, 1 + bonus, characterId, ...ids],
+    sql: `(SELECT COALESCE(SUM(CASE id ${prices} ELSE 0 END), 0)
+           FROM items WHERE character_id = ? AND id IN (${items.map(() => '?').join(', ')}))`,
+    binds: [characterId, ...items.map((item) => item.id)],
   };
 }
 
@@ -102,7 +106,7 @@ export async function sellItems(context) {
     // they go, so a second tap at the same moment pays nothing twice.
     const db = context.env.DB;
     const ids = sold.map((item) => item.id);
-    const price = soldGold(player.row.id, ids, sellBonusOf(player, context.now));
+    const price = soldGold(player.row.id, sold, sellBonusOf(player, context.now));
     const results = await db.batch([
       db
         .prepare(`UPDATE characters SET gold = gold + ${price.sql}, version = version + 1 WHERE id = ?`)
@@ -128,7 +132,7 @@ export async function sellItem(context) {
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
   const db = context.env.DB;
   const bonus = sellBonusOf(player, context.now);
-  const price = soldGold(player.row.id, [item.id], bonus);
+  const price = soldGold(player.row.id, [item], bonus);
   const results = await db.batch([
     db.prepare(`UPDATE characters SET gold = gold + ${price.sql}, version = version + 1 WHERE id = ?`).bind(...price.binds, player.row.id),
     db.prepare('DELETE FROM items WHERE id = ? AND character_id = ?').bind(item.id, player.row.id),

@@ -378,7 +378,7 @@ export function itemSheet(item, { equipped }) {
     const button = event.currentTarget;
     const sure = await confirmAction({
       title: 'Sprzedać przedmiot?',
-      text: `Złomiarz kupi: ${itemTitle(item)} za ${formatNumber(item.price)} złota.${item.upgrade > 0 ? ' Za ulepszenie nie płaci więcej.' : ''}`,
+      text: `Złomiarz kupi: ${itemTitle(item)} za ${formatNumber(item.price)} złota.${item.upgrade > 0 ? ' W tej cenie jest też część złota wydanego na ulepszenia.' : ''}`,
       confirmLabel: 'Sprzedaj',
     });
     if (!sure) return;
