@@ -1,0 +1,13 @@
+{
+  "id": "skill-backstab",
+  "payload": {
+    "text": "a stealthy dagger stab: a fast thin high swish and a sharp metallic stab, close up, dry, no thump, no bass, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-backstab-20261026T0702-0.mp3",
+    "audio/drafts/effects/skill-backstab-20261026T0702-1.mp3"
+  ],
+  "credits": 40
+}

@@ -1,0 +1,13 @@
+{
+  "id": "skill-mana-shield",
+  "payload": {
+    "text": "a magic shield forms around a mage: a bright crystalline shimmer and a rising glassy chime, airy and high, fantasy, no deep hum, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-mana-shield-20261026T0702-0.mp3",
+    "audio/drafts/effects/skill-mana-shield-20261026T0702-1.mp3"
+  ],
+  "credits": 60
+}

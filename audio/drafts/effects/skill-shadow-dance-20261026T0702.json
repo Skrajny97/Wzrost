@@ -1,0 +1,13 @@
+{
+  "id": "skill-shadow-dance",
+  "payload": {
+    "text": "shadow magic: quick light airy whooshes and a soft whispery swish, high and breathy, fantasy, no deep rumble, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-shadow-dance-20261026T0702-0.mp3",
+    "audio/drafts/effects/skill-shadow-dance-20261026T0702-1.mp3"
+  ],
+  "credits": 60
+}

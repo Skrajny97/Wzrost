@@ -1,0 +1,13 @@
+{
+  "id": "skill-fireball",
+  "payload": {
+    "text": "a fireball spell: a bright crackling whoosh of flame with hissing, popping sparks, high and sharp, fantasy magic, no deep rumble, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-fireball-20261026T0702-0.mp3",
+    "audio/drafts/effects/skill-fireball-20261026T0702-1.mp3"
+  ],
+  "credits": 60
+}
