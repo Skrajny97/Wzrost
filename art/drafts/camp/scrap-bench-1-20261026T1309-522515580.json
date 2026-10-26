@@ -1,0 +1,25 @@
+{
+  "id": "scrap-bench-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a small rough wooden table standing on two barrels, piled with rusty orange scrap metal, a dented round shield and broken sword blades",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 522515580,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793020161,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 62.56,
+    "request_id": "df2542d1-0fd1-4925-a7e2-8b9e2d8bf591",
+    "outputs_retained_until": 1793106550
+  }
+}
