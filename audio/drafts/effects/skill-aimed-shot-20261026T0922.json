@@ -1,0 +1,13 @@
+{
+  "id": "skill-aimed-shot",
+  "payload": {
+    "text": "an arrow hits the very centre of a straw archery target, a bullseye: one crisp solid thunk, then a short soft magical chime that rings out and fades, gentle shimmer, close up, no whistle, no squeak, no bow string, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-aimed-shot-20261026T0922-0.mp3",
+    "audio/drafts/effects/skill-aimed-shot-20261026T0922-1.mp3"
+  ],
+  "credits": 56
+}
