@@ -1476,3 +1476,25 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
     - Tam, gdzie szkic urywał sylwetkę prostą krawędzią kwadratu, brzegi przechodzą stopniowo w przezroczystość jak dym.
 4. **Nowy Szeroki zamach** (autor: za podobny do Potężnego ciosu). Jeden nowy szkic Retro Diffusion (0,18 USD): miecz w środku złotego wiru zamiast białego półksiężyca. Szkic wypełniał cały kwadrat, więc jest przycięty do koła, a jego brzeg przechodzi w przezroczystość.
 5. **Ostatnia ewolucja** (autor, daleka przyszłość). Na najwyższych poziomach klasy postać wybiera jedną z trzech klas: dalszy rozwój jednej z dwóch rozwijanych dotąd ścieżek albo fuzję obu. Zapis jest w dokumencie projektowym, przy ewolucjach.
+
+## Kwestia narratora o Dzienniku, mocniejszy Grad strzał i Nekromanta w planie (26.10.2026)
+
+1. **Kwestia narratora o ustawieniach** (tekst zatwierdzony przez autora: „Dopisz i nagraj”).
+    - Na końcu obu wersji kwestii (`settings` w `data/tutorial.json`) stoi teraz: „Na samej górze ustawień czeka też Dziennik – tam znajdziesz wszystkie raporty.”
+    - ElevenLabs nagrał po trzy wersje tym samym głosem i modelem co resztę wprowadzenia (`allLines`), za 1710 kredytów. Nagrania są przycięte i wyrównane jak reszta (ok. −18 LUFS, mono 56 kb/s).
+    - W grze jest wersja 2 obu kwestii: ma tempo i pauzy jak dawna. Wersje 1 i 3 mają w środku 2–3 s ciszy.
+    - Trzecia wersja żeńskiej kwestii urwała ostatnie słowo, więc odpadła. Pozostałe są na stronie odsłuchu do wyboru.
+2. **Grad strzał mocniejszy** (autor: „Podciągnij”).
+    - Trafia każdego z kilku wrogów za 85–120% obrażeń (było 65–95%), a jednego wroga za 140–190% (było 115–160%).
+    - W symulacji na 160 przebiegach droga łucznika do 50. poziomu postaci trwa teraz 46,6 h, tyle co z Celnym strzałem (46,6 h). Wcześniej było to 50,1 h, a bez umiejętności 53,8 h.
+    - Słabsze wersje (80–115% / 135–185%) i krótsze odnowienie dawały mniej.
+3. **Nekromanta** (autor). Jedna ze ścieżek stanie się nim w późniejszej ewolucji, nie w pierwszej. Najbliżej jest ścieżka Truciciela z Cienia: trucizny i rozkład przechodzą w klątwy i magię śmierci.
+
+    Obecne klasy budujemy z myślą o tym:
+    - pierwsza ewolucja Truciciela powinna dać trochę Woli i Intelektu, bo Cień rośnie dziś w siłę, zręczność i percepcję;
+    - efekty działające co ruch (oparzenie, zatrucie) zostają ogólne, żeby przyjęły klątwy;
+    - żywioł śmierci dojdzie jako przeciwieństwo sakrum;
+    - walka będzie musiała przyjmować przywołane stwory na wolne miejsca drużyny.
+
+    Zapis jest w dokumencie projektowym, przy ewolucjach.
+4. **Druga ścieżka bez górnej granicy.** Autor nie zrozumiał pytania o granicę 50. poziomu, więc zostaje najprostsze rozwiązanie: drugą umiejętność można dobrać w każdej chwili od 11. poziomu klasy.

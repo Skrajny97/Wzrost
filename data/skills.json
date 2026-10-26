@@ -71,7 +71,7 @@
     "kind": "sweep",
     "mana": 12,
     "cooldown": 3,
-    "params": { "power": [0.65, 0.95], "single": [1.15, 1.6] }
+    "params": { "power": [0.85, 1.2], "single": [1.4, 1.9] }
   },
   {
     "id": "pinning-shot",
