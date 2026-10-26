@@ -1,0 +1,25 @@
+{
+  "id": "stone-heart",
+  "payload": {
+    "prompt": "round mossy grey stone with a faint glowing green crack, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 732229599,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793015490,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 15.9,
+    "request_id": "08d0f6f1-a80e-49bc-926b-d3f149e9f583",
+    "outputs_retained_until": 1793101843
+  }
+}

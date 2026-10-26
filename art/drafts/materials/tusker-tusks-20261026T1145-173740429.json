@@ -1,0 +1,25 @@
+{
+  "id": "tusker-tusks",
+  "payload": {
+    "prompt": "pair of long curved white boar tusks tied together with a red cord, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 173740429,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793015442,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 16.08,
+    "request_id": "d54e7c6d-d524-42e7-b46f-c0daaccab25c",
+    "outputs_retained_until": 1793101758
+  }
+}

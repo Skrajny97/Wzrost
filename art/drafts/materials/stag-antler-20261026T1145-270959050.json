@@ -1,0 +1,25 @@
+{
+  "id": "stag-antler",
+  "payload": {
+    "prompt": "branching deer antler, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 270959050,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793015201,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 16.8,
+    "request_id": "a787b83e-8171-4936-bec3-520138e81c41",
+    "outputs_retained_until": 1793101553
+  }
+}

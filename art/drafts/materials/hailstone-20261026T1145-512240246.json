@@ -1,0 +1,25 @@
+{
+  "id": "hailstone",
+  "payload": {
+    "prompt": "glowing pale blue hailstone crackling with tiny lightning sparks, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 512240246,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793015356,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 16.26,
+    "request_id": "dcea97f8-e1e3-4667-8103-18ad18c234f0",
+    "outputs_retained_until": 1793101724
+  }
+}

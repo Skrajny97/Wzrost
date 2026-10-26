@@ -1,0 +1,25 @@
+{
+  "id": "eagle-owl-feather",
+  "payload": {
+    "prompt": "large tawny eagle-owl feather with dark stripes, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 417914788,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793015614,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 15.54,
+    "request_id": "63150fdd-e72a-4985-87e3-fb319d2ed7fa",
+    "outputs_retained_until": 1793101966
+  }
+}
