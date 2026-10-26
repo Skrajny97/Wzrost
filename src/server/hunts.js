@@ -223,7 +223,8 @@ export async function finishHunt(db, player, now) {
   const toBag = hunt.items.map((item, index) => index).filter((index) => !autoEquipped.includes(index));
   const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
   const sold = bagOverflow(candidates, capacity, row.class_id, content);
-  const soldStored = sold.filter((index) => index < bag.length).map((index) => bag[index].id);
+  const storedSold = sold.filter((index) => index < bag.length).map((index) => bag[index]);
+  const soldStored = storedSold.map((item) => item.id);
   const soldFound = sold.filter((index) => index >= bag.length).map((index) => toBag[index - bag.length]);
   const soldFoundGold = soldFound.reduce((sum, index) => sum + sellPrice(hunt.items[index], content, sellBonus), 0);
   const overflow =
@@ -259,7 +260,7 @@ export async function finishHunt(db, player, now) {
   };
 
   const insertItem = db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, ?)');
-  const storedPrice = soldStored.length > 0 ? soldGold(row.id, soldStored, sellBonus) : { sql: '0', binds: [] };
+  const storedPrice = soldStored.length > 0 ? soldGold(row.id, storedSold, sellBonus) : { sql: '0', binds: [] };
   const found = Object.entries(hunt.resources);
   const setResources = found.length
     ? `, resources = json_set(resources, ${found.map(() => '?, COALESCE(json_extract(resources, ?), 0) + ?').join(', ')})`

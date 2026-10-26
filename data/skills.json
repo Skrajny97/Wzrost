@@ -222,7 +222,7 @@
     "style": "unik",
     "rarity": "common",
     "description": "Cień rozmywa się w ruchu. Ciosy wrogów tną powietrze.",
-    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}: przez {hits} następnych ciosów wrogów unik rośnie o {dodge pp}, ponad zwykły limit 30%. Każdy unik daje kontrę za {counter%} obrażeń.",
+    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}: przez {hits} następnych ciosów wrogów unik rośnie o {dodge pp}. Każdy unik daje kontrę za {counter%} obrażeń.",
     "kind": "evade",
     "mana": 12,
     "params": { "below": 0.5, "dodge": [0.4, 0.6], "counter": [0.8, 1.2], "hits": 5 }

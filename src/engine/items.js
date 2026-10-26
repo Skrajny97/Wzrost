@@ -138,11 +138,16 @@ export function randomItem(level, rng, content, { rarityBonus = 1, filled, class
   return generateItem({ baseId: base.id, level, rarityId: rarityId ?? rollRarity(rng, content, rarityBonus), area }, rng, content);
 }
 
-// Gold from the scrapper: level × goldPerLevel × the rarity's multiplier.
-// `bonus`: the share the camp adds to the scrapper's prices (Skup złomu).
+// Gold from the scrapper: level × goldPerLevel × the rarity's multiplier, and
+// for an upgraded item a share of the gold its upgrades cost (sellRefund).
+// `bonus`: the share the camp adds to the scrapper's prices (Skup złomu). It
+// raises the item's own price only, so an upgrade never pays for itself.
 export function sellPrice(item, content, bonus = 0) {
   const rarity = content.raritiesById[item.rarity];
-  return Math.max(1, Math.round(item.level * content.balance.items.sellGoldPerLevel * rarity.sell * (1 + bonus)));
+  const price = Math.max(1, Math.round(item.level * content.balance.items.sellGoldPerLevel * rarity.sell * (1 + bonus)));
+  let spent = 0;
+  for (let target = 1; target <= (item.upgrade ?? 0); target += 1) spent += itemUpgradeCost(item, target, content).gold;
+  return price + Math.round(spent * content.balance.upgrades.sellRefund);
 }
 
 // When the bag holds more than its places, the scrapper buys the weakest

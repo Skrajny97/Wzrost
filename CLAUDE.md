@@ -3,6 +3,7 @@
 - Przed zmianą kodu przeczytaj w całości [dokument projektowy](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX) i `DECISIONS.md`. Decyzje z dokumentu są ustalone: zmianę proponuj autorowi jako pytanie.
 - Brakujący szczegół rozstrzygnij najprostszym rozwiązaniem zgodnym z filarami gry i dopisz go do `DECISIONS.md`.
 - Uwagi autora wtrącone w trakcie pracy, które nie dotyczą bieżącego zadania, zapisz na później i nie przerywaj pracy. Gdy trzeba przerwać, autor sam to powie.
+- Przed każdym dłuższym raportem przejrzyj wszystkie wiadomości autora od poprzedniego raportu. Nie pytaj o to, co autor już rozstrzygnął, i nie proponuj własnych wersji tekstów, które autor napisał.
 - Teksty czytane głosem, np. kwestie narratora, daj autorowi do zatwierdzenia przed nagraniem. Autor usuwa z nich naleciałości AI.
 - Nowe grafiki pokazuj autorowi do oceny pojedynczo, jedną po drugiej, zaraz po powstaniu, gdy autor nie śpi.
 - Z autorem rozmawiaj po polsku. Kod, nazwy plików i identyfikatory są po angielsku, a teksty widoczne w grze po polsku.

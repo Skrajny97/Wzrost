@@ -1304,6 +1304,22 @@ describe('upgrades', () => {
     assert.ok(rare.gold > common.gold && rare['iron-ore'] > common['iron-ore']);
   });
 
+  test('the scrapper adds half the gold the upgrades cost, without the camp bonus on that half', () => {
+    // A common level-1 Talizman sells for 1 gold, and +1 and +2 cost 2 gold each.
+    const talisman = { base: 'talisman', slot: 'talisman', level: 1, rarity: 'common', affixes: [], implicit: { stat: 'vitality', value: 2 } };
+    assert.equal(sellPrice(talisman, content), 1);
+    assert.equal(sellPrice({ ...talisman, upgrade: 2 }, content), 3);
+    // The Kolczuga's +1 and +2 cost 8 and 12 gold: 10 more, with a Skup złomu or without.
+    assert.equal(sellPrice({ ...mail, upgrade: 2 }, content), sellPrice(mail, content) + 10);
+    assert.equal(sellPrice({ ...mail, upgrade: 2 }, content, 1), sellPrice(mail, content, 1) + 10);
+    // Never more than the upgrades cost, even with the best Skup złomu.
+    for (let level = 1; level <= 10; level += 1) {
+      let spent = 0;
+      for (let target = 1; target <= level; target += 1) spent += itemUpgradeCost(sword, target, content).gold;
+      assert.ok(sellPrice({ ...sword, upgrade: level }, content, 1) - sellPrice(sword, content, 1) < spent);
+    }
+  });
+
   test('the chance falls from 95% to 15%, and from +7 a failure may break the item', () => {
     assert.deepEqual([1, 2, 5, 10].map((target) => upgradeChance(target, content)), [0.95, 0.9, 0.65, 0.15]);
     assert.deepEqual([0, 6, 7, 9].map((level) => breakChance(level, content)), [0, 0, 0.1, 0.1]);

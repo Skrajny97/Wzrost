@@ -303,7 +303,7 @@
       "type": "object",
       "description": "Ulepszanie przedmiotów na Kowadle w obozie, od +1 do +10 (dokument projektowy, „Ulepszanie”). Kowadło na poziomie L pozwala ulepszać do +L.",
       "additionalProperties": false,
-      "required": ["bonusPerLevel", "minGainPerLevel", "chances", "breakFrom", "breakChance", "goldPerItemLevel", "oreBase", "orePerItemLevel", "costGrowth"],
+      "required": ["bonusPerLevel", "minGainPerLevel", "chances", "breakFrom", "breakChance", "goldPerItemLevel", "oreBase", "orePerItemLevel", "costGrowth", "sellRefund"],
       "properties": {
         "bonusPerLevel": { "type": "number", "exclusiveMinimum": 0, "description": "O ile każdy poziom ulepszenia podnosi liczby przedmiotu (obrażenia, pancerz, cechy), jako ułamek wartości bazowej." },
         "minGainPerLevel": { "type": "integer", "minimum": 0, "description": "Co najmniej tyle każdy poziom ulepszenia dodaje do obrażeń broni i do Pancerza innych przedmiotów. Przedmiot bez własnego Pancerza (np. talizman) dostaje go tyle za poziom." },
@@ -318,7 +318,8 @@
         "goldPerItemLevel": { "type": "number", "exclusiveMinimum": 0, "description": "Złoto za ulepszenie na +1: poziom przedmiotu × ta wartość × mnożnik budżetu rzadkości." },
         "oreBase": { "type": "number", "minimum": 0, "description": "Ruda żelaza za ulepszenie na +1: ta wartość plus poziom przedmiotu × orePerItemLevel, razy mnożnik budżetu rzadkości." },
         "orePerItemLevel": { "type": "number", "minimum": 0, "description": "Ruda żelaza za każdy poziom przedmiotu przy ulepszeniu na +1." },
-        "costGrowth": { "type": "number", "minimum": 1, "description": "Ile razy więcej kosztuje każde kolejne ulepszenie." }
+        "costGrowth": { "type": "number", "minimum": 1, "description": "Ile razy więcej kosztuje każde kolejne ulepszenie." },
+        "sellRefund": { "type": "number", "minimum": 0, "maximum": 1, "description": "Jaką część złota, które kosztowały ulepszenia przedmiotu, złomiarz dolicza do jego ceny. Premia Skupu złomu tej części nie podnosi, więc ulepszenie nigdy się nie zwraca." }
       }
     },
     "hunt": {
