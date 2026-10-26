@@ -78,7 +78,7 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
     error.hidden = !message;
   };
   const describe = () => {
-    text.textContent = `Ostatni krok: potwierdź adres e-mail. Na adres ${state.user.email} poszedł link, który otworzy konto. Za potwierdzenie dostaniesz ${pointsText()}.`;
+    text.textContent = `Ostatni krok: potwierdź adres e-mail. Na adres ${state.user.email} został wysłany link, który otworzy konto. Za potwierdzenie dostaniesz ${pointsText()}.`;
   };
   describe();
   if (unsent) showError('Nie udało się wysłać maila. Stuknij „Wyślij link ponownie”.');
@@ -121,7 +121,7 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
             await sendLink(input.value);
             describe();
             change.hidden = true;
-            toast(`Link poszedł na adres ${state.user.email}.`);
+            toast(`Link został wysłany na adres ${state.user.email}.`);
           } catch (failure) {
             showError(failure.message);
           }
@@ -147,7 +147,7 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
           showError('');
           try {
             await sendLink();
-            toast(`Link poszedł na adres ${state.user.email}.`);
+            toast(`Link został wysłany na adres ${state.user.email}.`);
           } catch (failure) {
             showError(failure.message);
           }
@@ -260,7 +260,7 @@ function drawSent(page, email) {
     h('p', { class: 'narrator-label quests-label', id: 'email-invite-label', text: 'System' }),
     h('p', {
       class: 'email-invite-text',
-      text: `Link poszedł na adres ${email}. Otwórz go, a ${pointsText()} trafi do postaci. Link działa przez dobę, a gdyby mail nie przyszedł, zajrzyj do folderu spam.`,
+      text: `Link został wysłany na adres ${email}. Otwórz go, a ${pointsText()} trafi do postaci. Link działa przez dobę, a gdyby mail nie przyszedł, zajrzyj do folderu spam.`,
     }),
     h('div', { class: 'narrator-actions' }, h('button', { type: 'button', class: 'button narrator-next', text: 'Zamknij', onClick: () => closeInvite(false) })),
   );

@@ -1767,6 +1767,7 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
 4. **Nagroda**: 10 Punktów Systemu raz na konto, za pierwsze potwierdzenie linkiem (`balance.account.emailSystemPoints`), także dla nowych kont. Punkty Systemu należą do postaci (decyzja z 24.10.2026), więc trafiają do postaci, a konto bez postaci dostaje je z pierwszą postacią. „Zacznij od nowa” ich nie zwraca. Konto Google liczy się jako potwierdzone, bo Google potwierdził właściciela, i tej nagrody nie dostaje.
 5. **Link** działa przez dobę i potwierdza adres, na który poszedł, tylko dopóki konto ma ten adres. Nowy link wychodzi najwcześniej po minucie, najwyżej 5 na dobę. Adres zmienia się tylko na koncie, które go jeszcze nie potwierdziło. Baza trzyma tylko skrót linku (SHA-256), jak przy sesjach. Treść maila jest w `data/texts.json` (`emailConfirm…`), w wersji tekstowej i jako prosta strona z przyciskiem.
 6. **Panel autora** dopisuje „(niepotwierdzony)” przy adresie, którego nikt nie potwierdził.
+7. **Teksty autora**: komunikat o zbyt szybkim kolejnym linku brzmi „Link został już wysłany. Sprawdź skrzynkę, także folder spam, albo spróbuj ponownie za N s.” (autor: „Nie »Link poszedł przed chwilą«, a »Link został już wysłany«”). Tak samo pozostałe komunikaty o linku mówią „został wysłany” zamiast „poszedł”.
 
 ## Plansza obozu: przycisk poziomu i dymek Tartaku (26.10.2026)
 
