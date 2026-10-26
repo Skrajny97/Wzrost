@@ -1257,6 +1257,7 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - Przyczyna: każde „Dalej” zapisuje kwestię na serwerze osobno, a odpowiedź może przyjść dopiero po następnym „Dalej”. Lista przeczytanych kwestii w takiej odpowiedzi nie miała jeszcze kwestii przed chwilą minionej, więc narrator pokazywał ją jeszcze raz.
     - Teraz kwestia minięta na stronie zostaje minięta, choćby przyszła starsza lista (`passedHere` w `src/client/narrator.js`). Te kwestie odchodzą razem z postacią: po „Zacznij od nowa” i po wylogowaniu.
     - Sprawdzone przy odpowiedziach spóźnionych o 2,5 s: karty idą po kolei bez powtórek, a nowa postać o tym samym imieniu zaczyna od pierwszej karty.
+    - Druga przyczyna (26.10.2026, autor i testerka na iPhonie): przy wskazówkach narrator wchodził na ekran przez pół sekundy z pergaminem już otwartym, a potem pergamin zwijał się do zera i rozwijał od nowa. Teraz mały pergamin jest zwinięty, dopóki narrator nie wejdzie, i rozwija się raz.
 2. **Wolne punkty statystyk.** Autor: przy wolnych punktach podświetlenie jak przy gotowym zadaniu. Dopóki postać ma wolne punkty, a Statystyki są odblokowane:
     - „Postać” na dolnym pasku i „Statystyki” na pasku postaci mają złotą kropkę, jak twarz narratora, gdy czeka nagroda,
     - „Wolne punkty” na ekranie statystyk świecą na złoto.

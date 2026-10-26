@@ -734,6 +734,9 @@ function scrollNote(line) {
     ),
   );
   const element = h('div', { class: 'guide-note guide-note--scroll' }, narratorSprite(), h('div', { class: 'guide-scroll' }, rod(), sheet, rod()));
+  // Rolled up until it unrolls: the narrator steps in with the rods
+  // together, so the parchment does not show open and then unroll again.
+  if (!calm()) sheet.style.height = '0px';
   const show = h('button', { type: 'button', class: 'button narrator-show guide-show', onClick: unhide }, icon('eye', { size: 18 }), tutorial.showLabel);
   // "Ukryj": the parchment rolls up and the lit places stay; the narrator
   // reads on. "Pokaż pergamin" brings it back.
@@ -759,7 +762,9 @@ function scrollNote(line) {
   // narrator does not jump while it unrolls.
   const height = () => Math.max(element.offsetHeight, sheet.scrollHeight + 24);
   const open = async () => {
-    await roll(sheet, true, 1000);
+    const unrolling = roll(sheet, true, 1000);
+    sheet.style.height = '';
+    await unrolling;
     if (light?.line !== line || light.closing) return;
     $('.guide-next', sheet)?.focus({ preventScroll: true });
     speak(line);
