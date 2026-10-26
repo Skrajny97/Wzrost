@@ -3,14 +3,15 @@
 // midnight, a week at the midnight between Sunday and Monday. A period's
 // quests are drawn when it comes, from a seed of the character and the
 // period, so a period always gets the same ones: creatures of the newest
-// inner region open to the character's class and, once the Stół
-// rzemieślniczy stands, its work, and once the professions are there, the
-// herbs gathered, each with a reward of gold, a resource or parts. Claimed
-// explorations and gatherings and the table's orders move them on; a quest
+// inner region open to the character's class, never of a place too easy
+// for the character, and, once the Stół rzemieślniczy stands, its work, and
+// once the professions are there, the herbs gathered, each with a reward of
+// gold, a resource or parts. Claimed explorations and gatherings and the
+// table's orders move them on; a quest
 // done gives its reward when claimed, and all of a period's quests done open
 // its chest.
 
-import { encountersFor } from './hunt.js';
+import { easyPlace, encountersFor } from './hunt.js';
 import { randomItem } from './items.js';
 import { knownHerbs, professionState } from './professions.js';
 import { createRng } from './rng.js';
@@ -105,13 +106,18 @@ const questHerbs = (character, content) =>
 // creature that the period's most fights bring at least once on average;
 // gather: each herb known), the kind's weight shared among them. A kind
 // without this period, or of a module the character does not have yet, is
-// left out.
+// left out. No creatures of a place too easy for the character (the
+// author: "by ktoś z wyższym levelem nie był wysyłany na niskolevelowe
+// potwory"): when its class opens nothing harder, or it has outgrown every
+// place, the other kinds remain.
 function questOptions(periodId, { character, hasTable, hasProfessions = false }, content) {
+  const area = questArea(character, content);
   return content.quests.kinds.flatMap((kind) => {
     if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions)) return [];
+    if (kind.id === 'kill' && easyPlace(character.level, area, content)) return [];
     const variants =
       kind.id === 'kill'
-        ? [...creaturesPerFight(questArea(character, content), character.level)]
+        ? [...creaturesPerFight(area, character.level)]
             .filter(([, perFight]) => perFight * kind[periodId].fights[1] >= 1)
             .map(([target, perFight]) => ({ target, perFight }))
         : kind.id === 'gather'

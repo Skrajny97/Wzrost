@@ -81,6 +81,8 @@ import {
   lowerThreat,
   higherThreat,
   withRareOdds,
+  easyPlace,
+  rareCatchUp,
   materialDrops,
   materialView,
   materialsText,
@@ -422,6 +424,16 @@ describe('combat', () => {
     // Every blow goes to the wounded boar until it is down.
     assert.ok(blows.length > 0);
     for (const blow of blows.filter((event) => result.events.indexOf(event) < down)) assert.equal(blow.target, 'e1');
+  });
+
+  test('the front draws the party\'s blows: the back only when it falls much sooner', () => {
+    const player = { ...playerCombatant({ character: newCharacter('warrior', { level: 5 }), equipped: kit('warrior'), name: 'Mira' }, content), maxHp: 9000, hp: 9000 };
+    const boar = (id, hp, position) => ({ ...monsterCombatant({ monsterId: 'boar', level: 5, id }, content), hp, maxHp: 400, position });
+    const first = (back) => fight('przod', [player], [boar('e0', 400, 'front'), boar('e1', back, 'back')]).events.find((event) => event.actor === player.id && event.target).target;
+    // The back needs fewer blows, but not 40% of the front's: the front.
+    assert.equal(first(240), 'e0');
+    // A third of the front's: the back.
+    assert.equal(first(130), 'e1');
   });
 
   test('the damage bonus of a stat flattens out, so fights last alike at every level', () => {
@@ -795,10 +807,13 @@ describe('progression', () => {
     assert.equal(hpAfterHunt({ character, applied: applyHunt(character, calm, content), hunt: calm, equipped: [], name: 'A' }, content), 3);
   });
 
-  test('hunting far below your level gives clearly less XP', () => {
+  test('hunting far below your level gives less XP, at most half less', () => {
+    // From 4 levels above a creature, 10% less for each level, down to half.
     assert.equal(lowLevelMultiplier(5, 3, content), 1);
-    assert.equal(lowLevelMultiplier(8, 5, content), 0.75);
-    assert.equal(lowLevelMultiplier(20, 1, content), content.balance.hunt.lowLevelMinMultiplier);
+    assert.equal(lowLevelMultiplier(8, 5, content), 1);
+    assert.equal(lowLevelMultiplier(10, 5, content), 0.8);
+    assert.equal(lowLevelMultiplier(20, 1, content), 0.5);
+    assert.equal(content.balance.hunt.lowLevelMinMultiplier, 0.5);
   });
 
   test('the stats screen estimates the hours of hunting left to the next level', () => {
@@ -1092,14 +1107,17 @@ describe('camp', () => {
     assert.deepEqual(bagOverflow(bag, 3, 'warrior', content), []);
   });
 
-  test("the Ognisko's fire spirit: bigger trades and more of them with each level, counted anew each Polish day", () => {
+  test("the Ognisko's fire spirit: cheaper pieces and more trades with each level, counted anew each Polish day", () => {
     assert.equal(fireTrade(0, content), null);
-    assert.deepEqual(fireTrade(1, content), { amount: 5, gold: 50, unitGold: 10, perDay: 4, resources: ['wood', 'stone', 'iron-ore'] });
-    assert.deepEqual([2, 3, 5, 10].map((level) => [fireTrade(level, content).amount, fireTrade(level, content).gold, fireTrade(level, content).perDay]), [
-      [10, 100, 4],
-      [15, 150, 5],
-      [25, 250, 6],
-      [50, 500, 8],
+    assert.deepEqual(fireTrade(1, content), { amount: 50, gold: 500, unitGold: 10, perDay: 4, resources: ['wood', 'stone', 'iron-ore'] });
+    // A trade stays up to 50 pieces; a piece costs 1 gold less every 2 levels.
+    assert.deepEqual([2, 3, 4, 5, 9, 10].map((level) => [fireTrade(level, content).amount, fireTrade(level, content).unitGold, fireTrade(level, content).perDay]), [
+      [50, 9, 4],
+      [50, 9, 5],
+      [50, 8, 5],
+      [50, 8, 6],
+      [50, 6, 8],
+      [50, 5, 8],
     ]);
     // 23:30 and 0:30 in Warsaw (an hour ahead of UTC in winter) are two days.
     const late = Date.UTC(2026, 10, 3, 22, 30);
@@ -1107,16 +1125,19 @@ describe('camp', () => {
     const kept = { day: fireDay(late, content), count: 3 };
     assert.equal(fireTradesMade(kept, late, content), 3);
     assert.equal(fireTradesMade(kept, late + 3600000, content), 0);
-    const block = (changes) => fireTradeBlock({ level: 1, gold: 50, made: 3, resource: 'wood', ...changes }, content)?.code ?? null;
+    const block = (changes) => fireTradeBlock({ level: 1, gold: 500, made: 3, resource: 'wood', ...changes }, content)?.code ?? null;
     assert.equal(block({}), null);
     assert.equal(block({ made: 4 }), 'no_trades');
-    assert.equal(block({ gold: 49 }), 'not_enough');
+    assert.equal(block({ gold: 499 }), 'not_enough');
     assert.equal(block({ resource: 'gold' }), 'invalid_resource');
     assert.equal(block({ level: 0 }), 'not_built');
     // The slider: from 1 piece to a full trade, for 10 gold a piece.
     assert.equal(block({ amount: 3, gold: 30 }), null);
     assert.equal(block({ amount: 3, gold: 29 }), 'not_enough');
-    assert.deepEqual([0, 6, 2.5, '3'].map((amount) => block({ amount })), ['invalid_amount', 'invalid_amount', 'invalid_amount', 'invalid_amount']);
+    assert.deepEqual([0, 51, 2.5, '3'].map((amount) => block({ amount })), ['invalid_amount', 'invalid_amount', 'invalid_amount', 'invalid_amount']);
+    // At level 10 a piece costs 5 gold.
+    assert.equal(fireTradeBlock({ level: 10, gold: 15, made: 0, resource: 'stone', amount: 3 }, content), null);
+    assert.equal(fireTradeBlock({ level: 10, gold: 14, made: 0, resource: 'stone', amount: 3 }, content).code, 'not_enough');
     assert.equal(block({ amount: 1, made: 4 }), 'no_trades');
   });
 
@@ -1519,6 +1540,42 @@ describe('champions', () => {
     assert.ok(faintChances({ ...glade, seekRare: true }, content)[240] > faintChances(glade, content)[240]);
     assert.deepEqual(higherThreat({ 15: 'high', 60: 'low' }, { 15: 'moderate', 60: 'very-high' }), { 15: 'high', 60: 'very-high' });
   });
+
+  test('in a place too easy for the character, the elite and the champion it has not met come far more often, until met', () => {
+    // Dzicza Głusza (21–25): the Płanetnik and the Odyniec.
+    const area = content.areasById['boar-thicket'];
+    assert.deepEqual([easyPlace(28, area, content), easyPlace(29, area, content)], [false, true]);
+    assert.equal(rareCatchUp(28, area, [], content), null);
+    assert.deepEqual(rareCatchUp(29, area, [], content), { elite: true, champion: true });
+    assert.deepEqual(rareCatchUp(29, area, ['tusker'], content), { elite: true, champion: false });
+    assert.equal(rareCatchUp(29, area, ['planetnik', 'tusker'], content), null);
+    assert.equal(rareCatchUp(29, area, null, content), null);
+    const pace = explorationPace(30, content);
+    const caught = withRareOdds(pace, { catchUp: { elite: true, champion: false } }, content);
+    assert.equal(caught.eliteChance, content.balance.hunt.rareCatchUpChance);
+    assert.equal(caught.championChance, pace.championChance);
+    assert.deepEqual(withRareOdds(pace, { avoidRare: true, catchUp: { elite: true, champion: true } }, content), { ...pace, eliteChance: 0, championChance: 0 });
+    // A warrior of level 20 in Skraj Wiatrołomów (1–5) that has not met its
+    // Błędnica meets it on almost every exploration, once; one that has
+    // met it, avoids the elites or whose met creatures are not known,
+    // seldom or never.
+    const hero = geared('warrior', 20);
+    const elites = (options) => {
+      const counts = [];
+      for (let i = 0; i < 200; i++) {
+        const hunt = simulateHunt({ ...hero, hp: 99999, name: 'Mira', areaId: 'windfalls-edge', minutes: 30, seed: `blednica:${i}`, ...options }, content);
+        counts.push(hunt.fights.filter((fight) => fight.elite).length);
+      }
+      return { some: counts.filter((count) => count > 0).length, more: counts.filter((count) => count > 1).length };
+    };
+    const unmet = elites({ met: [] });
+    assert.ok(unmet.some > 160 && unmet.more < 10, JSON.stringify(unmet));
+    for (const options of [{ met: ['wisp'] }, { met: [], avoidRare: true }, {}]) {
+      assert.ok(elites(options).some < 20, JSON.stringify(options));
+    }
+    // In its own place the odds are as usual.
+    assert.equal(rareCatchUp(20, content.areasById['viper-heaps'], [], content), null);
+  });
 });
 
 describe('materials and chests', () => {
@@ -1818,6 +1875,22 @@ describe('quests from the narrator', () => {
     const kinds = new Set();
     for (let seed = 0; seed < 40; seed++) for (const quest of drawQuests('daily', { character, hasTable: true, seed }, content)) kinds.add(quest.kind);
     assert.deepEqual([...kinds].sort(), ['explore', 'kill', 'process', 'salvage']);
+  });
+
+  test('no quest sends a character to the creatures of a place too easy for it', () => {
+    const kinds = (character) => {
+      const found = new Set();
+      for (let seed = 0; seed < 40; seed++) for (const quest of drawQuests('daily', { character, hasTable: true, seed }, content)) found.add(quest.kind);
+      return [...found].sort();
+    };
+    // A class far behind the character opens only Krucze Wykroty (11–15):
+    // too easy at level 19, still fine at 18.
+    const behind = newCharacter('archer', { level: 19, classLevel: 14 });
+    assert.equal(questArea(behind, content).id, 'raven-hollows');
+    assert.deepEqual(kinds(behind), ['explore', 'process', 'salvage']);
+    assert.ok(kinds({ ...behind, level: 18 }).includes('kill'));
+    // Past every place of the game the same.
+    assert.ok(!kinds(newCharacter('archer', { level: 60, classLevel: 69 })).includes('kill'));
   });
 
   test('a quest asks for as many creatures as its fights bring, and rare ones only for the week', () => {

@@ -598,7 +598,7 @@ export function mountCombat(container, { params, navigate }) {
     const levelNote =
       character.level < area.minLevel
         ? h('p', { class: 'region-warning', text: `Przeciwnicy mają tu poziom ${area.minLevel}–${area.maxLevel}, wyżej niż Twoja postać.` })
-        : character.level > area.maxLevel + 2
+        : character.level > area.maxLevel + (state.content.easyAbove ?? 3)
           ? h('p', { class: 'region-warning', text: 'To miejsce jest już dla Ciebie za łatwe: dostaniesz mało doświadczenia.' })
           : null;
 

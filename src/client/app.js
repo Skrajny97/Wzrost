@@ -74,6 +74,10 @@ function show(name) {
 // /?google=<result> (src/server/google.js).
 const GOOGLE_NOTES = {
   linked: 'Połączono konto Google. Możesz już logować się przyciskiem Google.',
+  // The same, and the link brought Punkty Systemu (googleNote).
+  rewarded: 'Połączono konto Google. Możesz już logować się przyciskiem Google.',
+  // A new account made with Google (googleNote adds its Punkty Systemu).
+  created: 'Konto założone przez Google.',
   // An account with test mode (src/server/accounts.js).
   linkedOnly: 'Połączono konto Google. To konto otwiera się teraz tylko przez Google.',
   taken: 'To konto Google jest już połączone z innym kontem w grze.',
@@ -84,6 +88,17 @@ const GOOGLE_NOTES = {
   unavailable: 'Logowanie przez Google jest teraz niedostępne.',
   closed: 'Zakładanie nowych kont jest wyłączone.',
 };
+
+// The note for a return from Google signed in: an account with test mode
+// opens only with Google once linked, and Punkty Systemu are named.
+function googleNote(result, user) {
+  const linked = result === 'linked' || result === 'rewarded';
+  const note = GOOGLE_NOTES[linked && user.testMode ? 'linkedOnly' : result];
+  const points = `${state.content?.emailReward ?? 10} Punktów Systemu`;
+  if (result === 'rewarded') return `${note} Za połączenie: ${points}.`;
+  if (result === 'created') return `${note} Na start: ${points}.`;
+  return note;
+}
 
 // Why Google sign-in cannot work here, or null. Google refuses browsers
 // built into other apps, and a game added to the iPhone home screen keeps its
@@ -136,7 +151,7 @@ async function start() {
     const { user } = await request('GET', '/api/me');
     state.user = user;
     await enterGame();
-    if (googleResult) toast(GOOGLE_NOTES[googleResult === 'linked' && user.testMode ? 'linkedOnly' : googleResult]);
+    if (googleResult) toast(googleNote(googleResult, user));
     if (emailResult) toast(emailResult);
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {

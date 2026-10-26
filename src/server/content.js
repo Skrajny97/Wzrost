@@ -117,6 +117,9 @@ export function publicContent() {
     parts: content.parts.map(({ id, name, rarity, description }) => ({ id, name, rarity, description })),
     appearances: content.appearances,
     freeResetMaxLevel: content.balance.progression.freeResetMaxLevel,
+    // Levels a character may have above a place's strongest creatures
+    // before their XP drops: then the Walka screen warns of an easy place.
+    easyAbove: content.balance.hunt.lowLevelFreeDiff,
     // Punkty Systemu for a confirmed e-mail (email.js).
     emailReward: content.balance.account.emailSystemPoints,
     classEvolutionLevels: content.balance.progression.classEvolutionLevels,

@@ -464,9 +464,9 @@ function mountBuilding(container, id) {
   }
 
   // The fire spirit: a trade of gold for a resource at a tap, as many a day
-  // as the level allows, and what the next level gives. The slider picks a
-  // smaller trade for the same price a piece (the author: "Duch ognia musi
-  // mieć suwak"); a trade, small or full, is one of the day's.
+  // as the level allows, and the price and the trades of the next level.
+  // The slider picks how many pieces (the author: "Duch ognia musi mieć
+  // suwak"); a trade, small or full, is one of the day's.
   function tradeView(trade) {
     const pieces = (count) => countOf(count, 'sztuka', 'sztuki', 'sztuk');
     const trades = (count) => countOf(count, 'wymiana', 'wymiany', 'wymian');
@@ -529,12 +529,12 @@ function mountBuilding(container, id) {
       { class: 'fire-trade', 'aria-label': trade.title },
       h('h2', { class: 'fire-trade-title', text: trade.title }),
       h('p', { class: 'fire-trade-text', text: trade.text }),
-      h('p', { class: 'store-head' }, h('span', { text: 'Jedna wymiana' }), h('strong', { text: `do ${formatNumber(trade.gold)} złota → ${pieces(trade.amount)}` })),
+      h('p', { class: 'store-head' }, h('span', { text: 'Jedna wymiana' }), h('strong', { text: `do ${pieces(trade.amount)}, ${formatNumber(trade.unitGold)} złota za sztukę` })),
       h('div', { class: 'fire-trade-pick' }, slider, value),
       h('div', { class: 'fire-trade-buttons' }, buttons.map(({ button }) => button)),
       hint,
       trade.next &&
-        h('p', { class: 'store-hint', text: `Na poziomie ${trade.next.level}: do ${formatNumber(trade.next.gold)} złota → ${pieces(trade.next.amount)}, ${trades(trade.next.perDay)} dziennie.` }),
+        h('p', { class: 'store-hint', text: `Na poziomie ${trade.next.level}: ${formatNumber(trade.next.unitGold)} złota za sztukę, ${trades(trade.next.perDay)} dziennie.` }),
     );
   }
 

@@ -1,8 +1,10 @@
 // The Ognisko's fire spirit (`trade` of the building in data/buildings.json):
-// gold thrown into the fire comes back as wood, stone or iron ore. At the
-// building's level L a trade gives up to unitsPerLevel × L of one resource
-// for goldPerUnit gold each (a slider picks fewer: the author, "Duch ognia
-// musi mieć suwak"), and a day holds tradesPerDay trades, small or full, one
+// gold thrown into the fire comes back as wood, stone or iron ore. A trade
+// gives up to `units` of one resource (a slider picks fewer: the author,
+// "Duch ognia musi mieć suwak"), for goldPerUnit gold a piece, 1 gold less
+// for every cheaperEvery levels of the building (the author: "rozwój
+// Ogniska powinien zmniejszać koszt wymiany złota na zasoby zamiast
+// maksymalną wymianę"). A day holds tradesPerDay trades, small or full, one
 // more for every moreTradesEvery levels. Days follow the quests' clock
 // (Polish time), so the trades come back at midnight.
 
@@ -17,9 +19,9 @@ export const fireBuilding = (content) => content.buildings.find((building) => bu
 export function fireTrade(level, content) {
   const building = fireBuilding(content);
   if (!building || level < 1) return null;
-  const { unitsPerLevel, goldPerUnit, tradesPerDay, moreTradesEvery, resources } = building.trade;
-  const amount = unitsPerLevel * level;
-  return { amount, gold: amount * goldPerUnit, unitGold: goldPerUnit, perDay: tradesPerDay + Math.floor((level - 1) / moreTradesEvery), resources };
+  const { units, goldPerUnit, cheaperEvery, tradesPerDay, moreTradesEvery, resources } = building.trade;
+  const unitGold = Math.max(1, goldPerUnit - Math.floor(level / cheaperEvery));
+  return { amount: units, gold: units * unitGold, unitGold, perDay: tradesPerDay + Math.floor((level - 1) / moreTradesEvery), resources };
 }
 
 // The day of `now` on the quests' clock ("2026-10-26").

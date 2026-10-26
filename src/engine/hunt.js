@@ -15,7 +15,9 @@
 // region, and sometimes a chest with an epic or rarer item. A character sent
 // out to avoid them (avoidRare) meets neither the elite nor the champion, one
 // seeking them (seekRare) meets both more often, and one tracking the
-// creatures of its quests (tracked) meets those more often.
+// creatures of its quests (tracked) meets those more often. In a place too
+// easy for it, the elite and the champion it has not met yet come far more
+// often, until it meets them (rareCatchUp).
 
 import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
@@ -68,12 +70,31 @@ export function explorationPace(minutes, content) {
 
 // The pace with the elite and the champion avoided (none of them) or sought
 // (rareSeekFactor times as often, the author: "niech zwiększa to szansę
-// dwukrotnie").
-export function withRareOdds(pace, { avoidRare = false, seekRare = false }, content) {
+// dwukrotnie"), and with those of `catchUp` (rareCatchUp) met in at least
+// rareCatchUpChance of the fights.
+export function withRareOdds(pace, { avoidRare = false, seekRare = false, catchUp = null }, content) {
   if (avoidRare) return { ...pace, eliteChance: 0, championChance: 0 };
-  if (!seekRare) return pace;
-  const factor = content.balance.hunt.rareSeekFactor;
-  return { ...pace, eliteChance: Math.min(1, pace.eliteChance * factor), championChance: Math.min(1, pace.championChance * factor) };
+  if (!seekRare && !catchUp) return pace;
+  const { rareSeekFactor, rareCatchUpChance } = content.balance.hunt;
+  const odds = (chance, unmet) => Math.min(1, Math.max(seekRare ? chance * rareSeekFactor : chance, unmet ? rareCatchUpChance : 0));
+  return { ...pace, eliteChance: odds(pace.eliteChance, catchUp?.elite), championChance: odds(pace.championChance, catchUp?.champion) };
+}
+
+// A place whose strongest creatures already give the character less XP
+// (lowLevelMultiplier).
+export const easyPlace = (characterLevel, area, content) => characterLevel - area.maxLevel > content.balance.hunt.lowLevelFreeDiff;
+
+// The author: "Jak ktoś ma już karę za łatwe miejsce, musi mieć jednorazowy
+// mocny bonus na znalezienie Elity/Czempiona, żeby uzupełnić swój
+// bestiariusz. Później wraca to do normy." In a place too easy for the
+// character, which of its elite and champion the character has not met yet
+// (`met`: the ids of the creatures met), or null. Null too when `met` is
+// not known.
+export function rareCatchUp(characterLevel, area, met, content) {
+  if (!met || !easyPlace(characterLevel, area, content)) return null;
+  const elite = Boolean(area.elite) && !met.includes(area.elite);
+  const champion = Boolean(area.champion) && !met.includes(area.champion);
+  return elite || champion ? { elite, champion } : null;
 }
 
 // The champion is drawn only where it lives, so other places keep their draws.
@@ -203,7 +224,7 @@ export function resourceBundle(area, total) {
 // `first`: the character's very first exploration, which goes one way:
 // regular encounters only, no chests among the finds, and the one treasure
 // is a plain weapon of its class after the first won fight.
-export function simulateHunt({ character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [] }, content) {
+export function simulateHunt({ character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [], met = null }, content) {
   const rng = createRng(seed);
   const tuning = content.balance.hunt;
   const rewards = content.balance.rewards;
@@ -216,8 +237,12 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
   // Each fight pays for the time it stands for (`share`), so every length
   // gives about the same per hour. The first exploration meets no demanding
   // encounter, elite or champion; an avoiding one no elite or champion, and a
-  // seeking one meets them more often.
-  let pace = withRareOdds(explorationPace(minutes, content), { avoidRare: first || avoidRare, seekRare }, content);
+  // seeking one meets them more often. In a place too easy for the
+  // character, those it has not met come far more often until the first
+  // fight with them, and then as usual.
+  let catchUp = first || avoidRare ? null : rareCatchUp(character.level, area, met, content);
+  const odds = () => withRareOdds(explorationPace(minutes, content), { avoidRare: first || avoidRare, seekRare, catchUp }, content);
+  let pace = odds();
   if (first) pace = { ...pace, toughChance: 0 };
   const fightCount = pace.fights;
   const share = pace.timeFactor;
@@ -296,6 +321,11 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
     }
 
     const encounter = rollEncounter(area, rng, content, character.level, pace, tracked);
+    if (catchUp && (encounter.elite || encounter.champion)) {
+      catchUp = { elite: catchUp.elite && !encounter.elite, champion: catchUp.champion && !encounter.champion };
+      if (!catchUp.elite && !catchUp.champion) catchUp = null;
+      pace = odds();
+    }
     const enemies = encounterCombatants(encounter, content);
     const ally = { ...player, hp: hpNow };
     const fight = simulateFight({ allies: [ally], enemies, rng, content, record: true });

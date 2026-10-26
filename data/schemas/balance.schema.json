@@ -340,6 +340,7 @@
         "championChancePerFight",
         "championLevelBonus",
         "rareSeekFactor",
+        "rareCatchUpChance",
         "questTrackBonus",
         "recoveryAfterFight",
         "soloXpBonus",
@@ -447,6 +448,12 @@
           "type": "number",
           "minimum": 1,
           "description": "Ile razy częściej postać spotyka elitę i czempiona, gdy je tropi („Trop elity i czempiony”): 2 to dwa razy częściej."
+        },
+        "rareCatchUpChance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Szansa na walkę z elitą albo czempionem miejsca, którego postać jeszcze nie spotkała, w miejscu już dla niej za łatwym: do pierwszego spotkania (autor: „jednorazowy mocny bonus”)."
         },
         "questTrackBonus": {
           "type": "number",
