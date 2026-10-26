@@ -48,6 +48,8 @@ describe('content', () => {
     assert.equal(data.regions[1].areas[0].unlockClassLevel, 25);
     assert.equal(data.stats.length, 8);
     assert.equal(data.unlocks.find((unlock) => unlock.id === 'professions').level, 10);
+    // Skills open at a class level, and the locked tab says which.
+    assert.equal(data.unlocks.find((unlock) => unlock.id === 'skills').classLevel, 10);
     assert.match(data.elements.find((element) => element.id === 'fire').color, /^#[0-9a-f]{6}$/);
   });
 });
@@ -1515,6 +1517,7 @@ describe('Zadania od narratora', () => {
 
   const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
   const claim = (period, index) => call('POST', '/api/quests/claim', { cookie, body: { period, index } });
+  const claimAll = (period) => call('POST', '/api/quests/claim-all', { cookie, body: { period } });
   const chest = (period) => call('POST', '/api/quests/chest', { cookie, body: { period } });
   const stored = async () => JSON.parse((await (await db()).prepare('SELECT quests FROM characters').first()).quests);
   const store = async (quests) => (await db()).prepare('UPDATE characters SET quests = ?').bind(JSON.stringify(quests)).run();
@@ -1593,6 +1596,44 @@ describe('Zadania od narratora', () => {
     assert.equal((await claim('monthly', 0)).status, 400);
     assert.equal((await claim('daily', 9)).status, 404);
     assert.equal((await claim('daily', '0')).status, 404);
+  });
+
+  test('"Odbierz wszystkie" takes every reward of the period done and not taken yet, summed', async () => {
+    const quests = await stored();
+    const rewards = [
+      { kind: 'resource', id: 'iron-ore', amount: 7 },
+      { kind: 'gold', amount: 40 },
+      { kind: 'resource', id: 'iron-ore', amount: 3 },
+      { kind: 'part', id: 'scraps', amount: 2 },
+    ];
+    quests.daily.quests = quests.daily.quests.map((quest, index) => ({ ...quest, progress: index < 4 ? quest.count : 0, reward: rewards[index] ?? quest.reward }));
+    await store(quests);
+    const before = await character();
+    assert.equal((await claim('daily', 3)).status, 200);
+    const all = await claimAll('daily');
+    assert.equal(all.status, 200);
+    assert.deepEqual(all.data.rewards, rewards.slice(0, 3));
+    const after = all.data.character;
+    assert.equal(after.resources['iron-ore'], before.resources['iron-ore'] + 10);
+    assert.equal(after.gold, before.gold + 40);
+    assert.equal(after.crafting.parts.find((part) => part.id === 'scraps').count, 2);
+    assert.deepEqual(after.quests.daily.quests.map((quest) => quest.claimed), [true, true, true, true, false]);
+    // The week's quests and the chest wait for their own taps.
+    assert.ok(after.quests.weekly.quests.every((quest) => !quest.claimed));
+    assert.equal(after.quests.daily.chest.opened, false);
+    assert.equal((await claimAll('daily')).data.error.code, 'nothing_to_claim');
+    assert.equal((await claimAll('weekly')).data.error.code, 'nothing_to_claim');
+    assert.equal((await claimAll('monthly')).status, 400);
+  });
+
+  test('two taps on "Odbierz wszystkie" give the rewards once', async () => {
+    const quests = await stored();
+    quests.daily.quests = quests.daily.quests.map((quest) => ({ ...quest, progress: quest.count, reward: { kind: 'gold', amount: 10 } }));
+    await store(quests);
+    const before = await character();
+    const taps = await Promise.all([claimAll('daily'), claimAll('daily')]);
+    assert.deepEqual(taps.map((tap) => tap.status).sort(), [200, 409]);
+    assert.equal((await character()).gold, before.gold + 10 * quests.daily.quests.length);
   });
 
   test('all the daily quests done open the chest: Punkty Czasu and Punkty Systemu, once', async () => {

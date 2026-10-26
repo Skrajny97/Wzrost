@@ -430,6 +430,9 @@ function openSettings() {
     });
   openSheet(
     h('h2', { class: 'sheet-title', text: 'Ustawienia' }),
+    // The reports and System messages, also from the character's screens,
+    // where the bottom bar has no Dziennik.
+    h('a', { class: 'button button--world settings-journal', href: '#/dziennik', onClick: closeSheet }, icon('book', { size: 20 }), 'Dziennik'),
     h(
       'dl',
       { class: 'status-list' },

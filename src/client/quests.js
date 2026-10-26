@@ -1,7 +1,8 @@
 // The narrator's daily and weekly quests (quests.js in the engine): a
 // parchment that unrolls under his face in the top bar, with a tab for each
 // period on top, the time to its new quests, the quests with their rewards
-// and "Odbierz", and the period's chest in the top right corner.
+// and "Odbierz", the period's chest in the top right corner, and at the
+// bottom "Odbierz wszystkie" while a reward of the open tab waits.
 
 import { materialSprite, monsterSprite } from './art.js';
 import { $, fill, h, icon } from './dom.js';
@@ -38,6 +39,13 @@ function rewardName(reward) {
   if (reward.kind === 'gold') return 'Złoto';
   const list = reward.kind === 'resource' ? state.content.resources : state.content.parts;
   return list.find((entry) => entry.id === reward.id)?.name ?? reward.id;
+}
+
+// Rewards in words, those of one name added up: "Drewno +6, Złoto +16".
+function rewardsText(rewards) {
+  const totals = new Map();
+  for (const reward of rewards) totals.set(rewardName(reward), (totals.get(rewardName(reward)) ?? 0) + reward.amount);
+  return [...totals].map(([name, amount]) => `${name} +${formatNumber(amount)}`).join(', ');
 }
 
 function rewardChip(reward) {
@@ -144,6 +152,7 @@ function draw(now = serverNow()) {
   if (!open) return;
   const quests = state.character.quests;
   const period = quests[tab];
+  const waiting = period.quests.some((quest) => quest.done && !quest.claimed);
   open.endsAt = period.endsAt;
   open.countdown = h('span', { class: 'quests-timer', text: untilNew(period.endsAt - now) });
   fill(
@@ -164,7 +173,18 @@ function draw(now = serverNow()) {
         : h('p', { class: 'quests-empty', text: 'Na razie nie mam dla Ciebie zadań.' }),
       h('p', { class: 'quests-note', text: period.chest.text }),
     ),
-    h('div', { class: 'narrator-actions' }, h('button', { type: 'button', class: 'button narrator-next', text: 'Zwiń', onClick: () => showQuests(false) })),
+    h(
+      'div',
+      { class: 'narrator-actions' },
+      waiting &&
+        h('button', {
+          type: 'button',
+          class: 'button quest-claim quests-claim-all',
+          text: 'Odbierz wszystkie',
+          onClick: (event) => withButton(event.currentTarget, () => claimAll(tab)),
+        }),
+      h('button', { type: 'button', class: 'button narrator-next', text: 'Zwiń', onClick: () => showQuests(false) }),
+    ),
   );
 }
 
@@ -188,6 +208,13 @@ async function claimReward(periodId, quest) {
   const { reward } = await call('POST', '/api/quests/claim', { period: periodId, index: quest.index });
   playSound('collect');
   toast(`Nagroda za zadanie: ${rewardName(reward)} +${formatNumber(reward.amount)}.`);
+}
+
+// Every reward of the period's quests done, in one go; the chest opens on its own.
+async function claimAll(periodId) {
+  const { rewards } = await call('POST', '/api/quests/claim-all', { period: periodId });
+  playSound('collect');
+  toast(`Nagrody za zadania: ${rewardsText(rewards)}.`);
 }
 
 async function openChest(periodId, period) {

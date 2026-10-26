@@ -99,7 +99,7 @@ export function publicContent() {
     })),
     durations: { min: content.balance.hunt.minMinutes, step: content.balance.hunt.stepMinutes, max: content.balance.hunt.maxMinutes },
     lengths: content.texts.lengths,
-    unlocks: content.unlocks.map(({ id, name, level, condition }) => ({ id, name, level, condition })),
+    unlocks: content.unlocks.map(({ id, name, level, classLevel, condition }) => ({ id, name, level, classLevel, condition })),
     resources: content.resources.map(({ id, name, description, system }) => ({ id, name, description, system: Boolean(system) })),
     buildings: content.buildings.map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
     // With the family of the creature that leaves it, for its icon.

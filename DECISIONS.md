@@ -1368,3 +1368,12 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
 3. **Ikony:** po jednym szkicu Retro Diffusion na przedmiot, razem 3,60 USD.
     - Biret wyszedł dopiero za trzecim razem, z prostszym opisem. Dwie wcześniejsze próby padły po stronie Retro Diffusion i nic nie kosztowały.
     - Na prośbę autora z Brygantyny zniknęło tło, a z Ornatu wieszak. Obie poprawki zostały zrobione ręcznie na pikselach, bez nowych szkiców.
+
+## Odbierz wszystkie, Dziennik w ustawieniach i próg Umiejętności (26.10.2026)
+
+1. **„Odbierz wszystkie”** (autor). Na dole pergaminu zadań, z lewej strony obok „Zwiń”, stoi przycisk „Odbierz wszystkie”.
+    - Widać go, gdy w otwartej zakładce czeka choć jedna nagroda. Odbiera nagrody wszystkich wykonanych zadań tej zakładki naraz, jednym zapisem (`POST /api/quests/claim-all`), więc dwa stuknięcia dają nagrody raz.
+    - Komunikat sumuje nagrody o tej samej nazwie, np. „Nagrody za zadania: Drewno +6, Złoto +16.”
+    - Skrzynia dalej otwiera się osobnym stuknięciem, bo tygodniowa ma przedmiot i potrzebuje miejsca w plecaku.
+2. **Dziennik w ustawieniach** (autor). Dziennik jest teraz na samej górze ustawień, pod zębatką, więc da się do niego przejść z każdego ekranu. W dolnym pasku głównych ekranów też został. Na ekranach postaci (wyposażenie, Statystyki, Umiejętności, Rdzeń) dolny pasek ma swoje zakładki, więc tam Dziennika nie było widać.
+3. **Próg Umiejętności.** Zablokowane Umiejętności pisały „na poziomie klasy undefined”, bo serwer wysyłał z `data/unlocks.json` tylko progi poziomu postaci. Teraz wysyła też progi poziomu klasy. Ekran pisze „Umiejętności odblokujesz na poziomie klasy 10.”, a zakładka w pasku postaci ma dopisek „poz. kl. 10”.

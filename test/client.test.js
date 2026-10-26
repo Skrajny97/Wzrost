@@ -142,7 +142,7 @@ test("the narrator's quests sit in the top bar, where his line points", () => {
   // Between the levels and the gold.
   assert.match(layout, /h\('div', \{ class: 'topbar-badges' \}, level, classLevel\),\s*quests,/);
   const quests = readFileSync(join(CLIENT, 'quests.js'), 'utf8');
-  for (const path of ['/api/quests/claim', '/api/quests/chest']) assert.ok(quests.includes(`'${path}'`), path);
+  for (const path of ['/api/quests/claim', '/api/quests/claim-all', '/api/quests/chest']) assert.ok(quests.includes(`'${path}'`), path);
 });
 
 test('the page can be added to the home screen as an app', () => {

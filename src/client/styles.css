@@ -1244,6 +1244,11 @@ a.button {
   text-decoration: none;
 }
 
+/* The Dziennik on top of the settings, with its book. */
+.settings-journal {
+  gap: 8px;
+}
+
 .button--small {
   width: auto;
   min-height: 44px;
@@ -4941,6 +4946,14 @@ a.segmented-option {
   font-weight: 600;
   letter-spacing: 0;
   text-transform: none;
+}
+
+/* As large as "Zwiń" beside it. */
+.quests-claim-all {
+  min-height: 0;
+  padding: 10px 18px;
+  font-size: 17px;
+  font-weight: 500;
 }
 
 .quest-taken {
