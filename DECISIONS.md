@@ -1497,4 +1497,4 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
     - walka będzie musiała przyjmować przywołane stwory na wolne miejsca drużyny.
 
     Zapis jest w dokumencie projektowym, przy ewolucjach.
-4. **Druga ścieżka bez górnej granicy.** Autor nie zrozumiał pytania o granicę 50. poziomu, więc zostaje najprostsze rozwiązanie: drugą umiejętność można dobrać w każdej chwili od 11. poziomu klasy.
+4. **Druga ścieżka bez górnej granicy.** Pytanie o granicę 50. poziomu okazało się niejasne, więc zostaje najprostsze rozwiązanie: drugą umiejętność można dobrać w każdej chwili od 11. poziomu klasy.
