@@ -10,6 +10,7 @@
 import { fill, h } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
 import { skillSprite } from '../art.js';
+import { motionOn } from '../motion.js';
 import { call, isUnlocked, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from '../ui.js';
 
@@ -41,6 +42,7 @@ export function mountSkills(container) {
     const busy = Boolean(character.activity);
     const evolution = view.evolution ?? {};
     const waiting = evolution.need && character.classLevel >= evolution.level;
+    const before = pathTops();
     fill(
       container,
       heading,
@@ -51,6 +53,21 @@ export function mountSkills(container) {
       busy && systemPanel('Postać jest na wyprawie. Umiejętności zmienisz po jej powrocie.'),
       view.pools.map((pool) => poolSection(pool, view, busy)),
     );
+    slidePaths(before);
+  }
+
+  // Where each path stands on the page, by its skill.
+  const pathTops = () => new Map([...container.querySelectorAll('.skill-path')].map((node) => [node.dataset.skill, node.getBoundingClientRect().top]));
+
+  // A path that moved since `before`, like one that closed and went to the
+  // bottom, slides from its old place to the new one.
+  function slidePaths(before) {
+    if (!motionOn()) return;
+    for (const [skillId, top] of pathTops()) {
+      const shift = (before.get(skillId) ?? top) - top;
+      if (Math.abs(shift) < 1) continue;
+      container.querySelector(`.skill-path[data-skill="${skillId}"]`).animate([{ transform: `translateY(${shift}px)` }, { transform: 'none' }], { duration: 700, easing: 'ease-in-out' });
+    }
   }
 
   // A milestone's three paths, each with its name over its skill.
@@ -64,7 +81,7 @@ export function mountSkills(container) {
     const secondNow = secondOpen && state.character.classLevel >= view.secondLevel;
     const intro =
       known === 0
-        ? `Poziom klasy ${pool.classLevel}: wybierz główną ścieżkę rozwoju postaci. To wybór na stałe, a postać używa umiejętności w walce sama. Od poziomu klasy ${view.secondLevel} możesz dobrać drugą ścieżkę za 1 Punkt Umiejętności, a trzecia się wtedy zamknie. Ścieżki zdecydują o ewolucji klasy.`
+        ? `Od ${pool.classLevel}. poziomu wzrost poziomu klasy pozwala Ci uzyskać 1 Punkt Umiejętności. Każda umiejętność otwiera jedną ze ścieżek rozwoju. Ale ostrożnie! Możesz otworzyć tylko dwie ścieżki – a one będą miały istotny wpływ na Twoje dalsze losy.`
         : secondNow && view.points > 0
           ? `Masz ${skillPoints(view.points)}. Dodaj punkt do znanej umiejętności albo wybierz drugą ścieżkę. Ostatnia ścieżka się wtedy zamknie.`
           : secondNow
@@ -84,7 +101,8 @@ export function mountSkills(container) {
       { class: 'skill-paths', 'aria-label': 'Ścieżki rozwoju' },
       intro && systemPanel(deadline ? `${intro} ${deadline}` : intro),
       pointsNote && systemPanel(`Masz ${skillPoints(view.points)}. Dotknij umiejętności, żeby dodać punkt.`),
-      pool.options.map((skill) => pathSection(skill, pool, view, busy)),
+      // A closed path goes to the bottom.
+      [...pool.options].sort((a, b) => (a.state === 'closed') - (b.state === 'closed')).map((skill) => pathSection(skill, pool, view, busy)),
     );
   }
 
@@ -92,7 +110,7 @@ export function mountSkills(container) {
     const learned = skill.state === 'main' || skill.state === 'second';
     return h(
       'section',
-      { class: `skill-path skill-path--${skill.state}`, 'aria-label': `${PATH_LABELS[skill.state] ?? 'Ścieżka'}: ${skill.path}` },
+      { class: `skill-path skill-path--${skill.state}`, 'data-skill': skill.id, 'aria-label': `${PATH_LABELS[skill.state] ?? 'Ścieżka'}: ${skill.path}` },
       h('h2', { class: 'skill-path-title' }, h('span', { class: 'skill-path-label', text: PATH_LABELS[skill.state] ?? 'Ścieżka' }), h('span', { class: 'skill-path-name', text: skill.path })),
       learned ? learnedRow(skill, view, busy) : skill.state === 'closed' ? closedRow(skill) : choiceCard(skill, pool, view, busy),
     );
