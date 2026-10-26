@@ -964,7 +964,7 @@ Autor: afiksy mają nawiązywać do potworów, z których wypadają, a nie poluj
 | Szronu | Licha | Odporność na mróz |
 | Jadu | Żmii | Odporność na truciznę |
 
-Niedźwiedzi, Wilczy, Rysi i Kruka już nosiły nazwy potworów i zostają. Pięć przyrostków odporności (Topieli, Burzy, Skał, Mchu, Kapliczki) zostaje, dopóki nie pojawią się potwory wody, elektryczności, ziemi, natury i sakrum. Afiksy nadal losują się z całej listy, bez względu na potwora z walki.
+Niedźwiedzi, Wilczy, Rysi i Kruka już nosiły nazwy potworów i zostają. Pięć przyrostków odporności (Topieli, Burzy, Skał, Mchu, Kapliczki) zostaje, dopóki nie pojawią się potwory wody, elektryczności, ziemi, natury i sakrum. Afiksy nadal losują się z całej listy, bez względu na potwora z walki. Od 26.10.2026 nazwy afiksów nowych przedmiotów dają stwory z miejsca, w którym przedmiot znaleziono (zob. „Nazwy afiksów od stworów z miejsca”).
 
 ## Skromne portrety na start (25.10.2026)
 
@@ -1695,3 +1695,20 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
 12. **Plansza obozu w pixel-arcie** (autor: „popracuj w Retro Diffusion nad planszą obozu, też powinna być w stylu nowych lokacji”; pierwszy szkic zatwierdzony przez autora). Ziemia planszy to jeden obrazek polany w lesie (`art/prompts.json`, rodzaj `board`, styl `rd_plus__topdown_map`, 320 × 352), w grze stonowany (saturacja 0,7) i przyciemniony (0,72) tak jak budynki. Ścieżki do placów rysuje gra, bo muszą trafiać w place: to miękkie, ziemne dróżki, lekko rozmyte i półprzezroczyste. Bez obrazka zostaje dawna polana w wektorach. Koszt: dwa szkice po 0,06 USD.
 13. **Plac przed budową jest szary** (autor: „przed budową lokacji w obozie musi ona być wyszarzona”). Pusty plac pokazuje pierwszy wygląd swojego budynku bez kolorów (saturacja 0) i półprzezroczysty: 50%, a w trakcie budowy, pod rusztowaniem, 70%. Tak samo wygląda obrazek na ekranie budynku. Barwy pojawiają się po ukończeniu pierwszego poziomu. Punkt uzupełnia blady zarys z punktu 4 części o planszy obozu.
 14. **Kwestia narratora w obozie** (autor: „powinno być »Znalezione - nie kradzione«”, a kwestia mówiła o kilku monetach, choć światło pokazuje rudę żelaza). Zatwierdzony tekst brzmi: „Na tej polanie ktoś już kiedyś obozował. Dobrze dla Ciebie! Wygląda na to, że zostawił trochę drewna, kamieni i rudy żelaza. Znalezione – nie kradzione.” ElevenLabs nagrał trzy wersje (`camp-calm`, 510 kredytów). W grze jest trzecia: ma przerwę przed „nie kradzione” jak poprzednie nagranie, najczystszy początek i podobne tempo (12 znaków na sekundę). Pierwsza mówi wolniej (10,8 znaku na sekundę), a druga kończy się ponad sekundą ciszy.
+
+## Nazwy afiksów od stworów z miejsca (26.10.2026)
+
+1. **Afiks nosi nazwę stwora z miejsca, w którym znaleziono przedmiot** (autor: „Fokus Puszczyka wypadł mi właśnie ze Skraju Wiatrołomów, a nie ma tego wroga w tej lokacji. Nie powinno być więc takiego afiksu” oraz „»Lisa« i wszystkie inne takie to ozdobniki”, więc nazwa nie musi się wiązać ze statystyką).
+    - To, co daje afiks, losuje się jak dotąd: te same statystyki i wagi (`prefixes` i `suffixes` w `data/affixes.json`), w każdym miejscu tak samo. Balans się nie zmienia.
+    - Nazwę każdemu afiksowi daje potem stwór z listy „Czyhające niebezpieczeństwa” regionu wewnętrznego, razem z jego elitą i czempionem. Przedrostek daje stwór, od którego jest przymiotnik (Wilczy, Lisi), a przyrostek każdy stwór (Wilka, Lisa). Nazwy stworów leżą w `names` w `data/affixes.json`, a przedmiot zapisuje przy afiksie stwora, który go nazwał (`monster`).
+    - W Skraju Wiatrołomów przedmioty są więc wilcze, lisie, żmijowe i borsucze albo mają przyrostek Wilka, Lisa, Żmii, Borsuka lub Błędnicy, a nigdy Puszczyka.
+    - Jeden stwór nazywa jeden afiks przedmiotu, dopóki starcza innych stworów, więc nie ma „Lisiego Hełmu Lisa”.
+    - Cotygodniowa skrzynia zadań bierze nazwy od stworów z miejsca, o które proszą zadania (najnowszy region wewnętrzny otwarty poziomem klasy).
+    - Przedmioty znalezione wcześniej, także Fokus Puszczyka autora, mają dawne nazwy i liczby. Dawny afiks prowadzi do swojego stwora (`monster` przy afiksie) albo ma własny tekst.
+    - Pięć dawnych przyrostków odporności (Topieli, Burzy, Skał, Mchu, Kapliczki) nazywa już tylko stare przedmioty. Nowy przedmiot z odpornością na wodę, elektryczność, ziemię, naturę albo sakrum dostaje nazwę od stwora z miejsca, jak każdy inny.
+    - Walidacja pilnuje, żeby każdy stwór miał nazwę do afiksów, a w każdym miejscu żył stwór z przymiotnikiem. Testy pilnują, żeby nazwy brały się tylko od stworów z miejsca, także w skrzyni zadań, i żeby liczby przedmiotu były takie same jak bez miejsca.
+2. **Nowe nazwy.** Stwory, od których nie było jeszcze afiksu, mają nazwy od siebie. To propozycja, którą autor może zmienić:
+    - przymiotniki: Jeleni (Jeleń), Kuni (Kuna), Puchaczowy (Puchacz), Kamienny (Kamiennik) i Bazyliszkowy (Bazyliszek);
+    - przyrostki: Wilka, Krzyżaka, Jelenia, Kuny, Szerszeni (Rój szerszeni), Płanetnika, Odyńca, Kamiennika, Gacka, Puchacza, Wadery i Bazyliszka.
+    - Basior, Błędnica, Licho, Rój szerszeni, Płanetnik, Odyniec, Gacek i Wadera nazywają tylko przyrostki, bo przymiotnik od nich brzmiałby sztucznie.
+3. **Najmniej przedrostków jest w Uroczysku**: w Omszałych Głazach i Pajęczym Parowie tylko Rysi, Pajęczy i Kamienny, a w Wilczych Kręgach Rysi, Kamienny i Puchaczowy. Żyją tam głównie stwory, od których nie ma dobrego przymiotnika.
