@@ -1713,6 +1713,17 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
     - Basior, Błędnica, Licho, Rój szerszeni, Płanetnik, Odyniec, Gacek i Wadera nazywają tylko przyrostki, bo przymiotnik od nich brzmiałby sztucznie.
 3. **Najmniej przedrostków jest w Uroczysku**: w Omszałych Głazach i Pajęczym Parowie tylko Rysi, Pajęczy i Kamienny, a w Wilczych Kręgach Rysi, Kamienny i Puchaczowy. Żyją tam głównie stwory, od których nie ma dobrego przymiotnika.
 
+## Tropienie stworów z zadań i panel autora (26.10.2026)
+
+1. **„Trop przede wszystkim stwory z zadań”** (autor: „Pod »Czyhające niebezpieczeństwa« powinniśmy dodać opcję nową do zadań »Trop przede wszystkim stwory z zadań«, co powinno zwiększać szansę na trafienie w wyprawie stworów z zadań dziennych/tygodniowych o 50%”).
+    - Pole do zaznaczenia stoi na karcie regionu wewnętrznego, pod przyciskiem „Czyhające niebezpieczeństwa”. Przy pierwszej wyprawie go nie ma, tak jak pola „Unikaj elit i czempionów”.
+    - Zaznaczone pole sprawia, że spotkania ze stworem z niedokończonego zadania zabijania (dziennego albo tygodniowego) mają o połowę większą wagę (`questTrackBonus` 0,5 w `data/balance.json`), także spotkania wymagające. Na Skraju Wiatrołomów, przy zadaniu na lisa, walka z lisem wypada na 5. poziomie w ok. 31% walk zamiast 23%. Elita i czempion trafiają się jak dotąd, bo zadania nigdy o nie nie proszą.
+    - Liczą się stwory z zadań w chwili wyruszenia. Serwer zapisuje je z wyprawą (`activities.tracked`, migracja 0026), bo raport powstaje z ziarna dopiero przy odbiorze. Numer 0025 ma migracja profesji z gałęzi roboczej.
+    - Gdy w tym miejscu nie żyje żaden stwór z zadań, pod polem stoi dopisek „Żaden stwór z Twoich zadań nie żyje w tym miejscu.”, a wyprawa idzie jak zwykle.
+    - Wybór zostaje na telefonie (`localStorage`), także dla „Wyrusz ponownie”. Karta trwającej wyprawy mówi „Postać tropi stwory z zadań.”
+    - Poziom zagrożenia liczy walki jak bez tropienia, bo mieszanka spotkań zmienia się niewiele.
+2. **Podgląd umiejętności w Panelu autora pod przyciskiem** (autor: „schowaj pod osobnym przyciskiem, bo muszę specjalnie scrollować, by sprawdzić aktualne konta i postaci”). Na górze panelu jest przycisk „Podgląd umiejętności”, a zaraz pod nim liczby i konta. Lista umiejętności wczytuje się dopiero przy pierwszym otwarciu.
+
 ## Wersja testowa i Zielarstwo (26.10.2026)
 
 1. **Wersja testowa** (autor: „Jeśli umiesz tak zrobić – proszę zrób”). Pod https://test.insightrpg.com działa ta sama gra z gałęzi roboczej: osobny Worker `wzrost-test` i osobna baza D1 `wzrost-test` (środowisko `test` w `wrangler.jsonc`). Push na każdą gałąź poza `main` i `art-drafts` wdraża ją po testach (zadanie „Wersja testowa” w `.github/workflows/deploy.yml`). Nie ma tam logowania Google ani Panelu autora. Login z `TEST_LOGINS` ma tam tryb testowy. Działa tam tylko konto autora, założone wcześniej na hasło (autor: „Zablokuj wersję testową tak, by nie można było stworzyć więcej kont niż to, które właśnie stworzyłem”): `REGISTRATION` = `"closed"` wyłącza zakładanie kont, także przez Google, a ekran startowy pokazuje tylko logowanie. Nic nie kosztuje, bo plan Workers Paid obejmuje kolejnego Workera i bazę, a adres jest w domenie gry. Każda zmiana wdrożona do gry trafia też na wersję testową (autor: „Pamiętaj, żeby wszystkie zmiany z głównego serwera teraz deployować i na serwer testowy”): po wypchnięciu do `main` gałąź robocza dostaje `main` przez scalenie i jest wypychana.

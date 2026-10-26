@@ -646,6 +646,29 @@ describe('hunts and reports', () => {
     assert.equal(plain.data.character.activity.avoidRare, false);
   });
 
+  test('an exploration can track the creatures of the quests', async () => {
+    const quest = (target, progress = 0) => ({ kind: 'kill', target, count: 2, progress, reward: { kind: 'gold', amount: 5 }, claimed: false });
+    const stored = JSON.parse((await (await db()).prepare('SELECT quests FROM characters').first()).quests);
+    stored.daily.quests = [quest('fox'), quest('wolf', 2), quest('bear')];
+    stored.weekly.quests = [];
+    await (await db()).prepare('UPDATE characters SET quests = ?').bind(JSON.stringify(stored)).run();
+    const wrong = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, trackQuests: 'tak' } });
+    assert.equal(wrong.data.error.code, 'invalid_track');
+    // Only the fox: the wolves are beaten already and no bear lives on the edge.
+    const started = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, trackQuests: true } });
+    assert.equal(started.status, 201);
+    assert.equal(started.data.character.activity.tracksQuests, true);
+    assert.equal((await (await db()).prepare('SELECT tracked FROM activities').first()).tracked, '["fox"]');
+    await call('POST', '/api/test/skip-time', { cookie });
+    assert.equal((await call('POST', '/api/hunts/claim', { cookie })).status, 200);
+    // With no quest creature living there, nothing is tracked.
+    stored.daily.quests = [quest('bear')];
+    await (await db()).prepare('UPDATE characters SET quests = ?').bind(JSON.stringify(stored)).run();
+    const none = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, trackQuests: true } });
+    assert.equal(none.data.character.activity.tracksQuests, false);
+    assert.equal((await (await db()).prepare('SELECT tracked FROM activities').first()).tracked, null);
+  });
+
   test('checks the place and the duration', async () => {
     const place = await call('POST', '/api/hunts', { cookie, body: { areaId: 'moon', minutes: 60 } });
     assert.equal(place.data.error.code, 'invalid_area');

@@ -7,7 +7,7 @@ import { itemSprite, materialSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { playSound } from '../sound.js';
-import { activityFinished, avoidRareOn, call, reportCache, state } from '../state.js';
+import { activityFinished, avoidRareOn, call, reportCache, state, trackQuestsOn } from '../state.js';
 import { confirmAction, guided, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { itemDetails, itemSheet, itemSummary } from './character.js';
@@ -457,7 +457,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         text: `Wyrusz ponownie: ${report.areaName ?? report.regionName}, ${formatMinutes(report.minutes)}`,
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
-            await call('POST', '/api/hunts', { areaId: report.areaId ?? report.regionId, minutes: report.minutes, avoidRare: avoidRareOn() });
+            await call('POST', '/api/hunts', { areaId: report.areaId ?? report.regionId, minutes: report.minutes, avoidRare: avoidRareOn(), trackQuests: trackQuestsOn() });
             navigate('#/walka');
           }),
       });

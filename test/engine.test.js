@@ -110,6 +110,7 @@ import {
   drawQuests,
   huntKills,
   questArea,
+  questCreatures,
   questLevel,
   questPeriod,
   questText,
@@ -1669,6 +1670,23 @@ describe('Czyhające niebezpieczeństwa', () => {
     assert.equal(hollows.find((danger) => danger.monsterId === 'boar').maxLevel, 15);
   });
 
+  test('tracking the creatures of the quests meets them more often', () => {
+    const edge = content.areasById['windfalls-edge'];
+    const share = (tracked) => {
+      const rng = createRng('tropienie');
+      let foxes = 0;
+      for (let i = 0; i < 6000; i++) {
+        const encounter = rollEncounter(edge, rng, content, edge.maxLevel, { eliteChance: 0, toughChance: 0 }, tracked);
+        if (encounter.members.some((member) => member.monsterId === 'fox')) foxes += 1;
+      }
+      return foxes / 6000;
+    };
+    // At level 5 a fox comes in 18 of the 77 weight of Skraj's encounters, and
+    // tracked in 27 of 86: from about 23% of fights to about 31%.
+    assert.ok(Math.abs(share([]) - 18 / 77) < 0.02, String(share([])));
+    assert.ok(Math.abs(share(['fox']) - 27 / 86) < 0.02, String(share(['fox'])));
+  });
+
   test('every creature an inner region can roll is on its list, within its levels', () => {
     for (const area of Object.values(content.areasById)) {
       const dangers = new Map(areaDangers(area, content).map((danger) => [danger.monsterId, danger]));
@@ -1844,6 +1862,16 @@ describe('quests from the narrator', () => {
     const beaten = Object.values(huntKills(hunt)).reduce((sum, count) => sum + count, 0);
     const won = hunt.fights.filter((fight) => fight.won === true).reduce((sum, fight) => sum + fight.enemies.length, 0);
     assert.equal(beaten, won);
+  });
+
+  test('an exploration tracks the creatures the quests still ask for, if they live there', () => {
+    const quest = (kind, target, progress = 0) => ({ kind, ...(target && { target }), count: 3, progress, reward: { kind: 'gold', amount: 5 }, claimed: false });
+    const quests = {
+      daily: { period: 'd', quests: [quest('kill', 'fox'), quest('kill', 'wolf', 3), quest('kill', 'bear'), quest('explore')], chest: false },
+      weekly: { period: 'w', quests: [quest('kill', 'fox', 1), quest('kill', 'viper')], chest: false },
+    };
+    assert.deepEqual(questCreatures(quests, content.areasById['windfalls-edge']), ['fox', 'viper']);
+    assert.deepEqual(questCreatures(quests, content.areasById['glade-heart']), ['bear']);
   });
 
   test('the weekly chest holds an item of the level for the class, its rarity by the level', () => {
