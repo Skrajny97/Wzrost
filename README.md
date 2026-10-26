@@ -153,7 +153,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/camp/build` | zacznij budowę następnego poziomu budynku obozu: `buildingId`; naraz jedna budowa; budynek produkcyjny najpierw oddaje zawartość magazynu |
 | POST | `/api/camp/collect` | zbierz magazyn budynku produkcyjnego: `buildingId`; zwraca `collected` (409 `nothing_to_collect`, gdy magazyn jest pusty) |
 | POST | `/api/camp/cancel` | „Anuluj” budowę czekającą w kolejce: `buildingId` i `level`; koszt wraca w całości (409 `not_queued`) |
-| POST | `/api/camp/trade` | duch ognia w Ognisku: złoto za `resource` (`wood`, `stone` albo `iron-ore`), wymian na dzień według poziomu Ogniska (409 `not_built`, `no_trades`, `not_enough`) |
+| POST | `/api/camp/trade` | duch ognia w Ognisku: złoto za `amount` sztuk `resource` (`wood`, `stone` albo `iron-ore`), do limitu sztuk na dzień według poziomu Ogniska (400 `invalid_amount`; 409 `not_built`, `no_trades`, `not_enough`) |
 | POST | `/api/camp/buy` | lada złomiarza w Skupie złomu: `count` (1 albo 10) części `partId` za złoto, rzadkości i ceny według poziomu skupu; zwraca `bought` (400 `invalid_part`, `invalid_count`; 409 `not_built`, `not_sold`, `not_enough`) |
 | GET | `/api/hunts/options` | poziom zagrożenia dla każdego czasu w otwartym regionie wewnętrznym dla poziomu postaci (`threat`, a `threatAvoiding` bez elit i czempiona); `?area=<id>` liczy jeden wybrany region wewnętrzny |
 | POST | `/api/hunts` | wyrusz na eksplorację: `areaId` (otwarty region wewnętrzny), `minutes` (1, potem co 5 minut: do 30, od poziomu 25 do 60, od 35 do 120, od 50 do 240), `avoidRare` (`true`: postać nie spotyka elit ani czempionów) |

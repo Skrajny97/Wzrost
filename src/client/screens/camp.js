@@ -463,31 +463,55 @@ function mountBuilding(container, id) {
     );
   }
 
-  // The fire spirit: a trade of gold for a resource at a tap, as many a day
-  // as the level allows, and the price and the trades of the next level.
-  // The slider picks how many pieces (the author: "Duch ognia musi mieć
-  // suwak"); a trade, small or full, is one of the day's.
+  // The fire spirit: gold for a resource at a tap, up to the pieces left
+  // today, and the price and the pieces a day of the next level. The slider,
+  // with a button for one piece more or less, picks how many (the author:
+  // "Limit wymian u ducha ognia ustal na jednostki, nie na liczby wymian").
   function tradeView(trade) {
     const pieces = (count) => countOf(count, 'sztuka', 'sztuki', 'sztuk');
-    const trades = (count) => countOf(count, 'wymiana', 'wymiany', 'wymian');
-    // The full trade, or as much as the gold pays for, or the last choice.
+    const head = [
+      h('h2', { class: 'fire-trade-title', text: trade.title }),
+      h('p', { class: 'fire-trade-text', text: trade.text }),
+      h('p', { class: 'store-head' }, h('span', { text: 'Cena' }), h('strong', { text: `${formatNumber(trade.unitGold)} złota za sztukę` })),
+    ];
+    const next =
+      trade.next &&
+      h('p', { class: 'store-hint', text: `Na poziomie ${trade.next.level}: ${formatNumber(trade.next.unitGold)} złota za sztukę, do ${pieces(trade.next.perDay)} dziennie.` });
+    if (trade.left < 1) {
+      return h(
+        'section',
+        { class: 'fire-trade', 'aria-label': trade.title },
+        ...head,
+        h('p', { class: 'store-hint', text: 'Na dziś duch ognia nie przyjmie już złota. Wróć po północy.' }),
+        next,
+      );
+    }
+    // All that is left today, or as much as the gold pays for, or the last
+    // choice.
     const affordable = Math.floor(state.character.gold / trade.unitGold);
-    let amount = Math.max(1, Math.min(trade.amount, fireChoice ?? trade.amount, affordable));
+    let amount = Math.max(1, Math.min(trade.left, fireChoice ?? trade.left, affordable));
     const value = h('output', { class: 'fire-trade-amount', 'aria-live': 'off' });
     const slider = h('input', {
       type: 'range',
       class: 'duration-slider fire-trade-slider',
       min: 1,
-      max: trade.amount,
+      max: trade.left,
       step: 1,
       value: amount,
       'aria-label': 'Ile sztuk wymienić',
-      disabled: trade.amount < 2,
-      onInput: () => {
-        fireChoice = Number(slider.value);
-        set(fireChoice);
-      },
+      disabled: trade.left < 2,
+      onInput: () => choose(Number(slider.value)),
     });
+    const stepButton = (sign, label) =>
+      h('button', {
+        type: 'button',
+        class: 'button button--world duration-step',
+        'aria-label': label,
+        text: sign < 0 ? '−' : '+',
+        onClick: () => choose(amount + sign),
+      });
+    const less = stepButton(-1, 'O sztukę mniej');
+    const more = stepButton(1, 'O sztukę więcej');
     const hint = h('p', { class: 'store-hint' });
     const buttons = trade.resources.map((id) => {
       const label = h('span', {});
@@ -503,38 +527,38 @@ function mountBuilding(container, id) {
       );
       return { id, button, label };
     });
+    function choose(next) {
+      set(next);
+      fireChoice = amount;
+    }
     function set(next) {
-      amount = Math.max(1, Math.min(trade.amount, next));
+      amount = Math.max(1, Math.min(trade.left, next));
       const gold = amount * trade.unitGold;
       const short = state.character.gold < gold;
       slider.value = String(amount);
       slider.setAttribute('aria-valuetext', `${pieces(amount)} za ${formatNumber(gold)} złota`);
-      slider.style.setProperty('--fill', `${((amount - 1) / Math.max(1, trade.amount - 1)) * 100}%`);
+      slider.style.setProperty('--fill', `${((amount - 1) / Math.max(1, trade.left - 1)) * 100}%`);
       value.textContent = `${pieces(amount)} za ${formatNumber(gold)} złota`;
+      less.disabled = amount <= 1;
+      more.disabled = amount >= trade.left;
       for (const { id, button, label } of buttons) {
         label.textContent = `${resourceName(id)} +${formatNumber(amount)}`;
-        button.disabled = trade.left < 1 || short;
+        button.disabled = short;
         button.setAttribute('aria-label', `Wymień ${formatNumber(gold)} złota na: ${resourceName(id).toLowerCase()} +${formatNumber(amount)}`);
       }
-      hint.textContent =
-        trade.left < 1
-          ? 'Na dziś wymiany się skończyły. Duch ognia przyjmie złoto znów o północy.'
-          : short
-            ? `Wymiany na dziś: ${trade.left} z ${trade.perDay}. Brakuje złota na wymianę.`
-            : `Wymiany na dziś: ${trade.left} z ${trade.perDay}.`;
+      const left = `Na dziś zostało: ${formatNumber(trade.left)} z ${pieces(trade.perDay)}.`;
+      hint.textContent = short ? `${left} Brakuje złota na tę wymianę.` : left;
     }
     set(amount);
     return h(
       'section',
       { class: 'fire-trade', 'aria-label': trade.title },
-      h('h2', { class: 'fire-trade-title', text: trade.title }),
-      h('p', { class: 'fire-trade-text', text: trade.text }),
-      h('p', { class: 'store-head' }, h('span', { text: 'Jedna wymiana' }), h('strong', { text: `do ${pieces(trade.amount)}, ${formatNumber(trade.unitGold)} złota za sztukę` })),
-      h('div', { class: 'fire-trade-pick' }, slider, value),
+      ...head,
+      h('p', { class: 'fire-trade-pick' }, value),
+      h('div', { class: 'duration-row' }, less, slider, more),
       h('div', { class: 'fire-trade-buttons' }, buttons.map(({ button }) => button)),
       hint,
-      trade.next &&
-        h('p', { class: 'store-hint', text: `Na poziomie ${trade.next.level}: ${formatNumber(trade.next.unitGold)} złota za sztukę, ${trades(trade.next.perDay)} dziennie.` }),
+      next,
     );
   }
 

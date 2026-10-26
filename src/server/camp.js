@@ -19,7 +19,7 @@ import {
   fireDay,
   fireTrade,
   fireTradeBlock,
-  fireTradesMade,
+  fireUnitsMade,
   missingFor,
   partPrice,
   plannedLevel,
@@ -242,30 +242,29 @@ export async function completeBuilding(db, player, now) {
   ]);
 }
 
-// "Wrzuć złoto": one trade with the fire spirit at the Ognisko's level now
-// (an upgrade under way counts once it ends). Saved only if the character is
-// as seen here, so two taps at once make one trade and the day's count holds.
+// "Wrzuć złoto": `amount` pieces of a resource from the fire spirit at the
+// Ognisko's level now (an upgrade under way counts once it ends), within
+// the pieces left today. Saved only if the character is as seen here, so
+// two taps at once make one trade and the day's count holds.
 export async function tradeAtFire(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const now = context.now;
   const row = player.row;
   const level = buildingLevel(player.buildings[fireBuilding(content)?.id], now);
-  const made = fireTradesMade({ day: row.fire_day, count: row.fire_trades }, now, content);
-  // `amount`: the pieces the slider picked, a full trade without it.
+  const made = fireUnitsMade({ day: row.fire_day, units: row.fire_units }, now, content);
   const block = fireTradeBlock({ level, gold: row.gold, made, resource: body.resource, amount: body.amount }, content);
   if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
-  const trade = fireTrade(level, content);
-  const amount = body.amount ?? trade.amount;
-  const gold = amount * trade.unitGold;
+  const amount = body.amount;
+  const gold = amount * fireTrade(level, content).unitGold;
   const db = context.env.DB;
   const result = await db
     .prepare(
       `UPDATE characters SET gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) + ?),
-         fire_day = ?, fire_trades = ?, version = version + 1
+         fire_day = ?, fire_units = ?, version = version + 1
        WHERE id = ? AND version = ? AND gold >= ?`,
     )
-    .bind(gold, path(body.resource), path(body.resource), amount, fireDay(now, content), made + 1, row.id, row.version, gold)
+    .bind(gold, path(body.resource), path(body.resource), amount, fireDay(now, content), made + amount, row.id, row.version, gold)
     .run();
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
   return json({

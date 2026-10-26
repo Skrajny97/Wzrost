@@ -40,17 +40,17 @@
       "trade": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["title", "text", "resources", "units", "goldPerUnit", "cheaperEvery", "tradesPerDay", "moreTradesEvery"],
-        "description": "Wymiana złota na zasoby w budynku (Ognisko: duch ognia). Jedna wymiana daje do units sztuk jednego zasobu z resources. Sztuka kosztuje goldPerUnit złota i o 1 złoto mniej co cheaperEvery poziomów, najmniej 1. Dziennie, od północy czasu polskiego (jak zadania), można zrobić tradesPerDay wymian i jedną więcej co moreTradesEvery poziomów.",
+        "required": ["title", "text", "resources", "goldPerUnit", "cheaperEvery", "unitsPerDay", "moreUnits", "moreUnitsEvery"],
+        "description": "Wymiana złota na zasoby w budynku (Ognisko: duch ognia), sztuka po sztuce jednego zasobu z resources. Sztuka kosztuje goldPerUnit złota i o 1 złoto mniej co cheaperEvery poziomów, najmniej 1. Dziennie, od północy czasu polskiego (jak zadania), można wymienić unitsPerDay sztuk i o moreUnits więcej co moreUnitsEvery poziomów, w jednej wymianie albo w wielu.",
         "properties": {
           "title": { "type": "string", "minLength": 1 },
           "text": { "type": "string", "minLength": 1 },
           "resources": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
-          "units": { "type": "integer", "minimum": 1 },
           "goldPerUnit": { "type": "integer", "minimum": 1 },
           "cheaperEvery": { "type": "integer", "minimum": 1 },
-          "tradesPerDay": { "type": "integer", "minimum": 1 },
-          "moreTradesEvery": { "type": "integer", "minimum": 1 }
+          "unitsPerDay": { "type": "integer", "minimum": 1 },
+          "moreUnits": { "type": "integer", "minimum": 0 },
+          "moreUnitsEvery": { "type": "integer", "minimum": 1 }
         }
       },
       "shop": {

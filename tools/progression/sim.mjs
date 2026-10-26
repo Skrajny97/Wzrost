@@ -84,7 +84,7 @@ class Camp {
     this.content = content;
     this.wallet = wallet;
     this.fire = fire;
-    this.fireTrades = { day: null, count: 0 };
+    this.fireUnits = { day: null, units: 0 };
     this.stored = {};
     this.log = log; // { builds: [], idle: {gold:0,...}, idleChecks: {...}, spent: {...}, collected: {...} }
     this.idleSince = null;
@@ -155,19 +155,24 @@ class Camp {
     this.log.idleChecks += 1;
   }
 
-  // One trade at the fire for the resource the cheapest build waits for,
-  // keeping the gold that build needs. False when none can be made.
+  // One trade at the fire for what the cheapest build still waits for of a
+  // resource, within the pieces left today, keeping the gold that build
+  // needs. False when none can be made.
   trade(resource, option, t) {
     const building = engine.fireBuilding(this.content);
     if (!building) return false;
     const level = engine.buildingLevel(this.stored[building.id], t);
-    const made = engine.fireTradesMade(this.fireTrades, t, this.content);
+    const trade = engine.fireTrade(level, this.content);
+    if (!trade) return false;
+    const made = engine.fireUnitsMade(this.fireUnits, t, this.content);
     const gold = this.wallet.gold - (option.cost.gold ?? 0);
-    if (engine.fireTradeBlock({ level, gold, made, resource }, this.content)) return false;
-    const { amount, gold: price } = engine.fireTrade(level, this.content);
+    const missing = Math.max(1, (option.cost[resource] ?? 0) - (this.wallet[resource] ?? 0));
+    const amount = Math.min(missing, trade.perDay - made, Math.floor(gold / trade.unitGold));
+    if (engine.fireTradeBlock({ level, gold, made, resource, amount }, this.content)) return false;
+    const price = amount * trade.unitGold;
     this.wallet.gold -= price;
     this.wallet[resource] += amount;
-    this.fireTrades = { day: engine.fireDay(t, this.content), count: made + 1 };
+    this.fireUnits = { day: engine.fireDay(t, this.content), units: made + amount };
     this.log.fire = this.log.fire ?? { trades: 0, gold: 0, resources: {} };
     this.log.fire.trades += 1;
     this.log.fire.gold += price;
