@@ -1,0 +1,25 @@
+{
+  "id": "mugwort",
+  "payload": {
+    "prompt": "a sprig of mugwort with feathery silvery grey-green leaves and tiny yellow-brown flower heads, tied with twine, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 248613820,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793028559,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 62.08,
+    "request_id": "cd6a2135-cdd7-4897-a0da-6aec0b81846c",
+    "outputs_retained_until": 1793114854
+  }
+}
