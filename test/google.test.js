@@ -11,7 +11,7 @@ const CLIENT_ID = 'insight-test.apps.googleusercontent.com';
 const google = await fakeGoogle();
 after(() => google.close());
 
-const { server, call, db } = useServer({
+const { server, call, db, signUp } = useServer({
   GOOGLE_CLIENT_ID: CLIENT_ID,
   GOOGLE_CLIENT_SECRET: 'test-secret',
   GOOGLE_TOKEN_URL: google.url,
@@ -156,7 +156,7 @@ describe('Google sign-in', () => {
   });
 
   test('a taken login gets digits, and an unconfirmed e-mail is not kept', async () => {
-    await call('POST', '/api/auth/register', { body: { login: 'ola', password: 'tajnehaslo1' } });
+    await signUp('ola');
     const { session } = await signIn(codeFor(claims('google-ola', { email: 'ola@gmail.com' })));
     assert.match((await call('GET', '/api/me', { cookie: session })).data.user.login, /^ola\d{4}$/);
 
@@ -167,9 +167,7 @@ describe('Google sign-in', () => {
   });
 
   test('an account with the same e-mail is not taken over: the player links Google from it', async () => {
-    const registered = await call('POST', '/api/auth/register', {
-      body: { login: 'karol', email: 'karol@gmail.com', password: 'tajnehaslo1' },
-    });
+    const registered = await signUp('karol', { email: 'karol@gmail.com' });
     const { location, session } = await signIn(codeFor(claims('google-karol', { email: 'karol@gmail.com' })));
     assert.equal(location, '/?google=exists');
     assert.equal(session, null);
@@ -189,7 +187,7 @@ describe('Google sign-in', () => {
 
   test('a Google account already linked elsewhere is refused, and linking needs a session', async () => {
     await signIn(codeFor(claims('zajete')));
-    const other = await call('POST', '/api/auth/register', { body: { login: 'inny', password: 'tajnehaslo1' } });
+    const other = await signUp('inny');
     const taken = await signIn(codeFor(claims('zajete')), { cookie: other.cookie, mode: 'link' });
     assert.equal(taken.location, '/?google=taken');
     assert.equal((await call('GET', '/api/me', { cookie: other.cookie })).data.user.google, false);
@@ -200,7 +198,7 @@ describe('Google sign-in', () => {
   });
 
   test('an account with test mode opens only with Google once linked, and its other sessions end', async () => {
-    const first = await call('POST', '/api/auth/register', { body: { login: 'szef', password: 'tajnehaslo1' } });
+    const first = await signUp('szef');
     const second = await call('POST', '/api/auth/login', { body: { identifier: 'szef', password: 'tajnehaslo1' } });
     assert.equal(first.data.user.testMode, true);
     const link = await signIn(codeFor(claims('google-szef')), { cookie: first.cookie, mode: 'link' });
@@ -221,21 +219,24 @@ describe('Google sign-in', () => {
     assert.equal(me.data.user.testMode, true);
 
     // Other accounts keep their password after linking.
-    const player = await call('POST', '/api/auth/register', { body: { login: 'gracz2', password: 'tajnehaslo1' } });
+    const player = await signUp('gracz2');
     await signIn(codeFor(claims('google-gracz2')), { cookie: player.cookie, mode: 'link' });
     assert.equal((await call('POST', '/api/auth/login', { body: { identifier: 'gracz2', password: 'tajnehaslo1' } })).status, 200);
     assert.equal((await call('GET', '/api/me', { cookie: player.cookie })).status, 200);
   });
 
   test("the author's panel: only the author's account bound to Google sees every account with its e-mail", async () => {
-    const author = await call('POST', '/api/auth/register', { body: { login: 'szef', password: 'tajnehaslo1' } });
+    const author = await signUp('szef');
+    // An account from before e-mails were needed, without one.
+    await (await db()).prepare("UPDATE users SET email = NULL, email_confirmed_at = NULL, email_required = 0 WHERE login = 'szef'").run();
     // Not yet bound to Google: a password alone does not open it.
     assert.equal((await call('GET', '/api/me', { cookie: author.cookie })).data.user.author, false);
     assert.equal((await call('GET', '/api/author', { cookie: author.cookie })).status, 404);
     await signIn(codeFor(claims('google-szef')), { cookie: author.cookie, mode: 'link' });
     assert.equal((await call('GET', '/api/me', { cookie: author.cookie })).data.user.author, true);
 
-    const player = await call('POST', '/api/auth/register', { body: { login: 'gracz', password: 'tajnehaslo1' } });
+    const player = await signUp('gracz', { confirmed: false });
+    await (await db()).prepare("UPDATE users SET email_required = 0 WHERE login = 'gracz'").run();
     await call('POST', '/api/character', { cookie: player.cookie, body: { name: 'Wędrowiec', classId: 'mage', appearance: 'female' } });
     await signIn(codeFor(claims('nowy-gracz')));
     // Another player sees nothing.
@@ -245,12 +246,13 @@ describe('Google sign-in', () => {
     const panel = (await call('GET', '/api/author', { cookie: author.cookie })).data;
     assert.deepEqual(panel.counts, { accounts: 3, google: 2, newAccounts: 3, characters: 1, newCharacters: 1 });
     assert.deepEqual(
-      panel.accounts.map((account) => [account.login, account.email, account.google, account.character?.name ?? null]),
+      panel.accounts.map((account) => [account.login, account.email, account.google, account.emailConfirmed, account.character?.name ?? null]),
       [
-        ['nowy-gracz', 'nowy-gracz@gmail.com', true, null],
-        ['gracz', null, false, 'Wędrowiec'],
+        ['nowy-gracz', 'nowy-gracz@gmail.com', true, true, null],
+        // An older account plays without confirming its e-mail.
+        ['gracz', 'gracz@example.com', false, false, 'Wędrowiec'],
         // The e-mail Google confirmed is kept when Google is linked.
-        ['szef', 'google-szef@gmail.com', true, null],
+        ['szef', 'google-szef@gmail.com', true, true, null],
       ],
     );
     assert.deepEqual(panel.accounts[1].character, { ...panel.accounts[1].character, className: 'Mag', level: 1, classLevel: 1 });

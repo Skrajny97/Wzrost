@@ -203,11 +203,11 @@ describe('herbalism in the engine', () => {
 });
 
 describe('herbalism through the API', () => {
-  const { call, db } = useServer({ PROFESSIONS: 'on' });
+  const { call, db, signUp } = useServer({ PROFESSIONS: 'on' });
   let cookie;
 
   beforeEach(async () => {
-    ({ cookie } = await call('POST', '/api/auth/register', { body: { login: 'zielarka', password: 'tajnehaslo1' } }));
+    ({ cookie } = await signUp('zielarka'));
     await call('POST', '/api/character', { cookie, body: { name: 'Zielarka', classId: 'cleric', appearance: 'female' } });
   });
 

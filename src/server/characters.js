@@ -55,7 +55,7 @@ import { content } from './content.js';
 import { professionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { bagHerbs, herbsOf, professionsView } from './professions-view.js';
-import { requireSession } from './sessions.js';
+import { requirePlayable } from './sessions.js';
 
 // 2 to 20 characters: letters and digits, spaces, hyphens, apostrophes and
 // underscores ("Justi_725"), from a letter to a letter or a digit. What a
@@ -120,7 +120,7 @@ export function walletOf(row) {
 }
 
 export async function requirePlayer(context) {
-  const session = await requireSession(context);
+  const session = await requirePlayable(context);
   const player = await loadPlayer(context.env.DB, session.userId);
   if (!player) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
   await settleBuilds(context.env.DB, player, context.now);
@@ -641,7 +641,7 @@ export async function getCharacter(context) {
 // narrator gives it Time Points, and an abandoned camp some gold and wood
 // (data/balance.json: timePoints.start, startingSupply).
 export async function createCharacter(context) {
-  const session = await requireSession(context);
+  const session = await requirePlayable(context);
   const body = await readJson(context.request);
   const name = validateName(body.name);
   const cls = typeof body.classId === 'string' ? content.classesById[body.classId] : undefined;
@@ -657,16 +657,20 @@ export async function createCharacter(context) {
   const now = context.now;
   const supply = content.balance.startingSupply;
   try {
-    await db
-      .prepare(
-        `INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, position, hp, hp_at, created_at, gold, resources, time_points, time_points_at, tutorial)
-         VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]')`,
-      )
-      .bind(
-        session.userId, name, nameKey(name), cls.id, appearance, cls.position, hp, now, now,
-        supply.gold, JSON.stringify(supply.resources), content.balance.timePoints.start, now,
-      )
-      .run();
+    await db.batch([
+      // Punkty Systemu earned before there was a character, for the e-mail
+      // confirmed (email.js), come with it.
+      db
+        .prepare(
+          `INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, position, hp, hp_at, created_at, gold, resources, time_points, time_points_at, tutorial, system_points)
+           VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]', (SELECT system_points_waiting FROM users WHERE id = ?))`,
+        )
+        .bind(
+          session.userId, name, nameKey(name), cls.id, appearance, cls.position, hp, now, now,
+          supply.gold, JSON.stringify(supply.resources), content.balance.timePoints.start, now, session.userId,
+        ),
+      db.prepare('UPDATE users SET system_points_waiting = 0 WHERE id = ?').bind(session.userId),
+    ]);
   } catch (error) {
     const message = String(error?.message);
     if (message.includes('name_key')) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');

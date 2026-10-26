@@ -518,12 +518,6 @@ button {
   text-transform: uppercase;
 }
 
-.optional {
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
 .field input {
   width: 100%;
   min-height: 48px;
@@ -3695,9 +3689,11 @@ img.area-art {
    zoom.js) its letters shrink with it. */
 a.camp-level-button {
   position: absolute;
-  top: 6px;
-  left: 6px;
+  top: 0;
+  left: 0;
   z-index: 2;
+  /* Fitted to the board's rounded corner. */
+  border-radius: 5px 0 6px;
   display: block;
   width: auto;
   max-width: calc(50% - 56px);
@@ -3903,6 +3899,13 @@ a.camp-level-button {
   font-family: var(--font-system);
   font-size: 13px;
   font-weight: 700;
+}
+
+/* At the plot's right side, below the board's top corner and the level
+   button there (the Tartak). */
+.camp-bubble--side {
+  top: 36%;
+  right: -12px;
 }
 
 .camp-bubble[hidden] {
@@ -5856,4 +5859,57 @@ button.herb-tile[aria-pressed='true'] {
 .report-row-herbs {
   color: var(--text-muted);
   font-size: 13px;
+
+/* E-mail confirmation (email.js): the invitation on a parchment and the
+   address in the settings. */
+.email-invite-text {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.email-invite-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.email-invite-label {
+  color: #6b5233;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.email-invite .email-confirm-input {
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid #a88c5c;
+  border-radius: 4px;
+  background: rgba(255, 250, 238, 0.7);
+  color: #33281c;
+  /* 16 px keeps iOS from zooming in on focus. */
+  font-size: 16px;
+}
+
+.email-invite-form .narrator-actions {
+  margin-top: 6px;
+}
+
+.status-row--email {
+  align-items: center;
+}
+
+.status-row--email dd {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.email-row-address {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 400;
 }

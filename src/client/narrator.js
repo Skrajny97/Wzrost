@@ -272,6 +272,13 @@ export function narrate(hash = place) {
 const passedHere = new Set();
 const readNow = () => new Set([...state.character.tutorial, ...passedHere]);
 
+// The introduction is over and nothing of the narrator's is on the screen or
+// due here, so another parchment may open (email.js).
+export function narratorIdle() {
+  if (!state.character?.tutorial || !state.content?.tutorial) return false;
+  return !scroll && !light && !pause && !surveying && readNow().has('ending') && !nextLine();
+}
+
 // The first line in the order that is due: a lead or a tap whenever its
 // moment holds, a card or a pointer only until it is read. After the ending
 // only a late line is left.

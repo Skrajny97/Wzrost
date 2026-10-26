@@ -117,6 +117,8 @@ export function publicContent() {
     parts: content.parts.map(({ id, name, rarity, description }) => ({ id, name, rarity, description })),
     appearances: content.appearances,
     freeResetMaxLevel: content.balance.progression.freeResetMaxLevel,
+    // Punkty Systemu for a confirmed e-mail (email.js).
+    emailReward: content.balance.account.emailSystemPoints,
     classEvolutionLevels: content.balance.progression.classEvolutionLevels,
     // Background music: the client plays it on every screen (music.js).
     music,

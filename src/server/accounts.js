@@ -1,5 +1,6 @@
 // Account endpoints: registration, login, logout and the current user.
 
+import { sendLink } from './email.js';
 import { registrationOpen } from './features.js';
 import { googleConfigured } from './google.js';
 import { ApiError, json, readJson } from './http.js';
@@ -14,6 +15,7 @@ import {
   requireSession,
   sessionCookie,
   sessionIdFromRequest,
+  userView,
 } from './sessions.js';
 import { clearLoginFailures, getLoginBlock, recordLoginFailure } from './throttle.js';
 
@@ -35,13 +37,14 @@ export function validateLogin(value) {
   return login;
 }
 
-// E-mail is optional: an empty value means "no e-mail".
+// An empty value means "no e-mail": an account made with a password needs
+// one (register), an older one may have none.
 export function validateEmail(value) {
   if (value === undefined || value === null) return null;
   const email = typeof value === 'string' ? value.trim().toLowerCase() : value;
   if (email === '') return null;
   if (typeof email !== 'string' || email.length > MAX_EMAIL_LENGTH || !EMAIL_PATTERN.test(email)) {
-    throw new ApiError(400, 'invalid_email', 'Podaj poprawny adres e-mail albo zostaw to pole puste.');
+    throw new ApiError(400, 'invalid_email', 'Podaj poprawny adres e-mail.');
   }
   return email;
 }
@@ -58,11 +61,14 @@ const loginTaken = () => new ApiError(409, 'login_taken', 'Ten login jest już z
 const emailTaken = () =>
   new ApiError(409, 'email_taken', 'Ten e-mail jest już przypisany do innego konta.');
 
+// A new account plays once the link sent to its e-mail is opened
+// (email.js); until then the page asks for it.
 export async function register({ request, env, now }) {
   if (!registrationOpen()) throw new ApiError(403, 'registration_closed', 'Zakładanie nowych kont jest wyłączone.');
   const body = await readJson(request);
   const login = validateLogin(body.login);
   const email = validateEmail(body.email);
+  if (!email) throw new ApiError(400, 'email_required', 'Podaj adres e-mail: wyślemy na niego link, który otworzy konto.');
   const password = validatePassword(body.password);
   const db = env.DB;
 
@@ -75,7 +81,7 @@ export async function register({ request, env, now }) {
   let userId;
   try {
     const result = await db
-      .prepare('INSERT INTO users (login, email, password_hash, created_at) VALUES (?, ?, ?, ?)')
+      .prepare('INSERT INTO users (login, email, password_hash, created_at, email_required) VALUES (?, ?, ?, ?, 1)')
       .bind(login, email, passwordHash, now)
       .run();
     userId = result.meta.last_row_id;
@@ -88,7 +94,16 @@ export async function register({ request, env, now }) {
   }
 
   const session = await createSession(db, userId, now);
-  return json({ user: { login, email, createdAt: now, google: false, testMode: testModeFor(env, login), author: false } }, 201, {
+  // The account is made even when the mail fails: the page offers to send it again.
+  let emailSent = true;
+  try {
+    await sendLink(env, { userId, login, email }, new URL(request.url).origin, now);
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    emailSent = false;
+  }
+  const user = userView({ login, email, created_at: now, google_sub: null, email_confirmed_at: null, email_required: 1 });
+  return json({ user: { ...user, testMode: testModeFor(env, login), author: false }, emailSent }, 201, {
     'Set-Cookie': sessionCookie(session.token, session.expiresAt, now),
   });
 }
@@ -121,9 +136,8 @@ export async function login({ request, env, now }) {
     );
   }
 
-  const query = identifier.includes('@')
-    ? 'SELECT id, login, email, password_hash, google_sub, created_at FROM users WHERE email = ?'
-    : 'SELECT id, login, email, password_hash, google_sub, created_at FROM users WHERE login = ?';
+  const columns = 'id, login, email, password_hash, google_sub, created_at, email_confirmed_at, email_required';
+  const query = identifier.includes('@') ? `SELECT ${columns} FROM users WHERE email = ?` : `SELECT ${columns} FROM users WHERE login = ?`;
   const user = await db.prepare(query).bind(identifier).first();
   if (!user || !(await verifyPassword(password, user.password_hash))) {
     await recordLoginFailure(db, throttleKey, now);
@@ -148,10 +162,7 @@ export async function login({ request, env, now }) {
   return json(
     {
       user: {
-        login: user.login,
-        email: user.email,
-        createdAt: user.created_at,
-        google: user.google_sub !== null,
+        ...userView(user),
         testMode: testModeFor(env, user.login),
         author: isAuthor(env, { login: user.login, google: user.google_sub !== null }),
       },
@@ -188,6 +199,7 @@ export async function deleteAccount(context) {
     ),
     db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
+    db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM login_failures WHERE identifier IN (?, ?)').bind(login.toLowerCase(), email ?? ''),
     db.prepare('DELETE FROM users WHERE id = ?').bind(id),
   ]);

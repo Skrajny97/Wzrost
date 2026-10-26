@@ -33,7 +33,7 @@ export async function getSession(db, request, now) {
   const id = await sha256Hex(token);
   const row = await db
     .prepare(
-      `SELECT s.expires_at, u.id AS user_id, u.login, u.email, u.created_at, u.google_sub
+      `SELECT s.expires_at, u.id AS user_id, u.login, u.email, u.created_at, u.google_sub, u.email_confirmed_at, u.email_required
        FROM sessions s JOIN users u ON u.id = s.user_id
        WHERE s.id = ?`,
     )
@@ -49,13 +49,37 @@ export async function getSession(db, request, now) {
     token,
     expiresAt: row.expires_at,
     userId: row.user_id,
-    user: { login: row.login, email: row.email, createdAt: row.created_at, google: row.google_sub !== null },
+    user: userView(row),
+  };
+}
+
+// The account as the page sees it. An account bound to Google counts as
+// confirmed: Google confirmed its owner (email.js).
+export function userView(row) {
+  const google = row.google_sub !== null;
+  return {
+    login: row.login,
+    email: row.email,
+    createdAt: row.created_at,
+    google,
+    emailConfirmed: google || row.email_confirmed_at !== null,
+    emailRequired: row.email_required === 1,
   };
 }
 
 export async function requireSession({ request, env, now }) {
   const session = await getSession(env.DB, request, now);
   if (!session) throw new ApiError(401, 'unauthorized', 'Nie jesteś zalogowany.');
+  return session;
+}
+
+// The game itself waits for a confirmed e-mail on an account that needs one
+// (email.js). The account, signing out and sending the link do not.
+export async function requirePlayable(context) {
+  const session = await requireSession(context);
+  if (session.user.emailRequired && !session.user.emailConfirmed) {
+    throw new ApiError(403, 'email_unconfirmed', 'Najpierw potwierdź adres e-mail: link czeka w skrzynce.');
+  }
   return session;
 }
 

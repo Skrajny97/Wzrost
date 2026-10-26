@@ -16,7 +16,7 @@ import { useServer } from './helpers/server.js';
 const pushService = await fakePushService();
 after(() => pushService.close());
 
-const { server, call, db } = useServer({ PUSH_TEST_HOSTS: '127.0.0.1' });
+const { server, call, db, signUp } = useServer({ PUSH_TEST_HOSTS: '127.0.0.1' });
 
 const AGREEMENT = { name: 'ECDH', namedCurve: 'P-256' };
 const HOUR = 3600000;
@@ -177,7 +177,7 @@ describe('notifications through the server', () => {
   beforeEach(async () => {
     pushService.received.length = 0;
     pushService.status = 201;
-    ({ cookie } = await call('POST', '/api/auth/register', { body: { login: 'karol', password: 'tajnehaslo1' } }));
+    ({ cookie } = await signUp('karol'));
   });
 
   const run = (at) => server.getWorker().scheduled({ cron: '* * * * *', scheduledTime: new Date(at) });
@@ -222,7 +222,7 @@ describe('notifications through the server', () => {
   test('a phone signed in to another account moves to it', async () => {
     const phone = await fakePhone();
     await call('POST', '/api/push/subscribe', { cookie, body: phone.subscription });
-    const other = (await call('POST', '/api/auth/register', { body: { login: 'ola', password: 'tajnehaslo1' } })).cookie;
+    const other = (await signUp('ola')).cookie;
     await call('POST', '/api/push/subscribe', { cookie: other, body: phone.subscription });
     const [moved] = await subscriptions();
     const ola = await (await db()).prepare("SELECT id FROM users WHERE login = 'ola'").first('id');

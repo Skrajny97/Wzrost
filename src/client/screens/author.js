@@ -141,7 +141,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
           'li',
           { class: 'card author-account' },
           h('p', { class: 'author-account-head' }, h('strong', { text: account.login }), account.google && h('span', { class: 'author-google', text: 'Google' })),
-          h('p', { class: 'author-account-mail', text: account.email ?? 'bez adresu e-mail' }),
+          h('p', { class: 'author-account-mail', text: account.email ? `${account.email}${account.emailConfirmed ? '' : ' (niepotwierdzony)'}` : 'bez adresu e-mail' }),
           h(
             'p',
             { class: 'author-account-character' },

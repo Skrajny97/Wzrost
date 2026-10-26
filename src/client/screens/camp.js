@@ -254,9 +254,11 @@ function mountBoard(container, backHash) {
     );
   }
 
-  // "Rozwiń poziom obozu" in the board's top left corner leads to the
-  // camp's own screen. It is small, on two lines, and while the camp grows
-  // its time left follows "obozu", so nothing of it hangs over the plots.
+  // "Rozwiń poziom obozu" in the board's very top left corner leads to the
+  // camp's own screen (the author: "daj przycisk w lewy górny róg planszy
+  // obozu"). It is small, on two lines, and while the camp grows its time
+  // left follows "obozu", so nothing of it hangs over the plots or the
+  // Tartak's bubble.
   function campLevelButton(running) {
     const hash = `${CAMP}/${campOf().id}`;
     return h(
@@ -311,7 +313,7 @@ function mountBoard(container, backHash) {
       link,
       underway && timer(running),
       waiting && h('span', { class: 'camp-plot-timer camp-plot-timer--queued', 'aria-hidden': 'true' }, icon('hourglass', { size: 12 }), 'w kolejce'),
-      building.production && !building.production.paused && bubble(building),
+      building.production && !building.production.paused && bubble(building, spot.bubble),
     );
   }
 
@@ -324,12 +326,17 @@ function mountBoard(container, backHash) {
   }
 
   // What the store holds, counted up every second; a tap collects it.
-  function bubble(building) {
+  // `place` 'side' puts it at the plot's side instead of its corner.
+  function bubble(building, place) {
     const store = building.production;
     const amount = h('span', {});
     const button = h(
       'button',
-      { type: 'button', class: 'camp-bubble', onClick: (event) => withButton(event.currentTarget, () => collectStore(building)) },
+      {
+        type: 'button',
+        class: `camp-bubble${place === 'side' ? ' camp-bubble--side' : ''}`,
+        onClick: (event) => withButton(event.currentTarget, () => collectStore(building)),
+      },
       icon(RESOURCE_ICONS[store.resource] ?? 'unknown', { size: 14 }),
       amount,
     );
