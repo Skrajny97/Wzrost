@@ -1,0 +1,23 @@
+{
+  "id": "narrator",
+  "payload": {
+    "prompt": "game logo emblem, a hooded mysterious figure from the chest up inside a glowing cyan hexagon, no visible face, only two small glowing cyan eyes deep in the dark hood, a faint glowing parchment scroll below, pine forest silhouette behind, centered and symmetric, dark near-black background, bold simple shapes readable as a small app icon, no text, no letters",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 920935429,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793010263,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 18.96,
+    "request_id": "2a29bb50-5abc-488e-88d9-cebd281f1807",
+    "outputs_retained_until": 1793096605
+  }
+}

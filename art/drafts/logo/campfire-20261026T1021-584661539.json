@@ -1,0 +1,23 @@
+{
+  "id": "campfire",
+  "payload": {
+    "prompt": "game logo emblem, a hexagonal crest of dark wood and stone with a small campfire burning at its center, a sword and a woodcutter axe crossed behind it, tall pine trees on both sides, a thin glowing cyan outline around the hexagon, centered and symmetric, dark near-black forest background, bold simple shapes readable as a small app icon, no text, no letters",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 584661539,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793010203,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 19.14,
+    "request_id": "ab029c13-0444-4f5a-b5ce-6037e747a425",
+    "outputs_retained_until": 1793096507
+  }
+}

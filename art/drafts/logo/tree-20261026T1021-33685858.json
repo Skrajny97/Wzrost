@@ -1,0 +1,23 @@
+{
+  "id": "tree",
+  "payload": {
+    "prompt": "game logo emblem, an ancient gnarled tree growing inside a glowing cyan hexagonal frame, its roots wrapping around the bottom of the frame, a tiny warm campfire light at its base, a few fireflies, centered and symmetric, dark forest green background, bold simple shapes readable as a small app icon, no text, no letters",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 33685858,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793010293,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 18.78,
+    "request_id": "32311474-1b83-44bc-955a-9f3f329e0d8d",
+    "outputs_retained_until": 1793096666
+  }
+}

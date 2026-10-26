@@ -1,0 +1,23 @@
+{
+  "id": "eye",
+  "payload": {
+    "prompt": "game logo emblem, a glowing cyan hexagonal frame carved with faint runes, inside it one wise open eye with a bright cyan iris looking straight out, small pine tree silhouettes along the bottom inside the frame, mystical blue-green glow, centered and symmetric, dark near-black forest background, bold simple shapes readable as a small app icon, no text, no letters",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 193522421,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793010104,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 19.32,
+    "request_id": "bf56046b-d42a-4bc5-a25f-6953264e0d04",
+    "outputs_retained_until": 1793096476
+  }
+}
