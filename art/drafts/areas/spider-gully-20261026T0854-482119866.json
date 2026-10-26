@@ -1,0 +1,23 @@
+{
+  "id": "spider-gully",
+  "payload": {
+    "prompt": "narrow shadowy forest gully shrouded in thick spider webs, a large cross spider waiting in its web, dim green light from above, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 482119866,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793005321,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 20.4,
+    "request_id": "73397a0b-0765-478b-b707-4cf9b486f575",
+    "outputs_retained_until": 1793091663
+  }
+}

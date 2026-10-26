@@ -1,0 +1,23 @@
+{
+  "id": "windfalls-edge",
+  "payload": {
+    "prompt": "sparse grove of young birches and pines at the edge of an old forest, the first fallen tree trunks lying across the grass, a pale moon low in a dusky green sky, calm evening, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 930262532,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793004983,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 21.48,
+    "request_id": "6803e944-6a2a-42a7-853a-fc83e84febb4",
+    "outputs_retained_until": 1793091284
+  }
+}

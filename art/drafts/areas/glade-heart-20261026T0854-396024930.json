@@ -1,0 +1,23 @@
+{
+  "id": "glade-heart",
+  "payload": {
+    "prompt": "the heart of an ancient stone circle deep in a primeval forest, tall standing stones covered with moss and runes, a huge brown bear in the thicket behind them, faint mysterious glow, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 396024930,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793005442,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 19.86,
+    "request_id": "e3245591-3b3f-45d8-a1a1-8a1ea76431f9",
+    "outputs_retained_until": 1793091786
+  }
+}

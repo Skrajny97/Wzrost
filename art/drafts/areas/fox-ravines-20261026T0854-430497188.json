@@ -1,0 +1,23 @@
+{
+  "id": "fox-ravines",
+  "payload": {
+    "prompt": "sandy forest ravine with steep earthen banks full of fox burrows, tree roots hanging from the banks, an orange fox sitting at the bottom of the ravine, warm dusk light, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 430497188,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793005019,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 21.3,
+    "request_id": "75ba8344-11c8-4978-a59d-2b9fe016b0ba",
+    "outputs_retained_until": 1793091384
+  }
+}

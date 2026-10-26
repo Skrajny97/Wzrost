@@ -1,0 +1,23 @@
+{
+  "id": "viper-heaps",
+  "payload": {
+    "prompt": "sun-warmed heaps of stacked tree trunks and grey stones in a forest clearing, a grey viper with a dark zigzag stripe basking on a log, warm afternoon light, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 507517104,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793005142,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 20.94,
+    "request_id": "29b6c03e-8760-4fe0-bcc3-ffa9adbf49af",
+    "outputs_retained_until": 1793091488
+  }
+}

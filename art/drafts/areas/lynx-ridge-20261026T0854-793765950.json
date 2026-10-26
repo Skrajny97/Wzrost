@@ -1,0 +1,23 @@
+{
+  "id": "lynx-ridge",
+  "payload": {
+    "prompt": "rocky ridge with stone ledges above a forest glade, a lynx with tufted ears crouching on a ledge, evening sky, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 793765950,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793005349,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 20.22,
+    "request_id": "167aff1b-9360-461e-a85e-3a4f1d174506",
+    "outputs_retained_until": 1793091723
+  }
+}

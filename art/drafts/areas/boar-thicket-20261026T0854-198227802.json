@@ -1,0 +1,23 @@
+{
+  "id": "boar-thicket",
+  "payload": {
+    "prompt": "the densest dark thicket of a fallen-tree forest at night, churned muddy ground between ferns, a big wild boar with tusks among the bushes, faint moonlight, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 198227802,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793005196,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 20.76,
+    "request_id": "b54d1091-5e55-467a-807c-0045c29810ce",
+    "outputs_retained_until": 1793091544
+  }
+}

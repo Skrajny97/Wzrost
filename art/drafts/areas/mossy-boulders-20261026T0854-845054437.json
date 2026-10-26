@@ -1,0 +1,23 @@
+{
+  "id": "mossy-boulders",
+  "payload": {
+    "prompt": "outer ring of huge moss-covered boulders in an ancient forest glade, silver spider webs strung between the stones, light mist, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 845054437,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793005262,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 20.58,
+    "request_id": "a2f30a74-d3e3-4713-91db-88dd49a94a19",
+    "outputs_retained_until": 1793091597
+  }
+}

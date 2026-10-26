@@ -1,0 +1,23 @@
+{
+  "id": "wolf-circles",
+  "payload": {
+    "prompt": "moonlit forest clearing, a large grey alpha wolf howling at the full moon from a rock, dark pine forest around, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 281802889,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793005382,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 20.04,
+    "request_id": "41679041-0d21-4bc4-a2ff-a2d43961ade8",
+    "outputs_retained_until": 1793091751
+  }
+}

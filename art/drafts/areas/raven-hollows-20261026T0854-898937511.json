@@ -1,0 +1,23 @@
+{
+  "id": "raven-hollows",
+  "payload": {
+    "prompt": "toppled old trees with huge root plates torn out of the ground and pointing at the sky, black ravens perched on the roots, deep twilight, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 898937511,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793005085,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 21.12,
+    "request_id": "b939ae44-790e-425e-a75e-b8468509cd93",
+    "outputs_retained_until": 1793091422
+  }
+}
