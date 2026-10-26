@@ -1,0 +1,25 @@
+{
+  "id": "loot-shed-2",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a small wooden storage shed with a bright red roof and an open door, sacks, barrels and crates stacked outside",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 337841875,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019310,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 63.94,
+    "request_id": "880e6eed-d95b-49f3-b08f-1b5248dbe23c",
+    "outputs_retained_until": 1793105702
+  }
+}

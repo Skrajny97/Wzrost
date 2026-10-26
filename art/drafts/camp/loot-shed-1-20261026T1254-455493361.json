@@ -1,0 +1,25 @@
+{
+  "id": "loot-shed-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a tiny lean-to shelter of branches covered with a patched green cloth, a sack and a small wooden crate under it",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 455493361,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019300,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 64,
+    "request_id": "31e6267b-de4d-484f-80e3-a9eeaa612eb4",
+    "outputs_retained_until": 1793105664
+  }
+}
