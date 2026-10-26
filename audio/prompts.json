@@ -73,6 +73,66 @@
       "coins-scatter": {
         "text": "a handful of gold coins dropped onto a wooden table, scattering and settling with bright metallic jingles, close up, dry, no music",
         "seconds": 2
+      },
+      "skill-power-strike": {
+        "text": "a heavy two-handed sword blow landing on armor, a deep crunching metallic impact with a short ringing crack, fantasy battle, close up, dry, no music",
+        "seconds": 1.2
+      },
+      "skill-wide-sweep": {
+        "text": "a wide sweeping sword slash, one long whoosh cutting the air from side to side and ending in a bright ringing blade, fantasy battle, no music",
+        "seconds": 1.2
+      },
+      "skill-unyielding": {
+        "text": "a warrior plants his feet and raises a steel shield, a solid metallic shield slam with a deep resonant ring and a brief warm shimmer, fantasy, no music",
+        "seconds": 1.5
+      },
+      "skill-aimed-shot": {
+        "text": "a bow string slowly drawn tight with a creak, then one sharp precise arrow release and a fast whistle, close up, no music",
+        "seconds": 1.2
+      },
+      "skill-arrow-rain": {
+        "text": "a quick volley of many arrows released one after another, a rush of whistling arrows flying overhead, fantasy battle, no music",
+        "seconds": 1.5
+      },
+      "skill-pinning-shot": {
+        "text": "an arrow strikes and pins into hard ground with a heavy wooden thunk and a short vibrating twang of the shaft, close up, dry, no music",
+        "seconds": 1.0
+      },
+      "skill-fireball": {
+        "text": "a fireball spell, a roaring rush of flame thrown forward and a crackling fiery burst, fantasy magic, no music",
+        "seconds": 1.5
+      },
+      "skill-frost-gust": {
+        "text": "an icy magic wind gust, a cold howling blast with crackling frost and tinkling ice crystals, fantasy magic, no music",
+        "seconds": 1.5
+      },
+      "skill-mana-shield": {
+        "text": "a magic energy shield forming around a mage, a deep humming arcane bubble rising with a soft crystalline shimmer, fantasy, no music",
+        "seconds": 1.5
+      },
+      "skill-prayer-of-health": {
+        "text": "a gentle healing prayer spell, a soft warm choir hum rising with sparkling bell chimes, fantasy, no music",
+        "seconds": 1.5
+      },
+      "skill-exorcism": {
+        "text": "a holy exorcism spell, a bright radiant blast with a short choir swell and a ringing bell, fantasy magic, no music",
+        "seconds": 1.5
+      },
+      "skill-blessing": {
+        "text": "a blessing spell, a soft angelic chime with a warm glowing shimmer that fades out, fantasy, no music",
+        "seconds": 1.5
+      },
+      "skill-backstab": {
+        "text": "a stealthy dagger strike from the shadows, a quick soft swish and a sharp stab, close up, dry, no music",
+        "seconds": 1.0
+      },
+      "skill-poisoned-blade": {
+        "text": "poison smeared on a steel blade, a wet dripping sizzle with a faint bubbling hiss, close up, no music",
+        "seconds": 1.2
+      },
+      "skill-shadow-dance": {
+        "text": "shadow magic, a figure blurring into shadows with quick airy whooshes and a dark whispery swirl, fantasy, no music",
+        "seconds": 1.5
       }
     }
   },
