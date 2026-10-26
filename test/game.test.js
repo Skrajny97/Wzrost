@@ -1294,7 +1294,7 @@ describe('Time Points and the narrator', () => {
     const { data } = await call('GET', '/api/content');
     // Only the general parchments stand in the middle of the screen; the
     // others stand by the place they speak of.
-    const cards = data.tutorial.lines.filter((line) => line.kind === 'card').map((line) => line.id);
+    const cards = data.tutorial.lines.filter((line) => line.kind === 'card' && !line.chapter).map((line) => line.id);
     assert.deepEqual(cards, ['ask', 'intro', 'purpose', 'test', 'report', 'ending']);
     // The first card asks whether to go through the introduction.
     assert.deepEqual([data.tutorial.startLabel, data.tutorial.recommendedLabel, data.tutorial.skipLabel], ['Wprowadź mnie', 'zalecane', 'Pomiń wprowadzenie']);
@@ -1445,13 +1445,58 @@ describe('Time Points and the narrator', () => {
     assert.equal((await see({ card: 'lead-camp' })).data.error.code, 'invalid_card');
     // A lead marked once, whose tap changes no screen (the wallet), is kept.
     assert.deepEqual((await see({ card: 'wallet' })).data.character.tutorial, ['intro', 'purpose', 'report-summary', 'wallet']);
-    const once = (await call('GET', '/api/content')).data.tutorial.lines.filter((line) => line.kind === 'card' || line.kind === 'point' || line.once);
+    const once = (await call('GET', '/api/content')).data.tutorial.lines.filter((line) => (line.kind === 'card' || line.kind === 'point' || line.once) && !line.chapter);
     assert.deepEqual((await see({ skip: true })).data.character.tutorial, once.map((line) => line.id));
 
     // A character from before the introduction never sees it.
     await (await db()).prepare('UPDATE characters SET tutorial = NULL').run();
     assert.equal((await character()).tutorial, null);
     assert.equal((await see({ card: 'intro' })).data.error.code, 'no_tutorial');
+  });
+
+  test('the Umiejętności chapter after the introduction keeps its lines apart', async () => {
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once;
+    const intro = tutorial.lines.filter((line) => kept(line) && !line.chapter).map((line) => line.id);
+    const chapter = tutorial.lines.filter((line) => kept(line) && line.chapter === 'skills').map((line) => line.id);
+    assert.deepEqual(chapter, ['skills-welcome', 'skills-intro', 'skills-paths', 'skills-card', 'skills-choice', 'skills-points', 'skills-evolution', 'skills-ending']);
+    // The chapter's lines come after the introduction's ending.
+    assert.ok(tutorial.lines.findIndex((line) => line.chapter) > tutorial.lines.findIndex((line) => line.id === 'ending'));
+    assert.deepEqual(tutorial.chapters.skills, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Umiejętności czekają w zakładce Postać.' });
+    // Each class has its own words where the narrator speaks of the class.
+    for (const id of ['skills-welcome', 'skills-paths']) {
+      const line = tutorial.lines.find((candidate) => candidate.id === id);
+      assert.deepEqual(Object.keys(line.classes).sort(), content.classes.map((cls) => cls.id).sort());
+      assert.equal(line.text, undefined);
+    }
+    // "Pomiń wprowadzenie" leaves the chapter for its moment.
+    assert.deepEqual((await see({ skip: true })).data.character.tutorial, intro);
+    assert.deepEqual((await see({ card: 'skills-welcome' })).data.character.tutorial, [...intro, 'skills-welcome']);
+    // A lead of the chapter is not kept.
+    assert.equal((await see({ card: 'skills-lead' })).data.error.code, 'invalid_card');
+    // The chapter's own "Pomiń" marks only its lines and plays nothing.
+    const reports = (await call('GET', '/api/reports', { cookie })).data.reports.length;
+    assert.deepEqual((await see({ skip: true, chapter: 'skills' })).data.character.tutorial, [...intro, ...chapter]);
+    assert.equal((await call('GET', '/api/reports', { cookie })).data.reports.length, reports);
+    // Skipped once more, the introduction keeps the chapter read.
+    assert.deepEqual((await see({ skip: true })).data.character.tutorial, [...intro, ...chapter]);
+    assert.equal((await see({ skip: true, chapter: 'dragons' })).data.error.code, 'invalid_chapter');
+  });
+
+  test('test mode starts the Umiejętności chapter again, with the skills forgotten', async () => {
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    const intro = (await see({ skip: true })).data.character.tutorial;
+    await see({ skip: true, chapter: 'skills' });
+    await (await db()).prepare(`UPDATE characters SET class_level = 12, skills = '{"power-strike":2}'`).run();
+    const before = await character();
+    assert.equal(before.skills.points, 2);
+    const again = await call('POST', '/api/test/skills-tour', { cookie });
+    assert.equal(again.status, 200);
+    assert.deepEqual(again.data.character.tutorial, intro);
+    // The skill is forgotten and its points come back.
+    assert.ok(again.data.character.skills.pools.every((pool) => pool.chosen.length === 0));
+    assert.equal(again.data.character.skills.points, 3);
   });
 });
 
