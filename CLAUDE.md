@@ -13,3 +13,4 @@
 - Docelowo gra trafi do Sklepu Play jako aplikacja. Autor może dokupić tani plan Cloudflare albo domenę: zalecaj taki zakup, gdy się przyda.
 - Polecenia: `npm ci`, `npm test`, `npm run dev`.
 - Push do `main` testuje i wdraża grę (`.github/workflows/deploy.yml`). Etap kończy się wdrożoną wersją i raportem: co zrobiono, co sprawdzić w grze, co dalej.
+- Push na gałąź roboczą wdraża wersję testową (https://test.insightrpg.com). Każdą zmianę wdrożoną do gry wdrażaj też tam: scal `main` do gałęzi roboczej i wypchnij ją.
