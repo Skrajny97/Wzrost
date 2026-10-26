@@ -1,0 +1,13 @@
+{
+  "id": "eagle-owl-death",
+  "payload": {
+    "text": "a large eagle-owl gives a low fading hoot and a last flutter of wings, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/eagle-owl-death-20261026T1141-0.mp3",
+    "audio/drafts/voices/eagle-owl-death-20261026T1141-1.mp3"
+  ],
+  "credits": 40
+}

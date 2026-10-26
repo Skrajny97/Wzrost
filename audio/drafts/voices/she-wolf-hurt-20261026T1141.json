@@ -1,0 +1,13 @@
+{
+  "id": "she-wolf-hurt",
+  "payload": {
+    "text": "a she-wolf snarls sharply in pain, a short fierce growl, not a yelp, video game creature hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/she-wolf-hurt-20261026T1141-0.mp3",
+    "audio/drafts/voices/she-wolf-hurt-20261026T1141-1.mp3"
+  ],
+  "credits": 24
+}

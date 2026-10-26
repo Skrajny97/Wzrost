@@ -1,0 +1,13 @@
+{
+  "id": "eagle-owl-hurt",
+  "payload": {
+    "text": "a large eagle-owl hisses and screeches angrily when hit, short, video game creature hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/eagle-owl-hurt-20261026T1141-0.mp3",
+    "audio/drafts/voices/eagle-owl-hurt-20261026T1141-1.mp3"
+  ],
+  "credits": 24
+}

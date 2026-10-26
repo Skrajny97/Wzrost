@@ -1,0 +1,13 @@
+{
+  "id": "stag-hurt",
+  "payload": {
+    "text": "a red deer stag bellows short and angry when hit, a harsh grunting roar, video game creature hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/stag-hurt-20261026T1141-0.mp3",
+    "audio/drafts/voices/stag-hurt-20261026T1141-1.mp3"
+  ],
+  "credits": 24
+}

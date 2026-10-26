@@ -1,0 +1,13 @@
+{
+  "id": "stoneling-death",
+  "payload": {
+    "text": "a creature made of stone crumbles apart into falling rocks with a low fading rumble, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/stoneling-death-20261026T1141-0.mp3",
+    "audio/drafts/voices/stoneling-death-20261026T1141-1.mp3"
+  ],
+  "credits": 40
+}

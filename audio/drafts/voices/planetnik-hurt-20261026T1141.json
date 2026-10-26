@@ -1,0 +1,13 @@
+{
+  "id": "planetnik-hurt",
+  "payload": {
+    "text": "a storm spirit grunts in pain with a crackle of thunder and a gust of wind, short, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/planetnik-hurt-20261026T1141-0.mp3",
+    "audio/drafts/voices/planetnik-hurt-20261026T1141-1.mp3"
+  ],
+  "credits": 24
+}

@@ -1,0 +1,13 @@
+{
+  "id": "hornets-hurt",
+  "payload": {
+    "text": "a swarm of hornets buzzes louder and angrier for a moment, a sharp aggressive buzz, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/hornets-hurt-20261026T1141-0.mp3",
+    "audio/drafts/voices/hornets-hurt-20261026T1141-1.mp3"
+  ],
+  "credits": 24
+}

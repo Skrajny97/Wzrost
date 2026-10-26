@@ -1,0 +1,13 @@
+{
+  "id": "bat-death",
+  "payload": {
+    "text": "a bat squeaks weakly and flutters to the ground, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bat-death-20261026T1141-0.mp3",
+    "audio/drafts/voices/bat-death-20261026T1141-1.mp3"
+  ],
+  "credits": 40
+}

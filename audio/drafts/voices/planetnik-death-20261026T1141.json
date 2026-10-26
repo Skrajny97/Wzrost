@@ -1,0 +1,13 @@
+{
+  "id": "planetnik-death",
+  "payload": {
+    "text": "a storm spirit fades away with a long dying moan, rolling distant thunder and a rush of wind, close up, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/planetnik-death-20261026T1141-0.mp3",
+    "audio/drafts/voices/planetnik-death-20261026T1141-1.mp3"
+  ],
+  "credits": 40
+}

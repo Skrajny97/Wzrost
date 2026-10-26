@@ -1,0 +1,13 @@
+{
+  "id": "tusker-death",
+  "payload": {
+    "text": "a huge wild boar lets out a long deep grunting squeal and crashes heavily to the ground, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/tusker-death-20261026T1141-0.mp3",
+    "audio/drafts/voices/tusker-death-20261026T1141-1.mp3"
+  ],
+  "credits": 40
+}

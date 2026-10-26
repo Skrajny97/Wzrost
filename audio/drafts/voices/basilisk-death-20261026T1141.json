@@ -1,0 +1,13 @@
+{
+  "id": "basilisk-death",
+  "payload": {
+    "text": "a monstrous serpent lets out a long rattling hiss and screech and slumps heavily, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/basilisk-death-20261026T1141-0.mp3",
+    "audio/drafts/voices/basilisk-death-20261026T1141-1.mp3"
+  ],
+  "credits": 40
+}

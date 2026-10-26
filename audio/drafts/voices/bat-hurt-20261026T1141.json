@@ -1,0 +1,13 @@
+{
+  "id": "bat-hurt",
+  "payload": {
+    "text": "a bat lets out a high shrill squeak when hit, quick, video game creature hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bat-hurt-20261026T1141-0.mp3",
+    "audio/drafts/voices/bat-hurt-20261026T1141-1.mp3"
+  ],
+  "credits": 24
+}
