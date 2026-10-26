@@ -254,10 +254,15 @@ export function mountProfessions(container, { params, navigate }) {
     const tiles = h('ul', { class: 'herb-grid' });
     const estimate = h('p', { class: 'herb-estimate' });
     const room = h('p', { class: 'herb-room' });
+    // How many kinds of herbs at once, and the level of the profession that
+    // adds the next (the author's words).
     const next = gathering.slotLevels.find((slot) => slot.herbs > slots);
+    const kinds = countOf(slots, 'rodzaj zioła', 'rodzaje ziół', 'rodzajów ziół');
     const slotsHint = h('p', {
       class: 'muted',
-      text: `Naraz zbierasz ${countOf(slots, 'zioło', 'zioła', 'ziół')}.${next ? ` Od ${next.level}. poziomu: ${next.herbs}.` : ''}`,
+      text: next
+        ? `Obecnie możesz zbierać tylko ${kinds}. Potrzebujesz wyższego poziomu Profesji, by zbierać więcej rodzajów naraz. Kolejny rodzaj przy poziomie: ${next.level}.`
+        : `Obecnie możesz zbierać naraz ${kinds}.`,
     });
 
     const remember = () => {

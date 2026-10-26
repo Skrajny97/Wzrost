@@ -1756,3 +1756,4 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
     - Zadania z ziołami brzmią „Zbierz 12 sztuk Żywokostu.” i „Zbierz łącznie 60 ziół.”. Dzienne losują się tylko ze znanych ziół.
     - Gdy plecak zapełni się na wyprawie, złomiarz dalej sprzedaje przedmioty, ale ziół sam nigdy nie sprzedaje.
     - Cena liczy się za całą sprzedawaną część stosu i zaokrągla do pełnego złota, najmniej do 1.
+    - Pod ziołami stoi zdanie autora: „Obecnie możesz zbierać tylko 1 rodzaj zioła. Potrzebujesz wyższego poziomu Profesji, by zbierać więcej rodzajów naraz. Kolejny rodzaj przy poziomie: 10.” Liczba rodzajów i poziom biorą się z poziomu Zielarstwa postaci (2 rodzaje ziół, 5 rodzajów ziół). Od 50. poziomu, na ostatnim progu, zostaje samo „Obecnie możesz zbierać naraz 4 rodzaje ziół.”. Przy wpisaniu: przecinek przed „by” i „naraz” razem.
