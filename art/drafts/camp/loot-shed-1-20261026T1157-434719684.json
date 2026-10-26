@@ -1,0 +1,25 @@
+{
+  "id": "loot-shed-1",
+  "payload": {
+    "prompt": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a tiny lean-to shelter made of branches with a sack and a wooden crate under it",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 434719684,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793017063,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 11.94,
+    "request_id": "a082024e-b998-4176-9a64-65f2ea414143",
+    "outputs_retained_until": 1793103433
+  }
+}

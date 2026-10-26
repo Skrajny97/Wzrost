@@ -1,0 +1,25 @@
+{
+  "id": "mine-1",
+  "payload": {
+    "prompt": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a small dark hole in a rocky hillside with a pickaxe and a few rusty iron ore rocks beside it",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 243551053,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793016639,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 13.02,
+    "request_id": "6e6e64e3-51f8-4e18-95d3-50eb91a9265e",
+    "outputs_retained_until": 1793102965
+  }
+}

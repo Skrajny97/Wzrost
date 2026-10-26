@@ -1,0 +1,25 @@
+{
+  "id": "scrap-bench-3",
+  "payload": {
+    "prompt": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a large roofed scrap dealer's shop with shelves of parts, hanging armour pieces and a counter with a balance scale",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 991065147,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793017397,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 66.04,
+    "request_id": "cc046083-9c01-42be-bc72-71daaad6f7bd",
+    "outputs_retained_until": 1793103716
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "craft-table-1",
+  "payload": {
+    "prompt": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a simple wooden workbench with a knife and a few pelts on it",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 471010323,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793017650,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 65.32,
+    "request_id": "e6f64482-d7ce-40ce-8226-f2f0072b9bb9",
+    "outputs_retained_until": 1793104011
+  }
+}

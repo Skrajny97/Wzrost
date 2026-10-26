@@ -1,0 +1,25 @@
+{
+  "id": "campfire-3",
+  "payload": {
+    "prompt": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a big bonfire in a stone hearth with log benches around it, a roasting spit and a faint smiling fire spirit in the flames",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 770739237,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793017030,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 12.12,
+    "request_id": "6fba5442-73cd-4185-ba4b-0b4dabebfa5c",
+    "outputs_retained_until": 1793103313
+  }
+}

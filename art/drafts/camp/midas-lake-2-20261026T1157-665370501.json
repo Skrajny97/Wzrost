@@ -1,0 +1,25 @@
+{
+  "id": "midas-lake-2",
+  "payload": {
+    "prompt": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a forest pond with reeds and a wooden sluice trough for panning gold on the shore, glints of gold",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 665370501,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793016249,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 13.92,
+    "request_id": "7feabb90-37c5-4522-aab2-372cf3707a46",
+    "outputs_retained_until": 1793102529
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "sawmill-2",
+  "payload": {
+    "prompt": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a small open wooden sawmill shed with a log pile, a saw bench and stacked planks",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 97823922,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793015982,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 14.46,
+    "request_id": "52dd7a49-c159-4de3-afd1-5abe7f5d2f03",
+    "outputs_retained_until": 1793102336
+  }
+}

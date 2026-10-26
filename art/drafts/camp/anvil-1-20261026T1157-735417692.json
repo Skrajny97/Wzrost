@@ -1,0 +1,25 @@
+{
+  "id": "anvil-1",
+  "payload": {
+    "prompt": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a small iron anvil on a tree stump with a hammer leaning on it",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 735417692,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793017481,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 65.86,
+    "request_id": "e25d7bd2-eaff-4231-a95c-04082421d2aa",
+    "outputs_retained_until": 1793103799
+  }
+}

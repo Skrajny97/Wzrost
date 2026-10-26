@@ -1,0 +1,25 @@
+{
+  "id": "campfire-2",
+  "payload": {
+    "prompt": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a campfire in a ring of stones with a cooking pot on a tripod and two log benches around it",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 685381251,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793016912,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 12.3,
+    "request_id": "5d74ba2b-e7c0-46aa-a9b7-bd29a4e1c6a8",
+    "outputs_retained_until": 1793103248
+  }
+}
