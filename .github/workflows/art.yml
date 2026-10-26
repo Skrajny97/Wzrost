@@ -56,7 +56,8 @@ jobs:
   drafts:
     name: Szkice
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # A whole camp (27 pictures, about a minute each) needs more than half an hour.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6

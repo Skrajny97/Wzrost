@@ -3,7 +3,8 @@
 // art-drafts branch for review:
 //   node tools/generate-art.mjs --kind monsters --ids wolf,boar --variants 2 --max-cost 2
 //     [--style rd_pro__fantasy] [--seed 7] [--dry-run]
-// Prompts, styles and sizes are in art/prompts.json. The approved sprites listed
+// Prompts, styles and sizes are in art/prompts.json; a prompt given as
+// { prompt, style } draws in its own style. The approved sprites listed
 // there as references (art/references/<kind>/<id>.png) keep the style of the new
 // ones consistent. Every request is priced first (free), and the run stops
 // before it would spend more than --max-cost dollars.
@@ -49,7 +50,9 @@ if (unknown.length) fail(`Brak opisu w art/prompts.json dla: ${unknown.join(', '
 const variants = Math.max(1, Math.min(4, Number(values.variants) || 1));
 const maxCost = Number(values['max-cost']);
 if (!(maxCost > 0)) fail('--max-cost musi być dodatnią kwotą w dolarach.');
-const style = values.style || kind.style;
+// --style overrides every prompt; otherwise a prompt's own style, then the kind's.
+const styleOf = (id) => values.style || kind.prompts[id].style || kind.style;
+const promptOf = (id) => (typeof kind.prompts[id] === 'string' ? kind.prompts[id] : kind.prompts[id].prompt);
 
 const headers = { 'X-RD-Token': token, 'Content-Type': 'application/json' };
 
@@ -100,8 +103,9 @@ let balance = null;
 // One drawing: priced, then drawn and saved with what came back.
 async function draw(id) {
   const seed = values.seed ? Number(values.seed) : Math.floor(Math.random() * 1e9);
+  const style = styleOf(id);
   const payload = {
-    prompt: kind.prompts[id],
+    prompt: promptOf(id),
     prompt_style: style,
     width: kind.width,
     height: kind.height,
