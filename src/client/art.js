@@ -96,7 +96,7 @@ export const SPRITES = {
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
     size: 48,
-    ids: [],
+    ids: ['herbalism'],
   },
   // The places where professions work, dim behind their cards, 192×96.
   places: {
