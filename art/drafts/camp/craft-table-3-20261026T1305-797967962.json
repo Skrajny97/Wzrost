@@ -1,0 +1,25 @@
+{
+  "id": "craft-table-3",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a grand artisan's workshop pavilion with a purple roof, a long workbench glowing with violet runes, floating magical tools, shelves of crafted parts and purple crystals",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 797967962,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793020005,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 62.62,
+    "request_id": "e2a53d0a-e823-4c90-98b4-84e5c901d8ef",
+    "outputs_retained_until": 1793106392
+  }
+}

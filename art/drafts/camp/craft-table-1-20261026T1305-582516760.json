@@ -1,0 +1,25 @@
+{
+  "id": "craft-table-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a simple workbench of a plank on two stumps with a knife, a few leather scraps and a small pot of glue",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 582516760,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019974,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 62.74,
+    "request_id": "364888db-364a-4b0a-bb58-72d4c06b6f59",
+    "outputs_retained_until": 1793106366
+  }
+}
