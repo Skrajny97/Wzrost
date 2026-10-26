@@ -72,12 +72,14 @@ TAKES = {
 # Egzorcyzm is in the game now. Six were recorded again by the author's notes
 # (07:43; Osłona many and Taniec cieni once more at 07:46, as the drop came
 # out too short and the dance all rumble, and Cios w plecy at 07:49, as its
-# one low step stood almost a second before the slash).
+# one low step stood almost a second before the slash). The author then
+# picked the other take of Zatrute ostrze, and Celny strzał was recorded
+# once more (08:10) without its whistle, which sounded like a squeak.
 SKILL_TAKES = {
     'power-strike': ['0650-0', '0650-1'],
     'wide-sweep': ['0650-0', '0650-1'],
     'unyielding': ['0650-1', '0650-0'],
-    'aimed-shot': ['0743-1', '0743-0'],
+    'aimed-shot': ['0810-0', '0810-1'],
     'arrow-rain': ['0743-0', '0743-1'],
     'pinning-shot': ['0650-1', '0650-0'],
     'fireball': ['0702-1', '0650-1'],
@@ -87,7 +89,7 @@ SKILL_TAKES = {
     'exorcism': ['0650-1', '0650-0'],
     'blessing': ['0650-0', '0650-1'],
     'backstab': ['0749-1', '0749-0'],
-    'poisoned-blade': ['0743-0', '0743-1'],
+    'poisoned-blade': ['0743-1', '0743-0'],
     'shadow-dance': ['0746-0', '0746-1'],
 }
 for id, takes in SKILL_TAKES.items():

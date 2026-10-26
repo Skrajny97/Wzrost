@@ -1498,3 +1498,13 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
 
     Zapis jest w dokumencie projektowym, przy ewolucjach.
 4. **Druga ścieżka bez górnej granicy.** Pytanie o granicę 50. poziomu okazało się niejasne, więc zostaje najprostsze rozwiązanie: drugą umiejętność można dobrać w każdej chwili od 11. poziomu klasy.
+
+## Drugi wybór dźwięków (26.10.2026)
+
+1. **W grze są wersje wybrane przez autora na stronie odsłuchu:**
+    - kwestia narratora o ustawieniach: wersja 3, a jej wersja żeńska: wersja 2;
+    - Zatrute ostrze 4 i Taniec cieni 3;
+    - Grad strzał, Osłona many i Cios w plecy zostają przy 3, bez uwag.
+2. **Celny strzał nagrany raz jeszcze** (autor: „Brzmi jak pisk”). To teraz samo głuche uderzenie strzały w tarczę, bez świstu.
+    - Przy wersji z 07:43 świst brzmiał jak pisk: jej dźwięk skupiał się wokół 3 kHz. Nowa skupia się wokół 0,7–0,9 kHz.
+    - W grze jest wersja 5, a na stronie odsłuchu są 5 i 6. Koszt: 40 kredytów ElevenLabs.
