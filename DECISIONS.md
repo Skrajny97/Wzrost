@@ -1322,7 +1322,11 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
     | Cień | 59,8 | Cios w plecy 52,6 (−12%) | Zatrute ostrze 52,5 (−12%) | Taniec cieni 51,3 (−14%) |
 
     Umiejętność skraca drogę do 50. poziomu o 5–15%, a słabszym klasom pomaga trochę bardziej. Trzy wybory jednej klasy różnią się najwyżej o około 5 punktów procentowych.
-9. **Ikony** są szkicami Retro Diffusion, po jednym na umiejętność (0,18 USD za szkic, razem 2,70 USD). Weszły tymczasowo, do oceny autora. Przy części z nich wycinanie tła zostawiło ciemny kwadrat ze ściętymi rogami.
+9. **Ikony** są szkicami Retro Diffusion, po jednym na umiejętność (0,18 USD za szkic, razem 2,70 USD).
+    - Autor zatwierdził wygląd poza dwiema uwagami: ikony mają tło, a w Szerokim zamachu łuk wyglądał, jakby zamach szedł rękojeścią, nie ostrzem.
+    - Tło zniknęło z dwunastu ikon bez nowych szkiców, więc zatwierdzony motyw został. Ciemne kolory tła (zieleń, turkus, fiolet) zostały wycięte od zewnętrznej krawędzi ikony. Kontur motywu zatrzymywał wycinanie, więc to, co jest w jego środku, zostało.
+    - W Ciosie w plecy razem z tłem zniknęła ciemna sylwetka cienia za sztyletem, bo była prawie w kolorze tła i zajmowała pół kwadratu.
+    - Szeroki zamach dostał drugi szkic (0,18 USD) z opisem, w którym łuk ciągnie się za czubkiem ostrza, a rękojeść jest w środku zamachu.
 10. **Animacje.** W odtwarzaniu walki nad postacią pojawia się nazwa umiejętności, a każda umiejętność ma własny efekt (`src/client/skill-fx.js`): łuk ostrza, podmuch mrozu, słupy świętego światła, deszcz strzał, wielką kulę ognia, bańkę osłony, cienie tańca i aurę błogosławieństwa.
     - Efekty mieszczą się w arenie, więc strona nie przewija się w bok.
     - Panel autora ma „Podgląd umiejętności”. To krótka walka postaci 20. poziomu z umiejętnością na 10. poziomie, przeciw stworom dobranym tak, żeby umiejętność się pokazała. Graczom ten podgląd się nie pokazuje.
