@@ -1,8 +1,9 @@
-// "Pomiń czas" in test mode (test-mode.js). For an account without test mode,
-// and with test mode off, these routes do not exist.
+// "Pomiń czas" in test mode (test-mode.js), and the narrator's Umiejętności
+// once more. For an account without test mode, and with test mode off, these
+// routes do not exist.
 
 import { construction } from '../engine/index.js';
-import { content } from './content.js';
+import { content, tutorialPart } from './content.js';
 import { completeBuilding } from './camp.js';
 import { characterView, currentHp, loadPlayer, loadSettled, requirePlayer } from './characters.js';
 import { ApiError, json } from './http.js';
@@ -61,4 +62,23 @@ export async function skipBuilding(context) {
   }
   // The next waiting build starts at once.
   return json({ character: characterView(await loadSettled(db, session.userId, now), now) });
+}
+
+// The narrator's Umiejętności chapter from the start, to check it: the
+// skills learned are forgotten, so their points come back, and the chapter's
+// lines are unread again. It starts on any screen but a report.
+export async function repeatSkillsTour(context) {
+  if (!testMode(context.env)) throw notFound();
+  const { session, player } = await requirePlayer(context);
+  if (!testModeFor(context.env, session.user.login)) throw notFound();
+  const row = player.row;
+  if (row.tutorial === null) throw new ApiError(409, 'no_tutorial', 'Ta postać nie ma wprowadzenia.');
+  const db = context.env.DB;
+  const chapter = new Set(tutorialPart('skills'));
+  const read = JSON.parse(row.tutorial).filter((id) => !chapter.has(id));
+  await db
+    .prepare("UPDATE characters SET skills = '{}', tutorial = ?, version = version + 1 WHERE id = ?")
+    .bind(JSON.stringify(read), row.id)
+    .run();
+  return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
 }

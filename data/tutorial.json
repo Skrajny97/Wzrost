@@ -1,5 +1,5 @@
 {
-  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. Pierwsza karta (ask) pyta, czy przejść wprowadzenie: startLabel (z recommendedLabel pod spodem) idzie dalej, a skipLabel pomija całość. Ta karta jest od autora gry (speaker: author): podpisana authorLabel, bez postaci narratora i bez nagrania. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. once: lead, który po stuknięciu zostaje zapamiętany jak karta, bo stuknięcie nie zmienia ekranu (portfel pod złotem). Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest.",
+  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. Pierwsza karta (ask) pyta, czy przejść wprowadzenie: startLabel (z recommendedLabel pod spodem) idzie dalej, a skipLabel pomija całość. Ta karta jest od autora gry (speaker: author): podpisana authorLabel, bez postaci narratora i bez nagrania. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. once: lead, który po stuknięciu zostaje zapamiętany jak karta, bo stuknięcie nie zmienia ekranu (portfel pod złotem). Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest. chapter: kwestia z części po wprowadzeniu (chapters), która przychodzi w swoim momencie gry, np. Umiejętności na 10. poziomie klasy; jej skipLabel pomija tylko tę część, a skippedText mówi, co się stało. classes: osobny tekst dla każdej klasy (z własnym female i voice), gdy kwestia mówi o klasie postaci.",
   "skipLabel": "Pomiń wprowadzenie",
   "nextLabel": "Dalej",
   "startLabel": "Wprowadź mnie",
@@ -11,6 +11,12 @@
   "firstSteps": {
     "areaId": "windfalls-edge",
     "buildingId": "campfire"
+  },
+  "chapters": {
+    "skills": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Umiejętności czekają w zakładce Postać."
+    }
   },
   "lines": [
     {
@@ -374,6 +380,145 @@
           "Tyle na początek. Resztę funkcjonalności Systemu, swój cel i upodobania – będziesz musiała poznać sama. Powodzenia."
         ],
         "voice": "audio/narration/ending-female.mp3"
+      }
+    },
+    {
+      "id": "skills-welcome",
+      "kind": "card",
+      "chapter": "skills",
+      "classes": {
+        "warrior": {
+          "text": [
+            "Dziesiąty poziom klasy… Twoje ciosy nabrały ciężaru, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Umiejętności.",
+            "Zanim którąś wybierzesz – pozwól, że Ci je przedstawię."
+          ]
+        },
+        "archer": {
+          "text": [
+            "Dziesiąty poziom klasy… Twoje strzały coraz rzadziej chybiają, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Umiejętności.",
+            "Zanim którąś wybierzesz – pozwól, że Ci je przedstawię."
+          ]
+        },
+        "mage": {
+          "text": [
+            "Dziesiąty poziom klasy… Mana słucha Cię coraz chętniej, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Umiejętności.",
+            "Zanim którąś wybierzesz – pozwól, że Ci je przedstawię."
+          ]
+        },
+        "cleric": {
+          "text": [
+            "Dziesiąty poziom klasy… Twoje modlitwy niosą się coraz dalej, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Umiejętności.",
+            "Zanim którąś wybierzesz – pozwól, że Ci je przedstawię."
+          ]
+        },
+        "shadow": {
+          "text": [
+            "Dziesiąty poziom klasy… Poruszasz się coraz ciszej, ale przed Systemem nic się nie ukryje. Odblokował dla Ciebie Umiejętności.",
+            "Zanim którąś wybierzesz – pozwól, że Ci je przedstawię."
+          ]
+        }
+      }
+    },
+    {
+      "id": "skills-lead-character",
+      "kind": "lead",
+      "chapter": "skills",
+      "text": [
+        "Wróćmy do okienka Postaci."
+      ]
+    },
+    {
+      "id": "skills-lead",
+      "kind": "lead",
+      "chapter": "skills",
+      "text": [
+        "Umiejętności czekają w tej zakładce. Zajrzyjmy do nich."
+      ]
+    },
+    {
+      "id": "skills-intro",
+      "kind": "point",
+      "chapter": "skills",
+      "text": [
+        "Przeczytaj uważnie słowa Systemu. Rzadko kiedy ostrzega tak wyraźnie."
+      ]
+    },
+    {
+      "id": "skills-paths",
+      "kind": "point",
+      "chapter": "skills",
+      "classes": {
+        "warrior": {
+          "text": [
+            "Przed Tobą trzy ścieżki. Barbarzyńca miażdży wroga jednym ciosem, Gladiator tnie wszystkich naraz, a Strażnik nie cofa się nawet o krok."
+          ]
+        },
+        "archer": {
+          "text": [
+            "Przed Tobą trzy ścieżki. Snajper trafia tam, gdzie boli najbardziej, Strzelec Burzy zasypuje wrogów gradem strzał, a Łowca przyszpila zwierzynę, zanim ta zdąży się ruszyć."
+          ]
+        },
+        "mage": {
+          "text": [
+            "Przed Tobą trzy ścieżki. Elementalista ciska ogniem, Druid spowalnia wrogów mroźnym wiatrem, a Arkanista zasłania się własną maną."
+          ]
+        },
+        "cleric": {
+          "text": [
+            "Przed Tobą trzy ścieżki. Uzdrowiciel zasklepia rany, Inkwizytor smaga wrogów świętą mocą, a Kapłan błogosławi siebie i swoich towarzyszy."
+          ]
+        },
+        "shadow": {
+          "text": [
+            "Przed Tobą trzy ścieżki. Skrytobójca dopada tych, którzy chowają się za plecami innych, Truciciel zaprawia ostrze jadem, a Nocny Tancerz wymyka się ciosom i za każdy unik oddaje cios."
+          ]
+        }
+      }
+    },
+    {
+      "id": "skills-card",
+      "kind": "point",
+      "chapter": "skills",
+      "text": [
+        "System, jak zawsze, wszystko Ci wyliczył. Na karcie zobaczysz, co daje umiejętność, ile kosztuje many i jak często możesz jej użyć."
+      ]
+    },
+    {
+      "id": "skills-choice",
+      "kind": "point",
+      "chapter": "skills",
+      "text": [
+        "Pierwsza umiejętność, którą wybierzesz, otworzy ścieżkę główną. Nie kosztuje ani punktu, ale tego wyboru nie cofniesz.",
+        "Od jedenastego poziomu klasy możesz dobrać ścieżkę poboczną – za jeden Punkt Umiejętności. Trzecia ścieżka zamknie się wtedy na zawsze."
+      ]
+    },
+    {
+      "id": "skills-points",
+      "kind": "point",
+      "chapter": "skills",
+      "text": [
+        "Tu zobaczysz swoje Punkty Umiejętności. Każdy kolejny poziom klasy przyniesie Ci jeden. Punkt podniesie poznaną umiejętność o poziom – aż do dwudziestego."
+      ]
+    },
+    {
+      "id": "skills-evolution",
+      "kind": "card",
+      "chapter": "skills",
+      "text": [
+        "Jeszcze jedno. Na pięćdziesiątym poziomie klasy czeka Cię ewolucja. Zanim tam dotrzesz, wybierz obie ścieżki i rozdaj punkty – inaczej System zatrzyma Twoją klasę u progu, dopóki tego nie zrobisz."
+      ]
+    },
+    {
+      "id": "skills-ending",
+      "kind": "card",
+      "chapter": "skills",
+      "text": [
+        "Tyle ode mnie. Tym razem nawet System Cię nie wyręczy – wybór należy tylko do Ciebie. Wybierz ścieżkę, gdy będziesz gotów."
+      ],
+      "female": {
+        "text": [
+          "Tyle ode mnie. Tym razem nawet System Cię nie wyręczy – wybór należy tylko do Ciebie. Wybierz ścieżkę, gdy będziesz gotowa."
+        ]
       }
     }
   ]

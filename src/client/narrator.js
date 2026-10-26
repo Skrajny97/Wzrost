@@ -14,6 +14,10 @@
 // marked `once`, whose tap changes no screen, is kept like a card. "Pomiń
 // wprowadzenie" ends the whole introduction. Meanwhile the screen is the
 // narrator's: it neither scrolls nor takes a tap, also between the lines.
+// After the introduction come its chapters (a line's `chapter`), each at its
+// moment of the game: the Umiejętności at class level 10. A chapter's own
+// "Pomiń" passes only that chapter, and a line can be told for each class
+// (`classes`).
 
 import { narratorSprite } from './art.js';
 import { aim } from './camera.js';
@@ -36,6 +40,15 @@ const onBoard = (hash) => hash === '#/oboz';
 const calm = () => !motionOn();
 const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once === true;
 const mark = (id) => `[data-guide="${id}"]`;
+
+// The Umiejętności chapter: once the class reaches them, for a character
+// that has not learned one yet, after the report that brought it there. It
+// leads to the Umiejętności tab and goes through it.
+const noSkill = () => state.character.skills?.pools.every((pool) => pool.chosen.length === 0) ?? false;
+const onSkills = (hash) => hash === '#/postac/umiejetnosci';
+const skillsDue = (hash, read) => isUnlocked('skills') && noSkill() && !onReport(hash) && !read.has('skills-ending');
+const skillsTour = (hash, read) => skillsDue(hash, read) && read.has('skills-welcome');
+const skillsHere = (hash, read) => onSkills(hash) && skillsTour(hash, read);
 
 function affordable(buildingId) {
   const building = state.character.camp.buildings.find((candidate) => candidate.id === buildingId);
@@ -120,6 +133,17 @@ const BEATS = {
   settings: { place: '.topbar .icon-button[aria-label="Ustawienia"]', delay: 2500, when: campDone },
   quests: { place: mark('quests'), late: true, when: campDone },
   ending: { when: campDone },
+  // The Umiejętności chapter, after the introduction.
+  'skills-welcome': { when: skillsDue },
+  'skills-lead-character': { place: '.nav-item[href="#/postac"]', when: (hash, read) => skillsTour(hash, read) && !hash.startsWith('#/postac') },
+  'skills-lead': { place: '.nav-item[href="#/postac/umiejetnosci"]', when: (hash, read) => skillsTour(hash, read) && hash.startsWith('#/postac') && !onSkills(hash) },
+  'skills-intro': { place: mark('skills-intro'), when: skillsHere },
+  'skills-paths': { place: mark('skills-path'), whole: true, when: skillsHere },
+  'skills-card': { place: mark('skills-card'), when: skillsHere },
+  'skills-choice': { place: mark('skills-choice'), when: skillsHere },
+  'skills-points': { place: mark('skills-points'), when: skillsHere },
+  'skills-evolution': { when: skillsHere },
+  'skills-ending': { when: skillsHere },
 };
 
 let place = '#/walka';
@@ -281,12 +305,12 @@ export function narratorIdle() {
 
 // The first line in the order that is due: a lead or a tap whenever its
 // moment holds, a card or a pointer only until it is read. After the ending
-// only a late line is left.
+// only a late line is left, and the chapters' lines come.
 function nextLine() {
   const read = readNow();
   const over = read.has('ending');
   return state.content.tutorial.lines.find(
-    (line) => (!kept(line) || !read.has(line.id)) && (!over || BEATS[line.id]?.late) && BEATS[line.id]?.when(place, read),
+    (line) => (!kept(line) || !read.has(line.id)) && (line.chapter ? over : !over || BEATS[line.id]?.late) && BEATS[line.id]?.when(place, read),
   );
 }
 
@@ -298,12 +322,14 @@ function markRead(id) {
   call('POST', '/api/tutorial', { card: id }).catch(() => {});
 }
 
+// The chapters' lines stay as they were, for their own moments.
 function skipAll() {
   closeCard();
   stopLight();
   aim([]);
   release(0);
-  state.character.tutorial = state.content.tutorial.lines.filter(kept).map((line) => line.id);
+  const read = new Set(state.character.tutorial);
+  state.character.tutorial = state.content.tutorial.lines.filter((line) => kept(line) && (!line.chapter || read.has(line.id))).map((line) => line.id);
   for (const id of state.character.tutorial) passedHere.add(id);
   // The server plays the first steps meanwhile (an exploration, its report
   // and the Ognisko), and the screen draws the character it sends back.
@@ -312,9 +338,40 @@ function skipAll() {
     .catch((error) => toast(error.message));
 }
 
-// A line as told to this character: for a female look its female version,
-// with that version's own recording (none until it is recorded).
-const told = (line) => (line.female && state.character?.appearance === 'female' ? { ...line, text: line.female.text, voice: line.female.voice } : line);
+// A chapter's "Pomiń": its lines are read, and nothing else happens.
+function skipChapter(chapter) {
+  closeCard();
+  stopLight();
+  aim([]);
+  release(0);
+  const ids = state.content.tutorial.lines.filter((line) => line.chapter === chapter && kept(line)).map((line) => line.id);
+  state.character.tutorial = [...new Set([...state.character.tutorial, ...ids])];
+  for (const id of ids) passedHere.add(id);
+  call('POST', '/api/tutorial', { skip: true, chapter })
+    .then(() => toast(state.content.tutorial.chapters[chapter].skippedText))
+    .catch((error) => toast(error.message));
+}
+
+// What "Pomiń" passes on a line: the introduction until its ending, or the
+// line's chapter, but not on the last line of either; a late line after the
+// ending has nothing left to pass.
+function skipping(line) {
+  const tutorial = state.content.tutorial;
+  if (line.chapter) {
+    const last = tutorial.lines.filter((other) => other.chapter === line.chapter).at(-1);
+    return line === last ? null : { label: tutorial.chapters[line.chapter].skipLabel, pass: () => skipChapter(line.chapter) };
+  }
+  return line.id === 'ending' || readNow().has('ending') ? null : { label: tutorial.skipLabel, pass: skipAll };
+}
+
+// A line as told to this character: its class's text for a line told per
+// class, and for a female look its female version, with that version's own
+// recording (none until it is recorded).
+function told(line) {
+  const own = line.classes?.[state.character?.classId] ?? line;
+  const female = own.female && state.character?.appearance === 'female';
+  return { ...line, text: female ? own.female.text : own.text, voice: female ? own.female.voice : own.voice };
+}
 const words = (line) => told(line).text.map((text) => text.replaceAll('{points}', String(state.content.tutorial.startTimePoints)));
 
 // The line's recording, over quieter music. The next line's recording is
@@ -362,6 +419,7 @@ function openCard(line) {
 function write(line) {
   const tutorial = state.content.tutorial;
   const author = line.speaker === 'author';
+  const skip = skipping(line);
   scroll.art.hidden = author;
   fill(
     scroll.sheet,
@@ -380,7 +438,7 @@ function write(line) {
         : h(
             'div',
             { class: 'narrator-actions' },
-            line.id !== 'ending' && h('button', { type: 'button', class: 'narrator-skip', text: tutorial.skipLabel, onClick: skipAll }),
+            skip && h('button', { type: 'button', class: 'narrator-skip', text: skip.label, onClick: skip.pass }),
             h('button', { type: 'button', class: 'button narrator-next', text: tutorial.nextLabel, onClick: next }),
           ),
     ),
@@ -444,7 +502,7 @@ async function next() {
   markRead(current.line.id);
   await roll(current.sheet, false);
   if (scroll !== current) return;
-  const after = readNow().has('ending') ? null : nextLine();
+  const after = current.line.id === 'ending' ? null : nextLine();
   if (after?.kind === 'card' && !BEATS[after.id].delay) {
     current.line = after;
     write(after);
@@ -563,13 +621,12 @@ async function survey(line) {
 }
 
 function startLight(line) {
-  const tutorial = state.content.tutorial;
   const beat = BEATS[line.id];
   const shade = h('div', { class: 'guide-shade', onClick: nudge });
   const rings = h('div', { class: 'guide-rings', 'aria-hidden': 'true' });
   const note = line.kind === 'tap' ? bubbleNote(line) : scrollNote(line);
-  // A late line after the ending has no introduction left to skip.
-  const skip = !readNow().has('ending') && h('button', { type: 'button', class: 'guide-skip', text: tutorial.skipLabel, onClick: skipAll });
+  const passing = skipping(line);
+  const skip = passing && h('button', { type: 'button', class: 'guide-skip', text: passing.label, onClick: passing.pass });
   const root = h('div', { class: 'guide' }, shade, rings, note.element, skip);
   document.body.append(root);
   light = { line, root, note, frame: 0, closing: false, nudge };

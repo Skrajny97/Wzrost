@@ -54,9 +54,11 @@ const balance = tts && JSON.parse(readFileSync('data/balance.json', 'utf8'));
 const tutorial = tts && JSON.parse(readFileSync('data/tutorial.json', 'utf8'));
 
 // `allLines` makes a prompt of every line of the narrator's introduction,
-// named by the line's id, and of its female version, `<id>-female`. An entry
-// of the same name in `prompts` adds to it, and so does any other entry that
-// reads a line: say, words the voice reads differently from the parchment.
+// named by the line's id, and of its female version, `<id>-female`; a line
+// told per class makes one for each class, `<id>-<class>` and
+// `<id>-<class>-female`. An entry of the same name in `prompts` adds to it,
+// and so does any other entry that reads a line: say, words the voice reads
+// differently from the parchment.
 const own = (id) => kind.prompts?.[id] ?? {};
 const prompts = {
   ...Object.fromEntries(
@@ -64,10 +66,16 @@ const prompts = {
   ),
   ...(kind.allLines &&
     Object.fromEntries(
-      tutorial.lines.flatMap((line) => [
-        [line.id, { ...kind.allLines, line: line.id, ...own(line.id) }],
-        ...(line.female ? [[`${line.id}-female`, { ...kind.allLines, line: line.id, variant: 'female', ...own(`${line.id}-female`) }]] : []),
-      ]),
+      tutorial.lines.flatMap((line) =>
+        Object.entries(line.classes ?? { '': line }).flatMap(([classId, told]) => {
+          const id = classId ? `${line.id}-${classId}` : line.id;
+          const entry = { ...kind.allLines, line: line.id, ...(classId && { classId }) };
+          return [
+            [id, { ...entry, ...own(id) }],
+            ...(told.female ? [[`${id}-female`, { ...entry, variant: 'female', ...own(`${id}-female`) }]] : []),
+          ];
+        }),
+      ),
     )),
 };
 const variants = Math.max(1, Math.min(4, Number(values.variants) || 1));
@@ -94,7 +102,8 @@ function mainText(entry) {
   if (entry.text) return entry.text;
   const line = tutorial.lines.find((candidate) => candidate.id === entry.line);
   if (!line) fail(`Brak kwestii ${entry.line} w data/tutorial.json.`);
-  const told = entry.variant === 'female' ? line.female : line;
+  const forClass = entry.classId ? line.classes[entry.classId] : line;
+  const told = entry.variant === 'female' ? forClass.female : forClass;
   let text = told.text.join(' ').replaceAll('{points}', String(balance.timePoints.start));
   // `say`: [written, read] pairs, e.g. a comma that helps the voice end "broń".
   for (const [written, read] of entry.say ?? []) {
