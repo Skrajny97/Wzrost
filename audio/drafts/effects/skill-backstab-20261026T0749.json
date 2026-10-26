@@ -1,0 +1,13 @@
+{
+  "id": "skill-backstab",
+  "payload": {
+    "text": "three quick light footsteps of leather boots tapping on a wooden floor, immediately followed by one sharp swift dagger slash, no pause between them, close up, dry, crisp, no bass, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-backstab-20261026T0749-0.mp3",
+    "audio/drafts/effects/skill-backstab-20261026T0749-1.mp3"
+  ],
+  "credits": 48
+}
