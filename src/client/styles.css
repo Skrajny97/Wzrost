@@ -3689,9 +3689,11 @@ img.area-art {
    zoom.js) its letters shrink with it. */
 a.camp-level-button {
   position: absolute;
-  top: 6px;
-  left: 6px;
+  top: 0;
+  left: 0;
   z-index: 2;
+  /* Fitted to the board's rounded corner. */
+  border-radius: 5px 0 6px;
   display: block;
   width: auto;
   max-width: calc(50% - 56px);
@@ -3897,6 +3899,13 @@ a.camp-level-button {
   font-family: var(--font-system);
   font-size: 13px;
   font-weight: 700;
+}
+
+/* At the plot's right side, below the board's top corner and the level
+   button there (the Tartak). */
+.camp-bubble--side {
+  top: 36%;
+  right: -12px;
 }
 
 .camp-bubble[hidden] {

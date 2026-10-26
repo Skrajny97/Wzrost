@@ -34,7 +34,9 @@ export const PLOT_HEIGHT = 83;
 // In the left column, plots one above another stay 21 apart: a name hangs
 // 11 below its plot, and the narrator's ring stands 6 off the plot it lights.
 export const CAMP_PLOTS = {
-  sawmill: { x: 74, y: 48 },
+  // Its store's bubble stands at its side: in the plot's top right corner it
+  // went under "Rozwiń poziom obozu" in the board's corner.
+  sawmill: { x: 74, y: 48, bubble: 'side' },
   // Staw Midasa, where the pond at the edge of the glade lay.
   'midas-lake': { x: 70, y: 152 },
   quarry: { x: 286, y: 86 },
