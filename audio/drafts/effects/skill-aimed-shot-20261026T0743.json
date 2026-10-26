@@ -1,0 +1,13 @@
+{
+  "id": "skill-aimed-shot",
+  "payload": {
+    "text": "a single arrow slams hard into a wooden shield: a very short fast whistle, then one powerful sharp wooden thunk with a brief rattle of the shaft, close up, dry, no bow string, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-aimed-shot-20261026T0743-0.mp3",
+    "audio/drafts/effects/skill-aimed-shot-20261026T0743-1.mp3"
+  ],
+  "credits": 40
+}

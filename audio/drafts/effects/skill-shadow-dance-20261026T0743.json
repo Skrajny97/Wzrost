@@ -1,0 +1,13 @@
+{
+  "id": "skill-shadow-dance",
+  "payload": {
+    "text": "a rogue dancing between shadows: three very fast whooshes of a spinning dark cloak, light quick footsteps and a soft breathy whisper, close up, no deep rumble, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-shadow-dance-20261026T0743-0.mp3",
+    "audio/drafts/effects/skill-shadow-dance-20261026T0743-1.mp3"
+  ],
+  "credits": 60
+}

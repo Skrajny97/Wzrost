@@ -1,0 +1,13 @@
+{
+  "id": "skill-poisoned-blade",
+  "payload": {
+    "text": "thick poison poured from a small glass vial onto a steel dagger: a short liquid pour with gurgling bubbles and a soft acidic sizzle on the blade, close up, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-poisoned-blade-20261026T0743-0.mp3",
+    "audio/drafts/effects/skill-poisoned-blade-20261026T0743-1.mp3"
+  ],
+  "credits": 60
+}

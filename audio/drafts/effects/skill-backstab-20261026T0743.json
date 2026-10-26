@@ -1,0 +1,13 @@
+{
+  "id": "skill-backstab",
+  "payload": {
+    "text": "two soft quick sneaking footsteps on a wooden floor, then one fast sharp dagger slash cutting the air, close up, dry, no bass, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-backstab-20261026T0743-0.mp3",
+    "audio/drafts/effects/skill-backstab-20261026T0743-1.mp3"
+  ],
+  "credits": 60
+}

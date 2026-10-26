@@ -1,0 +1,13 @@
+{
+  "id": "skill-arrow-rain",
+  "payload": {
+    "text": "a rain of many arrows falling from the sky: a chorus of whistling arrows coming down, then a fast patter of dozens of arrows thudding into earth and wood, fantasy battle, no metal scraping, no sharpening, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-arrow-rain-20261026T0743-0.mp3",
+    "audio/drafts/effects/skill-arrow-rain-20261026T0743-1.mp3"
+  ],
+  "credits": 60
+}

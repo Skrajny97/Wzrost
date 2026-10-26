@@ -1,0 +1,13 @@
+{
+  "id": "skill-mana-shield",
+  "payload": {
+    "text": "an ethereal magic shield appears: one clear water droplet falling into still water with a soft echoing plink, wrapped in a faint airy shimmer, delicate and high, fantasy, no deep hum, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-mana-shield-20261026T0743-0.mp3",
+    "audio/drafts/effects/skill-mana-shield-20261026T0743-1.mp3"
+  ],
+  "credits": 60
+}
