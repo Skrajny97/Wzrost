@@ -1,0 +1,18 @@
+{
+  "id": "camp-calm",
+  "payload": {
+    "text": "[calmly] Na tej polanie ktoś już kiedyś obozował. Dobrze dla Ciebie! Wygląda na to, że zostawił trochę drewna, kamieni i rudy żelaza. Znalezione – nie kradzione. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/camp-calm-20261026T1654-0.mp3",
+    "audio/drafts/narration/camp-calm-20261026T1654-1.mp3",
+    "audio/drafts/narration/camp-calm-20261026T1654-2.mp3"
+  ],
+  "credits": 510
+}
