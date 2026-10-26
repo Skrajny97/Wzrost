@@ -3,7 +3,8 @@
 // upgraded at a time and the upgrade counts once its time has passed; a few
 // more builds wait in the queue, paid when queued, and start one after
 // another (characters.js: settleBuilds). Production buildings fill a store
-// that the player collects.
+// that the player collects, and the Ognisko's fire spirit trades gold for
+// resources a few times a day.
 
 import {
   buildMinutes,
@@ -13,6 +14,11 @@ import {
   cancelFromQueue,
   collect,
   construction,
+  fireBuilding,
+  fireDay,
+  fireTrade,
+  fireTradeBlock,
+  fireTradesMade,
   missingFor,
   plannedLevel,
   queueEnd,
@@ -228,6 +234,35 @@ export async function completeBuilding(db, player, now) {
       .prepare('UPDATE characters SET build_queue = ? WHERE id = ? AND build_queue = ?')
       .bind(JSON.stringify(shiftQueue(queue, shift)), player.row.id, player.row.build_queue ?? '[]'),
   ]);
+}
+
+// "Wrzuć złoto": one trade with the fire spirit at the Ognisko's level now
+// (an upgrade under way counts once it ends). Saved only if the character is
+// as seen here, so two taps at once make one trade and the day's count holds.
+export async function tradeAtFire(context) {
+  const { session, player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  const now = context.now;
+  const row = player.row;
+  const level = buildingLevel(player.buildings[fireBuilding(content)?.id], now);
+  const made = fireTradesMade({ day: row.fire_day, count: row.fire_trades }, now, content);
+  const block = fireTradeBlock({ level, gold: row.gold, made, resource: body.resource }, content);
+  if (block) throw new ApiError(block.code === 'invalid_resource' ? 400 : 409, block.code, block.message);
+  const { amount, gold } = fireTrade(level, content);
+  const db = context.env.DB;
+  const result = await db
+    .prepare(
+      `UPDATE characters SET gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) + ?),
+         fire_day = ?, fire_trades = ?, version = version + 1
+       WHERE id = ? AND version = ? AND gold >= ?`,
+    )
+    .bind(gold, path(body.resource), path(body.resource), amount, fireDay(now, content), made + 1, row.id, row.version, gold)
+    .run();
+  if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
+  return json({
+    traded: { resource: body.resource, amount, gold },
+    character: characterView(await loadPlayer(db, session.userId), now),
+  });
 }
 
 // "Zbierz": what a production building's store holds goes to the resources,

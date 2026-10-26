@@ -4,7 +4,9 @@
 // materials, one at a time, with a few more waiting in the queue; an upgrade
 // counts once its time has passed.
 // Production buildings fill a store the player collects, from a bubble on the
-// board or on the building's screen. Opened with the camp button in the top bar.
+// board or on the building's screen, and at the Ognisko the fire spirit trades
+// gold for resources a few times a day. Opened with the camp button in the top
+// bar.
 
 import { BOARD_HEIGHT, BOARD_WIDTH, CAMP_PLOTS, PLOT_HEIGHT, PLOT_WIDTH, boardArt, plotArt } from '../camp-art.js';
 import { craftTableSection } from '../craft-table.js';
@@ -109,6 +111,12 @@ async function collectStore(building) {
   const { collected } = await call('POST', '/api/camp/collect', { buildingId: building.id });
   playSound('collect');
   toast(`Zebrano: ${resourceName(collected.resource).toLowerCase()} +${formatNumber(collected.amount)}.`);
+}
+
+async function tradeAtFire(resource) {
+  const { traded } = await call('POST', '/api/camp/trade', { resource });
+  playSound('collect');
+  toast(`Duch ognia przyjął ${formatNumber(traded.gold)} złota i oddał: ${resourceName(traded.resource).toLowerCase()} +${formatNumber(traded.amount)}.`);
 }
 
 function heading(title, subtitle, back, badge = null) {
@@ -372,6 +380,7 @@ function mountBuilding(container, id) {
         h('p', { class: 'region-description', text: building.description }),
         building.effect && h('p', { class: 'building-effect' }, h('strong', { text: 'Teraz: ' }), building.effect),
         building.production && storeView(building),
+        building.trade && tradeView(building.trade),
       ),
       building.crafts && craftTableSection(ticks),
     );
@@ -424,6 +433,50 @@ function mountBuilding(container, id) {
       h('div', { class: 'bar' }, fillBar),
       hint,
       button,
+    );
+  }
+
+  // The fire spirit: one trade of gold for a resource at a tap, as many a
+  // day as the level allows, and what the next level gives.
+  function tradeView(trade) {
+    const short = state.character.gold < trade.gold;
+    const pieces = (count) => countOf(count, 'sztuka', 'sztuki', 'sztuk');
+    const trades = (count) => countOf(count, 'wymiana', 'wymiany', 'wymian');
+    return h(
+      'section',
+      { class: 'fire-trade', 'aria-label': trade.title },
+      h('h2', { class: 'fire-trade-title', text: trade.title }),
+      h('p', { class: 'fire-trade-text', text: trade.text }),
+      h('p', { class: 'store-head' }, h('span', { text: 'Jedna wymiana' }), h('strong', { text: `${formatNumber(trade.gold)} złota → ${pieces(trade.amount)}` })),
+      h(
+        'div',
+        { class: 'fire-trade-buttons' },
+        trade.resources.map((id) =>
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'button button--world fire-trade-button',
+              disabled: trade.left < 1 || short,
+              'aria-label': `Wymień ${formatNumber(trade.gold)} złota na: ${resourceName(id).toLowerCase()} +${formatNumber(trade.amount)}`,
+              onClick: (event) => withButton(event.currentTarget, () => tradeAtFire(id)),
+            },
+            icon(RESOURCE_ICONS[id] ?? 'unknown', { size: 18 }),
+            h('span', { text: `${resourceName(id)} +${formatNumber(trade.amount)}` }),
+          ),
+        ),
+      ),
+      h('p', {
+        class: 'store-hint',
+        text:
+          trade.left < 1
+            ? `Na dziś wymiany się skończyły. Duch ognia przyjmie złoto znów o północy.`
+            : short
+              ? `Wymiany na dziś: ${trade.left} z ${trade.perDay}. Brakuje złota na wymianę.`
+              : `Wymiany na dziś: ${trade.left} z ${trade.perDay}.`,
+      }),
+      trade.next &&
+        h('p', { class: 'store-hint', text: `Na poziomie ${trade.next.level}: ${formatNumber(trade.next.gold)} złota → ${pieces(trade.next.amount)}, ${trades(trade.next.perDay)} dziennie.` }),
     );
   }
 

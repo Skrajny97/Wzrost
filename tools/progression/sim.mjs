@@ -22,7 +22,11 @@
 //   point. Every Skill Point goes at once into the learned skill with the
 //   lower level, the first one on a tie. The class waits at its first
 //   evolution level for the second path only when the policy names one: one
-//   skill or none measures the skill alone (applyHunt's evolutionGate).
+//   skill or none measures the skill alone (applyHunt's evolutionGate);
+// - fire: with fire set, a camp that waits for a resource first trades gold
+//   for it with the Ognisko's fire spirit (src/engine/fire.js), as long as
+//   the gold for the build stays; the days run on the simulated clock, so a
+//   player who plays without a break gets the fewest trades.
 
 import * as engine from '../../src/engine/index.js';
 import { loadData } from '../validate-data.mjs';
@@ -47,6 +51,7 @@ export const DEFAULT_POLICY = {
   anvil: false,
   skill: null,
   second: null,
+  fire: false,
   maxHunts: 3000,
 };
 
@@ -75,9 +80,11 @@ function fittingAreaIndex(level, content) {
 // ---------------------------------------------------------------- camp
 
 class Camp {
-  constructor(content, wallet, log) {
+  constructor(content, wallet, log, { fire = false } = {}) {
     this.content = content;
     this.wallet = wallet;
+    this.fire = fire;
+    this.fireTrades = { day: null, count: 0 };
     this.stored = {};
     this.log = log; // { builds: [], idle: {gold:0,...}, idleChecks: {...}, spent: {...}, collected: {...} }
     this.idleSince = null;
@@ -134,6 +141,10 @@ class Camp {
     const cheapest = [...options].sort((a, b) => (a.cost.gold ?? 0) - (b.cost.gold ?? 0) || total(a.cost) - total(b.cost))[0];
     const missing = engine.missingFor(cheapest.cost, this.wallet);
     const binding = missing.reduce((best, m) => (m.amount / cheapest.cost[m.resource] > best.share ? { id: m.resource, share: m.amount / cheapest.cost[m.resource] } : best), { id: null, share: -1 }).id;
+    if (this.fire && binding !== 'gold' && this.trade(binding, cheapest, t)) {
+      this.check(t, character);
+      return;
+    }
     if (this.idleSince !== null) this.log.idle[this.idleReason] = (this.log.idle[this.idleReason] ?? 0) + (t - this.idleSince);
     this.idleSince = t;
     this.idleReason = binding;
@@ -142,6 +153,26 @@ class Camp {
       if (options.every(({ cost }) => (this.wallet[id] ?? 0) < (cost[id] ?? 0))) this.log.blockedAll[id] = (this.log.blockedAll[id] ?? 0) + 1;
     }
     this.log.idleChecks += 1;
+  }
+
+  // One trade at the fire for the resource the cheapest build waits for,
+  // keeping the gold that build needs. False when none can be made.
+  trade(resource, option, t) {
+    const building = engine.fireBuilding(this.content);
+    if (!building) return false;
+    const level = engine.buildingLevel(this.stored[building.id], t);
+    const made = engine.fireTradesMade(this.fireTrades, t, this.content);
+    const gold = this.wallet.gold - (option.cost.gold ?? 0);
+    if (engine.fireTradeBlock({ level, gold, made, resource }, this.content)) return false;
+    const { amount, gold: price } = engine.fireTrade(level, this.content);
+    this.wallet.gold -= price;
+    this.wallet[resource] += amount;
+    this.fireTrades = { day: engine.fireDay(t, this.content), count: made + 1 };
+    this.log.fire = this.log.fire ?? { trades: 0, gold: 0, resources: {} };
+    this.log.fire.trades += 1;
+    this.log.fire.gold += price;
+    this.log.fire.resources[resource] = (this.log.fire.resources[resource] ?? 0) + amount;
+    return true;
   }
 
   closeIdle(t) {
@@ -199,7 +230,7 @@ export function runCharacter(classId, runIndex, content, policyIn = {}) {
   const supply = content.balance.startingSupply;
   const wallet = { gold: supply.gold, wood: 0, stone: 0, 'iron-ore': 0, ...supply.resources };
   const campLog = { builds: [], idle: {}, blockedAll: {}, idleChecks: 0, spent: {}, collected: {}, goldByBuilding: {} };
-  const camp = new Camp(content, wallet, campLog);
+  const camp = new Camp(content, wallet, campLog, { fire: policy.fire });
   camp.cursor = 0;
 
   const character = { classId, level: 1, xp: 0, classLevel: 1, classXp: 0, points: {}, position: cls.position };

@@ -30,6 +30,7 @@ export function buildContent(raw) {
     statsById: byId(raw.stats),
     elements: raw.elements,
     elementsById: byId(raw.elements),
+    effects: raw.effects,
     effectsById: byId(raw.effects),
     rarities: raw.rarities,
     raritiesById: byId(raw.rarities),

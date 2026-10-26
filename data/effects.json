@@ -1,5 +1,5 @@
 [
-  { "id": "poisoned", "name": "Zatrucie", "element": "poison" },
-  { "id": "burning", "name": "Oparzenie", "element": "fire" },
-  { "id": "chilled", "name": "Wychłodzenie", "element": "frost" }
+  { "id": "poisoned", "name": "Zatrucie", "element": "poison", "color": "#c5e38f" },
+  { "id": "burning", "name": "Oparzenie", "element": "fire", "color": "#ff6b57" },
+  { "id": "chilled", "name": "Wychłodzenie", "element": "frost", "color": "#8fd3ff" }
 ]

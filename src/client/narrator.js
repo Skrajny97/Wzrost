@@ -51,7 +51,8 @@ const campDone = (hash, read) => read.has('camp') && (campStarted() || !affordab
 // leaves the lit places to the player until the moment passes, `above` puts
 // the narrator above the first of them, `whole` lights them all in one ring,
 // which the camera takes in whole even if it has to draw back, `unfold`
-// opens what folds there first, and `delay` lets the screen be seen first.
+// opens what folds there first, `delay` lets the screen be seen first, and
+// `browse` has the fights' tabs take turns while the line is told.
 // `survey` has the camera take in the whole of a place for a moment before
 // the light, with nothing lit: the camp's board before its plots. A `late`
 // line is told also after the ending, once, to a character that finished
@@ -71,7 +72,7 @@ const BEATS = {
   report: { when: onReport },
   'report-summary': { place: mark('report-summary'), when: onReport },
   'report-system': { place: mark('report-system'), when: onReport },
-  'report-fights': { place: `${mark('report-fights')}, ${mark('report-fight')}`, whole: true, when: onReport },
+  'report-fights': { place: `${mark('report-fights')}, ${mark('report-fight')}`, whole: true, browse: true, when: onReport },
   'report-items': { place: mark('report-items'), when: onReport },
   'report-account': { place: mark('report-account'), whole: true, unfold: true, when: onReport },
   'lead-character': {
@@ -94,7 +95,7 @@ const BEATS = {
     place: '.camp-button',
     when: (hash, read) => read.has('character') && !read.has('camp') && !freePoints() && !hash.startsWith('#/oboz'),
   },
-  camp: { place: mark('camp-stock'), delay: 3000, when: onBoard },
+  camp: { place: mark('camp-stock'), when: onBoard },
   'camp-sawmill': { place: mark('plot-sawmill'), survey: '.camp-board', when: (hash) => onBoard(hash) && !campStarted() },
   'camp-quarry': { place: `${mark('plot-quarry')}, ${mark('plot-mine')}`, when: (hash) => onBoard(hash) && !campStarted() },
   'camp-anvil': { place: mark('plot-anvil'), when: (hash) => onBoard(hash) && !campStarted() },
@@ -133,7 +134,7 @@ let missed = null; // { id, hash }: a lead or a tap whose place this screen lack
 // nothing more to show (a place this screen lacks, say) the player has the
 // screen back, so the game never stops dead.
 const HOLD = 2500;
-const SURVEY = 1800;
+const SURVEY = 1000;
 const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End', ' ']);
 const blocker = h('div', { class: 'narrator-hold', hidden: true, 'aria-hidden': 'true', onClick: () => light?.nudge() });
 let held = false;
@@ -761,6 +762,7 @@ function scrollNote(line) {
     if (light?.line !== line || light.closing) return;
     $('.guide-next', sheet)?.focus({ preventScroll: true });
     speak(line);
+    if (BEATS[line.id].browse) browseFights(line);
   };
   // "Dalej": the parchment rolls up and the narrator steps away, then the
   // next line.
@@ -780,6 +782,29 @@ function scrollNote(line) {
     narrate();
   }
   return { element, tail: null, height, open };
+}
+
+// While the narrator tells of the fights' tabs, they take turns as if
+// tapped: the other fights one by one while it says they can be chosen,
+// then the starred one, which the report opens on, as it speaks of the star.
+// The times are those of the line's recordings (report-fights.mp3), from the
+// start of the voice; without the voice the text shows as long. A line
+// passed sooner stops the turns.
+const BROWSE = { from: 4600, until: 7400, back: 8200, most: 3 };
+
+function browseFights(line) {
+  const tabs = () => [...document.querySelectorAll(`${mark('report-fights')} [role="tab"]`)];
+  const all = tabs();
+  const key = Math.max(0, all.findIndex((tab) => tab.querySelector('.fight-tab-key')));
+  const others = all.map((_, index) => index).filter((index) => index !== key).slice(0, BROWSE.most);
+  if (others.length === 0) return;
+  const step = (BROWSE.until - BROWSE.from) / others.length;
+  // The tabs are drawn anew after each choice, so each turn finds its own.
+  const turn = (index) => {
+    if (light?.line === line && !light.closing) tabs()[index]?.click();
+  };
+  others.forEach((index, order) => setTimeout(() => turn(index), BROWSE.from + step * order));
+  setTimeout(() => turn(key), BROWSE.back);
 }
 
 function stopLight() {

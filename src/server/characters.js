@@ -19,6 +19,8 @@ import {
   craftTakes,
   currentQuests,
   effectText,
+  fireTrade,
+  fireTradesMade,
   freePoints,
   gainedTimePoints,
   hoursToNext,
@@ -356,8 +358,27 @@ function campView(player, levels, now) {
           cost: upgradeCost(building, next),
         },
         queued: queued(building.id),
+        trade: building.trade && level > 0 ? fireView(building, level, player.row, now) : null,
       };
     }),
+  };
+}
+
+// The fire spirit's trade at the Ognisko's level: what a trade gives and
+// costs, the trades left today, and the same at the next level.
+function fireView(building, level, row, now) {
+  const trade = fireTrade(level, content);
+  const made = fireTradesMade({ day: row.fire_day, count: row.fire_trades }, now, content);
+  const next = level < building.maxLevel ? fireTrade(level + 1, content) : null;
+  return {
+    title: building.trade.title,
+    text: building.trade.text,
+    resources: trade.resources,
+    amount: trade.amount,
+    gold: trade.gold,
+    perDay: trade.perDay,
+    left: Math.max(0, trade.perDay - made),
+    next: next && { level: level + 1, amount: next.amount, gold: next.gold, perDay: next.perDay },
   };
 }
 

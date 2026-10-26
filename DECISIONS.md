@@ -1522,3 +1522,32 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
     - Dopóki druga ścieżka jest otwarta, w Umiejętnościach stoi: „Drugą ścieżkę wybierz najpóźniej na 50. poziomie klasy, przed ewolucją.”
     - Gdy klasa czeka, mówią o tym trzy miejsca: panel Systemu w Umiejętnościach, wiersz klasy w Statystykach („KLASA CZEKA: WYBIERZ DRUGĄ ŚCIEŻKĘ” albo „KLASA CZEKA: ROZDAJ PUNKTY UMIEJĘTNOŚCI”) i komunikat Systemu w każdym raporcie z wyprawy (`classWaitsPath`, `classWaitsPoints` w `data/texts.json`).
 3. **Symulator postępów** stosuje tę zasadę do wariantów z dwiema umiejętnościami. Warianty z jedną umiejętnością albo bez nich mierzą samą umiejętność, bez czekania. Na 80 przebiegach pary mają te same czasy co przed zmianą: wojownik 37,3–39,3 h, łucznik 45,3–48,0 h do 50. poziomu postaci.
+
+## Duch ognia w Ognisku, zakładki walk we wprowadzeniu i grafiki krain (26.10.2026)
+
+1. **Duch ognia w Ognisku** (pomysł autora: „Możesz wrzucić swoje złoto do ogniska i dzięki duchowi ognia wymienić je na potrzebne Ci zasoby.”).
+    - Ekran Ogniska ma kartę „Duch ognia” z tym zdaniem i trzema przyciskami: drewno, kamień, ruda żelaza.
+    - Na poziomie Ogniska L jedna wymiana daje 5 × L sztuk jednego zasobu, po 10 złota za sztukę: na 1. poziomie 5 sztuk za 50 złota, na 10. poziomie 50 sztuk za 500 złota.
+    - Dziennie są 4 wymiany i jedna więcej co 2 poziomy (8 na 10. poziomie). Licznik zaczyna się od nowa o północy czasu polskiego, jak zadania.
+    - Liczby są w `data/buildings.json` (`trade` Ogniska), a zasady w `src/engine/fire.js`. Wymiany z jednego dnia liczy `migrations/0022_fire_trades.sql`.
+2. **Dlaczego takie liczby** (pytanie autora, czy wymiana nie jest za mocna).
+    - Na wyprawach na 1 drewno przypada 4–8 złota. Propozycja 1 sztuki za 50 złota była więc kilka razy droższa od wypraw, a 4 sztuki dziennie byłyby niezauważalne.
+    - Przy 10 złota za sztukę wymiana dalej jest droższa od wypraw: ok. 2,5 raza na początku i 1,25 raza przy 50. poziomie. Dzienny limit trzyma ją w ryzach.
+    - Symulacja (10 przebiegów na klasę, gracz grający bez przerwy):
+        - czas dojścia do 50. poziomu postaci się nie zmienia: wojownik 49,7 h, łucznik 62,9 h, mag 78,1–78,2 h;
+        - obóz czeka na drewno o 2–6 h krócej, za ok. 2–2,7 tys. złota;
+        - złota i tak zostaje ok. 9 tys.
+    - Gracz, który gra krócej każdego dnia, ma z wymian więcej na godzinę gry, ale nadal najwyżej od kilkudziesięciu do kilkuset sztuk dziennie.
+    - Symulator postępów umie handlować przy ognisku (`fire` w `tools/progression/sim.mjs`).
+3. **Wprowadzenie: zakładki walk w raporcie** (autor). Gdy narrator mówi o zakładkach, przełączają się same.
+    - Najpierw po kolei inne walki (najwyżej 3), a przy słowach o gwiazdce wraca walka z gwiazdką, na której raport się otwiera.
+    - Czasy są wzięte z nagrań kwestii (`BROWSE` w `src/client/narrator.js`). „Dalej” zatrzymuje przełączanie.
+4. **Wprowadzenie: pauzy w obozie** (autor). Kwestia o porzuconym obozie pojawia się od razu po wejściu do obozu, bez dawnych 3 s. Pauza po pokazaniu całego obozu trwa 1 s zamiast 1,8 s.
+5. **Oparzenie na czerwono** (autor). Każdy efekt ma własny kolor w `data/effects.json`: oparzenie czerwone, zatrucie zielone, wychłodzenie niebieskie. W tym kolorze są napis efektu, liczby traconego HP i błysk karty.
+6. **Grafiki krain i regionów wewnętrznych** (autor).
+    - Retro Diffusion narysował po jednym szkicu dla 10 regionów wewnętrznych (kółka na ekranie Walka, 128×128) i dla 2 krain (192×96). Koszt: 12 × 0,18 USD = 2,16 USD.
+    - Wszystkie szkice są w grze. Zamknięty region pokazuje swój obrazek w szarości. Grafika krainy leży półprzezroczyście pod tekstem jej karty.
+    - Opisy szkiców są w `art/prompts.json` (rodzaje `areas` i `lands`). Sceny zachowują tło, więc generator usuwa tło tylko spod sprite'ów.
+7. **Strona odsłuchu zapisuje uwagi już w trakcie pisania.** Uwaga do Celnego strzału 5 dotarła bez tekstu, bo pole zapisywało się dopiero po wyjściu z niego. Na telefonie strona często zamyka się wcześniej.
+8. **Jezioro Midasa.** Na zrzucie od autora zaznaczone jest wolne miejsce na planszy obozu, między Tartakiem a Szałasem na łupy, z dopiskiem „to do Jeziora Midasa”. Miejsce zostaje wolne. Co jezioro ma robić, czeka na autora.
+

@@ -47,6 +47,18 @@ export const SPRITES = {
     height: 128,
     ids: ['narrator'],
   },
+  // The inner regions' scenes in their circles on the Walka screen, 128×128
+  // (area-art.js keeps a vector scene for a place without one).
+  areas: {
+    size: 128,
+    ids: ['windfalls-edge', 'fox-ravines', 'raven-hollows', 'viper-heaps', 'boar-thicket', 'mossy-boulders', 'spider-gully', 'lynx-ridge', 'wolf-circles', 'glade-heart'],
+  },
+  // The lands' wide scenes, dim behind the text of their cards, 192×96.
+  lands: {
+    width: 192,
+    height: 96,
+    ids: ['windfalls', 'stone-glade'],
+  },
 };
 
 const available = Object.fromEntries(Object.entries(SPRITES).map(([kind, { ids }]) => [kind, new Set(ids)]));
@@ -70,6 +82,9 @@ export const itemSprite = (item) => sprite('items', item.base, 'sprite--item');
 // A material, a part ("scraps") or the chest ("chest").
 export const materialSprite = (id) => sprite('materials', id, 'sprite--item');
 export const skillSprite = (id) => sprite('skills', id, 'sprite--skill');
+export const areaSprite = (areaId) => sprite('areas', areaId, 'area-art');
+// The address of a land's background, or null while it has none.
+export const landArt = (regionId) => (available.lands.has(regionId) ? `/art/lands/${regionId}.png` : null);
 
 // A class's figure for a look. `bust` shows the head and shoulders at the
 // image's own size, cut by the box it sits in (the arena, the class cards).

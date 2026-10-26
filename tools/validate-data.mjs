@@ -329,7 +329,12 @@ function checkReferences(data) {
         errors.push(`buildings.json: ${building.id} kosztuje nieznany zasób "${cost.resource}"`);
       }
     }
+    for (const id of building.trade?.resources ?? []) {
+      if (!resources.has(id)) errors.push(`buildings.json: ${building.id} wymienia złoto na nieznany zasób "${id}"`);
+    }
   }
+  // The fire spirit's trade lives in one building (src/engine/fire.js).
+  if (data.buildings.filter((building) => building.trade).length > 1) errors.push('buildings.json: wymianę złota (trade) może mieć tylko jeden budynek');
 
   for (const position of Object.keys(data.balance.combat.targetWeights)) {
     if (!POSITIONS.includes(position)) errors.push(`balance.json: nieznana pozycja "${position}"`);

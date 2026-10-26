@@ -44,9 +44,18 @@
   {
     "id": "campfire",
     "name": "Ognisko",
-    "description": "Ciepło, strawa i sen przy ogniu. Postać szybciej odzyskuje HP między wyprawami.",
+    "description": "Ciepło, strawa i sen przy ogniu. Postać szybciej odzyskuje HP między wyprawami, a duch ognia wymienia złoto na zasoby.",
     "maxLevel": 10,
     "effect": { "kind": "restSpeed", "perLevel": 0.1, "unit": "percent", "text": "Odpoczynek między wyprawami szybszy o {value}" },
+    "trade": {
+      "title": "Duch ognia",
+      "text": "Możesz wrzucić swoje złoto do ogniska i dzięki duchowi ognia wymienić je na potrzebne Ci zasoby.",
+      "resources": ["wood", "stone", "iron-ore"],
+      "unitsPerLevel": 5,
+      "goldPerUnit": 10,
+      "tradesPerDay": 4,
+      "moreTradesEvery": 2
+    },
     "costs": [
       { "resource": "gold", "base": 5, "growth": 2.0 },
       { "resource": "wood", "base": 4, "growth": 1.9 },

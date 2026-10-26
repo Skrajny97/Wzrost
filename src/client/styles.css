@@ -2335,6 +2335,34 @@ a.segmented-option {
   gap: 10px;
 }
 
+/* A land's pixel-art scene behind its card, half see-through and darker
+   towards the text, so the words stay easy to read. */
+.region-card--art {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.region-card--art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--land-art) center / cover no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.region-card--art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to right, rgba(13, 17, 11, 0.6), rgba(13, 17, 11, 0.2));
+  pointer-events: none;
+}
+
 .region-head {
   display: flex;
   flex-wrap: wrap;
@@ -2439,6 +2467,12 @@ a.segmented-option {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* A pixel-art scene fills its circle, pixels kept sharp. */
+img.area-art {
+  object-fit: cover;
+  image-rendering: pixelated;
 }
 
 .area-tile-name {
@@ -3911,6 +3945,41 @@ a.camp-level-button {
   margin: 0;
   color: var(--text-muted);
   font-size: 14px;
+}
+
+/* The Ognisko's fire spirit: gold into the fire for resources. */
+.fire-trade {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--bark-line);
+  background: radial-gradient(ellipse at 50% 120%, rgba(255, 138, 61, 0.14), transparent 70%);
+}
+
+.fire-trade-title {
+  margin: 0;
+  color: var(--gold);
+  font-size: 17px;
+}
+
+.fire-trade-text {
+  margin: 0;
+  font-style: italic;
+}
+
+.fire-trade-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 6px;
+}
+
+.fire-trade-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-inline: 6px;
+  white-space: nowrap;
 }
 
 .bar-fill--gold {

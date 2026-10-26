@@ -6,7 +6,7 @@
 // inner regions areas.
 
 import { areaArt } from '../area-art.js';
-import { monsterSprite } from '../art.js';
+import { landArt, monsterSprite } from '../art.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, timeFormat } from '../format.js';
@@ -335,9 +335,15 @@ export function mountCombat(container, { params, navigate }) {
   function regionLink(candidate, character) {
     const hash = `${HOME}/${candidate.id}`;
     const open = candidate.areas.filter((place) => areaOpen(place, character)).length;
-    return h(
+    const art = landArt(candidate.id);
+    const card = h(
       'a',
-      { class: 'card region-card region-link', href: hash, 'data-guide': `region-${candidate.id}`, onClick: (event) => openView(event, hash) },
+      {
+        class: `card region-card region-link${art ? ' region-card--art' : ''}`,
+        href: hash,
+        'data-guide': `region-${candidate.id}`,
+        onClick: (event) => openView(event, hash),
+      },
       h(
         'div',
         { class: 'region-head' },
@@ -360,6 +366,9 @@ export function mountCombat(container, { params, navigate }) {
         icon('chevron', { size: 20 }),
       ),
     );
+    // The land's scene, dim behind the text (styles.css).
+    if (art) card.style.setProperty('--land-art', `url("${art}")`);
+    return card;
   }
 
   // Step two: the inner regions of a region, as circles.

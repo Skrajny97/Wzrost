@@ -3,6 +3,10 @@ import { describe, test } from 'node:test';
 
 import {
   applyHunt,
+  fireDay,
+  fireTrade,
+  fireTradeBlock,
+  fireTradesMade,
   hpAfterHunt,
   areaDangers,
   areaFor,
@@ -999,6 +1003,29 @@ describe('camp', () => {
     // A warrior cannot use the staff, so it goes first; then the new common sword.
     assert.deepEqual(bagOverflow([...bag, ...finds], 3, 'warrior', content), [1, 3]);
     assert.deepEqual(bagOverflow(bag, 3, 'warrior', content), []);
+  });
+
+  test("the Ognisko's fire spirit: bigger trades and more of them with each level, counted anew each Polish day", () => {
+    assert.equal(fireTrade(0, content), null);
+    assert.deepEqual(fireTrade(1, content), { amount: 5, gold: 50, perDay: 4, resources: ['wood', 'stone', 'iron-ore'] });
+    assert.deepEqual([2, 3, 5, 10].map((level) => [fireTrade(level, content).amount, fireTrade(level, content).gold, fireTrade(level, content).perDay]), [
+      [10, 100, 4],
+      [15, 150, 5],
+      [25, 250, 6],
+      [50, 500, 8],
+    ]);
+    // 23:30 and 0:30 in Warsaw (an hour ahead of UTC in winter) are two days.
+    const late = Date.UTC(2026, 10, 3, 22, 30);
+    assert.deepEqual([fireDay(late, content), fireDay(late + 3600000, content)], ['2026-11-03', '2026-11-04']);
+    const kept = { day: fireDay(late, content), count: 3 };
+    assert.equal(fireTradesMade(kept, late, content), 3);
+    assert.equal(fireTradesMade(kept, late + 3600000, content), 0);
+    const block = (changes) => fireTradeBlock({ level: 1, gold: 50, made: 3, resource: 'wood', ...changes }, content)?.code ?? null;
+    assert.equal(block({}), null);
+    assert.equal(block({ made: 4 }), 'no_trades');
+    assert.equal(block({ gold: 49 }), 'not_enough');
+    assert.equal(block({ resource: 'gold' }), 'invalid_resource');
+    assert.equal(block({ level: 0 }), 'not_built');
   });
 });
 

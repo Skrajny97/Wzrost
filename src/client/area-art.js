@@ -1,6 +1,8 @@
 // Vector stand-ins for the inner regions, drawn for a circle (the page clips
 // them): one small scene for each place, in the colours of the class
-// portraits. The author will replace them with their own artwork.
+// portraits. A place with its pixel-art scene (art.js) shows that instead.
+
+import { areaSprite } from './art.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -155,6 +157,8 @@ const FALLBACK = `${SKY}
 export const areaArtIds = Object.keys(SCENES);
 
 export function areaArt(areaId) {
+  const drawn = areaSprite(areaId);
+  if (drawn) return drawn;
   const svg = document.createElementNS(SVG_NS, 'svg');
   svg.setAttribute('viewBox', '0 0 120 120');
   svg.setAttribute('aria-hidden', 'true');

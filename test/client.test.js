@@ -107,6 +107,9 @@ test('every sprite on the list has its file at its size, and every class has its
     // Materials, parts and the treasure chest of the report.
     materials: [...data('materials').materials.map((material) => material.id), ...data('materials').parts.map((part) => part.id), 'chest'],
     skills: data('skills').map((skill) => skill.id),
+    // The inner regions' circles and the lands' cards on the Walka screen.
+    areas: data('regions').flatMap((region) => region.areas.map((area) => area.id)),
+    lands: data('regions').map((region) => region.id),
   };
   for (const [kind, { size, width = size, height = size, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);

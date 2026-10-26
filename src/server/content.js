@@ -70,6 +70,7 @@ export function publicContent() {
       position,
     })),
     elements: content.elements.map(({ id, name, color }) => ({ id, name, color })),
+    effects: content.effects.map(({ id, name, color }) => ({ id, name, color })),
     slots: content.slots,
     rarities: content.rarities.map(({ id, name, forms, color }) => ({ id, name, forms, color })),
     regions: content.regions.map(({ id, land, name, minLevel, maxLevel, safe, description, trait, areas }) => ({

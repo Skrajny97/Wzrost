@@ -44,6 +44,10 @@ function saveSpeed(speed) {
 }
 
 const elementColor = (id) => state.content?.elements?.find((element) => element.id === id)?.color ?? '#8fe3ef';
+// An effect over time in its own colour (data/effects.json), by the name the
+// fight's events carry: a burn red, poison green.
+const effectColor = (name) => state.content?.effects?.find((effect) => effect.name === name)?.color ?? '#c5e38f';
+const tint = (hex, alpha) => `rgba(${[1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16)).join(', ')}, ${alpha})`;
 
 // Whose voice a unit has (data/sounds.json): a creature's own, a character's by its look.
 const voiceOf = (unit) => unit.monsterId ?? unit.appearance ?? null;
@@ -143,11 +147,12 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     cards.get(id)?.card.classList.toggle('unit--down', down);
   }
 
-  function float(id, text, kind, delay = 0) {
+  function float(id, text, kind, delay = 0, color = null) {
     const entry = cards.get(id);
     if (!entry) return;
     const { x, y } = centerOf(entry.card);
     const bubble = h('span', { class: `float float--${kind}`, text });
+    if (color) bubble.style.color = color;
     bubble.style.left = `${x}px`;
     bubble.style.top = `${y - 18}px`;
     fx.append(bubble);
@@ -489,21 +494,21 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       const color = elementColor(event.element);
       playSound('effect');
       cards.get(target.id).status.textContent = event.effect;
-      float(target.id, event.effect, 'effect');
+      float(target.id, event.effect, 'effect', 0, effectColor(event.effect));
       line();
-      await flash(target.id, color, 'rgba(156, 204, 101, 0.25)');
+      await flash(target.id, color, tint(effectColor(event.effect), 0.25));
       return;
     }
     if (event.kind === 'tick') {
       const color = elementColor(event.element);
       playSound('tick');
       setHp(target.id, event.hp);
-      float(target.id, `−${event.damage}`, 'tick');
+      float(target.id, `−${event.damage}`, 'tick', 0, effectColor(event.effect));
       if (event.absorbed) float(target.id, `osłona ${event.absorbed}`, 'absorb');
       shieldLeft(target.id, event.shield);
       effectOver(event);
       line();
-      await flash(target.id, color, 'rgba(156, 204, 101, 0.3)');
+      await flash(target.id, color, tint(effectColor(event.effect), 0.3));
       return;
     }
     if (event.kind === 'kill') {
