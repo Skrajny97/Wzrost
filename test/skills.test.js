@@ -66,12 +66,25 @@ describe('skills', () => {
     assert.equal(skillView(content.skillsById['mana-shield'], 1, content).cost, `Koszt: ${Math.round(pool * 100)}% maks. many, raz na walkę.`);
   });
 
-  test('Skill Points come with each class level after the tenth, one per level of a skill but the first', () => {
-    assert.deepEqual(skillPoints({ classLevel: 10, skills: {} }, content), { earned: 0, spent: 0, free: 0 });
-    assert.equal(skillPoints({ classLevel: 15, skills: {} }, content).free, 5);
-    assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3 } }, content), { earned: 5, spent: 2, free: 3 });
+  test('Skill Points come with each class level from the tenth on, one per level of a skill, its learning included', () => {
+    assert.deepEqual(skillPoints({ classLevel: 9, skills: {} }, content), { earned: 0, spent: 0, free: 0 });
+    assert.deepEqual(skillPoints({ classLevel: 10, skills: {} }, content), { earned: 1, spent: 0, free: 1 });
+    // The author: at class level 11, before the first choice, there are 2.
+    assert.equal(skillPoints({ classLevel: 11, skills: {} }, content).free, 2);
+    assert.equal(skillPoints({ classLevel: 15, skills: {} }, content).free, 6);
+    assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3 } }, content), { earned: 6, spent: 3, free: 3 });
     // The second skill's first level takes a point too.
-    assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3, unyielding: 1 } }, content), { earned: 5, spent: 3, free: 2 });
+    assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3, unyielding: 1 } }, content), { earned: 6, spent: 4, free: 2 });
+  });
+
+  test('the class level that opens the skills brings their first point, and each one after it another', () => {
+    const mage = (classLevel) => ({ classId: 'mage', level: 9, xp: 0, classLevel, classXp: 0, points: {}, skills: {} });
+    const opened = applyHunt(mage(9), { xp: classXpToNext(9, content), result: 'success' }, content);
+    assert.equal(opened.classLevel, 10);
+    assert.ok(opened.messages.includes('Zdobyto Punkty Umiejętności: +1'));
+    const next = applyHunt(mage(10), { xp: classXpToNext(10, content), result: 'success' }, content);
+    assert.equal(next.classLevel, 11);
+    assert.ok(next.messages.includes('Zdobyto Punkty Umiejętności: +1'));
   });
 
   test('a class picks its main path at class level 10, may add a second from 11 for a point, and the third closes', () => {
@@ -90,6 +103,11 @@ describe('skills', () => {
     assert.deepEqual(states(warrior(10, { 'power-strike': 1 })), ['main', 'soon', 'soon']);
     assert.deepEqual(states(warrior(11, { 'power-strike': 2 })), ['main', 'points', 'points']);
     assert.deepEqual(states(warrior(12, { 'power-strike': 1 })), ['main', 'pick', 'pick']);
+    // The main path takes the point of class level 10; at 11 the second waits
+    // for the point of that level.
+    assert.equal(skillsView(warrior(11), content).points, 2);
+    assert.equal(skillsView(warrior(10, { 'power-strike': 1 }), content).points, 0);
+    assert.deepEqual(states(warrior(11, { 'power-strike': 1 })), ['main', 'pick', 'pick']);
     // The first learned is the main path, whatever its place on the list.
     assert.deepEqual(states(warrior(30, { unyielding: 1, 'power-strike': 4 })), ['second', 'closed', 'main']);
     assert.deepEqual(skillsView(warrior(10), content).pools[0].options.map((skill) => skill.path), ['Barbarzyńca', 'Gladiator', 'Strażnik']);
