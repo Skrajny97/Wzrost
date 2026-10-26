@@ -121,7 +121,13 @@ describe('herbalism in the engine', () => {
     assert.ok(work.level > 10);
     assert.ok(work.levelled);
     assert.equal(work.timePoints, content.balance.timePoints.perLevel * (work.level - 10));
-    assert.ok(work.messages.some((line) => line.includes('HP')));
+    // The same lines as after an exploration, one gain to a line.
+    assert.deepEqual(work.messages.slice(0, 4), [
+      `Osiągnięto poziom: ${work.level}`,
+      `Zdobyto wolne punkty statystyk: +${8 * (work.level - 10)}`,
+      `Zdobyto Punkty Czasu: +${work.timePoints}`,
+      'Awansowałeś. Twoje HP i Mana odnowiły się.',
+    ]);
     assert.deepEqual(applyWork(character, 1, content).messages, []);
   });
 
@@ -154,8 +160,7 @@ describe('herbalism in the engine', () => {
     assert.equal(report.lost, 'Plecak był pełny. Nie zmieściło się: 3 × Żywokost.');
     assert.equal(after.level, 3);
     assert.deepEqual(report.revealed, ['mugwort']);
-    assert.ok(report.system.includes('Zielarstwo: poziom 3. Mądrość +1, Percepcja +1.'));
-    assert.ok(report.system.includes('System odsłania nowe zioło: Bylica.'));
+    assert.deepEqual(report.system, ['Osiągnięto poziom Zielarstwa: 3', 'Zdobyto Mądrość: +1', 'Zdobyto Percepcję: +1', 'System odsłania nowe zioło: Bylica']);
   });
 
   test('herb quests come with the professions, name only known herbs and count what was gathered', () => {

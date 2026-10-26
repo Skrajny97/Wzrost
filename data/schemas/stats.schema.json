@@ -6,10 +6,11 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "name", "combat", "events"],
+    "required": ["id", "name", "accusative", "combat", "events"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
       "name": { "type": "string", "minLength": 1 },
+      "accusative": { "type": "string", "minLength": 1 },
       "combat": { "type": "string", "minLength": 1 },
       "events": { "type": "string", "minLength": 1 }
     }

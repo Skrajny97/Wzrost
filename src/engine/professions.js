@@ -7,10 +7,10 @@
 // lost. The work gives the character a little XP (rules.characterXpShare of
 // what an hour of exploring gives) and no class XP.
 
+import { levelUpMessages } from './hunt.js';
 import { gainXp, xpPerHour, xpToNext } from './progression.js';
 import { countEvents, createRng } from './rng.js';
 import { say } from './text.js';
-import { unlockMessages } from './unlocks.js';
 
 // A profession as the character keeps it, { level, xp }: level 1 before any work.
 export const professionState = (professions, id) => ({ level: 1, xp: 0, ...professions?.[id] });
@@ -108,18 +108,12 @@ export const workXp = (level, minutes, content) =>
 
 // The character after the XP of work: its level, and the free points, Time
 // Points and System lines that come with a new one, as after an exploration
-// (applyHunt). A new level heals fully.
+// (applyHunt, levelUpMessages). A new level heals fully.
 export function applyWork(character, xp, content) {
   const next = gainXp(character.level, character.xp, xp, (level) => xpToNext(level, content), content.balance.progression.maxLevel);
   const levels = next.level - character.level;
-  const time = content.balance.timePoints;
-  const messages = [];
-  if (levels > 0) {
-    messages.push(say(content.texts, 'levelUp', next.level, { level: next.level, points: content.statIds.length * levels, time: time.perLevel * levels }));
-    for (let level = character.level + 1; level <= next.level; level++) messages.push(...unlockMessages(level, content));
-    messages.push(say(content.texts, 'levelHeal', 0, {}));
-  }
-  return { level: next.level, xp: next.xp, levelled: levels > 0, timePoints: time.perLevel * levels, messages };
+  const messages = levelUpMessages(character, { level: next.level }, content);
+  return { level: next.level, xp: next.xp, levelled: levels > 0, timePoints: content.balance.timePoints.perLevel * levels, messages };
 }
 
 // "7 × Żywokost, 3 × Bylica".
@@ -136,7 +130,14 @@ export function gatheringReport({ minutes, startedAt, endsAt, seed, found, store
   const profession = content.professionsById[content.gathering.profession];
   const levels = after.level - before.level;
   const revealed = content.herbs.filter((herb) => herb.level > before.level && herb.level <= after.level);
-  const stats = profession.stats.map((stat) => `${content.statsById[stat].name} +${levels * profession.statPerLevel}`).join(', ');
+  // One gain to a line, as after an exploration (levelUpMessages).
+  const levelLines =
+    levels > 0
+      ? [
+          say(texts, 'levelUp', 0, { profession: profession.genitive, level: after.level }),
+          ...profession.stats.map((stat) => say(texts, 'statGained', 0, { stat: content.statsById[stat].accusative, bonus: levels * profession.statPerLevel })),
+        ]
+      : [];
   return {
     kind: 'herbs',
     placeName: content.gathering.place.name,
@@ -158,10 +159,6 @@ export function gatheringReport({ minutes, startedAt, endsAt, seed, found, store
     },
     revealed: revealed.map((herb) => herb.id),
     summary: { xp, levelBefore: character.level, levelAfter: work.level, timePoints: work.timePoints },
-    system: [
-      ...(levels > 0 ? [say(texts, 'levelUp', 0, { profession: profession.name, level: after.level, stats })] : []),
-      ...revealed.map((herb, index) => say(texts, 'revealed', index, { herb: herb.name })),
-      ...work.messages,
-    ],
+    system: [...levelLines, ...revealed.map((herb, index) => say(texts, 'revealed', index, { herb: herb.name })), ...work.messages],
   };
 }

@@ -2,48 +2,56 @@
   {
     "id": "strength",
     "name": "Siła",
+    "accusative": "Siłę",
     "combat": "Obrażenia bronią ciężką.",
     "events": "Odsunięcie głazu, wyważenie wejścia."
   },
   {
     "id": "dexterity",
     "name": "Zręczność",
+    "accusative": "Zręczność",
     "combat": "Obrażenia bronią lekką i dystansową, unik, inicjatywa.",
     "events": "Wspinaczka, rozbrajanie pułapek."
   },
   {
     "id": "vitality",
     "name": "Witalność",
+    "accusative": "Witalność",
     "combat": "Maksymalne HP, regeneracja między wyprawami.",
     "events": "Trucizny, wyczerpanie."
   },
   {
     "id": "endurance",
     "name": "Wytrzymałość",
+    "accusative": "Wytrzymałość",
     "combat": "Redukcja otrzymywanych obrażeń fizycznych.",
     "events": "Upadek, zimno, pułapki."
   },
   {
     "id": "intellect",
     "name": "Intelekt",
+    "accusative": "Intelekt",
     "combat": "Moc zaklęć i broni magicznej.",
     "events": "Odczytywanie run, rozpoznawanie nieznanych materiałów."
   },
   {
     "id": "wisdom",
     "name": "Mądrość",
+    "accusative": "Mądrość",
     "combat": "Mana, skuteczność leczenia.",
     "events": "Intencje zwierząt i duchów lasu."
   },
   {
     "id": "perception",
     "name": "Percepcja",
+    "accusative": "Percepcję",
     "combat": "Trafienia krytyczne.",
     "events": "Ślady, ukryte łupy, zagrożenia."
   },
   {
     "id": "will",
     "name": "Wola",
+    "accusative": "Wolę",
     "combat": "Odporność na strach, klątwy i efekty okresowe.",
     "events": "Omamy, szepty."
   }

@@ -1,5 +1,5 @@
 {
-  "$comment": "Profesje (src/engine/professions.js). Każda ma 100 poziomów: awans z poziomu L wymaga L × levelMinutes minut pracy. Każdy awans daje statPerLevel do obu statystyk profesji (stats), więc 1. poziom daje 0. Praca daje postaci characterXpShare tego XP, co godzina wyprawy na jej poziomie, i nie daje XP klasy. soon: profesja widoczna w zakładce, ale jeszcze bez pracy. Zbieractwo (gathering): postać zbiera zioła w jednym stałym miejscu (place), przez minutes.min–max minut co step. Na godzinę zbiera perHour sztuk zioła, a każdy poziom dodaje yieldPerLevel; losowość to ± spread. slots: od którego poziomu ile ziół naraz, a zbiór dzieli się po równo między wybrane zioła. Zioło zna się od swojego poziomu (level). stack: ile sztuk zioła mieści jedno miejsce plecaka; co się nie zmieści, przepada. price: tyle płaci złomiarz za sztukę (z premią Skupu złomu). genitive: nazwa w dopełniaczu, do zadań narratora. texts: zdania raportu (report: jedno z wariantów) i komunikaty.",
+  "$comment": "Profesje (src/engine/professions.js). Każda ma 100 poziomów: awans z poziomu L wymaga L × levelMinutes minut pracy. Każdy awans daje statPerLevel do obu statystyk profesji (stats), więc 1. poziom daje 0. Praca daje postaci characterXpShare tego XP, co godzina wyprawy na jej poziomie, i nie daje XP klasy. soon: profesja widoczna w zakładce, ale jeszcze bez pracy. Zbieractwo (gathering): postać zbiera zioła w jednym stałym miejscu (place), przez minutes.min–max minut co step. Na godzinę zbiera perHour sztuk zioła, a każdy poziom dodaje yieldPerLevel; losowość to ± spread. slots: od którego poziomu ile ziół naraz, a zbiór dzieli się po równo między wybrane zioła. Zioło zna się od swojego poziomu (level). stack: ile sztuk zioła mieści jedno miejsce plecaka; co się nie zmieści, przepada. price: tyle płaci złomiarz za sztukę (z premią Skupu złomu). genitive: nazwa w dopełniaczu, zioła do zadań narratora, a profesji do komunikatu o jej poziomie. texts: zdania raportu (report: jedno z wariantów) i komunikaty.",
   "rules": {
     "characterXpShare": 0.1,
     "stack": 20
@@ -8,6 +8,7 @@
     {
       "id": "herbalism",
       "name": "Zielarstwo",
+      "genitive": "Zielarstwa",
       "kind": "gathering",
       "stats": ["wisdom", "perception"],
       "maxLevel": 100,
@@ -18,6 +19,7 @@
     {
       "id": "alchemy",
       "name": "Alchemia",
+      "genitive": "Alchemii",
       "kind": "crafting",
       "stats": ["intellect", "wisdom"],
       "maxLevel": 100,
@@ -29,6 +31,7 @@
     {
       "id": "crafting",
       "name": "Rzemieślnictwo",
+      "genitive": "Rzemieślnictwa",
       "kind": "crafting",
       "stats": ["strength", "dexterity"],
       "maxLevel": 100,
@@ -95,8 +98,9 @@
     ],
     "gathered": ["Zebrano: {herbs}."],
     "lost": ["Plecak był pełny. Nie zmieściło się: {herbs}."],
-    "levelUp": ["{profession}: poziom {level}. {stats}."],
-    "revealed": ["System odsłania nowe zioło: {herb}."],
+    "levelUp": ["Osiągnięto poziom {profession}: {level}"],
+    "statGained": ["Zdobyto {stat}: +{bonus}"],
+    "revealed": ["System odsłania nowe zioło: {herb}"],
     "hidden": ["Ukryte przez System do {level}. poziomu Zielarstwa."],
     "busy": ["Postać zbiera zioła. Poczekaj na koniec zbierania."],
     "claimFirst": ["Zbieranie się skończyło. Najpierw odbierz raport."],

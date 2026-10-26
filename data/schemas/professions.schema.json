@@ -45,6 +45,7 @@
         "required": [
           "id",
           "name",
+          "genitive",
           "kind",
           "stats",
           "maxLevel",
@@ -60,6 +61,11 @@
           "name": {
             "type": "string",
             "minLength": 1
+          },
+          "genitive": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nazwa w dopełniaczu: „Osiągnięto poziom Zielarstwa: 5”."
           },
           "kind": {
             "enum": [
@@ -256,6 +262,7 @@
         "gathered",
         "lost",
         "levelUp",
+        "statGained",
         "revealed",
         "hidden",
         "busy",
@@ -289,6 +296,14 @@
           }
         },
         "levelUp": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "statGained": {
           "type": "array",
           "minItems": 1,
           "items": {
