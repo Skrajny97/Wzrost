@@ -87,11 +87,11 @@
         "seconds": 1.5
       },
       "skill-aimed-shot": {
-        "text": "a bow string slowly drawn tight with a creak, then one sharp precise arrow release and a fast whistle, close up, no music",
-        "seconds": 1.2
+        "text": "a single arrow slams hard into a wooden shield: a very short fast whistle, then one powerful sharp wooden thunk with a brief rattle of the shaft, close up, dry, no bow string, no music",
+        "seconds": 1.0
       },
       "skill-arrow-rain": {
-        "text": "a quick volley of many arrows released one after another, a rush of whistling arrows flying overhead, fantasy battle, no music",
+        "text": "a rain of many arrows falling from the sky: a chorus of whistling arrows coming down, then a fast patter of dozens of arrows thudding into earth and wood, fantasy battle, no metal scraping, no sharpening, no music",
         "seconds": 1.5
       },
       "skill-pinning-shot": {
@@ -107,7 +107,7 @@
         "seconds": 1.5
       },
       "skill-mana-shield": {
-        "text": "a magic shield forms around a mage: a bright crystalline shimmer and a rising glassy chime, airy and high, fantasy, no deep hum, no music",
+        "text": "an ethereal magic shield appears: one clear water droplet falling into still water with a soft echoing plink, wrapped in a faint airy shimmer, delicate and high, fantasy, no deep hum, no music",
         "seconds": 1.5
       },
       "skill-prayer-of-health": {
@@ -123,15 +123,15 @@
         "seconds": 1.5
       },
       "skill-backstab": {
-        "text": "a stealthy dagger stab: a fast thin high swish and a sharp metallic stab, close up, dry, no thump, no bass, no music",
-        "seconds": 1.0
+        "text": "two soft quick sneaking footsteps on a wooden floor, then one fast sharp dagger slash cutting the air, close up, dry, no bass, no music",
+        "seconds": 1.5
       },
       "skill-poisoned-blade": {
-        "text": "poison smeared on a steel blade, a wet dripping sizzle with a faint bubbling hiss, close up, no music",
-        "seconds": 1.2
+        "text": "thick poison poured from a small glass vial onto a steel dagger: a short liquid pour with gurgling bubbles and a soft acidic sizzle on the blade, close up, no music",
+        "seconds": 1.5
       },
       "skill-shadow-dance": {
-        "text": "shadow magic: quick light airy whooshes and a soft whispery swish, high and breathy, fantasy, no deep rumble, no music",
+        "text": "a rogue dancing between shadows: three very fast whooshes of a spinning dark cloak, light quick footsteps and a soft breathy whisper, close up, no deep rumble, no music",
         "seconds": 1.5
       }
     }
