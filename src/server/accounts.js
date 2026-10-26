@@ -1,5 +1,6 @@
 // Account endpoints: registration, login, logout and the current user.
 
+import { registrationOpen } from './features.js';
 import { googleConfigured } from './google.js';
 import { ApiError, json, readJson } from './http.js';
 import { hashPassword, needsRehash, verifyPassword } from './passwords.js';
@@ -58,6 +59,7 @@ const emailTaken = () =>
   new ApiError(409, 'email_taken', 'Ten e-mail jest już przypisany do innego konta.');
 
 export async function register({ request, env, now }) {
+  if (!registrationOpen()) throw new ApiError(403, 'registration_closed', 'Zakładanie nowych kont jest wyłączone.');
   const body = await readJson(request);
   const login = validateLogin(body.login);
   const email = validateEmail(body.email);

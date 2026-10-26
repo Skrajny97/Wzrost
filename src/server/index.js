@@ -9,7 +9,7 @@ import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints
 import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
-import { readFeatures } from './features.js';
+import { readFeatures, registrationOpen } from './features.js';
 import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { discardHerbs, sellHerbs, startGathering } from './professions.js';
@@ -135,8 +135,9 @@ export default {
 
 async function health({ env, now }) {
   await env.DB.prepare('SELECT 1').first();
-  // `google`: whether the Google sign-in buttons can show.
-  return json({ ok: true, time: now, version: env.APP_VERSION, google: googleConfigured(env) });
+  // `google`: whether the Google sign-in buttons can show; `registration`:
+  // whether new accounts can be made (not on the test version).
+  return json({ ok: true, time: now, version: env.APP_VERSION, google: googleConfigured(env), registration: registrationOpen() });
 }
 
 // Browsers always send Origin with POST requests made by fetch; a foreign one is refused.

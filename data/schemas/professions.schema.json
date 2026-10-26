@@ -51,6 +51,7 @@
           "maxLevel",
           "levelMinutes",
           "statPerLevel",
+          "maxLevelBonus",
           "description"
         ],
         "properties": {
@@ -96,6 +97,11 @@
           "statPerLevel": {
             "type": "integer",
             "minimum": 1
+          },
+          "maxLevelBonus": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Dodatek do obu statystyk na ostatnim poziomie: nagroda za opanowanie profesji."
           },
           "soon": {
             "type": "boolean",

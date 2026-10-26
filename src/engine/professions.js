@@ -25,13 +25,19 @@ export function workProfession(profession, state, minutes) {
   return { level: next.level, xp: next.xp, levels: next.levels };
 }
 
-// What the professions add to the stats: statPerLevel to both of a
-// profession's stats for each level after the first, so level 1 adds nothing.
+// What a profession at a level adds to each of its two stats: statPerLevel
+// for each level after the first, so level 1 adds nothing, and on the last
+// level maxLevelBonus on top, the reward for mastering it (the author: "taka
+// sowita nagroda za zamknięcie trudnego działu").
+export const professionStatBonus = (profession, level) =>
+  (level - 1) * profession.statPerLevel + (level >= profession.maxLevel ? profession.maxLevelBonus : 0);
+
+// What the professions add to the stats.
 export function professionStats(professions, content) {
   const bonus = {};
   for (const profession of content.professions) {
     const { level } = professionState(professions, profession.id);
-    for (const stat of profession.stats) bonus[stat] = (bonus[stat] ?? 0) + (level - 1) * profession.statPerLevel;
+    for (const stat of profession.stats) bonus[stat] = (bonus[stat] ?? 0) + professionStatBonus(profession, level);
   }
   return bonus;
 }
@@ -131,11 +137,12 @@ export function gatheringReport({ minutes, startedAt, endsAt, seed, found, store
   const levels = after.level - before.level;
   const revealed = content.herbs.filter((herb) => herb.level > before.level && herb.level <= after.level);
   // One gain to a line, as after an exploration (levelUpMessages).
+  const gained = professionStatBonus(profession, after.level) - professionStatBonus(profession, before.level);
   const levelLines =
     levels > 0
       ? [
           say(texts, 'levelUp', 0, { profession: profession.genitive, level: after.level }),
-          ...profession.stats.map((stat) => say(texts, 'statGained', 0, { stat: content.statsById[stat].accusative, bonus: levels * profession.statPerLevel })),
+          ...profession.stats.map((stat) => say(texts, 'statGained', 0, { stat: content.statsById[stat].accusative, bonus: gained })),
         ]
       : [];
   return {

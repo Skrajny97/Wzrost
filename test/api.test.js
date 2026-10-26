@@ -22,6 +22,8 @@ describe('health', () => {
     assert.equal(data.version, 'dev');
     // Without the Google client secrets the Google buttons stay hidden.
     assert.equal(data.google, false);
+    // The game takes new accounts (the test version does not: test-version.test.js).
+    assert.equal(data.registration, true);
     assert.ok(data.time >= before - 1000 && data.time <= Date.now() + 1000);
     assert.equal(headers.get('Cache-Control'), 'no-store');
   });

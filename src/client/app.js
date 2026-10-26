@@ -80,6 +80,7 @@ const GOOGLE_NOTES = {
   expired: 'Logowanie przez Google trwało za długo albo sesja wygasła. Spróbuj ponownie.',
   failed: 'Nie udało się zalogować przez Google. Spróbuj ponownie za chwilę.',
   unavailable: 'Logowanie przez Google jest teraz niedostępne.',
+  closed: 'Zakładanie nowych kont jest wyłączone.',
 };
 
 // Why Google sign-in cannot work here, or null. Google refuses browsers
@@ -569,6 +570,8 @@ function enterAuth(note = null) {
     .then((health) => {
       for (const element of $$('[data-version]')) element.textContent = health.version;
       state.googleLogin = health.google === true;
+      // Where no new accounts are made, only the login form stays.
+      $('#auth-modes').hidden = health.registration === false;
       const hint = state.googleLogin ? googleHint() : null;
       $('#google-block').hidden = !state.googleLogin || hint !== null;
       $('#google-hint').textContent = hint ?? '';

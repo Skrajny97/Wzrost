@@ -55,12 +55,14 @@ describe('herbalism in the engine', () => {
     assert.deepEqual(top, { level: 100, xp: 0, levels: 0 });
   });
 
-  test('level 1 gives no stats, each level after it +1 to Mądrość and Percepcja', () => {
+  test('level 1 gives no stats, each level after it +1 to Mądrość and Percepcja, and level 100 +51 more', () => {
     assert.equal(professionStats({}, content).wisdom, 0);
     const third = professionStats({ herbalism: { level: 3, xp: 0 } }, content);
     assert.equal(third.wisdom, 2);
     assert.equal(third.perception, 2);
-    assert.equal(professionStats({ herbalism: { level: 100, xp: 0 } }, content).wisdom, 99);
+    assert.equal(professionStats({ herbalism: { level: 99, xp: 0 } }, content).wisdom, 98);
+    const master = professionStats({ herbalism: { level: 100, xp: 0 } }, content);
+    assert.deepEqual([master.wisdom, master.perception], [150, 150]);
     const character = newCharacter('warrior', { professions: { herbalism: { level: 4, xp: 0 } } });
     const { sources, totals } = computeStats(character, [], content);
     assert.equal(sources.perception.professions, 3);
@@ -161,6 +163,13 @@ describe('herbalism in the engine', () => {
     assert.equal(after.level, 3);
     assert.deepEqual(report.revealed, ['mugwort']);
     assert.deepEqual(report.system, ['Osiągnięto poziom Zielarstwa: 3', 'Zdobyto Mądrość: +1', 'Zdobyto Percepcję: +1', 'System odsłania nowe zioło: Bylica']);
+    // The last level brings the master's bonus with it: +1 and +51.
+    const top = { level: 99, xp: 0 };
+    const mastered = gatheringReport(
+      { minutes: 480, startedAt: 0, endsAt: 1, seed: 'm', found: { comfrey: 1 }, stored: { comfrey: 1 }, lost: {}, before: top, after: workProfession(herbalism, top, 99 * 30), character, xp: 0, work },
+      content,
+    );
+    assert.deepEqual(mastered.system.slice(0, 3), ['Osiągnięto poziom Zielarstwa: 100', 'Zdobyto Mądrość: +52', 'Zdobyto Percepcję: +52']);
   });
 
   test('herb quests come with the professions, name only known herbs and count what was gathered', () => {

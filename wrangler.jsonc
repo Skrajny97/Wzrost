@@ -80,7 +80,9 @@
         // No author's panel and no Google sign-in on the test version.
         "AUTHOR_LOGINS": "",
         "GOOGLE_HOSTS": "",
-        "PROFESSIONS": "on"
+        "PROFESSIONS": "on",
+        // No new accounts: only the author's, made before (the author's request).
+        "REGISTRATION": "closed"
       },
       "triggers": {
         "crons": ["* * * * *"]

@@ -7,6 +7,7 @@ import {
   herbSlots,
   herbsPerHour,
   isUnlocked,
+  professionStatBonus,
   professionState,
   professionXpToNext,
 } from '../engine/index.js';
@@ -56,7 +57,7 @@ export function professionsView(row) {
         xp,
         xpToNext: level < profession.maxLevel ? professionXpToNext(profession, level) : 0,
         maxLevel: profession.maxLevel,
-        stats: profession.stats.map((stat) => ({ id: stat, name: content.statsById[stat].name, bonus: (level - 1) * profession.statPerLevel })),
+        stats: profession.stats.map((stat) => ({ id: stat, name: content.statsById[stat].name, bonus: professionStatBonus(profession, level) })),
       };
     }),
     gathering: {

@@ -13,6 +13,7 @@
 // confirmed. The page learns how it went from /?google=… (app.js).
 
 import { fromBase64Url, toBase64Url } from './encoding.js';
+import { registrationOpen } from './features.js';
 import { createSession, deleteSession, getSession, readCookie, sessionCookie } from './sessions.js';
 import { testModeFor } from './test-mode.js';
 
@@ -86,6 +87,7 @@ export async function googleCallback({ request, env, now }) {
       if (identity.email && (await db.prepare('SELECT 1 FROM users WHERE email = ?').bind(identity.email).first())) {
         return finish('/?google=exists');
       }
+      if (!registrationOpen()) return finish('/?google=closed');
       user = await createGoogleUser(db, identity, now);
     }
     if (session) await deleteSession(db, session.id);

@@ -114,6 +114,10 @@ test('every sprite on the list has its file at its size, and every class has its
     board: ['camp'],
     // The camp's buildings at their three looks.
     camp: data('buildings').flatMap((building) => [1, 2, 3].map((tier) => `${building.id}-${tier}`)),
+    // Zielarstwo's herbs, the professions' squares and the places they work in.
+    herbs: data('professions').herbs.map((herb) => herb.id),
+    professions: data('professions').professions.map((profession) => profession.id),
+    places: [data('professions').gathering.place.id],
   };
   for (const [kind, { size, width = size, height = size, fit = false, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);

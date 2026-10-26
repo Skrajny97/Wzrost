@@ -134,14 +134,13 @@ export function mountProfessions(container, { params, navigate }) {
     fill(
       container,
       backHeading(profession.name, `poziom ${profession.level}`, HOME),
+      // What the character is doing comes first, so a report to claim is
+      // always at the top, above the place (the author).
+      activity?.kind === 'herbs' ? gatheringCard(activity) : activity && systemPanel('Postać jest na wyprawie. Do Zagajnika wyruszy po powrocie.'),
       testTools(character),
       placeCard(gathering),
       levelCard(profession),
-      activity?.kind === 'herbs'
-        ? gatheringCard(activity)
-        : activity
-          ? systemPanel('Postać jest na wyprawie. Do Zagajnika wyruszy po powrocie.')
-          : gatherForm(character, gathering),
+      !activity && gatherForm(character, gathering),
     );
   }
 
