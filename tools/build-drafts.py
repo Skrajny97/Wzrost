@@ -64,26 +64,31 @@ TAKES = {
     'male-death': [1, 2],
 }
 # The skills' sounds (effects/skill-<id>-<time>-<take>.mp3): skill-<id>-1 is
-# in the game, skill-<id>-2 on the listening page to choose from. Chosen by
-# measure: the least energy below 300 Hz, a clean fade. The four drafts of
+# in the game, skill-<id>-2 on the listening page to choose from. First chosen
+# by measure: the least energy below 300 Hz, a clean fade. The four drafts of
 # 26.10 07:02 were recorded again, brighter, as the first ones were mostly
-# rumble.
+# rumble. Then the author picked on the listening page (26.10): the other
+# take of Potężny cios, Szeroki zamach, Nieugięty, Przyszpilenie and
+# Egzorcyzm is in the game now. Six were recorded again by the author's notes
+# (07:43; Osłona many and Taniec cieni once more at 07:46, as the drop came
+# out too short and the dance all rumble, and Cios w plecy at 07:49, as its
+# one low step stood almost a second before the slash).
 SKILL_TAKES = {
-    'power-strike': ['0650-1', '0650-0'],
-    'wide-sweep': ['0650-1', '0650-0'],
-    'unyielding': ['0650-0', '0650-1'],
-    'aimed-shot': ['0650-0', '0650-1'],
-    'arrow-rain': ['0650-1', '0650-0'],
-    'pinning-shot': ['0650-0', '0650-1'],
+    'power-strike': ['0650-0', '0650-1'],
+    'wide-sweep': ['0650-0', '0650-1'],
+    'unyielding': ['0650-1', '0650-0'],
+    'aimed-shot': ['0743-1', '0743-0'],
+    'arrow-rain': ['0743-0', '0743-1'],
+    'pinning-shot': ['0650-1', '0650-0'],
     'fireball': ['0702-1', '0650-1'],
     'frost-gust': ['0650-1', '0650-0'],
-    'mana-shield': ['0702-1', '0702-0'],
+    'mana-shield': ['0746-0', '0746-1'],
     'prayer-of-health': ['0650-1', '0650-0'],
-    'exorcism': ['0650-0', '0650-1'],
+    'exorcism': ['0650-1', '0650-0'],
     'blessing': ['0650-0', '0650-1'],
-    'backstab': ['0702-0', '0650-1'],
-    'poisoned-blade': ['0650-0', '0650-1'],
-    'shadow-dance': ['0702-0', '0702-1'],
+    'backstab': ['0749-1', '0749-0'],
+    'poisoned-blade': ['0743-0', '0743-1'],
+    'shadow-dance': ['0746-0', '0746-1'],
 }
 for id, takes in SKILL_TAKES.items():
     for number, take in enumerate(takes):

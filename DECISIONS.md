@@ -1449,3 +1449,30 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
     - Cztery szkice miały prawie sam bas (Kula ognia, Osłona many, Taniec cieni, Cios w plecy), więc dostały nowe, jaśniejsze opisy.
     - Koszt: około 1030 kredytów ElevenLabs (812 za pierwsze nagrania i 220 za cztery poprawki).
     - Umiejętność bez własnego nagrania gra dawny dźwięk ataku albo czaru.
+
+## Wybór dźwięków umiejętności, nowe nagrania i dwie ikony (26.10.2026)
+
+1. **Wybór autora na stronie odsłuchu.**
+    - Ujęcie 2 jest teraz w grze dla Potężnego ciosu, Szerokiego zamachu, Nieugiętego, Przyszpilenia i Egzorcyzmu.
+    - Ujęcie 1 zostaje dla Mroźnego podmuchu i Modlitwy o zdrowie. Kula ognia i Błogosławieństwo też zostają przy 1.
+    - Kolejność ujęć w `tools/build-drafts.py` (`SKILL_TAKES`) odpowiada wyborowi, więc ponowne budowanie daje te same pliki.
+2. **Sześć dźwięków nagranych od nowa według uwag autora.**
+    - Celny strzał: mocne uderzenie strzały w tarczę zamiast naciągania cięciwy.
+    - Grad strzał: spadający deszcz strzał.
+    - Osłona many: kropla wody z eterycznym echem.
+    - Cios w plecy: kroki, a zaraz po nich szybkie cięcie.
+    - Zatrute ostrze: lanie i bulgotanie trucizny.
+    - Taniec cieni: nowe brzmienie, świst płaszcza i ciche kroki.
+
+    Trzy wymagały poprawek:
+    - Osłona many: pierwsza kropla trwała 0,13 s.
+    - Taniec cieni: pierwsze ujęcia były w 95% niskim dudnieniem, którego telefon nie gra.
+    - Cios w plecy: po jednym cichym kroku było prawie sekundę ciszy przed cięciem.
+
+    W grze jest teraz pierwsze ujęcie nowego nagrania. Na stronie odsłuchu oba nowe ujęcia mają numery 3 i 4 i własne miejsce na wybór, a dawne zaznaczenia „Do wymiany” są odhaczone. Koszt: 508 kredytów ElevenLabs.
+3. **Cios w plecy z cieniem** (autor).
+    - Ikona ma znowu zakapturzoną sylwetkę cienia ze świecącymi oczami za sztyletem, z pierwszego szkicu.
+    - Wycięte zostało tylko szare tło. Ciemny fiolet sylwetki został.
+    - Tam, gdzie szkic urywał sylwetkę prostą krawędzią kwadratu, brzegi przechodzą stopniowo w przezroczystość jak dym.
+4. **Nowy Szeroki zamach** (autor: za podobny do Potężnego ciosu). Jeden nowy szkic Retro Diffusion (0,18 USD): miecz w środku złotego wiru zamiast białego półksiężyca. Szkic wypełniał cały kwadrat, więc jest przycięty do koła, a jego brzeg przechodzi w przezroczystość.
+5. **Ostatnia ewolucja** (autor, daleka przyszłość). Na najwyższych poziomach klasy postać wybiera jedną z trzech klas: dalszy rozwój jednej z dwóch rozwijanych dotąd ścieżek albo fuzję obu. Zapis jest w dokumencie projektowym, przy ewolucjach.
