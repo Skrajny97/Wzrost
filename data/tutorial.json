@@ -285,7 +285,7 @@
       "id": "camp-loot-shed",
       "kind": "point",
       "text": [
-        "Zdobycze z wypraw trafiają do plecaka. Szałas na łupy go powiększy, a Skup złomu sprawi, że złomiarz zapłaci Ci więcej za to, czego nie potrzebujesz."
+        "Zdobycze z wypraw trafiają do plecaka. Szałas na łupy go powiększy, a Skup złomu sprawi, że złomiarz zapłaci Ci więcej za to, czego nie potrzebujesz. Sprzeda Ci też części do rzemiosła."
       ],
       "voice": "audio/narration/camp-loot-shed.mp3"
     },
