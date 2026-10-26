@@ -1094,7 +1094,7 @@ describe('camp', () => {
 
   test("the Ognisko's fire spirit: bigger trades and more of them with each level, counted anew each Polish day", () => {
     assert.equal(fireTrade(0, content), null);
-    assert.deepEqual(fireTrade(1, content), { amount: 5, gold: 50, perDay: 4, resources: ['wood', 'stone', 'iron-ore'] });
+    assert.deepEqual(fireTrade(1, content), { amount: 5, gold: 50, unitGold: 10, perDay: 4, resources: ['wood', 'stone', 'iron-ore'] });
     assert.deepEqual([2, 3, 5, 10].map((level) => [fireTrade(level, content).amount, fireTrade(level, content).gold, fireTrade(level, content).perDay]), [
       [10, 100, 4],
       [15, 150, 5],
@@ -1113,6 +1113,11 @@ describe('camp', () => {
     assert.equal(block({ gold: 49 }), 'not_enough');
     assert.equal(block({ resource: 'gold' }), 'invalid_resource');
     assert.equal(block({ level: 0 }), 'not_built');
+    // The slider: from 1 piece to a full trade, for 10 gold a piece.
+    assert.equal(block({ amount: 3, gold: 30 }), null);
+    assert.equal(block({ amount: 3, gold: 29 }), 'not_enough');
+    assert.deepEqual([0, 6, 2.5, '3'].map((amount) => block({ amount })), ['invalid_amount', 'invalid_amount', 'invalid_amount', 'invalid_amount']);
+    assert.equal(block({ amount: 1, made: 4 }), 'no_trades');
   });
 
   test("the Skup złomu's dealer: rarer parts and lower prices with each level", () => {

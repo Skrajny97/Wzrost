@@ -1025,7 +1025,7 @@ describe('camp', () => {
   });
 
   test('the fire spirit trades gold for resources a few times a day, more with each level', async () => {
-    const trade = (resource) => call('POST', '/api/camp/trade', { cookie, body: { resource } });
+    const trade = (resource, amount) => call('POST', '/api/camp/trade', { cookie, body: { resource, amount } });
     const fire = (view) => view.camp.buildings.find((building) => building.id === 'campfire').trade;
     await stock(1000, {});
     // Before the Ognisko stands there is no trade.
@@ -1059,6 +1059,12 @@ describe('camp', () => {
     assert.equal(fire(await character()).left, 5);
     await stock(149, {});
     assert.equal((await trade('wood')).data.error.code, 'not_enough');
+    // The slider: 5 pieces for 50 gold, and it is one of the day's trades.
+    const small = await trade('wood', 5);
+    assert.deepEqual(small.data.traded, { resource: 'wood', amount: 5, gold: 50 });
+    assert.deepEqual([small.data.character.gold, fire(small.data.character).left], [99, 4]);
+    assert.equal((await trade('wood', 16)).data.error.code, 'invalid_amount');
+    assert.equal((await trade('wood', 10)).data.error.code, 'not_enough');
   });
 
   test('the scrap dealer sells parts for gold, rarer and cheaper ones with each level of the Skup złomu', async () => {
