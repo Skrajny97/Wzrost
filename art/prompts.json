@@ -231,7 +231,7 @@
     }
   },
   "camp": {
-    "style": "rd_pro__isometric",
+    "style": "rd_plus__isometric_asset",
     "width": 128,
     "height": 96,
     "references": [],
@@ -250,7 +250,7 @@
       "mine-3": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a huge mine entrance with a carved stone arch, a tall wooden headframe with a big winch wheel, glowing orange lanterns, rails with a full ore cart and glittering blue crystals in the rock",
       "campfire-1": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a small campfire of a few sticks in a ring of grey stones with small bright orange flames",
       "campfire-2": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a campfire in a stone ring with a cooking pot on an iron tripod, two log benches and bright orange flames with a tiny smiling fire spirit face",
-      "campfire-3": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a big round stone hearth with tall bright magical flames forming a friendly fire spirit with a face and arms, carved log benches around it and floating glowing sparks",
+      "campfire-3": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a huge magical bonfire on a round platform of carved stone with glowing orange runes, a big friendly fire spirit with a smiling face and two arms rising out of the flames, carved log benches around it and floating sparks",
       "loot-shed-1": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a tiny lean-to shelter of branches covered with a patched green cloth, a sack and a small wooden crate under it",
       "loot-shed-2": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a small wooden storage shed with a bright red roof and an open door, sacks, barrels and crates stacked outside",
       "loot-shed-3": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a large sturdy storehouse of timber and grey stone with a blue slate roof and a red flag, a big padlocked double door, iron-bound treasure chests, barrels and sacks",
