@@ -3538,6 +3538,8 @@ a.segmented-option {
   margin: 0 auto;
   aspect-ratio: 360 / 400;
   overflow: hidden;
+  /* The corner button's letters count in its width (cqw). */
+  container-type: inline-size;
   border: 1px solid var(--bark-line);
   border-radius: 6px;
   background: #151d12;
@@ -3564,41 +3566,56 @@ a.segmented-option {
   white-space: nowrap;
 }
 
-.camp-level-button {
+/* Small and on two lines, it ends before the middle of the board, where a
+   timer or "w kolejce" stands over the Kowadło, and above the one over the
+   Tartak. On a narrower board (a narrow screen, or a game set larger in
+   zoom.js) its letters shrink with it. */
+a.camp-level-button {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 6px;
+  left: 6px;
   z-index: 2;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  display: block;
   width: auto;
-  max-width: 44%;
-  min-height: 40px;
-  padding: 6px 10px;
+  max-width: calc(50% - 56px);
+  min-height: 0;
+  padding: 4px 7px;
   /* The System's tint on a dark ground: the board does not show through. */
   background: linear-gradient(rgba(143, 227, 239, 0.16), rgba(143, 227, 239, 0.16)), #0f1714;
-  font-size: 13px;
+  font-size: 11px;
+  font-size: clamp(9px, 2.9cqw, 11px);
+  letter-spacing: 0.05em;
   line-height: 1.2;
   text-align: center;
-  text-decoration: none;
 }
 
-/* The camp's growth: its timer hangs under the button, clear of the Kowadło. */
+/* The camp's growth: its time left after "obozu", inside the button. */
 .camp-level-button .camp-plot-timer {
-  top: calc(100% + 4px);
-  left: 0;
+  position: static;
+  display: inline-flex;
+  gap: 0.25em;
+  margin-left: 0.4em;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: inherit;
+  letter-spacing: 0;
   transform: none;
+  vertical-align: bottom;
 }
 
-/* A narrow screen, or a game set larger (zoom.js): the button stays on two
-   lines, clear of the Kowadło. */
-@media (max-width: 340px) {
-  .camp-level-button {
-    padding: 5px 8px;
-    font-size: 11px;
-    letter-spacing: 0.05em;
+.camp-level-button .camp-plot-timer svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* A board narrower than on a phone at the normal size: tighter letters, so
+   the button keeps to two lines. */
+@container (max-width: 340px) {
+  a.camp-level-button {
+    padding: 3px 5px;
+    font-size: clamp(8px, 2.9cqw, 11px);
+    letter-spacing: 0.02em;
   }
 }
 

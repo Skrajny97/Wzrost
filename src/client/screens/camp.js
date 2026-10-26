@@ -231,7 +231,8 @@ function mountBoard(container, backHash) {
   }
 
   // "Rozwiń poziom obozu" in the board's top left corner leads to the
-  // camp's own screen, with the time left while the camp grows.
+  // camp's own screen. It is small, on two lines, and while the camp grows
+  // its time left follows "obozu", so nothing of it hangs over the plots.
   function campLevelButton(running) {
     const hash = `${CAMP}/${campOf().id}`;
     return h(
@@ -242,7 +243,9 @@ function mountBoard(container, backHash) {
         'data-guide': 'camp-level',
         onClick: (event) => openView(event, hash, HISTORY_KEY),
       },
-      'Rozwiń poziom obozu',
+      'Rozwiń poziom',
+      h('br'),
+      'obozu',
       running?.buildingId === campOf().id && timer(running),
     );
   }

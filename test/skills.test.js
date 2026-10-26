@@ -134,11 +134,21 @@ describe('skills', () => {
     assert.ok(woke > 0);
   });
 
-  test('a mana shield takes blows for mana', () => {
+  test('a mana shield takes blows for mana, and every blow tells what it can still take', () => {
     const result = fight('osłona', [withSkill('mage', 'mana-shield', { hpShare: 0.55 })], [sturdy('boar', 12, 'e0')]);
     const on = result.events.findIndex((event) => event.kind === 'skill' && event.skill === 'mana-shield');
     assert.ok(on >= 0);
+    assert.ok(result.events[on].shield > 0);
     assert.ok(result.events.slice(on).some((event) => event.target === 'a0' && event.absorbed > 0));
+    assert.ok(result.events.slice(0, on).every((event) => event.shield === undefined));
+    // What is left falls by what a blow took, or a point more, as mana is
+    // paid in whole points.
+    let left = result.events[on].shield;
+    for (const event of result.events.slice(on + 1).filter((candidate) => candidate.target === 'a0' && candidate.shield !== undefined)) {
+      const taken = event.absorbed ?? 0;
+      assert.ok(event.shield <= left - taken && event.shield >= left - taken - 1, `${left} − ${taken} → ${event.shield}`);
+      left = event.shield;
+    }
   });
 
   test('the dance of shadows dodges more and strikes back', () => {

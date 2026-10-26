@@ -41,6 +41,9 @@ function absorb(target, amount) {
   return absorbed;
 }
 
+// What a mana shield can still take: the points of damage its mana pays for.
+const shieldLeft = (unit) => (unit.shield ? Math.floor(unit.mana / unit.shield.cost) : undefined);
+
 function heal(unit, amount) {
   const healed = Math.max(0, Math.min(unit.maxHp - unit.hp, Math.round(amount)));
   unit.hp += healed;
@@ -137,7 +140,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       } else {
         if (skill.kind === 'shield') unit.shield = { cost: skill.params.cost };
         if (skill.kind === 'evade') unit.evade = { hits: skill.params.hits, dodge: skill.params.dodge, counter: skill.params.counter };
-        log(() => ({ ...base, kind: 'skill', hp: unit.hp, text: say(texts, 'skillUse', actions, vars) }));
+        log(() => ({ ...base, kind: 'skill', hp: unit.hp, shield: shieldLeft(unit), text: say(texts, 'skillUse', actions, vars) }));
       }
     }
   };
@@ -152,7 +155,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       damage(unit, amount, dot.source);
       dot.ticks -= 1;
       const vars = { target: unit.name, effect: dot.name, damage: amount };
-      log(() => ({ t, kind: 'tick', target: unit.id, effect: dot.name, element: dot.element, damage: amount, absorbed: absorbed || undefined, hp: unit.hp, text: say(texts, 'effectTick', actions, vars) }));
+      log(() => ({ t, kind: 'tick', target: unit.id, effect: dot.name, element: dot.element, damage: amount, absorbed: absorbed || undefined, shield: shieldLeft(unit), hp: unit.hp, text: say(texts, 'effectTick', actions, vars) }));
       if (unit.hp === 0) log(() => ({ t, kind: 'kill', target: unit.id, hp: 0, text: say(texts, 'kill', actions, vars) }));
       else if (unit.skills.length > 0) wounded(unit, t);
     }
@@ -243,6 +246,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       target: target.id,
       damage: amount,
       absorbed: absorbed || undefined,
+      shield: shieldLeft(target),
       hp: target.hp,
       ...marks,
       text: say(texts, wordsFor(kind, move), actions, { ...vars, damage: amount }) + (absorbed ? ` ${say(texts, 'absorbed', actions, { absorbed })}` : ''),

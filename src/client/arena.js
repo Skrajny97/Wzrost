@@ -19,6 +19,8 @@ const FIELDS = [
   ['back', 'tył'],
 ];
 const RESULTS = { true: 'Zwycięstwo', false: 'Porażka', null: 'Odwrót' };
+// The events of a unit's own move, as its actor (a counter is not one).
+const MOVES = new Set(['hit', 'crit', 'dodge']);
 const SPEED_KEY = 'wzrost.fight-speed';
 const HIT_COLOR = 'rgba(239, 154, 133, 0.95)';
 
@@ -309,9 +311,48 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     log.replaceChildren(...shown);
   }
 
+  // A pin or a slow lasts until its unit moves again: its next blow, or the
+  // tick of an effect that opens its move. Then its card shows again what it
+  // showed before.
+  const held = new Map(); // unit id → { text, before }
+  function hold(id, text) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    held.set(id, { text, before: held.get(id)?.before ?? entry.status.textContent });
+    entry.status.textContent = text;
+  }
+  function release(event) {
+    const id = event.kind === 'tick' ? event.target : MOVES.has(event.kind) && !event.counter ? event.actor : null;
+    const entry = held.get(id);
+    if (!entry) return;
+    held.delete(id);
+    const { status } = cards.get(id);
+    if (status.textContent === entry.text) status.textContent = entry.before;
+  }
+
+  // A mana shield's card shows how much damage it can still take; spent, the
+  // shield goes out.
+  const shields = new Map(); // unit id → the skill's name
+  function shieldUp(event) {
+    shields.set(event.actor, event.skillName);
+    if (event.shield > 0) cards.get(event.actor).status.textContent = `${event.skillName} · ${event.shield}`;
+  }
+  function shieldLeft(id, left) {
+    const entry = cards.get(id);
+    if (!shields.has(id) || !entry || left === undefined) return;
+    if (left > 0) {
+      entry.status.textContent = `${shields.get(id)} · ${left}`;
+      return;
+    }
+    shields.delete(id);
+    entry.status.textContent = '';
+    entry.card.classList.remove('unit--shielded');
+  }
+
   async function show(event) {
     const target = byId.get(event.target);
     const actor = byId.get(event.actor);
+    release(event);
     const line = () => {
       log.append(logLine(event));
       log.scrollTop = log.scrollHeight;
@@ -320,6 +361,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (event.kind === 'skill') {
       // A skill wakes: a sweep's wave over the foes, or an aura on its user.
       if (!event.targets) skills.status(event.actor, event.skillName);
+      if (event.shield !== undefined) shieldUp(event);
       await skills.cast(event);
       line();
       return;
@@ -330,7 +372,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       return;
     }
     if (event.kind === 'stun') {
-      skills.status(event.target, 'przyszpilony');
+      hold(event.target, 'przyszpilony');
       float(event.target, 'traci ruch', 'effect');
       line();
       await flash(event.target, '#c49a6c', 'rgba(196, 154, 108, 0.3)');
@@ -338,7 +380,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     }
     if (event.kind === 'slow') {
       for (const id of event.targets) {
-        skills.status(id, 'spowolniony');
+        hold(id, 'spowolniony');
         flash(id, '#8fd3ff', 'rgba(143, 211, 255, 0.25)');
       }
       line();
@@ -372,6 +414,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
         if (look && !event.sweep) skills.impact(event);
         float(target.id, strong ? `−${event.damage}!` : `−${event.damage}`, strong ? 'crit' : 'hit');
         if (event.absorbed) float(target.id, `osłona ${event.absorbed}`, 'absorb');
+        shieldLeft(target.id, event.shield);
         line();
       });
       return;
@@ -407,6 +450,8 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       playSound('tick');
       setHp(target.id, event.hp);
       float(target.id, `−${event.damage}`, 'tick');
+      if (event.absorbed) float(target.id, `osłona ${event.absorbed}`, 'absorb');
+      shieldLeft(target.id, event.shield);
       line();
       await flash(target.id, color, 'rgba(156, 204, 101, 0.3)');
       return;
@@ -434,13 +479,16 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
 
   // The state right after an event, without animation (for "Pomiń").
   function applyQuietly(event) {
+    release(event);
     if (event.hp !== undefined && byId.has(event.target)) setHp(event.target, event.hp);
     if (event.kind === 'effect') cards.get(event.target).status.textContent = event.effect;
     if (event.kind === 'kill') setDown(event.target, true);
     if (event.kind === 'skill' && !event.targets) cards.get(event.actor).status.textContent = event.skillName;
     if (event.kind === 'skill' && event.skill === 'mana-shield') cards.get(event.actor).card.classList.add('unit--shielded');
-    if (event.kind === 'stun') cards.get(event.target).status.textContent = 'przyszpilony';
-    if (event.kind === 'slow') for (const id of event.targets) cards.get(id).status.textContent = 'spowolniony';
+    if (event.kind === 'skill' && event.shield !== undefined) shieldUp(event);
+    if (event.kind === 'hit' || event.kind === 'crit' || event.kind === 'tick') shieldLeft(event.target, event.shield);
+    if (event.kind === 'stun') hold(event.target, 'przyszpilony');
+    if (event.kind === 'slow') for (const id of event.targets) hold(id, 'spowolniony');
     log.append(logLine(event));
   }
 
@@ -454,6 +502,8 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
 
   function reset() {
     cancelAll();
+    held.clear();
+    shields.clear();
     index = 0;
     log.replaceChildren();
     banner.classList.remove('arena-banner--shown');

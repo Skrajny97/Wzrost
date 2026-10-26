@@ -1165,7 +1165,7 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - Rozwój trwa 4, 8, 12, 18, 24, 36, 48, 60 i 72 godziny. Razem to 282 godziny, prawie 12 dni.
     - Każdy poziom ponad pierwszy przyspiesza budowy pozostałych budynków o 10%: ich czas dzieli się przez 1 + 0,1 × (poziom obozu − 1). Na poziomie 10 budowy trwają 1,9 raza krócej. Sam obóz rośnie we własnym tempie.
     - Rozwój obozu zajmuje jedyne miejsce budowy, jak każda budowa, a „Przewiń” Punktami Czasu działa tak samo. *Obok budowy w toku mogą teraz czekać dwie kolejne: zob. „Kolejka budów w obozie”.*
-    - Przycisk otwiera ekran obozu (`#/oboz/camp`) z następnym poziomem, kosztem i czasem rozwoju. Gdy obóz rośnie, licznik wisi pod przyciskiem, a na wąskim widoku napis jest mniejszy, żeby nie zasłaniać Kowadła.
+    - Przycisk otwiera ekran obozu (`#/oboz/camp`) z następnym poziomem, kosztem i czasem rozwoju. Gdy obóz rośnie, licznik wisi pod przyciskiem, a na wąskim widoku napis jest mniejszy, żeby nie zasłaniać Kowadła. *Przycisk jest teraz mniejszy, a licznik stoi w nim: zob. „Mniejszy przycisk obozu, przyszpilenie i liczba osłony many”.*
     - Gdy brakuje złota, przycisk mówi „Brakuje złota”, bez „zasobów”.
     - Na poziomie 10 ekran obozu mówi: „Na najwyższym poziomie obóz będzie mógł stać się Wioską. Wioska przyjdzie później.”
 2. **Pytanie przed wprowadzeniem.** Pierwszy pergamin pyta słowami autora: „Czy chcesz przejść Wprowadzenie? Pomoże ono zaznajomić Ci się z Systemem, ale jeśli z niego zrezygnujesz – nie stracisz żadnych uzyskanych w Samouczku zasobów.” Myślnik autora stał się półpauzą, jak w innych kwestiach narratora.
@@ -1377,3 +1377,16 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
     - Skrzynia dalej otwiera się osobnym stuknięciem, bo tygodniowa ma przedmiot i potrzebuje miejsca w plecaku.
 2. **Dziennik w ustawieniach** (autor). Dziennik jest teraz na samej górze ustawień, pod zębatką, więc da się do niego przejść z każdego ekranu. W dolnym pasku głównych ekranów też został. Na ekranach postaci (wyposażenie, Statystyki, Umiejętności, Rdzeń) dolny pasek ma swoje zakładki, więc tam Dziennika nie było widać.
 3. **Próg Umiejętności.** Zablokowane Umiejętności pisały „na poziomie klasy undefined”, bo serwer wysyłał z `data/unlocks.json` tylko progi poziomu postaci. Teraz wysyła też progi poziomu klasy. Ekran pisze „Umiejętności odblokujesz na poziomie klasy 10.”, a zakładka w pasku postaci ma dopisek „poz. kl. 10”.
+
+## Mniejszy przycisk obozu, przyszpilenie i liczba osłony many (26.10.2026)
+
+1. **„Rozwiń poziom obozu”** (autor). Przycisk w lewym górnym rogu planszy zasłaniał napis „w kolejce” nad Kowadłem, więc jest mniejszy.
+    - Napis ma dwa wiersze, „Rozwiń poziom” i „obozu”, mniejsze litery i kończy się przed środkiem planszy. Tam nad Kowadłem stoi jego licznik albo „w kolejce”.
+    - Gdy obóz rośnie, licznik stoi w przycisku zaraz po „obozu”, a nie pod nim. Pod przyciskiem stoi bowiem napis budowy Tartaku.
+    - Na węższej planszy, czyli na wąskim telefonie albo przy powiększonym widoku, litery maleją razem z planszą. Od planszy szerokiej na 288 px, czyli od telefonu szerokości 320 px, przycisk nie zasłania żadnego napisu. Węższa plansza zdarza się dopiero przy powiększonym widoku na wąskim telefonie, np. 125% na telefonie szerokości 360 px.
+    - Wprowadzenie wskazuje nowy przycisk tak jak stary: kamera podjeżdża bliżej, a złota obwódka obejmuje przycisk, z pergaminem pod nim.
+2. **„przyszpilony” znika** (autor). Napis na karcie wroga stawał po Przyszpileniu i już nie znikał. Teraz trwa do najbliższego ruchu tego wroga, bo tyle trwa przyszpilenie. Potem karta pokazuje to, co miała wcześniej. Tak samo działa „spowolniony” po Mroźnym podmuchu.
+3. **Liczba osłony many** (autor). W walce karta maga z osłoną pokazuje, ile obrażeń osłona jeszcze przyjmie, np. „Osłona many · 24”.
+    - Liczba maleje z każdym pochłoniętym ciosem. Gdy dojdzie do zera, napis i niebieska poświata znikają.
+    - To mana, która została, podzielona przez koszt punktu obrażeń, w dół do całości. Silnik zapisuje tę liczbę w zdarzeniach walki (`shield`), więc widać ją też w podglądzie autora i w powtórce.
+    - Raporty sprzed tej zmiany nie mają tej liczby, więc karta pokazuje w nich samą nazwę osłony.
