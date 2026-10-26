@@ -42,7 +42,11 @@
     // Cloud Console; a sign-in started elsewhere moves to the first one.
     // The Google client id and secret are Worker secrets, set by the deploy
     // workflow from the GitHub secrets.
-    "GOOGLE_HOSTS": "insightrpg.com,www.insightrpg.com"
+    "GOOGLE_HOSTS": "insightrpg.com,www.insightrpg.com",
+    // "on" shows the professions (Profesje). They stay hidden in the live game
+    // until all of the first three are ready; `npm run dev` and the test
+    // version turn them on.
+    "PROFESSIONS": "off"
   },
   // Every minute the server sends the phone notifications whose time has
   // come (src/server/push.js).
@@ -51,5 +55,36 @@
   },
   "observability": {
     "enabled": true
+  },
+  "env": {
+    // The test version at test.insightrpg.com: its own Worker and its own D1
+    // database, deployed from the working branches (not main), so new parts of
+    // the game can be tried on a phone before they reach the live game. The
+    // database ID is filled in by the deploy workflow, as above.
+    "test": {
+      "name": "wzrost-test",
+      "workers_dev": true,
+      "routes": [{ "pattern": "test.insightrpg.com", "custom_domain": true }],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "wzrost-test",
+          "database_id": "00000000-0000-0000-0000-000000000000",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "vars": {
+        "APP_VERSION": "dev",
+        "TEST_MODE": "on",
+        "TEST_LOGINS": "Skrajny",
+        // No author's panel and no Google sign-in on the test version.
+        "AUTHOR_LOGINS": "",
+        "GOOGLE_HOSTS": "",
+        "PROFESSIONS": "on"
+      },
+      "triggers": {
+        "crons": ["* * * * *"]
+      }
+    }
   }
 }

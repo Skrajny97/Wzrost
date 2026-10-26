@@ -2,6 +2,8 @@
 // Makes sure the Cloudflare account has a workers.dev subdomain and the D1
 // database exists, then writes the database ID into wrangler.jsonc. The file
 // is changed only in the CI checkout; the repository keeps the placeholder.
+// Without an argument it prepares the live game's database; the test version
+// names its own: node tools/prepare-cloudflare.mjs wzrost-test
 
 import { readFileSync, writeFileSync } from 'node:fs';
 
@@ -91,14 +93,18 @@ if (!/^[0-9a-f]{32}$/i.test(accountId)) {
 if (/\s/.test(token)) fail('Sekret CLOUDFLARE_API_TOKEN zawiera spacje lub złamania wiersza. Wklej token ponownie.');
 
 const config = readFileSync(CONFIG_FILE, 'utf8');
-const name = config.match(/"database_name":\s*"([^"]+)"/)?.[1];
+const name = process.argv[2] ?? config.match(/"database_name":\s*"([^"]+)"/)?.[1];
 if (!name) fail(`Nie znaleziono database_name w ${CONFIG_FILE}.`);
+// The database's own entry: its name, then the first database_id after it.
+const entry = new RegExp(`("database_name":\\s*"${name.replace(/[^a-z0-9]/gi, '\\$&')}"[\\s\\S]*?"database_id":\\s*")([0-9a-f-]{36})"`);
+const current = config.match(entry)?.[2];
+if (!current) fail(`Nie znaleziono bazy „${name}” z database_id w ${CONFIG_FILE}.`);
 
 await ensureSubdomain();
 const databaseId = await ensureDatabase(name);
 
-if (config.includes(PLACEHOLDER_ID)) {
-  writeFileSync(CONFIG_FILE, config.replace(PLACEHOLDER_ID, databaseId));
-} else if (!config.includes(databaseId)) {
+if (current === PLACEHOLDER_ID) {
+  writeFileSync(CONFIG_FILE, config.replace(entry, `$1${databaseId}"`));
+} else if (current !== databaseId) {
   fail(`${CONFIG_FILE} wskazuje inną bazę D1 niż „${name}” w Cloudflare (${databaseId}).`);
 }

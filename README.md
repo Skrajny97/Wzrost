@@ -81,7 +81,11 @@ Każdy push do `main` uruchamia workflow „Testy i wdrożenie” (`.github/work
 5. Wdrożenie Workera razem z plikami strony i kluczami logowania Google, jeśli są w sekretach repozytorium.
 6. Sprawdzenie, czy nowa wersja odpowiada (`tools/smoke-test.mjs`).
 
-Push na inną gałąź uruchamia tylko testy.
+Push na inną gałąź (poza `art-drafts`) uruchamia testy i wdraża **wersję testową**.
+
+## Wersja testowa
+
+**https://test.insightrpg.com** (zapasowo `wzrost-test` w domenie workers.dev) to ta sama gra z gałęzi roboczej, zanim trafi do `main`. Ma własnego Workera i własną bazę D1 `wzrost-test` (środowisko `test` w `wrangler.jsonc`), więc nic tam nie dotyka gry na insightrpg.com ani jej graczy. Konto zakłada się tam osobno, tylko z hasłem: wersja testowa nie ma logowania Google ani Panelu autora. Konto o loginie z `TEST_LOGINS` ma tam tryb testowy. Nowe części gry są tam włączone wcześniej, np. profesje (`PROFESSIONS` = `"on"`), a w grze na insightrpg.com czekają ukryte, aż będą gotowe.
 
 ## Struktura repozytorium
 
