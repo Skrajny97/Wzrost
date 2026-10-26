@@ -81,6 +81,7 @@
     "eliteLevelBonus": 1,
     "championChancePerFight": 0.003,
     "championLevelBonus": 2,
+    "questTrackBonus": 0.5,
     "recoveryAfterFight": 0.3,
     "soloXpBonus": 0.1,
     "lowLevelFreeDiff": 2,

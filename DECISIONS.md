@@ -1712,3 +1712,14 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
     - przyrostki: Wilka, Krzyżaka, Jelenia, Kuny, Szerszeni (Rój szerszeni), Płanetnika, Odyńca, Kamiennika, Gacka, Puchacza, Wadery i Bazyliszka.
     - Basior, Błędnica, Licho, Rój szerszeni, Płanetnik, Odyniec, Gacek i Wadera nazywają tylko przyrostki, bo przymiotnik od nich brzmiałby sztucznie.
 3. **Najmniej przedrostków jest w Uroczysku**: w Omszałych Głazach i Pajęczym Parowie tylko Rysi, Pajęczy i Kamienny, a w Wilczych Kręgach Rysi, Kamienny i Puchaczowy. Żyją tam głównie stwory, od których nie ma dobrego przymiotnika.
+
+## Tropienie stworów z zadań i panel autora (26.10.2026)
+
+1. **„Trop przede wszystkim stwory z zadań”** (autor: „Pod »Czyhające niebezpieczeństwa« powinniśmy dodać opcję nową do zadań »Trop przede wszystkim stwory z zadań«, co powinno zwiększać szansę na trafienie w wyprawie stworów z zadań dziennych/tygodniowych o 50%”).
+    - Pole do zaznaczenia stoi na karcie regionu wewnętrznego, pod przyciskiem „Czyhające niebezpieczeństwa”. Przy pierwszej wyprawie go nie ma, tak jak pola „Unikaj elit i czempionów”.
+    - Zaznaczone pole sprawia, że spotkania ze stworem z niedokończonego zadania zabijania (dziennego albo tygodniowego) mają o połowę większą wagę (`questTrackBonus` 0,5 w `data/balance.json`), także spotkania wymagające. Na Skraju Wiatrołomów, przy zadaniu na lisa, walka z lisem wypada na 5. poziomie w ok. 31% walk zamiast 23%. Elita i czempion trafiają się jak dotąd, bo zadania nigdy o nie nie proszą.
+    - Liczą się stwory z zadań w chwili wyruszenia. Serwer zapisuje je z wyprawą (`activities.tracked`, migracja 0026), bo raport powstaje z ziarna dopiero przy odbiorze. Numer 0025 ma migracja profesji z gałęzi roboczej.
+    - Gdy w tym miejscu nie żyje żaden stwór z zadań, pod polem stoi dopisek „Żaden stwór z Twoich zadań nie żyje w tym miejscu.”, a wyprawa idzie jak zwykle.
+    - Wybór zostaje na telefonie (`localStorage`), także dla „Wyrusz ponownie”. Karta trwającej wyprawy mówi „Postać tropi stwory z zadań.”
+    - Poziom zagrożenia liczy walki jak bez tropienia, bo mieszanka spotkań zmienia się niewiele.
+2. **Podgląd umiejętności w Panelu autora pod przyciskiem** (autor: „schowaj pod osobnym przyciskiem, bo muszę specjalnie scrollować, by sprawdzić aktualne konta i postaci”). Na górze panelu jest przycisk „Podgląd umiejętności”, a zaraz pod nim liczby i konta. Lista umiejętności wczytuje się dopiero przy pierwszym otwarciu.

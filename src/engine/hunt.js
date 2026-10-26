@@ -13,7 +13,8 @@
 // retreat). The champion, the strongest creature of a region, waits in one
 // inner region: it almost always leaves its material, the rarest of the
 // region, and sometimes a chest with an epic or rarer item. A character sent
-// out to avoid them (avoidRare) meets neither the elite nor the champion.
+// out to avoid them (avoidRare) meets neither the elite nor the champion, and
+// one tracking the creatures of its quests (tracked) meets them more often.
 
 import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
@@ -65,15 +66,21 @@ export function explorationPace(minutes, content) {
 }
 
 // The champion is drawn only where it lives, so other places keep their draws.
-export function rollEncounter(area, rng, content, characterLevel, pace) {
+export function rollEncounter(area, rng, content, characterLevel, pace, tracked = []) {
   if (area.champion && rng.chance(pace.championChance)) return championEncounter(area, content);
   if (rng.chance(pace.eliteChance)) return eliteEncounter(area, content);
+  const weight = encounterWeight(tracked, content);
   const tough = toughEncountersFor(area, characterLevel);
   if (tough.length > 0 && rng.chance(pace.toughChance)) {
-    return regularEncounter(rng.weighted(tough), area, rng, content, { tough: true, characterLevel });
+    return regularEncounter(rng.weighted(tough, weight), area, rng, content, { tough: true, characterLevel });
   }
-  return regularEncounter(rng.weighted(encountersFor(area, characterLevel)), area, rng, content, { characterLevel });
+  return regularEncounter(rng.weighted(encountersFor(area, characterLevel), weight), area, rng, content, { characterLevel });
 }
+
+// An encounter's weight: by half more (questTrackBonus) with a creature the
+// character tracks for its quests ("Trop przede wszystkim stwory z zadań").
+const encounterWeight = (tracked, content) => (encounter) =>
+  encounter.weight * (encounter.monsters.some((id) => tracked.includes(id)) ? 1 + content.balance.hunt.questTrackBonus : 1);
 
 // The inner region for an id. Activities and reports from before inner regions
 // name a whole region: they get its inner region for the character's level.
@@ -185,7 +192,7 @@ export function resourceBundle(area, total) {
 // `first`: the character's very first exploration, which goes one way:
 // regular encounters only, no chests among the finds, and the one treasure
 // is a plain weapon of its class after the first won fight.
-export function simulateHunt({ character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false }, content) {
+export function simulateHunt({ character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, tracked = [] }, content) {
   const rng = createRng(seed);
   const tuning = content.balance.hunt;
   const rewards = content.balance.rewards;
@@ -277,7 +284,7 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
       continue;
     }
 
-    const encounter = rollEncounter(area, rng, content, character.level, pace);
+    const encounter = rollEncounter(area, rng, content, character.level, pace, tracked);
     const enemies = encounterCombatants(encounter, content);
     const ally = { ...player, hp: hpNow };
     const fight = simulateFight({ allies: [ally], enemies, rng, content, record: true });

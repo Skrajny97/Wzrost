@@ -11,7 +11,22 @@ import { leaveView as leaveHistoryView, openView as openHistoryView } from '../h
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, timeFormat } from '../format.js';
 import { preloadReportMusic } from '../music.js';
-import { activityFinished, avoidRareOn, call, currentHp, isUnlocked, reportCache, restRate, serverNow, setAvoidRare, state, testModeOn, unlockInfo } from '../state.js';
+import {
+  activityFinished,
+  avoidRareOn,
+  call,
+  currentHp,
+  isUnlocked,
+  reportCache,
+  restRate,
+  serverNow,
+  setAvoidRare,
+  setTrackQuests,
+  state,
+  testModeOn,
+  trackQuestsOn,
+  unlockInfo,
+} from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
 
@@ -309,6 +324,7 @@ export function mountCombat(container, { params, navigate }) {
         countdown,
         h('div', { class: 'bar bar--system' }, progress),
         ...(activity.avoidRare ? [h('p', { class: 'system-hint', text: 'Postać omija elity i czempionów.' })] : []),
+        ...(activity.tracksQuests ? [h('p', { class: 'system-hint', text: 'Postać tropi stwory z zadań.' })] : []),
         h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
       ),
       skipper.element,
@@ -436,6 +452,35 @@ export function mountCombat(container, { params, navigate }) {
       },
     });
     const avoid = !first && h('label', { class: 'avoid-rare', for: 'avoid-rare' }, avoidBox, h('span', { text: 'Unikaj elit i czempionów' }));
+    // The box under the dangers sends the character mostly after the
+    // creatures its quests still ask for; a note says when none lives here.
+    const tracking = () => !first && trackQuestsOn();
+    const wanted = new Set(
+      Object.values(character.quests ?? {}).flatMap((period) => period.quests.filter((quest) => quest.kind === 'kill' && !quest.done).map((quest) => quest.monsterId)),
+    );
+    const trackNone = h('p', { class: 'muted track-quests-note', text: 'Żaden stwór z Twoich zadań nie żyje w tym miejscu.' });
+    const showTrackNote = () => {
+      trackNone.hidden = !trackQuestsOn() || (area.dangers ?? []).some((danger) => wanted.has(danger.monsterId));
+    };
+    const trackBox = h('input', {
+      type: 'checkbox',
+      id: 'track-quests',
+      class: 'avoid-rare-box',
+      checked: trackQuestsOn(),
+      onChange: () => {
+        setTrackQuests(trackBox.checked);
+        showTrackNote();
+      },
+    });
+    showTrackNote();
+    const track =
+      !first &&
+      h(
+        'div',
+        { class: 'track-quests' },
+        h('label', { class: 'avoid-rare', for: 'track-quests' }, trackBox, h('span', { text: 'Trop przede wszystkim stwory z zadań' })),
+        trackNone,
+      );
     showThreat = () => {
       const known = options[area.id];
       const ratings = known && known.build === buildKey(state.character) ? (avoiding() ? known.threatAvoiding : known.threat) : undefined;
@@ -512,7 +557,7 @@ export function mountCombat(container, { params, navigate }) {
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           remember();
-          await call('POST', '/api/hunts', { areaId: area.id, minutes, avoidRare: avoiding() });
+          await call('POST', '/api/hunts', { areaId: area.id, minutes, avoidRare: avoiding(), trackQuests: tracking() });
           leaveView(HOME, 2);
         }),
     });
@@ -551,6 +596,7 @@ export function mountCombat(container, { params, navigate }) {
             h('span', { text: 'Czyhające niebezpieczeństwa' }),
             icon('chevron', { size: 18 }),
           ),
+        track,
         levelNote,
         durations,
         avoid,

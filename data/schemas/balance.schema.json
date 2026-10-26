@@ -337,6 +337,7 @@
         "eliteLevelBonus",
         "championChancePerFight",
         "championLevelBonus",
+        "questTrackBonus",
         "recoveryAfterFight",
         "soloXpBonus",
         "lowLevelFreeDiff",
@@ -438,6 +439,11 @@
           "type": "number",
           "minimum": 0,
           "description": "Szansa na czempiona w walce trwającej minutesPerFightReference minut, tylko w regionie wewnętrznym, który ma czempiona (regions.json: champion). Jak przy elicie rośnie z czasem, który walka zajmuje."
+        },
+        "questTrackBonus": {
+          "type": "number",
+          "minimum": 0,
+          "description": "O ile rośnie waga spotkania, w którym jest stwór z niedokończonego zadania, gdy postać tropi stwory z zadań („Trop przede wszystkim stwory z zadań”): 0,5 to o połowę."
         },
         "championLevelBonus": {
           "type": "number",

@@ -598,6 +598,8 @@ export function characterView(player, now) {
       startedAt: activity.started_at,
       endsAt: activity.ends_at,
       avoidRare: activity.avoid_rare === 1,
+      // The creatures the exploration tracks for the quests (hunts.js).
+      tracksQuests: activity.tracked !== null && activity.tracked !== undefined,
       finished: activity.ends_at <= now,
     },
     serverTime: now,

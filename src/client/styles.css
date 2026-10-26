@@ -2794,6 +2794,13 @@ img.area-art {
   accent-color: var(--system);
 }
 
+/* "Trop przede wszystkim stwory z zadań" under the dangers, with a note when
+   none of the quests' creatures lives in the place. */
+.track-quests-note {
+  margin: 0 0 4px 32px;
+  font-size: 13px;
+}
+
 .threat {
   margin: 0;
   font-family: var(--font-system);

@@ -21,6 +21,7 @@ import {
   longestHunt,
   lowerThreat,
   nextHuntUnlock,
+  questCreatures,
   sellPrice,
   simulateHunt,
   threatSamples,
@@ -105,9 +106,10 @@ export async function startHunt(context) {
 }
 
 // An exploration of `minutes` in an inner region, from now on, avoiding the
-// elite and the champion when asked (avoidRare). The skipped introduction
-// sends the first one this way too (tutorial.js).
-export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false } = {}, now) {
+// elite and the champion when asked (avoidRare), and tracking the creatures
+// the quests ask for (trackQuests): those living there are kept with it. The
+// skipped introduction sends the first one this way too (tutorial.js).
+export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false, trackQuests = false } = {}, now) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
   const area = typeof id === 'string' ? areaFor(id, player.row.level, content) : undefined;
@@ -117,6 +119,7 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
     throw new ApiError(400, 'invalid_duration', 'Wybierz czas wyprawy.');
   }
   if (typeof avoidRare !== 'boolean') throw new ApiError(400, 'invalid_avoid', 'Zaznacz albo odznacz omijanie elit i czempionów.');
+  if (typeof trackQuests !== 'boolean') throw new ApiError(400, 'invalid_track', 'Zaznacz albo odznacz tropienie stworów z zadań.');
   if (!huntDurations(player.row.level, content).includes(minutes)) {
     const longest = longestHunt(player.row.level, content);
     const next = nextHuntUnlock(player.row.level, content);
@@ -129,13 +132,14 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
 
   const { hp } = currentHp(player, now);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
+  const tracked = trackQuests ? questCreatures(questsNow(player, now), area) : [];
   try {
     await db.batch([
       db
         .prepare(
-          'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, avoid_rare) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, avoid_rare, tracked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         )
-        .bind(player.row.id, 'hunt', area.id, minutes, now, now + minutes * 60000, seed, hp, avoidRare ? 1 : 0),
+        .bind(player.row.id, 'hunt', area.id, minutes, now, now + minutes * 60000, seed, hp, avoidRare ? 1 : 0, tracked.length > 0 ? JSON.stringify(tracked) : null),
       // The HP rested so far is saved now, so it is not counted again later.
       db.prepare('UPDATE characters SET hp = ?, hp_at = ?, version = version + 1 WHERE id = ?').bind(hp, now, player.row.id),
     ]);
@@ -196,6 +200,7 @@ export async function finishHunt(db, player, now) {
       seed: activity.seed,
       first,
       avoidRare: activity.avoid_rare === 1,
+      tracked: JSON.parse(activity.tracked ?? '[]'),
     },
     content,
   );

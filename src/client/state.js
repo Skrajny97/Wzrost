@@ -156,6 +156,31 @@ export function setAvoidRare(value) {
   }
 }
 
+// Whether explorations track the creatures of the narrator's quests (the box
+// under "Czyhające niebezpieczeństwa", and "Wyrusz ponownie"); kept in this
+// browser.
+const TRACK_KEY = 'wzrost.track-quests';
+let trackQuests = readTrackQuests();
+
+function readTrackQuests() {
+  try {
+    return localStorage.getItem(TRACK_KEY) === 'on';
+  } catch {
+    return false;
+  }
+}
+
+export const trackQuestsOn = () => trackQuests;
+
+export function setTrackQuests(value) {
+  trackQuests = value;
+  try {
+    localStorage.setItem(TRACK_KEY, value ? 'on' : 'off');
+  } catch {
+    // Without storage the choice lasts until the page is closed.
+  }
+}
+
 // Test mode ("Pomiń czas" and other test tools) can be turned off in the
 // settings while the server allows it; the choice is kept in this browser.
 const TEST_MODE_KEY = 'wzrost.test-mode';

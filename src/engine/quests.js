@@ -207,6 +207,16 @@ export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 
 
 export const questDone = (quest) => quest.progress >= quest.count;
 
+// The creatures an exploration of an area tracks for the quests ("Trop
+// przede wszystkim stwory z zadań"): those the kill quests of both periods
+// still ask for and that the area's encounters bring (rollEncounter weighs
+// them more).
+export function questCreatures(quests, area) {
+  const living = new Set([...area.encounters, ...area.tough].flatMap((encounter) => encounter.monsters));
+  const wanted = Object.values(quests).flatMap((period) => period.quests.filter((quest) => quest.kind === 'kill' && !questDone(quest)));
+  return [...new Set(wanted.map((quest) => quest.target))].filter((id) => living.has(id));
+}
+
 // A period's chest opens once all its quests are done, their rewards
 // claimed or not.
 export const chestReady = (period) => period.quests.length > 0 && period.quests.every(questDone);
