@@ -10,7 +10,7 @@ import {
   fireDay,
   fireTrade,
   fireTradeBlock,
-  fireTradesMade,
+  fireUnitsMade,
   partPrice,
   shopBlock,
   shopLevelFor,
@@ -1107,38 +1107,41 @@ describe('camp', () => {
     assert.deepEqual(bagOverflow(bag, 3, 'warrior', content), []);
   });
 
-  test("the Ognisko's fire spirit: cheaper pieces and more trades with each level, counted anew each Polish day", () => {
+  test("the Ognisko's fire spirit: cheaper pieces and more of them a day with each level, counted anew each Polish day", () => {
     assert.equal(fireTrade(0, content), null);
-    assert.deepEqual(fireTrade(1, content), { amount: 50, gold: 500, unitGold: 10, perDay: 4, resources: ['wood', 'stone', 'iron-ore'] });
-    // A trade stays up to 50 pieces; a piece costs 1 gold less every 2 levels.
-    assert.deepEqual([2, 3, 4, 5, 9, 10].map((level) => [fireTrade(level, content).amount, fireTrade(level, content).unitGold, fireTrade(level, content).perDay]), [
-      [50, 9, 4],
-      [50, 9, 5],
-      [50, 8, 5],
-      [50, 8, 6],
-      [50, 6, 8],
-      [50, 5, 8],
+    assert.deepEqual(fireTrade(1, content), { unitGold: 10, perDay: 200, resources: ['wood', 'stone', 'iron-ore'] });
+    // A piece costs 1 gold less every 2 levels, and a day takes 50 more
+    // pieces every 2 levels.
+    assert.deepEqual([2, 3, 4, 5, 9, 10].map((level) => [fireTrade(level, content).unitGold, fireTrade(level, content).perDay]), [
+      [9, 200],
+      [9, 250],
+      [8, 250],
+      [8, 300],
+      [6, 400],
+      [5, 400],
     ]);
     // 23:30 and 0:30 in Warsaw (an hour ahead of UTC in winter) are two days.
     const late = Date.UTC(2026, 10, 3, 22, 30);
     assert.deepEqual([fireDay(late, content), fireDay(late + 3600000, content)], ['2026-11-03', '2026-11-04']);
-    const kept = { day: fireDay(late, content), count: 3 };
-    assert.equal(fireTradesMade(kept, late, content), 3);
-    assert.equal(fireTradesMade(kept, late + 3600000, content), 0);
-    const block = (changes) => fireTradeBlock({ level: 1, gold: 500, made: 3, resource: 'wood', ...changes }, content)?.code ?? null;
+    const kept = { day: fireDay(late, content), units: 150 };
+    assert.equal(fireUnitsMade(kept, late, content), 150);
+    assert.equal(fireUnitsMade(kept, late + 3600000, content), 0);
+    // 150 of 200 pieces traded today: 50 are left, in one trade or many.
+    const block = (changes) => fireTradeBlock({ level: 1, gold: 500, made: 150, resource: 'wood', amount: 50, ...changes }, content)?.code ?? null;
     assert.equal(block({}), null);
-    assert.equal(block({ made: 4 }), 'no_trades');
+    assert.equal(block({ amount: 1 }), null);
+    assert.equal(block({ amount: 51 }), 'invalid_amount');
+    assert.equal(block({ made: 200 }), 'no_trades');
+    assert.equal(block({ made: 200, amount: 1 }), 'no_trades');
     assert.equal(block({ gold: 499 }), 'not_enough');
-    assert.equal(block({ resource: 'gold' }), 'invalid_resource');
-    assert.equal(block({ level: 0 }), 'not_built');
-    // The slider: from 1 piece to a full trade, for 10 gold a piece.
     assert.equal(block({ amount: 3, gold: 30 }), null);
     assert.equal(block({ amount: 3, gold: 29 }), 'not_enough');
-    assert.deepEqual([0, 51, 2.5, '3'].map((amount) => block({ amount })), ['invalid_amount', 'invalid_amount', 'invalid_amount', 'invalid_amount']);
+    assert.equal(block({ resource: 'gold' }), 'invalid_resource');
+    assert.equal(block({ level: 0 }), 'not_built');
+    assert.deepEqual([undefined, 0, 2.5, '3'].map((amount) => block({ amount })), ['invalid_amount', 'invalid_amount', 'invalid_amount', 'invalid_amount']);
     // At level 10 a piece costs 5 gold.
     assert.equal(fireTradeBlock({ level: 10, gold: 15, made: 0, resource: 'stone', amount: 3 }, content), null);
     assert.equal(fireTradeBlock({ level: 10, gold: 14, made: 0, resource: 'stone', amount: 3 }, content).code, 'not_enough');
-    assert.equal(block({ amount: 1, made: 4 }), 'no_trades');
   });
 
   test("the Skup złomu's dealer: rarer parts and lower prices with each level", () => {

@@ -20,7 +20,7 @@ import {
   currentQuests,
   effectText,
   fireTrade,
-  fireTradesMade,
+  fireUnitsMade,
   freePoints,
   gainedTimePoints,
   hoursToNext,
@@ -376,19 +376,16 @@ function campView(player, levels, now) {
   };
 }
 
-// The fire spirit's trade at the Ognisko's level: what a trade gives and
-// costs, the trades left today, and the price and the trades of the next
-// level.
+// The fire spirit's trade at the Ognisko's level: the price of a piece,
+// the pieces a day and those left today, and the same at the next level.
 function fireView(building, level, row, now) {
   const trade = fireTrade(level, content);
-  const made = fireTradesMade({ day: row.fire_day, count: row.fire_trades }, now, content);
+  const made = fireUnitsMade({ day: row.fire_day, units: row.fire_units }, now, content);
   const next = level < building.maxLevel ? fireTrade(level + 1, content) : null;
   return {
     title: building.trade.title,
     text: building.trade.text,
     resources: trade.resources,
-    amount: trade.amount,
-    gold: trade.gold,
     unitGold: trade.unitGold,
     perDay: trade.perDay,
     left: Math.max(0, trade.perDay - made),

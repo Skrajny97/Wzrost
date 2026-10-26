@@ -5608,21 +5608,17 @@ button.skill-row {
   display: none;
 }
 
-/* The fire spirit's slider: how many pieces, and their price beside it. */
+/* The fire spirit's slider: how many pieces and their price above it. */
 .fire-trade-pick {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 12px;
+  margin: 0;
+  text-align: center;
 }
 
 .fire-trade-amount {
-  min-width: 9.5em;
   color: var(--gold);
   font-family: var(--font-system);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
-  text-align: right;
 }
 
 /* E-mail confirmation (email.js): the invitation on a parchment and the
