@@ -584,7 +584,7 @@ Zmiany poniżej wynikają z kolejnych wiadomości autora. Najważniejsze: grę m
 
    Punkt zastępuje czasy pierwszych poziomów z punktu 1 „Nowej skali i eksploracji” i z punktu 1 „Obozu, pierwszej części”.
 9. **Progi drabinki według nowej krzywej.** Poziom 25 przychodzi po ok. 8,7 godziny eksploracji, poziom 35 po ok. 15,4 godziny, a poziom 50 po ok. 31 godzinach. Punkt zastępuje te liczby z punktu 2 „Drabinki eksploracji i lochów”.
-10. **Kilka awansów w jednym wierszu.** Kilka poziomów naraz daje jeden wiersz dla postaci i jeden dla klasy, z sumą punktów, np. „Osiągnięto poziom 4. Wolne punkty statystyk: +24.” Komunikaty o odblokowaniach zostają osobno.
+10. **Kilka awansów w jednym wierszu.** Kilka poziomów naraz daje jeden wiersz dla postaci i jeden dla klasy, z sumą punktów. Komunikaty o odblokowaniach zostają osobno. Od 26.10.2026 każdy zysk ma osobny wiersz, np. „Osiągnięto poziom: 4” i „Zdobyto wolne punkty statystyk: +24” (punkt 4 „Awans odnawia HP i manę”).
 11. **Ewolucje klas.** Autor zaproponował pierwszą ewolucję na poziomie klasy 50, a kolejne co 100 poziomów, chyba że jest lepszy pomysł. Ewolucje są na poziomach klasy 50, 100, 200, 300, 400 i 500 (`classEvolutionLevels` w `data/balance.json`):
     - druga przychodzi po ok. 100 godzinach eksploracji, a nie po ok. 260 przy progu 150,
     - ostatnia wypada na najwyższym poziomie klasy.
@@ -1063,9 +1063,15 @@ Uwagi autora po wdrożeniu sakwy i Punktów Czasu co pół godziny.
 
 Autor: wbicie poziomu postaci albo klasy odnawia HP i manę do pełna.
 
-1. **Przy odbiorze raportu.** Gdy wyprawa przynosi nowy poziom postaci albo klasy, postać ma po odebraniu raportu pełne HP nowego poziomu, z ekwipunkiem, który nosi po wyprawie (`hpAfterHunt` w silniku). Komunikaty Systemu w raporcie mówią raz: „Awans odnawia HP i manę do pełna.”, także gdy przyszły oba awanse naraz. Tak samo jest przy omdleniu, jeśli walki przed nim dały awans.
+1. **Przy odbiorze raportu.** Gdy wyprawa przynosi nowy poziom postaci albo klasy, postać ma po odebraniu raportu pełne HP nowego poziomu, z ekwipunkiem, który nosi po wyprawie (`hpAfterHunt` w silniku). Komunikaty Systemu w raporcie mówią o tym raz (tekst w punkcie 4), także gdy przyszły oba awanse naraz. Tak samo jest przy omdleniu, jeśli walki przed nim dały awans.
 2. **Mana.** Na razie nic jej nie wydaje, więc zawsze jest pełna. Gdy umiejętności zaczną ją zużywać, awans też ją odnowi.
 3. **Pierwsza wyprawa.** Zawsze daje awans, więc postać wraca z niej z pełnym HP. Kwestia narratora przy Ognisku („Teraz zajmijmy się jednak Twoim powrotem do zdrowia…”) mówiła o ranach, których teraz nie ma. Jej nowy tekst ma zgodę autora (punkt 8 „Zadań od narratora”).
+4. **Komunikat o awansie w nowym formacie (26.10.2026).** Autor: „Niech wygląda tak (…) I taki format będziemy stosować. Czytelniejszy.” Każdy zysk ma swoją linię, bez kropki na końcu:
+    - „Osiągnięto poziom: 10” i „Osiągnięto poziom Klasy Wojownik: 12”,
+    - „Zdobyto wolne punkty statystyk: +10” (punkty z poziomów postaci i klasy razem), „Zdobyto Punkty Czasu: +3” i „Zdobyto Punkty Umiejętności: +1”,
+    - na końcu „Awansowałeś. Twoje HP i Mana odnowiły się.”, a przy postaci kobiety „Awansowałaś.”.
+
+    Przed odblokowaniem Statystyk linia punktów kończy się „(rozdasz je od poziomu 2)”. Pod tym blokiem stoją komunikaty o tym, co odblokowały nowe poziomy. Ten sam format dostają kolejne komunikaty Systemu o zyskach.
 
 ## Zadania od narratora (25.10.2026)
 
