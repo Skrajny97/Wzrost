@@ -1,0 +1,13 @@
+{
+  "id": "skill-shadow-dance",
+  "payload": {
+    "text": "three fast high-pitched swishes of a silk cloak whipped through the air, crisp and airy, with a soft high breathy whisper, close up, dry, no bass, no rumble, no low frequencies, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-shadow-dance-20261026T0746-0.mp3",
+    "audio/drafts/effects/skill-shadow-dance-20261026T0746-1.mp3"
+  ],
+  "credits": 60
+}

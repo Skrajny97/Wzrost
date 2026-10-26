@@ -1,0 +1,13 @@
+{
+  "id": "skill-mana-shield",
+  "payload": {
+    "text": "a single water droplet falls into a still pool with a clear bright plink, followed by a soft shimmering magical echo that rings and slowly fades, ethereal and airy, high pitched, fantasy, no bass, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-mana-shield-20261026T0746-0.mp3",
+    "audio/drafts/effects/skill-mana-shield-20261026T0746-1.mp3"
+  ],
+  "credits": 60
+}
