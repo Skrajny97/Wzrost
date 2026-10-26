@@ -433,37 +433,14 @@ export function applyHunt(character, hunt, content, { evolutionGate = true } = {
   const held = waits && gainXp(character.classLevel, character.classXp, hunt.xp, toNextClass, maxLevel).level > nextClass.level;
   const penalty = hunt.result === 'fainted' ? faintPenalty(next.level, next.xp, content) : 0;
 
-  // A few levels at once make one line each for the character and the class,
-  // with all their points, so the report's System panel stays short. Every
-  // level also brings Time Points, and so do the time shards found.
-  const pointsPerLevel = content.statIds.length;
-  const time = content.balance.timePoints;
-  const messages = [];
-  const levels = next.level - character.level;
-  if (levels > 0) {
-    messages.push(say(content.texts, 'levelUp', next.level, { level: next.level, points: pointsPerLevel * levels, time: time.perLevel * levels }));
-    for (let level = character.level + 1; level <= next.level; level++) messages.push(...unlockMessages(level, content));
-  }
+  const messages = levelUpMessages(character, { level: next.level, classLevel: nextClass.level }, content);
   const className = content.classesById[character.classId].name;
-  // Class levels come first, so their points can wait for the Stats screen.
-  const unlockLevel = content.unlocksById.stats.level;
-  const textId = next.level < unlockLevel ? 'classLevelUpLocked' : 'classLevelUp';
-  const classLevels = nextClass.level - character.classLevel;
-  if (classLevels > 0) {
-    const points = Math.floor(pointsPerLevel / 4) * classLevels;
-    messages.push(
-      say(content.texts, textId, nextClass.level, { className, level: nextClass.level, points, unlockLevel, time: time.perClassLevel * classLevels }),
-    );
-    for (let level = character.classLevel + 1; level <= nextClass.level; level++) messages.push(...classUnlockMessages(level, content));
-    // Skill Points from the class levels after the skills open.
-    const skillGain = skillPoints({ classLevel: nextClass.level }, content).earned - skillPoints({ classLevel: character.classLevel }, content).earned;
-    if (skillGain > 0) messages.push(say(content.texts, 'skillPoints', nextClass.level, { points: skillGain }));
-  }
   if (held) messages.push(say(content.texts, block.code === 'second_path' ? 'classWaitsPath' : 'classWaitsPoints', 0, { className, level: evolution }));
-  // A new level of either kind heals fully (hpAfterHunt).
-  const levelled = levels > 0 || classLevels > 0;
-  if (levelled) messages.push(say(content.texts, 'levelHeal', 0, {}));
   if (penalty > 0) messages.push(say(content.texts, 'faintPenalty', 0, { xp: penalty }));
+  // Every level brings Time Points, and so do the time shards found.
+  const time = content.balance.timePoints;
+  const levels = next.level - character.level;
+  const classLevels = nextClass.level - character.classLevel;
 
   return {
     level: next.level,
@@ -471,10 +448,40 @@ export function applyHunt(character, hunt, content, { evolutionGate = true } = {
     classLevel: nextClass.level,
     classXp: nextClass.xp,
     penalty,
-    levelled,
+    // A new level of either kind heals fully (hpAfterHunt).
+    levelled: levels > 0 || classLevels > 0,
     timePoints: time.perLevel * levels + time.perClassLevel * classLevels + (hunt.timePoints ?? 0),
     messages,
   };
+}
+
+// The System lines of new character and class levels, one gain to a line
+// (the author: "taki format będziemy stosować. Czytelniejszy."): the levels
+// reached, then the free points, Time Points and Skill Points of all of them
+// together, then the heal, and last what the new levels open. Before the
+// Stats screen opens, the line with the points says when they can be spent.
+export function levelUpMessages(character, { level, classLevel = character.classLevel }, content) {
+  const levels = level - character.level;
+  const classLevels = classLevel - character.classLevel;
+  if (levels <= 0 && classLevels <= 0) return [];
+  const { texts } = content;
+  const perLevel = content.statIds.length;
+  const time = content.balance.timePoints;
+  const unlockLevel = content.unlocksById.stats.level;
+  // Skill Points come from the class levels after the skills open.
+  const skillGain = skillPoints({ classLevel }, content).earned - skillPoints({ classLevel: character.classLevel }, content).earned;
+  const messages = [];
+  if (levels > 0) messages.push(say(texts, 'levelUp', 0, { level }));
+  if (classLevels > 0) messages.push(say(texts, 'classLevelUp', 0, { className: content.classesById[character.classId].name, level: classLevel }));
+  messages.push(
+    say(texts, level < unlockLevel ? 'statPointsWaiting' : 'statPointsGained', 0, { points: perLevel * levels + Math.floor(perLevel / 4) * classLevels, unlockLevel }),
+    say(texts, 'timePointsGained', 0, { time: time.perLevel * levels + time.perClassLevel * classLevels }),
+  );
+  if (skillGain > 0) messages.push(say(texts, 'skillPoints', 0, { points: skillGain }));
+  messages.push(say(texts, character.appearance === 'female' ? 'levelHealFemale' : 'levelHeal', 0, {}));
+  for (let at = character.level + 1; at <= level; at++) messages.push(...unlockMessages(at, content));
+  for (let at = character.classLevel + 1; at <= classLevel; at++) messages.push(...classUnlockMessages(at, content));
+  return messages;
 }
 
 // HP when the report is claimed: a new character or class level heals the

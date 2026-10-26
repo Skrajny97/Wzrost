@@ -682,33 +682,47 @@ describe('progression', () => {
     assert.equal(applied.xp, 5);
     assert.equal(applied.classLevel, 2);
     assert.equal(applied.classXp, xpToNext(1, content) + 5 - classXpToNext(1, content));
-    assert.match(applied.messages[0], /^Osiągnięto poziom 2\. Wolne punkty statystyk: \+8\. Punkty Czasu: \+2\.$/);
-    // Level 2 opens long hunts and the stats screen, and the System says so.
+    // One gain to a line: the levels, the points of both together, the heal,
+    // and then what level 2 opens (long hunts and the stats screen).
     const unlocks = content.unlocks.filter((u) => u.level === 2).map((u) => u.message);
-    assert.deepEqual(applied.messages.slice(1, 1 + unlocks.length), unlocks);
-    assert.match(applied.messages.at(-2), /^Kleryk: poziom klasy 2\. Wolne punkty statystyk: \+2\. Punkty Czasu: \+1\.$/);
-    // A new level of either kind heals fully, and the System says so once.
-    assert.equal(applied.messages.at(-1), 'Awans odnawia HP i manę do pełna.');
+    assert.deepEqual(applied.messages, [
+      'Osiągnięto poziom: 2',
+      'Osiągnięto poziom Klasy Kleryk: 2',
+      'Zdobyto wolne punkty statystyk: +10',
+      'Zdobyto Punkty Czasu: +3',
+      'Awansowałeś. Twoje HP i Mana odnowiły się.',
+      ...unlocks,
+    ]);
     assert.equal(applied.levelled, true);
     // A level and a class level: 2 and 1 Time Points (data/balance.json).
     assert.equal(applied.timePoints, 3);
+    // A woman's character is told in her form.
+    const her = applyHunt({ ...character, appearance: 'female' }, { xp: xpToNext(1, content) + 5, result: 'success' }, content);
+    assert.equal(her.messages[4], 'Awansowałaś. Twoje HP i Mana odnowiły się.');
     // A class level before character level 2 says when its points can be spent.
     const early = applyHunt(character, { xp: classXpToNext(1, content), result: 'success' }, content);
     assert.equal(early.level, 1);
-    assert.deepEqual(early.messages, ['Kleryk: poziom klasy 2. Wolne punkty statystyk: +2, rozdasz je od poziomu 2. Punkty Czasu: +1.', 'Awans odnawia HP i manę do pełna.']);
+    assert.deepEqual(early.messages, [
+      'Osiągnięto poziom Klasy Kleryk: 2',
+      'Zdobyto wolne punkty statystyk: +2 (rozdasz je od poziomu 2)',
+      'Zdobyto Punkty Czasu: +1',
+      'Awansowałeś. Twoje HP i Mana odnowiły się.',
+    ]);
     assert.equal(early.timePoints, 1);
 
-    // Several levels at once make one line for the character and one for the class.
+    // Several levels at once: one line for each kind, with all their points.
     const xp = [1, 2, 3].reduce((sum, level) => sum + xpToNext(level, content), 0);
     const many = applyHunt(character, { xp, result: 'success' }, content);
     assert.equal(many.level, 4);
-    assert.equal(many.messages.filter((message) => message.startsWith('Osiągnięto poziom')).length, 1);
-    assert.equal(many.messages[0], 'Osiągnięto poziom 4. Wolne punkty statystyk: +24. Punkty Czasu: +6.');
-    assert.equal(many.messages.filter((message) => message.startsWith('Kleryk: poziom klasy')).length, 1);
-    assert.match(
-      many.messages.at(-2),
-      new RegExp(`^Kleryk: poziom klasy ${many.classLevel}\\. Wolne punkty statystyk: \\+${2 * (many.classLevel - 1)}\\. Punkty Czasu: \\+${many.classLevel - 1}\\.$`),
-    );
+    const classLevels = many.classLevel - 1;
+    assert.deepEqual(many.messages.slice(0, 5), [
+      'Osiągnięto poziom: 4',
+      `Osiągnięto poziom Klasy Kleryk: ${many.classLevel}`,
+      `Zdobyto wolne punkty statystyk: +${24 + 2 * classLevels}`,
+      `Zdobyto Punkty Czasu: +${6 + classLevels}`,
+      'Awansowałeś. Twoje HP i Mana odnowiły się.',
+    ]);
+    assert.equal(many.messages.filter((message) => message.startsWith('Osiągnięto poziom')).length, 2);
     assert.equal(many.timePoints, 6 + (many.classLevel - 1));
 
     const fainted = applyHunt({ ...character, level: 3, xp: 10 }, { xp: 0, result: 'fainted' }, content);

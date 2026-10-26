@@ -1620,7 +1620,7 @@ describe('Awans', () => {
     const { report, character } = (await call('POST', '/api/hunts/claim', { cookie })).data;
     assert.ok(character.level >= 2);
     assert.equal(character.hp, character.maxHp);
-    assert.ok(report.system.includes('Awans odnawia HP i manę do pełna.'));
+    assert.ok(report.system.includes('Awansowałaś. Twoje HP i Mana odnowiły się.'));
   });
 });
 
