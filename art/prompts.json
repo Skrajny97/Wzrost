@@ -1,5 +1,5 @@
 {
-  "$comment": "Prompts for tools/generate-art.mjs (Retro Diffusion). Each kind has its style, size and the approved sprites used as style references (art/references/<kind>/<id>.png). Approved sprites go to src/client/art/<kind>/<id>.png. The portraits are the starting look: plain clothes and empty hands, as characters start with nothing. portraits-evolved holds the prompts of the earlier, well-equipped portraits, kept in art/evolution/portraits/ for the look after the first class evolution. materials holds the materials left by creatures, the parts made on the Stół rzemieślniczy and the treasure chest (data/materials.json). areas holds the inner regions, each a scene in a circle on the Walka screen, and lands the wide, dim backgrounds behind the cards of the lands (regions.json); both keep their background (removeBackground: false). camp holds the camp buildings, each at three looks for levels 1–3, 4–7 and 8–10 (<building>-1, -2, -3), drawn on the board and the building screens: single isometric buildings without a background, each building in its own colours, and each look a clearly bigger and richer building than the one before (a prompt may also be { prompt, style } with its own style). board holds the camp board's ground: one picture of the glade, without paths, which the game draws over it to the plots.",
+  "$comment": "Prompts for tools/generate-art.mjs (Retro Diffusion). Each kind has its style, size and the approved sprites used as style references (art/references/<kind>/<id>.png). Approved sprites go to src/client/art/<kind>/<id>.png. The portraits are the starting look: plain clothes and empty hands, as characters start with nothing. portraits-evolved holds the prompts of the earlier, well-equipped portraits, kept in art/evolution/portraits/ for the look after the first class evolution. materials holds the materials left by creatures, the parts made on the Stół rzemieślniczy and the treasure chest (data/materials.json). areas holds the inner regions, each a scene in a circle on the Walka screen, and lands the wide, dim backgrounds behind the cards of the lands (regions.json); both keep their background (removeBackground: false). camp holds the camp buildings, each at three looks for levels 1–3, 4–7 and 8–10 (<building>-1, -2, -3), drawn on the board and the building screens: single isometric buildings without a background, each building in its own colours, and each look a clearly bigger and richer building than the one before (a prompt may also be { prompt, style } with its own style). board holds the camp board's ground: one picture of the glade, without paths, which the game draws over it to the plots. herbs holds the herbs of Zielarstwo, professions the icons of the professions on the Profesje tab, places the backgrounds of the places where professions work (the Systemowy Zagajnik).",
   "monsters": {
     "style": "rd_pro__fantasy",
     "width": 48,
@@ -273,6 +273,38 @@
     "references": [],
     "prompts": {
       "camp": "top-down pixel art game map of a large empty forest clearing for a village builder game, soft green grass with small flowers, clover and a few grey stones, a thick ring of dark green pine and oak trees around all edges, the middle open and empty, muted natural colours, no buildings, no paths, no water, no people"
+    }
+  },
+  "herbs": {
+    "style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "references": [],
+    "prompts": {
+      "comfrey": "a bundle of fresh comfrey: broad hairy dark green leaves, a thick fleshy pale root and a few small bell-shaped purple flowers, single inventory item icon",
+      "mugwort": "a sprig of mugwort with feathery silvery grey-green leaves and tiny yellow-brown flower heads, tied with twine, single inventory item icon",
+      "nettle": "a bunch of stinging nettle with serrated bright green leaves and fine stinging hairs on the stem, single inventory item icon"
+    }
+  },
+  "professions": {
+    "style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "references": [],
+    "prompts": {
+      "herbalism": "a small wicker basket full of fresh green herbs with a little curved sickle leaning against it, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background",
+      "alchemy": "a round glass flask of bubbling glowing red potion beside a small brass alembic, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background",
+      "crafting": "a smith hammer crossed with a big sewing needle and red thread, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background"
+    }
+  },
+  "places": {
+    "style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "removeBackground": false,
+    "references": [],
+    "prompts": {
+      "system-grove": "pixel art landscape, a small quiet forest grove thick with herbs and wild flowers, thin ice-blue glowing crystal shards growing between the plants, faint luminous blue lines running along the ground, soft mist, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens with ice-blue accents, no text, no border, no people, no animals"
     }
   }
 }

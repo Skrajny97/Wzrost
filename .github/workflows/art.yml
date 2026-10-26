@@ -24,6 +24,9 @@ on:
           - logo
           - camp
           - board
+          - herbs
+          - professions
+          - places
       ids:
         description: Identyfikatory po przecinku albo all
         required: true
