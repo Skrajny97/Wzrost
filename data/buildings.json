@@ -95,9 +95,17 @@
   {
     "id": "scrap-bench",
     "name": "Skup złomu",
-    "description": "Zadaszony skup, w którym złomiarz bierze zbędne przedmioty. Im lepiej urządzony, tym więcej płaci.",
+    "description": "Zadaszony skup, w którym złomiarz bierze zbędne przedmioty i sprzedaje części do rzemiosła. Im lepiej urządzony, tym więcej płaci, a części ma rzadsze i tańsze.",
     "maxLevel": 10,
     "effect": { "kind": "sellPrice", "perLevel": 0.1, "unit": "percent", "text": "Złomiarz płaci więcej o {value}" },
+    "shop": {
+      "title": "Lada złomiarza",
+      "text": "Złomiarz sprzedaje za złoto części do rzemiosła. Im wyższy poziom skupu, tym rzadsze części ma i tym mniej za nie bierze.",
+      "rarities": ["common", "rare", "unique", "unique", "epic", "epic", "legendary", "legendary", "mythic", "divine"],
+      "goldPerPart": 40,
+      "discountPerLevel": 0.06,
+      "counts": [1, 10]
+    },
     "costs": [
       { "resource": "gold", "base": 12, "growth": 2.0 },
       { "resource": "wood", "base": 4, "growth": 1.9 },

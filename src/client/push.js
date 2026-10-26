@@ -116,10 +116,8 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// The settings row: the switch with what the notifications tell, or why
-// there are none here.
-const WHAT = 'Koniec wyprawy, koniec budowy i pełny magazyn.';
-
+// The settings row: the switch, with a line under it only when there are no
+// notifications here or the phone blocks them.
 export function pushRow() {
   const hint = h('small', { class: 'status-hint' });
   const row = (value) =>
@@ -138,7 +136,8 @@ export function pushRow() {
     button.setAttribute('aria-checked', String(on));
     button.textContent = on ? 'Włączone' : 'Wyłączone';
     button.disabled = busy;
-    hint.textContent = !on && Notification.permission === 'denied' ? BLOCKED : WHAT;
+    hint.textContent = !on && Notification.permission === 'denied' ? BLOCKED : '';
+    hint.hidden = !hint.textContent;
   };
   button.addEventListener('click', async () => {
     if (busy) return;
@@ -160,7 +159,7 @@ export function pushRow() {
       await show();
     }
   });
-  hint.textContent = WHAT;
+  hint.hidden = true;
   show();
   return row(button);
 }

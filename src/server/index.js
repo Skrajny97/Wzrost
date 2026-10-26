@@ -3,7 +3,7 @@
 
 import { deleteAccount, login, logout, me, register } from './accounts.js';
 import { authorPanel, authorSkillDemo, authorSkills } from './author.js';
-import { cancelBuilding, collectProduction, startBuilding, tradeAtFire } from './camp.js';
+import { buyParts, cancelBuilding, collectProduction, startBuilding, tradeAtFire } from './camp.js';
 import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
 import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
@@ -60,6 +60,7 @@ const routes = [
   ['POST', '/api/camp/cancel', cancelBuilding],
   ['POST', '/api/camp/collect', collectProduction],
   ['POST', '/api/camp/trade', tradeAtFire],
+  ['POST', '/api/camp/buy', buyParts],
   ['GET', '/api/reports', listReports],
   ['GET', '/api/reports/:id', getReport],
   ['POST', '/api/time/skip', skipWithTimePoints],

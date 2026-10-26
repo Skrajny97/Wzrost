@@ -3,8 +3,9 @@
 // upgraded at a time and the upgrade counts once its time has passed; a few
 // more builds wait in the queue, paid when queued, and start one after
 // another (characters.js: settleBuilds). Production buildings fill a store
-// that the player collects, and the Ognisko's fire spirit trades gold for
-// resources a few times a day.
+// that the player collects, the Ognisko's fire spirit trades gold for
+// resources a few times a day, and the scrap dealer at the Skup złomu sells
+// crafting parts.
 
 import {
   buildMinutes,
@@ -20,10 +21,13 @@ import {
   fireTradeBlock,
   fireTradesMade,
   missingFor,
+  partPrice,
   plannedLevel,
   queueEnd,
   replanQueue,
   shiftQueue,
+  shopBlock,
+  shopBuilding,
   upgradeCost,
 } from '../engine/index.js';
 import { content } from './content.js';
@@ -263,6 +267,32 @@ export async function tradeAtFire(context) {
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
   return json({
     traded: { resource: body.resource, amount, gold },
+    character: characterView(await loadPlayer(db, session.userId), now),
+  });
+}
+
+// The scrap dealer's counter: `count` parts of a kind for gold, at the
+// price of the Skup złomu's level.
+export async function buyParts(context) {
+  const { session, player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  const now = context.now;
+  const row = player.row;
+  const level = buildingLevel(player.buildings[shopBuilding(content)?.id], now);
+  const block = shopBlock({ level, gold: row.gold, partId: body.partId, count: body.count }, content);
+  if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
+  const gold = partPrice(body.partId, level, content) * body.count;
+  const db = context.env.DB;
+  const result = await db
+    .prepare(
+      `UPDATE characters SET gold = gold - ?, parts = json_set(parts, ?, COALESCE(json_extract(parts, ?), 0) + ?), version = version + 1
+       WHERE id = ? AND version = ? AND gold >= ?`,
+    )
+    .bind(gold, path(body.partId), path(body.partId), body.count, row.id, row.version, gold)
+    .run();
+  if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
+  return json({
+    bought: { partId: body.partId, count: body.count, gold },
     character: characterView(await loadPlayer(db, session.userId), now),
   });
 }

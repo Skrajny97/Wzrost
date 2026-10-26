@@ -204,10 +204,13 @@ button {
   text-align: center;
 }
 
+/* The game's logo (logo.png, pixel art): the narrator in the System's hexagon. */
 .emblem {
-  width: 52px;
-  height: 52px;
-  color: var(--system);
+  width: 112px;
+  height: 112px;
+  border-radius: 18px;
+  box-shadow: 0 0 28px rgba(143, 227, 239, 0.18);
+  image-rendering: pixelated;
 }
 
 .hero-title {
@@ -4001,6 +4004,35 @@ a.camp-level-button {
   justify-content: center;
   gap: 6px;
   padding-inline: 6px;
+  white-space: nowrap;
+}
+
+/* The Skup złomu's counter: crafting parts for gold. */
+.scrap-shop {
+  background: radial-gradient(ellipse at 50% 120%, rgba(190, 196, 186, 0.1), transparent 70%);
+}
+
+.shop-price {
+  color: var(--gold);
+  font-weight: 400;
+}
+
+.shop-buttons {
+  display: flex;
+  flex: none;
+  gap: 6px;
+}
+
+/* The price over the count the character has. */
+.shop-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.shop-button {
+  min-width: 60px;
+  padding-inline: 10px;
   white-space: nowrap;
 }
 

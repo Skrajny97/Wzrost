@@ -7,6 +7,10 @@ import {
   fireTrade,
   fireTradeBlock,
   fireTradesMade,
+  partPrice,
+  shopBlock,
+  shopLevelFor,
+  shopOffer,
   hpAfterHunt,
   areaDangers,
   areaFor,
@@ -1027,6 +1031,42 @@ describe('camp', () => {
     assert.equal(block({ gold: 49 }), 'not_enough');
     assert.equal(block({ resource: 'gold' }), 'invalid_resource');
     assert.equal(block({ level: 0 }), 'not_built');
+  });
+
+  test("the Skup złomu's dealer: rarer parts and lower prices with each level", () => {
+    const offer = (level) => shopOffer(level, content).map(({ partId, price }) => `${partId} ${price}`);
+    assert.deepEqual(shopOffer(0, content), []);
+    assert.deepEqual(offer(1), ['scraps 40']);
+    assert.deepEqual(offer(2), ['scraps 38', 'straps 75']);
+    assert.deepEqual(offer(5), ['scraps 31', 'straps 62', 'fittings 125', 'shards 250']);
+    assert.deepEqual(offer(10), ['scraps 23', 'straps 46', 'fittings 92', 'shards 183', 'amber 367', 'bloodstone 733', 'star-shard 1467']);
+    assert.deepEqual(['common', 'rare', 'unique', 'epic', 'legendary', 'mythic', 'divine'].map((rarity) => shopLevelFor(rarity, content)), [1, 2, 3, 5, 7, 9, 10]);
+    const block = (changes) => shopBlock({ level: 2, gold: 750, partId: 'straps', count: 10, ...changes }, content)?.code ?? null;
+    assert.equal(block({}), null);
+    assert.equal(block({ gold: 749 }), 'not_enough');
+    assert.equal(block({ partId: 'fittings' }), 'not_sold');
+    assert.equal(block({ partId: 'constructor' }), 'invalid_part');
+    assert.equal(block({ partId: { id: 'straps' } }), 'invalid_part');
+    assert.equal(block({ count: 5 }), 'invalid_count');
+    assert.equal(block({ level: 0 }), 'not_built');
+  });
+
+  // The design's rule that selling pays less than buying: an item sold
+  // instead of taken apart never buys back the parts it would give, at any
+  // level of the Skup złomu (it raises what the dealer pays too).
+  test('parts bought cost more than the items they come from fetch when sold', () => {
+    const bench = content.buildingsById['scrap-bench'];
+    for (let level = 1; level <= bench.maxLevel; level++) {
+      const bonus = campBonus({ 'scrap-bench': level }, 'sellPrice', content);
+      for (const { partId, price } of shopOffer(level, content)) {
+        const rarityId = content.partsById[partId].rarity;
+        for (let itemLevel = 1; itemLevel <= 510; itemLevel++) {
+          const item = { level: itemLevel, rarity: rarityId };
+          const { count } = salvageYield(item, content);
+          assert.ok(price * count > sellPrice(item, content, bonus), `${partId} at level ${level}, item level ${itemLevel}`);
+        }
+      }
+    }
   });
 });
 

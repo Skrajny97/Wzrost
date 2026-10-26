@@ -1592,3 +1592,26 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
     - Zasady są te same co wcześniej: utwór gaśnie przez ostatnie 5 s i po 2,5 s pauzy gra od nowa. Zmiana utworu przechodzi płynnie w 1,5 s, a utwór, do którego się wraca, gra od miejsca, w którym ucichł.
     - Pliki nie mają okładki ani znaczników, a dźwięk jest bez zmian. Głośność: Umiejętności −15,4 LUFS, Profesje −16,2 LUFS, Obóz −15,9 LUFS, czyli do 1 dB od dotychczasowego utworu (−16,3 LUFS).
     - Miejsca muzyki to `places` w `data/music.json`: `skills`, `professions` i `camp`. Licencja: patrz punkt o planie Suno Pro albo Premier we wcześniejszym wpisie.
+
+## Nowe logo, lada złomiarza i wybrane nagrania (26.10.2026)
+
+1. **Nowe logo** (autor: dotychczasowy sześciokąt wyglądał słabo w podglądzie linku na Messengerze).
+    - Retro Diffusion dało cztery szkice godła: oko, ognisko, narratora i drzewo (4 × 0,18 USD). W grze jest szkic 3 wskazany przez autora: zakapturzony narrator w świecącym sześciokącie Systemu (`src/client/logo.png`, 128 × 128).
+    - Z godła powstały ikony aplikacji (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png` z marginesem na kółko Androida, `apple-touch-icon.png`) i ikonka karty przeglądarki `favicon-64.png`, która zastąpiła `favicon.svg`.
+    - Podgląd linku to `og.png` (1200 × 630): godło, napis Insight, hasło gry „Wejrzyj do miejsca pełnego wyzwań dla śmiałków” i adres insightrpg.com na tle grafiki Wiatrołomów. Znaczniki `og:` i `twitter:card` są w `index.html`.
+    - Ekran logowania pokazuje godło zamiast sześciokąta z linii.
+    - Messenger i inne komunikatory przez jakiś czas pamiętają stary podgląd linku. Zainstalowana gra zmienia ikonę na Androidzie sama, po kilku dniach, a na iPhonie dopiero po ponownym dodaniu do ekranu początkowego.
+    - Rodzaj `logo` w `art/prompts.json` zostawia tylko opis wybranego szkicu.
+2. **Powiadomienia bez opisu** (autor: „Nie podpisuj czego dotyczą powiadomienia”). Pod przełącznikiem „Powiadomienia” nie ma już zdania o tym, czego dotyczą. Zdanie pojawia się tylko wtedy, gdy powiadomień w tej przeglądarce nie ma (iPhone poza ekranem początkowym, przeglądarka bez Web Push) albo telefon je blokuje.
+3. **Wybrane nagrania** (autor, strona odsłuchu).
+    - Celny strzał: w grze jest wersja 8. Zastępuje to wersję 7 z punktu 6 poprzedniego wpisu.
+    - Kwestia narratora przy Ognisku: w grze jest nagranie 4, ze zwykłym zapisem tekstu. Zastępuje to nagranie z zapisem „ognju” z punktu 3 poprzedniego wpisu.
+4. **Lada złomiarza w Skupie złomu** (autor: „W skupie złomiarza dodamy możliwość kupna przerobionych materiałów Ścinek itd. za złoto. Im wyższy level budynku tym wyższa rzadkość i niższy koszt części.”).
+    - Ekran Skupu złomu ma kartę „Lada złomiarza”. Każda część ma tam cenę za sztukę, liczbę, którą postać już ma, i przyciski „Kup 1” i „Kup 10”. Zdanie pod listą mówi, co da następny poziom, np. „Na poziomie 3 dojdą Okucia, a ceny spadną o 6%.”
+    - Rzadkości według poziomu skupu: Ścinki (pospolite) od 1. poziomu, Rzemienie (rzadkie) od 2., Okucia (unikalne) od 3., Odłamki (epickie) od 5., Bursztyn (legendarny) od 7., Krwawnik (mityczny) od 9., a Gwiezdny odprysk (boski) na 10.
+    - Cena części to 40 złota razy mnożnik sprzedaży jej rzadkości (1, 2, 4, 8, 16, 32 i 64). Każdy poziom ponad pierwszy obniża ją o 6%. Ścinki kosztują 40 złota na 1. poziomie i 23 na 10., Rzemienie 75 na 2. i 46 na 10., a Gwiezdny odprysk 1467 złota.
+    - Skąd te liczby: dokument projektowy mówi, że sprzedaż jest mniej opłacalna niż kupno. Rozebrany przedmiot daje 2 + poziom/10 części, a sprzedany daje za każdą z nich najwyżej ok. 10 razy mnożnik rzadkości w złocie. Na 10. poziomie Skup złomu płaci o 100% więcej, czyli ok. 20 razy. Części są droższe, żeby sprzedaż przedmiotu i kupno części nigdy nie wychodziły lepiej niż rozbiórka na Stole rzemieślniczym. Test w `test/engine.test.js` sprawdza to dla przedmiotów poziomów 1–510 na każdym poziomie skupu.
+    - Zakupy nie mają dziennego limitu, bo autor o nim nie wspomniał. Części nadal czekają na profesje, więc ceny i ewentualny limit sprawdzimy razem z nimi. Liczby są w `shop` przy Skupie złomu w `data/buildings.json`.
+    - Kupować można także podczas wyprawy, jak u ducha ognia, bo obóz działa obok czynności postaci.
+    - Zakup brzmi brzękiem monet, jak skrzynia zadań. Opis budynku mówi teraz także o częściach.
+    - API: `POST /api/camp/buy` z `partId` i `count`. Jak wymiana u ducha ognia, zakup zapisuje się tylko wtedy, gdy postać jest taka, jak przy odczycie (`version`). Silnik: `src/engine/shop.js`.

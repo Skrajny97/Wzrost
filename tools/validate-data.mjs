@@ -332,9 +332,17 @@ function checkReferences(data) {
     for (const id of building.trade?.resources ?? []) {
       if (!resources.has(id)) errors.push(`buildings.json: ${building.id} wymienia złoto na nieznany zasób "${id}"`);
     }
+    // The dealer's rarities (every rarity has its part): known ones, never
+    // lower than at the level before.
+    const shopCaps = (building.shop?.rarities ?? []).map((id) => rarityOrder.indexOf(id));
+    if (shopCaps.includes(-1)) errors.push(`buildings.json: ${building.id} sprzedaje części nieznanej rzadkości`);
+    else if (shopCaps.some((index, i) => i > 0 && index < shopCaps[i - 1])) errors.push(`buildings.json: rzadkości w sklepie ${building.id} nie mogą maleć z poziomem`);
+    if (shopCaps.length > building.maxLevel) errors.push(`buildings.json: ${building.id} ma w sklepie więcej rzadkości niż poziomów`);
   }
-  // The fire spirit's trade lives in one building (src/engine/fire.js).
+  // The fire spirit's trade lives in one building (src/engine/fire.js), and
+  // so does the dealer's counter (src/engine/shop.js).
   if (data.buildings.filter((building) => building.trade).length > 1) errors.push('buildings.json: wymianę złota (trade) może mieć tylko jeden budynek');
+  if (data.buildings.filter((building) => building.shop).length > 1) errors.push('buildings.json: sprzedaż części (shop) może mieć tylko jeden budynek');
 
   for (const position of Object.keys(data.balance.combat.targetWeights)) {
     if (!POSITIONS.includes(position)) errors.push(`balance.json: nieznana pozycja "${position}"`);

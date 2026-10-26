@@ -4,12 +4,12 @@
 // materials, one at a time, with a few more waiting in the queue; an upgrade
 // counts once its time has passed.
 // Production buildings fill a store the player collects, from a bubble on the
-// board or on the building's screen, and at the Ognisko the fire spirit trades
-// gold for resources a few times a day. Opened with the camp button in the top
-// bar.
+// board or on the building's screen, at the Ognisko the fire spirit trades
+// gold for resources a few times a day, and at the Skup złomu the scrap
+// dealer sells crafting parts. Opened with the camp button in the top bar.
 
 import { BOARD_HEIGHT, BOARD_WIDTH, CAMP_PLOTS, PLOT_HEIGHT, PLOT_WIDTH, boardArt, plotArt } from '../camp-art.js';
-import { craftTableSection } from '../craft-table.js';
+import { craftTableSection, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { leaveView, openView } from '../history.js';
@@ -117,6 +117,21 @@ async function tradeAtFire(resource) {
   const { traded } = await call('POST', '/api/camp/trade', { resource });
   playSound('collect');
   toast(`Duch ognia przyjął ${formatNumber(traded.gold)} złota i oddał: ${resourceName(traded.resource).toLowerCase()} +${formatNumber(traded.amount)}.`);
+}
+
+async function buyParts(partId, count) {
+  const { bought } = await call('POST', '/api/camp/buy', { partId, count });
+  playSound('chest');
+  const name = state.character.crafting.parts.find((part) => part.id === bought.partId)?.name ?? bought.partId;
+  toast(`Kupiono: ${name} +${formatNumber(bought.count)} za ${formatNumber(bought.gold)} złota.`);
+}
+
+// "Na poziomie 3 dojdą Okucia, a ceny spadną o 6%."
+function shopNextText(next) {
+  const cut = `ceny spadną o ${Math.round(next.discount * 100)}%`;
+  if (next.added.length === 0) return `Na poziomie ${next.level} ${cut}.`;
+  const verb = next.added.length > 1 || next.added[0].gender === 'pl' ? 'dojdą' : 'dojdzie';
+  return `Na poziomie ${next.level} ${verb} ${next.added.map((part) => part.name).join(' i ')}, a ${cut}.`;
 }
 
 function heading(title, subtitle, back, badge = null) {
@@ -381,6 +396,7 @@ function mountBuilding(container, id) {
         building.effect && h('p', { class: 'building-effect' }, h('strong', { text: 'Teraz: ' }), building.effect),
         building.production && storeView(building),
         building.trade && tradeView(building.trade),
+        building.shop && shopView(building.shop),
       ),
       building.crafts && craftTableSection(ticks),
     );
@@ -477,6 +493,51 @@ function mountBuilding(container, id) {
       }),
       trade.next &&
         h('p', { class: 'store-hint', text: `Na poziomie ${trade.next.level}: ${formatNumber(trade.next.gold)} złota → ${pieces(trade.next.amount)}, ${trades(trade.next.perDay)} dziennie.` }),
+    );
+  }
+
+  // The scrap dealer's counter: every part he has, with its price, how many
+  // the character has, "Kup 1" and "Kup 10", and what the next level adds.
+  function shopView(shop) {
+    const { gold } = state.character;
+    return h(
+      'section',
+      { class: 'fire-trade scrap-shop', 'aria-label': shop.title },
+      h('h2', { class: 'fire-trade-title', text: shop.title }),
+      h('p', { class: 'fire-trade-text', text: shop.text }),
+      h(
+        'ul',
+        { class: 'craft-list' },
+        shop.parts.map(({ id, price }) => {
+          const part = state.character.crafting.parts.find((own) => own.id === id);
+          return h(
+            'li',
+            { class: 'craft-row shop-row' },
+            h('span', { class: 'craft-art' }, materialIcon(id, 32)),
+            h(
+              'span',
+              { class: 'craft-text' },
+              h('span', { class: 'item-name', vars: { '--rarity': part.color }, text: part.name }),
+              h('span', { class: 'item-meta shop-meta' }, h('strong', { class: 'shop-price', text: `${formatNumber(price)} złota` }), h('span', { text: `masz ${formatNumber(part.count)}` })),
+            ),
+            h(
+              'span',
+              { class: 'shop-buttons' },
+              shop.counts.map((count) =>
+                h('button', {
+                  type: 'button',
+                  class: 'button button--world button--small shop-button',
+                  disabled: gold < price * count,
+                  'aria-label': `Kup ${part.name}: ${formatNumber(count)} za ${formatNumber(price * count)} złota`,
+                  text: `Kup ${count}`,
+                  onClick: (event) => withButton(event.currentTarget, () => buyParts(id, count)),
+                }),
+              ),
+            ),
+          );
+        }),
+      ),
+      shop.next && h('p', { class: 'store-hint', text: shopNextText(shop.next) }),
     );
   }
 

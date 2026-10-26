@@ -1003,6 +1003,39 @@ describe('camp', () => {
     assert.equal((await trade('wood')).data.error.code, 'not_enough');
   });
 
+  test('the scrap dealer sells parts for gold, rarer and cheaper ones with each level of the Skup złomu', async () => {
+    const buy = (partId, count) => call('POST', '/api/camp/buy', { cookie, body: { partId, count } });
+    const shop = (view) => view.camp.buildings.find((building) => building.id === 'scrap-bench').shop;
+    const owned = (view, partId) => view.crafting.parts.find((part) => part.id === partId).count;
+    await stock(1000, {});
+    // Before the Skup złomu stands there is nothing to buy.
+    assert.equal(shop(await character()), null);
+    assert.equal((await buy('scraps', 1)).data.error.code, 'not_built');
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    await database.prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) VALUES (?, 'scrap-bench', 2, 0, 1)").bind(id).run();
+    // Level 2: Ścinki and Rzemienie, and Okucia at the next level.
+    const open = shop(await character());
+    assert.deepEqual([open.title, open.counts, open.parts], ['Lada złomiarza', [1, 10], [{ id: 'scraps', price: 38 }, { id: 'straps', price: 75 }]]);
+    assert.deepEqual(open.next, { level: 3, added: [{ id: 'fittings', name: 'Okucia', gender: 'pl' }], discount: 0.06 });
+    assert.equal((await buy('fittings', 1)).data.error.code, 'not_sold');
+    assert.equal((await buy('scraps', 5)).status, 400);
+    assert.equal((await buy('constructor', 1)).status, 400);
+    const first = await buy('scraps', 10);
+    assert.equal(first.status, 200);
+    assert.deepEqual(first.data.bought, { partId: 'scraps', count: 10, gold: 380 });
+    assert.deepEqual([first.data.character.gold, owned(first.data.character, 'scraps')], [620, 10]);
+    // Two taps at once: each purchase made is paid once.
+    const taps = await Promise.all([buy('straps', 1), buy('straps', 1)]);
+    const made = taps.filter((tap) => tap.status === 200).length;
+    const tapped = await character();
+    assert.ok(made >= 1);
+    assert.deepEqual([tapped.gold, owned(tapped, 'straps'), owned(tapped, 'scraps')], [620 - 75 * made, made, 10]);
+    await stock(74, {});
+    assert.equal((await buy('straps', 1)).data.error.code, 'not_enough');
+    assert.equal((await buy('scraps', 1)).status, 200);
+  });
+
   test('Jezioro Midasa fills its store with gold, which goes to the gold, also when an upgrade collects it', async () => {
     await stock(500, { wood: 50, stone: 20, 'iron-ore': 20 });
     const lake = (view) => view.camp.buildings.find((building) => building.id === 'midas-lake');

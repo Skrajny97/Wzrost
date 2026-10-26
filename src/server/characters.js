@@ -38,6 +38,7 @@ import {
   restedHp,
   salvageYield,
   settleCrafting,
+  shopOffer,
   skillsView,
   spentPoints,
   statEffects,
@@ -369,6 +370,7 @@ function campView(player, levels, now) {
         },
         queued: queued(building.id),
         trade: building.trade && level > 0 ? fireView(building, level, player.row, now) : null,
+        shop: building.shop && level > 0 ? shopView(building, level) : null,
       };
     }),
   };
@@ -389,6 +391,27 @@ function fireView(building, level, row, now) {
     perDay: trade.perDay,
     left: Math.max(0, trade.perDay - made),
     next: next && { level: level + 1, amount: next.amount, gold: next.gold, perDay: next.perDay },
+  };
+}
+
+// The scrap dealer's counter at the Skup złomu's level: the parts with
+// their prices (the page takes their names and counts from crafting), and
+// what the next level adds.
+function shopView(building, level) {
+  const offer = shopOffer(level, content);
+  const later = level < building.maxLevel ? shopOffer(level + 1, content) : null;
+  return {
+    title: building.shop.title,
+    text: building.shop.text,
+    counts: building.shop.counts,
+    parts: offer.map(({ partId, price }) => ({ id: partId, price })),
+    next: later && {
+      level: level + 1,
+      added: later
+        .filter(({ partId }) => !offer.some((entry) => entry.partId === partId))
+        .map(({ partId }) => ({ id: partId, name: content.partsById[partId].name, gender: content.partsById[partId].gender })),
+      discount: building.shop.discountPerLevel,
+    },
   };
 }
 

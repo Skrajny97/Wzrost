@@ -4,12 +4,12 @@
 // only page loads and the files of the offline page pass through here. It
 // also shows the game's phone notifications (push.js).
 
-const CACHE = 'insight-offline-v1';
+const CACHE = 'insight-offline-v2';
 // offline.html, at the address the static files answer without a redirect
 // (a page load cannot take a redirected answer from the worker).
 const OFFLINE_PAGE = '/offline';
 // What the offline page needs, refreshed whenever the game fetches it online.
-const OFFLINE_FILES = [OFFLINE_PAGE, '/styles.css', '/favicon.svg'];
+const OFFLINE_FILES = [OFFLINE_PAGE, '/styles.css', '/favicon-64.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
