@@ -14,6 +14,7 @@ import {
   campLevels,
   durationsUpTo,
   estimateThreat,
+  higherThreat,
   hpAfterHunt,
   huntDurations,
   huntKills,
@@ -86,8 +87,9 @@ export async function huntOptions(context) {
     : content.regions
         .map((region) => areaFor(region.id, character.level, content))
         .filter((candidate) => areaUnlocked(candidate, character.classLevel, content));
-  // threatAvoiding: the same exploration with the elite and the champion
-  // avoided, from the same sample fights, and never above the threat without.
+  // threatAvoiding and threatSeeking: the same exploration with the elite and
+  // the champion avoided or sought, from the same sample fights; the first is
+  // never above the threat without them, the second never below it.
   return json({
     hp,
     maxHp,
@@ -95,7 +97,8 @@ export async function huntOptions(context) {
       const samples = cachedSamples(player, character, equipped, id);
       const threat = estimateThreat({ character, equipped, hp, areaId: id }, content, samples);
       const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true }, content, samples);
-      return { id, threat, threatAvoiding: lowerThreat(avoiding, threat) };
+      const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true }, content, samples);
+      return { id, threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat) };
     }),
   });
 }
@@ -108,10 +111,11 @@ export async function startHunt(context) {
 }
 
 // An exploration of `minutes` in an inner region, from now on, avoiding the
-// elite and the champion when asked (avoidRare), and tracking the creatures
-// the quests ask for (trackQuests): those living there are kept with it. The
-// skipped introduction sends the first one this way too (tutorial.js).
-export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false, trackQuests = false } = {}, now) {
+// elite and the champion when asked (avoidRare) or seeking them (seekRare),
+// and tracking the creatures the quests ask for (trackQuests): those living
+// there are kept with it. The skipped introduction sends the first one this
+// way too (tutorial.js).
+export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false } = {}, now) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
   const area = typeof id === 'string' ? areaFor(id, player.row.level, content) : undefined;
@@ -121,6 +125,8 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
     throw new ApiError(400, 'invalid_duration', 'Wybierz czas wyprawy.');
   }
   if (typeof avoidRare !== 'boolean') throw new ApiError(400, 'invalid_avoid', 'Zaznacz albo odznacz omijanie elit i czempionów.');
+  if (typeof seekRare !== 'boolean') throw new ApiError(400, 'invalid_seek', 'Zaznacz albo odznacz tropienie elit i czempionów.');
+  if (avoidRare && seekRare) throw new ApiError(400, 'invalid_rare', 'Postać nie może naraz unikać i tropić elit i czempionów.');
   if (typeof trackQuests !== 'boolean') throw new ApiError(400, 'invalid_track', 'Zaznacz albo odznacz tropienie stworów z zadań.');
   if (!huntDurations(player.row.level, content).includes(minutes)) {
     const longest = longestHunt(player.row.level, content);
@@ -139,9 +145,9 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
     await db.batch([
       db
         .prepare(
-          'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, avoid_rare, tracked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, avoid_rare, seek_rare, tracked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         )
-        .bind(player.row.id, 'hunt', area.id, minutes, now, now + minutes * 60000, seed, hp, avoidRare ? 1 : 0, tracked.length > 0 ? JSON.stringify(tracked) : null),
+        .bind(player.row.id, 'hunt', area.id, minutes, now, now + minutes * 60000, seed, hp, avoidRare ? 1 : 0, seekRare ? 1 : 0, tracked.length > 0 ? JSON.stringify(tracked) : null),
       // The HP rested so far is saved now, so it is not counted again later.
       db.prepare('UPDATE characters SET hp = ?, hp_at = ?, version = version + 1 WHERE id = ?').bind(hp, now, player.row.id),
     ]);
@@ -206,6 +212,7 @@ export async function finishHunt(db, player, now) {
       seed: activity.seed,
       first,
       avoidRare: activity.avoid_rare === 1,
+      seekRare: activity.seek_rare === 1,
       tracked: JSON.parse(activity.tracked ?? '[]'),
     },
     content,

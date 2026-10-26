@@ -66,15 +66,17 @@ describe('skills', () => {
     assert.equal(skillView(content.skillsById['mana-shield'], 1, content).cost, `Koszt: ${Math.round(pool * 100)}% maks. many, raz na walkę.`);
   });
 
-  test('Skill Points come with each class level from the tenth on, one per level of a skill, its learning included', () => {
+  test('Skill Points come with each class level from the tenth on, that one included, one per level of a skill but the first', () => {
     assert.deepEqual(skillPoints({ classLevel: 9, skills: {} }, content), { earned: 0, spent: 0, free: 0 });
     assert.deepEqual(skillPoints({ classLevel: 10, skills: {} }, content), { earned: 1, spent: 0, free: 1 });
-    // The author: at class level 11, before the first choice, there are 2.
-    assert.equal(skillPoints({ classLevel: 11, skills: {} }, content).free, 2);
+    // The author: class level 10 already gives a point to spend, and the main
+    // path takes none of it.
+    assert.deepEqual(skillPoints({ classLevel: 10, skills: { fireball: 1 } }, content), { earned: 1, spent: 0, free: 1 });
+    assert.equal(skillPoints({ classLevel: 11, skills: { fireball: 1 } }, content).free, 2);
     assert.equal(skillPoints({ classLevel: 15, skills: {} }, content).free, 6);
-    assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3 } }, content), { earned: 6, spent: 3, free: 3 });
-    // The second skill's first level takes a point too.
-    assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3, unyielding: 1 } }, content), { earned: 6, spent: 4, free: 2 });
+    assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3 } }, content), { earned: 6, spent: 2, free: 4 });
+    // The second skill's first level takes a point.
+    assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3, unyielding: 1 } }, content), { earned: 6, spent: 3, free: 3 });
   });
 
   test('the class level that opens the skills brings their first point, and each one after it another', () => {
@@ -94,24 +96,27 @@ describe('skills', () => {
     assert.equal(learnBlock(warrior(10), 'power-strike', content), null);
     assert.equal(learnBlock(warrior(30, { 'power-strike': 1 }), 'power-strike', content).code, 'known');
     assert.equal(learnBlock(warrior(10, { 'power-strike': 1 }), 'wide-sweep', content).code, 'class_level');
-    assert.equal(learnBlock(warrior(11, { 'power-strike': 2 }), 'wide-sweep', content).code, 'no_points');
+    assert.equal(learnBlock(warrior(11, { 'power-strike': 3 }), 'wide-sweep', content).code, 'no_points');
+    assert.equal(learnBlock(warrior(11, { 'power-strike': 2 }), 'wide-sweep', content), null);
     assert.equal(learnBlock(warrior(12, { 'power-strike': 1 }), 'wide-sweep', content), null);
     assert.equal(learnBlock(warrior(30, { 'wide-sweep': 1 }), 'power-strike', content), null);
     assert.equal(learnBlock(warrior(30, { 'power-strike': 1, unyielding: 1 }), 'wide-sweep', content).code, 'chosen');
     const states = (character) => skillsView(character, content).pools[0].options.map((skill) => skill.state);
     assert.deepEqual(states(warrior(10)), ['pick', 'pick', 'pick']);
     assert.deepEqual(states(warrior(10, { 'power-strike': 1 })), ['main', 'soon', 'soon']);
-    assert.deepEqual(states(warrior(11, { 'power-strike': 2 })), ['main', 'points', 'points']);
+    assert.deepEqual(states(warrior(11, { 'power-strike': 3 })), ['main', 'points', 'points']);
     assert.deepEqual(states(warrior(12, { 'power-strike': 1 })), ['main', 'pick', 'pick']);
-    // The main path takes the point of class level 10; at 11 the second waits
-    // for the point of that level.
+    // The point of class level 10 is left after the main path; at 11 there
+    // are two, before the first choice or after it.
+    assert.equal(skillsView(warrior(10, { 'power-strike': 1 }), content).points, 1);
     assert.equal(skillsView(warrior(11), content).points, 2);
-    assert.equal(skillsView(warrior(10, { 'power-strike': 1 }), content).points, 0);
+    assert.equal(skillsView(warrior(11, { 'power-strike': 1 }), content).points, 2);
     assert.deepEqual(states(warrior(11, { 'power-strike': 1 })), ['main', 'pick', 'pick']);
     // The first learned is the main path, whatever its place on the list.
     assert.deepEqual(states(warrior(30, { unyielding: 1, 'power-strike': 4 })), ['second', 'closed', 'main']);
     assert.deepEqual(skillsView(warrior(10), content).pools[0].options.map((skill) => skill.path), ['Barbarzyńca', 'Gladiator', 'Strażnik']);
-    assert.equal(raiseBlock(warrior(10, { 'power-strike': 1 }), 'power-strike', content).code, 'no_points');
+    assert.equal(raiseBlock(warrior(10, { 'power-strike': 1 }), 'power-strike', content), null);
+    assert.equal(raiseBlock(warrior(10, { 'power-strike': 2 }), 'power-strike', content).code, 'no_points');
     assert.equal(raiseBlock(warrior(12, { 'power-strike': 1 }), 'power-strike', content), null);
     assert.equal(raiseBlock(warrior(40, { 'power-strike': 20 }), 'power-strike', content).code, 'max_level');
     assert.equal(raiseBlock(warrior(40), 'power-strike', content).code, 'not_learned');
@@ -123,10 +128,10 @@ describe('skills', () => {
     assert.equal(open.pools[0].options[0].cost, 'Koszt: 10 many, najwyżej co 3. ruch.');
     const chosen = skillsView(warrior(12, { 'power-strike': 2 }), content);
     assert.deepEqual(chosen.pools[0].chosen, ['power-strike']);
-    assert.equal(chosen.points, 1);
+    assert.equal(chosen.points, 2);
     assert.equal(chosen.ready, true);
     assert.match(chosen.pools[0].options[0].next, /^Cios za 14\d% obrażeń/);
-    assert.equal(skillsView(warrior(11, { 'power-strike': 2 }), content).ready, false);
+    assert.equal(skillsView(warrior(11, { 'power-strike': 3 }), content).ready, false);
     assert.equal(skillsView(warrior(9), content).ready, false);
   });
 
@@ -135,10 +140,10 @@ describe('skills', () => {
     assert.equal(evolutionBlock(warrior(12, {}), content).code, 'second_path');
     assert.equal(evolutionBlock(warrior(30, { 'power-strike': 20 }), content).code, 'second_path');
     assert.equal(evolutionBlock(warrior(30, { 'power-strike': 10, unyielding: 1 }), content).code, 'skill_points');
-    // Counted with the points of level 50: at 48 with none left, those of 49
-    // and 50 are still due.
-    assert.equal(skillPoints(warrior(48, { 'power-strike': 20, unyielding: 19 }), content).free, 0);
-    assert.equal(evolutionBlock(warrior(48, { 'power-strike': 20, unyielding: 19 }), content).code, 'skill_points');
+    // Counted with the points of level 50: at 47 with none left, those of 48
+    // to 50 are still due.
+    assert.equal(skillPoints(warrior(47, { 'power-strike': 20, unyielding: 19 }), content).free, 0);
+    assert.equal(evolutionBlock(warrior(47, { 'power-strike': 20, unyielding: 19 }), content).code, 'skill_points');
     // A point that no skill can take (both at 20) does not hold the class,
     // and a class already past 50 waits for nothing.
     assert.equal(evolutionBlock(warrior(50, { 'power-strike': 20, unyielding: 20 }), content), null);

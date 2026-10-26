@@ -1,5 +1,5 @@
 {
-  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. Pierwsza karta (ask) pyta, czy przejść wprowadzenie: startLabel (z recommendedLabel pod spodem) idzie dalej, a skipLabel pomija całość. Ta karta jest od autora gry (speaker: author): podpisana authorLabel, bez postaci narratora i bez nagrania. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest.",
+  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. Pierwsza karta (ask) pyta, czy przejść wprowadzenie: startLabel (z recommendedLabel pod spodem) idzie dalej, a skipLabel pomija całość. Ta karta jest od autora gry (speaker: author): podpisana authorLabel, bez postaci narratora i bez nagrania. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. once: lead, który po stuknięciu zostaje zapamiętany jak karta, bo stuknięcie nie zmienia ekranu (portfel pod złotem). Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest.",
   "skipLabel": "Pomiń wprowadzenie",
   "nextLabel": "Dalej",
   "startLabel": "Wprowadź mnie",
@@ -328,6 +328,15 @@
         "Budowa musi zawsze trochę potrwać, szczególnie jeśli chodzi o rozbudowę. Na szczęście i w tym System Cię wyręczy. Podczas budowy możesz wykonywać wszelkie inne dostępne aktywności."
       ],
       "voice": "audio/narration/camp-countdown.mp3"
+    },
+    {
+      "id": "wallet",
+      "kind": "lead",
+      "once": true,
+      "text": ["Przy okazji – w tym miejscu możesz sprawdzić swój stan złota i Punkty Systemu, a po kliknięciu – resztę zasobów wraz z Punktami Czasu. Sam zobacz."],
+      "female": {
+        "text": ["Przy okazji – w tym miejscu możesz sprawdzić swój stan złota i Punkty Systemu, a po kliknięciu – resztę zasobów wraz z Punktami Czasu. Sama zobacz."]
+      }
     },
     {
       "id": "settings",

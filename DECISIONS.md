@@ -1296,7 +1296,7 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
 
 1. **Dane.** 15 umiejętności, po 3 na klasę, jest w `data/skills.json` (schemat `data/schemas/skills.schema.json`). Liczba umiejętności to stała wartość albo para [poziom 1, poziom 20], a między nimi rośnie po równo z poziomem. Przykład: Potężny cios bije za 140% obrażeń i pomija 20% pancerza na 1. poziomie, a na 20. bije za 200% i pomija 40%.
     - Opis skutku na karcie podstawia liczby obecnego poziomu, a „Na poziomie N+1” liczby następnego. Test pilnuje, żeby każdy kolejny poziom różnił się na karcie, więc żaden punkt nie znika bez śladu. Do tego doszedł format `{nazwa%.1}`, czyli procent z jednym miejscem po przecinku.
-2. **Punkty Umiejętności.** Każdy poziom klasy po 10. daje 1 punkt (`balance.skills`). Wybrana umiejętność startuje z 1. poziomu, a każdy punkt podnosi ją o poziom, do 20. Pełne 20 poziomów wypada więc na 29. poziomie klasy. Punkty zebrane przed wyborem czekają. Od 26.10.2026 punkt daje też 10. poziom klasy, a wybór umiejętności go kosztuje (zob. „Punkty Umiejętności od 10. poziomu klasy”).
+2. **Punkty Umiejętności.** Każdy poziom klasy po 10. daje 1 punkt (`balance.skills`). Wybrana umiejętność startuje z 1. poziomu, a każdy punkt podnosi ją o poziom, do 20. Pełne 20 poziomów wypada więc na 29. poziomie klasy. Punkty zebrane przed wyborem czekają. Od 26.10.2026 punkt daje też 10. poziom klasy (zob. „Punkty Umiejętności od 10. poziomu klasy”).
 3. **Wybór na stałe.** Dokument projektowy zapowiada, że zmiana ścieżki będzie bardzo kosztowna. Zanim powstanie, wyboru nie da się cofnąć, a ekran pyta „Wybrać: …?”.
 4. **Mana.** Każda walka zaczyna się z pełną maną: 20, plus 5 za punkt Mądrości i 2 za poziom postaci (nowe `character.manaPerLevel`). W walce mana nie wraca. Bez many postać bije zwykłymi ciosami.
 5. **Postać używa umiejętności sama:**
@@ -1726,9 +1726,29 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
 
 ## Punkty Umiejętności od 10. poziomu klasy (26.10.2026)
 
-1. **Punkt także za 10. poziom klasy** (autor: „dalej mam punkt do rozdania – po prostu wyświetlało, że mam tylko jeden […] – do poprawy”). Dotąd 10. poziom dawał darmowy wybór ścieżki głównej, a punkty przychodziły od 11. poziomu. Na 11. poziomie zakładka pokazywała więc przed wyborem „PUNKTY: 1”, choć postać miała do wydania dwa: darmowy wybór i punkt. Teraz punkt daje każdy poziom klasy od 10. wzwyż, a nauka każdej umiejętności kosztuje punkt, także ścieżki głównej. Na 11. poziomie przed wyborem zakładka pokazuje 2. Tak mówi też tekst Systemu od autora: „Od 10. poziomu wzrost poziomu klasy pozwala Ci uzyskać 1 Punkt Umiejętności”.
-    - Bilans się nie zmienia. Postać z wybraną ścieżką ma tyle samo wolnych punktów co wcześniej. Pełne 20 poziomów jednej umiejętności dalej wypada na 29. poziomie klasy, a obu na 49. Zmieniają się tylko licznik przed pierwszym wyborem i raport 10. poziomu klasy, który podaje teraz „Zdobyto Punkty Umiejętności: +1”. Migracja nie jest potrzebna, bo punkty liczą się z poziomu klasy i znanych umiejętności.
-    - Okno wyboru ścieżki głównej mówi, że kosztuje ona 1 Punkt Umiejętności. Od 11. poziomu klasy dodaje, że ścieżkę poboczną postać dobierze za kolejny punkt.
+1. **Punkt do wydania już na 10. poziomie klasy** (autor: „10 poziom powinien dawać już 1 Punkt Umiejętności, to ważne. Dopiero na 11 dostałem Punkt. Nie może tak być”). Punkt daje teraz każdy poziom klasy od 10. wzwyż, a ścieżka główna dalej nic nie kosztuje. Na 10. poziomie postać wybiera więc ścieżkę główną i ma jeszcze 1 punkt. Na 11. poziomie ma 2, przed wyborem i po nim. Ścieżka poboczna kosztuje punkt jak dotąd.
+    - Pierwsza poprawka z tego samego dnia, po zgłoszeniu „wyświetlało, że mam tylko jeden […] – do poprawy”, liczyła punkt za 10. poziom, ale płaciła nim za ścieżkę główną. Do wydania nie przybywało więc nic, a autor chce punktu do wydania już na 10. poziomie.
+    - Punkty liczą się z poziomu klasy i znanych umiejętności, więc każda postać od 10. poziomu klasy ma od razu o 1 punkt więcej, także te sprzed zmiany. Mag autora dostał w ten sposób punkt, o który autor prosił („dodaj mi ręcznie ten jeden punkt na koncie admina”), bez zmian w bazie. Migracja nie jest potrzebna.
+    - Pełne 20 poziomów jednej umiejętności wypada teraz na 28. poziomie klasy, a obu na 48. Raport 10. poziomu klasy podaje „Zdobyto Punkty Umiejętności: +1”.
+    - Okno wyboru ścieżki głównej mówi, że to wybór na stałe. Od 11. poziomu klasy dodaje, że ścieżkę poboczną można dobrać od razu, za 1 Punkt Umiejętności.
+
+
+## Kowadło, złomiarz, tropienie elit i portfel we wprowadzeniu (26.10.2026)
+
+1. **Każdy poziom ulepszenia coś daje** (autor: „zauważyłem, że ulepszanie talizmanu nic nie daje… może dawać chociaż +1 do pancerza przy każdym ulepszeniu”). Ulepszenie dalej dodaje 6% liczb przedmiotu za poziom, ale co najmniej 1 (`balance.upgrades.minGainPerLevel`): broni do obrażeń, najmniejszych i największych, a każdemu innemu przedmiotowi do Pancerza. Przedmiot bez własnego Pancerza, np. talizman, amulet, pierścień, kołczan albo fokus, dostaje Pancerz +1 za każdy poziom ulepszenia. Talizman +2 z 1. poziomu ma więc Witalność +2 i Pancerz +2.
+    - Szczegół rozstrzygnięty najprostszym rozwiązaniem: zasada działa dla wszystkich przedmiotów, nie tylko talizmanów, bo małe liczby na niskich poziomach nie rosły nigdzie. Przy dużych liczbach nic się nie zmienia, bo 6% daje tam więcej niż 1. Przykład: Kolczuga z Pancerzem 15 ma na +10 Pancerz 25 zamiast 24.
+    - Pancerz z ulepszenia stoi na karcie pod cechami przedmiotu. Własny Pancerz zbroi jest jak dotąd na górze.
+2. **Złomiarz kupuje prosto z plecaka** (autor: „nie mogę sprzedać ulepszonych, o ile w ogóle jakichkolwiek przedmiotów z pozycji plecaka u złomiarza – ani w skupie, ani nigdzie”).
+    - Karta przedmiotu w plecaku ma przycisk „Sprzedaj za X złota”. Sprzedaje jeden przedmiot, także ulepszony, po potwierdzeniu. Za ulepszenie złomiarz nie płaci więcej i okno to mówi. Założonego przedmiotu nie kupuje.
+    - Ekran Skupu złomu ma nad ladą część „Skup przedmiotów” z przyciskiem „Sprzedaj zbędne przedmioty”. Otwiera tę samą sprzedaż według rzadkości co raport wyprawy. Pod nią stoi zdanie autora: „Złomiarz kupi zbędne przedmioty z plecaka. Sprzedasz u niego przedmioty także bezpośrednio z pozycji plecaka.” Ulepszone przedmioty dalej nie idą hurtem, a okno sprzedaży mówi, że sprzedaje się je bezpośrednio z pozycji plecaka.
+3. **„Trop elity i czempiony”** (autor: „Dodaj też, tak jak jest »Unikaj elit i czempionów«, »Trop elity i czempiony«, niech zwiększa to szansę dwukrotnie na znalezienie wspomnianych”).
+    - Pole stoi pod „Unikaj elit i czempionów”, przy „Wyrusz”. Zaznaczenie jednego odznacza drugie, a serwer nie przyjmie obu naraz. Przy pierwszej wyprawie pól nie ma.
+    - Szansa na elitę i na czempiona jest w każdej walce dwa razy większa (`balance.hunt.rareSeekFactor` = 2). Czempion dalej trafia się tylko tam, gdzie mieszka.
+    - Poziom zagrożenia liczy walki z podwojoną szansą i nigdy nie wychodzi niższy niż bez pola. Wybór zostaje na telefonie, także dla „Wyrusz ponownie”. Karta trwającej wyprawy mówi „Postać tropi elity i czempiony.”. Serwer zapisuje wybór z wyprawą (`activities.seek_rare`, migracja 0027).
+4. **Kwestia narratora o portfelu** (autor: „Trzeba dodać przed pokazywaniem zębatki ustawień kwestię Narratora: »Przy okazji – w tym miejscu możesz sprawdzić swój stan złota i Punkty Systemu, a po kliknięciu – resztę zasobów wraz z Punktami Czasu. Sam zobacz« (rozwija listę). Lecisz z tym pergaminem oraz nagraniem”).
+    - Kwestia `wallet` stoi tuż przed kwestią o ustawieniach. Podświetla złoto i Punkty Systemu w górnym pasku, a stuknięcie w nie albo „Dalej” rozwija listę. Lista zostaje na ekranie 2,5 sekundy, zanim przyjdzie kwestia o ustawieniach (`delay`).
+    - Postać o wyglądzie kobiecym słyszy „Sama zobacz.”. Przy wpisaniu: półpauzy w miejscu dywizów i kropka na końcu.
+    - Stuknięcie nie zmienia ekranu, więc ta kwestia „lead” zostaje zapamiętana jak karta (`once` w `data/tutorial.json`). Pokazuje się tylko we wprowadzeniu, nie postaciom, które już je skończyły.
 
 ## Wersja testowa i Zielarstwo (26.10.2026)
 

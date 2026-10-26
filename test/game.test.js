@@ -626,10 +626,11 @@ describe('hunts and reports', () => {
     assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).data.error.code, 'no_activity');
   });
 
-  test('an exploration can avoid the elite and the champion, with its own threat', async () => {
+  test('an exploration can avoid the elite and the champion, or seek them, each with its own threat', async () => {
     const options = await call('GET', '/api/hunts/options?area=windfalls-edge', { cookie });
-    const { threat, threatAvoiding } = options.data.areas[0];
+    const { threat, threatAvoiding, threatSeeking } = options.data.areas[0];
     assert.deepEqual(Object.keys(threatAvoiding), Object.keys(threat));
+    assert.deepEqual(Object.keys(threatSeeking), Object.keys(threat));
     const wrong = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, avoidRare: 'tak' } });
     assert.equal(wrong.status, 400);
     assert.equal(wrong.data.error.code, 'invalid_avoid');
@@ -641,9 +642,23 @@ describe('hunts and reports', () => {
     await call('POST', '/api/test/skip-time', { cookie });
     const claim = await call('POST', '/api/hunts/claim', { cookie });
     assert.ok(claim.data.report.fights.every((fight) => !fight.elite && !fight.champion));
+    // Seeking them instead ("Trop elity i czempiony"); not both at once.
+    const both = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, avoidRare: true, seekRare: true } });
+    assert.equal(both.status, 400);
+    assert.equal(both.data.error.code, 'invalid_rare');
+    const odd = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, seekRare: 1 } });
+    assert.equal(odd.data.error.code, 'invalid_seek');
+    const seeking = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, seekRare: true } });
+    assert.equal(seeking.status, 201);
+    assert.equal(seeking.data.character.activity.seekRare, true);
+    assert.equal(seeking.data.character.activity.avoidRare, false);
+    assert.equal((await (await db()).prepare('SELECT seek_rare FROM activities').first()).seek_rare, 1);
+    await call('POST', '/api/test/skip-time', { cookie });
+    assert.equal((await call('POST', '/api/hunts/claim', { cookie })).status, 200);
     // Without the choice the exploration goes as before.
     const plain = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
     assert.equal(plain.data.character.activity.avoidRare, false);
+    assert.equal(plain.data.character.activity.seekRare, false);
   });
 
   test('an exploration can track the creatures of the quests', async () => {
@@ -1227,6 +1242,24 @@ describe('upgrades on the Kowadło', () => {
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
     assert.equal((await upgrade()).data.error.code, 'busy');
   });
+
+  test('the scrapper buys one item from its card, an upgraded one too, but not a worn one', async () => {
+    await (await db()).prepare("UPDATE items SET data = json_set(data, '$.upgrade', 2)").run();
+    await stock(10, { wood: 0, stone: 0, 'iron-ore': 0 });
+    const before = await character();
+    const price = before.bag.find((item) => item.id === itemId).price;
+    const sold = await call('POST', `/api/items/${itemId}/sell`, { cookie });
+    assert.equal(sold.status, 200);
+    assert.deepEqual(sold.data.sold, { count: 1, gold: price });
+    assert.equal(sold.data.character.gold, 10 + price);
+    assert.deepEqual(sold.data.character.bag, []);
+    assert.equal((await call('POST', `/api/items/${itemId}/sell`, { cookie })).data.error.code, 'item_not_found');
+    // A worn item stays on.
+    const mail = { base: 'chainmail', slot: 'chest', level: 5, rarity: 'common', affixes: [], armor: 15 };
+    await (await db()).prepare("INSERT INTO items (character_id, slot, data, created_at) SELECT id, 'chest', ?, 0 FROM characters").bind(JSON.stringify(mail)).run();
+    const worn = (await character()).equipment.chest;
+    assert.equal((await call('POST', `/api/items/${worn.id}/sell`, { cookie })).data.error.code, 'equipped');
+  });
 });
 
 
@@ -1398,7 +1431,9 @@ describe('Time Points and the narrator', () => {
     // A lead or a tap is done when the game moves on, so it is not kept.
     assert.equal((await see({ card: 'tap-region' })).data.error.code, 'invalid_card');
     assert.equal((await see({ card: 'lead-camp' })).data.error.code, 'invalid_card');
-    const once = (await call('GET', '/api/content')).data.tutorial.lines.filter((line) => line.kind === 'card' || line.kind === 'point');
+    // A lead marked once, whose tap changes no screen (the wallet), is kept.
+    assert.deepEqual((await see({ card: 'wallet' })).data.character.tutorial, ['intro', 'purpose', 'report-summary', 'wallet']);
+    const once = (await call('GET', '/api/content')).data.tutorial.lines.filter((line) => line.kind === 'card' || line.kind === 'point' || line.once);
     assert.deepEqual((await see({ skip: true })).data.character.tutorial, once.map((line) => line.id));
 
     // A character from before the introduction never sees it.

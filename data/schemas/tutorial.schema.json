@@ -125,6 +125,7 @@
               "lead-campfire",
               "tap-build",
               "camp-countdown",
+              "wallet",
               "settings",
               "quests",
               "ending"
@@ -153,6 +154,10 @@
             "type": "string",
             "pattern": "^audio/narration/[a-z0-9-]+\\.mp3$",
             "description": "Nagranie kwestii, gdy już jest."
+          },
+          "once": {
+            "const": true,
+            "description": "Tylko przy kwestii lead: po stuknięciu zostaje zapamiętana jak karta, bo stuknięcie nie zmienia ekranu (portfel pod złotem w górnym pasku)."
           },
           "speaker": {
             "const": "author",

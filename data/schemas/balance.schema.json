@@ -303,9 +303,10 @@
       "type": "object",
       "description": "Ulepszanie przedmiotów na Kowadle w obozie, od +1 do +10 (dokument projektowy, „Ulepszanie”). Kowadło na poziomie L pozwala ulepszać do +L.",
       "additionalProperties": false,
-      "required": ["bonusPerLevel", "chances", "breakFrom", "breakChance", "goldPerItemLevel", "oreBase", "orePerItemLevel", "costGrowth"],
+      "required": ["bonusPerLevel", "minGainPerLevel", "chances", "breakFrom", "breakChance", "goldPerItemLevel", "oreBase", "orePerItemLevel", "costGrowth"],
       "properties": {
         "bonusPerLevel": { "type": "number", "exclusiveMinimum": 0, "description": "O ile każdy poziom ulepszenia podnosi liczby przedmiotu (obrażenia, pancerz, cechy), jako ułamek wartości bazowej." },
+        "minGainPerLevel": { "type": "integer", "minimum": 0, "description": "Co najmniej tyle każdy poziom ulepszenia dodaje do obrażeń broni i do Pancerza innych przedmiotów. Przedmiot bez własnego Pancerza (np. talizman) dostaje go tyle za poziom." },
         "chances": {
           "type": "array",
           "minItems": 1,
@@ -337,6 +338,7 @@
         "eliteLevelBonus",
         "championChancePerFight",
         "championLevelBonus",
+        "rareSeekFactor",
         "questTrackBonus",
         "recoveryAfterFight",
         "soloXpBonus",
@@ -439,6 +441,11 @@
           "type": "number",
           "minimum": 0,
           "description": "Szansa na czempiona w walce trwającej minutesPerFightReference minut, tylko w regionie wewnętrznym, który ma czempiona (regions.json: champion). Jak przy elicie rośnie z czasem, który walka zajmuje."
+        },
+        "rareSeekFactor": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Ile razy częściej postać spotyka elitę i czempiona, gdy je tropi („Trop elity i czempiony”): 2 to dwa razy częściej."
         },
         "questTrackBonus": {
           "type": "number",

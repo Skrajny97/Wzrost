@@ -52,9 +52,9 @@ export const content = buildContent({
 });
 
 // The narrator's lines that are read once, in their order: cards and
-// pointers. A lead or a tap is done when the game moves on, so it is not
-// kept.
-export const tutorialLines = tutorial.lines.filter((line) => line.kind === 'card' || line.kind === 'point').map((line) => line.id);
+// pointers, and a lead marked `once`, whose tap changes no screen. Another
+// lead or a tap is done when the game moves on, so it is not kept.
+export const tutorialLines = tutorial.lines.filter((line) => line.kind === 'card' || line.kind === 'point' || line.once).map((line) => line.id);
 
 // The first steps of the introduction, which a skipped one plays for the player.
 export const firstSteps = tutorial.firstSteps;

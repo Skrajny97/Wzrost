@@ -10,7 +10,8 @@
 // and the light goes with it; around a lit place the rest of the screen
 // waits under a shade. Cards and pointers are read once and the server keeps
 // them (src/server/tutorial.js), so a reload or another device goes on from
-// there; a lead or a tap is done when the game has moved on. "Pomiń
+// there; a lead or a tap is done when the game has moved on, but a lead
+// marked `once`, whose tap changes no screen, is kept like a card. "Pomiń
 // wprowadzenie" ends the whole introduction. Meanwhile the screen is the
 // narrator's: it neither scrolls nor takes a tap, also between the lines.
 
@@ -33,7 +34,7 @@ const campStarted = () => Boolean(state.character.camp.construction) || state.ch
 const onReport = (hash) => hash.startsWith('#/raport/');
 const onBoard = (hash) => hash === '#/oboz';
 const calm = () => !motionOn();
-const kept = (line) => line.kind === 'card' || line.kind === 'point';
+const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once === true;
 const mark = (id) => `[data-guide="${id}"]`;
 
 function affordable(buildingId) {
@@ -112,7 +113,11 @@ const BEATS = {
     when: (hash, read) => hash === '#/oboz/campfire' && read.has('camp') && !campStarted() && affordable('campfire'),
   },
   'camp-countdown': { place: mark('build-countdown'), when: (hash) => hash.startsWith('#/oboz') && campStarted() },
-  settings: { place: '.topbar .icon-button[aria-label="Ustawienia"]', when: campDone },
+  // The author: the gold and the Punkty Systemu, and under them the list
+  // with the rest, Punkty Czasu among it, before the settings; a tap on the
+  // gold unfolds the list, which stays in sight a moment before the next line.
+  wallet: { place: '.topbar .gold', when: campDone },
+  settings: { place: '.topbar .icon-button[aria-label="Ustawienia"]', delay: 2500, when: campDone },
   quests: { place: mark('quests'), late: true, when: campDone },
   ending: { when: campDone },
 };
@@ -590,6 +595,7 @@ function startLight(line) {
   const tapped = (event) => {
     if (line.kind === 'point' || beat.free || !light || light.line !== line) return;
     if (places(line).filter(inView).some((element) => element.contains(event.target))) {
+      if (kept(line)) markRead(line.id);
       stopLight();
       setTimeout(() => narrate(), 700);
     }

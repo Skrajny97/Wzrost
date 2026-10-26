@@ -7,9 +7,10 @@ import { itemSprite, materialSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { playSound } from '../sound.js';
-import { activityFinished, avoidRareOn, call, reportCache, state, trackQuestsOn } from '../state.js';
-import { confirmAction, guided, openSheet, systemPanel, toast, withButton } from '../ui.js';
+import { activityFinished, avoidRareOn, call, reportCache, seekRareOn, state, trackQuestsOn } from '../state.js';
+import { guided, openSheet, systemPanel, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
+import { scrapperSheet } from '../scrapper.js';
 import { itemDetails, itemSheet, itemSummary } from './character.js';
 import { herbsReport } from './professions.js';
 
@@ -305,54 +306,6 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     openSheet(itemDetails(item), h('p', { class: 'muted', text: 'Tego przedmiotu nie ma już w plecaku ani w ekwipunku.' }));
   }
 
-  // The scrapper buys what is in the bag, up to a rarity; worn and upgraded
-  // items stay.
-  function scrapperSheet() {
-    const bag = state.character.bag.filter((item) => !(item.upgrade > 0));
-    const rarities = state.content.rarities;
-    const rank = (item) => rarities.findIndex((rarity) => rarity.id === item.rarity);
-    openSheet(
-      h('h2', { class: 'sheet-title', text: 'Złomiarz' }),
-      h('p', { class: 'sheet-text', text: 'Sprzedaj przedmioty z plecaka o rzadkości niższej lub równej:' }),
-      h(
-        'div',
-        { class: 'scrap-options' },
-        rarities.map((rarity, index) => {
-          const items = bag.filter((item) => rank(item) <= index);
-          const gold = items.reduce((sum, item) => sum + item.price, 0);
-          const amount = countOf(items.length, 'przedmiot', 'przedmioty', 'przedmiotów');
-          return h(
-            'button',
-            {
-              type: 'button',
-              class: 'button button--world scrap-option',
-              disabled: items.length === 0,
-              onClick: () => sell(rarity, amount, gold),
-            },
-            h('span', { class: 'item-name', vars: { '--rarity': rarity.color }, text: rarity.name }),
-            h('span', { class: 'scrap-detail', text: items.length > 0 ? `${amount} · ${formatNumber(gold)} złota` : 'nic do sprzedania' }),
-          );
-        }),
-      ),
-      h('p', { class: 'muted', text: 'Założone i ulepszone przedmioty zostają.' }),
-    );
-  }
-
-  async function sell(rarity, amount, gold) {
-    const sure = await confirmAction({
-      title: 'Sprzedać przedmioty?',
-      text: `Złomiarz kupi ${amount} (do rzadkości: ${rarity.name}) za ${formatNumber(gold)} złota.`,
-      confirmLabel: 'Sprzedaj',
-    });
-    if (!sure) return;
-    try {
-      const { sold } = await call('POST', '/api/items/sell', { maxRarity: rarity.id });
-      toast(`Sprzedano: ${countOf(sold.count, 'przedmiot', 'przedmioty', 'przedmiotów')} za ${formatNumber(sold.gold)} złota.`);
-    } catch (error) {
-      toast(error.message);
-    }
-  }
-
   function itemsSection(report) {
     if (report.items.length === 0) return null;
     return h(
@@ -457,7 +410,13 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         text: `Wyrusz ponownie: ${report.areaName ?? report.regionName}, ${formatMinutes(report.minutes)}`,
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
-            await call('POST', '/api/hunts', { areaId: report.areaId ?? report.regionId, minutes: report.minutes, avoidRare: avoidRareOn(), trackQuests: trackQuestsOn() });
+            await call('POST', '/api/hunts', {
+              areaId: report.areaId ?? report.regionId,
+              minutes: report.minutes,
+              avoidRare: avoidRareOn(),
+              seekRare: seekRareOn(),
+              trackQuests: trackQuestsOn(),
+            });
             navigate('#/walka');
           }),
       });

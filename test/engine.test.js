@@ -78,6 +78,8 @@ import {
   itemProperties,
   lowLevelMultiplier,
   lowerThreat,
+  higherThreat,
+  withRareOdds,
   materialDrops,
   materialView,
   materialsText,
@@ -1265,22 +1267,31 @@ describe('upgrades', () => {
   // Scripted rolls: the next value in turn for each chance() call.
   const rolls = (...values) => ({ chance: (probability) => values.shift() < probability });
 
-  test('each level of upgrade adds 6% of every base number, rounded', () => {
+  test('each level of upgrade adds 6% of every base number, rounded, and at least 1 to the damage or the armor', () => {
     assert.equal(upgradedItem(sword, content), sword);
     const plus5 = upgradedItem({ ...sword, upgrade: 5 }, content);
     assert.deepEqual(plus5.damage, { min: 39, max: 59 });
     assert.equal(plus5.affixes[0].value, 13);
-    assert.equal(upgradedItem({ ...mail, upgrade: 10 }, content).armor, 24);
+    // 6% of 15 is less than 1 a level, so +10 gives 10.
+    assert.equal(upgradedItem({ ...mail, upgrade: 10 }, content).armor, 25);
     // The card shows the upgraded numbers; the stored item keeps its own.
-    assert.deepEqual(itemProperties({ ...mail, upgrade: 10 }, content), ['Pancerz: +24']);
+    assert.deepEqual(itemProperties({ ...mail, upgrade: 10 }, content), ['Pancerz: +25']);
     assert.equal(mail.armor, 15);
+    // Small numbers grow too: a first-level sword gains on each level.
+    const knife = { ...sword, level: 1, affixes: [], damage: { min: 2, max: 4 } };
+    assert.deepEqual(upgradedItem({ ...knife, upgrade: 1 }, content).damage, { min: 3, max: 5 });
+    // The author: a talisman's upgrade gives at least +1 Pancerz a level; its
+    // Witalność +2 stays until 6% of it rounds up.
+    const talisman = { base: 'talisman', slot: 'talisman', level: 1, rarity: 'common', affixes: [], implicit: { stat: 'vitality', value: 2 } };
+    assert.deepEqual(itemProperties({ ...talisman, upgrade: 2 }, content), ['Witalność: +2', 'Pancerz: +2']);
+    assert.equal(upgradedItem(talisman, content).armor, undefined);
   });
 
   test('worn upgraded items count with their upgraded numbers', () => {
     const character = { classId: 'warrior', classLevel: 1, level: 1, points: {} };
     const plain = computeStats(character, [mail, sword], content);
     const upgraded = computeStats(character, [{ ...mail, upgrade: 10 }, { ...sword, upgrade: 10 }], content);
-    assert.equal(upgraded.bonuses.armor - plain.bonuses.armor, 9);
+    assert.equal(upgraded.bonuses.armor - plain.bonuses.armor, 10);
     assert.equal(upgraded.sources.strength.equipment - plain.sources.strength.equipment, 6);
   });
 
@@ -1455,6 +1466,36 @@ describe('champions', () => {
       assert.ok(THREAT_LEVELS.indexOf(shown[minutes]) <= THREAT_LEVELS.indexOf(avoiding[minutes]), minutes);
     }
     assert.deepEqual(lowerThreat({ 15: 'high', 60: 'low' }, { 15: 'moderate', 60: 'very-high' }), { 15: 'moderate', 60: 'low' });
+  });
+
+  test('an exploration that seeks them meets the elite and the champion twice as often, and its threat counts them so', () => {
+    const pace = explorationPace(240, content);
+    const sought = withRareOdds(pace, { seekRare: true }, content);
+    assert.equal(sought.eliteChance, pace.eliteChance * 2);
+    assert.equal(sought.championChance, pace.championChance * 2);
+    assert.deepEqual(withRareOdds(pace, { avoidRare: true }, content), { ...pace, eliteChance: 0, championChance: 0 });
+    assert.equal(withRareOdds(pace, {}, content), pace);
+    // Over many explorations of Serce Uroczyska, about twice as large a share
+    // of fights with the elite or the champion (a lost one ends the
+    // exploration, so the share, not the count).
+    const hero = geared('warrior', 49);
+    const rareShare = (seekRare) => {
+      let rare = 0;
+      let all = 0;
+      for (let i = 0; i < 2000; i++) {
+        const hunt = simulateHunt({ ...hero, hp: 99999, name: 'Mira', areaId: 'glade-heart', minutes: 240, seed: `trop:${i}`, seekRare }, content);
+        rare += hunt.fights.filter((fight) => fight.elite || fight.champion).length;
+        all += hunt.fights.length;
+      }
+      return rare / all;
+    };
+    const plain = rareShare(false);
+    const seeking = rareShare(true);
+    assert.ok(seeking > plain * 1.7 && seeking < plain * 2.3, `${seeking} vs ${plain}`);
+    // Outside a safe region more of them make fainting more likely.
+    const glade = { ...geared('mage', 49), hp: 99999, areaId: 'glade-heart' };
+    assert.ok(faintChances({ ...glade, seekRare: true }, content)[240] > faintChances(glade, content)[240]);
+    assert.deepEqual(higherThreat({ 15: 'high', 60: 'low' }, { 15: 'moderate', 60: 'very-high' }), { 15: 'high', 60: 'very-high' });
   });
 });
 

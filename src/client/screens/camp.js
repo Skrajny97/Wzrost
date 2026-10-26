@@ -18,6 +18,7 @@ import { playSound } from '../sound.js';
 import { call, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, guided, systemPanel, toast, withButton } from '../ui.js';
+import { scrapperSheet } from '../scrapper.js';
 
 const CAMP = '#/oboz';
 const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
@@ -396,6 +397,7 @@ function mountBuilding(container, id) {
         building.effect && h('p', { class: 'building-effect' }, h('strong', { text: 'Teraz: ' }), building.effect),
         building.production && storeView(building),
         building.trade && tradeView(building.trade),
+        building.shop && saleView(),
         building.shop && shopView(building.shop),
       ),
       building.crafts && craftTableSection(ticks),
@@ -493,6 +495,19 @@ function mountBuilding(container, id) {
       }),
       trade.next &&
         h('p', { class: 'store-hint', text: `Na poziomie ${trade.next.level}: ${formatNumber(trade.next.gold)} złota → ${pieces(trade.next.amount)}, ${trades(trade.next.perDay)} dziennie.` }),
+    );
+  }
+
+  // The scrap dealer buys the bag's items too: all up to a rarity at once
+  // here, or one, an upgraded one too, from its card in the bag (the
+  // author's words).
+  function saleView() {
+    return h(
+      'section',
+      { class: 'fire-trade scrap-sale', 'aria-label': 'Skup przedmiotów' },
+      h('h2', { class: 'fire-trade-title', text: 'Skup przedmiotów' }),
+      h('p', { class: 'fire-trade-text', text: 'Złomiarz kupi zbędne przedmioty z plecaka. Sprzedasz u niego przedmioty także bezpośrednio z pozycji plecaka.' }),
+      h('button', { type: 'button', class: 'button button--world', onClick: scrapperSheet, text: 'Sprzedaj zbędne przedmioty' }),
     );
   }
 
