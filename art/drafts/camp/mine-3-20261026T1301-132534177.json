@@ -1,0 +1,25 @@
+{
+  "id": "mine-3",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a huge mine entrance with a carved stone arch, a tall wooden headframe with a big winch wheel, glowing orange lanterns, rails with a full ore cart and glittering blue crystals in the rock",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 132534177,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019882,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 62.92,
+    "request_id": "5086feaa-a487-40bc-b912-0659a94395d3",
+    "outputs_retained_until": 1793106248
+  }
+}

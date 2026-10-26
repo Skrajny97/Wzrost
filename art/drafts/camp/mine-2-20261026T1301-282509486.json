@@ -1,0 +1,25 @@
+{
+  "id": "mine-2",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a timber-framed mine entrance in a blue-grey rock hill with a hanging lantern, short rails and a small mine cart full of red iron ore",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 282509486,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019846,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 62.98,
+    "request_id": "1f5c015c-e2db-4e1d-b8c8-bce898dde80e",
+    "outputs_retained_until": 1793106217
+  }
+}

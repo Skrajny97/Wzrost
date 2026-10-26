@@ -1,0 +1,25 @@
+{
+  "id": "quarry-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, two white boulders with a pickaxe stuck in one and three small cut stones beside them",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 983013586,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019707,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 63.22,
+    "request_id": "ae45c62b-b30c-4144-88e8-f39b3abffd0d",
+    "outputs_retained_until": 1793106076
+  }
+}

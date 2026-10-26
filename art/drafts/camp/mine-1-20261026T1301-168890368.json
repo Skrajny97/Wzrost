@@ -1,0 +1,25 @@
+{
+  "id": "mine-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a narrow dark crack in a small grey rock with a pickaxe and a few lumps of rusty red iron ore",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 168890368,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019814,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 63.04,
+    "request_id": "5f669007-7f02-41aa-ad91-279d0529abcc",
+    "outputs_retained_until": 1793106192
+  }
+}
