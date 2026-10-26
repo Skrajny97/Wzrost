@@ -432,17 +432,26 @@ function svgElement(viewBox, className, markup) {
   return svg;
 }
 
-// A building's look: its picture, standing on the bottom of the plot, or its
-// vector stand-in. The picture's address is one of the fixed ones in art.js.
+// The share of the plot a picture fills at each look, so that a building
+// grows on the board with its level.
+const ART_SIZES = [0.64, 0.82, 1];
+
+// A building's look: its picture, standing on the bottom of the plot over its
+// shadow, or its vector stand-in. The picture's address is one of the fixed
+// ones in art.js.
 function look(buildingId, tier) {
   const src = campArt(buildingId, tier);
-  if (src) return `<image href="${src}" width="100" height="80" preserveAspectRatio="xMidYMax meet"></image>`;
-  return (BUILDINGS[buildingId] ?? BUILDINGS.campfire)[tier - 1]();
+  if (!src) return (BUILDINGS[buildingId] ?? BUILDINGS.campfire)[tier - 1]();
+  const size = ART_SIZES[tier - 1];
+  const width = 100 * size;
+  const height = 78 * size;
+  return `<ellipse cx="50" cy="75" rx="${(width * 0.42).toFixed(1)}" ry="${(3 + 3 * size).toFixed(1)}" fill="#0b0f09" opacity="0.45"></ellipse>
+<image href="${src}" x="${((100 - width) / 2).toFixed(1)}" y="${(78 - height).toFixed(1)}" width="${width.toFixed(1)}" height="${height.toFixed(1)}" preserveAspectRatio="xMidYMax meet"></image>`;
 }
 
 // The markup of a plot: the building at its level, an empty plot with a faint
 // outline of what will stand there, or either behind scaffolding. A picture
-// brings its own ground; a vector drawing stands on the trodden earth.
+// stands on its shadow; a vector drawing on the trodden earth.
 export function plotMarkup(buildingId, { level, building = false }) {
   if (level <= 0) {
     return `${EMPTY_PLOT}<g opacity="${building ? 0.45 : 0.22}">${look(buildingId, 1)}</g>${building ? SCAFFOLD : ''}`;

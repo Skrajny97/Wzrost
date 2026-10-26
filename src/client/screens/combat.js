@@ -11,7 +11,7 @@ import { leaveView as leaveHistoryView, openView as openHistoryView } from '../h
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, timeFormat } from '../format.js';
 import { preloadReportMusic } from '../music.js';
-import { activityFinished, call, currentHp, isUnlocked, reportCache, restRate, serverNow, state, testModeOn, unlockInfo } from '../state.js';
+import { activityFinished, avoidRareOn, call, currentHp, isUnlocked, reportCache, restRate, serverNow, setAvoidRare, state, testModeOn, unlockInfo } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
 
@@ -75,7 +75,7 @@ function dangersSheet(place) {
             'span',
             { class: 'danger-text' },
             h('span', { class: 'danger-name', text: known ? danger.name : '???' }),
-            h('span', { class: 'danger-meta', text: rank ? `${levels} · ${rank}` : levels }),
+            h('span', { class: `danger-meta${danger.champion ? ' danger-meta--champion' : ''}`, text: rank ? `${levels} · ${rank}` : levels }),
           ),
         );
       }),
@@ -141,7 +141,7 @@ export function mountCombat(container, { params, navigate }) {
         const known = options[areaId];
         if (known && known.build === build && known.hp === hp) continue;
         const { areas } = await call('GET', `/api/hunts/options?area=${encodeURIComponent(areaId)}`);
-        options[areaId] = { build, hp, threat: areas[0].threat };
+        options[areaId] = { build, hp, threat: areas[0].threat, threatAvoiding: areas[0].threatAvoiding };
         showThreat?.();
       } while (loadAgain);
     } catch (error) {
@@ -309,6 +309,7 @@ export function mountCombat(container, { params, navigate }) {
         `Eksploracja w toku: ${activity.areaName}, ${formatMinutes(activity.minutes)}.`,
         countdown,
         h('div', { class: 'bar bar--system' }, progress),
+        ...(activity.avoidRare ? [h('p', { class: 'system-hint', text: 'Postać omija elity i czempionów.' })] : []),
         h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
       ),
       skipper.element,
@@ -422,9 +423,24 @@ export function mountCombat(container, { params, navigate }) {
 
     const threatValue = h('strong', {});
     const threatLine = h('p', { class: 'threat' }, 'Zagrożenie: ', threatValue);
+    // The box by "Wyrusz" keeps the elite and the champion away and lowers
+    // the threat. The first exploration meets neither, so it has no box.
+    const avoiding = () => !first && avoidRareOn();
+    const avoidBox = h('input', {
+      type: 'checkbox',
+      id: 'avoid-rare',
+      class: 'avoid-rare-box',
+      checked: avoidRareOn(),
+      onChange: () => {
+        setAvoidRare(avoidBox.checked);
+        showThreat();
+      },
+    });
+    const avoid = !first && h('label', { class: 'avoid-rare', for: 'avoid-rare' }, avoidBox, h('span', { text: 'Unikaj elit i czempionów' }));
     showThreat = () => {
       const known = options[area.id];
-      const threat = known && known.build === buildKey(state.character) ? known.threat[minutes] : undefined;
+      const ratings = known && known.build === buildKey(state.character) ? (avoiding() ? known.threatAvoiding : known.threat) : undefined;
+      const threat = ratings?.[minutes];
       threatLine.className = `threat threat--${threat ?? 'unknown'}`;
       threatValue.textContent = threat ? THREAT_NAMES[threat] : '…';
     };
@@ -497,7 +513,7 @@ export function mountCombat(container, { params, navigate }) {
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           remember();
-          await call('POST', '/api/hunts', { areaId: area.id, minutes });
+          await call('POST', '/api/hunts', { areaId: area.id, minutes, avoidRare: avoiding() });
           leaveView(HOME, 2);
         }),
     });
@@ -538,6 +554,7 @@ export function mountCombat(container, { params, navigate }) {
           ),
         levelNote,
         durations,
+        avoid,
         threatLine,
         start,
       ),

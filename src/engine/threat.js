@@ -113,7 +113,7 @@ export function threatSamples({ character, equipped, areaId }, content) {
 }
 
 // Chance of fainting for every exploration length, between 0 and 1.
-export function faintChances({ character, equipped, hp, areaId }, content, samples) {
+export function faintChances({ character, equipped, hp, areaId, avoidRare = false }, content, samples) {
   const { maxHp, recovery, regular, tough, elite, champion, safe } = samples ?? threatSamples({ character, equipped, areaId }, content);
   // HP after the rest that follows a won fight, for each HP left after it.
   const rested = Array.from({ length: STEPS + 1 }, (_, left) => Math.round(left + (STEPS - left) * recovery));
@@ -128,9 +128,10 @@ export function faintChances({ character, equipped, hp, areaId }, content, sampl
   const result = {};
   for (const minutes of durationsUpTo(content.balance.hunt.maxMinutes, content)) {
     const pace = explorationPace(minutes, content);
-    // The champion is drawn first, then the elite (rollEncounter).
-    const championShare = champion ? pace.championChance : 0;
-    const eliteShare = (1 - championShare) * pace.eliteChance;
+    // The champion is drawn first, then the elite (rollEncounter); a
+    // character who avoids them meets neither.
+    const championShare = champion && !avoidRare ? pace.championChance : 0;
+    const eliteShare = avoidRare ? 0 : (1 - championShare) * pace.eliteChance;
     const toughShare = tough ? pace.toughChance : 0;
     const losses = [];
     // The elite's and the champion's share of fights that cost `steps`.
@@ -180,3 +181,15 @@ export function estimateThreat(input, content, samples) {
     Object.entries(faintChances(input, content, samples)).map(([minutes, chance]) => [minutes, threatLevel(chance)]),
   );
 }
+
+// The lower of two threats for each length. In a safe region a retreat before
+// the elite or the champion ends the exploration early, so without them the
+// chance of fainting can come out a shade higher; the threat shown for
+// avoiding them is never higher than the one without.
+export const lowerThreat = (threat, other) =>
+  Object.fromEntries(
+    Object.entries(threat).map(([minutes, level]) => [
+      minutes,
+      THREAT_LEVELS[Math.min(THREAT_LEVELS.indexOf(level), THREAT_LEVELS.indexOf(other[minutes] ?? level))],
+    ]),
+  );

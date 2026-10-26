@@ -71,10 +71,16 @@ export const SPRITES = {
   // The camp's buildings, <building>-<look> for the looks of levels 1–3, 4–7
   // and 8–10, 128×96 (camp-art.js keeps a vector drawing for a look without
   // one).
+  // Each building cut to its outline, at most 128 × 96.
   camp: {
     width: 128,
     height: 96,
-    ids: [],
+    fit: true,
+    ids: [
+      'sawmill-1', 'sawmill-2', 'sawmill-3', 'quarry-1', 'quarry-2', 'quarry-3', 'mine-1', 'mine-2', 'mine-3',
+      'midas-lake-1', 'midas-lake-2', 'midas-lake-3', 'campfire-1', 'campfire-2', 'campfire-3', 'loot-shed-1', 'loot-shed-2', 'loot-shed-3',
+      'scrap-bench-1', 'scrap-bench-2', 'scrap-bench-3', 'anvil-1', 'anvil-2', 'anvil-3', 'craft-table-1', 'craft-table-2', 'craft-table-3',
+    ],
   },
 };
 

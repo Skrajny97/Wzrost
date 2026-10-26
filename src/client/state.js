@@ -132,6 +132,30 @@ export const unlockInfo = (id) => state.content.unlocks.find((unlock) => unlock.
 // Reports fetched or just claimed, so opening one again needs no request.
 export const reportCache = new Map();
 
+// Whether explorations avoid the elite and the champion (the box by
+// "Wyrusz", and "Wyrusz ponownie" in a report); kept in this browser.
+const AVOID_KEY = 'wzrost.avoid-rare';
+let avoidRare = readAvoidRare();
+
+function readAvoidRare() {
+  try {
+    return localStorage.getItem(AVOID_KEY) === 'on';
+  } catch {
+    return false;
+  }
+}
+
+export const avoidRareOn = () => avoidRare;
+
+export function setAvoidRare(value) {
+  avoidRare = value;
+  try {
+    localStorage.setItem(AVOID_KEY, value ? 'on' : 'off');
+  } catch {
+    // Without storage the choice lasts until the page is closed.
+  }
+}
+
 // Test mode ("Pomiń czas" and other test tools) can be turned off in the
 // settings while the server allows it; the choice is kept in this browser.
 const TEST_MODE_KEY = 'wzrost.test-mode';

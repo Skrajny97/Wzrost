@@ -100,6 +100,13 @@ for id, takes in SKILL_TAKES.items():
         time, index = take.split('-')
         SOUNDS[f'skill-{id}-{number + 1}'] = (f'effects/skill-{id}-20261026T{time}-{index}.mp3', 'skill')
 
+# Voices whose takes come from different drafts (<time>-<take> of 26.10).
+# The author found the first Płanetnik death cry too human: it was drawn
+# again as a storm spirit blown away into the wind, and of the new takes the
+# one with the weakest pitch, the least like a voice, replaced it; the
+# second take, which the author kept, stays from the first draft.
+VOICE_TAKES = {'planetnik-death': ['1236-1', '1141-1']}
+
 # A voice made from another voice's drafts. ElevenLabs gave only sharp
 # hisses for a dying viper (three tries, ten takes, all turned down), so its
 # death is its cry when hit, which the author kept, lower and fading.
@@ -117,6 +124,10 @@ if os.path.isdir(VOICES):
         kind = 'cry' if id.endswith('-hurt') else 'dying'
         for number, take in enumerate(TAKES.get(id, [0, 1])):
             SOUNDS[f'{id}-{number + 1}'] = (os.path.relpath(draft['files'][take], 'audio/drafts'), kind)
+    for id, takes in VOICE_TAKES.items():
+        for number, take in enumerate(takes):
+            time, index = take.split('-')
+            SOUNDS[f'{id}-{number + 1}'] = (f'voices/{id}-20261026T{time}-{index}.mp3', 'dying')
     for id, (source, kind) in DERIVED.items():
         for number, take in enumerate([0, 1]):
             SOUNDS[f'{id}-{number + 1}'] = (os.path.relpath(newest[source]['files'][take], 'audio/drafts'), kind)

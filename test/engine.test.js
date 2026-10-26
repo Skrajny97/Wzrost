@@ -77,6 +77,7 @@ import {
   itemUpgradeCost,
   itemProperties,
   lowLevelMultiplier,
+  lowerThreat,
   materialDrops,
   materialView,
   materialsText,
@@ -96,6 +97,7 @@ import {
   settleCrafting,
   simulateHunt,
   statEffects,
+  THREAT_LEVELS,
   unlockedFeatures,
   areaUnlocked,
   areaUnlockLevel,
@@ -1289,8 +1291,10 @@ describe('champions', () => {
     assert.deepEqual(dangers.at(-1), { monsterId: 'tusker', minLevel: 27, maxLevel: 27, elite: false, champion: true });
     assert.deepEqual(dangers.find((danger) => danger.elite), { monsterId: 'planetnik', minLevel: 26, maxLevel: 26, elite: true, champion: false });
     assert.ok(!areaDangers(content.areasById['viper-heaps'], content).some((danger) => danger.champion));
-    // Elsewhere no draw is spent on it, so other places explore as before.
-    assert.equal(explorationPace(60, content).championChance, 0.012 * explorationPace(60, content).timeFactor);
+    // The rarest meeting of all: less often than the elite.
+    const pace = explorationPace(60, content);
+    assert.equal(pace.championChance, content.balance.hunt.championChancePerFight * pace.timeFactor);
+    assert.ok(pace.championChance < pace.eliteChance);
   });
 
   test('a beaten champion pays five times the XP and gold, leaves its material almost always and sometimes an epic item', () => {
@@ -1352,6 +1356,46 @@ describe('champions', () => {
     assert.ok(met[60] <= usual[60] + 1e-9, `${met[60]} vs ${usual[60]}`);
     const glade = { ...geared('mage', 49), hp: 99999, areaId: 'glade-heart' };
     assert.ok(faintChances(glade, always())[60] > faintChances(glade, content)[60]);
+  });
+
+  test('an exploration that avoids them meets neither the elite nor the champion, and its threat counts neither', () => {
+    // Every fight would meet the champion or the elite here.
+    const game = always();
+    game.balance.hunt = { ...game.balance.hunt, eliteChancePerFight: 100 };
+    const hero = geared('warrior', 49);
+    for (const areaId of ['boar-thicket', 'glade-heart', 'mossy-boulders']) {
+      const meets = simulateHunt({ ...hero, hp: 99999, name: 'Mira', areaId, minutes: 60, seed: `unik:${areaId}` }, game);
+      assert.ok(meets.fights.every((fight) => fight.elite || fight.champion), areaId);
+      const avoids = simulateHunt({ ...hero, hp: 99999, name: 'Mira', areaId, minutes: 60, seed: `unik:${areaId}`, avoidRare: true }, game);
+      assert.ok(avoids.fights.length > 0 && avoids.fights.every((fight) => !fight.elite && !fight.champion), areaId);
+    }
+    // Without them, fainting in Serce Uroczyska is as likely as with neither
+    // in the game at all.
+    const glade = { ...geared('mage', 49), hp: 99999, areaId: 'glade-heart' };
+    const none = {
+      ...content,
+      balance: { ...content.balance, hunt: { ...content.balance.hunt, eliteChancePerFight: 0, championChancePerFight: 0 } },
+    };
+    const avoided = faintChances({ ...glade, avoidRare: true }, game);
+    const without = faintChances(glade, none);
+    for (const minutes of [15, 60]) assert.ok(Math.abs(avoided[minutes] - without[minutes]) < 1e-9, `${minutes}: ${avoided[minutes]} vs ${without[minutes]}`);
+    assert.ok(avoided[60] < faintChances(glade, game)[60]);
+  });
+
+  test('avoiding them never shows a higher threat, even where a retreat before them would end the exploration early', () => {
+    // In the safe Dzicza Głusza every fight would be the champion's: without
+    // the box the first lost one is a retreat, with it the regular fights go on.
+    const game = always();
+    const hero = { ...geared('archer', 18), hp: 99999, areaId: 'boar-thicket' };
+    const threat = estimateThreat(hero, game);
+    const avoiding = estimateThreat({ ...hero, avoidRare: true }, game);
+    assert.ok(THREAT_LEVELS.indexOf(avoiding[60]) > THREAT_LEVELS.indexOf(threat[60]), `${avoiding[60]} vs ${threat[60]}`);
+    const shown = lowerThreat(avoiding, threat);
+    for (const minutes of Object.keys(threat)) {
+      assert.ok(THREAT_LEVELS.indexOf(shown[minutes]) <= THREAT_LEVELS.indexOf(threat[minutes]), minutes);
+      assert.ok(THREAT_LEVELS.indexOf(shown[minutes]) <= THREAT_LEVELS.indexOf(avoiding[minutes]), minutes);
+    }
+    assert.deepEqual(lowerThreat({ 15: 'high', 60: 'low' }, { 15: 'moderate', 60: 'very-high' }), { 15: 'moderate', 60: 'low' });
   });
 });
 

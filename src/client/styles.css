@@ -480,6 +480,12 @@ button {
   font-size: 12px;
 }
 
+/* The champion's levels and rank, in the blood red of its frame in fights. */
+.danger-meta--champion {
+  color: #e8414d;
+  font-weight: 600;
+}
+
 /* The lock and its level always under the name, whatever the name's length. */
 .segmented-option .lock-label {
   display: flex;
@@ -2771,6 +2777,27 @@ img.area-art {
   flex: none;
 }
 
+/* "Unikaj elit i czempionów" by "Wyrusz": a plain check mark, with the
+   whole line to tap. */
+.avoid-rare {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--text);
+  font-family: var(--font-system);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.avoid-rare-box {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--system);
+}
+
 .threat {
   margin: 0;
   font-family: var(--font-system);
@@ -2894,10 +2921,10 @@ img.area-art {
   border-color: #e0a03c;
 }
 
-/* The champion, the strongest creature of a region: a brighter gold frame. */
+/* The champion, the strongest creature of a region: a blood-red frame. */
 .unit--champion {
-  border-color: #f2d675;
-  box-shadow: 0 0 12px rgba(242, 214, 117, 0.35);
+  border-color: #b3121f;
+  box-shadow: 0 0 0 1px rgba(179, 18, 31, 0.6), 0 0 14px rgba(200, 20, 35, 0.5);
 }
 
 .unit-top {
@@ -3307,8 +3334,9 @@ img.area-art {
 }
 
 .chip--champion {
-  border-color: rgba(242, 214, 117, 0.8);
-  color: #f2d675;
+  border-color: rgba(179, 18, 31, 0.9);
+  background: rgba(120, 8, 18, 0.3);
+  color: #e8414d;
   font-size: 11px;
 }
 

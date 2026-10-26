@@ -113,13 +113,15 @@ test('every sprite on the list has its file at its size, and every class has its
     // The camp's buildings at their three looks.
     camp: data('buildings').flatMap((building) => [1, 2, 3].map((tier) => `${building.id}-${tier}`)),
   };
-  for (const [kind, { size, width = size, height = size, ids }] of Object.entries(SPRITES)) {
+  for (const [kind, { size, width = size, height = size, fit = false, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);
     for (const id of ids) {
       const file = join(CLIENT, 'art', kind, `${id}.png`);
       assert.ok(existsSync(file), `${file} is missing`);
       const png = readFileSync(file);
-      assert.equal(`${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`, `${width}x${height}`, file);
+      // A picture cut to its outline (fit) is at most that size.
+      if (fit) assert.ok(png.readUInt32BE(16) <= width && png.readUInt32BE(20) <= height, file);
+      else assert.equal(`${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`, `${width}x${height}`, file);
     }
   }
   assert.deepEqual(data('classes').map((cls) => cls.id).filter((id) => !classArtIds.includes(id)), []);

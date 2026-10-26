@@ -597,6 +597,7 @@ export function characterView(player, now) {
       minutes: activity.minutes,
       startedAt: activity.started_at,
       endsAt: activity.ends_at,
+      avoidRare: activity.avoid_rare === 1,
       finished: activity.ends_at <= now,
     },
     serverTime: now,

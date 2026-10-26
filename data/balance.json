@@ -79,7 +79,7 @@
     "groupFactors": [1, 0.7, 0.55],
     "eliteChancePerFight": 0.006,
     "eliteLevelBonus": 1,
-    "championChancePerFight": 0.012,
+    "championChancePerFight": 0.003,
     "championLevelBonus": 2,
     "recoveryAfterFight": 0.3,
     "soloXpBonus": 0.1,

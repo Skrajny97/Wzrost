@@ -4,6 +4,7 @@
 - Brakujący szczegół rozstrzygnij najprostszym rozwiązaniem zgodnym z filarami gry i dopisz go do `DECISIONS.md`.
 - Uwagi autora wtrącone w trakcie pracy, które nie dotyczą bieżącego zadania, zapisz na później i nie przerywaj pracy. Gdy trzeba przerwać, autor sam to powie.
 - Teksty czytane głosem, np. kwestie narratora, daj autorowi do zatwierdzenia przed nagraniem. Autor usuwa z nich naleciałości AI.
+- Nowe grafiki pokazuj autorowi do oceny pojedynczo, jedną po drugiej, zaraz po powstaniu, gdy autor nie śpi.
 - Z autorem rozmawiaj po polsku. Kod, nazwy plików i identyfikatory są po angielsku, a teksty widoczne w grze po polsku.
 - Autor pracuje wyłącznie z telefonu. Każdą czynność po jego stronie opisz krok po kroku dla przeglądarki mobilnej.
 - Treść gry (zdarzenia, przedmioty, potwory, NPC, teksty) trafia do `data/`, nigdy do logiki.

@@ -626,6 +626,26 @@ describe('hunts and reports', () => {
     assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).data.error.code, 'no_activity');
   });
 
+  test('an exploration can avoid the elite and the champion, with its own threat', async () => {
+    const options = await call('GET', '/api/hunts/options?area=windfalls-edge', { cookie });
+    const { threat, threatAvoiding } = options.data.areas[0];
+    assert.deepEqual(Object.keys(threatAvoiding), Object.keys(threat));
+    const wrong = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, avoidRare: 'tak' } });
+    assert.equal(wrong.status, 400);
+    assert.equal(wrong.data.error.code, 'invalid_avoid');
+    const started = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, avoidRare: true } });
+    assert.equal(started.status, 201);
+    assert.equal(started.data.character.activity.avoidRare, true);
+    const row = await (await db()).prepare('SELECT avoid_rare FROM activities').first();
+    assert.equal(row.avoid_rare, 1);
+    await call('POST', '/api/test/skip-time', { cookie });
+    const claim = await call('POST', '/api/hunts/claim', { cookie });
+    assert.ok(claim.data.report.fights.every((fight) => !fight.elite && !fight.champion));
+    // Without the choice the exploration goes as before.
+    const plain = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
+    assert.equal(plain.data.character.activity.avoidRare, false);
+  });
+
   test('checks the place and the duration', async () => {
     const place = await call('POST', '/api/hunts', { cookie, body: { areaId: 'moon', minutes: 60 } });
     assert.equal(place.data.error.code, 'invalid_area');

@@ -19,6 +19,7 @@ import {
   huntKills,
   huntReport,
   longestHunt,
+  lowerThreat,
   nextHuntUnlock,
   sellPrice,
   simulateHunt,
@@ -82,13 +83,17 @@ export async function huntOptions(context) {
     : content.regions
         .map((region) => areaFor(region.id, character.level, content))
         .filter((candidate) => areaUnlocked(candidate, character.classLevel, content));
+  // threatAvoiding: the same exploration with the elite and the champion
+  // avoided, from the same sample fights, and never above the threat without.
   return json({
     hp,
     maxHp,
-    areas: areas.map(({ id }) => ({
-      id,
-      threat: estimateThreat({ character, equipped, hp, areaId: id }, content, cachedSamples(player, character, equipped, id)),
-    })),
+    areas: areas.map(({ id }) => {
+      const samples = cachedSamples(player, character, equipped, id);
+      const threat = estimateThreat({ character, equipped, hp, areaId: id }, content, samples);
+      const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true }, content, samples);
+      return { id, threat, threatAvoiding: lowerThreat(avoiding, threat) };
+    }),
   });
 }
 
@@ -99,9 +104,10 @@ export async function startHunt(context) {
   return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) }, 201);
 }
 
-// An exploration of `minutes` in an inner region, from now on. The skipped
-// introduction sends the first one this way too (tutorial.js).
-export async function beginHunt(db, player, { areaId, regionId, minutes } = {}, now) {
+// An exploration of `minutes` in an inner region, from now on, avoiding the
+// elite and the champion when asked (avoidRare). The skipped introduction
+// sends the first one this way too (tutorial.js).
+export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false } = {}, now) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
   const area = typeof id === 'string' ? areaFor(id, player.row.level, content) : undefined;
@@ -110,6 +116,7 @@ export async function beginHunt(db, player, { areaId, regionId, minutes } = {}, 
   if (!durationsUpTo(content.balance.hunt.maxMinutes, content).includes(minutes)) {
     throw new ApiError(400, 'invalid_duration', 'Wybierz czas wyprawy.');
   }
+  if (typeof avoidRare !== 'boolean') throw new ApiError(400, 'invalid_avoid', 'Zaznacz albo odznacz omijanie elit i czempionów.');
   if (!huntDurations(player.row.level, content).includes(minutes)) {
     const longest = longestHunt(player.row.level, content);
     const next = nextHuntUnlock(player.row.level, content);
@@ -126,9 +133,9 @@ export async function beginHunt(db, player, { areaId, regionId, minutes } = {}, 
     await db.batch([
       db
         .prepare(
-          'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+          'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, avoid_rare) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
         )
-        .bind(player.row.id, 'hunt', area.id, minutes, now, now + minutes * 60000, seed, hp),
+        .bind(player.row.id, 'hunt', area.id, minutes, now, now + minutes * 60000, seed, hp, avoidRare ? 1 : 0),
       // The HP rested so far is saved now, so it is not counted again later.
       db.prepare('UPDATE characters SET hp = ?, hp_at = ?, version = version + 1 WHERE id = ?').bind(hp, now, player.row.id),
     ]);
@@ -188,6 +195,7 @@ export async function finishHunt(db, player, now) {
       minutes: activity.minutes,
       seed: activity.seed,
       first,
+      avoidRare: activity.avoid_rare === 1,
     },
     content,
   );
