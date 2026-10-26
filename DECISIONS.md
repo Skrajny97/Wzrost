@@ -1615,3 +1615,7 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
     - Kupować można także podczas wyprawy, jak u ducha ognia, bo obóz działa obok czynności postaci.
     - Zakup brzmi brzękiem monet, jak skrzynia zadań. Opis budynku mówi teraz także o częściach.
     - API: `POST /api/camp/buy` z `partId` i `count`. Jak wymiana u ducha ognia, zakup zapisuje się tylko wtedy, gdy postać jest taka, jak przy odczycie (`version`). Silnik: `src/engine/shop.js`.
+
+## Nowe stwory i czempioni (26.10.2026)
+
+1. **Zablokowane Profesje** (autor: „ma nie być napisane »profesje zbierackie«, a po prostu »profesje«, bo będą różne”). Komunikat Systemu na zablokowanej zakładce brzmi teraz „Dostęp zablokowany. Profesje: od poziomu postaci 10.” (`name` w `data/unlocks.json`). Które profesje otworzą się na tym poziomie, rozstrzygnie projekt profesji.

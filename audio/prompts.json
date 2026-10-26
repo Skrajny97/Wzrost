@@ -47,6 +47,56 @@
         "seconds": 0.6
       },
       "likho-death": "a gaunt forest demon lets out a long rattling death shriek, close up, dry, no music",
+      "stag-hurt": {
+        "text": "a red deer stag bellows short and angry when hit, a harsh grunting roar, video game creature hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
+      "stag-death": "a red deer stag lets out a long fading bellow and collapses to the ground, close up, dry, no music",
+      "marten-hurt": {
+        "text": "a small marten lets out a sharp angry chattering screech when hit, quick, video game creature hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
+      "marten-death": "a small marten squeals weakly and goes silent, close up, dry, no music",
+      "hornets-hurt": {
+        "text": "a swarm of hornets buzzes louder and angrier for a moment, a sharp aggressive buzz, close up, dry, no music",
+        "seconds": 0.6
+      },
+      "hornets-death": "a buzzing swarm of hornets breaks up and the buzz fades away, close up, dry, no music",
+      "planetnik-hurt": {
+        "text": "a storm spirit grunts in pain with a crackle of thunder and a gust of wind, short, video game monster hurt sound, close up, no music",
+        "seconds": 0.6
+      },
+      "planetnik-death": "a storm spirit fades away with a long dying moan, rolling distant thunder and a rush of wind, close up, no music",
+      "tusker-hurt": {
+        "text": "a huge wild boar squeals and grunts furiously when hit, deep and loud, video game creature hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
+      "tusker-death": "a huge wild boar lets out a long deep grunting squeal and crashes heavily to the ground, close up, dry, no music",
+      "stoneling-hurt": {
+        "text": "a creature made of stone grinds and cracks when struck, with a low rumbling groan, short, video game monster hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
+      "stoneling-death": "a creature made of stone crumbles apart into falling rocks with a low fading rumble, close up, dry, no music",
+      "bat-hurt": {
+        "text": "a bat lets out a high shrill squeak when hit, quick, video game creature hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
+      "bat-death": "a bat squeaks weakly and flutters to the ground, close up, dry, no music",
+      "eagle-owl-hurt": {
+        "text": "a large eagle-owl hisses and screeches angrily when hit, short, video game creature hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
+      "eagle-owl-death": "a large eagle-owl gives a low fading hoot and a last flutter of wings, close up, dry, no music",
+      "she-wolf-hurt": {
+        "text": "a she-wolf snarls sharply in pain, a short fierce growl, not a yelp, video game creature hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
+      "she-wolf-death": "a she-wolf whimpers and collapses with a fading whine, close up, dry, no music",
+      "basilisk-hurt": {
+        "text": "a monstrous serpent hisses loudly with a harsh rooster-like screech when hit, short, video game monster hurt sound, close up, dry, no music",
+        "seconds": 0.6
+      },
+      "basilisk-death": "a monstrous serpent lets out a long rattling hiss and screech and slumps heavily, close up, dry, no music",
       "male-hurt": "a young man grunts in pain from a blow in a fight, short, no words, close up, dry, no music",
       "male-death": "a young man lets out one pained groan and collapses to the ground, no words, no speech, video game character death sound, close up, dry, no music",
       "female-hurt": "a young woman grunts in pain from a blow in a fight, short, no words, close up, dry, no music",
