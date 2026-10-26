@@ -22,7 +22,11 @@ const levelText = (skill) => `Poziom ${skill.level} / ${skill.maxLevel}`;
 const skillPoints = (count) => countOf(count, 'Punkt Umiejętności', 'Punkty Umiejętności', 'Punktów Umiejętności');
 
 // What stands before a path's name, by its state (skillsView).
-const PATH_LABELS = { main: 'Ścieżka główna', second: 'Druga ścieżka', closed: 'Ścieżka zamknięta' };
+const PATH_LABELS = { main: 'Ścieżka główna', second: 'Ścieżka poboczna', closed: 'Ścieżka zamknięta' };
+
+// The main path on top, the side path under it, the paths still open in
+// their order, and a closed one at the bottom.
+const PATH_ORDER = { main: 0, second: 1, closed: 3 };
 
 export function mountSkills(container) {
   function render() {
@@ -48,7 +52,7 @@ export function mountSkills(container) {
       heading,
       waiting &&
         systemPanel(
-          `Klasa czeka na ${evolution.level}. poziomie, u progu ewolucji. Urośnie dalej, gdy ${evolution.need === 'second_path' ? 'wybierzesz drugą ścieżkę' : 'rozdasz Punkty Umiejętności'}. Zdobyte XP klasy nie przepada.`,
+          `Klasa czeka na ${evolution.level}. poziomie, u progu ewolucji. Urośnie dalej, gdy ${evolution.need === 'second_path' ? 'wybierzesz ścieżkę poboczną' : 'rozdasz Punkty Umiejętności'}. Zdobyte XP klasy nie przepada.`,
         ),
       busy && systemPanel('Postać jest na wyprawie. Umiejętności zmienisz po jej powrocie.'),
       view.pools.map((pool) => poolSection(pool, view, busy)),
@@ -59,8 +63,8 @@ export function mountSkills(container) {
   // Where each path stands on the page, by its skill.
   const pathTops = () => new Map([...container.querySelectorAll('.skill-path')].map((node) => [node.dataset.skill, node.getBoundingClientRect().top]));
 
-  // A path that moved since `before`, like one that closed and went to the
-  // bottom, slides from its old place to the new one.
+  // A path that moved since `before`, like the main one going to the top or
+  // a closed one to the bottom, slides from its old place to the new one.
   function slidePaths(before) {
     if (!motionOn()) return;
     for (const [skillId, top] of pathTops()) {
@@ -83,17 +87,17 @@ export function mountSkills(container) {
       known === 0
         ? `Od ${pool.classLevel}. poziomu wzrost poziomu klasy pozwala Ci uzyskać 1 Punkt Umiejętności. Każda umiejętność otwiera jedną ze ścieżek rozwoju. Ale ostrożnie! Możesz otworzyć tylko dwie ścieżki – a one będą miały istotny wpływ na Twoje dalsze losy.`
         : secondNow && view.points > 0
-          ? `Masz ${skillPoints(view.points)}. Dodaj punkt do znanej umiejętności albo wybierz drugą ścieżkę. Ostatnia ścieżka się wtedy zamknie.`
+          ? `Masz ${skillPoints(view.points)}. Dodaj punkt do znanej umiejętności albo wybierz ścieżkę poboczną. Ostatnia ścieżka się wtedy zamknie.`
           : secondNow
-            ? 'Drugą ścieżkę wybierzesz za 1 Punkt Umiejętności, a każdy poziom klasy daje jeden. Ostatnia ścieżka się wtedy zamknie.'
+            ? 'Ścieżkę poboczną wybierzesz za 1 Punkt Umiejętności, a każdy poziom klasy daje jeden. Ostatnia ścieżka się wtedy zamknie.'
             : secondOpen
-              ? `Drugą ścieżkę dobierzesz od poziomu klasy ${view.secondLevel} za 1 Punkt Umiejętności. Wtedy ostatnia ścieżka się zamknie.`
+              ? `Ścieżkę poboczną dobierzesz od poziomu klasy ${view.secondLevel} za 1 Punkt Umiejętności. Wtedy ostatnia ścieżka się zamknie.`
               : null;
     // The deadline, while the second path is open and the class not yet
     // waiting for it.
     const evolutionLevel = view.evolution?.level;
     const deadline =
-      secondOpen && evolutionLevel && state.character.classLevel < evolutionLevel && `Drugą ścieżkę wybierz najpóźniej na ${evolutionLevel}. poziomie klasy, przed ewolucją.`;
+      secondOpen && evolutionLevel && state.character.classLevel < evolutionLevel && `Ścieżkę poboczną wybierz najpóźniej na ${evolutionLevel}. poziomie klasy, przed ewolucją.`;
     // Points to spend, told unless the line above already tells them.
     const pointsNote = known > 0 && view.points > 0 && raisable && !(secondNow && view.points > 0);
     return h(
@@ -101,8 +105,7 @@ export function mountSkills(container) {
       { class: 'skill-paths', 'aria-label': 'Ścieżki rozwoju' },
       intro && systemPanel(deadline ? `${intro} ${deadline}` : intro),
       pointsNote && systemPanel(`Masz ${skillPoints(view.points)}. Dotknij umiejętności, żeby dodać punkt.`),
-      // A closed path goes to the bottom.
-      [...pool.options].sort((a, b) => (a.state === 'closed') - (b.state === 'closed')).map((skill) => pathSection(skill, pool, view, busy)),
+      [...pool.options].sort((a, b) => (PATH_ORDER[a.state] ?? 2) - (PATH_ORDER[b.state] ?? 2)).map((skill) => pathSection(skill, pool, view, busy)),
     );
   }
 
@@ -122,7 +125,7 @@ export function mountSkills(container) {
     const label =
       skill.state === 'pick'
         ? second
-          ? 'Wybierz jako drugą · 1 punkt'
+          ? 'Wybierz jako poboczną · 1 punkt'
           : 'Wybierz'
         : skill.state === 'soon'
           ? `Od poziomu klasy ${view.secondLevel}`
@@ -150,13 +153,13 @@ export function mountSkills(container) {
     const sure = await confirmAction(
       second
         ? {
-            title: `Druga ścieżka: ${skill.path}?`,
+            title: `Ścieżka poboczna: ${skill.path}?`,
             text: `${skill.name} kosztuje 1 Punkt Umiejętności. Ścieżka ${left?.path ?? ''} zamknie się na stałe.`,
             confirmLabel: 'Wybieram',
           }
         : {
             title: `Ścieżka główna: ${skill.path}?`,
-            text: `${skill.name} to wybór na stałe. Drugą ścieżkę dobierzesz od poziomu klasy ${state.character.skills.secondLevel}.`,
+            text: `${skill.name} to wybór na stałe. Ścieżkę poboczną dobierzesz od poziomu klasy ${state.character.skills.secondLevel}.`,
             confirmLabel: 'Wybieram',
           },
     );

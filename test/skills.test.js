@@ -132,7 +132,7 @@ describe('skills', () => {
     const held = applyHunt(alone, { xp: gained, result: 'success' }, content);
     assert.equal(held.classLevel, 50);
     assert.equal(held.classXp, gained - toNext(49));
-    assert.ok(held.messages.includes('Wojownik: klasa czeka na 50. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach wybierzesz drugą ścieżkę. Zdobyte XP klasy nie przepada.'));
+    assert.ok(held.messages.includes('Wojownik: klasa czeka na 50. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach wybierzesz ścieżkę poboczną. Zdobyte XP klasy nie przepada.'));
     assert.deepEqual(skillsView({ ...alone, classLevel: 50 }, content).evolution, { level: 50, need: 'second_path' });
     // Waiting, it keeps adding up and says so after each exploration.
     const still = applyHunt({ ...alone, classLevel: 50, classXp: held.classXp }, { xp: 100, result: 'success' }, content);

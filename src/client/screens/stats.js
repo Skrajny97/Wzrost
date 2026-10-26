@@ -87,7 +87,7 @@ export function mountStats(container) {
   function evolutionHint(character, evolution) {
     if (character.classLevel < evolution) return `PIERWSZA EWOLUCJA: POZ. KLASY ${evolution}`;
     const need = character.skills?.evolution?.need;
-    if (need === 'second_path') return 'KLASA CZEKA: WYBIERZ DRUGĄ ŚCIEŻKĘ';
+    if (need === 'second_path') return 'KLASA CZEKA: WYBIERZ ŚCIEŻKĘ POBOCZNĄ';
     if (need === 'skill_points') return 'KLASA CZEKA: ROZDAJ PUNKTY UMIEJĘTNOŚCI';
     return 'EWOLUCJA KLASY: WKRÓTCE';
   }
