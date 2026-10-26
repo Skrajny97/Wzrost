@@ -22,6 +22,7 @@ on:
           - areas
           - lands
           - logo
+          - camp
       ids:
         description: Identyfikatory po przecinku albo all
         required: true

@@ -1,5 +1,5 @@
 {
-  "$comment": "Prompts for tools/generate-art.mjs (Retro Diffusion). Each kind has its style, size and the approved sprites used as style references (art/references/<kind>/<id>.png). Approved sprites go to src/client/art/<kind>/<id>.png. The portraits are the starting look: plain clothes and empty hands, as characters start with nothing. portraits-evolved holds the prompts of the earlier, well-equipped portraits, kept in art/evolution/portraits/ for the look after the first class evolution. materials holds the materials left by creatures, the parts made on the Stół rzemieślniczy and the treasure chest (data/materials.json). areas holds the inner regions, each a scene in a circle on the Walka screen, and lands the wide, dim backgrounds behind the cards of the lands (regions.json); both keep their background (removeBackground: false).",
+  "$comment": "Prompts for tools/generate-art.mjs (Retro Diffusion). Each kind has its style, size and the approved sprites used as style references (art/references/<kind>/<id>.png). Approved sprites go to src/client/art/<kind>/<id>.png. The portraits are the starting look: plain clothes and empty hands, as characters start with nothing. portraits-evolved holds the prompts of the earlier, well-equipped portraits, kept in art/evolution/portraits/ for the look after the first class evolution. materials holds the materials left by creatures, the parts made on the Stół rzemieślniczy and the treasure chest (data/materials.json). areas holds the inner regions, each a scene in a circle on the Walka screen, and lands the wide, dim backgrounds behind the cards of the lands (regions.json); both keep their background (removeBackground: false). camp holds the camp buildings, each at three looks for levels 1–3, 4–7 and 8–10 (<building>-1, -2, -3), drawn on the board and the building screens.",
   "monsters": {
     "style": "rd_pro__fantasy",
     "width": 48,
@@ -228,6 +228,41 @@
     "references": [],
     "prompts": {
       "narrator": "game logo emblem, a hooded mysterious figure from the chest up inside a glowing cyan hexagon, no visible face, only two small glowing cyan eyes deep in the dark hood, a faint glowing parchment scroll below, pine forest silhouette behind, centered and symmetric, dark near-black background, bold simple shapes readable as a small app icon, no text, no letters"
+    }
+  },
+  "camp": {
+    "style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 96,
+    "references": [],
+    "prompts": {
+      "sawmill-1": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a simple sawhorse with a two-man saw, a few logs and wood chips",
+      "sawmill-2": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a small open wooden sawmill shed with a log pile, a saw bench and stacked planks",
+      "sawmill-3": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a large timber sawmill with a roofed saw frame, a big log pile, stacked planks and a cart",
+      "midas-lake-1": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a small dark forest pond with reeds and a trapper's gold pan on the muddy shore, specks of gold in the water",
+      "midas-lake-2": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a forest pond with reeds and a wooden sluice trough for panning gold on the shore, glints of gold",
+      "midas-lake-3": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a forest pond with a wooden pier, a hanging lantern, a gold sluice and a small sack of gold coins on the pier",
+      "quarry-1": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a few broken grey boulders with a pickaxe stuck in one and a small pile of cut stones",
+      "quarry-2": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a small open stone quarry pit with stacked stone blocks and a simple wooden lifting crane",
+      "quarry-3": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a large terraced stone quarry with a tall wooden crane, rows of cut stone blocks and a stone cart",
+      "mine-1": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a small dark hole in a rocky hillside with a pickaxe and a few rusty iron ore rocks beside it",
+      "mine-2": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a timbered mine entrance in a rocky hill with a small mine cart on rails and piles of iron ore",
+      "mine-3": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a large mine entrance with a wooden headframe, hanging lanterns and a mine cart full of iron ore on rails",
+      "campfire-1": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a small campfire in a ring of stones with a few logs, low flames",
+      "campfire-2": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a campfire in a ring of stones with a cooking pot on a tripod and two log benches around it",
+      "campfire-3": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a big bonfire in a stone hearth with log benches around it, a roasting spit and a faint smiling fire spirit in the flames",
+      "loot-shed-1": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a tiny lean-to shelter made of branches with a sack and a wooden crate under it",
+      "loot-shed-2": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a small wooden shed with a thatched roof, crates and sacks of loot by the open door",
+      "loot-shed-3": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a sturdy log storehouse with a shingle roof, barrels, iron-bound chests and sacks around it",
+      "scrap-bench-1": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a rough wooden table piled with scrap metal, an old dented shield and a few broken blades",
+      "scrap-bench-2": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a scrap dealer's covered market stall with hanging tools, piles of scrap and a balance scale",
+      "scrap-bench-3": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a large roofed scrap dealer's shop with shelves of parts, hanging armour pieces and a counter with a balance scale",
+      "anvil-1": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a small iron anvil on a tree stump with a hammer leaning on it",
+      "anvil-2": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, an iron anvil next to a small stone forge with glowing coals, leather bellows and tongs",
+      "anvil-3": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a roofed blacksmith forge with a glowing furnace, a big anvil, bellows and racks of weapons",
+      "craft-table-1": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a simple wooden workbench with a knife and a few pelts on it",
+      "craft-table-2": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a sturdy workbench with tools, leather straps, a vise and pelts under a small cloth canopy",
+      "craft-table-3": "pixel art game asset of a forest camp building, three-quarter top-down view, muted forest colours with warm light, isolated on a plain background, a large craftsman's workshop table under a wooden roof with racks of tools, crafting parts and small glowing crystals"
     }
   }
 }
