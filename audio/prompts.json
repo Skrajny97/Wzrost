@@ -107,7 +107,7 @@
         "seconds": 1.5
       },
       "skill-mana-shield": {
-        "text": "an ethereal magic shield appears: one clear water droplet falling into still water with a soft echoing plink, wrapped in a faint airy shimmer, delicate and high, fantasy, no deep hum, no music",
+        "text": "a single water droplet falls into a still pool with a clear bright plink, followed by a soft shimmering magical echo that rings and slowly fades, ethereal and airy, high pitched, fantasy, no bass, no music",
         "seconds": 1.5
       },
       "skill-prayer-of-health": {
@@ -131,7 +131,7 @@
         "seconds": 1.5
       },
       "skill-shadow-dance": {
-        "text": "a rogue dancing between shadows: three very fast whooshes of a spinning dark cloak, light quick footsteps and a soft breathy whisper, close up, no deep rumble, no music",
+        "text": "three fast high-pitched swishes of a silk cloak whipped through the air, crisp and airy, with a soft high breathy whisper, close up, dry, no bass, no rumble, no low frequencies, no music",
         "seconds": 1.5
       }
     }
