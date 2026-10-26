@@ -1,5 +1,5 @@
 {
-  "$comment": "Prompts for tools/generate-art.mjs (Retro Diffusion). Each kind has its style, size and the approved sprites used as style references (art/references/<kind>/<id>.png). Approved sprites go to src/client/art/<kind>/<id>.png. The portraits are the starting look: plain clothes and empty hands, as characters start with nothing. portraits-evolved holds the prompts of the earlier, well-equipped portraits, kept in art/evolution/portraits/ for the look after the first class evolution. materials holds the materials left by creatures, the parts made on the Stół rzemieślniczy and the treasure chest (data/materials.json).",
+  "$comment": "Prompts for tools/generate-art.mjs (Retro Diffusion). Each kind has its style, size and the approved sprites used as style references (art/references/<kind>/<id>.png). Approved sprites go to src/client/art/<kind>/<id>.png. The portraits are the starting look: plain clothes and empty hands, as characters start with nothing. portraits-evolved holds the prompts of the earlier, well-equipped portraits, kept in art/evolution/portraits/ for the look after the first class evolution. materials holds the materials left by creatures, the parts made on the Stół rzemieślniczy and the treasure chest (data/materials.json). areas holds the inner regions, each a scene in a circle on the Walka screen, and lands the wide, dim backgrounds behind the cards of the lands (regions.json); both keep their background (removeBackground: false).",
   "monsters": {
     "style": "rd_pro__fantasy",
     "width": 48,
@@ -168,6 +168,36 @@
       "backstab": "dagger striking out of dark smoke from behind, square fantasy RPG skill icon, bold readable shape, dark forest green background",
       "poisoned-blade": "dagger blade dripping bright green venom, square fantasy RPG skill icon, bold readable shape, dark forest green background",
       "shadow-dance": "hooded figure blurring into several dark shadow afterimages, square fantasy RPG skill icon, bold readable shape, dark forest green background"
+    }
+  },
+  "areas": {
+    "style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "removeBackground": false,
+    "references": [],
+    "prompts": {
+      "windfalls-edge": "sparse grove of young birches and pines at the edge of an old forest, the first fallen tree trunks lying across the grass, a pale moon low in a dusky green sky, calm evening, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+      "fox-ravines": "sandy forest ravine with steep earthen banks full of fox burrows, tree roots hanging from the banks, an orange fox sitting at the bottom of the ravine, warm dusk light, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+      "raven-hollows": "toppled old trees with huge root plates torn out of the ground and pointing at the sky, black ravens perched on the roots, deep twilight, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+      "viper-heaps": "sun-warmed heaps of stacked tree trunks and grey stones in a forest clearing, a grey viper with a dark zigzag stripe basking on a log, warm afternoon light, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+      "boar-thicket": "the densest dark thicket of a fallen-tree forest at night, churned muddy ground between ferns, a big wild boar with tusks among the bushes, faint moonlight, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+      "mossy-boulders": "outer ring of huge moss-covered boulders in an ancient forest glade, silver spider webs strung between the stones, light mist, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+      "spider-gully": "narrow shadowy forest gully shrouded in thick spider webs, a large cross spider waiting in its web, dim green light from above, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+      "lynx-ridge": "rocky ridge with stone ledges above a forest glade, a lynx with tufted ears crouching on a ledge, evening sky, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+      "wolf-circles": "moonlit forest clearing, a large grey alpha wolf howling at the full moon from a rock, dark pine forest around, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
+      "glade-heart": "the heart of an ancient stone circle deep in a primeval forest, tall standing stones covered with moss and runes, a huge brown bear in the thicket behind them, faint mysterious glow, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people"
+    }
+  },
+  "lands": {
+    "style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "removeBackground": false,
+    "references": [],
+    "prompts": {
+      "windfalls": "pixel art landscape, a long belt of fallen and toppled trees at the edge of a primeval forest, upturned roots, a faint will-o-the-wisp light glowing in the thicket, dusk, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and browns, no text, no border, no people, no animals in front",
+      "stone-glade": "pixel art landscape, a forest glade with a ring of moss-covered standing stones, the dark primeval forest rising beyond it, light mist, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and browns, no text, no border, no people, no animals in front"
     }
   }
 }

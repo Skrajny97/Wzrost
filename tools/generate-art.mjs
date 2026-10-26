@@ -107,8 +107,8 @@ async function draw(id) {
     height: kind.height,
     num_images: variants,
     seed,
-    remove_bg: true,
-    return_non_bg_removed: true,
+    // Sprites lose their background; scenes (removeBackground: false) keep it.
+    ...(kind.removeBackground === false ? {} : { remove_bg: true, return_non_bg_removed: true }),
   };
   const refs = references(id);
   if (refs.length) payload.reference_images = refs;

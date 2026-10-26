@@ -19,6 +19,8 @@ on:
           - materials
           - narrator
           - skills
+          - areas
+          - lands
       ids:
         description: Identyfikatory po przecinku albo all
         required: true
