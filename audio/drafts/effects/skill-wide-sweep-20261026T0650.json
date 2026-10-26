@@ -1,0 +1,13 @@
+{
+  "id": "skill-wide-sweep",
+  "payload": {
+    "text": "a wide sweeping sword slash, one long whoosh cutting the air from side to side and ending in a bright ringing blade, fantasy battle, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-wide-sweep-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-wide-sweep-20261026T0650-1.mp3"
+  ],
+  "credits": 48
+}

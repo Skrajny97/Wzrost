@@ -1,0 +1,13 @@
+{
+  "id": "skill-frost-gust",
+  "payload": {
+    "text": "an icy magic wind gust, a cold howling blast with crackling frost and tinkling ice crystals, fantasy magic, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-frost-gust-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-frost-gust-20261026T0650-1.mp3"
+  ],
+  "credits": 60
+}

@@ -1,0 +1,13 @@
+{
+  "id": "skill-poisoned-blade",
+  "payload": {
+    "text": "poison smeared on a steel blade, a wet dripping sizzle with a faint bubbling hiss, close up, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-poisoned-blade-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-poisoned-blade-20261026T0650-1.mp3"
+  ],
+  "credits": 48
+}

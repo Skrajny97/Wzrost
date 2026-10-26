@@ -1,0 +1,13 @@
+{
+  "id": "skill-aimed-shot",
+  "payload": {
+    "text": "a bow string slowly drawn tight with a creak, then one sharp precise arrow release and a fast whistle, close up, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-aimed-shot-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-aimed-shot-20261026T0650-1.mp3"
+  ],
+  "credits": 48
+}

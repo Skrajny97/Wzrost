@@ -1,0 +1,13 @@
+{
+  "id": "skill-exorcism",
+  "payload": {
+    "text": "a holy exorcism spell, a bright radiant blast with a short choir swell and a ringing bell, fantasy magic, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-exorcism-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-exorcism-20261026T0650-1.mp3"
+  ],
+  "credits": 60
+}

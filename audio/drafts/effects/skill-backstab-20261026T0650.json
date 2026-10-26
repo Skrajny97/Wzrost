@@ -1,0 +1,13 @@
+{
+  "id": "skill-backstab",
+  "payload": {
+    "text": "a stealthy dagger strike from the shadows, a quick soft swish and a sharp stab, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-backstab-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-backstab-20261026T0650-1.mp3"
+  ],
+  "credits": 40
+}

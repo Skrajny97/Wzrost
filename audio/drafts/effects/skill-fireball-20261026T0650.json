@@ -1,0 +1,13 @@
+{
+  "id": "skill-fireball",
+  "payload": {
+    "text": "a fireball spell, a roaring rush of flame thrown forward and a crackling fiery burst, fantasy magic, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-fireball-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-fireball-20261026T0650-1.mp3"
+  ],
+  "credits": 60
+}

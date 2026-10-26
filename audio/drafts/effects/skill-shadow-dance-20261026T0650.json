@@ -1,0 +1,13 @@
+{
+  "id": "skill-shadow-dance",
+  "payload": {
+    "text": "shadow magic, a figure blurring into shadows with quick airy whooshes and a dark whispery swirl, fantasy, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-shadow-dance-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-shadow-dance-20261026T0650-1.mp3"
+  ],
+  "credits": 60
+}

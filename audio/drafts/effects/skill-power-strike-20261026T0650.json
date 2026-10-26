@@ -1,0 +1,13 @@
+{
+  "id": "skill-power-strike",
+  "payload": {
+    "text": "a heavy two-handed sword blow landing on armor, a deep crunching metallic impact with a short ringing crack, fantasy battle, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-power-strike-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-power-strike-20261026T0650-1.mp3"
+  ],
+  "credits": 48
+}

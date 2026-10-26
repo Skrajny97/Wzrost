@@ -1,0 +1,13 @@
+{
+  "id": "skill-pinning-shot",
+  "payload": {
+    "text": "an arrow strikes and pins into hard ground with a heavy wooden thunk and a short vibrating twang of the shaft, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-pinning-shot-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-pinning-shot-20261026T0650-1.mp3"
+  ],
+  "credits": 40
+}

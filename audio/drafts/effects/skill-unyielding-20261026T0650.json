@@ -1,0 +1,13 @@
+{
+  "id": "skill-unyielding",
+  "payload": {
+    "text": "a warrior plants his feet and raises a steel shield, a solid metallic shield slam with a deep resonant ring and a brief warm shimmer, fantasy, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-unyielding-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-unyielding-20261026T0650-1.mp3"
+  ],
+  "credits": 60
+}

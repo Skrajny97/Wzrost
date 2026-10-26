@@ -1,0 +1,13 @@
+{
+  "id": "skill-blessing",
+  "payload": {
+    "text": "a blessing spell, a soft angelic chime with a warm glowing shimmer that fades out, fantasy, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-blessing-20261026T0650-0.mp3",
+    "audio/drafts/effects/skill-blessing-20261026T0650-1.mp3"
+  ],
+  "credits": 60
+}
