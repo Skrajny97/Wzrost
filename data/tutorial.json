@@ -325,12 +325,12 @@
       "id": "settings",
       "kind": "point",
       "text": [
-        "Dla Twojej wygody możesz również zajrzeć do części ustawień samego Systemu i ustawić je tak, jak Ci się żywnie podoba. Jeśli stwierdzisz, że popełniłeś za dużo błędów – możesz nawet zacząć od nowa."
+        "Dla Twojej wygody możesz również zajrzeć do części ustawień samego Systemu i ustawić je tak, jak Ci się żywnie podoba. Jeśli stwierdzisz, że popełniłeś za dużo błędów – możesz nawet zacząć od nowa. Na samej górze ustawień czeka też Dziennik – tam znajdziesz wszystkie raporty."
       ],
       "voice": "audio/narration/settings.mp3",
       "female": {
         "text": [
-          "Dla Twojej wygody możesz również zajrzeć do części ustawień samego Systemu i ustawić je tak, jak Ci się żywnie podoba. Jeśli stwierdzisz, że popełniłaś za dużo błędów – możesz nawet zacząć od nowa."
+          "Dla Twojej wygody możesz również zajrzeć do części ustawień samego Systemu i ustawić je tak, jak Ci się żywnie podoba. Jeśli stwierdzisz, że popełniłaś za dużo błędów – możesz nawet zacząć od nowa. Na samej górze ustawień czeka też Dziennik – tam znajdziesz wszystkie raporty."
         ],
         "voice": "audio/narration/settings-female.mp3"
       }
