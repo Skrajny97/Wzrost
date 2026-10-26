@@ -1,0 +1,13 @@
+{
+  "id": "planetnik-death",
+  "payload": {
+    "text": "a storm spirit dissolves into the wind: a howling gust that dies away, a last crackle of lightning and a long roll of distant thunder, no human voice, no moaning, no words, close up, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/planetnik-death-20261026T1236-0.mp3",
+    "audio/drafts/voices/planetnik-death-20261026T1236-1.mp3"
+  ],
+  "credits": 40
+}
