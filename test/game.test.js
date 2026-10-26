@@ -721,7 +721,7 @@ describe('camp', () => {
     assert.deepEqual(data.resources.map((resource) => resource.name), ['Drewno', 'Kamień', 'Ruda żelaza']);
     assert.deepEqual(
       data.buildings.map((building) => building.name),
-      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Jezioro Midasa', 'Ognisko', 'Szałas na łupy', 'Skup złomu', 'Kowadło', 'Stół rzemieślniczy'],
+      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Staw Midasa', 'Ognisko', 'Magazyn', 'Skup złomu', 'Kowadło', 'Stół rzemieślniczy'],
     );
   });
 
@@ -1056,7 +1056,7 @@ describe('camp', () => {
     assert.equal((await buy('scraps', 1)).status, 200);
   });
 
-  test('Jezioro Midasa fills its store with gold, which goes to the gold, also when an upgrade collects it', async () => {
+  test('Staw Midasa fills its store with gold, which goes to the gold, also when an upgrade collects it', async () => {
     await stock(500, { wood: 50, stone: 20, 'iron-ore': 20 });
     const lake = (view) => view.camp.buildings.find((building) => building.id === 'midas-lake');
     const built = await build('midas-lake');

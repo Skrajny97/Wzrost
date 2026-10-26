@@ -35,7 +35,7 @@ export const PLOT_HEIGHT = 83;
 // 11 below its plot, and the narrator's ring stands 6 off the plot it lights.
 export const CAMP_PLOTS = {
   sawmill: { x: 74, y: 48 },
-  // Jezioro Midasa, where the pond at the edge of the glade lay.
+  // Staw Midasa, where the pond at the edge of the glade lay.
   'midas-lake': { x: 70, y: 152 },
   quarry: { x: 286, y: 86 },
   mine: { x: 258, y: 318 },
@@ -72,7 +72,7 @@ const tufts = (spots) =>
 
 const GROUND = `<ellipse cx="50" cy="66" rx="45" ry="12" fill="#2a2519"></ellipse><ellipse cx="50" cy="66" rx="45" ry="12" fill="none" stroke="#3a3324" stroke-width="1"></ellipse>`;
 
-// Jezioro Midasa: dark water with a glint of light, reeds, the trapper's pan
+// Staw Midasa: dark water with a glint of light, reeds, the trapper's pan
 // and specks of gold.
 const POND = `<ellipse cx="50" cy="62" rx="44" ry="15" fill="#16242a" stroke="#28393d" stroke-width="1.5"></ellipse>
 <ellipse cx="40" cy="58" rx="15" ry="3.2" fill="#8fe3ef" opacity="0.08"></ellipse>

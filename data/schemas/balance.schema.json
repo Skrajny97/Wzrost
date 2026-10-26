@@ -295,7 +295,7 @@
         "bagSlots": {
           "type": "integer",
           "minimum": 1,
-          "description": "Miejsca w plecaku bez Szałasu na łupy. Założone przedmioty się nie liczą."
+          "description": "Miejsca w plecaku bez Magazynu. Założone przedmioty się nie liczą."
         }
       }
     },

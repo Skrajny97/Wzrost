@@ -148,7 +148,7 @@ describe('what comes due (engine)', () => {
     const [build] = notificationsDue(player({ buildings, queue }), t0 - 60000, t0, content);
     assert.equal(build.tag, 'build');
     assert.equal(build.title, 'Koniec budowy');
-    assert.equal(build.body, 'Ognisko: poziom 2 gotowy. Szałas na łupy: poziom 1 gotowy.');
+    assert.equal(build.body, 'Ognisko: poziom 2 gotowy. Magazyn: poziom 1 gotowy.');
   });
 
   test('a store that fills up names every full store; an upgrade from the queue takes its store along', () => {

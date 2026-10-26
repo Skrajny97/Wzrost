@@ -78,7 +78,7 @@ export async function beginBuilding(db, player, buildingId, now) {
   const producing = building.effect.kind === 'production';
   const gathered = producing ? collect(building, stored, now) : null;
   const changes = Object.fromEntries(resources.map((id) => [id, -cost[id]]));
-  // A store of gold (Jezioro Midasa) pays part of the cost.
+  // A store of gold (Staw Midasa) pays part of the cost.
   const gatheredGold = gathered?.resource === 'gold' ? gathered.amount : 0;
   if (gathered && !gatheredGold) changes[gathered.resource] = (changes[gathered.resource] ?? 0) + gathered.amount;
   // The upgrade starts only if nothing is being built, the building is as

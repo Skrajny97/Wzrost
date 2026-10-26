@@ -43,8 +43,8 @@
   },
   {
     "id": "midas-lake",
-    "name": "Jezioro Midasa",
-    "description": "Ciche jezioro, na którego dnie zalega złoto. Misa traperska sama odsącza je z mułu: niewiele, ale bez przerwy.",
+    "name": "Staw Midasa",
+    "description": "Cichy staw, na którego dnie zalega złoto. Misa traperska sama odsącza je z mułu: niewiele, ale bez przerwy.",
     "maxLevel": 10,
     "effect": { "kind": "production", "resource": "gold", "perLevel": 4, "storageHours": 2, "unit": "count", "text": "Odsącza {value} złota na godzinę, magazyn na {hours} produkcji" },
     "costs": [
@@ -80,7 +80,7 @@
   },
   {
     "id": "loot-shed",
-    "name": "Szałas na łupy",
+    "name": "Magazyn",
     "description": "Sucha wiata na zdobycze. Plecak mieści więcej przedmiotów.",
     "maxLevel": 10,
     "effect": { "kind": "bagSlots", "perLevel": 5, "unit": "count", "text": "Plecak większy o {value} miejsc" },
