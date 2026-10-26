@@ -10,7 +10,7 @@ import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
 import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
-import { discardItem, equipItem, previewItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
+import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { pushKey, sendNotifications, subscribePush, unsubscribePush } from './push.js';
 import { claimAllQuests, claimQuest, openChest } from './quests.js';
 import { getReport, listReports } from './reports.js';
@@ -47,6 +47,7 @@ const routes = [
   ['GET', '/api/items/:id/preview', previewItem],
   ['POST', '/api/items/:id/upgrade', upgradeItem],
   ['POST', '/api/items/sell', sellItems],
+  ['POST', '/api/items/:id/sell', sellItem],
   ['POST', '/api/items/:id/salvage', salvageItem],
   ['POST', '/api/craft/materials', craftMaterials],
   ['POST', '/api/quests/claim', claimQuest],

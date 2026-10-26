@@ -484,6 +484,7 @@ function checkReferences(data) {
   for (const line of data.tutorial.lines) {
     // A card from the author is read by nobody.
     if (line.speaker === 'author' && (line.voice || line.female)) errors.push(`tutorial.json: ${line.id} jest od autora i nie ma nagrania ani wersji żeńskiej`);
+    if (line.once && line.kind !== 'lead') errors.push(`tutorial.json: ${line.id} ma once, a to nie kwestia lead`);
     for (const voice of [line.voice, line.female?.voice]) {
       if (voice && !existsSync(new URL(voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${voice}`);
     }

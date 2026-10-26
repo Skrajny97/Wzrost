@@ -13,8 +13,9 @@
 // retreat). The champion, the strongest creature of a region, waits in one
 // inner region: it almost always leaves its material, the rarest of the
 // region, and sometimes a chest with an epic or rarer item. A character sent
-// out to avoid them (avoidRare) meets neither the elite nor the champion, and
-// one tracking the creatures of its quests (tracked) meets them more often.
+// out to avoid them (avoidRare) meets neither the elite nor the champion, one
+// seeking them (seekRare) meets both more often, and one tracking the
+// creatures of its quests (tracked) meets those more often.
 
 import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
@@ -63,6 +64,16 @@ export function explorationPace(minutes, content) {
     championChance: Math.min(1, tuning.championChancePerFight * timeFactor),
     finds: minutes / tuning.findIntervalMinutes,
   };
+}
+
+// The pace with the elite and the champion avoided (none of them) or sought
+// (rareSeekFactor times as often, the author: "niech zwiększa to szansę
+// dwukrotnie").
+export function withRareOdds(pace, { avoidRare = false, seekRare = false }, content) {
+  if (avoidRare) return { ...pace, eliteChance: 0, championChance: 0 };
+  if (!seekRare) return pace;
+  const factor = content.balance.hunt.rareSeekFactor;
+  return { ...pace, eliteChance: Math.min(1, pace.eliteChance * factor), championChance: Math.min(1, pace.championChance * factor) };
 }
 
 // The champion is drawn only where it lives, so other places keep their draws.
@@ -192,7 +203,7 @@ export function resourceBundle(area, total) {
 // `first`: the character's very first exploration, which goes one way:
 // regular encounters only, no chests among the finds, and the one treasure
 // is a plain weapon of its class after the first won fight.
-export function simulateHunt({ character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, tracked = [] }, content) {
+export function simulateHunt({ character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [] }, content) {
   const rng = createRng(seed);
   const tuning = content.balance.hunt;
   const rewards = content.balance.rewards;
@@ -204,10 +215,10 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
 
   // Each fight pays for the time it stands for (`share`), so every length
   // gives about the same per hour. The first exploration meets no demanding
-  // encounter, elite or champion; an avoiding one no elite or champion.
-  let pace = explorationPace(minutes, content);
+  // encounter, elite or champion; an avoiding one no elite or champion, and a
+  // seeking one meets them more often.
+  let pace = withRareOdds(explorationPace(minutes, content), { avoidRare: first || avoidRare, seekRare }, content);
   if (first) pace = { ...pace, toughChance: 0 };
-  if (first || avoidRare) pace = { ...pace, eliteChance: 0, championChance: 0 };
   const fightCount = pace.fights;
   const share = pace.timeFactor;
   const findCount = countEvents(pace.finds, rng);

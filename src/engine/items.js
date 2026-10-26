@@ -195,18 +195,25 @@ export function propertyName(stat, content) {
 }
 
 // The numbers of an upgraded item: each level of upgrade adds bonusPerLevel
-// of every base number (damage, armor, stats), rounded.
+// of every base number (damage, armor, stats), rounded, and at least
+// minGainPerLevel to a weapon's damage and to anything else's armor. An item
+// without armor of its own, like a talisman, gets that armor from the
+// upgrade alone (the author: "może dawać chociaż +1 do pancerza przy każdym
+// ulepszeniu"), so no level of upgrade leaves the numbers as they were.
 export function upgradedItem(item, content) {
   const level = item.upgrade ?? 0;
   if (!level) return item;
-  const factor = 1 + content.balance.upgrades.bonusPerLevel * level;
+  const { bonusPerLevel, minGainPerLevel } = content.balance.upgrades;
+  const factor = 1 + bonusPerLevel * level;
   const scale = (value) => Math.round(value * factor);
+  const least = minGainPerLevel * level;
   const upgraded = { ...item, affixes: item.affixes.map((affix) => ({ ...affix, value: scale(affix.value) })) };
   if (item.damage) {
-    const min = scale(item.damage.min);
-    upgraded.damage = { min, max: Math.max(min, scale(item.damage.max)) };
+    const min = Math.max(scale(item.damage.min), item.damage.min + least);
+    upgraded.damage = { min, max: Math.max(min, scale(item.damage.max), item.damage.max + least) };
+  } else {
+    upgraded.armor = Math.max(scale(item.armor ?? 0), (item.armor ?? 0) + least);
   }
-  if (item.armor) upgraded.armor = scale(item.armor);
   if (item.implicit) upgraded.implicit = { ...item.implicit, value: scale(item.implicit.value) };
   return upgraded;
 }
@@ -276,10 +283,14 @@ export function itemProperties(raw, content) {
       base.category === 'physical' ? 'fizyczne' : `magiczne, ${content.elementsById[item.element].name}`;
     lines.push(`Obrażenia: ${item.damage.min}–${item.damage.max} (${kind})`);
   }
-  if (item.armor) lines.push(`Pancerz: +${item.armor}`);
+  // An item's own armor comes first; the armor an upgrade gives an item
+  // without any, like a talisman, after its stats.
+  const armor = item.armor ? `Pancerz: +${item.armor}` : null;
+  if (armor && raw.armor) lines.push(armor);
   for (const { stat, value } of [...(item.implicit ? [item.implicit] : []), ...item.affixes]) {
     lines.push(`${propertyName(stat, content)}: +${value}`);
   }
+  if (armor && !raw.armor) lines.push(armor);
   return lines;
 }
 

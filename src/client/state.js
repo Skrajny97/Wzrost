@@ -154,6 +154,33 @@ export function setAvoidRare(value) {
   } catch {
     // Without storage the choice lasts until the page is closed.
   }
+  if (value && seekRare) setSeekRare(false);
+}
+
+// Whether explorations seek the elite and the champion instead (the box
+// "Trop elity i czempiony" under the avoiding one, and "Wyrusz ponownie");
+// kept in this browser. Only one of the two is on at a time.
+const SEEK_KEY = 'wzrost.seek-rare';
+let seekRare = readSeekRare();
+
+function readSeekRare() {
+  try {
+    return localStorage.getItem(SEEK_KEY) === 'on' && !avoidRare;
+  } catch {
+    return false;
+  }
+}
+
+export const seekRareOn = () => seekRare;
+
+export function setSeekRare(value) {
+  seekRare = value;
+  try {
+    localStorage.setItem(SEEK_KEY, value ? 'on' : 'off');
+  } catch {
+    // Without storage the choice lasts until the page is closed.
+  }
+  if (value && avoidRare) setAvoidRare(false);
 }
 
 // Whether explorations track the creatures of the narrator's quests (the box

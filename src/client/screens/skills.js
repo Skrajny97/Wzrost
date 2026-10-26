@@ -1,12 +1,12 @@
-// The Umiejętności tab: from class level 10 each class level brings a Skill
-// Point. At 10 the character picks one of the three skills of its class for
-// one, for good: its main development path. From the next class level it may
-// add a second one for a point, which closes the path left. Each path's name
-// stands over its skill. The other points raise the learned skills, up to
-// level 20. Both paths and the points are due by the first evolution (class
-// level 50): until then the class waits there. The server sends every card
-// ready to show (skillsView in the engine); a tap on a learned skill opens
-// its card.
+// The Umiejętności tab: at class level 10 the character picks one of the
+// three skills of its class, for good: its main development path. From the
+// next class level it may add a second one for a Skill Point, which closes
+// the path left. Each path's name stands over its skill. Each class level
+// from 10 on brings a Skill Point, and the points raise the learned skills,
+// up to level 20. Both paths and the points are due by the first evolution
+// (class level 50): until then the class waits there. The server sends every
+// card ready to show (skillsView in the engine); a tap on a learned skill
+// opens its card.
 
 import { fill, h } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
@@ -161,7 +161,7 @@ export function mountSkills(container) {
           }
         : {
             title: `Ścieżka główna: ${skill.path}?`,
-            text: `${skill.name} kosztuje 1 Punkt Umiejętności. To wybór na stałe, a ścieżkę poboczną dobierzesz ${state.character.classLevel >= secondLevel ? 'za kolejny punkt' : `od poziomu klasy ${secondLevel}`}.`,
+            text: `${skill.name} to wybór na stałe. ${state.character.classLevel >= secondLevel ? 'Ścieżkę poboczną możesz dobrać od razu, za 1 Punkt Umiejętności.' : `Ścieżkę poboczną dobierzesz od poziomu klasy ${secondLevel}.`}`,
             confirmLabel: 'Wybieram',
           },
     );

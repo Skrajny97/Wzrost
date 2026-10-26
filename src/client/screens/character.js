@@ -277,6 +277,22 @@ export function itemSheet(item, { equipped }) {
     if (sure) await withButton(button, () => call('POST', `/api/items/${item.id}/discard`));
   };
 
+  // The scrapper buys a bag item from its card, an upgraded one too.
+  const sell = async (event) => {
+    const button = event.currentTarget;
+    const sure = await confirmAction({
+      title: 'Sprzedać przedmiot?',
+      text: `Złomiarz kupi: ${itemTitle(item)} za ${formatNumber(item.price)} złota.${item.upgrade > 0 ? ' Za ulepszenie nie płaci więcej.' : ''}`,
+      confirmLabel: 'Sprzedaj',
+    });
+    if (!sure) return;
+    await withButton(button, async () => {
+      const { sold } = await call('POST', `/api/items/${item.id}/sell`);
+      closeSheet();
+      toast(`Sprzedano za ${formatNumber(sold.gold)} złota.`);
+    });
+  };
+
   const preview = h('div', { class: 'preview', 'aria-live': 'polite' }, h('p', { class: 'muted', text: 'Liczenie zmian…' }));
   openSheet(
     itemDetails(item),
@@ -287,6 +303,9 @@ export function itemSheet(item, { equipped }) {
     busy && h('p', { class: 'muted', text: 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.' }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
     early && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
+    !equipped &&
+      item.price !== undefined &&
+      h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: sell, text: `Sprzedaj za ${formatNumber(item.price)} złota` }),
     h(
       'div',
       { class: 'sheet-actions' },

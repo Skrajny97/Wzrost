@@ -119,6 +119,27 @@ export async function sellItems(context) {
   });
 }
 
+// The scrapper buys one item from the bag, an upgraded one too: the "Sprzedaj"
+// of its card (the author: "nie mogę sprzedać ulepszonych ... ani w skupie
+// ani nigdzie"). The price is counted from the item still there, as above.
+export async function sellItem(context) {
+  const { session, player } = await requireIdlePlayer(context);
+  const item = findItem(player, context.params.id);
+  if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
+  const db = context.env.DB;
+  const bonus = sellBonusOf(player, context.now);
+  const price = soldGold(player.row.id, [item.id], bonus);
+  const results = await db.batch([
+    db.prepare(`UPDATE characters SET gold = gold + ${price.sql}, version = version + 1 WHERE id = ?`).bind(...price.binds, player.row.id),
+    db.prepare('DELETE FROM items WHERE id = ? AND character_id = ?').bind(item.id, player.row.id),
+  ]);
+  const count = results[1].meta.changes;
+  return json({
+    sold: { count, gold: count === 1 ? sellPrice(item, content, bonus) : 0 },
+    character: characterView(await loadPlayer(context.env.DB, session.userId), context.now),
+  });
+}
+
 // What wearing the item (or taking it off) would change: the combat values the
 // stats screen shows, now and after.
 export async function previewItem(context) {

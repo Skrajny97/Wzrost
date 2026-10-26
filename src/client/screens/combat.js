@@ -19,8 +19,10 @@ import {
   isUnlocked,
   reportCache,
   restRate,
+  seekRareOn,
   serverNow,
   setAvoidRare,
+  setSeekRare,
   setTrackQuests,
   state,
   testModeOn,
@@ -324,6 +326,7 @@ export function mountCombat(container, { params, navigate }) {
         countdown,
         h('div', { class: 'bar bar--system' }, progress),
         ...(activity.avoidRare ? [h('p', { class: 'system-hint', text: 'Postać omija elity i czempionów.' })] : []),
+        ...(activity.seekRare ? [h('p', { class: 'system-hint', text: 'Postać tropi elity i czempiony.' })] : []),
         ...(activity.tracksQuests ? [h('p', { class: 'system-hint', text: 'Postać tropi stwory z zadań.' })] : []),
         h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
       ),
@@ -439,8 +442,11 @@ export function mountCombat(container, { params, navigate }) {
     const threatValue = h('strong', {});
     const threatLine = h('p', { class: 'threat' }, 'Zagrożenie: ', threatValue);
     // The box by "Wyrusz" keeps the elite and the champion away and lowers
-    // the threat. The first exploration meets neither, so it has no box.
+    // the threat; the one under it sends the character after them, twice as
+    // often, and raises it. One unticks the other. The first exploration
+    // meets neither, so it has no boxes.
     const avoiding = () => !first && avoidRareOn();
+    const seeking = () => !first && seekRareOn();
     const avoidBox = h('input', {
       type: 'checkbox',
       id: 'avoid-rare',
@@ -448,10 +454,23 @@ export function mountCombat(container, { params, navigate }) {
       checked: avoidRareOn(),
       onChange: () => {
         setAvoidRare(avoidBox.checked);
+        seekBox.checked = seekRareOn();
+        showThreat();
+      },
+    });
+    const seekBox = h('input', {
+      type: 'checkbox',
+      id: 'seek-rare',
+      class: 'avoid-rare-box',
+      checked: seekRareOn(),
+      onChange: () => {
+        setSeekRare(seekBox.checked);
+        avoidBox.checked = avoidRareOn();
         showThreat();
       },
     });
     const avoid = !first && h('label', { class: 'avoid-rare', for: 'avoid-rare' }, avoidBox, h('span', { text: 'Unikaj elit i czempionów' }));
+    const seek = !first && h('label', { class: 'avoid-rare', for: 'seek-rare' }, seekBox, h('span', { text: 'Trop elity i czempiony' }));
     // The box under the dangers sends the character mostly after the
     // creatures its quests still ask for; a note says when none lives here.
     const tracking = () => !first && trackQuestsOn();
@@ -483,7 +502,14 @@ export function mountCombat(container, { params, navigate }) {
       );
     showThreat = () => {
       const known = options[area.id];
-      const ratings = known && known.build === buildKey(state.character) ? (avoiding() ? known.threatAvoiding : known.threat) : undefined;
+      const ratings =
+        known && known.build === buildKey(state.character)
+          ? avoiding()
+            ? known.threatAvoiding
+            : seeking()
+              ? (known.threatSeeking ?? known.threat)
+              : known.threat
+          : undefined;
       const threat = ratings?.[minutes];
       threatLine.className = `threat threat--${threat ?? 'unknown'}`;
       threatValue.textContent = threat ? THREAT_NAMES[threat] : '…';
@@ -557,7 +583,7 @@ export function mountCombat(container, { params, navigate }) {
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           remember();
-          await call('POST', '/api/hunts', { areaId: area.id, minutes, avoidRare: avoiding(), trackQuests: tracking() });
+          await call('POST', '/api/hunts', { areaId: area.id, minutes, avoidRare: avoiding(), seekRare: seeking(), trackQuests: tracking() });
           leaveView(HOME, 2);
         }),
     });
@@ -600,6 +626,7 @@ export function mountCombat(container, { params, navigate }) {
         levelNote,
         durations,
         avoid,
+        seek,
         threatLine,
         start,
       ),
