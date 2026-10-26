@@ -23,7 +23,12 @@ export const SPRITES = {
   },
   items: {
     size: 32,
-    ids: ['sword', 'axe', 'dagger', 'bow', 'staff', 'aspergillum', 'shield', 'quiver', 'focus', 'hood', 'helmet', 'tunic', 'chainmail', 'robe', 'cowl', 'surplice', 'gloves', 'boots', 'amulet', 'ring', 'talisman', 'holed-stone'],
+    ids: [
+      'sword', 'axe', 'dagger', 'bow', 'staff', 'aspergillum', 'shield', 'quiver', 'focus', 'hood', 'helmet', 'tunic', 'chainmail', 'robe', 'cowl', 'surplice', 'gloves', 'boots', 'amulet', 'ring', 'talisman', 'holed-stone',
+      // The second bases of the categories, from class level 10.
+      'broadsword', 'war-axe', 'hunting-knife', 'recurve-bow', 'rune-staff', 'censer', 'pavise', 'bow-case', 'tome', 'fur-cap', 'peaked-helmet', 'biretta',
+      'gambeson', 'brigandine', 'cloak', 'chasuble', 'bracers', 'pointed-shoes', 'reliquary', 'signet-ring',
+    ],
   },
   // Materials left by creatures, the parts the Stół rzemieślniczy makes and
   // the treasure chest, 32×32.

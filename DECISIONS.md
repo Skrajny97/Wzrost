@@ -1065,7 +1065,7 @@ Autor: wbicie poziomu postaci albo klasy odnawia HP i manę do pełna.
 
 1. **Przy odbiorze raportu.** Gdy wyprawa przynosi nowy poziom postaci albo klasy, postać ma po odebraniu raportu pełne HP nowego poziomu, z ekwipunkiem, który nosi po wyprawie (`hpAfterHunt` w silniku). Komunikaty Systemu w raporcie mówią raz: „Awans odnawia HP i manę do pełna.”, także gdy przyszły oba awanse naraz. Tak samo jest przy omdleniu, jeśli walki przed nim dały awans.
 2. **Mana.** Na razie nic jej nie wydaje, więc zawsze jest pełna. Gdy umiejętności zaczną ją zużywać, awans też ją odnowi.
-3. **Pierwsza wyprawa.** Zawsze daje awans, więc postać wraca z niej z pełnym HP. Kwestia narratora przy Ognisku („Teraz zajmijmy się jednak Twoim powrotem do zdrowia…”) mówiła o ranach, których teraz nie ma. Autor zatwierdził jej nowy tekst (punkt 8 „Zadań od narratora”).
+3. **Pierwsza wyprawa.** Zawsze daje awans, więc postać wraca z niej z pełnym HP. Kwestia narratora przy Ognisku („Teraz zajmijmy się jednak Twoim powrotem do zdrowia…”) mówiła o ranach, których teraz nie ma. Jej nowy tekst ma zgodę autora (punkt 8 „Zadań od narratora”).
 
 ## Zadania od narratora (25.10.2026)
 
@@ -1274,9 +1274,10 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
     - **Otoczak**, kamień z dziurką, to dalsza baza od 10. poziomu klasy (autor zmienił z 15.): Witalność jak u Talizmanu i do tego +2–4. Nazwę dobrano na wzór Kordelasa z przykładu autora i łatwo ją zmienić w danych.
     - Stary obrazek z liściem wypadł z gry.
 4. **Premia +x zamiast mnożnika** (autor). Mnożnik przy zwykłym przedmiocie robi zbyt dużą różnicę na wyższych poziomach. Mnożniki i duże wzrosty procentowe zostają dla bardzo rzadkich przedmiotów.
-    - Dalsza baza kategorii ma ten sam współczynnik co pierwsza i stałą premię `bonus` (`{ "min", "max" }` w `data/item-bases.json`). Premia losuje się raz, przy powstaniu przedmiotu, i dodaje do obrażeń broni (min i max), pancerza albo statystyki. Przewaga nad pierwszą bazą jest więc taka sama na każdym poziomie przedmiotu.
+    - Dalsza baza kategorii ma stałą premię `bonus` (`{ "min", "max" }` w `data/item-bases.json`). Premia losuje się raz, przy powstaniu przedmiotu, i dodaje do obrażeń broni (min i max), pancerza albo statystyki.
+    - **Lepsza wersja** (autor, 26.10.2026): dalsza baza ma też odrobinę wyższe bazowe liczby niż pierwsza. Jej współczynnik jest o około 5% wyższy, zaokrąglony w górę do setnych, np. Miecz 1,2 i Pałasz 1,26, Talizman 0,3 i Otoczak 0,32. Przewaga rośnie więc z poziomem przedmiotu, ale tylko odrobinę, a większość daje premia.
     - Zakres dobieramy jako około 30–50% liczby zwykłego przedmiotu pierwszej bazy na poziomie przedmiotu równym poziomowi klasy bazy. Przy broni to 25–40% średnich obrażeń. Dla Otoczaka: Talizman na 10. poziomie ma Witalność +8, więc premia to +2–4.
-    - Walidator pilnuje, żeby dalsza baza miała premię i ten sam współczynnik co pierwsza, a pierwsza baza nie miała premii.
+    - Walidator pilnuje, żeby dalsza baza miała premię i współczynnik wyższy niż pierwsza, ale najwyżej o 20%, żeby nie stał się mnożnikiem. Pierwsza baza nie może mieć premii.
     - Otoczaki znalezione przed tą zmianą zachowują swoje liczby, bo przedmiot pamięta je od znalezienia.
 5. **Retro Diffusion oszczędnie** (autor). Przy kolejnych przedmiotach robimy jeden szkic na przedmiot, a drugi tylko dla odrzuconych. Arkusz czterech szkiców zostaje dla wyjątków, np. gdy pierwszy pomysł na wygląd nie pasuje.
 
@@ -1284,7 +1285,7 @@ Autor poprosił, żeby pod jego nieobecność przygotować nowe propozycje listy
 
 Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umiejętności. Kolejne poziomy umiejętności i ich ewolucje projektujemy później. Tym razem autor poprosił o gotową propozycję, więc zasada z „Balans i nowe zakładki”, punkt 2, nie dotyczy tego kroku. Propozycja do poprawek autora: [Umiejętności klas i przedmioty od 10. poziomu klasy](https://claude.ai/artifact/HhMWeUEZSkCqPH52bJoXz1).
 
-**Wdrożenie** (autor: „Umiejętności są okey”). Autor dodał, że każdą umiejętność da się wzmacniać Punktami Umiejętności, do 20 poziomu. Bonusy mogą więc startować niżej i rosnąć powoli. Pytań z końca propozycji autor nie zmienił, więc wchodzą odpowiedzi domyślne: wybór na stałe, pełna mana w każdej walce, Kula ognia zawsze jest ogniem, a przedmioty przychodzą później.
+**Wdrożenie** (autor: „Umiejętności są okey”). Do tego uwaga autora: każdą umiejętność da się wzmacniać Punktami Umiejętności, do 20 poziomu. Bonusy mogą więc startować niżej i rosnąć powoli. Pytania z końca propozycji zostały bez zmian, więc wchodzą odpowiedzi domyślne: wybór na stałe, pełna mana w każdej walce, Kula ognia zawsze jest ogniem, a przedmioty przychodzą później.
 
 1. **Dane.** 15 umiejętności, po 3 na klasę, jest w `data/skills.json` (schemat `data/schemas/skills.schema.json`). Liczba umiejętności to stała wartość albo para [poziom 1, poziom 20], a między nimi rośnie po równo z poziomem. Przykład: Potężny cios bije za 140% obrażeń i pomija 20% pancerza na 1. poziomie, a na 20. bije za 200% i pomija 40%.
     - Opis skutku na karcie podstawia liczby obecnego poziomu, a „Na poziomie N+1” liczby następnego. Test pilnuje, żeby każdy kolejny poziom różnił się na karcie, więc żaden punkt nie znika bez śladu. Do tego doszedł format `{nazwa%.1}`, czyli procent z jednym miejscem po przecinku.
@@ -1323,7 +1324,7 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
 
     Umiejętność skraca drogę do 50. poziomu o 5–15%, a słabszym klasom pomaga trochę bardziej. Trzy wybory jednej klasy różnią się najwyżej o około 5 punktów procentowych.
 9. **Ikony** są szkicami Retro Diffusion, po jednym na umiejętność (0,18 USD za szkic, razem 2,70 USD).
-    - Autor zatwierdził wygląd poza dwiema uwagami: ikony mają tło, a w Szerokim zamachu łuk wyglądał, jakby zamach szedł rękojeścią, nie ostrzem.
+    - Wygląd ma zgodę autora poza dwiema uwagami: ikony mają tło, a w Szerokim zamachu łuk wyglądał, jakby zamach szedł rękojeścią, nie ostrzem.
     - Tło zniknęło z dwunastu ikon bez nowych szkiców, więc zatwierdzony motyw został. Ciemne kolory tła (zieleń, turkus, fiolet) zostały wycięte od zewnętrznej krawędzi ikony. Kontur motywu zatrzymywał wycinanie, więc to, co jest w jego środku, zostało.
     - W Ciosie w plecy razem z tłem zniknęła ciemna sylwetka cienia za sztyletem, bo była prawie w kolorze tła i zajmowała pół kwadratu.
     - Szeroki zamach dostał drugi szkic (0,18 USD) z opisem, w którym łuk ciągnie się za czubkiem ostrza, a rękojeść jest w środku zamachu.
@@ -1331,3 +1332,39 @@ Autor: na 10. poziomie klasy każda klasa wybiera jedną z trzech swoich umieję
     - Efekty mieszczą się w arenie, więc strona nie przewija się w bok.
     - Panel autora ma „Podgląd umiejętności”. To krótka walka postaci 20. poziomu z umiejętnością na 10. poziomie, przeciw stworom dobranym tak, żeby umiejętność się pokazała. Graczom ten podgląd się nie pokazuje.
 11. **Wydajność.** Walka, w której nikt nie ma umiejętności, liczy się tak jak przedtem i losuje te same liczby. Kod umiejętności działa tylko w walkach, w których ktoś ją ma, więc szacowanie zagrożenia mieści się w limicie czasu procesora.
+
+## Dwadzieścia przedmiotów od 10. poziomu klasy (26.10.2026)
+
+20 przedmiotów z [propozycji](https://claude.ai/artifact/HhMWeUEZSkCqPH52bJoXz1) i opis ich działania mają zgodę autora, z jedną zmianą: dalsza baza ma mieć odrobinę wyższe bazowe liczby niż pierwsza, bo to lepsza wersja („Kategorie przedmiotów…”, punkt 4).
+
+1. **Każdy przedmiot to druga baza istniejącej kategorii**, np. Pałasz to drugi miecz, a Ornat druga komża.
+    - Nosi go ta sama klasa co pierwszą bazę, ale założyć go można dopiero od 10. poziomu klasy.
+    - Wypada od Lisich Jarów wzwyż i z cotygodniowej skrzyni, tak jak Otoczak.
+2. **Liczby:** współczynnik pierwszej bazy plus około 5% oraz premia z propozycji:
+
+    | Kategoria → nowa baza | Premia |
+    | --- | --- |
+    | Miecz → Pałasz | obrażenia +6–9 |
+    | Topór → Czekan | obrażenia +6–10 |
+    | Sztylet → Kordelas | obrażenia +4–7 |
+    | Łuk → Łuk refleksyjny | obrażenia +5–7 |
+    | Kostur → Laska runiczna | obrażenia +5–7 |
+    | Kropidło → Kadzielnica | obrażenia +4–7 |
+    | Tarcza → Paweż | pancerz +18–30 |
+    | Kołczan → Sajdak | Zręczność +6–10 |
+    | Fokus → Księga | Intelekt +6–10 |
+    | Kaptur → Kołpak | pancerz +6–10 |
+    | Hełm → Szyszak | pancerz +10–16 |
+    | Kapuza → Biret | pancerz +6–10 |
+    | Kurtka → Przeszywanica | pancerz +10–16 |
+    | Kolczuga → Brygantyna | pancerz +15–25 |
+    | Szata → Opończa | pancerz +9–15 |
+    | Komża → Ornat | pancerz +9–15 |
+    | Rękawice → Karwasze | pancerz +6–10 |
+    | Buty → Ciżmy | pancerz +6–10 |
+    | Amulet → Kaptorga | Wola +2–4 |
+    | Pierścień → Sygnet | Percepcja +2–4 |
+
+3. **Ikony:** po jednym szkicu Retro Diffusion na przedmiot, razem 3,60 USD.
+    - Biret wyszedł dopiero za trzecim razem, z prostszym opisem. Dwie wcześniejsze próby padły po stronie Retro Diffusion i nic nie kosztowały.
+    - Na prośbę autora z Brygantyny zniknęło tło, a z Ornatu wieszak. Obie poprawki zostały zrobione ręcznie na pikselach, bez nowych szkiców.

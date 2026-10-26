@@ -212,15 +212,44 @@ describe('items', () => {
     assert.equal(canUse('holed-stone', 'mage', content), true);
     assert.equal(itemView(generateItem({ baseId: 'holed-stone', level: 10 }, rng, content), content).classLevel, 10);
     assert.equal(itemView(generateItem({ baseId: 'talisman', level: 10 }, rng, content), content).classLevel, null);
-    // Stronger by a flat +2–4 Witalność, the same at any item level.
+    // Stronger by a slightly higher factor (0.32 against 0.3) and a flat
+    // +2–4 Witalność on top: the lead grows only a little with the level.
+    let lowLead = 0;
     for (const level of [6, 10, 100, 400]) {
       const charm = generateItem({ baseId: 'talisman', level }, rng, content).implicit.value;
-      const leads = Array.from({ length: 40 }, () => generateItem({ baseId: 'holed-stone', level }, rng, content).implicit.value - charm);
-      assert.deepEqual([...new Set(leads)].sort(), [2, 3, 4], `level ${level}`);
+      const leads = [...new Set(Array.from({ length: 40 }, () => generateItem({ baseId: 'holed-stone', level }, rng, content).implicit.value - charm))].sort((a, b) => a - b);
+      assert.equal(leads.length, 3, `level ${level}: ${leads}`);
+      assert.equal(leads[2] - leads[0], 2, `level ${level}: ${leads}`);
+      const fromFactor = leads[0] - 2;
+      assert.ok(fromFactor >= 0 && fromFactor <= Math.ceil(charm * 0.1) + 1, `level ${level}: ${fromFactor} more on ${charm}`);
+      if (level === 10) lowLead = fromFactor;
+      if (level === 400) assert.ok(fromFactor > lowLead, `the factor shows at level 400: ${fromFactor}`);
     }
     const stone = generateItem({ baseId: 'holed-stone', level: 10 }, rng, content);
     assert.deepEqual(autoEquip([], [stone], content, 'mage', 9), []);
     assert.deepEqual(autoEquip([], [stone], content, 'mage', 10), [0]);
+  });
+
+  test('each second base of a category is a better version from class level 10', () => {
+    const later = content.bases.filter((base) => base.family);
+    assert.ok(later.length >= 21, `${later.length} later bases`);
+    const key = { weapon: 'damageFactor', armor: 'armorFactor', implicit: 'statFactor' };
+    const number = (item) => (item.damage ? (item.damage.min + item.damage.max) / 2 : item.armor ?? item.implicit.value);
+    const rng = createRng('lepsze-wersje');
+    for (const base of later) {
+      const first = content.basesById[base.family];
+      assert.ok(base[key[base.kind]] > first[key[base.kind]] && base[key[base.kind]] <= first[key[base.kind]] * 1.2, base.id);
+      assert.equal(base.classLevel, 10, base.id);
+      for (const cls of content.classes) {
+        assert.equal(canUse(base.id, cls.id, content), canUse(first.id, cls.id, content), `${base.id} for ${cls.id}`);
+      }
+      // Even its weakest roll beats the first base at the same item level.
+      for (const level of [10, 100]) {
+        const plain = number(generateItem({ baseId: first.id, level }, rng, content));
+        const weakest = Math.min(...Array.from({ length: 12 }, () => number(generateItem({ baseId: base.id, level }, rng, content))));
+        assert.ok(weakest > plain, `${base.id} at level ${level}: ${weakest} against ${plain}`);
+      }
+    }
   });
 
   test('properties are described in Polish', () => {
