@@ -159,14 +159,21 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
           text: `${say(texts, 'skillHeal', actions, { ...vars, amount })} ${say(texts, 'guardArmor', actions, { armor: percent, turns })}`,
         }));
       } else {
+        const p = skill.params;
+        let text = say(texts, 'skillUse', actions, vars);
         if (skill.kind === 'shield') {
-          // A share of the unit's mana at once makes the shield's points.
-          const taken = Math.min(unit.mana, Math.round((unit.maxMana ?? 0) * skill.params.pool));
+          // A share of the unit's mana at once makes the shield: a point of
+          // mana for a point of damage.
+          const taken = Math.min(unit.mana, Math.round((unit.maxMana ?? 0) * p.pool));
           unit.mana -= taken;
-          unit.shield = { points: Math.round(taken * skill.params.ratio) };
+          unit.shield = { points: taken };
+          text = say(texts, 'skillShield', actions, { ...vars, shield: taken });
         }
-        if (skill.kind === 'evade') unit.evade = { hits: skill.params.hits, dodge: skill.params.dodge, counter: skill.params.counter };
-        log(() => ({ ...base, kind: 'skill', hp: unit.hp, shield: shieldLeft(unit), text: say(texts, 'skillUse', actions, vars) }));
+        if (skill.kind === 'evade') {
+          unit.evade = { hits: p.hits, dodge: p.dodge, counter: p.counter };
+          text = say(texts, 'skillEvade', actions, { ...vars, hits: p.hits, dodge: Math.round(p.dodge * 100), counter: Math.round(p.counter * 100) });
+        }
+        log(() => ({ ...base, kind: 'skill', hp: unit.hp, shield: shieldLeft(unit), text }));
       }
     }
   };
@@ -341,6 +348,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       unit.mana -= skill.mana;
       skill.used = true;
       const p = skill.params;
+      const vars = { actor: unit.name, skill: skill.name };
+      // The account says what the skill gives, with its numbers.
+      let text;
       if (skill.kind === 'buff') {
         // The whole side; each one more shares the bonus out (crowd).
         const party = units.filter((other) => other.side === unit.side);
@@ -350,10 +360,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
           member.resist = Object.fromEntries(Object.entries(member.resist).map(([element, value]) => [element, Math.round(value * (1 + p.resist * share))]));
           member.damageBonus += p.damage * share;
         }
+        const percent = (value) => Math.round(value * share * 100);
+        text = say(texts, 'skillBuff', 0, { ...vars, armor: percent(p.armor), resist: percent(p.resist), damage: percent(p.damage) });
+        if (party.length > 1) text += ` ${say(texts, 'skillBuffShared', 0, { count: party.length })}`;
       } else {
-        unit.weapon = { ...unit.weapon, dot: { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks: Math.round(p.dotTicks) } };
+        const ticks = Math.round(p.dotTicks);
+        unit.weapon = { ...unit.weapon, dot: { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks } };
+        const effect = content.effectsById[p.dotEffect]?.name ?? p.dotEffect;
+        text = say(texts, 'skillCoat', 0, { ...vars, effect, chance: Math.round(p.dotChance * 100), power: Math.round(p.dotPower * 100), ticks });
       }
-      log(() => ({ t: 0, kind: 'skill', actor: unit.id, target: unit.id, skill: skill.id, skillName: skill.name, text: say(texts, 'skillUse', actions, { actor: unit.name, skill: skill.name }) }));
+      log(() => ({ t: 0, kind: 'skill', actor: unit.id, target: unit.id, skill: skill.id, skillName: skill.name, text }));
     }
   }
 

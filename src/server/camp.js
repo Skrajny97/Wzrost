@@ -27,7 +27,7 @@ import {
   upgradeCost,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { buildQueue, characterView, currentHp, loadPlayer, requirePlayer, walletOf } from './characters.js';
+import { buildQueue, characterView, currentHp, gainSql, loadPlayer, requirePlayer, walletOf } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
@@ -74,7 +74,9 @@ export async function beginBuilding(db, player, buildingId, now) {
   const producing = building.effect.kind === 'production';
   const gathered = producing ? collect(building, stored, now) : null;
   const changes = Object.fromEntries(resources.map((id) => [id, -cost[id]]));
-  if (gathered) changes[gathered.resource] = (changes[gathered.resource] ?? 0) + gathered.amount;
+  // A store of gold (Jezioro Midasa) pays part of the cost.
+  const gatheredGold = gathered?.resource === 'gold' ? gathered.amount : 0;
+  if (gathered && !gatheredGold) changes[gathered.resource] = (changes[gathered.resource] ?? 0) + gathered.amount;
   // The upgrade starts only if nothing is being built, the building is as
   // seen here (level and store) and the cost is still there; the payment only
   // if the upgrade started. So two taps at once start and pay one upgrade.
@@ -113,7 +115,7 @@ export async function beginBuilding(db, player, buildingId, now) {
        )`,
     )
     .bind(
-      gold,
+      gold - gatheredGold,
       ...changed.flatMap(([id, amount]) => [path(id), path(id), amount]),
       ...(resting ? [currentHp(player, now).hp, now] : []),
       row.id, row.id, building.id, target, now,
@@ -285,15 +287,16 @@ export async function collectProduction(context) {
   // store moves on. Two taps at once compute the same new store, so the check
   // is on the store before: the second tap finds it moved and gets nothing.
   const seen = stored.collectedAt ?? stored.endsAt;
+  const gain = gainSql(gathered.resource, gathered.amount);
   const [paid] = await db.batch([
     db
       .prepare(
-        `UPDATE characters SET resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) + ?), version = version + 1
+        `UPDATE characters SET ${gain.sql}, version = version + 1
          WHERE id = ? AND EXISTS (
            SELECT 1 FROM buildings WHERE character_id = ? AND building_id = ? AND COALESCE(collected_at, ends_at) = ? AND ends_at <= ?
          )`,
       )
-      .bind(path(gathered.resource), path(gathered.resource), gathered.amount, row.id, row.id, building.id, seen, now),
+      .bind(...gain.values, row.id, row.id, building.id, seen, now),
     db
       .prepare(
         `UPDATE buildings SET collected_at = ?

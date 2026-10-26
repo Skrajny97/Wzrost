@@ -24,6 +24,7 @@ import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
 import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
 import { narrate } from './narrator.js';
+import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, handleSessionLost, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
 import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, toast, voiceSwitch, withButton } from './ui.js';
@@ -40,16 +41,16 @@ const ROUTES = [
   { pattern: /^#\/walka(?:\/(?<region>[a-z0-9-]+)(?:\/(?<area>[a-z0-9-]+))?)?$/, nav: 'main', tab: 'walka', mount: mountCombat },
   { pattern: /^#\/postac$/, nav: 'character', tab: 'equipment', mount: mountCharacter },
   { pattern: /^#\/postac\/statystyki$/, nav: 'character', tab: 'stats', mount: mountStats },
-  { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', mount: mountSkills },
+  { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', music: 'skills', mount: mountSkills },
   { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: lockedScreen('core', 'Rdzeń') },
-  { pattern: /^#\/profesje$/, nav: 'main', tab: 'profesje', mount: lockedScreen('professions', 'Profesje') },
+  { pattern: /^#\/profesje$/, nav: 'main', tab: 'profesje', music: 'professions', mount: lockedScreen('professions', 'Profesje') },
   { pattern: /^#\/osada$/, nav: 'main', tab: 'osada', mount: lockedScreen('settlement', 'Osada') },
   { pattern: /^#\/dziennik(?:\/(?<tab>system))?$/, nav: 'main', tab: 'dziennik', mount: mountJournal },
   { pattern: /^#\/raport\/(?<id>\d+)$/, nav: 'main', tab: null, mount: mountReport },
   // The camp opens from the top bar: the board, or one building.
   // The camp is a tab of its own, in the top bar (`lit`), but not one to
   // come back to with "Powrót".
-  { pattern: /^#\/oboz(?:\/(?<building>[a-z0-9-]+))?$/, nav: 'main', tab: null, lit: 'oboz', mount: mountCamp },
+  { pattern: /^#\/oboz(?:\/(?<building>[a-z0-9-]+))?$/, nav: 'main', tab: null, lit: 'oboz', music: 'camp', mount: mountCamp },
   // The author's panel, from the settings of the author's account.
   { pattern: /^#\/autor$/, nav: 'main', tab: null, mount: mountAuthor },
 ];
@@ -140,6 +141,8 @@ async function start() {
 }
 
 async function enterGame() {
+  // The phone's notifications follow the account signed in (push.js).
+  syncPush();
   await loadContent();
   try {
     await call('GET', '/api/character');
@@ -237,12 +240,13 @@ function route() {
   const params = match.groups ?? {};
   const screen = candidate.mount(container, { params, navigate, backHash: lastTabHash }) ?? {};
   current = { route: candidate, screen };
-  // An inner region or a region can have its own music, and so can the camp.
-  // A report opened right after its exploration plays the music of its
-  // result once; opened again, from the Dziennik say, it keeps the usual one.
+  // An inner region or a region can have its own music, and so can the camp
+  // and the tabs with a music place (Umiejętności, Profesje). A report opened
+  // right after its exploration plays the music of its result once; opened
+  // again, from the Dziennik say, it keeps the usual one.
   const fresh = candidate.mount === mountReport && params.id === state.freshReport;
   if (!fresh) state.freshReport = null;
-  const places = candidate.mount === mountCamp ? ['camp'] : [params.area, params.region].filter(Boolean);
+  const places = [params.area, params.region, candidate.music].filter(Boolean);
   setMusicPlace(places, fresh ? reportCache.get(params.id)?.result : null);
   renderNav();
   $('.page-title', container)?.focus({ preventScroll: true });
@@ -444,6 +448,7 @@ function openSettings() {
       volumeRow('effects-volume', 'Efekty dźwiękowe', effectsVolume(), setEffectsVolume, () => playSound('system')),
       h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: 'Głos narratora' }), h('dd', {}, voiceSwitch('voice-label'))),
       h('div', { class: 'status-row' }, h('dt', { id: 'motion-label', text: 'Animacje' }), h('dd', {}, motionSwitch('motion-label'))),
+      pushRow(),
       zoomOffered() && zoomRow(),
       testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
@@ -467,6 +472,8 @@ async function logout(event) {
   const button = event.currentTarget;
   button.disabled = true;
   try {
+    // This phone stops getting the account's notifications.
+    await stopPush();
     await request('POST', '/api/auth/logout');
     leaveGame();
   } catch (error) {
@@ -489,6 +496,7 @@ async function deleteAccount() {
   if (!sure) return;
   try {
     await request('DELETE', '/api/me', { login });
+    stopPush();
     leaveGame();
     toast('Konto zostało usunięte.');
   } catch (error) {

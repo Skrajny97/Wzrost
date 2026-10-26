@@ -44,6 +44,11 @@
     // workflow from the GitHub secrets.
     "GOOGLE_HOSTS": "insightrpg.com,www.insightrpg.com"
   },
+  // Every minute the server sends the phone notifications whose time has
+  // come (src/server/push.js).
+  "triggers": {
+    "crons": ["* * * * *"]
+  },
   "observability": {
     "enabled": true
   }

@@ -270,7 +270,8 @@
       "kind": "point",
       "text": [
         "W Jeziorze Midasa zalega złoto. Misa traperska sama je odsącza – niewiele, ale bez przerwy."
-      ]
+      ],
+      "voice": "audio/narration/camp-lake.mp3"
     },
     {
       "id": "camp-anvil",

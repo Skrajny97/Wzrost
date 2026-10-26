@@ -1551,3 +1551,44 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
 7. **Strona odsłuchu zapisuje uwagi już w trakcie pisania.** Uwaga do Celnego strzału 5 dotarła bez tekstu, bo pole zapisywało się dopiero po wyjściu z niego. Na telefonie strona często zamyka się wcześniej.
 8. **Jezioro Midasa.** Na zrzucie od autora zaznaczone jest wolne miejsce na planszy obozu, między Tartakiem a Szałasem na łupy, z dopiskiem „to do Jeziora Midasa”. Miejsce zostaje wolne. Co jezioro ma robić, czeka na autora.
 
+
+## Powiadomienia na telefon, Jezioro Midasa, osłona many i muzyka zakładek (26.10.2026)
+
+1. **Powiadomienia na telefon** (trzy rodzaje wskazane przez autora: koniec wyprawy, koniec budowy, pełny magazyn).
+    - Włącza je przełącznik „Powiadomienia” w Ustawieniach, a telefon pyta wtedy o zgodę. Wyłączenie przełącznika, wylogowanie albo usunięcie konta wyłącza je na tym telefonie.
+    - Treści są w `data/texts.json` (`push…`):
+        - „Koniec wyprawy”: „Eksploracja zakończona: {region wewnętrzny}. Raport czeka na odbiór.”
+        - „Koniec budowy”: „{budynek}: poziom {n} gotowy.” Dotyczy też budów z kolejki i poziomu obozu.
+        - „Pełny magazyn”: „{budynki}: produkcja stoi do zebrania.” Gdy zapełni się kolejny magazyn, wiadomość wymienia wszystkie pełne.
+    - Nowsza wiadomość tego samego rodzaju zastępuje na telefonie starszą. Otwarcie gry zamyka te, które już wiszą.
+    - Gdy gra jest otwarta na ekranie, powiadomienie się nie pokazuje, bo gra mówi to samo. Wyjątkiem jest iPhone: Safari odbiera zgodę stronie, której wiadomości niczego nie pokazują.
+    - Na iPhonie powiadomienia działają tylko w grze dodanej do ekranu początkowego (iOS 16.4 i nowsze). W Safari w karcie wiersz w Ustawieniach mówi, jak to zrobić. Na Androidzie działają w Chrome, Samsung Internet, Firefoksie i w zainstalowanej grze.
+    - Technika: Web Push, bez dodatkowych usług i opłat. Co minutę serwer (Cron Trigger w `wrangler.jsonc`) bierze minutę, która minęła, i wysyła to, co w niej przypadło.
+        - Każdy przebieg najpierw zajmuje swój odcinek czasu (`push_checked_at`), więc dwa nigdy nie wyślą tego samego. Po przerwie serwer patrzy najwyżej 15 minut wstecz.
+        - Usługa push trzyma wiadomość dla wyłączonego telefonu najwyżej 6 h.
+    - Klucze, którymi serwer podpisuje wiadomości (VAPID), powstają przy pierwszym użyciu i leżą w bazie (`server_settings`). Nie trzeba zakładać żadnego sekretu.
+    - Treść jest zaszyfrowana tak, że czyta ją tylko telefon (aes128gcm, RFC 8291). Test sprawdza szyfrowanie na przykładzie z normy.
+    - Serwer wysyła tylko do usług push przeglądarek: Google, Apple, Mozilli i Microsoftu. Konto ma najwyżej 10 telefonów. Subskrypcja, której usługa już nie zna (odpowiedź 404 albo 410), znika z bazy.
+    - Koszt: cron co minutę to ok. 43 tys. wywołań miesięcznie, ułamek tego, co obejmuje plan Workers Paid.
+    - Do polityki prywatności przed Sklepem Play: serwer przechowuje adres subskrypcji telefonu do wyłączenia powiadomień albo usunięcia konta.
+    - Pliki: `migrations/0023_push.sql`, `src/engine/notifications.js` (co i kiedy), `src/server/push.js` i `src/server/webpush.js`, `src/client/push.js` i `src/client/sw.js`, ikonka paska stanu `src/client/badge-96.png`.
+2. **Jezioro Midasa** (autor). Punkt uzupełnia punkt 8 poprzedniego wpisu.
+    - Stoi na wolnym miejscu zaznaczonym na zrzucie, między Tartakiem a Szałasem na łupy. Przeniósł się tam staw z dołu planszy.
+    - Działa jak Tartak, Kamieniołom i Kopalnia: misa traperska sama odsącza złoto z mułu. Daje 4 złota na godzinę na każdy poziom, ma magazyn na 2 h produkcji na każdy poziom i 10 poziomów. Zebrane złoto trafia do sakiewki.
+    - Koszt: złoto od 10 (×2,0 co poziom), drewno od 8 (×1,9), kamień od 2. poziomu (4, ×1,9), ruda żelaza od 3. poziomu (3, ×1,9). Budowa trwa 1 min na 1. poziomie, potem ×2,2 co poziom.
+    - Ma trzy wyglądy, jak inne budynki (poziomy 1–3, 4–7, 8–10): staw z misą, potem z drewnianą rynną, na końcu z pomostem, latarnią i workiem złota.
+    - Lewa kolumna planszy jest rozsunięta, żeby napisy działek nie wchodziły w pierścienie narratora. Tartak, Jezioro, Szałas i Stół rzemieślniczy stoją co 21 jednostek. Pierścień przy Stole nadal zahacza o napis Szałasu, tak jak przed tą zmianą.
+    - Nowa kwestia narratora w obozie, po Kamieniołomie: „W Jeziorze Midasa zalega złoto. Misa traperska sama je odsącza – niewiele, ale bez przerwy.” Tekst zatwierdzony przez autora. Do gry trafiło pierwsze nagranie, bo drugie ma urwany koniec.
+3. **Duch ognia we wprowadzeniu** (autor). Kwestia przy Ognisku brzmi teraz: „Teraz zadbajmy o odpoczynek po kolejnych wyprawach. Przy ogniu Twoja postać szybciej wraca do sił, a duch ognia przyjmie Twoje złoto i odda za nie zasoby. Zbuduj Ognisko.” Lektor dostał zapis „ognju”, bo zwykły zapis czytał jako „ognu”.
+4. **Osłona many** (autor: mały dodatkowy pasek, bez robienia z maga tanka).
+    - Raz na walkę, gdy HP spadnie poniżej 50%, umiejętność bierze 30–50% maks. many (więcej na wyższych poziomach) i zamienia ją w osłonę 1:1: każdy punkt many zatrzymuje jeden punkt obrażeń.
+    - Pasek osłony pod paskiem HP ma skalę HP postaci, więc jest krótki. Na przykład 118 punktów osłony przy 495 HP to mniej więcej jedna czwarta paska.
+5. **Relacja walki mówi, co dają umiejętności wspierające** (autor: Błogosławieństwo, Zatrute ostrze i inne).
+    - Błogosławieństwo: „Do końca walki pancerz +X%, odporności +Y%, obrażenia +Z%.” Gdy premia dzieli się na drużynę, następne zdanie mówi, na ile osób.
+    - Zatrute ostrze: szansa na zatrucie przy każdym ciosie, jego siła i czas trwania.
+    - Osłona many: ile obrażeń przyjmie. Taniec cieni: przez ile ciosów i o ile rośnie unik oraz za ile procent obrażeń jest kontra.
+6. **Celny strzał** (autor: „jakby ktoś trafił w dziesiątkę na tarczy strzeleckiej – jakiś lekko magiczny dźwięk na końcu”). Nowe nagranie to krótkie trafienie w środek tarczy, po którym cichnie lekko magiczny dźwięk (0,9 s). Strona odsłuchu ma wersje 7 i 8, a w grze jest 7.
+7. **Muzyka zakładek** (autor, utwory z Suno). Własne utwory mają Umiejętności, Profesje i Obóz (plansza i ekrany budynków). Na pozostałych ekranach gra dotychczasowy utwór.
+    - Zasady są te same co wcześniej: utwór gaśnie przez ostatnie 5 s i po 2,5 s pauzy gra od nowa. Zmiana utworu przechodzi płynnie w 1,5 s, a utwór, do którego się wraca, gra od miejsca, w którym ucichł.
+    - Pliki nie mają okładki ani znaczników, a dźwięk jest bez zmian. Głośność: Umiejętności −15,4 LUFS, Profesje −16,2 LUFS, Obóz −15,9 LUFS, czyli do 1 dB od dotychczasowego utworu (−16,3 LUFS).
+    - Miejsca muzyki to `places` w `data/music.json`: `skills`, `professions` i `camp`. Licencja: patrz punkt o planie Suno Pro albo Premier we wcześniejszym wpisie.

@@ -2,10 +2,13 @@
   "tracks": [
     { "id": "background-v1", "name": "Background v1", "file": "audio/music/background-v1.mp3" },
     { "id": "victory-v1", "name": "Zwycięstwo", "file": "audio/music/victory-v1.mp3" },
-    { "id": "defeat-v1", "name": "Omdlenie", "file": "audio/music/defeat-v1.mp3" }
+    { "id": "defeat-v1", "name": "Omdlenie", "file": "audio/music/defeat-v1.mp3" },
+    { "id": "skills-v1", "name": "Umiejętności", "file": "audio/music/skills-v1.mp3" },
+    { "id": "professions-v1", "name": "Profesje", "file": "audio/music/professions-v1.mp3" },
+    { "id": "camp-v1", "name": "Obóz", "file": "audio/music/camp-v1.mp3" }
   ],
   "default": "background-v1",
-  "places": {},
+  "places": { "camp": "camp-v1", "skills": "skills-v1", "professions": "professions-v1" },
   "reports": { "success": "victory-v1", "fainted": "defeat-v1" },
   "fadeOutSeconds": 5,
   "pauseSeconds": 2.5,

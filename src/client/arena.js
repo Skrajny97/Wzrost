@@ -340,7 +340,8 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
   }
 
   // A mana shield's card shows how much damage it can still take, in words
-  // and as a bar under the HP; spent, the shield goes out.
+  // and as a bar under the HP on the same scale as the HP, so it reads as
+  // the few points it adds; spent, the shield goes out.
   const shields = new Map(); // unit id → { name, full }
   function shieldUp(event) {
     const entry = cards.get(event.actor);
@@ -354,7 +355,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (!shield || !entry || left === undefined) return;
     if (left > 0) {
       entry.status.textContent = `${shield.name} · ${left}`;
-      entry.shieldFill.style.width = `${Math.min(100, (left / shield.full) * 100)}%`;
+      entry.shieldFill.style.width = `${Math.min(100, (left / Math.max(1, entry.unit.maxHp ?? shield.full)) * 100)}%`;
       return;
     }
     shields.delete(id);

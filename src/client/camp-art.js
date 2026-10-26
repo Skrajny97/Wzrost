@@ -29,15 +29,19 @@ export const BOARD_HEIGHT = 400;
 export const PLOT_WIDTH = 104;
 export const PLOT_HEIGHT = 83;
 
+// In the left column, plots one above another stay 21 apart: a name hangs
+// 11 below its plot, and the narrator's ring stands 6 off the plot it lights.
 export const CAMP_PLOTS = {
-  sawmill: { x: 74, y: 92 },
+  sawmill: { x: 74, y: 48 },
+  // Jezioro Midasa, where the pond at the edge of the glade lay.
+  'midas-lake': { x: 70, y: 152 },
   quarry: { x: 286, y: 86 },
   mine: { x: 258, y: 318 },
   campfire: { x: 180, y: 192 },
-  'loot-shed': { x: 70, y: 236 },
+  'loot-shed': { x: 70, y: 256 },
   'scrap-bench': { x: 290, y: 214 },
   anvil: { x: 180, y: 64 },
-  'craft-table': { x: 112, y: 322 },
+  'craft-table': { x: 112, y: 342 },
 };
 
 // The size of a building's drawing at a level.
@@ -65,6 +69,24 @@ const tufts = (spots) =>
   spots.map(([x, y]) => `<path d="M${x - 3} ${y} l1.5 -4 l1.5 4 l1.5 -5 l1.5 5" stroke="#5f7a3f" stroke-width="1" fill="none"></path>`).join('');
 
 const GROUND = `<ellipse cx="50" cy="66" rx="45" ry="12" fill="#2a2519"></ellipse><ellipse cx="50" cy="66" rx="45" ry="12" fill="none" stroke="#3a3324" stroke-width="1"></ellipse>`;
+
+// Jezioro Midasa: dark water with a glint of light, reeds, the trapper's pan
+// and specks of gold.
+const POND = `<ellipse cx="50" cy="62" rx="44" ry="15" fill="#16242a" stroke="#28393d" stroke-width="1.5"></ellipse>
+<ellipse cx="40" cy="58" rx="15" ry="3.2" fill="#8fe3ef" opacity="0.08"></ellipse>
+<ellipse cx="62" cy="67" rx="9" ry="2.3" fill="#8fe3ef" opacity="0.07"></ellipse>`;
+const reeds = (spots) =>
+  spots.map(([x, y]) => `<path d="M${x} ${y} q2 -10 0 -16 M${x + 4} ${y + 3} q3 -9 2 -14" stroke="#5f7a3f" stroke-width="1.2" fill="none"></path>`).join('');
+const specks = (spots) => spots.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="0.9" fill="${FIRE}" opacity="0.85"></circle>`).join('');
+// A shallow trapper's pan with gold in it, its rim at y.
+const pan = (x, y) =>
+  `<path d="M${x - 9} ${y} Q${x} ${y + 8} ${x + 9} ${y} Z" fill="#7d6a4a" stroke="${LINE}" stroke-width="0.8"></path>` +
+  `<ellipse cx="${x}" cy="${y}" rx="9" ry="2.2" fill="#5a4a33" stroke="${LINE}" stroke-width="0.6"></ellipse>` +
+  `<circle cx="${x - 2}" cy="${y}" r="1" fill="${FIRE}"></circle><circle cx="${x + 2.5}" cy="${y - 0.3}" r="0.8" fill="${FIRE}"></circle>`;
+// A wooden sluice slanting into the water, with its riffles.
+const SLUICE = `<path d="M10 46 L40 56 L40 61 L10 51 Z" fill="${WOOD}" stroke="${LINE}" stroke-width="0.7"></path>
+<path d="M16 49.5 l0 4 M22 51.5 l0 4 M28 53.5 l0 4 M34 55.5 l0 4" stroke="${PLANK}" stroke-width="0.9"></path>
+${pole(14, 52, 14, 64, 1.8)}${pole(34, 59, 34, 68, 1.8)}`;
 
 // Each building: its drawing at tiers 1, 2 and 3 (without the ground).
 const BUILDINGS = {
@@ -168,6 +190,19 @@ ${pole(18, 36, 28, 6, 2.2)}${pole(38, 30, 28, 6, 2.2)}
 <path d="M66 58 q4 -6 8 -1 q4 -5 8 1 Z" fill="#7a5a44" stroke="${LINE}" stroke-width="0.6"></path>
 <circle cx="70" cy="69" r="2.4" fill="${HOLE}" stroke="${LINE}" stroke-width="0.6"></circle>
 <circle cx="79" cy="69" r="2.4" fill="${HOLE}" stroke="${LINE}" stroke-width="0.6"></circle>`,
+  ],
+
+  // A pond with reeds and the trapper's pan at its edge; then a sluice
+  // washing the silt; then a small pier with a lantern and a sack of gold.
+  'midas-lake': [
+    () => `${POND}${reeds([[10, 60], [84, 64]])}${pan(70, 56)}${specks([[34, 62], [48, 67], [56, 59]])}`,
+    () => `${POND}${SLUICE}${reeds([[84, 64]])}${pan(70, 56)}${specks([[34, 64], [48, 67], [56, 59], [44, 60]])}`,
+    () => `${POND}${SLUICE}
+<rect x="56" y="49" width="38" height="4.5" fill="${PLANK}" stroke="${LINE}" stroke-width="0.6"></rect>
+${pole(60, 53, 60, 66, 2)}${pole(88, 53, 88, 64, 2)}
+${pole(92, 49, 92, 24, 2)}<circle cx="92" cy="22" r="2.4" fill="${FIRE}"></circle><circle cx="92" cy="22" r="6.5" fill="${FIRE}" opacity="0.18"></circle>
+<path d="M66 49 Q64 40 70 38 Q76 40 74 49 Z" fill="${CLOTH}" stroke="${LINE}" stroke-width="0.7"></path><circle cx="70" cy="37.5" r="1.4" fill="${FIRE}"></circle>
+${pan(80, 47)}${specks([[34, 64], [48, 67], [56, 60], [44, 60], [28, 66]])}`,
   ],
 
   // A fire in a ring of stones; then seats and a cauldron; then torches.
@@ -370,10 +405,6 @@ const BOARD = `<defs><radialGradient id="camp-glade" cx="0.5" cy="0.52" r="0.62"
 <rect width="360" height="400" fill="url(#camp-glade)"></rect>
 <path d="M212 400 Q236 300 300 286 Q340 280 360 296 V400 Z" fill="#1b2417"></path>
 ${BOULDERS.map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.72}" fill="${STONE_DARK}" stroke="#2a3322" stroke-width="1"></ellipse><ellipse cx="${x - r * 0.2}" cy="${y - r * 0.28}" rx="${r * 0.55}" ry="${r * 0.3}" fill="${STONE}" opacity="0.7"></ellipse>`).join('')}
-<ellipse cx="34" cy="356" rx="28" ry="13" fill="#16242a" stroke="#28393d" stroke-width="1.5"></ellipse>
-<ellipse cx="27" cy="353" rx="10" ry="2.8" fill="#8fe3ef" opacity="0.08"></ellipse>
-<ellipse cx="44" cy="360" rx="6" ry="2" fill="#8fe3ef" opacity="0.07"></ellipse>
-<path d="M8 354 q2 -10 0 -16 M12 358 q3 -9 2 -14 M60 362 q2 -9 0 -15" stroke="#5f7a3f" stroke-width="1.2" fill="none"></path>
 <g fill="none" stroke-linecap="round">
 <path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96 M171 332 Q150 330 128 340" stroke="#2a2218" stroke-width="16"></path>
 <path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96 M171 332 Q150 330 128 340" stroke="#352b1f" stroke-width="10"></path>

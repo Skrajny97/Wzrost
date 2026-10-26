@@ -184,7 +184,7 @@ function checkReferences(data) {
     guard: ['below', 'heal', 'armor', 'turns'],
     buff: ['armor', 'resist', 'damage'],
     coat: ['dotEffect', 'dotChance', 'dotPower', 'dotTicks'],
-    shield: ['below', 'pool', 'ratio'],
+    shield: ['below', 'pool'],
     evade: ['below', 'dodge', 'counter', 'hits'],
   };
   const classIds = new Set(data.classes.map((cls) => cls.id));
@@ -319,7 +319,7 @@ function checkReferences(data) {
       errors.push(`buildings.json: minutes.levels w ${building.id} muszą mieć po jednym czasie na poziom (${building.maxLevel}) i rosnąć`);
     }
     if (effect.kind === 'production') {
-      if (!resources.has(effect.resource)) errors.push(`buildings.json: ${building.id} wytwarza nieznany zasób "${effect.resource}"`);
+      if (effect.resource !== 'gold' && !resources.has(effect.resource)) errors.push(`buildings.json: ${building.id} wytwarza nieznany zasób "${effect.resource}"`);
       if (!effect.storageHours) errors.push(`buildings.json: ${building.id} wytwarza zasób, ale nie ma storageHours`);
     } else if (effect.resource || effect.storageHours) {
       errors.push(`buildings.json: ${building.id} ma resource albo storageHours, choć niczego nie wytwarza`);
@@ -370,14 +370,15 @@ function checkReferences(data) {
   if (evolutions.some((level, i) => i > 0 && level <= evolutions[i - 1])) errors.push('balance.json: classEvolutionLevels musi rosnąć');
   if (evolutions.at(-1) > data.balance.progression.maxLevel) errors.push('balance.json: ewolucja klasy powyżej maxLevel');
 
-  // Music: files that exist, places that are regions, inner regions or the
-  // camp, and report tracks that exist.
+  // Music: files that exist, places that are regions, inner regions, the
+  // camp or a tab with music (src/client/app.js: the routes' music), and
+  // report tracks that exist.
   const tracks = uniqueIds(errors, 'music', data.music.tracks);
   for (const track of data.music.tracks) {
     if (!existsSync(new URL(track.file, CLIENT_DIR))) errors.push(`music.json: brak pliku src/client/${track.file}`);
   }
   if (!tracks.has(data.music.default)) errors.push(`music.json: nieznany utwór domyślny ${data.music.default}`);
-  const places = new Set(['camp', ...data.regions.flatMap((region) => [region.id, ...region.areas.map((area) => area.id)])]);
+  const places = new Set(['camp', 'skills', 'professions', ...data.regions.flatMap((region) => [region.id, ...region.areas.map((area) => area.id)])]);
   for (const [place, track] of Object.entries(data.music.places)) {
     if (!places.has(place)) errors.push(`music.json: nieznane miejsce ${place}`);
     if (!tracks.has(track)) errors.push(`music.json: ${place} ma nieznany utwór ${track}`);

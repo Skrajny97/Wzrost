@@ -42,6 +42,20 @@
     "minutes": { "base": 1, "growth": 2.2 }
   },
   {
+    "id": "midas-lake",
+    "name": "Jezioro Midasa",
+    "description": "Ciche jezioro, na którego dnie zalega złoto. Misa traperska sama odsącza je z mułu: niewiele, ale bez przerwy.",
+    "maxLevel": 10,
+    "effect": { "kind": "production", "resource": "gold", "perLevel": 4, "storageHours": 2, "unit": "count", "text": "Odsącza {value} złota na godzinę, magazyn na {hours} produkcji" },
+    "costs": [
+      { "resource": "gold", "base": 10, "growth": 2.0 },
+      { "resource": "wood", "base": 8, "growth": 1.9 },
+      { "resource": "stone", "base": 4, "growth": 1.9, "fromLevel": 2 },
+      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 3 }
+    ],
+    "minutes": { "base": 1, "growth": 2.2 }
+  },
+  {
     "id": "campfire",
     "name": "Ognisko",
     "description": "Ciepło, strawa i sen przy ogniu. Postać szybciej odzyskuje HP między wyprawami, a duch ognia wymienia złoto na zasoby.",

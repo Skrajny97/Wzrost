@@ -957,6 +957,7 @@ describe('camp', () => {
       sawmill: 0,
       quarry: 0,
       mine: 0,
+      'midas-lake': 0,
       campfire: 1,
       'loot-shed': 0,
       'scrap-bench': 0,

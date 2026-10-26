@@ -683,11 +683,11 @@ describe('camp', () => {
     }
   }
 
-  test("starts with eight buildings at level 0, the abandoned camp's supply and a bag of 30", async () => {
+  test("starts with nine buildings at level 0, the abandoned camp's supply and a bag of 30", async () => {
     const start = await character();
     assert.deepEqual(
       start.camp.buildings.map((building) => [building.id, building.level]),
-      [['sawmill', 0], ['quarry', 0], ['mine', 0], ['campfire', 0], ['loot-shed', 0], ['scrap-bench', 0], ['anvil', 0], ['craft-table', 0]],
+      [['sawmill', 0], ['quarry', 0], ['mine', 0], ['midas-lake', 0], ['campfire', 0], ['loot-shed', 0], ['scrap-bench', 0], ['anvil', 0], ['craft-table', 0]],
     );
     assert.equal(start.camp.construction, null);
     const campfire = start.camp.buildings.find((building) => building.id === 'campfire');
@@ -701,7 +701,7 @@ describe('camp', () => {
     assert.deepEqual(data.resources.map((resource) => resource.name), ['Drewno', 'Kamień', 'Ruda żelaza']);
     assert.deepEqual(
       data.buildings.map((building) => building.name),
-      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Ognisko', 'Szałas na łupy', 'Skup złomu', 'Kowadło', 'Stół rzemieślniczy'],
+      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Jezioro Midasa', 'Ognisko', 'Szałas na łupy', 'Skup złomu', 'Kowadło', 'Stół rzemieślniczy'],
     );
   });
 
@@ -1001,6 +1001,32 @@ describe('camp', () => {
     assert.equal(fire(await character()).left, 5);
     await stock(149, {});
     assert.equal((await trade('wood')).data.error.code, 'not_enough');
+  });
+
+  test('Jezioro Midasa fills its store with gold, which goes to the gold, also when an upgrade collects it', async () => {
+    await stock(500, { wood: 50, stone: 20, 'iron-ore': 20 });
+    const lake = (view) => view.camp.buildings.find((building) => building.id === 'midas-lake');
+    const built = await build('midas-lake');
+    assert.equal(built.status, 201);
+    assert.equal(built.data.character.gold, 500 - 10);
+    await call('POST', '/api/test/skip-build', { cookie });
+    const ready = lake(await character());
+    assert.deepEqual([ready.production.resource, ready.production.perHour, ready.production.capacity], ['gold', 4, 8]);
+    assert.equal(ready.effect, 'Odsącza 4 złota na godzinę, magazyn na 2\u00a0h produkcji');
+    // A full store goes to the gold, not to the resources.
+    await call('POST', '/api/test/skip-build', { cookie });
+    const collected = await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'midas-lake' } });
+    assert.equal(collected.status, 200);
+    assert.deepEqual(collected.data.collected, { resource: 'gold', amount: 8 });
+    assert.equal(collected.data.character.gold, 490 + 8);
+    assert.equal(collected.data.character.resources.gold, undefined);
+    // An upgrade first collects the store, into the gold that pays for it:
+    // level 2 costs 20 gold, 15 wood and 8 stone.
+    await call('POST', '/api/test/skip-build', { cookie });
+    const upgraded = await build('midas-lake');
+    assert.equal(upgraded.status, 201);
+    assert.equal(upgraded.data.character.gold, 498 + 8 - 20);
+    assert.equal(upgraded.data.character.resources.gold, undefined);
   });
 
   test('two taps on "Zbierz" collect once', async () => {

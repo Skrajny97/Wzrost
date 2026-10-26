@@ -28,7 +28,7 @@ export function runsAsApp() {
   );
 }
 
-const onIphone = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+export const onIphone = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 export const inAppBrowser = () => /FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|TikTok|Snapchat/i.test(navigator.userAgent);
 
 // The button, or null when the game already runs as an app.

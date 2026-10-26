@@ -11,6 +11,7 @@ import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
 import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
+import { pushKey, sendNotifications, subscribePush, unsubscribePush } from './push.js';
 import { claimAllQuests, claimQuest, openChest } from './quests.js';
 import { getReport, listReports } from './reports.js';
 import { learnSkill, raiseSkill } from './skills.js';
@@ -63,6 +64,9 @@ const routes = [
   ['GET', '/api/reports/:id', getReport],
   ['POST', '/api/time/skip', skipWithTimePoints],
   ['POST', '/api/tutorial', seeTutorial],
+  ['GET', '/api/push/key', pushKey],
+  ['POST', '/api/push/subscribe', subscribePush],
+  ['POST', '/api/push/unsubscribe', unsubscribePush],
   ['POST', '/api/test/skip-time', skipTime],
   ['POST', '/api/test/skip-build', skipBuilding],
   ['POST', '/api/test/skip-craft', skipCrafting],
@@ -111,6 +115,13 @@ export default {
         new ApiError(500, 'internal', 'Wystąpił błąd serwera. Spróbuj ponownie za chwilę.'),
       );
     }
+  },
+
+  // The cron trigger (wrangler.jsonc), every minute: the phone notifications
+  // that came due (push.js). The scheduled minute is the clock here, so each
+  // run takes the time since the one before.
+  async scheduled(controller, env) {
+    await sendNotifications(env, controller.scheduledTime);
   },
 };
 

@@ -134,9 +134,10 @@ export function skillText(template, skill, params, content) {
 }
 
 // The line about the cost and how often the skill works; a mana shield
-// costs its share of mana, and a skill marked `once` works once a fight.
-export function skillCost(skill, content) {
-  if (typeof skill.params.pool === 'number') return content.texts.skillCostPool[0].replace('{pool}', `${Math.round(skill.params.pool * 100)}%`);
+// costs its share of mana at the skill's level (`params`, skillParams), and
+// a skill marked `once` works once a fight.
+export function skillCost(skill, content, params = skill.params) {
+  if (typeof params.pool === 'number') return content.texts.skillCostPool[0].replace('{pool}', `${Math.round(params.pool * 100)}%`);
   const key = skill.once ? 'skillCostOnce' : ACTIVE_KINDS.has(skill.kind) ? 'skillCostActive' : START_KINDS.has(skill.kind) ? 'skillCostStart' : 'skillCostOnce';
   return content.texts[key][0].replace('{mana}', String(skill.mana)).replace('{cooldown}', String(skill.cooldown ?? 1));
 }
@@ -158,7 +159,7 @@ export function skillView(skill, level, content) {
     maxLevel: top,
     effect: skillText(skill.effect, skill, skillParams(skill, shown, content), content),
     next: level > 0 && level < top ? skillText(skill.effect, skill, skillParams(skill, level + 1, content), content) : null,
-    cost: skillCost(skill, content),
+    cost: skillCost(skill, content, skillParams(skill, shown, content)),
   };
 }
 

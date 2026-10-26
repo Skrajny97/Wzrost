@@ -56,6 +56,11 @@
     "{actor} używa umiejętności {skill}.",
     "{actor}: {skill}!"
   ],
+  "skillBuff": ["{actor}: {skill}. Do końca walki pancerz +{armor}%, odporności +{resist}%, obrażenia +{damage}%."],
+  "skillBuffShared": ["Premia dzieli się na drużynę: każdy z {count} dostaje swoją część."],
+  "skillCoat": ["{actor}: {skill}. Do końca walki każdy cios ma {chance}% szans na {effect}: {power}% obrażeń ciosu co ruch przez {ticks} ruchy."],
+  "skillShield": ["{actor}: {skill}. Osłona przyjmie {shield} obrażeń, tyle, ile wzięła many."],
+  "skillEvade": ["{actor}: {skill}. Przez {hits} ciosów wrogów unik rośnie o {dodge} pkt proc., a każdy unik daje kontrę za {counter}% obrażeń."],
   "skillHeal": [
     "{actor} używa umiejętności {skill} i odzyskuje {amount} HP.",
     "{actor}: {skill}. Wraca {amount} HP."
@@ -119,6 +124,12 @@
   "faintPenalty": ["Omdlenie. Utracone doświadczenie: {xp}."],
   "bagOverflow": ["Plecak był pełny ({capacity} miejsc). Złomiarz kupił najsłabsze przedmioty: {count} za {gold} złota."],
   "autoEquip": ["Założono od razu: {item} ({slot}), bo ten slot był pusty."],
+  "pushHuntTitle": ["Koniec wyprawy"],
+  "pushHuntBody": ["Eksploracja zakończona: {area}. Raport czeka na odbiór."],
+  "pushBuildTitle": ["Koniec budowy"],
+  "pushBuildBody": ["{building}: poziom {level} gotowy."],
+  "pushStoreTitle": ["Pełny magazyn"],
+  "pushStoreBody": ["{buildings}: produkcja stoi do zebrania."],
   "lengths": [
     { "upTo": 10, "name": "bardzo krótka" },
     { "upTo": 30, "name": "krótka" },

@@ -1,6 +1,6 @@
-// Background music from data/music.json. For now one track plays on every
-// screen; a region, an inner region or the camp can get its own, and the
-// music then changes with the screen. A report opened right after its
+// Background music from data/music.json. One track plays on most screens; a
+// region, an inner region, the camp or a tab (Umiejętności, Profesje) can
+// have its own, and the music then changes with the screen. A report opened right after its
 // exploration plays the track of its result once (a win, a faint). A change
 // of tracks fades one out and the next in, and a track that comes back goes
 // on from where it stopped. A track fades out over its last seconds and

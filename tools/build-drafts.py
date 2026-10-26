@@ -74,12 +74,14 @@ TAKES = {
 # out too short and the dance all rumble, and Cios w plecy at 07:49, as its
 # one low step stood almost a second before the slash). The author then
 # picked the other take of Zatrute ostrze, and Celny strzał was recorded
-# once more (08:10) without its whistle, which sounded like a squeak.
+# once more (08:10) without its whistle, which sounded like a squeak. Then
+# once more (09:22) as an arrow in the bullseye with a soft magical chime
+# after it, as the author asked: take 0 rings on longer.
 SKILL_TAKES = {
     'power-strike': ['0650-0', '0650-1'],
     'wide-sweep': ['0650-0', '0650-1'],
     'unyielding': ['0650-1', '0650-0'],
-    'aimed-shot': ['0810-0', '0810-1'],
+    'aimed-shot': ['0922-0', '0922-1'],
     'arrow-rain': ['0743-0', '0743-1'],
     'pinning-shot': ['0650-1', '0650-0'],
     'fireball': ['0702-1', '0650-1'],

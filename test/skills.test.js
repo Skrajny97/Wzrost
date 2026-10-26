@@ -56,8 +56,9 @@ describe('skills', () => {
   test('a mana shield takes its share of mana at once and holds what that makes', () => {
     const result = fight('osłona-koszt', [withSkill('mage', 'mana-shield', { hpShare: 0.45 })], [sturdy('boar', 12, 'e0')]);
     const mage = withSkill('mage', 'mana-shield');
-    const { pool, ratio } = skillParams(content.skillsById['mana-shield'], 1, content);
-    const points = Math.round(Math.round(mage.maxMana * pool) * ratio);
+    // A point of mana for a point of damage.
+    const { pool } = skillParams(content.skillsById['mana-shield'], 1, content);
+    const points = Math.round(mage.maxMana * pool);
     const on = result.events.find((event) => event.kind === 'skill' && event.skill === 'mana-shield');
     assert.equal(on.shield, points);
     const absorbed = result.events.filter((event) => event.target === 'a0' && event.absorbed > 0).reduce((sum, event) => sum + event.absorbed, 0);
@@ -262,14 +263,24 @@ describe('skills', () => {
     assert.ok(counters > 0);
   });
 
-  test('a blessing and a coated blade work from the start', () => {
+  test('a blessing and a coated blade work from the start, and the account says what they give', () => {
     const blessed = fight('błogosławieństwo', [withSkill('cleric', 'blessing')], [sturdy('boar', 12, 'e0')]);
     assert.equal(blessed.events[0].kind, 'skill');
     assert.equal(blessed.events[0].skill, 'blessing');
     assert.equal(blessed.events[0].t, 0);
+    // Alone, the cleric has the whole bonus of level 1.
+    assert.equal(blessed.events[0].text, 'Mira: Błogosławieństwo. Do końca walki pancerz +20%, odporności +20%, obrażenia +8%.');
     const coated = fight('jad', [withSkill('shadow', 'poisoned-blade')], [sturdy('boar', 12, 'e0')]);
     assert.equal(coated.events[0].skill, 'poisoned-blade');
+    assert.equal(coated.events[0].text, 'Mira: Zatrute ostrze. Do końca walki każdy cios ma 30% szans na Zatrucie: 15% obrażeń ciosu co ruch przez 3 ruchy.');
     assert.ok(coated.events.some((event) => event.kind === 'effect' && event.actor === 'a0' && event.effect === 'Zatrucie'));
+    // So do a mana shield and the dance of shadows when they wake.
+    const shielded = fight('osłona-opis', [withSkill('mage', 'mana-shield', { hpShare: 0.45 })], [sturdy('boar', 12, 'e0')]);
+    const shield = shielded.events.find((event) => event.kind === 'skill' && event.skill === 'mana-shield');
+    assert.equal(shield.text, `Mira: Osłona many. Osłona przyjmie ${shield.shield} obrażeń, tyle, ile wzięła many.`);
+    const danced = fight('taniec-opis', [withSkill('shadow', 'shadow-dance', { hpShare: 0.45 })], [sturdy('wolf', 12, 'e0')]);
+    const dance = danced.events.find((event) => event.kind === 'skill' && event.skill === 'shadow-dance');
+    assert.equal(dance.text, 'Mira: Taniec cieni. Przez 5 ciosów wrogów unik rośnie o 40 pkt proc., a każdy unik daje kontrę za 80% obrażeń.');
   });
 
   test('a pinning shot takes a move, a frost gust slows everyone', () => {

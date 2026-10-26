@@ -23,7 +23,7 @@
     "default": { "type": "string", "description": "Utwór dla ekranów bez własnego." },
     "places": {
       "type": "object",
-      "description": "Id miejsca (regionu, regionu wewnętrznego albo camp) → id utworu. Region wewnętrzny bez wpisu gra utwór swojego regionu.",
+      "description": "Id miejsca (regionu, regionu wewnętrznego, camp, albo zakładki: skills to Umiejętności, professions to Profesje) → id utworu. Region wewnętrzny bez wpisu gra utwór swojego regionu.",
       "additionalProperties": { "type": "string" }
     },
     "reports": {

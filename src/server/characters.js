@@ -137,6 +137,14 @@ export const buildQueue = (row) => JSON.parse(row.build_queue ?? '[]');
 
 const path = (id) => `$."${id}"`;
 
+// What adds a gathered store to the character: gold has its own column, the
+// other resources sit in the JSON of `resources`.
+export function gainSql(resource, amount) {
+  return resource === 'gold'
+    ? { sql: 'gold = gold + ?', values: [amount] }
+    : { sql: 'resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) + ?)', values: [path(resource), path(resource), amount] };
+}
+
 // The waiting builds whose time has come start, one after another, each as
 // if it had started at its own time, as a build started by hand does
 // (camp.js: beginBuilding): a production building's store goes to the
@@ -154,15 +162,16 @@ async function settleBuilds(db, player, now) {
     const gathered = producing ? collect(building, player.buildings[building.id], at) : null;
     const resting = !player.activity;
     const hp = resting ? currentHp(player, at).hp : null;
+    const gain = gathered && gainSql(gathered.resource, gathered.amount);
     const statements = [
       db
         .prepare(
-          `UPDATE characters SET build_queue = ?${gathered ? ', resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) + ?)' : ''}${resting ? ', hp = ?, hp_at = ?' : ''}, version = version + 1
+          `UPDATE characters SET build_queue = ?${gain ? `, ${gain.sql}` : ''}${resting ? ', hp = ?, hp_at = ?' : ''}, version = version + 1
            WHERE id = ? AND version = ?`,
         )
         .bind(
           JSON.stringify(rest),
-          ...(gathered ? [path(gathered.resource), path(gathered.resource), gathered.amount] : []),
+          ...(gain ? gain.values : []),
           ...(resting ? [hp, at] : []),
           row.id,
           row.version,
@@ -188,7 +197,8 @@ async function settleBuilds(db, player, now) {
     }
     row.build_queue = JSON.stringify(rest);
     row.version += 1;
-    if (gathered) {
+    if (gathered?.resource === 'gold') row.gold += gathered.amount;
+    else if (gathered) {
       const resources = JSON.parse(row.resources ?? '{}');
       resources[gathered.resource] = (resources[gathered.resource] ?? 0) + gathered.amount;
       row.resources = JSON.stringify(resources);

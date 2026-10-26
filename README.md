@@ -146,6 +146,8 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/quests/chest` | skrzynia okresu, gdy wszystkie jego zadania są wykonane: Punkty Czasu i Punkty Systemu, a w tygodniowej też przedmiot do plecaka; zwraca `chest` (409 `not_ready`, `opened`, `bag_full`, `character_changed`) |
 | POST | `/api/camp/build` | zacznij budowę następnego poziomu budynku obozu: `buildingId`; naraz jedna budowa; budynek produkcyjny najpierw oddaje zawartość magazynu |
 | POST | `/api/camp/collect` | zbierz magazyn budynku produkcyjnego: `buildingId`; zwraca `collected` (409 `nothing_to_collect`, gdy magazyn jest pusty) |
+| POST | `/api/camp/cancel` | „Anuluj” budowę czekającą w kolejce: `buildingId` i `level`; koszt wraca w całości (409 `not_queued`) |
+| POST | `/api/camp/trade` | duch ognia w Ognisku: złoto za `resource` (`wood`, `stone` albo `iron-ore`), wymian na dzień według poziomu Ogniska (409 `not_built`, `no_trades`, `not_enough`) |
 | GET | `/api/hunts/options` | poziom zagrożenia dla każdego czasu w otwartym regionie wewnętrznym dla poziomu postaci; `?area=<id>` liczy jeden wybrany region wewnętrzny |
 | POST | `/api/hunts` | wyrusz na eksplorację: `areaId` (otwarty region wewnętrzny), `minutes` (1, potem co 5 minut: do 30, od poziomu 25 do 60, od 35 do 120, od 50 do 240) |
 | POST | `/api/hunts/cancel` | przerwij trwającą eksplorację |
@@ -153,12 +155,21 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |
 | GET | `/api/reports/:id` | pełny raport |
 | POST | `/api/time/skip` | „Przewiń”: `target` (`activity`, `rest` albo `build`); 1 Punkt Czasu za minutę, przy za małej liczbie punktów skraca o tyle minut, ile ich jest; zwraca `spent` (409 `no_time_points`, `nothing_to_skip`, `busy`) |
+| GET | `/api/push/key` | klucz publiczny serwera do subskrypcji powiadomień na telefon |
+| POST | `/api/push/subscribe` | subskrypcja powiadomień tego telefonu, tak jak podaje ją `PushSubscription.toJSON()`; przechodzi na zalogowane konto (400 `invalid_subscription`, gdy adres nie prowadzi do usługi push przeglądarki) |
+| POST | `/api/push/unsubscribe` | wyłączenie powiadomień: `endpoint` subskrypcji |
 | POST | `/api/tutorial` | kwestia narratora przeczytana, karta albo wskazanie: `card` (jej id), albo `skip: true` dla „Pomiń wprowadzenie”, które robi za gracza pierwsze kroki: wyprawę przewiniętą Punktami Czasu, jej raport i Ognisko (`firstSteps`; 409 `no_tutorial` dla postaci sprzed wprowadzenia) |
 | POST | `/api/test/skip-time` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wyprawę albo odpoczynek („Pomiń czas”) |
 | POST | `/api/test/skip-build` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu budowę w obozie, a gdy nic się nie buduje, zapełnia magazyny |
 | POST | `/api/test/skip-craft` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wszystkie zlecenia Stołu rzemieślniczego |
 
 Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie `message` jest po polsku.
+
+## Powiadomienia na telefon
+
+Gracz włącza je w Ustawieniach („Powiadomienia”). Przychodzą przy końcu wyprawy, końcu budowy i pełnym magazynie, a treści są w `data/texts.json` (`push…`). Co minutę Worker uruchamia się sam (`triggers` w `wrangler.jsonc`), sprawdza minutę, która minęła, i wysyła wiadomości przez Web Push do usług push przeglądarek. Nie trzeba zakładać żadnego sekretu: klucze, którymi serwer podpisuje wiadomości, powstają przy pierwszym użyciu i leżą w bazie D1. Na iPhonie powiadomienia działają tylko w grze dodanej do ekranu początkowego. Zasady są w `DECISIONS.md`, w części „Powiadomienia na telefon, Jezioro Midasa, osłona many i muzyka zakładek”.
+
+Lokalnie wysyłkę uruchamia się ręcznie: `npx wrangler dev --test-scheduled`, a potem `curl "http://localhost:8787/cdn-cgi/handler/scheduled?cron=*+*+*+*+*&time=<czas w ms>"`.
 
 ## Logowanie przez Google
 
@@ -185,7 +196,7 @@ Przebieg potrzebuje sekretu repozytorium `RETRO_DIFFUSION_API_KEY` z kluczem API
 
 ## Muzyka i dźwięki
 
-Muzyka w tle jest w `src/client/audio/music/`, a `data/music.json` mówi, który utwór gra domyślnie, a który w danym miejscu (`places`: id regionu, regionu wewnętrznego albo `camp`). Raport otwarty zaraz po wyprawie gra raz utwór swojego wyniku (`reports`: `success` dla wygranej, `fainted` dla omdlenia, `escaped` dla ucieczki), a ten sam raport z Dziennika zwykłą muzykę. Zmiana utworu wycisza jeden i pogłaśnia drugi (`switchSeconds`), a utwór, który wraca, gra od miejsca, w którym ucichł. Utwór cichnie przez ostatnie 5 sekund i po krótkiej pauzie gra od nowa. Kolejny utwór dodaje się tak:
+Muzyka w tle jest w `src/client/audio/music/`, a `data/music.json` mówi, który utwór gra domyślnie, a który w danym miejscu (`places`: id regionu, regionu wewnętrznego, `camp` albo zakładki: `skills` to Umiejętności, `professions` to Profesje). Raport otwarty zaraz po wyprawie gra raz utwór swojego wyniku (`reports`: `success` dla wygranej, `fainted` dla omdlenia, `escaped` dla ucieczki), a ten sam raport z Dziennika zwykłą muzykę. Zmiana utworu wycisza jeden i pogłaśnia drugi (`switchSeconds`), a utwór, który wraca, gra od miejsca, w którym ucichł. Utwór cichnie przez ostatnie 5 sekund i po krótkiej pauzie gra od nowa. Kolejny utwór dodaje się tak:
 
 1. Wgraj plik MP3 do `src/client/audio/music/` (nazwa małymi literami, z myślnikami).
 2. Dopisz go do `tracks` w `data/music.json`, a miejsce i id utworu do `places` (albo wynik wyprawy do `reports`).

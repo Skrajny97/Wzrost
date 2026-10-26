@@ -1639,6 +1639,28 @@ a.segmented-option {
   align-items: center;
 }
 
+/* Powiadomienia: the label with a line on what they tell, the switch beside. */
+.status-row--push {
+  align-items: center;
+}
+
+.status-row--push dt {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-hint {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.status-muted {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
 .sheet-actions {
   display: grid;
   grid-auto-columns: minmax(0, 1fr);
