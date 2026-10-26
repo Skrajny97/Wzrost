@@ -1,0 +1,25 @@
+{
+  "id": "she-wolf",
+  "payload": {
+    "prompt": "lean pale grey she-wolf with a white muzzle and icy blue eyes, crouched and snarling, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 513495462,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793014852,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 17.16,
+    "request_id": "a8d91c93-7440-4626-8dc4-4edefba75f65",
+    "outputs_retained_until": 1793101195
+  }
+}

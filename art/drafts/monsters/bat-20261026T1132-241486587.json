@@ -1,0 +1,25 @@
+{
+  "id": "bat",
+  "payload": {
+    "prompt": "brown long-eared bat with huge ears and wide open leathery wings, flying, mouth open showing small fangs",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 241486587,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793014717,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 17.52,
+    "request_id": "b1cc4d7f-cd7f-477e-a881-4bc904e7bbeb",
+    "outputs_retained_until": 1793101069
+  }
+}

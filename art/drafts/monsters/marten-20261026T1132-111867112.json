@@ -1,0 +1,25 @@
+{
+  "id": "marten",
+  "payload": {
+    "prompt": "pine marten, a slender dark brown weasel-like forest animal with a cream throat patch and a bushy tail, crouched to pounce, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 111867112,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793014470,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 18.42,
+    "request_id": "5b56f904-d198-404c-98c2-390d675ae768",
+    "outputs_retained_until": 1793100803
+  }
+}

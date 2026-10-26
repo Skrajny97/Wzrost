@@ -1,0 +1,25 @@
+{
+  "id": "basilisk",
+  "payload": {
+    "prompt": "basilisk from Polish legend: a serpent with the head and red crest of a rooster, scaly dark green coils, small leathery wings and glowing yellow eyes, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 978777633,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793014887,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 16.98,
+    "request_id": "5795bf6d-6ea9-4dad-8980-32f613206c93",
+    "outputs_retained_until": 1793101254
+  }
+}
