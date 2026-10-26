@@ -1,0 +1,25 @@
+{
+  "id": "midas-lake-3",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a magical shimmering turquoise lake with golden water lilies, a white stone pier with a small golden statue of a crowned king, a golden sluice and heaps of gold coins",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 967422066,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019660,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 63.28,
+    "request_id": "0e456e86-d667-4d2a-a0bd-edc5b842a199",
+    "outputs_retained_until": 1793106045
+  }
+}

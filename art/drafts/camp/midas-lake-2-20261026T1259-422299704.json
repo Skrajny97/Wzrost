@@ -1,0 +1,25 @@
+{
+  "id": "midas-lake-2",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a clear turquoise pond with lily pads, a wooden sluice trough for panning gold and a small open sack of gold nuggets",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 422299704,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793019643,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 63.34,
+    "request_id": "4e418adf-6054-48e9-84b8-953b678c2825",
+    "outputs_retained_until": 1793106026
+  }
+}
