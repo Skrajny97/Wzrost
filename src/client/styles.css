@@ -3761,8 +3761,10 @@ a.camp-level-button {
   transition: transform 0.12s ease;
 }
 
-/* A building's pixel-art picture, on the board and on its own screen. */
-.camp-plot-art image {
+/* A building's pixel-art picture, on the board and on its own screen, and
+   the board's ground. */
+.camp-plot-art image,
+.camp-board-art image {
   image-rendering: pixelated;
 }
 

@@ -71,6 +71,12 @@ export const SPRITES = {
   // The camp's buildings, <building>-<look> for the looks of levels 1–3, 4–7
   // and 8–10, 128×96 (camp-art.js keeps a vector drawing for a look without
   // one).
+  // The camp board's ground, without paths (camp-art.js draws them).
+  board: {
+    width: 320,
+    height: 352,
+    ids: ['camp'],
+  },
   // Each building cut to its outline, at most 128 × 96.
   camp: {
     width: 128,
@@ -110,6 +116,7 @@ export const areaSprite = (areaId) => sprite('areas', areaId, 'area-art');
 export const landArt = (regionId) => (available.lands.has(regionId) ? `/art/lands/${regionId}.png` : null);
 // The address of a camp building's picture at a look (1–3), or null while it
 // has none.
+export const boardGround = () => (available.board.has('camp') ? '/art/board/camp.png' : null);
 export const campArt = (buildingId, tier) => (available.camp.has(`${buildingId}-${tier}`) ? `/art/camp/${buildingId}-${tier}.png` : null);
 
 // A class's figure for a look. `bust` shows the head and shoulders at the

@@ -4,7 +4,7 @@
 // keep the vector stand-ins below, drawn in the colours of the inner regions'
 // scenes. Fixed markup only: no game data goes into these strings.
 
-import { campArt } from './art.js';
+import { boardGround, campArt } from './art.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -403,16 +403,19 @@ const TREES = [
 const FIRS = [[96, 24, 20], [250, 26, 18], [18, 116, 18], [16, 230, 20], [344, 128, 18], [348, 238, 20], [70, 396, 18], [330, 392, 20]];
 const BOULDERS = [[318, 38, 14], [342, 60, 10], [296, 30, 8], [244, 42, 9], [232, 362, 7], [336, 334, 8], [300, 372, 6]];
 
-const BOARD = `<defs><radialGradient id="camp-glade" cx="0.5" cy="0.52" r="0.62">
+// The paths from the campfire to the plots: a dark edge and a lighter middle.
+const PATHS = 'M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96 M171 332 Q150 330 128 340';
+const paths = (edge, middle, extra = '') =>
+  `<g fill="none" stroke-linecap="round"${extra}><path d="${PATHS}" stroke="${edge}" stroke-width="16"></path><path d="${PATHS}" stroke="${middle}" stroke-width="10"></path></g>`;
+
+// The glade drawn in vectors, for a board without its picture.
+const VECTOR_BOARD = `<defs><radialGradient id="camp-glade" cx="0.5" cy="0.52" r="0.62">
 <stop offset="0" stop-color="#2d3b24"></stop><stop offset="0.72" stop-color="#222e1c"></stop><stop offset="1" stop-color="#151d12"></stop>
 </radialGradient></defs>
 <rect width="360" height="400" fill="url(#camp-glade)"></rect>
 <path d="M212 400 Q236 300 300 286 Q340 280 360 296 V400 Z" fill="#1b2417"></path>
 ${BOULDERS.map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.72}" fill="${STONE_DARK}" stroke="#2a3322" stroke-width="1"></ellipse><ellipse cx="${x - r * 0.2}" cy="${y - r * 0.28}" rx="${r * 0.55}" ry="${r * 0.3}" fill="${STONE}" opacity="0.7"></ellipse>`).join('')}
-<g fill="none" stroke-linecap="round">
-<path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96 M171 332 Q150 330 128 340" stroke="#2a2218" stroke-width="16"></path>
-<path d="M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96 M171 332 Q150 330 128 340" stroke="#352b1f" stroke-width="10"></path>
-</g>
+${paths('#2a2218', '#352b1f')}
 ${tufts([[128, 70], [232, 120], [140, 304], [326, 176], [36, 186], [212, 372], [118, 156], [252, 196], [150, 110], [40, 300], [320, 260]])}
 <ellipse cx="128" cy="388" rx="16" ry="5" fill="${WOOD}" stroke="${LINE}" stroke-width="0.6" opacity="0.8" transform="rotate(-12 128 388)"></ellipse>
 <ellipse cx="330" cy="146" rx="7" ry="4" fill="${PLANK}" stroke="${LINE}" stroke-width="0.6" opacity="0.8"></ellipse>
@@ -420,6 +423,19 @@ ${FIRS.map(([x, y, size]) => `<path d="M${x} ${y - size} L${x + size * 0.55} ${y
 ${TREES.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#101710"></circle><circle cx="${x - r * 0.25}" cy="${y - r * 0.25}" r="${r * 0.7}" fill="#162114"></circle><circle cx="${x - r * 0.4}" cy="${y - r * 0.4}" r="${r * 0.3}" fill="#1d2a19"></circle>`).join('')}
 <circle cx="150" cy="40" r="1.2" fill="${FIRE}" opacity="0.6"></circle><circle cx="214" cy="62" r="1" fill="${FIRE}" opacity="0.5"></circle>
 <circle cx="40" cy="250" r="1" fill="${FIRE}" opacity="0.5"></circle><circle cx="330" cy="200" r="1.2" fill="${FIRE}" opacity="0.5"></circle>`;
+
+// The glade as a pixel-art picture (art.js), muted and darkened like the
+// buildings on it, with the paths worn into it: earthen, soft-edged and
+// partly see-through.
+const PICTURE_BOARD = (src) => `<filter id="camp-ground" color-interpolation-filters="sRGB">
+<feColorMatrix type="saturate" values="0.7"></feColorMatrix>
+<feComponentTransfer><feFuncR type="linear" slope="0.72"></feFuncR><feFuncG type="linear" slope="0.72"></feFuncG><feFuncB type="linear" slope="0.72"></feFuncB></feComponentTransfer>
+</filter>
+<filter id="camp-path"><feGaussianBlur stdDeviation="1.6"></feGaussianBlur></filter>
+<image href="${src}" width="360" height="400" preserveAspectRatio="xMidYMid slice" filter="url(#camp-ground)"></image>
+${paths('#3a2f1f', '#56462e', ' filter="url(#camp-path)" opacity="0.8"')}`;
+
+const BOARD = boardGround() ? PICTURE_BOARD(boardGround()) : VECTOR_BOARD;
 
 export const campArtIds = Object.keys(BUILDINGS);
 
