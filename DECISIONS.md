@@ -1598,7 +1598,7 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
 1. **Nowe logo** (autor: dotychczasowy sześciokąt wyglądał słabo w podglądzie linku na Messengerze).
     - Retro Diffusion dało cztery szkice godła: oko, ognisko, narratora i drzewo (4 × 0,18 USD). W grze jest szkic 3 wskazany przez autora: zakapturzony narrator w świecącym sześciokącie Systemu (`src/client/logo.png`, 128 × 128).
     - Z godła powstały ikony aplikacji (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png` z marginesem na kółko Androida, `apple-touch-icon.png`) i ikonka karty przeglądarki `favicon-64.png`, która zastąpiła `favicon.svg`.
-    - Podgląd linku to `og.png` (1200 × 630): godło, napis Insight, hasło gry „Wejrzyj do miejsca pełnego wyzwań dla śmiałków” i adres insightrpg.com na tle grafiki Wiatrołomów. Znaczniki `og:` i `twitter:card` są w `index.html`.
+    - Podgląd linku to `og.png` (1200 × 630): godło, napis Insight, hasło gry „Wejrzyj do miejsca pełnego wyzwań dla śmiałków” i adres insightrpg.com na tle grafiki Wiatrołomów. Znaczniki `og:` i `twitter:card` są w `index.html`. Obrazek ma 256 kolorów i waży ok. 150 KB, bo niektóre komunikatory, np. WhatsApp, nie pokazują większych.
     - Ekran logowania pokazuje godło zamiast sześciokąta z linii.
     - Messenger i inne komunikatory przez jakiś czas pamiętają stary podgląd linku. Zainstalowana gra zmienia ikonę na Androidzie sama, po kilku dniach, a na iPhonie dopiero po ponownym dodaniu do ekranu początkowego.
     - Rodzaj `logo` w `art/prompts.json` zostawia tylko opis wybranego szkicu.
