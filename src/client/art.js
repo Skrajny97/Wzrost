@@ -91,7 +91,7 @@ export const SPRITES = {
   // The herbs of Zielarstwo, 32×32, filled in as they are approved.
   herbs: {
     size: 32,
-    ids: ['comfrey', 'mugwort'],
+    ids: ['comfrey', 'mugwort', 'nettle'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
