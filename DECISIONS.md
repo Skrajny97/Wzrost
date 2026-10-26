@@ -1676,4 +1676,9 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
     - Autor ocenia każdy budynek osobno, zaraz po narysowaniu (zasada w `CLAUDE.md`).
     - Ognisko na poziomach 8–10: ducha ognia z twarzą ten styl nie narysował w dwóch próbach. Skup złomu na poziomach 1–3: pierwszy rysunek wyszedł z tłem lasu, więc jest narysowany drugi raz.
 7. **Koszt.** Retro Diffusion: pierwsza, odrzucona wersja obozu 27 × 0,18 USD, czyli 4,86 USD. Próba stylu Kowadła 3 × 0,18 USD, nowa wersja 27 × 0,06 USD i dwie poprawki po 0,06 USD, razem ok. 2,3 USD. ElevenLabs: dwa nagrania krzyku Płanetnika i trzy nagrania zdania narratora.
+8. **Nowe nazwy** (autor: „Jezioro Midasa zmieniamy na Staw Midasa”, a Szałas na łupy na „Magazyn”). Zmieniły się tylko nazwy w grze (`data/buildings.json`) i w zdaniach narratora, a identyfikatory `midas-lake` i `loot-shed` zostają. Opis stawu brzmi „Cichy staw, na którego dnie zalega złoto”. Zdania narratora przy obu miejscach są nagrane od nowa. W grze jest trzecie nagranie każdego z nich, bo zaczyna najniżej i najczyściej, a dwa pozostałe są na stronie odsłuchu.
+9. **Budynki wtopione w planszę** (autor: „zmniejsz trochę saturację tych budynków i powinno pasować, jak jeszcze wtopisz je w planszę obozu lekkim rozmyciem”; obrazki są zatwierdzone, a styl Magazynu ma zostać wzorem).
+    - Każdy obrazek na planszy i na ekranie budynku ma filtr SVG: saturacja 0,78, krawędzie zmiękczone rozmytą przezroczystością i delikatna poświata z rozmytej kopii obrazka pod nim (`blend` w `src/client/camp-art.js`). Obrazki w plikach zostają ostre, więc filtr da się łatwo zmienić.
+    - Kilofy Kamieniołomu na poziomach 1–3 są stalowe zamiast niebieskich (autor: „kilofy w złym kolorze”). Kolory są przemalowane w obrazku, bez nowego szkicu.
+    - Na 9. poziomie Stół rzemieślniczy zasłaniał nazwę Magazynu. Jego plac przesunął się o 12 w prawo, a nazwy budynków stoją zawsze nad obrazkami sąsiednich placów.
 

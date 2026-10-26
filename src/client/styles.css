@@ -3779,9 +3779,11 @@ a.camp-level-button {
   outline-offset: 2px;
 }
 
-/* The name and level under a plot; it may reach past the plot's width. */
+/* The name and level under a plot; it may reach past the plot's width, and
+   stays above the pictures of the plots around it. */
 .camp-plot-label {
   position: absolute;
+  z-index: 2;
   top: 100%;
   left: 50%;
   display: inline-flex;

@@ -43,7 +43,9 @@ export const CAMP_PLOTS = {
   'loot-shed': { x: 70, y: 256 },
   'scrap-bench': { x: 290, y: 214 },
   anvil: { x: 180, y: 64 },
-  'craft-table': { x: 112, y: 342 },
+  // A little to the right, so that its biggest look stays clear of the
+  // Magazyn's name above it.
+  'craft-table': { x: 124, y: 342 },
 };
 
 // The size of a building's drawing at a level.
@@ -436,6 +438,19 @@ function svgElement(viewBox, className, markup) {
 // grows on the board with its level.
 const ART_SIZES = [0.64, 0.82, 1];
 
+// A picture sits into the board: its colours a little muted, its edges soft
+// and a faint blur of it around them. Each plot has its own filter, as each
+// is its own SVG.
+let filters = 0;
+const blend = (id) => `<filter id="${id}" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+<feColorMatrix type="saturate" values="0.78" result="muted"></feColorMatrix>
+<feGaussianBlur in="SourceAlpha" stdDeviation="0.9" result="edge"></feGaussianBlur>
+<feComposite in="muted" in2="edge" operator="in" result="body"></feComposite>
+<feGaussianBlur in="muted" stdDeviation="1.5" result="blur"></feGaussianBlur>
+<feComponentTransfer in="blur" result="halo"><feFuncA type="linear" slope="0.45"></feFuncA></feComponentTransfer>
+<feMerge><feMergeNode in="halo"></feMergeNode><feMergeNode in="body"></feMergeNode></feMerge>
+</filter>`;
+
 // A building's look: its picture, standing on the bottom of the plot over its
 // shadow, or its vector stand-in. The picture's address is one of the fixed
 // ones in art.js.
@@ -445,8 +460,10 @@ function look(buildingId, tier) {
   const size = ART_SIZES[tier - 1];
   const width = 100 * size;
   const height = 78 * size;
-  return `<ellipse cx="50" cy="75" rx="${(width * 0.42).toFixed(1)}" ry="${(3 + 3 * size).toFixed(1)}" fill="#0b0f09" opacity="0.45"></ellipse>
-<image href="${src}" x="${((100 - width) / 2).toFixed(1)}" y="${(78 - height).toFixed(1)}" width="${width.toFixed(1)}" height="${height.toFixed(1)}" preserveAspectRatio="xMidYMax meet"></image>`;
+  filters += 1;
+  const id = `camp-blend-${filters}`;
+  return `${blend(id)}<ellipse cx="50" cy="75" rx="${(width * 0.42).toFixed(1)}" ry="${(3 + 3 * size).toFixed(1)}" fill="#0b0f09" opacity="0.45"></ellipse>
+<image href="${src}" x="${((100 - width) / 2).toFixed(1)}" y="${(78 - height).toFixed(1)}" width="${width.toFixed(1)}" height="${height.toFixed(1)}" preserveAspectRatio="xMidYMax meet" filter="url(#${id})"></image>`;
 }
 
 // The markup of a plot: the building at its level, an empty plot with a faint
