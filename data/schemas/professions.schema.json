@@ -1,0 +1,350 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Profesje",
+  "description": "Profesje, ich poziomy i statystyki, zbieractwo w Systemowym Zagajniku i zioła (src/engine/professions.js).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "rules",
+    "professions",
+    "gathering",
+    "herbs",
+    "texts"
+  ],
+  "properties": {
+    "$comment": {
+      "type": "string"
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "characterXpShare",
+        "stack"
+      ],
+      "properties": {
+        "characterXpShare": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Ile XP postaci daje godzina pracy, jako część XP z godziny wyprawy na tym samym poziomie."
+        },
+        "stack": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Ile sztuk zioła mieści jedno miejsce plecaka."
+        }
+      }
+    },
+    "professions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "stats",
+          "maxLevel",
+          "levelMinutes",
+          "statPerLevel",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "gathering",
+              "crafting"
+            ]
+          },
+          "stats": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Dwie statystyki ze stats.json, które rosną z poziomem profesji."
+          },
+          "maxLevel": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "levelMinutes": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Awans z poziomu L wymaga L razy tyle minut pracy."
+          },
+          "statPerLevel": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "soon": {
+            "type": "boolean",
+            "description": "Profesja jest w zakładce, ale jeszcze bez pracy."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "gathering": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profession",
+        "place",
+        "minutes",
+        "yieldPerLevel",
+        "spread",
+        "slots"
+      ],
+      "properties": {
+        "profession": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Profesja zbieracka, która zbiera zioła."
+        },
+        "place": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "minutes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "step",
+            "max"
+          ],
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "step": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "yieldPerLevel": {
+          "type": "number",
+          "minimum": 0
+        },
+        "spread": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.9
+        },
+        "slots": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Od którego poziomu ile ziół zbiera się naraz; pierwszy wpis od poziomu 1.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "level",
+              "herbs"
+            ],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "herbs": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "herbs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "genitive",
+          "level",
+          "perHour",
+          "price",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "genitive": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nazwa w dopełniaczu, do zadań narratora („Zbierz 12 sztuk Żywokostu”)."
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Poziom profesji, od którego postać zna to zioło."
+          },
+          "perHour": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "price": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report",
+        "gathered",
+        "lost",
+        "levelUp",
+        "revealed",
+        "hidden",
+        "busy",
+        "claimFirst",
+        "pushTitle",
+        "pushBody"
+      ],
+      "properties": {
+        "report": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "gathered": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "lost": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "levelUp": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "revealed": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "hidden": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "busy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "claimFirst": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "pushTitle": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "pushBody": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

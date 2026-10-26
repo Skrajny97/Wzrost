@@ -4,9 +4,17 @@
   "description": "Zadania dzienne i tygodniowe: okresy z liczbą zadań i skrzynią, rodzaje zadań, nagrody i progi poziomów. Kod zna okresy i rodzaje po id.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["timeZone", "periods", "kinds", "rewards", "levels"],
+  "required": [
+    "timeZone",
+    "periods",
+    "kinds",
+    "rewards",
+    "levels"
+  ],
   "properties": {
-    "$comment": { "type": "string" },
+    "$comment": {
+      "type": "string"
+    },
     "timeZone": {
       "type": "string",
       "minLength": 1,
@@ -15,10 +23,17 @@
     "periods": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["daily", "weekly"],
+      "required": [
+        "daily",
+        "weekly"
+      ],
       "properties": {
-        "daily": { "$ref": "#/definitions/period" },
-        "weekly": { "$ref": "#/definitions/period" }
+        "daily": {
+          "$ref": "#/definitions/period"
+        },
+        "weekly": {
+          "$ref": "#/definitions/period"
+        }
       }
     },
     "kinds": {
@@ -27,51 +42,119 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "text", "weight", "daily", "weekly"],
+        "required": [
+          "id",
+          "text",
+          "weight"
+        ],
         "properties": {
-          "id": { "enum": ["kill", "explore", "process", "salvage"] },
+          "id": {
+            "enum": [
+              "kill",
+              "explore",
+              "process",
+              "salvage",
+              "gather",
+              "gatherAny"
+            ]
+          },
           "text": {
             "type": "string",
             "minLength": 1,
             "pattern": "\\{count\\}",
-            "description": "{count}: ile, {noun}: rzeczownik w formie do tej liczby."
+            "description": "{count}: ile, {noun}: rzeczownik w formie do tej liczby, {herb}: zioło w dopełniaczu (gather)."
           },
           "counted": {
             "type": "array",
             "description": "Rzeczownik po liczbie: 1, 2–4, 5 i więcej. Rodzaj kill bierze go ze stwora.",
             "minItems": 3,
             "maxItems": 3,
-            "items": { "type": "string", "minLength": 1 }
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
           },
-          "table": { "type": "boolean", "description": "Tylko z postawionym Stołem rzemieślniczym." },
-          "weight": { "type": "number", "exclusiveMinimum": 0 },
-          "daily": { "$ref": "#/definitions/kindPeriod" },
-          "weekly": { "$ref": "#/definitions/kindPeriod" }
-        }
+          "table": {
+            "type": "boolean",
+            "description": "Tylko z postawionym Stołem rzemieślniczym."
+          },
+          "weight": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "daily": {
+            "$ref": "#/definitions/kindPeriod"
+          },
+          "weekly": {
+            "$ref": "#/definitions/kindPeriod"
+          },
+          "professions": {
+            "type": "boolean",
+            "description": "Tylko z dostępnymi profesjami (od ich poziomu odblokowania)."
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "daily"
+            ]
+          },
+          {
+            "required": [
+              "weekly"
+            ]
+          }
+        ]
       }
     },
     "rewards": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["weights", "spread", "daily", "weekly", "resources"],
+      "required": [
+        "weights",
+        "spread",
+        "daily",
+        "weekly",
+        "resources"
+      ],
       "properties": {
         "weights": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "gold": { "type": "number", "minimum": 0 },
-            "resource": { "type": "number", "minimum": 0 },
-            "part": { "type": "number", "minimum": 0 }
+            "gold": {
+              "type": "number",
+              "minimum": 0
+            },
+            "resource": {
+              "type": "number",
+              "minimum": 0
+            },
+            "part": {
+              "type": "number",
+              "minimum": 0
+            }
           }
         },
-        "spread": { "type": "number", "minimum": 0, "maximum": 0.9 },
-        "daily": { "$ref": "#/definitions/amounts" },
-        "weekly": { "$ref": "#/definitions/amounts" },
+        "spread": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.9
+        },
+        "daily": {
+          "$ref": "#/definitions/amounts"
+        },
+        "weekly": {
+          "$ref": "#/definitions/amounts"
+        },
         "resources": {
           "type": "object",
           "description": "Zasoby do wylosowania i ich udział w ilości.",
           "minProperties": 1,
-          "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }
+          "additionalProperties": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
         }
       }
     },
@@ -81,15 +164,28 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["fromLevel", "part", "chestRarities"],
+        "required": [
+          "fromLevel",
+          "part",
+          "chestRarities"
+        ],
         "properties": {
-          "fromLevel": { "type": "integer", "minimum": 1 },
-          "part": { "type": "string", "minLength": 1 },
+          "fromLevel": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "part": {
+            "type": "string",
+            "minLength": 1
+          },
           "chestRarities": {
             "type": "object",
             "description": "Wagi rzadkości przedmiotu ze skrzyni tygodniowej.",
             "minProperties": 1,
-            "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }
+            "additionalProperties": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
           }
         }
       }
@@ -99,19 +195,48 @@
     "period": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "count", "chest"],
+      "required": [
+        "name",
+        "count",
+        "chest"
+      ],
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "count": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
         "chest": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["timePoints", "systemPoints", "item", "text"],
+          "required": [
+            "timePoints",
+            "systemPoints",
+            "item",
+            "text"
+          ],
           "properties": {
-            "timePoints": { "type": "integer", "minimum": 0 },
-            "systemPoints": { "type": "integer", "minimum": 0 },
-            "item": { "type": "boolean", "description": "Czy w skrzyni jest też przedmiot." },
-            "text": { "type": "string", "minLength": 1, "description": "Napis pod zadaniami okresu: co daje skrzynia." }
+            "timePoints": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "systemPoints": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "item": {
+              "type": "boolean",
+              "description": "Czy w skrzyni jest też przedmiot."
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Napis pod zadaniami okresu: co daje skrzynia."
+            }
           }
         }
       }
@@ -120,34 +245,63 @@
       "type": "array",
       "minItems": 2,
       "maxItems": 2,
-      "items": { "type": "integer", "minimum": 1 }
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
     },
     "kindPeriod": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "count": { "$ref": "#/definitions/range" },
-        "step": { "type": "integer", "minimum": 1 },
-        "fights": { "$ref": "#/definitions/range" }
+        "count": {
+          "$ref": "#/definitions/range"
+        },
+        "step": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "fights": {
+          "$ref": "#/definitions/range"
+        }
       }
     },
     "amount": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["base", "perLevel"],
+      "required": [
+        "base",
+        "perLevel"
+      ],
       "properties": {
-        "base": { "type": "number", "minimum": 0 },
-        "perLevel": { "type": "number", "minimum": 0 }
+        "base": {
+          "type": "number",
+          "minimum": 0
+        },
+        "perLevel": {
+          "type": "number",
+          "minimum": 0
+        }
       }
     },
     "amounts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["gold", "resource", "part"],
+      "required": [
+        "gold",
+        "resource",
+        "part"
+      ],
       "properties": {
-        "gold": { "$ref": "#/definitions/amount" },
-        "resource": { "$ref": "#/definitions/amount" },
-        "part": { "$ref": "#/definitions/amount" }
+        "gold": {
+          "$ref": "#/definitions/amount"
+        },
+        "resource": {
+          "$ref": "#/definitions/amount"
+        },
+        "part": {
+          "$ref": "#/definitions/amount"
+        }
       }
     }
   }

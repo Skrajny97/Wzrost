@@ -15,7 +15,7 @@ import {
   upgradeView,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, engineCharacter, equippedItems, loadPlayer, requireIdlePlayer, requirePlayer, walletOf } from './characters.js';
+import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireIdlePlayer, requirePlayer, walletOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 
@@ -70,7 +70,7 @@ export async function unequipItem(context) {
   const item = findItem(player, context.params.id);
   if (!item.equippedSlot) throw new ApiError(409, 'not_equipped', 'Ten przedmiot nie jest założony.');
   const capacity = bagCapacity(campLevels(player.buildings, context.now, content), content);
-  if (player.items.filter((candidate) => !candidate.equippedSlot).length >= capacity) {
+  if (bagPlaces(player) >= capacity) {
     throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
   }
   await context.env.DB.prepare('UPDATE items SET slot = NULL WHERE id = ? AND character_id = ?')

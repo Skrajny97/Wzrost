@@ -88,6 +88,22 @@ export const SPRITES = {
       'scrap-bench-1', 'scrap-bench-2', 'scrap-bench-3', 'anvil-1', 'anvil-2', 'anvil-3', 'craft-table-1', 'craft-table-2', 'craft-table-3',
     ],
   },
+  // The herbs of Zielarstwo, 32×32, filled in as they are approved.
+  herbs: {
+    size: 32,
+    ids: [],
+  },
+  // The professions' squares on the Profesje tab, 48×48.
+  professions: {
+    size: 48,
+    ids: [],
+  },
+  // The places where professions work, dim behind their cards, 192×96.
+  places: {
+    width: 192,
+    height: 96,
+    ids: [],
+  },
 };
 
 const available = Object.fromEntries(Object.entries(SPRITES).map(([kind, { ids }]) => [kind, new Set(ids)]));
@@ -118,6 +134,11 @@ export const landArt = (regionId) => (available.lands.has(regionId) ? `/art/land
 // has none.
 export const boardGround = () => (available.board.has('camp') ? '/art/board/camp.png' : null);
 export const campArt = (buildingId, tier) => (available.camp.has(`${buildingId}-${tier}`) ? `/art/camp/${buildingId}-${tier}.png` : null);
+// A herb of Zielarstwo, a profession's square on the Profesje tab, and the
+// address of the background of a place where a profession works.
+export const herbSprite = (id) => sprite('herbs', id, 'sprite--item');
+export const professionSprite = (id) => sprite('professions', id, 'sprite--profession');
+export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 
 // A class's figure for a look. `bust` shows the head and shoulders at the
 // image's own size, cut by the box it sits in (the arena, the class cards).

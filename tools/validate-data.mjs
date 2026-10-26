@@ -11,7 +11,7 @@ const CLIENT_DIR = new URL('../src/client/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
-  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills',
+  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'settlement', 'dungeons', 'core'];
@@ -462,6 +462,42 @@ function checkReferences(data) {
     }
   }
   errors.push(...checkQuests(data, { resources, rarities }));
+  errors.push(...checkProfessions(data, { stats }));
+  return errors;
+}
+
+// Professions: stats that exist, a gathering profession that gathers, herbs
+// known within its levels, the herbs at once from level 1 on and growing, and
+// a slider that reaches its longest time in whole steps.
+function checkProfessions(data, { stats }) {
+  const errors = [];
+  const { professions, gathering, herbs } = data.professions;
+  const ids = uniqueIds(errors, 'professions', professions);
+  uniqueIds(errors, 'professions (zioła)', herbs);
+  for (const profession of professions) {
+    for (const stat of profession.stats) {
+      if (!stats.has(stat)) errors.push(`professions.json: ${profession.id} ma nieznaną statystykę "${stat}"`);
+    }
+  }
+  const gatherer = professions.find((profession) => profession.id === gathering.profession);
+  if (!ids.has(gathering.profession) || gatherer.kind !== 'gathering') {
+    errors.push(`professions.json: gathering.profession "${gathering.profession}" nie jest profesją zbieracką`);
+  } else {
+    for (const herb of herbs) {
+      if (herb.level > gatherer.maxLevel) errors.push(`professions.json: zioło ${herb.id} wymaga poziomu ${herb.level}, a profesja kończy się na ${gatherer.maxLevel}`);
+    }
+  }
+  if (!herbs.some((herb) => herb.level === 1)) errors.push('professions.json: żadnego zioła nie zna się od 1. poziomu');
+  const { slots, minutes } = gathering;
+  if (slots[0].level !== 1) errors.push('professions.json: gathering.slots musi zaczynać się od poziomu 1');
+  slots.forEach((slot, index) => {
+    if (index > 0 && (slot.level <= slots[index - 1].level || slot.herbs <= slots[index - 1].herbs)) {
+      errors.push('professions.json: gathering.slots muszą rosnąć z poziomem');
+    }
+  });
+  if (minutes.max < minutes.min || (minutes.max - minutes.min) % minutes.step !== 0) {
+    errors.push('professions.json: gathering.minutes.max musi wypadać na kroku suwaka od min');
+  }
   return errors;
 }
 
@@ -486,7 +522,8 @@ function checkQuests(data, { resources, rarities }) {
   for (const kind of quests.kinds) {
     if (kind.id !== 'kill' && !kind.counted) errors.push(`quests.json: rodzaj ${kind.id} nie ma counted`);
     if (kind.counted && !kind.text.includes('{noun}')) errors.push(`quests.json: tekst rodzaju ${kind.id} nie ma {noun}`);
-    for (const period of ['daily', 'weekly']) {
+    if (kind.text.includes('{herb}') !== (kind.id === 'gather')) errors.push(`quests.json: tylko rodzaj gather ma {herb} w tekście`);
+    for (const period of ['daily', 'weekly'].filter((each) => kind[each])) {
       const range = kind.id === 'kill' ? kind[period].fights : kind[period].count;
       if (!range) errors.push(`quests.json: rodzaj ${kind.id} nie ma ${kind.id === 'kill' ? 'fights' : 'count'} w ${period}`);
       else if (range[0] > range[1]) errors.push(`quests.json: rodzaj ${kind.id} ma odwrócony zakres w ${period}`);

@@ -3,7 +3,7 @@
 // The item card also upgrades the item on the camp's Kowadło and takes a bag
 // item apart on the Stół rzemieślniczy.
 
-import { itemSprite, materialSprite, portraitSprite } from '../art.js';
+import { herbSprite, itemSprite, materialSprite, portraitSprite } from '../art.js';
 import { MATERIALS_HINT, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatMinutes, formatNumber, plural, timeFormat } from '../format.js';
@@ -29,6 +29,19 @@ let bagTab = 'items';
 
 // "Rzadka skóra wilka" for a stack above its species' rarity.
 const materialTitle = (material) => material.label.charAt(0).toUpperCase() + material.label.slice(1);
+
+// Why the gear cannot change now: the character is away.
+const busyText = (character) =>
+  character.activity?.kind === 'herbs'
+    ? 'Postać zbiera zioła. Plecak i ekwipunek zmienisz po jej powrocie z Zagajnika.'
+    : 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.';
+
+// A herb's stacks in the bag: full ones, then the rest.
+function herbStacks(herb, stack) {
+  const stacks = Array.from({ length: Math.floor(herb.count / stack) }, () => stack);
+  if (herb.count % stack > 0) stacks.push(herb.count % stack);
+  return stacks;
+}
 
 export function mountCharacter(container) {
   function render() {
@@ -113,10 +126,12 @@ export function mountCharacter(container) {
 
   function bagSection(bag) {
     const capacity = state.character.bagCapacity;
+    // Herbs take places too, by the stack.
+    const used = state.character.bagUsed ?? bag.length;
     const { materials } = state.character.crafting;
     const count = h('span', {
-      class: `section-count${bag.length >= capacity ? ' section-count--full' : ''}`,
-      text: `(${formatNumber(bag.length)}/${formatNumber(capacity)})`,
+      class: `section-count${used >= capacity ? ' section-count--full' : ''}`,
+      text: `(${formatNumber(used)}/${formatNumber(capacity)})`,
     });
     const tab = (id, label) =>
       h(
@@ -196,10 +211,30 @@ export function mountCharacter(container) {
   }
 
   function itemsGrid(bag) {
-    if (bag.length === 0) return h('p', { class: 'muted', text: 'Plecak jest pusty. Łupy z wypraw trafiają tutaj.' });
+    const herbs = state.character.herbs ?? [];
+    if (bag.length === 0 && herbs.length === 0) return h('p', { class: 'muted', text: 'Plecak jest pusty. Łupy z wypraw trafiają tutaj.' });
     return h(
       'ul',
       { class: 'bag-grid' },
+      herbs.flatMap((herb) =>
+        herbStacks(herb, state.character.herbStack).map((count) =>
+          h(
+            'li',
+            {},
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'slot slot--bag slot--herb',
+                'aria-label': `${herb.name}, ${formatNumber(count)} szt.`,
+                onClick: () => herbSheet(herb),
+              },
+              herbSprite(herb.id) ?? icon('leaf', { size: 24 }),
+              h('span', { class: 'slot-level', text: formatNumber(count) }),
+            ),
+          ),
+        ),
+      ),
       bag.map((item) =>
         h(
           'li',
@@ -218,6 +253,67 @@ export function mountCharacter(container) {
           ),
         ),
       ),
+    );
+  }
+
+  // A herb's card: what it is, what the scrapper pays, and selling or
+  // throwing away as many as chosen.
+  function herbSheet(herb) {
+    const character = state.character;
+    const busy = Boolean(character.activity);
+    let count = herb.count;
+    const price = (amount) => Math.max(1, Math.round(herb.price * amount));
+    const value = h('output', { class: 'herb-count-value' });
+    const sell = h('button', { type: 'button', class: 'button button--system', disabled: busy });
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
+    const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(herb.count) });
+    function set(next) {
+      count = Math.min(herb.count, Math.max(1, next));
+      value.textContent = `${formatNumber(count)} szt.`;
+      sell.textContent = `Sprzedaj za ${formatNumber(price(count))} złota`;
+      less.disabled = count === 1;
+      more.disabled = count === herb.count;
+    }
+    set(count);
+    const act = (path, done) => async (event) =>
+      withButton(event.currentTarget, async () => {
+        const result = await call('POST', `/api/herbs/${path}`, { herbId: herb.id, count });
+        closeSheet();
+        done?.(result);
+      });
+    sell.addEventListener('click', act('sell', ({ sold }) => {
+      playSound('coin');
+      toast(`Złomiarz kupił ${formatNumber(sold.count)} szt. za ${formatNumber(sold.gold)} złota.`);
+    }));
+    const discard = async (event) => {
+      const button = event.currentTarget;
+      const sure = await confirmAction({
+        title: 'Wyrzucić zioła?',
+        text: `${herb.name}: ${formatNumber(count)} szt. zniknie na zawsze.`,
+        confirmLabel: 'Wyrzuć',
+        danger: true,
+      });
+      if (sure) await act('discard')({ currentTarget: button });
+    };
+    const art = herbSprite(herb.id);
+    const title = h('h2', { class: 'item-title', text: herb.name });
+    const stacks = Math.ceil(herb.count / character.herbStack);
+    const meta = h('p', { class: 'item-meta', text: `${formatNumber(herb.count)} szt. · ${stacks} ${plural(stacks, 'miejsce', 'miejsca', 'miejsc')} w plecaku` });
+    openSheet(
+      h(
+        'div',
+        { class: 'item-details' },
+        art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art' }, art), h('div', {}, title, meta)) : [title, meta],
+        h('p', { class: 'sheet-text', text: herb.description }),
+        h('p', { class: 'sheet-text', text: `Jedno miejsce mieści ${character.herbStack} szt. Złomiarz płaci ${formatDecimal(herb.price)} złota za sztukę.` }),
+      ),
+      busy
+        ? h('p', { class: 'muted', text: busyText(character) })
+        : [
+            h('div', { class: 'herb-count' }, less, value, more, all),
+            h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: 'Wyrzuć' }), sell),
+          ],
     );
   }
 
@@ -284,7 +380,7 @@ export function itemSheet(item, { equipped }) {
     worn && h('div', { class: 'compare' }, h('p', { class: 'compare-title', text: 'Założony teraz' }), itemDetails(worn, { small: true })),
     anvilSection(item, busy),
     !equipped && salvageSection(item, busy),
-    busy && h('p', { class: 'muted', text: 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.' }),
+    busy && h('p', { class: 'muted', text: busyText(character) }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
     early && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
     h(
@@ -493,7 +589,7 @@ export function itemDetails(item, { small = false } = {}) {
 }
 
 function characterMessage(character, busy) {
-  if (busy) return 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.';
+  if (busy) return busyText(character);
   if (character.freePoints > 0 && isUnlocked('stats')) {
     return `Masz ${formatNumber(character.freePoints)} ${plural(character.freePoints, 'wolny punkt', 'wolne punkty', 'wolnych punktów')} statystyk. Rozdziel je w Statystykach.`;
   }

@@ -259,8 +259,10 @@ export function updateTopbar(now = serverNow()) {
   const activity = character.activity;
   const { activityLabel, activityTime } = topbar;
   topbar.activity.classList.toggle('activity--done', activityFinished(activity, now));
+  // A gathering of herbs leads to its screen, the rest to Walka.
+  topbar.activity.setAttribute('href', activity?.kind === 'herbs' ? '#/profesje/zielarstwo' : '#/walka');
   if (activity) {
-    activityLabel.textContent = `EKSPLORACJA · ${activity.areaName}`;
+    activityLabel.textContent = activity.kind === 'herbs' ? `ZIELARSTWO · ${activity.placeName}` : `EKSPLORACJA · ${activity.areaName}`;
     activityTime.textContent = activityFinished(activity, now) ? 'RAPORT GOTOWY' : formatCountdown(activity.endsAt - now);
   } else {
     const hpNow = currentHp(character, now);

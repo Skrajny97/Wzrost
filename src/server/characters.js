@@ -23,7 +23,9 @@ import {
   fireTradesMade,
   freePoints,
   gainedTimePoints,
+  herbStacks,
   hoursToNext,
+  isUnlocked,
   huntDurations,
   itemView,
   materialView,
@@ -50,7 +52,9 @@ import {
   xpToNext,
 } from '../engine/index.js';
 import { content } from './content.js';
+import { professionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
+import { bagHerbs, herbsOf, professionsView } from './professions-view.js';
 import { requireSession } from './sessions.js';
 
 // 2 to 20 characters: letters and digits, spaces, hyphens, apostrophes and
@@ -138,6 +142,12 @@ export const buildQueue = (row) => JSON.parse(row.build_queue ?? '[]');
 
 const path = (id) => `$."${id}"`;
 
+// Gathering herbs is no fight: the character rests meanwhile, as at home.
+export const restsDuring = (activity) => !activity || activity.kind === 'herbs';
+
+// The bag's places taken: one an item, and the herbs by the stack.
+export const bagPlaces = (player) => player.items.filter((item) => !item.equippedSlot).length + herbStacks(herbsOf(player.row), content);
+
 // What adds a gathered store to the character: gold has its own column, the
 // other resources sit in the JSON of `resources`.
 export function gainSql(resource, amount) {
@@ -161,7 +171,7 @@ async function settleBuilds(db, player, now) {
     const building = content.buildingsById[entry.buildingId];
     const producing = building?.effect.kind === 'production';
     const gathered = producing ? collect(building, player.buildings[building.id], at) : null;
-    const resting = !player.activity;
+    const resting = restsDuring(player.activity);
     const hp = resting ? currentHp(player, at).hp : null;
     const gain = gathered && gainSql(gathered.resource, gathered.amount);
     const statements = [
@@ -231,6 +241,7 @@ async function settleTimePoints(db, row, now) {
 export const questContext = (player, now) => ({
   character: engineCharacter(player.row),
   hasTable: craftTable(campLevels(player.buildings, now, content), content).pace > 0,
+  hasProfessions: professionsOn() && isUnlocked('professions', player.row.level, content),
   seed: player.row.id,
 });
 
@@ -254,9 +265,10 @@ export async function requireIdlePlayer(context) {
   const found = await requirePlayer(context);
   const activity = found.player.activity;
   if (activity) {
+    const herbs = activity.kind === 'herbs' && content.professionTexts;
     throw activity.ends_at <= context.now
-      ? new ApiError(409, 'claim_first', 'Wyprawa się skończyła. Najpierw odbierz raport.')
-      : new ApiError(409, 'busy', 'Postać jest na wyprawie. Poczekaj na jej koniec.');
+      ? new ApiError(409, 'claim_first', herbs ? herbs.claimFirst[0] : 'Wyprawa się skończyła. Najpierw odbierz raport.')
+      : new ApiError(409, 'busy', herbs ? herbs.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
   }
   return found;
 }
@@ -273,19 +285,21 @@ export function engineCharacter(row) {
     appearance: row.appearance,
     // The skills learned and their levels (skills.js).
     skills: JSON.parse(row.skills ?? '{}'),
+    // The professions' levels and XP (professions.js).
+    professions: JSON.parse(row.professions ?? '{}'),
   };
 }
 
 export const equippedItems = (player) => player.items.filter((item) => item.equippedSlot);
 
-// HP now: frozen at the start of an activity, otherwise rested since hp_at,
-// faster with the camp's Ognisko.
+// HP now: frozen at the start of an exploration, otherwise rested since
+// hp_at (also while gathering herbs), faster with the camp's Ognisko.
 export function currentHp(player, now) {
   const character = engineCharacter(player.row);
   const { totals } = computeStats(character, equippedItems(player), content);
   const combatant = playerCombatant({ character, equipped: equippedItems(player), name: player.row.name }, content);
   const rest = restBonus(player.buildings, player.row.hp_at, now, content);
-  const hp = player.activity
+  const hp = !restsDuring(player.activity)
     ? player.activity.hp_at_start
     : restedHp(
         { hp: player.row.hp, since: player.row.hp_at, now, maxHp: combatant.maxHp, vitality: totals.vitality, ...rest },
@@ -478,8 +492,13 @@ function craftingView(row, levels, now) {
 }
 
 // Where an activity takes place. region_id holds the inner region, or a whole
-// region for an activity started before inner regions.
+// region for an activity started before inner regions; a gathering, its
+// place and the herbs chosen.
 function activityPlace(activity, level) {
+  if (activity.kind === 'herbs') {
+    const herbs = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content.herbsById[id]);
+    return { placeName: content.gathering.place.name, herbs: herbs.map((id) => ({ id, name: content.herbsById[id].name })) };
+  }
   const area = areaFor(activity.region_id, level, content);
   return { areaId: area.id, areaName: area.name, regionId: area.regionId, regionName: area.regionName };
 }
@@ -540,7 +559,7 @@ export function characterView(player, now) {
     maxHp,
     // While resting, the page counts HP up the same way the server does. A
     // camp upgrade that sped up resting since hp_at changes the pace at `at`.
-    regen: activity
+    regen: !restsDuring(activity)
       ? null
       : {
           hp: row.hp,
@@ -579,7 +598,13 @@ export function characterView(player, now) {
       }),
     ),
     bag: items.filter((item) => !item.equippedSlot).reverse().map(toItem),
+    // The herbs in the bag, which take its places by the stack.
+    herbs: bagHerbs(row, sellBonus),
+    herbStack: content.professionRules.stack,
+    bagUsed: bagPlaces(player),
     bagCapacity: bagCapacity(levels, content),
+    // The Profesje tab, or null while it is hidden or locked (professions-view.js).
+    professions: professionsView(row),
     camp: campView(player, levels, now),
     // The Stół rzemieślniczy: materials, parts and the queue (crafting.js).
     crafting: craftingView(row, levels, now),

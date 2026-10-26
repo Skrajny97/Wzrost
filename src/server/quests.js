@@ -6,7 +6,7 @@
 
 import { QUEST_PERIODS, bagCapacity, campLevels, chestItem, chestReady, createRng, itemName, questDone, withChest, withClaimed } from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, equippedItems, loadPlayer, questsNow, requirePlayer } from './characters.js';
+import { bagPlaces, characterView, equippedItems, loadPlayer, questsNow, requirePlayer } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
 
 // A JSON path for an id with a hyphen ("iron-ore").
@@ -100,7 +100,7 @@ export async function openChest(context) {
   let item = null;
   if (chest.item) {
     const capacity = bagCapacity(campLevels(player.buildings, now, content), content);
-    if (player.items.filter((candidate) => !candidate.equippedSlot).length >= capacity) {
+    if (bagPlaces(player) >= capacity) {
       throw new ApiError(409, 'bag_full', 'Plecak jest pełny. Zrób w nim miejsce, żeby otworzyć skrzynię.');
     }
     // The same week's chest holds the same item, whenever it is opened.

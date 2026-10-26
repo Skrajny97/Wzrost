@@ -16,6 +16,7 @@ import { mountCombat } from './screens/combat.js';
 import { renderCreate } from './screens/create.js';
 import { mountJournal } from './screens/journal.js';
 import { lockedScreen } from './screens/locked.js';
+import { mountProfessions } from './screens/professions.js';
 import { mountReport } from './screens/report.js';
 import { mountSkills } from './screens/skills.js';
 import { mountStats } from './screens/stats.js';
@@ -43,7 +44,8 @@ const ROUTES = [
   { pattern: /^#\/postac\/statystyki$/, nav: 'character', tab: 'stats', mount: mountStats },
   { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', music: 'skills', mount: mountSkills },
   { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: lockedScreen('core', 'Rdzeń') },
-  { pattern: /^#\/profesje$/, nav: 'main', tab: 'profesje', music: 'professions', mount: lockedScreen('professions', 'Profesje') },
+  // Profesje, or one profession's screen (Zielarstwo).
+  { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', music: 'professions', mount: mountProfessions },
   { pattern: /^#\/osada$/, nav: 'main', tab: 'osada', mount: lockedScreen('settlement', 'Osada') },
   { pattern: /^#\/dziennik(?:\/(?<tab>system))?$/, nav: 'main', tab: 'dziennik', mount: mountJournal },
   { pattern: /^#\/raport\/(?<id>\d+)$/, nav: 'main', tab: null, mount: mountReport },

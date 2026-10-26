@@ -2,16 +2,18 @@
 // distributing them by class.
 
 import { upgradedItem } from './items.js';
+import { professionStats } from './professions.js';
 
 // Totals and their sources (the segments of the source bar on the stats screen).
 export function computeStats(character, equipped, content) {
   const cls = content.classesById[character.classId];
   const totals = {};
   const sources = {};
+  const fromProfessions = professionStats(character.professions, content);
   for (const stat of content.statIds) {
     const fromClass = Math.floor(cls.baseStats[stat] + (cls.growth[stat] ?? 0) * (character.classLevel - 1));
     const fromPoints = character.points[stat] ?? 0;
-    sources[stat] = { class: fromClass, character: fromPoints, professions: 0, equipment: 0, core: 0 };
+    sources[stat] = { class: fromClass, character: fromPoints, professions: fromProfessions[stat] ?? 0, equipment: 0, core: 0 };
   }
 
   const bonuses = { armor: 0, resist: {} };

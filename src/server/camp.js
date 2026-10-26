@@ -31,7 +31,7 @@ import {
   upgradeCost,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { buildQueue, characterView, currentHp, gainSql, loadPlayer, requirePlayer, walletOf } from './characters.js';
+import { buildQueue, characterView, currentHp, gainSql, loadPlayer, requirePlayer, restsDuring, walletOf } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
@@ -110,7 +110,7 @@ export async function beginBuilding(db, player, buildingId, now) {
     : '';
   // While resting, the HP rested so far is saved: a faster rest from an
   // upgraded Ognisko counts from the end of the upgrade on.
-  const resting = !player.activity;
+  const resting = restsDuring(player.activity);
   const pay = db
     .prepare(
       `UPDATE characters SET gold = gold - ?${setResources}${resting ? ', hp = ?, hp_at = ?' : ''}, version = version + 1

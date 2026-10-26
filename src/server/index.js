@@ -9,8 +9,10 @@ import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints
 import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
+import { readFeatures } from './features.js';
 import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
+import { discardHerbs, sellHerbs, startGathering } from './professions.js';
 import { pushKey, sendNotifications, subscribePush, unsubscribePush } from './push.js';
 import { claimAllQuests, claimQuest, openChest } from './quests.js';
 import { getReport, listReports } from './reports.js';
@@ -56,6 +58,9 @@ const routes = [
   ['POST', '/api/hunts', startHunt],
   ['POST', '/api/hunts/cancel', cancelHunt],
   ['POST', '/api/hunts/claim', claimHunt],
+  ['POST', '/api/professions/gather', startGathering],
+  ['POST', '/api/herbs/sell', sellHerbs],
+  ['POST', '/api/herbs/discard', discardHerbs],
   ['POST', '/api/camp/build', startBuilding],
   ['POST', '/api/camp/cancel', cancelBuilding],
   ['POST', '/api/camp/collect', collectProduction],
@@ -87,6 +92,7 @@ function match(parts, path) {
 
 export default {
   async fetch(request, env) {
+    readFeatures(env);
     const url = new URL(request.url);
     if (!url.pathname.startsWith('/api/')) {
       return new Response('Nie znaleziono strony.', {
@@ -122,6 +128,7 @@ export default {
   // that came due (push.js). The scheduled minute is the clock here, so each
   // run takes the time since the one before.
   async scheduled(controller, env) {
+    readFeatures(env);
     await sendNotifications(env, controller.scheduledTime);
   },
 };

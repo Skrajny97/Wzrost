@@ -1,4 +1,5 @@
-// The journal: past hunt reports of the player's character.
+// The journal: past reports of the player's character, of explorations and
+// of gatherings (`kind`: hunt or herbs).
 
 import { requirePlayer } from './characters.js';
 import { ApiError, json } from './http.js';
@@ -9,12 +10,12 @@ export const KEPT_REPORTS = 50;
 export async function listReports(context) {
   const { player } = await requirePlayer(context);
   const { results } = await context.env.DB.prepare(
-    'SELECT id, created_at, summary FROM reports WHERE character_id = ? ORDER BY id DESC LIMIT ?',
+    'SELECT id, kind, created_at, summary FROM reports WHERE character_id = ? ORDER BY id DESC LIMIT ?',
   )
     .bind(player.row.id, KEPT_REPORTS)
     .all();
   return json({
-    reports: results.map((row) => ({ id: row.id, createdAt: row.created_at, ...JSON.parse(row.summary) })),
+    reports: results.map((row) => ({ id: row.id, kind: row.kind, createdAt: row.created_at, ...JSON.parse(row.summary) })),
   });
 }
 

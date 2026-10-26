@@ -5595,3 +5595,258 @@ button.skill-row {
 .author-skill-preview:empty {
   display: none;
 }
+
+/* The Profesje tab: three squares in a triangle, the first on top. A
+   profession still to come is grey, with "Wkrótce". */
+.profession-triangle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 0;
+}
+
+.profession-row {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.profession-square {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 132px;
+  height: 132px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--bark-line);
+  color: var(--text);
+  text-decoration: none;
+}
+
+a.profession-square:active {
+  background: var(--bark-active);
+}
+
+.profession-square--soon {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.profession-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  color: var(--leaf);
+}
+
+.profession-art .sprite--profession {
+  width: 56px;
+  height: 56px;
+  image-rendering: pixelated;
+}
+
+.profession-name {
+  font-weight: 700;
+  text-align: center;
+}
+
+.profession-level {
+  font-family: var(--font-system);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* The Systemowy Zagajnik: its scene dim behind its name, as a land's. */
+.place-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.place-card--art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--place-art) center / cover no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.place-card--art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to right, rgba(13, 17, 11, 0.65), rgba(13, 17, 11, 0.2));
+  pointer-events: none;
+}
+
+.profession-card {
+  gap: 8px;
+}
+
+.profession-card-head {
+  margin: 0;
+}
+
+.profession-card .bar-fill {
+  background: var(--src-professions);
+}
+
+.profession-stats {
+  margin: 0;
+  color: var(--src-professions);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+/* The herbs to choose: a tile each, lit when chosen; one the System still
+   hides is a black shape with "???". */
+.gather-card {
+  gap: 12px;
+}
+
+.herb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.herb-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 8px 6px;
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font: inherit;
+  text-align: center;
+}
+
+button.herb-tile[aria-pressed='true'] {
+  border-color: var(--leaf);
+  background: rgba(167, 196, 127, 0.12);
+}
+
+.herb-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--leaf);
+}
+
+.herb-art .sprite {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+}
+
+.herb-art--shadow {
+  color: #000;
+}
+
+.herb-art--shadow .sprite {
+  filter: brightness(0);
+}
+
+.herb-name {
+  font-weight: 700;
+}
+
+.herb-tile--hidden .herb-name {
+  color: var(--text-muted);
+  letter-spacing: 0.2em;
+}
+
+.herb-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.herb-estimate,
+.herb-room {
+  margin: 0;
+}
+
+.herb-room {
+  color: var(--text-muted);
+}
+
+.herb-room--full {
+  color: var(--danger);
+}
+
+/* A herb's card in the bag: how many to sell or throw away. */
+.herb-count {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.herb-count-value {
+  min-width: 64px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.slot--herb .sprite--item {
+  image-rendering: pixelated;
+}
+
+/* A gathering's report: the grove's line and the herbs found. */
+.herb-line {
+  margin: 0 0 8px;
+  font-style: italic;
+}
+
+.herb-found {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.herb-found-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.herb-found-name {
+  font-weight: 700;
+}
+
+.herb-found-lost {
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.chip--herbs {
+  border-color: rgba(167, 196, 127, 0.6);
+  color: var(--leaf);
+}
+
+.report-row-herbs {
+  color: var(--text-muted);
+  font-size: 13px;
+}

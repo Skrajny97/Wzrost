@@ -1710,3 +1710,10 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
 7. **Zioła w plecaku** (autor: „zioła zbierają się do plecaka, ale stackują. Dzięki temu będzie większa motywacja do rozbudowy Magazynu”). Jedno miejsce plecaka mieści stos 20 sztuk. Co się nie zmieści, przepada (autor: „trzeba trochę karać za brak pomyślunku”), a ekran przed wyruszeniem mówi, ile się zmieści. Złomiarz kupuje zioła po 2 złota za Żywokost, 3 za Bylicę i 4 za Pokrzywę, z premią Skupu złomu. Stos można sprzedać albo wyrzucić, cały albo część.
 8. **Raport, zadania i powiadomienia.** Raport ze zbioru to lista zebranych ziół, XP i awans, a nad nimi jedno zdanie z kilku wariantów. Koniec zbierania przychodzi jako powiadomienie na telefon, jak koniec wyprawy. Od 10. poziomu postaci narrator zleca też zadania z ziołami: dzienne „Zbierz 12 <zioło>” ze znanych ziół i tygodniowe „Zbierz 60 ziół”.
 9. **Grafiki.** Ikony trzech ziół i trzech profesji oraz tło Systemowego Zagajnika powstają w Retro Diffusion (rodzaje `herbs`, `professions` i `places` w `art/prompts.json`), oceniane po jednej.
+10. **Szczegóły wykonania Zielarstwa.**
+    - Każde zbieranie daje co najmniej jedno zioło, także 10 minut na 1. poziomie profesji.
+    - Awans postaci z XP za zbieranie odnawia HP do pełna, jak po wyprawie. Bez awansu postać dalej po prostu odpoczywa.
+    - Odbiór raportu, przerwanie i Punkty Czasu działają przez te same adresy co wyprawa (`/api/hunts/claim`, `/api/hunts/cancel` i pominięcie `activity`).
+    - Zadania z ziołami brzmią „Zbierz 12 sztuk Żywokostu.” i „Zbierz łącznie 60 ziół.”. Dzienne losują się tylko ze znanych ziół.
+    - Gdy plecak zapełni się na wyprawie, złomiarz dalej sprzedaje przedmioty, ale ziół sam nigdy nie sprzedaje.
+    - Cena liczy się za całą sprzedawaną część stosu i zaokrągla do pełnego złota, najmniej do 1.

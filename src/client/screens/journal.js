@@ -1,9 +1,11 @@
-// The journal: past hunt reports and the history of System messages.
+// The journal: past reports of explorations and gatherings, and the history
+// of System messages.
 
 import { fill, h, icon } from '../dom.js';
 import { dateTimeFormat, formatMinutes, formatNumber } from '../format.js';
 import { call } from '../state.js';
 import { systemPanel } from '../ui.js';
+import { herbsSummary } from './professions.js';
 
 const RESULT_NAMES = { success: 'sukces', fainted: 'omdlenie', escaped: 'odwrót' };
 
@@ -49,13 +51,21 @@ export function mountJournal(container, { params }) {
             h(
               'span',
               { class: 'report-row-main' },
-              h('span', { class: 'report-row-title', text: `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)}` }),
-              h(
-                'span',
-                { class: 'report-row-meta' },
-                h('span', { class: `chip chip--${report.result}`, text: RESULT_NAMES[report.result] ?? report.result }),
-                ` +${formatNumber(report.xp)} XP · +${formatNumber(report.gold)} złota`,
-              ),
+              h('span', { class: 'report-row-title', text: `${report.areaName ?? report.regionName ?? report.placeName} · ${formatMinutes(report.minutes)}` }),
+              report.kind === 'herbs'
+                ? h(
+                    'span',
+                    { class: 'report-row-meta' },
+                    h('span', { class: 'chip chip--herbs', text: 'zbieranie' }),
+                    ` +${formatNumber(report.xp)} XP · ${report.professionName} ${report.professionLevel}`,
+                  )
+                : h(
+                    'span',
+                    { class: 'report-row-meta' },
+                    h('span', { class: `chip chip--${report.result}`, text: RESULT_NAMES[report.result] ?? report.result }),
+                    ` +${formatNumber(report.xp)} XP · +${formatNumber(report.gold)} złota`,
+                  ),
+              report.kind === 'herbs' && h('span', { class: 'report-row-herbs', text: herbsSummary(report) }),
               report.bestFind && h('span', { class: 'item-name', vars: { '--rarity': report.bestFind.color }, text: report.bestFind.name }),
             ),
             h('span', { class: 'report-row-date', text: dateTimeFormat.format(new Date(report.createdAt)) }),

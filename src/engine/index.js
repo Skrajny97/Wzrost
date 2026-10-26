@@ -21,3 +21,4 @@ export * from './quests.js';
 export * from './skills.js';
 export * from './skill-demo.js';
 export * from './notifications.js';
+export * from './professions.js';

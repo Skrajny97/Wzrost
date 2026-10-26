@@ -210,7 +210,7 @@ export function mountCombat(container, { params, navigate }) {
   // What "Pomiń czas" would skip now: the hunt, the rest, or nothing.
   function skipKind(character, now = serverNow()) {
     if (!state.user.testMode || !testModeOn()) return null;
-    if (character.activity) return activityFinished(character.activity, now) ? null : 'hunt';
+    if (character.activity) return activityFinished(character.activity, now) || character.activity.kind === 'herbs' ? null : 'hunt';
     return currentHp(character, now) < character.maxHp ? 'rest' : null;
   }
 
@@ -261,6 +261,13 @@ export function mountCombat(container, { params, navigate }) {
   }
 
   function activityCard(activity) {
+    // A gathering of herbs lives on its own screen; here it only says so.
+    if (activity.kind === 'herbs') {
+      return systemPanel(
+        activityFinished(activity) ? 'Zbieranie ziół zakończone. Raport czeka w Zielarstwie.' : `Postać zbiera zioła w miejscu: ${activity.placeName}.`,
+        h('a', { class: 'button button--system', href: '#/profesje/zielarstwo', text: 'Do Zielarstwa' }),
+      );
+    }
     preloadReportMusic();
     if (activityFinished(activity)) {
       const claim = h('button', {

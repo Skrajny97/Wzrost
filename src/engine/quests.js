@@ -4,13 +4,15 @@
 // quests are drawn when it comes, from a seed of the character and the
 // period, so a period always gets the same ones: creatures of the newest
 // inner region open to the character's class and, once the Stół
-// rzemieślniczy stands, its work, each with a reward of gold, a resource or
-// parts. Claimed explorations and the table's orders move them on; a quest
+// rzemieślniczy stands, its work, and once the professions are there, the
+// herbs gathered, each with a reward of gold, a resource or parts. Claimed
+// explorations and gatherings and the table's orders move them on; a quest
 // done gives its reward when claimed, and all of a period's quests done open
 // its chest.
 
 import { encountersFor } from './hunt.js';
 import { randomItem } from './items.js';
+import { knownHerbs, professionState } from './professions.js';
 import { createRng } from './rng.js';
 import { areaUnlocked } from './unlocks.js';
 
@@ -94,18 +96,27 @@ function creaturesPerFight(area, level) {
   return shares;
 }
 
+// The herbs the character's gathering profession knows: those a gathering
+// quest can name.
+const questHerbs = (character, content) =>
+  content.gathering ? knownHerbs(professionState(character.professions, content.gathering.profession).level, content) : [];
+
 // What can be drawn: each kind once for each of its variants (kill: each
-// creature that the period's most fights bring at least once on average),
-// the kind's weight shared among them.
-function questOptions(periodId, { character, hasTable }, content) {
+// creature that the period's most fights bring at least once on average;
+// gather: each herb known), the kind's weight shared among them. A kind
+// without this period, or of a module the character does not have yet, is
+// left out.
+function questOptions(periodId, { character, hasTable, hasProfessions = false }, content) {
   return content.quests.kinds.flatMap((kind) => {
-    if (kind.table && !hasTable) return [];
+    if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions)) return [];
     const variants =
       kind.id === 'kill'
         ? [...creaturesPerFight(questArea(character, content), character.level)]
             .filter(([, perFight]) => perFight * kind[periodId].fights[1] >= 1)
             .map(([target, perFight]) => ({ target, perFight }))
-        : [{}];
+        : kind.id === 'gather'
+          ? questHerbs(character, content).map((herb) => ({ target: herb.id }))
+          : [{}];
     return variants.map((variant) => ({ kind, weight: kind.weight / variants.length, ...variant }));
   });
 }
@@ -140,9 +151,9 @@ function questReward(periodId, level, rng, content) {
 
 // A period's quests, drawn from `seed` for the character as it is: no
 // option twice, in the order of the kinds.
-export function drawQuests(periodId, { character, hasTable, seed }, content) {
+export function drawQuests(periodId, { character, hasTable, hasProfessions, seed }, content) {
   const rng = createRng(seed);
-  let options = questOptions(periodId, { character, hasTable }, content);
+  let options = questOptions(periodId, { character, hasTable, hasProfessions }, content);
   const drawn = [];
   while (drawn.length < content.quests.periods[periodId].count && options.length > 0) {
     const option = rng.weighted(options);
@@ -164,13 +175,13 @@ export function drawQuests(periodId, { character, hasTable, seed }, content) {
 
 // Both periods' quests at `now`: those kept while their period lasts, new
 // ones once it has passed. `seed` is the character's.
-export function currentQuests(stored, { character, hasTable, seed }, now, content) {
+export function currentQuests(stored, { character, hasTable, hasProfessions, seed }, now, content) {
   return Object.fromEntries(
     QUEST_PERIODS.map((periodId) => {
       const { key } = questPeriod(periodId, now, content);
       const kept = stored?.[periodId];
       if (kept?.period === key) return [periodId, kept];
-      const quests = drawQuests(periodId, { character, hasTable, seed: `${seed}:${periodId}:${key}` }, content);
+      const quests = drawQuests(periodId, { character, hasTable, hasProfessions, seed: `${seed}:${periodId}:${key}` }, content);
       return [periodId, { period: key, quests, chest: false }];
     }),
   );
@@ -189,11 +200,20 @@ export function huntKills(hunt) {
   return kills;
 }
 
-// What claimed explorations and the table's orders add: creatures beaten
-// (`kills` by id), `minutes` explored, materials `processed` and items
-// `salvaged`. A quest stops at its count.
-export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0 }) {
-  const gain = { kill: (quest) => kills[quest.target] ?? 0, explore: () => minutes, process: () => processed, salvage: () => salvaged };
+// What claimed explorations and gatherings and the table's orders add:
+// creatures beaten (`kills` by id), `minutes` explored, materials
+// `processed`, items `salvaged` and herbs gathered (`herbs` by id, all of
+// those found, also those the bag lost). A quest stops at its count.
+export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {} }) {
+  const gathered = Object.values(herbs).reduce((sum, count) => sum + count, 0);
+  const gain = {
+    kill: (quest) => kills[quest.target] ?? 0,
+    explore: () => minutes,
+    process: () => processed,
+    salvage: () => salvaged,
+    gather: (quest) => herbs[quest.target] ?? 0,
+    gatherAny: () => gathered,
+  };
   return Object.fromEntries(
     Object.entries(quests).map(([periodId, period]) => [
       periodId,
@@ -243,7 +263,10 @@ export function questText(quest, content, met = null) {
   const kind = content.quests.kinds.find((candidate) => candidate.id === quest.kind);
   const unknown = quest.kind === 'kill' && met && !met.includes(quest.target);
   const forms = quest.kind === 'kill' ? content.monstersById[quest.target].counted : kind.counted;
-  return kind.text.replace('{count}', String(quest.count)).replace('{noun}', unknown ? '???' : countedForm(quest.count, forms));
+  return kind.text
+    .replace('{count}', String(quest.count))
+    .replace('{noun}', unknown ? '???' : countedForm(quest.count, forms))
+    .replace('{herb}', quest.kind === 'gather' ? content.herbsById[quest.target].genitive : '');
 }
 
 // The quests as the page shows them: each period with its name, its end,
@@ -251,7 +274,9 @@ export function questText(quest, content, met = null) {
 // kind or a creature no longer in the data is left out.
 export function questsView(quests, now, content, met = null) {
   const known = (quest) =>
-    content.quests.kinds.some((kind) => kind.id === quest.kind) && (quest.kind !== 'kill' || Boolean(content.monstersById[quest.target]));
+    content.quests.kinds.some((kind) => kind.id === quest.kind) &&
+    (quest.kind !== 'kill' || Boolean(content.monstersById[quest.target])) &&
+    (quest.kind !== 'gather' || Boolean(content.herbsById[quest.target]));
   return Object.fromEntries(
     QUEST_PERIODS.map((periodId) => {
       const period = quests[periodId];

@@ -27,6 +27,7 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import {
+  bagPlaces,
   characterView,
   currentHp,
   engineCharacter,
@@ -39,6 +40,7 @@ import {
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { soldGold } from './inventory.js';
+import { finishGathering } from './professions.js';
 import { KEPT_REPORTS } from './reports.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
@@ -162,10 +164,14 @@ export async function cancelHunt(context) {
   return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
+// The report of the activity that ended: an exploration, or a gathering of
+// herbs (professions.js).
 export async function claimHunt(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
-  const { id, report } = await finishHunt(context.env.DB, player, now);
+  const { id, report } = player.activity?.kind === 'herbs' && player.activity.ends_at <= now
+    ? await finishGathering(context.env.DB, player, now)
+    : await finishHunt(context.env.DB, player, now);
   return json({
     report: { id, createdAt: now, ...report },
     character: characterView(await loadPlayer(context.env.DB, session.userId), now),
@@ -203,11 +209,12 @@ export async function finishHunt(db, player, now) {
   // A find for a slot with nothing in it is worn at once.
   const autoEquipped = autoEquip(equippedItems(player), hunt.items, content, row.class_id, row.class_level);
   // The rest goes to the bag. When it does not fit, the scrapper buys the
-  // weakest items, old or new, at the camp's price.
+  // weakest items, old or new, at the camp's price. Herbs keep the places
+  // their stacks take.
   const levels = campLevels(player.buildings, now, content);
-  const capacity = bagCapacity(levels, content);
-  const sellBonus = campBonus(levels, 'sellPrice', content);
   const bag = player.items.filter((item) => !item.equippedSlot);
+  const capacity = bagCapacity(levels, content) - (bagPlaces(player) - bag.length);
+  const sellBonus = campBonus(levels, 'sellPrice', content);
   const toBag = hunt.items.map((item, index) => index).filter((index) => !autoEquipped.includes(index));
   const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
   const sold = bagOverflow(candidates, capacity, row.class_id, content);

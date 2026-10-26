@@ -76,5 +76,14 @@ export function buildContent(raw) {
     // The skills the classes choose from (skills.js).
     skills: raw.skills ?? [],
     skillsById: byId(raw.skills ?? []),
+    // The professions, the herbs gathered in them, the gathering and the
+    // texts of their reports (professions.js).
+    professions: raw.professions?.professions ?? [],
+    professionsById: byId(raw.professions?.professions ?? []),
+    professionRules: raw.professions?.rules,
+    gathering: raw.professions?.gathering,
+    herbs: raw.professions?.herbs ?? [],
+    herbsById: byId(raw.professions?.herbs ?? []),
+    professionTexts: raw.professions?.texts,
   };
 }

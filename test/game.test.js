@@ -1829,3 +1829,18 @@ describe('Pierwsza wyprawa', () => {
     assert.ok(report.fights.every((fight) => !fight.elite && !fight.tough));
   });
 });
+
+describe('Profesje', () => {
+  // The game hides them (PROFESSIONS off in wrangler.jsonc) until all three
+  // are ready; the test version shows them (test/professions.test.js).
+  test('stay hidden in this version of the game, even at level 10: no tab, no gathering, no herb quests', async () => {
+    const cookie = await signUp();
+    await newCharacter(cookie);
+    await (await db()).prepare("UPDATE characters SET level = 10, quests = '{}'").run();
+    const { character } = (await call('GET', '/api/character', { cookie })).data;
+    assert.equal(character.professions, null);
+    assert.ok([...character.quests.daily.quests, ...character.quests.weekly.quests].every((quest) => !quest.kind.startsWith('gather')));
+    const gather = await call('POST', '/api/professions/gather', { cookie, body: { herbs: ['comfrey'], minutes: 60 } });
+    assert.equal(gather.status, 404);
+  });
+});
