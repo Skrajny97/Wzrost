@@ -103,10 +103,13 @@ jobs:
       - name: Wdrożenie Workera
         shell: bash
         run: |
-          echo "APP_VERSION=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+          # The game's number from package.json (the author: "numeruj wersje gry
+          # deployowanych też 0.0.1 -> 0.0.2 itd."), then the commit.
+          APP_VERSION="$(node -p "require('./package.json').version") (${GITHUB_SHA::7})"
+          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
           secrets=()
           if [ -f "$RUNNER_TEMP/worker-secrets.json" ]; then secrets=(--secrets-file "$RUNNER_TEMP/worker-secrets.json"); fi
-          npx wrangler deploy --var "APP_VERSION:${GITHUB_SHA::7}" "${secrets[@]}" | tee deploy.log
+          npx wrangler deploy --var "APP_VERSION:$APP_VERSION" "${secrets[@]}" | tee deploy.log
           rm -f "$RUNNER_TEMP/worker-secrets.json"
       - name: Sprawdzenie działania gry
         run: node tools/smoke-test.mjs deploy.log "$APP_VERSION"
