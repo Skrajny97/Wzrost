@@ -164,13 +164,14 @@ export function areaDangers(area, content) {
 }
 
 // The chest of an inner region's Bestiariusz, opened once every creature on
-// its list is met: gold and Punkty Czasu, both growing along one curve with
-// the place's highest level (balance.bestiary), from 30 and 5 in Skraj
-// Wiatrołomów to 600 and 100 in Serce Uroczyska.
+// its list is met (balance.bestiary): gold growing along a curve with the
+// place's highest level, from 30 in Skraj Wiatrołomów to 600 in Serce
+// Uroczyska, and Punkty Czasu growing by the same step with each next inner
+// region (the author: "+10 co kolejny region"), from 5 to 95.
 export function bestiaryChest(area, content) {
-  const { gold, timePoints, baseLevel, growth, goldStep } = content.balance.bestiary;
-  const scale = (area.maxLevel / baseLevel) ** growth;
-  return { gold: Math.round((gold * scale) / goldStep) * goldStep, timePoints: Math.round(timePoints * scale) };
+  const { gold, timePoints, timePointsStep, baseLevel, growth, goldStep } = content.balance.bestiary;
+  const step = area.maxLevel / baseLevel;
+  return { gold: Math.round((gold * step ** growth) / goldStep) * goldStep, timePoints: Math.round(timePoints + timePointsStep * (step - 1)) };
 }
 
 // Whether the character has met every creature on the inner region's list.

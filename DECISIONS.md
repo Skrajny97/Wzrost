@@ -517,7 +517,6 @@ Zmiany poniżej wynikają z kolejnej wiadomości autora. Najważniejsze: w obozi
 8. **Ochrona ulepszonych przedmiotów.** Złomiarz nie kupuje ich hurtem przyciskiem w raporcie, a gdy plecak się przepełnia, sprzedaje je na końcu.
 9. **API i baza.** `POST /api/items/:id/upgrade` próbuje ulepszyć przedmiot i zwraca wynik (`success`, `failure` albo `broken`), poziom przed i po próbie oraz koszt. Błędy to `anvil_level` (brak Kowadła albo za niski poziom), `max_upgrade`, `not_enough`, `busy` i `item_changed`. Przedmiot w API ma pola `upgrade` i `anvil` (poziom, najwyższe ulepszenie Kowadła i następna próba z kosztem, szansami i liczbami). Poziom ulepszenia i ziarno ostatniej próby są w danych przedmiotu (`upgrade`, `lastRoll`), więc nie trzeba migracji. Zapis, zapłata i ewentualne usunięcie przedmiotu idą w jednej transakcji, warunkowanej tym, co serwer widział, więc dwa dotknięcia naraz to jedna próba.
 
-
 ## Drabinka eksploracji i lochy (24.10.2026)
 
 Zmiany poniżej wynikają z kolejnej wiadomości autora i jego odpowiedzi. Najważniejsze: eksploracje wydłużają się stopniowo, od 30 minut na starcie do 4 godzin na poziomie 50, a lochy otwierają się na poziomie 50. Sprite'y z generatora są już w grze.
@@ -1058,7 +1057,6 @@ Uwagi autora po wdrożeniu sakwy i Punktów Czasu co pół godziny.
     Lista powstaje z danych spotkań regionu (`areaDangers` w silniku), więc nowy stwór w `data/regions.json` sam na nią trafia. Stwór, którego postać jeszcze nie spotkała w walce, to czarny cień z „???” zamiast imienia, a poziomy widać od razu. Pod listą stoi zdanie autora: „Zobaczysz tutaj pełne informacje jedynie o stworach, z którymi stoczyłeś potyczkę.”, a dla postaci kobiecej „stoczyłaś”, jak w kwestiach narratora. Walka, także przegrana, odkrywa go po odebraniu raportu. Spotkane stwory zapisuje kolumna `characters.met` (migracja `0018_met_monsters.sql`). Postacie sprzed zmiany znają stwory z raportów, które jeszcze mają.
 7. **Zakładka Lochy.** Kłódka z poziomem stoi pod nazwą zakładki, jak przy Treningu, bez względu na długość nazwy.
 
-
 ## Awans odnawia HP i manę (25.10.2026)
 
 Autor: wbicie poziomu postaci albo klasy odnawia HP i manę do pełna.
@@ -1125,7 +1123,6 @@ Autor: z pierwszej, 30-minutowej wyprawy po starcie od nowa przyszły 3 przedmio
 3. **Napis pod zadaniami.** Pod zadaniami dziennymi stoi „Skrzynia dziennych zadań dostarcza +30 Punktów Czasu i +5 Punktów Systemu.”, a pod tygodniowymi „Skrzynia tygodniowych zadań dostarcza losowy przedmiot, +120 Punktów Czasu i +20 Punktów Systemu.” Napisy są w danych (`chest.text` w `data/quests.json`), a walidacja pilnuje, żeby ich liczby zgadzały się ze skrzynią.
 4. **Dźwięk skrzyni.** Otwarcie skrzyni zadań gra nagranie monet wysypujących się z otwieranej skrzyni (ElevenLabs, `effects.chest` w `data/sounds.json`). Na stronie odsłuchu jest sześć wersji: dwie takie, dwie z magicznym dźwiękiem nagrody na koniec i dwie z garścią monet rozsypaną na stole. Autor może tam wybrać inną.
 5. **„Ogniu” przy Ognisku.** Głos czytał „przy ognu”. Nowe nagrania dostały dla głosu zapis „ogńu” albo „ognju” (`say` w `audio/prompts.json`), a tekst w grze się nie zmienił. W grze jest pierwsza wersja z „ogńu”, a wszystkie cztery są na stronie odsłuchu. *W grze jest teraz wersja 3, z „ognju”: zob. „Wybór autora na stronie odsłuchu”.*
-
 
 ## Propozycje umiejętności, profesji i spotkań (25.10.2026)
 
@@ -1560,7 +1557,6 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
 7. **Strona odsłuchu zapisuje uwagi już w trakcie pisania.** Uwaga do Celnego strzału 5 dotarła bez tekstu, bo pole zapisywało się dopiero po wyjściu z niego. Na telefonie strona często zamyka się wcześniej.
 8. **Jezioro Midasa.** Na zrzucie od autora zaznaczone jest wolne miejsce na planszy obozu, między Tartakiem a Szałasem na łupy, z dopiskiem „to do Jeziora Midasa”. Miejsce zostaje wolne. Co jezioro ma robić, czeka na autora.
 
-
 ## Powiadomienia na telefon, Jezioro Midasa, osłona many i muzyka zakładek (26.10.2026)
 
 1. **Powiadomienia na telefon** (trzy rodzaje wskazane przez autora: koniec wyprawy, koniec budowy, pełny magazyn).
@@ -1732,7 +1728,6 @@ Wyjaśnienie autora: na 50. poziomie klasy ścieżka rozwoju zmienia się przez 
     - Pełne 20 poziomów jednej umiejętności wypada teraz na 28. poziomie klasy, a obu na 48. *Teraz na 29. i 49.* Raport 10. poziomu klasy podaje „Zdobyto Punkty Umiejętności: +1”.
     - Okno wyboru ścieżki głównej mówi, że to wybór na stałe. Od 11. poziomu klasy dodaje, że ścieżkę poboczną można dobrać od razu, za 1 Punkt Umiejętności.
 
-
 ## Kowadło, złomiarz, tropienie elit i portfel we wprowadzeniu (26.10.2026)
 
 1. **Każdy poziom ulepszenia coś daje** (autor: „zauważyłem, że ulepszanie talizmanu nic nie daje… może dawać chociaż +1 do pancerza przy każdym ulepszeniu”). Ulepszenie dalej dodaje 6% liczb przedmiotu za poziom, ale co najmniej 1 (`balance.upgrades.minGainPerLevel`): broni do obrażeń, najmniejszych i największych, a każdemu innemu przedmiotowi do Pancerza. Przedmiot bez własnego Pancerza, np. talizman, amulet, pierścień, kołczan albo fokus, dostaje Pancerz +1 za każdy poziom ulepszenia. Talizman +2 z 1. poziomu ma więc Witalność +2 i Pancerz +2.
@@ -1853,10 +1848,11 @@ Autor: „Rozwiń poziom obozu zasłania często przychód z tartaku, daj przyci
 
 1. **Nazwa** (autor: „zmień nazwę Czyhające niebezpieczeństwa na Bestiariusz”). Lista stworów regionu wewnętrznego nazywa się teraz Bestiariusz, na karcie regionu i w jej oknie. Działa jak dotąd: stwór, z którym postać jeszcze nie walczyła, jest cieniem z „???”.
 2. **Skrzynia obok napisu** (autor: „Odbiór nagród za Bestiariusz będzie wyświetlać się jako Skrzynia (jak przy zadaniach dziennych) obok napisu”). Na karcie regionu wewnętrznego, w wierszu „Bestiariusz”, stoi skrzynia jak przy zadaniach narratora. Zamknięta pokazuje, ile stworów z listy postać już poznała (np. „4/5”). Gdy pozna wszystkie, także elitę i czempiona, skrzynia świeci się z napisem „Otwórz”. Po otwarciu zostaje szara z napisem „Otwarta”. Każda skrzynia otwiera się raz. Okno Bestiariusza mówi, co jest w skrzyni.
-3. **Nagroda** (autor: „za pierwszą lokację +30 złota i +5 Punktów Czasu rosnące jakąś krzywą rozsądną. I niech rosną i złoto i Punkty Czasu wraz z tą krzywą”). Złoto i Punkty Czasu rosną po jednej krzywej z najwyższym poziomem regionu wewnętrznego: nagroda pierwszego × (poziom / 5) do potęgi 1,3. Złoto zaokrągla się do 5. Wychodzi 30 i 5 w Skraju Wiatrołomów, 75 i 12 w Lisich Jarach, 245 i 41 w Dziczej Głuszy, a 600 i 100 w Sercu Uroczyska. Złoto za stwora rośnie z jego poziomem w równym tempie, więc nagroda trochę szybsza od niego zostaje warta podobnej liczby walk także w dalszych regionach. Liczby są w `data/balance.json` (`bestiary`).
+3. **Nagroda** (autor: „za pierwszą lokację +30 złota i +5 Punktów Czasu rosnące jakąś krzywą rozsądną. I niech rosną i złoto i Punkty Czasu wraz z tą krzywą”). Złoto i Punkty Czasu rosną po jednej krzywej z najwyższym poziomem regionu wewnętrznego: nagroda pierwszego × (poziom / 5) do potęgi 1,3. Złoto zaokrągla się do 5. Wychodzi 30 i 5 w Skraju Wiatrołomów, 75 i 12 w Lisich Jarach, 245 i 41 w Dziczej Głuszy, a 600 i 100 w Sercu Uroczyska. Złoto za stwora rośnie z jego poziomem w równym tempie, więc nagroda trochę szybsza od niego zostaje warta podobnej liczby walk także w dalszych regionach. Liczby są w `data/balance.json` (`bestiary`). *Punkty Czasu rosną teraz o 10 na region, zob. punkt 7.*
 4. **Wcześniej poznane stwory** liczą się od razu: kto ma już pełną listę, może otworzyć skrzynię po aktualizacji.
 5. **Baza.** Otwarte skrzynie zapisuje nowa kolumna `bestiary` postaci (migracja `0032_bestiary.sql`). Skrzynię otwiera `POST /api/bestiary/chest`.
 6. **Numer wersji** (autor: „Numerowanie wersji (...) cały czas będzie odbywać się: 0.0.4, 0.0.5, [...], 0.0.23, aż nie powiem, że to już wersja 0.1”). Po 0.0.9 idzie 0.0.10. Zasada stoi w `CLAUDE.md`.
+7. **Punkty Czasu o stałą liczbę** (autor: „wzrost za Bestiariusz, przynajmniej Punktów Czasu jest zdecydowanie za duży. Powinno to rosnąć o stałą wartość. Złoto może dalej tak rosnąć jak piszesz, ale Punkty Czasu -> +10 co kolejny region”). Złoto rośnie dalej po krzywej. Punkty Czasu: 5 w pierwszym regionie wewnętrznym i o 10 więcej w każdym kolejnym, czyli 15 w Lisich Jarach, 45 w Dziczej Głuszy i 95 w Sercu Uroczyska (`timePointsStep`). Skrzynie otwarte wcześniej zostają, jak były. W wersji 0.0.7.
 
 ## Spowolnienie Mroźnego podmuchu w opisie (27.10.2026)
 
