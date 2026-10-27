@@ -183,6 +183,14 @@
       "skill-shadow-dance": {
         "text": "three fast high-pitched swishes of a silk cloak whipped through the air, crisp and airy, with a soft high breathy whisper, close up, dry, no bass, no rumble, no low frequencies, no music",
         "seconds": 1.5
+      },
+      "potion": {
+        "text": "a quick sip and a short gulp from a small glass potion vial, a soft cork pop and a light glass clink, close up, dry, no music",
+        "seconds": 1.5
+      },
+      "brew": {
+        "text": "a small alchemist's cauldron gently bubbling with thick liquid, soft popping bubbles, ending with a light clink of a glass vial, close up, no music",
+        "seconds": 2
       }
     }
   },

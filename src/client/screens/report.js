@@ -90,6 +90,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const work = { herbs: herbsReport, potions: potionsReport }[report.kind];
     if (work) {
       fill(container, ...work(report, heading));
+      // The cauldron bubbles once over a finished brewing.
+      if (report.kind === 'potions' && firstPlayback) playSound('brew');
       if (report.system.length > 0 && firstPlayback) playSound('system');
       firstPlayback = false;
       return;
