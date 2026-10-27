@@ -113,6 +113,11 @@ export function mountProfessions(container, { params, navigate }) {
       renderAlchemy(character);
       return;
     }
+    // Rzemieślnictwo locked in this deployment leads back to the tab.
+    if (professionId === 'crafting' && !character.professions.workshop) {
+      location.replace(HOME);
+      return;
+    }
     if (professionId === 'crafting') {
       renderCrafting(character);
       return;

@@ -96,6 +96,10 @@
             "type": "boolean",
             "description": "Tylko z dostępnymi profesjami (od ich poziomu odblokowania)."
           },
+          "crafting": {
+            "type": "boolean",
+            "description": "Tylko tam, gdzie działa Rzemieślnictwo (przełącznik CRAFTING)."
+          },
           "rewardFactor": {
             "type": "number",
             "exclusiveMinimum": 0,

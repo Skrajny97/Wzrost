@@ -27,6 +27,7 @@ import { content } from './content.js';
 import { bagPlaces, characterView, craftingState, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requireIdlePlayer, walletOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
+import { craftingOn } from './features.js';
 import { requireProfessions } from './professions.js';
 import { KEPT_REPORTS } from './reports.js';
 
@@ -54,6 +55,7 @@ const shareOf = (amounts, of, count) =>
 export async function startCrafting(context) {
   const { session, player } = await requireIdlePlayer(context);
   requireProfessions(player);
+  if (!craftingOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const body = await readJson(context.request);
   const { workshop } = content;
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), workshop.profession);

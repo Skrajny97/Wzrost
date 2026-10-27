@@ -22,7 +22,7 @@ import {
   professionXpToNext,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { professionsOn } from './features.js';
+import { craftingOn, professionsOn } from './features.js';
 import { say } from '../engine/text.js';
 
 // The herbs and the potions the character carries, by id, as the row keeps
@@ -90,7 +90,8 @@ export function professionsView(row) {
         name: profession.name,
         kind: profession.kind,
         description: profession.description,
-        soon: Boolean(profession.soon),
+        // Rzemieślnictwo waits locked where it is switched off.
+        soon: Boolean(profession.soon) || (profession.id === workshop.profession && !craftingOn()),
         level,
         xp,
         xpToNext: level < profession.maxLevel ? professionXpToNext(profession, level) : 0,
@@ -149,7 +150,7 @@ export function professionsView(row) {
           : { id: potion.id, level: potion.level, hidden: true, hint: say(brewing.texts, 'hidden', 0, { level: potion.level }) },
       ),
     },
-    workshop: workshopView(crafter.level),
+    workshop: craftingOn() ? workshopView(crafter.level) : null,
   };
 }
 

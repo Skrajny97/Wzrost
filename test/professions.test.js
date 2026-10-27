@@ -229,7 +229,7 @@ describe('herbalism through the API', () => {
     assert.deepEqual(list.map((profession) => [profession.name, profession.level, profession.soon]), [
       ['Zielarstwo', 1, false],
       ['Alchemia', 1, false],
-      ['Rzemieślnictwo', 1, false],
+      ['Rzemieślnictwo', 1, true],
     ]);
     assert.equal(gathering.place.name, 'Systemowy Zagajnik');
     assert.equal(gathering.slots, 1);

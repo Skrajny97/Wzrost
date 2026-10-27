@@ -151,11 +151,12 @@ describe('the Warsztat in the engine', () => {
     assert.ok(report.system.includes('System pozwala już wykonywać przedmioty rzadkości: rzadki'));
   });
 
-  test('narrator quests ask for items with professions only, count the ones made and pay twice as much', () => {
+  test('narrator quests ask for items only where Rzemieślnictwo works, count the ones made and pay twice as much', () => {
     const character = newCharacter('warrior', { level: 12 });
-    const drawn = (hasProfessions, periodId) =>
-      Array.from({ length: 60 }, (_, index) => drawQuests(periodId, { character, hasTable: true, hasProfessions, seed: `q${index}` }, content)).flat();
+    const drawn = (hasCrafting, periodId) =>
+      Array.from({ length: 60 }, (_, index) => drawQuests(periodId, { character, hasTable: true, hasProfessions: true, hasCrafting, seed: `q${index}` }, content)).flat();
     assert.ok(!drawn(false, 'daily').some((quest) => quest.kind.startsWith('make')));
+    assert.ok(!drawn(false, 'weekly').some((quest) => quest.kind.startsWith('make')));
     const daily = drawn(true, 'daily');
     const made = daily.filter((quest) => quest.kind === 'make');
     assert.ok(made.length > 0 && made.every((quest) => quest.count === 1));
@@ -186,7 +187,7 @@ describe('the Warsztat in the engine', () => {
 });
 
 describe('the Warsztat through the API', () => {
-  const { call, db, signUp } = useServer({ PROFESSIONS: 'on' });
+  const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'on' });
   let cookie;
 
   beforeEach(async () => {
@@ -366,5 +367,21 @@ describe('the Warsztat through the API', () => {
     assert.equal(skipped.status, 200);
     assert.equal(skipped.data.spent, 60);
     assert.equal((await call('POST', '/api/hunts/claim', { cookie })).data.report.kind, 'items');
+  });
+});
+
+describe('the Warsztat switched off', () => {
+  const { call, db, signUp } = useServer({ PROFESSIONS: 'on' });
+
+  test('Rzemieślnictwo waits as "Wkrótce": no Warsztat, no orders and no quests for items', async () => {
+    const { cookie } = await signUp('zamknieta');
+    await call('POST', '/api/character', { cookie, body: { name: 'Zamknieta', classId: 'warrior', appearance: 'female' } });
+    await (await db()).prepare(`UPDATE characters SET level = 12, xp = 0, parts = '{"scraps":30}', resources = '{"stone":200,"iron-ore":40}'`).run();
+    const { professions, quests } = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.deepEqual(professions.list.map((profession) => [profession.id, profession.soon]), [['herbalism', false], ['alchemy', false], ['crafting', true]]);
+    assert.equal(professions.workshop, null);
+    const order = await call('POST', '/api/professions/craft', { cookie, body: { baseId: 'sword', rarity: 'common', count: 1 } });
+    assert.equal(order.status, 404);
+    assert.ok(![...quests.daily.quests, ...quests.weekly.quests].some((quest) => quest.kind.startsWith('make')));
   });
 });

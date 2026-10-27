@@ -44,9 +44,12 @@
     // workflow from the GitHub secrets.
     "GOOGLE_HOSTS": "insightrpg.com,www.insightrpg.com",
     // "on" shows the professions (Profesje). They stay hidden in the live game
-    // until all of the first three are ready; `npm run dev` and the test
+    // until Zielarstwo and Alchemia are ready; `npm run dev` and the test
     // version turn them on.
-    "PROFESSIONS": "off"
+    "PROFESSIONS": "off",
+    // "on" opens Rzemieślnictwo among the professions; off, its square says
+    // "Wkrótce". The live game waits for it to be done.
+    "CRAFTING": "off"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain
@@ -86,6 +89,7 @@
         "AUTHOR_LOGINS": "",
         "GOOGLE_HOSTS": "",
         "PROFESSIONS": "on",
+        "CRAFTING": "on",
         // No new accounts: only the author's, made before (the author's request).
         "REGISTRATION": "closed"
       },

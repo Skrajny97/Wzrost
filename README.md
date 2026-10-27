@@ -85,7 +85,7 @@ Push na inną gałąź (poza `art-drafts`) uruchamia testy i wdraża **wersję t
 
 ## Wersja testowa
 
-**https://test.insightrpg.com** (zapasowo `wzrost-test` w domenie workers.dev) to ta sama gra z gałęzi roboczej, zanim trafi do `main`. Ma własnego Workera i własną bazę D1 `wzrost-test` (środowisko `test` w `wrangler.jsonc`), więc nic tam nie dotyka gry na insightrpg.com ani jej graczy. Działa tam tylko konto autora, założone wcześniej na hasło: nowych kont nie da się tam zakładać (`REGISTRATION` = `"closed"`), a wersja testowa nie ma logowania Google ani Panelu autora. Konto o loginie z `TEST_LOGINS` ma tam tryb testowy. Nowe części gry są tam włączone wcześniej, np. profesje (`PROFESSIONS` = `"on"`), a w grze na insightrpg.com czekają ukryte, aż będą gotowe.
+**https://test.insightrpg.com** (zapasowo `wzrost-test` w domenie workers.dev) to ta sama gra z gałęzi roboczej, zanim trafi do `main`. Ma własnego Workera i własną bazę D1 `wzrost-test` (środowisko `test` w `wrangler.jsonc`), więc nic tam nie dotyka gry na insightrpg.com ani jej graczy. Działa tam tylko konto autora, założone wcześniej na hasło: nowych kont nie da się tam zakładać (`REGISTRATION` = `"closed"`), a wersja testowa nie ma logowania Google ani Panelu autora. Konto o loginie z `TEST_LOGINS` ma tam tryb testowy. Nowe części gry są tam włączone wcześniej, np. profesje (`PROFESSIONS` = `"on"`) i Rzemieślnictwo (`CRAFTING` = `"on"`), a w grze na insightrpg.com czekają ukryte, aż będą gotowe. Bez `CRAFTING` kwadrat Rzemieślnictwa mówi „Wkrótce”.
 
 ## Struktura repozytorium
 
@@ -166,7 +166,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/professions/brew` | tylko z profesjami: Alchemia, `recipe` (znany przepis) i `count` mikstur, do 8 godzin i tylu, na ile starcza ziół; zioła idą do kotła od razu (400 `unknown_recipe`, `invalid_count`; 403 `locked`; 409 `no_herbs`, `conflict`) |
 | POST | `/api/potions/sell` | złomiarz kupuje `count` mikstur `potionId`; zwraca `sold` (400 `unknown_potion`, `invalid_count`; 404 `no_potion`) |
 | POST | `/api/potions/discard` | wyrzuć `count` mikstur `potionId` |
-| POST | `/api/professions/craft` | tylko z profesjami: Rzemieślnictwo, `baseId` (znany wzór), `rarity` (rzadkość otwarta przez poziom) i `count` (1–5) przedmiotów; części i zasoby obozu idą od razu, a plecak musi mieć miejsce na wszystkie (400 `unknown_pattern`, `unknown_rarity`, `invalid_count`; 403 `locked`; 409 `no_parts`, `no_resources`, `bag_full`, `conflict`) |
+| POST | `/api/professions/craft` | tylko z profesjami i Rzemieślnictwem (`CRAFTING` = `"on"`, inaczej 404): Rzemieślnictwo, `baseId` (znany wzór), `rarity` (rzadkość otwarta przez poziom) i `count` (1–5) przedmiotów; części i zasoby obozu idą od razu, a plecak musi mieć miejsce na wszystkie (400 `unknown_pattern`, `unknown_rarity`, `invalid_count`; 403 `locked`; 409 `no_parts`, `no_resources`, `bag_full`, `conflict`) |
 | POST | `/api/potions/drink` | wypij miksturę `potionId` z plecaka: leczenie od razu, szybkość na 30 minut wypraw, a każda kolejna dodaje 30 (`speedBuff` w postaci: `ms` pozostałego czasu wypraw, `until` końca w trwającej wyprawie, `bonus`); zwraca `text` i `character` (409 `full_hp`, `fight_only` dla many) |
 | GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |
 | GET | `/api/reports/:id` | pełny raport |

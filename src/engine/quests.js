@@ -115,10 +115,10 @@ const questPotions = (character, content) =>
 // author: "by ktoś z wyższym levelem nie był wysyłany na niskolevelowe
 // potwory"): when its class opens nothing harder, or it has outgrown every
 // place, the other kinds remain.
-function questOptions(periodId, { character, hasTable, hasProfessions = false }, content) {
+function questOptions(periodId, { character, hasTable, hasProfessions = false, hasCrafting = false }, content) {
   const area = questArea(character, content);
   return content.quests.kinds.flatMap((kind) => {
-    if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions)) return [];
+    if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions) || (kind.crafting && !hasCrafting)) return [];
     if (kind.id === 'kill' && easyPlace(character.level, area, content)) return [];
     const variants =
       kind.id === 'kill'
@@ -165,9 +165,9 @@ function questReward(periodId, level, rng, content, factor = 1) {
 
 // A period's quests, drawn from `seed` for the character as it is: no
 // option twice, in the order of the kinds.
-export function drawQuests(periodId, { character, hasTable, hasProfessions, seed }, content) {
+export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, seed }, content) {
   const rng = createRng(seed);
-  let options = questOptions(periodId, { character, hasTable, hasProfessions }, content);
+  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting }, content);
   const drawn = [];
   while (drawn.length < content.quests.periods[periodId].count && options.length > 0) {
     const option = rng.weighted(options);
@@ -189,13 +189,13 @@ export function drawQuests(periodId, { character, hasTable, hasProfessions, seed
 
 // Both periods' quests at `now`: those kept while their period lasts, new
 // ones once it has passed. `seed` is the character's.
-export function currentQuests(stored, { character, hasTable, hasProfessions, seed }, now, content) {
+export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, seed }, now, content) {
   return Object.fromEntries(
     QUEST_PERIODS.map((periodId) => {
       const { key } = questPeriod(periodId, now, content);
       const kept = stored?.[periodId];
       if (kept?.period === key) return [periodId, kept];
-      const quests = drawQuests(periodId, { character, hasTable, hasProfessions, seed: `${seed}:${periodId}:${key}` }, content);
+      const quests = drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, seed: `${seed}:${periodId}:${key}` }, content);
       return [periodId, { period: key, quests, chest: false }];
     }),
   );

@@ -53,7 +53,7 @@ import {
   xpToNext,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { professionsOn } from './features.js';
+import { craftingOn, professionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
 import { requirePlayable } from './sessions.js';
@@ -263,13 +263,18 @@ async function settleTimePoints(db, row, now) {
 }
 
 // What a period's quests are drawn from: the character as it is, whether its
-// Stół rozbiórki stands, and its id for the seed (quests.js).
-export const questContext = (player, now) => ({
-  character: engineCharacter(player.row),
-  hasTable: craftTable(campLevels(player.buildings, now, content), content).pace > 0,
-  hasProfessions: professionsOn() && isUnlocked('professions', player.row.level, content),
-  seed: player.row.id,
-});
+// Stół rozbiórki stands, which professions it has, and its id for the seed
+// (quests.js).
+export function questContext(player, now) {
+  const hasProfessions = professionsOn() && isUnlocked('professions', player.row.level, content);
+  return {
+    character: engineCharacter(player.row),
+    hasTable: craftTable(campLevels(player.buildings, now, content), content).pace > 0,
+    hasProfessions,
+    hasCrafting: hasProfessions && craftingOn(),
+    seed: player.row.id,
+  };
+}
 
 // The quests of both periods at `now`.
 export const questsNow = (player, now) => currentQuests(JSON.parse(player.row.quests ?? '{}'), questContext(player, now), now, content);
