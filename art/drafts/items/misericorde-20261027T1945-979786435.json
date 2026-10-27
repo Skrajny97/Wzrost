@@ -1,0 +1,25 @@
+{
+  "id": "misericorde",
+  "payload": {
+    "prompt": "misericorde, a long very slender thrusting dagger with a narrow triangular steel blade, a small round disc guard, a dark grip and a round disc pommel, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 3,
+    "seed": 979786435,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793130384,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 55.56,
+    "request_id": "55b66ad2-6226-4599-89d2-659cce6c8cc0",
+    "outputs_retained_until": 1793216744
+  }
+}
