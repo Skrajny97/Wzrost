@@ -167,7 +167,11 @@
               "professions-lead",
               "professions-intro",
               "professions-list",
-              "professions-ending"
+              "professions-ending",
+              "community-welcome",
+              "community-lead",
+              "community-rules",
+              "community-ending"
             ]
           },
           "kind": {
@@ -230,7 +234,8 @@
           "chapter": {
             "enum": [
               "skills",
-              "professions"
+              "professions",
+              "community"
             ],
             "description": "Część po wprowadzeniu, do której należy kwestia (chapters). Jej kwestie przychodzą dopiero po zakończeniu wprowadzenia, w swoim momencie gry."
           },

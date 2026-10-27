@@ -20,6 +20,10 @@
     "professions": {
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Profesje czekają w zakładce Profesje."
+    },
+    "community": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Społeczność czeka w zakładce Społeczność."
     }
   },
   "lines": [
@@ -589,6 +593,38 @@
         "Mikstury zabierzesz na wyprawę – spakujesz je w podróż przed wyruszeniem. W walce Twoja postać sama po nie sięgnie."
       ],
       "voice": "audio/narration/professions-ending.mp3"
+    },
+    {
+      "id": "community-welcome",
+      "kind": "card",
+      "chapter": "community",
+      "text": [
+        "Piąty poziom postaci… System otworzył przed Tobą dwie nowe drogi: Społeczność i Szybkie Polowanie."
+      ]
+    },
+    {
+      "id": "community-lead",
+      "kind": "lead",
+      "chapter": "community",
+      "text": [
+        "W tej zakładce czekają inni wędrowcy. Zajrzyjmy do nich."
+      ]
+    },
+    {
+      "id": "community-rules",
+      "kind": "point",
+      "chapter": "community",
+      "text": [
+        "Tu porozmawiasz z innymi wędrowcami. Zanim napiszesz pierwsze słowo, przeczytaj zasady czatu."
+      ]
+    },
+    {
+      "id": "community-ending",
+      "kind": "card",
+      "chapter": "community",
+      "text": [
+        "A gdy zabraknie Ci czasu na długą wyprawę, sięgnij po Szybkie Polowanie. Czeka w Walce, pod „Wyrusz” – trzy razy dziennie."
+      ]
     }
   ]
 }

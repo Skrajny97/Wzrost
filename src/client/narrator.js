@@ -15,8 +15,9 @@
 // wprowadzenie" ends the whole introduction. Meanwhile the screen is the
 // narrator's: it neither scrolls nor takes a tap, also between the lines.
 // After the introduction come its chapters (a line's `chapter`), each at its
-// moment of the game: the Umiejętności at class level 10 and the Profesje at
-// character level 10, never before the Umiejętności. A chapter's own "Pomiń"
+// moment of the game: the Umiejętności at class level 10, the Profesje at
+// character level 10, never before the Umiejętności, and the Społeczność at
+// character level 5, after both when they wait. A chapter's own "Pomiń"
 // passes only that chapter, and a line can be told for each class
 // (`classes`).
 
@@ -63,6 +64,18 @@ const professionsDue = (hash, read) =>
   Boolean(state.character.professions) && !onReport(hash) && !onCharacter(hash) && !skillsWaiting(read) && !read.has('professions-ending');
 const professionsTour = (hash, read) => professionsDue(hash, read) && read.has('professions-welcome');
 const professionsHere = (hash, read) => onProfessions(hash) && professionsTour(hash, read);
+
+// The Społeczność chapter: once the character reaches level 5, after the
+// report that brought it there, and only when the Umiejętności and the
+// Profesje chapters are not waiting. Not on the character's screens either.
+// It leads to the Społeczność tab, points at the chat's rules and ends with
+// Szybkie Polowanie.
+const onCommunity = (hash) => hash === '#/spolecznosc';
+const professionsWaiting = (read) => Boolean(state.character.professions) && !read.has('professions-ending');
+const communityDue = (hash, read) =>
+  isUnlocked('community') && !onReport(hash) && !onCharacter(hash) && !skillsWaiting(read) && !professionsWaiting(read) && !read.has('community-ending');
+const communityTour = (hash, read) => communityDue(hash, read) && read.has('community-welcome');
+const communityHere = (hash, read) => onCommunity(hash) && communityTour(hash, read);
 
 function affordable(buildingId) {
   const building = state.character.camp.buildings.find((candidate) => candidate.id === buildingId);
@@ -168,6 +181,11 @@ const BEATS = {
   'professions-intro': { place: mark('professions-intro'), when: professionsHere },
   'professions-list': { place: mark('professions-list'), when: professionsHere },
   'professions-ending': { when: professionsHere },
+  // The Społeczność chapter, after the Profesje.
+  'community-welcome': { when: communityDue },
+  'community-lead': { place: '.nav-item[href="#/spolecznosc"]', when: (hash, read) => communityTour(hash, read) && !onCommunity(hash) },
+  'community-rules': { place: mark('community-rules'), when: communityHere },
+  'community-ending': { when: communityHere },
 };
 
 let place = '#/walka';

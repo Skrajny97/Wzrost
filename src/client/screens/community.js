@@ -63,7 +63,8 @@ export function mountCommunity(container, context) {
     text,
     sendButton,
   );
-  const footer = h('div', { class: 'chat-footer' });
+  // The narrator points here at the chat's rules (narrator.js).
+  const footer = h('div', { class: 'chat-footer', 'data-guide': 'community-rules' });
   const hidden = h('div', { class: 'chat-hidden' });
 
   // One channel is named under the title; more will get a row of their own.
