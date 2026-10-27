@@ -14,4 +14,5 @@
 - Docelowo gra trafi do Sklepu Play jako aplikacja. Autor może dokupić tani plan Cloudflare albo domenę: zalecaj taki zakup, gdy się przyda.
 - Polecenia: `npm ci`, `npm test`, `npm run dev`.
 - Push do `main` testuje i wdraża grę (`.github/workflows/deploy.yml`). Etap kończy się wdrożoną wersją i raportem: co zrobiono, co sprawdzić w grze, co dalej.
+- Każde wdrożenie do gry podnosi numer wersji w `package.json` o jeden na ostatnim miejscu (0.0.1, 0.0.2…): `npm version <numer> --no-git-tag-version`. Raport podaje ten numer, a Ustawienia gry pokazują go w „Wersja gry”.
 - Push na gałąź roboczą wdraża wersję testową (https://test.insightrpg.com). Każdą zmianę wdrożoną do gry wdrażaj też tam: scal `main` do gałęzi roboczej i wypchnij ją.
