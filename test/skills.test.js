@@ -56,7 +56,7 @@ describe('skills', () => {
   test('a mana shield takes its share of mana at once and holds what that makes', () => {
     const result = fight('osłona-koszt', [withSkill('mage', 'mana-shield', { hpShare: 0.45 })], [sturdy('boar', 12, 'e0')]);
     const mage = withSkill('mage', 'mana-shield');
-    // A point of mana for a point of damage.
+    // On level 1 a point of mana for a point of damage.
     const { pool } = skillParams(content.skillsById['mana-shield'], 1, content);
     const points = Math.round(mage.maxMana * pool);
     const on = result.events.find((event) => event.kind === 'skill' && event.skill === 'mana-shield');
@@ -64,6 +64,20 @@ describe('skills', () => {
     const absorbed = result.events.filter((event) => event.target === 'a0' && event.absorbed > 0).reduce((sum, event) => sum + event.absorbed, 0);
     assert.ok(absorbed > 0 && absorbed <= points);
     assert.equal(skillView(content.skillsById['mana-shield'], 1, content).cost, `Koszt: ${Math.round(pool * 100)}% maks. many, raz na walkę.`);
+  });
+
+  test('a mana shield takes the same share of mana on every level and makes more of it with each', () => {
+    const shield = content.skillsById['mana-shield'];
+    const [low, top] = [1, content.balance.skills.maxLevel].map((level) => skillParams(shield, level, content));
+    assert.equal(low.pool, top.pool);
+    assert.deepEqual([low.ratio, top.ratio], [1, 1.7]);
+    const result = fight('osłona-20', [withSkill('mage', 'mana-shield', { hpShare: 0.45, skillLevel: 20 })], [sturdy('boar', 12, 'e0')]);
+    const mage = withSkill('mage', 'mana-shield');
+    const taken = Math.round(mage.maxMana * top.pool);
+    const on = result.events.find((event) => event.kind === 'skill' && event.skill === 'mana-shield');
+    assert.equal(on.shield, Math.round(taken * 1.7));
+    assert.equal(on.text, `Mira: Osłona many. Osłona za ${taken} many przyjmie ${on.shield} obrażeń.`);
+    assert.match(skillView(shield, 20, content).effect, /równe 170% wziętej many/);
   });
 
   test('Skill Points come with each class level from the tenth to the 49th, one per level of a skill', () => {
@@ -316,7 +330,7 @@ describe('skills', () => {
     // So do a mana shield and the dance of shadows when they wake.
     const shielded = fight('osłona-opis', [withSkill('mage', 'mana-shield', { hpShare: 0.45 })], [sturdy('boar', 12, 'e0')]);
     const shield = shielded.events.find((event) => event.kind === 'skill' && event.skill === 'mana-shield');
-    assert.equal(shield.text, `Mira: Osłona many. Osłona przyjmie ${shield.shield} obrażeń, tyle, ile wzięła many.`);
+    assert.equal(shield.text, `Mira: Osłona many. Osłona za ${shield.shield} many przyjmie ${shield.shield} obrażeń.`);
     const danced = fight('taniec-opis', [withSkill('shadow', 'shadow-dance', { hpShare: 0.45 })], [sturdy('wolf', 12, 'e0')]);
     const dance = danced.events.find((event) => event.kind === 'skill' && event.skill === 'shadow-dance');
     assert.equal(dance.text, 'Mira: Taniec cieni. Przez 5 ciosów wrogów unik rośnie o 40 pkt proc., a każdy unik daje kontrę za 80% obrażeń.');

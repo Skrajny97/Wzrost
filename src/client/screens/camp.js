@@ -116,7 +116,15 @@ async function collectStore(building) {
   toast(`Zebrano: ${resourceName(collected.resource).toLowerCase()} +${formatNumber(collected.amount)}.`);
 }
 
-async function tradeAtFire(resource, amount) {
+// Asked first (the author: "Wymiana złota na zasoby w ognisku potrzebuje
+// dodatkowego okna potwierdzenia").
+async function tradeAtFire(resource, amount, gold) {
+  const sure = await confirmAction({
+    title: 'Wymiana u ducha ognia',
+    text: `Duch ognia weźmie ${formatNumber(gold)} złota i odda: ${resourceName(resource).toLowerCase()} +${formatNumber(amount)}.`,
+    confirmLabel: 'Wymień',
+  });
+  if (!sure) return;
   const { traded } = await call('POST', '/api/camp/trade', { resource, amount });
   playSound('collect');
   toast(`Duch ognia przyjął ${formatNumber(traded.gold)} złota i oddał: ${resourceName(traded.resource).toLowerCase()} +${formatNumber(traded.amount)}.`);
@@ -520,7 +528,7 @@ function mountBuilding(container, id) {
         {
           type: 'button',
           class: 'button button--world fire-trade-button',
-          onClick: (event) => withButton(event.currentTarget, () => tradeAtFire(id, amount)),
+          onClick: (event) => withButton(event.currentTarget, () => tradeAtFire(id, amount, amount * trade.unitGold)),
         },
         icon(RESOURCE_ICONS[id] ?? 'unknown', { size: 18 }),
         label,

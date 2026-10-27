@@ -198,12 +198,14 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
         const p = skill.params;
         let text = say(texts, 'skillUse', actions, vars);
         if (skill.kind === 'shield') {
-          // A share of the unit's mana at once makes the shield: a point of
-          // mana for a point of damage.
+          // A share of the unit's mana at once makes the shield, each point
+          // of mana `ratio` points of damage, more with the skill's level
+          // (the author: "niech pobiera stałą wartość Many np.30% ale z
+          // kazdym poziomem umiejetnosci daje z tego wiecej osłony").
           const taken = Math.min(unit.mana, Math.round((unit.maxMana ?? 0) * p.pool));
           unit.mana -= taken;
-          unit.shield = { points: taken };
-          text = say(texts, 'skillShield', actions, { ...vars, shield: taken });
+          unit.shield = { points: Math.round(taken * p.ratio) };
+          text = say(texts, 'skillShield', actions, { ...vars, shield: unit.shield.points, mana: taken });
         }
         if (skill.kind === 'evade') {
           unit.evade = { hits: p.hits, dodge: p.dodge, counter: p.counter };

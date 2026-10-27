@@ -135,10 +135,10 @@
     "style": "obrona",
     "rarity": "common",
     "description": "Mag otacza się magiczną osłoną, którą opiera o własną manę.",
-    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, wykorzystuje {pool%} maks. many i zamienia ją w osłonę: każdy punkt many zatrzymuje jeden punkt obrażeń. Osłona przyjmuje ciosy, aż się wyczerpie.",
+    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, wykorzystuje {pool%} maks. many i zamienia ją w osłonę, która zatrzymuje obrażenia równe {ratio%} wziętej many. Osłona przyjmuje ciosy, aż się wyczerpie.",
     "kind": "shield",
     "mana": 0,
-    "params": { "below": 0.5, "pool": [0.3, 0.5] }
+    "params": { "below": 0.5, "pool": 0.3, "ratio": [1, 1.7] }
   },
   {
     "id": "prayer-of-health",

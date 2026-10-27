@@ -211,7 +211,7 @@ function checkReferences(data) {
     guard: ['below', 'heal', 'armor', 'turns'],
     buff: ['armor', 'resist', 'damage'],
     coat: ['dotEffect', 'dotChance', 'dotPower', 'dotTicks'],
-    shield: ['below', 'pool'],
+    shield: ['below', 'pool', 'ratio'],
     evade: ['below', 'dodge', 'counter', 'hits'],
   };
   const classIds = new Set(data.classes.map((cls) => cls.id));

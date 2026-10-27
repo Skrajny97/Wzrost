@@ -2155,3 +2155,15 @@ Autor: „Zbuduj opcję w serwerze testowym "Testuj samouczki" i wrzuć tam wszy
 4. **Zgłoś i Ukryj** (Sklep Play). Prywatną wiadomość też można zgłosić, a zgłoszoną widzi moderacja, z dopiskiem „prywatna”. Ukrycie gracza ukrywa też jego prywatne wiadomości i zakładkę rozmowy, a dopóki trwa, żadne z nich nie napisze do drugiego. Zasady czatu mają nowe zdanie: „Prywatną rozmowę widzicie tylko Wy dwoje, ale zgłoszoną wiadomość przeczyta też moderacja.” To szkic do poprawy przez autora.
 5. **Kropka na zakładce Społeczność** zapala się od nowej prywatnej wiadomości także wtedy, gdy dzwonek wycisza Globalny. Przeczytane rozmowy pamięta telefon, jak przy Globalnym.
 6. **Migracja 0043**: kolumna `recipient_id` w wiadomościach czatu. „Zacznij od nowa” i usunięcie konta usuwają też rozmowy postaci, w obie strony.
+
+## Osłona many: stała część many, więcej osłony z poziomem (27.10.2026)
+
+Autor: „Czy przypadkiem nie jest tak ze Osłona many z kolejnymi levelami ogranicza używanie drugiej umiejetnosci przez co Mag walczy gorzej? Może niech pobiera stałą wartość Many np.30% ale z kazdym poziomem umiejetnosci daje z tego wiecej osłony?”. Symulacja pokazała, że mana nie ograniczała drugiej umiejętności, bo Mag ma jej dużo więcej, niż zużywa w walce. Autor zdecydował jednak o zmianie („Wdrażaj też nową Osłonę Many”).
+
+1. Osłona bierze zawsze 30% maks. many (wcześniej od 30% na 1. poziomie do 50% na 20.).
+2. Każdy punkt wziętej many zatrzymuje teraz od 1 punktu obrażeń na 1. poziomie do 1,7 na 20. (`ratio` w `data/skills.json`). Na 20. poziomie osłona jest więc tak duża jak dotąd, a Magowi zostaje 70% many zamiast 50%.
+3. Opis umiejętności: „…zamienia ją w osłonę, która zatrzymuje obrażenia równe {ratio%} wziętej many”. Zapis walki: „Osłona za X many przyjmie Y obrażeń.”
+
+## Potwierdzenie wymiany u ducha ognia (27.10.2026)
+
+Autor: „Wymiana złota na zasoby w ognisku potrzebuje dodatkowego okna potwierdzenia”. Stuknięcie zasobu przy duchu ognia otwiera teraz okienko „Wymiana u ducha ognia” z ceną i tym, co gracz dostanie, np. „Duch ognia weźmie 7 złota i odda: drewno +1.”, z przyciskami „Anuluj” i „Wymień”. Złoto znika dopiero po „Wymień”.
