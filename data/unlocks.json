@@ -6,6 +6,18 @@
     "message": "Odblokowano ekran Statystyki. Wolne punkty rozdzielisz w zakładce Postać."
   },
   {
+    "id": "quick-hunts",
+    "name": "Szybkie Polowanie",
+    "level": 5,
+    "message": "Odblokowano Szybkie Polowanie: trzy szybkie wyprawy dziennie, z raportem od razu. Znajdziesz je w Walce, pod „Wyrusz”."
+  },
+  {
+    "id": "community",
+    "name": "Społeczność",
+    "level": 5,
+    "message": "Odblokowano Społeczność. W zakładce Społeczność porozmawiasz z innymi graczami na czacie."
+  },
+  {
     "id": "skills",
     "name": "Umiejętności",
     "classLevel": 10,

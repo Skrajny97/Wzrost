@@ -1,24 +1,31 @@
-// The Społeczność tab: for now the chat (src/server/chat.js), in its only
-// channel so far, Globalny. While the chat is open
-// and the page is in front, it asks for new messages every few seconds, and
-// less often the longer nothing comes. A tap on someone else's message opens
-// its sheet: report it, or hide that player's messages; the author's account
-// also takes it down or silences its writer there. The rules come before the
-// first message, and the hidden players wait under the chat to be shown again.
+// The Społeczność tab, from character level 5: for now the chat
+// (src/server/chat.js), in its only channel so far, Globalny. While the chat
+// is open and the page is in front, it asks for new messages every few
+// seconds, and less often the longer nothing comes. A tap on someone else's
+// message opens its sheet: report it, or hide that player's messages. The
+// moderation (the admin and the moderators, marked by their names) also
+// takes it down or silences its writer there, and has the reports in a
+// sheet of their own. The rules come before the first message, and the
+// hidden players wait under the chat to be shown again.
 
 import { $, fill, h, icon } from '../dom.js';
 import { dateTimeFormat, timeFormat } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
-import { call, serverNow, state } from '../state.js';
+import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, openSheet, pageHeading, toast, withButton } from '../ui.js';
+import { lockedScreen } from './locked.js';
 
 // The most messages the page keeps; older ones leave from the top.
 const SHOWN = 200;
 
-export function mountCommunity(container) {
+// A silence "na stałe" (chat.js).
+const FOREVER = 8.64e15;
+const untilText = (until) => (until >= FOREVER ? 'na stałe' : `do ${dateTimeFormat.format(new Date(until))}`);
+
+export function mountCommunity(container, context) {
+  if (!isUnlocked('community')) return lockedScreen('community', 'Społeczność')(container, context);
   const chat = state.content.chat;
   const channel = chat.channels[0].id;
-  const author = Boolean(state.user?.author);
   let messages = [];
   let account = null;
   let error = null;
@@ -78,6 +85,7 @@ export function mountCommunity(container) {
         { class: 'chat-head' },
         icon(CLASS_ICONS[message.classId] ?? 'person', { size: 14, className: 'chat-class' }),
         h('strong', { class: 'chat-name', text: message.name }),
+        message.role && h('span', { class: `chat-role chat-role--${message.role}`, text: `(${message.role})` }),
         h('span', { class: 'chat-level', text: `poz. ${message.level}` }),
         h('time', { class: 'chat-time', datetime: time.toISOString(), text: (today ? timeFormat : dateTimeFormat).format(time) }),
       ),
@@ -119,12 +127,18 @@ export function mountCommunity(container) {
   const changed = (part, key) => shown[part] !== key && ((shown[part] = key), true);
 
   function render() {
-    const reports = author ? account?.reports ?? 0 : 0;
+    const reports = account?.role ? account.reports : 0;
     if (changed('notices', `${error}|${reports}`)) {
       fill(
         notices,
         error && h('p', { class: 'chat-error', role: 'status', text: error }),
-        reports > 0 && h('a', { class: 'button button--world button--small chat-reports', href: '#/autor', text: `Zgłoszenia czekają: ${reports}` }),
+        reports > 0 &&
+          h('button', {
+            type: 'button',
+            class: 'button button--world button--small chat-reports',
+            text: `Zgłoszenia czekają: ${reports}`,
+            onClick: (event) => withButton(event.currentTarget, openReports),
+          }),
       );
     }
     empty.hidden = messages.length > 0;
@@ -158,8 +172,7 @@ export function mountCommunity(container) {
         }),
       );
     }
-    const until = account.mutedUntil;
-    return h('p', { class: 'chat-muted', text: until >= 8.64e15 ? 'Czat jest dla Ciebie wyciszony na stałe.' : `Czat jest dla Ciebie wyciszony do ${dateTimeFormat.format(new Date(until))}.` });
+    return h('p', { class: 'chat-muted', text: `Czat jest dla Ciebie wyciszony ${untilText(account.mutedUntil)}.` });
   }
 
   function hiddenList(blocked) {
@@ -194,18 +207,24 @@ export function mountCommunity(container) {
     );
   }
 
+  const act = (label, run, kind = 'world', size = '') =>
+    h('button', { type: 'button', class: `button button--${kind} ${size}`.trim(), text: label, onClick: (event) => withButton(event.currentTarget, run) });
+  // The moderation's decision on a message; a moderator has none on the
+  // messages of the moderation itself.
+  const decide = (messageId, action) => call('POST', '/api/chat/moderate', { messageId, action });
+  const canModerate = (writerRole) => account?.role === 'admin' || (account?.role === 'moderator' && !writerRole);
+  const DONE = { hide: 'Wiadomość usunięta.', keep: 'Wiadomość zostaje.', muteDay: 'Czat wyciszony na dobę.', muteForever: 'Czat wyciszony na stałe.' };
+
   // The sheet of someone else's message.
   function actions(message) {
-    const act = (label, run, kind = 'world') =>
-      h('button', { type: 'button', class: `button button--${kind}`, text: label, onClick: (event) => withButton(event.currentTarget, run) });
-    const moderate = (action, done) => async () => {
-      await call('POST', '/api/author/chat', { messageId: message.id, action });
+    const moderate = (action) => async () => {
+      await decide(message.id, action);
       closeSheet();
-      toast(done);
+      toast(DONE[action]);
       if (action === 'hide') drop([message.id]);
     };
     openSheet(
-      h('h2', { class: 'sheet-title', text: message.name }),
+      h('h2', { class: 'sheet-title chat-sheet', text: message.name }),
       h('p', { class: 'sheet-text chat-sheet-text', text: message.text }),
       h(
         'div',
@@ -226,13 +245,69 @@ export function mountCommunity(container) {
           render();
           toast(`Wiadomości postaci ${message.name} są ukryte. Pokażesz je pod czatem, w „Ukryte postacie”.`);
         }),
-        author && [
-          h('p', { class: 'chat-sheet-label', text: 'Autor gry' }),
-          act('Usuń wiadomość', moderate('hide', 'Wiadomość usunięta.'), 'danger'),
-          act('Wycisz na dobę', moderate('muteDay', `Czat dla ${message.name} wyciszony na dobę.`)),
-          act('Wycisz na stałe', moderate('muteForever', `Czat dla ${message.name} wyciszony na stałe.`), 'danger'),
+        canModerate(message.role) && [
+          h('p', { class: 'chat-sheet-label', text: 'Moderacja' }),
+          act('Usuń wiadomość', moderate('hide'), 'danger'),
+          act('Wycisz na dobę', moderate('muteDay')),
+          act('Wycisz na stałe', moderate('muteForever'), 'danger'),
         ],
       ),
+    );
+  }
+
+  // The moderation's sheet of reported messages, the longest waiting first;
+  // after each decision the list is read anew.
+  async function openReports() {
+    const { reports } = await call('GET', '/api/chat/reports');
+    const decision = (report, action) => async () => {
+      await decide(report.messageId, action);
+      toast(DONE[action]);
+      if (action === 'hide') drop([report.messageId]);
+      await openReports();
+      ask();
+    };
+    openSheet(
+      h('h2', { class: 'sheet-title chat-sheet', text: 'Zgłoszenia' }),
+      reports.length === 0
+        ? h('p', { class: 'sheet-text', text: 'Nie ma zgłoszeń do sprawdzenia.' })
+        : h(
+            'ol',
+            { class: 'chat-report-list' },
+            reports.map((report) =>
+              h(
+                'li',
+                { class: 'chat-report' },
+                h(
+                  'p',
+                  { class: 'chat-report-head' },
+                  h('strong', { text: report.name }),
+                  report.role && h('span', { class: `chat-role chat-role--${report.role}`, text: `(${report.role})` }),
+                  report.login && h('span', { class: 'chat-report-login', text: report.login }),
+                ),
+                h('p', { class: 'chat-report-text', text: report.text }),
+                h('p', {
+                  class: 'chat-report-meta',
+                  text: [
+                    dateTimeFormat.format(new Date(report.createdAt)),
+                    `zgłoszenia: ${report.reports}`,
+                    report.hidden && 'ukryta do decyzji',
+                    report.mutedUntil && `czat wyciszony ${untilText(report.mutedUntil)}`,
+                  ]
+                    .filter(Boolean)
+                    .join(' · '),
+                }),
+                canModerate(report.role) &&
+                  h(
+                    'div',
+                    { class: 'chat-report-actions' },
+                    act('Usuń', decision(report, 'hide'), 'danger', 'button--small'),
+                    act('Zostaw', decision(report, 'keep'), 'world', 'button--small'),
+                    act('Wycisz na dobę', decision(report, 'muteDay'), 'world', 'button--small'),
+                    act('Wycisz na stałe', decision(report, 'muteForever'), 'danger', 'button--small'),
+                  ),
+              ),
+            ),
+          ),
     );
   }
 
@@ -287,7 +362,7 @@ export function mountCommunity(container) {
       gone = true;
       clearTimeout(timer);
       document.removeEventListener('visibilitychange', onVisible);
-      if ($('#sheet')?.open && $('.chat-sheet-actions')) closeSheet();
+      if ($('#sheet')?.open && $('#sheet .chat-sheet')) closeSheet();
     },
   };
 }

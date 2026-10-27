@@ -1,13 +1,17 @@
 // The chat of the Społeczność tab (DECISIONS.md, "Czat"): the Globalny
-// channel for now, with room for more channels in data/chat.json. The open
-// chat asks every few seconds for the messages after the last one it has.
-// A player writes once they accept the rules, once every few seconds, with
-// no links and with rude words masked. As the Play Store asks of content
-// made by players, every message can be reported, a player can hide the
-// messages of another, a message reported by a few players goes down until
-// the author looks at it, and the author takes messages down and silences
-// accounts (the author's panel, or a tap on a message).
+// channel for now, with room for more channels in data/chat.json, open from
+// the character level of its unlock (community in data/unlocks.json). The
+// open chat asks every few seconds for the messages after the last one it
+// has. A player writes once they accept the rules, once every few seconds,
+// with no links and with rude words masked. As the Play Store asks of
+// content made by players, every message can be reported, a player can
+// hide the messages of another, a message reported by a few players goes
+// down until the moderation looks at it, and the moderation takes messages
+// down and silences accounts. The moderation is the author's account (the
+// admin) and the accounts the author names moderators in the author's
+// panel; the chat marks their characters.
 
+import { isUnlocked } from '../engine/index.js';
 import { isAuthor } from './author.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
@@ -38,6 +42,12 @@ export function mutedText(until) {
   return until >= FOREVER ? 'Czat jest dla Ciebie wyciszony na stałe.' : `Czat jest dla Ciebie wyciszony do ${untilFormat.format(new Date(until))}.`;
 }
 
+// "admin" for the author's account, "moderator" for an account the author
+// named, null for everyone else. `row` has the account's login, google_sub
+// and chat_moderator.
+export const chatRole = (env, row) =>
+  isAuthor(env, { login: row.login, google: row.google_sub !== null }) ? 'admin' : row.chat_moderator === 1 ? 'moderator' : null;
+
 // The message as it is kept: one line of visible signs, within the length,
 // without links, with the words of data/chat.json turned into stars.
 export function cleanText(raw) {
@@ -51,7 +61,7 @@ export function cleanText(raw) {
   return text.replace(WORD, (word) => (words.some((part) => word.toLowerCase().includes(part)) ? '*'.repeat([...word].length) : word));
 }
 
-const messageView = (row, userId) => ({
+const messageView = (row, userId, env) => ({
   id: row.id,
   name: row.name,
   level: row.level,
@@ -59,78 +69,99 @@ const messageView = (row, userId) => ({
   text: row.text,
   createdAt: row.created_at,
   own: row.user_id === userId,
+  role: chatRole(env, row),
 });
 
-const blockedList = (db, userId) =>
-  db.prepare('SELECT id, name FROM chat_blocks WHERE user_id = ? ORDER BY id').bind(userId);
+const blockedList = (db, userId) => db.prepare('SELECT id, name FROM chat_blocks WHERE user_id = ? ORDER BY id').bind(userId);
 
-const accountOf = (db, userId) => db.prepare('SELECT chat_rules_at, chat_muted_until FROM users WHERE id = ?').bind(userId);
+// The account and its character as the chat needs them, once the character
+// reaches the chat's level.
+async function requireChatter(context) {
+  const session = await requirePlayable(context);
+  const db = context.env.DB;
+  const [characters, accounts] = await db.batch([
+    db.prepare("SELECT id, name, level, class_id FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId),
+    db.prepare('SELECT login, google_sub, chat_moderator, chat_rules_at, chat_muted_until FROM users WHERE id = ?').bind(session.userId),
+  ]);
+  const character = characters.results[0];
+  if (!character) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
+  if (!isUnlocked('community', character.level, content)) {
+    throw new ApiError(403, 'locked', `Społeczność odblokujesz na poziomie postaci ${content.unlocksById.community.level}.`);
+  }
+  const account = accounts.results[0];
+  return { session, character, account, role: chatRole(context.env, account), db };
+}
+
+// The moderation: the admin and the moderators, also below the chat's level.
+async function requireModeration(context) {
+  const session = await requireSession(context);
+  const account = await context.env.DB.prepare('SELECT login, google_sub, chat_moderator FROM users WHERE id = ?').bind(session.userId).first();
+  const role = chatRole(context.env, account);
+  if (!role) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  return { session, role, db: context.env.DB };
+}
+
+async function requireAdmin(context) {
+  const session = await requireSession(context);
+  if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  return { session, db: context.env.DB };
+}
 
 // GET /api/chat?channel=global&after=<id>&from=<id>: the newest messages
 // after `after` (the last ones of the channel when it is 0), without those
 // taken down and those of the players this one hides, and of the messages
-// the page shows (from `from` to `after`) the ones taken down since.
+// the page shows (from `from` to `after`) the ones taken down since. The
+// moderation also hears how many messages wait in the reports.
 export async function readChat(context) {
-  const session = await requirePlayable(context);
+  const { session, account, role, db } = await requireChatter(context);
   const url = new URL(context.request.url);
   const channel = channelOf(url.searchParams.get('channel') ?? 'global');
   const after = whole(url.searchParams.get('after'));
   const from = whole(url.searchParams.get('from'));
-  const db = context.env.DB;
   const { userId } = session;
-  const author = isAuthor(context.env, session.user);
-  const [messages, account, hidden, blocked, reports] = await db.batch([
+  const [messages, hidden, blocked, reports] = await db.batch([
     db
       .prepare(
-        `SELECT id, user_id, name, level, class_id, text, created_at FROM chat_messages
-         WHERE channel = ? AND id > ? AND hidden_at IS NULL AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)
-         ORDER BY id DESC LIMIT ?`,
+        `SELECT m.id, m.user_id, m.name, m.level, m.class_id, m.text, m.created_at, u.login, u.google_sub, u.chat_moderator
+         FROM chat_messages m JOIN users u ON u.id = m.user_id
+         WHERE m.channel = ? AND m.id > ? AND m.hidden_at IS NULL AND m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)
+         ORDER BY m.id DESC LIMIT ?`,
       )
       .bind(channel.id, after, userId, content.chat.rules.page),
-    accountOf(db, userId),
     db.prepare('SELECT id FROM chat_messages WHERE channel = ? AND id >= ? AND id <= ? AND hidden_at IS NOT NULL').bind(channel.id, from || after, after),
     blockedList(db, userId),
-    db.prepare(author ? 'SELECT COUNT(DISTINCT message_id) AS count FROM chat_reports WHERE closed_at IS NULL' : 'SELECT NULL AS count'),
+    db.prepare(role ? 'SELECT COUNT(DISTINCT message_id) AS count FROM chat_reports WHERE closed_at IS NULL' : 'SELECT NULL AS count'),
   ]);
-  const user = account.results[0];
   return json({
     channel: channel.id,
-    messages: messages.results.reverse().map((row) => messageView(row, userId)),
+    messages: messages.results.reverse().map((row) => messageView(row, userId, context.env)),
     hidden: hidden.results.map((row) => row.id),
-    rulesAccepted: Boolean(user.chat_rules_at),
-    mutedUntil: user.chat_muted_until > context.now ? user.chat_muted_until : null,
+    rulesAccepted: Boolean(account.chat_rules_at),
+    mutedUntil: account.chat_muted_until > context.now ? account.chat_muted_until : null,
     blocked: blocked.results,
-    // For the author: how many messages wait in the reports.
-    reports: author ? reports.results[0].count : undefined,
+    role,
+    reports: role ? reports.results[0].count : undefined,
   });
 }
 
 // POST /api/chat/rules: the player accepts the rules of the chat.
 export async function acceptChatRules(context) {
-  const session = await requirePlayable(context);
-  await context.env.DB.prepare('UPDATE users SET chat_rules_at = COALESCE(chat_rules_at, ?) WHERE id = ?').bind(context.now, session.userId).run();
+  const { session, db } = await requireChatter(context);
+  await db.prepare('UPDATE users SET chat_rules_at = COALESCE(chat_rules_at, ?) WHERE id = ?').bind(context.now, session.userId).run();
   return json({ rulesAccepted: true });
 }
 
 // POST /api/chat {channel, text}: a message, under the character's name,
 // level and class. The channel keeps its last messages and the reported
-// ones still waiting for the author.
+// ones still waiting for the moderation.
 export async function sendChat(context) {
-  const session = await requirePlayable(context);
+  const { session, character, account, db } = await requireChatter(context);
   const body = await readJson(context.request);
   const channel = channelOf(body.channel ?? 'global');
-  const db = context.env.DB;
   const now = context.now;
   const { userId } = session;
-  const [characters, account] = await db.batch([
-    db.prepare("SELECT id, name, level, class_id FROM characters WHERE user_id = ? AND role = 'player'").bind(userId),
-    accountOf(db, userId),
-  ]);
-  const character = characters.results[0];
-  const user = account.results[0];
-  if (!character) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
-  if (!user.chat_rules_at) throw new ApiError(403, 'rules', 'Najpierw zaakceptuj zasady czatu.');
-  if (user.chat_muted_until > now) throw new ApiError(403, 'muted', mutedText(user.chat_muted_until));
+  if (!account.chat_rules_at) throw new ApiError(403, 'rules', 'Najpierw zaakceptuj zasady czatu.');
+  if (account.chat_muted_until > now) throw new ApiError(403, 'muted', mutedText(account.chat_muted_until));
   const text = cleanText(body.text);
   const { everySeconds, keep } = content.chat.rules;
   const [sent] = await db.batch([
@@ -149,25 +180,30 @@ export async function sendChat(context) {
       .bind(channel.id, channel.id, keep),
   ]);
   if (sent.meta.changes !== 1) throw new ApiError(429, 'too_fast', `Za szybko. Kolejną wiadomość wyślesz po ${everySeconds} sekundach.`);
-  const row = { id: sent.meta.last_row_id, user_id: userId, name: character.name, level: character.level, class_id: character.class_id, text, created_at: now };
-  return json({ message: messageView(row, userId) }, 201);
+  const row = { ...account, id: sent.meta.last_row_id, user_id: userId, name: character.name, level: character.level, class_id: character.class_id, text, created_at: now };
+  return json({ message: messageView(row, userId, context.env) }, 201);
 }
 
-// The message a request names, still in the chat.
+// The message a request names, still in the chat, with its writer's account.
 async function namedMessage(db, body) {
   const message = Number.isInteger(body.messageId)
-    ? await db.prepare('SELECT id, user_id, name, hidden_at FROM chat_messages WHERE id = ?').bind(body.messageId).first()
+    ? await db
+        .prepare(
+          `SELECT m.id, m.user_id, m.name, m.hidden_at, u.login, u.google_sub, u.chat_moderator
+           FROM chat_messages m JOIN users u ON u.id = m.user_id WHERE m.id = ?`,
+        )
+        .bind(body.messageId)
+        .first()
     : null;
   if (!message) throw new ApiError(404, 'no_message', 'Tej wiadomości już nie ma.');
   return message;
 }
 
-// POST /api/chat/report {messageId}: a report for the author, once per
-// player and message; enough reports take the message down until the author
-// decides.
+// POST /api/chat/report {messageId}: a report for the moderation, once per
+// player and message; enough reports take the message down until the
+// moderation decides.
 export async function reportChat(context) {
-  const session = await requirePlayable(context);
-  const db = context.env.DB;
+  const { session, db } = await requireChatter(context);
   const message = await namedMessage(db, await readJson(context.request));
   if (message.user_id === session.userId) throw new ApiError(400, 'own', 'Własnej wiadomości nie zgłosisz.');
   await db.batch([
@@ -179,14 +215,13 @@ export async function reportChat(context) {
       )
       .bind(context.now, message.id, message.id, content.chat.rules.hideAfterReports),
   ]);
-  return json({ text: 'Zgłoszono. Autor gry sprawdzi tę wiadomość.' });
+  return json({ text: 'Zgłoszono. Moderacja sprawdzi tę wiadomość.' });
 }
 
 // POST /api/chat/block {messageId}: the player stops seeing the messages of
 // the one who wrote it, also of their later characters.
 export async function blockInChat(context) {
-  const session = await requirePlayable(context);
-  const db = context.env.DB;
+  const { session, db } = await requireChatter(context);
   const message = await namedMessage(db, await readJson(context.request));
   if (message.user_id === session.userId) throw new ApiError(400, 'own', 'Siebie nie ukryjesz.');
   await db
@@ -198,24 +233,54 @@ export async function blockInChat(context) {
 
 // POST /api/chat/unblock {id}: the messages of a hidden player show again.
 export async function unblockInChat(context) {
-  const session = await requirePlayable(context);
+  const { session, db } = await requireChatter(context);
   const body = await readJson(context.request);
-  const db = context.env.DB;
   if (Number.isInteger(body.id)) await db.prepare('DELETE FROM chat_blocks WHERE id = ? AND user_id = ?').bind(body.id, session.userId).run();
   return json({ blocked: (await blockedList(db, session.userId).all()).results });
 }
 
-// POST /api/author/chat {messageId, action}: the author's decision on a
-// message. "hide" takes it down, "keep" brings it back, and both close its
-// reports; "muteDay" and "muteForever" silence the account that wrote it.
-// Only the author's account, as the author's panel (author.js).
+// GET /api/chat/reports: for the moderation, the messages with reports not
+// decided yet, the longest waiting first; the admin also sees the login of
+// the account that wrote each.
+export async function chatReports(context) {
+  const { role, db } = await requireModeration(context);
+  const rows = await db
+    .prepare(
+      `SELECT m.id, m.name, m.text, m.created_at, m.hidden_at, u.login, u.google_sub, u.chat_moderator, u.chat_muted_until,
+         COUNT(*) AS reports, MIN(r.created_at) AS reported_at
+       FROM chat_reports r JOIN chat_messages m ON m.id = r.message_id JOIN users u ON u.id = m.user_id
+       WHERE r.closed_at IS NULL
+       GROUP BY m.id
+       ORDER BY reported_at
+       LIMIT 100`,
+    )
+    .all();
+  return json({
+    reports: rows.results.map((row) => ({
+      messageId: row.id,
+      name: row.name,
+      login: role === 'admin' ? row.login : undefined,
+      role: chatRole(context.env, row),
+      text: row.text,
+      createdAt: row.created_at,
+      hidden: row.hidden_at !== null,
+      reports: row.reports,
+      reportedAt: row.reported_at,
+      mutedUntil: row.chat_muted_until > context.now ? row.chat_muted_until : null,
+    })),
+  });
+}
+
+// POST /api/chat/moderate {messageId, action}: the moderation's decision on
+// a message. "hide" takes it down, "keep" brings it back, and both close its
+// reports; "muteDay" and "muteForever" silence the account that wrote it. A
+// moderator decides on no message of the admin or of another moderator.
 export async function moderateChat(context) {
-  const session = await requireSession(context);
-  if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  const { role, db } = await requireModeration(context);
   const body = await readJson(context.request);
-  const db = context.env.DB;
   const now = context.now;
   const message = await namedMessage(db, body);
+  if (role === 'moderator' && chatRole(context.env, message)) throw new ApiError(403, 'protected', 'Wiadomości moderacji nie moderujesz.');
   const close = db.prepare('UPDATE chat_reports SET closed_at = ? WHERE message_id = ? AND closed_at IS NULL').bind(now, message.id);
   const mute = (until) => [db.prepare('UPDATE users SET chat_muted_until = MAX(COALESCE(chat_muted_until, 0), ?) WHERE id = ?').bind(until, message.user_id)];
   const actions = {
@@ -229,12 +294,22 @@ export async function moderateChat(context) {
   return json({ ok: true });
 }
 
-// POST /api/author/chat/unmute {login}: the account may write again.
+// POST /api/author/chat/unmute {login}: only the admin lets an account
+// write again.
 export async function unmuteInChat(context) {
-  const session = await requireSession(context);
-  if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  const { db } = await requireAdmin(context);
   const body = await readJson(context.request);
   if (typeof body.login !== 'string') throw new ApiError(400, 'invalid_login', 'Nie ma takiego konta.');
-  await context.env.DB.prepare('UPDATE users SET chat_muted_until = NULL WHERE login = ?').bind(body.login).run();
+  await db.prepare('UPDATE users SET chat_muted_until = NULL WHERE login = ?').bind(body.login).run();
+  return json({ ok: true });
+}
+
+// POST /api/author/chat/moderator {login, moderator}: only the admin names
+// moderators and takes the role back.
+export async function setModerator(context) {
+  const { db } = await requireAdmin(context);
+  const body = await readJson(context.request);
+  if (typeof body.login !== 'string' || typeof body.moderator !== 'boolean') throw new ApiError(400, 'invalid_login', 'Nie ma takiego konta.');
+  await db.prepare('UPDATE users SET chat_moderator = ? WHERE login = ?').bind(body.moderator ? 1 : 0, body.login).run();
   return json({ ok: true });
 }

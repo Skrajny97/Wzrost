@@ -5327,50 +5327,13 @@ a.camp-level-button {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
+}
+
+.author-account-muted {
+  flex: 1;
   color: var(--danger);
   font-size: 13px;
-}
-
-/* The chat's reports in the author's panel, each with its decisions. */
-.author-chat-list {
-  display: grid;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.author-chat-report {
-  display: grid;
-  gap: 4px;
-  padding-top: 10px;
-  border-top: 1px solid var(--line);
-}
-
-.author-chat-report:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.author-chat-report p {
-  margin: 0;
-}
-
-.author-chat-login {
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-.author-chat-text {
-  overflow-wrap: anywhere;
-}
-
-.author-chat-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
 }
 
 /* The Społeczność tab's chat (screens/community.js): messages one under
@@ -5443,6 +5406,76 @@ a.camp-level-button {
 .chat-level {
   color: var(--text-muted);
   white-space: nowrap;
+}
+
+/* The moderation by its names: the admin in the System's light, the
+   moderators in green. */
+.chat-role {
+  flex: none;
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chat-role--admin {
+  color: var(--system);
+}
+
+.chat-role--moderator {
+  color: var(--src-class);
+}
+
+/* The moderation's sheet of reported messages, each with its decisions. */
+.chat-report-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chat-report {
+  display: grid;
+  gap: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.chat-report:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.chat-report p {
+  margin: 0;
+}
+
+.chat-report-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.chat-report-login,
+.chat-report-meta {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.chat-report-login {
+  margin-left: auto;
+}
+
+.chat-report-text {
+  overflow-wrap: anywhere;
+}
+
+.chat-report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .chat-time {

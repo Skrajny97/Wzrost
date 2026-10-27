@@ -611,8 +611,8 @@ export function quickHuntsUsed(row, now) {
 
 // The Szybkie Polowania left today, or null below their level.
 function quickHuntsView(row, now) {
-  const { level, perDay, minutes } = content.balance.quickHunt;
-  return row.level < level ? null : { left: Math.max(0, perDay - quickHuntsUsed(row, now)), perDay, minutes };
+  const { perDay, minutes } = content.balance.quickHunt;
+  return isUnlocked('quick-hunts', row.level, content) ? { left: Math.max(0, perDay - quickHuntsUsed(row, now)), perDay, minutes } : null;
 }
 
 // The Awatar Systemu (avatar.js): its price and words until it is bought,

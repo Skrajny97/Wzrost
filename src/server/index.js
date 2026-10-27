@@ -7,7 +7,7 @@ import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyParts, cancelBuilding, collectProduction, startBuilding, tradeAtFire } from './camp.js';
-import { acceptChatRules, blockInChat, moderateChat, readChat, reportChat, sendChat, unblockInChat, unmuteInChat } from './chat.js';
+import { acceptChatRules, blockInChat, chatReports, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
 import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
 import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, setSkin, spendPoints } from './characters.js';
@@ -41,8 +41,8 @@ const routes = [
   ['GET', '/api/author', authorPanel],
   ['GET', '/api/author/skills', authorSkills],
   ['GET', '/api/author/skills/:id', authorSkillDemo],
-  ['POST', '/api/author/chat', moderateChat],
   ['POST', '/api/author/chat/unmute', unmuteInChat],
+  ['POST', '/api/author/chat/moderator', setModerator],
   ['GET', '/api/content', () => json(publicContent())],
   ['GET', '/api/character', getCharacter],
   ['POST', '/api/character', createCharacter],
@@ -94,6 +94,8 @@ const routes = [
   ['POST', '/api/chat/report', reportChat],
   ['POST', '/api/chat/block', blockInChat],
   ['POST', '/api/chat/unblock', unblockInChat],
+  ['GET', '/api/chat/reports', chatReports],
+  ['POST', '/api/chat/moderate', moderateChat],
   ['GET', '/api/reports', listReports],
   ['GET', '/api/reports/:id', getReport],
   ['POST', '/api/time/skip', skipWithTimePoints],

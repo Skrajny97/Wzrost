@@ -20,6 +20,7 @@ import {
   higherThreat,
   hpAfterHunt,
   huntDurations,
+  isUnlocked,
   huntKills,
   huntReport,
   longestHunt,
@@ -154,14 +155,16 @@ export async function huntOptions(context) {
   });
 }
 
-// Szybkie Polowanie: from the character's level `level`, `perDay` times a
-// day in Poland, an exploration of `minutes` in the inner region chosen,
+// Szybkie Polowanie: from the level of its unlock (quick-hunts in
+// data/unlocks.json), `perDay` times a day in Poland, an exploration of `minutes` in the inner region chosen,
 // with the same choices as "Wyrusz", that ends as it starts, so its report
 // comes with the answer (DECISIONS.md, "Szybkie Polowanie").
 export async function quickHunt(context) {
   const { session, player } = await requireIdlePlayer(context);
   const rules = content.balance.quickHunt;
-  if (player.row.level < rules.level) throw new ApiError(403, 'locked', `Szybkie Polowanie odblokujesz na poziomie postaci ${rules.level}.`);
+  if (!isUnlocked('quick-hunts', player.row.level, content)) {
+    throw new ApiError(403, 'locked', `Szybkie Polowanie odblokujesz na poziomie postaci ${content.unlocksById['quick-hunts'].level}.`);
+  }
   const now = context.now;
   const used = quickHuntsUsed(player.row, now);
   if (used >= rules.perDay) throw new ApiError(409, 'no_quick_hunts', 'Szybkie Polowania na dziś się skończyły. Nowe od północy.');

@@ -162,14 +162,16 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/hunts/cancel` | przerwij trwającą eksplorację, zbieranie, warzenie albo wyrób; przerwane warzenie i wyrób zwracają `report` gotowych mikstur albo przedmiotów (`null`, gdy nic nie było gotowe), a zioła albo części i zasoby na resztę wracają |
 | POST | `/api/hunts/claim` | odbierz raport zakończonej eksploracji, zbierania, warzenia albo wyrobu |
 | POST | `/api/hunts/quick` | Szybkie Polowanie: te same pola co `POST /api/hunts` bez `minutes`; wyprawa jak na `quickHunt.minutes` minut z `data/balance.json` kończy się od razu i zwraca `report`; od poziomu `quickHunt.level`, `quickHunt.perDay` razy na dzień w Polsce (403 `locked`; 409 `no_quick_hunts`, `busy`) |
-| GET | `/api/chat?channel=global&after=<id>&from=<id>` | Czat: najnowsze wiadomości kanału po `after` (bez zdjętych i bez wiadomości ukrytych graczy), `hidden` (zdjęte od `from` do `after`), `rulesAccepted`, `mutedUntil`, `blocked` (ukryci gracze); konto autora dostaje też `reports` |
+| GET | `/api/chat?channel=global&after=<id>&from=<id>` | Czat, od poziomu postaci z wpisu `community` w `data/unlocks.json` (403 `locked` na wszystkich `/api/chat`): najnowsze wiadomości kanału po `after` (bez zdjętych i bez wiadomości ukrytych graczy), każda z `role` autora (`admin`, `moderator` albo `null`), `hidden` (zdjęte od `from` do `after`), `rulesAccepted`, `mutedUntil`, `blocked` (ukryci gracze), `role` konta; moderacja dostaje też `reports` |
 | POST | `/api/chat` | wiadomość `text` na kanał `channel`, do `rules.maxLength` znaków z `data/chat.json`, bez linków, z gwiazdkami zamiast słów z `words`; zwraca `message` (400 `empty`, `too_long`, `link`; 403 `rules`, `muted`; 404 `no_character`; 429 `too_fast`) |
 | POST | `/api/chat/rules` | konto przyjmuje zasady czatu |
 | POST | `/api/chat/report` | zgłoś wiadomość `messageId`; po `rules.hideAfterReports` zgłoszeniach znika do decyzji autora (400 `own`; 404 `no_message`) |
 | POST | `/api/chat/block` | ukryj wiadomości konta, które napisało `messageId`; zwraca `blocked` (400 `own`) |
 | POST | `/api/chat/unblock` | pokaż znów gracza `id` z `blocked` |
-| POST | `/api/author/chat` | tylko autor: decyzja `action` (`hide`, `keep`, `muteDay`, `muteForever`) o wiadomości `messageId` |
+| GET | `/api/chat/reports` | moderacja (admin i moderatorzy): wiadomości ze zgłoszeniami do decyzji, `login` piszącego tylko dla admina (404 dla innych) |
+| POST | `/api/chat/moderate` | moderacja: decyzja `action` (`hide`, `keep`, `muteDay`, `muteForever`) o wiadomości `messageId`; moderator nie decyduje o wiadomościach moderacji (403 `protected`) |
 | POST | `/api/author/chat/unmute` | tylko autor: konto `login` może znów pisać na czacie |
+| POST | `/api/author/chat/moderator` | tylko autor: konto `login` zostaje moderatorem czatu (`moderator: true`) albo przestaje nim być |
 | POST | `/api/professions/gather` | tylko z profesjami (`PROFESSIONS` = `"on"`): Zielarstwo, `herbs` (znane zioła, naraz tyle, ile pozwala poziom) i `minutes` (10–480 co 10) (400 `invalid_herbs`, `too_many_herbs`, `unknown_herb`, `invalid_duration`; 403 `locked`) |
 | POST | `/api/herbs/sell` | złomiarz kupuje `count` sztuk zioła `herbId`; zwraca `sold` (400 `unknown_herb`, `invalid_count`; 404 `no_herb`) |
 | POST | `/api/herbs/discard` | wyrzuć `count` sztuk zioła `herbId` |

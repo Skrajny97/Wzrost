@@ -166,7 +166,6 @@
     "emailSystemPoints": 10
   },
   "quickHunt": {
-    "level": 5,
     "perDay": 3,
     "minutes": 15
   }

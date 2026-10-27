@@ -1001,11 +1001,10 @@
     },
     "quickHunt": {
       "type": "object",
-      "description": "Szybkie Polowanie: od poziomu postaci level, perDay razy na dzień (w Polsce, od północy), wyprawa jak na minutes minut w wybranym regionie wewnętrznym, z raportem od razu.",
+      "description": "Szybkie Polowanie: od poziomu postaci z wpisu quick-hunts w unlocks.json, perDay razy na dzień (w Polsce, od północy), wyprawa jak na minutes minut w wybranym regionie wewnętrznym, z raportem od razu.",
       "additionalProperties": false,
-      "required": ["level", "perDay", "minutes"],
+      "required": ["perDay", "minutes"],
       "properties": {
-        "level": { "type": "integer", "minimum": 1 },
         "perDay": { "type": "integer", "minimum": 1 },
         "minutes": { "type": "integer", "minimum": 1 }
       }

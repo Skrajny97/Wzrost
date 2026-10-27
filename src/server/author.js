@@ -1,6 +1,6 @@
-// The author's panel: how many accounts and characters the game has, every
-// account with its e-mail, its character and its silence in the chat, and
-// the chat's reported messages. Only the author's account
+// The author's panel: how many accounts and characters the game has, and
+// every account with its e-mail, its character, its silence in the chat and
+// whether it moderates the chat. Only the author's account
 // sees it (AUTHOR_LOGINS in wrangler.jsonc), and only once it is bound to
 // Google, so that no password opens it (accounts.js); anyone else gets "not
 // found". The e-mail is the one Google confirmed: an account made with
@@ -27,7 +27,7 @@ export async function authorPanel(context) {
   if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const db = context.env.DB;
   const since = context.now - DAY;
-  const [counts, rows, reports] = await db.batch([
+  const [counts, rows] = await db.batch([
     db
       .prepare(
         `SELECT
@@ -39,24 +39,13 @@ export async function authorPanel(context) {
       )
       .bind(since, since),
     db.prepare(
-      `SELECT u.login, u.email, u.google_sub IS NOT NULL AS google, u.email_confirmed_at IS NOT NULL AS email_confirmed, u.created_at, u.chat_muted_until,
+      `SELECT u.login, u.email, u.google_sub IS NOT NULL AS google, u.email_confirmed_at IS NOT NULL AS email_confirmed, u.created_at, u.chat_muted_until, u.chat_moderator,
          c.name, c.class_id, c.level, c.class_level, c.created_at AS character_created_at
        FROM users u LEFT JOIN characters c ON c.user_id = u.id AND c.role = 'player'
        ORDER BY u.created_at DESC, u.id DESC
        LIMIT 1000`,
     ),
-    // The chat's messages with reports the author has not decided on yet,
-    // the longest waiting first (chat.js).
-    db.prepare(
-      `SELECT m.id, m.name, m.text, m.created_at, m.hidden_at, u.login, u.chat_muted_until, COUNT(*) AS reports, MIN(r.created_at) AS reported_at
-       FROM chat_reports r JOIN chat_messages m ON m.id = r.message_id JOIN users u ON u.id = m.user_id
-       WHERE r.closed_at IS NULL
-       GROUP BY m.id
-       ORDER BY reported_at
-       LIMIT 100`,
-    ),
   ]);
-  const muted = (until) => (until > context.now ? until : null);
   const total = counts.results[0];
   return json({
     counts: {
@@ -80,18 +69,10 @@ export async function authorPanel(context) {
         classLevel: row.class_level,
         createdAt: row.character_created_at,
       },
-      chatMutedUntil: muted(row.chat_muted_until),
-    })),
-    chatReports: reports.results.map((row) => ({
-      messageId: row.id,
-      name: row.name,
-      login: row.login,
-      text: row.text,
-      createdAt: row.created_at,
-      hidden: row.hidden_at !== null,
-      reports: row.reports,
-      reportedAt: row.reported_at,
-      mutedUntil: muted(row.chat_muted_until),
+      // The chat (chat.js): until when the account may not write, and
+      // whether it moderates.
+      chatMutedUntil: row.chat_muted_until > context.now ? row.chat_muted_until : null,
+      chatModerator: row.chat_moderator === 1,
     })),
   });
 }
