@@ -1,21 +1,25 @@
 // The Społeczność tab, from character level 5: for now the chat
-// (src/server/chat.js), in its only channel so far, Globalny. While the chat
-// is open and the page is in front, it asks for new messages every few
-// seconds, and less often the longer nothing comes. A tap on someone else's
-// message opens its sheet: report it, or hide that player's messages. The
-// moderation (the admin and the moderators, marked by their names) also
-// takes it down or silences its writer there, and has the reports in a
-// sheet of their own. The rules come before the first message, and the
-// hidden players wait under the chat to be shown again.
+// (src/server/chat.js), in its only channel so far, Globalny, the newest
+// messages on top, under the line to write in. While the chat is open and
+// the page is in front, it asks for new messages every few seconds, and
+// less often the longer nothing comes. A tap on a name shows that character
+// (profile.js); a tap on someone else's message opens its sheet: report it,
+// or hide that player's messages. The moderation (the admin and the
+// moderators, marked by their names) also takes it down or silences its
+// writer there, and has the reports in a sheet of their own. The rules come
+// before the first message, and the hidden players wait under the chat to
+// be shown again.
 
 import { $, fill, h, icon } from '../dom.js';
 import { dateTimeFormat, timeFormat } from '../format.js';
+import { chatSeen } from '../chat-news.js';
 import { CLASS_ICONS } from '../icons.js';
+import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, openSheet, pageHeading, toast, withButton } from '../ui.js';
 import { lockedScreen } from './locked.js';
 
-// The most messages the page keeps; older ones leave from the top.
+// The most messages the page keeps; older ones leave from the bottom.
 const SHOWN = 200;
 
 // A silence "na stałe" (chat.js).
@@ -67,50 +71,55 @@ export function mountCommunity(container, context) {
     container,
     pageHeading('Społeczność', `Czat: ${chat.channels[0].name}`),
     notices,
+    footer,
     empty,
     list,
-    footer,
     hidden,
   );
-
-  const atBottom = () => window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
-  const toBottom = () => window.scrollTo({ top: document.documentElement.scrollHeight });
 
   function messageItem(message) {
     const time = new Date(message.createdAt);
     const today = time.toDateString() === new Date(serverNow()).toDateString();
-    const parts = [
+    return h(
+      'li',
+      { class: message.own ? 'chat-message chat-message--own' : 'chat-message', 'data-id': String(message.id) },
       h(
-        'span',
+        'div',
         { class: 'chat-head' },
         icon(CLASS_ICONS[message.classId] ?? 'person', { size: 14, className: 'chat-class' }),
-        h('strong', { class: 'chat-name', text: message.name }),
+        h('button', {
+          type: 'button',
+          class: 'chat-name',
+          text: message.name,
+          'aria-label': `${message.name}: zobacz postać`,
+          onClick: (event) => withButton(event.currentTarget, () => openProfile(message.name)),
+        }),
         message.role && h('span', { class: `chat-role chat-role--${message.role}`, text: `(${message.role})` }),
         h('span', { class: 'chat-level', text: `poz. ${message.level}` }),
         h('time', { class: 'chat-time', datetime: time.toISOString(), text: (today ? timeFormat : dateTimeFormat).format(time) }),
       ),
-      h('span', { class: 'chat-text', text: message.text }),
-    ];
-    return h(
-      'li',
-      { class: message.own ? 'chat-message chat-message--own' : 'chat-message', 'data-id': String(message.id) },
-      message.own ? h('div', { class: 'chat-body' }, parts) : h('button', { type: 'button', class: 'chat-body', onClick: () => actions(message) }, parts),
+      message.own
+        ? h('p', { class: 'chat-text', text: message.text })
+        : h('button', { type: 'button', class: 'chat-text chat-text--button', text: message.text, onClick: () => actions(message) }),
     );
   }
 
-  // New messages at the bottom, the oldest over the limit gone from the top.
+  // New messages on top, the oldest over the limit gone from the bottom.
+  // Someone reading further down keeps the same messages in view.
   function add(fresh) {
     const known = new Set(messages.map((message) => message.id));
     const added = fresh.filter((message) => !known.has(message.id));
     if (added.length === 0) return false;
-    const follow = messages.length === 0 || atBottom() || added.some((message) => message.own);
+    const below = list.getBoundingClientRect().top < 0;
+    const height = list.offsetHeight;
     messages.push(...added);
-    list.append(...added.map(messageItem));
+    list.prepend(...[...added].reverse().map(messageItem));
     while (messages.length > SHOWN) {
       messages.shift();
-      list.firstElementChild?.remove();
+      list.lastElementChild?.remove();
     }
-    if (follow) toBottom();
+    if (below) window.scrollBy(0, list.offsetHeight - height);
+    chatSeen(messages.at(-1).id);
     return true;
   }
 
@@ -229,6 +238,7 @@ export function mountCommunity(container, context) {
       h(
         'div',
         { class: 'chat-sheet-actions' },
+        act('Zobacz postać', () => openProfile(message.name)),
         act(
           'Zgłoś',
           async () => {

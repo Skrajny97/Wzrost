@@ -144,6 +144,20 @@ export async function readChat(context) {
   });
 }
 
+// GET /api/chat/latest: the newest message someone else wrote that this
+// player may read, for the light on the Społeczność tab.
+export async function latestChat(context) {
+  const { session, db } = await requireChatter(context);
+  const row = await db
+    .prepare(
+      `SELECT MAX(id) AS id FROM chat_messages
+       WHERE channel = ? AND hidden_at IS NULL AND user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)`,
+    )
+    .bind(content.chat.channels[0].id, session.userId, session.userId)
+    .first();
+  return json({ latest: row.id ?? 0 });
+}
+
 // POST /api/chat/rules: the player accepts the rules of the chat.
 export async function acceptChatRules(context) {
   const { session, db } = await requireChatter(context);

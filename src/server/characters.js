@@ -54,6 +54,7 @@ import {
   campLevel,
   xpToNext,
 } from '../engine/index.js';
+import { chatRole } from './chat.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
@@ -754,6 +755,54 @@ export function characterView(player, now) {
 export async function getCharacter(context) {
   const { player } = await requirePlayer(context);
   return json({ character: characterView(player, context.now) });
+}
+
+// GET /api/profile/:name: another player's character as everyone may see
+// it, from a tap on its name in the chat: its look, levels, what it wears
+// and the skills it has learned, with its account's role in the chat.
+export async function characterProfile(context) {
+  await requirePlayable(context);
+  const db = context.env.DB;
+  const name = String(context.params.name ?? '');
+  const found = await db
+    .prepare("SELECT c.user_id, u.login, u.google_sub, u.chat_moderator FROM characters c JOIN users u ON u.id = c.user_id WHERE c.name_key = ? AND c.role = 'player'")
+    .bind(nameKey(name))
+    .first();
+  if (!found) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
+  const view = characterView(await loadPlayer(db, found.user_id), context.now);
+  const worn = (item) =>
+    item && {
+      name: item.name,
+      base: item.base,
+      slot: item.slot,
+      slotName: item.slotName,
+      level: item.level,
+      upgrade: item.upgrade,
+      rarity: item.rarity,
+      rarityName: item.rarityName,
+      color: item.color,
+      properties: item.properties,
+      classNames: item.classNames,
+      classLevel: item.classLevel,
+    };
+  return json({
+    profile: {
+      name: view.name,
+      classId: view.classId,
+      className: view.className,
+      appearance: view.appearance,
+      skin: view.skin,
+      level: view.level,
+      classLevel: view.classLevel,
+      role: chatRole(context.env, found),
+      equipment: content.slots.map((slot) => ({ slot: slot.id, slotName: slot.name, item: worn(view.equipment[slot.id]) })),
+      skills: view.skills.pools.flatMap((pool) =>
+        pool.options
+          .filter((skill) => skill.state === 'main' || skill.state === 'second')
+          .map(({ id, name: skillName, level, maxLevel, state, effect }) => ({ id, name: skillName, level, maxLevel, path: state, effect })),
+      ),
+    },
+  });
 }
 
 // A new character starts without gear: its first comes from the hunts. The

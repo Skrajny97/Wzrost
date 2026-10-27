@@ -5,6 +5,7 @@
 // character bar with its own background.
 
 import { materialSprite, narratorFace } from './art.js';
+import { chatNews } from './chat-news.js';
 import { $, fill, h, icon } from './dom.js';
 import { countOf, formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
 import { RESOURCE_ICONS, SYSTEM_POINTS_ICON } from './icons.js';
@@ -286,6 +287,7 @@ export function updateTopbar(now = serverNow()) {
   topbar.campLabel.textContent = busy ? formatCountdown(building.endsAt - now) : 'Obóz';
   const labels = [busy && `budowa: ${building.name}`, ready && 'pełny magazyn'].filter(Boolean);
   topbar.camp.setAttribute('aria-label', labels.length > 0 ? `Obóz, ${labels.join(', ')}` : 'Obóz');
+  updateNavTimers(now);
   topbar.hp.set(currentHp(character, now), character.maxHp);
   topbar.mana.set(character.mana, character.maxMana);
   topbar.xp.set(character.xp, character.xpToNext);
@@ -320,13 +322,21 @@ export function updateTopbar(now = serverNow()) {
 }
 
 // Builds a bottom bar; `active` is the id of the highlighted tab.
-// Free stat points light Postać and Statystyki with a gold dot, and a skill to
-// choose or a Skill Point to spend lights Postać and Umiejętności, as a
+// Free stat points light Postać and Statystyki with a gold dot, a skill to
+// choose or a Skill Point to spend lights Postać and Umiejętności, and a
+// message someone wrote in the chat lights Społeczność (chat-news.js), as a
 // quest's reward lights the narrator's face in the top bar.
 const pointsWaiting = () => (state.character?.freePoints ?? 0) > 0 && isUnlocked('stats');
 const skillsWaiting = () => Boolean(state.character?.skills?.ready) && isUnlocked('skills');
-const WAITING = { postac: () => pointsWaiting() || skillsWaiting(), stats: pointsWaiting, skills: skillsWaiting };
-const waitingText = (id) => (id === 'skills' || (id === 'postac' && !pointsWaiting()) ? 'umiejętność czeka' : 'wolne punkty do rozdania');
+// While the character explores, the Walka tab counts its time down in the
+// System's light, as the camp counts a build; then a dot says the report
+// waits (updateNavTimers, every second).
+const hunt = () => (state.character?.activity?.kind === 'hunt' ? state.character.activity : null);
+const reportWaiting = () => Boolean(hunt()) && activityFinished(hunt());
+const WAITING = { postac: () => pointsWaiting() || skillsWaiting(), stats: pointsWaiting, skills: skillsWaiting, spolecznosc: chatNews, walka: reportWaiting };
+const WAITING_TEXTS = { spolecznosc: 'nowe wiadomości na czacie', walka: 'raport czeka' };
+const waitingText = (id) =>
+  WAITING_TEXTS[id] ?? (id === 'skills' || (id === 'postac' && !pointsWaiting()) ? 'umiejętność czeka' : 'wolne punkty do rozdania');
 
 function navButton(tab, active, onBack) {
   const unlocked = !tab.unlock || isUnlocked(tab.unlock);
@@ -358,5 +368,21 @@ export function updateNav({ kind, active, onBack }) {
   character.hidden = kind !== 'character';
   if (kind === 'main') fill(main, ...MAIN_TABS.map((tab) => navButton(tab, active)));
   else fill(character, ...CHARACTER_TABS.map((tab) => navButton(tab, active, onBack)));
+  updateNavTimers();
+}
+
+// The time left of the exploration on the Walka tab, and its dot once the
+// report waits.
+export function updateNavTimers(now = serverNow()) {
+  const item = $('#nav-main .nav-item[href="#/walka"]');
+  const label = item && $('.nav-label', item);
+  if (!label) return;
+  const activity = hunt();
+  const running = Boolean(activity) && !activityFinished(activity, now);
+  const ready = Boolean(activity) && !running;
+  item.classList.toggle('nav-item--busy', running);
+  item.classList.toggle('nav-item--ready', ready);
+  label.textContent = running ? formatCountdown(activity.endsAt - now) : 'Walka';
+  item.setAttribute('aria-label', running ? `Walka, eksploracja: ${label.textContent}` : ready ? 'Walka, raport czeka' : 'Walka');
 }
 

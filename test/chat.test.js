@@ -183,6 +183,37 @@ describe('Czat', () => {
     assert.equal((await call('GET', '/api/chat/reports', { cookie: players.ola })).status, 404);
   });
 
+  test('a tap on a name shows that character: its levels, what it wears and its skills', async () => {
+    const database = await db();
+    const ala = await database.prepare("SELECT id FROM characters WHERE name = 'Ala'").first();
+    const skill = content.skills.find((entry) => entry.classId === 'mage' && entry.classLevel === 10);
+    await database.prepare('UPDATE characters SET class_level = 10, skills = ? WHERE id = ?').bind(JSON.stringify({ [skill.id]: 3 }), ala.id).run();
+    await database
+      .prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, 0)')
+      .bind(ala.id, 'head', JSON.stringify({ base: 'helmet', slot: 'head', level: 1, rarity: 'common', affixes: [], armor: 6, upgrade: 2 }))
+      .run();
+    const { profile } = (await call('GET', `/api/profile/${encodeURIComponent('ala')}`, { cookie: players.ola })).data;
+    assert.deepEqual([profile.name, profile.className, profile.level, profile.classLevel, profile.role], ['Ala', 'Mag', 5, 10, null]);
+    assert.equal(profile.equipment.length, content.slots.length);
+    const head = profile.equipment.find((entry) => entry.slot === 'head').item;
+    assert.deepEqual([head.base, head.upgrade, head.rarity], ['helmet', 2, 'common']);
+    assert.ok(head.properties.length > 0);
+    assert.equal(head.price, undefined);
+    assert.equal(profile.equipment.find((entry) => entry.slot === 'weapon').item, null);
+    assert.deepEqual(profile.skills.map(({ id, level, path }) => [id, level, path]), [[skill.id, 3, 'main']]);
+    assert.equal(profile.gold, undefined);
+    assert.equal((await call('GET', '/api/profile/Nikt', { cookie: players.ola })).data.error.code, 'no_character');
+  });
+
+  test('the Społeczność tab hears of the newest message someone else wrote', async () => {
+    const latest = async (cookie) => (await call('GET', '/api/chat/latest', { cookie })).data.latest;
+    assert.equal(await latest(players.ala), 0);
+    const { message } = (await send(players.ola, 'Hej!')).data;
+    assert.deepEqual([await latest(players.ala), await latest(players.ola)], [message.id, 0]);
+    await call('POST', '/api/chat/block', { cookie: players.ala, body: { messageId: message.id } });
+    assert.equal(await latest(players.ala), 0);
+  });
+
   test('the channel keeps its last messages and the reported ones, and they go with the character', async () => {
     const database = await db();
     const { message } = (await send(players.ola, 'Zgłoszona')).data;

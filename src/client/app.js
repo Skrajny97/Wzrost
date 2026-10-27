@@ -15,6 +15,7 @@ import { mountCamp } from './screens/camp.js';
 import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
 import { mountCommunity } from './screens/community.js';
+import { checkChat, onChatNews } from './chat-news.js';
 import { renderCreate } from './screens/create.js';
 import { mountJournal } from './screens/journal.js';
 import { lockedScreen } from './screens/locked.js';
@@ -220,7 +221,9 @@ function openGame() {
     watchConstruction(now);
     watchCrafting(now);
     watchQuests(now);
+    checkChat();
   }, 1000);
+  checkChat({ now: true });
 }
 
 // When a camp upgrade ends, the character is fetched again (new levels,
@@ -345,7 +348,13 @@ document.addEventListener('visibilitychange', () => {
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && state.character && !views.game.hidden) {
     call('GET', '/api/character').catch((error) => toast(error.message));
+    checkChat({ now: true });
   }
+});
+
+// Someone wrote in the chat, or the player read it: the bar shows it.
+onChatNews(() => {
+  if (!views.game.hidden) renderNav();
 });
 
 window.addEventListener('hashchange', route);

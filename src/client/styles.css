@@ -1255,6 +1255,17 @@ button {
   color: var(--gold);
 }
 
+/* The Walka tab while the character explores: the time left in its label. */
+.nav-item--busy,
+.nav-item--busy .nav-icon {
+  color: var(--system);
+}
+
+.nav-item--busy .nav-label {
+  font-family: var(--font-system);
+  font-variant-numeric: tabular-nums;
+}
+
 .nav-item--ready .nav-icon::after {
   content: '';
   position: absolute;
@@ -5363,22 +5374,29 @@ a.camp-level-button {
   display: none;
 }
 
-.chat-body {
+.chat-message {
   display: grid;
   gap: 2px;
-  width: 100%;
   padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 4px;
   background: var(--surface);
-  color: var(--text);
-  font: inherit;
-  text-align: left;
 }
 
-.chat-message--own .chat-body {
+.chat-message--own {
   border-color: var(--system-line);
   background: rgba(143, 227, 239, 0.06);
+}
+
+/* The name shows the character; the text of someone else's message opens
+   its sheet. */
+.chat-name,
+.chat-text--button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
 }
 
 .chat-head {
@@ -5396,9 +5414,13 @@ a.camp-level-button {
 
 .chat-name {
   overflow: hidden;
+  min-height: 32px;
   color: var(--gold);
   font-family: var(--font-world);
   font-size: 15px;
+  font-weight: 700;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -5487,19 +5509,12 @@ a.camp-level-button {
 }
 
 .chat-text {
+  width: 100%;
+  margin: 0;
+  color: var(--text);
   font-size: 15px;
   line-height: 1.35;
   overflow-wrap: anywhere;
-}
-
-.chat-footer:has(.chat-form) {
-  position: sticky;
-  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
-  z-index: 5;
-  margin: 0 calc(var(--gutter) * -1);
-  padding: 8px var(--gutter);
-  border-top: 1px solid var(--system-line);
-  background: rgba(13, 17, 11, 0.97);
 }
 
 .chat-form {
@@ -5574,6 +5589,95 @@ a.camp-level-button {
   display: grid;
   gap: 8px;
   margin-top: 12px;
+}
+
+/* Another player's character (profile.js). */
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 40px;
+}
+
+.profile-portrait {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 96px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+
+.profile-portrait .sprite--portrait {
+  width: 72px;
+  height: auto;
+}
+
+.profile-title {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.profile-levels {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.profile-section {
+  margin: 16px 0 8px;
+  font-size: 16px;
+}
+
+.profile-items,
+.profile-skills {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.profile-item summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.profile-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.profile-item .item-properties {
+  margin: 6px 0 4px 34px;
+}
+
+.profile-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.profile-skill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-skill-text {
+  display: grid;
+  gap: 2px;
+}
+
+.profile-skill-meta {
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 .chat-sheet-label {

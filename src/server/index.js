@@ -7,10 +7,10 @@ import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyParts, cancelBuilding, collectProduction, startBuilding, tradeAtFire } from './camp.js';
-import { acceptChatRules, blockInChat, chatReports, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
+import { acceptChatRules, blockInChat, chatReports, latestChat, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
 import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
-import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, setSkin, spendPoints } from './characters.js';
+import { autoPoints, characterProfile, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, setSkin, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
@@ -45,6 +45,7 @@ const routes = [
   ['POST', '/api/author/chat/moderator', setModerator],
   ['GET', '/api/content', () => json(publicContent())],
   ['GET', '/api/character', getCharacter],
+  ['GET', '/api/profile/:name', characterProfile],
   ['POST', '/api/character', createCharacter],
   ['DELETE', '/api/character', deleteCharacter],
   ['POST', '/api/character/points', spendPoints],
@@ -89,6 +90,7 @@ const routes = [
   ['POST', '/api/camp/trade', tradeAtFire],
   ['POST', '/api/camp/buy', buyParts],
   ['GET', '/api/chat', readChat],
+  ['GET', '/api/chat/latest', latestChat],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],
   ['POST', '/api/chat/report', reportChat],
