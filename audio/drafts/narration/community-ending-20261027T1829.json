@@ -1,0 +1,17 @@
+{
+  "id": "community-ending",
+  "payload": {
+    "text": "A gdy zabraknie Ci czasu na długą wyprawę, sięgnij po Szybkie Polowanie. Czeka w Walce, pod „Wyrusz” – trzy razy dziennie. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/community-ending-20261027T1829-0.mp3",
+    "audio/drafts/narration/community-ending-20261027T1829-1.mp3"
+  ],
+  "credits": 262
+}

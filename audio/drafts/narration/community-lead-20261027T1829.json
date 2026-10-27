@@ -1,0 +1,17 @@
+{
+  "id": "community-lead",
+  "payload": {
+    "text": "W tej zakładce czekają inni wędrowcy. Zajrzyjmy do nich. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/community-lead-20261027T1829-0.mp3",
+    "audio/drafts/narration/community-lead-20261027T1829-1.mp3"
+  ],
+  "credits": 130
+}
