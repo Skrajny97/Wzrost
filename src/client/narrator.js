@@ -27,7 +27,7 @@ import { $, fill, h, icon } from './dom.js';
 import { motionOn } from './motion.js';
 import { duckMusic } from './music.js';
 import { rod, roll, stopRoll } from './parchment.js';
-import { narratorVoiceOn, playNarration, playSound, preloadNarration, stopNarration } from './sound.js';
+import { narrationWaits, narratorVoiceOn, playNarration, playSound, preloadNarration, stopNarration } from './sound.js';
 import { activityFinished, call, isUnlocked, state } from './state.js';
 import { toast } from './ui.js';
 
@@ -336,6 +336,16 @@ export function narrate(hash = place) {
     }
     if (Date.now() < pause.at) return;
   }
+  // A chapter begins when the game is opened, often before anything was
+  // touched, and the browser lets no sound out until then: its line with a
+  // recording waits for that first touch, so it is heard from the start. The
+  // touch does what it was for first, e.g. opens a tab.
+  if (line.chapter && told(line).voice && !touched && narrationWaits()) {
+    stopLight();
+    aim([]);
+    release(0);
+    return;
+  }
   if (line.kind === 'card') {
     stopLight();
     aim([]);
@@ -448,6 +458,18 @@ function speak(line, onStart) {
 }
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// The first touch of the page lets the sound out (app.js), and a chapter's
+// line that waited for it comes a moment later.
+const AFTER_TOUCH = 400;
+let touched = false;
+function firstTouch() {
+  if (touched) return;
+  touched = true;
+  setTimeout(() => narrate(), AFTER_TOUCH);
+}
+document.addEventListener('pointerdown', firstTouch, { capture: true });
+document.addEventListener('keydown', firstTouch, { capture: true });
 
 // The card: the figure above a scroll in the middle of the screen. A card
 // from the author of the game (speaker "author") has no figure.

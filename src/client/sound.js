@@ -297,6 +297,10 @@ function readVoice() {
 
 export const narratorVoiceOn = () => voiceOn;
 
+// The voice would be heard, but the browser has not let the sound out yet:
+// nothing was touched since the page opened.
+export const narrationWaits = () => voiceOn && volume > 0 && context?.state !== 'running';
+
 export function setNarratorVoice(on) {
   voiceOn = on;
   try {
