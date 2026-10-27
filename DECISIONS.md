@@ -2186,3 +2186,27 @@ Autor: „Dodaj też opcję Wymiana po kliknięciu na Postać innego gracza lub 
     - Punkty Systemu, przyszła waluta za pieniądze, i Punkty Czasu nie wchodzą do wymiany, żeby nie dało się nimi handlować poza grą. Surowce obozu, materiały i części też nie, bo nie było ich na liście autora.
     Złoto przechodzi bez ograniczeń, więc gracz z dwoma kontami może przesłać złoto nowej postaci. Wymaga to jednak obu graczy online i obu postaci w obozie.
 11. **Migracja 0044**: tabele `trades` (stan, obie oferty, `version`, kto zatwierdził) i `trade_blocks`, a w `users` kolumny `trade_off` i `seen_at`. „Zacznij od nowa” i usunięcie konta usuwają też wymiany postaci, a usunięcie konta i blokady.
+
+## Rzemieślnictwo, krok 2: ulepszone wyroby, zwoje, wzory z rozbiórki i dzienny limit części (27.10.2026)
+
+Krok 2 z planu w „Rzemieślnictwo: odpowiedzi autora” (R8, R14–R19), na razie tylko w wersji testowej (`CRAFTING` w grze jest dalej `"off"`). Liczby to propozycja do zmiany przez autora.
+
+1. **Ulepszone wyroby** (R8, R17). Od 10. poziomu Rzemieślnictwa wyrób może wyjść od razu ulepszony (`upgrades` w `workshop` w `data/professions.json`):
+    - +1 od 10. poziomu: 10%, rośnie o 0,5 pkt proc. na poziom, do 40%;
+    - +2 od 25.: 5%, +0,25 pkt na poziom, do 20%;
+    - +3 od 40.: 3%, +0,15 pkt, do 10%;
+    - +4 od 60.: 2%, +0,1 pkt, do 5%;
+    - +5 od 80.: 1%, +0,05 pkt, do 2%.
+    Serwer losuje od najwyższego ulepszenia w dół, a pierwsze, które wypadnie, zostaje. Na 100. poziomie ok. 60% wyrobów wychodzi ulepszonych, w tym 2% na +5. Warsztat pokazuje te szanse nad przyciskiem „Zacznij wyrób”. Poniżej 10. poziomu serwer niczego nie losuje, więc wyroby z kroku 1 się nie zmieniają.
+2. **Zwój ochronny** (R18). Od 25. poziomu Warsztat ma kartę „Zwój ochronny”. Jeden zwój to 2 Odłamki i godzina na 1. poziomie, krócej z poziomem jak przy wyrobie (45,6 minuty na 25. poziomie). Jedno zlecenie ma od 1 do 5 zwojów. Zwój zawsze się udaje, nie bierze zasobów obozu ani miejsca w plecaku i nie liczy się do zadań „Wykonaj…”. Postać trzyma zwoje w liczniku `scrolls`.
+3. **Zwój na Kowadle.** Gdy przedmiot może się rozpaść (od +7), karta przedmiotu ma pole „Użyj Zwoju ochronnego (masz N)”. Pole jest domyślnie puste, żeby zwój nie przepadł bez woli gracza. Zwój przepada przy próbie. Rozpad staje się zwykłą porażką ze spadkiem o poziom, a gracz widzi: „Zwój ochronny uchronił przedmiot przed rozpadem.”. Poniżej +7 zwój nie jest potrzebny i serwer go nie bierze.
+4. **Wzory z rozbiórki** (R14). Rozebranie przedmiotu późniejszej bazy (od 10. poziomu klasy, np. Pałasza) od razu odsłania jej wzór w Warsztacie, bez czekania na 10. poziom profesji (`patterns`). Karta przedmiotu zapowiada to przy Rozbiórce, a kafelek wzoru ma dopisek „z rozbiórki”. Wzór dochodzi tylko wtedy, gdy Rzemieślnictwo jest włączone.
+5. **Rozbiórka wyrobu** (R19). Wyrób pamięta, ile części zużył i z jakim ulepszeniem wyszedł (`crafted`). Na Stole rozbiórki oddaje połowę tych części, zaokrągloną w dół, i po jednej za każde ulepszenie z Kowadła ponad to z Warsztatu. Łup rozbiera się jak dotąd.
+6. **Ceny złomiarza** (R16):
+    - Wyrób bierze o jedną część więcej co 10 poziomów przedmiotu (`partsLevelStep`): miecz na 1. poziomie 6 części, na 15. poziomie 7, na 500. poziomie 56. Zasoby obozu liczą się dalej od części slotu.
+    - Złomiarz płaci za wyrób jak za łup tej rzadkości. Za ulepszenia, z którymi wyrób wyszedł, nie dopłaca, bo nikt za nie nie płacił złotem.
+    - Test sprawdza zasadę autora: części na wyrób kosztują w Skupie złomu więcej, niż złomiarz za niego płaci, dla każdej rzadkości, slotu, poziomu Skupu i poziomu przedmiotu od 1 do 510.
+    - Bez dodatkowych części na wysokich poziomach zasada by nie działała. Np. rękawice na 500. poziomie kosztowały 3 części za 69 złota, a złomiarz płaciłby za nie 1000 złota.
+7. **Dzienny limit części** (R15, autor: „30-20-10 itd.”). Złomiarz sprzeda postaci dziennie najwyżej 30 Ścinków, 20 Rzemieni, 10 Okuć, 5 Odłamków, 3 Bursztyny, 2 Krwawniki i 1 Gwiezdny odprysk (`daily` w `data/buildings.json`). Doba liczy się od północy czasu polskiego, jak u ducha ognia. Przy każdej części lada pokazuje „Dziś zostało: N z M”, a przyciski zakupu ponad limit są wyłączone.
+8. **Migracja 0045**: w `characters` kolumny `scrolls`, `patterns`, `shop_day` i `shop_parts`.
+9. **Co zostaje na krok 3:** nowa nazwa Stołu rzemieślniczego z kwestią narratora, tło Warsztatu, dźwięki młota i nieudanego wyrobu, objaśnienie narratora na 15. poziomie i komunikat Systemu. Każda z tych rzeczy czeka na zatwierdzenie autora, a Rzemieślnictwo trafi do gry po nich.

@@ -125,6 +125,23 @@
     "fastest": 0.5,
     "maxCount": 5,
     "laterPatternLevel": 10,
+    "partsLevelStep": 10,
+    "upgrades": [
+      { "upgrade": 1, "level": 10, "chance": 0.1, "perLevel": 0.005, "max": 0.4 },
+      { "upgrade": 2, "level": 25, "chance": 0.05, "perLevel": 0.0025, "max": 0.2 },
+      { "upgrade": 3, "level": 40, "chance": 0.03, "perLevel": 0.0015, "max": 0.1 },
+      { "upgrade": 4, "level": 60, "chance": 0.02, "perLevel": 0.001, "max": 0.05 },
+      { "upgrade": 5, "level": 80, "chance": 0.01, "perLevel": 0.0005, "max": 0.02 }
+    ],
+    "scroll": {
+      "id": "ward-scroll",
+      "name": "Zwój ochronny",
+      "level": 25,
+      "part": "shards",
+      "parts": 2,
+      "minutes": 60,
+      "description": "Zwój Systemu do Kowadła. Przy ulepszaniu od +7 wzwyż chroni przedmiot przed rozpadem, ale nie przed spadkiem ulepszenia."
+    },
     "chancePerLevel": 0.005,
     "maxChance": 0.95,
     "rarities": [

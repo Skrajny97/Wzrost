@@ -472,7 +472,9 @@ function salvageSection(item, busy) {
     const button = event.currentTarget;
     const sure = await confirmAction({
       title: 'Rozebrać przedmiot?',
-      text: `${itemTitle(item)} zniknie, a stół zrobi z niego: ${salvage.part} ×${salvage.parts}, w ${formatMinutes(salvage.minutes)}.`,
+      text: `${itemTitle(item)} zniknie, a stół zrobi z niego: ${salvage.part} ×${salvage.parts}, w ${formatMinutes(salvage.minutes)}.${
+        salvage.pattern ? ` System odsłoni Ci wzór w Warsztacie: ${salvage.pattern}.` : ''
+      }`,
       confirmLabel: 'Rozbierz',
     });
     if (!sure) return;
@@ -480,7 +482,11 @@ function salvageSection(item, busy) {
       const { salvage: order } = await call('POST', `/api/items/${item.id}/salvage`);
       closeSheet();
       playSound('build');
-      toast(`Na stole: ${order.name}. ${order.part} ×${order.parts} będą gotowe o ${timeFormat.format(new Date(order.endsAt))}.`);
+      toast(
+        `Na stole: ${order.name}. ${order.part} ×${order.parts} będą gotowe o ${timeFormat.format(new Date(order.endsAt))}.${
+          order.pattern ? ` Nowy wzór w Warsztacie: ${order.pattern}.` : ''
+        }`,
+      );
     });
   };
   return h(
@@ -490,13 +496,16 @@ function salvageSection(item, busy) {
     h('p', { class: 'anvil-step' }, 'Rozbiórka: ', h('span', { class: 'item-name', vars: { '--rarity': salvage.color }, text: `${salvage.part} ×${salvage.parts}` }), salvage.minutes !== null ? ` · ${formatMinutes(salvage.minutes)}` : ''),
     !built && h('p', { class: 'muted', text: 'Zbuduj w obozie Stół rozbiórki, żeby rozbierać przedmioty na części.' }),
     needs && h('p', { class: 'muted', text: `Ta rzadkość wymaga Stołu rozbiórki na poziomie ${needs}.` }),
+    salvage.pattern && h('p', { class: 'system-hint', text: `Rozbiórka odsłoni wzór w Warsztacie: ${salvage.pattern}.` }),
     built && !needs && full && h('p', { class: 'muted', text: 'Kolejka stołu jest pełna. Poczekaj, aż skończy się pierwsze zlecenie.' }),
     h('button', { type: 'button', class: 'button button--world', disabled: busy || !built || Boolean(needs) || full, onClick: takeApart, text: 'Rozbierz' }),
   );
 }
 
 // The Kowadło part of the item card: the next upgrade with its price, chance
-// and risk, or why there is none. The server rolls the outcome.
+// and risk, or why there is none, and where the item may break, a Zwój
+// ochronny from the Warsztat to put on the Kowadło. The server rolls the
+// outcome.
 function anvilSection(item, busy) {
   const anvil = item.anvil;
   if (!anvil) return null;
@@ -520,9 +529,14 @@ function anvilSection(item, busy) {
       : `Porażka zabiera złoto i rudę, a przedmiot spada do +${anvil.level - 1}${
           next.breakChance > 0 ? `. Z szansą ${percent(next.breakChance)} przedmiot rozpada się` : ''
         }.`;
+  // The scroll only where the item may break; the box starts empty, so a
+  // scroll goes only when the player says so.
+  const scrolls = state.character.scrolls ?? 0;
+  const ward =
+    next.breakChance > 0 && scrolls > 0 ? h('input', { type: 'checkbox', class: 'avoid-rare-box', id: `ward-${item.id}`, 'aria-describedby': `ward-note-${item.id}` }) : null;
   const upgrade = (event) =>
     withButton(event.currentTarget, async () => {
-      const { upgrade: done } = await call('POST', `/api/items/${item.id}/upgrade`);
+      const { upgrade: done } = await call('POST', `/api/items/${item.id}/upgrade`, { ward: Boolean(ward?.checked) });
       if (done.result === 'success') {
         playSound('done');
         toast(`Udało się: ${done.name} +${done.to}.`);
@@ -531,9 +545,11 @@ function anvilSection(item, busy) {
         toast(
           done.result === 'broken'
             ? `Przedmiot rozpadł się na kowadle: ${done.name} +${done.from}.`
-            : done.to < done.from
-              ? `Nie udało się: ${done.name} spada do +${done.to}.`
-              : `Nie udało się: ${done.name} zostaje na +0.`,
+            : done.saved
+              ? `Nie udało się: ${done.name} spada do +${done.to}. Zwój ochronny uchronił przedmiot przed rozpadem.`
+              : done.to < done.from
+                ? `Nie udało się: ${done.name} spada do +${done.to}.`
+                : `Nie udało się: ${done.name} zostaje na +0.`,
         );
       }
       const owned = ownedItem(done.itemId);
@@ -561,6 +577,18 @@ function anvilSection(item, busy) {
       ),
     ),
     h('p', { class: 'muted', text: risk }),
+    ward &&
+      h(
+        'label',
+        { class: 'avoid-rare', for: `ward-${item.id}` },
+        ward,
+        h('span', { text: `Użyj Zwoju ochronnego (masz ${formatNumber(scrolls)})` }),
+      ),
+    ward && h('p', { class: 'muted', id: `ward-note-${item.id}`, text: 'Zwój chroni przed rozpadem, ale nie przed spadkiem ulepszenia. Przepada przy tej próbie.' }),
+    next.breakChance > 0 &&
+      !ward &&
+      state.character.professions?.workshop &&
+      h('p', { class: 'system-hint', text: 'Zwój ochronny z Systemowego Warsztatu chroni przed rozpadem na Kowadle.' }),
     h('button', {
       type: 'button',
       class: 'button button--system',

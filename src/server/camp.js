@@ -27,7 +27,9 @@ import {
   replanQueue,
   shiftQueue,
   shopBlock,
+  shopBought,
   shopBuilding,
+  shopDay,
   upgradeCost,
 } from '../engine/index.js';
 import { content } from './content.js';
@@ -281,16 +283,19 @@ export async function buyParts(context) {
   const now = context.now;
   const row = player.row;
   const level = buildingLevel(player.buildings[shopBuilding(content)?.id], now);
-  const block = shopBlock({ level, gold: row.gold, partId: body.partId, count: body.count }, content);
+  // The parts bought today, by id, count toward the dealer's daily limit.
+  const bought = shopBought({ day: row.shop_day, parts: JSON.parse(row.shop_parts ?? '{}') }, now, content);
+  const block = shopBlock({ level, gold: row.gold, partId: body.partId, count: body.count, bought }, content);
   if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
   const gold = partPrice(body.partId, level, content) * body.count;
+  const today = { ...bought, [body.partId]: (bought[body.partId] ?? 0) + body.count };
   const db = context.env.DB;
   const result = await db
     .prepare(
-      `UPDATE characters SET gold = gold - ?, parts = json_set(parts, ?, COALESCE(json_extract(parts, ?), 0) + ?), version = version + 1
+      `UPDATE characters SET gold = gold - ?, parts = json_set(parts, ?, COALESCE(json_extract(parts, ?), 0) + ?), shop_day = ?, shop_parts = ?, version = version + 1
        WHERE id = ? AND version = ? AND gold >= ?`,
     )
-    .bind(gold, path(body.partId), path(body.partId), body.count, row.id, row.version, gold)
+    .bind(gold, path(body.partId), path(body.partId), body.count, shopDay(now, content), JSON.stringify(today), row.id, row.version, gold)
     .run();
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
   return json({

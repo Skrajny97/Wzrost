@@ -584,7 +584,8 @@ function mountBuilding(container, id) {
   }
 
   // The scrap dealer's counter: every part he has, with its price, how many
-  // the character has, "Kup 1" and "Kup 10", and what the next level adds.
+  // the character has and he still sells today, "Kup 1" and "Kup 10", and
+  // what the next level adds.
   function shopView(shop) {
     const { gold } = state.character;
     return h(
@@ -595,7 +596,7 @@ function mountBuilding(container, id) {
       h(
         'ul',
         { class: 'craft-list' },
-        shop.parts.map(({ id, price }) => {
+        shop.parts.map(({ id, price, daily, left }) => {
           const part = state.character.crafting.parts.find((own) => own.id === id);
           return h(
             'li',
@@ -606,6 +607,7 @@ function mountBuilding(container, id) {
               { class: 'craft-text' },
               h('span', { class: 'item-name', vars: { '--rarity': part.color }, text: part.name }),
               h('span', { class: 'item-meta shop-meta' }, h('strong', { class: 'shop-price', text: `${formatNumber(price)} złota` }), h('span', { text: `masz ${formatNumber(part.count)}` })),
+              h('span', { class: 'item-meta', text: `Dziś zostało: ${formatNumber(left)} z ${formatNumber(daily)}` }),
             ),
             h(
               'span',
@@ -614,7 +616,7 @@ function mountBuilding(container, id) {
                 h('button', {
                   type: 'button',
                   class: 'button button--world button--small shop-button',
-                  disabled: gold < price * count,
+                  disabled: gold < price * count || count > left,
                   'aria-label': `Kup ${part.name}: ${formatNumber(count)} za ${formatNumber(price * count)} złota`,
                   text: `Kup ${count}`,
                   onClick: (event) => withButton(event.currentTarget, () => buyParts(id, count)),

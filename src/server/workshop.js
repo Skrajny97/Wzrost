@@ -3,7 +3,9 @@
 // and the camp's resources at the start, and its report brings the items
 // made into the bag, the parts of the failed ones lost and their resources
 // back. Called back early, the character brings the items done and gets
-// back all the rest.
+// back all the rest. From the scroll's level an order may be of Zwoje
+// ochronne instead, from parts alone: they always come out and wait for the
+// Kowadło (`scrolls` of the character), taking no room in the bag.
 
 import {
   addQuestProgress,
@@ -12,12 +14,14 @@ import {
   craftCost,
   craftItems,
   craftRarities,
+  knowsPattern,
   orderMinutes,
-  patternLevel,
   potionsDone,
   professionOpen,
   professionState,
   professionUnlockLevel,
+  scrollCost,
+  scrollOrderMinutes,
   settleCrafting,
   workshopReport,
 } from '../engine/index.js';
@@ -28,16 +32,17 @@ import { ApiError, json, readJson } from './http.js';
 import { craftingOn } from './features.js';
 import { addTo, insertWork, requireProfessions, workGains } from './professions.js';
 import { KEPT_REPORTS } from './reports.js';
+import { say } from '../engine/text.js';
 
 // A share of what an order took, by id: for `of` items out of `count`.
 const shareOf = (amounts, of, count) =>
   Object.fromEntries(Object.entries(amounts ?? {}).map(([id, amount]) => [id, Math.round((amount * of) / Math.max(1, count))]));
 
-// An order of `count` items of a known pattern and rarity, from now on, by
-// the character or by its Awatar Systemu (`avatar` in the request). The
-// parts and the resources go at once, only if the character is still as
-// seen, so two taps at once start one order; and only with room in the bag
-// for all the items.
+// An order of `count` items of a known pattern and rarity, or with `scroll`
+// of `count` Zwoje ochronne, from now on, by the character or by its Awatar
+// Systemu (`avatar` in the request). The parts and the resources go at once,
+// only if the character is still as seen, so two taps at once start one
+// order; and items only with room in the bag for all of them.
 export async function startCrafting(context) {
   const body = await readJson(context.request);
   const { session, player, avatar } = await requireWorker(context, body);
@@ -49,16 +54,13 @@ export async function startCrafting(context) {
     throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content)}.`);
   }
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), workshop.profession);
-  const base = typeof body.baseId === 'string' ? content.basesById[body.baseId] : undefined;
-  if (!base || !workshop.parts[base.slot] || patternLevel(base, content) > level) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
-  const rarity = craftRarities(level, content).find((candidate) => candidate.id === body.rarity);
-  if (!rarity) throw new ApiError(400, 'unknown_rarity', 'Tej rzadkości jeszcze nie wykonasz.');
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > workshop.maxCount) {
     throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${workshop.maxCount} sztuk.`);
   }
+  const order = body.scroll === true ? scrollOrder(level, body.count) : itemOrder(player.row, level, body);
+  const { cost } = order;
 
   const now = context.now;
-  const cost = craftCost(base, rarity.id, body.count, content);
   // The parts include those of the table's orders done by now.
   const table = settleCrafting(craftingState(player.row), now);
   const { parts } = table;
@@ -68,9 +70,9 @@ export async function startCrafting(context) {
   const short = Object.entries(cost.resources).find(([id, amount]) => (wallet[id] ?? 0) < amount);
   if (short) throw new ApiError(409, 'no_resources', `Brakuje zasobów: ${content.resourcesById[short[0]].name} (potrzeba ${short[1]}).`);
   const free = bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player);
-  if (free < body.count) throw new ApiError(409, 'bag_full', `W plecaku musi być ${body.count} wolnych miejsc na całe zlecenie.`);
+  if (order.room && free < body.count) throw new ApiError(409, 'bag_full', `W plecaku musi być ${body.count} wolnych miejsc na całe zlecenie.`);
 
-  const minutes = orderMinutes(body.count, rarity.id, level, content);
+  const { minutes } = order;
   const partsLeft = { ...parts, [partId]: parts[partId] - needed };
   const resources = JSON.parse(player.row.resources ?? '{}');
   for (const [id, amount] of Object.entries(cost.resources)) resources[id] = (resources[id] ?? 0) - amount;
@@ -94,12 +96,35 @@ export async function startCrafting(context) {
       now,
       seed,
       hp,
-      // The item level is the character's at the start.
-      options: { base: base.id, rarity: rarity.id, count: body.count, level: row.level, parts: cost.parts, resources: cost.resources },
+      options: { ...order.options, count: body.count, parts: cost.parts, resources: cost.resources },
     }),
   ]);
   if (taken.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
+}
+
+// An order of items: a pattern the character knows, a rarity of its level,
+// what they take at the character's level, which is also the items' level,
+// and room for them in the bag.
+function itemOrder(row, level, body) {
+  const base = typeof body.baseId === 'string' ? content.basesById[body.baseId] : undefined;
+  const learned = JSON.parse(row.patterns ?? '[]');
+  if (!base || !content.workshop.parts[base.slot] || !knowsPattern(base, level, learned, content)) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
+  const rarity = craftRarities(level, content).find((candidate) => candidate.id === body.rarity);
+  if (!rarity) throw new ApiError(400, 'unknown_rarity', 'Tej rzadkości jeszcze nie wykonasz.');
+  return {
+    cost: craftCost(base, rarity.id, body.count, row.level, content),
+    minutes: orderMinutes(body.count, rarity.id, level, content),
+    room: true,
+    options: { base: base.id, rarity: rarity.id, level: row.level },
+  };
+}
+
+// An order of Zwoje ochronne, from the scroll's level of the profession.
+function scrollOrder(level, count) {
+  const { scroll, texts } = content.workshop;
+  if (level < scroll.level) throw new ApiError(403, 'locked', say(texts, 'hidden', 0, { level: scroll.level }));
+  return { cost: { ...scrollCost(count, content), resources: {} }, minutes: scrollOrderMinutes(count, level, content), room: false, options: { scroll: true } };
 }
 
 // The report of an order (claimHunt sends a finished one here), or with
@@ -114,18 +139,24 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
   const profession = content.professionsById[workshop.profession];
   const before = professionState(JSON.parse(row.professions ?? '{}'), profession.id);
   const options = JSON.parse(activity.options ?? '{}');
+  const { scroll } = options;
   // A base the data no longer has makes nothing.
-  const base = content.basesById[options.base];
+  const base = scroll ? workshop.scroll : content.basesById[options.base];
   const count = base ? options.count : 0;
   const elapsed = now - activity.started_at;
   const done = stop ? potionsDone(count, activity.minutes, elapsed) : count;
   const worked = stop ? Math.floor(elapsed / 60000) : activity.minutes;
-  const results = done > 0 ? craftItems({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed }, content) : [];
+  const results =
+    done > 0 && !scroll
+      ? craftItems({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed }, content)
+      : [];
   const made = results.filter((result) => result.made).map((result) => result.item);
+  // Every scroll done comes out.
+  const madeCount = scroll ? done : made.length;
   // The parts of the items not done come back, and the resources of those
   // and of the failed ones.
   const partsBack = shareOf(options.parts, options.count - done, options.count);
-  const resourcesBack = shareOf(options.resources, options.count - made.length, options.count);
+  const resourcesBack = shareOf(options.resources, options.count - madeCount, options.count);
   const back = [addTo('parts', partsBack), addTo('resources', resourcesBack)];
   // Only while the activity is as seen, so two calls at once give back once.
   const ongoing = `EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ?)`;
@@ -143,7 +174,23 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
   const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);
   const report = {
     ...workshopReport(
-      { base, rarityId: options.rarity, results, minutes: worked, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, stopped: stop, before, after, character, xp, work },
+      {
+        base,
+        rarityId: scroll ? null : options.rarity,
+        results,
+        ...(scroll && { scrolls: done }),
+        learned: JSON.parse(row.patterns ?? '[]'),
+        minutes: worked,
+        startedAt: activity.started_at,
+        endsAt: stop ? now : activity.ends_at,
+        seed: activity.seed,
+        stopped: stop,
+        before,
+        after,
+        character,
+        xp,
+        work,
+      },
       content,
     ),
     ...(avatar && { avatar: true }),
@@ -151,7 +198,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
   const summary = {
     placeName: report.placeName,
     minutes: report.minutes,
-    items: made.length > 0 ? [{ name: base.name, count: made.length }] : [],
+    items: madeCount > 0 ? [{ name: base.name, count: madeCount }] : [],
     failed: report.failed,
     xp,
     professionName: profession.name,
@@ -174,10 +221,10 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
         .bind(row.id, row.id, KEPT_REPORTS),
       db
         .prepare(
-          `UPDATE characters SET quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${back.map((each) => each.sql).join('')}, version = version + 1
+          `UPDATE characters SET quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${back.map((each) => each.sql).join('')}${scroll ? ', scrolls = scrolls + ?' : ''}, version = version + 1
            WHERE id = ? AND ${ongoing}`,
         )
-        .bind(row.quests, quests, ...sets.binds, ...back.flatMap((each) => each.binds), row.id, row.id, activity.started_at),
+        .bind(row.quests, quests, ...sets.binds, ...back.flatMap((each) => each.binds), ...(scroll ? [done] : []), row.id, row.id, activity.started_at),
       // The items made go to the bag; the room was there at the start.
       ...made.map((item) => insertItem.bind(row.id, JSON.stringify(item), now)),
       end,

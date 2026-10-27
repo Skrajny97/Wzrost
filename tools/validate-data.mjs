@@ -391,6 +391,13 @@ function checkReferences(data) {
     if (shopCaps.includes(-1)) errors.push(`buildings.json: ${building.id} sprzedaje części nieznanej rzadkości`);
     else if (shopCaps.some((index, i) => i > 0 && index < shopCaps[i - 1])) errors.push(`buildings.json: rzadkości w sklepie ${building.id} nie mogą maleć z poziomem`);
     if (shopCaps.length > building.maxLevel) errors.push(`buildings.json: ${building.id} ma w sklepie więcej rzadkości niż poziomów`);
+    // A daily limit for every rarity, smaller (or the same) for a rarer one.
+    if (building.shop) {
+      const daily = rarityOrder.map((id) => building.shop.daily[id]);
+      if (daily.includes(undefined) || Object.keys(building.shop.daily).length !== rarityOrder.length) {
+        errors.push(`buildings.json: ${building.id} musi mieć w shop.daily limit każdej rzadkości`);
+      } else if (daily.some((limit, i) => i > 0 && limit > daily[i - 1])) errors.push(`buildings.json: dzienne limity w sklepie ${building.id} nie mogą rosnąć z rzadkością`);
+    }
   }
   // The fire spirit's trade lives in one building (src/engine/fire.js), and
   // so does the dealer's counter (src/engine/shop.js).
@@ -637,6 +644,18 @@ function checkWorkshop(data, ids) {
     if (!(rarity.chance > 0 && rarity.chance <= 1)) errors.push(`professions.json: szansa rzadkości ${rarity.id} musi być z przedziału (0, 1]`);
   });
   if (crafter && workshop.laterPatternLevel > crafter.maxLevel) errors.push('professions.json: workshop.laterPatternLevel przekracza poziomy profesji');
+  // Upgrades from +1 up, each opening later than the one below it.
+  workshop.upgrades.forEach((tier, index) => {
+    if (tier.upgrade !== index + 1) errors.push('professions.json: workshop.upgrades musi iść po kolei od +1');
+    if (index > 0 && tier.level <= workshop.upgrades[index - 1].level) errors.push('professions.json: poziomy w workshop.upgrades muszą rosnąć');
+    if (tier.max < tier.chance) errors.push(`professions.json: max ulepszenia +${tier.upgrade} jest niższe niż jego szansa`);
+    if (crafter && tier.level > crafter.maxLevel) errors.push(`professions.json: ulepszenie +${tier.upgrade} wymaga poziomu ponad profesję`);
+  });
+  if (workshop.upgrades.length > data.balance.upgrades.chances.length) errors.push('professions.json: workshop.upgrades sięga wyżej niż Kowadło');
+  const { scroll } = workshop;
+  if (!data.materials.parts.some((part) => part.id === scroll.part)) errors.push(`professions.json: zwój robi się z nieznanej części "${scroll.part}"`);
+  if (crafter && scroll.level > crafter.maxLevel) errors.push('professions.json: zwój wymaga poziomu ponad profesję');
+  if (data['item-bases'].some((base) => base.id === scroll.id)) errors.push(`professions.json: id zwoju "${scroll.id}" jest już bazą przedmiotu`);
   return errors;
 }
 

@@ -16,11 +16,13 @@ import {
   itemName,
   orderMaterials,
   orderSalvage,
+  patternFrom,
   settleCrafting,
 } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, craftingState, loadPlayer, questsNow, requireIdlePlayer, requirePlayer } from './characters.js';
 import { toHex } from './encoding.js';
+import { craftingOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { testMode, testModeFor } from './test-mode.js';
 
@@ -50,16 +52,18 @@ const withIds = (before, state) => ({ ...state, queue: state.queue.map((order, i
 
 // `quests`: the narrator's quests moved on by the order. `condition` adds to
 // the WHERE clause, with its own `binds`.
-const saveState = (db, row, state, { quests, condition = '', binds = [] } = {}) =>
+const saveState = (db, row, state, { quests, patterns, condition = '', binds = [] } = {}) =>
   db
     .prepare(
-      `UPDATE characters SET materials = ?, parts = ?, crafting = ?${quests ? ', quests = ?' : ''}, version = version + 1 WHERE id = ? AND version = ?${condition}`,
+      `UPDATE characters SET materials = ?, parts = ?, crafting = ?${quests ? ', quests = ?' : ''}${patterns ? ', patterns = ?' : ''}, version = version + 1
+       WHERE id = ? AND version = ?${condition}`,
     )
     .bind(
       JSON.stringify(state.materials),
       JSON.stringify(state.parts),
       JSON.stringify(state.queue),
       ...(quests ? [JSON.stringify(quests)] : []),
+      ...(patterns ? [JSON.stringify(patterns)] : []),
       row.id,
       row.version,
       ...binds,
@@ -94,7 +98,8 @@ export async function craftMaterials(context) {
 }
 
 // An item from the bag taken apart on the table: it goes now, and its parts
-// come when the order ends.
+// come when the order ends. With Rzemieślnictwo, an item of a pattern the
+// Warsztat does not show yet teaches it at once (patternFrom).
 export async function salvageItem(context) {
   const { session, player } = await requireIdlePlayer(context);
   const item = player.items.find((candidate) => String(candidate.id) === context.params.id);
@@ -112,9 +117,12 @@ export async function salvageItem(context) {
   // The order is saved only while the item is still in the bag, and the item
   // goes only if that order was saved: two taps make one order.
   const quests = addQuestProgress(questsNow(player, now), { salvaged: 1 });
+  const learned = JSON.parse(row.patterns ?? '[]');
+  const pattern = craftingOn() && patternFrom(item, learned, content);
   const [saved] = await db.batch([
     saveState(db, row, state, {
       quests,
+      ...(pattern && { patterns: [...learned, pattern] }),
       condition: ' AND EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ? AND slot IS NULL)',
       binds: [item.id, row.id],
     }),
@@ -124,7 +132,13 @@ export async function salvageItem(context) {
   ]);
   if (saved.meta.changes !== 1) throw changed();
   return json({
-    salvage: { name: order.name, part: content.partsById[order.partId].name, parts: order.parts, endsAt: order.endsAt },
+    salvage: {
+      name: order.name,
+      part: content.partsById[order.partId].name,
+      parts: order.parts,
+      endsAt: order.endsAt,
+      ...(pattern && { pattern: content.basesById[pattern].name }),
+    },
     character: characterView(await loadPlayer(db, session.userId), now),
   });
 }

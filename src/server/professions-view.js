@@ -6,6 +6,7 @@ import {
   baseClasses,
   craftChance,
   craftCost,
+  craftUpgrades,
   craftableBases,
   fightKind,
   gatheringMinutes,
@@ -22,6 +23,7 @@ import {
   professionState,
   professionUnlockLevel,
   professionXpToNext,
+  scrollMinutes,
 } from '../engine/index.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn } from './features.js';
@@ -175,23 +177,42 @@ export function professionsView(row) {
           : { id: potion.id, level: potion.level, hidden: true, hint: say(brewing.texts, 'hidden', 0, { level: potion.level }) },
       ),
     },
-    workshop: craftingOn() && professionOpen(content.professionsById[workshop.profession], row.level, content) ? workshopView(crafter.level) : null,
+    workshop: craftingOn() && professionOpen(content.professionsById[workshop.profession], row.level, content) ? workshopView(crafter.level, row) : null,
   };
 }
 
-// The Warsztat at a level of Rzemieślnictwo. What one item of a pattern
-// takes is told for common gear: the parts of the rarity chosen, and the
-// resources times the rarity's step (craftCost). A rarity's minutes are of
-// one item at this level; an order of n takes n of them, rounded up to a
-// whole minute (orderMinutes).
-function workshopView(level) {
+// The Warsztat at a level of Rzemieślnictwo, for the character's row. What
+// one item of a pattern takes is told for common gear at the character's
+// level: the parts of the rarity chosen, and the resources times the
+// rarity's step (craftCost). A rarity's minutes are of one item at this
+// level; an order of n takes n of them, rounded up to a whole minute
+// (orderMinutes). A pattern learned by taking an item apart is known before
+// its level (`learned`). Then the upgrades a made item may come with, and
+// the Zwoje ochronne: what one takes, its minutes and those the character
+// has, or the level the System shows them at.
+function workshopView(level, row) {
   const { workshop } = content;
   const hint = (from) => say(workshop.texts, 'hidden', 0, { level: from });
   const bases = craftableBases(content);
+  const learned = JSON.parse(row.patterns ?? '[]');
+  const { scroll } = workshop;
+  const scrollPart = content.partsById[scroll.part];
   return {
     professionId: workshop.profession,
     place: workshop.place,
     maxCount: workshop.maxCount,
+    upgrades: craftUpgrades(level, content),
+    upgradesFrom: workshop.upgrades[0].level,
+    scroll: {
+      id: scroll.id,
+      name: scroll.name,
+      description: scroll.description,
+      level: scroll.level,
+      owned: row.scrolls,
+      ...(scroll.level <= level
+        ? { part: { id: scrollPart.id, name: scrollPart.name }, parts: scroll.parts, minutes: scrollMinutes(level, content) }
+        : { hidden: true, hint: hint(scroll.level) }),
+    },
     // The slots in the order of the parts they take, the weapon first.
     slots: Object.keys(workshop.parts)
       .map((id) => content.slotsById[id])
@@ -202,8 +223,9 @@ function workshopView(level) {
           .filter((base) => base.slot === slot.id)
           .map((base) => {
             const from = patternLevel(base, content);
-            if (from > level) return { id: base.id, level: from, hidden: true, hint: hint(from) };
-            const one = craftCost(base, 'common', 1, content);
+            const taught = from > level && learned.includes(base.id);
+            if (from > level && !taught) return { id: base.id, level: from, hidden: true, hint: hint(from) };
+            const one = craftCost(base, 'common', 1, row.level, content);
             const classIds = baseClasses(base.id, content);
             return {
               id: base.id,
@@ -213,6 +235,7 @@ function workshopView(level) {
               resources: Object.entries(one.resources).map(([id, amount]) => ({ id, name: content.resourcesById[id].name, amount })),
               classNames: classIds && classIds.map((id) => content.classesById[id].name),
               classLevel: base.classLevel ?? null,
+              ...(taught && { learned: true }),
             };
           }),
       })),

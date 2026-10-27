@@ -5,7 +5,11 @@
 // multiplier, and every level above the first takes discountPerLevel off
 // the price. The prices stay above what the items the parts come from fetch
 // when sold instead (test/engine.test.js), so taking an item apart on the
-// Stół rozbiórki keeps its worth.
+// Stół rozbiórki keeps its worth. A day (Polish time, the quests' clock) the
+// dealer sells a character `daily` parts of each rarity at most, fewer of a
+// rarer one (the author: "30-20-10 itd.").
+
+import { questPeriod } from './quests.js';
 
 const rarityIndex = (rarityId, content) => content.rarities.findIndex((rarity) => rarity.id === rarityId);
 
@@ -39,8 +43,17 @@ export function shopLevelFor(rarityId, content) {
   return shopBuilding(content).shop.rarities.findIndex((cap) => rarityIndex(cap, content) >= index) + 1 || null;
 }
 
-// Why `count` parts of a kind cannot be bought now, or null.
-export function shopBlock({ level, gold, partId, count }, content) {
+// The day a purchase counts for, and the parts bought on the day of `now`,
+// by id: those kept for an earlier day are none today.
+export const shopDay = (now, content) => questPeriod('daily', now, content).key;
+export const shopBought = ({ day, parts }, now, content) => (day === shopDay(now, content) ? parts : {});
+
+// How many more parts of a kind the dealer sells today, after `bought`.
+export const shopLeft = (partId, bought, content) => Math.max(0, shopBuilding(content).shop.daily[content.partsById[partId].rarity] - (bought[partId] ?? 0));
+
+// Why `count` parts of a kind cannot be bought now, or null: `bought` is
+// shopBought.
+export function shopBlock({ level, gold, partId, count, bought = {} }, content) {
   const building = shopBuilding(content);
   if (!building || level < 1) return { code: 'not_built', message: `Najpierw zbuduj: ${building?.name ?? 'Skup złomu'}.` };
   const part = typeof partId === 'string' && Object.hasOwn(content.partsById, partId) ? content.partsById[partId] : null;
@@ -51,6 +64,9 @@ export function shopBlock({ level, gold, partId, count }, content) {
     const from = shopLevelFor(part.rarity, content);
     return { code: 'not_sold', message: from ? `Złomiarz sprzeda ${part.name} od poziomu ${from}.` : 'Złomiarz nie ma takich części.' };
   }
+  const left = shopLeft(part.id, bought, content);
+  if (left === 0) return { code: 'daily_limit', message: `Złomiarz nie sprzeda Ci już dziś więcej: ${part.name}. Wróć jutro.` };
+  if (count > left) return { code: 'daily_limit', message: `Złomiarz sprzeda Ci dziś jeszcze ${left} szt.: ${part.name}.` };
   if (gold < offer.price * count) return { code: 'not_enough', message: 'Brakuje złota na te części.' };
   return null;
 }

@@ -56,7 +56,7 @@
       "shop": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["title", "text", "rarities", "goldPerPart", "discountPerLevel", "counts"],
+        "required": ["title", "text", "rarities", "goldPerPart", "discountPerLevel", "counts", "daily"],
         "description": "Sprzedaż części do rzemiosła za złoto (Skup złomu: lada złomiarza). Na poziomie L budynek sprzedaje części wszystkich rzadkości do rarities[L − 1] włącznie (ostatnia obowiązuje na dalszych poziomach). Część kosztuje goldPerPart × mnożnik sprzedaży rzadkości (rarities.json: sell), a każdy poziom ponad pierwszy obniża cenę o discountPerLevel. Ceny muszą przewyższać to, co dają przedmioty sprzedane zamiast rozebrania (test w test/engine.test.js). Jednym zakupem bierze się counts sztuk.",
         "properties": {
           "title": { "type": "string", "minLength": 1 },
@@ -64,7 +64,12 @@
           "rarities": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
           "goldPerPart": { "type": "integer", "minimum": 1 },
           "discountPerLevel": { "type": "number", "minimum": 0, "exclusiveMaximum": 1 },
-          "counts": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "integer", "minimum": 1 } }
+          "counts": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "integer", "minimum": 1 } },
+          "daily": {
+            "type": "object",
+            "description": "Ile części każdej rzadkości (id z rarities.json) złomiarz sprzeda jednej postaci na dzień, liczony od północy czasu polskiego.",
+            "additionalProperties": { "type": "integer", "minimum": 1 }
+          }
         }
       },
       "costs": {

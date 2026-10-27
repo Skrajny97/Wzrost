@@ -105,7 +105,8 @@
       "rarities": ["common", "rare", "unique", "unique", "epic", "epic", "legendary", "legendary", "mythic", "divine"],
       "goldPerPart": 40,
       "discountPerLevel": 0.06,
-      "counts": [1, 10]
+      "counts": [1, 10],
+      "daily": { "common": 30, "rare": 20, "unique": 10, "epic": 5, "legendary": 3, "mythic": 2, "divine": 1 }
     },
     "costs": [
       { "resource": "gold", "base": 12, "growth": 2.0 },

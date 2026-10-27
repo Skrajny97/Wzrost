@@ -141,12 +141,14 @@ export function randomItem(level, rng, content, { rarityBonus = 1, filled, class
 // Gold from the scrapper: level × goldPerLevel × the rarity's multiplier, and
 // for an upgraded item a share of the gold its upgrades cost (sellRefund).
 // `bonus`: the share the camp adds to the scrapper's prices (Skup złomu). It
-// raises the item's own price only, so an upgrade never pays for itself.
+// raises the item's own price only, so an upgrade never pays for itself. An
+// item made upgraded in the Warsztat (`crafted`) cost no gold for the
+// upgrades it came with, so only those of the Kowadło above them count.
 export function sellPrice(item, content, bonus = 0) {
   const rarity = content.raritiesById[item.rarity];
   const price = Math.max(1, Math.round(item.level * content.balance.items.sellGoldPerLevel * rarity.sell * (1 + bonus)));
   let spent = 0;
-  for (let target = 1; target <= (item.upgrade ?? 0); target += 1) spent += itemUpgradeCost(item, target, content).gold;
+  for (let target = (item.crafted?.upgrade ?? 0) + 1; target <= (item.upgrade ?? 0); target += 1) spent += itemUpgradeCost(item, target, content).gold;
   return price + Math.round(spent * content.balance.upgrades.sellRefund);
 }
 
@@ -246,12 +248,14 @@ export function breakChance(current, content) {
 
 // One try at the next level, with the server's random numbers. A failure takes
 // the payment and one level (none below +0), and from breakFrom on may break
-// the item instead.
-export function rollUpgrade(item, rng, content) {
+// the item instead. `warded`: a Zwój ochronny from the Warsztat lies on the
+// Kowadło, and a break is a failure (`saved`), with its lost level too.
+export function rollUpgrade(item, rng, content, { warded = false } = {}) {
   const current = item.upgrade ?? 0;
   if (rng.chance(upgradeChance(current + 1, content))) return { result: 'success', upgrade: current + 1 };
-  if (rng.chance(breakChance(current, content))) return { result: 'broken', upgrade: current };
-  return { result: 'failure', upgrade: Math.max(0, current - 1) };
+  const failure = { result: 'failure', upgrade: Math.max(0, current - 1) };
+  if (rng.chance(breakChance(current, content))) return warded ? { ...failure, saved: true } : { result: 'broken', upgrade: current };
+  return failure;
 }
 
 // What the item card shows about upgrading: the level, the highest one the

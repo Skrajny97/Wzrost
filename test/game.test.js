@@ -1104,7 +1104,7 @@ describe('camp', () => {
     await database.prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) VALUES (?, 'scrap-bench', 2, 0, 1)").bind(id).run();
     // Level 2: Ścinki and Rzemienie, and Okucia at the next level.
     const open = shop(await character());
-    assert.deepEqual([open.title, open.counts, open.parts], ['Lada złomiarza', [1, 10], [{ id: 'scraps', price: 38 }, { id: 'straps', price: 75 }]]);
+    assert.deepEqual([open.title, open.counts, open.parts], ['Lada złomiarza', [1, 10], [{ id: 'scraps', price: 38, daily: 30, left: 30 }, { id: 'straps', price: 75, daily: 20, left: 20 }]]);
     assert.deepEqual(open.next, { level: 3, added: [{ id: 'fittings', name: 'Okucia', gender: 'pl' }], discount: 0.06 });
     assert.equal((await buy('fittings', 1)).data.error.code, 'not_sold');
     assert.equal((await buy('scraps', 5)).status, 400);

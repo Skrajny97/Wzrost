@@ -16,6 +16,7 @@ import {
   craftLevelFor,
   craftMinutes,
   craftTable,
+  patternFrom,
   craftTakes,
   currentQuests,
   effectText,
@@ -42,6 +43,8 @@ import {
   restedHp,
   salvageYield,
   settleCrafting,
+  shopBought,
+  shopLeft,
   shopOffer,
   skillsView,
   speedLeft,
@@ -457,7 +460,7 @@ function campView(player, levels, now) {
         },
         queued: queued(building.id),
         trade: building.trade && level > 0 ? fireView(building, level, player.row, now) : null,
-        shop: building.shop && level > 0 ? shopView(building, level) : null,
+        shop: building.shop && level > 0 ? shopView(building, level, player.row, now) : null,
       };
     }),
   };
@@ -483,14 +486,21 @@ function fireView(building, level, row, now) {
 // The scrap dealer's counter at the Skup złomu's level: the parts with
 // their prices (the page takes their names and counts from crafting), and
 // what the next level adds.
-function shopView(building, level) {
+function shopView(building, level, row, now) {
   const offer = shopOffer(level, content);
   const later = level < building.maxLevel ? shopOffer(level + 1, content) : null;
+  const bought = shopBought({ day: row.shop_day, parts: JSON.parse(row.shop_parts ?? '{}') }, now, content);
   return {
     title: building.shop.title,
     text: building.shop.text,
     counts: building.shop.counts,
-    parts: offer.map(({ partId, price }) => ({ id: partId, price })),
+    // Each part with its price, the parts a day and those left today.
+    parts: offer.map(({ partId, price }) => ({
+      id: partId,
+      price,
+      daily: building.shop.daily[content.partsById[partId].rarity],
+      left: shopLeft(partId, bought, content),
+    })),
     next: later && {
       level: level + 1,
       added: later
@@ -578,14 +588,15 @@ function activityPlace(activity, level) {
     return { profession: content.brewing.profession, placeName: content.brewing.place.name, potion: potion ? { id: potion.id, name: potion.name } : null, count: count ?? 0 };
   }
   if (activity.kind === 'items') {
-    const { base: baseId, rarity, count } = JSON.parse(activity.options ?? '{}');
-    const base = content.basesById[baseId];
+    const { base: baseId, rarity, count, scroll } = JSON.parse(activity.options ?? '{}');
+    const base = scroll ? content.workshop.scroll : content.basesById[baseId];
     return {
       profession: content.workshop.profession,
       placeName: content.workshop.place.name,
       base: base ? { id: base.id, name: base.name } : null,
       rarityName: content.raritiesById[rarity]?.name ?? '',
       count: count ?? 0,
+      ...(scroll && { scroll: true }),
     };
   }
   const area = areaFor(activity.region_id, level, content);
@@ -645,17 +656,21 @@ export function characterView(player, now) {
   const upgradeCap = campBonus(levels, 'upgradeCap', content);
   // What the Stół rozbiórki makes of an item taken apart and how long it
   // takes, or the table's level its rarity needs.
+  // With Rzemieślnictwo, also the pattern the item teaches (patternFrom).
   const table = craftTable(levels, content);
+  const learned = JSON.parse(row.patterns ?? '[]');
   const salvage = (item) => {
     const { partId, count } = salvageYield(item, content);
     const part = content.partsById[partId];
     const takes = table.pace > 0 && craftTakes(table, item.rarity, content);
+    const pattern = craftingOn() && patternFrom(item, learned, content);
     return {
       part: part.name,
       color: content.raritiesById[part.rarity].color,
       parts: count,
       minutes: takes ? craftMinutes(item.rarity, count, table.pace, content) : null,
       needs: table.pace > 0 && !takes ? craftLevelFor(item.rarity, content) : null,
+      ...(pattern && { pattern: content.basesById[pattern].name }),
     };
   };
   const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap }), salvage: salvage(item) });
@@ -742,6 +757,8 @@ export function characterView(player, now) {
     camp: campView(player, levels, now),
     // The Stół rozbiórki: materials, parts and the queue (crafting.js).
     crafting: craftingView(row, levels, now),
+    // The Zwoje ochronne made in the Warsztat for the Kowadło.
+    scrolls: row.scrolls,
     // The creatures met in fights, by id: the others are shadows on the
     // lists of an inner region's dangers.
     met: JSON.parse(row.met ?? '[]'),

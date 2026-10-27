@@ -13,7 +13,7 @@
 
 import { herbSprite, itemSprite, placeArt, potionSprite, professionSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
-import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
+import { countOf, dateTimeFormat, formatCountdown, formatDecimal, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { workScene } from '../scenes.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
@@ -64,6 +64,13 @@ const patternIcon = (id) => itemSprite({ base: id }) ?? icon('hammer', { size: 2
 // A work of `count` potions or items of `each` minutes in whole minutes, as
 // the server counts it (brewMinutes and orderMinutes in src/engine).
 const workMinutes = (count, each) => Math.ceil(Math.round(count * each * 1000) / 1000);
+
+// The chances that a made item comes out upgraded already, or the level of
+// Rzemieślnictwo it may from.
+const upgradesText = (workshop) =>
+  workshop.upgrades.length === 0
+    ? `Od ${workshop.upgradesFrom}. poziomu Rzemieślnictwa wyrób może wyjść od razu ulepszony.`
+    : `Wyrób może wyjść od razu ulepszony: ${workshop.upgrades.map((tier) => `+${tier.upgrade} (${formatDecimal(tier.chance * 100)}%)`).join(', ')}.`;
 
 // A title with a large "Powrót" on the right, as in the report.
 function backHeading(title, subtitle, hash) {
@@ -278,6 +285,7 @@ export function mountProfessions(container, { params, navigate }) {
       placeCard(workshop.place),
       levelCard(profession, 'wyrobu'),
       anyFree(character) && craftForm(character, workshop),
+      anyFree(character) && scrollForm(character, workshop),
     );
   }
 
@@ -507,7 +515,7 @@ export function mountProfessions(container, { params, navigate }) {
   // The order under way, or its report waiting. Called back early, the
   // character brings the items done, with their report.
   function craftingCard(activity, avatar) {
-    const what = `${activity.count} × ${activity.base?.name ?? 'przedmiot'} (${activity.rarityName})`;
+    const what = activity.scroll ? `${activity.count} × ${activity.base.name}` : `${activity.count} × ${activity.base?.name ?? 'przedmiot'} (${activity.rarityName})`;
     if (activityFinished(activity)) {
       return systemPanel(`Wyrób zakończony: ${what}.`, 'Raport czeka na odbiór.', claimButton(avatar));
     }
@@ -934,9 +942,12 @@ export function mountProfessions(container, { params, navigate }) {
       return { byParts, byResources, most: Math.min(workshop.maxCount, byParts, byResources, free) };
     }
 
-    // For whom a pattern is, and from which class level.
+    // For whom a pattern is, from which class level, and whether it came from
+    // an item taken apart.
     const forWhom = (each) =>
-      [each.classNames ? each.classNames.join(', ') : 'każda klasa', each.classLevel && `od poz. klasy ${each.classLevel}`].filter(Boolean).join(' · ');
+      [each.classNames ? each.classNames.join(', ') : 'każda klasa', each.classLevel && `od poz. klasy ${each.classLevel}`, each.learned && 'z rozbiórki']
+        .filter(Boolean)
+        .join(' · ');
 
     function show() {
       fill(
@@ -1097,6 +1108,7 @@ export function mountProfessions(container, { params, navigate }) {
           class: 'muted',
           text: rarity.chance >= 1 ? 'Każdy przedmiot tej rzadkości się uda.' : `Każdy przedmiot ma ${chance}% szans na powodzenie. Nieudany zabiera swoje części, a zasoby wracają.`,
         }),
+        h('p', { class: 'muted', text: upgradesText(workshop) }),
         h('p', { class: 'muted', text: `Przedmioty dostaną poziom postaci: ${formatNumber(character.level)}.` }),
         free < Math.min(workshop.maxCount, byParts, byResources) &&
           h('p', { class: 'herb-room', text: `Plecak ma miejsce tylko na ${countOf(free, 'przedmiot', 'przedmioty', 'przedmiotów')}.` }),
@@ -1117,6 +1129,83 @@ export function mountProfessions(container, { params, navigate }) {
       rarityRow,
       next && h('p', { class: 'muted', text: `Następna rzadkość: ${next.name}, od ${next.level}. poziomu Rzemieślnictwa.` }),
       picker,
+    );
+  }
+
+  // The Zwoje ochronne for the Kowadło: what they do and how many the
+  // character has, then, from the scroll's level, how many to make from the
+  // parts there are, with their time, and the start; before it, the level
+  // the System shows them at.
+  function scrollForm(character, workshop) {
+    const { scroll } = workshop;
+    const head = [
+      h('h2', { class: 'section-title', id: 'scroll-title', text: scroll.name }),
+      h('p', { class: 'muted', text: scroll.description }),
+      h('p', { class: 'herb-estimate', text: `Masz: ${countOf(scroll.owned, 'zwój', 'zwoje', 'zwojów')}.` }),
+    ];
+    const card = (...children) => h('section', { class: 'card gather-card', 'aria-labelledby': 'scroll-title' }, head, children);
+    if (scroll.hidden) return card(h('p', { class: 'system-hint', text: scroll.hint }));
+    const have = character.crafting.parts.find((part) => part.id === scroll.part.id)?.count ?? 0;
+    const most = Math.min(workshop.maxCount, Math.floor(have / scroll.parts));
+    const needs = `Jeden zwój to ${formatNumber(scroll.parts)} × ${scroll.part.name} i ${formatMinutes(workMinutes(1, scroll.minutes))}.`;
+    if (most === 0) {
+      return card(
+        h('p', { class: 'herb-room herb-room--full', text: `${needs} Masz: ${formatNumber(have)} × ${scroll.part.name}.` }),
+        h('a', { class: 'button button--world', href: TABLE, text: 'Do Stołu rozbiórki' }),
+      );
+    }
+    const who = workerPicker(character);
+    let count = 1;
+    const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
+    const estimate = h('p', { class: 'herb-estimate' });
+    const slider = h('input', {
+      type: 'range',
+      class: 'duration-slider',
+      min: 1,
+      max: most,
+      step: 1,
+      value: count,
+      'aria-label': 'Liczba zwojów',
+      onInput: () => set(Number(slider.value)),
+    });
+    const stepButton = (sign, label) =>
+      h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': label, text: sign < 0 ? '−' : '+', onClick: () => set(count + sign) });
+    const less = stepButton(-1, 'Mniej');
+    const more = stepButton(1, 'Więcej');
+    function set(nextCount) {
+      count = Math.min(most, Math.max(1, nextCount));
+      const label = countOf(count, 'zwój', 'zwoje', 'zwojów');
+      slider.value = String(count);
+      slider.setAttribute('aria-valuetext', label);
+      slider.style.setProperty('--fill', `${most > 1 ? ((count - 1) / (most - 1)) * 100 : 100}%`);
+      value.textContent = label;
+      less.disabled = count === 1;
+      more.disabled = count === most;
+      estimate.textContent = `Czas: ${formatMinutes(workMinutes(count, scroll.minutes))}. Zużyjesz: ${formatNumber(scroll.parts * count)} × ${scroll.part.name}.`;
+    }
+    set(count);
+    const start = h('button', {
+      type: 'button',
+      class: 'button button--system',
+      text: 'Zrób zwoje',
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          await call('POST', '/api/professions/craft', { scroll: true, count, ...who.body() });
+          window.scrollTo(0, 0);
+        }),
+    });
+    return card(
+      who.element,
+      h(
+        'div',
+        { class: 'duration-picker' },
+        h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, 'Liczba zwojów'), value),
+        h('div', { class: 'duration-row' }, less, slider, more),
+        h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: '1' }), h('span', { text: formatNumber(most) })),
+      ),
+      estimate,
+      h('p', { class: 'muted', text: 'Każdy zwój się uda. Zwoje nie zajmują miejsca w plecaku.' }),
+      start,
     );
   }
 

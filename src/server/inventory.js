@@ -192,15 +192,20 @@ export async function upgradeItem(context) {
   if (missingFor(cost, walletOf(player.row)).length > 0) {
     throw new ApiError(409, 'not_enough', 'Brakuje złota albo rudy żelaza na to ulepszenie.');
   }
+  // `ward`: a Zwój ochronny on the Kowadło, only where the item may break.
+  const body = context.request.headers.get('Content-Type') ? await readJson(context.request) : {};
+  const warded = body.ward === true && view.next.breakChance > 0;
+  const row = player.row;
+  if (warded && row.scrolls < 1) throw new ApiError(409, 'no_scroll', 'Nie masz Zwoju ochronnego. Zrobisz go w Systemowym Warsztacie.');
 
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const outcome = rollUpgrade(item, createRng(roll), content);
-  const row = player.row;
+  const outcome = rollUpgrade(item, createRng(roll), content, { warded });
   const ore = '$."iron-ore"';
   const db = context.env.DB;
   // The item changes only if it is as seen here (its level and last roll) and
-  // the price is still there; the payment only if this roll was saved, and a
-  // broken item goes after that. So two taps at once make and pay one try.
+  // the price (and the scroll) is still there; the payment only if this roll
+  // was saved, and a broken item goes after that. So two taps at once make
+  // and pay one try.
   const statements = [
     db
       .prepare(
@@ -208,15 +213,16 @@ export async function upgradeItem(context) {
          WHERE id = ? AND character_id = ?
            AND COALESCE(json_extract(data, '$.upgrade'), 0) = ? AND COALESCE(json_extract(data, '$.lastRoll'), '') = ?
            AND (SELECT gold FROM characters WHERE id = ?) >= ?
-           AND COALESCE(json_extract((SELECT resources FROM characters WHERE id = ?), ?), 0) >= ?`,
+           AND COALESCE(json_extract((SELECT resources FROM characters WHERE id = ?), ?), 0) >= ?
+           AND (SELECT scrolls FROM characters WHERE id = ?) >= ?`,
       )
-      .bind(outcome.upgrade, roll, item.id, row.id, view.level, item.lastRoll ?? '', row.id, cost.gold, row.id, ore, cost['iron-ore']),
+      .bind(outcome.upgrade, roll, item.id, row.id, view.level, item.lastRoll ?? '', row.id, cost.gold, row.id, ore, cost['iron-ore'], row.id, warded ? 1 : 0),
     db
       .prepare(
-        `UPDATE characters SET gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?), version = version + 1
+        `UPDATE characters SET gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?), scrolls = scrolls - ?, version = version + 1
          WHERE id = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
       )
-      .bind(cost.gold, ore, ore, cost['iron-ore'], row.id, item.id, roll),
+      .bind(cost.gold, ore, ore, cost['iron-ore'], warded ? 1 : 0, row.id, item.id, roll),
   ];
   if (outcome.result === 'broken') {
     statements.push(db.prepare("DELETE FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?").bind(item.id, roll));
@@ -226,7 +232,16 @@ export async function upgradeItem(context) {
     throw new ApiError(409, 'item_changed', 'Przedmiot albo zapasy zmieniły się w międzyczasie. Spróbuj jeszcze raz.');
   }
   return json({
-    upgrade: { itemId: item.id, name: itemName(item, content), result: outcome.result, from: view.level, to: outcome.upgrade, cost },
+    upgrade: {
+      itemId: item.id,
+      name: itemName(item, content),
+      result: outcome.result,
+      from: view.level,
+      to: outcome.upgrade,
+      cost,
+      ...(warded && { warded: true }),
+      ...(outcome.saved && { saved: true }),
+    },
     character: characterView(await loadPlayer(db, session.userId), context.now),
   });
 }
