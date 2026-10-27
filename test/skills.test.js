@@ -328,6 +328,9 @@ describe('skills', () => {
     const frozen = fight('mróz', [withSkill('mage', 'frost-gust')], [0, 1].map((i) => sturdy('wolf', 12, `e${i}`)));
     const slow = frozen.events.find((event) => event.kind === 'slow');
     assert.deepEqual(slow.targets, ['e0', 'e1']);
+    // The author: the slow grows by 1% with each level of the skill.
+    const said = (level) => skillView(content.skillsById['frost-gust'], level, content).effect.match(/spowolniony o (\d+)%/)[1];
+    assert.deepEqual([1, 2, 20].map(said), ['50', '51', '69']);
   });
 
   test('a fireball burns with fire whatever the staff', () => {
