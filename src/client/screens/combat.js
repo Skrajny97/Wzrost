@@ -6,10 +6,10 @@
 // inner regions areas.
 
 import { areaArt } from '../area-art.js';
-import { landArt, monsterSprite } from '../art.js';
+import { landArt, materialSprite, monsterSprite } from '../art.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon } from '../dom.js';
-import { formatCountdown, formatMinutes, timeFormat } from '../format.js';
+import { formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { preloadReportMusic } from '../music.js';
 import {
   activityFinished,
@@ -29,7 +29,8 @@ import {
   trackQuestsOn,
   unlockInfo,
 } from '../state.js';
-import { skipControl } from '../time.js';
+import { playSound } from '../sound.js';
+import { skipControl, timePoints } from '../time.js';
 import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
 
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -69,13 +70,13 @@ const areaOpen = (area, character) => character.classLevel >= area.unlockClassLe
 
 const chip = (text, className = '') => h('span', { class: `chip ${className}`.trim(), text });
 
-// "Czyhające niebezpieczeństwa": the creatures of an inner region with the
-// levels they come at. One the character has not met in a fight yet is only
-// a shadow with "???"; its levels show from the start.
+// The Bestiariusz: the creatures of an inner region with the levels they
+// come at. One the character has not met in a fight yet is only a shadow
+// with "???"; its levels show from the start.
 function dangersSheet(place) {
   const met = new Set(state.character.met ?? []);
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Czyhające niebezpieczeństwa' }),
+    h('h2', { class: 'sheet-title', text: 'Bestiariusz' }),
     h('p', { class: 'sheet-text', text: place.name }),
     h(
       'ul',
@@ -102,6 +103,50 @@ function dangersSheet(place) {
       class: 'muted',
       text: `Zobaczysz tutaj pełne informacje jedynie o stworach, z którymi ${state.character.appearance === 'female' ? 'stoczyłaś' : 'stoczyłeś'} potyczkę.`,
     }),
+    h('p', { class: 'muted', text: `Skrzynia Bestiariusza dostarcza ${chestText(place.chest)}, gdy poznasz wszystkie stwory tego regionu.` }),
+  );
+}
+
+const chestText = (chest) => `+${formatNumber(chest.gold)} złota i +${timePoints(chest.timePoints)}`;
+
+// The Bestiariusz chest beside its name, as at the quests: shut, with the
+// creatures met so far, until all are met, then ready to open, then open.
+function chestButton(place) {
+  const met = new Set(state.character.met ?? []);
+  const known = place.dangers.filter((danger) => met.has(danger.monsterId)).length;
+  const all = place.dangers.length;
+  const opened = (state.character.bestiary ?? []).includes(place.id);
+  const ready = !opened && known === all;
+  const inside = chestText(place.chest);
+  const label = opened
+    ? 'Skrzynia Bestiariusza otwarta'
+    : ready
+      ? `Otwórz skrzynię Bestiariusza: ${inside}`
+      : `Skrzynia Bestiariusza: ${inside}. Poznane stwory: ${known} z ${all}`;
+  const open = async () => {
+    if (opened) {
+      toast('Ta skrzynia jest już otwarta.');
+      return;
+    }
+    if (!ready) {
+      toast(`Poznaj wszystkie stwory tego regionu (${known} z ${all}), a skrzynia się otworzy. W środku: ${inside}.`);
+      return;
+    }
+    const { chest } = await call('POST', '/api/bestiary/chest', { area: place.id });
+    // Coins spilling from the chest (data/sounds.json).
+    playSound('chest');
+    toast(`Skrzynia otwarta: ${chestText(chest)}.`);
+  };
+  return h(
+    'button',
+    {
+      type: 'button',
+      class: `quest-chest quest-chest--${opened ? 'opened' : ready ? 'ready' : 'locked'} bestiary-chest`,
+      'aria-label': label,
+      onClick: (event) => withButton(event.currentTarget, open),
+    },
+    h('span', { class: 'quest-chest-art', 'aria-hidden': 'true' }, materialSprite('chest') ?? icon('pouch', { size: 28 })),
+    h('span', { class: 'quest-chest-caption', text: opened ? 'Otwarta' : ready ? 'Otwórz' : `${known}/${all}` }),
   );
 }
 
@@ -623,11 +668,16 @@ export function mountCombat(container, { params, navigate }) {
         h('p', { class: 'region-description', text: area.description }),
         area.dangers?.length > 0 &&
           h(
-            'button',
-            { type: 'button', class: 'danger-link', onClick: () => dangersSheet(area) },
-            icon('beast', { size: 20 }),
-            h('span', { text: 'Czyhające niebezpieczeństwa' }),
-            icon('chevron', { size: 18 }),
+            'div',
+            { class: 'bestiary-row' },
+            h(
+              'button',
+              { type: 'button', class: 'danger-link', onClick: () => dangersSheet(area) },
+              icon('beast', { size: 20 }),
+              h('span', { text: 'Bestiariusz' }),
+              icon('chevron', { size: 18 }),
+            ),
+            chestButton(area),
           ),
         track,
         levelNote,

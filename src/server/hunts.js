@@ -286,8 +286,8 @@ export async function finishHunt(db, player, now) {
   // A new level heals fully, with the finds worn from now on (hpAfterHunt).
   const worn = [...equippedItems(player), ...autoEquipped.map((index) => hunt.items[index])];
   const hp = hpAfterHunt({ character, applied, hunt, equipped: worn, name: row.name }, content);
-  // The creatures of every fight join those the character has met
-  // ("Czyhające niebezpieczeństwa" shows them by name from now on).
+  // The creatures of every fight join those the character has met (the
+  // Bestiariusz shows them by name from now on).
   const met = [...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))])];
   // The narrator's quests count the creatures beaten and the minutes. They
   // are saved only as read, so a reward claimed meanwhile is not undone.

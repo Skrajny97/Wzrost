@@ -3,6 +3,7 @@
 
 import { deleteAccount, login, logout, me, register } from './accounts.js';
 import { authorPanel, authorSkillDemo, authorSkills } from './author.js';
+import { openBestiaryChest } from './bestiary.js';
 import { buyParts, cancelBuilding, collectProduction, startBuilding, tradeAtFire } from './camp.js';
 import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
@@ -58,6 +59,7 @@ const routes = [
   ['POST', '/api/quests/claim', claimQuest],
   ['POST', '/api/quests/claim-all', claimAllQuests],
   ['POST', '/api/quests/chest', openChest],
+  ['POST', '/api/bestiary/chest', openBestiaryChest],
   ['GET', '/api/hunts/options', huntOptions],
   ['POST', '/api/hunts', startHunt],
   ['POST', '/api/hunts/cancel', cancelHunt],

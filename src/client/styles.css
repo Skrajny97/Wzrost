@@ -394,17 +394,38 @@ button {
   color: var(--system-text);
 }
 
-/* "Czyhające niebezpieczeństwa" on an inner region's card, and its list. */
-.danger-link {
+/* The Bestiariusz on an inner region's card, with its chest beside it (the
+   quests' chest, styled for the dark card), and its list. */
+.bestiary-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.bestiary-chest {
+  color: var(--text-muted);
+}
+
+.bestiary-chest.quest-chest--ready {
+  color: var(--gold);
+}
+
+/* Shut, still easy to see on the dark card. */
+.bestiary-chest.quest-chest--locked .quest-chest-art {
+  filter: grayscale(0.8);
+  opacity: 0.85;
+}
+
+.danger-link {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
   min-height: 44px;
   padding: 0;
   border: 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
   background: none;
   color: var(--gold);
   font-family: var(--font-system);

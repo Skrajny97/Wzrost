@@ -1683,7 +1683,7 @@ describe('Stół rzemieślniczy', () => {
   });
 });
 
-describe('Czyhające niebezpieczeństwa', () => {
+describe('Bestiariusz', () => {
   let cookie;
   beforeEach(async () => {
     cookie = await signUp();
@@ -1721,6 +1721,30 @@ describe('Czyhające niebezpieczeństwa', () => {
     await database.batch(migration.map((statement) => database.prepare(statement)));
     const { character } = (await call('GET', '/api/character', { cookie })).data;
     assert.deepEqual([...character.met].sort(), fought(report));
+  });
+
+  test('its chest opens once every creature of the inner region is met, once', async () => {
+    const { data } = await call('GET', '/api/content');
+    assert.deepEqual(data.regions[0].areas[0].chest, { gold: 30, timePoints: 5 });
+    const open = (area) => call('POST', '/api/bestiary/chest', { cookie, body: { area } });
+    const before = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.deepEqual(before.bestiary, []);
+    assert.equal((await open('nowhere')).status, 404);
+    const database = await db();
+    await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(['wolf', 'fox', 'viper', 'badger'])).run();
+    const shut = await open('windfalls-edge');
+    assert.deepEqual([shut.status, shut.data.error.code], [409, 'not_ready']);
+    await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(['wolf', 'fox', 'viper', 'badger', 'wisp'])).run();
+    const opened = await open('windfalls-edge');
+    assert.equal(opened.status, 200);
+    assert.deepEqual(opened.data.chest, { gold: 30, timePoints: 5 });
+    assert.equal(opened.data.character.gold, before.gold + 30);
+    assert.equal(opened.data.character.timePoints, before.timePoints + 5);
+    assert.deepEqual(opened.data.character.bestiary, ['windfalls-edge']);
+    const again = await open('windfalls-edge');
+    assert.deepEqual([again.status, again.data.error.code], [409, 'opened']);
+    // Another inner region's list is not full with these.
+    assert.equal((await open('fox-ravines')).data.error.code, 'not_ready');
   });
 });
 

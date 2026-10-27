@@ -120,7 +120,7 @@
     "style": "grupa",
     "rarity": "common",
     "description": "Lodowaty wiatr smaga wszystkich wrogów i spowalnia ich ruchy.",
-    "effect": "Zaklęcie mrozu na wszystkich wrogów zadaje {power%} obrażeń. Każdy trafiony zostaje spowolniony.",
+    "effect": "Zaklęcie mrozu na wszystkich wrogów zadaje {power%} obrażeń. Każdy trafiony zostaje spowolniony o {slow%}.",
     "kind": "sweep",
     "mana": 14,
     "cooldown": 3,
