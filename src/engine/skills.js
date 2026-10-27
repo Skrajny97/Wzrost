@@ -120,15 +120,12 @@ export function raiseBlock(character, skillId, content) {
 
 // The skill's effect in words at its numbers. {name} is a whole number,
 // {name%} a percent, {name%.1} a percent with one decimal, {name pp}
-// percentage points, {name.1} one decimal, {cooldown} the cooldown,
-// {critPower%} the power with a critical hit and {slow%} how much slower a
-// slowed enemy is until its next move: put off by a whole move (`delay` 1),
-// it waits twice as long, so it is 50% slower.
+// percentage points, {name.1} one decimal, {cooldown} the cooldown and
+// {critPower%} the power with a critical hit.
 const decimal = (value) => String(Math.round(value * 10) / 10).replace('.', ',');
 
 export function skillText(template, skill, params, content) {
-  const slow = typeof params.delay === 'number' ? params.delay / (1 + params.delay) : undefined;
-  const values = { ...params, cooldown: skill.cooldown, critPower: (params.power ?? 0) * content.balance.combat.critMultiplier, slow };
+  const values = { ...params, cooldown: skill.cooldown, critPower: (params.power ?? 0) * content.balance.combat.critMultiplier };
   return template.replace(/\{(\w+)(%\.1|%| pp|\.1)?\}/g, (whole, name, format) => {
     const value = values[name];
     if (typeof value !== 'number') return whole;

@@ -1860,7 +1860,8 @@ Autor: „Rozwiń poziom obozu zasłania często przychód z tartaku, daj przyci
 
 ## Spowolnienie Mroźnego podmuchu w opisie (27.10.2026)
 
-1. **Wartość w opisie** (autor: „„Każdy trafiony zostaje spowolniony.” dodajemy „Każdy trafiony zostaje spowolniony o x%.” Nie wiem jak to liczy System ale niech pokazuje jednak wartość spowolnienia”). System odsuwa najbliższy ruch każdego trafionego wroga o cały jeden ruch, więc wróg czeka na niego dwa razy dłużej. Do tego ruchu jest więc o 50% wolniejszy i tyle pokazuje opis: „Każdy trafiony zostaje spowolniony o 50%.”. Liczba wynika z `delay` w `data/skills.json` (`{slow%}` w opisie), więc zmieni się razem z nim. Spowolnienie nie rośnie z poziomem umiejętności.
+1. **Wartość w opisie** (autor: „„Każdy trafiony zostaje spowolniony.” dodajemy „Każdy trafiony zostaje spowolniony o x%.” Nie wiem jak to liczy System ale niech pokazuje jednak wartość spowolnienia”). System odsuwa najbliższy ruch każdego trafionego wroga o cały jeden ruch, więc wróg czeka na niego dwa razy dłużej. Do tego ruchu jest więc o 50% wolniejszy i tyle pokazuje opis: „Każdy trafiony zostaje spowolniony o 50%.”. Liczba wynika z `delay` w `data/skills.json` (`{slow%}` w opisie), więc zmieni się razem z nim. Spowolnienie nie rośnie z poziomem umiejętności. *Teraz rośnie, zob. punkt 2.*
+2. **Spowolnienie rośnie z poziomem** (autor: „Niech wartość spowolnienia Mroźnego podmuchu też rośnie o 1% wraz z poziomem umiejętności”). 50% na 1. poziomie i o 1 punkt procentowy więcej na każdym następnym, do 69% na 20. W danych stoi teraz `slow` (od 0,5 do 0,69) zamiast `delay`. Walka odsuwa najbliższy ruch trafionego o slow / (1 − slow) jego ruchu: o cały ruch przy 50%, o ok. 2,2 ruchu przy 69%. W wersji 0.0.6.
 
 ## Wersja testowa i Zielarstwo (26.10.2026)
 

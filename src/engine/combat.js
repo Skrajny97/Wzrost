@@ -333,9 +333,12 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
           if (target.hp <= 0) continue;
           strike(actor, target, t, blowOf(skill, { power, sweep: true }));
         }
-        if (skill.params.delay) {
+        // A slow of 50% halves a hit enemy's speed until its next move: it
+        // waits twice as long for it, 1 / (1 - slow) times.
+        if (skill.params.slow) {
           const slowed = opponents.filter((unit) => unit.hp > 0);
-          for (const unit of slowed) unit.next += skill.params.delay * unit.interval;
+          const delay = skill.params.slow / (1 - skill.params.slow);
+          for (const unit of slowed) unit.next += delay * unit.interval;
           if (slowed.length > 0) {
             const one = slowed.length === 1;
             log(() => ({ ...base, kind: 'slow', targets: slowed.map((unit) => unit.id), text: say(texts, one ? 'slowOne' : 'slow', actions, { target: slowed[0].name }) }));

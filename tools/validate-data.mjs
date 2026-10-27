@@ -233,8 +233,7 @@ function checkReferences(data) {
     if (params.category !== undefined && !['physical', 'magical'].includes(params.category)) errors.push(`${where} ma nieznany rodzaj obrażeń "${params.category}"`);
     if (params.target !== undefined && params.target !== 'back') errors.push(`${where} ma nieznany cel "${params.target}"`);
     for (const [, name] of skill.effect.matchAll(/\{(\w+)(?:%\.1|%| pp|\.1)?\}/g)) {
-      const derived = name === 'cooldown' || name === 'critPower' || (name === 'slow' && params.delay !== undefined);
-      if (!(name in params) && !derived) errors.push(`${where} ma w opisie skutku nieznaną liczbę "${name}"`);
+      if (!(name in params) && name !== 'cooldown' && name !== 'critPower') errors.push(`${where} ma w opisie skutku nieznaną liczbę "${name}"`);
     }
     const choice = `${skill.classId}, poziom klasy ${skill.classLevel}`;
     skillChoices.set(choice, (skillChoices.get(choice) ?? 0) + 1);

@@ -124,7 +124,7 @@
     "kind": "sweep",
     "mana": 14,
     "cooldown": 3,
-    "params": { "power": [0.4, 0.6], "category": "magical", "element": "frost", "delay": 1 }
+    "params": { "power": [0.4, 0.6], "category": "magical", "element": "frost", "slow": [0.5, 0.69] }
   },
   {
     "id": "mana-shield",
