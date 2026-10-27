@@ -205,13 +205,14 @@
     "skills": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Umiejętności: od unlockClassLevel postać wybiera jedną z trzech umiejętności klasy, swoją główną ścieżkę. Od secondClassLevel może dobrać drugą za Punkt Umiejętności, a wtedy pozostała ścieżka się zamyka: razem najwyżej paths. Każdy kolejny poziom klasy daje pointsPerClassLevel Punktów Umiejętności, a punkt podnosi umiejętność o poziom, najwyżej do maxLevel.",
+      "description": "Umiejętności: od unlockClassLevel postać wybiera jedną z trzech umiejętności klasy, swoją główną ścieżkę. Od secondClassLevel może dobrać drugą za Punkt Umiejętności, a wtedy pozostała ścieżka się zamyka: razem najwyżej paths. Każdy poziom klasy od unlockClassLevel do lastPointClassLevel daje pointsPerClassLevel Punktów Umiejętności, a punkt poznaje umiejętność albo podnosi poznaną o poziom, najwyżej do maxLevel.",
       "required": [
         "unlockClassLevel",
         "maxLevel",
         "pointsPerClassLevel",
         "paths",
-        "secondClassLevel"
+        "secondClassLevel",
+        "lastPointClassLevel"
       ],
       "properties": {
         "unlockClassLevel": {
@@ -235,6 +236,11 @@
           "type": "integer",
           "minimum": 1,
           "description": "Poziom klasy, od którego można dobrać kolejną umiejętność progu."
+        },
+        "lastPointClassLevel": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Ostatni poziom klasy, który daje Punkty Umiejętności. Punkty z poziomów od unlockClassLevel do niego wypełniają dokładnie paths ścieżek po maxLevel poziomów, przed pierwszą ewolucją."
         }
       }
     },

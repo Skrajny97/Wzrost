@@ -6,7 +6,7 @@
 // and the path left closes: of the three it knows at most
 // balance.skills.paths. The first learned stays first in `character.skills`
 // (keys keep the order they were added in). Every class level from
-// unlockClassLevel on, that one included, brings Skill Points, and each point
+// unlockClassLevel to lastPointClassLevel brings Skill Points, and each point
 // learns a skill or raises a learned one by a level, up to maxLevel. A skill's
 // numbers grow evenly from level 1 to the top level ([from, to] in its
 // params). The fight (combat.js) uses learned skills by their kind.
@@ -31,11 +31,14 @@ export function skillParams(skill, level, content) {
 
 // Skill Points: earned from the class level of the first milestone on, that
 // one included (the author: "10 poziom powinien dawać już 1 Punkt
-// Umiejętności"), and spent one per level of each learned skill, the first
-// level of the main path too (the author: "żadnych bonusów na start").
+// Umiejętności"), up to lastPointClassLevel (the author: "nie dostaje
+// punktu przy awansie z 49 na 50 lvl"), and spent one per level of each
+// learned skill, the first level of the main path too (the author:
+// "żadnych bonusów na start"). So they fill both paths to the top level,
+// with none left (tools/validate-data.mjs).
 export function skillPoints(character, content) {
-  const { unlockClassLevel, pointsPerClassLevel } = content.balance.skills;
-  const earned = Math.max(0, character.classLevel - unlockClassLevel + 1) * pointsPerClassLevel;
+  const { unlockClassLevel, lastPointClassLevel, pointsPerClassLevel } = content.balance.skills;
+  const earned = Math.max(0, Math.min(character.classLevel, lastPointClassLevel) - unlockClassLevel + 1) * pointsPerClassLevel;
   const spent = Object.values(character.skills ?? {}).reduce((sum, level) => sum + level, 0);
   return { earned, spent, free: Math.max(0, earned - spent) };
 }
@@ -201,6 +204,7 @@ export function skillsView(character, content) {
   const block = evolutionBlock(character, content);
   return {
     unlockLevel: content.balance.skills.unlockClassLevel,
+    lastPointLevel: content.balance.skills.lastPointClassLevel,
     secondLevel: secondClassLevel,
     paths,
     evolution: { level: content.balance.progression.classEvolutionLevels[0], need: block?.code ?? null },
