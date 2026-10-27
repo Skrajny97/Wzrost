@@ -342,7 +342,20 @@
         "style": "rd_advanced_animation__custom_action",
         "startFrame": "art/references/animations/crafting-start.png",
         "frames": 8
-      }
+      },
+      "alchemy-smooth": {
+        "prompt": "stirs the bubbling cauldron with the wooden paddle in a slow circle, green bubbles rise and pop, steam curls up, smooth seamless loop",
+        "style": "rd_advanced_animation__custom_action",
+        "startFrame": "art/references/animations/alchemy-start.png",
+        "frames": 8
+      },
+      "exploring-walk": {
+        "prompt": "a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet and a small travel pack",
+        "style": "rd_animation__four_angle_walking",
+        "width": 48,
+        "height": 48
+      },
+      "exploring-side": "pixel art sprite for a side-scrolling game: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet and a small travel pack, in profile facing right, walking to the right on a narrow dirt forest path at night, walk cycle loop"
     }
   }
 }

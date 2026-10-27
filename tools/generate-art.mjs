@@ -8,7 +8,8 @@
 // there as references (art/references/<kind>/<id>.png) keep the style of the new
 // ones consistent. A kind with `animation` draws looping animations, one at a
 // time, each as a PNG sheet of its frames; a prompt with `startFrame` (a PNG
-// in the repository) moves that picture in `frames` frames. Every request is
+// in the repository) moves that picture in `frames` frames, and one with
+// `width` and `height` has its own size. Every request is
 // priced first (free), and the run stops before it would spend more than
 // --max-cost dollars.
 
@@ -114,8 +115,8 @@ async function draw(id, count = variants) {
   const payload = {
     prompt: promptOf(id),
     prompt_style: style,
-    width: kind.width,
-    height: kind.height,
+    width: kind.prompts[id].width ?? kind.width,
+    height: kind.prompts[id].height ?? kind.height,
     num_images: count,
     seed,
     // Sprites lose their background; scenes (removeBackground: false) keep it.
