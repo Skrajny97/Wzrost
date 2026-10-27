@@ -147,13 +147,14 @@ function questCount({ kind, perFight }, periodId, rng) {
 // The band of levels the character is in (levels in quests.json).
 export const questLevel = (level, content) => content.quests.levels.findLast((band) => band.fromLevel <= level);
 
-// A quest's reward: gold, a resource or parts, more at a higher level.
-function questReward(periodId, level, rng, content) {
+// A quest's reward: gold, a resource or parts, more at a higher level, and
+// `factor` times as much for a rarer kind (rewardFactor in quests.json).
+function questReward(periodId, level, rng, content, factor = 1) {
   const { rewards } = content.quests;
   const [kind] = rng.weighted(Object.entries(rewards.weights), ([, weight]) => weight);
   const { base, perLevel } = rewards[periodId][kind];
   const spread = rng.float(1 - rewards.spread, 1 + rewards.spread);
-  const amount = (share = 1) => Math.max(1, Math.round((base + perLevel * level) * share * spread));
+  const amount = (share = 1) => Math.max(1, Math.round((base + perLevel * level) * share * spread * factor));
   if (kind === 'gold') return { kind, amount: amount() };
   if (kind === 'resource') {
     const [id, share] = rng.pick(Object.entries(rewards.resources));
@@ -181,7 +182,7 @@ export function drawQuests(periodId, { character, hasTable, hasProfessions, seed
       ...(option.target && { target: option.target }),
       count: questCount(option, periodId, rng),
       progress: 0,
-      reward: questReward(periodId, character.level, rng, content),
+      reward: questReward(periodId, character.level, rng, content, option.kind.rewardFactor),
       claimed: false,
     }));
 }
@@ -213,12 +214,13 @@ export function huntKills(hunt) {
   return kills;
 }
 
-// What claimed explorations, gatherings and brewings and the table's
-// orders add: creatures beaten (`kills` by id), `minutes` explored,
-// materials `processed`, items `salvaged`, herbs gathered (`herbs` by id,
-// all of those found, also those the bag lost) and potions brewed
-// (`potions` by id, the same way). A quest stops at its count.
-export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {} }) {
+// What claimed explorations, gatherings, brewings and orders of items and
+// the table's orders add: creatures beaten (`kills` by id), `minutes`
+// explored, materials `processed`, items `salvaged`, herbs gathered (`herbs`
+// by id, all of those found, also those the bag lost), potions brewed
+// (`potions` by id, the same way) and items `made` in the Warsztat (only
+// those that came out). A quest stops at its count.
+export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0 }) {
   const total = (counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
   const gathered = total(herbs);
   const gain = {
@@ -230,6 +232,8 @@ export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 
     gatherAny: () => gathered,
     brew: (quest) => potions[quest.target] ?? 0,
     brewAny: () => total(potions),
+    make: () => made,
+    makeAny: () => made,
   };
   return Object.fromEntries(
     Object.entries(quests).map(([periodId, period]) => [

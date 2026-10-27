@@ -107,5 +107,7 @@ export function buildContent(raw) {
     potionsById: byId(raw.professions?.potions ?? []),
     // How potions are drunk on explorations (potions.js).
     potionUse: raw.professions?.potionUse,
+    // The gear Rzemieślnictwo makes (workshop.js).
+    workshop: raw.professions?.workshop,
   };
 }

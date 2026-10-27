@@ -545,6 +545,42 @@ function checkProfessions(data, { stats }) {
     errors.push('professions.json: gathering.minutes.max musi wypadać na kroku suwaka od min');
   }
   errors.push(...checkBrewing(data.professions, ids));
+  errors.push(...checkWorkshop(data, ids));
+  return errors;
+}
+
+// The Warsztat: a crafting profession, slots and families of bases that
+// exist, resources that exist, and every rarity once, in order, from level 1
+// on, within the profession's levels.
+function checkWorkshop(data, ids) {
+  const errors = [];
+  const { workshop, professions } = data.professions;
+  const crafter = professions.find((profession) => profession.id === workshop.profession);
+  if (!ids.has(workshop.profession) || crafter.kind !== 'crafting') {
+    errors.push(`professions.json: workshop.profession "${workshop.profession}" nie jest profesją wytwórczą`);
+  }
+  const slots = new Set(data.slots.map((slot) => slot.id));
+  for (const slot of Object.keys(workshop.parts)) {
+    if (!slots.has(slot)) errors.push(`professions.json: workshop.parts ma nieznany slot "${slot}"`);
+  }
+  const resources = new Set(data.resources.map((resource) => resource.id));
+  const families = new Set(data['item-bases'].map((base) => base.family ?? base.id));
+  for (const [resource, list] of Object.entries(workshop.resources.families)) {
+    if (!resources.has(resource)) errors.push(`professions.json: workshop.resources.families ma nieznany zasób "${resource}"`);
+    for (const family of list) {
+      if (!families.has(family)) errors.push(`professions.json: workshop.resources.families ma nieznaną rodzinę "${family}"`);
+    }
+  }
+  if (workshop.rarities.map((rarity) => rarity.id).join() !== data.rarities.map((rarity) => rarity.id).join()) {
+    errors.push('professions.json: workshop.rarities musi mieć każdą rzadkość raz, w kolejności z rarities.json');
+  }
+  if (workshop.rarities[0]?.level !== 1) errors.push('professions.json: workshop.rarities musi zaczynać się od poziomu 1');
+  workshop.rarities.forEach((rarity, index) => {
+    if (index > 0 && rarity.level <= workshop.rarities[index - 1].level) errors.push('professions.json: poziomy w workshop.rarities muszą rosnąć');
+    if (crafter && rarity.level > crafter.maxLevel) errors.push(`professions.json: rzadkość ${rarity.id} wymaga poziomu ${rarity.level}, a profesja kończy się na ${crafter.maxLevel}`);
+    if (!(rarity.chance > 0 && rarity.chance <= 1)) errors.push(`professions.json: szansa rzadkości ${rarity.id} musi być z przedziału (0, 1]`);
+  });
+  if (crafter && workshop.laterPatternLevel > crafter.maxLevel) errors.push('professions.json: workshop.laterPatternLevel przekracza poziomy profesji');
   return errors;
 }
 

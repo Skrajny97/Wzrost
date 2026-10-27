@@ -1,9 +1,10 @@
 // Phone notifications (src/server/push.js sends them): what a player hears
 // about from a stretch of time, after `from` up to `to`: the exploration,
-// gathering or brewing that ended, the camp builds that ended and the stores
-// that filled up, which stops their production. Each kind has its tag, and on
-// the phone a newer notification takes the place of an older one with the
-// same tag, so the store's one names every store full at `to`.
+// gathering, brewing or order of items that ended, the camp builds that
+// ended and the stores that filled up, which stops their production. Each
+// kind has its tag, and on the phone a newer notification takes the place of
+// an older one with the same tag, so the store's one names every store full
+// at `to`.
 
 import { production } from './camp.js';
 import { areaFor } from './hunt.js';
@@ -28,8 +29,8 @@ export function notificationsDue({ level, activity, buildings, queue }, from, to
       body: say(texts, 'pushHuntBody', 0, { area: area?.name ?? '' }),
     });
   }
-  // A gathering of herbs (professions.js) and a brewing of potions
-  // (brewing.js), told the same way.
+  // A gathering of herbs (professions.js), a brewing of potions (brewing.js)
+  // and an order of items (workshop.js), told the same way.
   if (activity?.kind === 'herbs' && within(activity.endsAt, from, to)) {
     due.push({
       tag: 'herbs',
@@ -46,6 +47,15 @@ export function notificationsDue({ level, activity, buildings, queue }, from, to
       at: activity.endsAt,
       title: say(content.brewing.texts, 'pushTitle', 0),
       body: say(content.brewing.texts, 'pushBody', 0, { place: content.brewing.place.name }),
+    });
+  }
+  if (activity?.kind === 'items' && within(activity.endsAt, from, to)) {
+    due.push({
+      tag: 'items',
+      url: '#/profesje/rzemieslnictwo',
+      at: activity.endsAt,
+      title: say(content.workshop.texts, 'pushTitle', 0),
+      body: say(content.workshop.texts, 'pushBody', 0, { place: content.workshop.place.name }),
     });
   }
 

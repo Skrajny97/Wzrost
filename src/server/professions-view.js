@@ -3,12 +3,18 @@
 // characters.js can draw the view without a loop between the two.
 
 import {
+  baseClasses,
+  craftChance,
+  craftCost,
+  craftableBases,
   fightKind,
   gatheringMinutes,
   herbSlots,
   herbsPerHour,
   isUnlocked,
+  itemMinutes,
   mostPotions,
+  patternLevel,
   potionMinutes,
   potionPrice,
   professionStatBonus,
@@ -62,16 +68,19 @@ export function bagPotions(row, sellBonus) {
 // the gathering of Zielarstwo: its place, the slider, how many herbs at
 // once, and each herb, known or hidden by the System; and the brewing of
 // Alchemia: its place, a potion's minutes and each recipe, known (with its
-// herbs and the most potions at once) or hidden. Null while the professions
+// herbs and the most potions at once) or hidden; and the Warsztat of
+// Rzemieślnictwo: its place, the slots with their patterns, known (with what
+// one item takes) or hidden, and the rarities. Null while the professions
 // are hidden in this deployment or not unlocked yet.
 export function professionsView(row) {
   if (!professionsOn() || !isUnlocked('professions', row.level, content)) return null;
   const professions = JSON.parse(row.professions ?? '{}');
   const herbs = herbsOf(row);
   const potions = potionsOf(row);
-  const { gathering, brewing } = content;
+  const { gathering, brewing, workshop } = content;
   const gatherer = professionState(professions, gathering.profession);
   const brewer = professionState(professions, brewing.profession);
+  const crafter = professionState(professions, workshop.profession);
   const hidden = content.professionTexts.hidden;
   return {
     list: content.professions.map((profession) => {
@@ -140,5 +149,61 @@ export function professionsView(row) {
           : { id: potion.id, level: potion.level, hidden: true, hint: say(brewing.texts, 'hidden', 0, { level: potion.level }) },
       ),
     },
+    workshop: workshopView(crafter.level),
+  };
+}
+
+// The Warsztat at a level of Rzemieślnictwo. What one item of a pattern
+// takes is told for common gear: the parts of the rarity chosen, and the
+// resources times the rarity's step (craftCost). A rarity's minutes are of
+// one item at this level; an order of n takes n of them, rounded up to a
+// whole minute (orderMinutes).
+function workshopView(level) {
+  const { workshop } = content;
+  const hint = (from) => say(workshop.texts, 'hidden', 0, { level: from });
+  const bases = craftableBases(content);
+  return {
+    professionId: workshop.profession,
+    place: workshop.place,
+    maxCount: workshop.maxCount,
+    // The slots in the order of the parts they take, the weapon first.
+    slots: Object.keys(workshop.parts)
+      .map((id) => content.slotsById[id])
+      .map((slot) => ({
+        id: slot.id,
+        name: slot.name,
+        patterns: bases
+          .filter((base) => base.slot === slot.id)
+          .map((base) => {
+            const from = patternLevel(base, content);
+            if (from > level) return { id: base.id, level: from, hidden: true, hint: hint(from) };
+            const one = craftCost(base, 'common', 1, content);
+            const classIds = baseClasses(base.id, content);
+            return {
+              id: base.id,
+              name: base.name,
+              level: from,
+              parts: Object.values(one.parts)[0],
+              resources: Object.entries(one.resources).map(([id, amount]) => ({ id, name: content.resourcesById[id].name, amount })),
+              classNames: classIds && classIds.map((id) => content.classesById[id].name),
+              classLevel: base.classLevel ?? null,
+            };
+          }),
+      })),
+    rarities: workshop.rarities.map((rarity) => {
+      const { name, color } = content.raritiesById[rarity.id];
+      const part = content.partsByRarity[rarity.id];
+      return {
+        id: rarity.id,
+        name,
+        color,
+        level: rarity.level,
+        step: content.rarities.findIndex((candidate) => candidate.id === rarity.id) + 1,
+        part: { id: part.id, name: part.name },
+        ...(rarity.level <= level
+          ? { chance: craftChance(rarity.id, level, content), itemMinutes: itemMinutes(rarity.id, level, content) }
+          : { hidden: true, hint: hint(rarity.level) }),
+      };
+    }),
   };
 }

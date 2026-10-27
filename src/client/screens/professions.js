@@ -5,26 +5,35 @@
 // gather and the time, and the gathering under way with "Przewiń",
 // "Przerwij" and its report at the end; and the Alchemia screen in the same
 // way: the Systemowa Pracownia, the recipes, how many potions and the
-// brewing under way. Locked, or hidden in this deployment, the tab says so
-// as before.
+// brewing under way; and the Rzemieślnictwo screen: the Systemowy
+// Warsztat, the patterns by slot, the rarity, how many items and the order
+// under way. Locked, or hidden in this deployment, the tab says so as before.
 
-import { herbSprite, placeArt, potionSprite, professionSprite } from '../art.js';
+import { herbSprite, itemSprite, placeArt, potionSprite, professionSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, systemPanel, toast, withButton } from '../ui.js';
+import { itemSummary } from './character.js';
 import { lockedScreen } from './locked.js';
 
 const HOME = '#/profesje';
 // The addresses of the professions with a screen.
-const SCREENS = { zielarstwo: 'herbalism', alchemia: 'alchemy' };
-const HASHES = { herbalism: `${HOME}/zielarstwo`, alchemy: `${HOME}/alchemia` };
+const SCREENS = { zielarstwo: 'herbalism', alchemia: 'alchemy', rzemieslnictwo: 'crafting' };
+const HASHES = { herbalism: `${HOME}/zielarstwo`, alchemy: `${HOME}/alchemia`, crafting: `${HOME}/rzemieslnictwo` };
 // The activity of each profession's work, and what its square says meanwhile.
-const WORK = { herbalism: { kind: 'herbs', busy: 'Zbiera zioła' }, alchemy: { kind: 'potions', busy: 'Warzy mikstury' } };
+const WORK = {
+  herbalism: { kind: 'herbs', busy: 'Zbiera zioła' },
+  alchemy: { kind: 'potions', busy: 'Warzy mikstury' },
+  crafting: { kind: 'items', busy: 'Wykonuje przedmioty' },
+};
 const FALLBACK_ICONS = { herbalism: 'leaf', alchemy: 'spirit', crafting: 'hammer' };
 const HERB_CHOICE = 'wzrost.herb-choice';
 const BREW_CHOICE = 'wzrost.brew-choice';
+const CRAFT_CHOICE = 'wzrost.craft-choice';
+// The Stół rzemieślniczy, where parts are made.
+const TABLE = '#/oboz/craft-table';
 
 function loadChoice(key) {
   try {
@@ -44,10 +53,11 @@ function saveChoice(key, choice) {
 
 const herbIcon = (id) => herbSprite(id) ?? icon('leaf', { size: 24 });
 const potionIcon = (id) => potionSprite(id) ?? icon('flask', { size: 24 });
+const patternIcon = (id) => itemSprite({ base: id }) ?? icon('hammer', { size: 24 });
 
-// A brewing of `count` potions in whole minutes, as the server counts it
-// (brewMinutes in src/engine/brewing.js).
-const brewMinutes = (count, potionMinutes) => Math.ceil(Math.round(count * potionMinutes * 1000) / 1000);
+// A work of `count` potions or items of `each` minutes in whole minutes, as
+// the server counts it (brewMinutes and orderMinutes in src/engine).
+const workMinutes = (count, each) => Math.ceil(Math.round(count * each * 1000) / 1000);
 
 // A title with a large "Powrót" on the right, as in the report.
 function backHeading(title, subtitle, hash) {
@@ -69,6 +79,7 @@ export function mountProfessions(container, { params, navigate }) {
   }
   const choice = loadChoice(HERB_CHOICE); // { herbs: [ids], minutes }
   const brewChoice = loadChoice(BREW_CHOICE); // { recipe, count }
+  const craftChoice = loadChoice(CRAFT_CHOICE); // { slot, pattern, rarity, count }
   let lockedScreenShown = null;
   let shownState = null;
   let countdown = null;
@@ -100,6 +111,10 @@ export function mountProfessions(container, { params, navigate }) {
     }
     if (professionId === 'alchemy') {
       renderAlchemy(character);
+      return;
+    }
+    if (professionId === 'crafting') {
+      renderCrafting(character);
       return;
     }
     fill(
@@ -175,9 +190,24 @@ export function mountProfessions(container, { params, navigate }) {
     );
   }
 
+  function renderCrafting(character) {
+    const { list, workshop } = character.professions;
+    const profession = list.find((candidate) => candidate.id === workshop.professionId);
+    const activity = character.activity;
+    fill(
+      container,
+      backHeading(profession.name, `poziom ${profession.level}`, HOME),
+      activity?.kind === 'items' ? craftingCard(activity) : activity && busyPanel(activity, 'Wyrób zacznie po powrocie.'),
+      testTools(character, 'items', 'Tryb testowy: wyrób skończy się od razu, z tym samym wynikiem.'),
+      placeCard(workshop.place),
+      levelCard(profession, 'wyrobu'),
+      !activity && craftForm(character, workshop),
+    );
+  }
+
   // What the character does elsewhere, and when it comes here.
   function busyPanel(activity, then) {
-    const doing = { herbs: 'Postać zbiera zioła.', potions: 'Postać warzy mikstury.' }[activity.kind] ?? 'Postać jest na wyprawie.';
+    const doing = { herbs: 'Postać zbiera zioła.', potions: 'Postać warzy mikstury.', items: 'Postać wykonuje przedmioty.' }[activity.kind] ?? 'Postać jest na wyprawie.';
     return systemPanel(`${doing} ${then}`);
   }
 
@@ -323,6 +353,39 @@ export function mountProfessions(container, { params, navigate }) {
       },
     });
     return workUnderWay(activity, `Warzenie w toku: ${what}, ${formatMinutes(activity.minutes)}.`, 'Warzenie', cancel);
+  }
+
+  // The order under way, or its report waiting. Called back early, the
+  // character brings the items done, with their report.
+  function craftingCard(activity) {
+    const what = `${activity.count} × ${activity.base?.name ?? 'przedmiot'} (${activity.rarityName})`;
+    if (activityFinished(activity)) {
+      return systemPanel(`Wyrób zakończony: ${what}.`, 'Raport czeka na odbiór.', claimButton());
+    }
+    const cancel = h('button', {
+      type: 'button',
+      class: 'button button--world',
+      text: 'Przerwij wyrób',
+      onClick: async (event) => {
+        const button = event.currentTarget;
+        const done = Math.min(activity.count, Math.floor((activity.count * (serverNow() - activity.startedAt)) / (activity.endsAt - activity.startedAt)));
+        const sure = await confirmAction({
+          title: 'Przerwać wyrób?',
+          text:
+            done > 0
+              ? `Ukończone przedmioty (${formatNumber(done)}) zostaną, a części i zasoby na resztę wrócą.`
+              : 'Żaden przedmiot nie jest jeszcze ukończony. Części i zasoby wrócą.',
+          confirmLabel: 'Przerwij',
+          danger: true,
+        });
+        if (!sure) return;
+        await withButton(button, async () => {
+          const { report } = await call('POST', '/api/hunts/cancel');
+          if (report) openReport(report);
+        });
+      },
+    });
+    return workUnderWay(activity, `Wyrób w toku: ${what}, ${formatMinutes(activity.minutes)}.`, 'Wyrób', cancel);
   }
 
   // The herbs to gather, the time and the start.
@@ -627,7 +690,7 @@ export function mountProfessions(container, { params, navigate }) {
         less.disabled = count === 1;
         more.disabled = count === most;
         const used = recipe.herbs.map((herb) => `${herb.need * count} × ${herb.name}`).join(', ');
-        estimate.textContent = `Czas warzenia: ${formatMinutes(brewMinutes(count, brewing.potionMinutes))}. Zużyjesz: ${used}.`;
+        estimate.textContent = `Czas warzenia: ${formatMinutes(workMinutes(count, brewing.potionMinutes))}. Zużyjesz: ${used}.`;
         const fits = roomFor(count);
         room.className = `herb-room${count > fits ? ' herb-room--full' : ''}`;
         room.textContent =
@@ -669,6 +732,235 @@ export function mountProfessions(container, { params, navigate }) {
       about,
       needs,
       lucky,
+      picker,
+    );
+  }
+
+  // The slots, the patterns of the slot chosen (those the System still hides
+  // are shadows), the rarity, how many items, what they take, the chance and
+  // the time, and the start.
+  function craftForm(character, workshop) {
+    const known = (slot) => slot.patterns.filter((pattern) => !pattern.hidden);
+    // A slot's pattern for the character's class comes first.
+    const firstFor = (slot) => known(slot).find((pattern) => !pattern.classNames || pattern.classNames.includes(character.className)) ?? known(slot)[0];
+    const rarities = workshop.rarities.filter((rarity) => !rarity.hidden);
+    const next = workshop.rarities.find((rarity) => rarity.hidden);
+    let slot = workshop.slots.find((candidate) => candidate.id === craftChoice.slot) ?? workshop.slots[0];
+    let pattern = known(slot).find((candidate) => candidate.id === craftChoice.pattern) ?? firstFor(slot);
+    let rarity = rarities.find((candidate) => candidate.id === craftChoice.rarity) ?? rarities[0];
+    let count = 1;
+    const free = Math.max(0, character.bagCapacity - character.bagUsed);
+    const partCount = (id) => character.crafting.parts.find((part) => part.id === id)?.count ?? 0;
+    const need = (resource) => resource.amount * rarity.step;
+
+    const slotRow = h('div', { class: 'segmented workshop-slots', role: 'group', 'aria-label': 'Rodzaj przedmiotu' });
+    const tiles = h('ul', { class: 'herb-grid' });
+    const hiddenHint = h('p', { class: 'muted' });
+    const rarityRow = h('div', { class: 'workshop-rarities', role: 'group', 'aria-label': 'Rzadkość' });
+    const picker = h('div', { class: 'stack' });
+
+    const remember = () => {
+      craftChoice.slot = slot.id;
+      craftChoice.pattern = pattern.id;
+      craftChoice.rarity = rarity.id;
+      craftChoice.count = count;
+      saveChoice(CRAFT_CHOICE, craftChoice);
+    };
+
+    function choose(change) {
+      change();
+      remember();
+      show();
+    }
+
+    // How many items the parts, the camp's resources and the bag allow.
+    function affordable() {
+      const byParts = Math.floor(partCount(rarity.part.id) / pattern.parts);
+      const byResources = Math.min(...pattern.resources.map((resource) => Math.floor((character.resources[resource.id] ?? 0) / need(resource))));
+      return { byParts, byResources, most: Math.min(workshop.maxCount, byParts, byResources, free) };
+    }
+
+    // For whom a pattern is, and from which class level.
+    const forWhom = (each) =>
+      [each.classNames ? each.classNames.join(', ') : 'każda klasa', each.classLevel && `od poz. klasy ${each.classLevel}`].filter(Boolean).join(' · ');
+
+    function show() {
+      fill(
+        slotRow,
+        workshop.slots.map((each) =>
+          h('button', {
+            type: 'button',
+            class: 'segmented-option',
+            'aria-pressed': each.id === slot.id,
+            text: each.name,
+            onClick: () =>
+              choose(() => {
+                slot = each;
+                pattern = firstFor(each);
+              }),
+          }),
+        ),
+      );
+      // The known patterns first, then the shadows, whose level the line
+      // under them tells in the System's words.
+      const hidden = slot.patterns.filter((each) => each.hidden);
+      fill(
+        tiles,
+        [...known(slot), ...hidden].map((each) => {
+          if (each.hidden) {
+            return h(
+              'li',
+              {},
+              h(
+                'div',
+                { class: 'herb-tile herb-tile--hidden', role: 'img', 'aria-label': `Nieznany wzór. ${each.hint}` },
+                h('span', { class: 'herb-art herb-art--shadow' }, patternIcon(each.id)),
+                h('span', { class: 'herb-name', text: '???' }),
+                h('span', { class: 'herb-meta', text: `poz. ${each.level}` }),
+              ),
+            );
+          }
+          return h(
+            'li',
+            {},
+            h(
+              'button',
+              { type: 'button', class: 'herb-tile', 'aria-pressed': each.id === pattern.id, onClick: () => choose(() => (pattern = each)) },
+              h('span', { class: 'herb-art' }, patternIcon(each.id)),
+              h('span', { class: 'herb-name', text: each.name }),
+              h('span', { class: 'herb-meta', text: forWhom(each) }),
+            ),
+          );
+        }),
+      );
+      hiddenHint.hidden = hidden.length === 0;
+      hiddenHint.textContent = [...new Set(hidden.map((each) => each.hint))].join(' ');
+      fill(
+        rarityRow,
+        rarities.map((each) =>
+          h('button', {
+            type: 'button',
+            class: 'rarity-option',
+            'aria-pressed': each.id === rarity.id,
+            vars: { '--rarity': each.color },
+            text: each.name,
+            onClick: () => choose(() => (rarity = each)),
+          }),
+        ),
+      );
+      const plan = affordable();
+      if (plan.most === 0) {
+        fill(picker, shortage(plan));
+        return;
+      }
+      count = Math.min(plan.most, Math.max(1, craftChoice.count ?? 1));
+      fill(picker, countPicker(plan));
+    }
+
+    // What one item still lacks, and where parts come from.
+    function shortage({ byParts, byResources }) {
+      const lines = [];
+      if (byParts === 0) lines.push(`Brakuje części: ${rarity.part.name} (masz ${formatNumber(partCount(rarity.part.id))}, potrzeba ${formatNumber(pattern.parts)}).`);
+      if (byResources === 0) {
+        for (const resource of pattern.resources) {
+          const have = character.resources[resource.id] ?? 0;
+          if (have < need(resource)) lines.push(`Brakuje zasobów: ${resource.name} (masz ${formatNumber(have)}, potrzeba ${formatNumber(need(resource))}).`);
+        }
+      }
+      if (free === 0) lines.push('Plecak jest pełny. Zrób w nim miejsce na przedmiot.');
+      return [
+        lines.map((text) => h('p', { class: 'herb-room herb-room--full', text })),
+        byParts === 0 && h('p', { class: 'muted', text: 'Części zrobisz z materiałów na Stole rzemieślniczym albo kupisz w Skupie złomu.' }),
+        byParts === 0 && h('a', { class: 'button button--world', href: TABLE, text: 'Do Stołu rzemieślniczego' }),
+      ];
+    }
+
+    // A slider of the items with buttons for one at a time, what they take
+    // and how long, the chance, the room in the bag and the start.
+    function countPicker({ byParts, byResources, most }) {
+      const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
+      const estimate = h('p', { class: 'herb-estimate' });
+      const slider = h('input', {
+        type: 'range',
+        class: 'duration-slider',
+        min: 1,
+        max: most,
+        step: 1,
+        value: count,
+        'aria-label': 'Liczba przedmiotów',
+        onInput: () => set(Number(slider.value)),
+        onChange: () => remember(),
+      });
+      const stepButton = (sign, label) =>
+        h('button', {
+          type: 'button',
+          class: 'button button--world duration-step',
+          'aria-label': label,
+          text: sign < 0 ? '−' : '+',
+          onClick: () => {
+            set(count + sign);
+            remember();
+          },
+        });
+      const less = stepButton(-1, 'Mniej');
+      const more = stepButton(1, 'Więcej');
+      function set(nextCount) {
+        count = Math.min(most, Math.max(1, nextCount));
+        const label = countOf(count, 'przedmiot', 'przedmioty', 'przedmiotów');
+        slider.value = String(count);
+        slider.setAttribute('aria-valuetext', label);
+        slider.style.setProperty('--fill', `${most > 1 ? ((count - 1) / (most - 1)) * 100 : 100}%`);
+        value.textContent = label;
+        less.disabled = count === 1;
+        more.disabled = count === most;
+        const used = [`${formatNumber(pattern.parts * count)} × ${rarity.part.name}`, ...pattern.resources.map((resource) => `${formatNumber(need(resource) * count)} × ${resource.name}`)];
+        estimate.textContent = `Czas wyrobu: ${formatMinutes(workMinutes(count, rarity.itemMinutes))}. Zużyjesz: ${used.join(', ')}.`;
+      }
+      set(count);
+      const chance = Math.round(rarity.chance * 100);
+      const start = h('button', {
+        type: 'button',
+        class: 'button button--system',
+        text: 'Zacznij wyrób',
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            remember();
+            await call('POST', '/api/professions/craft', { baseId: pattern.id, rarity: rarity.id, count });
+            // The order's card is at the top, above the long form.
+            window.scrollTo(0, 0);
+          }),
+      });
+      return [
+        h(
+          'div',
+          { class: 'duration-picker' },
+          h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, 'Liczba przedmiotów'), value),
+          h('div', { class: 'duration-row' }, less, slider, more),
+          h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: '1' }), h('span', { text: formatNumber(most) })),
+        ),
+        estimate,
+        h('p', {
+          class: 'muted',
+          text: rarity.chance >= 1 ? 'Każdy przedmiot tej rzadkości się uda.' : `Każdy przedmiot ma ${chance}% szans na powodzenie. Nieudany zabiera swoje części, a zasoby wracają.`,
+        }),
+        h('p', { class: 'muted', text: `Przedmioty dostaną poziom postaci: ${formatNumber(character.level)}.` }),
+        free < Math.min(workshop.maxCount, byParts, byResources) &&
+          h('p', { class: 'herb-room', text: `Plecak ma miejsce tylko na ${countOf(free, 'przedmiot', 'przedmioty', 'przedmiotów')}.` }),
+        start,
+      ];
+    }
+
+    show();
+    return h(
+      'section',
+      { class: 'card gather-card', 'aria-labelledby': 'patterns-title' },
+      h('h2', { class: 'section-title', id: 'patterns-title', text: 'Wzory' }),
+      slotRow,
+      tiles,
+      hiddenHint,
+      h('h3', { class: 'workshop-subtitle', text: 'Rzadkość' }),
+      rarityRow,
+      next && h('p', { class: 'muted', text: `Następna rzadkość: ${next.name}, od ${next.level}. poziomu Rzemieślnictwa.` }),
       picker,
     );
   }
@@ -777,6 +1069,38 @@ export function potionsReport(report, heading) {
   ];
 }
 
-// What a work's report brought, for the journal's row: "Żywokost ×13", or
-// "Mniejsza mikstura leczenia ×12".
-export const workSummaryText = (summary) => (summary.herbs ?? summary.potions ?? []).map((entry) => `${entry.name} ×${formatNumber(entry.count)}`).join(', ');
+// The report of an order in the Warsztat, in the same way: the workshop's
+// line, whether it was stopped, the items made (each opens like a find of an
+// exploration, by `findSheet`) and the failed ones, the profession's levels,
+// the XP and the System's lines.
+export function itemsReport(report, heading, findSheet) {
+  return [
+    heading('Raport z wyrobu', `${report.placeName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
+    h(
+      'section',
+      { class: 'card report-summary', 'aria-label': 'Podsumowanie' },
+      h('p', { class: 'herb-line', text: report.line }),
+      report.stopped && h('p', { class: 'muted', text: report.stopped }),
+      report.made && h('p', { class: 'herb-estimate', text: report.made }),
+      report.items.length > 0 &&
+        h(
+          'ul',
+          { class: 'item-list' },
+          report.items.map((item) =>
+            h('li', {}, h('button', { type: 'button', class: 'item-row', onClick: () => findSheet(item) }, itemSummary(item), icon('chevron', { size: 18 }))),
+          ),
+        ),
+      report.failedText && h('p', { class: 'herb-room herb-room--full', text: report.failedText }),
+      workSummary(report),
+    ),
+    report.system.length > 0 && systemPanel(...report.system),
+    h('a', { class: 'button button--system', href: HASHES.crafting, text: 'Do Warsztatu' }),
+  ];
+}
+
+// What a work's report brought, for the journal's row: "Żywokost ×13",
+// "Mniejsza mikstura leczenia ×12" or "Miecz ×3, nieudane: 1".
+export const workSummaryText = (summary) =>
+  [...(summary.herbs ?? summary.potions ?? summary.items ?? []).map((entry) => `${entry.name} ×${formatNumber(entry.count)}`), summary.failed > 0 && `nieudane: ${formatNumber(summary.failed)}`]
+    .filter(Boolean)
+    .join(', ');

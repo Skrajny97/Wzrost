@@ -9,7 +9,7 @@ import { workSummaryText } from './professions.js';
 
 const RESULT_NAMES = { success: 'sukces', fainted: 'omdlenie', escaped: 'odwrót' };
 // A profession's work, by the kind of its report, and its chip.
-const WORK_CHIPS = { herbs: 'zbieranie', potions: 'warzenie' };
+const WORK_CHIPS = { herbs: 'zbieranie', potions: 'warzenie', items: 'wyrób' };
 
 export function mountJournal(container, { params }) {
   const tab = params.tab === 'system' ? 'system' : 'reports';

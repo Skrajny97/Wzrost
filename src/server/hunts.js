@@ -53,6 +53,7 @@ import { soldGold } from './inventory.js';
 import { finishGathering } from './professions.js';
 import { potionsOf } from './professions-view.js';
 import { KEPT_REPORTS } from './reports.js';
+import { finishCrafting } from './workshop.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
 const resourcePath = (id) => `$."${id}"`;
@@ -237,8 +238,9 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
 }
 
 // Calling the character back early gives nothing and costs nothing. A
-// brewing keeps the potions done, with their report (brewing.js), and a
-// speed potion the time not used.
+// brewing keeps the potions done and an order in the Warsztat the items
+// done, with their report (brewing.js, workshop.js), and a speed potion the
+// time not used.
 export async function cancelHunt(context) {
   const { session, player } = await requirePlayer(context);
   const activity = player.activity;
@@ -247,8 +249,10 @@ export async function cancelHunt(context) {
     throw new ApiError(409, 'claim_first', 'Wyprawa się skończyła. Odbierz raport.');
   }
   const db = context.env.DB;
-  if (activity.kind === 'potions') {
-    const stopped = await finishBrewing(db, player, context.now, { stop: true });
+  // A brewing or an order in the Warsztat keeps what is done.
+  const stop = { potions: finishBrewing, items: finishCrafting }[activity.kind];
+  if (stop) {
+    const stopped = await stop(db, player, context.now, { stop: true });
     return json({
       report: stopped && { id: stopped.id, createdAt: context.now, ...stopped.report },
       character: characterView(await loadPlayer(db, session.userId), context.now),
@@ -271,11 +275,12 @@ export async function cancelHunt(context) {
 }
 
 // The report of the activity that ended: an exploration, a gathering of
-// herbs (professions.js) or a brewing of potions (brewing.js).
+// herbs (professions.js), a brewing of potions (brewing.js) or an order of
+// items (workshop.js).
 export async function claimHunt(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
-  const finish = { herbs: finishGathering, potions: finishBrewing }[player.activity?.kind];
+  const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting }[player.activity?.kind];
   const { id, report } = finish && player.activity.ends_at <= now ? await finish(context.env.DB, player, now) : await finishHunt(context.env.DB, player, now);
   return json({
     report: { id, createdAt: now, ...report },

@@ -12,7 +12,7 @@ import { guided, openSheet, systemPanel, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { scrapperSheet } from '../scrapper.js';
 import { itemDetails, itemSheet, itemSummary } from './character.js';
-import { herbsReport, potionsReport } from './professions.js';
+import { herbsReport, itemsReport, potionsReport } from './professions.js';
 
 // "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
 const materialsText = (materials) => materials.map((material) => (material.count > 1 ? `${material.label} ×${material.count}` : material.label)).join(', ');
@@ -85,11 +85,11 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       fill(container, heading('Raport z wyprawy'), h('p', { class: 'muted', text: 'Wczytywanie raportu…' }));
       return;
     }
-    // A gathering of herbs or a brewing of potions has no fights or finds:
-    // its own short report.
-    const work = { herbs: herbsReport, potions: potionsReport }[report.kind];
+    // A gathering of herbs, a brewing of potions or an order in the Warsztat
+    // has no fights: its own short report.
+    const work = { herbs: herbsReport, potions: potionsReport, items: itemsReport }[report.kind];
     if (work) {
-      fill(container, ...work(report, heading));
+      fill(container, ...work(report, heading, findSheet));
       // The cauldron bubbles once over a finished brewing.
       if (report.kind === 'potions' && firstPlayback) playSound('brew');
       if (report.system.length > 0 && firstPlayback) playSound('system');

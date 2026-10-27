@@ -34,6 +34,7 @@ const materialTitle = (material) => material.label.charAt(0).toUpperCase() + mat
 const BUSY_TEXTS = {
   herbs: 'Postać zbiera zioła. Plecak i ekwipunek zmienisz po jej powrocie z Zagajnika.',
   potions: 'Postać warzy mikstury. Plecak i ekwipunek zmienisz po jej powrocie z Pracowni.',
+  items: 'Postać wykonuje przedmioty. Plecak i ekwipunek zmienisz po jej powrocie z Warsztatu.',
 };
 const busyText = (character) => BUSY_TEXTS[character.activity?.kind] ?? 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.';
 

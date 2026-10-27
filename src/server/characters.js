@@ -143,9 +143,9 @@ export const buildQueue = (row) => JSON.parse(row.build_queue ?? '[]');
 
 const path = (id) => `$."${id}"`;
 
-// Gathering herbs and brewing potions are no fights: the character rests
-// meanwhile, as at home.
-export const restsDuring = (activity) => !activity || activity.kind === 'herbs' || activity.kind === 'potions';
+// Gathering herbs, brewing potions and making items are no fights: the
+// character rests meanwhile, as at home.
+export const restsDuring = (activity) => !activity || ['herbs', 'potions', 'items'].includes(activity.kind);
 
 // A character's buffs (potions.js). A speed potion drunk while its time
 // still passed everywhere keeps what it had left.
@@ -292,7 +292,7 @@ export async function requireIdlePlayer(context) {
   const activity = found.player.activity;
   if (activity) {
     // A profession's work says so in its own words.
-    const texts = { herbs: content.professionTexts, potions: content.brewing?.texts }[activity.kind];
+    const texts = { herbs: content.professionTexts, potions: content.brewing?.texts, items: content.workshop?.texts }[activity.kind];
     throw activity.ends_at <= context.now
       ? new ApiError(409, 'claim_first', texts ? texts.claimFirst[0] : 'Wyprawa się skończyła. Najpierw odbierz raport.')
       : new ApiError(409, 'busy', texts ? texts.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
@@ -519,7 +519,8 @@ function craftingView(row, levels, now) {
 
 // Where an activity takes place. region_id holds the inner region, or a whole
 // region for an activity started before inner regions; a gathering, its
-// place and the herbs chosen; a brewing, its place, the potion and how many.
+// place and the herbs chosen; a brewing, its place, the potion and how many;
+// an order of items, its place, the pattern, the rarity and how many.
 function activityPlace(activity, level) {
   if (activity.kind === 'herbs') {
     const herbs = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content.herbsById[id]);
@@ -529,6 +530,16 @@ function activityPlace(activity, level) {
     const { recipe, count } = JSON.parse(activity.options ?? '{}');
     const potion = content.potionsById[recipe];
     return { placeName: content.brewing.place.name, potion: potion ? { id: potion.id, name: potion.name } : null, count: count ?? 0 };
+  }
+  if (activity.kind === 'items') {
+    const { base: baseId, rarity, count } = JSON.parse(activity.options ?? '{}');
+    const base = content.basesById[baseId];
+    return {
+      placeName: content.workshop.place.name,
+      base: base ? { id: base.id, name: base.name } : null,
+      rarityName: content.raritiesById[rarity]?.name ?? '',
+      count: count ?? 0,
+    };
   }
   const area = areaFor(activity.region_id, level, content);
   return { areaId: area.id, areaName: area.name, regionId: area.regionId, regionName: area.regionName };

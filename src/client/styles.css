@@ -5901,9 +5901,55 @@ button.herb-tile[aria-pressed='true'] {
   color: var(--leaf);
 }
 
-.chip--potions {
+.chip--potions,
+.chip--items {
   border-color: var(--system-line);
   color: var(--system);
+}
+
+/* The Warsztat: the slots in two rows of three, and the rarities, each in
+   its colour, lit when chosen. */
+.workshop-slots {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.workshop-slots .segmented-option {
+  padding: 0 4px;
+  letter-spacing: 0.04em;
+}
+
+.workshop-slots .segmented-option:nth-child(3n + 1) {
+  border-left: 0;
+}
+
+.workshop-slots .segmented-option:nth-child(n + 4) {
+  border-top: 1px solid var(--system-line);
+}
+
+.workshop-subtitle {
+  margin: 0;
+  font-size: 15px;
+}
+
+.workshop-rarities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rarity-option {
+  min-height: 44px;
+  padding: 0 14px;
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  color: var(--rarity);
+  font: inherit;
+  font-weight: 700;
+}
+
+.rarity-option[aria-pressed='true'] {
+  border-color: var(--rarity);
+  background: color-mix(in srgb, var(--rarity) 14%, transparent);
 }
 
 /* A brewing's lucky potions. */

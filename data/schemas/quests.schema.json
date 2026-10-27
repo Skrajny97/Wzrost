@@ -57,7 +57,9 @@
               "gather",
               "gatherAny",
               "brew",
-              "brewAny"
+              "brewAny",
+              "make",
+              "makeAny"
             ]
           },
           "text": {
@@ -93,6 +95,11 @@
           "professions": {
             "type": "boolean",
             "description": "Tylko z dostępnymi profesjami (od ich poziomu odblokowania)."
+          },
+          "rewardFactor": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Ile razy większa nagroda niż zwykle (rzadsze zadania z lepszą nagrodą)."
           }
         },
         "anyOf": [

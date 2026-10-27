@@ -23,6 +23,7 @@ import { learnSkill, raiseSkill } from './skills.js';
 import { repeatSkillsTour, skipBuilding, skipTime } from './testing.js';
 import { skipWithTimePoints } from './time.js';
 import { seeTutorial } from './tutorial.js';
+import { startCrafting } from './workshop.js';
 
 const routes = [
   ['GET', '/api/health', health],
@@ -69,6 +70,7 @@ const routes = [
   ['POST', '/api/herbs/sell', sellHerbs],
   ['POST', '/api/herbs/discard', discardHerbs],
   ['POST', '/api/professions/brew', startBrewing],
+  ['POST', '/api/professions/craft', startCrafting],
   ['POST', '/api/potions/sell', sellPotions],
   ['POST', '/api/potions/discard', discardPotions],
   ['POST', '/api/potions/drink', drinkPotion],

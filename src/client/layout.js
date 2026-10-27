@@ -17,6 +17,7 @@ import { meter } from './ui.js';
 const WORK_SCREENS = {
   herbs: { href: '#/profesje/zielarstwo', label: 'ZIELARSTWO' },
   potions: { href: '#/profesje/alchemia', label: 'ALCHEMIA' },
+  items: { href: '#/profesje/rzemieslnictwo', label: 'RZEMIEŚLNICTWO' },
 };
 
 const MAIN_TABS = [

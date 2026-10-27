@@ -341,8 +341,8 @@ export function mountCombat(container, { params, navigate }) {
   }
 
   function activityCard(activity) {
-    // A gathering of herbs and a brewing of potions live on their own
-    // screens; here they only say so.
+    // A gathering of herbs, a brewing of potions and an order of items live
+    // on their own screens; here they only say so.
     if (activity.kind === 'herbs') {
       return systemPanel(
         activityFinished(activity) ? 'Zbieranie ziół zakończone. Raport czeka w Zielarstwie.' : `Postać zbiera zioła w miejscu: ${activity.placeName}.`,
@@ -353,6 +353,12 @@ export function mountCombat(container, { params, navigate }) {
       return systemPanel(
         activityFinished(activity) ? 'Warzenie mikstur zakończone. Raport czeka w Alchemii.' : `Postać warzy mikstury w miejscu: ${activity.placeName}.`,
         h('a', { class: 'button button--system', href: '#/profesje/alchemia', text: 'Do Alchemii' }),
+      );
+    }
+    if (activity.kind === 'items') {
+      return systemPanel(
+        activityFinished(activity) ? 'Wyrób przedmiotów zakończony. Raport czeka w Rzemieślnictwie.' : `Postać wykonuje przedmioty w miejscu: ${activity.placeName}.`,
+        h('a', { class: 'button button--system', href: '#/profesje/rzemieslnictwo', text: 'Do Rzemieślnictwa' }),
       );
     }
     preloadReportMusic();

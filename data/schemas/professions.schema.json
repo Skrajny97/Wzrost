@@ -9,6 +9,7 @@
     "professions",
     "gathering",
     "brewing",
+    "workshop",
     "potionUse",
     "herbs",
     "potions",
@@ -348,6 +349,279 @@
               }
             },
             "revealed": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "hidden": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "busy": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "claimFirst": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pushTitle": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pushBody": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "workshop": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Rzemieślnictwo: wyrób ekwipunku z części w miejscu Systemu (src/engine/workshop.js).",
+      "required": [
+        "profession",
+        "place",
+        "parts",
+        "resources",
+        "itemMinutes",
+        "rarityTime",
+        "speedPerLevel",
+        "fastest",
+        "maxCount",
+        "laterPatternLevel",
+        "chancePerLevel",
+        "maxChance",
+        "rarities",
+        "texts"
+      ],
+      "properties": {
+        "profession": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Profesja wytwórcza, która wykonuje przedmioty."
+        },
+        "place": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "parts": {
+          "type": "object",
+          "description": "Ile części rzadkości przedmiotu idzie na jeden przedmiot, według miejsca (slots.json). Tylko te miejsca da się wykonać.",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stone",
+            "extra",
+            "families"
+          ],
+          "properties": {
+            "stone": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Kamień na każdą część i każdy stopień rzadkości (pospolity 1, rzadki 2…), przy każdym przedmiocie."
+            },
+            "extra": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Zasób rodziny (families) na każdą część i każdy stopień rzadkości."
+            },
+            "families": {
+              "type": "object",
+              "description": "Rodziny przedmiotów (item-bases.json) z drewna albo metalu: zasób → rodziny. Reszta bierze sam kamień.",
+              "additionalProperties": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "itemMinutes": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Ile minut trwa pospolity przedmiot na 1. poziomie profesji."
+        },
+        "rarityTime": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Ile razy dłużej trwa przedmiot każdej rzadkości wyżej."
+        },
+        "speedPerLevel": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.1,
+          "description": "O jaką część czasu przedmiotu skraca go każdy poziom profesji."
+        },
+        "fastest": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "description": "Najkrótszy czas przedmiotu, jako część czasu z 1. poziomu."
+        },
+        "maxCount": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Najwięcej sztuk jednym zleceniem."
+        },
+        "laterPatternLevel": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Od którego poziomu profesji System odsłania wzory późniejszych baz rodziny (classLevel w item-bases.json)."
+        },
+        "chancePerLevel": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.1,
+          "description": "O ile każdy poziom profesji podnosi szansę powodzenia."
+        },
+        "maxChance": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "description": "Najwyższa szansa powodzenia rzadkości, która nie udaje się zawsze."
+        },
+        "rarities": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Rzadkości wyrobów po kolei: od którego poziomu profesji i z jaką szansą powodzenia na tym poziomie.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "level",
+              "chance"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "level": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "chance": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "report",
+            "made",
+            "failed",
+            "stopped",
+            "revealed",
+            "rarity",
+            "hidden",
+            "busy",
+            "claimFirst",
+            "pushTitle",
+            "pushBody"
+          ],
+          "properties": {
+            "report": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "made": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "failed": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "stopped": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "revealed": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "rarity": {
               "type": "array",
               "minItems": 1,
               "items": {

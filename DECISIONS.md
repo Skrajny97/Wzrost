@@ -1953,3 +1953,48 @@ Brakujące szczegóły kroku 2 rozstrzygnięte najprościej. Wszystko działa ty
 1. **Zdania raportu z warzenia** (A35). Zostają trzy: „W Pracowni bulgocze kocioł, a na półce przybywa fiolek.”, „Zioła oddają wywarowi wszystko, co mają najlepsze.” (poprawka autora) i „Błękitne linie Systemu mierzą każdą kroplę mikstury.”.
 2. **Grafika Mniejszej mikstury leczenia**: wersja 2. Kolejne przychodzą po jednej: mikstura many, szybkości i tło Pracowni.
 3. **Wygląd postaci** (pytanie testujących o ekwipunek na portrecie). Zostaje sposób z Margonem: portret nie pokazuje zakładanych przedmiotów, a lepszy strój przychodzi z ewolucją klasy (autor: „trzymamy się wersji z Margonem”). O czymś więcej można pomyśleć, gdy gra będzie dobrze zarabiać.
+
+
+## Rzemieślnictwo: odpowiedzi autora (27.10.2026)
+
+Odpowiedzi na pytania R1–R29 i W1–W13 z dokumentu „Alchemia i Rzemieślnictwo: pytania”. Rzemieślnictwo powstaje na wersji testowej krok po kroku i trafi do gry razem z Zielarstwem i Alchemią (W1).
+
+1. **Wyroby** (R1, R2, R4–R7, R9). Wyrób ma te same bazy co łup, więc wygląda i działa jak przedmiot z wyprawy, i jest równy łupowi tej samej rzadkości. Jego poziom to poziom postaci, a poziom profesji decyduje o rzadkości i szansie powodzenia. Afiksy są całkiem losowe, a ich nazwy pochodzą od stworów z dowolnego regionu, który postać już odwiedziła. Wyrób może być dla dowolnej klasy (autor: „bo handel wprowadzimy i elementy społecznościowe + możliwość sprzedaży u złomiarza”). Karta wyrobu nie ma podpisu twórcy.
+2. **Rzadkość i koszt** (R3, R11–R13). Gracz wybiera rzadkość, a każda wymaga części tej rzadkości: broń i pancerz po 6, druga ręka i hełm po 4, rękawice i buty po 3 (wstępnie). Do tego zasoby obozu: ruda żelaza do metalu, drewno do łuków, kosturów i tarcz, a kamienia najwięcej (autor: „bo kamień ma najmniej zastosowań”). Materiały stworów idą do wyrobu tylko jako części.
+3. **Wzory** (R14). Odsłania je poziom profesji. Rozebranie przedmiotu odsłania jego wzór od razu (autor: „rozbiórka pozwoli po prostu łatwiej i szybciej uzyskać dostęp”).
+4. **Złomiarz** (R10, R15, R16). Kupuje wyroby jak łup tej rzadkości, a części na przedmiot kosztują u niego więcej, niż on płaci za wyrób. Test pilnuje tego dla każdej rzadkości. Części kupuje się w dziennym limicie sztuk każdej rzadkości, malejącym z rzadkością (autor: „30-20-10 itd.”).
+5. **Ulepszone wyroby i zwoje** (R8, R17, R18). Od 10. poziomu profesji wyrób może wyjść od razu ulepszony. Z poziomem rośnie szansa na niższe ulepszenia i pojawia się szansa na wyższe, nawet do +5. Ochronny zwój do Kowadła robi Rzemieślnictwo z Odłamków od 25. poziomu. Chroni przed zniszczeniem przy +7 do +10, ale nie przed spadkiem ulepszenia. Przeróbka gotowych przedmiotów przyjdzie później, w profesji Zaklinania (u Zaklinaczki).
+6. **Rozbieranie wyrobu** (R19). Oddaje połowę zużytych części.
+7. **Miejsce pracy** (R20). Osobne miejsce Systemu, jak Zagajnik i Pracownia. Stół rzemieślniczy w obozie zmieni nazwę (propozycja autora: „Plac rozbiórki”), co zmieni też kwestię narratora we wprowadzeniu i parę innych miejsc.
+8. **Czas i powodzenie** (R21–R24). Pospolity przedmiot trwa 1 godzinę na 1. poziomie, a każda rzadkość wyżej dwa razy dłużej. Czas maleje z poziomem profesji. Szansa powodzenia: pospolity 100%, rzadki 90%, unikalny 75%, epicki 55%, legendarny 35%, mityczny 20%, boski 10%, a każdy poziom profesji dodaje 0,5 pkt proc., najwyżej do 95%. Porażka zabiera części, a zasoby obozu wracają. Jedno zlecenie to od 1 do 5 sztuk tego samego wzoru.
+9. **Rozwój** (R25, R26). Poziomy z czasu pracy, jak w Zielarstwie, także przy porażce. Za awans +1 do Siły i Zręczności.
+10. **Raport i zadania** (R27–R29). Raport to karta gotowego przedmiotu albo zdanie o porażce, plus XP i awans, a nad nimi jedno z 3 zdań (szkic dla autora). Postać nie zacznie pracy bez wolnego miejsca w plecaku na całe zlecenie. Zadania narratora: dzienne „Wykonaj 1 przedmiot.” i tygodniowe „Wykonaj łącznie 5 przedmiotów.”. Liczą się tylko udane, a te zadania trafiają się rzadziej i dają lepsze nagrody.
+11. **Sprawy wspólne** (W1–W10, W12).
+    - Kolejność: Alchemia, potem Rzemieślnictwo, obie w wersji testowej, a potem trzy profesje razem do gry. Gracz może mieć wszystkie trzy naraz.
+    - Ekrany Alchemii i Rzemieślnictwa w układzie Zielarstwa, ze wspólną muzyką zakładki Profesje.
+    - Objaśnienie narratora dla Profesji na 10. poziomie postaci, w stylu objaśnienia Umiejętności. Komunikat Systemu o profesjach dostaje autor w szkicu do poprawy.
+    - Punkty Czasu skracają warzenie i wyrób, a „Pomiń czas” w trybie testowym kończy je od razu. Koniec warzenia i wyrobu przychodzi jako powiadomienie na telefon.
+    - Profesje nie są głównym sposobem na złoto.
+    - Grafiki z Retro Diffusion po jednej, w kolejności: trzy mikstury, tło Pracowni, tło miejsca Rzemieślnictwa. Wyroby mają obecne ikony przedmiotów. Dźwięki z ElevenLabs po 2 wersje: bulgotanie, młot na koniec wyrobu, łyk mikstury, nieudany wyrób.
+    - Balans mikstur (W11) został bez odpowiedzi, więc obowiązuje propozycja: przed wdrożeniem symulacja wypraw z miksturami, a pełen zapas mikstur zabiera ok. jedną trzecią omdleń, nie wszystkie.
+12. **Następne profesje** (W13): jubilerstwo i górnictwo, które szuka szlachetnych kamieni do jubilerstwa (może pod inną nazwą).
+13. **Kolejność pracy.**
+    - Krok 1: miejsce pracy, wzory z poziomu profesji, wyrób z częściami i zasobami, czas, szansa powodzenia, raport, poziomy, zadania i powiadomienie.
+    - Krok 2: ulepszone wyroby od 10. poziomu, ochronny zwój od 25. poziomu, wzory z rozbierania, połowa części z rozebranego wyrobu, ceny złomiarza i dzienny limit części.
+    - Krok 3: nowa nazwa Stołu rzemieślniczego z kwestią narratora, grafiki, dźwięki, objaśnienie narratora i komunikat Systemu.
+
+
+## Rzemieślnictwo, krok 1: wyrób w Systemowym Warsztacie (27.10.2026)
+
+Brakujące szczegóły kroku 1 rozstrzygnięte najprościej. Wszystko działa tylko na wersji testowej.
+
+1. **Miejsce.** Systemowy Warsztat, z opisem w szkicu do poprawy przez autora. Ekran ma układ Pracowni: sloty (broń, pancerz, druga ręka, hełm, rękawice, buty), wzory wybranego slotu, rzadkość i liczbę sztuk. Biżuteria i talizmany nie mają wzorów, bo nie mają części w R11.
+2. **Wzory.** Pierwsza baza każdej rodziny jest znana od 1. poziomu profesji, a późniejsza (ta od 10. poziomu klasy) od 10. poziomu profesji. Ukryte wzory są cieniami, jak zioła i przepisy. Ekran zaczyna od wzoru dla klasy postaci, ale można wykonać każdy.
+3. **Rzadkości.** Rzadki od 5. poziomu profesji, unikalny od 15., epicki od 25., legendarny od 40., mityczny od 60., boski od 80. Szanse są te z odpowiedzi (R23), każdy poziom po 1. dodaje 0,5 pkt proc.
+4. **Zasoby.** Na każdą część i każdy stopień rzadkości (pospolity 1, rzadki 2 i dalej) 3 kamienie, a do metalu tyle samo co części rudy żelaza, do łuków, kosturów i tarcz drewna. Pospolity miecz: 6 Ścinków, 18 kamieni i 6 rudy żelaza.
+5. **Czas.** Pospolity przedmiot 1 godzina na 1. poziomie, każda rzadkość wyżej dwa razy dłużej, a każdy poziom profesji skraca go o 1%, najwyżej o połowę, jak w Alchemii. Zlecenie zaokrągla się w górę do pełnej minuty. Postać odpoczywa w czasie wyrobu, jak w Zagajniku i Pracowni.
+6. **Nazwy afiksów** (R4, R5) pochodzą od stworów, które postać spotkała w walkach. Przed pierwszym spotkaniem przedmiot ma zwykłe nazwy afiksów.
+7. **Części ze Stołu.** Warsztat liczy też części ze skończonych zleceń Stołu rzemieślniczego, tak jak sakiewka.
+8. **Przerwanie.** Przedmioty powstają jeden po drugim. „Przerwij wyrób” daje gotowe przedmioty z raportem oraz XP za przepracowane minuty. Części i zasoby na resztę wracają, a zasoby nieudanych też. Przed pierwszym gotowym przedmiotem przerwanie tylko oddaje wszystko, bez raportu.
+9. **Zadania.** Dzienne „Wykonaj 1 przedmiot.” i tygodniowe „Wykonaj łącznie 5 przedmiotów.” trafiają się dwa razy rzadziej niż inne zadania profesji, a ich nagroda jest dwa razy większa.
+10. **Teksty.** Trzy zdania raportu, opis Warsztatu i komunikaty to szkic do poprawy przez autora. Grafika tła Warsztatu i dźwięki młota przyjdą w kroku 3.

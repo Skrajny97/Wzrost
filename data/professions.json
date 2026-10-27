@@ -1,5 +1,5 @@
 {
-  "$comment": "Profesje (src/engine/professions.js). Każda ma 100 poziomów: awans z poziomu L wymaga L × levelMinutes minut pracy. Każdy awans daje statPerLevel do obu statystyk profesji (stats), więc 1. poziom daje 0, a ostatni poziom dodaje jeszcze maxLevelBonus: nagrodę za opanowanie profesji (1 × 99 + 51 = 150). Praca daje postaci characterXpShare tego XP, co godzina wyprawy na jej poziomie, i nie daje XP klasy. soon: profesja widoczna w zakładce, ale jeszcze bez pracy. Zbieractwo (gathering): postać zbiera zioła w jednym stałym miejscu (place), przez minutes.min–max minut co step. Na godzinę zbiera perHour sztuk zioła, a każdy poziom dodaje yieldPerLevel; losowość to ± spread. slots: od którego poziomu ile ziół naraz, a zbiór dzieli się po równo między wybrane zioła. Zioło zna się od swojego poziomu (level). stack: ile sztuk zioła mieści jedno miejsce plecaka; co się nie zmieści, przepada. price: tyle płaci złomiarz za sztukę (z premią Skupu złomu). genitive: nazwa w dopełniaczu, zioła do zadań narratora, a profesji do komunikatu o jej poziomie. texts: zdania raportu (report: jedno z wariantów) i komunikaty. Warzenie (brewing): postać warzy mikstury w jednym stałym miejscu (place), jeden przepis naraz. Mikstura trwa potionMinutes minut, każdy poziom profesji skraca ją o speedPerLevel, ale nie bardziej niż do fastest tego czasu; całe warzenie trwa najwyżej maxMinutes. Każda uwarzona mikstura ma bonusChance szans na jedną dodatkową. Złomiarz płaci za miksturę priceFactor razy tyle, co za jej zioła. potions: przepisy, każdy znany od swojego poziomu (level), z ziołami na jedną miksturę (herbs) i działaniem (effect: heal i mana to część maks. HP i many, speed to dodatek do szybkości ruchów). counted: nazwa po liczbie (1, 2–4, 5 i więcej) do zadań narratora. Mikstury też układają się w plecaku po stack sztuk. minutes: tyle minut działa mikstura wypita z plecaka (szybkość). potionUse: jak postać pije mikstury. Na wyprawę zabiera ich tyle, ile wybierze gracz, każdego rodzaju najwyżej tyle, ile walk ma wyprawa, i w walce pije każdego rodzaju najwyżej jedną: leczenia, gdy HP spadnie poniżej progu (healBelow, gracz wybiera z healBelowChoices), a many, gdy zabraknie jej na umiejętność. texts: wpisy w walce i raporcie, {potion} w bierniku (counted[0]).",
+  "$comment": "Profesje (src/engine/professions.js). Każda ma 100 poziomów: awans z poziomu L wymaga L × levelMinutes minut pracy. Każdy awans daje statPerLevel do obu statystyk profesji (stats), więc 1. poziom daje 0, a ostatni poziom dodaje jeszcze maxLevelBonus: nagrodę za opanowanie profesji (1 × 99 + 51 = 150). Praca daje postaci characterXpShare tego XP, co godzina wyprawy na jej poziomie, i nie daje XP klasy. soon: profesja widoczna w zakładce, ale jeszcze bez pracy. Zbieractwo (gathering): postać zbiera zioła w jednym stałym miejscu (place), przez minutes.min–max minut co step. Na godzinę zbiera perHour sztuk zioła, a każdy poziom dodaje yieldPerLevel; losowość to ± spread. slots: od którego poziomu ile ziół naraz, a zbiór dzieli się po równo między wybrane zioła. Zioło zna się od swojego poziomu (level). stack: ile sztuk zioła mieści jedno miejsce plecaka; co się nie zmieści, przepada. price: tyle płaci złomiarz za sztukę (z premią Skupu złomu). genitive: nazwa w dopełniaczu, zioła do zadań narratora, a profesji do komunikatu o jej poziomie. texts: zdania raportu (report: jedno z wariantów) i komunikaty. Warzenie (brewing): postać warzy mikstury w jednym stałym miejscu (place), jeden przepis naraz. Mikstura trwa potionMinutes minut, każdy poziom profesji skraca ją o speedPerLevel, ale nie bardziej niż do fastest tego czasu; całe warzenie trwa najwyżej maxMinutes. Każda uwarzona mikstura ma bonusChance szans na jedną dodatkową. Złomiarz płaci za miksturę priceFactor razy tyle, co za jej zioła. potions: przepisy, każdy znany od swojego poziomu (level), z ziołami na jedną miksturę (herbs) i działaniem (effect: heal i mana to część maks. HP i many, speed to dodatek do szybkości ruchów). counted: nazwa po liczbie (1, 2–4, 5 i więcej) do zadań narratora. Mikstury też układają się w plecaku po stack sztuk. minutes: tyle minut działa mikstura wypita z plecaka (szybkość). potionUse: jak postać pije mikstury. Na wyprawę zabiera ich tyle, ile wybierze gracz, każdego rodzaju najwyżej tyle, ile walk ma wyprawa, i w walce pije każdego rodzaju najwyżej jedną: leczenia, gdy HP spadnie poniżej progu (healBelow, gracz wybiera z healBelowChoices), a many, gdy zabraknie jej na umiejętność. texts: wpisy w walce i raporcie, {potion} w bierniku (counted[0]). Wyrób (workshop): postać wykonuje przedmioty w jednym stałym miejscu (place), jeden wzór i jedną rzadkość naraz, od 1 do maxCount sztuk. Wzór to baza przedmiotu ze slotu, który ma parts: pierwszą bazę rodziny zna się od 1. poziomu, a późniejszą (classLevel w item-bases.json) od laterPatternLevel. parts: ile części rzadkości przedmiotu bierze jedna sztuka w danym slocie. resources: na każdą część i każdy stopień rzadkości (pospolity 1, rzadki 2 i dalej) stone kamienia oraz extra drewna albo rudy żelaza dla rodzin z families. Przedmiot trwa itemMinutes minut, każda rzadkość wyżej rarityTime razy dłużej, a każdy poziom profesji skraca go o speedPerLevel czasu z 1. poziomu, ale nie bardziej niż do fastest. rarities: od którego poziomu jaka rzadkość i z jaką szansą powodzenia (chance); każdy poziom po 1. dodaje chancePerLevel, najwyżej do maxChance, a szansa 1 zostaje 1. Nieudany przedmiot zabiera swoje części, a zasoby wracają. texts: zdania raportu i komunikaty.",
   "rules": {
     "characterXpShare": 0.025,
     "stack": 20
@@ -39,7 +39,6 @@
       "levelMinutes": 30,
       "statPerLevel": 1,
       "maxLevelBonus": 51,
-      "soon": true,
       "description": "Wyrób ekwipunku z części."
     }
   ],
@@ -89,6 +88,57 @@
       "claimFirst": ["Warzenie się skończyło. Najpierw odbierz raport."],
       "pushTitle": ["Koniec warzenia"],
       "pushBody": ["Mikstury gotowe: {place}. Raport czeka na odbiór."]
+    }
+  },
+  "workshop": {
+    "profession": "crafting",
+    "place": {
+      "id": "system-workbench",
+      "name": "Systemowy Warsztat",
+      "description": "Narzędzia czekają tu na ręce, które umieją ich użyć. System odsłania wzory dopiero wtedy, gdy uzna, że umiesz je wykonać."
+    },
+    "parts": { "weapon": 6, "chest": 6, "offhand": 4, "head": 4, "hands": 3, "feet": 3 },
+    "resources": {
+      "stone": 3,
+      "extra": 1,
+      "families": {
+        "wood": ["bow", "staff", "shield"],
+        "iron-ore": ["sword", "axe", "dagger", "aspergillum", "helmet", "chainmail"]
+      }
+    },
+    "itemMinutes": 60,
+    "rarityTime": 2,
+    "speedPerLevel": 0.01,
+    "fastest": 0.5,
+    "maxCount": 5,
+    "laterPatternLevel": 10,
+    "chancePerLevel": 0.005,
+    "maxChance": 0.95,
+    "rarities": [
+      { "id": "common", "level": 1, "chance": 1 },
+      { "id": "rare", "level": 5, "chance": 0.9 },
+      { "id": "unique", "level": 15, "chance": 0.75 },
+      { "id": "epic", "level": 25, "chance": 0.55 },
+      { "id": "legendary", "level": 40, "chance": 0.35 },
+      { "id": "mythic", "level": 60, "chance": 0.2 },
+      { "id": "divine", "level": 80, "chance": 0.1 }
+    ],
+    "texts": {
+      "report": [
+        "W Warsztacie dzwoni młot, a wzór powoli nabiera kształtu.",
+        "Części pasują do siebie, jakby czekały na właściwe ręce.",
+        "Błękitne linie Systemu prowadzą każdy szew i każde uderzenie."
+      ],
+      "made": ["Wykonano: {items}."],
+      "failed": ["Nie udało się: {items}. Części przepadły, a zasoby obozu wróciły."],
+      "stopped": ["Wyrób przerwany. Części i zasoby na resztę wróciły."],
+      "revealed": ["System odsłania nowe wzory: {patterns}"],
+      "rarity": ["System pozwala już wykonywać przedmioty rzadkości: {rarity}"],
+      "hidden": ["Ukryte przez System do {level}. poziomu Rzemieślnictwa."],
+      "busy": ["Postać wykonuje przedmioty. Poczekaj na koniec wyrobu."],
+      "claimFirst": ["Wyrób się skończył. Najpierw odbierz raport."],
+      "pushTitle": ["Koniec wyrobu"],
+      "pushBody": ["Przedmioty gotowe: {place}. Raport czeka na odbiór."]
     }
   },
   "potionUse": {
