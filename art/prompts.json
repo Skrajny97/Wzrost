@@ -328,13 +328,19 @@
     "animation": {},
     "prompts": {
       "herbalism": "pixel art, a mysterious dark shadow figure in a hooded cloak, a solid black silhouette with a faint ice-blue glowing outline, standing among herbs in a small forest grove, bends down, picks a bunch of green herbs and drops them into a wicker basket on the ground, side view, smooth seamless looping animation",
-      "alchemy": "pixel art, a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet, standing on a small patch of stone floor, stirring a large bubbling black cauldron with a long wooden paddle, green bubbles and wisps of steam rising, side view, smooth seamless looping animation",
+      "alchemy": "pixel art scene with one single character: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet, standing beside one large black cauldron on a stone floor in a dim workshop, stirring it with a long wooden paddle, green bubbles and wisps of steam rising, side view, smooth seamless looping animation",
       "crafting": "pixel art, a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet, standing on a small patch of dirt floor at a sturdy wooden workbench, raises a heavy hammer and strikes a glowing piece of metal on the bench, small orange sparks fly, side view, smooth seamless looping animation",
-      "exploring": "pixel art, a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet and a small travel pack, walking to the right on a short stretch of dirt forest path, walking in place, side view, smooth seamless walk cycle loop",
+      "exploring": "pixel art, a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet and a small travel pack, seen from the side in profile facing right, walking along a narrow dirt forest path at night, walking in place, smooth seamless walk cycle loop",
       "herbalism-smooth": {
         "prompt": "bends down slowly, picks a bunch of green herbs from the ground and drops them into the wicker basket, then straightens up again, smooth seamless loop",
         "style": "rd_advanced_animation__custom_action",
         "startFrame": "art/references/animations/herbalism-start.png",
+        "frames": 8
+      },
+      "crafting-smooth": {
+        "prompt": "raises the hammer high and strikes the glowing metal on the workbench, sparks fly, then raises it again, smooth seamless loop",
+        "style": "rd_advanced_animation__custom_action",
+        "startFrame": "art/references/animations/crafting-start.png",
         "frames": 8
       }
     }
