@@ -307,7 +307,7 @@ export function setNarratorVoice(on) {
   if (!on) stopNarration();
 }
 
-export function playNarration(file, { onEnd } = {}) {
+export function playNarration(file, { onStart, onEnd } = {}) {
   stopNarration();
   if (!voiceOn || !canPlay()) {
     onEnd?.();
@@ -331,6 +331,7 @@ export function playNarration(file, { onEnd } = {}) {
     };
     current.source = source;
     source.start();
+    onStart?.(buffer.duration);
   });
 }
 

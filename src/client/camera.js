@@ -2,11 +2,11 @@
 // below it stay put). It goes to a place like a film camera: the page
 // scrolls there, on the way from one place to another the screen draws back
 // a little, and at the place it comes closer, up to 1.25 times for a small
-// one. It frames the place with room for the narrator below it, stays while
-// the narrator speaks, and goes home (the screen as it is) when the narrator
-// leaves the screen. A place to be seen whole that does not fit with the
-// narrator makes it draw back, down to 0.6 times. With the animations off it
-// only scrolls, at once, and draws back at once too.
+// one. It frames the place with room for the narrator below it (or above),
+// stays while the narrator speaks, and goes home (the screen as it is) when
+// the narrator leaves the screen. A place to be seen whole that does not fit
+// with the narrator makes it draw back, down to 0.6 times. With the
+// animations off it only scrolls, at once, and draws back at once too.
 
 import { motionOn } from './motion.js';
 
@@ -82,8 +82,9 @@ export function resetCamera() {
 // the screen, and says when the move started, how long it takes and when it
 // is done. `zoom` lets the camera come closer, `travel` marks the way from
 // one place to another, `keep` is the room the narrator needs below the
-// place, and `whole` frames all the places together, drawing back if need be.
-export function aim(elements, { zoom = true, travel = false, keep = 0, whole = false } = {}) {
+// place (above it with `above`), `slow` the least time a move takes, and
+// `whole` frames all the places together, drawing back if need be.
+export function aim(elements, { zoom = true, travel = false, keep = 0, above = false, slow = 0, whole = false } = {}) {
   halt();
   const start = performance.now();
   const element = screen();
@@ -142,7 +143,10 @@ export function aim(elements, { zoom = true, travel = false, keep = 0, whole = f
     }
     const block = 2 * half.y * z + keep;
     const room = height - 2 * ROOM;
-    const eye = bars.top + ROOM + (block <= room ? (room - block) / 2 + half.y * z : half.y);
+    let eye = bars.top + ROOM + (above ? keep : 0) + (block <= room ? (room - block) / 2 + half.y * z : half.y);
+    // With the narrator above, a place that fits by itself stays whole and
+    // the narrator gives way.
+    if (above && 2 * half.y * z <= room) eye = Math.min(eye, bars.bottom - ROOM - half.y * z);
     to.scroll = clamp(at.top + to.point.y - eye);
     // Where the page stops short, the zoom keeps clear of the bars.
     const stands = natural(to.point, to.scroll).y;
@@ -171,6 +175,7 @@ export function aim(elements, { zoom = true, travel = false, keep = 0, whole = f
   };
   let duration = way < 8 && closer < 0.01 && !travel ? 0 : Math.min(2400, 900 + way * 1.1 + closer * 1500);
   if (travel) duration = Math.max(duration, 1100);
+  if (duration > 0) duration = Math.max(duration, slow);
   if (duration === 0 || !motionOn()) {
     if (!motionOn() && !back) to.z = 1;
     frame(1);

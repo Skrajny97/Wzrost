@@ -120,10 +120,10 @@ export function mountSkills(container) {
     const learned = skill.state === 'main' || skill.state === 'second';
     return h(
       'section',
-      { class: `skill-path skill-path--${skill.state}`, 'data-skill': skill.id, 'aria-label': `${PATH_LABELS[skill.state] ?? 'Ścieżka'}: ${skill.path}` },
+      { class: `skill-path skill-path--${skill.state}`, 'data-skill': skill.id, 'data-guide': 'skills-path', 'aria-label': `${PATH_LABELS[skill.state] ?? 'Ścieżka'}: ${skill.path}` },
       h(
         'h2',
-        { class: 'skill-path-title', 'data-guide': 'skills-path' },
+        { class: 'skill-path-title' },
         h('span', { class: 'skill-path-label', text: PATH_LABELS[skill.state] ?? 'Ścieżka' }),
         h('span', { class: 'skill-path-name', text: skill.path }),
       ),
