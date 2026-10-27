@@ -419,3 +419,34 @@ describe('static files', () => {
     assert.equal((await server.fetch('/_headers')).status, 404);
   });
 });
+
+describe('migration 0042', () => {
+  test("a Shadow's Kołczan and Sajdak become a Mizerykordia and a Kordzik, an archer's stay", async () => {
+    const database = await db();
+    for (const [login, classId] of [['cien', 'shadow'], ['lucznik', 'archer']]) {
+      const { cookie } = await signUp(login);
+      await call('POST', '/api/character', { cookie, body: { name: login, classId, appearance: 'female' } });
+    }
+    const quiver = JSON.stringify({ base: 'quiver', slot: 'offhand', level: 3, rarity: 'rare', affixes: [{ id: 'mist', kind: 'suffix', stat: 'dexterity', value: 2 }], implicit: { stat: 'dexterity', value: 7 } });
+    const bowCase = JSON.stringify({ base: 'bow-case', slot: 'offhand', level: 12, rarity: 'common', affixes: [], implicit: { stat: 'dexterity', value: 20 }, bonus: 8 });
+    for (const name of ['cien', 'lucznik']) {
+      const { id } = await database.prepare('SELECT id FROM characters WHERE name = ?').bind(name).first();
+      await database.prepare("INSERT INTO items (character_id, slot, data, created_at) VALUES (?, 'offhand', ?, 0), (?, NULL, ?, 0)").bind(id, quiver, id, bowCase).run();
+    }
+    const migration = readFileSync(new URL('../migrations/0042_shadow_offhand.sql', import.meta.url), 'utf8');
+    for (const statement of migration.split(';').map((part) => part.replace(/^\s*--.*$/gm, '').trim()).filter(Boolean)) {
+      await database.prepare(statement).run();
+    }
+    const items = async (name) =>
+      (await database.prepare('SELECT i.slot, i.data FROM items i JOIN characters c ON c.id = i.character_id WHERE c.name = ? ORDER BY i.id').bind(name).all()).results.map(
+        (row) => ({ worn: row.slot, ...JSON.parse(row.data) }),
+      );
+    const shadow = await items('cien');
+    assert.deepEqual(shadow.map(({ worn, base }) => [worn, base]), [['offhand', 'misericorde'], [null, 'dirk']]);
+    // Only the base changes: the numbers and affixes stay.
+    const unchanged = ({ worn, ...item }, base) => ({ ...item, base });
+    assert.deepEqual(unchanged(shadow[0], 'quiver'), JSON.parse(quiver));
+    assert.deepEqual(unchanged(shadow[1], 'bow-case'), JSON.parse(bowCase));
+    assert.deepEqual((await items('lucznik')).map(({ base }) => base), ['quiver', 'bow-case']);
+  });
+});

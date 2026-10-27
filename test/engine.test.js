@@ -341,6 +341,13 @@ describe('items', () => {
     assert.deepEqual(wearers('surplice'), ['cleric']);
     assert.deepEqual(wearers('tunic'), ['archer', 'shadow']);
     assert.deepEqual(wearers('hood'), ['archer', 'mage', 'shadow']);
+    // The Kołczan and the Sajdak are the archer's alone; the Cień, who does
+    // not shoot, has the Mizerykordia and the Kordzik with the same numbers.
+    assert.deepEqual(wearers('quiver'), ['archer']);
+    assert.deepEqual(wearers('bow-case'), ['archer']);
+    assert.deepEqual(wearers('misericorde'), ['shadow']);
+    assert.deepEqual(wearers('dirk'), ['shadow']);
+    assert.equal(canUse('dirk', 'shadow', content, 9), false);
     for (const baseId of ['gloves', 'boots', 'amulet', 'ring', 'talisman']) assert.equal(wearers(baseId).length, 5, baseId);
     // Loot only ever holds what the character's class can use.
     const rng = createRng('łup');

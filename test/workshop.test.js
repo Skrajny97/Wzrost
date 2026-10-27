@@ -29,13 +29,13 @@ const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9,
 describe('the Warsztat in the engine', () => {
   test('the first base of each family is known at once, the later ones from level 10, and no jewellery', () => {
     const first = knownPatterns(1, content).map((pattern) => pattern.id);
-    assert.equal(first.length, 18);
-    assert.ok(first.includes('sword') && first.includes('surplice') && first.includes('boots'));
+    assert.equal(first.length, 19);
+    assert.ok(first.includes('sword') && first.includes('surplice') && first.includes('boots') && first.includes('misericorde'));
     assert.ok(!first.some((id) => ['broadsword', 'amulet', 'ring', 'talisman'].includes(id)));
-    assert.deepEqual(knownPatterns(9, content).length, 18);
+    assert.deepEqual(knownPatterns(9, content).length, 19);
     const all = knownPatterns(10, content).map((pattern) => pattern.id);
-    assert.equal(all.length, 36);
-    assert.ok(all.includes('broadsword') && all.includes('pointed-shoes') && !all.includes('signet-ring'));
+    assert.equal(all.length, 38);
+    assert.ok(all.includes('broadsword') && all.includes('pointed-shoes') && all.includes('dirk') && !all.includes('signet-ring'));
   });
 
   test('the rarities open with the level: rare at 5, unique at 15 and divine at 80', () => {
@@ -143,7 +143,7 @@ describe('the Warsztat in the engine', () => {
     assert.equal(report.made, 'Wykonano: 2 × Topór.');
     assert.equal(report.failedText, 'Nie udało się: 1 × Topór. Części przepadły, a zasoby obozu wróciły.');
     assert.equal(report.stopped, null);
-    assert.equal(report.revealed.length, 18);
+    assert.equal(report.revealed.length, 19);
     assert.ok(report.revealed.includes('war-axe'));
     assert.ok(report.system.includes('Osiągnięto poziom Rzemieślnictwa: 10'), report.system.join(' | '));
     assert.ok(report.system.includes('Zdobyto Siłę: +6'));

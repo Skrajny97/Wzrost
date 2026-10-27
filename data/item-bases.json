@@ -15,6 +15,8 @@
   { "id": "pavise", "name": "Paweż", "gender": "f", "slot": "offhand", "kind": "armor", "armorFactor": 1.26, "family": "shield", "classLevel": 10, "bonus": { "min": 18, "max": 30 } },
   { "id": "quiver", "name": "Kołczan", "gender": "m", "slot": "offhand", "kind": "implicit", "stat": "dexterity", "statFactor": 0.8 },
   { "id": "bow-case", "name": "Sajdak", "gender": "m", "slot": "offhand", "kind": "implicit", "stat": "dexterity", "statFactor": 0.84, "family": "quiver", "classLevel": 10, "bonus": { "min": 6, "max": 10 } },
+  { "id": "misericorde", "name": "Mizerykordia", "gender": "f", "slot": "offhand", "kind": "implicit", "stat": "dexterity", "statFactor": 0.8 },
+  { "id": "dirk", "name": "Kordzik", "gender": "m", "slot": "offhand", "kind": "implicit", "stat": "dexterity", "statFactor": 0.84, "family": "misericorde", "classLevel": 10, "bonus": { "min": 6, "max": 10 } },
   { "id": "focus", "name": "Fokus", "gender": "m", "slot": "offhand", "kind": "implicit", "stat": "intellect", "statFactor": 0.8 },
   { "id": "tome", "name": "Księga", "gender": "f", "slot": "offhand", "kind": "implicit", "stat": "intellect", "statFactor": 0.84, "family": "focus", "classLevel": 10, "bonus": { "min": 6, "max": 10 } },
   { "id": "hood", "name": "Kaptur", "gender": "m", "slot": "head", "kind": "armor", "armorFactor": 0.4 },

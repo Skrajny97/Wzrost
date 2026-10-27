@@ -71,7 +71,7 @@
     "autoPoints": { "dexterity": 4, "perception": 2, "vitality": 2 },
     "recovery": { "base": 0, "perWisdom": 0 },
     "weapons": ["dagger"],
-    "offhands": ["quiver"],
+    "offhands": ["misericorde"],
     "armor": ["hood", "tunic"]
   }
 ]

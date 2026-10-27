@@ -21,7 +21,7 @@ const KIT = {
   archer: { chest: 'tunic', offhand: 'quiver', head: 'hood' },
   mage: { chest: 'robe', offhand: 'focus', head: 'hood' },
   cleric: { chest: 'surplice', offhand: 'shield', head: 'cowl' },
-  shadow: { chest: 'tunic', offhand: 'quiver', head: 'hood' },
+  shadow: { chest: 'tunic', offhand: 'misericorde', head: 'hood' },
 };
 const SLOT_ORDER = ['weapon', 'chest', 'offhand', 'head', 'feet', 'hands', 'amulet', 'ring', 'talisman'];
 const OTHER_BASES = { feet: 'boots', hands: 'gloves', amulet: 'amulet', ring: 'ring', talisman: 'talisman' };
