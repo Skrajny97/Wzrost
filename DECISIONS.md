@@ -1812,3 +1812,7 @@ Autor: „Rozwiń poziom obozu zasłania często przychód z tartaku, daj przyci
 
 1. **Numer wersji** (autor: „Od tej pory numeruj wersje gry deployowanych też 0.0.1 -> 0.0.2 itd. żebym łatwiej rozeznawał się czy już puściłeś nową wersję czy jeszcze nie”). Numer stoi w `package.json` i każde wdrożenie do gry podnosi ostatnią liczbę. Pierwsza numerowana wersja to 0.0.1. „Wersja gry” w Ustawieniach pokazuje numer i skrót wersji kodu, np. „0.0.1 (1a2b3c4)”. Wersja testowa pokazuje numer gry, z której wyszła, i własny skrót.
 2. **Postać autora** (autor: „Po poprawkach moja postać główna admina ma za dużo rozdane Punktów […] odbierz odpowiednią liczbę punktów z umiejętności Mroźny podmuch”). Mag autora na 14. poziomie klasy ma 5 Punktów Umiejętności, a rozdane miał 6: Osłona many 1 i Mroźny podmuch 5. Migracja 0031 obniża Mroźny podmuch do 4, tylko tej postaci (konto z `AUTHOR_LOGINS`) i tylko przy dokładnie tych poziomach. Inne postacie z takim nadmiarem go zachowują i odrabiają następnym poziomem klasy, zob. „Punkty Umiejętności: jeden za każdy poziom klasy od 10. do 49.”, punkt 2.
+
+## Żeńska kwestia na ekranie Postaci (27.10.2026)
+
+1. **Nowe nagranie** (wersja 0.0.2). Kwestia „W tym oknie Systemu możesz przejrzeć swój ekwipunek. Podczas wyprawy zdobyłaś broń…” jest nagrana jeszcze raz, z „BROŃ” wielkimi literami jak w wersji męskiej (autor przy poprzednim nagraniu: „Dalej czyta „bron” zamiast „broń” i za wysoka tonacja”). Do gry trafiła wersja 3, wybrana przez autora na stronie odsłuchu.
