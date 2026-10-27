@@ -320,7 +320,7 @@
     }
   },
   "animations": {
-    "$comment": "Zapętlone animacje do czekania na raport: zacieniona postać przy pracy. Każda wersja to osobne zamówienie, a wynik to arkusz klatek PNG obok siebie.",
+    "$comment": "Zapętlone animacje do czekania na raport: zacieniona postać przy pracy. Każda wersja to osobne zamówienie, a wynik to arkusz klatek PNG. Opis ze startFrame porusza ten obrazek w frames klatkach (rd_advanced_animation__custom_action).",
     "style": "rd_animation__big_animation",
     "width": 128,
     "height": 128,
@@ -330,7 +330,13 @@
       "herbalism": "pixel art, a mysterious dark shadow figure in a hooded cloak, a solid black silhouette with a faint ice-blue glowing outline, standing among herbs in a small forest grove, bends down, picks a bunch of green herbs and drops them into a wicker basket on the ground, side view, smooth seamless looping animation",
       "alchemy": "pixel art, a mysterious dark shadow figure in a hooded cloak, a solid black silhouette with a faint ice-blue glowing outline, stirring a large bubbling cauldron with a long wooden paddle, green bubbles and wisps of steam rising, side view, smooth seamless looping animation",
       "crafting": "pixel art, a mysterious dark shadow figure in a hooded cloak, a solid black silhouette with a faint ice-blue glowing outline, raises a heavy hammer and strikes a glowing piece of metal on a wooden workbench, small orange sparks fly, side view, smooth seamless looping animation",
-      "exploring": "pixel art, a mysterious dark shadow figure in a hooded cloak, a solid black silhouette with a faint ice-blue glowing outline and a small travel pack, walking to the right along a narrow dirt forest path, walking in place, side view, smooth seamless walk cycle loop"
+      "exploring": "pixel art, a mysterious dark shadow figure in a hooded cloak, a solid black silhouette with a faint ice-blue glowing outline and a small travel pack, walking to the right along a narrow dirt forest path, walking in place, side view, smooth seamless walk cycle loop",
+      "herbalism-smooth": {
+        "prompt": "bends down slowly, picks a bunch of green herbs from the ground and drops them into the wicker basket, then straightens up again, smooth seamless loop",
+        "style": "rd_advanced_animation__custom_action",
+        "startFrame": "art/references/animations/herbalism-start.png",
+        "frames": 8
+      }
     }
   }
 }

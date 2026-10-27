@@ -7,7 +7,8 @@
 // { prompt, style } draws in its own style. The approved sprites listed
 // there as references (art/references/<kind>/<id>.png) keep the style of the new
 // ones consistent. A kind with `animation` draws looping animations, one at a
-// time, each as a PNG sheet of its frames side by side. Every request is
+// time, each as a PNG sheet of its frames; a prompt with `startFrame` (a PNG
+// in the repository) moves that picture in `frames` frames. Every request is
 // priced first (free), and the run stops before it would spend more than
 // --max-cost dollars.
 
@@ -55,6 +56,9 @@ if (!(maxCost > 0)) fail('--max-cost musi być dodatnią kwotą w dolarach.');
 // --style overrides every prompt; otherwise a prompt's own style, then the kind's.
 const styleOf = (id) => values.style || kind.prompts[id].style || kind.style;
 const promptOf = (id) => (typeof kind.prompts[id] === 'string' ? kind.prompts[id] : kind.prompts[id].prompt);
+// An animation's first frame and its number of frames, if the prompt gives them.
+const startOf = (id) => kind.prompts[id].startFrame;
+const framesOf = (id) => kind.prompts[id].frames ?? kind.animation?.frames;
 
 const headers = { 'X-RD-Token': token, 'Content-Type': 'application/json' };
 
@@ -116,7 +120,8 @@ async function draw(id, count = variants) {
     seed,
     // Sprites lose their background; scenes (removeBackground: false) keep it.
     ...(kind.removeBackground === false ? {} : { remove_bg: true, return_non_bg_removed: true }),
-    ...(kind.animation && { return_spritesheet: true, ...(kind.animation.frames && { frames_duration: kind.animation.frames }) }),
+    ...(kind.animation && { return_spritesheet: true, ...(framesOf(id) && { frames_duration: framesOf(id) }) }),
+    ...(startOf(id) && { input_image: readFileSync(startOf(id)).toString('base64') }),
   };
   const refs = references(id);
   if (refs.length) payload.reference_images = refs;
