@@ -1,0 +1,23 @@
+{
+  "id": "system-workshop",
+  "payload": {
+    "prompt": "pixel art interior landscape, a quiet alchemist workshop: a long wooden table with glass flasks, small bottles and a brass alembic over a low fire, shelves of dried herbs hanging in bunches, thin ice-blue glowing crystal shards and faint luminous blue lines along the stone walls, soft warm light, wide panorama for a dim background behind text, low contrast, muted dark palette of deep browns and greens with ice-blue accents, no text, no border, no people, no animals",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 2,
+    "seed": 123356757,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793104805,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 59.74,
+    "request_id": "8341ea2c-dec9-4bbd-94eb-2dc1f424dcd1",
+    "outputs_retained_until": 1793191118
+  }
+}
