@@ -328,13 +328,31 @@ export function updateTopbar(now = serverNow()) {
 // quest's reward lights the narrator's face in the top bar.
 const pointsWaiting = () => (state.character?.freePoints ?? 0) > 0 && isUnlocked('stats');
 const skillsWaiting = () => Boolean(state.character?.skills?.ready) && isUnlocked('skills');
-// While the character explores, the Walka tab counts its time down in the
-// System's light, as the camp counts a build; then a dot says the report
-// waits (updateNavTimers, every second).
-const hunt = () => (state.character?.activity?.kind === 'hunt' ? state.character.activity : null);
-const reportWaiting = () => Boolean(hunt()) && activityFinished(hunt());
-const WAITING = { postac: () => pointsWaiting() || skillsWaiting(), stats: pointsWaiting, skills: skillsWaiting, spolecznosc: chatNews, walka: reportWaiting };
-const WAITING_TEXTS = { spolecznosc: 'nowe wiadomości na czacie', walka: 'raport czeka' };
+// While the character explores or works in a profession, the tab of that
+// activity counts its time down in the System's light, as the camp counts a
+// build; then a dot says the report waits (updateNavTimers, every second).
+// The Awatar Systemu's work, once done, lights the Profesje tab too.
+const TIMED = {
+  walka: { label: 'Walka', kinds: ['hunt'], doing: 'eksploracja' },
+  profesje: { label: 'Profesje', kinds: Object.keys(WORK_SCREENS), doing: 'praca' },
+};
+function tabTime(id, now = serverNow()) {
+  const activity = state.character?.activity;
+  const work = activity && TIMED[id].kinds.includes(activity.kind) ? activity : null;
+  const running = Boolean(work) && !activityFinished(work, now);
+  const avatar = id === 'profesje' && state.character?.professions?.avatar?.activity;
+  const ready = (Boolean(work) && !running) || (Boolean(avatar) && activityFinished(avatar, now));
+  return { work, running, ready };
+}
+const WAITING = {
+  postac: () => pointsWaiting() || skillsWaiting(),
+  stats: pointsWaiting,
+  skills: skillsWaiting,
+  spolecznosc: chatNews,
+  walka: () => tabTime('walka').ready,
+  profesje: () => tabTime('profesje').ready,
+};
+const WAITING_TEXTS = { spolecznosc: 'nowe wiadomości na czacie', walka: 'raport czeka', profesje: 'raport czeka' };
 const waitingText = (id) =>
   WAITING_TEXTS[id] ?? (id === 'skills' || (id === 'postac' && !pointsWaiting()) ? 'umiejętność czeka' : 'wolne punkty do rozdania');
 
@@ -371,18 +389,19 @@ export function updateNav({ kind, active, onBack }) {
   updateNavTimers();
 }
 
-// The time left of the exploration on the Walka tab, and its dot once the
-// report waits.
+// The time left of the exploration on the Walka tab and of the work in a
+// profession on the Profesje tab, and their dots once a report waits. A tab
+// still locked keeps its level.
 export function updateNavTimers(now = serverNow()) {
-  const item = $('#nav-main .nav-item[href="#/walka"]');
-  const label = item && $('.nav-label', item);
-  if (!label) return;
-  const activity = hunt();
-  const running = Boolean(activity) && !activityFinished(activity, now);
-  const ready = Boolean(activity) && !running;
-  item.classList.toggle('nav-item--busy', running);
-  item.classList.toggle('nav-item--ready', ready);
-  label.textContent = running ? formatCountdown(activity.endsAt - now) : 'Walka';
-  item.setAttribute('aria-label', running ? `Walka, eksploracja: ${label.textContent}` : ready ? 'Walka, raport czeka' : 'Walka');
+  for (const [id, tab] of Object.entries(TIMED)) {
+    const item = $(`#nav-main .nav-item[href="#/${id}"]`);
+    const label = item && $('.nav-label', item);
+    if (!label || item.classList.contains('nav-item--locked')) continue;
+    const { work, running, ready } = tabTime(id, now);
+    item.classList.toggle('nav-item--busy', running);
+    item.classList.toggle('nav-item--ready', ready);
+    label.textContent = running ? formatCountdown(work.endsAt - now) : tab.label;
+    item.setAttribute('aria-label', [tab.label, running && `${tab.doing}: ${label.textContent}`, ready && 'raport czeka'].filter(Boolean).join(', '));
+  }
 }
 

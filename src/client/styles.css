@@ -1255,7 +1255,8 @@ button {
   color: var(--gold);
 }
 
-/* The Walka tab while the character explores: the time left in its label. */
+/* The Walka tab while the character explores and the Profesje tab while it
+   works: the time left in its label. */
 .nav-item--busy,
 .nav-item--busy .nav-icon {
   color: var(--system);
