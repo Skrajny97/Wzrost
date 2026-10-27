@@ -1,0 +1,17 @@
+{
+  "id": "professions-intro",
+  "payload": {
+    "text": "Najpierw przeczytaj, co mówi o nich System. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/professions-intro-20261027T1346-0.mp3",
+    "audio/drafts/narration/professions-intro-20261027T1346-1.mp3"
+  ],
+  "credits": 104
+}
