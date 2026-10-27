@@ -1,0 +1,16 @@
+{
+  "id": "community-welcome",
+  "payload": {
+    "text": "Piąty poziom postaci… System otworzył przed Tobą dwie nowe drogi: Społeczność i Szybkie Polowanie. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/community-welcome-20261027T1834-0.mp3"
+  ],
+  "credits": 107
+}
