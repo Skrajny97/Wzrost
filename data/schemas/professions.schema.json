@@ -117,6 +117,11 @@
             "type": "boolean",
             "description": "Profesja jest w zakładce, ale jeszcze bez pracy."
           },
+          "unlockLevel": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Poziom postaci, od którego profesja się otwiera, gdy później niż zakładka Profesje (data/unlocks.json)."
+          },
           "description": {
             "type": "string",
             "minLength": 1

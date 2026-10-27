@@ -15,6 +15,11 @@ import { say } from './text.js';
 // A profession as the character keeps it, { level, xp }: level 1 before any work.
 export const professionState = (professions, id) => ({ level: 1, xp: 0, ...professions?.[id] });
 
+// The character level a profession opens at: its own (unlockLevel, for one
+// that comes later), or that of the Profesje tab.
+export const professionUnlockLevel = (profession, content) => profession.unlockLevel ?? content.unlocksById.professions.level;
+export const professionOpen = (profession, level, content) => level >= professionUnlockLevel(profession, content);
+
 // The minutes of work from a level to the next: a point of XP a minute.
 export const professionXpToNext = (profession, level) => level * profession.levelMinutes;
 

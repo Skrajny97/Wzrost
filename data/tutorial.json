@@ -551,7 +551,8 @@
       "text": [
         "Dziesiąty poziom postaci… Puszcza zna już Twoje imię, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Profesje.",
         "Zanim którąś sprawdzisz – pozwól, że Ci je przedstawię."
-      ]
+      ],
+      "voice": "audio/narration/professions-welcome.mp3"
     },
     {
       "id": "professions-lead",
@@ -559,7 +560,8 @@
       "chapter": "professions",
       "text": [
         "Profesje czekają w tej zakładce. Zajrzyjmy do nich."
-      ]
+      ],
+      "voice": "audio/narration/professions-lead.mp3"
     },
     {
       "id": "professions-intro",
@@ -567,7 +569,8 @@
       "chapter": "professions",
       "text": [
         "Najpierw przeczytaj, co mówi o nich System."
-      ]
+      ],
+      "voice": "audio/narration/professions-intro.mp3"
     },
     {
       "id": "professions-list",
@@ -575,7 +578,8 @@
       "chapter": "professions",
       "text": [
         "Zielarstwo pozwala Ci zbierać zioła w Systemowym Zagajniku, a w Alchemii uwarzysz z nich mikstury w Systemowej Pracowni. Na Rzemieślnictwo przyjdzie jeszcze czas."
-      ]
+      ],
+      "voice": "audio/narration/professions-list.mp3"
     },
     {
       "id": "professions-ending",
@@ -583,7 +587,8 @@
       "chapter": "professions",
       "text": [
         "Mikstury zabierzesz na wyprawę – spakujesz je w podróż przed wyruszeniem. W walce Twoja postać sama po nie sięgnie."
-      ]
+      ],
+      "voice": "audio/narration/professions-ending.mp3"
     }
   ]
 }

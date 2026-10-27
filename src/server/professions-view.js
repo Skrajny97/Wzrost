@@ -17,8 +17,10 @@ import {
   patternLevel,
   potionMinutes,
   potionPrice,
+  professionOpen,
   professionStatBonus,
   professionState,
+  professionUnlockLevel,
   professionXpToNext,
 } from '../engine/index.js';
 import { content } from './content.js';
@@ -71,8 +73,9 @@ export function bagPotions(row, sellBonus) {
 // Alchemia: its place, a potion's minutes and each recipe, known (with its
 // herbs and the most potions at once) or hidden; and the Warsztat of
 // Rzemieślnictwo: its place, the slots with their patterns, known (with what
-// one item takes) or hidden, and the rarities. Null while the professions
-// are hidden in this deployment or not unlocked yet.
+// one item takes) or hidden, and the rarities, once Rzemieślnictwo opens.
+// Null while the professions are hidden in this deployment or not unlocked
+// yet.
 export function professionsView(row) {
   if (!professionsOn() || !isUnlocked('professions', row.level, content)) return null;
   const professions = JSON.parse(row.professions ?? '{}');
@@ -95,6 +98,9 @@ export function professionsView(row) {
         description: profession.description,
         // Rzemieślnictwo waits locked where it is switched off.
         soon: Boolean(profession.soon) || (profession.id === workshop.profession && !craftingOn()),
+        // A profession that opens later than the tab waits for its level.
+        locked: !professionOpen(profession, row.level, content),
+        unlockLevel: professionUnlockLevel(profession, content),
         level,
         xp,
         xpToNext: level < profession.maxLevel ? professionXpToNext(profession, level) : 0,
@@ -153,7 +159,7 @@ export function professionsView(row) {
           : { id: potion.id, level: potion.level, hidden: true, hint: say(brewing.texts, 'hidden', 0, { level: potion.level }) },
       ),
     },
-    workshop: craftingOn() ? workshopView(crafter.level) : null,
+    workshop: craftingOn() && professionOpen(content.professionsById[workshop.profession], row.level, content) ? workshopView(crafter.level) : null,
   };
 }
 

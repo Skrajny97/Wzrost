@@ -520,10 +520,12 @@ function checkProfessions(data, { stats }) {
   const { professions, gathering, herbs } = data.professions;
   const ids = uniqueIds(errors, 'professions', professions);
   uniqueIds(errors, 'professions (zioła)', herbs);
+  const tabLevel = data.unlocks.find((unlock) => unlock.id === 'professions').level;
   for (const profession of professions) {
     for (const stat of profession.stats) {
       if (!stats.has(stat)) errors.push(`professions.json: ${profession.id} ma nieznaną statystykę "${stat}"`);
     }
+    if (profession.unlockLevel < tabLevel) errors.push(`professions.json: ${profession.id} otwiera się na poziomie ${profession.unlockLevel}, przed zakładką Profesje (${tabLevel})`);
   }
   const gatherer = professions.find((profession) => profession.id === gathering.profession);
   if (!ids.has(gathering.profession) || gatherer.kind !== 'gathering') {

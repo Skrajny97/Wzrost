@@ -33,6 +33,7 @@ import {
   plannedLevel,
   playerCombatant,
   production,
+  professionOpen,
   questsStale,
   questsView,
   regenPerMinute,
@@ -263,15 +264,16 @@ async function settleTimePoints(db, row, now) {
 }
 
 // What a period's quests are drawn from: the character as it is, whether its
-// Stół rozbiórki stands, which professions it has, and its id for the seed
-// (quests.js).
+// Stół rozbiórki stands, which professions it has (Rzemieślnictwo where it
+// works and from its own level), and its id for the seed (quests.js).
 export function questContext(player, now) {
   const hasProfessions = professionsOn() && isUnlocked('professions', player.row.level, content);
+  const crafting = content.professionsById[content.workshop.profession];
   return {
     character: engineCharacter(player.row),
     hasTable: craftTable(campLevels(player.buildings, now, content), content).pace > 0,
     hasProfessions,
-    hasCrafting: hasProfessions && craftingOn(),
+    hasCrafting: hasProfessions && craftingOn() && professionOpen(crafting, player.row.level, content),
     seed: player.row.id,
   };
 }

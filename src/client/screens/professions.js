@@ -156,6 +156,16 @@ export function mountProfessions(container, { params, navigate }) {
         h('span', { class: 'profession-level', text: 'Wkrótce' }),
       );
     }
+    // A profession that opens later than the tab waits for its level.
+    if (profession.locked) {
+      return h(
+        'div',
+        { class: 'profession-square profession-square--soon', role: 'img', 'aria-label': `${profession.name}: od poziomu postaci ${profession.unlockLevel}` },
+        h('span', { class: 'profession-art' }, art),
+        label,
+        h('span', { class: 'profession-level' }, icon('lock', { size: 12 }), ` od poz. ${profession.unlockLevel}`),
+      );
+    }
     const work = WORK[profession.id];
     const working = work && character.activity?.kind === work.kind;
     return h(

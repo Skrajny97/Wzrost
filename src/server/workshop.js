@@ -17,7 +17,9 @@ import {
   patternLevel,
   playerCombatant,
   potionsDone,
+  professionOpen,
   professionState,
+  professionUnlockLevel,
   settleCrafting,
   workProfession,
   workXp,
@@ -56,8 +58,12 @@ export async function startCrafting(context) {
   const { session, player } = await requireIdlePlayer(context);
   requireProfessions(player);
   if (!craftingOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
-  const body = await readJson(context.request);
   const { workshop } = content;
+  const crafting = content.professionsById[workshop.profession];
+  if (!professionOpen(crafting, player.row.level, content)) {
+    throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content)}.`);
+  }
+  const body = await readJson(context.request);
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), workshop.profession);
   const base = typeof body.baseId === 'string' ? content.basesById[body.baseId] : undefined;
   if (!base || !workshop.parts[base.slot] || patternLevel(base, content) > level) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');

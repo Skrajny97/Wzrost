@@ -193,7 +193,7 @@ describe('the Warsztat through the API', () => {
   beforeEach(async () => {
     ({ cookie } = await signUp('kowalka'));
     await call('POST', '/api/character', { cookie, body: { name: 'Kowalka', classId: 'warrior', appearance: 'female' } });
-    await (await db()).prepare(`UPDATE characters SET level = 12, xp = 0, parts = '{"scraps":30}', resources = '{"wood":50,"stone":200,"iron-ore":40}'`).run();
+    await (await db()).prepare(`UPDATE characters SET level = 15, xp = 0, parts = '{"scraps":30}', resources = '{"wood":50,"stone":200,"iron-ore":40}'`).run();
   });
 
   const set = async (sql, ...binds) => (await db()).prepare(`UPDATE characters SET ${sql}`).bind(...binds).run();
@@ -213,6 +213,23 @@ describe('the Warsztat through the API', () => {
         .run();
     }
   };
+
+  test('Rzemieślnictwo opens at character level 15, later than the other professions', async () => {
+    await set('level = 14, quests = ?', '{}');
+    const before = await character();
+    const square = before.professions.list.find((profession) => profession.id === 'crafting');
+    assert.deepEqual([square.locked, square.unlockLevel, square.soon], [true, 15, false]);
+    assert.ok(before.professions.list.filter((profession) => profession.id !== 'crafting').every((profession) => !profession.locked && profession.unlockLevel === 10));
+    assert.equal(before.professions.workshop, null);
+    const order = await craft({ baseId: 'sword', rarity: 'common', count: 1 });
+    assert.equal(order.status, 403);
+    assert.equal(order.data.error.message, 'Rzemieślnictwo odblokujesz na poziomie postaci 15.');
+    assert.ok(![...before.quests.daily.quests, ...before.quests.weekly.quests].some((quest) => quest.kind.startsWith('make')));
+    await set('level = 15');
+    const after = await character();
+    assert.equal(after.professions.list.find((profession) => profession.id === 'crafting').locked, false);
+    assert.ok(after.professions.workshop);
+  });
 
   test('the Warsztat shows the slots with their patterns, what one item takes, and the rarities', async () => {
     const { workshop } = (await character()).professions;
@@ -303,7 +320,7 @@ describe('the Warsztat through the API', () => {
     assert.equal(report.kind, 'items');
     assert.equal(report.minutes, 120);
     assert.equal(report.items.length, 2);
-    assert.ok(report.items.every((item) => item.base === 'axe' && item.level === 12 && item.rarity === 'common'));
+    assert.ok(report.items.every((item) => item.base === 'axe' && item.level === 15 && item.rarity === 'common'));
     assert.equal(report.failed, 0);
     assert.equal(report.made, 'Wykonano: 2 × Topór.');
     assert.equal(report.profession.levelAfter, 3);
