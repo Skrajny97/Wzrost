@@ -25,6 +25,7 @@ import {
   workProfession,
   workXp,
   xpPerHour,
+  xpToNext,
 } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -116,9 +117,11 @@ describe('herbalism in the engine', () => {
     assert.deepEqual(storeHerbs({ comfrey: 20 }, { comfrey: 3 }, 0, content).lost, { comfrey: 3 });
   });
 
-  test('work gives the character a tenth of the XP of exploring, and a level heals', () => {
-    assert.equal(workXp(10, 60, content), Math.round(xpPerHour(10, content) * 0.1));
-    const character = newCharacter('archer', { level: 10, xp: 0 });
+  test('work gives the character a small share of the XP of exploring, and a level heals', () => {
+    // The author: the XP from a profession is a small bonus, so exploring stays the choice.
+    assert.equal(workXp(10, 60, content), Math.round(xpPerHour(10, content) * 0.025));
+    assert.ok(workXp(12, 480, content) < xpToNext(12, content));
+    const character = newCharacter('archer', { level: 10, xp: xpToNext(10, content) - 100 });
     const work = applyWork(character, workXp(10, 480, content), content);
     assert.ok(work.level > 10);
     assert.ok(work.levelled);

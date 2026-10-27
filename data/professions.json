@@ -1,7 +1,7 @@
 {
   "$comment": "Profesje (src/engine/professions.js). Każda ma 100 poziomów: awans z poziomu L wymaga L × levelMinutes minut pracy. Każdy awans daje statPerLevel do obu statystyk profesji (stats), więc 1. poziom daje 0, a ostatni poziom dodaje jeszcze maxLevelBonus: nagrodę za opanowanie profesji (1 × 99 + 51 = 150). Praca daje postaci characterXpShare tego XP, co godzina wyprawy na jej poziomie, i nie daje XP klasy. soon: profesja widoczna w zakładce, ale jeszcze bez pracy. Zbieractwo (gathering): postać zbiera zioła w jednym stałym miejscu (place), przez minutes.min–max minut co step. Na godzinę zbiera perHour sztuk zioła, a każdy poziom dodaje yieldPerLevel; losowość to ± spread. slots: od którego poziomu ile ziół naraz, a zbiór dzieli się po równo między wybrane zioła. Zioło zna się od swojego poziomu (level). stack: ile sztuk zioła mieści jedno miejsce plecaka; co się nie zmieści, przepada. price: tyle płaci złomiarz za sztukę (z premią Skupu złomu). genitive: nazwa w dopełniaczu, zioła do zadań narratora, a profesji do komunikatu o jej poziomie. texts: zdania raportu (report: jedno z wariantów) i komunikaty.",
   "rules": {
-    "characterXpShare": 0.1,
+    "characterXpShare": 0.025,
     "stack": 20
   },
   "professions": [
