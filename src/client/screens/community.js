@@ -1,24 +1,35 @@
-// The Społeczność tab, from character level 5: for now the chat
-// (src/server/chat.js), in its only channel so far, Globalny, the newest
-// messages at the bottom, over the line to write in. While the chat is open and
-// the page is in front, it asks for new messages every few seconds, and
-// less often the longer nothing comes. A tap on a name shows that character
-// (profile.js); a tap on someone else's message opens its sheet: report it,
-// or hide that player's messages. The moderation (the admin and the
-// moderators, marked by their names) also takes it down or silences its
-// writer there, and has the reports in a sheet of their own. The rules come
-// before the first message, and the hidden players wait over the chat to be
-// shown again. The chat reaches down to the bottom bar, so the line to write
-// in stays at the bottom of the screen, the messages right over it.
+// The Społeczność tab, from character level 5. A list at its top, folded to
+// the part shown, picks one of its parts (data/community.json): the Czat,
+// the Znajomi with their daily Upominek (friends.js), the Ranking postaci
+// (ranking.js), and the Gildie and the Drużyna still to come ("Wkrótce").
+// It opens on the part with news (chat-news.js), else on the one last shown
+// on the device; while the narrator has not shown the chat's rules yet
+// (narrator.js), on the Czat. News in a part not shown lights the folded
+// list too. By the list a bell mutes the chat's light on the tab.
+//
+// The chat (src/server/chat.js), in its only channel so far, Globalny, the
+// newest messages at the bottom, over the line to write in. While the chat
+// is open and the page is in front, it asks for new messages every few
+// seconds, and less often the longer nothing comes. A tap on a name shows
+// that character (profile.js); a tap on someone else's message opens its
+// sheet: report it, or hide that player's messages. The moderation (the
+// admin and the moderators, marked by their names) also takes it down or
+// silences its writer there, and has the reports in a sheet of their own.
+// The rules come before the first message, and the hidden players wait over
+// the chat to be shown again. The chat reaches down to the bottom bar, so
+// the line to write in stays at the bottom of the screen, the messages right
+// over it.
 
 import { $, fill, h, icon } from '../dom.js';
 import { dateTimeFormat, timeFormat } from '../format.js';
-import { chatSeen } from '../chat-news.js';
+import { chatMuted, chatNews, chatSeen, friendNews, onChatNews, setChatMuted } from '../chat-news.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, openSheet, pageHeading, toast, withButton } from '../ui.js';
+import { mountFriends } from './friends.js';
 import { lockedScreen } from './locked.js';
+import { mountRanking } from './ranking.js';
 
 // The most messages the page keeps; older ones leave from the top.
 const SHOWN = 200;
@@ -27,8 +38,156 @@ const SHOWN = 200;
 const FOREVER = 8.64e15;
 const untilText = (until) => (until >= FOREVER ? 'na stałe' : `do ${dateTimeFormat.format(new Date(until))}`);
 
+const SECTION_KEY = 'insight-community-section';
+const SECTION_ICONS = { chat: 'chat', friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords' };
+const SECTION_NEWS = { chat: chatNews, friends: friendNews };
+
 export function mountCommunity(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Społeczność')(container, context);
+  const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking };
+  const sections = state.content.community.sections;
+  let current = firstSection(sections);
+  let part = null;
+  const body = h('div', { class: 'community-body' });
+  const picker = sectionPicker(sections, () => current, show);
+  fill(container, pageHeading('Społeczność'), picker.element, body);
+
+  // The list stays under the top bar while the page scrolls, so it is at
+  // hand under a long chat too (styles.css).
+  const topbar = $('.topbar');
+  const stick = () => picker.element.style.setProperty('--community-top', `${topbar?.offsetHeight ?? 0}px`);
+  const watcher = topbar && typeof ResizeObserver === 'function' ? new ResizeObserver(stick) : null;
+  watcher?.observe(topbar);
+  stick();
+
+  function show(id) {
+    current = id;
+    try {
+      localStorage.setItem(SECTION_KEY, id);
+    } catch {
+      // Remembered for this visit only.
+    }
+    part?.unmount();
+    fill(body);
+    part = MOUNTS[id](body);
+    picker.render();
+  }
+
+  show(current);
+  return {
+    unmount() {
+      part?.unmount();
+      picker.unmount();
+      watcher?.disconnect();
+    },
+  };
+}
+
+function firstSection(sections) {
+  if (!state.character.tutorial.includes('community-rules')) return 'chat';
+  const open = sections.filter((section) => !section.soon).map((section) => section.id);
+  const news = open.find((id) => SECTION_NEWS[id]?.());
+  if (news) return news;
+  let kept = null;
+  try {
+    kept = localStorage.getItem(SECTION_KEY);
+  } catch {
+    // The first part, then.
+  }
+  return open.includes(kept) ? kept : open[0];
+}
+
+// The bar with the part shown and the list it unfolds; a tap outside folds
+// it again. The parts still to come cannot be picked yet.
+function sectionPicker(sections, current, choose) {
+  const list = h('ul', { class: 'community-sections', id: 'community-sections', hidden: true });
+  const toggle = h('button', {
+    type: 'button',
+    class: 'community-toggle',
+    'aria-expanded': 'false',
+    'aria-controls': 'community-sections',
+    onClick: () => unfold(list.hidden),
+  });
+  const bell = h('button', {
+    type: 'button',
+    class: 'community-bell',
+    onClick: () => {
+      setChatMuted(!chatMuted());
+      toast(chatMuted() ? 'Powiadomienia czatu wyciszone: nowe wiadomości nie zapalą kropki na Społeczności.' : 'Powiadomienia czatu włączone.');
+      render();
+    },
+  });
+  const element = h('div', { class: 'community-picker' }, h('div', { class: 'community-picker-row' }, toggle, bell), list);
+
+  function unfold(open) {
+    list.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+
+  const label = (section) => [
+    icon(SECTION_ICONS[section.id] ?? 'unknown', { size: 20, className: 'community-icon' }),
+    h('span', { class: 'community-name', text: section.id === 'chat' ? `${section.name} · ${state.content.chat.channels[0].name}` : section.name }),
+    SECTION_NEWS[section.id]?.() && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'nowe' }),
+    section.soon && h('span', { class: 'community-soon', text: 'Wkrótce' }),
+  ];
+
+  function render() {
+    const shown = sections.find((section) => section.id === current());
+    const elsewhere = sections.some((section) => section.id !== shown.id && SECTION_NEWS[section.id]?.());
+    fill(
+      toggle,
+      label(shown),
+      elsewhere && h('span', { class: 'community-dot community-dot--elsewhere', role: 'img', 'aria-label': 'nowe w innej części' }),
+      icon('chevron', { size: 18, className: 'community-chevron' }),
+    );
+    fill(
+      list,
+      sections.map((section) =>
+        h(
+          'li',
+          {},
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'community-section',
+              disabled: Boolean(section.soon),
+              'aria-current': section.id === shown.id ? 'true' : undefined,
+              onClick: () => {
+                unfold(false);
+                if (section.id !== current()) choose(section.id);
+              },
+            },
+            label(section),
+          ),
+        ),
+      ),
+    );
+    const muted = chatMuted();
+    bell.hidden = shown.id !== 'chat';
+    bell.setAttribute('aria-pressed', String(muted));
+    bell.setAttribute('aria-label', 'Wycisz powiadomienia czatu');
+    bell.title = muted ? 'Powiadomienia czatu wyciszone' : 'Powiadomienia czatu włączone';
+    fill(bell, icon(muted ? 'bell-off' : 'bell', { size: 20 }));
+  }
+
+  const outside = (event) => {
+    if (!list.hidden && !element.contains(event.target)) unfold(false);
+  };
+  document.addEventListener('pointerdown', outside);
+  const stop = onChatNews(render);
+  return {
+    element,
+    render,
+    unmount() {
+      document.removeEventListener('pointerdown', outside);
+      stop();
+    },
+  };
+}
+
+// The Czat: its notices, the players hidden and the room of messages.
+function mountChat(container) {
   const chat = state.content.chat;
   const channel = chat.channels[0].id;
   let messages = [];
@@ -69,14 +228,7 @@ export function mountCommunity(container, context) {
   const hidden = h('div', { class: 'chat-hidden' });
   const room = h('div', { class: 'chat-room' }, empty, list, footer);
 
-  // One channel is named under the title; more will get a row of their own.
-  fill(
-    container,
-    pageHeading('Społeczność', `Czat: ${chat.channels[0].name}`),
-    notices,
-    hidden,
-    room,
-  );
+  fill(container, notices, hidden, room);
 
   // The room is as tall as the screen under where it starts (styles.css),
   // counted without the camera's zoom.

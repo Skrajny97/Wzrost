@@ -29,6 +29,7 @@ import quests from '../../data/quests.json' with { type: 'json' };
 import skills from '../../data/skills.json' with { type: 'json' };
 import professions from '../../data/professions.json' with { type: 'json' };
 import chat from '../../data/chat.json' with { type: 'json' };
+import community from '../../data/community.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -54,6 +55,7 @@ export const content = buildContent({
   skills,
   professions,
   chat,
+  community,
 });
 
 // The narrator's lines that are read once, in their order: cards and
@@ -156,6 +158,13 @@ export function publicContent() {
       maxLength: content.chat.rules.maxLength,
       pollSeconds: content.chat.rules.pollSeconds,
       rules: content.chat.texts.rules,
+    },
+    // The Społeczność's drop-down list, and the limits of the Znajomi and
+    // the Upominek the page tells of (community.js).
+    community: {
+      sections: content.community.sections,
+      friendsMax: content.community.friends.max,
+      gift: { name: content.community.gift.name, claimsPerDay: content.community.gift.claimsPerDay, timePoints: content.community.gift.timePoints },
     },
   };
 }

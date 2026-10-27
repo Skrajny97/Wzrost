@@ -14,6 +14,7 @@
 import { isUnlocked } from '../engine/index.js';
 import { isAuthor } from './author.js';
 import { content } from './content.js';
+import { friendNews } from './community.js';
 import { ApiError, json, readJson } from './http.js';
 import { requirePlayable, requireSession } from './sessions.js';
 
@@ -76,7 +77,7 @@ const blockedList = (db, userId) => db.prepare('SELECT id, name FROM chat_blocks
 
 // The account and its character as the chat needs them, once the character
 // reaches the chat's level.
-async function requireChatter(context) {
+export async function requireChatter(context) {
   const session = await requirePlayable(context);
   const db = context.env.DB;
   const [characters, accounts] = await db.batch([
@@ -145,17 +146,21 @@ export async function readChat(context) {
 }
 
 // GET /api/chat/latest: the newest message someone else wrote that this
-// player may read, for the light on the Społeczność tab.
+// player may read, and the Upominki and invitations waiting in Znajomi
+// (community.js), for the light on the Społeczność tab.
 export async function latestChat(context) {
-  const { session, db } = await requireChatter(context);
-  const row = await db
-    .prepare(
-      `SELECT MAX(id) AS id FROM chat_messages
-       WHERE channel = ? AND hidden_at IS NULL AND user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)`,
-    )
-    .bind(content.chat.channels[0].id, session.userId, session.userId)
-    .first();
-  return json({ latest: row.id ?? 0 });
+  const { session, character, db } = await requireChatter(context);
+  const [row, friends] = await Promise.all([
+    db
+      .prepare(
+        `SELECT MAX(id) AS id FROM chat_messages
+         WHERE channel = ? AND hidden_at IS NULL AND user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)`,
+      )
+      .bind(content.chat.channels[0].id, session.userId, session.userId)
+      .first(),
+    friendNews(db, character.id, context.now),
+  ]);
+  return json({ latest: row.id ?? 0, ...friends });
 }
 
 // POST /api/chat/rules: the player accepts the rules of the chat.

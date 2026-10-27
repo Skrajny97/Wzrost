@@ -11,7 +11,7 @@ const CLIENT_DIR = new URL('../src/client/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
-  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat',
+  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'professions', 'settlement', 'dungeons', 'core'];
@@ -557,6 +557,12 @@ function checkReferences(data) {
   const { pollSeconds, page, keep } = data.chat.rules;
   if (pollSeconds.min > pollSeconds.max) errors.push('chat.json: rules.pollSeconds.min nie może być większe niż max');
   if (page > keep) errors.push('chat.json: rules.page nie może być większe niż keep');
+  // The Społeczność's list needs the parts the page draws.
+  uniqueIds(errors, 'community', data.community.sections);
+  for (const id of ['chat', 'friends', 'ranking']) {
+    const section = data.community.sections.find((candidate) => candidate.id === id);
+    if (!section || section.soon) errors.push(`community.json: brak otwartego działu ${id}`);
+  }
   return errors;
 }
 

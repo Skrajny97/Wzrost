@@ -55,6 +55,7 @@ import {
   xpToNext,
 } from '../engine/index.js';
 import { chatRole } from './chat.js';
+import { relationTo } from './community.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
@@ -761,15 +762,17 @@ export async function getCharacter(context) {
 // it, from a tap on its name in the chat: its look, levels, what it wears
 // and the skills it has learned, with its account's role in the chat.
 export async function characterProfile(context) {
-  await requirePlayable(context);
+  const session = await requirePlayable(context);
   const db = context.env.DB;
   const name = String(context.params.name ?? '');
   const found = await db
-    .prepare("SELECT c.user_id, u.login, u.google_sub, u.chat_moderator FROM characters c JOIN users u ON u.id = c.user_id WHERE c.name_key = ? AND c.role = 'player'")
+    .prepare("SELECT c.id, c.user_id, u.login, u.google_sub, u.chat_moderator FROM characters c JOIN users u ON u.id = c.user_id WHERE c.name_key = ? AND c.role = 'player'")
     .bind(nameKey(name))
     .first();
   if (!found) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
   const view = characterView(await loadPlayer(db, found.user_id), context.now);
+  // Whether the one who looks is a friend of this character (community.js).
+  const own = await db.prepare("SELECT id FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId).first();
   const worn = (item) =>
     item && {
       name: item.name,
@@ -795,6 +798,7 @@ export async function characterProfile(context) {
       level: view.level,
       classLevel: view.classLevel,
       role: chatRole(context.env, found),
+      relation: own ? await relationTo(db, own.id, found.id, context.now) : null,
       equipment: content.slots.map((slot) => ({ slot: slot.id, slotName: slot.name, item: worn(view.equipment[slot.id]) })),
       skills: view.skills.pools.flatMap((pool) =>
         pool.options
@@ -895,6 +899,8 @@ export async function deleteCharacter(context) {
 // The statements that remove a character with all it has.
 export function characterRemoval(db, id) {
   return [
+    db.prepare('DELETE FROM friends WHERE character_id = ? OR friend_id = ?').bind(id, id),
+    db.prepare('DELETE FROM gifts WHERE sender_id = ? OR receiver_id = ?').bind(id, id),
     db.prepare('DELETE FROM chat_reports WHERE message_id IN (SELECT id FROM chat_messages WHERE character_id = ?)').bind(id),
     db.prepare('DELETE FROM chat_messages WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM reports WHERE character_id = ?').bind(id),

@@ -6788,3 +6788,308 @@ button.herb-tile[aria-pressed='true'] {
   display: grid;
   margin-top: 16px;
 }
+
+/* The Społeczność's list of parts (screens/community.js): the part shown on
+   a bar under the title, the bell muting the chat's light beside it, and the
+   list it unfolds over what is below; the parts still to come are marked
+   "Wkrótce". */
+.community-picker {
+  position: sticky;
+  top: var(--community-top, 0px);
+  z-index: 15;
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 8px var(--gutter);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-deep);
+}
+
+.community-picker-row {
+  display: flex;
+  gap: 8px;
+}
+
+.community-toggle,
+.community-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: var(--bark);
+  color: var(--text);
+  font-family: var(--font-world);
+  font-size: 17px;
+  text-align: left;
+}
+
+.community-toggle {
+  flex: 1;
+  min-width: 0;
+}
+
+.community-icon {
+  flex: none;
+  color: var(--gold);
+}
+
+.community-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.community-chevron {
+  flex: none;
+  color: var(--text-muted);
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.community-toggle[aria-expanded='true'] .community-chevron {
+  transform: rotate(-90deg);
+}
+
+.community-bell {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  min-height: 48px;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: var(--bark);
+  color: var(--text);
+}
+
+.community-bell[aria-pressed='true'] {
+  color: var(--text-muted);
+}
+
+.community-sections {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: var(--gutter);
+  left: var(--gutter);
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+  list-style: none;
+}
+
+.community-sections[hidden] {
+  display: none;
+}
+
+.community-section {
+  border-color: transparent;
+  background: transparent;
+}
+
+.community-section[aria-current='true'] {
+  border-color: var(--bark-line);
+  background: var(--bark-active);
+}
+
+.community-section:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.community-section:disabled .community-icon {
+  color: var(--icon-muted);
+}
+
+.community-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.community-soon {
+  flex: none;
+  padding: 2px 6px;
+  border: 1px solid var(--system-line);
+  border-radius: 3px;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.community-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* The Ranking postaci (screens/ranking.js): the order to pick, the
+   player's place, and the table with both levels, the column of the order
+   in gold and the player's own row in the System's light. */
+.ranking-place {
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.ranking-place:empty {
+  display: none;
+}
+
+.ranking {
+  padding: 8px 10px;
+}
+
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.ranking-table th {
+  padding: 6px 4px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ranking-table td {
+  padding: 0 4px;
+  border-top: 1px solid var(--line);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ranking-table th:nth-child(2),
+.ranking-table .ranking-name {
+  width: 100%;
+  max-width: 0;
+  text-align: left;
+}
+
+.ranking-number {
+  color: var(--text-muted);
+}
+
+.ranking-table .ranking-sorted {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.ranking-own td {
+  background: rgba(143, 227, 239, 0.08);
+}
+
+.ranking-who {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* The Znajomi (screens/friends.js): the Upominki to collect, and rows of
+   characters with what can be done with each. */
+.friends {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.friends-gifts .card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.friends-gifts .card-title svg {
+  color: var(--gold);
+}
+
+.friends-gifts-count {
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.friends-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.friend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 8px;
+  padding: 4px 0;
+  border-top: 1px solid var(--line);
+}
+
+.friend:first-child {
+  border-top: 0;
+}
+
+.friend-who {
+  flex: 1 1 150px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.friend-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.friend-gift {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.friend-sent,
+.profile-relation {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.friend-waiting {
+  flex: none;
+  display: inline-flex;
+  color: var(--gold);
+}
+
+.profile-friend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}

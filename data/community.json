@@ -1,0 +1,21 @@
+{
+  "$comment": "Społeczność (src/server/community.js, screens/community.js). sections: the parts of its drop-down list, in their order; soon marks one that is not open yet („Wkrótce”). ranking.size: how many characters the Ranking postaci shows. friends.max: the most Znajomi a character may have, and the most invitations it may have waiting. gift: the daily Upominek to a friend (one a day to each, by the Warsaw day). The receiver collects at most claimsPerDay a day, so as many Time Points too; one not collected waits keepDays days. Each gives timePoints Time Points and, at random, gold (goldChance) or one resource, more with the receiver's level: base + perLevel × level, rounded.",
+  "sections": [
+    { "id": "chat", "name": "Czat" },
+    { "id": "friends", "name": "Znajomi" },
+    { "id": "ranking", "name": "Ranking postaci" },
+    { "id": "guilds", "name": "Gildie", "soon": true },
+    { "id": "party", "name": "Drużyna", "soon": true }
+  ],
+  "ranking": { "size": 100 },
+  "friends": { "max": 30 },
+  "gift": {
+    "name": "Upominek",
+    "claimsPerDay": 10,
+    "keepDays": 7,
+    "timePoints": 1,
+    "goldChance": 0.5,
+    "gold": { "base": 20, "perLevel": 4 },
+    "resources": { "base": 4, "perLevel": 0.4 }
+  }
+}

@@ -26,3 +26,4 @@ export * from './brewing.js';
 export * from './potions.js';
 export * from './workshop.js';
 export * from './mail.js';
+export * from './gifts.js';

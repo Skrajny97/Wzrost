@@ -164,14 +164,21 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/hunts/quick` | Szybkie Polowanie: te same pola co `POST /api/hunts` bez `minutes`; wyprawa jak na `quickHunt.minutes` minut z `data/balance.json` kończy się od razu i zwraca `report`; od poziomu `quickHunt.level`, `quickHunt.perDay` razy na dzień w Polsce (403 `locked`; 409 `no_quick_hunts`, `busy`) |
 | GET | `/api/chat?channel=global&after=<id>&from=<id>` | Czat, od poziomu postaci z wpisu `community` w `data/unlocks.json` (403 `locked` na wszystkich `/api/chat`): najnowsze wiadomości kanału po `after` (bez zdjętych i bez wiadomości ukrytych graczy), każda z `role` autora (`admin`, `moderator` albo `null`), `hidden` (zdjęte od `from` do `after`), `rulesAccepted`, `mutedUntil`, `blocked` (ukryci gracze), `role` konta; moderacja dostaje też `reports` |
 | POST | `/api/chat` | wiadomość `text` na kanał `channel`, do `rules.maxLength` znaków z `data/chat.json`, bez linków, z gwiazdkami zamiast słów z `words`; zwraca `message` (400 `empty`, `too_long`, `link`; 403 `rules`, `muted`; 404 `no_character`; 429 `too_fast`) |
-| GET | `/api/chat/latest` | najnowsza wiadomość innego gracza, którą konto może czytać (`latest`, 0 gdy brak), dla kropki na zakładce Społeczność |
-| GET | `/api/profile/:name` | postać innego gracza po imieniu: wygląd, poziomy, `role` na czacie, `equipment` (każdy slot z `item` albo `null`, bez cen) i nauczone `skills` (404 `no_character`) |
+| GET | `/api/chat/latest` | najnowsza wiadomość innego gracza, którą konto może czytać (`latest`, 0 gdy brak), oraz `invites` (zaproszenia do znajomych) i `gifts` (Upominki, które postać może dziś jeszcze odebrać), dla kropki na zakładce Społeczność |
+| GET | `/api/profile/:name` | postać innego gracza po imieniu: wygląd, poziomy, `role` na czacie, `equipment` (każdy slot z `item` albo `null`, bez cen), nauczone `skills` i `relation` do postaci gracza (`self`, `friends` z `sentToday`, `sent`, `received`, każda z `id` znajomości, albo `null`) (404 `no_character`) |
 | POST | `/api/chat/rules` | konto przyjmuje zasady czatu |
 | POST | `/api/chat/report` | zgłoś wiadomość `messageId`; po `rules.hideAfterReports` zgłoszeniach znika do decyzji autora (400 `own`; 404 `no_message`) |
 | POST | `/api/chat/block` | ukryj wiadomości konta, które napisało `messageId`; zwraca `blocked` (400 `own`) |
 | POST | `/api/chat/unblock` | pokaż znów gracza `id` z `blocked` |
 | GET | `/api/chat/reports` | moderacja (admin i moderatorzy): wiadomości ze zgłoszeniami do decyzji, `login` piszącego tylko dla admina (404 dla innych) |
 | POST | `/api/chat/moderate` | moderacja: decyzja `action` (`hide`, `keep`, `muteDay`, `muteForever`) o wiadomości `messageId`; moderator nie decyduje o wiadomościach moderacji (403 `protected`) |
+| GET | `/api/ranking?by=level` | Ranking postaci, od poziomu Społeczności (403 `locked`), według poziomu postaci albo klasy (`by=class`): `rows` (do `ranking.size` z `data/community.json`), każdy z `place`, `name`, `classId`, `className`, `level`, `classLevel`, `role` i `own`, oraz `place` postaci gracza wśród wszystkich |
+| GET | `/api/friends` | Znajomi, od poziomu Społeczności: `friends` (każdy z `id` znajomości, `sentToday` i `waiting`: Upominki od niego), `incoming` i `outgoing` (zaproszenia), `gifts` (`waiting`, `claimedToday`, `claimsPerDay`) i `max` |
+| POST | `/api/friends/invite` | zaproś postać `name`; jej zaproszenie, które już czeka, staje się znajomością; zwraca Znajomych i `text` (400 `self`; 404 `no_character`; 409 `locked`, `friends`, `invited`, `full`) |
+| POST | `/api/friends/accept` | przyjmij zaproszenie `id`; zwraca Znajomych i `text` (404 `no_invitation`; 409 `full`) |
+| POST | `/api/friends/remove` | zakończ znajomość `id` u obu stron, odrzuć albo cofnij zaproszenie |
+| POST | `/api/friends/gift` | dzisiejszy Upominek dla znajomego `id`, z zawartością wylosowaną według jego poziomu (404 `no_friend`; 409 `sent`) |
+| POST | `/api/friends/claim` | odbierz czekające Upominki, najstarsze najpierw, najwyżej `gift.claimsPerDay` na dobę; zwraca `reward` (`count`, `timePoints`, `gold`, `resources`), `character` i Znajomych (409 `limit`, `none`) |
 | POST | `/api/author/chat/unmute` | tylko autor: konto `login` może znów pisać na czacie |
 | POST | `/api/author/chat/moderator` | tylko autor: konto `login` zostaje moderatorem czatu (`moderator: true`) albo przestaje nim być |
 | POST | `/api/professions/gather` | tylko z profesjami (`PROFESSIONS` = `"on"`): Zielarstwo, `herbs` (znane zioła, naraz tyle, ile pozwala poziom) i `minutes` (10–480 co 10) (400 `invalid_herbs`, `too_many_herbs`, `unknown_herb`, `invalid_duration`; 403 `locked`) |

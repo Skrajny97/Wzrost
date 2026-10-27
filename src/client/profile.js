@@ -1,18 +1,21 @@
-// Another player's character, from a tap on its name in the chat: its
-// portrait, levels, what it wears and the skills it has learned
-// (characterProfile in src/server/characters.js). A tap on a piece of gear
-// shows its properties.
+// Another player's character, from a tap on its name in the chat, the
+// Ranking or the Znajomi: its portrait, levels, what it wears and the skills
+// it has learned (characterProfile in src/server/characters.js), with what
+// the player can do with it as a friend (src/server/community.js). A tap on
+// a piece of gear shows its properties. `onChange` gets the Znajomi anew
+// after such an action.
 
 import { portraitSprite, skillSprite } from './art.js';
+import { friendsSeen } from './chat-news.js';
 import { h, icon } from './dom.js';
 import { SLOT_ICONS } from './icons.js';
-import { call } from './state.js';
-import { openSheet } from './ui.js';
+import { call, state } from './state.js';
+import { confirmAction, openSheet, toast, withButton } from './ui.js';
 import { itemSummary } from './screens/character.js';
 
 const PATHS = { main: 'ścieżka główna', second: 'ścieżka poboczna' };
 
-export async function openProfile(name) {
+export async function openProfile(name, { onChange } = {}) {
   const { profile } = await call('GET', `/api/profile/${encodeURIComponent(name)}`);
   openSheet(
     h(
@@ -31,6 +34,7 @@ export async function openProfile(name) {
         h('p', { class: 'profile-levels', text: `${profile.className} · poziom ${profile.level} · klasa ${profile.classLevel}` }),
       ),
     ),
+    profile.relation?.state !== 'self' && friendship(profile, onChange),
     h('h3', { class: 'profile-section', text: 'Ekwipunek' }),
     h(
       'ul',
@@ -76,4 +80,50 @@ export async function openProfile(name) {
           ),
         ),
   );
+}
+
+// Inviting the character, the invitation either way, or the friendship with
+// its Upominek for today. After each the sheet shows the character anew.
+function friendship(profile, onChange) {
+  const { relation, name } = profile;
+  const again = () => openProfile(name, { onChange });
+  const act = (path, data, said) => async () => {
+    const answer = await call('POST', path, data);
+    friendsSeen(answer);
+    onChange?.(answer);
+    toast(answer.text ?? said);
+    await again();
+  };
+  const button = (label, run, kind = 'world') =>
+    h('button', { type: 'button', class: `button button--${kind} button--small`, text: label, onClick: (event) => withButton(event.currentTarget, run) });
+  const note = (...children) => h('span', { class: 'profile-relation' }, children);
+  const parts = !relation
+    ? [button('Dodaj do znajomych', act('/api/friends/invite', { name }), 'system')]
+    : relation.state === 'sent'
+      ? [note('Zaproszenie wysłane.'), button('Cofnij', act('/api/friends/remove', { id: relation.id }, `Zaproszenie dla postaci ${name} cofnięte.`))]
+      : relation.state === 'received'
+        ? [
+            button('Przyjmij zaproszenie', act('/api/friends/accept', { id: relation.id }), 'system'),
+            button('Odrzuć', act('/api/friends/remove', { id: relation.id }, `Zaproszenie od postaci ${name} odrzucone.`)),
+          ]
+        : [
+            relation.sentToday
+              ? note(icon('gift', { size: 16 }), `${state.content.community.gift.name} wysłany dziś.`)
+              : button(`Wyślij ${state.content.community.gift.name}`, act('/api/friends/gift', { id: relation.id }), 'system'),
+            button(
+              'Usuń ze znajomych',
+              async () => {
+                const sure = await confirmAction({
+                  title: 'Usunąć ze znajomych?',
+                  text: `${name} zniknie z Twoich znajomych, a Ty z listy tej postaci.`,
+                  confirmLabel: 'Usuń',
+                  danger: true,
+                });
+                if (sure) await act('/api/friends/remove', { id: relation.id }, `${name} nie jest już wśród Twoich znajomych.`)();
+                else await again();
+              },
+              'danger',
+            ),
+          ];
+  return h('div', { class: 'profile-friend' }, parts);
 }

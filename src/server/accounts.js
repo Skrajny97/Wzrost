@@ -198,6 +198,8 @@ export async function deleteAccount(context) {
     db.prepare('DELETE FROM chat_reports WHERE user_id = ? OR message_id IN (SELECT id FROM chat_messages WHERE user_id = ?)').bind(id, id),
     db.prepare('DELETE FROM chat_messages WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM chat_blocks WHERE user_id = ? OR blocked_id = ?').bind(id, id),
+    db.prepare(`DELETE FROM friends WHERE character_id IN (${characters}) OR friend_id IN (${characters})`).bind(id, id),
+    db.prepare(`DELETE FROM gifts WHERE sender_id IN (${characters}) OR receiver_id IN (${characters})`).bind(id, id),
     ...['reports', 'activities', 'avatar_activities', 'items', 'buildings'].map((table) =>
       db.prepare(`DELETE FROM ${table} WHERE character_id IN (${characters})`).bind(id),
     ),

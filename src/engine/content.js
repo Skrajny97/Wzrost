@@ -107,6 +107,8 @@ export function buildContent(raw) {
     avatar: raw.professions?.avatar,
     // The chat of the Społeczność tab (src/server/chat.js).
     chat: raw.chat,
+    // The Społeczność's list, Ranking, Znajomi and Upominek (community.json).
+    community: raw.community,
     gathering: raw.professions?.gathering,
     herbs: raw.professions?.herbs ?? [],
     herbsById: byId(raw.professions?.herbs ?? []),

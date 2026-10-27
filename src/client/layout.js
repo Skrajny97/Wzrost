@@ -5,7 +5,7 @@
 // character bar with its own background.
 
 import { materialSprite, narratorFace } from './art.js';
-import { chatNews } from './chat-news.js';
+import { communityNews, communityNewsText } from './chat-news.js';
 import { $, fill, h, icon } from './dom.js';
 import { countOf, formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
 import { RESOURCE_ICONS, SYSTEM_POINTS_ICON } from './icons.js';
@@ -348,13 +348,15 @@ const WAITING = {
   postac: () => pointsWaiting() || skillsWaiting(),
   stats: pointsWaiting,
   skills: skillsWaiting,
-  spolecznosc: chatNews,
+  spolecznosc: communityNews,
   walka: () => tabTime('walka').ready,
   profesje: () => tabTime('profesje').ready,
 };
-const WAITING_TEXTS = { spolecznosc: 'nowe wiadomości na czacie', walka: 'raport czeka', profesje: 'raport czeka' };
+const WAITING_TEXTS = { walka: 'raport czeka', profesje: 'raport czeka' };
 const waitingText = (id) =>
-  WAITING_TEXTS[id] ?? (id === 'skills' || (id === 'postac' && !pointsWaiting()) ? 'umiejętność czeka' : 'wolne punkty do rozdania');
+  id === 'spolecznosc'
+    ? communityNewsText()
+    : (WAITING_TEXTS[id] ?? (id === 'skills' || (id === 'postac' && !pointsWaiting()) ? 'umiejętność czeka' : 'wolne punkty do rozdania'));
 
 function navButton(tab, active, onBack) {
   const unlocked = !tab.unlock || isUnlocked(tab.unlock);

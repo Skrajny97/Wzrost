@@ -47,6 +47,14 @@ export const ICONS = {
     solid('M9.5 20h5L12 17.2z'),
   ],
   chevron: [path('M9 5l7 7-7 7')],
+  // The Społeczność's list: the chat, the Ranking, the Gildie, the Upominek
+  // and the chat's light muted.
+  chat: [path('M4 5h16v11H10l-6 4.5z'), path('M8 9h8M8 12.5h5')],
+  trophy: [path('M8 3.5h8V9a4 4 0 0 1-8 0z'), path('M8 5.5H4.5c0 3 1.5 4.8 3.7 5M16 5.5h3.5c0 3-1.5 4.8-3.7 5'), path('M12 13v3.5M9 20.5h6M10 16.5h4v4h-4z')],
+  banner: [path('M6 21V3'), path('M6 4h12l-3 4 3 4H6')],
+  gift: [['rect', { x: 4, y: 10.5, width: 16, height: 10, rx: 1 }], path('M3 7h18v3.5H3z'), path('M12 7v13.5'), path('M12 7c-1.5-3.5-5.5-4.2-5.5-1.6C6.5 7 10 7 12 7zM12 7c1.5-3.5 5.5-4.2 5.5-1.6C17.5 7 14 7 12 7z')],
+  bell: [path('M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z'), path('M10 20.5a2 2 0 0 0 4 0')],
+  'bell-off': [path('M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z'), path('M10 20.5a2 2 0 0 0 4 0'), path('M3.5 3.5l17 17')],
   tent: [path('M2.5 20L12 4l9.5 16'), path('M2.5 20h19'), path('M9 20l3-6 3 6'), path('M12 4l1.5-2')],
   hammer: [path('M13 4.5l6.5 6.5-2.5 2.5L10.5 7z'), path('M12 9L4 17l3 3 8-8')],
   // A tied pouch: the materials and parts of the Stół rozbiórki.

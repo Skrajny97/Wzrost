@@ -8,6 +8,7 @@ import { openBestiaryChest } from './bestiary.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyParts, cancelBuilding, collectProduction, startBuilding, tradeAtFire } from './camp.js';
 import { acceptChatRules, blockInChat, chatReports, latestChat, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
+import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendGift } from './community.js';
 import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
 import { autoPoints, characterProfile, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, setSkin, spendPoints } from './characters.js';
@@ -91,6 +92,13 @@ const routes = [
   ['POST', '/api/camp/buy', buyParts],
   ['GET', '/api/chat', readChat],
   ['GET', '/api/chat/latest', latestChat],
+  ['GET', '/api/ranking', ranking],
+  ['GET', '/api/friends', friendsView],
+  ['POST', '/api/friends/invite', inviteFriend],
+  ['POST', '/api/friends/accept', acceptFriend],
+  ['POST', '/api/friends/remove', removeFriend],
+  ['POST', '/api/friends/gift', sendGift],
+  ['POST', '/api/friends/claim', claimGifts],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],
   ['POST', '/api/chat/report', reportChat],
