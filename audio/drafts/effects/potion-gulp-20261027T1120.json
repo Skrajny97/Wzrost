@@ -1,0 +1,13 @@
+{
+  "id": "potion-gulp",
+  "payload": {
+    "text": "one loud human gulp of water, a single throat swallow, close up, dry, realistic, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.8
+  },
+  "files": [
+    "audio/drafts/effects/potion-gulp-20261027T1120-0.mp3",
+    "audio/drafts/effects/potion-gulp-20261027T1120-1.mp3"
+  ],
+  "credits": 40
+}

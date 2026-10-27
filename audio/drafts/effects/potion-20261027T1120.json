@@ -1,0 +1,13 @@
+{
+  "id": "potion",
+  "payload": {
+    "text": "a person drinks from a small glass bottle: two big gulps, the sound of liquid swallowed in the throat, close up, realistic foley, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.8
+  },
+  "files": [
+    "audio/drafts/effects/potion-20261027T1120-0.mp3",
+    "audio/drafts/effects/potion-20261027T1120-1.mp3"
+  ],
+  "credits": 60
+}
