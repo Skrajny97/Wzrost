@@ -64,7 +64,8 @@ export function bagPotions(row, sellBonus) {
     }));
 }
 
-// The Profesje tab: each profession with its level and the stats it gave;
+// The Profesje tab: the System's words at its top, each profession with its
+// level and the stats it gave;
 // the gathering of Zielarstwo: its place, the slider, how many herbs at
 // once, and each herb, known or hidden by the System; and the brewing of
 // Alchemia: its place, a potion's minutes and each recipe, known (with its
@@ -83,6 +84,8 @@ export function professionsView(row) {
   const crafter = professionState(professions, workshop.profession);
   const hidden = content.professionTexts.hidden;
   return {
+    // The System's words at the top of the tab.
+    intro: content.professionsIntro,
     list: content.professions.map((profession) => {
       const { level, xp } = professionState(professions, profession.id);
       return {

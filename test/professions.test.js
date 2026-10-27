@@ -225,7 +225,9 @@ describe('herbalism through the API', () => {
     assert.equal((await gather({ herbs: ['comfrey'], minutes: 60 })).status, 403);
     await atLevel(10);
     const { data } = await call('GET', '/api/character', { cookie });
-    const { list, gathering } = data.character.professions;
+    const { intro, list, gathering } = data.character.professions;
+    // The System's words over the squares, which the narrator points at.
+    assert.equal(intro, 'W czasie pracy postać nie wyrusza na wyprawy, a jej rany się goją. Każdy poziom profesji wzmacnia dwie statystyki. Rozwijać możesz wszystkie profesje, ale naraz pracujesz tylko w jednej.');
     assert.deepEqual(list.map((profession) => [profession.name, profession.level, profession.soon]), [
       ['Zielarstwo', 1, false],
       ['Alchemia', 1, false],

@@ -14,7 +14,8 @@
   {
     "id": "professions",
     "name": "Profesje",
-    "level": 10
+    "level": 10,
+    "message": "Odblokowano Profesje. Zajrzyj do zakładki Profesje."
   },
   {
     "id": "settlement",

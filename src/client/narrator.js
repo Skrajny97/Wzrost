@@ -15,8 +15,9 @@
 // wprowadzenie" ends the whole introduction. Meanwhile the screen is the
 // narrator's: it neither scrolls nor takes a tap, also between the lines.
 // After the introduction come its chapters (a line's `chapter`), each at its
-// moment of the game: the Umiejętności at class level 10. A chapter's own
-// "Pomiń" passes only that chapter, and a line can be told for each class
+// moment of the game: the Umiejętności at class level 10 and the Profesje at
+// character level 10, never before the Umiejętności. A chapter's own "Pomiń"
+// passes only that chapter, and a line can be told for each class
 // (`classes`).
 
 import { narratorSprite } from './art.js';
@@ -46,9 +47,22 @@ const mark = (id) => `[data-guide="${id}"]`;
 // leads to the Umiejętności tab and goes through it.
 const noSkill = () => state.character.skills?.pools.every((pool) => pool.chosen.length === 0) ?? false;
 const onSkills = (hash) => hash === '#/postac/umiejetnosci';
-const skillsDue = (hash, read) => isUnlocked('skills') && noSkill() && !onReport(hash) && !read.has('skills-ending');
+const skillsWaiting = (read) => isUnlocked('skills') && noSkill() && !read.has('skills-ending');
+const skillsDue = (hash, read) => skillsWaiting(read) && !onReport(hash);
 const skillsTour = (hash, read) => skillsDue(hash, read) && read.has('skills-welcome');
 const skillsHere = (hash, read) => onSkills(hash) && skillsTour(hash, read);
+
+// The Profesje chapter: once the character reaches them, after the report
+// that brought it there, and only when the Umiejętności chapter is not
+// waiting (it always comes first). Not on the character's screens either,
+// where the skills are chosen and the main bar with the Profesje tab is
+// hidden. It leads to the Profesje tab and goes through it.
+const onProfessions = (hash) => hash === '#/profesje';
+const onCharacter = (hash) => hash.startsWith('#/postac');
+const professionsDue = (hash, read) =>
+  Boolean(state.character.professions) && !onReport(hash) && !onCharacter(hash) && !skillsWaiting(read) && !read.has('professions-ending');
+const professionsTour = (hash, read) => professionsDue(hash, read) && read.has('professions-welcome');
+const professionsHere = (hash, read) => onProfessions(hash) && professionsTour(hash, read);
 
 function affordable(buildingId) {
   const building = state.character.camp.buildings.find((candidate) => candidate.id === buildingId);
@@ -148,6 +162,12 @@ const BEATS = {
   'skills-points': { place: mark('skills-points'), when: skillsHere },
   'skills-evolution': { when: skillsHere },
   'skills-ending': { when: skillsHere },
+  // The Profesje chapter, after the Umiejętności.
+  'professions-welcome': { when: professionsDue },
+  'professions-lead': { place: '.nav-item[href="#/profesje"]', when: (hash, read) => professionsTour(hash, read) && !onProfessions(hash) },
+  'professions-intro': { place: mark('professions-intro'), when: professionsHere },
+  'professions-list': { place: mark('professions-list'), when: professionsHere },
+  'professions-ending': { when: professionsHere },
 };
 
 let place = '#/walka';

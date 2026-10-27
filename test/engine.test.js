@@ -872,6 +872,7 @@ describe('tutorial unlocks', () => {
     assert.deepEqual(unlockedFeatures(2, content), ['stats']);
     // Each step has its System message, and dungeons open with the longest hunts.
     assert.deepEqual(unlockMessages(25, content), ['Odblokowano eksploracje do 1 godziny.']);
+    assert.deepEqual(unlockMessages(10, content), ['Odblokowano Profesje. Zajrzyj do zakładki Profesje.']);
     assert.deepEqual(
       ['professions', 'settlement', 'dungeons'].map((id) => content.unlocksById[id].level),
       [10, 20, 50],

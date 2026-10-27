@@ -1498,6 +1498,42 @@ describe('Time Points and the narrator', () => {
     assert.ok(again.data.character.skills.pools.every((pool) => pool.chosen.length === 0));
     assert.equal(again.data.character.skills.points, 3);
   });
+
+  test('the Profesje chapter comes after the Umiejętności and keeps its lines apart', async () => {
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once;
+    const ids = (chapter) => tutorial.lines.filter((line) => kept(line) && line.chapter === chapter).map((line) => line.id);
+    const intro = tutorial.lines.filter((line) => kept(line) && !line.chapter).map((line) => line.id);
+    const chapter = ids('professions');
+    assert.deepEqual(chapter, ['professions-welcome', 'professions-intro', 'professions-list', 'professions-ending']);
+    // Its lines stand after those of the Umiejętności, which come first.
+    const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
+    assert.ok(at('professions-welcome') > at('skills-ending'));
+    assert.deepEqual(tutorial.chapters.professions, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Profesje czekają w zakładce Profesje.' });
+    // The lead to the tab is not kept, and "Pomiń objaśnienie" marks only this chapter.
+    await see({ skip: true });
+    assert.equal((await see({ card: 'professions-lead' })).data.error.code, 'invalid_card');
+    assert.deepEqual((await see({ skip: true, chapter: 'professions' })).data.character.tutorial, [...intro, ...chapter]);
+    // The lines read keep the order of the data.
+    assert.deepEqual((await see({ skip: true, chapter: 'skills' })).data.character.tutorial, [...intro, ...ids('skills'), ...chapter]);
+  });
+
+  test('test mode starts the Profesje chapter again, with the professions kept', async () => {
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    const intro = (await see({ skip: true })).data.character.tutorial;
+    await see({ skip: true, chapter: 'skills' });
+    const skills = (await see({ skip: true, chapter: 'professions' })).data.character.tutorial.filter((id) => !id.startsWith('professions-'));
+    const professions = '{"herbalism":{"level":3,"xp":20}}';
+    await (await db()).prepare('UPDATE characters SET level = 12, professions = ?').bind(professions).run();
+    const again = await call('POST', '/api/test/professions-tour', { cookie });
+    assert.equal(again.status, 200);
+    assert.deepEqual(again.data.character.tutorial, skills);
+    assert.ok(skills.length > intro.length);
+    // Only the narrator starts again: the levels stay.
+    const row = await (await db()).prepare('SELECT professions FROM characters').first();
+    assert.equal(row.professions, professions);
+  });
 });
 
 describe('Stół rozbiórki', () => {

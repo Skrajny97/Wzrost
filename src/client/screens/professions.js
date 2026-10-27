@@ -122,9 +122,13 @@ export function mountProfessions(container, { params, navigate }) {
       renderCrafting(character);
       return;
     }
+    // The System's words over the squares, which the narrator points at.
+    const intro = character.professions.intro && systemPanel(character.professions.intro);
+    if (intro) intro.dataset.guide = 'professions-intro';
     fill(
       container,
       h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Profesje' })),
+      intro,
       triangle(character),
     );
   }
@@ -134,7 +138,7 @@ export function mountProfessions(container, { params, navigate }) {
     const [first, ...rest] = character.professions.list;
     return h(
       'div',
-      { class: 'profession-triangle' },
+      { class: 'profession-triangle', 'data-guide': 'professions-list' },
       h('div', { class: 'profession-row' }, square(first, character)),
       h('div', { class: 'profession-row' }, rest.map((profession) => square(profession, character))),
     );

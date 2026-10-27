@@ -20,7 +20,7 @@ import { pushKey, sendNotifications, subscribePush, unsubscribePush } from './pu
 import { claimAllQuests, claimQuest, openChest } from './quests.js';
 import { getReport, listReports } from './reports.js';
 import { learnSkill, raiseSkill } from './skills.js';
-import { repeatSkillsTour, skipBuilding, skipTime } from './testing.js';
+import { repeatProfessionsTour, repeatSkillsTour, skipBuilding, skipTime } from './testing.js';
 import { skipWithTimePoints } from './time.js';
 import { seeTutorial } from './tutorial.js';
 import { startCrafting } from './workshop.js';
@@ -90,6 +90,7 @@ const routes = [
   ['POST', '/api/test/skip-build', skipBuilding],
   ['POST', '/api/test/skip-craft', skipCrafting],
   ['POST', '/api/test/skills-tour', repeatSkillsTour],
+  ['POST', '/api/test/professions-tour', repeatProfessionsTour],
 ].map(([method, pattern, handler]) => ({ method, parts: pattern.split('/'), handler }));
 
 // Returns the :params of a matching pattern, or null.

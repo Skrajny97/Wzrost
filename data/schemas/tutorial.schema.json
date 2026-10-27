@@ -162,7 +162,12 @@
               "skills-choice",
               "skills-points",
               "skills-evolution",
-              "skills-ending"
+              "skills-ending",
+              "professions-welcome",
+              "professions-lead",
+              "professions-intro",
+              "professions-list",
+              "professions-ending"
             ]
           },
           "kind": {
@@ -224,7 +229,8 @@
           },
           "chapter": {
             "enum": [
-              "skills"
+              "skills",
+              "professions"
             ],
             "description": "Część po wprowadzeniu, do której należy kwestia (chapters). Jej kwestie przychodzą dopiero po zakończeniu wprowadzenia, w swoim momencie gry."
           },

@@ -6,6 +6,7 @@
   "additionalProperties": false,
   "required": [
     "rules",
+    "intro",
     "professions",
     "gathering",
     "brewing",
@@ -39,6 +40,11 @@
           "description": "Ile sztuk zioła mieści jedno miejsce plecaka."
         }
       }
+    },
+    "intro": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Słowa Systemu na górze zakładki Profesje."
     },
     "professions": {
       "type": "array",

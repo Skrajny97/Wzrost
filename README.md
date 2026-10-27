@@ -174,10 +174,12 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | GET | `/api/push/key` | klucz publiczny serwera do subskrypcji powiadomień na telefon |
 | POST | `/api/push/subscribe` | subskrypcja powiadomień tego telefonu, tak jak podaje ją `PushSubscription.toJSON()`; przechodzi na zalogowane konto (400 `invalid_subscription`, gdy adres nie prowadzi do usługi push przeglądarki) |
 | POST | `/api/push/unsubscribe` | wyłączenie powiadomień: `endpoint` subskrypcji |
-| POST | `/api/tutorial` | kwestia narratora przeczytana, karta albo wskazanie: `card` (jej id), albo `skip: true` dla „Pomiń wprowadzenie”, które robi za gracza pierwsze kroki: wyprawę przewiniętą Punktami Czasu, jej raport i Ognisko (`firstSteps`; 409 `no_tutorial` dla postaci sprzed wprowadzenia) |
+| POST | `/api/tutorial` | kwestia narratora przeczytana, karta albo wskazanie: `card` (jej id), albo `skip: true` dla „Pomiń wprowadzenie”, które robi za gracza pierwsze kroki: wyprawę przewiniętą Punktami Czasu, jej raport i Ognisko (`firstSteps`; 409 `no_tutorial` dla postaci sprzed wprowadzenia), a `skip: true` z `chapter` (`skills`, `professions`) dla „Pomiń objaśnienie”, które oznacza tylko kwestie tej części |
 | POST | `/api/test/skip-time` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wyprawę albo odpoczynek („Pomiń czas”) |
 | POST | `/api/test/skip-build` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu budowę w obozie, a gdy nic się nie buduje, zapełnia magazyny |
 | POST | `/api/test/skip-craft` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wszystkie zlecenia Stołu rozbiórki |
+| POST | `/api/test/skills-tour` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: objaśnienie Umiejętności od nowa, a postać zapomina wybrane umiejętności |
+| POST | `/api/test/professions-tour` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: objaśnienie Profesji od nowa, a poziomy profesji zostają |
 
 Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie `message` jest po polsku.
 

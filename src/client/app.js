@@ -505,6 +505,10 @@ function openSettings() {
       isUnlocked('skills') &&
       state.character.tutorial &&
       h('button', { type: 'button', class: 'button button--system', onClick: repeatSkillsTour, text: 'Objaśnienie Umiejętności od nowa' }),
+    testToggle &&
+      state.character.professions &&
+      state.character.tutorial &&
+      h('button', { type: 'button', class: 'button button--system', onClick: repeatProfessionsTour, text: 'Objaśnienie Profesji od nowa' }),
     installButton(),
     state.user.author && h('a', { class: 'button button--system', href: '#/autor', onClick: closeSheet, text: 'Panel autora' }),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
@@ -577,6 +581,22 @@ async function repeatSkillsTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/skills-tour');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's Profesje chapter from the start (testing.js).
+async function repeatProfessionsTour() {
+  const sure = await confirmAction({
+    title: 'Objaśnienie Profesji od nowa?',
+    text: 'Poziomy profesji zostaną. Narrator objaśni Profesje od początku.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/professions-tour');
   } catch (error) {
     toast(error.message);
   }

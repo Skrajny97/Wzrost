@@ -1,5 +1,5 @@
 {
-  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. Pierwsza karta (ask) pyta, czy przejść wprowadzenie: startLabel (z recommendedLabel pod spodem) idzie dalej, a skipLabel pomija całość. Ta karta jest od autora gry (speaker: author): podpisana authorLabel, bez postaci narratora i bez nagrania. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. once: lead, który po stuknięciu zostaje zapamiętany jak karta, bo stuknięcie nie zmienia ekranu (portfel pod złotem). Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest. chapter: kwestia z części po wprowadzeniu (chapters), która przychodzi w swoim momencie gry, np. Umiejętności na 10. poziomie klasy; jej skipLabel pomija tylko tę część, a skippedText mówi, co się stało. classes: osobny tekst dla każdej klasy (z własnym female i voice), gdy kwestia mówi o klasie postaci.",
+  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. Pierwsza karta (ask) pyta, czy przejść wprowadzenie: startLabel (z recommendedLabel pod spodem) idzie dalej, a skipLabel pomija całość. Ta karta jest od autora gry (speaker: author): podpisana authorLabel, bez postaci narratora i bez nagrania. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. once: lead, który po stuknięciu zostaje zapamiętany jak karta, bo stuknięcie nie zmienia ekranu (portfel pod złotem). Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest. chapter: kwestia z części po wprowadzeniu (chapters), która przychodzi w swoim momencie gry, np. Umiejętności na 10. poziomie klasy i Profesje na 10. poziomie postaci (Umiejętności zawsze pierwsze); jej skipLabel pomija tylko tę część, a skippedText mówi, co się stało. classes: osobny tekst dla każdej klasy (z własnym female i voice), gdy kwestia mówi o klasie postaci.",
   "skipLabel": "Pomiń wprowadzenie",
   "nextLabel": "Dalej",
   "startLabel": "Wprowadź mnie",
@@ -16,6 +16,10 @@
     "skills": {
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Umiejętności czekają w zakładce Postać."
+    },
+    "professions": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Profesje czekają w zakładce Profesje."
     }
   },
   "lines": [
@@ -539,6 +543,47 @@
         ],
         "voice": "audio/narration/skills-ending-female.mp3"
       }
+    },
+    {
+      "id": "professions-welcome",
+      "kind": "card",
+      "chapter": "professions",
+      "text": [
+        "Dziesiąty poziom postaci… Puszcza zna już Twoje imię, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Profesje.",
+        "Zanim po którąś sięgniesz – pozwól, że Ci je przedstawię."
+      ]
+    },
+    {
+      "id": "professions-lead",
+      "kind": "lead",
+      "chapter": "professions",
+      "text": [
+        "Profesje czekają w tej zakładce. Zajrzyjmy do nich."
+      ]
+    },
+    {
+      "id": "professions-intro",
+      "kind": "point",
+      "chapter": "professions",
+      "text": [
+        "Najpierw przeczytaj, co mówi o nich System."
+      ]
+    },
+    {
+      "id": "professions-list",
+      "kind": "point",
+      "chapter": "professions",
+      "text": [
+        "W Zielarstwie zbierzesz zioła w Systemowym Zagajniku, a w Alchemii uwarzysz z nich mikstury w Systemowej Pracowni. Na Rzemieślnictwo przyjdzie jeszcze czas."
+      ]
+    },
+    {
+      "id": "professions-ending",
+      "kind": "card",
+      "chapter": "professions",
+      "text": [
+        "Mikstury zabierzesz na wyprawę – wybierzesz je przed wyruszeniem. W walce Twoja postać sama po nie sięgnie."
+      ]
     }
   ]
 }
