@@ -1914,3 +1914,18 @@ Odpowiedzi na pytania z dokumentu „Alchemia i Rzemieślnictwo: pytania” (A1�
 9. **Grafiki i dźwięki** (W8, W9): trzy mikstury, a potem tło Systemowej Pracowni z Retro Diffusion, do oceny po jednej. Dźwięki z ElevenLabs po 2 wersje: bulgotanie na koniec warzenia i łyk mikstury w walce.
 10. **Kolejność pracy.** Krok 1: przepisy, warzenie i raport, a mikstury w plecaku do sprzedaży. Krok 2: mikstury w walce, próg leczenia, zabieranie na wyprawę i mikstura szybkości na czas.
 
+
+## Alchemia, krok 1: warzenie w Systemowej Pracowni (27.10.2026)
+
+Brakujące szczegóły kroku 1 rozstrzygnięte najprościej. Wszystko działa tylko na wersji testowej.
+
+1. **Czas mikstury.** Mikstura trwa 10 minut na 1. poziomie, a każdy poziom skraca ją o 1% tego czasu (A27: „na 50. poziomie o połowę”). Od 51. poziomu mikstura trwa połowę, 5 minut, i dalej się nie skraca. Całe warzenie zaokrągla się w górę do pełnej minuty. Naraz warzy się tyle mikstur, ile mieści się w 8 godzinach i na ile starcza ziół, np. 48 na 1. poziomie.
+2. **Zioła idą do kotła od razu.** Start zabiera zioła na wszystkie mikstury, więc plecak od razu pokazuje, co zostało.
+3. **Przerwanie** (A30). Mikstury powstają jedna po drugiej, w równych odstępach. „Przerwij warzenie” daje gotowe mikstury z raportem oraz XP postaci i profesji za przepracowane minuty, a zioła na resztę wracają do plecaka. Przed pierwszą gotową miksturą przerwanie tylko oddaje zioła, bez raportu.
+4. **Szczęśliwe warzenie** (A33). Każda uwarzona mikstura ma 5% szans na jedną dodatkową. Losy idą po kolei z ziarna, więc przerwanie nie zmienia losów mikstur już gotowych.
+5. **Plecak** (A9, A34). Mikstury leżą po 20 na miejscu, jak zioła. Ekran przed startem liczy też miejsca, które zwolnią zabrane zioła. Co się nie zmieści, przepada, a raport mówi ile.
+6. **Cena** (A23). Złomiarz płaci 1,5 raza tyle co za zioła mikstury, z premią Skupu złomu: Mniejsza mikstura leczenia 9 złota, many 13,5, szybkości 18.
+7. **Zadania** (A36). Dzienne „Uwarz 3 Mniejsze mikstury leczenia.” wybiera jeden ze znanych przepisów, a tygodniowe „Uwarz łącznie 15 mikstur.” liczy wszystkie. Liczą się wszystkie uwarzone mikstury, także te, które przepadły, jak zioła w Zielarstwie.
+8. **Teksty.** Opisy Pracowni i mikstur są napisane najprościej, do poprawy przez autora. Trzy zdania raportu to szkic, który autor dostał do poprawy (A35). Działanie mikstur (`effect` w `data/professions.json`) czeka na krok 2, a walidator pilnuje, żeby opis mikstury podawał te same procenty.
+9. **Grafiki i dźwięki.** Do zatwierdzenia grafik mikstury mają ikonkę kolby, a Pracownia jest bez tła. Bulgotanie i łyk przyjdą z krokiem 2.
+10. **Migracja 0033.** Kolumna `potions` (migracja 0033) jest tylko na gałęzi roboczej, jak 0025, więc kolejna migracja w `main` ma numer 0034.
