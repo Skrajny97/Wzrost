@@ -1,6 +1,6 @@
 // The Społeczność tab, from character level 5: for now the chat
 // (src/server/chat.js), in its only channel so far, Globalny, the newest
-// messages on top, under the line to write in. While the chat is open and
+// messages at the bottom, over the line to write in. While the chat is open and
 // the page is in front, it asks for new messages every few seconds, and
 // less often the longer nothing comes. A tap on a name shows that character
 // (profile.js); a tap on someone else's message opens its sheet: report it,
@@ -19,7 +19,7 @@ import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, openSheet, pageHeading, toast, withButton } from '../ui.js';
 import { lockedScreen } from './locked.js';
 
-// The most messages the page keeps; older ones leave from the bottom.
+// The most messages the page keeps; older ones leave from the top.
 const SHOWN = 200;
 
 // A silence "na stałe" (chat.js).
@@ -71,11 +71,14 @@ export function mountCommunity(container, context) {
     container,
     pageHeading('Społeczność', `Czat: ${chat.channels[0].name}`),
     notices,
-    footer,
     empty,
     list,
+    footer,
     hidden,
   );
+
+  const atBottom = () => window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+  const toBottom = () => window.scrollTo({ top: document.documentElement.scrollHeight });
 
   function messageItem(message) {
     const time = new Date(message.createdAt);
@@ -104,21 +107,20 @@ export function mountCommunity(container, context) {
     );
   }
 
-  // New messages on top, the oldest over the limit gone from the bottom.
-  // Someone reading further down keeps the same messages in view.
+  // New messages at the bottom, the oldest over the limit gone from the top.
+  // The page follows them down unless the player reads further up.
   function add(fresh) {
     const known = new Set(messages.map((message) => message.id));
     const added = fresh.filter((message) => !known.has(message.id));
     if (added.length === 0) return false;
-    const below = list.getBoundingClientRect().top < 0;
-    const height = list.offsetHeight;
+    const follow = messages.length === 0 || atBottom() || added.some((message) => message.own);
     messages.push(...added);
-    list.prepend(...[...added].reverse().map(messageItem));
+    list.append(...added.map(messageItem));
     while (messages.length > SHOWN) {
       messages.shift();
-      list.lastElementChild?.remove();
+      list.firstElementChild?.remove();
     }
-    if (below) window.scrollBy(0, list.offsetHeight - height);
+    if (follow) toBottom();
     chatSeen(messages.at(-1).id);
     return true;
   }
