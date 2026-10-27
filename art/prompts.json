@@ -328,9 +328,9 @@
     "animation": {},
     "prompts": {
       "herbalism": "pixel art, a mysterious dark shadow figure in a hooded cloak, a solid black silhouette with a faint ice-blue glowing outline, standing among herbs in a small forest grove, bends down, picks a bunch of green herbs and drops them into a wicker basket on the ground, side view, smooth seamless looping animation",
-      "alchemy": "pixel art, a mysterious dark shadow figure in a hooded cloak, a solid black silhouette with a faint ice-blue glowing outline, stirring a large bubbling cauldron with a long wooden paddle, green bubbles and wisps of steam rising, side view, smooth seamless looping animation",
-      "crafting": "pixel art, a mysterious dark shadow figure in a hooded cloak, a solid black silhouette with a faint ice-blue glowing outline, raises a heavy hammer and strikes a glowing piece of metal on a wooden workbench, small orange sparks fly, side view, smooth seamless looping animation",
-      "exploring": "pixel art, a mysterious dark shadow figure in a hooded cloak, a solid black silhouette with a faint ice-blue glowing outline and a small travel pack, walking to the right along a narrow dirt forest path, walking in place, side view, smooth seamless walk cycle loop",
+      "alchemy": "pixel art, a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet, standing on a small patch of stone floor, stirring a large bubbling black cauldron with a long wooden paddle, green bubbles and wisps of steam rising, side view, smooth seamless looping animation",
+      "crafting": "pixel art, a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet, standing on a small patch of dirt floor at a sturdy wooden workbench, raises a heavy hammer and strikes a glowing piece of metal on the bench, small orange sparks fly, side view, smooth seamless looping animation",
+      "exploring": "pixel art, a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet and a small travel pack, walking to the right on a short stretch of dirt forest path, walking in place, side view, smooth seamless walk cycle loop",
       "herbalism-smooth": {
         "prompt": "bends down slowly, picks a bunch of green herbs from the ground and drops them into the wicker basket, then straightens up again, smooth seamless loop",
         "style": "rd_advanced_animation__custom_action",
