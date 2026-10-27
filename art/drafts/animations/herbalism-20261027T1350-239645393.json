@@ -1,0 +1,24 @@
+{
+  "id": "herbalism",
+  "payload": {
+    "prompt": "pixel art, a mysterious dark shadow figure in a hooded cloak, a solid black silhouette with a faint ice-blue glowing outline, standing among herbs in a small forest grove, bends down, picks a bunch of green herbs and drops them into a wicker basket on the ground, side view, smooth seamless looping animation",
+    "prompt_style": "rd_animation__big_animation",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 239645393,
+    "return_spritesheet": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793109079,
+    "credit_cost": 10,
+    "balance_cost": 0.25,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 59.49,
+    "request_id": "8c139f4f-7f02-4464-b13a-92ff874040cf",
+    "outputs_retained_until": 1793195403
+  }
+}
