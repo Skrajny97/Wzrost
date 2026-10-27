@@ -33,7 +33,8 @@
     "maxLevel": 20,
     "pointsPerClassLevel": 1,
     "paths": 2,
-    "secondClassLevel": 11
+    "secondClassLevel": 11,
+    "lastPointClassLevel": 49
   },
   "monsters": {
     "hpBase": 2,

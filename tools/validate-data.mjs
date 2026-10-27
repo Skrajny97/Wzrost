@@ -242,6 +242,14 @@ function checkReferences(data) {
     if (count < 2) errors.push(`skills.json: wybór (${choice}) ma tylko jedną umiejętność`);
     if (count <= data.balance.skills.paths) errors.push(`skills.json: wybór (${choice}) ma ${count} umiejętności, a postać może poznać ${data.balance.skills.paths}, więc żadna ścieżka się nie zamknie`);
   }
+  // The author: the points fill both paths to the top level, with none left,
+  // and all of them come before the first evolution.
+  {
+    const { unlockClassLevel, lastPointClassLevel, pointsPerClassLevel, paths, maxLevel } = data.balance.skills;
+    const points = (lastPointClassLevel - unlockClassLevel + 1) * pointsPerClassLevel;
+    if (points !== paths * maxLevel) errors.push(`balance.json: poziomy klasy ${unlockClassLevel}–${lastPointClassLevel} dają ${points} Punktów Umiejętności, a ${paths} ścieżki po ${maxLevel} poziomów biorą ${paths * maxLevel}`);
+    if (lastPointClassLevel >= data.balance.progression.classEvolutionLevels[0]) errors.push(`balance.json: ostatni Punkt Umiejętności (poziom klasy ${lastPointClassLevel}) przychodzi dopiero z pierwszą ewolucją albo po niej`);
+  }
   // A skill's own sound names a skill there is.
   for (const name of Object.keys(data.sounds.effects)) {
     if (name.startsWith('skill-') && !data.skills.some((skill) => `skill-${skill.id}` === name)) errors.push(`sounds.json: effects ma dźwięk "${name}" nieznanej umiejętności`);
