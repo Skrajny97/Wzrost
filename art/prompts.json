@@ -286,6 +286,17 @@
       "nettle": "a bunch of stinging nettle with serrated bright green leaves and fine stinging hairs on the stem, single inventory item icon"
     }
   },
+  "potions": {
+    "style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "references": [],
+    "prompts": {
+      "lesser-healing": "a small round glass potion flask with a cork stopper, filled with glowing ruby red liquid, a tiny green comfrey leaf tied to its neck with twine, single inventory item icon, bold clean outline",
+      "lesser-mana": "a small round glass potion flask with a cork stopper, filled with glowing deep sapphire blue liquid, a tiny silvery mugwort sprig tied to its neck with twine, single inventory item icon, bold clean outline",
+      "lesser-speed": "a small round glass potion flask with a cork stopper, filled with glowing bright yellow-green liquid with tiny swirls, a small nettle leaf tied to its neck with twine, single inventory item icon, bold clean outline"
+    }
+  },
   "professions": {
     "style": "rd_pro__fantasy",
     "width": 48,
@@ -304,7 +315,8 @@
     "removeBackground": false,
     "references": [],
     "prompts": {
-      "system-grove": "pixel art landscape, a small quiet forest grove thick with herbs and wild flowers, thin ice-blue glowing crystal shards growing between the plants, faint luminous blue lines running along the ground, soft mist, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens with ice-blue accents, no text, no border, no people, no animals"
+      "system-grove": "pixel art landscape, a small quiet forest grove thick with herbs and wild flowers, thin ice-blue glowing crystal shards growing between the plants, faint luminous blue lines running along the ground, soft mist, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens with ice-blue accents, no text, no border, no people, no animals",
+      "system-workshop": "pixel art interior landscape, a quiet alchemist workshop: a long wooden table with glass flasks, small bottles and a brass alembic over a low fire, shelves of dried herbs hanging in bunches, thin ice-blue glowing crystal shards and faint luminous blue lines along the stone walls, soft warm light, wide panorama for a dim background behind text, low contrast, muted dark palette of deep browns and greens with ice-blue accents, no text, no border, no people, no animals"
     }
   }
 }

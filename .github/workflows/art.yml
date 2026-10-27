@@ -25,6 +25,7 @@ on:
           - camp
           - board
           - herbs
+          - potions
           - professions
           - places
       ids:
