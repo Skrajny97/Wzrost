@@ -1,0 +1,25 @@
+{
+  "id": "dirk",
+  "payload": {
+    "prompt": "short straight dirk with a narrow double-edged steel blade, a brass crossguard and a black grip wound with silver wire, held in a black leather sheath with brass fittings, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 3,
+    "seed": 207876415,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793129790,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 56.1,
+    "request_id": "a7fcd208-35ef-4b99-8b62-89c55107f6c9",
+    "outputs_retained_until": 1793216153
+  }
+}
