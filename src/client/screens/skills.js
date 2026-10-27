@@ -1,13 +1,13 @@
 // The Umiejętności tab: at class level 10 the character picks one of the
 // three skills of its class for its first Skill Point, for good: its main
 // development path. From the next class level it may add a second one for a
-// Skill Point, which closes the path left. Each path's name stands over its skill. Each class level
-// from 10 on brings a Skill Point, and the points raise the learned skills,
-// up to level 20. Both paths and the points are due by the first evolution
-// (class level 50): until then the class waits there. The server sends every
-// card ready to show (skillsView in the engine); a tap on a learned skill
-// opens its card. The narrator's tour of the tab (narrator.js) points at the
-// places marked data-guide.
+// Skill Point, which closes the path left. Each path's name stands over its
+// skill. Each class level from 10 to 49 brings a Skill Point, and the points
+// raise the learned skills, up to level 20. Both paths and the points are due
+// by the first evolution (class level 50): until then the class waits there.
+// The server sends every card ready to show (skillsView in the engine); a tap
+// on a learned skill opens its card. The narrator's tour of the tab
+// (narrator.js) points at the places marked data-guide.
 
 import { fill, h } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
@@ -232,7 +232,7 @@ export function mountSkills(container) {
       skill.next && h('h3', { class: 'skill-subtitle', text: `Na poziomie ${skill.level + 1}` }),
       skill.next && h('p', { class: 'skill-effect skill-effect--next', text: skill.next }),
       h('p', { class: 'skill-cost', text: skill.cost }),
-      h('p', { class: 'muted', text: `Punkty Umiejętności: ${formatNumber(view.points)}. Każdy poziom klasy daje jeden.` }),
+      h('p', { class: 'muted', text: `Punkty Umiejętności: ${formatNumber(view.points)}. Każdy poziom klasy do ${view.lastPointLevel}. daje jeden.` }),
       h('p', { class: 'muted', text: `Ścieżka: ${skill.path}. Zdecyduje o ewolucji klasy.` }),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: closeSheet, text: 'Zamknij' }), raise),
     );

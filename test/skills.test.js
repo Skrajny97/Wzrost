@@ -66,7 +66,7 @@ describe('skills', () => {
     assert.equal(skillView(content.skillsById['mana-shield'], 1, content).cost, `Koszt: ${Math.round(pool * 100)}% maks. many, raz na walkę.`);
   });
 
-  test('Skill Points come with each class level from the tenth on, that one included, one per level of a skill', () => {
+  test('Skill Points come with each class level from the tenth to the 49th, one per level of a skill', () => {
     assert.deepEqual(skillPoints({ classLevel: 9, skills: {} }, content), { earned: 0, spent: 0, free: 0 });
     assert.deepEqual(skillPoints({ classLevel: 10, skills: {} }, content), { earned: 1, spent: 0, free: 1 });
     // The author: the point of class level 10 opens the main path, with no
@@ -77,6 +77,15 @@ describe('skills', () => {
     assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3 } }, content), { earned: 6, spent: 3, free: 3 });
     // The second skill's first level takes a point too.
     assert.deepEqual(skillPoints({ classLevel: 15, skills: { 'power-strike': 3, unyielding: 1 } }, content), { earned: 6, spent: 4, free: 2 });
+    // The author: none at 50, so the 40 of levels 10 to 49 fill both paths
+    // to 20, with none left.
+    assert.equal(skillPoints({ classLevel: 49, skills: {} }, content).earned, 40);
+    assert.deepEqual(skillPoints({ classLevel: 50, skills: { 'power-strike': 20, unyielding: 20 } }, content), { earned: 40, spent: 40, free: 0 });
+    assert.equal(skillPoints({ classLevel: 120, skills: { 'power-strike': 20, unyielding: 20 } }, content).free, 0);
+    const toNext = (level) => classXpToNext(level, content);
+    const at50 = applyHunt({ classId: 'warrior', level: 50, xp: 0, classLevel: 49, classXp: 0, points: {}, skills: { 'power-strike': 20, unyielding: 20 } }, { xp: toNext(49), result: 'success' }, content);
+    assert.equal(at50.classLevel, 50);
+    assert.ok(!at50.messages.some((message) => message.startsWith('Zdobyto Punkty Umiejętności')));
   });
 
   test('the class level that opens the skills brings their first point, and each one after it another', () => {
@@ -147,11 +156,12 @@ describe('skills', () => {
     assert.equal(evolutionBlock(warrior(30, { 'power-strike': 20 }), content).code, 'second_path');
     assert.equal(evolutionBlock(warrior(30, { 'power-strike': 10, unyielding: 1 }), content).code, 'skill_points');
     // Counted with the points of level 50: at 47 with none left, those of 48
-    // to 50 are still due.
-    assert.equal(skillPoints(warrior(47, { 'power-strike': 20, unyielding: 19 }), content).free, 0);
-    assert.equal(evolutionBlock(warrior(47, { 'power-strike': 20, unyielding: 19 }), content).code, 'skill_points');
-    // A point that no skill can take (both at 20) does not hold the class,
-    // and a class already past 50 waits for nothing.
+    // and 49 are still due.
+    assert.equal(skillPoints(warrior(47, { 'power-strike': 20, unyielding: 18 }), content).free, 0);
+    assert.equal(evolutionBlock(warrior(47, { 'power-strike': 20, unyielding: 18 }), content).code, 'skill_points');
+    // Both at 20 take all the points, so nothing holds the class, and a
+    // class already past 50 waits for nothing.
+    assert.equal(evolutionBlock(warrior(49, { 'power-strike': 20, unyielding: 20 }), content), null);
     assert.equal(evolutionBlock(warrior(50, { 'power-strike': 20, unyielding: 20 }), content), null);
     assert.equal(evolutionBlock(warrior(60, { 'power-strike': 20 }), content), null);
 
