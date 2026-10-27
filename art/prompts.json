@@ -355,7 +355,13 @@
         "width": 48,
         "height": 48
       },
-      "exploring-side": "pixel art sprite for a side-scrolling game: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet and a small travel pack, in profile facing right, walking to the right on a narrow dirt forest path at night, walk cycle loop"
+      "exploring-side": "pixel art sprite for a side-scrolling game: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet and a small travel pack, in profile facing right, walking to the right on a narrow dirt forest path at night, walk cycle loop",
+      "exploring-smooth": {
+        "prompt": "calm steady steps along the forest path, walking in place, smooth seamless walk cycle loop",
+        "style": "rd_advanced_animation__walking",
+        "startFrame": "art/references/animations/exploring-start.png",
+        "frames": 8
+      }
     }
   }
 }
