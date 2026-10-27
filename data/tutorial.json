@@ -430,7 +430,8 @@
       "chapter": "skills",
       "text": [
         "Wróćmy do okienka Postaci."
-      ]
+      ],
+      "voice": "audio/narration/skills-lead-character.mp3"
     },
     {
       "id": "skills-lead",
@@ -447,7 +448,8 @@
       "chapter": "skills",
       "text": [
         "Przeczytaj uważnie słowa Systemu. Rzadko kiedy ostrzega tak wyraźnie."
-      ]
+      ],
+      "voice": "audio/narration/skills-intro.mp3"
     },
     {
       "id": "skills-paths",
@@ -457,7 +459,8 @@
         "warrior": {
           "text": [
             "Przed Tobą trzy ścieżki. Barbarzyńca miażdży wroga jednym ciosem, Gladiator tnie wszystkich naraz, a Strażnik nie cofa się nawet o krok."
-          ]
+          ],
+          "voice": "audio/narration/skills-paths-warrior.mp3"
         },
         "archer": {
           "text": [
@@ -474,7 +477,8 @@
         "cleric": {
           "text": [
             "Przed Tobą trzy ścieżki. Uzdrowiciel zasklepia rany, Inkwizytor smaga wrogów świętą mocą, a Kapłan błogosławi siebie i swoich towarzyszy."
-          ]
+          ],
+          "voice": "audio/narration/skills-paths-cleric.mp3"
         },
         "shadow": {
           "text": [
@@ -518,7 +522,8 @@
       "chapter": "skills",
       "text": [
         "Jeszcze jedno. Na pięćdziesiątym poziomie klasy czeka Cię ewolucja. Zanim tam dotrzesz, wybierz obie ścieżki i rozdaj punkty – inaczej System zatrzyma Twoją klasę u progu, dopóki tego nie zrobisz."
-      ]
+      ],
+      "voice": "audio/narration/skills-evolution.mp3"
     },
     {
       "id": "skills-ending",
