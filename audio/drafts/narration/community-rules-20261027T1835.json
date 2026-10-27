@@ -1,0 +1,17 @@
+{
+  "id": "community-rules",
+  "payload": {
+    "text": "Tu porozmawiasz z innymi wędrowcami. Zanim napiszesz pierwsze słowo, przeczytaj zasady czatu. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/community-rules-20261027T1835-0.mp3",
+    "audio/drafts/narration/community-rules-20261027T1835-1.mp3"
+  ],
+  "credits": 204
+}
