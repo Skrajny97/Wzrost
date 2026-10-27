@@ -5,7 +5,8 @@
 //     [--variants 2] [--dry-run]
 // An id can ask for its own number of takes: --ids intro:3,purpose.
 // Prompts and lengths are in audio/prompts.json; a prompt is its text, or
-// {text, seconds} when it needs a length of its own. A sound of a set length
+// {text, seconds, influence} when it needs a length or a closeness to the
+// text (prompt influence, 0 to 1) of its own. A sound of a set length
 // costs 20 credits a second, so the run counts the credits before it starts
 // and stops before it would spend more than --max-credits.
 // A kind with `tts` is speech instead (ElevenLabs text to speech): a prompt is
@@ -192,9 +193,9 @@ async function creditsLeft() {
 // One request: a sound of a set length, speech in the prompt's voice, or a
 // remix of that voice reading the text.
 function requestFor(id) {
-  const { text, seconds, voice, model, settings, remix, design, reference, promptStrength } = prompt(id);
+  const { text, seconds, influence, voice, model, settings, remix, design, reference, promptStrength } = prompt(id);
   if (!tts) {
-    return { url: `${API}/sound-generation?output_format=mp3_44100_64`, payload: { text, duration_seconds: seconds, prompt_influence: kind.influence ?? 0.5 } };
+    return { url: `${API}/sound-generation?output_format=mp3_44100_64`, payload: { text, duration_seconds: seconds, prompt_influence: influence ?? kind.influence ?? 0.5 } };
   }
   if (design) {
     const payload = { voice_description: design, text, model_id: tts.designModel ?? 'eleven_ttv_v3', guidance_scale: tts.designGuidance ?? 3 };

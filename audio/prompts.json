@@ -185,12 +185,18 @@
         "seconds": 1.5
       },
       "potion": {
-        "text": "a quick sip and a short gulp from a small glass potion vial, a soft cork pop and a light glass clink, close up, dry, no music",
-        "seconds": 1.5
+        "text": "a person drinks from a small glass bottle: two big gulps, the sound of liquid swallowed in the throat, close up, realistic foley, no music",
+        "seconds": 1.5,
+        "influence": 0.8
       },
       "brew": {
         "text": "a small alchemist's cauldron gently bubbling with thick liquid, soft popping bubbles, ending with a light clink of a glass vial, close up, no music",
         "seconds": 2
+      },
+      "potion-gulp": {
+        "text": "one loud human gulp of water, a single throat swallow, close up, dry, realistic, no music",
+        "seconds": 1,
+        "influence": 0.8
       }
     }
   },
