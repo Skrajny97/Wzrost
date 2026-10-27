@@ -14,6 +14,7 @@ import { mountAuthor } from './screens/author.js';
 import { mountCamp } from './screens/camp.js';
 import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
+import { mountCommunity } from './screens/community.js';
 import { renderCreate } from './screens/create.js';
 import { mountJournal } from './screens/journal.js';
 import { lockedScreen } from './screens/locked.js';
@@ -49,6 +50,7 @@ const ROUTES = [
   // Profesje, or one profession's screen (Zielarstwo).
   { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', music: 'professions', mount: mountProfessions },
   { pattern: /^#\/osada$/, nav: 'main', tab: 'osada', mount: lockedScreen('settlement', 'Osada') },
+  { pattern: /^#\/spolecznosc$/, nav: 'main', tab: 'spolecznosc', mount: mountCommunity },
   { pattern: /^#\/dziennik(?:\/(?<tab>system))?$/, nav: 'main', tab: 'dziennik', mount: mountJournal },
   { pattern: /^#\/raport\/(?<id>\d+)$/, nav: 'main', tab: null, mount: mountReport },
   // The camp opens from the top bar: the board, or one building.

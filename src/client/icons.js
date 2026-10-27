@@ -11,6 +11,8 @@ export const ICONS = {
 
   // Navigation
   person: [circle(12, 7.5, 3.5), path('M5 21c0-4.2 3.1-7.5 7-7.5s7 3.3 7 7.5')],
+  // Społeczność: two figures side by side.
+  people: [circle(9, 8, 3.2), path('M3 20.5c0-3.8 2.7-6.8 6-6.8s6 3 6 6.8'), circle(16.5, 9, 2.6), path('M15.2 14.1c.4-.1.9-.2 1.3-.2 2.5 0 4.5 2.6 4.5 5.8')],
   swords: [
     path('M4 4l10.5 10.5M20 4L9.5 14.5'),
     path('M4 4h3.5M4 4v3.5M20 4h-3.5M20 4v3.5'),

@@ -1,6 +1,7 @@
 // The author's panel (src/server/author.js), opened from the settings of the
-// author's account: how many accounts and characters the game has, and every
-// account, newest first, with its e-mail and its character. It is read anew
+// author's account: how many accounts and characters the game has, the
+// chat's reported messages to decide on, and every account, newest first,
+// with its e-mail, its character and its silence in the chat. It is read anew
 // on every visit and with "Odśwież". The preview of the skills opens with its
 // own button, so the accounts show without scrolling (the author: "schowaj
 // pod osobnym przyciskiem"): a tap on a skill plays a short fight that shows
@@ -109,7 +110,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
         h('div', { class: 'page-heading-text' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Panel autora' }), h('p', { class: 'page-subtitle', text: 'Konta i postacie w grze' })),
         h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
       ),
-      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [skillsToggle(), skillsPreview(), counts(panel.counts), accounts(panel.accounts)],
+      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [skillsToggle(), skillsPreview(), counts(panel.counts), chatReports(panel.chatReports), accounts(panel.accounts)],
       h('button', {
         type: 'button',
         class: 'button button--world',
@@ -128,6 +129,56 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
       tile('Konta', numbers.accounts, `nowe w 24 h: ${formatNumber(numbers.newAccounts)}`),
       tile('Postacie', numbers.characters, `nowe w 24 h: ${formatNumber(numbers.newCharacters)}`),
       tile('Z Google', numbers.google),
+    );
+  }
+
+  const small = (label, onClick, kind = 'world') => h('button', { type: 'button', class: `button button--${kind} button--small`, text: label, onClick });
+  const untilText = (until) => (until >= 8.64e15 ? 'na stałe' : `do ${dateTimeFormat.format(new Date(until))}`);
+
+  // The chat's reported messages, the longest waiting first: the author
+  // takes one down or keeps it, and may silence its writer (chat.js).
+  function chatReports(list) {
+    if (list.length === 0) return null;
+    const decide = (report, action) => (event) =>
+      withButton(event.currentTarget, async () => {
+        await call('POST', '/api/author/chat', { messageId: report.messageId, action });
+        await load();
+      });
+    return h(
+      'section',
+      { class: 'card author-chat', 'aria-label': 'Zgłoszenia z czatu' },
+      h('h2', { class: 'card-title', text: `Zgłoszenia z czatu (${list.length})` }),
+      h(
+        'ol',
+        { class: 'author-chat-list' },
+        list.map((report) =>
+          h(
+            'li',
+            { class: 'author-chat-report' },
+            h('p', { class: 'author-account-head' }, h('strong', { text: report.name }), h('span', { class: 'author-chat-login', text: report.login })),
+            h('p', { class: 'author-chat-text', text: report.text }),
+            h('p', {
+              class: 'author-account-date',
+              text: [
+                dateTimeFormat.format(new Date(report.createdAt)),
+                `zgłoszenia: ${report.reports}`,
+                report.hidden && 'ukryta do decyzji',
+                report.mutedUntil && `czat wyciszony ${untilText(report.mutedUntil)}`,
+              ]
+                .filter(Boolean)
+                .join(' · '),
+            }),
+            h(
+              'div',
+              { class: 'author-chat-actions' },
+              small('Usuń', decide(report, 'hide'), 'danger'),
+              small('Zostaw', decide(report, 'keep')),
+              small('Wycisz na dobę', decide(report, 'muteDay')),
+              small('Wycisz na stałe', decide(report, 'muteForever'), 'danger'),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -150,6 +201,18 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
               : 'bez postaci',
           ),
           h('p', { class: 'author-account-date', text: `Konto od ${dateTimeFormat.format(new Date(account.createdAt))}` }),
+          account.chatMutedUntil &&
+            h(
+              'p',
+              { class: 'author-account-chat' },
+              h('span', { text: `Czat wyciszony ${untilText(account.chatMutedUntil)}` }),
+              small('Przywróć czat', (event) =>
+                withButton(event.currentTarget, async () => {
+                  await call('POST', '/api/author/chat/unmute', { login: account.login });
+                  await load();
+                }),
+              ),
+            ),
         ),
       ),
     );

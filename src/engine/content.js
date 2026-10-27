@@ -105,6 +105,8 @@ export function buildContent(raw) {
     professionsIntro: raw.professions?.intro,
     // The Awatar Systemu (src/server/avatar.js).
     avatar: raw.professions?.avatar,
+    // The chat of the Społeczność tab (src/server/chat.js).
+    chat: raw.chat,
     gathering: raw.professions?.gathering,
     herbs: raw.professions?.herbs ?? [],
     herbsById: byId(raw.professions?.herbs ?? []),

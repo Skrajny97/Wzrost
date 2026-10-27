@@ -28,6 +28,7 @@ import materials from '../../data/materials.json' with { type: 'json' };
 import quests from '../../data/quests.json' with { type: 'json' };
 import skills from '../../data/skills.json' with { type: 'json' };
 import professions from '../../data/professions.json' with { type: 'json' };
+import chat from '../../data/chat.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -52,6 +53,7 @@ export const content = buildContent({
   quests,
   skills,
   professions,
+  chat,
 });
 
 // The narrator's lines that are read once, in their order: cards and
@@ -146,5 +148,14 @@ export function publicContent() {
     // The narrator's introduction for a new character (narrator.js), with
     // the Time Points the narrator gives.
     tutorial: { ...tutorial, $comment: undefined, startTimePoints: content.balance.timePoints.start },
+    // The chat of the Społeczność tab (chat.js): its channels, how long a
+    // message may be, how often the open chat asks for new ones, and the
+    // rules accepted before the first message.
+    chat: {
+      channels: content.chat.channels,
+      maxLength: content.chat.rules.maxLength,
+      pollSeconds: content.chat.rules.pollSeconds,
+      rules: content.chat.texts.rules,
+    },
   };
 }

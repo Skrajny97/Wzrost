@@ -11,7 +11,7 @@ const CLIENT_DIR = new URL('../src/client/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
-  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins',
+  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'settlement', 'dungeons', 'core'];
@@ -553,6 +553,10 @@ function checkReferences(data) {
   }
   errors.push(...checkQuests(data, { resources, rarities }));
   errors.push(...checkProfessions(data, { stats }));
+  uniqueIds(errors, 'chat', data.chat.channels);
+  const { pollSeconds, page, keep } = data.chat.rules;
+  if (pollSeconds.min > pollSeconds.max) errors.push('chat.json: rules.pollSeconds.min nie może być większe niż max');
+  if (page > keep) errors.push('chat.json: rules.page nie może być większe niż keep');
   return errors;
 }
 

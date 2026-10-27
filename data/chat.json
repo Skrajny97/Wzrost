@@ -1,0 +1,23 @@
+{
+  "$comment": "Czat w zakładce Społeczność (src/server/chat.js). channels: kanały czatu, na razie tylko Globalny. rules: najdłuższa wiadomość w znakach, co ile sekund wolno pisać, ile ostatnich wiadomości kanału zostaje (zgłoszone zostają do decyzji autora), ile wiadomości przychodzi naraz, po ilu zgłoszeniach od różnych graczy wiadomość znika do sprawdzenia i co ile sekund otwarty czat pyta o nowe (najczęściej i najrzadziej, gdy długo nic nie przychodzi). words: początki albo części słów, które czat zamienia na gwiazdki (wielkość liter bez znaczenia). texts.rules: zasady, które gracz akceptuje przed pierwszą wiadomością.",
+  "channels": [
+    { "id": "global", "name": "Globalny" }
+  ],
+  "rules": {
+    "maxLength": 200,
+    "everySeconds": 3,
+    "keep": 300,
+    "page": 50,
+    "hideAfterReports": 3,
+    "pollSeconds": { "min": 4, "max": 10 }
+  },
+  "words": ["kurw", "chuj", "huj", "pierd", "jeb", "pizd", "kutas", "dziwk", "cwel", "fuck", "shit", "bitch", "cunt", "nigg", "fagg"],
+  "texts": {
+    "rules": [
+      "Czat widzą wszyscy gracze. Pisz z szacunkiem: bez wulgaryzmów, obrażania, gróźb, treści dla dorosłych, spamu i linków.",
+      "Nie podawaj swoich danych, np. adresu, numeru telefonu czy hasła.",
+      "Wiadomość, która łamie zasady, zgłoś: stuknij ją i wybierz „Zgłoś”. Wiadomości kogoś, kogo nie chcesz czytać, ukryjesz tak samo.",
+      "Za łamanie zasad autor gry może wyciszyć czat dla konta na dobę albo na stałe."
+    ]
+  }
+}

@@ -833,13 +833,16 @@ export async function setSkin(context) {
   return json({ character: characterView(updated, context.now) });
 }
 
-// "Zacznij od nowa": the character, its items, hunt and reports are removed;
-// the account stays and a new character can be created.
+// "Zacznij od nowa": the character, its items, hunt, reports and messages in
+// the chat are removed; the account stays, with what it hides in the chat
+// and its silence there (chat.js), and a new character can be created.
 export async function deleteCharacter(context) {
   const { player } = await requirePlayer(context);
   const db = context.env.DB;
   const id = player.row.id;
   await db.batch([
+    db.prepare('DELETE FROM chat_reports WHERE message_id IN (SELECT id FROM chat_messages WHERE character_id = ?)').bind(id),
+    db.prepare('DELETE FROM chat_messages WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM reports WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM activities WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM avatar_activities WHERE character_id = ?').bind(id),

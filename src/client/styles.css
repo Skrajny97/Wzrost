@@ -5323,6 +5323,234 @@ a.camp-level-button {
   font-size: 13px;
 }
 
+.author-account-chat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--danger);
+  font-size: 13px;
+}
+
+/* The chat's reports in the author's panel, each with its decisions. */
+.author-chat-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.author-chat-report {
+  display: grid;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.author-chat-report:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.author-chat-report p {
+  margin: 0;
+}
+
+.author-chat-login {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.author-chat-text {
+  overflow-wrap: anywhere;
+}
+
+.author-chat-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* The Społeczność tab's chat (screens/community.js): messages one under
+   another, someone else's a button that opens its sheet, one's own on a
+   lighter ground. The message line stays over the bottom bar while the
+   page scrolls. */
+.chat-notices:empty,
+.chat-footer:empty,
+.chat-hidden:empty {
+  display: none;
+}
+
+.chat-reports {
+  align-self: flex-start;
+}
+
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chat-list:empty {
+  display: none;
+}
+
+.chat-body {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+}
+
+.chat-message--own .chat-body {
+  border-color: var(--system-line);
+  background: rgba(143, 227, 239, 0.06);
+}
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.chat-class {
+  flex: none;
+  color: var(--icon-muted);
+}
+
+.chat-name {
+  overflow: hidden;
+  color: var(--gold);
+  font-family: var(--font-world);
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-level {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.chat-time {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.chat-text {
+  font-size: 15px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.chat-footer:has(.chat-form) {
+  position: sticky;
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+  z-index: 5;
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 8px var(--gutter);
+  border-top: 1px solid var(--system-line);
+  background: rgba(13, 17, 11, 0.97);
+}
+
+.chat-form {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-form input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 8px 10px;
+  border: 1px solid var(--bark-line);
+  border-radius: 0;
+  background: var(--bg-deep);
+  color: var(--text);
+  /* 16 px keeps iOS from zooming in on focus. */
+  font-family: var(--font-system);
+  font-size: 16px;
+}
+
+.chat-form input:focus {
+  outline: none;
+  border-color: var(--system);
+  box-shadow: 0 0 0 1px var(--system);
+}
+
+.chat-send {
+  flex: none;
+  width: auto;
+}
+
+.chat-rules p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.chat-muted,
+.chat-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 14px;
+}
+
+.chat-blocked summary {
+  cursor: pointer;
+  font-family: var(--font-world);
+  font-size: 16px;
+}
+
+.chat-blocked-list {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chat-blocked-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chat-sheet-text {
+  overflow-wrap: anywhere;
+}
+
+.chat-sheet-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.chat-sheet-label {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 /* The Umiejętności tab: the three paths of a milestone, each name over its
    skill: a card to choose from, the learned skill's row, or a closed path,
    dimmed. A row with a Skill Point to spend glows gold. */
