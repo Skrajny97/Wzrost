@@ -1,0 +1,24 @@
+{
+  "id": "exploring-side",
+  "payload": {
+    "prompt": "pixel art sprite for a side-scrolling game: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet and a small travel pack, in profile facing right, walking to the right on a narrow dirt forest path at night, walk cycle loop",
+    "prompt_style": "rd_animation__big_animation",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 72310066,
+    "return_spritesheet": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793110248,
+    "credit_cost": 10,
+    "balance_cost": 0.25,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 56.92,
+    "request_id": "ed42576b-5882-4791-a3a6-5e8e2013f036",
+    "outputs_retained_until": 1793196598
+  }
+}
