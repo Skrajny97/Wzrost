@@ -12,6 +12,7 @@
 import { herbSprite, itemSprite, placeArt, potionSprite, professionSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
+import { workScene } from '../scenes.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, systemPanel, toast, withButton } from '../ui.js';
@@ -84,6 +85,7 @@ export function mountProfessions(container, { params, navigate }) {
   let shownState = null;
   let countdown = null;
   let progress = null;
+  let scene = null;
   let skipper = null;
 
   // What the screen shows depends on: the gathering under way (or not) and
@@ -104,6 +106,7 @@ export function mountProfessions(container, { params, navigate }) {
     shownState = stateKey(character);
     countdown = null;
     progress = null;
+    scene = null;
     skipper = null;
     if (professionId === 'herbalism') {
       renderHerbalism(character);
@@ -294,16 +297,18 @@ export function mountProfessions(container, { params, navigate }) {
     navigate(`#/raport/${report.id}`);
   }
 
-  // A work under way: what and for how long, the countdown and its bar, the
-  // time of the report, "Przewiń" (`label` names the work) and the button
-  // that calls the character back.
+  // A work under way: its looping scene (scenes.js), what and for how long,
+  // the countdown and its bar, the time of the report, "Przewiń" (`label`
+  // names the work) and the button that calls the character back.
   function workUnderWay(activity, what, label, cancel) {
     countdown = h('p', { class: 'countdown', 'aria-live': 'off' });
     progress = h('div', { class: 'bar-fill bar-fill--system' });
+    scene = workScene(activity.profession, activity);
     skipper = skipControl('activity', (now) => activity.endsAt - now, label);
     const card = h(
       'div',
       { class: 'stack' },
+      ...(scene ? [scene.element] : []),
       systemPanel(
         what,
         countdown,
@@ -1001,6 +1006,7 @@ export function mountProfessions(container, { params, navigate }) {
       countdown.textContent = formatCountdown(activity.endsAt - now);
       const done = (now - activity.startedAt) / (activity.endsAt - activity.startedAt);
       progress.style.width = `${Math.min(100, Math.max(0, done * 100))}%`;
+      scene?.update(done);
     }
   }
 

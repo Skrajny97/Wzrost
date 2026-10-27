@@ -11,7 +11,7 @@ const CLIENT_DIR = new URL('../src/client/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
-  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions',
+  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'settlement', 'dungeons', 'core'];
@@ -430,6 +430,34 @@ function checkReferences(data) {
   const evolutions = data.balance.progression.classEvolutionLevels;
   if (evolutions.some((level, i) => i > 0 && level <= evolutions[i - 1])) errors.push('balance.json: classEvolutionLevels musi rosnąć');
   if (evolutions.at(-1) > data.balance.progression.maxLevel) errors.push('balance.json: ewolucja klasy powyżej maxLevel');
+
+  // Waiting scenes: files that exist, a scene for each profession, the
+  // lands of regions, and the light of the day from midnight on.
+  const animations = data.animations;
+  const sceneFiles = [
+    ...Object.values(animations.work).map((sheet) => sheet.file),
+    animations.walk.figure.file,
+    animations.walk.path,
+    ...Object.values(animations.walk.lands),
+    animations.bird,
+  ];
+  for (const file of sceneFiles) {
+    if (!existsSync(new URL(file, CLIENT_DIR))) errors.push(`animations.json: brak pliku src/client/${file}`);
+  }
+  for (const profession of data.professions.professions) {
+    if (!animations.work[profession.id]) errors.push(`animations.json: brak sceny pracy dla ${profession.id}`);
+  }
+  for (const id of Object.keys(animations.work)) {
+    if (!data.professions.professions.some((profession) => profession.id === id)) errors.push(`animations.json: nieznana profesja ${id}`);
+  }
+  for (const id of Object.keys(animations.walk.lands)) {
+    if (!data.regions.some((region) => region.id === id)) errors.push(`animations.json: nieznany region ${id}`);
+  }
+  for (const range of [animations.moments.firstSeconds, animations.moments.seconds]) {
+    if (range[1] < range[0]) errors.push('animations.json: przedział czasu rzadkich zdarzeń od większej liczby');
+  }
+  const hours = animations.dayParts.map((part) => part.from);
+  if (hours[0] !== 0 || hours.some((hour, i) => i > 0 && hour <= hours[i - 1])) errors.push('animations.json: dayParts od godziny 0, rosnąco');
 
   // Music: files that exist, places that are regions, inner regions, the
   // camp or a tab with music (src/client/app.js: the routes' music), and

@@ -1,0 +1,28 @@
+{
+  "$comment": "Looping scenes while the character works or explores (src/client/scenes.js). A sheet is one row of square frames of `size` pixels, shown at twice the size. A work's moment is its rare event: a bird over the scene, or steam or sparks from the point x, y of a frame. The Walka scene walks the figure in place on the path while the land of the exploration's region drifts behind it, the land at landSpeed and the path at pathSpeed pixels a second. The first rare moment comes after firstSeconds, the next ones after seconds (a random time between the two numbers). dayParts: the light of the scene from that hour in Poland.",
+  "work": {
+    "herbalism": { "file": "art/scenes/herbalism.png", "size": 128, "frames": 8, "fps": 8, "place": "system-grove", "moment": { "kind": "bird" } },
+    "alchemy": { "file": "art/scenes/alchemy.png", "size": 128, "frames": 14, "fps": 8, "moment": { "kind": "steam", "x": 44, "y": 72 } },
+    "crafting": { "file": "art/scenes/crafting.png", "size": 128, "frames": 8, "fps": 8, "moment": { "kind": "sparks", "x": 86, "y": 80 } }
+  },
+  "walk": {
+    "figure": { "file": "art/scenes/walker.png", "size": 48, "frames": 4, "fps": 8 },
+    "path": "art/scenes/path.png",
+    "lands": {
+      "windfalls": "art/scenes/lands/windfalls.png",
+      "stone-glade": "art/scenes/lands/stone-glade.png"
+    },
+    "landSpeed": 20,
+    "pathSpeed": 60,
+    "moments": ["bird", "shadow"]
+  },
+  "bird": "art/scenes/bird.png",
+  "moments": { "firstSeconds": [8, 15], "seconds": [25, 70] },
+  "dayParts": [
+    { "id": "night", "from": 0 },
+    { "id": "dawn", "from": 5 },
+    { "id": "day", "from": 8 },
+    { "id": "dusk", "from": 18 },
+    { "id": "night", "from": 21 }
+  ]
+}

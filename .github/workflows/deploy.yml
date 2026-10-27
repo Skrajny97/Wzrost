@@ -10,6 +10,9 @@ on:
     # Sprite drafts from the "Grafiki (szkice)" workflow are not the game.
     branches-ignore:
       - art-drafts
+    # Notes alone (DECISIONS.md, README.md) change nothing in the game.
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
 
 permissions:
@@ -29,14 +32,26 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
+      # A working branch at the commit main has just tested (main merged in
+      # after a deploy of the game) skips a second run of the same tests.
+      - name: Czy main ma ten sam commit
+        id: main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          git fetch --quiet --depth=1 origin main
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)" ]; then echo "same=true" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-node@v6
+        if: steps.main.outputs.same != 'true'
         with:
           node-version: 22
           cache: npm
       - run: npm ci
+        if: steps.main.outputs.same != 'true'
       - name: Walidacja danych gry
+        if: steps.main.outputs.same != 'true'
         run: npm run validate
       - run: npm test
+        if: steps.main.outputs.same != 'true'
 
   configuration:
     name: Sprawdzenie sekretów Cloudflare

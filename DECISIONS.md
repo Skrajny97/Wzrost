@@ -2039,3 +2039,13 @@ Trzecia część wprowadzenia, po Umiejętnościach (W3, W4). Kwestie narratora 
     - w Walce tło zależy od krainy wyprawy, a w oddali czasem przemknie sylwetka stwora z Bestiariusza.
 
     Sylwetka w stroju klasy postaci odpada (autor: „zeby sylwetka postaci tam w walce szła to byłoby pewnie za drogo”).
+
+## Animacje oczekiwania w grze (27.10.2026)
+
+1. **Gdzie grają.** Scena pracy stoi na górze karty pracy w toku, nad słowami Systemu: Zielarstwo w wersji B na tle Systemowego Zagajnika, Alchemia w pętli tam i z powrotem (autor: „Alchemia jest okey”) i Rzemieślnictwo. W Walce scena stoi nad słowami Systemu o eksploracji w toku: postać idzie w miejscu po dróżce, a kraina regionu wyprawy przesuwa się za nią (Wiatrołomy albo Uroczysko Kamieni). Klatki i prędkości są w `data/animations.json`, a grafiki w `src/client/art/scenes/`. W wersji 0.0.10.
+2. **Rzadkie zdarzenia.** Pierwsze przychodzi po 8–15 sekundach, kolejne co 25–70 sekund. Nad Zagajnikiem i w Walce przelatuje ptak, nad kotłem bucha para, a spod młota lecą iskry. W Walce czasem przebiega w oddali cień stwora z Bestiariusza tego regionu wewnętrznego. Ptak i dróżka to proste rysunki w pikselach, do wymiany na grafiki z Retro Diffusion, gdyby autor chciał.
+3. **Pora dnia** według godziny w Polsce: świt od 5, dzień od 8, zmierzch od 18, a noc od 21. Rano scena lekko się ociepla, wieczorem ciemnieje, a w nocy jest najciemniejsza.
+4. **Postęp przy scenie.** Pod sceną pracy stoi półka na 6 rzeczy. Kosz zbieracza zapełnia się z upływem czasu, bo zioła liczy dopiero raport. Mikstury i przedmioty przybywają tak, jak naprawdę powstają, z liczbą gotowych („× 4”).
+5. **Animacje wyłączone** w Ustawieniach zatrzymują sceny na pierwszej klatce i wyłączają rzadkie zdarzenia.
+6. **Minuty GitHub Actions** (autor ustawił budżety: Actions 10 $, reszta 5 $; „mam nadzieje ze bedziesz sie pilnował”). Zmiana samych notatek (`*.md`) nie uruchamia testów ani wdrożenia. Gałąź robocza na tym samym commicie co `main` nie powtarza testów. Kod idzie na GitHuba raz na etap.
+7. **Na później: kolor skóry postaci** (autor: „Czy istnieje szansa dodania koloru skóry postaci która kierujemy? od jasnej po ciemną i ewentualnie żółte barwy? na poziomie tworzenia postaci i z pozycji zębatki?”). Najtaniej przemalować piksele skóry na gotowych portretach na kilka odcieni, bez nowych grafik. Wybór przy tworzeniu postaci i w Ustawieniach. Przed wdrożeniem próbki do oceny autora.

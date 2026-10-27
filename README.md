@@ -226,6 +226,8 @@ Muzyka w tle jest w `src/client/audio/music/`, a `data/music.json` mówi, który
 2. Dopisz go do `tracks` w `data/music.json`, a miejsce i id utworu do `places` (albo wynik wyprawy do `reports`).
 3. `npm run validate` sprawdzi, że plik i miejsce istnieją.
 
+Animacje oczekiwania to paski klatek w `src/client/art/scenes/`, a `data/animations.json` mówi, która scena gra przy której profesji (`work`, z rzadkim zdarzeniem `moment`: ptak, para albo iskry) i jak idzie postać w Walce (`walk`: kraina regionu przesuwa się za postacią, a dróżka szybciej). Pierwsze rzadkie zdarzenie przychodzi po `firstSeconds`, kolejne po `seconds`, a `dayParts` ustawia światło sceny według godziny w Polsce. Z wyłączonymi Animacjami sceny stoją. `npm run validate` sprawdzi pliki, profesje i regiony.
+
 Ciosy, uniki i upadki w walce to nagrania z paczek Kenney (CC0) w `src/client/audio/sfx/`, przypisane w `data/sounds.json` do rodzajów broni i ataków potworów (pole `sound` w `data/item-bases.json` i `data/monsters.json`). Przerabia je dla głośnika telefonu `tools/build-sfx.py` (Python i ffmpeg). Głosy stworów i postaci przy trafieniu i pokonaniu (`voices`) oraz nagrania dźwięków wołanych po nazwie (`effects`, np. `tab`: zmiana zakładki, `swing`: zamach) pochodzą z generatora ElevenLabs. Nagrywa je przebieg **Dźwięki (szkice)**:
 
 1. Na github.com otwórz repozytorium, zakładkę **Actions** i przebieg **Dźwięki (szkice)**.

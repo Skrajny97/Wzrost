@@ -531,17 +531,18 @@ function craftingView(row, levels, now) {
 function activityPlace(activity, level) {
   if (activity.kind === 'herbs') {
     const herbs = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content.herbsById[id]);
-    return { placeName: content.gathering.place.name, herbs: herbs.map((id) => ({ id, name: content.herbsById[id].name })) };
+    return { profession: content.gathering.profession, placeName: content.gathering.place.name, herbs: herbs.map((id) => ({ id, name: content.herbsById[id].name })) };
   }
   if (activity.kind === 'potions') {
     const { recipe, count } = JSON.parse(activity.options ?? '{}');
     const potion = content.potionsById[recipe];
-    return { placeName: content.brewing.place.name, potion: potion ? { id: potion.id, name: potion.name } : null, count: count ?? 0 };
+    return { profession: content.brewing.profession, placeName: content.brewing.place.name, potion: potion ? { id: potion.id, name: potion.name } : null, count: count ?? 0 };
   }
   if (activity.kind === 'items') {
     const { base: baseId, rarity, count } = JSON.parse(activity.options ?? '{}');
     const base = content.basesById[baseId];
     return {
+      profession: content.workshop.profession,
       placeName: content.workshop.place.name,
       base: base ? { id: base.id, name: base.name } : null,
       rarityName: content.raritiesById[rarity]?.name ?? '',

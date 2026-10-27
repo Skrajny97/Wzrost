@@ -6080,3 +6080,227 @@ button.herb-tile[aria-pressed='true'] {
   font-size: 13px;
   font-weight: 400;
 }
+
+/* Looping scenes while the character works or explores (scenes.js): a sheet
+   of frames played in steps, the Walka land and path drifting at their own
+   speeds, the light of the hour, and the rare moments. With the animations
+   off (calm) everything stands on its first frame. */
+.scene {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+.scene-frames {
+  width: var(--frame);
+  height: var(--frame);
+  background: var(--sheet) 0 0 / var(--sheet-width) var(--frame) no-repeat;
+  image-rendering: pixelated;
+  animation: scene-frames var(--duration) steps(var(--frames)) infinite;
+}
+@keyframes scene-frames {
+  to {
+    background-position: calc(-1 * var(--sheet-width)) 0;
+  }
+}
+.scene-stage {
+  position: relative;
+  isolation: isolate;
+  width: 256px;
+  height: 256px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--bg-deep);
+}
+.scene-stage--place {
+  background: var(--place-art) center / cover no-repeat;
+  image-rendering: pixelated;
+}
+.scene-walk {
+  position: relative;
+  isolation: isolate;
+  justify-self: stretch;
+  height: var(--land-height);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--land, none) 0 0 / var(--land-width) var(--land-height) repeat-x, var(--bg-deep);
+  image-rendering: pixelated;
+  animation: scene-land var(--land-duration) linear infinite;
+}
+@keyframes scene-land {
+  to {
+    background-position: calc(-1 * var(--land-width)) 0, 0 0;
+  }
+}
+.scene-path {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0 0;
+  height: var(--path-height);
+  background: var(--path) 0 0 / var(--path-width) var(--path-height) repeat-x;
+  image-rendering: pixelated;
+  animation: scene-path var(--path-duration) linear infinite;
+}
+@keyframes scene-path {
+  to {
+    background-position: calc(-1 * var(--path-width)) 0;
+  }
+}
+.scene-walker {
+  position: absolute;
+  z-index: 2;
+  left: calc(50% - var(--frame) / 2);
+  bottom: 22px;
+}
+.scene--dawn {
+  filter: brightness(1.04) sepia(0.18) saturate(1.1);
+}
+.scene--dusk {
+  filter: brightness(0.82) sepia(0.3) saturate(1.15);
+}
+.scene--night {
+  filter: brightness(0.62) saturate(0.75);
+}
+.scene-shelf {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+.scene-slot {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+.scene-slot img {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+.scene-count {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-variant-numeric: tabular-nums;
+}
+.scene-bird {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  width: var(--bird-width);
+  height: var(--bird-height);
+  animation: scene-fly 6s linear forwards;
+}
+.scene-bird--back {
+  animation-name: scene-fly-back;
+}
+.scene-bird span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--bird) 0 0 / calc(2 * var(--bird-width)) var(--bird-height) no-repeat;
+  image-rendering: pixelated;
+  animation: scene-flap 0.4s steps(2) infinite;
+}
+@keyframes scene-fly {
+  from {
+    transform: translate(calc(-1 * var(--bird-width)), 0);
+  }
+  50% {
+    transform: translate(calc(var(--across) / 2), -8px);
+  }
+  to {
+    transform: translate(var(--across), 0);
+  }
+}
+@keyframes scene-fly-back {
+  from {
+    transform: translate(var(--across), 0);
+  }
+  50% {
+    transform: translate(calc(var(--across) / 2), -8px);
+  }
+  to {
+    transform: translate(calc(-1 * var(--bird-width)), 0);
+  }
+}
+@keyframes scene-flap {
+  to {
+    background-position: calc(-2 * var(--bird-width)) 0;
+  }
+}
+.scene-steam,
+.scene-sparks {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.scene-steam span {
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(214, 226, 232, 0.5);
+  opacity: 0;
+  animation: scene-steam 2.4s ease-out forwards;
+}
+@keyframes scene-steam {
+  15% {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(2.4);
+  }
+}
+.scene-sparks span {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--gold);
+  box-shadow: 0 0 4px var(--time);
+  animation: scene-spark 0.8s ease-out forwards;
+}
+@keyframes scene-spark {
+  to {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy));
+  }
+}
+.scene-shadow {
+  position: absolute;
+  left: 0;
+  bottom: 44px;
+  animation: scene-run 7s linear forwards;
+}
+.scene-shadow img {
+  display: block;
+  width: 48px;
+  height: 48px;
+  filter: brightness(0);
+  opacity: 0.75;
+  image-rendering: pixelated;
+  animation: scene-bob 0.35s steps(2) infinite;
+}
+@keyframes scene-run {
+  from {
+    transform: translateX(var(--across));
+  }
+  to {
+    transform: translateX(-60px);
+  }
+}
+@keyframes scene-bob {
+  to {
+    transform: translateY(-2px);
+  }
+}
+.calm .scene,
+.calm .scene * {
+  animation: none !important;
+}

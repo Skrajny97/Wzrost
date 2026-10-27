@@ -12,6 +12,7 @@ import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { preloadReportMusic } from '../music.js';
 import { systemPoints } from '../quests.js';
+import { walkScene } from '../scenes.js';
 import {
   activityFinished,
   avoidRareOn,
@@ -401,9 +402,11 @@ export function mountCombat(container, { params, navigate }) {
       },
     });
     skipper = skipControl('activity', (now) => activity.endsAt - now, 'Eksploracja');
+    const scene = walkScene(activity);
     const card = h(
       'div',
       { class: 'stack' },
+      ...(scene ? [scene.element] : []),
       systemPanel(
         `Eksploracja w toku: ${activity.areaName}, ${formatMinutes(activity.minutes)}.`,
         countdown,
