@@ -1,14 +1,16 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Profesje",
-  "description": "Profesje, ich poziomy i statystyki, zbieractwo w Systemowym Zagajniku i zioła (src/engine/professions.js).",
+  "description": "Profesje, ich poziomy i statystyki, zbieractwo w Systemowym Zagajniku, zioła, warzenie w Systemowej Pracowni i mikstury (src/engine/professions.js, src/engine/brewing.js).",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "rules",
     "professions",
     "gathering",
+    "brewing",
     "herbs",
+    "potions",
     "texts"
   ],
   "properties": {
@@ -211,6 +213,191 @@
         }
       }
     },
+    "brewing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profession",
+        "place",
+        "potionMinutes",
+        "speedPerLevel",
+        "fastest",
+        "maxMinutes",
+        "bonusChance",
+        "priceFactor",
+        "texts"
+      ],
+      "properties": {
+        "profession": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Profesja wytwórcza, która warzy mikstury."
+        },
+        "place": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "potionMinutes": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Ile minut trwa jedna mikstura na 1. poziomie profesji."
+        },
+        "speedPerLevel": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.1,
+          "description": "O jaką część czasu mikstury skraca ją każdy poziom profesji."
+        },
+        "fastest": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "description": "Najkrótszy czas mikstury, jako część czasu z 1. poziomu."
+        },
+        "maxMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Najdłuższe warzenie naraz, w minutach."
+        },
+        "bonusChance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Szansa każdej uwarzonej mikstury na jedną dodatkową."
+        },
+        "priceFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Ile razy więcej niż za zioła mikstury płaci złomiarz."
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "report",
+            "brewed",
+            "lucky",
+            "lost",
+            "stopped",
+            "revealed",
+            "hidden",
+            "busy",
+            "claimFirst",
+            "pushTitle",
+            "pushBody"
+          ],
+          "properties": {
+            "report": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "brewed": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "lucky": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "lost": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "stopped": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "revealed": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "hidden": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "busy": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "claimFirst": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pushTitle": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pushBody": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
     "herbs": {
       "type": "array",
       "minItems": 1,
@@ -252,6 +439,86 @@
           "price": {
             "type": "integer",
             "minimum": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "potions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "counted",
+          "level",
+          "herbs",
+          "effect",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "counted": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Nazwa po liczbie: 1, 2–4, 5 i więcej („Uwarz 3 Mniejsze mikstury leczenia”)."
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Poziom profesji, od którego postać zna ten przepis."
+          },
+          "herbs": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Zioła na jedną miksturę: id zioła i liczba sztuk."
+          },
+          "effect": {
+            "type": "object",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "properties": {
+              "heal": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "Leczy taką część maks. HP."
+              },
+              "mana": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "Oddaje taką część maks. many."
+              },
+              "speed": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "Dodaje tyle do szybkości ruchów postaci."
+              }
+            }
           },
           "description": {
             "type": "string",

@@ -1,5 +1,5 @@
-// The professions as the page draws them, and the herbs in the bag. Kept
-// apart from professions.js, which needs characters.js, so that
+// The professions as the page draws them, and the herbs and potions in the
+// bag. Kept apart from professions.js, which needs characters.js, so that
 // characters.js can draw the view without a loop between the two.
 
 import {
@@ -7,6 +7,9 @@ import {
   herbSlots,
   herbsPerHour,
   isUnlocked,
+  mostPotions,
+  potionMinutes,
+  potionPrice,
   professionStatBonus,
   professionState,
   professionXpToNext,
@@ -15,8 +18,10 @@ import { content } from './content.js';
 import { professionsOn } from './features.js';
 import { say } from '../engine/text.js';
 
-// The herbs the character carries, by id, as the row keeps them.
+// The herbs and the potions the character carries, by id, as the row keeps
+// them.
 export const herbsOf = (row) => JSON.parse(row.herbs ?? '{}');
+export const potionsOf = (row) => JSON.parse(row.potions ?? '{}');
 
 // The herbs in the bag, one entry for each herb, with the scrapper's price of
 // one at the camp's Skup złomu (sellBonus). The page splits them into stacks.
@@ -33,16 +38,35 @@ export function bagHerbs(row, sellBonus) {
     }));
 }
 
-// The Profesje tab: each profession with its level and the stats it gave,
-// and the gathering of Zielarstwo: its place, the slider, how many herbs at
-// once, and each herb, known or hidden by the System. Null while the
-// professions are hidden in this deployment or not unlocked yet.
+// The potions in the bag, as the herbs: one entry for each, with the
+// scrapper's price of one.
+export function bagPotions(row, sellBonus) {
+  const potions = potionsOf(row);
+  return content.potions
+    .filter((potion) => (potions[potion.id] ?? 0) > 0)
+    .map((potion) => ({
+      id: potion.id,
+      name: potion.name,
+      description: potion.description,
+      count: potions[potion.id],
+      price: potionPrice(potion, content) * (1 + sellBonus),
+    }));
+}
+
+// The Profesje tab: each profession with its level and the stats it gave;
+// the gathering of Zielarstwo: its place, the slider, how many herbs at
+// once, and each herb, known or hidden by the System; and the brewing of
+// Alchemia: its place, a potion's minutes and each recipe, known (with its
+// herbs and the most potions at once) or hidden. Null while the professions
+// are hidden in this deployment or not unlocked yet.
 export function professionsView(row) {
   if (!professionsOn() || !isUnlocked('professions', row.level, content)) return null;
   const professions = JSON.parse(row.professions ?? '{}');
   const herbs = herbsOf(row);
-  const { gathering } = content;
+  const potions = potionsOf(row);
+  const { gathering, brewing } = content;
   const gatherer = professionState(professions, gathering.profession);
+  const brewer = professionState(professions, brewing.profession);
   const hidden = content.professionTexts.hidden;
   return {
     list: content.professions.map((profession) => {
@@ -80,6 +104,28 @@ export function professionsView(row) {
               count: herbs[herb.id] ?? 0,
             }
           : { id: herb.id, level: herb.level, hidden: true, hint: say({ hidden }, 'hidden', 0, { level: herb.level }) },
+      ),
+    },
+    brewing: {
+      professionId: brewing.profession,
+      place: brewing.place,
+      // One potion's minutes at this level; a brewing of n takes n of them,
+      // rounded up to a whole minute (brewMinutes).
+      potionMinutes: potionMinutes(brewer.level, content),
+      maxMinutes: brewing.maxMinutes,
+      bonusChance: brewing.bonusChance,
+      recipes: content.potions.map((potion) =>
+        potion.level <= brewer.level
+          ? {
+              id: potion.id,
+              name: potion.name,
+              description: potion.description,
+              level: potion.level,
+              herbs: Object.entries(potion.herbs).map(([id, need]) => ({ id, name: content.herbsById[id].name, need, have: herbs[id] ?? 0 })),
+              count: potions[potion.id] ?? 0,
+              most: mostPotions(potion, brewer.level, herbs, content),
+            }
+          : { id: potion.id, level: potion.level, hidden: true, hint: say(brewing.texts, 'hidden', 0, { level: potion.level }) },
       ),
     },
   };

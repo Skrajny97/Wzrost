@@ -1,5 +1,5 @@
 {
-  "$comment": "Profesje (src/engine/professions.js). Każda ma 100 poziomów: awans z poziomu L wymaga L × levelMinutes minut pracy. Każdy awans daje statPerLevel do obu statystyk profesji (stats), więc 1. poziom daje 0, a ostatni poziom dodaje jeszcze maxLevelBonus: nagrodę za opanowanie profesji (1 × 99 + 51 = 150). Praca daje postaci characterXpShare tego XP, co godzina wyprawy na jej poziomie, i nie daje XP klasy. soon: profesja widoczna w zakładce, ale jeszcze bez pracy. Zbieractwo (gathering): postać zbiera zioła w jednym stałym miejscu (place), przez minutes.min–max minut co step. Na godzinę zbiera perHour sztuk zioła, a każdy poziom dodaje yieldPerLevel; losowość to ± spread. slots: od którego poziomu ile ziół naraz, a zbiór dzieli się po równo między wybrane zioła. Zioło zna się od swojego poziomu (level). stack: ile sztuk zioła mieści jedno miejsce plecaka; co się nie zmieści, przepada. price: tyle płaci złomiarz za sztukę (z premią Skupu złomu). genitive: nazwa w dopełniaczu, zioła do zadań narratora, a profesji do komunikatu o jej poziomie. texts: zdania raportu (report: jedno z wariantów) i komunikaty.",
+  "$comment": "Profesje (src/engine/professions.js). Każda ma 100 poziomów: awans z poziomu L wymaga L × levelMinutes minut pracy. Każdy awans daje statPerLevel do obu statystyk profesji (stats), więc 1. poziom daje 0, a ostatni poziom dodaje jeszcze maxLevelBonus: nagrodę za opanowanie profesji (1 × 99 + 51 = 150). Praca daje postaci characterXpShare tego XP, co godzina wyprawy na jej poziomie, i nie daje XP klasy. soon: profesja widoczna w zakładce, ale jeszcze bez pracy. Zbieractwo (gathering): postać zbiera zioła w jednym stałym miejscu (place), przez minutes.min–max minut co step. Na godzinę zbiera perHour sztuk zioła, a każdy poziom dodaje yieldPerLevel; losowość to ± spread. slots: od którego poziomu ile ziół naraz, a zbiór dzieli się po równo między wybrane zioła. Zioło zna się od swojego poziomu (level). stack: ile sztuk zioła mieści jedno miejsce plecaka; co się nie zmieści, przepada. price: tyle płaci złomiarz za sztukę (z premią Skupu złomu). genitive: nazwa w dopełniaczu, zioła do zadań narratora, a profesji do komunikatu o jej poziomie. texts: zdania raportu (report: jedno z wariantów) i komunikaty. Warzenie (brewing): postać warzy mikstury w jednym stałym miejscu (place), jeden przepis naraz. Mikstura trwa potionMinutes minut, każdy poziom profesji skraca ją o speedPerLevel, ale nie bardziej niż do fastest tego czasu; całe warzenie trwa najwyżej maxMinutes. Każda uwarzona mikstura ma bonusChance szans na jedną dodatkową. Złomiarz płaci za miksturę priceFactor razy tyle, co za jej zioła. potions: przepisy, każdy znany od swojego poziomu (level), z ziołami na jedną miksturę (herbs) i działaniem (effect: heal i mana to część maks. HP i many, speed to dodatek do szybkości ruchów). counted: nazwa po liczbie (1, 2–4, 5 i więcej) do zadań narratora. Mikstury też układają się w plecaku po stack sztuk.",
   "rules": {
     "characterXpShare": 0.025,
     "stack": 20
@@ -27,7 +27,6 @@
       "levelMinutes": 30,
       "statPerLevel": 1,
       "maxLevelBonus": 51,
-      "soon": true,
       "description": "Warzenie mikstur z ziół."
     },
     {
@@ -61,6 +60,37 @@
       { "level": 50, "herbs": 4 }
     ]
   },
+  "brewing": {
+    "profession": "alchemy",
+    "place": {
+      "id": "system-workshop",
+      "name": "Systemowa Pracownia",
+      "description": "Kocioł grzeje się tu bez ognia, a półki czekają na fiolki. System odsłania przepisy dopiero wtedy, gdy uzna, że umiesz je uwarzyć."
+    },
+    "potionMinutes": 10,
+    "speedPerLevel": 0.01,
+    "fastest": 0.5,
+    "maxMinutes": 480,
+    "bonusChance": 0.05,
+    "priceFactor": 1.5,
+    "texts": {
+      "report": [
+        "W Pracowni bulgocze kocioł, a na półce przybywa fiolek.",
+        "Zioła oddały wywarowi wszystko, co miały najlepsze.",
+        "Błękitne linie Systemu mierzą każdą kroplę mikstury."
+      ],
+      "brewed": ["Uwarzono: {potions}."],
+      "lucky": ["Szczęśliwe warzenie, dodatkowo: {potions}."],
+      "lost": ["Plecak był pełny. Nie zmieściło się: {potions}."],
+      "stopped": ["Warzenie przerwane. Zioła na resztę wróciły do plecaka."],
+      "revealed": ["System odsłania nowy przepis: {potion}"],
+      "hidden": ["Ukryte przez System do {level}. poziomu Alchemii."],
+      "busy": ["Postać warzy mikstury. Poczekaj na koniec warzenia."],
+      "claimFirst": ["Warzenie się skończyło. Najpierw odbierz raport."],
+      "pushTitle": ["Koniec warzenia"],
+      "pushBody": ["Mikstury gotowe: {place}. Raport czeka na odbiór."]
+    }
+  },
   "herbs": [
     {
       "id": "comfrey",
@@ -88,6 +118,35 @@
       "perHour": 4,
       "price": 4,
       "description": "Parzy każdego, kto ją zrywa, ale jej sok przyspiesza ruchy."
+    }
+  ],
+  "potions": [
+    {
+      "id": "lesser-healing",
+      "name": "Mniejsza mikstura leczenia",
+      "counted": ["Mniejszą miksturę leczenia", "Mniejsze mikstury leczenia", "Mniejszych mikstur leczenia"],
+      "level": 1,
+      "herbs": { "comfrey": 3 },
+      "effect": { "heal": 0.2 },
+      "description": "Rubinowy wywar z Żywokostu. Zrasta rany: leczy 20% maks. HP."
+    },
+    {
+      "id": "lesser-mana",
+      "name": "Mniejsza mikstura many",
+      "counted": ["Mniejszą miksturę many", "Mniejsze mikstury many", "Mniejszych mikstur many"],
+      "level": 3,
+      "herbs": { "mugwort": 3 },
+      "effect": { "mana": 0.3 },
+      "description": "Szafirowy wywar z Bylicy. Budzi uśpioną moc: oddaje 30% maks. many."
+    },
+    {
+      "id": "lesser-speed",
+      "name": "Mniejsza mikstura szybkości",
+      "counted": ["Mniejszą miksturę szybkości", "Mniejsze mikstury szybkości", "Mniejszych mikstur szybkości"],
+      "level": 5,
+      "herbs": { "nettle": 3 },
+      "effect": { "speed": 0.15 },
+      "description": "Żółtozielony wywar z Pokrzywy. Przyspiesza ruchy postaci o 15%."
     }
   ],
   "texts": {

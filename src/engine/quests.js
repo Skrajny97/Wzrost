@@ -5,12 +5,14 @@
 // period, so a period always gets the same ones: creatures of the newest
 // inner region open to the character's class, never of a place too easy
 // for the character, and, once the Stół rzemieślniczy stands, its work, and
-// once the professions are there, the herbs gathered, each with a reward of
-// gold, a resource or parts. Claimed explorations and gatherings and the
-// table's orders move them on; a quest
+// once the professions are there, the herbs gathered and the potions
+// brewed, each with a reward of gold, a resource or parts. Claimed
+// explorations, gatherings and brewings and the table's orders move them
+// on; a quest
 // done gives its reward when claimed, and all of a period's quests done open
 // its chest.
 
+import { knownPotions } from './brewing.js';
 import { easyPlace, encountersFor } from './hunt.js';
 import { randomItem } from './items.js';
 import { knownHerbs, professionState } from './professions.js';
@@ -98,13 +100,16 @@ function creaturesPerFight(area, level) {
 }
 
 // The herbs the character's gathering profession knows: those a gathering
-// quest can name.
+// quest can name. The same for the recipes of brewing.
 const questHerbs = (character, content) =>
   content.gathering ? knownHerbs(professionState(character.professions, content.gathering.profession).level, content) : [];
+const questPotions = (character, content) =>
+  content.brewing ? knownPotions(professionState(character.professions, content.brewing.profession).level, content) : [];
 
 // What can be drawn: each kind once for each of its variants (kill: each
 // creature that the period's most fights bring at least once on average;
-// gather: each herb known), the kind's weight shared among them. A kind
+// gather: each herb known; brew: each recipe known), the kind's weight
+// shared among them. A kind
 // without this period, or of a module the character does not have yet, is
 // left out. No creatures of a place too easy for the character (the
 // author: "by ktoś z wyższym levelem nie był wysyłany na niskolevelowe
@@ -122,7 +127,9 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false },
             .map(([target, perFight]) => ({ target, perFight }))
         : kind.id === 'gather'
           ? questHerbs(character, content).map((herb) => ({ target: herb.id }))
-          : [{}];
+          : kind.id === 'brew'
+            ? questPotions(character, content).map((potion) => ({ target: potion.id }))
+            : [{}];
     return variants.map((variant) => ({ kind, weight: kind.weight / variants.length, ...variant }));
   });
 }
@@ -206,12 +213,14 @@ export function huntKills(hunt) {
   return kills;
 }
 
-// What claimed explorations and gatherings and the table's orders add:
-// creatures beaten (`kills` by id), `minutes` explored, materials
-// `processed`, items `salvaged` and herbs gathered (`herbs` by id, all of
-// those found, also those the bag lost). A quest stops at its count.
-export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {} }) {
-  const gathered = Object.values(herbs).reduce((sum, count) => sum + count, 0);
+// What claimed explorations, gatherings and brewings and the table's
+// orders add: creatures beaten (`kills` by id), `minutes` explored,
+// materials `processed`, items `salvaged`, herbs gathered (`herbs` by id,
+// all of those found, also those the bag lost) and potions brewed
+// (`potions` by id, the same way). A quest stops at its count.
+export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {} }) {
+  const total = (counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
+  const gathered = total(herbs);
   const gain = {
     kill: (quest) => kills[quest.target] ?? 0,
     explore: () => minutes,
@@ -219,6 +228,8 @@ export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 
     salvage: () => salvaged,
     gather: (quest) => herbs[quest.target] ?? 0,
     gatherAny: () => gathered,
+    brew: (quest) => potions[quest.target] ?? 0,
+    brewAny: () => total(potions),
   };
   return Object.fromEntries(
     Object.entries(quests).map(([periodId, period]) => [
@@ -280,7 +291,8 @@ export function countedForm(count, [one, few, many]) {
 export function questText(quest, content, met = null) {
   const kind = content.quests.kinds.find((candidate) => candidate.id === quest.kind);
   const unknown = quest.kind === 'kill' && met && !met.includes(quest.target);
-  const forms = quest.kind === 'kill' ? content.monstersById[quest.target].counted : kind.counted;
+  const forms =
+    quest.kind === 'kill' ? content.monstersById[quest.target].counted : quest.kind === 'brew' ? content.potionsById[quest.target].counted : kind.counted;
   return kind.text
     .replace('{count}', String(quest.count))
     .replace('{noun}', unknown ? '???' : countedForm(quest.count, forms))
@@ -294,7 +306,8 @@ export function questsView(quests, now, content, met = null) {
   const known = (quest) =>
     content.quests.kinds.some((kind) => kind.id === quest.kind) &&
     (quest.kind !== 'kill' || Boolean(content.monstersById[quest.target])) &&
-    (quest.kind !== 'gather' || Boolean(content.herbsById[quest.target]));
+    (quest.kind !== 'gather' || Boolean(content.herbsById[quest.target])) &&
+    (quest.kind !== 'brew' || Boolean(content.potionsById[quest.target]));
   return Object.fromEntries(
     QUEST_PERIODS.map((periodId) => {
       const period = quests[periodId];

@@ -17,7 +17,7 @@ import {
   isUnlocked,
   playerCombatant,
   professionState,
-  storeHerbs,
+  storeStacks,
   workProfession,
   workXp,
 } from '../engine/index.js';
@@ -33,7 +33,7 @@ import { KEPT_REPORTS } from './reports.js';
 const path = (id) => `$."${id}"`;
 
 // Professions need this deployment to show them and the character's level.
-function requireProfessions(player) {
+export function requireProfessions(player) {
   if (!professionsOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const unlock = content.unlocksById.professions;
   if (!isUnlocked('professions', player.row.level, content)) {
@@ -92,7 +92,7 @@ export async function finishGathering(db, player, now) {
   const herbIds = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content.herbsById[id]);
   const found = herbIds.length > 0 ? gatherHerbs({ herbIds, minutes: activity.minutes, level: before.level, seed: activity.seed }, content) : {};
   const capacity = bagCapacity(campLevels(player.buildings, now, content), content);
-  const { herbs, stored, lost } = storeHerbs(herbsOf(row), found, capacity - bagPlaces(player), content);
+  const { after: herbs, stored, lost } = storeStacks(herbsOf(row), found, capacity - bagPlaces(player), content);
   const after = workProfession(profession, before, activity.minutes);
   const xp = workXp(row.level, activity.minutes, content);
   const work = applyWork(character, xp, content);
@@ -150,20 +150,20 @@ function herbCount(player, body) {
   const have = herbsOf(player.row)[herb.id] ?? 0;
   if (have === 0) throw new ApiError(404, 'no_herb', 'Nie masz tego zioła.');
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > have) throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${have} sztuk.`);
-  return { herb, have, count: body.count };
+  return { id: herb.id, price: herb.price, have, count: body.count };
 }
 
-// The herbs after `count` of one go: the key goes with the last of them. The
-// change saves only if the herb is still as seen, so two taps at once sell
-// or throw away once.
-function takeHerbs(db, player, { herb, have, count }, gold = 0) {
+// The herbs or the potions (`column`) after `count` of one kind go: the key
+// goes with the last of them. The change saves only if the kind is still as
+// seen, so two taps at once sell or throw away once.
+export function takeFromBag(db, player, column, { id, have, count }, gold = 0) {
   const left = have - count;
   return db
     .prepare(
-      `UPDATE characters SET herbs = ${left === 0 ? 'json_remove(herbs, ?)' : 'json_set(herbs, ?, ?)'}, gold = gold + ?, version = version + 1
-       WHERE id = ? AND json_extract(herbs, ?) = ?`,
+      `UPDATE characters SET ${column} = ${left === 0 ? `json_remove(${column}, ?)` : `json_set(${column}, ?, ?)`}, gold = gold + ?, version = version + 1
+       WHERE id = ? AND json_extract(${column}, ?) = ?`,
     )
-    .bind(path(herb.id), ...(left === 0 ? [] : [left]), gold, player.row.id, path(herb.id), have)
+    .bind(path(id), ...(left === 0 ? [] : [left]), gold, player.row.id, path(id), have)
     .run();
 }
 
@@ -173,8 +173,8 @@ export async function sellHerbs(context) {
   const body = await readJson(context.request);
   const taken = herbCount(player, body);
   const bonus = campBonus(campLevels(player.buildings, context.now, content), 'sellPrice', content);
-  const gold = Math.max(1, Math.round(taken.herb.price * taken.count * (1 + bonus)));
-  const result = await takeHerbs(context.env.DB, player, taken, gold);
+  const gold = Math.max(1, Math.round(taken.price * taken.count * (1 + bonus)));
+  const result = await takeFromBag(context.env.DB, player, 'herbs', taken, gold);
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Zioła zmieniły się w międzyczasie. Spróbuj ponownie.');
   return json({ sold: { count: taken.count, gold }, character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
 }
@@ -182,7 +182,7 @@ export async function sellHerbs(context) {
 export async function discardHerbs(context) {
   const { session, player } = await requireIdlePlayer(context);
   const body = await readJson(context.request);
-  const result = await takeHerbs(context.env.DB, player, herbCount(player, body));
+  const result = await takeFromBag(context.env.DB, player, 'herbs', herbCount(player, body));
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Zioła zmieniły się w międzyczasie. Spróbuj ponownie.');
   return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
 }

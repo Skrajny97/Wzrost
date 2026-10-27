@@ -28,6 +28,7 @@ import {
   simulateHunt,
   threatSamples,
 } from '../engine/index.js';
+import { finishBrewing } from './brewing.js';
 import { content } from './content.js';
 import {
   bagPlaces,
@@ -165,7 +166,8 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
   }
 }
 
-// Calling the character back early gives nothing and costs nothing.
+// Calling the character back early gives nothing and costs nothing. A
+// brewing keeps the potions done, with their report (brewing.js).
 export async function cancelHunt(context) {
   const { session, player } = await requirePlayer(context);
   const activity = player.activity;
@@ -174,20 +176,26 @@ export async function cancelHunt(context) {
     throw new ApiError(409, 'claim_first', 'Wyprawa się skończyła. Odbierz raport.');
   }
   const db = context.env.DB;
+  if (activity.kind === 'potions') {
+    const stopped = await finishBrewing(db, player, context.now, { stop: true });
+    return json({
+      report: stopped && { id: stopped.id, createdAt: context.now, ...stopped.report },
+      character: characterView(await loadPlayer(db, session.userId), context.now),
+    });
+  }
   await db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?')
     .bind(player.row.id, activity.started_at)
     .run();
   return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
-// The report of the activity that ended: an exploration, or a gathering of
-// herbs (professions.js).
+// The report of the activity that ended: an exploration, a gathering of
+// herbs (professions.js) or a brewing of potions (brewing.js).
 export async function claimHunt(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
-  const { id, report } = player.activity?.kind === 'herbs' && player.activity.ends_at <= now
-    ? await finishGathering(context.env.DB, player, now)
-    : await finishHunt(context.env.DB, player, now);
+  const finish = { herbs: finishGathering, potions: finishBrewing }[player.activity?.kind];
+  const { id, report } = finish && player.activity.ends_at <= now ? await finish(context.env.DB, player, now) : await finishHunt(context.env.DB, player, now);
   return json({
     report: { id, createdAt: now, ...report },
     character: characterView(await loadPlayer(context.env.DB, session.userId), now),

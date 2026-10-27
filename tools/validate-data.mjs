@@ -544,6 +544,31 @@ function checkProfessions(data, { stats }) {
   if (minutes.max < minutes.min || (minutes.max - minutes.min) % minutes.step !== 0) {
     errors.push('professions.json: gathering.minutes.max musi wypadać na kroku suwaka od min');
   }
+  errors.push(...checkBrewing(data.professions, ids));
+  return errors;
+}
+
+// Brewing: a crafting profession that brews, recipes known within its levels
+// from level 1 on, of herbs that exist, and each potion's description naming
+// what it does, as the data does ("leczy 20% maks. HP").
+function checkBrewing({ professions, brewing, herbs, potions }, ids) {
+  const errors = [];
+  uniqueIds(errors, 'professions (mikstury)', potions);
+  const brewer = professions.find((profession) => profession.id === brewing.profession);
+  if (!ids.has(brewing.profession) || brewer.kind !== 'crafting') {
+    errors.push(`professions.json: brewing.profession "${brewing.profession}" nie jest profesją wytwórczą`);
+  }
+  if (!potions.some((potion) => potion.level === 1)) errors.push('professions.json: żadnego przepisu nie zna się od 1. poziomu');
+  const herbIds = new Set(herbs.map((herb) => herb.id));
+  for (const potion of potions) {
+    if (brewer && potion.level > brewer.maxLevel) errors.push(`professions.json: mikstura ${potion.id} wymaga poziomu ${potion.level}, a profesja kończy się na ${brewer.maxLevel}`);
+    for (const id of Object.keys(potion.herbs)) {
+      if (!herbIds.has(id)) errors.push(`professions.json: mikstura ${potion.id} ma nieznane zioło "${id}"`);
+    }
+    for (const value of Object.values(potion.effect)) {
+      if (!potion.description.includes(`${Math.round(value * 100)}%`)) errors.push(`professions.json: opis mikstury ${potion.id} nie podaje ${Math.round(value * 100)}%`);
+    }
+  }
   return errors;
 }
 
@@ -566,8 +591,10 @@ function checkQuests(data, { resources, rarities }) {
     }
   }
   for (const kind of quests.kinds) {
-    if (kind.id !== 'kill' && !kind.counted) errors.push(`quests.json: rodzaj ${kind.id} nie ma counted`);
-    if (kind.counted && !kind.text.includes('{noun}')) errors.push(`quests.json: tekst rodzaju ${kind.id} nie ma {noun}`);
+    // Creatures and potions bring their own nouns.
+    const ownNoun = kind.id === 'kill' || kind.id === 'brew';
+    if (!ownNoun && !kind.counted) errors.push(`quests.json: rodzaj ${kind.id} nie ma counted`);
+    if ((ownNoun || kind.counted) && !kind.text.includes('{noun}')) errors.push(`quests.json: tekst rodzaju ${kind.id} nie ma {noun}`);
     if (kind.text.includes('{herb}') !== (kind.id === 'gather')) errors.push(`quests.json: tylko rodzaj gather ma {herb} w tekście`);
     for (const period of ['daily', 'weekly'].filter((each) => kind[each])) {
       const range = kind.id === 'kill' ? kind[period].fights : kind[period].count;

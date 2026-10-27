@@ -55,7 +55,9 @@
               "process",
               "salvage",
               "gather",
-              "gatherAny"
+              "gatherAny",
+              "brew",
+              "brewAny"
             ]
           },
           "text": {
@@ -66,7 +68,7 @@
           },
           "counted": {
             "type": "array",
-            "description": "Rzeczownik po liczbie: 1, 2–4, 5 i więcej. Rodzaj kill bierze go ze stwora.",
+            "description": "Rzeczownik po liczbie: 1, 2–4, 5 i więcej. Rodzaj kill bierze go ze stwora, a brew z mikstury.",
             "minItems": 3,
             "maxItems": 3,
             "items": {

@@ -81,17 +81,18 @@ export function gatherHerbs({ herbIds, minutes, level, seed }, content) {
   return found;
 }
 
-// The places in the bag the herbs take: each herb apart, a stack of
-// rules.stack to a place.
-export const herbStacks = (herbs, content) =>
-  Object.values(herbs ?? {}).reduce((sum, count) => sum + Math.ceil(count / content.professionRules.stack), 0);
+// The places in the bag that herbs or potions take, by id: each kind apart,
+// a stack of rules.stack to a place.
+export const bagStacks = (counts, content) =>
+  Object.values(counts ?? {}).reduce((sum, count) => sum + Math.ceil(count / content.professionRules.stack), 0);
 
-// The herbs found, put into the bag with `free` places left: first into the
-// room left in each herb's last stack, then into new stacks while there are
-// places. Gives the herbs after, and what went in and what did not, by id.
-export function storeHerbs(herbs, found, free, content) {
+// Herbs found or potions brewed, put into the bag with `free` places left:
+// first into the room left in each kind's last stack, then into new stacks
+// while there are places. Gives what the bag holds of them after, and what
+// went in and what did not, by id.
+export function storeStacks(have, found, free, content) {
   const { stack } = content.professionRules;
-  const after = { ...herbs };
+  const after = { ...have };
   const stored = {};
   const lost = {};
   let places = Math.max(0, free);
@@ -105,7 +106,7 @@ export function storeHerbs(herbs, found, free, content) {
     }
     if (count > fits) lost[id] = count - fits;
   }
-  return { herbs: after, stored, lost };
+  return { after, stored, lost };
 }
 
 // The character's XP from `minutes` of work at its level.
@@ -122,11 +123,35 @@ export function applyWork(character, xp, content) {
   return { level: next.level, xp: next.xp, levelled: levels > 0, timePoints: content.balance.timePoints.perLevel * levels, messages };
 }
 
-// "7 × Żywokost, 3 × Bylica".
-const herbList = (counts, content) =>
+// "7 × Żywokost, 3 × Bylica", of herbs or of potions (byId).
+export const countList = (counts, byId) =>
   Object.entries(counts)
-    .map(([id, count]) => `${count} × ${content.herbsById[id].name}`)
+    .map(([id, count]) => `${count} × ${byId[id].name}`)
     .join(', ');
+
+// The System's lines for a profession's new levels: the level, then one gain
+// to a line, as after an exploration (levelUpMessages).
+export function professionLevelLines(profession, before, after, content) {
+  if (after.level <= before.level) return [];
+  const texts = content.professionTexts;
+  const gained = professionStatBonus(profession, after.level) - professionStatBonus(profession, before.level);
+  return [
+    say(texts, 'levelUp', 0, { profession: profession.genitive, level: after.level }),
+    ...profession.stats.map((stat) => say(texts, 'statGained', 0, { stat: content.statsById[stat].accusative, bonus: gained })),
+  ];
+}
+
+// A profession in a report: its levels before and after, the XP of the
+// `minutes` worked and what the next level needs.
+export const professionProgress = (profession, before, after, minutes) => ({
+  id: profession.id,
+  name: profession.name,
+  levelBefore: before.level,
+  levelAfter: after.level,
+  xp: minutes,
+  xpAfter: after.xp,
+  xpToNext: after.level < profession.maxLevel ? professionXpToNext(profession, after.level) : 0,
+});
 
 // The report of a gathering: a line about the grove from the seed, the herbs
 // found and those the full bag lost, the profession's new levels with their
@@ -134,17 +159,7 @@ const herbList = (counts, content) =>
 export function gatheringReport({ minutes, startedAt, endsAt, seed, found, stored, lost, before, after, character, xp, work }, content) {
   const texts = content.professionTexts;
   const profession = content.professionsById[content.gathering.profession];
-  const levels = after.level - before.level;
   const revealed = content.herbs.filter((herb) => herb.level > before.level && herb.level <= after.level);
-  // One gain to a line, as after an exploration (levelUpMessages).
-  const gained = professionStatBonus(profession, after.level) - professionStatBonus(profession, before.level);
-  const levelLines =
-    levels > 0
-      ? [
-          say(texts, 'levelUp', 0, { profession: profession.genitive, level: after.level }),
-          ...profession.stats.map((stat) => say(texts, 'statGained', 0, { stat: content.statsById[stat].accusative, bonus: gained })),
-        ]
-      : [];
   return {
     kind: 'herbs',
     placeName: content.gathering.place.name,
@@ -153,19 +168,15 @@ export function gatheringReport({ minutes, startedAt, endsAt, seed, found, store
     endsAt,
     line: say(texts, 'report', createRng(`${seed}:line`).int(0, texts.report.length - 1)),
     herbs: Object.entries(found).map(([id, count]) => ({ id, name: content.herbsById[id].name, count, stored: stored[id] ?? 0, lost: lost[id] ?? 0 })),
-    gathered: say(texts, 'gathered', 0, { herbs: herbList(found, content) }),
-    lost: Object.keys(lost).length > 0 ? say(texts, 'lost', 0, { herbs: herbList(lost, content) }) : null,
-    profession: {
-      id: profession.id,
-      name: profession.name,
-      levelBefore: before.level,
-      levelAfter: after.level,
-      xp: minutes,
-      xpAfter: after.xp,
-      xpToNext: after.level < profession.maxLevel ? professionXpToNext(profession, after.level) : 0,
-    },
+    gathered: say(texts, 'gathered', 0, { herbs: countList(found, content.herbsById) }),
+    lost: Object.keys(lost).length > 0 ? say(texts, 'lost', 0, { herbs: countList(lost, content.herbsById) }) : null,
+    profession: professionProgress(profession, before, after, minutes),
     revealed: revealed.map((herb) => herb.id),
     summary: { xp, levelBefore: character.level, levelAfter: work.level, timePoints: work.timePoints },
-    system: [...levelLines, ...revealed.map((herb, index) => say(texts, 'revealed', index, { herb: herb.name })), ...work.messages],
+    system: [
+      ...professionLevelLines(profession, before, after, content),
+      ...revealed.map((herb, index) => say(texts, 'revealed', index, { herb: herb.name })),
+      ...work.messages,
+    ],
   };
 }

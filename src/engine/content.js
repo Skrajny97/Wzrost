@@ -93,7 +93,8 @@ export function buildContent(raw) {
     skills: raw.skills ?? [],
     skillsById: byId(raw.skills ?? []),
     // The professions, the herbs gathered in them, the gathering and the
-    // texts of their reports (professions.js).
+    // texts of their reports (professions.js), and the brewing with its
+    // potions (brewing.js).
     professions: raw.professions?.professions ?? [],
     professionsById: byId(raw.professions?.professions ?? []),
     professionRules: raw.professions?.rules,
@@ -101,5 +102,8 @@ export function buildContent(raw) {
     herbs: raw.professions?.herbs ?? [],
     herbsById: byId(raw.professions?.herbs ?? []),
     professionTexts: raw.professions?.texts,
+    brewing: raw.professions?.brewing,
+    potions: raw.professions?.potions ?? [],
+    potionsById: byId(raw.professions?.potions ?? []),
   };
 }

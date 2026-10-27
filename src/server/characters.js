@@ -23,7 +23,7 @@ import {
   fireUnitsMade,
   freePoints,
   gainedTimePoints,
-  herbStacks,
+  bagStacks,
   hoursToNext,
   isUnlocked,
   huntDurations,
@@ -54,7 +54,7 @@ import {
 import { content } from './content.js';
 import { professionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
-import { bagHerbs, herbsOf, professionsView } from './professions-view.js';
+import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
 import { requirePlayable } from './sessions.js';
 
 // 2 to 20 characters: letters and digits, spaces, hyphens, apostrophes and
@@ -142,11 +142,14 @@ export const buildQueue = (row) => JSON.parse(row.build_queue ?? '[]');
 
 const path = (id) => `$."${id}"`;
 
-// Gathering herbs is no fight: the character rests meanwhile, as at home.
-export const restsDuring = (activity) => !activity || activity.kind === 'herbs';
+// Gathering herbs and brewing potions are no fights: the character rests
+// meanwhile, as at home.
+export const restsDuring = (activity) => !activity || activity.kind === 'herbs' || activity.kind === 'potions';
 
-// The bag's places taken: one an item, and the herbs by the stack.
-export const bagPlaces = (player) => player.items.filter((item) => !item.equippedSlot).length + herbStacks(herbsOf(player.row), content);
+// The bag's places taken: one an item, and the herbs and the potions by the
+// stack.
+export const bagPlaces = (player) =>
+  player.items.filter((item) => !item.equippedSlot).length + bagStacks(herbsOf(player.row), content) + bagStacks(potionsOf(player.row), content);
 
 // What adds a gathered store to the character: gold has its own column, the
 // other resources sit in the JSON of `resources`.
@@ -265,10 +268,11 @@ export async function requireIdlePlayer(context) {
   const found = await requirePlayer(context);
   const activity = found.player.activity;
   if (activity) {
-    const herbs = activity.kind === 'herbs' && content.professionTexts;
+    // A profession's work says so in its own words.
+    const texts = { herbs: content.professionTexts, potions: content.brewing?.texts }[activity.kind];
     throw activity.ends_at <= context.now
-      ? new ApiError(409, 'claim_first', herbs ? herbs.claimFirst[0] : 'Wyprawa się skończyła. Najpierw odbierz raport.')
-      : new ApiError(409, 'busy', herbs ? herbs.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
+      ? new ApiError(409, 'claim_first', texts ? texts.claimFirst[0] : 'Wyprawa się skończyła. Najpierw odbierz raport.')
+      : new ApiError(409, 'busy', texts ? texts.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
   }
   return found;
 }
@@ -492,11 +496,16 @@ function craftingView(row, levels, now) {
 
 // Where an activity takes place. region_id holds the inner region, or a whole
 // region for an activity started before inner regions; a gathering, its
-// place and the herbs chosen.
+// place and the herbs chosen; a brewing, its place, the potion and how many.
 function activityPlace(activity, level) {
   if (activity.kind === 'herbs') {
     const herbs = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content.herbsById[id]);
     return { placeName: content.gathering.place.name, herbs: herbs.map((id) => ({ id, name: content.herbsById[id].name })) };
+  }
+  if (activity.kind === 'potions') {
+    const { recipe, count } = JSON.parse(activity.options ?? '{}');
+    const potion = content.potionsById[recipe];
+    return { placeName: content.brewing.place.name, potion: potion ? { id: potion.id, name: potion.name } : null, count: count ?? 0 };
   }
   const area = areaFor(activity.region_id, level, content);
   return { areaId: area.id, areaName: area.name, regionId: area.regionId, regionName: area.regionName };
@@ -597,8 +606,9 @@ export function characterView(player, now) {
       }),
     ),
     bag: items.filter((item) => !item.equippedSlot).reverse().map(toItem),
-    // The herbs in the bag, which take its places by the stack.
+    // The herbs and the potions in the bag, which take its places by the stack.
     herbs: bagHerbs(row, sellBonus),
+    potions: bagPotions(row, sellBonus),
     herbStack: content.professionRules.stack,
     bagUsed: bagPlaces(player),
     bagCapacity: bagCapacity(levels, content),

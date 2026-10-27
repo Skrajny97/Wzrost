@@ -8,6 +8,7 @@ import { beforeEach, describe, test } from 'node:test';
 import {
   addQuestProgress,
   applyWork,
+  bagStacks,
   computeStats,
   drawQuests,
   expectedHerbs,
@@ -15,13 +16,12 @@ import {
   gatheringMinutes,
   gatheringReport,
   herbSlots,
-  herbStacks,
   knownHerbs,
   notificationsDue,
   professionStats,
   professionXpToNext,
   questText,
-  storeHerbs,
+  storeStacks,
   workProfession,
   workXp,
   xpPerHour,
@@ -106,15 +106,15 @@ describe('herbalism in the engine', () => {
   });
 
   test('herbs stack 20 to a place: a full bag keeps what fits and loses the rest', () => {
-    assert.equal(herbStacks({}, content), 0);
-    assert.equal(herbStacks({ comfrey: 20, mugwort: 21 }, content), 3);
+    assert.equal(bagStacks({}, content), 0);
+    assert.equal(bagStacks({ comfrey: 20, mugwort: 21 }, content), 3);
     // 17 Żywokost leave room for 3 in their stack, and one free place holds 20 more.
-    const { herbs, stored, lost } = storeHerbs({ comfrey: 17 }, { comfrey: 10, mugwort: 25 }, 1, content);
+    const { after: herbs, stored, lost } = storeStacks({ comfrey: 17 }, { comfrey: 10, mugwort: 25 }, 1, content);
     assert.deepEqual(herbs, { comfrey: 27 });
     assert.deepEqual(stored, { comfrey: 10 });
     assert.deepEqual(lost, { mugwort: 25 });
-    assert.deepEqual(storeHerbs({}, { comfrey: 45 }, 2, content), { herbs: { comfrey: 40 }, stored: { comfrey: 40 }, lost: { comfrey: 5 } });
-    assert.deepEqual(storeHerbs({ comfrey: 20 }, { comfrey: 3 }, 0, content).lost, { comfrey: 3 });
+    assert.deepEqual(storeStacks({}, { comfrey: 45 }, 2, content), { after: { comfrey: 40 }, stored: { comfrey: 40 }, lost: { comfrey: 5 } });
+    assert.deepEqual(storeStacks({ comfrey: 20 }, { comfrey: 3 }, 0, content).lost, { comfrey: 3 });
   });
 
   test('work gives the character a small share of the XP of exploring, and a level heals', () => {
@@ -228,7 +228,7 @@ describe('herbalism through the API', () => {
     const { list, gathering } = data.character.professions;
     assert.deepEqual(list.map((profession) => [profession.name, profession.level, profession.soon]), [
       ['Zielarstwo', 1, false],
-      ['Alchemia', 1, true],
+      ['Alchemia', 1, false],
       ['Rzemieślnictwo', 1, true],
     ]);
     assert.equal(gathering.place.name, 'Systemowy Zagajnik');
