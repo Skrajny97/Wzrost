@@ -1,0 +1,13 @@
+{
+  "id": "brew",
+  "payload": {
+    "text": "a small alchemist's cauldron gently bubbling with thick liquid, soft popping bubbles, ending with a light clink of a glass vial, close up, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/brew-20261027T1111-0.mp3",
+    "audio/drafts/effects/brew-20261027T1111-1.mp3"
+  ],
+  "credits": 80
+}
