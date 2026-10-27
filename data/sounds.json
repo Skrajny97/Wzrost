@@ -135,6 +135,7 @@
     "skill-backstab": { "files": ["audio/sfx/skill-backstab-1.mp3"], "gain": 0.7 },
     "skill-poisoned-blade": { "files": ["audio/sfx/skill-poisoned-blade-1.mp3"], "gain": 0.7 },
     "skill-shadow-dance": { "files": ["audio/sfx/skill-shadow-dance-1.mp3"], "gain": 0.7 },
-    "brew": { "files": ["audio/sfx/brew-1.mp3"], "gain": 0.6 }
+    "brew": { "files": ["audio/sfx/brew-1.mp3"], "gain": 0.6 },
+    "potion": { "files": ["audio/sfx/potion-1.mp3"], "gain": 0.7 }
   }
 }

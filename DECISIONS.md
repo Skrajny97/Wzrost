@@ -1944,7 +1944,7 @@ Brakujące szczegóły kroku 2 rozstrzygnięte najprościej. Wszystko działa ty
 6. **„Wypij” poza wyprawą.** Mikstura leczenia leczy od razu 20% maks. HP, a odpoczynek liczy się dalej od nowego HP. Przy pełnym HP nie da się jej wypić. Mikstury many nie da się wypić z plecaka, bo działa tylko w walce.
 7. **Zagrożenie** (A5). Szacunek liczy zabrane mikstury leczenia z ich progiem. Mikstury many i szybkości go nie zmieniają.
 8. **Raport.** W walce widać wypicie („Mira wypija Mniejszą miksturę leczenia: +52 HP.”), a w podsumowaniu zużyte mikstury i liczbę walk z miksturą szybkości.
-9. **Dźwięki.** Bulgotanie autor wybrał w wersji 2. Gra raz, gdy otwiera się raport z warzenia. Łyk w walce i po „Wypij” nie brzmiał jak łyk, więc są 4 nowe wersje z prostszych opisów. Opis dźwięku może teraz sam ustawić, jak wiernie ElevenLabs ma go trzymać (`influence` w `audio/prompts.json`).
+9. **Dźwięki.** Bulgotanie autor wybrał w wersji 2. Gra raz, gdy otwiera się raport z warzenia. Łyk w walce i po „Wypij” za pierwszym razem nie brzmiał jak łyk. Z 4 nowych wersji, nagranych z prostszych opisów, autor wybrał trzecią: jedno przełknięcie. Opis dźwięku może teraz sam ustawić, jak wiernie ElevenLabs ma go trzymać (`influence` w `audio/prompts.json`).
 10. **Migracja 0035.** Kolumna `buffs` (migracja 0035) jest tylko na gałęzi roboczej, jak 0033, więc kolejna migracja w `main` ma numer 0036.
 
 
