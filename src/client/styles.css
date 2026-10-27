@@ -6304,3 +6304,29 @@ button.herb-tile[aria-pressed='true'] {
 .calm .scene * {
   animation: none !important;
 }
+
+/* Skin tones (ui.js skinSwatches): a dot of each tone, the chosen one ringed. */
+.skin-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.skin-swatch {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.skin-swatch[aria-checked='true'] {
+  border-color: var(--bg);
+  box-shadow: 0 0 0 2px var(--gold);
+}
+.skin-swatch:focus-visible {
+  outline: 2px solid var(--system);
+  outline-offset: 3px;
+}
+.status-row--skin {
+  align-items: center;
+}

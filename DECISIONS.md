@@ -2049,3 +2049,11 @@ Trzecia część wprowadzenia, po Umiejętnościach (W3, W4). Kwestie narratora 
 5. **Animacje wyłączone** w Ustawieniach zatrzymują sceny na pierwszej klatce i wyłączają rzadkie zdarzenia.
 6. **Minuty GitHub Actions** (autor ustawił budżety: Actions 10 $, reszta 5 $; „mam nadzieje ze bedziesz sie pilnował”). Zmiana samych notatek (`*.md`) nie uruchamia testów ani wdrożenia. Gałąź robocza na tym samym commicie co `main` nie powtarza testów. Kod idzie na GitHuba raz na etap.
 7. **Na później: kolor skóry postaci** (autor: „Czy istnieje szansa dodania koloru skóry postaci która kierujemy? od jasnej po ciemną i ewentualnie żółte barwy? na poziomie tworzenia postaci i z pozycji zębatki?”). Najtaniej przemalować piksele skóry na gotowych portretach na kilka odcieni, bez nowych grafik. Wybór przy tworzeniu postaci i w Ustawieniach. Przed wdrożeniem próbki do oceny autora.
+
+## Kolor skóry postaci (27.10.2026)
+
+1. **Wybór** (autor: „Najpierw kolor skóry, potem Awatar i deploy”). Przy tworzeniu postaci, pod „Wygląd”, stoi rząd kropek „Kolor skóry”, a popiersia klas od razu pokazują wybrany odcień. W Ustawieniach (zębatka) ten sam rząd zmienia odcień w każdej chwili, za darmo, jak wygląd. Odcień widać na portrecie postaci i w walkach. Raporty sprzed zmiany grają z odcieniem domyślnym.
+2. **Sześć odcieni** w `data/skins.json`: Blada, Jasna (portret taki, jak narysowano, domyślny), Śniada, Brązowa, Ciemna i Złocista. Nazwy to szkic do poprawy przez autora. Stare postacie mają odcień Jasna.
+3. **Bez nowych grafik.** `tools/skin-tones.py` przemalowuje skórę na gotowych portretach: bierze barwy twarzy i szuka ich tylko w obszarach głowy, rąk i stóp każdego portretu, bo te same barwy wracają na skórzanych butach i łatach. Każda barwa skóry trzyma swoje miejsce między cieniem a światłem, na rampie odcienia. Pliki `<klasa>-<wygląd>-<odcień>.png` leżą obok portretów, a walidator pilnuje, żeby żadnego nie brakowało.
+4. **Migracja 0036** dodaje kolumnę `skin`. Pusta oznacza odcień domyślny.
+

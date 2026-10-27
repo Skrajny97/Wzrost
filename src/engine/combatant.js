@@ -23,6 +23,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     isPlayer: true,
     classId: character.classId,
     appearance: character.appearance,
+    skin: character.skin,
     family: 'player',
     elite: false,
     position: character.position,
@@ -149,6 +150,7 @@ export function combatantView(unit, opponentLevel, content) {
     classId: unit.classId,
     // A character's look: its portrait and voice in the playback.
     appearance: unit.appearance,
+    skin: unit.skin,
     monsterId: unit.monsterId,
     elite: unit.elite,
     champion: unit.champion ?? false,

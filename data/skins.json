@@ -1,0 +1,12 @@
+{
+  "$comment": "Skin tones of the character's portrait, chosen when the character is made and later in Ustawienia. The tone without a ramp is the portrait as drawn; the others recolour its skin from shadow to light (tools/skin-tones.py makes the files). swatch: the colour of the tone's dot on the screen.",
+  "default": "light",
+  "skins": [
+    { "id": "pale", "name": "Blada", "swatch": "#ecc8b4", "ramp": ["#c49684", "#ecc8b4", "#fce4d6"] },
+    { "id": "light", "name": "Jasna", "swatch": "#e2b090" },
+    { "id": "tan", "name": "Śniada", "swatch": "#b98a62", "ramp": ["#8a5a3a", "#b98a62", "#d9ad84"] },
+    { "id": "brown", "name": "Brązowa", "swatch": "#a06c48", "ramp": ["#70462c", "#a06c48", "#c49068"] },
+    { "id": "dark", "name": "Ciemna", "swatch": "#684228", "ramp": ["#3e261a", "#684228", "#8e6244"] },
+    { "id": "golden", "name": "Złocista", "swatch": "#deb876", "ramp": ["#b08848", "#deb876", "#f2d6a0"] }
+  ]
+}

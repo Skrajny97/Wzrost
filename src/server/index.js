@@ -8,7 +8,7 @@ import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewin
 import { buyParts, cancelBuilding, collectProduction, startBuilding, tradeAtFire } from './camp.js';
 import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
-import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, spendPoints } from './characters.js';
+import { autoPoints, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, setSkin, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
@@ -47,6 +47,7 @@ const routes = [
   ['POST', '/api/character/points/auto', autoPoints],
   ['POST', '/api/character/points/reset', resetPoints],
   ['POST', '/api/character/appearance', setAppearance],
+  ['POST', '/api/character/skin', setSkin],
   ['POST', '/api/skills/learn', learnSkill],
   ['POST', '/api/skills/raise', raiseSkill],
   ['POST', '/api/items/:id/equip', equipItem],

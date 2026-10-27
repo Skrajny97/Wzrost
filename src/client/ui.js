@@ -4,6 +4,7 @@
 import { $, append, clear, h, icon } from './dom.js';
 import { motionOn, setMotion } from './motion.js';
 import { narratorVoiceOn, playSound, setNarratorVoice } from './sound.js';
+import { state } from './state.js';
 
 // A message from the System: the cold, ice-blue panel with the [ SYSTEM ] header.
 export function systemPanel(...lines) {
@@ -126,6 +127,30 @@ export function toast(message) {
 }
 
 // Runs an action from a button: disables it meanwhile and shows errors as a toast.
+// The skin tones as dots to choose from (data/skins.json), `current` marked.
+// A tap marks another once `pick` resolves true (its id and the dot).
+export function skinSwatches(current, pick) {
+  const tones = state.content.skins.tones;
+  const dots = tones.map((tone) =>
+    h('button', {
+      type: 'button',
+      class: 'skin-swatch',
+      role: 'radio',
+      'aria-checked': String(tone.id === current),
+      'aria-label': tone.name,
+      title: tone.name,
+      dataset: { skin: tone.id },
+      onClick: async (event) => {
+        const dot = event.currentTarget;
+        if (dot.getAttribute('aria-checked') === 'true' || !(await pick(tone.id, dot))) return;
+        for (const other of dots) other.setAttribute('aria-checked', String(other.dataset.skin === tone.id));
+      },
+    }),
+  );
+  for (const [index, dot] of dots.entries()) dot.style.backgroundColor = tones[index].swatch;
+  return dots;
+}
+
 export async function withButton(button, action) {
   if (button.disabled) return;
   button.disabled = true;

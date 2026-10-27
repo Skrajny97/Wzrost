@@ -87,6 +87,10 @@ export function buildContent(raw) {
     partsByRarity: Object.fromEntries(raw.materials.parts.map((part) => [part.rarity, part])),
     appearances: raw.appearances ?? [],
     appearancesById: byId(raw.appearances ?? []),
+    // The skin tones of the portrait and the one a new character starts with.
+    skins: raw.skins?.skins ?? [],
+    skinsById: byId(raw.skins?.skins ?? []),
+    defaultSkin: raw.skins?.default,
     // The narrator's daily and weekly quests (quests.js).
     quests: raw.quests,
     // The skills the classes choose from (skills.js).

@@ -317,6 +317,7 @@ export function engineCharacter(row) {
     points: JSON.parse(row.points),
     position: row.position,
     appearance: row.appearance,
+    skin: row.skin ?? content.defaultSkin,
     // The skills learned and their levels (skills.js).
     skills: JSON.parse(row.skills ?? '{}'),
     // The professions' levels and XP (professions.js).
@@ -588,8 +589,10 @@ export function characterView(player, now) {
     name: row.name,
     classId: row.class_id,
     className: content.classesById[row.class_id].name,
-    // The look: the portrait and the voice in fights.
+    // The look: the portrait and the voice in fights, and the portrait's
+    // skin tone.
     appearance: row.appearance,
+    skin: row.skin ?? content.defaultSkin,
     level: row.level,
     xp: row.xp,
     xpToNext: xpToNext(row.level, content),
@@ -702,6 +705,7 @@ export async function createCharacter(context) {
   const cls = typeof body.classId === 'string' ? content.classesById[body.classId] : undefined;
   if (!cls) throw new ApiError(400, 'invalid_class', 'Wybierz klasę postaci.');
   const appearance = validAppearance(body.appearance);
+  const skin = body.skin === undefined ? content.defaultSkin : validSkin(body.skin);
 
   const db = context.env.DB;
   const exists = () => new ApiError(409, 'character_exists', 'Masz już postać.');
@@ -717,11 +721,11 @@ export async function createCharacter(context) {
       // confirmed (email.js), come with it.
       db
         .prepare(
-          `INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, position, hp, hp_at, created_at, gold, resources, time_points, time_points_at, tutorial, system_points)
-           VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]', (SELECT system_points_waiting FROM users WHERE id = ?))`,
+          `INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, skin, position, hp, hp_at, created_at, gold, resources, time_points, time_points_at, tutorial, system_points)
+           VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]', (SELECT system_points_waiting FROM users WHERE id = ?))`,
         )
         .bind(
-          session.userId, name, nameKey(name), cls.id, appearance, cls.position, hp, now, now,
+          session.userId, name, nameKey(name), cls.id, appearance, skin, cls.position, hp, now, now,
           supply.gold, JSON.stringify(supply.resources), content.balance.timePoints.start, now, session.userId,
         ),
       db.prepare('UPDATE users SET system_points_waiting = 0 WHERE id = ?').bind(session.userId),
@@ -750,6 +754,21 @@ export async function setAppearance(context) {
   const appearance = validAppearance(body.appearance);
   await context.env.DB.prepare('UPDATE characters SET appearance = ?, version = version + 1 WHERE id = ?').bind(appearance, player.row.id).run();
   const updated = { ...player, row: { ...player.row, appearance, version: player.row.version + 1 } };
+  return json({ character: characterView(updated, context.now) });
+}
+
+const validSkin = (id) => {
+  if (typeof id !== 'string' || !content.skinsById[id]) throw new ApiError(400, 'invalid_skin', 'Wybierz kolor skóry.');
+  return id;
+};
+
+// The skin tone changes the portrait only, so it too can change at any time.
+export async function setSkin(context) {
+  const { player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  const skin = validSkin(body.skin);
+  await context.env.DB.prepare('UPDATE characters SET skin = ?, version = version + 1 WHERE id = ?').bind(skin, player.row.id).run();
+  const updated = { ...player, row: { ...player.row, skin, version: player.row.version + 1 } };
   return json({ character: characterView(updated, context.now) });
 }
 

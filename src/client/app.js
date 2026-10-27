@@ -29,7 +29,7 @@ import { narrate } from './narrator.js';
 import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
-import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, toast, voiceSwitch, withButton } from './ui.js';
+import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, skinSwatches, toast, voiceSwitch, withButton } from './ui.js';
 
 const views = {
   loading: $('#view-loading'),
@@ -424,6 +424,24 @@ function lookRow() {
   );
 }
 
+// The skin tone of the portrait: a free change, like the look.
+function skinRow() {
+  const dots = skinSwatches(state.character.skin, async (skin, dot) => {
+    let done = false;
+    await withButton(dot, async () => {
+      await call('POST', '/api/character/skin', { skin });
+      done = true;
+    });
+    return done;
+  });
+  return h(
+    'div',
+    { class: 'status-row status-row--skin' },
+    h('dt', { id: 'skin-label', text: 'Kolor skóry' }),
+    h('dd', {}, h('div', { class: 'skin-swatches', role: 'radiogroup', 'aria-labelledby': 'skin-label' }, dots)),
+  );
+}
+
 // Google sign-in for this account: linked, or a button that links it.
 function googleRow() {
   if (!state.user.google && (!state.googleLogin || googleHint())) return null;
@@ -491,6 +509,7 @@ function openSettings() {
       emailRow(),
       h('div', { class: 'status-row' }, h('dt', { text: 'Postać' }), h('dd', { text: state.character.name })),
       lookRow(),
+      skinRow(),
       googleRow(),
       volumeRow('music-volume', 'Muzyka', musicVolume(), setMusicVolume),
       volumeRow('effects-volume', 'Efekty dźwiękowe', effectsVolume(), setEffectsVolume, () => playSound('system')),

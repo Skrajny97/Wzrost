@@ -4,6 +4,7 @@
 // yet keeps its line icon or vector art.
 
 import { h } from './dom.js';
+import { state } from './state.js';
 
 // The ids with a sprite file, and the size it was drawn at.
 export const SPRITES = {
@@ -149,13 +150,17 @@ export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/plac
 
 // A class's figure for a look. `bust` shows the head and shoulders at the
 // image's own size, cut by the box it sits in (the arena, the class cards).
-export function portraitSprite(classId, appearance, { bust = false } = {}) {
+export function portraitSprite(classId, appearance, { bust = false, skin } = {}) {
   const id = `${classId}-${appearance}`;
   if (!available.portraits.has(id)) return null;
+  // A skin tone other than the portrait as drawn has its own recoloured file
+  // (data/skins.json, tools/skin-tones.py).
+  const tone = state.content?.skins?.tones.find((candidate) => candidate.id === skin);
+  const file = tone && !tone.drawn ? `${id}-${tone.id}` : id;
   const { width, height, faces } = SPRITES.portraits;
   const off = bust ? (faces[id] ?? width / 2) - width / 2 : 0;
   return h('img', {
-    src: `/art/portraits/${id}.png`,
+    src: `/art/portraits/${file}.png`,
     alt: '',
     width,
     height,

@@ -78,6 +78,27 @@ describe('character creation', () => {
     assert.equal((await call('POST', '/api/character/appearance', { cookie, body: { appearance: 'troll' } })).status, 400);
   });
 
+  test('a character has a skin tone, chosen at the start and changed at any time', async () => {
+    const wrong = await call('POST', '/api/character', { cookie, body: { name: 'Mira', classId: 'archer', appearance: 'female', skin: 'green' } });
+    assert.equal(wrong.status, 400);
+    assert.equal(wrong.data.error.code, 'invalid_skin');
+    const made = await call('POST', '/api/character', { cookie, body: { name: 'Mira', classId: 'archer', appearance: 'female', skin: 'dark' } });
+    assert.equal(made.status, 201);
+    assert.equal(made.data.character.skin, 'dark');
+    const changed = await call('POST', '/api/character/skin', { cookie, body: { skin: 'golden' } });
+    assert.equal(changed.status, 200);
+    assert.equal(changed.data.character.skin, 'golden');
+    assert.equal((await call('POST', '/api/character/skin', { cookie, body: { skin: 'green' } })).status, 400);
+    // The tones reach the screen with their dots; one is the portrait as drawn.
+    const { skins } = (await call('GET', '/api/content')).data;
+    assert.ok(skins.tones.some((tone) => tone.id === skins.default));
+    assert.equal(skins.tones.filter((tone) => tone.drawn).length, 1);
+  });
+
+  test('without a chosen skin tone the character starts in the default one', async () => {
+    assert.equal((await newCharacter(cookie, 'archer', 'Mira', 'male')).data.character.skin, 'light');
+  });
+
   test('creates a level 1 character with full HP and no items', async () => {
     const { status, data } = await newCharacter(cookie, 'warrior', '  Mira   z Boru ');
     assert.equal(status, 201);

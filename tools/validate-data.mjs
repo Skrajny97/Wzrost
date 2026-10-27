@@ -11,7 +11,7 @@ const CLIENT_DIR = new URL('../src/client/', import.meta.url);
 export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
-  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations',
+  'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'skills', 'professions', 'settlement', 'dungeons', 'core'];
@@ -430,6 +430,22 @@ function checkReferences(data) {
   const evolutions = data.balance.progression.classEvolutionLevels;
   if (evolutions.some((level, i) => i > 0 && level <= evolutions[i - 1])) errors.push('balance.json: classEvolutionLevels musi rosnąć');
   if (evolutions.at(-1) > data.balance.progression.maxLevel) errors.push('balance.json: ewolucja klasy powyżej maxLevel');
+
+  // Skin tones: the default among them, one tone that is the portrait as
+  // drawn, and a recoloured file for every portrait in every other tone.
+  const tones = uniqueIds(errors, 'skins', data.skins.skins);
+  if (!tones.has(data.skins.default)) errors.push(`skins.json: nieznany odcień domyślny ${data.skins.default}`);
+  if (data.skins.skins.filter((tone) => !tone.ramp).length !== 1) errors.push('skins.json: dokładnie jeden odcień bez ramp (portret taki, jak narysowany)');
+  for (const tone of data.skins.skins.filter((candidate) => candidate.ramp)) {
+    for (const cls of data.classes) {
+      for (const look of data.appearances) {
+        const file = `art/portraits/${cls.id}-${look.id}-${tone.id}.png`;
+        if (existsSync(new URL(`art/portraits/${cls.id}-${look.id}.png`, CLIENT_DIR)) && !existsSync(new URL(file, CLIENT_DIR))) {
+          errors.push(`skins.json: brak pliku src/client/${file} (python3 tools/skin-tones.py)`);
+        }
+      }
+    }
+  }
 
   // Waiting scenes: files that exist, a scene for each profession, the
   // lands of regions, and the light of the day from midnight on.

@@ -19,6 +19,7 @@ import resources from '../../data/resources.json' with { type: 'json' };
 import buildings from '../../data/buildings.json' with { type: 'json' };
 import camp from '../../data/camp.json' with { type: 'json' };
 import appearances from '../../data/appearances.json' with { type: 'json' };
+import skins from '../../data/skins.json' with { type: 'json' };
 import animations from '../../data/animations.json' with { type: 'json' };
 import music from '../../data/music.json' with { type: 'json' };
 import sounds from '../../data/sounds.json' with { type: 'json' };
@@ -46,6 +47,7 @@ export const content = buildContent({
   buildings,
   camp,
   appearances,
+  skins,
   materials,
   quests,
   skills,
@@ -125,6 +127,9 @@ export function publicContent() {
     })),
     parts: content.parts.map(({ id, name, rarity, description }) => ({ id, name, rarity, description })),
     appearances: content.appearances,
+    // The skin tones: `drawn` is the portrait as drawn, the others have their
+    // own recoloured files (art.js).
+    skins: { default: content.defaultSkin, tones: content.skins.map(({ id, name, swatch, ramp }) => ({ id, name, swatch, drawn: !ramp })) },
     freeResetMaxLevel: content.balance.progression.freeResetMaxLevel,
     // Levels a character may have above a place's strongest creatures
     // before their XP drops: then the Walka screen warns of an easy place.

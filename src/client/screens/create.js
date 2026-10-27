@@ -6,7 +6,7 @@ import { classArt } from '../class-art.js';
 import { $, fill, h, icon } from '../dom.js';
 import { CLASS_ICONS } from '../icons.js';
 import { call, state } from '../state.js';
-import { systemPanel, voiceSwitch } from '../ui.js';
+import { skinSwatches, systemPanel, voiceSwitch } from '../ui.js';
 
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 const START_BADGES = { gentle: 'łagodniejszy start', hard: 'trudniejszy start' };
@@ -14,6 +14,7 @@ const START_BADGES = { gentle: 'łagodniejszy start', hard: 'trudniejszy start' 
 export function renderCreate(container, onCreated) {
   let selected = null;
   let look = null;
+  let skin = state.content.skins.default;
   const error = h('p', { class: 'form-error', role: 'alert', hidden: true });
   const nameInput = h('input', {
     id: 'character-name',
@@ -57,7 +58,7 @@ export function renderCreate(container, onCreated) {
   // by side before the choice; the vector bust only without portraits.
   function classIcons(classId) {
     const looks = look ? [look] : state.content.appearances.map((appearance) => appearance.id);
-    const busts = looks.map((id) => portraitSprite(classId, id, { bust: true })).filter(Boolean);
+    const busts = looks.map((id) => portraitSprite(classId, id, { bust: true, skin })).filter(Boolean);
     const art = busts.length > 0 ? busts : [classArt(classId) ?? icon(CLASS_ICONS[classId] ?? 'person', { size: 26 })];
     return art.map((picture) => h('span', { class: 'class-icon' }, picture));
   }
@@ -84,6 +85,13 @@ export function renderCreate(container, onCreated) {
     }),
   );
 
+  // The skin tone: a dot of each tone; the class cards show the busts in it.
+  const tones = skinSwatches(skin, (id) => {
+    skin = id;
+    for (const card of cards) fill($('.class-icons', card), classIcons(card.dataset.classId));
+    return true;
+  });
+
   const form = h(
     'form',
     { class: 'form', novalidate: true },
@@ -92,6 +100,12 @@ export function renderCreate(container, onCreated) {
       { class: 'field' },
       h('span', { class: 'field-label', id: 'look-label', text: 'Wygląd' }),
       h('div', { class: 'segmented', role: 'group', 'aria-labelledby': 'look-label' }, looks),
+    ),
+    h(
+      'div',
+      { class: 'field' },
+      h('span', { class: 'field-label', id: 'skin-label', text: 'Kolor skóry' }),
+      h('div', { class: 'skin-swatches', role: 'radiogroup', 'aria-labelledby': 'skin-label' }, tones),
     ),
     h(
       'div',
@@ -129,7 +143,7 @@ export function renderCreate(container, onCreated) {
     submit.disabled = true;
     submit.textContent = 'Tworzenie postaci…';
     try {
-      await call('POST', '/api/character', { name: nameInput.value, classId: selected, appearance: look });
+      await call('POST', '/api/character', { name: nameInput.value, classId: selected, appearance: look, skin });
       onCreated();
     } catch (failure) {
       error.textContent = failure.message;
