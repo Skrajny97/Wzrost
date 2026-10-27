@@ -1,0 +1,18 @@
+{
+  "id": "camp-craft-table",
+  "payload": {
+    "text": "Przy Stole rozbiórki przerobisz materiały ze stworów na części. Możesz tam też rozebrać zbędne przedmioty. Części przydadzą się, gdy poznasz profesje. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/camp-craft-table-20261027T1301-0.mp3",
+    "audio/drafts/narration/camp-craft-table-20261027T1301-1.mp3",
+    "audio/drafts/narration/camp-craft-table-20261027T1301-2.mp3"
+  ],
+  "credits": 477
+}
