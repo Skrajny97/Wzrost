@@ -67,6 +67,10 @@ const campDone = (hash, read) => read.has('camp') && (campStarted() || !affordab
 // which the camera takes in whole even if it has to draw back, `unfold`
 // opens what folds there first, `delay` lets the screen be seen first, and
 // `browse` has the fights' tabs take turns while the line is told.
+// `sweep` has the camera ride, at the screen's own size, from place to
+// place in their order, each as the line tells its name (the text of the
+// element `sweep` names in it), and back to the first after the line; the
+// light rides along on one place at a time, the narrator above it.
 // `survey` has the camera take in the whole of a place for a moment before
 // the light, with nothing lit: the camp's board before its plots. A `late`
 // line is told also after the ending, once, to a character that finished
@@ -138,7 +142,7 @@ const BEATS = {
   'skills-lead-character': { place: '.nav-item[href="#/postac"]', when: (hash, read) => skillsTour(hash, read) && !hash.startsWith('#/postac') },
   'skills-lead': { place: '.nav-item[href="#/postac/umiejetnosci"]', when: (hash, read) => skillsTour(hash, read) && hash.startsWith('#/postac') && !onSkills(hash) },
   'skills-intro': { place: mark('skills-intro'), when: skillsHere },
-  'skills-paths': { place: mark('skills-path'), whole: true, when: skillsHere },
+  'skills-paths': { place: mark('skills-path'), sweep: '.skill-path-name', when: skillsHere },
   'skills-card': { when: skillsHere },
   'skills-choice': { when: skillsHere },
   'skills-points': { place: mark('skills-points'), when: skillsHere },
@@ -375,8 +379,8 @@ function told(line) {
 const words = (line) => told(line).text.map((text) => text.replaceAll('{points}', String(state.content.tutorial.startTimePoints)));
 
 // The line's recording, over quieter music. The next line's recording is
-// fetched meanwhile, so it starts on time.
-function speak(line) {
+// fetched meanwhile, so it starts on time. `onStart` learns how long it is.
+function speak(line, onStart) {
   if (!narratorVoiceOn()) return;
   const lines = state.content.tutorial.lines;
   const following = lines
@@ -387,7 +391,7 @@ function speak(line) {
   const { voice } = told(line);
   if (!voice) return;
   duckMusic(true);
-  playNarration(voice, { onEnd: () => duckMusic(false) });
+  playNarration(voice, { onStart, onEnd: () => duckMusic(false) });
 }
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -629,7 +633,7 @@ function startLight(line) {
   const skip = passing && h('button', { type: 'button', class: 'guide-skip', text: passing.label, onClick: passing.pass });
   const root = h('div', { class: 'guide' }, shade, rings, note.element, skip);
   document.body.append(root);
-  light = { line, root, note, frame: 0, closing: false, nudge };
+  light = { line, root, note, frame: 0, closing: false, nudge, sweep: beat.sweep ? { at: 0, move: null } : null };
   hold();
   const corners = skip && skipCorners(skip);
   // The camera goes to the place, framing it with room for the narrator
@@ -639,7 +643,8 @@ function startLight(line) {
   const before = lastSpot?.hash === place && performance.now() - lastSpot.at < 3000 && !calm() ? lastSpot.line : null;
   lastSpot = null;
   if (beat.unfold) for (const element of places(line)) element.dispatchEvent(new Event('unfold'));
-  const shot = aim(places(line), { zoom: !beat.free, travel: Boolean(before), keep: beat.above ? 0 : note.height() + 20, whole: beat.whole });
+  // A sweep starts on the first place.
+  const shot = aim(beat.sweep ? places(line).slice(0, 1) : places(line), { zoom: !beat.free && !beat.sweep, travel: Boolean(before), keep: beat.above ? 0 : note.height() + 20, above: Boolean(beat.sweep), whole: beat.whole });
   light.slide = before && { from: before, start: shot.start, duration: Math.max(shot.duration, 700) };
   note.element.classList.add('guide-note--waiting');
   Promise.all([shot.done, wait(light.slide?.duration ?? 0)]).then(async () => {
@@ -713,8 +718,24 @@ function startLight(line) {
     const seen = found.filter(inView);
     const left = slide && done < 1 ? places(slide.from).map(padded) : [];
     const gliding = left.length > 0;
-    // A whole light is one ring around all its places.
-    const ringed = (elements) => (beat.whole ? [union(elements.map(padded))] : elements.map(padded));
+    // A whole light is one ring around all its places. A sweeping one stands
+    // on one place at a time and rides on with the camera (see `sweep`).
+    const sweep = light.sweep;
+    if (sweep?.shares) {
+      const next = Math.min(found.length - 1, sweepTarget(sweep, performance.now()));
+      if (next !== sweep.at) {
+        const shot = aim([found[next]], { zoom: false, keep: note.height() + 20, above: true, slow: SWEEP.ride });
+        sweep.move = { from: sweep.at, start: shot.start, duration: shot.duration };
+        sweep.at = next;
+      }
+    }
+    const swept = () => {
+      const here = padded(found[Math.min(sweep.at, found.length - 1)]);
+      const { move } = sweep;
+      const along = move && move.duration > 0 ? Math.min(1, (performance.now() - move.start) / move.duration) : 1;
+      return along < 1 ? between(padded(found[Math.min(move.from, found.length - 1)]), here, ease(along)) : here;
+    };
+    const ringed = (elements) => (beat.whole ? [union(elements.map(padded))] : sweep ? [swept()] : elements.map(padded));
     const boxes = gliding
       ? ringed(found).map((box) => fit(between(union(left), box, ease(done))))
       : ringed(seen.length > 0 ? seen : found.slice(0, 1)).map(fit);
@@ -735,8 +756,9 @@ function startLight(line) {
       });
     });
     // The narrator stands below the places, or above them when there is more
-    // room there; it never leaves the screen.
-    const anchor = beat.above
+    // room there or the beat wants it there; it never leaves the screen.
+    const above = beat.above || Boolean(sweep);
+    const anchor = above
       ? boxes[0]
       : boxes.reduce((all, box) => ({
           top: Math.min(all.top, box.top),
@@ -747,7 +769,7 @@ function startLight(line) {
     const tall = note.height();
     const gap = 14;
     const roomBelow = height - anchor.bottom - gap;
-    const underneath = !beat.above && (roomBelow >= tall || roomBelow >= anchor.top - gap);
+    const underneath = !above && (roomBelow >= tall || roomBelow >= anchor.top - gap);
     const element = note.element;
     element.classList.toggle('guide-note--below', underneath);
     element.classList.toggle('guide-note--above', !underneath);
@@ -837,7 +859,8 @@ function scrollNote(line) {
     await unrolling;
     if (light?.line !== line || light.closing) return;
     $('.guide-next', sheet)?.focus({ preventScroll: true });
-    speak(line);
+    const sweep = light.sweep && startSweep(line);
+    speak(line, sweep && ((seconds) => Object.assign(sweep, { start: performance.now(), duration: seconds * 1000 })));
     if (BEATS[line.id].browse) browseFights(line);
   };
   // "Dalej": the parchment rolls up and the narrator steps away, then the
@@ -881,6 +904,38 @@ function browseFights(line) {
   };
   others.forEach((index, order) => setTimeout(() => turn(index), BROWSE.from + step * order));
   setTimeout(() => turn(key), BROWSE.back);
+}
+
+// A sweep (`sweep`) goes at the line's pace: that of its recording once it
+// plays, or as long as the words take to read without it. Each place has
+// its share of the line, where its name is told (without the name, its turn
+// in the order), and the camera sets off one slow ride before it.
+const SWEEP = { ride: 2000, letters: 11 };
+
+function startSweep(line) {
+  const text = words(line).join(' ');
+  let last = 0;
+  const shares = places(line).map((element, index, all) => {
+    const name = element.querySelector(BEATS[line.id].sweep)?.textContent;
+    const at = name ? text.indexOf(name) : -1;
+    last = Math.max(last, at >= 0 ? at / text.length : index / all.length);
+    return last;
+  });
+  return Object.assign(light.sweep, { shares, start: performance.now(), duration: (text.length / SWEEP.letters) * 1000 });
+}
+
+// The place the camera is at or on its way to: each from a ride before its
+// name is told (with the animations off, as it is told), and the first again
+// after the line.
+function sweepTarget(sweep, now) {
+  const time = now - sweep.start;
+  if (time >= sweep.duration) return 0;
+  const lead = calm() ? 0 : SWEEP.ride;
+  let at = 0;
+  sweep.shares.forEach((share, index) => {
+    if (index > 0 && time >= share * sweep.duration - lead) at = index;
+  });
+  return at;
 }
 
 function stopLight() {
