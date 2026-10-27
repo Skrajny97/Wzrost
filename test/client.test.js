@@ -119,7 +119,7 @@ test('every sprite on the list has its file at its size, and every class has its
     herbs: data('professions').herbs.map((herb) => herb.id),
     potions: data('professions').potions.map((potion) => potion.id),
     professions: data('professions').professions.map((profession) => profession.id),
-    places: [data('professions').gathering.place.id],
+    places: ['gathering', 'brewing', 'workshop'].map((work) => data('professions')[work].place.id),
   };
   for (const [kind, { size, width = size, height = size, fit = false, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);

@@ -107,7 +107,7 @@ export const SPRITES = {
   places: {
     width: 192,
     height: 96,
-    ids: ['system-grove'],
+    ids: ['system-grove', 'system-workshop'],
   },
 };
 

@@ -1951,7 +1951,7 @@ Brakujące szczegóły kroku 2 rozstrzygnięte najprościej. Wszystko działa ty
 ## Alchemia: wybory autora (27.10.2026)
 
 1. **Zdania raportu z warzenia** (A35). Zostają trzy: „W Pracowni bulgocze kocioł, a na półce przybywa fiolek.”, „Zioła oddają wywarowi wszystko, co mają najlepsze.” (poprawka autora) i „Błękitne linie Systemu mierzą każdą kroplę mikstury.”.
-2. **Grafika Mniejszej mikstury leczenia**: wersja 2. Mikstury many i szybkości to ta sama butelka z zawartością w innym kolorze: many niebieska, szybkości zielona, jaśniejsza od listka (autor: „będziemy to mieli ustandaryzowane”). Tło Pracowni przychodzi osobno.
+2. **Grafika Mniejszej mikstury leczenia**: wersja 2. Mikstury many i szybkości to ta sama butelka z zawartością w innym kolorze: many niebieska, szybkości zielona, jaśniejsza od listka (autor: „będziemy to mieli ustandaryzowane”). Tło Pracowni: wersja 2, z kamiennym łukiem i błękitnymi liniami Systemu na ścianie.
 3. **Wygląd postaci** (pytanie testujących o ekwipunek na portrecie). Zostaje sposób z Margonem: portret nie pokazuje zakładanych przedmiotów, a lepszy strój przychodzi z ewolucją klasy (autor: „trzymamy się wersji z Margonem”). O czymś więcej można pomyśleć, gdy gra będzie dobrze zarabiać.
 
 
