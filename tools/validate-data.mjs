@@ -493,8 +493,18 @@ function checkReferences(data) {
     // A card from the author is read by nobody.
     if (line.speaker === 'author' && (line.voice || line.female)) errors.push(`tutorial.json: ${line.id} jest od autora i nie ma nagrania ani wersji żeńskiej`);
     if (line.once && line.kind !== 'lead') errors.push(`tutorial.json: ${line.id} ma once, a to nie kwestia lead`);
-    for (const voice of [line.voice, line.female?.voice]) {
-      if (voice && !existsSync(new URL(voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${voice}`);
+    if (line.chapter && !data.tutorial.chapters[line.chapter]) errors.push(`tutorial.json: ${line.id} należy do nieznanej części "${line.chapter}"`);
+    // A line told per class has a text for every class, and only for them.
+    for (const id of classIds) {
+      if (line.classes && !line.classes[id]) errors.push(`tutorial.json: ${line.id} nie ma tekstu dla klasy ${id}`);
+    }
+    for (const id of Object.keys(line.classes ?? {})) {
+      if (!classIds.has(id)) errors.push(`tutorial.json: ${line.id} ma tekst dla nieznanej klasy "${id}"`);
+    }
+    for (const told of [line, ...Object.values(line.classes ?? {})]) {
+      for (const voice of [told.voice, told.female?.voice]) {
+        if (voice && !existsSync(new URL(voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${voice}`);
+      }
     }
   }
   errors.push(...checkQuests(data, { resources, rarities }));

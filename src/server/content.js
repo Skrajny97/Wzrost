@@ -52,7 +52,13 @@ export const content = buildContent({
 // The narrator's lines that are read once, in their order: cards and
 // pointers, and a lead marked `once`, whose tap changes no screen. Another
 // lead or a tap is done when the game moves on, so it is not kept.
-export const tutorialLines = tutorial.lines.filter((line) => line.kind === 'card' || line.kind === 'point' || line.once).map((line) => line.id);
+const keptLines = tutorial.lines.filter((line) => line.kind === 'card' || line.kind === 'point' || line.once);
+export const tutorialLines = keptLines.map((line) => line.id);
+
+// The kept lines of one part: the introduction (no chapter) or one of the
+// chapters after it, such as the Umiejętności.
+export const tutorialPart = (chapter = null) => keptLines.filter((line) => (line.chapter ?? null) === chapter).map((line) => line.id);
+export const tutorialChapters = Object.keys(tutorial.chapters);
 
 // The first steps of the introduction, which a skipped one plays for the player.
 export const firstSteps = tutorial.firstSteps;

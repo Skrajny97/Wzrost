@@ -6,7 +6,8 @@
 // raise the learned skills, up to level 20. Both paths and the points are due
 // by the first evolution (class level 50): until then the class waits there.
 // The server sends every card ready to show (skillsView in the engine); a tap
-// on a learned skill opens its card.
+// on a learned skill opens its card. The narrator's tour of the tab
+// (narrator.js) points at the places marked data-guide.
 
 import { fill, h } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
@@ -37,7 +38,9 @@ export function mountSkills(container) {
       'div',
       { class: 'title-row' },
       h('h1', { class: 'page-title', tabindex: '-1', text: 'Umiejętności' }),
-      view && isUnlocked('skills') && h('span', { class: `badge badge--system badge--tall${view.points > 0 ? ' badge--ready' : ''}`, text: `PUNKTY: ${formatNumber(view.points)}` }),
+      view &&
+        isUnlocked('skills') &&
+        h('span', { class: `badge badge--system badge--tall${view.points > 0 ? ' badge--ready' : ''}`, 'data-guide': 'skills-points', text: `PUNKTY: ${formatNumber(view.points)}` }),
     );
     if (!view || !isUnlocked('skills')) {
       const unlock = unlockInfo('skills');
@@ -101,10 +104,13 @@ export function mountSkills(container) {
       secondOpen && evolutionLevel && state.character.classLevel < evolutionLevel && `Ścieżkę poboczną wybierz najpóźniej na ${evolutionLevel}. poziomie klasy, przed ewolucją.`;
     // Points to spend, told unless the line above already tells them.
     const pointsNote = known > 0 && view.points > 0 && raisable && !(secondNow && view.points > 0);
+    const panel = intro && systemPanel(deadline ? `${intro} ${deadline}` : intro);
+    // Before the first choice the narrator points at the System's words.
+    if (panel && known === 0) panel.dataset.guide = 'skills-intro';
     return h(
       'section',
       { class: 'skill-paths', 'aria-label': 'Ścieżki rozwoju' },
-      intro && systemPanel(deadline ? `${intro} ${deadline}` : intro),
+      panel,
       pointsNote && systemPanel(`Masz ${skillPoints(view.points)}. Dotknij umiejętności, żeby dodać punkt.`),
       [...pool.options].sort((a, b) => (PATH_ORDER[a.state] ?? 2) - (PATH_ORDER[b.state] ?? 2)).map((skill) => pathSection(skill, pool, view, busy)),
     );
@@ -115,12 +121,18 @@ export function mountSkills(container) {
     return h(
       'section',
       { class: `skill-path skill-path--${skill.state}`, 'data-skill': skill.id, 'aria-label': `${PATH_LABELS[skill.state] ?? 'Ścieżka'}: ${skill.path}` },
-      h('h2', { class: 'skill-path-title' }, h('span', { class: 'skill-path-label', text: PATH_LABELS[skill.state] ?? 'Ścieżka' }), h('span', { class: 'skill-path-name', text: skill.path })),
+      h(
+        'h2',
+        { class: 'skill-path-title', 'data-guide': 'skills-path' },
+        h('span', { class: 'skill-path-label', text: PATH_LABELS[skill.state] ?? 'Ścieżka' }),
+        h('span', { class: 'skill-path-name', text: skill.path }),
+      ),
       learned ? learnedRow(skill, view, busy) : skill.state === 'closed' ? closedRow(skill) : choiceCard(skill, pool, view, busy),
     );
   }
 
-  // A path still open: the skill's card in words and its button.
+  // A path still open: the skill's card in words and its button. Each path
+  // takes a Skill Point, the main one too.
   function choiceCard(skill, pool, view, busy) {
     const second = pool.chosen.length > 0;
     const label =

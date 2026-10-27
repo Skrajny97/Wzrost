@@ -2,12 +2,13 @@
 // a pointer at its moment and tells the server once it has been read, so it
 // is not shown again on another device. "Pomiń wprowadzenie" marks them all
 // as read and plays the first steps for the player, so that both ways start
-// the game the same.
+// the game the same. A chapter after the introduction (the Umiejętności) has
+// its own "Pomiń", which marks only its lines.
 
 import { buildingLevel, construction, longestHunt, missingFor, upgradeCost } from '../engine/index.js';
 import { beginBuilding, completeBuilding } from './camp.js';
 import { characterView, loadPlayer, requirePlayer, walletOf } from './characters.js';
-import { content, firstSteps, tutorialLines } from './content.js';
+import { content, firstSteps, tutorialChapters, tutorialLines, tutorialPart } from './content.js';
 import { beginHunt, finishHunt } from './hunts.js';
 import { ApiError, json, readJson } from './http.js';
 import { spendTimePoints } from './time.js';
@@ -19,8 +20,14 @@ export async function seeTutorial(context) {
   if (row.tutorial === null) throw new ApiError(409, 'no_tutorial', 'Ta postać nie ma wprowadzenia.');
   const db = context.env.DB;
   if (body.skip === true) {
-    if (!JSON.parse(row.tutorial).includes('ending')) await playFirstSteps(db, session.userId, context.now);
-    await db.prepare('UPDATE characters SET tutorial = ? WHERE id = ?').bind(JSON.stringify(tutorialLines), row.id).run();
+    const chapter = body.chapter ?? null;
+    if (chapter !== null && !tutorialChapters.includes(chapter)) throw new ApiError(400, 'invalid_chapter', 'Nie ma takiej części wprowadzenia.');
+    const read = JSON.parse(row.tutorial);
+    if (chapter === null && !read.includes('ending')) await playFirstSteps(db, session.userId, context.now);
+    // The part's lines are read, and the other parts' stay as they were.
+    const part = tutorialPart(chapter);
+    const kept = tutorialLines.filter((id) => part.includes(id) || read.includes(id));
+    await db.prepare('UPDATE characters SET tutorial = ? WHERE id = ?').bind(JSON.stringify(kept), row.id).run();
   } else {
     if (!tutorialLines.includes(body.card)) throw new ApiError(400, 'invalid_card', 'Nie ma takiej kwestii narratora.');
     // Added in the database, so two cards read at once are both kept.

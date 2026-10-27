@@ -27,7 +27,7 @@ import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from 
 import { narrate } from './narrator.js';
 import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
-import { call, handleSessionLost, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
+import { call, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
 import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, toast, voiceSwitch, withButton } from './ui.js';
 
 const views = {
@@ -498,6 +498,10 @@ function openSettings() {
       testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
     ),
+    testToggle &&
+      isUnlocked('skills') &&
+      state.character.tutorial &&
+      h('button', { type: 'button', class: 'button button--system', onClick: repeatSkillsTour, text: 'Objaśnienie Umiejętności od nowa' }),
     installButton(),
     state.user.author && h('a', { class: 'button button--system', href: '#/autor', onClick: closeSheet, text: 'Panel autora' }),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
@@ -559,6 +563,22 @@ async function deleteAccount() {
 }
 
 // Removes the character after a question; the account stays.
+// Test mode: the narrator's Umiejętności chapter from the start (testing.js).
+async function repeatSkillsTour() {
+  const sure = await confirmAction({
+    title: 'Objaśnienie Umiejętności od nowa?',
+    text: 'Postać zapomni wybrane umiejętności, a Punkty Umiejętności wrócą. Narrator objaśni Umiejętności od początku.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/skills-tour');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
 async function startOver() {
   const sure = await confirmAction({
     title: 'Zacząć od nowa?',

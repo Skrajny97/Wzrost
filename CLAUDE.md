@@ -5,6 +5,7 @@
 - Uwagi autora wtrącone w trakcie pracy, które nie dotyczą bieżącego zadania, zapisz na później i nie przerywaj pracy. Gdy trzeba przerwać, autor sam to powie.
 - Przed każdym dłuższym raportem przejrzyj wszystkie wiadomości autora od poprzedniego raportu. Nie pytaj o to, co autor już rozstrzygnął, i nie proponuj własnych wersji tekstów, które autor napisał.
 - Teksty czytane głosem, np. kwestie narratora, daj autorowi do zatwierdzenia przed nagraniem. Autor usuwa z nich naleciałości AI.
+- Nagrania autor sprawdza sam, na słuch: wrzucaj mu je w czacie albo na stronę odsłuchu. Nie pobieraj programów do rozpoznawania mowy ani innych modeli.
 - Nowe grafiki pokazuj autorowi do oceny pojedynczo, jedną po drugiej, zaraz po powstaniu, gdy autor nie śpi.
 - Z autorem rozmawiaj po polsku. Kod, nazwy plików i identyfikatory są po angielsku, a teksty widoczne w grze po polsku.
 - Autor pracuje wyłącznie z telefonu. Każdą czynność po jego stronie opisz krok po kroku dla przeglądarki mobilnej.
