@@ -68,9 +68,11 @@ const professionsHere = (hash, read) => onProfessions(hash) && professionsTour(h
 // The Społeczność chapter: once the character reaches level 5, after the
 // report that brought it there, and only when the Umiejętności and the
 // Profesje chapters are not waiting. Not on the character's screens either.
-// It leads to the Społeczność tab and points at the chat's rules. Its last
-// line waits for the player to open an inner region by themselves and points
-// there at Szybkie Polowanie, under "Wyrusz", with nothing to tap but "Dalej".
+// It leads to the Społeczność tab and points at the chat's rules. Then the
+// narrator itself opens the inner region the player hunts in and points
+// there at Szybkie Polowanie, under "Wyrusz", with nothing to tap but
+// "Dalej". While the character is away it waits, and goes there from the
+// Walka tab once the character is back.
 const onCommunity = (hash) => hash === '#/spolecznosc';
 const professionsWaiting = (read) => Boolean(state.character.professions) && !read.has('professions-ending');
 const communityDue = (hash, read) =>
@@ -85,6 +87,29 @@ function onOpenArea(hash) {
   return Boolean(area && state.character.quickHunts) && !state.character.activity && state.character.classLevel >= area.unlockClassLevel;
 }
 const quickHuntHere = (hash, read) => onOpenArea(hash) && communityTour(hash, read) && read.has('community-rules');
+// From the chat only right after its rules, so a later visit stays there.
+const quickHuntTrip = (hash, read, passed) =>
+  ((onCommunity(hash) && passed === 'community-rules') || hash.startsWith('#/walka')) &&
+  communityTour(hash, read) &&
+  read.has('community-rules') &&
+  Boolean(state.character.quickHunts) &&
+  !state.character.activity
+    ? huntingGround()
+    : null;
+
+// The inner region the player hunts in now: of the open ones the character
+// has reached, the one with the highest level.
+function huntingGround() {
+  const { level, classLevel } = state.character;
+  let best = null;
+  for (const region of state.content.regions) {
+    for (const area of region.areas) {
+      if (classLevel < area.unlockClassLevel || area.minLevel > level || (best && best.area.minLevel >= area.minLevel)) continue;
+      best = { region, area };
+    }
+  }
+  return best && `#/walka/${best.region.id}/${best.area.id}`;
+}
 
 function affordable(buildingId) {
   const building = state.character.camp.buildings.find((candidate) => candidate.id === buildingId);
@@ -106,7 +131,10 @@ const campDone = (hash, read) => read.has('camp') && (campStarted() || !affordab
 // `sweep` has the camera ride, at the screen's own size, from place to
 // place in their order, each as the line tells its name (the text of the
 // element `sweep` names in it), and back to the first after the line; the
-// light rides along on one place at a time, the narrator above it.
+// light rides along on one place at a time, the narrator above it. A line
+// with `go` (an address for the moment, given the line just passed) takes
+// the player to that screen by itself when nothing else is due where they
+// are.
 // `survey` has the camera take in the whole of a place for a moment before
 // the light, with nothing lit: the camp's board before its plots. A `late`
 // line is told also after the ending, once, to a character that finished
@@ -197,7 +225,7 @@ const BEATS = {
     when: (hash, read) => communityTour(hash, read) && !onCommunity(hash) && !read.has('community-rules'),
   },
   'community-rules': { place: mark('community-rules'), when: communityHere },
-  'community-ending': { place: mark('quick-hunt'), when: quickHuntHere },
+  'community-ending': { place: mark('quick-hunt'), go: quickHuntTrip, when: quickHuntHere },
 };
 
 let place = '#/walka';
@@ -313,6 +341,8 @@ export function narrate(hash = place) {
   // "Dalej" and a survey: a change of the character meanwhile (its read line
   // saved, say) must not start the next line under it.
   if (scroll || light?.closing || surveying) return;
+  const passed = justPassed;
+  justPassed = null;
   const line = nextLine();
   if (pause && pause.id !== line?.id) {
     clearTimeout(pause.timer);
@@ -321,6 +351,11 @@ export function narrate(hash = place) {
   if (!line) {
     stopLight();
     aim([]);
+    const trip = tripTarget(passed);
+    if (trip) {
+      location.hash = trip;
+      return;
+    }
     release(readNow().has('ending') ? 0 : HOLD);
     return;
   }
@@ -358,6 +393,8 @@ export function narrate(hash = place) {
 // the line just passed, which must not show again (its parchment would
 // unroll a second time). They go with the character.
 const passedHere = new Set();
+// The pointer passed with "Dalej" just now, for the next line's `go`.
+let justPassed = null;
 const readNow = () => new Set([...state.character.tutorial, ...passedHere]);
 
 // The introduction is over, the Społeczność chapter is not halfway (it
@@ -379,6 +416,19 @@ function nextLine() {
   return state.content.tutorial.lines.find(
     (line) => (!kept(line) || !read.has(line.id)) && (line.chapter ? over : !over || BEATS[line.id]?.late) && BEATS[line.id]?.when(place, read),
   );
+}
+
+// Where a chapter's line with `go` takes the player now, if anywhere.
+function tripTarget(passed) {
+  const read = readNow();
+  if (!read.has('ending')) return null;
+  for (const line of state.content.tutorial.lines) {
+    const go = line.chapter && BEATS[line.id]?.go;
+    if (!go || (kept(line) && read.has(line.id))) continue;
+    const target = go(place, read, passed);
+    if (target && target !== place) return target;
+  }
+  return null;
 }
 
 // A line is read as soon as it is passed: the page counts it at once, and
@@ -953,6 +1003,7 @@ function scrollNote(line) {
     // The next pointer's camera and light travel from here.
     if (light?.drawn?.length) lastSpot = { hash: place, line, at: performance.now() };
     stopLight();
+    justPassed = line.id;
     narrate();
   }
   return { element, tail: null, height, open };

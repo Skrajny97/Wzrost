@@ -195,9 +195,12 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/test/skip-time` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wyprawę albo odpoczynek („Pomiń czas”) |
 | POST | `/api/test/skip-build` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu budowę w obozie, a gdy nic się nie buduje, zapełnia magazyny |
 | POST | `/api/test/skip-craft` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wszystkie zlecenia Stołu rozbiórki |
-| POST | `/api/test/skills-tour` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: objaśnienie Umiejętności od nowa, a postać zapomina wybrane umiejętności |
-| POST | `/api/test/professions-tour` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: objaśnienie Profesji od nowa, a poziomy profesji zostają |
-| POST | `/api/test/community-tour` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: objaśnienie Społeczności i Szybkiego Polowania od nowa |
+| POST | `/api/test/skills-tour` | „Testuj samouczki” (wersja testowa, `TUTORIAL_TESTS`): objaśnienie Umiejętności od nowa, a postać zapomina wybrane umiejętności |
+| POST | `/api/test/professions-tour` | „Testuj samouczki” (wersja testowa, `TUTORIAL_TESTS`): objaśnienie Profesji od nowa, a poziomy profesji zostają |
+| POST | `/api/test/community-tour` | „Testuj samouczki” (wersja testowa, `TUTORIAL_TESTS`): objaśnienie Społeczności i Szybkiego Polowania od nowa |
+| GET | `/api/test/tutorials` | „Testuj samouczki” (wersja testowa, `TUTORIAL_TESTS`): czy postać czeka z boku na powrót z wprowadzenia |
+| POST | `/api/test/introduction` | „Testuj samouczki”: postać czeka z boku, a konto tworzy postać testową od wprowadzenia |
+| POST | `/api/test/back` | „Testuj samouczki”: postać testowa znika, wraca postać, która czekała |
 
 Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie `message` jest po polsku.
 

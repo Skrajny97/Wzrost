@@ -1,13 +1,14 @@
-// "Pomiń czas" in test mode (test-mode.js), and the narrator's Umiejętności
-// and Profesje once more. For an account without test mode, and with test
-// mode off, these routes do not exist.
+// "Pomiń czas" in test mode (test-mode.js), and on the test version
+// "Testuj samouczki": every tutorial from its start. For an account without
+// test mode, and with test mode off, these routes do not exist.
 
 import { construction } from '../engine/index.js';
 import { content, tutorialPart } from './content.js';
 import { completeBuilding } from './camp.js';
-import { characterView, currentHp, loadPlayer, loadSettled, requirePlayer } from './characters.js';
+import { characterRemoval, characterView, currentHp, loadPlayer, loadSettled, requirePlayer } from './characters.js';
 import { ApiError, json } from './http.js';
-import { testMode, testModeFor } from './test-mode.js';
+import { requireSession } from './sessions.js';
+import { testMode, testModeFor, tutorialTestsFor } from './test-mode.js';
 
 const notFound = () => new ApiError(404, 'not_found', 'Nie znaleziono.');
 
@@ -69,6 +70,45 @@ export async function skipBuilding(context) {
   return json({ character: characterView(await loadSettled(db, session.userId, now), now) });
 }
 
+// "Testuj samouczki": the character that waits aside while a test character
+// goes through the introduction, if one does.
+export async function tutorialTests(context) {
+  const session = await requireTester(context);
+  const parked = await parkedOf(context.env.DB, session.userId);
+  return json({ parked: parked && { name: parked.name } });
+}
+
+// "Wprowadzenie" from the start: the character waits aside (role 'parked'),
+// out of the game, and the account makes a new one, which gets the
+// introduction like any new character. One character waits at a time.
+export async function testIntroduction(context) {
+  const session = await requireTester(context);
+  const { player } = await requirePlayer(context);
+  const db = context.env.DB;
+  if (await parkedOf(db, session.userId)) throw new ApiError(409, 'parked', 'Najpierw wróć do swojej postaci.');
+  await db.prepare("UPDATE characters SET role = 'parked' WHERE id = ?").bind(player.row.id).run();
+  return json({ parked: { name: player.row.name } });
+}
+
+// Back to the character that waited; the test character goes for good.
+export async function backFromTest(context) {
+  const session = await requireTester(context);
+  const db = context.env.DB;
+  const parked = await parkedOf(db, session.userId);
+  if (!parked) throw new ApiError(409, 'not_parked', 'Żadna postać nie czeka.');
+  const test = await db.prepare("SELECT id FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId).first();
+  await db.batch([...(test ? characterRemoval(db, test.id) : []), db.prepare("UPDATE characters SET role = 'player' WHERE id = ?").bind(parked.id)]);
+  return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
+}
+
+const parkedOf = (db, userId) => db.prepare("SELECT id, name FROM characters WHERE user_id = ? AND role = 'parked'").bind(userId).first();
+
+async function requireTester(context) {
+  const session = await requireSession(context);
+  if (!tutorialTestsFor(context.env, session.user.login)) throw notFound();
+  return session;
+}
+
 // The narrator's Umiejętności chapter from the start, to check it: the
 // skills learned are forgotten, so their points come back, and the chapter's
 // lines are unread again. It starts on any screen but a report.
@@ -84,9 +124,8 @@ export const repeatCommunityTour = (context) => repeatChapter(context, 'communit
 
 // A chapter's lines unread again, with `reset` (SQL assignments) done too.
 async function repeatChapter(context, chapterId, reset = '') {
-  if (!testMode(context.env)) throw notFound();
+  await requireTester(context);
   const { session, player } = await requirePlayer(context);
-  if (!testModeFor(context.env, session.user.login)) throw notFound();
   const row = player.row;
   if (row.tutorial === null) throw new ApiError(409, 'no_tutorial', 'Ta postać nie ma wprowadzenia.');
   const db = context.env.DB;

@@ -3,9 +3,10 @@
 import { after, before, beforeEach } from 'node:test';
 import { createTestHarness } from 'wrangler';
 
-// Test mode is for every account here, unless `vars` sets TEST_LOGINS.
+// Test mode, with "Testuj samouczki", is for every account here, unless
+// `vars` sets TEST_LOGINS.
 export function useServer(vars = {}) {
-  const server = createTestHarness({ workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', ...vars } }] });
+  const server = createTestHarness({ workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', ...vars } }] });
   before(() => server.listen());
   beforeEach(async () => {
     await server.reset();

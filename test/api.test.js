@@ -41,7 +41,7 @@ describe('registration', () => {
       password: 'tajnehaslo1',
     });
     assert.equal(status, 201);
-    assert.deepEqual(Object.keys(data.user).sort(), ['author', 'createdAt', 'email', 'emailConfirmed', 'emailRequired', 'google', 'login', 'testMode']);
+    assert.deepEqual(Object.keys(data.user).sort(), ['author', 'createdAt', 'email', 'emailConfirmed', 'emailRequired', 'google', 'login', 'testMode', 'tutorialTests']);
     assert.equal(data.user.author, false);
     assert.equal(data.user.google, false);
     // It waits for the link sent to its e-mail (the e-mail confirmation tests below).

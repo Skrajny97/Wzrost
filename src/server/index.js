@@ -22,7 +22,7 @@ import { pushKey, sendNotifications, subscribePush, unsubscribePush } from './pu
 import { claimAllQuests, claimQuest, openChest } from './quests.js';
 import { getReport, listReports } from './reports.js';
 import { learnSkill, raiseSkill } from './skills.js';
-import { repeatCommunityTour, repeatProfessionsTour, repeatSkillsTour, skipBuilding, skipTime } from './testing.js';
+import { backFromTest, repeatCommunityTour, repeatProfessionsTour, repeatSkillsTour, skipBuilding, skipTime, testIntroduction, tutorialTests } from './testing.js';
 import { skipWithTimePoints } from './time.js';
 import { seeTutorial } from './tutorial.js';
 import { startCrafting } from './workshop.js';
@@ -111,6 +111,9 @@ const routes = [
   ['POST', '/api/test/skills-tour', repeatSkillsTour],
   ['POST', '/api/test/professions-tour', repeatProfessionsTour],
   ['POST', '/api/test/community-tour', repeatCommunityTour],
+  ['GET', '/api/test/tutorials', tutorialTests],
+  ['POST', '/api/test/introduction', testIntroduction],
+  ['POST', '/api/test/back', backFromTest],
 ].map(([method, pattern, handler]) => ({ method, parts: pattern.split('/'), handler }));
 
 // Returns the :params of a matching pattern, or null.

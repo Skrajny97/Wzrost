@@ -12,3 +12,7 @@ export function testModeFor(env, login) {
     .filter(Boolean);
   return logins.length === 0 || logins.includes(String(login).toLowerCase());
 }
+
+// "Testuj samouczki" (testing.js): every tutorial from its start, on the test
+// version only (TUTORIAL_TESTS "on"), for the accounts with test mode.
+export const tutorialTestsFor = (env, login) => env.TUTORIAL_TESTS === 'on' && testModeFor(env, login);

@@ -1566,6 +1566,27 @@ describe('Time Points and the narrator', () => {
     assert.equal(again.status, 200);
     assert.deepEqual(again.data.character.tutorial, before);
   });
+
+  test('"Testuj samouczki": the character waits aside while a test character goes through the introduction', async () => {
+    const own = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.equal((await call('GET', '/api/test/tutorials', { cookie })).data.parked, null);
+    const parked = await call('POST', '/api/test/introduction', { cookie });
+    assert.equal(parked.status, 200);
+    assert.deepEqual(parked.data.parked, { name: own.name });
+    assert.equal((await call('GET', '/api/character', { cookie })).data.error.code, 'no_character');
+    // The test character may even have the same name, and starts the introduction.
+    await newCharacter(cookie, 'mage', own.name);
+    const test = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.equal(test.classId, 'mage');
+    assert.deepEqual(test.tutorial, []);
+    assert.equal((await call('POST', '/api/test/introduction', { cookie })).data.error.code, 'parked');
+    const back = await call('POST', '/api/test/back', { cookie });
+    assert.equal(back.status, 200);
+    assert.equal(back.data.character.name, own.name);
+    assert.equal(back.data.character.classId, own.classId);
+    assert.equal((await call('GET', '/api/test/tutorials', { cookie })).data.parked, null);
+    assert.equal((await call('POST', '/api/test/back', { cookie })).data.error.code, 'not_parked');
+  });
 });
 
 describe('Stół rozbiórki', () => {

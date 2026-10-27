@@ -888,8 +888,13 @@ export async function setSkin(context) {
 export async function deleteCharacter(context) {
   const { player } = await requirePlayer(context);
   const db = context.env.DB;
-  const id = player.row.id;
-  await db.batch([
+  await db.batch(characterRemoval(db, player.row.id));
+  return json({ ok: true });
+}
+
+// The statements that remove a character with all it has.
+export function characterRemoval(db, id) {
+  return [
     db.prepare('DELETE FROM chat_reports WHERE message_id IN (SELECT id FROM chat_messages WHERE character_id = ?)').bind(id),
     db.prepare('DELETE FROM chat_messages WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM reports WHERE character_id = ?').bind(id),
@@ -898,8 +903,7 @@ export async function deleteCharacter(context) {
     db.prepare('DELETE FROM items WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM characters WHERE id = ?').bind(id),
-  ]);
-  return json({ ok: true });
+  ];
 }
 
 async function savePoints(context, player, points) {

@@ -90,7 +90,9 @@
         "PROFESSIONS": "on",
         "CRAFTING": "on",
         // No new accounts: only the author's, made before (the author's request).
-        "REGISTRATION": "closed"
+        "REGISTRATION": "closed",
+        // "Testuj samouczki" in the settings: every tutorial from its start.
+        "TUTORIAL_TESTS": "on"
       },
       "triggers": {
         "crons": ["* * * * *"]

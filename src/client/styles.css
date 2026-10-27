@@ -6752,3 +6752,39 @@ button.herb-tile[aria-pressed='true'] {
   align-items: flex-start;
   gap: 10px;
 }
+
+/* "Testuj samouczki" on the test version (app.js): the tutorials one under
+   another, each with its "Od nowa", and the way back to the character that
+   waits aside, also on the creation screen. */
+.tutorial-tests {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tutorial-test {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.tutorial-test-text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tutorial-test .button {
+  flex: none;
+  width: auto;
+}
+
+.create-back {
+  display: grid;
+  margin-top: 16px;
+}

@@ -5,7 +5,7 @@ import { registrationOpen } from './features.js';
 import { googleConfigured } from './google.js';
 import { ApiError, json, readJson } from './http.js';
 import { hashPassword, needsRehash, verifyPassword } from './passwords.js';
-import { testModeFor } from './test-mode.js';
+import { testModeFor, tutorialTestsFor } from './test-mode.js';
 import { isAuthor } from './author.js';
 import {
   clearedSessionCookie,
@@ -103,7 +103,7 @@ export async function register({ request, env, now }) {
     emailSent = false;
   }
   const user = userView({ login, email, created_at: now, google_sub: null, email_confirmed_at: null, email_required: 1 });
-  return json({ user: { ...user, testMode: testModeFor(env, login), author: false }, emailSent }, 201, {
+  return json({ user: { ...user, testMode: testModeFor(env, login), tutorialTests: tutorialTestsFor(env, login), author: false }, emailSent }, 201, {
     'Set-Cookie': sessionCookie(session.token, session.expiresAt, now),
   });
 }
@@ -164,6 +164,7 @@ export async function login({ request, env, now }) {
       user: {
         ...userView(user),
         testMode: testModeFor(env, user.login),
+        tutorialTests: tutorialTestsFor(env, user.login),
         author: isAuthor(env, { login: user.login, google: user.google_sub !== null }),
       },
     },
@@ -213,6 +214,11 @@ export async function me(context) {
   const session = await requireSession(context);
   const expiresAt = await refreshSession(context.env.DB, session, context.now);
   const headers = expiresAt ? { 'Set-Cookie': sessionCookie(session.token, expiresAt, context.now) } : {};
-  const user = { ...session.user, testMode: testModeFor(context.env, session.user.login), author: isAuthor(context.env, session.user) };
+  const user = {
+    ...session.user,
+    testMode: testModeFor(context.env, session.user.login),
+    tutorialTests: tutorialTestsFor(context.env, session.user.login),
+    author: isAuthor(context.env, session.user),
+  };
   return json({ user }, 200, headers);
 }

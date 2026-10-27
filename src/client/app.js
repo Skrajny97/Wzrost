@@ -190,6 +190,7 @@ async function enterGame() {
         history.replaceState(null, '', HOME);
         openGame();
       });
+      if (state.user.tutorialTests) offerBack($('#create-screen'));
       return;
     }
     throw error;
@@ -531,18 +532,7 @@ function openSettings() {
       testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
     ),
-    testToggle &&
-      isUnlocked('skills') &&
-      state.character.tutorial &&
-      h('button', { type: 'button', class: 'button button--system', onClick: repeatSkillsTour, text: 'Objaśnienie Umiejętności od nowa' }),
-    testToggle &&
-      state.character.professions &&
-      state.character.tutorial &&
-      h('button', { type: 'button', class: 'button button--system', onClick: repeatProfessionsTour, text: 'Objaśnienie Profesji od nowa' }),
-    testToggle &&
-      isUnlocked('community') &&
-      state.character.tutorial &&
-      h('button', { type: 'button', class: 'button button--system', onClick: repeatCommunityTour, text: 'Objaśnienie Społeczności od nowa' }),
+    state.user.tutorialTests && h('button', { type: 'button', class: 'button button--system', onClick: openTutorialTests, text: 'Testuj samouczki' }),
     installButton(),
     state.user.author && h('a', { class: 'button button--system', href: '#/autor', onClick: closeSheet, text: 'Panel autora' }),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
@@ -604,6 +594,85 @@ async function deleteAccount() {
 }
 
 // Removes the character after a question; the account stays.
+// "Testuj samouczki" on the test version (testing.js): every tutorial from
+// its start, in the order the game brings them. The introduction needs a new
+// character, so the player's own waits aside until "Wróć do postaci".
+async function openTutorialTests() {
+  let parked;
+  try {
+    ({ parked } = await call('GET', '/api/test/tutorials'));
+  } catch (error) {
+    toast(error.message);
+    return;
+  }
+  const told = Boolean(state.character.tutorial);
+  const row = (title, note, run, ready) =>
+    h(
+      'li',
+      { class: 'tutorial-test' },
+      h('div', { class: 'tutorial-test-text' }, h('strong', { text: title }), h('span', { class: 'muted', text: note })),
+      h('button', { type: 'button', class: 'button button--system button--small', text: 'Od nowa', disabled: !ready, onClick: run }),
+    );
+  openSheet(
+    h('h2', { class: 'sheet-title', text: 'Testuj samouczki' }),
+    h('p', { class: 'sheet-text', text: 'Na wersji testowej każdy samouczek zaczniesz tu od początku.' }),
+    parked && backButton(parked),
+    h(
+      'ul',
+      { class: 'tutorial-tests' },
+      row(
+        'Wprowadzenie',
+        parked ? `Trwa na postaci testowej, ${parked.name} czeka z boku.` : 'Nowa postać testowa od pierwszej karty. Twoja postać poczeka z boku.',
+        testIntroduction,
+        !parked,
+      ),
+      row('Objaśnienie Społeczności i Szybkiego Polowania', 'Od 5. poziomu postaci.', repeatCommunityTour, told && isUnlocked('community')),
+      row('Objaśnienie Umiejętności', 'Od 10. poziomu klasy. Postać zapomni wybrane umiejętności.', repeatSkillsTour, told && isUnlocked('skills')),
+      row('Objaśnienie Profesji', 'Od 10. poziomu postaci. Poziomy profesji zostają.', repeatProfessionsTour, told && Boolean(state.character.professions)),
+    ),
+  );
+}
+
+const backButton = (parked) =>
+  h('button', { type: 'button', class: 'button button--world', text: `Wróć do postaci ${parked.name}`, onClick: backFromTest });
+
+async function testIntroduction() {
+  const sure = await confirmAction({
+    title: 'Wprowadzenie od nowa?',
+    text: `${state.character.name} poczeka z boku. Stworzysz postać testową i przejdziesz wprowadzenie od pierwszej karty. Potem w „Testuj samouczki” wybierz „Wróć do postaci ${state.character.name}”, a postać testowa zniknie.`,
+    confirmLabel: 'Zacznij',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/introduction');
+    await characterGone();
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+async function backFromTest() {
+  closeSheet();
+  try {
+    await call('POST', '/api/test/back');
+    await characterGone();
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// On the creation screen of the test version: the way back to the character
+// that waits aside, when one does.
+async function offerBack(container) {
+  try {
+    const { parked } = await call('GET', '/api/test/tutorials');
+    if (parked) container.append(h('div', { class: 'create-back' }, backButton(parked)));
+  } catch {
+    // Without it the account makes the test character as usual.
+  }
+}
+
 // Test mode: the narrator's Umiejętności chapter from the start (testing.js).
 async function repeatSkillsTour() {
   const sure = await confirmAction({
@@ -662,16 +731,22 @@ async function startOver() {
   if (!sure) return;
   try {
     await call('DELETE', '/api/character');
-    clearInterval(ticker);
-    current?.screen.unmount?.();
-    current = null;
-    state.character = null;
-    narrate();
-    history.replaceState(null, '', HOME);
-    await enterGame();
+    await characterGone();
   } catch (error) {
     toast(error.message);
   }
+}
+
+// The character is gone from the game (removed or waiting aside): the game
+// starts again from the account, with a new character or the one back.
+async function characterGone() {
+  clearInterval(ticker);
+  current?.screen.unmount?.();
+  current = null;
+  state.character = null;
+  narrate();
+  history.replaceState(null, '', HOME);
+  await enterGame();
 }
 
 function leaveGame() {
