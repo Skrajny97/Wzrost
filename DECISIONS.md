@@ -1951,13 +1951,13 @@ Brakujące szczegóły kroku 2 rozstrzygnięte najprościej. Wszystko działa ty
 ## Alchemia: wybory autora (27.10.2026)
 
 1. **Zdania raportu z warzenia** (A35). Zostają trzy: „W Pracowni bulgocze kocioł, a na półce przybywa fiolek.”, „Zioła oddają wywarowi wszystko, co mają najlepsze.” (poprawka autora) i „Błękitne linie Systemu mierzą każdą kroplę mikstury.”.
-2. **Grafika Mniejszej mikstury leczenia**: wersja 2. Kolejne przychodzą po jednej: mikstura many, szybkości i tło Pracowni.
+2. **Grafika Mniejszej mikstury leczenia**: wersja 2. Mikstury many i szybkości to ta sama butelka z zawartością w innym kolorze: many niebieska, szybkości zielona, jaśniejsza od listka (autor: „będziemy to mieli ustandaryzowane”). Tło Pracowni przychodzi osobno.
 3. **Wygląd postaci** (pytanie testujących o ekwipunek na portrecie). Zostaje sposób z Margonem: portret nie pokazuje zakładanych przedmiotów, a lepszy strój przychodzi z ewolucją klasy (autor: „trzymamy się wersji z Margonem”). O czymś więcej można pomyśleć, gdy gra będzie dobrze zarabiać.
 
 
 ## Rzemieślnictwo: odpowiedzi autora (27.10.2026)
 
-Odpowiedzi na pytania R1–R29 i W1–W13 z dokumentu „Alchemia i Rzemieślnictwo: pytania”. Rzemieślnictwo powstaje na wersji testowej krok po kroku i trafi do gry razem z Zielarstwem i Alchemią (W1).
+Odpowiedzi na pytania R1–R29 i W1–W13 z dokumentu „Alchemia i Rzemieślnictwo: pytania”. Rzemieślnictwo powstaje na wersji testowej krok po kroku. Zielarstwo i Alchemia trafią do gry wcześniej, gdy będą wstępnie gotowe, bo od Rzemieślnictwa nie zależą, a Rzemieślnictwo zostaje w grze zablokowane, aż będzie gotowe (zmiana W1 przez autora 27.10).
 
 1. **Wyroby** (R1, R2, R4–R7, R9). Wyrób ma te same bazy co łup, więc wygląda i działa jak przedmiot z wyprawy, i jest równy łupowi tej samej rzadkości. Jego poziom to poziom postaci, a poziom profesji decyduje o rzadkości i szansie powodzenia. Afiksy są całkiem losowe, a ich nazwy pochodzą od stworów z dowolnego regionu, który postać już odwiedziła. Wyrób może być dla dowolnej klasy (autor: „bo handel wprowadzimy i elementy społecznościowe + możliwość sprzedaży u złomiarza”). Karta wyrobu nie ma podpisu twórcy.
 2. **Rzadkość i koszt** (R3, R11–R13). Gracz wybiera rzadkość, a każda wymaga części tej rzadkości: broń i pancerz po 6, druga ręka i hełm po 4, rękawice i buty po 3 (wstępnie). Do tego zasoby obozu: ruda żelaza do metalu, drewno do łuków, kosturów i tarcz, a kamienia najwięcej (autor: „bo kamień ma najmniej zastosowań”). Materiały stworów idą do wyrobu tylko jako części.
@@ -1970,7 +1970,7 @@ Odpowiedzi na pytania R1–R29 i W1–W13 z dokumentu „Alchemia i Rzemieślnic
 9. **Rozwój** (R25, R26). Poziomy z czasu pracy, jak w Zielarstwie, także przy porażce. Za awans +1 do Siły i Zręczności.
 10. **Raport i zadania** (R27–R29). Raport to karta gotowego przedmiotu albo zdanie o porażce, plus XP i awans, a nad nimi jedno z 3 zdań (szkic dla autora). Postać nie zacznie pracy bez wolnego miejsca w plecaku na całe zlecenie. Zadania narratora: dzienne „Wykonaj 1 przedmiot.” i tygodniowe „Wykonaj łącznie 5 przedmiotów.”. Liczą się tylko udane, a te zadania trafiają się rzadziej i dają lepsze nagrody.
 11. **Sprawy wspólne** (W1–W10, W12).
-    - Kolejność: Alchemia, potem Rzemieślnictwo, obie w wersji testowej, a potem trzy profesje razem do gry. Gracz może mieć wszystkie trzy naraz.
+    - Kolejność: Alchemia, potem Rzemieślnictwo, obie w wersji testowej. Zielarstwo i Alchemia idą do gry, gdy będą wstępnie gotowe, a Rzemieślnictwo czeka w grze zablokowane (autor: „Rzemieślnictwo będzie czekać zablokowane aż zrobimy je”). Gracz może mieć wszystkie trzy naraz.
     - Ekrany Alchemii i Rzemieślnictwa w układzie Zielarstwa, ze wspólną muzyką zakładki Profesje.
     - Objaśnienie narratora dla Profesji na 10. poziomie postaci, w stylu objaśnienia Umiejętności. Komunikat Systemu o profesjach dostaje autor w szkicu do poprawy.
     - Punkty Czasu skracają warzenie i wyrób, a „Pomiń czas” w trybie testowym kończy je od razu. Koniec warzenia i wyrobu przychodzi jako powiadomienie na telefon.

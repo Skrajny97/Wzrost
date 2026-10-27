@@ -96,7 +96,7 @@ export const SPRITES = {
   // The potions of Alchemia, 32×32, filled in as they are approved.
   potions: {
     size: 32,
-    ids: ['lesser-healing'],
+    ids: ['lesser-healing', 'lesser-mana', 'lesser-speed'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
