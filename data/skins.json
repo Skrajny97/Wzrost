@@ -7,6 +7,8 @@
     { "id": "tan", "name": "Śniada", "swatch": "#b98a62", "ramp": ["#8a5a3a", "#b98a62", "#d9ad84"] },
     { "id": "brown", "name": "Brązowa", "swatch": "#a06c48", "ramp": ["#70462c", "#a06c48", "#c49068"] },
     { "id": "dark", "name": "Ciemna", "swatch": "#684228", "ramp": ["#3e261a", "#684228", "#8e6244"] },
-    { "id": "golden", "name": "Złocista", "swatch": "#deb876", "ramp": ["#b08848", "#deb876", "#f2d6a0"] }
+    { "id": "golden", "name": "Złocista", "swatch": "#deb876", "ramp": ["#b08848", "#deb876", "#f2d6a0"] },
+    { "id": "yellow", "name": "Żółta", "swatch": "#f4cf2e", "ramp": ["#c99b16", "#f4cf2e", "#fff09a"] },
+    { "id": "grey", "name": "Szara", "swatch": "#9b9b9b", "ramp": ["#666666", "#9b9b9b", "#cdcdcd"] }
   ]
 }

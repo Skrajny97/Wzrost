@@ -2053,9 +2053,11 @@ Trzecia część wprowadzenia, po Umiejętnościach (W3, W4). Kwestie narratora 
 ## Kolor skóry postaci (27.10.2026)
 
 1. **Wybór** (autor: „Najpierw kolor skóry, potem Awatar i deploy”). Przy tworzeniu postaci, pod „Wygląd”, stoi rząd kropek „Kolor skóry”, a popiersia klas od razu pokazują wybrany odcień. W Ustawieniach (zębatka) ten sam rząd zmienia odcień w każdej chwili, za darmo, jak wygląd. Odcień widać na portrecie postaci i w walkach. Raporty sprzed zmiany grają z odcieniem domyślnym.
-2. **Sześć odcieni** w `data/skins.json`: Blada, Jasna (portret taki, jak narysowano, domyślny), Śniada, Brązowa, Ciemna i Złocista. Nazwy to szkic do poprawy przez autora. Stare postacie mają odcień Jasna.
+2. **Sześć odcieni** w `data/skins.json`: Blada, Jasna (portret taki, jak narysowano, domyślny), Śniada, Brązowa, Ciemna i Złocista. Nazwy to szkic do poprawy przez autora. Stare postacie mają odcień Jasna. *Teraz jest ich osiem: zob. punkt 5.*
 3. **Bez nowych grafik.** `tools/skin-tones.py` przemalowuje skórę na gotowych portretach: bierze barwy twarzy i szuka ich tylko w obszarach głowy, rąk i stóp każdego portretu, bo te same barwy wracają na skórzanych butach i łatach. Każda barwa skóry trzyma swoje miejsce między cieniem a światłem, na rampie odcienia. Pliki `<klasa>-<wygląd>-<odcień>.png` leżą obok portretów, a walidator pilnuje, żeby żadnego nie brakowało.
 4. **Migracja 0036** dodaje kolumnę `skin`. Pusta oznacza odcień domyślny.
+5. **Żółta i Szara, bez suwaka** (autor: „o ale kolor tak jak zaznaczyłeś to lepiej niż suwak”, „możesz dodać żółtą obok złocistej po prostu”, „i szarą całą”). Zostają kropki. Obok Złocistej stoi Żółta, cała żółta jak słońce (autor: „taką całą żółtą jak słońce”), a na końcu rzędu Szara, cała szara. Złocista zostaje. W Ustawieniach kropki mają cały wiersz pod napisem „Kolor skóry”, bo osiem nie mieści się obok niego. W wersji 0.0.12.
+6. **Lepsza maska skóry.** Na Szarej i Żółtej widać było braki: pomarańczowe uszy, nosy i szyje, a u czterech portretów jasne pasma grzywki brały kolor skóry. Teraz skóra głowy rośnie od policzków po połączonych pikselach, razem z odcieniami cienia, a dziury w niej (usta, rumieniec) się domykają. Kolory włosów z czubka głowy nie wchodzą do skóry. Poprawka obejmuje wszystkie odcienie.
 
 ## Awatar Systemu w grze (27.10.2026)
 

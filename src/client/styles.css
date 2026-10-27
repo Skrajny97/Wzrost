@@ -6328,7 +6328,7 @@ button.herb-tile[aria-pressed='true'] {
 .skin-swatches {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 .skin-swatch {
   width: 32px;
@@ -6346,6 +6346,9 @@ button.herb-tile[aria-pressed='true'] {
   outline: 2px solid var(--system);
   outline-offset: 3px;
 }
+/* In Ustawienia the dots take the whole row under their label. */
 .status-row--skin {
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
 }
