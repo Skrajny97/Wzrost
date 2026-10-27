@@ -790,6 +790,7 @@ export async function characterProfile(context) {
     };
   return json({
     profile: {
+      id: found.id,
       name: view.name,
       classId: view.classId,
       className: view.className,
@@ -901,8 +902,8 @@ export function characterRemoval(db, id) {
   return [
     db.prepare('DELETE FROM friends WHERE character_id = ? OR friend_id = ?').bind(id, id),
     db.prepare('DELETE FROM gifts WHERE sender_id = ? OR receiver_id = ?').bind(id, id),
-    db.prepare('DELETE FROM chat_reports WHERE message_id IN (SELECT id FROM chat_messages WHERE character_id = ?)').bind(id),
-    db.prepare('DELETE FROM chat_messages WHERE character_id = ?').bind(id),
+    db.prepare('DELETE FROM chat_reports WHERE message_id IN (SELECT id FROM chat_messages WHERE character_id = ? OR recipient_id = ?)').bind(id, id),
+    db.prepare('DELETE FROM chat_messages WHERE character_id = ? OR recipient_id = ?').bind(id, id),
     db.prepare('DELETE FROM reports WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM activities WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM avatar_activities WHERE character_id = ?').bind(id),

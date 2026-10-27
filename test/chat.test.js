@@ -236,4 +236,45 @@ describe('Czat', () => {
     assert.equal(await count(`id = ${message.id}`), 0);
     assert.equal((await database.prepare('SELECT COUNT(*) AS n FROM chat_reports').first()).n, 0);
   });
+  test('a private message is only for its two characters, with a tab for each conversation', async () => {
+    const database = await db();
+    const id = async (name) => (await database.prepare('SELECT id FROM characters WHERE name = ?').bind(name).first()).id;
+    const [ala, ola] = [await id('Ala'), await id('Ola')];
+    const ewa = await player('Ewa');
+    const whisper = (cookie, to, text) => call('POST', '/api/chat', { cookie, body: { with: to, text } });
+    const sent = await whisper(players.ala, ola, 'Tylko dla Ciebie');
+    assert.equal(sent.status, 201);
+    assert.equal(sent.data.message.own, true);
+    // Ola reads it in the conversation with Ala, and has a tab for it.
+    const seen = (await call('GET', `/api/chat?with=${ala}`, { cookie: players.ola })).data;
+    assert.deepEqual(seen.with, { id: ala, name: 'Ala' });
+    assert.deepEqual(seen.messages.map(({ name, text, own }) => [name, text, own]), [['Ala', 'Tylko dla Ciebie', false]]);
+    assert.deepEqual(seen.conversations, [{ id: ala, name: 'Ala', classId: 'mage', latest: sent.data.message.id }]);
+    const light = (await call('GET', '/api/chat/latest', { cookie: players.ola })).data;
+    assert.deepEqual([light.latest, light.conversations.map(({ id: other, latest }) => [other, latest])], [0, [[ala, sent.data.message.id]]]);
+    // Nobody else sees it, in the Globalny or with either of them.
+    assert.deepEqual((await read(ewa)).messages, []);
+    assert.deepEqual((await call('GET', `/api/chat?with=${ola}`, { cookie: ewa })).data.messages, []);
+    assert.deepEqual((await call('GET', `/api/chat?with=${ala}`, { cookie: ewa })).data.conversations, []);
+    assert.equal((await call('POST', '/api/chat/report', { cookie: ewa, body: { messageId: sent.data.message.id } })).status, 404);
+    // Reported by Ola, the moderation sees it, marked private.
+    await call('POST', '/api/chat/report', { cookie: players.ola, body: { messageId: sent.data.message.id } });
+    const reports = (await call('GET', '/api/chat/reports', { cookie: await admin() })).data.reports;
+    assert.deepEqual(reports.map(({ text, private: secret }) => [text, secret]), [['Tylko dla Ciebie', true]]);
+    // Not to oneself, nor to a character without the Społeczność.
+    assert.equal((await whisper(players.ola, ola, 'Ja')).data.error.code, 'self');
+    await player('Iza', { level: 4 });
+    assert.equal((await whisper(players.ola, await id('Iza'), 'Hej')).data.error.code, 'locked');
+    // Once Ola hides Ala, neither writes to the other, and the tab goes.
+    await call('POST', '/api/chat/block', { cookie: players.ola, body: { messageId: sent.data.message.id } });
+    await age();
+    assert.equal((await whisper(players.ala, ola, 'Halo?')).data.error.code, 'refused');
+    assert.equal((await whisper(players.ola, ala, 'Halo?')).data.error.code, 'hiding');
+    assert.deepEqual((await call('GET', '/api/chat/latest', { cookie: players.ola })).data.conversations, []);
+    // A character gone takes the conversation along, both ways.
+    await call('POST', '/api/chat/unblock', { cookie: players.ola, body: { id: (await read(players.ola)).blocked[0].id } });
+    await whisper(players.ola, ala, 'Wracam');
+    await call('DELETE', '/api/character', { cookie: players.ala });
+    assert.equal((await database.prepare("SELECT COUNT(*) AS n FROM chat_messages WHERE channel = 'private'").first()).n, 0);
+  });
 });

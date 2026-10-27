@@ -1,16 +1,16 @@
 // Another player's character, from a tap on its name in the chat, the
 // Ranking or the Znajomi: its portrait, levels, what it wears and the skills
-// it has learned (characterProfile in src/server/characters.js), with what
-// the player can do with it as a friend (src/server/community.js). A tap on
-// a piece of gear shows its properties. `onChange` gets the Znajomi anew
-// after such an action.
+// it has learned (characterProfile in src/server/characters.js), with a
+// private message to it in the chat and what the player can do with it as a
+// friend (src/server/community.js). A tap on a piece of gear shows its
+// properties. `onChange` gets the Znajomi anew after a friend's action.
 
 import { portraitSprite, skillSprite } from './art.js';
-import { friendsSeen } from './chat-news.js';
+import { friendsSeen, wantConversation } from './chat-news.js';
 import { h, icon } from './dom.js';
 import { SLOT_ICONS } from './icons.js';
 import { call, state } from './state.js';
-import { confirmAction, openSheet, toast, withButton } from './ui.js';
+import { closeSheet, confirmAction, openSheet, toast, withButton } from './ui.js';
 import { itemSummary } from './screens/character.js';
 
 const PATHS = { main: 'ścieżka główna', second: 'ścieżka poboczna' };
@@ -125,5 +125,20 @@ function friendship(profile, onChange) {
               'danger',
             ),
           ];
-  return h('div', { class: 'profile-friend' }, parts);
+  return h('div', { class: 'profile-friend' }, whisper(profile), parts);
+}
+
+// "Prywatna wiadomość": the chat of the Społeczność opens the conversation
+// with the character (screens/community.js).
+function whisper(profile) {
+  return h('button', {
+    type: 'button',
+    class: 'button button--system button--small',
+    text: 'Prywatna wiadomość',
+    onClick: () => {
+      closeSheet();
+      wantConversation({ id: profile.id, name: profile.name });
+      if (location.hash !== '#/spolecznosc') location.hash = '#/spolecznosc';
+    },
+  });
 }

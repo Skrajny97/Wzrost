@@ -1,8 +1,8 @@
 // The chat of the Społeczność tab (DECISIONS.md, "Czat"): the Globalny
-// channel for now, with room for more channels in data/chat.json, open from
-// the character level of its unlock (community in data/unlocks.json). The
-// open chat asks every few seconds for the messages after the last one it
-// has. A player writes once they accept the rules, once every few seconds,
+// channel for now, with room for more channels in data/chat.json, and the
+// private conversations of two characters beside it, open from the
+// character level of its unlock (community in data/unlocks.json). The open
+// chat asks every few seconds for the messages after the last one it has. A player writes once they accept the rules, once every few seconds,
 // with no links and with rude words masked. As the Play Store asks of
 // content made by players, every message can be reported, a player can
 // hide the messages of another, a message reported by a few players goes
@@ -39,6 +39,39 @@ function channelOf(id) {
 
 const whole = (value) => (/^\d{1,15}$/.test(value ?? '') ? Number(value) : 0);
 
+// The channel of the private messages, each with its recipient.
+const PRIVATE = 'private';
+// The messages between two characters, either way (`m` is chat_messages).
+const PAIR = '((m.character_id = ? AND m.recipient_id = ?) OR (m.character_id = ? AND m.recipient_id = ?))';
+const pairOf = (one, other) => [one, other, other, one];
+
+// The other character of a private conversation: another player's.
+async function partnerOf(db, character, id) {
+  const other = id > 0 ? await db.prepare("SELECT id, user_id, name, level FROM characters WHERE id = ? AND role = 'player'").bind(id).first() : null;
+  if (!other) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
+  if (other.id === character.id) throw new ApiError(400, 'self', 'Do siebie nie napiszesz.');
+  return other;
+}
+
+// The private conversations of a character, the most recent first, each
+// with the other character and the newest message that one wrote, without
+// the players it hides.
+const conversationsOf = (db, userId, characterId) =>
+  db
+    .prepare(
+      `SELECT c.id, c.name, c.class_id, s.latest
+       FROM (SELECT CASE WHEN m.character_id = ? THEN m.recipient_id ELSE m.character_id END AS other,
+                    MAX(m.id) AS last, MAX(CASE WHEN m.character_id != ? THEN m.id END) AS latest
+             FROM chat_messages m
+             WHERE m.channel = '${PRIVATE}' AND (m.character_id = ? OR m.recipient_id = ?) AND m.hidden_at IS NULL
+             GROUP BY other) s
+       JOIN characters c ON c.id = s.other
+       WHERE c.role = 'player' AND c.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)
+       ORDER BY s.last DESC LIMIT ?`,
+    )
+    .bind(characterId, characterId, characterId, characterId, userId, content.chat.rules.conversations);
+const conversationView = (row) => ({ id: row.id, name: row.name, classId: row.class_id, latest: row.latest ?? 0 });
+
 export function mutedText(until) {
   return until >= FOREVER ? 'Czat jest dla Ciebie wyciszony na stałe.' : `Czat jest dla Ciebie wyciszony do ${untilFormat.format(new Date(until))}.`;
 }
@@ -64,6 +97,7 @@ export function cleanText(raw) {
 
 const messageView = (row, userId, env) => ({
   id: row.id,
+  characterId: row.character_id,
   name: row.name,
   level: row.level,
   classId: row.class_id,
@@ -108,35 +142,43 @@ async function requireAdmin(context) {
   return { session, db: context.env.DB };
 }
 
-// GET /api/chat?channel=global&after=<id>&from=<id>: the newest messages
-// after `after` (the last ones of the channel when it is 0), without those
-// taken down and those of the players this one hides, and of the messages
-// the page shows (from `from` to `after`) the ones taken down since. The
-// moderation also hears how many messages wait in the reports.
+// GET /api/chat?channel=global&after=<id>&from=<id>, or ?with=<character
+// id> for a private conversation: the newest messages after `after` (the
+// last ones when it is 0), without those taken down and those of the
+// players this one hides, and of the messages the page shows (from `from`
+// to `after`) the ones taken down since, with the private conversations for
+// the tabs. The moderation also hears how many messages wait in the reports.
 export async function readChat(context) {
-  const { session, account, role, db } = await requireChatter(context);
+  const { session, character, account, role, db } = await requireChatter(context);
   const url = new URL(context.request.url);
-  const channel = channelOf(url.searchParams.get('channel') ?? 'global');
+  const withId = whole(url.searchParams.get('with'));
+  const other = withId ? await partnerOf(db, character, withId) : null;
+  const channel = other ? null : channelOf(url.searchParams.get('channel') ?? 'global');
+  const where = other ? `m.channel = '${PRIVATE}' AND ${PAIR}` : 'm.channel = ?';
+  const binds = other ? pairOf(character.id, other.id) : [channel.id];
   const after = whole(url.searchParams.get('after'));
   const from = whole(url.searchParams.get('from'));
   const { userId } = session;
-  const [messages, hidden, blocked, reports] = await db.batch([
+  const [messages, hidden, blocked, reports, conversations] = await db.batch([
     db
       .prepare(
-        `SELECT m.id, m.user_id, m.name, m.level, m.class_id, m.text, m.created_at, u.login, u.google_sub, u.chat_moderator
+        `SELECT m.id, m.user_id, m.character_id, m.name, m.level, m.class_id, m.text, m.created_at, u.login, u.google_sub, u.chat_moderator
          FROM chat_messages m JOIN users u ON u.id = m.user_id
-         WHERE m.channel = ? AND m.id > ? AND m.hidden_at IS NULL AND m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)
+         WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)
          ORDER BY m.id DESC LIMIT ?`,
       )
-      .bind(channel.id, after, userId, content.chat.rules.page),
-    db.prepare('SELECT id FROM chat_messages WHERE channel = ? AND id >= ? AND id <= ? AND hidden_at IS NOT NULL').bind(channel.id, from || after, after),
+      .bind(...binds, after, userId, content.chat.rules.page),
+    db.prepare(`SELECT m.id FROM chat_messages m WHERE ${where} AND m.id >= ? AND m.id <= ? AND m.hidden_at IS NOT NULL`).bind(...binds, from || after, after),
     blockedList(db, userId),
     db.prepare(role ? 'SELECT COUNT(DISTINCT message_id) AS count FROM chat_reports WHERE closed_at IS NULL' : 'SELECT NULL AS count'),
+    conversationsOf(db, userId, character.id),
   ]);
   return json({
-    channel: channel.id,
+    channel: other ? PRIVATE : channel.id,
+    with: other && { id: other.id, name: other.name },
     messages: messages.results.reverse().map((row) => messageView(row, userId, context.env)),
     hidden: hidden.results.map((row) => row.id),
+    conversations: conversations.results.map(conversationView),
     rulesAccepted: Boolean(account.chat_rules_at),
     mutedUntil: account.chat_muted_until > context.now ? account.chat_muted_until : null,
     blocked: blocked.results,
@@ -145,12 +187,13 @@ export async function readChat(context) {
   });
 }
 
-// GET /api/chat/latest: the newest message someone else wrote that this
-// player may read, and the Upominki and invitations waiting in Znajomi
-// (community.js), for the light on the Społeczność tab.
+// GET /api/chat/latest: the newest message someone else wrote in the
+// Globalny that this player may read, the private conversations with the
+// newest message of each other character, and the Upominki and invitations
+// waiting in Znajomi (community.js), for the light on the Społeczność tab.
 export async function latestChat(context) {
   const { session, character, db } = await requireChatter(context);
-  const [row, friends] = await Promise.all([
+  const [row, conversations, friends] = await Promise.all([
     db
       .prepare(
         `SELECT MAX(id) AS id FROM chat_messages
@@ -158,9 +201,10 @@ export async function latestChat(context) {
       )
       .bind(content.chat.channels[0].id, session.userId, session.userId)
       .first(),
+    conversationsOf(db, session.userId, character.id).all(),
     friendNews(db, character.id, context.now),
   ]);
-  return json({ latest: row.id ?? 0, ...friends });
+  return json({ latest: row.id ?? 0, conversations: conversations.results.map(conversationView), ...friends });
 }
 
 // POST /api/chat/rules: the player accepts the rules of the chat.
@@ -170,51 +214,73 @@ export async function acceptChatRules(context) {
   return json({ rulesAccepted: true });
 }
 
-// POST /api/chat {channel, text}: a message, under the character's name,
-// level and class. The channel keeps its last messages and the reported
-// ones still waiting for the moderation.
+// A private message goes only to a character that has the Społeczność,
+// and not between two players when either hides the other.
+async function privateAllowed(db, userId, other) {
+  if (!isUnlocked('community', other.level, content)) {
+    throw new ApiError(409, 'locked', `${other.name} nie ma jeszcze Społeczności. Otworzy się na ${content.unlocksById.community.level}. poziomie.`);
+  }
+  const [hiding, hidden] = await db.batch([
+    db.prepare('SELECT 1 FROM chat_blocks WHERE user_id = ? AND blocked_id = ?').bind(userId, other.user_id),
+    db.prepare('SELECT 1 FROM chat_blocks WHERE user_id = ? AND blocked_id = ?').bind(other.user_id, userId),
+  ]);
+  if (hiding.results.length > 0) throw new ApiError(403, 'hiding', `${other.name} jest wśród ukrytych postaci. Pokaż ją nad czatem, żeby napisać.`);
+  if (hidden.results.length > 0) throw new ApiError(403, 'refused', `${other.name} nie przyjmuje Twoich wiadomości.`);
+}
+
+// POST /api/chat {channel, text}, or {with: character id, text} for a
+// private message: a message under the character's name, level and class.
+// The channel keeps its last messages, a private conversation its last
+// privateKeep, and both the reported ones still waiting for the moderation.
 export async function sendChat(context) {
   const { session, character, account, db } = await requireChatter(context);
   const body = await readJson(context.request);
-  const channel = channelOf(body.channel ?? 'global');
+  const other = Number.isInteger(body.with) ? await partnerOf(db, character, body.with) : null;
+  const channel = other ? null : channelOf(body.channel ?? 'global');
   const now = context.now;
   const { userId } = session;
   if (!account.chat_rules_at) throw new ApiError(403, 'rules', 'Najpierw zaakceptuj zasady czatu.');
   if (account.chat_muted_until > now) throw new ApiError(403, 'muted', mutedText(account.chat_muted_until));
   const text = cleanText(body.text);
-  const { everySeconds, keep } = content.chat.rules;
+  if (other) await privateAllowed(db, userId, other);
+  const { everySeconds, keep, privateKeep } = content.chat.rules;
+  const where = other ? `m.channel = '${PRIVATE}' AND ${PAIR}` : 'm.channel = ?';
+  const binds = other ? pairOf(character.id, other.id) : [channel.id];
   const [sent] = await db.batch([
     db
       .prepare(
-        `INSERT INTO chat_messages (channel, user_id, character_id, name, level, class_id, text, created_at)
-         SELECT ?, ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id = ? AND created_at > ?)`,
+        `INSERT INTO chat_messages (channel, user_id, character_id, recipient_id, name, level, class_id, text, created_at)
+         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id = ? AND created_at > ?)`,
       )
-      .bind(channel.id, userId, character.id, character.name, character.level, character.class_id, text, now, userId, now - everySeconds * 1000),
+      .bind(other ? PRIVATE : channel.id, userId, character.id, other?.id ?? null, character.name, character.level, character.class_id, text, now, userId, now - everySeconds * 1000),
     db
       .prepare(
-        `DELETE FROM chat_messages WHERE channel = ?
-           AND id <= (SELECT id FROM chat_messages WHERE channel = ? ORDER BY id DESC LIMIT 1 OFFSET ?)
-           AND id NOT IN (SELECT message_id FROM chat_reports WHERE closed_at IS NULL)`,
+        `DELETE FROM chat_messages WHERE id IN (SELECT m.id FROM chat_messages m WHERE ${where}
+           AND m.id <= (SELECT m.id FROM chat_messages m WHERE ${where} ORDER BY m.id DESC LIMIT 1 OFFSET ?)
+           AND m.id NOT IN (SELECT message_id FROM chat_reports WHERE closed_at IS NULL))`,
       )
-      .bind(channel.id, channel.id, keep),
+      .bind(...binds, ...binds, other ? privateKeep : keep),
   ]);
   if (sent.meta.changes !== 1) throw new ApiError(429, 'too_fast', `Za szybko. Kolejną wiadomość wyślesz po ${everySeconds} sekundach.`);
-  const row = { ...account, id: sent.meta.last_row_id, user_id: userId, name: character.name, level: character.level, class_id: character.class_id, text, created_at: now };
+  const row = { ...account, id: sent.meta.last_row_id, user_id: userId, character_id: character.id, name: character.name, level: character.level, class_id: character.class_id, text, created_at: now };
   return json({ message: messageView(row, userId, context.env) }, 201);
 }
 
-// The message a request names, still in the chat, with its writer's account.
-async function namedMessage(db, body) {
+// The message a request names, still in the chat, with its writer's
+// account. A private one only its two characters see, and the moderation;
+// `character` is the one who asks, none for the moderation.
+async function namedMessage(db, body, character = null) {
   const message = Number.isInteger(body.messageId)
     ? await db
         .prepare(
-          `SELECT m.id, m.user_id, m.name, m.hidden_at, u.login, u.google_sub, u.chat_moderator
+          `SELECT m.id, m.channel, m.user_id, m.character_id, m.recipient_id, m.name, m.hidden_at, u.login, u.google_sub, u.chat_moderator
            FROM chat_messages m JOIN users u ON u.id = m.user_id WHERE m.id = ?`,
         )
         .bind(body.messageId)
         .first()
     : null;
-  if (!message) throw new ApiError(404, 'no_message', 'Tej wiadomości już nie ma.');
+  const unseen = message?.channel === PRIVATE && character && ![message.character_id, message.recipient_id].includes(character.id);
+  if (!message || unseen) throw new ApiError(404, 'no_message', 'Tej wiadomości już nie ma.');
   return message;
 }
 
@@ -222,8 +288,8 @@ async function namedMessage(db, body) {
 // player and message; enough reports take the message down until the
 // moderation decides.
 export async function reportChat(context) {
-  const { session, db } = await requireChatter(context);
-  const message = await namedMessage(db, await readJson(context.request));
+  const { session, character, db } = await requireChatter(context);
+  const message = await namedMessage(db, await readJson(context.request), character);
   if (message.user_id === session.userId) throw new ApiError(400, 'own', 'Własnej wiadomości nie zgłosisz.');
   await db.batch([
     db.prepare('INSERT OR IGNORE INTO chat_reports (message_id, user_id, created_at) VALUES (?, ?, ?)').bind(message.id, session.userId, context.now),
@@ -240,8 +306,8 @@ export async function reportChat(context) {
 // POST /api/chat/block {messageId}: the player stops seeing the messages of
 // the one who wrote it, also of their later characters.
 export async function blockInChat(context) {
-  const { session, db } = await requireChatter(context);
-  const message = await namedMessage(db, await readJson(context.request));
+  const { session, character, db } = await requireChatter(context);
+  const message = await namedMessage(db, await readJson(context.request), character);
   if (message.user_id === session.userId) throw new ApiError(400, 'own', 'Siebie nie ukryjesz.');
   await db
     .prepare('INSERT OR IGNORE INTO chat_blocks (user_id, blocked_id, name, created_at) VALUES (?, ?, ?, ?)')
@@ -265,7 +331,7 @@ export async function chatReports(context) {
   const { role, db } = await requireModeration(context);
   const rows = await db
     .prepare(
-      `SELECT m.id, m.name, m.text, m.created_at, m.hidden_at, u.login, u.google_sub, u.chat_moderator, u.chat_muted_until,
+      `SELECT m.id, m.channel, m.name, m.text, m.created_at, m.hidden_at, u.login, u.google_sub, u.chat_moderator, u.chat_muted_until,
          COUNT(*) AS reports, MIN(r.created_at) AS reported_at
        FROM chat_reports r JOIN chat_messages m ON m.id = r.message_id JOIN users u ON u.id = m.user_id
        WHERE r.closed_at IS NULL
@@ -281,6 +347,7 @@ export async function chatReports(context) {
       login: role === 'admin' ? row.login : undefined,
       role: chatRole(context.env, row),
       text: row.text,
+      private: row.channel === PRIVATE,
       createdAt: row.created_at,
       hidden: row.hidden_at !== null,
       reports: row.reports,

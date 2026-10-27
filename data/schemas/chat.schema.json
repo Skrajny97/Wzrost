@@ -23,11 +23,13 @@
     "rules": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["maxLength", "everySeconds", "keep", "page", "hideAfterReports", "pollSeconds"],
+      "required": ["maxLength", "everySeconds", "keep", "privateKeep", "conversations", "page", "hideAfterReports", "pollSeconds"],
       "properties": {
         "maxLength": { "type": "integer", "minimum": 1 },
         "everySeconds": { "type": "integer", "minimum": 0 },
         "keep": { "type": "integer", "minimum": 1 },
+        "privateKeep": { "type": "integer", "minimum": 1 },
+        "conversations": { "type": "integer", "minimum": 1 },
         "page": { "type": "integer", "minimum": 1 },
         "hideAfterReports": { "type": "integer", "minimum": 1 },
         "pollSeconds": {

@@ -5,10 +5,13 @@
 // It opens on the part with news (chat-news.js), else on the one last shown
 // on the device; while the narrator has not shown the chat's rules yet
 // (narrator.js), on the Czat. News in a part not shown lights the folded
-// list too. By the list a bell mutes the chat's light on the tab.
+// list too. By the list a bell mutes the Globalny's light on the tab.
 //
-// The chat (src/server/chat.js), in its only channel so far, Globalny, the
-// newest messages at the bottom, over the line to write in. While the chat
+// The chat (src/server/chat.js) has a tab for its only channel so far,
+// Globalny, and one for each private conversation, which only its two
+// characters see; "Prywatna wiadomość" on a character's sheet opens one
+// (profile.js). The newest messages are at the bottom, over the line to
+// write in. While the chat
 // is open and the page is in front, it asks for new messages every few
 // seconds, and less often the longer nothing comes. A tap on a name shows
 // that character (profile.js); a tap on someone else's message opens its
@@ -22,7 +25,19 @@
 
 import { $, fill, h, icon } from '../dom.js';
 import { dateTimeFormat, timeFormat } from '../format.js';
-import { chatMuted, chatNews, chatSeen, friendNews, onChatNews, setChatMuted } from '../chat-news.js';
+import {
+  chatMuted,
+  chatNews,
+  chatSeen,
+  conversationNews,
+  conversationsSeen,
+  friendNews,
+  globalNews,
+  onChatNews,
+  privateRead,
+  setChatMuted,
+  takeConversation,
+} from '../chat-news.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
@@ -46,7 +61,8 @@ export function mountCommunity(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Społeczność')(container, context);
   const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking };
   const sections = state.content.community.sections;
-  let current = firstSection(sections);
+  const asked = takeConversation();
+  let current = asked ? 'chat' : firstSection(sections);
   let part = null;
   const body = h('div', { class: 'community-body' });
   const picker = sectionPicker(sections, () => current, show);
@@ -60,7 +76,9 @@ export function mountCommunity(container, context) {
   watcher?.observe(topbar);
   stick();
 
-  function show(id) {
+  // A part shown, with the bar under the list for its own row (the chat's
+  // tabs); `person` is the private conversation for the chat to open.
+  function show(id, person = null) {
     current = id;
     try {
       localStorage.setItem(SECTION_KEY, id);
@@ -69,15 +87,25 @@ export function mountCommunity(container, context) {
     }
     part?.unmount();
     fill(body);
-    part = MOUNTS[id](body);
+    fill(picker.bar);
+    part = MOUNTS[id](body, { bar: picker.bar, person });
     picker.render();
   }
 
-  show(current);
+  // "Prywatna wiadomość" on a character's sheet, shown over this screen.
+  const stopAsking = onChatNews(() => {
+    const person = takeConversation();
+    if (!person) return;
+    if (current === 'chat') part.talkTo(person);
+    else show('chat', person);
+  });
+
+  show(current, asked);
   return {
     unmount() {
       part?.unmount();
       picker.unmount();
+      stopAsking();
       watcher?.disconnect();
     },
   };
@@ -117,7 +145,8 @@ function sectionPicker(sections, current, choose) {
       render();
     },
   });
-  const element = h('div', { class: 'community-picker' }, h('div', { class: 'community-picker-row' }, toggle, bell), list);
+  const bar = h('div', { class: 'community-bar' });
+  const element = h('div', { class: 'community-picker' }, h('div', { class: 'community-picker-row' }, toggle, bell, list), bar);
 
   function unfold(open) {
     list.hidden = !open;
@@ -126,7 +155,7 @@ function sectionPicker(sections, current, choose) {
 
   const label = (section) => [
     icon(SECTION_ICONS[section.id] ?? 'unknown', { size: 20, className: 'community-icon' }),
-    h('span', { class: 'community-name', text: section.id === 'chat' ? `${section.name} · ${state.content.chat.channels[0].name}` : section.name }),
+    h('span', { class: 'community-name', text: section.name }),
     SECTION_NEWS[section.id]?.() && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'nowe' }),
     section.soon && h('span', { class: 'community-soon', text: 'Wkrótce' }),
   ];
@@ -178,6 +207,7 @@ function sectionPicker(sections, current, choose) {
   const stop = onChatNews(render);
   return {
     element,
+    bar,
     render,
     unmount() {
       document.removeEventListener('pointerdown', outside);
@@ -186,12 +216,19 @@ function sectionPicker(sections, current, choose) {
   };
 }
 
-// The Czat: its notices, the players hidden and the room of messages.
-function mountChat(container) {
+// The Czat: its tabs, its notices, the players hidden and the room of
+// messages. `person` is the private conversation to open first.
+function mountChat(container, { bar, person = null }) {
   const chat = state.content.chat;
-  const channel = chat.channels[0].id;
+  const channel = chat.channels[0];
+  // The other character of the private conversation shown, null on the
+  // Globalny, and the private conversations for the tabs.
+  let talk = person && { id: person.id, name: person.name };
+  let conversations = [];
   let messages = [];
   let account = null;
+  // Whether the tab shown has had its first answer.
+  let loaded = false;
   let error = null;
   let timer = null;
   let delay = chat.pollSeconds.min;
@@ -207,7 +244,7 @@ function mountChat(container) {
     maxlength: String(chat.maxLength),
     autocomplete: 'off',
     enterkeyhint: 'send',
-    placeholder: 'Napisz wiadomość…',
+    placeholder: talk ? `Do postaci ${talk.name}…` : 'Napisz wiadomość…',
     'aria-label': 'Wiadomość',
   });
   const sendButton = h('button', { type: 'submit', class: 'button button--system chat-send', text: 'Wyślij' });
@@ -228,7 +265,43 @@ function mountChat(container) {
   const hidden = h('div', { class: 'chat-hidden' });
   const room = h('div', { class: 'chat-room' }, empty, list, footer);
 
+  const tabs = h('div', { class: 'chat-tabs', role: 'tablist', 'aria-label': 'Rozmowy' });
+  fill(bar, tabs);
   fill(container, notices, hidden, room);
+
+  const tab = (label, selected, news, pick) =>
+    h(
+      'button',
+      { type: 'button', class: 'chat-tab', role: 'tab', 'aria-selected': String(selected), onClick: pick },
+      h('span', { class: 'chat-tab-name', text: label }),
+      news && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'nowe' }),
+    );
+
+  // The Globalny first, then the conversations, the most recent first; one
+  // opened from a sheet shows before its first message too.
+  function renderTabs() {
+    const entries = talk && !conversations.some((entry) => entry.id === talk.id) ? [{ ...talk, latest: 0 }, ...conversations] : conversations;
+    fill(
+      tabs,
+      tab(channel.name, !talk, Boolean(talk) && globalNews(), () => talkTo(null)),
+      entries.map((entry) => tab(entry.name, entry.id === talk?.id, entry.id !== talk?.id && conversationNews(entry.id, entry.latest), () => talkTo(entry))),
+    );
+  }
+
+  // Another tab: its messages from the start, asked for at once.
+  function talkTo(next) {
+    if ((next?.id ?? 0) === (talk?.id ?? 0)) return;
+    talk = next && { id: next.id, name: next.name };
+    messages = [];
+    fill(list);
+    loaded = false;
+    error = null;
+    delay = chat.pollSeconds.min;
+    text.placeholder = talk ? `Do postaci ${talk.name}…` : 'Napisz wiadomość…';
+    renderTabs();
+    render();
+    ask();
+  }
 
   // The room is as tall as the screen under where it starts (styles.css),
   // counted without the camera's zoom.
@@ -282,7 +355,8 @@ function mountChat(container) {
       list.firstElementChild?.remove();
     }
     if (follow) toBottom();
-    chatSeen(messages.at(-1).id);
+    if (talk) privateRead(talk.id, messages.at(-1).id);
+    else chatSeen(messages.at(-1).id);
     return true;
   }
 
@@ -314,7 +388,11 @@ function mountChat(container) {
       );
     }
     empty.hidden = messages.length > 0;
-    empty.textContent = account ? 'Nikt jeszcze nic nie napisał. Zacznij rozmowę!' : 'Wczytywanie…';
+    empty.textContent = !loaded
+      ? 'Wczytywanie…'
+      : talk
+        ? `Napisz do postaci ${talk.name}. Tę rozmowę widzicie tylko Wy dwoje.`
+        : 'Nikt jeszcze nic nie napisał. Zacznij rozmowę!';
     const part = !account ? 'loading' : account.mutedUntil ? `muted:${account.mutedUntil}` : account.rulesAccepted ? 'form' : 'rules';
     if (changed('footer', part)) fill(footer, footerPart(part));
     const blocked = account?.blocked ?? [];
@@ -403,6 +481,11 @@ function mountChat(container) {
         'div',
         { class: 'chat-sheet-actions' },
         act('Zobacz postać', () => openProfile(message.name)),
+        !talk &&
+          act('Prywatna wiadomość', () => {
+            closeSheet();
+            talkTo({ id: message.characterId, name: message.name });
+          }),
         act(
           'Zgłoś',
           async () => {
@@ -464,6 +547,7 @@ function mountChat(container) {
                   text: [
                     dateTimeFormat.format(new Date(report.createdAt)),
                     `zgłoszenia: ${report.reports}`,
+                    report.private && 'prywatna',
                     report.hidden && 'ukryta do decyzji',
                     report.mutedUntil && `czat wyciszony ${untilText(report.mutedUntil)}`,
                   ]
@@ -488,34 +572,52 @@ function mountChat(container) {
   async function send() {
     const value = text.value.trim();
     if (!value) return;
-    const { message } = await call('POST', '/api/chat', { channel, text: value });
+    const { message } = await call('POST', '/api/chat', talk ? { with: talk.id, text: value } : { channel: channel.id, text: value });
     text.value = '';
     add([message]);
     delay = chat.pollSeconds.min;
     ask();
   }
 
-  // The messages after the last one shown, and what was taken down since.
+  // The messages of the tab after the last one shown, and what was taken
+  // down since.
   async function ask() {
     if (asking || gone) return;
     asking = true;
     clearTimeout(timer);
+    const asked = talk;
+    let answer = null;
+    let failure = null;
     try {
       const last = messages.at(-1)?.id ?? 0;
       const first = messages[0]?.id ?? 0;
-      const answer = await call('GET', `/api/chat?channel=${channel}&after=${last}&from=${first}`);
-      drop(answer.hidden);
-      const fresh = add(answer.messages);
-      delay = fresh ? chat.pollSeconds.min : Math.min(delay + 2, chat.pollSeconds.max);
-      account = answer;
-      error = null;
-    } catch (failure) {
-      error = failure.message;
-      delay = chat.pollSeconds.max;
+      const where = asked ? `with=${asked.id}` : `channel=${channel.id}`;
+      answer = await call('GET', `/api/chat?${where}&after=${last}&from=${first}`);
+    } catch (problem) {
+      failure = problem;
     } finally {
       asking = false;
     }
     if (gone) return;
+    // Another tab was opened meanwhile: this answer is not for it.
+    if (asked !== talk) {
+      ask();
+      return;
+    }
+    if (failure) {
+      error = failure.message;
+      delay = chat.pollSeconds.max;
+    } else {
+      drop(answer.hidden);
+      const fresh = add(answer.messages);
+      delay = fresh ? chat.pollSeconds.min : Math.min(delay + 2, chat.pollSeconds.max);
+      account = answer;
+      loaded = true;
+      error = null;
+      conversations = answer.conversations;
+      conversationsSeen(conversations);
+    }
+    renderTabs();
     render();
     if (!document.hidden) timer = setTimeout(ask, delay * 1000);
   }
@@ -530,16 +632,20 @@ function mountChat(container) {
   }
   document.addEventListener('visibilitychange', onVisible);
   window.addEventListener('resize', fit);
+  const stopNews = onChatNews(renderTabs);
 
+  renderTabs();
   fit();
   ask();
   return {
     unmount() {
       gone = true;
       clearTimeout(timer);
+      stopNews();
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('resize', fit);
       if ($('#sheet')?.open && $('#sheet .chat-sheet')) closeSheet();
     },
+    talkTo,
   };
 }
