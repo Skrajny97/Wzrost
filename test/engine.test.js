@@ -1795,13 +1795,13 @@ describe('Bestiariusz', () => {
     assert.equal(hollows.find((danger) => danger.monsterId === 'boar').maxLevel, 15);
   });
 
-  test('its chest holds gold growing along a curve and Punkty Czasu growing by 10 a region', () => {
+  test('its chest holds gold growing along a curve, Punkty Czasu growing by 10 a region and 20 Punkty Systemu', () => {
     const chest = (id) => bestiaryChest(content.areasById[id], content);
     // The author: +30 gold and +5 Punkty Czasu for the first inner region.
-    assert.deepEqual(chest('windfalls-edge'), { gold: 30, timePoints: 5 });
-    assert.deepEqual(chest('fox-ravines'), { gold: 75, timePoints: 15 });
-    assert.deepEqual(chest('boar-thicket'), { gold: 245, timePoints: 45 });
-    assert.deepEqual(chest('glade-heart'), { gold: 600, timePoints: 95 });
+    assert.deepEqual(chest('windfalls-edge'), { gold: 30, timePoints: 5, systemPoints: 20 });
+    assert.deepEqual(chest('fox-ravines'), { gold: 75, timePoints: 15, systemPoints: 20 });
+    assert.deepEqual(chest('boar-thicket'), { gold: 245, timePoints: 45, systemPoints: 20 });
+    assert.deepEqual(chest('glade-heart'), { gold: 600, timePoints: 95, systemPoints: 20 });
     // Each next inner region gives more of both.
     const areas = Object.values(content.areasById).sort((a, b) => a.maxLevel - b.maxLevel).map((area) => bestiaryChest(area, content));
     for (const [before, after] of areas.slice(1).map((next, index) => [areas[index], next])) {

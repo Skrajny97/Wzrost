@@ -1,7 +1,8 @@
 // The Bestiariusz of an inner region: its creatures (areaDangers in the
 // engine), each by name once met, and a chest that opens once all are, with
-// gold and Punkty Czasu (bestiaryChest). Each chest opens once, and only if
-// the character is as read (its version), so two taps give one reward.
+// gold, Punkty Czasu and Punkty Systemu (bestiaryChest). Each chest opens
+// once, and only if the character is as read (its version), so two taps
+// give one reward.
 
 import { bestiaryChest, bestiaryFull } from '../engine/index.js';
 import { content } from './content.js';
@@ -23,8 +24,11 @@ export async function openBestiaryChest(context) {
   const chest = bestiaryChest(area, content);
   const db = context.env.DB;
   const result = await db
-    .prepare('UPDATE characters SET gold = gold + ?, time_points = time_points + ?, bestiary = ?, version = version + 1 WHERE id = ? AND version = ?')
-    .bind(chest.gold, chest.timePoints, JSON.stringify([...opened, area.id]), row.id, row.version)
+    .prepare(
+      `UPDATE characters SET gold = gold + ?, time_points = time_points + ?, system_points = system_points + ?, bestiary = ?, version = version + 1
+       WHERE id = ? AND version = ?`,
+    )
+    .bind(chest.gold, chest.timePoints, chest.systemPoints, JSON.stringify([...opened, area.id]), row.id, row.version)
     .run();
   if (result.meta.changes !== 1) throw new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
   return json({ chest, character: characterView(await loadPlayer(db, session.userId), context.now) });

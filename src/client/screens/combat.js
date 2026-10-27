@@ -11,6 +11,7 @@ import { leaveView as leaveHistoryView, openView as openHistoryView } from '../h
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { preloadReportMusic } from '../music.js';
+import { systemPoints } from '../quests.js';
 import {
   activityFinished,
   avoidRareOn,
@@ -107,7 +108,7 @@ function dangersSheet(place) {
   );
 }
 
-const chestText = (chest) => `+${formatNumber(chest.gold)} złota i +${timePoints(chest.timePoints)}`;
+const chestText = (chest) => `+${formatNumber(chest.gold)} złota, +${timePoints(chest.timePoints)} i +${systemPoints(chest.systemPoints)}`;
 
 // The Bestiariusz chest beside its name, as at the quests: shut, with the
 // creatures met so far, until all are met, then ready to open, then open.
