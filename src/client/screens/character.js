@@ -321,8 +321,11 @@ export function mountCharacter(container) {
       busy
         ? h('p', { class: 'muted', text: busyText(character) })
         : [
-            // A healing or a speed potion is drunk one at a time (potions.js).
+            // A healing or a speed potion is drunk one at a time (potions.js);
+            // one from a Wymiana waits for its recipe.
+            entry.known === false && h('p', { class: 'region-warning', text: 'Tej mikstury nie użyjesz, póki nie poznasz jej receptury w Alchemii.' }),
             entry.drink &&
+              entry.known !== false &&
               h('button', {
                 type: 'button',
                 class: 'button button--system',
@@ -379,6 +382,8 @@ export function itemSheet(item, { equipped }) {
   const usable = !item.classIds || item.classIds.includes(character.classId);
   // A later base of its kind waits for its class level (a Metin2-like tier).
   const early = usable && item.classLevel !== null && character.classLevel < item.classLevel;
+  // One from a Wymiana is worn from its own level on (inventory.js).
+  const traded = !equipped && item.traded && item.level > character.level;
   const worn = equipped ? null : character.equipment[item.slot];
   const act = (path) => async (event) =>
     withButton(event.currentTarget, async () => {
@@ -423,6 +428,7 @@ export function itemSheet(item, { equipped }) {
     busy && h('p', { class: 'muted', text: busyText(character) }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
     early && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
+    traded && h('p', { class: 'region-warning', text: `Ten przedmiot z wymiany założysz od poziomu postaci ${item.level}.` }),
     !equipped &&
       item.price !== undefined &&
       h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: sell, text: `Sprzedaj za ${formatNumber(item.price)} złota` }),
@@ -433,7 +439,7 @@ export function itemSheet(item, { equipped }) {
         ? h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: 'Zdejmij' })
         : [
             h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: discard, text: 'Wyrzuć' }),
-            h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early, onClick: act('equip'), text: 'Załóż' }),
+            h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early || traded, onClick: act('equip'), text: 'Załóż' }),
           ],
     ),
   );

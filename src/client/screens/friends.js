@@ -1,8 +1,8 @@
 // The Znajomi in the Społeczność (src/server/community.js): the Upominki
-// waiting to be collected, the invitations to accept, the friends with
-// today's Upominek to send to each, a name to invite and the invitations
-// sent. A tap on a name shows that character (profile.js), where a
-// friendship also ends.
+// waiting to be collected, the invitations to accept, the friends with a
+// Wymiana to propose (trade.js) and today's Upominek to send to each, a
+// name to invite and the invitations sent. A tap on a name shows that
+// character (profile.js), where a friendship also ends.
 
 import { friendsSeen } from '../chat-news.js';
 import { fill, h, icon } from '../dom.js';
@@ -12,6 +12,7 @@ import { openProfile } from '../profile.js';
 import { playSound } from '../sound.js';
 import { call, state, walletEntries } from '../state.js';
 import { toast, withButton } from '../ui.js';
+import { proposeTrade } from './trade.js';
 
 const resourceName = (id) => walletEntries().find((entry) => entry.id === id)?.name ?? id;
 
@@ -169,19 +170,34 @@ export function mountFriends(container) {
                 'li',
                 { class: 'friend' },
                 who(person, person.waiting > 0 && h('span', { class: 'friend-waiting', title: 'Upominek od tej postaci czeka' }, icon('gift', { size: 14 }))),
-                person.sentToday
-                  ? h('span', { class: 'friend-sent' }, icon('gift', { size: 16 }), 'Wysłany')
-                  : h(
-                      'button',
-                      {
-                        type: 'button',
-                        class: 'button button--system button--small friend-gift',
-                        'aria-label': `Wyślij ${gift.name}: ${person.name}`,
-                        onClick: (event) => withButton(event.currentTarget, act('/api/friends/gift', { id: person.id })),
-                      },
-                      icon('gift', { size: 16 }),
-                      'Wyślij',
-                    ),
+                h(
+                  'div',
+                  { class: 'friend-actions' },
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: 'button button--world button--small friend-gift',
+                      'aria-label': `Wymiana: ${person.name}`,
+                      onClick: (event) => withButton(event.currentTarget, () => proposeTrade({ id: person.characterId, name: person.name })),
+                    },
+                    icon('swap', { size: 16 }),
+                    'Wymiana',
+                  ),
+                  person.sentToday
+                    ? h('span', { class: 'friend-sent' }, icon('gift', { size: 16 }), 'Wysłany')
+                    : h(
+                        'button',
+                        {
+                          type: 'button',
+                          class: 'button button--system button--small friend-gift',
+                          'aria-label': `Wyślij ${gift.name}: ${person.name}`,
+                          onClick: (event) => withButton(event.currentTarget, act('/api/friends/gift', { id: person.id })),
+                        },
+                        icon('gift', { size: 16 }),
+                        'Wyślij',
+                      ),
+                ),
               ),
             ),
           ),

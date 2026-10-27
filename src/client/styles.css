@@ -7140,3 +7140,174 @@ button.herb-tile[aria-pressed='true'] {
   background: rgba(143, 227, 239, 0.12);
   color: var(--system-text);
 }
+
+/* The Wymiana (screens/trade.js): who it is with, its state, both offers
+   and what can be done now; the offer to put together in a sheet, and the
+   trade waiting in the Społeczność. */
+.trade {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trade-with {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.trade-status {
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+}
+
+.trade-countdown {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.trade-gold {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.trade-coin {
+  color: var(--gold);
+}
+
+.trade-stacks {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trade-stack {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.trade-stack-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.trade-stack-count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.trade-note {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+}
+
+.trade-pick[aria-pressed='true'] {
+  border-color: var(--system);
+  background: rgba(143, 227, 239, 0.1);
+}
+
+.trade-pick-mark {
+  flex: none;
+  display: inline-flex;
+  color: var(--system);
+  visibility: hidden;
+}
+
+.trade-pick[aria-pressed='true'] .trade-pick-mark {
+  visibility: visible;
+}
+
+.trade-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.trade-field-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.trade-number {
+  flex: none;
+  width: 104px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--bark-line);
+  border-radius: 0;
+  background: var(--bg-deep);
+  color: var(--text);
+  /* 16 px keeps iOS from zooming in on focus. */
+  font-family: var(--font-system);
+  font-size: 16px;
+  text-align: right;
+}
+
+.trade-number:focus {
+  outline: none;
+  border-color: var(--system);
+  box-shadow: 0 0 0 1px var(--system);
+}
+
+.trade-field-most {
+  flex: none;
+  min-width: 48px;
+  font-size: 13px;
+}
+
+.trade-sheet-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trade-banner {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 12px;
+  border-color: var(--system);
+}
+
+.trade-banner p {
+  flex: 1 1 160px;
+  margin: 0;
+}
+
+.trade-banner-icon {
+  flex: none;
+  color: var(--system);
+}
+
+.trade-banner-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.trade-blocked {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trade-blocked li {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}

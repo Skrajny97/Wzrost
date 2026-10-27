@@ -5,7 +5,8 @@
 // It opens on the part with news (chat-news.js), else on the one last shown
 // on the device; while the narrator has not shown the chat's rules yet
 // (narrator.js), on the Czat. News in a part not shown lights the folded
-// list too. By the list a bell mutes the Globalny's light on the tab.
+// list too. By the list a bell mutes the Globalny's light on the tab. Under
+// it waits a Wymiana proposed or going on (trade.js).
 //
 // The chat (src/server/chat.js) has a tab for its only channel so far,
 // Globalny, and one for each private conversation, which only its two
@@ -45,6 +46,7 @@ import { closeSheet, openSheet, pageHeading, toast, withButton } from '../ui.js'
 import { mountFriends } from './friends.js';
 import { lockedScreen } from './locked.js';
 import { mountRanking } from './ranking.js';
+import { tradeBanner } from './trade.js';
 
 // The most messages the page keeps; older ones leave from the top.
 const SHOWN = 200;
@@ -66,7 +68,8 @@ export function mountCommunity(container, context) {
   let part = null;
   const body = h('div', { class: 'community-body' });
   const picker = sectionPicker(sections, () => current, show);
-  fill(container, pageHeading('Społeczność'), picker.element, body);
+  const trade = h('div', { class: 'community-trade' }, tradeBanner());
+  fill(container, pageHeading('Społeczność'), picker.element, trade, body);
 
   // The list stays under the top bar while the page scrolls, so it is at
   // hand under a long chat too (styles.css).
@@ -92,8 +95,10 @@ export function mountCommunity(container, context) {
     picker.render();
   }
 
-  // "Prywatna wiadomość" on a character's sheet, shown over this screen.
+  // "Prywatna wiadomość" on a character's sheet, shown over this screen,
+  // and the Wymiana as it is now.
   const stopAsking = onChatNews(() => {
+    fill(trade, tradeBanner());
     const person = takeConversation();
     if (!person) return;
     if (current === 'chat') part.talkTo(person);

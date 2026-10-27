@@ -54,7 +54,7 @@ import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { soldGold } from './inventory.js';
 import { finishGathering } from './professions.js';
-import { potionsOf } from './professions-view.js';
+import { knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
 import { KEPT_REPORTS } from './reports.js';
 import { finishCrafting } from './workshop.js';
 
@@ -86,7 +86,7 @@ function healingFor(player, params) {
   if (!Number.isInteger(count) || count <= 0) return null;
   const { healBelow, healBelowChoices } = content.potionUse;
   const below = Number(params.get('below') ?? healBelow);
-  const have = potionsOf(player.row);
+  const have = knownPotionsOf(player.row);
   const kit = fightPotions(have, healBelowChoices.includes(below) ? below : healBelow, content).heal;
   return kit ? { count: Math.min(count, have[kit.id]), amount: kit.amount, below: kit.below } : null;
 }
@@ -105,6 +105,8 @@ function takenPotions(player, asked, minutes) {
     if (!potion || !fightKind(potion)) throw new ApiError(400, 'invalid_potions', 'Tej mikstury nie zabiera się na wyprawę.');
     const limit = Math.min(have[id] ?? 0, most);
     if (!Number.isInteger(count) || count < 0 || count > limit) throw new ApiError(400, 'invalid_potions', `Zabierz od 0 do ${limit} sztuk.`);
+    // One got in a Wymiana waits for its recipe (DECISIONS.md, "Wymiana").
+    if (count > 0 && !potionKnown(player.row, potion)) throw new ApiError(400, 'unknown_recipe', `Nie znasz jeszcze receptury: ${potion.name}.`);
     if (count > 0) taken[id] = count;
   }
   return taken;

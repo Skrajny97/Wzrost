@@ -200,6 +200,8 @@ export async function deleteAccount(context) {
       .bind(id, id, id),
     db.prepare(`DELETE FROM chat_messages WHERE user_id = ? OR recipient_id IN (${characters})`).bind(id, id),
     db.prepare('DELETE FROM chat_blocks WHERE user_id = ? OR blocked_id = ?').bind(id, id),
+    db.prepare('DELETE FROM trade_blocks WHERE user_id = ? OR blocked_id = ?').bind(id, id),
+    db.prepare(`DELETE FROM trades WHERE from_id IN (${characters}) OR to_id IN (${characters})`).bind(id, id),
     db.prepare(`DELETE FROM friends WHERE character_id IN (${characters}) OR friend_id IN (${characters})`).bind(id, id),
     db.prepare(`DELETE FROM gifts WHERE sender_id IN (${characters}) OR receiver_id IN (${characters})`).bind(id, id),
     ...['reports', 'activities', 'avatar_activities', 'items', 'buildings'].map((table) =>

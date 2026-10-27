@@ -54,7 +54,8 @@ describe('Szybkie Polowanie', () => {
   });
 
   test('needs the character at home, and takes potions only up to its length', async () => {
-    await set(`level = 5, potions = '{"lesser-healing":9}'`);
+    // From level 10, with the Profesje, the recipe is known.
+    await set(`level = 10, potions = '{"lesser-healing":9}'`);
     assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } })).status, 201);
     assert.equal((await quick()).data.error.code, 'busy');
     await call('POST', '/api/hunts/cancel', { cookie });

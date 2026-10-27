@@ -131,7 +131,10 @@ describe('potions through the API', () => {
   beforeEach(async () => {
     ({ cookie } = await signUp('pijaczka'));
     await call('POST', '/api/character', { cookie, body: { name: 'Pijaczka', classId: 'warrior', appearance: 'female' } });
-    await (await db()).prepare(`UPDATE characters SET level = 10, class_level = 10, xp = 0, potions = '{"lesser-healing":5,"lesser-mana":2,"lesser-speed":2}'`).run();
+    // Alchemia at level 5 knows all three recipes.
+    await (await db())
+      .prepare(`UPDATE characters SET level = 10, class_level = 10, xp = 0, professions = '{"alchemy":{"level":5,"xp":0}}', potions = '{"lesser-healing":5,"lesser-mana":2,"lesser-speed":2}'`)
+      .run();
   });
 
   const set = async (sql, ...binds) => (await db()).prepare(`UPDATE characters SET ${sql}`).bind(...binds).run();

@@ -84,7 +84,7 @@ async function friendsOf(db, id, now) {
   ]);
   const sentTo = new Set(sent.results.map((row) => row.receiver_id));
   const from = new Map(waiting.results.map((row) => [row.sender_id, row.count]));
-  const person = (row) => ({ id: row.id, name: row.name, classId: row.class_id, level: row.level, classLevel: row.class_level });
+  const person = (row) => ({ id: row.id, characterId: row.other, name: row.name, classId: row.class_id, level: row.level, classLevel: row.class_level });
   const pending = rows.results.filter((row) => row.accepted_at === null);
   const { max } = content.community.friends;
   const { claimsPerDay } = content.community.gift;

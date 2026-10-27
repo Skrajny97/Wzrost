@@ -61,6 +61,7 @@ import { craftingOn, professionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
 import { requirePlayable } from './sessions.js';
+import { tradeBlockOf } from './trades.js';
 
 // 2 to 20 characters: letters and digits, spaces, hyphens, apostrophes and
 // underscores ("Justi_725"), from a letter to a letter or a digit. What a
@@ -302,15 +303,20 @@ export async function settleQuests(db, player, now) {
 // For changes that need the character at home.
 export async function requireIdlePlayer(context) {
   const found = await requirePlayer(context);
-  const activity = found.player.activity;
-  if (activity) {
-    // A profession's work says so in its own words.
-    const texts = { herbs: content.professionTexts, potions: content.brewing?.texts, items: content.workshop?.texts }[activity.kind];
-    throw activity.ends_at <= context.now
-      ? new ApiError(409, 'claim_first', texts ? texts.claimFirst[0] : 'Wyprawa się skończyła. Najpierw odbierz raport.')
-      : new ApiError(409, 'busy', texts ? texts.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
-  }
+  requireIdle(found.player, context.now);
   return found;
+}
+
+// The character at home, with no exploration or work of a profession going
+// on: its bag and its equipment wait for its return.
+export function requireIdle(player, now) {
+  const activity = player.activity;
+  if (!activity) return;
+  // A profession's work says so in its own words.
+  const texts = { herbs: content.professionTexts, potions: content.brewing?.texts, items: content.workshop?.texts }[activity.kind];
+  throw activity.ends_at <= now
+    ? new ApiError(409, 'claim_first', texts ? texts.claimFirst[0] : 'Wyprawa się skończyła. Najpierw odbierz raport.')
+    : new ApiError(409, 'busy', texts ? texts.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
 }
 
 // Who does a profession's work: the character at home, or with `avatar` in
@@ -800,6 +806,7 @@ export async function characterProfile(context) {
       classLevel: view.classLevel,
       role: chatRole(context.env, found),
       relation: own ? await relationTo(db, own.id, found.id, context.now) : null,
+      tradeBlocked: await tradeBlockOf(db, session.userId, found.user_id),
       equipment: content.slots.map((slot) => ({ slot: slot.id, slotName: slot.name, item: worn(view.equipment[slot.id]) })),
       skills: view.skills.pools.flatMap((pool) =>
         pool.options
@@ -902,6 +909,7 @@ export function characterRemoval(db, id) {
   return [
     db.prepare('DELETE FROM friends WHERE character_id = ? OR friend_id = ?').bind(id, id),
     db.prepare('DELETE FROM gifts WHERE sender_id = ? OR receiver_id = ?').bind(id, id),
+    db.prepare('DELETE FROM trades WHERE from_id = ? OR to_id = ?').bind(id, id),
     db.prepare('DELETE FROM chat_reports WHERE message_id IN (SELECT id FROM chat_messages WHERE character_id = ? OR recipient_id = ?)').bind(id, id),
     db.prepare('DELETE FROM chat_messages WHERE character_id = ? OR recipient_id = ?').bind(id, id),
     db.prepare('DELETE FROM reports WHERE character_id = ?').bind(id),

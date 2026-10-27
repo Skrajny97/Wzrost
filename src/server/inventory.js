@@ -59,6 +59,10 @@ export async function equipItem(context) {
   if (!canUse(item.base, player.row.class_id, content, player.row.class_level)) {
     throw new ApiError(403, 'class_level', `Ten przedmiot założysz od poziomu klasy ${baseClassLevel(item.base, content)}.`);
   }
+  // A strong item from a friend waits for the character to grow into it (trades.js).
+  if (item.traded && item.level > player.row.level) {
+    throw new ApiError(403, 'trade_level', `Przedmiot z wymiany założysz od poziomu postaci ${item.level}.`);
+  }
 
   // Whatever was in the slot goes back to the bag first.
   const db = context.env.DB;

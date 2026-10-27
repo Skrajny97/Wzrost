@@ -159,12 +159,13 @@ export function publicContent() {
       pollSeconds: content.chat.rules.pollSeconds,
       rules: content.chat.texts.rules,
     },
-    // The Społeczność's drop-down list, and the limits of the Znajomi and
-    // the Upominek the page tells of (community.js).
+    // The Społeczność's drop-down list, and the limits of the Znajomi, the
+    // Upominek and the Wymiana the page tells of (community.js, trade.js).
     community: {
       sections: content.community.sections,
       friendsMax: content.community.friends.max,
       gift: { name: content.community.gift.name, claimsPerDay: content.community.gift.claimsPerDay, timePoints: content.community.gift.timePoints },
+      trade: { proposalSeconds: content.community.trade.proposalSeconds, maxItems: content.community.trade.maxItems },
     },
   };
 }

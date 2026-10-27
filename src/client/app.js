@@ -3,7 +3,7 @@
 // so the static file server needs no routes. All visible texts are in Polish.
 
 import { ApiError, request } from './api.js';
-import { $, $$, clear, h, icon } from './dom.js';
+import { $, $$, clear, fill, h, icon } from './dom.js';
 import { emailRow, inviteToConfirm, mustConfirm, renderConfirm, takeEmailResult } from './email.js';
 import { countOf } from './format.js';
 import { preloadPortraits } from './art.js';
@@ -23,6 +23,7 @@ import { mountProfessions } from './screens/professions.js';
 import { mountReport } from './screens/report.js';
 import { mountSkills } from './screens/skills.js';
 import { mountStats } from './screens/stats.js';
+import { mountTrade, offerTrade } from './screens/trade.js';
 import { musicVolume, setMusicConfig, setMusicPlace, setMusicVolume, startMusic } from './music.js';
 import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
@@ -52,6 +53,8 @@ const ROUTES = [
   { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', music: 'professions', mount: mountProfessions },
   { pattern: /^#\/osada$/, nav: 'main', tab: 'osada', mount: lockedScreen('settlement', 'Osada') },
   { pattern: /^#\/spolecznosc$/, nav: 'main', tab: 'spolecznosc', mount: mountCommunity },
+  // A Wymiana with another player's character, from the Społeczność.
+  { pattern: /^#\/wymiana$/, nav: 'main', tab: null, lit: 'spolecznosc', mount: mountTrade },
   { pattern: /^#\/dziennik(?:\/(?<tab>system))?$/, nav: 'main', tab: 'dziennik', mount: mountJournal },
   { pattern: /^#\/raport\/(?<id>\d+)$/, nav: 'main', tab: null, mount: mountReport },
   // The camp opens from the top bar: the board, or one building.
@@ -223,6 +226,7 @@ function openGame() {
     watchCrafting(now);
     watchQuests(now);
     checkChat();
+    offerTrade();
   }, 1000);
   checkChat({ now: true });
 }
@@ -353,9 +357,12 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// Someone wrote in the chat, or the player read it: the bar shows it.
+// Someone wrote in the chat, or the player read it: the bar shows it. A
+// Wymiana proposed asks in a sheet.
 onChatNews(() => {
-  if (!views.game.hidden) renderNav();
+  if (views.game.hidden) return;
+  renderNav();
+  offerTrade();
 });
 
 window.addEventListener('hashchange', route);
@@ -476,6 +483,52 @@ function googleRow() {
   );
 }
 
+// "Wymiana" (screens/trade.js): whether the player takes trades, and the
+// players it takes none from, each with "Odblokuj". From the Społeczność on.
+function tradeRows() {
+  if (!isUnlocked('community')) return null;
+  let off = false;
+  const toggle = h('button', { type: 'button', class: 'toggle', role: 'switch', 'aria-labelledby': 'trade-label', 'aria-checked': 'false', disabled: true, text: '…' });
+  const blocked = h('div', { class: 'status-row status-row--trade-blocked', hidden: true });
+  const show = (settings) => {
+    off = settings.off;
+    toggle.disabled = false;
+    toggle.setAttribute('aria-checked', String(!off));
+    toggle.textContent = off ? 'Wyłączona' : 'Włączona';
+    blocked.hidden = settings.blocked.length === 0;
+    fill(
+      blocked,
+      h('dt', { text: 'Zablokowane wymiany' }),
+      h(
+        'dd',
+        {},
+        h(
+          'ul',
+          { class: 'trade-blocked' },
+          settings.blocked.map((entry) =>
+            h(
+              'li',
+              {},
+              h('span', { text: entry.name }),
+              h('button', {
+                type: 'button',
+                class: 'button button--world button--small',
+                text: 'Odblokuj',
+                onClick: (event) => withButton(event.currentTarget, async () => show(await call('POST', '/api/trade/block', { user: entry.user, blocked: false }))),
+              }),
+            ),
+          ),
+        ),
+      ),
+    );
+  };
+  toggle.addEventListener('click', () => withButton(toggle, async () => show(await call('POST', '/api/trade/settings', { off: !off }))));
+  call('GET', '/api/trade/settings').then(show, () => {
+    toggle.textContent = 'brak połączenia';
+  });
+  return [h('div', { class: 'status-row' }, h('dt', { id: 'trade-label', text: 'Wymiana' }), h('dd', {}, toggle)), blocked];
+}
+
 // An account with test mode opens only with Google once linked, so the
 // player is asked first.
 async function confirmGoogleOnly(event) {
@@ -528,6 +581,7 @@ function openSettings() {
       h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: 'Głos narratora' }), h('dd', {}, voiceSwitch('voice-label'))),
       h('div', { class: 'status-row' }, h('dt', { id: 'motion-label', text: 'Animacje' }), h('dd', {}, motionSwitch('motion-label'))),
       pushRow(),
+      tradeRows(),
       zoomOffered() && zoomRow(),
       testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),

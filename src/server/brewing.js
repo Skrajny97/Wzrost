@@ -30,7 +30,7 @@ import { buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdlePl
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, insertWork, requireProfessions, takeFromBag, workGains } from './professions.js';
-import { herbsOf, potionsOf } from './professions-view.js';
+import { herbsOf, potionKnown, potionsOf } from './professions-view.js';
 import { KEPT_REPORTS } from './reports.js';
 import { say } from '../engine/text.js';
 
@@ -200,6 +200,9 @@ export async function drinkPotion(context) {
   const body = await readJson(context.request);
   const taken = potionCount(player, { potionId: body.potionId, count: 1 });
   const potion = content.potionsById[taken.id];
+  if (!potion.effect.heal && !potion.effect.speed) throw new ApiError(409, 'fight_only', 'Ta mikstura działa sama w walce, gdy zabraknie many na umiejętność.');
+  // One got in a Wymiana waits for its recipe (DECISIONS.md, "Wymiana").
+  if (!potionKnown(player.row, potion)) throw new ApiError(409, 'unknown_recipe', `Nie znasz jeszcze receptury: ${potion.name}.`);
   const texts = content.potionUse.texts;
   const now = context.now;
   let also;
@@ -215,8 +218,6 @@ export async function drinkPotion(context) {
     const buffs = drinkSpeed(buffsOf(player.row, now), potion);
     also = { sql: 'buffs = ?', binds: [JSON.stringify(buffs)] };
     text = say(texts, 'drunkSpeed', 0, { potion: potion.counted[0], bonus: Math.round(potion.effect.speed * 100), minutes: Math.round(speedLeft(buffs) / 60000) });
-  } else {
-    throw new ApiError(409, 'fight_only', 'Ta mikstura działa sama w walce, gdy zabraknie many na umiejętność.');
   }
   const result = await takeFromBag(context.env.DB, player, 'potions', taken, 0, also);
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Mikstury zmieniły się w międzyczasie. Spróbuj ponownie.');

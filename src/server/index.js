@@ -25,6 +25,7 @@ import { getReport, listReports } from './reports.js';
 import { learnSkill, raiseSkill } from './skills.js';
 import { backFromTest, repeatCommunityTour, repeatProfessionsTour, repeatSkillsTour, skipBuilding, skipTime, testIntroduction, tutorialTests } from './testing.js';
 import { skipWithTimePoints } from './time.js';
+import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
 import { seeTutorial } from './tutorial.js';
 import { startCrafting } from './workshop.js';
 
@@ -93,6 +94,15 @@ const routes = [
   ['GET', '/api/chat', readChat],
   ['GET', '/api/chat/latest', latestChat],
   ['GET', '/api/ranking', ranking],
+  ['GET', '/api/trade', readTrade],
+  ['GET', '/api/trade/settings', tradeSettings],
+  ['POST', '/api/trade/propose', proposeTrade],
+  ['POST', '/api/trade/answer', answerTrade],
+  ['POST', '/api/trade/offer', setOffer],
+  ['POST', '/api/trade/confirm', confirmTrade],
+  ['POST', '/api/trade/cancel', cancelTrade],
+  ['POST', '/api/trade/settings', setTradeSettings],
+  ['POST', '/api/trade/block', blockTrades],
   ['GET', '/api/friends', friendsView],
   ['POST', '/api/friends/invite', inviteFriend],
   ['POST', '/api/friends/accept', acceptFriend],

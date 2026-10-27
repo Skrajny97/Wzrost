@@ -1,11 +1,13 @@
 // What waits in the Społeczność: messages someone wrote in the Globalny or
 // in a private conversation since the player last read them, invitations
-// to the Znajomi and Upominki to collect. The Społeczność tab lights up then
-// (layout.js), as Postać does for free points, and so do their parts in its
-// list and the chat's tabs (screens/community.js). While the game is in
-// front, the page asks for them every minute (/api/chat/latest in
-// src/server/chat.js); the newest messages read stay on the device, and so
-// does the Globalny's light muted. Private messages light it even then.
+// to the Znajomi, Upominki to collect and a Wymiana proposed or going on.
+// The Społeczność tab lights up then (layout.js), as Postać does for free
+// points, and so do their parts in its list and the chat's tabs
+// (screens/community.js). While the game is in front, the page asks for
+// them every 15 seconds (/api/chat/latest in src/server/chat.js), which
+// also keeps the player online for a Wymiana; the newest messages read stay
+// on the device, and so does the Globalny's light muted. Private messages
+// light it even then.
 
 import { request } from './api.js';
 import { isUnlocked, state } from './state.js';
@@ -13,7 +15,7 @@ import { isUnlocked, state } from './state.js';
 const SEEN_KEY = 'insight-chat-seen';
 const PRIVATE_KEY = 'insight-chat-private-seen';
 const MUTED_KEY = 'insight-chat-muted';
-const EVERY_MS = 60000;
+const EVERY_MS = 15000;
 
 let latest = 0;
 let seen = 0;
@@ -32,6 +34,8 @@ try {
 let conversations = [];
 let invites = 0;
 let gifts = 0;
+// The character's live Wymiana: { id, state, proposer, other }, or null.
+let trade = null;
 let askedAt = 0;
 const listeners = new Set();
 
@@ -40,12 +44,23 @@ export const globalNews = () => open() && !muted && latest > seen;
 export const conversationNews = (id, newest = conversations.find((entry) => entry.id === id)?.latest ?? 0) => open() && newest > (privateSeen[id] ?? 0);
 export const chatNews = () => globalNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest));
 export const friendNews = () => open() && invites + gifts > 0;
-export const communityNews = () => chatNews() || friendNews();
+export const liveTrade = () => (open() ? trade : null);
+// A proposal to this character, or a trade going on.
+export const tradeNews = () => Boolean(liveTrade()) && !(trade.state === 'proposed' && trade.proposer);
+export const communityNews = () => chatNews() || friendNews() || tradeNews();
 export const chatMuted = () => muted;
 
 // The tab's light in words, for a screen reader.
 export const communityNewsText = () =>
-  chatNews() ? 'nowe wiadomości na czacie' : invites > 0 ? 'zaproszenie do znajomych czeka' : 'upominek czeka';
+  tradeNews()
+    ? trade.state === 'proposed'
+      ? 'propozycja wymiany czeka'
+      : 'trwa wymiana'
+    : chatNews()
+      ? 'nowe wiadomości na czacie'
+      : invites > 0
+        ? 'zaproszenie do znajomych czeka'
+        : 'upominek czeka';
 
 // What happens when a light changes (app.js redraws the bar); the returned
 // function stops it.
@@ -55,7 +70,8 @@ export function onChatNews(callback) {
 }
 
 // The lights as words, to tell when one changed.
-const lights = () => [globalNews(), friendNews(), ...conversations.map((entry) => `${entry.id}:${conversationNews(entry.id, entry.latest)}`)].join();
+const lights = () =>
+  [globalNews(), friendNews(), trade && `${trade.id}:${trade.state}:${trade.proposer}`, ...conversations.map((entry) => `${entry.id}:${conversationNews(entry.id, entry.latest)}`)].join();
 
 // Runs `change` and tells the listeners if a light changed.
 function update(change) {
@@ -123,6 +139,13 @@ export function setChatMuted(value) {
   });
 }
 
+// The Wymiana as its screen last saw it (screens/trade.js), live or over.
+export function tradeSeen(view) {
+  update(() => {
+    trade = view && ['proposed', 'open', 'locked'].includes(view.state) ? { id: view.id, state: view.state, proposer: view.proposer, other: view.other.name } : null;
+  });
+}
+
 // The Znajomi as the server last described them (/api/friends): the
 // invitations waiting, and the Upominki the character may still collect today.
 export function friendsSeen(view) {
@@ -132,9 +155,9 @@ export function friendsSeen(view) {
   });
 }
 
-// Asks the server for the newest message and what waits in the Znajomi, at
-// most once a minute unless `now` is set; nothing while the page is in the
-// background.
+// Asks the server for the newest message, what waits in the Znajomi and the
+// Wymiana, at most every 15 seconds unless `now` is set; nothing while the
+// page is in the background.
 export async function checkChat({ now = false } = {}) {
   if (!open() || document.hidden) return;
   if (!now && Date.now() - askedAt < EVERY_MS) return;
@@ -150,5 +173,6 @@ export async function checkChat({ now = false } = {}) {
     conversations = answer.conversations ?? [];
     invites = answer.invites ?? 0;
     gifts = answer.gifts ?? 0;
+    trade = answer.trade ?? null;
   });
 }

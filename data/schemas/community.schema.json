@@ -4,7 +4,7 @@
   "description": "Działy listy rozwijanej Społeczności, Ranking postaci, Znajomi i codzienny Upominek (src/server/community.js).",
   "type": "object",
   "additionalProperties": false,
-  "required": ["sections", "ranking", "friends", "gift"],
+  "required": ["sections", "ranking", "friends", "gift", "trade"],
   "properties": {
     "$comment": { "type": "string" },
     "sections": {
@@ -45,6 +45,19 @@
         "goldChance": { "type": "number", "minimum": 0, "maximum": 1 },
         "gold": { "$ref": "#/definitions/amount" },
         "resources": { "$ref": "#/definitions/amount" }
+      }
+    },
+    "trade": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["onlineSeconds", "proposalSeconds", "idleMinutes", "rejectionsInRow", "pauseMinutes", "maxItems"],
+      "properties": {
+        "onlineSeconds": { "type": "integer", "minimum": 30 },
+        "proposalSeconds": { "type": "integer", "minimum": 10 },
+        "idleMinutes": { "type": "integer", "minimum": 1 },
+        "rejectionsInRow": { "type": "integer", "minimum": 1 },
+        "pauseMinutes": { "type": "integer", "minimum": 1 },
+        "maxItems": { "type": "integer", "minimum": 1 }
       }
     }
   },

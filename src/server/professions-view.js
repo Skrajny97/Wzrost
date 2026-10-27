@@ -32,6 +32,21 @@ import { say } from '../engine/text.js';
 export const herbsOf = (row) => JSON.parse(row.herbs ?? '{}');
 export const potionsOf = (row) => JSON.parse(row.potions ?? '{}');
 
+// Whether the character knows the recipe of a potion: only then may it use
+// one, so a potion got in a Wymiana waits for its recipe, and for the
+// Alchemia itself (the author: "Jeśli gracz w wyniku wymiany wejdzie w
+// posiadanie mikstury jakiejś przed odblokowaniem jej receptury albo w ogóle
+// nawet Profesji Alchemii to nie może jej użyć").
+export function potionKnown(row, potion) {
+  if (!professionsOn() || !isUnlocked('professions', row.level, content)) return false;
+  const alchemy = content.professions.find((profession) => profession.id === content.brewing.profession);
+  const { level } = professionState(JSON.parse(row.professions ?? '{}'), alchemy.id);
+  return professionOpen(alchemy, row.level, content) && potion.level <= level;
+}
+
+// The potions the character carries whose recipes it knows.
+export const knownPotionsOf = (row) => Object.fromEntries(Object.entries(potionsOf(row)).filter(([id]) => content.potionsById[id] && potionKnown(row, content.potionsById[id])));
+
 // The herbs in the bag, one entry for each herb, with the scrapper's price of
 // one at the camp's Skup złomu (sellBonus). The page splits them into stacks.
 export function bagHerbs(row, sellBonus) {
@@ -63,6 +78,7 @@ export function bagPotions(row, sellBonus) {
       price: potionPrice(potion, content) * (1 + sellBonus),
       fight: fightKind(potion),
       drink: Boolean(potion.effect.heal || potion.effect.speed),
+      known: potionKnown(row, potion),
     }));
 }
 

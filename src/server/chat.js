@@ -15,10 +15,14 @@ import { isUnlocked } from '../engine/index.js';
 import { isAuthor } from './author.js';
 import { content } from './content.js';
 import { friendNews } from './community.js';
+import { tradeNews } from './trades.js';
 import { ApiError, json, readJson } from './http.js';
 import { requirePlayable, requireSession } from './sessions.js';
 
 const DAY = 24 * 3600000;
+// How often the time the game last asked is written down: who is online
+// for a Wymiana (trades.js).
+const SEEN_EVERY = 30000;
 // A silence "na stałe" lasts until the end of the time Date knows.
 export const FOREVER = 8.64e15;
 
@@ -116,7 +120,7 @@ export async function requireChatter(context) {
   const db = context.env.DB;
   const [characters, accounts] = await db.batch([
     db.prepare("SELECT id, name, level, class_id FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId),
-    db.prepare('SELECT login, google_sub, chat_moderator, chat_rules_at, chat_muted_until FROM users WHERE id = ?').bind(session.userId),
+    db.prepare('SELECT login, google_sub, chat_moderator, chat_rules_at, chat_muted_until, trade_off, seen_at FROM users WHERE id = ?').bind(session.userId),
   ]);
   const character = characters.results[0];
   if (!character) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
@@ -124,6 +128,9 @@ export async function requireChatter(context) {
     throw new ApiError(403, 'locked', `Społeczność odblokujesz na poziomie postaci ${content.unlocksById.community.level}.`);
   }
   const account = accounts.results[0];
+  if (!(context.now - (account.seen_at ?? 0) < SEEN_EVERY)) {
+    await db.prepare('UPDATE users SET seen_at = ? WHERE id = ?').bind(context.now, session.userId).run();
+  }
   return { session, character, account, role: chatRole(context.env, account), db };
 }
 
@@ -189,11 +196,12 @@ export async function readChat(context) {
 
 // GET /api/chat/latest: the newest message someone else wrote in the
 // Globalny that this player may read, the private conversations with the
-// newest message of each other character, and the Upominki and invitations
-// waiting in Znajomi (community.js), for the light on the Społeczność tab.
+// newest message of each other character, the Upominki and invitations
+// waiting in Znajomi (community.js), for the light on the Społeczność tab,
+// and a Wymiana proposed or going on (trades.js).
 export async function latestChat(context) {
   const { session, character, db } = await requireChatter(context);
-  const [row, conversations, friends] = await Promise.all([
+  const [row, conversations, friends, trade] = await Promise.all([
     db
       .prepare(
         `SELECT MAX(id) AS id FROM chat_messages
@@ -203,8 +211,9 @@ export async function latestChat(context) {
       .first(),
     conversationsOf(db, session.userId, character.id).all(),
     friendNews(db, character.id, context.now),
+    tradeNews(db, character.id, context.now),
   ]);
-  return json({ latest: row.id ?? 0, conversations: conversations.results.map(conversationView), ...friends });
+  return json({ latest: row.id ?? 0, conversations: conversations.results.map(conversationView), ...friends, trade });
 }
 
 // POST /api/chat/rules: the player accepts the rules of the chat.

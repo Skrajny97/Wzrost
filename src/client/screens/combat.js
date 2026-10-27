@@ -588,7 +588,8 @@ export function mountCombat(container, { params, navigate }) {
       );
     // Potions to take along, once the character carries some that work in fights.
     const use = character.professions?.potionUse;
-    const carried = use && !first ? (character.potions ?? []).filter((potion) => potion.fight) : [];
+    // One from a Wymiana stays home until its recipe is known.
+    const carried = use && !first ? (character.potions ?? []).filter((potion) => potion.fight && potion.known) : [];
     potions = carried.length > 0 ? potionPicker(carried, use) : null;
     showThreat = () => {
       const known = options[area.id];

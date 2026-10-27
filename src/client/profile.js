@@ -1,8 +1,9 @@
 // Another player's character, from a tap on its name in the chat, the
 // Ranking or the Znajomi: its portrait, levels, what it wears and the skills
 // it has learned (characterProfile in src/server/characters.js), with a
-// private message to it in the chat and what the player can do with it as a
-// friend (src/server/community.js). A tap on a piece of gear shows its
+// private message to it in the chat, a Wymiana (screens/trade.js) and what
+// the player can do with it as a friend (src/server/community.js); last,
+// trades from its player blocked or not. A tap on a piece of gear shows its
 // properties. `onChange` gets the Znajomi anew after a friend's action.
 
 import { portraitSprite, skillSprite } from './art.js';
@@ -12,6 +13,7 @@ import { SLOT_ICONS } from './icons.js';
 import { call, state } from './state.js';
 import { closeSheet, confirmAction, openSheet, toast, withButton } from './ui.js';
 import { itemSummary } from './screens/character.js';
+import { proposeTrade } from './screens/trade.js';
 
 const PATHS = { main: 'ścieżka główna', second: 'ścieżka poboczna' };
 
@@ -125,7 +127,33 @@ function friendship(profile, onChange) {
               'danger',
             ),
           ];
-  return h('div', { class: 'profile-friend' }, whisper(profile), parts);
+  return h('div', { class: 'profile-friend' }, whisper(profile), tradeButton(profile), parts, tradeBlock(profile, again));
+}
+
+// "Wymiana": a trade proposed to the character, while both players are
+// online.
+const tradeButton = (profile) =>
+  h('button', {
+    type: 'button',
+    class: 'button button--system button--small',
+    text: 'Wymiana',
+    onClick: (event) => withButton(event.currentTarget, () => proposeTrade({ id: profile.id, name: profile.name })),
+  });
+
+// No trades proposed by the character's player, or trades again.
+function tradeBlock(profile, again) {
+  const blocked = profile.tradeBlocked;
+  return h('button', {
+    type: 'button',
+    class: 'button button--world button--small',
+    text: blocked ? 'Odblokuj wymianę' : 'Zablokuj wymianę',
+    onClick: (event) =>
+      withButton(event.currentTarget, async () => {
+        await call('POST', '/api/trade/block', { id: profile.id, blocked: !blocked });
+        toast(blocked ? `${profile.name} znów może zaproponować Ci wymianę.` : `${profile.name} nie zaproponuje Ci już wymiany.`);
+        await again();
+      }),
+  });
 }
 
 // "Prywatna wiadomość": the chat of the Społeczność opens the conversation
