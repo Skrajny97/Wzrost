@@ -6,8 +6,10 @@
 // Prompts, styles and sizes are in art/prompts.json; a prompt given as
 // { prompt, style } draws in its own style. The approved sprites listed
 // there as references (art/references/<kind>/<id>.png) keep the style of the new
-// ones consistent. Every request is priced first (free), and the run stops
-// before it would spend more than --max-cost dollars.
+// ones consistent. A kind with `animation` draws looping animations, one at a
+// time, each as a PNG sheet of its frames side by side. Every request is
+// priced first (free), and the run stops before it would spend more than
+// --max-cost dollars.
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
@@ -100,8 +102,9 @@ const failed = [];
 let spent = 0;
 let balance = null;
 
-// One drawing: priced, then drawn and saved with what came back.
-async function draw(id) {
+// One drawing: priced, then drawn and saved with what came back. An
+// animation comes one at a time, so its variants are drawings of their own.
+async function draw(id, count = variants) {
   const seed = values.seed ? Number(values.seed) : Math.floor(Math.random() * 1e9);
   const style = styleOf(id);
   const payload = {
@@ -109,10 +112,11 @@ async function draw(id) {
     prompt_style: style,
     width: kind.width,
     height: kind.height,
-    num_images: variants,
+    num_images: count,
     seed,
     // Sprites lose their background; scenes (removeBackground: false) keep it.
     ...(kind.removeBackground === false ? {} : { remove_bg: true, return_non_bg_removed: true }),
+    ...(kind.animation && { return_spritesheet: true, ...(kind.animation.frames && { frames_duration: kind.animation.frames }) }),
   };
   const refs = references(id);
   if (refs.length) payload.reference_images = refs;
@@ -147,11 +151,13 @@ async function draw(id) {
 
 // A failed drawing does not stop the others, so the paid ones are kept.
 for (const id of ids) {
-  try {
-    await draw(id);
-  } catch (error) {
-    failed.push(id);
-    lines.push(`| ${id} | błąd: ${error.message} | | |`);
+  for (let take = 0; take < (kind.animation ? variants : 1); take++) {
+    try {
+      await draw(id, kind.animation ? 1 : variants);
+    } catch (error) {
+      failed.push(id);
+      lines.push(`| ${id} | błąd: ${error.message} | | |`);
+    }
   }
 }
 

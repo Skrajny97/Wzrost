@@ -28,6 +28,7 @@ on:
           - potions
           - professions
           - places
+          - animations
       ids:
         description: Identyfikatory po przecinku albo all
         required: true
