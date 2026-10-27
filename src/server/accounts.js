@@ -194,7 +194,7 @@ export async function deleteAccount(context) {
   const id = session.userId;
   const characters = 'SELECT id FROM characters WHERE user_id = ?';
   await db.batch([
-    ...['reports', 'activities', 'items', 'buildings'].map((table) =>
+    ...['reports', 'activities', 'avatar_activities', 'items', 'buildings'].map((table) =>
       db.prepare(`DELETE FROM ${table} WHERE character_id IN (${characters})`).bind(id),
     ),
     db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),

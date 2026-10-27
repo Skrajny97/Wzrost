@@ -103,6 +103,8 @@ export function buildContent(raw) {
     professionsById: byId(raw.professions?.professions ?? []),
     professionRules: raw.professions?.rules,
     professionsIntro: raw.professions?.intro,
+    // The Awatar Systemu (src/server/avatar.js).
+    avatar: raw.professions?.avatar,
     gathering: raw.professions?.gathering,
     herbs: raw.professions?.herbs ?? [],
     herbsById: byId(raw.professions?.herbs ?? []),

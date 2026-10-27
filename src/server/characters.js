@@ -95,9 +95,10 @@ const nameKey = (name) => name.toLowerCase();
 export async function loadPlayer(db, userId) {
   const row = await db.prepare("SELECT * FROM characters WHERE user_id = ? AND role = 'player'").bind(userId).first();
   if (!row) return null;
-  const [items, activities, buildings] = await db.batch([
+  const [items, activities, avatarActivities, buildings] = await db.batch([
     db.prepare('SELECT id, slot, data FROM items WHERE character_id = ? ORDER BY id').bind(row.id),
     db.prepare('SELECT * FROM activities WHERE character_id = ?').bind(row.id),
+    db.prepare('SELECT * FROM avatar_activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT building_id, level, started_at, ends_at, collected_at FROM buildings WHERE character_id = ?').bind(row.id),
   ]);
   return {
@@ -105,6 +106,8 @@ export async function loadPlayer(db, userId) {
     // equippedSlot is where the item is worn (null in the bag); item.slot is where it can go.
     items: items.results.map((item) => ({ id: item.id, equippedSlot: item.slot, ...JSON.parse(item.data) })),
     activity: activities.results[0] ?? null,
+    // The work of the Awatar Systemu, kept as the character's own (avatar.js).
+    avatarActivity: avatarActivities.results[0] ?? null,
     // { campfire: { level, startedAt, endsAt, collectedAt } }: see camp.js in the engine.
     buildings: Object.fromEntries(
       buildings.results.map((building) => [
@@ -305,6 +308,32 @@ export async function requireIdlePlayer(context) {
       : new ApiError(409, 'busy', texts ? texts.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
   }
   return found;
+}
+
+// Who does a profession's work: the character at home, or with `avatar` in
+// the request its Awatar Systemu, bought and free (avatar.js), while the
+// character may be away or at work itself.
+export async function requireWorker(context, body) {
+  if (body.avatar !== true) return { ...(await requireIdlePlayer(context)), avatar: false };
+  const found = await requirePlayer(context);
+  const { row, avatarActivity } = found.player;
+  if (!row.avatar_at) throw new ApiError(409, 'no_avatar', 'Nie masz jeszcze Awatara Systemu.');
+  if (avatarActivity) {
+    const { texts } = content.avatar;
+    throw avatarActivity.ends_at <= context.now ? new ApiError(409, 'claim_first', texts.claimFirst[0]) : new ApiError(409, 'busy', texts.busy[0]);
+  }
+  return { ...found, avatar: true };
+}
+
+// The work of the character or, with `avatar`, of its Awatar Systemu: the
+// table it sits in, the activity and the key of its report.
+export function workOf(player, avatar) {
+  const activity = avatar ? player.avatarActivity : player.activity;
+  return {
+    table: avatar ? 'avatar_activities' : 'activities',
+    activity,
+    key: avatar ? `${player.row.id}:avatar:${activity.started_at}` : `${player.row.id}:${activity.started_at}`,
+  };
 }
 
 export function engineCharacter(row) {
@@ -554,10 +583,36 @@ function activityPlace(activity, level) {
   return { areaId: area.id, areaName: area.name, regionId: area.regionId, regionName: area.regionName };
 }
 
+// An activity as the page shows it, of the character or of its Awatar.
+function activityView(activity, level, now) {
+  return (
+    activity && {
+      kind: activity.kind,
+      ...activityPlace(activity, level),
+      minutes: activity.minutes,
+      startedAt: activity.started_at,
+      endsAt: activity.ends_at,
+      avoidRare: activity.avoid_rare === 1,
+      seekRare: activity.seek_rare === 1,
+      // The creatures the exploration tracks for the quests (hunts.js).
+      tracksQuests: activity.tracked !== null && activity.tracked !== undefined,
+      finished: activity.ends_at <= now,
+    }
+  );
+}
+
+// The Awatar Systemu (avatar.js): its price and words until it is bought,
+// then its work under way, or null.
+function avatarView(player, now) {
+  const { name, price, description } = content.avatar;
+  return { name, price, description, owned: Boolean(player.row.avatar_at), activity: activityView(player.avatarActivity, player.row.level, now) };
+}
+
 export function characterView(player, now) {
   const { row, items, activity } = player;
   const character = engineCharacter(row);
   const equipped = equippedItems(player);
+  const professions = professionsView(row);
   const { totals, sources } = computeStats(character, equipped, content);
   const { hp, maxHp, combatant, rest } = currentHp(player, now);
   const values = combatValues(character, equipped, content);
@@ -657,8 +712,9 @@ export function characterView(player, now) {
     herbStack: content.professionRules.stack,
     bagUsed: bagPlaces(player),
     bagCapacity: bagCapacity(levels, content),
-    // The Profesje tab, or null while it is hidden or locked (professions-view.js).
-    professions: professionsView(row),
+    // The Profesje tab, or null while it is hidden or locked (professions-view.js),
+    // with the Awatar Systemu.
+    professions: professions && { ...professions, avatar: avatarView(player, now) },
     camp: campView(player, levels, now),
     // The Stół rozbiórki: materials, parts and the queue (crafting.js).
     crafting: craftingView(row, levels, now),
@@ -674,18 +730,7 @@ export function characterView(player, now) {
     // The narrator's cards seen so far, or null for a character made before
     // the introduction (tutorial.js).
     tutorial: row.tutorial === null ? null : JSON.parse(row.tutorial),
-    activity: activity && {
-      kind: activity.kind,
-      ...activityPlace(activity, row.level),
-      minutes: activity.minutes,
-      startedAt: activity.started_at,
-      endsAt: activity.ends_at,
-      avoidRare: activity.avoid_rare === 1,
-      seekRare: activity.seek_rare === 1,
-      // The creatures the exploration tracks for the quests (hunts.js).
-      tracksQuests: activity.tracked !== null && activity.tracked !== undefined,
-      finished: activity.ends_at <= now,
-    },
+    activity: activityView(activity, row.level, now),
     serverTime: now,
   };
 }
@@ -781,6 +826,7 @@ export async function deleteCharacter(context) {
   await db.batch([
     db.prepare('DELETE FROM reports WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM activities WHERE character_id = ?').bind(id),
+    db.prepare('DELETE FROM avatar_activities WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM items WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM characters WHERE id = ?').bind(id),

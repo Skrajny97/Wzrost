@@ -128,11 +128,15 @@ async function claimWindow(db, now) {
 async function notificationsByUser(db, from, to) {
   const subscribed = "role = 'player' AND user_id IN (SELECT user_id FROM push_subscriptions)";
   const producing = content.buildings.filter((building) => building.effect.kind === 'production').map((building) => building.id);
-  const [characters, activities, buildings] = await db.batch([
-    db.prepare(`SELECT id, user_id, level, build_queue FROM characters WHERE ${subscribed}`),
+  const ending = (table) =>
     db
-      .prepare(`SELECT character_id, kind, region_id, ends_at FROM activities WHERE ends_at > ? AND ends_at <= ? AND character_id IN (SELECT id FROM characters WHERE ${subscribed})`)
-      .bind(from, to),
+      .prepare(`SELECT character_id, kind, region_id, ends_at FROM ${table} WHERE ends_at > ? AND ends_at <= ? AND character_id IN (SELECT id FROM characters WHERE ${subscribed})`)
+      .bind(from, to);
+  const [characters, activities, avatarActivities, buildings] = await db.batch([
+    db.prepare(`SELECT id, user_id, level, build_queue FROM characters WHERE ${subscribed}`),
+    ending('activities'),
+    // The works of the Awatar Systemu (avatar.js).
+    ending('avatar_activities'),
     // The production buildings for their stores, the others only when a
     // build of theirs ends now.
     db
@@ -144,12 +148,20 @@ async function notificationsByUser(db, from, to) {
       .bind(...producing, from, to),
   ]);
   const players = new Map(
-    characters.results.map((row) => [row.id, { userId: row.user_id, level: row.level, activity: null, buildings: {}, queue: JSON.parse(row.build_queue ?? '[]') }]),
+    characters.results.map((row) => [
+      row.id,
+      { userId: row.user_id, level: row.level, activity: null, avatarActivity: null, buildings: {}, queue: JSON.parse(row.build_queue ?? '[]') },
+    ]),
   );
-  for (const row of activities.results) {
-    const player = players.get(row.character_id);
-    // region_id holds the inner region (or a whole region, from before them).
-    if (player) player.activity = { kind: row.kind, areaId: row.region_id, endsAt: row.ends_at };
+  for (const [rows, key] of [
+    [activities.results, 'activity'],
+    [avatarActivities.results, 'avatarActivity'],
+  ]) {
+    for (const row of rows) {
+      const player = players.get(row.character_id);
+      // region_id holds the inner region (or a whole region, from before them).
+      if (player) player[key] = { kind: row.kind, areaId: row.region_id, endsAt: row.ends_at };
+    }
   }
   for (const row of buildings.results) {
     const player = players.get(row.character_id);

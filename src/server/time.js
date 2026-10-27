@@ -25,11 +25,12 @@ export async function skipWithTimePoints(context) {
   return json({ spent, character: characterView(await loadSettled(context.env.DB, session.userId, context.now), context.now) });
 }
 
-// Points for the minutes left of a wait (`target`: activity, rest or build).
+// Points for the minutes left of a wait (`target`: activity, avatar, rest or
+// build).
 // The skipped introduction pays for its first exploration this way too.
 export async function spendTimePoints(db, player, target, now) {
   if (player.row.time_points < 1) throw new ApiError(409, 'no_time_points', 'Nie masz Punktów Czasu.');
-  const plan = { activity: skipActivity, rest: skipRest, build: skipBuild }[target];
+  const plan = { activity: skipActivity, avatar: skipAvatar, rest: skipRest, build: skipBuild }[target];
   if (!plan) throw new ApiError(400, 'invalid_target', 'Nie wiadomo, co przewinąć.');
   const { spent, statements } = plan(db, player, now);
   // The first statement pays, only if the character and the wait are as seen
@@ -47,11 +48,16 @@ function cost(left, available) {
   return { spent, shift: spent === minutes ? left + SLACK : spent * MINUTE };
 }
 
-// The exploration moves into the past; its result still comes from the seed
-// saved at its start.
-function skipActivity(db, player, now) {
-  const { row, activity } = player;
-  if (!activity || activity.ends_at <= now) throw nothing('Nie trwa żadna wyprawa.');
+// The exploration or the work moves into the past; its result still comes
+// from the seed saved at its start.
+const skipActivity = (db, player, now) => skipWork(db, player, now, 'activities', player.activity, 'Nie trwa żadna wyprawa.');
+
+// The work of the Awatar Systemu (avatar.js) moves the same way.
+const skipAvatar = (db, player, now) => skipWork(db, player, now, 'avatar_activities', player.avatarActivity, 'Awatar Systemu teraz nie pracuje.');
+
+function skipWork(db, player, now, table, activity, none) {
+  const { row } = player;
+  if (!activity || activity.ends_at <= now) throw nothing(none);
   const { spent, shift } = cost(activity.ends_at - now, row.time_points);
   return {
     spent,
@@ -60,12 +66,12 @@ function skipActivity(db, player, now) {
         .prepare(
           `UPDATE characters SET time_points = time_points - ?, version = version + 1
            WHERE id = ? AND version = ? AND time_points >= ?
-             AND EXISTS (SELECT 1 FROM activities WHERE character_id = ? AND started_at = ? AND ends_at = ?)`,
+             AND EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ? AND ends_at = ?)`,
         )
         .bind(spent, row.id, row.version, spent, row.id, activity.started_at, activity.ends_at),
       db
         .prepare(
-          `UPDATE activities SET started_at = started_at - ?, ends_at = ends_at - ?
+          `UPDATE ${table} SET started_at = started_at - ?, ends_at = ends_at - ?
            WHERE character_id = ? AND started_at = ? AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ?)`,
         )
         .bind(shift, shift, row.id, activity.started_at, row.id, row.version + 1),

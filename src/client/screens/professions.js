@@ -7,7 +7,9 @@
 // way: the Systemowa Pracownia, the recipes, how many potions and the
 // brewing under way; and the Rzemieślnictwo screen: the Systemowy
 // Warsztat, the patterns by slot, the rarity, how many items and the order
-// under way. Locked, or hidden in this deployment, the tab says so as before.
+// under way. Each work can be done by the character or by the Awatar Systemu,
+// bought on the tab, which works beside the character in its own card.
+// Locked, or hidden in this deployment, the tab says so as before.
 
 import { herbSprite, itemSprite, placeArt, potionSprite, professionSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
@@ -29,8 +31,11 @@ const WORK = {
   alchemy: { kind: 'potions', busy: 'Warzy mikstury' },
   crafting: { kind: 'items', busy: 'Wykonuje przedmioty' },
 };
+// What the character or the Awatar Systemu is doing, by the activity's kind.
+const DOING = { herbs: 'zbiera zioła', potions: 'warzy mikstury', items: 'wykonuje przedmioty' };
 const FALLBACK_ICONS = { herbalism: 'leaf', alchemy: 'spirit', crafting: 'hammer' };
 const HERB_CHOICE = 'wzrost.herb-choice';
+const WORKER_CHOICE = 'wzrost.worker-choice';
 const BREW_CHOICE = 'wzrost.brew-choice';
 const CRAFT_CHOICE = 'wzrost.craft-choice';
 // The Stół rozbiórki, where parts are made.
@@ -83,16 +88,19 @@ export function mountProfessions(container, { params, navigate }) {
   const craftChoice = loadChoice(CRAFT_CHOICE); // { slot, pattern, rarity, count }
   let lockedScreenShown = null;
   let shownState = null;
-  let countdown = null;
-  let progress = null;
-  let scene = null;
-  let skipper = null;
+  // The works under way on the screen, each with its countdown, bar, scene
+  // and "Przewiń": the character's and the Awatar's.
+  let timers = [];
 
-  // What the screen shows depends on: the gathering under way (or not) and
-  // whether it has ended, and test mode.
+  // What the screen shows depends on: the work under way (or not) of the
+  // character and of the Awatar, whether it has ended, and test mode.
   const stateKey = (character, now = serverNow()) => {
-    const activity = character.activity;
-    return JSON.stringify([activity?.kind ?? null, activity?.startedAt ?? null, activityFinished(activity, now), state.user.testMode && testModeOn()]);
+    const works = [character.activity, character.professions?.avatar?.activity];
+    return JSON.stringify([
+      ...works.flatMap((work) => [work?.kind ?? null, work?.startedAt ?? null, activityFinished(work, now)]),
+      character.professions?.avatar?.owned ?? false,
+      state.user.testMode && testModeOn(),
+    ]);
   };
 
   function render() {
@@ -104,10 +112,7 @@ export function mountProfessions(container, { params, navigate }) {
     }
     lockedScreenShown = null;
     shownState = stateKey(character);
-    countdown = null;
-    progress = null;
-    scene = null;
-    skipper = null;
+    timers = [];
     if (professionId === 'herbalism') {
       renderHerbalism(character);
       return;
@@ -133,6 +138,7 @@ export function mountProfessions(container, { params, navigate }) {
       h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Profesje' })),
       intro,
       triangle(character),
+      avatarPanel(character),
     );
   }
 
@@ -170,73 +176,183 @@ export function mountProfessions(container, { params, navigate }) {
       );
     }
     const work = WORK[profession.id];
-    const working = work && character.activity?.kind === work.kind;
+    const own = work && character.activity?.kind === work.kind ? character.activity : null;
+    const avatar = character.professions.avatar.activity;
+    const avatarHere = work && avatar?.kind === work.kind ? avatar : null;
+    let status = `poz. ${profession.level}`;
+    if (own) status = activityFinished(own) ? 'Raport gotowy' : work.busy;
+    else if (avatarHere) status = activityFinished(avatarHere) ? 'Raport Awatara' : 'Pracuje Awatar';
     return h(
       'a',
       { class: 'profession-square', href: HASHES[profession.id] ?? HOME },
       h('span', { class: 'profession-art' }, art),
       label,
-      h('span', { class: 'profession-level', text: working ? (activityFinished(character.activity) ? 'Raport gotowy' : work.busy) : `poz. ${profession.level}` }),
+      h('span', { class: 'profession-level', text: status }),
     );
+  }
+
+  // The Awatar Systemu under the squares: what it is and its price until it
+  // is bought, then what it is doing.
+  function avatarPanel(character) {
+    const { avatar } = character.professions;
+    const card = h('section', { class: 'card avatar-card', 'aria-labelledby': 'avatar-title' }, h('h2', { class: 'card-title', id: 'avatar-title', text: avatar.name }));
+    if (!avatar.owned) {
+      const short = avatar.price - character.gold;
+      card.append(
+        h('p', { class: 'region-description', text: avatar.description }),
+        h('p', { class: 'avatar-price' }, icon('coin', { size: 16 }), ` ${formatNumber(avatar.price)} złota, jednorazowo i na zawsze`),
+        ...(short > 0 ? [h('p', { class: 'muted', text: `Brakuje jeszcze ${formatNumber(short)} złota.` })] : []),
+        h('button', {
+          type: 'button',
+          class: 'button button--system',
+          text: 'Kup Awatara',
+          disabled: short > 0,
+          onClick: async (event) => {
+            const button = event.currentTarget;
+            const sure = await confirmAction({
+              title: `Kupić: ${avatar.name}?`,
+              text: `Zapłacisz ${formatNumber(avatar.price)} złota. Zakup jest jednorazowy i na zawsze.`,
+              confirmLabel: 'Kup',
+            });
+            if (!sure) return;
+            await withButton(button, async () => {
+              const { text } = await call('POST', '/api/avatar/buy');
+              toast(text);
+            });
+          },
+        }),
+      );
+      return card;
+    }
+    const work = avatar.activity;
+    if (!work) {
+      card.append(h('p', { text: 'Czeka na pracę. Wybierz profesję i przy starcie zaznacz, że pracuje Awatar.' }));
+      return card;
+    }
+    const done = activityFinished(work);
+    card.append(
+      h('p', { text: done ? 'Praca skończona. Raport czeka na odbiór.' : `${WORK[work.profession].busy}: ${work.placeName}.` }),
+      h('a', { class: 'button button--world', href: HASHES[work.profession] ?? HOME, text: done ? 'Odbierz raport' : 'Zobacz pracę' }),
+    );
+    return card;
   }
 
   function renderHerbalism(character) {
     const { list, gathering } = character.professions;
     const profession = list.find((candidate) => candidate.id === gathering.professionId);
-    const activity = character.activity;
     fill(
       container,
       backHeading(profession.name, `poziom ${profession.level}`, HOME),
-      // What the character is doing comes first, so a report to claim is
-      // always at the top, above the place (the author).
-      activity?.kind === 'herbs' ? gatheringCard(activity) : activity && busyPanel(activity, 'Do Zagajnika wyruszy po powrocie.'),
+      // What the character and the Awatar are doing comes first, so a
+      // report to claim is always at the top, above the place (the author).
+      works(character, 'herbs', gatheringCard, 'Do Zagajnika wyruszy po powrocie.'),
       testTools(character, 'herbs', 'Tryb testowy: zbieranie skończy się od razu, z tym samym wynikiem.'),
       placeCard(gathering.place),
       levelCard(profession, 'zbierania'),
-      !activity && gatherForm(character, gathering),
+      anyFree(character) && gatherForm(character, gathering),
     );
   }
 
   function renderAlchemy(character) {
     const { list, brewing } = character.professions;
     const profession = list.find((candidate) => candidate.id === brewing.professionId);
-    const activity = character.activity;
     fill(
       container,
       backHeading(profession.name, `poziom ${profession.level}`, HOME),
-      activity?.kind === 'potions' ? brewingCard(activity) : activity && busyPanel(activity, 'Warzenie zacznie po powrocie.'),
+      works(character, 'potions', brewingCard, 'Warzenie możliwe po powrocie.'),
       testTools(character, 'potions', 'Tryb testowy: warzenie skończy się od razu, z tym samym wynikiem.'),
       placeCard(brewing.place),
       levelCard(profession, 'warzenia'),
-      !activity && brewForm(character, brewing),
+      anyFree(character) && brewForm(character, brewing),
     );
   }
 
   function renderCrafting(character) {
     const { list, workshop } = character.professions;
     const profession = list.find((candidate) => candidate.id === workshop.professionId);
-    const activity = character.activity;
     fill(
       container,
       backHeading(profession.name, `poziom ${profession.level}`, HOME),
-      activity?.kind === 'items' ? craftingCard(activity) : activity && busyPanel(activity, 'Wyrób zacznie po powrocie.'),
+      works(character, 'items', craftingCard, 'Wyrób możliwy po powrocie.'),
       testTools(character, 'items', 'Tryb testowy: wyrób skończy się od razu, z tym samym wynikiem.'),
       placeCard(workshop.place),
       levelCard(profession, 'wyrobu'),
-      !activity && craftForm(character, workshop),
+      anyFree(character) && craftForm(character, workshop),
     );
+  }
+
+  // Who is free for a new work: the character at home, and the Awatar
+  // Systemu once bought and not at work.
+  const freeWorkers = (character) => ({ character: !character.activity, avatar: character.professions.avatar.owned && !character.professions.avatar.activity });
+  const anyFree = (character) => {
+    const free = freeWorkers(character);
+    return free.character || free.avatar;
+  };
+
+  // The works of `kind` here, by `card`: the character's, or what it does
+  // elsewhere while no one can take this work (`then` says when it can), and
+  // the Awatar's under its name. A report to claim comes first.
+  function works(character, kind, card, then) {
+    const { avatar } = character.professions;
+    const activity = character.activity;
+    const own = activity?.kind === kind ? card(activity, false) : activity && !freeWorkers(character).avatar && busyPanel(activity, then);
+    const avatarWork = avatar.activity?.kind === kind ? avatar.activity : null;
+    const theirs = avatarWork && h('section', { class: 'stack', 'aria-label': avatar.name }, h('h2', { class: 'section-title', text: avatar.name }), card(avatarWork, true));
+    const avatarFirst = avatarWork && activityFinished(avatarWork) && !(activity?.kind === kind && activityFinished(activity));
+    return avatarFirst ? [theirs, own] : [own, theirs];
   }
 
   // What the character does elsewhere, and when it comes here.
   function busyPanel(activity, then) {
-    const doing = { herbs: 'Postać zbiera zioła.', potions: 'Postać warzy mikstury.', items: 'Postać wykonuje przedmioty.' }[activity.kind] ?? 'Postać jest na wyprawie.';
-    return systemPanel(`${doing} ${then}`);
+    return systemPanel(`Postać ${DOING[activity.kind] ?? 'jest na wyprawie'}. ${then}`);
+  }
+
+  // Who takes a new work, over its start button: with the Awatar bought,
+  // the character or the Awatar when both are free (the last choice is
+  // remembered), otherwise the one that is free. `body` adds the choice to
+  // the start's request.
+  function workerPicker(character) {
+    const { avatar } = character.professions;
+    const free = freeWorkers(character);
+    if (!avatar.owned) return { element: null, body: () => ({}) };
+    let worker = free.character && free.avatar ? (loadChoice(WORKER_CHOICE).worker === 'avatar' ? 'avatar' : 'character') : free.avatar ? 'avatar' : 'character';
+    const row = h('div', { class: 'segmented', role: 'group', 'aria-label': 'Kto pracuje' });
+    const show = () =>
+      fill(
+        row,
+        [
+          ['character', 'Postać'],
+          ['avatar', avatar.name],
+        ].map(([id, name]) =>
+          h('button', {
+            type: 'button',
+            class: 'segmented-option',
+            'aria-pressed': worker === id,
+            disabled: !free[id],
+            text: name,
+            onClick: () => {
+              worker = id;
+              saveChoice(WORKER_CHOICE, { worker });
+              show();
+            },
+          }),
+        ),
+      );
+    show();
+    // Why one of them cannot take it.
+    let note = null;
+    if (!free.character) note = `Postać ${DOING[character.activity.kind] ?? 'jest na wyprawie'}, więc pracę wykona ${avatar.name}.`;
+    else if (!free.avatar) note = activityFinished(avatar.activity) ? `${avatar.name} czeka na odbiór raportu.` : `${avatar.name} ${DOING[avatar.activity.kind]}.`;
+    return {
+      element: h('div', { class: 'stack worker-picker' }, h('p', { class: 'duration-title', text: 'Kto pracuje' }), row, note && h('p', { class: 'muted', text: note })),
+      body: () => (worker === 'avatar' ? { avatar: true } : {}),
+    };
   }
 
   // Test mode only: one button that ends the work of `kind` at once.
   function testTools(character, kind, text) {
-    const activity = character.activity;
-    if (!state.user.testMode || !testModeOn() || activity?.kind !== kind || activityFinished(activity)) return null;
+    const going = [character.activity, character.professions.avatar.activity].some((work) => work?.kind === kind && !activityFinished(work));
+    if (!state.user.testMode || !testModeOn() || !going) return null;
     return h(
       'div',
       { class: 'test-tools' },
@@ -277,19 +393,23 @@ export function mountProfessions(container, { params, navigate }) {
     );
   }
 
-  // "Odbierz raport" of a work that has ended.
-  function claimButton() {
+  // "Odbierz raport" of a work that has ended, the character's or the
+  // Awatar's.
+  function claimButton(avatar) {
     return h('button', {
       type: 'button',
       class: 'button button--system',
       text: 'Odbierz raport',
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
-          const { report } = await call('POST', '/api/hunts/claim');
+          const { report } = await call('POST', avatar ? '/api/avatar/claim' : '/api/hunts/claim');
           openReport(report);
         }),
     });
   }
+
+  // Calling the character or the Awatar back early.
+  const cancelPath = (avatar) => (avatar ? '/api/avatar/cancel' : '/api/hunts/cancel');
 
   function openReport(report) {
     reportCache.set(String(report.id), report);
@@ -299,34 +419,39 @@ export function mountProfessions(container, { params, navigate }) {
 
   // A work under way: its looping scene (scenes.js), what and for how long,
   // the countdown and its bar, the time of the report, "Przewiń" (`label`
-  // names the work) and the button that calls the character back.
-  function workUnderWay(activity, what, label, cancel) {
-    countdown = h('p', { class: 'countdown', 'aria-live': 'off' });
-    progress = h('div', { class: 'bar-fill bar-fill--system' });
-    scene = workScene(activity.profession, activity);
-    skipper = skipControl('activity', (now) => activity.endsAt - now, label);
+  // names the work) and the button that calls the character, or the Awatar,
+  // back.
+  function workUnderWay(activity, what, label, cancel, avatar) {
+    const timer = {
+      activity,
+      countdown: h('p', { class: 'countdown', 'aria-live': 'off' }),
+      progress: h('div', { class: 'bar-fill bar-fill--system' }),
+      scene: workScene(activity.profession, activity, { avatar }),
+      skipper: skipControl(avatar ? 'avatar' : 'activity', (now) => activity.endsAt - now, label),
+    };
+    timers.push(timer);
     const card = h(
       'div',
       { class: 'stack' },
-      ...(scene ? [scene.element] : []),
+      ...(timer.scene ? [timer.scene.element] : []),
       systemPanel(
         what,
-        countdown,
-        h('div', { class: 'bar bar--system' }, progress),
+        timer.countdown,
+        h('div', { class: 'bar bar--system' }, timer.progress),
         h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
       ),
-      skipper.element,
+      timer.skipper.element,
       cancel,
     );
-    tick(serverNow());
+    showTimer(timer, serverNow());
     return card;
   }
 
   // The gathering under way, or its report waiting.
-  function gatheringCard(activity) {
+  function gatheringCard(activity, avatar) {
     const names = activity.herbs.map((herb) => herb.name).join(', ');
     if (activityFinished(activity)) {
-      return systemPanel(`Zbieranie zakończone: ${names}, ${formatMinutes(activity.minutes)}.`, 'Raport czeka na odbiór.', claimButton());
+      return systemPanel(`Zbieranie zakończone: ${names}, ${formatMinutes(activity.minutes)}.`, 'Raport czeka na odbiór.', claimButton(avatar));
     }
     const cancel = h('button', {
       type: 'button',
@@ -336,22 +461,22 @@ export function mountProfessions(container, { params, navigate }) {
         const button = event.currentTarget;
         const sure = await confirmAction({
           title: 'Przerwać zbieranie?',
-          text: 'Postać wróci od razu, bez ziół i bez doświadczenia.',
+          text: avatar ? 'Awatar wróci od razu, bez ziół.' : 'Postać wróci od razu, bez ziół i bez doświadczenia.',
           confirmLabel: 'Przerwij',
           danger: true,
         });
-        if (sure) await withButton(button, () => call('POST', '/api/hunts/cancel'));
+        if (sure) await withButton(button, () => call('POST', cancelPath(avatar)));
       },
     });
-    return workUnderWay(activity, `Zbieranie w toku: ${names}, ${formatMinutes(activity.minutes)}.`, 'Zbieranie', cancel);
+    return workUnderWay(activity, `Zbieranie w toku: ${names}, ${formatMinutes(activity.minutes)}.`, 'Zbieranie', cancel, avatar);
   }
 
   // The brewing under way, or its report waiting. Called back early, the
   // character brings the potions done, with their report.
-  function brewingCard(activity) {
+  function brewingCard(activity, avatar) {
     const what = `${activity.count} × ${activity.potion?.name ?? 'mikstura'}`;
     if (activityFinished(activity)) {
-      return systemPanel(`Warzenie zakończone: ${what}.`, 'Raport czeka na odbiór.', claimButton());
+      return systemPanel(`Warzenie zakończone: ${what}.`, 'Raport czeka na odbiór.', claimButton(avatar));
     }
     const cancel = h('button', {
       type: 'button',
@@ -371,20 +496,20 @@ export function mountProfessions(container, { params, navigate }) {
         });
         if (!sure) return;
         await withButton(button, async () => {
-          const { report } = await call('POST', '/api/hunts/cancel');
+          const { report } = await call('POST', cancelPath(avatar));
           if (report) openReport(report);
         });
       },
     });
-    return workUnderWay(activity, `Warzenie w toku: ${what}, ${formatMinutes(activity.minutes)}.`, 'Warzenie', cancel);
+    return workUnderWay(activity, `Warzenie w toku: ${what}, ${formatMinutes(activity.minutes)}.`, 'Warzenie', cancel, avatar);
   }
 
   // The order under way, or its report waiting. Called back early, the
   // character brings the items done, with their report.
-  function craftingCard(activity) {
+  function craftingCard(activity, avatar) {
     const what = `${activity.count} × ${activity.base?.name ?? 'przedmiot'} (${activity.rarityName})`;
     if (activityFinished(activity)) {
-      return systemPanel(`Wyrób zakończony: ${what}.`, 'Raport czeka na odbiór.', claimButton());
+      return systemPanel(`Wyrób zakończony: ${what}.`, 'Raport czeka na odbiór.', claimButton(avatar));
     }
     const cancel = h('button', {
       type: 'button',
@@ -404,16 +529,17 @@ export function mountProfessions(container, { params, navigate }) {
         });
         if (!sure) return;
         await withButton(button, async () => {
-          const { report } = await call('POST', '/api/hunts/cancel');
+          const { report } = await call('POST', cancelPath(avatar));
           if (report) openReport(report);
         });
       },
     });
-    return workUnderWay(activity, `Wyrób w toku: ${what}, ${formatMinutes(activity.minutes)}.`, 'Wyrób', cancel);
+    return workUnderWay(activity, `Wyrób w toku: ${what}, ${formatMinutes(activity.minutes)}.`, 'Wyrób', cancel, avatar);
   }
 
   // The herbs to gather, the time and the start.
   function gatherForm(character, gathering) {
+    const who = workerPicker(character);
     const known = gathering.herbs.filter((herb) => !herb.hidden);
     const slots = gathering.slots;
     // The last choice, without herbs no longer known or too many for now.
@@ -563,7 +689,7 @@ export function mountProfessions(container, { params, navigate }) {
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           remember();
-          await call('POST', '/api/professions/gather', { herbs: chosen, minutes });
+          await call('POST', '/api/professions/gather', { herbs: chosen, minutes, ...who.body() });
         }),
     });
 
@@ -571,6 +697,7 @@ export function mountProfessions(container, { params, navigate }) {
       'section',
       { class: 'card gather-card', 'aria-labelledby': 'herbs-title' },
       h('h2', { class: 'section-title', id: 'herbs-title', text: 'Zioła' }),
+      who.element,
       tiles,
       slotsHint,
       h(
@@ -590,6 +717,7 @@ export function mountProfessions(container, { params, navigate }) {
   // potions, the time and the herbs they take, the room in the bag and the
   // start.
   function brewForm(character, brewing) {
+    const who = workerPicker(character);
     const known = brewing.recipes.filter((recipe) => !recipe.hidden);
     let recipe = known.find((candidate) => candidate.id === brewChoice.recipe) ?? known[0];
     let count = 1;
@@ -730,7 +858,7 @@ export function mountProfessions(container, { params, navigate }) {
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
             remember();
-            await call('POST', '/api/professions/brew', { recipe: recipe.id, count });
+            await call('POST', '/api/professions/brew', { recipe: recipe.id, count, ...who.body() });
           }),
       });
       return [
@@ -752,6 +880,7 @@ export function mountProfessions(container, { params, navigate }) {
       'section',
       { class: 'card gather-card', 'aria-labelledby': 'recipes-title' },
       h('h2', { class: 'section-title', id: 'recipes-title', text: 'Przepisy' }),
+      who.element,
       tiles,
       about,
       needs,
@@ -764,6 +893,7 @@ export function mountProfessions(container, { params, navigate }) {
   // are shadows), the rarity, how many items, what they take, the chance and
   // the time, and the start.
   function craftForm(character, workshop) {
+    const who = workerPicker(character);
     const known = (slot) => slot.patterns.filter((pattern) => !pattern.hidden);
     // A slot's pattern for the character's class comes first.
     const firstFor = (slot) => known(slot).find((pattern) => !pattern.classNames || pattern.classNames.includes(character.className)) ?? known(slot)[0];
@@ -949,7 +1079,7 @@ export function mountProfessions(container, { params, navigate }) {
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
             remember();
-            await call('POST', '/api/professions/craft', { baseId: pattern.id, rarity: rarity.id, count });
+            await call('POST', '/api/professions/craft', { baseId: pattern.id, rarity: rarity.id, count, ...who.body() });
             // The order's card is at the top, above the long form.
             window.scrollTo(0, 0);
           }),
@@ -979,6 +1109,7 @@ export function mountProfessions(container, { params, navigate }) {
       'section',
       { class: 'card gather-card', 'aria-labelledby': 'patterns-title' },
       h('h2', { class: 'section-title', id: 'patterns-title', text: 'Wzory' }),
+      who.element,
       slotRow,
       tiles,
       hiddenHint,
@@ -1000,14 +1131,15 @@ export function mountProfessions(container, { params, navigate }) {
       render();
       return;
     }
-    skipper?.update(now);
-    const activity = character.activity;
-    if (countdown && activity) {
-      countdown.textContent = formatCountdown(activity.endsAt - now);
-      const done = (now - activity.startedAt) / (activity.endsAt - activity.startedAt);
-      progress.style.width = `${Math.min(100, Math.max(0, done * 100))}%`;
-      scene?.update(done);
-    }
+    for (const timer of timers) showTimer(timer, now);
+  }
+
+  function showTimer({ activity, countdown, progress, scene, skipper }, now) {
+    skipper.update(now);
+    countdown.textContent = formatCountdown(activity.endsAt - now);
+    const done = (now - activity.startedAt) / (activity.endsAt - activity.startedAt);
+    progress.style.width = `${Math.min(100, Math.max(0, done * 100))}%`;
+    scene?.update(done);
   }
 
   render();
@@ -1015,13 +1147,16 @@ export function mountProfessions(container, { params, navigate }) {
 }
 
 // The XP, the profession's levels and the Time Points of a work's report.
+// The Awatar Systemu's work brings no XP and no levels.
 function workSummary(report) {
   const { summary, profession } = report;
-  const rows = [
-    ['XP postaci', `+${formatNumber(summary.xp)} XP`],
-    [profession.name, profession.levelAfter > profession.levelBefore ? `poziom ${profession.levelBefore} → ${profession.levelAfter}` : `poziom ${profession.levelAfter}`],
-    summary.timePoints > 0 && ['Punkty Czasu', `+${formatNumber(summary.timePoints)}`],
-  ].filter(Boolean);
+  const rows = report.avatar
+    ? [['Wykonawca', 'Awatar Systemu']]
+    : [
+        ['XP postaci', `+${formatNumber(summary.xp)} XP`],
+        [profession.name, profession.levelAfter > profession.levelBefore ? `poziom ${profession.levelBefore} → ${profession.levelAfter}` : `poziom ${profession.levelAfter}`],
+        summary.timePoints > 0 && ['Punkty Czasu', `+${formatNumber(summary.timePoints)}`],
+      ].filter(Boolean);
   return h(
     'dl',
     { class: 'status-list' },
@@ -1124,8 +1259,10 @@ export function itemsReport(report, heading, findSheet) {
 }
 
 // What a work's report brought, for the journal's row: "Żywokost ×13",
-// "Mniejsza mikstura leczenia ×12" or "Miecz ×3, nieudane: 1".
+// "Mniejsza mikstura leczenia ×12" or "Miecz ×3, nieudane: 1", after
+// "Awatar Systemu · " for the Awatar's work.
 export const workSummaryText = (summary) =>
+  (summary.avatar ? 'Awatar Systemu · ' : '') +
   [...(summary.herbs ?? summary.potions ?? summary.items ?? []).map((entry) => `${entry.name} ×${formatNumber(entry.count)}`), summary.failed > 0 && `nieudane: ${formatNumber(summary.failed)}`]
     .filter(Boolean)
     .join(', ');

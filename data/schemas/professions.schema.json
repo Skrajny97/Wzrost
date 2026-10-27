@@ -6,6 +6,7 @@
   "additionalProperties": false,
   "required": [
     "rules",
+    "avatar",
     "intro",
     "professions",
     "gathering",
@@ -407,6 +408,29 @@
                 "minLength": 1
               }
             }
+          }
+        }
+      }
+    },
+    "avatar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "price", "description", "texts"],
+      "description": "Awatar Systemu: kupiony raz na zawsze za price złota wykonuje jedną pracę naraz obok postaci, z jej poziomami profesji, ziołami, przepisami i wzorami. Nie daje XP, poziomów profesji ani statystyk.",
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "price": { "type": "integer", "minimum": 1, "description": "Cena w złocie, płacona raz." },
+        "description": { "type": "string", "minLength": 1, "description": "Opis na karcie zakupu w zakładce Profesje." },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bought", "busy", "claimFirst", "pushTitle"],
+          "description": "bought: po zakupie; busy i claimFirst: gdy Awatar dostaje nową pracę, choć jeszcze pracuje albo czeka na odbiór raportu; pushTitle: tytuł powiadomienia na telefonie o końcu jego pracy (treść jest ta sama co przy postaci).",
+          "properties": {
+            "bought": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "busy": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "claimFirst": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "pushTitle": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
           }
         }
       }

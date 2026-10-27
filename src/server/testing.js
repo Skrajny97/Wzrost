@@ -21,13 +21,18 @@ export async function skipTime(context) {
   const db = context.env.DB;
   const now = context.now;
   const activity = player.activity;
-  if (activity) {
-    // Two seconds into the past, because the page shows the report a second after the end.
-    const shift = Math.max(0, activity.ends_at - (now - 2000));
-    await db
-      .prepare('UPDATE activities SET started_at = started_at - ?, ends_at = ends_at - ? WHERE character_id = ? AND started_at = ?')
-      .bind(shift, shift, player.row.id, activity.started_at)
+  // Two seconds into the past, because the page shows the report a second
+  // after the end. The work of the Awatar Systemu (avatar.js) ends with it.
+  const end = (table, work) => {
+    const shift = Math.max(0, work.ends_at - (now - 2000));
+    return db
+      .prepare(`UPDATE ${table} SET started_at = started_at - ?, ends_at = ends_at - ? WHERE character_id = ? AND started_at = ?`)
+      .bind(shift, shift, player.row.id, work.started_at)
       .run();
+  };
+  if (player.avatarActivity) await end('avatar_activities', player.avatarActivity);
+  if (activity) {
+    await end('activities', activity);
   } else {
     const { maxHp } = currentHp(player, now);
     await db

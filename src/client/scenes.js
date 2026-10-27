@@ -47,12 +47,13 @@ function frames(sheet, className) {
 }
 
 // The scene of a work under way: the figure at work (over the picture of
-// its place, when the place has one) and a shelf of the things done so far.
-// Null for a profession without a scene.
-export function workScene(professionId, activity) {
+// its place, when the place has one) and a shelf of the things done so far;
+// with `avatar`, the Awatar Systemu's, in the System's light. Null for a
+// profession without a scene.
+export function workScene(professionId, activity, { avatar = false } = {}) {
   const sheet = config()?.work[professionId];
   if (!sheet) return null;
-  const stage = h('div', { class: `scene-stage scene--${dayPart()}` }, frames(sheet, 'scene-figure'));
+  const stage = h('div', { class: `scene-stage scene--${dayPart()}${avatar ? ' scene--avatar' : ''}` }, frames(sheet, 'scene-figure'));
   const art = sheet.place && placeArt(sheet.place);
   if (art) {
     stage.classList.add('scene-stage--place');

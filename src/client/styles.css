@@ -6160,6 +6160,25 @@ button.herb-tile[aria-pressed='true'] {
 .scene--night {
   filter: brightness(0.62) saturate(0.75);
 }
+/* The Awatar Systemu works as a likeness of the character in the System's
+   light. */
+.scene--avatar .scene-figure {
+  filter: saturate(0.35) brightness(1.15) drop-shadow(0 0 4px rgb(143 227 239 / 0.85));
+}
+/* The Awatar Systemu on the Profesje tab, and the choice of who works. */
+.avatar-card {
+  border-color: var(--system);
+}
+.avatar-price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold);
+}
+.worker-picker {
+  gap: 8px;
+  margin-bottom: 12px;
+}
 .scene-shelf {
   display: flex;
   flex-wrap: wrap;

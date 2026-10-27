@@ -12,11 +12,34 @@ import { say } from './text.js';
 
 const within = (time, from, to) => time > from && time <= to;
 
-// `player`: { level, activity, buildings, queue }: the activity as
-// { kind, areaId, endsAt } (or null), the buildings and the build queue as
-// the camp keeps them (camp.js). Gives [{ tag, url, at, title, body }],
-// oldest first.
-export function notificationsDue({ level, activity, buildings, queue }, from, to, content) {
+// The professions' works: where each one's report waits, and whose place
+// and texts it has.
+const WORKS = {
+  herbs: { url: '#/profesje/zielarstwo', place: 'gathering' },
+  potions: { url: '#/profesje/alchemia', place: 'brewing' },
+  items: { url: '#/profesje/rzemieslnictwo', place: 'workshop' },
+};
+
+// The notification of a work that ended, the character's or, with
+// `avatar`, the Awatar's; null for none.
+function workNotice(activity, from, to, content, avatar = false) {
+  const work = activity && WORKS[activity.kind];
+  if (!work || !within(activity.endsAt, from, to)) return null;
+  const texts = activity.kind === 'herbs' ? content.professionTexts : content[work.place].texts;
+  return {
+    tag: avatar ? `avatar-${activity.kind}` : activity.kind,
+    url: work.url,
+    at: activity.endsAt,
+    title: say(avatar ? content.avatar.texts : texts, 'pushTitle', 0),
+    body: say(texts, 'pushBody', 0, { place: content[work.place].place.name }),
+  };
+}
+
+// `player`: { level, activity, avatarActivity, buildings, queue }: the
+// activity and the Awatar's work as { kind, areaId, endsAt } (or null), the
+// buildings and the build queue as the camp keeps them (camp.js). Gives
+// [{ tag, url, at, title, body }], oldest first.
+export function notificationsDue({ level, activity, avatarActivity = null, buildings, queue }, from, to, content) {
   const { texts } = content;
   const due = [];
   if (activity?.kind === 'hunt' && within(activity.endsAt, from, to)) {
@@ -30,33 +53,10 @@ export function notificationsDue({ level, activity, buildings, queue }, from, to
     });
   }
   // A gathering of herbs (professions.js), a brewing of potions (brewing.js)
-  // and an order of items (workshop.js), told the same way.
-  if (activity?.kind === 'herbs' && within(activity.endsAt, from, to)) {
-    due.push({
-      tag: 'herbs',
-      url: '#/profesje/zielarstwo',
-      at: activity.endsAt,
-      title: say(content.professionTexts, 'pushTitle', 0),
-      body: say(content.professionTexts, 'pushBody', 0, { place: content.gathering.place.name }),
-    });
-  }
-  if (activity?.kind === 'potions' && within(activity.endsAt, from, to)) {
-    due.push({
-      tag: 'potions',
-      url: '#/profesje/alchemia',
-      at: activity.endsAt,
-      title: say(content.brewing.texts, 'pushTitle', 0),
-      body: say(content.brewing.texts, 'pushBody', 0, { place: content.brewing.place.name }),
-    });
-  }
-  if (activity?.kind === 'items' && within(activity.endsAt, from, to)) {
-    due.push({
-      tag: 'items',
-      url: '#/profesje/rzemieslnictwo',
-      at: activity.endsAt,
-      title: say(content.workshop.texts, 'pushTitle', 0),
-      body: say(content.workshop.texts, 'pushBody', 0, { place: content.workshop.place.name }),
-    });
+  // and an order of items (workshop.js), told the same way, and so the work
+  // of the Awatar Systemu (avatar.js), under its own title and tag.
+  for (const work of [workNotice(activity, from, to, content), workNotice(avatarActivity, from, to, content, true)]) {
+    if (work) due.push(work);
   }
 
   // The upgrade under way and the waiting ones: a build from the queue may

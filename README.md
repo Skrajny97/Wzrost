@@ -168,10 +168,13 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/potions/sell` | złomiarz kupuje `count` mikstur `potionId`; zwraca `sold` (400 `unknown_potion`, `invalid_count`; 404 `no_potion`) |
 | POST | `/api/potions/discard` | wyrzuć `count` mikstur `potionId` |
 | POST | `/api/professions/craft` | tylko z profesjami i Rzemieślnictwem (`CRAFTING` = `"on"`, inaczej 404): Rzemieślnictwo, `baseId` (znany wzór), `rarity` (rzadkość otwarta przez poziom) i `count` (1–5) przedmiotów; części i zasoby obozu idą od razu, a plecak musi mieć miejsce na wszystkie (400 `unknown_pattern`, `unknown_rarity`, `invalid_count`; 403 `locked`; 409 `no_parts`, `no_resources`, `bag_full`, `conflict`) |
+| POST | `/api/avatar/buy` | tylko z profesjami: kup Awatara Systemu za `avatar.price` złota z `data/professions.json`, raz na zawsze; zwraca `text` (409 `owned`, `no_gold`, `conflict`). Z `avatar: true` w `gather`, `brew` i `craft` pracę bierze Awatar, także gdy postać jest zajęta (409 `no_avatar`, `busy`, `claim_first`) |
+| POST | `/api/avatar/claim` | odbierz raport zakończonej pracy Awatara (409 `no_activity`, `not_finished`, `already_claimed`) |
+| POST | `/api/avatar/cancel` | odwołaj Awatara wcześniej: zbieranie przepada, warzenie i wyrób oddają to, co gotowe, z raportem (409 `no_activity`, `claim_first`) |
 | POST | `/api/potions/drink` | wypij miksturę `potionId` z plecaka: leczenie od razu, szybkość na 30 minut wypraw, a każda kolejna dodaje 30 (`speedBuff` w postaci: `ms` pozostałego czasu wypraw, `until` końca w trwającej wyprawie, `bonus`); zwraca `text` i `character` (409 `full_hp`, `fight_only` dla many) |
 | GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |
 | GET | `/api/reports/:id` | pełny raport |
-| POST | `/api/time/skip` | „Przewiń”: `target` (`activity`, `rest` albo `build`); 1 Punkt Czasu za minutę, przy za małej liczbie punktów skraca o tyle minut, ile ich jest; zwraca `spent` (409 `no_time_points`, `nothing_to_skip`, `busy`) |
+| POST | `/api/time/skip` | „Przewiń”: `target` (`activity`, `avatar`, `rest` albo `build`); 1 Punkt Czasu za minutę, przy za małej liczbie punktów skraca o tyle minut, ile ich jest; zwraca `spent` (409 `no_time_points`, `nothing_to_skip`, `busy`) |
 | GET | `/api/push/key` | klucz publiczny serwera do subskrypcji powiadomień na telefon |
 | POST | `/api/push/subscribe` | subskrypcja powiadomień tego telefonu, tak jak podaje ją `PushSubscription.toJSON()`; przechodzi na zalogowane konto (400 `invalid_subscription`, gdy adres nie prowadzi do usługi push przeglądarki) |
 | POST | `/api/push/unsubscribe` | wyłączenie powiadomień: `endpoint` subskrypcji |

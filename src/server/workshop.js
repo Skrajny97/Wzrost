@@ -7,7 +7,6 @@
 
 import {
   addQuestProgress,
-  applyWork,
   bagCapacity,
   campLevels,
   craftCost,
@@ -15,47 +14,33 @@ import {
   craftRarities,
   orderMinutes,
   patternLevel,
-  playerCombatant,
   potionsDone,
   professionOpen,
   professionState,
   professionUnlockLevel,
   settleCrafting,
-  workProfession,
-  workXp,
   workshopReport,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, craftingState, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requireIdlePlayer, walletOf } from './characters.js';
+import { bagPlaces, characterView, craftingState, currentHp, loadPlayer, questsNow, requireWorker, walletOf, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { craftingOn } from './features.js';
-import { requireProfessions } from './professions.js';
+import { addTo, insertWork, requireProfessions, workGains } from './professions.js';
 import { KEPT_REPORTS } from './reports.js';
-
-const path = (id) => `$."${id}"`;
-
-// What adds `amounts` (by id) to a JSON column at once, so a change made
-// meanwhile elsewhere (the camp's stores, the table's queue) stays.
-function addTo(column, amounts) {
-  const entries = Object.entries(amounts).filter(([, amount]) => amount > 0);
-  if (entries.length === 0) return { sql: '', binds: [] };
-  return {
-    sql: `, ${column} = json_set(${column}, ${entries.map(() => `?, COALESCE(json_extract(${column}, ?), 0) + ?`).join(', ')})`,
-    binds: entries.flatMap(([id, amount]) => [path(id), path(id), amount]),
-  };
-}
 
 // A share of what an order took, by id: for `of` items out of `count`.
 const shareOf = (amounts, of, count) =>
   Object.fromEntries(Object.entries(amounts ?? {}).map(([id, amount]) => [id, Math.round((amount * of) / Math.max(1, count))]));
 
-// An order of `count` items of a known pattern and rarity, from now on. The
+// An order of `count` items of a known pattern and rarity, from now on, by
+// the character or by its Awatar Systemu (`avatar` in the request). The
 // parts and the resources go at once, only if the character is still as
 // seen, so two taps at once start one order; and only with room in the bag
 // for all the items.
 export async function startCrafting(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const body = await readJson(context.request);
+  const { session, player, avatar } = await requireWorker(context, body);
   requireProfessions(player);
   if (!craftingOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const { workshop } = content;
@@ -63,7 +48,6 @@ export async function startCrafting(context) {
   if (!professionOpen(crafting, player.row.level, content)) {
     throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content)}.`);
   }
-  const body = await readJson(context.request);
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), workshop.profession);
   const base = typeof body.baseId === 'string' ? content.basesById[body.baseId] : undefined;
   if (!base || !workshop.parts[base.slot] || patternLevel(base, content) > level) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
@@ -95,32 +79,24 @@ export async function startCrafting(context) {
   const { row } = player;
   const db = context.env.DB;
   const [taken] = await db.batch([
-    // The HP rested so far is saved, and resting goes on from now.
+    // The HP rested so far is saved, and resting goes on from now; the
+    // Awatar's work leaves it be.
     db
       .prepare(
-        `UPDATE characters SET parts = ?, crafting = ?, resources = ?, hp = ?, hp_at = ?, version = version + 1
-         WHERE id = ? AND version = ? AND NOT EXISTS (SELECT 1 FROM activities WHERE character_id = ?)`,
+        `UPDATE characters SET parts = ?, crafting = ?, resources = ?${avatar ? '' : ', hp = ?, hp_at = ?'}, version = version + 1
+         WHERE id = ? AND version = ? AND NOT EXISTS (SELECT 1 FROM ${avatar ? 'avatar_activities' : 'activities'} WHERE character_id = ?)`,
       )
-      .bind(JSON.stringify(partsLeft), JSON.stringify(table.queue), JSON.stringify(resources), hp, now, row.id, row.version, row.id),
-    db
-      .prepare(
-        `INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options)
-         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ?)`,
-      )
-      .bind(
-        row.id,
-        'items',
-        workshop.place.id,
-        minutes,
-        now,
-        now + minutes * 60000,
-        seed,
-        hp,
-        // The item level is the character's at the start.
-        JSON.stringify({ base: base.id, rarity: rarity.id, count: body.count, level: row.level, parts: cost.parts, resources: cost.resources }),
-        row.id,
-        row.version + 1,
-      ),
+      .bind(JSON.stringify(partsLeft), JSON.stringify(table.queue), JSON.stringify(resources), ...(avatar ? [] : [hp, now]), row.id, row.version, row.id),
+    insertWork(db, avatar, row, {
+      kind: 'items',
+      placeId: workshop.place.id,
+      minutes,
+      now,
+      seed,
+      hp,
+      // The item level is the character's at the start.
+      options: { base: base.id, rarity: rarity.id, count: body.count, level: row.level, parts: cost.parts, resources: cost.resources },
+    }),
   ]);
   if (taken.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
@@ -128,13 +104,15 @@ export async function startCrafting(context) {
 
 // The report of an order (claimHunt sends a finished one here), or with
 // `stop` of the part done before now (cancelHunt). Stopped before the first
-// item, it only gives everything back and makes no report (null).
-export async function finishCrafting(db, player, now, { stop = false } = {}) {
-  const { row, activity } = player;
-  const character = engineCharacter(row);
+// item, it only gives everything back and makes no report (null). With
+// `avatar`, the order of the Awatar Systemu (avatar.js), whose work brings
+// the items alone.
+export async function finishCrafting(db, player, now, { stop = false, avatar = false } = {}) {
+  const { row } = player;
+  const { table, activity, key } = workOf(player, avatar);
   const { workshop } = content;
   const profession = content.professionsById[workshop.profession];
-  const before = professionState(character.professions, profession.id);
+  const before = professionState(JSON.parse(row.professions ?? '{}'), profession.id);
   const options = JSON.parse(activity.options ?? '{}');
   // A base the data no longer has makes nothing.
   const base = content.basesById[options.base];
@@ -149,10 +127,9 @@ export async function finishCrafting(db, player, now, { stop = false } = {}) {
   const partsBack = shareOf(options.parts, options.count - done, options.count);
   const resourcesBack = shareOf(options.resources, options.count - made.length, options.count);
   const back = [addTo('parts', partsBack), addTo('resources', resourcesBack)];
-  const key = `${row.id}:${activity.started_at}`;
   // Only while the activity is as seen, so two calls at once give back once.
-  const ongoing = 'EXISTS (SELECT 1 FROM activities WHERE character_id = ? AND started_at = ?)';
-  const end = db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(row.id, activity.started_at);
+  const ongoing = `EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ?)`;
+  const end = db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at);
   if (done === 0) {
     await db.batch([
       db
@@ -163,16 +140,14 @@ export async function finishCrafting(db, player, now, { stop = false } = {}) {
     return null;
   }
 
-  const after = workProfession(profession, before, worked);
-  const xp = workXp(row.level, worked, content);
-  const work = applyWork(character, xp, content);
-  // A new level heals fully; otherwise resting simply goes on.
-  const levelled = { ...character, level: work.level, xp: work.xp };
-  const hp = work.levelled ? playerCombatant({ character: levelled, equipped: equippedItems(player), name: row.name }, content).maxHp : null;
-  const report = workshopReport(
-    { base, rarityId: options.rarity, results, minutes: worked, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, stopped: stop, before, after, character, xp, work },
-    content,
-  );
+  const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);
+  const report = {
+    ...workshopReport(
+      { base, rarityId: options.rarity, results, minutes: worked, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, stopped: stop, before, after, character, xp, work },
+      content,
+    ),
+    ...(avatar && { avatar: true }),
+  };
   const summary = {
     placeName: report.placeName,
     minutes: report.minutes,
@@ -183,8 +158,8 @@ export async function finishCrafting(db, player, now, { stop = false } = {}) {
     professionLevel: after.level,
     levelAfter: work.level,
     system: report.system,
+    ...(avatar && { avatar: true }),
   };
-  const professions = { ...character.professions, [profession.id]: { level: after.level, xp: after.xp } };
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { made: made.length }));
   const insertItem = db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)');
 
@@ -199,23 +174,10 @@ export async function finishCrafting(db, player, now, { stop = false } = {}) {
         .bind(row.id, row.id, KEPT_REPORTS),
       db
         .prepare(
-          `UPDATE characters SET level = ?, xp = ?, time_points = time_points + ?, professions = ?,
-             quests = CASE WHEN quests = ? THEN ? ELSE quests END${hp === null ? '' : ', hp = ?, hp_at = ?'}${back.map((each) => each.sql).join('')}, version = version + 1
+          `UPDATE characters SET quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${back.map((each) => each.sql).join('')}, version = version + 1
            WHERE id = ? AND ${ongoing}`,
         )
-        .bind(
-          work.level,
-          work.xp,
-          work.timePoints,
-          JSON.stringify(professions),
-          row.quests,
-          quests,
-          ...(hp === null ? [] : [hp, now]),
-          ...back.flatMap((each) => each.binds),
-          row.id,
-          row.id,
-          activity.started_at,
-        ),
+        .bind(row.quests, quests, ...sets.binds, ...back.flatMap((each) => each.binds), row.id, row.id, activity.started_at),
       // The items made go to the bag; the room was there at the start.
       ...made.map((item) => insertItem.bind(row.id, JSON.stringify(item), now)),
       end,

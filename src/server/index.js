@@ -3,6 +3,7 @@
 
 import { deleteAccount, login, logout, me, register } from './accounts.js';
 import { authorPanel, authorSkillDemo, authorSkills } from './author.js';
+import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyParts, cancelBuilding, collectProduction, startBuilding, tradeAtFire } from './camp.js';
@@ -72,6 +73,9 @@ const routes = [
   ['POST', '/api/herbs/discard', discardHerbs],
   ['POST', '/api/professions/brew', startBrewing],
   ['POST', '/api/professions/craft', startCrafting],
+  ['POST', '/api/avatar/buy', buyAvatar],
+  ['POST', '/api/avatar/claim', claimAvatar],
+  ['POST', '/api/avatar/cancel', cancelAvatar],
   ['POST', '/api/potions/sell', sellPotions],
   ['POST', '/api/potions/discard', discardPotions],
   ['POST', '/api/potions/drink', drinkPotion],
