@@ -5840,7 +5840,8 @@ button.herb-tile[aria-pressed='true'] {
   font-weight: 700;
 }
 
-.slot--herb .sprite--item {
+.slot--herb .sprite--item,
+.slot--potion .sprite--item {
   image-rendering: pixelated;
 }
 
@@ -5877,6 +5878,16 @@ button.herb-tile[aria-pressed='true'] {
 .chip--herbs {
   border-color: rgba(167, 196, 127, 0.6);
   color: var(--leaf);
+}
+
+.chip--potions {
+  border-color: var(--system-line);
+  color: var(--system);
+}
+
+/* A brewing's lucky potions. */
+.herb-room--lucky {
+  color: var(--gold);
 }
 
 .report-row-herbs {

@@ -12,6 +12,13 @@ import { anyClaimable, showQuests } from './quests.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
 import { meter } from './ui.js';
 
+// A profession's work, by the kind of its activity: its screen and its name
+// in the top bar.
+const WORK_SCREENS = {
+  herbs: { href: '#/profesje/zielarstwo', label: 'ZIELARSTWO' },
+  potions: { href: '#/profesje/alchemia', label: 'ALCHEMIA' },
+};
+
 const MAIN_TABS = [
   { id: 'postac', label: 'Postać', icon: 'person', href: '#/postac' },
   { id: 'walka', label: 'Walka', icon: 'swords', href: '#/walka' },
@@ -259,10 +266,11 @@ export function updateTopbar(now = serverNow()) {
   const activity = character.activity;
   const { activityLabel, activityTime } = topbar;
   topbar.activity.classList.toggle('activity--done', activityFinished(activity, now));
-  // A gathering of herbs leads to its screen, the rest to Walka.
-  topbar.activity.setAttribute('href', activity?.kind === 'herbs' ? '#/profesje/zielarstwo' : '#/walka');
+  // A profession's work leads to its screen, the rest to Walka.
+  const work = WORK_SCREENS[activity?.kind];
+  topbar.activity.setAttribute('href', work ? work.href : '#/walka');
   if (activity) {
-    activityLabel.textContent = activity.kind === 'herbs' ? `ZIELARSTWO · ${activity.placeName}` : `EKSPLORACJA · ${activity.areaName}`;
+    activityLabel.textContent = work ? `${work.label} · ${activity.placeName}` : `EKSPLORACJA · ${activity.areaName}`;
     activityTime.textContent = activityFinished(activity, now) ? 'RAPORT GOTOWY' : formatCountdown(activity.endsAt - now);
   } else {
     const hpNow = currentHp(character, now);

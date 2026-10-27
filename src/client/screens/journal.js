@@ -5,9 +5,11 @@ import { fill, h, icon } from '../dom.js';
 import { dateTimeFormat, formatMinutes, formatNumber } from '../format.js';
 import { call } from '../state.js';
 import { systemPanel } from '../ui.js';
-import { herbsSummary } from './professions.js';
+import { workSummaryText } from './professions.js';
 
 const RESULT_NAMES = { success: 'sukces', fainted: 'omdlenie', escaped: 'odwrót' };
+// A profession's work, by the kind of its report, and its chip.
+const WORK_CHIPS = { herbs: 'zbieranie', potions: 'warzenie' };
 
 export function mountJournal(container, { params }) {
   const tab = params.tab === 'system' ? 'system' : 'reports';
@@ -52,11 +54,11 @@ export function mountJournal(container, { params }) {
               'span',
               { class: 'report-row-main' },
               h('span', { class: 'report-row-title', text: `${report.areaName ?? report.regionName ?? report.placeName} · ${formatMinutes(report.minutes)}` }),
-              report.kind === 'herbs'
+              WORK_CHIPS[report.kind]
                 ? h(
                     'span',
                     { class: 'report-row-meta' },
-                    h('span', { class: 'chip chip--herbs', text: 'zbieranie' }),
+                    h('span', { class: `chip chip--${report.kind}`, text: WORK_CHIPS[report.kind] }),
                     ` +${formatNumber(report.xp)} XP · ${report.professionName} ${report.professionLevel}`,
                   )
                 : h(
@@ -65,7 +67,7 @@ export function mountJournal(container, { params }) {
                     h('span', { class: `chip chip--${report.result}`, text: RESULT_NAMES[report.result] ?? report.result }),
                     ` +${formatNumber(report.xp)} XP · +${formatNumber(report.gold)} złota`,
                   ),
-              report.kind === 'herbs' && h('span', { class: 'report-row-herbs', text: herbsSummary(report) }),
+              WORK_CHIPS[report.kind] && h('span', { class: 'report-row-herbs', text: workSummaryText(report) }),
               report.bestFind && h('span', { class: 'item-name', vars: { '--rarity': report.bestFind.color }, text: report.bestFind.name }),
             ),
             h('span', { class: 'report-row-date', text: dateTimeFormat.format(new Date(report.createdAt)) }),

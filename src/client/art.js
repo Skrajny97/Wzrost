@@ -93,6 +93,11 @@ export const SPRITES = {
     size: 32,
     ids: ['comfrey', 'mugwort', 'nettle'],
   },
+  // The potions of Alchemia, 32×32, filled in as they are approved.
+  potions: {
+    size: 32,
+    ids: [],
+  },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
     size: 48,
@@ -134,9 +139,11 @@ export const landArt = (regionId) => (available.lands.has(regionId) ? `/art/land
 // has none.
 export const boardGround = () => (available.board.has('camp') ? '/art/board/camp.png' : null);
 export const campArt = (buildingId, tier) => (available.camp.has(`${buildingId}-${tier}`) ? `/art/camp/${buildingId}-${tier}.png` : null);
-// A herb of Zielarstwo, a profession's square on the Profesje tab, and the
-// address of the background of a place where a profession works.
+// A herb of Zielarstwo, a potion of Alchemia, a profession's square on the
+// Profesje tab, and the address of the background of a place where a
+// profession works.
 export const herbSprite = (id) => sprite('herbs', id, 'sprite--item');
+export const potionSprite = (id) => sprite('potions', id, 'sprite--item');
 export const professionSprite = (id) => sprite('professions', id, 'sprite--profession');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 

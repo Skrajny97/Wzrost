@@ -3,7 +3,7 @@
 // The item card also upgrades the item on the camp's Kowadło and takes a bag
 // item apart on the Stół rzemieślniczy.
 
-import { herbSprite, itemSprite, materialSprite, portraitSprite } from '../art.js';
+import { herbSprite, itemSprite, materialSprite, portraitSprite, potionSprite } from '../art.js';
 import { MATERIALS_HINT, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatMinutes, formatNumber, plural, timeFormat } from '../format.js';
@@ -31,17 +31,25 @@ let bagTab = 'items';
 const materialTitle = (material) => material.label.charAt(0).toUpperCase() + material.label.slice(1);
 
 // Why the gear cannot change now: the character is away.
-const busyText = (character) =>
-  character.activity?.kind === 'herbs'
-    ? 'Postać zbiera zioła. Plecak i ekwipunek zmienisz po jej powrocie z Zagajnika.'
-    : 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.';
+const BUSY_TEXTS = {
+  herbs: 'Postać zbiera zioła. Plecak i ekwipunek zmienisz po jej powrocie z Zagajnika.',
+  potions: 'Postać warzy mikstury. Plecak i ekwipunek zmienisz po jej powrocie z Pracowni.',
+};
+const busyText = (character) => BUSY_TEXTS[character.activity?.kind] ?? 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.';
 
-// A herb's stacks in the bag: full ones, then the rest.
-function herbStacks(herb, stack) {
-  const stacks = Array.from({ length: Math.floor(herb.count / stack) }, () => stack);
-  if (herb.count % stack > 0) stacks.push(herb.count % stack);
+// A herb's or a potion's stacks in the bag: full ones, then the rest.
+function stacksOf(entry, stack) {
+  const stacks = Array.from({ length: Math.floor(entry.count / stack) }, () => stack);
+  if (entry.count % stack > 0) stacks.push(entry.count % stack);
   return stacks;
 }
+
+// What the bag holds by the stack: herbs and potions, each with its picture,
+// its slot class and its address in the API (/api/herbs/…, /api/potions/…).
+const STACKS = {
+  herbs: { art: (id) => herbSprite(id) ?? icon('leaf', { size: 24 }), slot: 'slot--herb', api: 'herbs', key: 'herbId', discard: 'Wyrzucić zioła?' },
+  potions: { art: (id) => potionSprite(id) ?? icon('flask', { size: 24 }), slot: 'slot--potion', api: 'potions', key: 'potionId', discard: 'Wyrzucić mikstury?' },
+};
 
 export function mountCharacter(container) {
   function render() {
@@ -211,13 +219,13 @@ export function mountCharacter(container) {
   }
 
   function itemsGrid(bag) {
-    const herbs = state.character.herbs ?? [];
-    if (bag.length === 0 && herbs.length === 0) return h('p', { class: 'muted', text: 'Plecak jest pusty. Łupy z wypraw trafiają tutaj.' });
+    const stacked = Object.keys(STACKS).flatMap((kind) => (state.character[kind] ?? []).map((entry) => ({ kind, entry })));
+    if (bag.length === 0 && stacked.length === 0) return h('p', { class: 'muted', text: 'Plecak jest pusty. Łupy z wypraw trafiają tutaj.' });
     return h(
       'ul',
       { class: 'bag-grid' },
-      herbs.flatMap((herb) =>
-        herbStacks(herb, state.character.herbStack).map((count) =>
+      stacked.flatMap(({ kind, entry }) =>
+        stacksOf(entry, state.character.herbStack).map((count) =>
           h(
             'li',
             {},
@@ -225,11 +233,11 @@ export function mountCharacter(container) {
               'button',
               {
                 type: 'button',
-                class: 'slot slot--bag slot--herb',
-                'aria-label': `${herb.name}, ${formatNumber(count)} szt.`,
-                onClick: () => herbSheet(herb),
+                class: `slot slot--bag ${STACKS[kind].slot}`,
+                'aria-label': `${entry.name}, ${formatNumber(count)} szt.`,
+                onClick: () => stackSheet(kind, entry),
               },
-              herbSprite(herb.id) ?? icon('leaf', { size: 24 }),
+              STACKS[kind].art(entry.id),
               h('span', { class: 'slot-level', text: formatNumber(count) }),
             ),
           ),
@@ -256,29 +264,30 @@ export function mountCharacter(container) {
     );
   }
 
-  // A herb's card: what it is, what the scrapper pays, and selling or
-  // throwing away as many as chosen.
-  function herbSheet(herb) {
+  // A herb's or a potion's card: what it is, what the scrapper pays, and
+  // selling or throwing away as many as chosen.
+  function stackSheet(kind, entry) {
+    const { art: artOf, api, key, discard: discardTitle } = STACKS[kind];
     const character = state.character;
     const busy = Boolean(character.activity);
-    let count = herb.count;
-    const price = (amount) => Math.max(1, Math.round(herb.price * amount));
+    let count = entry.count;
+    const price = (amount) => Math.max(1, Math.round(entry.price * amount));
     const value = h('output', { class: 'herb-count-value' });
     const sell = h('button', { type: 'button', class: 'button button--system', disabled: busy });
     const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
     const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
-    const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(herb.count) });
+    const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(entry.count) });
     function set(next) {
-      count = Math.min(herb.count, Math.max(1, next));
+      count = Math.min(entry.count, Math.max(1, next));
       value.textContent = `${formatNumber(count)} szt.`;
       sell.textContent = `Sprzedaj za ${formatNumber(price(count))} złota`;
       less.disabled = count === 1;
-      more.disabled = count === herb.count;
+      more.disabled = count === entry.count;
     }
     set(count);
     const act = (path, done) => async (event) =>
       withButton(event.currentTarget, async () => {
-        const result = await call('POST', `/api/herbs/${path}`, { herbId: herb.id, count });
+        const result = await call('POST', `/api/${api}/${path}`, { [key]: entry.id, count });
         closeSheet();
         done?.(result);
       });
@@ -289,24 +298,24 @@ export function mountCharacter(container) {
     const discard = async (event) => {
       const button = event.currentTarget;
       const sure = await confirmAction({
-        title: 'Wyrzucić zioła?',
-        text: `${herb.name}: ${formatNumber(count)} szt. zniknie na zawsze.`,
+        title: discardTitle,
+        text: `${entry.name}: ${formatNumber(count)} szt. zniknie na zawsze.`,
         confirmLabel: 'Wyrzuć',
         danger: true,
       });
       if (sure) await act('discard')({ currentTarget: button });
     };
-    const art = herbSprite(herb.id);
-    const title = h('h2', { class: 'item-title', text: herb.name });
-    const stacks = Math.ceil(herb.count / character.herbStack);
-    const meta = h('p', { class: 'item-meta', text: `${formatNumber(herb.count)} szt. · ${stacks} ${plural(stacks, 'miejsce', 'miejsca', 'miejsc')} w plecaku` });
+    const art = artOf(entry.id);
+    const title = h('h2', { class: 'item-title', text: entry.name });
+    const stacks = Math.ceil(entry.count / character.herbStack);
+    const meta = h('p', { class: 'item-meta', text: `${formatNumber(entry.count)} szt. · ${stacks} ${plural(stacks, 'miejsce', 'miejsca', 'miejsc')} w plecaku` });
     openSheet(
       h(
         'div',
         { class: 'item-details' },
         art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art' }, art), h('div', {}, title, meta)) : [title, meta],
-        h('p', { class: 'sheet-text', text: herb.description }),
-        h('p', { class: 'sheet-text', text: `Jedno miejsce mieści ${character.herbStack} szt. Złomiarz płaci ${formatDecimal(herb.price)} złota za sztukę.` }),
+        h('p', { class: 'sheet-text', text: entry.description }),
+        h('p', { class: 'sheet-text', text: `Jedno miejsce mieści ${character.herbStack} szt. Złomiarz płaci ${formatDecimal(entry.price)} złota za sztukę.` }),
       ),
       busy
         ? h('p', { class: 'muted', text: busyText(character) })

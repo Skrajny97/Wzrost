@@ -12,7 +12,7 @@ import { guided, openSheet, systemPanel, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { scrapperSheet } from '../scrapper.js';
 import { itemDetails, itemSheet, itemSummary } from './character.js';
-import { herbsReport } from './professions.js';
+import { herbsReport, potionsReport } from './professions.js';
 
 // "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
 const materialsText = (materials) => materials.map((material) => (material.count > 1 ? `${material.label} ×${material.count}` : material.label)).join(', ');
@@ -85,9 +85,11 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       fill(container, heading('Raport z wyprawy'), h('p', { class: 'muted', text: 'Wczytywanie raportu…' }));
       return;
     }
-    // A gathering of herbs has no fights or finds: its own short report.
-    if (report.kind === 'herbs') {
-      fill(container, ...herbsReport(report, heading));
+    // A gathering of herbs or a brewing of potions has no fights or finds:
+    // its own short report.
+    const work = { herbs: herbsReport, potions: potionsReport }[report.kind];
+    if (work) {
+      fill(container, ...work(report, heading));
       if (report.system.length > 0 && firstPlayback) playSound('system');
       firstPlayback = false;
       return;

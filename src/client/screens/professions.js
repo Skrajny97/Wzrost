@@ -1,12 +1,14 @@
 // The Profesje tab: the professions as squares in a triangle (Zielarstwo on
-// top, Alchemia and Rzemieślnictwo below it, grey until they come), and the
+// top, Alchemia and Rzemieślnictwo below it, grey until they come), the
 // Zielarstwo screen: the Systemowy Zagajnik, the profession's level and
 // stats, the herbs (those the System still hides are shadows), the herbs to
 // gather and the time, and the gathering under way with "Przewiń",
-// "Przerwij" and its report at the end. Locked, or hidden in this
-// deployment, the tab says so as before.
+// "Przerwij" and its report at the end; and the Alchemia screen in the same
+// way: the Systemowa Pracownia, the recipes, how many potions and the
+// brewing under way. Locked, or hidden in this deployment, the tab says so
+// as before.
 
-import { herbSprite, placeArt, professionSprite } from '../art.js';
+import { herbSprite, placeArt, potionSprite, professionSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
@@ -16,28 +18,36 @@ import { lockedScreen } from './locked.js';
 
 const HOME = '#/profesje';
 // The addresses of the professions with a screen.
-const SCREENS = { zielarstwo: 'herbalism' };
-const HASHES = { herbalism: `${HOME}/zielarstwo` };
+const SCREENS = { zielarstwo: 'herbalism', alchemia: 'alchemy' };
+const HASHES = { herbalism: `${HOME}/zielarstwo`, alchemy: `${HOME}/alchemia` };
+// The activity of each profession's work, and what its square says meanwhile.
+const WORK = { herbalism: { kind: 'herbs', busy: 'Zbiera zioła' }, alchemy: { kind: 'potions', busy: 'Warzy mikstury' } };
 const FALLBACK_ICONS = { herbalism: 'leaf', alchemy: 'spirit', crafting: 'hammer' };
-const CHOICE_KEY = 'wzrost.herb-choice';
+const HERB_CHOICE = 'wzrost.herb-choice';
+const BREW_CHOICE = 'wzrost.brew-choice';
 
-function loadChoice() {
+function loadChoice(key) {
   try {
-    return JSON.parse(localStorage.getItem(CHOICE_KEY)) ?? {};
+    return JSON.parse(localStorage.getItem(key)) ?? {};
   } catch {
     return {};
   }
 }
 
-function saveChoice(choice) {
+function saveChoice(key, choice) {
   try {
-    localStorage.setItem(CHOICE_KEY, JSON.stringify(choice));
+    localStorage.setItem(key, JSON.stringify(choice));
   } catch {
     // Without storage the page simply forgets the last choice.
   }
 }
 
 const herbIcon = (id) => herbSprite(id) ?? icon('leaf', { size: 24 });
+const potionIcon = (id) => potionSprite(id) ?? icon('flask', { size: 24 });
+
+// A brewing of `count` potions in whole minutes, as the server counts it
+// (brewMinutes in src/engine/brewing.js).
+const brewMinutes = (count, potionMinutes) => Math.ceil(Math.round(count * potionMinutes * 1000) / 1000);
 
 // A title with a large "Powrót" on the right, as in the report.
 function backHeading(title, subtitle, hash) {
@@ -57,7 +67,8 @@ export function mountProfessions(container, { params, navigate }) {
     location.replace(HOME);
     return {};
   }
-  const choice = loadChoice(); // { herbs: [ids], minutes }
+  const choice = loadChoice(HERB_CHOICE); // { herbs: [ids], minutes }
+  const brewChoice = loadChoice(BREW_CHOICE); // { recipe, count }
   let lockedScreenShown = null;
   let shownState = null;
   let countdown = null;
@@ -85,6 +96,10 @@ export function mountProfessions(container, { params, navigate }) {
     skipper = null;
     if (professionId === 'herbalism') {
       renderHerbalism(character);
+      return;
+    }
+    if (professionId === 'alchemy') {
+      renderAlchemy(character);
       return;
     }
     fill(
@@ -117,13 +132,14 @@ export function mountProfessions(container, { params, navigate }) {
         h('span', { class: 'profession-level', text: 'Wkrótce' }),
       );
     }
-    const working = character.activity?.kind === 'herbs' && profession.id === character.professions.gathering.professionId;
+    const work = WORK[profession.id];
+    const working = work && character.activity?.kind === work.kind;
     return h(
       'a',
       { class: 'profession-square', href: HASHES[profession.id] ?? HOME },
       h('span', { class: 'profession-art' }, art),
       label,
-      h('span', { class: 'profession-level', text: working ? (activityFinished(character.activity) ? 'Raport gotowy' : 'Zbiera zioła') : `poz. ${profession.level}` }),
+      h('span', { class: 'profession-level', text: working ? (activityFinished(character.activity) ? 'Raport gotowy' : work.busy) : `poz. ${profession.level}` }),
     );
   }
 
@@ -136,22 +152,43 @@ export function mountProfessions(container, { params, navigate }) {
       backHeading(profession.name, `poziom ${profession.level}`, HOME),
       // What the character is doing comes first, so a report to claim is
       // always at the top, above the place (the author).
-      activity?.kind === 'herbs' ? gatheringCard(activity) : activity && systemPanel('Postać jest na wyprawie. Do Zagajnika wyruszy po powrocie.'),
-      testTools(character),
-      placeCard(gathering),
-      levelCard(profession),
+      activity?.kind === 'herbs' ? gatheringCard(activity) : activity && busyPanel(activity, 'Do Zagajnika wyruszy po powrocie.'),
+      testTools(character, 'herbs', 'Tryb testowy: zbieranie skończy się od razu, z tym samym wynikiem.'),
+      placeCard(gathering.place),
+      levelCard(profession, 'zbierania'),
       !activity && gatherForm(character, gathering),
     );
   }
 
-  // Test mode only: one button that ends the gathering at once.
-  function testTools(character) {
+  function renderAlchemy(character) {
+    const { list, brewing } = character.professions;
+    const profession = list.find((candidate) => candidate.id === brewing.professionId);
     const activity = character.activity;
-    if (!state.user.testMode || !testModeOn() || activity?.kind !== 'herbs' || activityFinished(activity)) return null;
+    fill(
+      container,
+      backHeading(profession.name, `poziom ${profession.level}`, HOME),
+      activity?.kind === 'potions' ? brewingCard(activity) : activity && busyPanel(activity, 'Warzenie zacznie po powrocie.'),
+      testTools(character, 'potions', 'Tryb testowy: warzenie skończy się od razu, z tym samym wynikiem.'),
+      placeCard(brewing.place),
+      levelCard(profession, 'warzenia'),
+      !activity && brewForm(character, brewing),
+    );
+  }
+
+  // What the character does elsewhere, and when it comes here.
+  function busyPanel(activity, then) {
+    const doing = { herbs: 'Postać zbiera zioła.', potions: 'Postać warzy mikstury.' }[activity.kind] ?? 'Postać jest na wyprawie.';
+    return systemPanel(`${doing} ${then}`);
+  }
+
+  // Test mode only: one button that ends the work of `kind` at once.
+  function testTools(character, kind, text) {
+    const activity = character.activity;
+    if (!state.user.testMode || !testModeOn() || activity?.kind !== kind || activityFinished(activity)) return null;
     return h(
       'div',
       { class: 'test-tools' },
-      h('p', { class: 'test-tools-text', text: 'Tryb testowy: zbieranie skończy się od razu, z tym samym wynikiem.' }),
+      h('p', { class: 'test-tools-text', text }),
       h('button', {
         type: 'button',
         class: 'button button--test',
@@ -161,20 +198,21 @@ export function mountProfessions(container, { params, navigate }) {
     );
   }
 
-  // The grove's picture dim behind its name and the System's words.
-  function placeCard(gathering) {
-    const art = placeArt(gathering.place.id);
+  // The place's picture dim behind its name and the System's words.
+  function placeCard(place) {
+    const art = placeArt(place.id);
     const card = h(
       'section',
-      { class: `card place-card${art ? ' place-card--art' : ''}`, 'aria-label': gathering.place.name },
-      h('h2', { class: 'card-title', text: gathering.place.name }),
-      h('p', { class: 'region-description', text: gathering.place.description }),
+      { class: `card place-card${art ? ' place-card--art' : ''}`, 'aria-label': place.name },
+      h('h2', { class: 'card-title', text: place.name }),
+      h('p', { class: 'region-description', text: place.description }),
     );
     if (art) card.style.setProperty('--place-art', `url("${art}")`);
     return card;
   }
 
-  function levelCard(profession) {
+  // `work`: the work in the genitive, "zbierania".
+  function levelCard(profession, work) {
     const top = profession.xpToNext === 0;
     const share = top ? 100 : (profession.xp / profession.xpToNext) * 100;
     return h(
@@ -182,31 +220,60 @@ export function mountProfessions(container, { params, navigate }) {
       { class: 'card profession-card', 'aria-label': `${profession.name}, poziom ${profession.level}` },
       h('p', { class: 'profession-card-head' }, h('strong', { text: `Poziom ${profession.level}` }), h('span', { class: 'muted', text: ` z ${profession.maxLevel}` })),
       h('div', { class: 'bar bar--xp', role: 'presentation' }, h('div', { class: 'bar-fill', style: { width: `${share}%` } })),
-      h('p', { class: 'muted', text: top ? 'Najwyższy poziom.' : `Do następnego poziomu: ${formatMinutes(profession.xpToNext - profession.xp)} zbierania.` }),
+      h('p', { class: 'muted', text: top ? 'Najwyższy poziom.' : `Do następnego poziomu: ${formatMinutes(profession.xpToNext - profession.xp)} ${work}.` }),
       h('p', { class: 'profession-stats', text: profession.stats.map((stat) => `${stat.name} +${formatNumber(stat.bonus)}`).join(' · ') }),
     );
+  }
+
+  // "Odbierz raport" of a work that has ended.
+  function claimButton() {
+    return h('button', {
+      type: 'button',
+      class: 'button button--system',
+      text: 'Odbierz raport',
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          const { report } = await call('POST', '/api/hunts/claim');
+          openReport(report);
+        }),
+    });
+  }
+
+  function openReport(report) {
+    reportCache.set(String(report.id), report);
+    state.freshReport = String(report.id);
+    navigate(`#/raport/${report.id}`);
+  }
+
+  // A work under way: what and for how long, the countdown and its bar, the
+  // time of the report, "Przewiń" (`label` names the work) and the button
+  // that calls the character back.
+  function workUnderWay(activity, what, label, cancel) {
+    countdown = h('p', { class: 'countdown', 'aria-live': 'off' });
+    progress = h('div', { class: 'bar-fill bar-fill--system' });
+    skipper = skipControl('activity', (now) => activity.endsAt - now, label);
+    const card = h(
+      'div',
+      { class: 'stack' },
+      systemPanel(
+        what,
+        countdown,
+        h('div', { class: 'bar bar--system' }, progress),
+        h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
+      ),
+      skipper.element,
+      cancel,
+    );
+    tick(serverNow());
+    return card;
   }
 
   // The gathering under way, or its report waiting.
   function gatheringCard(activity) {
     const names = activity.herbs.map((herb) => herb.name).join(', ');
     if (activityFinished(activity)) {
-      const claim = h('button', {
-        type: 'button',
-        class: 'button button--system',
-        text: 'Odbierz raport',
-        onClick: (event) =>
-          withButton(event.currentTarget, async () => {
-            const { report } = await call('POST', '/api/hunts/claim');
-            reportCache.set(String(report.id), report);
-            state.freshReport = String(report.id);
-            navigate(`#/raport/${report.id}`);
-          }),
-      });
-      return systemPanel(`Zbieranie zakończone: ${names}, ${formatMinutes(activity.minutes)}.`, 'Raport czeka na odbiór.', claim);
+      return systemPanel(`Zbieranie zakończone: ${names}, ${formatMinutes(activity.minutes)}.`, 'Raport czeka na odbiór.', claimButton());
     }
-    countdown = h('p', { class: 'countdown', 'aria-live': 'off' });
-    progress = h('div', { class: 'bar-fill bar-fill--system' });
     const cancel = h('button', {
       type: 'button',
       class: 'button button--world',
@@ -222,21 +289,40 @@ export function mountProfessions(container, { params, navigate }) {
         if (sure) await withButton(button, () => call('POST', '/api/hunts/cancel'));
       },
     });
-    skipper = skipControl('activity', (now) => activity.endsAt - now, 'Zbieranie');
-    const card = h(
-      'div',
-      { class: 'stack' },
-      systemPanel(
-        `Zbieranie w toku: ${names}, ${formatMinutes(activity.minutes)}.`,
-        countdown,
-        h('div', { class: 'bar bar--system' }, progress),
-        h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
-      ),
-      skipper.element,
-      cancel,
-    );
-    tick(serverNow());
-    return card;
+    return workUnderWay(activity, `Zbieranie w toku: ${names}, ${formatMinutes(activity.minutes)}.`, 'Zbieranie', cancel);
+  }
+
+  // The brewing under way, or its report waiting. Called back early, the
+  // character brings the potions done, with their report.
+  function brewingCard(activity) {
+    const what = `${activity.count} × ${activity.potion?.name ?? 'mikstura'}`;
+    if (activityFinished(activity)) {
+      return systemPanel(`Warzenie zakończone: ${what}.`, 'Raport czeka na odbiór.', claimButton());
+    }
+    const cancel = h('button', {
+      type: 'button',
+      class: 'button button--world',
+      text: 'Przerwij warzenie',
+      onClick: async (event) => {
+        const button = event.currentTarget;
+        const done = Math.min(activity.count, Math.floor((activity.count * (serverNow() - activity.startedAt)) / (activity.endsAt - activity.startedAt)));
+        const sure = await confirmAction({
+          title: 'Przerwać warzenie?',
+          text:
+            done > 0
+              ? `Gotowe mikstury (${formatNumber(done)}) trafią do plecaka, a zioła na resztę wrócą.`
+              : 'Żadna mikstura nie jest jeszcze gotowa. Zioła wrócą do plecaka.',
+          confirmLabel: 'Przerwij',
+          danger: true,
+        });
+        if (!sure) return;
+        await withButton(button, async () => {
+          const { report } = await call('POST', '/api/hunts/cancel');
+          if (report) openReport(report);
+        });
+      },
+    });
+    return workUnderWay(activity, `Warzenie w toku: ${what}, ${formatMinutes(activity.minutes)}.`, 'Warzenie', cancel);
   }
 
   // The herbs to gather, the time and the start.
@@ -268,7 +354,7 @@ export function mountProfessions(container, { params, navigate }) {
     const remember = () => {
       choice.herbs = chosen;
       choice.minutes = minutes;
-      saveChoice(choice);
+      saveChoice(HERB_CHOICE, choice);
     };
 
     function toggle(id) {
@@ -413,6 +499,180 @@ export function mountProfessions(container, { params, navigate }) {
     );
   }
 
+  // The recipes (those the System still hides are shadows), how many
+  // potions, the time and the herbs they take, the room in the bag and the
+  // start.
+  function brewForm(character, brewing) {
+    const known = brewing.recipes.filter((recipe) => !recipe.hidden);
+    let recipe = known.find((candidate) => candidate.id === brewChoice.recipe) ?? known[0];
+    let count = 1;
+
+    const tiles = h('ul', { class: 'herb-grid' });
+    const about = h('p', { class: 'muted' });
+    const needs = h('p', { class: 'herb-estimate' });
+    const picker = h('div', { class: 'stack' });
+    const lucky = h('p', {
+      class: 'muted',
+      text: `Każda uwarzona mikstura ma ${formatNumber(Math.round(brewing.bonusChance * 100))}% szans na jedną dodatkową.`,
+    });
+
+    const remember = () => {
+      brewChoice.recipe = recipe.id;
+      brewChoice.count = count;
+      saveChoice(BREW_CHOICE, brewChoice);
+    };
+
+    // The bag's room for the potions: what is left in the potion's last
+    // stack, and whole stacks in the places free once the herbs are taken
+    // (herbs and potions stack alike).
+    function roomFor(amount) {
+      const stack = character.herbStack;
+      const freed = recipe.herbs.reduce((sum, herb) => sum + Math.ceil(herb.have / stack) - Math.ceil((herb.have - herb.need * amount) / stack), 0);
+      const free = Math.max(0, character.bagCapacity - character.bagUsed + freed);
+      return Math.ceil(recipe.count / stack) * stack - recipe.count + free * stack;
+    }
+
+    function choose(id) {
+      recipe = known.find((candidate) => candidate.id === id);
+      remember();
+      show();
+    }
+
+    function showTiles() {
+      fill(
+        tiles,
+        brewing.recipes.map((each) => {
+          if (each.hidden) {
+            return h(
+              'li',
+              {},
+              h(
+                'div',
+                { class: 'herb-tile herb-tile--hidden', role: 'img', 'aria-label': `Nieznany przepis. ${each.hint}` },
+                h('span', { class: 'herb-art herb-art--shadow' }, potionIcon(each.id)),
+                h('span', { class: 'herb-name', text: '???' }),
+                h('span', { class: 'herb-meta', text: each.hint }),
+              ),
+            );
+          }
+          return h(
+            'li',
+            {},
+            h(
+              'button',
+              { type: 'button', class: 'herb-tile', 'aria-pressed': each.id === recipe.id, onClick: () => choose(each.id) },
+              h('span', { class: 'herb-art' }, potionIcon(each.id)),
+              h('span', { class: 'herb-name', text: each.name }),
+              h('span', { class: 'herb-meta', text: `w plecaku: ${formatNumber(each.count)}` }),
+            ),
+          );
+        }),
+      );
+    }
+
+    function show() {
+      showTiles();
+      about.textContent = recipe.description;
+      needs.textContent = `Na jedną miksturę: ${recipe.herbs.map((herb) => `${herb.need} × ${herb.name} (w plecaku ${formatNumber(herb.have)})`).join(', ')}.`;
+      if (recipe.most === 0) {
+        fill(
+          picker,
+          h('p', { class: 'herb-room herb-room--full', text: 'Brakuje ziół na tę miksturę. Zbierzesz je w Zielarstwie.' }),
+          h('a', { class: 'button button--world', href: HASHES.herbalism, text: 'Do Zielarstwa' }),
+        );
+        return;
+      }
+      count = Math.min(recipe.most, Math.max(1, brewChoice.count ?? Math.min(recipe.most, 6)));
+      fill(picker, countPicker());
+    }
+
+    // A slider of the potions with buttons for one at a time, the time and
+    // the herbs they take, the room in the bag and the start.
+    function countPicker() {
+      const most = recipe.most;
+      const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
+      const estimate = h('p', { class: 'herb-estimate' });
+      const room = h('p', { class: 'herb-room' });
+      const slider = h('input', {
+        type: 'range',
+        class: 'duration-slider',
+        min: 1,
+        max: most,
+        step: 1,
+        value: count,
+        'aria-label': 'Liczba mikstur',
+        onInput: () => set(Number(slider.value)),
+        onChange: () => remember(),
+      });
+      const stepButton = (sign, label) =>
+        h('button', {
+          type: 'button',
+          class: 'button button--world duration-step',
+          'aria-label': label,
+          text: sign < 0 ? '−' : '+',
+          onClick: () => {
+            set(count + sign);
+            remember();
+          },
+        });
+      const less = stepButton(-1, 'Mniej');
+      const more = stepButton(1, 'Więcej');
+      function set(next) {
+        count = Math.min(most, Math.max(1, next));
+        const label = countOf(count, 'mikstura', 'mikstury', 'mikstur');
+        slider.value = String(count);
+        slider.setAttribute('aria-valuetext', label);
+        slider.style.setProperty('--fill', `${most > 1 ? ((count - 1) / (most - 1)) * 100 : 100}%`);
+        value.textContent = label;
+        less.disabled = count === 1;
+        more.disabled = count === most;
+        const used = recipe.herbs.map((herb) => `${herb.need * count} × ${herb.name}`).join(', ');
+        estimate.textContent = `Czas warzenia: ${formatMinutes(brewMinutes(count, brewing.potionMinutes))}. Zużyjesz: ${used}.`;
+        const fits = roomFor(count);
+        room.className = `herb-room${count > fits ? ' herb-room--full' : ''}`;
+        room.textContent =
+          count > fits
+            ? `W plecaku zmieści się tylko ${countOf(fits, 'mikstura', 'mikstury', 'mikstur')}. Reszta przepadnie.`
+            : `W plecaku zmieści się jeszcze ${countOf(fits, 'mikstura', 'mikstury', 'mikstur')}.`;
+      }
+      set(count);
+      const start = h('button', {
+        type: 'button',
+        class: 'button button--system',
+        text: 'Warz mikstury',
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            remember();
+            await call('POST', '/api/professions/brew', { recipe: recipe.id, count });
+          }),
+      });
+      return [
+        h(
+          'div',
+          { class: 'duration-picker' },
+          h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, 'Liczba mikstur'), value),
+          h('div', { class: 'duration-row' }, less, slider, more),
+          h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: '1' }), h('span', { text: formatNumber(most) })),
+        ),
+        estimate,
+        room,
+        start,
+      ];
+    }
+
+    show();
+    return h(
+      'section',
+      { class: 'card gather-card', 'aria-labelledby': 'recipes-title' },
+      h('h2', { class: 'section-title', id: 'recipes-title', text: 'Przepisy' }),
+      tiles,
+      about,
+      needs,
+      lucky,
+      picker,
+    );
+  }
+
   function tick(now) {
     const character = state.character;
     if (!character?.professions) {
@@ -437,17 +697,25 @@ export function mountProfessions(container, { params, navigate }) {
   return { update: render, tick };
 }
 
-// The report of a gathering, drawn by the report screen (report.js): the
-// grove's line, the herbs found and lost, the profession's levels, the XP
-// and the System's lines.
-export function herbsReport(report, heading) {
-  const summary = report.summary;
-  const { profession } = report;
+// The XP, the profession's levels and the Time Points of a work's report.
+function workSummary(report) {
+  const { summary, profession } = report;
   const rows = [
     ['XP postaci', `+${formatNumber(summary.xp)} XP`],
     [profession.name, profession.levelAfter > profession.levelBefore ? `poziom ${profession.levelBefore} → ${profession.levelAfter}` : `poziom ${profession.levelAfter}`],
     summary.timePoints > 0 && ['Punkty Czasu', `+${formatNumber(summary.timePoints)}`],
   ].filter(Boolean);
+  return h(
+    'dl',
+    { class: 'status-list' },
+    rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value }))),
+  );
+}
+
+// The report of a gathering, drawn by the report screen (report.js): the
+// grove's line, the herbs found and lost, the profession's levels, the XP
+// and the System's lines.
+export function herbsReport(report, heading) {
   return [
     heading('Raport ze zbierania', `${report.placeName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
     h(
@@ -469,16 +737,46 @@ export function herbsReport(report, heading) {
         ),
       ),
       report.lost && h('p', { class: 'herb-room herb-room--full', text: report.lost }),
-      h(
-        'dl',
-        { class: 'status-list' },
-        rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value }))),
-      ),
+      workSummary(report),
     ),
     report.system.length > 0 && systemPanel(...report.system),
     h('a', { class: 'button button--system', href: HASHES.herbalism, text: 'Do Zagajnika' }),
   ];
 }
 
-// The herbs of a report for the journal's row: "Żywokost ×13".
-export const herbsSummary = (summary) => summary.herbs.map((herb) => `${herb.name} ×${formatNumber(herb.count)}`).join(', ');
+// The report of a brewing, in the same way: the workshop's line, the
+// potions brewed, the lucky and the lost ones, whether it was stopped, the
+// profession's levels, the XP and the System's lines.
+export function potionsReport(report, heading) {
+  const { potion } = report;
+  return [
+    heading('Raport z warzenia', `${report.placeName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
+    h(
+      'section',
+      { class: 'card report-summary', 'aria-label': 'Podsumowanie' },
+      h('p', { class: 'herb-line', text: report.line }),
+      report.stopped && h('p', { class: 'muted', text: report.stopped }),
+      h(
+        'ul',
+        { class: 'herb-found' },
+        h(
+          'li',
+          { class: 'herb-found-row' },
+          h('span', { class: 'herb-art' }, potionIcon(potion.id)),
+          h('span', { class: 'herb-found-name', text: potion.name }),
+          h('span', { class: 'herb-found-count', text: `×${formatNumber(potion.count)}` }),
+          potion.lost > 0 && h('span', { class: 'herb-found-lost', text: `przepadło ${formatNumber(potion.lost)}` }),
+        ),
+      ),
+      report.lucky && h('p', { class: 'herb-room herb-room--lucky', text: report.lucky }),
+      report.lost && h('p', { class: 'herb-room herb-room--full', text: report.lost }),
+      workSummary(report),
+    ),
+    report.system.length > 0 && systemPanel(...report.system),
+    h('a', { class: 'button button--system', href: HASHES.alchemy, text: 'Do Pracowni' }),
+  ];
+}
+
+// What a work's report brought, for the journal's row: "Żywokost ×13", or
+// "Mniejsza mikstura leczenia ×12".
+export const workSummaryText = (summary) => (summary.herbs ?? summary.potions ?? []).map((entry) => `${entry.name} ×${formatNumber(entry.count)}`).join(', ');
