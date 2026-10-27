@@ -1,0 +1,24 @@
+{
+  "id": "alchemy",
+  "payload": {
+    "prompt": "pixel art, a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing blue hands and feet, standing on a small patch of stone floor, stirring a large bubbling black cauldron with a long wooden paddle, green bubbles and wisps of steam rising, side view, smooth seamless looping animation",
+    "prompt_style": "rd_animation__big_animation",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 215033697,
+    "return_spritesheet": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793109524,
+    "credit_cost": 10,
+    "balance_cost": 0.25,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 58.74,
+    "request_id": "fe8e0856-4840-4a90-bbd9-456382dd68b8",
+    "outputs_retained_until": 1793195876
+  }
+}
