@@ -1,0 +1,25 @@
+{
+  "id": "lesser-healing",
+  "payload": {
+    "prompt": "a small round glass potion flask with a cork stopper, filled with glowing ruby red liquid, a tiny green comfrey leaf tied to its neck with twine, single inventory item icon, bold clean outline",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 514442660,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793092235,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 60.46,
+    "request_id": "487b12a0-e8cc-4218-aba5-3b2986fbccce",
+    "outputs_retained_until": 1793178562
+  }
+}
