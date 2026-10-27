@@ -97,7 +97,7 @@
     "place": {
       "id": "system-workbench",
       "name": "Systemowy Warsztat",
-      "description": "Narzędzia czekają tu na ręce, które umieją ich użyć. System odsłania wzory dopiero wtedy, gdy uzna, że umiesz je wykonać."
+      "description": "Posortowane narzędzia zdają się czekać na ich użycie. Ale do tego potrzebne są wprawne ręce. Niektóre wzory będą dla Ciebie dostępne dopiero, gdy System uzna, że sobie poradzisz."
     },
     "parts": { "weapon": 6, "chest": 6, "offhand": 4, "head": 4, "hands": 3, "feet": 3 },
     "resources": {

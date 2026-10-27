@@ -2015,16 +2015,17 @@ describe('Pierwsza wyprawa', () => {
 });
 
 describe('Profesje', () => {
-  // The game hides them (PROFESSIONS off in wrangler.jsonc) until all three
-  // are ready; the test version shows them (test/professions.test.js).
-  test('stay hidden in this version of the game, even at level 10: no tab, no gathering, no herb quests', async () => {
+  // In the game from version 0.0.9: Zielarstwo and Alchemia open with the tab
+  // at character level 10, while Rzemieślnictwo waits as "Wkrótce" (CRAFTING
+  // off in wrangler.jsonc); the test version opens it (test/workshop.test.js).
+  test('open at level 10 with Zielarstwo and Alchemia, Rzemieślnictwo coming soon', async () => {
     const cookie = await signUp();
     await newCharacter(cookie);
-    await (await db()).prepare("UPDATE characters SET level = 10, quests = '{}'").run();
-    const { character } = (await call('GET', '/api/character', { cookie })).data;
-    assert.equal(character.professions, null);
-    assert.ok([...character.quests.daily.quests, ...character.quests.weekly.quests].every((quest) => !quest.kind.startsWith('gather')));
-    const gather = await call('POST', '/api/professions/gather', { cookie, body: { herbs: ['comfrey'], minutes: 60 } });
-    assert.equal(gather.status, 404);
+    await (await db()).prepare('UPDATE characters SET level = 9').run();
+    assert.equal((await call('GET', '/api/character', { cookie })).data.character.professions, null);
+    await (await db()).prepare('UPDATE characters SET level = 10').run();
+    const { professions } = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.deepEqual(professions.list.map(({ id, soon }) => [id, soon]), [['herbalism', false], ['alchemy', false], ['crafting', true]]);
+    assert.equal(professions.workshop, null);
   });
 });

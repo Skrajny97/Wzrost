@@ -43,10 +43,9 @@
     // The Google client id and secret are Worker secrets, set by the deploy
     // workflow from the GitHub secrets.
     "GOOGLE_HOSTS": "insightrpg.com,www.insightrpg.com",
-    // "on" shows the professions (Profesje). They stay hidden in the live game
-    // until Zielarstwo and Alchemia are ready; `npm run dev` and the test
-    // version turn them on.
-    "PROFESSIONS": "off",
+    // "on" shows the professions (Profesje): Zielarstwo and Alchemia are in
+    // the live game from version 0.0.9.
+    "PROFESSIONS": "on",
     // "on" opens Rzemieślnictwo among the professions; off, its square says
     // "Wkrótce". The live game waits for it to be done.
     "CRAFTING": "off"
