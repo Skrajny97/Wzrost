@@ -391,31 +391,36 @@
           "text": [
             "Dziesiąty poziom klasy… Twoje ciosy nabrały ciężaru, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Umiejętności.",
             "Zanim którąś wybierzesz – pozwól, że Ci je przedstawię."
-          ]
+          ],
+          "voice": "audio/narration/skills-welcome-warrior.mp3"
         },
         "archer": {
           "text": [
             "Dziesiąty poziom klasy… Twoje strzały coraz rzadziej chybiają, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Umiejętności.",
             "Zanim którąś wybierzesz – pozwól, że Ci je przedstawię."
-          ]
+          ],
+          "voice": "audio/narration/skills-welcome-archer.mp3"
         },
         "mage": {
           "text": [
             "Dziesiąty poziom klasy… Mana słucha Cię coraz chętniej, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Umiejętności.",
             "Zanim którąś wybierzesz – pozwól, że Ci je przedstawię."
-          ]
+          ],
+          "voice": "audio/narration/skills-welcome-mage.mp3"
         },
         "cleric": {
           "text": [
             "Dziesiąty poziom klasy… Twoje modły niosą się coraz dalej, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Umiejętności.",
             "Zanim którąś wybierzesz – pozwól, że Ci je przedstawię."
-          ]
+          ],
+          "voice": "audio/narration/skills-welcome-cleric.mp3"
         },
         "shadow": {
           "text": [
             "Dziesiąty poziom klasy… Poruszasz się coraz ciszej, ale przed Systemem nic się nie ukryje. Odblokował dla Ciebie Umiejętności.",
             "Zanim którąś wybierzesz – pozwól, że Ci je przedstawię."
-          ]
+          ],
+          "voice": "audio/narration/skills-welcome-shadow.mp3"
         }
       }
     },
@@ -433,7 +438,8 @@
       "chapter": "skills",
       "text": [
         "Umiejętności czekają w tej zakładce. Zajrzyjmy do nich."
-      ]
+      ],
+      "voice": "audio/narration/skills-lead.mp3"
     },
     {
       "id": "skills-intro",
@@ -456,12 +462,14 @@
         "archer": {
           "text": [
             "Przed Tobą trzy ścieżki. Snajper trafia tam, gdzie boli najbardziej, Strzelec Burzy zasypuje wrogów gradem strzał, a Łowca przyszpila zwierzynę, zanim ta zdąży się ruszyć."
-          ]
+          ],
+          "voice": "audio/narration/skills-paths-archer.mp3"
         },
         "mage": {
           "text": [
             "Przed Tobą trzy ścieżki. Elementalista ciska ogniem, Władca Lodu spowalnia wrogów mroźnym wiatrem, a Arkanista zajmuje się zgłębianiem natury samej many."
-          ]
+          ],
+          "voice": "audio/narration/skills-paths-mage.mp3"
         },
         "cleric": {
           "text": [
@@ -471,7 +479,8 @@
         "shadow": {
           "text": [
             "Przed Tobą trzy ścieżki. Skrytobójca dopada tych, którzy chowają się za plecami innych, Truciciel zaprawia ostrze jadem, a Nocny Tancerz wymyka się ciosom i potrafi przeprowadzić szybką kontrę."
-          ]
+          ],
+          "voice": "audio/narration/skills-paths-shadow.mp3"
         }
       }
     },
@@ -481,7 +490,8 @@
       "chapter": "skills",
       "text": [
         "System, jak zawsze, wszystko Ci wyliczył. Na karcie zobaczysz, co daje umiejętność, ile kosztuje many i jak często możesz jej użyć."
-      ]
+      ],
+      "voice": "audio/narration/skills-card.mp3"
     },
     {
       "id": "skills-choice",
@@ -490,7 +500,8 @@
       "text": [
         "Pierwsza umiejętność, na którą przeznaczysz pierwszy Punkt Umiejętności, otworzy ścieżkę główną.",
         "Od jedenastego poziomu klasy możesz dobrać ścieżkę poboczną – za jeden Punkt Umiejętności. Trzecia ścieżka zamknie się wtedy na zawsze."
-      ]
+      ],
+      "voice": "audio/narration/skills-choice.mp3"
     },
     {
       "id": "skills-points",
@@ -498,7 +509,8 @@
       "chapter": "skills",
       "text": [
         "Tu zobaczysz swoje Punkty Umiejętności. Każdy kolejny poziom klasy przyniesie Ci jeden. Punkt podniesie poznaną umiejętność o poziom – aż do dwudziestego."
-      ]
+      ],
+      "voice": "audio/narration/skills-points.mp3"
     },
     {
       "id": "skills-evolution",
@@ -515,10 +527,12 @@
       "text": [
         "Tyle ode mnie. Tym razem nawet System Cię nie wyręczy – wybór należy tylko do Ciebie. Wybierz ścieżkę, gdy będziesz gotów."
       ],
+      "voice": "audio/narration/skills-ending.mp3",
       "female": {
         "text": [
           "Tyle ode mnie. Tym razem nawet System Cię nie wyręczy – wybór należy tylko do Ciebie. Wybierz ścieżkę, gdy będziesz gotowa."
-        ]
+        ],
+        "voice": "audio/narration/skills-ending-female.mp3"
       }
     }
   ]
