@@ -1,0 +1,17 @@
+{
+  "id": "skills-evolution-calm",
+  "payload": {
+    "text": "[calmly] Jeszcze jedno. Na pięćdziesiątym poziomie klasy czeka Cię ewolucja. Zanim tam dotrzesz, wybierz obie ścieżki i rozdaj punkty – inaczej System zatrzyma Twoją klasę u progu, dopóki tego nie zrobisz. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/skills-evolution-calm-20261027T0701-0.mp3",
+    "audio/drafts/narration/skills-evolution-calm-20261027T0701-1.mp3"
+  ],
+  "credits": 428
+}

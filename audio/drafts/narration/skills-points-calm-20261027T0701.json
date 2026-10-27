@@ -1,0 +1,19 @@
+{
+  "id": "skills-points-calm",
+  "payload": {
+    "text": "[calmly] Tu zobaczysz swoje Punkty Umiejętności. Każdy kolejny poziom klasy przyniesie Ci jeden. Punkt podniesie poznaną umiejętność o poziom – aż do dwudziestego. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5,
+      "speed": 0.85
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/skills-points-calm-20261027T0701-0.mp3",
+    "audio/drafts/narration/skills-points-calm-20261027T0701-1.mp3",
+    "audio/drafts/narration/skills-points-calm-20261027T0701-2.mp3"
+  ],
+  "credits": 516
+}
