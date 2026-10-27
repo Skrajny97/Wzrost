@@ -1,0 +1,17 @@
+{
+  "id": "professions-list",
+  "payload": {
+    "text": "Zielarstwo pozwala Ci zbierać zioła w Systemowym Zagajniku, a w Alchemii uwarzysz z nich mikstury w Systemowej Pracowni. Na Rzemieślnictwo przyjdzie jeszcze czas. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/professions-list-20261027T1341-0.mp3",
+    "audio/drafts/narration/professions-list-20261027T1341-1.mp3"
+  ],
+  "credits": 342
+}

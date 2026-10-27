@@ -1,0 +1,17 @@
+{
+  "id": "professions-welcome",
+  "payload": {
+    "text": "Dziesiąty poziom postaci… Puszcza zna już Twoje imię, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Profesje. Zanim którąś sprawdzisz – pozwól, że Ci je przedstawię. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/professions-welcome-20261027T1341-0.mp3",
+    "audio/drafts/narration/professions-welcome-20261027T1341-1.mp3"
+  ],
+  "credits": 368
+}

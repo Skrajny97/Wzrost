@@ -1,0 +1,17 @@
+{
+  "id": "professions-ending",
+  "payload": {
+    "text": "Mikstury zabierzesz na wyprawę – spakujesz je w podróż przed wyruszeniem. W walce Twoja postać sama po nie sięgnie. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/professions-ending-20261027T1341-0.mp3",
+    "audio/drafts/narration/professions-ending-20261027T1341-1.mp3"
+  ],
+  "credits": 248
+}
