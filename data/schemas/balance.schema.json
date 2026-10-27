@@ -801,11 +801,12 @@
     },
     "bestiary": {
       "type": "object",
-      "description": "Skrzynia Bestiariusza regionu wewnętrznego: otwiera się, gdy postać pozna wszystkie stwory z jego listy. Złoto i Punkty Czasu rosną po jednej krzywej z najwyższym poziomem regionu: nagroda × (poziom / baseLevel) ^ growth.",
+      "description": "Skrzynia Bestiariusza regionu wewnętrznego: otwiera się, gdy postać pozna wszystkie stwory z jego listy. Złoto rośnie po krzywej z najwyższym poziomem regionu: złoto pierwszego × (poziom / baseLevel) ^ growth. Punkty Czasu rosną o stałą liczbę z każdym kolejnym regionem: timePoints + timePointsStep × (poziom / baseLevel − 1).",
       "additionalProperties": false,
       "required": [
         "gold",
         "timePoints",
+        "timePointsStep",
         "baseLevel",
         "growth",
         "goldStep"
@@ -821,6 +822,11 @@
           "minimum": 0,
           "description": "Punkty Czasu w skrzyni pierwszego regionu wewnętrznego."
         },
+        "timePointsStep": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "O tyle Punktów Czasu więcej daje skrzynia każdego kolejnego regionu wewnętrznego."
+        },
         "baseLevel": {
           "type": "integer",
           "minimum": 1,
@@ -829,7 +835,7 @@
         "growth": {
           "type": "number",
           "minimum": 0,
-          "description": "Wykładnik krzywej: 1 to wzrost w równym tempie z poziomem, więcej to coraz szybszy."
+          "description": "Wykładnik krzywej złota: 1 to wzrost w równym tempie z poziomem, więcej to coraz szybszy."
         },
         "goldStep": {
           "type": "integer",
