@@ -315,6 +315,83 @@
             "zakonczyła"
           ]
         ]
+      },
+      "skills-evolution-calm": {
+        "line": "skills-evolution",
+        "say": [
+          [
+            "Jeszcze jedno.",
+            "[calmly] Jeszcze jedno."
+          ]
+        ]
+      },
+      "skills-evolution-caps": {
+        "line": "skills-evolution",
+        "say": [
+          [
+            "Jeszcze jedno.",
+            "[calmly] JESZCZE jedno."
+          ]
+        ]
+      },
+      "skills-intro-caps": {
+        "line": "skills-intro",
+        "say": [
+          [
+            "Przeczytaj uważnie",
+            "PRZECZYTAJ uważnie"
+          ]
+        ]
+      },
+      "skills-intro-calm-caps": {
+        "line": "skills-intro",
+        "say": [
+          [
+            "Przeczytaj uważnie",
+            "[calmly] PRZECZYTAJ uważnie"
+          ]
+        ]
+      },
+      "skills-lead-character-caps": {
+        "line": "skills-lead-character",
+        "say": [
+          [
+            "Wróćmy",
+            "WRÓĆMY"
+          ]
+        ]
+      },
+      "skills-lead-character-calm-caps": {
+        "line": "skills-lead-character",
+        "say": [
+          [
+            "Wróćmy",
+            "[calmly] WRÓĆMY"
+          ]
+        ]
+      },
+      "skills-paths-cleric-calm": {
+        "line": "skills-paths",
+        "classId": "cleric",
+        "say": [
+          [
+            "Przed Tobą",
+            "[calmly] Przed Tobą"
+          ]
+        ]
+      },
+      "skills-points-calm": {
+        "line": "skills-points",
+        "say": [
+          [
+            "Tu zobaczysz",
+            "[calmly] Tu zobaczysz"
+          ]
+        ],
+        "settings": {
+          "stability": 0.5,
+          "speed": 0.85
+        }
       }
     },
     "allLines": {
