@@ -98,6 +98,9 @@ export function buildTopbar(onSettings) {
   const activityLabel = h('span', { class: 'activity-label' });
   const activityTime = h('span', { class: 'activity-time' });
   const activity = h('a', { class: 'activity', href: '#/walka' }, activityLabel, activityTime);
+  // A speed potion drunk from the bag (potions.js): how long it still works.
+  const speedTime = h('span', { class: 'speed-chip-time' });
+  const speed = h('a', { class: 'speed-chip', href: '#/postac', hidden: true }, icon('flask', { size: 16 }), speedTime);
 
   const element = $('#topbar');
   fill(element,
@@ -117,9 +120,31 @@ export function buildTopbar(onSettings) {
     wallet,
     // Two rows: HP over mana, character XP over class XP.
     h('div', { class: 'meters' }, hp.element, xp.element, mana.element, classXp.element),
-    h('div', { class: 'activity-row' }, pouchButton, activity, pouch),
+    h('div', { class: 'activity-row' }, pouchButton, speed, activity, pouch),
   );
-  topbar = { level, classLevel, quests, gold, points, goldButton, wallet, timeNote, pouch, pouchButton, camp, campLabel, hp, mana, xp, classXp, activity, activityLabel, activityTime };
+  topbar = {
+    level,
+    classLevel,
+    quests,
+    gold,
+    points,
+    goldButton,
+    wallet,
+    timeNote,
+    pouch,
+    pouchButton,
+    camp,
+    campLabel,
+    hp,
+    mana,
+    xp,
+    classXp,
+    activity,
+    activityLabel,
+    activityTime,
+    speed,
+    speedTime,
+  };
   updateTopbar();
 }
 
@@ -262,6 +287,14 @@ export function updateTopbar(now = serverNow()) {
   topbar.mana.set(character.mana, character.maxMana);
   topbar.xp.set(character.xp, character.xpToNext);
   topbar.classXp.set(character.classXp, character.classXpToNext);
+
+  const buff = character.speedBuff;
+  const fast = Boolean(buff) && buff.until > now;
+  topbar.speed.hidden = !fast;
+  if (fast) {
+    topbar.speedTime.textContent = formatCountdown(buff.until - now);
+    topbar.speed.setAttribute('aria-label', `Mikstura szybkości: ruchy +${Math.round(buff.bonus * 100)}%, jeszcze ${formatCountdown(buff.until - now)}`);
+  }
 
   const activity = character.activity;
   const { activityLabel, activityTime } = topbar;

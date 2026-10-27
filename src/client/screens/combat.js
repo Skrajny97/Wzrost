@@ -6,7 +6,7 @@
 // inner regions areas.
 
 import { areaArt } from '../area-art.js';
-import { landArt, materialSprite, monsterSprite } from '../art.js';
+import { landArt, materialSprite, monsterSprite, potionSprite } from '../art.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -36,23 +36,29 @@ import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } f
 
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
 const CHOICE_KEY = 'wzrost.hunt-choice';
+// The potions to take along and the healing mark: { potions: { [id]: count }, healBelow }.
+const POTION_KEY = 'wzrost.potion-choice';
 const HOME = '#/walka';
 
-function loadChoice() {
+function loadChoice(key = CHOICE_KEY) {
   try {
-    return JSON.parse(localStorage.getItem(CHOICE_KEY)) ?? {};
+    return JSON.parse(localStorage.getItem(key)) ?? {};
   } catch {
     return {};
   }
 }
 
-function saveChoice(choice) {
+function saveChoice(choice, key = CHOICE_KEY) {
   try {
-    localStorage.setItem(CHOICE_KEY, JSON.stringify(choice));
+    localStorage.setItem(key, JSON.stringify(choice));
   } catch {
     // Without storage the page simply forgets the last choice.
   }
 }
+
+// The fights of an exploration of `minutes`, and so the most potions of a
+// kind it takes along (potionsPerKind in the engine).
+const fightsFor = (use, minutes) => use.fightsByMinutes.filter(([from]) => from <= minutes).at(-1)?.[1] ?? 1;
 
 // What the threat rating depends on, apart from HP.
 const buildKey = (character) =>
@@ -170,6 +176,9 @@ export function mountCombat(container, { params, navigate }) {
   const choice = loadChoice(); // { [areaId]: minutes }
   let shownArea = null; // the inner region whose threat is on the screen
   let showThreat = null;
+  // The potions to take along on the screen (potionPicker), whose healing
+  // ones count in the threat.
+  let potions = null;
   let loading = false;
   let loadAgain = false;
   let countdown = null;
@@ -201,10 +210,11 @@ export function mountCombat(container, { params, navigate }) {
         if (!areaId || !character || character.activity) return;
         const build = buildKey(character);
         const hp = hpStep(character, serverNow());
+        const healing = healingQuery();
         const known = options[areaId];
-        if (known && known.build === build && known.hp === hp) continue;
-        const { areas } = await call('GET', `/api/hunts/options?area=${encodeURIComponent(areaId)}`);
-        options[areaId] = { build, hp, threat: areas[0].threat, threatAvoiding: areas[0].threatAvoiding };
+        if (known && known.build === build && known.hp === hp && known.healing === healing) continue;
+        const { areas } = await call('GET', `/api/hunts/options?area=${encodeURIComponent(areaId)}${healing}`);
+        options[areaId] = { build, hp, healing, threat: areas[0].threat, threatAvoiding: areas[0].threatAvoiding };
         showThreat?.();
       } while (loadAgain);
     } catch (error) {
@@ -212,6 +222,12 @@ export function mountCombat(container, { params, navigate }) {
     } finally {
       loading = false;
     }
+  }
+
+  // The healing potions taken along, for the threat: "&heal=2&below=0.4".
+  function healingQuery() {
+    const healing = potions?.healing();
+    return healing && healing.count > 0 ? `&heal=${healing.count}&below=${healing.below}` : '';
   }
 
   function render() {
@@ -224,6 +240,7 @@ export function mountCombat(container, { params, navigate }) {
     skipper = null;
     shownArea = null;
     showThreat = null;
+    potions = null;
 
     // While the character is away, every view shows the exploration.
     if (activity || !region) {
@@ -560,10 +577,14 @@ export function mountCombat(container, { params, navigate }) {
         h('label', { class: 'avoid-rare', for: 'track-quests' }, trackBox, h('span', { text: 'Trop przede wszystkim stwory z zadań' })),
         trackNone,
       );
+    // Potions to take along, once the character carries some that work in fights.
+    const use = character.professions?.potionUse;
+    const carried = use && !first ? (character.potions ?? []).filter((potion) => potion.fight) : [];
+    potions = carried.length > 0 ? potionPicker(carried, use) : null;
     showThreat = () => {
       const known = options[area.id];
       const ratings =
-        known && known.build === buildKey(state.character)
+        known && known.build === buildKey(state.character) && known.healing === healingQuery()
           ? avoiding()
             ? known.threatAvoiding
             : seeking()
@@ -617,6 +638,7 @@ export function mountCombat(container, { params, navigate }) {
       kind.textContent = lengthName(minutes);
       less.disabled = index === 0;
       more.disabled = index === allowed.length - 1;
+      potions?.update(minutes);
       showThreat();
     }
     set(index);
@@ -643,7 +665,14 @@ export function mountCombat(container, { params, navigate }) {
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           remember();
-          await call('POST', '/api/hunts', { areaId: area.id, minutes, avoidRare: avoiding(), seekRare: seeking(), trackQuests: tracking() });
+          await call('POST', '/api/hunts', {
+            areaId: area.id,
+            minutes,
+            avoidRare: avoiding(),
+            seekRare: seeking(),
+            trackQuests: tracking(),
+            ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
+          });
           leaveView(HOME, 2);
         }),
     });
@@ -690,6 +719,7 @@ export function mountCombat(container, { params, navigate }) {
         track,
         levelNote,
         durations,
+        potions?.element,
         avoid,
         seek,
         threatLine,
@@ -697,6 +727,87 @@ export function mountCombat(container, { params, navigate }) {
       ),
       h('p', { class: 'muted threat-note', text: 'Zagrożenie to szansa omdlenia na wyprawie.' }),
     );
+  }
+
+  // The potions to take along, each kind with −/+ up to one for each fight
+  // of the length, and the healing mark, both remembered in this browser.
+  // The wish is kept apart from what a shorter length allows, so it comes
+  // back with a longer one. A change asks for the threat again.
+  function potionPicker(carried, use) {
+    const stored = loadChoice(POTION_KEY);
+    const wanted = { ...stored.potions };
+    let below = use.healBelowChoices.includes(stored.healBelow) ? stored.healBelow : use.healBelow;
+    let fights = 1;
+    const save = () => saveChoice({ potions: wanted, healBelow: below }, POTION_KEY);
+    const changed = () => {
+      save();
+      loadOptions();
+      showThreat?.();
+    };
+    const stepper = (label, onStep) => {
+      const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': `${label}: mniej`, text: '−', onClick: () => onStep(-1) });
+      const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': `${label}: więcej`, text: '+', onClick: () => onStep(1) });
+      return { less, more };
+    };
+    const rows = carried.map((potion) => {
+      const limit = () => Math.min(potion.count, fights);
+      const count = () => Math.min(wanted[potion.id] ?? 0, limit());
+      const value = h('output', { class: 'potion-pick-value' });
+      const { less, more } = stepper(potion.name, (sign) => {
+        wanted[potion.id] = Math.max(0, Math.min(limit(), count() + sign));
+        show();
+        changed();
+      });
+      const show = () => {
+        value.textContent = `${count()} z ${limit()}`;
+        less.disabled = count() === 0;
+        more.disabled = count() >= limit();
+      };
+      const element = h(
+        'div',
+        { class: 'potion-pick' },
+        h('span', { class: 'potion-pick-art' }, potionSprite(potion.id) ?? icon('flask', { size: 20 })),
+        h('span', { class: 'potion-pick-name', text: potion.name }),
+        less,
+        value,
+        more,
+      );
+      return { potion, count, show, element };
+    });
+    const healRow = rows.find((row) => row.potion.fight === 'heal');
+    const markValue = h('output', { class: 'potion-pick-value' });
+    const mark = stepper('Próg leczenia', (sign) => {
+      const choices = use.healBelowChoices;
+      below = choices[Math.max(0, Math.min(choices.length - 1, choices.indexOf(below) + sign))];
+      showMark();
+      changed();
+    });
+    const showMark = () => {
+      markValue.textContent = `${Math.round(below * 100)}% HP`;
+      mark.less.disabled = below === use.healBelowChoices[0];
+      mark.more.disabled = below === use.healBelowChoices.at(-1);
+    };
+    showMark();
+    const element = h(
+      'section',
+      { class: 'potion-picks', 'aria-label': 'Mikstury na wyprawę' },
+      h('p', { class: 'duration-title', text: 'Mikstury na wyprawę' }),
+      rows.map((row) => row.element),
+      healRow && h('div', { class: 'potion-pick' }, h('span', { class: 'potion-pick-name', text: 'Lecz poniżej' }), mark.less, markValue, mark.more),
+      h('p', { class: 'muted', text: 'Każdego rodzaju najwyżej jedna na walkę. Postać pije sama: leczenia poniżej progu, many, gdy zabraknie jej na umiejętność. Niewypite wrócą do plecaka.' }),
+    );
+    return {
+      element,
+      update(minutes) {
+        fights = fightsFor(use, minutes);
+        for (const row of rows) row.show();
+      },
+      taken: () => Object.fromEntries(rows.map((row) => [row.potion.id, row.count()]).filter(([, count]) => count > 0)),
+      // The healing potions wished for, whatever the length: the server
+      // takes one for each fight of every length.
+      healing: () => healRow && { count: Math.min(wanted[healRow.potion.id] ?? 0, healRow.potion.count), below },
+      below: () => below,
+    };
   }
 
   // Resting can be skipped with Punkty Czasu on every Walka screen, from the

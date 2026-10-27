@@ -3,8 +3,9 @@
 // after the end brews them with that seed, puts what fits into the bag and
 // saves the report. Called back early, the character brings the potions done
 // so far with their report, and the herbs for the rest go back to the bag.
-// Potions in the bag can be sold to the scrapper or thrown away. All of it
-// waits while the professions are hidden in this deployment (features.js).
+// Potions in the bag can be sold to the scrapper, thrown away or drunk. All
+// of it waits while the professions are hidden in this deployment
+// (features.js).
 
 import {
   addQuestProgress,
@@ -16,6 +17,7 @@ import {
   brewingReport,
   campBonus,
   campLevels,
+  drinkSpeed,
   mostPotions,
   playerCombatant,
   potionHerbs,
@@ -33,6 +35,7 @@ import { ApiError, json, readJson } from './http.js';
 import { requireProfessions, takeFromBag } from './professions.js';
 import { herbsOf, potionsOf } from './professions-view.js';
 import { KEPT_REPORTS } from './reports.js';
+import { say } from '../engine/text.js';
 
 // A brewing of `count` potions of the recipe chosen, from now on. The herbs
 // go into the cauldron at once, only if the character is still as seen, so
@@ -215,6 +218,36 @@ export async function sellPotions(context) {
   const result = await takeFromBag(context.env.DB, player, 'potions', taken, gold);
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Mikstury zmieniły się w międzyczasie. Spróbuj ponownie.');
   return json({ sold: { count: taken.count, gold }, character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
+}
+
+// "Wypij" in the bag: a healing potion gives HP back now, and a speed
+// potion speeds up the fights of its next minutes (potions.js). A mana
+// potion works only by itself in fights.
+export async function drinkPotion(context) {
+  const { session, player } = await requireIdlePlayer(context);
+  const body = await readJson(context.request);
+  const taken = potionCount(player, { potionId: body.potionId, count: 1 });
+  const potion = content.potionsById[taken.id];
+  const texts = content.potionUse.texts;
+  const now = context.now;
+  let also;
+  let text;
+  if (potion.effect.heal) {
+    const { hp, maxHp } = currentHp(player, now);
+    if (hp >= maxHp) throw new ApiError(409, 'full_hp', 'Postać ma pełne HP.');
+    const healed = Math.min(maxHp - hp, Math.round(potion.effect.heal * maxHp));
+    // Resting goes on from the HP the potion gave.
+    also = { sql: 'hp = ?, hp_at = ?', binds: [hp + healed, now] };
+    text = say(texts, 'drunkHeal', 0, { potion: potion.counted[0], amount: healed });
+  } else if (potion.effect.speed) {
+    also = { sql: 'buffs = ?', binds: [JSON.stringify(drinkSpeed(JSON.parse(player.row.buffs ?? '{}'), potion, now))] };
+    text = say(texts, 'drunkSpeed', 0, { potion: potion.counted[0], bonus: Math.round(potion.effect.speed * 100), minutes: potion.minutes });
+  } else {
+    throw new ApiError(409, 'fight_only', 'Ta mikstura działa sama w walce, gdy zabraknie many na umiejętność.');
+  }
+  const result = await takeFromBag(context.env.DB, player, 'potions', taken, 0, also);
+  if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Mikstury zmieniły się w międzyczasie. Spróbuj ponownie.');
+  return json({ text, character: characterView(await loadPlayer(context.env.DB, session.userId), now) });
 }
 
 export async function discardPotions(context) {

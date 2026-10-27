@@ -156,8 +156,8 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/camp/cancel` | „Anuluj” budowę czekającą w kolejce: `buildingId` i `level`; koszt wraca w całości (409 `not_queued`) |
 | POST | `/api/camp/trade` | duch ognia w Ognisku: złoto za `amount` sztuk `resource` (`wood`, `stone` albo `iron-ore`), do limitu sztuk na dzień według poziomu Ogniska (400 `invalid_amount`; 409 `not_built`, `no_trades`, `not_enough`) |
 | POST | `/api/camp/buy` | lada złomiarza w Skupie złomu: `count` (1 albo 10) części `partId` za złoto, rzadkości i ceny według poziomu skupu; zwraca `bought` (400 `invalid_part`, `invalid_count`; 409 `not_built`, `not_sold`, `not_enough`) |
-| GET | `/api/hunts/options` | poziom zagrożenia dla każdego czasu w otwartym regionie wewnętrznym dla poziomu postaci (`threat`, a `threatAvoiding` bez elit i czempiona); `?area=<id>` liczy jeden wybrany region wewnętrzny |
-| POST | `/api/hunts` | wyrusz na eksplorację: `areaId` (otwarty region wewnętrzny), `minutes` (1, potem co 5 minut: do 30, od poziomu 25 do 60, od 35 do 120, od 50 do 240), `avoidRare` (`true`: postać nie spotyka elit ani czempionów) |
+| GET | `/api/hunts/options` | poziom zagrożenia dla każdego czasu w otwartym regionie wewnętrznym dla poziomu postaci (`threat`, a `threatAvoiding` bez elit i czempiona); `?area=<id>` liczy jeden wybrany region wewnętrzny, a z profesjami `&heal=<liczba>&below=<próg>` liczy zabrane mikstury leczenia |
+| POST | `/api/hunts` | wyrusz na eksplorację: `areaId` (otwarty region wewnętrzny), `minutes` (1, potem co 5 minut: do 30, od poziomu 25 do 60, od 35 do 120, od 50 do 240), `avoidRare` (`true`: postać nie spotyka elit ani czempionów); z profesjami `potions` (`{ id: liczba }` mikstur leczenia i many, każdej najwyżej tyle, ile walk) i `healBelow` (próg leczenia, np. `0.4`) (400 `invalid_potions`, `invalid_heal_below`) |
 | POST | `/api/hunts/cancel` | przerwij trwającą eksplorację, zbieranie albo warzenie; przerwane warzenie zwraca `report` gotowych mikstur (`null`, gdy żadna nie była gotowa), a zioła na resztę wracają do plecaka |
 | POST | `/api/hunts/claim` | odbierz raport zakończonej eksploracji, zbierania albo warzenia |
 | POST | `/api/professions/gather` | tylko z profesjami (`PROFESSIONS` = `"on"`): Zielarstwo, `herbs` (znane zioła, naraz tyle, ile pozwala poziom) i `minutes` (10–480 co 10) (400 `invalid_herbs`, `too_many_herbs`, `unknown_herb`, `invalid_duration`; 403 `locked`) |
@@ -166,6 +166,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/professions/brew` | tylko z profesjami: Alchemia, `recipe` (znany przepis) i `count` mikstur, do 8 godzin i tylu, na ile starcza ziół; zioła idą do kotła od razu (400 `unknown_recipe`, `invalid_count`; 403 `locked`; 409 `no_herbs`, `conflict`) |
 | POST | `/api/potions/sell` | złomiarz kupuje `count` mikstur `potionId`; zwraca `sold` (400 `unknown_potion`, `invalid_count`; 404 `no_potion`) |
 | POST | `/api/potions/discard` | wyrzuć `count` mikstur `potionId` |
+| POST | `/api/potions/drink` | wypij miksturę `potionId` z plecaka: leczenie od razu, szybkość na 30 minut (`speedBuff` w postaci); zwraca `text` i `character` (409 `full_hp`, `fight_only` dla many) |
 | GET | `/api/reports` | 50 ostatnich raportów (Dziennik); starsze usuwa odbiór kolejnego |
 | GET | `/api/reports/:id` | pełny raport |
 | POST | `/api/time/skip` | „Przewiń”: `target` (`activity`, `rest` albo `build`); 1 Punkt Czasu za minutę, przy za małej liczbie punktów skraca o tyle minut, ile ich jest; zwraca `spent` (409 `no_time_points`, `nothing_to_skip`, `busy`) |

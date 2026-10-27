@@ -23,4 +23,5 @@ export * from './skill-demo.js';
 export * from './notifications.js';
 export * from './professions.js';
 export * from './brewing.js';
+export * from './potions.js';
 export * from './mail.js';

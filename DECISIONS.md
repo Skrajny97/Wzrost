@@ -1930,3 +1930,19 @@ Brakujące szczegóły kroku 1 rozstrzygnięte najprościej. Wszystko działa ty
 8. **Teksty.** Opisy Pracowni i mikstur są napisane najprościej, do poprawy przez autora. Trzy zdania raportu to szkic, który autor dostał do poprawy (A35). Działanie mikstur (`effect` w `data/professions.json`) czeka na krok 2, a walidator pilnuje, żeby opis mikstury podawał te same procenty.
 9. **Grafiki i dźwięki.** Do zatwierdzenia grafik mikstury mają ikonkę kolby, a Pracownia jest bez tła. Bulgotanie i łyk przyjdą z krokiem 2.
 10. **Migracja 0033.** Kolumna `potions` (migracja 0033) jest tylko na gałęzi roboczej, jak 0025, więc kolejna migracja w `main` ma numer 0034.
+
+
+## Alchemia, krok 2: mikstury na wyprawach (27.10.2026)
+
+Brakujące szczegóły kroku 2 rozstrzygnięte najprościej. Wszystko działa tylko na wersji testowej.
+
+1. **Kiedy postać pije.** Miksturę leczenia postać wypija, gdy po ciosie albo po obrażeniach z efektu (np. krwawienia) ma HP poniżej progu. Miksturę many wypija, gdy brakuje jej many na umiejętność. W jednej walce wypija najwyżej jedną miksturę każdego rodzaju. Wypicie nie zabiera ruchu.
+2. **Próg leczenia** (A2). Gracz wybiera go przed „Wyrusz”: 20, 30, 40, 50, 60 albo 70% maks. HP. Na start 40%.
+3. **Ile zabrać** (A8). Każdego rodzaju najwyżej tyle, ile walk może mieć wyprawa tej długości: przez 1 minutę 1, od 5 minut 2, od 15 minut 3, od godziny 4, od 4 godzin 5.
+4. **Mikstury zostają w plecaku do końca wyprawy.** W czasie wyprawy plecaka nie da się zmienić, więc przy odbiorze raportu z plecaka znikają tylko mikstury wypite. Niewypite zostają.
+5. **Mikstura szybkości** (A7). Działa 30 minut od wypicia z plecaka. Kolejna dodaje następne 30 minut. Wyprawa rozpoczęta w tym czasie ma szybsze walki do końca działania mikstury, a dalsze walki toczą się zwykle. Pod górnym paskiem, obok sakiewki, widać kolbę z pozostałym czasem.
+6. **„Wypij” poza wyprawą.** Mikstura leczenia leczy od razu 20% maks. HP, a odpoczynek liczy się dalej od nowego HP. Przy pełnym HP nie da się jej wypić. Mikstury many nie da się wypić z plecaka, bo działa tylko w walce.
+7. **Zagrożenie** (A5). Szacunek liczy zabrane mikstury leczenia z ich progiem. Mikstury many i szybkości go nie zmieniają.
+8. **Raport.** W walce widać wypicie („Mira wypija Mniejszą miksturę leczenia: +52 HP.”), a w podsumowaniu zużyte mikstury i liczbę walk z miksturą szybkości.
+9. **Dźwięki.** Łyk w walce i bulgotanie na koniec warzenia czekają na wybór autora (po 2 wersje z ElevenLabs).
+10. **Migracja 0035.** Kolumna `buffs` (migracja 0035) jest tylko na gałęzi roboczej, jak 0033, więc kolejna migracja w `main` ma numer 0036.

@@ -146,6 +146,13 @@ const path = (id) => `$."${id}"`;
 // meanwhile, as at home.
 export const restsDuring = (activity) => !activity || activity.kind === 'herbs' || activity.kind === 'potions';
 
+// A speed potion drunk from the bag that still works: until when, and its
+// bonus (potions.js).
+function activeSpeed(row, now) {
+  const speed = JSON.parse(row.buffs ?? '{}').speed;
+  return speed && speed.until > now ? speed : null;
+}
+
 // The bag's places taken: one an item, and the herbs and the potions by the
 // stack.
 export const bagPlaces = (player) =>
@@ -622,6 +629,8 @@ export function characterView(player, now) {
     met: JSON.parse(row.met ?? '[]'),
     // The inner regions whose Bestiariusz chest is open (bestiary.js).
     bestiary: JSON.parse(row.bestiary ?? '[]'),
+    // A speed potion still working (potions.js), or null.
+    speedBuff: activeSpeed(row, now),
     // The narrator's daily and weekly quests (quests.js).
     quests: questsView(questsNow(player, now), now, content, JSON.parse(row.met ?? '[]')),
     // The narrator's cards seen so far, or null for a character made before

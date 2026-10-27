@@ -266,6 +266,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       'section',
       { class: 'card report-summary', 'aria-label': 'Podsumowanie', 'data-guide': 'report-summary' },
       h('p', { class: `result ${RESULT_CLASS[report.result] ?? ''}`, text: report.resultText }),
+      // The potions drunk and the fights a speed potion sped up.
+      (summary.potions ?? []).map((line) => h('p', { class: 'report-potions', text: line })),
       h(
         'dl',
         { class: 'status-list' },

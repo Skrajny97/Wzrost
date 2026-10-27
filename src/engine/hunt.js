@@ -23,6 +23,7 @@ import { combatantView, monsterCombatant, playerCombatant } from './combatant.js
 import { simulateFight } from './combat.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { itemName, itemRank, itemView, randomItem } from './items.js';
+import { fightPotions } from './potions.js';
 import {
   classXpToNext,
   faintPenalty,
@@ -67,6 +68,10 @@ export function explorationPace(minutes, content) {
     finds: minutes / tuning.findIntervalMinutes,
   };
 }
+
+// The most potions of a kind an exploration of `minutes` takes along
+// (potions.js): one for each of its fights.
+export const potionsPerKind = (minutes, content) => explorationPace(minutes, content).fights;
 
 // The pace with the elite and the champion avoided (none of them) or sought
 // (rareSeekFactor times as often, the author: "niech zwiększa to szansę
@@ -245,8 +250,14 @@ export function resourceBundle(area, total) {
 
 // `first`: the character's very first exploration, which goes one way:
 // regular encounters only, no chests among the finds, and the one treasure
-// is a plain weapon of its class after the first won fight.
-export function simulateHunt({ character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [], met = null }, content) {
+// is a plain weapon of its class after the first won fight. `potions`: the
+// potions taken along, by id, the healing one drunk below `healBelow`;
+// `speed`: a speed potion's bonus for the first `ms` of the exploration
+// (potions.js).
+export function simulateHunt(
+  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [], met = null, potions = {}, healBelow, speed = null },
+  content,
+) {
   const rng = createRng(seed);
   const tuning = content.balance.hunt;
   const rewards = content.balance.rewards;
@@ -301,6 +312,11 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
   const fights = [];
   const entries = [];
   let key = null;
+  // The potions still carried and those drunk, by id, and the fights the
+  // speed potion sped up.
+  const left = { ...potions };
+  const potionsUsed = {};
+  let speedFights = 0;
   // An item from a chest. A character without a weapon holds a found one at
   // once, for the rest of the exploration.
   const take = (item) => {
@@ -349,10 +365,17 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
       pace = odds();
     }
     const enemies = encounterCombatants(encounter, content);
-    const ally = { ...player, hp: hpNow };
+    const kit = fightPotions(left, healBelow ?? content.potionUse?.healBelow, content);
+    const fast = Boolean(speed) && event.t < speed.ms;
+    const ally = { ...player, hp: hpNow, ...(fast && { speed: player.speed * (1 + speed.bonus) }), ...((kit.heal || kit.mana) && { potions: kit }) };
     const fight = simulateFight({ allies: [ally], enemies, rng, content, record: true });
     const hpBefore = hpNow;
     hpNow = fight.units.find((unit) => unit.id === ally.id).hp;
+    for (const id of fight.drunk) {
+      left[id] -= 1;
+      potionsUsed[id] = (potionsUsed[id] ?? 0) + 1;
+    }
+    if (fast) speedFights += 1;
 
     // Every fight keeps what its playback needs: the sides and the events.
     const summary = {
@@ -482,6 +505,8 @@ export function simulateHunt({ character, equipped, hp, name, areaId, minutes, s
     fights,
     entries,
     keyFight: key && { index: key.index },
+    potionsUsed,
+    speedFights,
   };
 }
 
@@ -564,6 +589,17 @@ export function hpAfterHunt({ character, applied, hunt, equipped, name }, conten
   return playerCombatant({ character: levelled, equipped, name }, content).maxHp;
 }
 
+// "Zużyte mikstury: 2 × Mniejsza mikstura leczenia." and the fights a speed
+// potion sped up, or nothing for an exploration without potions.
+function potionsLines(hunt, content) {
+  const texts = content.potionUse?.texts;
+  const used = Object.entries(hunt.potionsUsed ?? {}).filter(([id]) => content.potionsById[id]);
+  const lines = [];
+  if (used.length > 0) lines.push(say(texts, 'used', 0, { potions: used.map(([id, count]) => `${count} × ${content.potionsById[id].name}`).join(', ') }));
+  if (hunt.speedFights > 0) lines.push(say(texts, 'speedFights', 0, { fights: hunt.speedFights, all: hunt.fights.length }));
+  return lines;
+}
+
 // `autoEquipped`: indices of the finds that went straight into empty slots.
 // `overflow`: what the scrapper bought because the bag was full
 // ({ capacity, count, gold, sold: indices of the finds among them }).
@@ -604,6 +640,9 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       hpStart: hunt.hpStart,
       hpEnd: hunt.hpEnd,
       maxHp: hunt.maxHp,
+      // The potions drunk in the fights and the fights a speed potion sped
+      // up (potions.js), each told in a line.
+      potions: potionsLines(hunt, content),
     },
     system: [
       ...applied.messages,
@@ -632,5 +671,7 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
     })),
     keyFight: hunt.keyFight,
     entries: hunt.entries,
+    // The potions drunk, by id (potions.js).
+    potionsUsed: hunt.potionsUsed ?? {},
   };
 }

@@ -9,6 +9,7 @@
     "professions",
     "gathering",
     "brewing",
+    "potionUse",
     "herbs",
     "potions",
     "texts"
@@ -398,6 +399,97 @@
         }
       }
     },
+    "potionUse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "healBelow",
+        "healBelowChoices",
+        "texts"
+      ],
+      "description": "Picie mikstur: próg leczenia w walce i teksty walki oraz raportu.",
+      "properties": {
+        "healBelow": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1,
+          "description": "Domyślny próg: mikstura leczenia działa, gdy HP spadnie poniżej tej części maks. HP."
+        },
+        "healBelowChoices": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "exclusiveMaximum": 1
+          },
+          "description": "Progi do wyboru przy „Wyrusz”."
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "drinkHeal",
+            "drinkMana",
+            "drunkHeal",
+            "drunkSpeed",
+            "used",
+            "speedFights"
+          ],
+          "properties": {
+            "drinkHeal": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "drinkMana": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "drunkHeal": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "drunkSpeed": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "used": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "speedFights": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
     "herbs": {
       "type": "array",
       "minItems": 1,
@@ -519,6 +611,11 @@
                 "description": "Dodaje tyle do szybkości ruchów postaci."
               }
             }
+          },
+          "minutes": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Mikstura na czas: tyle minut działa po wypiciu z plecaka (szybkość)."
           },
           "description": {
             "type": "string",

@@ -14,6 +14,10 @@
 // takes a share of mana at once and holds until its points are spent. Every
 // fight starts with full mana. A fight without skills draws the same random
 // numbers as before skills existed.
+//
+// A character may carry potions (potions.js): a healing one is drunk the
+// moment HP falls below the player's mark, a mana one when a skill lacks
+// mana, each kind at most once a fight. Potions draw no random numbers.
 
 import { cappedChance, reduction } from './formulas.js';
 import { ACTIVE_KINDS, START_KINDS, WOUND_KINDS } from './skills.js';
@@ -107,6 +111,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
   for (const unit of units) unit.next = unit.interval * (0.5 + 0.5 * rng.next());
 
   const events = [];
+  // The potions drunk, by id, and which unit drank which kind already.
+  const drunk = [];
+  const drank = new Set();
   const dealt = Object.fromEntries(units.map((unit) => [unit.id, 0]));
   const taken = Object.fromEntries(units.map((unit) => [unit.id, 0]));
   let actions = 0;
@@ -132,11 +139,40 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
     taken[target.id] += amount;
   };
 
+  // A potion of a kind (`heal` or `mana`) the unit carries and has not drunk
+  // yet in this fight. Gives whether it drank.
+  const drink = (unit, kind, t) => {
+    const potion = unit.potions?.[kind];
+    if (!potion || drank.has(`${unit.id}:${kind}`)) return false;
+    drank.add(`${unit.id}:${kind}`);
+    drunk.push(potion.id);
+    const vars = { actor: unit.name, potion: potion.accusative };
+    const potionTexts = content.potionUse.texts;
+    if (kind === 'heal') {
+      const amount = heal(unit, potion.amount * unit.maxHp);
+      log(() => ({ t, kind: 'potion', effect: 'heal', actor: unit.id, target: unit.id, potion: potion.id, amount, hp: unit.hp, text: say(potionTexts, 'drinkHeal', actions, { ...vars, amount }) }));
+    } else {
+      const before = unit.mana;
+      unit.mana = Math.min(unit.maxMana ?? 0, unit.mana + Math.round(potion.amount * (unit.maxMana ?? 0)));
+      const amount = unit.mana - before;
+      log(() => ({ t, kind: 'potion', effect: 'mana', actor: unit.id, target: unit.id, potion: potion.id, amount, hp: unit.hp, text: say(potionTexts, 'drinkMana', actions, { ...vars, amount }) }));
+    }
+    return true;
+  };
+
+  // A healing potion the moment HP falls below the player's mark.
+  const healPotion = (unit, t) => {
+    if (unit.hp > 0 && unit.hp < unit.potions.heal.below * unit.maxHp) drink(unit, 'heal', t);
+  };
+
+  // Mana enough for `need`, from a mana potion when short of it.
+  const manaFor = (unit, need, t) => unit.mana >= need || (Boolean(unit.potions?.mana) && drink(unit, 'mana', t) && unit.mana >= need);
+
   // A wound skill wakes the moment HP falls below its mark, once a fight.
   const wounded = (unit, t) => {
     if (unit.hp <= 0) return;
     for (const skill of unit.skills) {
-      if (!WOUND_KINDS.has(skill.kind) || skill.used || unit.hp >= skill.params.below * unit.maxHp || unit.mana < skill.mana) continue;
+      if (!WOUND_KINDS.has(skill.kind) || skill.used || unit.hp >= skill.params.below * unit.maxHp || !manaFor(unit, skill.mana, t)) continue;
       skill.used = true;
       unit.mana -= skill.mana;
       const vars = { actor: unit.name, skill: skill.name };
@@ -190,7 +226,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       const vars = { target: unit.name, effect: dot.name, damage: amount };
       log(() => ({ t, kind: 'tick', target: unit.id, effect: dot.name, element: dot.element, damage: amount, absorbed: absorbed || undefined, shield: shieldLeft(unit), left: dot.ticks, hp: unit.hp, text: say(texts, 'effectTick', actions, vars) }));
       if (unit.hp === 0) log(() => ({ t, kind: 'kill', target: unit.id, hp: 0, text: say(texts, 'kill', actions, vars) }));
-      else if (unit.skills.length > 0) wounded(unit, t);
+      else {
+        if (unit.skills.length > 0) wounded(unit, t);
+        if (unit.potions?.heal) healPotion(unit, t);
+      }
     }
     unit.dots = unit.dots.filter((dot) => dot.ticks > 0);
   };
@@ -298,6 +337,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       log(() => ({ t, kind: 'stun', target: target.id, label: move.stunLabel, hp: target.hp, ...marks, text: say(texts, 'stun', actions, vars) }));
     }
     if (target.skills.length > 0) wounded(target, t);
+    if (target.potions?.heal) healPotion(target, t);
   };
 
   // The opponent standing furthest back, the quickest kill among equals.
@@ -311,8 +351,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
   const useSkill = (actor, opponents, t) => {
     if (!skilled || actor.skills.length === 0) return false;
     for (const skill of actor.skills) {
-      if (!ACTIVE_KINDS.has(skill.kind) || skill.used || actor.moves < skill.ready || actor.mana < skill.mana) continue;
+      if (!ACTIVE_KINDS.has(skill.kind) || skill.used || actor.moves < skill.ready) continue;
       if (skill.kind === 'heal' && actor.hp >= skill.params.below * actor.maxHp) continue;
+      if (!manaFor(actor, skill.mana, t)) continue;
       actor.mana -= skill.mana;
       skill.ready = actor.moves + skill.cooldown;
       skill.used = skill.once === true;
@@ -395,6 +436,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
         units: units.map((unit) => ({ id: unit.id, hp: unit.hp })),
         dealt,
         taken,
+        drunk,
       };
     }
 

@@ -14,6 +14,8 @@ import {
   campLevels,
   durationsUpTo,
   estimateThreat,
+  fightKind,
+  fightPotions,
   higherThreat,
   hpAfterHunt,
   huntDurations,
@@ -22,10 +24,12 @@ import {
   longestHunt,
   lowerThreat,
   nextHuntUnlock,
+  potionsPerKind,
   questCreatures,
   rareCatchUp,
   sellPrice,
   simulateHunt,
+  speedWindow,
   threatSamples,
 } from '../engine/index.js';
 import { finishBrewing } from './brewing.js';
@@ -45,6 +49,7 @@ import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { soldGold } from './inventory.js';
 import { finishGathering } from './professions.js';
+import { potionsOf } from './professions-view.js';
 import { KEPT_REPORTS } from './reports.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
@@ -65,6 +70,38 @@ function cachedSamples(player, character, equipped, areaId) {
     samplesCache.set(key, samples);
   }
   return samples;
+}
+
+// The healing potions of ?heal=…&below=… for the threat (potions.js): as
+// many as asked of the first kind the character carries, drunk below the
+// mark asked, or null.
+function healingFor(player, params) {
+  const count = Number(params.get('heal') ?? 0);
+  if (!Number.isInteger(count) || count <= 0) return null;
+  const { healBelow, healBelowChoices } = content.potionUse;
+  const below = Number(params.get('below') ?? healBelow);
+  const have = potionsOf(player.row);
+  const kit = fightPotions(have, healBelowChoices.includes(below) ? below : healBelow, content).heal;
+  return kit ? { count: Math.min(count, have[kit.id]), amount: kit.amount, below: kit.below } : null;
+}
+
+// The potions an exploration of `minutes` takes along (potions.js): known
+// ones that work in fights, of each at most as many as the character has
+// and as the exploration has fights.
+function takenPotions(player, asked, minutes) {
+  if (asked === undefined || asked === null) return {};
+  if (typeof asked !== 'object' || Array.isArray(asked)) throw new ApiError(400, 'invalid_potions', 'Wybierz mikstury na wyprawę.');
+  const have = potionsOf(player.row);
+  const most = potionsPerKind(minutes, content);
+  const taken = {};
+  for (const [id, count] of Object.entries(asked)) {
+    const potion = content.potionsById[id];
+    if (!potion || !fightKind(potion)) throw new ApiError(400, 'invalid_potions', 'Tej mikstury nie zabiera się na wyprawę.');
+    const limit = Math.min(have[id] ?? 0, most);
+    if (!Number.isInteger(count) || count < 0 || count > limit) throw new ApiError(400, 'invalid_potions', `Zabierz od 0 do ${limit} sztuk.`);
+    if (count > 0) taken[id] = count;
+  }
+  return taken;
 }
 
 // Inner regions open with the class level (areaUnlockLevel).
@@ -93,8 +130,10 @@ export async function huntOptions(context) {
   // the champion avoided or sought, from the same sample fights; the first is
   // never above the threat without them, the second never below it. In a
   // place too easy for the character, the elite and the champion it has not
-  // met come far more often (rareCatchUp).
+  // met come far more often (rareCatchUp). Healing potions taken along
+  // count too (healingFor).
   const met = JSON.parse(player.row.met ?? '[]');
+  const healing = healingFor(player, params);
   return json({
     hp,
     maxHp,
@@ -102,9 +141,9 @@ export async function huntOptions(context) {
       const { id } = place;
       const samples = cachedSamples(player, character, equipped, id);
       const catchUp = rareCatchUp(character.level, place, met, content);
-      const threat = estimateThreat({ character, equipped, hp, areaId: id, catchUp }, content, samples);
-      const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true }, content, samples);
-      const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true, catchUp }, content, samples);
+      const threat = estimateThreat({ character, equipped, hp, areaId: id, catchUp, healing }, content, samples);
+      const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true, healing }, content, samples);
+      const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true, catchUp, healing }, content, samples);
       return { id, threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat) };
     }),
   });
@@ -120,9 +159,10 @@ export async function startHunt(context) {
 // An exploration of `minutes` in an inner region, from now on, avoiding the
 // elite and the champion when asked (avoidRare) or seeking them (seekRare),
 // and tracking the creatures the quests ask for (trackQuests): those living
-// there are kept with it. The skipped introduction sends the first one this
-// way too (tutorial.js).
-export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false } = {}, now) {
+// there are kept with it, as are the potions taken along (potions), the
+// healing mark (healBelow) and a speed potion drunk before (potions.js).
+// The skipped introduction sends the first one this way too (tutorial.js).
+export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, potions, healBelow } = {}, now) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
   const area = typeof id === 'string' ? areaFor(id, player.row.level, content) : undefined;
@@ -145,6 +185,16 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
     );
   }
 
+  if (healBelow !== undefined && !content.potionUse.healBelowChoices.includes(healBelow)) {
+    throw new ApiError(400, 'invalid_heal_below', 'Wybierz próg mikstury leczenia.');
+  }
+  const taken = takenPotions(player, potions, minutes);
+  const speed = speedWindow(JSON.parse(player.row.buffs ?? '{}'), now, minutes);
+  const options = {
+    ...(Object.keys(taken).length > 0 && { potions: taken, healBelow: healBelow ?? content.potionUse.healBelow }),
+    ...(speed && { speed }),
+  };
+
   const { hp } = currentHp(player, now);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const tracked = trackQuests ? questCreatures(questsNow(player, now), area) : [];
@@ -152,9 +202,22 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
     await db.batch([
       db
         .prepare(
-          'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, avoid_rare, seek_rare, tracked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, avoid_rare, seek_rare, tracked, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         )
-        .bind(player.row.id, 'hunt', area.id, minutes, now, now + minutes * 60000, seed, hp, avoidRare ? 1 : 0, seekRare ? 1 : 0, tracked.length > 0 ? JSON.stringify(tracked) : null),
+        .bind(
+          player.row.id,
+          'hunt',
+          area.id,
+          minutes,
+          now,
+          now + minutes * 60000,
+          seed,
+          hp,
+          avoidRare ? 1 : 0,
+          seekRare ? 1 : 0,
+          tracked.length > 0 ? JSON.stringify(tracked) : null,
+          JSON.stringify(options),
+        ),
       // The HP rested so far is saved now, so it is not counted again later.
       db.prepare('UPDATE characters SET hp = ?, hp_at = ?, version = version + 1 WHERE id = ?').bind(hp, now, player.row.id),
     ]);
@@ -215,6 +278,8 @@ export async function finishHunt(db, player, now) {
   const area = areaFor(activity.region_id, row.level, content);
   // The very first exploration, before any report, goes one way (simulateHunt).
   const first = !(await db.prepare('SELECT 1 AS found FROM reports WHERE character_id = ? LIMIT 1').bind(row.id).first());
+  // The potions taken along and a speed potion's window (beginHunt).
+  const options = JSON.parse(activity.options ?? '{}');
   const hunt = simulateHunt(
     {
       character,
@@ -231,10 +296,21 @@ export async function finishHunt(db, player, now) {
       // The creatures met before this exploration: it changes them only
       // when claimed, so the report comes out the same every time.
       met: JSON.parse(row.met ?? '[]'),
+      potions: options.potions ?? {},
+      healBelow: options.healBelow,
+      speed: options.speed ?? null,
     },
     content,
   );
   const applied = applyHunt(character, hunt, content);
+  // The potions drunk leave the bag; the bag cannot change during the
+  // exploration, so they are still there.
+  const drunk = Object.entries(hunt.potionsUsed);
+  const potionsLeft = Object.fromEntries(
+    Object.entries(potionsOf(row))
+      .map(([id, count]) => [id, count - (hunt.potionsUsed[id] ?? 0)])
+      .filter(([, count]) => count > 0),
+  );
   // A find for a slot with nothing in it is worn at once.
   const autoEquipped = autoEquip(equippedItems(player), hunt.items, content, row.class_id, row.class_level);
   // The rest goes to the bag. When it does not fit, the scrapper buys the
@@ -320,7 +396,7 @@ export async function finishHunt(db, player, now) {
       db
         .prepare(
           `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ? + ${storedPrice.sql}${setResources}${setMaterials},
-             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END,
+             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${drunk.length > 0 ? ', potions = ?' : ''},
              version = version + 1
            WHERE id = ?`,
         )
@@ -339,6 +415,7 @@ export async function finishHunt(db, player, now) {
           JSON.stringify(met),
           row.quests,
           quests,
+          ...(drunk.length > 0 ? [JSON.stringify(potionsLeft)] : []),
           row.id,
         ),
       // Bag items the scrapper bought: paid for above, while they were still there.

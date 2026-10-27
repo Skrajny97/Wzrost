@@ -7,7 +7,10 @@
 // character, not its level alone. The chance of fainting then follows from how
 // likely each HP level is before every next fight, with the odds of each kind
 // for that length and the rest after each won fight, as in a real
-// exploration. HP is counted in steps of 4% of the maximum.
+// exploration. HP is counted in steps of 4% of the maximum. Healing potions
+// taken along (potions.js) count too: one a fight, drunk when HP falls below
+// the player's mark. Mana and speed potions only make the fights easier, so
+// the estimate leaves them out and stays on the safe side.
 
 import { playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
@@ -114,17 +117,25 @@ export function threatSamples({ character, equipped, areaId }, content) {
 }
 
 // Chance of fainting for every exploration length, between 0 and 1.
-export function faintChances({ character, equipped, hp, areaId, avoidRare = false, seekRare = false, catchUp = null }, content, samples) {
+// `healing`: the healing potions taken ({ count, amount, below }), at most
+// one for each fight of a length.
+export function faintChances({ character, equipped, hp, areaId, avoidRare = false, seekRare = false, catchUp = null, healing = null }, content, samples) {
   const { maxHp, recovery, regular, tough, elite, champion, safe } = samples ?? threatSamples({ character, equipped, areaId }, content);
   // HP after the rest that follows a won fight, for each HP left after it.
   const rested = Array.from({ length: STEPS + 1 }, (_, left) => Math.round(left + (STEPS - left) * recovery));
   const start = Math.round((Math.min(hp, maxHp) / maxHp) * STEPS);
-  let chances = new Float64Array(STEPS + 1);
-  let next = new Float64Array(STEPS + 1);
+  // A healing potion, in steps: what it heals, and the HP below which it is
+  // drunk. The chances are kept for each number of potions left.
+  const potionSteps = healing ? Math.round(healing.amount * STEPS) : 0;
+  const mark = healing ? healing.below * STEPS : 0;
+  const layers = (count) => Array.from({ length: count + 1 }, () => new Float64Array(STEPS + 1));
   // Per length: the share of fights by HP lost, all kinds mixed by their odds,
   // and the chance that a fight begun with some HP ends in fainting.
   const shares = new Float64Array(LOST + 1);
   const faintFrom = new Float64Array(STEPS + 1);
+  // The same with a potion at hand: a fight that would take up to its heal
+  // more than the HP left is survived.
+  const faintWithPotion = new Float64Array(STEPS + 1);
 
   const result = {};
   for (const minutes of durationsUpTo(content.balance.hunt.maxMinutes, content)) {
@@ -151,19 +162,38 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
       tail += fainting(steps);
       faintFrom[steps] = tail;
     }
+    for (let steps = 0; steps <= STEPS; steps++) {
+      faintWithPotion[steps] = steps + potionSteps <= STEPS ? faintFrom[steps + potionSteps] : fainting(LOST);
+    }
 
-    chances.fill(0);
-    chances[start] = 1;
+    const potions = healing ? Math.min(healing.count, pace.fights) : 0;
+    let chances = layers(potions);
+    let next = layers(potions);
+    chances[potions][start] = 1;
     let fainted = 0;
     for (let fight = 0; fight < pace.fights; fight++) {
-      next.fill(0);
-      for (let step = 0; step <= STEPS; step++) {
-        const chance = chances[step];
-        if (chance === 0) continue;
-        fainted += chance * faintFrom[step];
-        for (const loss of losses) {
-          if (loss >= step) break;
-          next[rested[step - loss]] += chance * shares[loss];
+      for (const layer of next) layer.fill(0);
+      for (let left = 0; left <= potions; left++) {
+        const from = chances[left];
+        for (let step = 0; step <= STEPS; step++) {
+          const chance = from[step];
+          if (chance === 0) continue;
+          if (left === 0) {
+            fainted += chance * faintFrom[step];
+            for (const loss of losses) {
+              if (loss >= step) break;
+              next[0][rested[step - loss]] += chance * shares[loss];
+            }
+            continue;
+          }
+          // With a potion: drunk once HP falls below the mark.
+          fainted += chance * faintWithPotion[step];
+          for (const loss of losses) {
+            if (loss >= step + potionSteps) break;
+            const after = step - loss;
+            const drinks = after < mark;
+            next[drinks ? left - 1 : left][rested[drinks ? Math.min(STEPS, after + potionSteps) : after]] += chance * shares[loss];
+          }
         }
       }
       [chances, next] = [next, chances];

@@ -1079,6 +1079,27 @@ button {
   color: var(--text);
 }
 
+/* A speed potion at work: a flask and the time it still lasts. */
+.speed-chip {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid rgba(167, 196, 127, 0.6);
+  background: rgba(167, 196, 127, 0.1);
+  color: var(--leaf);
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+}
+
+.speed-chip[hidden] {
+  display: none;
+}
+
 .activity {
   display: flex;
   flex: 1;
@@ -5888,6 +5909,58 @@ button.herb-tile[aria-pressed='true'] {
 /* A brewing's lucky potions. */
 .herb-room--lucky {
   color: var(--gold);
+}
+
+/* The potions to take along by "Wyrusz": a row for each, with − and +. */
+.potion-picks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.potion-picks > p {
+  margin: 0;
+}
+
+.potion-pick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.potion-pick-art {
+  display: flex;
+  color: var(--leaf);
+}
+
+.potion-pick-art .sprite {
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+}
+
+.potion-pick-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.potion-pick-value {
+  min-width: 56px;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.potion-pick .duration-step {
+  flex: none;
+  width: 48px;
+  min-height: 44px;
+}
+
+/* The potions an exploration drank, under its result. */
+.report-potions {
+  margin: 0 0 8px;
+  color: var(--leaf);
 }
 
 .report-row-herbs {

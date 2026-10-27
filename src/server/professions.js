@@ -154,16 +154,17 @@ function herbCount(player, body) {
 }
 
 // The herbs or the potions (`column`) after `count` of one kind go: the key
-// goes with the last of them. The change saves only if the kind is still as
-// seen, so two taps at once sell or throw away once.
-export function takeFromBag(db, player, column, { id, have, count }, gold = 0) {
+// goes with the last of them, and `also` ({ sql, binds }) sets more with
+// them. The change saves only if the kind is still as seen, so two taps at
+// once sell, throw away or drink once.
+export function takeFromBag(db, player, column, { id, have, count }, gold = 0, also = null) {
   const left = have - count;
   return db
     .prepare(
-      `UPDATE characters SET ${column} = ${left === 0 ? `json_remove(${column}, ?)` : `json_set(${column}, ?, ?)`}, gold = gold + ?, version = version + 1
+      `UPDATE characters SET ${column} = ${left === 0 ? `json_remove(${column}, ?)` : `json_set(${column}, ?, ?)`}, gold = gold + ?${also ? `, ${also.sql}` : ''}, version = version + 1
        WHERE id = ? AND json_extract(${column}, ?) = ?`,
     )
-    .bind(path(id), ...(left === 0 ? [] : [left]), gold, player.row.id, path(id), have)
+    .bind(path(id), ...(left === 0 ? [] : [left]), gold, ...(also?.binds ?? []), player.row.id, path(id), have)
     .run();
 }
 

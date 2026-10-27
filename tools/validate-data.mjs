@@ -551,7 +551,8 @@ function checkProfessions(data, { stats }) {
 // Brewing: a crafting profession that brews, recipes known within its levels
 // from level 1 on, of herbs that exist, and each potion's description naming
 // what it does, as the data does ("leczy 20% maks. HP").
-function checkBrewing({ professions, brewing, herbs, potions }, ids) {
+function checkBrewing(data, ids) {
+  const { professions, brewing, herbs, potions } = data;
   const errors = [];
   uniqueIds(errors, 'professions (mikstury)', potions);
   const brewer = professions.find((profession) => profession.id === brewing.profession);
@@ -568,7 +569,12 @@ function checkBrewing({ professions, brewing, herbs, potions }, ids) {
     for (const value of Object.values(potion.effect)) {
       if (!potion.description.includes(`${Math.round(value * 100)}%`)) errors.push(`professions.json: opis mikstury ${potion.id} nie podaje ${Math.round(value * 100)}%`);
     }
+    // Speed is drunk from the bag and lasts its minutes; the others work in fights.
+    if (('speed' in potion.effect) !== ('minutes' in potion)) errors.push(`professions.json: tylko mikstura szybkości ma minutes (${potion.id})`);
+    if (potion.minutes && !potion.description.includes(`${potion.minutes} minut`)) errors.push(`professions.json: opis mikstury ${potion.id} nie podaje ${potion.minutes} minut`);
   }
+  const { healBelow, healBelowChoices } = data.potionUse;
+  if (!healBelowChoices.includes(healBelow)) errors.push('professions.json: potionUse.healBelow musi być jednym z healBelowChoices');
   return errors;
 }
 

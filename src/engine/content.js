@@ -105,5 +105,7 @@ export function buildContent(raw) {
     brewing: raw.professions?.brewing,
     potions: raw.professions?.potions ?? [],
     potionsById: byId(raw.professions?.potions ?? []),
+    // How potions are drunk on explorations (potions.js).
+    potionUse: raw.professions?.potionUse,
   };
 }

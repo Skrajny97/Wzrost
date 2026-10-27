@@ -424,6 +424,15 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       line();
       return;
     }
+    // A potion (potions.js): the HP or the mana it gave over the card.
+    if (event.kind === 'potion') {
+      playSound('potion');
+      setHp(event.target, event.hp);
+      float(event.target, event.effect === 'mana' ? `+${event.amount} many` : `+${event.amount}`, 'heal', 0, event.effect === 'mana' ? '#8fd3ff' : null);
+      line();
+      await flash(event.target, event.effect === 'mana' ? '#8fd3ff' : '#a7c47f', event.effect === 'mana' ? 'rgba(143, 211, 255, 0.25)' : 'rgba(167, 196, 127, 0.25)');
+      return;
+    }
     if (event.kind === 'fade') {
       guardDown(event);
       line();

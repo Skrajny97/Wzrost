@@ -320,6 +320,20 @@ export function mountCharacter(container) {
       busy
         ? h('p', { class: 'muted', text: busyText(character) })
         : [
+            // A healing or a speed potion is drunk one at a time (potions.js).
+            entry.drink &&
+              h('button', {
+                type: 'button',
+                class: 'button button--system',
+                text: 'Wypij',
+                onClick: (event) =>
+                  withButton(event.currentTarget, async () => {
+                    const { text } = await call('POST', '/api/potions/drink', { potionId: entry.id });
+                    closeSheet();
+                    playSound('potion');
+                    toast(text);
+                  }),
+              }),
             h('div', { class: 'herb-count' }, less, value, more, all),
             h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: 'Wyrzuć' }), sell),
           ],

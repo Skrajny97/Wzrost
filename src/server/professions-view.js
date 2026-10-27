@@ -3,6 +3,7 @@
 // characters.js can draw the view without a loop between the two.
 
 import {
+  fightKind,
   gatheringMinutes,
   herbSlots,
   herbsPerHour,
@@ -39,7 +40,9 @@ export function bagHerbs(row, sellBonus) {
 }
 
 // The potions in the bag, as the herbs: one entry for each, with the
-// scrapper's price of one.
+// scrapper's price of one, and how it is used (potions.js): `heal` and
+// `mana` work by themselves in fights and go along on explorations, a
+// healing and a speed potion can be drunk from the bag (`drink`).
 export function bagPotions(row, sellBonus) {
   const potions = potionsOf(row);
   return content.potions
@@ -50,6 +53,8 @@ export function bagPotions(row, sellBonus) {
       description: potion.description,
       count: potions[potion.id],
       price: potionPrice(potion, content) * (1 + sellBonus),
+      fight: fightKind(potion),
+      drink: Boolean(potion.effect.heal || potion.effect.speed),
     }));
 }
 
@@ -105,6 +110,13 @@ export function professionsView(row) {
             }
           : { id: herb.id, level: herb.level, hidden: true, hint: say({ hidden }, 'hidden', 0, { level: herb.level }) },
       ),
+    },
+    // Potions on explorations: the healing mark to choose from, and how
+    // many fights (and so potions of a kind) each length has.
+    potionUse: {
+      healBelow: content.potionUse.healBelow,
+      healBelowChoices: content.potionUse.healBelowChoices,
+      fightsByMinutes: content.balance.hunt.fightsByMinutes,
     },
     brewing: {
       professionId: brewing.profession,
