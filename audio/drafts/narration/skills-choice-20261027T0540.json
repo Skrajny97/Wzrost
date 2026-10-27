@@ -1,0 +1,17 @@
+{
+  "id": "skills-choice",
+  "payload": {
+    "text": "Pierwsza umiejętność, na którą przeznaczysz pierwszy Punkt Umiejętności, otworzy ścieżkę główną. Od jedenastego poziomu klasy możesz dobrać ścieżkę poboczną – za jeden Punkt Umiejętności. Trzecia ścieżka zamknie się wtedy na zawsze. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/skills-choice-20261027T0540-0.mp3",
+    "audio/drafts/narration/skills-choice-20261027T0540-1.mp3"
+  ],
+  "credits": 482
+}

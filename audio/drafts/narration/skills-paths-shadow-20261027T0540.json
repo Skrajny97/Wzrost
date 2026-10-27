@@ -1,0 +1,17 @@
+{
+  "id": "skills-paths-shadow",
+  "payload": {
+    "text": "Przed Tobą trzy ścieżki. Skrytobójca dopada tych, którzy chowają się za plecami innych, Truciciel zaprawia ostrze jadem, a Nocny Tancerz wymyka się ciosom i potrafi przeprowadzić szybką kontrę. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/skills-paths-shadow-20261027T0540-0.mp3",
+    "audio/drafts/narration/skills-paths-shadow-20261027T0540-1.mp3"
+  ],
+  "credits": 404
+}

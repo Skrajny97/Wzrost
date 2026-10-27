@@ -1,0 +1,17 @@
+{
+  "id": "skills-paths-mage",
+  "payload": {
+    "text": "Przed Tobą trzy ścieżki. Elementalista ciska ogniem, Władca Lodu spowalnia wrogów mroźnym wiatrem, a Arkanista zajmuje się zgłębianiem natury samej many. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/skills-paths-mage-20261027T0540-0.mp3",
+    "audio/drafts/narration/skills-paths-mage-20261027T0540-1.mp3"
+  ],
+  "credits": 324
+}

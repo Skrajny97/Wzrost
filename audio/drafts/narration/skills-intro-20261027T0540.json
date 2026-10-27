@@ -1,0 +1,17 @@
+{
+  "id": "skills-intro",
+  "payload": {
+    "text": "Przeczytaj uważnie słowa Systemu. Rzadko kiedy ostrzega tak wyraźnie. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/skills-intro-20261027T0540-0.mp3",
+    "audio/drafts/narration/skills-intro-20261027T0540-1.mp3"
+  ],
+  "credits": 156
+}

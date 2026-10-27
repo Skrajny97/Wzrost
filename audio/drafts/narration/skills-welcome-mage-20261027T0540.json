@@ -1,0 +1,17 @@
+{
+  "id": "skills-welcome-mage",
+  "payload": {
+    "text": "Dziesiąty poziom klasy… Mana słucha Cię coraz chętniej, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Umiejętności. Zanim którąś wybierzesz – pozwól, że Ci je przedstawię. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/skills-welcome-mage-20261027T0540-0.mp3",
+    "audio/drafts/narration/skills-welcome-mage-20261027T0540-1.mp3"
+  ],
+  "credits": 380
+}

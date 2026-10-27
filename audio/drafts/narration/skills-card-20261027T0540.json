@@ -1,0 +1,17 @@
+{
+  "id": "skills-card",
+  "payload": {
+    "text": "System, jak zawsze, wszystko Ci wyliczył. Na karcie zobaczysz, co daje umiejętność, ile kosztuje many i jak często możesz jej użyć. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/skills-card-20261027T0540-0.mp3",
+    "audio/drafts/narration/skills-card-20261027T0540-1.mp3"
+  ],
+  "credits": 280
+}
