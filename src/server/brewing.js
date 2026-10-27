@@ -24,12 +24,13 @@ import {
   potionPrice,
   potionsDone,
   professionState,
+  speedLeft,
   storeStacks,
   workProfession,
   workXp,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requireIdlePlayer } from './characters.js';
+import { buffsOf, characterView, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requireIdlePlayer } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { requireProfessions, takeFromBag } from './professions.js';
@@ -221,8 +222,9 @@ export async function sellPotions(context) {
 }
 
 // "Wypij" in the bag: a healing potion gives HP back now, and a speed
-// potion speeds up the fights of its next minutes (potions.js). A mana
-// potion works only by itself in fights.
+// potion speeds up the fights of its next minutes on explorations, added to
+// those still left (potions.js). A mana potion works only by itself in
+// fights.
 export async function drinkPotion(context) {
   const { session, player } = await requireIdlePlayer(context);
   const body = await readJson(context.request);
@@ -240,8 +242,9 @@ export async function drinkPotion(context) {
     also = { sql: 'hp = ?, hp_at = ?', binds: [hp + healed, now] };
     text = say(texts, 'drunkHeal', 0, { potion: potion.counted[0], amount: healed });
   } else if (potion.effect.speed) {
-    also = { sql: 'buffs = ?', binds: [JSON.stringify(drinkSpeed(JSON.parse(player.row.buffs ?? '{}'), potion, now))] };
-    text = say(texts, 'drunkSpeed', 0, { potion: potion.counted[0], bonus: Math.round(potion.effect.speed * 100), minutes: potion.minutes });
+    const buffs = drinkSpeed(buffsOf(player.row, now), potion);
+    also = { sql: 'buffs = ?', binds: [JSON.stringify(buffs)] };
+    text = say(texts, 'drunkSpeed', 0, { potion: potion.counted[0], bonus: Math.round(potion.effect.speed * 100), minutes: Math.round(speedLeft(buffs) / 60000) });
   } else {
     throw new ApiError(409, 'fight_only', 'Ta mikstura działa sama w walce, gdy zabraknie many na umiejętność.');
   }

@@ -1940,9 +1940,16 @@ Brakujące szczegóły kroku 2 rozstrzygnięte najprościej. Wszystko działa ty
 2. **Próg leczenia** (A2). Gracz wybiera go przed „Wyrusz”: 20, 30, 40, 50, 60 albo 70% maks. HP. Na start 40%.
 3. **Ile zabrać** (A8). Każdego rodzaju najwyżej tyle, ile walk może mieć wyprawa tej długości: przez 1 minutę 1, od 5 minut 2, od 15 minut 3, od godziny 4, od 4 godzin 5.
 4. **Mikstury zostają w plecaku do końca wyprawy.** W czasie wyprawy plecaka nie da się zmienić, więc przy odbiorze raportu z plecaka znikają tylko mikstury wypite. Niewypite zostają.
-5. **Mikstura szybkości** (A7). Działa 30 minut od wypicia z plecaka. Kolejna dodaje następne 30 minut. Wyprawa rozpoczęta w tym czasie ma szybsze walki do końca działania mikstury, a dalsze walki toczą się zwykle. Pod górnym paskiem, obok sakiewki, widać kolbę z pozostałym czasem.
+5. **Mikstura szybkości** (A7, zmiana autora: „Mikstura szybkości niech działa 30 minut, ale niech to obejmuje tylko czas płynący na wyprawach oraz niech się stackuje efekt”). Wypita z plecaka daje 30 minut wypraw, a każda kolejna dodaje następne 30, np. trzy dają półtorej godziny. Czas mikstury płynie tylko na wyprawie: wyprawa zabiera tyle, ile trwa, a przerwana oddaje to, czego nie zużyła. Walki w tym czasie są szybsze o 15%, a dalsze toczą się zwykle. Pod górnym paskiem, obok sakiewki, widać kolbę z pozostałym czasem, który odlicza się tylko w czasie wyprawy.
 6. **„Wypij” poza wyprawą.** Mikstura leczenia leczy od razu 20% maks. HP, a odpoczynek liczy się dalej od nowego HP. Przy pełnym HP nie da się jej wypić. Mikstury many nie da się wypić z plecaka, bo działa tylko w walce.
 7. **Zagrożenie** (A5). Szacunek liczy zabrane mikstury leczenia z ich progiem. Mikstury many i szybkości go nie zmieniają.
 8. **Raport.** W walce widać wypicie („Mira wypija Mniejszą miksturę leczenia: +52 HP.”), a w podsumowaniu zużyte mikstury i liczbę walk z miksturą szybkości.
-9. **Dźwięki.** Łyk w walce i bulgotanie na koniec warzenia czekają na wybór autora (po 2 wersje z ElevenLabs).
+9. **Dźwięki.** Bulgotanie autor wybrał w wersji 2. Gra raz, gdy otwiera się raport z warzenia. Łyk w walce i po „Wypij” nie brzmiał jak łyk, więc są 4 nowe wersje z prostszych opisów. Opis dźwięku może teraz sam ustawić, jak wiernie ElevenLabs ma go trzymać (`influence` w `audio/prompts.json`).
 10. **Migracja 0035.** Kolumna `buffs` (migracja 0035) jest tylko na gałęzi roboczej, jak 0033, więc kolejna migracja w `main` ma numer 0036.
+
+
+## Alchemia: wybory autora (27.10.2026)
+
+1. **Zdania raportu z warzenia** (A35). Zostają trzy: „W Pracowni bulgocze kocioł, a na półce przybywa fiolek.”, „Zioła oddają wywarowi wszystko, co mają najlepsze.” (poprawka autora) i „Błękitne linie Systemu mierzą każdą kroplę mikstury.”.
+2. **Grafika Mniejszej mikstury leczenia**: wersja 2. Kolejne przychodzą po jednej: mikstura many, szybkości i tło Pracowni.
+3. **Wygląd postaci** (pytanie testujących o ekwipunek na portrecie). Zostaje sposób z Margonem: portret nie pokazuje zakładanych przedmiotów, a lepszy strój przychodzi z ewolucją klasy (autor: „trzymamy się wersji z Margonem”). O czymś więcej można pomyśleć, gdy gra będzie dobrze zarabiać.

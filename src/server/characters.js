@@ -42,6 +42,7 @@ import {
   settleCrafting,
   shopOffer,
   skillsView,
+  speedLeft,
   spentPoints,
   statEffects,
   unlockedFeatures,
@@ -146,11 +147,26 @@ const path = (id) => `$."${id}"`;
 // meanwhile, as at home.
 export const restsDuring = (activity) => !activity || activity.kind === 'herbs' || activity.kind === 'potions';
 
-// A speed potion drunk from the bag that still works: until when, and its
-// bonus (potions.js).
-function activeSpeed(row, now) {
-  const speed = JSON.parse(row.buffs ?? '{}').speed;
-  return speed && speed.until > now ? speed : null;
+// A character's buffs (potions.js). A speed potion drunk while its time
+// still passed everywhere keeps what it had left.
+export function buffsOf(row, now) {
+  const buffs = JSON.parse(row.buffs ?? '{}');
+  const { speed } = buffs;
+  if (speed && !Number.isFinite(speed.ms)) buffs.speed = { ms: Math.max(0, (speed.until ?? now) - now), bonus: speed.bonus };
+  return buffs;
+}
+
+// The speed potions drunk from the bag that still work (potions.js): the
+// time of explorations they have left after the one under way, until when
+// they work in it, and their bonus.
+function activeSpeed(player, now) {
+  const buffs = buffsOf(player.row, now);
+  const window = player.activity?.kind === 'hunt' ? JSON.parse(player.activity.options ?? '{}').speed : null;
+  const ends = window ? player.activity.started_at + window.ms : 0;
+  const until = ends > now ? ends : null;
+  const ms = speedLeft(buffs);
+  if (ms <= 0 && !until) return null;
+  return { ms, until, bonus: until ? window.bonus : buffs.speed.bonus };
 }
 
 // The bag's places taken: one an item, and the herbs and the potions by the
@@ -630,7 +646,7 @@ export function characterView(player, now) {
     // The inner regions whose Bestiariusz chest is open (bestiary.js).
     bestiary: JSON.parse(row.bestiary ?? '[]'),
     // A speed potion still working (potions.js), or null.
-    speedBuff: activeSpeed(row, now),
+    speedBuff: activeSpeed(player, now),
     // The narrator's daily and weekly quests (quests.js).
     quests: questsView(questsNow(player, now), now, content, JSON.parse(row.met ?? '[]')),
     // The narrator's cards seen so far, or null for a character made before

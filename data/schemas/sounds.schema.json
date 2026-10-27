@@ -34,10 +34,10 @@
     },
     "effects": {
       "type": "object",
-      "description": "Nazwa dźwięku z src/client/sound.js (SOUNDS) albo skill-<id umiejętności> → jego nagranie.",
+      "description": "Nazwa dźwięku z src/client/sound.js (SOUNDS), mikstury (potion, brew) albo skill-<id umiejętności> → jego nagranie.",
       "propertyNames": {
         "anyOf": [
-          { "enum": ["tap", "tab", "open", "swing", "shot", "magic", "effect", "tick", "victory", "defeat", "system", "build", "collect", "done", "chest"] },
+          { "enum": ["tap", "tab", "open", "swing", "shot", "magic", "effect", "tick", "victory", "defeat", "system", "build", "collect", "done", "chest", "potion", "brew"] },
           { "pattern": "^skill-[a-z][a-z0-9-]*$" }
         ]
       },

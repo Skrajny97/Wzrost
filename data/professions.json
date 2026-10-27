@@ -76,7 +76,7 @@
     "texts": {
       "report": [
         "W Pracowni bulgocze kocioł, a na półce przybywa fiolek.",
-        "Zioła oddały wywarowi wszystko, co miały najlepsze.",
+        "Zioła oddają wywarowi wszystko, co mają najlepsze.",
         "Błękitne linie Systemu mierzą każdą kroplę mikstury."
       ],
       "brewed": ["Uwarzono: {potions}."],
@@ -98,7 +98,7 @@
       "drinkHeal": ["{actor} wypija {potion}: +{amount} HP."],
       "drinkMana": ["{actor} wypija {potion}: +{amount} many."],
       "drunkHeal": ["Postać wypija {potion}: +{amount} HP."],
-      "drunkSpeed": ["Postać wypija {potion}. Ruchy w walkach szybsze o {bonus}% przez {minutes} minut."],
+      "drunkSpeed": ["Postać wypija {potion}. Ruchy w walkach szybsze o {bonus}% przez {minutes} min wypraw."],
       "used": ["Zużyte mikstury: {potions}."],
       "speedFights": ["Mikstura szybkości działała w walkach: {fights} z {all}."]
     }
@@ -159,7 +159,7 @@
       "herbs": { "nettle": 3 },
       "effect": { "speed": 0.15 },
       "minutes": 30,
-      "description": "Żółtozielony wywar z Pokrzywy. Wypita z plecaka przyspiesza ruchy postaci w walkach o 15% na 30 minut."
+      "description": "Żółtozielony wywar z Pokrzywy. Wypita z plecaka przyspiesza ruchy postaci w walkach o 15% na 30 minut wypraw. Każda kolejna dodaje następne 30 minut."
     }
   ],
   "texts": {

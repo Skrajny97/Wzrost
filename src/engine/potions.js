@@ -4,7 +4,8 @@
 // moment HP falls below the player's mark and a mana potion when a skill
 // lacks mana, each kind at most once a fight (combat.js). A speed potion is
 // drunk from the bag instead and speeds up the moves in the fights of its
-// minutes. Potions not drunk stay in the bag.
+// minutes, which pass only on explorations. Potions not drunk stay in the
+// bag.
 
 // The kind of a potion that works by itself in fights: heal, mana, or null
 // for one drunk from the bag (speed).
@@ -22,17 +23,23 @@ export function fightPotions(left, healBelow, content) {
   return kit;
 }
 
-// A speed potion drunk at `now`: its minutes from now, or added to those
-// still left of the one before.
-export function drinkSpeed(buffs, potion, now) {
-  const until = Math.max(now, buffs?.speed?.until ?? 0) + potion.minutes * 60000;
-  return { ...buffs, speed: { until, bonus: potion.effect.speed } };
+// The milliseconds of explorations the speed potions drunk still have.
+export const speedLeft = (buffs) => (Number.isFinite(buffs?.speed?.ms) ? buffs.speed.ms : 0);
+
+// Buffs with `ms` more of a speed potion's time, or less when below 0: a
+// potion drunk adds its minutes to those still left, an exploration takes
+// what it covers and gives back what it did not use.
+export function addSpeed(buffs, ms, bonus) {
+  const { speed, ...rest } = buffs ?? {};
+  const left = speedLeft(buffs) + ms;
+  return left > 0 ? { ...rest, speed: { ms: left, bonus: Math.max(speed?.bonus ?? 0, bonus ?? 0) } } : rest;
 }
 
-// What of an exploration of `minutes` from `now` a speed potion drunk before
-// covers: its bonus and the milliseconds it still lasts, or null.
-export function speedWindow(buffs, now, minutes) {
-  const speed = buffs?.speed;
-  if (!speed || speed.until <= now) return null;
-  return { bonus: speed.bonus, ms: Math.min(speed.until - now, minutes * 60000) };
+export const drinkSpeed = (buffs, potion) => addSpeed(buffs, potion.minutes * 60000, potion.effect.speed);
+
+// What of an exploration of `minutes` the speed potions drunk before cover,
+// from its start: their bonus and milliseconds, or null.
+export function speedWindow(buffs, minutes) {
+  const left = speedLeft(buffs);
+  return left > 0 ? { bonus: buffs.speed.bonus, ms: Math.min(left, minutes * 60000) } : null;
 }

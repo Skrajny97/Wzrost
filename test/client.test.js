@@ -114,8 +114,10 @@ test('every sprite on the list has its file at its size, and every class has its
     board: ['camp'],
     // The camp's buildings at their three looks.
     camp: data('buildings').flatMap((building) => [1, 2, 3].map((tier) => `${building.id}-${tier}`)),
-    // Zielarstwo's herbs, the professions' squares and the places they work in.
+    // Zielarstwo's herbs, Alchemia's potions, the professions' squares and the
+    // places they work in.
     herbs: data('professions').herbs.map((herb) => herb.id),
+    potions: data('professions').potions.map((potion) => potion.id),
     professions: data('professions').professions.map((profession) => profession.id),
     places: [data('professions').gathering.place.id],
   };

@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import {
+  addSpeed,
   createRng,
   drinkSpeed,
   faintChances,
@@ -96,14 +97,18 @@ describe('potions in fights', () => {
     if (late) assert.equal(late.allies[0].speed, plain.fights[0].allies[0].speed);
   });
 
-  test('a speed potion lasts its minutes from now, and another adds as many', () => {
+  test('a speed potion lasts 30 minutes of explorations, and each one more adds as many', () => {
     const speed = content.potionsById['lesser-speed'];
-    const once = drinkSpeed({}, speed, 1000);
-    assert.deepEqual(once.speed, { until: 1000 + 30 * 60000, bonus: 0.15 });
-    assert.equal(drinkSpeed(once, speed, 2000).speed.until, 1000 + 60 * 60000);
-    assert.deepEqual(speedWindow(once, 1000 + 20 * 60000, 60), { bonus: 0.15, ms: 10 * 60000 });
-    assert.deepEqual(speedWindow(once, 1000, 15), { bonus: 0.15, ms: 15 * 60000 });
-    assert.equal(speedWindow(once, 1000 + 30 * 60000, 60), null);
+    const once = drinkSpeed({}, speed);
+    assert.deepEqual(once.speed, { ms: 30 * 60000, bonus: 0.15 });
+    const thrice = drinkSpeed(drinkSpeed(once, speed), speed);
+    assert.equal(thrice.speed.ms, 90 * 60000);
+    // An exploration takes what it covers and gives back what it did not use.
+    assert.deepEqual(speedWindow(thrice, 60), { bonus: 0.15, ms: 60 * 60000 });
+    assert.deepEqual(speedWindow(once, 60), { bonus: 0.15, ms: 30 * 60000 });
+    assert.deepEqual(addSpeed(once, -30 * 60000), {});
+    assert.deepEqual(addSpeed(addSpeed(thrice, -60 * 60000), 20 * 60000, 0.15).speed, { ms: 50 * 60000, bonus: 0.15 });
+    assert.equal(speedWindow({}, 60), null);
   });
 
   test('healing potions taken along lower the chance of fainting', () => {
@@ -183,21 +188,33 @@ describe('potions through the API', () => {
     assert.ok(Math.abs(healed.data.character.hp - (10 + Math.round(0.2 * maxHp))) <= 1);
     assert.equal(healed.data.character.potions[0].count, 4);
 
-    const before = Date.now();
     const sped = await drink('lesser-speed');
-    assert.equal(sped.data.text, 'Postać wypija Mniejszą miksturę szybkości. Ruchy w walkach szybsze o 15% przez 30 minut.');
-    const { until, bonus } = sped.data.character.speedBuff;
-    assert.equal(bonus, 0.15);
-    assert.ok(until >= before + 30 * 60000 && until <= Date.now() + 30 * 60000);
-    const again = (await drink('lesser-speed')).data.character;
-    assert.equal(again.speedBuff.until, until + 30 * 60000);
-    assert.equal(again.potions.find((potion) => potion.id === 'lesser-speed'), undefined);
+    assert.equal(sped.data.text, 'Postać wypija Mniejszą miksturę szybkości. Ruchy w walkach szybsze o 15% przez 30 min wypraw.');
+    assert.deepEqual(sped.data.character.speedBuff, { ms: 30 * 60000, until: null, bonus: 0.15 });
+    const again = await drink('lesser-speed');
+    assert.equal(again.data.text, 'Postać wypija Mniejszą miksturę szybkości. Ruchy w walkach szybsze o 15% przez 60 min wypraw.');
+    assert.equal(again.data.character.speedBuff.ms, 60 * 60000);
+    assert.equal(again.data.character.potions.find((potion) => potion.id === 'lesser-speed'), undefined);
 
-    // An exploration started meanwhile goes faster for those minutes.
+    // An exploration takes 30 minutes of it and goes faster all along; the
+    // rest waits for the next one.
     await set('hp = ?, hp_at = ?', maxHp, Date.now());
+    const started = Date.now();
     await hunt({});
+    const during = (await character()).speedBuff;
+    assert.equal(during.ms, 30 * 60000);
+    assert.ok(during.until >= started + 30 * 60000 && during.until <= Date.now() + 30 * 60000);
     await finish();
-    const { report } = (await call('POST', '/api/hunts/claim', { cookie })).data;
+    const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
     assert.deepEqual(report.summary.potions, [`Mikstura szybkości działała w walkach: ${report.fights.length} z ${report.fights.length}.`]);
+    assert.deepEqual(after.speedBuff, { ms: 30 * 60000, until: null, bonus: 0.15 });
+
+    // One called back at once gives back the time it did not use.
+    await hunt({});
+    assert.equal((await character()).speedBuff.ms, 0);
+    await call('POST', '/api/hunts/cancel', { cookie });
+    const back = (await character()).speedBuff;
+    assert.ok(back.ms > 29 * 60000 && back.ms <= 30 * 60000, `${back.ms}`);
+    assert.equal(back.until, null);
   });
 });

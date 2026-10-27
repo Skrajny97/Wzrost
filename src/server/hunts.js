@@ -3,6 +3,7 @@
 
 import {
   addQuestProgress,
+  addSpeed,
   applyHunt,
   areaFor,
   areaUnlocked,
@@ -36,6 +37,7 @@ import { finishBrewing } from './brewing.js';
 import { content } from './content.js';
 import {
   bagPlaces,
+  buffsOf,
   characterView,
   currentHp,
   engineCharacter,
@@ -189,7 +191,10 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
     throw new ApiError(400, 'invalid_heal_below', 'Wybierz próg mikstury leczenia.');
   }
   const taken = takenPotions(player, potions, minutes);
-  const speed = speedWindow(JSON.parse(player.row.buffs ?? '{}'), now, minutes);
+  // A speed potion drunk before covers what it can of the exploration, and
+  // that much of its time is used up (potions.js).
+  const buffs = buffsOf(player.row, now);
+  const speed = speedWindow(buffs, minutes);
   const options = {
     ...(Object.keys(taken).length > 0 && { potions: taken, healBelow: healBelow ?? content.potionUse.healBelow }),
     ...(speed && { speed }),
@@ -219,7 +224,9 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
           JSON.stringify(options),
         ),
       // The HP rested so far is saved now, so it is not counted again later.
-      db.prepare('UPDATE characters SET hp = ?, hp_at = ?, version = version + 1 WHERE id = ?').bind(hp, now, player.row.id),
+      db
+        .prepare(`UPDATE characters SET hp = ?, hp_at = ?${speed ? ', buffs = ?' : ''}, version = version + 1 WHERE id = ?`)
+        .bind(hp, now, ...(speed ? [JSON.stringify(addSpeed(buffs, -speed.ms))] : []), player.row.id),
     ]);
   } catch (error) {
     if (String(error?.message).includes('constraint')) {
@@ -230,7 +237,8 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
 }
 
 // Calling the character back early gives nothing and costs nothing. A
-// brewing keeps the potions done, with their report (brewing.js).
+// brewing keeps the potions done, with their report (brewing.js), and a
+// speed potion the time not used.
 export async function cancelHunt(context) {
   const { session, player } = await requirePlayer(context);
   const activity = player.activity;
@@ -246,9 +254,19 @@ export async function cancelHunt(context) {
       character: characterView(await loadPlayer(db, session.userId), context.now),
     });
   }
-  await db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?')
-    .bind(player.row.id, activity.started_at)
-    .run();
+  // A speed potion gets back the time the exploration did not use.
+  const window = JSON.parse(activity.options ?? '{}').speed;
+  const unused = window ? Math.max(0, window.ms - (context.now - activity.started_at)) : 0;
+  await db.batch([
+    db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(player.row.id, activity.started_at),
+    ...(unused > 0
+      ? [
+          db
+            .prepare('UPDATE characters SET buffs = ?, version = version + 1 WHERE id = ?')
+            .bind(JSON.stringify(addSpeed(buffsOf(player.row, context.now), unused, window.bonus)), player.row.id),
+        ]
+      : []),
+  ]);
   return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 

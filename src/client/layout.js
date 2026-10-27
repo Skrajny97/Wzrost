@@ -98,7 +98,8 @@ export function buildTopbar(onSettings) {
   const activityLabel = h('span', { class: 'activity-label' });
   const activityTime = h('span', { class: 'activity-time' });
   const activity = h('a', { class: 'activity', href: '#/walka' }, activityLabel, activityTime);
-  // A speed potion drunk from the bag (potions.js): how long it still works.
+  // A speed potion drunk from the bag (potions.js): how long it still works
+  // on explorations.
   const speedTime = h('span', { class: 'speed-chip-time' });
   const speed = h('a', { class: 'speed-chip', href: '#/postac', hidden: true }, icon('flask', { size: 16 }), speedTime);
 
@@ -288,12 +289,13 @@ export function updateTopbar(now = serverNow()) {
   topbar.xp.set(character.xp, character.xpToNext);
   topbar.classXp.set(character.classXp, character.classXpToNext);
 
+  // Its time runs down only on an exploration, until `until`.
   const buff = character.speedBuff;
-  const fast = Boolean(buff) && buff.until > now;
-  topbar.speed.hidden = !fast;
-  if (fast) {
-    topbar.speedTime.textContent = formatCountdown(buff.until - now);
-    topbar.speed.setAttribute('aria-label', `Mikstura szybkości: ruchy +${Math.round(buff.bonus * 100)}%, jeszcze ${formatCountdown(buff.until - now)}`);
+  const left = buff ? buff.ms + Math.max(0, (buff.until ?? 0) - now) : 0;
+  topbar.speed.hidden = !(left > 0);
+  if (left > 0) {
+    topbar.speedTime.textContent = formatCountdown(left);
+    topbar.speed.setAttribute('aria-label', `Mikstura szybkości: ruchy w walkach +${Math.round(buff.bonus * 100)}%, jeszcze ${formatCountdown(left)} wypraw`);
   }
 
   const activity = character.activity;
