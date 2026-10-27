@@ -20,7 +20,7 @@
         "properties": {
           "kind": {
             "enum": ["restSpeed", "bagSlots", "sellPrice", "production", "upgradeCap", "craftSpeed"],
-            "description": "restSpeed: szybszy odpoczynek między wyprawami (ułamek), bagSlots: miejsca w plecaku, sellPrice: wyższe ceny u złomiarza (ułamek), production: budynek wytwarza zasób (resource), upgradeCap: najwyższe ulepszenie przedmiotów (Kowadło), craftSpeed: szybsza przeróbka na Stole rzemieślniczym (ułamek). Bez budynku z craftSpeed nie ma przeróbki ani rozbiórki."
+            "description": "restSpeed: szybszy odpoczynek między wyprawami (ułamek), bagSlots: miejsca w plecaku, sellPrice: wyższe ceny u złomiarza (ułamek), production: budynek wytwarza zasób (resource), upgradeCap: najwyższe ulepszenie przedmiotów (Kowadło), craftSpeed: szybsza przeróbka na Stole rozbiórki (ułamek). Bez budynku z craftSpeed nie ma przeróbki ani rozbiórki."
           },
           "perLevel": { "type": "number", "exclusiveMinimum": 0, "description": "Premia za poziom; przy production zasób na godzinę za poziom." },
           "resource": { "type": "string", "minLength": 1, "description": "Tylko production: wytwarzany zasób (resources.json) albo złoto (gold)." },

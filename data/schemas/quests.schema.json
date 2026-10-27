@@ -80,7 +80,7 @@
           },
           "table": {
             "type": "boolean",
-            "description": "Tylko z postawionym Stołem rzemieślniczym."
+            "description": "Tylko z postawionym Stołem rozbiórki."
           },
           "weight": {
             "type": "number",

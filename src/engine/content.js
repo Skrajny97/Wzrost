@@ -78,7 +78,7 @@ export function buildContent(raw) {
     camp: raw.camp,
     buildingsById: byId([...raw.buildings, ...(raw.camp ? [raw.camp] : [])]),
     // What creatures leave (one material each) and the parts the Stół
-    // rzemieślniczy makes from materials and from taken-apart items, one per rarity.
+    // rozbiórki makes from materials and from taken-apart items, one per rarity.
     materials: raw.materials.materials,
     materialsById: byId(raw.materials.materials),
     materialsByMonster: Object.fromEntries(raw.materials.materials.map((material) => [material.monster, material])),

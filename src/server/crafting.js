@@ -1,4 +1,4 @@
-// The Stół rzemieślniczy in the camp: materials from beaten creatures and
+// The Stół rozbiórki in the camp: materials from beaten creatures and
 // taken-apart items become parts, for free, in a queue that takes time
 // (crafting.js in the engine). The table's level sets the highest rarity it
 // takes and, later, the chance of extra parts. The queue works on its own,
@@ -27,12 +27,12 @@ import { testMode, testModeFor } from './test-mode.js';
 // The table at the camp's levels, or an error without one.
 function tableOf(player, now) {
   const table = craftTable(campLevels(player.buildings, now, content), content);
-  if (table.pace === 0) throw new ApiError(409, 'no_table', 'Najpierw zbuduj Stół rzemieślniczy w obozie.');
+  if (table.pace === 0) throw new ApiError(409, 'no_table', 'Najpierw zbuduj Stół rozbiórki w obozie.');
   return table;
 }
 
 const tooRare = (rarityId) =>
-  new ApiError(409, 'too_rare', `Ta rzadkość wymaga Stołu rzemieślniczego na poziomie ${craftLevelFor(rarityId, content)}. Rozbuduj go w obozie.`);
+  new ApiError(409, 'too_rare', `Ta rzadkość wymaga Stołu rozbiórki na poziomie ${craftLevelFor(rarityId, content)}. Rozbuduj go w obozie.`);
 
 // The roll of extra parts for a new order.
 const newRng = () => createRng(toHex(crypto.getRandomValues(new Uint8Array(16))));

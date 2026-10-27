@@ -32,7 +32,7 @@ const FALLBACK_ICONS = { herbalism: 'leaf', alchemy: 'spirit', crafting: 'hammer
 const HERB_CHOICE = 'wzrost.herb-choice';
 const BREW_CHOICE = 'wzrost.brew-choice';
 const CRAFT_CHOICE = 'wzrost.craft-choice';
-// The Stół rzemieślniczy, where parts are made.
+// The Stół rozbiórki, where parts are made.
 const TABLE = '#/oboz/craft-table';
 
 function loadChoice(key) {
@@ -870,8 +870,8 @@ export function mountProfessions(container, { params, navigate }) {
       if (free === 0) lines.push('Plecak jest pełny. Zrób w nim miejsce na przedmiot.');
       return [
         lines.map((text) => h('p', { class: 'herb-room herb-room--full', text })),
-        byParts === 0 && h('p', { class: 'muted', text: 'Części zrobisz z materiałów na Stole rzemieślniczym albo kupisz w Skupie złomu.' }),
-        byParts === 0 && h('a', { class: 'button button--world', href: TABLE, text: 'Do Stołu rzemieślniczego' }),
+        byParts === 0 && h('p', { class: 'muted', text: 'Części zrobisz z materiałów na Stole rozbiórki albo kupisz w Skupie złomu.' }),
+        byParts === 0 && h('a', { class: 'button button--world', href: TABLE, text: 'Do Stołu rozbiórki' }),
       ];
     }
 

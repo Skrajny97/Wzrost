@@ -263,7 +263,7 @@ async function settleTimePoints(db, row, now) {
 }
 
 // What a period's quests are drawn from: the character as it is, whether its
-// Stół rzemieślniczy stands, and its id for the seed (quests.js).
+// Stół rozbiórki stands, and its id for the seed (quests.js).
 export const questContext = (player, now) => ({
   character: engineCharacter(player.row),
   hasTable: craftTable(campLevels(player.buildings, now, content), content).pace > 0,
@@ -392,7 +392,7 @@ function campView(player, levels, now) {
         description: building.description,
         level,
         maxLevel: building.maxLevel,
-        // The Stół rzemieślniczy: its screen shows the table (crafting).
+        // The Stół rozbiórki: its screen shows the table (crafting).
         crafts: building.effect.kind === 'craftSpeed',
         effect: level > 0 ? effectText(building, level, content) : null,
         production: store && {
@@ -557,7 +557,7 @@ export function characterView(player, now) {
   const sellBonus = campBonus(levels, 'sellPrice', content);
   // The Kowadło's level is the highest upgrade it allows.
   const upgradeCap = campBonus(levels, 'upgradeCap', content);
-  // What the Stół rzemieślniczy makes of an item taken apart and how long it
+  // What the Stół rozbiórki makes of an item taken apart and how long it
   // takes, or the table's level its rarity needs.
   const table = craftTable(levels, content);
   const salvage = (item) => {
@@ -649,7 +649,7 @@ export function characterView(player, now) {
     // The Profesje tab, or null while it is hidden or locked (professions-view.js).
     professions: professionsView(row),
     camp: campView(player, levels, now),
-    // The Stół rzemieślniczy: materials, parts and the queue (crafting.js).
+    // The Stół rozbiórki: materials, parts and the queue (crafting.js).
     crafting: craftingView(row, levels, now),
     // The creatures met in fights, by id: the others are shadows on the
     // lists of an inner region's dangers.

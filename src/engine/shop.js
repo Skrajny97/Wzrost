@@ -5,7 +5,7 @@
 // multiplier, and every level above the first takes discountPerLevel off
 // the price. The prices stay above what the items the parts come from fetch
 // when sold instead (test/engine.test.js), so taking an item apart on the
-// Stół rzemieślniczy keeps its worth.
+// Stół rozbiórki keeps its worth.
 
 const rarityIndex = (rarityId, content) => content.rarities.findIndex((rarity) => rarity.id === rarityId);
 

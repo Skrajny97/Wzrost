@@ -4140,7 +4140,7 @@ a.camp-level-button {
   transition: width 1s linear;
 }
 
-/* The Stół rzemieślniczy: materials, the queue and parts, also in the report. */
+/* The Stół rozbiórki: materials, the queue and parts, also in the report. */
 .craft-card {
   display: grid;
   gap: 10px;

@@ -345,7 +345,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     );
   }
 
-  // What beaten creatures left, and the way to the Stół rzemieślniczy.
+  // What beaten creatures left, and the way to the Stół rozbiórki.
   function materialsSection(report) {
     const materials = report.summary.materials ?? [];
     if (materials.length === 0) return null;

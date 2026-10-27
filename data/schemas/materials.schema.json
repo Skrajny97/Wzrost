@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Materiały i części",
-  "description": "Materiały zostawiają pokonane stwory, każdy stwór swój. Stół rzemieślniczy w obozie przerabia materiał na jedną część tej samej rzadkości, a rozebrany przedmiot na kilka części jego rzadkości. Części posłużą do wyrobu przedmiotów w profesjach.",
+  "description": "Materiały zostawiają pokonane stwory, każdy stwór swój. Stół rozbiórki w obozie przerabia materiał na jedną część tej samej rzadkości, a rozebrany przedmiot na kilka części jego rzadkości. Części posłużą do wyrobu przedmiotów w profesjach.",
   "type": "object",
   "additionalProperties": false,
   "required": ["materials", "parts"],

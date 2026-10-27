@@ -47,7 +47,7 @@ export const ICONS = {
   chevron: [path('M9 5l7 7-7 7')],
   tent: [path('M2.5 20L12 4l9.5 16'), path('M2.5 20h19'), path('M9 20l3-6 3 6'), path('M12 4l1.5-2')],
   hammer: [path('M13 4.5l6.5 6.5-2.5 2.5L10.5 7z'), path('M12 9L4 17l3 3 8-8')],
-  // A tied pouch: the materials and parts of the Stół rzemieślniczy.
+  // A tied pouch: the materials and parts of the Stół rozbiórki.
   pouch: [
     path('M9.5 7.5L8 4h8l-1.5 3.5'),
     path('M8.5 7.5h7'),

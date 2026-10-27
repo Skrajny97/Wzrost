@@ -736,7 +736,7 @@
     },
     "crafting": {
       "type": "object",
-      "description": "Stół rzemieślniczy w obozie: przeróbka materiałów i rozbiórka przedmiotów na części, za darmo, w kolejce na czas (craftMinutes w rarities.json).",
+      "description": "Stół rozbiórki w obozie: przeróbka materiałów i rozbiórka przedmiotów na części, za darmo, w kolejce na czas (craftMinutes w rarities.json).",
       "additionalProperties": false,
       "required": [
         "salvageBase",

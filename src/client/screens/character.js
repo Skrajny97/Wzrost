@@ -1,7 +1,7 @@
 // The character screen: a 3:4 portrait with five equipment slots on each side,
 // an eye that hides the slots, and the bag with items that are not worn.
 // The item card also upgrades the item on the camp's Kowadło and takes a bag
-// item apart on the Stół rzemieślniczy.
+// item apart on the Stół rozbiórki.
 
 import { herbSprite, itemSprite, materialSprite, portraitSprite, potionSprite } from '../art.js';
 import { MATERIALS_HINT, materialIcon } from '../craft-table.js';
@@ -213,9 +213,9 @@ export function mountCharacter(container) {
         { class: 'item-details' },
         art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art', vars: { '--rarity': material.color } }, art), h('div', {}, title, meta)) : [title, meta],
         description && h('p', { class: 'sheet-text', text: description }),
-        h('p', { class: 'sheet-text', text: `Stół rzemieślniczy zrobi z tego: ${material.part} ×${formatNumber(material.count)}.` }),
+        h('p', { class: 'sheet-text', text: `Stół rozbiórki zrobi z tego: ${material.part} ×${formatNumber(material.count)}.` }),
       ),
-      table && h('a', { class: 'button button--world', href: `#/oboz/${table.id}`, onClick: closeSheet, text: table.level > 0 ? 'Do stołu rzemieślniczego' : 'Zbuduj stół w obozie' }),
+      table && h('a', { class: 'button button--world', href: `#/oboz/${table.id}`, onClick: closeSheet, text: table.level > 0 ? 'Do Stołu rozbiórki' : 'Zbuduj Stół rozbiórki w obozie' }),
     );
   }
 
@@ -451,7 +451,7 @@ function ownedItem(id) {
 
 const percent = (share) => `${formatDecimal(share * 100)}%`;
 
-// The Stół rzemieślniczy part of a bag item's card: the parts that taking it
+// The Stół rozbiórki part of a bag item's card: the parts that taking it
 // apart gives and how long it takes, or that the table is still to be built.
 function salvageSection(item, busy) {
   const { salvage } = item;
@@ -480,10 +480,10 @@ function salvageSection(item, busy) {
   return h(
     'div',
     { class: 'compare' },
-    h('p', { class: 'compare-title', text: table?.name ?? 'Stół rzemieślniczy' }),
+    h('p', { class: 'compare-title', text: table?.name ?? 'Stół rozbiórki' }),
     h('p', { class: 'anvil-step' }, 'Rozbiórka: ', h('span', { class: 'item-name', vars: { '--rarity': salvage.color }, text: `${salvage.part} ×${salvage.parts}` }), salvage.minutes !== null ? ` · ${formatMinutes(salvage.minutes)}` : ''),
-    !built && h('p', { class: 'muted', text: 'Zbuduj w obozie Stół rzemieślniczy, żeby rozbierać przedmioty na części.' }),
-    needs && h('p', { class: 'muted', text: `Ta rzadkość wymaga Stołu rzemieślniczego na poziomie ${needs}.` }),
+    !built && h('p', { class: 'muted', text: 'Zbuduj w obozie Stół rozbiórki, żeby rozbierać przedmioty na części.' }),
+    needs && h('p', { class: 'muted', text: `Ta rzadkość wymaga Stołu rozbiórki na poziomie ${needs}.` }),
     built && !needs && full && h('p', { class: 'muted', text: 'Kolejka stołu jest pełna. Poczekaj, aż skończy się pierwsze zlecenie.' }),
     h('button', { type: 'button', class: 'button button--world', disabled: busy || !built || Boolean(needs) || full, onClick: takeApart, text: 'Rozbierz' }),
   );

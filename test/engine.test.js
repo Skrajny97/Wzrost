@@ -1690,7 +1690,7 @@ describe('materials and chests', () => {
   });
 });
 
-describe('Stół rzemieślniczy', () => {
+describe('Stół rozbiórki', () => {
   const MINUTE = 60000;
   const empty = { materials: {}, parts: {}, queue: [] };
   // A table that takes every rarity, at pace 1 and without extra parts.
@@ -1885,7 +1885,7 @@ describe('quests from the narrator', () => {
         const kills = quests.filter((quest) => quest.kind === 'kill');
         assert.ok(kills.every((quest) => prey.has(quest.target) && quest.count >= 1));
         assert.equal(new Set(kills.map((quest) => quest.target)).size, kills.length, 'a creature twice');
-        // Nothing for the Stół rzemieślniczy before it stands.
+        // Nothing for the Stół rozbiórki before it stands.
         assert.ok(quests.every((quest) => ['kill', 'explore'].includes(quest.kind)));
         assert.ok(quests.every((quest) => quest.progress === 0 && !quest.claimed && quest.reward.amount >= 1));
       }
@@ -2081,8 +2081,8 @@ describe('quests from the narrator', () => {
     assert.equal(text({ kind: 'kill', target: 'viper', count: 1 }), 'Pokonaj 1 żmiję.');
     assert.equal(text({ kind: 'kill', target: 'lynx', count: 5 }), 'Pokonaj 5 rysiów.');
     assert.equal(text({ kind: 'explore', count: 45 }), 'Spędź na wyprawach łącznie 45 minut.');
-    assert.equal(text({ kind: 'process', count: 2 }), 'Przerób na Stole rzemieślniczym 2 materiały.');
-    assert.equal(text({ kind: 'salvage', count: 1 }), 'Rozbierz na Stole rzemieślniczym 1 przedmiot.');
+    assert.equal(text({ kind: 'process', count: 2 }), 'Przerób na Stole rozbiórki 2 materiały.');
+    assert.equal(text({ kind: 'salvage', count: 1 }), 'Rozbierz na Stole rozbiórki 1 przedmiot.');
     for (const monster of Object.values(content.monstersById)) assert.equal(monster.counted.length, 3, monster.id);
     // A creature the character has not met yet keeps its secret, as on the list of dangers.
     assert.equal(questText({ kind: 'kill', target: 'viper', count: 1, progress: 0 }, content, ['wolf']), 'Pokonaj 1 ???.');

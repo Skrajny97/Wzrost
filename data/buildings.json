@@ -131,7 +131,7 @@
   },
   {
     "id": "craft-table",
-    "name": "Stół rzemieślniczy",
+    "name": "Stół rozbiórki",
     "description": "Prosty stół z narzędziami. Za darmo, z upływem czasu przerabia materiały ze stworów i rozebrane przedmioty na części do wyrobu przedmiotów.",
     "maxLevel": 10,
     "effect": {

@@ -95,7 +95,7 @@ function checkReferences(data) {
   }
 
   // Every creature leaves one material of its own, and every rarity has one
-  // part that the Stół rzemieślniczy makes.
+  // part that the Stół rozbiórki makes.
   const { materials, parts } = data.materials;
   uniqueIds(errors, 'materials', [...materials, ...parts]);
   for (const material of materials) {
@@ -341,7 +341,7 @@ function checkReferences(data) {
   // A building is paid in gold and resources, from the first level on: the
   // resources come from explorations.
   if (!data.buildings.some((building) => building.effect.kind === 'craftSpeed')) {
-    errors.push('buildings.json: brak budynku z craftSpeed (Stół rzemieślniczy), bez którego nie ma przeróbki materiałów');
+    errors.push('buildings.json: brak budynku z craftSpeed (Stół rozbiórki), bez którego nie ma przeróbki materiałów');
   }
   // The table takes higher rarities with its first levels, every one in the
   // end, and later levels add extra parts.

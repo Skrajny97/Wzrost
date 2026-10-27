@@ -4,7 +4,7 @@
 // quests are drawn when it comes, from a seed of the character and the
 // period, so a period always gets the same ones: creatures of the newest
 // inner region open to the character's class, never of a place too easy
-// for the character, and, once the Stół rzemieślniczy stands, its work, and
+// for the character, and, once the Stół rozbiórki stands, its work, and
 // once the professions are there, the herbs gathered and the potions
 // brewed, each with a reward of gold, a resource or parts. Claimed
 // explorations, gatherings and brewings and the table's orders move them

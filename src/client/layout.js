@@ -207,12 +207,12 @@ function pouchRows(character) {
     crafting.queue.length > 0
       ? `Na stole: ${countOf(crafting.queue.length, 'zlecenie', 'zlecenia', 'zleceń')}`
       : table?.level > 0
-        ? 'Stół rzemieślniczy'
-        : 'Zbuduj Stół rzemieślniczy w obozie';
+        ? 'Stół rozbiórki'
+        : 'Zbuduj Stół rozbiórki w obozie';
   return [
     h('p', { class: 'pouch-title', id: 'pouch-parts', text: 'Części do rzemiosła' }),
     parts.length === 0
-      ? h('p', { class: 'pouch-empty', text: 'Stół rzemieślniczy robi je z materiałów i rozebranych przedmiotów.' })
+      ? h('p', { class: 'pouch-empty', text: 'Stół rozbiórki robi je z materiałów i rozebranych przedmiotów.' })
       : h(
           'ul',
           { class: 'pouch-list', 'aria-labelledby': 'pouch-parts' },

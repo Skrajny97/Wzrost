@@ -1,4 +1,4 @@
-// Materials and the Stół rzemieślniczy (data/materials.json). A creature
+// Materials and the Stół rozbiórki (data/materials.json). A creature
 // beaten in a fight may leave its own material, at the rarity of its
 // species and, the higher its level, more often one rarity higher. The table
 // turns each material into one part of the same rarity and takes items apart

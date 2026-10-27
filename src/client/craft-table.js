@@ -1,4 +1,4 @@
-// The Stół rzemieślniczy on its building screen: the materials waiting, the
+// The Stół rozbiórki on its building screen: the materials waiting, the
 // queue of orders and the parts made. The table turns each material into one
 // part of the same rarity and taken-apart items into several, for free, one
 // order after another (src/engine/crafting.js). The server settles the queue;

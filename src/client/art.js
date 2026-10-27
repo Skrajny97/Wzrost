@@ -34,7 +34,7 @@ export const SPRITES = {
       'gambeson', 'brigandine', 'cloak', 'chasuble', 'bracers', 'pointed-shoes', 'reliquary', 'signet-ring',
     ],
   },
-  // Materials left by creatures, the parts the Stół rzemieślniczy makes and
+  // Materials left by creatures, the parts the Stół rozbiórki makes and
   // the treasure chest, 32×32.
   materials: {
     size: 32,

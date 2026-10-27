@@ -28,7 +28,7 @@
       "budget": { "type": "number", "exclusiveMinimum": 0 },
       "sell": { "type": "number", "minimum": 0, "description": "Mnożnik ceny u złomiarza." },
       "materialChance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa, że pokonany stwór zostawi swój materiał, gdy gatunek ma tę rzadkość (materials.json). Liczy się za każdego pokonanego, razem z udziałem walki w czasie wyprawy." },
-      "craftMinutes": { "type": "number", "exclusiveMinimum": 0, "description": "Minuty pracy Stołu rzemieślniczego nad jedną częścią tej rzadkości, przed premią z poziomu stołu." }
+      "craftMinutes": { "type": "number", "exclusiveMinimum": 0, "description": "Minuty pracy Stołu rozbiórki nad jedną częścią tej rzadkości, przed premią z poziomu stołu." }
     }
   }
 }

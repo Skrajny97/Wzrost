@@ -1965,7 +1965,7 @@ Odpowiedzi na pytania R1–R29 i W1–W13 z dokumentu „Alchemia i Rzemieślnic
 4. **Złomiarz** (R10, R15, R16). Kupuje wyroby jak łup tej rzadkości, a części na przedmiot kosztują u niego więcej, niż on płaci za wyrób. Test pilnuje tego dla każdej rzadkości. Części kupuje się w dziennym limicie sztuk każdej rzadkości, malejącym z rzadkością (autor: „30-20-10 itd.”).
 5. **Ulepszone wyroby i zwoje** (R8, R17, R18). Od 10. poziomu profesji wyrób może wyjść od razu ulepszony. Z poziomem rośnie szansa na niższe ulepszenia i pojawia się szansa na wyższe, nawet do +5. Ochronny zwój do Kowadła robi Rzemieślnictwo z Odłamków od 25. poziomu. Chroni przed zniszczeniem przy +7 do +10, ale nie przed spadkiem ulepszenia. Przeróbka gotowych przedmiotów przyjdzie później, w profesji Zaklinania (u Zaklinaczki).
 6. **Rozbieranie wyrobu** (R19). Oddaje połowę zużytych części.
-7. **Miejsce pracy** (R20). Osobne miejsce Systemu, jak Zagajnik i Pracownia. Stół rzemieślniczy w obozie zmieni nazwę (propozycja autora: „Plac rozbiórki”), co zmieni też kwestię narratora we wprowadzeniu i parę innych miejsc.
+7. **Miejsce pracy** (R20). Osobne miejsce Systemu, jak Zagajnik i Pracownia. Stół rzemieślniczy w obozie zmienia nazwę na Stół rozbiórki (szczegóły w „Stół rozbiórki i siła mikstur”).
 8. **Czas i powodzenie** (R21–R24). Pospolity przedmiot trwa 1 godzinę na 1. poziomie, a każda rzadkość wyżej dwa razy dłużej. Czas maleje z poziomem profesji. Szansa powodzenia: pospolity 100%, rzadki 90%, unikalny 75%, epicki 55%, legendarny 35%, mityczny 20%, boski 10%, a każdy poziom profesji dodaje 0,5 pkt proc., najwyżej do 95%. Porażka zabiera części, a zasoby obozu wracają. Jedno zlecenie to od 1 do 5 sztuk tego samego wzoru.
 9. **Rozwój** (R25, R26). Poziomy z czasu pracy, jak w Zielarstwie, także przy porażce. Za awans +1 do Siły i Zręczności.
 10. **Raport i zadania** (R27–R29). Raport to karta gotowego przedmiotu albo zdanie o porażce, plus XP i awans, a nad nimi jedno z 3 zdań (szkic dla autora). Postać nie zacznie pracy bez wolnego miejsca w plecaku na całe zlecenie. Zadania narratora: dzienne „Wykonaj 1 przedmiot.” i tygodniowe „Wykonaj łącznie 5 przedmiotów.”. Liczą się tylko udane, a te zadania trafiają się rzadziej i dają lepsze nagrody.
@@ -1976,7 +1976,7 @@ Odpowiedzi na pytania R1–R29 i W1–W13 z dokumentu „Alchemia i Rzemieślnic
     - Punkty Czasu skracają warzenie i wyrób, a „Pomiń czas” w trybie testowym kończy je od razu. Koniec warzenia i wyrobu przychodzi jako powiadomienie na telefon.
     - Profesje nie są głównym sposobem na złoto.
     - Grafiki z Retro Diffusion po jednej, w kolejności: trzy mikstury, tło Pracowni, tło miejsca Rzemieślnictwa. Wyroby mają obecne ikony przedmiotów. Dźwięki z ElevenLabs po 2 wersje: bulgotanie, młot na koniec wyrobu, łyk mikstury, nieudany wyrób.
-    - Balans mikstur (W11) został bez odpowiedzi, więc obowiązuje propozycja: przed wdrożeniem symulacja wypraw z miksturami, a pełen zapas mikstur zabiera ok. jedną trzecią omdleń, nie wszystkie.
+    - Balans mikstur (W11): symulacja przed wdrożeniem pokazała, że przy wartościach autora pełen zapas zabiera ok. 83% omdleń, nie jedną trzecią z pierwszej propozycji. Autor zostawia swoje wartości (szczegóły w „Stół rozbiórki i siła mikstur”).
 12. **Następne profesje** (W13): jubilerstwo i górnictwo, które szuka szlachetnych kamieni do jubilerstwa (może pod inną nazwą).
 13. **Kolejność pracy.**
     - Krok 1: miejsce pracy, wzory z poziomu profesji, wyrób z częściami i zasobami, czas, szansa powodzenia, raport, poziomy, zadania i powiadomienie.
@@ -1997,4 +1997,10 @@ Brakujące szczegóły kroku 1 rozstrzygnięte najprościej. Wszystko działa ty
 7. **Części ze Stołu.** Warsztat liczy też części ze skończonych zleceń Stołu rzemieślniczego, tak jak sakiewka.
 8. **Przerwanie.** Przedmioty powstają jeden po drugim. „Przerwij wyrób” daje gotowe przedmioty z raportem oraz XP za przepracowane minuty. Części i zasoby na resztę wracają, a zasoby nieudanych też. Przed pierwszym gotowym przedmiotem przerwanie tylko oddaje wszystko, bez raportu.
 9. **Zadania.** Dzienne „Wykonaj 1 przedmiot.” i tygodniowe „Wykonaj łącznie 5 przedmiotów.” trafiają się dwa razy rzadziej niż inne zadania profesji, a ich nagroda jest dwa razy większa.
-10. **Teksty.** Trzy zdania raportu, opis Warsztatu i komunikaty to szkic do poprawy przez autora. Grafika tła Warsztatu i dźwięki młota przyjdą w kroku 3.
+10. **Teksty.** Trzy zdania raportu i opis Warsztatu autor zatwierdził bez zmian (autor: „nie trzeba poprawiać, zatwierdzam”). Grafika tła Warsztatu i dźwięki młota przyjdą w kroku 3.
+
+
+## Stół rozbiórki i siła mikstur (27.10.2026)
+
+1. **Stół rozbiórki** (R20). Stół rzemieślniczy w obozie nazywa się teraz Stół rozbiórki. Grafika, miejsce na planszy i poziomy zostają, a nazwa zmienia się we wszystkich tekstach gry i w zadaniach narratora („Przerób na Stole rozbiórki 3 materiały.”). Kwestia narratora we wprowadzeniu: „Przy Stole rozbiórki przerobisz materiały ze stworów na części. Możesz tam też rozebrać zbędne przedmioty. Części przydadzą się, gdy poznasz profesje.” (autor: „modyfikuj Stół rzemieślniczy w Obozie wraz z kwestią narratora i nagraniem”). Nowe nagranie autor wybiera na stronie odsłuchu.
+2. **Siła mikstur** (W11). Symulacja: każda klasa na poziomach 12–50 w najnowszym otwartym miejscu, na najdłuższej wyprawie, od pełnego HP. Bez mikstur omdlewa 11,6% wypraw, z pełnym zapasem (leczenie i mana tyle, ile walk, szybkość na całą wyprawę) 1,9%. Sama szybkość zabiera ok. 43% omdleń, samo leczenie ok. 72%. Żeby zabrać tylko jedną trzecią, mikstury musiałyby być bardzo słabe, więc autor zostawia swoje wartości: leczenie 20%, mana 30%, szybkość +15% (autor: „zostawiamy moje wartości”). Mocniejsze Zwykłe i Duże mikstury mogą przyjść z wyższymi poziomami.

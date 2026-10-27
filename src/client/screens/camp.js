@@ -369,7 +369,7 @@ function mountBoard(container, backHash) {
 // A building's screen. Building comes first, at the top, so nobody scrolls
 // down for it (the author's wish): the build under way, the levels waiting
 // and the next level with the cost and "Zbuduj" or "Ulepsz". Below them
-// its picture, what it gives now and its store (the Stół rzemieślniczy:
+// its picture, what it gives now and its store (the Stół rozbiórki:
 // its materials, queue and parts).
 function mountBuilding(container, id) {
   let ticks = [];

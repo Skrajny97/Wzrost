@@ -759,7 +759,7 @@ describe('camp', () => {
     assert.deepEqual(data.resources.map((resource) => resource.name), ['Drewno', 'Kamień', 'Ruda żelaza']);
     assert.deepEqual(
       data.buildings.map((building) => building.name),
-      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Staw Midasa', 'Ognisko', 'Magazyn', 'Skup złomu', 'Kowadło', 'Stół rzemieślniczy'],
+      ['Tartak', 'Kamieniołom', 'Kopalnia', 'Staw Midasa', 'Ognisko', 'Magazyn', 'Skup złomu', 'Kowadło', 'Stół rozbiórki'],
     );
   });
 
@@ -1500,7 +1500,7 @@ describe('Time Points and the narrator', () => {
   });
 });
 
-describe('Stół rzemieślniczy', () => {
+describe('Stół rozbiórki', () => {
   let cookie;
   beforeEach(async () => {
     cookie = await signUp();

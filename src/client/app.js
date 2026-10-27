@@ -237,7 +237,7 @@ function watchConstruction(now) {
     .catch((error) => toast(error.message));
 }
 
-// When an order on the Stół rzemieślniczy ends, the character is fetched
+// When an order on the Stół rozbiórki ends, the character is fetched
 // again, with the parts made, and a short message says what is ready.
 let craftRetryAt = 0;
 function watchCrafting(now) {
@@ -247,7 +247,7 @@ function watchCrafting(now) {
   call('GET', '/api/character')
     .then(() => {
       const extra = order.bonus > 0 ? ` i ${countOf(order.bonus, 'dodatkowa część', 'dodatkowe części', 'dodatkowych części')}` : '';
-      toast(`Stół rzemieślniczy skończył: ${order.part} ×${order.parts}${extra}.`);
+      toast(`Stół rozbiórki skończył: ${order.part} ×${order.parts}${extra}.`);
       playSound('done');
     })
     .catch((error) => toast(error.message));

@@ -299,7 +299,7 @@
       "id": "camp-craft-table",
       "kind": "point",
       "text": [
-        "Przy Stole rzemieślniczym przerobisz materiały ze stworów na części. Możesz tam też rozebrać zbędne przedmioty. Części przydadzą się, gdy poznasz profesje."
+        "Przy Stole rozbiórki przerobisz materiały ze stworów na części. Możesz tam też rozebrać zbędne przedmioty. Części przydadzą się, gdy poznasz profesje."
       ],
       "voice": "audio/narration/camp-craft-table.mp3"
     },

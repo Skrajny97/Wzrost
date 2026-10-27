@@ -156,7 +156,7 @@ export function effectText(building, level, content) {
   const shown = effect.unit === 'percent' ? `${Math.round(value * 100)}%` : String(Math.round(value));
   const text = effect.text.replace('{value}', shown).replace('{hours}', `${effect.storageHours * level}\u00a0h`);
   if (!effect.rarities) return text;
-  // The Stół rzemieślniczy also names the highest rarity it takes and, from
+  // The Stół rozbiórki also names the highest rarity it takes and, from
   // a level on, the chance of an extra part.
   const all = level >= effect.rarities.length;
   const cap = all ? 'Wszystkie rzadkości' : `Najwyższa rzadkość: ${content.raritiesById[effect.rarities[level - 1]].forms.f}`;
