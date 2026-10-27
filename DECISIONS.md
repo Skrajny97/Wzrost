@@ -1848,3 +1848,17 @@ Autor: „Rozwiń poziom obozu zasłania często przychód z tartaku, daj przyci
 2. **Kiedy.** Chwila nazwy wynika z jej miejsca w tekście i z długości nagrania. Bez głosu narratora tempo liczy się z długości tekstu: ok. 11 znaków na sekundę, tyle co w nagraniach.
 3. **Pergamin nad ramką.** Pergamin stoi nad ścieżką i jedzie razem z ramką, więc nie przeskakuje. Na małym telefonie (360 × 740) zasłania część górnego paska.
 4. **Bez animacji** kamera przeskakuje do ścieżki w chwili jej nazwy.
+
+## Bestiariusz i jego skrzynia (27.10.2026)
+
+1. **Nazwa** (autor: „zmień nazwę Czyhające niebezpieczeństwa na Bestiariusz”). Lista stworów regionu wewnętrznego nazywa się teraz Bestiariusz, na karcie regionu i w jej oknie. Działa jak dotąd: stwór, z którym postać jeszcze nie walczyła, jest cieniem z „???”.
+2. **Skrzynia obok napisu** (autor: „Odbiór nagród za Bestiariusz będzie wyświetlać się jako Skrzynia (jak przy zadaniach dziennych) obok napisu”). Na karcie regionu wewnętrznego, w wierszu „Bestiariusz”, stoi skrzynia jak przy zadaniach narratora. Zamknięta pokazuje, ile stworów z listy postać już poznała (np. „4/5”). Gdy pozna wszystkie, także elitę i czempiona, skrzynia świeci się z napisem „Otwórz”. Po otwarciu zostaje szara z napisem „Otwarta”. Każda skrzynia otwiera się raz. Okno Bestiariusza mówi, co jest w skrzyni.
+3. **Nagroda** (autor: „za pierwszą lokację +30 złota i +5 Punktów Czasu rosnące jakąś krzywą rozsądną. I niech rosną i złoto i Punkty Czasu wraz z tą krzywą”). Złoto i Punkty Czasu rosną po jednej krzywej z najwyższym poziomem regionu wewnętrznego: nagroda pierwszego × (poziom / 5) do potęgi 1,3. Złoto zaokrągla się do 5. Wychodzi 30 i 5 w Skraju Wiatrołomów, 75 i 12 w Lisich Jarach, 245 i 41 w Dziczej Głuszy, a 600 i 100 w Sercu Uroczyska. Złoto za stwora rośnie z jego poziomem w równym tempie, więc nagroda trochę szybsza od niego zostaje warta podobnej liczby walk także w dalszych regionach. Liczby są w `data/balance.json` (`bestiary`).
+4. **Wcześniej poznane stwory** liczą się od razu: kto ma już pełną listę, może otworzyć skrzynię po aktualizacji.
+5. **Baza.** Otwarte skrzynie zapisuje nowa kolumna `bestiary` postaci (migracja `0032_bestiary.sql`). Skrzynię otwiera `POST /api/bestiary/chest`.
+6. **Numer wersji** (autor: „Numerowanie wersji (...) cały czas będzie odbywać się: 0.0.4, 0.0.5, [...], 0.0.23, aż nie powiem, że to już wersja 0.1”). Po 0.0.9 idzie 0.0.10. Zasada stoi w `CLAUDE.md`.
+
+## Spowolnienie Mroźnego podmuchu w opisie (27.10.2026)
+
+1. **Wartość w opisie** (autor: „„Każdy trafiony zostaje spowolniony.” dodajemy „Każdy trafiony zostaje spowolniony o x%.” Nie wiem jak to liczy System ale niech pokazuje jednak wartość spowolnienia”). System odsuwa najbliższy ruch każdego trafionego wroga o cały jeden ruch, więc wróg czeka na niego dwa razy dłużej. Do tego ruchu jest więc o 50% wolniejszy i tyle pokazuje opis: „Każdy trafiony zostaje spowolniony o 50%.”. Liczba wynika z `delay` w `data/skills.json` (`{slow%}` w opisie), więc zmieni się razem z nim. Spowolnienie nie rośnie z poziomem umiejętności.
+

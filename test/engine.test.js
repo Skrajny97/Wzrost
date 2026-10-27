@@ -17,6 +17,8 @@ import {
   shopOffer,
   hpAfterHunt,
   areaDangers,
+  bestiaryChest,
+  bestiaryFull,
   areaFor,
   autoDistribute,
   autoEquip,
@@ -1773,7 +1775,7 @@ describe('Stół rzemieślniczy', () => {
   });
 });
 
-describe('Czyhające niebezpieczeństwa', () => {
+describe('Bestiariusz', () => {
   test('an inner region lists its creatures with the levels they come at, the elite last', () => {
     const edge = areaDangers(content.areasById['windfalls-edge'], content);
     assert.deepEqual(
@@ -1791,6 +1793,26 @@ describe('Czyhające niebezpieczeństwa', () => {
     const crow = hollows.find((danger) => danger.monsterId === 'crow');
     assert.deepEqual([crow.minLevel, crow.maxLevel], [11, 15 + content.balance.hunt.toughLevelBonus]);
     assert.equal(hollows.find((danger) => danger.monsterId === 'boar').maxLevel, 15);
+  });
+
+  test('its chest holds gold and Punkty Czasu growing along one curve with the place\'s levels', () => {
+    const chest = (id) => bestiaryChest(content.areasById[id], content);
+    // The author: +30 gold and +5 Punkty Czasu for the first inner region.
+    assert.deepEqual(chest('windfalls-edge'), { gold: 30, timePoints: 5 });
+    assert.deepEqual(chest('fox-ravines'), { gold: 75, timePoints: 12 });
+    assert.deepEqual(chest('boar-thicket'), { gold: 245, timePoints: 41 });
+    assert.deepEqual(chest('glade-heart'), { gold: 600, timePoints: 100 });
+    // Each next inner region gives more of both.
+    const areas = Object.values(content.areasById).sort((a, b) => a.maxLevel - b.maxLevel).map((area) => bestiaryChest(area, content));
+    for (const [before, after] of areas.slice(1).map((next, index) => [areas[index], next])) {
+      assert.ok(after.gold > before.gold && after.timePoints > before.timePoints);
+    }
+  });
+
+  test('it is full once every creature on the list is met, the elite too', () => {
+    const edge = content.areasById['windfalls-edge'];
+    assert.equal(bestiaryFull(edge, ['wolf', 'fox', 'viper', 'badger'], content), false);
+    assert.equal(bestiaryFull(edge, ['wolf', 'fox', 'viper', 'badger', 'wisp', 'boar'], content), true);
   });
 
   test('tracking the creatures of the quests meets them more often', () => {

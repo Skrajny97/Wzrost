@@ -14,10 +14,12 @@
     "rewards",
     "crafting",
     "timePoints",
+    "bestiary",
     "startingSupply",
     "regen",
-    "progression"
-  , "account"],
+    "progression",
+    "account"
+  ],
   "properties": {
     "combat": {
       "type": "object",
@@ -309,23 +311,76 @@
       "type": "object",
       "description": "Ulepszanie przedmiotów na Kowadle w obozie, od +1 do +10 (dokument projektowy, „Ulepszanie”). Kowadło na poziomie L pozwala ulepszać do +L.",
       "additionalProperties": false,
-      "required": ["bonusPerLevel", "minGainPerLevel", "chances", "breakFrom", "breakChance", "goldPerItemLevel", "oreBase", "orePerItemLevel", "costGrowth", "sellRefund"],
+      "required": [
+        "bonusPerLevel",
+        "minGainPerLevel",
+        "chances",
+        "breakFrom",
+        "breakChance",
+        "goldPerItemLevel",
+        "oreBase",
+        "orePerItemLevel",
+        "costGrowth",
+        "sellRefund"
+      ],
       "properties": {
-        "bonusPerLevel": { "type": "number", "exclusiveMinimum": 0, "description": "O ile każdy poziom ulepszenia podnosi liczby przedmiotu (obrażenia, pancerz, cechy), jako ułamek wartości bazowej." },
-        "minGainPerLevel": { "type": "integer", "minimum": 0, "description": "Co najmniej tyle każdy poziom ulepszenia dodaje do obrażeń broni i do Pancerza innych przedmiotów. Przedmiot bez własnego Pancerza (np. talizman) dostaje go tyle za poziom." },
+        "bonusPerLevel": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "O ile każdy poziom ulepszenia podnosi liczby przedmiotu (obrażenia, pancerz, cechy), jako ułamek wartości bazowej."
+        },
+        "minGainPerLevel": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Co najmniej tyle każdy poziom ulepszenia dodaje do obrażeń broni i do Pancerza innych przedmiotów. Przedmiot bez własnego Pancerza (np. talizman) dostaje go tyle za poziom."
+        },
         "chances": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
           "description": "Szansa powodzenia kolejnych ulepszeń: pierwsza na +1, ostatnia na najwyższe. Liczba pozycji to najwyższe ulepszenie."
         },
-        "breakFrom": { "type": "integer", "minimum": 1, "description": "Od tego poziomu ulepszenia przedmiotu porażka może go zniszczyć." },
-        "breakChance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa, że porażka od poziomu breakFrom niszczy przedmiot." },
-        "goldPerItemLevel": { "type": "number", "exclusiveMinimum": 0, "description": "Złoto za ulepszenie na +1: poziom przedmiotu × ta wartość × mnożnik budżetu rzadkości." },
-        "oreBase": { "type": "number", "minimum": 0, "description": "Ruda żelaza za ulepszenie na +1: ta wartość plus poziom przedmiotu × orePerItemLevel, razy mnożnik budżetu rzadkości." },
-        "orePerItemLevel": { "type": "number", "minimum": 0, "description": "Ruda żelaza za każdy poziom przedmiotu przy ulepszeniu na +1." },
-        "costGrowth": { "type": "number", "minimum": 1, "description": "Ile razy więcej kosztuje każde kolejne ulepszenie." },
-        "sellRefund": { "type": "number", "minimum": 0, "maximum": 1, "description": "Jaką część złota, które kosztowały ulepszenia przedmiotu, złomiarz dolicza do jego ceny. Premia Skupu złomu tej części nie podnosi, więc ulepszenie nigdy się nie zwraca." }
+        "breakFrom": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Od tego poziomu ulepszenia przedmiotu porażka może go zniszczyć."
+        },
+        "breakChance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Szansa, że porażka od poziomu breakFrom niszczy przedmiot."
+        },
+        "goldPerItemLevel": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Złoto za ulepszenie na +1: poziom przedmiotu × ta wartość × mnożnik budżetu rzadkości."
+        },
+        "oreBase": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Ruda żelaza za ulepszenie na +1: ta wartość plus poziom przedmiotu × orePerItemLevel, razy mnożnik budżetu rzadkości."
+        },
+        "orePerItemLevel": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Ruda żelaza za każdy poziom przedmiotu przy ulepszeniu na +1."
+        },
+        "costGrowth": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Ile razy więcej kosztuje każde kolejne ulepszenie."
+        },
+        "sellRefund": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Jaką część złota, które kosztowały ulepszenia przedmiotu, złomiarz dolicza do jego ceny. Premia Skupu złomu tej części nie podnosi, więc ulepszenie nigdy się nie zwraca."
+        }
       }
     },
     "hunt": {
@@ -388,7 +443,10 @@
             "type": "array",
             "minItems": 2,
             "maxItems": 2,
-            "items": { "type": "number", "minimum": 0 }
+            "items": {
+              "type": "number",
+              "minimum": 0
+            }
           },
           "description": "Pary [minuty, walki]: wyprawa ma tyle walk, ile podaje para o największej liczbie minut nie większej niż jej czas."
         },
@@ -404,7 +462,10 @@
             "type": "array",
             "minItems": 2,
             "maxItems": 2,
-            "items": { "type": "number", "minimum": 0 }
+            "items": {
+              "type": "number",
+              "minimum": 0
+            }
           },
           "description": "Pary [minuty, szansa]: szansa, że walka jest wymagającym spotkaniem; między parami rośnie z logarytmem czasu."
         },
@@ -560,8 +621,14 @@
           "minimum": 0,
           "description": "Mnożnik szansy na wyższą rzadkość przedmiotu ze skrzyni, którą zostawia pokonana elita."
         },
-        "championXpMultiplier": { "type": "number", "minimum": 0 },
-        "championGoldMultiplier": { "type": "number", "minimum": 0 },
+        "championXpMultiplier": {
+          "type": "number",
+          "minimum": 0
+        },
+        "championGoldMultiplier": {
+          "type": "number",
+          "minimum": 0
+        },
         "championMaterialChance": {
           "type": "number",
           "minimum": 0,
@@ -581,10 +648,23 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["fromLevel", "rarities"],
+            "required": [
+              "fromLevel",
+              "rarities"
+            ],
             "properties": {
-              "fromLevel": { "type": "integer", "minimum": 1 },
-              "rarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 } }
+              "fromLevel": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "rarities": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
             }
           }
         },
@@ -658,34 +738,126 @@
       "type": "object",
       "description": "Stół rzemieślniczy w obozie: przeróbka materiałów i rozbiórka przedmiotów na części, za darmo, w kolejce na czas (craftMinutes w rarities.json).",
       "additionalProperties": false,
-      "required": ["salvageBase", "salvageLevelStep", "queueLimit"],
+      "required": [
+        "salvageBase",
+        "salvageLevelStep",
+        "queueLimit"
+      ],
       "properties": {
-        "salvageBase": { "type": "integer", "minimum": 1, "description": "Części z rozebranego przedmiotu: salvageBase + poziom przedmiotu / salvageLevelStep (w dół) + jego ulepszenie." },
-        "salvageLevelStep": { "type": "integer", "minimum": 1 },
-        "queueLimit": { "type": "integer", "minimum": 1, "description": "Najwięcej zleceń naraz w kolejce stołu." }
+        "salvageBase": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Części z rozebranego przedmiotu: salvageBase + poziom przedmiotu / salvageLevelStep (w dół) + jego ulepszenie."
+        },
+        "salvageLevelStep": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "queueLimit": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Najwięcej zleceń naraz w kolejce stołu."
+        }
       }
     },
     "timePoints": {
       "type": "object",
       "description": "Punkty Czasu postaci: 1 punkt przewija 1 minutę czynności, odpoczynku albo budowy. Przybywają same z upływem czasu i za grę, nigdy za pieniądze.",
       "additionalProperties": false,
-      "required": ["start", "perLevel", "perClassLevel", "find", "generateMinutes"],
+      "required": [
+        "start",
+        "perLevel",
+        "perClassLevel",
+        "find",
+        "generateMinutes"
+      ],
       "properties": {
-        "start": { "type": "integer", "minimum": 0, "description": "Punkty nowej postaci, które daje narrator we wprowadzeniu." },
-        "perLevel": { "type": "integer", "minimum": 0, "description": "Za każdy nowy poziom postaci." },
-        "perClassLevel": { "type": "integer", "minimum": 0, "description": "Za każdy nowy poziom klasy." },
-        "find": { "type": "integer", "minimum": 0, "description": "Za odłamek czasu, rzadkie znalezisko na wyprawie." },
-        "generateMinutes": { "type": "integer", "minimum": 1, "description": "Co tyle minut przybywa 1 punkt, sam z siebie, także gdy gracz nie gra. Bez górnej granicy." }
+        "start": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Punkty nowej postaci, które daje narrator we wprowadzeniu."
+        },
+        "perLevel": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Za każdy nowy poziom postaci."
+        },
+        "perClassLevel": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Za każdy nowy poziom klasy."
+        },
+        "find": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Za odłamek czasu, rzadkie znalezisko na wyprawie."
+        },
+        "generateMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Co tyle minut przybywa 1 punkt, sam z siebie, także gdy gracz nie gra. Bez górnej granicy."
+        }
+      }
+    },
+    "bestiary": {
+      "type": "object",
+      "description": "Skrzynia Bestiariusza regionu wewnętrznego: otwiera się, gdy postać pozna wszystkie stwory z jego listy. Złoto i Punkty Czasu rosną po jednej krzywej z najwyższym poziomem regionu: nagroda × (poziom / baseLevel) ^ growth.",
+      "additionalProperties": false,
+      "required": [
+        "gold",
+        "timePoints",
+        "baseLevel",
+        "growth",
+        "goldStep"
+      ],
+      "properties": {
+        "gold": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Złoto w skrzyni pierwszego regionu wewnętrznego (najwyższy poziom równy baseLevel)."
+        },
+        "timePoints": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Punkty Czasu w skrzyni pierwszego regionu wewnętrznego."
+        },
+        "baseLevel": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Najwyższy poziom pierwszego regionu wewnętrznego, od którego liczy się krzywa."
+        },
+        "growth": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Wykładnik krzywej: 1 to wzrost w równym tempie z poziomem, więcej to coraz szybszy."
+        },
+        "goldStep": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Złoto zaokrągla się do wielokrotności tej liczby."
+        }
       }
     },
     "startingSupply": {
       "type": "object",
       "description": "Zapas nowej postaci z porzuconego obozu: złoto i zasoby z resources.json.",
       "additionalProperties": false,
-      "required": ["gold", "resources"],
+      "required": [
+        "gold",
+        "resources"
+      ],
       "properties": {
-        "gold": { "type": "integer", "minimum": 0 },
-        "resources": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } }
+        "gold": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
       }
     },
     "regen": {
@@ -745,7 +917,10 @@
         },
         "earlyXpFactors": {
           "type": "array",
-          "items": { "type": "number", "exclusiveMinimum": 0 },
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
           "description": "Mnożniki XP potrzebnego na pierwsze poziomy (od poziomu 1). W pierwszym regionie wewnętrznym potwory mają głównie poziomy 1–2, więc bez nich poziomy 3–5 trwałyby 2–4 razy dłużej niż według krzywej. Poziomy 2–5 wymagają po tyle samo XP."
         },
         "classXpFactor": {
@@ -759,7 +934,10 @@
         "classEvolutionLevels": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "integer", "minimum": 2 },
+          "items": {
+            "type": "integer",
+            "minimum": 2
+          },
           "description": "Poziomy klasy kolejnych ewolucji, rosnąco: pierwsza na 50, potem co setny poziom."
         }
       }
@@ -797,9 +975,15 @@
       "type": "object",
       "description": "Konto gracza, poza postacią.",
       "additionalProperties": false,
-      "required": ["emailSystemPoints"],
+      "required": [
+        "emailSystemPoints"
+      ],
       "properties": {
-        "emailSystemPoints": { "type": "integer", "minimum": 0, "description": "Punkty Systemu za potwierdzenie adresu e-mail linkiem z maila, raz na konto. Trafiają do postaci, a konto bez postaci dostaje je z pierwszą postacią." }
+        "emailSystemPoints": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Punkty Systemu za potwierdzenie adresu e-mail linkiem z maila, raz na konto. Trafiają do postaci, a konto bez postaci dostaje je z pierwszą postacią."
+        }
       }
     }
   }

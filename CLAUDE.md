@@ -15,4 +15,4 @@
 - Docelowo gra trafi do Sklepu Play jako aplikacja. Autor może dokupić tani plan Cloudflare albo domenę: zalecaj taki zakup, gdy się przyda.
 - Polecenia: `npm ci`, `npm test`, `npm run dev`.
 - Push do `main` testuje i wdraża grę (`.github/workflows/deploy.yml`). Etap kończy się wdrożoną wersją i raportem: co zrobiono, co sprawdzić w grze, co dalej.
-- Każde wdrożenie do gry podnosi numer wersji w `package.json` o jeden na ostatnim miejscu (0.0.1, 0.0.2…): `npm version <numer> --no-git-tag-version`. Raport podaje ten numer, a Ustawienia gry pokazują go w „Wersja gry”.
+- Każde wdrożenie do gry podnosi numer wersji w `package.json` o jeden na ostatnim miejscu (0.0.1, 0.0.2…): `npm version <numer> --no-git-tag-version`. Po 0.0.9 idzie 0.0.10, 0.0.11 i tak dalej, aż autor powie, że to wersja 0.1. Raport podaje ten numer, a Ustawienia gry pokazują go w „Wersja gry”.

@@ -1,7 +1,7 @@
 // Game content bundled into the Worker from data/ (validated against
 // data/schemas before every deploy).
 
-import { areaDangers, areaUnlockLevel, buildContent } from '../engine/index.js';
+import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent } from '../engine/index.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
 import classes from '../../data/classes.json' with { type: 'json' };
@@ -95,13 +95,15 @@ export function publicContent() {
         maxLevel: area.maxLevel,
         description: area.description,
         unlockClassLevel: areaUnlockLevel(area, content),
-        // "Czyhające niebezpieczeństwa": the page shows a creature by name
-        // only once the character has met it (`met` in the character's view).
+        // The Bestiariusz: the page shows a creature by name only once the
+        // character has met it (`met` in the character's view), and its
+        // chest opens once all are met.
         dangers: areaDangers(area, content).map((danger) => ({
           ...danger,
           name: content.monstersById[danger.monsterId].name,
           family: content.monstersById[danger.monsterId].family,
         })),
+        chest: bestiaryChest(area, content),
       })),
     })),
     durations: { min: content.balance.hunt.minMinutes, step: content.balance.hunt.stepMinutes, max: content.balance.hunt.maxMinutes },

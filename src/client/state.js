@@ -184,8 +184,7 @@ export function setSeekRare(value) {
 }
 
 // Whether explorations track the creatures of the narrator's quests (the box
-// under "Czyhające niebezpieczeństwa", and "Wyrusz ponownie"); kept in this
-// browser.
+// under the Bestiariusz, and "Wyrusz ponownie"); kept in this browser.
 const TRACK_KEY = 'wzrost.track-quests';
 let trackQuests = readTrackQuests();
 

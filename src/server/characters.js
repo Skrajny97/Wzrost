@@ -585,6 +585,8 @@ export function characterView(player, now) {
     // The creatures met in fights, by id: the others are shadows on the
     // lists of an inner region's dangers.
     met: JSON.parse(row.met ?? '[]'),
+    // The inner regions whose Bestiariusz chest is open (bestiary.js).
+    bestiary: JSON.parse(row.bestiary ?? '[]'),
     // The narrator's daily and weekly quests (quests.js).
     quests: questsView(questsNow(player, now), now, content, JSON.parse(row.met ?? '[]')),
     // The narrator's cards seen so far, or null for a character made before

@@ -140,8 +140,8 @@ export function championEncounter(area, content) {
   return { elite: false, champion: true, members: [{ monsterId: area.champion, level: area.maxLevel + content.balance.hunt.championLevelBonus }] };
 }
 
-// The creatures that may meet a character in an inner region ("Czyhające
-// niebezpieczeństwa"), each with the levels it can come at: the place's range
+// The creatures that may meet a character in an inner region (its
+// Bestiariusz), each with the levels it can come at: the place's range
 // in the usual encounters, some levels above it in the demanding ones, the
 // elite above the strongest and the champion above the elite. In the order
 // of the place's encounters, then the elite and the champion.
@@ -161,6 +161,22 @@ export function areaDangers(area, content) {
   if (area.elite) add(area.elite, area.maxLevel + eliteLevelBonus, area.maxLevel + eliteLevelBonus, { elite: true });
   if (area.champion) add(area.champion, area.maxLevel + championLevelBonus, area.maxLevel + championLevelBonus, { champion: true });
   return [...dangers.values()];
+}
+
+// The chest of an inner region's Bestiariusz, opened once every creature on
+// its list is met: gold and Punkty Czasu, both growing along one curve with
+// the place's highest level (balance.bestiary), from 30 and 5 in Skraj
+// Wiatrołomów to 600 and 100 in Serce Uroczyska.
+export function bestiaryChest(area, content) {
+  const { gold, timePoints, baseLevel, growth, goldStep } = content.balance.bestiary;
+  const scale = (area.maxLevel / baseLevel) ** growth;
+  return { gold: Math.round((gold * scale) / goldStep) * goldStep, timePoints: Math.round(timePoints * scale) };
+}
+
+// Whether the character has met every creature on the inner region's list.
+export function bestiaryFull(area, met, content) {
+  const known = new Set(met);
+  return areaDangers(area, content).every((danger) => known.has(danger.monsterId));
 }
 
 // A level from the place's range, whatever the character's level. Lower
