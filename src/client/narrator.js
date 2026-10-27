@@ -68,14 +68,23 @@ const professionsHere = (hash, read) => onProfessions(hash) && professionsTour(h
 // The Społeczność chapter: once the character reaches level 5, after the
 // report that brought it there, and only when the Umiejętności and the
 // Profesje chapters are not waiting. Not on the character's screens either.
-// It leads to the Społeczność tab, points at the chat's rules and ends with
-// Szybkie Polowanie.
+// It leads to the Społeczność tab and points at the chat's rules. Its last
+// line waits for the player to open an inner region by themselves and points
+// there at Szybkie Polowanie, under "Wyrusz", with nothing to tap but "Dalej".
 const onCommunity = (hash) => hash === '#/spolecznosc';
 const professionsWaiting = (read) => Boolean(state.character.professions) && !read.has('professions-ending');
 const communityDue = (hash, read) =>
   isUnlocked('community') && !onReport(hash) && !onCharacter(hash) && !skillsWaiting(read) && !professionsWaiting(read) && !read.has('community-ending');
 const communityTour = (hash, read) => communityDue(hash, read) && read.has('community-welcome');
 const communityHere = (hash, read) => onCommunity(hash) && communityTour(hash, read);
+// An inner region the class has opened, while the character is at home: its
+// screen has "Wyrusz" and Szybkie Polowanie (screens/combat.js).
+function onOpenArea(hash) {
+  const [, regionId, areaId] = hash.match(/^#\/walka\/([^/]+)\/([^/]+)$/) ?? [];
+  const area = state.content.regions.find((region) => region.id === regionId)?.areas.find((candidate) => candidate.id === areaId);
+  return Boolean(area && state.character.quickHunts) && !state.character.activity && state.character.classLevel >= area.unlockClassLevel;
+}
+const quickHuntHere = (hash, read) => onOpenArea(hash) && communityTour(hash, read) && read.has('community-rules');
 
 function affordable(buildingId) {
   const building = state.character.camp.buildings.find((candidate) => candidate.id === buildingId);
@@ -183,9 +192,12 @@ const BEATS = {
   'professions-ending': { when: professionsHere },
   // The Społeczność chapter, after the Profesje.
   'community-welcome': { when: communityDue },
-  'community-lead': { place: '.nav-item[href="#/spolecznosc"]', when: (hash, read) => communityTour(hash, read) && !onCommunity(hash) },
+  'community-lead': {
+    place: '.nav-item[href="#/spolecznosc"]',
+    when: (hash, read) => communityTour(hash, read) && !onCommunity(hash) && !read.has('community-rules'),
+  },
   'community-rules': { place: mark('community-rules'), when: communityHere },
-  'community-ending': { when: communityHere },
+  'community-ending': { place: mark('quick-hunt'), when: quickHuntHere },
 };
 
 let place = '#/walka';
@@ -338,11 +350,14 @@ export function narrate(hash = place) {
 const passedHere = new Set();
 const readNow = () => new Set([...state.character.tutorial, ...passedHere]);
 
-// The introduction is over and nothing of the narrator's is on the screen or
-// due here, so another parchment may open (email.js).
+// The introduction is over, the Społeczność chapter is not halfway (it
+// waits for an inner region at its end), and nothing of the narrator's is on
+// the screen or due here, so another parchment may open (email.js).
 export function narratorIdle() {
   if (!state.character?.tutorial || !state.content?.tutorial) return false;
-  return !scroll && !light && !pause && !surveying && readNow().has('ending') && !nextLine();
+  const read = readNow();
+  const halfway = read.has('community-welcome') && !read.has('community-ending');
+  return !scroll && !light && !pause && !surveying && read.has('ending') && !halfway && !nextLine();
 }
 
 // The first line in the order that is due: a lead or a tap whenever its

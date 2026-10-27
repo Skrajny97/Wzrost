@@ -2108,3 +2108,16 @@ Trzecia część wprowadzenia, po Umiejętnościach (W3, W4). Kwestie narratora 
 4. **Zegar na zakładce Walka** (autor: „taki timer co ma obóz powinien tez byc przy ikonce Walki kiedy postać jest na eksploracji”). W czasie eksploracji napis „Walka” w dolnym pasku zamienia się w czas do końca wyprawy, w barwie Systemu, jak zegar budowy przy Obozie. Gdy wyprawa się skończy, wraca napis „Walka” ze złotą kropką: raport czeka. Praca w profesjach zostaje przy pasku czynności u góry. *Zmienione: zob. punkt 5.*
 5. **Zegar na zakładce Profesje** (autor: „i taki sam timer dla Profesji”). W czasie pracy postaci w Zielarstwie, Alchemii albo Rzemieślnictwie napis „Profesje” zamienia się w czas do końca pracy, jak przy Walce. Po końcu wraca napis „Profesje” ze złotą kropką. Kropkę zapala też skończona praca Awatara Systemu, ale jego czasu zakładka nie liczy, bo pracuje obok postaci i ma własną kartę w zakładce.
 6. **Najnowsze znów na dole** (autor: „wracamy do poprzedniej wersji czatu - na dole najnowsza wiadomość jednak”). Od wersji 0.0.18 czat wygląda jak w 0.0.15: najnowsza wiadomość jest na dole, a pole do pisania pod nią, przypięte nad dolnym paskiem. Strona sama zjeżdża do nowej wiadomości, chyba że gracz czyta wyżej. Profile postaci, kropka na zakładce i zegary zostają.
+
+## Objaśnienie Społeczności i Szybkiego Polowania (27.10.2026)
+
+Czwarta część wprowadzenia, na 5. poziomie postaci. Kwestie narratora zatwierdził autor („Zatwierdzam powyższe.”). Każda ma po dwie wersje nagrania na stronie odsłuchu. Wersje z uciętym ostatnim słowem nagrały się drugi raz. W grze jest wszędzie wersja 1, z wyboru autora.
+
+1. **Kiedy.** Po raporcie, który dał 5. poziom, na każdym ekranie poza raportem i ekranami postaci. Czeka, aż skończą się objaśnienia Umiejętności i Profesji, jeśli są w toku.
+2. **Kolejność.** Karta powitania. Potem wskazanie zakładki Społeczność, którą gracz stuka, i pergamin przy zasadach czatu (u gracza, który je już przyjął: przy polu wiadomości).
+3. **Szybkie Polowanie bez przymusu klikania** (autor: „Niech wskaże to Szybkie Polowanie w Samouczku, ale bez przymusu klikania”). Ostatnia kwestia czeka, aż gracz sam otworzy któreś odblokowane miejsce w Walce, gdy postać jest w obozie. Wtedy narrator wskazuje pole Szybkiego Polowania pod „Wyrusz”, a pergamin zamyka „Dalej”. Gracz nie musi niczego stukać, a żadne Szybkie Polowanie się nie zużywa. Do tego czasu nie otwierają się inne pergaminy, np. prośba o adres e-mail. Po zasadach czatu narrator nie prowadzi już z powrotem do zakładki Społeczność.
+4. **Tryb testowy.** W Ustawieniach jest przycisk „Objaśnienie Społeczności od nowa”, jak przy Umiejętnościach i Profesjach.
+
+## Pole wiadomości na dole ekranu (27.10.2026)
+
+Autor: „tylko wtedy input wiadomości też na dole”. Czat sięga od nagłówka do dolnego paska. Pole wiadomości stoi zawsze na dole ekranu, a wiadomości tuż nad nim, także gdy jest ich tylko kilka. Lista ukrytych postaci przeszła nad czat.

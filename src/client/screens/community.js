@@ -7,8 +7,9 @@
 // or hide that player's messages. The moderation (the admin and the
 // moderators, marked by their names) also takes it down or silences its
 // writer there, and has the reports in a sheet of their own. The rules come
-// before the first message, and the hidden players wait under the chat to
-// be shown again.
+// before the first message, and the hidden players wait over the chat to be
+// shown again. The chat reaches down to the bottom bar, so the line to write
+// in stays at the bottom of the screen, the messages right over it.
 
 import { $, fill, h, icon } from '../dom.js';
 import { dateTimeFormat, timeFormat } from '../format.js';
@@ -66,17 +67,24 @@ export function mountCommunity(container, context) {
   // The narrator points here at the chat's rules (narrator.js).
   const footer = h('div', { class: 'chat-footer', 'data-guide': 'community-rules' });
   const hidden = h('div', { class: 'chat-hidden' });
+  const room = h('div', { class: 'chat-room' }, empty, list, footer);
 
   // One channel is named under the title; more will get a row of their own.
   fill(
     container,
     pageHeading('Społeczność', `Czat: ${chat.channels[0].name}`),
     notices,
-    empty,
-    list,
-    footer,
     hidden,
+    room,
   );
+
+  // The room is as tall as the screen under where it starts (styles.css),
+  // counted without the camera's zoom.
+  function fit() {
+    let top = 0;
+    for (let node = room; node; node = node.offsetParent) top += node.offsetTop;
+    room.style.setProperty('--chat-top', `${top}px`);
+  }
 
   const atBottom = () => window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
   const toBottom = () => window.scrollTo({ top: document.documentElement.scrollHeight });
@@ -159,6 +167,7 @@ export function mountCommunity(container, context) {
     if (changed('footer', part)) fill(footer, footerPart(part));
     const blocked = account?.blocked ?? [];
     if (changed('hidden', blocked.map((entry) => entry.id).join())) fill(hidden, blocked.length > 0 && hiddenList(blocked));
+    fit();
   }
 
   function footerPart(part) {
@@ -256,7 +265,7 @@ export function mountCommunity(container, context) {
           closeSheet();
           drop(messages.filter((other) => other.name === message.name && !other.own).map((other) => other.id));
           render();
-          toast(`Wiadomości postaci ${message.name} są ukryte. Pokażesz je pod czatem, w „Ukryte postacie”.`);
+          toast(`Wiadomości postaci ${message.name} są ukryte. Pokażesz je nad czatem, w „Ukryte postacie”.`);
         }),
         canModerate(message.role) && [
           h('p', { class: 'chat-sheet-label', text: 'Moderacja' }),
@@ -368,13 +377,16 @@ export function mountCommunity(container, context) {
     }
   }
   document.addEventListener('visibilitychange', onVisible);
+  window.addEventListener('resize', fit);
 
+  fit();
   ask();
   return {
     unmount() {
       gone = true;
       clearTimeout(timer);
       document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('resize', fit);
       if ($('#sheet')?.open && $('#sheet .chat-sheet')) closeSheet();
     },
   };

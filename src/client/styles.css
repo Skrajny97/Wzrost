@@ -5350,11 +5350,30 @@ a.camp-level-button {
 
 /* The Społeczność tab's chat (screens/community.js): messages one under
    another, the newest at the bottom, one's own on a lighter ground. The
-   message line stays over the bottom bar while the page scrolls. */
+   room reaches from where it starts (--chat-top) down to the bottom bar, so
+   the message line sits at the bottom of the screen, the messages right
+   over it however few, and it stays there while the page scrolls. */
 .chat-notices:empty,
 .chat-footer:empty,
 .chat-hidden:empty {
   display: none;
+}
+
+.screen--game:has(.chat-room) {
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+}
+
+.chat-room {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: calc(100vh - var(--chat-top, 0px) - var(--nav-height) - env(safe-area-inset-bottom));
+  min-height: calc(100dvh - var(--chat-top, 0px) - var(--nav-height) - env(safe-area-inset-bottom));
+}
+
+.chat-room > .chat-empty,
+.chat-room > .chat-list {
+  margin-top: auto;
 }
 
 .chat-reports {

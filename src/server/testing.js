@@ -79,6 +79,9 @@ export const repeatSkillsTour = (context) => repeatChapter(context, 'skills', "s
 // the character's, after the Umiejętności chapter if that one waits too.
 export const repeatProfessionsTour = (context) => repeatChapter(context, 'professions');
 
+// The Społeczność chapter from the start: only its lines are unread again.
+export const repeatCommunityTour = (context) => repeatChapter(context, 'community');
+
 // A chapter's lines unread again, with `reset` (SQL assignments) done too.
 async function repeatChapter(context, chapterId, reset = '') {
   if (!testMode(context.env)) throw notFound();

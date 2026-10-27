@@ -1555,6 +1555,17 @@ describe('Time Points and the narrator', () => {
     const row = await (await db()).prepare('SELECT professions FROM characters').first();
     assert.equal(row.professions, professions);
   });
+
+  test('test mode starts the Społeczność chapter again', async () => {
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    await see({ skip: true });
+    const before = (await see({ skip: true, chapter: 'skills' })).data.character.tutorial;
+    const read = (await see({ skip: true, chapter: 'community' })).data.character.tutorial;
+    assert.ok(read.includes('community-ending'));
+    const again = await call('POST', '/api/test/community-tour', { cookie });
+    assert.equal(again.status, 200);
+    assert.deepEqual(again.data.character.tutorial, before);
+  });
 });
 
 describe('Stół rozbiórki', () => {

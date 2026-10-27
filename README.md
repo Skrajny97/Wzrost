@@ -197,6 +197,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/test/skip-craft` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: kończy od razu wszystkie zlecenia Stołu rozbiórki |
 | POST | `/api/test/skills-tour` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: objaśnienie Umiejętności od nowa, a postać zapomina wybrane umiejętności |
 | POST | `/api/test/professions-tour` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: objaśnienie Profesji od nowa, a poziomy profesji zostają |
+| POST | `/api/test/community-tour` | tylko w trybie testowym i dla kont z `TEST_LOGINS`: objaśnienie Społeczności i Szybkiego Polowania od nowa |
 
 Błędy mają postać `{ "error": { "code": "…", "message": "…" } }`, gdzie `message` jest po polsku.
 

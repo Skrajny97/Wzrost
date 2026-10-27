@@ -755,7 +755,7 @@ export function mountCombat(container, { params, navigate }) {
   function quickHuntBox({ left, perDay, minutes }, choices) {
     return h(
       'div',
-      { class: 'quick-hunt' },
+      { class: 'quick-hunt', 'data-guide': 'quick-hunt' },
       h('button', {
         type: 'button',
         class: 'button button--world',

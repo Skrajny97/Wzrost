@@ -539,6 +539,10 @@ function openSettings() {
       state.character.professions &&
       state.character.tutorial &&
       h('button', { type: 'button', class: 'button button--system', onClick: repeatProfessionsTour, text: 'Objaśnienie Profesji od nowa' }),
+    testToggle &&
+      isUnlocked('community') &&
+      state.character.tutorial &&
+      h('button', { type: 'button', class: 'button button--system', onClick: repeatCommunityTour, text: 'Objaśnienie Społeczności od nowa' }),
     installButton(),
     state.user.author && h('a', { class: 'button button--system', href: '#/autor', onClick: closeSheet, text: 'Panel autora' }),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
@@ -627,6 +631,22 @@ async function repeatProfessionsTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/professions-tour');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's Społeczność chapter from the start (testing.js).
+async function repeatCommunityTour() {
+  const sure = await confirmAction({
+    title: 'Objaśnienie Społeczności od nowa?',
+    text: 'Narrator objaśni Społeczność i Szybkie Polowanie od początku.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/community-tour');
   } catch (error) {
     toast(error.message);
   }

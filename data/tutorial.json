@@ -600,7 +600,8 @@
       "chapter": "community",
       "text": [
         "Piąty poziom postaci… System otworzył przed Tobą dwie nowe drogi: Społeczność i Szybkie Polowanie."
-      ]
+      ],
+      "voice": "audio/narration/community-welcome.mp3"
     },
     {
       "id": "community-lead",
@@ -608,7 +609,8 @@
       "chapter": "community",
       "text": [
         "W tej zakładce czekają inni wędrowcy. Zajrzyjmy do nich."
-      ]
+      ],
+      "voice": "audio/narration/community-lead.mp3"
     },
     {
       "id": "community-rules",
@@ -616,15 +618,17 @@
       "chapter": "community",
       "text": [
         "Tu porozmawiasz z innymi wędrowcami. Zanim napiszesz pierwsze słowo, przeczytaj zasady czatu."
-      ]
+      ],
+      "voice": "audio/narration/community-rules.mp3"
     },
     {
       "id": "community-ending",
-      "kind": "card",
+      "kind": "point",
       "chapter": "community",
       "text": [
         "A gdy zabraknie Ci czasu na długą wyprawę, sięgnij po Szybkie Polowanie. Czeka w Walce, pod „Wyrusz” – trzy razy dziennie."
-      ]
+      ],
+      "voice": "audio/narration/community-ending.mp3"
     }
   ]
 }
