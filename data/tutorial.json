@@ -550,7 +550,7 @@
       "chapter": "professions",
       "text": [
         "Dziesiąty poziom postaci… Puszcza zna już Twoje imię, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Profesje.",
-        "Zanim po którąś sięgniesz – pozwól, że Ci je przedstawię."
+        "Zanim którąś sprawdzisz – pozwól, że Ci je przedstawię."
       ]
     },
     {
@@ -574,7 +574,7 @@
       "kind": "point",
       "chapter": "professions",
       "text": [
-        "W Zielarstwie zbierzesz zioła w Systemowym Zagajniku, a w Alchemii uwarzysz z nich mikstury w Systemowej Pracowni. Na Rzemieślnictwo przyjdzie jeszcze czas."
+        "Zielarstwo pozwala Ci zbierać zioła w Systemowym Zagajniku, a w Alchemii uwarzysz z nich mikstury w Systemowej Pracowni. Na Rzemieślnictwo przyjdzie jeszcze czas."
       ]
     },
     {
@@ -582,7 +582,7 @@
       "kind": "card",
       "chapter": "professions",
       "text": [
-        "Mikstury zabierzesz na wyprawę – wybierzesz je przed wyruszeniem. W walce Twoja postać sama po nie sięgnie."
+        "Mikstury zabierzesz na wyprawę – spakujesz je w podróż przed wyruszeniem. W walce Twoja postać sama po nie sięgnie."
       ]
     }
   ]

@@ -2009,7 +2009,7 @@ Brakujące szczegóły kroku 1 rozstrzygnięte najprościej. Wszystko działa ty
 
 ## Objaśnienie Profesji (27.10.2026)
 
-Trzecia część wprowadzenia, po Umiejętnościach (W3, W4). Teksty to szkice do poprawy przez autora, więc kwestie nie mają jeszcze nagrań.
+Trzecia część wprowadzenia, po Umiejętnościach (W3, W4). Kwestie narratora mają brzmienie autora, poprawione ze szkicu: „Zanim którąś sprawdzisz”, „Zielarstwo pozwala Ci zbierać zioła…” i „spakujesz je w podróż przed wyruszeniem”. Nagrania powstają.
 
 1. **Kiedy.** Profesje otwiera 10. poziom postaci, więc objaśnienie przychodzi do postaci, która ma Profesje i skończyła wprowadzenie. Zwykle rusza po „Powrót” z raportu, który dał 10. poziom. W grze głównej przyjdzie po wdrożeniu Profesji także do postaci, które mają już 10. poziom albo wyższy. Postacie sprzed wprowadzenia narratora go nie dostają.
 2. **Umiejętności zawsze pierwsze** (autor: „może czasowo nakładać się z Umiejętnościami, jakoś trzeba to rozwiązać, jakby coś to Umiejętności mają pierwszeństwo zawsze”). Gdy czeka objaśnienie Umiejętności, Profesje czekają, aż się skończy albo zostanie pominięte. Jeśli Umiejętności staną się dostępne w trakcie objaśnienia Profesji, narrator przechodzi do nich i wraca do Profesji potem. Objaśnienie Profesji nie zaczyna się też na ekranach Postaci, bo tam gracz wybiera umiejętność po objaśnieniu Umiejętności, a dolny pasek nie ma tam zakładki Profesje. Rusza na najbliższym innym ekranie, np. po „Powrót”.
