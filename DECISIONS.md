@@ -1853,6 +1853,7 @@ Autor: „Rozwiń poziom obozu zasłania często przychód z tartaku, daj przyci
 5. **Baza.** Otwarte skrzynie zapisuje nowa kolumna `bestiary` postaci (migracja `0032_bestiary.sql`). Skrzynię otwiera `POST /api/bestiary/chest`.
 6. **Numer wersji** (autor: „Numerowanie wersji (...) cały czas będzie odbywać się: 0.0.4, 0.0.5, [...], 0.0.23, aż nie powiem, że to już wersja 0.1”). Po 0.0.9 idzie 0.0.10. Zasada stoi w `CLAUDE.md`.
 7. **Punkty Czasu o stałą liczbę** (autor: „wzrost za Bestiariusz, przynajmniej Punktów Czasu jest zdecydowanie za duży. Powinno to rosnąć o stałą wartość. Złoto może dalej tak rosnąć jak piszesz, ale Punkty Czasu -> +10 co kolejny region”). Złoto rośnie dalej po krzywej. Punkty Czasu: 5 w pierwszym regionie wewnętrznym i o 10 więcej w każdym kolejnym, czyli 15 w Lisich Jarach, 45 w Dziczej Głuszy i 95 w Sercu Uroczyska (`timePointsStep`). Skrzynie otwarte wcześniej zostają, jak były. W wersji 0.0.7.
+8. **Punkty Systemu** (autor: „poza złotem i Punktami Czasu, niech każda skrzynia daje też równo +20 Punktów Systemu. Jeśli ktoś już odebrał te Skrzynie na głównym serwerze to mu dolicz te punkty do jego bilansu”). Każda skrzynia daje też +20 Punktów Systemu, tyle samo w każdym regionie wewnętrznym (`systemPoints`). Postacie, które otwierały skrzynie wcześniej, dostają je raz od migracji `0034_bestiary_system_points.sql`: 20 za każdą otwartą skrzynię. Numer 0033 ma migracja mikstur z gałęzi roboczej. W wersji 0.0.8.
 
 ## Spowolnienie Mroźnego podmuchu w opisie (27.10.2026)
 

@@ -1725,7 +1725,7 @@ describe('Bestiariusz', () => {
 
   test('its chest opens once every creature of the inner region is met, once', async () => {
     const { data } = await call('GET', '/api/content');
-    assert.deepEqual(data.regions[0].areas[0].chest, { gold: 30, timePoints: 5 });
+    assert.deepEqual(data.regions[0].areas[0].chest, { gold: 30, timePoints: 5, systemPoints: 20 });
     const open = (area) => call('POST', '/api/bestiary/chest', { cookie, body: { area } });
     const before = (await call('GET', '/api/character', { cookie })).data.character;
     assert.deepEqual(before.bestiary, []);
@@ -1737,14 +1737,23 @@ describe('Bestiariusz', () => {
     await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(['wolf', 'fox', 'viper', 'badger', 'wisp'])).run();
     const opened = await open('windfalls-edge');
     assert.equal(opened.status, 200);
-    assert.deepEqual(opened.data.chest, { gold: 30, timePoints: 5 });
+    assert.deepEqual(opened.data.chest, { gold: 30, timePoints: 5, systemPoints: 20 });
     assert.equal(opened.data.character.gold, before.gold + 30);
     assert.equal(opened.data.character.timePoints, before.timePoints + 5);
+    assert.equal(opened.data.character.systemPoints, before.systemPoints + 20);
     assert.deepEqual(opened.data.character.bestiary, ['windfalls-edge']);
     const again = await open('windfalls-edge');
     assert.deepEqual([again.status, again.data.error.code], [409, 'opened']);
     // Another inner region's list is not full with these.
     assert.equal((await open('fox-ravines')).data.error.code, 'not_ready');
+  });
+
+  test('chests opened before the Punkty Systemu get them once, by the migration', async () => {
+    const database = await db();
+    await database.prepare(`UPDATE characters SET bestiary = '["windfalls-edge","fox-ravines"]', system_points = 3`).run();
+    const migration = readFileSync('migrations/0034_bestiary_system_points.sql', 'utf8').replace(/--.*$/gm, '').trim();
+    await database.prepare(migration).run();
+    assert.equal((await call('GET', '/api/character', { cookie })).data.character.systemPoints, 3 + 2 * 20);
   });
 });
 

@@ -19,7 +19,7 @@ const PERIODS = ['daily', 'weekly'];
 let open = null; // { dialog, sheet, page, timer, endsAt, countdown, closing } while the parchment is out
 let tab = 'daily';
 
-const systemPoints = (count) => countOf(count, 'Punkt Systemu', 'Punkty Systemu', 'Punktów Systemu');
+export const systemPoints = (count) => countOf(count, 'Punkt Systemu', 'Punkty Systemu', 'Punktów Systemu');
 
 // What can be taken: rewards of quests done and chests ready, by period.
 export const claimable = (quests, periodId) =>
