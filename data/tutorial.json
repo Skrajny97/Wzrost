@@ -407,7 +407,7 @@
         },
         "cleric": {
           "text": [
-            "Dziesiąty poziom klasy… Twoje modlitwy niosą się coraz dalej, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Umiejętności.",
+            "Dziesiąty poziom klasy… Twoje modły niosą się coraz dalej, a System nie mógł tego przeoczyć. Odblokował dla Ciebie Umiejętności.",
             "Zanim którąś wybierzesz – pozwól, że Ci je przedstawię."
           ]
         },
@@ -460,7 +460,7 @@
         },
         "mage": {
           "text": [
-            "Przed Tobą trzy ścieżki. Elementalista ciska ogniem, Druid spowalnia wrogów mroźnym wiatrem, a Arkanista zasłania się własną maną."
+            "Przed Tobą trzy ścieżki. Elementalista ciska ogniem, Władca Lodu spowalnia wrogów mroźnym wiatrem, a Arkanista zajmuje się zgłębianiem natury samej many."
           ]
         },
         "cleric": {
@@ -470,14 +470,14 @@
         },
         "shadow": {
           "text": [
-            "Przed Tobą trzy ścieżki. Skrytobójca dopada tych, którzy chowają się za plecami innych, Truciciel zaprawia ostrze jadem, a Nocny Tancerz wymyka się ciosom i za każdy unik oddaje cios."
+            "Przed Tobą trzy ścieżki. Skrytobójca dopada tych, którzy chowają się za plecami innych, Truciciel zaprawia ostrze jadem, a Nocny Tancerz wymyka się ciosom i potrafi przeprowadzić szybką kontrę."
           ]
         }
       }
     },
     {
       "id": "skills-card",
-      "kind": "point",
+      "kind": "card",
       "chapter": "skills",
       "text": [
         "System, jak zawsze, wszystko Ci wyliczył. Na karcie zobaczysz, co daje umiejętność, ile kosztuje many i jak często możesz jej użyć."
@@ -485,10 +485,10 @@
     },
     {
       "id": "skills-choice",
-      "kind": "point",
+      "kind": "card",
       "chapter": "skills",
       "text": [
-        "Pierwsza umiejętność, którą wybierzesz, otworzy ścieżkę główną. Nie kosztuje ani punktu, ale tego wyboru nie cofniesz.",
+        "Pierwsza umiejętność, na którą przeznaczysz pierwszy Punkt Umiejętności, otworzy ścieżkę główną.",
         "Od jedenastego poziomu klasy możesz dobrać ścieżkę poboczną – za jeden Punkt Umiejętności. Trzecia ścieżka zamknie się wtedy na zawsze."
       ]
     },

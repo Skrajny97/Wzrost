@@ -1,7 +1,7 @@
 // The Umiejętności tab: at class level 10 the character picks one of the
-// three skills of its class, for good: its main development path. From the
-// next class level it may add a second one for a Skill Point, which closes
-// the path left. Each path's name stands over its skill. Each class level
+// three skills of its class for its first Skill Point, for good: its main
+// development path. From the next class level it may add a second one for a
+// Skill Point, which closes the path left. Each path's name stands over its skill. Each class level
 // from 10 on brings a Skill Point, and the points raise the learned skills,
 // up to level 20. Both paths and the points are due by the first evolution
 // (class level 50): until then the class waits there. The server sends every
@@ -112,12 +112,11 @@ export function mountSkills(container) {
       { class: 'skill-paths', 'aria-label': 'Ścieżki rozwoju' },
       panel,
       pointsNote && systemPanel(`Masz ${skillPoints(view.points)}. Dotknij umiejętności, żeby dodać punkt.`),
-      [...pool.options].sort((a, b) => (PATH_ORDER[a.state] ?? 2) - (PATH_ORDER[b.state] ?? 2)).map((skill, index) => pathSection(skill, pool, view, busy, index === 0)),
+      [...pool.options].sort((a, b) => (PATH_ORDER[a.state] ?? 2) - (PATH_ORDER[b.state] ?? 2)).map((skill) => pathSection(skill, pool, view, busy)),
     );
   }
 
-  // `first`: the top path, whose card the narrator shows.
-  function pathSection(skill, pool, view, busy, first) {
+  function pathSection(skill, pool, view, busy) {
     const learned = skill.state === 'main' || skill.state === 'second';
     return h(
       'section',
@@ -128,24 +127,25 @@ export function mountSkills(container) {
         h('span', { class: 'skill-path-label', text: PATH_LABELS[skill.state] ?? 'Ścieżka' }),
         h('span', { class: 'skill-path-name', text: skill.path }),
       ),
-      learned ? learnedRow(skill, view, busy) : skill.state === 'closed' ? closedRow(skill) : choiceCard(skill, pool, view, busy, first),
+      learned ? learnedRow(skill, view, busy) : skill.state === 'closed' ? closedRow(skill) : choiceCard(skill, pool, view, busy),
     );
   }
 
-  // A path still open: the skill's card in words and its button.
-  function choiceCard(skill, pool, view, busy, first) {
+  // A path still open: the skill's card in words and its button. Each path
+  // takes a Skill Point, the main one too.
+  function choiceCard(skill, pool, view, busy) {
     const second = pool.chosen.length > 0;
     const label =
       skill.state === 'pick'
         ? second
           ? 'Wybierz jako poboczną · 1 punkt'
-          : 'Wybierz'
+          : 'Wybierz · 1 punkt'
         : skill.state === 'soon'
           ? `Od poziomu klasy ${view.secondLevel}`
           : 'Potrzebny 1 Punkt Umiejętności';
     return h(
       'article',
-      { class: 'card skill-card', 'aria-label': skill.name, 'data-guide': first ? 'skills-card' : undefined },
+      { class: 'card skill-card', 'aria-label': skill.name },
       h('div', { class: 'skill-head' }, skillIcon(skill), h('div', {}, h('h3', { class: 'skill-name', text: skill.name }), h('p', { class: 'skill-style', text: skill.style }))),
       h('p', { class: 'skill-description', text: skill.description }),
       h('p', { class: 'skill-effect', text: skill.effect }),
@@ -154,7 +154,6 @@ export function mountSkills(container) {
         type: 'button',
         class: 'button button--system',
         disabled: busy || skill.state !== 'pick',
-        'data-guide': first ? 'skills-choice' : undefined,
         text: label,
         onClick: (event) => choose(event.currentTarget, skill, pool),
       }),
@@ -174,7 +173,7 @@ export function mountSkills(container) {
           }
         : {
             title: `Ścieżka główna: ${skill.path}?`,
-            text: `${skill.name} to wybór na stałe. ${state.character.classLevel >= secondLevel ? 'Ścieżkę poboczną możesz dobrać od razu, za 1 Punkt Umiejętności.' : `Ścieżkę poboczną dobierzesz od poziomu klasy ${secondLevel}.`}`,
+            text: `${skill.name} kosztuje 1 Punkt Umiejętności. To wybór na stałe. ${state.character.classLevel >= secondLevel ? 'Ścieżkę poboczną możesz dobrać od razu, za kolejny Punkt Umiejętności.' : `Ścieżkę poboczną dobierzesz od poziomu klasy ${secondLevel}.`}`,
             confirmLabel: 'Wybieram',
           },
     );

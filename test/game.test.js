@@ -1490,7 +1490,7 @@ describe('Time Points and the narrator', () => {
     await see({ skip: true, chapter: 'skills' });
     await (await db()).prepare(`UPDATE characters SET class_level = 12, skills = '{"power-strike":2}'`).run();
     const before = await character();
-    assert.equal(before.skills.points, 2);
+    assert.equal(before.skills.points, 1);
     const again = await call('POST', '/api/test/skills-tour', { cookie });
     assert.equal(again.status, 200);
     assert.deepEqual(again.data.character.tutorial, intro);

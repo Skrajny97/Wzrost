@@ -238,6 +238,20 @@
           ]
         ]
       },
+      "character-female-caps": {
+        "line": "character",
+        "variant": "female",
+        "say": [
+          [
+            "W tym oknie",
+            "[calmly] W tym oknie"
+          ],
+          [
+            "broń i",
+            "BROŃ, i"
+          ]
+        ]
+      },
       "tap-claim": {
         "settings": {
           "stability": 0.5,
