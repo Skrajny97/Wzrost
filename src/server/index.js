@@ -14,7 +14,7 @@ import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
 import { readFeatures, registrationOpen } from './features.js';
-import { cancelHunt, claimHunt, huntOptions, startHunt } from './hunts.js';
+import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { discardHerbs, sellHerbs, startGathering } from './professions.js';
 import { pushKey, sendNotifications, subscribePush, unsubscribePush } from './push.js';
@@ -68,6 +68,7 @@ const routes = [
   ['POST', '/api/hunts', startHunt],
   ['POST', '/api/hunts/cancel', cancelHunt],
   ['POST', '/api/hunts/claim', claimHunt],
+  ['POST', '/api/hunts/quick', quickHunt],
   ['POST', '/api/professions/gather', startGathering],
   ['POST', '/api/herbs/sell', sellHerbs],
   ['POST', '/api/herbs/discard', discardHerbs],

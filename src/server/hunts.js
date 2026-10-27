@@ -27,6 +27,7 @@ import {
   nextHuntUnlock,
   potionsPerKind,
   questCreatures,
+  questPeriod,
   rareCatchUp,
   sellPrice,
   simulateHunt,
@@ -44,6 +45,7 @@ import {
   equippedItems,
   loadPlayer,
   questsNow,
+  quickHuntsUsed,
   requireIdlePlayer,
   requirePlayer,
 } from './characters.js';
@@ -152,6 +154,32 @@ export async function huntOptions(context) {
   });
 }
 
+// Szybkie Polowanie: from the character's level `level`, `perDay` times a
+// day in Poland, an exploration of `minutes` in the inner region chosen,
+// with the same choices as "Wyrusz", that ends as it starts, so its report
+// comes with the answer (DECISIONS.md, "Szybkie Polowanie").
+export async function quickHunt(context) {
+  const { session, player } = await requireIdlePlayer(context);
+  const rules = content.balance.quickHunt;
+  if (player.row.level < rules.level) throw new ApiError(403, 'locked', `Szybkie Polowanie odblokujesz na poziomie postaci ${rules.level}.`);
+  const now = context.now;
+  const used = quickHuntsUsed(player.row, now);
+  if (used >= rules.perDay) throw new ApiError(409, 'no_quick_hunts', 'Szybkie Polowania na dziś się skończyły. Nowe od północy.');
+  const body = await readJson(context.request);
+  // Potions chosen for a longer "Wyrusz" are cut to what this length takes.
+  const most = potionsPerKind(rules.minutes, content);
+  const asked = body.potions && typeof body.potions === 'object' && !Array.isArray(body.potions) ? body.potions : null;
+  const potions = asked ? Object.fromEntries(Object.entries(asked).map(([id, count]) => [id, Number.isInteger(count) ? Math.min(count, most) : count])) : body.potions;
+  const db = context.env.DB;
+  await beginHunt(db, player, { ...body, potions, minutes: rules.minutes }, now, { quick: true });
+  await db
+    .prepare('UPDATE characters SET quick_hunts = ?, version = version + 1 WHERE id = ?')
+    .bind(JSON.stringify({ day: questPeriod('daily', now, content).key, used: used + 1 }), player.row.id)
+    .run();
+  const { id, report } = await finishHunt(db, await loadPlayer(db, session.userId), now);
+  return json({ report: { id, createdAt: now, ...report }, character: characterView(await loadPlayer(db, session.userId), now) });
+}
+
 export async function startHunt(context) {
   const { session, player } = await requireIdlePlayer(context);
   const body = await readJson(context.request);
@@ -165,7 +193,9 @@ export async function startHunt(context) {
 // there are kept with it, as are the potions taken along (potions), the
 // healing mark (healBelow) and a speed potion drunk before (potions.js).
 // The skipped introduction sends the first one this way too (tutorial.js).
-export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, potions, healBelow } = {}, now) {
+// A Szybkie Polowanie (`quick`) is over as it starts: it began `minutes`
+// ago.
+export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, potions, healBelow } = {}, now, { quick = false } = {}) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
   const area = typeof id === 'string' ? areaFor(id, player.row.level, content) : undefined;
@@ -199,7 +229,9 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
   const options = {
     ...(Object.keys(taken).length > 0 && { potions: taken, healBelow: healBelow ?? content.potionUse.healBelow }),
     ...(speed && { speed }),
+    ...(quick && { quick }),
   };
+  const startsAt = quick ? now - minutes * 60000 : now;
 
   const { hp } = currentHp(player, now);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
@@ -215,8 +247,8 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
           'hunt',
           area.id,
           minutes,
-          now,
-          now + minutes * 60000,
+          startsAt,
+          startsAt + minutes * 60000,
           seed,
           hp,
           avoidRare ? 1 : 0,
@@ -359,10 +391,10 @@ export async function finishHunt(db, player, now) {
           sold: soldFound,
         }
       : null;
-  const report = huntReport(
-    { hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped, overflow },
-    content,
-  );
+  const report = {
+    ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped, overflow }, content),
+    ...(options.quick && { quick: true }),
+  };
   const summary = {
     areaName: report.areaName,
     regionName: report.regionName,

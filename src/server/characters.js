@@ -34,6 +34,7 @@ import {
   playerCombatant,
   production,
   professionOpen,
+  questPeriod,
   questsStale,
   questsView,
   regenPerMinute,
@@ -601,6 +602,19 @@ function activityView(activity, level, now) {
   );
 }
 
+// How many Szybkie Polowania the character has used today in Poland
+// (hunts.js).
+export function quickHuntsUsed(row, now) {
+  const stored = JSON.parse(row.quick_hunts ?? 'null');
+  return stored?.day === questPeriod('daily', now, content).key ? stored.used : 0;
+}
+
+// The Szybkie Polowania left today, or null below their level.
+function quickHuntsView(row, now) {
+  const { level, perDay, minutes } = content.balance.quickHunt;
+  return row.level < level ? null : { left: Math.max(0, perDay - quickHuntsUsed(row, now)), perDay, minutes };
+}
+
 // The Awatar Systemu (avatar.js): its price and words until it is bought,
 // then its work under way, or null.
 function avatarView(player, now) {
@@ -679,6 +693,8 @@ export function characterView(player, now) {
     maxMana: values.mana,
     features: unlockedFeatures(row.level, content, row.class_level),
     huntDurations: huntDurations(row.level, content),
+    // Szybkie Polowania left today (hunts.js), or null below their level.
+    quickHunts: quickHuntsView(row, now),
     // The next longer exploration and its level, for the hint under the slider.
     huntNext: nextHuntUnlock(row.level, content),
     freePoints: freePoints(character, content),

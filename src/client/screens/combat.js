@@ -686,6 +686,18 @@ export function mountCombat(container, { params, navigate }) {
         }),
     });
 
+    // Szybkie Polowanie: the same choices as "Wyrusz", its own length and
+    // the report at once, a few times a day (hunts.js).
+    const quick =
+      character.quickHunts &&
+      quickHuntBox(character.quickHunts, () => ({
+        areaId: area.id,
+        avoidRare: avoiding(),
+        seekRare: seeking(),
+        trackQuests: tracking(),
+        ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
+      }));
+
     const levelNote =
       character.level < area.minLevel
         ? h('p', { class: 'region-warning', text: `Przeciwnicy mają tu poziom ${area.minLevel}–${area.maxLevel}, wyżej niż Twoja postać.` })
@@ -733,8 +745,37 @@ export function mountCombat(container, { params, navigate }) {
         seek,
         threatLine,
         start,
+        quick,
       ),
       h('p', { class: 'muted threat-note', text: 'Zagrożenie to szansa omdlenia na wyprawie.' }),
+    );
+  }
+
+  // "Szybkie Polowanie" under "Wyrusz", with how many are left today.
+  function quickHuntBox({ left, perDay, minutes }, choices) {
+    return h(
+      'div',
+      { class: 'quick-hunt' },
+      h('button', {
+        type: 'button',
+        class: 'button button--world',
+        text: 'Szybkie Polowanie',
+        disabled: left === 0,
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            const { report } = await call('POST', '/api/hunts/quick', choices());
+            reportCache.set(String(report.id), report);
+            state.freshReport = String(report.id);
+            navigate(`#/raport/${report.id}`);
+          }),
+      }),
+      h('p', {
+        class: 'muted',
+        text:
+          left > 0
+            ? `Wyprawa jak na ${formatMinutes(minutes)}, z raportem od razu. Zostało dziś: ${left} z ${perDay}.`
+            : 'Szybkie Polowania na dziś się skończyły. Nowe od północy.',
+      }),
     );
   }
 

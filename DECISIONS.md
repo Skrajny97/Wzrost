@@ -2068,3 +2068,10 @@ Trzecia część wprowadzenia, po Umiejętnościach (W3, W4). Kwestie narratora 
 5. **Powiadomienie** na telefonie o końcu jego pracy ma tytuł „Praca Awatara Systemu zakończona” i tę samą treść co przy postaci.
 6. **Migracja 0037**: kolumna `avatar_at` (chwila zakupu) i tabela `avatar_activities` z pracą Awatara, zbudowana jak `activities` postaci. Raport zapisuje to, co przybyło w plecaku, dodawaniem, więc dwa raporty odebrane naraz (postaci i Awatara) nie zacierają się nawzajem.
 7. **Zdania o zajętej postaci** (autor: „Do poprawy zdanie: "Warzenie zacznie po powrocie" na "Warzenie możliwe po powrocie"”). Tak samo w Warsztacie: „Wyrób możliwy po powrocie.”. Gdy wolny Awatar może wziąć pracę, tego zdania nie ma, bo rząd „Kto pracuje” mówi, że pracę wykona Awatar.
+
+## Szybkie Polowanie (27.10.2026)
+
+1. **Zasady** (autor: „możemy wprowadzić Szybkie Polowanie - 3 na dzień eksploracje porównywalne do 15 minutowej eksploracji danego regionu”, „Po prostu przy wyborze lokacji taka opcja, ale od poziomu 5 i to tak jak mówię 3 na dzień”). Od 5. poziomu postaci pod „Wyrusz” w wybranym regionie wewnętrznym stoi przycisk „Szybkie Polowanie”. To wyprawa jak na 15 minut, która kończy się od razu, więc raport przychodzi zaraz po stuknięciu. Są trzy na dzień, liczone od północy w Polsce, jak zadania narratora. Liczby są w `quickHunt` w `data/balance.json`.
+2. **Te same wybory co przy „Wyrusz”**: omijanie albo tropienie elit i czempionów, tropienie stworów z zadań i mikstury. Mikstur każdego rodzaju bierze najwyżej tyle, ile walk ma 15-minutowa wyprawa. Postać musi być w domu, bez innej wyprawy ani pracy, a walki zabierają HP jak zwykle.
+3. **Raport** ma tytuł „Szybkie Polowanie” i trafia do Dziennika jak zwykły raport z wyprawy. Mikstura szybkości działa w nim tak samo jak na zwykłej wyprawie.
+4. **Migracja 0038** dodaje kolumnę `quick_hunts` z dniem i liczbą użytych polowań.

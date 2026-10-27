@@ -101,7 +101,10 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
 
     fill(
       container,
-      heading('Raport z wyprawy', `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
+      heading(
+        report.quick ? 'Szybkie Polowanie' : 'Raport z wyprawy',
+        `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
+      ),
       summaryCard(report),
       report.system.length > 0 && guided(systemPanel(...report.system), 'report-system'),
       count > 0 &&
