@@ -2489,7 +2489,7 @@ Autor: „Skoro z Krzyżaka zrobiłeś Pająka to trzeba dodać jeszcze jednego 
     - Każda z 10 postaci przeszła przegląd we wszystkich 4 klatkach: narzędzie wypisuje każdy piksel w kolorze skóry, który leży tuż przy masce, a nie należy do niej, z położeniem i kolorem.
     - Doszły dwa brązowe cienie skóry, które Wojownik i Mag dzielą z włosami. Liczą się dopiero od 18. wiersza w dół, pod linią włosów.
     - Doszło 6 pojedynczych pikseli, wpisanych w `PIXELS` w `tools/walker-tones.py`: dwa na twarzy, czubek dłoni i stopa Wojowniczki oraz dwa światła na twarzy Czarodziejki.
-    - Pozostałe piksele przy masce to kontury, włosy, kaptury i stroje. Zostają bez zmian.
+    - Pozostałe piksele przy masce to kontury, włosy, kaptury i stroje. Zostają bez zmian. *Dalej: zob. „Chód: każda klatka jeszcze raz, piksel po pikselu”.*
     - Łucznik (autor: „przeskakują piksele jasne u Łucznika”). Jego mała twarz ma światła w kolorach kaptura, więc zostawały jasne, w każdej klatce w innym miejscu. 20 pikseli twarzy jest wpisanych po jednym, osobno dla każdej z 4 klatek. U Łuczniczki jasne piksele przy twarzy to brzeg kaptura, ten sam w każdej klatce, więc zostają.
 3. **Nowy chód Kleryczki** (osoba testująca grę, przekazane przez autora: „Trochę mam zamieszana głowę jak zdeformowana”). Głowa w chodzie miała dwubarwną, poszarpaną fryzurę i twarz wciśniętą w bok. Nowy chód z Retro Diffusion ma włosy splecione w jeden warkocz na plecach i małą, czytelną twarz. Opis w `art/prompts.json` prosi o to wprost. Z 4 wersji w grze jest czwarta. Ma też własne kolory skóry w odcieniach. Koszt: 4 animacje po 0,07 USD, razem 0,28 USD.
 
@@ -2538,3 +2538,18 @@ Autor przekazał zgłoszenie osoby testującej grę: na telefon nie przychodzi p
 
    Próbne powiadomienie można wysłać raz na pół minuty (`tested_at`, `migrations/0047_push_test.sql`).
 
+## Chód: każda klatka jeszcze raz, piksel po pikselu (28.10.2026)
+
+Autor: „szary łucznik w 0.0.32 nie chodzi jakby był szary, miałeś się przyjrzeć wszystkim postaciom i robić tak jak Kleryka”, „Wojownik dark też ma plamy”, „musisz każdy obrazek przejrzeć piksel po pikselu raczej niestety, nie u Łucznika u wszystkich postaci”, „estetyka jest ważna”.
+
+1. **Przegląd.** Każda z 40 klatek chodu (10 postaci po 4 klatki) przeszła przegląd w powiększeniu, z kolorem i maską skóry przy każdym pikselu, obok wersji szarej i ciemnej. Potem każda postać we wszystkich 8 kolorach skóry.
+2. **Co było źle.**
+    - Wojownik: kremowe światła na brodzie, barku i palcach stopy, cień szyi oraz czerwone kontury drugiej dłoni i stóp w cieniu zostawały w kolorach rysunku. Na ciemnej skórze robiły jasne plamy.
+    - Wojowniczka: policzek przy prawym oku oraz czerwone kontury twarzy, dłoni i stóp. Dwa piksele włosów brały kolor skóry.
+    - Mag: biały punkt na policzku i druga dłoń przy biodrze, która zostawała czerwoną plamą. Czarodziejka: światła na policzku, usta i stopa w cieniu pod suknią.
+    - Kleryczka: kontury nosa, ramion, dłoni i stóp, światła na barku i palcach stóp, a w klatkach w pół kroku cała stopa pod suknią. Dwa piksele paska brały kolor skóry.
+    - Cień: światła na czole i dłoniach, skroń, nos, łokcie i druga dłoń. Brew i ciemny punkt między oczami jaśniały razem ze skórą. Cienista: ciemnoczerwone kontury ucha, twarzy i dłoni oraz druga dłoń. Kosmyki włosów brały kolor skóry.
+    - Łucznik i Łuczniczka: kolor skóry brały pojedyncze piksele buta, peleryny i zapięcia.
+    - Kleryk: bez zmian.
+3. **Jak.** `PIXELS` i `NOT_PIXELS` w `tools/walker-tones.py` wypisują piksele dodane do maski i z niej wyjęte, osobno dla każdej klatki. Światło jaśniejsze od skóry dostaje najjaśniejszy odcień, a kontur ciemniejszy od niej — najciemniejszy, przyciemniony tak jak na rysunku, jak kontur portretów. Zmieniły się tylko przejrzane piksele, reszta ma ten sam kolor co wcześniej. Przeliczone są wszystkie 70 pliki.
+4. **Łucznik.** W chodzie ma kaptur na głowie (tak opisuje go `art/prompts.json`), a peleryna zasłania dłonie. Skóry widać więc tylko ok. 10 pikseli twarzy. Twarz jest w wybranym kolorze w każdej klatce, ale postać i tak wygląda głównie jak kaptur. Na portrecie kaptur jest zsunięty na plecy. Chód bez kaptura wymagałby nowej animacji z Retro Diffusion.

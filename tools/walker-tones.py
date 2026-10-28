@@ -10,10 +10,18 @@
 # clothes or hair, such as a cream light on the face and on the shirt, or a
 # brown shadow on the arm and on the trousers: they count as skin only next
 # to it, up to two pixels in, and one the hair shares only from a row down.
-# PIXELS holds the few pixels of skin, checked one by one on every frame,
-# that the colours leave out (x across the whole sheet, y). Each skin colour
-# keeps its place between the darkest and the lightest of them, on the
-# tone's ramp from shadow to light.
+# Every frame of every figure was then checked pixel by pixel in all tones.
+# PIXELS holds, per frame (x within the 48-pixel frame, y), the pixels of
+# skin that the colours leave out: cream and white lights on faces, arms
+# and toes, outlines of hands and feet, a hand behind the body, lips.
+# NOT_PIXELS holds the pixels that share a skin colour but are not skin:
+# hair, a boot, a cloak, a belt, eyebrows and the dark between the eyes.
+#
+# Each skin colour keeps its place between the darkest and the lightest
+# colour of SKIN and EDGES, on the tone's ramp from shadow to light. A
+# checked pixel lighter than those takes the light end; a darker one, an
+# outline, takes the shadow end darkened as much as it is darker (as the
+# rims of the portraits in tools/skin-tones.py).
 #
 # Usage: python3 tools/walker-tones.py [--mask out.png]
 import importlib.util, json, os, sys
@@ -46,15 +54,77 @@ EDGES = {
 }
 PIXELS = {
     # The Archer's small face: its lights share the hood's colours.
-    'archer-male': [
-        (27, 18), (27, 19), (28, 20), (28, 21), (27, 23),
-        (76, 19), (76, 20), (74, 22), (75, 22),
-        (123, 18), (123, 19), (124, 20), (124, 21), (124, 22), (121, 21), (123, 23),
-        (172, 19), (172, 20), (170, 22), (171, 22),
-    ],
-    'mage-female': [(76, 22), (172, 21)],
-    'warrior-female': [(26, 18), (26, 19), (15, 31), (30, 40)],
+    'archer-male': {
+        0: [(27, 18), (27, 19), (28, 20), (28, 21), (27, 23)],
+        1: [(28, 19), (28, 20), (26, 22), (27, 22)],
+        2: [(27, 18), (27, 19), (28, 20), (28, 21), (28, 22), (25, 21), (27, 23)],
+        3: [(28, 19), (28, 20), (26, 22), (27, 22)],
+    },
+    # The nose and the chin's edge, the shoulder's light, the shadow under
+    # the chin, the outlines of the arms, hands and feet, the toes' light,
+    # and in the passing frames the foot under the robe.
+    'cleric-female': {
+        0: [(29, 19), (29, 20), (29, 22), (20, 23), (22, 23), (28, 23), (21, 24), (27, 24), (28, 24),
+            (20, 25), (19, 27), (16, 32), (17, 32), (19, 38), (31, 39), (32, 39), (28, 41), (30, 41)],
+        1: [(24, 22), (19, 23), (27, 23), (28, 23), (21, 25), (21, 26), (21, 27), (17, 28), (18, 28),
+            (19, 31), (20, 32), (22, 40), (23, 40), (24, 40), (22, 41), (23, 41), (24, 41), (25, 41)],
+        2: [(29, 19), (29, 22), (23, 23), (28, 23), (23, 25), (21, 26), (24, 27), (22, 31), (26, 31),
+            (23, 32), (24, 33), (25, 33), (30, 37), (30, 38), (17, 40), (20, 40), (20, 41)],
+        3: [(29, 21), (22, 22), (24, 22), (28, 22), (19, 23), (28, 23), (21, 25), (21, 26), (21, 27),
+            (19, 31), (20, 31), (22, 40), (23, 40), (24, 40), (22, 41), (23, 41), (24, 41), (25, 41)],
+    },
+    # A light on the cheek, and the far hand at the hip.
+    'mage-male': {0: [(26, 22), (28, 28), (29, 28), (28, 29), (29, 29)], 1: [(26, 28)], 2: [(26, 22)], 3: [(26, 28)]},
+    # Lights on the cheek, the lips, and the far foot under the dress.
+    'mage-female': {
+        0: [(28, 21), (28, 22), (29, 21), (29, 22), (20, 38), (21, 38)],
+        1: [(28, 20), (28, 21), (29, 20), (28, 22), (26, 38), (27, 38)],
+        2: [(29, 21)],
+        3: [(28, 20), (29, 20), (28, 21), (29, 21), (26, 38), (27, 38)],
+    },
+    # Lights on the forehead and the hands, the temple, the nose, the
+    # elbows, and the far hand.
+    'shadow-male': {
+        0: [(24, 16), (27, 16), (26, 18), (26, 27), (28, 27), (14, 28), (15, 30)],
+        1: [(26, 14), (28, 14), (28, 17), (29, 18), (18, 25), (19, 25)],
+        2: [(27, 16), (26, 18), (22, 28), (21, 29)],
+        3: [(26, 14), (28, 14), (28, 17), (24, 18), (29, 18), (18, 25), (19, 25), (20, 30)],
+    },
+    # Dark red outlines of the ear, the face and the hands, a light on the
+    # hand, and the far hand.
+    'shadow-female': {
+        0: [(23, 19), (21, 20), (23, 20), (29, 20), (23, 21), (16, 32), (28, 28), (29, 28), (29, 29), (30, 29), (28, 30)],
+        1: [(23, 19), (20, 29)],
+        2: [(23, 19), (23, 20), (22, 21), (23, 21), (23, 31), (21, 31)],
+        3: [(23, 19), (23, 20), (19, 29), (20, 29)],
+    },
+    # The cheek by the right eye, red outlines of the face, hands and feet,
+    # a light on the arm.
+    'warrior-female': {
+        0: [(26, 18), (26, 19), (15, 31), (30, 40), (30, 19), (29, 22), (29, 23), (30, 28), (30, 29), (27, 41)],
+        1: [(30, 18), (29, 21), (20, 32)],
+        2: [(30, 19), (29, 22), (22, 27), (20, 27), (20, 39)],
+        3: [(29, 21), (29, 22)],
+    },
+    # Cream lights on the chin, the shoulder and the toes, the neck, and the
+    # red outlines of the far hand and the feet in shadow.
+    'warrior-male': {
+        0: [(25, 20), (26, 20), (27, 20), (25, 21), (27, 21), (20, 22), (18, 24), (29, 27), (30, 27),
+            (29, 37), (20, 38), (21, 38)],
+        1: [(25, 17), (28, 18), (26, 19), (21, 21), (21, 22), (26, 38)],
+        2: [(25, 19), (28, 19), (26, 20), (26, 21), (30, 36), (29, 37), (28, 38)],
+        3: [(28, 17), (28, 18), (26, 19), (21, 21), (21, 22), (21, 37), (26, 38)],
+    },
 }
+NOT_PIXELS = {
+    'archer-male': {0: [(22, 37), (23, 37)], 2: [(21, 39)]},  # the back boot
+    'archer-female': {1: [(16, 21)], 2: [(27, 25), (27, 27)], 3: [(16, 21)]},  # the cloak, the clasp
+    'cleric-female': {1: [(24, 28), (26, 28)]},  # the belt
+    'shadow-male': {0: [(26, 19)], 1: [(25, 16)], 3: [(25, 16)]},  # between the eyes, an eyebrow
+    'shadow-female': {0: [(22, 12)], 1: [(22, 12), (26, 13)], 2: [(22, 12)], 3: [(22, 11)]},  # the hair
+    'warrior-female': {1: [(20, 15)], 2: [(21, 8)]},  # the hair
+}
+FRAME = 48
 STEPS = 2
 
 # The ramp and its colours as tools/skin-tones.py reads them (without
@@ -79,7 +149,8 @@ def skin_pixels(im, name):
             for x in range(im.width)
             if px[x, y][3] and y >= edges.get(px[x, y][:3], im.height) and any((x + dx, y + dy) in found for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
         }
-    return found | set(PIXELS.get(name, []))
+    sheet = lambda lists: {(frame * FRAME + x, y) for frame, frame_pixels in lists.get(name, {}).items() for x, y in frame_pixels}
+    return (found | sheet(PIXELS)) - sheet(NOT_PIXELS)
 
 
 def main():
@@ -89,16 +160,22 @@ def main():
         im = Image.open(os.path.join(WALKERS, f'{name}.png')).convert('RGBA')
         pixels = skin_pixels(im, name)
         lums = {c: skin.luminance(c) for c in {im.getpixel(p)[:3] for p in pixels}}
-        low, high = min(lums.values()), max(lums.values())
+        listed = {skin.rgb(item if isinstance(item, str) else item[0]) for item in SKIN[name] + EDGES.get(name, [])}
+        low = min(lum for c, lum in lums.items() if c in listed)
+        high = max(lum for c, lum in lums.items() if c in listed)
         for tone in tones:
             if not tone.get('ramp'):
                 continue
+            ramp = [skin.rgb(code) for code in tone['ramp']]
             out = im.copy()
             po = out.load()
             for x, y in pixels:
                 c = po[x, y]
-                t = (lums[c[:3]] - low) / (high - low or 1)
-                po[x, y] = (*skin.on_ramp([skin.rgb(code) for code in tone['ramp']], t), c[3])
+                lum = lums[c[:3]]
+                if lum < low:
+                    po[x, y] = (*(round(v * lum / low) for v in ramp[0]), c[3])
+                else:
+                    po[x, y] = (*skin.on_ramp(ramp, min(1, (lum - low) / (high - low or 1))), c[3])
             out.save(os.path.join(WALKERS, f"{name}-{tone['id']}.png"), optimize=True)
         mask = im.copy()
         for x, y in pixels:
