@@ -1,0 +1,25 @@
+{
+  "id": "quarry-2",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a rustic camp in a forest, made of wood, canvas, rope and hand-stacked stone, no tiled roofs and no stone houses, a small open stone pit in white marble rock with a wooden ramp, a wheelbarrow full of white stone and steel pickaxes stuck in the rock, standing directly on bare ground with no ground tile, base or platform under it",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 2,
+    "seed": 159941360,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793190678,
+    "credit_cost": 2,
+    "balance_cost": 0.12,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 32.68,
+    "request_id": "567e5f43-63b4-4445-b61e-f346a090c965",
+    "outputs_retained_until": 1793277074
+  }
+}

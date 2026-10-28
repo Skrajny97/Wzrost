@@ -1,0 +1,25 @@
+{
+  "id": "mine-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a rustic camp in a forest, made of wood, canvas, rope and hand-stacked stone, no tiled roofs and no stone houses, a shallow digging pit in blue-grey rock with chunks of red iron ore and a pickaxe stuck in it, standing directly on bare ground with no ground tile, base or platform under it",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 2,
+    "seed": 707818481,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793190691,
+    "credit_cost": 2,
+    "balance_cost": 0.12,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 32.44,
+    "request_id": "ca9af825-f5fd-43c5-aace-f003bf20118d",
+    "outputs_retained_until": 1793277087
+  }
+}

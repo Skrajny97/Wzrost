@@ -1,0 +1,25 @@
+{
+  "id": "sawmill-3",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a rustic camp in a forest, made of wood, canvas, rope and hand-stacked stone, no tiled roofs and no stone houses, a large open-sided sawmill shed of fresh pine logs with a green canvas awning, a big frame saw cutting a log, tall neat stacks of pale yellow planks and a pile of logs, standing directly on bare ground with no ground tile, base or platform under it",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 2,
+    "seed": 58138682,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793190646,
+    "credit_cost": 2,
+    "balance_cost": 0.12,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 33.28,
+    "request_id": "bd22def0-aa6e-4354-962e-296b97304426",
+    "outputs_retained_until": 1793277042
+  }
+}

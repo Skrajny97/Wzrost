@@ -1,0 +1,25 @@
+{
+  "id": "quarry-3",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a rustic camp in a forest, made of wood, canvas, rope and hand-stacked stone, no tiled roofs and no stone houses, a large open quarry cut into white marble rock with a wooden crane lifting a stone block, wooden scaffolding and stacks of cut white stone blocks, standing directly on bare ground with no ground tile, base or platform under it",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 2,
+    "seed": 354737985,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793190684,
+    "credit_cost": 2,
+    "balance_cost": 0.12,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 32.56,
+    "request_id": "73a7f355-e2ad-483e-ac03-f19046f3d91b",
+    "outputs_retained_until": 1793277081
+  }
+}
