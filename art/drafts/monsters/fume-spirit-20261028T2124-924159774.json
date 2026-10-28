@@ -1,0 +1,25 @@
+{
+  "id": "fume-spirit",
+  "payload": {
+    "prompt": "smouldering fume spirit, a hunched shape of thick grey-yellow smoke with glowing ember eyes and coal-red cracks, choking haze trailing behind, floating, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 924159774,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793222900,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 61.74,
+    "request_id": "813cd26f-ed14-44e3-a9b6-0377340bc6f6",
+    "outputs_retained_until": 1793309272
+  }
+}

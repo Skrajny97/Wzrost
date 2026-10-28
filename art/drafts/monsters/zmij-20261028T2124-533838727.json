@@ -1,0 +1,25 @@
+{
+  "id": "zmij",
+  "payload": {
+    "prompt": "fiery winged serpent from slavic legend, long scaly red-black body glowing with embers, small leathery wings, burning yellow eyes, smoke from its jaws, coiled in the air, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 533838727,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793222869,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 62.1,
+    "request_id": "a7ed0273-3d51-4944-b050-734743775c17",
+    "outputs_retained_until": 1793309247
+  }
+}

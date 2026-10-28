@@ -1,0 +1,25 @@
+{
+  "id": "diving-beetle",
+  "payload": {
+    "prompt": "giant diving beetle, glossy dark olive-black shell with a yellow rim, hairy swimming legs, sharp curved mandibles, menacing, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 178805163,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793222804,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 62.82,
+    "request_id": "186edaa6-2515-4662-a3b2-ab1b13eafb40",
+    "outputs_retained_until": 1793309174
+  }
+}

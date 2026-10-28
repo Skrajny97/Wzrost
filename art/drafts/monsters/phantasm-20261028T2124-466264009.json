@@ -1,0 +1,25 @@
+{
+  "id": "phantasm",
+  "payload": {
+    "prompt": "shifting phantasm spirit made of colourful swirling bog vapour, a vague hollow face with many glowing eyes appearing and fading, translucent, floating, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 466264009,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793222843,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 62.46,
+    "request_id": "10f39abb-53d6-433f-8480-5f877fa70bf4",
+    "outputs_retained_until": 1793309206
+  }
+}

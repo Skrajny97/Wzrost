@@ -1,0 +1,25 @@
+{
+  "id": "mine-spirit",
+  "payload": {
+    "prompt": "old mine guardian spirit, a bearded gnome-like ghost miner in a ragged black cloak and a miner cap, holding up a glowing old lantern, pale greenish skin, stern face, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 736506801,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793223024,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 61.38,
+    "request_id": "bc4c79cf-3acd-438c-b0cc-50cda9a1d2fc",
+    "outputs_retained_until": 1793309301
+  }
+}
