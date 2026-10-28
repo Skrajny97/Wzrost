@@ -1,0 +1,23 @@
+{
+  "id": "old-riverbed",
+  "payload": {
+    "prompt": "a deep dark old riverbed with muddy banks, old bones in the mud, clay jars on the bottom glowing faintly, night, centered composition, the scene fills the whole square edge to edge, no frame, no ring, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 2,
+    "seed": 287369054,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183859,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 37.92,
+    "request_id": "c5b1ee34-555c-4fd4-b541-57c885b5d796",
+    "outputs_retained_until": 1793270190
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "beaver-dams",
+  "payload": {
+    "prompt": "a beaver dam of logs and branches holding back a flooded forest, a beaver lodge, a dark cloud of mosquitoes over the water, centered composition, the scene fills the whole square edge to edge, no frame, no ring, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 2,
+    "seed": 115645396,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183786,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 38.28,
+    "request_id": "52b5fdd7-af70-44df-8e1c-4992469a7092",
+    "outputs_retained_until": 1793270122
+  }
+}
