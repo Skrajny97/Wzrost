@@ -6,10 +6,11 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "name", "role", "start", "description", "position", "baseStats", "growth", "autoPoints", "recovery", "weapons", "offhands", "armor"],
+    "required": ["id", "name", "short", "role", "start", "description", "position", "baseStats", "growth", "autoPoints", "recovery", "weapons", "offhands", "armor"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
       "name": { "type": "string", "minLength": 1 },
+      "short": { "type": "string", "minLength": 1, "maxLength": 4, "description": "Skrót nazwy na górnym pasku, przy poziomie klasy (np. Woj)." },
       "role": { "type": "string", "minLength": 1 },
       "start": { "enum": ["gentle", "normal", "hard"], "description": "Jak łatwy jest start: łagodniejszy, zwykły albo trudniejszy. Ekran wyboru klasy to pokazuje." },
       "description": { "type": "string", "minLength": 1 },

@@ -3,13 +3,34 @@
 
 // The level length is measured in hours of exploring at that level. The first
 // levels take firstLevelMinutes each (a 5-minute exploration is enough), then
-// the time grows like (level / flatLevels)^levelTimeExponent: about 10 minutes
-// at level 10, 3 hours at level 100 and a day at level 500. XP per hour grows
-// like monster XP (level^xpExponent); xpPerHourScale is set from the balance
+// the time grows like (level / flatLevels)^levelTimeExponent, and through the
+// mid-game (midGame) by up to levelTimeFactor more. XP per hour grows like
+// monster XP (level^xpExponent); xpPerHourScale is set from the balance
 // simulation (tools/simulate.mjs).
 export function huntingHours(level, content) {
-  const { firstLevelMinutes, flatLevels, levelTimeExponent } = content.balance.progression;
-  return (firstLevelMinutes / 60) * Math.max(1, level / flatLevels) ** levelTimeExponent;
+  const { firstLevelMinutes, flatLevels, levelTimeExponent, midGame } = content.balance.progression;
+  const base = (firstLevelMinutes / 60) * Math.max(1, level / flatLevels) ** levelTimeExponent;
+  return base * midGameSlowdown(level, midGame);
+}
+
+// How many times longer a level takes for the mid-game: evenly more from
+// fromLevel to levelTimeFactor at toLevel, then less again, geometrically,
+// to none at fadeLevel, so that each level still takes longer than the one
+// before it and the late game keeps its pace (about a day a level at 500).
+function midGameSlowdown(level, midGame) {
+  const { toLevel, fadeLevel, levelTimeFactor } = midGame;
+  if (level <= toLevel) return 1 + (levelTimeFactor - 1) * midGameShare(level, midGame);
+  return levelTimeFactor ** Math.max(0, 1 - Math.log(level / toLevel) / Math.log(fadeLevel / toLevel));
+}
+
+// How far a level is into the mid-game of `range` ({ fromLevel, toLevel }):
+// 0 up to fromLevel, 1 from toLevel on, evenly between. The author: "krzywą
+// wzrostu wyzwania musimy bardzo delikatnie podwyższyć … I oczywiscie chodzi
+// o midgame, bo early musi byc latwiejssze", so the first levels keep their
+// pace and monsters, and the mid-game levels take a little longer and their
+// monsters hit a little harder (balance.monsters.midGame).
+export function midGameShare(level, { fromLevel, toLevel }) {
+  return Math.min(1, Math.max(0, (level - fromLevel) / (toLevel - fromLevel)));
 }
 
 // The level a character had `minutes` of exploring before reaching `level`.

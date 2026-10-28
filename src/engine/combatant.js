@@ -3,7 +3,7 @@
 
 import { budget, cappedChance, damageScale, maxHp, maxMana, speed, weaponDamage } from './formulas.js';
 import { upgradedItem } from './items.js';
-import { gearLevel } from './progression.js';
+import { gearLevel, midGameShare } from './progression.js';
 import { learnedSkills } from './skills.js';
 import { computeStats } from './stats.js';
 
@@ -90,14 +90,19 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   // wears at its level (gearLevel), so at the fast first levels they lag
   // behind like the character's.
   const hide = balance.monsters.budgetBase + balance.items.budgetPerLevel * gearLevel(level, content);
-  const average = weaponDamage(hide, monster.attack.damageFactor, balance) * balance.monsters.damageMultiplier * groupFactor;
+  // Through the mid-game monsters hit harder and last longer, a little more
+  // with each level (midGameShare in progression.js).
+  const mid = balance.monsters.midGame;
+  const stronger = midGameShare(level, mid);
+  const average =
+    weaponDamage(hide, monster.attack.damageFactor, balance) * balance.monsters.damageMultiplier * groupFactor * (1 + mid.damage * stronger);
   const resist = {};
   for (const [element, value] of Object.entries(monster.resistances ?? {})) {
     resist[element] = Math.round(value.base + value.perLevel * (level - 1));
   }
   const { hpPerVitality, hpPerLevel } = balance.character;
   const rawHp = balance.monsters.hpBase + hpPerVitality * stat('vitality') + hpPerLevel * level;
-  const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor));
+  const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger)));
   return {
     id,
     side,

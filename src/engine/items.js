@@ -121,11 +121,17 @@ export const canUse = (baseId, classId, content, classLevel) =>
 // drops no more often. `filled` is the set of slots already covered (worn,
 // or found earlier in the same hunt); found items are added. `rarityId`
 // gives the rarity instead of a roll (the weekly quest chest), and `area`
-// the place whose creatures name the affixes (generateItem).
-export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId, maxClassLevel = 1, rarityId, area } = {}) {
+// the place whose creatures name the affixes (generateItem). With
+// `otherClassShare` that share of the items is for another class instead
+// (otherClassFamily), once the character has a weapon.
+export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId, maxClassLevel = 1, rarityId, area, otherClassShare = 0 } = {}) {
   let family;
+  let own = true;
   if (filled && classId && !filled.has('weapon')) {
     family = rng.pick(content.classesById[classId].weapons);
+  } else if (classId && otherClassShare > 0 && rng.chance(otherClassShare)) {
+    family = otherClassFamily(classId, rng, content);
+    own = false;
   } else {
     const weight = content.balance.items.emptySlotWeight;
     const firsts = content.bases.filter((candidate) => baseFamily(candidate) === candidate.id && (!classId || canUse(candidate.id, classId, content)));
@@ -134,8 +140,18 @@ export function randomItem(level, rng, content, { rarityBonus = 1, filled, class
   const bases = content.bases.filter((candidate) => baseFamily(candidate) === family && baseClassLevel(candidate.id, content) <= maxClassLevel);
   // Only a real choice draws, so loot without one stays as it was.
   const base = bases.length === 1 ? bases[0] : rng.pick(bases);
-  filled?.add(base.slot);
+  if (own) filled?.add(base.slot);
   return generateItem({ baseId: base.id, level, rarityId: rarityId ?? rollRarity(rng, content, rarityBonus), area }, rng, content);
+}
+
+// The family of an item for another class than `classId`: one of the other
+// classes, as often each, and a family it uses and `classId` does not, for
+// trading it or taking it apart in the Warsztat.
+function otherClassFamily(classId, rng, content) {
+  const other = rng.pick(content.classes.filter((cls) => cls.id !== classId)).id;
+  const firsts = content.bases.filter((base) => baseFamily(base) === base.id && canUse(base.id, other, content));
+  const theirs = firsts.filter((base) => !canUse(base.id, classId, content));
+  return rng.pick(theirs.length > 0 ? theirs : firsts).id;
 }
 
 // Gold from the scrapper: level × goldPerLevel × the rarity's multiplier, and

@@ -722,7 +722,10 @@ function checkQuests(data, { resources, rarities }) {
       const range = byFights ? kind[period].fights : kind[period].count;
       if (!range) errors.push(`quests.json: rodzaj ${kind.id} nie ma ${byFights ? 'fights' : 'count'} w ${period}`);
       else if (range[0] > range[1]) errors.push(`quests.json: rodzaj ${kind.id} ma odwrócony zakres w ${period}`);
+      // Regions to open are counted within reach of the class level.
+      if (kind.id === 'unlock' && !kind[period].reach) errors.push(`quests.json: rodzaj unlock nie ma reach w ${period}`);
     }
+    if (kind.id === 'unlock' && !kind.untilClassLevel) errors.push('quests.json: rodzaj unlock nie ma untilClassLevel');
   }
   for (const id of Object.keys(quests.rewards.resources)) {
     if (!resources.has(id)) errors.push(`quests.json: nagroda z nieznanym zasobem "${id}"`);

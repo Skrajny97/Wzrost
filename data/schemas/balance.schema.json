@@ -260,7 +260,8 @@
         "statPerBudget",
         "resistancePerBudget",
         "sellGoldPerLevel",
-        "bagSlots"
+        "bagSlots",
+        "otherClass"
       ],
       "properties": {
         "budgetBase": {
@@ -305,6 +306,16 @@
           "type": "integer",
           "minimum": 1,
           "description": "Miejsca w plecaku bez Magazynu. Założone przedmioty się nie liczą."
+        },
+        "otherClass": {
+          "type": "object",
+          "description": "Łupy eksploracji dla innych klas (na wymianę albo do rozebrania): od poziomu postaci fromLevel taka część (share) przedmiotów ze znalezisk i skrzyń elity i czempiona jest dla innej klasy. Pierwsza broń i skrzynie zadań zawsze są dla klasy postaci.",
+          "additionalProperties": false,
+          "required": ["fromLevel", "share"],
+          "properties": {
+            "fromLevel": { "type": "integer", "minimum": 1 },
+            "share": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
         }
       }
     },
@@ -913,6 +924,7 @@
         "levelTimeExponent",
         "xpPerHourScale",
         "classXpFactor",
+        "midGame",
         "earlyXpFactors",
         "freeResetMaxLevel",
         "classEvolutionLevels"
@@ -948,6 +960,18 @@
           },
           "description": "Mnożniki XP potrzebnego na pierwsze poziomy (od poziomu 1). W pierwszym regionie wewnętrznym potwory mają głównie poziomy 1–2, więc bez nich poziomy 3–5 trwałyby 2–4 razy dłużej niż według krzywej. Poziomy 2–5 wymagają po tyle samo XP."
         },
+        "midGame": {
+          "type": "object",
+          "description": "Środek gry: od fromLevel poziom trwa dłużej, rosnąco do levelTimeFactor razy dłużej na toLevel, potem coraz mniej, aż na fadeLevel krzywa wraca do zwykłej (każdy poziom i tak trwa dłużej od poprzedniego). Wcześniejsze poziomy bez zmian.",
+          "additionalProperties": false,
+          "required": ["fromLevel", "toLevel", "fadeLevel", "levelTimeFactor"],
+          "properties": {
+            "fromLevel": { "type": "integer", "minimum": 1 },
+            "toLevel": { "type": "integer", "minimum": 2 },
+            "fadeLevel": { "type": "integer", "minimum": 3 },
+            "levelTimeFactor": { "type": "number", "minimum": 1 }
+          }
+        },
         "classXpFactor": {
           "type": "number",
           "minimum": 0
@@ -974,7 +998,8 @@
         "hpBase",
         "budgetBase",
         "damageMultiplier",
-        "gearLagMinutes"
+        "gearLagMinutes",
+        "midGame"
       ],
       "properties": {
         "hpBase": {
@@ -993,6 +1018,18 @@
           "type": "number",
           "minimum": 0,
           "description": "Naturalne uzbrojenie potwora odpowiada przedmiotom z poziomu, który postać miała tyle minut eksploracji wcześniej."
+        },
+        "midGame": {
+          "type": "object",
+          "description": "Środek gry: od fromLevel potwory zadają o damage więcej obrażeń i mają o hp więcej HP, rosnąco do pełnej wartości na toLevel i dalej. Wcześniejsze poziomy bez zmian.",
+          "additionalProperties": false,
+          "required": ["fromLevel", "toLevel", "damage", "hp"],
+          "properties": {
+            "fromLevel": { "type": "integer", "minimum": 1 },
+            "toLevel": { "type": "integer", "minimum": 2 },
+            "damage": { "type": "number", "minimum": 0 },
+            "hp": { "type": "number", "minimum": 0 }
+          }
         }
       }
     },

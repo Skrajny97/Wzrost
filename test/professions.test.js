@@ -206,7 +206,7 @@ describe('herbalism in the engine', () => {
 });
 
 describe('herbalism through the API', () => {
-  const { call, db, signUp } = useServer({ PROFESSIONS: 'on' });
+  const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'off' });
   let cookie;
 
   beforeEach(async () => {

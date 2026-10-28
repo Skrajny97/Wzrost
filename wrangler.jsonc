@@ -47,8 +47,8 @@
     // the live game from version 0.0.9.
     "PROFESSIONS": "on",
     // "on" opens Rzemieślnictwo among the professions; off, its square says
-    // "Wkrótce". The live game waits for it to be done.
-    "CRAFTING": "off"
+    // "Wkrótce". In the live game from version 0.0.27.
+    "CRAFTING": "on"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain

@@ -52,6 +52,11 @@ export const areaUnlockLevel = (area, content) => Math.max(1, area.minLevel - co
 
 export const areaUnlocked = (area, classLevel, content) => classLevel >= areaUnlockLevel(area, content);
 
+// How many inner regions a class opens on its way from one class level to
+// another (above the first, up to the second).
+export const areasOpened = (fromClassLevel, toClassLevel, content) =>
+  content.areas.filter((area) => areaUnlockLevel(area, content) > fromClassLevel && areaUnlockLevel(area, content) <= toClassLevel).length;
+
 // A module's System message shows only where its part of the game is on
 // (`feature`, in content.features).
 const told = (unlock, content) => unlock.message && (!unlock.feature || (content.features ?? []).includes(unlock.feature));

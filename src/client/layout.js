@@ -283,7 +283,9 @@ export function updateTopbar(now = serverNow()) {
   const character = state.character;
   if (!topbar || !character) return;
   topbar.level.textContent = `POZ. ${character.level}`;
-  topbar.className.textContent = character.className.toUpperCase();
+  // The class by its short name, so the bar fits a phone (Woj for Wojownik).
+  const short = state.content?.classes.find((cls) => cls.id === character.classId)?.short ?? character.className;
+  topbar.className.textContent = short.toUpperCase();
   topbar.classNumber.textContent = String(character.classLevel);
   topbar.classLevel.setAttribute('aria-label', `${character.className} ${character.classLevel}`);
   topbar.gold.textContent = formatShort(character.gold);

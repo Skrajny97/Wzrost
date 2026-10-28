@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, generateItem, itemName, meetingChances, questPeriod, upgradeCost, xpToNext } from '../src/engine/index.js';
+import { classXpToNext, createRng, generateItem, itemName, meetingChances, questPeriod, upgradeCost, xpToNext } from '../src/engine/index.js';
 import { skipTime } from '../src/server/testing.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -38,6 +38,8 @@ describe('content', () => {
     assert.equal(status, 200);
     assert.deepEqual(data.classes.map((cls) => cls.id), ['warrior', 'archer', 'mage', 'cleric', 'shadow']);
     assert.deepEqual(data.classes.filter((cls) => cls.start === 'gentle').map((cls) => cls.name), ['Wojownik', 'Kleryk']);
+    // The top bar shows the class by a short name.
+    assert.deepEqual(data.classes.map((cls) => cls.short), ['Woj', 'Łuc', 'Mag', 'Kle', 'Cień']);
     assert.deepEqual(data.classes.filter((cls) => cls.start === 'hard').map((cls) => cls.name), ['Mag']);
     assert.deepEqual(data.durations, { min: 1, step: 5, max: 240 });
     assert.equal(data.regions[0].name, 'Wiatrołomy');
@@ -1931,16 +1933,16 @@ describe('Zadania od narratora', () => {
     await store(quests);
   }
 
-  // Skraj Wiatrołomów has two creatures: before the Stół rozbiórki a new
-  // character gets four quests a period (each creature, creatures of any
-  // kind and the time), the table's work makes it five.
-  test('a new character gets four daily and four weekly quests, which end at midnight Polish time', async () => {
+  // Skraj Wiatrołomów has two creatures: a new character gets five quests
+  // a period (each creature, creatures of any kind, the time and the inner
+  // regions to open).
+  test('a new character gets five daily and five weekly quests, which end at midnight Polish time', async () => {
     const created = await newCharacter(await signUp('ola'), 'mage', 'Ola');
-    assert.equal(created.data.character.quests.daily.quests.length, 4);
+    assert.equal(created.data.character.quests.daily.quests.length, 5);
     const view = (await character()).quests;
     const now = Date.now();
     for (const periodId of ['daily', 'weekly']) {
-      assert.equal(view[periodId].quests.length, 4);
+      assert.equal(view[periodId].quests.length, 5);
       assert.equal(view[periodId].endsAt, questPeriod(periodId, now, content).endsAt);
       assert.ok(view[periodId].quests.every((quest) => quest.progress === 0 && !quest.done && !quest.claimed && quest.text.endsWith('.')));
       assert.deepEqual(view[periodId].chest, { ...content.quests.periods[periodId].chest, ready: false, opened: false });
@@ -1983,6 +1985,17 @@ describe('Zadania od narratora', () => {
     assert.deepEqual(after.quests.daily.quests.map((entry) => [entry.progress, entry.done]), [[3, false], [1, true]]);
   });
 
+  test('a class level that opens an inner region counts toward "Odblokuj dostęp"', async () => {
+    // One class XP short of class level 5, which opens Lisie Jary.
+    await (await db()).prepare('UPDATE characters SET class_level = 4, class_xp = ?').bind(classXpToNext(4, content) - 1).run();
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    await finishHunt();
+    const after = (await call('POST', '/api/hunts/claim', { cookie })).data.character;
+    assert.equal(after.classLevel, 5);
+    const unlock = after.quests.daily.quests.find((quest) => quest.kind === 'unlock');
+    assert.deepEqual([unlock.progress, unlock.count, unlock.done, unlock.text], [1, 1, true, 'Odblokuj dostęp do 1 nowego regionu.']);
+  });
+
   test('a quest done gives its reward once: gold, a resource or parts', async () => {
     const quests = await stored();
     const rewards = [{ kind: 'resource', id: 'iron-ore', amount: 7 }, { kind: 'gold', amount: 40 }, { kind: 'part', id: 'scraps', amount: 2 }];
@@ -1999,7 +2012,7 @@ describe('Zadania od narratora', () => {
     const parts = (await claim('daily', 2)).data.character.crafting.parts.find((part) => part.id === 'scraps').count;
     assert.equal(parts, 2);
     const after = await character();
-    assert.deepEqual(after.quests.daily.quests.map((quest) => quest.claimed), [true, true, true, false]);
+    assert.deepEqual(after.quests.daily.quests.map((quest) => quest.claimed), [true, true, true, false, false]);
     assert.equal((await claim('monthly', 0)).status, 400);
     assert.equal((await claim('daily', 9)).status, 404);
     assert.equal((await claim('daily', '0')).status, 404);
@@ -2013,8 +2026,8 @@ describe('Zadania od narratora', () => {
       { kind: 'resource', id: 'iron-ore', amount: 3 },
       { kind: 'part', id: 'scraps', amount: 2 },
     ];
-    // Five quests, as with the Stół rozbiórki standing; the fifth not done.
-    quests.daily.quests = [...quests.daily.quests, quests.daily.quests[0]].map((quest, index) => ({
+    // Five quests, the fifth not done.
+    quests.daily.quests = quests.daily.quests.map((quest, index) => ({
       ...quest,
       progress: index < 4 ? quest.count : 0,
       reward: rewards[index] ?? quest.reward,
@@ -2105,7 +2118,7 @@ describe('Zadania od narratora', () => {
     assert.equal(now.daily.period, questPeriod('daily', Date.now(), content).key);
     assert.deepEqual(now.weekly, week);
     await (await db()).prepare("UPDATE characters SET quests = '{}'").run();
-    assert.equal((await character()).quests.weekly.quests.length, 4);
+    assert.equal((await character()).quests.weekly.quests.length, 5);
     assert.ok((await stored()).weekly.period);
   });
 });
@@ -2127,17 +2140,17 @@ describe('Pierwsza wyprawa', () => {
 });
 
 describe('Profesje', () => {
-  // In the game from version 0.0.9: Zielarstwo and Alchemia open with the tab
-  // at character level 10, while Rzemieślnictwo waits as "Wkrótce" (CRAFTING
-  // off in wrangler.jsonc); the test version opens it (test/workshop.test.js).
-  test('open at level 10 with Zielarstwo and Alchemia, Rzemieślnictwo coming soon', async () => {
+  // In the game Zielarstwo and Alchemia open with the tab at character level
+  // 10 (from version 0.0.9), and Rzemieślnictwo has its square there too
+  // (from 0.0.27, CRAFTING on in wrangler.jsonc), its Warsztat from level 15.
+  test('open at level 10 with Zielarstwo, Alchemia and Rzemieślnictwo', async () => {
     const cookie = await signUp();
     await newCharacter(cookie);
     await (await db()).prepare('UPDATE characters SET level = 9').run();
     assert.equal((await call('GET', '/api/character', { cookie })).data.character.professions, null);
     await (await db()).prepare('UPDATE characters SET level = 10').run();
     const { professions } = (await call('GET', '/api/character', { cookie })).data.character;
-    assert.deepEqual(professions.list.map(({ id, soon }) => [id, soon]), [['herbalism', false], ['alchemy', false], ['crafting', true]]);
+    assert.deepEqual(professions.list.map(({ id, soon }) => [id, soon]), [['herbalism', false], ['alchemy', false], ['crafting', false]]);
     assert.equal(professions.workshop, null);
   });
 });

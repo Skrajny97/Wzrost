@@ -200,10 +200,12 @@
         "maxLevel": 50,
         "description": "Środek kamiennego kręgu. Wszystko jest tu większe i groźniejsze, a w gąszczu mieszka niedźwiedź. Między głazami stoją kamienne zwierzęta, których nikt nie wyrzeźbił.",
         "encounters": [
-          { "weight": 52, "monsters": ["bear"] }
+          { "weight": 30, "monsters": ["bear"] },
+          { "weight": 22, "monsters": ["bear", "bear"] }
         ],
         "tough": [
-          { "weight": 6, "monsters": ["bear"] }
+          { "weight": 10, "monsters": ["bear", "bear"] },
+          { "weight": 2, "monsters": ["bear", "bear", "bear"] }
         ],
         "champion": "basilisk"
       }

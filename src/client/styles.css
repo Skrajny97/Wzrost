@@ -4981,6 +4981,17 @@ a.camp-level-button {
   .topbar-right .icon-button {
     width: 38px;
   }
+
+  .camp-button {
+    min-width: 34px;
+    padding: 0 2px;
+    font-size: 9px;
+    letter-spacing: 0;
+  }
+
+  .topbar-right {
+    gap: 2px;
+  }
 }
 
 .quest-button--ready {

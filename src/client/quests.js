@@ -63,13 +63,15 @@ function rewardChip(reward) {
 
 // The picture of a quest: the creature to beat (a shadow until met), or what
 // the work is done with.
+const QUEST_ICONS = { explore: 'swords', unlock: 'unlocked' };
+
 function questArt(quest) {
   if (quest.kind === 'kill') {
     const known = (state.character.met ?? []).includes(quest.monsterId);
     const sprite = monsterSprite(quest.monsterId);
     return h('span', { class: `quest-art${known ? '' : ' quest-art--unknown'}`, 'aria-hidden': 'true' }, sprite ?? icon('beast', { size: 24 }));
   }
-  return h('span', { class: 'quest-art', 'aria-hidden': 'true' }, icon(quest.kind === 'explore' ? 'swords' : 'hammer', { size: 24 }));
+  return h('span', { class: 'quest-art', 'aria-hidden': 'true' }, icon(QUEST_ICONS[quest.kind] ?? 'hammer', { size: 24 }));
 }
 
 function questRow(periodId, quest) {

@@ -409,7 +409,7 @@ describe('the Warsztat through the API', () => {
 });
 
 describe('the Warsztat switched off', () => {
-  const { call, db, signUp } = useServer({ PROFESSIONS: 'on' });
+  const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'off' });
 
   test('Rzemieślnictwo waits as "Wkrótce": no Warsztat, no orders and no quests for items', async () => {
     const { cookie } = await signUp('zamknieta');

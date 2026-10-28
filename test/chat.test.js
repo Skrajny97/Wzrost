@@ -59,6 +59,9 @@ describe('Czat', () => {
     const next = await send(players.ola, 'Hej!');
     assert.deepEqual((await read(players.ala, `&after=${sent.data.message.id}`)).messages.map(({ id }) => id), [next.data.message.id]);
     assert.equal((await call('GET', '/api/chat?channel=nowhere', { cookie: players.ala })).status, 404);
+    // The level is the character's current one, also under older messages.
+    await (await db()).prepare("UPDATE characters SET level = 12 WHERE name = 'Ala'").run();
+    assert.deepEqual((await read(players.ola)).messages.filter(({ name }) => name === 'Ala').map(({ level }) => level), [12]);
   });
 
   test('opens at character level 5, which the report announces with Szybkie Polowanie', async () => {

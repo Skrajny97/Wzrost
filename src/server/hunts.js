@@ -6,6 +6,7 @@ import {
   addSpeed,
   applyHunt,
   areaFor,
+  areasOpened,
   areaUnlocked,
   areaUnlockLevel,
   autoEquip,
@@ -433,9 +434,11 @@ export async function finishHunt(db, player, now) {
   // The creatures of every fight join those the character has met (the
   // Bestiariusz shows them by name from now on).
   const met = [...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))])];
-  // The narrator's quests count the creatures beaten and the minutes. They
-  // are saved only as read, so a reward claimed meanwhile is not undone.
-  const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills: huntKills(hunt), minutes: activity.minutes }));
+  // The narrator's quests count the creatures beaten, the minutes and the
+  // inner regions the new class levels open. They are saved only as read,
+  // so a reward claimed meanwhile is not undone.
+  const opened = areasOpened(character.classLevel, applied.classLevel, content);
+  const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills: huntKills(hunt), minutes: activity.minutes, opened }));
   const setMaterials = left.length
     ? `, materials = json_set(materials, ${left.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})`
     : '';

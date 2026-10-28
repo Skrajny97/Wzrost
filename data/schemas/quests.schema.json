@@ -53,6 +53,7 @@
               "kill",
               "killAny",
               "explore",
+              "unlock",
               "process",
               "salvage",
               "gather",
@@ -105,6 +106,11 @@
             "type": "number",
             "exclusiveMinimum": 0,
             "description": "Ile razy większa nagroda niż zwykle (rzadsze zadania z lepszą nagrodą)."
+          },
+          "untilClassLevel": {
+            "type": "integer",
+            "minimum": 2,
+            "description": "Rodzaj unlock: losuje się tylko postaciom z niższym poziomem klasy (nowym graczom)."
           }
         },
         "anyOf": [
@@ -277,6 +283,11 @@
         },
         "fights": {
           "$ref": "#/definitions/range"
+        },
+        "reach": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Rodzaj unlock: na ile poziomów klasy w przód liczą się zamknięte regiony; zadanie prosi najwyżej o tyle, ile ich tam jest."
         }
       }
     },

@@ -89,9 +89,10 @@ const dangerView = (danger) => ({
 export function publicContent() {
   return {
     stats: content.stats.map(({ id, name, combat }) => ({ id, name, effect: combat })),
-    classes: content.classes.map(({ id, name, role, start, description, position }) => ({
+    classes: content.classes.map(({ id, name, short, role, start, description, position }) => ({
       id,
       name,
+      short,
       role,
       start,
       description,

@@ -21,6 +21,8 @@ const capitalized = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 const RESULT_CLASS = { success: 'result--success', fainted: 'result--fainted', escaped: 'result--escaped' };
 const FIGHT_RESULTS = { true: 'wygrana', false: 'przegrana', null: 'odwrót' };
 const SWIPE_DISTANCE = 60;
+// The failed work cracks once the hammer's blows have rung out.
+const CRAFT_FAIL_AFTER_MS = 1400;
 
 // A report keeps copies of its finds; the same item in the bag has an id.
 const sameItem = (a, b) =>
@@ -90,8 +92,15 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const work = { herbs: herbsReport, potions: potionsReport, items: itemsReport }[report.kind];
     if (work) {
       fill(container, ...work(report, heading, findSheet));
-      // The cauldron bubbles once over a finished brewing.
+      // The cauldron bubbles once over a finished brewing, and the hammer
+      // strikes over an order of the Warsztat: the work that cracked after
+      // the items that came out.
       if (report.kind === 'potions' && firstPlayback) playSound('brew');
+      if (report.kind === 'items' && firstPlayback) {
+        const made = report.items.length > 0 || report.scrolls > 0;
+        if (made) playSound('craft');
+        if (report.failed > 0) setTimeout(() => playSound('craft-fail'), made ? CRAFT_FAIL_AFTER_MS : 0);
+      }
       if (report.system.length > 0 && firstPlayback) playSound('system');
       firstPlayback = false;
       return;

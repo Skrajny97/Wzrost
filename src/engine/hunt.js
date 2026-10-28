@@ -354,9 +354,12 @@ export function simulateHunt(
   // class level it asks for, whatever the character's own: the Otoczak (from
   // class level 10) not in Skraj Wiatrołomów (1–5), but from Lisie Jary
   // (6–10) on. The place's creatures name the affixes: no Puszczyka in
-  // Skraj Wiatrołomów, where no tawny owl lives.
+  // Skraj Wiatrołomów, where no tawny owl lives. From a character level on,
+  // a share of the items is for other classes, to trade or take apart.
   const filled = new Set(equipped.map((item) => item.slot));
-  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area };
+  const otherClass = content.balance.items.otherClass;
+  const otherClassShare = character.level >= otherClass.fromLevel ? otherClass.share : 0;
+  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare };
   const hpStart = player.hp;
   let hpNow = player.hp;
   let result = 'success';

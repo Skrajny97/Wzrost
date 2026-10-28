@@ -43,6 +43,8 @@ export const ICONS = {
   eye: [path('M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'), circle(12, 12, 3)],
   'eye-off': [path('M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'), circle(12, 12, 3), path('M3 3l18 18')],
   lock: [['rect', { x: 5, y: 11, width: 14, height: 10, rx: 1 }], path('M8 11V8a4 4 0 0 1 8 0v3')],
+  // An open padlock: a way that opens (the quests of inner regions to open).
+  unlocked: [['rect', { x: 5, y: 11, width: 14, height: 10, rx: 1 }], path('M8 11V8a4 4 0 0 1 7.6-1.8')],
   plus: [path('M12 5v14M5 12h14')],
   minus: [path('M5 12h14')],
   close: [path('M6 6l12 12M18 6L6 18')],

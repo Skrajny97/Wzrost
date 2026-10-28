@@ -2258,3 +2258,69 @@ Autor: „tu zostawiamy miejsce na Sklep Systemu na razie tylko jakąś specjaln
 
 1. Obok twarzy narratora, przed złotem, stoi ikona straganu ze znakiem Systemu, przygaszona, z kłódką w rogu jak przy Rdzeniu. Stuknięcie pokazuje: „Sklep Systemu dojdzie w jednej z kolejnych aktualizacji.” Końcówka „aktualizacji” jest poprawiona z „aktualizacjach”, tak jak w komunikacie zablokowanych modułów.
 2. Odznaka klasy w górnym pasku skraca teraz samą nazwę klasy, a jej poziom zawsze widać, np. „WOJOW… 42”. Wcześniej na wąskim telefonie znikał numer.
+
+## Środek gry: wolniejsze poziomy i silniejsze stwory (28.10.2026)
+
+Autor: „krzywą wzrostu wyzwania musimy bardzo delikatnie podwyższyć, bo gram Magiem a lecę jak burza ze wszystkim, szczegolnie od momentu posiadania mikstur i umiejętności coraz silniejszych (mid-game) / Za szybko też jednak troche się te lvle wbijają, pomimo że hardcap jest wysoko. I oczywiscie chodzi o midgame, bo early musi byc latwiejssze”. Potem zrzut z Serca Uroczyska na 42. poziomie z „Zagrożenie: niskie” i: „zajebane tym expem po sufit jest na dluzszych wyprawach i w ogole”.
+
+1. **Poziomy** (`midGame` w `progression` w `data/balance.json`). Do 17. poziomu nic się nie zmienia: pierwsze poziomy dalej trwają po ok. 20 minut. Od 17. poziomu każdy trwa coraz dłużej niż dotąd, równo aż do dwóch razy dłużej na 50. Potem to spowolnienie maleje i od 100. poziomu krzywa jest dawna. Poziom 500 dalej zajmuje ok. doby, a żaden poziom nie trwa krócej od poprzedniego (pilnuje tego test). Godziny eksploracji na jeden poziom, przed i po:
+    - 20. poziom: 0,40 → 0,44 h;
+    - 30.: 0,68 → 0,95 h;
+    - 40.: 1,00 → 1,69 h;
+    - 45.: 1,16 → 2,14 h;
+    - 50.: 1,33 → 2,66 h;
+    - 100. i 500.: bez zmian (3,3 h i 26,5 h).
+
+   Od 1. do 50. poziomu to razem ok. 47 godzin eksploracji zamiast ok. 31.
+2. **Stwory** (`midGame` w `monsters`). Od 15. poziomu stwory biją mocniej i mają więcej HP, równo aż do +25% obu na 50. poziomie, np. ok. +11% na 30. i ok. +18% na 40. Dotyczy to też elit i czempionów. Stwory do 15. poziomu są jak dotąd.
+3. **Serce Uroczyska** ma znowu pary niedźwiedzi: 30 pojedynczych na 22 pary, a w trudnych spotkaniach 10 par i 2 trójki. Żeby XP na godzinę w miejscach 36–50 trafiało w nową krzywą, a nie wyżej, zmalały nagrody (XP, złoto):
+    - niedźwiedź: 1,8 → 1,0 i 1,2 → 0,9;
+    - wadera: 1,1 → 0,95 i 0,9 → 0,8;
+    - basior: 1,5 → 1,3 i 1,0 → 0,9;
+    - ryś: 1,2 → 1,05 i 0,9 → 0,8;
+    - puchacz: 1,0 → 0,9 i 0,6 → 0,55.
+4. **Symulator** (`tools/simulate.mjs`) liczy teraz typową postać z umiejętnościami. Wydaje Punkty Umiejętności najpierw na pierwszą umiejętność klasy do 20., potem na drugą. Bez nich niedoszacowywał graczy środka gry.
+5. **Wyniki symulacji** (300 wypraw na wiersz):
+    - Typowa postać z umiejętnościami w Sercu Uroczyska na 50. poziomie, wyprawa 30-minutowa: kończy z 63–96% HP, omdlenia do 1%. Na 46–48. poziomie przy wyprawach 2-godzinnych Cień mdleje w 4–11% wypraw, Wojownik w ok. 5%, Mag prawie nigdy.
+    - Postać z ulepszeniami z Kowadła i miksturami nie mdleje, ale traci więcej HP niż przedtem.
+    - Mag na 42. poziomie z ulepszeniami i miksturami, 2 godziny w Sercu: przedtem kończył z 83% HP i ok. 71 tys. XP na godzinę, czyli ok. 3 poziomy z wyprawy. Teraz kończy z 66% HP i ok. 50 tys. XP na godzinę, czyli ok. 1,3 poziomu.
+6. **„Zagrożenie”** to szansa omdlenia na wyprawie, licząc mikstury leczenia. Mocna postać z miksturami może więc w Sercu dalej mieć „niskie”: traci więcej HP, ale rzadko mdleje.
+7. **Punkty Czasu** przewijają wyprawę z tym samym XP, więc ich nadmiar przyspiesza poziomy (autor: „zdazylem juz wbic maksymalny poziom klasy przewijając nadmiarem Punktów Czasu”). Ich źródła to liczby autora (skrzynie Bestiariusza, zadań, krain, poziomy, co 30 minut), więc zmiana czeka na jego odpowiedź.
+
+## Zadania: „Odblokuj dostęp do N nowych regionów” (28.10.2026)
+
+Autor: „Tygodniowe można ustawić nowym graczom "Odblokuj dostęp do x nowych regionów" i w dziennych tez w sumie”.
+
+1. **Nowy rodzaj zadania** `unlock` w `data/quests.json`: „Odblokuj dostęp do {count} {noun}.” z formami „nowego regionu / nowych regionów”. Liczą się regiony wewnętrzne, które klasa otwiera nowymi poziomami. Postęp dodaje odbiór raportu z wyprawy, z którym przyszły te poziomy klasy.
+2. **Tylko dla nowych postaci:** zadanie losuje się, póki poziom klasy jest niższy niż 25 (`untilClassLevel`).
+3. **Ile regionów.** Dzienne zadanie prosi o 1 region, tygodniowe o 2–3. Nigdy nie prosi o więcej, niż otwiera się w zasięgu 5 (dzienne) albo 15 (tygodniowe) poziomów klasy (`reach`). Regiony otwierają się co 5 poziomów klasy, od 5. (Lisie Jary).
+4. **Liczba zadań.** Nowa postać ma teraz 5 zadań na okres (oba stwory Skraju, wszystkie stwory, czas wypraw i regiony). Na pergaminie zadanie ma ikonę otwartej kłódki.
+
+## Łupy dla innych klas od 15. poziomu (28.10.2026)
+
+Autor: „I teraz skoro wymiana jest niech lupy w eksploracji pozniejszej (po 15 lvlu) bo wejdzie Rzemieślnictwo trafiaja sie tez na inne klasy”.
+
+1. **Od 15. poziomu postaci** co czwarty przedmiot z wyprawy jest dla innej klasy (`otherClass` w `items` w `data/balance.json`: `fromLevel` 15, `share` 0,25). Dotyczy to znalezisk i skrzyń elity i czempiona. Inna klasa losuje się po równo spośród czterech pozostałych, a przedmiot jest z rodzaju, którego klasa postaci nie nosi, np. kostur dla Cienia.
+2. **Bez zmian zostają** pierwsza broń i skrzynie zadań: zawsze są dla klasy postaci. Przedmioty innych klas służą do wymiany i rozbiórki. Przy pełnym plecaku złomiarz kupuje je jako pierwsze, jak dotąd.
+
+## Skróty klas w górnym pasku (28.10.2026)
+
+Autor: „nazwy klas przy poziomie zmień na skróty 3-literowe jesli trzeba Wojownik to może byc Woj itp. / zeby sie na gorze zmiescilo”.
+
+1. **Skróty.** Klasy mają skrót (`short` w `data/classes.json`): Woj, Łuc, Mag, Kle, Cień. Cień ma 4 litery, bo to jego cała nazwa. Górny pasek pokazuje skrót z poziomem klasy, np. „WOJ 42”. Pełna nazwa jest dalej na ekranie Postaci.
+2. **Najwęższe telefony.** Na 340 px i węższych ikona Obozu i odstępy obok złota są ciaśniejsze, więc „POZ. 37” i „WOJ 42” mieszczą się całe także na 320 px.
+
+## Czat: bieżący poziom postaci (28.10.2026)
+
+Autor: „okno czatu ma w starych wiadomościach stary poziom postaci, a powinien być uzależniony po prostu od funkcji, która sprawdza to na biezaco”.
+
+Wiadomości pokazują teraz poziom, który postać ma w chwili czytania, także przy starych wiadomościach. Poziom z chwili wysłania zostaje w bazie tylko na zapas.
+
+## Rzemieślnictwo w grze i dźwięki Warsztatu (28.10.2026)
+
+1. **Dźwięki wybrane przez autora** na stronie odsłuchu:
+    - udany wyrób: craft-7, trzy uderzenia młota (`craft`);
+    - nieudany: craft-fail-5, uderzenie i pęknięcie (`craft-fail`).
+
+   Grają przy pierwszym czytaniu raportu z Warsztatu. Kiedy coś wyszło, a coś pękło, pęknięcie gra po uderzeniach.
+2. **Rzemieślnictwo działa w grze od wersji 0.0.27** (`CRAFTING` = `"on"`). Na 15. poziomie System podaje swój komunikat, a narrator objaśnia Warsztat. Migracja 0045 dodaje kolumny kroku 2 z wartościami domyślnymi.

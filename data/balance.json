@@ -40,7 +40,8 @@
     "hpBase": 2,
     "budgetBase": 0,
     "damageMultiplier": 1.4,
-    "gearLagMinutes": 45
+    "gearLagMinutes": 45,
+    "midGame": { "fromLevel": 15, "toLevel": 50, "damage": 0.25, "hp": 0.25 }
   },
   "items": {
     "budgetBase": 10,
@@ -52,7 +53,8 @@
     "statPerBudget": 0.5,
     "resistancePerBudget": 1.0,
     "sellGoldPerLevel": 1,
-    "bagSlots": 30
+    "bagSlots": 30,
+    "otherClass": { "fromLevel": 15, "share": 0.25 }
   },
   "upgrades": {
     "bonusPerLevel": 0.06,
@@ -161,6 +163,7 @@
     "xpPerHourScale": 650,
     "earlyXpFactors": [1, 0.861, 0.551, 0.402, 0.314],
     "classXpFactor": 0.6,
+    "midGame": { "fromLevel": 17, "toLevel": 50, "fadeLevel": 100, "levelTimeFactor": 2 },
     "freeResetMaxLevel": 20,
     "classEvolutionLevels": [50, 100, 200, 300, 400, 500]
   },

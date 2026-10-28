@@ -110,6 +110,7 @@ import {
   statEffects,
   THREAT_LEVELS,
   unlockedFeatures,
+  areasOpened,
   areaUnlocked,
   areaUnlockLevel,
   xpToNext,
@@ -369,6 +370,14 @@ describe('items', () => {
       found.add(item.base);
     }
     assert.ok(found.has('tunic') && found.has('hood') && found.has('gloves'));
+    // With a share for other classes, that share is theirs alone: to trade or take apart.
+    const others = Array.from({ length: 2000 }, () =>
+      randomItem(20, rng, content, { classId: 'shadow', filled: new Set(['weapon']), otherClassShare: 0.25 }),
+    ).filter((item) => !canUse(item.base, 'shadow', content));
+    assert.ok(Math.abs(others.length / 2000 - 0.25) < 0.04, `${others.length}`);
+    assert.ok(new Set(others.map((item) => item.base)).has('staff'));
+    // The first weapon is still of the character's class.
+    assert.ok(canUse(randomItem(20, rng, content, { classId: 'shadow', filled: new Set(), otherClassShare: 1 }).base, 'shadow', content));
   });
 
   test('the scrapper pays by level and rarity', () => {
@@ -481,6 +490,17 @@ describe('hunts', () => {
       { ...warrior, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed: 'polowanie', ...overrides },
       content,
     );
+
+  test('from character level 15 some of the items found are for other classes', () => {
+    const foreign = (level, areaId) => {
+      const character = typicalCharacter('warrior', level, content);
+      return Array.from({ length: 60 }, (_, i) => simulateHunt({ ...character, hp: 9999, name: 'Mira', areaId, minutes: 120, seed: `obce:${i}` }, content))
+        .flatMap((result) => result.items)
+        .filter((item) => !canUse(item.base, 'warrior', content)).length;
+    };
+    assert.equal(foreign(content.balance.items.otherClass.fromLevel - 1, 'raven-hollows'), 0);
+    assert.ok(foreign(content.balance.items.otherClass.fromLevel, 'raven-hollows') > 0);
+  });
 
   test('the same seed always gives the same hunt', () => {
     assert.deepEqual(hunt(), hunt());
@@ -726,6 +746,29 @@ describe('progression', () => {
     assert.ok(classXpToNext(1, content) < xpToNext(1, content));
   });
 
+  test('the mid-game levels take longer, twice as long at its end, and none takes less than the one before', () => {
+    const { firstLevelMinutes, flatLevels, levelTimeExponent, midGame } = content.balance.progression;
+    const plain = (level) => (firstLevelMinutes / 60) * Math.max(1, level / flatLevels) ** levelTimeExponent;
+    assert.ok(Math.abs(huntingHours(midGame.fromLevel, content) - plain(midGame.fromLevel)) < 1e-9);
+    assert.ok(huntingHours(35, content) > plain(35) * 1.3);
+    assert.ok(Math.abs(huntingHours(midGame.toLevel, content) / plain(midGame.toLevel) - midGame.levelTimeFactor) < 1e-9);
+    // Past the mid-game the slowdown fades, and the late game keeps its pace.
+    assert.ok(Math.abs(huntingHours(midGame.fadeLevel, content) - plain(midGame.fadeLevel)) < 1e-9);
+    for (let level = 2; level <= content.balance.progression.maxLevel; level++) {
+      assert.ok(huntingHours(level, content) >= huntingHours(level - 1, content), `level ${level}`);
+    }
+  });
+
+  test('mid-game monsters hit harder and last longer, the first ones do not', () => {
+    const { midGame } = content.balance.monsters;
+    const plainContent = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, midGame: { ...midGame, damage: 0, hp: 0 } } } };
+    const bear = (level, from) => monsterCombatant({ monsterId: 'bear', level, id: 'e0' }, from);
+    assert.equal(bear(midGame.fromLevel, content).maxHp, bear(midGame.fromLevel, plainContent).maxHp);
+    assert.equal(bear(midGame.fromLevel, content).weapon.max, bear(midGame.fromLevel, plainContent).weapon.max);
+    assert.ok(Math.abs(bear(midGame.toLevel, content).maxHp / bear(midGame.toLevel, plainContent).maxHp - (1 + midGame.hp)) < 0.01);
+    assert.ok(Math.abs(bear(midGame.toLevel, content).weapon.max / bear(midGame.toLevel, plainContent).weapon.max - (1 + midGame.damage)) < 1e-9);
+  });
+
   test('levels 2 to 5 need the same XP, and later ones more', () => {
     // In the first inner region monsters are mostly of levels 1–2, so levels
     // 2–5 need the same, smaller XP (earlyXpFactors): about 20 minutes each.
@@ -963,10 +1006,10 @@ test('the threat level follows the whole character, not its level alone', () => 
 });
 
 test('the threat level follows the simulated chance of fainting', () => {
-  // A level 30 mage on a 4-hour exploration in the first unsafe inner region faints now and then.
-  const { character, equipped } = typicalCharacter('mage', 30, content);
+  // A level 26 mage, new to the first unsafe inner region, faints now and then on a 4-hour exploration.
+  const { character, equipped } = typicalCharacter('mage', 26, content);
   const estimated = faintChances({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content)[240];
-  const simulated = simulateMany({ classId: 'mage', level: 30, minutes: 240, hunts: 300 }, content).faintRate;
+  const simulated = simulateMany({ classId: 'mage', level: 26, minutes: 240, hunts: 300 }, content).faintRate;
   assert.ok(simulated > 0.05, `simulated ${simulated}`);
   assert.ok(Math.abs(estimated - simulated) < 0.1, `estimated ${estimated}, simulated ${simulated}`);
   assert.ok(['high', 'very-high'].includes(estimateThreat({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content)[240]));
@@ -1967,14 +2010,14 @@ describe('quests from the narrator', () => {
       for (let seed = 0; seed < 30; seed++) {
         const quests = drawQuests(periodId, { character, hasTable: false, seed }, content);
         // Skraj Wiatrołomów has two creatures: one quest for each, one for
-        // creatures of any kind and one for the time, four of the five
-        // until the Stół rozbiórki stands.
-        assert.equal(quests.length, Math.min(4, content.quests.periods[periodId].count));
+        // creatures of any kind, one for the time and one for the inner
+        // regions to open, five before the Stół rozbiórki stands.
+        assert.equal(quests.length, Math.min(5, content.quests.periods[periodId].count));
         const kills = quests.filter((quest) => quest.kind === 'kill');
         assert.ok(kills.every((quest) => prey.has(quest.target) && quest.count >= 1));
         assert.equal(new Set(kills.map((quest) => quest.target)).size, kills.length, 'a creature twice');
         // Nothing for the Stół rozbiórki before it stands.
-        assert.ok(quests.every((quest) => ['kill', 'killAny', 'explore'].includes(quest.kind)));
+        assert.ok(quests.every((quest) => ['kill', 'killAny', 'explore', 'unlock'].includes(quest.kind)));
         assert.ok(quests.every((quest) => quest.progress === 0 && !quest.claimed && quest.reward.amount >= 1));
       }
     }
@@ -1983,11 +2026,38 @@ describe('quests from the narrator', () => {
     assert.notDeepEqual(drawQuests('daily', { character, hasTable: true, seed: 'a:daily:2026-10-25' }, content), drawQuests('daily', { character, hasTable: true, seed: 'a:daily:2026-10-26' }, content));
   });
 
+  test('a new character is asked to open inner regions: as many as lie within reach, only while new', () => {
+    const unlock = content.quests.kinds.find((kind) => kind.id === 'unlock');
+    const asked = (character, periodId, data = content) =>
+      Array.from({ length: 40 }, (_, seed) => drawQuests(periodId, { character, hasTable: true, seed }, data))
+        .flat()
+        .filter((quest) => quest.kind === 'unlock')
+        .map((quest) => quest.count);
+    // Lisie Jary opens at class level 5, then one more every 5 levels.
+    assert.equal(areasOpened(1, 5, content), 1);
+    assert.equal(areasOpened(4, 20, content), 4);
+    assert.deepEqual(new Set(asked(newCharacter('warrior'), 'daily')), new Set([1]));
+    assert.deepEqual(new Set(asked(newCharacter('warrior'), 'weekly')), new Set([2, 3]));
+    // Near the last inner region of the game a week asks for no more than are left.
+    const always = { ...content, quests: { ...content.quests, kinds: content.quests.kinds.map((kind) => (kind.id === 'unlock' ? { ...kind, untilClassLevel: 100 } : kind)) } };
+    assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 42, classLevel: 42 }), 'weekly', always)), new Set([1]));
+    // Only while new.
+    assert.ok(asked(newCharacter('warrior', { level: 20, classLevel: unlock.untilClassLevel - 1 }), 'daily').length > 0);
+    assert.deepEqual(asked(newCharacter('warrior', { level: 30, classLevel: unlock.untilClassLevel }), 'daily'), []);
+    assert.deepEqual(asked(newCharacter('warrior', { level: 50, classLevel: 50 }), 'weekly'), []);
+    // Progress: the inner regions a claim's new class levels open.
+    const quests = { daily: { period: 'd', quests: [{ kind: 'unlock', count: 1, progress: 0, claimed: false }], chest: false } };
+    assert.equal(addQuestProgress(quests, { opened: 2 }).daily.quests[0].progress, 1);
+    assert.equal(addQuestProgress(quests, { minutes: 30 }).daily.quests[0].progress, 0);
+    assert.equal(questText({ kind: 'unlock', count: 2 }, content), 'Odblokuj dostęp do 2 nowych regionów.');
+    assert.equal(questText({ kind: 'unlock', count: 1 }, content), 'Odblokuj dostęp do 1 nowego regionu.');
+  });
+
   test('with the table built, its work comes into the draw', () => {
     const character = newCharacter('archer', { level: 12, classLevel: 10 });
     const kinds = new Set();
     for (let seed = 0; seed < 40; seed++) for (const quest of drawQuests('daily', { character, hasTable: true, seed }, content)) kinds.add(quest.kind);
-    assert.deepEqual([...kinds].sort(), ['explore', 'kill', 'killAny', 'process', 'salvage']);
+    assert.deepEqual([...kinds].sort(), ['explore', 'kill', 'killAny', 'process', 'salvage', 'unlock']);
   });
 
   test('no quest sends a character to the creatures of a place too easy for it', () => {
@@ -2000,7 +2070,7 @@ describe('quests from the narrator', () => {
     // too easy at level 19, still fine at 18.
     const behind = newCharacter('archer', { level: 19, classLevel: 14 });
     assert.equal(questArea(behind, content).id, 'raven-hollows');
-    assert.deepEqual(kinds(behind), ['explore', 'process', 'salvage']);
+    assert.deepEqual(kinds(behind), ['explore', 'process', 'salvage', 'unlock']);
     assert.ok(kinds({ ...behind, level: 18 }).includes('kill'));
     // Past every place of the game the same.
     assert.ok(!kinds(newCharacter('archer', { level: 60, classLevel: 69 })).includes('kill'));
@@ -2196,11 +2266,11 @@ describe('quests from the narrator', () => {
     assert.deepEqual(view.weekly.chest, { ...content.quests.periods.weekly.chest, ready: false, opened: false });
     const explore = view.daily.quests.find((quest) => quest.kind === 'explore');
     assert.ok(explore.done && !explore.claimed && explore.progress === explore.count);
-    assert.deepEqual(view.daily.quests.map((quest) => quest.index), [0, 1, 2, 3]);
+    assert.deepEqual(view.daily.quests.map((quest) => quest.index), [0, 1, 2, 3, 4]);
     assert.ok(view.daily.quests.filter((quest) => quest.kind === 'kill').every((quest) => quest.monsterId && quest.text.startsWith('Pokonaj')));
     // A quest of a creature no longer in the data is left out, the others keep their places.
     const gone = { ...quests, daily: { ...quests.daily, quests: [{ ...quests.daily.quests[0], kind: 'kill', target: 'dragon' }, ...quests.daily.quests.slice(1)] } };
-    assert.deepEqual(questsView(gone, now, content).daily.quests.map((quest) => quest.index), [1, 2, 3]);
+    assert.deepEqual(questsView(gone, now, content).daily.quests.map((quest) => quest.index), [1, 2, 3, 4]);
   });
 });
 

@@ -17,7 +17,7 @@ import { easyPlace, encountersFor } from './hunt.js';
 import { randomItem } from './items.js';
 import { knownHerbs, professionState } from './professions.js';
 import { createRng } from './rng.js';
-import { areaUnlocked } from './unlocks.js';
+import { areasOpened, areaUnlocked } from './unlocks.js';
 
 export const QUEST_PERIODS = ['daily', 'weekly'];
 
@@ -122,6 +122,10 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false, h
   return content.quests.kinds.flatMap((kind) => {
     if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions) || (kind.crafting && !hasCrafting)) return [];
     if ((kind.id === 'kill' || kind.id === 'killAny') && easyPlace(character.level, area, content)) return [];
+    // Regions to open: only for a new character, and no more than open
+    // within reach of its class level.
+    const ahead = kind.id === 'unlock' ? areasOpened(character.classLevel, character.classLevel + kind[periodId].reach, content) : 0;
+    if (kind.id === 'unlock' && (character.classLevel >= kind.untilClassLevel || ahead === 0)) return [];
     const variants =
       kind.id === 'kill'
         ? [...creaturesPerFight(area, character.level)]
@@ -133,19 +137,21 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false, h
             ? questHerbs(character, content).map((herb) => ({ target: herb.id }))
             : kind.id === 'brew'
               ? questPotions(character, content).map((potion) => ({ target: potion.id }))
-              : [{}];
+              : kind.id === 'unlock'
+                ? [{ most: ahead }]
+                : [{}];
     return variants.map((variant) => ({ kind, weight: kind.weight / variants.length, ...variant }));
   });
 }
 
 // How much a quest asks for: for creatures, as many as `fights` fights
-// bring on average.
-function questCount({ kind, perFight }, periodId, rng) {
+// bring on average, and never more than `most`.
+function questCount({ kind, perFight, most = Infinity }, periodId, rng) {
   const tuning = kind[periodId];
   if (tuning.fights) return Math.max(1, Math.round(rng.int(...tuning.fights) * perFight));
   const [min, max] = tuning.count;
   const step = tuning.step ?? 1;
-  return min + step * rng.int(0, Math.floor((max - min) / step));
+  return Math.min(most, min + step * rng.int(0, Math.floor((max - min) / step)));
 }
 
 // The band of levels the character is in (levels in quests.json).
@@ -222,15 +228,17 @@ export function huntKills(hunt) {
 // the table's orders add: creatures beaten (`kills` by id), `minutes`
 // explored, materials `processed`, items `salvaged`, herbs gathered (`herbs`
 // by id, all of those found, also those the bag lost), potions brewed
-// (`potions` by id, the same way) and items `made` in the Warsztat (only
-// those that came out). A quest stops at its count.
-export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0 }) {
+// (`potions` by id, the same way), items `made` in the Warsztat (only
+// those that came out) and inner regions `opened` by new class levels. A
+// quest stops at its count.
+export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, opened = 0 }) {
   const total = (counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
   const gathered = total(herbs);
   const gain = {
     kill: (quest) => kills[quest.target] ?? 0,
     killAny: () => total(kills),
     explore: () => minutes,
+    unlock: () => opened,
     process: () => processed,
     salvage: () => salvaged,
     gather: (quest) => herbs[quest.target] ?? 0,

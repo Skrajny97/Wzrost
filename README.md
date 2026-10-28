@@ -85,7 +85,7 @@ Push na inną gałąź (poza `art-drafts`) uruchamia testy i wdraża **wersję t
 
 ## Wersja testowa
 
-**https://test.insightrpg.com** (zapasowo `wzrost-test` w domenie workers.dev) to ta sama gra z gałęzi roboczej, zanim trafi do `main`. Ma własnego Workera i własną bazę D1 `wzrost-test` (środowisko `test` w `wrangler.jsonc`), więc nic tam nie dotyka gry na insightrpg.com ani jej graczy. Działa tam tylko konto autora, założone wcześniej na hasło: nowych kont nie da się tam zakładać (`REGISTRATION` = `"closed"`), a wersja testowa nie ma logowania Google ani Panelu autora. Konto o loginie z `TEST_LOGINS` ma tam tryb testowy. Nowe części gry są tam włączone wcześniej, np. Rzemieślnictwo (`CRAFTING` = `"on"`), które w grze na insightrpg.com czeka, aż będzie gotowe: bez `CRAFTING` jego kwadrat mówi „Wkrótce”. Profesje (`PROFESSIONS` = `"on"`) są w grze od wersji 0.0.9.
+**https://test.insightrpg.com** (zapasowo `wzrost-test` w domenie workers.dev) to ta sama gra z gałęzi roboczej, zanim trafi do `main`. Ma własnego Workera i własną bazę D1 `wzrost-test` (środowisko `test` w `wrangler.jsonc`), więc nic tam nie dotyka gry na insightrpg.com ani jej graczy. Działa tam tylko konto autora, założone wcześniej na hasło: nowych kont nie da się tam zakładać (`REGISTRATION` = `"closed"`), a wersja testowa nie ma logowania Google ani Panelu autora. Konto o loginie z `TEST_LOGINS` ma tam tryb testowy. Nowe części gry mogą być tam włączone wcześniej: bez swojego przełącznika, np. `CRAFTING`, kwadrat profesji mówi „Wkrótce”. Profesje (`PROFESSIONS` = `"on"`) są w grze od wersji 0.0.9, a Rzemieślnictwo (`CRAFTING` = `"on"`) od 0.0.27.
 
 ## Struktura repozytorium
 

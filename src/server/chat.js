@@ -169,8 +169,8 @@ export async function readChat(context) {
   const [messages, hidden, blocked, reports, conversations] = await db.batch([
     db
       .prepare(
-        `SELECT m.id, m.user_id, m.character_id, m.name, m.level, m.class_id, m.text, m.created_at, u.login, u.google_sub, u.chat_moderator
-         FROM chat_messages m JOIN users u ON u.id = m.user_id
+        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.created_at, u.login, u.google_sub, u.chat_moderator
+         FROM chat_messages m JOIN users u ON u.id = m.user_id LEFT JOIN characters c ON c.id = m.character_id
          WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)
          ORDER BY m.id DESC LIMIT ?`,
       )

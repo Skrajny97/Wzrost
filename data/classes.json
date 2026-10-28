@@ -2,6 +2,7 @@
   {
     "id": "warrior",
     "name": "Wojownik",
+    "short": "Woj",
     "role": "obrona",
     "start": "gentle",
     "description": "Walczy na przedzie ciężką bronią i tarczą. Dużo wytrzymuje i rzadko mdleje, ale zabija wolniej.",
@@ -17,6 +18,7 @@
   {
     "id": "archer",
     "name": "Łucznik",
+    "short": "Łuc",
     "role": "dystans",
     "start": "normal",
     "description": "Strzela z tylnej linii. Jest szybki i celny, ale słabo znosi ciosy.",
@@ -32,6 +34,7 @@
   {
     "id": "mage",
     "name": "Mag",
+    "short": "Mag",
     "role": "magia",
     "start": "hard",
     "description": "Rzuca zaklęcia żywiołów z tylnej linii. Magii nie da się uniknąć ani zatrzymać pancerzem, ale mag jest kruchy. Pierwsze kroki są trudne, a magia z czasem się odwdzięcza.",
@@ -47,6 +50,7 @@
   {
     "id": "cleric",
     "name": "Kleryk",
+    "short": "Kle",
     "role": "wsparcie",
     "start": "gentle",
     "description": "Włada sakrum. Lepiej odpoczywa między walkami, więc bezpieczniej znosi długie wyprawy.",
@@ -62,6 +66,7 @@
   {
     "id": "shadow",
     "name": "Cień",
+    "short": "Cień",
     "role": "zwinność",
     "start": "normal",
     "description": "Zwinny i nieuchwytny. Często trafia krytycznie i unika ciosów, ale ma mało HP.",

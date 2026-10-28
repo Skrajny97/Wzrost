@@ -45,7 +45,7 @@ export function itemsPerHour(content) {
 export function typicalCharacter(classId, level, content) {
   const cls = content.classesById[classId];
   const classLevel = typicalClassLevel(level, content);
-  const character = { classId, level, classLevel, points: {}, position: cls.position, xp: 0, classXp: 0 };
+  const character = { classId, level, classLevel, points: {}, position: cls.position, xp: 0, classXp: 0, skills: typicalSkills(classId, classLevel, content) };
   character.points = engine.autoDistribute(character, content);
   const mainStat = Object.entries(cls.autoPoints).sort((a, b) => b[1] - a[1])[0][0];
   const affixIds = [content.prefixes.find((affix) => affix.stat === mainStat).id];
@@ -62,6 +62,20 @@ export function typicalCharacter(classId, level, content) {
       : engine.generateItem({ baseId: bases[slot], level: itemLevel }, rng, content),
   );
   return { character, equipped };
+}
+
+// The skills a character usually has: from the class level of the first
+// skill every Skill Point spent, first on the class's first skill up to the
+// top level (the main path), then on its second (the side path). Skills
+// carry the mid-game, so the balance counts on them.
+export function typicalSkills(classId, classLevel, content) {
+  const { unlockClassLevel, lastPointClassLevel, maxLevel } = content.balance.skills;
+  const points = Math.max(0, Math.min(classLevel, lastPointClassLevel) - unlockClassLevel + 1);
+  const [main, side] = content.skills.filter((skill) => skill.classId === classId);
+  const skills = {};
+  if (points > 0) skills[main.id] = Math.min(maxLevel, points);
+  if (points > maxLevel) skills[side.id] = points - maxLevel;
+  return skills;
 }
 
 // The class level a character usually has at a character level: class levels
