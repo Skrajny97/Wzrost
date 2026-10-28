@@ -47,9 +47,9 @@ const LIMITS = [0.01, 0.05, 0.15];
 const sampleKind = (build, weight) => ({ build, weight, counts: new Array(LOST + 1).fill(0), fought: 0, lost: 0, worst: 0 });
 
 // A fight that drags on ends the exploration without fainting, so it is left out.
-function fightSamples(kind, times, player, rng, content) {
+function fightSamples(kind, times, player, rng, content, trait) {
   for (let i = 0; i < times; i++) {
-    const fight = simulateFight({ allies: [{ ...player }], enemies: encounterCombatants(kind.build(), content), rng, content });
+    const fight = simulateFight({ allies: [{ ...player }], enemies: encounterCombatants(kind.build(), content), rng, content, trait });
     if (fight.won === null) continue;
     kind.fought += 1;
     if (!fight.won) {
@@ -94,12 +94,12 @@ export function threatSamples({ character, equipped, areaId }, content) {
     elite: [sampleKind(() => eliteEncounter(area, content), 1)],
     champion: area.champion ? [sampleKind(() => championEncounter(area, content), 1)] : [],
   };
-  for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content);
+  for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content, area.trait);
   if (mix(groups.regular)[LOST] < LIMITS.at(-1)) {
     for (const [group, list] of Object.entries(groups)) {
       const total = list.reduce((sum, kind) => sum + kind.weight, 0);
       for (const kind of list.filter(inDoubt)) {
-        fightSamples(kind, Math.ceil((MORE_SAMPLES[group] * kind.weight) / total), player, rng, content);
+        fightSamples(kind, Math.ceil((MORE_SAMPLES[group] * kind.weight) / total), player, rng, content, area.trait);
       }
     }
   }

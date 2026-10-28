@@ -74,6 +74,17 @@
             "type": "number",
             "minimum": 0,
             "maximum": 0.2
+          },
+          "backDodgeBonus": {
+            "type": "number",
+            "description": "O tyle więcej uniku dla postaci z tyłu szyku.",
+            "minimum": 0,
+            "maximum": 0.2
+          },
+          "effectTicks": {
+            "type": "object",
+            "description": "O ile ruchów dłużej trwa efekt (effects.json), u stworów i u postaci.",
+            "additionalProperties": { "type": "integer", "minimum": 1, "maximum": 5 }
           }
         }
       },

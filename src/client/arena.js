@@ -446,13 +446,25 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       await flash(event.target, '#c49a6c', 'rgba(196, 154, 108, 0.3)');
       return;
     }
+    // A skill's slow, or a monster's blow that mires (Ugrzęźnięcie), which
+    // shows its effect's name and colour.
     if (event.kind === 'slow') {
+      const color = event.effect ? effectColor(event.effect) : '#8fd3ff';
       for (const id of event.targets) {
-        hold(id, 'spowolniony');
-        flash(id, '#8fd3ff', 'rgba(143, 211, 255, 0.25)');
+        hold(id, event.effect ?? 'spowolniony');
+        if (event.effect) float(id, event.effect, 'effect', 0, color);
+        flash(id, color, tint(color, 0.25));
       }
       line();
       await wait(320 / speed);
+      return;
+    }
+    // Wysysanie: the monster takes back HP from the wound it made.
+    if (event.kind === 'drain') {
+      setHp(event.target, event.hp);
+      float(event.target, `+${event.amount}`, 'heal');
+      line();
+      await flash(event.target, '#a7c47f', 'rgba(167, 196, 127, 0.25)');
       return;
     }
     // A skill's blow shows its look; a sweep's blows land at once, as its
@@ -564,7 +576,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (event.kind === 'heal' && event.armor) guardUp(event);
     if (event.kind === 'fade') guardDown(event);
     if (event.kind === 'stun') hold(event.target, event.label ?? 'przyszpilony');
-    if (event.kind === 'slow') for (const id of event.targets) hold(id, 'spowolniony');
+    if (event.kind === 'slow') for (const id of event.targets) hold(id, event.effect ?? 'spowolniony');
     log.append(logLine(event));
   }
 

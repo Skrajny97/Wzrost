@@ -435,7 +435,7 @@ export function simulateHunt(
     const kit = fightPotions(left, healBelow ?? content.potionUse?.healBelow, content);
     const fast = Boolean(speed) && event.t < speed.ms;
     const ally = { ...player, hp: hpNow, ...(fast && { speed: player.speed * (1 + speed.bonus) }), ...((kit.heal || kit.mana) && { potions: kit }) };
-    const fight = simulateFight({ allies: [ally], enemies, rng, content, record: true });
+    const fight = simulateFight({ allies: [ally], enemies, rng, content, record: true, trait: area.trait });
     const hpBefore = hpNow;
     hpNow = fight.units.find((unit) => unit.id === ally.id).hp;
     for (const id of fight.drunk) {

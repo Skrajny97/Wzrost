@@ -14,6 +14,8 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   const weapon = weaponItem ? itemWeapon(weaponItem, content) : unarmed(character.level, content);
   let armor = bonuses.armor + totals.endurance * balance.combat.armorPerEndurance;
   if (area?.trait.frontArmorBonus && character.position === 'front') armor *= 1 + area.trait.frontArmorBonus;
+  // Szuwary: the back of the line hides in the reeds.
+  const dodgeBonus = character.position === 'back' ? (area?.trait.backDodgeBonus ?? 0) : 0;
   const cls = content.classesById[character.classId];
   const hpMax = maxHp(totals.vitality, character.level, balance);
   return {
@@ -35,7 +37,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     damageScale: damageScale(totals[weapon.scaling], character.level, balance),
     armor: Math.round(armor),
     resist: { ...bonuses.resist },
-    dodgeRating: totals.dexterity * balance.combat.dodgePerDexterity,
+    dodgeRating: totals.dexterity * balance.combat.dodgePerDexterity * (1 + dodgeBonus),
     critRating: totals.perception * balance.combat.critPerPerception,
     willRating: totals.will * balance.combat.willPerPoint,
     speed: speed(totals.dexterity, character.level, balance),
@@ -127,11 +129,16 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
       min: average * (1 - monster.attack.variance),
       max: average * (1 + monster.attack.variance),
       dot: monster.attack.dot,
+      // Ugrzęźnięcie and Wysysanie (combat.js).
+      slow: monster.attack.slow,
+      drain: monster.attack.drain,
     },
     scalingValue: stat(monster.attack.scaling),
     damageScale: damageScale(stat(monster.attack.scaling), level, balance),
     armor: Math.round(hide * balance.items.armorPerBudget * monster.armorFactor + stat('endurance') * balance.combat.armorPerEndurance),
     resist,
+    // More damage from these elements, e.g. { fire: 0.5 }: half as much again.
+    weak: monster.weaknesses,
     dodgeRating: stat('dexterity') * balance.combat.dodgePerDexterity,
     critRating: stat('perception') * balance.combat.critPerPerception,
     willRating: stat('will') * balance.combat.willPerPoint,

@@ -2370,3 +2370,36 @@ Autor: „Dodajmy też możliwość zamknięcia okna czatu miedzy uzytkownikami 
 ## Jedna aktualizacja dla potworów, Bestiariusza, Sklepu Systemu i Rzemieślnictwa (28.10.2026)
 
 Autor: „Niech Potwory, ulepszony Bestiariusz, Sklep Systemu i Rzemieślnictwo trafią w jednej aktualizacji”. Trafiły razem w 0.0.27. Nowe pająki Parowu przychodzą w następnej wersji.
+
+## Zarośnięte Rozlewiska i Torfowe Mszary (28.10.2026)
+
+Autor rozpisał stwory regionów Rozlewisk w dokumencie z propozycjami („Insight: nowe krainy, zioła i mikstury”), a potem: „ja dałem stwory tylko tam gdzie są lokacje, reszte uzupelnisz sam”.
+
+1. **Dwie krainy Torfowisk** (`data/regions.json`, `land` Torfowiska), każda z 5 regionami po 5 poziomów. Otwierają się jak wcześniejsze: region na poziomie klasy o jeden niższym niż jego pierwszy poziom, Trzcinowisko na 50.
+    - **Zarośnięte Rozlewiska** (51–75): Trzcinowisko, Bobrowe Tamy, Zatopiony Las, Wierzbowe Kępy, Stare Koryto. Elita to Topielica w całej krainie, czempion to Wodnik w Starym Korycie. Cecha „Szuwary”: postać z tyłu szyku ma o 5% więcej uniku (`backDodgeBonus`). Zasoby: drewno 4, kamień 2, ruda żelaza 4.
+    - **Torfowe Mszary** (76–100): Żurawie Łąki, Pijawkowe Oczka, Rosiczkowe Pole, Tlące się Torfy, Stare Wyrobisko. Elita to Kikimora w całej krainie, czempion to Błotnik w Starym Wyrobisku. Cecha „Opary torfu”: Zatrucie trwa o jeden ruch dłużej, u stworów i u postaci (`effectTicks`), więc zyskuje też Zatrute ostrze Cienia. Zasoby: drewno 2, kamień 3, ruda żelaza 5.
+2. **Stwory Rozlewisk** są z listy autora, a pozycje, ataki i materiały uzupełnione (rzadkość materiału w nawiasie):
+    - Trzcinowisko: Czapla (tył, Pchnięcie dziobem; Pióro czapli, rzadki), Wydra (przód, Ugryzienie wydry; Futro wydry, unikalny; też w Zatopionym Lesie), Komarzysko (tył, Kłujka z Wysysaniem; Kłujka komarzyska, pospolity), Trzcinownik (środek, Oplatające trzciny, magia natury z Ugrzęźnięciem; Splot trzcin, rzadki);
+    - Bobrowe Tamy: Bóbr (przód, Siekacze, gruby kożuch; Siekacze bobra, rzadki), Chmara komarów (tył, Ukąszenia z Zatruciem, po dwie i trzy; Komarze skrzydełka, pospolity), Węgorz (środek, Wyładowanie, magia elektryczności; Skóra węgorza, unikalny), Orzeł (tył, Szpony orła; Pióro orła, unikalny);
+    - Zatopiony Las: Kormoran (tył, Atak z nurkowania, mocny cios i mało HP; Pióro kormorana, rzadki), Sum (przód, Paszcza suma z Ugrzęźnięciem, dużo HP; Wąs suma, epicki), Ropucha (środek, Jad ropuchy, magia trucizny z Zatruciem; Jad ropuchy, unikalny), Krokodyl (przód, Szczęki krokodyla, twarda łuska; Skóra krokodyla, epicki);
+    - Wierzbowe Kępy: Wierzbowy duch (przód, Smagnięcie witkami, kora jak pancerz; Wierzbowa kora, unikalny), Zjawa (środek, Lodowaty dotyk, magia mrozu z Wysysaniem; Welon zjawy, epicki), Mgławica (tył, Duszące opary, magia trucizny z Zatruciem; Kropla mgły, rzadki);
+    - Stare Koryto: Szkielet (przód, Zardzewiały miecz, odporny na truciznę; Stara kość, rzadki), Utopiec (środek, Wciągnięcie pod wodę z Ugrzęźnięciem; Wodorosty utopca, unikalny), Szlamiarz (przód, Kwaśny szlam z Zatruciem, bardzo dużo HP; Grudka szlamu, pospolity), Błotny goblin (tył, Rzut błotem z daleka; Goblińska błyskotka, epicki);
+    - elita Topielica (środek, Zimny pocałunek, magia wody z Wychłodzeniem; Łza topielicy, mityczny) i czempion Wodnik (środek, Topiel, magia wody z Ugrzęźnięciem, odporny na wodę; Perła wodnika, boski).
+3. **Stwory Mszarów** są z dokumentu, ale każdy region musi mieć co najmniej dwa własne stwory (wpis „Potwory: co najmniej dwa własne stwory…”). Dlatego:
+    - doszły Rak (przód, Szczypce, gruby pancerz; Pancerz raka, rzadki) w Pijawkowych Oczkach, Salamandra (środek, Trujący śluz z Zatruciem; Skóra salamandry, unikalny) w Tlących się Torfach, a w Starym Wyrobisku Torfiarz (przód, Cios szpadlem, kopacz, którego bagno nie oddało; Szpadel torfiarza, epicki) i Czerw (środek, Kwaśna ślina z Zatruciem; Szczęka czerwia, unikalny);
+    - Pijawki są jedną Pijawką, bo zdania walki mają liczbę pojedynczą („Pijawka pada”); jest w pierwszych trzech regionach;
+    - Torfiak jest tylko w Rosiczkowym Polu, Łoś i Błotniak każdy w jednym regionie;
+    - Ognik ma grafikę ze starego szkicu Błędnicy (`art/spare`).
+   Reszta jak w dokumencie: Żuraw (tył, Dziób żurawia), Łoś (przód, Szarża łopatami), Pijawka (środek, Wysysanie), Błotniak (tył, Szpony z lotu), Bagienna rosiczka (przód, Lepkie czułki, magia natury z Ugrzęźnięciem), Torfiak (przód, Torfowa pięść, słaby na ogień), Ognik (tył, Płomyczek z Oparzeniem), Kikimora (elita, Bagienne zaklęcie z Zatruciem i Ugrzęźnięciem), Błotnik (czempion, Bagienny uścisk z Ugrzęźnięciem, ogromne HP).
+4. **Nowe działania w walce** (`combat.js`, pola w `monsters.json` opisane w `data/README.md`):
+    - **Ugrzęźnięcie** (`slow`): po trafieniu, z szansą zmniejszaną przez Wolę celu, następny ruch celu przychodzi później, 1 / (1 − `slow`) razy później, jak po Mroźnym podmuchu. W odtwarzaniu karta celu pokazuje „Ugrzęźnięcie”.
+    - **Wysysanie** (`drain`): stwór odzyskuje część obrażeń zadanych ciosem: Komarzysko i Pijawka 60%, Zjawa 40%. Odtwarzanie pokazuje zielone „+HP” nad stworem.
+    - **Słabość na żywioł** (`weaknesses`): Torfiak dostaje o połowę więcej obrażeń od ognia, z ciosów i z Oparzenia. Opis walki dopisuje „Słaby punkt (ogień): +50%.”.
+   Te działania losują liczby tylko u stworów, które je mają, więc walki w starych krainach się nie zmieniają.
+5. **Nazwy przedmiotów.** Każdy nowy stwór ma końcówkę w nazwach przedmiotów, a wiele także przymiotnik (np. „Kościany”, „Bagienny”, „Mglisty”). W każdym regionie żyje stwór z przymiotnikiem.
+6. **Równowaga** (symulacja: 100–150 wypraw na wiersz, 5 klas, postać typowa i mocna):
+    - wyprawy 30-minutowe: omdlenia 0–2% w każdym regionie;
+    - wyprawy 2-godzinne: postać typowa (bez umiejętności i mikstur) mdleje do 8% w Rosiczkowym Polu i do 6% w Starym Wyrobisku, a mocna najwyżej 1,3%;
+    - czas na poziom zgadza się z krzywą w granicach ok. 4%. Nagrody stworów są dobrane do regionów, np. w Rosiczkowym Polu o jedną czwartą mniejsze, bo walki z rosiczkami i torfiakami dawały za dużo XP.
+7. **Skrzynie Bestiariusza** rosną dalej po krzywej: od Trzcinowiska (680 złota, 105 Punktów Czasu, 20 Punktów Systemu) do Starego Wyrobiska (1475, 195, 20). Skrzynie krain: Rozlewiska 1270 złota, 181 Punktów Czasu i 25 Punktów Systemu, Mszary 1845, 244 i 25.
+8. **Grafiki i okrzyki.** Z Retro Diffusion jest po jednym szkicu każdego stwora (33), ikony materiału (34), koła regionu (10) i tła krainy (2), pokazywane autorowi pojedynczo. Okrzyki (ElevenLabs) mają po dwie wersje bólu i śmierci. Wypchnięcie samych opisów szkiców (`art/`, `audio/`) nie uruchamia już testów i wdrożenia, tak jak same notatki.

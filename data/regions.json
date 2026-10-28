@@ -214,5 +214,235 @@
         "champion": "basilisk"
       }
     ]
+  },
+  {
+    "id": "backwaters",
+    "land": "Torfowiska",
+    "name": "Zarośnięte Rozlewiska",
+    "minLevel": 51,
+    "maxLevel": 75,
+    "safe": false,
+    "description": "Dolina, w której stara rzeka zgubiła koryto i rozlała się po lesie. Czaple, bobry, sumy i krokodyle, a we mgle topielice i wodnik.",
+    "trait": {
+      "name": "Szuwary",
+      "description": "Postać z tyłu szyku ma o 5% więcej uniku, bo kryje się w trzcinach.",
+      "backDodgeBonus": 0.05
+    },
+    "elite": "drowned-maiden",
+    "resources": { "wood": 4, "stone": 2, "iron-ore": 4 },
+    "areas": [
+      {
+        "id": "reed-beds",
+        "name": "Trzcinowisko",
+        "minLevel": 51,
+        "maxLevel": 55,
+        "description": "Pas trzcin nad pierwszą wodą. Czaple brodzą w płyciźnie, ścieżki w trzcinach wydeptały wydry, a nad wodą brzęczą komarzyska. Niektóre kępy trzcin chodzą same.",
+        "encounters": [
+          { "weight": 18, "monsters": ["otter"] },
+          { "weight": 14, "monsters": ["heron"] },
+          { "weight": 14, "monsters": ["reedling"] },
+          { "weight": 12, "monsters": ["otter", "heron"] },
+          { "weight": 10, "monsters": ["giant-mosquito", "giant-mosquito"] },
+          { "weight": 10, "monsters": ["reedling", "giant-mosquito"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["otter", "otter", "heron"] },
+          { "weight": 6, "monsters": ["reedling", "giant-mosquito", "giant-mosquito"] },
+          { "weight": 6, "monsters": ["otter", "reedling"] }
+        ]
+      },
+      {
+        "id": "beaver-dams",
+        "name": "Bobrowe Tamy",
+        "minLevel": 56,
+        "maxLevel": 60,
+        "description": "Bobry zatamowały strumienie i zalały las. Bronią żeremi, nad wodą wiszą chmary komarów, w mule kryją się węgorze, a z martwych drzew wypatruje orzeł.",
+        "encounters": [
+          { "weight": 18, "monsters": ["beaver"] },
+          { "weight": 14, "monsters": ["mosquitoes", "mosquitoes"] },
+          { "weight": 14, "monsters": ["eel"] },
+          { "weight": 12, "monsters": ["beaver", "eagle"] },
+          { "weight": 10, "monsters": ["eagle"] },
+          { "weight": 8, "monsters": ["eel", "mosquitoes"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["beaver", "beaver", "eagle"] },
+          { "weight": 6, "monsters": ["mosquitoes", "mosquitoes", "mosquitoes"] },
+          { "weight": 6, "monsters": ["beaver", "eel", "mosquitoes"] }
+        ]
+      },
+      {
+        "id": "drowned-forest",
+        "name": "Zatopiony Las",
+        "minLevel": 61,
+        "maxLevel": 65,
+        "description": "Martwe drzewa stoją po kolana w wodzie. Na suchych gałęziach siedzą kormorany, w cieniu pni czai się sum, a to, co wygląda na kłodę, bywa krokodylem.",
+        "encounters": [
+          { "weight": 16, "monsters": ["catfish"] },
+          { "weight": 14, "monsters": ["toad"] },
+          { "weight": 12, "monsters": ["cormorant", "cormorant"] },
+          { "weight": 10, "monsters": ["otter", "toad"] },
+          { "weight": 10, "monsters": ["crocodile"] },
+          { "weight": 10, "monsters": ["catfish", "cormorant"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["crocodile", "cormorant"] },
+          { "weight": 6, "monsters": ["catfish", "toad", "cormorant"] },
+          { "weight": 6, "monsters": ["crocodile", "otter"] }
+        ]
+      },
+      {
+        "id": "willow-isles",
+        "name": "Wierzbowe Kępy",
+        "minLevel": 66,
+        "maxLevel": 70,
+        "description": "Wyspy starych wierzb we mgle. Między pniami snują się zjawy i mgławice, w koronach szumią wierzbowe duchy, a nocą po wodzie tańczy topielica.",
+        "encounters": [
+          { "weight": 18, "monsters": ["willow-spirit"] },
+          { "weight": 16, "monsters": ["wraith"] },
+          { "weight": 12, "monsters": ["mistling", "mistling"] },
+          { "weight": 12, "monsters": ["willow-spirit", "mistling"] },
+          { "weight": 10, "monsters": ["wraith", "mistling"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["willow-spirit", "wraith", "mistling"] },
+          { "weight": 6, "monsters": ["wraith", "wraith"] },
+          { "weight": 6, "monsters": ["willow-spirit", "willow-spirit"] }
+        ]
+      },
+      {
+        "id": "old-riverbed",
+        "name": "Stare Koryto",
+        "minLevel": 71,
+        "maxLevel": 75,
+        "description": "Dawne koryto rzeki, głębokie i ciemne. W mule leżą kości, z wody wychodzą utopce i szlamiarze, a błotne gobliny zbierają wszystko, co błyszczy. Mieszka tu wodnik, który trzyma w dzbanach dusze utopionych.",
+        "encounters": [
+          { "weight": 16, "monsters": ["skeleton"] },
+          { "weight": 14, "monsters": ["drowner"] },
+          { "weight": 12, "monsters": ["sludger"] },
+          { "weight": 12, "monsters": ["mud-goblin", "mud-goblin"] },
+          { "weight": 10, "monsters": ["skeleton", "mud-goblin"] },
+          { "weight": 8, "monsters": ["drowner", "sludger"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["skeleton", "skeleton", "mud-goblin"] },
+          { "weight": 6, "monsters": ["drowner", "sludger", "mud-goblin"] },
+          { "weight": 6, "monsters": ["sludger", "skeleton"] }
+        ],
+        "champion": "water-spirit"
+      }
+    ]
+  },
+  {
+    "id": "peat-bogs",
+    "land": "Torfowiska",
+    "name": "Torfowe Mszary",
+    "minLevel": 76,
+    "maxLevel": 100,
+    "safe": false,
+    "description": "Woda zarosła tu mchem, a nad torfem stoją opary. Żurawie, łosie, pijawki i rosiczki, a między kępami ogniki, kikimora i błotnik.",
+    "trait": {
+      "name": "Opary torfu",
+      "description": "Zatrucie trwa o jeden ruch dłużej, u stworów i u postaci.",
+      "effectTicks": { "poisoned": 1 }
+    },
+    "elite": "kikimora",
+    "resources": { "wood": 2, "stone": 3, "iron-ore": 5 },
+    "areas": [
+      {
+        "id": "crane-meadows",
+        "name": "Żurawie Łąki",
+        "minLevel": 76,
+        "maxLevel": 80,
+        "description": "Otwarte mszary, na których tańczą żurawie. Pod mchem stoi woda, więc każdy krok się zapada, a łosie brodzą tu po pierś.",
+        "encounters": [
+          { "weight": 18, "monsters": ["elk"] },
+          { "weight": 14, "monsters": ["crane", "crane"] },
+          { "weight": 14, "monsters": ["leech"] },
+          { "weight": 12, "monsters": ["elk", "crane"] },
+          { "weight": 10, "monsters": ["leech", "crane"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["elk", "crane", "crane"] },
+          { "weight": 6, "monsters": ["elk", "leech"] },
+          { "weight": 4, "monsters": ["elk", "elk"] }
+        ]
+      },
+      {
+        "id": "leech-pools",
+        "name": "Pijawkowe Oczka",
+        "minLevel": 81,
+        "maxLevel": 85,
+        "description": "Okna czarnej wody w torfie, pełne pijawek i raków. Nad nimi krąży błotniak.",
+        "encounters": [
+          { "weight": 16, "monsters": ["leech"] },
+          { "weight": 16, "monsters": ["crayfish"] },
+          { "weight": 12, "monsters": ["harrier"] },
+          { "weight": 12, "monsters": ["leech", "harrier"] },
+          { "weight": 10, "monsters": ["crayfish", "leech"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["crayfish", "leech", "harrier"] },
+          { "weight": 6, "monsters": ["leech", "leech", "harrier"] },
+          { "weight": 6, "monsters": ["crayfish", "crayfish"] }
+        ]
+      },
+      {
+        "id": "sundew-field",
+        "name": "Rosiczkowe Pole",
+        "minLevel": 86,
+        "maxLevel": 90,
+        "description": "Mech czerwony od rosiczek, które łowią owady. Między kępami kroczą torfiaki, a od oparów kręci się w głowie.",
+        "encounters": [
+          { "weight": 16, "monsters": ["sundew"] },
+          { "weight": 16, "monsters": ["peatling"] },
+          { "weight": 12, "monsters": ["sundew", "leech"] },
+          { "weight": 12, "monsters": ["peatling", "leech"] },
+          { "weight": 8, "monsters": ["leech", "leech"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["sundew", "peatling", "leech"] },
+          { "weight": 6, "monsters": ["peatling", "peatling"] },
+          { "weight": 6, "monsters": ["sundew", "sundew", "leech"] }
+        ]
+      },
+      {
+        "id": "smoldering-peat",
+        "name": "Tlące się Torfy",
+        "minLevel": 91,
+        "maxLevel": 95,
+        "description": "Pod ziemią tli się torf, a z dziur bije dym. Nocą między kępami wędrują ogniki, a w ciepłym popiele grzeją się salamandry.",
+        "encounters": [
+          { "weight": 18, "monsters": ["salamander"] },
+          { "weight": 14, "monsters": ["will-o-wisp", "will-o-wisp"] },
+          { "weight": 14, "monsters": ["salamander", "will-o-wisp"] },
+          { "weight": 10, "monsters": ["will-o-wisp"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["salamander", "salamander", "will-o-wisp"] },
+          { "weight": 6, "monsters": ["will-o-wisp", "will-o-wisp", "will-o-wisp"] },
+          { "weight": 6, "monsters": ["salamander", "salamander"] }
+        ]
+      },
+      {
+        "id": "old-diggings",
+        "name": "Stare Wyrobisko",
+        "minLevel": 96,
+        "maxLevel": 100,
+        "description": "Opuszczona kopalnia torfu z kładkami z bali. Wciąż kopią tu torfiarze, których bagno nie oddało, w ścianach drążą czerwie, a na dnie wyrobiska ożywa sam torf.",
+        "encounters": [
+          { "weight": 18, "monsters": ["peat-cutter"] },
+          { "weight": 14, "monsters": ["bog-worm"] },
+          { "weight": 14, "monsters": ["peat-cutter", "bog-worm"] },
+          { "weight": 10, "monsters": ["bog-worm", "bog-worm"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["peat-cutter", "peat-cutter", "bog-worm"] },
+          { "weight": 6, "monsters": ["bog-worm", "bog-worm", "bog-worm"] },
+          { "weight": 6, "monsters": ["peat-cutter", "peat-cutter"] }
+        ],
+        "champion": "mud-lord"
+      }
+    ]
   }
 ]

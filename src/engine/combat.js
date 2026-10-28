@@ -18,6 +18,13 @@
 // A character may carry potions (potions.js): a healing one is drunk the
 // moment HP falls below the player's mark, a mana one when a skill lacks
 // mana, each kind at most once a fight. Potions draw no random numbers.
+//
+// A monster's blow may also mire its target (`slow`: Ugrzęźnięcie puts off
+// its next move, as a skill's slow does), heal the monster by a share of the
+// damage (`drain`: Wysysanie), and a monster may take more damage from an
+// element (`weak`). The place's trait may make an effect last longer
+// (`effectTicks`: Opary torfu). These draw random numbers only for a monster
+// that has them, so fights elsewhere stay as they were.
 
 import { cappedChance, reduction } from './formulas.js';
 import { ACTIVE_KINDS, START_KINDS, WOUND_KINDS } from './skills.js';
@@ -88,7 +95,7 @@ function marksOf(move) {
   return marks;
 }
 
-export function simulateFight({ allies, enemies, rng, content, record = false }) {
+export function simulateFight({ allies, enemies, rng, content, record = false, trait = null }) {
   const balance = content.balance;
   const tuning = balance.combat;
   const texts = content.texts;
@@ -220,7 +227,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
     for (const dot of unit.dots) {
       if (unit.hp <= 0) break;
       const resisted = reduction(unit.resist[dot.element] ?? 0, dot.sourceLevel, balance);
-      const raw = Math.max(1, Math.round(dot.perTick * (1 - resisted)));
+      const raw = Math.max(1, Math.round(dot.perTick * (1 - resisted) * (1 + (unit.weak?.[dot.element] ?? 0))));
       const absorbed = unit.shield ? absorb(unit, raw) : 0;
       const amount = raw - absorbed;
       damage(unit, amount, dot.source);
@@ -268,9 +275,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
     if (!rng.chance(dot.chance * (1 - resisted))) return;
     const effect = content.effectsById[dot.effect];
     const perTick = Math.max(1, Math.round(raw * dot.power));
+    const ticks = dot.ticks + (trait?.effectTicks?.[effect.id] ?? 0);
     const active = target.dots.find((each) => each.effect === effect.id);
     if (active) {
-      active.ticks = Math.max(active.ticks, dot.ticks);
+      active.ticks = Math.max(active.ticks, ticks);
       active.perTick = Math.max(active.perTick, perTick);
     } else {
       target.dots.push({
@@ -278,12 +286,23 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
         name: effect.name,
         element: effect.element,
         perTick,
-        ticks: dot.ticks,
+        ticks,
         sourceLevel: actor.level,
         source: actor.id,
       });
     }
     log(() => ({ t, kind: 'effect', actor: actor.id, target: target.id, effect: effect.name, element: effect.element, hp: target.hp, text: say(texts, 'effectApplied', actions, { ...vars, effect: effect.name }) }));
+  };
+
+  // A blow that mires (Ugrzęźnięcie): the target's Will may keep it off, as
+  // with an effect over time; otherwise its next move comes later, 1 / (1 -
+  // slow) times as late, as after a skill's slow.
+  const applySlow = (actor, target, slow, t, vars) => {
+    const resisted = cappedChance(target.willRating, actor.level, tuning.willCap, balance);
+    if (!rng.chance(slow.chance * (1 - resisted))) return;
+    const effect = content.effectsById[slow.effect];
+    target.next += (slow.slow / (1 - slow.slow)) * target.interval;
+    log(() => ({ t, kind: 'slow', actor: actor.id, targets: [target.id], effect: effect.name, element: effect.element, text: say(texts, 'mired', actions, { ...vars, effect: effect.name }) }));
   };
 
   // One blow, plain or shaped by a skill (`move`): its power, the share of
@@ -310,7 +329,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
     const raw = rng.float(weapon.min, weapon.max) * actor.damageScale * (move.power ?? 1) * (actor.damageBonus ? 1 + actor.damageBonus : 1);
     const critical = move.alwaysCrit || rng.chance(Math.min(1, cappedChance(actor.critRating, target.level, tuning.critCap, balance) + (move.critBonus ?? 0)));
     const defense = category === 'physical' ? target.armor * (1 - (move.armorIgnore ?? 0)) : (target.resist[element] ?? 0);
-    let amount = Math.max(1, Math.round(raw * (critical ? tuning.critMultiplier : 1) * (1 - reduction(defense, actor.level, balance))));
+    const weak = (element && target.weak?.[element]) || 0;
+    let amount = Math.max(1, Math.round(raw * (critical ? tuning.critMultiplier : 1) * (1 - reduction(defense, actor.level, balance)) * (1 + weak)));
     const absorbed = target.shield ? absorb(target, amount) : 0;
     amount -= absorbed;
     damage(target, amount, actor.id);
@@ -325,8 +345,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
       shield: shieldLeft(target),
       hp: target.hp,
       ...marks,
-      text: say(texts, wordsFor(kind, move), actions, { ...vars, damage: amount }) + (absorbed ? ` ${say(texts, 'absorbed', actions, { absorbed })}` : ''),
+      text:
+        say(texts, wordsFor(kind, move), actions, { ...vars, damage: amount }) +
+        (weak ? ` ${say(texts, 'weakness', actions, { element: content.elementsById[element].name, percent: Math.round(weak * 100) })}` : '') +
+        (absorbed ? ` ${say(texts, 'absorbed', actions, { absorbed })}` : ''),
     }));
+    // Wysysanie: the monster heals by a share of what the blow took.
+    if (weapon.drain && !move.counter) {
+      const healed = heal(actor, amount * weapon.drain);
+      if (healed > 0) log(() => ({ t, kind: 'drain', actor: actor.id, target: actor.id, amount: healed, hp: actor.hp, text: say(texts, 'drain', actions, { actor: actor.name, amount: healed }) }));
+    }
     if (target.hp === 0) {
       log(() => ({ t, kind: 'kill', target: target.id, hp: 0, text: say(texts, 'kill', actions, vars) }));
       return;
@@ -334,6 +362,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false })
 
     const dot = move.dot ?? weapon.dot;
     if (dot) applyDot(actor, target, dot, raw, t, vars);
+    if (weapon.slow && !move.counter) applySlow(actor, target, weapon.slow, t, vars);
     if (move.stun || (move.stunChance && rng.chance(move.stunChance))) {
       target.next += target.interval;
       log(() => ({ t, kind: 'stun', target: target.id, label: move.stunLabel, hp: target.hp, ...marks, text: say(texts, 'stun', actions, vars) }));

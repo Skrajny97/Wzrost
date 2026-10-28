@@ -481,6 +481,70 @@ describe('combat', () => {
     assert.ok(Math.abs(reduction(140, 5, content.balance) - 0.5) < 1e-9);
     assert.ok(reduction(1e9, 1, content.balance) < 1);
   });
+
+  // The swamps' effects: Ugrzęźnięcie, Wysysanie, a weakness, and the traits
+  // of Szuwary and Opary torfu.
+  const swampFight = (seed, classId, level, monsterId, { trait = null, sure = false } = {}) => {
+    const { character, equipped } = typicalCharacter(classId, level, content);
+    const player = { ...playerCombatant({ character, equipped, name: 'Mira' }, content), willRating: 0 };
+    const enemy = monsterCombatant({ monsterId, level, id: 'e0' }, content);
+    const weapon = sure && enemy.weapon.slow ? { ...enemy.weapon, slow: { ...enemy.weapon.slow, chance: 1 } } : enemy.weapon;
+    return simulateFight({ allies: [player], enemies: [{ ...enemy, weapon, maxHp: 50000, hp: 50000 }], rng: createRng(seed), content, record: true, trait });
+  };
+
+  test('a miring blow (Ugrzęźnięcie) puts off the next move of the one it hits', () => {
+    const result = swampFight('grzęzawisko', 'warrior', 88, 'sundew', { sure: true });
+    const mired = result.events.filter((event) => event.kind === 'slow' && event.effect === 'Ugrzęźnięcie');
+    assert.ok(mired.length > 0);
+    assert.deepEqual(mired[0].targets, ['a0']);
+    // The sundew moves more often than the mired warrior would let it otherwise.
+    const free = swampFight('grzęzawisko', 'warrior', 88, 'peatling');
+    const moves = (fight, id) => fight.events.filter((event) => event.actor === id && (event.kind === 'hit' || event.kind === 'crit' || event.kind === 'dodge')).length;
+    assert.ok(moves(result, 'e0') / Math.max(1, moves(result, 'a0')) > moves(free, 'e0') / Math.max(1, moves(free, 'a0')));
+  });
+
+  test('a draining blow (Wysysanie) heals the monster by a share of the damage', () => {
+    const result = swampFight('pijawki', 'warrior', 82, 'leech');
+    const drains = result.events.filter((event) => event.kind === 'drain');
+    assert.ok(drains.length > 0);
+    // Each drain follows the leech's own blow and gives back at most 60% of it.
+    for (const drain of drains) {
+      const blow = result.events[result.events.indexOf(drain) - 1];
+      assert.equal(blow.actor, 'e0');
+      assert.ok(drain.amount <= Math.round(blow.damage * 0.6));
+      assert.match(drain.text, /Pijawka/);
+    }
+  });
+
+  test('the Torfiak takes half as much again from fire, from blows and burns', () => {
+    const result = swampFight('torf', 'mage', 88, 'peatling');
+    const fireHits = result.events.filter((event) => (event.kind === 'hit' || event.kind === 'crit') && event.actor === 'a0' && /Słaby punkt \(ogień\): \+50%/.test(event.text));
+    assert.ok(fireHits.length > 0);
+    // Without the weakness the same fight's first fire blow is two thirds as strong.
+    const plain = simulateFight({
+      allies: [{ ...playerCombatant({ ...typicalCharacter('mage', 88, content), name: 'Mira' }, content), willRating: 0 }],
+      enemies: [{ ...monsterCombatant({ monsterId: 'peatling', level: 88, id: 'e0' }, content), weak: undefined, maxHp: 50000, hp: 50000 }],
+      rng: createRng('torf'),
+      content,
+      record: true,
+    });
+    const first = (fight) => fight.events.find((event) => (event.kind === 'hit' || event.kind === 'crit') && event.actor === 'a0').damage;
+    assert.ok(Math.abs(first(result) / first(plain) - 1.5) < 0.02, `${first(result)} / ${first(plain)}`);
+  });
+
+  test('Opary torfu make a poison last one move longer, and Szuwary hide the back of the line', () => {
+    const peat = content.regionsById['peat-bogs'].trait;
+    const ticksLeft = (fight) => fight.events.find((event) => event.kind === 'tick' && event.effect === 'Zatrucie')?.left;
+    const plain = swampFight('opary', 'warrior', 92, 'salamander');
+    const fumes = swampFight('opary', 'warrior', 92, 'salamander', { trait: peat });
+    assert.equal(ticksLeft(fumes), ticksLeft(plain) + 1);
+    const { character, equipped } = typicalCharacter('archer', 53, content);
+    const reeds = content.areasById['reed-beds'];
+    const back = (area) => playerCombatant({ character: { ...character, position: 'back' }, equipped, name: 'Mira', area }, content).dodgeRating;
+    assert.ok(Math.abs(back(reeds) / back(content.areasById['glade-heart']) - 1.05) < 1e-9);
+    const front = playerCombatant({ character: { ...character, position: 'front' }, equipped, name: 'Mira', area: reeds }, content).dodgeRating;
+    assert.ok(Math.abs(front / back(content.areasById['glade-heart']) - 1) < 1e-9);
+  });
 });
 
 describe('hunts', () => {
@@ -703,7 +767,7 @@ describe('inner regions', () => {
     }
     // Wiatrołomy: Błędnica in the first three inner regions, Płanetnik deeper.
     assert.deepEqual(content.regionsById.windfalls.areas.map((area) => area.elite), ['wisp', 'wisp', 'wisp', 'planetnik', 'planetnik']);
-    assert.deepEqual(content.regions.map((region) => region.areas.at(-1).champion), ['tusker', 'basilisk']);
+    assert.deepEqual(content.regions.map((region) => region.areas.at(-1).champion), ['tusker', 'basilisk', 'water-spirit', 'mud-lord']);
   });
 
   test('Uroczysko Kamieni has its own creatures, none from Wiatrołomy', () => {
@@ -951,7 +1015,7 @@ describe('tutorial unlocks', () => {
   });
 
   test('an inner region opens when the class reaches the level before its lowest one', () => {
-    assert.deepEqual(content.areas.map((area) => areaUnlockLevel(area, content)), [1, 5, 10, 15, 20, 25, 30, 35, 40, 45]);
+    assert.deepEqual(content.areas.map((area) => areaUnlockLevel(area, content)), [1, ...Array.from({ length: 19 }, (_, i) => 5 * (i + 1))]);
     // A class at level 5 may go to the places of levels 1–5 and 6–10, not further.
     const open = content.areas.filter((area) => areaUnlocked(area, 5, content)).map((area) => area.id);
     assert.deepEqual(open, ['windfalls-edge', 'fox-ravines']);
@@ -1865,8 +1929,7 @@ describe('Bestiariusz', () => {
       }
       for (const area of region.areas) {
         const own = areaDangers(area, content).filter((danger) => homes.get(danger.monsterId).length === 1);
-        // Pajęczy Parów waits for a new creature: the krzyżak alone is its own.
-        assert.ok(own.length >= (area.id === 'spider-gully' ? 1 : 2), `${area.id}: ${own.map((danger) => danger.monsterId)}`);
+        assert.ok(own.length >= 2, `${area.id}: ${own.map((danger) => danger.monsterId)}`);
       }
     }
   });
@@ -2040,7 +2103,7 @@ describe('quests from the narrator', () => {
     assert.deepEqual(new Set(asked(newCharacter('warrior'), 'weekly')), new Set([2, 3]));
     // Near the last inner region of the game a week asks for no more than are left.
     const always = { ...content, quests: { ...content.quests, kinds: content.quests.kinds.map((kind) => (kind.id === 'unlock' ? { ...kind, untilClassLevel: 100 } : kind)) } };
-    assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 42, classLevel: 42 }), 'weekly', always)), new Set([1]));
+    assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 92, classLevel: 92 }), 'weekly', always)), new Set([1]));
     // Only while new.
     assert.ok(asked(newCharacter('warrior', { level: 20, classLevel: unlock.untilClassLevel - 1 }), 'daily').length > 0);
     assert.deepEqual(asked(newCharacter('warrior', { level: 30, classLevel: unlock.untilClassLevel }), 'daily'), []);
@@ -2073,7 +2136,7 @@ describe('quests from the narrator', () => {
     assert.deepEqual(kinds(behind), ['explore', 'process', 'salvage', 'unlock']);
     assert.ok(kinds({ ...behind, level: 18 }).includes('kill'));
     // Past every place of the game the same.
-    assert.ok(!kinds(newCharacter('archer', { level: 60, classLevel: 69 })).includes('kill'));
+    assert.ok(!kinds(newCharacter('archer', { level: 110, classLevel: 119 })).includes('kill'));
   });
 
   test('a quest asks for as many creatures as its fights bring, and rare ones only for the week', () => {

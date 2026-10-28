@@ -81,6 +81,17 @@
     "{target} zwalnia.",
     "{target} rusza się wolniej."
   ],
+  "mired": [
+    "{target} grzęźnie i zwalnia.",
+    "{effect}: {target} rusza się wolniej."
+  ],
+  "drain": [
+    "{actor} wysysa {amount} HP.",
+    "{actor} odzyskuje {amount} HP z rany."
+  ],
+  "weakness": [
+    "Słaby punkt ({element}): +{percent}%."
+  ],
   "absorbed": [
     "Osłona pochłania {absorbed}.",
     "Osłona bierze na siebie {absorbed}."

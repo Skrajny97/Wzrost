@@ -282,8 +282,14 @@ function checkReferences(data) {
     if (monster.attack.dot && !effects.has(monster.attack.dot.effect)) {
       errors.push(`monsters.json: ${monster.id} nakłada nieznany efekt "${monster.attack.dot.effect}"`);
     }
+    if (monster.attack.slow && !effects.has(monster.attack.slow.effect)) {
+      errors.push(`monsters.json: ${monster.id} spowalnia nieznanym efektem "${monster.attack.slow.effect}"`);
+    }
     for (const element of Object.keys(monster.resistances ?? {})) {
       if (!elements.has(element)) errors.push(`monsters.json: ${monster.id} ma odporność na nieznany żywioł "${element}"`);
+    }
+    for (const element of Object.keys(monster.weaknesses ?? {})) {
+      if (!elements.has(element)) errors.push(`monsters.json: ${monster.id} ma słabość na nieznany żywioł "${element}"`);
     }
   }
 

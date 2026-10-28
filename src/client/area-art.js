@@ -147,6 +147,96 @@ ${[[33, 100], [51, 100], [69, 100], [87, 100], [42, 84], [60, 84], [78, 84], [51
 <path d="M8 86 q3 -2 6 0 M32 90 q4 -3 9 0 M79 88 q4 -3 9 0 M104 86 q3 -2 7 0" stroke="#7d9a5a" stroke-width="1.6" fill="none" stroke-linecap="round"></path>
 <path d="M60 88 C58 80 62 74 60 66 M56 86 C55 82 57 78 56 74 M64 86 C65 82 63 79 64 75" stroke="#8fe3ef" stroke-width="0.8" fill="none" opacity="0.5"></path>
 <circle cx="52" cy="62" r="1" fill="#8fe3ef"></circle><circle cx="66" cy="56" r="1.2" fill="#8fe3ef"></circle><circle cx="60" cy="48" r="0.8" fill="#8fe3ef"></circle>`,
+
+  // Zarośnięte Rozlewiska: reeds over the first water, with a heron.
+  'reed-beds': `${SKY}
+<path d="M0 78 H120 V120 H0 Z" fill="#1d2f36"></path>
+<path d="M8 86 h26 M50 96 h30 M86 84 h24 M20 106 h40" stroke="#2c4650" stroke-width="1.4" stroke-linecap="round"></path>
+<path d="M10 80 V44 M16 80 V36 M22 80 V48 M98 80 V40 M104 80 V32 M110 80 V46" stroke="#5f7a3f" stroke-width="1.6" fill="none"></path>
+<ellipse cx="16" cy="40" rx="2" ry="5" fill="#6b4a2c"></ellipse><ellipse cx="104" cy="36" rx="2" ry="5" fill="#6b4a2c"></ellipse>
+<path d="M58 92 L60 70 M64 92 L62 70" stroke="${LINE}" stroke-width="1.2"></path>
+<path d="M50 70 C50 60 60 56 70 60 C74 62 74 68 68 70 Z" fill="#8a8f8c" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M68 61 C70 52 70 46 74 42 L90 44 L75 46 C73 50 73 56 72 62" fill="#8a8f8c" stroke="${LINE}" stroke-width="0.8"></path>`,
+
+  // Bobrowe Tamy: a dam of logs holding back the flood, mosquitoes above.
+  'beaver-dams': `${SKY}
+<path d="M0 70 H120 V120 H0 Z" fill="#1d2f36"></path>
+<path d="M0 92 L120 84 L120 98 L0 106 Z" fill="#4a3d2c" stroke="${LINE}" stroke-width="1"></path>
+<path d="M6 96 l24 -2 M40 93 l30 -2 M80 90 l30 -2 M12 102 l40 -3 M64 99 l44 -3" stroke="#6b5a3e" stroke-width="2" stroke-linecap="round"></path>
+<path d="M78 84 Q90 62 104 84 Z" fill="#3a2e22" stroke="${LINE}" stroke-width="1"></path>
+<path d="M0 108 H120 V120 H0 Z" fill="#172a31"></path>
+<circle cx="30" cy="40" r="1" fill="${LINE}"></circle><circle cx="36" cy="36" r="1" fill="${LINE}"></circle><circle cx="34" cy="44" r="1" fill="${LINE}"></circle><circle cx="42" cy="40" r="1" fill="${LINE}"></circle><circle cx="38" cy="48" r="1" fill="${LINE}"></circle>`,
+
+  // Zatopiony Las: dead trees knee-deep in water, a cormorant on a branch.
+  'drowned-forest': `${NIGHT}
+<path d="M0 74 H120 V120 H0 Z" fill="#1a2a30"></path>
+<path d="M26 98 V30 M26 52 l-10 -10 M26 62 l9 -8 M84 96 V24 M84 44 l12 -10 M84 58 l-10 -8 M56 102 V54 M56 66 l7 -6" stroke="#4a4d45" stroke-width="3.5" fill="none" stroke-linecap="round"></path>
+<path d="M14 100 h24 M72 98 h26 M46 104 h22" stroke="#2c4650" stroke-width="1.4" stroke-linecap="round"></path>
+<path d="M92 30 C92 24 98 22 101 26 L106 25 L102 28 C102 32 98 34 95 34 Z" fill="#0d110b" stroke="${LINE}" stroke-width="0.8"></path>
+<ellipse cx="60" cy="112" rx="20" ry="4" fill="#0d1418"></ellipse>`,
+
+  // Wierzbowe Kępy: willow islands in the fog, a pale maiden over the water.
+  'willow-isles': `${NIGHT}
+<path d="M0 80 H120 V120 H0 Z" fill="#1a2a30"></path>
+<ellipse cx="28" cy="82" rx="24" ry="6" fill="#141b11"></ellipse><ellipse cx="96" cy="86" rx="22" ry="5" fill="#141b11"></ellipse>
+<path d="M28 80 V52 M28 54 C18 56 14 66 12 78 M28 54 C38 56 42 66 44 78 M28 58 C22 62 20 70 20 78 M28 58 C34 62 36 70 36 78" stroke="#3b4a30" stroke-width="2" fill="none" stroke-linecap="round"></path>
+<path d="M96 84 V60 M96 62 C88 64 84 72 82 82 M96 62 C104 64 108 72 110 82" stroke="#3b4a30" stroke-width="2" fill="none" stroke-linecap="round"></path>
+<path d="M60 100 C54 92 56 78 60 72 C64 78 66 92 60 100 Z" fill="#c9d6dc" opacity="0.55"></path>
+<circle cx="60" cy="70" r="3" fill="#c9d6dc" opacity="0.7"></circle>
+<path d="M0 66 Q30 60 60 66 T120 64" stroke="#c9d6dc" stroke-width="5" fill="none" opacity="0.12"></path>`,
+
+  // Stare Koryto: a deep old riverbed, bones in the mud, a glowing jar.
+  'old-riverbed': `${NIGHT}
+<path d="M0 40 Q30 60 34 120 H0 Z M120 40 Q90 60 86 120 H120 Z" fill="#2b2219"></path>
+<path d="M34 120 Q36 70 60 64 Q84 70 86 120 Z" fill="#162228"></path>
+<path d="M14 92 l12 4 M16 98 l8 -6 M100 96 l-10 4" stroke="#d8cfb6" stroke-width="2" stroke-linecap="round"></path>
+<circle cx="13" cy="91" r="2" fill="#d8cfb6"></circle><circle cx="27" cy="97" r="2" fill="#d8cfb6"></circle>
+<path d="M52 110 C50 100 54 94 60 94 C66 94 70 100 68 110 Z" fill="#6b4a2c" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M56 94 h8" stroke="${LINE}" stroke-width="1.2"></path>
+<circle cx="60" cy="102" r="3" fill="#8fe3ef" opacity="0.6"></circle>`,
+
+  // Torfowe Mszary: open moss with dancing cranes.
+  'crane-meadows': `${SKY}
+<path d="M0 74 Q60 66 120 74 V120 H0 Z" fill="#3a4428"></path>
+<ellipse cx="28" cy="100" rx="14" ry="4" fill="#1a2a30"></ellipse><ellipse cx="92" cy="108" rx="12" ry="3.5" fill="#1a2a30"></ellipse>
+<path d="M58 96 L56 80 M62 96 L64 80" stroke="${LINE}" stroke-width="1.1"></path>
+<path d="M50 80 C50 70 62 66 70 72 C72 76 68 80 64 80 Z" fill="#9a9e98" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M66 72 C68 60 68 54 66 48 L70 46 L72 50 C70 56 70 64 70 72" fill="#9a9e98" stroke="${LINE}" stroke-width="0.8"></path>
+<circle cx="69" cy="47" r="1.2" fill="#c0392b"></circle>
+<path d="M40 70 Q30 56 34 46 M76 70 Q86 56 88 46" stroke="#9a9e98" stroke-width="1.4" fill="none"></path>`,
+
+  // Pijawkowe Oczka: black pools in the peat, a harrier circling above.
+  'leech-pools': `${SKY}
+<path d="M0 70 Q60 62 120 70 V120 H0 Z" fill="#33301f"></path>
+<ellipse cx="34" cy="90" rx="18" ry="6" fill="#0d1418" stroke="#5f7a3f" stroke-width="1"></ellipse>
+<ellipse cx="84" cy="104" rx="22" ry="7" fill="#0d1418" stroke="#5f7a3f" stroke-width="1"></ellipse>
+<path d="M28 90 q3 -2 6 0 q3 2 6 0 M78 104 q3 -2 6 0 q3 2 6 0" stroke="#6b4a2c" stroke-width="1.6" fill="none" stroke-linecap="round"></path>
+<path d="M50 34 q10 -8 20 0 q10 -8 20 0" stroke="${LINE}" stroke-width="1.8" fill="none" stroke-linecap="round"></path>`,
+
+  // Rosiczkowe Pole: moss red with sundews, under heavy fumes.
+  'sundew-field': `${SKY}
+<path d="M0 72 Q60 64 120 72 V120 H0 Z" fill="#3a2a22"></path>
+<path d="M0 58 Q30 50 60 58 T120 56" stroke="#c8d46a" stroke-width="7" fill="none" opacity="0.12"></path>
+<g stroke="#b3403a" stroke-width="1.4" stroke-linecap="round" fill="none"><path d="M30 96 l-8 -10 M30 96 l0 -13 M30 96 l8 -10 M30 96 l-11 -4 M30 96 l11 -4"></path><path d="M80 104 l-8 -10 M80 104 l0 -13 M80 104 l8 -10 M80 104 l-11 -4 M80 104 l11 -4"></path></g>
+<circle cx="22" cy="86" r="1.4" fill="#e7dcc2"></circle><circle cx="30" cy="83" r="1.4" fill="#e7dcc2"></circle><circle cx="38" cy="86" r="1.4" fill="#e7dcc2"></circle>
+<circle cx="72" cy="94" r="1.4" fill="#e7dcc2"></circle><circle cx="80" cy="91" r="1.4" fill="#e7dcc2"></circle><circle cx="88" cy="94" r="1.4" fill="#e7dcc2"></circle>
+<path d="M96 80 C96 70 104 66 108 72 C110 76 108 82 104 82 Z" fill="#3a2e22" stroke="${LINE}" stroke-width="0.8"></path>`,
+
+  // Tlące się Torfy: smoke from the smouldering peat, will-o-wisps at night.
+  'smoldering-peat': `${NIGHT}
+<path d="M0 76 Q60 68 120 76 V120 H0 Z" fill="#221a14"></path>
+<path d="M30 80 C26 66 34 58 30 44 M70 84 C66 68 76 60 72 40 M96 78 C92 68 100 60 96 50" stroke="#5d6459" stroke-width="4" fill="none" opacity="0.5" stroke-linecap="round"></path>
+<ellipse cx="30" cy="82" rx="5" ry="2" fill="#c0562b" opacity="0.8"></ellipse><ellipse cx="70" cy="86" rx="6" ry="2" fill="#c0562b" opacity="0.8"></ellipse>
+<circle cx="48" cy="58" r="3" fill="#ff8a3d" opacity="0.85"></circle><circle cx="88" cy="48" r="2.4" fill="#ff8a3d" opacity="0.75"></circle><circle cx="20" cy="40" r="2" fill="#ff8a3d" opacity="0.6"></circle>`,
+
+  // Stare Wyrobisko: an old peat pit with log walkways, the peat waking below.
+  'old-diggings': `${NIGHT}
+<path d="M0 30 L30 30 L40 120 H0 Z M120 30 L90 30 L80 120 H120 Z" fill="#1d1712"></path>
+<path d="M40 120 L30 30 H90 L80 120 Z" fill="#120f0c"></path>
+<path d="M2 50 H32 M88 50 H118 M4 76 H36 M84 76 H116" stroke="#6b5a3e" stroke-width="3" stroke-linecap="round"></path>
+<path d="M8 50 v6 M24 50 v6 M96 50 v6 M112 50 v6" stroke="#4a3d2c" stroke-width="2"></path>
+<path d="M44 118 C42 96 50 86 60 86 C70 86 78 96 76 118 Z" fill="#2b2219" stroke="${LINE}" stroke-width="0.8"></path>
+<circle cx="55" cy="96" r="1.8" fill="#c8d46a"></circle><circle cx="65" cy="96" r="1.8" fill="#c8d46a"></circle>`,
 };
 
 // For a place without its own scene yet: a few trees.
