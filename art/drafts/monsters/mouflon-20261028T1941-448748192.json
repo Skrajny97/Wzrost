@@ -1,0 +1,25 @@
+{
+  "id": "mouflon",
+  "payload": {
+    "prompt": "wild mouflon ram with thick curled horns, reddish-brown coat with a pale saddle patch, head lowered to charge, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 448748192,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793216635,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 72.18,
+    "request_id": "19a4ed88-25d4-4183-8ace-bf55bcc4a200",
+    "outputs_retained_until": 1793302976
+  }
+}

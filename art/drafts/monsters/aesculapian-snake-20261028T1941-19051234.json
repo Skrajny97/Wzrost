@@ -1,0 +1,25 @@
+{
+  "id": "aesculapian-snake",
+  "payload": {
+    "prompt": "large aesculapian snake, long olive-brown body with a pale yellow belly, coiled thickly, jaws open, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 19051234,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793216866,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 70.38,
+    "request_id": "c7b32bb4-88f4-481c-bb2e-df12b7bbe28f",
+    "outputs_retained_until": 1793303221
+  }
+}

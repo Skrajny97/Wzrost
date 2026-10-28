@@ -1,0 +1,25 @@
+{
+  "id": "falcon",
+  "payload": {
+    "prompt": "peregrine falcon diving with wings folded back, slate-grey back, barred pale chest, yellow talons forward, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 347444265,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793216656,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 71.82,
+    "request_id": "cfe65968-19a8-415b-954f-e12a2a8aa1b8",
+    "outputs_retained_until": 1793303037
+  }
+}
