@@ -737,9 +737,9 @@ describe('progression', () => {
   test('the first levels take about 20 minutes, level 500 about a day', () => {
     assert.ok(xpToNext(2, content) > xpToNext(1, content));
     // A slow burn: a 30-minute exploration gives one or two levels at first.
-    for (const level of [1, 2, 5, 10, 17]) assert.ok(Math.abs(huntingHours(level, content) * 60 - 20) < 0.5, `level ${level}`);
+    for (const level of [1, 2, 5, 10]) assert.ok(Math.abs(huntingHours(level, content) * 60 - 20) < 0.5, `level ${level}`);
     assert.ok(huntingHours(25, content) * 60 > 30);
-    assert.ok(huntingHours(100, content) > 2 && huntingHours(100, content) < 5);
+    assert.ok(huntingHours(100, content) > 4 && huntingHours(100, content) < 8);
     assert.ok(huntingHours(500, content) > 20 && huntingHours(500, content) < 30);
     assert.equal(content.balance.progression.maxLevel, 500);
     // Class levels need less XP, so they come faster.

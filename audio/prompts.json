@@ -40,6 +40,10 @@
         "seconds": 0.6
       },
       "spider-death": "a giant spider gives a fading chittering screech as its legs curl up with a few dry clicks, video game monster death sound, close up, dry, no music",
+      "tarantula-hurt": { "text": "a large hairy spider hisses sharply when hit, a short dry rasping hiss with a clack of fangs, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
+      "tarantula-death": "a big hairy spider gives a long rasping hiss that fades as its legs curl and scrape on stone, video game monster death sound, close up, dry, no music",
+      "bird-eater-hurt": { "text": "a giant monstrous spider lets out a deep angry hiss and a loud clicking of huge fangs when struck, video game monster hurt sound, close up, dry, no music", "seconds": 0.7 },
+      "bird-eater-death": "a giant monstrous spider screeches with a deep rasping hiss, then its heavy legs thud and curl with dry cracking, video game monster death sound, close up, dry, no music",
       "wisp-hurt": "a ghostly flame spirit lets out a short high eerie whispering wail, airy and hissing, close up, no music",
       "wisp-death": "a ghostly flame spirit fades away with a high airy whispering sigh and a soft fizzle, close up, no music",
       "likho-hurt": {

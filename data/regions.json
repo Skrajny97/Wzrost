@@ -113,7 +113,7 @@
     "minLevel": 26,
     "maxLevel": 50,
     "safe": false,
-    "description": "Polana z kręgiem omszałych głazów, za którą zaczyna się prawdziwa puszcza. Kamienniki, rysie, krzyżaki i watahy wader z basiorem.",
+    "description": "Polana z kręgiem omszałych głazów, za którą zaczyna się prawdziwa puszcza. Kamienniki, pająki, rysie i watahy wader z basiorem.",
     "trait": {
       "name": "Kamienny krąg",
       "description": "Postać na przedzie ma o 5% więcej pancerza.",
@@ -146,14 +146,18 @@
         "name": "Pajęczy Parów",
         "minLevel": 31,
         "maxLevel": 35,
-        "description": "Wąski parów zasnuty pajęczyną. Krzyżaki czekają w cieniu na każdego, kto tu zabłądzi.",
+        "description": "Wąski parów zasnuty pajęczyną. Pająki czekają w sieciach, tarantule polują między głazami, a w najgłębszej norze mieszka ptasznik.",
+        "elite": "bird-eater",
         "encounters": [
-          { "weight": 30, "monsters": ["spider"] },
-          { "weight": 24, "monsters": ["spider", "spider"] }
+          { "weight": 24, "monsters": ["spider"] },
+          { "weight": 16, "monsters": ["spider", "spider"] },
+          { "weight": 16, "monsters": ["tarantula"] },
+          { "weight": 10, "monsters": ["tarantula", "spider"] }
         ],
         "tough": [
-          { "weight": 14, "monsters": ["spider", "spider", "spider"] },
-          { "weight": 8, "monsters": ["spider", "spider"] }
+          { "weight": 10, "monsters": ["spider", "spider", "spider"] },
+          { "weight": 8, "monsters": ["tarantula", "spider", "spider"] },
+          { "weight": 6, "monsters": ["tarantula", "tarantula"] }
         ]
       },
       {
