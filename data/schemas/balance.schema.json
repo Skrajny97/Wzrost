@@ -172,10 +172,8 @@
       "required": [
         "hpBase",
         "hpPerVitality",
-        "hpPerLevel",
         "manaBase",
-        "manaPerWisdom",
-        "manaPerLevel"
+        "manaPerWisdom"
       ],
       "properties": {
         "hpBase": {
@@ -186,10 +184,6 @@
           "type": "number",
           "minimum": 0
         },
-        "hpPerLevel": {
-          "type": "number",
-          "minimum": 0
-        },
         "manaBase": {
           "type": "number",
           "minimum": 0
@@ -197,13 +191,9 @@
         "manaPerWisdom": {
           "type": "number",
           "minimum": 0
-        },
-        "manaPerLevel": {
-          "type": "number",
-          "minimum": 0,
-          "description": "Mana za każdy poziom postaci, żeby każda klasa mogła używać umiejętności."
         }
-      }
+      },
+      "description": "HP i mana postaci: podstawa i przyrost z Witalności i Mądrości. Przyrost za poziom klasy podaje każda klasa (perClassLevel w classes.json)."
     },
     "skills": {
       "type": "object",
@@ -996,6 +986,7 @@
       "additionalProperties": false,
       "required": [
         "hpBase",
+        "hpPerLevel",
         "budgetBase",
         "damageMultiplier",
         "gearLagMinutes",
@@ -1005,6 +996,11 @@
         "hpBase": {
           "type": "number",
           "minimum": 0
+        },
+        "hpPerLevel": {
+          "type": "number",
+          "minimum": 0,
+          "description": "HP stwora za każdy jego poziom."
         },
         "budgetBase": {
           "type": "number",

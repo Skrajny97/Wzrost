@@ -99,7 +99,8 @@ test('every sprite on the list has its file at its size, and every class has its
   const data = (name) => JSON.parse(readFileSync(new URL(`../data/${name}.json`, import.meta.url), 'utf8'));
   const looks = data('appearances').map((look) => look.id);
   const known = {
-    monsters: data('monsters').map((monster) => monster.id),
+    // The people of the events fight as monsters do.
+    monsters: [...data('monsters'), ...data('events').foes].map((monster) => monster.id),
     items: data('item-bases').map((base) => base.id),
     portraits: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     // The character walking on the Walka scene, one sheet for each portrait.
@@ -122,6 +123,8 @@ test('every sprite on the list has its file at its size, and every class has its
     potions: data('professions').potions.map((potion) => potion.id),
     professions: data('professions').professions.map((profession) => profession.id),
     places: ['gathering', 'brewing', 'workshop'].map((work) => data('professions')[work].place.id),
+    events: data('events').list.map((event) => event.art),
+    'event-scenes': data('events').list.map((event) => event.scene),
   };
   for (const [kind, { size, width = size, height = size, fit = false, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);

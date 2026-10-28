@@ -210,9 +210,23 @@ describe('skills', () => {
     assert.equal(applyHunt(alone, { xp: gained, result: 'success' }, content, { evolutionGate: false }).classLevel, 52);
   });
 
-  test('mana grows with each character level, so every class can use its skills', () => {
-    const warrior = (level) => playerCombatant({ character: { classId: 'warrior', level, classLevel: 1, points: {}, position: 'front' }, equipped: [], name: 'Mira' }, content);
-    assert.equal(warrior(11).maxMana - warrior(10).maxMana, content.balance.character.manaPerLevel);
+  test('HP and mana grow with each class level, by the class, so every class can use its skills', () => {
+    const unit = (classId, level, classLevel) =>
+      playerCombatant({ character: { classId, level, classLevel, points: {}, position: 'front' }, equipped: [], name: 'Mira' }, content);
+    for (const cls of content.classes) {
+      // A character level alone adds nothing.
+      assert.equal(unit(cls.id, 11, 10).maxHp, unit(cls.id, 10, 10).maxHp);
+      assert.equal(unit(cls.id, 11, 10).maxMana, unit(cls.id, 10, 10).maxMana);
+      // A class level adds its class's share; its stats grow too.
+      const before = unit(cls.id, 10, 10);
+      const after = unit(cls.id, 10, 11);
+      const { hpPerVitality, manaPerWisdom } = content.balance.character;
+      assert.equal(after.maxHp - before.maxHp, cls.perClassLevel.hp + hpPerVitality * (cls.growth.vitality ?? 0));
+      assert.equal(after.maxMana - before.maxMana, cls.perClassLevel.mana + manaPerWisdom * (cls.growth.wisdom ?? 0));
+    }
+    // The warrior gains the most HP, the mage the most mana.
+    const growth = (id) => content.classesById[id].perClassLevel;
+    assert.ok(content.classes.every((cls) => growth('warrior').hp >= cls.perClassLevel.hp && growth('mage').mana >= cls.perClassLevel.mana));
   });
 
   test('a ready strike skill replaces a blow, then waits for its cooldown', () => {

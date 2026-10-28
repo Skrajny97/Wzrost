@@ -2574,7 +2574,7 @@ Autor: „Dodajmy też na stole rozbiórki możliwość wymiany zasobów typu ka
     - Suwak przy duchu ognia stoi teraz na 1 sztuce, gdy gracz otwiera ekran Ogniska. Wcześniej stał na wszystkim, co zostało na dziś albo na co starczało złota. Ekran pamięta ostatni wybór do wyjścia z niego, a po powrocie suwak znów stoi na 1. Tak samo działa suwak wymiany przy Stole rozbiórki.
     - Pytanie przed wymianą jest od 0.0.25 („Wymiana u ducha ognia”, punkt w sekcji o Osłonie many): złoto znika dopiero po „Wymień”.
 2. **HP i mana z poziomem.** Autor: „Niech poziom Many i Zdrowia rośnie u każdej postaci również bez zwiekszania statystyk troche jeśli trzeba”, „Ewentualnie dostosuj rozdawanie automatyczne. Najlepiej zrob obydwa jesli dobrze mysle, ze HP i Mana nie rosna bez wzrostu statystyk.”
-    - HP i mana rosną już bez punktów: każdy poziom postaci daje +5 maks. HP i +2 maks. many (`hpPerLevel` i `manaPerLevel` w `data/balance.json`). Poziomy klasy dodają też Witalność (wszystkie klasy) i Mądrość (Mag i Kleryk), a rozdawanie automatyczne daje Witalności ćwierć punktów w każdej klasie.
+    - HP i mana rosną już bez punktów: każdy poziom postaci daje +5 maks. HP i +2 maks. many (`hpPerLevel` i `manaPerLevel` w `data/balance.json`; od 0.0.41 dodatek jest za poziom klasy, zob. „HP i mana za poziom klasy”). Poziomy klasy dodają też Witalność (wszystkim klasom poza Cieniem) i Mądrość (Magowi i Klerykowi), a rozdawanie automatyczne daje Witalności ćwierć punktów w każdej klasie.
     - Symulacja postaci z rozdawaniem automatycznym (`tools/simulate.mjs`, godzinne wyprawy): omdlenia 0–2,3% na poziomach 25–100. W walkach (także z elitami) postać używa umiejętności 2–6 razy, a z nieograniczoną maną używałaby ich tyle samo. Umiejętności kosztują stałe 10–15 many, a mana rośnie z poziomem, więc z czasem starcza na coraz więcej.
     - Dlatego HP, mana i rozdawanie automatyczne zostają bez zmian. Ekran Statystyk pokazuje za to w „Wartościach bojowych” maks. manę obok maks. HP, a przy obu: „+5 z każdym poziomem postaci” i „+2 z każdym poziomem postaci”.
 
@@ -2604,4 +2604,22 @@ Autor: „Ewentualnie zdarzenia na koniec wyprawy: wyświetla się nagle jakiś 
     - XP z walki to ok. 30% XP godzinnej wyprawy od 30. poziomu, 36–45% na poziomach 8–15 i 87% na 5. poziomie. Przy szansie zdarzenia daje to średnio 7–26% XP więcej na wyprawę.
 6. **Raport.** Pod podsumowaniem stoi karta zdarzenia: tekst i wybrana opcja ze skutkiem. Walka z bandytami ma w zakładkach znacznik „zdarzenie”, a raport otwiera się na niej. Relacja kończy się zdarzeniem.
 7. **Na razie tylko wersja testowa** (`EVENTS` „on” w `wrangler.jsonc`). „Testuj zdarzenia” w Ustawieniach wybiera zdarzenie na następny raport, bez losowania. Przychodzi ono po następnej wyprawie zakończonej zgodnie z planem (nie po samouczku ani Szybkim Polowaniu), a po wyborze opcji wybór znika (`event_test`, migracja 0048).
-8. **Grafiki.** Zdarzenie ma miejsce na postać (`art`) i tło (`scene`) z `src/client/art/events/`, a bandyci na swoje sylwetki. Szkice z Retro Diffusion idą do autora pojedynczo. Do tego czasu zdarzenie pokazuje sam tekst, a bandyci walczą bez sylwetek.
+8. **Grafiki.** Postać zdarzenia (`art`) leży w `src/client/art/events/`, tło (`scene`) w `src/client/art/event-scenes/`, a sylwetki bandytów obok stworów. Szkice z Retro Diffusion idą do autora pojedynczo. Ranna kobieta ma już postać (lewa wersja, wybrana przez autora). Bez tła zdarzenie pokazuje samą postać i tekst, a bandyci bez sylwetek walczą z samym kółkiem.
+
+## HP i mana za poziom klasy (28.10.2026)
+
+Autor: „ale powinno być HP i mana dodatkowe za poziom klasy a nie postaci - i to od tej klasy uzaleznione w jakiej wielkości”.
+
+1. **Zasada.** Poziom postaci nie daje już HP ani many. Każdy poziom klasy daje stały dodatek, inny w każdej klasie (`perClassLevel` w `data/classes.json`), poza tym, co dają statystyki:
+    - Wojownik: +6 HP i +1 many,
+    - Cień: +5 HP i +1 many,
+    - Łucznik: +4 HP i +1 many,
+    - Kleryk: +4 HP i +2 many,
+    - Mag: +3 HP i +3 many.
+2. **Dlaczego tyle.** Średnio dodatki są bliskie dawnych +5 HP i +2 many za poziom postaci, bo klasa ma zwykle trochę wyższy poziom niż postać (przy 100. poziomie postaci ok. 121. poziom klasy). Wojownik z przodu dostaje najwięcej HP, a Mag najwięcej many i najmniej HP. Cień ma +5 HP, bo jego poziomy klasy nie dają Witalności (Wojownikowi dają 2, a Łucznikowi, Magowi i Klerykowi po 1).
+3. **Skutki** (symulacja typowych postaci z rozdawaniem automatycznym, poziomy postaci 5–100):
+    - Maks. HP na 100. poziomie: Wojownik +7%, Cień +5%, Łucznik i Kleryk −1%, Mag −5%.
+    - Mana: Mag +8–11%, Kleryk bez zmian, pozostałe klasy mniej. Nadal starcza na każdą umiejętność: postać rzuca ich tyle samo co z nieograniczoną maną, także w walkach z elitą.
+    - Omdlenia bez zmian, 0–5% godzinnych wypraw.
+4. **Potwory** mają nadal +5 HP za każdy swój poziom (`monsters.hpPerLevel` w `data/balance.json`).
+5. **Ekran Statystyk** pokazuje przy „Maks. HP” i „Maks. mana” dodatek klasy, np. u Wojownika „+6 z każdym poziomem klasy”.

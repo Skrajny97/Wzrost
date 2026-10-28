@@ -3,7 +3,7 @@
 // measured against an opponent of the character's own level.
 
 import { playerCombatant } from './combatant.js';
-import { cappedChance, maxMana, reduction } from './formulas.js';
+import { cappedChance, reduction } from './formulas.js';
 import { regenPerMinute } from './progression.js';
 import { computeStats } from './stats.js';
 
@@ -24,7 +24,7 @@ export function combatValues(character, equipped, content) {
     effectResist: cappedChance(unit.willRating, level, tuning.willCap, balance),
     speed: unit.speed,
     maxHp: unit.maxHp,
-    mana: maxMana(totals.wisdom, level, balance),
+    mana: unit.maxMana,
     regen: regenPerMinute(unit.maxHp, totals.vitality, content),
     recovery: unit.recovery,
     // Each element's resistance as the share of its damage it takes away.

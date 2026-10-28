@@ -27,16 +27,18 @@ export function speed(dexterity, level, balance) {
   return 1 + ((speedMax - 1) * dexterity) / (dexterity + speedKBase + speedKPerLevel * level);
 }
 
-export function maxHp(vitality, level, balance) {
-  const { hpBase, hpPerVitality, hpPerLevel } = balance.character;
-  return Math.round(hpBase + hpPerVitality * vitality + hpPerLevel * level);
+// HP grows with Vitality and with each class level, by as much as the class
+// gives (perClassLevel in data/classes.json).
+export function maxHp(vitality, classLevel, perClassLevel, balance) {
+  const { hpBase, hpPerVitality } = balance.character;
+  return Math.round(hpBase + hpPerVitality * vitality + perClassLevel.hp * classLevel);
 }
 
-// Mana grows with Wisdom and, so that every class can use its skills, a
-// little with each character level.
-export function maxMana(wisdom, level, balance) {
-  const { manaBase, manaPerWisdom, manaPerLevel } = balance.character;
-  return Math.round(manaBase + manaPerWisdom * wisdom + manaPerLevel * level);
+// Mana grows with Wisdom and, so that every class can use its skills, with
+// each class level, by as much as the class gives.
+export function maxMana(wisdom, classLevel, perClassLevel, balance) {
+  const { manaBase, manaPerWisdom } = balance.character;
+  return Math.round(manaBase + manaPerWisdom * wisdom + perClassLevel.mana * classLevel);
 }
 
 // Stat budget of an item (or of a monster's natural weapon and hide) at a level.

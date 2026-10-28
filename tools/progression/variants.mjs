@@ -49,8 +49,8 @@ export const VARIANTS = {
   },
   groups: { describe: 'hunt.groupFactors [1, 0.7, 0.55] -> [1, 0.6, 0.45]', apply(raw) { raw.balance.hunt.groupFactors = [1, 0.6, 0.45]; } },
   recover40: { describe: 'hunt.recoveryAfterFight 0.3 -> 0.4', apply(raw) { raw.balance.hunt.recoveryAfterFight = 0.4; } },
-  hp8: { describe: 'character.hpPerLevel 5 -> 8', apply(raw) { raw.balance.character.hpPerLevel = 8; } },
-  hp10: { describe: 'character.hpPerLevel 5 -> 10', apply(raw) { raw.balance.character.hpPerLevel = 10; } },
+  hp8: { describe: 'classes perClassLevel.hp +3', apply(raw) { for (const cls of raw.classes) cls.perClassLevel.hp += 3; } },
+  hp10: { describe: 'classes perClassLevel.hp +5', apply(raw) { for (const cls of raw.classes) cls.perClassLevel.hp += 5; } },
   boar: {
     describe: 'boar (monsters.json): strength and endurance growth 2.5 -> 2.0',
     apply(raw) { const m = raw.monsters.find((x) => x.id === 'boar'); m.stats.growth.strength = 2.0; m.stats.growth.endurance = 2.0; },

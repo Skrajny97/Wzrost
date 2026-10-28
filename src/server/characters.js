@@ -761,8 +761,8 @@ export function characterView(player, now) {
       reduction: Math.round(values.reduction * 100),
       maxHp,
       maxMana: values.mana,
-      // What every character level adds to both, without any points.
-      perLevel: { hp: content.balance.character.hpPerLevel, mana: content.balance.character.manaPerLevel },
+      // What every class level adds to both, without any points.
+      perClassLevel: content.classesById[character.classId].perClassLevel,
     },
     equipment: Object.fromEntries(
       content.slots.map((slot) => {

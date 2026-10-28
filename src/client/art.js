@@ -146,6 +146,11 @@ export const SPRITES = {
   events: {
     width: 96,
     height: 128,
+    ids: ['wounded-woman'],
+  },
+  'event-scenes': {
+    width: 192,
+    height: 96,
     ids: [],
   },
 };
@@ -189,7 +194,7 @@ export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/plac
 // is none.
 export const eventFigure = (id) =>
   available.events.has(id) ? h('img', { src: `/art/events/${id}.png`, alt: '', width: 96, height: 128, class: 'sprite event-figure', decoding: 'async', draggable: 'false' }) : null;
-export const eventScene = (id) => (available.events.has(id) ? `/art/events/${id}.png` : null);
+export const eventScene = (id) => (available['event-scenes'].has(id) ? `/art/event-scenes/${id}.png` : null);
 
 // A skin tone other than the one drawn has its own recoloured file
 // (data/skins.json, tools/skin-tones.py).

@@ -23,10 +23,8 @@
   "character": {
     "hpBase": 30,
     "hpPerVitality": 5,
-    "hpPerLevel": 5,
     "manaBase": 20,
-    "manaPerWisdom": 5,
-    "manaPerLevel": 2
+    "manaPerWisdom": 5
   },
   "skills": {
     "unlockClassLevel": 10,
@@ -38,6 +36,7 @@
   },
   "monsters": {
     "hpBase": 2,
+    "hpPerLevel": 5,
     "budgetBase": 0,
     "damageMultiplier": 1.4,
     "gearLagMinutes": 45,

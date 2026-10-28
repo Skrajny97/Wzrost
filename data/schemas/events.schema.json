@@ -27,7 +27,7 @@
           "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
           "title": { "type": "string", "minLength": 1 },
           "art": { "type": "string", "minLength": 1, "description": "Postać zdarzenia: src/client/art/events/<art>.png." },
-          "scene": { "type": "string", "minLength": 1, "description": "Tło zdarzenia: src/client/art/events/<scene>.png." },
+          "scene": { "type": "string", "minLength": 1, "description": "Tło zdarzenia: src/client/art/event-scenes/<scene>.png." },
           "text": { "type": "string", "minLength": 1 },
           "weight": { "type": "number", "exclusiveMinimum": 0, "description": "Waga losowania zdarzenia (domyślnie 1)." },
           "options": {

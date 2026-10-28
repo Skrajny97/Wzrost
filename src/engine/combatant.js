@@ -17,7 +17,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   // Szuwary: the back of the line hides in the reeds.
   const dodgeBonus = character.position === 'back' ? (area?.trait.backDodgeBonus ?? 0) : 0;
   const cls = content.classesById[character.classId];
-  const hpMax = maxHp(totals.vitality, character.level, balance);
+  const hpMax = maxHp(totals.vitality, character.classLevel, cls.perClassLevel, balance);
   return {
     id,
     side,
@@ -43,7 +43,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     speed: speed(totals.dexterity, character.level, balance),
     // Skills and the mana they spend, full at the start of every fight;
     // Wisdom also strengthens healing.
-    maxMana: maxMana(totals.wisdom, character.level, balance),
+    maxMana: maxMana(totals.wisdom, character.classLevel, cls.perClassLevel, balance),
     wisdom: totals.wisdom,
     skills: learnedSkills(character, content),
     recovery:
@@ -102,8 +102,7 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   for (const [element, value] of Object.entries(monster.resistances ?? {})) {
     resist[element] = Math.round(value.base + value.perLevel * (level - 1));
   }
-  const { hpPerVitality, hpPerLevel } = balance.character;
-  const rawHp = balance.monsters.hpBase + hpPerVitality * stat('vitality') + hpPerLevel * level;
+  const rawHp = balance.monsters.hpBase + balance.character.hpPerVitality * stat('vitality') + balance.monsters.hpPerLevel * level;
   const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger)));
   return {
     id,

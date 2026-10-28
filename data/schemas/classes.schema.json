@@ -6,7 +6,7 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "name", "short", "role", "start", "description", "position", "baseStats", "growth", "autoPoints", "recovery", "weapons", "offhands", "armor"],
+    "required": ["id", "name", "short", "role", "start", "description", "position", "baseStats", "growth", "perClassLevel", "autoPoints", "recovery", "weapons", "offhands", "armor"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
       "name": { "type": "string", "minLength": 1 },
@@ -17,6 +17,16 @@
       "position": { "enum": ["front", "middle", "back"] },
       "baseStats": { "$ref": "#/definitions/statMap" },
       "growth": { "$ref": "#/definitions/statMap" },
+      "perClassLevel": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["hp", "mana"],
+        "description": "Maks. HP i maks. mana za każdy poziom klasy, poza tym, co dają statystyki.",
+        "properties": {
+          "hp": { "type": "number", "minimum": 0 },
+          "mana": { "type": "number", "minimum": 0 }
+        }
+      },
       "autoPoints": { "$ref": "#/definitions/statMap" },
       "recovery": {
         "type": "object",

@@ -260,8 +260,8 @@ export function mountStats(container) {
       // Both grow with every character level, also without points (the
       // author: "Niech poziom Many i Zdrowia rośnie u każdej postaci
       // również bez zwiększania statystyk").
-      ['Maks. HP', formatNumber(character.combat.maxHp), `+${formatNumber(character.combat.perLevel.hp)} z każdym poziomem postaci`],
-      ['Maks. mana', formatNumber(character.combat.maxMana), `+${formatNumber(character.combat.perLevel.mana)} z każdym poziomem postaci`],
+      ['Maks. HP', formatNumber(character.combat.maxHp), `+${formatNumber(character.combat.perClassLevel.hp)} z każdym poziomem klasy`],
+      ['Maks. mana', formatNumber(character.combat.maxMana), `+${formatNumber(character.combat.perClassLevel.mana)} z każdym poziomem klasy`],
     ];
     return h(
       'section',
