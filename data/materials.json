@@ -51,7 +51,7 @@
     {"id": "elk-antler", "name": "Łopata łosia", "gender": "f", "monster": "elk", "rarity": "epic", "description": "Szeroka, płaska łopata poroża."},
     {"id": "leech-slime", "name": "Śluz pijawki", "gender": "m", "monster": "leech", "rarity": "common", "description": "Gęsty śluz, po którym rany długo nie krzepną."},
     {"id": "harrier-feather", "name": "Pióro błotniaka", "gender": "n", "monster": "harrier", "rarity": "unique", "description": "Rdzawe pióro w ciemne paski."},
-    {"id": "crayfish-shell", "name": "Pancerz raka", "gender": "m", "monster": "crayfish", "rarity": "rare", "description": "Twarda, ciemnozielona skorupa z kolcami."},
+    {"id": "crayfish-shell", "name": "Pancerz raka", "gender": "m", "monster": "crayfish", "rarity": "rare", "description": "Twarda, czerwona skorupa z kolcami."},
     {"id": "sundew-dew", "name": "Rosa rosiczki", "gender": "f", "monster": "sundew", "rarity": "unique", "description": "Lepka, słodka kropla, w której utknął komar."},
     {"id": "peat-heart", "name": "Serce torfiaka", "gender": "n", "monster": "peatling", "rarity": "epic", "description": "Ciężka, ciemna bryła torfu, ciepła w środku."},
     {"id": "wisp-spark", "name": "Iskra ognika", "gender": "f", "monster": "will-o-wisp", "rarity": "rare", "description": "Maleńki płomyk, który nie gaśnie w zamkniętej dłoni."},
