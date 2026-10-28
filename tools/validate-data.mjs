@@ -628,13 +628,18 @@ function checkEvents(data, { monsters, rarities }) {
       errors.push(`events.json: ${where} ma nagrodę bez kind reward`);
     }
   };
-  // An outcome or a list of them, each drawn by its weight.
+  // An outcome or a list of them, each drawn by its weight. An outcome of a
+  // list that "Testuj zdarzenia" can choose has both an id and a name, and
+  // the live game, which leaves the drafts out, needs one to draw.
   const checkOutcomes = (where, outcomes) => {
     if (!Array.isArray(outcomes)) return checkOutcome(where, outcomes);
     outcomes.forEach((outcome, index) => {
       if (outcome.weight === undefined) errors.push(`events.json: ${where} [${index}] na liście skutków potrzebuje wagi`);
+      if ((outcome.id === undefined) !== (outcome.name === undefined)) errors.push(`events.json: ${where} [${index}] potrzebuje i id, i name albo żadnego z nich`);
       checkOutcome(`${where} [${index}]`, outcome);
     });
+    uniqueIds(errors, `events (${where})`, outcomes.filter((outcome) => outcome.id));
+    if (outcomes.every((outcome) => outcome.draft)) errors.push(`events.json: ${where} ma same szkice, więc w grze nie byłoby czego losować`);
   };
   for (const event of events.list) {
     const options = uniqueIds(errors, `events (${event.id})`, event.options);

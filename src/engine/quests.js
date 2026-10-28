@@ -3,8 +3,8 @@
 // midnight, a week at the midnight between Sunday and Monday. A period's
 // quests are drawn when it comes, from a seed of the character and the
 // period, so a period always gets the same ones: creatures of the newest
-// inner region open to the character's class, never of a place too easy
-// for the character, and, once the Stół rozbiórki stands, its work, and
+// inner region open to the character's class (and of the one before it for
+// the day's), never of a place too easy for the character, and, once the Stół rozbiórki stands, its work, and
 // once the professions are there, the herbs gathered and the potions
 // brewed, each with a reward of gold, a resource or parts. Claimed
 // explorations, gatherings and brewings and the table's orders move them
@@ -87,6 +87,19 @@ export function questArea(character, content) {
     .reduce((newest, area) => (area.minLevel > newest.minLevel ? area : newest));
 }
 
+// The inner regions whose creatures a period's quests ask for: the newest
+// one open to the character's class and, for the daily quests, also the one
+// before it (the author: "do zadań dziennych losuj z ostatniej otwartej
+// lokacji i jednej przed nią (bo nie muszą być bardzo trudne)"), newest
+// first, without those too easy for the character.
+function questAreas(periodId, character, content) {
+  return content.areas
+    .filter((area) => areaUnlocked(area, character.classLevel, content))
+    .sort((a, b) => b.minLevel - a.minLevel)
+    .slice(0, periodId === 'daily' ? 2 : 1)
+    .filter((area) => !easyPlace(character.level, area, content));
+}
+
 // How many of each creature a fight there brings on average, among the
 // regular encounters at the character's level.
 function creaturesPerFight(area, level) {
@@ -118,21 +131,24 @@ const questPotions = (character, content) =>
 // potwory"): when its class opens nothing harder, or it has outgrown every
 // place, the other kinds remain.
 function questOptions(periodId, { character, hasTable, hasProfessions = false, hasCrafting = false }, content) {
-  const area = questArea(character, content);
+  const areas = questAreas(periodId, character, content);
+  // Each creature of those places, as often as a fight of its place brings it.
+  const perFight = new Map();
+  for (const area of areas) for (const [target, share] of creaturesPerFight(area, character.level)) perFight.set(target, Math.max(perFight.get(target) ?? 0, share));
   return content.quests.kinds.flatMap((kind) => {
     if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions) || (kind.crafting && !hasCrafting)) return [];
-    if ((kind.id === 'kill' || kind.id === 'killAny') && easyPlace(character.level, area, content)) return [];
+    if ((kind.id === 'kill' || kind.id === 'killAny') && areas.length === 0) return [];
     // Regions to open: only for a new character, and no more than open
     // within reach of its class level.
     const ahead = kind.id === 'unlock' ? areasOpened(character.classLevel, character.classLevel + kind[periodId].reach, content) : 0;
     if (kind.id === 'unlock' && (character.classLevel >= kind.untilClassLevel || ahead === 0)) return [];
     const variants =
       kind.id === 'kill'
-        ? [...creaturesPerFight(area, character.level)]
-            .filter(([, perFight]) => perFight * kind[periodId].fights[1] >= 1)
-            .map(([target, perFight]) => ({ target, perFight }))
+        ? [...perFight]
+            .filter(([, share]) => share * kind[periodId].fights[1] >= 1)
+            .map(([target, share]) => ({ target, perFight: share }))
         : kind.id === 'killAny'
-          ? [{ perFight: [...creaturesPerFight(area, character.level).values()].reduce((sum, share) => sum + share, 0) }]
+          ? [{ perFight: [...creaturesPerFight(areas[0], character.level).values()].reduce((sum, share) => sum + share, 0) }]
           : kind.id === 'gather'
             ? questHerbs(character, content).map((herb) => ({ target: herb.id }))
             : kind.id === 'brew'

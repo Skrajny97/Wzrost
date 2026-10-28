@@ -1,6 +1,7 @@
 // Events at the end of an exploration (data/events.json, src/engine/events.js):
 // after "Odbierz raport" the player first chooses what to do, and the report
-// tells what came of it. On the test version only for now (EVENTS "on").
+// tells what came of it. In the live game (EVENTS "on"), and on the test
+// version with the outcomes the author has not approved yet (EVENTS "test").
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -159,7 +160,7 @@ describe('events', () => {
     const [dies, turns] = woman.options[1].outcome;
     for (const caseId of ['grateful-gold', 'grateful-find']) {
       const endings = Array.from({ length: 200 }, (_, index) =>
-        resolveEvent({ hunt: base, event: woman, optionId: 'ask', caseId, character, equipped, name: 'Mira', seed: `pytania-${index}` }, content),
+        resolveEvent({ hunt: base, event: woman, optionId: 'ask', caseId, drafts: true, character, equipped, name: 'Mira', seed: `pytania-${index}` }, content),
       );
       const fought = endings.filter((asked) => asked.fights.length > base.fights.length);
       assert.ok(Math.abs(fought.length / endings.length - 0.5) < 0.1, `${caseId}: ${fought.length}`);
@@ -181,10 +182,19 @@ describe('events', () => {
     }
     for (const one of woman.cases) assert.equal(resolve('leave', base, one.id).event.option.text, woman.options[2].outcome.text);
   });
+
+  test('the Błędnica, a draft, comes only where drafts are on; "Testuj zdarzenia" chooses an ending', () => {
+    const asked = (seedOf, extra) => resolveEvent({ hunt: base, event: woman, optionId: 'ask', caseId: 'grateful-gold', character, equipped, name: 'Mira', seed: seedOf, ...extra }, content);
+    const seeds = Array.from({ length: 60 }, (_, index) => `szkic-${index}`);
+    assert.ok(seeds.every((one) => asked(one).fights.length === base.fights.length));
+    assert.ok(seeds.every((one) => asked(one, { endingId: 'wisp' }).event.option.text === woman.options[1].outcome[0].text));
+    assert.ok(seeds.slice(0, 10).every((one) => asked(one, { endingId: 'wisp', drafts: true }).fights.at(-1).enemies[0].monsterId === 'wisp'));
+    assert.ok(seeds.slice(0, 10).every((one) => asked(one, { endingId: 'dies', drafts: true }).fights.length === base.fights.length));
+  });
 });
 
 describe('events (API)', () => {
-  const { call, db, signUp } = useServer({ EVENTS: 'on' });
+  const { call, db, signUp } = useServer({ EVENTS: 'test' });
   let cookie;
 
   beforeEach(async () => {
@@ -197,7 +207,7 @@ describe('events (API)', () => {
     await call('POST', '/api/test/skip-time', { cookie });
   };
   const claim = (choice) => call('POST', '/api/hunts/claim', { cookie, ...(choice !== undefined && { body: { choice } }) });
-  const choose = (eventId, caseId) => call('POST', '/api/test/events', { cookie, body: { eventId, ...(caseId && { caseId }) } });
+  const choose = (eventId, caseId, endingId) => call('POST', '/api/test/events', { cookie, body: { eventId, ...(caseId && { caseId }), ...(endingId && { endingId }) } });
   const next = async () => (await call('GET', '/api/test/events', { cookie })).data.next;
   // After the first exploration (the tutorial's), a character strong enough
   // for the edge of the Wiatrołomy to end every exploration as planned.
@@ -211,16 +221,30 @@ describe('events (API)', () => {
   test('"Testuj zdarzenia" brings the event chosen, not after the tutorial, and the report waits for the choice', async () => {
     const tests = (await call('GET', '/api/test/events', { cookie })).data;
     assert.deepEqual(tests, {
-      events: [{ id: 'wounded-woman', title: 'Ranna kobieta', cases: woman.cases.map(({ id, name }) => ({ id, name })) }],
+      events: [
+        {
+          id: 'wounded-woman',
+          title: 'Ranna kobieta',
+          cases: woman.cases.map(({ id, name }) => ({ id, name })),
+          endings: [
+            { id: 'dies', name: 'Pytania: umiera urażona' },
+            { id: 'wisp', name: 'Pytania: zamienia się w Błędnicę' },
+          ],
+        },
+      ],
       next: null,
     });
     assert.equal((await choose('nie-ma')).data.error.code, 'unknown_event');
     assert.equal((await choose('wounded-woman', 'smok')).data.error.code, 'unknown_case');
-    assert.deepEqual((await choose('wounded-woman')).data, { next: { eventId: 'wounded-woman', caseId: null } });
+    assert.equal((await choose('wounded-woman', null, 'smok')).data.error.code, 'unknown_ending');
+    // An ending comes in a case that leads to it.
+    assert.deepEqual((await choose('wounded-woman', null, 'wisp')).data, { next: { eventId: 'wounded-woman', caseId: 'grateful-gold', endingId: 'wisp' } });
+    assert.deepEqual(await next(), { eventId: 'wounded-woman', caseId: 'grateful-gold', endingId: 'wisp' });
+    assert.deepEqual((await choose('wounded-woman')).data, { next: { eventId: 'wounded-woman', caseId: null, endingId: null } });
 
     // The first exploration is the tutorial's: no event, and the choice waits.
     await pastTutorial();
-    assert.deepEqual(await next(), { eventId: 'wounded-woman', caseId: null });
+    assert.deepEqual(await next(), { eventId: 'wounded-woman', caseId: null, endingId: null });
 
     await explore();
     const count = await reports();
@@ -258,7 +282,7 @@ describe('events (API)', () => {
   test('"Pomóż jej sprawnie" adds the bandits\' fight to the report, and they stay out of the Bestiariusz', async () => {
     await pastTutorial();
     await choose('wounded-woman', 'ambush');
-    assert.deepEqual(await next(), { eventId: 'wounded-woman', caseId: 'ambush' });
+    assert.deepEqual(await next(), { eventId: 'wounded-woman', caseId: 'ambush', endingId: null });
     await explore();
     assert.equal((await claim()).data.event.id, 'wounded-woman');
     const { report } = (await claim('help')).data;
@@ -277,15 +301,10 @@ describe('events (API)', () => {
 
   test('turned into a Błędnica, the woman joins the Bestiariusz as a creature met on the way', async () => {
     await pastTutorial();
-    await choose('wounded-woman', 'grateful-gold');
+    await choose('wounded-woman', null, 'wisp');
     // Avoiding the elites, the exploration meets no Błędnica of its own.
     assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5, avoidRare: true } })).status, 201);
     await call('POST', '/api/test/skip-time', { cookie });
-    // A seed that makes the questions end in the Błędnica's fight.
-    const seed = Array.from({ length: 50 }, (_, index) => `blednica-${index}`).find(
-      (one) => createRng(`${one}:event:ask`).weighted(woman.options[1].outcome, (outcome) => outcome.weight).kind === 'fight',
-    );
-    await (await db()).prepare(`UPDATE activities SET seed = ?`).bind(seed).run();
     await (await db()).prepare(`UPDATE characters SET met = '[]'`).run();
     assert.equal((await claim()).data.event.id, 'wounded-woman');
     const { report } = (await claim('ask')).data;
@@ -319,6 +338,25 @@ describe('events (API)', () => {
     const found = (await claim('help')).data.report;
     assert.equal(found.event.case, 'grateful-find');
     assert.ok(found.items[found.event.reward.item]);
+  });
+});
+
+describe('events in the live game', () => {
+  const { call, db, signUp } = useServer({ EVENTS: 'on' });
+
+  test('the Błędnica, not approved yet, never comes: the questions end in her death', async () => {
+    const { cookie } = await signUp('wedrowiec');
+    await call('POST', '/api/character', { cookie, body: { name: 'Wedrowiec', classId: 'warrior', appearance: 'male' } });
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    await call('POST', '/api/test/skip-time', { cookie });
+    await call('POST', '/api/hunts/claim', { cookie });
+    await (await db()).prepare(`UPDATE characters SET level = 30, points = '{"strength":150,"vitality":140}', hp_at = 0, event_test = 'wounded-woman:grateful-gold:wisp'`).run();
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    await call('POST', '/api/test/skip-time', { cookie });
+    assert.equal((await call('POST', '/api/hunts/claim', { cookie })).data.event.id, 'wounded-woman');
+    const { report } = (await call('POST', '/api/hunts/claim', { cookie, body: { choice: 'ask' } })).data;
+    assert.equal(report.event.option.text, woman.options[1].outcome[0].text);
+    assert.equal(report.event.fight, null);
   });
 });
 

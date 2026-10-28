@@ -63,6 +63,14 @@ export function eventCase(event, seed, forced = null) {
 // be a list of outcomes, drawn from by weight.
 export const eventOutcome = (option, chosen) => chosen?.outcomes[option.id] ?? option.outcome;
 
+// One outcome of a list: the one "Testuj zdarzenia" chose (`endingId`), or
+// one drawn by weight. A draft, an outcome the author has not approved yet,
+// is there only where `drafts` are on (the test version).
+function listOutcome(list, { endingId, drafts }, rng) {
+  const open = list.filter((one) => drafts || !one.draft);
+  return open.find((one) => one.id === endingId) ?? rng.weighted(open, (one) => one.weight);
+}
+
 // What an item found on an event may be, as for the exploration's finds.
 function lootRules(character, equipped, area, content) {
   const { otherClass } = content.balance.items;
@@ -72,7 +80,9 @@ function lootRules(character, equipped, area, content) {
 
 // The exploration with the event's outcome for the option chosen, at the
 // exploration's end, in the event's case (`caseId` from "Testuj zdarzenia",
-// or drawn): the outcome's text, and what it brings. A reward is gold
+// or drawn), with the outcome of a list that "Testuj zdarzenia" chose
+// (`endingId`) or a drawn one, drafts only with `drafts`: the outcome's
+// text, and what it brings. A reward is gold
 // (`gold` times rewards.goldPerLevel at the character's level, ±25%) or an
 // item at the character's level of a rarity drawn from `itemRarities`. A
 // fight is against the foes at the character's level (the events' people, or
@@ -82,13 +92,13 @@ function lootRules(character, equipped, area, content) {
 // reference fights does, and the foes leave gold and, with itemChance, now
 // and then an item; lost, the character faints (or, in a safe place, only
 // gets away) as after a lost fight on the way.
-export function resolveEvent({ hunt, event, optionId, caseId = null, character, equipped, name, seed }, content) {
+export function resolveEvent({ hunt, event, optionId, caseId = null, endingId = null, drafts = false, character, equipped, name, seed }, content) {
   const option = event.options.find((candidate) => candidate.id === optionId);
   const chosen = eventCase(event, seed, caseId);
   const t = hunt.minutes * 60000;
   const rng = createRng(`${seed}:event:${option.id}`);
   const found = eventOutcome(option, chosen);
-  const outcome = Array.isArray(found) ? rng.weighted(found, (one) => one.weight) : found;
+  const outcome = Array.isArray(found) ? listOutcome(found, { endingId, drafts }, rng) : found;
   const area = content.areasById[hunt.areaId];
   const tell = (text) => ({ t, type: 'event', text: `${event.title}. ${option.label}: ${text}` });
   const view = (text) => ({ ...eventView(event), case: chosen?.id ?? null, option: { id: option.id, label: option.label, text }, fight: null });

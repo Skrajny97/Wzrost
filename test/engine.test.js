@@ -2274,6 +2274,19 @@ describe('quests from the narrator', () => {
     assert.equal(next.weekly, busy.weekly);
   });
 
+  test('the day asks for creatures of the newest open inner region and the one before it, the week of the newest', () => {
+    const character = newCharacter('cleric', { level: 23, classLevel: 27 });
+    const targets = (periodId) =>
+      new Set(
+        Array.from({ length: 80 }, (_, seed) => drawQuests(periodId, { character, hasTable: true, seed }, content))
+          .flat()
+          .filter((quest) => quest.kind === 'kill')
+          .map((quest) => quest.target),
+      );
+    assert.deepEqual([...targets('daily')].sort(), ['bat', 'boar', 'stag', 'stoneling']);
+    assert.deepEqual([...targets('weekly')].sort(), ['bat', 'stoneling']);
+  });
+
   test('a kept quest for a creature the class cannot reach is drawn anew, the others stay', () => {
     // As drawn on 28.10 before the creatures moved to inner regions of their
     // own (0.0.27): Wadera now lives only where class level 40 goes.
@@ -2294,7 +2307,7 @@ describe('quests from the narrator', () => {
     // A new quest the period does not ask for yet, from what the class may get.
     assert.notEqual(fresh.target, 'she-wolf');
     assert.ok(!['explore', 'salvage'].includes(fresh.kind) && fresh.target !== 'stoneling');
-    assert.ok(fresh.kind !== 'kill' || ['bat', 'stoneling'].includes(fresh.target));
+    assert.ok(fresh.kind !== 'kill' || ['bat', 'boar', 'stag'].includes(fresh.target));
     assert.deepEqual([fresh.progress, fresh.claimed], [0, false]);
     // Reachable, done or claimed quests stay as they were.
     assert.deepEqual(kept, stored.daily.quests.slice(1));

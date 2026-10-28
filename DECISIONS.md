@@ -2660,3 +2660,19 @@ Autor, ze zrzutem ekranu osoby testującej grę (poziom postaci 23, poziom klasy
 1. **Przyczyna.** Zadania dnia losują się raz, przy pierwszym wejściu do gry po północy, i potem się nie zmieniają. Tej nocy grała jeszcze wersja 0.0.26, w której Omszałe Głazy miały między innymi Waderę, Pająka i Kamiennika. Rano wersja 0.0.27 dała każdemu regionowi wewnętrznemu własne stwory. Wadera trafiła do Wilczych Kręgów (od poziomu klasy 40), a Pająk do Pajęczego Parowu (od poziomu klasy 30). Zapisane zadania zostały, więc wskazywały stwory, do których klasa nie ma już dostępu. Samo losowanie działało dobrze: nowe zadania biorą stwory z najnowszego regionu wewnętrznego otwartego dla klasy.
 2. **Naprawa.** Przy każdym wczytaniu postaci gra sprawdza zapisane zadania dnia i tygodnia. Zadanie na stwora, który nie żyje w żadnym regionie wewnętrznym otwartym dla klasy postaci, losuje się na nowo, chyba że jest już wykonane albo odebrane. Nowe zadanie pochodzi z tego, co postać dostałaby teraz, i nie powtarza zadań, które okres już ma. Pozostałe zadania zostają bez zmian, z postępem i odebranymi nagrodami. Nowe zadanie od razu się zapisuje (`currentQuests` w `src/engine/quests.js`, `settleQuests` w `src/server/characters.js`).
 3. **Przelosowanie.** Osoba testująca grę nie musi nic robić: przy następnym wejściu do gry zadania na Waderę i Pająka zmienią się na nowe, a zadanie na Kamiennika zostanie, bo Omszałe Głazy są dla niej otwarte. To samo dzieje się u każdego gracza, któremu zostały takie zadania, także tygodniowe.
+
+## Zdarzenia w grze głównej, Błędnica do zatwierdzenia (28.10.2026, 0.0.43)
+
+Autor: „Jesli chodzi o zdarzenie rannej kobiety to to co jest działa i jest okey,, ale nie ma dostepnej jeszzcze tej opcji z Błędnicą. Wrzuć tak do gry glownej. Dokończ Błędnice i daj do zatwierdzenia przed lista i generowaniem stworów albo równolegle żeby i opcje z Błędnicą dodać”.
+
+1. **Gra główna.** Zdarzenia działają w grze głównej od wersji 0.0.43 (`EVENTS` „on” w `wrangler.jsonc`) i przychodzą po 10% wypraw zakończonych zgodnie z planem.
+2. **Błędnica jako szkic.** Zakończenie z Błędnicą czeka na zatwierdzenie autora (`draft` w `data/events.json`), więc losuje się tylko w wersji testowej (`EVENTS` „test”). W grze głównej uczciwa kobieta po „Zadaj dodatkowe pytania” zawsze umiera urażona. Po zatwierdzeniu wystarczy usunąć `draft`, a oba zakończenia znów będą po 50%.
+3. **„Testuj zdarzenia”** ma też zakończenia pytań: „Pytania: umiera urażona” i „Pytania: zamienia się w Błędnicę”. Zakończenie wybrane bez przypadku przychodzi w pierwszym przypadku, w którym pytania do niego prowadzą, czyli „Wdzięczność: złoto”.
+
+## Zadania dzienne z dwóch regionów wewnętrznych (28.10.2026, 0.0.43)
+
+Autor: „Po pierwsze do zadań dziennych losuj z ostatniej otwartej lokacji i jednej przed nią (bo nie muszą być bardzo trudne)”.
+
+1. Zadania dzienne na stwory biorą stwory z najnowszego regionu wewnętrznego otwartego dla klasy i z regionu przed nim. Region za łatwy dla postaci odpada, jak dotąd.
+2. Zadania tygodniowe zostają przy najnowszym regionie, bo autor mówił tylko o dziennych.
+3. Liczba stworów w „Pokonaj N dowolnych stworów” liczy się jak dotąd z najnowszego regionu.

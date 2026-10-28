@@ -48,7 +48,11 @@
     "PROFESSIONS": "on",
     // "on" opens Rzemieślnictwo among the professions; off, its square says
     // "Wkrótce". In the live game from version 0.0.27.
-    "CRAFTING": "on"
+    "CRAFTING": "on",
+    // "on": events at the end of an exploration (src/engine/events.js), in
+    // the live game from version 0.0.43, without the outcomes the author has
+    // not approved yet (drafts), which the test version has ("test").
+    "EVENTS": "on"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain
@@ -93,9 +97,9 @@
         "REGISTRATION": "closed",
         // "Testuj samouczki" in the settings: every tutorial from its start.
         "TUTORIAL_TESTS": "on",
-        // "on": events at the end of an exploration (src/engine/events.js),
-        // with "Testuj zdarzenia" in the settings. Off in the live game.
-        "EVENTS": "on"
+        // "test": the events with their drafts, and "Testuj zdarzenia" in the
+        // settings (TUTORIAL_TESTS).
+        "EVENTS": "test"
       },
       "triggers": {
         "crons": ["* * * * *"]

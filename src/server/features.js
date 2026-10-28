@@ -3,8 +3,9 @@
 // the live game shows Zielarstwo and Alchemia once they are ready, with
 // Rzemieślnictwo locked ("Wkrótce") until it is done. The test version
 // takes no new accounts (REGISTRATION "closed"): only the author's, made
-// before. The events at the end of an exploration (EVENTS "on") are on the
-// test version only for now. The env is the same for every request of a
+// before. The events at the end of an exploration are on (EVENTS "on"),
+// and the test version (EVENTS "test") also has the outcomes the author has
+// not approved yet (drafts). The env is the same for every request of a
 // deployment, so the switches are read once per request (index.js) and kept
 // here for the rest of the code.
 
@@ -12,17 +13,20 @@ let professions = false;
 let crafting = false;
 let registration = true;
 let events = false;
+let eventDrafts = false;
 
 export function readFeatures(env) {
   professions = env.PROFESSIONS === 'on';
   crafting = env.CRAFTING === 'on';
   registration = env.REGISTRATION !== 'closed';
-  events = env.EVENTS === 'on';
+  events = env.EVENTS === 'on' || env.EVENTS === 'test';
+  eventDrafts = env.EVENTS === 'test';
 }
 
 export const professionsOn = () => professions;
 // Rzemieślnictwo needs the professions too.
 export const craftingOn = () => professions && crafting;
 export const registrationOpen = () => registration;
-// The events at the end of an exploration (events.js): the test version first.
+// The events at the end of an exploration (events.js), and their drafts.
 export const eventsOn = () => events;
+export const eventDraftsOn = () => eventDrafts;

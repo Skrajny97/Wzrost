@@ -6,7 +6,9 @@ import { createTestHarness } from 'wrangler';
 // Test mode, with "Testuj samouczki", is for every account here, unless
 // `vars` sets TEST_LOGINS.
 export function useServer(vars = {}) {
-  const server = createTestHarness({ workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', ...vars } }] });
+  // No events at the end of explorations, which would come after a tenth of
+  // them, unless a test asks for them (events.test.js).
+  const server = createTestHarness({ workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', ...vars } }] });
   before(() => server.listen());
   beforeEach(async () => {
     await server.reset();

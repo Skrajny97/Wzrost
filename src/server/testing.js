@@ -4,7 +4,7 @@
 // account without test mode, and with test mode off, these routes do not
 // exist.
 
-import { construction } from '../engine/index.js';
+import { construction, eventOutcome } from '../engine/index.js';
 import { content, tutorialPart } from './content.js';
 import { completeBuilding } from './camp.js';
 import { characterRemoval, characterView, currentHp, loadPlayer, loadSettled, requirePlayer } from './characters.js';
@@ -81,35 +81,63 @@ export async function tutorialTests(context) {
   return json({ parked: parked && { name: parked.name } });
 }
 
-// "Testuj zdarzenia": the events there are with their cases, and the one
-// the next exploration brings at its end, if one was chosen (event_test is
-// "event" or "event:case").
+// The outcomes of an event's lists that "Testuj zdarzenia" can choose: those
+// with an id, drafts too.
+const eventEndings = (event) =>
+  [...event.options.map((option) => option.outcome), ...(event.cases ?? []).flatMap((one) => Object.values(one.outcomes))]
+    .filter(Array.isArray)
+    .flat()
+    .filter((outcome) => outcome.id);
+
+// The first case of an event in which an option leads to a list with the
+// ending, or null.
+const caseWithEnding = (event, endingId) =>
+  (event.cases ?? []).find((one) => event.options.some((option) => [eventOutcome(option, one)].flat().some((outcome) => outcome?.id === endingId)))?.id ?? null;
+
+// The choice stored in event_test: "event", "event:case", "event::ending"
+// or "event:case:ending".
+const storedTest = (value) => {
+  const [eventId = null, caseId = null, endingId = null] = value ? value.split(':').map((part) => part || null) : [];
+  return eventId ? { eventId, caseId, endingId } : null;
+};
+
+// "Testuj zdarzenia": the events there are with their cases and endings,
+// and the one the next exploration brings at its end, if one was chosen.
 export async function eventTests(context) {
   await requireTester(context);
   if (!eventsOn()) throw notFound();
   const { player } = await requirePlayer(context);
-  const [eventId, caseId = null] = player.row.event_test ? player.row.event_test.split(':') : [];
   return json({
-    events: content.events.list.map((event) => ({ id: event.id, title: event.title, cases: (event.cases ?? []).map(({ id, name }) => ({ id, name })) })),
-    next: eventId ? { eventId, caseId } : null,
+    events: content.events.list.map((event) => ({
+      id: event.id,
+      title: event.title,
+      cases: (event.cases ?? []).map(({ id, name }) => ({ id, name })),
+      endings: eventEndings(event).map(({ id, name }) => ({ id, name })),
+    })),
+    next: storedTest(player.row.event_test),
   });
 }
 
 // "Przy następnym raporcie": the next exploration that ends as planned
 // brings this event (`eventId`), in this case (`caseId`) or a drawn one
-// (null), or no event again (`eventId` null). The draw does not decide the
-// event, and its play clears the choice (hunts.js).
+// (null), with this ending of a list (`endingId`), which picks a case that
+// leads to it when none is given, or no event again (`eventId` null). The
+// draw does not decide the event, and its play clears the choice (hunts.js).
 export async function chooseTestEvent(context) {
   await requireTester(context);
   if (!eventsOn()) throw notFound();
   const { player } = await requirePlayer(context);
-  const { eventId, caseId = null } = await readJson(context.request);
+  const { eventId, caseId = null, endingId = null } = await readJson(context.request);
   const event = eventId !== null && Object.hasOwn(content.eventsById, eventId) ? content.eventsById[eventId] : null;
   if (eventId !== null && !event) throw new ApiError(400, 'unknown_event', 'Nie ma takiego zdarzenia.');
   if (caseId !== null && !(event?.cases ?? []).some((candidate) => candidate.id === caseId)) throw new ApiError(400, 'unknown_case', 'To zdarzenie nie ma takiego przebiegu.');
-  const stored = eventId === null ? null : caseId === null ? eventId : `${eventId}:${caseId}`;
+  if (endingId !== null && !(event ? eventEndings(event) : []).some((ending) => ending.id === endingId)) {
+    throw new ApiError(400, 'unknown_ending', 'To zdarzenie nie ma takiego zakończenia.');
+  }
+  const next = event && { eventId, caseId: endingId === null ? caseId : (caseId ?? caseWithEnding(event, endingId)), endingId };
+  const stored = next ? [next.eventId, next.caseId ?? '', next.endingId ?? ''].join(':').replace(/:+$/, '') : null;
   await context.env.DB.prepare('UPDATE characters SET event_test = ? WHERE id = ?').bind(stored, player.row.id).run();
-  return json({ next: eventId === null ? null : { eventId, caseId } });
+  return json({ next: next || null });
 }
 
 // "Wprowadzenie" from the start: the character waits aside (role 'parked'),

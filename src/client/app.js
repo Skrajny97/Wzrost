@@ -691,7 +691,8 @@ async function openTutorialTests() {
 
 // "Testuj zdarzenia" on the test version (testing.js): the event chosen
 // here comes at the end of the next exploration that ends as planned,
-// without the draw, in the case chosen with it or in a drawn one.
+// without the draw, in the case chosen with it or in a drawn one, or with
+// an ending of an option chosen (in a case that leads to it).
 async function openEventTests() {
   let data;
   try {
@@ -700,21 +701,22 @@ async function openEventTests() {
     toast(error.message);
     return;
   }
-  const choose = (eventId, caseId = null) => async (event) => {
+  const choose = (eventId, caseId = null, endingId = null) => async (event) => {
     await withButton(event.currentTarget, async () => {
-      const { next } = await call('POST', '/api/test/events', { eventId, caseId });
+      const { next } = await call('POST', '/api/test/events', { eventId, caseId, endingId });
       toast(next ? 'Zdarzenie przyjdzie po następnej wyprawie, przy „Odbierz raport”.' : 'Zdarzenia znów losują się jak w grze.');
       closeSheet();
     });
   };
-  const chosen = (eventId, caseId) => data.next?.eventId === eventId && data.next.caseId === caseId;
-  const pick = (eventId, caseId, text) =>
+  const chosen = (eventId, caseId, endingId) =>
+    data.next?.eventId === eventId && (endingId ? data.next.endingId === endingId : data.next.caseId === caseId && !data.next.endingId);
+  const pick = (eventId, caseId, text, endingId = null) =>
     h('button', {
       type: 'button',
       class: 'button button--system button--small',
-      text: chosen(eventId, caseId) ? `${text} (wybrane)` : text,
-      disabled: chosen(eventId, caseId),
-      onClick: choose(eventId, caseId),
+      text: chosen(eventId, caseId, endingId) ? `${text} (wybrane)` : text,
+      disabled: chosen(eventId, caseId, endingId),
+      onClick: choose(eventId, caseId, endingId),
     });
   openSheet(
     h('h2', { class: 'sheet-title', text: 'Testuj zdarzenia' }),
@@ -730,7 +732,11 @@ async function openEventTests() {
           'li',
           { class: 'tutorial-test event-test' },
           h('div', { class: 'tutorial-test-text' }, h('strong', { text: event.title }), data.next?.eventId === event.id && h('span', { class: 'muted', text: 'Czeka na następny raport.' })),
-          h('div', { class: 'event-test-cases' }, [pick(event.id, null, 'Losowo'), ...event.cases.map((one) => pick(event.id, one.id, one.name))]),
+          h('div', { class: 'event-test-cases' }, [
+            pick(event.id, null, 'Losowo'),
+            ...event.cases.map((one) => pick(event.id, one.id, one.name)),
+            ...event.endings.map((one) => pick(event.id, null, one.name, one.id)),
+          ]),
         ),
       ),
     ),

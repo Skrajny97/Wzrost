@@ -13,6 +13,9 @@
       "properties": {
         "kind": { "enum": ["none", "fight", "reward"] },
         "weight": { "type": "number", "exclusiveMinimum": 0, "description": "Waga skutku na liście skutków, losowanych przy wyborze opcji." },
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Skutek z listy do wybrania w „Testuj zdarzenia”." },
+        "name": { "type": "string", "minLength": 1, "description": "Nazwa skutku w „Testuj zdarzenia”." },
+        "draft": { "type": "boolean", "description": "Szkic, którego autor jeszcze nie zatwierdził: losuje się tylko w wersji testowej." },
         "text": { "type": "string", "minLength": 1, "description": "Tekst skutku; przy nagrodzie z {gold} albo {item}." },
         "foes": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "string", "minLength": 1 } },
         "ambush": { "type": "boolean", "description": "Wrogowie ruszają pierwsi, wszyscy przed postacią." },
