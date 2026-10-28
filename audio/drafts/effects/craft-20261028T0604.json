@@ -1,0 +1,13 @@
+{
+  "id": "craft",
+  "payload": {
+    "text": "a blacksmith's hammer strikes metal on an anvil three times, clear bright ringing clangs, the last strike rings out a little longer, close up, dry, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/craft-20261028T0604-0.mp3",
+    "audio/drafts/effects/craft-20261028T0604-1.mp3"
+  ],
+  "credits": 80
+}
