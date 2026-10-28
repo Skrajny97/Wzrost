@@ -1,0 +1,14 @@
+{
+  "id": "craft",
+  "payload": {
+    "text": "three hard blows of a heavy hammer on a thick block of iron, each blow a short dry heavy clank with a thud that stops at once, no ringing tail, no bell tone, no echo, close up, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.8
+  },
+  "files": [
+    "audio/drafts/effects/craft-20261028T0722-0.mp3",
+    "audio/drafts/effects/craft-20261028T0722-1.mp3",
+    "audio/drafts/effects/craft-20261028T0722-2.mp3"
+  ],
+  "credits": 120
+}

@@ -1,0 +1,14 @@
+{
+  "id": "craft-fail",
+  "payload": {
+    "text": "one very loud heavy hammer blow on metal at the very start, the loudest part of the sound, then the metal cracks and a few small broken pieces fall onto a stone floor, close up, no echo, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.8
+  },
+  "files": [
+    "audio/drafts/effects/craft-fail-20261028T0722-0.mp3",
+    "audio/drafts/effects/craft-fail-20261028T0722-1.mp3",
+    "audio/drafts/effects/craft-fail-20261028T0722-2.mp3"
+  ],
+  "credits": 108
+}
