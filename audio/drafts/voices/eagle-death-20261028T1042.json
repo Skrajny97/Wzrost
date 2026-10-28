@@ -1,0 +1,13 @@
+{
+  "id": "eagle-death",
+  "payload": {
+    "text": "an eagle lets out a long falling screech and its wings flap weakly, video game monster death sound, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/eagle-death-20261028T1042-0.mp3",
+    "audio/drafts/voices/eagle-death-20261028T1042-1.mp3"
+  ],
+  "credits": 40
+}

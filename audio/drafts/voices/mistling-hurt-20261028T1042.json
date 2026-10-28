@@ -1,0 +1,13 @@
+{
+  "id": "mistling-hurt",
+  "payload": {
+    "text": "a creature of mist hisses like escaping steam with a faint eerie moan, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mistling-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/mistling-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

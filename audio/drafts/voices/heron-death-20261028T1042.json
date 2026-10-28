@@ -1,0 +1,13 @@
+{
+  "id": "heron-death",
+  "payload": {
+    "text": "a large heron lets out a long hoarse croak that fades as it falls into shallow water, video game monster death sound, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/heron-death-20261028T1042-0.mp3",
+    "audio/drafts/voices/heron-death-20261028T1042-1.mp3"
+  ],
+  "credits": 40
+}

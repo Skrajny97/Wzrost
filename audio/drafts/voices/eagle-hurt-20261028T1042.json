@@ -1,0 +1,13 @@
+{
+  "id": "eagle-hurt",
+  "payload": {
+    "text": "an eagle gives a piercing angry screech when hit, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/eagle-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/eagle-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

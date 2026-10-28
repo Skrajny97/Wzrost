@@ -1,0 +1,13 @@
+{
+  "id": "drowned-maiden-hurt",
+  "payload": {
+    "text": "a drowned maiden gives a short eerie gurgling cry of pain, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/drowned-maiden-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/drowned-maiden-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

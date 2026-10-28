@@ -1,0 +1,13 @@
+{
+  "id": "willow-spirit-hurt",
+  "payload": {
+    "text": "an old tree creaks and groans deeply when struck, with rustling leaves, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/willow-spirit-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/willow-spirit-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

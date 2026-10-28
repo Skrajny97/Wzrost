@@ -1,0 +1,13 @@
+{
+  "id": "drowner-hurt",
+  "payload": {
+    "text": "a drowned man gurgles and groans wetly in pain, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/drowner-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/drowner-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

@@ -1,0 +1,13 @@
+{
+  "id": "peatling-hurt",
+  "payload": {
+    "text": "a creature of wet peat thuds and crunches with a low groan when struck, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/peatling-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/peatling-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

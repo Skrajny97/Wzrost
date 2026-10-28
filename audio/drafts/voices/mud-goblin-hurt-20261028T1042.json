@@ -1,0 +1,13 @@
+{
+  "id": "mud-goblin-hurt",
+  "payload": {
+    "text": "a small goblin yelps and squeaks in pain, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mud-goblin-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/mud-goblin-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

@@ -1,0 +1,13 @@
+{
+  "id": "giant-mosquito-hurt",
+  "payload": {
+    "text": "a giant mosquito buzzes loudly and shrilly for a moment when swatted, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/giant-mosquito-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/giant-mosquito-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

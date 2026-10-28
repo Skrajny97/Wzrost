@@ -1,0 +1,13 @@
+{
+  "id": "heron-hurt",
+  "payload": {
+    "text": "a large grey heron gives a harsh croaking squawk when hit, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/heron-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/heron-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

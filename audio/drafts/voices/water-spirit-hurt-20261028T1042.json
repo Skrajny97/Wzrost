@@ -1,0 +1,13 @@
+{
+  "id": "water-spirit-hurt",
+  "payload": {
+    "text": "an old water spirit gives a deep bubbling roar of anger when hit, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/water-spirit-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/water-spirit-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

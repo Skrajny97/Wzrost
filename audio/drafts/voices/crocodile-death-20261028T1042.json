@@ -1,0 +1,13 @@
+{
+  "id": "crocodile-death",
+  "payload": {
+    "text": "a crocodile lets out a long rumbling hiss and its jaws snap shut, video game monster death sound, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/crocodile-death-20261028T1042-0.mp3",
+    "audio/drafts/voices/crocodile-death-20261028T1042-1.mp3"
+  ],
+  "credits": 40
+}

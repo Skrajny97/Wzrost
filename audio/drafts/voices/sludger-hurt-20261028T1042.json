@@ -1,0 +1,13 @@
+{
+  "id": "sludger-hurt",
+  "payload": {
+    "text": "a blob of thick sludge squelches and bubbles angrily when hit, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/sludger-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/sludger-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

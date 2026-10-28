@@ -1,0 +1,13 @@
+{
+  "id": "crayfish-death",
+  "payload": {
+    "text": "a big crayfish shell cracks with a crunch and its claws clatter, video game monster death sound, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/crayfish-death-20261028T1042-0.mp3",
+    "audio/drafts/voices/crayfish-death-20261028T1042-1.mp3"
+  ],
+  "credits": 40
+}

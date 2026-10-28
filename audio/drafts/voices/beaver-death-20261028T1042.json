@@ -1,0 +1,13 @@
+{
+  "id": "beaver-death",
+  "payload": {
+    "text": "a beaver gives a long grunting moan and slumps into water with a splash, video game monster death sound, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/beaver-death-20261028T1042-0.mp3",
+    "audio/drafts/voices/beaver-death-20261028T1042-1.mp3"
+  ],
+  "credits": 40
+}

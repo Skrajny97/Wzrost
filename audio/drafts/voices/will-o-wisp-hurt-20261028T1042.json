@@ -1,0 +1,13 @@
+{
+  "id": "will-o-wisp-hurt",
+  "payload": {
+    "text": "a small flame flickers with a soft crackle and a faint high whine, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/will-o-wisp-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/will-o-wisp-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}

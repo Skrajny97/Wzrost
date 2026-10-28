@@ -1,0 +1,13 @@
+{
+  "id": "cormorant-death",
+  "payload": {
+    "text": "a cormorant croaks hoarsely and falls into water with a splash, video game monster death sound, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/cormorant-death-20261028T1042-0.mp3",
+    "audio/drafts/voices/cormorant-death-20261028T1042-1.mp3"
+  ],
+  "credits": 40
+}

@@ -1,0 +1,13 @@
+{
+  "id": "eel-hurt",
+  "payload": {
+    "text": "an eel thrashes in water with a wet slap and a crackle of electric sparks, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/eel-hurt-20261028T1042-0.mp3",
+    "audio/drafts/voices/eel-hurt-20261028T1042-1.mp3"
+  ],
+  "credits": 24
+}
