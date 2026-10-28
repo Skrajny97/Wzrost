@@ -2481,7 +2481,7 @@ Autor: „Skoro z Krzyżaka zrobiłeś Pająka to trzeba dodać jeszcze jednego 
 
 ## Spokojniejszy obóz, skóra piksel po pikselu i nowa głowa Kleryczki (28.10.2026)
 
-1. **Obóz wpasowany w polanę** (autor: „budynki obozu zatwierdzam jesli wpasujesz je w planszę, ale postaraj sie mysle obnkzyc saturacje wszystkiego wraz z planszą obozu, wydaje mi się ze zbyt jaskrawy jest obóz”).
+1. **Obóz wpasowany w polanę** (autor: „budynki obozu zatwierdzam jesli wpasujesz je w planszę, ale postaraj sie mysle obnkzyc saturacje wszystkiego wraz z planszą obozu, wydaje mi się ze zbyt jaskrawy jest obóz”, a po zmianie: „obóz zatwierdzam”).
     - Polana zostawia połowę swojego nasycenia (wcześniej 0,7) i 70% jasności. Budynki też zostawiają połowę nasycenia (wcześniej 0,78), są przyciemnione do 82% i biorą 12% ciemnej zieleni leśnego podłoża, więc stoją w tym samym świetle co polana, tylko trochę jaśniej od niej.
     - Każdy budynek stoi na miękkim, rozmytym cieniu, szerszym niż wcześniej.
     - Wartości są w `GROUND_TONE` i `BUILDING_TONE` w `src/client/camp-art.js`. Pora dnia działa na nie tak jak wcześniej.
@@ -2490,4 +2490,5 @@ Autor: „Skoro z Krzyżaka zrobiłeś Pająka to trzeba dodać jeszcze jednego 
     - Doszły dwa brązowe cienie skóry, które Wojownik i Mag dzielą z włosami. Liczą się dopiero od 18. wiersza w dół, pod linią włosów.
     - Doszło 6 pojedynczych pikseli, wpisanych w `PIXELS` w `tools/walker-tones.py`: dwa na twarzy, czubek dłoni i stopa Wojowniczki oraz dwa światła na twarzy Czarodziejki.
     - Pozostałe piksele przy masce to kontury, włosy, kaptury i stroje. Zostają bez zmian.
+    - Łucznik (autor: „przeskakują piksele jasne u Łucznika”). Jego mała twarz ma światła w kolorach kaptura, więc zostawały jasne, w każdej klatce w innym miejscu. 20 pikseli twarzy jest wpisanych po jednym, osobno dla każdej z 4 klatek. U Łuczniczki jasne piksele przy twarzy to brzeg kaptura, ten sam w każdej klatce, więc zostają.
 3. **Nowy chód Kleryczki** (osoba testująca grę, przekazane przez autora: „Trochę mam zamieszana głowę jak zdeformowana”). Głowa w chodzie miała dwubarwną, poszarpaną fryzurę i twarz wciśniętą w bok. Nowy chód z Retro Diffusion ma włosy splecione w jeden warkocz na plecach i małą, czytelną twarz. Opis w `art/prompts.json` prosi o to wprost. Z 4 wersji w grze jest czwarta. Ma też własne kolory skóry w odcieniach. Koszt: 4 animacje po 0,07 USD, razem 0,28 USD.
