@@ -64,6 +64,9 @@ export function buildContent(raw) {
     // The creatures, and the foes of the events' fights (events.json), who
     // fight the same way but live in no region and have no Bestiariusz.
     monstersById: byId([...raw.monsters, ...(raw.events?.foes ?? [])]),
+    // The events' foes alone: people, whom the Bestiariusz and the quests
+    // leave out.
+    eventFoesById: byId(raw.events?.foes ?? []),
     regions,
     regionsById: byId(regions),
     areas,

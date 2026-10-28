@@ -608,13 +608,13 @@ function checkEvents(data, { monsters, rarities }) {
   const foes = uniqueIds(errors, 'events', events.foes);
   for (const id of foes) if (monsters.has(id)) errors.push(`events.json: przeciwnik ${id} ma id stwora z monsters.json`);
   uniqueIds(errors, 'events', events.list);
-  if (events.chancePerMinute > events.maxChance) errors.push('events.json: chancePerMinute nie może być większe niż maxChance');
   const checkOutcome = (where, outcome) => {
     const fighting = outcome.foes || outcome.ambush || outcome.speedBonus || outcome.itemChance !== undefined || outcome.start;
     const rewarding = outcome.gold !== undefined || outcome.itemRarities;
     if (outcome.kind === 'fight') {
       if (!outcome.foes) errors.push(`events.json: ${where} ma walkę bez przeciwników`);
-      for (const id of outcome.foes ?? []) if (!foes.has(id)) errors.push(`events.json: ${where} ma nieznanego przeciwnika "${id}"`);
+      // People of the events, or creatures of monsters.json (the Błędnica).
+      for (const id of outcome.foes ?? []) if (!foes.has(id) && !monsters.has(id)) errors.push(`events.json: ${where} ma nieznanego przeciwnika "${id}"`);
       if (!outcome.start?.includes('{enemies}')) errors.push(`events.json: ${where} potrzebuje zdania start z {enemies}`);
     } else if (fighting) {
       errors.push(`events.json: ${where} ma ustawienia walki bez walki`);
@@ -628,15 +628,23 @@ function checkEvents(data, { monsters, rarities }) {
       errors.push(`events.json: ${where} ma nagrodę bez kind reward`);
     }
   };
+  // An outcome or a list of them, each drawn by its weight.
+  const checkOutcomes = (where, outcomes) => {
+    if (!Array.isArray(outcomes)) return checkOutcome(where, outcomes);
+    outcomes.forEach((outcome, index) => {
+      if (outcome.weight === undefined) errors.push(`events.json: ${where} [${index}] na liście skutków potrzebuje wagi`);
+      checkOutcome(`${where} [${index}]`, outcome);
+    });
+  };
   for (const event of events.list) {
     const options = uniqueIds(errors, `events (${event.id})`, event.options);
     uniqueIds(errors, `events (${event.id}, przypadki)`, event.cases ?? []);
-    for (const option of event.options) if (option.outcome) checkOutcome(`${event.id}/${option.id}`, option.outcome);
+    for (const option of event.options) if (option.outcome) checkOutcomes(`${event.id}/${option.id}`, option.outcome);
     // Every option has an outcome in every case: its own or the case's.
     for (const eventCase of event.cases ?? [{ id: null, outcomes: {} }]) {
       for (const [id, outcome] of Object.entries(eventCase.outcomes)) {
         if (!options.has(id)) errors.push(`events.json: ${event.id}/${eventCase.id} ma skutek nieznanej opcji "${id}"`);
-        checkOutcome(`${event.id}/${eventCase.id}/${id}`, outcome);
+        checkOutcomes(`${event.id}/${eventCase.id}/${id}`, outcome);
       }
       for (const option of event.options) {
         if (!eventCase.outcomes[option.id] && !option.outcome) errors.push(`events.json: ${event.id}/${option.id} nie ma skutku${eventCase.id ? ` w przypadku ${eventCase.id}` : ''}`);

@@ -3,15 +3,20 @@
 // the report (the author: "zdarzenia na koniec wyprawy: wyświetla się nagle
 // jakiś NPC który coś proponuje i jest parę opcji do wyboru jeszcze przed
 // pokazaniem się Raportu z wyprawy (który będzie uwzględniał zdarzenie)").
-// An exploration that ended as planned may bring one, more often the longer
-// it was, but not the very first (the tutorial's) and not a Szybkie
-// Polowanie. An event may hide what is really going on: its cases (the
-// wounded woman is a bait or truly hurt), drawn once, and each option leads
-// to the outcome it has in that case (the author: "pomoc rannej kobiecie
-// powinno móc czasem zrobić tak, że nie ma bandytów a ona odwdzięcza się
-// złotem albo jakimś rzadkim przedmiotem"). Whether an event comes, which,
-// its case and an option's outcome all come from the exploration's seed, so
-// the same exploration always brings the same event and ends the same way.
+// An exploration that ended as planned brings one in a tenth of cases
+// (events.chance), each event of the list as likely as the others (the
+// author: "niech trafiają się w 10% przypadków… każde będzie miało równe
+// prawdopodobieństwo"), but not the very first (the tutorial's) and not a
+// Szybkie Polowanie. An event may hide what is really going on: its cases
+// (the wounded woman is a bait or truly hurt), drawn once, and each option
+// leads to the outcome it has in that case (the author: "pomoc rannej
+// kobiecie powinno móc czasem zrobić tak, że nie ma bandytów a ona
+// odwdzięcza się złotem albo jakimś rzadkim przedmiotem"), or to one of a
+// few, drawn by weight when it is chosen (the author: "Błędnica może się
+// pojawić po zadaniu dodatkowych pytań albo umrzeć urażona"). Whether an
+// event comes, which, its case and an option's outcome all come from the
+// exploration's seed, so the same exploration always brings the same event
+// and ends the same way.
 
 import { simulateFight } from './combat.js';
 import { combatantView, playerCombatant } from './combatant.js';
@@ -21,8 +26,8 @@ import { monsterXp } from './progression.js';
 import { createRng } from './rng.js';
 import { say } from './text.js';
 
-// The chance an exploration of `minutes` brings an event.
-export const eventChance = (minutes, content) => Math.min(content.events.maxChance, content.events.chancePerMinute * minutes);
+// The chance an exploration that ended as planned brings an event.
+export const eventChance = (content) => content.events.chance;
 
 // The event an exploration brings, or null. `forced` (an event's id, from
 // "Testuj zdarzenia" on the test version) brings that one without the draw,
@@ -31,7 +36,7 @@ export function eventFor({ hunt, seed, first = false, quick = false, forced = nu
   if (!content.events || first || quick || hunt.result !== 'success') return null;
   if (forced) return content.eventsById[forced] ?? null;
   const rng = createRng(`${seed}:event`);
-  if (!rng.chance(eventChance(hunt.minutes, content))) return null;
+  if (!rng.chance(eventChance(content))) return null;
   return rng.weighted(content.events.list, (event) => event.weight ?? 1);
 }
 
@@ -54,7 +59,8 @@ export function eventCase(event, seed, forced = null) {
   return createRng(`${seed}:event:case`).weighted(event.cases, (candidate) => candidate.weight);
 }
 
-// What an option leads to: its outcome in the case, or its own.
+// What an option leads to: its outcome in the case, or its own; either may
+// be a list of outcomes, drawn from by weight.
 export const eventOutcome = (option, chosen) => chosen?.outcomes[option.id] ?? option.outcome;
 
 // What an item found on an event may be, as for the exploration's finds.
@@ -69,19 +75,20 @@ function lootRules(character, equipped, area, content) {
 // or drawn): the outcome's text, and what it brings. A reward is gold
 // (`gold` times rewards.goldPerLevel at the character's level, ±25%) or an
 // item at the character's level of a rarity drawn from `itemRarities`. A
-// fight is against the foes at the character's level, with the character's
-// HP of the exploration's end. In an ambush the foes all move first; a speed
-// bonus makes the character quicker. Won, the fight pays as one of the
-// exploration's reference fights does, and the foes, being people, leave
-// gold and now and then an item (itemChance each); lost, the character
-// faints (or, in a safe place, only gets away) as after a lost fight on the
-// way.
+// fight is against the foes at the character's level (the events' people, or
+// a creature, as the Błędnica), with the character's HP of the exploration's
+// end. In an ambush the foes all move first; a speed bonus makes the
+// character quicker. Won, the fight pays as one of the exploration's
+// reference fights does, and the foes leave gold and, with itemChance, now
+// and then an item; lost, the character faints (or, in a safe place, only
+// gets away) as after a lost fight on the way.
 export function resolveEvent({ hunt, event, optionId, caseId = null, character, equipped, name, seed }, content) {
   const option = event.options.find((candidate) => candidate.id === optionId);
   const chosen = eventCase(event, seed, caseId);
-  const outcome = eventOutcome(option, chosen);
   const t = hunt.minutes * 60000;
   const rng = createRng(`${seed}:event:${option.id}`);
+  const found = eventOutcome(option, chosen);
+  const outcome = Array.isArray(found) ? rng.weighted(found, (one) => one.weight) : found;
   const area = content.areasById[hunt.areaId];
   const tell = (text) => ({ t, type: 'event', text: `${event.title}. ${option.label}: ${text}` });
   const view = (text) => ({ ...eventView(event), case: chosen?.id ?? null, option: { id: option.id, label: option.label, text }, fight: null });

@@ -27,12 +27,6 @@ describe('events', () => {
   // In the case given; the ambush, unless said otherwise.
   const resolve = (optionId, hunt = base, caseId = 'ambush') => resolveEvent({ hunt, event: woman, optionId, caseId, character, equipped, name: 'Mira', seed }, content);
 
-  test('the longer the exploration, the likelier an event, up to the most', () => {
-    const { chancePerMinute, maxChance } = content.events;
-    assert.equal(eventChance(10, content), chancePerMinute * 10);
-    assert.equal(eventChance(100000, content), maxChance);
-  });
-
   test('none after the first exploration, a Szybkie Polowanie or one that did not end as planned', () => {
     const hunt = { result: 'success', minutes: 60 };
     const forced = 'wounded-woman';
@@ -42,12 +36,24 @@ describe('events', () => {
     assert.equal(eventFor({ hunt, seed, forced }, content), woman);
   });
 
-  test('the seed decides whether one comes, about as often as its chance says', () => {
-    const hunt = { result: 'success', minutes: 30 };
+  test('the seed decides whether one comes, in a tenth of explorations however long', () => {
+    assert.equal(eventChance(content), 0.1);
     const seeds = Array.from({ length: 2000 }, (_, index) => `ziarno-${index}`);
-    const drawn = seeds.filter((one) => eventFor({ hunt, seed: one }, content));
-    assert.ok(Math.abs(drawn.length / seeds.length - eventChance(30, content)) < 0.03);
+    for (const minutes of [5, 240]) {
+      const hunt = { result: 'success', minutes };
+      const drawn = seeds.filter((one) => eventFor({ hunt, seed: one }, content));
+      assert.ok(Math.abs(drawn.length / seeds.length - eventChance(content)) < 0.025, `${minutes}: ${drawn.length}`);
+    }
+    const hunt = { result: 'success', minutes: 30 };
     for (const one of seeds.slice(0, 50)) assert.equal(eventFor({ hunt, seed: one }, content), eventFor({ hunt, seed: one }, content));
+  });
+
+  test('every event is as likely as the others', () => {
+    const two = { ...content, events: { ...content.events, chance: 1, list: [woman, { ...woman, id: 'drugie' }] } };
+    const hunt = { result: 'success', minutes: 30 };
+    const seeds = Array.from({ length: 2000 }, (_, index) => `rowne-${index}`);
+    const share = seeds.filter((one) => eventFor({ hunt, seed: one }, two).id === 'drugie').length / seeds.length;
+    assert.ok(Math.abs(share - 0.5) < 0.04, String(share));
   });
 
   test('in an ambush every enemy moves before the allies, however quick', () => {
@@ -114,7 +120,7 @@ describe('events', () => {
   });
 
   test('the bandits count for no quest', () => {
-    assert.deepEqual(huntKills(resolve('help')), huntKills(base));
+    assert.deepEqual(huntKills(resolve('help'), content), huntKills(base, content));
   });
 
   test('what is really going on is drawn once, about as often as its weight says', () => {
@@ -149,11 +155,29 @@ describe('events', () => {
     assert.equal(found.gold, base.gold);
   });
 
-  test('asked too many questions, she leaves without a reward; leaving is the same in every case', () => {
+  test('asked too many questions, a truly wounded woman dies offended or turns into a Błędnica; leaving is the same in every case', () => {
+    const [dies, turns] = woman.options[1].outcome;
     for (const caseId of ['grateful-gold', 'grateful-find']) {
-      const asked = resolve('ask', base, caseId);
-      assert.deepEqual([asked.fights.length, asked.gold, asked.items.length], [base.fights.length, base.gold, base.items.length]);
-      assert.equal(asked.event.option.text, woman.options[1].outcome.text);
+      const endings = Array.from({ length: 200 }, (_, index) =>
+        resolveEvent({ hunt: base, event: woman, optionId: 'ask', caseId, character, equipped, name: 'Mira', seed: `pytania-${index}` }, content),
+      );
+      const fought = endings.filter((asked) => asked.fights.length > base.fights.length);
+      assert.ok(Math.abs(fought.length / endings.length - 0.5) < 0.1, `${caseId}: ${fought.length}`);
+      for (const asked of endings.filter((one) => !fought.includes(one))) {
+        assert.deepEqual([asked.gold, asked.xp, asked.items.length, asked.result], [base.gold, base.xp, base.items.length, base.result]);
+        assert.equal(asked.event.option.text, dies.text);
+      }
+      for (const asked of fought) {
+        const fight = asked.fights.at(-1);
+        assert.equal(fight.event, true);
+        assert.deepEqual(fight.enemies.map((enemy) => [enemy.monsterId, enemy.level]), [['wisp', character.level]]);
+        assert.deepEqual(fight.chests, []);
+        assert.equal(asked.event.option.text, turns.text);
+        assert.equal(asked.event.fight, asked.fights.length - 1);
+      }
+      // Beaten, the Błędnica counts for the quests as one met on the way.
+      const won = fought.find((asked) => asked.fights.at(-1).won === true);
+      assert.equal(huntKills(won, content).wisp, (huntKills(base, content).wisp ?? 0) + 1);
     }
     for (const one of woman.cases) assert.equal(resolve('leave', base, one.id).event.option.text, woman.options[2].outcome.text);
   });
@@ -249,6 +273,31 @@ describe('events (API)', () => {
     assert.equal(report.keyFight.index, report.fights.length - 1);
     const met = JSON.parse((await (await db()).prepare('SELECT met FROM characters').first()).met);
     assert.ok(bandits.every((id) => !met.includes(id)));
+  });
+
+  test('turned into a Błędnica, the woman joins the Bestiariusz as a creature met on the way', async () => {
+    await pastTutorial();
+    await choose('wounded-woman', 'grateful-gold');
+    // Avoiding the elites, the exploration meets no Błędnica of its own.
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5, avoidRare: true } })).status, 201);
+    await call('POST', '/api/test/skip-time', { cookie });
+    // A seed that makes the questions end in the Błędnica's fight.
+    const seed = Array.from({ length: 50 }, (_, index) => `blednica-${index}`).find(
+      (one) => createRng(`${one}:event:ask`).weighted(woman.options[1].outcome, (outcome) => outcome.weight).kind === 'fight',
+    );
+    await (await db()).prepare(`UPDATE activities SET seed = ?`).bind(seed).run();
+    await (await db()).prepare(`UPDATE characters SET met = '[]'`).run();
+    assert.equal((await claim()).data.event.id, 'wounded-woman');
+    const { report } = (await claim('ask')).data;
+    const fight = report.fights.at(-1);
+    assert.equal(fight.event, true);
+    assert.deepEqual(
+      fight.enemies.map((enemy) => enemy.monsterId),
+      ['wisp'],
+    );
+    assert.ok(report.fights.slice(0, -1).every((one) => one.enemies.every((enemy) => enemy.monsterId !== 'wisp')));
+    const met = JSON.parse((await (await db()).prepare('SELECT met FROM characters').first()).met);
+    assert.ok(met.includes('wisp'));
   });
 
   test('chosen to be honest, the woman thanks with gold or an item that reach the character', async () => {

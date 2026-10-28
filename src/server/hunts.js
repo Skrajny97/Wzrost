@@ -453,16 +453,20 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const worn = [...equippedItems(player), ...autoEquipped.map((index) => hunt.items[index])];
   const hp = hpAfterHunt({ character, applied, hunt, equipped: worn, name: row.name }, content);
   // The creatures of every fight join those the character has met (the
-  // Bestiariusz shows them by name from now on); the people of an event's
-  // fight are not in the Bestiariusz.
+  // Bestiariusz shows them by name from now on), also a creature of an
+  // event's fight (the Błędnica); the people of an event's fight are not in
+  // the Bestiariusz.
   const met = [
-    ...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.filter((fight) => !fight.event).flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))]),
+    ...new Set([
+      ...JSON.parse(row.met ?? '[]'),
+      ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId)).filter((monsterId) => !content.eventFoesById[monsterId]),
+    ]),
   ];
   // The narrator's quests count the creatures beaten, the minutes and the
   // inner regions the new class levels open. They are saved only as read,
   // so a reward claimed meanwhile is not undone.
   const opened = areasOpened(character.classLevel, applied.classLevel, content);
-  const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills: huntKills(hunt), minutes: activity.minutes, opened }));
+  const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills: huntKills(hunt, content), minutes: activity.minutes, opened }));
   const setMaterials = left.length
     ? `, materials = json_set(materials, ${left.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})`
     : '';

@@ -3,7 +3,7 @@
   "title": "Zdarzenia na końcu wyprawy",
   "type": "object",
   "additionalProperties": false,
-  "required": ["chancePerMinute", "maxChance", "texts", "list", "foes"],
+  "required": ["chance", "texts", "list", "foes"],
   "definitions": {
     "outcome": {
       "type": "object",
@@ -12,6 +12,7 @@
       "description": "Skutek opcji: tekst i co z niego wynika.",
       "properties": {
         "kind": { "enum": ["none", "fight", "reward"] },
+        "weight": { "type": "number", "exclusiveMinimum": 0, "description": "Waga skutku na liście skutków, losowanych przy wyborze opcji." },
         "text": { "type": "string", "minLength": 1, "description": "Tekst skutku; przy nagrodzie z {gold} albo {item}." },
         "foes": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "string", "minLength": 1 } },
         "ambush": { "type": "boolean", "description": "Wrogowie ruszają pierwsi, wszyscy przed postacią." },
@@ -26,12 +27,15 @@
           "description": "Przedmiot nagrody na poziomie postaci: wagi jego rzadkości."
         }
       }
+    },
+    "outcomes": {
+      "description": "Jeden skutek albo lista skutków z wagami, z której los wybiera przy wyborze opcji.",
+      "oneOf": [{ "$ref": "#/definitions/outcome" }, { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/outcome" } }]
     }
   },
   "properties": {
     "$comment": { "type": "string" },
-    "chancePerMinute": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa na zdarzenie za każdą minutę wyprawy." },
-    "maxChance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Najwyższa szansa na zdarzenie, przy dowolnie długiej wyprawie." },
+    "chance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa na zdarzenie po wyprawie zakończonej zgodnie z planem." },
     "texts": {
       "type": "object",
       "additionalProperties": false,
@@ -75,7 +79,7 @@
               "properties": {
                 "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
                 "label": { "type": "string", "minLength": 1 },
-                "outcome": { "$ref": "#/definitions/outcome", "description": "Skutek opcji, gdy przypadek nie podaje własnego." }
+                "outcome": { "$ref": "#/definitions/outcomes", "description": "Skutek opcji, gdy przypadek nie podaje własnego." }
               }
             }
           },
@@ -91,7 +95,7 @@
                 "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
                 "name": { "type": "string", "minLength": 1, "description": "Nazwa przypadku w „Testuj zdarzenia”." },
                 "weight": { "type": "number", "exclusiveMinimum": 0 },
-                "outcomes": { "type": "object", "additionalProperties": { "$ref": "#/definitions/outcome" } }
+                "outcomes": { "type": "object", "additionalProperties": { "$ref": "#/definitions/outcomes" } }
               }
             }
           }

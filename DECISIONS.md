@@ -2587,7 +2587,7 @@ Autor: „Dopisz na gorę info o możliwości wymiany zasobów i rozwoju sytuacj
 Autor: „Ewentualnie zdarzenia na koniec wyprawy: wyświetla się nagle jakiś NPC który coś proponuje i jest parę opcji do wyboru jeszcze przed pokazaniem się Raportu z wyprawy(który bedzie uwzględniał zdarzenie). Zdarzenia beda mozliwe od samego początku prawie (po Samouczku).” Pierwsze zdarzenie i jego trzy opcje są ze szkicu autora („Pierwszym zdarzeniem może być spotkanie rannej kobiety…”). Zdarzenie pokazuje się po dotknięciu „Odbierz raport”.
 
 1. **Kiedy.** Po „Odbierz raport” gra najpierw pokazuje zdarzenie: tytuł, krótki tekst i opcje. Raport otwiera się dopiero po wyborze i opisuje, co z niego wynikło. Zdarzenie zamknięte bez wyboru czeka: następne „Odbierz raport” pokaże je znowu, a do wyboru nic się nie zapisuje.
-    - Zdarzenie może przyjść po wyprawie zakończonej zgodnie z planem, z szansą 0,5% za każdą minutę, najwyżej 25%: 5 minut to 2,5%, 30 minut 15%, a godzina i dłużej 25% (`chancePerMinute` i `maxChance` w `data/events.json`).
+    - Zdarzenie może przyjść po wyprawie zakończonej zgodnie z planem, z szansą 0,5% za każdą minutę, najwyżej 25%: 5 minut to 2,5%, 30 minut 15%, a godzina i dłużej 25% (`chancePerMinute` i `maxChance` w `data/events.json`). Zmienione niżej: stałe 10%, bez względu na długość wyprawy.
     - Nie przychodzi po pierwszej wyprawie (samouczek), po Szybkim Polowaniu ani po omdleniu lub odwrocie.
     - Ziarno wyprawy decyduje, czy zdarzenie przyjdzie i jak skończy się każda opcja, więc ta sama wyprawa zawsze daje to samo.
 2. **Ranna kobieta.** Opcje mają nazwy ze szkicu autora. Krótkie teksty skutków są nowe, w `data/events.json`.
@@ -2635,7 +2635,20 @@ Autor: „Trzeba zrobić tak by te zdarzenie miało różne możliwości docelow
     - Zasadzka (60%): jak dotąd. Po „Pomóż jej sprawnie” bandyci atakują pierwsi, a po „Zadaj dodatkowe pytania” walka zaczyna się bez zaskoczenia, z szybszą postacią.
     - Wdzięczność, złoto (25%): po „Pomóż jej sprawnie” kobieta daje sakiewkę, ok. 10 złota za każdy poziom postaci (±25%). To mniej więcej tyle, ile godzina wyprawy.
     - Wdzięczność, przedmiot (15%): po „Pomóż jej sprawnie” kobieta oddaje przedmiot znaleziony w lesie, na poziomie postaci: rzadki (70%), unikalny (25%) albo epicki (5%).
-    - Gdy kobieta jest uczciwa, „Zadaj dodatkowe pytania” kończy się bez nagrody: urażona podejrzliwością, odchodzi o własnych siłach. Dzięki temu opcje się różnią. Pomoc grozi zasadzką, ale może dać nagrodę. Pytania chronią przed zasadzką, ale tracą nagrodę. Odejście nic nie daje i nic nie kosztuje.
+    - Gdy kobieta jest uczciwa, „Zadaj dodatkowe pytania” kończy się bez nagrody: urażona podejrzliwością, odchodzi o własnych siłach. Zmienione niżej: kobieta umiera urażona albo zamienia się w Błędnicę. Dzięki temu opcje się różnią. Pomoc grozi zasadzką, ale może dać nagrodę. Pytania chronią przed zasadzką, ale tracą nagrodę. Odejście nic nie daje i nic nie kosztuje.
     - „Odejdź nieufnie” kończy się tak samo w każdym przypadku.
 3. **Nagroda** trafia do postaci jak znaleziska z wyprawy, a karta zdarzenia w raporcie podaje kwotę albo nazwę przedmiotu.
 4. **„Testuj zdarzenia”** pozwala wybrać przy zdarzeniu „Losowo” albo jeden z przypadków, żeby sprawdzić każdy z nich.
+
+## Ranna kobieta umiera urażona albo zamienia się w Błędnicę; zdarzenia w 10% wypraw (28.10.2026, wersja testowa)
+
+Autor: „Niech te zdarzenia działają na zasadzie losowości, niech trafiaja sie w 10% przypadków, a jakie.. no na razie jest to jedno tylko, ale zrobimy więcej i każde będzie miało równe prawdopodobieństwo”, „w sumie dodaj tylko to ze Blednica moze sie pojawic po zadaniu dodatkowych pytań albo umrzec urażona”, „nieee, ona ma sie ta kobieta zamieniać w Błędnice” i „Tylko niech zamiana w Błednice tez uzupelni pozniej Bestiariusz normalnie - dopilnuj tego”.
+
+1. **Szansa.** Zdarzenie przychodzi po 10% wypraw zakończonych zgodnie z planem, bez względu na ich długość (`chance` w `data/events.json`). Wyjątki bez zmian: pierwsza wyprawa (samouczek), Szybkie Polowanie, omdlenie i odwrót. Każde zdarzenie z listy ma tę samą szansę.
+2. **Pytania, gdy kobieta jest uczciwa.** „Zadaj dodatkowe pytania” w przypadkach „Wdzięczność” kończy się na jeden z dwóch sposobów, po 50%. Los rozstrzyga to dopiero po wyborze opcji:
+    - kobieta umiera urażona na oczach postaci i postać nic nie zyskuje;
+    - kobieta zamienia się w Błędnicę i postać walczy z nią sama, na poziomie postaci, z HP z końca wyprawy. Wygrana daje XP i złoto jak za Błędnicę spotkaną na wyprawie. Przedmiotów ani materiałów nie ma, jak w walce z bandytami. Przegrana to omdlenie, a w bezpiecznym miejscu odwrót. Błędnica w zdarzeniu nie ma premii poziomu: według symulacji postać wygrywa prawie zawsze i traci ok. 30–40% HP, czyli podobnie jak w zasadzce.
+3. **Bestiariusz i zadania.** Błędnica ze zdarzenia trafia do Bestiariusza jak stwór spotkany na wyprawie. Jej pokonanie liczy się też do zadań narratora. Bandyci są ludźmi, więc nadal nie ma ich ani w Bestiariuszu, ani w zadaniach.
+4. **Pozostałe opcje bez zmian.** W zasadzce pytania prowadzą do walki z bandytami bez zaskoczenia, a „Odejdź nieufnie” kończy się zawsze tak samo.
+5. **Dane.** Skutek opcji może być listą skutków z wagami (`weight`), z której los wybiera przy wyborze opcji (`src/engine/events.js`). Walka w zdarzeniu może być ze stworem z `data/monsters.json`.
+6. **Pominięte na razie.** Na razie nie ma rannego mężczyzny, przedmiotu w krzakach po nieufnym odejściu ani innych zaproponowanych pomysłów, bo autor napisał „dodaj tylko to”.

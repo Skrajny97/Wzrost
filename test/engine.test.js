@@ -2310,10 +2310,10 @@ describe('quests from the narrator', () => {
         { won: true, enemies: [{ monsterId: 'fox' }] },
         { won: false, enemies: [{ monsterId: 'bear' }] },
       ],
-    });
+    }, content);
     assert.deepEqual(kills, { wolf: 2, fox: 1 });
     const hunt = simulateHunt({ character: newCharacter('warrior'), equipped: [], name: 'Test', areaId: 'windfalls-edge', minutes: 30, seed: 'zadania' }, content);
-    const beaten = Object.values(huntKills(hunt)).reduce((sum, count) => sum + count, 0);
+    const beaten = Object.values(huntKills(hunt, content)).reduce((sum, count) => sum + count, 0);
     const won = hunt.fights.filter((fight) => fight.won === true).reduce((sum, fight) => sum + fight.enemies.length, 0);
     assert.equal(beaten, won);
   });

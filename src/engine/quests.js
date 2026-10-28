@@ -214,13 +214,14 @@ export function currentQuests(stored, { character, hasTable, hasProfessions, has
 export const questsStale = (stored, now, content) =>
   QUEST_PERIODS.some((periodId) => stored?.[periodId]?.period !== questPeriod(periodId, now, content).key);
 
-// The creatures beaten in an exploration's won fights, by id.
-export function huntKills(hunt) {
+// The creatures beaten in an exploration's won fights, by id. People beaten
+// in an event's fight (events.js) are no creatures, but a creature met in
+// one, as the Błędnica, counts as on the way.
+export function huntKills(hunt, content) {
   const kills = {};
   for (const fight of hunt.fights) {
-    // People beaten in an event's fight (events.js) are no creatures.
-    if (fight.won !== true || fight.event) continue;
-    for (const enemy of fight.enemies) kills[enemy.monsterId] = (kills[enemy.monsterId] ?? 0) + 1;
+    if (fight.won !== true) continue;
+    for (const enemy of fight.enemies) if (!content.eventFoesById[enemy.monsterId]) kills[enemy.monsterId] = (kills[enemy.monsterId] ?? 0) + 1;
   }
   return kills;
 }
