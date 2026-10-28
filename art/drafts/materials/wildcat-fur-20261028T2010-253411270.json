@@ -1,0 +1,25 @@
+{
+  "id": "wildcat-fur",
+  "payload": {
+    "prompt": "folded piece of grey-brown striped wildcat fur, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 253411270,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793218241,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 65.34,
+    "request_id": "cfc7959c-6f12-4985-a23b-f044b4712e26",
+    "outputs_retained_until": 1793304621
+  }
+}

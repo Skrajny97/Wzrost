@@ -1,0 +1,25 @@
+{
+  "id": "aesculapian-skin",
+  "payload": {
+    "prompt": "rolled olive-brown snakeskin with a yellow underside, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 906181570,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793218270,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 64.98,
+    "request_id": "e5c04c6c-c337-4b2f-9d97-7aba5babd244",
+    "outputs_retained_until": 1793304643
+  }
+}
