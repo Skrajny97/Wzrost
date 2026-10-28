@@ -9,7 +9,8 @@
 // ones consistent. A kind with `animation` draws looping animations, one at a
 // time, each as a PNG sheet of its frames; a prompt with `startFrame` (a PNG
 // in the repository) moves that picture in `frames` frames, and one with
-// `width` and `height` has its own size. Every request is
+// `width` and `height` has its own size (and with `removeBackground` its own
+// background). Every request is
 // priced first (free), and the run stops before it would spend more than
 // --max-cost dollars.
 
@@ -119,8 +120,9 @@ async function draw(id, count = variants) {
     height: kind.prompts[id].height ?? kind.height,
     num_images: count,
     seed,
-    // Sprites lose their background; scenes (removeBackground: false) keep it.
-    ...(kind.removeBackground === false ? {} : { remove_bg: true, return_non_bg_removed: true }),
+    // Sprites lose their background; scenes (removeBackground: false, of the
+    // kind or of the prompt) keep it.
+    ...((kind.prompts[id].removeBackground ?? kind.removeBackground) === false ? {} : { remove_bg: true, return_non_bg_removed: true }),
     ...(kind.animation && { return_spritesheet: true, ...(framesOf(id) && { frames_duration: framesOf(id) }) }),
     ...(startOf(id) && { input_image: readFileSync(startOf(id)).toString('base64') }),
   };

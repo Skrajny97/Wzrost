@@ -29,6 +29,7 @@ on:
           - professions
           - places
           - animations
+          - events
       ids:
         description: Identyfikatory po przecinku albo all
         required: true
