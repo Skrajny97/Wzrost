@@ -85,7 +85,7 @@ export const SPRITES = {
   lands: {
     width: 192,
     height: 96,
-    ids: ['windfalls', 'stone-glade'],
+    ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs'],
   },
   // The camp's buildings, <building>-<look> for the looks of levels 1–3, 4–7
   // and 8–10, 128×96 (camp-art.js keeps a vector drawing for a look without
