@@ -1,0 +1,25 @@
+{
+  "id": "leech-slime",
+  "payload": {
+    "prompt": "glob of dark leech slime on a leaf, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 111664964,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793184017,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 36.84,
+    "request_id": "9d7c80bd-fff7-49b2-be7b-d85d6ab74924",
+    "outputs_retained_until": 1793270362
+  }
+}

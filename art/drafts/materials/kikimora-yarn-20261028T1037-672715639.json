@@ -1,0 +1,25 @@
+{
+  "id": "kikimora-yarn",
+  "payload": {
+    "prompt": "skein of grey yarn spun from moss and hair, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 672715639,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793184057,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 36.48,
+    "request_id": "f3236374-a5d8-4a51-9001-df9e6e2b1977",
+    "outputs_retained_until": 1793270420
+  }
+}
