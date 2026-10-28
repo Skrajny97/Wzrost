@@ -89,6 +89,26 @@
     { "monster": "peat-cutter", "prefix": { "m": "Torfiarski", "f": "Torfiarska", "n": "Torfiarskie", "pl": "Torfiarskie" }, "suffix": "Torfiarza" },
     { "monster": "bog-worm", "suffix": "Czerwia" },
     { "monster": "kikimora", "suffix": "Kikimory" },
-    { "monster": "mud-lord", "prefix": { "m": "Bagienny", "f": "Bagienna", "n": "Bagienne", "pl": "Bagienne" }, "suffix": "Króla Błót" }
+    { "monster": "mud-lord", "prefix": { "m": "Bagienny", "f": "Bagienna", "n": "Bagienne", "pl": "Bagienne" }, "suffix": "Króla Błót" },
+    { "monster": "squirrel", "prefix": { "m": "Wiewiórczy", "f": "Wiewiórcza", "n": "Wiewiórcze", "pl": "Wiewiórcze" }, "suffix": "Wiewiórki" },
+    { "monster": "grass-snake", "prefix": { "m": "Zaskrońcowy", "f": "Zaskrońcowa", "n": "Zaskrońcowe", "pl": "Zaskrońcowe" }, "suffix": "Zaskrońca" },
+    { "monster": "raccoon-dog", "prefix": { "m": "Jenoci", "f": "Jenocia", "n": "Jenocie", "pl": "Jenocie" }, "suffix": "Jenota" },
+    { "monster": "antlion", "prefix": { "m": "Mrówkolwi", "f": "Mrówkolwia", "n": "Mrówkolwie", "pl": "Mrówkolwie" }, "suffix": "Mrówkolwa" },
+    { "monster": "capercaillie", "prefix": { "m": "Głuszcowy", "f": "Głuszcowa", "n": "Głuszcowe", "pl": "Głuszcowe" }, "suffix": "Głuszca" },
+    { "monster": "weasel", "prefix": { "m": "Łasiczy", "f": "Łasicza", "n": "Łasicze", "pl": "Łasicze" }, "suffix": "Łasicy" },
+    { "monster": "stag-beetle", "prefix": { "m": "Jelonkowy", "f": "Jelonkowa", "n": "Jelonkowe", "pl": "Jelonkowe" }, "suffix": "Jelonka" },
+    { "monster": "snake-hawk", "prefix": { "m": "Gadożerczy", "f": "Gadożercza", "n": "Gadożercze", "pl": "Gadożercze" }, "suffix": "Gadożera" },
+    { "monster": "wildcat", "prefix": { "m": "Żbiczy", "f": "Żbicza", "n": "Żbicze", "pl": "Żbicze" }, "suffix": "Żbika" },
+    { "monster": "black-stork", "prefix": { "m": "Bociani", "f": "Bociania", "n": "Bocianie", "pl": "Bocianie" }, "suffix": "Bociana" },
+    { "monster": "mossling", "prefix": { "m": "Mchowy", "f": "Mchowa", "n": "Mchowe", "pl": "Mchowe" }, "suffix": "Mchowca" },
+    { "monster": "imp", "prefix": { "m": "Chochlikowy", "f": "Chochlikowa", "n": "Chochlikowe", "pl": "Chochlikowe" }, "suffix": "Chochlika" },
+    { "monster": "cross-spider", "prefix": { "m": "Krzyżakowy", "f": "Krzyżakowa", "n": "Krzyżakowe", "pl": "Krzyżakowe" }, "suffix": "Krzyżaka" },
+    { "monster": "mouflon", "prefix": { "m": "Muflonowy", "f": "Muflonowa", "n": "Muflonowe", "pl": "Muflonowe" }, "suffix": "Muflona" },
+    { "monster": "falcon", "prefix": { "m": "Sokoli", "f": "Sokola", "n": "Sokole", "pl": "Sokole" }, "suffix": "Sokoła" },
+    { "monster": "werewolf", "prefix": { "m": "Wilkołaczy", "f": "Wilkołacza", "n": "Wilkołacze", "pl": "Wilkołacze" }, "suffix": "Wilkołaka" },
+    { "monster": "wolf-shepherd", "prefix": { "m": "Pasterski", "f": "Pasterska", "n": "Pasterskie", "pl": "Pasterskie" }, "suffix": "Pasterza" },
+    { "monster": "aurochs", "prefix": { "m": "Turzy", "f": "Turza", "n": "Turze", "pl": "Turze" }, "suffix": "Tura" },
+    { "monster": "aesculapian-snake", "prefix": { "m": "Połozowy", "f": "Połozowa", "n": "Połozowe", "pl": "Połozowe" }, "suffix": "Połoza" },
+    { "monster": "strzyga", "prefix": { "m": "Strzyży", "f": "Strzyża", "n": "Strzyże", "pl": "Strzyże" }, "suffix": "Strzygi" }
   ]
 }

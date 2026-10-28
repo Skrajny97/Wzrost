@@ -1979,6 +1979,8 @@ describe('Bestiariusz', () => {
       [
         ['wolf', 1, 5, false],
         ['badger', 1, 5, false],
+        ['squirrel', 1, 5, false],
+        ['grass-snake', 1, 5, false],
         ['wisp', 6, 6, true],
       ],
     );
@@ -2003,13 +2005,16 @@ describe('Bestiariusz', () => {
 
   test('it shows the chance of meeting each creature in a fight of a standard exploration', () => {
     const pace = explorationPace(content.balance.bestiary.chanceMinutes, content);
-    // Skraj Wiatrołomów: wolves in 52 of the 77 weight, badgers in 31, the
-    // elite before them, nothing demanding.
+    // Skraj Wiatrołomów: wolves in 46 of the 104 weight, badgers in 29,
+    // squirrels in 23 and grass snakes in 20, the elite before them, nothing
+    // demanding.
     const edge = meetingChances(content.areasById['windfalls-edge'], content);
     const usual = 1 - pace.eliteChance;
-    assert.deepEqual([...edge.keys()], ['wolf', 'badger', 'wisp']);
-    assert.ok(Math.abs(edge.get('wolf') - (usual * 52) / 77) < 1e-9);
-    assert.ok(Math.abs(edge.get('badger') - (usual * 31) / 77) < 1e-9);
+    assert.deepEqual([...edge.keys()], ['wolf', 'badger', 'squirrel', 'grass-snake', 'wisp']);
+    assert.ok(Math.abs(edge.get('wolf') - (usual * 46) / 104) < 1e-9);
+    assert.ok(Math.abs(edge.get('badger') - (usual * 29) / 104) < 1e-9);
+    assert.ok(Math.abs(edge.get('squirrel') - (usual * 23) / 104) < 1e-9);
+    assert.ok(Math.abs(edge.get('grass-snake') - (usual * 20) / 104) < 1e-9);
     assert.ok(Math.abs(edge.get('wisp') - pace.eliteChance) < 1e-9);
     // As often as the draws of an exploration bring them, the champion and
     // the demanding encounters too.
@@ -2035,7 +2040,8 @@ describe('Bestiariusz', () => {
   test('a whole land lists all creatures of its inner regions, the elites and the champion last', () => {
     const windfalls = regionDangers(content.regionsById.windfalls, content);
     assert.deepEqual(windfalls.map((danger) => danger.monsterId), [
-      'wolf', 'badger', 'fox', 'marten', 'crow', 'owl', 'viper', 'hornets', 'boar', 'stag', 'wisp', 'planetnik', 'tusker',
+      'wolf', 'badger', 'squirrel', 'grass-snake', 'fox', 'marten', 'raccoon-dog', 'antlion', 'crow', 'owl', 'capercaillie', 'weasel',
+      'viper', 'hornets', 'stag-beetle', 'snake-hawk', 'boar', 'stag', 'wildcat', 'black-stork', 'wisp', 'planetnik', 'tusker',
     ]);
     // The elite of three inner regions, at the levels of all three.
     const wisp = windfalls.find((danger) => danger.monsterId === 'wisp');
@@ -2068,8 +2074,8 @@ describe('Bestiariusz', () => {
 
   test('it is full once every creature on the list is met, the elite too', () => {
     const edge = content.areasById['windfalls-edge'];
-    assert.equal(bestiaryFull(edge, ['wolf', 'badger'], content), false);
-    assert.equal(bestiaryFull(edge, ['wolf', 'badger', 'wisp', 'boar'], content), true);
+    assert.equal(bestiaryFull(edge, ['wolf', 'badger', 'wisp'], content), false);
+    assert.equal(bestiaryFull(edge, ['wolf', 'badger', 'squirrel', 'grass-snake', 'wisp', 'boar'], content), true);
   });
 
   test('tracking the creatures of the quests meets them more often', () => {
@@ -2083,11 +2089,11 @@ describe('Bestiariusz', () => {
       }
       return badgers / 6000;
     };
-    // At level 5 a badger comes in 31 of the 77 weight of Skraj's
-    // encounters, and tracked in 46.5 of 92.5: from about 40% of fights to
-    // about 50%.
-    assert.ok(Math.abs(share([]) - 31 / 77) < 0.02, String(share([])));
-    assert.ok(Math.abs(share(['badger']) - 46.5 / 92.5) < 0.02, String(share(['badger'])));
+    // At level 5 a badger comes in 29 of the 104 weight of Skraj's
+    // encounters, and tracked in 43.5 of 118.5: from about 28% of fights to
+    // about 37%.
+    assert.ok(Math.abs(share([]) - 29 / 104) < 0.02, String(share([])));
+    assert.ok(Math.abs(share(['badger']) - 43.5 / 118.5) < 0.02, String(share(['badger'])));
   });
 
   test('every creature an inner region can roll is on its list, within its levels', () => {
@@ -2207,10 +2213,11 @@ describe('quests from the narrator', () => {
   });
 
   test('a quest asks for as many creatures as its fights bring, and rare ones only for the week', () => {
-    // Skraj Wiatrołomów at level 1: wolves come in 38 fights of 63, badgers
-    // in 25, and each fight brings one creature.
+    // Skraj Wiatrołomów at level 1: wolves come in 30 fights of 84, badgers
+    // in 20, squirrels in 18 and grass snakes in 16, and each fight brings
+    // one creature.
     const character = newCharacter('mage');
-    const shares = { wolf: 38 / 63, badger: 25 / 63 };
+    const shares = { wolf: 30 / 84, badger: 20 / 84, squirrel: 18 / 84, 'grass-snake': 16 / 84 };
     for (const periodId of ['daily', 'weekly']) {
       const [fewest, most] = content.quests.kinds.find((kind) => kind.id === 'kill')[periodId].fights;
       for (let seed = 0; seed < 30; seed++) {
@@ -2283,8 +2290,8 @@ describe('quests from the narrator', () => {
           .filter((quest) => quest.kind === 'kill')
           .map((quest) => quest.target),
       );
-    assert.deepEqual([...targets('daily')].sort(), ['bat', 'boar', 'stag', 'stoneling']);
-    assert.deepEqual([...targets('weekly')].sort(), ['bat', 'stoneling']);
+    assert.deepEqual([...targets('daily')].sort(), ['bat', 'black-stork', 'boar', 'imp', 'mossling', 'stag', 'stoneling', 'wildcat']);
+    assert.deepEqual([...targets('weekly')].sort(), ['bat', 'imp', 'mossling', 'stoneling']);
   });
 
   test('a kept quest for a creature the class cannot reach is drawn anew, the others stay', () => {
@@ -2307,7 +2314,7 @@ describe('quests from the narrator', () => {
     // A new quest the period does not ask for yet, from what the class may get.
     assert.notEqual(fresh.target, 'she-wolf');
     assert.ok(!['explore', 'salvage'].includes(fresh.kind) && fresh.target !== 'stoneling');
-    assert.ok(fresh.kind !== 'kill' || ['bat', 'boar', 'stag'].includes(fresh.target));
+    assert.ok(fresh.kind !== 'kill' || ['bat', 'mossling', 'imp', 'boar', 'stag', 'wildcat', 'black-stork'].includes(fresh.target));
     assert.deepEqual([fresh.progress, fresh.claimed], [0, false]);
     // Reachable, done or claimed quests stay as they were.
     assert.deepEqual(kept, stored.daily.quests.slice(1));

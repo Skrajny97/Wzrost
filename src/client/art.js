@@ -24,6 +24,10 @@ export const SPRITES = {
       'peat-cutter', 'bog-worm', 'mud-lord', 'kikimora',
       // The bandits of the wounded woman's event (data/events.json).
       'bandit-thug', 'bandit-knifer', 'bandit-crossbow',
+      // Four regular creatures per inner region of levels 1–50, from 28.10.2026.
+      'squirrel', 'grass-snake', 'raccoon-dog', 'antlion', 'capercaillie', 'weasel', 'stag-beetle', 'snake-hawk',
+      'wildcat', 'black-stork', 'mossling', 'imp', 'cross-spider', 'mouflon', 'falcon', 'werewolf', 'wolf-shepherd',
+      'aurochs', 'aesculapian-snake', 'strzyga',
     ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved.
@@ -62,6 +66,11 @@ export const SPRITES = {
       'mist-drop', 'old-bone', 'drowner-weeds', 'sludge-lump', 'vodnik-pearl', 'drowned-tear', 'crane-feather', 'elk-antler',
       'crayfish-shell', 'harrier-feather', 'sundew-dew', 'peat-heart', 'wisp-spark', 'salamander-skin', 'peat-spade', 'worm-jaw',
       'goblin-trinket', 'leech-slime', 'kikimora-yarn', 'bog-heart',
+      // Four regular creatures per inner region of levels 1–50, from 28.10.2026.
+      'squirrel-tail', 'grass-snake-slough', 'raccoon-dog-fur', 'antlion-jaws', 'capercaillie-feather', 'weasel-fur',
+      'stag-beetle-horn', 'snake-hawk-talon', 'wildcat-fur', 'black-stork-feather', 'living-moss', 'imp-dust',
+      'cross-spider-silk', 'mouflon-horn', 'falcon-feather', 'werewolf-fur', 'shepherd-crook', 'aurochs-horn',
+      'aesculapian-skin', 'strzyga-fang',
     ],
   },
   // The skills of the classes (data/skills.json), 48×48.

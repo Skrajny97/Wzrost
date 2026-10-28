@@ -227,7 +227,7 @@ describe('events (API)', () => {
           title: 'Ranna kobieta',
           cases: woman.cases.map(({ id, name }) => ({ id, name })),
           endings: [
-            { id: 'dies', name: 'Pytania: umiera urażona' },
+            { id: 'dies', name: 'Pytania: umiera w beznadziei' },
             { id: 'wisp', name: 'Pytania: zamienia się w Błędnicę' },
           ],
         },

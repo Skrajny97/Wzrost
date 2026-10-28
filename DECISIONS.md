@@ -2667,7 +2667,8 @@ Autor: „Jesli chodzi o zdarzenie rannej kobiety to to co jest działa i jest o
 
 1. **Gra główna.** Zdarzenia działają w grze głównej od wersji 0.0.43 (`EVENTS` „on” w `wrangler.jsonc`) i przychodzą po 10% wypraw zakończonych zgodnie z planem.
 2. **Błędnica jako szkic.** Zakończenie z Błędnicą czeka na zatwierdzenie autora (`draft` w `data/events.json`), więc losuje się tylko w wersji testowej (`EVENTS` „test”). W grze głównej uczciwa kobieta po „Zadaj dodatkowe pytania” zawsze umiera urażona. Po zatwierdzeniu wystarczy usunąć `draft`, a oba zakończenia znów będą po 50%.
-3. **„Testuj zdarzenia”** ma też zakończenia pytań: „Pytania: umiera urażona” i „Pytania: zamienia się w Błędnicę”. Zakończenie wybrane bez przypadku przychodzi w pierwszym przypadku, w którym pytania do niego prowadzą, czyli „Wdzięczność: złoto”.
+3. **„Testuj zdarzenia”** ma też zakończenia pytań: „Pytania: umiera w beznadziei” i „Pytania: zamienia się w Błędnicę”. Zakończenie wybrane bez przypadku przychodzi w pierwszym przypadku, w którym pytania do niego prowadzą, czyli „Wdzięczność: złoto”.
+4. **Tekst autora (0.0.44).** Od wersji 0.0.44 kobieta po pytaniach umiera w beznadziei, w słowach autora: „Kobieta próbuje odpowiadać, ale Twoje podejrzliwe pytania nie pomagają a odbierają nadziei na jakąkolwiek pomoc. Na Twoich oczach umiera w beznadziei. Nic już dla niej nie zrobisz.”
 
 ## Zadania dzienne z dwóch regionów wewnętrznych (28.10.2026, 0.0.43)
 
@@ -2676,3 +2677,25 @@ Autor: „Po pierwsze do zadań dziennych losuj z ostatniej otwartej lokacji i j
 1. Zadania dzienne na stwory biorą stwory z najnowszego regionu wewnętrznego otwartego dla klasy i z regionu przed nim. Region za łatwy dla postaci odpada, jak dotąd.
 2. Zadania tygodniowe zostają przy najnowszym regionie, bo autor mówił tylko o dziennych.
 3. Liczba stworów w „Pokonaj N dowolnych stworów” liczy się jak dotąd z najnowszego regionu.
+
+## Cztery zwykłe stwory w każdym regionie wewnętrznym poziomów 1–50 (28.10.2026)
+
+Autor: „Nastepnym krokiem będzie rozwiniecie listy stworow na niskich poziomach. Niech kazdy region wewnętrzny ma 4 stwory zwykłe”, potem „Gadożer zmiana opisu - nie orzeł a jastrząb” i „Lista zatwierdzona, zaczynamy od tych do 50 poziomu, aż do wdrożenia przed północą, a później zajmiemy się resztą”.
+
+1. **Nowe stwory** (pozycja w nawiasie):
+    - Skraj Wiatrołomów: Wiewiórka (tył), Zaskroniec (środek).
+    - Lisie Jary: Jenot (przód), Mrówkolew (tył).
+    - Krucze Wykroty: Głuszec (przód), Łasica (środek).
+    - Żmijowe Zwalisko: Jelonek rogacz (przód), Gadożer (tył).
+    - Dzicza Głusza: Żbik (środek), Bocian czarny (tył).
+    - Omszałe Głazy: Mchowiec (przód), Chochlik (środek).
+    - Pajęczy Parów: Krzyżak (tył).
+    - Rysia Grań: Muflon (przód), Sokół (tył).
+    - Wilcze Kręgi: Wilkołak (środek), Wilczy pasterz (tył).
+    - Serce Uroczyska: Tur (przód), Połoz (środek), Strzyga (tył).
+2. **Ataki i efekty** dobrane do opisów z listy: Mrówkolew, Krzyżak i Połoz spowalniają (Ugrzęźnięcie), Mchowiec i Strzyga wysysają część zadanych obrażeń, Wilczy pasterz atakuje mrozem i wychładza, Chochlik rzuca magiczne iskry. Gadożer lepiej znosi jad, a Mchowiec jest słaby na ogień.
+3. **Siła i nagrody** jak u sąsiadów z tego samego regionu. Według symulacji omdlenia się nie zmieniły, a XP i złoto na godzinę różnią się od dotychczasowych najwyżej o 2%.
+4. **Materiały**: każdy nowy stwór zostawia własny materiał, o rzadkości jak u stworów tego regionu (od pospolitych na Skraju Wiatrołomów do epickich w Sercu Uroczyska). Każdy ma też nazwę do afiksów przedmiotów.
+5. **Spotkania**: nowe stwory przychodzą same i w parach z dotychczasowymi, a od Kruczych Wykrotów także w wymagających spotkaniach. Na Skraju Wiatrołomów pary są dopiero od 5. poziomu, jak dotąd. Opisy regionów wewnętrznych wymieniają nowe stwory.
+6. **Bestiariusz**: nowe stwory są na listach regionów i krain. Skrzynia regionu, który ktoś już otworzył, zostaje otwarta. Kto jej jeszcze nie otworzył, musi teraz spotkać także nowe stwory.
+7. **Głosy**: po dwa nagrania bólu i śmierci na stwora, z ElevenLabs, jak u pozostałych stworów.

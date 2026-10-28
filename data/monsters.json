@@ -1046,5 +1046,310 @@
     "armorFactor": 0.75,
     "resistances": {"earth": {"base": 25, "perLevel": 4}, "poison": {"base": 25, "perLevel": 4}},
     "reward": {"xp": 1.0, "gold": 1.0}
+  },
+  {
+    "id": "squirrel",
+    "name": "Wiewiórka",
+    "counted": ["wiewiórkę", "wiewiórki", "wiewiórek"],
+    "family": "beast",
+    "position": "back",
+    "stats": {
+      "base": {"strength": 2, "dexterity": 6, "vitality": 2, "endurance": 1, "intellect": 1, "wisdom": 1, "perception": 5, "will": 2},
+      "growth": {"strength": 1, "dexterity": 2, "vitality": 1.5, "endurance": 0.5, "perception": 1.5, "will": 0.5}
+    },
+    "attack": {"name": "Rzut szyszką", "sound": "fist", "category": "physical", "strike": "arrow", "scaling": "dexterity", "damageFactor": 0.4, "variance": 0.2},
+    "hpFactor": 0.4,
+    "armorFactor": 0.1,
+    "reward": {"xp": 1.0, "gold": 0.7}
+  },
+  {
+    "id": "grass-snake",
+    "name": "Zaskroniec",
+    "counted": ["zaskrońca", "zaskrońce", "zaskrońców"],
+    "family": "snake",
+    "position": "middle",
+    "stats": {
+      "base": {"strength": 3, "dexterity": 5, "vitality": 3, "endurance": 2, "intellect": 1, "wisdom": 1, "perception": 4, "will": 2},
+      "growth": {"strength": 1.5, "dexterity": 2, "vitality": 2, "endurance": 1, "perception": 1, "will": 0.5}
+    },
+    "attack": {"name": "Ukąszenie zaskrońca", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.45, "variance": 0.2},
+    "hpFactor": 0.5,
+    "armorFactor": 0.2,
+    "reward": {"xp": 1.0, "gold": 0.7}
+  },
+  {
+    "id": "raccoon-dog",
+    "name": "Jenot",
+    "counted": ["jenota", "jenoty", "jenotów"],
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": {"strength": 5, "dexterity": 3, "vitality": 5, "endurance": 5, "intellect": 1, "wisdom": 1, "perception": 3, "will": 3},
+      "growth": {"strength": 2, "dexterity": 1, "vitality": 2.5, "endurance": 2, "perception": 0.5, "will": 1}
+    },
+    "attack": {"name": "Zajadłe ugryzienie", "sound": "bite", "category": "physical", "scaling": "strength", "damageFactor": 0.55, "variance": 0.2},
+    "hpFactor": 0.65,
+    "armorFactor": 0.45,
+    "reward": {"xp": 1.0, "gold": 0.7}
+  },
+  {
+    "id": "antlion",
+    "name": "Mrówkolew",
+    "counted": ["mrówkolwa", "mrówkolwy", "mrówkolwów"],
+    "family": "insect",
+    "position": "back",
+    "stats": {
+      "base": {"strength": 4, "dexterity": 5, "vitality": 3, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 4, "will": 2},
+      "growth": {"strength": 1.5, "dexterity": 2, "vitality": 1.5, "endurance": 1, "perception": 1, "will": 0.5}
+    },
+    "attack": {"name": "Sypnięcie piaskiem", "sound": "claw", "category": "physical", "strike": "arrow", "scaling": "dexterity", "damageFactor": 0.4, "variance": 0.2, "slow": {"effect": "mired", "chance": 0.3, "slow": 0.3}},
+    "hpFactor": 0.45,
+    "armorFactor": 0.35,
+    "reward": {"xp": 0.9, "gold": 0.5}
+  },
+  {
+    "id": "capercaillie",
+    "name": "Głuszec",
+    "counted": ["głuszca", "głuszce", "głuszców"],
+    "family": "bird",
+    "position": "front",
+    "stats": {
+      "base": {"strength": 5, "dexterity": 4, "vitality": 5, "endurance": 4, "intellect": 1, "wisdom": 1, "perception": 3, "will": 4},
+      "growth": {"strength": 2, "dexterity": 1, "vitality": 2.5, "endurance": 1.5, "perception": 0.5, "will": 1}
+    },
+    "attack": {"name": "Uderzenie skrzydłem", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 0.55, "variance": 0.25},
+    "hpFactor": 0.6,
+    "armorFactor": 0.3,
+    "reward": {"xp": 1.05, "gold": 0.7}
+  },
+  {
+    "id": "weasel",
+    "name": "Łasica",
+    "counted": ["łasicę", "łasice", "łasic"],
+    "family": "beast",
+    "position": "middle",
+    "stats": {
+      "base": {"strength": 3, "dexterity": 8, "vitality": 3, "endurance": 2, "intellect": 1, "wisdom": 1, "perception": 6, "will": 2},
+      "growth": {"strength": 1.5, "dexterity": 2.5, "vitality": 1.5, "endurance": 1, "perception": 2, "will": 0.5}
+    },
+    "attack": {"name": "Szybkie kąśnięcie", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.5, "variance": 0.2},
+    "hpFactor": 0.4,
+    "armorFactor": 0.15,
+    "reward": {"xp": 0.85, "gold": 0.6}
+  },
+  {
+    "id": "stag-beetle",
+    "name": "Jelonek rogacz",
+    "counted": ["jelonka rogacza", "jelonki rogacze", "jelonków rogaczy"],
+    "family": "insect",
+    "position": "front",
+    "stats": {
+      "base": {"strength": 6, "dexterity": 2, "vitality": 5, "endurance": 7, "intellect": 1, "wisdom": 1, "perception": 2, "will": 3},
+      "growth": {"strength": 2, "dexterity": 0.5, "vitality": 2.5, "endurance": 3, "perception": 0.5, "will": 1}
+    },
+    "attack": {"name": "Uścisk żuwaczek", "sound": "claw", "category": "physical", "scaling": "strength", "damageFactor": 0.55, "variance": 0.2},
+    "hpFactor": 0.6,
+    "armorFactor": 0.8,
+    "reward": {"xp": 1.1, "gold": 0.7}
+  },
+  {
+    "id": "snake-hawk",
+    "name": "Gadożer",
+    "counted": ["gadożera", "gadożery", "gadożerów"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": {"strength": 3, "dexterity": 6, "vitality": 3, "endurance": 2, "intellect": 1, "wisdom": 2, "perception": 7, "will": 3},
+      "growth": {"strength": 1.5, "dexterity": 2, "vitality": 1.5, "endurance": 0.5, "perception": 2, "will": 0.5}
+    },
+    "attack": {"name": "Atak z lotu", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.5, "variance": 0.25},
+    "hpFactor": 0.45,
+    "armorFactor": 0.1,
+    "resistances": {"poison": {"base": 20, "perLevel": 3}},
+    "reward": {"xp": 0.9, "gold": 0.55}
+  },
+  {
+    "id": "wildcat",
+    "name": "Żbik",
+    "counted": ["żbika", "żbiki", "żbików"],
+    "family": "beast",
+    "position": "middle",
+    "stats": {
+      "base": {"strength": 4, "dexterity": 8, "vitality": 3, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 7, "will": 3},
+      "growth": {"strength": 2, "dexterity": 2.5, "vitality": 2, "endurance": 1, "perception": 2, "will": 0.5}
+    },
+    "attack": {"name": "Pazury żbika", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.55, "variance": 0.25},
+    "hpFactor": 0.5,
+    "armorFactor": 0.2,
+    "reward": {"xp": 1.15, "gold": 0.8}
+  },
+  {
+    "id": "black-stork",
+    "name": "Bocian czarny",
+    "counted": ["bociana czarnego", "bociany czarne", "bocianów czarnych"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": {"strength": 3, "dexterity": 6, "vitality": 3, "endurance": 2, "intellect": 1, "wisdom": 2, "perception": 6, "will": 3},
+      "growth": {"strength": 1.5, "dexterity": 2, "vitality": 2, "endurance": 0.5, "perception": 2, "will": 0.5}
+    },
+    "attack": {"name": "Pchnięcie dziobem", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.5, "variance": 0.25},
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "reward": {"xp": 1.1, "gold": 0.75}
+  },
+  {
+    "id": "mossling",
+    "name": "Mchowiec",
+    "counted": ["mchowca", "mchowce", "mchowców"],
+    "family": "spirit",
+    "position": "front",
+    "stats": {
+      "base": {"strength": 5, "dexterity": 2, "vitality": 7, "endurance": 5, "intellect": 3, "wisdom": 2, "perception": 2, "will": 5},
+      "growth": {"strength": 1.5, "dexterity": 0.5, "vitality": 3, "endurance": 2, "perception": 0.5, "will": 1.2}
+    },
+    "attack": {"name": "Przyrastający mech", "sound": "fist", "category": "physical", "scaling": "strength", "damageFactor": 0.5, "variance": 0.2, "drain": 0.3},
+    "hpFactor": 0.8,
+    "armorFactor": 0.45,
+    "resistances": {"nature": {"base": 15, "perLevel": 3}},
+    "weaknesses": {"fire": 0.5},
+    "reward": {"xp": 1.2, "gold": 0.8}
+  },
+  {
+    "id": "imp",
+    "name": "Chochlik",
+    "counted": ["chochlika", "chochliki", "chochlików"],
+    "family": "spirit",
+    "position": "middle",
+    "stats": {
+      "base": {"strength": 2, "dexterity": 7, "vitality": 3, "endurance": 2, "intellect": 7, "wisdom": 4, "perception": 5, "will": 4},
+      "growth": {"strength": 0.5, "dexterity": 2, "vitality": 2, "endurance": 0.5, "intellect": 2.5, "wisdom": 1, "perception": 1, "will": 1}
+    },
+    "attack": {"name": "Psotny czar", "sound": "magic", "category": "magical", "element": "lightning", "scaling": "intellect", "damageFactor": 0.45, "variance": 0.25},
+    "hpFactor": 0.45,
+    "armorFactor": 0.15,
+    "reward": {"xp": 1.0, "gold": 0.7}
+  },
+  {
+    "id": "cross-spider",
+    "name": "Krzyżak",
+    "counted": ["krzyżaka", "krzyżaki", "krzyżaków"],
+    "family": "spider",
+    "position": "back",
+    "stats": {
+      "base": {"strength": 3, "dexterity": 6, "vitality": 3, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 2},
+      "growth": {"strength": 1.5, "dexterity": 2, "vitality": 2, "endurance": 1, "perception": 1.5, "will": 0.5}
+    },
+    "attack": {"name": "Lepka sieć", "sound": "bite", "category": "physical", "strike": "arrow", "scaling": "dexterity", "damageFactor": 0.4, "variance": 0.2, "slow": {"effect": "mired", "chance": 0.35, "slow": 0.35}},
+    "hpFactor": 0.5,
+    "armorFactor": 0.25,
+    "resistances": {"poison": {"base": 15, "perLevel": 3}},
+    "reward": {"xp": 1.0, "gold": 0.6}
+  },
+  {
+    "id": "mouflon",
+    "name": "Muflon",
+    "counted": ["muflona", "muflony", "muflonów"],
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": {"strength": 7, "dexterity": 4, "vitality": 6, "endurance": 5, "intellect": 1, "wisdom": 1, "perception": 3, "will": 4},
+      "growth": {"strength": 2.5, "dexterity": 1, "vitality": 3, "endurance": 2, "perception": 0.5, "will": 1}
+    },
+    "attack": {"name": "Taran", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.3},
+    "hpFactor": 0.75,
+    "armorFactor": 0.45,
+    "reward": {"xp": 1.15, "gold": 0.85}
+  },
+  {
+    "id": "falcon",
+    "name": "Sokół",
+    "counted": ["sokoła", "sokoły", "sokołów"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": {"strength": 3, "dexterity": 9, "vitality": 3, "endurance": 2, "intellect": 1, "wisdom": 2, "perception": 8, "will": 3},
+      "growth": {"strength": 1.5, "dexterity": 2.5, "vitality": 1.5, "endurance": 0.5, "perception": 2.5, "will": 0.5}
+    },
+    "attack": {"name": "Lot nurkowy", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.55, "variance": 0.25},
+    "hpFactor": 0.45,
+    "armorFactor": 0.1,
+    "reward": {"xp": 0.95, "gold": 0.6}
+  },
+  {
+    "id": "werewolf",
+    "name": "Wilkołak",
+    "counted": ["wilkołaka", "wilkołaki", "wilkołaków"],
+    "family": "beast",
+    "position": "middle",
+    "stats": {
+      "base": {"strength": 7, "dexterity": 7, "vitality": 5, "endurance": 4, "intellect": 2, "wisdom": 1, "perception": 5, "will": 4},
+      "growth": {"strength": 2.5, "dexterity": 2, "vitality": 2.5, "endurance": 1.5, "perception": 1, "will": 1}
+    },
+    "attack": {"name": "Rozszarpanie", "sound": "claw", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.25},
+    "hpFactor": 0.7,
+    "armorFactor": 0.3,
+    "reward": {"xp": 1.1, "gold": 0.9}
+  },
+  {
+    "id": "wolf-shepherd",
+    "name": "Wilczy pasterz",
+    "counted": ["wilczego pasterza", "wilczych pasterzy", "wilczych pasterzy"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": {"strength": 2, "dexterity": 4, "vitality": 4, "endurance": 3, "intellect": 8, "wisdom": 6, "perception": 5, "will": 6},
+      "growth": {"dexterity": 1, "vitality": 2, "endurance": 1, "intellect": 3, "wisdom": 1.5, "will": 1.5}
+    },
+    "attack": {"name": "Mroźne wycie", "sound": "magic", "category": "magical", "element": "frost", "scaling": "intellect", "damageFactor": 0.5, "variance": 0.25, "dot": {"effect": "chilled", "chance": 0.3, "power": 0.3, "ticks": 3}},
+    "hpFactor": 0.6,
+    "armorFactor": 0.2,
+    "resistances": {"frost": {"base": 20, "perLevel": 4}},
+    "reward": {"xp": 1.0, "gold": 0.85}
+  },
+  {
+    "id": "aurochs",
+    "name": "Tur",
+    "counted": ["tura", "tury", "turów"],
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": {"strength": 9, "dexterity": 3, "vitality": 9, "endurance": 7, "intellect": 1, "wisdom": 1, "perception": 3, "will": 5},
+      "growth": {"strength": 3, "dexterity": 0.5, "vitality": 3.5, "endurance": 2.5, "perception": 0.5, "will": 1}
+    },
+    "attack": {"name": "Szarża tura", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 0.6, "variance": 0.3},
+    "hpFactor": 0.95,
+    "armorFactor": 0.55,
+    "reward": {"xp": 1.05, "gold": 0.95}
+  },
+  {
+    "id": "aesculapian-snake",
+    "name": "Połoz",
+    "counted": ["połoza", "połozy", "połozów"],
+    "family": "snake",
+    "position": "middle",
+    "stats": {
+      "base": {"strength": 6, "dexterity": 6, "vitality": 5, "endurance": 4, "intellect": 1, "wisdom": 1, "perception": 5, "will": 3},
+      "growth": {"strength": 2, "dexterity": 2, "vitality": 2.5, "endurance": 1.5, "perception": 1, "will": 0.5}
+    },
+    "attack": {"name": "Duszący splot", "sound": "bite", "category": "physical", "scaling": "strength", "damageFactor": 0.5, "variance": 0.2, "slow": {"effect": "mired", "chance": 0.3, "slow": 0.4}},
+    "hpFactor": 0.7,
+    "armorFactor": 0.3,
+    "reward": {"xp": 1.0, "gold": 0.8}
+  },
+  {
+    "id": "strzyga",
+    "name": "Strzyga",
+    "counted": ["strzygę", "strzygi", "strzyg"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": {"strength": 3, "dexterity": 6, "vitality": 4, "endurance": 3, "intellect": 8, "wisdom": 5, "perception": 6, "will": 6},
+      "growth": {"strength": 1, "dexterity": 1.5, "vitality": 2, "endurance": 1, "perception": 1, "will": 1.5}
+    },
+    "attack": {"name": "Wysysanie krwi", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.5, "variance": 0.2, "drain": 0.35},
+    "hpFactor": 0.6,
+    "armorFactor": 0.2,
+    "reward": {"xp": 1.05, "gold": 0.85}
   }
 ]

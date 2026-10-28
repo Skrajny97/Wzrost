@@ -20,10 +20,10 @@
           "outcome": [
             {
               "id": "dies",
-              "name": "Pytania: umiera urażona",
+              "name": "Pytania: umiera w beznadziei",
               "weight": 50,
               "kind": "none",
-              "text": "Kobieta próbuje odpowiadać, ale twoje pytania ranią ją bardziej niż rana. Urażona odwraca głowę i umiera na twoich oczach. Nic już dla niej nie zrobisz."
+              "text": "Kobieta próbuje odpowiadać, ale Twoje podejrzliwe pytania nie pomagają a odbierają nadziei na jakąkolwiek pomoc. Na Twoich oczach umiera w beznadziei. Nic już dla niej nie zrobisz."
             },
             {
               "id": "wisp",

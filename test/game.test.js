@@ -1854,7 +1854,7 @@ describe('Bestiariusz', () => {
   test('every inner region lists its creatures, and those fought become known', async () => {
     const { data } = await call('GET', '/api/content');
     const edge = data.regions[0].areas.find((area) => area.id === 'windfalls-edge');
-    assert.deepEqual(edge.dangers.map((danger) => danger.monsterId), ['wolf', 'badger', 'wisp']);
+    assert.deepEqual(edge.dangers.map((danger) => danger.monsterId), ['wolf', 'badger', 'squirrel', 'grass-snake', 'wisp']);
     assert.deepEqual([edge.dangers[0].name, edge.dangers[0].minLevel, edge.dangers[0].maxLevel], ['Wilk', 1, 5]);
     assert.deepEqual(edge.dangers.at(-1).elite, true);
     // Each with its chance of coming in a fight, met or not.
@@ -1862,7 +1862,7 @@ describe('Bestiariusz', () => {
     assert.deepEqual(edge.dangers.map((danger) => danger.chance), edge.dangers.map((danger) => chances.get(danger.monsterId)));
     assert.ok(data.regions.every((region) => region.areas.every((area) => area.dangers.every((danger) => danger.chance > 0))));
     // The whole land's list: every creature of its inner regions, no chances.
-    assert.equal(data.regions[0].dangers.length, 13);
+    assert.equal(data.regions[0].dangers.length, 23);
     assert.ok(data.regions[0].dangers.every((danger) => danger.chance === undefined && danger.name));
     assert.deepEqual((await call('GET', '/api/character', { cookie })).data.character.met, []);
     const { report, character } = await hunt();
@@ -1895,7 +1895,7 @@ describe('Bestiariusz', () => {
     await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(['wolf', 'badger'])).run();
     const shut = await open('windfalls-edge');
     assert.deepEqual([shut.status, shut.data.error.code], [409, 'not_ready']);
-    await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(['wolf', 'badger', 'wisp'])).run();
+    await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(['wolf', 'badger', 'squirrel', 'grass-snake', 'wisp'])).run();
     const opened = await open('windfalls-edge');
     assert.equal(opened.status, 200);
     assert.deepEqual(opened.data.chest, { gold: 30, timePoints: 5, systemPoints: 20 });
