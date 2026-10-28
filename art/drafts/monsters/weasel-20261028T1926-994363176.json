@@ -1,0 +1,25 @@
+{
+  "id": "weasel",
+  "payload": {
+    "prompt": "small slender weasel with a brown back and white belly, long body arched and ready to bite, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 994363176,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793215975,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 75.42,
+    "request_id": "634e71c0-b65d-4a00-99a5-5a03111ee000",
+    "outputs_retained_until": 1793302325
+  }
+}

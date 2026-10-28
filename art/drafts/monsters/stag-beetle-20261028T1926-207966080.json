@@ -1,0 +1,25 @@
+{
+  "id": "stag-beetle",
+  "payload": {
+    "prompt": "giant stag beetle with glossy dark brown armour and huge antler-like red-brown mandibles, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 207966080,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793216002,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 75.06,
+    "request_id": "aabc984a-0a7b-4d35-b41d-8ad8fec5e5d9",
+    "outputs_retained_until": 1793302379
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "imp",
+  "payload": {
+    "prompt": "small mischievous forest imp with pointed ears, grey-green skin and a sly grin, crouching on a mossy stone with a tiny green spark of magic in its hand, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 394951967,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793216256,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 73.26,
+    "request_id": "ab475ab4-23af-440d-a2a2-720137df951f",
+    "outputs_retained_until": 1793302618
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "antlion",
+  "payload": {
+    "prompt": "giant antlion larva the size of a dog, bulbous sandy-brown bristly body, huge curved sickle jaws, half buried in a funnel of sand, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 240026174,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793215825,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 75.78,
+    "request_id": "50665244-cec7-4261-94ac-fe59e03719ea",
+    "outputs_retained_until": 1793302160
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "snake-hawk",
+  "payload": {
+    "prompt": "hawk with a barred pale chest and fierce yellow eyes, wings raised, a viper writhing in its talons, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 875725885,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793216057,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 74.7,
+    "request_id": "66a57338-1b78-4200-be01-bb18b7900c97",
+    "outputs_retained_until": 1793302404
+  }
+}
