@@ -640,7 +640,8 @@
       "chapter": "crafting",
       "text": [
         "Piętnasty poziom postaci… System otworzył przed Tobą Rzemieślnictwo."
-      ]
+      ],
+      "voice": "audio/narration/crafting-welcome.mp3"
     },
     {
       "id": "crafting-lead",
@@ -648,7 +649,8 @@
       "chapter": "crafting",
       "text": [
         "Systemowy Warsztat czeka w zakładce Profesje. Zajrzyjmy tam."
-      ]
+      ],
+      "voice": "audio/narration/crafting-lead.mp3"
     },
     {
       "id": "crafting-patterns",
@@ -656,7 +658,8 @@
       "chapter": "crafting",
       "text": [
         "Tu wykonasz broń i pancerz według wzorów. Części do nich uzyskasz przy Stole rozbiórki albo kupisz u złomiarza."
-      ]
+      ],
+      "voice": "audio/narration/crafting-patterns.mp3"
     },
     {
       "id": "crafting-ending",
@@ -664,7 +667,8 @@
       "chapter": "crafting",
       "text": [
         "Każdy nowy poziom Rzemieślnictwa odsłoni Ci kolejne wzory. Zajrzyj tu też, gdy rozbierzesz na części wcześniej nierozbierany przedmiot."
-      ]
+      ],
+      "voice": "audio/narration/crafting-ending.mp3"
     }
   ]
 }

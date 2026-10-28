@@ -198,8 +198,8 @@
         "seconds": 1,
         "influence": 0.8
       },
-      "craft": { "text": "a blacksmith's hammer strikes metal on an anvil three times, clear bright ringing clangs, the last strike rings out a little longer, close up, dry, no music", "seconds": 2 },
-      "craft-fail": { "text": "a hammer hits metal on an anvil once with a dull flat clunk, then a sharp crack and a few small broken metal pieces clatter onto a stone floor, close up, dry, no music", "seconds": 1.8 }
+      "craft": { "text": "a heavy blacksmith's hammer pounds hot iron on an anvil three times, deep low solid thuds with a short dull metallic knock, no bell-like ringing, no high tones, close up, dry, no music", "seconds": 2 },
+      "craft-fail": { "text": "one loud heavy hammer blow on metal on an anvil, a strong deep clunk, then a sharp crack and a few small broken metal pieces clatter onto a stone floor, close up, dry, no music", "seconds": 1.8 }
     }
   },
   "ui": {
