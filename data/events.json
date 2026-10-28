@@ -29,7 +29,6 @@
               "id": "wisp",
               "name": "Pytania: zamienia się w Błędnicę",
               "weight": 50,
-              "draft": true,
               "kind": "fight",
               "text": "Kobieta milknie urażona. Jej oczy bieleją, skóra zaczyna jarzyć się zimnym światłem, a ciało unosi się nad ścieżką. Ranna kobieta zamienia się w Błędnicę!",
               "foes": ["wisp"],

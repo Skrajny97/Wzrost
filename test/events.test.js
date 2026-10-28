@@ -156,11 +156,11 @@ describe('events', () => {
     assert.equal(found.gold, base.gold);
   });
 
-  test('asked too many questions, a truly wounded woman dies offended or turns into a Błędnica; leaving is the same in every case', () => {
+  test('asked too many questions, a truly wounded woman dies in hopelessness or turns into a Błędnica; leaving is the same in every case', () => {
     const [dies, turns] = woman.options[1].outcome;
     for (const caseId of ['grateful-gold', 'grateful-find']) {
       const endings = Array.from({ length: 200 }, (_, index) =>
-        resolveEvent({ hunt: base, event: woman, optionId: 'ask', caseId, drafts: true, character, equipped, name: 'Mira', seed: `pytania-${index}` }, content),
+        resolveEvent({ hunt: base, event: woman, optionId: 'ask', caseId, character, equipped, name: 'Mira', seed: `pytania-${index}` }, content),
       );
       const fought = endings.filter((asked) => asked.fights.length > base.fights.length);
       assert.ok(Math.abs(fought.length / endings.length - 0.5) < 0.1, `${caseId}: ${fought.length}`);
@@ -183,8 +183,11 @@ describe('events', () => {
     for (const one of woman.cases) assert.equal(resolve('leave', base, one.id).event.option.text, woman.options[2].outcome.text);
   });
 
-  test('the Błędnica, a draft, comes only where drafts are on; "Testuj zdarzenia" chooses an ending', () => {
-    const asked = (seedOf, extra) => resolveEvent({ hunt: base, event: woman, optionId: 'ask', caseId: 'grateful-gold', character, equipped, name: 'Mira', seed: seedOf, ...extra }, content);
+  test('a draft ending comes only where drafts are on; "Testuj zdarzenia" chooses an ending', () => {
+    // The Błędnica was a draft until the author approved it (0.0.44).
+    const drafted = structuredClone(woman);
+    drafted.options[1].outcome[1].draft = true;
+    const asked = (seedOf, extra) => resolveEvent({ hunt: base, event: drafted, optionId: 'ask', caseId: 'grateful-gold', character, equipped, name: 'Mira', seed: seedOf, ...extra }, content);
     const seeds = Array.from({ length: 60 }, (_, index) => `szkic-${index}`);
     assert.ok(seeds.every((one) => asked(one).fights.length === base.fights.length));
     assert.ok(seeds.every((one) => asked(one, { endingId: 'wisp' }).event.option.text === woman.options[1].outcome[0].text));
@@ -344,7 +347,7 @@ describe('events (API)', () => {
 describe('events in the live game', () => {
   const { call, db, signUp } = useServer({ EVENTS: 'on' });
 
-  test('the Błędnica, not approved yet, never comes: the questions end in her death', async () => {
+  test('the Błędnica, approved by the author, comes in the live game too', async () => {
     const { cookie } = await signUp('wedrowiec');
     await call('POST', '/api/character', { cookie, body: { name: 'Wedrowiec', classId: 'warrior', appearance: 'male' } });
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
@@ -355,8 +358,11 @@ describe('events in the live game', () => {
     await call('POST', '/api/test/skip-time', { cookie });
     assert.equal((await call('POST', '/api/hunts/claim', { cookie })).data.event.id, 'wounded-woman');
     const { report } = (await call('POST', '/api/hunts/claim', { cookie, body: { choice: 'ask' } })).data;
-    assert.equal(report.event.option.text, woman.options[1].outcome[0].text);
-    assert.equal(report.event.fight, null);
+    assert.equal(report.event.option.text, woman.options[1].outcome[1].text);
+    assert.deepEqual(
+      report.fights[report.event.fight].enemies.map((enemy) => enemy.monsterId),
+      ['wisp'],
+    );
   });
 });
 

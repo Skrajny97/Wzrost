@@ -2670,6 +2670,13 @@ Autor: „Jesli chodzi o zdarzenie rannej kobiety to to co jest działa i jest o
 3. **„Testuj zdarzenia”** ma też zakończenia pytań: „Pytania: umiera w beznadziei” i „Pytania: zamienia się w Błędnicę”. Zakończenie wybrane bez przypadku przychodzi w pierwszym przypadku, w którym pytania do niego prowadzą, czyli „Wdzięczność: złoto”.
 4. **Tekst autora (0.0.44).** Od wersji 0.0.44 kobieta po pytaniach umiera w beznadziei, w słowach autora: „Kobieta próbuje odpowiadać, ale Twoje podejrzliwe pytania nie pomagają a odbierają nadziei na jakąkolwiek pomoc. Na Twoich oczach umiera w beznadziei. Nic już dla niej nie zrobisz.”
 
+## Błędnica zatwierdzona (28.10.2026, 0.0.44)
+
+Autor: „Wszystkie wersje Rannej kobiety działają dobrze - możesz wdrażać na główną grę”.
+
+1. **Gra główna.** Zakończenie z Błędnicą nie jest już szkicem, więc w grze głównej uczciwa kobieta po „Zadaj dodatkowe pytania” umiera w beznadziei albo zamienia się w Błędnicę, każde po 50%.
+2. **Szkice zostają.** Znacznik `draft` w `data/events.json` działa dalej dla przyszłych zakończeń do zatwierdzenia: takie zakończenie losuje się tylko w wersji testowej.
+
 ## Zadania dzienne z dwóch regionów wewnętrznych (28.10.2026, 0.0.43)
 
 Autor: „Po pierwsze do zadań dziennych losuj z ostatniej otwartej lokacji i jednej przed nią (bo nie muszą być bardzo trudne)”.
