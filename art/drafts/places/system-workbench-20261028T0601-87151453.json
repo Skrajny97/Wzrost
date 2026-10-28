@@ -1,0 +1,23 @@
+{
+  "id": "system-workbench",
+  "payload": {
+    "prompt": "pixel art interior landscape, a quiet craftsman's workshop: a sturdy wooden workbench with hammers, tongs, chisels, an awl and leather straps neatly sorted in rows as if waiting to be used, a small anvil and a low forge glowing softly, a half-made sword and a round shield on wall racks, thin ice-blue glowing crystal shards and faint luminous blue lines along the stone walls, soft warm light, wide panorama for a dim background behind text, low contrast, muted dark palette of deep browns and greys with ice-blue accents, no text, no border, no people, no animals",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 3,
+    "seed": 87151453,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793167381,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 55.02,
+    "request_id": "13c9ff8d-0492-41e5-b59b-c37fbfea91ab",
+    "outputs_retained_until": 1793253701
+  }
+}
