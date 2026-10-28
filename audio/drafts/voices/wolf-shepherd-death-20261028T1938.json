@@ -1,0 +1,13 @@
+{
+  "id": "wolf-shepherd-death",
+  "payload": {
+    "text": "a ghostly forest spirit fades away with a cold windy sigh and a far wolf howl, no words, close up, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wolf-shepherd-death-20261028T1938-0.mp3",
+    "audio/drafts/voices/wolf-shepherd-death-20261028T1938-1.mp3"
+  ],
+  "credits": 40
+}

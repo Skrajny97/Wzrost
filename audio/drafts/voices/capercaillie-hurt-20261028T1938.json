@@ -1,0 +1,13 @@
+{
+  "id": "capercaillie-hurt",
+  "payload": {
+    "text": "a large grouse squawks and flaps its wings in pain, short harsh call, video game creature hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/capercaillie-hurt-20261028T1938-0.mp3",
+    "audio/drafts/voices/capercaillie-hurt-20261028T1938-1.mp3"
+  ],
+  "credits": 24
+}

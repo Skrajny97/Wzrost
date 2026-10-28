@@ -1,0 +1,13 @@
+{
+  "id": "mouflon-death",
+  "payload": {
+    "text": "a wild ram gives a long weak bleat and collapses, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mouflon-death-20261028T1938-0.mp3",
+    "audio/drafts/voices/mouflon-death-20261028T1938-1.mp3"
+  ],
+  "credits": 40
+}

@@ -1,0 +1,13 @@
+{
+  "id": "cross-spider-hurt",
+  "payload": {
+    "text": "a large spider hisses and clicks its fangs when hit, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/cross-spider-hurt-20261028T1938-0.mp3",
+    "audio/drafts/voices/cross-spider-hurt-20261028T1938-1.mp3"
+  ],
+  "credits": 24
+}

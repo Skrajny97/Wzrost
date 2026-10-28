@@ -1,0 +1,13 @@
+{
+  "id": "falcon-death",
+  "payload": {
+    "text": "a falcon gives a weak cry and drops with a flutter of feathers, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/falcon-death-20261028T1938-0.mp3",
+    "audio/drafts/voices/falcon-death-20261028T1938-1.mp3"
+  ],
+  "credits": 40
+}

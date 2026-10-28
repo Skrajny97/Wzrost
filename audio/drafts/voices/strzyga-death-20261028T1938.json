@@ -1,0 +1,13 @@
+{
+  "id": "strzyga-death",
+  "payload": {
+    "text": "a female demon wails and fades into a screech owl's cry, no words, close up, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/strzyga-death-20261028T1938-0.mp3",
+    "audio/drafts/voices/strzyga-death-20261028T1938-1.mp3"
+  ],
+  "credits": 40
+}

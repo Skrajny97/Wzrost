@@ -1,0 +1,13 @@
+{
+  "id": "stag-beetle-hurt",
+  "payload": {
+    "text": "a hard beetle shell cracks and the beetle clicks its mandibles angrily, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/stag-beetle-hurt-20261028T1938-0.mp3",
+    "audio/drafts/voices/stag-beetle-hurt-20261028T1938-1.mp3"
+  ],
+  "credits": 24
+}

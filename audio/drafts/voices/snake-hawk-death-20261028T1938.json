@@ -1,0 +1,13 @@
+{
+  "id": "snake-hawk-death",
+  "payload": {
+    "text": "a hawk gives a weak fading cry and falls with a rustle of feathers, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/snake-hawk-death-20261028T1938-0.mp3",
+    "audio/drafts/voices/snake-hawk-death-20261028T1938-1.mp3"
+  ],
+  "credits": 40
+}

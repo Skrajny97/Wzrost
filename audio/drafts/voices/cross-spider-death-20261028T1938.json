@@ -1,0 +1,13 @@
+{
+  "id": "cross-spider-death",
+  "payload": {
+    "text": "a large spider hisses weakly and curls up with a dry crackle, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/cross-spider-death-20261028T1938-0.mp3",
+    "audio/drafts/voices/cross-spider-death-20261028T1938-1.mp3"
+  ],
+  "credits": 40
+}

@@ -1,0 +1,13 @@
+{
+  "id": "werewolf-death",
+  "payload": {
+    "text": "a werewolf lets out a long howling death roar that fades into a human groan, no words, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/werewolf-death-20261028T1938-0.mp3",
+    "audio/drafts/voices/werewolf-death-20261028T1938-1.mp3"
+  ],
+  "credits": 40
+}

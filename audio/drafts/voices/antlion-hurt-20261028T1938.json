@@ -1,0 +1,13 @@
+{
+  "id": "antlion-hurt",
+  "payload": {
+    "text": "a giant insect larva clicks and chitters when hit, with a spray of sand, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/antlion-hurt-20261028T1938-0.mp3",
+    "audio/drafts/voices/antlion-hurt-20261028T1938-1.mp3"
+  ],
+  "credits": 24
+}

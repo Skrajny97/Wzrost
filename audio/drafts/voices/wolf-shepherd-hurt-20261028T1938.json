@@ -1,0 +1,13 @@
+{
+  "id": "wolf-shepherd-hurt",
+  "payload": {
+    "text": "a ghostly forest spirit groans in pain with a distant echo of wolves howling, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wolf-shepherd-hurt-20261028T1938-0.mp3",
+    "audio/drafts/voices/wolf-shepherd-hurt-20261028T1938-1.mp3"
+  ],
+  "credits": 24
+}

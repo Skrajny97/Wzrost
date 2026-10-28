@@ -1,0 +1,13 @@
+{
+  "id": "imp-death",
+  "payload": {
+    "text": "a small imp gives a high squeak and vanishes with a soft magical pop, close up, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/imp-death-20261028T1938-0.mp3",
+    "audio/drafts/voices/imp-death-20261028T1938-1.mp3"
+  ],
+  "credits": 40
+}

@@ -1,0 +1,13 @@
+{
+  "id": "aesculapian-snake-death",
+  "payload": {
+    "text": "a big snake hisses long and weakly as its coils go limp, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/aesculapian-snake-death-20261028T1938-0.mp3",
+    "audio/drafts/voices/aesculapian-snake-death-20261028T1938-1.mp3"
+  ],
+  "credits": 40
+}

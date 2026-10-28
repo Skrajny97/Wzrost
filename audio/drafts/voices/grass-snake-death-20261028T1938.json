@@ -1,0 +1,13 @@
+{
+  "id": "grass-snake-death",
+  "payload": {
+    "text": "a snake lets out a long fading hiss as it goes limp, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/grass-snake-death-20261028T1938-0.mp3",
+    "audio/drafts/voices/grass-snake-death-20261028T1938-1.mp3"
+  ],
+  "credits": 40
+}

@@ -1,0 +1,13 @@
+{
+  "id": "black-stork-hurt",
+  "payload": {
+    "text": "a stork clatters its beak loudly and hisses in pain, video game creature hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/black-stork-hurt-20261028T1938-0.mp3",
+    "audio/drafts/voices/black-stork-hurt-20261028T1938-1.mp3"
+  ],
+  "credits": 24
+}

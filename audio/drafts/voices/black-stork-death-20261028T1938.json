@@ -1,0 +1,13 @@
+{
+  "id": "black-stork-death",
+  "payload": {
+    "text": "a stork clatters its beak weakly and falls with a flap of wings, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/black-stork-death-20261028T1938-0.mp3",
+    "audio/drafts/voices/black-stork-death-20261028T1938-1.mp3"
+  ],
+  "credits": 40
+}
