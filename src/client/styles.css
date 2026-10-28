@@ -5618,9 +5618,77 @@ a.camp-level-button {
   background: rgba(13, 17, 11, 0.97);
 }
 
+/* The line to write in: the items picked for a Wymiana offer over it, then
+   the pouch that picks them, the line itself and Wyślij. */
 .chat-form {
+  display: grid;
+  gap: 6px;
+}
+
+.chat-form-row {
   display: flex;
   gap: 8px;
+}
+
+.chat-attach {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--bark-line);
+  background: var(--bg-deep);
+}
+
+.chat-attached {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chat-attached-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 100%;
+  padding: 0 0 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  font-size: 14px;
+}
+
+.chat-attached-item .item-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-attached-drop {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+}
+
+/* The items a Wymiana message shows, each opening its card. */
+.chat-items {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chat-item {
+  min-height: 44px;
+  padding: 6px 10px;
 }
 
 .chat-form input {
@@ -7211,6 +7279,35 @@ button.herb-tile[aria-pressed='true'] {
   border-color: var(--system-line);
   background: rgba(143, 227, 239, 0.12);
   color: var(--system-text);
+}
+
+/* A private conversation's tab, with the × that closes it inside its end. */
+.chat-tab-wrap {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  max-width: 60%;
+}
+
+.chat-tab-wrap .chat-tab {
+  max-width: 100%;
+  padding-right: 36px;
+}
+
+.chat-tab-close {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--text-muted);
+  transform: translateY(-50%);
 }
 
 /* The Wymiana (screens/trade.js): who it is with, its state, both offers

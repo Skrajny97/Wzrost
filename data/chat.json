@@ -1,13 +1,15 @@
 {
-  "$comment": "Czat w zakładce Społeczność (src/server/chat.js). channels: kanały czatu, na razie tylko Globalny, a obok nich prywatne rozmowy dwóch postaci. rules: najdłuższa wiadomość w znakach, co ile sekund wolno pisać, ile ostatnich wiadomości kanału zostaje (zgłoszone zostają do decyzji autora), ile ostatnich wiadomości zostaje w prywatnej rozmowie, ile rozmów najwyżej pokazują zakładki, ile wiadomości przychodzi naraz, po ilu zgłoszeniach od różnych graczy wiadomość znika do sprawdzenia i co ile sekund otwarty czat pyta o nowe (najczęściej i najrzadziej, gdy długo nic nie przychodzi). words: początki albo części słów, które czat zamienia na gwiazdki (wielkość liter bez znaczenia). texts.rules: zasady, które gracz akceptuje przed pierwszą wiadomością.",
+  "$comment": "Czat w zakładce Społeczność (src/server/chat.js). channels: kanały czatu, Globalny i Wymiana, a obok nich prywatne rozmowy dwóch postaci; w kanale z items wiadomość może pokazać przedmioty z plecaka piszącego (najwyżej rules.items), jak były w chwili wysłania. rules: najdłuższa wiadomość w znakach, co ile sekund wolno pisać, ile ostatnich wiadomości kanału zostaje (zgłoszone zostają do decyzji autora), ile ostatnich wiadomości zostaje w prywatnej rozmowie, ile rozmów najwyżej pokazują zakładki, ile wiadomości przychodzi naraz, po ilu zgłoszeniach od różnych graczy wiadomość znika do sprawdzenia i co ile sekund otwarty czat pyta o nowe (najczęściej i najrzadziej, gdy długo nic nie przychodzi). words: początki albo części słów, które czat zamienia na gwiazdki (wielkość liter bez znaczenia). texts.rules: zasady, które gracz akceptuje przed pierwszą wiadomością.",
   "channels": [
-    { "id": "global", "name": "Globalny" }
+    { "id": "global", "name": "Globalny" },
+    { "id": "trade", "name": "Wymiana", "items": true }
   ],
   "rules": {
     "maxLength": 200,
     "everySeconds": 3,
     "keep": 300,
     "privateKeep": 100,
+    "items": 3,
     "conversations": 20,
     "page": 50,
     "hideAfterReports": 3,

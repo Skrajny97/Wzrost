@@ -280,4 +280,52 @@ describe('Czat', () => {
     await call('DELETE', '/api/character', { cookie: players.ala });
     assert.equal((await database.prepare("SELECT COUNT(*) AS n FROM chat_messages WHERE channel = 'private'").first()).n, 0);
   });
+
+  test('a closed private conversation leaves the tabs until a newer message comes', async () => {
+    const database = await db();
+    const id = async (name) => (await database.prepare('SELECT id FROM characters WHERE name = ?').bind(name).first()).id;
+    const [ala, ola] = [await id('Ala'), await id('Ola')];
+    const whisper = (cookie, to, text) => call('POST', '/api/chat', { cookie, body: { with: to, text } });
+    const tabs = async (cookie) => (await call('GET', '/api/chat?channel=global', { cookie })).data.conversations.map((entry) => entry.id);
+    await whisper(players.ala, ola, 'Hej');
+    assert.deepEqual(await tabs(players.ola), [ala]);
+    assert.equal((await call('POST', '/api/chat/close', { cookie: players.ola, body: { with: ala } })).status, 200);
+    assert.deepEqual(await tabs(players.ola), []);
+    assert.deepEqual((await call('GET', '/api/chat/latest', { cookie: players.ola })).data.conversations, []);
+    // Only for the one who closed it, and the messages stay.
+    assert.deepEqual(await tabs(players.ala), [ola]);
+    assert.equal((await call('GET', `/api/chat?with=${ala}`, { cookie: players.ola })).data.messages.length, 1);
+    await age();
+    await whisper(players.ala, ola, 'Jesteś?');
+    assert.deepEqual(await tabs(players.ola), [ala]);
+    assert.equal((await call('POST', '/api/chat/close', { cookie: players.ola, body: { with: 999999 } })).status, 404);
+  });
+
+  test('a message in the Wymiana shows items from the bag, as they were when it was sent', async () => {
+    const database = await db();
+    const ala = (await database.prepare("SELECT id FROM characters WHERE name = 'Ala'").first()).id;
+    const amulet = { base: 'amulet', slot: 'amulet', level: 4, rarity: 'rare', affixes: [], implicit: { stat: 'will', value: 2 } };
+    const inBag = async (item) => (await database.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, 0)').bind(ala, JSON.stringify(item)).run()).meta.last_row_id;
+    const [one, two] = [await inBag(amulet), await inBag({ ...amulet, level: 5 })];
+    const offer = (body) => call('POST', '/api/chat', { cookie: players.ala, body: { channel: 'trade', text: 'Sprzedam amulety', ...body } });
+    const sent = await offer({ items: [one, two] });
+    assert.equal(sent.status, 201);
+    assert.deepEqual(sent.data.message.items.map(({ base, level, rarity }) => [base, level, rarity]), [['amulet', 4, 'rare'], ['amulet', 5, 'rare']]);
+    const seen = (await call('GET', '/api/chat?channel=trade', { cookie: players.ola })).data.messages;
+    assert.deepEqual(seen.map(({ text, items }) => [text, items.length]), [['Sprzedam amulety', 2]]);
+    assert.ok(seen[0].items[0].name && seen[0].items[0].properties.length > 0);
+    // The Globalny has no items, and the channels keep apart.
+    assert.deepEqual((await read(players.ola)).messages, []);
+    await age();
+    assert.equal((await call('POST', '/api/chat', { cookie: players.ala, body: { channel: 'global', text: 'Hej', items: [one] } })).data.error.code, 'no_items_here');
+    // Only items of the writer's bag, at most three, none twice.
+    const worn = (await database.prepare("INSERT INTO items (character_id, slot, data, created_at) VALUES (?, 'amulet', ?, 0)").bind(ala, JSON.stringify(amulet)).run()).meta.last_row_id;
+    assert.equal((await offer({ items: [worn] })).data.error.code, 'not_in_bag');
+    assert.equal((await offer({ items: [one, one] })).data.error.code, 'bad_items');
+    const more = [await inBag(amulet), await inBag(amulet)];
+    assert.equal((await offer({ items: [one, two, ...more] })).data.error.code, 'too_many_items');
+    // Sold or traded later, the offer still shows the item as it was.
+    await database.prepare('DELETE FROM items WHERE id = ?').bind(one).run();
+    assert.equal((await call('GET', '/api/chat?channel=trade', { cookie: players.ola })).data.messages[0].items.length, 2);
+  });
 });

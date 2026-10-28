@@ -1,8 +1,11 @@
-// The chat of the Społeczność tab (DECISIONS.md, "Czat"): the Globalny
-// channel for now, with room for more channels in data/chat.json, and the
-// private conversations of two characters beside it, open from the
-// character level of its unlock (community in data/unlocks.json). The open
-// chat asks every few seconds for the messages after the last one it has. A player writes once they accept the rules, once every few seconds,
+// The chat of the Społeczność tab (DECISIONS.md, "Czat"): the Globalny and
+// the Wymiana channels of data/chat.json, and the private conversations of
+// two characters beside them, open from the character level of its unlock
+// (community in data/unlocks.json). A message in the Wymiana can show items
+// from the writer's bag, as they were when it was sent, for offers made in
+// words. A character closes a private conversation until a newer message
+// comes. The open chat asks every few seconds for the messages after the
+// last one it has. A player writes once they accept the rules, once every few seconds,
 // with no links and with rude words masked. As the Play Store asks of
 // content made by players, every message can be reported, a player can
 // hide the messages of another, a message reported by a few players goes
@@ -11,7 +14,7 @@
 // admin) and the accounts the author names moderators in the author's
 // panel; the chat marks their characters.
 
-import { isUnlocked } from '../engine/index.js';
+import { isUnlocked, itemView } from '../engine/index.js';
 import { isAuthor } from './author.js';
 import { content } from './content.js';
 import { friendNews } from './community.js';
@@ -59,7 +62,7 @@ async function partnerOf(db, character, id) {
 
 // The private conversations of a character, the most recent first, each
 // with the other character and the newest message that one wrote, without
-// the players it hides.
+// the players it hides and those it closed, until a newer message comes.
 const conversationsOf = (db, userId, characterId) =>
   db
     .prepare(
@@ -70,10 +73,11 @@ const conversationsOf = (db, userId, characterId) =>
              WHERE m.channel = '${PRIVATE}' AND (m.character_id = ? OR m.recipient_id = ?) AND m.hidden_at IS NULL
              GROUP BY other) s
        JOIN characters c ON c.id = s.other
-       WHERE c.role = 'player' AND c.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)
+       LEFT JOIN chat_closed x ON x.character_id = ? AND x.other_id = s.other
+       WHERE c.role = 'player' AND c.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?) AND (x.last_id IS NULL OR s.last > x.last_id)
        ORDER BY s.last DESC LIMIT ?`,
     )
-    .bind(characterId, characterId, characterId, characterId, userId, content.chat.rules.conversations);
+    .bind(characterId, characterId, characterId, characterId, characterId, userId, content.chat.rules.conversations);
 const conversationView = (row) => ({ id: row.id, name: row.name, classId: row.class_id, latest: row.latest ?? 0 });
 
 export function mutedText(until) {
@@ -109,7 +113,44 @@ const messageView = (row, userId, env) => ({
   createdAt: row.created_at,
   own: row.user_id === userId,
   role: chatRole(env, row),
+  ...(row.items && { items: JSON.parse(row.items) }),
 });
+
+// An item a Wymiana message shows: what its sheet tells.
+const offeredItem = (item) => {
+  const view = itemView(item, content);
+  return {
+    name: view.name,
+    base: view.base,
+    slot: view.slot,
+    slotName: view.slotName,
+    level: view.level,
+    upgrade: view.upgrade,
+    rarity: view.rarity,
+    rarityName: view.rarityName,
+    color: view.color,
+    properties: view.properties,
+    classNames: view.classNames,
+    classLevel: view.classLevel,
+  };
+};
+
+// The items of the writer's bag a message names by id, in that order: in a
+// channel that has items, at most rules.items of them, none twice.
+async function offeredItems(db, channel, characterId, ids) {
+  if (ids === undefined || (Array.isArray(ids) && ids.length === 0)) return null;
+  if (!channel?.items) throw new ApiError(400, 'no_items_here', 'Przedmioty pokażesz tylko w kanale Wymiana.');
+  const most = content.chat.rules.items;
+  if (!Array.isArray(ids) || !ids.every(Number.isInteger) || new Set(ids).size !== ids.length) throw new ApiError(400, 'bad_items', 'Nie ma takich przedmiotów.');
+  if (ids.length > most) throw new ApiError(400, 'too_many_items', `Jedna wiadomość pokaże najwyżej ${most} przedmioty.`);
+  const rows = await db
+    .prepare(`SELECT id, data FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${ids.map(() => '?').join(', ')})`)
+    .bind(characterId, ...ids)
+    .all();
+  const byId = new Map(rows.results.map((row) => [row.id, JSON.parse(row.data)]));
+  if (byId.size !== ids.length) throw new ApiError(409, 'not_in_bag', 'Pokażesz tylko przedmioty z plecaka, nie założone.');
+  return ids.map((id) => offeredItem(byId.get(id)));
+}
 
 const blockedList = (db, userId) => db.prepare('SELECT id, name FROM chat_blocks WHERE user_id = ? ORDER BY id').bind(userId);
 
@@ -169,7 +210,7 @@ export async function readChat(context) {
   const [messages, hidden, blocked, reports, conversations] = await db.batch([
     db
       .prepare(
-        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.created_at, u.login, u.google_sub, u.chat_moderator
+        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, u.login, u.google_sub, u.chat_moderator
          FROM chat_messages m JOIN users u ON u.id = m.user_id LEFT JOIN characters c ON c.id = m.character_id
          WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)
          ORDER BY m.id DESC LIMIT ?`,
@@ -252,16 +293,18 @@ export async function sendChat(context) {
   if (account.chat_muted_until > now) throw new ApiError(403, 'muted', mutedText(account.chat_muted_until));
   const text = cleanText(body.text);
   if (other) await privateAllowed(db, userId, other);
+  const offered = await offeredItems(db, channel, character.id, body.items);
+  const items = offered && JSON.stringify(offered);
   const { everySeconds, keep, privateKeep } = content.chat.rules;
   const where = other ? `m.channel = '${PRIVATE}' AND ${PAIR}` : 'm.channel = ?';
   const binds = other ? pairOf(character.id, other.id) : [channel.id];
   const [sent] = await db.batch([
     db
       .prepare(
-        `INSERT INTO chat_messages (channel, user_id, character_id, recipient_id, name, level, class_id, text, created_at)
-         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id = ? AND created_at > ?)`,
+        `INSERT INTO chat_messages (channel, user_id, character_id, recipient_id, name, level, class_id, text, items, created_at)
+         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id = ? AND created_at > ?)`,
       )
-      .bind(other ? PRIVATE : channel.id, userId, character.id, other?.id ?? null, character.name, character.level, character.class_id, text, now, userId, now - everySeconds * 1000),
+      .bind(other ? PRIVATE : channel.id, userId, character.id, other?.id ?? null, character.name, character.level, character.class_id, text, items, now, userId, now - everySeconds * 1000),
     db
       .prepare(
         `DELETE FROM chat_messages WHERE id IN (SELECT m.id FROM chat_messages m WHERE ${where}
@@ -271,8 +314,26 @@ export async function sendChat(context) {
       .bind(...binds, ...binds, other ? privateKeep : keep),
   ]);
   if (sent.meta.changes !== 1) throw new ApiError(429, 'too_fast', `Za szybko. Kolejną wiadomość wyślesz po ${everySeconds} sekundach.`);
-  const row = { ...account, id: sent.meta.last_row_id, user_id: userId, character_id: character.id, name: character.name, level: character.level, class_id: character.class_id, text, created_at: now };
+  const row = { ...account, id: sent.meta.last_row_id, user_id: userId, character_id: character.id, name: character.name, level: character.level, class_id: character.class_id, text, items, created_at: now };
   return json({ message: messageView(row, userId, context.env) }, 201);
+}
+
+// POST /api/chat/close {with: character id}: the private conversation
+// leaves the tabs of this character until a message newer than its last one
+// comes, either way. Opening it from a character's sheet brings it back.
+export async function closeChat(context) {
+  const { character, db } = await requireChatter(context);
+  const body = await readJson(context.request);
+  const other = await partnerOf(db, character, Number.isInteger(body.with) ? body.with : 0);
+  await db
+    .prepare(
+      `INSERT INTO chat_closed (character_id, other_id, last_id)
+       VALUES (?, ?, COALESCE((SELECT MAX(m.id) FROM chat_messages m WHERE m.channel = '${PRIVATE}' AND ${PAIR}), 0))
+       ON CONFLICT (character_id, other_id) DO UPDATE SET last_id = excluded.last_id`,
+    )
+    .bind(character.id, other.id, ...pairOf(character.id, other.id))
+    .run();
+  return json({ closed: other.id });
 }
 
 // The message a request names, still in the chat, with its writer's

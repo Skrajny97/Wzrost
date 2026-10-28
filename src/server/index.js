@@ -7,7 +7,7 @@ import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyParts, cancelBuilding, collectProduction, startBuilding, tradeAtFire } from './camp.js';
-import { acceptChatRules, blockInChat, chatReports, latestChat, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
+import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendGift } from './community.js';
 import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
@@ -111,6 +111,7 @@ const routes = [
   ['POST', '/api/friends/claim', claimGifts],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],
+  ['POST', '/api/chat/close', closeChat],
   ['POST', '/api/chat/report', reportChat],
   ['POST', '/api/chat/block', blockInChat],
   ['POST', '/api/chat/unblock', unblockInChat],

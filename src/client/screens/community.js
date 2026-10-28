@@ -8,10 +8,13 @@
 // list too. By the list a bell mutes the Globalny's light on the tab. Under
 // it waits a Wymiana proposed or going on (trade.js).
 //
-// The chat (src/server/chat.js) has a tab for its only channel so far,
-// Globalny, and one for each private conversation, which only its two
+// The chat (src/server/chat.js) has a tab for each channel, Globalny and
+// Wymiana, and one for each private conversation, which only its two
 // characters see; "Prywatna wiadomość" on a character's sheet opens one
-// (profile.js). The newest messages are at the bottom, over the line to
+// (profile.js), and its × closes it until a newer message comes. In the
+// Wymiana a message can show up to three items of the bag, picked under the
+// line to write in, for offers made in words; a tap on one shows its card.
+// The newest messages are at the bottom, over the line to
 // write in. While the chat
 // is open and the page is in front, it asks for new messages every few
 // seconds, and less often the longer nothing comes. A tap on a name shows
@@ -43,6 +46,7 @@ import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, openSheet, pageHeading, toast, withButton } from '../ui.js';
+import { itemDetails, itemSummary } from './character.js';
 import { mountFriends } from './friends.js';
 import { lockedScreen } from './locked.js';
 import { mountRanking } from './ranking.js';
@@ -225,10 +229,12 @@ function sectionPicker(sections, current, choose) {
 // messages. `person` is the private conversation to open first.
 function mountChat(container, { bar, person = null }) {
   const chat = state.content.chat;
-  const channel = chat.channels[0];
-  // The other character of the private conversation shown, null on the
-  // Globalny, and the private conversations for the tabs.
+  // The channel shown, or the other character of the private conversation
+  // shown (null on a channel), and the private conversations for the tabs.
+  let channel = chat.channels[0];
   let talk = person && { id: person.id, name: person.name };
+  // The items of the bag the next message in the Wymiana shows.
+  let attached = [];
   let conversations = [];
   let messages = [];
   let account = null;
@@ -243,16 +249,23 @@ function mountChat(container, { bar, person = null }) {
   const notices = h('div', { class: 'chat-notices' });
   const list = h('ol', { class: 'chat-list', 'aria-label': 'Wiadomości' });
   const empty = h('p', { class: 'muted chat-empty', text: 'Wczytywanie…' });
+  const placeholder = () => (talk ? `Do postaci ${talk.name}…` : channel.items ? 'Napisz ofertę…' : 'Napisz wiadomość…');
   const text = h('input', {
     type: 'text',
     id: 'chat-text',
     maxlength: String(chat.maxLength),
     autocomplete: 'off',
     enterkeyhint: 'send',
-    placeholder: talk ? `Do postaci ${talk.name}…` : 'Napisz wiadomość…',
+    placeholder: placeholder(),
     'aria-label': 'Wiadomość',
   });
   const sendButton = h('button', { type: 'submit', class: 'button button--system chat-send', text: 'Wyślij' });
+  const attachButton = h(
+    'button',
+    { type: 'button', class: 'icon-button chat-attach', 'aria-label': 'Pokaż przedmioty z plecaka', onClick: pickItems },
+    icon('pouch', { size: 20 }),
+  );
+  const attachedList = h('ul', { class: 'chat-attached', 'aria-label': 'Przedmioty w wiadomości' });
   const form = h(
     'form',
     {
@@ -262,9 +275,100 @@ function mountChat(container, { bar, person = null }) {
         withButton(sendButton, send);
       },
     },
-    text,
-    sendButton,
+    attachedList,
+    h('div', { class: 'chat-form-row' }, attachButton, text, sendButton),
   );
+
+  // The items picked for the next message, each with a × to leave it out;
+  // the button to pick them only in a channel with items.
+  function renderAttached() {
+    attachButton.hidden = Boolean(talk) || !channel.items;
+    fill(
+      attachedList,
+      attached.map((item) =>
+        h(
+          'li',
+          { class: 'chat-attached-item' },
+          h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: item.name }),
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'chat-attached-drop',
+              'aria-label': `Bez przedmiotu ${item.name}`,
+              onClick: () => {
+                attached = attached.filter((other) => other.id !== item.id);
+                renderAttached();
+              },
+            },
+            icon('close', { size: 14 }),
+          ),
+        ),
+      ),
+    );
+    attachedList.hidden = attached.length === 0;
+  }
+
+  // The bag in a sheet: up to chat.itemsMax of its items for the message.
+  function pickItems() {
+    const bag = state.character.bag ?? [];
+    const picked = new Set(attached.map((item) => item.id).filter((id) => bag.some((item) => item.id === id)));
+    const count = h('p', { class: 'muted' });
+    const showCount = () => {
+      count.textContent = `Wybrane: ${picked.size} z ${chat.itemsMax}.`;
+    };
+    showCount();
+    const rows = bag.map((item) => {
+      const row = h(
+        'button',
+        {
+          type: 'button',
+          class: 'item-row trade-pick',
+          'aria-pressed': String(picked.has(item.id)),
+          onClick: () => {
+            if (picked.has(item.id)) picked.delete(item.id);
+            else if (picked.size >= chat.itemsMax) {
+              toast(`Jedna wiadomość pokaże najwyżej ${chat.itemsMax} przedmioty.`);
+              return;
+            } else picked.add(item.id);
+            row.setAttribute('aria-pressed', String(picked.has(item.id)));
+            showCount();
+          },
+        },
+        itemSummary(item),
+        h('span', { class: 'trade-pick-mark', 'aria-hidden': 'true' }, icon('check', { size: 18 })),
+      );
+      return h('li', {}, row);
+    });
+    openSheet(
+      h('h2', { class: 'sheet-title chat-sheet', text: 'Przedmioty do oferty' }),
+      h('p', { class: 'sheet-text', text: 'Wiadomość pokaże je wszystkim w Wymianie, tak jak wyglądają teraz. Same przedmioty zostają w plecaku.' }),
+      bag.length === 0 ? h('p', { class: 'muted', text: 'W plecaku nie ma przedmiotów. Założonych nie pokażesz.' }) : [count, h('ul', { class: 'item-list' }, rows)],
+      h(
+        'div',
+        { class: 'sheet-actions' },
+        h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+        h('button', {
+          type: 'button',
+          class: 'button button--system',
+          text: 'Gotowe',
+          onClick: () => {
+            attached = bag.filter((item) => picked.has(item.id));
+            closeSheet();
+            renderAttached();
+            text.focus();
+          },
+        }),
+      ),
+    );
+  }
+
+  // An item a message shows, in a sheet of its own.
+  const showItem = (item) =>
+    openSheet(
+      itemDetails(item),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Zamknij', onClick: closeSheet })),
+    );
   // The narrator points here at the chat's rules (narrator.js).
   const footer = h('div', { class: 'chat-footer', 'data-guide': 'community-rules' });
   const hidden = h('div', { class: 'chat-hidden' });
@@ -282,30 +386,64 @@ function mountChat(container, { bar, person = null }) {
       news && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'nowe' }),
     );
 
-  // The Globalny first, then the conversations, the most recent first; one
-  // opened from a sheet shows before its first message too.
+  // A private conversation's tab, with the × that closes it.
+  const privateTab = (entry) =>
+    h(
+      'span',
+      { class: 'chat-tab-wrap' },
+      tab(entry.name, entry.id === talk?.id, entry.id !== talk?.id && conversationNews(entry.id, entry.latest), () => switchTo(channel, entry)),
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'chat-tab-close',
+          'aria-label': `Zamknij rozmowę z postacią ${entry.name}`,
+          onClick: (event) => withButton(event.currentTarget, () => closeTalk(entry)),
+        },
+        icon('close', { size: 12 }),
+      ),
+    );
+
+  // The channels first, then the conversations, the most recent first; one
+  // opened from a sheet shows before its first message too. The Globalny's
+  // tab lights for its news.
   function renderTabs() {
     const entries = talk && !conversations.some((entry) => entry.id === talk.id) ? [{ ...talk, latest: 0 }, ...conversations] : conversations;
     fill(
       tabs,
-      tab(channel.name, !talk, Boolean(talk) && globalNews(), () => talkTo(null)),
-      entries.map((entry) => tab(entry.name, entry.id === talk?.id, entry.id !== talk?.id && conversationNews(entry.id, entry.latest), () => talkTo(entry))),
+      chat.channels.map((entry, index) =>
+        tab(entry.name, !talk && entry.id === channel.id, index === 0 && (Boolean(talk) || channel.id !== entry.id) && globalNews(), () => switchTo(entry, null)),
+      ),
+      entries.map(privateTab),
     );
   }
 
   // Another tab: its messages from the start, asked for at once.
-  function talkTo(next) {
-    if ((next?.id ?? 0) === (talk?.id ?? 0)) return;
+  function switchTo(nextChannel, next) {
+    if (next ? next.id === talk?.id : !talk && nextChannel.id === channel.id) return;
+    channel = nextChannel;
     talk = next && { id: next.id, name: next.name };
+    attached = [];
     messages = [];
     fill(list);
     loaded = false;
     error = null;
     delay = chat.pollSeconds.min;
-    text.placeholder = talk ? `Do postaci ${talk.name}…` : 'Napisz wiadomość…';
+    text.placeholder = placeholder();
+    renderAttached();
     renderTabs();
     render();
     ask();
+  }
+  const talkTo = (next) => switchTo(next ? channel : chat.channels[0], next);
+
+  // A private conversation out of the tabs until a newer message comes.
+  async function closeTalk(entry) {
+    await call('POST', '/api/chat/close', { with: entry.id });
+    conversations = conversations.filter((other) => other.id !== entry.id);
+    conversationsSeen(conversations);
+    if (talk?.id === entry.id) switchTo(channel, null);
+    else renderTabs();
   }
 
   // The room is as tall as the screen under where it starts (styles.css),
@@ -343,6 +481,12 @@ function mountChat(container, { bar, person = null }) {
       message.own
         ? h('p', { class: 'chat-text', text: message.text })
         : h('button', { type: 'button', class: 'chat-text chat-text--button', text: message.text, onClick: () => actions(message) }),
+      message.items?.length > 0 &&
+        h(
+          'ul',
+          { class: 'chat-items', 'aria-label': 'Przedmioty w ofercie' },
+          message.items.map((item) => h('li', {}, h('button', { type: 'button', class: 'item-row chat-item', onClick: () => showItem(item) }, itemSummary(item)))),
+        ),
     );
   }
 
@@ -577,8 +721,15 @@ function mountChat(container, { bar, person = null }) {
   async function send() {
     const value = text.value.trim();
     if (!value) return;
-    const { message } = await call('POST', '/api/chat', talk ? { with: talk.id, text: value } : { channel: channel.id, text: value });
+    const items = attached.map((item) => item.id);
+    const { message } = await call(
+      'POST',
+      '/api/chat',
+      talk ? { with: talk.id, text: value } : { channel: channel.id, text: value, ...(items.length > 0 && { items }) },
+    );
     text.value = '';
+    attached = [];
+    renderAttached();
     add([message]);
     delay = chat.pollSeconds.min;
     ask();
@@ -591,12 +742,13 @@ function mountChat(container, { bar, person = null }) {
     asking = true;
     clearTimeout(timer);
     const asked = talk;
+    const askedChannel = channel;
     let answer = null;
     let failure = null;
     try {
       const last = messages.at(-1)?.id ?? 0;
       const first = messages[0]?.id ?? 0;
-      const where = asked ? `with=${asked.id}` : `channel=${channel.id}`;
+      const where = asked ? `with=${asked.id}` : `channel=${askedChannel.id}`;
       answer = await call('GET', `/api/chat?${where}&after=${last}&from=${first}`);
     } catch (problem) {
       failure = problem;
@@ -605,7 +757,7 @@ function mountChat(container, { bar, person = null }) {
     }
     if (gone) return;
     // Another tab was opened meanwhile: this answer is not for it.
-    if (asked !== talk) {
+    if (asked !== talk || askedChannel !== channel) {
       ask();
       return;
     }
@@ -639,6 +791,7 @@ function mountChat(container, { bar, person = null }) {
   window.addEventListener('resize', fit);
   const stopNews = onChatNews(renderTabs);
 
+  renderAttached();
   renderTabs();
   fit();
   ask();

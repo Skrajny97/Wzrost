@@ -58,6 +58,14 @@
       "hurt": { "files": ["audio/sfx/spider-hurt-1.mp3", "audio/sfx/spider-hurt-2.mp3"], "gain": 0.6 },
       "death": { "files": ["audio/sfx/spider-death-1.mp3", "audio/sfx/spider-death-2.mp3"], "gain": 0.7 }
     },
+    "tarantula": {
+      "hurt": { "files": ["audio/sfx/tarantula-hurt-1.mp3", "audio/sfx/tarantula-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/tarantula-death-1.mp3", "audio/sfx/tarantula-death-2.mp3"], "gain": 0.7 }
+    },
+    "bird-eater": {
+      "hurt": { "files": ["audio/sfx/bird-eater-hurt-1.mp3", "audio/sfx/bird-eater-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/bird-eater-death-1.mp3", "audio/sfx/bird-eater-death-2.mp3"], "gain": 0.7 }
+    },
     "wisp": {
       "hurt": { "files": ["audio/sfx/wisp-hurt-1.mp3", "audio/sfx/wisp-hurt-2.mp3"], "gain": 0.6 },
       "death": { "files": ["audio/sfx/wisp-death-1.mp3", "audio/sfx/wisp-death-2.mp3"], "gain": 0.7 }

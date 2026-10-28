@@ -2324,3 +2324,49 @@ Wiadomości pokazują teraz poziom, który postać ma w chwili czytania, także 
 
    Grają przy pierwszym czytaniu raportu z Warsztatu. Kiedy coś wyszło, a coś pękło, pęknięcie gra po uderzeniach.
 2. **Rzemieślnictwo działa w grze od wersji 0.0.27** (`CRAFTING` = `"on"`). Na 15. poziomie System podaje swój komunikat, a narrator objaśnia Warsztat. Migracja 0045 dodaje kolumny kroku 2 z wartościami domyślnymi.
+
+## XP znacznie w dół (28.10.2026)
+
+Autor: „skoro teraz tyle zrodel Punktow Czasu jest to XP musi significantly w dol pójść”. Wpis „Środek gry: wolniejsze poziomy i silniejsze stwory” zostaje, ale jego pkt 1 zmienia się tak:
+
+1. **Spowolnienie zaczyna się od 10. poziomu** (`midGame` w `progression`: `fromLevel` 10, `levelTimeFactor` 3,5, `fadeLevel` 200). Poziomy 1–10 dalej trwają po ok. 20 minut: to początek z mało funkcjami. Od 10. poziomu każdy trwa coraz dłużej niż w 0.0.26, aż 3,5 raza dłużej na 50. Potem spowolnienie maleje do zera na 200. poziomie. Poziom 500 zostaje ok. dobą, a żaden poziom nie trwa krócej od poprzedniego.
+2. **Godziny eksploracji na jeden poziom** (0.0.26 → 0.0.27 → teraz):
+    - 20. poziom: 0,40 → 0,44 → 0,66 h;
+    - 30.: 0,68 → 0,95 → 1,54 h;
+    - 40.: 1,00 → 1,69 → 2,86 h;
+    - 45.: 1,16 → 2,14 → 3,70 h;
+    - 50.: 1,33 → 2,66 → 4,66 h;
+    - 100.: 3,3 → 3,3 → 6,1 h.
+
+   Od 1. do 50. poziomu to razem ok. 75 godzin eksploracji (0.0.26: ok. 31, 0.0.27: ok. 47). Klasa zwalnia tak samo, bo jej poziom potrzebuje 0,6 XP poziomu postaci.
+3. **Symulacja** (typowa postać z umiejętnościami, 300 wypraw na wiersz) trafia w te czasy w granicach kilkunastu procent. Na 20. poziomie wychodzi ok. 0,8 h zamiast 0,66, bo miejsca na tych poziomach dają trochę mniej XP niż wzorzec. Punkty Czasu zostają, jak są.
+
+## Pajęczy Parów: Pająk, Tarantula i Ptasznik (28.10.2026)
+
+Autor: „Stwory do Pajęczego Parowu to mogą być po prostu "Pająk" "Tarantula" i elita "Ptasznik"”, a potem: „opisy i pozycje tak samo jak atak i grafiki ustal sam”.
+
+1. **Krzyżak nazywa się teraz Pająk** (to ten sam stwór, `spider`). Jego materiał to „Pajęczy jedwab”, a w nazwach przedmiotów „Pająka”.
+2. **Tarantula** to nowy zwykły stwór Parowu (`tarantula`):
+    - stoi z przodu i atakuje skokiem, „Skok tarantuli” (fizyczny, od Zręczności);
+    - jest szybsza i ma więcej HP niż Pająk, ale nie zatruwa;
+    - materiał: „Włosie tarantuli” (unikalny);
+    - w nazwach przedmiotów: „Tarantulowy” i „Tarantuli”.
+3. **Ptasznik** to elita samego Parowu (`bird-eater`, `elite` w regionie wewnętrznym). W reszcie Uroczyska elitą zostaje Licho.
+    - Stoi z przodu i atakuje „Jadowitymi kłami” (fizycznie, od Siły). Często zatruwa i ma dużo HP oraz pancerza.
+    - Materiał: „Kieł ptasznika” (legendarny, jak u Płanetnika, elity jednego miejsca).
+4. **Spotkania w Parowie:** Pająk sam albo parami, Tarantula sama albo z Pająkiem, a w trudnych walkach do trzech pająków. Symulacja: omdlenia na 31–35. poziomie 0–0,3%, czas na poziom jak w krzywej.
+5. **Grafiki i okrzyki.** Wybór należał do mnie: z 3 szkiców Retro Diffusion każdego stwora i 2 szkiców każdej ikony wybrane są pierwsze. Okrzyki (ElevenLabs, po dwie wersje) trafiają do gry i na stronę odsłuchu do oceny autora.
+
+## Czat: kanał Wymiana i zamykanie rozmów (28.10.2026)
+
+Autor: „Dodajmy też możliwość zamknięcia okna czatu miedzy uzytkownikami (bo sie ich nagromadzi multum pozniej, oraz odpowiednia zakladke Czatu - Wymiana, skupiona na Wymianach / Niech bedzie mozna tam oznaczać jakoś przedmioty, by tworzyć takie tekstowe oferty z pozycji gracza.”
+
+1. **Kanał Wymiana** stoi obok Globalnego (`data/chat.json`, `items: true`). Ma te same zasady, zgłoszenia i moderację, ale osobne wiadomości. Nie zapala kropki na zakładce Społeczność. Kropkę zapala dalej tylko Globalny.
+2. **Oznaczanie przedmiotów.** W Wymianie przycisk sakiewki przy linii pisania otwiera plecak. Można w nim wybrać do 3 przedmiotów (`rules.items`), tylko z plecaka, bo założonych też nie da się wymienić. Wiadomość pokazuje je pod tekstem jak w plecaku. Stuknięcie otwiera kartę przedmiotu z jego właściwościami.
+
+   Wiadomość zapisuje przedmioty takie, jakie były w chwili wysłania. Sprzedany albo oddany przedmiot zostaje więc w starej ofercie. Sama wymiana dzieje się jak dotąd, przyciskiem Wymiana na karcie postaci.
+3. **Zamykanie rozmów.** Każda zakładka prywatnej rozmowy ma ×. Zamknięta znika z zakładek tej postaci (migracja 0046, tabela `chat_closed`) i wraca sama, gdy przyjdzie nowsza wiadomość, w którąkolwiek stronę. „Prywatna wiadomość” z karty postaci też ją otwiera. Wiadomości zostają.
+
+## Jedna aktualizacja dla potworów, Bestiariusza, Sklepu Systemu i Rzemieślnictwa (28.10.2026)
+
+Autor: „Niech Potwory, ulepszony Bestiariusz, Sklep Systemu i Rzemieślnictwo trafią w jednej aktualizacji”. Trafiły razem w 0.0.27. Nowe pająki Parowu przychodzą w następnej wersji.

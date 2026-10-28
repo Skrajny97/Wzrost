@@ -14,6 +14,8 @@ export const SPRITES = {
       'wolf', 'alpha-wolf', 'fox', 'lynx', 'bear', 'boar', 'badger', 'crow', 'owl', 'viper', 'spider', 'wisp', 'likho',
       // Wiatrołomy and Uroczysko Kamieni from 26.10.2026, with their champions.
       'stag', 'marten', 'hornets', 'planetnik', 'tusker', 'stoneling', 'bat', 'eagle-owl', 'she-wolf', 'basilisk',
+      // Pajęczy Parów from 28.10.2026.
+      'tarantula', 'bird-eater',
     ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved.
@@ -44,6 +46,8 @@ export const SPRITES = {
       'scraps', 'straps', 'fittings', 'shards', 'amber', 'bloodstone', 'star-shard', 'chest',
       // The creatures of 26.10.2026.
       'stag-antler', 'marten-fur', 'hornet-sting', 'hailstone', 'tusker-tusks', 'stone-heart', 'bat-wing', 'eagle-owl-feather', 'she-wolf-fur', 'basilisk-scale',
+      // Pajęczy Parów from 28.10.2026.
+      'tarantula-hair', 'bird-eater-fang',
     ],
   },
   // The skills of the classes (data/skills.json), 48×48.

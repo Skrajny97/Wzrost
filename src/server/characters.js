@@ -929,6 +929,7 @@ export function characterRemoval(db, id) {
     db.prepare('DELETE FROM trades WHERE from_id = ? OR to_id = ?').bind(id, id),
     db.prepare('DELETE FROM chat_reports WHERE message_id IN (SELECT id FROM chat_messages WHERE character_id = ? OR recipient_id = ?)').bind(id, id),
     db.prepare('DELETE FROM chat_messages WHERE character_id = ? OR recipient_id = ?').bind(id, id),
+    db.prepare('DELETE FROM chat_closed WHERE character_id = ? OR other_id = ?').bind(id, id),
     db.prepare('DELETE FROM reports WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM activities WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM avatar_activities WHERE character_id = ?').bind(id),

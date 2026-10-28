@@ -174,6 +174,7 @@ export function publicContent() {
     chat: {
       channels: content.chat.channels,
       maxLength: content.chat.rules.maxLength,
+      itemsMax: content.chat.rules.items,
       pollSeconds: content.chat.rules.pollSeconds,
       rules: content.chat.texts.rules,
     },
