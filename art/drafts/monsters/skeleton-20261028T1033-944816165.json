@@ -1,0 +1,25 @@
+{
+  "id": "skeleton",
+  "payload": {
+    "prompt": "skeleton warrior covered in river mud and green algae, holding a rusty sword, faint green glowing eyes, standing on both feet, the whole figure from skull to feet inside the frame, nothing cut off at the edges",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 944816165,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183651,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 39,
+    "request_id": "13ec43a9-7879-4639-ba1c-a38da3efaab6",
+    "outputs_retained_until": 1793269980
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "spiderlings",
+  "payload": {
+    "prompt": "a swarm of dozens of tiny freshly hatched spiderlings pouring out of a torn silk egg sac, pale brown and grey, full swarm",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 574970872,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183707,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 38.64,
+    "request_id": "bf200599-dafd-4da6-a7a1-213c5ccb7041",
+    "outputs_retained_until": 1793270053
+  }
+}
