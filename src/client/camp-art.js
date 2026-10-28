@@ -426,12 +426,31 @@ ${TREES.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#101710">
 <circle cx="150" cy="40" r="1.2" fill="${FIRE}" opacity="0.6"></circle><circle cx="214" cy="62" r="1" fill="${FIRE}" opacity="0.5"></circle>
 <circle cx="40" cy="250" r="1" fill="${FIRE}" opacity="0.5"></circle><circle cx="330" cy="200" r="1.2" fill="${FIRE}" opacity="0.5"></circle>`;
 
-// The glade as a pixel-art picture (art.js), muted and darkened like the
-// buildings on it, with the paths worn into it: earthen, soft-edged and
-// partly see-through.
+// How much of their colour and light the glade and the buildings keep on the
+// board: muted and dimmed, the buildings a little brighter than the ground
+// they stand on, so that the camp sits in the forest (the author: the camp
+// was too bright).
+// A building also takes a little of the forest floor's dark green-brown.
+const GROUND_TONE = { saturation: 0.5, light: 0.7 };
+const BUILDING_TONE = { saturation: 0.5, light: 0.82, floor: 0.12 };
+const FLOOR = [0.16, 0.2, 0.12];
+
+// The SVG saturate matrix, scaled by the light kept and mixed with a share of
+// the forest floor's colour.
+function toneMatrix({ saturation: s, light, floor = 0 }) {
+  const rows = [
+    [0.213 + 0.787 * s, 0.715 - 0.715 * s, 0.072 - 0.072 * s],
+    [0.213 - 0.213 * s, 0.715 + 0.285 * s, 0.072 - 0.072 * s],
+    [0.213 - 0.213 * s, 0.715 - 0.715 * s, 0.072 + 0.928 * s],
+  ];
+  const round = (value) => +value.toFixed(4);
+  return [...rows.map((row, i) => [...row.map((value) => round(value * light * (1 - floor))), 0, round(FLOOR[i] * floor)].join(' ')), '0 0 0 1 0'].join(' ');
+}
+
+// The glade as a pixel-art picture (art.js), muted and darkened, with the
+// paths worn into it: earthen, soft-edged and partly see-through.
 const PICTURE_BOARD = (src) => `<filter id="camp-ground" color-interpolation-filters="sRGB">
-<feColorMatrix type="saturate" values="0.7"></feColorMatrix>
-<feComponentTransfer><feFuncR type="linear" slope="0.72"></feFuncR><feFuncG type="linear" slope="0.72"></feFuncG><feFuncB type="linear" slope="0.72"></feFuncB></feComponentTransfer>
+<feColorMatrix type="matrix" values="${toneMatrix(GROUND_TONE)}"></feColorMatrix>
 </filter>
 <filter id="camp-path"><feGaussianBlur stdDeviation="1.6"></feGaussianBlur></filter>
 <image href="${src}" width="360" height="400" preserveAspectRatio="xMidYMid slice" filter="url(#camp-ground)"></image>
@@ -461,13 +480,13 @@ function svgElement(viewBox, className, markup) {
 // grows on the board with its level.
 const ART_SIZES = [0.64, 0.82, 1];
 
-// A picture sits into the board: its colours a little muted, its edges soft
-// and a faint blur of it around them. Each plot has its own filter, as each
-// is its own SVG.
+// A picture sits into the board: its colours muted and dimmed, its edges
+// soft and a faint blur of it around them. Each plot has its own filter, as
+// each is its own SVG.
 // A plot not built yet shows its building greyed out.
 let filters = 0;
 const blend = (id, grey = false) => `<filter id="${id}" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
-<feColorMatrix type="saturate" values="${grey ? 0 : 0.78}" result="muted"></feColorMatrix>
+<feColorMatrix type="matrix" values="${toneMatrix(grey ? { ...BUILDING_TONE, saturation: 0 } : BUILDING_TONE)}" result="muted"></feColorMatrix>
 <feGaussianBlur in="SourceAlpha" stdDeviation="0.9" result="edge"></feGaussianBlur>
 <feComposite in="muted" in2="edge" operator="in" result="body"></feComposite>
 <feGaussianBlur in="muted" stdDeviation="1.5" result="blur"></feGaussianBlur>
@@ -476,7 +495,7 @@ const blend = (id, grey = false) => `<filter id="${id}" x="-10%" y="-10%" width=
 </filter>`;
 
 // A building's look: its picture, standing on the bottom of the plot over its
-// shadow, or its vector stand-in. The picture's address is one of the fixed
+// soft shadow, or its vector stand-in. The picture's address is one of the fixed
 // ones in art.js.
 function look(buildingId, tier, grey = false) {
   const src = campArt(buildingId, tier);
@@ -486,7 +505,8 @@ function look(buildingId, tier, grey = false) {
   const height = 78 * size;
   filters += 1;
   const id = `camp-blend-${filters}`;
-  return `${blend(id, grey)}<ellipse cx="50" cy="75" rx="${(width * 0.42).toFixed(1)}" ry="${(3 + 3 * size).toFixed(1)}" fill="#0b0f09" opacity="0.45"></ellipse>
+  return `${blend(id, grey)}<filter id="${id}-shadow" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="1.8"></feGaussianBlur></filter>
+<ellipse cx="50" cy="75" rx="${(width * 0.46).toFixed(1)}" ry="${(3.5 + 3 * size).toFixed(1)}" fill="#0b0f09" opacity="0.55" filter="url(#${id}-shadow)"></ellipse>
 <image href="${src}" x="${((100 - width) / 2).toFixed(1)}" y="${(78 - height).toFixed(1)}" width="${width.toFixed(1)}" height="${height.toFixed(1)}" preserveAspectRatio="xMidYMax meet" filter="url(#${id})"></image>`;
 }
 

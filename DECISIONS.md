@@ -2477,4 +2477,17 @@ Autor: „Skoro z Krzyżaka zrobiłeś Pająka to trzeba dodać jeszcze jednego 
 4. **Chód w każdym kolorze skóry** (autor: „zmiana odcieni skóry niedokładna w animacji”, przy zrzucie z rozmowy z kuzynem autora: na brązowej skórze chód jest „ciapaty”, a na czarnej „plamy jasne wywala”).
     - Przemalowanie chodu pomijało światła i cienie skóry, które postać dzieli ze strojem albo z włosami: kremowe światło na twarzy i koszuli Wojowniczki, jasne punkty na twarzy, ręce i stopach Kleryka, cienie rąk i nóg Wojownika. Na ciemnych odcieniach zostawały z nich jasne plamy.
     - Teraz `tools/walker-tones.py` liczy takie barwy jako skórę tylko tuż przy niej, najwyżej dwa piksele w głąb. Skóra zmienia kolor w całości, a włosy i strój zostają jak na portrecie, we wszystkich 70 plikach (10 postaci, 7 odcieni).
-    - Próba narysowania 70 chodów od nowa w Retro Diffusion, od portretu w danym odcieniu, nie trafiła do gry: rysunki zmieniały kolor włosów i strój, a część nie miała zamówionego odcienia. Koszt próby: 70 animacji po 0,07 USD, razem 4,90 USD.
+    - Próba narysowania 70 chodów od nowa w Retro Diffusion, od portretu w danym odcieniu, nie trafiła do gry: rysunki zmieniały kolor włosów i strój, a część nie miała zamówionego odcienia. Koszt próby: 70 animacji po 0,07 USD, razem 4,90 USD. *Dalej: zob. „Spokojniejszy obóz, skóra piksel po pikselu i nowa głowa Kleryczki”, punkty 2 i 3.*
+
+## Spokojniejszy obóz, skóra piksel po pikselu i nowa głowa Kleryczki (28.10.2026)
+
+1. **Obóz wpasowany w polanę** (autor: „budynki obozu zatwierdzam jesli wpasujesz je w planszę, ale postaraj sie mysle obnkzyc saturacje wszystkiego wraz z planszą obozu, wydaje mi się ze zbyt jaskrawy jest obóz”).
+    - Polana zostawia połowę swojego nasycenia (wcześniej 0,7) i 70% jasności. Budynki też zostawiają połowę nasycenia (wcześniej 0,78), są przyciemnione do 82% i biorą 12% ciemnej zieleni leśnego podłoża, więc stoją w tym samym świetle co polana, tylko trochę jaśniej od niej.
+    - Każdy budynek stoi na miękkim, rozmytym cieniu, szerszym niż wcześniej.
+    - Wartości są w `GROUND_TONE` i `BUILDING_TONE` w `src/client/camp-art.js`. Pora dnia działa na nie tak jak wcześniej.
+2. **Skóra w chodzie piksel po pikselu** (autor: „będziesz musiał chyba zrobic odcień skóry w animacji piksel po pikselu”).
+    - Każda z 10 postaci przeszła przegląd we wszystkich 4 klatkach: narzędzie wypisuje każdy piksel w kolorze skóry, który leży tuż przy masce, a nie należy do niej, z położeniem i kolorem.
+    - Doszły dwa brązowe cienie skóry, które Wojownik i Mag dzielą z włosami. Liczą się dopiero od 18. wiersza w dół, pod linią włosów.
+    - Doszło 6 pojedynczych pikseli, wpisanych w `PIXELS` w `tools/walker-tones.py`: dwa na twarzy, czubek dłoni i stopa Wojowniczki oraz dwa światła na twarzy Czarodziejki.
+    - Pozostałe piksele przy masce to kontury, włosy, kaptury i stroje. Zostają bez zmian.
+3. **Nowy chód Kleryczki** (osoba testująca grę, przekazane przez autora: „Trochę mam zamieszana głowę jak zdeformowana”). Głowa w chodzie miała dwubarwną, poszarpaną fryzurę i twarz wciśniętą w bok. Nowy chód z Retro Diffusion ma włosy splecione w jeden warkocz na plecach i małą, czytelną twarz. Opis w `art/prompts.json` prosi o to wprost. Z 4 wersji w grze jest czwarta. Ma też własne kolory skóry w odcieniach. Koszt: 4 animacje po 0,07 USD, razem 0,28 USD.

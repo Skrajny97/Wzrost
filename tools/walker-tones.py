@@ -9,8 +9,11 @@
 # holds the lights and shadows of the skin that the figure shares with its
 # clothes or hair, such as a cream light on the face and on the shirt, or a
 # brown shadow on the arm and on the trousers: they count as skin only next
-# to it, up to two pixels in. Each skin colour keeps its place between the
-# darkest and the lightest of them, on the tone's ramp from shadow to light.
+# to it, up to two pixels in, and one the hair shares only from a row down.
+# PIXELS holds the few pixels of skin, checked one by one on every frame,
+# that the colours leave out (x across the whole sheet, y). Each skin colour
+# keeps its place between the darkest and the lightest of them, on the
+# tone's ramp from shadow to light.
 #
 # Usage: python3 tools/walker-tones.py [--mask out.png]
 import importlib.util, json, os, sys
@@ -21,7 +24,7 @@ WALKERS = os.path.join(ROOT, 'src', 'client', 'art', 'walkers')
 SKIN = {
     'archer-female': ['#f4c3a7', '#8e402d'],
     'archer-male': ['#fce0d4', '#d27a6c', '#8a424c'],
-    'cleric-female': ['#df9362', '#c06d4e'],
+    'cleric-female': ['#fccaa7', '#f0c068', '#eca278', '#b87250'],
     'cleric-male': ['#e5aa5c', '#b77d3e', '#8d3d2b'],
     'mage-female': ['#f7bb90', '#cd845b', '#a9543e'],
     'mage-male': ['#fcc691', '#f7a56f', ('#e17a4f', 14), '#c45640'],
@@ -32,14 +35,18 @@ SKIN = {
 }
 EDGES = {
     'archer-male': ['#63373d'],
-    'cleric-female': ['#f6c06e'],
+    'cleric-female': ['#87392f'],
     'cleric-male': ['#dac880'],
     'mage-female': ['#e2a769', '#f1d794', '#8c482b'],
-    'mage-male': ['#88271a'],
+    'mage-male': ['#88271a', ('#905a3a', 18)],
     'shadow-female': ['#6d361f'],
     'shadow-male': ['#5e372c', '#4c211a', '#3b1819'],
     'warrior-female': ['#e8cda5', '#fdac5c'],
-    'warrior-male': ['#b17b44', '#7e321d'],
+    'warrior-male': ['#b17b44', '#7e321d', ('#824f2d', 18)],
+}
+PIXELS = {
+    'mage-female': [(76, 22), (172, 21)],
+    'warrior-female': [(26, 18), (26, 19), (15, 31), (30, 40)],
 }
 STEPS = 2
 
@@ -55,16 +62,17 @@ def skin_pixels(im, name):
     px = im.load()
     tops = {skin.rgb(code): 0 for code in SKIN[name] if isinstance(code, str)}
     tops.update({skin.rgb(code): row for code, row in (item for item in SKIN[name] if not isinstance(item, str))})
-    edges = {skin.rgb(code) for code in EDGES.get(name, [])}
+    edges = {skin.rgb(code): 0 for code in EDGES.get(name, []) if isinstance(code, str)}
+    edges.update({skin.rgb(code): row for code, row in (item for item in EDGES.get(name, []) if not isinstance(item, str))})
     found = {(x, y) for y in range(im.height) for x in range(im.width) if px[x, y][3] and y >= tops.get(px[x, y][:3], im.height)}
     for _ in range(STEPS):
         found |= {
             (x, y)
             for y in range(im.height)
             for x in range(im.width)
-            if px[x, y][3] and px[x, y][:3] in edges and any((x + dx, y + dy) in found for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+            if px[x, y][3] and y >= edges.get(px[x, y][:3], im.height) and any((x + dx, y + dy) in found for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
         }
-    return found
+    return found | set(PIXELS.get(name, []))
 
 
 def main():
