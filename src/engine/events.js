@@ -43,7 +43,7 @@ export const eventsIn = (areaId, drafts, content) =>
 // in any region, still only after an exploration that ended as planned.
 export function eventFor({ hunt, seed, first = false, quick = false, forced = null, drafts = false }, content) {
   if (!content.events || first || quick || hunt.result !== 'success') return null;
-  if (forced) return content.eventsById[forced] ?? null;
+  if (forced) return content.eventsById[forced] && (drafts || !content.eventsById[forced].draft) ? content.eventsById[forced] : null;
   const rng = createRng(`${seed}:event`);
   if (!rng.chance(eventChance(content))) return null;
   const open = eventsIn(hunt.areaId, drafts, content);

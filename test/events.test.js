@@ -196,6 +196,25 @@ describe('events', () => {
     for (const one of woman.cases) assert.equal(resolve('leave', base, one.id).event.option.text, woman.options[2].outcome.text);
   });
 
+  test('the fern flower, a draft, comes only where Licho lives and drafts are on: picking it risks Licho for an item', () => {
+    const fern = content.eventsById['fern-flower'];
+    const always = { ...content, events: { ...content.events, chance: 1 } };
+    const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
+    const seeds = Array.from({ length: 30 }, (_, index) => `paproc-${index}`);
+    assert.ok(seeds.every((one) => eventFor({ hunt: hunt('mossy-boulders'), seed: one }, always) === null));
+    assert.ok(seeds.every((one) => eventFor({ hunt: hunt('mossy-boulders'), seed: one, drafts: true }, always) === fern));
+    assert.equal(eventFor({ hunt: hunt('mossy-boulders'), seed, forced: 'fern-flower' }, always), null);
+    const resolveFern = (optionId, caseId) => resolveEvent({ hunt: base, event: fern, optionId, caseId, drafts: true, character, equipped, name: 'Mira', seed }, content);
+    const fought = resolveFern('pick', 'guarded');
+    assert.deepEqual(fought.fights.at(-1).enemies.map((enemy) => [enemy.monsterId, enemy.level]), [['likho', character.level]]);
+    const found = resolveFern('pick', 'free');
+    assert.equal(found.items.length, base.items.length + 1);
+    assert.ok(['rare', 'unique', 'epic'].includes(found.items[found.event.reward.item].rarity));
+    assert.ok(resolveFern('watch', 'guarded').gold > base.gold);
+    assert.equal(resolveFern('watch', 'free').gold, base.gold);
+    assert.equal(resolveFern('leave', 'free').fights.length, base.fights.length);
+  });
+
   test('a draft ending comes only where drafts are on; "Testuj zdarzenia" chooses an ending', () => {
     // The Błędnica was a draft until the author approved it (0.0.44).
     const drafted = structuredClone(woman);
@@ -241,11 +260,22 @@ describe('events (API)', () => {
         {
           id: 'wounded-woman',
           title: 'Ranna kobieta',
+          draft: false,
           cases: woman.cases.map(({ id, name }) => ({ id, name })),
           endings: [
             { id: 'dies', name: 'Pytania: umiera w beznadziei' },
             { id: 'wisp', name: 'Pytania: zamienia się w Błędnicę' },
           ],
+        },
+        {
+          id: 'fern-flower',
+          title: 'Kwiat paproci',
+          draft: true,
+          cases: [
+            { id: 'guarded', name: 'Licho strzeże kwiatu' },
+            { id: 'free', name: 'Kwiat bez stróża' },
+          ],
+          endings: [],
         },
       ],
       next: null,

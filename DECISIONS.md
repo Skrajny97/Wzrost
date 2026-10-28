@@ -2732,3 +2732,16 @@ Autor: „Do Rankingu w Społeczności dodaj zakładkę "Poziom Profesji". Będz
 2. **Najwyższa profesja.** Każda postać stoi na miejscu według swojej najwyżej rozwiniętej profesji. Obok poziomu jest ikonka tej profesji, ta sama co na zakładce Profesje. Przy równych poziomach liczy się ta wcześniejsza na liście (Zielarstwo, Alchemia, Rzemieślnictwo), a o miejscu decyduje potem poziom postaci.
 3. **Tylko pracujący.** W tym porządku są tylko postacie, które pracowały w jakiejś profesji. Postać bez profesji nie ma tu miejsca („Twoje miejsce” się wtedy nie pokazuje).
 4. **Kolumna Profesja** pokazuje się tylko w tej zakładce, żeby dwie pozostałe zostały czytelne na wąskim telefonie.
+
+## Kwiat paproci: nowe zdarzenie do sprawdzenia (28.10.2026, wersja testowa)
+
+Autor: „Wymyśl i zaproponuj nowe zdarzenie. Możesz je nawet wdrożyć na serwer testowy, jutro je sprawdzę”.
+
+1. **Co się dzieje.** Wśród paproci żarzy się kwiat paproci. Kto go zerwie, temu podobno szczęście już nie odstąpi, ale coś porusza się między głazami. Kwiatu strzeże Licho (przypadek „Licho strzeże kwiatu”, 50%) albo nikt (przypadek „Kwiat bez stróża”, 50%).
+2. **Opcje.**
+    - **„Zerwij kwiat”** to ryzyko za dużą nagrodę. Ze strażnikiem kończy się walką z Licho na poziomie postaci, a bez niego daje przedmiot: rzadki (30%), unikatowy (50%) albo epicki (20%).
+    - **„Obserwuj z ukrycia”** to ostrożność za małą nagrodę. Licho odchodzi i zostaje złoto (4 × złoto za poziom, jak u rannej kobiety 5), a bez strażnika kwiat gaśnie i nic się nie dzieje.
+    - **„Odejdź”** nic nie daje i nic nie kosztuje.
+3. **Gdzie.** Tylko tam, gdzie żyje Licho, elita Uroczyska Kamieni: w Omszałych Głazach, na Rysiej Grani, w Wilczych Kręgach i w Sercu Uroczyska (tak jak ranna kobieta tylko przy Błędnicy).
+4. **Szkic.** Zdarzenie ma `draft`, więc przychodzi tylko w wersji testowej. W „Testuj zdarzenia” ma dopisek „(szkic)”. W grze głównej nie pojawi się, dopóki autor go nie zatwierdzi.
+5. **Grafiki** (kwiat i nocna polana z głazami) powstają w Retro Diffusion. Autor wybiera je rano. Do tego czasu zdarzenie pokazuje sam tekst.

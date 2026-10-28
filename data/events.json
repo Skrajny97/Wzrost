@@ -92,6 +92,61 @@
           }
         }
       ]
+    },
+    {
+      "id": "fern-flower",
+      "draft": true,
+      "areas": ["mossy-boulders", "lynx-ridge", "wolf-circles", "glade-heart"],
+      "title": "Kwiat paproci",
+      "art": "fern-flower",
+      "scene": "fern-glade",
+      "figure": { "left": 50, "bottom": 6, "height": 48 },
+      "text": "Wśród paproci pod omszałym głazem żarzy się czerwone światło. To kwiat paproci, o którym opowiadają w każdej wsi: kto go zerwie, temu szczęście już nie odstąpi. Między głazami coś się poruszyło.",
+      "options": [
+        { "id": "pick", "label": "Zerwij kwiat" },
+        { "id": "watch", "label": "Obserwuj z ukrycia" },
+        {
+          "id": "leave",
+          "label": "Odejdź",
+          "outcome": { "kind": "none", "text": "Nie każde szczęście jest warte swojej ceny. Odchodzisz, a czerwone światło gaśnie za twoimi plecami." }
+        }
+      ],
+      "cases": [
+        {
+          "id": "guarded",
+          "name": "Licho strzeże kwiatu",
+          "weight": 50,
+          "outcomes": {
+            "pick": {
+              "kind": "fight",
+              "text": "Gdy sięgasz po kwiat, zza głazu wychodzi Licho: chude, jednookie, z ręką wyciągniętą po cudze szczęście.",
+              "foes": ["likho"],
+              "start": "{enemies} staje między tobą a kwiatem."
+            },
+            "watch": {
+              "kind": "reward",
+              "text": "Zza głazu wychodzi Licho. Ogląda kwiat jednym okiem, węszy i znika między kamieniami. Zrywasz kwiat, a ten w twojej dłoni zamienia się w złote monety (+{gold}).",
+              "gold": 4
+            }
+          }
+        },
+        {
+          "id": "free",
+          "name": "Kwiat bez stróża",
+          "weight": 50,
+          "outcomes": {
+            "pick": {
+              "kind": "reward",
+              "text": "Zrywasz kwiat. Rozkwita w twojej dłoni, rozsypuje się czerwonym pyłem i zostawia po sobie {item}.",
+              "itemRarities": { "rare": 30, "unique": 50, "epic": 20 }
+            },
+            "watch": {
+              "kind": "none",
+              "text": "Czekasz w ukryciu, ale nic się nie dzieje. Nad ranem kwiat gaśnie i znika, jakby go nigdy nie było."
+            }
+          }
+        }
+      ]
     }
   ],
   "foes": [

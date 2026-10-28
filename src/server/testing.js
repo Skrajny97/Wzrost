@@ -8,7 +8,7 @@ import { construction, eventOutcome } from '../engine/index.js';
 import { content, tutorialPart } from './content.js';
 import { completeBuilding } from './camp.js';
 import { characterRemoval, characterView, currentHp, loadPlayer, loadSettled, requirePlayer } from './characters.js';
-import { eventsOn } from './features.js';
+import { eventDraftsOn, eventsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { requireSession } from './sessions.js';
 import { testMode, testModeFor, tutorialTestsFor } from './test-mode.js';
@@ -108,15 +108,20 @@ export async function eventTests(context) {
   if (!eventsOn()) throw notFound();
   const { player } = await requirePlayer(context);
   return json({
-    events: content.events.list.map((event) => ({
+    events: testableEvents().map((event) => ({
       id: event.id,
       title: event.title,
+      draft: Boolean(event.draft),
       cases: (event.cases ?? []).map(({ id, name }) => ({ id, name })),
       endings: eventEndings(event).map(({ id, name }) => ({ id, name })),
     })),
     next: storedTest(player.row.event_test),
   });
 }
+
+// The events "Testuj zdarzenia" offers: every one, the drafts only where
+// they are on (the test version).
+const testableEvents = () => content.events.list.filter((event) => eventDraftsOn() || !event.draft);
 
 // "Przy następnym raporcie": the next exploration that ends as planned
 // brings this event (`eventId`), in this case (`caseId`) or a drawn one
@@ -128,7 +133,7 @@ export async function chooseTestEvent(context) {
   if (!eventsOn()) throw notFound();
   const { player } = await requirePlayer(context);
   const { eventId, caseId = null, endingId = null } = await readJson(context.request);
-  const event = eventId !== null && Object.hasOwn(content.eventsById, eventId) ? content.eventsById[eventId] : null;
+  const event = testableEvents().find((candidate) => candidate.id === eventId) ?? null;
   if (eventId !== null && !event) throw new ApiError(400, 'unknown_event', 'Nie ma takiego zdarzenia.');
   if (caseId !== null && !(event?.cases ?? []).some((candidate) => candidate.id === caseId)) throw new ApiError(400, 'unknown_case', 'To zdarzenie nie ma takiego przebiegu.');
   if (endingId !== null && !(event ? eventEndings(event) : []).some((ending) => ending.id === endingId)) {

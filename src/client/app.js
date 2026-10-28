@@ -731,7 +731,7 @@ async function openEventTests() {
         h(
           'li',
           { class: 'tutorial-test event-test' },
-          h('div', { class: 'tutorial-test-text' }, h('strong', { text: event.title }), data.next?.eventId === event.id && h('span', { class: 'muted', text: 'Czeka na następny raport.' })),
+          h('div', { class: 'tutorial-test-text' }, h('strong', { text: event.draft ? `${event.title} (szkic)` : event.title }), data.next?.eventId === event.id && h('span', { class: 'muted', text: 'Czeka na następny raport.' })),
           h('div', { class: 'event-test-cases' }, [
             pick(event.id, null, 'Losowo'),
             ...event.cases.map((one) => pick(event.id, one.id, one.name)),

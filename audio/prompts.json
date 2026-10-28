@@ -214,7 +214,23 @@
       "aesculapian-snake-hurt": { "text": "a big snake hisses loudly when hit, heavy angry hiss, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
       "aesculapian-snake-death": "a big snake hisses long and weakly as its coils go limp, close up, dry, no music",
       "strzyga-hurt": { "text": "a female demon shrieks like a screech owl in pain, no words, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
-      "strzyga-death": "a female demon wails and fades into a screech owl's cry, no words, close up, no music"
+      "strzyga-death": "a female demon wails and fades into a screech owl's cry, no words, close up, no music",
+      "little-owl-hurt": { "text": "a small owl screeches sharply when hit, high piercing call, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
+      "little-owl-death": { "text": "a small owl gives a long eerie mournful hoot that fades away, close up, dry, no music", "seconds": 1.2 },
+      "black-grouse-hurt": { "text": "a black grouse cock gives a harsh angry hiss and flaps its wings when hit, video game monster hurt sound, close up, dry, no music", "seconds": 0.7 },
+      "black-grouse-death": { "text": "a large forest bird gives a choked squawk as its wings flutter weakly and stop, close up, dry, no music", "seconds": 1 },
+      "diving-beetle-hurt": { "text": "a giant beetle's hard shell cracks with a sharp chitinous click and an angry buzz, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
+      "diving-beetle-death": { "text": "a giant beetle collapses with crunching chitin and scraping legs, then silence, close up, dry, no music", "seconds": 1 },
+      "phantasm-hurt": { "text": "a ghostly spirit gives a distorted whispering shriek that echoes, no words, video game monster hurt sound, close up, no music", "seconds": 0.7 },
+      "phantasm-death": { "text": "many ghostly whispers dissolve into one fading airy sigh, no words, close up, no music", "seconds": 1.2 },
+      "zmij-hurt": { "text": "a fiery serpent hisses with a burst of crackling flame, video game monster hurt sound, close up, dry, no music", "seconds": 0.7 },
+      "zmij-death": { "text": "a large serpent gives a deep rasping death hiss as its flames die down into crackling embers, close up, no music", "seconds": 1.3 },
+      "fume-spirit-hurt": { "text": "a smoke spirit gives a raspy hollow wheeze with a puff of hissing smoke, no words, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
+      "fume-spirit-death": { "text": "a smoke spirit fades with a long dry hollow exhale over dying crackling embers, no words, close up, no music", "seconds": 1.2 },
+      "mine-spirit-hurt": { "text": "an old ghostly man grunts angrily with a metallic lantern rattle, no words, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
+      "mine-spirit-death": { "text": "an old ghostly man gives a long fading groan as a lantern clatters to the stone floor, no words, close up, no music", "seconds": 1.3 },
+      "giant-rat-hurt": { "text": "a giant rat squeals sharply when hit, video game monster hurt sound, close up, dry, no music", "seconds": 0.5 },
+      "giant-rat-death": { "text": "a giant rat gives a last raspy squeal and falls with a soft thud, close up, dry, no music", "seconds": 0.9 }
     }
   },
   "effects": {
