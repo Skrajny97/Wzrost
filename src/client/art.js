@@ -15,7 +15,7 @@ export const SPRITES = {
       // Wiatrołomy and Uroczysko Kamieni from 26.10.2026, with their champions.
       'stag', 'marten', 'hornets', 'planetnik', 'tusker', 'stoneling', 'bat', 'eagle-owl', 'she-wolf', 'basilisk',
       // Pajęczy Parów from 28.10.2026.
-      'tarantula', 'bird-eater',
+      'tarantula', 'bird-eater', 'spiderlings',
       // Zarośnięte Rozlewiska and Torfowe Mszary from 28.10.2026; the Ognik
       // takes the old Błędnica sprite.
       'otter', 'heron', 'reedling', 'giant-mosquito', 'beaver', 'mosquitoes', 'eel', 'eagle', 'catfish', 'toad', 'cormorant',
