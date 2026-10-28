@@ -2744,4 +2744,34 @@ Autor: „Wymyśl i zaproponuj nowe zdarzenie. Możesz je nawet wdrożyć na ser
     - **„Odejdź”** nic nie daje i nic nie kosztuje.
 3. **Gdzie.** Tylko tam, gdzie żyje Licho, elita Uroczyska Kamieni: w Omszałych Głazach, na Rysiej Grani, w Wilczych Kręgach i w Sercu Uroczyska (tak jak ranna kobieta tylko przy Błędnicy).
 4. **Szkic.** Zdarzenie ma `draft`, więc przychodzi tylko w wersji testowej. W „Testuj zdarzenia” ma dopisek „(szkic)”. W grze głównej nie pojawi się, dopóki autor go nie zatwierdzi.
-5. **Grafiki** (kwiat i nocna polana z głazami) powstają w Retro Diffusion. Autor wybiera je rano. Do tego czasu zdarzenie pokazuje sam tekst.
+5. **Grafiki** (kwiat i nocna polana z głazami) są z Retro Diffusion, po dwie wersje. Na wersji testowej stoją na próbę kwiat z drugiej wersji i polana z pierwszej, a kwiat stoi na środku polany (`figure`: 41% od lewej, 6% od dołu, 50% wysokości). Autor wybiera wersje rano.
+
+## Osiem stworów dla poziomów 66–100: propozycja (28.10.2026)
+
+Autor: „Zbuduj liste kolejnych stworów na kolejne poziomy i tak jak teraz opisy, materiały, dźwięki itd.” Regiony wewnętrzne poziomów 51–65 i Stare Koryto mają już po 4 zwykłe stwory. Pozostałym brakuje ośmiu.
+
+1. **Lista do zatwierdzenia** (pozycja w walce, materiał, rzadkość materiału):
+    - Wierzbowe Kępy (66–70): **Zwid** (tył), Okruch zwidu (pospolity).
+    - Żurawie Łąki (76–80): **Cietrzew** (środek), Pióro cietrzewia (unikalne).
+    - Pijawkowe Oczka (81–85): **Pływak** (środek), Pokrywa pływaka (epicka).
+    - Rosiczkowe Pole (86–90): **Pójdźka** (tył), Pióro pójdźki (rzadkie).
+    - Tlące się Torfy (91–95): **Żmij** (przód), Łuska żmija (epicka), i **Zaduch** (środek), Tlący węgielek (pospolity).
+    - Stare Wyrobisko (96–100): **Skarbnik** (tył), Lampka skarbnika (rzadka), i **Szczur** (środek), Szczurzy ogon (pospolity).
+
+    Rzadkości uzupełniają to, czego w danym regionie brakuje, tak żeby każdy miał materiał każdej z czterech rzadkości.
+2. **Szkice przed zatwierdzeniem.** Grafiki stworów (po 2 wersje), ikony materiałów (po 2) i okrzyki (po 2 okrzyki bólu i 2 okrzyki śmierci) powstały w nocy, żeby autor mógł wybierać od razu. Koszt: ok. 6,1 USD Retro Diffusion i 564 kredyty ElevenLabs. Pierwszy przebieg okrzyków nie ruszył, bo limit 400 kredytów był za niski.
+3. **Zaduch.** Pierwsza wersja miała dym ucięty prostą krawędzią kadru, a druga i dwie dorobione wypadły słabo (ciemna plama, czarne resztki tła). Pierwsza wersja jest przesunięta o 3 piksele w lewo, a jej dwie smugi dymu zwężają się w szpic przed krawędzią, tak jak ogon Połoza.
+4. **Dane czekają na autora.** Stwory nie trafiają do `data/` przed zatwierdzeniem listy, bo gałąź robocza trafia przy wdrożeniu do gry głównej. Po zatwierdzeniu: statystyki, ataki, materiały, afiksy, spotkania, opisy regionów, dźwięki i sprawdzenie balansu. Nazwa Żmija w afiksach może się mylić z Żmiją, więc afiks Żmija dostanie inną formę.
+
+## Ewolucje i Osada: propozycje (28.10.2026)
+
+Autor: „Pomyśl nad modułem Osady. Ja na pewno chciałbym żeby trafiła tam Zaklinaczka” oraz „przede wszystkim musimy też ruszyć Ewolucje na 50 poziomie klasy. To ważny aspekt. Przygotuj propozycje i pytania.”
+
+1. **Dokument.** [Insight — Ewolucje i Osada: propozycje i pytania](https://claude.ai/artifact/ExqU9vANqjsGVXKvcSns71) zawiera:
+    - zasady ewolucji: nazwa klasy, przyrost statystyk, cecha, rozwinięta umiejętność ścieżki, nowa umiejętność 1 z 2, Punkty Umiejętności od 50. do 99. poziomu i nowy strój;
+    - 15 pierwszych ewolucji z cechami i umiejętnościami;
+    - przebieg ewolucji na ekranie, grafiki, dźwięki i koszty;
+    - Osadę Rozstaje: reputację w pięciu stopniach, Zaklinaczkę (przekucie afiksu, zaklęcie żywiołu, przeniesienie afiksu), Karczmę z werbunkiem towarzyszy i plotkami, Tablicę zleceń, Targ, Chatę zielarki i Pustelnika;
+    - szkic planszy Osady i ekranu miejsca, kolejność prac i 20 pytań z zaleceniami (E1–E9, O1–O11).
+2. **Nic z niego nie wchodzi do gry** przed odpowiedziami autora.
+3. **Liczby z krzywej.** 50. poziom klasy przychodzi według obecnej krzywej po ok. 80 godzinach wypraw, przy ok. 44. poziomie postaci, a 100. po ok. 400 godzinach.
