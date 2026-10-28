@@ -22,6 +22,8 @@ export const SPRITES = {
       'crocodile', 'willow-spirit', 'wraith', 'mistling', 'skeleton', 'drowner', 'sludger', 'mud-goblin', 'water-spirit',
       'drowned-maiden', 'elk', 'crane', 'leech', 'crayfish', 'harrier', 'sundew', 'peatling', 'salamander', 'will-o-wisp',
       'peat-cutter', 'bog-worm', 'mud-lord', 'kikimora',
+      // The bandits of the wounded woman's event (data/events.json).
+      'bandit-thug', 'bandit-knifer', 'bandit-crossbow',
     ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved.
