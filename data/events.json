@@ -100,7 +100,7 @@
       "title": "Kwiat paproci",
       "art": "fern-flower",
       "scene": "fern-glade",
-      "figure": { "left": 50, "bottom": 6, "height": 48 },
+      "figure": { "left": 41, "bottom": 6, "height": 50 },
       "text": "Wśród paproci pod omszałym głazem żarzy się czerwone światło. To kwiat paproci, o którym opowiadają w każdej wsi: kto go zerwie, temu szczęście już nie odstąpi. Między głazami coś się poruszyło.",
       "options": [
         { "id": "pick", "label": "Zerwij kwiat" },
