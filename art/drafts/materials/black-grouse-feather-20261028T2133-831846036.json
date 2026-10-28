@@ -1,0 +1,25 @@
+{
+  "id": "black-grouse-feather",
+  "payload": {
+    "prompt": "curved glossy blue-black lyre-shaped grouse tail feather, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 831846036,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793223283,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 60.3,
+    "request_id": "8092d4bc-4c26-423a-ba1b-78e805b16934",
+    "outputs_retained_until": 1793309655
+  }
+}
