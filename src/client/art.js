@@ -16,6 +16,12 @@ export const SPRITES = {
       'stag', 'marten', 'hornets', 'planetnik', 'tusker', 'stoneling', 'bat', 'eagle-owl', 'she-wolf', 'basilisk',
       // Pajęczy Parów from 28.10.2026.
       'tarantula', 'bird-eater',
+      // Zarośnięte Rozlewiska and Torfowe Mszary from 28.10.2026; the Ognik
+      // takes the old Błędnica sprite.
+      'otter', 'heron', 'reedling', 'giant-mosquito', 'beaver', 'mosquitoes', 'eel', 'eagle', 'catfish', 'toad', 'cormorant',
+      'crocodile', 'willow-spirit', 'wraith', 'mistling', 'skeleton', 'drowner', 'sludger', 'mud-goblin', 'water-spirit',
+      'drowned-maiden', 'elk', 'crane', 'leech', 'crayfish', 'harrier', 'sundew', 'peatling', 'salamander', 'will-o-wisp',
+      'peat-cutter', 'bog-worm', 'mud-lord', 'kikimora',
     ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved.
