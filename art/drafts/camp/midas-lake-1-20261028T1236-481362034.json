@@ -1,0 +1,25 @@
+{
+  "id": "midas-lake-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a small turquoise forest pond filling most of the picture, with reeds, a wooden gold-panning pan on its bank and a few gold glints in the water, no tent, no hut, no building, standing directly on bare ground with no ground tile, base or platform under it",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 2,
+    "seed": 481362034,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793191025,
+    "credit_cost": 2,
+    "balance_cost": 0.12,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 29.44,
+    "request_id": "ef2cb960-7341-4d78-93e1-516a675ff63d",
+    "outputs_retained_until": 1793277421
+  }
+}
