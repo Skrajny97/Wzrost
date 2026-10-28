@@ -2054,7 +2054,7 @@ Trzecia część wprowadzenia, po Umiejętnościach (W3, W4). Kwestie narratora 
 
 1. **Wybór** (autor: „Najpierw kolor skóry, potem Awatar i deploy”). Przy tworzeniu postaci, pod „Wygląd”, stoi rząd kropek „Kolor skóry”, a popiersia klas od razu pokazują wybrany odcień. W Ustawieniach (zębatka) ten sam rząd zmienia odcień w każdej chwili, za darmo, jak wygląd. Odcień widać na portrecie postaci i w walkach. Raporty sprzed zmiany grają z odcieniem domyślnym.
 2. **Sześć odcieni** w `data/skins.json`: Blada, Jasna (portret taki, jak narysowano, domyślny), Śniada, Brązowa, Ciemna i Złocista. Nazwy to szkic do poprawy przez autora. Stare postacie mają odcień Jasna. *Teraz jest ich osiem: zob. punkt 5.*
-3. **Bez nowych grafik.** `tools/skin-tones.py` przemalowuje skórę na gotowych portretach: bierze barwy twarzy i szuka ich tylko w obszarach głowy, rąk i stóp każdego portretu, bo te same barwy wracają na skórzanych butach i łatach. Każda barwa skóry trzyma swoje miejsce między cieniem a światłem, na rampie odcienia. Pliki `<klasa>-<wygląd>-<odcień>.png` leżą obok portretów, a walidator pilnuje, żeby żadnego nie brakowało.
+3. **Bez nowych grafik.** `tools/skin-tones.py` przemalowuje skórę na gotowych portretach: bierze barwy twarzy i szuka ich tylko w obszarach głowy, rąk i stóp każdego portretu, bo te same barwy wracają na skórzanych butach i łatach. Każda barwa skóry trzyma swoje miejsce między cieniem a światłem, na rampie odcienia. Pliki `<klasa>-<wygląd>-<odcień>.png` leżą obok portretów, a walidator pilnuje, żeby żadnego nie brakowało. *Teraz maska jest sprawdzona piksel po pikselu: zob. „Skóra na portretach piksel po pikselu”.*
 4. **Migracja 0036** dodaje kolumnę `skin`. Pusta oznacza odcień domyślny.
 5. **Żółta i Szara, bez suwaka** (autor: „o ale kolor tak jak zaznaczyłeś to lepiej niż suwak”, „możesz dodać żółtą obok złocistej po prostu”, „i szarą całą”). Zostają kropki. Obok Złocistej stoi Żółta, cała żółta jak słońce (autor: „taką całą żółtą jak słońce”), a na końcu rzędu Szara, cała szara. Złocista zostaje. W Ustawieniach kropki mają cały wiersz pod napisem „Kolor skóry”, bo osiem nie mieści się obok niego. W wersji 0.0.12.
 6. **Lepsza maska skóry.** Na Szarej i Żółtej widać było braki: pomarańczowe uszy, nosy i szyje, a u czterech portretów jasne pasma grzywki brały kolor skóry. Teraz skóra głowy rośnie od policzków po połączonych pikselach, razem z odcieniami cienia, a dziury w niej (usta, rumieniec) się domykają. Kolory włosów z czubka głowy nie wchodzą do skóry. Poprawka obejmuje wszystkie odcienie.
@@ -2511,3 +2511,16 @@ Autor: „Jeszcze by się przydalo lepsze porównywanie itemów jak coś dropnie
     - „Po założeniu” zaczyna się od werdyktu („Lepiej: postać będzie silniejsza.”, „Gorzej: postać będzie słabsza.”, „Coś za coś: jedne wartości wzrosną, inne spadną.”, „Bez zmian w walce.”). Pod nim są wszystkie zmienione wartości, a nie tylko pięć jak wcześniej. Karta założonego przedmiotu pokazuje tak samo „Po zdjęciu”.
     - „Porównanie z założonym” zastępuje dawne „Założony teraz”: nazwa założonego przedmiotu w kolorze jego rzadkości i tabelka „Ten / Założony / Różnica” z obrażeniami broni, pancerzem i każdą statystyką przedmiotu. Różnica obrażeń to różnica ich średnich. Statystyka, której jeden z przedmiotów nie ma, ma u niego kreskę.
     - Przedmiot, którego klasa nie założy, nie ma ani „Po założeniu”, ani tabelki, tylko ostrzeżenie jak wcześniej.
+
+## Skóra na portretach piksel po pikselu (28.10.2026)
+
+Autor: „nawet portrety mają słabe maski też trzeba chyba piksel po pikselu ogarnąć”, przy zrzucie szarego Łucznika z pomarańczową szyją, dekoltem i brzegami dłoni.
+
+1. **Przegląd.** Każdy z 10 portretów przeszedł przegląd w powiększeniu, z siatką pikseli: twarz, szyja, dekolt, ręce, dłonie i stopy, w szarym i w ciemnym odcieniu.
+2. **Maska** (`tools/skin-tones.py`):
+    - Skóra znaleziona na głowie zostaje jak dotąd.
+    - W ramkach `GROW` (szyja, dekolt, czoło, ręce, dłonie, stopy) skóra rośnie tylko w kolory skóry z twarzy tego samego portretu: dość nasycone i pomarańczowe, bez kolorów z `NOT` (kołnierz i sznurówka Wojowniczki, rzemień Wojownika, które twarz z nimi dzieli).
+    - Poza głową maska zostawia tylko te kolory, więc owijki stóp, rękawy i spodnie w kolorze skóry już nie szarzeją razem z nią.
+    - `PATCHES` dodają skórę odciętą od reszty, np. piętę Wojownika między rzemieniami i palce Wojowniczki. `PIXELS` i `NOT_PIXELS` to pojedyncze piksele: czoło Cienistej między kosmykami, cienie między jej palcami i tęczówki jej oczu, które zostają w swoim kolorze.
+3. **Kontur.** Ciemny, ciepły kontur rąk, dłoni i stóp (np. bordowy u Wojowniczki) dostaje ciemny odcień wybranej skóry. Jest tak samo ciemny względem niej, jak był względem najciemniejszej skóry portretu. Przy głowie kontur zostaje, bo graniczy tam z włosami.
+4. **Co widać w grze.** Szyje i dekolty są w kolorze wybranej skóry (najbardziej u Łucznika, Łuczniczki, Kleryka, Czarodziejki i Wojowniczki), tak samo ciemne bruzdy dłoni, pięty i palce. Przeliczone są wszystkie 70 pliki (10 portretów, 7 odcieni). Chód z Walki się nie zmienia.

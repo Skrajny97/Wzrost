@@ -6,7 +6,8 @@
 # Skin is found in two steps: the colours of the face (a box around it that
 # pass a test for skin), and of those only the pixels inside the boxes below,
 # where the figure shows skin (head, arms or hands, feet), as the portraits
-# reuse some skin colours on leather and cloth. Each skin colour keeps its
+# reuse some skin colours on leather and cloth. Then the mask as checked
+# pixel by pixel (GROW and below) takes over. Each skin colour keeps its
 # place between the darkest and the lightest skin colour of the portrait, on
 # the tone's ramp from shadow to light.
 #
@@ -45,6 +46,45 @@ BOXES = {
 }
 
 
+# The masks as checked pixel by pixel (the author: "nawet portrety mają
+# słabe maski"). The head keeps the skin found on it. From there skin grows,
+# inside GROW's boxes (head: neck, chest, forehead; limbs: arms, hands,
+# feet), only into the face's own skin colours: saturated and orange enough,
+# without the colours in NOT (a collar, a lace or a strap the face shares);
+# elsewhere the skin found keeps only those colours, so cloth and wraps of a
+# skin-like colour drop out. PATCHES are bits of skin cut off from the rest,
+# such as a heel between straps: the skin colours in their box and the shades
+# named for it. PIXELS and NOT_PIXELS are single pixels the colours get
+# wrong: skin between strands of a fringe, the iris of an eye. Next to the
+# skin of the limbs, a dark, warm outline takes a darker shade of the tone,
+# so no brown or maroon rim is left around a grey arm (rim_pixels).
+GROW = {
+    'archer-female': ([(44, 28, 56, 37)], [(26, 60, 40, 82), (60, 60, 76, 82)]),
+    'archer-male': ([(44, 24, 62, 40)], [(32, 62, 46, 92), (60, 62, 78, 90)]),
+    'cleric-female': ([], [(28, 50, 48, 72), (52, 50, 68, 70), (34, 98, 68, 128)]),
+    'cleric-male': ([(44, 30, 58, 47)], [(26, 50, 42, 84), (56, 46, 74, 80), (32, 86, 72, 128)]),
+    'mage-female': ([(48, 30, 58, 42)], [(28, 56, 42, 86), (56, 52, 72, 80), (32, 96, 68, 128)]),
+    'mage-male': ([(46, 30, 58, 46)], [(26, 66, 40, 90), (56, 64, 72, 88), (32, 96, 66, 128)]),
+    'shadow-female': ([(46, 12, 57, 18), (43, 18, 47, 23), (54, 18, 58, 23)], [(22, 38, 40, 88), (52, 34, 76, 84), (28, 108, 68, 128)]),
+    'shadow-male': ([], [(24, 62, 40, 90), (56, 58, 74, 86), (30, 108, 68, 128)]),
+    'warrior-female': ([(44, 30, 58, 44)], [(18, 50, 38, 90), (60, 48, 82, 86), (30, 106, 74, 128)]),
+    'warrior-male': ([(44, 30, 58, 46)], [(22, 52, 40, 88), (58, 50, 78, 86), (30, 106, 72, 128)]),
+}
+NOT = {'warrior-female': ['#876d56', '#775030'], 'warrior-male': ['#6c4e39']}
+PATCHES = {
+    'shadow-female': [((46, 36, 54, 42), [])],
+    'warrior-female': [((28, 119, 31, 123), [])],
+    'warrior-male': [((53, 114, 56, 119), []), ((61, 115, 64, 118), ['#af713f'])],
+}
+PIXELS = {
+    'shadow-female': [(46, 17), (47, 16), (48, 15), (48, 16), (53, 21), (67, 75), (67, 76), (66, 77), (66, 76), (65, 76)],
+}
+NOT_PIXELS = {
+    'shadow-female': [(50, 13), (47, 21), (48, 21), (47, 22), (48, 22), (52, 21)],
+}
+SIDES = ((1, 0), (-1, 0), (0, 1), (0, -1))
+
+
 def skinlike(r, g, b):
     h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
     return 0.01 <= h <= 0.085 and 0.2 <= s <= 0.62 and v >= 0.42
@@ -63,7 +103,7 @@ def distance(a, b):
     return sum((x - y) ** 2 for x, y in zip(a, b)) ** 0.5
 
 
-def skin_pixels(im, name):
+def found_pixels(im, name):
     px = im.load()
     fx = FACES.get(name, im.width // 2)
     top = next(y for y in range(im.height) if any(px[x, y][3] for x in range(im.width)))
@@ -146,6 +186,55 @@ def skin_pixels(im, name):
     return colours, pixels
 
 
+def within(box, x, y):
+    return box[0] <= x < box[2] and box[1] <= y < box[3]
+
+
+def skin_pixels(im, name):
+    px = im.load()
+    _, found = found_pixels(im, name)
+    head = BOXES[name][0]
+    heads, limbs = GROW[name]
+    grow = heads + limbs
+
+    def skin_colour(c):
+        h, s, _ = colorsys.rgb_to_hsv(*(v / 255 for v in c))
+        return s >= 0.3 and (h <= 0.08 or h >= 0.95)
+
+    allowed = {px[p][:3] for p in found if within(head, *p) and skin_colour(px[p][:3])}
+    allowed -= {rgb(code) for code in NOT.get(name, [])}
+    pixels = {p for p in found if within(head, *p) or px[p][:3] in allowed}
+    edge = list(pixels)
+    while edge:
+        x, y = edge.pop()
+        for dx, dy in SIDES:
+            n = (x + dx, y + dy)
+            if n not in pixels and any(within(box, *n) for box in grow) and px[n][3] and px[n][:3] in allowed:
+                pixels.add(n)
+                edge.append(n)
+    for box, shades in PATCHES.get(name, []):
+        here = allowed | {rgb(code) for code in shades}
+        pixels |= {(x, y) for y in range(box[1], box[3]) for x in range(box[0], box[2]) if px[x, y][3] and px[x, y][:3] in here}
+    pixels = (pixels | set(PIXELS.get(name, []))) - set(NOT_PIXELS.get(name, []))
+    return {px[p][:3] for p in pixels}, sorted(pixels)
+
+
+def rim_pixels(im, name, pixels):
+    px = im.load()
+    skin = set(pixels)
+    rim = set()
+    for box in GROW[name][1]:
+        for y in range(box[1], box[3]):
+            for x in range(box[0], box[2]):
+                c = px[x, y]
+                if (x, y) in skin or not c[3]:
+                    continue
+                h, s, v = colorsys.rgb_to_hsv(*(t / 255 for t in c[:3]))
+                if (h <= 0.1 or h >= 0.9) and s >= 0.4 and 0.08 <= v < 0.36 and any((x + dx, y + dy) in skin for dx, dy in SIDES):
+                    rim.add((x, y))
+    return sorted(rim)
+
+
 def rgb(code):
     return tuple(int(code[i:i + 2], 16) for i in (1, 3, 5))
 
@@ -162,6 +251,7 @@ def main():
     for name in sorted(BOXES):
         im = Image.open(os.path.join(PORTRAITS, f'{name}.png')).convert('RGBA')
         colours, pixels = skin_pixels(im, name)
+        rim = rim_pixels(im, name, pixels)
         lums = {c: luminance(c) for c in colours}
         low, high = min(lums.values()), max(lums.values())
         for tone in tones:
@@ -169,6 +259,13 @@ def main():
                 continue
             out = im.copy()
             po = out.load()
+            # The outline as dark next to the tone's shadow as it was next
+            # to the darkest skin.
+            shadow = rgb(tone['ramp'][0])
+            for x, y in rim:
+                c = po[x, y]
+                k = min(1, luminance(c) / (low or 1))
+                po[x, y] = (*(round(v * k) for v in shadow), c[3])
             for x, y in pixels:
                 c = po[x, y]
                 t = (lums[c[:3]] - low) / (high - low or 1)
@@ -177,8 +274,10 @@ def main():
         mask = im.copy()
         for x, y in pixels:
             mask.putpixel((x, y), (255, 0, 255, 255))
+        for x, y in rim:
+            mask.putpixel((x, y), (0, 230, 255, 255))
         masks.append(mask)
-        print(name, len(colours), 'colours,', len(pixels), 'pixels')
+        print(name, len(colours), 'colours,', len(pixels), 'pixels,', len(rim), 'outline')
     if '--mask' in sys.argv:
         w, h = masks[0].size
         sheet = Image.new('RGBA', (w * 3 * 5 + 40, h * 3 * 2 + 10), (18, 24, 20, 255))
