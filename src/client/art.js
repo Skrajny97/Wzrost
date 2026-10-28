@@ -151,7 +151,7 @@ export const SPRITES = {
   'event-scenes': {
     width: 192,
     height: 96,
-    ids: [],
+    ids: ['forest-ambush'],
   },
 };
 

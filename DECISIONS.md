@@ -2604,7 +2604,7 @@ Autor: „Ewentualnie zdarzenia na koniec wyprawy: wyświetla się nagle jakiś 
     - XP z walki to ok. 30% XP godzinnej wyprawy od 30. poziomu, 36–45% na poziomach 8–15 i 87% na 5. poziomie. Przy szansie zdarzenia daje to średnio 7–26% XP więcej na wyprawę.
 6. **Raport.** Pod podsumowaniem stoi karta zdarzenia: tekst i wybrana opcja ze skutkiem. Walka z bandytami ma w zakładkach znacznik „zdarzenie”, a raport otwiera się na niej. Relacja kończy się zdarzeniem.
 7. **Na razie tylko wersja testowa** (`EVENTS` „on” w `wrangler.jsonc`). „Testuj zdarzenia” w Ustawieniach wybiera zdarzenie na następny raport, bez losowania. Przychodzi ono po następnej wyprawie zakończonej zgodnie z planem (nie po samouczku ani Szybkim Polowaniu), a po wyborze opcji wybór znika (`event_test`, migracja 0048).
-8. **Grafiki.** Postać zdarzenia (`art`) leży w `src/client/art/events/`, tło (`scene`) w `src/client/art/event-scenes/`, a sylwetki bandytów obok stworów. Szkice z Retro Diffusion idą do autora pojedynczo. Ranna kobieta ma już postać (lewa wersja, wybrana przez autora). Bez tła zdarzenie pokazuje samą postać i tekst, a bandyci bez sylwetek walczą z samym kółkiem.
+8. **Grafiki.** Postać zdarzenia (`art`) leży w `src/client/art/events/`, tło (`scene`) w `src/client/art/event-scenes/`, a sylwetki bandytów obok stworów. Szkice z Retro Diffusion idą do autora pojedynczo. Ranna kobieta ma już postać (lewa wersja) i tło leśnej ścieżki (prawa wersja), obie wybrane przez autora. Bandyci bez sylwetek walczą z samym kółkiem.
 
 ## HP i mana za poziom klasy (28.10.2026)
 
