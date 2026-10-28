@@ -1,0 +1,13 @@
+{
+  "id": "craft",
+  "payload": {
+    "text": "a heavy blacksmith's hammer pounds hot iron on an anvil three times, deep low solid thuds with a short dull metallic knock, no bell-like ringing, no high tones, close up, dry, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/craft-20261028T0704-0.mp3",
+    "audio/drafts/effects/craft-20261028T0704-1.mp3"
+  ],
+  "credits": 80
+}

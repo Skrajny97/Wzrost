@@ -1,0 +1,13 @@
+{
+  "id": "craft-fail",
+  "payload": {
+    "text": "one loud heavy hammer blow on metal on an anvil, a strong deep clunk, then a sharp crack and a few small broken metal pieces clatter onto a stone floor, close up, dry, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/craft-fail-20261028T0704-0.mp3",
+    "audio/drafts/effects/craft-fail-20261028T0704-1.mp3"
+  ],
+  "credits": 72
+}
