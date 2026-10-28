@@ -1,0 +1,25 @@
+{
+  "id": "spiderlings",
+  "payload": {
+    "prompt": "a swarm of six young pale brown spiders of different sizes crawling over each other in a tight cluster, each with eight thin legs and tiny red eyes, a few strands of silk",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 4,
+    "seed": 280316255,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793189093,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 35.4,
+    "request_id": "ff635214-86d5-4732-9205-fe6d6306ae06",
+    "outputs_retained_until": 1793275438
+  }
+}
