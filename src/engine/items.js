@@ -319,6 +319,21 @@ export function itemProperties(raw, content) {
   return lines;
 }
 
+// The item's numbers one by one, for setting it beside another: its damage
+// by the average of its range, then its armor and each stat (an item's own
+// armor, its implicit and its affixes added up by stat).
+export function itemLines(raw, content) {
+  const item = upgradedItem(raw, content);
+  const lines = [];
+  if (item.damage) {
+    lines.push({ id: 'damage', label: 'Obrażenia', value: (item.damage.min + item.damage.max) / 2, text: `${item.damage.min}–${item.damage.max}` });
+  }
+  const stats = new Map(item.armor ? [['armor', item.armor]] : []);
+  for (const { stat, value } of [...(item.implicit ? [item.implicit] : []), ...item.affixes]) stats.set(stat, (stats.get(stat) ?? 0) + value);
+  for (const [stat, value] of stats) lines.push({ id: stat, label: propertyName(stat, content), value, text: `+${value}` });
+  return lines;
+}
+
 // Higher rarity first, then higher level: used to pick the best find of a hunt.
 export function itemRank(item, content) {
   return content.rarities.findIndex((rarity) => rarity.id === item.rarity) * 1000 + item.level;
@@ -355,6 +370,7 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap } = {}) {
     rarityName: rarity.name,
     color: rarity.color,
     properties: itemProperties(item, content),
+    lines: itemLines(item, content),
     // null: any class can use it.
     classIds,
     classNames: classIds && classIds.map((id) => content.classesById[id].name),

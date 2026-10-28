@@ -108,6 +108,8 @@ import {
   settleCrafting,
   simulateHunt,
   statEffects,
+  equipChange,
+  itemLines,
   THREAT_LEVELS,
   unlockedFeatures,
   areasOpened,
@@ -1040,6 +1042,46 @@ describe('stat previews', () => {
     assert.equal(mage.strength.damage, undefined);
     const cleric = statEffects(newCharacter('cleric'), kit('cleric'), content);
     assert.ok(cleric.wisdom.recovery > 0 && cleric.wisdom.mana > 0);
+  });
+});
+
+describe('item comparisons', () => {
+  test('a find is better, worse, a trade-off or the same as what its slot holds', () => {
+    const character = newCharacter('warrior');
+    const worn = kit('warrior');
+    const sword = worn.find((item) => item.slot === 'weapon');
+    const mail = worn.find((item) => item.slot === 'chest');
+    const stronger = equipChange(character, worn, { ...sword, damage: { min: sword.damage.min + 5, max: sword.damage.max + 5 } }, content);
+    assert.equal(stronger.verdict, 'better');
+    assert.ok(stronger.changes.damage > 0);
+    assert.equal(equipChange(character, worn, { ...sword, damage: { min: 1, max: 1 } }, content).verdict, 'worse');
+    assert.deepEqual(equipChange(character, worn, sword, content), { changes: {}, verdict: 'same' });
+    // Less armour for much more strength: more damage, less reduction.
+    const traded = equipChange(character, worn, { ...mail, armor: 1, affixes: [{ kind: 'prefix', stat: 'strength', value: 20 }] }, content);
+    assert.equal(traded.verdict, 'mixed');
+    assert.ok(traded.changes.damage > 0 && traded.changes.reduction < 0);
+    // Into an empty slot anything that adds something is better.
+    assert.equal(equipChange(character, worn.filter((item) => item !== mail), mail, content).verdict, 'better');
+  });
+
+  test('a resistance counts as a change in combat, by its element', () => {
+    const character = newCharacter('warrior');
+    const worn = kit('warrior');
+    const mail = worn.find((item) => item.slot === 'chest');
+    const warded = equipChange(character, worn, { ...mail, affixes: [...mail.affixes, { kind: 'suffix', stat: 'resist.fire', value: 10 }] }, content);
+    assert.equal(warded.verdict, 'better');
+    assert.deepEqual(Object.keys(warded.changes), ['resist.fire']);
+    assert.ok(warded.changes['resist.fire'] > 0);
+  });
+
+  test("an item's lines add its armour and stats up by kind", () => {
+    const sword = { base: 'sword', slot: 'weapon', level: 1, rarity: 'common', damage: { min: 5, max: 8 }, affixes: [{ kind: 'prefix', stat: 'strength', value: 3 }] };
+    assert.deepEqual(itemLines(sword, content), [
+      { id: 'damage', label: 'Obrażenia', value: 6.5, text: '5–8' },
+      { id: 'strength', label: content.statsById.strength.name, value: 3, text: '+3' },
+    ]);
+    const mail = { base: 'chainmail', slot: 'chest', level: 1, rarity: 'common', armor: 10, affixes: [{ kind: 'suffix', stat: 'armor', value: 2 }] };
+    assert.deepEqual(itemLines(mail, content), [{ id: 'armor', label: 'Pancerz', value: 12, text: '+12' }]);
   });
 });
 

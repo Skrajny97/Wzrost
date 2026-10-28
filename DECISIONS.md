@@ -2492,3 +2492,22 @@ Autor: „Skoro z Krzyżaka zrobiłeś Pająka to trzeba dodać jeszcze jednego 
     - Pozostałe piksele przy masce to kontury, włosy, kaptury i stroje. Zostają bez zmian.
     - Łucznik (autor: „przeskakują piksele jasne u Łucznika”). Jego mała twarz ma światła w kolorach kaptura, więc zostawały jasne, w każdej klatce w innym miejscu. 20 pikseli twarzy jest wpisanych po jednym, osobno dla każdej z 4 klatek. U Łuczniczki jasne piksele przy twarzy to brzeg kaptura, ten sam w każdej klatce, więc zostają.
 3. **Nowy chód Kleryczki** (osoba testująca grę, przekazane przez autora: „Trochę mam zamieszana głowę jak zdeformowana”). Głowa w chodzie miała dwubarwną, poszarpaną fryzurę i twarz wciśniętą w bok. Nowy chód z Retro Diffusion ma włosy splecione w jeden warkocz na plecach i małą, czytelną twarz. Opis w `art/prompts.json` prosi o to wprost. Z 4 wersji w grze jest czwarta. Ma też własne kolory skóry w odcieniach. Koszt: 4 animacje po 0,07 USD, razem 0,28 USD.
+
+## Porównywarka przedmiotów (28.10.2026)
+
+Autor: „Jeszcze by się przydalo lepsze porównywanie itemów jak coś dropnie albo sie wytworzy i w plecaku - taka porównywarka czytelna”, a potem: „rób porównywarkę itemów”.
+
+1. **Werdykt.** Serwer liczy dla każdego przedmiotu w plecaku, co zmieni się w walce, gdy postać założy go zamiast tego, co nosi w jego slocie (`valueChanges` i `equipChange` w `src/engine/preview.js`).
+    - Liczą się wartości ze Statystyk: obrażenia, redukcja obrażeń, maks. HP, unik, trafienie krytyczne, odporność na efekty, szybkość, maks. mana, regeneracja i odzysk HP po walce. Do tego odporności na żywioły, liczone jak redukcja obrażeń: jaką część obrażeń danego żywiołu odejmują przeciwnikowi z poziomu postaci.
+    - Każda wartość jest zaokrąglona tak, jak pokazuje ją gra, więc zmiana, której gracz by nie zobaczył, się nie liczy.
+    - „Lepiej”: coś rośnie, nic nie spada. „Gorzej”: coś spada, nic nie rośnie. „Coś za coś”: jedne wartości rosną, inne spadają. „Bez zmian”: nic się nie zmienia.
+    - Przedmiot, którego klasa postaci nie założy, nie ma werdyktu. Przedmiot z wymiany albo na wyższy poziom klasy ma werdykt, bo postać założy go później.
+    - Werdykty całego plecaka liczą się w mniej niż 1 ms.
+2. **Znaczki.** Zielony trójkąt w górę to „lepiej”, czerwony w dół to „gorzej”, a oba obok siebie to „coś za coś”. „Bez zmian” nie ma znaczka. Trójkąty są rysowane w CSS, więc nie zależą od czcionek telefonu. Znaczek jest:
+    - w lewym górnym rogu kafelka w plecaku (poziom ulepszenia zostaje w prawym dolnym),
+    - ze słowem na liście przedmiotów do pustego slotu,
+    - ze słowem przy znaleziskach w raporcie z wyprawy i przy przedmiotach z raportu Warsztatu, dopóki przedmiot leży w plecaku.
+3. **Karta przedmiotu.**
+    - „Po założeniu” zaczyna się od werdyktu („Lepiej: postać będzie silniejsza.”, „Gorzej: postać będzie słabsza.”, „Coś za coś: jedne wartości wzrosną, inne spadną.”, „Bez zmian w walce.”). Pod nim są wszystkie zmienione wartości, a nie tylko pięć jak wcześniej. Karta założonego przedmiotu pokazuje tak samo „Po zdjęciu”.
+    - „Porównanie z założonym” zastępuje dawne „Założony teraz”: nazwa założonego przedmiotu w kolorze jego rzadkości i tabelka „Ten / Założony / Różnica” z obrażeniami broni, pancerzem i każdą statystyką przedmiotu. Różnica obrażeń to różnica ich średnich. Statystyka, której jeden z przedmiotów nie ma, ma u niego kreskę.
+    - Przedmiot, którego klasa nie założy, nie ma ani „Po założeniu”, ani tabelki, tylko ostrzeżenie jak wcześniej.

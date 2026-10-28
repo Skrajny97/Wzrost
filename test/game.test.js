@@ -324,6 +324,15 @@ describe('equipment', () => {
     assert.equal(data.after.damage, data.now.damage);
     const weapon = (await call('GET', `/api/items/${bagItemId}/preview`, { cookie })).data;
     assert.ok(weapon.after.damageAverage > weapon.now.damageAverage);
+    // Each change as the game shows it, and the verdict on them all.
+    assert.ok(data.changes.reduction > 0);
+    assert.equal(data.changes.damage, undefined);
+    assert.ok(['better', 'mixed'].includes(data.verdict));
+    // The bag marks every item the class can wear, with its lines.
+    const bag = (await call('GET', '/api/character', { cookie })).data.character.bag;
+    const mail = bag.find((item) => item.id === mailId);
+    assert.ok(['better', 'mixed'].includes(mail.verdict));
+    assert.ok(mail.lines.some((line) => line.id === 'armor' && line.value > 0));
   });
 
   test('a weapon or armour of another class cannot be worn, and gloves fit anyone', async () => {

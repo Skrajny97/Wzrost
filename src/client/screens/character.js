@@ -6,7 +6,7 @@
 import { herbSprite, itemSprite, materialSprite, portraitSprite, potionSprite } from '../art.js';
 import { MATERIALS_HINT, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
-import { formatDecimal, formatHours, formatMinutes, formatNumber, plural, timeFormat } from '../format.js';
+import { formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, timeFormat } from '../format.js';
 import { RESOURCE_ICONS, SLOT_ICONS, itemIcon } from '../icons.js';
 import { portrait } from '../portraits.js';
 import { playSound } from '../sound.js';
@@ -20,6 +20,46 @@ export const itemTitle = (item) => (item.upgrade > 0 ? `${item.name} +${item.upg
 
 // The number in the corner of a slot: the upgrade level.
 const upgradeBadge = (item) => item.upgrade > 0 && h('span', { class: 'slot-level', text: `+${item.upgrade}` });
+
+// Whether an item would make the character stronger in place of what its
+// slot holds, as the server counts it (valueChanges in preview.js): a word
+// for the lists of items and a line for the item's card.
+const VERDICTS = {
+  better: { text: 'lepiej', line: 'Lepiej: postać będzie silniejsza.' },
+  worse: { text: 'gorzej', line: 'Gorzej: postać będzie słabsza.' },
+  mixed: { text: 'coś za coś', line: 'Coś za coś: jedne wartości wzrosną, inne spadną.' },
+  same: { text: 'bez zmian', line: 'Bez zmian w walce.' },
+};
+
+// The mark of a bag item: a green triangle up, a red one down, both for a
+// trade-off (drawn in CSS, so that no font lacks them), with the word in a
+// list and alone in the corner of a tile. None for an item that changes
+// nothing or that the class cannot wear (verdict null).
+export function verdictMark(verdict, { tile = false } = {}) {
+  if (!verdict || verdict === 'same') return null;
+  return tile
+    ? h('span', { class: `slot-verdict verdict verdict--${verdict}`, 'aria-hidden': 'true' })
+    : h('span', { class: `verdict verdict--${verdict}`, text: VERDICTS[verdict].text });
+}
+
+// A report keeps copies of its finds; the same item in the bag has an id.
+const sameItem = (a, b) =>
+  a.name === b.name && a.level === b.level && a.rarityName === b.rarityName && a.properties.join('|') === b.properties.join('|');
+
+// Where a report's copy of an item is now: in the bag or worn, or null.
+export function ownedCopy(item) {
+  const character = state.character;
+  const inBag = character.bag.find((candidate) => sameItem(candidate, item));
+  if (inBag) return { item: inBag, equipped: false };
+  const worn = Object.values(character.equipment).find((candidate) => candidate && sameItem(candidate, item));
+  return worn ? { item: worn, equipped: true } : null;
+}
+
+// The mark of a find in a report's list, while it waits in the bag.
+export function findMark(item) {
+  const owned = ownedCopy(item);
+  return owned && !owned.equipped ? verdictMark(owned.item.verdict) : null;
+}
 
 // The eye toggle is remembered while the page is open.
 let gearHidden = false;
@@ -254,10 +294,13 @@ export function mountCharacter(container) {
               type: 'button',
               class: 'slot slot--bag',
               vars: { '--rarity': item.color },
-              'aria-label': `${itemTitle(item)}, ${item.rarityName}, ${item.slotName}, poziom ${item.level}`,
+              'aria-label': [itemTitle(item), item.rarityName, item.slotName, `poziom ${item.level}`, verdictMark(item.verdict) && VERDICTS[item.verdict].text]
+                .filter(Boolean)
+                .join(', '),
               onClick: () => itemSheet(item, { equipped: false }),
             },
             itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
+            verdictMark(item.verdict, { tile: true }),
             upgradeBadge(item),
           ),
         ),
@@ -364,6 +407,7 @@ export function mountCharacter(container) {
                   'button',
                   { type: 'button', class: 'item-row', onClick: () => itemSheet(item, { equipped: false }) },
                   itemSummary(item),
+                  verdictMark(item.verdict),
                   icon('chevron', { size: 18 }),
                 ),
               ),
@@ -377,7 +421,8 @@ export function mountCharacter(container) {
 }
 
 // An item from the bag or the equipment: its properties, what wearing it
-// changes, and the actions.
+// changes (for an item the class can wear), the item beside the one worn in
+// its slot, and the actions.
 export function itemSheet(item, { equipped }) {
   const character = state.character;
   const busy = Boolean(character.activity);
@@ -420,11 +465,11 @@ export function itemSheet(item, { equipped }) {
     });
   };
 
-  const preview = h('div', { class: 'preview', 'aria-live': 'polite' }, h('p', { class: 'muted', text: 'Liczenie zmian…' }));
+  const preview = usable && h('div', { class: 'preview', 'aria-live': 'polite' }, h('p', { class: 'muted', text: 'Liczenie zmian…' }));
   openSheet(
     itemDetails(item),
     preview,
-    worn && h('div', { class: 'compare' }, h('p', { class: 'compare-title', text: 'Założony teraz' }), itemDetails(worn, { small: true })),
+    usable && worn && compareTable(item, worn),
     anvilSection(item, busy),
     !equipped && salvageSection(item, busy),
     busy && h('p', { class: 'muted', text: busyText(character) }),
@@ -445,7 +490,56 @@ export function itemSheet(item, { equipped }) {
           ],
     ),
   );
-  showPreview(preview, item, equipped);
+  if (preview) showPreview(preview, item, equipped);
+}
+
+// The item beside the one worn in its slot, number by number: the damage of
+// a weapon, the armor and each stat, and by how much the item has more or
+// less of it (for damage, of its average).
+function compareTable(item, worn) {
+  const ids = [...new Set([...item.lines, ...worn.lines].map((line) => line.id))];
+  const lineOf = (of, id) => of.lines.find((line) => line.id === id);
+  return h(
+    'div',
+    { class: 'compare' },
+    h('p', { class: 'compare-title', text: 'Porównanie z założonym' }),
+    h(
+      'p',
+      { class: 'compare-worn' },
+      'Założony: ',
+      h('span', { class: 'item-name', vars: { '--rarity': worn.color }, text: itemTitle(worn) }),
+      ` · ${worn.rarityName} · poz. ${worn.level}`,
+    ),
+    h(
+      'table',
+      { class: 'compare-table' },
+      h(
+        'thead',
+        {},
+        h('tr', {}, h('th', { scope: 'col' }, h('span', { class: 'visually-hidden', text: 'Wartość' })), ['Ten', 'Założony', 'Różnica'].map((text) => h('th', { scope: 'col', text }))),
+      ),
+      h(
+        'tbody',
+        {},
+        ids.map((id) => {
+          const mine = lineOf(item, id);
+          const theirs = lineOf(worn, id);
+          const change = Math.round(((mine?.value ?? 0) - (theirs?.value ?? 0)) * 10) / 10;
+          return h(
+            'tr',
+            {},
+            h('th', { scope: 'row', text: (mine ?? theirs).label }),
+            h('td', { class: 'num', text: mine?.text ?? '—' }),
+            h('td', { class: 'num', text: theirs?.text ?? '—' }),
+            h('td', {
+              class: `num${change > 0 ? ' compare-up' : change < 0 ? ' compare-down' : ''}`,
+              text: change === 0 ? '0' : `${change > 0 ? '+' : '−'}${formatDecimal(Math.abs(change))}`,
+            }),
+          );
+        }),
+      ),
+    ),
+  );
 }
 
 // Where an item is now: in the bag or worn.
@@ -601,35 +695,47 @@ function anvilSection(item, busy) {
   );
 }
 
-// What wearing (or taking off) the item changes, counted by the server.
+// The combat values an item changes, named as on the stats screen, with
+// their units; a resistance ("resist.fire") is named by its element.
+const CHANGES = {
+  damage: ['Średnie obrażenia', ''],
+  reduction: ['Redukcja obrażeń', '%'],
+  maxHp: ['Maks. HP', ''],
+  dodge: ['Unik', '%'],
+  crit: ['Trafienie krytyczne', '%'],
+  effectResist: ['Odporność na efekty', '%'],
+  speed: ['Szybkość', ''],
+  mana: ['Maks. mana', ''],
+  regen: ['Regeneracja', ' HP/min'],
+  recovery: ['Odzysk HP po walce', '%'],
+};
+const changeName = (key) => CHANGES[key] ?? [state.content.elements.find((element) => `resist.${element.id}` === key)?.resistance ?? key, '%'];
+
+// What wearing (or taking off) the item changes, counted by the server: the
+// verdict on the whole, then each change, as the author asked: "+2,5", "−4",
+// "+1%".
 async function showPreview(box, item, equipped) {
   try {
-    const { now, after } = await call('GET', `/api/items/${item.id}/preview`);
-    // Only the change, as the author asked: "+2,5", "−4", "+1%".
-    const rows = [
-      ['Średnie obrażenia', after.damageAverage - now.damageAverage, ''],
-      ['Redukcja obrażeń', after.reduction - now.reduction, '%'],
-      ['Maks. HP', after.maxHp - now.maxHp, ''],
-      ['Unik', after.dodge - now.dodge, '%'],
-      ['Trafienie krytyczne', after.crit - now.crit, '%'],
-    ].filter(([, change]) => Math.abs(change) >= 0.05);
+    const { changes, verdict } = await call('GET', `/api/items/${item.id}/preview`);
+    const rows = Object.entries(changes);
     fill(
       box,
       h('p', { class: 'compare-title', text: equipped ? 'Po zdjęciu' : 'Po założeniu' }),
-      rows.length === 0
-        ? h('p', { class: 'muted', text: 'Bez zmian w obrażeniach, redukcji, HP, uniku i krytykach.' })
-        : h(
-            'ul',
-            { class: 'preview-list' },
-            rows.map(([label, change, unit]) =>
-              h(
-                'li',
-                { class: change > 0 ? 'preview-up' : 'preview-down' },
-                h('span', { text: label }),
-                h('span', { class: 'num', text: `${change > 0 ? '+' : '−'}${formatDecimal(Math.abs(change))}${unit}` }),
-              ),
-            ),
-          ),
+      h('p', { class: `verdict verdict-line verdict--${verdict}`, text: VERDICTS[verdict].line }),
+      rows.length > 0 &&
+        h(
+          'ul',
+          { class: 'preview-list' },
+          rows.map(([key, change]) => {
+            const [label, unit] = changeName(key);
+            return h(
+              'li',
+              { class: change > 0 ? 'preview-up' : 'preview-down' },
+              h('span', { text: label }),
+              h('span', { class: 'num', text: `${change > 0 ? '+' : '−'}${formatPrecise(Math.abs(change))}${unit}` }),
+            );
+          }),
+        ),
     );
   } catch {
     fill(box);

@@ -11,7 +11,7 @@ import { activityFinished, avoidRareOn, call, reportCache, seekRareOn, state, tr
 import { guided, openSheet, systemPanel, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { scrapperSheet } from '../scrapper.js';
-import { itemDetails, itemSheet, itemSummary } from './character.js';
+import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy } from './character.js';
 import { herbsReport, itemsReport, potionsReport } from './professions.js';
 
 // "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
@@ -23,18 +23,6 @@ const FIGHT_RESULTS = { true: 'wygrana', false: 'przegrana', null: 'odwrót' };
 const SWIPE_DISTANCE = 60;
 // The failed work cracks once the hammer's blows have rung out.
 const CRAFT_FAIL_AFTER_MS = 1400;
-
-// A report keeps copies of its finds; the same item in the bag has an id.
-const sameItem = (a, b) =>
-  a.name === b.name && a.level === b.level && a.rarityName === b.rarityName && a.properties.join('|') === b.properties.join('|');
-
-function ownedItem(item) {
-  const character = state.character;
-  const inBag = character.bag.find((candidate) => sameItem(candidate, item));
-  if (inBag) return { item: inBag, equipped: false };
-  const worn = Object.values(character.equipment).find((candidate) => candidate && sameItem(candidate, item));
-  return worn ? { item: worn, equipped: true } : null;
-}
 
 // Playback data of a fight. Reports from before every fight was kept have it
 // only for the key fight.
@@ -316,7 +304,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
   // A find the character still has opens like in the bag: with what wearing
   // it changes and the buttons.
   function findSheet(item) {
-    const owned = ownedItem(item);
+    const owned = ownedCopy(item);
     if (owned) {
       itemSheet(owned.item, { equipped: owned.equipped });
       return;
@@ -348,7 +336,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
               { type: 'button', class: 'item-row', onClick: () => findSheet(item) },
               itemSummary(item),
               // Bought by the scrapper at once, because the bag was full.
-              item.sold && h('span', { class: 'chip chip--dashed', text: 'sprzedany' }),
+              item.sold ? h('span', { class: 'chip chip--dashed', text: 'sprzedany' }) : findMark(item),
               icon('chevron', { size: 18 }),
             ),
           ),

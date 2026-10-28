@@ -8,6 +8,7 @@ import {
   buildsUnderWay,
   campBonus,
   campLevels,
+  canUse,
   classXpToNext,
   collect,
   combatValues,
@@ -20,6 +21,7 @@ import {
   craftTakes,
   currentQuests,
   effectText,
+  equipChange,
   fireTrade,
   fireUnitsMade,
   freePoints,
@@ -674,6 +676,11 @@ export function characterView(player, now) {
     };
   };
   const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap }), salvage: salvage(item) });
+  // Whether a bag item would make the character stronger in place of what
+  // its slot holds (preview.js), for the marks on the bag and on finds; null
+  // for an item the class cannot wear.
+  const verdict = (item) =>
+    canUse(item.base, row.class_id, content) && !content.slotsById[item.slot].locked ? equipChange(character, equipped, item, content, values).verdict : null;
   const { gold, ...resources } = walletOf(row);
   const weapon = combatant.weapon;
 
@@ -744,7 +751,10 @@ export function characterView(player, now) {
         return [slot.id, item ? toItem(item) : null];
       }),
     ),
-    bag: items.filter((item) => !item.equippedSlot).reverse().map(toItem),
+    bag: items
+      .filter((item) => !item.equippedSlot)
+      .reverse()
+      .map((item) => ({ ...toItem(item), verdict: verdict(item) })),
     // The herbs and the potions in the bag, which take its places by the stack.
     herbs: bagHerbs(row, sellBonus),
     potions: bagPotions(row, sellBonus),

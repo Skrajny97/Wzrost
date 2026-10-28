@@ -98,7 +98,7 @@ export function publicContent() {
       description,
       position,
     })),
-    elements: content.elements.map(({ id, name, color }) => ({ id, name, color })),
+    elements: content.elements.map(({ id, name, resistance, color }) => ({ id, name, resistance, color })),
     effects: content.effects.map(({ id, name, color }) => ({ id, name, color })),
     slots: content.slots,
     rarities: content.rarities.map(({ id, name, forms, color }) => ({ id, name, forms, color })),

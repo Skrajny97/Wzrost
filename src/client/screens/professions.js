@@ -18,7 +18,7 @@ import { workScene } from '../scenes.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, systemPanel, toast, withButton } from '../ui.js';
-import { itemSummary } from './character.js';
+import { findMark, itemSummary } from './character.js';
 import { lockedScreen } from './locked.js';
 
 const HOME = '#/profesje';
@@ -1320,8 +1320,8 @@ export function potionsReport(report, heading) {
 
 // The report of an order in the Warsztat, in the same way: the workshop's
 // line, whether it was stopped, the items made (each opens like a find of an
-// exploration, by `findSheet`) and the failed ones, the profession's levels,
-// the XP and the System's lines.
+// exploration, by `findSheet`, and is marked like one) and the failed ones,
+// the profession's levels, the XP and the System's lines.
 export function itemsReport(report, heading, findSheet) {
   return [
     heading('Raport z wyrobu', `${report.placeName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
@@ -1336,7 +1336,7 @@ export function itemsReport(report, heading, findSheet) {
           'ul',
           { class: 'item-list' },
           report.items.map((item) =>
-            h('li', {}, h('button', { type: 'button', class: 'item-row', onClick: () => findSheet(item) }, itemSummary(item), icon('chevron', { size: 18 }))),
+            h('li', {}, h('button', { type: 'button', class: 'item-row', onClick: () => findSheet(item) }, itemSummary(item), findMark(item), icon('chevron', { size: 18 }))),
           ),
         ),
       report.failedText && h('p', { class: 'herb-room herb-room--full', text: report.failedText }),

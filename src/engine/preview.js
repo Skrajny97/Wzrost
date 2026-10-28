@@ -27,6 +27,8 @@ export function combatValues(character, equipped, content) {
     mana: maxMana(totals.wisdom, level, balance),
     regen: regenPerMinute(unit.maxHp, totals.vitality, content),
     recovery: unit.recovery,
+    // Each element's resistance as the share of its damage it takes away.
+    resist: Object.fromEntries(content.elements.map(({ id }) => [id, reduction(unit.resist[id] ?? 0, level, balance)])),
   };
 }
 
@@ -46,4 +48,48 @@ export function statEffects(character, equipped, content) {
       return [stat, changes];
     }),
   );
+}
+
+// The combat values an item changes, rounded as the game shows them (the
+// resistances keyed as the item's stats, "resist.fire"), and a verdict on the
+// whole: "better" when some go up and none goes down, "worse" when some go
+// down and none up, "mixed" when some go up and some down, and "same" when
+// none changes.
+const shown = {
+  damage: (value) => Math.round(value * 10) / 10,
+  reduction: percent,
+  maxHp: Math.round,
+  dodge: percent,
+  crit: percent,
+  effectResist: percent,
+  speed: (value) => Math.round(value * 100) / 100,
+  mana: Math.round,
+  regen: (value) => Math.round(value * 100) / 100,
+  recovery: percent,
+};
+
+function percent(value) {
+  return Math.round(value * 1000) / 10;
+}
+
+export function valueChanges(now, after) {
+  const changes = {};
+  for (const [key, round] of Object.entries(shown)) {
+    const change = Math.round((round(after[key]) - round(now[key])) * 100) / 100;
+    if (change !== 0) changes[key] = change;
+  }
+  for (const element of Object.keys(after.resist ?? {})) {
+    const change = Math.round((percent(after.resist[element]) - percent(now.resist[element])) * 100) / 100;
+    if (change !== 0) changes[`resist.${element}`] = change;
+  }
+  const up = Object.values(changes).some((change) => change > 0);
+  const down = Object.values(changes).some((change) => change < 0);
+  return { changes, verdict: up && down ? 'mixed' : up ? 'better' : down ? 'worse' : 'same' };
+}
+
+// What putting an item on changes, in place of what its slot holds. `now`:
+// the values as worn, when they are counted already.
+export function equipChange(character, equipped, item, content, now = combatValues(character, equipped, content)) {
+  const worn = equipped.filter((candidate) => candidate.slot !== item.slot);
+  return valueChanges(now, combatValues(character, [...worn, item], content));
 }

@@ -2051,6 +2051,145 @@ a.segmented-option {
   text-transform: uppercase;
 }
 
+/* The item beside the one worn in its slot, number by number. */
+.compare-worn {
+  margin: 0;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 5px 0 5px 10px;
+  font-weight: 400;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.compare-table th[scope='row'] {
+  padding-left: 0;
+  color: var(--text);
+  text-align: left;
+  white-space: normal;
+}
+
+.compare-table thead th {
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.compare-table tbody tr {
+  border-top: 1px solid var(--line);
+}
+
+.compare-up {
+  color: var(--leaf);
+}
+
+.compare-down {
+  color: var(--danger);
+}
+
+/* Whether an item beats the worn one: a green triangle up, a red one down,
+   both for a trade-off. Drawn, not typed, so that no font lacks them. */
+.verdict {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.verdict::before,
+.verdict--mixed::after {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 7px;
+  background: currentColor;
+}
+
+.verdict--better {
+  color: var(--leaf);
+}
+
+.verdict--better::before,
+.verdict--mixed::before {
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.verdict--worse {
+  color: var(--danger);
+}
+
+.verdict--worse::before,
+.verdict--mixed::after {
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.verdict--mixed {
+  color: var(--gold);
+}
+
+.verdict--mixed::before {
+  order: -2;
+  background: var(--leaf);
+}
+
+.verdict--mixed::after {
+  order: -1;
+  margin-left: -2px;
+  background: var(--danger);
+}
+
+.verdict--same {
+  color: var(--text-muted);
+}
+
+.verdict--same::before {
+  align-self: center;
+  height: 2px;
+}
+
+/* On the item's card: the verdict on the whole, over the changes. */
+.verdict-line {
+  display: flex;
+  align-items: baseline;
+  margin: 0;
+  font-size: 14px;
+  white-space: normal;
+}
+
+/* In the corner of a bag tile, opposite the upgrade level. */
+.slot-verdict {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  justify-content: center;
+  height: 16px;
+  padding: 0 3px;
+  border: 1px solid var(--bark-line);
+  background: var(--bg-deep);
+}
+
+.item-row > .verdict,
+.item-row > .chip {
+  margin-left: auto;
+}
+
 /* The Kowadło part of the item card. */
 .anvil-step,
 .anvil-chance {

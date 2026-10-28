@@ -8,6 +8,7 @@ import {
   canUse,
   combatValues,
   createRng,
+  valueChanges,
   itemName,
   missingFor,
   rollUpgrade,
@@ -149,7 +150,8 @@ export async function sellItem(context) {
 }
 
 // What wearing the item (or taking it off) would change: the combat values the
-// stats screen shows, now and after.
+// stats screen shows, now and after, each change as the game shows it and the
+// verdict on them all (valueChanges in preview.js).
 export async function previewItem(context) {
   const { player } = await requirePlayer(context);
   const item = findItem(player, context.params.id);
@@ -158,18 +160,23 @@ export async function previewItem(context) {
   const after = item.equippedSlot
     ? worn.filter((candidate) => candidate.id !== item.id)
     : [...worn.filter((candidate) => candidate.equippedSlot !== item.slot), item];
-  const view = (equipped) => {
-    const values = combatValues(character, equipped, content);
-    return {
-      damage: `${values.damageMin}–${values.damageMax}`,
-      damageAverage: Math.round(values.damage * 10) / 10,
-      reduction: Math.round(values.reduction * 100),
-      maxHp: values.maxHp,
-      dodge: Math.round(values.dodge * 1000) / 10,
-      crit: Math.round(values.crit * 1000) / 10,
-    };
-  };
-  return json({ itemId: item.id, equipped: Boolean(item.equippedSlot), now: view(worn), after: view(after) });
+  const nowValues = combatValues(character, worn, content);
+  const afterValues = combatValues(character, after, content);
+  const view = (values) => ({
+    damage: `${values.damageMin}–${values.damageMax}`,
+    damageAverage: Math.round(values.damage * 10) / 10,
+    reduction: Math.round(values.reduction * 100),
+    maxHp: values.maxHp,
+    dodge: Math.round(values.dodge * 1000) / 10,
+    crit: Math.round(values.crit * 1000) / 10,
+  });
+  return json({
+    itemId: item.id,
+    equipped: Boolean(item.equippedSlot),
+    now: view(nowValues),
+    after: view(afterValues),
+    ...valueChanges(nowValues, afterValues),
+  });
 }
 
 // One try at upgrading an item on the camp's Kowadło, paid in gold and iron
