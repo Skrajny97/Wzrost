@@ -1,0 +1,25 @@
+{
+  "id": "eel-skin",
+  "payload": {
+    "prompt": "coiled strip of dark slippery eel skin with a tiny blue spark, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 954122750,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793181323,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 46.02,
+    "request_id": "6a6b9f33-0f7b-4c8f-b86c-36f55c62e7a1",
+    "outputs_retained_until": 1793267673
+  }
+}

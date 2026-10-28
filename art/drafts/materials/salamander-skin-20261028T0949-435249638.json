@@ -1,0 +1,25 @@
+{
+  "id": "salamander-skin",
+  "payload": {
+    "prompt": "piece of black skin with yellow spots, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 435249638,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793182612,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 42.24,
+    "request_id": "a8cc1509-b210-473b-b87e-79f90e174762",
+    "outputs_retained_until": 1793268952
+  }
+}

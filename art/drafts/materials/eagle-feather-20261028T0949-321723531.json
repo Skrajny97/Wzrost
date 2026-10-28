@@ -1,0 +1,25 @@
+{
+  "id": "eagle-feather",
+  "payload": {
+    "prompt": "large brown eagle flight feather, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 321723531,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793181392,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 45.84,
+    "request_id": "3888e37e-ec79-4af5-a8a4-ec91bbad39e5",
+    "outputs_retained_until": 1793267726
+  }
+}

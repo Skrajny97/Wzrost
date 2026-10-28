@@ -1,0 +1,25 @@
+{
+  "id": "toad-venom",
+  "payload": {
+    "prompt": "a few drops of milky toad venom on a green leaf, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 87702799,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793181539,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 45.3,
+    "request_id": "3eafa068-4221-44e8-a865-7487a1e8a398",
+    "outputs_retained_until": 1793267895
+  }
+}

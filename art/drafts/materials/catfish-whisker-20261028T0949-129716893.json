@@ -1,0 +1,25 @@
+{
+  "id": "catfish-whisker",
+  "payload": {
+    "prompt": "long thick dark catfish whisker, curled, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 129716893,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793181494,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 45.48,
+    "request_id": "a47429f3-446c-4486-afe2-e0c255e34f19",
+    "outputs_retained_until": 1793267848
+  }
+}

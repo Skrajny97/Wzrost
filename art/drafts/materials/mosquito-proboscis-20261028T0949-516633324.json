@@ -1,0 +1,25 @@
+{
+  "id": "mosquito-proboscis",
+  "payload": {
+    "prompt": "long thin needle-like mosquito proboscis, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 516633324,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793181151,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 46.74,
+    "request_id": "006aefc9-365e-4e5e-ab94-e8530435638a",
+    "outputs_retained_until": 1793267491
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "bog-heart",
+  "payload": {
+    "prompt": "black glistening lump shaped like a heart with faint green veins, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 491404303,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793182859,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 41.7,
+    "request_id": "1f2819aa-8809-400c-8383-da1ffc1d6dc0",
+    "outputs_retained_until": 1793269209
+  }
+}

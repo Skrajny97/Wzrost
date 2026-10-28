@@ -1,0 +1,25 @@
+{
+  "id": "worm-jaw",
+  "payload": {
+    "prompt": "round worm jaw ring full of small hooked teeth, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 184989472,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793182713,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 41.88,
+    "request_id": "8e31704d-9e01-4cf1-b524-bf1d277e01e1",
+    "outputs_retained_until": 1793269062
+  }
+}

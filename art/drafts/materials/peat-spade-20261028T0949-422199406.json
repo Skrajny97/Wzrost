@@ -1,0 +1,25 @@
+{
+  "id": "peat-spade",
+  "payload": {
+    "prompt": "narrow black oak spade with a worn handle, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 422199406,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793182660,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 42.06,
+    "request_id": "0a212ac9-b032-4057-9665-b30f36e9c88d",
+    "outputs_retained_until": 1793269015
+  }
+}

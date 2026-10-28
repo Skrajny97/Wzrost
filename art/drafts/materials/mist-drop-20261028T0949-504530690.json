@@ -1,0 +1,25 @@
+{
+  "id": "mist-drop",
+  "payload": {
+    "prompt": "a cold glowing drop of mist that steams slightly, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 504530690,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793181735,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 44.58,
+    "request_id": "452bbd2a-e5e6-49ea-b4ff-3d08466e7d8e",
+    "outputs_retained_until": 1793268112
+  }
+}

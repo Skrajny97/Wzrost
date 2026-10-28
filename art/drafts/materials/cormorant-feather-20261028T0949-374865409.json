@@ -1,0 +1,25 @@
+{
+  "id": "cormorant-feather",
+  "payload": {
+    "prompt": "black feather with a green sheen, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 374865409,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793181446,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 45.66,
+    "request_id": "63933288-a1bd-404b-aa41-034b5d9beb32",
+    "outputs_retained_until": 1793267795
+  }
+}
