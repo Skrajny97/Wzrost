@@ -8,7 +8,7 @@
 // gold for resources a few times a day, and at the Skup złomu the scrap
 // dealer sells crafting parts. Opened with the camp button in the top bar.
 
-import { BOARD_HEIGHT, BOARD_WIDTH, CAMP_PLOTS, PLOT_HEIGHT, PLOT_WIDTH, boardArt, plotArt } from '../camp-art.js';
+import { BOARD_HEIGHT, BOARD_WIDTH, CAMP_PLOTS, PLOT_HEIGHT, PLOT_WIDTH, boardArt, buildingTier, plotArt } from '../camp-art.js';
 import { craftTableSection, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -19,6 +19,7 @@ import { call, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEnt
 import { skipControl } from '../time.js';
 import { confirmAction, guided, systemPanel, toast, withButton } from '../ui.js';
 import { scrapperSheet } from '../scrapper.js';
+import { dayPart } from '../scenes.js';
 
 const CAMP = '#/oboz';
 const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
@@ -233,8 +234,10 @@ function mountBoard(container, backHash) {
       guided(materials(), 'camp-stock'),
       h(
         'div',
-        { class: 'camp-board', role: 'group', 'aria-label': 'Plansza obozu' },
-        boardArt(),
+        // The glade in the light of the hour in Poland, its palisade growing
+        // with the camp's level.
+        { class: `camp-board camp-board--${dayPart()}`, role: 'group', 'aria-label': 'Plansza obozu' },
+        boardArt(campOf().level),
         character.camp.buildings.map((building) => plot(building, running)),
         campLevelButton(running),
       ),
@@ -303,6 +306,7 @@ function mountBoard(container, backHash) {
         onClick: (event) => openView(event, hash, HISTORY_KEY),
       },
       plotArt(building.id, { level: building.level, building: underway }),
+      building.id === 'campfire' && !empty && campfireLight(buildingTier(building.level)),
       h(
         'span',
         { class: 'camp-plot-label' },
@@ -324,6 +328,18 @@ function mountBoard(container, backHash) {
       underway && timer(running),
       waiting && h('span', { class: 'camp-plot-timer camp-plot-timer--queued', 'aria-hidden': 'true' }, icon('hourglass', { size: 12 }), 'w kolejce'),
       building.production && !building.production.paused && bubble(building, spot.bubble),
+    );
+  }
+
+  // The campfire's flickering glow and its smoke over its picture, at the
+  // fire of each of its looks (styles.css); still with the animations off.
+  function campfireLight(tier) {
+    return h(
+      'span',
+      { class: `camp-fire camp-fire--${tier}`, 'aria-hidden': 'true' },
+      h('span', { class: 'camp-fire-glow' }),
+      h('span', { class: 'camp-smoke' }),
+      h('span', { class: 'camp-smoke camp-smoke--late' }),
     );
   }
 

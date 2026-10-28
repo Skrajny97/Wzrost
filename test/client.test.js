@@ -112,8 +112,8 @@ test('every sprite on the list has its file at its size, and every class has its
     // The inner regions' circles and the lands' cards on the Walka screen.
     areas: data('regions').flatMap((region) => region.areas.map((area) => area.id)),
     lands: data('regions').map((region) => region.id),
-    // The camp board's ground.
-    board: ['camp'],
+    // The camp board's ground at the camp's three looks.
+    board: ['camp-1', 'camp-2', 'camp-3'],
     // The camp's buildings at their three looks.
     camp: data('buildings').flatMap((building) => [1, 2, 3].map((tier) => `${building.id}-${tier}`)),
     // Zielarstwo's herbs, Alchemia's potions, the professions' squares and the

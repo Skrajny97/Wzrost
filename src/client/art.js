@@ -101,11 +101,12 @@ export const SPRITES = {
   // The camp's buildings, <building>-<look> for the looks of levels 1–3, 4–7
   // and 8–10, 128×96 (camp-art.js keeps a vector drawing for a look without
   // one).
-  // The camp board's ground, without paths (camp-art.js draws them).
+  // The camp board's ground, without paths (camp-art.js draws them): the
+  // glade at the camp's levels 1–3, 4–7 and 8–10, its palisade growing.
   board: {
     width: 320,
     height: 352,
-    ids: ['camp'],
+    ids: ['camp-1', 'camp-2', 'camp-3'],
   },
   // Each building cut to its outline, at most 128 × 96.
   camp: {
@@ -165,9 +166,9 @@ export const skillSprite = (id) => sprite('skills', id, 'sprite--skill');
 export const areaSprite = (areaId) => sprite('areas', areaId, 'area-art');
 // The address of a land's background, or null while it has none.
 export const landArt = (regionId) => (available.lands.has(regionId) ? `/art/lands/${regionId}.png` : null);
-// The address of a camp building's picture at a look (1–3), or null while it
-// has none.
-export const boardGround = () => (available.board.has('camp') ? '/art/board/camp.png' : null);
+// The address of the camp board's ground and of a camp building's picture at
+// a look (1–3), or null while it has none.
+export const boardGround = (tier) => (available.board.has(`camp-${tier}`) ? `/art/board/camp-${tier}.png` : null);
 export const campArt = (buildingId, tier) => (available.camp.has(`${buildingId}-${tier}`) ? `/art/camp/${buildingId}-${tier}.png` : null);
 // A herb of Zielarstwo, a potion of Alchemia, a profession's square on the
 // Profesje tab, and the address of the background of a place where a

@@ -437,7 +437,12 @@ const PICTURE_BOARD = (src) => `<filter id="camp-ground" color-interpolation-fil
 <image href="${src}" width="360" height="400" preserveAspectRatio="xMidYMid slice" filter="url(#camp-ground)"></image>
 ${paths('#3a2f1f', '#56462e', ' filter="url(#camp-path)" opacity="0.8"')}`;
 
-const BOARD = boardGround() ? PICTURE_BOARD(boardGround()) : VECTOR_BOARD;
+// The glade at the camp's level: its palisade grows with the camp as a
+// building does, in three looks. Without its picture, the vector glade.
+function board(level) {
+  const src = boardGround(buildingTier(level));
+  return src ? PICTURE_BOARD(src) : VECTOR_BOARD;
+}
 
 export const campArtIds = Object.keys(BUILDINGS);
 
@@ -497,8 +502,8 @@ export function plotMarkup(buildingId, { level, building = false }) {
   return `${campArt(buildingId, tier) ? '' : GROUND}${look(buildingId, tier)}${building ? SCAFFOLD : ''}`;
 }
 
-export const boardMarkup = () => BOARD;
+export const boardMarkup = (level = 1) => board(level);
 
-export const boardArt = () => svgElement(`0 0 ${BOARD_WIDTH} ${BOARD_HEIGHT}`, 'camp-board-art', BOARD);
+export const boardArt = (level = 1) => svgElement(`0 0 ${BOARD_WIDTH} ${BOARD_HEIGHT}`, 'camp-board-art', board(level));
 
 export const plotArt = (buildingId, state) => svgElement('0 0 100 80', 'camp-plot-art', plotMarkup(buildingId, state));

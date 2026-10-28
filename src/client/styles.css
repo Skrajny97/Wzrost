@@ -3869,6 +3869,104 @@ a.camp-level-button {
   outline-offset: 2px;
 }
 
+/* The living camp (screens/camp.js). The glade and its buildings take the
+   light of the hour in Poland, as the scenes do (data/animations.json
+   dayParts), and the campfire flickers and smokes over its picture, its
+   glow stronger at dusk and at night. */
+.camp-board--dawn .camp-board-art,
+.camp-board--dawn .camp-plot-art {
+  filter: brightness(1.04) sepia(0.18) saturate(1.1);
+}
+.camp-board--dusk .camp-board-art,
+.camp-board--dusk .camp-plot-art {
+  filter: brightness(0.82) sepia(0.3) saturate(1.15);
+}
+.camp-board--night .camp-board-art,
+.camp-board--night .camp-plot-art {
+  filter: brightness(0.62) saturate(0.75);
+}
+/* Over the plot's picture; the fire sits lower in a smaller look. */
+.camp-fire {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 100 / 80;
+  pointer-events: none;
+  --fire-y: 70%;
+  --glow: 42%;
+}
+.camp-fire--2 {
+  --fire-y: 60%;
+  --glow: 56%;
+}
+.camp-fire--3 {
+  --fire-y: 55%;
+  --glow: 70%;
+}
+.camp-fire-glow {
+  position: absolute;
+  left: calc(50% - var(--glow) / 2);
+  top: var(--fire-y);
+  width: var(--glow);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 176 72 / 0.5), rgb(255 120 40 / 0.18) 45%, transparent 70%);
+  mix-blend-mode: screen;
+  transform: translateY(-50%);
+  animation: camp-flicker 1.7s ease-in-out infinite alternate;
+}
+.camp-board--dusk .camp-fire-glow,
+.camp-board--night .camp-fire-glow {
+  background: radial-gradient(circle, rgb(255 176 72 / 0.75), rgb(255 120 40 / 0.3) 45%, transparent 72%);
+}
+.camp-smoke {
+  position: absolute;
+  left: 47%;
+  top: calc(var(--fire-y) - 20%);
+  width: 6%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(214 210 196 / 0.55);
+  filter: blur(1.5px);
+  opacity: 0;
+  animation: camp-smoke 3.6s ease-out infinite;
+}
+.camp-smoke--late {
+  animation-delay: 1.8s;
+}
+@keyframes camp-flicker {
+  0% {
+    opacity: 0.6;
+    transform: translateY(-50%) scale(0.94);
+  }
+  40% {
+    opacity: 0.9;
+    transform: translateY(-50%) scale(1.03);
+  }
+  70% {
+    opacity: 0.7;
+    transform: translateY(-50%) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.05);
+  }
+}
+@keyframes camp-smoke {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  15% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(60%, -480%) scale(2.4);
+  }
+}
+
 /* The name and level under a plot; it may reach past the plot's width, and
    stays above the pictures of the plots around it. */
 .camp-plot-label {
@@ -5327,11 +5425,17 @@ a.camp-level-button {
    Last in the file, so it wins over the rules it calms. */
 .calm .activity--done,
 .calm .camp-bubble--full,
+.calm .camp-fire-glow,
+.calm .camp-smoke,
 .calm .guide-ring,
 .calm .guide-ring--nudge,
 .calm .guide-note .sprite--narrator,
 .calm .quest-chest--ready .quest-chest-art {
   animation: none;
+}
+
+.calm .camp-smoke {
+  display: none;
 }
 
 .calm .camp-plot-art,

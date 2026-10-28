@@ -26,8 +26,9 @@ const hourFormat = new Intl.DateTimeFormat('pl-PL', { hour: 'numeric', hourCycle
 const config = () => state.content.animations;
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
-// dawn, day, dusk or night at this hour in Poland.
-function dayPart() {
+// dawn, day, dusk or night at this hour in Poland, for the scenes and the
+// camp board.
+export function dayPart() {
   const hour = Number(hourFormat.format(new Date()));
   let part = 'day';
   for (const { id, from } of config().dayParts) if (hour >= from) part = id;
