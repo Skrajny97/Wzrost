@@ -28,9 +28,19 @@ export function openEvent(event, done) {
     }),
   );
   playSound('system');
-  // Without its art yet, the event shows only its text.
+  // The person sits in their place in the scene (event.figure, in percent
+  // of it); without a scene they stand alone, and without any art yet the
+  // event shows only its text.
+  const { left, bottom, height } = event.figure;
+  const art = scene
+    ? h(
+        'div',
+        { class: 'event-scene', vars: { '--scene': `url("${scene}")` } },
+        figure && h('div', { class: 'event-figure-place', vars: { '--left': `${left}%`, '--bottom': `${bottom}%`, '--height': `${height}%` } }, figure),
+      )
+    : figure && h('div', { class: 'event-scene event-scene--bare' }, figure);
   openSheet(
-    (scene || figure) && h('div', { class: 'event-scene', ...(scene && { vars: { '--scene': `url("${scene}")` } }) }, figure),
+    art,
     h('h2', { class: 'sheet-title', text: event.title }),
     h('p', { class: 'sheet-text event-text', text: event.text }),
     h('div', { class: 'event-options' }, options),

@@ -37,6 +37,7 @@ export const eventView = (event) => ({
   title: event.title,
   art: event.art,
   scene: event.scene,
+  figure: event.figure,
   text: event.text,
   options: event.options.map((option) => ({ id: option.id, label: option.label })),
 });

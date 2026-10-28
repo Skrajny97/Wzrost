@@ -162,6 +162,7 @@ describe('events (API)', () => {
       title: 'Ranna kobieta',
       art: 'wounded-woman',
       scene: 'forest-ambush',
+      figure: woman.figure,
       text: woman.text,
       options: [
         { id: 'help', label: 'Pomóż jej sprawnie' },

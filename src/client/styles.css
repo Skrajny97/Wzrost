@@ -3570,22 +3570,61 @@ img.area-art {
 }
 
 /* The event at the end of an exploration (event.js): its scene with the
-   person met, the text and the options; and its card in the report. */
+   person met, the text and the options; and its card in the report. The
+   scene is drawn 2:1, so the person keeps their place in it on every
+   screen. */
 .event-scene {
+  position: relative;
+  aspect-ratio: 2 / 1;
+  margin-top: 36px;
+  overflow: hidden;
+  border: 1px solid var(--bark-line);
+  background: var(--scene, none) center / 100% 100% no-repeat, var(--bg-deep);
+  image-rendering: pixelated;
+}
+
+/* Without a scene the person stands alone, in the middle. */
+.event-scene--bare {
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  aspect-ratio: auto;
   min-height: 140px;
-  margin-top: 36px;
-  border: 1px solid var(--bark-line);
-  background: var(--scene, none) center / cover no-repeat, var(--bg-deep);
-  image-rendering: pixelated;
 }
 
 .event-figure {
   width: 144px;
   height: 192px;
   image-rendering: pixelated;
+}
+
+/* The person's place in the scene (data/events.json, in percent of the
+   scene), with a soft shadow on the ground under them. */
+.event-figure-place {
+  position: absolute;
+  left: var(--left);
+  bottom: var(--bottom);
+  height: var(--height);
+  aspect-ratio: 3 / 4;
+}
+
+.event-figure-place::before {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 4%;
+  bottom: -3%;
+  height: 14%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 55%), rgb(0 0 0 / 0%));
+}
+
+/* Toned down to the scene's dusk, so the person sits in it. */
+.event-figure-place .event-figure {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  filter: brightness(0.75) sepia(0.3) saturate(0.85);
 }
 
 .event-text {

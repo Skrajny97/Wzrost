@@ -22,12 +22,23 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "title", "art", "scene", "text", "options"],
+        "required": ["id", "title", "art", "scene", "figure", "text", "options"],
         "properties": {
           "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
           "title": { "type": "string", "minLength": 1 },
           "art": { "type": "string", "minLength": 1, "description": "Postać zdarzenia: src/client/art/events/<art>.png." },
           "scene": { "type": "string", "minLength": 1, "description": "Tło zdarzenia: src/client/art/event-scenes/<scene>.png." },
+          "figure": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["left", "bottom", "height"],
+            "description": "Miejsce postaci na tle, w procentach tła: od lewej krawędzi, od dołu i wysokość postaci.",
+            "properties": {
+              "left": { "type": "number", "minimum": 0, "maximum": 100 },
+              "bottom": { "type": "number", "minimum": 0, "maximum": 100 },
+              "height": { "type": "number", "exclusiveMinimum": 0, "maximum": 100 }
+            }
+          },
           "text": { "type": "string", "minLength": 1 },
           "weight": { "type": "number", "exclusiveMinimum": 0, "description": "Waga losowania zdarzenia (domyślnie 1)." },
           "options": {
