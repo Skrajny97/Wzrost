@@ -1,0 +1,18 @@
+{
+  "id": "crafting-lead",
+  "payload": {
+    "text": "Systemowy Warsztat czeka w zakładce Profesje. Zajrzyjmy tam. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/crafting-lead-20261028T0603-0.mp3",
+    "audio/drafts/narration/crafting-lead-20261028T0603-1.mp3",
+    "audio/drafts/narration/crafting-lead-20261028T0603-2.mp3"
+  ],
+  "credits": 207
+}
