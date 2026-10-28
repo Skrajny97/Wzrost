@@ -1,0 +1,13 @@
+{
+  "id": "bird-eater-hurt",
+  "payload": {
+    "text": "a giant monstrous spider lets out a deep angry hiss and a loud clicking of huge fangs when struck, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bird-eater-hurt-20261028T0856-0.mp3",
+    "audio/drafts/voices/bird-eater-hurt-20261028T0856-1.mp3"
+  ],
+  "credits": 28
+}

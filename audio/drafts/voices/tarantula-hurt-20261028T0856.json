@@ -1,0 +1,13 @@
+{
+  "id": "tarantula-hurt",
+  "payload": {
+    "text": "a large hairy spider hisses sharply when hit, a short dry rasping hiss with a clack of fangs, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/tarantula-hurt-20261028T0856-0.mp3",
+    "audio/drafts/voices/tarantula-hurt-20261028T0856-1.mp3"
+  ],
+  "credits": 24
+}

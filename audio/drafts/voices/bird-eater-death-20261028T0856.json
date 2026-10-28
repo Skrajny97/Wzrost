@@ -1,0 +1,13 @@
+{
+  "id": "bird-eater-death",
+  "payload": {
+    "text": "a giant monstrous spider screeches with a deep rasping hiss, then its heavy legs thud and curl with dry cracking, video game monster death sound, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bird-eater-death-20261028T0856-0.mp3",
+    "audio/drafts/voices/bird-eater-death-20261028T0856-1.mp3"
+  ],
+  "credits": 40
+}

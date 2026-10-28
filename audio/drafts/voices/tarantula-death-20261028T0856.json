@@ -1,0 +1,13 @@
+{
+  "id": "tarantula-death",
+  "payload": {
+    "text": "a big hairy spider gives a long rasping hiss that fades as its legs curl and scrape on stone, video game monster death sound, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/tarantula-death-20261028T0856-0.mp3",
+    "audio/drafts/voices/tarantula-death-20261028T0856-1.mp3"
+  ],
+  "credits": 40
+}
