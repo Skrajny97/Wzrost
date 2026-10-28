@@ -1,0 +1,25 @@
+{
+  "id": "anvil-3",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, a large blacksmith's camp pavilion: a big soot-stained cream and red canvas tent on thick wooden poles with open sides, a stone forge with a short chimney poking through the canvas and a red-hot glowing furnace, a huge black anvil, racks of shining swords and shields and flying sparks",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 3,
+    "seed": 829353782,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793189224,
+    "credit_cost": 3,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 35.04,
+    "request_id": "5857077a-f0af-4e64-b6d2-6c964c4537ac",
+    "outputs_retained_until": 1793275620
+  }
+}
