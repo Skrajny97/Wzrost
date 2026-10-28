@@ -10,9 +10,13 @@ on:
     # Sprite drafts from the "Grafiki (szkice)" workflow are not the game.
     branches-ignore:
       - art-drafts
-    # Notes alone (DECISIONS.md, README.md) change nothing in the game.
+    # Notes alone (DECISIONS.md, README.md) change nothing in the game, and
+    # neither do the prompts and references for drafts (art/, audio/): the
+    # game's own pictures and sounds live in src/client.
     paths-ignore:
       - '**.md'
+      - 'art/**'
+      - 'audio/**'
   workflow_dispatch:
 
 permissions:

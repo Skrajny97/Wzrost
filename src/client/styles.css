@@ -6254,6 +6254,8 @@ a.profession-square:active {
   font-family: var(--font-system);
   font-size: 12px;
   color: var(--text-muted);
+  /* A status of two lines ("Wykonuje przedmioty") stays centred too. */
+  text-align: center;
 }
 
 /* The Systemowy Zagajnik: its scene dim behind its name, as a land's. */
