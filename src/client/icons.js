@@ -25,6 +25,13 @@ export const ICONS = {
   stats: [path('M5 20V11M12 20V4M19 20v-7')],
   skills: [path('M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z')],
   core: [path('M12 2l8 4.5v11L12 22l-8-4.5v-11z'), path('M12 7l4 2.5v5L12 17l-4-2.5v-5z')],
+  // The Sklep Systemu: a market stall with the System's sign under its awning.
+  shop: [
+    path('M4.5 9L6 4.5h12L19.5 9'),
+    path('M4.5 9a1.875 1.875 0 0 0 3.75 0a1.875 1.875 0 0 0 3.75 0a1.875 1.875 0 0 0 3.75 0a1.875 1.875 0 0 0 3.75 0'),
+    path('M5.5 11v9.5h13V11'),
+    path('M12 12.6l2.7 1.55v3.1L12 18.8l-2.7-1.55v-3.1z'),
+  ],
 
   // Interface
   gear: [

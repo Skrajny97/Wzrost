@@ -482,8 +482,18 @@ button {
 
 .danger-text {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 2px;
+}
+
+/* The chance of meeting the creature in a fight, at the row's end. */
+.danger-chance {
+  flex: none;
+  color: var(--text);
+  font-family: var(--font-system);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
 }
 
 .danger-name {
@@ -661,12 +671,22 @@ button {
 }
 
 .badge--world {
+  display: flex;
   max-width: 60%;
-  overflow: hidden;
   border-color: var(--bark-line);
   color: var(--text);
-  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.badge-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-number {
+  flex: none;
+  margin-left: 0.35em;
 }
 
 .version {
@@ -4891,6 +4911,42 @@ a.camp-level-button {
   border-color: var(--system-line);
 }
 
+/* The narrator and the Sklep Systemu side by side between the levels and
+   the gold. */
+.topbar-middle {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+}
+
+/* The Sklep Systemu, still locked: the System's stall, dimmed, with the
+   padlock of the locked tabs at its corner (the Rdzeń's). */
+.system-shop {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--bark-line);
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 38%, #1d3440, #10141d 72%);
+  color: var(--system);
+}
+
+.system-shop > svg:first-child {
+  opacity: 0.6;
+}
+
+.system-shop-lock {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  color: var(--text-muted);
+}
+
 .narrator-face {
   width: 34px;
   height: 34px;
@@ -4906,9 +4962,14 @@ a.camp-level-button {
     gap: 4px;
   }
 
-  .quest-button {
+  .quest-button,
+  .system-shop {
     width: 36px;
     height: 36px;
+  }
+
+  .topbar-middle {
+    gap: 4px;
   }
 
   .narrator-face {

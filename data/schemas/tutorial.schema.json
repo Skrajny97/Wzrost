@@ -171,7 +171,11 @@
               "community-welcome",
               "community-lead",
               "community-rules",
-              "community-ending"
+              "community-ending",
+              "crafting-welcome",
+              "crafting-lead",
+              "crafting-patterns",
+              "crafting-ending"
             ]
           },
           "kind": {
@@ -235,7 +239,8 @@
             "enum": [
               "skills",
               "professions",
-              "community"
+              "community",
+              "crafting"
             ],
             "description": "Część po wprowadzeniu, do której należy kwestia (chapters). Jej kwestie przychodzą dopiero po zakończeniu wprowadzenia, w swoim momencie gry."
           },

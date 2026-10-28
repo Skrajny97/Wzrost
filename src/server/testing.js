@@ -122,6 +122,10 @@ export const repeatProfessionsTour = (context) => repeatChapter(context, 'profes
 // The Społeczność chapter from the start: only its lines are unread again.
 export const repeatCommunityTour = (context) => repeatChapter(context, 'community');
 
+// The Rzemieślnictwo chapter from the start: only its lines are unread again,
+// and the professions keep their levels.
+export const repeatCraftingTour = (context) => repeatChapter(context, 'crafting');
+
 // A chapter's lines unread again, with `reset` (SQL assignments) done too.
 async function repeatChapter(context, chapterId, reset = '') {
   await requireTester(context);

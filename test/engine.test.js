@@ -19,6 +19,10 @@ import {
   areaDangers,
   bestiaryChest,
   bestiaryFull,
+  landBestiaryChest,
+  landBestiaryFull,
+  meetingChances,
+  regionDangers,
   areaFor,
   autoDistribute,
   autoEquip,
@@ -242,11 +246,18 @@ describe('items', () => {
 
   test('a creature names one affix of an item while the place has others', () => {
     const rng = createRng('jeden stwór');
-    const edge = content.areasById['windfalls-edge'];
-    for (let i = 0; i < 400; i++) {
-      const item = generateItem({ baseId: 'helmet', level: 5, rarityId: 'epic', area: edge }, rng, content);
-      const creatures = item.affixes.map((affix) => affix.monster);
-      assert.equal(new Set(creatures).size, creatures.length);
+    for (const area of [content.areasById['windfalls-edge'], content.areasById['boar-thicket']]) {
+      for (let i = 0; i < 400; i++) {
+        const item = generateItem({ baseId: 'helmet', level: 5, rarityId: 'epic', area }, rng, content);
+        const named = new Set();
+        for (const affix of item.affixes) {
+          if (area.affixNames[affix.kind].some((name) => !named.has(name.monster))) assert.ok(!named.has(affix.monster), `${area.id}: ${affix.monster} twice`);
+          named.add(affix.monster);
+        }
+        // So the name never has one creature twice: no "Wilczy Hełm Wilka".
+        const [prefix, suffix] = ['prefix', 'suffix'].map((kind) => item.affixes.find((affix) => affix.kind === kind));
+        assert.notEqual(prefix.monster, suffix.monster);
+      }
     }
   });
 
@@ -880,6 +891,9 @@ describe('tutorial unlocks', () => {
     // Each step has its System message, and dungeons open with the longest hunts.
     assert.deepEqual(unlockMessages(25, content), ['Odblokowano eksploracje do 1 godziny.']);
     assert.deepEqual(unlockMessages(10, content), ['Odblokowano Profesje. Zajrzyj do zakładki Profesje.']);
+    // Rzemieślnictwo's message only where the game has it on.
+    assert.deepEqual(unlockMessages(15, content), []);
+    assert.deepEqual(unlockMessages(15, { ...content, features: ['crafting'] }), ['Odblokowano Rzemieślnictwo. Systemowy Warsztat czeka w zakładce Profesje.']);
     assert.deepEqual(
       ['professions', 'settlement', 'dungeons'].map((id) => content.unlocksById[id].level),
       [10, 20, 50],
@@ -1790,8 +1804,6 @@ describe('Bestiariusz', () => {
       edge.map(({ monsterId, minLevel, maxLevel, elite }) => [monsterId, minLevel, maxLevel, elite]),
       [
         ['wolf', 1, 5, false],
-        ['fox', 1, 5, false],
-        ['viper', 1, 5, false],
         ['badger', 1, 5, false],
         ['wisp', 6, 6, true],
       ],
@@ -1800,7 +1812,71 @@ describe('Bestiariusz', () => {
     const hollows = areaDangers(content.areasById['raven-hollows'], content);
     const crow = hollows.find((danger) => danger.monsterId === 'crow');
     assert.deepEqual([crow.minLevel, crow.maxLevel], [11, 15 + content.balance.hunt.toughLevelBonus]);
-    assert.equal(hollows.find((danger) => danger.monsterId === 'boar').maxLevel, 15);
+  });
+
+  test('every inner region has at least two creatures of its own (the author: "niech się różnią")', () => {
+    for (const region of content.regions) {
+      const homes = new Map();
+      for (const area of region.areas) {
+        for (const danger of areaDangers(area, content)) homes.set(danger.monsterId, [...(homes.get(danger.monsterId) ?? []), area.id]);
+      }
+      for (const area of region.areas) {
+        const own = areaDangers(area, content).filter((danger) => homes.get(danger.monsterId).length === 1);
+        // Pajęczy Parów waits for a new creature: the krzyżak alone is its own.
+        assert.ok(own.length >= (area.id === 'spider-gully' ? 1 : 2), `${area.id}: ${own.map((danger) => danger.monsterId)}`);
+      }
+    }
+  });
+
+  test('it shows the chance of meeting each creature in a fight of a standard exploration', () => {
+    const pace = explorationPace(content.balance.bestiary.chanceMinutes, content);
+    // Skraj Wiatrołomów: wolves in 52 of the 77 weight, badgers in 31, the
+    // elite before them, nothing demanding.
+    const edge = meetingChances(content.areasById['windfalls-edge'], content);
+    const usual = 1 - pace.eliteChance;
+    assert.deepEqual([...edge.keys()], ['wolf', 'badger', 'wisp']);
+    assert.ok(Math.abs(edge.get('wolf') - (usual * 52) / 77) < 1e-9);
+    assert.ok(Math.abs(edge.get('badger') - (usual * 31) / 77) < 1e-9);
+    assert.ok(Math.abs(edge.get('wisp') - pace.eliteChance) < 1e-9);
+    // As often as the draws of an exploration bring them, the champion and
+    // the demanding encounters too.
+    for (const id of ['boar-thicket', 'raven-hollows']) {
+      const area = content.areasById[id];
+      const chances = meetingChances(area, content);
+      const rng = createRng(`szanse-${id}`);
+      const seen = new Map();
+      const rolls = 40000;
+      for (let i = 0; i < rolls; i++) {
+        for (const monsterId of new Set(rollEncounter(area, rng, content, area.maxLevel, pace).members.map((member) => member.monsterId))) seen.set(monsterId, (seen.get(monsterId) ?? 0) + 1);
+      }
+      assert.deepEqual([...seen.keys()].sort(), [...chances.keys()].sort());
+      for (const [monsterId, chance] of chances) assert.ok(Math.abs(seen.get(monsterId) / rolls - chance) < 0.01, `${id}: ${monsterId}`);
+    }
+    // Every creature on a list has its chance.
+    for (const area of content.areas) {
+      const chances = meetingChances(area, content);
+      for (const danger of areaDangers(area, content)) assert.ok(chances.get(danger.monsterId) > 0 && chances.get(danger.monsterId) <= 1, `${area.id}: ${danger.monsterId}`);
+    }
+  });
+
+  test('a whole land lists all creatures of its inner regions, the elites and the champion last', () => {
+    const windfalls = regionDangers(content.regionsById.windfalls, content);
+    assert.deepEqual(windfalls.map((danger) => danger.monsterId), [
+      'wolf', 'badger', 'fox', 'marten', 'crow', 'owl', 'viper', 'hornets', 'boar', 'stag', 'wisp', 'planetnik', 'tusker',
+    ]);
+    // The elite of three inner regions, at the levels of all three.
+    const wisp = windfalls.find((danger) => danger.monsterId === 'wisp');
+    assert.deepEqual([wisp.minLevel, wisp.maxLevel, wisp.elite], [6, 16, true]);
+    const all = windfalls.map((danger) => danger.monsterId);
+    assert.equal(landBestiaryFull(content.regionsById.windfalls, all.slice(1), content), false);
+    assert.equal(landBestiaryFull(content.regionsById.windfalls, all, content), true);
+  });
+
+  test("a land's chest holds a quarter more than its last inner region's", () => {
+    // Dzicza Głusza: 245 gold, 45 Punktów Czasu and 20 Punktów Systemu.
+    assert.deepEqual(landBestiaryChest(content.regionsById.windfalls, content), { gold: 305, timePoints: 56, systemPoints: 25 });
+    // Serce Uroczyska: 600, 95 and 20.
+    assert.deepEqual(landBestiaryChest(content.regionsById['stone-glade'], content), { gold: 750, timePoints: 119, systemPoints: 25 });
   });
 
   test('its chest holds gold growing along a curve, Punkty Czasu growing by 10 a region and 20 Punkty Systemu', () => {
@@ -1819,25 +1895,26 @@ describe('Bestiariusz', () => {
 
   test('it is full once every creature on the list is met, the elite too', () => {
     const edge = content.areasById['windfalls-edge'];
-    assert.equal(bestiaryFull(edge, ['wolf', 'fox', 'viper', 'badger'], content), false);
-    assert.equal(bestiaryFull(edge, ['wolf', 'fox', 'viper', 'badger', 'wisp', 'boar'], content), true);
+    assert.equal(bestiaryFull(edge, ['wolf', 'badger'], content), false);
+    assert.equal(bestiaryFull(edge, ['wolf', 'badger', 'wisp', 'boar'], content), true);
   });
 
   test('tracking the creatures of the quests meets them more often', () => {
     const edge = content.areasById['windfalls-edge'];
     const share = (tracked) => {
       const rng = createRng('tropienie');
-      let foxes = 0;
+      let badgers = 0;
       for (let i = 0; i < 6000; i++) {
         const encounter = rollEncounter(edge, rng, content, edge.maxLevel, { eliteChance: 0, toughChance: 0 }, tracked);
-        if (encounter.members.some((member) => member.monsterId === 'fox')) foxes += 1;
+        if (encounter.members.some((member) => member.monsterId === 'badger')) badgers += 1;
       }
-      return foxes / 6000;
+      return badgers / 6000;
     };
-    // At level 5 a fox comes in 18 of the 77 weight of Skraj's encounters, and
-    // tracked in 27 of 86: from about 23% of fights to about 31%.
-    assert.ok(Math.abs(share([]) - 18 / 77) < 0.02, String(share([])));
-    assert.ok(Math.abs(share(['fox']) - 27 / 86) < 0.02, String(share(['fox'])));
+    // At level 5 a badger comes in 31 of the 77 weight of Skraj's
+    // encounters, and tracked in 46.5 of 92.5: from about 40% of fights to
+    // about 50%.
+    assert.ok(Math.abs(share([]) - 31 / 77) < 0.02, String(share([])));
+    assert.ok(Math.abs(share(['badger']) - 46.5 / 92.5) < 0.02, String(share(['badger'])));
   });
 
   test('every creature an inner region can roll is on its list, within its levels', () => {
@@ -1881,7 +1958,7 @@ describe('quests from the narrator', () => {
     assert.equal(questPeriod('weekly', at('2026-11-01T12:00:00Z'), content).key, '2026-10-26');
   });
 
-  test('a new character gets five quests a period: creatures of its place and the time explored', () => {
+  test('a new character gets quests of the creatures of its place, of creatures of any kind and of the time explored', () => {
     const character = newCharacter('warrior');
     const area = questArea(character, content);
     assert.equal(area.id, 'windfalls-edge');
@@ -1889,12 +1966,15 @@ describe('quests from the narrator', () => {
     for (const periodId of ['daily', 'weekly']) {
       for (let seed = 0; seed < 30; seed++) {
         const quests = drawQuests(periodId, { character, hasTable: false, seed }, content);
-        assert.equal(quests.length, content.quests.periods[periodId].count);
+        // Skraj Wiatrołomów has two creatures: one quest for each, one for
+        // creatures of any kind and one for the time, four of the five
+        // until the Stół rozbiórki stands.
+        assert.equal(quests.length, Math.min(4, content.quests.periods[periodId].count));
         const kills = quests.filter((quest) => quest.kind === 'kill');
         assert.ok(kills.every((quest) => prey.has(quest.target) && quest.count >= 1));
         assert.equal(new Set(kills.map((quest) => quest.target)).size, kills.length, 'a creature twice');
         // Nothing for the Stół rozbiórki before it stands.
-        assert.ok(quests.every((quest) => ['kill', 'explore'].includes(quest.kind)));
+        assert.ok(quests.every((quest) => ['kill', 'killAny', 'explore'].includes(quest.kind)));
         assert.ok(quests.every((quest) => quest.progress === 0 && !quest.claimed && quest.reward.amount >= 1));
       }
     }
@@ -1907,7 +1987,7 @@ describe('quests from the narrator', () => {
     const character = newCharacter('archer', { level: 12, classLevel: 10 });
     const kinds = new Set();
     for (let seed = 0; seed < 40; seed++) for (const quest of drawQuests('daily', { character, hasTable: true, seed }, content)) kinds.add(quest.kind);
-    assert.deepEqual([...kinds].sort(), ['explore', 'kill', 'process', 'salvage']);
+    assert.deepEqual([...kinds].sort(), ['explore', 'kill', 'killAny', 'process', 'salvage']);
   });
 
   test('no quest sends a character to the creatures of a place too easy for it', () => {
@@ -1927,28 +2007,33 @@ describe('quests from the narrator', () => {
   });
 
   test('a quest asks for as many creatures as its fights bring, and rare ones only for the week', () => {
-    // Skraj Wiatrołomów at level 1: wolves come in 25 fights of 63, badgers in 12.
+    // Skraj Wiatrołomów at level 1: wolves come in 38 fights of 63, badgers
+    // in 25, and each fight brings one creature.
     const character = newCharacter('mage');
-    const shares = { wolf: 25 / 63, fox: 12 / 63, viper: 14 / 63, badger: 12 / 63 };
+    const shares = { wolf: 38 / 63, badger: 25 / 63 };
     for (const periodId of ['daily', 'weekly']) {
       const [fewest, most] = content.quests.kinds.find((kind) => kind.id === 'kill')[periodId].fights;
       for (let seed = 0; seed < 30; seed++) {
-        for (const quest of drawQuests(periodId, { character, hasTable: false, seed }, content).filter((candidate) => candidate.kind === 'kill')) {
-          const share = shares[quest.target];
+        for (const quest of drawQuests(periodId, { character, hasTable: false, seed }, content).filter((candidate) => candidate.kind.startsWith('kill'))) {
+          const share = quest.kind === 'killAny' ? 1 : shares[quest.target];
           assert.ok(quest.count >= Math.max(1, Math.round(fewest * share)) && quest.count <= Math.round(most * share), `${periodId} ${quest.target} ${quest.count}`);
         }
       }
     }
-    // In Wilcze Kręgi bats come in few fights: never a daily quest, sometimes a weekly one.
+    // A creature of few fights in the place (here a bat in Wilcze Kręgi of
+    // the test): never a daily quest, sometimes a weekly one.
     const later = newCharacter('mage', { level: 42, classLevel: 40 });
     assert.equal(questArea(later, content).id, 'wolf-circles');
-    const targets = (periodId, who = later) => new Set(Array.from({ length: 60 }, (_, seed) => drawQuests(periodId, { character: who, hasTable: false, seed }, content)).flat().map((quest) => quest.target));
+    const rare = { ...content.areasById['wolf-circles'], encounters: [{ weight: 60, monsters: ['she-wolf'] }, { weight: 4, monsters: ['bat'] }] };
+    const rareContent = { ...content, areas: content.areas.map((area) => (area.id === rare.id ? rare : area)) };
+    const targets = (periodId, who = later, data = rareContent) =>
+      new Set(Array.from({ length: 60 }, (_, seed) => drawQuests(periodId, { character: who, hasTable: false, seed }, data)).flat().map((quest) => quest.target));
     assert.ok(!targets('daily').has('bat'));
     assert.ok(targets('weekly').has('bat'));
     // The champion is never a quest's target.
     const last = newCharacter('mage', { level: 23, classLevel: 22 });
     assert.equal(questArea(last, content).id, 'boar-thicket');
-    assert.ok(!targets('weekly', last).has('tusker'));
+    assert.ok(!targets('weekly', last, content).has('tusker'));
   });
 
   test('rewards: gold, resources and parts, more for a higher level and for the week', () => {
@@ -2036,10 +2121,10 @@ describe('quests from the narrator', () => {
   test('an exploration tracks the creatures the quests still ask for, if they live there', () => {
     const quest = (kind, target, progress = 0) => ({ kind, ...(target && { target }), count: 3, progress, reward: { kind: 'gold', amount: 5 }, claimed: false });
     const quests = {
-      daily: { period: 'd', quests: [quest('kill', 'fox'), quest('kill', 'wolf', 3), quest('kill', 'bear'), quest('explore')], chest: false },
-      weekly: { period: 'w', quests: [quest('kill', 'fox', 1), quest('kill', 'viper')], chest: false },
+      daily: { period: 'd', quests: [quest('kill', 'badger'), quest('kill', 'wolf', 3), quest('kill', 'bear'), quest('explore'), quest('killAny')], chest: false },
+      weekly: { period: 'w', quests: [quest('kill', 'badger', 1), quest('kill', 'viper')], chest: false },
     };
-    assert.deepEqual(questCreatures(quests, content.areasById['windfalls-edge']), ['fox', 'viper']);
+    assert.deepEqual(questCreatures(quests, content.areasById['windfalls-edge']), ['badger']);
     assert.deepEqual(questCreatures(quests, content.areasById['glade-heart']), ['bear']);
   });
 
@@ -2091,6 +2176,9 @@ describe('quests from the narrator', () => {
     assert.equal(text({ kind: 'explore', count: 45 }), 'Spędź na wyprawach łącznie 45 minut.');
     assert.equal(text({ kind: 'process', count: 2 }), 'Przerób na Stole rozbiórki 2 materiały.');
     assert.equal(text({ kind: 'salvage', count: 1 }), 'Rozbierz na Stole rozbiórki 1 przedmiot.');
+    assert.deepEqual([1, 3, 12].map((count) => text({ kind: 'killAny', count })), [
+      'Pokonaj łącznie 1 stwora.', 'Pokonaj łącznie 3 stwory.', 'Pokonaj łącznie 12 stworów.',
+    ]);
     for (const monster of Object.values(content.monstersById)) assert.equal(monster.counted.length, 3, monster.id);
     // A creature the character has not met yet keeps its secret, as on the list of dangers.
     assert.equal(questText({ kind: 'kill', target: 'viper', count: 1, progress: 0 }, content, ['wolf']), 'Pokonaj 1 ???.');
@@ -2108,11 +2196,11 @@ describe('quests from the narrator', () => {
     assert.deepEqual(view.weekly.chest, { ...content.quests.periods.weekly.chest, ready: false, opened: false });
     const explore = view.daily.quests.find((quest) => quest.kind === 'explore');
     assert.ok(explore.done && !explore.claimed && explore.progress === explore.count);
-    assert.deepEqual(view.daily.quests.map((quest) => quest.index), [0, 1, 2, 3, 4]);
+    assert.deepEqual(view.daily.quests.map((quest) => quest.index), [0, 1, 2, 3]);
     assert.ok(view.daily.quests.filter((quest) => quest.kind === 'kill').every((quest) => quest.monsterId && quest.text.startsWith('Pokonaj')));
     // A quest of a creature no longer in the data is left out, the others keep their places.
     const gone = { ...quests, daily: { ...quests.daily, quests: [{ ...quests.daily.quests[0], kind: 'kill', target: 'dragon' }, ...quests.daily.quests.slice(1)] } };
-    assert.deepEqual(questsView(gone, now, content).daily.quests.map((quest) => quest.index), [1, 2, 3, 4]);
+    assert.deepEqual(questsView(gone, now, content).daily.quests.map((quest) => quest.index), [1, 2, 3]);
   });
 });
 

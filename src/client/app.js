@@ -683,6 +683,7 @@ async function openTutorialTests() {
       row('Objaśnienie Społeczności i Szybkiego Polowania', 'Od 5. poziomu postaci.', repeatCommunityTour, told && isUnlocked('community')),
       row('Objaśnienie Umiejętności', 'Od 10. poziomu klasy. Postać zapomni wybrane umiejętności.', repeatSkillsTour, told && isUnlocked('skills')),
       row('Objaśnienie Profesji', 'Od 10. poziomu postaci. Poziomy profesji zostają.', repeatProfessionsTour, told && Boolean(state.character.professions)),
+      row('Objaśnienie Rzemieślnictwa', 'Od 15. poziomu postaci. Poziomy profesji zostają.', repeatCraftingTour, told && Boolean(state.character.professions?.workshop)),
     ),
   );
 }
@@ -744,6 +745,21 @@ async function repeatSkillsTour() {
 }
 
 // Test mode: the narrator's Profesje chapter from the start (testing.js).
+async function repeatCraftingTour() {
+  const sure = await confirmAction({
+    title: 'Objaśnienie Rzemieślnictwa od nowa?',
+    text: 'Poziomy profesji zostaną. Narrator objaśni Rzemieślnictwo od początku.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/crafting-tour');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
 async function repeatProfessionsTour() {
   const sure = await confirmAction({
     title: 'Objaśnienie Profesji od nowa?',

@@ -78,10 +78,18 @@ const areaOpen = (area, character) => character.classLevel >= area.unlockClassLe
 
 const chip = (text, className = '') => h('span', { class: `chip ${className}`.trim(), text });
 
+// A chance of meeting a creature: whole percents, below 10% to a tenth.
+function chanceText(chance) {
+  const percent = chance * 100;
+  return `${percent >= 10 ? Math.round(percent) : percent.toFixed(1).replace('.', ',')}%`;
+}
+
 // The Bestiariusz: the creatures of an inner region with the levels they
-// come at. One the character has not met in a fight yet is only a shadow
-// with "???"; its levels show from the start.
-function dangersSheet(place) {
+// come at and the chance of meeting each in a fight, or of a whole land
+// (`land`), all of its inner regions' creatures. One the character has not
+// met in a fight yet is only a shadow with "???"; its levels and chance
+// show from the start.
+function dangersSheet(place, land = false) {
   const met = new Set(state.character.met ?? []);
   openSheet(
     h('h2', { class: 'sheet-title', text: 'Bestiariusz' }),
@@ -93,9 +101,13 @@ function dangersSheet(place) {
         const known = met.has(danger.monsterId);
         const levels = danger.minLevel === danger.maxLevel ? `poz. ${danger.minLevel}` : `poz. ${danger.minLevel}–${danger.maxLevel}`;
         const rank = danger.champion ? 'czempion' : danger.elite ? 'elita' : null;
+        const chance = danger.chance === undefined ? null : chanceText(danger.chance);
         return h(
           'li',
-          { class: `danger-row${known ? '' : ' danger-row--unknown'}`, 'aria-label': `${known ? danger.name : 'Nieznany stwór'}, ${levels}${rank ? `, ${rank}` : ''}` },
+          {
+            class: `danger-row${known ? '' : ' danger-row--unknown'}`,
+            'aria-label': `${known ? danger.name : 'Nieznany stwór'}, ${levels}${rank ? `, ${rank}` : ''}${chance ? `, ${chance}` : ''}`,
+          },
           h('span', { class: 'danger-art' }, monsterSprite(danger.monsterId) ?? icon(danger.family, { size: 28 })),
           h(
             'span',
@@ -103,6 +115,7 @@ function dangersSheet(place) {
             h('span', { class: 'danger-name', text: known ? danger.name : '???' }),
             h('span', { class: `danger-meta${danger.champion ? ' danger-meta--champion' : ''}`, text: rank ? `${levels} · ${rank}` : levels }),
           ),
+          chance && h('span', { class: 'danger-chance', text: chance }),
         );
       }),
     ),
@@ -111,7 +124,25 @@ function dangersSheet(place) {
       class: 'muted',
       text: `Zobaczysz tutaj pełne informacje jedynie o stworach, z którymi ${state.character.appearance === 'female' ? 'stoczyłaś' : 'stoczyłeś'} potyczkę.`,
     }),
-    h('p', { class: 'muted', text: `Skrzynia Bestiariusza dostarcza ${chestText(place.chest)}, gdy poznasz wszystkie stwory tego regionu.` }),
+    h('p', { class: 'muted', text: `Skrzynia Bestiariusza dostarcza ${chestText(place.chest)}, gdy poznasz wszystkie stwory ${whose(land)}.` }),
+  );
+}
+
+const whose = (land) => (land ? 'tej krainy' : 'tego regionu');
+
+// The way to a Bestiariusz, of an inner region or a whole land, with its chest.
+function bestiaryRow(place, land = false) {
+  return h(
+    'div',
+    { class: 'bestiary-row' },
+    h(
+      'button',
+      { type: 'button', class: 'danger-link', onClick: () => dangersSheet(place, land) },
+      icon('beast', { size: 20 }),
+      h('span', { text: 'Bestiariusz' }),
+      icon('chevron', { size: 18 }),
+    ),
+    chestButton(place, land),
   );
 }
 
@@ -119,7 +150,8 @@ const chestText = (chest) => `+${formatNumber(chest.gold)} złota, +${timePoints
 
 // The Bestiariusz chest beside its name, as at the quests: shut, with the
 // creatures met so far, until all are met, then ready to open, then open.
-function chestButton(place) {
+// `land`: the chest of a whole land.
+function chestButton(place, land = false) {
   const met = new Set(state.character.met ?? []);
   const known = place.dangers.filter((danger) => met.has(danger.monsterId)).length;
   const all = place.dangers.length;
@@ -137,10 +169,10 @@ function chestButton(place) {
       return;
     }
     if (!ready) {
-      toast(`Poznaj wszystkie stwory tego regionu (${known} z ${all}), a skrzynia się otworzy. W środku: ${inside}.`);
+      toast(`Poznaj wszystkie stwory ${whose(land)} (${known} z ${all}), a skrzynia się otworzy. W środku: ${inside}.`);
       return;
     }
-    const { chest } = await call('POST', '/api/bestiary/chest', { area: place.id });
+    const { chest } = await call('POST', '/api/bestiary/chest', land ? { region: place.id } : { area: place.id });
     // Coins spilling from the chest (data/sounds.json).
     playSound('chest');
     toast(`Skrzynia otwarta: ${chestText(chest)}.`);
@@ -477,7 +509,8 @@ export function mountCombat(container, { params, navigate }) {
     return card;
   }
 
-  // Step two: the inner regions of a region, as circles.
+  // Step two: the inner regions of a region, as circles, under the
+  // Bestiariusz of the whole land.
   function regionView(character) {
     return h(
       'div',
@@ -485,6 +518,7 @@ export function mountCombat(container, { params, navigate }) {
       restSkip(character),
       h('p', { class: 'region-description', text: region.description }),
       h('p', { class: 'region-trait' }, h('strong', { text: `${region.trait.name}. ` }), region.trait.description),
+      region.dangers?.length > 0 && bestiaryRow(region, true),
       h('div', { class: 'area-grid' }, region.areas.map((place) => areaTile(place, character))),
     );
   }
@@ -725,19 +759,7 @@ export function mountCombat(container, { params, navigate }) {
           ),
         ),
         h('p', { class: 'region-description', text: area.description }),
-        area.dangers?.length > 0 &&
-          h(
-            'div',
-            { class: 'bestiary-row' },
-            h(
-              'button',
-              { type: 'button', class: 'danger-link', onClick: () => dangersSheet(area) },
-              icon('beast', { size: 20 }),
-              h('span', { text: 'Bestiariusz' }),
-              icon('chevron', { size: 18 }),
-            ),
-            chestButton(area),
-          ),
+        area.dangers?.length > 0 && bestiaryRow(area),
         track,
         levelNote,
         durations,

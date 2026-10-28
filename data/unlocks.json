@@ -30,6 +30,13 @@
     "message": "Odblokowano Profesje. Zajrzyj do zakładki Profesje."
   },
   {
+    "id": "crafting",
+    "name": "Rzemieślnictwo",
+    "level": 15,
+    "feature": "crafting",
+    "message": "Odblokowano Rzemieślnictwo. Systemowy Warsztat czeka w zakładce Profesje."
+  },
+  {
     "id": "settlement",
     "name": "Osada",
     "level": 20

@@ -141,7 +141,9 @@
     "systemPoints": 20,
     "baseLevel": 5,
     "growth": 1.3,
-    "goldStep": 5
+    "goldStep": 5,
+    "landFactor": 1.25,
+    "chanceMinutes": 30
   },
   "startingSupply": {
     "gold": 15,

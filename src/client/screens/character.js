@@ -266,12 +266,14 @@ export function mountCharacter(container) {
   }
 
   // A herb's or a potion's card: what it is, what the scrapper pays, and
-  // selling or throwing away as many as chosen.
+  // selling or throwing away as many as chosen: one to start with (the
+  // author: "niech domyślnie zaznaczona będzie jedna jednostka a nie
+  // wszystkie"), "wszystkie" for the whole stack.
   function stackSheet(kind, entry) {
     const { art: artOf, api, key, discard: discardTitle } = STACKS[kind];
     const character = state.character;
     const busy = Boolean(character.activity);
-    let count = entry.count;
+    let count = 1;
     const price = (amount) => Math.max(1, Math.round(entry.price * amount));
     const value = h('output', { class: 'herb-count-value' });
     const sell = h('button', { type: 'button', class: 'button button--system', disabled: busy });

@@ -168,6 +168,51 @@ export function areaDangers(area, content) {
   return [...dangers.values()];
 }
 
+// The chance of meeting each creature of an inner region in one fight, as
+// its Bestiariusz shows it, also for those not met yet (the author:
+// "standardowe procentowe możliwości spotkania danego stwora ... bez
+// włączenia tropień konkretnych"): a fight of an exploration
+// balance.bestiary.chanceMinutes long, at the place's highest level (all
+// its encounters), without tracking, seeking or avoiding anything. The
+// draws go as in rollEncounter: the champion, the elite, a demanding
+// encounter, then a usual one. A creature twice in a group counts once.
+export function meetingChances(area, content) {
+  const pace = explorationPace(content.balance.bestiary.chanceMinutes, content);
+  const champion = area.champion ? pace.championChance : 0;
+  const elite = (1 - champion) * pace.eliteChance;
+  const tough = toughEncountersFor(area, area.maxLevel);
+  const toughShare = tough.length > 0 ? pace.toughChance : 0;
+  const rest = 1 - champion - elite;
+  const chances = new Map();
+  const add = (monsterId, chance) => chances.set(monsterId, (chances.get(monsterId) ?? 0) + chance);
+  const addTable = (encounters, share) => {
+    const total = encounters.reduce((sum, encounter) => sum + encounter.weight, 0);
+    for (const encounter of encounters) for (const monsterId of new Set(encounter.monsters)) add(monsterId, (share * encounter.weight) / total);
+  };
+  addTable(encountersFor(area, area.maxLevel), rest * (1 - toughShare));
+  addTable(tough, rest * toughShare);
+  if (area.elite) add(area.elite, elite);
+  if (area.champion) add(area.champion, champion);
+  return chances;
+}
+
+// The Bestiariusz of a whole land (the author: "Bestiariusz główny dla danej
+// krainy głównej ze wszystkimi stworami"): the creatures of all its inner
+// regions, each with the levels it comes at anywhere in the land, in the
+// order of the places, the elites and the champion last.
+export function regionDangers(region, content) {
+  const dangers = new Map();
+  for (const area of region.areas) {
+    for (const danger of areaDangers(area, content)) {
+      const known = dangers.get(danger.monsterId);
+      if (!known) dangers.set(danger.monsterId, { ...danger });
+      else Object.assign(known, { minLevel: Math.min(known.minLevel, danger.minLevel), maxLevel: Math.max(known.maxLevel, danger.maxLevel) });
+    }
+  }
+  const rank = (danger) => (danger.champion ? 2 : danger.elite ? 1 : 0);
+  return [...dangers.values()].sort((a, b) => rank(a) - rank(b));
+}
+
 // The chest of an inner region's Bestiariusz, opened once every creature on
 // its list is met (balance.bestiary): gold growing along a curve with the
 // place's highest level, from 30 in Skraj Wiatrołomów to 600 in Serce
@@ -184,11 +229,30 @@ export function bestiaryChest(area, content) {
   };
 }
 
-// Whether the character has met every creature on the inner region's list.
-export function bestiaryFull(area, met, content) {
-  const known = new Set(met);
-  return areaDangers(area, content).every((danger) => known.has(danger.monsterId));
+// The chest of a land's Bestiariusz, opened once every creature of the land
+// is met: its last inner region's chest, landFactor times more of each
+// (the author: "troche wiecej niz z ostatniego regionu odpowiednich
+// zasobów"), the gold rounded as there.
+export function landBestiaryChest(region, content) {
+  const { landFactor, goldStep } = content.balance.bestiary;
+  const last = region.areas.reduce((top, area) => (area.maxLevel > top.maxLevel ? area : top));
+  const chest = bestiaryChest(last, content);
+  return {
+    gold: Math.round((chest.gold * landFactor) / goldStep) * goldStep,
+    timePoints: Math.round(chest.timePoints * landFactor),
+    systemPoints: Math.round(chest.systemPoints * landFactor),
+  };
 }
+
+const allMet = (dangers, met) => {
+  const known = new Set(met);
+  return dangers.every((danger) => known.has(danger.monsterId));
+};
+
+// Whether the character has met every creature on the inner region's list,
+// and on the whole land's.
+export const bestiaryFull = (area, met, content) => allMet(areaDangers(area, content), met);
+export const landBestiaryFull = (region, met, content) => allMet(regionDangers(region, content), met);
 
 // A level from the place's range, whatever the character's level. Lower
 // levels come more often (monsterLevelWeights), so a character at the start of

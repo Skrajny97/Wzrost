@@ -11,7 +11,7 @@ import { countOf, formatCountdown, formatMinutes, formatNumber, formatShort } fr
 import { RESOURCE_ICONS, SYSTEM_POINTS_ICON } from './icons.js';
 import { anyClaimable, showQuests } from './quests.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
-import { meter } from './ui.js';
+import { meter, toast } from './ui.js';
 
 // A profession's work, by the kind of its activity: its screen and its name
 // in the top bar.
@@ -42,7 +42,10 @@ let topbar = null;
 
 export function buildTopbar(onSettings) {
   const level = h('span', { class: 'badge badge--system' });
-  const classLevel = h('span', { class: 'badge badge--world' });
+  // The class's name gives way on a narrow phone, its level never does.
+  const className = h('span', { class: 'badge-name' });
+  const classNumber = h('span', { class: 'badge-number' });
+  const classLevel = h('span', { class: 'badge badge--world' }, className, classNumber);
   const gold = h('span', { class: 'gold-value' });
   const points = h('span', { class: 'points-value' });
   // Gold over Punkty Systemu, like the levels on the other side, so the
@@ -92,6 +95,20 @@ export function buildTopbar(onSettings) {
     },
     narratorFace(),
   );
+  // The place of the Sklep Systemu beside him, locked like the Rdzeń until
+  // it comes (the author: "na razie tylko jakąś specjalną ikonę i
+  // zablokowane kłódką jak Rdzeń").
+  const shop = h(
+    'button',
+    {
+      type: 'button',
+      class: 'system-shop',
+      'aria-label': 'Sklep Systemu, zablokowane',
+      onClick: () => toast('Sklep Systemu dojdzie w jednej z kolejnych aktualizacji.'),
+    },
+    icon('shop', { size: 24 }),
+    icon('lock', { size: 12, className: 'system-shop-lock' }),
+  );
   const campLabel = h('span', { class: 'camp-label' });
   const camp = h('a', { class: 'camp-button', href: '#/oboz', 'aria-label': 'Obóz' }, icon('tent'), campLabel);
   const hp = meter({ label: 'HP', value: 0, max: 0, kind: 'hp' });
@@ -112,7 +129,7 @@ export function buildTopbar(onSettings) {
       'div',
       { class: 'topbar-row' },
       h('div', { class: 'topbar-badges' }, level, classLevel),
-      quests,
+      h('div', { class: 'topbar-middle' }, quests, shop),
       h(
         'div',
         { class: 'topbar-right' },
@@ -129,6 +146,8 @@ export function buildTopbar(onSettings) {
   topbar = {
     level,
     classLevel,
+    className,
+    classNumber,
     quests,
     gold,
     points,
@@ -264,7 +283,9 @@ export function updateTopbar(now = serverNow()) {
   const character = state.character;
   if (!topbar || !character) return;
   topbar.level.textContent = `POZ. ${character.level}`;
-  topbar.classLevel.textContent = `${character.className.toUpperCase()} ${character.classLevel}`;
+  topbar.className.textContent = character.className.toUpperCase();
+  topbar.classNumber.textContent = String(character.classLevel);
+  topbar.classLevel.setAttribute('aria-label', `${character.className} ${character.classLevel}`);
   topbar.gold.textContent = formatShort(character.gold);
   topbar.points.textContent = formatShort(character.systemPoints);
   topbar.goldButton.setAttribute(

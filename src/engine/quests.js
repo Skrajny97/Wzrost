@@ -109,7 +109,9 @@ const questPotions = (character, content) =>
 // What can be drawn: each kind once for each of its variants (kill: each
 // creature that the period's most fights bring at least once on average;
 // gather: each herb known; brew: each recipe known), the kind's weight
-// shared among them. A kind
+// shared among them. killAny asks for creatures of any kind, so a place
+// of few creatures still fills the period (the author: "Może być potworów
+// mniej w lokacji, ale niech się różnią"). A kind
 // without this period, or of a module the character does not have yet, is
 // left out. No creatures of a place too easy for the character (the
 // author: "by ktoś z wyższym levelem nie był wysyłany na niskolevelowe
@@ -119,17 +121,19 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false, h
   const area = questArea(character, content);
   return content.quests.kinds.flatMap((kind) => {
     if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions) || (kind.crafting && !hasCrafting)) return [];
-    if (kind.id === 'kill' && easyPlace(character.level, area, content)) return [];
+    if ((kind.id === 'kill' || kind.id === 'killAny') && easyPlace(character.level, area, content)) return [];
     const variants =
       kind.id === 'kill'
         ? [...creaturesPerFight(area, character.level)]
             .filter(([, perFight]) => perFight * kind[periodId].fights[1] >= 1)
             .map(([target, perFight]) => ({ target, perFight }))
-        : kind.id === 'gather'
-          ? questHerbs(character, content).map((herb) => ({ target: herb.id }))
-          : kind.id === 'brew'
-            ? questPotions(character, content).map((potion) => ({ target: potion.id }))
-            : [{}];
+        : kind.id === 'killAny'
+          ? [{ perFight: [...creaturesPerFight(area, character.level).values()].reduce((sum, share) => sum + share, 0) }]
+          : kind.id === 'gather'
+            ? questHerbs(character, content).map((herb) => ({ target: herb.id }))
+            : kind.id === 'brew'
+              ? questPotions(character, content).map((potion) => ({ target: potion.id }))
+              : [{}];
     return variants.map((variant) => ({ kind, weight: kind.weight / variants.length, ...variant }));
   });
 }
@@ -138,7 +142,7 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false, h
 // bring on average.
 function questCount({ kind, perFight }, periodId, rng) {
   const tuning = kind[periodId];
-  if (kind.id === 'kill') return Math.max(1, Math.round(rng.int(...tuning.fights) * perFight));
+  if (tuning.fights) return Math.max(1, Math.round(rng.int(...tuning.fights) * perFight));
   const [min, max] = tuning.count;
   const step = tuning.step ?? 1;
   return min + step * rng.int(0, Math.floor((max - min) / step));
@@ -225,6 +229,7 @@ export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 
   const gathered = total(herbs);
   const gain = {
     kill: (quest) => kills[quest.target] ?? 0,
+    killAny: () => total(kills),
     explore: () => minutes,
     process: () => processed,
     salvage: () => salvaged,

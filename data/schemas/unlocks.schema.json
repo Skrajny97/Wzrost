@@ -16,6 +16,7 @@
       "classLevel": { "type": "integer", "minimum": 2, "description": "Moduł otwiera poziom klasy zamiast poziomu postaci, a komunikat pojawia się po osiągnięciu tego poziomu klasy." },
       "condition": { "type": "string", "minLength": 1 },
       "message": { "type": "string", "minLength": 1 },
+      "feature": { "type": "string", "enum": ["crafting"], "description": "Komunikat Systemu tylko tam, gdzie ta część gry jest włączona (crafting: CRAFTING w wrangler.jsonc)." },
       "huntMinutes": { "type": "integer", "minimum": 1, "description": "Od tego poziomu eksploracja może trwać do tylu minut (najdłuższa z odblokowanych). Przed pierwszym takim wpisem: shortHuntMaxMinutes z balance.json." }
     }
   }

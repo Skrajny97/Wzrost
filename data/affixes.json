@@ -37,7 +37,7 @@
     { "monster": "badger", "prefix": { "m": "Borsuczy", "f": "Borsucza", "n": "Borsucze", "pl": "Borsucze" }, "suffix": "Borsuka" },
     { "monster": "lynx", "prefix": { "m": "Rysi", "f": "Rysia", "n": "Rysie", "pl": "Rysie" }, "suffix": "Rysia" },
     { "monster": "spider", "prefix": { "m": "Pajęczy", "f": "Pajęcza", "n": "Pajęcze", "pl": "Pajęcze" }, "suffix": "Krzyżaka" },
-    { "monster": "alpha-wolf", "suffix": "Basiora" },
+    { "monster": "alpha-wolf", "prefix": { "m": "Basiorowy", "f": "Basiorowa", "n": "Basiorowe", "pl": "Basiorowe" }, "suffix": "Basiora" },
     { "monster": "fox", "prefix": { "m": "Lisi", "f": "Lisia", "n": "Lisie", "pl": "Lisie" }, "suffix": "Lisa" },
     { "monster": "owl", "prefix": { "m": "Puszczykowy", "f": "Puszczykowa", "n": "Puszczykowe", "pl": "Puszczykowe" }, "suffix": "Puszczyka" },
     { "monster": "bear", "prefix": { "m": "Niedźwiedzi", "f": "Niedźwiedzia", "n": "Niedźwiedzie", "pl": "Niedźwiedzie" }, "suffix": "Niedźwiedzia" },

@@ -154,8 +154,9 @@ test('the narrator knows when and where each of its lines shows', () => {
 test("the narrator's quests sit in the top bar, where his line points", () => {
   const layout = readFileSync(join(CLIENT, 'layout.js'), 'utf8');
   assert.match(layout, /'data-guide': 'quests'/);
-  // Between the levels and the gold.
-  assert.match(layout, /h\('div', \{ class: 'topbar-badges' \}, level, classLevel\),\s*quests,/);
+  // Between the levels and the gold, with the locked Sklep Systemu beside him.
+  assert.match(layout, /h\('div', \{ class: 'topbar-badges' \}, level, classLevel\),\s*h\('div', \{ class: 'topbar-middle' \}, quests, shop\),/);
+  assert.match(layout, /'Sklep Systemu dojdzie w jednej z kolejnych aktualizacji\.'/);
   const quests = readFileSync(join(CLIENT, 'quests.js'), 'utf8');
   for (const path of ['/api/quests/claim', '/api/quests/claim-all', '/api/quests/chest']) assert.ok(quests.includes(`'${path}'`), path);
 });

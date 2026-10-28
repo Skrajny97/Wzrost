@@ -51,6 +51,7 @@
           "id": {
             "enum": [
               "kill",
+              "killAny",
               "explore",
               "process",
               "salvage",

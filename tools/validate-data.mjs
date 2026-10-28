@@ -587,6 +587,9 @@ function checkProfessions(data, { stats }) {
       if (!stats.has(stat)) errors.push(`professions.json: ${profession.id} ma nieznaną statystykę "${stat}"`);
     }
     if (profession.unlockLevel < tabLevel) errors.push(`professions.json: ${profession.id} otwiera się na poziomie ${profession.unlockLevel}, przed zakładką Profesje (${tabLevel})`);
+    // A profession that opens later has its System message in unlocks.json, at the same level.
+    const own = data.unlocks.find((unlock) => unlock.id === profession.id);
+    if (own && own.level !== (profession.unlockLevel ?? tabLevel)) errors.push(`unlocks.json: ${profession.id} ma poziom ${own.level}, a profesja otwiera się na ${profession.unlockLevel ?? tabLevel}`);
   }
   const gatherer = professions.find((profession) => profession.id === gathering.profession);
   if (!ids.has(gathering.profession) || gatherer.kind !== 'gathering') {
@@ -713,9 +716,11 @@ function checkQuests(data, { resources, rarities }) {
     if (!ownNoun && !kind.counted) errors.push(`quests.json: rodzaj ${kind.id} nie ma counted`);
     if ((ownNoun || kind.counted) && !kind.text.includes('{noun}')) errors.push(`quests.json: tekst rodzaju ${kind.id} nie ma {noun}`);
     if (kind.text.includes('{herb}') !== (kind.id === 'gather')) errors.push(`quests.json: tylko rodzaj gather ma {herb} w tekście`);
+    // Creatures are counted by the fights that bring them.
+    const byFights = kind.id === 'kill' || kind.id === 'killAny';
     for (const period of ['daily', 'weekly'].filter((each) => kind[each])) {
-      const range = kind.id === 'kill' ? kind[period].fights : kind[period].count;
-      if (!range) errors.push(`quests.json: rodzaj ${kind.id} nie ma ${kind.id === 'kill' ? 'fights' : 'count'} w ${period}`);
+      const range = byFights ? kind[period].fights : kind[period].count;
+      if (!range) errors.push(`quests.json: rodzaj ${kind.id} nie ma ${byFights ? 'fights' : 'count'} w ${period}`);
       else if (range[0] > range[1]) errors.push(`quests.json: rodzaj ${kind.id} ma odwrócony zakres w ${period}`);
     }
   }

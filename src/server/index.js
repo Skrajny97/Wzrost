@@ -23,7 +23,7 @@ import { pushKey, sendNotifications, subscribePush, unsubscribePush } from './pu
 import { claimAllQuests, claimQuest, openChest } from './quests.js';
 import { getReport, listReports } from './reports.js';
 import { learnSkill, raiseSkill } from './skills.js';
-import { backFromTest, repeatCommunityTour, repeatProfessionsTour, repeatSkillsTour, skipBuilding, skipTime, testIntroduction, tutorialTests } from './testing.js';
+import { backFromTest, repeatCommunityTour, repeatCraftingTour, repeatProfessionsTour, repeatSkillsTour, skipBuilding, skipTime, testIntroduction, tutorialTests } from './testing.js';
 import { skipWithTimePoints } from './time.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
 import { seeTutorial } from './tutorial.js';
@@ -129,6 +129,7 @@ const routes = [
   ['POST', '/api/test/skills-tour', repeatSkillsTour],
   ['POST', '/api/test/professions-tour', repeatProfessionsTour],
   ['POST', '/api/test/community-tour', repeatCommunityTour],
+  ['POST', '/api/test/crafting-tour', repeatCraftingTour],
   ['GET', '/api/test/tutorials', tutorialTests],
   ['POST', '/api/test/introduction', testIntroduction],
   ['POST', '/api/test/back', backFromTest],

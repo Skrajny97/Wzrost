@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, generateItem, itemName, questPeriod, upgradeCost, xpToNext } from '../src/engine/index.js';
+import { createRng, generateItem, itemName, meetingChances, questPeriod, upgradeCost, xpToNext } from '../src/engine/index.js';
 import { skipTime } from '../src/server/testing.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -685,16 +685,16 @@ describe('hunts and reports', () => {
   test('an exploration can track the creatures of the quests', async () => {
     const quest = (target, progress = 0) => ({ kind: 'kill', target, count: 2, progress, reward: { kind: 'gold', amount: 5 }, claimed: false });
     const stored = JSON.parse((await (await db()).prepare('SELECT quests FROM characters').first()).quests);
-    stored.daily.quests = [quest('fox'), quest('wolf', 2), quest('bear')];
+    stored.daily.quests = [quest('badger'), quest('wolf', 2), quest('bear')];
     stored.weekly.quests = [];
     await (await db()).prepare('UPDATE characters SET quests = ?').bind(JSON.stringify(stored)).run();
     const wrong = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, trackQuests: 'tak' } });
     assert.equal(wrong.data.error.code, 'invalid_track');
-    // Only the fox: the wolves are beaten already and no bear lives on the edge.
+    // Only the badger: the wolves are beaten already and no bear lives on the edge.
     const started = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, trackQuests: true } });
     assert.equal(started.status, 201);
     assert.equal(started.data.character.activity.tracksQuests, true);
-    assert.equal((await (await db()).prepare('SELECT tracked FROM activities').first()).tracked, '["fox"]');
+    assert.equal((await (await db()).prepare('SELECT tracked FROM activities').first()).tracked, '["badger"]');
     await call('POST', '/api/test/skip-time', { cookie });
     assert.equal((await call('POST', '/api/hunts/claim', { cookie })).status, 200);
     // With no quest creature living there, nothing is tracked.
@@ -1556,6 +1556,24 @@ describe('Time Points and the narrator', () => {
     assert.equal(row.professions, professions);
   });
 
+  test('the Rzemieślnictwo chapter comes after all the others, and test mode starts it again', async () => {
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once;
+    const chapter = tutorial.lines.filter((line) => kept(line) && line.chapter === 'crafting').map((line) => line.id);
+    assert.deepEqual(chapter, ['crafting-welcome', 'crafting-patterns', 'crafting-ending']);
+    const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
+    assert.ok(at('crafting-welcome') > at('community-ending'));
+    assert.deepEqual(tutorial.chapters.crafting, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Rzemieślnictwo czeka w zakładce Profesje.' });
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    await see({ skip: true });
+    const before = (await see({ skip: true, chapter: 'skills' })).data.character.tutorial;
+    const read = (await see({ skip: true, chapter: 'crafting' })).data.character.tutorial;
+    assert.deepEqual(read, [...before, ...chapter]);
+    const again = await call('POST', '/api/test/crafting-tour', { cookie });
+    assert.equal(again.status, 200);
+    assert.deepEqual(again.data.character.tutorial, before);
+  });
+
   test('test mode starts the Społeczność chapter again', async () => {
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });
@@ -1789,9 +1807,16 @@ describe('Bestiariusz', () => {
   test('every inner region lists its creatures, and those fought become known', async () => {
     const { data } = await call('GET', '/api/content');
     const edge = data.regions[0].areas.find((area) => area.id === 'windfalls-edge');
-    assert.deepEqual(edge.dangers.map((danger) => danger.monsterId), ['wolf', 'fox', 'viper', 'badger', 'wisp']);
+    assert.deepEqual(edge.dangers.map((danger) => danger.monsterId), ['wolf', 'badger', 'wisp']);
     assert.deepEqual([edge.dangers[0].name, edge.dangers[0].minLevel, edge.dangers[0].maxLevel], ['Wilk', 1, 5]);
     assert.deepEqual(edge.dangers.at(-1).elite, true);
+    // Each with its chance of coming in a fight, met or not.
+    const chances = meetingChances(content.areasById['windfalls-edge'], content);
+    assert.deepEqual(edge.dangers.map((danger) => danger.chance), edge.dangers.map((danger) => chances.get(danger.monsterId)));
+    assert.ok(data.regions.every((region) => region.areas.every((area) => area.dangers.every((danger) => danger.chance > 0))));
+    // The whole land's list: every creature of its inner regions, no chances.
+    assert.equal(data.regions[0].dangers.length, 13);
+    assert.ok(data.regions[0].dangers.every((danger) => danger.chance === undefined && danger.name));
     assert.deepEqual((await call('GET', '/api/character', { cookie })).data.character.met, []);
     const { report, character } = await hunt();
     assert.ok(fought(report).length > 0);
@@ -1820,10 +1845,10 @@ describe('Bestiariusz', () => {
     assert.deepEqual(before.bestiary, []);
     assert.equal((await open('nowhere')).status, 404);
     const database = await db();
-    await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(['wolf', 'fox', 'viper', 'badger'])).run();
+    await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(['wolf', 'badger'])).run();
     const shut = await open('windfalls-edge');
     assert.deepEqual([shut.status, shut.data.error.code], [409, 'not_ready']);
-    await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(['wolf', 'fox', 'viper', 'badger', 'wisp'])).run();
+    await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(['wolf', 'badger', 'wisp'])).run();
     const opened = await open('windfalls-edge');
     assert.equal(opened.status, 200);
     assert.deepEqual(opened.data.chest, { gold: 30, timePoints: 5, systemPoints: 20 });
@@ -1835,6 +1860,31 @@ describe('Bestiariusz', () => {
     assert.deepEqual([again.status, again.data.error.code], [409, 'opened']);
     // Another inner region's list is not full with these.
     assert.equal((await open('fox-ravines')).data.error.code, 'not_ready');
+  });
+
+  test("a whole land's chest opens once every creature of its inner regions is met, once", async () => {
+    const { data } = await call('GET', '/api/content');
+    assert.deepEqual(data.regions[0].chest, { gold: 305, timePoints: 56, systemPoints: 25 });
+    const open = (region) => call('POST', '/api/bestiary/chest', { cookie, body: { region } });
+    assert.equal((await open('moon')).status, 404);
+    const all = data.regions[0].dangers.map((danger) => danger.monsterId);
+    const database = await db();
+    await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(all.slice(0, -1))).run();
+    const shut = await open('windfalls');
+    assert.deepEqual([shut.status, shut.data.error.code], [409, 'not_ready']);
+    assert.match(shut.data.error.message, /tej krainy/);
+    await database.prepare('UPDATE characters SET met = ?, bestiary = ?').bind(JSON.stringify(all), '[]').run();
+    const before = (await call('GET', '/api/character', { cookie })).data.character;
+    const opened = await open('windfalls');
+    assert.equal(opened.status, 200);
+    assert.deepEqual(opened.data.chest, { gold: 305, timePoints: 56, systemPoints: 25 });
+    assert.equal(opened.data.character.gold, before.gold + 305);
+    assert.equal(opened.data.character.timePoints, before.timePoints + 56);
+    assert.equal(opened.data.character.systemPoints, before.systemPoints + 25);
+    assert.deepEqual(opened.data.character.bestiary, ['windfalls']);
+    assert.equal((await open('windfalls')).data.error.code, 'opened');
+    // The inner regions' chests stay to open on their own.
+    assert.equal((await call('POST', '/api/bestiary/chest', { cookie, body: { area: 'windfalls-edge' } })).status, 200);
   });
 
   test('chests opened before the Punkty Systemu get them once, by the migration', async () => {
@@ -1881,13 +1931,16 @@ describe('Zadania od narratora', () => {
     await store(quests);
   }
 
-  test('a new character gets five daily and five weekly quests, which end at midnight Polish time', async () => {
+  // Skraj Wiatrołomów has two creatures: before the Stół rozbiórki a new
+  // character gets four quests a period (each creature, creatures of any
+  // kind and the time), the table's work makes it five.
+  test('a new character gets four daily and four weekly quests, which end at midnight Polish time', async () => {
     const created = await newCharacter(await signUp('ola'), 'mage', 'Ola');
-    assert.equal(created.data.character.quests.daily.quests.length, 5);
+    assert.equal(created.data.character.quests.daily.quests.length, 4);
     const view = (await character()).quests;
     const now = Date.now();
     for (const periodId of ['daily', 'weekly']) {
-      assert.equal(view[periodId].quests.length, content.quests.periods[periodId].count);
+      assert.equal(view[periodId].quests.length, 4);
       assert.equal(view[periodId].endsAt, questPeriod(periodId, now, content).endsAt);
       assert.ok(view[periodId].quests.every((quest) => quest.progress === 0 && !quest.done && !quest.claimed && quest.text.endsWith('.')));
       assert.deepEqual(view[periodId].chest, { ...content.quests.periods[periodId].chest, ready: false, opened: false });
@@ -1907,7 +1960,8 @@ describe('Zadania od narratora', () => {
       for (const enemy of fight.enemies) beaten[enemy.monsterId] = (beaten[enemy.monsterId] ?? 0) + 1;
     }
     for (const quest of [...after.quests.daily.quests, ...after.quests.weekly.quests]) {
-      const expected = quest.kind === 'kill' ? (beaten[quest.monsterId] ?? 0) : quest.kind === 'explore' ? 30 : 0;
+      const all = Object.values(beaten).reduce((sum, count) => sum + count, 0);
+      const expected = quest.kind === 'kill' ? (beaten[quest.monsterId] ?? 0) : quest.kind === 'killAny' ? all : quest.kind === 'explore' ? 30 : 0;
       assert.equal(quest.progress, Math.min(quest.count, expected), quest.text);
     }
   });
@@ -1945,7 +1999,7 @@ describe('Zadania od narratora', () => {
     const parts = (await claim('daily', 2)).data.character.crafting.parts.find((part) => part.id === 'scraps').count;
     assert.equal(parts, 2);
     const after = await character();
-    assert.deepEqual(after.quests.daily.quests.map((quest) => quest.claimed), [true, true, true, false, false]);
+    assert.deepEqual(after.quests.daily.quests.map((quest) => quest.claimed), [true, true, true, false]);
     assert.equal((await claim('monthly', 0)).status, 400);
     assert.equal((await claim('daily', 9)).status, 404);
     assert.equal((await claim('daily', '0')).status, 404);
@@ -1959,7 +2013,12 @@ describe('Zadania od narratora', () => {
       { kind: 'resource', id: 'iron-ore', amount: 3 },
       { kind: 'part', id: 'scraps', amount: 2 },
     ];
-    quests.daily.quests = quests.daily.quests.map((quest, index) => ({ ...quest, progress: index < 4 ? quest.count : 0, reward: rewards[index] ?? quest.reward }));
+    // Five quests, as with the Stół rozbiórki standing; the fifth not done.
+    quests.daily.quests = [...quests.daily.quests, quests.daily.quests[0]].map((quest, index) => ({
+      ...quest,
+      progress: index < 4 ? quest.count : 0,
+      reward: rewards[index] ?? quest.reward,
+    }));
     await store(quests);
     const before = await character();
     assert.equal((await claim('daily', 3)).status, 200);
@@ -2046,7 +2105,7 @@ describe('Zadania od narratora', () => {
     assert.equal(now.daily.period, questPeriod('daily', Date.now(), content).key);
     assert.deepEqual(now.weekly, week);
     await (await db()).prepare("UPDATE characters SET quests = '{}'").run();
-    assert.equal((await character()).quests.weekly.quests.length, 5);
+    assert.equal((await character()).quests.weekly.quests.length, 4);
     assert.ok((await stored()).weekly.period);
   });
 });

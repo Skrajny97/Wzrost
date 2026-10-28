@@ -52,12 +52,16 @@ export const areaUnlockLevel = (area, content) => Math.max(1, area.minLevel - co
 
 export const areaUnlocked = (area, classLevel, content) => classLevel >= areaUnlockLevel(area, content);
 
+// A module's System message shows only where its part of the game is on
+// (`feature`, in content.features).
+const told = (unlock, content) => unlock.message && (!unlock.feature || (content.features ?? []).includes(unlock.feature));
+
 // System messages for the modules that open exactly at this level.
 export function unlockMessages(level, content) {
-  return content.unlocks.filter((unlock) => unlock.level === level && unlock.message).map((unlock) => unlock.message);
+  return content.unlocks.filter((unlock) => unlock.level === level && told(unlock, content)).map((unlock) => unlock.message);
 }
 
 // The same for the modules a class level opens.
 export function classUnlockMessages(classLevel, content) {
-  return content.unlocks.filter((unlock) => unlock.classLevel === classLevel && unlock.message).map((unlock) => unlock.message);
+  return content.unlocks.filter((unlock) => unlock.classLevel === classLevel && told(unlock, content)).map((unlock) => unlock.message);
 }

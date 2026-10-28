@@ -24,6 +24,10 @@
     "community": {
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Społeczność czeka w zakładce Społeczność."
+    },
+    "crafting": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Rzemieślnictwo czeka w zakładce Profesje."
     }
   },
   "lines": [
@@ -629,6 +633,38 @@
         "A gdy zabraknie Ci czasu na długą wyprawę, sięgnij po Szybkie Polowanie. Czeka w Walce, pod „Wyrusz” – trzy razy dziennie."
       ],
       "voice": "audio/narration/community-ending.mp3"
+    },
+    {
+      "id": "crafting-welcome",
+      "kind": "card",
+      "chapter": "crafting",
+      "text": [
+        "Piętnasty poziom postaci… System otworzył przed Tobą Rzemieślnictwo."
+      ]
+    },
+    {
+      "id": "crafting-lead",
+      "kind": "lead",
+      "chapter": "crafting",
+      "text": [
+        "Systemowy Warsztat czeka w zakładce Profesje. Zajrzyjmy tam."
+      ]
+    },
+    {
+      "id": "crafting-patterns",
+      "kind": "point",
+      "chapter": "crafting",
+      "text": [
+        "Tu wykonasz broń i pancerz według wzorów. Części do nich uzyskasz przy Stole rozbiórki albo kupisz u złomiarza."
+      ]
+    },
+    {
+      "id": "crafting-ending",
+      "kind": "card",
+      "chapter": "crafting",
+      "text": [
+        "Każdy nowy poziom Rzemieślnictwa odsłoni Ci kolejne wzory. Zajrzyj tu też, gdy rozbierzesz na części wcześniej nierozbierany przedmiot."
+      ]
     }
   ]
 }

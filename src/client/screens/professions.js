@@ -1119,7 +1119,7 @@ export function mountProfessions(container, { params, navigate }) {
     show();
     return h(
       'section',
-      { class: 'card gather-card', 'aria-labelledby': 'patterns-title' },
+      { class: 'card gather-card', 'aria-labelledby': 'patterns-title', 'data-guide': 'workshop-patterns' },
       h('h2', { class: 'section-title', id: 'patterns-title', text: 'Wzory' }),
       who.element,
       slotRow,

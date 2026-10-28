@@ -2210,3 +2210,51 @@ Krok 2 z planu w „Rzemieślnictwo: odpowiedzi autora” (R8, R14–R19), na ra
 7. **Dzienny limit części** (R15, autor: „30-20-10 itd.”). Złomiarz sprzeda postaci dziennie najwyżej 30 Ścinków, 20 Rzemieni, 10 Okuć, 5 Odłamków, 3 Bursztyny, 2 Krwawniki i 1 Gwiezdny odprysk (`daily` w `data/buildings.json`). Doba liczy się od północy czasu polskiego, jak u ducha ognia. Przy każdej części lada pokazuje „Dziś zostało: N z M”, a przyciski zakupu ponad limit są wyłączone.
 8. **Migracja 0045**: w `characters` kolumny `scrolls`, `patterns`, `shop_day` i `shop_parts`.
 9. **Co zostaje na krok 3:** nowa nazwa Stołu rzemieślniczego z kwestią narratora, tło Warsztatu, dźwięki młota i nieudanego wyrobu, objaśnienie narratora na 15. poziomie i komunikat Systemu. Każda z tych rzeczy czeka na zatwierdzenie autora, a Rzemieślnictwo trafi do gry po nich.
+
+## Rzemieślnictwo, krok 3: objaśnienie narratora na 15. poziomie i komunikat Systemu (28.10.2026)
+
+1. **Rozdział `crafting`** w `data/tutorial.json` ma cztery kwestie z tekstami zatwierdzonymi przez autora: powitanie, prowadzenie do zakładki Profesje, wskazanie sekcji Wzory w Systemowym Warsztacie i zakończenie. Zaczyna się, gdy postać ma otwarty Warsztat (15. poziom postaci, Rzemieślnictwo włączone) i skończyła wcześniejsze rozdziały: Umiejętności, Profesje i Społeczność. Kto go pominie, widzi: „Objaśnienie pominięte. Rzemieślnictwo czeka w zakładce Profesje.”, na wzór pozostałych rozdziałów.
+2. **Komunikat Systemu na 15. poziomie:** „Odblokowano Rzemieślnictwo. Systemowy Warsztat czeka w zakładce Profesje.” (zatwierdzony przez autora). Pojawia się tylko tam, gdzie Rzemieślnictwo działa (`feature: "crafting"` w `data/unlocks.json`). W grze, gdzie `CRAFTING` jest jeszcze `"off"`, go nie ma.
+3. **Testuj samouczki** ma wiersz „Objaśnienie Rzemieślnictwa”, od 15. poziomu.
+4. **Czeka na autora:** wybór nagrań czterech kwestii na stronie odsłuchu, szkic tła Warsztatu (1, 2 albo 3) i dźwięki udanego i nieudanego wyrobu. Rzemieślnictwo trafi do gry po tych wyborach.
+
+## Potwory: co najmniej dwa własne stwory w każdym regionie wewnętrznym (28.10.2026)
+
+Autor: „Każda kraina musi mieć chociaż 2 unikalne postaci, bo inaczej Bestiariusza nie ma sensu. Może być potworów mniej w lokacji, ale niech się różnią. To trzeba zastosować do wszystkich krain i regionów.”
+
+1. **Nowy podział** (`data/regions.json`). Każdy zwykły stwór żyje teraz w jednym regionie wewnętrznym:
+    - Skraj Wiatrołomów: wilk, borsuk;
+    - Lisie Jary: lis, kuna;
+    - Krucze Wykroty: kruk, puszczyk (kruki częściej parami i trójkami);
+    - Żmijowe Zwalisko: żmija, szerszenie;
+    - Dzicza Głusza: dzik, jeleń, a do tego czempion odyniec;
+    - Omszałe Głazy: kamiennik, gacek;
+    - Pajęczy Parów: krzyżak;
+    - Rysia Grań: ryś, puchacz;
+    - Wilcze Kręgi: wadera, basior;
+    - Serce Uroczyska: niedźwiedź, a do tego czempion bazyliszek.
+   Elity zostają, jak były: Błędnica, Płanetnik i Licho. Opisy regionów wewnętrznych mówią teraz o ich stworach.
+2. **Pajęczy Parów** ma na razie jednego własnego stwora. Uroczysko ma 8 zwykłych stworów i czempiona na 5 regionów wewnętrznych, więc dwóch na każdy nie starcza. Pierwszy nowy stwór Uroczyska trafi do Parowu. Test pilnuje dwóch własnych stworów wszędzie poza nim.
+3. **Basior** dostał przymiotnik „Basiorowy, Basiorowa, Basiorowe” (`data/affixes.json`), bo w każdym miejscu musi żyć stwór z przymiotnikiem do nazw przedmiotów. Przy dwóch–trzech stworach w miejscu trzecia i dalsze właściwości przedmiotu mogą powtórzyć stwora, ale nazwa przedmiotu (pierwszy przymiotnik i pierwsza końcówka) nigdy nie ma jednego stwora dwa razy.
+4. **Równowaga** (symulacja, 1000 wypraw na wiersz, przed i po):
+    - wyprawy 30-minutowe: XP na godzinę na poziomach 1–8 bez zmian w granicach kilku procent, na 12. poziomie o ok. 5% mniej, na 23. o ok. 13% więcej, na 48. o ok. 13% więcej; omdlenia wszędzie poniżej 1,5%;
+    - wyprawy 2-godzinne na 38–48. poziomie: omdlenia jak dotąd w granicach 1–2 pkt proc., Mag na 43. poziomie w Wilczych Kręgach ok. 10% (wcześniej ok. 9%). Basior przychodzi tam rzadziej niż wadera, żeby Mag nie mdlał częściej.
+5. **Zadania.** Mniej stworów w miejscu to mniej zadań „Pokonaj…”. Doszedł rodzaj „Pokonaj łącznie N stworów.” (`killAny` w `data/quests.json`), dzienny i tygodniowy, liczony z walk jak zwykłe zadania ze stworami i tak samo pomijany w miejscach za łatwych dla postaci. Nowa postać ma więc 4 zadania na okres (oba stwory Skraju, wszystkie stwory i czas wypraw), a 5 od postawienia Stołu rozbiórki.
+
+## Bestiariusz: szanse spotkania i Bestiariusz całej krainy (28.10.2026)
+
+Autor: „Dodajmy też standardowe procentowe możliwości spotkania danego stwora w Bestiariuszu bez włączenia tropień konkretnych (nie trzeba o tym informować gracza czego tyczą się procenty) i to przed odblokowaniem (spotkaniem danego stwora)”. I: „zrób też Bestiariusz główny dla danej krainy głównej ze wszystkimi stworami. Jak ktoś odblokuje cały Bestiariusz krainy głównej np. Wiatrołomy to dostaje ze skrzyni przy tej krainie troche wiecej niz z ostatniego regionu odpowiednich zasobów”.
+
+1. **Procenty.** Każdy stwór na liście regionu wewnętrznego ma szansę, że przyjdzie w jednej walce wyprawy 30-minutowej (`chanceMinutes` w `bestiary` w `data/balance.json`). Liczą się wszystkie spotkania miejsca, jak na jego najwyższym poziomie, a tropienie stworów z zadań, „Trop elity i czempiony” i unikanie elit są wyłączone. Silnik liczy szanse tak, jak losuje spotkania (`meetingChances`): najpierw czempion, potem elita, potem trudne spotkanie, a na końcu zwykłe. Test porównuje je z 40 000 losowań. Stwór dwa razy w jednej grupie liczy się raz, więc procenty stworów sumują się do ponad 100%. Procent widać od razu, także przy cieniu nieznanego stwora, bez opisu, czego dotyczy. Od 10% w górę jest w pełnych procentach, poniżej z jednym miejscem po przecinku, np. „0,5%”.
+2. **Bestiariusz krainy** jest na ekranie krainy (Walka, potem np. Wiatrołomy), nad kołami regionów wewnętrznych. Ma wszystkie stwory jej regionów: zwykłe w kolejności miejsc, potem elity i czempion, każdy z poziomami z całej krainy (np. Błędnica 6–16). Procentów tu nie ma, bo każdy region wewnętrzny ma inne.
+3. **Skrzynia krainy** daje o jedną czwartą więcej niż skrzynia jej ostatniego regionu wewnętrznego (`landFactor` 1,25), złoto zaokrąglone do 5:
+    - Wiatrołomy: 305 złota, 56 Punktów Czasu i 25 Punktów Systemu (Dzicza Głusza: 245, 45 i 20);
+    - Uroczysko Kamieni: 750 złota, 119 Punktów Czasu i 25 Punktów Systemu (Serce Uroczyska: 600, 95 i 20).
+   Otwiera się raz, gdy postać pozna wszystkie stwory krainy, niezależnie od skrzyń regionów wewnętrznych. Otwarte skrzynie krain zapisują się w tej samej liście co skrzynie regionów (`bestiary`, po id krainy), więc migracja nie była potrzebna.
+
+## Sklep Systemu: miejsce w górnym pasku (28.10.2026)
+
+Autor: „tu zostawiamy miejsce na Sklep Systemu na razie tylko jakąś specjalną ikonę i zablokowane kłódką jak Rdzeń, a po kliknięciu komunikat "Sklep Systemu dojdzie w jednej z kolejnych aktualizacjach"”.
+
+1. Obok twarzy narratora, przed złotem, stoi ikona straganu ze znakiem Systemu, przygaszona, z kłódką w rogu jak przy Rdzeniu. Stuknięcie pokazuje: „Sklep Systemu dojdzie w jednej z kolejnych aktualizacji.” Końcówka „aktualizacji” jest poprawiona z „aktualizacjach”, tak jak w komunikacie zablokowanych modułów.
+2. Odznaka klasy w górnym pasku skraca teraz samą nazwę klasy, a jej poziom zawsze widać, np. „WOJOW… 42”. Wcześniej na wąskim telefonie znikał numer.

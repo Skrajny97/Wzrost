@@ -802,7 +802,7 @@
     },
     "bestiary": {
       "type": "object",
-      "description": "Skrzynia Bestiariusza regionu wewnętrznego: otwiera się, gdy postać pozna wszystkie stwory z jego listy. Złoto rośnie po krzywej z najwyższym poziomem regionu: złoto pierwszego × (poziom / baseLevel) ^ growth. Punkty Czasu rosną o stałą liczbę z każdym kolejnym regionem: timePoints + timePointsStep × (poziom / baseLevel − 1). Punkty Systemu są te same w każdej skrzyni (systemPoints).",
+      "description": "Skrzynia Bestiariusza regionu wewnętrznego: otwiera się, gdy postać pozna wszystkie stwory z jego listy. Skrzynia całej krainy: landFactor. Złoto rośnie po krzywej z najwyższym poziomem regionu: złoto pierwszego × (poziom / baseLevel) ^ growth. Punkty Czasu rosną o stałą liczbę z każdym kolejnym regionem: timePoints + timePointsStep × (poziom / baseLevel − 1). Punkty Systemu są te same w każdej skrzyni (systemPoints).",
       "additionalProperties": false,
       "required": [
         "gold",
@@ -811,7 +811,9 @@
         "systemPoints",
         "baseLevel",
         "growth",
-        "goldStep"
+        "goldStep",
+        "landFactor",
+        "chanceMinutes"
       ],
       "properties": {
         "gold": {
@@ -848,6 +850,16 @@
           "type": "integer",
           "minimum": 1,
           "description": "Złoto zaokrągla się do wielokrotności tej liczby."
+        },
+        "landFactor": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Skrzynia Bestiariusza całej krainy (wszystkie stwory jej regionów wewnętrznych) daje tyle razy więcej złota, Punktów Czasu i Punktów Systemu niż skrzynia jej ostatniego regionu wewnętrznego."
+        },
+        "chanceMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Procenty w Bestiariuszu: szansa spotkania stwora w jednej walce wyprawy tej długości, bez tropienia, szukania i unikania."
         }
       }
     },

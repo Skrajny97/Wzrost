@@ -16,10 +16,10 @@
 // narrator's: it neither scrolls nor takes a tap, also between the lines.
 // After the introduction come its chapters (a line's `chapter`), each at its
 // moment of the game: the Umiejętności at class level 10, the Profesje at
-// character level 10, never before the Umiejętności, and the Społeczność at
-// character level 5, after both when they wait. A chapter's own "Pomiń"
-// passes only that chapter, and a line can be told for each class
-// (`classes`).
+// character level 10, never before the Umiejętności, the Społeczność at
+// character level 5, after both when they wait, and the Rzemieślnictwo at
+// character level 15, after all the others. A chapter's own "Pomiń" passes
+// only that chapter, and a line can be told for each class (`classes`).
 
 import { narratorSprite } from './art.js';
 import { aim } from './camera.js';
@@ -87,6 +87,26 @@ function onOpenArea(hash) {
   return Boolean(area && state.character.quickHunts) && !state.character.activity && state.character.classLevel >= area.unlockClassLevel;
 }
 const quickHuntHere = (hash, read) => onOpenArea(hash) && communityTour(hash, read) && read.has('community-rules');
+
+// The Rzemieślnictwo chapter: once the Warsztat opens (character level 15,
+// where the game has Rzemieślnictwo), after the report that brought it there
+// and only when no other chapter waits. Not on the character's screens
+// either. It leads to the Profesje tab, from where the narrator itself opens
+// the Warsztat, points at its patterns and ends there.
+const onWorkshop = (hash) => hash === '#/profesje/rzemieslnictwo';
+const communityWaiting = (read) => isUnlocked('community') && !read.has('community-ending');
+const craftingDue = (hash, read) =>
+  Boolean(state.character.professions?.workshop) &&
+  !onReport(hash) &&
+  !onCharacter(hash) &&
+  !skillsWaiting(read) &&
+  !professionsWaiting(read) &&
+  !communityWaiting(read) &&
+  !read.has('crafting-ending');
+const craftingTour = (hash, read) => craftingDue(hash, read) && read.has('crafting-welcome');
+const craftingHere = (hash, read) => onWorkshop(hash) && craftingTour(hash, read);
+// From the Profesje tab, which the lead opens, on to the Warsztat.
+const craftingTrip = (hash, read) => (hash === '#/profesje' && craftingTour(hash, read) && !read.has('crafting-patterns') ? '#/profesje/rzemieslnictwo' : null);
 // From the chat only right after its rules, so a later visit stays there.
 const quickHuntTrip = (hash, read, passed) =>
   ((onCommunity(hash) && passed === 'community-rules') || hash.startsWith('#/walka')) &&
@@ -226,6 +246,11 @@ const BEATS = {
   },
   'community-rules': { place: mark('community-rules'), when: communityHere },
   'community-ending': { place: mark('quick-hunt'), go: quickHuntTrip, when: quickHuntHere },
+  // The Rzemieślnictwo chapter, after all the others.
+  'crafting-welcome': { when: craftingDue },
+  'crafting-lead': { place: '.nav-item[href="#/profesje"]', when: (hash, read) => craftingTour(hash, read) && !hash.startsWith('#/profesje') },
+  'crafting-patterns': { place: mark('workshop-patterns'), go: craftingTrip, when: craftingHere },
+  'crafting-ending': { when: craftingHere },
 };
 
 let place = '#/walka';
