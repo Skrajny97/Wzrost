@@ -1032,8 +1032,8 @@
   },
   {
     "id": "mud-lord",
-    "name": "Błotnik",
-    "counted": ["błotnika", "błotniki", "błotników"],
+    "name": "Król Błót",
+    "counted": ["Króla Błót", "Królów Błót", "Królów Błót"],
     "family": "stone",
     "position": "front",
     "champion": true,

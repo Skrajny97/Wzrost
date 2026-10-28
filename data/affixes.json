@@ -89,6 +89,6 @@
     { "monster": "peat-cutter", "prefix": { "m": "Torfiarski", "f": "Torfiarska", "n": "Torfiarskie", "pl": "Torfiarskie" }, "suffix": "Torfiarza" },
     { "monster": "bog-worm", "suffix": "Czerwia" },
     { "monster": "kikimora", "suffix": "Kikimory" },
-    { "monster": "mud-lord", "prefix": { "m": "Bagienny", "f": "Bagienna", "n": "Bagienne", "pl": "Bagienne" }, "suffix": "Błotnika" }
+    { "monster": "mud-lord", "prefix": { "m": "Bagienny", "f": "Bagienna", "n": "Bagienne", "pl": "Bagienne" }, "suffix": "Króla Błót" }
   ]
 }

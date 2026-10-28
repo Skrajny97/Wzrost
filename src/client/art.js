@@ -67,6 +67,15 @@ export const SPRITES = {
     size: 48,
     ids: ['power-strike', 'wide-sweep', 'unyielding', 'aimed-shot', 'arrow-rain', 'pinning-shot', 'fireball', 'frost-gust', 'mana-shield', 'prayer-of-health', 'exorcism', 'blessing', 'backstab', 'poisoned-blade', 'shadow-dance'],
   },
+  // The character walking in place on the Walka scene, <class>-<look>: four
+  // frames of 48×48 in a row, facing right, drawn from the portraits. A skin
+  // tone other than the one drawn has its own recoloured file, as a portrait
+  // does (tools/walker-tones.py).
+  walkers: {
+    width: 192,
+    height: 48,
+    ids: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
+  },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
   narrator: {
     width: 96,
@@ -168,15 +177,19 @@ export const potionSprite = (id) => sprite('potions', id, 'sprite--item');
 export const professionSprite = (id) => sprite('professions', id, 'sprite--profession');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 
+// A skin tone other than the one drawn has its own recoloured file
+// (data/skins.json, tools/skin-tones.py).
+function toneFile(id, skin) {
+  const tone = state.content?.skins?.tones.find((candidate) => candidate.id === skin);
+  return tone && !tone.drawn ? `${id}-${tone.id}` : id;
+}
+
 // A class's figure for a look. `bust` shows the head and shoulders at the
 // image's own size, cut by the box it sits in (the arena, the class cards).
 export function portraitSprite(classId, appearance, { bust = false, skin } = {}) {
   const id = `${classId}-${appearance}`;
   if (!available.portraits.has(id)) return null;
-  // A skin tone other than the portrait as drawn has its own recoloured file
-  // (data/skins.json, tools/skin-tones.py).
-  const tone = state.content?.skins?.tones.find((candidate) => candidate.id === skin);
-  const file = tone && !tone.drawn ? `${id}-${tone.id}` : id;
+  const file = toneFile(id, skin);
   const { width, height, faces } = SPRITES.portraits;
   const off = bust ? (faces[id] ?? width / 2) - width / 2 : 0;
   return h('img', {
@@ -189,6 +202,14 @@ export function portraitSprite(classId, appearance, { bust = false, skin } = {})
     decoding: 'async',
     draggable: 'false',
   });
+}
+
+// The sheet of the character walking in its look and skin tone, as a path
+// from the site's root like the scenes' sheets (data/animations.json), or
+// null for a look without one.
+export function walkerSheet(classId, appearance, skin) {
+  const id = `${classId}-${appearance}`;
+  return available.walkers.has(id) ? `art/walkers/${toneFile(id, skin)}.png` : null;
 }
 
 // The narrator's hooded face, for the quests in the top bar (quests.js).

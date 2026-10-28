@@ -187,4 +187,6 @@ def main():
         sheet.save(sys.argv[sys.argv.index('--mask') + 1])
 
 
-main()
+# tools/walker-tones.py takes the portraits' skin from here.
+if __name__ == '__main__':
+    main()

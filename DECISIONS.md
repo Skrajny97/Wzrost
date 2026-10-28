@@ -2038,7 +2038,7 @@ Trzecia część wprowadzenia, po Umiejętnościach (W3, W4). Kwestie narratora 
     - postęp przy scenie: z upływem pracy w koszu przybywa ziół, na półce mikstur, na stole gotowych rzeczy,
     - w Walce tło zależy od krainy wyprawy, a w oddali czasem przemknie sylwetka stwora z Bestiariusza.
 
-    Sylwetka w stroju klasy postaci odpada (autor: „zeby sylwetka postaci tam w walce szła to byłoby pewnie za drogo”).
+    Sylwetka w stroju klasy postaci odpada (autor: „zeby sylwetka postaci tam w walce szła to byłoby pewnie za drogo”). *Teraz jest: zob. „Król Błót, nowy Pajęczy wylęg i postać gracza w Walce”, punkt 4.*
 
 ## Animacje oczekiwania w grze (27.10.2026)
 
@@ -2377,7 +2377,7 @@ Autor rozpisał stwory regionów Rozlewisk w dokumencie z propozycjami („Insig
 
 1. **Dwie krainy Torfowisk** (`data/regions.json`, `land` Torfowiska), każda z 5 regionami po 5 poziomów. Otwierają się jak wcześniejsze: region na poziomie klasy o jeden niższym niż jego pierwszy poziom, Trzcinowisko na 50.
     - **Zarośnięte Rozlewiska** (51–75): Trzcinowisko, Bobrowe Tamy, Zatopiony Las, Wierzbowe Kępy, Stare Koryto. Elita to Topielica w całej krainie, czempion to Wodnik w Starym Korycie. Cecha „Szuwary”: postać z tyłu szyku ma o 5% więcej uniku (`backDodgeBonus`). Zasoby: drewno 4, kamień 2, ruda żelaza 4.
-    - **Torfowe Mszary** (76–100): Żurawie Łąki, Pijawkowe Oczka, Rosiczkowe Pole, Tlące się Torfy, Stare Wyrobisko. Elita to Kikimora w całej krainie, czempion to Błotnik w Starym Wyrobisku. Cecha „Opary torfu”: Zatrucie trwa o jeden ruch dłużej, u stworów i u postaci (`effectTicks`), więc zyskuje też Zatrute ostrze Cienia. Zasoby: drewno 2, kamień 3, ruda żelaza 5.
+    - **Torfowe Mszary** (76–100): Żurawie Łąki, Pijawkowe Oczka, Rosiczkowe Pole, Tlące się Torfy, Stare Wyrobisko. Elita to Kikimora w całej krainie, czempion to Błotnik (*teraz Król Błót*) w Starym Wyrobisku. Cecha „Opary torfu”: Zatrucie trwa o jeden ruch dłużej, u stworów i u postaci (`effectTicks`), więc zyskuje też Zatrute ostrze Cienia. Zasoby: drewno 2, kamień 3, ruda żelaza 5.
 2. **Stwory Rozlewisk** są z listy autora, a pozycje, ataki i materiały uzupełnione (rzadkość materiału w nawiasie):
     - Trzcinowisko: Czapla (tył, Pchnięcie dziobem; Pióro czapli, rzadki), Wydra (przód, Ugryzienie wydry; Futro wydry, unikalny; też w Zatopionym Lesie), Komarzysko (tył, Kłujka z Wysysaniem; Kłujka komarzyska, pospolity), Trzcinownik (środek, Oplatające trzciny, magia natury z Ugrzęźnięciem; Splot trzcin, rzadki);
     - Bobrowe Tamy: Bóbr (przód, Siekacze, gruby kożuch; Siekacze bobra, rzadki), Chmara komarów (tył, Ukąszenia z Zatruciem, po dwie i trzy; Komarze skrzydełka, pospolity), Węgorz (środek, Wyładowanie, magia elektryczności; Skóra węgorza, unikalny), Orzeł (tył, Szpony orła; Pióro orła, unikalny);
@@ -2442,3 +2442,16 @@ Autor: „Skoro z Krzyżaka zrobiłeś Pająka to trzeba dodać jeszcze jednego 
     - HP, obrażenia i XP ma między Pająkiem a Tarantulą, a pancerz słaby, bo pajączki są miękkie.
 2. **Materiał: „Pajęcze wylinki”** (rzadki), czyli puste skorupki, które młode pająki zrzucają, gdy rosną. W nazwach przedmiotów: „Wylęgu”.
 3. **Spotkania w Parowie:** wylęg sam albo z Pająkiem, a w trudnych walkach dwa wylęgi z Pająkiem. Symulacja na 33. poziomie: omdleń brak, poziom trwa ok. 5% krócej niż w krzywej. Parów ma teraz cztery własne stwory.
+
+## Król Błót, nowy Pajęczy wylęg i postać gracza w Walce (28.10.2026)
+
+1. **Król Błót** (autor: „nazwa Błotnik(czempion) na Król Błót(czempion)”). Czempion Torfowych Mszarów nazywa się teraz Król Błót. Identyfikator `mud-lord`, materiał, okrzyki i grafika zostają. Zadania liczą go jako „Króla Błót” i „Królów Błót”, a przyrostek przedmiotów brzmi „Króla Błót”, także na przedmiotach zdobytych wcześniej, bo przedmiot pamięta stwora, a nie jego nazwę.
+2. **Nowy Pajęczy wylęg** (autor: „Do zmiany: Ikonka pajęczego wylęgu”). Zamiast rozdartego kokonu rysunek pokazuje chmarę sześciu młodych, jasnobrązowych pająków. Ikona Pajęczych wylinek zostaje (autor: „cala reszta dzwiekow, ikonek materiałów, stworów itp gra”).
+3. **Tło Walki w nowych krainach.** Scena wyprawy w Zarośniętych Rozlewiskach i Torfowych Mszarach nie miała przesuwanej krainy. Pasy powstały tak jak dla Wiatrołomów i Uroczyska: zatwierdzone tło karty krainy i jego lustrzane odbicie (384 × 96).
+4. **Postać gracza w Walce** (autor: „i jedna ważna zmiana o której rozmawialiśmy, a odstawiliśmy na pozniej - moze warto teraz ja juz zacząć i zrobić”, przy uwadze kuzyna, że ludek na wyprawie mógłby być postacią gracza).
+    - W scenie wyprawy idzie teraz postać gracza: jej klasa i wygląd, jak na portrecie startowym, i jej kolor skóry. Postać Systemu zostaje dla wyglądu bez rysunku chodu.
+    - Każdy z 10 portretów (5 klas, 2 wyglądy) ma animację chodu z Retro Diffusion (`rd_animation__four_angle_walking`, 48 × 48, 4 klatki w prawo). Obrazkiem startowym jest portret zmniejszony do 48 × 48 (`art/references/animations/walk-*.png`), więc chód zachowuje włosy, strój i barwy portretu. Z dwóch wersji każdej postaci w grze jest ta bliższa portretowi.
+    - Koszt: 20 animacji po 0,07 USD, razem 1,40 USD. Wcześniejsza obawa, że to za drogo, się nie sprawdziła.
+    - Kolory skóry: `tools/walker-tones.py` przemalowuje skórę chodu na 7 pozostałych odcieni, tak jak `tools/skin-tones.py` portrety. Barwy skóry każdej postaci są wybrane ręcznie z jej palety, bo w tak małym rysunku włosy, skóra i pas mają bliskie kolory. Kolor, który Mag dzieli z włosami, liczy się jako skóra dopiero poniżej linii włosów.
+    - Pliki leżą w `src/client/art/walkers/` (`<klasa>-<wygląd>.png` i `<klasa>-<wygląd>-<odcień>.png`). Walidator pilnuje, żeby żadnego odcienia nie brakowało.
+5. **Kowadło pod płótnem** (kuzyn autora o obozie: „trochę wyrwane”, dwie ściany nie pasują do obozu, „może bardziej w namiotu pójść”; autor: domki później, w Osadzie z NPC). Kowadło na poziomach 4–7 i 8–10 to jedyne budynki obozu bez dachu, z dwiema ścianami jak wycięte z domu. Szkice kuźni pod płócienną płachtą i dużego namiotu kowalskiego czekają na decyzję autora. Do tego czasu zostają obecne grafiki.

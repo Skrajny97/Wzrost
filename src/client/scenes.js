@@ -6,7 +6,7 @@
 // rare moment: a bird crossing the sky, steam from the cauldron, sparks from
 // the hammer, or the shadow of a creature of the place passing far away.
 
-import { herbSprite, itemSprite, monsterSprite, placeArt, potionSprite } from './art.js';
+import { herbSprite, itemSprite, monsterSprite, placeArt, potionSprite, walkerSheet } from './art.js';
 import { h } from './dom.js';
 import { motionOn } from './motion.js';
 import { state } from './state.js';
@@ -64,11 +64,15 @@ export function workScene(professionId, activity, { avatar = false } = {}) {
   return { element: h('div', { class: 'scene', 'aria-hidden': 'true' }, stage, shelf.element), update: shelf.update };
 }
 
-// The Walka scene of an exploration under way.
+// The Walka scene of an exploration under way: the character in its own look
+// and skin tone, or the System's figure for a look not drawn walking yet.
 export function walkScene(activity) {
   const walk = config()?.walk;
   if (!walk) return null;
-  const stage = h('div', { class: `scene-walk scene--${dayPart()}` }, h('div', { class: 'scene-path' }), frames(walk.figure, 'scene-walker'));
+  const { classId, appearance, skin } = state.character ?? {};
+  const own = walkerSheet(classId, appearance, skin);
+  const figure = own ? { ...walk.figure, file: own } : walk.figure;
+  const stage = h('div', { class: `scene-walk scene--${dayPart()}` }, h('div', { class: 'scene-path' }), frames(figure, 'scene-walker'));
   const land = walk.lands[activity.regionId];
   if (land) stage.style.setProperty('--land', `url("/${land}")`);
   stage.style.setProperty('--land-width', `${LAND.width * SCALE}px`);

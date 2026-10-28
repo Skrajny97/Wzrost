@@ -102,6 +102,8 @@ test('every sprite on the list has its file at its size, and every class has its
     monsters: data('monsters').map((monster) => monster.id),
     items: data('item-bases').map((base) => base.id),
     portraits: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
+    // The character walking on the Walka scene, one sheet for each portrait.
+    walkers: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     // The introduction's one narrator (narrator.js).
     narrator: ['narrator'],
     // Materials, parts and the treasure chest of the report.
