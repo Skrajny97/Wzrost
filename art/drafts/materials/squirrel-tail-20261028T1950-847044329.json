@@ -1,0 +1,25 @@
+{
+  "id": "squirrel-tail",
+  "payload": {
+    "prompt": "fluffy red squirrel tail, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 847044329,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793217048,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 69.12,
+    "request_id": "e962bd3b-e87d-411c-98b5-4f0448c2b2cc",
+    "outputs_retained_until": 1793303405
+  }
+}

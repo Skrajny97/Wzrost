@@ -1,0 +1,25 @@
+{
+  "id": "living-moss",
+  "payload": {
+    "prompt": "small clump of glowing green living moss, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 186767019,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793217470,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 67.32,
+    "request_id": "0a27e596-0350-4348-8dc2-71df2b6bb089",
+    "outputs_retained_until": 1793303842
+  }
+}

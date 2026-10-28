@@ -1,0 +1,25 @@
+{
+  "id": "antlion-jaws",
+  "payload": {
+    "prompt": "pair of curved sickle-shaped sandy brown insect mandibles, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 501453098,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793217167,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 68.58,
+    "request_id": "3d34e5c5-0bba-405a-b4be-78b73b99b35e",
+    "outputs_retained_until": 1793303537
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "stag-beetle-horn",
+  "payload": {
+    "prompt": "single glossy red-brown stag beetle mandible shaped like a small antler, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 753542054,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793217320,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 68.04,
+    "request_id": "4fd70740-3e0c-4963-a04b-67de1bdc322e",
+    "outputs_retained_until": 1793303679
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "black-stork-feather",
+  "payload": {
+    "prompt": "long glossy black stork feather, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 395008617,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793217441,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 67.5,
+    "request_id": "f50707ad-9f78-4893-b318-f8af0aaf2dc7",
+    "outputs_retained_until": 1793303796
+  }
+}
