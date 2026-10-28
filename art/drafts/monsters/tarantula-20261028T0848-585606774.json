@@ -1,0 +1,25 @@
+{
+  "id": "tarantula",
+  "payload": {
+    "prompt": "big hairy wolf spider tarantula with brown and grey banded legs, a thick furry body and a row of glinting eyes, crouched low ready to leap, full body, top-down three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 585606774,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793177327,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 54.48,
+    "request_id": "7ea17259-9661-4cfc-93ee-5c7b78c1e7c7",
+    "outputs_retained_until": 1793263704
+  }
+}

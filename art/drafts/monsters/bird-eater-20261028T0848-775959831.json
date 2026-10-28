@@ -1,0 +1,25 @@
+{
+  "id": "bird-eater",
+  "payload": {
+    "prompt": "giant goliath bird-eating spider, huge and hairy with thick dark legs tipped with rust-red hairs, large black fangs bared, rearing up menacingly, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 775959831,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793177391,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 53.94,
+    "request_id": "24f2b21e-add3-43e5-b045-316b2b2839f9",
+    "outputs_retained_until": 1793263729
+  }
+}
