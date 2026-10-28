@@ -1,0 +1,23 @@
+{
+  "id": "drowned-forest",
+  "payload": {
+    "prompt": "dead grey trees standing knee-deep in still dark water, black cormorants on the bare branches, the shadow of a huge catfish under the surface, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 525031681,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183045,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 41.34,
+    "request_id": "0c7379d1-7fe1-4ec8-97f1-34091095e64c",
+    "outputs_retained_until": 1793269416
+  }
+}

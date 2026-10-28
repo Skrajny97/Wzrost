@@ -1,0 +1,23 @@
+{
+  "id": "smoldering-peat",
+  "payload": {
+    "prompt": "smoldering peat land with smoke rising from holes in the ground, small floating will-o-wisps between the hummocks, night, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 654443565,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183413,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 40.26,
+    "request_id": "c7f75b8c-c151-4307-be24-067662aff58b",
+    "outputs_retained_until": 1793269770
+  }
+}

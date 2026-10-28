@@ -1,0 +1,23 @@
+{
+  "id": "old-diggings",
+  "payload": {
+    "prompt": "an abandoned peat mine pit with wooden log walkways, black peat walls, a huge mud creature rising at the bottom, gloomy, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 445156417,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183452,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 40.08,
+    "request_id": "0d763bfe-baa4-44ea-ac59-7ec74b17783f",
+    "outputs_retained_until": 1793269813
+  }
+}

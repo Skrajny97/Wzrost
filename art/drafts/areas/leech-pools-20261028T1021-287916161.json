@@ -1,0 +1,23 @@
+{
+  "id": "leech-pools",
+  "payload": {
+    "prompt": "small round pools of black water in peat moss, leeches in the water, a marsh harrier circling above, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 287916161,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183295,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 40.62,
+    "request_id": "a0db0fc9-486e-4b25-9330-d86e862e08c6",
+    "outputs_retained_until": 1793269639
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "crane-meadows",
+  "payload": {
+    "prompt": "open moss bog with grey cranes dancing, a moose far away, pools of water in the moss, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 888458121,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183236,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 40.8,
+    "request_id": "4b611880-6bba-428f-a1bf-fbb4cdb6993b",
+    "outputs_retained_until": 1793269581
+  }
+}

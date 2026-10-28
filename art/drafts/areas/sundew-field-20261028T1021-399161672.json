@@ -1,0 +1,23 @@
+{
+  "id": "sundew-field",
+  "payload": {
+    "prompt": "a moss carpet red with sundew plants with sticky drops, heavy yellow-green fumes, a peat golem far away, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 399161672,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183369,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 40.44,
+    "request_id": "3787cc51-0950-4ec7-b048-2c7150f92a57",
+    "outputs_retained_until": 1793269697
+  }
+}

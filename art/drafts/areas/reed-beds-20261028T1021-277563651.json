@@ -1,0 +1,23 @@
+{
+  "id": "reed-beds",
+  "payload": {
+    "prompt": "a belt of tall green reeds and cattails by shallow water, a grey heron wading in the shallows, morning mist, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 1,
+    "seed": 277563651,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793182912,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 41.52,
+    "request_id": "4cf09e0e-e0cf-4ae3-9f42-cb5e8fdaea08",
+    "outputs_retained_until": 1793269278
+  }
+}
