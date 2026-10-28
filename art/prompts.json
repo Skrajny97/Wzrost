@@ -449,7 +449,17 @@
         "style": "rd_advanced_animation__walking",
         "startFrame": "art/references/animations/exploring-start.png",
         "frames": 8
-      }
+      },
+      "walk-warrior-female": {"prompt": "a young woman with red hair tied up in a bun, a cream linen shirt with a rope belt, patched brown trousers, bare feet with cloth wraps, empty hands", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-warrior-female.png"},
+      "walk-warrior-male": {"prompt": "a young man with short brown hair, a cream linen shirt with a rope belt, patched brown trousers, bare feet with cloth wraps, empty hands", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-warrior-male.png"},
+      "walk-archer-female": {"prompt": "a young woman in a brown hood and a short brown cape, a green tunic, dark green trousers, brown leather boots, a small leather pouch at the hip, empty hands", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-archer-female.png"},
+      "walk-archer-male": {"prompt": "a young man with brown hair in a long brown hooded cloak, a green tunic, dark green trousers, brown leather boots, empty hands", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-archer-male.png"},
+      "walk-mage-female": {"prompt": "a young woman with long brown hair, a patched blue robe with a rope belt, simple sandals, empty hands", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-mage-female.png"},
+      "walk-mage-male": {"prompt": "a young man with brown hair, a patched blue tunic with a satchel strap across the chest, brown trousers, simple sandals, empty hands", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-mage-male.png"},
+      "walk-cleric-female": {"prompt": "a young woman with a dark brown braid, a plain cream dress with a rope belt and a small wooden pendant, simple sandals, empty hands", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-cleric-female.png"},
+      "walk-cleric-male": {"prompt": "a young man with dark blue-black hair, a ragged cream tunic with a rope belt and a small pendant, cloth-wrapped feet, empty hands", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-cleric-male.png"},
+      "walk-shadow-female": {"prompt": "a young woman with brown hair, a dark grey scarf over her mouth and nose, a ragged dark grey tunic, olive trousers, cloth-wrapped feet, empty hands", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-shadow-female.png"},
+      "walk-shadow-male": {"prompt": "a young man with messy black hair, a dark grey scarf over his mouth and nose, ragged dark clothes, olive trousers, cloth-wrapped feet, empty hands", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-shadow-male.png"}
     }
   }
 }
