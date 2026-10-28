@@ -133,7 +133,7 @@
   {
     "id": "craft-table",
     "name": "Stół rozbiórki",
-    "description": "Prosty stół z narzędziami. Za darmo, z upływem czasu przerabia materiały ze stworów i rozebrane przedmioty na części do wyrobu przedmiotów.",
+    "description": "Prosty stół z narzędziami. Za darmo, z upływem czasu przerabia materiały ze stworów i rozebrane przedmioty na części do wyrobu przedmiotów. Przy nim wymienisz też jeden zasób obozu na inny.",
     "maxLevel": 10,
     "effect": {
       "kind": "craftSpeed",
@@ -143,6 +143,12 @@
       "rarities": ["rare", "unique", "epic", "legendary", "divine"],
       "bonusFromLevel": 6,
       "bonusPerLevel": 0.05
+    },
+    "exchange": {
+      "title": "Wymiana zasobów",
+      "text": "Za kilka sztuk jednego zasobu dostaniesz sztukę innego. Im wyższy poziom stołu, tym mniej oddajesz.",
+      "resources": ["wood", "stone", "iron-ore"],
+      "rates": [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
     },
     "costs": [
       { "resource": "gold", "base": 3, "growth": 2.0 },

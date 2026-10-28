@@ -5,7 +5,8 @@
 // back. Called back early, the character brings the items done and gets
 // back all the rest. From the scroll's level an order may be of Zwoje
 // ochronne instead, from parts alone: they always come out and wait for the
-// Kowadło (`scrolls` of the character), taking no room in the bag.
+// Kowadło (`scrolls` of the character), taking no room in the bag. Parts of a
+// rarity go for one of the next at once, beside any work (exchangeParts).
 
 import {
   addQuestProgress,
@@ -16,6 +17,8 @@ import {
   craftRarities,
   knowsPattern,
   orderMinutes,
+  partExchangeBlock,
+  partSource,
   potionsDone,
   professionOpen,
   professionState,
@@ -26,7 +29,7 @@ import {
   workshopReport,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, craftingState, currentHp, loadPlayer, questsNow, requireWorker, walletOf, workOf } from './characters.js';
+import { bagPlaces, characterView, craftingState, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, walletOf, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { craftingOn } from './features.js';
@@ -101,6 +104,40 @@ export async function startCrafting(context) {
   ]);
   if (taken.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
+}
+
+// The parts' exchange: `count` parts of a kind for `rate` times as many of
+// the rarity below (partExchangeBlock), at once and whatever the character
+// and its Awatar do. The parts include those of the table's orders done by
+// now; saved only if the character is as seen, so two taps make one.
+export async function exchangeParts(context) {
+  const body = await readJson(context.request);
+  const { session, player } = await requirePlayer(context);
+  requireProfessions(player);
+  if (!craftingOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  const crafting = content.professionsById[content.workshop.profession];
+  if (!professionOpen(crafting, player.row.level, content)) {
+    throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content)}.`);
+  }
+  const now = context.now;
+  const table = settleCrafting(craftingState(player.row), now);
+  const { partId, count } = body;
+  const block = partExchangeBlock({ parts: table.parts, partId, count }, content);
+  if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
+  const source = partSource(partId, content);
+  const given = count * source.rate;
+  const parts = { ...table.parts, [source.partId]: table.parts[source.partId] - given, [partId]: (table.parts[partId] ?? 0) + count };
+  const { row } = player;
+  const db = context.env.DB;
+  const result = await db
+    .prepare('UPDATE characters SET parts = ?, crafting = ?, version = version + 1 WHERE id = ? AND version = ?')
+    .bind(JSON.stringify(parts), JSON.stringify(table.queue), row.id, row.version)
+    .run();
+  if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
+  return json({
+    exchanged: { from: source.partId, partId, given, count },
+    character: characterView(await loadPlayer(db, session.userId), now),
+  });
 }
 
 // An order of items: a pattern the character knows, a rarity of its level,

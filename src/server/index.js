@@ -6,7 +6,7 @@ import { authorPanel, authorSkillDemo, authorSkills } from './author.js';
 import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
-import { buyParts, cancelBuilding, collectProduction, startBuilding, tradeAtFire } from './camp.js';
+import { buyParts, cancelBuilding, collectProduction, exchangeResources, startBuilding, tradeAtFire } from './camp.js';
 import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendGift } from './community.js';
 import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
@@ -27,7 +27,7 @@ import { backFromTest, repeatCommunityTour, repeatCraftingTour, repeatProfession
 import { skipWithTimePoints } from './time.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
 import { seeTutorial } from './tutorial.js';
-import { startCrafting } from './workshop.js';
+import { exchangeParts, startCrafting } from './workshop.js';
 
 const routes = [
   ['GET', '/api/health', health],
@@ -80,6 +80,7 @@ const routes = [
   ['POST', '/api/herbs/discard', discardHerbs],
   ['POST', '/api/professions/brew', startBrewing],
   ['POST', '/api/professions/craft', startCrafting],
+  ['POST', '/api/professions/exchange', exchangeParts],
   ['POST', '/api/avatar/buy', buyAvatar],
   ['POST', '/api/avatar/claim', claimAvatar],
   ['POST', '/api/avatar/cancel', cancelAvatar],
@@ -91,6 +92,7 @@ const routes = [
   ['POST', '/api/camp/collect', collectProduction],
   ['POST', '/api/camp/trade', tradeAtFire],
   ['POST', '/api/camp/buy', buyParts],
+  ['POST', '/api/camp/exchange', exchangeResources],
   ['GET', '/api/chat', readChat],
   ['GET', '/api/chat/latest', latestChat],
   ['GET', '/api/ranking', ranking],

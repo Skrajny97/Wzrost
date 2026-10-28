@@ -2553,3 +2553,17 @@ Autor: „szary łucznik w 0.0.32 nie chodzi jakby był szary, miałeś się prz
     - Kleryk: bez zmian.
 3. **Jak.** `PIXELS` i `NOT_PIXELS` w `tools/walker-tones.py` wypisują piksele dodane do maski i z niej wyjęte, osobno dla każdej klatki. Światło jaśniejsze od skóry dostaje najjaśniejszy odcień, a kontur ciemniejszy od niej — najciemniejszy, przyciemniony tak jak na rysunku, jak kontur portretów. Zmieniły się tylko przejrzane piksele, reszta ma ten sam kolor co wcześniej. Przeliczone są wszystkie 70 pliki.
 4. **Łucznik.** W chodzie ma kaptur na głowie (tak opisuje go `art/prompts.json`), a peleryna zasłania dłonie. Skóry widać więc tylko ok. 10 pikseli twarzy. Twarz jest w wybranym kolorze w każdej klatce, ale postać i tak wygląda głównie jak kaptur. Na portrecie kaptur jest zsunięty na plecy. Chód bez kaptura wymagałby nowej animacji z Retro Diffusion.
+
+## Wymiana zasobów przy Stole rozbiórki i wymiana części w Warsztacie (28.10.2026)
+
+Autor: „Dodajmy też na stole rozbiórki możliwość wymiany zasobów typu kamień na drewno w stosunku 1 za 10 i aż do 1 do 1 przy poziomie 10-tym stołu rozbiórki”, „W Rzemieślnictwie też powinna być natychmiastowa opcja wymiany Ścinek na Rzemienie itd. w jakichś adekwatnych ilościach typu 10 Ścinek = 1 Rzemień jeśli to adekwatne”.
+
+1. **Stół rozbiórki: „Wymiana zasobów”.** Drewno, kamień i rudę żelaza można wymienić jedno na drugie. Na poziomie 1 stołu za sztukę oddaje się 10 sztuk innego zasobu, każdy poziom to o 1 mniej, a na poziomie 10 wymiana idzie 1 za 1 (`exchange.rates` w `data/buildings.json`, `src/engine/exchange.js`).
+    - Wymiana nie ma dziennego limitu i nie dotyczy złota. Złoto na zasoby wymienia duch ognia w Ognisku.
+    - Na ekranie stołu gracz wybiera zasób, który oddaje, suwakiem (i przyciskami − i +) liczbę sztuk, które chce dostać, a potem przycisk zasobu, który bierze. Przed wymianą gra pyta o potwierdzenie, jak u ducha ognia.
+    - Wymiana działa obok wszystkiego, co robi postać, także w czasie wyprawy, tak jak reszta obozu. Rozbudowa stołu obniża stawkę dopiero po swoim końcu.
+2. **Warsztat: „Wymiana części”.** Od ręki, bez pracy postaci i Awatara: 10 części jednej rzadkości za 1 część następnej (Ścinki → Rzemienie → Okucia → Odłamki → Bursztyn → Krwawnik → Gwiezdny odprysk). Przyciski „Wymień 1” i „Wymień 10” bez pytania o potwierdzenie, jak „Kup 1” i „Kup 10” u złomiarza. Liczą się też części ze zleceń stołu skończonych do teraz. Karta stoi w Rzemieślnictwie, więc wymiana działa od 15. poziomu postaci, jak cała profesja.
+3. **Czy 10 za 1 jest adekwatne.** Tak, zostaje 10 za 1 (`workshop.exchange.rate` w `data/professions.json`):
+    - U złomiarza część następnej rzadkości kosztuje dwa razy tyle co poprzednia. Za 10 części zapłaciłoby się pięć razy więcej niż za jedną wyższą, więc wymiana nigdy nie jest tańsza od zakupu, a złomiarz nie traci sensu (test w `test/workshop.test.js`).
+    - Rzadsze części trzeba nadal zdobyć: 1 Odłamek to 1000 Ścinek, a Gwiezdny odprysk — milion. Przy 2 lub 3 za 1 Ścinki z rozbiórki szybko zamieniałyby się w części boskie.
+    - Wymiana daje za to ujście nadmiarowi Ścinek i Rzemieni, gdy brakuje kilku części wyższej rzadkości do zlecenia, a złomiarz jeszcze ich nie sprzedaje albo skończył się jego dzienny limit.

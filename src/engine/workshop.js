@@ -112,6 +112,28 @@ export function metNames(met, content) {
 // What Zwoje ochronne take: the scroll's parts for each.
 export const scrollCost = (count, content) => ({ parts: { [content.workshop.scroll.part]: content.workshop.scroll.parts * count } });
 
+// The parts' exchange (`exchange` of workshop): `rate` parts of a rarity
+// for one of the next, at once and without the character's work (the
+// author: "natychmiastowa opcja wymiany Ścinek na Rzemienie itd. w jakichś
+// adekwatnych ilościach typu 10 Ścinek = 1 Rzemień"). The part a part is
+// had for and how many of it one takes; null for the commonest part.
+export function partSource(partId, content) {
+  const index = content.rarities.findIndex((rarity) => rarity.id === content.partsById[partId]?.rarity);
+  if (index < 1) return null;
+  return { partId: content.partsByRarity[content.rarities[index - 1].id].id, rate: content.workshop.exchange.rate };
+}
+
+// Why `count` parts of a kind cannot be had now for parts a rarity lower,
+// or null: `parts` is what the character has, by id.
+export function partExchangeBlock({ parts, partId, count }, content) {
+  const source = typeof partId === 'string' && Object.hasOwn(content.partsById, partId) ? partSource(partId, content) : null;
+  if (!source) return { code: 'invalid_part', message: 'Tych części System nie wymienia.' };
+  if (!content.workshop.exchange.counts.includes(count)) return { code: 'invalid_count', message: 'System nie wymienia tylu części naraz.' };
+  const given = count * source.rate;
+  if ((parts[source.partId] ?? 0) < given) return { code: 'not_enough', message: `Brakuje części: ${content.partsById[source.partId].name} (potrzeba ${given}).` };
+  return null;
+}
+
 // A tier's chance at a level of the profession: from its level on, growing
 // perLevel a level, up to max.
 const tierChance = (tier, level) => Math.min(tier.max, tier.chance + tier.perLevel * (level - tier.level));

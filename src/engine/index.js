@@ -15,6 +15,7 @@ export * from './unlocks.js';
 export * from './camp.js';
 export * from './fire.js';
 export * from './shop.js';
+export * from './exchange.js';
 export * from './crafting.js';
 export * from './preview.js';
 export * from './quests.js';

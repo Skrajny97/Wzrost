@@ -453,6 +453,7 @@
         "partsLevelStep",
         "upgrades",
         "scroll",
+        "exchange",
         "chancePerLevel",
         "maxChance",
         "rarities",
@@ -581,6 +582,18 @@
               "perLevel": { "type": "number", "minimum": 0 },
               "max": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
             }
+          }
+        },
+        "exchange": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title", "text", "rate", "counts"],
+          "description": "Wymiana części od ręki, bez pracy postaci: za rate części jednej rzadkości (rarities.json, części z materials.json) System daje 1 część następnej rzadkości. Jedną wymianą bierze się counts sztuk. Rate musi być większy niż stosunek cen sąsiednich części u złomiarza, aby wymiana nie wychodziła taniej niż zakup (test w test/workshop.test.js).",
+          "properties": {
+            "title": { "type": "string", "minLength": 1 },
+            "text": { "type": "string", "minLength": 1 },
+            "rate": { "type": "integer", "minimum": 2 },
+            "counts": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "integer", "minimum": 1 } }
           }
         },
         "scroll": {

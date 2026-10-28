@@ -4402,6 +4402,57 @@ a.camp-level-button {
 }
 
 /* The Skup złomu's counter: crafting parts for gold. */
+/* The Stół rozbiórki's exchange: the three resources to give side by side,
+   each with what the character has of it. */
+.resource-exchange {
+  background: radial-gradient(ellipse at 50% 120%, rgba(190, 196, 186, 0.1), transparent 70%);
+}
+
+.exchange-label {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.segmented--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.exchange-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 4px;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.exchange-option-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.exchange-option small {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* The Warsztat's parts' exchange: the buttons go under the part, so its
+   name and counts keep the row's width. */
+.part-exchange-row {
+  flex-wrap: wrap;
+}
+
+.part-exchange-row .shop-buttons {
+  flex-basis: 100%;
+  justify-content: flex-end;
+}
+
 .scrap-shop {
   background: radial-gradient(ellipse at 50% 120%, rgba(190, 196, 186, 0.1), transparent 70%);
 }

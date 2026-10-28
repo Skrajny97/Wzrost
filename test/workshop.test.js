@@ -21,6 +21,9 @@ import {
   knownPatterns,
   notificationsDue,
   orderMinutes,
+  partExchangeBlock,
+  partPrice,
+  partSource,
   patternFrom,
   questPeriod,
   questText,
@@ -529,6 +532,30 @@ describe('the Warsztat, step 2, in the engine', () => {
     assert.ok(known(['broadsword']).includes('broadsword'));
   });
 
+  // The author: "10 Ścinek = 1 Rzemień jeśli to adekwatne". Ten for one
+  // keeps the rarer parts earned (a Gwiezdny odprysk would take a million
+  // Ścinki), and buying a part at the Skup złomu always costs less than
+  // buying the parts it is had for.
+  test('ten parts of a rarity go for one of the next, never cheaper than at the dealer', () => {
+    assert.equal(partSource('scraps', content), null);
+    assert.deepEqual(partSource('straps', content), { partId: 'scraps', rate: 10 });
+    assert.deepEqual(partSource('star-shard', content), { partId: 'bloodstone', rate: 10 });
+    const block = (changes) => partExchangeBlock({ parts: { scraps: 100 }, partId: 'straps', count: 10, ...changes }, content)?.code ?? null;
+    assert.equal(block({}), null);
+    assert.equal(block({ count: 1 }), null);
+    assert.equal(block({ parts: { scraps: 99 } }), 'not_enough');
+    assert.equal(block({ partId: 'fittings' }), 'not_enough');
+    assert.deepEqual([5, 0, '1', undefined].map((count) => block({ count })), Array(4).fill('invalid_count'));
+    assert.deepEqual(['scraps', 'nothing', 'toString', undefined].map((partId) => block({ partId })), Array(4).fill('invalid_part'));
+    assert.equal(partExchangeBlock({ parts: { scraps: 99 }, partId: 'straps', count: 10 }, content).message, 'Brakuje części: Ścinki (potrzeba 100).');
+    for (let level = 1; level <= content.buildingsById['scrap-bench'].maxLevel; level++) {
+      for (const part of content.parts.slice(1)) {
+        const source = partSource(part.id, content);
+        assert.ok(source.rate * partPrice(source.partId, level, content) > partPrice(part.id, level, content), `${part.id} at level ${level}`);
+      }
+    }
+  });
+
   test('the dealer sells a character 30 scraps a day, fewer of the rarer parts, and more again from midnight', () => {
     const ids = ['scraps', 'straps', 'fittings', 'shards', 'amber', 'bloodstone', 'star-shard'];
     assert.deepEqual(ids.map((id) => shopLeft(id, {}, content)), [30, 20, 10, 5, 3, 2, 1]);
@@ -648,6 +675,40 @@ describe('the Warsztat, step 2, through the API', () => {
     await build('craft-table', 1);
     const itemId = await addItem({ base: 'sword', slot: 'weapon', level: 15, rarity: 'common', affixes: [], damage: { min: 5, max: 9 }, crafted: { parts: 7, upgrade: 0 } });
     assert.equal((await character()).bag.find((item) => item.id === itemId).salvage.parts, 3);
+  });
+
+  test('parts go for one of the next rarity at once, also while the character works, with the table\'s parts done by now', async () => {
+    const exchange = (partId, count) => call('POST', '/api/professions/exchange', { cookie, body: { partId, count } });
+    // Ścinki, Rzemienie and Odłamki.
+    const owned = (view) => ['scraps', 'straps', 'shards'].map((id) => view.crafting.parts.find((part) => part.id === id).count);
+    const card = (await character()).professions.workshop.exchange;
+    assert.deepEqual([card.title, card.rate, card.counts], ['Wymiana części', 10, [1, 10]]);
+    assert.deepEqual(card.parts.slice(0, 2), [{ id: 'straps', from: 'scraps' }, { id: 'fittings', from: 'straps' }]);
+    assert.equal(card.parts.length, content.parts.length - 1);
+    assert.equal((await exchange('scraps', 1)).status, 400);
+    assert.equal((await exchange('straps', 3)).data.error.code, 'invalid_count');
+    const short = await exchange('fittings', 1);
+    assert.deepEqual([short.status, short.data.error.message], [409, 'Brakuje części: Rzemienie (potrzeba 10).']);
+    const first = await exchange('straps', 1);
+    assert.equal(first.status, 200);
+    assert.deepEqual(first.data.exchanged, { from: 'scraps', partId: 'straps', given: 10, count: 1 });
+    assert.deepEqual(owned(first.data.character), [20, 1, 20]);
+    // Two taps at once: each exchange made takes its parts once.
+    const taps = await Promise.all([exchange('straps', 1), exchange('straps', 1)]);
+    const made = taps.filter((tap) => tap.status === 200).length;
+    assert.ok(made >= 1);
+    assert.deepEqual(owned(await character()), [20 - 10 * made, 1 + made, 20]);
+    // While the character is away, with 5 Ścinki and a table's order of 15
+    // done by now: they count, and the queue keeps the rest.
+    const now = Date.now();
+    const done = { id: 'a', kind: 'material', key: 'wolf-pelt:common', count: 15, partId: 'scraps', parts: 15, bonus: 0, startsAt: now - 7200000, endsAt: now - 3600000 };
+    const later = { ...done, id: 'b', startsAt: now - 3600000, endsAt: now + 3600000 };
+    await set("parts = '{\"scraps\":5,\"shards\":20}', crafting = ?", JSON.stringify([done, later]));
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } })).status, 201);
+    const away = await exchange('straps', 1);
+    assert.equal(away.status, 200);
+    assert.deepEqual(owned(away.data.character), [10, 1, 20]);
+    assert.deepEqual(away.data.character.crafting.queue.map((order) => order.id), ['b']);
   });
 
   test('the dealer keeps count of the parts sold today', async () => {

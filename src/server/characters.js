@@ -41,6 +41,7 @@ import {
   questsStale,
   questsView,
   regenPerMinute,
+  resourceExchange,
   restBonus,
   restedHp,
   salvageYield,
@@ -463,6 +464,7 @@ function campView(player, levels, now) {
         queued: queued(building.id),
         trade: building.trade && level > 0 ? fireView(building, level, player.row, now) : null,
         shop: building.shop && level > 0 ? shopView(building, level, player.row, now) : null,
+        exchange: building.exchange && level > 0 ? exchangeView(building, level) : null,
       };
     }),
   };
@@ -482,6 +484,20 @@ function fireView(building, level, row, now) {
     perDay: trade.perDay,
     left: Math.max(0, trade.perDay - made),
     next: next && { level: level + 1, unitGold: next.unitGold, perDay: next.perDay },
+  };
+}
+
+// The Stół rozbiórki's exchange at its level: the pieces of a resource
+// given for one of another, and fewer at the next level.
+function exchangeView(building, level) {
+  const exchange = resourceExchange(level, content);
+  const next = level < building.maxLevel ? resourceExchange(level + 1, content) : null;
+  return {
+    title: building.exchange.title,
+    text: building.exchange.text,
+    resources: exchange.resources,
+    rate: exchange.rate,
+    next: next && next.rate < exchange.rate ? { level: level + 1, rate: next.rate } : null,
   };
 }
 

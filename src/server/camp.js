@@ -4,8 +4,8 @@
 // more builds wait in the queue, paid when queued, and start one after
 // another (characters.js: settleBuilds). Production buildings fill a store
 // that the player collects, the Ognisko's fire spirit trades gold for
-// resources a few times a day, and the scrap dealer at the Skup złomu sells
-// crafting parts.
+// resources a few times a day, the scrap dealer at the Skup złomu sells
+// crafting parts, and at the Stół rozbiórki one resource goes for another.
 
 import {
   buildMinutes,
@@ -15,6 +15,8 @@ import {
   cancelFromQueue,
   collect,
   construction,
+  exchangeBlock,
+  exchangeBuilding,
   fireBuilding,
   fireDay,
   fireTrade,
@@ -25,6 +27,7 @@ import {
   plannedLevel,
   queueEnd,
   replanQueue,
+  resourceExchange,
   shiftQueue,
   shopBlock,
   shopBought,
@@ -300,6 +303,35 @@ export async function buyParts(context) {
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
   return json({
     bought: { partId: body.partId, count: body.count, gold },
+    character: characterView(await loadPlayer(db, session.userId), now),
+  });
+}
+
+// The Stół rozbiórki's exchange: `amount` pieces of a resource (`to`) for
+// pieces of another (`from`) at the building's level now (an upgrade under
+// way counts once it ends). Saved only if the character is as seen here and
+// still has the pieces, so two taps at once make one exchange.
+export async function exchangeResources(context) {
+  const { session, player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  const now = context.now;
+  const row = player.row;
+  const level = buildingLevel(player.buildings[exchangeBuilding(content)?.id], now);
+  const { from, to, amount } = body;
+  const block = exchangeBlock({ level, resources: walletOf(row), from, to, amount }, content);
+  if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
+  const given = amount * resourceExchange(level, content).rate;
+  const db = context.env.DB;
+  const result = await db
+    .prepare(
+      `UPDATE characters SET resources = json_set(resources, ?, json_extract(resources, ?) - ?, ?, COALESCE(json_extract(resources, ?), 0) + ?), version = version + 1
+       WHERE id = ? AND version = ? AND COALESCE(json_extract(resources, ?), 0) >= ?`,
+    )
+    .bind(path(from), path(from), given, path(to), path(to), amount, row.id, row.version, path(from), given)
+    .run();
+  if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
+  return json({
+    exchanged: { from, to, given, amount },
     character: characterView(await loadPlayer(db, session.userId), now),
   });
 }

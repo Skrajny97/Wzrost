@@ -25,6 +25,9 @@ const CAMP = '#/oboz';
 const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
 // The pieces last picked on the fire spirit's slider, while the page is open.
 let fireChoice = null;
+// The resource last given at the Stół rozbiórki's exchange and the pieces
+// last picked there, while the page is open.
+const exchangeChoice = { from: null, amount: null };
 
 export function mountCamp(container, { params, backHash = '#/walka' }) {
   const id = params.building;
@@ -129,6 +132,18 @@ async function tradeAtFire(resource, amount, gold) {
   const { traded } = await call('POST', '/api/camp/trade', { resource, amount });
   playSound('collect');
   toast(`Duch ognia przyjął ${formatNumber(traded.gold)} złota i oddał: ${resourceName(traded.resource).toLowerCase()} +${formatNumber(traded.amount)}.`);
+}
+
+async function exchangeResources(from, to, amount, given) {
+  const sure = await confirmAction({
+    title: 'Wymiana zasobów',
+    text: `Oddasz ${formatNumber(given)} × ${resourceName(from)} i dostaniesz ${formatNumber(amount)} × ${resourceName(to)}.`,
+    confirmLabel: 'Wymień',
+  });
+  if (!sure) return;
+  const { exchanged } = await call('POST', '/api/camp/exchange', { from, to, amount });
+  playSound('collect');
+  toast(`Wymieniono ${formatNumber(exchanged.given)} × ${resourceName(exchanged.from)} na ${formatNumber(exchanged.amount)} × ${resourceName(exchanged.to)}.`);
 }
 
 async function buyParts(partId, count) {
@@ -432,6 +447,7 @@ function mountBuilding(container, id) {
         building.trade && tradeView(building.trade),
         building.shop && saleView(),
         building.shop && shopView(building.shop),
+        building.exchange && exchangeView(building.exchange),
       ),
       building.crafts && craftTableSection(ticks),
     );
@@ -584,6 +600,121 @@ function mountBuilding(container, id) {
       hint,
       next,
     );
+  }
+
+  // The Stół rozbiórki's exchange: the resource that goes, then how many
+  // pieces of another come for it, by the slider with a button for one more
+  // or less, and a button for each of the other resources; the rate now and
+  // at the next level (the author: "wymiany zasobów typu kamień na drewno w
+  // stosunku 1 za 10 i aż do 1 do 1 przy poziomie 10-tym").
+  function exchangeView(exchange) {
+    const section = h('section', { class: 'fire-trade resource-exchange', 'aria-label': exchange.title });
+    const have = (id) => state.character.resources[id] ?? 0;
+    const pieces = (count) => countOf(count, 'sztuka', 'sztuki', 'sztuk');
+    function draw() {
+      // The last resource given, or the one there is most of.
+      const from = exchange.resources.includes(exchangeChoice.from)
+        ? exchangeChoice.from
+        : exchange.resources.reduce((best, id) => (have(id) > have(best) ? id : best));
+      const most = Math.floor(have(from) / exchange.rate);
+      const picker = h(
+        'div',
+        { class: 'segmented segmented--three', role: 'group', 'aria-label': 'Oddajesz' },
+        exchange.resources.map((id) =>
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'segmented-option exchange-option',
+              'aria-pressed': String(id === from),
+              onClick: () => {
+                exchangeChoice.from = id;
+                draw();
+              },
+            },
+            h('span', { class: 'exchange-option-name' }, icon(RESOURCE_ICONS[id] ?? 'unknown', { size: 16 }), resourceName(id)),
+            h('small', { text: `masz ${formatNumber(have(id))}` }),
+          ),
+        ),
+      );
+      const head = [
+        h('h2', { class: 'fire-trade-title', text: exchange.title }),
+        h('p', { class: 'fire-trade-text', text: exchange.text }),
+        h('p', { class: 'store-head' }, h('span', { text: 'Stawka' }), h('strong', { text: `${pieces(exchange.rate)} za 1` })),
+        h('p', { class: 'exchange-label', text: 'Oddajesz' }),
+        picker,
+      ];
+      const next = exchange.next && h('p', { class: 'store-hint', text: `Na poziomie ${exchange.next.level}: ${pieces(exchange.next.rate)} za 1.` });
+      if (most < 1) {
+        fill(section, ...head, h('p', { class: 'store-hint', text: `Za mało: ${resourceName(from).toLowerCase()}. Jedna sztuka innego zasobu to ${pieces(exchange.rate)}.` }), next);
+        return;
+      }
+      let amount = Math.max(1, Math.min(most, exchangeChoice.amount ?? 1));
+      const value = h('output', { class: 'fire-trade-amount', 'aria-live': 'off' });
+      const slider = h('input', {
+        type: 'range',
+        class: 'duration-slider fire-trade-slider',
+        min: 1,
+        max: most,
+        step: 1,
+        value: amount,
+        'aria-label': 'Ile sztuk wziąć',
+        disabled: most < 2,
+        onInput: () => choose(Number(slider.value)),
+      });
+      const stepButton = (sign, label) =>
+        h('button', {
+          type: 'button',
+          class: 'button button--world duration-step',
+          'aria-label': label,
+          text: sign < 0 ? '−' : '+',
+          onClick: () => choose(amount + sign),
+        });
+      const less = stepButton(-1, 'O sztukę mniej');
+      const more = stepButton(1, 'O sztukę więcej');
+      const buttons = exchange.resources
+        .filter((id) => id !== from)
+        .map((id) => {
+          const label = h('span', {});
+          const button = h(
+            'button',
+            {
+              type: 'button',
+              class: 'button button--world fire-trade-button',
+              onClick: (event) => withButton(event.currentTarget, () => exchangeResources(from, id, amount, amount * exchange.rate)),
+            },
+            icon(RESOURCE_ICONS[id] ?? 'unknown', { size: 18 }),
+            label,
+          );
+          return { id, button, label };
+        });
+      function choose(nextAmount) {
+        amount = Math.max(1, Math.min(most, nextAmount));
+        exchangeChoice.amount = amount;
+        const given = amount * exchange.rate;
+        slider.value = String(amount);
+        slider.setAttribute('aria-valuetext', `${pieces(amount)} za ${formatNumber(given)} × ${resourceName(from)}`);
+        slider.style.setProperty('--fill', `${((amount - 1) / Math.max(1, most - 1)) * 100}%`);
+        value.textContent = `${pieces(amount)} za ${formatNumber(given)} × ${resourceName(from)}`;
+        less.disabled = amount <= 1;
+        more.disabled = amount >= most;
+        for (const { id, button, label } of buttons) {
+          label.textContent = `${resourceName(id)} +${formatNumber(amount)}`;
+          button.setAttribute('aria-label', `Wymień ${formatNumber(given)} × ${resourceName(from)} na ${formatNumber(amount)} × ${resourceName(id)}`);
+        }
+      }
+      choose(amount);
+      fill(
+        section,
+        ...head,
+        h('p', { class: 'fire-trade-pick' }, value),
+        h('div', { class: 'duration-row' }, less, slider, more),
+        h('div', { class: 'fire-trade-buttons' }, buttons.map(({ button }) => button)),
+        next,
+      );
+    }
+    draw();
+    return section;
   }
 
   // The scrap dealer buys the bag's items too: all up to a rarity at once

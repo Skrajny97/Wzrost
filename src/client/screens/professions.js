@@ -6,15 +6,17 @@
 // "Przerwij" and its report at the end; and the Alchemia screen in the same
 // way: the Systemowa Pracownia, the recipes, how many potions and the
 // brewing under way; and the Rzemieślnictwo screen: the Systemowy
-// Warsztat, the patterns by slot, the rarity, how many items and the order
-// under way. Each work can be done by the character or by the Awatar Systemu,
+// Warsztat, the patterns by slot, the rarity, how many items, the order
+// under way and the parts' exchange. Each work can be done by the character or by the Awatar Systemu,
 // bought on the tab, which works beside the character in its own card.
 // Locked, or hidden in this deployment, the tab says so as before.
 
 import { herbSprite, itemSprite, placeArt, potionSprite, professionSprite } from '../art.js';
+import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatDecimal, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { workScene } from '../scenes.js';
+import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, systemPanel, toast, withButton } from '../ui.js';
@@ -286,6 +288,7 @@ export function mountProfessions(container, { params, navigate }) {
       levelCard(profession, 'wyrobu'),
       anyFree(character) && craftForm(character, workshop),
       anyFree(character) && scrollForm(character, workshop),
+      partExchange(character, workshop),
     );
   }
 
@@ -1130,6 +1133,67 @@ export function mountProfessions(container, { params, navigate }) {
       next && h('p', { class: 'muted', text: `Następna rzadkość: ${next.name}, od ${next.level}. poziomu Rzemieślnictwa.` }),
       picker,
     );
+  }
+
+  // The parts' exchange, at once and whoever is at work: each part above the
+  // commonest for `rate` of the part a rarity lower, by "Wymień 1" or
+  // "Wymień 10", with what the character has of both (the author:
+  // "natychmiastowa opcja wymiany Ścinek na Rzemienie itd.").
+  function partExchange(character, workshop) {
+    const { exchange } = workshop;
+    const own = (id) => character.crafting.parts.find((part) => part.id === id);
+    return h(
+      'section',
+      { class: 'card gather-card', 'aria-labelledby': 'part-exchange-title' },
+      h('h2', { class: 'section-title', id: 'part-exchange-title', text: exchange.title }),
+      h('p', { class: 'muted', text: exchange.text }),
+      h(
+        'ul',
+        { class: 'craft-list' },
+        exchange.parts.map(({ id, from }) => {
+          const part = own(id);
+          const source = own(from);
+          return h(
+            'li',
+            { class: 'craft-row shop-row part-exchange-row' },
+            h('span', { class: 'craft-art' }, materialIcon(id, 32)),
+            h(
+              'span',
+              { class: 'craft-text' },
+              h('span', { class: 'item-name', vars: { '--rarity': part.color }, text: part.name }),
+              h(
+                'span',
+                { class: 'item-meta shop-meta' },
+                h('strong', { class: 'shop-price', text: `${formatNumber(exchange.rate)} × ${source.name} za 1` }),
+                h('span', { text: `masz ${formatNumber(part.count)}` }),
+              ),
+              h('span', { class: 'item-meta', text: `${source.name}: masz ${formatNumber(source.count)}` }),
+            ),
+            h(
+              'span',
+              { class: 'shop-buttons' },
+              exchange.counts.map((count) =>
+                h('button', {
+                  type: 'button',
+                  class: 'button button--world button--small shop-button',
+                  disabled: source.count < count * exchange.rate,
+                  'aria-label': `Wymień ${formatNumber(count * exchange.rate)} × ${source.name} na ${formatNumber(count)} × ${part.name}`,
+                  text: `Wymień ${count}`,
+                  onClick: (event) => withButton(event.currentTarget, () => exchangeParts(id, count)),
+                }),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  async function exchangeParts(partId, count) {
+    const { exchanged } = await call('POST', '/api/professions/exchange', { partId, count });
+    playSound('collect');
+    const name = (id) => state.character.crafting.parts.find((part) => part.id === id)?.name ?? id;
+    toast(`Wymieniono ${formatNumber(exchanged.given)} × ${name(exchanged.from)} na ${formatNumber(exchanged.count)} × ${name(exchanged.partId)}.`);
   }
 
   // The Zwoje ochronne for the Kowadło: what they do and how many the

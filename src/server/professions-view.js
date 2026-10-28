@@ -15,6 +15,7 @@ import {
   isUnlocked,
   itemMinutes,
   mostPotions,
+  partSource,
   patternLevel,
   potionMinutes,
   potionPrice,
@@ -203,6 +204,12 @@ function workshopView(level, row) {
     maxCount: workshop.maxCount,
     upgrades: craftUpgrades(level, content),
     upgradesFrom: workshop.upgrades[0].level,
+    // Parts of a rarity for one of the next, at once (exchangeParts): each
+    // part with the one it is had for.
+    exchange: {
+      ...workshop.exchange,
+      parts: content.parts.map((part) => ({ id: part.id, from: partSource(part.id, content)?.partId })).filter((part) => part.from),
+    },
     scroll: {
       id: scroll.id,
       name: scroll.name,

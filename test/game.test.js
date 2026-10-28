@@ -1135,6 +1135,40 @@ describe('camp', () => {
     assert.equal((await buy('scraps', 1)).status, 200);
   });
 
+  test('at the Stół rozbiórki one resource goes for another: ten pieces for one at level 1, one for one at level 10', async () => {
+    const exchange = (body) => call('POST', '/api/camp/exchange', { cookie, body });
+    const table = (view) => view.camp.buildings.find((building) => building.id === 'craft-table').exchange;
+    await stock(0, { wood: 100, stone: 5, 'iron-ore': 0 });
+    // Before the table stands there is no exchange.
+    assert.equal(table(await character()), null);
+    assert.equal((await exchange({ from: 'wood', to: 'stone', amount: 1 })).data.error.code, 'not_built');
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    await database.prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) VALUES (?, 'craft-table', 1, 0, 1)").bind(id).run();
+    const open = table(await character());
+    assert.deepEqual([open.title, open.resources, open.rate, open.next], ['Wymiana zasobów', ['wood', 'stone', 'iron-ore'], 10, { level: 2, rate: 9 }]);
+    assert.equal((await exchange({ from: 'wood', to: 'gold', amount: 1 })).status, 400);
+    assert.equal((await exchange({ from: 'wood', to: 'wood', amount: 1 })).status, 400);
+    assert.equal((await exchange({ from: 'wood', to: 'stone', amount: 0 })).data.error.code, 'invalid_amount');
+    const short = await exchange({ from: 'stone', to: 'wood', amount: 1 });
+    assert.deepEqual([short.status, short.data.error.message], [409, 'Brakuje zasobów: Kamień (potrzeba 10).']);
+    const first = await exchange({ from: 'wood', to: 'iron-ore', amount: 3 });
+    assert.equal(first.status, 200);
+    assert.deepEqual(first.data.exchanged, { from: 'wood', to: 'iron-ore', given: 30, amount: 3 });
+    assert.deepEqual(first.data.character.resources, { wood: 70, stone: 5, 'iron-ore': 3 });
+    // Two taps at once: each exchange made takes its pieces once.
+    const taps = await Promise.all([exchange({ from: 'wood', to: 'stone', amount: 3 }), exchange({ from: 'wood', to: 'stone', amount: 3 })]);
+    const made = taps.filter((tap) => tap.status === 200).length;
+    assert.ok(made >= 1);
+    assert.deepEqual((await character()).resources, { wood: 70 - 30 * made, stone: 5 + 3 * made, 'iron-ore': 3 });
+    // At level 10 one for one, and no level after it.
+    await database.prepare("UPDATE buildings SET level = 10 WHERE building_id = 'craft-table'").run();
+    assert.deepEqual([table(await character()).rate, table(await character()).next], [1, null]);
+    const even = await exchange({ from: 'stone', to: 'iron-ore', amount: 5 + 3 * made });
+    assert.equal(even.status, 200);
+    assert.deepEqual(even.data.character.resources, { wood: 70 - 30 * made, stone: 0, 'iron-ore': 8 + 3 * made });
+  });
+
   test('Staw Midasa fills its store with gold, which goes to the gold, also when an upgrade collects it', async () => {
     await stock(500, { wood: 50, stone: 20, 'iron-ore': 20 });
     const lake = (view) => view.camp.buildings.find((building) => building.id === 'midas-lake');

@@ -3,6 +3,7 @@ import { describe, test } from 'node:test';
 
 import {
   applyHunt,
+  exchangeBlock,
   confirmationEmail,
   championEncounter,
   championItemRarity,
@@ -12,6 +13,7 @@ import {
   fireTradeBlock,
   fireUnitsMade,
   partPrice,
+  resourceExchange,
   shopBlock,
   shopLevelFor,
   shopOffer,
@@ -1316,6 +1318,25 @@ describe('camp', () => {
     // At level 10 a piece costs 5 gold.
     assert.equal(fireTradeBlock({ level: 10, gold: 15, made: 0, resource: 'stone', amount: 3 }, content), null);
     assert.equal(fireTradeBlock({ level: 10, gold: 14, made: 0, resource: 'stone', amount: 3 }, content).code, 'not_enough');
+  });
+
+  test("the Stół rozbiórki's exchange: ten pieces of a resource for one of another at level 1, one fewer with each level, one for one at 10", () => {
+    assert.equal(resourceExchange(0, content), null);
+    assert.deepEqual(resourceExchange(1, content), { rate: 10, resources: ['wood', 'stone', 'iron-ore'] });
+    assert.deepEqual([2, 5, 9, 10].map((level) => resourceExchange(level, content).rate), [9, 6, 2, 1]);
+    const block = (changes) => exchangeBlock({ level: 1, resources: { wood: 50, stone: 0 }, from: 'wood', to: 'stone', amount: 5, ...changes }, content)?.code ?? null;
+    assert.equal(block({}), null);
+    assert.equal(block({ amount: 6 }), 'not_enough');
+    assert.equal(block({ level: 2, amount: 5 }), null);
+    assert.equal(block({ level: 10, amount: 50 }), null);
+    assert.equal(block({ level: 10, amount: 51 }), 'not_enough');
+    assert.equal(block({ from: 'stone', to: 'wood', amount: 1 }), 'not_enough');
+    assert.equal(block({ to: 'wood' }), 'invalid_resource');
+    assert.equal(block({ to: 'gold' }), 'invalid_resource');
+    assert.equal(block({ from: undefined }), 'invalid_resource');
+    assert.equal(block({ level: 0 }), 'not_built');
+    assert.deepEqual([undefined, 0, -1, 2.5, '3'].map((amount) => block({ amount })), Array(5).fill('invalid_amount'));
+    assert.equal(exchangeBlock({ level: 1, resources: { wood: 49 }, from: 'wood', to: 'iron-ore', amount: 5 }, content).message, 'Brakuje zasobów: Drewno (potrzeba 50).');
   });
 
   test("the Skup złomu's dealer: rarer parts and lower prices with each level", () => {
