@@ -78,7 +78,8 @@ export const SPRITES = {
     size: 128,
     ids: [
       'windfalls-edge', 'fox-ravines', 'raven-hollows', 'viper-heaps', 'boar-thicket', 'mossy-boulders', 'spider-gully', 'lynx-ridge', 'wolf-circles', 'glade-heart',
-      'reed-beds', 'drowned-forest', 'willow-isles', 'crane-meadows', 'leech-pools', 'sundew-field', 'smoldering-peat', 'old-diggings',
+      'reed-beds', 'beaver-dams', 'drowned-forest', 'willow-isles', 'old-riverbed', 'crane-meadows', 'leech-pools', 'sundew-field', 'smoldering-peat',
+      'old-diggings',
     ],
   },
   // The lands' wide scenes, dim behind the text of their cards, 192×96.
