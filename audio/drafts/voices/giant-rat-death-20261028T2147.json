@@ -1,0 +1,13 @@
+{
+  "id": "giant-rat-death",
+  "payload": {
+    "text": "a giant rat gives a last raspy squeal and falls with a soft thud, close up, dry, no music",
+    "duration_seconds": 0.9,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/giant-rat-death-20261028T2147-0.mp3",
+    "audio/drafts/voices/giant-rat-death-20261028T2147-1.mp3"
+  ],
+  "credits": 36
+}

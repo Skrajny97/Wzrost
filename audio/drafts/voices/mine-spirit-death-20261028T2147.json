@@ -1,0 +1,13 @@
+{
+  "id": "mine-spirit-death",
+  "payload": {
+    "text": "an old ghostly man gives a long fading groan as a lantern clatters to the stone floor, no words, close up, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mine-spirit-death-20261028T2147-0.mp3",
+    "audio/drafts/voices/mine-spirit-death-20261028T2147-1.mp3"
+  ],
+  "credits": 52
+}

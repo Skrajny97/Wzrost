@@ -1,0 +1,13 @@
+{
+  "id": "little-owl-hurt",
+  "payload": {
+    "text": "a small owl screeches sharply when hit, high piercing call, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/little-owl-hurt-20261028T2147-0.mp3",
+    "audio/drafts/voices/little-owl-hurt-20261028T2147-1.mp3"
+  ],
+  "credits": 24
+}

@@ -1,0 +1,13 @@
+{
+  "id": "diving-beetle-death",
+  "payload": {
+    "text": "a giant beetle collapses with crunching chitin and scraping legs, then silence, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/diving-beetle-death-20261028T2147-0.mp3",
+    "audio/drafts/voices/diving-beetle-death-20261028T2147-1.mp3"
+  ],
+  "credits": 40
+}

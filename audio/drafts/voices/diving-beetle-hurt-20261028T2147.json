@@ -1,0 +1,13 @@
+{
+  "id": "diving-beetle-hurt",
+  "payload": {
+    "text": "a giant beetle's hard shell cracks with a sharp chitinous click and an angry buzz, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/diving-beetle-hurt-20261028T2147-0.mp3",
+    "audio/drafts/voices/diving-beetle-hurt-20261028T2147-1.mp3"
+  ],
+  "credits": 24
+}
