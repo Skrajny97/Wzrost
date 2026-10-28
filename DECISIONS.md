@@ -2403,6 +2403,9 @@ Autor rozpisał stwory regionów Rozlewisk w dokumencie z propozycjami („Insig
     - czas na poziom zgadza się z krzywą w granicach ok. 4%. Nagrody stworów są dobrane do regionów, np. w Rosiczkowym Polu o jedną czwartą mniejsze, bo walki z rosiczkami i torfiakami dawały za dużo XP.
 7. **Skrzynie Bestiariusza** rosną dalej po krzywej: od Trzcinowiska (680 złota, 105 Punktów Czasu, 20 Punktów Systemu) do Starego Wyrobiska (1475, 195, 20). Skrzynie krain: Rozlewiska 1270 złota, 181 Punktów Czasu i 25 Punktów Systemu, Mszary 1845, 244 i 25.
 8. **Grafiki i okrzyki.** Z Retro Diffusion jest po jednym szkicu każdego stwora (33), ikony materiału (34), koła regionu (10) i tła krainy (2), pokazywane autorowi pojedynczo. Okrzyki (ElevenLabs) mają po dwie wersje bólu i śmierci. Wypchnięcie samych opisów szkiców (`art/`, `audio/`) nie uruchamia już testów i wdrożenia, tak jak same notatki.
+    - Rak jest czerwony (decyzja autora): zatwierdzony rysunek i ikona Pancerza raka są przekolorowane, a opis pancerza mówi o czerwonej skorupie.
+    - Szkielet ma nowy rysunek, cały od czaszki po stopy (pierwszy był ucięty w kolanach), a Stare Koryto koło bez własnej kamiennej obręczy, która dałaby podwójną ramkę.
+    - Pajęcze wylinki to blada, półprzezroczysta kopia rysunku Pająka, bo szkice wyszły jako małe niebieskie kryształki. Węgorz i Iskra ognika straciły ciemne tło szkicu.
 
 ## Jeszcze wolniejsze poziomy (28.10.2026)
 
