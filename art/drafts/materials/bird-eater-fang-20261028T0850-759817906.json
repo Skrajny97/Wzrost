@@ -1,0 +1,25 @@
+{
+  "id": "bird-eater-fang",
+  "payload": {
+    "prompt": "large curved glossy black spider fang with a drop of green venom on its tip, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 759817906,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793177483,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 53.22,
+    "request_id": "75ce49ad-36a7-450c-99eb-95f70fcf8a9a",
+    "outputs_retained_until": 1793263840
+  }
+}

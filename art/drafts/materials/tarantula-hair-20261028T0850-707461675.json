@@ -1,0 +1,25 @@
+{
+  "id": "tarantula-hair",
+  "payload": {
+    "prompt": "tuft of stiff bristly brown spider hairs tied with a thin thread, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 707461675,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793177437,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 53.58,
+    "request_id": "01bc7893-c46f-4b05-814c-ccacd5a23247",
+    "outputs_retained_until": 1793263809
+  }
+}
