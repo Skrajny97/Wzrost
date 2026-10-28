@@ -144,7 +144,11 @@
     "growth": 1.3,
     "goldStep": 5,
     "landFactor": 1.25,
-    "chanceMinutes": 30
+    "chanceMinutes": 30,
+    "laterCreatures": [
+      "squirrel", "grass-snake", "raccoon-dog", "antlion", "capercaillie", "weasel", "stag-beetle", "snake-hawk", "wildcat", "black-stork",
+      "mossling", "imp", "cross-spider", "mouflon", "falcon", "werewolf", "wolf-shepherd", "aurochs", "aesculapian-snake", "strzyga"
+    ]
   },
   "startingSupply": {
     "gold": 15,

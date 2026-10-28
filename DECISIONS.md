@@ -2706,3 +2706,29 @@ Autor: „Nastepnym krokiem będzie rozwiniecie listy stworow na niskich pozioma
 5. **Spotkania**: nowe stwory przychodzą same i w parach z dotychczasowymi, a od Kruczych Wykrotów także w wymagających spotkaniach. Na Skraju Wiatrołomów pary są dopiero od 5. poziomu, jak dotąd. Opisy regionów wewnętrznych wymieniają nowe stwory.
 6. **Bestiariusz**: nowe stwory są na listach regionów i krain. Skrzynia regionu, który ktoś już otworzył, zostaje otwarta. Kto jej jeszcze nie otworzył, musi teraz spotkać także nowe stwory.
 7. **Głosy**: po dwa nagrania bólu i śmierci na stwora, z ElevenLabs, jak u pozostałych stworów.
+
+## Ranna kobieta tylko tam, gdzie żyje Błędnica (28.10.2026, 0.0.46)
+
+Autor: „Trzeba pamiętać, że to obecne z ranną kobietą może się pojawiać tylko w Skraju Wiatrołomów, Lisich Jarach i Kruczych Wykrotach, bo tylko tam jest Błędnica”.
+
+1. **Regiony zdarzenia.** Zdarzenie może mieć w `data/events.json` listę `areas`. Wtedy przychodzi tylko po wyprawach w te regiony wewnętrzne. Bez listy przychodzi wszędzie. Ranna kobieta ma Skraj Wiatrołomów, Lisie Jary i Krucze Wykroty.
+2. **Szansa się nie zmienia.** Wyprawa w regionie bez zdarzeń nie dostaje innego zdarzenia w zamian. Losowanie 10% zostaje, a gdy w regionie nie ma żadnego zdarzenia, nic nie przychodzi.
+3. **Sprawdzanie danych.** Walidator pilnuje, żeby stwory, z którymi zdarzenie walczy, żyły w każdym regionie z jego listy, tak jak Błędnica w tych trzech.
+4. **„Testuj zdarzenia”** wybiera zdarzenie w każdym regionie, żeby autor mógł je sprawdzić od razu.
+5. **Całe zdarzenie jako szkic.** Zdarzenie z `draft` przychodzi tylko w wersji testowej, tak jak szkice zakończeń.
+
+## Nowe stwory otwierają skrzynię Bestiariusza znowu (28.10.2026, 0.0.46)
+
+Autor: „Jeśli ktoś już odebrał nagrodę Bestiariusza to nowe stwory dadzą kolejne nagrody, mimo ze ktos je już wcześniej odebrał. To i tak testowa wersja, więc niech tak zostanie. Przy okazji ludzie będą mieli powód by zwiedzić starsze poziomy”.
+
+1. **Skrzynia znowu do otwarcia.** Zmienia to punkt 6 z sekcji o czterech zwykłych stworach. Gdy na liście regionu albo krainy przybędzie stworów, otwarta skrzynia zamyka się. Otworzy się ponownie, gdy postać pozna wszystkie stwory listy, także nowe. Daje wtedy tę samą nagrodę co za pierwszym razem: złoto, Punkty Czasu i Punkty Systemu.
+2. **Zapis.** Otwarta skrzynia jest zapisana z liczbą stworów, które jej lista miała w chwili otwarcia („windfalls-edge:5”). Skrzynie otwarte wcześniej są zapisane bez liczby. Liczą się jako otwarte przed stworami z 28.10.2026 (`balance.bestiary.laterCreatures`), więc regiony poziomów 1–50 i ich dwie krainy mają je znowu do otwarcia.
+
+## Ranking: Poziom Profesji (28.10.2026, 0.0.46)
+
+Autor: „Do Rankingu w Społeczności dodaj zakładkę "Poziom Profesji". Będzie tam brany najwyższy z rozwijanych przez Postać z ikonką danej Profesji obok poziomu”.
+
+1. **Trzecia zakładka.** Ranking ma teraz trzy porządki: „Poziom postaci”, „Poziom klasy” i „Poziom Profesji”, w jednym rzędzie.
+2. **Najwyższa profesja.** Każda postać stoi na miejscu według swojej najwyżej rozwiniętej profesji. Obok poziomu jest ikonka tej profesji, ta sama co na zakładce Profesje. Przy równych poziomach liczy się ta wcześniejsza na liście (Zielarstwo, Alchemia, Rzemieślnictwo), a o miejscu decyduje potem poziom postaci.
+3. **Tylko pracujący.** W tym porządku są tylko postacie, które pracowały w jakiejś profesji. Postać bez profesji nie ma tu miejsca („Twoje miejsce” się wtedy nie pokazuje).
+4. **Kolumna Profesja** pokazuje się tylko w tej zakładce, żeby dwie pozostałe zostały czytelne na wąskim telefonie.

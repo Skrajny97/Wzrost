@@ -17,6 +17,7 @@ import {
   craftLevelFor,
   craftMinutes,
   craftTable,
+  openedChests,
   patternFrom,
   craftTakes,
   currentQuests,
@@ -793,8 +794,9 @@ export function characterView(player, now) {
     // The creatures met in fights, by id: the others are shadows on the
     // lists of an inner region's dangers.
     met: JSON.parse(row.met ?? '[]'),
-    // The inner regions whose Bestiariusz chest is open (bestiary.js).
-    bestiary: JSON.parse(row.bestiary ?? '[]'),
+    // The inner regions and lands whose Bestiariusz chest is open for their
+    // lists as they are now (bestiary.js).
+    bestiary: openedChests(JSON.parse(row.bestiary ?? '[]'), content),
     // A speed potion still working (potions.js), or null.
     speedBuff: activeSpeed(player, now),
     // The narrator's daily and weekly quests (quests.js).

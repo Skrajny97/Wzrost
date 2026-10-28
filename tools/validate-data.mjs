@@ -641,7 +641,30 @@ function checkEvents(data, { monsters, rarities }) {
     uniqueIds(errors, `events (${where})`, outcomes.filter((outcome) => outcome.id));
     if (outcomes.every((outcome) => outcome.draft)) errors.push(`events.json: ${where} ma same szkice, więc w grze nie byłoby czego losować`);
   };
+  // An event limited to inner regions comes only where the creatures it
+  // fights live (the author: the wounded woman only where the Błędnica is).
+  const living = new Map();
+  for (const region of data.regions) {
+    for (const area of region.areas) {
+      const ids = new Set(area.encounters.flatMap((encounter) => encounter.monsters));
+      for (const id of [area.elite ?? region.elite, area.champion ?? region.champion]) if (id) ids.add(id);
+      living.set(area.id, ids);
+    }
+  }
+  const outcomesOf = (event) =>
+    [...event.options.map((option) => option.outcome), ...(event.cases ?? []).flatMap((eventCase) => Object.values(eventCase.outcomes))]
+      .filter(Boolean)
+      .flatMap((outcome) => (Array.isArray(outcome) ? outcome : [outcome]));
   for (const event of events.list) {
+    for (const id of event.areas ?? []) {
+      if (!living.has(id)) {
+        errors.push(`events.json: ${event.id} ma nieznany region wewnętrzny "${id}"`);
+        continue;
+      }
+      for (const foe of new Set(outcomesOf(event).flatMap((outcome) => outcome.foes ?? []))) {
+        if (monsters.has(foe) && !living.get(id).has(foe)) errors.push(`events.json: ${event.id} przychodzi w ${id}, a tam nie żyje ${foe}`);
+      }
+    }
     const options = uniqueIds(errors, `events (${event.id})`, event.options);
     uniqueIds(errors, `events (${event.id}, przypadki)`, event.cases ?? []);
     for (const option of event.options) if (option.outcome) checkOutcomes(`${event.id}/${option.id}`, option.outcome);

@@ -41,17 +41,30 @@ describe('events', () => {
     assert.equal(eventChance(content), 0.1);
     const seeds = Array.from({ length: 2000 }, (_, index) => `ziarno-${index}`);
     for (const minutes of [5, 240]) {
-      const hunt = { result: 'success', minutes };
+      const hunt = { result: 'success', areaId: 'windfalls-edge', minutes };
       const drawn = seeds.filter((one) => eventFor({ hunt, seed: one }, content));
       assert.ok(Math.abs(drawn.length / seeds.length - eventChance(content)) < 0.025, `${minutes}: ${drawn.length}`);
     }
-    const hunt = { result: 'success', minutes: 30 };
+    const hunt = { result: 'success', areaId: 'windfalls-edge', minutes: 30 };
     for (const one of seeds.slice(0, 50)) assert.equal(eventFor({ hunt, seed: one }, content), eventFor({ hunt, seed: one }, content));
+  });
+
+  test('the wounded woman comes only where the Błędnica lives; a draft event only where drafts are on', () => {
+    const always = { ...content, events: { ...content.events, chance: 1 } };
+    const seeds = Array.from({ length: 40 }, (_, index) => `region-${index}`);
+    const drawn = (areaId, extra = {}, data = always) => seeds.map((one) => eventFor({ hunt: { result: 'success', areaId, minutes: 30 }, seed: one, ...extra }, data)?.id ?? null);
+    for (const areaId of ['windfalls-edge', 'fox-ravines', 'raven-hollows']) assert.ok(drawn(areaId).every((id) => id === 'wounded-woman'), areaId);
+    for (const areaId of ['viper-heaps', 'mossy-boulders', 'reed-beds']) assert.ok(drawn(areaId).every((id) => id === null), areaId);
+    // "Testuj zdarzenia" still brings it anywhere.
+    assert.equal(eventFor({ hunt: { result: 'success', areaId: 'viper-heaps', minutes: 30 }, seed, forced: 'wounded-woman' }, always), woman);
+    const drafted = { ...always, events: { ...always.events, list: [...always.events.list, { ...woman, id: 'szkic', areas: undefined, draft: true }] } };
+    assert.ok(drawn('viper-heaps', {}, drafted).every((id) => id === null));
+    assert.ok(drawn('viper-heaps', { drafts: true }, drafted).every((id) => id === 'szkic'));
   });
 
   test('every event is as likely as the others', () => {
     const two = { ...content, events: { ...content.events, chance: 1, list: [woman, { ...woman, id: 'drugie' }] } };
-    const hunt = { result: 'success', minutes: 30 };
+    const hunt = { result: 'success', areaId: 'windfalls-edge', minutes: 30 };
     const seeds = Array.from({ length: 2000 }, (_, index) => `rowne-${index}`);
     const share = seeds.filter((one) => eventFor({ hunt, seed: one }, two).id === 'drugie').length / seeds.length;
     assert.ok(Math.abs(share - 0.5) < 0.04, String(share));

@@ -23,6 +23,8 @@ import {
   bestiaryFull,
   landBestiaryChest,
   landBestiaryFull,
+  openedChestEntry,
+  openedChests,
   meetingChances,
   regionDangers,
   areaFor,
@@ -2076,6 +2078,17 @@ describe('Bestiariusz', () => {
     const edge = content.areasById['windfalls-edge'];
     assert.equal(bestiaryFull(edge, ['wolf', 'badger', 'wisp'], content), false);
     assert.equal(bestiaryFull(edge, ['wolf', 'badger', 'squirrel', 'grass-snake', 'wisp', 'boar'], content), true);
+  });
+
+  test('a chest opened before new creatures joined its list opens again', () => {
+    assert.equal(openedChestEntry('windfalls-edge', content), 'windfalls-edge:5');
+    assert.equal(openedChestEntry('windfalls', content), `windfalls:${regionDangers(content.regionsById.windfalls, content).length}`);
+    // Kept by id alone: opened before the creatures of 28.10.2026, which
+    // Skraj Wiatrołomów and its land got and Trzcinowisko did not.
+    assert.deepEqual(openedChests(['windfalls-edge', 'windfalls', 'reed-beds', 'nowhere'], content), ['reed-beds']);
+    assert.deepEqual(openedChests(['windfalls-edge:5', openedChestEntry('windfalls', content)], content), ['windfalls-edge', 'windfalls']);
+    // A list longer now than when its chest was opened.
+    assert.deepEqual(openedChests(['windfalls-edge:3'], content), []);
   });
 
   test('tracking the creatures of the quests meets them more often', () => {

@@ -379,7 +379,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // and the ending chosen for it if any ("event:case:ending"), without the
   // draw.
   const [forcedEvent = null, forcedCase = null, forcedEnding = null] = row.event_test ? row.event_test.split(':').map((part) => part || null) : [];
-  const event = eventsOn() ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent }, content) : null;
+  const event = eventsOn() ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn() }, content) : null;
   if (event && choice === undefined) return { event: eventView(event) };
   if (event) {
     if (!event.options.some((option) => option.id === choice)) throw new ApiError(400, 'invalid_choice', 'Wybierz jedną z opcji.');

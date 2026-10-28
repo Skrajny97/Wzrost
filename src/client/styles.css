@@ -7510,6 +7510,14 @@ button.herb-tile[aria-pressed='true'] {
 /* The Ranking postaci (screens/ranking.js): the order to pick, the
    player's place, and the table with both levels, the column of the order
    in gold and the player's own row in the System's light. */
+.ranking-by {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ranking-by .segmented-option {
+  line-height: 1.2;
+}
+
 .ranking-place {
   margin: 0;
   color: var(--system-text);
@@ -7574,6 +7582,17 @@ button.herb-tile[aria-pressed='true'] {
   align-items: center;
   gap: 6px;
   min-width: 0;
+}
+
+.ranking-profession {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ranking-profession .sprite {
+  width: 20px;
+  height: 20px;
 }
 
 /* The Znajomi (screens/friends.js): the Upominki to collect, and rows of

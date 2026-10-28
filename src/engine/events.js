@@ -29,15 +29,25 @@ import { say } from './text.js';
 // The chance an exploration that ended as planned brings an event.
 export const eventChance = (content) => content.events.chance;
 
+// The events that can come after an exploration of an inner region: those
+// that name it among their `areas`, or any region when they name none (the
+// author: "to obecne z ranną kobietą może się pojawiać tylko w Skraju
+// Wiatrołomów, Lisich Jarach i Kruczych Wykrotach, bo tylko tam jest
+// Błędnica"). A draft, an event the author has not approved yet, comes only
+// where `drafts` are on (the test version).
+export const eventsIn = (areaId, drafts, content) =>
+  content.events.list.filter((event) => (drafts || !event.draft) && (!event.areas || event.areas.includes(areaId)));
+
 // The event an exploration brings, or null. `forced` (an event's id, from
 // "Testuj zdarzenia" on the test version) brings that one without the draw,
-// still only after an exploration that ended as planned.
-export function eventFor({ hunt, seed, first = false, quick = false, forced = null }, content) {
+// in any region, still only after an exploration that ended as planned.
+export function eventFor({ hunt, seed, first = false, quick = false, forced = null, drafts = false }, content) {
   if (!content.events || first || quick || hunt.result !== 'success') return null;
   if (forced) return content.eventsById[forced] ?? null;
   const rng = createRng(`${seed}:event`);
   if (!rng.chance(eventChance(content))) return null;
-  return rng.weighted(content.events.list, (event) => event.weight ?? 1);
+  const open = eventsIn(hunt.areaId, drafts, content);
+  return open.length ? rng.weighted(open, (event) => event.weight ?? 1) : null;
 }
 
 // An event as the player first sees it: who, where, the text and the options.

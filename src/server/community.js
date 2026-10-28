@@ -6,7 +6,7 @@
 // collects at most claimsPerDay a day, all waiting ones at once, and one not
 // collected goes after keepDays days.
 
-import { giftReward, isUnlocked, questPeriod } from '../engine/index.js';
+import { giftReward, highestProfession, isUnlocked, questPeriod } from '../engine/index.js';
 import { characterView, loadPlayer } from './characters.js';
 import { chatRole, requireChatter } from './chat.js';
 import { content } from './content.js';
@@ -17,29 +17,37 @@ const today = (now) => questPeriod('daily', now, content).key;
 // The first day whose Upominek still waits to be collected.
 const firstKept = (now) => questPeriod('daily', now - (content.community.gift.keepDays - 1) * DAY, content).key;
 
-// The Ranking's two orders: by the character's level, or by its class's.
+// The highest level of the character's professions (characters.professions,
+// {"herbalism": {"level": 3, ...}}), 0 before its first work.
+const levels = content.professions.map(({ id }) => `coalesce(json_extract(c.professions, '$.${id}.level'), 0)`);
+const PROFESSION_LEVEL = levels.length > 1 ? `max(${levels.join(', ')})` : levels[0];
+
+// The Ranking's orders: by the character's level, by its class's, or by its
+// highest profession's (only characters that have worked in one).
 const ORDERS = {
-  level: 'c.level DESC, c.xp DESC, c.class_level DESC, c.class_xp DESC, c.id',
-  class: 'c.class_level DESC, c.class_xp DESC, c.level DESC, c.xp DESC, c.id',
+  level: { order: 'c.level DESC, c.xp DESC, c.class_level DESC, c.class_xp DESC, c.id', where: '' },
+  class: { order: 'c.class_level DESC, c.class_xp DESC, c.level DESC, c.xp DESC, c.id', where: '' },
+  profession: { order: `${PROFESSION_LEVEL} DESC, c.level DESC, c.xp DESC, c.id`, where: ` AND ${PROFESSION_LEVEL} > 0` },
 };
 
-// GET /api/ranking?by=level|class: the characters highest by the level of
-// the character (or of its class), each with both levels, and the player's
-// own place among all of them.
+// GET /api/ranking?by=level|class|profession: the characters highest by
+// the level of the character, of its class or of its highest profession,
+// each with these levels, and the player's own place among all of them.
 export async function ranking(context) {
   const { character, db } = await requireChatter(context);
-  const by = new URL(context.request.url).searchParams.get('by') === 'class' ? 'class' : 'level';
-  const order = ORDERS[by];
+  const asked = new URL(context.request.url).searchParams.get('by');
+  const by = Object.hasOwn(ORDERS, asked) ? asked : 'level';
+  const { order, where } = ORDERS[by];
   const [rows, own] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.name, c.class_id, c.level, c.class_level, u.login, u.google_sub, u.chat_moderator
+        `SELECT c.id, c.name, c.class_id, c.level, c.class_level, c.professions, u.login, u.google_sub, u.chat_moderator
          FROM characters c JOIN users u ON u.id = c.user_id
-         WHERE c.role = 'player' ORDER BY ${order} LIMIT ?`,
+         WHERE c.role = 'player'${where} ORDER BY ${order} LIMIT ?`,
       )
       .bind(content.community.ranking.size),
     db
-      .prepare(`SELECT place FROM (SELECT c.id, ROW_NUMBER() OVER (ORDER BY ${order}) AS place FROM characters c WHERE c.role = 'player') WHERE id = ?`)
+      .prepare(`SELECT place FROM (SELECT c.id, ROW_NUMBER() OVER (ORDER BY ${order}) AS place FROM characters c WHERE c.role = 'player'${where}) WHERE id = ?`)
       .bind(character.id),
   ]);
   return json({
@@ -51,6 +59,7 @@ export async function ranking(context) {
       className: content.classesById[row.class_id]?.name ?? row.class_id,
       level: row.level,
       classLevel: row.class_level,
+      profession: highestProfession(JSON.parse(row.professions ?? '{}'), content),
       role: chatRole(context.env, row),
       own: row.id === character.id,
     })),

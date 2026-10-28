@@ -1934,6 +1934,24 @@ describe('Bestiariusz', () => {
     assert.equal((await call('POST', '/api/bestiary/chest', { cookie, body: { area: 'windfalls-edge' } })).status, 200);
   });
 
+  test('a chest opened before new creatures joined its list opens again once they are met', async () => {
+    const database = await db();
+    const open = () => call('POST', '/api/bestiary/chest', { cookie, body: { area: 'windfalls-edge' } });
+    // Opened before the Wiewiórka and the Zaskroniec came: kept by id alone.
+    await database.prepare('UPDATE characters SET met = ?, bestiary = ?').bind(JSON.stringify(['wolf', 'badger', 'wisp']), '["windfalls-edge"]').run();
+    assert.deepEqual((await call('GET', '/api/character', { cookie })).data.character.bestiary, []);
+    assert.equal((await open()).data.error.code, 'not_ready');
+    await database.prepare('UPDATE characters SET met = ?').bind(JSON.stringify(['wolf', 'badger', 'wisp', 'squirrel', 'grass-snake'])).run();
+    const before = (await call('GET', '/api/character', { cookie })).data.character;
+    const opened = await open();
+    assert.equal(opened.status, 200);
+    assert.equal(opened.data.character.systemPoints, before.systemPoints + 20);
+    assert.deepEqual(opened.data.character.bestiary, ['windfalls-edge']);
+    const { bestiary } = await database.prepare('SELECT bestiary FROM characters').first();
+    assert.deepEqual(JSON.parse(bestiary), ['windfalls-edge:5']);
+    assert.equal((await open()).data.error.code, 'opened');
+  });
+
   test('chests opened before the Punkty Systemu get them once, by the migration', async () => {
     const database = await db();
     await database.prepare(`UPDATE characters SET bestiary = '["windfalls-edge","fox-ravines"]', system_points = 3`).run();

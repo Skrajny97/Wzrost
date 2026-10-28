@@ -1,8 +1,10 @@
 // The Ranking postaci in the Społeczność (src/server/community.js): the
-// characters highest by their own level or by their class's, both levels in
-// their columns, and the player's own place among all of them. A tap on a
-// name shows that character (profile.js).
+// characters highest by their own level, by their class's or by their
+// highest profession's, the levels in their columns (the profession's with
+// its icon, in its own order), and the player's own place among all of them.
+// A tap on a name shows that character (profile.js).
 
+import { professionSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { formatNumber } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
@@ -13,7 +15,12 @@ import { withButton } from '../ui.js';
 const ORDERS = [
   { id: 'level', name: 'Poziom postaci', column: 'Poziom' },
   { id: 'class', name: 'Poziom klasy', column: 'Klasa' },
+  { id: 'profession', name: 'Poziom Profesji', column: 'Profesja', own: true },
 ];
+
+// A profession's level with its icon beside it.
+const professionLevel = (profession) =>
+  profession && h('span', { class: 'ranking-profession' }, professionSprite(profession.id) ?? icon('leaf', { size: 14 }), formatNumber(profession.level));
 
 export function mountRanking(container) {
   let by = 'level';
@@ -55,6 +62,8 @@ export function mountRanking(container) {
   function show({ rows, place: own }) {
     place.textContent = own ? `Twoje miejsce: ${formatNumber(own)}.` : '';
     const sorted = (id) => (id === by ? 'ranking-sorted' : undefined);
+    // A column of its own order shows only there.
+    const columns = ORDERS.filter((order) => !order.own || order.id === by);
     fill(
       board,
       h(
@@ -68,7 +77,7 @@ export function mountRanking(container) {
             {},
             h('th', { scope: 'col', 'aria-label': 'Miejsce', text: '#' }),
             h('th', { scope: 'col', text: 'Postać' }),
-            ORDERS.map((order) => h('th', { scope: 'col', class: sorted(order.id), 'aria-sort': order.id === by ? 'descending' : undefined, text: order.column })),
+            columns.map((order) => h('th', { scope: 'col', class: sorted(order.id), 'aria-sort': order.id === by ? 'descending' : undefined, text: order.column })),
           ),
         ),
         h(
@@ -98,6 +107,7 @@ export function mountRanking(container) {
               ),
               h('td', { class: sorted('level'), text: formatNumber(row.level) }),
               h('td', { class: sorted('class'), text: formatNumber(row.classLevel) }),
+              by === 'profession' && h('td', { class: sorted('profession') }, professionLevel(row.profession)),
             ),
           ),
         ),

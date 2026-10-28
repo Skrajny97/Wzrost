@@ -53,6 +53,24 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
     assert.equal((await call('GET', '/api/ranking', { cookie: young })).status, 403);
   });
 
+  test('the Ranking by profession takes each character\'s highest one, and only characters that have worked in one', async () => {
+    const ewa = await player('Ewa', { level: 30 });
+    const database = await db();
+    const set = (name, professions) => database.prepare('UPDATE characters SET professions = ? WHERE name = ?').bind(JSON.stringify(professions), name).run();
+    await set('Ala', { herbalism: { level: 3, xp: 10 } });
+    await set('Ola', { herbalism: { level: 2, xp: 0 }, alchemy: { level: 7, xp: 5 } });
+    const byProfession = (await call('GET', '/api/ranking?by=profession', { cookie: players.ala })).data;
+    assert.equal(byProfession.by, 'profession');
+    assert.deepEqual(byProfession.rows.map(({ name, profession }) => [name, profession]), [
+      ['Ola', { id: 'alchemy', level: 7 }],
+      ['Ala', { id: 'herbalism', level: 3 }],
+    ]);
+    assert.equal(byProfession.place, 2);
+    // Without a profession, no place in this order; an unknown order is by level.
+    assert.equal((await call('GET', '/api/ranking?by=profession', { cookie: ewa })).data.place, null);
+    assert.equal((await call('GET', '/api/ranking?by=gold', { cookie: ewa })).data.by, 'level');
+  });
+
   test('a friendship starts with an invitation and holds once accepted', async () => {
     const sent = await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'ola' } });
     assert.equal(sent.status, 200);

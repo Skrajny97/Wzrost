@@ -814,7 +814,8 @@
         "growth",
         "goldStep",
         "landFactor",
-        "chanceMinutes"
+        "chanceMinutes",
+        "laterCreatures"
       ],
       "properties": {
         "gold": {
@@ -861,6 +862,11 @@
           "type": "integer",
           "minimum": 1,
           "description": "Procenty w Bestiariuszu: szansa spotkania stwora w jednej walce wyprawy tej długości, bez tropienia, szukania i unikania."
+        },
+        "laterCreatures": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Stwory dodane 28.10.2026 (0.0.44). Skrzynia otwarta przed nimi (zapisana bez liczby stworów) otwiera się znowu, gdy postać pozna wszystkie stwory jej listy, także te."
         }
       }
     },

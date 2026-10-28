@@ -47,6 +47,19 @@ export function professionStats(professions, content) {
   return bonus;
 }
 
+// The character's highest profession, { id, level }, or null before its
+// first work: for the Ranking (the author: "będzie tam brany najwyższy z
+// rozwijanych przez Postać z ikonką danej Profesji obok poziomu"). Of equal
+// levels, the one first in professions.json.
+export function highestProfession(professions, content) {
+  let best = null;
+  for (const { id } of content.professions) {
+    const level = professions[id]?.level ?? 0;
+    if (level > 0 && level > (best?.level ?? 0)) best = { id, level };
+  }
+  return best;
+}
+
 // The herbs the System shows at a level of the gathering profession.
 export const knownHerbs = (level, content) => content.herbs.filter((herb) => herb.level <= level);
 

@@ -35,6 +35,14 @@ test('the validator catches broken references and schema errors', () => {
   affixes.affixes.suffixes.find((affix) => affix.id === 'mire').monster = 'wolf';
   assert.deepEqual(validateData(affixes), ['affixes.json: stwór stag nie ma nazwy do afiksów', 'affixes.json: przyrostek mire ma mieć stwora albo tekst']);
 
+  // An event limited to inner regions comes only where its creatures live.
+  const events = structuredClone(loadData());
+  events.events.list[0].areas = ['windfalls-edge', 'viper-heaps', 'nowhere'];
+  assert.deepEqual(validateData(events), [
+    'events.json: wounded-woman przychodzi w viper-heaps, a tam nie żyje wisp',
+    'events.json: wounded-woman ma nieznany region wewnętrzny "nowhere"',
+  ]);
+
   const broken = structuredClone(loadData());
   broken.rarities[0].color = 'grey';
   assert.match(validateData(broken)[0], /^rarities\.json\/0\/color: must match pattern/);

@@ -254,6 +254,34 @@ const allMet = (dangers, met) => {
 export const bestiaryFull = (area, met, content) => allMet(areaDangers(area, content), met);
 export const landBestiaryFull = (region, met, content) => allMet(regionDangers(region, content), met);
 
+// The creatures on the Bestiariusz list of an inner region or a land, by id.
+function listedDangers(id, content) {
+  if (content.areasById[id]) return areaDangers(content.areasById[id], content);
+  if (content.regionsById[id]) return regionDangers(content.regionsById[id], content);
+  return null;
+}
+
+// How an opened chest is kept: its id and how many creatures its list had,
+// "windfalls-edge:5".
+export const openedChestEntry = (id, content) => `${id}:${listedDangers(id, content).length}`;
+
+// The chests open for the lists as they are now, by id. A list that has
+// grown since its chest was opened opens it again, with the same reward
+// (the author: "nowe stwory dadzą kolejne nagrody, mimo że ktoś je już
+// wcześniej odebrał… niech tak zostanie. Przy okazji ludzie będą mieli powód
+// by zwiedzić starsze poziomy"). A chest kept by its id alone was opened
+// before the creatures of balance.bestiary.laterCreatures came.
+export function openedChests(entries, content) {
+  const later = new Set(content.balance.bestiary.laterCreatures);
+  return entries.flatMap((entry) => {
+    const [id, count] = entry.split(':');
+    const dangers = listedDangers(id, content);
+    if (!dangers) return [];
+    const then = count === undefined ? dangers.filter((danger) => !later.has(danger.monsterId)).length : Number(count);
+    return then >= dangers.length ? [id] : [];
+  });
+}
+
 // A level from the place's range, whatever the character's level. Lower
 // levels come more often (monsterLevelWeights), so a character at the start of
 // an inner region is not outmatched in every fight.
