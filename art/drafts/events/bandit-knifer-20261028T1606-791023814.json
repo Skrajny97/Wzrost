@@ -1,0 +1,25 @@
+{
+  "id": "bandit-knifer",
+  "payload": {
+    "prompt": "lean forest bandit holding two long knives, patched dark cloak, a cloth mask over the lower face, crouched ready to strike, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 791023814,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793203763,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 22.58,
+    "request_id": "f99be3bb-5a74-436f-a4f1-2e8ad4072a65",
+    "outputs_retained_until": 1793290116
+  }
+}

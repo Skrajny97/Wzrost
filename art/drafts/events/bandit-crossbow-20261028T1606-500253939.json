@@ -1,0 +1,25 @@
+{
+  "id": "bandit-crossbow",
+  "payload": {
+    "prompt": "forest bandit aiming a wooden crossbow, leather cap, ragged green cloak and a quiver of bolts at the hip, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 500253939,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793203812,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 22.22,
+    "request_id": "75171434-1762-44e2-98f2-17c38dc8c9f5",
+    "outputs_retained_until": 1793290165
+  }
+}

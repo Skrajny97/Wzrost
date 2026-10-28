@@ -1,0 +1,23 @@
+{
+  "id": "forest-ambush",
+  "payload": {
+    "prompt": "pixel art landscape, a narrow forest path at dusk between dense bushes and old crooked trees, a fallen wicker basket lying on the path, deep shadows in the undergrowth where someone could hide, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and browns, no text, no border, no people, no animals",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 2,
+    "seed": 492475,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793203674,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 23.3,
+    "request_id": "54312096-794c-409b-b9b3-d224ad0033fe",
+    "outputs_retained_until": 1793290027
+  }
+}

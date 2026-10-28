@@ -1,0 +1,25 @@
+{
+  "id": "bandit-thug",
+  "payload": {
+    "prompt": "burly forest bandit with a heavy knotted wooden club, ragged leather jerkin and a dark hood, unshaven scowling face, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 468764841,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793203715,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 22.94,
+    "request_id": "8562bbb2-19bd-4054-b381-2319e9955079",
+    "outputs_retained_until": 1793290076
+  }
+}
