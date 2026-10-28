@@ -1,0 +1,14 @@
+{
+  "id": "imp-death",
+  "payload": {
+    "text": "a small imp gives a sharp high-pitched dying shriek that breaks into a dry raspy gasp, video game monster death sound, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/imp-death-20261028T2040-0.mp3",
+    "audio/drafts/voices/imp-death-20261028T2040-1.mp3",
+    "audio/drafts/voices/imp-death-20261028T2040-2.mp3"
+  ],
+  "credits": 60
+}
