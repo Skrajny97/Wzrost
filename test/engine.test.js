@@ -1254,6 +1254,9 @@ describe('camp', () => {
     assert.ok(Math.abs(campBonus(levels, 'sellPrice', content) - 0.5) < 1e-9);
     assert.equal(effectText(campfire, 3), 'Odpoczynek między wyprawami szybszy o 30%');
     assert.equal(effectText(content.buildingsById['loot-shed'], 2), 'Plecak większy o 10 miejsc');
+    // The Stół rozbiórki names its exchange's rate at the level, on the build card and in "Teraz".
+    assert.equal(effectText(content.buildingsById['craft-table'], 2, content), 'Najwyższa rzadkość: unikalna, przeróbka szybsza o 20%, wymiana zasobów 9 za 1');
+    assert.equal(effectText(content.buildingsById['craft-table'], 10, content).endsWith(', wymiana zasobów 1 za 1'), true);
     const item = generateItem({ baseId: 'sword', level: 10, rarityId: 'common' }, createRng('price'), content);
     assert.equal(sellPrice(item, content, 0.5), Math.round(sellPrice(item, content) * 1.5));
   });

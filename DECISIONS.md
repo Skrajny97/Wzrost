@@ -2577,3 +2577,7 @@ Autor: „Dodajmy też na stole rozbiórki możliwość wymiany zasobów typu ka
     - HP i mana rosną już bez punktów: każdy poziom postaci daje +5 maks. HP i +2 maks. many (`hpPerLevel` i `manaPerLevel` w `data/balance.json`). Poziomy klasy dodają też Witalność (wszystkie klasy) i Mądrość (Mag i Kleryk), a rozdawanie automatyczne daje Witalności ćwierć punktów w każdej klasie.
     - Symulacja postaci z rozdawaniem automatycznym (`tools/simulate.mjs`, godzinne wyprawy): omdlenia 0–2,3% na poziomach 25–100. W walkach (także z elitami) postać używa umiejętności 2–6 razy, a z nieograniczoną maną używałaby ich tyle samo. Umiejętności kosztują stałe 10–15 many, a mana rośnie z poziomem, więc z czasem starcza na coraz więcej.
     - Dlatego HP, mana i rozdawanie automatyczne zostają bez zmian. Ekran Statystyk pokazuje za to w „Wartościach bojowych” maks. manę obok maks. HP, a przy obu: „+5 z każdym poziomem postaci” i „+2 z każdym poziomem postaci”.
+
+## Stawka wymiany na górze ekranu Stołu rozbiórki (28.10.2026)
+
+Autor: „Dopisz na gorę info o możliwości wymiany zasobów i rozwoju sytuacji wraz z lvlem”. Efekt poziomu Stołu rozbiórki kończy się teraz stawką wymiany zasobów na tym poziomie, np. „Najwyższa rzadkość: unikalna, przeróbka szybsza o 20%, wymiana zasobów 9 za 1”. Widać ją w karcie budowy lub ulepszenia na samej górze ekranu i w „Teraz” (`exchange.levelText` w `data/buildings.json`, `effectText` w `src/engine/camp.js`).

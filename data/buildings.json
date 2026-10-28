@@ -148,7 +148,8 @@
       "title": "Wymiana zasobów",
       "text": "Za kilka sztuk jednego zasobu dostaniesz sztukę innego. Im wyższy poziom stołu, tym mniej oddajesz.",
       "resources": ["wood", "stone", "iron-ore"],
-      "rates": [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+      "rates": [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+      "levelText": "wymiana zasobów {rate} za 1"
     },
     "costs": [
       { "resource": "gold", "base": 3, "growth": 2.0 },

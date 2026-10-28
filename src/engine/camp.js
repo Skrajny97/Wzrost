@@ -155,13 +155,18 @@ export function effectText(building, level, content) {
   const value = effect.perLevel * level;
   const shown = effect.unit === 'percent' ? `${Math.round(value * 100)}%` : String(Math.round(value));
   const text = effect.text.replace('{value}', shown).replace('{hours}', `${effect.storageHours * level}\u00a0h`);
-  if (!effect.rarities) return text;
+  // A building that exchanges resources (the Stół rozbiórki) adds its rate
+  // at the level (the author: "Dopisz na górę info o możliwości wymiany
+  // zasobów i rozwoju sytuacji wraz z lvlem").
+  const { exchange } = building;
+  const rate = exchange ? `, ${exchange.levelText.replace('{rate}', exchange.rates[Math.min(level, exchange.rates.length) - 1])}` : '';
+  if (!effect.rarities) return `${text}${rate}`;
   // The Stół rozbiórki also names the highest rarity it takes and, from
   // a level on, the chance of an extra part.
   const all = level >= effect.rarities.length;
   const cap = all ? 'Wszystkie rzadkości' : `Najwyższa rzadkość: ${content.raritiesById[effect.rarities[level - 1]].forms.f}`;
   const bonus = level >= effect.bonusFromLevel ? `, szansa na dodatkową część: ${Math.round((level - effect.bonusFromLevel + 1) * effect.bonusPerLevel * 100)}%` : '';
-  return `${cap}, ${text.charAt(0).toLowerCase()}${text.slice(1)}${bonus}`;
+  return `${cap}, ${text.charAt(0).toLowerCase()}${text.slice(1)}${bonus}${rate}`;
 }
 
 const HOUR = 3600000;

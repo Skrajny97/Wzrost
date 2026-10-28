@@ -56,13 +56,14 @@
       "exchange": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["title", "text", "resources", "rates"],
+        "required": ["title", "text", "resources", "rates", "levelText"],
         "description": "Wymiana zasobów obozu jeden na drugi (Stół rozbiórki), bez dziennego limitu. Na poziomie L budynku za sztukę zasobu z resources oddaje się rates[L − 1] sztuk innego zasobu z resources (ostatnia stawka obowiązuje na dalszych poziomach).",
         "properties": {
           "title": { "type": "string", "minLength": 1 },
           "text": { "type": "string", "minLength": 1 },
           "resources": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
-          "rates": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 } }
+          "rates": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 } },
+          "levelText": { "type": "string", "pattern": "\\{rate\\}", "description": "Dopisek do efektu poziomu budynku (karta budowy i „Teraz”), z {rate}: ile sztuk za jedną na tym poziomie." }
         }
       },
       "shop": {
