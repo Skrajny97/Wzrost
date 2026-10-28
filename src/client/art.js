@@ -53,12 +53,13 @@ export const SPRITES = {
       // The creatures of 26.10.2026.
       'stag-antler', 'marten-fur', 'hornet-sting', 'hailstone', 'tusker-tusks', 'stone-heart', 'bat-wing', 'eagle-owl-feather', 'she-wolf-fur', 'basilisk-scale',
       // Pajęczy Parów from 28.10.2026.
-      'tarantula-hair', 'bird-eater-fang',
+      'tarantula-hair', 'bird-eater-fang', 'spider-moults',
       // Zarośnięte Rozlewiska and Torfowe Mszary from 28.10.2026.
       'heron-feather', 'otter-fur', 'mosquito-proboscis', 'reed-bundle', 'beaver-teeth', 'mosquito-wings', 'eel-skin',
       'eagle-feather', 'cormorant-feather', 'catfish-whisker', 'toad-venom', 'crocodile-hide', 'willow-bark', 'wraith-veil',
       'mist-drop', 'old-bone', 'drowner-weeds', 'sludge-lump', 'vodnik-pearl', 'drowned-tear', 'crane-feather', 'elk-antler',
       'crayfish-shell', 'harrier-feather', 'sundew-dew', 'peat-heart', 'wisp-spark', 'salamander-skin', 'peat-spade', 'worm-jaw',
+      'goblin-trinket', 'leech-slime', 'kikimora-yarn', 'bog-heart',
     ],
   },
   // The skills of the classes (data/skills.json), 48×48.
