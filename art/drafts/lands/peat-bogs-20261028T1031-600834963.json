@@ -1,0 +1,23 @@
+{
+  "id": "peat-bogs",
+  "payload": {
+    "prompt": "pixel art landscape, a vast peat bog covered with moss and hummocks, black pools of water, low fumes and smoke over the peat, a few crooked pines, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, browns and rusty reds, no text, no border, no people, no animals in front",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 2,
+    "seed": 600834963,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183565,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 39.36,
+    "request_id": "49b872ee-4315-4449-9f0b-9e0a9bc0f7ee",
+    "outputs_retained_until": 1793269918
+  }
+}

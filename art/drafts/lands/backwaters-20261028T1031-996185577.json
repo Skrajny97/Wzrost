@@ -1,0 +1,23 @@
+{
+  "id": "backwaters",
+  "payload": {
+    "prompt": "pixel art landscape, a wide valley where an old river overflowed into the forest, reeds, beaver dams and dead trees standing in shallow water, mist over old willows, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, browns and grey-blues, no text, no border, no people, no animals in front",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 2,
+    "seed": 996185577,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793183515,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 39.72,
+    "request_id": "f75616e4-494f-4701-a908-6242c6129b23",
+    "outputs_retained_until": 1793269866
+  }
+}
