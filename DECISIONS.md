@@ -2567,3 +2567,13 @@ Autor: „Dodajmy też na stole rozbiórki możliwość wymiany zasobów typu ka
     - U złomiarza część następnej rzadkości kosztuje dwa razy tyle co poprzednia. Za 10 części zapłaciłoby się pięć razy więcej niż za jedną wyższą, więc wymiana nigdy nie jest tańsza od zakupu, a złomiarz nie traci sensu (test w `test/workshop.test.js`).
     - Rzadsze części trzeba nadal zdobyć: 1 Odłamek to 1000 Ścinek, a Gwiezdny odprysk — milion. Przy 2 lub 3 za 1 Ścinki z rozbiórki szybko zamieniałyby się w części boskie.
     - Wymiana daje za to ujście nadmiarowi Ścinek i Rzemieni, gdy brakuje kilku części wyższej rzadkości do zlecenia, a złomiarz jeszcze ich nie sprzedaje albo skończył się jego dzienny limit.
+
+## Suwak ducha ognia od jednej sztuki oraz HP i mana z poziomem (28.10.2026)
+
+1. **Duch ognia.** Autor: „Ducha ognia miałeś też domyślnie ustawić by suwak był ustawiony na najniższą wartość i pytać przed wymianą złota na zasoby”.
+    - Suwak przy duchu ognia stoi teraz na 1 sztuce, gdy gracz otwiera ekran Ogniska. Wcześniej stał na wszystkim, co zostało na dziś albo na co starczało złota. Ekran pamięta ostatni wybór do wyjścia z niego, a po powrocie suwak znów stoi na 1. Tak samo działa suwak wymiany przy Stole rozbiórki.
+    - Pytanie przed wymianą jest od 0.0.25 („Wymiana u ducha ognia”, punkt w sekcji o Osłonie many): złoto znika dopiero po „Wymień”.
+2. **HP i mana z poziomem.** Autor: „Niech poziom Many i Zdrowia rośnie u każdej postaci również bez zwiekszania statystyk troche jeśli trzeba”, „Ewentualnie dostosuj rozdawanie automatyczne. Najlepiej zrob obydwa jesli dobrze mysle, ze HP i Mana nie rosna bez wzrostu statystyk.”
+    - HP i mana rosną już bez punktów: każdy poziom postaci daje +5 maks. HP i +2 maks. many (`hpPerLevel` i `manaPerLevel` w `data/balance.json`). Poziomy klasy dodają też Witalność (wszystkie klasy) i Mądrość (Mag i Kleryk), a rozdawanie automatyczne daje Witalności ćwierć punktów w każdej klasie.
+    - Symulacja postaci z rozdawaniem automatycznym (`tools/simulate.mjs`, godzinne wyprawy): omdlenia 0–2,3% na poziomach 25–100. W walkach (także z elitami) postać używa umiejętności 2–6 razy, a z nieograniczoną maną używałaby ich tyle samo. Umiejętności kosztują stałe 10–15 many, a mana rośnie z poziomem, więc z czasem starcza na coraz więcej.
+    - Dlatego HP, mana i rozdawanie automatyczne zostają bez zmian. Ekran Statystyk pokazuje za to w „Wartościach bojowych” maks. manę obok maks. HP, a przy obu: „+5 z każdym poziomem postaci” i „+2 z każdym poziomem postaci”.

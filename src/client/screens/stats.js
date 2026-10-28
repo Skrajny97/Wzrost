@@ -257,7 +257,11 @@ export function mountStats(container) {
     const values = [
       ['Obrażenia', character.combat.damage, character.combat.damageKind],
       ['Redukcja obrażeń', `${character.combat.reduction}%`, 'fizycznych'],
-      ['Maks. HP', formatNumber(character.combat.maxHp), null],
+      // Both grow with every character level, also without points (the
+      // author: "Niech poziom Many i Zdrowia rośnie u każdej postaci
+      // również bez zwiększania statystyk").
+      ['Maks. HP', formatNumber(character.combat.maxHp), `+${formatNumber(character.combat.perLevel.hp)} z każdym poziomem postaci`],
+      ['Maks. mana', formatNumber(character.combat.maxMana), `+${formatNumber(character.combat.perLevel.mana)} z każdym poziomem postaci`],
     ];
     return h(
       'section',

@@ -760,6 +760,9 @@ export function characterView(player, now) {
       damageKind: weapon.category === 'physical' ? 'fizyczne' : `magiczne, ${content.elementsById[weapon.element].name}`,
       reduction: Math.round(values.reduction * 100),
       maxHp,
+      maxMana: values.mana,
+      // What every character level adds to both, without any points.
+      perLevel: { hp: content.balance.character.hpPerLevel, mana: content.balance.character.manaPerLevel },
     },
     equipment: Object.fromEntries(
       content.slots.map((slot) => {

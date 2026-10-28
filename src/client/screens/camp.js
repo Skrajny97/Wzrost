@@ -23,10 +23,12 @@ import { dayPart } from '../scenes.js';
 
 const CAMP = '#/oboz';
 const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
-// The pieces last picked on the fire spirit's slider, while the page is open.
+// The pieces last picked on the fire spirit's slider, while its building's
+// screen stays open: a newly opened screen starts at one piece (the author:
+// "suwak był ustawiony na najniższą wartość").
 let fireChoice = null;
 // The resource last given at the Stół rozbiórki's exchange and the pieces
-// last picked there, while the page is open.
+// last picked there, the same way.
 const exchangeChoice = { from: null, amount: null };
 
 export function mountCamp(container, { params, backHash = '#/walka' }) {
@@ -413,6 +415,8 @@ function mountBoard(container, backHash) {
 function mountBuilding(container, id) {
   let ticks = [];
   let shownBuild = null;
+  fireChoice = null;
+  exchangeChoice.amount = null;
 
   function render() {
     const own = id === campOf().id;
@@ -526,10 +530,8 @@ function mountBuilding(container, id) {
         next,
       );
     }
-    // All that is left today, or as much as the gold pays for, or the last
-    // choice.
-    const affordable = Math.floor(state.character.gold / trade.unitGold);
-    let amount = Math.max(1, Math.min(trade.left, fireChoice ?? trade.left, affordable));
+    // One piece, or the last choice while the screen is open.
+    let amount = Math.max(1, Math.min(trade.left, fireChoice ?? 1));
     const value = h('output', { class: 'fire-trade-amount', 'aria-live': 'off' });
     const slider = h('input', {
       type: 'range',
