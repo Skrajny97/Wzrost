@@ -1,0 +1,25 @@
+{
+  "id": "antlion",
+  "payload": {
+    "prompt": "giant antlion larva the size of a dog, bulbous sandy-brown bristly body on six short legs, huge curved sickle jaws, flicking sand with its head, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 425685873,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793216968,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 69.3,
+    "request_id": "6ec90f68-2bce-4b06-97cb-78d788e11776",
+    "outputs_retained_until": 1793303345
+  }
+}
