@@ -10,6 +10,7 @@
     { "id": "lynx-fur", "name": "Futro rysia", "gender": "n", "monster": "lynx", "rarity": "unique", "description": "Gęste, cętkowane futro, ciepłe nawet zimą." },
     { "id": "spider-silk", "name": "Pajęczy jedwab", "gender": "m", "monster": "spider", "rarity": "unique", "description": "Kłębek lepkiej i mocnej pajęczej nici." },
     { "id": "tarantula-hair", "name": "Włosie tarantuli", "gender": "n", "monster": "tarantula", "rarity": "unique", "description": "Pęczek sztywnych, kłujących włosków z odwłoka tarantuli." },
+    { "id": "spider-moults", "name": "Pajęcze wylinki", "gender": "pl", "monster": "spiderlings", "rarity": "rare", "description": "Cieniutkie, puste skorupki, które młode pająki zrzuciły, gdy rosły." },
     { "id": "bird-eater-fang", "name": "Kieł ptasznika", "gender": "m", "monster": "bird-eater", "rarity": "legendary", "description": "Czarny, zakrzywiony kieł. Na jego czubku wciąż lśni kropla jadu." },
     { "id": "alpha-fang", "name": "Kieł basiora", "gender": "m", "monster": "alpha-wolf", "rarity": "unique", "description": "Kieł przywódcy watahy, dłuższy niż palec." },
     { "id": "bear-hide", "name": "Skóra niedźwiedzia", "gender": "f", "monster": "bear", "rarity": "epic", "description": "Ciężka, gruba skóra z brunatnym futrem." },

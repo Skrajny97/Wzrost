@@ -803,7 +803,7 @@ describe('progression', () => {
     // A slow burn: a 30-minute exploration gives one or two levels at first.
     for (const level of [1, 2, 5, 10]) assert.ok(Math.abs(huntingHours(level, content) * 60 - 20) < 0.5, `level ${level}`);
     assert.ok(huntingHours(25, content) * 60 > 30);
-    assert.ok(huntingHours(100, content) > 4 && huntingHours(100, content) < 8);
+    assert.ok(huntingHours(100, content) > 8 && huntingHours(100, content) < 12);
     assert.ok(huntingHours(500, content) > 20 && huntingHours(500, content) < 30);
     assert.equal(content.balance.progression.maxLevel, 500);
     // Class levels need less XP, so they come faster.
@@ -1070,13 +1070,14 @@ test('the threat level follows the whole character, not its level alone', () => 
 });
 
 test('the threat level follows the simulated chance of fainting', () => {
-  // A level 26 mage, new to the first unsafe inner region, faints now and then on a 4-hour exploration.
+  // A level 26 mage, new to the first unsafe inner region, faints now and then on a 4-hour exploration
+  // (with the slower levels of 28.10.2026 its gear lags less, so about one in twenty).
   const { character, equipped } = typicalCharacter('mage', 26, content);
   const estimated = faintChances({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content)[240];
   const simulated = simulateMany({ classId: 'mage', level: 26, minutes: 240, hunts: 300 }, content).faintRate;
-  assert.ok(simulated > 0.05, `simulated ${simulated}`);
+  assert.ok(simulated > 0.03, `simulated ${simulated}`);
   assert.ok(Math.abs(estimated - simulated) < 0.1, `estimated ${estimated}, simulated ${simulated}`);
-  assert.ok(['high', 'very-high'].includes(estimateThreat({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content)[240]));
+  assert.ok(['moderate', 'high', 'very-high'].includes(estimateThreat({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content)[240]));
 
   // An inner region far above the character is hopeless, by sample fights too.
   const beginner = typicalCharacter('cleric', 1, content);

@@ -146,18 +146,21 @@
         "name": "Pajęczy Parów",
         "minLevel": 31,
         "maxLevel": 35,
-        "description": "Wąski parów zasnuty pajęczyną. Pająki czekają w sieciach, tarantule polują między głazami, a w najgłębszej norze mieszka ptasznik.",
+        "description": "Wąski parów zasnuty pajęczyną. Pająki czekają w sieciach, tarantule polują między głazami, spod kamieni wysypuje się świeży wylęg, a w najgłębszej norze mieszka ptasznik.",
         "elite": "bird-eater",
         "encounters": [
-          { "weight": 24, "monsters": ["spider"] },
-          { "weight": 16, "monsters": ["spider", "spider"] },
-          { "weight": 16, "monsters": ["tarantula"] },
-          { "weight": 10, "monsters": ["tarantula", "spider"] }
+          { "weight": 20, "monsters": ["spider"] },
+          { "weight": 14, "monsters": ["spider", "spider"] },
+          { "weight": 14, "monsters": ["tarantula"] },
+          { "weight": 14, "monsters": ["spiderlings"] },
+          { "weight": 10, "monsters": ["tarantula", "spider"] },
+          { "weight": 8, "monsters": ["spiderlings", "spider"] }
         ],
         "tough": [
           { "weight": 10, "monsters": ["spider", "spider", "spider"] },
           { "weight": 8, "monsters": ["tarantula", "spider", "spider"] },
-          { "weight": 6, "monsters": ["tarantula", "tarantula"] }
+          { "weight": 6, "monsters": ["tarantula", "tarantula"] },
+          { "weight": 6, "monsters": ["spiderlings", "spiderlings", "spider"] }
         ]
       },
       {

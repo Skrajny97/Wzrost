@@ -172,6 +172,22 @@
     }
   },
   {
+    "id": "spiderlings",
+    "name": "Pajęczy wylęg",
+    "counted": ["pajęczy wylęg", "pajęcze wylęgi", "pajęczych wylęgów"],
+    "family": "spider",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 3, "dexterity": 6, "vitality": 4, "endurance": 2, "intellect": 1, "wisdom": 1, "perception": 4, "will": 2 },
+      "growth": { "strength": 1.6, "dexterity": 2.1, "vitality": 2.1, "endurance": 1.2, "perception": 1, "will": 0.5 }
+    },
+    "attack": { "name": "Rój ukąszeń", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.45, "variance": 0.25, "dot": { "effect": "poisoned", "chance": 0.4, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.6,
+    "armorFactor": 0.2,
+    "resistances": { "poison": { "base": 10, "perLevel": 2 } },
+    "reward": { "xp": 1.05, "gold": 0.5 }
+  },
+  {
     "id": "bird-eater",
     "name": "Ptasznik",
     "counted": [

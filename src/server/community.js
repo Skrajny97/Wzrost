@@ -105,18 +105,26 @@ async function friendsOf(db, id, now) {
 
 // The invitations and the Upominki that wait for a character, for the light
 // on the Społeczność tab (chat.js): only as many Upominki as it may still
-// collect today.
+// collect today, and the friends it has not sent one to today (the author:
+// "że są upominki do wysłania/odebrania").
 export async function friendNews(db, id, now) {
   const day = today(now);
   const row = await db
     .prepare(
       `SELECT (SELECT COUNT(*) FROM friends WHERE friend_id = ? AND accepted_at IS NULL) AS invites,
               (SELECT COUNT(*) FROM gifts WHERE receiver_id = ? AND claimed_at IS NULL AND day >= ?) AS waiting,
-              (SELECT COUNT(*) FROM gifts WHERE receiver_id = ? AND claimed_day = ?) AS claimed`,
+              (SELECT COUNT(*) FROM gifts WHERE receiver_id = ? AND claimed_day = ?) AS claimed,
+              (SELECT COUNT(*) FROM friends f JOIN characters o ON o.id = CASE WHEN f.character_id = ? THEN f.friend_id ELSE f.character_id END
+               WHERE (f.character_id = ? OR f.friend_id = ?) AND f.accepted_at IS NOT NULL AND o.role = 'player'
+                 AND NOT EXISTS (SELECT 1 FROM gifts g WHERE g.sender_id = ? AND g.receiver_id = o.id AND g.day = ?)) AS unsent`,
     )
-    .bind(id, id, firstKept(now), id, day)
+    .bind(id, id, firstKept(now), id, day, id, id, id, id, day)
     .first();
-  return { invites: row.invites, gifts: Math.min(row.waiting, Math.max(0, content.community.gift.claimsPerDay - row.claimed)) };
+  return {
+    invites: row.invites,
+    gifts: Math.min(row.waiting, Math.max(0, content.community.gift.claimsPerDay - row.claimed)),
+    unsent: row.unsent,
+  };
 }
 
 // How the other character stands to this one, for its profile.

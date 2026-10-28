@@ -106,7 +106,11 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
   test('one Upominek a day to each friend, with its reward for the friend\'s level', async () => {
     const accepted = await befriend(players.ala, players.ola, 'Ola');
     const id = accepted.data.friends[0].id;
+    // Both have an Upominek to send, and the light on the tab says so.
+    const unsent = async (cookie) => (await call('GET', '/api/chat/latest', { cookie })).data.unsent;
+    assert.deepEqual([await unsent(players.ala), await unsent(players.ola)], [1, 1]);
     const sent = await call('POST', '/api/friends/gift', { cookie: players.ala, body: { id } });
+    assert.deepEqual([await unsent(players.ala), await unsent(players.ola)], [0, 1]);
     assert.equal(sent.status, 200);
     assert.equal(sent.data.friends[0].sentToday, true);
     assert.equal((await call('POST', '/api/friends/gift', { cookie: players.ala, body: { id } })).data.error.code, 'sent');

@@ -1510,14 +1510,23 @@ a.segmented-option {
   white-space: nowrap;
 }
 
+/* At the top, over the top bar, so it hides neither the backpack's rows
+   nor the chat line, and taps go through it to what lies below (the author:
+   taking items apart one by one, "trzeba czekać aż powiadomienie zniknie").
+   As a popover it also sets aside the browser's own popover look. */
 .toast {
   position: fixed;
+  top: calc(8px + env(safe-area-inset-top));
   right: var(--gutter);
-  bottom: calc(var(--nav-height) + 16px + env(safe-area-inset-bottom));
+  bottom: auto;
   left: var(--gutter);
   z-index: 50;
+  width: auto;
+  height: auto;
   max-width: 408px;
   margin: 0 auto;
+  overflow: visible;
+  pointer-events: none;
   padding: 12px 14px;
   border: 1px solid var(--system-line);
   background: rgba(13, 17, 11, 0.97);

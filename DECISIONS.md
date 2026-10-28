@@ -2403,3 +2403,39 @@ Autor rozpisał stwory regionów Rozlewisk w dokumencie z propozycjami („Insig
     - czas na poziom zgadza się z krzywą w granicach ok. 4%. Nagrody stworów są dobrane do regionów, np. w Rosiczkowym Polu o jedną czwartą mniejsze, bo walki z rosiczkami i torfiakami dawały za dużo XP.
 7. **Skrzynie Bestiariusza** rosną dalej po krzywej: od Trzcinowiska (680 złota, 105 Punktów Czasu, 20 Punktów Systemu) do Starego Wyrobiska (1475, 195, 20). Skrzynie krain: Rozlewiska 1270 złota, 181 Punktów Czasu i 25 Punktów Systemu, Mszary 1845, 244 i 25.
 8. **Grafiki i okrzyki.** Z Retro Diffusion jest po jednym szkicu każdego stwora (33), ikony materiału (34), koła regionu (10) i tła krainy (2), pokazywane autorowi pojedynczo. Okrzyki (ElevenLabs) mają po dwie wersje bólu i śmierci. Wypchnięcie samych opisów szkiców (`art/`, `audio/`) nie uruchamia już testów i wdrożenia, tak jak same notatki.
+
+## Jeszcze wolniejsze poziomy (28.10.2026)
+
+Autor o spowolnieniu z 0.0.28: „jeszcze wolniej, tak z 1,5-2 razy”.
+
+1. **Spowolnienie na 50. poziomie wynosi teraz 6 zamiast 3,5** (`levelTimeFactor` w `midGame`), a znika dopiero na 300. poziomie (`fadeLevel`, wcześniej 200), żeby żaden poziom nie trwał krócej od poprzedniego. Do 10. poziomu nic się nie zmienia, a 500. poziom dalej zajmuje około doby (26,5 h).
+2. **Godziny eksploracji na jeden poziom** (0.0.28 → teraz):
+    - 20. poziom: 0,66 → 0,91 h;
+    - 30.: 1,54 → 2,40 h;
+    - 40.: 2,86 → 4,73 h;
+    - 45.: 3,70 → 6,24 h;
+    - 50.: 4,66 → 7,98 h;
+    - 100.: 6,1 → 9,8 h.
+
+   Na 30–50. poziomie to 1,6–1,7 raza wolniej, na 20. poziomie 1,4 raza. Od 1. do 50. poziomu to razem ok. 118 godzin eksploracji (wcześniej ok. 75), a od 50. do 100. ok. 450 godzin. Klasa zwalnia tak samo. Nagrody stworów zostają, więc w Rozlewiskach i Mszarach poziom dalej trwa tyle, ile mówi krzywa.
+
+## Powiadomienia na górze, kropka Znajomych i usuwanie postaci (28.10.2026)
+
+1. **Powiadomienia** (`toast` w `ui.js`) pokazują się teraz na górze ekranu, nad paskiem postaci. Są też nad otwartym okienkiem, bo jako popover leżą w warstwie najwyższej. Wcześniej odmowa Wymiany w czasie wyrobu („Postać wykonuje przedmioty…”) chowała się pod kartą postaci. Stuknięcia przechodzą przez powiadomienie, więc przy rozbiórce plecak jest od razu dostępny i nie trzeba czekać, aż zniknie (autor: „trzeba czekać aż powiadomienie zniknie”).
+2. **Kropka przy Znajomych** świeciła już przy zaproszeniu i Upominku do odebrania. Teraz świeci też wtedy, gdy któryś znajomy nie dostał jeszcze dziś Upominku od tej postaci (`unsent` w `/api/chat/latest`), bo autor chciał kropki także dla „upominków do wysłania”. Ta sama kropka zapala zakładkę Społeczność.
+3. **Usunięcie postaci** („Zacznij od nowa”) zabiera wszystko, co jej dotyczy, także u innych graczy:
+    - jej znajomości, więc znika z list znajomych;
+    - Upominki wysłane i odebrane; nieodebrany Upominek od niej przepada, a to, co inni już odebrali, zostaje;
+    - Wymiany z nią; przedmioty nie wiszą w wymianie, bo przechodzą dopiero przy jej zakończeniu;
+    - wszystkie jej wiadomości czatu (Globalny, Wymiana i rozmowy prywatne w obie strony), zgłoszenia tych wiadomości i zamknięte rozmowy.
+   Na koncie zostają ukryci gracze, blokady Wymian i zgoda na zasady czatu. Sprawdzają to testy czatu i Znajomych.
+
+## Pajęczy wylęg w Pajęczym Parowie (28.10.2026)
+
+Autor: „Skoro z Krzyżaka zrobiłeś Pająka to trzeba dodać jeszcze jednego wroga. Na przykład "Młoda chmara" albo nazwij ładniej taką dużą ilość małych pająków dopiero wyklutych. Mocniejsze od Pająka, słabsze od Tarantuli. Jesli chodzi o przedmiot z nich - to resztki skorup na przykład”.
+
+1. **Pajęczy wylęg** (`spiderlings`) to chmara świeżo wyklutych pajączków. Nazwa jest w liczbie pojedynczej, jak Chmara komarów, żeby zdania walki brzmiały dobrze („Pajęczy wylęg pada”).
+    - Stoi z przodu i atakuje „Rojem ukąszeń” (fizycznie, od Zręczności), z Zatruciem słabszym niż u Pająka.
+    - HP, obrażenia i XP ma między Pająkiem a Tarantulą, a pancerz słaby, bo pajączki są miękkie.
+2. **Materiał: „Pajęcze wylinki”** (rzadki), czyli puste skorupki, które młode pająki zrzucają, gdy rosną. W nazwach przedmiotów: „Wylęgu”.
+3. **Spotkania w Parowie:** wylęg sam albo z Pająkiem, a w trudnych walkach dwa wylęgi z Pająkiem. Symulacja na 33. poziomie: omdleń brak, poziom trwa ok. 5% krócej niż w krzywej. Parów ma teraz cztery własne stwory.

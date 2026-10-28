@@ -1,6 +1,7 @@
 // What waits in the Społeczność: messages someone wrote in the Globalny or
 // in a private conversation since the player last read them, invitations
-// to the Znajomi, Upominki to collect and a Wymiana proposed or going on.
+// to the Znajomi, Upominki to collect or to send today and a Wymiana
+// proposed or going on.
 // The Społeczność tab lights up then (layout.js), as Postać does for free
 // points, and so do their parts in its list and the chat's tabs
 // (screens/community.js). While the game is in front, the page asks for
@@ -34,6 +35,8 @@ try {
 let conversations = [];
 let invites = 0;
 let gifts = 0;
+// Friends without an Upominek from this character today.
+let unsent = 0;
 // The character's live Wymiana: { id, state, proposer, other }, or null.
 let trade = null;
 let askedAt = 0;
@@ -43,7 +46,7 @@ const open = () => Boolean(state.character) && isUnlocked('community');
 export const globalNews = () => open() && !muted && latest > seen;
 export const conversationNews = (id, newest = conversations.find((entry) => entry.id === id)?.latest ?? 0) => open() && newest > (privateSeen[id] ?? 0);
 export const chatNews = () => globalNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest));
-export const friendNews = () => open() && invites + gifts > 0;
+export const friendNews = () => open() && invites + gifts + unsent > 0;
 export const liveTrade = () => (open() ? trade : null);
 // A proposal to this character, or a trade going on.
 export const tradeNews = () => Boolean(liveTrade()) && !(trade.state === 'proposed' && trade.proposer);
@@ -60,7 +63,9 @@ export const communityNewsText = () =>
       ? 'nowe wiadomości na czacie'
       : invites > 0
         ? 'zaproszenie do znajomych czeka'
-        : 'upominek czeka';
+        : gifts > 0
+          ? 'upominek czeka'
+          : 'upominek do wysłania';
 
 // What happens when a light changes (app.js redraws the bar); the returned
 // function stops it.
@@ -147,11 +152,13 @@ export function tradeSeen(view) {
 }
 
 // The Znajomi as the server last described them (/api/friends): the
-// invitations waiting, and the Upominki the character may still collect today.
+// invitations waiting, the Upominki the character may still collect today
+// and the friends it has not sent one to yet.
 export function friendsSeen(view) {
   update(() => {
     invites = view.incoming.length;
     gifts = Math.min(view.gifts.waiting, Math.max(0, view.gifts.claimsPerDay - view.gifts.claimedToday));
+    unsent = view.friends.filter((friend) => !friend.sentToday).length;
   });
 }
 
@@ -173,6 +180,7 @@ export async function checkChat({ now = false } = {}) {
     conversations = answer.conversations ?? [];
     invites = answer.invites ?? 0;
     gifts = answer.gifts ?? 0;
+    unsent = answer.unsent ?? 0;
     trade = answer.trade ?? null;
   });
 }

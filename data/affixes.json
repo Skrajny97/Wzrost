@@ -38,6 +38,7 @@
     { "monster": "lynx", "prefix": { "m": "Rysi", "f": "Rysia", "n": "Rysie", "pl": "Rysie" }, "suffix": "Rysia" },
     { "monster": "spider", "prefix": { "m": "Pajęczy", "f": "Pajęcza", "n": "Pajęcze", "pl": "Pajęcze" }, "suffix": "Pająka" },
     { "monster": "tarantula", "prefix": { "m": "Tarantulowy", "f": "Tarantulowa", "n": "Tarantulowe", "pl": "Tarantulowe" }, "suffix": "Tarantuli" },
+    { "monster": "spiderlings", "suffix": "Wylęgu" },
     { "monster": "bird-eater", "suffix": "Ptasznika" },
     { "monster": "alpha-wolf", "prefix": { "m": "Basiorowy", "f": "Basiorowa", "n": "Basiorowe", "pl": "Basiorowe" }, "suffix": "Basiora" },
     { "monster": "fox", "prefix": { "m": "Lisi", "f": "Lisia", "n": "Lisie", "pl": "Lisie" }, "suffix": "Lisa" },

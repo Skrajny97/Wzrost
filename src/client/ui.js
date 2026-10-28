@@ -116,12 +116,20 @@ export function confirmAction({ title, text, confirmLabel, cancelLabel = 'Anuluj
 
 let toastTimer = null;
 
+// A toast shows over an open sheet too (the author: a refusal "pokazuje się
+// pod okienkiem"): as a popover it sits in the top layer, and showing it
+// anew puts it above a sheet opened in the meantime.
 export function toast(message) {
   const element = $('#toast');
   element.textContent = message;
   element.hidden = false;
+  if (element.showPopover) {
+    if (element.matches(':popover-open')) element.hidePopover();
+    element.showPopover();
+  }
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
+    if (element.hidePopover && element.matches(':popover-open')) element.hidePopover();
     element.hidden = true;
   }, 4500);
 }

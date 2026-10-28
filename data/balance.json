@@ -163,7 +163,7 @@
     "xpPerHourScale": 650,
     "earlyXpFactors": [1, 0.861, 0.551, 0.402, 0.314],
     "classXpFactor": 0.6,
-    "midGame": { "fromLevel": 10, "toLevel": 50, "fadeLevel": 200, "levelTimeFactor": 3.5 },
+    "midGame": { "fromLevel": 10, "toLevel": 50, "fadeLevel": 300, "levelTimeFactor": 6 },
     "freeResetMaxLevel": 20,
     "classEvolutionLevels": [50, 100, 200, 300, 400, 500]
   },
