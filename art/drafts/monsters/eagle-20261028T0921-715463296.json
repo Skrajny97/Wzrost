@@ -1,0 +1,25 @@
+{
+  "id": "eagle",
+  "payload": {
+    "prompt": "white-tailed eagle with brown plumage, pale head and white tail, wings spread wide, yellow hooked beak and talons forward, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 715463296,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793179718,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 51.78,
+    "request_id": "a9aa7295-b0a7-476c-9afc-6364e6241554",
+    "outputs_retained_until": 1793266052
+  }
+}

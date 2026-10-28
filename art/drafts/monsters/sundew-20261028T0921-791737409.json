@@ -1,0 +1,25 @@
+{
+  "id": "sundew",
+  "payload": {
+    "prompt": "giant carnivorous sundew plant, red tentacle leaves tipped with glistening sticky drops, a trapped insect, roots in moss, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 791737409,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793180667,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 48.36,
+    "request_id": "19aaafff-2dbd-4d4e-8774-302227c701b5",
+    "outputs_retained_until": 1793267006
+  }
+}

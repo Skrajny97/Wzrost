@@ -1,0 +1,25 @@
+{
+  "id": "mistling",
+  "payload": {
+    "prompt": "creature of thick swamp mist, a swirling grey-green cloud with a vague face and two faint yellow eyes, wispy tendrils, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 865749427,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793180048,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 50.52,
+    "request_id": "526ed672-aea2-45ca-8e4f-94bd77e57458",
+    "outputs_retained_until": 1793266403
+  }
+}

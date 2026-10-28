@@ -1,0 +1,25 @@
+{
+  "id": "drowned-maiden",
+  "payload": {
+    "prompt": "drowned maiden from Slavic legend, pale bluish skin, long wet dark hair with water weeds, white soaked dress, glowing pale eyes, floating over dark water, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 577655610,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793180123,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 50.34,
+    "request_id": "6ed8568e-1a01-4710-8776-5f311d476852",
+    "outputs_retained_until": 1793266450
+  }
+}

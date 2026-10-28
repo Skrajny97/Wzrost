@@ -1,0 +1,25 @@
+{
+  "id": "water-spirit",
+  "payload": {
+    "prompt": "vodnik water spirit from Slavic legend, green-skinned old man with a long dripping beard of water weeds, webbed hands, old frock coat, holding a clay jar with a glowing soul inside, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 893972093,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793180339,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.44,
+    "request_id": "8a7fdd79-8670-46cb-bd43-6bd72aef1e08",
+    "outputs_retained_until": 1793266712
+  }
+}

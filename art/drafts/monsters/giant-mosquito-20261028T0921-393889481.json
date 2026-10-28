@@ -1,0 +1,25 @@
+{
+  "id": "giant-mosquito",
+  "payload": {
+    "prompt": "giant swamp mosquito the size of a cat, long thin needle proboscis, striped legs, translucent wings, red swollen belly, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 393889481,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793179418,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 52.68,
+    "request_id": "f6b12213-fb8e-46fc-bfca-7785fb4c0645",
+    "outputs_retained_until": 1793265776
+  }
+}

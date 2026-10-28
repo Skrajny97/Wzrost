@@ -1,0 +1,25 @@
+{
+  "id": "wraith",
+  "payload": {
+    "prompt": "pale ghostly wraith in a tattered grey shroud, long thin clawed hands, hollow dark eyes, cold blue mist trailing below, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 217211644,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793180001,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 50.7,
+    "request_id": "d88b860b-a3a6-4dab-b232-a8ea4da75e32",
+    "outputs_retained_until": 1793266343
+  }
+}

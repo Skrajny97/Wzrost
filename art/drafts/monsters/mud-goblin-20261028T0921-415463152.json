@@ -1,0 +1,25 @@
+{
+  "id": "mud-goblin",
+  "payload": {
+    "prompt": "small mud-covered goblin with big ears and a crooked grin, holding a ball of mud ready to throw, shiny trinkets on a string, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 415463152,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793180309,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.62,
+    "request_id": "a4dfa3cd-bf99-4d52-9644-8422fd132df1",
+    "outputs_retained_until": 1793266637
+  }
+}

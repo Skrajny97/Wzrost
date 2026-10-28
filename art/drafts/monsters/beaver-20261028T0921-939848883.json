@@ -1,0 +1,25 @@
+{
+  "id": "beaver",
+  "payload": {
+    "prompt": "large angry beaver with thick brown fur, huge orange front teeth, flat scaly tail, standing on hind legs, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 939848883,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793179551,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 52.32,
+    "request_id": "0c492ace-28cb-4295-81c5-f47bf0277c1f",
+    "outputs_retained_until": 1793265893
+  }
+}

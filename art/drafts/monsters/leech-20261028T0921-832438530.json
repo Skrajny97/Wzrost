@@ -1,0 +1,25 @@
+{
+  "id": "leech",
+  "payload": {
+    "prompt": "giant swamp leech, dark slimy segmented body with orange stripes, round sucker mouth full of tiny teeth, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 832438530,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793180491,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 48.9,
+    "request_id": "ac82acbe-e2c8-4541-89d9-53ea13d42fcc",
+    "outputs_retained_until": 1793266836
+  }
+}

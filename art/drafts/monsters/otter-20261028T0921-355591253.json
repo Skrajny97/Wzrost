@@ -1,0 +1,25 @@
+{
+  "id": "otter",
+  "payload": {
+    "prompt": "sleek brown river otter with wet glossy fur, bared teeth, crouched ready to pounce, long thick tail, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 355591253,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793179373,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 52.86,
+    "request_id": "b38c87e6-28d0-47bc-9376-1e654b0c4974",
+    "outputs_retained_until": 1793265719
+  }
+}

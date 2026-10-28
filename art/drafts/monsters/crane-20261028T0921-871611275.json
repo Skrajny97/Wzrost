@@ -1,0 +1,25 @@
+{
+  "id": "crane",
+  "payload": {
+    "prompt": "grey common crane with a red crown patch, long neck and long legs, wings raised in a dance, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 871611275,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793180397,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.26,
+    "request_id": "b89ca2de-fece-44dc-a8eb-c30537f42f03",
+    "outputs_retained_until": 1793266741
+  }
+}

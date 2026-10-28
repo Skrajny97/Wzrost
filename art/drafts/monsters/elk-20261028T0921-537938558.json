@@ -1,0 +1,25 @@
+{
+  "id": "elk",
+  "payload": {
+    "prompt": "huge moose with wide palmate antlers, dark brown shaggy fur, charging with its head down, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 537938558,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793180435,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.08,
+    "request_id": "79a1bc7c-c034-44d1-bed7-7a8b9d091636",
+    "outputs_retained_until": 1793266801
+  }
+}

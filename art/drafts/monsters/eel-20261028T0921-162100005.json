@@ -1,0 +1,25 @@
+{
+  "id": "eel",
+  "payload": {
+    "prompt": "long dark green-brown eel coiled in a loop, crackling with small blue lightning sparks, open mouth with small teeth, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 162100005,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793179651,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 51.96,
+    "request_id": "7941b791-7bbf-4158-adbf-22bd8fae13f4",
+    "outputs_retained_until": 1793266020
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "peat-cutter",
+  "payload": {
+    "prompt": "undead peat cutter, a gaunt man with dark leathery bog-body skin, ragged clothes, holding a narrow wooden spade, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 764611533,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793180850,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 47.82,
+    "request_id": "53919f39-3140-44c1-96c7-6e0deb51c720",
+    "outputs_retained_until": 1793267196
+  }
+}

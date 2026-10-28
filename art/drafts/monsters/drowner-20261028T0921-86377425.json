@@ -1,0 +1,25 @@
+{
+  "id": "drowner",
+  "payload": {
+    "prompt": "drowned man from Slavic folklore, bloated grey-green skin, webbed clawed hands, weeds in his hair, dripping with water, reaching forward, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 86377425,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793180206,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.98,
+    "request_id": "b4173d00-8813-46b9-ab55-b6b9f5961971",
+    "outputs_retained_until": 1793266583
+  }
+}
