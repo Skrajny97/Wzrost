@@ -691,7 +691,7 @@ async function openTutorialTests() {
 
 // "Testuj zdarzenia" on the test version (testing.js): the event chosen
 // here comes at the end of the next exploration that ends as planned,
-// without the draw.
+// without the draw, in the case chosen with it or in a drawn one.
 async function openEventTests() {
   let data;
   try {
@@ -700,31 +700,37 @@ async function openEventTests() {
     toast(error.message);
     return;
   }
-  const choose = (eventId) => async (event) => {
+  const choose = (eventId, caseId = null) => async (event) => {
     await withButton(event.currentTarget, async () => {
-      const { next } = await call('POST', '/api/test/events', { eventId });
+      const { next } = await call('POST', '/api/test/events', { eventId, caseId });
       toast(next ? 'Zdarzenie przyjdzie po następnej wyprawie, przy „Odbierz raport”.' : 'Zdarzenia znów losują się jak w grze.');
       closeSheet();
     });
   };
+  const chosen = (eventId, caseId) => data.next?.eventId === eventId && data.next.caseId === caseId;
+  const pick = (eventId, caseId, text) =>
+    h('button', {
+      type: 'button',
+      class: 'button button--system button--small',
+      text: chosen(eventId, caseId) ? `${text} (wybrane)` : text,
+      disabled: chosen(eventId, caseId),
+      onClick: choose(eventId, caseId),
+    });
   openSheet(
     h('h2', { class: 'sheet-title', text: 'Testuj zdarzenia' }),
-    h('p', { class: 'sheet-text', text: 'Wybrane zdarzenie przyjdzie po następnej wyprawie, gdy dotkniesz „Odbierz raport”, bez losowania. Wyprawa musi się skończyć bez omdlenia.' }),
+    h('p', {
+      class: 'sheet-text',
+      text: 'Wybrane zdarzenie przyjdzie po następnej wyprawie, gdy dotkniesz „Odbierz raport”, bez losowania. Możesz też wybrać, co się w nim naprawdę dzieje. Wyprawa musi się skończyć bez omdlenia.',
+    }),
     h(
       'ul',
       { class: 'tutorial-tests' },
       data.events.map((event) =>
         h(
           'li',
-          { class: 'tutorial-test' },
-          h('div', { class: 'tutorial-test-text' }, h('strong', { text: event.title }), data.next === event.id && h('span', { class: 'muted', text: 'Czeka na następny raport.' })),
-          h('button', {
-            type: 'button',
-            class: 'button button--system button--small',
-            text: data.next === event.id ? 'Wybrane' : 'Przy następnym raporcie',
-            disabled: data.next === event.id,
-            onClick: choose(event.id),
-          }),
+          { class: 'tutorial-test event-test' },
+          h('div', { class: 'tutorial-test-text' }, h('strong', { text: event.title }), data.next?.eventId === event.id && h('span', { class: 'muted', text: 'Czeka na następny raport.' })),
+          h('div', { class: 'event-test-cases' }, [pick(event.id, null, 'Losowo'), ...event.cases.map((one) => pick(event.id, one.id, one.name))]),
         ),
       ),
     ),

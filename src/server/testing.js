@@ -81,26 +81,35 @@ export async function tutorialTests(context) {
   return json({ parked: parked && { name: parked.name } });
 }
 
-// "Testuj zdarzenia": the events there are, and the one the next
-// exploration brings at its end, if one was chosen.
+// "Testuj zdarzenia": the events there are with their cases, and the one
+// the next exploration brings at its end, if one was chosen (event_test is
+// "event" or "event:case").
 export async function eventTests(context) {
   await requireTester(context);
   if (!eventsOn()) throw notFound();
   const { player } = await requirePlayer(context);
-  return json({ events: content.events.list.map((event) => ({ id: event.id, title: event.title })), next: player.row.event_test ?? null });
+  const [eventId, caseId = null] = player.row.event_test ? player.row.event_test.split(':') : [];
+  return json({
+    events: content.events.list.map((event) => ({ id: event.id, title: event.title, cases: (event.cases ?? []).map(({ id, name }) => ({ id, name })) })),
+    next: eventId ? { eventId, caseId } : null,
+  });
 }
 
 // "Przy następnym raporcie": the next exploration that ends as planned
-// brings this event (`eventId`), or none again (null). The draw does not
-// decide it, and the event's play clears it (hunts.js).
+// brings this event (`eventId`), in this case (`caseId`) or a drawn one
+// (null), or no event again (`eventId` null). The draw does not decide the
+// event, and its play clears the choice (hunts.js).
 export async function chooseTestEvent(context) {
   await requireTester(context);
   if (!eventsOn()) throw notFound();
   const { player } = await requirePlayer(context);
-  const { eventId } = await readJson(context.request);
-  if (eventId !== null && !Object.hasOwn(content.eventsById, eventId)) throw new ApiError(400, 'unknown_event', 'Nie ma takiego zdarzenia.');
-  await context.env.DB.prepare('UPDATE characters SET event_test = ? WHERE id = ?').bind(eventId, player.row.id).run();
-  return json({ next: eventId });
+  const { eventId, caseId = null } = await readJson(context.request);
+  const event = eventId !== null && Object.hasOwn(content.eventsById, eventId) ? content.eventsById[eventId] : null;
+  if (eventId !== null && !event) throw new ApiError(400, 'unknown_event', 'Nie ma takiego zdarzenia.');
+  if (caseId !== null && !(event?.cases ?? []).some((candidate) => candidate.id === caseId)) throw new ApiError(400, 'unknown_case', 'To zdarzenie nie ma takiego przebiegu.');
+  const stored = eventId === null ? null : caseId === null ? eventId : `${eventId}:${caseId}`;
+  await context.env.DB.prepare('UPDATE characters SET event_test = ? WHERE id = ?').bind(stored, player.row.id).run();
+  return json({ next: eventId === null ? null : { eventId, caseId } });
 }
 
 // "Wprowadzenie" from the start: the character waits aside (role 'parked'),

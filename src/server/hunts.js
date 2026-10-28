@@ -375,12 +375,14 @@ export async function finishHunt(db, player, now, { choice } = {}) {
     },
     content,
   );
-  // "Testuj zdarzenia" (the test version) brings its event without the draw.
-  const event = eventsOn() ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: row.event_test }, content) : null;
+  // "Testuj zdarzenia" (the test version) brings its event, and the case
+  // chosen for it if any ("event:case"), without the draw.
+  const [forcedEvent = null, forcedCase = null] = row.event_test ? row.event_test.split(':') : [];
+  const event = eventsOn() ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent }, content) : null;
   if (event && choice === undefined) return { event: eventView(event) };
   if (event) {
     if (!event.options.some((option) => option.id === choice)) throw new ApiError(400, 'invalid_choice', 'Wybierz jedną z opcji.');
-    hunt = resolveEvent({ hunt, event, optionId: choice, character, equipped: equippedItems(player), name: row.name, seed: activity.seed }, content);
+    hunt = resolveEvent({ hunt, event, optionId: choice, caseId: forcedCase, character, equipped: equippedItems(player), name: row.name, seed: activity.seed }, content);
   }
   const applied = applyHunt(character, hunt, content);
   // The potions drunk leave the bag; the bag cannot change during the

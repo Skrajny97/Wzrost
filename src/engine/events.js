@@ -5,9 +5,13 @@
 // pokazaniem się Raportu z wyprawy (który będzie uwzględniał zdarzenie)").
 // An exploration that ended as planned may bring one, more often the longer
 // it was, but not the very first (the tutorial's) and not a Szybkie
-// Polowanie. Whether it does, and which, comes from the exploration's seed,
-// and an option's outcome from the seed and the option, so the same
-// exploration always brings the same event and ends the same way.
+// Polowanie. An event may hide what is really going on: its cases (the
+// wounded woman is a bait or truly hurt), drawn once, and each option leads
+// to the outcome it has in that case (the author: "pomoc rannej kobiecie
+// powinno móc czasem zrobić tak, że nie ma bandytów a ona odwdzięcza się
+// złotem albo jakimś rzadkim przedmiotem"). Whether an event comes, which,
+// its case and an option's outcome all come from the exploration's seed, so
+// the same exploration always brings the same event and ends the same way.
 
 import { simulateFight } from './combat.js';
 import { combatantView, playerCombatant } from './combatant.js';
@@ -42,24 +46,67 @@ export const eventView = (event) => ({
   options: event.options.map((option) => ({ id: option.id, label: option.label })),
 });
 
-// The exploration with the event's outcome for the option chosen, at the
-// exploration's end: the option's text, and for a fight the foes at the
-// character's level, against the character with its HP of the exploration's
-// end. In an ambush the foes all move first; a speed bonus makes the
-// character quicker. Won, the fight pays as one of the exploration's
-// reference fights does, and the foes, being people, leave gold and now and
-// then an item (itemChance each); lost, the character faints (or, in a safe
-// place, only gets away) as after a lost fight on the way.
-export function resolveEvent({ hunt, event, optionId, character, equipped, name, seed }, content) {
-  const option = event.options.find((candidate) => candidate.id === optionId);
-  const { outcome } = option;
-  const t = hunt.minutes * 60000;
-  const told = { t, type: 'event', text: `${event.title}. ${option.label}: ${option.text}` };
-  const view = { ...eventView(event), option: { id: option.id, label: option.label, text: option.text }, fight: null };
-  if (outcome.kind !== 'fight') return { ...hunt, entries: [...hunt.entries, told], event: view };
+// The case behind an event, drawn from the exploration's seed, or the one
+// "Testuj zdarzenia" chose (`forced`); null for an event without cases.
+export function eventCase(event, seed, forced = null) {
+  if (!event.cases) return null;
+  if (forced) return event.cases.find((candidate) => candidate.id === forced) ?? null;
+  return createRng(`${seed}:event:case`).weighted(event.cases, (candidate) => candidate.weight);
+}
 
+// What an option leads to: its outcome in the case, or its own.
+export const eventOutcome = (option, chosen) => chosen?.outcomes[option.id] ?? option.outcome;
+
+// What an item found on an event may be, as for the exploration's finds.
+function lootRules(character, equipped, area, content) {
+  const { otherClass } = content.balance.items;
+  const otherClassShare = character.level >= otherClass.fromLevel ? otherClass.share : 0;
+  return { filled: new Set(equipped.map((item) => item.slot)), classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare };
+}
+
+// The exploration with the event's outcome for the option chosen, at the
+// exploration's end, in the event's case (`caseId` from "Testuj zdarzenia",
+// or drawn): the outcome's text, and what it brings. A reward is gold
+// (`gold` times rewards.goldPerLevel at the character's level, ±25%) or an
+// item at the character's level of a rarity drawn from `itemRarities`. A
+// fight is against the foes at the character's level, with the character's
+// HP of the exploration's end. In an ambush the foes all move first; a speed
+// bonus makes the character quicker. Won, the fight pays as one of the
+// exploration's reference fights does, and the foes, being people, leave
+// gold and now and then an item (itemChance each); lost, the character
+// faints (or, in a safe place, only gets away) as after a lost fight on the
+// way.
+export function resolveEvent({ hunt, event, optionId, caseId = null, character, equipped, name, seed }, content) {
+  const option = event.options.find((candidate) => candidate.id === optionId);
+  const chosen = eventCase(event, seed, caseId);
+  const outcome = eventOutcome(option, chosen);
+  const t = hunt.minutes * 60000;
   const rng = createRng(`${seed}:event:${option.id}`);
   const area = content.areasById[hunt.areaId];
+  const tell = (text) => ({ t, type: 'event', text: `${event.title}. ${option.label}: ${text}` });
+  const view = (text) => ({ ...eventView(event), case: chosen?.id ?? null, option: { id: option.id, label: option.label, text }, fight: null });
+
+  if (outcome.kind === 'none') return { ...hunt, entries: [...hunt.entries, tell(outcome.text)], event: view(outcome.text) };
+
+  if (outcome.kind === 'reward') {
+    const gold = outcome.gold ? Math.round(content.balance.rewards.goldPerLevel * character.level * outcome.gold * rng.float(0.75, 1.25)) : 0;
+    const items = [...hunt.items];
+    let item = null;
+    if (outcome.itemRarities) {
+      const [rarityId] = rng.weighted(Object.entries(outcome.itemRarities), ([, weight]) => weight);
+      item = randomItem(character.level, rng, content, { ...lootRules(character, equipped, area, content), rarityId });
+      items.push(item);
+    }
+    const text = outcome.text.replace('{gold}', String(gold)).replace('{item}', item ? itemName(item, content) : '');
+    return {
+      ...hunt,
+      gold: hunt.gold + gold,
+      items,
+      entries: [...hunt.entries, tell(text)],
+      event: { ...view(text), reward: { gold, item: item ? items.length - 1 : null } },
+    };
+  }
+
   const texts = content.texts;
   const enemies = encounterCombatants({ members: outcome.foes.map((monsterId) => ({ monsterId, level: character.level })) }, content);
   const player = playerCombatant({ character, equipped, hp: hunt.hpEnd, name, area }, content);
@@ -94,9 +141,8 @@ export function resolveEvent({ hunt, event, optionId, character, equipped, name,
   let { result } = hunt;
 
   if (fight.won === true) {
-    const { rewards, items: itemRules } = content.balance;
-    const otherClassShare = character.level >= itemRules.otherClass.fromLevel ? itemRules.otherClass.share : 0;
-    const loot = { filled: new Set(equipped.map((item) => item.slot)), classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare };
+    const { rewards } = content.balance;
+    const loot = lootRules(character, equipped, area, content);
     let fightXp = 0;
     let fightGold = 0;
     for (const enemy of enemies) {
@@ -127,9 +173,9 @@ export function resolveEvent({ hunt, event, optionId, character, equipped, name,
     items,
     hpEnd: hpNow,
     fights: [...hunt.fights, summary],
-    entries: [...hunt.entries, told, { t, type: 'fight', fight: index, text: lines.join(' ') }],
+    entries: [...hunt.entries, tell(outcome.text), { t, type: 'fight', fight: index, text: lines.join(' ') }],
     // The report opens on the event's fight.
     keyFight: { index },
-    event: { ...view, fight: index },
+    event: { ...view(outcome.text), fight: index },
   };
 }

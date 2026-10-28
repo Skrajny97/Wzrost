@@ -4,6 +4,30 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["chancePerMinute", "maxChance", "texts", "list", "foes"],
+  "definitions": {
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "text"],
+      "description": "Skutek opcji: tekst i co z niego wynika.",
+      "properties": {
+        "kind": { "enum": ["none", "fight", "reward"] },
+        "text": { "type": "string", "minLength": 1, "description": "Tekst skutku; przy nagrodzie z {gold} albo {item}." },
+        "foes": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "string", "minLength": 1 } },
+        "ambush": { "type": "boolean", "description": "Wrogowie ruszają pierwsi, wszyscy przed postacią." },
+        "speedBonus": { "type": "number", "exclusiveMinimum": 0, "description": "Postać jest w tej walce szybsza o taką część." },
+        "itemChance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa, że pokonany wróg zostawi przedmiot." },
+        "start": { "type": "string", "minLength": 1, "description": "Zdanie relacji przed walką, z {enemies}." },
+        "gold": { "type": "number", "exclusiveMinimum": 0, "description": "Złoto nagrody: tyle razy rewards.goldPerLevel × poziom postaci, ±25%." },
+        "itemRarities": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": "number", "exclusiveMinimum": 0 },
+          "description": "Przedmiot nagrody na poziomie postaci: wagi jego rzadkości."
+        }
+      }
+    }
+  },
   "properties": {
     "$comment": { "type": "string" },
     "chancePerMinute": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa na zdarzenie za każdą minutę wyprawy." },
@@ -47,24 +71,27 @@
             "items": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["id", "label", "text", "outcome"],
+              "required": ["id", "label"],
               "properties": {
                 "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
                 "label": { "type": "string", "minLength": 1 },
-                "text": { "type": "string", "minLength": 1 },
-                "outcome": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": ["kind"],
-                  "properties": {
-                    "kind": { "enum": ["none", "fight"] },
-                    "foes": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "string", "minLength": 1 } },
-                    "ambush": { "type": "boolean", "description": "Wrogowie ruszają pierwsi, wszyscy przed postacią." },
-                    "speedBonus": { "type": "number", "exclusiveMinimum": 0, "description": "Postać jest w tej walce szybsza o taką część." },
-                    "itemChance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa, że pokonany wróg zostawi przedmiot." },
-                    "start": { "type": "string", "minLength": 1, "description": "Zdanie relacji przed walką, z {enemies}." }
-                  }
-                }
+                "outcome": { "$ref": "#/definitions/outcome", "description": "Skutek opcji, gdy przypadek nie podaje własnego." }
+              }
+            }
+          },
+          "cases": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Co naprawdę się dzieje, losowane raz na zdarzenie z wagą weight. Przypadek podaje skutki opcji (outcomes, po id opcji); opcja bez skutku w przypadku ma swój własny.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "name", "weight", "outcomes"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+                "name": { "type": "string", "minLength": 1, "description": "Nazwa przypadku w „Testuj zdarzenia”." },
+                "weight": { "type": "number", "exclusiveMinimum": 0 },
+                "outcomes": { "type": "object", "additionalProperties": { "$ref": "#/definitions/outcome" } }
               }
             }
           }

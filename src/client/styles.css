@@ -7342,6 +7342,18 @@ button.herb-tile[aria-pressed='true'] {
   width: auto;
 }
 
+/* "Testuj zdarzenia": each event with its cases under it. */
+.event-test {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.event-test-cases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .create-back {
   display: grid;
   margin-top: 16px;

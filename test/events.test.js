@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, encounterCombatants, eventChance, eventFor, huntKills, playerCombatant, resolveEvent, simulateFight, simulateHunt } from '../src/engine/index.js';
+import { createRng, encounterCombatants, eventCase, eventChance, eventFor, huntKills, playerCombatant, resolveEvent, simulateFight, simulateHunt } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -24,7 +24,8 @@ describe('events', () => {
   const { character, equipped } = typicalCharacter('warrior', 8, content);
   const seed = 'zdarzenie';
   const base = simulateHunt({ character, equipped, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed }, content);
-  const resolve = (optionId, hunt = base) => resolveEvent({ hunt, event: woman, optionId, character, equipped, name: 'Mira', seed }, content);
+  // In the case given; the ambush, unless said otherwise.
+  const resolve = (optionId, hunt = base, caseId = 'ambush') => resolveEvent({ hunt, event: woman, optionId, caseId, character, equipped, name: 'Mira', seed }, content);
 
   test('the longer the exploration, the likelier an event, up to the most', () => {
     const { chancePerMinute, maxChance } = content.events;
@@ -63,7 +64,7 @@ describe('events', () => {
     const left = resolve('leave');
     assert.equal(left.result, 'success');
     assert.deepEqual([left.fights.length, left.xp, left.gold, left.hpEnd], [base.fights.length, base.xp, base.gold, base.hpEnd]);
-    assert.deepEqual(left.event.option, { id: 'leave', label: 'Odejdź nieufnie', text: woman.options[2].text });
+    assert.deepEqual(left.event.option, { id: 'leave', label: 'Odejdź nieufnie', text: woman.options[2].outcome.text });
     assert.equal(left.event.fight, null);
     assert.equal(left.entries.at(-1).type, 'event');
   });
@@ -115,6 +116,47 @@ describe('events', () => {
   test('the bandits count for no quest', () => {
     assert.deepEqual(huntKills(resolve('help')), huntKills(base));
   });
+
+  test('what is really going on is drawn once, about as often as its weight says', () => {
+    const seeds = Array.from({ length: 3000 }, (_, index) => `przypadek-${index}`);
+    const total = woman.cases.reduce((sum, one) => sum + one.weight, 0);
+    for (const one of woman.cases) {
+      const share = seeds.filter((each) => eventCase(woman, each) === one).length / seeds.length;
+      assert.ok(Math.abs(share - one.weight / total) < 0.03, `${one.id}: ${share}`);
+    }
+    assert.equal(eventCase(woman, seed, 'grateful-find').id, 'grateful-find');
+    // Drawn, the case is the same for every option.
+    const drawn = eventCase(woman, seed).id;
+    for (const optionId of ['help', 'ask', 'leave']) {
+      assert.equal(resolveEvent({ hunt: base, event: woman, optionId, character, equipped, name: 'Mira', seed }, content).event.case, drawn);
+    }
+  });
+
+  test('a truly wounded woman thanks with gold or with something she found, and has no bandits', () => {
+    const paid = resolve('help', base, 'grateful-gold');
+    assert.equal(paid.fights.length, base.fights.length);
+    assert.ok(paid.event.reward.gold > 0);
+    assert.equal(paid.gold, base.gold + paid.event.reward.gold);
+    assert.match(paid.event.option.text, new RegExp(`\\+${paid.event.reward.gold}\\)`));
+    assert.equal(paid.entries.at(-1).type, 'event');
+
+    const found = resolve('help', base, 'grateful-find');
+    assert.equal(found.fights.length, base.fights.length);
+    assert.equal(found.items.length, base.items.length + 1);
+    const item = found.items[found.event.reward.item];
+    assert.ok(Object.keys(woman.cases.find((one) => one.id === 'grateful-find').outcomes.help.itemRarities).includes(item.rarity));
+    assert.equal(item.level, character.level);
+    assert.equal(found.gold, base.gold);
+  });
+
+  test('asked too many questions, she leaves without a reward; leaving is the same in every case', () => {
+    for (const caseId of ['grateful-gold', 'grateful-find']) {
+      const asked = resolve('ask', base, caseId);
+      assert.deepEqual([asked.fights.length, asked.gold, asked.items.length], [base.fights.length, base.gold, base.items.length]);
+      assert.equal(asked.event.option.text, woman.options[1].outcome.text);
+    }
+    for (const one of woman.cases) assert.equal(resolve('leave', base, one.id).event.option.text, woman.options[2].outcome.text);
+  });
 });
 
 describe('events (API)', () => {
@@ -131,7 +173,7 @@ describe('events (API)', () => {
     await call('POST', '/api/test/skip-time', { cookie });
   };
   const claim = (choice) => call('POST', '/api/hunts/claim', { cookie, ...(choice !== undefined && { body: { choice } }) });
-  const choose = (eventId) => call('POST', '/api/test/events', { cookie, body: { eventId } });
+  const choose = (eventId, caseId) => call('POST', '/api/test/events', { cookie, body: { eventId, ...(caseId && { caseId }) } });
   const next = async () => (await call('GET', '/api/test/events', { cookie })).data.next;
   // After the first exploration (the tutorial's), a character strong enough
   // for the edge of the Wiatrołomy to end every exploration as planned.
@@ -144,13 +186,17 @@ describe('events (API)', () => {
 
   test('"Testuj zdarzenia" brings the event chosen, not after the tutorial, and the report waits for the choice', async () => {
     const tests = (await call('GET', '/api/test/events', { cookie })).data;
-    assert.deepEqual(tests, { events: [{ id: 'wounded-woman', title: 'Ranna kobieta' }], next: null });
+    assert.deepEqual(tests, {
+      events: [{ id: 'wounded-woman', title: 'Ranna kobieta', cases: woman.cases.map(({ id, name }) => ({ id, name })) }],
+      next: null,
+    });
     assert.equal((await choose('nie-ma')).data.error.code, 'unknown_event');
-    assert.deepEqual((await choose('wounded-woman')).data, { next: 'wounded-woman' });
+    assert.equal((await choose('wounded-woman', 'smok')).data.error.code, 'unknown_case');
+    assert.deepEqual((await choose('wounded-woman')).data, { next: { eventId: 'wounded-woman', caseId: null } });
 
     // The first exploration is the tutorial's: no event, and the choice waits.
     await pastTutorial();
-    assert.equal(await next(), 'wounded-woman');
+    assert.deepEqual(await next(), { eventId: 'wounded-woman', caseId: null });
 
     await explore();
     const count = await reports();
@@ -187,10 +233,12 @@ describe('events (API)', () => {
 
   test('"Pomóż jej sprawnie" adds the bandits\' fight to the report, and they stay out of the Bestiariusz', async () => {
     await pastTutorial();
-    await choose('wounded-woman');
+    await choose('wounded-woman', 'ambush');
+    assert.deepEqual(await next(), { eventId: 'wounded-woman', caseId: 'ambush' });
     await explore();
     assert.equal((await claim()).data.event.id, 'wounded-woman');
     const { report } = (await claim('help')).data;
+    assert.equal(report.event.case, 'ambush');
     const fight = report.fights.at(-1);
     assert.equal(fight.event, true);
     assert.deepEqual(
@@ -201,6 +249,27 @@ describe('events (API)', () => {
     assert.equal(report.keyFight.index, report.fights.length - 1);
     const met = JSON.parse((await (await db()).prepare('SELECT met FROM characters').first()).met);
     assert.ok(bandits.every((id) => !met.includes(id)));
+  });
+
+  test('chosen to be honest, the woman thanks with gold or an item that reach the character', async () => {
+    await pastTutorial();
+    await choose('wounded-woman', 'grateful-gold');
+    await explore();
+    const before = (await call('GET', '/api/character', { cookie })).data.character.gold;
+    await claim();
+    const paid = (await claim('help')).data;
+    assert.equal(paid.report.event.case, 'grateful-gold');
+    assert.ok(paid.report.fights.every((fight) => !fight.event));
+    assert.ok(paid.report.event.reward.gold > 0);
+    assert.ok(paid.character.gold >= before + paid.report.event.reward.gold);
+    assert.equal(await next(), null);
+
+    await choose('wounded-woman', 'grateful-find');
+    await explore();
+    await claim();
+    const found = (await claim('help')).data.report;
+    assert.equal(found.event.case, 'grateful-find');
+    assert.ok(found.items[found.event.reward.item]);
   });
 });
 

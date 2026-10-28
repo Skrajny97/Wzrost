@@ -2625,3 +2625,17 @@ Autor: „ale powinno być HP i mana dodatkowe za poziom klasy a nie postaci - i
     - Omdlenia bez zmian, 0–5% godzinnych wypraw.
 4. **Potwory** mają nadal +5 HP za każdy swój poziom (`monsters.hpPerLevel` w `data/balance.json`).
 5. **Ekran Statystyk** pokazuje przy „Maks. HP” i „Maks. mana” dodatek klasy, np. u Wojownika „+6 z każdym poziomem klasy”.
+
+## Losowany przebieg zdarzenia: ranna kobieta bywa uczciwa (28.10.2026, wersja testowa)
+
+Autor: „Trzeba zrobić tak by te zdarzenie miało różne możliwości docelowo, czyli pomoc rannej kobiecie powinno móc czasem zrobic tak, ze nie ma bandytów a ona odwdzięcza się złotem albo jakimś rzadkim przedmiotem (który znalazła w lesie) losowanie tego typu”.
+
+1. **Przypadki.** Zdarzenie może mieć kilka przypadków, czyli tego, co naprawdę się dzieje (`cases` w `data/events.json`). Los wybiera przypadek raz, z ziarna wyprawy, zanim gracz cokolwiek wybierze. Każda opcja ma w każdym przypadku swój skutek: ten z przypadku, a gdy przypadek go nie podaje, domyślny skutek opcji.
+2. **Ranna kobieta:**
+    - Zasadzka (60%): jak dotąd. Po „Pomóż jej sprawnie” bandyci atakują pierwsi, a po „Zadaj dodatkowe pytania” walka zaczyna się bez zaskoczenia, z szybszą postacią.
+    - Wdzięczność, złoto (25%): po „Pomóż jej sprawnie” kobieta daje sakiewkę, ok. 10 złota za każdy poziom postaci (±25%). To mniej więcej tyle, ile godzina wyprawy.
+    - Wdzięczność, przedmiot (15%): po „Pomóż jej sprawnie” kobieta oddaje przedmiot znaleziony w lesie, na poziomie postaci: rzadki (70%), unikalny (25%) albo epicki (5%).
+    - Gdy kobieta jest uczciwa, „Zadaj dodatkowe pytania” kończy się bez nagrody: urażona podejrzliwością, odchodzi o własnych siłach. Dzięki temu opcje się różnią. Pomoc grozi zasadzką, ale może dać nagrodę. Pytania chronią przed zasadzką, ale tracą nagrodę. Odejście nic nie daje i nic nie kosztuje.
+    - „Odejdź nieufnie” kończy się tak samo w każdym przypadku.
+3. **Nagroda** trafia do postaci jak znaleziska z wyprawy, a karta zdarzenia w raporcie podaje kwotę albo nazwę przedmiotu.
+4. **„Testuj zdarzenia”** pozwala wybrać przy zdarzeniu „Losowo” albo jeden z przypadków, żeby sprawdzić każdy z nich.

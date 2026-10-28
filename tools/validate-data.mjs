@@ -596,29 +596,50 @@ function checkReferences(data) {
     const section = data.community.sections.find((candidate) => candidate.id === id);
     if (!section || section.soon) errors.push(`community.json: brak otwartego działu ${id}`);
   }
-  errors.push(...checkEvents(data, { monsters }));
+  errors.push(...checkEvents(data, { monsters, rarities }));
   return errors;
 }
 
 // The events at the end of an exploration: their foes apart from the
 // creatures (no Bestiariusz), each fight with foes, and options unique.
-function checkEvents(data, { monsters }) {
+function checkEvents(data, { monsters, rarities }) {
   const errors = [];
   const { events } = data;
   const foes = uniqueIds(errors, 'events', events.foes);
   for (const id of foes) if (monsters.has(id)) errors.push(`events.json: przeciwnik ${id} ma id stwora z monsters.json`);
   uniqueIds(errors, 'events', events.list);
   if (events.chancePerMinute > events.maxChance) errors.push('events.json: chancePerMinute nie może być większe niż maxChance');
+  const checkOutcome = (where, outcome) => {
+    const fighting = outcome.foes || outcome.ambush || outcome.speedBonus || outcome.itemChance !== undefined || outcome.start;
+    const rewarding = outcome.gold !== undefined || outcome.itemRarities;
+    if (outcome.kind === 'fight') {
+      if (!outcome.foes) errors.push(`events.json: ${where} ma walkę bez przeciwników`);
+      for (const id of outcome.foes ?? []) if (!foes.has(id)) errors.push(`events.json: ${where} ma nieznanego przeciwnika "${id}"`);
+      if (!outcome.start?.includes('{enemies}')) errors.push(`events.json: ${where} potrzebuje zdania start z {enemies}`);
+    } else if (fighting) {
+      errors.push(`events.json: ${where} ma ustawienia walki bez walki`);
+    }
+    if (outcome.kind === 'reward') {
+      if (!rewarding) errors.push(`events.json: ${where} ma nagrodę bez złota i przedmiotu`);
+      if (outcome.gold !== undefined && !outcome.text.includes('{gold}')) errors.push(`events.json: ${where} potrzebuje {gold} w tekście`);
+      if (outcome.itemRarities && !outcome.text.includes('{item}')) errors.push(`events.json: ${where} potrzebuje {item} w tekście`);
+      for (const id of Object.keys(outcome.itemRarities ?? {})) if (!rarities.has(id)) errors.push(`events.json: ${where} ma nieznaną rzadkość "${id}"`);
+    } else if (rewarding) {
+      errors.push(`events.json: ${where} ma nagrodę bez kind reward`);
+    }
+  };
   for (const event of events.list) {
-    uniqueIds(errors, `events (${event.id})`, event.options);
-    for (const option of event.options) {
-      const { outcome } = option;
-      if (outcome.kind === 'fight') {
-        if (!outcome.foes) errors.push(`events.json: ${event.id}/${option.id} ma walkę bez przeciwników`);
-        for (const id of outcome.foes ?? []) if (!foes.has(id)) errors.push(`events.json: ${event.id}/${option.id} ma nieznanego przeciwnika "${id}"`);
-        if (!outcome.start?.includes('{enemies}')) errors.push(`events.json: ${event.id}/${option.id} potrzebuje zdania start z {enemies}`);
-      } else if (outcome.foes || outcome.ambush || outcome.speedBonus || outcome.itemChance !== undefined || outcome.start) {
-        errors.push(`events.json: ${event.id}/${option.id} ma ustawienia walki bez walki`);
+    const options = uniqueIds(errors, `events (${event.id})`, event.options);
+    uniqueIds(errors, `events (${event.id}, przypadki)`, event.cases ?? []);
+    for (const option of event.options) if (option.outcome) checkOutcome(`${event.id}/${option.id}`, option.outcome);
+    // Every option has an outcome in every case: its own or the case's.
+    for (const eventCase of event.cases ?? [{ id: null, outcomes: {} }]) {
+      for (const [id, outcome] of Object.entries(eventCase.outcomes)) {
+        if (!options.has(id)) errors.push(`events.json: ${event.id}/${eventCase.id} ma skutek nieznanej opcji "${id}"`);
+        checkOutcome(`${event.id}/${eventCase.id}/${id}`, outcome);
+      }
+      for (const option of event.options) {
+        if (!eventCase.outcomes[option.id] && !option.outcome) errors.push(`events.json: ${event.id}/${option.id} nie ma skutku${eventCase.id ? ` w przypadku ${eventCase.id}` : ''}`);
       }
     }
   }

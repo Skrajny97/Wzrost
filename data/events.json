@@ -1,5 +1,5 @@
 {
-  "$comment": "Zdarzenia na końcu wyprawy (src/engine/events.js): po „Odbierz raport” postać spotyka kogoś na drodze powrotnej, a gracz wybiera jedną z opcji, zanim zobaczy raport. Raport uwzględnia wybór. Wyprawa zakończona zgodnie z planem przynosi zdarzenie z szansą chancePerMinute za każdą minutę, najwyżej maxChance, ale nie pierwsza (samouczek) i nie Szybkie Polowanie. list: zdarzenia, każde z tytułem, krótkim tekstem, postacią (art, grafika z src/client/art/events/), tłem (scene, grafika z src/client/art/event-scenes/), miejscem postaci na tle (figure: od lewej i od dołu oraz wysokość, w procentach tła) i opcjami. Opcja ma etykietę, tekst skutku i outcome: kind none (nic) albo fight (walka z foes na poziomie postaci, z jej HP z końca wyprawy). ambush: wrogowie ruszają pierwsi, wszyscy przed postacią. speedBonus: postać szybsza o taką część. itemChance: szansa, że pokonany wróg zostawi przedmiot. start: zdanie relacji przed walką ({enemies}). texts: zdania relacji o łupie ({item}). foes: przeciwnicy zdarzeń, zapisani jak stwory w monsters.json, ale bez materiałów, nazw afiksów i Bestiariusza.",
+  "$comment": "Zdarzenia na końcu wyprawy (src/engine/events.js): po „Odbierz raport” postać spotyka kogoś na drodze powrotnej, a gracz wybiera jedną z opcji, zanim zobaczy raport. Raport uwzględnia wybór. Wyprawa zakończona zgodnie z planem przynosi zdarzenie z szansą chancePerMinute za każdą minutę, najwyżej maxChance, ale nie pierwsza (samouczek) i nie Szybkie Polowanie. list: zdarzenia, każde z tytułem, krótkim tekstem, postacią (art, grafika z src/client/art/events/), tłem (scene, grafika z src/client/art/event-scenes/), miejscem postaci na tle (figure: od lewej i od dołu oraz wysokość, w procentach tła) i opcjami. cases: przypadki, czyli co naprawdę się dzieje, losowane raz na zdarzenie z wagą weight (name: nazwa w „Testuj zdarzenia”). Skutek opcji (outcome) to ten z outcomes przypadku, a gdy przypadek go nie podaje, outcome samej opcji. Skutek ma tekst (text) i kind: none (nic), fight (walka z foes na poziomie postaci, z jej HP z końca wyprawy) albo reward (nagroda: gold to złoto za rewards.goldPerLevel × poziom postaci, ±25%, a itemRarities to wagi rzadkości przedmiotu na poziomie postaci; tekst z {gold} i {item}). ambush: wrogowie ruszają pierwsi, wszyscy przed postacią. speedBonus: postać szybsza o taką część. itemChance: szansa, że pokonany wróg zostawi przedmiot. start: zdanie relacji przed walką ({enemies}). texts: zdania relacji o łupie ({item}). foes: przeciwnicy zdarzeń, zapisani jak stwory w monsters.json, ale bez materiałów, nazw afiksów i Bestiariusza.",
   "chancePerMinute": 0.005,
   "maxChance": 0.25,
   "texts": {
@@ -14,35 +14,68 @@
       "figure": { "left": 54, "bottom": 0, "height": 72 },
       "text": "Przy ścieżce leży ranna kobieta. Jest blada, ledwo oddycha i szepcze: „Pomóż mi…”.",
       "options": [
-        {
-          "id": "help",
-          "label": "Pomóż jej sprawnie",
-          "text": "Pochylasz się nad nią, a z zarośli wyskakują trzej bandyci. Kobieta zrywa się i ucieka. To była zasadzka!",
-          "outcome": {
-            "kind": "fight",
-            "foes": ["bandit-thug", "bandit-knifer", "bandit-crossbow"],
-            "ambush": true,
-            "itemChance": 0.35,
-            "start": "Zasadzka! Bandyci atakują pierwsi: {enemies}."
-          }
-        },
+        { "id": "help", "label": "Pomóż jej sprawnie" },
         {
           "id": "ask",
           "label": "Zadaj dodatkowe pytania",
-          "text": "Kobieta plącze się w odpowiedziach, a w krzakach trzaska gałązka. Wyczuwasz zasadzkę, zanim bandyci wyskoczą z ukrycia.",
           "outcome": {
-            "kind": "fight",
-            "foes": ["bandit-thug", "bandit-knifer", "bandit-crossbow"],
-            "speedBonus": 0.25,
-            "itemChance": 0.35,
-            "start": "Bandyci wyskakują z ukrycia, ale zasadzka już nie zaskakuje: {enemies}."
+            "kind": "none",
+            "text": "Kobieta odpowiada spokojnie i składnie, a jej rana jest prawdziwa. Urażona podejrzliwością, przyjmuje tylko łyk wody i odchodzi o własnych siłach."
           }
         },
         {
           "id": "leave",
           "label": "Odejdź nieufnie",
-          "text": "Odchodzisz, nie odwracając się plecami. Nikt za tobą nie idzie.",
-          "outcome": { "kind": "none" }
+          "outcome": { "kind": "none", "text": "Odchodzisz, nie odwracając się plecami. Nikt za tobą nie idzie." }
+        }
+      ],
+      "cases": [
+        {
+          "id": "ambush",
+          "name": "Zasadzka",
+          "weight": 60,
+          "outcomes": {
+            "help": {
+              "kind": "fight",
+              "text": "Pochylasz się nad nią, a z zarośli wyskakują trzej bandyci. Kobieta zrywa się i ucieka. To była zasadzka!",
+              "foes": ["bandit-thug", "bandit-knifer", "bandit-crossbow"],
+              "ambush": true,
+              "itemChance": 0.35,
+              "start": "Zasadzka! Bandyci atakują pierwsi: {enemies}."
+            },
+            "ask": {
+              "kind": "fight",
+              "text": "Kobieta plącze się w odpowiedziach, a w krzakach trzaska gałązka. Wyczuwasz zasadzkę, zanim bandyci wyskoczą z ukrycia.",
+              "foes": ["bandit-thug", "bandit-knifer", "bandit-crossbow"],
+              "speedBonus": 0.25,
+              "itemChance": 0.35,
+              "start": "Bandyci wyskakują z ukrycia, ale zasadzka już nie zaskakuje: {enemies}."
+            }
+          }
+        },
+        {
+          "id": "grateful-gold",
+          "name": "Wdzięczność: złoto",
+          "weight": 25,
+          "outcomes": {
+            "help": {
+              "kind": "reward",
+              "text": "Opatrujesz jej ranę i pomagasz wstać. Kobieta dziękuje ze łzami w oczach i wciska ci w dłoń sakiewkę ze złotem (+{gold}).",
+              "gold": 5
+            }
+          }
+        },
+        {
+          "id": "grateful-find",
+          "name": "Wdzięczność: przedmiot",
+          "weight": 15,
+          "outcomes": {
+            "help": {
+              "kind": "reward",
+              "text": "Opatrujesz jej ranę i pomagasz wstać. W podzięce kobieta oddaje ci coś, co znalazła w lesie: {item}.",
+              "itemRarities": { "rare": 70, "unique": 25, "epic": 5 }
+            }
+          }
         }
       ]
     }
