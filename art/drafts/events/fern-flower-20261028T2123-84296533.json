@@ -1,0 +1,25 @@
+{
+  "id": "fern-flower",
+  "payload": {
+    "prompt": "a glowing crimson fern flower in full bloom among dark green fern fronds, magical red light and tiny sparks rising from its petals, small mossy stones at its foot, full plant",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 84296533,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793222625,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 64.26,
+    "request_id": "3e4bebc2-cbd3-4ebe-a75c-8b3024bc6984",
+    "outputs_retained_until": 1793308998
+  }
+}

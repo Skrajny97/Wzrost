@@ -1,0 +1,23 @@
+{
+  "id": "fern-glade",
+  "payload": {
+    "prompt": "pixel art landscape, a night forest glade with huge moss-covered boulders and dense ferns, pale moonlight between old trees, a faint red glow among the ferns in the middle, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and blues, no text, no border, no people, no animals",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 2,
+    "seed": 410577693,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793222647,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 63.9,
+    "request_id": "983aae7b-f202-461b-ad4c-fa9a40eeb2a7",
+    "outputs_retained_until": 1793309027
+  }
+}
