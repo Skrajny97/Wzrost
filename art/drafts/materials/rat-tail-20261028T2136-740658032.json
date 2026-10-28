@@ -1,0 +1,25 @@
+{
+  "id": "rat-tail",
+  "payload": {
+    "prompt": "long bare pink rat tail in a loose coil, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 740658032,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793223569,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 58.14,
+    "request_id": "52785606-455d-426f-ac31-3b324240026b",
+    "outputs_retained_until": 1793309939
+  }
+}

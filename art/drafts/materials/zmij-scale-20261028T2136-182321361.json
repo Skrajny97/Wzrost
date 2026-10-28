@@ -1,0 +1,25 @@
+{
+  "id": "zmij-scale",
+  "payload": {
+    "prompt": "large red-black dragon scale glowing with embers at its edges, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 182321361,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793223478,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 59.22,
+    "request_id": "f6fbcf04-31da-4e24-bcc2-5be4138b9410",
+    "outputs_retained_until": 1793309856
+  }
+}

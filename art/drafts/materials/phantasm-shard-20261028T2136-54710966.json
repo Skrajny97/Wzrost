@@ -1,0 +1,25 @@
+{
+  "id": "phantasm-shard",
+  "payload": {
+    "prompt": "small shard of iridescent glass with swirling colourful mist inside, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 54710966,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793223455,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 59.58,
+    "request_id": "fa36f427-8c90-48fd-8cae-b2d1f6bb7dbd",
+    "outputs_retained_until": 1793309824
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "diving-beetle-shell",
+  "payload": {
+    "prompt": "glossy dark olive beetle wing case with a yellow rim, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 305652042,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793223424,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 59.94,
+    "request_id": "005656a5-9364-4267-b508-3fda15e9cae7",
+    "outputs_retained_until": 1793309793
+  }
+}
