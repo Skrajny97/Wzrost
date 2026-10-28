@@ -68,7 +68,8 @@ self.addEventListener('fetch', (event) => {
 // A message from the server (src/server/push.js) shows as a notification.
 // While the game is in front of the player, it shows the same news itself
 // and the message stays quiet, except on Apple's push service: Safari takes
-// the permission away from a page whose messages show nothing.
+// the permission away from a page whose messages show nothing. A test
+// message (`always`) shows anyway: the player asked for it in the game.
 self.addEventListener('push', (event) => {
   let message = null;
   try {
@@ -80,11 +81,11 @@ self.addEventListener('push', (event) => {
   event.waitUntil(notify(message));
 });
 
-async function notify({ title, body, tag, url, at }) {
+async function notify({ title, body, tag, url, at, always = false }) {
   const subscription = await self.registration.pushManager.getSubscription();
   const apple = subscription?.endpoint.includes('.push.apple.com') ?? false;
   const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-  if (!apple && windows.some((client) => client.visibilityState === 'visible')) return;
+  if (!always && !apple && windows.some((client) => client.visibilityState === 'visible')) return;
   await self.registration.showNotification(title, {
     body,
     // A newer message of the same kind takes the older one's place.

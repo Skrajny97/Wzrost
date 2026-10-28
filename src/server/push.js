@@ -6,6 +6,7 @@
 // of those players. The service worker (src/client/sw.js) shows them.
 
 import { notificationsDue } from '../engine/index.js';
+import { say } from '../engine/text.js';
 import { content } from './content.js';
 import { fromBase64Url } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
@@ -20,6 +21,11 @@ const PUSH_HOSTS = ['.googleapis.com', '.push.apple.com', '.mozilla.com', '.noti
 const MAX_SUBSCRIPTIONS = 10;
 // How long a push service keeps a message for a phone that is off.
 const MESSAGE_TTL_SECONDS = 6 * 3600;
+// The news is the player's to act on, so it wakes a sleeping phone at once
+// rather than when the phone wakes up by itself, maybe hours later.
+const URGENCY = 'high';
+// How often a phone may ask for a test notification.
+const TEST_EVERY_MS = 30000;
 // The first run looks at the last minute. After a break (a failed run) the
 // next one looks back at most this far: older news would only come late.
 const FIRST_WINDOW_MS = 60000;
@@ -68,6 +74,42 @@ export async function unsubscribePush(context) {
   return json({ ok: true });
 }
 
+// A test notification to the phone that asks for it (Ustawienia, "Wyślij
+// próbne powiadomienie"), sent at once. It shows even while the game is open
+// (`always`, sw.js), and the push service's answer comes back, so the player
+// sees where the way to the phone breaks: "sent" (the service took it),
+// "gone" (the service no longer knows the phone, which is forgotten),
+// "failed" with the service's status (0: unreachable), "unknown" (the server
+// has no such phone of this account) or "wait" (one a half minute).
+export async function testPush(context) {
+  const session = await requireSession(context);
+  const { endpoint } = await readJson(context.request);
+  if (typeof endpoint !== 'string') throw unsupported();
+  const db = context.env.DB;
+  const subscription = await db
+    .prepare('SELECT endpoint, p256dh, auth, tested_at FROM push_subscriptions WHERE endpoint = ? AND user_id = ?')
+    .bind(endpoint, session.userId)
+    .first();
+  if (!subscription) return json({ result: 'unknown' });
+  if (subscription.tested_at !== null && context.now - subscription.tested_at < TEST_EVERY_MS) return json({ result: 'wait' });
+  await db.prepare('UPDATE push_subscriptions SET tested_at = ? WHERE endpoint = ?').bind(context.now, endpoint).run();
+  const message = { title: say(content.texts, 'pushTestTitle', 0), body: say(content.texts, 'pushTestBody', 0), tag: 'test', url: '#/walka', at: context.now, always: true };
+  let status = 0;
+  try {
+    const authorization = await vapidAuthorization(endpoint, await vapidKeys(db), context.now);
+    status = await sendPush(subscription, message, { authorization, ttl: 60, topic: 'test', urgency: URGENCY });
+  } catch (error) {
+    console.warn(`Push test: ${new URL(endpoint).host} unreachable: ${error?.message}`);
+  }
+  if (status === 404 || status === 410) {
+    await db.prepare('DELETE FROM push_subscriptions WHERE endpoint = ?').bind(endpoint).run();
+    return json({ result: 'gone' });
+  }
+  if (status >= 200 && status < 300) return json({ result: 'sent' });
+  console.warn(`Push test: ${new URL(endpoint).host} answered ${status}.`);
+  return json({ result: 'failed', status });
+}
+
 // The cron run at `now`: the notifications that came due since the last run
 // go to the phones of their players. A run takes its stretch of time first,
 // so two runs never send the same news. Returns how many messages the push
@@ -94,7 +136,7 @@ export async function sendNotifications(env, now) {
     subscriptions.flatMap((subscription) =>
       (due.get(subscription.user_id) ?? []).map(async ({ tag, url, at, title, body }) => {
         try {
-          const status = await sendPush(subscription, { title, body, tag, url, at }, { authorization: await authorization(subscription.endpoint), ttl: MESSAGE_TTL_SECONDS, topic: tag });
+          const status = await sendPush(subscription, { title, body, tag, url, at }, { authorization: await authorization(subscription.endpoint), ttl: MESSAGE_TTL_SECONDS, topic: tag, urgency: URGENCY });
           if (status === 404 || status === 410) gone.add(subscription.endpoint);
           else if (status >= 200 && status < 300) sent += 1;
           else console.warn(`Push: ${new URL(subscription.endpoint).host} answered ${status}.`);

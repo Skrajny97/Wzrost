@@ -19,7 +19,7 @@ import { readFeatures, registrationOpen } from './features.js';
 import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { discardHerbs, sellHerbs, startGathering } from './professions.js';
-import { pushKey, sendNotifications, subscribePush, unsubscribePush } from './push.js';
+import { pushKey, sendNotifications, subscribePush, testPush, unsubscribePush } from './push.js';
 import { claimAllQuests, claimQuest, openChest } from './quests.js';
 import { getReport, listReports } from './reports.js';
 import { learnSkill, raiseSkill } from './skills.js';
@@ -124,6 +124,7 @@ const routes = [
   ['GET', '/api/push/key', pushKey],
   ['POST', '/api/push/subscribe', subscribePush],
   ['POST', '/api/push/unsubscribe', unsubscribePush],
+  ['POST', '/api/push/test', testPush],
   ['POST', '/api/test/skip-time', skipTime],
   ['POST', '/api/test/skip-build', skipBuilding],
   ['POST', '/api/test/skip-craft', skipCrafting],

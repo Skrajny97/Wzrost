@@ -149,6 +149,8 @@
   "pushBuildBody": ["{building}: poziom {level} gotowy."],
   "pushStoreTitle": ["Pełny magazyn"],
   "pushStoreBody": ["{buildings}: produkcja stoi do zebrania."],
+  "pushTestTitle": ["Próbne powiadomienie"],
+  "pushTestBody": ["Tak przyjdą wieści o końcu wyprawy, budowy i pracy w profesjach."],
   "emailConfirmSubject": ["Potwierdź adres e-mail w grze Insight"],
   "emailConfirmIntro": ["Cześć, {login}! Kliknij przycisk niżej, żeby potwierdzić ten adres e-mail w grze Insight."],
   "emailConfirmButton": ["Potwierdź adres e-mail"],

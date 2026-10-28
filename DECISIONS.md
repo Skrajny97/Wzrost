@@ -2524,3 +2524,17 @@ Autor: „nawet portrety mają słabe maski też trzeba chyba piksel po pikselu 
     - `PATCHES` dodają skórę odciętą od reszty, np. piętę Wojownika między rzemieniami i palce Wojowniczki. `PIXELS` i `NOT_PIXELS` to pojedyncze piksele: czoło Cienistej między kosmykami, cienie między jej palcami i tęczówki jej oczu, które zostają w swoim kolorze.
 3. **Kontur.** Ciemny, ciepły kontur rąk, dłoni i stóp (np. bordowy u Wojowniczki) dostaje ciemny odcień wybranej skóry. Jest tak samo ciemny względem niej, jak był względem najciemniejszej skóry portretu. Przy głowie kontur zostaje, bo graniczy tam z włosami.
 4. **Co widać w grze.** Szyje i dekolty są w kolorze wybranej skóry (najbardziej u Łucznika, Łuczniczki, Kleryka, Czarodziejki i Wojowniczki), tak samo ciemne bruzdy dłoni, pięty i palce. Przeliczone są wszystkie 70 pliki (10 portretów, 7 odcieni). Chód z Walki się nie zmienia.
+
+## Powiadomienia: wysoki priorytet i próbne powiadomienie (28.10.2026)
+
+Autor przekazał zgłoszenie osoby testującej grę: na telefon nie przychodzi powiadomienie o końcu wyprawy, choć włączyła je jak trzeba.
+
+1. **Co sprawdzone.** Droga od końca wyprawy do usługi push działa w testach od początku do końca, a telefon przy każdym uruchomieniu gry zgłasza serwerowi swoją subskrypcję od nowa. Danych graczy z gry głównej nikt nie przeglądał. Zostają przyczyny po stronie telefonu albo usługi push, których z serwera nie widać.
+2. **Wysoki priorytet.** Powiadomienia wychodzą z nagłówkiem `Urgency: high`. Wcześniej miały zwykły priorytet, a takie wiadomości Android przy oszczędzaniu baterii (Doze) wstrzymuje, aż telefon sam się obudzi, czasem na godziny. Gdy gracz w tym czasie otworzy grę, ona zamyka zaległe powiadomienia, więc mogło wyglądać, jakby nie przyszły wcale. iPhone przy niskiej baterii także dostarcza od razu tylko pilne wiadomości.
+3. **Próbne powiadomienie.** Pod przełącznikiem „Powiadomienia” w Ustawieniach, gdy są włączone, jest „Wyślij próbne powiadomienie”. Gra najpierw zgłasza serwerowi ten telefon jeszcze raz, a serwer od razu wysyła do niego „Próbne powiadomienie” (`pushTestTitle` i `pushTestBody` w `data/texts.json`). Pokazuje się ono także przy otwartej grze. Komunikat mówi, co odpowiedziała usługa push:
+    - „Wysłane…”: usługa je przyjęła. Gdy mimo to nic nie przyjdzie, przyczyna jest w ustawieniach telefonu.
+    - kod błędu: usługa odrzuciła wiadomość,
+    - „Usługa powiadomień nie zna już tego telefonu…”: subskrypcja wygasła. Znika z serwera i z telefonu, a przełącznik trzeba włączyć ponownie.
+
+   Próbne powiadomienie można wysłać raz na pół minuty (`tested_at`, `migrations/0047_push_test.sql`).
+

@@ -63,8 +63,10 @@ export async function encryptMessage(subscription, text, { salt = crypto.getRand
 // Sends `message` (JSON) to one subscription and returns the push service's
 // answer: 201 when it took the message, 404 or 410 when the subscription is
 // gone for good. `ttl`: seconds the service keeps it for a phone that is off;
-// `topic`: a newer message of the same topic replaces one still waiting.
-export async function sendPush(subscription, message, { authorization, ttl, topic }) {
+// `topic`: a newer message of the same topic replaces one still waiting;
+// `urgency`: "high" wakes a sleeping phone (Android's battery saving holds
+// back the others until it wakes up by itself).
+export async function sendPush(subscription, message, { authorization, ttl, topic, urgency = 'normal' }) {
   const response = await fetch(subscription.endpoint, {
     method: 'POST',
     headers: {
@@ -72,7 +74,7 @@ export async function sendPush(subscription, message, { authorization, ttl, topi
       'Content-Encoding': 'aes128gcm',
       'Content-Type': 'application/octet-stream',
       TTL: String(ttl),
-      Urgency: 'normal',
+      Urgency: urgency,
       ...(topic ? { Topic: topic } : {}),
     },
     body: await encryptMessage(subscription, JSON.stringify(message)),

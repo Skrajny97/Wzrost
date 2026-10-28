@@ -1738,6 +1738,17 @@ a.segmented-option {
   line-height: 1.4;
 }
 
+.push-test {
+  align-self: flex-start;
+  color: var(--system);
+  font-size: 12px;
+  text-align: left;
+}
+
+.push-test[hidden] {
+  display: none;
+}
+
 .status-muted {
   color: var(--text-muted);
   font-weight: 400;

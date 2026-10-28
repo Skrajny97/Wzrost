@@ -12,6 +12,13 @@ import { toast } from './ui.js';
 
 const BLOCKED = 'Powiadomienia gry są zablokowane. Zezwól na nie w ustawieniach telefonu albo przeglądarki i spróbuj ponownie.';
 const FAILED = 'Nie udało się włączyć powiadomień. Spróbuj ponownie za chwilę.';
+// What the server says of a test notification (push.js on the server).
+const TESTED = {
+  sent: 'Wysłane. Powiadomienie powinno przyjść za kilka sekund. Jeśli nie przyjdzie, sprawdź w ustawieniach telefonu powiadomienia gry albo przeglądarki, w której ją otwierasz.',
+  gone: 'Usługa powiadomień nie zna już tego telefonu. Włącz powiadomienia ponownie.',
+  unknown: 'Serwer nie zna tego telefonu. Wyłącz powiadomienia i włącz je ponownie.',
+  wait: 'Próbne powiadomienie można wysłać raz na pół minuty.',
+};
 
 const supported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 
@@ -86,6 +93,20 @@ export async function syncPush() {
   }
 }
 
+// A test notification for this phone, sent by the server at once, so the
+// player sees whether the whole way to the phone works. The server learns
+// the phone again first, in case it has forgotten it; a phone the push
+// service no longer knows is switched off here too, to be switched on anew.
+async function sendTest() {
+  const current = await subscription();
+  if (!current) return TESTED.unknown;
+  await request('POST', '/api/push/subscribe', current.toJSON());
+  const { result, status } = await request('POST', '/api/push/test', { endpoint: current.endpoint });
+  if (result === 'gone') await current.unsubscribe().catch(() => {});
+  if (result === 'failed') return `Usługa powiadomień telefonu nie przyjęła wiadomości (kod ${status}). Spróbuj ponownie za chwilę.`;
+  return TESTED[result] ?? FAILED;
+}
+
 // Before signing out or deleting the account: the phone stops getting the
 // account's news.
 export async function stopPush() {
@@ -117,11 +138,14 @@ if ('serviceWorker' in navigator) {
 }
 
 // The settings row: the switch, with a line under it only when there are no
-// notifications here or the phone blocks them.
+// notifications here or the phone blocks them, and while they are on, the
+// test notification.
 export function pushRow() {
   const hint = h('small', { class: 'status-hint' });
+  const test = h('button', { type: 'button', class: 'link-button push-test', text: 'Wyślij próbne powiadomienie' });
+  test.hidden = true;
   const row = (value) =>
-    h('div', { class: 'status-row status-row--push' }, h('dt', {}, h('span', { id: 'push-label', text: 'Powiadomienia' }), hint), h('dd', {}, value));
+    h('div', { class: 'status-row status-row--push' }, h('dt', {}, h('span', { id: 'push-label', text: 'Powiadomienia' }), hint, test), h('dd', {}, value));
   if (!supported()) {
     hint.textContent =
       onIphone() && !runsAsApp()
@@ -136,9 +160,24 @@ export function pushRow() {
     button.setAttribute('aria-checked', String(on));
     button.textContent = on ? 'Włączone' : 'Wyłączone';
     button.disabled = busy;
+    test.hidden = !on;
+    test.disabled = busy;
     hint.textContent = !on && Notification.permission === 'denied' ? BLOCKED : '';
     hint.hidden = !hint.textContent;
   };
+  test.addEventListener('click', async () => {
+    if (busy) return;
+    busy = true;
+    test.disabled = true;
+    try {
+      toast(await sendTest());
+    } catch (error) {
+      toast(error.message || FAILED);
+    } finally {
+      busy = false;
+      await show();
+    }
+  });
   button.addEventListener('click', async () => {
     if (busy) return;
     busy = true;

@@ -250,6 +250,8 @@ describe('notifications through the server', () => {
     assert.equal(message.headers['content-encoding'], 'aes128gcm');
     assert.equal(message.headers.ttl, String(6 * 3600));
     assert.equal(message.headers.topic, 'hunt');
+    // The news wakes a sleeping phone at once.
+    assert.equal(message.headers.urgency, 'high');
     const { key, claims } = await verifiedClaims(message.headers.authorization);
     assert.equal(key, data.key);
     assert.equal(claims.aud, pushService.url);
@@ -264,6 +266,36 @@ describe('notifications through the server', () => {
     await run(endsAt + 90000);
     await run(endsAt + 90000);
     assert.equal(pushService.received.length, 1);
+  });
+
+  test('a test notification goes at once, shows with the game open and says what the push service answered', async () => {
+    const phone = await fakePhone();
+    const body = { endpoint: phone.subscription.endpoint };
+    assert.equal((await call('POST', '/api/push/test', { body })).status, 401);
+    // A phone the server does not know yet.
+    assert.deepEqual((await call('POST', '/api/push/test', { cookie, body })).data, { result: 'unknown' });
+    await call('POST', '/api/push/subscribe', { cookie, body: phone.subscription });
+    assert.deepEqual((await call('POST', '/api/push/test', { cookie, body })).data, { result: 'sent' });
+    assert.equal(pushService.received.length, 1);
+    const [message] = pushService.received;
+    assert.equal(message.headers.urgency, 'high');
+    assert.equal(message.headers.topic, 'test');
+    const shown = await phone.read(message.body);
+    assert.equal(shown.title, 'Próbne powiadomienie');
+    assert.equal(shown.always, true);
+    // One a half minute.
+    assert.deepEqual((await call('POST', '/api/push/test', { cookie, body })).data, { result: 'wait' });
+    assert.equal(pushService.received.length, 1);
+    const database = await db();
+    const again = () => database.prepare('UPDATE push_subscriptions SET tested_at = NULL').run();
+    await again();
+    pushService.status = 400;
+    assert.deepEqual((await call('POST', '/api/push/test', { cookie, body })).data, { result: 'failed', status: 400 });
+    await again();
+    // The push service no longer knows the phone: it is forgotten.
+    pushService.status = 410;
+    assert.deepEqual((await call('POST', '/api/push/test', { cookie, body })).data, { result: 'gone' });
+    assert.deepEqual(await subscriptions(), []);
   });
 
   test('a build that ends and a store that fills up; a phone gone for good is forgotten', async () => {
