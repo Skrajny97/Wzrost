@@ -173,6 +173,16 @@ function questReward(periodId, level, rng, content, factor = 1) {
   return { kind, id: questLevel(level, content).part, amount: amount() };
 }
 
+// A quest of a drawn option, with its count and reward.
+const newQuest = (option, periodId, character, rng, content) => ({
+  kind: option.kind.id,
+  ...(option.target && { target: option.target }),
+  count: questCount(option, periodId, rng),
+  progress: 0,
+  reward: questReward(periodId, character.level, rng, content, option.kind.rewardFactor),
+  claimed: false,
+});
+
 // A period's quests, drawn from `seed` for the character as it is: no
 // option twice, in the order of the kinds.
 export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, seed }, content) {
@@ -185,26 +195,49 @@ export function drawQuests(periodId, { character, hasTable, hasProfessions, hasC
     drawn.push(option);
   }
   const { kinds } = content.quests;
-  return drawn
-    .sort((a, b) => kinds.indexOf(a.kind) - kinds.indexOf(b.kind))
-    .map((option) => ({
-      kind: option.kind.id,
-      ...(option.target && { target: option.target }),
-      count: questCount(option, periodId, rng),
-      progress: 0,
-      reward: questReward(periodId, character.level, rng, content, option.kind.rewardFactor),
-      claimed: false,
-    }));
+  return drawn.sort((a, b) => kinds.indexOf(a.kind) - kinds.indexOf(b.kind)).map((option) => newQuest(option, periodId, character, rng, content));
 }
 
-// Both periods' quests at `now`: those kept while their period lasts, new
-// ones once it has passed. `seed` is the character's.
+// Whether a creature lives in an inner region open to the character's class.
+const reachable = (monsterId, character, content) =>
+  content.areas.some((area) => areaUnlocked(area, character.classLevel, content) && area.encounters.some((encounter) => encounter.monsters.includes(monsterId)));
+
+// A kept quest that cannot be done any more: a creature's, neither done nor
+// claimed, whose creature lives nowhere the character can go. Quests drawn
+// before the creatures moved to inner regions of their own (0.0.27) asked
+// for such (the author: "kuzynka nawet nie ma dostępu do tych potworów za
+// niski poziom klasy").
+const lostQuest = (quest, character, content) => quest.kind === 'kill' && !quest.claimed && !questDone(quest) && !reachable(quest.target, character, content);
+
+// A kept period with each lost quest drawn anew in its place, among what the
+// character may get now and the period does not ask for yet; the other
+// quests stay as they are, with their progress and rewards.
+function healedPeriod(period, periodId, { character, hasTable, hasProfessions, hasCrafting, seed }, content) {
+  const lost = (quest) => lostQuest(quest, character, content);
+  if (!period.quests.some(lost)) return period;
+  const asked = (option) => period.quests.some((quest) => !lost(quest) && quest.kind === option.kind.id && quest.target === option.target);
+  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting }, content).filter((option) => !asked(option));
+  return {
+    ...period,
+    quests: period.quests.map((quest, index) => {
+      if (!lost(quest) || options.length === 0) return quest;
+      const rng = createRng(`${seed}:${periodId}:${period.period}:${index}`);
+      const option = rng.weighted(options);
+      options = options.filter((other) => other !== option);
+      return newQuest(option, periodId, character, rng, content);
+    }),
+  };
+}
+
+// Both periods' quests at `now`: those kept while their period lasts (with
+// the lost ones drawn anew), new ones once it has passed. `seed` is the
+// character's.
 export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, seed }, now, content) {
   return Object.fromEntries(
     QUEST_PERIODS.map((periodId) => {
       const { key } = questPeriod(periodId, now, content);
       const kept = stored?.[periodId];
-      if (kept?.period === key) return [periodId, kept];
+      if (kept?.period === key) return [periodId, healedPeriod(kept, periodId, { character, hasTable, hasProfessions, hasCrafting, seed }, content)];
       const quests = drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, seed: `${seed}:${periodId}:${key}` }, content);
       return [periodId, { period: key, quests, chest: false }];
     }),

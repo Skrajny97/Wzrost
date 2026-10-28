@@ -2274,6 +2274,36 @@ describe('quests from the narrator', () => {
     assert.equal(next.weekly, busy.weekly);
   });
 
+  test('a kept quest for a creature the class cannot reach is drawn anew, the others stay', () => {
+    // As drawn on 28.10 before the creatures moved to inner regions of their
+    // own (0.0.27): Wadera now lives only where class level 40 goes.
+    const character = newCharacter('cleric', { level: 23, classLevel: 27 });
+    const context = { character, hasTable: true, seed: 7 };
+    const now = at('2026-10-28T18:00:00Z');
+    const quest = (kind, target, extra = {}) => ({ kind, ...(target && { target }), count: 2, progress: 0, reward: { kind: 'gold', amount: 9 }, claimed: false, ...extra });
+    const drawn = currentQuests({}, context, now, content);
+    const stored = {
+      ...drawn,
+      daily: {
+        ...drawn.daily,
+        quests: [quest('kill', 'she-wolf'), quest('kill', 'stoneling'), quest('kill', 'spider', { progress: 2 }), quest('explore', null, { count: 60, progress: 60, claimed: true }), quest('salvage')],
+      },
+    };
+    const healed = currentQuests(stored, context, now, content);
+    const [fresh, ...kept] = healed.daily.quests;
+    // A new quest the period does not ask for yet, from what the class may get.
+    assert.notEqual(fresh.target, 'she-wolf');
+    assert.ok(!['explore', 'salvage'].includes(fresh.kind) && fresh.target !== 'stoneling');
+    assert.ok(fresh.kind !== 'kill' || ['bat', 'stoneling'].includes(fresh.target));
+    assert.deepEqual([fresh.progress, fresh.claimed], [0, false]);
+    // Reachable, done or claimed quests stay as they were.
+    assert.deepEqual(kept, stored.daily.quests.slice(1));
+    assert.equal(healed.weekly, stored.weekly);
+    // The same every time, and nothing more once saved.
+    assert.deepEqual(currentQuests(stored, context, now, content), healed);
+    assert.equal(currentQuests(healed, context, now, content).daily, healed.daily);
+  });
+
   test('beaten creatures, minutes and the table move the quests on, up to their count', () => {
     const quests = {
       daily: {

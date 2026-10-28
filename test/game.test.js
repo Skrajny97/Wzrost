@@ -696,12 +696,14 @@ describe('hunts and reports', () => {
   test('an exploration can track the creatures of the quests', async () => {
     const quest = (target, progress = 0) => ({ kind: 'kill', target, count: 2, progress, reward: { kind: 'gold', amount: 5 }, claimed: false });
     const stored = JSON.parse((await (await db()).prepare('SELECT quests FROM characters').first()).quests);
-    stored.daily.quests = [quest('badger'), quest('wolf', 2), quest('bear')];
+    // A class that opens Lisie Jary, so a quest for foxes stays as it is.
+    await (await db()).prepare('UPDATE characters SET class_level = 6').run();
+    stored.daily.quests = [quest('badger'), quest('wolf', 2), quest('fox')];
     stored.weekly.quests = [];
     await (await db()).prepare('UPDATE characters SET quests = ?').bind(JSON.stringify(stored)).run();
     const wrong = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, trackQuests: 'tak' } });
     assert.equal(wrong.data.error.code, 'invalid_track');
-    // Only the badger: the wolves are beaten already and no bear lives on the edge.
+    // Only the badger: the wolves are beaten already and no fox lives on the edge.
     const started = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, trackQuests: true } });
     assert.equal(started.status, 201);
     assert.equal(started.data.character.activity.tracksQuests, true);
@@ -709,7 +711,7 @@ describe('hunts and reports', () => {
     await call('POST', '/api/test/skip-time', { cookie });
     assert.equal((await call('POST', '/api/hunts/claim', { cookie })).status, 200);
     // With no quest creature living there, nothing is tracked.
-    stored.daily.quests = [quest('bear')];
+    stored.daily.quests = [quest('fox')];
     await (await db()).prepare('UPDATE characters SET quests = ?').bind(JSON.stringify(stored)).run();
     const none = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, trackQuests: true } });
     assert.equal(none.data.character.activity.tracksQuests, false);
@@ -1993,6 +1995,19 @@ describe('Zadania od narratora', () => {
     assert.deepEqual([view.daily.name, view.weekly.name], ['Dzienne', 'Tygodniowe']);
     // Drawn once and saved: the next request shows the same quests.
     assert.equal((await stored()).daily.period, questPeriod('daily', now, content).key);
+    assert.deepEqual((await character()).quests, view);
+  });
+
+  test('a quest for a creature the class cannot reach is drawn anew and saved', async () => {
+    await character();
+    const quests = await stored();
+    quests.daily.quests[0] = { kind: 'kill', target: 'she-wolf', count: 2, progress: 0, reward: { kind: 'gold', amount: 9 }, claimed: false };
+    await store(quests);
+    const view = (await character()).quests;
+    assert.ok(view.daily.quests.every((quest) => quest.monsterId !== 'she-wolf'));
+    const saved = await stored();
+    assert.notEqual(saved.daily.quests[0].target, 'she-wolf');
+    assert.deepEqual(saved.daily.quests.slice(1), quests.daily.quests.slice(1));
     assert.deepEqual((await character()).quests, view);
   });
 

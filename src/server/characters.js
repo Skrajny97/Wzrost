@@ -295,13 +295,15 @@ export function questContext(player, now) {
 export const questsNow = (player, now) => currentQuests(JSON.parse(player.row.quests ?? '{}'), questContext(player, now), now, content);
 
 // A new day or week draws its quests and saves them at once, so they stay
-// the same however the character changes that day. As with the Punkty
-// Czasu, the version stays, and only the first of two requests at once
-// saves them.
+// the same however the character changes that day; so are the lost quests
+// drawn anew in their place (quests.js). As with the Punkty Czasu, the
+// version stays, and only the first of two requests at once saves them.
 export async function settleQuests(db, player, now) {
   const { row } = player;
-  if (!questsStale(JSON.parse(row.quests ?? '{}'), now, content)) return;
-  const quests = JSON.stringify(questsNow(player, now));
+  const stored = JSON.parse(row.quests ?? '{}');
+  const settled = questsNow(player, now);
+  if (!questsStale(stored, now, content) && JSON.stringify(settled) === JSON.stringify(stored)) return;
+  const quests = JSON.stringify(settled);
   const result = await db.prepare('UPDATE characters SET quests = ? WHERE id = ? AND quests = ?').bind(quests, row.id, row.quests).run();
   row.quests = result.meta.changes === 1 ? quests : (await db.prepare('SELECT quests FROM characters WHERE id = ?').bind(row.id).first()).quests;
 }
