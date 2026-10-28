@@ -197,7 +197,9 @@
         "text": "one loud human gulp of water, a single throat swallow, close up, dry, realistic, no music",
         "seconds": 1,
         "influence": 0.8
-      }
+      },
+      "craft": { "text": "a blacksmith's hammer strikes metal on an anvil three times, clear bright ringing clangs, the last strike rings out a little longer, close up, dry, no music", "seconds": 2 },
+      "craft-fail": { "text": "a hammer hits metal on an anvil once with a dull flat clunk, then a sharp crack and a few small broken metal pieces clatter onto a stone floor, close up, dry, no music", "seconds": 1.8 }
     }
   },
   "ui": {
@@ -406,7 +408,11 @@
           "stability": 0.5,
           "speed": 0.85
         }
-      }
+      },
+      "crafting-welcome": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Piętnasty poziom postaci… System otworzył przed Tobą Rzemieślnictwo." },
+      "crafting-lead": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Systemowy Warsztat czeka w zakładce Profesje. Zajrzyjmy tam." },
+      "crafting-patterns": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Tu wykonasz broń i pancerz według wzorów. Części do nich uzyskasz przy Stole rozbiórki albo kupisz u złomiarza." },
+      "crafting-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Każdy nowy poziom Rzemieślnictwa odsłoni Ci kolejne wzory. Zajrzyj tu też, gdy rozbierzesz na części wcześniej nierozbierany przedmiot." }
     },
     "allLines": {
       "voice": "Narrator",
