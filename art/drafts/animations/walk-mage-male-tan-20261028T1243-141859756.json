@@ -1,0 +1,25 @@
+{
+  "id": "walk-mage-male-tan",
+  "payload": {
+    "prompt": "a young man with brown hair, a patched blue tunic with a satchel strap across the chest, brown trousers, simple sandals, light tan skin, empty hands",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 141859756,
+    "return_spritesheet": true,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793191671,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 26.61,
+    "request_id": "51357917-fbd3-4d7a-ad27-7820473dd453",
+    "outputs_retained_until": 1793278067
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "walk-mage-female-golden",
+  "payload": {
+    "prompt": "a young woman with long brown hair, a patched blue robe with a rope belt, simple sandals, golden skin, empty hands",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 97763661,
+    "return_spritesheet": true,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793191644,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 26.89,
+    "request_id": "a6c329d9-32ae-41f1-bbeb-bb78174a30d1",
+    "outputs_retained_until": 1793278040
+  }
+}

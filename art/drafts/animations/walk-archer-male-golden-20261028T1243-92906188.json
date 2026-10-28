@@ -1,0 +1,25 @@
+{
+  "id": "walk-archer-male-golden",
+  "payload": {
+    "prompt": "a young man with brown hair in a long brown hooded cloak, a green tunic, dark green trousers, brown leather boots, golden skin, empty hands",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 92906188,
+    "return_spritesheet": true,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793191598,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 27.38,
+    "request_id": "e814e64a-954c-4e8a-8755-c0ea2095cda1",
+    "outputs_retained_until": 1793277994
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "walk-warrior-male-golden",
+  "payload": {
+    "prompt": "a young man with short brown hair, a cream linen shirt with a rope belt, patched brown trousers, bare feet with cloth wraps, golden skin, empty hands",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 801138931,
+    "return_spritesheet": true,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793191506,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 28.36,
+    "request_id": "6c245ea8-4571-4476-b102-26f651186b4b",
+    "outputs_retained_until": 1793277900
+  }
+}

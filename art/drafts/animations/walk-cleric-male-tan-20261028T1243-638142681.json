@@ -1,0 +1,25 @@
+{
+  "id": "walk-cleric-male-tan",
+  "payload": {
+    "prompt": "a young man with dark blue-black hair, a ragged cream tunic with a rope belt and a small pendant, cloth-wrapped feet, light tan skin, empty hands",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 638142681,
+    "return_spritesheet": true,
+    "input_image": "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAGzklEQVR42u2Z2W9cZxXAf3eWO7tnn/HY4xnbGW+JsziJnTQlIQmQtmooCFpFIhVSoOIB8cJL3yoBL/AG4g8oDwmiCCohEIvTRGnibIqzO7EdB28Tj8ez79udmXt5qJo88DoRt6jn8Tyc8/10vrN854Mv5X8rwssybLJ1K7Ks0GW1UKqUqZeTwhcGwOboVawWCzqtBpvFhN3loVatEY1tkE2uddSn5mUAeFxOvG4HcquBaLSg1YDdbiPo9+D19iud9KXr9OHt9oAiinpkBYaGIsiNCrlSDalRI+D3kcmXUHUERFEkm81SLubRCzJvT3Uj5eP0d7UoF9I0WrK6AeqShMNqREHA0sySy+b56dv7OX18FFMzR7VcRtVXqFSIC/tHepQ3J0MYRR2vTgxht9soVxscjOaZeTSt/iS+Pr/JRxcfMRr24HY7iUZjGIU2WlnuuC/dywBolOPC7UVB+ccFB3qdDq/TxuXbT/nVHz4RvhAAAOM9Xqb2DjO3sMrNxRjnLt57KT2n4wC/fP89xW4z8XDmBmbRyMkj27g5t8F3jh9SHE4bH37c2RzQdtLYBz/+nvLNt46y/5U9oNFw6epD9o5FmNo1TGJrizM/OsW+PeM/+9v5mZ+rLgI//O7rylcPT5AplHH6PRz+xhGKTZjdyEAmg8EfIDQ8gNXp4OuTk8qF2VlBVVXIYhbpGwjidjnYXNugWqtz/GsHSNdbfDofxR/w0W7LxKMxBkNO9ZXRYqXJk6fPMBn03Lk1Ry6Tw+60MxjuQWuzsXvfOPWGxPqzOBOTO9QF8OaBCeXkG68yOj5Es9ViK5FCbrWpV6pI9QbZhQUK+Tz1UpVCoYTb41IXwPiuYXZtD6NRZDLxBMhtquUytXIVn8/FiXdO4rKY2FiNUk4kMbUb6gKY3DdCW9CSWltnfXmNrXgWh91GKpHC43Nz8JU96PVadHod7VoFt1Hgd7/9QFEFwLvHJhSfRYvN48LhshNdWkEvakkks2hFkVy5itXZhdFqpSa1qBq7mHsSxWkV1VFGXX0hNgt1UjcfMDIygNnn596VC2TzVSLDYWxmI4MjAzTKVa7M3CGTzmEOmrl0e0kdAPW2hnO//xevHRzh8ZVrbBXrNGWZeDrPZnwLt83C1UvXqbWgr9dDfGMTBnZwdLubj86rAOD8zD26RZlDO3q4v7DOn6dnOXF0Cr1RpFStozQlnE4bd+ZWSKYLhAMOpsbDpCotdURgLbomrAGJoqT4/F7MXXb6er2IZgOju8aIrmwwOh6hJ/SIy9MzjEYC3Jpb4dD+cXU1slyuiNVqYijsxeK04wv4qTckAn0BvN0+urs9dDmsVFpwd34Dj8PM+6dPKKoBsJoMjEX6ODjSjSC3QG5TyBVwe52AwsjYNvQGkVq9gd3tQgGGuu3qGObePbxbGYv0UCpVcFlNpIoldk6MUak3sVrNNKUmosmIJEkMRfpIGIycv/KAQq2ljit0buaBMHt7nlQizY0Hq7RlEI1GwpEB5HYbQSNgMBooVyREo5nRsW08nIvisZnVM06fu3if7cE4yYrE4cEQJrOFarGI1JBw+70oikwoFKC314+kwEosxdlb84JqcuCfd54KNUMX+yZ3srSwTLVSZfXpGk2pSaNWp9mQOHz8IPsP7aWNhmuxlLreAwCjQyHCPT7CgyHcXgd/PPsXkok0Uq1OajNJNldm5ek6Ib+9Yz47BnDmW8cVr8OAjEx6M8aF6au0CyUyqTxGUYvTpGHhyQp3btzGpOvcs7hjOZDMlvhk5i6FYpWdPiMupYLFoqNcLJBOZjh/4QZOPSw8ekIs07ntXMdXHaemBpWfnH4Ns8XIbz78O21PH8VMlj5Di6mJEVajcX7xp2uC6iLwuUyMhikUCzxZiXH2+pIASxwdDinfPnMMjQBLyypf7vYEPAwO9tMb7H6u+8rufiwWI8H+fqqI6gaQ2zLBYIDoRuq5bimWIlOoUqvWmF9+pl6AI7tHlXy1ycP5ZRL1F/ouu51/bxa4tZLC3dOtXgCNoENjczKfaWKwvqj1j2MFEATsopZsoaZegE/vPxIWF5dJp3JMT19+rk+n0tSlNqLbS6ZcUXcOBH1OHB4Xi8kXq5PVeIGtbJl8sUyo26tegG1+n6LRamhLTXpt+uf6kwcieG0G7GaRH3z/Ld47dbJjP5Ud7QNBvwvRbCM8EGRyb4TZ5fXPKpMA2VyRi9ceM7mjyDvHdrPDq1ei8TS//nhGUA1AwG2hx21CSsQY8L9YH/715mdjs9PuVVYWlwj6HYwM9LK8kVVXBJRWi9RmArnZxKz/b9O5QkqYfvh5f7jLl/L/IP8BVU7QkL6zGcMAAAAASUVORK5CYII=",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793191766,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 25.63,
+    "request_id": "1e3d66f6-4ae3-495d-94f7-317e77dfb11d",
+    "outputs_retained_until": 1793278161
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "walk-shadow-female-grey",
+  "payload": {
+    "prompt": "a young woman with brown hair, a dark grey scarf over her mouth and nose, a ragged dark grey tunic, olive trousers, cloth-wrapped feet, grey skin, empty hands",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 378878241,
+    "return_spritesheet": true,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793191846,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 24.79,
+    "request_id": "64e35f90-8674-49a0-bf4e-a576a3f90eae",
+    "outputs_retained_until": 1793278241
+  }
+}

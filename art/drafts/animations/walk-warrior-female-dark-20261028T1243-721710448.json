@@ -1,0 +1,25 @@
+{
+  "id": "walk-warrior-female-dark",
+  "payload": {
+    "prompt": "a young woman with red hair tied up in a bun, a cream linen shirt with a rope belt, patched brown trousers, bare feet with cloth wraps, dark brown skin, empty hands",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 721710448,
+    "return_spritesheet": true,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793191452,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 28.92,
+    "request_id": "ac1b07ff-ff3c-4827-a06a-ef959eb4d8ac",
+    "outputs_retained_until": 1793277847
+  }
+}

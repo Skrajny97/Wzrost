@@ -1,0 +1,25 @@
+{
+  "id": "walk-cleric-female-golden",
+  "payload": {
+    "prompt": "a young woman with a dark brown braid, a plain cream dress with a rope belt and a small wooden pendant, simple sandals, golden skin, empty hands",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 858974787,
+    "return_spritesheet": true,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793191739,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 25.91,
+    "request_id": "ddecd1a6-5454-4301-a97e-3fd55de8c0e1",
+    "outputs_retained_until": 1793278134
+  }
+}

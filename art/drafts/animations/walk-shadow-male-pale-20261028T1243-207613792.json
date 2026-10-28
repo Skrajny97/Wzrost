@@ -1,0 +1,25 @@
+{
+  "id": "walk-shadow-male-pale",
+  "payload": {
+    "prompt": "a young man with messy black hair, a dark grey scarf over his mouth and nose, ragged dark clothes, olive trousers, cloth-wrapped feet, very pale skin, empty hands",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 207613792,
+    "return_spritesheet": true,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793191852,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 24.72,
+    "request_id": "382bd376-7b2a-4aad-b197-4c962132c578",
+    "outputs_retained_until": 1793278247
+  }
+}
