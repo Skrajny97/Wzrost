@@ -3563,6 +3563,69 @@ img.area-art {
   font-size: 11px;
 }
 
+.chip--event {
+  border-color: rgba(190, 196, 186, 0.6);
+  color: var(--text);
+  font-size: 11px;
+}
+
+/* The event at the end of an exploration (event.js): its scene with the
+   person met, the text and the options; and its card in the report. */
+.event-scene {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 140px;
+  margin-top: 36px;
+  border: 1px solid var(--bark-line);
+  background: var(--scene, none) center / cover no-repeat, var(--bg-deep);
+  image-rendering: pixelated;
+}
+
+.event-figure {
+  width: 144px;
+  height: 192px;
+  image-rendering: pixelated;
+}
+
+.event-text {
+  font-style: italic;
+}
+
+.event-options {
+  display: grid;
+  gap: 8px;
+}
+
+.event-option {
+  width: 100%;
+}
+
+.report-event {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.report-event-art {
+  flex: none;
+}
+
+.report-event-art .event-figure {
+  width: 72px;
+  height: 96px;
+}
+
+.report-event-text {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.report-event-text p {
+  margin: 0;
+}
+
 .chip--elite {
   border-color: rgba(224, 160, 60, 0.7);
   color: #e0a03c;

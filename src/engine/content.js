@@ -61,7 +61,9 @@ export function buildContent(raw) {
     suffixes,
     affixesById: byId([...prefixes, ...suffixes]),
     affixNamesByMonster: Object.fromEntries(names.map((name) => [name.monster, name])),
-    monstersById: byId(raw.monsters),
+    // The creatures, and the foes of the events' fights (events.json), who
+    // fight the same way but live in no region and have no Bestiariusz.
+    monstersById: byId([...raw.monsters, ...(raw.events?.foes ?? [])]),
     regions,
     regionsById: byId(regions),
     areas,
@@ -120,5 +122,8 @@ export function buildContent(raw) {
     potionUse: raw.professions?.potionUse,
     // The gear Rzemieślnictwo makes (workshop.js).
     workshop: raw.professions?.workshop,
+    // The events at the end of an exploration (events.js).
+    events: raw.events ?? null,
+    eventsById: byId(raw.events?.list ?? []),
   };
 }

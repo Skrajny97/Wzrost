@@ -23,7 +23,19 @@ import { pushKey, sendNotifications, subscribePush, testPush, unsubscribePush } 
 import { claimAllQuests, claimQuest, openChest } from './quests.js';
 import { getReport, listReports } from './reports.js';
 import { learnSkill, raiseSkill } from './skills.js';
-import { backFromTest, repeatCommunityTour, repeatCraftingTour, repeatProfessionsTour, repeatSkillsTour, skipBuilding, skipTime, testIntroduction, tutorialTests } from './testing.js';
+import {
+  backFromTest,
+  chooseTestEvent,
+  eventTests,
+  repeatCommunityTour,
+  repeatCraftingTour,
+  repeatProfessionsTour,
+  repeatSkillsTour,
+  skipBuilding,
+  skipTime,
+  testIntroduction,
+  tutorialTests,
+} from './testing.js';
 import { skipWithTimePoints } from './time.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
 import { seeTutorial } from './tutorial.js';
@@ -135,6 +147,8 @@ const routes = [
   ['POST', '/api/test/community-tour', repeatCommunityTour],
   ['POST', '/api/test/crafting-tour', repeatCraftingTour],
   ['GET', '/api/test/tutorials', tutorialTests],
+  ['GET', '/api/test/events', eventTests],
+  ['POST', '/api/test/events', chooseTestEvent],
   ['POST', '/api/test/introduction', testIntroduction],
   ['POST', '/api/test/back', backFromTest],
 ].map(([method, pattern, handler]) => ({ method, parts: pattern.split('/'), handler }));

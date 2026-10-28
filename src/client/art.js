@@ -140,6 +140,14 @@ export const SPRITES = {
     height: 96,
     ids: ['system-grove', 'system-workshop', 'system-workbench'],
   },
+  // The events at the end of an exploration (data/events.json): the people
+  // met, 96×128, and the scenes behind them, 192×96, filled in as they are
+  // approved.
+  events: {
+    width: 96,
+    height: 128,
+    ids: [],
+  },
 };
 
 const available = Object.fromEntries(Object.entries(SPRITES).map(([kind, { ids }]) => [kind, new Set(ids)]));
@@ -177,6 +185,11 @@ export const herbSprite = (id) => sprite('herbs', id, 'sprite--item');
 export const potionSprite = (id) => sprite('potions', id, 'sprite--item');
 export const professionSprite = (id) => sprite('professions', id, 'sprite--profession');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
+// The figure of an event and the address of its scene, or null while there
+// is none.
+export const eventFigure = (id) =>
+  available.events.has(id) ? h('img', { src: `/art/events/${id}.png`, alt: '', width: 96, height: 128, class: 'sprite event-figure', decoding: 'async', draggable: 'false' }) : null;
+export const eventScene = (id) => (available.events.has(id) ? `/art/events/${id}.png` : null);
 
 // A skin tone other than the one drawn has its own recoloured file
 // (data/skins.json, tools/skin-tones.py).

@@ -34,6 +34,7 @@ import {
 import { playSound } from '../sound.js';
 import { skipControl, timePoints } from '../time.js';
 import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
+import { openEvent } from '../event.js';
 
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
 const CHOICE_KEY = 'wzrost.hunt-choice';
@@ -403,10 +404,15 @@ export function mountCombat(container, { params, navigate }) {
         text: 'Odbierz raport',
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
-            const { report } = await call('POST', '/api/hunts/claim');
-            reportCache.set(String(report.id), report);
-            state.freshReport = String(report.id);
-            navigate(`#/raport/${report.id}`);
+            const open = (report) => {
+              reportCache.set(String(report.id), report);
+              state.freshReport = String(report.id);
+              navigate(`#/raport/${report.id}`);
+            };
+            // An event at the exploration's end comes before the report.
+            const answer = await call('POST', '/api/hunts/claim');
+            if (answer.event) openEvent(answer.event, open);
+            else open(answer.report);
           }),
       });
       return h(

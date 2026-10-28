@@ -92,7 +92,10 @@
         // No new accounts: only the author's, made before (the author's request).
         "REGISTRATION": "closed",
         // "Testuj samouczki" in the settings: every tutorial from its start.
-        "TUTORIAL_TESTS": "on"
+        "TUTORIAL_TESTS": "on",
+        // "on": events at the end of an exploration (src/engine/events.js),
+        // with "Testuj zdarzenia" in the settings. Off in the live game.
+        "EVENTS": "on"
       },
       "triggers": {
         "crons": ["* * * * *"]

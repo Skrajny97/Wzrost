@@ -1,9 +1,10 @@
-// A hunt report: the summary at the top, then every fight of the hunt to play
-// back (tabs, or a swipe on the arena), the finds, and the full text account
-// on request. The report opens on its key fight.
+// A hunt report: the summary at the top, the event at its end if one came,
+// then every fight of the hunt to play back (tabs, or a swipe on the arena),
+// the finds, and the full text account on request. The report opens on its
+// key fight.
 
 import { createArena } from '../arena.js';
-import { itemSprite, materialSprite } from '../art.js';
+import { eventFigure, itemSprite, materialSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { playSound } from '../sound.js';
@@ -103,6 +104,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
       ),
       summaryCard(report),
+      report.event && eventCard(report.event),
       report.system.length > 0 && guided(systemPanel(...report.system), 'report-system'),
       count > 0 &&
         h(
@@ -169,7 +171,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const enemies = (fight.enemies ?? []).map((enemy) => `${enemy.name} (${enemy.level})`).join(', ');
     // Reports from before materials count the items dropped (`loot`).
     const left = fight.materials?.length > 0 ? ` · łup: ${materialsText(fight.materials)}` : fight.loot ? ` · łup: ${fight.loot}` : '';
-    const chest = fight.chests > 0 ? ` · ${fight.chests === 1 ? 'skrzynia' : `skrzynie: ${fight.chests}`}` : '';
+    // An event's foes leave items, not chests.
+    const chest = fight.chests > 0 ? ` · ${fight.event ? `przedmioty: ${fight.chests}` : fight.chests === 1 ? 'skrzynia' : `skrzynie: ${fight.chests}`}` : '';
     const outcome =
       fight.won === true
         ? `HP ${fight.hpBefore} → ${fight.hpAfter} · +${formatNumber(fight.xp)} XP · +${formatNumber(fight.gold)} złota${left}${chest}`
@@ -185,6 +188,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         fight.champion && h('span', { class: 'chip chip--champion', text: 'czempion' }),
         fight.elite && h('span', { class: 'chip chip--elite', text: 'elita' }),
         fight.tough && h('span', { class: 'chip chip--tough', text: 'wymagająca' }),
+        fight.event && h('span', { class: 'chip chip--event', text: 'zdarzenie' }),
       ),
       h('p', { class: 'fight-meta', text: `${formatOffset(fight.t)} · ${enemies}` }),
       h('p', { class: `fight-outcome fight-outcome--${String(fight.won)}`, text: outcome }),
@@ -247,6 +251,23 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       .filter((resource) => found[resource.id] > 0)
       .map((resource) => `${resource.name} +${formatNumber(found[resource.id])}`);
     return parts.length > 0 && ['Zasoby', parts.join(' · ')];
+  }
+
+  // The event at the exploration's end: who was met, the option chosen and
+  // what came of it.
+  function eventCard(event) {
+    return h(
+      'section',
+      { class: 'card report-event', 'aria-labelledby': 'report-event-title' },
+      eventFigure(event.art) && h('div', { class: 'report-event-art' }, eventFigure(event.art)),
+      h(
+        'div',
+        { class: 'report-event-text' },
+        h('h2', { class: 'section-title', id: 'report-event-title', text: event.title }),
+        h('p', { class: 'muted', text: event.text }),
+        h('p', {}, h('strong', { text: `${event.option.label}. ` }), event.option.text),
+      ),
+    );
   }
 
   function summaryCard(report) {

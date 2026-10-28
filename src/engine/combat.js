@@ -95,7 +95,7 @@ function marksOf(move) {
   return marks;
 }
 
-export function simulateFight({ allies, enemies, rng, content, record = false, trait = null }) {
+export function simulateFight({ allies, enemies, rng, content, record = false, trait = null, ambush = false }) {
   const balance = content.balance;
   const tuning = balance.combat;
   const texts = content.texts;
@@ -116,6 +116,12 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     for (const unit of units) Object.assign(unit, { mana: unit.maxMana ?? 0, moves: 0, damageBonus: 0, guard: null, shield: null, evade: null });
   }
   for (const unit of units) unit.next = unit.interval * (0.5 + 0.5 * rng.next());
+  // An ambush (an event's, events.js): every enemy moves before the allies'
+  // first move. It draws no random numbers.
+  if (ambush) {
+    const last = Math.max(...units.filter((unit) => unit.side === 'enemy').map((unit) => unit.next));
+    for (const unit of units) if (unit.side === 'ally') unit.next = Math.max(unit.next, last + 1);
+  }
 
   const events = [];
   // The potions drunk, by id, and which unit drank which kind already.

@@ -31,6 +31,7 @@ import skills from '../../data/skills.json' with { type: 'json' };
 import professions from '../../data/professions.json' with { type: 'json' };
 import chat from '../../data/chat.json' with { type: 'json' };
 import community from '../../data/community.json' with { type: 'json' };
+import events from '../../data/events.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -57,6 +58,7 @@ export const content = buildContent({
   professions,
   chat,
   community,
+  events,
 });
 
 // The parts of the game this deployment has on, for the System's messages

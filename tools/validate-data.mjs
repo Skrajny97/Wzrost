@@ -12,6 +12,7 @@ export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
+  'events',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'professions', 'settlement', 'dungeons', 'core'];
@@ -35,6 +36,11 @@ export function validateData(data = loadData()) {
         errors.push(`${name}.json${error.instancePath || ''}: ${error.message}`);
       }
     }
+  }
+  // The events' foes have the shape of the creatures.
+  const foes = ajv.compile(readJson('schemas/monsters.schema.json'));
+  if (!foes(data.events.foes)) {
+    for (const error of foes.errors) errors.push(`events.json/foes${error.instancePath || ''}: ${error.message}`);
   }
   // References only make sense once every file has the expected shape.
   if (errors.length === 0) errors.push(...checkReferences(data));
@@ -272,7 +278,8 @@ function checkReferences(data) {
   }
 
   const monstersById = new Map(data.monsters.map((monster) => [monster.id, monster]));
-  for (const monster of data.monsters) {
+  // The events' foes fight as creatures do, so they are checked the same way.
+  for (const monster of [...data.monsters, ...data.events.foes]) {
     statKeys('monsters', monster.id, monster.stats.base, { all: true });
     statKeys('monsters', monster.id, monster.stats.growth);
     if (!stats.has(monster.attack.scaling)) errors.push(`monsters.json: ${monster.id} skaluje atak nieznaną statystyką`);
@@ -588,6 +595,32 @@ function checkReferences(data) {
   for (const id of ['chat', 'friends', 'ranking']) {
     const section = data.community.sections.find((candidate) => candidate.id === id);
     if (!section || section.soon) errors.push(`community.json: brak otwartego działu ${id}`);
+  }
+  errors.push(...checkEvents(data, { monsters }));
+  return errors;
+}
+
+// The events at the end of an exploration: their foes apart from the
+// creatures (no Bestiariusz), each fight with foes, and options unique.
+function checkEvents(data, { monsters }) {
+  const errors = [];
+  const { events } = data;
+  const foes = uniqueIds(errors, 'events', events.foes);
+  for (const id of foes) if (monsters.has(id)) errors.push(`events.json: przeciwnik ${id} ma id stwora z monsters.json`);
+  uniqueIds(errors, 'events', events.list);
+  if (events.chancePerMinute > events.maxChance) errors.push('events.json: chancePerMinute nie może być większe niż maxChance');
+  for (const event of events.list) {
+    uniqueIds(errors, `events (${event.id})`, event.options);
+    for (const option of event.options) {
+      const { outcome } = option;
+      if (outcome.kind === 'fight') {
+        if (!outcome.foes) errors.push(`events.json: ${event.id}/${option.id} ma walkę bez przeciwników`);
+        for (const id of outcome.foes ?? []) if (!foes.has(id)) errors.push(`events.json: ${event.id}/${option.id} ma nieznanego przeciwnika "${id}"`);
+        if (!outcome.start?.includes('{enemies}')) errors.push(`events.json: ${event.id}/${option.id} potrzebuje zdania start z {enemies}`);
+      } else if (outcome.foes || outcome.ambush || outcome.speedBonus || outcome.itemChance !== undefined || outcome.start) {
+        errors.push(`events.json: ${event.id}/${option.id} ma ustawienia walki bez walki`);
+      }
+    }
   }
   return errors;
 }

@@ -587,6 +587,7 @@ function openSettings() {
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
     ),
     state.user.tutorialTests && h('button', { type: 'button', class: 'button button--system', onClick: openTutorialTests, text: 'Testuj samouczki' }),
+    state.user.tutorialTests && h('button', { type: 'button', class: 'button button--system', onClick: openEventTests, text: 'Testuj zdarzenia' }),
     installButton(),
     state.user.author && h('a', { class: 'button button--system', href: '#/autor', onClick: closeSheet, text: 'Panel autora' }),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
@@ -685,6 +686,49 @@ async function openTutorialTests() {
       row('Objaśnienie Profesji', 'Od 10. poziomu postaci. Poziomy profesji zostają.', repeatProfessionsTour, told && Boolean(state.character.professions)),
       row('Objaśnienie Rzemieślnictwa', 'Od 15. poziomu postaci. Poziomy profesji zostają.', repeatCraftingTour, told && Boolean(state.character.professions?.workshop)),
     ),
+  );
+}
+
+// "Testuj zdarzenia" on the test version (testing.js): the event chosen
+// here comes at the end of the next exploration that ends as planned,
+// without the draw.
+async function openEventTests() {
+  let data;
+  try {
+    data = await call('GET', '/api/test/events');
+  } catch (error) {
+    toast(error.message);
+    return;
+  }
+  const choose = (eventId) => async (event) => {
+    await withButton(event.currentTarget, async () => {
+      const { next } = await call('POST', '/api/test/events', { eventId });
+      toast(next ? 'Zdarzenie przyjdzie po następnej wyprawie, przy „Odbierz raport”.' : 'Zdarzenia znów losują się jak w grze.');
+      closeSheet();
+    });
+  };
+  openSheet(
+    h('h2', { class: 'sheet-title', text: 'Testuj zdarzenia' }),
+    h('p', { class: 'sheet-text', text: 'Wybrane zdarzenie przyjdzie po następnej wyprawie, gdy dotkniesz „Odbierz raport”, bez losowania. Wyprawa musi się skończyć bez omdlenia.' }),
+    h(
+      'ul',
+      { class: 'tutorial-tests' },
+      data.events.map((event) =>
+        h(
+          'li',
+          { class: 'tutorial-test' },
+          h('div', { class: 'tutorial-test-text' }, h('strong', { text: event.title }), data.next === event.id && h('span', { class: 'muted', text: 'Czeka na następny raport.' })),
+          h('button', {
+            type: 'button',
+            class: 'button button--system button--small',
+            text: data.next === event.id ? 'Wybrane' : 'Przy następnym raporcie',
+            disabled: data.next === event.id,
+            onClick: choose(event.id),
+          }),
+        ),
+      ),
+    ),
+    data.next && h('button', { type: 'button', class: 'button button--world', text: 'Bez wybranego zdarzenia', onClick: choose(null) }),
   );
 }
 

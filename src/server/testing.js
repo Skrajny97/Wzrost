@@ -1,12 +1,15 @@
 // "Pomiń czas" in test mode (test-mode.js), and on the test version
-// "Testuj samouczki": every tutorial from its start. For an account without
-// test mode, and with test mode off, these routes do not exist.
+// "Testuj samouczki": every tutorial from its start, and "Testuj zdarzenia":
+// an event at the end of the next exploration, without the draw. For an
+// account without test mode, and with test mode off, these routes do not
+// exist.
 
 import { construction } from '../engine/index.js';
 import { content, tutorialPart } from './content.js';
 import { completeBuilding } from './camp.js';
 import { characterRemoval, characterView, currentHp, loadPlayer, loadSettled, requirePlayer } from './characters.js';
-import { ApiError, json } from './http.js';
+import { eventsOn } from './features.js';
+import { ApiError, json, readJson } from './http.js';
 import { requireSession } from './sessions.js';
 import { testMode, testModeFor, tutorialTestsFor } from './test-mode.js';
 
@@ -76,6 +79,28 @@ export async function tutorialTests(context) {
   const session = await requireTester(context);
   const parked = await parkedOf(context.env.DB, session.userId);
   return json({ parked: parked && { name: parked.name } });
+}
+
+// "Testuj zdarzenia": the events there are, and the one the next
+// exploration brings at its end, if one was chosen.
+export async function eventTests(context) {
+  await requireTester(context);
+  if (!eventsOn()) throw notFound();
+  const { player } = await requirePlayer(context);
+  return json({ events: content.events.list.map((event) => ({ id: event.id, title: event.title })), next: player.row.event_test ?? null });
+}
+
+// "Przy następnym raporcie": the next exploration that ends as planned
+// brings this event (`eventId`), or none again (null). The draw does not
+// decide it, and the event's play clears it (hunts.js).
+export async function chooseTestEvent(context) {
+  await requireTester(context);
+  if (!eventsOn()) throw notFound();
+  const { player } = await requirePlayer(context);
+  const { eventId } = await readJson(context.request);
+  if (eventId !== null && !Object.hasOwn(content.eventsById, eventId)) throw new ApiError(400, 'unknown_event', 'Nie ma takiego zdarzenia.');
+  await context.env.DB.prepare('UPDATE characters SET event_test = ? WHERE id = ?').bind(eventId, player.row.id).run();
+  return json({ next: eventId });
 }
 
 // "Wprowadzenie" from the start: the character waits aside (role 'parked'),

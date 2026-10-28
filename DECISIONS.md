@@ -2581,3 +2581,27 @@ Autor: „Dodajmy też na stole rozbiórki możliwość wymiany zasobów typu ka
 ## Stawka wymiany na górze ekranu Stołu rozbiórki (28.10.2026)
 
 Autor: „Dopisz na gorę info o możliwości wymiany zasobów i rozwoju sytuacji wraz z lvlem”. Efekt poziomu Stołu rozbiórki kończy się teraz stawką wymiany zasobów na tym poziomie, np. „Najwyższa rzadkość: unikalna, przeróbka szybsza o 20%, wymiana zasobów 9 za 1”. Widać ją w karcie budowy lub ulepszenia na samej górze ekranu i w „Teraz” (`exchange.levelText` w `data/buildings.json`, `effectText` w `src/engine/camp.js`).
+
+## Zdarzenia na końcu wyprawy: Ranna kobieta (28.10.2026, wersja testowa)
+
+Autor: „Ewentualnie zdarzenia na koniec wyprawy: wyświetla się nagle jakiś NPC który coś proponuje i jest parę opcji do wyboru jeszcze przed pokazaniem się Raportu z wyprawy(który bedzie uwzględniał zdarzenie). Zdarzenia beda mozliwe od samego początku prawie (po Samouczku).” Pierwsze zdarzenie i jego trzy opcje są ze szkicu autora („Pierwszym zdarzeniem może być spotkanie rannej kobiety…”). Zdarzenie pokazuje się po dotknięciu „Odbierz raport”.
+
+1. **Kiedy.** Po „Odbierz raport” gra najpierw pokazuje zdarzenie: tytuł, krótki tekst i opcje. Raport otwiera się dopiero po wyborze i opisuje, co z niego wynikło. Zdarzenie zamknięte bez wyboru czeka: następne „Odbierz raport” pokaże je znowu, a do wyboru nic się nie zapisuje.
+    - Zdarzenie może przyjść po wyprawie zakończonej zgodnie z planem, z szansą 0,5% za każdą minutę, najwyżej 25%: 5 minut to 2,5%, 30 minut 15%, a godzina i dłużej 25% (`chancePerMinute` i `maxChance` w `data/events.json`).
+    - Nie przychodzi po pierwszej wyprawie (samouczek), po Szybkim Polowaniu ani po omdleniu lub odwrocie.
+    - Ziarno wyprawy decyduje, czy zdarzenie przyjdzie i jak skończy się każda opcja, więc ta sama wyprawa zawsze daje to samo.
+2. **Ranna kobieta.** Opcje mają nazwy ze szkicu autora. Krótkie teksty skutków są nowe, w `data/events.json`.
+    - „Pomóż jej sprawnie”: zasadzka. Trzej bandyci na poziomie postaci ruszają pierwsi, wszyscy przed pierwszym ruchem postaci (`ambush` w `simulateFight`). Postać walczy z HP, z jakim skończyła wyprawę.
+    - „Zadaj dodatkowe pytania”: postać wyczuwa zasadzkę. Bandyci nie atakują z zaskoczenia, a postać jest w tej walce o 25% szybsza. Reszta jak w pierwszej opcji.
+    - „Odejdź nieufnie”: nic więcej się nie dzieje.
+3. **Bandyci.** Zbir (przód, pałka), Nożownik (środek, nóż) i Kusznik (tył, kusza), zapisani jak stwory, ale w `data/events.json`.
+    - To ludzie, więc nie ma ich w Bestiariuszu, nie zostawiają materiałów i nie liczą się do zadań narratora.
+    - Każdy pokonany zostawia złoto jak stwór, a z szansą 35% także losowy przedmiot na poziomie postaci (średnio ok. 1 przedmiot na walkę).
+    - XP jak za trzy stwory na poziomie postaci w jednej walce wyprawy.
+4. **Przegrana.** Jak przegrana walka na wyprawie: omdlenie. W bezpiecznym regionie (Wiatrołomy) tylko odwrót, jak po przegranej z elitą albo czempionem, bo bandyci przychodzą na poziomie postaci, a nie miejsca.
+5. **Balans.** Symulacja typowych postaci 5 klas po godzinnej wyprawie w miejscu na miarę poziomu, opcja „Pomóż jej sprawnie”:
+    - Postać wygrywa każdą walkę. Zasadzka zabiera 43–52% HP na poziomach 5–8, 38% na 15. i ok. 24% od 30. poziomu. „Zadaj dodatkowe pytania” zabiera mniej.
+    - XP z walki to ok. 30% XP godzinnej wyprawy od 30. poziomu, 36–45% na poziomach 8–15 i 87% na 5. poziomie. Przy szansie zdarzenia daje to średnio 7–26% XP więcej na wyprawę.
+6. **Raport.** Pod podsumowaniem stoi karta zdarzenia: tekst i wybrana opcja ze skutkiem. Walka z bandytami ma w zakładkach znacznik „zdarzenie”, a raport otwiera się na niej. Relacja kończy się zdarzeniem.
+7. **Na razie tylko wersja testowa** (`EVENTS` „on” w `wrangler.jsonc`). „Testuj zdarzenia” w Ustawieniach wybiera zdarzenie na następny raport, bez losowania. Przychodzi ono po następnej wyprawie zakończonej zgodnie z planem (nie po samouczku ani Szybkim Polowaniu), a po wyborze opcji wybór znika (`event_test`, migracja 0048).
+8. **Grafiki.** Zdarzenie ma miejsce na postać (`art`) i tło (`scene`) z `src/client/art/events/`, a bandyci na swoje sylwetki. Szkice z Retro Diffusion idą do autora pojedynczo. Do tego czasu zdarzenie pokazuje sam tekst, a bandyci walczą bez sylwetek.

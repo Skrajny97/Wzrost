@@ -218,7 +218,8 @@ export const questsStale = (stored, now, content) =>
 export function huntKills(hunt) {
   const kills = {};
   for (const fight of hunt.fights) {
-    if (fight.won !== true) continue;
+    // People beaten in an event's fight (events.js) are no creatures.
+    if (fight.won !== true || fight.event) continue;
     for (const enemy of fight.enemies) kills[enemy.monsterId] = (kills[enemy.monsterId] ?? 0) + 1;
   }
   return kills;

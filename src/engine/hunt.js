@@ -725,6 +725,8 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       elite: fight.elite,
       champion: fight.champion ?? false,
       tough: fight.tough,
+      // The fight of an event at the exploration's end (events.js).
+      ...(fight.event && { event: true }),
       won: fight.won,
       hpBefore: fight.hpBefore,
       hpAfter: fight.hpAfter,
@@ -738,6 +740,8 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
     })),
     keyFight: hunt.keyFight,
     entries: hunt.entries,
+    // The event at the exploration's end and the option chosen (events.js).
+    event: hunt.event ?? null,
     // The potions drunk, by id (potions.js).
     potionsUsed: hunt.potionsUsed ?? {},
   };

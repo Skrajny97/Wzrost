@@ -23,6 +23,8 @@ import {
   huntDurations,
   isUnlocked,
   huntKills,
+  eventFor,
+  eventView,
   huntReport,
   longestHunt,
   lowerThreat,
@@ -32,6 +34,7 @@ import {
   questPeriod,
   rareCatchUp,
   sellPrice,
+  resolveEvent,
   simulateHunt,
   speedWindow,
   threatSamples,
@@ -53,6 +56,7 @@ import {
 } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
+import { eventsOn } from './features.js';
 import { soldGold } from './inventory.js';
 import { finishGathering } from './professions.js';
 import { knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
@@ -318,8 +322,13 @@ export async function cancelHunt(context) {
 export async function claimHunt(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
+  // The option chosen in the event at the exploration's end, if one came.
+  const body = (context.request.headers.get('Content-Type') ?? '').startsWith('application/json') ? await readJson(context.request) : {};
   const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting }[player.activity?.kind];
-  const { id, report } = finish && player.activity.ends_at <= now ? await finish(context.env.DB, player, now) : await finishHunt(context.env.DB, player, now);
+  const done = finish && player.activity.ends_at <= now ? await finish(context.env.DB, player, now) : await finishHunt(context.env.DB, player, now, { choice: body.choice });
+  // The event comes first: the report waits for the player's choice.
+  if (done.event) return json({ event: done.event });
+  const { id, report } = done;
   return json({
     report: { id, createdAt: now, ...report },
     character: characterView(await loadPlayer(context.env.DB, session.userId), now),
@@ -327,8 +336,11 @@ export async function claimHunt(context) {
 }
 
 // The report of a finished exploration: the engine runs it with the seed
-// saved at its start, and the character gets what it brought.
-export async function finishHunt(db, player, now) {
+// saved at its start, and the character gets what it brought. An event at
+// its end (events.js) comes first: without `choice` only the event is
+// returned ({ event }), and nothing is saved; with an option of it, the
+// exploration takes the option's outcome.
+export async function finishHunt(db, player, now, { choice } = {}) {
   const activity = player.activity;
   if (!activity) throw new ApiError(409, 'no_activity', 'Postać nie jest na wyprawie.');
   if (activity.ends_at > now) throw new ApiError(409, 'not_finished', 'Wyprawa jeszcze trwa.');
@@ -341,7 +353,7 @@ export async function finishHunt(db, player, now) {
   const first = !(await db.prepare('SELECT 1 AS found FROM reports WHERE character_id = ? LIMIT 1').bind(row.id).first());
   // The potions taken along and a speed potion's window (beginHunt).
   const options = JSON.parse(activity.options ?? '{}');
-  const hunt = simulateHunt(
+  let hunt = simulateHunt(
     {
       character,
       equipped: equippedItems(player),
@@ -363,6 +375,13 @@ export async function finishHunt(db, player, now) {
     },
     content,
   );
+  // "Testuj zdarzenia" (the test version) brings its event without the draw.
+  const event = eventsOn() ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: row.event_test }, content) : null;
+  if (event && choice === undefined) return { event: eventView(event) };
+  if (event) {
+    if (!event.options.some((option) => option.id === choice)) throw new ApiError(400, 'invalid_choice', 'Wybierz jedną z opcji.');
+    hunt = resolveEvent({ hunt, event, optionId: choice, character, equipped: equippedItems(player), name: row.name, seed: activity.seed }, content);
+  }
   const applied = applyHunt(character, hunt, content);
   // The potions drunk leave the bag; the bag cannot change during the
   // exploration, so they are still there.
@@ -432,8 +451,11 @@ export async function finishHunt(db, player, now) {
   const worn = [...equippedItems(player), ...autoEquipped.map((index) => hunt.items[index])];
   const hp = hpAfterHunt({ character, applied, hunt, equipped: worn, name: row.name }, content);
   // The creatures of every fight join those the character has met (the
-  // Bestiariusz shows them by name from now on).
-  const met = [...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))])];
+  // Bestiariusz shows them by name from now on); the people of an event's
+  // fight are not in the Bestiariusz.
+  const met = [
+    ...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.filter((fight) => !fight.event).flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))]),
+  ];
   // The narrator's quests count the creatures beaten, the minutes and the
   // inner regions the new class levels open. They are saved only as read,
   // so a reward claimed meanwhile is not undone.
@@ -459,7 +481,7 @@ export async function finishHunt(db, player, now) {
       db
         .prepare(
           `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ? + ${storedPrice.sql}${setResources}${setMaterials},
-             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${drunk.length > 0 ? ', potions = ?' : ''},
+             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${drunk.length > 0 ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''},
              version = version + 1
            WHERE id = ?`,
         )
