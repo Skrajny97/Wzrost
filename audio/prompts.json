@@ -198,7 +198,7 @@
       "mossling-hurt": { "text": "a creature of moss squelches and rustles when hit, soft wet tearing sound, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
       "mossling-death": "a creature of moss sags and falls apart with a long wet rustle, close up, dry, no music",
       "imp-hurt": { "text": "a small imp squeals angrily when hit, high mischievous voice, no words, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
-      "imp-death": "a small imp gives a high squeak and vanishes with a soft magical pop, close up, no music",
+      "imp-death": { "text": "a small imp gives a sharp high-pitched dying shriek that breaks into a dry raspy gasp, video game monster death sound, close up, dry, no music", "seconds": 1 },
       "cross-spider-hurt": { "text": "a large spider hisses and clicks its fangs when hit, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
       "cross-spider-death": "a large spider hisses weakly and curls up with a dry crackle, close up, dry, no music",
       "mouflon-hurt": { "text": "a wild ram bleats harshly in pain, short angry bleat, video game creature hurt sound, close up, dry, no music", "seconds": 0.6 },
