@@ -2810,6 +2810,12 @@ Odpowiedzi na pytania E1–E7 z propozycji ewolucji, zadane w czacie. Autor: „
 6. **Portrety (E5):** 30 nowych portretów, po dwa na każdą z 15 ewolucji (kobieta i mężczyzna), ok. 16 USD w Retro Diffusion.
 7. **Muzyka ceremonii (E6):** utwór autora z Suno. Ceremonia czeka na niego.
 8. **Nazwa klasy (E7):** sama nowa nazwa w górnym pasku, na czacie i w rankingu, np. „Barbarzyńca”. Klasa podstawowa zostaje dopiskiem w karcie postaci.
+9. **Czekanie (E8):** przed kolejną ewolucją, na 100. poziomie klasy, klasa czeka, aż gracz rozda wszystkie Punkty Umiejętności, tak jak dziś przed 50.
+10. **Kolejność (E9):** po przedmiotach, ziołach i miksturach najpierw ewolucje na wersji testowej, z „Testuj ewolucję” w trybie testowym, a potem Osada.
+11. **Liczby umiejętności.** Autor przy Barbarzyńcy: „te 25% to na najwyższym poziomie rozwoju umiejętności”. Liczby w opisach umiejętności ewolucji dotyczą ich najwyższego poziomu (45.), a od 1. poziomu rosną do nich równo, jak dziś.
+12. **Wojownik:**
+    - **Barbarzyńca:** Druzgocący cios (Potężny cios, po którym cel traci najbliższy ruch, z szansą do 25%) i Krwawy szał (przez 3 ruchy +40% obrażeń i leczenie do 15% zadanych, ale postać przyjmuje o 20% więcej);
+    - **Gladiator:** Młyn (Szeroki zamach bez chybień, trafieni tracą 10% pancerza do końca walki) i Riposta (po uniku postać oddaje cios za 120%), z dodatkiem autora: cios Riposty powoduje też krwawienie.
 
 ## Ewolucje i Osada: propozycje (28.10.2026)
 
