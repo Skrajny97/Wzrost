@@ -92,7 +92,9 @@
       "zmij": "fiery winged serpent from slavic legend, long scaly red-black body glowing with embers, small leathery wings, burning yellow eyes, smoke from its jaws, coiled in the air, full body",
       "fume-spirit": "smouldering fume spirit, a compact hunched shape of thick grey-yellow smoke curling around itself, glowing ember eyes and coal-red cracks, the whole figure inside the frame, floating, full body",
       "mine-spirit": "old mine guardian spirit, a bearded gnome-like ghost miner in a ragged black cloak and a miner cap, holding up a glowing old lantern, pale greenish skin, stern face, full body",
-      "giant-rat": "giant mangy grey rat with a bare pink tail, yellow teeth bared, torn ears, hunched aggressive pose, full body, three-quarter view"
+      "giant-rat": "giant mangy grey rat with a bare pink tail, yellow teeth bared, torn ears, hunched aggressive pose, full body, three-quarter view",
+      "summon-elemental": "fire elemental summoned by a mage, a small humanoid figure of swirling orange and red flames around a dark glowing ember core, two bright yellow eyes, floating above a faint violet magic circle, full body, three-quarter view",
+      "summon-slime": "toxic slime, a wobbling blob of bright acid green ooze with two glowing yellow eyes, green drops dripping and bubbling, a small puddle of poison under it, full body, three-quarter view"
     }
   },
   "portraits": {
@@ -409,7 +411,7 @@
       "indomitable": "massive iron tower shield with a golden glow, arrows bouncing off it in bright reflected sparks, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
       "challenge": "sword striking a round iron shield, golden rings of sound spreading out from the hit, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
       "piercing-shot": "long arrow flying straight through two red targets in a row, a bright white speed streak behind it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
-      "ambush-shot": "arrow shooting out of dark green bushes, one glowing eye watching from the shadow, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "ambush-shot": "arrow flying out of a small round leafy green bush to the right, a hooded archer half hidden in the leaves, a white speed streak behind the arrow, fantasy RPG skill icon, bold readable shape, no background, isolated on a plain flat background",
       "arrow-storm": "many arrows falling in a wide fan, crackling with blue lightning, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
       "storm-cloud": "dark grey storm cloud striking down with blue lightning bolts, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
       "barbed-arrow": "arrow with a jagged barbed arrowhead dripping red blood, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
@@ -430,7 +432,7 @@
       "death-mark": "glowing purple skull sigil branded in a dark smoky aura, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
       "black-venom": "dagger dripping thick black venom with dark green smoke, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
       "toxic-slime": "bubbling green toxic slime blob with glowing eyes and dripping poison, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
-      "blade-dance": "two curved blades crossing in a swirl of violet shadow ribbons, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "blade-dance": "two steel daggers spinning around each other in a circle, leaving bright violet trails, dynamic whirling motion, fantasy RPG skill icon, bold readable shape, no background, isolated on a plain flat background",
       "shadow-whirl": "dark violet whirlwind of shadows with small blades spinning inside, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background"
     }
   },
@@ -651,7 +653,8 @@
       "walk-ice-lord-female": {"prompt": "a young woman in a long blue hooded robe with gold trim, holding a wooden staff with a glowing cyan crystal", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-ice-lord-female.png"},
       "walk-ice-lord-male": {"prompt": "a young man in a long blue hooded robe with gold trim and a dark cloak, holding a wooden staff with a glowing cyan crystal", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-ice-lord-male.png"},
       "walk-priest-female": {"prompt": "a young woman with long brown hair and a thin gold circlet, a long white and gold robe with a holy symbol, a round silver shield and a silver aspergillum", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-priest-female.png"},
-      "walk-priest-male": {"prompt": "a young man with messy brown hair, a long white and gold robe with a holy symbol, a round silver shield and a silver aspergillum", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-priest-male.png"},
+      "walk-priest-male": {"prompt": "a young man with messy brown hair, a long white robe with gold trim and a golden sun on the chest, a big round white and gold shield on the left arm, a short silver mace in the right hand", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-priest-male.png"},
+      "walk-elementalist-female": {"prompt": "a young woman with very long flowing light brown hair, a long red and orange hooded mage robe with wide sleeves, a brown belt with pouches, a long wooden staff topped with a glowing orange crystal, a small flame floating over her open hand", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-elementalist-female.png"},
       "walk-assassin-female": {"prompt": "a young woman in a black hood with a black mask over the mouth, black leather armour, a dagger in each hand", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-assassin-female.png"},
       "walk-assassin-male": {"prompt": "a young man in a black hood with a black mask over the mouth, black leather armour, a dagger in each hand", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-assassin-male.png"},
       "walk-barbarian-male": {"prompt": "a broad-shouldered young man with short brown hair and a short beard, a grey wolf fur mantle over the shoulders, a sleeveless dark leather jerkin with a wide belt, fur-wrapped boots, a big two-handed battle axe", "style": "rd_animation__four_angle_walking", "width": 48, "height": 48, "startFrame": "art/references/animations/walk-barbarian-male.png"},

@@ -50,14 +50,14 @@ export const SPRITES = {
       'guardian-female', 'guardian-male', 'sniper-female', 'sniper-male', 'ice-lord-female', 'ice-lord-male', 'priest-female', 'priest-male', 'assassin-female', 'assassin-male',
       // The evolutions drawn anew (Retro Diffusion), as the author picked them.
       'barbarian-female', 'barbarian-male', 'gladiator-female', 'gladiator-male', 'storm-archer-female', 'storm-archer-male', 'hunter-female', 'hunter-male',
-      'elementalist-male', 'arcanist-female', 'arcanist-male', 'healer-female', 'healer-male', 'inquisitor-female', 'inquisitor-male',
+      'elementalist-female', 'elementalist-male', 'arcanist-female', 'arcanist-male', 'healer-female', 'healer-male', 'inquisitor-female', 'inquisitor-male',
       'poisoner-female', 'poisoner-male', 'night-dancer-female', 'night-dancer-male',
     ],
     faces: {
       'archer-female': 49, 'archer-male': 52, 'cleric-male': 49, 'shadow-male': 51, 'warrior-male': 50,
       'guardian-female': 50, 'sniper-female': 43, 'sniper-male': 47, 'ice-lord-female': 50, 'priest-female': 50, 'priest-male': 50, 'assassin-female': 54, 'assassin-male': 52,
       'barbarian-female': 55, 'barbarian-male': 57, 'gladiator-female': 51, 'gladiator-male': 51, 'storm-archer-female': 46, 'storm-archer-male': 52, 'hunter-female': 51, 'hunter-male': 56,
-      'arcanist-female': 47, 'arcanist-male': 52, 'healer-female': 46, 'healer-male': 45, 'inquisitor-female': 45, 'poisoner-female': 52, 'poisoner-male': 53,
+      'elementalist-female': 53, 'arcanist-female': 47, 'arcanist-male': 52, 'healer-female': 46, 'healer-male': 45, 'inquisitor-female': 45, 'poisoner-female': 52, 'poisoner-male': 53,
       'night-dancer-female': 50, 'night-dancer-male': 47,
     },
     toned: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
