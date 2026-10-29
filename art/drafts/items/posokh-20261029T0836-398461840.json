@@ -1,0 +1,25 @@
+{
+  "id": "posokh",
+  "payload": {
+    "prompt": "a long gnarled dark oak staff shown whole from end to end, diagonal from bottom left to top right, its top bent into a small hook that holds a glowing amber stone, silver wire wrapped below the hook, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 2,
+    "seed": 398461840,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793263011,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 47.88,
+    "request_id": "67656358-3d47-40d6-8f80-6daacaaa3270",
+    "outputs_retained_until": 1793349391
+  }
+}
