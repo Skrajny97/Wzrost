@@ -2808,6 +2808,44 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - **wzory w Warsztacie** (brakujący szczegół): wzór bazy od 25. poziomu klasy odsłania się na 25. poziomie Rzemieślnictwa, a od 50. na 50. Wcześniej każda dalsza baza miała wzór od `laterPatternLevel`, czyli od 10. Rozbiórka takiego przedmiotu nadal od razu uczy jego wzoru;
     - symulacja balansu (`tools/simulate.mjs`) liczy, jak dotąd, ekwipunek z pierwszych baz kategorii. Dalsze bazy są więc zapasem siły ponad nią i nie zmieniają jej tabel.
 
+## Uwagi autora po 0.0.55 (29.10.2026, na wersji testowej)
+
+1. **Wdrożenia na komendę autora.** Autor: „Od kolejnej rundy wdrożenia (poza awaryjnymi, które podpiszę) robimy rzadziej na moją komendę. Możesz sugerować wdrożenie, ale sam go nie bedziesz wykonywał.”
+    - Zmiany trafiają na wersję testową (push na gałąź roboczą), jak dotąd. Do gry (push do `main`) wchodzą tylko na komendę autora albo jako wdrożenie awaryjne podpisane przez autora. Raport na koniec etapu mówi, czy wdrożenie jest zalecane.
+    - Numer wersji rośnie tylko przy wdrożeniu do gry (brakujący szczegół). Do tego czasu wersja testowa pokazuje ostatni numer z gry i nowy skrót commita, np. „0.0.55 (abc1234)”.
+    - `CLAUDE.md` przypomina o tym kolejnym sesjom.
+2. **Niebieski grzyb zatwierdzony.** Autor: „grzyb tak” i „"Przy ścieżce rośnie grzyb, którego nie znasz." Lekka poprawka do opisu”.
+    - Zdarzenie nie jest już szkicem. Przychodzi w każdym regionie wewnętrznym, w grze od najbliższego wdrożenia. Zasady są jak w „Uwagach autora po 0.0.52”, punkt 1.
+    - Opis zaczyna się od zdania autora („którego” zamiast „jakiego”), a dalej jest bez zmian.
+3. **Błyskawiczne polowanie.** Autor: „Zmieńmy Szybkie Polowania / 3 razy po 15 minut jest ale dodajmy jeszcze opcje 3 razy po 10 minut (Błyskawiczne polowanie) resetowane co 12h po zużyciu jako drugi przycisk”.
+    - Pod Szybkim Polowaniem w Walce jest drugi przycisk, „Błyskawiczne polowanie”: wyprawa jak na 10 minut, z raportem od razu, jak Szybkie Polowanie. Opcje wyprawy, tropienie i mikstury (przycięte do 10 minut) działają tak samo, od 5. poziomu.
+    - Są trzy. Po zużyciu trzeciego wszystkie wracają 12 godzin po nim, a wcześniej żadne nie wraca (`flashHunt` w `data/balance.json`). Przycisk podaje „Zostało: N z 3”, a po zużyciu dzień i godzinę powrotu.
+    - Szybkie Polowania (3 na dzień, liczone od północy w Warszawie) są od nich niezależne.
+    - Raport ma tytuł „Błyskawiczne polowanie”. Serwer zapisuje zużycie w `characters.quick_hunts` obok Szybkich Polowań, więc migracja nie była potrzebna. `POST /api/hunts/quick` z `kind: 'flash'` startuje Błyskawiczne, a bez wolnego odpowiada 409 `no_flash_hunts`.
+4. **Moneta złota i klepsydra Punktów Czasu.** Autor: „Wygenerujmy też ikonkę dla złota (złota moneta oraz Punktów Czasu -> klepsydra) i wrzucajmy wszedzie gdzie trzeba / tylko Punkty Systemu będą w takiej wyróżniającej formie jak do tej pory” i po szkicach: „zloto i punkty Czasu sa okey, ale złotą monetę musisz tak dostosowac by była wielkościowo i pozycją zbliżona do Punktów Systemu - lub odwrotnie”.
+    - Obie grafiki to rodzaj `icons`, 32 × 32. Monecie dorysowano środek, który zniknął przy usuwaniu tła, a klepsydra ma bursztynowy piasek w kolorze Punktów Czasu.
+    - W górnym pasku moneta i znak Punktów Systemu mają po 20 px (wcześniej po 16 px) i stoją jeden nad drugim w jednej kolumnie, więc obie liczby zaczynają się w tym samym miejscu.
+    - W portfelu wszystkie znaki mają 24 px: moneta, znak Punktów Systemu, klepsydra i zasoby. Nazwy stoją w jednej kolumnie.
+    - Moneta stoi też w kosztach i magazynach obozu, w nagrodach zadań, w Wymianie i przy cenie Awatara Systemu, a klepsydra na przycisku „Przewiń”. Kreskowa klepsydra zostaje tam, gdzie znaczy tylko czas: przy budowie, w kolejce i w „Czasie budowy”.
+    - Punkty Systemu zachowują kreskowy znak w kolorze Systemu.
+5. **Ikona Encyklopedii zatwierdzona.** Autor: „Encyklopedia wygląda dobrze.” Grafika czeka w `src/client/art/icons/encyclopedia.png`. Wejdzie do górnego paska z Encyklopedią, w miejsce sakwy (autor: „mysle ze sakiewke z czesciami do rzemiosła wrzucimy do Postaci gdzies a w jej miejsce ikonke Encyklopedii właśnie która rozwinie cały nowy moduł”).
+6. **Encyklopedia: plan autora.** Autor: „Z kolejnych wielkich kroków to zbudowanie Encyklopedii (ale najpierw sprawdzenie i zebranie wszystkich danych o przedmiotach, miksturach, materiałach i zebranie tego) i tam wrzucamy też Bestiariusz (pomimo skrzynek przy wyprawach - do odbioru też z pozycji Encyklopedii)”, „Ma to działać tak jak Bestiariusz - odkrywanie nowych zestawów przedmiotów daje drobny bonus, mikstur itp. jak nie da się zestawami to za konkretne ilości odkryć”, „Konieczny podział na zakładki rzeczy i wszystkiego” i wcześniej: „Encyklopedia niech wskazuje i bedzie posegregowana tierami też”.
+    - Najpierw przegląd i zebranie danych o przedmiotach, miksturach i materiałach, potem moduł z zakładkami.
+    - Bestiariusz trafi do Encyklopedii. Jego skrzynie da się odebrać i tam, i jak dziś przy wyprawach.
+    - Odkrycie zestawu przedmiotów, mikstur itd. da drobny bonus, a gdzie zestawów nie ma, bonus dadzą liczby odkryć.
+    - Wpisy będą wskazywać, gdzie zdobyć daną rzecz, i będą ułożone według tierów.
+    - Części do rzemiosła z sakwy przejdą do Postaci.
+    - Na razie nic z tego nie ma w grze.
+7. **Nowe zastosowania materiałów.** Autor: „Nowe zastosowania Materiałów: 1, 2, 3, 4, 5, 6(afiksu i bonusów - zarówno czasem rzadkich jak i zwykłych, zależnie od przedmiotu), 7”. Wybrane są wszystkie propozycje z czatu:
+    - Skup złomu kupuje materiały za złoto, a cena rośnie z rzadkością.
+    - Materiały w Wymianie między graczami, jak przedmioty, zioła i mikstury.
+    - Katalizatory w Alchemii. Wybrane mikstury biorą jeden materiał stwora, np. Łuskę żmii do Odtrutki, a rzadszy materiał daje szansę na dodatkową miksturę.
+    - Kowadło od +5. Wyższe ulepszenia biorą też materiał rzadkości przedmiotu.
+    - Tablica zleceń w Osadzie. Mieszkańcy zamawiają np. „5 × Skóra wilka” za złoto, reputację albo Punkty Systemu.
+    - Zaklinaczka w Osadzie przekuwa afiksy i bonusy przedmiotów. Kosztuje to materiały czasem rzadkie, a czasem zwykłe, zależnie od przedmiotu.
+    - Trofea w Encyklopedii. Materiał jednego gatunku zebrany w każdym stopniu daje trofeum z drobnym bonusem przeciw temu gatunkowi.
+    - Kolejność (brakujący szczegół): najpierw cztery pierwsze, bo nie czekają na nowe moduły, trofea razem z Encyklopedią, a tablica zleceń i Zaklinaczka razem z Osadą.
+
 ## Uwagi autora po 0.0.54 (29.10.2026, w grze od 0.0.55)
 
 1. **Materiały wyższej rzadkości ze zwykłych stworów.** Autor: „Niech materiały ze zwykłych stworow też czasem będą wyzszego stopnia rzadkosci - drugiego i o wiele rzadziej - trzeciego / te na niskich lvlach, a pozniej jeszcze wyższe stopnie rzadkości / do tego pewnie przyda sie Osada ale musimy o tym pamiętać”.
@@ -2816,7 +2854,7 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - Co 25 poziomów stworów otwiera się następny stopień: trzeci od 26. poziomu, czwarty od 51., piąty od 76. Materiał nigdy nie przekracza ostatniej rzadkości.
     - Wcześniej materiał bywał najwyżej o jedną rzadkość wyżej, z szansą 0,5% za poziom stwora.
     - Rzadszy materiał daje na Stole rozbiórki część swojej rzadkości, a Stół przyjmuje go, gdy jego poziom otwiera tę rzadkość, jak dotąd.
-    - Osada i nowe zastosowania materiałów czekają na wybór autora z propozycji w czacie.
+    - Osada i nowe zastosowania materiałów czekają na wybór autora z propozycji w czacie. *Autor wybrał wszystkie: zob. „Uwagi autora po 0.0.55”, punkt 7.*
 2. **Powiadomienia przestają przychodzić.** Autor: „Czy nowe wersje wdrażane moga miec wplyw na przychodzenie powiadomień? kuzynka zgłosiła problem, wczesniej ktos inny / zresetowala to ustawienie w iPhonie i grze i pomogło, ale tak za kazdym razem robic?”.
     - Wdrożenia nie zmieniają kluczy powiadomień (są w bazie), zapisanych telefonów ani pliku service workera (bez zmian od 0.0.36).
     - Słaby punkt był gdzie indziej. Gdy usługa powiadomień telefonu (Apple, Google) przestała znać subskrypcję, serwer ją usuwał. Telefon przy każdym starcie odsyłał tę samą martwą subskrypcję, a przełącznik w grze dalej pokazywał „Włączone”. Pomagało dopiero wyłączenie i włączenie powiadomień.
@@ -2835,8 +2873,8 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - Pozycje ukryte przez System to już nie osobne kafelki z „???”. Zamiast tego jest jeden wiersz na poziom, który je odsłoni: czarne sylwetki i zdanie Systemu, np. „Ukryte przez System do 10. poziomu Rzemieślnictwa.”
     - Przy przepisie bez ziół na choć jedną miksturę lista dopisuje „brak ziół” (brakujący szczegół).
     - Ekrany na telefonie są krótsze: Zielarstwo z ok. 1600 do 1060 px, Alchemia z ok. 1970 do 1070 px, a Warsztat z ok. 2750 do 1800 px.
-2. **Ikonki zasobów przy obozie.** Autor: „Nie zmieniłes chyba ikonek do zbierania zasobów przy obozie”. Dymki „Zbierz” nad Tartakiem, Kamieniołomem i Kopalnią miały już nowe grafiki, ale w 14 px, gdzie wyglądały jak dawne ikonki. Grafika zasobu ma teraz zawsze co najmniej 24 px: w dymkach, magazynach, wymianie, kosztach budowy i ulepszeń oraz w portfelu. Kreskowe ikonki złota i punktów zostają w swoim rozmiarze, a w portfelu stoją w tej samej kolumnie co grafiki.
-3. **Ikona Encyklopedii.** Autor: „Encyklopedii ikonkę w ten róg wygeneruj w RetroDiffusion a nie rysuj jak coś”. Jest jeden szkic (rodzaj grafik `icons`, 32 × 32): skórzana księga z niebieskim kamieniem Systemu. Czeka na ocenę autora. Do gry wejdzie razem z Encyklopedią, w rogu górnego paska zamiast sakwy, której części są już w plecaku.
+2. **Ikonki zasobów przy obozie.** Autor: „Nie zmieniłes chyba ikonek do zbierania zasobów przy obozie”. Dymki „Zbierz” nad Tartakiem, Kamieniołomem i Kopalnią miały już nowe grafiki, ale w 14 px, gdzie wyglądały jak dawne ikonki. Grafika zasobu ma teraz zawsze co najmniej 24 px: w dymkach, magazynach, wymianie, kosztach budowy i ulepszeń oraz w portfelu. Kreskowe ikonki złota i punktów zostają w swoim rozmiarze, a w portfelu stoją w tej samej kolumnie co grafiki. *Złoto i Punkty Czasu mają teraz grafiki: zob. „Uwagi autora po 0.0.55”, punkt 4.*
+3. **Ikona Encyklopedii.** Autor: „Encyklopedii ikonkę w ten róg wygeneruj w RetroDiffusion a nie rysuj jak coś”. Jest jeden szkic (rodzaj grafik `icons`, 32 × 32): skórzana księga z niebieskim kamieniem Systemu. Czeka na ocenę autora. Do gry wejdzie razem z Encyklopedią, w rogu górnego paska zamiast sakwy, której części są już w plecaku. *Zatwierdzona: zob. „Uwagi autora po 0.0.55”, punkt 5.*
 
 ## Uwagi autora po 0.0.52 (29.10.2026, w grze od 0.0.53)
 
@@ -2846,14 +2884,14 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - Omdlenie zabiera 30% złota z tej wyprawy (`goldLoss`), co najmniej 1, jeśli było jakieś złoto. Tekst dopisuje wtedy „Sakiewka jest wyraźnie lżejsza (−N złota).”
     - Wzmocnienia działają jak mikstury na czas: lekkość (ruchy w walkach +25%), twarda skóra (pancerz +15%), siła (obrażenia +10%) albo jasność umysłu (Intelekt i Mądrość +10%), każde przez 30 minut wypraw. Dodają się do wypitych mikstur jak kolejna mikstura tego rodzaju.
     - Wolny Punkt Statystyk zapisuje się osobno (`bonus_points`, migracja 0049) i liczy się do punktów z poziomów. Gra pokazuje go jak inne wolne punkty.
-    - To szkic: przychodzi tylko na wersji testowej i da się go wybrać w „Testuj zdarzenia”, także z konkretnym skutkiem. Do gry wejdzie po zatwierdzeniu przez autora razem z grafiką grzyba (jeden szkic Retro Diffusion).
+    - To szkic: przychodzi tylko na wersji testowej i da się go wybrać w „Testuj zdarzenia”, także z konkretnym skutkiem. Do gry wejdzie po zatwierdzeniu przez autora razem z grafiką grzyba (jeden szkic Retro Diffusion). *Zatwierdzony: zob. „Uwagi autora po 0.0.55”, punkt 2.*
 2. **Plecak: trzy zakładki.** Autor (ze zrzutem ekranu plecaka): „Podzielić na 3: Przedmioty, Materiały, Części”. Plecak ma zakładki „Przedmioty”, „Materiały” i „Części”, a przy dwóch ostatnich liczbę sztuk. Części, jak materiały, nie zajmują miejsca w plecaku. Stuknięta część pokazuje opis, liczbę sztuk i przycisk „Do Warsztatu”. Sakwa w górnym pasku zostaje bez zmian.
 
 ## Uwagi autora po 0.0.51 (29.10.2026, w grze od 0.0.52)
 
 1. **Ikonki zasobów.** Autor: „Wygenerujmy może też normalne ikonki zasobów” i o szkicach: „1 tak / 2 tak tylko usuń ziemie spod kamieni / 3 przemaluj ten brązowy kolor na pasujący pod żelazo”.
     - Drewno weszło bez zmian. Kamień nie ma już brązowej plamy ziemi i ma domknięty ciemny kontur. Ruda żelaza ma żyły przemalowane z rdzawego brązu na zimną stal, a białe błyski kruszcu zostały.
-    - Ikonki stoją wszędzie, gdzie były kreskowe: w portfelu, w zasobach i kosztach obozu, w Magazynach, u Ducha ognia, przy wymianie na Stole rozbiórki, w kosztach Kowadła i w nagrodach zadań. Złoto zostaje monetą.
+    - Ikonki stoją wszędzie, gdzie były kreskowe: w portfelu, w zasobach i kosztach obozu, w Magazynach, u Ducha ognia, przy wymianie na Stole rozbiórki, w kosztach Kowadła i w nagrodach zadań. Złoto zostaje monetą. *Moneta ma teraz grafikę: zob. „Uwagi autora po 0.0.55”, punkt 4.*
 2. **Ikonki mikstur.** Autor: „Dorób kontury dużych mikstur reszta super”. Trzy Duże mikstury mają domknięty ciemny kontur (dół i boki kolby oraz sznurek). Olejek z tojadu, Eliksir jemiołowy, Napar z kwiatu paproci i drugi szkic Jemioły weszły bez zmian.
 3. **Opcje wyprawy: wszystko w jednym miejscu, jako zakładka.** Autor: „Skoro tworzysz "Opcje wyprawy" to wrzuć tam wszystko wlącznie z zabieranymi miksturami i w ogóle, bo to ładniej będzie” i „Opcje wyprawy niech staną się rozwijaną zakładką”.
     - „Opcje wyprawy” to jedna zakładka nad zagrożeniem i „Wyrusz”: czas wyprawy, mikstury na wyprawę i cztery pola, z cienką linią między nimi.

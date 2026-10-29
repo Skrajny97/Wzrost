@@ -9,7 +9,7 @@
 // sheet wherever the player is, once nothing else is on the screen
 // (offerTrade), and waits in the Społeczność too (tradeBanner).
 
-import { herbSprite, potionSprite } from '../art.js';
+import { goldArt, herbSprite, potionSprite } from '../art.js';
 import { liveTrade, tradeSeen } from '../chat-news.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatNumber } from '../format.js';
@@ -247,7 +247,7 @@ export function mountTrade(container, { backHash }) {
       { class: 'card trade-offer' },
       h('h2', { class: 'card-title', text: view.state === 'done' ? (mine ? 'Oddano' : 'Otrzymano') : mine ? 'Twoja oferta' : `Oferta: ${view.other.name}` }),
       isEmpty(offer) && h('p', { class: 'muted', text: 'Na razie pusto.' }),
-      offer.gold > 0 && h('p', { class: 'trade-gold' }, icon('coin', { size: 18 }), `${formatNumber(offer.gold)} złota`),
+      offer.gold > 0 && h('p', { class: 'trade-gold' }, goldArt(20), `${formatNumber(offer.gold)} złota`),
       offer.items.length > 0 && h('ul', { class: 'item-list' }, offer.items.map((item) => h('li', {}, itemEntry(item, mine)))),
       stacks.length > 0 && h('ul', { class: 'trade-stacks' }, stacks.map((stack) => stackEntry(stack, mine))),
       mine && view.state === 'open' && h('button', { type: 'button', class: 'button button--world', text: isEmpty(offer) ? 'Dodaj do oferty' : 'Zmień ofertę', onClick: editOffer }),
@@ -335,7 +335,7 @@ export function mountTrade(container, { backHash }) {
       };
       return { element, read };
     };
-    const gold = field('trade-gold', 'Złoto', view.mine.gold, character.gold, icon('coin', { size: 20, className: 'trade-coin' }));
+    const gold = field('trade-gold', 'Złoto', view.mine.gold, character.gold, goldArt(20));
     const stackFields = (entries, kind, art) => entries.map((entry) => ({ id: entry.id, ...field(`trade-${kind}-${entry.id}`, entry.name, counts[entry.id] ?? 0, entry.count, art(entry.id)) }));
     const herbs = stackFields(character.herbs ?? [], 'herb', (id) => herbSprite(id) ?? icon('leaf', { size: 20 }));
     const potions = stackFields(character.potions ?? [], 'potion', (id) => potionSprite(id) ?? icon('flask', { size: 20 }));

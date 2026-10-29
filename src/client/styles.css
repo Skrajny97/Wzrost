@@ -838,12 +838,6 @@ button {
   border-top: 1px solid var(--line);
 }
 
-/* The line icons (18 px) take the room of the resources' sprites (24 px), so
-   the names stand in one column. */
-.wallet-item > svg {
-  margin-inline: 3px;
-}
-
 .wallet-name {
   flex: 1;
   color: var(--text);
@@ -912,8 +906,7 @@ button {
 }
 
 /* Each currency in its own color: gold, the System's blue and amber time. */
-.wallet-item--gold .wallet-name,
-.wallet-item--gold svg {
+.wallet-item--gold .wallet-name {
   color: var(--gold);
 }
 
@@ -924,8 +917,7 @@ button {
 }
 
 .wallet-item--time .wallet-name,
-.wallet-item--time .wallet-amount,
-.wallet-item--time svg {
+.wallet-item--time .wallet-amount {
   color: var(--time);
 }
 
@@ -8000,10 +7992,6 @@ a.profession-square:active {
   margin: 0;
   color: var(--gold);
   font-weight: 700;
-}
-
-.trade-coin {
-  color: var(--gold);
 }
 
 .trade-stacks {

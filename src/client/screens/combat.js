@@ -9,7 +9,7 @@ import { areaArt } from '../area-art.js';
 import { landArt, materialSprite, monsterSprite, potionSprite } from '../art.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon } from '../dom.js';
-import { countOf, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
+import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { preloadReportMusic } from '../music.js';
 import { systemPoints } from '../quests.js';
 import { walkScene } from '../scenes.js';
@@ -777,8 +777,9 @@ export function mountCombat(container, { params, navigate }) {
         }),
     });
 
-    // Szybkie Polowanie: the same choices as "Wyrusz", its own length and
-    // the report at once, a few times a day (hunts.js).
+    // Szybkie Polowanie and Błyskawiczne polowanie: the same choices as
+    // "Wyrusz", their own lengths and the report at once, a few times a day
+    // and a few times every 12 hours (hunts.js).
     const quick =
       character.quickHunts &&
       quickHuntBox(character.quickHunts, () => ({
@@ -831,23 +832,25 @@ export function mountCombat(container, { params, navigate }) {
   }
 
   // "Szybkie Polowanie" under "Wyrusz", with how many are left today.
-  function quickHuntBox({ left, perDay, minutes }, choices) {
-    return h(
-      'div',
-      { class: 'quick-hunt', 'data-guide': 'quick-hunt' },
+  function quickHuntBox({ left, perDay, minutes, flash }, choices) {
+    const start = (label, kind, none) =>
       h('button', {
         type: 'button',
         class: 'button button--world',
-        text: 'Szybkie Polowanie',
-        disabled: left === 0,
+        text: label,
+        disabled: none,
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
-            const { report } = await call('POST', '/api/hunts/quick', choices());
+            const { report } = await call('POST', '/api/hunts/quick', { ...choices(), ...(kind && { kind }) });
             reportCache.set(String(report.id), report);
             state.freshReport = String(report.id);
             navigate(`#/raport/${report.id}`);
           }),
-      }),
+      });
+    return h(
+      'div',
+      { class: 'quick-hunt', 'data-guide': 'quick-hunt' },
+      start('Szybkie Polowanie', null, left === 0),
       h('p', {
         class: 'muted',
         text:
@@ -855,6 +858,17 @@ export function mountCombat(container, { params, navigate }) {
             ? `Wyprawa jak na ${formatMinutes(minutes)}, z raportem od razu. Zostało dziś: ${left} z ${perDay}.`
             : 'Szybkie Polowania na dziś się skończyły. Nowe od północy.',
       }),
+      // A second button (the author): shorter ones, back 12 hours after
+      // the last.
+      flash && start('Błyskawiczne polowanie', 'flash', flash.left === 0),
+      flash &&
+        h('p', {
+          class: 'muted',
+          text:
+            flash.left > 0
+              ? `Wyprawa jak na ${formatMinutes(flash.minutes)}, z raportem od razu. Zostało: ${flash.left} z ${flash.count}. Gdy zużyjesz wszystkie, wrócą po 12 godzinach.`
+              : `Błyskawiczne polowania się skończyły. Wrócą ${dateTimeFormat.format(new Date(flash.backAt))}.`,
+        }),
     );
   }
 

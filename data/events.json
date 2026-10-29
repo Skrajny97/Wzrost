@@ -208,12 +208,11 @@
 ,
     {
       "id": "blue-mushroom",
-      "draft": true,
       "title": "Niebieski grzyb",
       "art": "blue-mushroom",
       "scene": "land",
       "figure": { "left": 40, "bottom": 4, "height": 46 },
-      "text": "Przy ścieżce rośnie grzyb, jakiego nie znasz. Jego kapelusz świeci błękitem, a w powietrzu wokół unoszą się drobne, lśniące zarodniki. Pachnie słodko i obco.",
+      "text": "Przy ścieżce rośnie grzyb, którego nie znasz. Jego kapelusz świeci błękitem, a w powietrzu wokół unoszą się drobne, lśniące zarodniki. Pachnie słodko i obco.",
       "options": [
         {
           "id": "eat",

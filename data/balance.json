@@ -182,5 +182,10 @@
   "quickHunt": {
     "perDay": 3,
     "minutes": 15
+  },
+  "flashHunt": {
+    "count": 3,
+    "minutes": 10,
+    "refillHours": 12
   }
 }

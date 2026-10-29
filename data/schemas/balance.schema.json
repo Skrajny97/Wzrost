@@ -19,7 +19,8 @@
     "regen",
     "progression",
     "account",
-    "quickHunt"
+    "quickHunt",
+    "flashHunt"
   ],
   "properties": {
     "combat": {
@@ -1090,6 +1091,17 @@
       "properties": {
         "perDay": { "type": "integer", "minimum": 1 },
         "minutes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "flashHunt": {
+      "type": "object",
+      "description": "Błyskawiczne polowanie: obok Szybkiego Polowania, od tego samego poziomu, count wypraw jak na minutes minut, z raportem od razu. Gdy zużyje się wszystkie, wracają refillHours godzin po ostatniej.",
+      "additionalProperties": false,
+      "required": ["count", "minutes", "refillHours"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 1 },
+        "minutes": { "type": "integer", "minimum": 1 },
+        "refillHours": { "type": "number", "exclusiveMinimum": 0 }
       }
     }
   }

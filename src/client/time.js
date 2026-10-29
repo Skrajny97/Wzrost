@@ -2,7 +2,8 @@
 // (src/server/time.js). The button shows how many points it would use now
 // and asks before spending them.
 
-import { h, icon } from './dom.js';
+import { timePointsArt } from './art.js';
+import { h } from './dom.js';
 import { countOf, formatMinutes } from './format.js';
 import { playSound } from './sound.js';
 import { call, serverNow, state, timePointsNow } from './state.js';
@@ -35,7 +36,7 @@ export function skipControl(target, left, name) {
       'data-guide': `skip-${target}`,
       onClick: (event) => withButton(event.currentTarget, () => skip(target, left, name)),
     },
-    icon('hourglass', { size: 18 }),
+    timePointsArt(20),
     label,
     cost,
   );

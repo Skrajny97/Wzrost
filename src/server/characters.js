@@ -659,10 +659,25 @@ export function quickHuntsUsed(row, now) {
   return stored?.day === questPeriod('daily', now, content).key ? stored.used : 0;
 }
 
-// The Szybkie Polowania left today, or null below their level.
+// The Błyskawiczne polowania left, and when they come back once all are
+// used: `refillHours` after the last one (the author: "resetowane co 12h po
+// zużyciu"). Stored beside the Szybkie Polowania: { used, at }.
+export function flashHuntsLeft(row, now) {
+  const { count, refillHours } = content.balance.flashHunt;
+  const flash = JSON.parse(row.quick_hunts ?? 'null')?.flash;
+  if (!flash || flash.used < count) return { left: count - (flash?.used ?? 0), backAt: null };
+  const backAt = flash.at + refillHours * 3600000;
+  return now >= backAt ? { left: count, backAt: null } : { left: 0, backAt };
+}
+
+// The Szybkie Polowania left today and the Błyskawiczne polowania left, or
+// null below their level.
 function quickHuntsView(row, now) {
   const { perDay, minutes } = content.balance.quickHunt;
-  return isUnlocked('quick-hunts', row.level, content) ? { left: Math.max(0, perDay - quickHuntsUsed(row, now)), perDay, minutes } : null;
+  const flash = content.balance.flashHunt;
+  return isUnlocked('quick-hunts', row.level, content)
+    ? { left: Math.max(0, perDay - quickHuntsUsed(row, now)), perDay, minutes, flash: { ...flashHuntsLeft(row, now), count: flash.count, minutes: flash.minutes } }
+    : null;
 }
 
 // The Awatar Systemu (avatar.js): its price and words until it is bought,

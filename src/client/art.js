@@ -161,6 +161,14 @@ export const SPRITES = {
     size: 32,
     ids: ['wood', 'stone', 'iron-ore'],
   },
+  // The coin of gold and the hourglass of Punkty Czasu where their line icons
+  // stood, and the Encyclopedia's corner of the top bar, 32×32. Punkty
+  // Systemu keep their line icon (the author: "tylko Punkty Systemu będą w
+  // takiej wyróżniającej formie jak do tej pory").
+  icons: {
+    size: 32,
+    ids: ['gold', 'time-points', 'encyclopedia'],
+  },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
     size: 48,
@@ -224,15 +232,26 @@ export const professionSprite = (id) => sprite('professions', id, 'sprite--profe
 // Gold or a resource where a line icon stood: the resource's sprite, never
 // under 24 px, where its detail still reads (at 14 px in the camp's bubbles
 // the author took it for the old icon), or its line icon at `size` while it
-// has none (gold keeps its coin).
+// has none.
 const RESOURCE_SPRITE_MIN = 24;
 export function resourceArt(id, size) {
-  const art = sprite('resources', id, 'sprite--resource');
+  const art = id === 'gold' ? sprite('icons', 'gold', 'sprite--resource') : sprite('resources', id, 'sprite--resource');
   if (!art) return icon(RESOURCE_ICONS[id] ?? 'unknown', { size });
   art.width = Math.max(size, RESOURCE_SPRITE_MIN);
   art.height = Math.max(size, RESOURCE_SPRITE_MIN);
   return art;
 }
+// The coin of gold and the hourglass of Punkty Czasu at just `size`, by a
+// number in a line of text, or their line icons while they have no sprite.
+function iconArt(id, size, fallback) {
+  const art = sprite('icons', id, 'sprite--resource');
+  if (!art) return icon(fallback, { size });
+  art.width = size;
+  art.height = size;
+  return art;
+}
+export const goldArt = (size) => iconArt('gold', size, 'coin');
+export const timePointsArt = (size) => iconArt('time-points', size, 'hourglass');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The figure of an event and the address of its scene, or null while there
 // is none.

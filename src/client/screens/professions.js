@@ -11,7 +11,7 @@
 // bought on the tab, which works beside the character in its own card.
 // Locked, or hidden in this deployment, the tab says so as before.
 
-import { herbSprite, itemSprite, placeArt, potionSprite, professionSprite } from '../art.js';
+import { goldArt, herbSprite, itemSprite, placeArt, potionSprite, professionSprite } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatDecimal, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -284,7 +284,7 @@ export function mountProfessions(container, { params, navigate }) {
       const short = avatar.price - character.gold;
       card.append(
         h('p', { class: 'region-description', text: avatar.description }),
-        h('p', { class: 'avatar-price' }, icon('coin', { size: 16 }), ` ${formatNumber(avatar.price)} złota, jednorazowo i na zawsze`),
+        h('p', { class: 'avatar-price' }, goldArt(20), ` ${formatNumber(avatar.price)} złota, jednorazowo i na zawsze`),
         ...(short > 0 ? [h('p', { class: 'muted', text: `Brakuje jeszcze ${formatNumber(short)} złota.` })] : []),
         h('button', {
           type: 'button',

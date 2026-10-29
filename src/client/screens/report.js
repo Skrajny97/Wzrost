@@ -100,7 +100,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     fill(
       container,
       heading(
-        report.quick ? 'Szybkie Polowanie' : 'Raport z wyprawy',
+        report.flash ? 'Błyskawiczne polowanie' : report.quick ? 'Szybkie Polowanie' : 'Raport z wyprawy',
         `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
       ),
       summaryCard(report),

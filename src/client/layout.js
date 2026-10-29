@@ -4,7 +4,7 @@
 // pouch of parts beside it) and the two bottom bars, the main menu and the
 // character bar with its own background.
 
-import { materialSprite, narratorFace, resourceArt } from './art.js';
+import { goldArt, materialSprite, narratorFace, resourceArt, timePointsArt } from './art.js';
 import { communityNews, communityNewsText } from './chat-news.js';
 import { $, fill, h, icon } from './dom.js';
 import { countOf, formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
@@ -39,6 +39,11 @@ const CHARACTER_TABS = [
 ];
 
 let topbar = null;
+
+// The coin and the core of Punkty Systemu in one size, one over the other, so
+// the two numbers start in one column (the author: the coin "wielkościowo i
+// pozycją zbliżona do Punktów Systemu").
+const TOPBAR_ICON = 20;
 
 export function buildTopbar(onSettings) {
   const level = h('span', { class: 'badge badge--system' });
@@ -78,8 +83,8 @@ export function buildTopbar(onSettings) {
       'aria-controls': 'wallet-list',
       onClick: () => showWallet(wallet.hidden),
     },
-    h('span', { class: 'gold-row' }, icon('coin', { size: 16 }), gold),
-    h('span', { class: 'points' }, icon(SYSTEM_POINTS_ICON, { size: 16 }), points),
+    h('span', { class: 'gold-row' }, goldArt(TOPBAR_ICON), gold),
+    h('span', { class: 'points' }, icon(SYSTEM_POINTS_ICON, { size: TOPBAR_ICON }), points),
   );
   // The narrator waits with his quests between the levels and the gold.
   const quests = h(
@@ -171,7 +176,9 @@ export function buildTopbar(onSettings) {
   updateTopbar();
 }
 
-// Gold, Punkty Systemu and Punkty Czasu first, then the materials.
+// Gold, Punkty Systemu and Punkty Czasu first, then the materials, all in
+// one size, so the names stand in one column.
+const WALLET_ICON = 24;
 function walletRows(timePoints) {
   const [gold, ...materials] = walletEntries();
   const row = (art, name, amount, kind, note) =>
@@ -183,10 +190,10 @@ function walletRows(timePoints) {
       h('span', { class: 'wallet-amount', text: formatNumber(amount) }),
     );
   return [
-    row(icon('coin', { size: 18 }), gold.name, gold.amount, 'gold'),
-    row(icon(SYSTEM_POINTS_ICON, { size: 18 }), 'Punkty Systemu', state.character.systemPoints, 'system'),
-    row(icon('hourglass', { size: 18 }), 'Punkty Czasu', timePoints, 'time', topbar.timeNote),
-    ...materials.map((entry, index) => row(resourceArt(entry.id, 18), entry.name, entry.amount, index === 0 && 'materials')),
+    row(goldArt(WALLET_ICON), gold.name, gold.amount, 'gold'),
+    row(icon(SYSTEM_POINTS_ICON, { size: WALLET_ICON }), 'Punkty Systemu', state.character.systemPoints, 'system'),
+    row(timePointsArt(WALLET_ICON), 'Punkty Czasu', timePoints, 'time', topbar.timeNote),
+    ...materials.map((entry, index) => row(resourceArt(entry.id, WALLET_ICON), entry.name, entry.amount, index === 0 && 'materials')),
   ];
 }
 

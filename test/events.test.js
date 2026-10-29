@@ -51,8 +51,10 @@ describe('events', () => {
 
   test('the wounded woman comes only where the Błędnica lives; a draft event only where drafts are on', () => {
     const always = { ...content, events: { ...content.events, chance: 1 } };
+    // Apart from the blue mushroom, which comes anywhere (its own test).
+    const regional = { ...always, events: { ...always.events, list: always.events.list.filter((event) => event.id !== 'blue-mushroom') } };
     const seeds = Array.from({ length: 40 }, (_, index) => `region-${index}`);
-    const drawn = (areaId, extra = {}, data = always) => seeds.map((one) => eventFor({ hunt: { result: 'success', areaId, minutes: 30 }, seed: one, ...extra }, data)?.id ?? null);
+    const drawn = (areaId, extra = {}, data = regional) => seeds.map((one) => eventFor({ hunt: { result: 'success', areaId, minutes: 30 }, seed: one, ...extra }, data)?.id ?? null);
     for (const areaId of ['windfalls-edge', 'fox-ravines', 'raven-hollows']) assert.ok(drawn(areaId).every((id) => id === 'wounded-woman'), areaId);
     assert.ok(drawn('viper-heaps').every((id) => id === null));
     // Further on only the fern flower without Licho comes there.
@@ -60,8 +62,8 @@ describe('events', () => {
     // "Testuj zdarzenia" still brings it anywhere.
     assert.equal(eventFor({ hunt: { result: 'success', areaId: 'viper-heaps', minutes: 30 }, seed, forced: 'wounded-woman' }, always), woman);
     // A draft of its own, beside the approved events only.
-    const approved = always.events.list.filter((event) => !event.draft);
-    const drafted = { ...always, events: { ...always.events, list: [...approved, { ...woman, id: 'szkic', areas: undefined, draft: true }] } };
+    const approved = regional.events.list.filter((event) => !event.draft);
+    const drafted = { ...regional, events: { ...regional.events, list: [...approved, { ...woman, id: 'szkic', areas: undefined, draft: true }] } };
     assert.ok(drawn('viper-heaps', {}, drafted).every((id) => id === null));
     assert.ok(drawn('viper-heaps', { drafts: true }, drafted).every((id) => id === 'szkic'));
   });
@@ -203,7 +205,8 @@ describe('events', () => {
   test('the fern flower comes only where Licho lives: picking it risks Licho for an item', () => {
     // A draft until the author approved it (0.0.48).
     const fern = content.eventsById['fern-flower'];
-    const always = { ...content, events: { ...content.events, chance: 1 } };
+    // Without the blue mushroom, which comes anywhere (its own test).
+    const always = { ...content, events: { ...content.events, chance: 1, list: content.events.list.filter((event) => event.id !== 'blue-mushroom') } };
     const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
     const seeds = Array.from({ length: 30 }, (_, index) => `paproc-${index}`);
     assert.ok(seeds.every((one) => eventFor({ hunt: hunt('mossy-boulders'), seed: one }, always) === fern));
@@ -232,7 +235,7 @@ describe('events', () => {
   test('the fern flower without Licho comes in every region from level 26 but where the full one does, its blossom rarer', () => {
     const calm = content.eventsById['fern-flower-calm'];
     const full = content.eventsById['fern-flower'];
-    const always = { ...content, events: { ...content.events, chance: 1 } };
+    const always = { ...content, events: { ...content.events, chance: 1, list: content.events.list.filter((event) => event.id !== 'blue-mushroom') } };
     const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
     const seeds = Array.from({ length: 30 }, (_, index) => `spokoj-${index}`);
     const brought = (areaId) => new Set(seeds.map((one) => eventFor({ hunt: hunt(areaId), seed: one }, always)?.id));
@@ -250,14 +253,14 @@ describe('events', () => {
     assert.equal(resolveEvent({ hunt: base, event: calm, optionId: 'watch', character, equipped, name: 'Mira', seed }, content).gold, base.gold);
   });
 
-  test('the blue mushroom, a draft, comes in any land on its background: eaten, it faints, strengthens or gives a free stat point', () => {
+  test('the blue mushroom comes in any land on its background: eaten, it faints, strengthens or gives a free stat point', () => {
+    // A draft until the author approved it (0.0.56).
     const mushroom = content.eventsById['blue-mushroom'];
     const always = { ...content, events: { ...content.events, chance: 1 } };
     const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
     const seeds = Array.from({ length: 30 }, (_, index) => `grzyb-${index}`);
-    for (const areaId of ['windfalls-edge', 'spider-gully', 'old-diggings']) {
-      assert.ok(seeds.every((one) => eventFor({ hunt: hunt(areaId), seed: one }, always)?.id !== mushroom.id), areaId);
-      assert.ok(seeds.some((one) => eventFor({ hunt: hunt(areaId), seed: one, drafts: true }, always)?.id === mushroom.id), areaId);
+    for (const areaId of ['windfalls-edge', 'viper-heaps', 'spider-gully', 'old-diggings']) {
+      assert.ok(seeds.some((one) => eventFor({ hunt: hunt(areaId), seed: one }, always)?.id === mushroom.id), areaId);
     }
     const eaten = (endingId, gold = base.gold) =>
       resolveEvent({ hunt: { ...base, gold }, event: mushroom, optionId: 'eat', endingId, drafts: true, character, equipped, name: 'Mira', seed }, content);
@@ -355,7 +358,7 @@ describe('events (API)', () => {
         {
           id: 'blue-mushroom',
           title: 'Niebieski grzyb',
-          draft: true,
+          draft: false,
           cases: [],
           endings: [
             { id: 'faint', name: 'Zjedzenie: omdlenie' },
