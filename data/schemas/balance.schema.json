@@ -324,6 +324,7 @@
         "oreBase",
         "orePerItemLevel",
         "costGrowth",
+        "materialFrom",
         "sellRefund"
       ],
       "properties": {
@@ -377,6 +378,11 @@
           "type": "number",
           "minimum": 1,
           "description": "Ile razy więcej kosztuje każde kolejne ulepszenie."
+        },
+        "materialFrom": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Od tego ulepszenia (propozycja 4: „Kowadło od +5”) każde bierze też materiał rzadkości przedmiotu: 1 sztukę na tym poziomie i o jedną więcej na każdym kolejnym."
         },
         "sellRefund": {
           "type": "number",
@@ -776,7 +782,8 @@
       "required": [
         "salvageBase",
         "salvageLevelStep",
-        "queueLimit"
+        "queueLimit",
+        "sellGold"
       ],
       "properties": {
         "salvageBase": {
@@ -792,6 +799,11 @@
           "type": "integer",
           "minimum": 1,
           "description": "Najwięcej zleceń naraz w kolejce stołu."
+        },
+        "sellGold": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Złoto, które złomiarz płaci za sztukę pospolitego materiału. Rzadszy razy mnożnik sell swojej rzadkości (rarities.json), z premią Skupu złomu."
         }
       }
     },

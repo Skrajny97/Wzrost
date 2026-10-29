@@ -69,7 +69,7 @@ let gearHidden = false;
 let bagTab = 'items';
 
 // "Rzadka skóra wilka" for a stack above its species' rarity.
-const materialTitle = (material) => material.label.charAt(0).toUpperCase() + material.label.slice(1);
+export const materialTitle = (material) => material.label.charAt(0).toUpperCase() + material.label.slice(1);
 
 // Why the gear cannot change now: the character is away.
 const BUSY_TEXTS = {
@@ -297,12 +297,38 @@ export function mountCharacter(container) {
     ];
   }
 
+  // A material's card: what it is and what the table makes of it, and
+  // selling as many as chosen to the scrapper (proposal 1: "Skup złomu
+  // kupuje materiały"), one to start with, as for herbs and potions.
   function materialSheet(material) {
     const description = state.content.materials?.find((candidate) => candidate.id === material.materialId)?.description;
     const table = state.character.camp.buildings.find((building) => building.crafts);
     const art = materialSprite(material.materialId);
     const title = h('h2', { class: 'item-title', vars: { '--rarity': material.color }, text: materialTitle(material) });
     const meta = h('p', { class: 'item-meta', text: `${material.rarityName} · ${formatNumber(material.count)} szt.` });
+    let count = 1;
+    const price = (amount) => Math.max(1, Math.round(material.price * amount));
+    const value = h('output', { class: 'herb-count-value' });
+    const sell = h('button', { type: 'button', class: 'button button--system' });
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
+    const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(material.count) });
+    function set(next) {
+      count = Math.min(material.count, Math.max(1, next));
+      value.textContent = `${formatNumber(count)} szt.`;
+      sell.textContent = `Sprzedaj za ${formatNumber(price(count))} złota`;
+      less.disabled = count === 1;
+      more.disabled = count === material.count;
+    }
+    set(count);
+    sell.addEventListener('click', (event) =>
+      withButton(event.currentTarget, async () => {
+        const { sold } = await call('POST', '/api/materials/sell', { key: material.key, count });
+        closeSheet();
+        playSound('coin');
+        toast(`Złomiarz kupił ${formatNumber(sold.count)} szt. za ${formatNumber(sold.gold)} złota.`);
+      }),
+    );
     openSheet(
       h(
         'div',
@@ -310,8 +336,15 @@ export function mountCharacter(container) {
         art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art', vars: { '--rarity': material.color } }, art), h('div', {}, title, meta)) : [title, meta],
         description && h('p', { class: 'sheet-text', text: description }),
         h('p', { class: 'sheet-text', text: `Stół rozbiórki zrobi z tego: ${material.part} ×${formatNumber(material.count)}.` }),
+        h('p', { class: 'sheet-text', text: `Złomiarz płaci ${formatDecimal(material.price)} złota za sztukę.` }),
       ),
-      table && h('a', { class: 'button button--world', href: `#/oboz/${table.id}`, onClick: closeSheet, text: table.level > 0 ? 'Do Stołu rozbiórki' : 'Zbuduj Stół rozbiórki w obozie' }),
+      h('div', { class: 'herb-count' }, less, value, more, all),
+      h(
+        'div',
+        { class: 'sheet-actions' },
+        table && h('a', { class: 'button button--world', href: `#/oboz/${table.id}`, onClick: closeSheet, text: table.level > 0 ? 'Do Stołu rozbiórki' : 'Zbuduj Stół rozbiórki' }),
+        sell,
+      ),
     );
   }
 
@@ -675,13 +708,48 @@ function anvilSection(item, busy) {
     return h('div', { class: 'compare' }, title, h('p', { class: 'system-hint', text: hint }));
   }
   const have = Object.fromEntries(walletEntries().map((entry) => [entry.id, entry]));
-  const missing = Object.entries(next.cost).some(([resource, amount]) => (have[resource]?.amount ?? 0) < amount);
+  const short = Object.entries(next.cost).some(([resource, amount]) => (have[resource]?.amount ?? 0) < amount);
+  // From +5 on a material of the item's rarity too (proposal 4: "Wyższe
+  // ulepszenia biorą też materiał rzadkości przedmiotu"): the stack with the
+  // most pieces, unless the player picks another one.
+  const need = next.materials;
+  const stacks = need
+    ? (state.character.crafting?.materials ?? []).filter((material) => material.rarity === need.rarity && material.count >= need.count).sort((a, b) => b.count - a.count)
+    : [];
+  let chosen = stacks[0] ?? null;
+  const missing = short || Boolean(need && !chosen);
+  const paid = need ? 'złoto, rudę i materiał' : 'złoto i rudę';
   const risk =
     anvil.level === 0
-      ? 'Porażka zabiera tylko złoto i rudę.'
-      : `Porażka zabiera złoto i rudę, a przedmiot spada do +${anvil.level - 1}${
+      ? `Porażka zabiera tylko ${paid}.`
+      : `Porażka zabiera ${paid}, a przedmiot spada do +${anvil.level - 1}${
           next.breakChance > 0 ? `. Z szansą ${percent(next.breakChance)} przedmiot rozpada się` : ''
         }.`;
+  const materialCost = () =>
+    h(
+      'li',
+      { class: `cost${chosen ? '' : ' cost--missing'}` },
+      chosen ? materialIcon(chosen.materialId, 16) : icon('unknown', { size: 16 }),
+      h('span', { text: chosen ? materialTitle(chosen) : `Materiał: ${state.content.rarities.find((rarity) => rarity.id === need.rarity)?.name ?? need.rarity}` }),
+      h('strong', { text: `${formatNumber(chosen?.count ?? 0)} / ${formatNumber(need.count)}` }),
+    );
+  let materialLine = need ? materialCost() : null;
+  const picker =
+    stacks.length > 1 &&
+    h(
+      'select',
+      {
+        class: 'anvil-material',
+        'aria-label': 'Materiał do ulepszenia',
+        onChange: (event) => {
+          chosen = stacks.find((material) => material.key === event.currentTarget.value) ?? chosen;
+          const line = materialCost();
+          materialLine.replaceWith(line);
+          materialLine = line;
+        },
+      },
+      stacks.map((material) => h('option', { value: material.key, text: `${materialTitle(material)} (${formatNumber(material.count)} szt.)` })),
+    );
   // The scroll only where the item may break; the box starts empty, so a
   // scroll goes only when the player says so.
   const scrolls = state.character.scrolls ?? 0;
@@ -689,7 +757,7 @@ function anvilSection(item, busy) {
     next.breakChance > 0 && scrolls > 0 ? h('input', { type: 'checkbox', class: 'avoid-rare-box', id: `ward-${item.id}`, 'aria-describedby': `ward-note-${item.id}` }) : null;
   const upgrade = (event) =>
     withButton(event.currentTarget, async () => {
-      const { upgrade: done } = await call('POST', `/api/items/${item.id}/upgrade`, { ward: Boolean(ward?.checked) });
+      const { upgrade: done } = await call('POST', `/api/items/${item.id}/upgrade`, { ward: Boolean(ward?.checked), ...(chosen && { material: chosen.key }) });
       if (done.result === 'success') {
         playSound('done');
         toast(`Udało się: ${done.name} +${done.to}.`);
@@ -728,7 +796,10 @@ function anvilSection(item, busy) {
           h('strong', { text: `${formatNumber(have[resource]?.amount ?? 0)} / ${formatNumber(amount)}` }),
         ),
       ),
+      materialLine,
     ),
+    picker,
+    need && !chosen && h('p', { class: 'system-hint', text: `To ulepszenie bierze też ${formatNumber(need.count)} szt. materiału tej samej rzadkości co przedmiot.` }),
     h('p', { class: 'muted', text: risk }),
     ward &&
       h(
@@ -747,7 +818,7 @@ function anvilSection(item, busy) {
       class: 'button button--system',
       disabled: busy || missing,
       onClick: upgrade,
-      text: missing ? 'Brakuje złota albo rudy żelaza' : `Ulepsz do +${next.level}`,
+      text: short ? 'Brakuje złota albo rudy żelaza' : missing ? 'Brakuje materiału' : `Ulepsz do +${next.level}`,
     }),
   );
 }

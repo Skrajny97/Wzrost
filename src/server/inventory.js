@@ -10,7 +10,9 @@ import {
   createRng,
   valueChanges,
   itemName,
+  knownStack,
   missingFor,
+  parseStack,
   rollUpgrade,
   sellPrice,
   upgradeView,
@@ -179,9 +181,20 @@ export async function previewItem(context) {
   });
 }
 
+// The stack of materials an upgrade from materialFrom on takes: the one the
+// player chose ({ material }), of the item's rarity with enough pieces, or
+// else the one with the most of them; null when none has enough.
+function upgradeStack(row, need, chosen) {
+  const fits = Object.entries(JSON.parse(row.materials ?? '{}')).filter(
+    ([key, count]) => knownStack(key, content) && parseStack(key).rarityId === need.rarity && count >= need.count,
+  );
+  return (fits.find(([key]) => key === chosen) ?? fits.sort((a, b) => b[1] - a[1])[0])?.[0] ?? null;
+}
+
 // One try at upgrading an item on the camp's Kowadło, paid in gold and iron
-// ore and rolled with a fresh seed (rollUpgrade in the engine). A failure takes
-// the payment and a level, and from +7 on may break the item.
+// ore, from materialFrom on also in a material of the item's rarity, and
+// rolled with a fresh seed (rollUpgrade in the engine). A failure takes the
+// payment and a level, and from +7 on may break the item.
 export async function upgradeItem(context) {
   const { session, player } = await requireIdlePlayer(context);
   const item = findItem(player, context.params.id);
@@ -204,6 +217,14 @@ export async function upgradeItem(context) {
   const warded = body.ward === true && view.next.breakChance > 0;
   const row = player.row;
   if (warded && row.scrolls < 1) throw new ApiError(409, 'no_scroll', 'Nie masz Zwoju ochronnego. Zrobisz go w Systemowym Warsztacie.');
+  const need = view.next.materials;
+  const stack = need ? upgradeStack(row, need, body.material) : null;
+  if (need && !stack) {
+    throw new ApiError(409, 'no_material', `To ulepszenie bierze też ${need.count} szt. materiału tej samej rzadkości co przedmiot (${content.raritiesById[need.rarity].name}).`);
+  }
+  // No material: a path that is never there, which asks for 0.
+  const taken = stack ? need.count : 0;
+  const material = `$."${stack ?? 'none'}"`;
 
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const outcome = rollUpgrade(item, createRng(roll), content, { warded });
@@ -221,15 +242,18 @@ export async function upgradeItem(context) {
            AND COALESCE(json_extract(data, '$.upgrade'), 0) = ? AND COALESCE(json_extract(data, '$.lastRoll'), '') = ?
            AND (SELECT gold FROM characters WHERE id = ?) >= ?
            AND COALESCE(json_extract((SELECT resources FROM characters WHERE id = ?), ?), 0) >= ?
+           AND COALESCE(json_extract((SELECT materials FROM characters WHERE id = ?), ?), 0) >= ?
            AND (SELECT scrolls FROM characters WHERE id = ?) >= ?`,
       )
-      .bind(outcome.upgrade, roll, item.id, row.id, view.level, item.lastRoll ?? '', row.id, cost.gold, row.id, ore, cost['iron-ore'], row.id, warded ? 1 : 0),
+      .bind(outcome.upgrade, roll, item.id, row.id, view.level, item.lastRoll ?? '', row.id, cost.gold, row.id, ore, cost['iron-ore'], row.id, material, taken, row.id, warded ? 1 : 0),
     db
       .prepare(
-        `UPDATE characters SET gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?), scrolls = scrolls - ?, version = version + 1
+        `UPDATE characters SET gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?), scrolls = scrolls - ?,
+           materials = CASE WHEN ? = 0 THEN materials WHEN json_extract(materials, ?) > ? THEN json_set(materials, ?, json_extract(materials, ?) - ?) ELSE json_remove(materials, ?) END,
+           version = version + 1
          WHERE id = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
       )
-      .bind(cost.gold, ore, ore, cost['iron-ore'], warded ? 1 : 0, row.id, item.id, roll),
+      .bind(cost.gold, ore, ore, cost['iron-ore'], warded ? 1 : 0, taken, material, taken, material, material, taken, material, row.id, item.id, roll),
   ];
   if (outcome.result === 'broken') {
     statements.push(db.prepare("DELETE FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?").bind(item.id, roll));
@@ -246,6 +270,7 @@ export async function upgradeItem(context) {
       from: view.level,
       to: outcome.upgrade,
       cost,
+      ...(stack && { material: { key: stack, count: taken } }),
       ...(warded && { warded: true }),
       ...(outcome.saved && { saved: true }),
     },

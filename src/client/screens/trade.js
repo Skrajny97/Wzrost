@@ -1,7 +1,8 @@
 // The Wymiana with another player's character (src/server/trades.js),
 // proposed on its sheet (profile.js) or in a row of the Znajomi while both
 // players are online and both characters at home. The other accepts the
-// proposal, both put their offers together, and the first confirmation
+// proposal, both put their offers together (gold, items, herbs, potions and
+// materials), and the first confirmation
 // freezes both: the other side then only accepts the trade, when all of it
 // moves at once, or rejects it. Each confirmation asks first, with what goes
 // and what comes. While the screen is open and the page is in front, it asks
@@ -11,13 +12,14 @@
 
 import { goldArt, herbSprite, potionSprite } from '../art.js';
 import { liveTrade, tradeSeen } from '../chat-news.js';
+import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatNumber } from '../format.js';
 import { narratorIdle } from '../narrator.js';
 import { playSound } from '../sound.js';
 import { call, serverNow, state } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, toast, withButton } from '../ui.js';
-import { itemSummary, itemTitle } from './character.js';
+import { itemSummary, itemTitle, materialTitle } from './character.js';
 
 const HASH = '#/wymiana';
 const EVERY_MS = 2000;
@@ -78,7 +80,7 @@ export function offerTrade() {
   };
   openSheet(
     h('h2', { class: 'sheet-title trade-sheet-title' }, icon('swap', { size: 22 }), 'Propozycja wymiany'),
-    h('p', { class: 'sheet-text', text: `${trade.other} proponuje Ci wymianę przedmiotów, ziół, mikstur albo złota.` }),
+    h('p', { class: 'sheet-text', text: `${trade.other} proponuje Ci wymianę przedmiotów, ziół, mikstur, materiałów albo złota.` }),
     h('p', { class: 'muted', text: `Bez odpowiedzi propozycja przepadnie po ${Math.round(state.content.community.trade.proposalSeconds / 60)} min.` }),
     h('div', { class: 'sheet-actions' }, button('Odrzuć', 'world', reply(false)), button('Przyjmij', 'system', reply(true))),
   );
@@ -100,17 +102,24 @@ export function tradeBanner() {
   return h('section', { class: 'card trade-banner', 'aria-label': 'Wymiana' }, icon('swap', { size: 22, className: 'trade-banner-icon' }), parts);
 }
 
+// The herbs, potions and materials of an offer, each with its name.
+const stacksOf = (offer) => [
+  ...offer.herbs.map((stack) => ({ ...stack, herb: true })),
+  ...offer.potions,
+  ...(offer.materials ?? []).map((stack) => ({ ...stack, name: materialTitle(stack), material: true })),
+];
+
 // What an offer holds, in words: "120 złota, Amulet Dębu, Żywokost ×5".
 function offerText(offer) {
   const parts = [
     offer.gold > 0 && `${formatNumber(offer.gold)} złota`,
     ...offer.items.map(itemTitle),
-    ...[...offer.herbs, ...offer.potions].map((stack) => `${stack.name} ×${formatNumber(stack.count)}`),
+    ...stacksOf(offer).map((stack) => `${stack.name} ×${formatNumber(stack.count)}`),
   ].filter(Boolean);
   return parts.length > 0 ? parts.join(', ') : 'nic';
 }
 
-const isEmpty = (offer) => offer.gold === 0 && offer.items.length === 0 && offer.herbs.length === 0 && offer.potions.length === 0;
+const isEmpty = (offer) => offer.gold === 0 && offer.items.length === 0 && stacksOf(offer).length === 0;
 
 export function mountTrade(container, { backHash }) {
   let view = null;
@@ -241,7 +250,7 @@ export function mountTrade(container, { backHash }) {
 
   function offerCard(mine) {
     const offer = mine ? view.mine : view.theirs;
-    const stacks = [...offer.herbs.map((stack) => ({ ...stack, herb: true })), ...offer.potions];
+    const stacks = stacksOf(offer);
     return h(
       'section',
       { class: 'card trade-offer' },
@@ -283,17 +292,19 @@ export function mountTrade(container, { backHash }) {
     ];
   }
 
-  // Herbs or potions of an offer; a potion whose recipe the character does
-  // not know waits for it.
+  // Herbs, potions or materials of an offer; a potion whose recipe the
+  // character does not know waits for it.
   function stackEntry(stack, mine) {
-    const art = (stack.herb ? herbSprite(stack.id) : potionSprite(stack.id)) ?? icon(stack.herb ? 'leaf' : 'flask', { size: 20 });
+    const art = stack.material
+      ? materialIcon(stack.materialId, 20)
+      : ((stack.herb ? herbSprite(stack.id) : potionSprite(stack.id)) ?? icon(stack.herb ? 'leaf' : 'flask', { size: 20 }));
     return h(
       'li',
       { class: 'trade-stack' },
       h('span', { class: 'potion-pick-art' }, art),
       h('span', { class: 'trade-stack-name', text: stack.name }),
       h('span', { class: 'trade-stack-count', text: `×${formatNumber(stack.count)}` }),
-      !mine && !stack.herb && !stack.known && h('p', { class: 'region-warning trade-note', text: 'Nie znasz jej receptury, więc jej nie użyjesz.' }),
+      !mine && !stack.herb && !stack.material && !stack.known && h('p', { class: 'region-warning trade-note', text: 'Nie znasz jej receptury, więc jej nie użyjesz.' }),
     );
   }
 
@@ -312,12 +323,12 @@ export function mountTrade(container, { backHash }) {
   }
 
   // The player's offer in a sheet: gold, items from the bag (not those
-  // worn), herbs and potions, saved at once for the other to see.
+  // worn), herbs, potions and materials, saved at once for the other to see.
   function editOffer() {
     const character = state.character;
     const { maxItems } = state.content.community.trade;
     const picked = new Set(view.mine.items.map((item) => item.id).filter((id) => character.bag.some((item) => item.id === id)));
-    const counts = Object.fromEntries([...view.mine.herbs, ...view.mine.potions].map((stack) => [stack.id, stack.count]));
+    const counts = Object.fromEntries(stacksOf(view.mine).map((stack) => [stack.id, stack.count]));
     const field = (id, label, value, most, art) => {
       const input = h('input', { type: 'number', id, class: 'trade-number', min: '0', max: String(most), step: '1', inputmode: 'numeric', value: String(Math.min(value, most)) });
       const element = h(
@@ -336,9 +347,12 @@ export function mountTrade(container, { backHash }) {
       return { element, read };
     };
     const gold = field('trade-gold', 'Złoto', view.mine.gold, character.gold, goldArt(20));
-    const stackFields = (entries, kind, art) => entries.map((entry) => ({ id: entry.id, ...field(`trade-${kind}-${entry.id}`, entry.name, counts[entry.id] ?? 0, entry.count, art(entry.id)) }));
-    const herbs = stackFields(character.herbs ?? [], 'herb', (id) => herbSprite(id) ?? icon('leaf', { size: 20 }));
-    const potions = stackFields(character.potions ?? [], 'potion', (id) => potionSprite(id) ?? icon('flask', { size: 20 }));
+    const stackFields = (entries, kind, art) =>
+      entries.map((entry) => ({ id: entry.id, ...field(`trade-${kind}-${entry.id.replace(':', '-')}`, entry.name, counts[entry.id] ?? 0, entry.count, art(entry)) }));
+    const herbs = stackFields(character.herbs ?? [], 'herb', (entry) => herbSprite(entry.id) ?? icon('leaf', { size: 20 }));
+    const potions = stackFields(character.potions ?? [], 'potion', (entry) => potionSprite(entry.id) ?? icon('flask', { size: 20 }));
+    const owned = (character.crafting?.materials ?? []).map((material) => ({ id: material.key, name: materialTitle(material), count: material.count, materialId: material.materialId }));
+    const materials = stackFields(owned, 'material', (entry) => materialIcon(entry.materialId, 20));
     const count = h('p', { class: 'muted' });
     const showCount = () => {
       count.textContent = `Wybrane: ${picked.size} z ${maxItems}.`;
@@ -370,7 +384,7 @@ export function mountTrade(container, { backHash }) {
       let offer;
       try {
         const kept = (fields) => Object.fromEntries(fields.map((entry) => [entry.id, entry.read()]).filter(([, value]) => value > 0));
-        offer = { gold: gold.read(), items: [...picked], herbs: kept(herbs), potions: kept(potions) };
+        offer = { gold: gold.read(), items: [...picked], herbs: kept(herbs), potions: kept(potions), materials: kept(materials) };
       } catch (error) {
         toast(error.message);
         return;
@@ -396,6 +410,7 @@ export function mountTrade(container, { backHash }) {
       ),
       herbs.length > 0 && section('Zioła', herbs.map((entry) => entry.element)),
       potions.length > 0 && section('Mikstury', potions.map((entry) => entry.element)),
+      materials.length > 0 && section('Materiały', materials.map((entry) => entry.element)),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }), button('Zapisz ofertę', 'system', save)),
     );
   }

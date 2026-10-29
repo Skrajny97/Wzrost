@@ -701,8 +701,9 @@ describe('the Warsztat, step 2, through the API', () => {
     await (await db()).prepare("UPDATE items SET data = json_set(data, '$.upgrade', 7)").run();
     const missing = await upgrade({ ward: true });
     assert.equal(missing.data.error.code, 'no_scroll');
-    // A break would come about once in 15 tries at +7 without the scroll.
-    await set(`scrolls = 40, resources = '{"iron-ore":100000}'`);
+    // A break would come about once in 15 tries at +7 without the scroll;
+    // from +5 on, each upgrade takes a material of the item's rarity too.
+    await set(`scrolls = 40, resources = '{"iron-ore":100000}', materials = '{"wolf-pelt:common":1000}'`);
     for (let index = 0; index < 40; index++) {
       await (await db()).prepare("UPDATE items SET data = json_set(data, '$.upgrade', 7)").run();
       const { data } = await upgrade({ ward: true });

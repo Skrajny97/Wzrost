@@ -5,6 +5,7 @@
 import {
   baseClasses,
   carryLimit,
+  catalystChance,
   craftChance,
   craftCost,
   craftLuck,
@@ -16,7 +17,9 @@ import {
   herbsPerHour,
   isUnlocked,
   itemMinutes,
+  materialView,
   mostPotions,
+  parseStack,
   partSource,
   patternLevel,
   potionMinutes,
@@ -37,6 +40,23 @@ import { say } from '../engine/text.js';
 // them.
 export const herbsOf = (row) => JSON.parse(row.herbs ?? '{}');
 export const potionsOf = (row) => JSON.parse(row.potions ?? '{}');
+
+// A recipe's catalyst (proposal 3: "Wybrane mikstury biorą jeden materiał
+// stwora"): the material, and the grades of it the character has, each with
+// its chance of an extra potion, the commonest first.
+function catalystView(potion, materials) {
+  if (!potion.catalyst) return null;
+  const material = content.materialsById[potion.catalyst];
+  const index = (id) => content.rarities.findIndex((rarity) => rarity.id === id);
+  return {
+    id: material.id,
+    name: material.name,
+    stacks: Object.entries(materials)
+      .filter(([key]) => parseStack(key).materialId === material.id)
+      .map(([key, count]) => ({ ...materialView(key, count, content), chance: content.brewing.bonusChance + catalystChance(key, content) }))
+      .sort((a, b) => index(a.rarity) - index(b.rarity)),
+  };
+}
 
 // Whether the character knows the recipe of a potion: only then may it use
 // one, so a potion got in a Wymiana waits for its recipe, and for the
@@ -107,6 +127,7 @@ export function professionsView(row) {
   const professions = JSON.parse(row.professions ?? '{}');
   const herbs = herbsOf(row);
   const potions = potionsOf(row);
+  const materials = JSON.parse(row.materials ?? '{}');
   const { gathering, brewing, workshop } = content;
   const gatherer = professionState(professions, gathering.profession);
   const brewer = professionState(professions, brewing.profession);
@@ -179,6 +200,7 @@ export function professionsView(row) {
               description: potion.description,
               level: potion.level,
               herbs: Object.entries(potion.herbs).map(([id, need]) => ({ id, name: content.herbsById[id].name, need, have: herbs[id] ?? 0 })),
+              catalyst: catalystView(potion, materials),
               count: potions[potion.id] ?? 0,
               most: mostPotions(potion, brewer.level, herbs, content),
             }

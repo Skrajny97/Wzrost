@@ -731,7 +731,7 @@ function checkProfessions(data, { stats }) {
   if (minutes.max < minutes.min || (minutes.max - minutes.min) % minutes.step !== 0) {
     errors.push('professions.json: gathering.minutes.max musi wypadać na kroku suwaka od min');
   }
-  errors.push(...checkBrewing(data.professions, ids, new Set(data.effects.map((effect) => effect.id))));
+  errors.push(...checkBrewing(data.professions, ids, new Set(data.effects.map((effect) => effect.id)), new Set(data.materials.materials.map((material) => material.id))));
   errors.push(...checkWorkshop(data, ids));
   return errors;
 }
@@ -784,9 +784,9 @@ function checkWorkshop(data, ids) {
 }
 
 // Brewing: a crafting profession that brews, recipes known within its levels
-// from level 1 on, of herbs that exist, and each potion's description naming
-// what it does, as the data does ("leczy 20% maks. HP").
-function checkBrewing(data, ids, effects) {
+// from level 1 on, of herbs and catalysts that exist, and each potion's
+// description naming what it does, as the data does ("leczy 20% maks. HP").
+function checkBrewing(data, ids, effects, materialIds) {
   const { professions, brewing, herbs, potions } = data;
   const errors = [];
   uniqueIds(errors, 'professions (mikstury)', potions);
@@ -798,6 +798,7 @@ function checkBrewing(data, ids, effects) {
   const herbIds = new Set(herbs.map((herb) => herb.id));
   for (const potion of potions) {
     if (brewer && potion.level > brewer.maxLevel) errors.push(`professions.json: mikstura ${potion.id} wymaga poziomu ${potion.level}, a profesja kończy się na ${brewer.maxLevel}`);
+    if (potion.catalyst && !materialIds.has(potion.catalyst)) errors.push(`professions.json: mikstura ${potion.id} ma nieznany katalizator "${potion.catalyst}"`);
     for (const id of Object.keys(potion.herbs)) {
       if (!herbIds.has(id)) errors.push(`professions.json: mikstura ${potion.id} ma nieznane zioło "${id}"`);
     }

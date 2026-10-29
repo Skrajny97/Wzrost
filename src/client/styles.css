@@ -2229,6 +2229,20 @@ a.segmented-option {
   font-weight: 600;
 }
 
+/* Which material of the item's rarity an upgrade from +5 takes. */
+.anvil-material {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+  color: var(--text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
 .anvil .preview-list li {
   color: var(--leaf);
 }

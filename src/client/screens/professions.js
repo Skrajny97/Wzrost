@@ -808,15 +808,17 @@ export function mountProfessions(container, { params, navigate }) {
     const known = brewing.recipes.filter((recipe) => !recipe.hidden);
     let recipe = known.find((candidate) => candidate.id === brewChoice.recipe) ?? known[0];
     let count = 1;
+    // A recipe's catalyst (proposal 3: "Wybrane mikstury biorą jeden materiał
+    // stwora"): the grade chosen, and the most potions herbs and it allow.
+    let catalyst = null;
+    let limit = 1;
+    const catalystBox = h('div', { class: 'stack' });
 
     const list = choiceList('Przepisy', { unknown: ['nieznany przepis', 'nieznane przepisy', 'nieznanych przepisów'] });
     const about = h('p', { class: 'muted' });
     const needs = h('p', { class: 'herb-estimate' });
     const picker = h('div', { class: 'stack' });
-    const lucky = h('p', {
-      class: 'muted',
-      text: `Każda uwarzona mikstura ma ${formatNumber(Math.round(brewing.bonusChance * 100))}% szans na jedną dodatkową.`,
-    });
+    const lucky = h('p', { class: 'muted' });
 
     const remember = () => {
       brewChoice.recipe = recipe.id;
@@ -840,8 +842,47 @@ export function mountProfessions(container, { params, navigate }) {
       show();
     }
 
-    // In the bag, and whether its herbs are there for one potion.
-    const recipeMeta = (each) => `w plecaku: ${formatNumber(each.count)}${each.most === 0 ? ' · brak ziół' : ''}`;
+    // In the bag, and whether its herbs and its catalyst are there for one
+    // potion.
+    const recipeMeta = (each) =>
+      `w plecaku: ${formatNumber(each.count)}${each.most === 0 ? ' · brak ziół' : each.catalyst && each.catalyst.stacks.length === 0 ? ' · brak katalizatora' : ''}`;
+
+    // A grade of a catalyst by its name with the rarity: "Rzadka łuska żmii".
+    const stackTitle = (stack) => `${stack.label.charAt(0).toUpperCase()}${stack.label.slice(1)}`;
+
+    // The grades of the catalyst the character has, the one chosen first:
+    // the one remembered, or else the commonest.
+    function catalystPicker() {
+      const { stacks, name } = recipe.catalyst;
+      if (stacks.length === 0) {
+        fill(catalystBox, h('p', { class: 'herb-room herb-room--full', text: `Brakuje katalizatora: ${name}. Zostawiają go pokonane stwory.` }));
+        return;
+      }
+      const select = h(
+        'select',
+        {
+          class: 'anvil-material',
+          'aria-label': `Katalizator: ${name}`,
+          onChange: (event) => {
+            brewChoice.catalyst = event.currentTarget.value;
+            saveChoice(BREW_CHOICE, brewChoice);
+            show();
+          },
+        },
+        stacks.map((stack) =>
+          h('option', {
+            value: stack.key,
+            selected: stack.key === catalyst.key,
+            text: `${stackTitle(stack)}: ${formatNumber(stack.count)} szt. · ${formatNumber(Math.round(stack.chance * 100))}% na dodatkową`,
+          }),
+        ),
+      );
+      fill(
+        catalystBox,
+        h('p', { class: 'herb-estimate', text: `Katalizator: 1 × ${name} na miksturę. Rzadszy daje większą szansę na dodatkową miksturę.` }),
+        select,
+      );
+    }
 
     function show() {
       list.show(
@@ -852,6 +893,12 @@ export function mountProfessions(container, { params, navigate }) {
       );
       about.textContent = recipe.description;
       needs.textContent = `Na jedną miksturę: ${recipe.herbs.map((herb) => `${herb.need} × ${herb.name} (w plecaku ${formatNumber(herb.have)})`).join(', ')}.`;
+      const stacks = recipe.catalyst?.stacks ?? [];
+      catalyst = stacks.find((stack) => stack.key === brewChoice.catalyst) ?? stacks[0] ?? null;
+      limit = recipe.catalyst ? Math.min(recipe.most, catalyst?.count ?? 0) : recipe.most;
+      lucky.textContent = `Każda uwarzona mikstura ma ${formatNumber(Math.round((catalyst?.chance ?? brewing.bonusChance) * 100))}% szans na jedną dodatkową.`;
+      if (recipe.catalyst) catalystPicker();
+      else fill(catalystBox);
       if (recipe.most === 0) {
         fill(
           picker,
@@ -860,14 +907,18 @@ export function mountProfessions(container, { params, navigate }) {
         );
         return;
       }
-      count = Math.min(recipe.most, Math.max(1, brewChoice.count ?? Math.min(recipe.most, 6)));
+      if (limit === 0) {
+        fill(picker);
+        return;
+      }
+      count = Math.min(limit, Math.max(1, brewChoice.count ?? Math.min(limit, 6)));
       fill(picker, countPicker());
     }
 
     // A slider of the potions with buttons for one at a time, the time and
     // the herbs they take, the room in the bag and the start.
     function countPicker() {
-      const most = recipe.most;
+      const most = limit;
       const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
       const estimate = h('p', { class: 'herb-estimate' });
       const room = h('p', { class: 'herb-room' });
@@ -904,7 +955,7 @@ export function mountProfessions(container, { params, navigate }) {
         value.textContent = label;
         less.disabled = count === 1;
         more.disabled = count === most;
-        const used = recipe.herbs.map((herb) => `${herb.need * count} × ${herb.name}`).join(', ');
+        const used = [...recipe.herbs.map((herb) => `${herb.need * count} × ${herb.name}`), catalyst && `${count} × ${stackTitle(catalyst)}`].filter(Boolean).join(', ');
         estimate.textContent = `Czas warzenia: ${formatMinutes(workMinutes(count, brewing.potionMinutes))}. Zużyjesz: ${used}.`;
         const fits = roomFor(count);
         room.className = `herb-room${count > fits ? ' herb-room--full' : ''}`;
@@ -921,7 +972,7 @@ export function mountProfessions(container, { params, navigate }) {
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
             remember();
-            await call('POST', '/api/professions/brew', { recipe: recipe.id, count, ...who.body() });
+            await call('POST', '/api/professions/brew', { recipe: recipe.id, count, ...(catalyst && { catalyst: catalyst.key }), ...who.body() });
           }),
       });
       return [
@@ -947,6 +998,7 @@ export function mountProfessions(container, { params, navigate }) {
       list.element,
       about,
       needs,
+      catalystBox,
       lucky,
       picker,
     );

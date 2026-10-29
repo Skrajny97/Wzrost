@@ -1,5 +1,6 @@
 // The Wymiana (DECISIONS.md, "Wymiana"): two characters whose players are
-// both online trade items from their bags, herbs, potions and gold. One
+// both online trade items from their bags, herbs, potions, materials and
+// gold. One
 // proposes it on the other's sheet or in the Znajomi, and the other accepts
 // or turns it down. Both then put their offers together; once one confirms,
 // neither offer changes any more, and the other confirms too, when all of it
@@ -10,7 +11,7 @@
 // change of the bag, a trade waits for both characters at home
 // (requireIdle): an exploration counts on the potions it took along.
 
-import { bagCapacity, bagStacks, campLevels, isUnlocked, itemView } from '../engine/index.js';
+import { bagCapacity, bagStacks, campLevels, isUnlocked, itemView, knownStack, materialView } from '../engine/index.js';
 import { characterView, loadPlayer, requireIdle } from './characters.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
@@ -26,7 +27,8 @@ const rules = () => content.community.trade;
 const onlineSince = (now) => now - rules().onlineSeconds * 1000;
 const path = (id) => `$."${id}"`;
 
-const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {} });
+// Materials (keys "materialId:rarityId") take no places in the bag.
+const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, materials: {} });
 const offerOf = (raw) => ({ ...emptyOffer(), ...JSON.parse(raw || '{}') });
 const sideOf = (trade, characterId) => (trade.from_id === characterId ? 'from' : 'to');
 const offerColumn = (side) => (side === 'from' ? 'from_offer' : 'to_offer');
@@ -99,6 +101,12 @@ async function tradeView(db, trade, character, now) {
       const potion = content.potionsById[id];
       return { id, name: potion?.name ?? id, count, known: Boolean(potion && viewer && potionKnown(viewer, potion)) };
     }),
+    materials: Object.entries(offer.materials)
+      .filter(([key]) => knownStack(key, content))
+      .map(([key, count]) => {
+        const { label, materialId, rarity, color } = materialView(key, count, content);
+        return { id: key, materialId, label, rarity, color, count };
+      }),
   });
   const { proposalSeconds, idleMinutes } = rules();
   return {
@@ -198,8 +206,8 @@ export async function answerTrade(context) {
   return json({ trade: await tradeView(db, { ...trade, state: 'open', updated_at: now, version: trade.version + 1 }, character, now) });
 }
 
-// An offer as kept: gold, items from the bag (not worn), herbs and potions
-// the character has, none of them more than it has.
+// An offer as kept: gold, items from the bag (not worn), herbs, potions and
+// materials the character has, none of them more than it has.
 function cleanOffer(raw, player) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
   const offer = emptyOffer();
@@ -216,22 +224,25 @@ function cleanOffer(raw, player) {
     if (item.equippedSlot) throw new ApiError(409, 'worn', 'Założonego przedmiotu nie wymienisz. Najpierw go zdejmij.');
   }
   offer.items = ids;
-  for (const [kind, have, known] of [
-    ['herbs', herbsOf(player.row), content.herbsById],
-    ['potions', potionsOf(player.row), content.potionsById],
+  const named = (table) => (id) => (Object.hasOwn(table, id) ? table[id].name : null);
+  for (const [kind, have, nameOf] of [
+    ['herbs', herbsOf(player.row), named(content.herbsById)],
+    ['potions', potionsOf(player.row), named(content.potionsById)],
+    ['materials', JSON.parse(player.row.materials ?? '{}'), (key) => (knownStack(key, content) ? materialView(key, 0, content).label : null)],
   ]) {
     const asked = raw[kind] ?? {};
     if (!asked || typeof asked !== 'object' || Array.isArray(asked)) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
     for (const [id, count] of Object.entries(asked)) {
-      if (!known[id] || !Number.isInteger(count) || count < 0) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
-      if (count > (have[id] ?? 0)) throw new ApiError(409, 'not_enough', `Masz mniej sztuk: ${known[id].name}.`);
+      const name = nameOf(id);
+      if (!name || !Number.isInteger(count) || count < 0) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
+      if (count > (Object.hasOwn(have, id) ? have[id] : 0)) throw new ApiError(409, 'not_enough', `Masz mniej sztuk: ${name}.`);
       if (count > 0) offer[kind][id] = count;
     }
   }
   return offer;
 }
 
-const isEmpty = (offer) => offer.gold === 0 && offer.items.length === 0 && Object.keys(offer.herbs).length === 0 && Object.keys(offer.potions).length === 0;
+const isEmpty = (offer) => offer.gold === 0 && offer.items.length === 0 && ['herbs', 'potions', 'materials'].every((kind) => Object.keys(offer[kind]).length === 0);
 
 // POST /api/trade/offer {id, offer}: the character's offer, while neither
 // has confirmed the trade.
@@ -283,7 +294,7 @@ function exchange(db, trade, now, sides) {
       conditions.push('(SELECT gold FROM characters WHERE id = ?) >= ?');
       binds.push(id, offer.gold);
     }
-    for (const kind of ['herbs', 'potions']) {
+    for (const kind of ['herbs', 'potions', 'materials']) {
       for (const [stack, count] of Object.entries(offer[kind])) {
         conditions.push(`COALESCE((SELECT json_extract(${kind}, ?) FROM characters WHERE id = ?), 0) >= ?`);
         binds.push(path(stack), id, count);
@@ -316,10 +327,11 @@ function exchange(db, trade, now, sides) {
     };
     const herbs = change('herbs');
     const potions = change('potions');
+    const materials = change('materials');
     moves.push(
       db
-        .prepare(`UPDATE characters SET gold = gold + ?, herbs = ${herbs.sql}, potions = ${potions.sql}, version = version + 1 WHERE id = ?`)
-        .bind(taker.offer.gold - giver.offer.gold, ...herbs.values, ...potions.values, giver.id),
+        .prepare(`UPDATE characters SET gold = gold + ?, herbs = ${herbs.sql}, potions = ${potions.sql}, materials = ${materials.sql}, version = version + 1 WHERE id = ?`)
+        .bind(taker.offer.gold - giver.offer.gold, ...herbs.values, ...potions.values, ...materials.values, giver.id),
     );
   }
   const emptied = (kind) => `(SELECT COALESCE(json_group_object(key, value), '{}') FROM json_each(characters.${kind}) WHERE value > 0)`;
@@ -327,7 +339,7 @@ function exchange(db, trade, now, sides) {
     db.prepare(`SELECT CASE WHEN ${conditions.join(' AND ')} THEN 1 ELSE json(t.state) END AS ok FROM trades t WHERE t.id = ?`).bind(...binds, trade.id),
     db.prepare("UPDATE trades SET state = 'done', updated_at = ? WHERE id = ? AND state = 'locked' AND version = ?").bind(now, trade.id, trade.version),
     ...moves,
-    db.prepare(`UPDATE characters SET herbs = ${emptied('herbs')}, potions = ${emptied('potions')} WHERE id IN (?, ?)`).bind(one.id, two.id),
+    db.prepare(`UPDATE characters SET herbs = ${emptied('herbs')}, potions = ${emptied('potions')}, materials = ${emptied('materials')} WHERE id IN (?, ?)`).bind(one.id, two.id),
   ]);
 }
 

@@ -8,6 +8,7 @@
 // (features.js).
 
 import {
+  addCounts,
   addQuestProgress,
   bagCapacity,
   bagStacks,
@@ -17,8 +18,11 @@ import {
   buffLeft,
   campBonus,
   campLevels,
+  catalystChance,
   drinkTimed,
+  knownStack,
   mostPotions,
+  parseStack,
   potionHerbs,
   potionPrice,
   potionsDone,
@@ -48,11 +52,22 @@ export async function startBrewing(context) {
   const potion = typeof body.recipe === 'string' ? content.potionsById[body.recipe] : undefined;
   if (!potion || potion.level > level) throw new ApiError(400, 'unknown_recipe', 'Tego przepisu jeszcze nie znasz.');
   const herbs = herbsOf(player.row);
-  const most = mostPotions(potion, level, herbs, content);
+  let most = mostPotions(potion, level, herbs, content);
   if (most === 0) throw new ApiError(409, 'no_herbs', 'Brakuje ziół na tę miksturę.');
+  // A recipe with a catalyst (proposal 3: "Wybrane mikstury biorą jeden
+  // materiał stwora") takes a piece of its material a potion, of the grade
+  // chosen ({ catalyst: "viper-scales:rare" }).
+  const materials = JSON.parse(player.row.materials ?? '{}');
+  const catalystKey = potion.catalyst ? body.catalyst : null;
+  if (potion.catalyst) {
+    const have = knownStack(catalystKey, content) && parseStack(catalystKey).materialId === potion.catalyst ? (materials[catalystKey] ?? 0) : 0;
+    if (have === 0) throw new ApiError(409, 'no_catalyst', `Ta mikstura bierze też katalizator: ${content.materialsById[potion.catalyst].name}.`);
+    most = Math.min(most, have);
+  }
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > most) {
     throw new ApiError(400, 'invalid_count', `Wybierz liczbę mikstur od 1 do ${most}.`);
   }
+  const catalyst = catalystKey ? { key: catalystKey, count: body.count } : null;
 
   const now = context.now;
   const minutes = brewMinutes(body.count, level, content);
@@ -67,11 +82,26 @@ export async function startBrewing(context) {
     // Awatar's work leaves it be.
     db
       .prepare(
-        `UPDATE characters SET herbs = ?${avatar ? '' : ', hp = ?, hp_at = ?'}, version = version + 1
+        `UPDATE characters SET herbs = ?${catalyst ? ', materials = ?' : ''}${avatar ? '' : ', hp = ?, hp_at = ?'}, version = version + 1
          WHERE id = ? AND version = ? AND NOT EXISTS (SELECT 1 FROM ${avatar ? 'avatar_activities' : 'activities'} WHERE character_id = ?)`,
       )
-      .bind(JSON.stringify(left), ...(avatar ? [] : [hp, now]), row.id, row.version, row.id),
-    insertWork(db, avatar, row, { kind: 'potions', placeId: brewing.place.id, minutes, now, seed, hp, options: { recipe: potion.id, count: body.count, herbs: used } }),
+      .bind(
+        JSON.stringify(left),
+        ...(catalyst ? [JSON.stringify(addCounts(materials, { [catalyst.key]: -catalyst.count }))] : []),
+        ...(avatar ? [] : [hp, now]),
+        row.id,
+        row.version,
+        row.id,
+      ),
+    insertWork(db, avatar, row, {
+      kind: 'potions',
+      placeId: brewing.place.id,
+      minutes,
+      now,
+      seed,
+      hp,
+      options: { recipe: potion.id, count: body.count, herbs: used, ...(catalyst && { catalyst }) },
+    }),
   ]);
   if (taken.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
@@ -106,18 +136,24 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
   const herbs = herbsOf(row);
   for (const [id, amount] of Object.entries(back)) if (amount > 0) herbs[id] = (herbs[id] ?? 0) + amount;
   const herbsBack = addTo('herbs', back);
+  // The catalyst: a piece a potion brewed, the rest back; its grade raises
+  // every potion's chance of an extra one (catalystChance).
+  const catalyst = options.catalyst && knownStack(options.catalyst.key, content) ? options.catalyst : null;
+  const catalystsBack = addTo('materials', catalyst ? { [catalyst.key]: catalyst.count - Math.min(catalyst.count, done) } : {});
   // Only while the activity is as seen, so two calls at once give back once.
   const ongoing = `EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ?)`;
   const end = db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at);
   if (done === 0) {
     await db.batch([
-      db.prepare(`UPDATE characters SET version = version + 1${herbsBack.sql} WHERE id = ? AND ${ongoing}`).bind(...herbsBack.binds, row.id, row.id, activity.started_at),
+      db
+        .prepare(`UPDATE characters SET version = version + 1${herbsBack.sql}${catalystsBack.sql} WHERE id = ? AND ${ongoing}`)
+        .bind(...herbsBack.binds, ...catalystsBack.binds, row.id, row.id, activity.started_at),
       end,
     ]);
     return null;
   }
 
-  const made = brewPotions({ count: done, seed: activity.seed }, content);
+  const made = brewPotions({ count: done, seed: activity.seed, extraChance: catalystChance(catalyst?.key, content) }, content);
   const capacity = bagCapacity(campLevels(player.buildings, now, content), content);
   const taken = player.items.filter((item) => !item.equippedSlot).length + bagStacks(herbs, content) + bagStacks(potionsOf(row), content);
   const { stored, lost } = storeStacks(potionsOf(row), { [potion.id]: made.count }, capacity - taken, content);
@@ -155,10 +191,10 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
         .bind(row.id, row.id, KEPT_REPORTS),
       db
         .prepare(
-          `UPDATE characters SET quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${herbsBack.sql}${potions.sql}, version = version + 1
+          `UPDATE characters SET quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${herbsBack.sql}${catalystsBack.sql}${potions.sql}, version = version + 1
            WHERE id = ? AND ${ongoing}`,
         )
-        .bind(row.quests, quests, ...sets.binds, ...herbsBack.binds, ...potions.binds, row.id, row.id, activity.started_at),
+        .bind(row.quests, quests, ...sets.binds, ...herbsBack.binds, ...catalystsBack.binds, ...potions.binds, row.id, row.id, activity.started_at),
       end,
     ]);
   } catch (error) {

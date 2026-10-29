@@ -65,6 +65,7 @@
     "oreBase": 1,
     "orePerItemLevel": 0.15,
     "costGrowth": 1.6,
+    "materialFrom": 5,
     "sellRefund": 0.5
   },
   "hunt": {
@@ -131,7 +132,8 @@
   "crafting": {
     "salvageBase": 2,
     "salvageLevelStep": 10,
-    "queueLimit": 10
+    "queueLimit": 10,
+    "sellGold": 2
   },
   "timePoints": {
     "start": 60,

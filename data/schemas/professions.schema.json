@@ -238,6 +238,7 @@
         "fastest",
         "maxMinutes",
         "bonusChance",
+        "catalystStep",
         "priceFactor",
         "texts"
       ],
@@ -297,6 +298,12 @@
           "minimum": 0,
           "maximum": 1,
           "description": "Szansa każdej uwarzonej mikstury na jedną dodatkową."
+        },
+        "catalystStep": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "O tyle rośnie szansa na dodatkową miksturę za każdy stopień rzadkości katalizatora powyżej rzadkości jego gatunku."
         },
         "priceFactor": {
           "type": "number",
@@ -1118,6 +1125,11 @@
               "minimum": 1
             },
             "description": "Zioła na jedną miksturę: id zioła i liczba sztuk."
+          },
+          "catalyst": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "description": "Katalizator (propozycja 3: „Wybrane mikstury biorą jeden materiał stwora”): id materiału z materials.json, 1 sztuka na miksturę. Rzadszy stopień materiału daje większą szansę na dodatkową miksturę (brewing.catalystStep)."
           },
           "effect": {
             "type": "object",

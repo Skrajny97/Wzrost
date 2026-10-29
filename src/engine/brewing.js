@@ -7,6 +7,7 @@
 // in the bag as herbs do, and the work gives the character the little XP
 // gathering gives (professions.js).
 
+import { gradeSteps } from './crafting.js';
 import { countList, professionLevelLines, professionProgress } from './professions.js';
 import { createRng } from './rng.js';
 import { say } from './text.js';
@@ -45,14 +46,19 @@ export const potionsDone = (count, minutes, elapsed) => Math.min(count, Math.max
 // The potions of `count` brewed: each has bonusChance of one more, drawn by
 // the seed in order, so a brewing stopped early keeps the draws of the
 // potions it made.
-export function brewPotions({ count, seed }, content) {
+export function brewPotions({ count, seed, extraChance = 0 }, content) {
   const rng = createRng(seed);
   let bonus = 0;
   for (let index = 0; index < count; index += 1) {
-    if (rng.chance(content.brewing.bonusChance)) bonus += 1;
+    if (rng.chance(Math.min(1, content.brewing.bonusChance + extraChance))) bonus += 1;
   }
   return { count: count + bonus, bonus };
 }
+
+// What a catalyst of a rarer grade than its species adds to every potion's
+// chance of an extra one (proposal 3: "Rzadszy materiał daje szansę na
+// dodatkową miksturę"): catalystStep a grade.
+export const catalystChance = (key, content) => (key ? gradeSteps(key, content) * content.brewing.catalystStep : 0);
 
 // What the scrapper pays for a potion, before the camp's Skup złomu:
 // priceFactor times the price of its herbs.

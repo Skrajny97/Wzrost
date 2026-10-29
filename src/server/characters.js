@@ -32,6 +32,7 @@ import {
   isUnlocked,
   huntDurations,
   itemView,
+  materialPrice,
   materialView,
   nextHuntUnlock,
   plannedLevel,
@@ -558,6 +559,8 @@ function craftingView(row, levels, now) {
   const table = craftTable(levels, content);
   const { pace } = table;
   const { materials, parts, queue } = settleCrafting(craftingState(row), now);
+  // What the scrapper pays for a piece, with the camp's Skup złomu.
+  const sellBonus = campBonus(levels, 'sellPrice', content);
   return {
     pace,
     // The table's level, the highest rarity it takes and the chance of an
@@ -573,6 +576,7 @@ function craftingView(row, levels, now) {
         const takes = pace > 0 && craftTakes(table, view.rarity, content);
         return {
           ...view,
+          price: materialPrice(view.rarity, content) * (1 + sellBonus),
           minutes: takes ? craftMinutes(view.rarity, count, pace, content) : null,
           needs: pace > 0 && !takes ? craftLevelFor(view.rarity, content) : null,
         };

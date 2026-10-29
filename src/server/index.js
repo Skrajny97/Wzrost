@@ -9,7 +9,7 @@ import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewin
 import { buyParts, cancelBuilding, collectProduction, exchangeResources, startBuilding, tradeAtFire } from './camp.js';
 import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendGift } from './community.js';
-import { craftMaterials, salvageItem, skipCrafting } from './crafting.js';
+import { craftMaterials, salvageItem, sellMaterials, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
 import { autoPoints, characterProfile, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, setSkin, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
@@ -78,6 +78,7 @@ const routes = [
   ['POST', '/api/items/:id/sell', sellItem],
   ['POST', '/api/items/:id/salvage', salvageItem],
   ['POST', '/api/craft/materials', craftMaterials],
+  ['POST', '/api/materials/sell', sellMaterials],
   ['POST', '/api/quests/claim', claimQuest],
   ['POST', '/api/quests/claim-all', claimAllQuests],
   ['POST', '/api/quests/chest', openChest],

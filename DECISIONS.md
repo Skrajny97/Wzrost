@@ -2819,6 +2819,36 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
 5. **Dodatkowy czas.** Punkty Czasu (1 na 30 minut oraz skrzynie zadań) przewijają ok. 1,5 godziny wypraw dziennie. Szybkie Polowania dają 45 minut dziennie, a Błyskawiczne 30–60 minut. Razem to do ok. 3 godzin dziennie. Najbardziej pomaga to graczom, którzy zaglądają rzadko i do 24. poziomu mają wyprawy najwyżej 30-minutowe. Zostaje tak, jak autor ustalił.
 6. **Narzędzie.** Symulacja przyjmuje teraz opcje wyprawy gracza (`hunt` w polityce, np. `seekRare`).
 
+## Materiały: Skup złomu, Wymiana, katalizatory i Kowadło od +5 (29.10.2026, na wersji testowej)
+
+To cztery pierwsze z zastosowań materiałów wybranych przez autora („Uwagi autora po 0.0.55”, punkt 7). Liczby i szczegóły to brakujące szczegóły, rozstrzygnięte najprościej.
+
+1. **Skup złomu kupuje materiały.** Karta materiału w zakładce „Materiały” plecaka ma wybór liczby sztuk (−, +, „wszystkie”) i przycisk „Sprzedaj za N złota”.
+    - Sztuka kosztuje 2 złota razy mnożnik rzadkości, ten sam co przy przedmiotach (`sell` w `data/rarities.json`). Pospolita kosztuje 2 złota, rzadka 4, unikalna 8, epicka 16, legendarna 32, mityczna 64, a boska 128 (`crafting.sellGold` w `data/balance.json`).
+    - Każdy poziom Skupu złomu dodaje 10% do ceny, jak przy przedmiotach.
+    - Sprzedaż działa też w trakcie wyprawy, jak Stół rozbiórki.
+    - Sprzedaje `POST /api/materials/sell` z `{ key, count }`.
+2. **Materiały w Wymianie.** Oferta ma sekcję „Materiały” z polem na każdy stos, jak zioła i mikstury. Materiały każdego stopnia przechodzą razem z resztą oferty i nie zajmują miejsca w plecaku.
+3. **Katalizatory w Alchemii.** Siedem przepisów bierze 1 sztukę materiału stwora na miksturę (`catalyst` w `data/professions.json`):
+    - Odtrutka: Łuska żmii;
+    - Zwykła mikstura szybkości: Żądło szerszenia;
+    - Wywar kamiennej skóry: Róg jelonka;
+    - Wywar siły: Kieł dzika;
+    - Mikstura skupienia: Pióro puszczyka;
+    - Olejek z tojadu: Pajęcze wylinki;
+    - Eliksir jemiołowy: Pył chochlika.
+
+    Bez katalizatora zostają mikstury leczenia i many, Mniejsza mikstura szybkości (początek Alchemii) i Duża mikstura szybkości, która ma już rzadszy składnik, Żurawinę. Bez katalizatora jest też Napar z kwiatu paproci, który ma Kwiat paproci.
+    - Stopień katalizatora wybiera się z listy pod przepisem. Domyślnie stoi najpospolitszy, a wybór zostaje zapamiętany.
+    - Każdy stopień ponad rzadkość gatunku dodaje 15 punktów procentowych do 5% szansy na dodatkową miksturę (`brewing.catalystStep`). Rzadka łuska żmii daje więc 20%, a unikalna 35%.
+    - Katalizator schodzi na początku warzenia, jak zioła. Przerwane warzenie oddaje sztuki na mikstury nieuwarzone.
+    - Gdy katalizatora brak, lista przepisów pisze „brak katalizatora”, a formularz: „Brakuje katalizatora: … Zostawiają go pokonane stwory.”
+4. **Kowadło od +5.** Od ulepszenia +4 → +5 każde ulepszenie bierze też materiały rzadkości przedmiotu: 1 sztukę na +5 i o jedną więcej na każdym kolejnym poziomie, czyli 6 sztuk na +10 (`upgrades.materialFrom` w `data/balance.json`).
+    - Pasuje materiał dowolnego gatunku tej rzadkości. Domyślnie schodzi ze stosu z największą liczbą sztuk, a lista na karcie pozwala wybrać inny.
+    - Porażka zabiera materiał, tak samo jak złoto i rudę.
+    - Bez materiału przycisk pisze „Brakuje materiału”, a serwer odpowiada 409 `no_material`.
+5. **Sprawdzanie.** Walidator danych sprawdza, czy każdy katalizator to istniejący materiał. Testy obejmują sprzedaż, Wymianę, katalizatory i Kowadło.
+
 ## Uwagi autora po 0.0.55 (29.10.2026, na wersji testowej)
 
 1. **Wdrożenia na komendę autora.** Autor: „Od kolejnej rundy wdrożenia (poza awaryjnymi, które podpiszę) robimy rzadziej na moją komendę. Możesz sugerować wdrożenie, ale sam go nie bedziesz wykonywał.”

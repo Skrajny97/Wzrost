@@ -22,6 +22,25 @@ export function parseStack(key) {
   return { materialId: key.slice(0, at), rarityId: key.slice(at + 1) };
 }
 
+// A material key the data knows: an existing material at an existing rarity.
+export function knownStack(key, content) {
+  if (typeof key !== 'string' || !key.includes(':')) return false;
+  const { materialId, rarityId } = parseStack(key);
+  return Object.hasOwn(content.materialsById, materialId) && Object.hasOwn(content.raritiesById, rarityId);
+}
+
+// What the scrapper pays for one piece of a material, before the camp's Skup
+// złomu: sellGold times the sell factor of its rarity (proposal 1: "cena
+// rośnie z rzadkością").
+export const materialPrice = (rarityId, content) => content.balance.crafting.sellGold * content.raritiesById[rarityId].sell;
+
+// How many grades a stack stands above its species' own rarity.
+export function gradeSteps(key, content) {
+  const { materialId, rarityId } = parseStack(key);
+  const index = (id) => content.rarities.findIndex((rarity) => rarity.id === id);
+  return Math.max(0, index(rarityId) - index(content.materialsById[materialId].rarity));
+}
+
 // Adds counts from `more` to `counts`, without zeros.
 export function addCounts(counts, more) {
   const sum = { ...counts };

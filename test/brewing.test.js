@@ -10,6 +10,7 @@ import {
   brewMinutes,
   brewPotions,
   brewingReport,
+  catalystChance,
   drawQuests,
   knownPotions,
   mostPotions,
@@ -58,6 +59,17 @@ describe('brewing in the engine', () => {
       const short = brewPotions({ count: 10, seed: `c${index}` }, content).bonus;
       assert.ok(short <= brewPotions({ count: 30, seed: `c${index}` }, content).bonus);
     }
+  });
+
+  test('a catalyst of a rarer grade than its species adds 15% a grade to every potion\'s chance of one more', () => {
+    assert.equal(catalystChance(null, content), 0);
+    assert.equal(catalystChance('viper-scales:common', content), 0);
+    assert.ok(Math.abs(catalystChance('viper-scales:rare', content) - 0.15) < 1e-9);
+    assert.ok(Math.abs(catalystChance('viper-scales:epic', content) - 0.45) < 1e-9);
+    const runs = Array.from({ length: 200 }, (_, index) => brewPotions({ count: 40, seed: `k${index}`, extraChance: 0.15 }, content));
+    const share = runs.reduce((sum, run) => sum + run.bonus, 0) / (200 * 40);
+    assert.ok(share > 0.17 && share < 0.23, String(share));
+    assert.equal(brewPotions({ count: 10, seed: 'all', extraChance: 2 }, content).bonus, 10);
   });
 
   test('the scrapper pays 1.5 times the herbs of a potion', () => {
@@ -237,6 +249,36 @@ describe('brewing through the API', () => {
     assert.deepEqual(after.herbs.map((herb) => herb.count), [40 - 9]);
     assert.equal(after.potions[0].count, report.potion.count);
     assert.equal((await call('GET', '/api/reports', { cookie })).data.reports[0].kind, 'potions');
+  });
+
+  test('a recipe with a catalyst takes a piece of it a potion, of the grade chosen, and gives back the rest when stopped', async () => {
+    await set(`professions = '{"alchemy":{"level":18,"xp":0}}', herbs = '{"calamus":60}', materials = '{"viper-scales:common":2,"viper-scales:rare":5,"wolf-pelt:rare":9}'`);
+    const materials = async () => JSON.parse((await (await db()).prepare('SELECT materials FROM characters').first()).materials);
+    const recipe = (await character()).professions.brewing.recipes.find((one) => one.name === content.potionsById.antidote.name);
+    assert.equal(recipe.catalyst.id, 'viper-scales');
+    assert.deepEqual(
+      recipe.catalyst.stacks.map((stack) => [stack.key, stack.count, Math.round(stack.chance * 100)]),
+      [
+        ['viper-scales:common', 2, 5],
+        ['viper-scales:rare', 5, 20],
+      ],
+    );
+    assert.equal((await brew({ recipe: 'antidote', count: 1 })).data.error.code, 'no_catalyst');
+    assert.equal((await brew({ recipe: 'antidote', count: 1, catalyst: 'wolf-pelt:rare' })).data.error.code, 'no_catalyst');
+    assert.equal((await brew({ recipe: 'antidote', count: 1, catalyst: 'viper-scales:epic' })).data.error.code, 'no_catalyst');
+    assert.equal((await brew({ recipe: 'antidote', count: 6, catalyst: 'viper-scales:rare' })).data.error.code, 'invalid_count');
+    const started = await brew({ recipe: 'antidote', count: 4, catalyst: 'viper-scales:rare' });
+    assert.equal(started.status, 201, JSON.stringify(started.data));
+    assert.deepEqual(await materials(), { 'viper-scales:common': 2, 'viper-scales:rare': 1, 'wolf-pelt:rare': 9 });
+    const back = await call('POST', '/api/hunts/cancel', { cookie });
+    assert.equal(back.data.report, null);
+    assert.deepEqual(await materials(), { 'viper-scales:common': 2, 'viper-scales:rare': 5, 'wolf-pelt:rare': 9 });
+    // A whole brewing uses a piece a potion.
+    await brew({ recipe: 'antidote', count: 2, catalyst: 'viper-scales:common' });
+    await age(600);
+    const claimed = await call('POST', '/api/hunts/claim', { cookie });
+    assert.equal(claimed.data.report.potion.count, 2 + claimed.data.report.potion.bonus);
+    assert.deepEqual(await materials(), { 'viper-scales:rare': 5, 'wolf-pelt:rare': 9 });
   });
 
   test('Time Points skip a brewing', async () => {

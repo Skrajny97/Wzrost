@@ -74,6 +74,28 @@ describe('Wymiana', () => {
     assert.equal(await current(players.ala), null);
   });
 
+  test('materials go in a trade too, of any grade, and take no places in the bag', async () => {
+    const stock = (name, materials) => db().then((database) => database.prepare('UPDATE characters SET materials = ? WHERE name = ?').bind(JSON.stringify(materials), name).run());
+    const materials = async (name) => JSON.parse((await (await db()).prepare('SELECT materials FROM characters WHERE name = ?').bind(name).first()).materials);
+    await stock('Ala', { 'wolf-pelt:rare': 4, 'fox-pelt:common': 2 });
+    await stock('Ola', { 'wolf-pelt:rare': 1 });
+    const id = await opened();
+    assert.equal((await trade(players.ala, 'offer', { id, offer: { materials: { 'wolf-pelt:rare': 5 } } })).data.error.code, 'not_enough');
+    assert.equal((await trade(players.ala, 'offer', { id, offer: { materials: { 'constructor:common': 1 } } })).data.error.code, 'invalid_offer');
+    assert.equal((await trade(players.ala, 'offer', { id, offer: { materials: { 'wolf-pelt': 1 } } })).data.error.code, 'invalid_offer');
+    await trade(players.ala, 'offer', { id, offer: { materials: { 'wolf-pelt:rare': 4 } } });
+    const offered = await trade(players.ola, 'offer', { id, offer: { gold: 30 } });
+    const [stack] = offered.data.trade.theirs.materials;
+    assert.deepEqual([stack.id, stack.materialId, stack.rarity, stack.count], ['wolf-pelt:rare', 'wolf-pelt', 'rare', 4]);
+    assert.match(stack.label, /^rzadk/);
+    const locked = await trade(players.ola, 'confirm', { id, version: offered.data.trade.version });
+    const done = await trade(players.ala, 'confirm', { id, version: locked.data.trade.version });
+    assert.equal(done.data.trade.state, 'done', JSON.stringify(done.data));
+    assert.deepEqual(await materials('Ala'), { 'fox-pelt:common': 2 });
+    assert.deepEqual(await materials('Ola'), { 'wolf-pelt:rare': 5 });
+    assert.deepEqual([(await row('Ala')).gold, (await row('Ola')).gold], [530, 470]);
+  });
+
   test('a confirmation is for the offers as seen, and a trade that lost its items moves nothing', async () => {
     const given = await inBag('Ala', amulet(3));
     const id = await opened();

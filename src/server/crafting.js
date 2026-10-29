@@ -7,15 +7,20 @@
 // version), so two taps at once make one change.
 
 import {
+  addCounts,
   addQuestProgress,
+  campBonus,
   campLevels,
   craftLevelFor,
   craftTable,
   craftTakes,
   createRng,
   itemName,
+  knownStack,
+  materialPrice,
   orderMaterials,
   orderSalvage,
+  parseStack,
   patternFrom,
   settleCrafting,
 } from '../engine/index.js';
@@ -50,12 +55,13 @@ function checkRoom(queue) {
 const newId = () => toHex(crypto.getRandomValues(new Uint8Array(8)));
 const withIds = (before, state) => ({ ...state, queue: state.queue.map((order, index) => (index < before ? order : { id: newId(), ...order })) });
 
-// `quests`: the narrator's quests moved on by the order. `condition` adds to
-// the WHERE clause, with its own `binds`.
-const saveState = (db, row, state, { quests, patterns, condition = '', binds = [] } = {}) =>
+// `quests`: the narrator's quests moved on by the order; `gold`: the
+// scrapper's payment. `condition` adds to the WHERE clause, with its own
+// `binds`.
+const saveState = (db, row, state, { quests, patterns, gold = 0, condition = '', binds = [] } = {}) =>
   db
     .prepare(
-      `UPDATE characters SET materials = ?, parts = ?, crafting = ?${quests ? ', quests = ?' : ''}${patterns ? ', patterns = ?' : ''}, version = version + 1
+      `UPDATE characters SET materials = ?, parts = ?, crafting = ?${quests ? ', quests = ?' : ''}${patterns ? ', patterns = ?' : ''}${gold ? ', gold = gold + ?' : ''}, version = version + 1
        WHERE id = ? AND version = ?${condition}`,
     )
     .bind(
@@ -64,12 +70,34 @@ const saveState = (db, row, state, { quests, patterns, condition = '', binds = [
       JSON.stringify(state.queue),
       ...(quests ? [JSON.stringify(quests)] : []),
       ...(patterns ? [JSON.stringify(patterns)] : []),
+      ...(gold ? [gold] : []),
       row.id,
       row.version,
       ...binds,
     );
 
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
+
+// The scrapper buys `count` pieces of a stack of materials ({ key, count }),
+// for their price with the camp's Skup złomu (proposal 1: "Skup złomu
+// kupuje materiały. Za złoto, a cena rośnie z rzadkością"), also while the
+// character is away, as the table works then too.
+export async function sellMaterials(context) {
+  const { session, player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  const now = context.now;
+  const settled = settleCrafting(craftingState(player.row), now);
+  const have = knownStack(body.key, content) ? (settled.materials[body.key] ?? 0) : 0;
+  if (have === 0) throw new ApiError(404, 'no_materials', 'Nie masz tego materiału.');
+  if (!Number.isInteger(body.count) || body.count < 1 || body.count > have) throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${have} sztuk.`);
+  const bonus = campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
+  const gold = Math.max(1, Math.round(materialPrice(parseStack(body.key).rarityId, content) * body.count * (1 + bonus)));
+  const state = { ...settled, materials: addCounts(settled.materials, { [body.key]: -body.count }) };
+  const db = context.env.DB;
+  const result = await saveState(db, player.row, state, { gold }).run();
+  if (result.meta.changes !== 1) throw changed();
+  return json({ sold: { count: body.count, gold }, character: characterView(await loadPlayer(db, session.userId), now) });
+}
 
 // Whole stacks of materials to the queue: { keys: ["wolf-pelt:common", …] },
 // or { all: true } for every stack, while the queue has room.

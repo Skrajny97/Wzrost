@@ -84,6 +84,7 @@
     "fastest": 0.5,
     "maxMinutes": 480,
     "bonusChance": 0.05,
+    "catalystStep": 0.15,
     "priceFactor": 1.5,
     "texts": {
       "report": [
@@ -383,6 +384,7 @@
       "counted": ["Odtrutkę", "Odtrutki", "Odtrutek"],
       "level": 18,
       "herbs": { "calamus": 3 },
+      "catalyst": "viper-scales",
       "effect": { "cure": 1 },
       "cures": "poisoned",
       "description": "Gorzki wywar z Tataraku. Działa sam w walce: zdejmuje Zatrucie i chroni przed nim do końca walki."
@@ -393,6 +395,7 @@
       "counted": ["Zwykłą miksturę szybkości", "Zwykłe mikstury szybkości", "Zwykłych mikstur szybkości"],
       "level": 24,
       "herbs": { "nettle": 2, "arnica": 1 },
+      "catalyst": "hornet-sting",
       "effect": { "speed": 0.25 },
       "minutes": 30,
       "description": "Zielony wywar z Pokrzywy i Arniki. Wypita z plecaka przyspiesza ruchy postaci w walkach o 25% na 30 minut wypraw. Każda kolejna dodaje następne 30 minut."
@@ -403,6 +406,7 @@
       "counted": ["Wywar kamiennej skóry", "Wywary kamiennej skóry", "Wywarów kamiennej skóry"],
       "level": 26,
       "herbs": { "arnica": 3 },
+      "catalyst": "stag-beetle-horn",
       "effect": { "armor": 0.15 },
       "minutes": 30,
       "description": "Szary wywar z Arniki. Wypity z plecaka wzmacnia pancerz postaci o 15% na 30 minut wypraw. Każdy kolejny dodaje następne 30 minut."
@@ -413,6 +417,7 @@
       "counted": ["Wywar siły", "Wywary siły", "Wywarów siły"],
       "level": 32,
       "herbs": { "wormwood": 3 },
+      "catalyst": "boar-tusk",
       "effect": { "damage": 0.1 },
       "minutes": 30,
       "description": "Pomarańczowy wywar z Piołunu. Wypity z plecaka zwiększa obrażenia postaci o 10% na 30 minut wypraw. Każdy kolejny dodaje następne 30 minut."
@@ -423,6 +428,7 @@
       "counted": ["Miksturę skupienia", "Mikstury skupienia", "Mikstur skupienia"],
       "level": 36,
       "herbs": { "valerian": 3 },
+      "catalyst": "owl-feather",
       "effect": { "focus": 0.1 },
       "minutes": 30,
       "description": "Fioletowy wywar z Kozłka. Wypita z plecaka zwiększa Intelekt i Mądrość postaci o 10% na 30 minut wypraw. Każda kolejna dodaje następne 30 minut."
@@ -461,6 +467,7 @@
       "counted": ["Olejek z tojadu", "Olejki z tojadu", "Olejków z tojadu"],
       "level": 55,
       "herbs": { "aconite": 2 },
+      "catalyst": "spider-moults",
       "effect": { "poison": 0.5 },
       "minutes": 30,
       "verb": "Nałóż",
@@ -473,6 +480,7 @@
       "counted": ["Eliksir jemiołowy", "Eliksiry jemiołowe", "Eliksirów jemiołowych"],
       "level": 65,
       "herbs": { "mistletoe": 3 },
+      "catalyst": "imp-dust",
       "effect": { "ward": 0.2 },
       "minutes": 30,
       "description": "Biało-zielony eliksir z Jemioły. Wypity z plecaka zmniejsza obrażenia od magii o 20% na 30 minut wypraw. Każdy kolejny dodaje następne 30 minut."

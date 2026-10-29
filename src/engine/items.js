@@ -256,6 +256,15 @@ export function itemUpgradeCost(item, target, content) {
 
 export const upgradeChance = (target, content) => content.balance.upgrades.chances[target - 1];
 
+// The material an upgrade to `target` also takes from materialFrom on (the
+// author: "Wyższe ulepszenia biorą też materiał rzadkości przedmiotu"): any
+// material of the item's rarity, 1 piece at materialFrom and one more at
+// every level after it; null below it.
+export function upgradeMaterials(item, target, content) {
+  const from = content.balance.upgrades.materialFrom;
+  return target >= from ? { rarity: item.rarity, count: target - from + 1 } : null;
+}
+
 // From breakFrom on, a failed upgrade may also break the item.
 export function breakChance(current, content) {
   const tuning = content.balance.upgrades;
@@ -291,6 +300,7 @@ export function upgradeView(item, cap, content) {
         ? {
             level: target,
             cost: itemUpgradeCost(item, target, content),
+            materials: upgradeMaterials(item, target, content),
             chance: upgradeChance(target, content),
             breakChance: breakChance(level, content),
             properties: itemProperties({ ...item, upgrade: target }, content),

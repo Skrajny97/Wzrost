@@ -1322,6 +1322,36 @@ describe('upgrades on the Kowadło', () => {
     assert.equal((await upgrade()).data.error.code, 'not_enough');
   });
 
+  test('from +5 on a try takes a material of the item\'s rarity too: 1 at +5 and one more each level, the most plentiful stack unless one is chosen', async () => {
+    await anvilAt(10);
+    const at = (level) => db().then((database) => database.prepare("UPDATE items SET data = json_set(data, '$.upgrade', ?)").bind(level).run());
+    const materials = async () => JSON.parse((await (await db()).prepare('SELECT materials FROM characters').first()).materials);
+    await at(3);
+    await stock(100000, { wood: 0, stone: 0, 'iron-ore': 1000 });
+    assert.equal((await character()).bag[0].anvil.next.materials, null);
+    await at(4);
+    assert.deepEqual((await character()).bag[0].anvil.next.materials, { rarity: 'common', count: 1 });
+    const none = await upgrade();
+    assert.equal(none.status, 409);
+    assert.equal(none.data.error.code, 'no_material');
+    // A rare material is not for a common item.
+    await (await db()).prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ 'wolf-pelt:rare': 9, 'wolf-pelt:common': 1, 'fox-pelt:common': 3 })).run();
+    const first = await upgrade();
+    assert.equal(first.status, 200);
+    assert.deepEqual(first.data.upgrade.material, { key: 'fox-pelt:common', count: 1 });
+    assert.deepEqual(await materials(), { 'wolf-pelt:rare': 9, 'wolf-pelt:common': 1, 'fox-pelt:common': 2 });
+    // At +6 two pieces, of the stack chosen; the last of a stack leaves no trace.
+    await at(5);
+    assert.deepEqual((await character()).bag[0].anvil.next.materials, { rarity: 'common', count: 2 });
+    const chosen = await call('POST', `/api/items/${itemId}/upgrade`, { cookie, body: { material: 'fox-pelt:common' } });
+    assert.deepEqual(chosen.data.upgrade.material, { key: 'fox-pelt:common', count: 2 });
+    assert.deepEqual(await materials(), { 'wolf-pelt:rare': 9, 'wolf-pelt:common': 1 });
+    await at(5);
+    assert.equal((await upgrade()).data.error.code, 'no_material');
+    // A failure takes the material as it takes the gold and the ore.
+    assert.ok(['success', 'failure'].includes(chosen.data.upgrade.result));
+  });
+
   test('nothing is upgraded during an exploration, and the scrapper does not sell upgraded items by the handful', async () => {
     await anvilAt(3);
     await (await db()).prepare("UPDATE items SET data = json_set(data, '$.upgrade', 2)").run();
@@ -1714,6 +1744,37 @@ describe('Stół rozbiórki', () => {
     // The fights name their materials, and items came only in chests.
     assert.deepEqual(report.fights.flatMap((fight) => fight.materials.map(({ key, count }) => [key, count])).length > 0, true);
     assert.ok(report.entries.some((entry) => /skrzyni|skrzynk|kuferek/.test(entry.text)));
+  });
+
+  test('the scrapper buys materials, 2 gold a piece times the rarity\'s factor, more with the Skup złomu', async () => {
+    await stockMaterials({ 'wolf-pelt:common': 5, 'wolf-pelt:rare': 2 });
+    await (await db()).prepare('UPDATE characters SET gold = 0').run();
+    const sell = (body) => call('POST', '/api/materials/sell', { cookie, body });
+    const stacks = (view) => view.crafting.materials.map((material) => [material.key, material.count, material.price]);
+    assert.deepEqual(stacks(await character()), [
+      ['wolf-pelt:common', 5, 2],
+      ['wolf-pelt:rare', 2, 4],
+    ]);
+    assert.equal((await sell({ key: 'wolf-pelt:rare', count: 3 })).data.error.code, 'invalid_count');
+    assert.equal((await sell({ key: 'wolf-pelt:rare', count: 0 })).data.error.code, 'invalid_count');
+    assert.equal((await sell({ key: 'wolf-pelt:epic', count: 1 })).data.error.code, 'no_materials');
+    assert.equal((await sell({ key: 'constructor:common', count: 1 })).data.error.code, 'no_materials');
+    const sold = await sell({ key: 'wolf-pelt:common', count: 3 });
+    assert.equal(sold.status, 200);
+    assert.deepEqual(sold.data.sold, { count: 3, gold: 6 });
+    assert.equal(sold.data.character.gold, 6);
+    // The Skup złomu at level 5 pays half as much again.
+    await (await db())
+      .prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'scrap-bench', 5, 0, 1 FROM characters")
+      .run();
+    assert.deepEqual(stacks(await character()), [
+      ['wolf-pelt:common', 2, 3],
+      ['wolf-pelt:rare', 2, 6],
+    ]);
+    const more = await sell({ key: 'wolf-pelt:rare', count: 2 });
+    assert.deepEqual(more.data.sold, { count: 2, gold: 12 });
+    assert.equal(more.data.character.gold, 18);
+    assert.deepEqual(stacks(more.data.character), [['wolf-pelt:common', 2, 3]]);
   });
 
   test('without the table nothing is made; with it, materials become parts in time, for free', async () => {
