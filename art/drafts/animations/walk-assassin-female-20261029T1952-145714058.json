@@ -1,0 +1,25 @@
+{
+  "id": "walk-assassin-female",
+  "payload": {
+    "prompt": "a young woman in a black hood with a black mask over the mouth, black leather armour, a dagger in each hand",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 145714058,
+    "return_spritesheet": true,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793303706,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 63.59,
+    "request_id": "a8d093a6-21c1-4194-8968-05cc56a30923",
+    "outputs_retained_until": 1793390099
+  }
+}
