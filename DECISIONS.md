@@ -2875,6 +2875,18 @@ Autor: „ej a gra coś zacina, znasz tego powód? długie ladowania itp nie tyl
 2. **Poprawka.** Po pierwszym dotknięciu ładują się tylko odgłosy ciosów i dźwięki nazwane (zakładki, umiejętności): 48 plików zamiast 407. Okrzyki stworów i postaci z danej walki ładują się, gdy powstaje jej odtwarzanie. Rozpakowane zostają okrzyki ostatnich 24 stworów. Kwestia narratora, przeczytana raz, nie zostaje w pamięci. W przeglądarce ze spowolnionym procesorem (jak telefon) start gry trwał 2,9 s, a teraz trwa 0,8 s. Zapytań przy starcie było 502, a jest 143.
 3. **Muzyka.** Utwór miejsca pobiera się w całości przy pierwszym wejściu na jego ekran: 3,6–4,8 MB, w jakości ok. 170 kb/s. Lżejsze pliki (ok. 112 kb/s, o jedną trzecią mniejsze) są propozycją dla autora, bo zmieniają brzmienie jego utworów.
 
+## Ewolucje: balans (29.10.2026, symulacja; zmiany czekają na autora)
+
+`tools/evolution-sim.mjs` porównuje każdą ewolucję z jej klasą bez ewolucji: typowa postać z `tools/simulate.mjs` na danym poziomie, w obszarze dla tego poziomu, z tymi samymi przedmiotami, a Punkty Umiejętności ewolucji są rozdane po równo (40 zwróconych i 1 za każdy poziom klasy od 51.). Narzędzie mierzy omdlenia, XP na godzinę, HP na końcu, długość walki oraz obrażenia zadane i przyjęte w jednostce czasu walki, bo XP na godzinę zależy głównie od liczby walk na wyprawie.
+
+1. **Wyniki** (postacie 50. i 75. poziomu, klasa 56 i 89, po 30–60 godzinnych wypraw): większość ewolucji zadaje od 33% mniej do 34% więcej niż klasa, a obronne (Łowca, Władca Lodu, Arkanista, Truciciel) przyjmują o 20–62% mniej. Najsilniejsze: Inkwizytor (+49% i +112% wobec Kleryka, w liczbach tyle co Barbarzyńca), Snajper (+9% i +53%), Strzelec Burzy (+25% i +45%), Skrytobójca (+16% i +39%).
+2. **Odstają trzy:**
+    - Elementalista mdleje w 5–13% wypraw (Mag wcale) i przyjmuje o 86–128% więcej, bo traci spowolnienie Mroźnego podmuchu;
+    - Strażnik zadaje o 42% mniej niż Wojownik, przyjmuje o 11–13% mniej, a jego walki trwają 1,6–1,7 raza dłużej;
+    - Nocny Tancerz zadaje o 16% mniej niż Cień, a przyjmuje mniej więcej tyle samo.
+3. **Sprawdzone poprawki** (w pamięci, dane bez zmian): spowolnienie Promienia Żywiołów jak w Mroźnym podmuchu (50–69%) daje 0–2% omdleń i o 21–53% więcej przyjętych obrażeń; Wyzwanie z ciosami silniejszymi o 50–100% daje o 6–16% mniej zadanych i o 11–12% mniej przyjętych obrażeń niż u Wojownika oraz więcej HP na końcu; Wir cieni po 30–60% zamiast 20–40% daje o 2–6% mniej zadanych niż u Cienia. Nie pomogły: więcej Siły w przyroście Strażnika, większe odbicie Wyzwania i Niezłomnego ani więcej Witalności Elementalisty.
+4. **Do autora.** Liczby umiejętności ewolucji pochodzą od autora albo z zatwierdzonej propozycji (zob. „Ewolucje: odpowiedzi autora”), więc te zmiany idą jako pytania 134–137 w czacie. Do odpowiedzi gra zostaje bez zmian.
+
 ## Grafiki ewolucji: poprawki po ocenie autora (29.10.2026, na wersji testowej)
 
 Autor o pozycjach 24–42: „kobieta Inkwizytor wyglada jak facet, dorób jej chociaż lekki biust albo coś ręcznie / 24. A / […] / 25 Tak / 26 Popraw / 27 Tak / 28 Tak / 29 Młyn popraw, zlewa się / 30 Tak / 31 Popraw obydwa (pierwsze usuń tylko tło) / 32 Tak / 33 Popraw grot z zadziorem (parę pikseli zbędnych z prawej strony) / 34 Tak / 35 Tak / 36 Tak, tylko wygeneruj jeszcze postać żywiołaka do gry do walki w oparciu o wygląd z umiejętności) / 37 Tak, tylko w Cudzie pozbądź sie zbędnych pikseli / 38 Tak / 39 Tak / 40 Tak / 41 Tak, tylko więcej tego jadu troszkę, a Szlam musi być też postacią w grze do walki / 42 Taniec ostrzy do poprawy”.
