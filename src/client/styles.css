@@ -1166,11 +1166,19 @@ button {
   border-top-color: var(--line);
 }
 
-/* The character bar has its own bark background, as in the mockup. */
+/* The character bar has its own bark background, as in the mockup, and as
+   many equal columns as its tabs (Ewolucja made them five). */
 .nav--character {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
   background: var(--bark);
   border-top-color: var(--bark-line);
+}
+
+/* Five tabs: a little smaller, so "Umiejętności" fits a 360 px phone. */
+.nav--character .nav-item {
+  padding: 0 1px;
+  font-size: 12px;
 }
 
 .nav-item {
@@ -8397,4 +8405,21 @@ a.profession-square:active {
   padding: 8px;
   border: 1px solid var(--gold);
   border-radius: 6px;
+}
+
+/* A gift code (gift-code.js): the field and Odbierz in one row. */
+.gift-code-form {
+  display: flex;
+  gap: 8px;
+}
+
+.gift-code-form input {
+  flex: 1;
+  min-width: 0;
+  text-transform: uppercase;
+}
+
+.gift-code-redeem {
+  flex: none;
+  width: auto;
 }

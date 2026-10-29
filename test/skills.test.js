@@ -199,7 +199,7 @@ describe('skills', () => {
     assert.deepEqual(skillsView(ready, content).evolution, { level: 50, need: 'evolve' });
     const unevolved = applyHunt(ready, { xp: 0, result: 'success' }, content);
     assert.equal(unevolved.classLevel, 50);
-    assert.ok(unevolved.messages.includes('Wojownik: klasa czeka na 50. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach wybierzesz ewolucję. Zdobyte XP klasy nie przepada.'));
+    assert.ok(unevolved.messages.includes('Wojownik: klasa czeka na 50. poziomie, u progu ewolucji. Urośnie dalej, gdy w zakładce Ewolucja wybierzesz ewolucję. Zdobyte XP klasy nie przepada.'));
     const evolved = { ...ready, evolution: 'barbarian', skills: evolvedSkills('barbarian', content) };
     const after = applyHunt(evolved, { xp: 0, result: 'success' }, content);
     assert.equal(after.classLevel, 52);

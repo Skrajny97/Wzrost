@@ -5,8 +5,9 @@
 // skill. Each class level from 10 to 49 brings a Skill Point, and the points
 // raise the learned skills, up to level 20. Both paths and the points are due
 // by the first evolution (class level 50): until then the class waits there,
-// and then for the evolution chosen of the two paths (evolution.js). After
-// it the tab holds the evolution's two skills, up to level 45.
+// and then for the evolution chosen of the two paths in the Ewolucja tab
+// (screens/evolution.js). After it this tab holds the evolution's two
+// skills, up to level 45.
 // The server sends every card ready to show (skillsView in the engine); a tap
 // on a learned skill opens its card. The narrator's tour of the tab
 // (narrator.js) points at the places marked data-guide.
@@ -14,7 +15,6 @@
 import { fill, h } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
 import { skillSprite } from '../art.js';
-import { chooseEvolution, evolutionCard } from '../evolution.js';
 import { motionOn } from '../motion.js';
 import { call, isUnlocked, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from '../ui.js';
@@ -39,7 +39,7 @@ const PATH_LABELS = { main: 'Ścieżka główna', second: 'Ścieżka poboczna', 
 const PATH_ORDER = { main: 0, second: 1, closed: 3 };
 
 // What the class waits for at an evolution level, by the reason's code.
-const WAITS_FOR = { second_path: 'wybierzesz ścieżkę poboczną', skill_points: 'rozdasz Punkty Umiejętności', evolve: 'wybierzesz ewolucję' };
+const WAITS_FOR = { second_path: 'wybierzesz ścieżkę poboczną', skill_points: 'rozdasz Punkty Umiejętności', evolve: 'w zakładce Ewolucja wybierzesz ewolucję' };
 
 export function mountSkills(container) {
   function render() {
@@ -68,34 +68,10 @@ export function mountSkills(container) {
       waiting &&
         systemPanel(`Klasa czeka na ${evolution.level}. poziomie, u progu ewolucji. Urośnie dalej, gdy ${WAITS_FOR[evolution.need]}. Zdobyte XP klasy nie przepada.`),
       busy && systemPanel('Postać jest na wyprawie. Umiejętności zmienisz po jej powrocie.'),
-      evolutionSection(character, busy),
+      evolution.need === 'evolve' && character.classLevel >= evolution.level && h('a', { class: 'button button--system', href: '#/postac/ewolucja', text: 'Przejdź do Ewolucji' }),
       view.pools.map((pool) => (pool.evolution ? evolutionPool(pool, view, busy) : poolSection(pool, view, busy))),
     );
     slidePaths(before);
-  }
-
-  // The evolution: the one taken, with its trait, or the two to choose from
-  // once the class may take one.
-  function evolutionSection(character, busy) {
-    const { current, choices } = character.evolution ?? { current: null, choices: [] };
-    const t = state.content.evolutionTexts;
-    if (current) {
-      return h(
-        'section',
-        { class: 'card evolution-current', 'aria-label': t.title },
-        h('h2', { class: 'card-title', text: current.name }),
-        h('p', { class: 'muted', text: t.baseClass.replace('{className}', character.baseClassName) }),
-        h('p', { class: 'evolution-trait' }, h('strong', { text: `${t.trait}: ${current.trait.name}. ` }), current.trait.text),
-      );
-    }
-    if (choices.length === 0) return null;
-    return h(
-      'section',
-      { class: 'evolution-choice', 'aria-label': t.title },
-      h('h2', { class: 'section-title', text: t.title }),
-      systemPanel(t.intro.replace('{level}', String(character.skills.evolution.level))),
-      choices.map((choice) => evolutionCard(choice, { busy, onChoose: (button, chosen) => chooseEvolution(button, chosen) })),
-    );
   }
 
   // The evolution's two skills, with the points to share between them.

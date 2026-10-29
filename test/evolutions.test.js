@@ -94,6 +94,8 @@ describe('class evolutions in the engine', () => {
     assert.equal(card.pathName, 'Potężny cios');
     assert.equal(card.skills[0].from, 'Potężny cios');
     assert.equal(card.skills[0].effect, 'Cios za 260% obrażeń, który pomija 50% pancerza celu. Cel ma 25% szans stracić najbliższy ruch.');
+    // The author's words for the ceremony.
+    assert.equal(content.evolutionTexts.ceremonyLine, 'Twoja nowa klasa to: {name}. Rozdaj Punkty Umiejętności na nowe zdolności.');
   });
 });
 
@@ -219,8 +221,11 @@ describe('class evolutions through the API', () => {
     await set(`level = 50, class_level = 49, skills = '{"power-strike":20,"unyielding":20}'`);
     assert.deepEqual((await character()).evolution, { current: null, choices: [] });
     assert.equal((await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'barbarian' } })).data.error.code, 'class_level');
+    assert.equal((await character()).features.includes('evolution'), false);
     await set('class_level = 50');
     const before = await character();
+    // The Ewolucja tab opens at class level 50.
+    assert.equal(before.features.includes('evolution'), true);
     assert.deepEqual(before.evolution.choices.map((choice) => choice.name), ['Barbarzyńca', 'Strażnik']);
     assert.equal(before.skills.evolution.need, 'evolve');
     assert.equal((await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'gladiator' } })).status, 400);
@@ -251,6 +256,8 @@ describe('class evolutions through the API', () => {
     assert.equal(taken.status, 200, JSON.stringify(taken.data));
     assert.equal(taken.data.character.className, 'Strażnik');
     assert.equal(taken.data.character.evolutionUndo, true);
+    // A test evolution below class level 50 opens its tab as well.
+    assert.equal(taken.data.character.features.includes('evolution'), true);
     const undone = await call('POST', '/api/evolution/undo', { cookie });
     assert.equal(undone.status, 200, JSON.stringify(undone.data));
     assert.equal(undone.data.character.className, 'Wojownik');

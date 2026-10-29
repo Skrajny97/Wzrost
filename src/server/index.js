@@ -7,6 +7,7 @@ import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { openEncyclopediaChest, readEncyclopedia } from './encyclopedia.js';
 import { takeEvolution, testEvolutions, undoEvolution } from './evolutions.js';
+import { redeemGiftCode } from './gift-codes.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyParts, cancelBuilding, collectProduction, exchangeResources, startBuilding, tradeAtFire } from './camp.js';
 import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
@@ -74,6 +75,7 @@ const routes = [
   ['POST', '/api/evolution', takeEvolution],
   ['GET', '/api/evolution/test', testEvolutions],
   ['POST', '/api/evolution/undo', undoEvolution],
+  ['POST', '/api/gift-code', redeemGiftCode],
   ['POST', '/api/items/:id/equip', equipItem],
   ['POST', '/api/items/:id/unequip', unequipItem],
   ['POST', '/api/items/:id/discard', discardItem],

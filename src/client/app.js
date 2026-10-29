@@ -12,6 +12,7 @@ import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { showQuests, watchQuests } from './quests.js';
 import { mountAuthor } from './screens/author.js';
 import { mountEncyclopedia } from './screens/encyclopedia.js';
+import { mountEvolution } from './screens/evolution.js';
 import { mountCamp } from './screens/camp.js';
 import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
@@ -34,6 +35,7 @@ import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
 import { openEvolutionTests } from './evolution.js';
+import { giftCodeRow } from './gift-code.js';
 import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, skinSwatches, toast, voiceSwitch, withButton } from './ui.js';
 
 const views = {
@@ -50,6 +52,7 @@ const ROUTES = [
   { pattern: /^#\/postac$/, nav: 'character', tab: 'equipment', mount: mountCharacter },
   { pattern: /^#\/postac\/statystyki$/, nav: 'character', tab: 'stats', mount: mountStats },
   { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', music: 'skills', mount: mountSkills },
+  { pattern: /^#\/postac\/ewolucja$/, nav: 'character', tab: 'evolution', music: 'skills', mount: mountEvolution },
   { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: lockedScreen('core', 'Rdzeń') },
   // Profesje, or one profession's screen (Zielarstwo).
   { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', music: 'professions', mount: mountProfessions },
@@ -587,6 +590,7 @@ function openSettings() {
       tradeRows(),
       zoomOffered() && zoomRow(),
       testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
+      giftCodeRow(),
       h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
     ),
     state.user.tutorialTests && h('button', { type: 'button', class: 'button button--system', onClick: openTutorialTests, text: 'Testuj samouczki' }),

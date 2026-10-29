@@ -148,7 +148,7 @@
   "skillCostPool": ["Koszt: {pool} maks. many, raz na walkę."],
   "classWaitsPath": ["{className}: klasa czeka na {level}. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach wybierzesz ścieżkę poboczną. Zdobyte XP klasy nie przepada."],
   "classWaitsPoints": ["{className}: klasa czeka na {level}. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach rozdasz Punkty Umiejętności. Zdobyte XP klasy nie przepada."],
-  "classWaitsEvolution": ["{className}: klasa czeka na {level}. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach wybierzesz ewolucję. Zdobyte XP klasy nie przepada."],
+  "classWaitsEvolution": ["{className}: klasa czeka na {level}. poziomie, u progu ewolucji. Urośnie dalej, gdy w zakładce Ewolucja wybierzesz ewolucję. Zdobyte XP klasy nie przepada."],
   "victory": ["Zwycięstwo.", "Walka skończona. Wygrana."],
   "defeat": ["{target} traci przytomność.", "Ciemność. {target} traci przytomność."],
   "escape": ["{target} ledwo uchodzi z życiem.", "{target} wycofuje się, zanim będzie za późno."],

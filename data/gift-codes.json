@@ -1,0 +1,25 @@
+{
+  "$comment": "Kody podarunkowe (DECISIONS.md, „Kod podarunkowy”). Gracz wpisuje kod w Ustawieniach; wielkość liter, spacje i myślniki nie mają znaczenia. Każdy kod działa raz na konto, do chwili `until` (czas z przesunięciem, np. Warszawy). Nagrody idą do postaci: Punkty Systemu, Punkty Czasu, złoto i zasoby obozu po id z resources.json. Repozytorium jest publiczne, więc kod widać w tym pliku: kod dla wybranych osób trzeba by zapisywać inaczej.",
+  "codes": [
+    {
+      "id": "testers-2026-11",
+      "code": "JESTEMTESTEREM",
+      "until": "2026-11-13T00:00:00+01:00",
+      "rewards": { "systemPoints": 100, "timePoints": 100, "gold": 1000, "resources": { "wood": 100, "stone": 100, "iron-ore": 100 } }
+    }
+  ],
+  "texts": {
+    "title": "Kod podarunkowy",
+    "intro": "Wpisz kod podarunkowy. Każdy kod działa raz na konto.",
+    "placeholder": "Kod",
+    "open": "Wpisz kod",
+    "redeem": "Odbierz",
+    "redeemed": "Kod przyjęty. Odebrano: {rewards}.",
+    "unknown": "Nie ma takiego kodu.",
+    "expired": "Ten kod już wygasł.",
+    "used": "Ten kod został już odebrany na tym koncie.",
+    "systemPoints": "Punkty Systemu",
+    "timePoints": "Punkty Czasu",
+    "gold": "złoto"
+  }
+}

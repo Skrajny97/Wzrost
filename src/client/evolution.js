@@ -64,7 +64,7 @@ export function ceremony(evolution) {
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--system', onClick: closeSheet, text: 'Dalej' })),
     ),
   );
-  afterSheet(() => setMusicPlace(location.hash.startsWith('#/postac/umiejetnosci') ? ['skills'] : []));
+  afterSheet(() => setMusicPlace(/^#\/postac\/(umiejetnosci|ewolucja)/.test(location.hash) ? ['skills'] : []));
 }
 
 // "Testuj ewolucję" on the test version: every evolution of the class to

@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Kody podarunkowe",
+  "description": "Kody wpisywane w Ustawieniach (src/engine/gift-codes.js): każdy raz na konto, do chwili until, z nagrodami dla postaci.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["codes", "texts"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "codes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "code", "until", "rewards"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Stałe id: konto, które odebrało kod, ma je zapisane." },
+          "code": { "type": "string", "pattern": "^[A-Z0-9]{4,32}$", "description": "Kod wielkimi literami, bez spacji." },
+          "until": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(Z|[+-]\\d{2}:\\d{2})$", "description": "Chwila, od której kod już nie działa, np. 2026-11-13T00:00:00+01:00." },
+          "rewards": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "systemPoints": { "type": "integer", "minimum": 0 },
+              "timePoints": { "type": "integer", "minimum": 0 },
+              "gold": { "type": "integer", "minimum": 0 },
+              "resources": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 1 }, "description": "Zasoby obozu po id." }
+            }
+          }
+        }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "intro", "placeholder", "open", "redeem", "redeemed", "unknown", "expired", "used", "systemPoints", "timePoints", "gold"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "intro": { "type": "string", "minLength": 1 },
+        "placeholder": { "type": "string", "minLength": 1 },
+        "open": { "type": "string", "minLength": 1 },
+        "redeem": { "type": "string", "minLength": 1 },
+        "redeemed": { "type": "string", "pattern": "\\{rewards\\}" },
+        "unknown": { "type": "string", "minLength": 1 },
+        "expired": { "type": "string", "minLength": 1 },
+        "used": { "type": "string", "minLength": 1 },
+        "systemPoints": { "type": "string", "minLength": 1 },
+        "timePoints": { "type": "string", "minLength": 1 },
+        "gold": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -37,6 +37,7 @@ const CHARACTER_TABS = [
   { id: 'back', label: 'Powrót', icon: 'back' },
   { id: 'stats', label: 'Statystyki', icon: 'stats', href: '#/postac/statystyki', unlock: 'stats' },
   { id: 'skills', label: 'Umiejętności', icon: 'skills', href: '#/postac/umiejetnosci', unlock: 'skills' },
+  { id: 'evolution', label: 'Ewolucja', icon: 'evolution', href: '#/postac/ewolucja', unlock: 'evolution' },
   { id: 'core', label: 'Rdzeń', icon: 'core', href: '#/postac/rdzen', unlock: 'core', system: true },
 ];
 
@@ -293,11 +294,13 @@ export function updateTopbar(now = serverNow()) {
 
 // Builds a bottom bar; `active` is the id of the highlighted tab.
 // Free stat points light Postać and Statystyki with a gold dot, a skill to
-// choose or a Skill Point to spend lights Postać and Umiejętności, and a
-// message someone wrote in the chat lights Społeczność (chat-news.js), as a
-// quest's reward lights the narrator's face in the top bar.
+// choose or a Skill Point to spend lights Postać and Umiejętności, an
+// evolution to choose lights Postać and Ewolucja, and a message someone wrote
+// in the chat lights Społeczność (chat-news.js), as a quest's reward lights
+// the narrator's face in the top bar.
 const pointsWaiting = () => (state.character?.freePoints ?? 0) > 0 && isUnlocked('stats');
 const skillsWaiting = () => Boolean(state.character?.skills?.ready) && isUnlocked('skills');
+const evolutionWaiting = () => (state.character?.evolution?.choices?.length ?? 0) > 0 && isUnlocked('evolution');
 // While the character explores or works in a profession, the tab of that
 // activity counts its time down in the System's light, as the camp counts a
 // build; then a dot says the report waits (updateNavTimers, every second).
@@ -315,18 +318,21 @@ function tabTime(id, now = serverNow()) {
   return { work, running, ready };
 }
 const WAITING = {
-  postac: () => pointsWaiting() || skillsWaiting(),
+  postac: () => pointsWaiting() || skillsWaiting() || evolutionWaiting(),
   stats: pointsWaiting,
   skills: skillsWaiting,
+  evolution: evolutionWaiting,
   spolecznosc: communityNews,
   walka: () => tabTime('walka').ready,
   profesje: () => tabTime('profesje').ready,
 };
-const WAITING_TEXTS = { walka: 'raport czeka', profesje: 'raport czeka' };
-const waitingText = (id) =>
-  id === 'spolecznosc'
-    ? communityNewsText()
-    : (WAITING_TEXTS[id] ?? (id === 'skills' || (id === 'postac' && !pointsWaiting()) ? 'umiejętność czeka' : 'wolne punkty do rozdania'));
+const WAITING_TEXTS = { walka: 'raport czeka', profesje: 'raport czeka', evolution: 'ewolucja czeka' };
+function waitingText(id) {
+  if (id === 'spolecznosc') return communityNewsText();
+  if (WAITING_TEXTS[id]) return WAITING_TEXTS[id];
+  if (id === 'postac' && !pointsWaiting() && !skillsWaiting()) return WAITING_TEXTS.evolution;
+  return id === 'skills' || (id === 'postac' && !pointsWaiting()) ? 'umiejętność czeka' : 'wolne punkty do rozdania';
+}
 
 function navButton(tab, active, onBack) {
   const unlocked = !tab.unlock || isUnlocked(tab.unlock);

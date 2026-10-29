@@ -34,6 +34,7 @@ import community from '../../data/community.json' with { type: 'json' };
 import events from '../../data/events.json' with { type: 'json' };
 import encyclopedia from '../../data/encyclopedia.json' with { type: 'json' };
 import evolutions from '../../data/evolutions.json' with { type: 'json' };
+import giftCodes from '../../data/gift-codes.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -63,6 +64,7 @@ export const content = buildContent({
   events,
   encyclopedia,
   evolutions,
+  'gift-codes': giftCodes,
 });
 
 // The parts of the game this deployment has on, for the System's messages
@@ -106,6 +108,7 @@ export function publicContent() {
     })),
     // The words of the class evolutions' choice and ceremony.
     evolutionTexts: content.evolutionTexts,
+    giftTexts: content.giftTexts,
     elements: content.elements.map(({ id, name, resistance, color }) => ({ id, name, resistance, color })),
     effects: content.effects.map(({ id, name, color }) => ({ id, name, color })),
     slots: content.slots,

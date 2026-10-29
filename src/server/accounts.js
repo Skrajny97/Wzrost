@@ -211,6 +211,7 @@ export async function deleteAccount(context) {
     db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(id),
+    db.prepare('DELETE FROM gift_codes_used WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM login_failures WHERE identifier IN (?, ?)').bind(login.toLowerCase(), email ?? ''),
     db.prepare('DELETE FROM users WHERE id = ?').bind(id),
   ]);

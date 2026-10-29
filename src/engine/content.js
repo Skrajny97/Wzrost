@@ -129,6 +129,10 @@ export function buildContent(raw) {
       ? { skillMaxLevel: raw.evolutions.skillMaxLevel, lastPointClassLevel: raw.evolutions.lastPointClassLevel, pointsPerClassLevel: raw.evolutions.pointsPerClassLevel }
       : null,
     evolutionTexts: raw.evolutions?.texts ?? null,
+    // The gift codes typed in the settings (gift-codes.js); only their
+    // texts go to the page.
+    giftCodes: raw['gift-codes']?.codes ?? [],
+    giftTexts: raw['gift-codes']?.texts ?? null,
     // The professions, the System's words over them, the herbs gathered in
     // them, the gathering and the texts of their reports (professions.js),
     // and the brewing with its potions (brewing.js).

@@ -24,6 +24,12 @@
     "message": "Odblokowano Umiejętności. Wybierz jedną z trzech w zakładce Postać, w Umiejętnościach."
   },
   {
+    "id": "evolution",
+    "name": "Ewolucja",
+    "classLevel": 50,
+    "message": "Odblokowano Ewolucję. Gdy obie ścieżki będą gotowe, wybierzesz ewolucję klasy w zakładce Postać, w Ewolucji."
+  },
+  {
     "id": "professions",
     "name": "Profesje",
     "level": 10,

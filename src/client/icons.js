@@ -25,6 +25,8 @@ export const ICONS = {
   stats: [path('M5 20V11M12 20V4M19 20v-7')],
   skills: [path('M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z')],
   core: [path('M12 2l8 4.5v11L12 22l-8-4.5v-11z'), path('M12 7l4 2.5v5L12 17l-4-2.5v-5z')],
+  // Ewolucja: the class climbs a step.
+  evolution: [path('M5 12.5l7-7 7 7'), path('M5 19.5l7-7 7 7')],
   // The Sklep Systemu: a market stall with the System's sign under its awning.
   shop: [
     path('M4.5 9L6 4.5h12L19.5 9'),

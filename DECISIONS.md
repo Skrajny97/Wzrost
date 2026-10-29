@@ -2833,6 +2833,20 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
     - Krainy w zakładce Bestiariusz zwijają się tak samo. Na start rozwinięta jest kraina poziomu postaci i każda z czekającą skrzynią.
     - Gra pamięta, co gracz zwinął albo rozwinął, dopóki jest otwarta.
 
+## Uwagi autora: kod podarunkowy i zakładka Ewolucja (29.10.2026, na wersji testowej)
+
+1. **Kod podarunkowy.** Autor: „Wygeneruj tez w ustawieniach opcje dodania gift code: JESTEMTESTEREM. Pozniej w przyszłości moze inne jeszcze ale na razie ten. Niech daje 100 Punktów Systemu, 100 Punktów Czasu, 1000 złota i po 100 każdego z zasobów. Niech ma ważność 2 tygodnie, licząc od jutra. I oczywiscie ten gift code jednorazowy.”
+    - W Ustawieniach jest wiersz „Kod podarunkowy” z przyciskiem „Wpisz kod”. Wielkość liter, spacje i myślniki nie mają znaczenia. Po przyjęciu kodu komunikat wymienia nagrody.
+    - „Jednorazowy” znaczy raz na konto (brakujący szczegół): kod odebrany raz nie działa ponownie ani po „Zacznij od nowa”, ani dla nowej postaci tego konta. Nagrody idą do postaci, a zasoby to drewno, kamień i ruda żelaza.
+    - „2 tygodnie, licząc od jutra”: kod działa do końca 12 listopada 2026 czasu polskiego, czyli 14 dni od 30 października (brakujący szczegół). Działa też od razu po wdrożeniu, żeby autor mógł go sprawdzić.
+    - Kody są w `data/gift-codes.json`, a kto odebrał który, zapisuje tabela `gift_codes_used`, kasowana razem z kontem. Repozytorium jest publiczne, więc kod w nim widać. Kodowi dla testerów to nie szkodzi, ale kod tylko dla wybranych osób trzeba by zapisać inaczej, np. jako skrót.
+2. **Zakładka Ewolucja.** Autor: „Do Ewolucji (klasy) będzie trzeba zrobić zablokowany do poz.50 klasy modul osobny w zakładce postaci. Między Rdzeniem (który przyjdzie później) a Umiejętnościami.”
+    - Pasek Postaci ma teraz pięć zakładek: Powrót, Statystyki, Umiejętności, Ewolucja, Rdzeń. Ewolucja jest zablokowana do 50. poziomu klasy, a na 50. poziomie przychodzi wiadomość Systemu o jej odblokowaniu.
+    - W zakładce są karty dwóch ewolucji do wybrania, gdy obie ścieżki są gotowe, a po wyborze karta ewolucji. Dopóki ścieżki nie są gotowe, zakładka mówi, czego brakuje, i prowadzi do Umiejętności. W Umiejętnościach zostają same umiejętności i punkty.
+    - Złota kropka na zakładce Ewolucja i na Postaci znaczy, że ewolucja czeka na wybór. Ewolucja wypróbowana przez „Testuj ewolucję” poniżej 50. poziomu też otwiera zakładkę.
+    - Napisy na pasku są o włos mniejsze, żeby „Umiejętności” mieściły się na wąskim telefonie.
+3. **Zdanie ceremonii.** Autor: „albo "Rozdaj Punkty Umiejętności na nowe zdolności" lepiej”. Karta ceremonii mówi teraz: „Twoja nowa klasa to: {nazwa}. Rozdaj Punkty Umiejętności na nowe zdolności.” To samo zdanie stoi w zakładce Ewolucja, dopóki zostają punkty do rozdania.
+
 ## Ewolucje: walka (29.10.2026, na wersji testowej)
 
 Wszystkie 30 umiejętności ewolucji i 15 cech działa w walce (`src/engine/combat.js`), a odtwarzanie walki pokazuje ich skutki. Liczby są robocze, do symulacji balansu (krok D). Brakujące szczegóły, rozstrzygnięte najprościej:
@@ -2854,7 +2868,7 @@ Wszystkie 30 umiejętności ewolucji i 15 cech działa w walce (`src/engine/comb
 
 Ewolucje według „Ewolucji: odpowiedzi autora” i zatwierdzonej propozycji (cechy, przyrost statystyk, umiejętności). Dane są w `data/evolutions.json`, zasady w `src/engine/evolutions.js`. Liczby to brakujące szczegóły, rozstrzygnięte najprościej, do ustawienia w symulacji.
 
-1. **Wybór.** Na 50. poziomie klasy, gdy obie ścieżki są wybrane, a punkty rozdane, gracz widzi w Umiejętnościach dwie ewolucje swoich ścieżek, główną pierwszą. Każda karta ma przyrost statystyk, cechę i dwie umiejętności z liczbami na 45. poziomie. Wybór jest na stałe i potwierdzony jeszcze raz.
+1. **Wybór.** Na 50. poziomie klasy, gdy obie ścieżki są wybrane, a punkty rozdane, gracz widzi w zakładce Ewolucja (zob. „Uwagi autora: kod podarunkowy i zakładka Ewolucja”) dwie ewolucje swoich ścieżek, główną pierwszą. Każda karta ma przyrost statystyk, cechę i dwie umiejętności z liczbami na 45. poziomie. Wybór jest na stałe i potwierdzony jeszcze raz.
     - Klasa czeka na 50. poziomie, aż gracz wybierze ewolucję, tak jak dziś czeka na drugą ścieżkę i punkty (brakujący szczegół). Zdobyte XP klasy nie przepada.
     - Postać, która przekroczyła już 50. poziom bez ewolucji, wybiera ją w każdej chwili. Przyrost ewolucji liczy się wtedy od 51. poziomu.
 2. **Umiejętności i punkty.** Obie dotychczasowe umiejętności znikają, a w ich miejsce wchodzą dwie umiejętności ewolucji na poziomie 0. Wraca 40 Punktów Umiejętności, a poziomy klasy 50–99 dają po jednym, razem 90 na dwie umiejętności po 45 poziomów.
@@ -2862,7 +2876,7 @@ Ewolucje według „Ewolucji: odpowiedzi autora” i zatwierdzonej propozycji (c
     - Na 100. poziomie klasa czeka, dopóki zostają punkty (E8).
 3. **Statystyki.** Od 51. poziomu klasy statystyki rosną według ewolucji, a nie klasy. HP i mana na poziom klasy zostają jak w klasie, a Arkanista dostaje 4 many zamiast 3 (brakujący szczegół).
 4. **Nazwa.** Górny pasek pokazuje trzy pierwsze litery ewolucji, np. „BAR”, ranking jej pełną nazwę, a karta postaci dopisek „z klasy: Wojownik”. Czat zostaje przy znaku klasy.
-5. **Ceremonia.** Po wyborze otwiera się karta Systemu z nazwą ewolucji i cechą, a gra muzyka autora „Ewolucja klasy” (`evolution-v1`). Zdanie karty jest od autora: „Twoja nowa klasa to: Barbarzyńca. Rozdaj Punkty Umiejętności po ewolucji.” (autor: „Zamiast "Twoja klasa staje się:" to "Twoja nowa klasa to:" i po prostu "Rozdaj Punkty Umiejętności po ewolucji."”). Po zamknięciu karty wraca muzyka zakładki. Na razie ceremonia jest bez głosu narratora (brakujący szczegół): kwestie można dodać po zatwierdzeniu tekstów.
+5. **Ceremonia.** Po wyborze otwiera się karta Systemu z nazwą ewolucji i cechą, a gra muzyka autora „Ewolucja klasy” (`evolution-v1`). Zdanie karty jest od autora: „Twoja nowa klasa to: Barbarzyńca. Rozdaj Punkty Umiejętności na nowe zdolności.” (autor: „Zamiast "Twoja klasa staje się:" to "Twoja nowa klasa to:"”, a potem: „albo "Rozdaj Punkty Umiejętności na nowe zdolności" lepiej”). Po zamknięciu karty wraca muzyka zakładki. Na razie ceremonia jest bez głosu narratora (brakujący szczegół): kwestie można dodać po zatwierdzeniu tekstów.
 6. **Testuj ewolucję** (wersja testowa, przycisk w Ustawieniach, obok „Testuj samouczki”). Daje każdą z trzech ewolucji klasy na dowolnym poziomie klasy. „Cofnij ewolucję” przywraca umiejętności sprzed testu.
 7. **Teksty i grafiki.** Zdania fabularne pod nazwami umiejętności ewolucji są robocze, do oceny autora. Do czasu nowych ikon rozwinięta umiejętność ma ikonę tej, z której wyrasta, a nowa pierwszą literę. Portrety ewolucji przyjdą osobno.
 8. **Walka.** Skutki umiejętności i cech działają w walce, zob. „Ewolucje: walka”.

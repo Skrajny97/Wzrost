@@ -13,10 +13,10 @@ export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
-  'events', 'encyclopedia', 'evolutions',
+  'events', 'encyclopedia', 'evolutions', 'gift-codes',
 ];
 // Unlocks the code refers to by id.
-const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'professions', 'settlement', 'dungeons', 'core'];
+const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'dungeons', 'core'];
 const POSITIONS = ['front', 'middle', 'back'];
 
 function readJson(path) {
@@ -318,6 +318,22 @@ function checkReferences(data) {
   }
 
   errors.push(...checkEvolutions(data, { classIds, effectIds, elements, stats }));
+
+  // Gift codes: their own ids and codes, a date they end at, and camp
+  // resources there are.
+  {
+    const codes = data['gift-codes'].codes;
+    uniqueIds(errors, 'gift-codes', codes);
+    const typed = new Set();
+    for (const gift of codes) {
+      if (typed.has(gift.code)) errors.push(`gift-codes.json: kod ${gift.code} powtarza się`);
+      typed.add(gift.code);
+      if (Number.isNaN(Date.parse(gift.until))) errors.push(`gift-codes.json: ${gift.id} ma nieczytelną datę końca "${gift.until}"`);
+      for (const id of Object.keys(gift.rewards.resources ?? {})) {
+        if (!resources.has(id)) errors.push(`gift-codes.json: ${gift.id} daje nieznany zasób "${id}"`);
+      }
+    }
+  }
 
   // Every class has something for each slot its armour fills: a class
   // without a helmet of its own would leave the slot empty for good.

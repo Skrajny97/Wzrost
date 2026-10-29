@@ -801,7 +801,9 @@ export function characterView(player, now) {
         },
     mana: values.mana,
     maxMana: values.mana,
-    features: unlockedFeatures(row.level, content, row.class_level),
+    // An evolution tried below its class level on the test version opens
+    // its tab too.
+    features: [...new Set([...unlockedFeatures(row.level, content, row.class_level), ...(row.evolution ? ['evolution'] : [])])],
     huntDurations: huntDurations(row.level, content),
     // Szybkie Polowania left today (hunts.js), or null below their level.
     quickHunts: quickHuntsView(row, now),
