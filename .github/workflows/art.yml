@@ -16,6 +16,7 @@ on:
           - monsters
           - items
           - portraits
+          - evolutions
           - materials
           - resources
           - narrator
