@@ -10,7 +10,7 @@ import { h, icon } from './dom.js';
 import { CLASS_ICONS } from './icons.js';
 import { motionOn } from './motion.js';
 import { lookOf, skillEffects } from './skill-fx.js';
-import { playHit, playMoment, playSound, playVoice } from './sound.js';
+import { playHit, playMoment, playSound, playVoice, preloadVoices } from './sound.js';
 import { state } from './state.js';
 
 const FIELDS = [
@@ -54,6 +54,7 @@ const voiceOf = (unit) => unit.monsterId ?? unit.appearance ?? null;
 
 export function createArena(fight, { autoplay = 'visible' } = {}) {
   const units = [...fight.enemies, ...fight.allies];
+  preloadVoices(units.map(voiceOf));
   const byId = new Map(units.map((unit) => [unit.id, unit]));
   const cards = new Map();
   const running = new Set();

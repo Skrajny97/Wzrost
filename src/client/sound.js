@@ -228,13 +228,39 @@ export function setRecordings(sounds) {
   loadRecordings();
 }
 
-// Decodes every recording once, after the first touch (they are small).
+// After the first touch, decodes the blows and the named effects, which any
+// screen may play. The creatures' voices wait for a fight with them
+// (preloadVoices): there are hundreds, and decoded all at once at every
+// start they slowed the game down on phones.
 function loadRecordings() {
   if (!recordings || !context) return;
-  const voices = Object.values(recordings.voices).flatMap((voice) => Object.values(voice));
-  const all = [...Object.values(recordings.sounds), ...Object.values(recordings.effects ?? {}), ...voices];
+  const all = [...Object.values(recordings.sounds), ...Object.values(recordings.effects ?? {})];
   for (const file of new Set(all.flatMap((sound) => sound.files))) decode(file);
+  preloadVoices([...wantedVoices]);
 }
+
+// The voices of the creatures and characters of a fight (by creature id or
+// look), decoded ahead of its playback. Only the voices of the last few
+// fights are kept decoded.
+const KEPT_VOICES = 24;
+const wantedVoices = new Set(); // in the order asked for, the newest last
+export function preloadVoices(whos) {
+  if (!recordings) return;
+  for (const who of whos) {
+    if (!who || !recordings.voices[who]) continue;
+    wantedVoices.delete(who);
+    wantedVoices.add(who);
+  }
+  while (wantedVoices.size > KEPT_VOICES) {
+    const oldest = wantedVoices.values().next().value;
+    wantedVoices.delete(oldest);
+    for (const file of voiceFiles(oldest)) buffers.delete(file);
+  }
+  if (!context) return;
+  for (const who of whos) if (wantedVoices.has(who)) for (const file of voiceFiles(who)) decode(file);
+}
+
+const voiceFiles = (who) => Object.values(recordings.voices[who] ?? {}).flatMap((voice) => voice.files);
 
 // A recording decoded once: the sound, or the promise of it (null when it
 // cannot be had).
@@ -248,11 +274,12 @@ function decode(file) {
     // The callback form also works in older Safari.
     .then((data) => new Promise((resolve, reject) => context.decodeAudioData(data, resolve, reject)))
     .then((buffer) => {
-      buffers.set(file, buffer);
+      // Not kept if it was let go while it was being decoded.
+      if (buffers.get(file) === loading) buffers.set(file, buffer);
       return buffer;
     })
     .catch(() => {
-      buffers.delete(file);
+      if (buffers.get(file) === loading) buffers.delete(file);
       return null;
     });
   buffers.set(file, loading);
@@ -317,7 +344,7 @@ export function playNarration(file, { onStart, onEnd } = {}) {
     onEnd?.();
     return;
   }
-  const current = { source: null, stopped: false, onEnd };
+  const current = { source: null, stopped: false, onEnd, file };
   narration = current;
   Promise.resolve(decode(file)).then((buffer) => {
     if (current.stopped || narration !== current) return;
@@ -354,6 +381,8 @@ export function stopNarration() {
   } catch {
     // Already over.
   }
+  // A line is read once: its decoded sound, seconds long, is let go.
+  if (current.source) buffers.delete(current.file);
   current.onEnd?.();
 }
 
