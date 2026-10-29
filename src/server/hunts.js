@@ -3,7 +3,6 @@
 
 import {
   addQuestProgress,
-  addSpeed,
   applyHunt,
   areaFor,
   areasOpened,
@@ -12,8 +11,12 @@ import {
   autoEquip,
   bagCapacity,
   bagOverflow,
+  bagStacks,
+  buffWindows,
   campBonus,
   campLevels,
+  carryLimit,
+  countList,
   durationsUpTo,
   estimateThreat,
   fightKind,
@@ -29,16 +32,20 @@ import {
   longestHunt,
   lowerThreat,
   nextHuntUnlock,
+  optionWindows,
   potionsPerKind,
   questCreatures,
   questPeriod,
   rareCatchUp,
   sellPrice,
   resolveEvent,
+  returnWindows,
   simulateHunt,
-  speedWindow,
+  spendWindows,
+  storeStacks,
   threatSamples,
 } from '../engine/index.js';
+import { say } from '../engine/text.js';
 import { finishBrewing } from './brewing.js';
 import { content } from './content.js';
 import {
@@ -59,7 +66,7 @@ import { ApiError, json, readJson } from './http.js';
 import { eventDraftsOn, eventsOn } from './features.js';
 import { soldGold } from './inventory.js';
 import { finishGathering } from './professions.js';
-import { knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
+import { herbsOf, knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
 import { KEPT_REPORTS } from './reports.js';
 import { finishCrafting } from './workshop.js';
 
@@ -98,7 +105,7 @@ function healingFor(player, params) {
 
 // The potions an exploration of `minutes` takes along (potions.js): known
 // ones that work in fights, of each at most as many as the character has
-// and as the exploration has fights.
+// and as the exploration has fights, and one fern brew.
 function takenPotions(player, asked, minutes) {
   if (asked === undefined || asked === null) return {};
   if (typeof asked !== 'object' || Array.isArray(asked)) throw new ApiError(400, 'invalid_potions', 'Wybierz mikstury na wyprawę.');
@@ -108,7 +115,7 @@ function takenPotions(player, asked, minutes) {
   for (const [id, count] of Object.entries(asked)) {
     const potion = content.potionsById[id];
     if (!potion || !fightKind(potion)) throw new ApiError(400, 'invalid_potions', 'Tej mikstury nie zabiera się na wyprawę.');
-    const limit = Math.min(have[id] ?? 0, most);
+    const limit = Math.min(have[id] ?? 0, carryLimit(potion, most));
     if (!Number.isInteger(count) || count < 0 || count > limit) throw new ApiError(400, 'invalid_potions', `Zabierz od 0 do ${limit} sztuk.`);
     // One got in a Wymiana waits for its recipe (DECISIONS.md, "Wymiana").
     if (count > 0 && !potionKnown(player.row, potion)) throw new ApiError(400, 'unknown_recipe', `Nie znasz jeszcze receptury: ${potion.name}.`);
@@ -201,7 +208,8 @@ export async function startHunt(context) {
 // elite and the champion when asked (avoidRare) or seeking them (seekRare),
 // and tracking the creatures the quests ask for (trackQuests): those living
 // there are kept with it, as are the potions taken along (potions), the
-// healing mark (healBelow) and a speed potion drunk before (potions.js).
+// healing mark (healBelow) and the potions for a time drunk before
+// (potions.js).
 // The skipped introduction sends the first one this way too (tutorial.js).
 // A Szybkie Polowanie (`quick`) is over as it starts: it began `minutes`
 // ago.
@@ -232,13 +240,14 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
     throw new ApiError(400, 'invalid_heal_below', 'Wybierz próg mikstury leczenia.');
   }
   const taken = takenPotions(player, potions, minutes);
-  // A speed potion drunk before covers what it can of the exploration, and
-  // that much of its time is used up (potions.js).
+  // The potions for a time drunk before cover what they can of the
+  // exploration, and that much of their time is used up (potions.js).
   const buffs = buffsOf(player.row, now);
-  const speed = speedWindow(buffs, minutes);
+  const windows = buffWindows(buffs, minutes);
+  const timed = Object.keys(windows).length > 0;
   const options = {
     ...(Object.keys(taken).length > 0 && { potions: taken, healBelow: healBelow ?? content.potionUse.healBelow }),
-    ...(speed && { speed }),
+    ...(timed && { buffs: windows }),
     ...(quick && { quick }),
   };
   const startsAt = quick ? now - minutes * 60000 : now;
@@ -268,8 +277,8 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
         ),
       // The HP rested so far is saved now, so it is not counted again later.
       db
-        .prepare(`UPDATE characters SET hp = ?, hp_at = ?${speed ? ', buffs = ?' : ''}, version = version + 1 WHERE id = ?`)
-        .bind(hp, now, ...(speed ? [JSON.stringify(addSpeed(buffs, -speed.ms))] : []), player.row.id),
+        .prepare(`UPDATE characters SET hp = ?, hp_at = ?${timed ? ', buffs = ?' : ''}, version = version + 1 WHERE id = ?`)
+        .bind(hp, now, ...(timed ? [JSON.stringify(spendWindows(buffs, windows))] : []), player.row.id),
     ]);
   } catch (error) {
     if (String(error?.message).includes('constraint')) {
@@ -281,8 +290,8 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
 
 // Calling the character back early gives nothing and costs nothing. A
 // brewing keeps the potions done and an order in the Warsztat the items
-// done, with their report (brewing.js, workshop.js), and a speed potion the
-// time not used.
+// done, with their report (brewing.js, workshop.js), and the potions for a
+// time the time they did not use.
 export async function cancelHunt(context) {
   const { session, player } = await requirePlayer(context);
   const activity = player.activity;
@@ -300,16 +309,17 @@ export async function cancelHunt(context) {
       character: characterView(await loadPlayer(db, session.userId), context.now),
     });
   }
-  // A speed potion gets back the time the exploration did not use.
-  const window = JSON.parse(activity.options ?? '{}').speed;
-  const unused = window ? Math.max(0, window.ms - (context.now - activity.started_at)) : 0;
+  // The potions for a time get back the time the exploration did not use.
+  const windows = optionWindows(JSON.parse(activity.options ?? '{}'));
+  const used = context.now - activity.started_at;
+  const unused = Object.values(windows).some((window) => window.ms > used);
   await db.batch([
     db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(player.row.id, activity.started_at),
-    ...(unused > 0
+    ...(unused
       ? [
           db
             .prepare('UPDATE characters SET buffs = ?, version = version + 1 WHERE id = ?')
-            .bind(JSON.stringify(addSpeed(buffsOf(player.row, context.now), unused, window.bonus)), player.row.id),
+            .bind(JSON.stringify(returnWindows(buffsOf(player.row, context.now), windows, used)), player.row.id),
         ]
       : []),
   ]);
@@ -351,7 +361,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const area = areaFor(activity.region_id, row.level, content);
   // The very first exploration, before any report, goes one way (simulateHunt).
   const first = !(await db.prepare('SELECT 1 AS found FROM reports WHERE character_id = ? LIMIT 1').bind(row.id).first());
-  // The potions taken along and a speed potion's window (beginHunt).
+  // The potions taken along and the windows of the potions for a time
+  // (beginHunt).
   const options = JSON.parse(activity.options ?? '{}');
   let hunt = simulateHunt(
     {
@@ -371,7 +382,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       met: JSON.parse(row.met ?? '[]'),
       potions: options.potions ?? {},
       healBelow: options.healBelow,
-      speed: options.speed ?? null,
+      buffs: optionWindows(options),
     },
     content,
   );
@@ -401,10 +412,23 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const autoEquipped = autoEquip(equippedItems(player), hunt.items, content, row.class_id, row.class_level);
   // The rest goes to the bag. When it does not fit, the scrapper buys the
   // weakest items, old or new, at the camp's price. Herbs keep the places
-  // their stacks take.
+  // their stacks take, and an event's herbs (the Kwiat paproci) take theirs
+  // first; what finds no place at all is lost, said after the event's words.
   const levels = campLevels(player.buildings, now, content);
   const bag = player.items.filter((item) => !item.equippedSlot);
-  const capacity = bagCapacity(levels, content) - (bagPlaces(player) - bag.length);
+  const free = bagCapacity(levels, content) - (bagPlaces(player) - bag.length);
+  const herbsBefore = herbsOf(row);
+  const herbs = storeStacks(herbsBefore, hunt.herbs ?? {}, free, content);
+  const capacity = free - (bagStacks(herbs.after, content) - bagStacks(herbsBefore, content));
+  if (Object.keys(herbs.lost).length > 0) {
+    const lost = say(content.professionTexts, 'lost', 0, { herbs: countList(herbs.lost, content.herbsById) });
+    const told = (text) => `${text} ${lost}`;
+    hunt = {
+      ...hunt,
+      entries: hunt.entries.map((entry) => (entry.type === 'event' ? { ...entry, text: told(entry.text) } : entry)),
+      event: { ...hunt.event, option: { ...hunt.event.option, text: told(hunt.event.option.text) } },
+    };
+  }
   const sellBonus = campBonus(levels, 'sellPrice', content);
   const toBag = hunt.items.map((item, index) => index).filter((index) => !autoEquipped.includes(index));
   const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
@@ -474,6 +498,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const setMaterials = left.length
     ? `, materials = json_set(materials, ${left.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})`
     : '';
+  // An event's herbs that found their places.
+  const storedHerbs = Object.entries(herbs.stored);
+  const setHerbs = storedHerbs.length ? `, herbs = json_set(herbs, ${storedHerbs.map(() => '?, COALESCE(json_extract(herbs, ?), 0) + ?').join(', ')})` : '';
   let results;
   try {
     results = await db.batch([
@@ -490,7 +517,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       ),
       db
         .prepare(
-          `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ? + ${storedPrice.sql}${setResources}${setMaterials},
+          `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ? + ${storedPrice.sql}${setResources}${setMaterials}${setHerbs},
              time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${drunk.length > 0 ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''},
              version = version + 1
            WHERE id = ?`,
@@ -504,6 +531,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
           ...storedPrice.binds,
           ...found.flatMap(([id, amount]) => [resourcePath(id), resourcePath(id), amount]),
           ...left.flatMap(([key, count]) => [resourcePath(key), resourcePath(key), count]),
+          ...storedHerbs.flatMap(([id, count]) => [resourcePath(id), resourcePath(id), count]),
           applied.timePoints,
           hp,
           activity.ends_at,

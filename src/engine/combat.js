@@ -17,7 +17,13 @@
 //
 // A character may carry potions (potions.js): a healing one is drunk the
 // moment HP falls below the player's mark, a mana one when a skill lacks
-// mana, each kind at most once a fight. Potions draw no random numbers.
+// mana, an antidote the moment the effect it cures lands (it then keeps the
+// effect off to the end of the fight) and a fern brew the moment the
+// character faints (it rises with a share of its HP), each kind at most once
+// a fight. Potions drunk before an exploration may also have strengthened
+// its blows (`damageBonus`), coated its blade or warded it from magic
+// (`ward`: a share less of every magical blow). Potions draw no random
+// numbers of their own.
 //
 // A monster's blow may also mire its target (`slow`: Ugrzęźnięcie puts off
 // its next move, as a skill's slow does), heal the monster by a share of the
@@ -113,7 +119,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   // For skills: the fight's mana, the unit's own moves so far and the effects
   // of the skills that woke; each skill knows the move it is ready again from.
   if (skilled) {
-    for (const unit of units) Object.assign(unit, { mana: unit.maxMana ?? 0, moves: 0, damageBonus: 0, guard: null, shield: null, evade: null });
+    for (const unit of units) Object.assign(unit, { mana: unit.maxMana ?? 0, moves: 0, damageBonus: unit.damageBonus ?? 0, guard: null, shield: null, evade: null });
   }
   for (const unit of units) unit.next = unit.interval * (0.5 + 0.5 * rng.next());
   // An ambush (an event's, events.js): every enemy moves before the allies'
@@ -152,8 +158,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     taken[target.id] += amount;
   };
 
-  // A potion of a kind (`heal` or `mana`) the unit carries and has not drunk
-  // yet in this fight. Gives whether it drank.
+  // A potion of a kind (`heal`, `mana`, `cure` or `revive`) the unit carries
+  // and has not drunk yet in this fight. Gives whether it drank.
   const drink = (unit, kind, t) => {
     const potion = unit.potions?.[kind];
     if (!potion || drank.has(`${unit.id}:${kind}`)) return false;
@@ -164,6 +170,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     if (kind === 'heal') {
       const amount = heal(unit, potion.amount * unit.maxHp);
       log(() => ({ t, kind: 'potion', effect: 'heal', actor: unit.id, target: unit.id, potion: potion.id, amount, hp: unit.hp, text: say(potionTexts, 'drinkHeal', actions, { ...vars, amount }) }));
+    } else if (kind === 'cure') {
+      // The effect goes and stays off to the end of the fight.
+      const effect = content.effectsById[potion.cures];
+      unit.dots = unit.dots.filter((dot) => dot.effect !== effect.id);
+      unit.cured = effect.id;
+      log(() => ({ t, kind: 'potion', effect: 'cure', actor: unit.id, target: unit.id, potion: potion.id, cleared: effect.name, hp: unit.hp, text: say(potionTexts, 'drinkCure', actions, vars) }));
+    } else if (kind === 'revive') {
+      unit.hp = Math.max(1, Math.round(potion.amount * unit.maxHp));
+      const amount = unit.hp;
+      log(() => ({ t, kind: 'potion', effect: 'revive', actor: unit.id, target: unit.id, potion: potion.id, amount, hp: unit.hp, text: say(potionTexts, 'drinkRevive', actions, { ...vars, amount }) }));
     } else {
       const before = unit.mana;
       unit.mana = Math.min(unit.maxMana ?? 0, unit.mana + Math.round(potion.amount * (unit.maxMana ?? 0)));
@@ -177,6 +193,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   const healPotion = (unit, t) => {
     if (unit.hp > 0 && unit.hp < unit.potions.heal.below * unit.maxHp) drink(unit, 'heal', t);
   };
+
+  // A fern brew the moment the unit faints: it rises instead.
+  const revived = (unit, t) => Boolean(unit.potions?.revive) && drink(unit, 'revive', t);
 
   // Mana enough for `need`, from a mana potion when short of it.
   const manaFor = (unit, need, t) => unit.mana >= need || (Boolean(unit.potions?.mana) && drink(unit, 'mana', t) && unit.mana >= need);
@@ -240,7 +259,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       dot.ticks -= 1;
       const vars = { target: unit.name, effect: dot.name, damage: amount };
       log(() => ({ t, kind: 'tick', target: unit.id, effect: dot.name, element: dot.element, damage: amount, absorbed: absorbed || undefined, shield: shieldLeft(unit), left: dot.ticks, hp: unit.hp, text: say(texts, 'effectTick', actions, vars) }));
-      if (unit.hp === 0) log(() => ({ t, kind: 'kill', target: unit.id, hp: 0, text: say(texts, 'kill', actions, vars) }));
+      if (unit.hp === 0 && !revived(unit, t)) log(() => ({ t, kind: 'kill', target: unit.id, hp: 0, text: say(texts, 'kill', actions, vars) }));
       else {
         if (unit.skills.length > 0) wounded(unit, t);
         if (unit.potions?.heal) healPotion(unit, t);
@@ -275,8 +294,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   const pickTarget = (actor, opponents) =>
     actor.side === 'ally' ? quickestKill(actor, opponents) : rng.weighted(opponents, (unit) => tuning.targetWeights[unit.position]);
 
-  // An effect over time from a blow: the target's Will may keep it off.
+  // An effect over time from a blow: the target's Will may keep it off, and
+  // so does an antidote drunk in this fight. One the target carries is drunk
+  // the moment the effect it cures lands.
   const applyDot = (actor, target, dot, raw, t, vars) => {
+    if (target.cured === dot.effect) return;
     const resisted = cappedChance(target.willRating, actor.level, tuning.willCap, balance);
     if (!rng.chance(dot.chance * (1 - resisted))) return;
     const effect = content.effectsById[dot.effect];
@@ -298,6 +320,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       });
     }
     log(() => ({ t, kind: 'effect', actor: actor.id, target: target.id, effect: effect.name, element: effect.element, hp: target.hp, text: say(texts, 'effectApplied', actions, { ...vars, effect: effect.name }) }));
+    if (target.potions?.cure?.cures === effect.id) drink(target, 'cure', t);
   };
 
   // A blow that mires (Ugrzęźnięcie): the target's Will may keep it off, as
@@ -336,7 +359,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const critical = move.alwaysCrit || rng.chance(Math.min(1, cappedChance(actor.critRating, target.level, tuning.critCap, balance) + (move.critBonus ?? 0)));
     const defense = category === 'physical' ? target.armor * (1 - (move.armorIgnore ?? 0)) : (target.resist[element] ?? 0);
     const weak = (element && target.weak?.[element]) || 0;
-    let amount = Math.max(1, Math.round(raw * (critical ? tuning.critMultiplier : 1) * (1 - reduction(defense, actor.level, balance)) * (1 + weak)));
+    const ward = category === 'magical' ? (target.ward ?? 0) : 0;
+    let amount = Math.max(1, Math.round(raw * (critical ? tuning.critMultiplier : 1) * (1 - reduction(defense, actor.level, balance)) * (1 + weak) * (1 - ward)));
     const absorbed = target.shield ? absorb(target, amount) : 0;
     amount -= absorbed;
     damage(target, amount, actor.id);
@@ -361,7 +385,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       const healed = heal(actor, amount * weapon.drain);
       if (healed > 0) log(() => ({ t, kind: 'drain', actor: actor.id, target: actor.id, amount: healed, hp: actor.hp, text: say(texts, 'drain', actions, { actor: actor.name, amount: healed }) }));
     }
-    if (target.hp === 0) {
+    if (target.hp === 0 && !revived(target, t)) {
       log(() => ({ t, kind: 'kill', target: target.id, hp: 0, text: say(texts, 'kill', actions, vars) }));
       return;
     }

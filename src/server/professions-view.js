@@ -4,6 +4,7 @@
 
 import {
   baseClasses,
+  carryLimit,
   craftChance,
   craftCost,
   craftUpgrades,
@@ -25,6 +26,7 @@ import {
   professionUnlockLevel,
   professionXpToNext,
   scrollMinutes,
+  timedKind,
 } from '../engine/index.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn } from './features.js';
@@ -67,8 +69,10 @@ export function bagHerbs(row, sellBonus) {
 
 // The potions in the bag, as the herbs: one entry for each, with the
 // scrapper's price of one, and how it is used (potions.js): `heal` and
-// `mana` work by themselves in fights and go along on explorations, a
-// healing and a speed potion can be drunk from the bag (`drink`).
+// `mana`, `cure` or `revive` work by themselves in fights and go along on
+// explorations (`carry` of them at most, null for one each fight), a healing
+// potion and a potion for a time can be drunk from the bag (`drink`, with
+// its `verb`).
 export function bagPotions(row, sellBonus) {
   const potions = potionsOf(row);
   return content.potions
@@ -80,7 +84,9 @@ export function bagPotions(row, sellBonus) {
       count: potions[potion.id],
       price: potionPrice(potion, content) * (1 + sellBonus),
       fight: fightKind(potion),
-      drink: Boolean(potion.effect.heal || potion.effect.speed),
+      carry: carryLimit(potion, null),
+      drink: Boolean(potion.effect.heal || timedKind(potion)),
+      verb: potion.verb ?? 'Wypij',
       known: potionKnown(row, potion),
     }));
 }

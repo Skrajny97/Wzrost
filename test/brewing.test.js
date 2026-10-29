@@ -161,7 +161,10 @@ describe('brewing through the API', () => {
     assert.equal(known.name, 'Mniejsza mikstura leczenia');
     assert.deepEqual(known.herbs, [{ id: 'comfrey', name: 'Żywokost', need: 3, have: 31 }]);
     assert.equal(known.most, 10);
-    assert.deepEqual(hidden.map((recipe) => recipe.hint), ['Ukryte przez System do 3. poziomu Alchemii.', 'Ukryte przez System do 5. poziomu Alchemii.']);
+    assert.deepEqual(
+      hidden.map((recipe) => recipe.hint),
+      [3, 5, 10, 14, 18, 24, 26, 32, 36, 45, 48, 52, 55, 65, 90].map((level) => `Ukryte przez System do ${level}. poziomu Alchemii.`),
+    );
   });
 
   test('a brewing checks the recipe, the herbs and the count, and takes the herbs at the start', async () => {

@@ -366,15 +366,16 @@ export function mountCharacter(container) {
       busy
         ? h('p', { class: 'muted', text: busyText(character) })
         : [
-            // A healing or a speed potion is drunk one at a time (potions.js);
-            // one from a Wymiana waits for its recipe.
+            // A healing potion or a potion for a time is drunk, or the oil put
+            // on the blade, one at a time (potions.js); one from a Wymiana
+            // waits for its recipe.
             entry.known === false && h('p', { class: 'region-warning', text: 'Tej mikstury nie użyjesz, póki nie poznasz jej receptury w Alchemii.' }),
             entry.drink &&
               entry.known !== false &&
               h('button', {
                 type: 'button',
                 class: 'button button--system',
-                text: 'Wypij',
+                text: entry.verb,
                 onClick: (event) =>
                   withButton(event.currentTarget, async () => {
                     const { text } = await call('POST', '/api/potions/drink', { potionId: entry.id });

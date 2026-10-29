@@ -409,9 +409,10 @@ function mountBoard(container, backHash) {
 
 // A building's screen. Building comes first, at the top, so nobody scrolls
 // down for it (the author's wish): the build under way, the levels waiting
-// and the next level with the cost and "Zbuduj" or "Ulepsz". Below them
-// its picture, what it gives now and its store (the Stół rozbiórki:
-// its materials, queue and parts).
+// and the next level with the cost and "Zbuduj" or "Ulepsz". Below them the
+// Stół rozbiórki's own work, its materials, queue and parts (the author:
+// its basic function higher up), then the picture, what the building gives
+// now and its store, trade or exchange.
 function mountBuilding(container, id) {
   let ticks = [];
   let shownBuild = null;
@@ -441,6 +442,7 @@ function mountBuilding(container, id) {
       underway && constructionPanel(running, ticks),
       waitingNote(id),
       nextLevel(building),
+      building.crafts && craftTableSection(ticks),
       h(
         'article',
         { class: 'card building-view', 'aria-label': building.name },
@@ -453,7 +455,6 @@ function mountBuilding(container, id) {
         building.shop && shopView(building.shop),
         building.exchange && exchangeView(building.exchange),
       ),
-      building.crafts && craftTableSection(ticks),
     );
     tick(serverNow());
   }

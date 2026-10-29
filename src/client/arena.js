@@ -395,10 +395,12 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     entry.card.classList.remove('unit--shielded');
   }
 
-  // An effect over time leaves the card with its last tick.
+  // An effect over time leaves the card with its last tick, or with an
+  // antidote that took it off.
   function effectOver(event) {
     const entry = cards.get(event.target);
-    if (event.left === 0 && entry?.status.textContent === event.effect) entry.status.textContent = '';
+    const gone = event.kind === 'potion' ? event.cleared : event.left === 0 && event.effect;
+    if (gone && entry?.status.textContent === gone) entry.status.textContent = '';
   }
 
   async function show(event) {
@@ -424,13 +426,17 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       line();
       return;
     }
-    // A potion (potions.js): the HP or the mana it gave over the card.
+    // A potion (potions.js) over the card: the HP or the mana it gave, the
+    // effect an antidote took off, the HP a fern brew rose with in gold.
     if (event.kind === 'potion') {
       playSound('potion');
       setHp(event.target, event.hp);
-      float(event.target, event.effect === 'mana' ? `+${event.amount} many` : `+${event.amount}`, 'heal', 0, event.effect === 'mana' ? '#8fd3ff' : null);
+      if (event.effect === 'cure') effectOver(event);
+      const color = { mana: '#8fd3ff', revive: '#f2c14e' }[event.effect] ?? '#a7c47f';
+      const text = { mana: `+${event.amount} many`, cure: `−${event.cleared}` }[event.effect] ?? `+${event.amount}`;
+      float(event.target, text, 'heal', 0, color === '#a7c47f' ? null : color);
       line();
-      await flash(event.target, event.effect === 'mana' ? '#8fd3ff' : '#a7c47f', event.effect === 'mana' ? 'rgba(143, 211, 255, 0.25)' : 'rgba(167, 196, 127, 0.25)');
+      await flash(event.target, color, tint(color, 0.25));
       return;
     }
     if (event.kind === 'fade') {
@@ -572,7 +578,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (event.kind === 'skill' && event.skill === 'mana-shield') cards.get(event.actor).card.classList.add('unit--shielded');
     if (event.kind === 'skill' && event.shield !== undefined) shieldUp(event);
     if (event.kind === 'hit' || event.kind === 'crit' || event.kind === 'tick') shieldLeft(event.target, event.shield);
-    if (event.kind === 'tick') effectOver(event);
+    if (event.kind === 'tick' || (event.kind === 'potion' && event.effect === 'cure')) effectOver(event);
     if (event.kind === 'heal' && event.armor) guardUp(event);
     if (event.kind === 'fade') guardDown(event);
     if (event.kind === 'stun') hold(event.target, event.label ?? 'przyszpilony');

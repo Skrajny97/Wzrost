@@ -93,8 +93,9 @@ function lootRules(character, equipped, area, content) {
 // or drawn), with the outcome of a list that "Testuj zdarzenia" chose
 // (`endingId`) or a drawn one, drafts only with `drafts`: the outcome's
 // text, and what it brings. A reward is gold
-// (`gold` times rewards.goldPerLevel at the character's level, ±25%) or an
-// item at the character's level of a rarity drawn from `itemRarities`. A
+// (`gold` times rewards.goldPerLevel at the character's level, ±25%), an
+// item at the character's level of a rarity drawn from `itemRarities` or
+// `herbs` for the bag (the Kwiat paproci), kept in the exploration's `herbs`. A
 // fight is against the foes at the character's level (the events' people, or
 // a creature, as the Błędnica), with the character's HP of the exploration's
 // end. In an ambush the foes all move first; a speed bonus makes the
@@ -124,13 +125,16 @@ export function resolveEvent({ hunt, event, optionId, caseId = null, endingId = 
       item = randomItem(character.level, rng, content, { ...lootRules(character, equipped, area, content), rarityId });
       items.push(item);
     }
+    const herbs = { ...hunt.herbs };
+    for (const [id, count] of Object.entries(outcome.herbs ?? {})) herbs[id] = (herbs[id] ?? 0) + count;
     const text = outcome.text.replace('{gold}', String(gold)).replace('{item}', item ? itemName(item, content) : '');
     return {
       ...hunt,
       gold: hunt.gold + gold,
       items,
+      ...(outcome.herbs && { herbs }),
       entries: [...hunt.entries, tell(text)],
-      event: { ...view(text), reward: { gold, item: item ? items.length - 1 : null } },
+      event: { ...view(text), reward: { gold, item: item ? items.length - 1 : null, herbs: outcome.herbs ?? null } },
     };
   }
 

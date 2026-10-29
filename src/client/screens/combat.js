@@ -809,7 +809,8 @@ export function mountCombat(container, { params, navigate }) {
   }
 
   // The potions to take along, each kind with −/+ up to one for each fight
-  // of the length, and the healing mark, both remembered in this browser.
+  // of the length (a fern brew one at all: its `carry`), and the healing
+  // mark, both remembered in this browser.
   // The wish is kept apart from what a shorter length allows, so it comes
   // back with a longer one. A change asks for the threat again.
   function potionPicker(carried, use) {
@@ -829,7 +830,7 @@ export function mountCombat(container, { params, navigate }) {
       return { less, more };
     };
     const rows = carried.map((potion) => {
-      const limit = () => Math.min(potion.count, fights);
+      const limit = () => Math.min(potion.count, fights, potion.carry ?? Infinity);
       const count = () => Math.min(wanted[potion.id] ?? 0, limit());
       const value = h('output', { class: 'potion-pick-value' });
       const { less, more } = stepper(potion.name, (sign) => {
@@ -873,7 +874,7 @@ export function mountCombat(container, { params, navigate }) {
       h('p', { class: 'duration-title', text: 'Mikstury na wyprawę' }),
       rows.map((row) => row.element),
       healRow && h('div', { class: 'potion-pick' }, h('span', { class: 'potion-pick-name', text: 'Lecz poniżej' }), mark.less, markValue, mark.more),
-      h('p', { class: 'muted', text: 'Każdego rodzaju najwyżej jedna na walkę. Postać pije sama: leczenia poniżej progu, many, gdy zabraknie jej na umiejętność. Niewypite wrócą do plecaka.' }),
+      h('p', { class: 'muted', text: 'Każdego rodzaju najwyżej jedna na walkę, a Napar z kwiatu paproci jeden na wyprawę. Postać pije sama: leczenia poniżej progu, many, gdy zabraknie jej na umiejętność, Odtrutkę, gdy ją zatrują, a Napar, gdy padnie. Niewypite wrócą do plecaka.' }),
     );
     return {
       element,

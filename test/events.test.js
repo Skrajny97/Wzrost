@@ -205,12 +205,21 @@ describe('events', () => {
     assert.ok(seeds.every((one) => eventFor({ hunt: hunt('mossy-boulders'), seed: one }, always) === fern));
     assert.ok(seeds.every((one) => eventFor({ hunt: hunt('raven-hollows'), seed: one }, always) !== fern));
     assert.equal(eventFor({ hunt: hunt('mossy-boulders'), seed, forced: 'fern-flower' }, always), fern);
-    const resolveFern = (optionId, caseId) => resolveEvent({ hunt: base, event: fern, optionId, caseId, character, equipped, name: 'Mira', seed }, content);
+    const resolveFern = (optionId, caseId, endingId = null) => resolveEvent({ hunt: base, event: fern, optionId, caseId, endingId, character, equipped, name: 'Mira', seed }, content);
     const fought = resolveFern('pick', 'guarded');
     assert.deepEqual(fought.fights.at(-1).enemies.map((enemy) => [enemy.monsterId, enemy.level]), [['likho', character.level]]);
-    const found = resolveFern('pick', 'free');
+    const found = resolveFern('pick', 'free', 'item');
     assert.equal(found.items.length, base.items.length + 1);
     assert.ok(['rare', 'unique', 'epic'].includes(found.items[found.event.reward.item].rarity));
+    assert.equal(found.herbs, undefined);
+    // One time in four the flower stays: a Kwiat paproci for the bag
+    // instead of the item (the author, 29.10.2026).
+    const blossom = resolveFern('pick', 'free', 'blossom');
+    assert.deepEqual([blossom.items.length, blossom.herbs, blossom.event.reward], [base.items.length, { 'fern-blossom': 1 }, { gold: 0, item: null, herbs: { 'fern-blossom': 1 } }]);
+    assert.match(blossom.event.option.text, /\(\+1 Kwiat paproci\)\.$/);
+    const picked = seeds.map((one) => resolveEvent({ hunt: base, event: fern, optionId: 'pick', caseId: 'free', character, equipped, name: 'Mira', seed: one }, content));
+    const blossoms = picked.filter((one) => one.herbs).length;
+    assert.ok(blossoms > 0 && blossoms < seeds.length / 2, `${blossoms} of ${seeds.length}`);
     assert.ok(resolveFern('watch', 'guarded').gold > base.gold);
     assert.equal(resolveFern('watch', 'free').gold, base.gold);
     assert.equal(resolveFern('leave', 'free').fights.length, base.fights.length);
@@ -276,7 +285,10 @@ describe('events (API)', () => {
             { id: 'guarded', name: 'Licho strzeże kwiatu' },
             { id: 'free', name: 'Kwiat bez stróża' },
           ],
-          endings: [],
+          endings: [
+            { id: 'item', name: 'Zerwanie: zostaje przedmiot' },
+            { id: 'blossom', name: 'Zerwanie: zostaje Kwiat paproci' },
+          ],
         },
       ],
       next: null,
@@ -364,6 +376,18 @@ describe('events (API)', () => {
     assert.ok(report.fights.slice(0, -1).every((one) => one.enemies.every((enemy) => enemy.monsterId !== 'wisp')));
     const met = JSON.parse((await (await db()).prepare('SELECT met FROM characters').first()).met);
     assert.ok(met.includes('wisp'));
+  });
+
+  test('a Kwiat paproci the fern flower leaves goes to the bag', async () => {
+    await pastTutorial();
+    await choose('fern-flower', null, 'blossom');
+    assert.deepEqual(await next(), { eventId: 'fern-flower', caseId: 'free', endingId: 'blossom' });
+    await (await db()).prepare(`UPDATE characters SET herbs = '{"comfrey":4}'`).run();
+    await explore();
+    assert.equal((await claim()).data.event.id, 'fern-flower');
+    const { report } = (await claim('pick')).data;
+    assert.deepEqual(report.event.reward, { gold: 0, item: null, herbs: { 'fern-blossom': 1 } });
+    assert.deepEqual(JSON.parse((await (await db()).prepare('SELECT herbs FROM characters').first()).herbs), { comfrey: 4, 'fern-blossom': 1 });
   });
 
   test('chosen to be honest, the woman thanks with gold or an item that reach the character', async () => {

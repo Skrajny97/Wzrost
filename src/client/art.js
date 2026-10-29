@@ -144,12 +144,12 @@ export const SPRITES = {
   // The herbs of Zielarstwo, 32×32, filled in as they are approved.
   herbs: {
     size: 32,
-    ids: ['comfrey', 'mugwort', 'nettle'],
+    ids: ['comfrey', 'mugwort', 'nettle', 'plantain', 'st-johns-wort', 'calamus', 'arnica', 'wormwood', 'valerian', 'cranberry', 'aconite', 'fern-blossom'],
   },
   // The potions of Alchemia, 32×32, filled in as they are approved.
   potions: {
     size: 32,
-    ids: ['lesser-healing', 'lesser-mana', 'lesser-speed'],
+    ids: ['lesser-healing', 'lesser-mana', 'lesser-speed', 'healing', 'mana', 'antidote', 'speed', 'stoneskin-brew', 'strength-brew', 'focus-draught'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {

@@ -14,16 +14,17 @@ import {
   brewMinutes,
   brewPotions,
   brewingReport,
+  buffLeft,
   campBonus,
   campLevels,
-  drinkSpeed,
+  drinkTimed,
   mostPotions,
   potionHerbs,
   potionPrice,
   potionsDone,
   professionState,
-  speedLeft,
   storeStacks,
+  timedKind,
 } from '../engine/index.js';
 import { content } from './content.js';
 import { buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdlePlayer, requireWorker, workOf } from './characters.js';
@@ -191,16 +192,19 @@ export async function sellPotions(context) {
   return json({ sold: { count: taken.count, gold }, character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
 }
 
-// "Wypij" in the bag: a healing potion gives HP back now, and a speed
-// potion speeds up the fights of its next minutes on explorations, added to
-// those still left (potions.js). A mana potion works only by itself in
-// fights.
+// "Wypij" in the bag: a healing potion gives HP back now, and a potion for a
+// time works in the fights of its next minutes on explorations, added to
+// those still left (potions.js). A mana potion, an antidote and the fern
+// brew work only by themselves in fights.
 export async function drinkPotion(context) {
   const { session, player } = await requireIdlePlayer(context);
   const body = await readJson(context.request);
   const taken = potionCount(player, { potionId: body.potionId, count: 1 });
   const potion = content.potionsById[taken.id];
-  if (!potion.effect.heal && !potion.effect.speed) throw new ApiError(409, 'fight_only', 'Ta mikstura działa sama w walce, gdy zabraknie many na umiejętność.');
+  const kind = timedKind(potion);
+  if (!potion.effect.heal && !kind) {
+    throw new ApiError(409, 'fight_only', potion.effect.mana ? 'Ta mikstura działa sama w walce, gdy zabraknie many na umiejętność.' : 'Ta mikstura działa sama na wyprawie.');
+  }
   // One got in a Wymiana waits for its recipe (DECISIONS.md, "Wymiana").
   if (!potionKnown(player.row, potion)) throw new ApiError(409, 'unknown_recipe', `Nie znasz jeszcze receptury: ${potion.name}.`);
   const texts = content.potionUse.texts;
@@ -214,10 +218,13 @@ export async function drinkPotion(context) {
     // Resting goes on from the HP the potion gave.
     also = { sql: 'hp = ?, hp_at = ?', binds: [hp + healed, now] };
     text = say(texts, 'drunkHeal', 0, { potion: potion.counted[0], amount: healed });
-  } else if (potion.effect.speed) {
-    const buffs = drinkSpeed(buffsOf(player.row, now), potion);
+  } else {
+    const buffs = drinkTimed(buffsOf(player.row, now), potion);
     also = { sql: 'buffs = ?', binds: [JSON.stringify(buffs)] };
-    text = say(texts, 'drunkSpeed', 0, { potion: potion.counted[0], bonus: Math.round(potion.effect.speed * 100), minutes: Math.round(speedLeft(buffs) / 60000) });
+    // drunkSpeed, drunkArmor and so on: what the kind gives now and for how
+    // long.
+    const key = `drunk${kind[0].toUpperCase()}${kind.slice(1)}`;
+    text = say(texts, key, 0, { potion: potion.counted[0], bonus: Math.round(buffs[kind].bonus * 100), minutes: Math.round(buffLeft(buffs, kind) / 60000) });
   }
   const result = await takeFromBag(context.env.DB, player, 'potions', taken, 0, also);
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Mikstury zmieniły się w międzyczasie. Spróbuj ponownie.');

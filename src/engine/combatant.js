@@ -7,9 +7,12 @@ import { gearLevel, midGameShare } from './progression.js';
 import { learnedSkills } from './skills.js';
 import { computeStats } from './stats.js';
 
-export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally' }, content) {
+// `statBoost`: shares some stats are raised by for a while, by stat (a
+// potion of focus, potions.js).
+export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally', statBoost = null }, content) {
   const balance = content.balance;
-  const { totals, bonuses } = computeStats(character, equipped, content);
+  const { totals: stats, bonuses } = computeStats(character, equipped, content);
+  const totals = statBoost ? Object.fromEntries(Object.entries(stats).map(([stat, value]) => [stat, Math.round(value * (1 + (statBoost[stat] ?? 0)))])) : stats;
   const weaponItem = equipped.find((item) => item.slot === 'weapon');
   const weapon = weaponItem ? itemWeapon(weaponItem, content) : unarmed(character.level, content);
   let armor = bonuses.armor + totals.endurance * balance.combat.armorPerEndurance;

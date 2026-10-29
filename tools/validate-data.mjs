@@ -5,6 +5,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import Ajv from 'ajv';
+import { TIMED_KINDS } from '../src/engine/potions.js';
 
 const DATA_DIR = new URL('../data/', import.meta.url);
 const CLIENT_DIR = new URL('../src/client/', import.meta.url);
@@ -607,10 +608,11 @@ function checkEvents(data, { monsters, rarities }) {
   const { events } = data;
   const foes = uniqueIds(errors, 'events', events.foes);
   for (const id of foes) if (monsters.has(id)) errors.push(`events.json: przeciwnik ${id} ma id stwora z monsters.json`);
+  const herbs = new Set(data.professions.herbs.map((herb) => herb.id));
   uniqueIds(errors, 'events', events.list);
   const checkOutcome = (where, outcome) => {
     const fighting = outcome.foes || outcome.ambush || outcome.speedBonus || outcome.itemChance !== undefined || outcome.start;
-    const rewarding = outcome.gold !== undefined || outcome.itemRarities;
+    const rewarding = outcome.gold !== undefined || outcome.itemRarities || outcome.herbs;
     if (outcome.kind === 'fight') {
       if (!outcome.foes) errors.push(`events.json: ${where} ma walkę bez przeciwników`);
       // People of the events, or creatures of monsters.json (the Błędnica).
@@ -620,10 +622,11 @@ function checkEvents(data, { monsters, rarities }) {
       errors.push(`events.json: ${where} ma ustawienia walki bez walki`);
     }
     if (outcome.kind === 'reward') {
-      if (!rewarding) errors.push(`events.json: ${where} ma nagrodę bez złota i przedmiotu`);
+      if (!rewarding) errors.push(`events.json: ${where} ma nagrodę bez złota, przedmiotu i ziół`);
       if (outcome.gold !== undefined && !outcome.text.includes('{gold}')) errors.push(`events.json: ${where} potrzebuje {gold} w tekście`);
       if (outcome.itemRarities && !outcome.text.includes('{item}')) errors.push(`events.json: ${where} potrzebuje {item} w tekście`);
       for (const id of Object.keys(outcome.itemRarities ?? {})) if (!rarities.has(id)) errors.push(`events.json: ${where} ma nieznaną rzadkość "${id}"`);
+      for (const id of Object.keys(outcome.herbs ?? {})) if (!herbs.has(id)) errors.push(`events.json: ${where} ma nieznane zioło "${id}"`);
     } else if (rewarding) {
       errors.push(`events.json: ${where} ma nagrodę bez kind reward`);
     }
@@ -719,7 +722,7 @@ function checkProfessions(data, { stats }) {
   if (minutes.max < minutes.min || (minutes.max - minutes.min) % minutes.step !== 0) {
     errors.push('professions.json: gathering.minutes.max musi wypadać na kroku suwaka od min');
   }
-  errors.push(...checkBrewing(data.professions, ids));
+  errors.push(...checkBrewing(data.professions, ids, new Set(data.effects.map((effect) => effect.id))));
   errors.push(...checkWorkshop(data, ids));
   return errors;
 }
@@ -774,7 +777,7 @@ function checkWorkshop(data, ids) {
 // Brewing: a crafting profession that brews, recipes known within its levels
 // from level 1 on, of herbs that exist, and each potion's description naming
 // what it does, as the data does ("leczy 20% maks. HP").
-function checkBrewing(data, ids) {
+function checkBrewing(data, ids, effects) {
   const { professions, brewing, herbs, potions } = data;
   const errors = [];
   uniqueIds(errors, 'professions (mikstury)', potions);
@@ -789,11 +792,20 @@ function checkBrewing(data, ids) {
     for (const id of Object.keys(potion.herbs)) {
       if (!herbIds.has(id)) errors.push(`professions.json: mikstura ${potion.id} ma nieznane zioło "${id}"`);
     }
-    for (const value of Object.values(potion.effect)) {
+    for (const [kind, value] of Object.entries(potion.effect)) {
+      // An antidote says what it cures instead of a share.
+      if (kind === 'cure') continue;
       if (!potion.description.includes(`${Math.round(value * 100)}%`)) errors.push(`professions.json: opis mikstury ${potion.id} nie podaje ${Math.round(value * 100)}%`);
     }
-    // Speed is drunk from the bag and lasts its minutes; the others work in fights.
-    if (('speed' in potion.effect) !== ('minutes' in potion)) errors.push(`professions.json: tylko mikstura szybkości ma minutes (${potion.id})`);
+    if (Object.keys(potion.effect).length !== 1) errors.push(`professions.json: mikstura ${potion.id} ma mieć jedno działanie`);
+    // A potion for a time is drunk from the bag and lasts its minutes; the
+    // others work by themselves in fights.
+    const timed = TIMED_KINDS.some((kind) => kind in potion.effect);
+    if (timed !== ('minutes' in potion)) errors.push(`professions.json: minutes ma tylko mikstura na czas (${potion.id})`);
+    if (('poison' in potion.effect) !== ('dot' in potion)) errors.push(`professions.json: dot ma tylko mikstura z poison (${potion.id})`);
+    if (potion.dot && !effects.has(potion.dot.effect)) errors.push(`professions.json: mikstura ${potion.id} ma nieznany efekt "${potion.dot.effect}"`);
+    if (('cure' in potion.effect) !== ('cures' in potion)) errors.push(`professions.json: cures ma tylko odtrutka (${potion.id})`);
+    if (potion.cures && !effects.has(potion.cures)) errors.push(`professions.json: mikstura ${potion.id} leczy nieznany efekt "${potion.cures}"`);
     if (potion.minutes && !potion.description.includes(`${potion.minutes} minut`)) errors.push(`professions.json: opis mikstury ${potion.id} nie podaje ${potion.minutes} minut`);
   }
   const { healBelow, healBelowChoices } = data.potionUse;

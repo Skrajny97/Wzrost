@@ -767,6 +767,7 @@
       "required": [
         "healBelow",
         "healBelowChoices",
+        "buffLabels",
         "texts"
       ],
       "description": "Picie mikstur: próg leczenia w walce i teksty walki oraz raportu.",
@@ -776,6 +777,45 @@
           "exclusiveMinimum": 0,
           "exclusiveMaximum": 1,
           "description": "Domyślny próg: mikstura leczenia działa, gdy HP spadnie poniżej tej części maks. HP."
+        },
+        "buffLabels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "speed",
+            "armor",
+            "damage",
+            "focus",
+            "poison",
+            "ward"
+          ],
+          "description": "Opis działającej mikstury na czas, po rodzaju, w górnym pasku ({bonus} w procentach).",
+          "properties": {
+            "speed": {
+              "type": "string",
+              "minLength": 1
+            },
+            "armor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "damage": {
+              "type": "string",
+              "minLength": 1
+            },
+            "focus": {
+              "type": "string",
+              "minLength": 1
+            },
+            "poison": {
+              "type": "string",
+              "minLength": 1
+            },
+            "ward": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         },
         "healBelowChoices": {
           "type": "array",
@@ -797,7 +837,19 @@
             "drunkHeal",
             "drunkSpeed",
             "used",
-            "speedFights"
+            "speedFights",
+            "drinkCure",
+            "drinkRevive",
+            "drunkArmor",
+            "drunkDamage",
+            "drunkFocus",
+            "drunkPoison",
+            "drunkWard",
+            "armorFights",
+            "damageFights",
+            "focusFights",
+            "poisonFights",
+            "wardFights"
           ],
           "properties": {
             "drinkHeal": {
@@ -841,6 +893,102 @@
               }
             },
             "speedFights": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "drinkCure": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "drinkRevive": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "drunkArmor": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "drunkDamage": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "drunkFocus": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "drunkPoison": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "drunkWard": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "armorFights": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "damageFights": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "focusFights": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "poisonFights": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "wardFights": {
               "type": "array",
               "minItems": 1,
               "items": {
@@ -971,13 +1119,88 @@
                 "exclusiveMinimum": 0,
                 "maximum": 1,
                 "description": "Dodaje tyle do szybkości ruchów postaci."
+              },
+              "armor": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "Mikstura na czas: tyle dodaje do pancerza postaci."
+              },
+              "damage": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "Mikstura na czas: tyle dodaje do obrażeń postaci."
+              },
+              "focus": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "Mikstura na czas: tyle dodaje do Intelektu i Mądrości postaci."
+              },
+              "poison": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "Mikstura na czas: taka szansa, że cios postaci zatruje (dot)."
+              },
+              "ward": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "Mikstura na czas: o tyle mniej obrażeń od magii."
+              },
+              "cure": {
+                "const": 1,
+                "description": "Działa sama w walce: zdejmuje Zatrucie i chroni przed nim do końca walki."
+              },
+              "revive": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "Działa sama: raz na wyprawę postać, która omdlewa, wstaje z taką częścią maks. HP."
               }
             }
           },
           "minutes": {
             "type": "integer",
             "minimum": 1,
-            "description": "Mikstura na czas: tyle minut działa po wypiciu z plecaka (szybkość)."
+            "description": "Mikstura na czas: tyle minut wypraw działa po wypiciu z plecaka (szybkość, pancerz, obrażenia, skupienie, olejek, ochrona przed magią)."
+          },
+          "cures": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Odtrutka (cure): id efektu z effects.json, który zdejmuje w walce."
+          },
+          "verb": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Napis przycisku w plecaku zamiast „Wypij”, np. „Nałóż” dla olejku."
+          },
+          "dot": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "effect",
+              "power",
+              "ticks"
+            ],
+            "description": "Efekt, który daje cios przy miksturze z poison: id z effects.json, część obrażeń ciosu na ruch i liczba ruchów.",
+            "properties": {
+              "effect": {
+                "type": "string",
+                "minLength": 1
+              },
+              "power": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1
+              },
+              "ticks": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
           },
           "description": {
             "type": "string",

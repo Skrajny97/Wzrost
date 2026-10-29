@@ -51,7 +51,6 @@ import {
   shopLeft,
   shopOffer,
   skillsView,
-  speedLeft,
   spentPoints,
   statEffects,
   unlockedFeatures,
@@ -60,6 +59,9 @@ import {
   campEffectText,
   campLevel,
   xpToNext,
+  buffLeft,
+  optionWindows,
+  TIMED_KINDS,
 } from '../engine/index.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
@@ -171,17 +173,23 @@ export function buffsOf(row, now) {
   return buffs;
 }
 
-// The speed potions drunk from the bag that still work (potions.js): the
-// time of explorations they have left after the one under way, until when
-// they work in it, and their bonus.
-function activeSpeed(player, now) {
+// The potions for a time drunk from the bag that still work (potions.js), by
+// kind: the time of explorations they have left after the one under way,
+// until when they work in it, their bonus and the words for it.
+function activeBuffs(player, now) {
   const buffs = buffsOf(player.row, now);
-  const window = player.activity?.kind === 'hunt' ? JSON.parse(player.activity.options ?? '{}').speed : null;
-  const ends = window ? player.activity.started_at + window.ms : 0;
-  const until = ends > now ? ends : null;
-  const ms = speedLeft(buffs);
-  if (ms <= 0 && !until) return null;
-  return { ms, until, bonus: until ? window.bonus : buffs.speed.bonus };
+  const windows = player.activity?.kind === 'hunt' ? optionWindows(JSON.parse(player.activity.options ?? '{}')) : {};
+  const active = [];
+  for (const kind of TIMED_KINDS) {
+    const window = windows[kind];
+    const ends = window ? player.activity.started_at + window.ms : 0;
+    const until = ends > now ? ends : null;
+    const ms = buffLeft(buffs, kind);
+    if (ms <= 0 && !until) continue;
+    const bonus = until ? window.bonus : buffs[kind].bonus;
+    active.push({ kind, ms, until, bonus, label: content.potionUse.buffLabels[kind].replace('{bonus}', Math.round(bonus * 100)) });
+  }
+  return active;
 }
 
 // The bag's places taken: one an item, and the herbs and the potions by the
@@ -797,8 +805,8 @@ export function characterView(player, now) {
     // The inner regions and lands whose Bestiariusz chest is open for their
     // lists as they are now (bestiary.js).
     bestiary: openedChests(JSON.parse(row.bestiary ?? '[]'), content),
-    // A speed potion still working (potions.js), or null.
-    speedBuff: activeSpeed(player, now),
+    // The potions for a time still working (potions.js).
+    buffs: activeBuffs(player, now),
     // The narrator's daily and weekly quests (quests.js).
     quests: questsView(questsNow(player, now), now, content, JSON.parse(row.met ?? '[]')),
     // The narrator's cards seen so far, or null for a character made before

@@ -23,7 +23,7 @@ import { combatantView, monsterCombatant, playerCombatant } from './combatant.js
 import { simulateFight } from './combat.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { itemName, itemRank, itemView, randomItem } from './items.js';
-import { fightPotions } from './potions.js';
+import { TIMED_KINDS, fightPotions } from './potions.js';
 import {
   classXpToNext,
   faintPenalty,
@@ -344,10 +344,12 @@ export function resourceBundle(area, total) {
 // regular encounters only, no chests among the finds, and the one treasure
 // is a plain weapon of its class after the first won fight. `potions`: the
 // potions taken along, by id, the healing one drunk below `healBelow`;
-// `speed`: a speed potion's bonus for the first `ms` of the exploration
+// `buffs`: the potions for a time drunk before, by kind, each with its bonus
+// for the first `ms` of the exploration, and `speed` the same for a speed
+// potion alone, as explorations started before the other kinds kept it
 // (potions.js).
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [], met = null, potions = {}, healBelow, speed = null },
+  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [], met = null, potions = {}, healBelow, buffs = {}, speed = null },
   content,
 ) {
   const rng = createRng(seed);
@@ -407,11 +409,14 @@ export function simulateHunt(
   const fights = [];
   const entries = [];
   let key = null;
-  // The potions still carried and those drunk, by id, and the fights the
-  // speed potion sped up.
+  // The potions still carried and those drunk, by id, and, by kind, the
+  // fights the potions for a time worked in. The aconite oil coats a blade
+  // that has no coat of its own yet.
   const left = { ...potions };
   const potionsUsed = {};
-  let speedFights = 0;
+  const windows = { ...(speed && { speed }), ...buffs };
+  const buffFights = {};
+  const oil = content.potions.find((potion) => potion.effect.poison)?.dot;
   // An item from a chest. A character without a weapon holds a found one at
   // once, for the rest of the exploration.
   const take = (item) => {
@@ -461,8 +466,20 @@ export function simulateHunt(
     }
     const enemies = encounterCombatants(encounter, content);
     const kit = fightPotions(left, healBelow ?? content.potionUse?.healBelow, content);
-    const fast = Boolean(speed) && event.t < speed.ms;
-    const ally = { ...player, hp: hpNow, ...(fast && { speed: player.speed * (1 + speed.bonus) }), ...((kit.heal || kit.mana) && { potions: kit }) };
+    const on = {};
+    for (const [kind, window] of Object.entries(windows)) if (event.t < window.ms) on[kind] = window.bonus;
+    // Focus raises Intelekt and Mądrość, which the character's numbers grow from.
+    const base = on.focus ? playerCombatant({ character, equipped: worn, hp: hpNow, name, area, statBoost: { intellect: on.focus, wisdom: on.focus } }, content) : player;
+    const ally = {
+      ...base,
+      hp: hpNow,
+      ...(on.speed && { speed: base.speed * (1 + on.speed) }),
+      ...(on.armor && { armor: Math.round(base.armor * (1 + on.armor)) }),
+      ...(on.damage && { damageBonus: on.damage }),
+      ...(on.ward && { ward: on.ward }),
+      ...(on.poison && oil && !base.weapon.dot && { weapon: { ...base.weapon, dot: { ...oil, chance: on.poison } } }),
+      ...(Object.keys(kit).length > 0 && { potions: kit }),
+    };
     const fight = simulateFight({ allies: [ally], enemies, rng, content, record: true, trait: area.trait });
     const hpBefore = hpNow;
     hpNow = fight.units.find((unit) => unit.id === ally.id).hp;
@@ -470,7 +487,7 @@ export function simulateHunt(
       left[id] -= 1;
       potionsUsed[id] = (potionsUsed[id] ?? 0) + 1;
     }
-    if (fast) speedFights += 1;
+    for (const kind of Object.keys(on)) buffFights[kind] = (buffFights[kind] ?? 0) + 1;
 
     // Every fight keeps what its playback needs: the sides and the events.
     const summary = {
@@ -601,7 +618,7 @@ export function simulateHunt(
     entries,
     keyFight: key && { index: key.index },
     potionsUsed,
-    speedFights,
+    buffFights,
   };
 }
 
@@ -684,14 +701,18 @@ export function hpAfterHunt({ character, applied, hunt, equipped, name }, conten
   return playerCombatant({ character: levelled, equipped, name }, content).maxHp;
 }
 
-// "Zużyte mikstury: 2 × Mniejsza mikstura leczenia." and the fights a speed
-// potion sped up, or nothing for an exploration without potions.
+// "Zużyte mikstury: 2 × Mniejsza mikstura leczenia." and the fights each
+// kind of potion for a time worked in, or nothing for an exploration without
+// potions.
 function potionsLines(hunt, content) {
   const texts = content.potionUse?.texts;
   const used = Object.entries(hunt.potionsUsed ?? {}).filter(([id]) => content.potionsById[id]);
   const lines = [];
   if (used.length > 0) lines.push(say(texts, 'used', 0, { potions: used.map(([id, count]) => `${count} × ${content.potionsById[id].name}`).join(', ') }));
-  if (hunt.speedFights > 0) lines.push(say(texts, 'speedFights', 0, { fights: hunt.speedFights, all: hunt.fights.length }));
+  for (const kind of TIMED_KINDS) {
+    const fights = hunt.buffFights?.[kind] ?? 0;
+    if (fights > 0) lines.push(say(texts, `${kind}Fights`, 0, { fights, all: hunt.fights.length }));
+  }
   return lines;
 }
 

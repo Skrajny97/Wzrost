@@ -180,13 +180,33 @@
   "potionUse": {
     "healBelow": 0.4,
     "healBelowChoices": [0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
+    "buffLabels": {
+      "speed": "Mikstura szybkości: ruchy w walkach +{bonus}%",
+      "armor": "Wywar kamiennej skóry: pancerz +{bonus}%",
+      "damage": "Wywar siły: obrażenia +{bonus}%",
+      "focus": "Mikstura skupienia: Intelekt i Mądrość +{bonus}%",
+      "poison": "Olejek z tojadu: {bonus}% szans na Zatrucie przy ciosie",
+      "ward": "Eliksir jemiołowy: obrażenia od magii −{bonus}%"
+    },
     "texts": {
       "drinkHeal": ["{actor} wypija {potion}: +{amount} HP."],
       "drinkMana": ["{actor} wypija {potion}: +{amount} many."],
       "drunkHeal": ["Postać wypija {potion}: +{amount} HP."],
       "drunkSpeed": ["Postać wypija {potion}. Ruchy w walkach szybsze o {bonus}% przez {minutes} min wypraw."],
       "used": ["Zużyte mikstury: {potions}."],
-      "speedFights": ["Mikstura szybkości działała w walkach: {fights} z {all}."]
+      "speedFights": ["Mikstura szybkości działała w walkach: {fights} z {all}."],
+      "drinkCure": ["{actor} wypija {potion}: Zatrucie znika i nie wróci do końca walki."],
+      "drinkRevive": ["{actor} pada, ale wypija {potion} i wstaje z {amount} HP."],
+      "drunkArmor": ["Postać wypija {potion}. Pancerz większy o {bonus}% przez {minutes} min wypraw."],
+      "drunkDamage": ["Postać wypija {potion}. Obrażenia większe o {bonus}% przez {minutes} min wypraw."],
+      "drunkFocus": ["Postać wypija {potion}. Intelekt i Mądrość większe o {bonus}% przez {minutes} min wypraw."],
+      "drunkPoison": ["Postać nakłada {potion} na broń. Przez {minutes} min wypraw każdy cios ma {bonus}% szans na Zatrucie."],
+      "drunkWard": ["Postać wypija {potion}. Obrażenia od magii mniejsze o {bonus}% przez {minutes} min wypraw."],
+      "armorFights": ["Wywar kamiennej skóry działał w walkach: {fights} z {all}."],
+      "damageFights": ["Wywar siły działał w walkach: {fights} z {all}."],
+      "focusFights": ["Mikstura skupienia działała w walkach: {fights} z {all}."],
+      "poisonFights": ["Olejek z tojadu działał w walkach: {fights} z {all}."],
+      "wardFights": ["Eliksir jemiołowy działał w walkach: {fights} z {all}."]
     }
   },
   "herbs": [
@@ -216,6 +236,96 @@
       "perHour": 4,
       "price": 4,
       "description": "Parzy każdego, kto ją zrywa, ale jej sok przyspiesza ruchy."
+    },
+    {
+      "id": "plantain",
+      "name": "Babka lancetowata",
+      "genitive": "Babki lancetowatej",
+      "level": 8,
+      "perHour": 4,
+      "price": 5,
+      "description": "Wąskie liście przy każdej ścieżce. Przyłożona do rany tamuje krew."
+    },
+    {
+      "id": "st-johns-wort",
+      "name": "Dziurawiec",
+      "genitive": "Dziurawca",
+      "level": 12,
+      "perHour": 4,
+      "price": 6,
+      "description": "Żółte kwiaty, a w liściach pod światło widać dziurki. Rozjaśnia umysł."
+    },
+    {
+      "id": "calamus",
+      "name": "Tatarak",
+      "genitive": "Tataraku",
+      "level": 16,
+      "perHour": 3,
+      "price": 7,
+      "description": "Pachnący korzeń znad wody. Wyciąga truciznę z krwi."
+    },
+    {
+      "id": "arnica",
+      "name": "Arnika",
+      "genitive": "Arniki",
+      "level": 22,
+      "perHour": 3,
+      "price": 8,
+      "description": "Pomarańczowe kwiaty z górskich łąk. Goi stłuczenia."
+    },
+    {
+      "id": "wormwood",
+      "name": "Piołun",
+      "genitive": "Piołunu",
+      "level": 28,
+      "perHour": 3,
+      "price": 10,
+      "description": "Najbardziej gorzkie ziele w puszczy. Rozgrzewa i dodaje sił."
+    },
+    {
+      "id": "valerian",
+      "name": "Kozłek",
+      "genitive": "Kozłka",
+      "level": 34,
+      "perHour": 2,
+      "price": 12,
+      "description": "Korzeń o mocnym zapachu, który uspokaja myśli."
+    },
+    {
+      "id": "cranberry",
+      "name": "Żurawina",
+      "genitive": "Żurawiny",
+      "level": 40,
+      "perHour": 2,
+      "price": 14,
+      "description": "Czerwone jagody z mszarów, kwaśne i chłodne."
+    },
+    {
+      "id": "aconite",
+      "name": "Tojad",
+      "genitive": "Tojadu",
+      "level": 50,
+      "perHour": 2,
+      "price": 18,
+      "description": "Piękny, niebieski i śmiertelnie trujący."
+    },
+    {
+      "id": "mistletoe",
+      "name": "Jemioła",
+      "genitive": "Jemioły",
+      "level": 65,
+      "perHour": 1,
+      "price": 24,
+      "description": "Rośnie wysoko na drzewach i chroni przed czarami."
+    },
+    {
+      "id": "fern-blossom",
+      "name": "Kwiat paproci",
+      "genitive": "Kwiatu paproci",
+      "level": 90,
+      "perHour": 0.5,
+      "price": 60,
+      "description": "Kwitnie raz w roku, w najkrótszą noc. Mało kto go widział."
     }
   ],
   "potions": [
@@ -246,6 +356,133 @@
       "effect": { "speed": 0.15 },
       "minutes": 30,
       "description": "Żółtozielony wywar z Pokrzywy. Wypita z plecaka przyspiesza ruchy postaci w walkach o 15% na 30 minut wypraw. Każda kolejna dodaje następne 30 minut."
+    },
+    {
+      "id": "healing",
+      "name": "Zwykła mikstura leczenia",
+      "counted": ["Zwykłą miksturę leczenia", "Zwykłe mikstury leczenia", "Zwykłych mikstur leczenia"],
+      "level": 10,
+      "herbs": { "comfrey": 2, "plantain": 2 },
+      "effect": { "heal": 0.35 },
+      "description": "Rubinowy wywar z Żywokostu i Babki. Zrasta rany: leczy 35% maks. HP."
+    },
+    {
+      "id": "mana",
+      "name": "Zwykła mikstura many",
+      "counted": ["Zwykłą miksturę many", "Zwykłe mikstury many", "Zwykłych mikstur many"],
+      "level": 14,
+      "herbs": { "mugwort": 2, "st-johns-wort": 2 },
+      "effect": { "mana": 0.45 },
+      "description": "Szafirowy wywar z Bylicy i Dziurawca. Budzi uśpioną moc: oddaje 45% maks. many."
+    },
+    {
+      "id": "antidote",
+      "name": "Odtrutka",
+      "counted": ["Odtrutkę", "Odtrutki", "Odtrutek"],
+      "level": 18,
+      "herbs": { "calamus": 3 },
+      "effect": { "cure": 1 },
+      "cures": "poisoned",
+      "description": "Gorzki wywar z Tataraku. Działa sam w walce: zdejmuje Zatrucie i chroni przed nim do końca walki."
+    },
+    {
+      "id": "speed",
+      "name": "Zwykła mikstura szybkości",
+      "counted": ["Zwykłą miksturę szybkości", "Zwykłe mikstury szybkości", "Zwykłych mikstur szybkości"],
+      "level": 24,
+      "herbs": { "nettle": 2, "arnica": 1 },
+      "effect": { "speed": 0.25 },
+      "minutes": 30,
+      "description": "Zielony wywar z Pokrzywy i Arniki. Wypita z plecaka przyspiesza ruchy postaci w walkach o 25% na 30 minut wypraw. Każda kolejna dodaje następne 30 minut."
+    },
+    {
+      "id": "stoneskin-brew",
+      "name": "Wywar kamiennej skóry",
+      "counted": ["Wywar kamiennej skóry", "Wywary kamiennej skóry", "Wywarów kamiennej skóry"],
+      "level": 26,
+      "herbs": { "arnica": 3 },
+      "effect": { "armor": 0.15 },
+      "minutes": 30,
+      "description": "Szary wywar z Arniki. Wypity z plecaka wzmacnia pancerz postaci o 15% na 30 minut wypraw. Każdy kolejny dodaje następne 30 minut."
+    },
+    {
+      "id": "strength-brew",
+      "name": "Wywar siły",
+      "counted": ["Wywar siły", "Wywary siły", "Wywarów siły"],
+      "level": 32,
+      "herbs": { "wormwood": 3 },
+      "effect": { "damage": 0.1 },
+      "minutes": 30,
+      "description": "Pomarańczowy wywar z Piołunu. Wypity z plecaka zwiększa obrażenia postaci o 10% na 30 minut wypraw. Każdy kolejny dodaje następne 30 minut."
+    },
+    {
+      "id": "focus-draught",
+      "name": "Mikstura skupienia",
+      "counted": ["Miksturę skupienia", "Mikstury skupienia", "Mikstur skupienia"],
+      "level": 36,
+      "herbs": { "valerian": 3 },
+      "effect": { "focus": 0.1 },
+      "minutes": 30,
+      "description": "Fioletowy wywar z Kozłka. Wypita z plecaka zwiększa Intelekt i Mądrość postaci o 10% na 30 minut wypraw. Każda kolejna dodaje następne 30 minut."
+    },
+    {
+      "id": "greater-healing",
+      "name": "Duża mikstura leczenia",
+      "counted": ["Dużą miksturę leczenia", "Duże mikstury leczenia", "Dużych mikstur leczenia"],
+      "level": 45,
+      "herbs": { "comfrey": 3, "cranberry": 2 },
+      "effect": { "heal": 0.5 },
+      "description": "Gęsty rubinowy wywar z Żywokostu i Żurawiny. Zrasta nawet głębokie rany: leczy 50% maks. HP."
+    },
+    {
+      "id": "greater-mana",
+      "name": "Duża mikstura many",
+      "counted": ["Dużą miksturę many", "Duże mikstury many", "Dużych mikstur many"],
+      "level": 48,
+      "herbs": { "mugwort": 3, "cranberry": 2 },
+      "effect": { "mana": 0.6 },
+      "description": "Ciemnoszafirowy wywar z Bylicy i Żurawiny. Oddaje 60% maks. many."
+    },
+    {
+      "id": "greater-speed",
+      "name": "Duża mikstura szybkości",
+      "counted": ["Dużą miksturę szybkości", "Duże mikstury szybkości", "Dużych mikstur szybkości"],
+      "level": 52,
+      "herbs": { "nettle": 3, "cranberry": 2 },
+      "effect": { "speed": 0.35 },
+      "minutes": 30,
+      "description": "Jaskrawozielony wywar z Pokrzywy i Żurawiny. Wypita z plecaka przyspiesza ruchy postaci w walkach o 35% na 30 minut wypraw. Każda kolejna dodaje następne 30 minut."
+    },
+    {
+      "id": "aconite-oil",
+      "name": "Olejek z tojadu",
+      "counted": ["Olejek z tojadu", "Olejki z tojadu", "Olejków z tojadu"],
+      "level": 55,
+      "herbs": { "aconite": 2 },
+      "effect": { "poison": 0.5 },
+      "minutes": 30,
+      "verb": "Nałóż",
+      "dot": { "effect": "poisoned", "power": 0.2, "ticks": 3 },
+      "description": "Ciemny olejek z Tojadu na ostrze. Nałożony z plecaka na 30 minut wypraw daje każdemu ciosowi postaci 50% szans na Zatrucie. Każdy kolejny dodaje następne 30 minut."
+    },
+    {
+      "id": "mistletoe-elixir",
+      "name": "Eliksir jemiołowy",
+      "counted": ["Eliksir jemiołowy", "Eliksiry jemiołowe", "Eliksirów jemiołowych"],
+      "level": 65,
+      "herbs": { "mistletoe": 3 },
+      "effect": { "ward": 0.2 },
+      "minutes": 30,
+      "description": "Biało-zielony eliksir z Jemioły. Wypity z plecaka zmniejsza obrażenia od magii o 20% na 30 minut wypraw. Każdy kolejny dodaje następne 30 minut."
+    },
+    {
+      "id": "fern-brew",
+      "name": "Napar z kwiatu paproci",
+      "counted": ["Napar z kwiatu paproci", "Napary z kwiatu paproci", "Naparów z kwiatu paproci"],
+      "level": 90,
+      "herbs": { "fern-blossom": 1, "comfrey": 5 },
+      "effect": { "revive": 0.3 },
+      "description": "Złoty napar z Kwiatu paproci. Działa sam: raz na wyprawę chroni przed omdleniem i postać wstaje z 30% HP."
     }
   ],
   "texts": {

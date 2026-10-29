@@ -2808,6 +2808,50 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - **wzory w Warsztacie** (brakujący szczegół): wzór bazy od 25. poziomu klasy odsłania się na 25. poziomie Rzemieślnictwa, a od 50. na 50. Wcześniej każda dalsza baza miała wzór od `laterPatternLevel`, czyli od 10. Rozbiórka takiego przedmiotu nadal od razu uczy jego wzoru;
     - symulacja balansu (`tools/simulate.mjs`) liczy, jak dotąd, ekwipunek z pierwszych baz kategorii. Dalsze bazy są więc zapasem siły ponad nią i nie zmieniają jej tabel.
 
+## Zioła i mikstury: wybory autora (29.10.2026, w grze od 0.0.50)
+
+Propozycja: 10 nowych ziół Zielarstwa i 13 nowych mikstur Alchemii, po jednym szkicu Retro Diffusion na każde. Autor ocenia je w czacie, pozycja po pozycji.
+
+1. **Zioła.** Autor: „Zioła: 1/10 - super do Zwykłej mikstury i wszystkie do zwykłej / 2/10 - super / 3/10 - super / 4/10 - super tylko popraw szkic ręcznie / 5/10 - super / 6/10 - super / 7/10 - super, tylko zmniejsz jagody / 8/10 - super / 9/10 - zrób drugi szkic / 10/10 - super”.
+    - Szkice Babki lancetowatej, Dziurawca, Tataraku, Piołunu, Kozłka, Tojadu i Kwiatu paproci są w grze bez zmian.
+    - Arnika ma szkic poprawiony ręcznie, a Żurawina mniejsze jagody.
+    - Jemioła ma drugi szkic, który czeka na ocenę. Do tego czasu w grze nie ma ikony.
+    - Poziom Zielarstwa, zbiór na godzinę i cena u złomiarza: Babka lancetowata 8, 4, 5 złota; Dziurawiec 12, 4, 6; Tatarak 16, 3, 7; Arnika 22, 3, 8; Piołun 28, 3, 10; Kozłek 34, 2, 12; Żurawina 40, 2, 14; Tojad 50, 2, 18; Jemioła 65, 1, 24; Kwiat paproci 90, 0,5, 60.
+2. **Przepisy.** Babka, Dziurawiec i Arnika idą tylko do Zwykłych mikstur. Duże biorą po 3 Żywokostu, Bylicy albo Pokrzywy i 2 Żurawiny (wybór w czacie: „Tak, Duże bez nich (zalecane)”). Poziom Alchemii, zioła i działanie:
+    - Zwykła mikstura leczenia: 10, Żywokost ×2 i Babka ×2, leczy 35% maks. HP;
+    - Zwykła mikstura many: 14, Bylica ×2 i Dziurawiec ×2, oddaje 45% maks. many;
+    - Odtrutka: 18, Tatarak ×3, zdejmuje Zatrucie;
+    - Zwykła mikstura szybkości: 24, Pokrzywa ×2 i Arnika ×1, ruchy w walkach +25%;
+    - Wywar kamiennej skóry: 26, Arnika ×3, pancerz +15%;
+    - Wywar siły: 32, Piołun ×3, obrażenia +10%;
+    - Mikstura skupienia: 36, Kozłek ×3, Intelekt i Mądrość +10%;
+    - Duża mikstura leczenia: 45, Żywokost ×3 i Żurawina ×2, leczy 50% maks. HP;
+    - Duża mikstura many: 48, Bylica ×3 i Żurawina ×2, oddaje 60% maks. many;
+    - Duża mikstura szybkości: 52, Pokrzywa ×3 i Żurawina ×2, ruchy w walkach +35%;
+    - Olejek z tojadu: 55, Tojad ×2, 50% szans na Zatrucie przy ciosie;
+    - Eliksir jemiołowy: 65, Jemioła ×3, obrażenia od magii −20%;
+    - Napar z kwiatu paproci: 90, Kwiat paproci ×1 i Żywokost ×5, raz na wyprawę chroni przed omdleniem.
+3. **Mikstura skupienia.** Autor: „skupienia zmień działanie na wzrost statystyki Intelektu i Mądrości na jakis czas o ileś”. Liczby to brakujący szczegół: +10% Intelektu i Mądrości na 30 minut wypraw, jak u innych mikstur na czas. Mądrość daje więcej many, mocniejsze leczenie i odpoczynek po walce, a Intelekt mocniejsze ciosy broni, która od niego zależy.
+4. **Olejek z tojadu.** Autor: „Olejek z Tojadu powinien dawać dużą szansę zatrucia a nie zawsze zatruwać wrogów”.
+    - Na 30 minut wypraw każdy cios postaci ma 50% szans na Zatrucie: 0,2 siły ciosu przez 3 ruchy. Wola celu może je odeprzeć jak każde Zatrucie.
+    - Nakłada się go z plecaka przyciskiem „Nałóż” zamiast „Wypij”.
+    - Zatrute ostrze Cienia kładzie na broń w walce własną truciznę w miejsce olejku.
+5. **Butelki.** Autor: „Duże mikstury muszą być inne, brzydko wygenerowane tak samo Olejek z tojadu i Eliksir jemiołowy i Napar z kwiatu paproci / […] Reszta super”.
+    - Grafiki Zwykłych mikstur leczenia, many i szybkości, Odtrutki, Wywaru kamiennej skóry, Wywaru siły i Mikstury skupienia są w grze.
+    - Nowe szkice czekają na ocenę: stożkowa kolba dla trzech Dużych w ich kolorach, wąska fiolka olejku, rombowa flaszka eliksiru i złota flaszka naparu. Do tego czasu te mikstury mają w grze zwykłą ikonę kolby.
+6. **Jak działają nowe rodzaje** (brakujące szczegóły, najprostsze rozwiązania):
+    - Odtrutka działa sama w walce. Postać pije ją w chwili, gdy dopada ją Zatrucie. Trucizna znika i do końca walki już się jej nie ima.
+    - Napar z kwiatu paproci też działa sam. Gdy HP spada do zera, postać zamiast paść wstaje z 30% maks. HP. Wyprawa zabiera najwyżej jeden, więc chroni raz na wyprawę.
+    - Eliksir jemiołowy zmniejsza tylko obrażenia od ciosów magicznych.
+    - Z kilku mikstur jednego rodzaju postać pije najpierw najsilniejszą, np. Dużą leczenia przed Zwykłą.
+    - Mikstury na czas różnych rodzajów działają naraz, każda ze swoim czasem. Pasek u góry pokazuje czas tej, która zostanie najdłużej.
+    - Dwie mikstury jednego rodzaju o różnej sile, np. Mniejsza i Duża szybkości, zostawiają silniejszy bonus. Minuty słabszej liczą się tyle, ile są przy nim warte: 30 minut po 35% i 30 minut po 15% dają ok. 43 minut po 35%. Inaczej tania Mniejsza przedłużałaby Dużą za darmo.
+7. **Kwiat paproci ze zdarzenia.** Autor: „ale nie na startowych lvlach”. Zdarzenie z kwiatem przychodzi tylko w Uroczysku Kamieni (regiony 26–50). Na pytanie o próg w czacie wybrane jest „Od 26. poziomu, jak zdarzenie”, więc dodatkowego progu nie ma.
+    - W przypadku „Kwiat bez stróża” opcja „Zerwij kwiat” zostawia przedmiot (75%) albo Kwiat paproci (25%), który trafia do plecaka.
+    - Kwiat zajmuje miejsce w plecaku przed znalezionymi przedmiotami. Gdy miejsca brak, złomiarz odkupuje najsłabszy przedmiot, jak przy pełnym plecaku.
+    - W „Testuj zdarzenia” można wybrać oba zakończenia.
+8. **Id:** zioła `plantain`, `st-johns-wort`, `calamus`, `arnica`, `wormwood`, `valerian`, `cranberry`, `aconite`, `mistletoe`, `fern-blossom`; mikstury `healing`, `mana`, `antidote`, `speed`, `stoneskin-brew`, `strength-brew`, `focus-draught`, `greater-healing`, `greater-mana`, `greater-speed`, `aconite-oil`, `mistletoe-elixir`, `fern-brew`.
+
 ## Ewolucje: odpowiedzi autora (29.10.2026)
 
 Odpowiedzi na pytania E1–E7 z propozycji ewolucji, zadane w czacie. Autor: „Ja nie lubię tych dokumentów […] wolę przedmiot po przedmiocie tutaj decydować i tak samo z ewolucjami klas i wszystkim”, więc dalsze pytania idą w czacie.
