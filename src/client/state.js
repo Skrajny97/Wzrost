@@ -232,6 +232,30 @@ export function setTrackUnknown(value) {
   }
 }
 
+// "Opcje wyprawy" on the Walka screen stays as the player left it, folded
+// (the author: "rozwijaną zakładką") or unfolded; folded at first.
+const OPTIONS_KEY = 'wzrost.hunt-options';
+let optionsOpen = readOptionsOpen();
+
+function readOptionsOpen() {
+  try {
+    return localStorage.getItem(OPTIONS_KEY) === 'open';
+  } catch {
+    return false;
+  }
+}
+
+export const huntOptionsOpen = () => optionsOpen;
+
+export function setHuntOptionsOpen(value) {
+  optionsOpen = value;
+  try {
+    localStorage.setItem(OPTIONS_KEY, value ? 'open' : 'folded');
+  } catch {
+    // Without storage the choice lasts until the page is closed.
+  }
+}
+
 // Test mode ("Pomiń czas" and other test tools) can be turned off in the
 // settings while the server allows it; the choice is kept in this browser.
 const TEST_MODE_KEY = 'wzrost.test-mode';

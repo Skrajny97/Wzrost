@@ -4,10 +4,10 @@
 // and "Odbierz", the period's chest in the top right corner, and at the
 // bottom "Odbierz wszystkie" while a reward of the open tab waits.
 
-import { materialSprite, monsterSprite } from './art.js';
+import { materialSprite, monsterSprite, resourceArt } from './art.js';
 import { $, fill, h, icon } from './dom.js';
 import { countOf, formatCountdown, formatNumber } from './format.js';
-import { RESOURCE_ICONS, SYSTEM_POINTS_ICON } from './icons.js';
+import { SYSTEM_POINTS_ICON } from './icons.js';
 import { rod, roll, stopRoll } from './parchment.js';
 import { playSound } from './sound.js';
 import { call, onCharacterChange, serverNow, state } from './state.js';
@@ -52,7 +52,7 @@ function rewardChip(reward) {
   const art =
     reward.kind === 'part'
       ? (materialSprite(reward.id) ?? icon('hammer', { size: 20 }))
-      : icon(RESOURCE_ICONS[reward.kind === 'gold' ? 'gold' : reward.id] ?? 'unknown', { size: 18 });
+      : resourceArt(reward.kind === 'gold' ? 'gold' : reward.id, 18);
   return h(
     'span',
     { class: `quest-reward quest-reward--${reward.kind}`, title: rewardName(reward) },

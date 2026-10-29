@@ -456,6 +456,7 @@
         "exchange",
         "chancePerLevel",
         "maxChance",
+        "luck",
         "rarities",
         "texts"
       ],
@@ -567,6 +568,18 @@
           "minimum": 1,
           "description": "Co tyle poziomów przedmiotu wyrób bierze o jedną część więcej, niż podaje parts (koszt rośnie z poziomem, więc części zawsze kosztują u złomiarza więcej, niż on płaci za wyrób; test w test/workshop.test.js)."
         },
+        "luck": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["oneUp", "twoUp", "everyLevels", "perStep"],
+          "description": "Łut szczęścia (autor): wykonany przedmiot wychodzi o rzadkość wyżej z szansą oneUp, a o dwie wyżej z szansą twoUp. Co everyLevels poziomów profesji obie szanse rosną o perStep. Nigdy wyżej niż ostatnia rzadkość.",
+          "properties": {
+            "oneUp": { "type": "number", "minimum": 0, "maximum": 1 },
+            "twoUp": { "type": "number", "minimum": 0, "maximum": 1 },
+            "everyLevels": { "type": "integer", "minimum": 1 },
+            "perStep": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
         "upgrades": {
           "type": "array",
           "minItems": 1,
@@ -666,10 +679,19 @@
             "busy",
             "claimFirst",
             "pushTitle",
-            "pushBody"
+            "pushBody",
+            "lucky"
           ],
           "properties": {
             "report": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "lucky": {
               "type": "array",
               "minItems": 1,
               "items": {

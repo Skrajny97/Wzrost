@@ -110,7 +110,7 @@ export async function eventTests(context) {
   return json({
     events: testableEvents().map((event) => ({
       id: event.id,
-      title: event.title,
+      title: event.name ?? event.title,
       draft: Boolean(event.draft),
       cases: (event.cases ?? []).map(({ id, name }) => ({ id, name })),
       endings: eventEndings(event).map(({ id, name }) => ({ id, name })),

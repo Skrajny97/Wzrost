@@ -8,12 +8,12 @@
 // gold for resources a few times a day, and at the Skup złomu the scrap
 // dealer sells crafting parts. Opened with the camp button in the top bar.
 
+import { resourceArt } from '../art.js';
 import { BOARD_HEIGHT, BOARD_WIDTH, CAMP_PLOTS, PLOT_HEIGHT, PLOT_WIDTH, boardArt, buildingTier, plotArt } from '../camp-art.js';
 import { craftTableSection, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { leaveView, openView } from '../history.js';
-import { RESOURCE_ICONS } from '../icons.js';
 import { playSound } from '../sound.js';
 import { call, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
 import { skipControl } from '../time.js';
@@ -276,7 +276,7 @@ function mountBoard(container, backHash) {
         h(
           'li',
           { class: 'camp-material' },
-          icon(RESOURCE_ICONS[entry.id] ?? 'unknown', { size: 16 }),
+          resourceArt(entry.id, 24),
           h('span', { text: entry.name }),
           h('strong', { text: formatNumber(entry.amount) }),
         ),
@@ -380,7 +380,7 @@ function mountBoard(container, backHash) {
         class: `camp-bubble${place === 'side' ? ' camp-bubble--side' : ''}`,
         onClick: (event) => withButton(event.currentTarget, () => collectStore(building)),
       },
-      icon(RESOURCE_ICONS[store.resource] ?? 'unknown', { size: 14 }),
+      resourceArt(store.resource, 14),
       amount,
     );
     ticks.push((now) => {
@@ -498,7 +498,7 @@ function mountBuilding(container, id) {
       h(
         'p',
         { class: 'store-head' },
-        icon(RESOURCE_ICONS[store.resource] ?? 'unknown', { size: 18 }),
+        resourceArt(store.resource, 18),
         h('span', { text: `Magazyn: ${resourceName(store.resource)}` }),
         amount,
       ),
@@ -565,7 +565,7 @@ function mountBuilding(container, id) {
           class: 'button button--world fire-trade-button',
           onClick: (event) => withButton(event.currentTarget, () => tradeAtFire(id, amount, amount * trade.unitGold)),
         },
-        icon(RESOURCE_ICONS[id] ?? 'unknown', { size: 18 }),
+        resourceArt(id, 18),
         label,
       );
       return { id, button, label };
@@ -635,7 +635,7 @@ function mountBuilding(container, id) {
                 draw();
               },
             },
-            h('span', { class: 'exchange-option-name' }, icon(RESOURCE_ICONS[id] ?? 'unknown', { size: 16 }), resourceName(id)),
+            h('span', { class: 'exchange-option-name' }, resourceArt(id, 16), resourceName(id)),
             h('small', { text: `masz ${formatNumber(have(id))}` }),
           ),
         ),
@@ -686,7 +686,7 @@ function mountBuilding(container, id) {
               class: 'button button--world fire-trade-button',
               onClick: (event) => withButton(event.currentTarget, () => exchangeResources(from, id, amount, amount * exchange.rate)),
             },
-            icon(RESOURCE_ICONS[id] ?? 'unknown', { size: 18 }),
+            resourceArt(id, 18),
             label,
           );
           return { id, button, label };
@@ -827,7 +827,7 @@ function mountBuilding(container, id) {
           h(
             'li',
             { class: `cost${(have[resource] ?? 0) < amount ? ' cost--missing' : ''}` },
-            icon(RESOURCE_ICONS[resource] ?? 'unknown', { size: 16 }),
+            resourceArt(resource, 16),
             h('span', { text: resourceName(resource) }),
             h('strong', { text: `${formatNumber(have[resource] ?? 0)} / ${formatNumber(amount)}` }),
           ),

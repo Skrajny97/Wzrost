@@ -3,11 +3,11 @@
 // The item card also upgrades the item on the camp's Kowadło and takes a bag
 // item apart on the Stół rozbiórki.
 
-import { herbSprite, itemSprite, materialSprite, portraitSprite, potionSprite } from '../art.js';
+import { herbSprite, itemSprite, materialSprite, portraitSprite, potionSprite, resourceArt } from '../art.js';
 import { MATERIALS_HINT, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, timeFormat } from '../format.js';
-import { RESOURCE_ICONS, SLOT_ICONS, itemIcon } from '../icons.js';
+import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { portrait } from '../portraits.js';
 import { playSound } from '../sound.js';
 import { call, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
@@ -667,7 +667,7 @@ function anvilSection(item, busy) {
         h(
           'li',
           { class: `cost${(have[resource]?.amount ?? 0) < amount ? ' cost--missing' : ''}` },
-          icon(RESOURCE_ICONS[resource] ?? 'unknown', { size: 16 }),
+          resourceArt(resource, 16),
           h('span', { text: have[resource]?.name ?? resource }),
           h('strong', { text: `${formatNumber(have[resource]?.amount ?? 0)} / ${formatNumber(amount)}` }),
         ),

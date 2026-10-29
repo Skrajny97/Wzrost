@@ -3,7 +3,8 @@
 // and a full-figure portrait for each class and look. Whatever has no sprite
 // yet keeps its line icon or vector art.
 
-import { h } from './dom.js';
+import { h, icon } from './dom.js';
+import { RESOURCE_ICONS } from './icons.js';
 import { state } from './state.js';
 
 // The ids with a sprite file, and the size it was drawn at.
@@ -144,12 +145,21 @@ export const SPRITES = {
   // The herbs of Zielarstwo, 32×32, filled in as they are approved.
   herbs: {
     size: 32,
-    ids: ['comfrey', 'mugwort', 'nettle', 'plantain', 'st-johns-wort', 'calamus', 'arnica', 'wormwood', 'valerian', 'cranberry', 'aconite', 'fern-blossom'],
+    ids: ['comfrey', 'mugwort', 'nettle', 'plantain', 'st-johns-wort', 'calamus', 'arnica', 'wormwood', 'valerian', 'cranberry', 'aconite', 'mistletoe', 'fern-blossom'],
   },
   // The potions of Alchemia, 32×32, filled in as they are approved.
   potions: {
     size: 32,
-    ids: ['lesser-healing', 'lesser-mana', 'lesser-speed', 'healing', 'mana', 'antidote', 'speed', 'stoneskin-brew', 'strength-brew', 'focus-draught'],
+    ids: [
+      'lesser-healing', 'lesser-mana', 'lesser-speed', 'healing', 'mana', 'antidote', 'speed', 'stoneskin-brew', 'strength-brew', 'focus-draught',
+      'greater-healing', 'greater-mana', 'greater-speed', 'aconite-oil', 'mistletoe-elixir', 'fern-brew',
+    ],
+  },
+  // The camp's resources (data/resources.json), 32×32, shown at the size of
+  // the line icons they replace.
+  resources: {
+    size: 32,
+    ids: ['wood', 'stone', 'iron-ore'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
@@ -211,6 +221,15 @@ export const campArt = (buildingId, tier) => (available.camp.has(`${buildingId}-
 export const herbSprite = (id) => sprite('herbs', id, 'sprite--item');
 export const potionSprite = (id) => sprite('potions', id, 'sprite--item');
 export const professionSprite = (id) => sprite('professions', id, 'sprite--profession');
+// Gold or a resource at a line icon's size: the resource's sprite, or its
+// line icon while it has none (gold keeps its coin).
+export function resourceArt(id, size) {
+  const art = sprite('resources', id, 'sprite--resource');
+  if (!art) return icon(RESOURCE_ICONS[id] ?? 'unknown', { size });
+  art.width = size;
+  art.height = size;
+  return art;
+}
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The figure of an event and the address of its scene, or null while there
 // is none.

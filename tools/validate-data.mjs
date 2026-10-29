@@ -659,6 +659,9 @@ function checkEvents(data, { monsters, rarities }) {
       .filter(Boolean)
       .flatMap((outcome) => (Array.isArray(outcome) ? outcome : [outcome]));
   for (const event of events.list) {
+    for (const id of event.exceptAreas ?? []) {
+      if (!living.has(id)) errors.push(`events.json: ${event.id} ma nieznany region wewnętrzny "${id}" w exceptAreas`);
+    }
     for (const id of event.areas ?? []) {
       if (!living.has(id)) {
         errors.push(`events.json: ${event.id} ma nieznany region wewnętrzny "${id}"`);

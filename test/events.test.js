@@ -54,7 +54,9 @@ describe('events', () => {
     const seeds = Array.from({ length: 40 }, (_, index) => `region-${index}`);
     const drawn = (areaId, extra = {}, data = always) => seeds.map((one) => eventFor({ hunt: { result: 'success', areaId, minutes: 30 }, seed: one, ...extra }, data)?.id ?? null);
     for (const areaId of ['windfalls-edge', 'fox-ravines', 'raven-hollows']) assert.ok(drawn(areaId).every((id) => id === 'wounded-woman'), areaId);
-    for (const areaId of ['viper-heaps', 'spider-gully', 'reed-beds']) assert.ok(drawn(areaId).every((id) => id === null), areaId);
+    assert.ok(drawn('viper-heaps').every((id) => id === null));
+    // Further on only the fern flower without Licho comes there.
+    for (const areaId of ['spider-gully', 'reed-beds']) assert.ok(drawn(areaId).every((id) => id === 'fern-flower-calm'), areaId);
     // "Testuj zdarzenia" still brings it anywhere.
     assert.equal(eventFor({ hunt: { result: 'success', areaId: 'viper-heaps', minutes: 30 }, seed, forced: 'wounded-woman' }, always), woman);
     const drafted = { ...always, events: { ...always.events, list: [...always.events.list, { ...woman, id: 'szkic', areas: undefined, draft: true }] } };
@@ -225,6 +227,27 @@ describe('events', () => {
     assert.equal(resolveFern('leave', 'free').fights.length, base.fights.length);
   });
 
+  test('the fern flower without Licho comes in every region from level 26 but where the full one does, its blossom rarer', () => {
+    const calm = content.eventsById['fern-flower-calm'];
+    const full = content.eventsById['fern-flower'];
+    const always = { ...content, events: { ...content.events, chance: 1 } };
+    const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
+    const seeds = Array.from({ length: 30 }, (_, index) => `spokoj-${index}`);
+    const brought = (areaId) => new Set(seeds.map((one) => eventFor({ hunt: hunt(areaId), seed: one }, always)?.id));
+    // Not on the starting levels, nor beside the full fern flower.
+    for (const areaId of ['windfalls-edge', 'boar-thicket', ...full.areas]) assert.ok(!brought(areaId).has(calm.id), areaId);
+    for (const areaId of ['spider-gully', 'reed-beds', 'old-riverbed', 'crane-meadows', 'old-diggings']) assert.deepEqual([...brought(areaId)], [calm.id], areaId);
+    // No Licho: picking leaves an item, and a Kwiat paproci one time in ten.
+    const picked = Array.from({ length: 200 }, (_, index) =>
+      resolveEvent({ hunt: base, event: calm, optionId: 'pick', character, equipped, name: 'Mira', seed: `kwiat-${index}` }, content),
+    );
+    assert.ok(picked.every((one) => one.fights.length === base.fights.length));
+    const blossoms = picked.filter((one) => one.herbs).length;
+    assert.ok(blossoms > 6 && blossoms < 40, `${blossoms} of 200`);
+    assert.ok(picked.filter((one) => !one.herbs).every((one) => one.items.length === base.items.length + 1));
+    assert.equal(resolveEvent({ hunt: base, event: calm, optionId: 'watch', character, equipped, name: 'Mira', seed }, content).gold, base.gold);
+  });
+
   test('a draft ending comes only where drafts are on; "Testuj zdarzenia" chooses an ending', () => {
     // The Błędnica was a draft until the author approved it (0.0.44).
     const drafted = structuredClone(woman);
@@ -285,6 +308,16 @@ describe('events (API)', () => {
             { id: 'guarded', name: 'Licho strzeże kwiatu' },
             { id: 'free', name: 'Kwiat bez stróża' },
           ],
+          endings: [
+            { id: 'item', name: 'Zerwanie: zostaje przedmiot' },
+            { id: 'blossom', name: 'Zerwanie: zostaje Kwiat paproci' },
+          ],
+        },
+        {
+          id: 'fern-flower-calm',
+          title: 'Kwiat paproci bez Licha',
+          draft: false,
+          cases: [],
           endings: [
             { id: 'item', name: 'Zerwanie: zostaje przedmiot' },
             { id: 'blossom', name: 'Zerwanie: zostaje Kwiat paproci' },

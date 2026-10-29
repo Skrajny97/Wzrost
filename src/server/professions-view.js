@@ -7,6 +7,7 @@ import {
   carryLimit,
   craftChance,
   craftCost,
+  craftLuck,
   craftUpgrades,
   craftableBases,
   fightKind,
@@ -209,6 +210,8 @@ function workshopView(level, row) {
     place: workshop.place,
     maxCount: workshop.maxCount,
     upgrades: craftUpgrades(level, content),
+    // The chances of an item one or two rarities above the ordered one.
+    luck: craftLuck(level, content),
     upgradesFrom: workshop.upgrades[0].level,
     // Parts of a rarity for one of the next, at once (exchangeParts): each
     // part with the one it is had for.

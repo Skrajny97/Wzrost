@@ -84,6 +84,18 @@
             "items": { "type": "string", "minLength": 1 },
             "description": "Regiony wewnętrzne, po których wyprawach zdarzenie może przyjść (np. tam, gdzie żyją jego stwory); bez listy przychodzi wszędzie."
           },
+          "exceptAreas": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 },
+            "description": "Regiony wewnętrzne, w których zdarzenie nie przychodzi (np. tam, gdzie przychodzi jego pełna wersja)."
+          },
+          "minLevel": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Zdarzenie przychodzi tylko w regionach wewnętrznych od tego poziomu (minLevel regionu) w górę."
+          },
+          "name": { "type": "string", "minLength": 1, "description": "Nazwa w „Testuj zdarzenia”, gdy tytuł jest taki sam jak innego zdarzenia." },
           "draft": { "type": "boolean", "description": "Zdarzenie, którego autor jeszcze nie zatwierdził: przychodzi tylko w wersji testowej." },
           "options": {
             "type": "array",

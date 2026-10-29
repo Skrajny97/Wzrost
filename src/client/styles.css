@@ -2005,6 +2005,13 @@ a.segmented-option {
   image-rendering: pixelated;
 }
 
+/* A resource's sprite stands where its line icon stood, in a line of text. */
+.sprite--resource {
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+
 .item-details {
   display: flex;
   flex-direction: column;
@@ -3006,6 +3013,76 @@ img.area-art {
   flex: none;
 }
 
+/* "Opcje wyprawy": a tab that unfolds the length, the potions and the
+   boxes, a thin line between them; folded, its bar tells the choices. */
+.hunt-options {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+
+.hunt-options-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.hunt-options-title {
+  flex: none;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hunt-options-summary {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hunt-options-chevron {
+  flex: none;
+  color: var(--text-muted);
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.hunt-options-toggle[aria-expanded='true'] .hunt-options-chevron {
+  transform: rotate(-90deg);
+}
+
+.hunt-options-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 12px 12px;
+}
+
+.hunt-options-body[hidden] {
+  display: none;
+}
+
+.hunt-options-body > * + * {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
 /* "Unikaj elit i czempionów" by "Wyrusz": a plain check mark, with the
    whole line to tap. */
 .avoid-rare {
@@ -3970,7 +4047,8 @@ img.area-art {
   font-family: var(--font-system);
 }
 
-.camp-material svg {
+.camp-material svg,
+.camp-material .sprite {
   grid-row: span 2;
 }
 

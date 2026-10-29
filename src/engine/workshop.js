@@ -15,7 +15,7 @@
 // once (the author: "rozbiórka pozwoli po prostu łatwiej i szybciej uzyskać
 // dostęp").
 
-import { generateItem, itemView } from './items.js';
+import { generateItem, itemName, itemView } from './items.js';
 import { countList, professionLevelLines, professionProgress } from './professions.js';
 import { createRng } from './rng.js';
 import { say } from './text.js';
@@ -155,6 +155,26 @@ export function craftUpgrades(level, content) {
   return chances;
 }
 
+// The chances a made item comes out one rarity or two above the ordered one,
+// by luck alone (the author: "5% na poziom rzadkości wyższej niż oczekiwana,
+// 1% na dwa poziomy wyżej. Rośnie wraz z levelem Profesji co 20 lvli o 1%
+// obydwa wskaźniki").
+export function craftLuck(level, content) {
+  const { oneUp, twoUp, everyLevels, perStep } = content.workshop.luck;
+  const bonus = perStep * Math.floor(level / everyLevels);
+  return { oneUp: oneUp + bonus, twoUp: twoUp + bonus };
+}
+
+// The rarity a made item comes out with: one draw for both chances of
+// craftLuck, never above the last rarity.
+function luckyRarity(rarityId, level, rng, content) {
+  const { oneUp, twoUp } = craftLuck(level, content);
+  const roll = rng.next();
+  const steps = roll < twoUp ? 2 : roll < twoUp + oneUp ? 1 : 0;
+  const index = Math.min(content.rarities.length - 1, rarityStep(rarityId, content) - 1 + steps);
+  return content.rarities[index].id;
+}
+
 // The upgrade one made item comes with, drawn as craftUpgrades tells: no
 // draw at all below the first tier's level.
 function rollCraftUpgrade(level, rng, content) {
@@ -165,10 +185,10 @@ function rollCraftUpgrade(level, rng, content) {
 }
 
 // The `count` items of an order, one after another from the seed: whether
-// each came out and, if so, the item, upgraded or not. A made item keeps the
-// parts it took and the upgrade it came with (`crafted`) for the scrapper's
-// price and the Stół rozbiórki. An order stopped early keeps the draws of
-// the items it made.
+// each came out and, if so, the item, of the ordered rarity or a luckier one,
+// upgraded or not. A made item keeps the parts it took and the upgrade it
+// came with (`crafted`) for the scrapper's price and the Stół rozbiórki. An
+// order stopped early keeps the draws of the items it made.
 export function craftItems({ baseId, rarityId, count, level, professionLevel, met = [], seed }, content) {
   const rng = createRng(seed);
   const chance = craftChance(rarityId, professionLevel, content);
@@ -181,7 +201,7 @@ export function craftItems({ baseId, rarityId, count, level, professionLevel, me
       results.push({ made });
       continue;
     }
-    const item = generateItem({ baseId, level, rarityId, area }, rng, content);
+    const item = generateItem({ baseId, level, rarityId: luckyRarity(rarityId, professionLevel, rng, content), area }, rng, content);
     const upgrade = rollCraftUpgrade(professionLevel, rng, content);
     results.push({ made, item: { ...item, ...(upgrade > 0 && { upgrade }), crafted: { parts, upgrade } } });
   }
@@ -204,6 +224,7 @@ export function workshopReport({ base, rarityId, results, scrolls, learned = [],
   const patterns = craftableBases(content).filter((candidate) => opened(patternLevel(candidate, content)) && !learned.includes(candidate.id));
   const rarities = workshop.rarities.filter((rarity) => opened(rarity.level));
   const made = results.filter((result) => result.made).map((result) => result.item);
+  const lucky = rarityId ? made.filter((item) => item.rarity !== rarityId) : [];
   const failed = results.length - made.length;
   const madeCount = scrolls ?? made.length;
   return {
@@ -225,6 +246,7 @@ export function workshopReport({ base, rarityId, results, scrolls, learned = [],
     revealed: patterns.map((candidate) => candidate.id),
     summary: { xp, levelBefore: character.level, levelAfter: work.level, timePoints: work.timePoints },
     system: [
+      ...lucky.map((item) => say(texts, 'lucky', 0, { item: itemName(item, content), rarity: content.raritiesById[item.rarity].name })),
       ...professionLevelLines(profession, before, after, content),
       ...(patterns.length > 0 ? [say(texts, 'revealed', 0, { patterns: patterns.map((candidate) => candidate.name).join(', ') })] : []),
       ...rarities.map((rarity, index) => say(texts, 'rarity', index, { rarity: content.raritiesById[rarity.id].name })),

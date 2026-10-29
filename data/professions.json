@@ -150,6 +150,7 @@
     },
     "chancePerLevel": 0.005,
     "maxChance": 0.95,
+    "luck": { "oneUp": 0.05, "twoUp": 0.01, "everyLevels": 20, "perStep": 0.01 },
     "rarities": [
       { "id": "common", "level": 1, "chance": 1 },
       { "id": "rare", "level": 5, "chance": 0.9 },
@@ -174,7 +175,8 @@
       "busy": ["Postać wykonuje przedmioty. Poczekaj na koniec wyrobu."],
       "claimFirst": ["Wyrób się skończył. Najpierw odbierz raport."],
       "pushTitle": ["Koniec wyrobu"],
-      "pushBody": ["Przedmioty gotowe: {place}. Raport czeka na odbiór."]
+      "pushBody": ["Przedmioty gotowe: {place}. Raport czeka na odbiór."],
+      "lucky": ["Łut szczęścia! Przedmiot wyższej rzadkości: {item} ({rarity})."]
     }
   },
   "potionUse": {

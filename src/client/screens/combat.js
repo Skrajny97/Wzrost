@@ -9,7 +9,7 @@ import { areaArt } from '../area-art.js';
 import { landArt, materialSprite, monsterSprite, potionSprite } from '../art.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon } from '../dom.js';
-import { formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
+import { countOf, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { preloadReportMusic } from '../music.js';
 import { systemPoints } from '../quests.js';
 import { walkScene } from '../scenes.js';
@@ -18,12 +18,14 @@ import {
   avoidRareOn,
   call,
   currentHp,
+  huntOptionsOpen,
   isUnlocked,
   reportCache,
   restRate,
   seekRareOn,
   serverNow,
   setAvoidRare,
+  setHuntOptionsOpen,
   setSeekRare,
   setTrackQuests,
   setTrackUnknown,
@@ -617,6 +619,7 @@ export function mountCombat(container, { params, navigate }) {
       onChange: () => {
         setTrackQuests(trackBox.checked);
         showTrackNote();
+        showSummary();
       },
     });
     showTrackNote();
@@ -636,17 +639,16 @@ export function mountCombat(container, { params, navigate }) {
       onChange: () => {
         setTrackUnknown(unknownBox.checked);
         showUnknownNote();
+        showSummary();
       },
     });
     showUnknownNote();
-    // All the choices of the exploration in one place, above the threat
-    // they change and "Wyrusz" (the author: not scattered over the card).
+    // The boxes of the exploration; they go into "Opcje wyprawy" below.
     const choices =
       !first &&
       h(
-        'section',
-        { class: 'potion-picks hunt-options', 'aria-label': 'Opcje wyprawy' },
-        h('p', { class: 'duration-title', text: 'Opcje wyprawy' }),
+        'div',
+        { class: 'hunt-options-boxes' },
         avoid,
         seek,
         h(
@@ -676,7 +678,22 @@ export function mountCombat(container, { params, navigate }) {
       const threat = ratings?.[minutes];
       threatLine.className = `threat threat--${threat ?? 'unknown'}`;
       threatValue.textContent = threat ? THREAT_NAMES[threat] : '…';
+      showSummary();
     };
+    // The folded "Opcje wyprawy" tells the length, the potions taken and
+    // how many boxes are ticked.
+    const summary = h('span', { class: 'hunt-options-summary' });
+    function showSummary() {
+      const taken = Object.values(potions?.taken() ?? {}).reduce((sum, count) => sum + count, 0);
+      const ticked = [avoiding(), seeking(), tracking(), tracingUnknown()].filter(Boolean).length;
+      summary.textContent = [
+        formatMinutes(minutes),
+        taken > 0 && countOf(taken, 'mikstura', 'mikstury', 'mikstur'),
+        ticked > 0 && countOf(ticked, 'opcja', 'opcje', 'opcji'),
+      ]
+        .filter(Boolean)
+        .join(' · ');
+    }
 
     // A slider with buttons for one step at a time, and the length's name.
     const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
@@ -801,9 +818,10 @@ export function mountCombat(container, { params, navigate }) {
         h('p', { class: 'region-description', text: area.description }),
         area.dangers?.length > 0 && bestiaryRow(area),
         levelNote,
-        durations,
-        potions?.element,
-        choices,
+        // Everything the exploration is set up with in one frame, above the
+        // threat it changes and "Wyrusz" (the author: not scattered over the
+        // card). The narrator's first exploration has only its length.
+        first ? durations : huntOptions(summary, [durations, potions?.element, choices]),
         threatLine,
         start,
         quick,
@@ -838,6 +856,31 @@ export function mountCombat(container, { params, navigate }) {
             : 'Szybkie Polowania na dziś się skończyły. Nowe od północy.',
       }),
     );
+  }
+
+  // "Opcje wyprawy" as a tab that unfolds (the author: "niech staną się
+  // rozwijaną zakładką"): a bar with the summary, the choices under it.
+  function huntOptions(summary, parts) {
+    const body = h('div', { class: 'hunt-options-body', id: 'hunt-options-body', hidden: !huntOptionsOpen() }, parts);
+    const toggle = h(
+      'button',
+      {
+        type: 'button',
+        class: 'hunt-options-toggle',
+        'aria-expanded': String(huntOptionsOpen()),
+        'aria-controls': 'hunt-options-body',
+        onClick: () => {
+          const open = body.hidden;
+          body.hidden = !open;
+          toggle.setAttribute('aria-expanded', String(open));
+          setHuntOptionsOpen(open);
+        },
+      },
+      h('span', { class: 'hunt-options-title', text: 'Opcje wyprawy' }),
+      summary,
+      icon('chevron', { size: 18, className: 'hunt-options-chevron' }),
+    );
+    return h('section', { class: 'hunt-options', 'aria-label': 'Opcje wyprawy' }, toggle, body);
   }
 
   // The potions to take along, each kind with −/+ up to one for each fight

@@ -2808,6 +2808,26 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - **wzory w Warsztacie** (brakujący szczegół): wzór bazy od 25. poziomu klasy odsłania się na 25. poziomie Rzemieślnictwa, a od 50. na 50. Wcześniej każda dalsza baza miała wzór od `laterPatternLevel`, czyli od 10. Rozbiórka takiego przedmiotu nadal od razu uczy jego wzoru;
     - symulacja balansu (`tools/simulate.mjs`) liczy, jak dotąd, ekwipunek z pierwszych baz kategorii. Dalsze bazy są więc zapasem siły ponad nią i nie zmieniają jej tabel.
 
+## Uwagi autora po 0.0.51 (29.10.2026, w grze od 0.0.52)
+
+1. **Ikonki zasobów.** Autor: „Wygenerujmy może też normalne ikonki zasobów” i o szkicach: „1 tak / 2 tak tylko usuń ziemie spod kamieni / 3 przemaluj ten brązowy kolor na pasujący pod żelazo”.
+    - Drewno weszło bez zmian. Kamień nie ma już brązowej plamy ziemi i ma domknięty ciemny kontur. Ruda żelaza ma żyły przemalowane z rdzawego brązu na zimną stal, a białe błyski kruszcu zostały.
+    - Ikonki stoją wszędzie, gdzie były kreskowe: w portfelu, w zasobach i kosztach obozu, w Magazynach, u Ducha ognia, przy wymianie na Stole rozbiórki, w kosztach Kowadła i w nagrodach zadań. Złoto zostaje monetą.
+2. **Ikonki mikstur.** Autor: „Dorób kontury dużych mikstur reszta super”. Trzy Duże mikstury mają domknięty ciemny kontur (dół i boki kolby oraz sznurek). Olejek z tojadu, Eliksir jemiołowy, Napar z kwiatu paproci i drugi szkic Jemioły weszły bez zmian.
+3. **Opcje wyprawy: wszystko w jednym miejscu, jako zakładka.** Autor: „Skoro tworzysz "Opcje wyprawy" to wrzuć tam wszystko wlącznie z zabieranymi miksturami i w ogóle, bo to ładniej będzie” i „Opcje wyprawy niech staną się rozwijaną zakładką”.
+    - „Opcje wyprawy” to jedna zakładka nad zagrożeniem i „Wyrusz”: czas wyprawy, mikstury na wyprawę i cztery pola, z cienką linią między nimi.
+    - Zakładka jest na początku zwinięta. Na pasku widać czas wyprawy, liczbę wziętych mikstur i liczbę zaznaczonych pól, np. „15 min · 2 mikstury · 1 opcja”. Telefon pamięta, czy zakładka była rozwinięta.
+    - Pierwsza wyprawa z narratorem ma tylko czas wyprawy, bez zakładki, bo narrator pokazuje suwak.
+4. **Łut szczęścia w Warsztacie.** Autor: „Niech wytwarzanie teoretycznie przedmiotu danej rzadkości ma szansę wytworzenia przedmiotu wyzszej rzadkości w zależności totalnie od łutu szczęścia. 5% na poziom rzadkości wyższej niż oczekiwana, 1% na dwa poziomy wyżej. Rośnie wraz z levelem Profesji co 20 lvli o 1% obydwa wskaźniki”.
+    - Każdy udany przedmiot losuje raz: 5% szans na rzadkość o jedną wyżej i 1% na dwie wyżej. Od 20. poziomu Rzemieślnictwa 6% i 2%, od 40. 7% i 3%, aż do 10% i 6% na 100. poziomie (`luck` w `data/professions.json`).
+    - Nigdy wyżej niż boski. Części i czas są takie, jak dla zamówionej rzadkości.
+    - Raport pisze „Łut szczęścia! Przedmiot wyższej rzadkości: Topór (rzadki).”, a formularz Warsztatu podaje obecne szanse.
+5. **Kwiat paproci bez Licha wszędzie.** Autor: „Zdarzenie Kwiat Paproci bez Licha (w drugiej wersji jakby) powinno moc sie tez wyswietlac wszędzie”, „Ale Kwiat Paproci rzadko mozna zdobyć”, „ale nie na startowych lvlach” i na pytanie o poziom: „Od 26. poziomu, jak zdarzenie”.
+    - Druga wersja (`fern-flower-calm`) przychodzi we wszystkich regionach wewnętrznych od 26. poziomu, poza czterema miejscami, w których żyje Licho i przychodzi pełna wersja. Dziś to Pajęczy Parów oraz całe Zarośnięte Rozlewiska i Torfowe Mszary. W Wiatrołomach jej nie ma.
+    - Licha w niej nie ma. Zerwany kwiat zostawia przedmiot (rzadki, unikatowy albo epicki), a Kwiat paproci tylko raz na 10 razy (w pełnej wersji raz na 4).
+    - Tekst jest jak w pełnej wersji, bez głazu i bez ruchu między kamieniami: „Wśród paproci żarzy się czerwone światło. To kwiat paproci, o którym opowiadają w każdej wsi: kto go zerwie, temu szczęście już nie odstąpi.”
+    - W „Testuj zdarzenia” ta wersja nazywa się „Kwiat paproci bez Licha”.
+
 ## Uwagi autora po 0.0.50 (29.10.2026, w grze od 0.0.51)
 
 1. **Stół rozbiórki.** Autor (ze zrzutami ekranu): „Podstawowa funkcja stołu do rozbiórki powinna być wyżej, tak jak zaznaczone”. Materiały, kolejka i części stoją teraz zaraz pod kartą ulepszenia, nad obrazkiem stołu, opisem i wymianą zasobów. Weszło już w 0.0.50.
@@ -2822,8 +2842,6 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
 5. **Opcje wyprawy w jednym miejscu.** Autor (ze zrzutem ekranu): „i takie wszystkie opcje wraz z tropieniem stworów z zadań oraz z bestiariusza powinny być w jednym miejscu -> albo na górze albo na dole, zależnie jak bardziej pasuje, bo są rozrzucone”. Wszystkie cztery pola stoją w sekcji „Opcje wyprawy” na dole, pod miksturami, a nad zagrożeniem i „Wyrusz”: „Unikaj elit i czempionów”, „Trop elity i czempiony”, „Trop przede wszystkim stwory z zadań” i „Trop nieznane stwory”. Dół pasuje bardziej, bo dwa pierwsze pola zmieniają zagrożenie, które jest tuż pod nimi.
 6. **Czas jednego przedmiotu.** Autor: „Rzemieślnictwo musi też pokazywac czas wyrobu jednego przedmiotu”. Przy jednym przedmiocie Warsztat pisze „Czas wyrobu jednego przedmiotu: 30 min”, a przy kilku „Czas wyrobu: 1 h 30 min, po 30 min na przedmiot”. Zwój ochronny tak samo: „Czas jednego zwoju” albo „po 1 h na zwój”.
 7. **Ikonka na Discord** (autor: „Daj mi do pobrania ikonkę na serwer Discord dla gry”): logo gry z ikony aplikacji, 1024×1024 px, z ciemnym tłem, wysłane w czacie do pobrania. Discord sam przycina ją do koła.
-5. **Opcje wyprawy w jednym miejscu.** Autor: „i takie wszystkie opcje wraz z tropieniem stworów z zadań oraz z bestiariusza powinny być w jednym miejscu -> albo na górze albo na dole, zależnie jak bardziej pasuje, bo są rozrzucone.” Cztery pola stoją razem w sekcji „Opcje wyprawy” na dole karty miejsca: „Unikaj elit i czempionów”, „Trop elity i czempiony”, „Trop przede wszystkim stwory z zadań” i „Trop nieznane stwory”. Sekcja jest pod miksturami, a nad zagrożeniem i „Wyrusz”, bo dwa pierwsze pola zmieniają zagrożenie.
-6. **Czas jednego przedmiotu.** Autor: „Rzemieślnictwo musi też pokazywac czas wyrobu jednego przedmiotu”. Przy jednym przedmiocie Warsztat pisze „Czas wyrobu jednego przedmiotu: 30 min.”, a przy kilku na przykład „Czas wyrobu: 1 h 30 min, po 30 min na przedmiot.” Zwój ochronny pokazuje czas tak samo.
 
 ## Zioła i mikstury: wybory autora (29.10.2026, w grze od 0.0.50)
 
@@ -2832,7 +2850,7 @@ Propozycja: 10 nowych ziół Zielarstwa i 13 nowych mikstur Alchemii, po jednym 
 1. **Zioła.** Autor: „Zioła: 1/10 - super do Zwykłej mikstury i wszystkie do zwykłej / 2/10 - super / 3/10 - super / 4/10 - super tylko popraw szkic ręcznie / 5/10 - super / 6/10 - super / 7/10 - super, tylko zmniejsz jagody / 8/10 - super / 9/10 - zrób drugi szkic / 10/10 - super”.
     - Szkice Babki lancetowatej, Dziurawca, Tataraku, Piołunu, Kozłka, Tojadu i Kwiatu paproci są w grze bez zmian.
     - Arnika ma szkic poprawiony ręcznie, a Żurawina mniejsze jagody.
-    - Jemioła ma drugi szkic, który czeka na ocenę. Do tego czasu w grze nie ma ikony.
+    - Jemioła ma drugi szkic, który czeka na ocenę. Do tego czasu w grze nie ma ikony. *Od 0.0.52 drugi szkic jest w grze (autor: „reszta super”).*
     - Poziom Zielarstwa, zbiór na godzinę i cena u złomiarza: Babka lancetowata 8, 4, 5 złota; Dziurawiec 12, 4, 6; Tatarak 16, 3, 7; Arnika 22, 3, 8; Piołun 28, 3, 10; Kozłek 34, 2, 12; Żurawina 40, 2, 14; Tojad 50, 2, 18; Jemioła 65, 1, 24; Kwiat paproci 90, 0,5, 60.
 2. **Przepisy.** Babka, Dziurawiec i Arnika idą tylko do Zwykłych mikstur. Duże biorą po 3 Żywokostu, Bylicy albo Pokrzywy i 2 Żurawiny (wybór w czacie: „Tak, Duże bez nich (zalecane)”). Poziom Alchemii, zioła i działanie:
     - Zwykła mikstura leczenia: 10, Żywokost ×2 i Babka ×2, leczy 35% maks. HP;

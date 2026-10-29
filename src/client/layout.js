@@ -4,11 +4,11 @@
 // pouch of parts beside it) and the two bottom bars, the main menu and the
 // character bar with its own background.
 
-import { materialSprite, narratorFace } from './art.js';
+import { materialSprite, narratorFace, resourceArt } from './art.js';
 import { communityNews, communityNewsText } from './chat-news.js';
 import { $, fill, h, icon } from './dom.js';
 import { countOf, formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
-import { RESOURCE_ICONS, SYSTEM_POINTS_ICON } from './icons.js';
+import { SYSTEM_POINTS_ICON } from './icons.js';
 import { anyClaimable, showQuests } from './quests.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
 import { meter, toast } from './ui.js';
@@ -174,19 +174,19 @@ export function buildTopbar(onSettings) {
 // Gold, Punkty Systemu and Punkty Czasu first, then the materials.
 function walletRows(timePoints) {
   const [gold, ...materials] = walletEntries();
-  const row = (iconName, name, amount, kind, note) =>
+  const row = (art, name, amount, kind, note) =>
     h(
       'li',
       { class: `wallet-item${kind ? ` wallet-item--${kind}` : ''}` },
-      icon(iconName, { size: 18 }),
+      art,
       h('span', { class: 'wallet-name' }, name, note),
       h('span', { class: 'wallet-amount', text: formatNumber(amount) }),
     );
   return [
-    row('coin', gold.name, gold.amount, 'gold'),
-    row(SYSTEM_POINTS_ICON, 'Punkty Systemu', state.character.systemPoints, 'system'),
-    row('hourglass', 'Punkty Czasu', timePoints, 'time', topbar.timeNote),
-    ...materials.map((entry, index) => row(RESOURCE_ICONS[entry.id] ?? 'unknown', entry.name, entry.amount, index === 0 && 'materials')),
+    row(icon('coin', { size: 18 }), gold.name, gold.amount, 'gold'),
+    row(icon(SYSTEM_POINTS_ICON, { size: 18 }), 'Punkty Systemu', state.character.systemPoints, 'system'),
+    row(icon('hourglass', { size: 18 }), 'Punkty Czasu', timePoints, 'time', topbar.timeNote),
+    ...materials.map((entry, index) => row(resourceArt(entry.id, 18), entry.name, entry.amount, index === 0 && 'materials')),
   ];
 }
 

@@ -11,6 +11,7 @@ import {
   craftChance,
   craftCost,
   craftItems,
+  craftLuck,
   craftParts,
   craftRarities,
   craftUpgrades,
@@ -127,6 +128,51 @@ describe('the Warsztat in the engine', () => {
     }
     const unnamed = craftItems({ baseId: 'helmet', rarityId: 'epic', count: 5, level: 30, professionLevel: 25, met: [], seed: 'n' }, content);
     assert.ok(unnamed.filter((result) => result.made).every(({ item }) => item.affixes.every((affix) => affix.monster === undefined)));
+  });
+
+  test('luck makes an item one rarity above the ordered one 5% of the time and two above 1%, both a point more every 20 levels', () => {
+    near(craftLuck(1, content).oneUp, 0.05);
+    near(craftLuck(19, content).twoUp, 0.01);
+    near(craftLuck(20, content).oneUp, 0.06);
+    near(craftLuck(20, content).twoUp, 0.02);
+    near(craftLuck(100, content).oneUp, 0.1);
+    near(craftLuck(100, content).twoUp, 0.06);
+    const counts = { common: 0, rare: 0, unique: 0 };
+    for (let index = 0; index < 400; index++) {
+      for (const { item } of craftItems({ baseId: 'sword', rarityId: 'common', count: 5, level: 12, professionLevel: 1, seed: `l${index}` }, content)) counts[item.rarity] += 1;
+    }
+    // Of 2000 items about 100 rare and 20 unique.
+    assert.ok(counts.rare > 65 && counts.rare < 140, JSON.stringify(counts));
+    assert.ok(counts.unique > 6 && counts.unique < 40, JSON.stringify(counts));
+    // Never above the last rarity.
+    for (let index = 0; index < 100; index++) {
+      for (const { made, item } of craftItems({ baseId: 'sword', rarityId: 'divine', count: 5, level: 90, professionLevel: 100, seed: `d${index}` }, content)) {
+        if (made) assert.equal(item.rarity, 'divine');
+      }
+    }
+    // The report says which item came out rarer than ordered.
+    let index = 0;
+    let rare = craftItems({ baseId: 'axe', rarityId: 'rare', count: 1, level: 12, professionLevel: 5, seed: 'luck0' }, content)[0];
+    while (!rare.made) rare = craftItems({ baseId: 'axe', rarityId: 'rare', count: 1, level: 12, professionLevel: 5, seed: `luck${++index}` }, content)[0];
+    const report = workshopReport(
+      {
+        base: base('axe'),
+        rarityId: 'common',
+        results: [rare],
+        minutes: 30,
+        startedAt: 0,
+        endsAt: 1800000,
+        seed: 'luck',
+        stopped: false,
+        before: { level: 5, xp: 0 },
+        after: { level: 5, xp: 0 },
+        character: newCharacter('warrior', { level: 12 }),
+        xp: 1,
+        work: { level: 12, xp: 0, timePoints: 0, messages: [] },
+      },
+      content,
+    );
+    assert.ok(report.system[0].startsWith('Łut szczęścia! Przedmiot wyższej rzadkości: '), report.system.join(' | '));
   });
 
   test('a rarer item fails as often as its chance says', () => {

@@ -74,6 +74,11 @@ const upgradesText = (workshop) =>
     ? `Od ${workshop.upgradesFrom}. poziomu Rzemieślnictwa wyrób może wyjść od razu ulepszony.`
     : `Wyrób może wyjść od razu ulepszony: ${workshop.upgrades.map((tier) => `+${tier.upgrade} (${formatDecimal(tier.chance * 100)}%)`).join(', ')}.`;
 
+// The chances that luck alone makes an item one or two rarities above the
+// ordered one.
+const luckText = (workshop) =>
+  `Łut szczęścia: ${formatDecimal(workshop.luck.oneUp * 100)}% szans na przedmiot o rzadkość wyżej i ${formatDecimal(workshop.luck.twoUp * 100)}% na dwie wyżej. Szanse rosną co 20 poziomów Rzemieślnictwa.`;
+
 // A title with a large "Powrót" on the right, as in the report.
 function backHeading(title, subtitle, hash) {
   return h(
@@ -1137,6 +1142,7 @@ export function mountProfessions(container, { params, navigate }) {
           text: rarity.chance >= 1 ? 'Każdy przedmiot tej rzadkości się uda.' : `Każdy przedmiot ma ${chance}% szans na powodzenie. Nieudany zabiera swoje części, a zasoby wracają.`,
         }),
         h('p', { class: 'muted', text: upgradesText(workshop) }),
+        h('p', { class: 'muted', text: luckText(workshop) }),
         h('p', { class: 'muted', text: `Przedmioty dostaną poziom postaci: ${formatNumber(character.level)}.` }),
         free < Math.min(workshop.maxCount, byParts, byResources) &&
           h('p', { class: 'herb-room', text: `Plecak ma miejsce tylko na ${countOf(free, 'przedmiot', 'przedmioty', 'przedmiotów')}.` }),

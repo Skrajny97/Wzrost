@@ -125,6 +125,8 @@ test('every sprite on the list has its file at its size, and every class has its
     places: ['gathering', 'brewing', 'workshop'].map((work) => data('professions')[work].place.id),
     events: data('events').list.map((event) => event.art),
     'event-scenes': data('events').list.map((event) => event.scene),
+    // The camp's resources in place of their line icons.
+    resources: data('resources').map((resource) => resource.id),
   };
   for (const [kind, { size, width = size, height = size, fit = false, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);

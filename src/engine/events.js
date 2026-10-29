@@ -33,10 +33,19 @@ export const eventChance = (content) => content.events.chance;
 // that name it among their `areas`, or any region when they name none (the
 // author: "to obecne z ranną kobietą może się pojawiać tylko w Skraju
 // Wiatrołomów, Lisich Jarach i Kruczych Wykrotach, bo tylko tam jest
-// Błędnica"). A draft, an event the author has not approved yet, comes only
-// where `drafts` are on (the test version).
+// Błędnica"), not one of their `exceptAreas`, and from `minLevel` only in
+// the regions of that level and higher (the author of the fern flower
+// without Licho: "powinno moc sie tez wyswietlac wszędzie", "ale nie na
+// startowych lvlach"). A draft, an event the author has not approved yet,
+// comes only where `drafts` are on (the test version).
 export const eventsIn = (areaId, drafts, content) =>
-  content.events.list.filter((event) => (drafts || !event.draft) && (!event.areas || event.areas.includes(areaId)));
+  content.events.list.filter(
+    (event) =>
+      (drafts || !event.draft) &&
+      (!event.areas || event.areas.includes(areaId)) &&
+      !event.exceptAreas?.includes(areaId) &&
+      (content.areasById[areaId]?.minLevel ?? 0) >= (event.minLevel ?? 0),
+  );
 
 // The event an exploration brings, or null. `forced` (an event's id, from
 // "Testuj zdarzenia" on the test version) brings that one without the draw,
