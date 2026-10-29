@@ -2830,6 +2830,13 @@ Odpowiedzi na pytania E1–E7 z propozycji ewolucji, zadane w czacie. Autor: „
     - **Snajper:** Przebijający strzał (Celny strzał przebija cel i trafia stojącego za nim za połowę) i Strzał z ukrycia (raz na walkę, w pierwszym ruchu, 280% we wroga z największym HP);
     - **Strzelec Burzy:** Burza strzał (Grad strzał z elektrycznością, trafiony ma 15% szans stracić najbliższy ruch) i Chmura burzowa (przez 3 ruchy 40% elektryczności we wszystkich wrogów);
     - **Łowca:** Grot z zadziorem (Przyszpilenie, po którym cel krwawi przez 3 ruchy) i Sokół (przez 4 ruchy sokół dziobie losowy cel za 40%).
+14. **Mag:**
+    - **Elementalista:** Ognisty wybuch (Kula ognia wybucha i parzy pozostałych wrogów za 30%) i Promień Żywiołów. Autor: „Promień Żywiołów zadający 100% obrażeń w każdego wroga (po równej ilości % każdego dostępnego Elementaliście żywiołu)”, czyli w każdego wroga po jednej trzeciej ze 100% ognia, mrozu i elektryczności;
+    - **Władca Lodu:** Zamieć i Lodowa włócznia (220% mrozu w jeden cel, wychłodzony dostaje o 50% więcej). Autor: „Zamieć musi być mocniejsza i zamrażać całkiem, bo na bazowym poziomie już było spowolnienie. Tutaj będzie 20% na zamrożenie”. Zamieć to Mroźny podmuch, po którym każdy trafiony wróg ma 20% szans na zamrożenie i traci najbliższy ruch;
+    - **Arkanista:** Lustro many (Osłona many odbija 25% pochłoniętych obrażeń w napastnika) i Przywołanie żywiołaka. Autor: „Dodaj jakąś umiejętność Przywołania żywiołaka, skoro później będzie Druid”. Działanie żywiołaka czeka na potwierdzenie autora.
+15. **Kleryk, Uzdrowiciel:** Odnowa i Cud.
+    - Autor o Odnowie: „Większe leczenie z Odnowy lub takie samo, ale na wszystkie postaci”. Wybór między tymi dwiema wersjami czeka na autora.
+    - Cud: autor: „Cud -> wskrzeszenie z 50% HP”. Raz na walkę omdlała postać wstaje z 50% maks. HP.
 
 ## Ewolucje i Osada: propozycje (28.10.2026)
 
