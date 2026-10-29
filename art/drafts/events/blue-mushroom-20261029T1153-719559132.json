@@ -1,0 +1,25 @@
+{
+  "id": "blue-mushroom",
+  "payload": {
+    "prompt": "a single large strange mushroom with a wide glowing blue cap speckled with pale spots and a slender pale stem, faint cyan glow and tiny floating spores around it, a few blades of grass and moss at its foot, full plant, mysterious and tempting",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 719559132,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793274821,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 70.72,
+    "request_id": "146572f6-df54-4437-9221-b86bd3e1e21e",
+    "outputs_retained_until": 1793361183
+  }
+}
