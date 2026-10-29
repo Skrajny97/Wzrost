@@ -15,10 +15,10 @@
     { "name": "Tier IV", "classLevel": 50, "upTo": 100 }
   ],
   "chests": [
-    { "gold": 50, "timePoints": 5 },
-    { "gold": 150, "timePoints": 10 },
-    { "gold": 400, "timePoints": 20 },
-    { "gold": 1000, "timePoints": 40 }
+    { "gold": 50, "timePoints": 5, "systemPoints": 10 },
+    { "gold": 150, "timePoints": 10, "systemPoints": 20 },
+    { "gold": 400, "timePoints": 20, "systemPoints": 20 },
+    { "gold": 1000, "timePoints": 40, "systemPoints": 20 }
   ],
   "milestones": {
     "potions": [4, 8, 12, 16],

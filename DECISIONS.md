@@ -2849,13 +2849,16 @@ To plan autora z „Uwag autora po 0.0.55”, punkty 5–7. Liczby i szczegóły
 
     Kolejne progi dają kolejne skrzynie.
 8. **Skrzynie.** Jak w Bestiariuszu, skrzynia otwiera się raz.
-    - Tier I daje 50 złota i 5 Punktów Czasu, II 150 i 10, III 400 i 20, a IV 1000 i 40.
-    - Punktów Systemu skrzynie nie dają. To pytanie do autora.
+    - Tier I daje 50 złota, 5 Punktów Czasu i 10 Punktów Systemu, II 150, 10 i 20, III 400, 20 i 20, a IV 1000, 40 i 20.
+    - Punkty Systemu są jak w Bestiariuszu. Autor: „Skrzynie Encyklopedii mają dawać Punkty Systemu tak jak w Bestiariuszu i zostawmy te 20.” Potem: „Jednak to bedzie za dużo za tier 1 musi być mniej”. Tier I ma więc połowę, 10, tak jak przy Punktach Czasu (5 wobec 10). To brakujący szczegół, rozstrzygnięty najprościej.
+    - Progi odkryć biorą skrzynie kolejnych tierów, więc pierwszy próg daje 10 Punktów Systemu, a dalsze po 20. Razem 39 skrzyń daje 680 Punktów Systemu, a Bestiariusz 500 (20 za region wewnętrzny, 25 za krainę).
+    - Skrzynie otwarte wcześniej na wersji testowej nie dostają Punktów Systemu wstecz. W grze głównej Encyklopedii jeszcze nie ma.
     - Skrzynia zestawu, do którego dojdą później nowe przedmioty, zostaje otwarta.
 9. **Trofea** (zastosowanie materiałów 7). Materiał zdobyty w stopniu swojego gatunku i w dwóch wyższych to trofeum: ciosy przeciw jego stworowi zadają o 5% więcej (`trophy` w `data/encyclopedia.json`).
     - Wymóg wszystkich stopni byłby dla wielu gatunków nieosiągalny. Stopień o 4 wyżej od gatunku wypada raz na kilka tysięcy sztuk, a o 5 wyżej raz na 40 000. Stopień o 2 wyżej wypada raz na 40–200 sztuk.
     - Bonus działa na ciosy, bez obrażeń rozłożonych w czasie.
     - Wyprawa bierze trofea swoich stworów przy starcie, więc raport wychodzi zawsze taki sam.
+    - Trofea zostają. Autor: „Trofeum zostaw, choć nie widzę zastosowania w dłuższym terminie (chociaż w sumie te potwory na wyższych lvlach bedziemy mogli wrzucić w Lochach pozniej to może jednak!”. Stwory z niższych krain na wyższych poziomach w Lochach to pomysł na później.
 10. **Bestiariusz** w Encyklopedii pokazuje każdą krainę i jej regiony wewnętrzne z tymi samymi listami i skrzyniami co w Walce. Skrzynie otwierają się w obu miejscach.
 11. **API.** `GET /api/encyclopedia` daje zakładki z wpisami i skrzyniami, a `POST /api/encyclopedia/chest` z `{ id }` otwiera skrzynię. Widok postaci ma `encyclopedia.ready`, liczbę skrzyń gotowych do otwarcia.
 

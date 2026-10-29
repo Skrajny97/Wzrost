@@ -150,8 +150,8 @@ describe('the Encyklopedia through the API', () => {
     assert.equal(book.materials.found, 1);
   });
 
-  test('a chest opens once, when its list is full, with gold and Punkty Czasu', async () => {
-    await set(`gold = 0, time_points = 0, parts = '{"scraps":1,"straps":1}'`);
+  test('a chest opens once, when its list is full, with gold, Punkty Czasu and Punkty Systemu', async () => {
+    await set(`gold = 0, time_points = 0, system_points = 0, parts = '{"scraps":1,"straps":1}'`);
     const shut = await call('POST', '/api/encyclopedia/chest', { cookie, body: { id: 'parts:3' } });
     assert.equal(shut.status, 409);
     assert.equal(shut.data.error.code, 'not_ready');
@@ -159,8 +159,9 @@ describe('the Encyklopedia through the API', () => {
     assert.equal((await call('GET', '/api/character', { cookie })).data.character.encyclopedia.ready, 1);
     const opened = await call('POST', '/api/encyclopedia/chest', { cookie, body: { id: 'parts:3' } });
     assert.equal(opened.status, 200, JSON.stringify(opened.data));
-    assert.deepEqual(opened.data.chest, { gold: 50, timePoints: 5, systemPoints: 0 });
+    assert.deepEqual(opened.data.chest, { gold: 50, timePoints: 5, systemPoints: 10 });
     assert.equal(opened.data.character.gold, 50);
+    assert.equal((await (await db()).prepare('SELECT system_points FROM characters').first()).system_points, 10);
     assert.equal(opened.data.character.encyclopedia.ready, 0);
     assert.equal(opened.data.encyclopedia.parts.chests[0].opened, true);
     assert.equal((await call('POST', '/api/encyclopedia/chest', { cookie, body: { id: 'parts:3' } })).data.error.code, 'opened');
