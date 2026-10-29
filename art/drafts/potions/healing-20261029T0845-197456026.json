@@ -1,0 +1,25 @@
+{
+  "id": "healing",
+  "payload": {
+    "prompt": "a medium pear-shaped glass potion bottle with a cork stopper and twine at the neck, filled with glowing ruby red liquid, single inventory item icon, bold clean outline",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 197456026,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793263586,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 47.7,
+    "request_id": "bd7cf727-41f4-4259-a4b6-efff73ac476d",
+    "outputs_retained_until": 1793349932
+  }
+}
