@@ -221,13 +221,16 @@ export const campArt = (buildingId, tier) => (available.camp.has(`${buildingId}-
 export const herbSprite = (id) => sprite('herbs', id, 'sprite--item');
 export const potionSprite = (id) => sprite('potions', id, 'sprite--item');
 export const professionSprite = (id) => sprite('professions', id, 'sprite--profession');
-// Gold or a resource at a line icon's size: the resource's sprite, or its
-// line icon while it has none (gold keeps its coin).
+// Gold or a resource where a line icon stood: the resource's sprite, never
+// under 24 px, where its detail still reads (at 14 px in the camp's bubbles
+// the author took it for the old icon), or its line icon at `size` while it
+// has none (gold keeps its coin).
+const RESOURCE_SPRITE_MIN = 24;
 export function resourceArt(id, size) {
   const art = sprite('resources', id, 'sprite--resource');
   if (!art) return icon(RESOURCE_ICONS[id] ?? 'unknown', { size });
-  art.width = size;
-  art.height = size;
+  art.width = Math.max(size, RESOURCE_SPRITE_MIN);
+  art.height = Math.max(size, RESOURCE_SPRITE_MIN);
   return art;
 }
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);

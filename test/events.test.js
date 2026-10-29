@@ -487,9 +487,11 @@ describe('events (API)', () => {
       (await character()).buffs.map(({ kind, ms, bonus }) => ({ kind, ms, bonus })),
       [{ kind: 'damage', ms: 30 * 60000, bonus: 0.1 }],
     );
+    // A short exploration may bring no gold, and then loses none (the
+    // engine's test checks both cases on fixed numbers).
     const fainted = await eat('faint');
-    const lost = Number(/\(−(\d+) złota\)\.$/.exec(fainted.event.option.text)[1]);
-    assert.ok(lost > 0);
+    const lost = Number(/\(−(\d+) złota\)\.$/.exec(fainted.event.option.text)?.[1] ?? 0);
+    assert.equal(fainted.event.loss.gold, lost);
     assert.ok(Math.abs(lost - Math.round(0.3 * (fainted.summary.gold + lost))) <= 1, `${lost} of ${fainted.summary.gold + lost}`);
   });
 

@@ -89,6 +89,74 @@ function backHeading(title, subtitle, hash) {
   );
 }
 
+// A folded list of the herbs, recipes or patterns, which grew too many for
+// tiles (the author: the screens were long to scroll). Folded, its button
+// shows the choice; open, a row for each known one and, last, the shadows
+// the System still hides, a row for each level that shows them (`unknown`
+// names them: one, a few, many). A choice folds the list, except in a list
+// of several choices at once (`multi`), folded by its button or "Gotowe".
+function choiceList(label, { multi = false, unknown }) {
+  let open = false;
+  const chosen = h('span', { class: 'choice-chosen' });
+  const action = h('span', { class: 'choice-action' });
+  const rows = h('ul', { class: 'choice-rows', 'aria-label': label });
+  const body = h('div', { class: 'choice-body', hidden: true }, rows, multi && h('button', { type: 'button', class: 'button button--world', text: 'Gotowe', onClick: () => setOpen(false) }));
+  const toggle = h('button', { type: 'button', class: 'choice-toggle', 'aria-expanded': false, onClick: () => setOpen(!open) }, chosen, action);
+  function setOpen(value) {
+    open = value;
+    body.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    fill(action, open ? 'Zwiń' : 'Zmień', icon('chevron', { size: 16 }));
+    // Folded after a choice far down the list, the button comes back into view.
+    if (!open) toggle.scrollIntoView({ block: 'nearest' });
+  }
+  const text = (name, meta) => h('span', { class: 'choice-text' }, h('span', { class: 'choice-name', text: name }), meta && h('span', { class: 'choice-meta', text: meta }));
+  fill(action, 'Zmień', icon('chevron', { size: 16 }));
+  return {
+    element: h('div', { class: 'choice-list' }, toggle, body),
+    // `picked`: the choice in the button, { art, name, meta }; `entries`:
+    // the known ones, { id, art, name, meta, on }; `hidden`: the shadows,
+    // { art, level, hint }; `pick(id)` takes one.
+    show(picked, entries, hidden, pick) {
+      fill(chosen, h('span', { class: 'choice-art' }, picked.art), text(picked.name, picked.meta));
+      const levels = [...new Set(hidden.map((each) => each.level))].sort((a, b) => a - b);
+      fill(
+        rows,
+        entries.map((entry) =>
+          h(
+            'li',
+            {},
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'choice-row',
+                'aria-pressed': entry.on,
+                onClick: () => {
+                  pick(entry.id);
+                  if (!multi) setOpen(false);
+                },
+              },
+              h('span', { class: 'choice-art' }, entry.art),
+              text(entry.name, entry.meta),
+              entry.on && icon('check', { size: 18 }),
+            ),
+          ),
+        ),
+        levels.map((level) => {
+          const group = hidden.filter((each) => each.level === level);
+          return h(
+            'li',
+            { class: 'choice-hidden', role: 'img', 'aria-label': `${countOf(group.length, ...unknown)}. ${group[0].hint}` },
+            h('span', { class: 'choice-shadows' }, group.map((each) => h('span', { class: 'choice-shadow' }, each.art))),
+            h('span', { class: 'choice-meta', text: group[0].hint }),
+          );
+        }),
+      );
+    },
+  };
+}
+
 export function mountProfessions(container, { params, navigate }) {
   const locked = lockedScreen('professions', 'Profesje');
   const professionId = params.profession ? SCREENS[params.profession] : null;
@@ -588,7 +656,7 @@ export function mountProfessions(container, { params, navigate }) {
     if (index === -1) index = Math.max(0, allowed.indexOf(60));
     let minutes = allowed[index];
 
-    const tiles = h('ul', { class: 'herb-grid' });
+    const list = choiceList('Zioła', { multi: slots > 1, unknown: ['nieznane zioło', 'nieznane zioła', 'nieznanych ziół'] });
     const estimate = h('p', { class: 'herb-estimate' });
     const room = h('p', { class: 'herb-room' });
     // How many kinds of herbs at once, and the level of the profession that
@@ -633,35 +701,16 @@ export function mountProfessions(container, { params, navigate }) {
     }
 
     function show() {
-      fill(
-        tiles,
-        gathering.herbs.map((herb) => {
-          if (herb.hidden) {
-            return h(
-              'li',
-              {},
-              h(
-                'div',
-                { class: 'herb-tile herb-tile--hidden', role: 'img', 'aria-label': `Nieznane zioło. ${herb.hint}` },
-                h('span', { class: 'herb-art herb-art--shadow' }, herbIcon(herb.id)),
-                h('span', { class: 'herb-name', text: '???' }),
-                h('span', { class: 'herb-meta', text: herb.hint }),
-              ),
-            );
-          }
-          const on = chosen.includes(herb.id);
-          return h(
-            'li',
-            {},
-            h(
-              'button',
-              { type: 'button', class: 'herb-tile', 'aria-pressed': on, onClick: () => toggle(herb.id) },
-              h('span', { class: 'herb-art' }, herbIcon(herb.id)),
-              h('span', { class: 'herb-name', text: herb.name }),
-              h('span', { class: 'herb-meta', text: `w plecaku: ${formatNumber(herb.count)}` }),
-            ),
-          );
-        }),
+      const picked = chosen.map((id) => known.find((herb) => herb.id === id));
+      list.show(
+        {
+          art: picked.map((herb) => herbIcon(herb.id)),
+          name: picked.map((herb) => herb.name).join(', '),
+          meta: slots > 1 ? `wybrano ${picked.length} z ${slots}` : `w plecaku: ${formatNumber(picked[0].count)}`,
+        },
+        known.map((herb) => ({ id: herb.id, art: herbIcon(herb.id), name: herb.name, meta: `w plecaku: ${formatNumber(herb.count)}`, on: chosen.includes(herb.id) })),
+        gathering.herbs.filter((herb) => herb.hidden).map((herb) => ({ art: herbIcon(herb.id), level: herb.level, hint: herb.hint })),
+        toggle,
       );
       const share = chosen.length;
       const expected = chosen.map((id) => {
@@ -736,7 +785,7 @@ export function mountProfessions(container, { params, navigate }) {
       { class: 'card gather-card', 'aria-labelledby': 'herbs-title' },
       h('h2', { class: 'section-title', id: 'herbs-title', text: 'Zioła' }),
       who.element,
-      tiles,
+      list.element,
       slotsHint,
       h(
         'div',
@@ -760,7 +809,7 @@ export function mountProfessions(container, { params, navigate }) {
     let recipe = known.find((candidate) => candidate.id === brewChoice.recipe) ?? known[0];
     let count = 1;
 
-    const tiles = h('ul', { class: 'herb-grid' });
+    const list = choiceList('Przepisy', { unknown: ['nieznany przepis', 'nieznane przepisy', 'nieznanych przepisów'] });
     const about = h('p', { class: 'muted' });
     const needs = h('p', { class: 'herb-estimate' });
     const picker = h('div', { class: 'stack' });
@@ -791,40 +840,16 @@ export function mountProfessions(container, { params, navigate }) {
       show();
     }
 
-    function showTiles() {
-      fill(
-        tiles,
-        brewing.recipes.map((each) => {
-          if (each.hidden) {
-            return h(
-              'li',
-              {},
-              h(
-                'div',
-                { class: 'herb-tile herb-tile--hidden', role: 'img', 'aria-label': `Nieznany przepis. ${each.hint}` },
-                h('span', { class: 'herb-art herb-art--shadow' }, potionIcon(each.id)),
-                h('span', { class: 'herb-name', text: '???' }),
-                h('span', { class: 'herb-meta', text: each.hint }),
-              ),
-            );
-          }
-          return h(
-            'li',
-            {},
-            h(
-              'button',
-              { type: 'button', class: 'herb-tile', 'aria-pressed': each.id === recipe.id, onClick: () => choose(each.id) },
-              h('span', { class: 'herb-art' }, potionIcon(each.id)),
-              h('span', { class: 'herb-name', text: each.name }),
-              h('span', { class: 'herb-meta', text: `w plecaku: ${formatNumber(each.count)}` }),
-            ),
-          );
-        }),
-      );
-    }
+    // In the bag, and whether its herbs are there for one potion.
+    const recipeMeta = (each) => `w plecaku: ${formatNumber(each.count)}${each.most === 0 ? ' · brak ziół' : ''}`;
 
     function show() {
-      showTiles();
+      list.show(
+        { art: potionIcon(recipe.id), name: recipe.name, meta: recipeMeta(recipe) },
+        known.map((each) => ({ id: each.id, art: potionIcon(each.id), name: each.name, meta: recipeMeta(each), on: each.id === recipe.id })),
+        brewing.recipes.filter((each) => each.hidden).map((each) => ({ art: potionIcon(each.id), level: each.level, hint: each.hint })),
+        choose,
+      );
       about.textContent = recipe.description;
       needs.textContent = `Na jedną miksturę: ${recipe.herbs.map((herb) => `${herb.need} × ${herb.name} (w plecaku ${formatNumber(herb.have)})`).join(', ')}.`;
       if (recipe.most === 0) {
@@ -919,7 +944,7 @@ export function mountProfessions(container, { params, navigate }) {
       { class: 'card gather-card', 'aria-labelledby': 'recipes-title' },
       h('h2', { class: 'section-title', id: 'recipes-title', text: 'Przepisy' }),
       who.element,
-      tiles,
+      list.element,
       about,
       needs,
       lucky,
@@ -946,8 +971,7 @@ export function mountProfessions(container, { params, navigate }) {
     const need = (resource) => resource.amount * rarity.step;
 
     const slotRow = h('div', { class: 'segmented workshop-slots', role: 'group', 'aria-label': 'Rodzaj przedmiotu' });
-    const tiles = h('ul', { class: 'herb-grid' });
-    const hiddenHint = h('p', { class: 'muted' });
+    const list = choiceList('Wzory', { unknown: ['nieznany wzór', 'nieznane wzory', 'nieznanych wzorów'] });
     const rarityRow = h('div', { class: 'workshop-rarities', role: 'group', 'aria-label': 'Rzadkość' });
     const picker = h('div', { class: 'stack' });
 
@@ -996,40 +1020,12 @@ export function mountProfessions(container, { params, navigate }) {
           }),
         ),
       );
-      // The known patterns first, then the shadows, whose level the line
-      // under them tells in the System's words.
-      const hidden = slot.patterns.filter((each) => each.hidden);
-      fill(
-        tiles,
-        [...known(slot), ...hidden].map((each) => {
-          if (each.hidden) {
-            return h(
-              'li',
-              {},
-              h(
-                'div',
-                { class: 'herb-tile herb-tile--hidden', role: 'img', 'aria-label': `Nieznany wzór. ${each.hint}` },
-                h('span', { class: 'herb-art herb-art--shadow' }, patternIcon(each.id)),
-                h('span', { class: 'herb-name', text: '???' }),
-                h('span', { class: 'herb-meta', text: `poz. ${each.level}` }),
-              ),
-            );
-          }
-          return h(
-            'li',
-            {},
-            h(
-              'button',
-              { type: 'button', class: 'herb-tile', 'aria-pressed': each.id === pattern.id, onClick: () => choose(() => (pattern = each)) },
-              h('span', { class: 'herb-art' }, patternIcon(each.id)),
-              h('span', { class: 'herb-name', text: each.name }),
-              h('span', { class: 'herb-meta', text: forWhom(each) }),
-            ),
-          );
-        }),
+      list.show(
+        { art: patternIcon(pattern.id), name: pattern.name, meta: forWhom(pattern) },
+        known(slot).map((each) => ({ id: each.id, art: patternIcon(each.id), name: each.name, meta: forWhom(each), on: each.id === pattern.id })),
+        slot.patterns.filter((each) => each.hidden).map((each) => ({ art: patternIcon(each.id), level: each.level, hint: each.hint })),
+        (id) => choose(() => (pattern = known(slot).find((each) => each.id === id))),
       );
-      hiddenHint.hidden = hidden.length === 0;
-      hiddenHint.textContent = [...new Set(hidden.map((each) => each.hint))].join(' ');
       fill(
         rarityRow,
         rarities.map((each) =>
@@ -1157,8 +1153,7 @@ export function mountProfessions(container, { params, navigate }) {
       h('h2', { class: 'section-title', id: 'patterns-title', text: 'Wzory' }),
       who.element,
       slotRow,
-      tiles,
-      hiddenHint,
+      list.element,
       h('h3', { class: 'workshop-subtitle', text: 'Rzadkość' }),
       rarityRow,
       next && h('p', { class: 'muted', text: `Następna rzadkość: ${next.name}, od ${next.level}. poziomu Rzemieślnictwa.` }),

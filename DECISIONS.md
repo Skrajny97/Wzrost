@@ -2808,6 +2808,17 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - **wzory w Warsztacie** (brakujący szczegół): wzór bazy od 25. poziomu klasy odsłania się na 25. poziomie Rzemieślnictwa, a od 50. na 50. Wcześniej każda dalsza baza miała wzór od `laterPatternLevel`, czyli od 10. Rozbiórka takiego przedmiotu nadal od razu uczy jego wzoru;
     - symulacja balansu (`tools/simulate.mjs`) liczy, jak dotąd, ekwipunek z pierwszych baz kategorii. Dalsze bazy są więc zapasem siły ponad nią i nie zmieniają jej tabel.
 
+## Uwagi autora po 0.0.53 (29.10.2026, w grze od 0.0.54)
+
+1. **Listy zamiast kafelków w profesjach.** Autor: „Stworz też listy mikstur do warzenia, zioł do zbierania i przedmiotów bo dużo ich się zrobiło i ekrany są długie do przewijania”.
+    - Zioła w Zielarstwie, przepisy w Alchemii i wzory w Warsztacie to rozwijane listy, jak „Opcje wyprawy”. Zwinięta lista pokazuje tylko wybór: grafikę, nazwę i krótką linię (w plecaku, dla kogo wzór). „Zmień” rozwija wiersze ze wszystkimi znanymi pozycjami.
+    - Wybór jednej pozycji zwija listę. Zioła, gdy wolno zbierać kilka rodzajów naraz, zaznacza się po kolei, a listę zwija „Gotowe” albo jej przycisk.
+    - Pozycje ukryte przez System to już nie osobne kafelki z „???”. Zamiast tego jest jeden wiersz na poziom, który je odsłoni: czarne sylwetki i zdanie Systemu, np. „Ukryte przez System do 10. poziomu Rzemieślnictwa.”
+    - Przy przepisie bez ziół na choć jedną miksturę lista dopisuje „brak ziół” (brakujący szczegół).
+    - Ekrany na telefonie są krótsze: Zielarstwo z ok. 1600 do 1060 px, Alchemia z ok. 1970 do 1070 px, a Warsztat z ok. 2750 do 1800 px.
+2. **Ikonki zasobów przy obozie.** Autor: „Nie zmieniłes chyba ikonek do zbierania zasobów przy obozie”. Dymki „Zbierz” nad Tartakiem, Kamieniołomem i Kopalnią miały już nowe grafiki, ale w 14 px, gdzie wyglądały jak dawne ikonki. Grafika zasobu ma teraz zawsze co najmniej 24 px: w dymkach, magazynach, wymianie, kosztach budowy i ulepszeń oraz w portfelu. Kreskowe ikonki złota i punktów zostają w swoim rozmiarze, a w portfelu stoją w tej samej kolumnie co grafiki.
+3. **Ikona Encyklopedii.** Autor: „Encyklopedii ikonkę w ten róg wygeneruj w RetroDiffusion a nie rysuj jak coś”. Jest jeden szkic (rodzaj grafik `icons`, 32 × 32): skórzana księga z niebieskim kamieniem Systemu. Czeka na ocenę autora. Do gry wejdzie razem z Encyklopedią, w rogu górnego paska zamiast sakwy, której części są już w plecaku.
+
 ## Uwagi autora po 0.0.52 (29.10.2026, w grze od 0.0.53)
 
 1. **Niebieski grzyb, zdarzenie ogólne (szkic na wersji testowej).** Autor: „Kolejna rzecz - jedno zdarzenie ogólne, mocno losowe, możliwe w każdej lokacji. Nie wiem co można wymyślic, ale musza tam byc albo zewnętrzne stwory tylko albo najlepiej ich brak” i „Co do tego zdarzenia to może natrafienie na nieznanego niebieskiego grzyba i decyzja o tym co z nim zrobić i losowo - utrata przytomności i części złota albo wzmocnienie na 30 minut jakieś albo zdobycie 1 Wolnego Punktu Statystyk”, „Tu byłoby używane tło danej krainy”.

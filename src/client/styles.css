@@ -838,6 +838,12 @@ button {
   border-top: 1px solid var(--line);
 }
 
+/* The line icons (18 px) take the room of the resources' sprites (24 px), so
+   the names stand in one column. */
+.wallet-item > svg {
+  margin-inline: 3px;
+}
+
 .wallet-name {
   flex: 1;
   color: var(--text);
@@ -6808,39 +6814,169 @@ a.profession-square:active {
   font-size: 13px;
 }
 
-/* The herbs to choose: a tile each, lit when chosen; one the System still
-   hides is a black shape with "???". */
+/* The herbs, recipes or patterns to choose: a folded list whose button
+   shows the choice; open, a row for each known one, lit when chosen, and the
+   shadows the System still hides, a row for each level that shows them. */
 .gather-card {
   gap: 12px;
 }
 
-.herb-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+.choice-list {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+
+.choice-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 12px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.choice-chosen {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.choice-chosen .choice-text {
+  flex: 1;
+}
+
+.choice-action {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.choice-action svg {
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.choice-toggle[aria-expanded='true'] .choice-action svg {
+  transform: rotate(-90deg);
+}
+
+.choice-art {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  color: var(--leaf);
+}
+
+.choice-art .sprite {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.choice-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.choice-name {
+  font-weight: 700;
+}
+
+.choice-meta {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.choice-body {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
+  padding: 0 8px 8px;
+  border-top: 1px solid var(--line);
+}
+
+.choice-body[hidden] {
+  display: none;
+}
+
+.choice-rows {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.herb-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  width: 100%;
-  height: 100%;
-  padding: 8px 6px;
-  background: var(--bg-deep);
-  border: 1px solid var(--line);
-  color: var(--text);
-  font: inherit;
-  text-align: center;
+.choice-rows > li + li {
+  border-top: 1px solid var(--line);
 }
 
-button.herb-tile[aria-pressed='true'] {
-  border-color: var(--leaf);
+.choice-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 6px 8px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.choice-row .choice-text {
+  flex: 1;
+}
+
+.choice-row[aria-pressed='true'] {
   background: rgba(167, 196, 127, 0.12);
+}
+
+.choice-row > svg {
+  flex: none;
+  color: var(--leaf);
+}
+
+.choice-hidden {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+
+.choice-shadows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.choice-shadow {
+  display: flex;
+  color: #000;
+}
+
+.choice-shadow .sprite {
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+  filter: brightness(0);
 }
 
 .herb-art {
@@ -6856,28 +6992,6 @@ button.herb-tile[aria-pressed='true'] {
   width: 40px;
   height: 40px;
   image-rendering: pixelated;
-}
-
-.herb-art--shadow {
-  color: #000;
-}
-
-.herb-art--shadow .sprite {
-  filter: brightness(0);
-}
-
-.herb-name {
-  font-weight: 700;
-}
-
-.herb-tile--hidden .herb-name {
-  color: var(--text-muted);
-  letter-spacing: 0.2em;
-}
-
-.herb-meta {
-  font-size: 12px;
-  color: var(--text-muted);
 }
 
 .herb-estimate,
