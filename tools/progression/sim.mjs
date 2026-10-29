@@ -53,6 +53,9 @@ export const DEFAULT_POLICY = {
   second: null,
   fire: false,
   maxHunts: 3000,
+  // The exploration's own options, as the player sets them (e.g. seekRare,
+  // "Trop elity i czempiony").
+  hunt: {},
 };
 
 // Offence x defence from the numbers the item card's preview shows. The HP
@@ -331,7 +334,7 @@ export function runCharacter(classId, runIndex, content, policyIn = {}) {
       policy.captured.push({ character: JSON.parse(JSON.stringify(character)), equipped: JSON.parse(JSON.stringify(equipped)), hp: hpStart, maxHp, areaId: area.id, minutes });
     }
     const hunt = engine.simulateHunt(
-      { character: { ...character }, equipped, hp: hpStart, name: 'S', areaId: area.id, minutes, seed: `bal:${classId}:${runIndex}:${hunts.length}` },
+      { character: { ...character }, equipped, hp: hpStart, name: 'S', areaId: area.id, minutes, seed: `bal:${classId}:${runIndex}:${hunts.length}`, ...policy.hunt },
       content,
     );
 

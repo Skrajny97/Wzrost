@@ -2808,6 +2808,17 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - **wzory w Warsztacie** (brakujący szczegół): wzór bazy od 25. poziomu klasy odsłania się na 25. poziomie Rzemieślnictwa, a od 50. na 50. Wcześniej każda dalsza baza miała wzór od `laterPatternLevel`, czyli od 10. Rozbiórka takiego przedmiotu nadal od razu uczy jego wzoru;
     - symulacja balansu (`tools/simulate.mjs`) liczy, jak dotąd, ekwipunek z pierwszych baz kategorii. Dalsze bazy są więc zapasem siły ponad nią i nie zmieniają jej tabel.
 
+## Sprawdzenie balansu pod obecne wyprawy (29.10.2026)
+
+Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo sprawdzić po prostu czy nie jest to przesada) - zadania, szybkosci awansu itp itd”, a w trakcie sprawdzania: „Pamiętaj, w kwestii balansu, że nie może być za łatwo tez.” i „Jest wiele opcji, ekwipunek nabywany itp. Tobie symulacja może pokazywać że są omdlenia a w rzeczywistosci nie ma - dzieki ekwipunkowi i innym rzeczom dla przykładu.”
+
+1. **Tempo awansu.** Symulacja (`tools/progression`, po 60 postaci na klasę, z umiejętnościami obu ścieżek, ale bez Kowadła, mikstur, Warsztatu i zakupów) daje 50. poziom klasy po 87 (Wojownik) do 103 (Kleryk) godzinach wypraw, przy ok. 45. poziomie postaci. Krzywa zakłada ok. 81 godzin, więc tempo jest bliskie założeniom. Różnicę robią omdlenia, które w grze łagodzą sprzęt, Kowadło i mikstury.
+2. **Omdlenia.** W symulacji mdleje 7–17% wypraw. Najtrudniej jest na wejściu do nowego regionu wewnętrznego na jego najniższym poziomie: w Żmijowym Zwalisku (16.), Dziczej Głuszy (21.–22.) i Omszałych Głazach (26.). Stwory zostają bez zmian, zgodnie z uwagami autora. Symulacja nie zna sprzętu z Warsztatu, Kowadła ani mikstur, a gracz widzi zagrożenie przed wyprawą.
+3. **Trop elity i czempiony** nie przyspiesza awansu i nie daje więcej złota z wypraw: tempo jest to samo, a od 41. poziomu jest trochę więcej omdleń. Zostaje bez zmian.
+4. **Zadania** nie dają XP, więc nie przyspieszają awansu. Złoto z zadań dziennych to równowartość ok. 0,5–1 godziny wypraw. Wymagania pasują do obecnego tempa: 30–90 minut wypraw dziennie, 5–10 godzin tygodniowo, a od 20. poziomu klasy jeden nowy region tygodniowo, czyli 5 poziomów klasy, ok. 8–13 godzin wypraw. Bez zmian.
+5. **Dodatkowy czas.** Punkty Czasu (1 na 30 minut oraz skrzynie zadań) przewijają ok. 1,5 godziny wypraw dziennie. Szybkie Polowania dają 45 minut dziennie, a Błyskawiczne 30–60 minut. Razem to do ok. 3 godzin dziennie. Najbardziej pomaga to graczom, którzy zaglądają rzadko i do 24. poziomu mają wyprawy najwyżej 30-minutowe. Zostaje tak, jak autor ustalił.
+6. **Narzędzie.** Symulacja przyjmuje teraz opcje wyprawy gracza (`hunt` w polityce, np. `seekRare`).
+
 ## Uwagi autora po 0.0.55 (29.10.2026, na wersji testowej)
 
 1. **Wdrożenia na komendę autora.** Autor: „Od kolejnej rundy wdrożenia (poza awaryjnymi, które podpiszę) robimy rzadziej na moją komendę. Możesz sugerować wdrożenie, ale sam go nie bedziesz wykonywał.”
