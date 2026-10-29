@@ -103,10 +103,10 @@ export function rareCatchUp(characterLevel, area, met, content) {
 }
 
 // The champion is drawn only where it lives, so other places keep their draws.
-export function rollEncounter(area, rng, content, characterLevel, pace, tracked = []) {
+export function rollEncounter(area, rng, content, characterLevel, pace, tracked = [], unknown = []) {
   if (area.champion && rng.chance(pace.championChance)) return championEncounter(area, content);
   if (rng.chance(pace.eliteChance)) return eliteEncounter(area, content);
-  const weight = encounterWeight(tracked, content);
+  const weight = encounterWeight(tracked, unknown, content);
   const tough = toughEncountersFor(area, characterLevel);
   if (tough.length > 0 && rng.chance(pace.toughChance)) {
     return regularEncounter(rng.weighted(tough, weight), area, rng, content, { tough: true, characterLevel });
@@ -115,9 +115,19 @@ export function rollEncounter(area, rng, content, characterLevel, pace, tracked 
 }
 
 // An encounter's weight: by half more (questTrackBonus) with a creature the
-// character tracks for its quests ("Trop przede wszystkim stwory z zadań").
-const encounterWeight = (tracked, content) => (encounter) =>
-  encounter.weight * (encounter.monsters.some((id) => tracked.includes(id)) ? 1 + content.balance.hunt.questTrackBonus : 1);
+// character tracks for its quests ("Trop przede wszystkim stwory z zadań"),
+// and by a tenth more (unknownTrackBonus) with one it has not met yet, while
+// it tracks those ("Trop nieznane stwory").
+const encounterWeight = (tracked, unknown, content) => (encounter) =>
+  encounter.weight *
+  (encounter.monsters.some((id) => tracked.includes(id)) ? 1 + content.balance.hunt.questTrackBonus : 1) *
+  (encounter.monsters.some((id) => unknown.includes(id)) ? 1 + content.balance.hunt.unknownTrackBonus : 1);
+
+// The creatures of a place's encounters, plain and demanding, that the
+// character has not met (`met`: ids), for "Trop nieznane stwory".
+export const unknownCreatures = (area, met) => [
+  ...new Set([...area.encounters, ...(area.tough ?? [])].flatMap((encounter) => encounter.monsters).filter((id) => !met.includes(id))),
+];
 
 // The inner region for an id. Activities and reports from before inner regions
 // name a whole region: they get its inner region for the character's level.
@@ -340,6 +350,7 @@ export function resourceBundle(area, total) {
   return [[top, 1]];
 }
 
+// `unknown`: the creatures not met yet that the exploration tracks.
 // `first`: the character's very first exploration, which goes one way:
 // regular encounters only, no chests among the finds, and the one treasure
 // is a plain weapon of its class after the first won fight. `potions`: the
@@ -349,7 +360,7 @@ export function resourceBundle(area, total) {
 // potion alone, as explorations started before the other kinds kept it
 // (potions.js).
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [], met = null, potions = {}, healBelow, buffs = {}, speed = null },
+  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null },
   content,
 ) {
   const rng = createRng(seed);
@@ -458,7 +469,7 @@ export function simulateHunt(
       continue;
     }
 
-    const encounter = rollEncounter(area, rng, content, character.level, pace, tracked);
+    const encounter = rollEncounter(area, rng, content, character.level, pace, tracked, unknown);
     if (catchUp && (encounter.elite || encounter.champion)) {
       catchUp = { elite: catchUp.elite && !encounter.elite, champion: catchUp.champion && !encounter.champion };
       if (!catchUp.elite && !catchUp.champion) catchUp = null;

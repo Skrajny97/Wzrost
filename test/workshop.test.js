@@ -85,16 +85,16 @@ describe('the Warsztat in the engine', () => {
     assert.deepEqual(craftCost(base('gloves'), 'common', 3, 1, content), { parts: { scraps: 9 }, resources: { stone: 27 } });
   });
 
-  test('a common item takes an hour at level 1, each rarity up twice as long, each level 1% less, down to half', () => {
-    assert.equal(itemMinutes('common', 1, content), 60);
-    assert.equal(itemMinutes('rare', 1, content), 120);
-    assert.equal(itemMinutes('divine', 1, content), 3840);
-    near(itemMinutes('common', 11, content), 54);
-    assert.equal(itemMinutes('common', 51, content), 30);
-    assert.equal(itemMinutes('common', 100, content), 30);
-    assert.equal(orderMinutes(5, 'common', 1, content), 300);
-    assert.equal(orderMinutes(3, 'common', 11, content), 162);
-    assert.equal(orderMinutes(1, 'rare', 5, content), 116);
+  test('a common item takes half an hour at level 1, each rarity up twice as long, each level 1% less, down to half', () => {
+    assert.equal(itemMinutes('common', 1, content), 30);
+    assert.equal(itemMinutes('rare', 1, content), 60);
+    assert.equal(itemMinutes('divine', 1, content), 1920);
+    near(itemMinutes('common', 11, content), 27);
+    assert.equal(itemMinutes('common', 51, content), 15);
+    assert.equal(itemMinutes('common', 100, content), 15);
+    assert.equal(orderMinutes(5, 'common', 1, content), 150);
+    assert.equal(orderMinutes(3, 'common', 11, content), 81);
+    assert.equal(orderMinutes(1, 'rare', 5, content), 58);
   });
 
   test('a common item always comes out; the others more often with each level, at most 95%', () => {
@@ -283,7 +283,7 @@ describe('the Warsztat through the API', () => {
     assert.deepEqual(broadsword, { id: 'broadsword', level: 10, hidden: true, hint: 'Ukryte przez System do 10. poziomu Rzemieślnictwa.' });
     assert.equal(workshop.slots[5].patterns[0].classNames, null);
     const [common, rare] = workshop.rarities;
-    assert.deepEqual(common, { id: 'common', name: 'pospolity', color: '#9b9b9b', level: 1, step: 1, part: { id: 'scraps', name: 'Ścinki' }, chance: 1, itemMinutes: 60 });
+    assert.deepEqual(common, { id: 'common', name: 'pospolity', color: '#9b9b9b', level: 1, step: 1, part: { id: 'scraps', name: 'Ścinki' }, chance: 1, itemMinutes: 30 });
     assert.equal(rare.hidden, true);
     assert.equal(rare.hint, 'Ukryte przez System do 5. poziomu Rzemieślnictwa.');
   });
@@ -316,7 +316,7 @@ describe('the Warsztat through the API', () => {
     assert.equal(after.activity.placeName, 'Systemowy Warsztat');
     assert.equal(after.activity.rarityName, 'pospolity');
     assert.equal(after.activity.count, 2);
-    assert.equal(after.activity.minutes, 120);
+    assert.equal(after.activity.minutes, 60);
     // 7 parts for each sword at the character's level 15.
     assert.deepEqual(parts(after), { scraps: 16 });
     assert.deepEqual(after.resources, { wood: 50, stone: 164, 'iron-ore': 28 });
@@ -350,17 +350,17 @@ describe('the Warsztat through the API', () => {
     assert.equal(claimed.status, 200);
     const { report, character: after } = claimed.data;
     assert.equal(report.kind, 'items');
-    assert.equal(report.minutes, 120);
+    assert.equal(report.minutes, 60);
     assert.equal(report.items.length, 2);
     assert.ok(report.items.every((item) => item.base === 'axe' && item.level === 15 && item.rarity === 'common'));
     assert.equal(report.failed, 0);
     assert.equal(report.made, 'Wykonano: 2 × Topór.');
-    assert.equal(report.profession.levelAfter, 3);
+    assert.equal(report.profession.levelAfter, 2);
     assert.ok(report.summary.xp > 0);
     assert.equal(after.activity, null);
     assert.equal(after.bag.filter((item) => item.base === 'axe').length, 2);
-    assert.equal(after.professions.list[2].level, 3);
-    assert.equal(after.stats.find((stat) => stat.id === 'strength').sources.professions, 2);
+    assert.equal(after.professions.list[2].level, 2);
+    assert.equal(after.stats.find((stat) => stat.id === 'strength').sources.professions, 1);
     // Nothing comes back from an order made in full.
     assert.deepEqual(parts(after), { scraps: 16 });
     assert.deepEqual(after.resources, { wood: 50, stone: 164, 'iron-ore': 28 });
@@ -398,13 +398,13 @@ describe('the Warsztat through the API', () => {
     assert.equal(none.data.character.professions.list[2].xp, 0);
 
     await craft({ baseId: 'sword', rarity: 'common', count: 3 });
-    await age(70);
+    await age(40);
     const { report, character: after } = (await call('POST', '/api/hunts/cancel', { cookie })).data;
     assert.equal(report.kind, 'items');
-    assert.equal(report.minutes, 70);
+    assert.equal(report.minutes, 40);
     assert.equal(report.items.length, 1);
     assert.equal(report.stopped, 'Wyrób przerwany. Części i zasoby na resztę wróciły.');
-    assert.equal(report.profession.xp, 70);
+    assert.equal(report.profession.xp, 40);
     assert.equal(after.activity, null);
     // 21 parts taken for the three, 14 back for the two not done.
     assert.deepEqual(parts(after), { scraps: 23 });
@@ -416,7 +416,7 @@ describe('the Warsztat through the API', () => {
     await craft({ baseId: 'gloves', rarity: 'common', count: 1 });
     const skipped = await call('POST', '/api/time/skip', { cookie, body: { target: 'activity' } });
     assert.equal(skipped.status, 200);
-    assert.equal(skipped.data.spent, 60);
+    assert.equal(skipped.data.spent, 30);
     assert.equal((await call('POST', '/api/hunts/claim', { cookie })).data.report.kind, 'items');
   });
 });

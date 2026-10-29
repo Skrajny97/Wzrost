@@ -119,7 +119,7 @@
         "iron-ore": ["sword", "axe", "dagger", "aspergillum", "helmet", "chainmail"]
       }
     },
-    "itemMinutes": 60,
+    "itemMinutes": 30,
     "rarityTime": 2,
     "speedPerLevel": 0.01,
     "fastest": 0.5,

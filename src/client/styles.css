@@ -6867,6 +6867,10 @@ button.herb-tile[aria-pressed='true'] {
 
 /* The Warsztat: the slots in two rows of three, and the rarities, each in
    its colour, lit when chosen. */
+.workshop-tabs {
+  margin: 2px 0 4px;
+}
+
 .workshop-slots {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }

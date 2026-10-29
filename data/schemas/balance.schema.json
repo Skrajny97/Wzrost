@@ -405,6 +405,7 @@
         "rareSeekFactor",
         "rareCatchUpChance",
         "questTrackBonus",
+        "unknownTrackBonus",
         "recoveryAfterFight",
         "soloXpBonus",
         "lowLevelFreeDiff",
@@ -528,6 +529,11 @@
           "type": "number",
           "minimum": 0,
           "description": "O ile rośnie waga spotkania, w którym jest stwór z niedokończonego zadania, gdy postać tropi stwory z zadań („Trop przede wszystkim stwory z zadań”): 0,5 to o połowę."
+        },
+        "unknownTrackBonus": {
+          "type": "number",
+          "minimum": 0,
+          "description": "O ile rośnie waga spotkania, w którym jest stwór jeszcze niespotkany (nieodkryty w Bestiariuszu), gdy postać tropi nieznane stwory („Trop nieznane stwory”): 0,1 to o 10%."
         },
         "championLevelBonus": {
           "type": "number",

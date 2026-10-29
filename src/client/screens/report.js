@@ -8,7 +8,7 @@ import { eventFigure, itemSprite, materialSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { playSound } from '../sound.js';
-import { activityFinished, avoidRareOn, call, reportCache, seekRareOn, state, trackQuestsOn } from '../state.js';
+import { activityFinished, avoidRareOn, call, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn } from '../state.js';
 import { guided, openSheet, systemPanel, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { scrapperSheet } from '../scrapper.js';
@@ -443,6 +443,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
               avoidRare: avoidRareOn(),
               seekRare: seekRareOn(),
               trackQuests: trackQuestsOn(),
+              trackUnknown: trackUnknownOn(),
             });
             navigate('#/walka');
           }),

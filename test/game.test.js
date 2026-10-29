@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
-import { classXpToNext, createRng, generateItem, itemName, meetingChances, questPeriod, upgradeCost, xpToNext } from '../src/engine/index.js';
+import { classXpToNext, createRng, generateItem, itemName, meetingChances, questPeriod, unknownCreatures, upgradeCost, xpToNext } from '../src/engine/index.js';
 import { skipTime } from '../src/server/testing.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -716,6 +716,18 @@ describe('hunts and reports', () => {
     const none = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, trackQuests: true } });
     assert.equal(none.data.character.activity.tracksQuests, false);
     assert.equal((await (await db()).prepare('SELECT tracked FROM activities').first()).tracked, null);
+  });
+
+  test('an exploration can track the creatures not met yet', async () => {
+    const wrong = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, trackUnknown: 'tak' } });
+    assert.equal(wrong.data.error.code, 'invalid_track_unknown');
+    await (await db()).prepare(`UPDATE characters SET met = '["badger","wolf"]'`).run();
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, trackUnknown: true } })).status, 201);
+    const { unknown } = JSON.parse((await (await db()).prepare('SELECT options FROM activities').first()).options);
+    assert.deepEqual(unknown, unknownCreatures(content.areasById['windfalls-edge'], ['badger', 'wolf']));
+    assert.ok(unknown.length > 0 && !unknown.includes('badger'));
+    await call('POST', '/api/test/skip-time', { cookie });
+    assert.equal((await call('POST', '/api/hunts/claim', { cookie })).status, 200);
   });
 
   test('checks the place and the duration', async () => {

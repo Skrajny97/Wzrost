@@ -44,6 +44,7 @@ import {
   spendWindows,
   storeStacks,
   threatSamples,
+  unknownCreatures,
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { finishBrewing } from './brewing.js';
@@ -206,14 +207,15 @@ export async function startHunt(context) {
 
 // An exploration of `minutes` in an inner region, from now on, avoiding the
 // elite and the champion when asked (avoidRare) or seeking them (seekRare),
-// and tracking the creatures the quests ask for (trackQuests): those living
-// there are kept with it, as are the potions taken along (potions), the
+// and tracking the creatures the quests ask for (trackQuests) or those not
+// met yet (trackUnknown): those living there are kept with it, as are the
+// potions taken along (potions), the
 // healing mark (healBelow) and the potions for a time drunk before
 // (potions.js).
 // The skipped introduction sends the first one this way too (tutorial.js).
 // A Szybkie Polowanie (`quick`) is over as it starts: it began `minutes`
 // ago.
-export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, potions, healBelow } = {}, now, { quick = false } = {}) {
+export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow } = {}, now, { quick = false } = {}) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
   const area = typeof id === 'string' ? areaFor(id, player.row.level, content) : undefined;
@@ -226,6 +228,7 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
   if (typeof seekRare !== 'boolean') throw new ApiError(400, 'invalid_seek', 'Zaznacz albo odznacz tropienie elit i czempionów.');
   if (avoidRare && seekRare) throw new ApiError(400, 'invalid_rare', 'Postać nie może naraz unikać i tropić elit i czempionów.');
   if (typeof trackQuests !== 'boolean') throw new ApiError(400, 'invalid_track', 'Zaznacz albo odznacz tropienie stworów z zadań.');
+  if (typeof trackUnknown !== 'boolean') throw new ApiError(400, 'invalid_track_unknown', 'Zaznacz albo odznacz tropienie nieznanych stworów.');
   if (!huntDurations(player.row.level, content).includes(minutes)) {
     const longest = longestHunt(player.row.level, content);
     const next = nextHuntUnlock(player.row.level, content);
@@ -245,9 +248,11 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
   const buffs = buffsOf(player.row, now);
   const windows = buffWindows(buffs, minutes);
   const timed = Object.keys(windows).length > 0;
+  const unknown = trackUnknown ? unknownCreatures(area, JSON.parse(player.row.met ?? '[]')) : [];
   const options = {
     ...(Object.keys(taken).length > 0 && { potions: taken, healBelow: healBelow ?? content.potionUse.healBelow }),
     ...(timed && { buffs: windows }),
+    ...(unknown.length > 0 && { unknown }),
     ...(quick && { quick }),
   };
   const startsAt = quick ? now - minutes * 60000 : now;
@@ -377,6 +382,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       avoidRare: activity.avoid_rare === 1,
       seekRare: activity.seek_rare === 1,
       tracked: JSON.parse(activity.tracked ?? '[]'),
+      unknown: options.unknown ?? [],
       // The creatures met before this exploration: it changes them only
       // when claimed, so the report comes out the same every time.
       met: JSON.parse(row.met ?? '[]'),

@@ -26,9 +26,11 @@ import {
   setAvoidRare,
   setSeekRare,
   setTrackQuests,
+  setTrackUnknown,
   state,
   testModeOn,
   trackQuestsOn,
+  trackUnknownOn,
   unlockInfo,
 } from '../state.js';
 import { playSound } from '../sound.js';
@@ -618,13 +620,43 @@ export function mountCombat(container, { params, navigate }) {
       },
     });
     showTrackNote();
-    const track =
+    // The one under it: the creatures not met yet, a tenth more often, to
+    // fill the Bestiariusz; a note says when all of this place's are known.
+    const tracingUnknown = () => !first && trackUnknownOn();
+    const met = new Set(character.met ?? []);
+    const unknownNone = h('p', { class: 'muted track-quests-note', text: 'Wszystkie stwory z tego miejsca są już w Bestiariuszu.' });
+    const showUnknownNote = () => {
+      unknownNone.hidden = !trackUnknownOn() || (area.dangers ?? []).some((danger) => !met.has(danger.monsterId));
+    };
+    const unknownBox = h('input', {
+      type: 'checkbox',
+      id: 'track-unknown',
+      class: 'avoid-rare-box',
+      checked: trackUnknownOn(),
+      onChange: () => {
+        setTrackUnknown(unknownBox.checked);
+        showUnknownNote();
+      },
+    });
+    showUnknownNote();
+    // All the choices of the exploration in one place, above the threat
+    // they change and "Wyrusz" (the author: not scattered over the card).
+    const choices =
       !first &&
       h(
-        'div',
-        { class: 'track-quests' },
-        h('label', { class: 'avoid-rare', for: 'track-quests' }, trackBox, h('span', { text: 'Trop przede wszystkim stwory z zadań' })),
-        trackNone,
+        'section',
+        { class: 'potion-picks hunt-options', 'aria-label': 'Opcje wyprawy' },
+        h('p', { class: 'duration-title', text: 'Opcje wyprawy' }),
+        avoid,
+        seek,
+        h(
+          'div',
+          { class: 'track-quests' },
+          h('label', { class: 'avoid-rare', for: 'track-quests' }, trackBox, h('span', { text: 'Trop przede wszystkim stwory z zadań' })),
+          trackNone,
+          h('label', { class: 'avoid-rare', for: 'track-unknown' }, unknownBox, h('span', { text: 'Trop nieznane stwory' })),
+          unknownNone,
+        ),
       );
     // Potions to take along, once the character carries some that work in fights.
     const use = character.professions?.potionUse;
@@ -721,6 +753,7 @@ export function mountCombat(container, { params, navigate }) {
             avoidRare: avoiding(),
             seekRare: seeking(),
             trackQuests: tracking(),
+            trackUnknown: tracingUnknown(),
             ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
           });
           leaveView(HOME, 2);
@@ -736,6 +769,7 @@ export function mountCombat(container, { params, navigate }) {
         avoidRare: avoiding(),
         seekRare: seeking(),
         trackQuests: tracking(),
+        trackUnknown: tracingUnknown(),
         ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
       }));
 
@@ -766,12 +800,10 @@ export function mountCombat(container, { params, navigate }) {
         ),
         h('p', { class: 'region-description', text: area.description }),
         area.dangers?.length > 0 && bestiaryRow(area),
-        track,
         levelNote,
         durations,
         potions?.element,
-        avoid,
-        seek,
+        choices,
         threatLine,
         start,
         quick,

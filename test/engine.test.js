@@ -134,6 +134,7 @@ import {
   questText,
   questsStale,
   questsView,
+  unknownCreatures,
   withChest,
   withClaimed,
 } from '../src/engine/index.js';
@@ -2138,6 +2139,28 @@ describe('Bestiariusz', () => {
     // about 37%.
     assert.ok(Math.abs(share([]) - 29 / 104) < 0.02, String(share([])));
     assert.ok(Math.abs(share(['badger']) - 43.5 / 118.5) < 0.02, String(share(['badger'])));
+  });
+
+  test('tracking the creatures not met yet meets them a tenth more often, with the quests\' tracking on top', () => {
+    const edge = content.areasById['windfalls-edge'];
+    const share = (tracked, unknown) => {
+      const rng = createRng('nieznane');
+      let badgers = 0;
+      for (let i = 0; i < 20000; i++) {
+        const encounter = rollEncounter(edge, rng, content, edge.maxLevel, { eliteChance: 0, toughChance: 0 }, tracked, unknown);
+        if (encounter.members.some((member) => member.monsterId === 'badger')) badgers += 1;
+      }
+      return badgers / 20000;
+    };
+    // A badger in 29 of the 104 weight, a tenth more: 31.9 of 106.9, and
+    // tracked for a quest too: 47.85 of 122.85.
+    assert.ok(Math.abs(share([], ['badger']) - 31.9 / 106.9) < 0.01, String(share([], ['badger'])));
+    assert.ok(Math.abs(share(['badger'], ['badger']) - 47.85 / 122.85) < 0.01, String(share(['badger'], ['badger'])));
+    // The place's creatures the character has not met, elites and champions apart.
+    const all = unknownCreatures(edge, []);
+    assert.ok(all.includes('badger') && !all.includes(edge.elite));
+    assert.deepEqual(unknownCreatures(edge, ['badger']), all.filter((id) => id !== 'badger'));
+    assert.deepEqual(unknownCreatures(edge, all), []);
   });
 
   test('every creature an inner region can roll is on its list, within its levels', () => {

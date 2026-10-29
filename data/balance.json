@@ -88,6 +88,7 @@
     "rareSeekFactor": 2,
     "rareCatchUpChance": 0.5,
     "questTrackBonus": 0.5,
+    "unknownTrackBonus": 0.1,
     "recoveryAfterFight": 0.3,
     "soloXpBonus": 0.1,
     "lowLevelFreeDiff": 3,

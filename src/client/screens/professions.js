@@ -97,6 +97,8 @@ export function mountProfessions(container, { params, navigate }) {
   const craftChoice = loadChoice(CRAFT_CHOICE); // { slot, pattern, rarity, count }
   let lockedScreenShown = null;
   let shownState = null;
+  // The Warsztat's tab: the workshop itself or its part exchange.
+  let workshopTab = 'workshop';
   // The works under way on the screen, each with its countdown, bar, scene
   // and "Przewiń": the character's and the Awatar's.
   let timers = [];
@@ -276,19 +278,39 @@ export function mountProfessions(container, { params, navigate }) {
     );
   }
 
+  // Under the works, two tabs: the Warsztat and its part exchange (the
+  // author: the exchange at the top as a tab, not at the very bottom).
   function renderCrafting(character) {
     const { list, workshop } = character.professions;
     const profession = list.find((candidate) => candidate.id === workshop.professionId);
+    const tab = (id, label) =>
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'segmented-option',
+          'aria-pressed': workshopTab === id,
+          onClick: () => {
+            workshopTab = id;
+            render();
+          },
+        },
+        label,
+      );
     fill(
       container,
       backHeading(profession.name, `poziom ${profession.level}`, HOME),
       works(character, 'items', craftingCard, 'Wyrób możliwy po powrocie.'),
       testTools(character, 'items', 'Tryb testowy: wyrób skończy się od razu, z tym samym wynikiem.'),
-      placeCard(workshop.place),
-      levelCard(profession, 'wyrobu'),
-      anyFree(character) && craftForm(character, workshop),
-      anyFree(character) && scrollForm(character, workshop),
-      partExchange(character, workshop),
+      h('div', { class: 'segmented workshop-tabs', role: 'group', 'aria-label': workshop.place.name }, tab('workshop', 'Warsztat'), tab('exchange', workshop.exchange.title)),
+      workshopTab === 'exchange'
+        ? partExchange(character, workshop)
+        : [
+            placeCard(workshop.place),
+            levelCard(profession, 'wyrobu'),
+            anyFree(character) && craftForm(character, workshop),
+            anyFree(character) && scrollForm(character, workshop),
+          ],
     );
   }
 
@@ -1082,7 +1104,10 @@ export function mountProfessions(container, { params, navigate }) {
         less.disabled = count === 1;
         more.disabled = count === most;
         const used = [`${formatNumber(pattern.parts * count)} × ${rarity.part.name}`, ...pattern.resources.map((resource) => `${formatNumber(need(resource) * count)} × ${resource.name}`)];
-        estimate.textContent = `Czas wyrobu: ${formatMinutes(workMinutes(count, rarity.itemMinutes))}. Zużyjesz: ${used.join(', ')}.`;
+        // The time of one item too, whatever the count (the author).
+        const each = formatMinutes(workMinutes(1, rarity.itemMinutes));
+        const time = count === 1 ? `Czas wyrobu jednego przedmiotu: ${each}` : `Czas wyrobu: ${formatMinutes(workMinutes(count, rarity.itemMinutes))}, po ${each} na przedmiot`;
+        estimate.textContent = `${time}. Zużyjesz: ${used.join(', ')}.`;
       }
       set(count);
       const chance = Math.round(rarity.chance * 100);
@@ -1245,7 +1270,9 @@ export function mountProfessions(container, { params, navigate }) {
       value.textContent = label;
       less.disabled = count === 1;
       more.disabled = count === most;
-      estimate.textContent = `Czas: ${formatMinutes(workMinutes(count, scroll.minutes))}. Zużyjesz: ${formatNumber(scroll.parts * count)} × ${scroll.part.name}.`;
+      const each = formatMinutes(workMinutes(1, scroll.minutes));
+      const time = count === 1 ? `Czas jednego zwoju: ${each}` : `Czas: ${formatMinutes(workMinutes(count, scroll.minutes))}, po ${each} na zwój`;
+      estimate.textContent = `${time}. Zużyjesz: ${formatNumber(scroll.parts * count)} × ${scroll.part.name}.`;
     }
     set(count);
     const start = h('button', {

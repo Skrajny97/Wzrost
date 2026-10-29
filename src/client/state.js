@@ -207,6 +207,31 @@ export function setTrackQuests(value) {
   }
 }
 
+// Whether explorations track the creatures not met yet ("Trop nieznane
+// stwory", under the quests' box, and "Wyrusz ponownie"); kept in this
+// browser too.
+const UNKNOWN_KEY = 'wzrost.track-unknown';
+let trackUnknown = readTrackUnknown();
+
+function readTrackUnknown() {
+  try {
+    return localStorage.getItem(UNKNOWN_KEY) === 'on';
+  } catch {
+    return false;
+  }
+}
+
+export const trackUnknownOn = () => trackUnknown;
+
+export function setTrackUnknown(value) {
+  trackUnknown = value;
+  try {
+    localStorage.setItem(UNKNOWN_KEY, value ? 'on' : 'off');
+  } catch {
+    // Without storage the choice lasts until the page is closed.
+  }
+}
+
 // Test mode ("Pomiń czas" and other test tools) can be turned off in the
 // settings while the server allows it; the choice is kept in this browser.
 const TEST_MODE_KEY = 'wzrost.test-mode';
