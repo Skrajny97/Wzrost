@@ -611,7 +611,9 @@
     "height": 32,
     "references": [],
     "prompts": {
-      "encyclopedia": "a thick closed leather-bound tome with brass corner caps and a small glowing blue gem on the front cover, a red ribbon bookmark hanging out at the bottom, slightly angled, bold readable shape, single inventory item icon"
+      "encyclopedia": "a thick closed leather-bound tome with brass corner caps and a small glowing blue gem on the front cover, a red ribbon bookmark hanging out at the bottom, slightly angled, bold readable shape, single inventory item icon",
+      "gold": "a single shiny gold coin seen slightly from the side, thick embossed rim and a simple star emblem in the middle, warm yellow gold with bright highlights and a dark outline, bold readable shape, single inventory item icon",
+      "time-points": "a small hourglass with a dark wooden frame and brass caps, glowing pale blue sand pouring from the top bulb into the bottom one, bold readable shape, single inventory item icon"
     }
   }
 }
