@@ -2785,6 +2785,12 @@ Autor: „Do tego - trzeba dostosować zadania z odblokowywaniem regionów. Na n
 3. **Skąd progi.** Według krzywej z 0.0.30 trzy regiony od 1. poziomu klasy to ok. 3,4 godziny wypraw. Dwa regiony od 10. poziomu to ok. 4 godziny, a jeden od 20. też ok. 4 godziny. Od 25. poziomu jeden region to ok. 6,5 godziny, a od 30. już ok. 10 godzin, więc tam zadanie znika.
 4. **Zastępuje** punkty 2 i 3 z „Zadania: „Odblokuj dostęp do N nowych regionów”” (28.10.2026). Zadania już wylosowane zostają do końca swojego okresu. Nowa postać dalej dostaje 5 zadań dziennych, wylosowanych spośród stworów Skraju, wszystkich stworów i czasu wypraw.
 
+## Krzywa XP zostaje (29.10.2026)
+
+Autor chciał, żeby pierwsza ewolucja przychodziła po ok. 30 godzinach wypraw zamiast 23. Liczba 23 pochodziła ze starej notatki sprzed spowolnień z 0.0.27, 0.0.28 i 0.0.30. Według obecnej krzywej 50. poziom klasy przychodzi po ok. 81 godzinach eksploracji, przy ok. 44. poziomie postaci, a 100. po ok. 400. Po tej informacji autor zdecydował: „Zostaw aktualny XP curve”.
+
+1. **Bez zmian.** Krzywa z 0.0.30 zostaje, z dalszym spowolnieniem po 50. poziomie klasy, jakie już ma.
+
 ## Ewolucje i Osada: propozycje (28.10.2026)
 
 Autor: „Pomyśl nad modułem Osady. Ja na pewno chciałbym żeby trafiła tam Zaklinaczka” oraz „przede wszystkim musimy też ruszyć Ewolucje na 50 poziomie klasy. To ważny aspekt. Przygotuj propozycje i pytania.”
