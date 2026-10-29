@@ -180,6 +180,25 @@ describe('class evolutions in fights', () => {
     assert.ok(gladiator.events.some((event) => event.kind === 'effect' && event.effect === 'Krwawienie'));
   });
 
+  test('Riposta raises the dodge by 15 percentage points for the whole fight', () => {
+    // The share of the wolf's blows at the gladiator that miss, over a few fights.
+    const missed = (only) => {
+      let dodges = 0;
+      let blows = 0;
+      for (let seed = 0; seed < 20; seed++) {
+        for (const event of fight(`riposta-unik${seed}`, [evolved('gladiator', { only })], [sturdy('wolf', 58, 'e0')]).events) {
+          if (event.actor !== 'e0' || event.target !== 'a0' || !['dodge', 'hit', 'crit'].includes(event.kind)) continue;
+          blows += 1;
+          if (event.kind === 'dodge') dodges += 1;
+        }
+      }
+      return dodges / blows;
+    };
+    assert.ok(missed(['riposte']) - missed([]) > 0.08);
+    const start = fight('riposta-tekst', [evolved('gladiator', { only: ['riposte'] })], [sturdy('wolf', 58, 'e0')]).events.find((event) => event.kind === 'skill' && event.skill === 'riposte');
+    assert.match(start.text, /unik rośnie o 15 pkt proc\./);
+  });
+
   test('Zimna krew makes the first blow that lands critical; a mark of death strikes its echo', () => {
     for (let seed = 0; seed < 5; seed++) {
       const result = fight(`zimna-krew:${seed}`, [evolved('sniper', { only: [] })], [sturdy('boar', 58, 'e0')]);

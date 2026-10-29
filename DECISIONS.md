@@ -2904,6 +2904,7 @@ Wszystkie 30 umiejętności ewolucji i 15 cech działa w walce (`src/engine/comb
 10. **Zgodność.** Walki postaci bez ewolucji losują dokładnie to samo co wcześniej, co sprawdzono na 540 walkach, więc ich wyniki się nie zmieniają.
 11. **Podgląd autora** (Panel autora, „Podgląd umiejętności”) pokazuje też umiejętności ewolucji: postać na poziomie 60, umiejętność na poziomie 20. Panel działa w grze, więc ten podgląd będzie po wdrożeniu.
 12. **Do balansu (krok D).** Riposta Gladiatora działa po uniku, a Wojownik rzadko unika: w próbie wyszedł mniej więcej jeden unik na 80 ruchów. Uzdrowiciel zadaje mało obrażeń. Snajper i Skrytobójca mają bardzo mocny pierwszy cios.
+13. **Riposta z unikiem.** Autor zgodził się dodać Ripoście uniki („21 Tak”): do końca walki unik postaci rośnie o 15 pkt proc., ponad zwykły limit uniku, jak w Tańcu ostrzy. W próbie wilk chybia Gladiatora w 16,6% ciosów zamiast w 1,4%. Opis umiejętności i relacja walki podają ten unik.
 
 ## Ewolucje: budowa (29.10.2026, na wersji testowej)
 

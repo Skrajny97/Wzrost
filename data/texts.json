@@ -116,7 +116,7 @@
   "skillShieldReflect": ["Osłona odbija {reflect}% pochłoniętych obrażeń."],
   "skillEvadeBlades": ["Każdy unik daje też cięcie za {blades}% obrażeń w losowego wroga."],
   "guardReflect": ["W tym czasie odbija {reflect}% przyjętych obrażeń."],
-  "skillRiposte": ["{actor}: {skill}. Do końca walki każdy unik daje kontrę za {power}% obrażeń, a trafiony krwawi przez {ticks} ruchy."],
+  "skillRiposte": ["{actor}: {skill}. Do końca walki unik rośnie o {dodge} pkt proc., a każdy unik daje kontrę za {power}% obrażeń. Trafiony krwawi przez {ticks} ruchy."],
   "stanceFrenzy": ["{actor}: {skill}. Przez {turns} ruchy obrażenia +{damage}% i leczenie o {lifesteal}% zadanych, ale przyjmowane obrażenia +{taken}%."],
   "stanceProvoke": ["{actor}: {skill}. Przez {turns} ruchy wrogowie biją tylko w tę postać, a ona odbija {reflect}% przyjętych obrażeń."],
   "stanceCloud": ["{actor}: {skill}. Przez {turns} ruchy nad wrogami wisi chmura burzowa."],

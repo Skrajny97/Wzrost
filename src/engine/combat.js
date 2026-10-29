@@ -537,7 +537,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       const evading = target.evade && target.evade.hits > 0 ? target.evade : null;
       if (evading) evading.hits -= 1;
       const base = cappedChance(target.dodgeRating, actor.level, tuning.dodgeCap, balance);
-      const dodge = evading ? Math.min(0.95, base + evading.dodge) : base;
+      // Taniec ostrzy and Riposta raise it above the cap.
+      const bonus = (evading ? evading.dodge : 0) + (evolving && target.riposte ? target.riposte.dodge : 0);
+      const dodge = bonus ? Math.min(0.95, base + bonus) : base;
       if (rng.chance(dodge)) {
         log(() => ({ t, kind: 'dodge', actor: actor.id, target: target.id, hp: target.hp, ...marks, text: say(texts, wordsFor('dodge', move), actions, vars) }));
         // Krok cienia: the next blow after a dodge is stronger.
@@ -951,10 +953,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         if (p.speed) text += ` ${say(texts, 'skillBuffSpeed', 0, { speed: percent(p.speed) })}`;
         if (party.length > 1) text += ` ${say(texts, 'skillBuffShared', 0, { count: party.length })}`;
       } else if (skill.kind === 'riposte') {
-        // Riposta: every dodge answered with a blow that makes the foe bleed.
+        // Riposta: more dodges, every one answered with a blow that makes the
+        // foe bleed.
         const ticks = Math.round(p.dotTicks);
-        unit.riposte = { skill, power: p.power, dot: { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks } };
-        text = say(texts, 'skillRiposte', 0, { ...vars, power: Math.round(p.power * 100), ticks });
+        unit.riposte = { skill, dodge: p.dodge ?? 0, power: p.power, dot: { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks } };
+        text = say(texts, 'skillRiposte', 0, { ...vars, dodge: Math.round((p.dodge ?? 0) * 100), power: Math.round(p.power * 100), ticks });
       } else {
         const ticks = Math.round(p.dotTicks);
         unit.weapon = { ...unit.weapon, dot: { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks, ...(p.weaken && { weaken: p.weaken }) } };

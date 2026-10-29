@@ -186,10 +186,10 @@
       "name": "Riposta",
       "style": "unik",
       "description": "Na arenie przeżywa ten, kto oddaje szybciej, niż dostał.",
-      "effect": "Do końca walki: po każdym uniku postać oddaje cios za {power%} obrażeń, a trafiony krwawi przez {dotTicks} swoje ruchy, tracąc po {dotPower%} obrażeń ciosu.",
+      "effect": "Do końca walki unik postaci rośnie o {dodge pp}, a po każdym uniku oddaje ona cios za {power%} obrażeń. Trafiony krwawi przez {dotTicks} swoje ruchy, tracąc po {dotPower%} obrażeń ciosu.",
       "kind": "riposte",
       "mana": 10,
-      "params": { "power": [0.5, 1.2], "dotEffect": "bleeding", "dotChance": 1, "dotPower": [0.1, 0.2], "dotTicks": 3 }
+      "params": { "dodge": 0.15, "power": [0.5, 1.2], "dotEffect": "bleeding", "dotChance": 1, "dotPower": [0.1, 0.2], "dotTicks": 3 }
     },
     {
       "id": "indomitable",
