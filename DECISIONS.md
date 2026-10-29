@@ -2825,6 +2825,11 @@ Odpowiedzi na pytania E1–E7 z propozycji ewolucji, zadane w czacie. Autor: „
 12. **Wojownik:**
     - **Barbarzyńca:** Druzgocący cios (Potężny cios, po którym cel traci najbliższy ruch, z szansą do 25%) i Krwawy szał (przez 3 ruchy +40% obrażeń i leczenie do 15% zadanych, ale postać przyjmuje o 20% więcej);
     - **Gladiator:** Młyn (Szeroki zamach bez chybień, trafieni tracą 10% pancerza do końca walki) i Riposta (po uniku postać oddaje cios za 120%), z dodatkiem autora: cios Riposty powoduje też krwawienie.
+    - **Strażnik:** Niezłomny (Nieugięty leczy więcej i odbija 20% przyjętych obrażeń; autor: bez „przez swoje ruchy” w opisie) i Wyzwanie (prowokacja na 3 ruchy i odbicie 30% przyjętych obrażeń).
+13. **Łucznik:**
+    - **Snajper:** Przebijający strzał (Celny strzał przebija cel i trafia stojącego za nim za połowę) i Strzał z ukrycia (raz na walkę, w pierwszym ruchu, 280% we wroga z największym HP);
+    - **Strzelec Burzy:** Burza strzał (Grad strzał z elektrycznością, trafiony ma 15% szans stracić najbliższy ruch) i Chmura burzowa (przez 3 ruchy 40% elektryczności we wszystkich wrogów);
+    - **Łowca:** Grot z zadziorem (Przyszpilenie, po którym cel krwawi przez 3 ruchy) i Sokół (przez 4 ruchy sokół dziobie losowy cel za 40%).
 
 ## Ewolucje i Osada: propozycje (28.10.2026)
 
