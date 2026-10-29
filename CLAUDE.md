@@ -9,6 +9,7 @@
 - Nowe grafiki pokazuj autorowi do oceny pojedynczo, jedną po drugiej, zaraz po powstaniu, gdy autor nie śpi.
 - Z autorem rozmawiaj po polsku. Kod, nazwy plików i identyfikatory są po angielsku, a teksty widoczne w grze po polsku.
 - Autor pracuje wyłącznie z telefonu. Każdą czynność po jego stronie opisz krok po kroku dla przeglądarki mobilnej.
+- Propozycje i pytania dawaj autorowi tutaj, w czacie, pozycja po pozycji: przedmiot po przedmiocie, z grafiką, nazwą i opisem, z numerem do odpowiedzi. Nie rób z nich osobnych dokumentów, bo autor musi wtedy przeskakiwać między okienkami. Dotyczy to też ewolucji klas i wszystkich kolejnych tematów.
 - Treść gry (zdarzenia, przedmioty, potwory, NPC, teksty) trafia do `data/`, nigdy do logiki.
 - `src/engine/` to czyste, deterministyczne funkcje, bez `Date.now()`, `Math.random()` i wejścia-wyjścia. Czas i ziarno losowości podaje serwer.
 - Gra działa na planie Workers Paid: do 30 s CPU na żądanie, a 30 mln ms CPU miesięcznie jest w cenie. Żądania i tak mają być szybkie.
