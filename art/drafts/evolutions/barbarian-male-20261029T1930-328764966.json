@@ -1,0 +1,25 @@
+{
+  "id": "barbarian-male",
+  "payload": {
+    "prompt": "young man barbarian, broad-shouldered and muscular, short brown hair and a short beard, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a grey wolf fur mantle over the shoulders, a sleeveless dark leather jerkin with a wide belt, leather bracers and fur-wrapped boots, red war paint across the eyes, holding a big two-handed battle axe low across the body, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 328764966,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793302248,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 69.82,
+    "request_id": "2aa6108d-91ae-4486-881f-b9ec876790fc",
+    "outputs_retained_until": 1793388604
+  }
+}

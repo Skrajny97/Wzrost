@@ -1,0 +1,25 @@
+{
+  "id": "gladiator-male",
+  "payload": {
+    "prompt": "young man gladiator, athletic, short brown hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, an open bronze helmet with a red crest, one large iron shoulder guard and a quilted arm guard on the sword arm, a fitted leather breastplate, a short skirt of red leather strips, bronze greaves and sandals, holding a broad curved sword and a small round buckler, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 108482361,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793302366,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 69.1,
+    "request_id": "da272cb7-c42b-4cf7-8852-cf2e86a58487",
+    "outputs_retained_until": 1793388688
+  }
+}

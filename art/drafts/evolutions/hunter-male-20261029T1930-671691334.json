@@ -1,0 +1,25 @@
+{
+  "id": "hunter-male",
+  "payload": {
+    "prompt": "young man hunter, lean and weathered, messy brown hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a brown leather jerkin with fur trim, a wolf pelt over the shoulders, a hunting knife and pouches on the belt, soft leather boots, a short bow in one hand, a brown falcon perched on the leather glove of the other forearm, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 671691334,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793302715,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 68.38,
+    "request_id": "2eaad352-4e5b-4418-b3d6-a1c4f8aad74d",
+    "outputs_retained_until": 1793389051
+  }
+}

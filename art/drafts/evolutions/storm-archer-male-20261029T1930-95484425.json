@@ -1,0 +1,25 @@
+{
+  "id": "storm-archer-male",
+  "payload": {
+    "prompt": "young man storm archer, lean, messy brown hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a long slate-blue cloak with silver lightning embroidery and the hood down, a grey leather jacket and bracers, a quiver of arrows with glowing blue tips on the back, holding a recurve bow low at the side with small blue sparks crackling along it, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 95484425,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793302512,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 68.74,
+    "request_id": "f173ff0e-455f-472f-9fd3-89d5fc372904",
+    "outputs_retained_until": 1793388865
+  }
+}

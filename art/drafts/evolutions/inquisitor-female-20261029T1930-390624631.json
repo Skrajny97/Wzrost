@@ -1,0 +1,25 @@
+{
+  "id": "inquisitor-female",
+  "payload": {
+    "prompt": "young woman inquisitor, stern, dark hair in a tight braid, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a long dark crimson coat over a black cassock with silver buckles, a silver holy symbol on a heavy chain, holding a flanged iron mace in one hand and a smoking censer on a chain in the other, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 390624631,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793303265,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 65.86,
+    "request_id": "b5f3d1c3-0d62-4892-8ed8-c05d9f555def",
+    "outputs_retained_until": 1793389594
+  }
+}

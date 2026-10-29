@@ -1,0 +1,25 @@
+{
+  "id": "healer-female",
+  "payload": {
+    "prompt": "young woman healer, calm, dark hair in a braid, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a long white linen robe with a soft green mantle, a satchel of herbs and small bottles on the belt, holding a simple wooden staff with a sprouting green branch and a soft green glow at the top, the staff no taller than the head, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 386159097,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793303134,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 66.58,
+    "request_id": "4884293c-1b69-42ba-a7c3-a81693439347",
+    "outputs_retained_until": 1793389505
+  }
+}

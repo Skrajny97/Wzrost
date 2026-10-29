@@ -1,0 +1,25 @@
+{
+  "id": "arcanist-female",
+  "payload": {
+    "prompt": "young woman arcanist, slender, long brown hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a long deep purple robe with silver star embroidery and a high collar, an open grimoire with glowing violet pages floating beside one hand, faint violet runes circling the other hand, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 561428573,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793303048,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 67.3,
+    "request_id": "36dc0638-b369-4c70-bb1d-f163daa02a76",
+    "outputs_retained_until": 1793389415
+  }
+}

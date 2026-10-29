@@ -1,0 +1,25 @@
+{
+  "id": "night-dancer-male",
+  "payload": {
+    "prompt": "young man night dancer, lithe, black spiky hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, light flowing dark violet garments with long trailing scarves, a half mask over the mouth, soft boots, holding two slim curved blades in a graceful dancing stance, faint shadow wisps around the feet, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 520125533,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793303455,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 65.14,
+    "request_id": "2b568b9a-a846-4c71-b985-f9f79cb2d170",
+    "outputs_retained_until": 1793389805
+  }
+}
