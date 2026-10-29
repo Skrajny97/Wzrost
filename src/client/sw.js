@@ -99,6 +99,29 @@ async function notify({ title, body, tag, url, at, always = false }) {
   });
 }
 
+// The browser may replace the subscription by itself, where it says so: the
+// new one goes to the server at once (push.js hands it in on every start
+// too). The key is the old subscription's, or the server's.
+self.addEventListener('pushsubscriptionchange', (event) => {
+  event.waitUntil(
+    (async () => {
+      const key = event.oldSubscription?.options?.applicationServerKey ?? (await serverKey());
+      const fresh = event.newSubscription ?? (await self.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key }));
+      await fetch('/api/push/subscribe', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(fresh.toJSON()),
+      });
+    })().catch(() => {}),
+  );
+});
+
+async function serverKey() {
+  const { key } = await (await fetch('/api/push/key', { credentials: 'same-origin', headers: { Accept: 'application/json' } })).json();
+  return Uint8Array.from(atob(key.replaceAll('-', '+').replaceAll('_', '/')), (char) => char.charCodeAt(0));
+}
+
 // A tap opens the game where the news is: the open game moves there itself.
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();

@@ -101,7 +101,7 @@ import {
   orderSalvage,
   playerCombatant,
   randomItem,
-  rarityUpChance,
+  rarityUpChances,
   reduction,
   restedHp,
   rollEncounter,
@@ -1849,18 +1849,29 @@ describe('materials and chests', () => {
     assert.ok(long === 1 || long === 2, `${long}`);
   });
 
-  test('a higher level sometimes gives the material one rarity higher, never two', () => {
-    assert.equal(rarityUpChance(1, content), 0.005);
-    assert.equal(rarityUpChance(30, content), 0.15);
-    assert.equal(rarityUpChance(400, content), content.balance.rewards.materialRarityUpMax);
-    const rng = createRng('rzadkość');
-    const seen = {};
-    for (let i = 0; i < 4000; i++) {
-      for (const [key, count] of Object.entries(materialDrops('wolf', 30, 1, rng, content))) seen[key] = (seen[key] ?? 0) + count;
-    }
-    assert.deepEqual(Object.keys(seen).sort(), ['wolf-pelt:common', 'wolf-pelt:rare']);
-    const share = seen['wolf-pelt:rare'] / (seen['wolf-pelt:common'] + seen['wolf-pelt:rare']);
-    assert.ok(Math.abs(share - 0.15) < 0.04, `${share}`);
+  test('a material is sometimes a rarity higher, much more rarely two, and higher grades open with the levels', () => {
+    const near = (actual, expected) => actual.length === expected.length && actual.every((chance, i) => Math.abs(chance - expected[i]) < 1e-12);
+    // At low levels the second grade comes sometimes and the third ten
+    // times more rarely; every 25 levels one more grade opens.
+    assert.ok(near(rarityUpChances(1, content), [0.05, 0.005]), `${rarityUpChances(1, content)}`);
+    assert.ok(near(rarityUpChances(25, content), [0.125, 0.0125]));
+    assert.ok(near(rarityUpChances(30, content), [0.15, 0.015, 0.0015]));
+    assert.ok(near(rarityUpChances(80, content), [0.25, 0.025, 0.0025, 0.00025, 0.000025]));
+    const drops = (level, fights) => {
+      const rng = createRng(`rzadkość:${level}`);
+      const seen = {};
+      for (let i = 0; i < fights; i++) {
+        for (const [key, count] of Object.entries(materialDrops('wolf', level, 1, rng, content))) seen[key] = (seen[key] ?? 0) + count;
+      }
+      return seen;
+    };
+    const low = drops(3, 40000);
+    assert.deepEqual(Object.keys(low).sort(), ['wolf-pelt:common', 'wolf-pelt:rare', 'wolf-pelt:unique']);
+    const total = Object.values(low).reduce((sum, count) => sum + count, 0);
+    assert.ok(Math.abs(low['wolf-pelt:rare'] / total - 0.045) < 0.01, `${low['wolf-pelt:rare'] / total}`);
+    assert.ok(Math.abs(low['wolf-pelt:unique'] / total - 0.005) < 0.003, `${low['wolf-pelt:unique'] / total}`);
+    // However many grades open, a material stays within the last rarity.
+    assert.ok(Object.keys(drops(500, 2000)).every((key) => content.raritiesById[key.split(':')[1]]));
   });
 
   test('names say the rarity only when it is above the species', () => {

@@ -181,7 +181,8 @@ describe('notifications through the server', () => {
   });
 
   const run = (at) => server.getWorker().scheduled({ cron: '* * * * *', scheduledTime: new Date(at) });
-  const subscriptions = async () => (await (await db()).prepare('SELECT endpoint, user_id FROM push_subscriptions').all()).results;
+  // The subscriptions notifications go to: not those the push service gave up on.
+  const subscriptions = async () => (await (await db()).prepare('SELECT endpoint, user_id FROM push_subscriptions WHERE gone_at IS NULL').all()).results;
 
   test('the key and the subscription need a signed-in player', async () => {
     assert.equal((await call('GET', '/api/push/key')).status, 401);
@@ -292,10 +293,15 @@ describe('notifications through the server', () => {
     pushService.status = 400;
     assert.deepEqual((await call('POST', '/api/push/test', { cookie, body })).data, { result: 'failed', status: 400 });
     await again();
-    // The push service no longer knows the phone: it is forgotten.
+    // The push service no longer knows the phone: nothing goes to it, and
+    // handed in again, it is not taken back.
     pushService.status = 410;
     assert.deepEqual((await call('POST', '/api/push/test', { cookie, body })).data, { result: 'gone' });
     assert.deepEqual(await subscriptions(), []);
+    assert.deepEqual((await call('POST', '/api/push/subscribe', { cookie, body: phone.subscription })).data, { ok: false, gone: true });
+    assert.deepEqual(await subscriptions(), []);
+    await again();
+    assert.deepEqual((await call('POST', '/api/push/test', { cookie, body })).data, { result: 'gone' });
   });
 
   test('a build that ends and a store that fills up; a phone gone for good is forgotten', async () => {
@@ -318,10 +324,24 @@ describe('notifications through the server', () => {
         ['Pełny magazyn', 'Tartak: produkcja stoi do zebrania.'],
       ],
     );
-    // The push service no longer knows the phone: the subscription goes.
+    // The push service no longer knows the phone: nothing more goes to it.
+    // The phone, handing the subscription in at its next start, hears it is
+    // gone (push.js in the client makes a new one), and the new one works.
     pushService.status = 410;
     await database.prepare("UPDATE buildings SET ends_at = ? WHERE building_id = 'campfire'").bind(t0 + 60000).run();
     await run(t0 + 80000);
     assert.deepEqual(await subscriptions(), []);
+    assert.deepEqual((await call('POST', '/api/push/subscribe', { cookie, body: phone.subscription })).data, { ok: false, gone: true });
+    pushService.status = 201;
+    pushService.received.length = 0;
+    await database.prepare("UPDATE buildings SET ends_at = ? WHERE building_id = 'campfire'").bind(t0 + 120000).run();
+    await run(t0 + 140000);
+    assert.equal(pushService.received.length, 0);
+    const renewed = await fakePhone('/push/phone-2');
+    assert.deepEqual((await call('POST', '/api/push/subscribe', { cookie, body: renewed.subscription })).data, { ok: true });
+    await database.prepare("UPDATE buildings SET ends_at = ? WHERE building_id = 'campfire'").bind(t0 + 180000).run();
+    await run(t0 + 200000);
+    assert.equal(pushService.received.length, 1);
+    assert.equal((await renewed.read(pushService.received[0].body)).title, 'Koniec budowy');
   });
 });

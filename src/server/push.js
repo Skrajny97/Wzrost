@@ -26,6 +26,9 @@ const MESSAGE_TTL_SECONDS = 6 * 3600;
 const URGENCY = 'high';
 // How often a phone may ask for a test notification.
 const TEST_EVERY_MS = 30000;
+// How long a subscription the push service has given up on is kept, so that
+// its phone learns it and makes a new one.
+const GONE_KEPT_MS = 30 * 24 * 3600000;
 // The first run looks at the last minute. After a break (a failed run) the
 // next one looks back at most this far: older news would only come late.
 const FIRST_WINDOW_MS = 60000;
@@ -40,7 +43,10 @@ export async function pushKey(context) {
 }
 
 // The phone's subscription, as PushSubscription.toJSON() gives it. A phone
-// already known moves to the account signed in now.
+// already known moves to the account signed in now. One its push service
+// has given up on stays given up (`gone`): the phone, which hands it in on
+// every start, makes a new one instead (push.js in the client), so the
+// player need not switch anything off and on again.
 export async function subscribePush(context) {
   const session = await requireSession(context);
   const { endpoint, keys } = await readJson(context.request);
@@ -48,6 +54,8 @@ export async function subscribePush(context) {
   const phoneKey = keyOf(keys?.p256dh, 65);
   if (!pushAddress(endpoint, context.env) || phoneKey?.[0] !== 4 || !keyOf(keys?.auth, 16)) throw unsupported();
   const db = context.env.DB;
+  const known = await db.prepare('SELECT gone_at FROM push_subscriptions WHERE endpoint = ?').bind(endpoint).first();
+  if (known && known.gone_at !== null) return json({ ok: false, gone: true });
   await db.batch([
     db
       .prepare(
@@ -78,7 +86,7 @@ export async function unsubscribePush(context) {
 // próbne powiadomienie"), sent at once. It shows even while the game is open
 // (`always`, sw.js), and the push service's answer comes back, so the player
 // sees where the way to the phone breaks: "sent" (the service took it),
-// "gone" (the service no longer knows the phone, which is forgotten),
+// "gone" (the service no longer knows the phone, and nothing goes to it),
 // "failed" with the service's status (0: unreachable), "unknown" (the server
 // has no such phone of this account) or "wait" (one a half minute).
 export async function testPush(context) {
@@ -87,10 +95,11 @@ export async function testPush(context) {
   if (typeof endpoint !== 'string') throw unsupported();
   const db = context.env.DB;
   const subscription = await db
-    .prepare('SELECT endpoint, p256dh, auth, tested_at FROM push_subscriptions WHERE endpoint = ? AND user_id = ?')
+    .prepare('SELECT endpoint, p256dh, auth, tested_at, gone_at FROM push_subscriptions WHERE endpoint = ? AND user_id = ?')
     .bind(endpoint, session.userId)
     .first();
   if (!subscription) return json({ result: 'unknown' });
+  if (subscription.gone_at !== null) return json({ result: 'gone' });
   if (subscription.tested_at !== null && context.now - subscription.tested_at < TEST_EVERY_MS) return json({ result: 'wait' });
   await db.prepare('UPDATE push_subscriptions SET tested_at = ? WHERE endpoint = ?').bind(context.now, endpoint).run();
   const message = { title: say(content.texts, 'pushTestTitle', 0), body: say(content.texts, 'pushTestBody', 0), tag: 'test', url: '#/walka', at: context.now, always: true };
@@ -102,7 +111,7 @@ export async function testPush(context) {
     console.warn(`Push test: ${new URL(endpoint).host} unreachable: ${error?.message}`);
   }
   if (status === 404 || status === 410) {
-    await db.prepare('DELETE FROM push_subscriptions WHERE endpoint = ?').bind(endpoint).run();
+    await db.prepare('UPDATE push_subscriptions SET gone_at = ? WHERE endpoint = ?').bind(context.now, endpoint).run();
     return json({ result: 'gone' });
   }
   if (status >= 200 && status < 300) return json({ result: 'sent' });
@@ -118,7 +127,7 @@ export async function sendNotifications(env, now) {
   const db = env.DB;
   const from = await claimWindow(db, now);
   if (from === null) return { sent: 0, gone: 0 };
-  const subscriptions = (await db.prepare('SELECT endpoint, user_id, p256dh, auth FROM push_subscriptions').all()).results;
+  const subscriptions = (await db.prepare('SELECT endpoint, user_id, p256dh, auth FROM push_subscriptions WHERE gone_at IS NULL').all()).results;
   if (subscriptions.length === 0) return { sent: 0, gone: 0 };
 
   const due = await notificationsByUser(db, from, now);
@@ -146,8 +155,13 @@ export async function sendNotifications(env, now) {
       }),
     ),
   );
+  // Given up on, a subscription stays a while to tell its phone so; after
+  // that, a phone that hands it in again has it given up on once more.
   if (gone.size > 0) {
-    await db.batch([...gone].map((endpoint) => db.prepare('DELETE FROM push_subscriptions WHERE endpoint = ?').bind(endpoint)));
+    await db.batch([
+      ...[...gone].map((endpoint) => db.prepare('UPDATE push_subscriptions SET gone_at = ? WHERE endpoint = ?').bind(now, endpoint)),
+      db.prepare('DELETE FROM push_subscriptions WHERE gone_at < ?').bind(now - GONE_KEPT_MS),
+    ]);
   }
   return { sent, gone: gone.size };
 }

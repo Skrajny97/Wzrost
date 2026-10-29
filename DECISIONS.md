@@ -2808,6 +2808,25 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - **wzory w Warsztacie** (brakujący szczegół): wzór bazy od 25. poziomu klasy odsłania się na 25. poziomie Rzemieślnictwa, a od 50. na 50. Wcześniej każda dalsza baza miała wzór od `laterPatternLevel`, czyli od 10. Rozbiórka takiego przedmiotu nadal od razu uczy jego wzoru;
     - symulacja balansu (`tools/simulate.mjs`) liczy, jak dotąd, ekwipunek z pierwszych baz kategorii. Dalsze bazy są więc zapasem siły ponad nią i nie zmieniają jej tabel.
 
+## Uwagi autora po 0.0.54 (29.10.2026, w grze od 0.0.55)
+
+1. **Materiały wyższej rzadkości ze zwykłych stworów.** Autor: „Niech materiały ze zwykłych stworow też czasem będą wyzszego stopnia rzadkosci - drugiego i o wiele rzadziej - trzeciego / te na niskich lvlach, a pozniej jeszcze wyższe stopnie rzadkości / do tego pewnie przyda sie Osada ale musimy o tym pamiętać”.
+    - Każda sztuka materiału losuje swój stopień. O jedną rzadkość wyżej niż gatunek wypada z szansą 0,5% za poziom stwora, ale co najmniej 5% (do 10. poziomu) i najwyżej 25% (od 50. poziomu).
+    - Każdy kolejny stopień jest dziesięć razy rzadszy: o dwie rzadkości wyżej 0,5–2,5%.
+    - Co 25 poziomów stworów otwiera się następny stopień: trzeci od 26. poziomu, czwarty od 51., piąty od 76. Materiał nigdy nie przekracza ostatniej rzadkości.
+    - Wcześniej materiał bywał najwyżej o jedną rzadkość wyżej, z szansą 0,5% za poziom stwora.
+    - Rzadszy materiał daje na Stole rozbiórki część swojej rzadkości, a Stół przyjmuje go, gdy jego poziom otwiera tę rzadkość, jak dotąd.
+    - Osada i nowe zastosowania materiałów czekają na wybór autora z propozycji w czacie.
+2. **Powiadomienia przestają przychodzić.** Autor: „Czy nowe wersje wdrażane moga miec wplyw na przychodzenie powiadomień? kuzynka zgłosiła problem, wczesniej ktos inny / zresetowala to ustawienie w iPhonie i grze i pomogło, ale tak za kazdym razem robic?”.
+    - Wdrożenia nie zmieniają kluczy powiadomień (są w bazie), zapisanych telefonów ani pliku service workera (bez zmian od 0.0.36).
+    - Słaby punkt był gdzie indziej. Gdy usługa powiadomień telefonu (Apple, Google) przestała znać subskrypcję, serwer ją usuwał. Telefon przy każdym starcie odsyłał tę samą martwą subskrypcję, a przełącznik w grze dalej pokazywał „Włączone”. Pomagało dopiero wyłączenie i włączenie powiadomień.
+    - Teraz serwer pamięta taką subskrypcję jako porzuconą (`gone_at`, migracja 0050) i nic do niej nie wysyła. Przy następnym wejściu do gry telefon słyszy, że jest martwa, i sam zakłada nową, bez pytania, bo zgoda telefonu dalej jest.
+    - Gra pamięta też, że powiadomienia były włączone. Telefon, który sam zgubił subskrypcję, dostaje nową przy starcie gry.
+    - Gdy telefon nie da nowej subskrypcji bez dotknięcia, gra raz mówi: „Powiadomienia przestały docierać na ten telefon. Włącz je ponownie w Ustawieniach (zębatka).” Wystarczy wtedy przełącznik w grze, bez ustawień iPhone'a.
+    - „Wyślij próbne powiadomienie” przy martwej subskrypcji od razu zakłada nową i wysyła próbę na nią.
+    - Service worker przyjmuje też zmianę subskrypcji, gdy przeglądarka wymieni ją sama (`pushsubscriptionchange`).
+    - Porzucone subskrypcje znikają z bazy po 30 dniach.
+
 ## Uwagi autora po 0.0.53 (29.10.2026, w grze od 0.0.54)
 
 1. **Listy zamiast kafelków w profesjach.** Autor: „Stworz też listy mikstur do warzenia, zioł do zbierania i przedmiotów bo dużo ich się zrobiło i ekrany są długie do przewijania”.

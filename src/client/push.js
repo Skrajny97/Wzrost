@@ -12,6 +12,10 @@ import { toast } from './ui.js';
 
 const BLOCKED = 'Powiadomienia gry są zablokowane. Zezwól na nie w ustawieniach telefonu albo przeglądarki i spróbuj ponownie.';
 const FAILED = 'Nie udało się włączyć powiadomień. Spróbuj ponownie za chwilę.';
+const LOST = 'Powiadomienia przestały docierać na ten telefon. Włącz je ponownie w Ustawieniach (zębatka).';
+// Whether the player switched the notifications on here: a phone that loses
+// its subscription by itself gets a new one at the next start.
+const WANTED = 'wzrost.push';
 // What the server says of a test notification (push.js on the server).
 const TESTED = {
   sent: 'Wysłane. Powiadomienie powinno przyjść za kilka sekund. Jeśli nie przyjdzie, sprawdź w ustawieniach telefonu powiadomienia gry albo przeglądarki, w której ją otwierasz.',
@@ -21,6 +25,23 @@ const TESTED = {
 };
 
 const supported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+
+function wanted() {
+  try {
+    return localStorage.getItem(WANTED) === 'on';
+  } catch {
+    return false;
+  }
+}
+
+function remember(on) {
+  try {
+    if (on) localStorage.setItem(WANTED, 'on');
+    else localStorage.removeItem(WANTED);
+  } catch {
+    // Without storage a lost subscription waits for the switch.
+  }
+}
 
 const fromBase64Url = (text) => Uint8Array.from(atob(text.replaceAll('-', '+').replaceAll('_', '/')), (char) => char.charCodeAt(0));
 const toBase64Url = (bytes) => btoa(String.fromCharCode(...bytes)).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
@@ -64,30 +85,61 @@ async function enable() {
     throw new Error(FAILED);
   }
   await request('POST', '/api/push/subscribe', current.toJSON());
+  remember(true);
 }
 
 async function disable() {
+  remember(false);
   const current = await subscription();
   if (!current) return;
   await request('POST', '/api/push/unsubscribe', { endpoint: current.endpoint }).catch(() => {});
   await current.unsubscribe();
 }
 
-// After signing in: a phone with notifications on hands its subscription to
-// the account signed in now, made anew if the server's key changed. The
+// A new subscription in place of `dead` (or of none): the phone still allows
+// the game's notifications, so it is not asked again. Null when the phone
+// takes it only after a tap, or not at all.
+async function renew(dead, key) {
+  await dead?.unsubscribe().catch(() => {});
+  if (Notification.permission !== 'granted') return null;
+  try {
+    const registration = await activeWorker();
+    const fresh = await registration?.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: fromBase64Url(key) });
+    if (!fresh) return null;
+    await request('POST', '/api/push/subscribe', fresh.toJSON());
+    return fresh;
+  } catch {
+    return null;
+  }
+}
+
+// On every start: a phone with notifications on hands its subscription to
+// the account signed in now, made anew if the server's key changed. One the
+// push service has given up on (the server says `gone`), or one the phone
+// lost by itself while the player had the notifications on, is made anew
+// too, so the player need not switch them off and on (the author: a tester
+// had to reset them in the iPhone's settings and in the game). The
 // notifications already shown go away: the game is in front now.
 export async function syncPush() {
   clearNotifications();
+  if (!supported()) return;
   const current = await subscription().catch(() => null);
-  if (!current) return;
+  if (!current && !wanted()) return;
   try {
     const { key } = await request('GET', '/api/push/key');
-    if (!madeWith(current, key)) {
+    if (current && !madeWith(current, key)) {
       await current.unsubscribe();
       await enable();
       return;
     }
-    await request('POST', '/api/push/subscribe', current.toJSON());
+    if (current && !(await request('POST', '/api/push/subscribe', current.toJSON())).gone) {
+      remember(true);
+      return;
+    }
+    if (!(await renew(current, key))) {
+      remember(false);
+      toast(Notification.permission === 'denied' ? BLOCKED : LOST);
+    }
   } catch {
     // The next start tries again.
   }
@@ -95,12 +147,16 @@ export async function syncPush() {
 
 // A test notification for this phone, sent by the server at once, so the
 // player sees whether the whole way to the phone works. The server learns
-// the phone again first, in case it has forgotten it; a phone the push
-// service no longer knows is switched off here too, to be switched on anew.
+// the phone again first, in case it has forgotten it; a subscription the
+// push service has given up on is made anew first (the tap allows it), and
+// one it gives up on now is switched off here too, to be switched on anew.
 async function sendTest() {
-  const current = await subscription();
+  let current = await subscription();
   if (!current) return TESTED.unknown;
-  await request('POST', '/api/push/subscribe', current.toJSON());
+  if ((await request('POST', '/api/push/subscribe', current.toJSON())).gone) {
+    current = await renew(current, (await request('GET', '/api/push/key')).key);
+    if (!current) return TESTED.gone;
+  }
   const { result, status } = await request('POST', '/api/push/test', { endpoint: current.endpoint });
   if (result === 'gone') await current.unsubscribe().catch(() => {});
   if (result === 'failed') return `Usługa powiadomień telefonu nie przyjęła wiadomości (kod ${status}). Spróbuj ponownie za chwilę.`;

@@ -1,6 +1,6 @@
 // Materials and the Stół rozbiórki (data/materials.json). A creature
 // beaten in a fight may leave its own material, at the rarity of its
-// species and, the higher its level, more often one rarity higher. The table
+// species or, sometimes, a rarity or more higher. The table
 // turns each material into one part of the same rarity and takes items apart
 // into several parts of theirs, for free, one order after another, each
 // taking its time. Its first levels open the higher rarities, and the last
@@ -33,16 +33,25 @@ export function addCounts(counts, more) {
   return sum;
 }
 
-// The chance that a creature of `level` leaves its material one rarity higher.
-export function rarityUpChance(level, content) {
-  const { materialRarityUpPerLevel, materialRarityUpMax } = content.balance.rewards;
-  return Math.min(materialRarityUpMax, Math.max(0, level) * materialRarityUpPerLevel);
+// The chances that a creature of `level` leaves its material one, two or
+// more rarities above its species' (the author: the second grade sometimes,
+// the third much more rarely at low levels, and higher grades later). The
+// first grows with the level between its floor and its cap, each further
+// one is `materialRarityStepRatio` of the one before, and one more grade
+// opens every `materialRarityStepEvery` levels.
+export function rarityUpChances(level, content) {
+  const { materialRarityUpPerLevel, materialRarityUpMin, materialRarityUpMax, materialRarityStepRatio, materialRaritySteps, materialRarityStepEvery } =
+    content.balance.rewards;
+  const first = Math.min(materialRarityUpMax, Math.max(materialRarityUpMin, Math.max(0, level) * materialRarityUpPerLevel));
+  const steps = materialRaritySteps + Math.floor(Math.max(0, level - 1) / materialRarityStepEvery);
+  return Array.from({ length: steps }, (_, step) => first * materialRarityStepRatio ** step);
 }
 
 const rarityIndex = (rarityId, content) => content.rarities.findIndex((rarity) => rarity.id === rarityId);
 
-function nextRarity(rarityId, content) {
-  return content.rarities[Math.min(rarityIndex(rarityId, content) + 1, content.rarities.length - 1)].id;
+// The rarity `steps` above `rarityId`, at most the last one.
+function raisedRarity(rarityId, steps, content) {
+  return content.rarities[Math.min(rarityIndex(rarityId, content) + steps, content.rarities.length - 1)].id;
 }
 
 // What a beaten creature of `level` leaves, as { stackKey: count }. `weight`
@@ -58,9 +67,12 @@ export function materialDrops(monsterId, level, weight, rng, content) {
   const count = content.monstersById[monsterId]?.champion
     ? Number(rng.chance(content.balance.rewards.championMaterialChance))
     : countEvents(content.raritiesById[material.rarity].materialChance * weight, rng);
-  const up = rarityUpChance(level, content);
+  const chances = rarityUpChances(level, content);
   for (let i = 0; i < count; i++) {
-    const key = stackKey(material.id, rng.chance(up) ? nextRarity(material.rarity, content) : material.rarity);
+    // One draw for each piece: under the first chance it is a rarity
+    // higher, under the second two, and so on.
+    const roll = rng.next();
+    const key = stackKey(material.id, raisedRarity(material.rarity, chances.filter((chance) => roll < chance).length, content));
     found[key] = (found[key] ?? 0) + 1;
   }
   return found;

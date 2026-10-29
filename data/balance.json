@@ -122,7 +122,11 @@
     "findResourcePerLevel": 4,
     "gatherPerLevelHour": 2,
     "materialRarityUpPerLevel": 0.005,
-    "materialRarityUpMax": 0.25
+    "materialRarityUpMin": 0.05,
+    "materialRarityUpMax": 0.25,
+    "materialRarityStepRatio": 0.1,
+    "materialRaritySteps": 2,
+    "materialRarityStepEvery": 25
   },
   "crafting": {
     "salvageBase": 2,

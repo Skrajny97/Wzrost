@@ -601,7 +601,11 @@
         "findResourcePerLevel",
         "gatherPerLevelHour",
         "materialRarityUpPerLevel",
-        "materialRarityUpMax"
+        "materialRarityUpMin",
+        "materialRarityUpMax",
+        "materialRarityStepRatio",
+        "materialRaritySteps",
+        "materialRarityStepEvery"
       ],
       "properties": {
         "xpBase": {
@@ -732,13 +736,35 @@
         "materialRarityUpPerLevel": {
           "type": "number",
           "minimum": 0,
-          "description": "Szansa za każdy poziom stwora, że jego materiał będzie o jedną rzadkość wyższy niż rzadkość gatunku."
+          "description": "Szansa za każdy poziom stwora, że jego materiał będzie o co najmniej jedną rzadkość wyższy niż rzadkość gatunku."
+        },
+        "materialRarityUpMin": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Najniższa szansa na materiał o rzadkość wyższy, także u stworów z pierwszych poziomów."
         },
         "materialRarityUpMax": {
           "type": "number",
           "minimum": 0,
           "maximum": 1,
           "description": "Najwyższa szansa na materiał o rzadkość wyższy, bez względu na poziom stwora."
+        },
+        "materialRarityStepRatio": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "description": "Szansa na każdy kolejny stopień rzadkości wyżej to szansa na poprzedni razy ta wartość, np. 0,1: dwie rzadkości wyżej dziesięć razy rzadziej niż jedna."
+        },
+        "materialRaritySteps": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "O ile stopni rzadkości najwyżej materiał może być rzadszy od gatunku u stworów z pierwszych poziomów."
+        },
+        "materialRarityStepEvery": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Co tyle poziomów stwora otwiera się jeszcze jeden stopień rzadkości wyżej."
         }
       }
     },
