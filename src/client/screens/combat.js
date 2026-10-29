@@ -7,6 +7,7 @@
 
 import { areaArt } from '../area-art.js';
 import { landArt, materialSprite, monsterSprite, potionSprite } from '../art.js';
+import { bonusList } from '../bonuses.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -819,6 +820,9 @@ export function mountCombat(container, { params, navigate }) {
         h('p', { class: 'region-description', text: area.description }),
         area.dangers?.length > 0 && bestiaryRow(area),
         levelNote,
+        // The bonuses that will work on this exploration, before it is set
+        // up (the author: "powinny byc bonusy przed wyprawą napisane").
+        bonusList(character),
         // Everything the exploration is set up with in one frame, above the
         // threat it changes and "Wyrusz" (the author: not scattered over the
         // card). The narrator's first exploration has only its length.

@@ -277,7 +277,7 @@ describe('potions through the API', () => {
 
     const sped = await drink('lesser-speed');
     assert.equal(sped.data.text, 'Postać wypija Mniejszą miksturę szybkości. Ruchy w walkach szybsze o 15% przez 30 min wypraw.');
-    assert.deepEqual(sped.data.character.buffs, [{ kind: 'speed', ms: 30 * 60000, until: null, bonus: 0.15, label: 'Mikstura szybkości: ruchy w walkach +15%' }]);
+    assert.deepEqual(sped.data.character.buffs, [{ kind: 'speed', ms: 30 * 60000, until: null, bonus: 0.15, label: 'Szybkość: ruchy w walkach +15%', potion: 'lesser-speed' }]);
     const again = await drink('lesser-speed');
     assert.equal(again.data.text, 'Postać wypija Mniejszą miksturę szybkości. Ruchy w walkach szybsze o 15% przez 60 min wypraw.');
     assert.equal(speedBuff(again.data.character).ms, 60 * 60000);
@@ -294,7 +294,7 @@ describe('potions through the API', () => {
     await finish();
     const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
     assert.deepEqual(report.summary.potions, [`Mikstura szybkości działała w walkach: ${report.fights.length} z ${report.fights.length}.`]);
-    assert.deepEqual(after.buffs, [{ kind: 'speed', ms: 30 * 60000, until: null, bonus: 0.15, label: 'Mikstura szybkości: ruchy w walkach +15%' }]);
+    assert.deepEqual(after.buffs, [{ kind: 'speed', ms: 30 * 60000, until: null, bonus: 0.15, label: 'Szybkość: ruchy w walkach +15%', potion: 'lesser-speed' }]);
 
     // One called back at once gives back the time it did not use.
     await hunt({});
@@ -323,8 +323,8 @@ describe('potions through the API', () => {
     const oiled = await drink('aconite-oil');
     assert.equal(oiled.data.text, 'Postać nakłada Olejek z tojadu na broń. Przez 30 min wypraw każdy cios ma 50% szans na Zatrucie.');
     assert.deepEqual(oiled.data.character.buffs.map(({ kind, ms, label }) => [kind, ms, label]), [
-      ['armor', 30 * 60000, 'Wywar kamiennej skóry: pancerz +15%'],
-      ['poison', 30 * 60000, 'Olejek z tojadu: 50% szans na Zatrucie przy ciosie'],
+      ['armor', 30 * 60000, 'Twarda skóra: pancerz +15%'],
+      ['poison', 30 * 60000, 'Trucizna na broni: 50% szans na Zatrucie przy ciosie'],
     ]);
 
     // A fern brew goes along one at a time; both kinds for a time work all

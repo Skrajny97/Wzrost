@@ -811,7 +811,7 @@
             "poison",
             "ward"
           ],
-          "description": "Opis działającej mikstury na czas, po rodzaju, w górnym pasku ({bonus} w procentach).",
+          "description": "Działający bonus na czas po rodzaju, z mikstury albo ze zdarzenia (np. niebieskiego grzyba): nazwa działania, dwukropek i działanie ({bonus} w procentach). Widać go na Postaci, przed wyprawą i w górnym pasku.",
           "properties": {
             "speed": {
               "type": "string",

@@ -2845,6 +2845,12 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - Zaklinaczka w Osadzie przekuwa afiksy i bonusy przedmiotów. Kosztuje to materiały czasem rzadkie, a czasem zwykłe, zależnie od przedmiotu.
     - Trofea w Encyklopedii. Materiał jednego gatunku zebrany w każdym stopniu daje trofeum z drobnym bonusem przeciw temu gatunkowi.
     - Kolejność (brakujący szczegół): najpierw cztery pierwsze, bo nie czekają na nowe moduły, trofea razem z Encyklopedią, a tablica zleceń i Zaklinaczka razem z Osadą.
+8. **Aktywne bonusy na widoku.** Autor (ze zrzutem górnego paska z fiolką „30:00”): „efekt grzyba jest widoczny widze tylko tu, a w wyajtkowych sytuacjach jak się dwa bonusy nałożą albo ktoś miksture wypije to co? powinny byc bonusy przed wyprawą napisane gdzieś i w oknie postaci, najlepiej nad postacią jakie aktualne są obecne, bo tak to lipa”.
+    - Lista „Aktywne bonusy” stoi na Postaci nad portretem i w widoku wyprawy nad „Opcjami wyprawy”. Bez bonusów jej nie ma.
+    - Każdy bonus ma obrazek mikstury swojego rodzaju, nazwę, działanie i czas, np. „Szybkość: ruchy w walkach +25%” i „jeszcze 30 min wypraw”. W trakcie wyprawy czas odlicza się na żywo.
+    - Nazwy mówią o działaniu, nie o miksturze, bo ten sam bonus daje mikstura albo grzyb: Szybkość, Twarda skóra, Siła, Skupienie, Trucizna na broni i Osłona przed magią (wcześniej np. „Mikstura szybkości: …”).
+    - Bonusy różnych rodzajów to osobne wiersze. Dwa jednego rodzaju, np. z grzyba i z Mikstury szybkości, to jeden wiersz z silniejszym bonusem i wspólnym czasem, jak w zasadach mikstur („Zioła i mikstury: wybory autora”, punkt 6).
+    - Fiolka w górnym pasku zostaje i dalej prowadzi do Postaci.
 
 ## Uwagi autora po 0.0.54 (29.10.2026, w grze od 0.0.55)
 

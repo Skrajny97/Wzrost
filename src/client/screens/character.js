@@ -4,6 +4,7 @@
 // item apart on the Stół rozbiórki.
 
 import { herbSprite, itemSprite, materialSprite, portraitSprite, potionSprite, resourceArt } from '../art.js';
+import { bonusList } from '../bonuses.js';
 import { MATERIALS_HINT, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, timeFormat } from '../format.js';
@@ -126,6 +127,8 @@ export function mountCharacter(container) {
 
     fill(container,
       pageHeading(character.name, `${character.className} · ${POSITION_NAMES[character.position]} · solo`),
+      // What works on the character now, over its figure (the author).
+      bonusList(character),
       h('div', { class: 'portrait-wrap' }, frame),
       systemPanel(characterMessage(character, busy)),
       bagSection(character.bag),

@@ -62,6 +62,7 @@ import {
   buffLeft,
   optionWindows,
   TIMED_KINDS,
+  timedKind,
 } from '../engine/index.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
@@ -173,9 +174,11 @@ export function buffsOf(row, now) {
   return buffs;
 }
 
-// The potions for a time drunk from the bag that still work (potions.js), by
-// kind: the time of explorations they have left after the one under way,
-// until when they work in it, their bonus and the words for it.
+// The potions for a time drunk from the bag and the strengthenings of events
+// (the blue mushroom's) that still work (potions.js), by kind: the time of
+// explorations they have left after the one under way, until when they work
+// in it, their bonus, the words for it and the first potion of the kind for
+// its picture.
 function activeBuffs(player, now) {
   const buffs = buffsOf(player.row, now);
   const windows = player.activity?.kind === 'hunt' ? optionWindows(JSON.parse(player.activity.options ?? '{}')) : {};
@@ -187,7 +190,8 @@ function activeBuffs(player, now) {
     const ms = buffLeft(buffs, kind);
     if (ms <= 0 && !until) continue;
     const bonus = until ? window.bonus : buffs[kind].bonus;
-    active.push({ kind, ms, until, bonus, label: content.potionUse.buffLabels[kind].replace('{bonus}', Math.round(bonus * 100)) });
+    const potion = content.potions.find((one) => timedKind(one) === kind)?.id ?? null;
+    active.push({ kind, ms, until, bonus, label: content.potionUse.buffLabels[kind].replace('{bonus}', Math.round(bonus * 100)), potion });
   }
   return active;
 }
