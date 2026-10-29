@@ -3,9 +3,11 @@
 // has got, in tabs and tiers, each entry with where to get it; one not got
 // yet is a shadow with "???". The item sets and the counts of discoveries
 // open chests, and the Bestiariusz of every land and inner region is here
-// too, with its chests (combat.js).
+// too, with its chests (combat.js). A tab with a chest to open has a gold
+// dot, and the set, the counts or the place of that chest a gold frame.
 
 import { herbSprite, itemSprite, materialSprite, potionSprite } from '../art.js';
+import { bestiaryReady, placeReady } from '../bestiary.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
@@ -49,6 +51,10 @@ export function mountEncyclopedia(container, { params }) {
   const body = h('div', { class: 'encyclopedia' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
   fill(container, pageHeading('Encyklopedia'), tabs, body);
 
+  // The chests ready to open by the character's view, to fetch the book
+  // again when one more waits.
+  let readyCount = state.character.encyclopedia?.ready ?? 0;
+
   async function load() {
     try {
       const { encyclopedia } = await call('GET', '/api/encyclopedia');
@@ -60,15 +66,28 @@ export function mountEncyclopedia(container, { params }) {
     }
   }
 
-  function render() {
-    if (!book) return;
+  // The tabs with a chest to open.
+  function readyTabs() {
+    const ready = (chests) => chests.some((entry) => entry.ready);
+    return new Set(
+      [
+        ready(book.items.tiers.flatMap((tier) => tier.sets)) && 'items',
+        ...['potions', 'herbs', 'materials', 'parts'].filter((kind) => ready(book[kind].chests)),
+        bestiaryReady(state.character, state.content) > 0 && 'bestiary',
+      ].filter(Boolean),
+    );
+  }
+
+  function renderTabs() {
+    const ready = readyTabs();
     fill(
       tabs,
       book.tabs.map((each) =>
         h('button', {
           type: 'button',
-          class: 'segmented-option',
+          class: `segmented-option${ready.has(each.id) ? ' encyclopedia-tab--ready' : ''}`,
           'aria-pressed': each.id === tab,
+          'aria-label': ready.has(each.id) ? `${each.name}: skrzynia do odebrania` : null,
           text: each.name,
           // The tab changes here, without a new request; the address
           // keeps it for a reload.
@@ -80,6 +99,11 @@ export function mountEncyclopedia(container, { params }) {
         }),
       ),
     );
+  }
+
+  function render() {
+    if (!book) return;
+    renderTabs();
     const views = { bestiary: bestiaryTab, items: itemsTab, potions: () => tieredTab('potions'), herbs: () => tieredTab('herbs'), materials: materialsTab, parts: partsTab };
     fill(body, (views[tab] ?? itemsTab)());
   }
@@ -165,7 +189,7 @@ export function mountEncyclopedia(container, { params }) {
     chests.length > 0 &&
     h(
       'section',
-      { class: 'card encyclopedia-counts', 'aria-label': 'Skrzynie za odkrycia' },
+      { class: `card encyclopedia-counts${chests.some((entry) => entry.ready) ? ' encyclopedia-ready' : ''}`, 'aria-label': 'Skrzynie za odkrycia' },
       h('h2', { class: 'card-title', text: 'Skrzynie za odkrycia' }),
       h(
         'ul',
@@ -189,7 +213,7 @@ export function mountEncyclopedia(container, { params }) {
           tier.sets.map((set) =>
             h(
               'div',
-              { class: 'card encyclopedia-set' },
+              { class: `card encyclopedia-set${set.ready ? ' encyclopedia-ready' : ''}` },
               h('div', { class: 'encyclopedia-set-head' }, h('h3', { class: 'card-title', text: set.name }), chestButton(set, 'Zdobądź wszystkie przedmioty zestawu')),
               h(
                 'ul',
@@ -240,14 +264,20 @@ export function mountEncyclopedia(container, { params }) {
   function bestiaryTab() {
     const met = new Set(state.character.met ?? []);
     const known = (place) => `${place.dangers.filter((danger) => met.has(danger.monsterId)).length} z ${place.dangers.length}`;
+    const ready = (place) => placeReady(place, state.character);
     return state.content.regions.map((region) =>
       h(
         'section',
-        { class: 'card encyclopedia-land' },
+        { class: `card encyclopedia-land${[region, ...region.areas].some(ready) ? ' encyclopedia-ready' : ''}` },
         h('h2', { class: 'card-title' }, region.name, h('span', { class: 'muted', text: ` · poz. ${region.minLevel}–${region.maxLevel}` })),
         region.dangers?.length > 0 && [h('p', { class: 'muted', text: `Cała kraina, poznane stwory: ${known(region)}` }), bestiaryRow(region, true)],
         region.areas.map((area) =>
-          h('div', { class: 'encyclopedia-area' }, h('p', { class: 'encyclopedia-area-name', text: `${area.name} · poz. ${area.minLevel}–${area.maxLevel}` }), bestiaryRow(area)),
+          h(
+            'div',
+            { class: `encyclopedia-area${ready(area) ? ' encyclopedia-ready' : ''}` },
+            h('p', { class: 'encyclopedia-area-name', text: `${area.name} · poz. ${area.minLevel}–${area.maxLevel}` }),
+            bestiaryRow(area),
+          ),
         ),
       ),
     );
@@ -255,9 +285,16 @@ export function mountEncyclopedia(container, { params }) {
 
   load();
   return {
-    // The Bestiariusz follows the character's creatures met and chests opened.
+    // A chest more to open brings the book again; the Bestiariusz and its
+    // dot follow the character's creatures met and chests opened.
     update() {
-      if (tab === 'bestiary') render();
+      if (!book) return;
+      const ready = state.character.encyclopedia?.ready ?? 0;
+      if (ready !== readyCount) {
+        readyCount = ready;
+        load();
+      } else if (tab === 'bestiary') render();
+      else renderTabs();
     },
     unmount() {
       gone = true;

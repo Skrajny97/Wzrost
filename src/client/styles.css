@@ -8152,8 +8152,21 @@ a.profession-square:active {
 }
 
 .encyclopedia-tabs .segmented-option {
+  position: relative;
   padding: 0 4px;
   letter-spacing: 0.04em;
+}
+
+/* A chest waits behind the tab: a gold dot in its corner. */
+.encyclopedia-tab--ready::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
 }
 
 .encyclopedia-tabs .segmented-option:nth-child(3n + 1) {
@@ -8251,4 +8264,16 @@ a.profession-square:active {
 
 .encyclopedia-area-name {
   font-weight: 600;
+}
+
+/* The set, the counts or the place whose chest waits: a gold frame. */
+.encyclopedia-ready {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(217, 180, 90, 0.35);
+}
+
+.encyclopedia-area.encyclopedia-ready {
+  padding: 8px;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
 }

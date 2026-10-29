@@ -2819,6 +2819,15 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
 5. **Dodatkowy czas.** Punkty Czasu (1 na 30 minut oraz skrzynie zadań) przewijają ok. 1,5 godziny wypraw dziennie. Szybkie Polowania dają 45 minut dziennie, a Błyskawiczne 30–60 minut. Razem to do ok. 3 godzin dziennie. Najbardziej pomaga to graczom, którzy zaglądają rzadko i do 24. poziomu mają wyprawy najwyżej 30-minutowe. Zostaje tak, jak autor ustalił.
 6. **Narzędzie.** Symulacja przyjmuje teraz opcje wyprawy gracza (`hunt` w polityce, np. `seekRare`).
 
+## Uwagi autora po 0.0.57 (29.10.2026, na wersji testowej)
+
+1. **Kolejność pracy.** Autor: „Sklep Systemu jednak później.” Potem: „Najpierw te 2 punkty co mówisz, poźniej zwijanie Tierów w encyklopedii, zeby tez nie trzeba bylo tyle scrollować i wtedy Ewolucje.” Najpierw idą kropka z ramką w Encyklopedii i propozycja samouczka, potem zwijanie tierów, potem ewolucje, a Sklep Systemu po nich.
+2. **Kropka i ramka w Encyklopedii.** Autor: „Do Encyklopedii jesli nie dodales ramke i kółeczko żółte z powiadomieniem też dodaj jak ktoś zapełni cały tier czegokolwiek i jest skrzynka do odebrania.”
+    - Zakładka, w której czeka skrzynia, ma złotą kropkę w rogu. Dotyczy to Przedmiotów (zestaw), Mikstur, Ziół, Materiałów i Części (próg odkryć) oraz Bestiariusza.
+    - Złotą ramkę, jak gotowa umiejętność, ma to, czego skrzynia czeka: zestaw przedmiotów, karta „Skrzynie za odkrycia” albo kraina i region wewnętrzny w Bestiariuszu.
+    - Gdy w widoku postaci przybędzie skrzyń do otwarcia, otwarty ekran sam pobiera Encyklopedię jeszcze raz.
+3. **Samouczek o Encyklopedii i Bestiariuszu.** Autor: „W kolejnej rundzie rozbudujemy tez Samouczek początkowy o Encyklopedie i Bestiariusz. Zaproponujesz co i jak i pewnie tylko zatwierdzę, oby.” Propozycja miejsc i kwestii narratora idzie do autora w czacie. Nagrania powstają po zatwierdzeniu tekstów.
+
 ## Encyklopedia (29.10.2026, w grze od 0.0.57)
 
 To plan autora z „Uwag autora po 0.0.55”, punkty 5–7. Liczby i szczegóły to brakujące szczegóły, rozstrzygnięte najprościej.
