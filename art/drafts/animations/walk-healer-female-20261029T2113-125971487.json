@@ -1,0 +1,25 @@
+{
+  "id": "walk-healer-female",
+  "payload": {
+    "prompt": "a calm young woman with dark hair in a braid, a long white linen robe with a soft green mantle, a satchel of herbs on the belt, holding a simple wooden staff with a sprouting green branch",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 125971487,
+    "return_spritesheet": true,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793308620,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 52.93,
+    "request_id": "508497b8-a9e6-4e3b-a83d-3b7399c26932",
+    "outputs_retained_until": 1793395014
+  }
+}

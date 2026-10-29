@@ -1,0 +1,25 @@
+{
+  "id": "walk-poisoner-female",
+  "payload": {
+    "prompt": "a wiry young woman with short brown hair, a dark green leather coat with the hood down, a cloth mask over the mouth, belts of small green glass vials across the chest, a curved dagger dripping green venom",
+    "prompt_style": "rd_animation__four_angle_walking",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 838599304,
+    "return_spritesheet": true,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793308700,
+    "credit_cost": 10,
+    "balance_cost": 0.07,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 52.3,
+    "request_id": "e213ae56-ae22-41a9-a7e7-347106ec5ca9",
+    "outputs_retained_until": 1793395095
+  }
+}
