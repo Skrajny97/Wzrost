@@ -2791,6 +2791,26 @@ Autor chciał, żeby pierwsza ewolucja przychodziła po ok. 30 godzinach wypraw 
 
 1. **Bez zmian.** Krzywa z 0.0.30 zostaje, z dalszym spowolnieniem po 50. poziomie klasy, jakie już ma.
 
+## Ewolucje: odpowiedzi autora (29.10.2026)
+
+Odpowiedzi na pytania E1–E7 z propozycji ewolucji, zadane w czacie. Autor: „Ja nie lubię tych dokumentów […] wolę przedmiot po przedmiocie tutaj decydować i tak samo z ewolucjami klas i wszystkim”, więc dalsze pytania idą w czacie.
+
+1. **Zestaw (E1):** pełny. Ewolucja daje nową nazwę klasy, przyrost statystyk pod ścieżkę, stałą cechę, dwie umiejętności ewolucji i nowy strój.
+2. **Bez próby (E2):** gracz wybiera ewolucję i ogląda ceremonię. Próby zostają na ukryte ewolucje od 100. poziomu.
+3. **Jedna ścieżka.** Autor przy E3: „umiejętności dotychczasowe muszą się przekształcić w nową. Gracz wybiera jedną ścieżkę ewolucji z dwóch dostępnych dla niego. Reszta znika i już później co ewolucję (poza ukrytymi) jest tylko jedna ścieżka, z dwoma nowymi umiejętnościami”.
+    - Na 50. poziomie klasy gracz wybiera ewolucję swojej ścieżki głównej albo pobocznej.
+    - Obie dotychczasowe umiejętności zamieniają się w dwie umiejętności tej ewolucji: rozwiniętą umiejętność ścieżki i drugą, nową. Druga ścieżka znika.
+    - Kolejne ewolucje (100, 200…) prowadzą tę jedną ścieżkę dalej, każda z dwiema nowymi umiejętnościami.
+4. **Punkty przy przemianie (E3).** Autor: „Nowe umiejętności powinny być na tyle silne bazowo by odpowiadały starym na najwyższym stopniu rozwoju. Jeśli uważasz, że to bez sensu to Zwrot punktów”. Wybrany jest zwrot punktów:
+    - przy ewolucji wraca 40 Punktów Umiejętności, które gracz od razu rozdaje na dwie nowe umiejętności;
+    - nowa umiejętność na 20. poziomie jest co najmniej tak silna jak stara na 20. i ma swoje nowe działanie;
+    - punkty z poziomów klasy 50–99 (po 1 za poziom, razem 50) podnoszą obie dalej, do 45. poziomu każda (90 = 45 + 45, nic nie zostaje);
+    - silna baza od 1. poziomu wymagałaby darmowego 1. poziomu obu umiejętności, a wtedy 50 punktów nie dzieli się równo. Inaczej druga umiejętność czekałaby na punkt cały poziom klasy, czyli ok. 5 godzin wypraw.
+5. **Zmiana ewolucji (E4).** Autor: „U mieszkańca Osady, ale tylko raz darmowo, a później baaaardzo baaaardzo drogo (może nawet za Punkty Systemu, bo to nie pay2win)”. Pierwsza zmiana jest darmowa, a każda następna bardzo droga, w złocie albo w Punktach Systemu. Cenę ustalimy razem z Osadą.
+6. **Portrety (E5):** 30 nowych portretów, po dwa na każdą z 15 ewolucji (kobieta i mężczyzna), ok. 16 USD w Retro Diffusion.
+7. **Muzyka ceremonii (E6):** utwór autora z Suno. Ceremonia czeka na niego.
+8. **Nazwa klasy (E7):** sama nowa nazwa w górnym pasku, na czacie i w rankingu, np. „Barbarzyńca”. Klasa podstawowa zostaje dopiskiem w karcie postaci.
+
 ## Ewolucje i Osada: propozycje (28.10.2026)
 
 Autor: „Pomyśl nad modułem Osady. Ja na pewno chciałbym żeby trafiła tam Zaklinaczka” oraz „przede wszystkim musimy też ruszyć Ewolucje na 50 poziomie klasy. To ważny aspekt. Przygotuj propozycje i pytania.”
