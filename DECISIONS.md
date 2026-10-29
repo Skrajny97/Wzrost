@@ -2791,6 +2791,15 @@ Autor chciał, żeby pierwsza ewolucja przychodziła po ok. 30 godzinach wypraw 
 
 1. **Bez zmian.** Krzywa z 0.0.30 zostaje, z dalszym spowolnieniem po 50. poziomie klasy, jakie już ma.
 
+## Przedmioty od 25. i 50. poziomu klasy: wybory autora (29.10.2026)
+
+Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, nowych ziół i mikstur. Zajmiemy się tym jeszcze przed zajęciem ewolucją klas”. Propozycja: trzecia i czwarta baza w każdej z 22 kategorii, od 25. i od 50. poziomu klasy, z premią jak u przedmiotów od 10. poziomu, po jednym szkicu Retro Diffusion na przedmiot. Autor ocenia je w czacie, przedmiot po przedmiocie.
+
+1. **Od 25. poziomu klasy (1–22).** Autor zatwierdził wszystkie 22 szkice, z dwiema zmianami:
+    - „Łuk długi” nazywa się **Długi łuk** (autor: „Długi łuk (zamień miejscami nazwę)”);
+    - **Posoch**: opis zostaje, ale szkic do powtórki („opis dobry, ale wygeneruj nowe”). Nowy szkic pokazuje całą laskę od końca do końca.
+2. **Muzyka ewolucji.** Autor dał utwór z Suno „Ewolucja klasy” (3 min 25 s). Leży w `src/client/audio/music/evolution-v1.mp3`, bez okładki i metadanych, i zagra na ceremonii, gdy ewolucje powstaną.
+
 ## Ewolucje: odpowiedzi autora (29.10.2026)
 
 Odpowiedzi na pytania E1–E7 z propozycji ewolucji, zadane w czacie. Autor: „Ja nie lubię tych dokumentów […] wolę przedmiot po przedmiocie tutaj decydować i tak samo z ewolucjami klas i wszystkim”, więc dalsze pytania idą w czacie.
