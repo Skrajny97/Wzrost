@@ -58,6 +58,7 @@ import {
   shopOffer,
   skillsView,
   spentPoints,
+  pointSources,
   statEffects,
   unlockedFeatures,
   upgradeCost,
@@ -723,6 +724,7 @@ function avatarView(player, now) {
 export function characterView(player, now) {
   const { row, items, activity } = player;
   const character = engineCharacter(row);
+  const spent = spentPoints(character);
   const equipped = equippedItems(player);
   const professions = professionsView(row);
   const { totals, sources } = computeStats(character, equipped, content);
@@ -816,7 +818,11 @@ export function characterView(player, now) {
     evolution: evolutionPanel(character, content),
     // On the test version, a test evolution can be undone (evolutions.js).
     evolutionUndo: Boolean(row.evolution_undo),
-    canResetPoints: row.level <= content.balance.progression.freeResetMaxLevel && spentPoints(character) > 0,
+    // The free reset of the stat points after an evolution, while the player
+    // has not decided: all the points there will be to give out again, from
+    // the character's levels, the class's levels and events.
+    evolutionReset: row.evolution_reset && spent > 0 ? pointSources(character, content) : null,
+    canResetPoints: row.level <= content.balance.progression.freeResetMaxLevel && spent > 0,
     stats: content.stats.map((stat) => ({
       id: stat.id,
       name: stat.name,

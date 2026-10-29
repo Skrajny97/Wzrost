@@ -2846,6 +2846,14 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
     - Złota kropka na zakładce Ewolucja i na Postaci znaczy, że ewolucja czeka na wybór. Ewolucja wypróbowana przez „Testuj ewolucję” poniżej 50. poziomu też otwiera zakładkę.
     - Napisy na pasku są o włos mniejsze, żeby „Umiejętności” mieściły się na wąskim telefonie.
 3. **Zdanie ceremonii.** Autor: „albo "Rozdaj Punkty Umiejętności na nowe zdolności" lepiej”. Karta ceremonii mówi teraz: „Twoja nowa klasa to: {nazwa}. Rozdaj Punkty Umiejętności na nowe zdolności.” To samo zdanie stoi w zakładce Ewolucja, dopóki zostają punkty do rozdania.
+4. **Zerowanie statystyk po ewolucji.** Autor: „Zrób też tak, że po Ewolucji klasy wszystkie statystyki się zerują na życzenie gracza i gracz może je rozdać na nowo (bo po ewolucji może potrzebowac innych), ostrzeż, że to darmowe jednorazowo. Musi od razu zdecydować o wyzerowaniu przy wyświetleniu tego okienka (niech bedzie napis "zalecane" przy "Zeruj")”.
+    - Zaraz po karcie ceremonii System pyta: „Wyzerować statystyki?”. Okienko ostrzega, że to zerowanie jest darmowe jednorazowo. Nad przyciskiem „Zeruj” stoi „zalecane”, pod nim jest „Zostaw statystyki”.
+    - Autor: „Zeruj powinno oddawac wszystkie punkty i klasy i postaci i wszystkie rozdane ręcznie”. Zerowanie oddaje do puli wszystkie rozdane punkty: z poziomów postaci (8 na poziom), z poziomów klasy (2 na poziom, czyli 98 na 50. poziomie klasy) i ze zdarzeń, rozdane ręcznie i przez „Rozdaj według klasy”. Okienko podaje, ile punktów będzie do rozdania od nowa i skąd. Część „klasa” na paskach statystyk, czyli statystyki startowe klasy i jej przyrost na poziom, to nie punkty do rozdania, więc zostaje.
+    - Okienko nie ma krzyżyka i nie zamyka się stuknięciem obok. Zamknięte inaczej (np. gestem wstecz) albo przerwane zamknięciem gry wraca, dopóki gracz nie wybierze (brakujący szczegół). Pokazuje się, gdy postać jest w obozie, a narrator nie mówi.
+    - Każda odpowiedź jest ostateczna: po „Zostaw statystyki” darmowego zerowania już nie ma. Przedmioty i profesje zerowanie omija.
+    - Gdy przed ewolucją nie było rozdanych punktów, okienko się nie pokazuje, bo nie ma czego zerować (brakujący szczegół).
+    - Na wersji testowej „Cofnij ewolucję” oddaje też punkty sprzed zerowania.
+    - Przy okazji: na Statystykach trzy profesje z wysokimi poziomami nie mieściły się w jednym rzędzie na wąskim telefonie i rozpychały ekran, przez co okienka ucinały się u dołu. Teraz przechodzą do drugiego rzędu.
 
 ## Ewolucje: walka (29.10.2026, na wersji testowej)
 

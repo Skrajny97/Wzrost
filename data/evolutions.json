@@ -527,10 +527,19 @@
     "spend": "Rozdaj Punkty Umiejętności na nowe zdolności.",
     "toSkills": "Przejdź do Umiejętności",
     "busy": "Postać jest na wyprawie. Ewolucję wybierzesz po jej powrocie.",
+    "resetTitle": "Wyzerować statystyki?",
+    "resetText": "Nowa klasa może potrzebować innych statystyk. Zerowanie oddaje do puli wszystkie rozdane punkty: z poziomów postaci i z poziomów klasy, rozdane ręcznie i przez „Rozdaj według klasy”.",
+    "resetPool": "Punkty do rozdania od nowa: {points} ({character} z poziomów postaci, {class} z poziomów klasy).",
+    "resetPoolBonus": "Punkty do rozdania od nowa: {points} ({character} z poziomów postaci, {class} z poziomów klasy, {bonus} ze zdarzeń).",
+    "resetWarning": "To zerowanie jest darmowe jednorazowo. Zdecyduj teraz: później tego wyboru już nie będzie.",
+    "reset": "Zeruj",
+    "recommended": "zalecane",
+    "keep": "Zostaw statystyki",
+    "resetDone": "Punkty wróciły do puli. Rozdaj je w zakładce Statystyki.",
     "baseClass": "z klasy: {className}",
     "test": "Testuj ewolucję",
     "testText": "Tylko na wersji testowej: wybór ewolucji bez względu na poziom klasy, z możliwością cofnięcia.",
     "undo": "Cofnij ewolucję",
-    "undone": "Ewolucja cofnięta. Klasa i umiejętności są jak przed nią."
+    "undone": "Ewolucja cofnięta. Klasa, umiejętności i statystyki są jak przed nią."
   }
 }

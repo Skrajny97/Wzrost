@@ -1,13 +1,16 @@
 // Class evolutions (evolutions.js in the engine; DECISIONS.md, "Ewolucje:
 // budowa"): the cards of the two evolutions to choose from at class level 50
-// (in Umiejętności), the choice for good, and the ceremony with the
-// evolution's music. On the test version "Testuj ewolucję" (in the settings)
-// opens every evolution of the class at any level and can undo the test.
+// (in the Ewolucja tab), the choice for good, the ceremony with the
+// evolution's music and after it the free reset of the stat points, once.
+// On the test version "Testuj ewolucję" (in the settings) opens every
+// evolution of the class at any level and can undo the test.
 
 import { h } from './dom.js';
+import { formatNumber } from './format.js';
 import { setMusicPlace } from './music.js';
+import { narratorIdle } from './narrator.js';
 import { call, state } from './state.js';
-import { afterSheet, closeSheet, confirmAction, openSheet, toast, withButton } from './ui.js';
+import { afterSheet, closeSheet, confirmAction, openDecision, openSheet, toast, withButton } from './ui.js';
 
 const texts = () => state.content.evolutionTexts;
 const filled = (template, vars) => template.replace(/\{(\w+)\}/g, (whole, key) => String(vars[key] ?? whole));
@@ -64,7 +67,55 @@ export function ceremony(evolution) {
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--system', onClick: closeSheet, text: 'Dalej' })),
     ),
   );
-  afterSheet(() => setMusicPlace(/^#\/postac\/(umiejetnosci|ewolucja)/.test(location.hash) ? ['skills'] : []));
+  afterSheet(() => {
+    setMusicPlace(/^#\/postac\/(umiejetnosci|ewolucja)/.test(location.hash) ? ['skills'] : []);
+    offerPointsReset();
+  });
+}
+
+// After an evolution the stat points can be reset once, for free (the
+// author: "ostrzeż, że to darmowe jednorazowo"; "Musi od razu zdecydować o
+// wyzerowaniu przy wyświetleniu tego okienka (niech bedzie napis "zalecane"
+// przy "Zeruj")"). The window waits for the answer; closed without one, it
+// comes back (the app asks every second), while the character is at home.
+export function offerPointsReset() {
+  const offer = state.character?.evolutionReset;
+  if (!offer || state.character.activity || !narratorIdle() || document.querySelector('dialog[open]')) return;
+  const t = texts();
+  const decide = (reset) => (event) =>
+    withButton(event.currentTarget, async () => {
+      try {
+        const result = await call('POST', '/api/evolution/points', { reset });
+        if (result.reset) toast(t.resetDone);
+      } finally {
+        // Refused (the character set out from another device, say), the
+        // window waits for the character as read again.
+        closeSheet();
+      }
+    });
+  openDecision(
+    h('p', { class: 'system-label', text: '[ SYSTEM ]' }),
+    h('h2', { class: 'sheet-title', text: t.resetTitle }),
+    h('p', { class: 'sheet-text', text: t.resetText }),
+    h(
+      'p',
+      { class: 'sheet-text evolution-reset-pool' },
+      filled(offer.bonus > 0 ? t.resetPoolBonus : t.resetPool, {
+        points: formatNumber(offer.total),
+        character: formatNumber(offer.character),
+        class: formatNumber(offer.class),
+        bonus: formatNumber(offer.bonus),
+      }),
+    ),
+    h('p', { class: 'sheet-text evolution-reset-warning', text: t.resetWarning }),
+    h(
+      'div',
+      { class: 'evolution-reset-choice' },
+      h('span', { class: 'evolution-recommended', text: t.recommended }),
+      h('button', { type: 'button', class: 'button button--system', text: t.reset, onClick: decide(true) }),
+      h('button', { type: 'button', class: 'button button--world', text: t.keep, onClick: decide(false) }),
+    ),
+  );
 }
 
 // "Testuj ewolucję" on the test version: every evolution of the class to

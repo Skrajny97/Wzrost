@@ -46,10 +46,20 @@ export function computeStats(character, equipped, content) {
 
 // Each character level gives as many points as there are stats, each class
 // level a quarter of that (author's decision, see DECISIONS.md), and an event
-// may give a few more (`bonusPoints`, the blue mushroom).
-export function earnedPoints(character, content) {
+// may give a few more (`bonusPoints`, the blue mushroom). By where they come
+// from, as the free reset after an evolution shows them.
+export function pointSources(character, content) {
   const perLevel = content.statIds.length;
-  return perLevel * (character.level - 1) + Math.floor(perLevel / 4) * (character.classLevel - 1) + (character.bonusPoints ?? 0);
+  const sources = {
+    character: perLevel * (character.level - 1),
+    class: Math.floor(perLevel / 4) * (character.classLevel - 1),
+    bonus: character.bonusPoints ?? 0,
+  };
+  return { ...sources, total: sources.character + sources.class + sources.bonus };
+}
+
+export function earnedPoints(character, content) {
+  return pointSources(character, content).total;
 }
 
 export function spentPoints(character) {

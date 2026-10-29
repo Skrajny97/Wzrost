@@ -41,6 +41,7 @@ const sheet = () => $('#sheet');
 
 export function openSheet(...children) {
   const dialog = sheet();
+  delete dialog.dataset.locked;
   clear(dialog);
   append(dialog, [
     h(
@@ -54,6 +55,15 @@ export function openSheet(...children) {
     dialog.showModal();
     playSound('open');
   }
+  return dialog;
+}
+
+// A sheet that waits for an answer: no close button, and neither Escape nor
+// a tap beside it closes it, only its own buttons.
+export function openDecision(...children) {
+  const dialog = openSheet(...children);
+  dialog.dataset.locked = 'true';
+  $('.sheet-close', dialog)?.remove();
   return dialog;
 }
 
@@ -76,11 +86,18 @@ export function afterSheet(then) {
 
 export function initSheet() {
   const dialog = sheet();
-  // A tap on the dimmed backdrop (outside the sheet body) closes it.
+  // A tap on the dimmed backdrop (outside the sheet body) closes it, unless
+  // the sheet waits for an answer (openDecision).
   dialog.addEventListener('click', (event) => {
-    if (event.target === dialog) closeSheet();
+    if (event.target === dialog && !dialog.dataset.locked) closeSheet();
   });
-  dialog.addEventListener('close', () => clear(dialog));
+  dialog.addEventListener('cancel', (event) => {
+    if (dialog.dataset.locked) event.preventDefault();
+  });
+  dialog.addEventListener('close', () => {
+    delete dialog.dataset.locked;
+    clear(dialog);
+  });
 }
 
 // Asks before something that cannot be undone. Resolves to true or false.

@@ -34,7 +34,7 @@ import { narrate } from './narrator.js';
 import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
-import { openEvolutionTests } from './evolution.js';
+import { offerPointsReset, openEvolutionTests } from './evolution.js';
 import { giftCodeRow } from './gift-code.js';
 import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, skinSwatches, toast, voiceSwitch, withButton } from './ui.js';
 
@@ -234,6 +234,7 @@ function openGame() {
     watchQuests(now);
     checkChat();
     offerTrade();
+    offerPointsReset();
   }, 1000);
   checkChat({ now: true });
 }

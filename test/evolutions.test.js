@@ -263,4 +263,52 @@ describe('class evolutions through the API', () => {
     assert.equal(undone.data.character.className, 'Wojownik');
     assert.deepEqual(JSON.parse((await (await db()).prepare('SELECT skills FROM characters').first()).skills), { 'wide-sweep': 6 });
   });
+
+  const points = async () => JSON.parse((await (await db()).prepare('SELECT points FROM characters').first()).points);
+  const decide = (reset) => call('POST', '/api/evolution/points', { cookie, body: { reset } });
+
+  test('after an evolution the stat points can be reset once, for free, and the answer is final', async () => {
+    await set(`level = 50, class_level = 50, skills = '{"power-strike":20,"unyielding":20}', points = '{"strength":3,"vitality":2}'`);
+    const before = await character();
+    assert.equal(before.evolutionReset, null);
+    const taken = await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'barbarian' } });
+    // Everything comes back: the points of the character's 49 levels and of
+    // the class's 49, given out by hand or by class alike.
+    assert.deepEqual(taken.data.character.evolutionReset, { character: 392, class: 98, bonus: 0, total: 490 });
+    const reset = await decide(true);
+    assert.equal(reset.status, 200, JSON.stringify(reset.data));
+    assert.equal(reset.data.reset, true);
+    assert.equal(reset.data.character.evolutionReset, null);
+    assert.equal(reset.data.character.freePoints, before.freePoints + 5);
+    assert.deepEqual(await points(), {});
+    // Once: points spent again stay, asked again (from another device, say).
+    assert.equal((await call('POST', '/api/character/points', { cookie, body: { points: { strength: 2 } } })).status, 200);
+    const again = await decide(true);
+    assert.equal(again.status, 200, JSON.stringify(again.data));
+    assert.equal(again.data.reset, false);
+    assert.deepEqual(await points(), { strength: 2 });
+  });
+
+  test('keeping the stat points ends the offer too, and without points spent there is none', async () => {
+    await set(`level = 50, class_level = 50, skills = '{"power-strike":20,"unyielding":20}', points = '{"agility":4}'`);
+    await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'guardian' } });
+    const kept = await decide(false);
+    assert.equal(kept.data.reset, false);
+    assert.equal(kept.data.character.evolutionReset, null);
+    assert.equal((await decide(true)).data.reset, false);
+    assert.deepEqual(await points(), { agility: 4 });
+    await set(`evolution = NULL, skills = '{"power-strike":20,"unyielding":20}', points = '{}'`);
+    assert.equal((await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'guardian' } })).data.character.evolutionReset, null);
+  });
+
+  test('on the test version undoing an evolution gives back the stat points it reset', async () => {
+    await set(`level = 20, class_level = 15, skills = '{"wide-sweep":6}', points = '{"strength":4}'`);
+    await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'gladiator', test: true } });
+    assert.equal((await decide(true)).data.reset, true);
+    assert.deepEqual(await points(), {});
+    const undone = await call('POST', '/api/evolution/undo', { cookie });
+    assert.equal(undone.status, 200, JSON.stringify(undone.data));
+    assert.equal(undone.data.character.evolutionReset, null);
+    assert.deepEqual(await points(), { strength: 4 });
+  });
 });

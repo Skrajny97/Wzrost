@@ -2331,6 +2331,14 @@ a.segmented-option {
   font-size: 16px;
 }
 
+.level-profession-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+
 .stat-actions {
   display: flex;
   flex-wrap: wrap;
@@ -6623,6 +6631,29 @@ button.skill-row {
 .evolution-ceremony-title {
   color: #c9a8ef;
   font-size: 26px;
+}
+
+/* The free reset of the stat points after an evolution (evolution.js): the
+   warning in gold, "zalecane" over "Zeruj", the way to keep them below. */
+.evolution-reset-pool {
+  font-weight: 600;
+}
+
+.evolution-reset-warning {
+  color: var(--gold);
+}
+
+.evolution-reset-choice {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.evolution-recommended {
+  margin-bottom: -4px;
+  color: var(--gold);
+  font-size: 13px;
+  text-align: center;
 }
 
 .skill-row--ready .skill-row-level {

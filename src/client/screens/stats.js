@@ -107,13 +107,18 @@ export function mountStats(container) {
         { class: 'level-professions' },
         h('span', { text: 'Profesje' }),
         // The professions with work, and their levels; "wkrótce" while hidden.
-        character.professions
-          ? character.professions.list
-              .filter((profession) => !profession.soon)
-              .map((profession) => h('span', { class: 'chip', text: `${profession.name} ${profession.level}` }))
-          : isUnlocked('professions')
-            ? h('span', { class: 'chip chip--dashed', text: 'wkrótce' })
-            : h('span', { class: 'chip chip--dashed', text: `od poz. ${professions.level}` }),
+        // Three long names go to a second line on a narrow phone.
+        h(
+          'span',
+          { class: 'level-profession-chips' },
+          character.professions
+            ? character.professions.list
+                .filter((profession) => !profession.soon)
+                .map((profession) => h('span', { class: 'chip', text: `${profession.name} ${profession.level}` }))
+            : isUnlocked('professions')
+              ? h('span', { class: 'chip chip--dashed', text: 'wkrótce' })
+              : h('span', { class: 'chip chip--dashed', text: `od poz. ${professions.level}` }),
+        ),
       ),
     );
   }
