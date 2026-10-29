@@ -2851,6 +2851,7 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - Nazwy mówią o działaniu, nie o miksturze, bo ten sam bonus daje mikstura albo grzyb: Szybkość, Twarda skóra, Siła, Skupienie, Trucizna na broni i Osłona przed magią (wcześniej np. „Mikstura szybkości: …”).
     - Bonusy różnych rodzajów to osobne wiersze. Dwa jednego rodzaju, np. z grzyba i z Mikstury szybkości, to jeden wiersz z silniejszym bonusem i wspólnym czasem, jak w zasadach mikstur („Zioła i mikstury: wybory autora”, punkt 6).
     - Fiolka w górnym pasku zostaje i dalej prowadzi do Postaci.
+9. **Opis Łutu szczęścia.** Autor (ze zrzutem formularza Warsztatu): „korekta opisu Łutu szczescia: 5% szans na przedmiot o wyższej rzadkości, 1% szans na przemiot rzadkości wyższej o 2 stopnie. Szanse rosną co 20 poziomów Rzemieślnictwa.” Formularz Warsztatu pisze to słowami autora, z poprawioną literówką („przedmiot”). Liczby to obecne szanse postaci, więc od 20. poziomu Rzemieślnictwa są wyższe.
 
 ## Uwagi autora po 0.0.54 (29.10.2026, w grze od 0.0.55)
 

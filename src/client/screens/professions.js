@@ -75,9 +75,9 @@ const upgradesText = (workshop) =>
     : `Wyrób może wyjść od razu ulepszony: ${workshop.upgrades.map((tier) => `+${tier.upgrade} (${formatDecimal(tier.chance * 100)}%)`).join(', ')}.`;
 
 // The chances that luck alone makes an item one or two rarities above the
-// ordered one.
+// ordered one, in the author's words.
 const luckText = (workshop) =>
-  `Łut szczęścia: ${formatDecimal(workshop.luck.oneUp * 100)}% szans na przedmiot o rzadkość wyżej i ${formatDecimal(workshop.luck.twoUp * 100)}% na dwie wyżej. Szanse rosną co 20 poziomów Rzemieślnictwa.`;
+  `Łut szczęścia: ${formatDecimal(workshop.luck.oneUp * 100)}% szans na przedmiot o wyższej rzadkości, ${formatDecimal(workshop.luck.twoUp * 100)}% szans na przedmiot rzadkości wyższej o 2 stopnie. Szanse rosną co 20 poziomów Rzemieślnictwa.`;
 
 // A title with a large "Powrót" on the right, as in the report.
 function backHeading(title, subtitle, hash) {
