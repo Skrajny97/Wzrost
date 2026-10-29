@@ -2855,6 +2855,20 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
     - Na wersji testowej „Cofnij ewolucję” oddaje też punkty sprzed zerowania.
     - Przy okazji: na Statystykach trzy profesje z wysokimi poziomami nie mieściły się w jednym rzędzie na wąskim telefonie i rozpychały ekran, przez co okienka ucinały się u dołu. Teraz przechodzą do drugiego rzędu.
 
+## Ewolucje: portrety (29.10.2026, na wersji testowej)
+
+Autor: „Kolejna rzecz to portrety dla wyewoluowanych klas, bez tego nie wdrażamy ewolucji też.”, „nie giftcode i wszystko zaczekaja”, „0.0.58 to bedzie duzy update po prostu”. Kod podarunkowy, Encyklopedia i ewolucje czekają więc na portrety i wejdą do gry razem, jako 0.0.58.
+
+1. **Dawne portrety dla pięciu ewolucji.** Autor: „części może można użyć nawet zastanow sie czy mozna przyporządkować”. Dawne, bogatsze portrety klas (`art/evolution/portraits/`, zob. „Skromne portrety na start”, punkt 2) dostały ewolucje, do których pasują strojem i umiejętnościami: Strażnik (Wojownik), Snajper (Łucznik), Władca Lodu (Mag), Kapłan (Kleryk) i Skrytobójca (Cień). Autor zatwierdził wszystkie pięć, w trzech męskich wersjach z poprawkami: „1 tak 2 Snajper męski ma ucięty kaptur do ręcznej poprawy 3 tak 4 Kapłan męski ma ucięte wlosy 5 Skrytobójca męski ma od razu odcień skóry szary”.
+2. **Poprawki** (autor: „2 4 i 5 tak”):
+    - Snajper: dorysowany czubek kaptura. Obrazek był ucięty także na dole, więc dorysowane są też podeszwy butów i oba końce łuku.
+    - Kapłan: dorysowany czubek głowy w kolorach reszty włosów.
+    - Skrytobójca: szara skóra między kapturem a maską ma teraz jasny odcień, jak na portretach startowych. Oczy i obrys zostały.
+3. **Wspólna wielkość.** Wszystkie portrety ewolucji mają postać wysokości 118 px, ze stopami na tej samej linii co postacie startowe. Przy zmniejszaniu bez wygładzania wypadał rząd pikseli z oczami Snajpera, więc skalowanie wybiera przesunięcie, które zostawia najwięcej szczegółów twarzy. Popiersie w walce centruje się na środku skóry twarzy, bo łuki i kostury przy głowie przesuwały środek postaci.
+4. **Gdzie widać portret ewolucji.** Na ekranie Postaci, w popiersiu w odtwarzaniu walki i w profilu gracza (z czatu, rankingu i Znajomych). Ewolucja, która nie ma jeszcze portretu, pokazuje portret klasy (brakujący szczegół). Chód na ekranie Walka zostaje na razie chodem klasy.
+5. **Kolory skóry.** Autor: „Pamietaj jeszcze o tych odcieniach skóry do zrobienia później ręcznie maskami i przerysowaniem”. Portrety ewolucji mają na razie tylko jasną skórę, w której są narysowane. Postać z innym kolorem skóry widzi do tego czasu portret ewolucji w jasnym odcieniu.
+6. **Pozostałe 10 ewolucji** dostają nowe portrety z Retro Diffusion (`evolutions` w `art/prompts.json`): po 2 wersje każdego wyglądu, w ramce portretów startowych, z włosami postaci startowej i bronią poniżej czubka głowy, żeby postacie skalowały się jak reszta. Szkice kosztowały 7,20 USD.
+
 ## Ewolucje: walka (29.10.2026, na wersji testowej)
 
 Wszystkie 30 umiejętności ewolucji i 15 cech działa w walce (`src/engine/combat.js`), a odtwarzanie walki pokazuje ich skutki. Liczby są robocze, do symulacji balansu (krok D). Brakujące szczegóły, rozstrzygnięte najprościej:

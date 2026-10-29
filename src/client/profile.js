@@ -23,7 +23,7 @@ export async function openProfile(name, { onChange } = {}) {
     h(
       'div',
       { class: 'profile-head' },
-      h('span', { class: 'profile-portrait' }, portraitSprite(profile.classId, profile.appearance, { skin: profile.skin })),
+      h('span', { class: 'profile-portrait' }, portraitSprite(profile.classId, profile.appearance, { skin: profile.skin, evolution: profile.evolution })),
       h(
         'div',
         { class: 'profile-title' },

@@ -121,7 +121,7 @@ export function mountCharacter(container) {
         slots.filter((slot) => slot.column === side).map((slot) => slotButton(slot, character.equipment[slot.id])),
       );
     // The forest, and over it the class's figure in the character's look.
-    const figure = portraitSprite(character.classId, character.appearance, { skin: character.skin });
+    const figure = portraitSprite(character.classId, character.appearance, { skin: character.skin, evolution: character.evolution?.current?.id });
     const art = figure ? [portrait(character.classId, { figure: false }), figure] : [portrait(character.classId)];
     frame.append(h('div', { class: 'portrait-art' }, art), column('left'), column('right'), eye);
 

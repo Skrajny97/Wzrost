@@ -928,6 +928,8 @@ export async function characterProfile(context) {
       className: view.className,
       appearance: view.appearance,
       skin: view.skin,
+      // The evolution's portrait (art.js), once the character has one.
+      evolution: view.evolution.current?.id ?? null,
       level: view.level,
       classLevel: view.classLevel,
       role: chatRole(context.env, found),

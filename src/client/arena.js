@@ -80,7 +80,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     // vector bust or the old line icon beside the level.
     const art =
       unit.side === 'ally'
-        ? portraitSprite(unit.classId, unit.appearance ?? 'male', { bust: true, skin: unit.skin }) ?? classArt(unit.classId)
+        ? portraitSprite(unit.classId, unit.appearance ?? 'male', { bust: true, skin: unit.skin, evolution: unit.evolution }) ?? classArt(unit.classId)
         : monsterSprite(unit.monsterId);
     const card = h(
       'div',

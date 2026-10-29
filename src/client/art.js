@@ -33,15 +33,27 @@ export const SPRITES = {
       'phantasm', 'black-grouse', 'diving-beetle', 'little-owl', 'zmij', 'fume-spirit', 'mine-spirit', 'giant-rat',
     ],
   },
-  // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved.
+  // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved,
+  // and the class evolutions' <evolution>-<look> in the same frame.
   // `faces`: where the face is across, when not in the middle (a head turned
-  // in three quarters), as tools/normalize-portraits.py prints it. Busts
-  // centre on the face; the whole figure stays centred.
+  // in three quarters), as tools/normalize-portraits.py prints it, or for a
+  // figure with a bow or a staff at its head, the middle of the face's skin.
+  // Busts centre on the face; the whole figure stays centred. `toned`: the
+  // portraits with a file for every skin tone; the evolutions' get theirs
+  // later, by hand (the author), and show as drawn till then.
   portraits: {
     width: 96,
     height: 128,
-    ids: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
-    faces: { 'archer-female': 49, 'archer-male': 52, 'cleric-male': 49, 'shadow-male': 51, 'warrior-male': 50 },
+    ids: [
+      'warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male',
+      // The evolutions that took the earlier, well-equipped portraits.
+      'guardian-female', 'guardian-male', 'sniper-female', 'sniper-male', 'ice-lord-female', 'ice-lord-male', 'priest-female', 'priest-male', 'assassin-female', 'assassin-male',
+    ],
+    faces: {
+      'archer-female': 49, 'archer-male': 52, 'cleric-male': 49, 'shadow-male': 51, 'warrior-male': 50,
+      'guardian-female': 50, 'sniper-female': 43, 'sniper-male': 47, 'ice-lord-female': 50, 'priest-female': 50, 'priest-male': 50, 'assassin-female': 54, 'assassin-male': 52,
+    },
+    toned: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
   },
   items: {
     size: 32,
@@ -267,12 +279,16 @@ function toneFile(id, skin) {
   return tone && !tone.drawn ? `${id}-${tone.id}` : id;
 }
 
-// A class's figure for a look. `bust` shows the head and shoulders at the
-// image's own size, cut by the box it sits in (the arena, the class cards).
-export function portraitSprite(classId, appearance, { bust = false, skin } = {}) {
-  const id = `${classId}-${appearance}`;
+const toned = new Set(SPRITES.portraits.toned);
+
+// A class's figure for a look, or its evolution's once it has one. `bust`
+// shows the head and shoulders at the image's own size, cut by the box it
+// sits in (the arena, the class cards).
+export function portraitSprite(classId, appearance, { bust = false, skin, evolution } = {}) {
+  const evolved = evolution ? `${evolution}-${appearance}` : null;
+  const id = evolved && available.portraits.has(evolved) ? evolved : `${classId}-${appearance}`;
   if (!available.portraits.has(id)) return null;
-  const file = toneFile(id, skin);
+  const file = toned.has(id) ? toneFile(id, skin) : id;
   const { width, height, faces } = SPRITES.portraits;
   const off = bust ? (faces[id] ?? width / 2) - width / 2 : 0;
   return h('img', {
@@ -321,9 +337,9 @@ export function narratorSprite() {
   });
 }
 
-// Fetches every portrait ahead, so the class cards show them at once.
+// Fetches the classes' portraits ahead, so the class cards show them at once.
 export function preloadPortraits() {
-  for (const id of SPRITES.portraits.ids) {
+  for (const id of SPRITES.portraits.toned) {
     const image = new Image();
     image.decoding = 'async';
     image.src = `/art/portraits/${id}.png`;

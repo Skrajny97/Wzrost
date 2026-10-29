@@ -102,7 +102,8 @@ test('every sprite on the list has its file at its size, and every class has its
     // The people of the events fight as monsters do.
     monsters: [...data('monsters'), ...data('events').foes].map((monster) => monster.id),
     items: data('item-bases').map((base) => base.id),
-    portraits: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
+    // The classes' portraits and their evolutions' (data/evolutions.json).
+    portraits: [...data('classes'), ...data('evolutions').evolutions].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
     // The character walking on the Walka scene, one sheet for each portrait.
     walkers: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     // The introduction's one narrator (narrator.js).
@@ -142,6 +143,11 @@ test('every sprite on the list has its file at its size, and every class has its
     }
   }
   assert.deepEqual(data('classes').map((cls) => cls.id).filter((id) => !classArtIds.includes(id)), []);
+  // Every class has its portraits with all the skin tones.
+  assert.deepEqual(
+    SPRITES.portraits.toned,
+    data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)).filter((id) => SPRITES.portraits.ids.includes(id)),
+  );
   // A bust centres on a face inside the portrait.
   for (const [id, face] of Object.entries(SPRITES.portraits.faces)) {
     assert.ok(SPRITES.portraits.ids.includes(id), `faces: no portrait ${id}`);

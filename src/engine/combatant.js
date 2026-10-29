@@ -44,6 +44,8 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     classId: character.classId,
     appearance: character.appearance,
     skin: character.skin,
+    // The evolution's portrait in the playback.
+    ...(character.evolution && { evolution: character.evolution }),
     family: 'player',
     elite: false,
     position: character.position,
@@ -179,9 +181,11 @@ export function combatantView(unit, opponentLevel, content) {
     position: unit.position,
     family: unit.family,
     classId: unit.classId,
-    // A character's look: its portrait and voice in the playback.
+    // A character's look: its portrait (its evolution's, once it has one)
+    // and voice in the playback.
     appearance: unit.appearance,
     skin: unit.skin,
+    evolution: unit.evolution,
     monsterId: unit.monsterId,
     elite: unit.elite,
     champion: unit.champion ?? false,
