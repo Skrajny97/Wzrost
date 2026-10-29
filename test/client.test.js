@@ -110,7 +110,10 @@ test('every sprite on the list has its file at its size, and every class has its
     narrator: ['narrator'],
     // Materials, parts and the treasure chest of the report.
     materials: [...data('materials').materials.map((material) => material.id), ...data('materials').parts.map((part) => part.id), 'chest'],
-    skills: data('skills').map((skill) => skill.id),
+    // The classes' skills and their evolutions' (data/evolutions.json).
+    skills: [...data('skills'), ...data('evolutions').skills].map((skill) => skill.id),
+    // The figures the evolutions' summoning skills put in fights.
+    summons: data('evolutions').skills.filter((skill) => skill.kind === 'summon').map((skill) => skill.id),
     // The inner regions' circles and the lands' cards on the Walka screen.
     areas: data('regions').flatMap((region) => region.areas.map((area) => area.id)),
     lands: data('regions').map((region) => region.id),

@@ -4,7 +4,7 @@
 // flies to it, and the hit flashes with the damage. The text log runs
 // underneath and "+" opens the participants' stats.
 
-import { monsterSprite, portraitSprite } from './art.js';
+import { monsterSprite, portraitSprite, summonSprite } from './art.js';
 import { classArt } from './class-art.js';
 import { h, icon } from './dom.js';
 import { CLASS_ICONS } from './icons.js';
@@ -387,8 +387,10 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
   }
 
   // A summon (evolutions: Żywiołak, Trujący Szlam) shows on its summoner's
-  // card, in the status line, with the HP it has left; gone, the line clears.
+  // card, in the status line, with the HP it has left, and as its figure at
+  // the card's corner, once its art is in (summonSprite); gone, both go.
   const summons = new Map(); // unit id → the text it shows
+  const figures = new Map(); // unit id → its summon's figure
   function summonState(event) {
     const entry = cards.get(event.target);
     if (!entry) return;
@@ -397,10 +399,28 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       const text = `${event.summon} · ${event.summonHp}`;
       summons.set(event.target, text);
       entry.status.textContent = text;
+      if (event.state === 'up') summonUp(entry, event);
       return;
     }
     summons.delete(event.target);
+    summonGone(event.target);
     if (entry.status.textContent === before) entry.status.textContent = '';
+  }
+  function summonUp(entry, event) {
+    summonGone(event.target);
+    const art = summonSprite(event.skill);
+    if (!art) return;
+    const figure = h('span', { class: 'unit-summon', 'aria-hidden': 'true' }, art);
+    entry.card.append(figure);
+    figures.set(event.target, figure);
+    if (!reducedMotion()) animate(figure, [{ opacity: 0, transform: 'scale(0.4)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' });
+  }
+  function summonGone(id) {
+    const figure = figures.get(id);
+    if (!figure) return;
+    figures.delete(id);
+    if (reducedMotion()) figure.remove();
+    else animate(figure, [{ opacity: 1 }, { opacity: 0, transform: 'scale(0.6)' }], { duration: 260, easing: 'ease-in' }).then(() => figure.remove());
   }
 
   // A stance or a guard that ends takes its name off the card.
@@ -418,6 +438,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     guards.delete(id);
     shields.delete(id);
     summons.delete(id);
+    summonGone(id);
     entry.status.textContent = '';
     entry.shieldBar.hidden = true;
     entry.card.classList.remove('unit--shielded');
@@ -664,6 +685,8 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     shields.clear();
     guards.clear();
     summons.clear();
+    for (const figure of figures.values()) figure.remove();
+    figures.clear();
     index = 0;
     log.replaceChildren();
     banner.classList.remove('arena-banner--shown');

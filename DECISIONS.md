@@ -2875,6 +2875,25 @@ Autor: „ej a gra coś zacina, znasz tego powód? długie ladowania itp nie tyl
 2. **Poprawka.** Po pierwszym dotknięciu ładują się tylko odgłosy ciosów i dźwięki nazwane (zakładki, umiejętności): 48 plików zamiast 407. Okrzyki stworów i postaci z danej walki ładują się, gdy powstaje jej odtwarzanie. Rozpakowane zostają okrzyki ostatnich 24 stworów. Kwestia narratora, przeczytana raz, nie zostaje w pamięci. W przeglądarce ze spowolnionym procesorem (jak telefon) start gry trwał 2,9 s, a teraz trwa 0,8 s. Zapytań przy starcie było 502, a jest 143.
 3. **Muzyka.** Utwór miejsca pobiera się w całości przy pierwszym wejściu na jego ekran: 3,6–4,8 MB, w jakości ok. 170 kb/s. Lżejsze pliki (ok. 112 kb/s, o jedną trzecią mniejsze) są propozycją dla autora, bo zmieniają brzmienie jego utworów.
 
+## Grafiki ewolucji: poprawki po ocenie autora (29.10.2026, na wersji testowej)
+
+Autor o pozycjach 24–42: „kobieta Inkwizytor wyglada jak facet, dorób jej chociaż lekki biust albo coś ręcznie / 24. A / […] / 25 Tak / 26 Popraw / 27 Tak / 28 Tak / 29 Młyn popraw, zlewa się / 30 Tak / 31 Popraw obydwa (pierwsze usuń tylko tło) / 32 Tak / 33 Popraw grot z zadziorem (parę pikseli zbędnych z prawej strony) / 34 Tak / 35 Tak / 36 Tak, tylko wygeneruj jeszcze postać żywiołaka do gry do walki w oparciu o wygląd z umiejętności) / 37 Tak, tylko w Cudzie pozbądź sie zbędnych pikseli / 38 Tak / 39 Tak / 40 Tak / 41 Tak, tylko więcej tego jadu troszkę, a Szlam musi być też postacią w grze do walki / 42 Taniec ostrzy do poprawy”.
+
+1. **Inkwizytorka.** Krzyż na łańcuszku wisi 2 piksele wyżej, a pod nim i obok widać lekki biust: jaśniejszy łuk u góry i cień pod spodem. Poły płaszcza rozchodzą się na wysokości biustu i schodzą się w talii, a pas jest węższy o 2 piksele.
+2. **Elementalistka** (autor: „24. A”). Portret ma rozmiar pozostałych (postać wysokości 118 px). Chód: 4 szkice z portretu do wyboru autora. Na próbę w grze stoi szkic A, z płomykiem nad dłonią w każdej klatce.
+3. **Chód Kapłana** (autor: „26 Popraw”). Zamówienie chodu podawało „srebrną tarczę i kropidło”, a na portrecie Kapłan ma biało-złotą tarczę i buzdygan. Stąd tarcza widziana z boku w co drugiej klatce. Opis jest poprawiony i są 4 nowe szkice. Na próbę w grze stoi szkic D: ta sama postać w każdej klatce, bez tarczy. Szkic C ma tarczę, widać ją, gdy ręka idzie do tyłu.
+4. **Ikony umiejętności ewolucji:**
+    - Kwadratowe tła schodzą, jak przy umiejętnościach klas (zob. „Ewolucje: portrety”, punkt 9): Riposta, Przebijający strzał (autor: „pierwsze usuń tylko tło”), Burza strzał, Chmura burzowa, Wybuch ognia, Promień żywiołów, Lustro many i Znak śmierci. Zamieć zostaje w kwadracie, bo jej wir wypełnia cały obrazek.
+    - Młyn: szary wir za mieczem jest teraz ciemnobrązowy, a stalowe ostrze ma czarny obrys z obu stron.
+    - Strzał z ukrycia: nowy szkic, łucznik w kapturze ukryty w krzaku i strzały wylatujące z niego. Krzak był ucięty prosto przy prawej krawędzi, więc dostał zaokrąglony bok z obrysem.
+    - Grot z zadziorem: zdjęta czerwona kreska za obrysem grotu, z prawej strony. Kropla krwi pod grotem zostaje.
+    - Cud: zdjęty ciemny kształt obok pióra.
+    - Czarny jad: więcej jadu, czyli nowe strugi, kropla i ciemnozielony połysk.
+    - Taniec ostrzy: 3 nowe szkice, dwa sztylety wirujące w fioletowych smugach. Na próbę w grze stoi szkic A.
+    - Pozostałe ikony z „Tak” są w grze bez zmian. Ikony są na ekranie Umiejętności i w podglądzie autora.
+5. **Żywiołak i Trujący Szlam w walce.** Przywołany stwór stoi w lewym górnym rogu karty przywołującego, przed jego popiersiem, od przywołania aż do upadku albo odejścia. Jego HP zostaje w wierszu stanu karty. Obrazki to szkice z Retro Diffusion na wzór ikon umiejętności, przycięte ciasno wokół postaci. Na próbę w grze stoją Żywiołak B i Szlam A, z 4 szkiców każdego.
+6. **Koszt:** chody 0,56 USD, ikony 1,08 USD (Taniec ostrzy powtórzony po błędzie serwera Retro Diffusion), stwory 1,44 USD. Zostało 48,10 USD.
+
 ## Ewolucje: portrety (29.10.2026, na wersji testowej)
 
 Autor: „Kolejna rzecz to portrety dla wyewoluowanych klas, bez tego nie wdrażamy ewolucji też.”, „nie giftcode i wszystko zaczekaja”, „0.0.58 to bedzie duzy update po prostu”. Kod podarunkowy, Encyklopedia i ewolucje czekały więc na portrety, by wejść do gry razem, jako 0.0.58. Później plan się zmienia: 0.0.58 wchodzi do gry bez ewolucji (zob. „Wersja 0.0.58 bez ewolucji klas”).

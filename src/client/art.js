@@ -107,7 +107,14 @@ export const SPRITES = {
   // The skills of the classes (data/skills.json), 48×48.
   skills: {
     size: 48,
-    ids: ['power-strike', 'wide-sweep', 'unyielding', 'aimed-shot', 'arrow-rain', 'pinning-shot', 'fireball', 'frost-gust', 'mana-shield', 'prayer-of-health', 'exorcism', 'blessing', 'backstab', 'poisoned-blade', 'shadow-dance'],
+    ids: [
+      'power-strike', 'wide-sweep', 'unyielding', 'aimed-shot', 'arrow-rain', 'pinning-shot', 'fireball', 'frost-gust', 'mana-shield', 'prayer-of-health', 'exorcism', 'blessing', 'backstab', 'poisoned-blade', 'shadow-dance',
+      // The class evolutions' skills, as the author approved them, or the
+      // drafts in their place till the author picks (DECISIONS.md).
+      'crushing-blow', 'blood-frenzy', 'millstone', 'riposte', 'indomitable', 'challenge', 'piercing-shot', 'ambush-shot', 'arrow-storm', 'storm-cloud',
+      'barbed-arrow', 'falcon', 'fire-burst', 'elemental-ray', 'blizzard', 'ice-lance', 'mana-mirror', 'elemental-summon', 'renewal', 'miracle',
+      'judgement', 'verdict', 'great-blessing', 'psalm', 'execution', 'death-mark', 'black-venom', 'toxic-slime', 'blade-dance', 'shadow-whirl',
+    ],
   },
   // The character walking in place on the Walka scene, <class>-<look>: four
   // frames of 48×48 in a row, facing right, drawn from the portraits. A skin
@@ -120,6 +127,7 @@ export const SPRITES = {
     ids: [
       'warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male',
       'guardian-female', 'guardian-male', 'sniper-female', 'sniper-male', 'ice-lord-female', 'ice-lord-male', 'priest-female', 'priest-male', 'assassin-female', 'assassin-male',
+      'elementalist-female',
     ],
   },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
@@ -216,6 +224,14 @@ export const SPRITES = {
     height: 96,
     ids: ['forest-ambush', 'fern-glade'],
   },
+  // The figures the evolutions' skills summon in fights, by the skill's id
+  // (Przywołanie żywiołaka, Trujący Szlam): square, cut close around the
+  // figure, shown at one size on the summoner's card.
+  summons: {
+    size: 48,
+    fit: true,
+    ids: ['elemental-summon', 'toxic-slime'],
+  },
 };
 
 const available = Object.fromEntries(Object.entries(SPRITES).map(([kind, { ids }]) => [kind, new Set(ids)]));
@@ -235,6 +251,7 @@ function sprite(kind, id, className) {
 }
 
 export const monsterSprite = (monsterId) => sprite('monsters', monsterId, 'sprite--monster');
+export const summonSprite = (skillId) => sprite('summons', skillId, 'sprite--summon');
 export const itemSprite = (item) => sprite('items', item.base, 'sprite--item');
 // A material, a part ("scraps") or the chest ("chest").
 export const materialSprite = (id) => sprite('materials', id, 'sprite--item');
