@@ -8190,11 +8190,65 @@ a.profession-square:active {
   margin: 0;
 }
 
-.encyclopedia-set,
-.encyclopedia-land {
+.encyclopedia-set {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+/* A tier or a land that folds under its heading, its chevron turned as at
+   the Opcje wyprawy. */
+.encyclopedia-fold-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.encyclopedia-fold-head::-webkit-details-marker {
+  display: none;
+}
+
+.encyclopedia-fold-head > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.encyclopedia-fold-count {
+  flex: none;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.encyclopedia-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.encyclopedia-fold-chevron {
+  flex: none;
+  color: var(--text-muted);
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.encyclopedia-fold[open] > .encyclopedia-fold-head .encyclopedia-fold-chevron {
+  transform: rotate(-90deg);
+}
+
+.encyclopedia-fold-body {
+  margin-top: 6px;
+}
+
+.encyclopedia-land .encyclopedia-fold-head .card-title {
+  margin: 0;
 }
 
 .encyclopedia-set-head {

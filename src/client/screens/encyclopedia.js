@@ -5,6 +5,8 @@
 // open chests, and the Bestiariusz of every land and inner region is here
 // too, with its chests (combat.js). A tab with a chest to open has a gold
 // dot, and the set, the counts or the place of that chest a gold frame.
+// Tiers and lands fold under their headings: the character's own and those
+// with a chest to open start unfolded.
 
 import { herbSprite, itemSprite, materialSprite, potionSprite } from '../art.js';
 import { bestiaryReady, placeReady } from '../bestiary.js';
@@ -20,6 +22,10 @@ import { bestiaryRow } from './combat.js';
 
 const HOME = '#/encyklopedia';
 const DEFAULT_TAB = 'items';
+
+// The tiers and lands the player folded or unfolded by hand, kept while
+// the game is open.
+const unfolded = new Map();
 
 const chestText = (chest) =>
   [`+${formatNumber(chest.gold)} złota`, chest.timePoints > 0 && `+${timePoints(chest.timePoints)}`, chest.systemPoints > 0 && `+${systemPoints(chest.systemPoints)}`]
@@ -198,7 +204,41 @@ export function mountEncyclopedia(container, { params }) {
       ),
     );
 
-  const tierHeading = (tier) => h('h2', { class: 'section-title encyclopedia-tier' }, `${tier.name} `, h('span', { class: 'muted', text: `· ${tier.range}` }));
+  // A tier or a land that folds under its heading: unfolded at first when
+  // `startOpen`, then as the player left it.
+  function foldable(key, startOpen, className, head, ...children) {
+    return h(
+      'details',
+      {
+        class: `${className} encyclopedia-fold`,
+        open: unfolded.get(key) ?? startOpen,
+        onToggle: (event) => {
+          const { open } = event.currentTarget;
+          if (open === startOpen) unfolded.delete(key);
+          else unfolded.set(key, open);
+        },
+      },
+      h('summary', { class: 'encyclopedia-fold-head' }, head, icon('chevron', { size: 18, className: 'encyclopedia-fold-chevron' })),
+      h('div', { class: 'stack encyclopedia-fold-body' }, children),
+    );
+  }
+
+  // The gold dot of a folded heading whose chest waits.
+  const headDot = (ready) => ready && [h('span', { class: 'encyclopedia-dot', 'aria-hidden': 'true' }), h('span', { class: 'visually-hidden', text: 'Skrzynia do odebrania' })];
+
+  // A tier's heading with how much of it is discovered.
+  const tierHead = (tier, ready) => [
+    h('h2', { class: 'section-title encyclopedia-tier' }, `${tier.name} `, h('span', { class: 'muted', text: `· ${tier.range}` })),
+    h('span', { class: 'encyclopedia-fold-count', text: `${tier.entries.filter((entry) => entry.found).length} z ${tier.entries.length}` }),
+    headDot(ready),
+  ];
+
+  // The tier the character is in, or one with a chest to open, starts
+  // unfolded; without the character's own, the first.
+  const tierOpen = (tiers, tier, ready) => tier.current || ready || (!tiers.some((each) => each.current) && tier === tiers[0]);
+
+  const tierSection = (kind, tiers, tier, ready, ...children) =>
+    foldable(`${kind}:${tier.index}`, tierOpen(tiers, tier, ready), 'encyclopedia-section', tierHead(tier, ready), ...children);
 
   function itemsTab() {
     const part = book.items;
@@ -206,10 +246,11 @@ export function mountEncyclopedia(container, { params }) {
       summary(part),
       h('p', { class: 'muted', text: part.note }),
       part.tiers.map((tier) =>
-        h(
-          'section',
-          { class: 'stack encyclopedia-section' },
-          tierHeading(tier),
+        tierSection(
+          'items',
+          part.tiers,
+          tier,
+          tier.sets.some((set) => set.ready),
           tier.sets.map((set) =>
             h(
               'div',
@@ -235,7 +276,7 @@ export function mountEncyclopedia(container, { params }) {
     return [
       summary(part),
       countChests(kind, part.chests),
-      part.tiers.map((tier) => h('section', { class: 'stack encyclopedia-section' }, tierHeading(tier), h('ul', { class: 'bag-grid' }, tier.entries.map((entry) => tile(kind, entry))))),
+      part.tiers.map((tier) => tierSection(kind, part.tiers, tier, false, h('ul', { class: 'bag-grid' }, tier.entries.map((entry) => tile(kind, entry))))),
     ];
   }
 
@@ -245,10 +286,11 @@ export function mountEncyclopedia(container, { params }) {
       summary(part, `Trofea: ${formatNumber(part.trophies)}`),
       countChests('materials', part.chests),
       part.tiers.map((tier) =>
-        h(
-          'section',
-          { class: 'stack encyclopedia-section' },
-          tierHeading(tier),
+        tierSection(
+          'materials',
+          part.tiers,
+          tier,
+          false,
           h('ul', { class: 'bag-grid' }, tier.entries.map((entry) => tile('materials', entry, entry.found ? rarityColor(entry.rarity) : null))),
         ),
       ),
@@ -265,11 +307,16 @@ export function mountEncyclopedia(container, { params }) {
     const met = new Set(state.character.met ?? []);
     const known = (place) => `${place.dangers.filter((danger) => met.has(danger.monsterId)).length} z ${place.dangers.length}`;
     const ready = (place) => placeReady(place, state.character);
-    return state.content.regions.map((region) =>
-      h(
-        'section',
-        { class: `card encyclopedia-land${[region, ...region.areas].some(ready) ? ' encyclopedia-ready' : ''}` },
-        h('h2', { class: 'card-title' }, region.name, h('span', { class: 'muted', text: ` · poz. ${region.minLevel}–${region.maxLevel}` })),
+    const { level } = state.character;
+    // The land of the character's level, or one with a chest to open,
+    // starts unfolded.
+    return state.content.regions.map((region) => {
+      const waiting = [region, ...region.areas].some(ready);
+      return foldable(
+        `bestiary:${region.id}`,
+        waiting || (level >= region.minLevel && level <= region.maxLevel),
+        `card encyclopedia-land${waiting ? ' encyclopedia-ready' : ''}`,
+        [h('h2', { class: 'card-title' }, region.name, h('span', { class: 'muted', text: ` · poz. ${region.minLevel}–${region.maxLevel}` })), headDot(waiting)],
         region.dangers?.length > 0 && [h('p', { class: 'muted', text: `Cała kraina, poznane stwory: ${known(region)}` }), bestiaryRow(region, true)],
         region.areas.map((area) =>
           h(
@@ -279,8 +326,8 @@ export function mountEncyclopedia(container, { params }) {
             bestiaryRow(area),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   load();

@@ -102,6 +102,18 @@ describe('the Encyklopedia in the engine', () => {
     assert.ok(Math.abs(stronger.damage - 2 * plain.damage) <= 1, `${plain.damage} → ${stronger.damage}`);
   });
 
+  test('the tier a character is in is marked on each tab: items by class level, potions and herbs by profession level, materials by level', () => {
+    const levels = { level: 30, classLevel: 10, professions: { alchemy: { level: 60, xp: 0 }, herbalism: { level: 30, xp: 0 } } };
+    const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
+    const currentOf = (tiers) => tiers.filter((tier) => tier.current).map((tier) => tier.index);
+    assert.deepEqual(currentOf(view.items.tiers), [1]);
+    assert.deepEqual(currentOf(view.potions.tiers), [2]);
+    assert.deepEqual(currentOf(view.herbs.tiers), [1]);
+    assert.deepEqual(currentOf(view.materials.tiers), [1]);
+    assert.deepEqual(currentOf(encyclopediaView({ discovered: {}, claimed: [], met: [], levels: { level: 1, classLevel: 1, professions: {} } }, content).potions.tiers), [0]);
+    assert.deepEqual(currentOf(encyclopediaView({ discovered: {}, claimed: [], met: [] }, content).items.tiers), []);
+  });
+
   test('the tabs show what is got by name, the rest as "???" with where to get it, a creature unmet as "???" too', () => {
     const view = encyclopediaView({ discovered: { 'item:sword': 3, 'material:wolf-pelt:common': 1 }, claimed: [], met: [] }, content);
     assert.deepEqual([view.items.found, view.items.all], [1, content.bases.length]);
@@ -144,7 +156,9 @@ describe('the Encyklopedia through the API', () => {
     assert.deepEqual(await record(), { 'item:axe': 2, 'potion:lesser-healing': 1, 'herb:comfrey': 1, 'material:wolf-pelt:common': 1, 'part:scraps': 1 });
     await set(`potions = '{}', herbs = '{}', materials = '{}', parts = '{}'`);
     await (await db()).prepare('DELETE FROM items').run();
+    await set('class_level = 10');
     const book = await read();
+    assert.equal(book.items.tiers.find((tier) => tier.current).index, 1, 'class level 10 is in Tier II');
     assert.equal(book.potions.found, 1);
     assert.equal(book.items.tiers[0].entries.find((entry) => entry.id === 'axe').name, 'Topór');
     assert.equal(book.materials.found, 1);

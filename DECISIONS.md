@@ -2827,6 +2827,11 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
     - Złotą ramkę, jak gotowa umiejętność, ma to, czego skrzynia czeka: zestaw przedmiotów, karta „Skrzynie za odkrycia” albo kraina i region wewnętrzny w Bestiariuszu.
     - Gdy w widoku postaci przybędzie skrzyń do otwarcia, otwarty ekran sam pobiera Encyklopedię jeszcze raz.
 3. **Samouczek o Encyklopedii i Bestiariuszu.** Autor: „W kolejnej rundzie rozbudujemy tez Samouczek początkowy o Encyklopedie i Bestiariusz. Zaproponujesz co i jak i pewnie tylko zatwierdzę, oby.” Propozycja miejsc i kwestii narratora idzie do autora w czacie. Nagrania powstają po zatwierdzeniu tekstów.
+4. **Zwijane tiery.** Autor: „poźniej zwijanie Tierów w encyklopedii, zeby tez nie trzeba bylo tyle scrollować”.
+    - Tiery w Przedmiotach, Miksturach, Ziołach i Materiałach zwijają się pod nagłówkiem, jak „Opcje wyprawy”. Nagłówek podaje, ile z tieru jest odkryte. Złota kropka przy nagłówku znaczy, że w tierze czeka skrzynia zestawu.
+    - Na start rozwinięty jest tier, w którym postać jest teraz: przedmioty według poziomu klasy, mikstury według poziomu Alchemii, zioła według poziomu Zielarstwa, a materiały według poziomu postaci. Rozwinięty jest też każdy tier z czekającą skrzynią (brakujący szczegół).
+    - Krainy w zakładce Bestiariusz zwijają się tak samo. Na start rozwinięta jest kraina poziomu postaci i każda z czekającą skrzynią.
+    - Gra pamięta, co gracz zwinął albo rozwinął, dopóki jest otwarta.
 
 ## Encyklopedia (29.10.2026, w grze od 0.0.57)
 

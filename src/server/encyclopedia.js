@@ -13,6 +13,7 @@ const recordOf = (row) => ({
   discovered: JSON.parse(row.discovered ?? '{}'),
   claimed: JSON.parse(row.encyclopedia ?? '[]'),
   met: JSON.parse(row.met ?? '[]'),
+  levels: { level: row.level, classLevel: row.class_level, professions: JSON.parse(row.professions ?? '{}') },
 });
 
 // GET /api/encyclopedia: every tab with its entries and chests.

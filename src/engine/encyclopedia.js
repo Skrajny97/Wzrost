@@ -12,6 +12,7 @@
 import { knownStack } from './crafting.js';
 import { areaDangers } from './hunt.js';
 import { baseClasses, baseClassLevel } from './items.js';
+import { professionState } from './professions.js';
 import { shopLevelFor } from './shop.js';
 import { say } from './text.js';
 import { craftableBases, partSource, patternLevel } from './workshop.js';
@@ -295,11 +296,29 @@ function partEntry(part, discovered, content) {
   };
 }
 
+// The tier a character is in on each tab, to unfold first: items by its
+// class level, potions and herbs by the level of their profession, and
+// materials by its level. None without `levels`.
+function currentTiers(levels, content) {
+  if (!levels) return {};
+  const { tiers } = content.encyclopedia;
+  const profession = (id) => professionState(levels.professions, id).level;
+  return {
+    items: tiers.reduce((found, tier, index) => (levels.classLevel >= tier.classLevel ? index : found), 0),
+    potions: levelTier(profession(content.brewing.profession), content),
+    herbs: levelTier(profession(content.gathering.profession), content),
+    materials: levelTier(levels.level, content),
+  };
+}
+
 // The Encyklopedia as a character sees it: each tab with its tiers of
 // entries (a stranger as "???" with only where to get it), how many are
-// discovered, and the chests. `met` is the creatures met (characters.met).
-export function encyclopediaView({ discovered, claimed, met }, content) {
+// discovered, and the chests; the tier the character is in is `current`.
+// `met` is the creatures met (characters.met), `levels` the character's
+// { level, classLevel, professions }.
+export function encyclopediaView({ discovered, claimed, met, levels = null }, content) {
   const metSet = new Set(met);
+  const current = currentTiers(levels, content);
   const chests = chestStates(discovered, claimed, content);
   const chestView = (entry) => ({
     id: entry.id,
@@ -315,8 +334,10 @@ export function encyclopediaView({ discovered, claimed, met }, content) {
   const patterns = new Set(craftableBases(content).map((base) => base.id));
   const ranges = creatureRanges(content);
   const fromEvents = eventHerbs(content);
-  const byTier = (entries, tierOf, headings) =>
-    headings.map((heading) => ({ ...heading, entries: entries.filter((entry) => tierOf(entry) === heading.index) })).filter((tier) => tier.entries.length > 0);
+  const byTier = (entries, tierOf, headings, tab) =>
+    headings
+      .map((heading) => ({ ...heading, current: heading.index === current[tab], entries: entries.filter((entry) => tierOf(entry) === heading.index) }))
+      .filter((tier) => tier.entries.length > 0);
   const count = (entries) => ({ found: entries.filter((entry) => entry.found).length, all: entries.length });
 
   const items = content.bases.map((base) => ({ ...itemEntry(base, discovered, content, patterns), tier: baseTier(base.id, content) }));
@@ -336,7 +357,7 @@ export function encyclopediaView({ discovered, claimed, met }, content) {
     tabs: content.encyclopedia.tabs,
     items: {
       ...count(items),
-      tiers: byTier(items, (entry) => entry.tier, tierHeadings(content, true)).map((tier) => ({
+      tiers: byTier(items, (entry) => entry.tier, tierHeadings(content, true), 'items').map((tier) => ({
         ...tier,
         sets: itemSets(content)
           .filter((set) => set.tier === tier.index)
@@ -344,12 +365,12 @@ export function encyclopediaView({ discovered, claimed, met }, content) {
       })),
       note: text(content, 'itemOtherClasses', { level: content.balance.items.otherClass.fromLevel }),
     },
-    potions: { ...count(potions), tiers: byTier(potions, (entry) => levelTier(entry.level, content), tierHeadings(content, false)), chests: tabChests('potions') },
-    herbs: { ...count(herbs), tiers: byTier(herbs, (entry) => levelTier(entry.level, content), tierHeadings(content, false)), chests: tabChests('herbs') },
+    potions: { ...count(potions), tiers: byTier(potions, (entry) => levelTier(entry.level, content), tierHeadings(content, false), 'potions'), chests: tabChests('potions') },
+    herbs: { ...count(herbs), tiers: byTier(herbs, (entry) => levelTier(entry.level, content), tierHeadings(content, false), 'herbs'), chests: tabChests('herbs') },
     materials: {
       ...count(materials),
       trophies: materials.filter((entry) => entry.trophy.won).length,
-      tiers: byTier(materials, (entry) => entry.tier, tierHeadings(content, false)),
+      tiers: byTier(materials, (entry) => entry.tier, tierHeadings(content, false), 'materials'),
       chests: tabChests('materials'),
     },
     parts: { ...count(parts), entries: parts, chests: tabChests('parts') },
