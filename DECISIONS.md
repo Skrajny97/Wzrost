@@ -2799,6 +2799,7 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - „Łuk długi” nazywa się **Długi łuk** (autor: „Długi łuk (zamień miejscami nazwę)”);
     - **Posoch**: opis zostaje, ale szkic do powtórki („opis dobry, ale wygeneruj nowe”). Nowy szkic pokazuje całą laskę od końca do końca.
 2. **Muzyka ewolucji.** Autor dał utwór z Suno „Ewolucja klasy” (3 min 25 s). Leży w `src/client/audio/music/evolution-v1.mp3`, bez okładki i metadanych, i zagra na ceremonii, gdy ewolucje powstaną.
+3. **Kwiat paproci także ze zdarzenia.** Zioło Kwiat paproci daje Zielarstwo dopiero od 90. poziomu, po ok. 2000 godzinach zbierania. Wybór autora w czacie: w przypadku „Kwiat bez stróża” zdarzenia Kwiat paproci raz na 4 razy zamiast przedmiotu zostaje 1 Kwiat paproci.
 
 ## Ewolucje: odpowiedzi autora (29.10.2026)
 
@@ -2833,10 +2834,17 @@ Odpowiedzi na pytania E1–E7 z propozycji ewolucji, zadane w czacie. Autor: „
 14. **Mag:**
     - **Elementalista:** Ognisty wybuch (Kula ognia wybucha i parzy pozostałych wrogów za 30%) i Promień Żywiołów. Autor: „Promień Żywiołów zadający 100% obrażeń w każdego wroga (po równej ilości % każdego dostępnego Elementaliście żywiołu)”, czyli w każdego wroga po jednej trzeciej ze 100% ognia, mrozu i elektryczności;
     - **Władca Lodu:** Zamieć i Lodowa włócznia (220% mrozu w jeden cel, wychłodzony dostaje o 50% więcej). Autor: „Zamieć musi być mocniejsza i zamrażać całkiem, bo na bazowym poziomie już było spowolnienie. Tutaj będzie 20% na zamrożenie”. Zamieć to Mroźny podmuch, po którym każdy trafiony wróg ma 20% szans na zamrożenie i traci najbliższy ruch;
-    - **Arkanista:** Lustro many (Osłona many odbija 25% pochłoniętych obrażeń w napastnika) i Przywołanie żywiołaka. Autor: „Dodaj jakąś umiejętność Przywołania żywiołaka, skoro później będzie Druid”. Działanie żywiołaka czeka na potwierdzenie autora.
-15. **Kleryk, Uzdrowiciel:** Odnowa i Cud.
-    - Autor o Odnowie: „Większe leczenie z Odnowy lub takie samo, ale na wszystkie postaci”. Wybór między tymi dwiema wersjami czeka na autora.
-    - Cud: autor: „Cud -> wskrzeszenie z 50% HP”. Raz na walkę omdlała postać wstaje z 50% maks. HP.
+    - **Arkanista:** Lustro many (Osłona many odbija 25% pochłoniętych obrażeń w napastnika) i Przywołanie żywiołaka. Autor: „Dodaj jakąś umiejętność Przywołania żywiołaka, skoro później będzie Druid”. Żywiołak działa jak przywołania z punktu 18 i co ruch uderza losowego wroga za 50% żywiołem, na który ten jest najsłabszy.
+15. **Kleryk:**
+    - **Uzdrowiciel:** Odnowa i Cud. Autor o Odnowie: „Większe leczenie z Odnowy lub takie samo, ale na wszystkie postaci”. W czacie wybrana jest wersja z obiema zmianami naraz: Modlitwa o zdrowie leczy całą drużynę, a potem każdego przez 3 ruchy po 10% maks. HP. Cud: autor: „Cud -> wskrzeszenie z 50% HP”, czyli raz na walkę omdlała postać wstaje z 50% maks. HP;
+    - **Inkwizytor:** Sąd (Egzorcyzm piętnuje trafione duchy, które przez 3 ruchy dostają o 20% więcej obrażeń) i Wyrok (220% sakrum w cel poniżej 40% HP);
+    - **Kapłan:** Wielkie błogosławieństwo (Błogosławieństwo daje też +10% szybkości) i Psalm. Autor: „Psalm ale mocniejszy (około 10% na ostatnim lvlu umiejętności)”: przez 3 ruchy drużyna odzyskuje po 10% maks. HP.
+16. **Cień:**
+    - **Skrytobójca:** Egzekucja (Cios w plecy zadaje podwójne obrażenia celowi poniżej 30% HP) i Znak śmierci (po 3 ruchach cel dostaje jeszcze raz połowę obrażeń, które dostał w tym czasie);
+    - **Truciciel:** Czarny jad (Zatrucie z Zatrutego ostrza zmniejsza też obrażenia celu o 10%) i Trujący Szlam. Autor: „Coś a'la Nekromanta - przyzwanie Trującego Szlamu na przykład”. Szlam działa jak przywołania z punktu 18, co ruch zatruwa losowego wroga, a gdy zginie, rozpryskuje się i zatruwa wszystkich wrogów;
+    - **Nocny Tancerz:** Taniec ostrzy (podczas Tańca cieni każdy unik oddaje cios za 60%) i Wir cieni (cztery ciosy po 40% w losowych wrogów).
+17. **Cechy i statystyki** wszystkich 15 ewolucji zostają takie jak w propozycji, bez uwag autora.
+18. **Przywołania** (Żywiołak i Trujący Szlam): przywołaniec staje w szyku przed postacią na 4 ruchy i ma 30% jej maks. HP, a wrogowie mogą go atakować, jak u przyszłego Nekromanty. Sokół Łowcy zostaje bez zmian: tylko atakuje i sam nie przyjmuje ciosów.
 
 ## Ewolucje i Osada: propozycje (28.10.2026)
 
