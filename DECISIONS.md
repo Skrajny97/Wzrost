@@ -2855,6 +2855,14 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
     - Na wersji testowej „Cofnij ewolucję” oddaje też punkty sprzed zerowania.
     - Przy okazji: na Statystykach trzy profesje z wysokimi poziomami nie mieściły się w jednym rzędzie na wąskim telefonie i rozpychały ekran, przez co okienka ucinały się u dołu. Teraz przechodzą do drugiego rzędu.
 
+## Zacinanie i długie ładowanie: dźwięki stworów (29.10.2026, na wersji testowej)
+
+Autor: „ej a gra coś zacina, znasz tego powód? długie ladowania itp nie tylko u mnie”.
+
+1. **Przyczyna.** Przy każdym starcie, po pierwszym dotknięciu, gra pobierała i dekodowała wszystkie 407 plików dźwięków, z czego 359 to okrzyki 90 stworów i postaci. Z każdym nowym stworem było ich więcej. Na telefonie zajmowało to łącze i procesor, a rozpakowane dźwięki zajmowały dużo pamięci. Serwer odpowiada szybko: na kopii lokalnej z postacią na 80. poziomie każde wejście API zajmuje 10–70 ms.
+2. **Poprawka.** Po pierwszym dotknięciu ładują się tylko odgłosy ciosów i dźwięki nazwane (zakładki, umiejętności): 48 plików zamiast 407. Okrzyki stworów i postaci z danej walki ładują się, gdy powstaje jej odtwarzanie. Rozpakowane zostają okrzyki ostatnich 24 stworów. Kwestia narratora, przeczytana raz, nie zostaje w pamięci. W przeglądarce ze spowolnionym procesorem (jak telefon) start gry trwał 2,9 s, a teraz trwa 0,8 s. Zapytań przy starcie było 502, a jest 143.
+3. **Muzyka.** Utwór miejsca pobiera się w całości przy pierwszym wejściu na jego ekran: 3,6–4,8 MB, w jakości ok. 170 kb/s. Lżejsze pliki (ok. 112 kb/s, o jedną trzecią mniejsze) są propozycją dla autora, bo zmieniają brzmienie jego utworów.
+
 ## Ewolucje: portrety (29.10.2026, na wersji testowej)
 
 Autor: „Kolejna rzecz to portrety dla wyewoluowanych klas, bez tego nie wdrażamy ewolucji też.”, „nie giftcode i wszystko zaczekaja”, „0.0.58 to bedzie duzy update po prostu”. Kod podarunkowy, Encyklopedia i ewolucje czekają więc na portrety i wejdą do gry razem, jako 0.0.58.
@@ -2868,6 +2876,11 @@ Autor: „Kolejna rzecz to portrety dla wyewoluowanych klas, bez tego nie wdraż
 4. **Gdzie widać portret ewolucji.** Na ekranie Postaci, w popiersiu w odtwarzaniu walki i w profilu gracza (z czatu, rankingu i Znajomych). Ewolucja, która nie ma jeszcze portretu, pokazuje portret klasy (brakujący szczegół). Chód na ekranie Walka zostaje na razie chodem klasy.
 5. **Kolory skóry.** Autor: „Pamietaj jeszcze o tych odcieniach skóry do zrobienia później ręcznie maskami i przerysowaniem”. Portrety ewolucji mają na razie tylko jasną skórę, w której są narysowane. Postać z innym kolorem skóry widzi do tego czasu portret ewolucji w jasnym odcieniu.
 6. **Pozostałe 10 ewolucji** dostają nowe portrety z Retro Diffusion (`evolutions` w `art/prompts.json`): po 2 wersje każdego wyglądu, w ramce portretów startowych, z włosami postaci startowej i bronią poniżej czubka głowy, żeby postacie skalowały się jak reszta. Szkice kosztowały 7,20 USD.
+7. **Wybór autora** (pozycje 6–15): „6. obydwa B 7. obydwa A 8. obydwa B 9. obydwa B 10. facet B, kobieta do przerobienia ani A ani B 11. obydwa B 12. facet B, kobieta A 13. obydwa A, ale do poprawy przycięte głowy 14. obydwa A, ale facetowi dorobić nogę, bo ucięło 15. obydwa A”. Wybrane portrety są w grze, z poprawkami:
+    - Arkanista i Uzdrowiciel: dorysowany czubek włosów, ucięty przez generator. U Uzdrowiciela także koniec gałązki na kosturze. Łowca: główka sokoła.
+    - Inkwizytor: dorysowany czubek głowy. Autor: „Inkwizytor juz widze ma zbyt scieta glowe”, więc głowy obojga są wyższe i okrąglejsze. Trzy (on) i cztery (ona) rzędy włosów wychodzą ponad wspólną linię głów, jak dorysowane włosy w `tools/normalize-portraits.py`. Jego lewy but dostał podeszwę i czubek, a mały przedmiot przy jego nodze zniknął. U niej generator uciął czoło, więc dorysowane są ciemne, zaczesane do tyłu włosy, a nie skóra.
+    - Truciciel: dalsza noga kończyła się na kolanie, więc dostała but jak bliższa, o rząd wyżej, bo stoi dalej.
+    - Elementalistka rysuje się od nowa (4 wersje), w stroju wybranego Elementalisty. Do czasu wyboru ma portret Maga.
 
 ## Ewolucje: walka (29.10.2026, na wersji testowej)
 
