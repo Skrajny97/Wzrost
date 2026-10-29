@@ -2886,7 +2886,8 @@ Autor: „Kolejna rzecz to portrety dla wyewoluowanych klas, bez tego nie wdraż
     - Kapłan: co drugą klatkę z pleców wystawała płaska listwa (tarcza widziana z boku) i plecy wyglądały na ucięte. Listwy nie ma, w każdej klatce widać plecy szaty.
     - Skrytobójczyni: twarz była gołą skórą z plamką nisko. Ma oko pod brwią i ciemną maskę na nos i usta, jak na portrecie.
     - Ewolucja bez własnego chodu idzie chodem klasy, w swoim kolorze skóry (brakujący szczegół). Chody ewolucji, jak ich portrety, mają na razie tylko skórę, w której są narysowane (punkt 5).
-    - Dziesięć nowych ewolucji dostanie chody z portretów, gdy autor wybierze Elementalistkę.
+    - Dziewięć nowych ewolucji ma już szkice chodów z zatwierdzonych portretów, po 2 na wygląd (do wyboru autora, pozycje 43–52). Dziewięć szkiców Barbarzyńcy, Gladiatora i Strzelca Burzy wróciło jako jedna nieruchoma postać, więc te powstały od nowa. Chód Elementalistki powstanie z jej portretu po wyborze.
+9. **Ikony i dźwięki umiejętności ewolucji** (autor: „22 Tak”, do 0.0.58). Ikony 48×48 z Retro Diffusion, po jednej na umiejętność, czekają na ocenę autora (pozycje 28–42); kwadratowe tła usuwa się po wyborze, jak przy umiejętnościach klas. Dźwięki z ElevenLabs, po 2 wersje, są na stronie odsłuchu „Dźwięki Insight”, w grupie „Umiejętności ewolucji”. Koszt: ikony 5,58 USD, chody 3,50 USD, dźwięki ok. 1800 kredytów ElevenLabs. Zostało 51,39 USD i ok. 17 500 kredytów.
 
 ## Ewolucje: walka (29.10.2026, na wersji testowej)
 
