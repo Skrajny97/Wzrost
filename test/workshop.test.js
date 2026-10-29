@@ -398,7 +398,8 @@ describe('the Warsztat through the API', () => {
     assert.equal(report.kind, 'items');
     assert.equal(report.minutes, 60);
     assert.equal(report.items.length, 2);
-    assert.ok(report.items.every((item) => item.base === 'axe' && item.level === 15 && item.rarity === 'common'));
+    // The rarity ordered, or by luck one or two above it (the server's seed).
+    assert.ok(report.items.every((item) => item.base === 'axe' && item.level === 15 && ['common', 'rare', 'unique'].includes(item.rarity)));
     assert.equal(report.failed, 0);
     assert.equal(report.made, 'Wykonano: 2 × Topór.');
     assert.equal(report.profession.levelAfter, 2);
