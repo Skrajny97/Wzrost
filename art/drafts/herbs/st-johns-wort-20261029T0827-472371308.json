@@ -1,0 +1,25 @@
+{
+  "id": "st-johns-wort",
+  "payload": {
+    "prompt": "a sprig of st john's wort with clusters of small bright yellow five-petal flowers and small oval leaves, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 472371308,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793262550,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.5,
+    "request_id": "2cf9d12a-89a4-4f5c-9cef-051bd8a7e5e8",
+    "outputs_retained_until": 1793348914
+  }
+}

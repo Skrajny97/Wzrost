@@ -1,0 +1,25 @@
+{
+  "id": "calamus",
+  "payload": {
+    "prompt": "a few long sword-shaped green calamus leaves rising from a thick knobby pale root, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 501805208,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793262574,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.32,
+    "request_id": "9a8016a2-e42f-4f03-a665-b2243b4088b5",
+    "outputs_retained_until": 1793348953
+  }
+}

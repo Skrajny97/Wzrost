@@ -1,0 +1,25 @@
+{
+  "id": "plantain",
+  "payload": {
+    "prompt": "a rosette of narrow lance-shaped ribbed green plantain leaves with two thin brown flower spikes, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 784552065,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793262512,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.68,
+    "request_id": "109ec302-a4cc-4348-a1fd-e7181cf02b0e",
+    "outputs_retained_until": 1793348865
+  }
+}

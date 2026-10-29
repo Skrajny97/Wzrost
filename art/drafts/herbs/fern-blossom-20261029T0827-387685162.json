@@ -1,0 +1,25 @@
+{
+  "id": "fern-blossom",
+  "payload": {
+    "prompt": "a glowing magical fern flower, a fiery red and gold blossom shining with light above small green fern fronds, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 387685162,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793262974,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 48.24,
+    "request_id": "5446ef94-28c7-490e-bf1e-bcad163d7f03",
+    "outputs_retained_until": 1793349344
+  }
+}

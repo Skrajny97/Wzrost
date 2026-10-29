@@ -1,0 +1,25 @@
+{
+  "id": "arnica",
+  "payload": {
+    "prompt": "three orange-yellow arnica flowers with ragged daisy-like petals on hairy green stems, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 157115079,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793262637,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.14,
+    "request_id": "f2f55c7a-4e8d-4f25-85a6-0363e2438099",
+    "outputs_retained_until": 1793348975
+  }
+}
