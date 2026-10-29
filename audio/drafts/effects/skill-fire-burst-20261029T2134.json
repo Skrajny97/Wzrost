@@ -1,0 +1,13 @@
+{
+  "id": "skill-fire-burst",
+  "payload": {
+    "text": "a ball of fire bursting apart, a bright explosive whoomp of flame scattering crackling embers in every direction, fantasy magic, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-fire-burst-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-fire-burst-20261029T2134-1.mp3"
+  ],
+  "credits": 60
+}

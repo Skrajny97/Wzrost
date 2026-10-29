@@ -1,0 +1,13 @@
+{
+  "id": "skill-crushing-blow",
+  "payload": {
+    "text": "a huge two-handed battle axe crashing down through armor into stony ground, a deep heavy crunch of splitting metal and cracking stone, then a short dull ring, fantasy battle, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-crushing-blow-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-crushing-blow-20261029T2134-1.mp3"
+  ],
+  "credits": 52
+}

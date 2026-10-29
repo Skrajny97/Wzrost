@@ -1,0 +1,13 @@
+{
+  "id": "skill-elemental-ray",
+  "payload": {
+    "text": "a magic ray of three elements at once: a roaring flame, crackling ice and buzzing electric sparks woven into one bright beam, fantasy magic, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-elemental-ray-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-elemental-ray-20261029T2134-1.mp3"
+  ],
+  "credits": 64
+}

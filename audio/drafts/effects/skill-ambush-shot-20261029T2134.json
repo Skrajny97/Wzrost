@@ -1,0 +1,13 @@
+{
+  "id": "skill-ambush-shot",
+  "payload": {
+    "text": "rustling leaves in a bush, a soft held breath, then one sudden quiet bowstring snap and a swift arrow whoosh, close up, tense, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-ambush-shot-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-ambush-shot-20261029T2134-1.mp3"
+  ],
+  "credits": 52
+}

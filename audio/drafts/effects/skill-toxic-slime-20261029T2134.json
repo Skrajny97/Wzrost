@@ -1,0 +1,13 @@
+{
+  "id": "skill-toxic-slime",
+  "payload": {
+    "text": "a big blob of toxic green slime squelching and bubbling as it rises up from the ground, wet gloopy sounds with a soft acidic fizz, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-toxic-slime-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-toxic-slime-20261029T2134-1.mp3"
+  ],
+  "credits": 64
+}

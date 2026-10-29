@@ -1,0 +1,13 @@
+{
+  "id": "skill-indomitable",
+  "payload": {
+    "text": "a deep bronze gong struck once, swelling into a firm warm hum of protective magic, steady and solid, fantasy, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-indomitable-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-indomitable-20261029T2134-1.mp3"
+  ],
+  "credits": 60
+}

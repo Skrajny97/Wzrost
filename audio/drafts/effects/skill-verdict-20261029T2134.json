@@ -1,0 +1,13 @@
+{
+  "id": "skill-verdict",
+  "payload": {
+    "text": "a stern final verdict: one heavy wooden gavel strike merged with a holy ringing blast and a short solemn bell, close up, fantasy, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-verdict-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-verdict-20261029T2134-1.mp3"
+  ],
+  "credits": 48
+}

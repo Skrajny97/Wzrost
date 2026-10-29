@@ -1,0 +1,13 @@
+{
+  "id": "skill-psalm",
+  "payload": {
+    "text": "a soft calm monk chant hum, warm and peaceful, with gentle sparkling chimes, fantasy, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-psalm-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-psalm-20261029T2134-1.mp3"
+  ],
+  "credits": 72
+}

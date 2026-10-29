@@ -1,0 +1,13 @@
+{
+  "id": "skill-miracle",
+  "payload": {
+    "text": "a miracle: a warm heavenly choir hum swelling up with bright bells and a radiant shimmer, uplifting, fantasy, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-miracle-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-miracle-20261029T2134-1.mp3"
+  ],
+  "credits": 72
+}

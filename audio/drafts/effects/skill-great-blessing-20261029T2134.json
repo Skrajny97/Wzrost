@@ -1,0 +1,13 @@
+{
+  "id": "skill-great-blessing",
+  "payload": {
+    "text": "a great blessing spell, a rich angelic choir hum swelling with golden chimes and a warm radiant shimmer, fantasy, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-great-blessing-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-great-blessing-20261029T2134-1.mp3"
+  ],
+  "credits": 72
+}

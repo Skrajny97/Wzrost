@@ -1,0 +1,13 @@
+{
+  "id": "skill-riposte",
+  "payload": {
+    "text": "a quick steel parry, a bright clang of two blades, instantly answered by one fast slicing counter cut, close up, dry, crisp, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-riposte-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-riposte-20261029T2134-1.mp3"
+  ],
+  "credits": 40
+}

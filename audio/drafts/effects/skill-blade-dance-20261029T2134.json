@@ -1,0 +1,13 @@
+{
+  "id": "skill-blade-dance",
+  "payload": {
+    "text": "two slim curved blades whirling in a fast elegant dance, a quick run of light airy swishes and soft metallic rings, close up, crisp, no bass, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-blade-dance-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-blade-dance-20261029T2134-1.mp3"
+  ],
+  "credits": 56
+}

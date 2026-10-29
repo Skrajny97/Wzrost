@@ -1,0 +1,13 @@
+{
+  "id": "skill-ice-lance",
+  "payload": {
+    "text": "a long spear of ice forming with a crystalline crackle and shooting forward with a cold whoosh, ending in a sharp glassy shatter, fantasy magic, close up, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-ice-lance-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-ice-lance-20261029T2134-1.mp3"
+  ],
+  "credits": 48
+}

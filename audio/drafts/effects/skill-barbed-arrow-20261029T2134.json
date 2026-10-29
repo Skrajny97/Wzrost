@@ -1,0 +1,13 @@
+{
+  "id": "skill-barbed-arrow",
+  "payload": {
+    "text": "a barbed arrow hits a thick leather hide with a heavy thud and a short tearing rip as the barbs catch, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-barbed-arrow-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-barbed-arrow-20261029T2134-1.mp3"
+  ],
+  "credits": 44
+}

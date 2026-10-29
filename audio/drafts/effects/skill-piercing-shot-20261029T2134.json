@@ -1,0 +1,13 @@
+{
+  "id": "skill-piercing-shot",
+  "payload": {
+    "text": "a heavy bow released with a deep thrum, the arrow tearing through the air with a sharp whistle and punching through wood with a loud crack, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-piercing-shot-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-piercing-shot-20261029T2134-1.mp3"
+  ],
+  "credits": 48
+}

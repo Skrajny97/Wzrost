@@ -1,0 +1,13 @@
+{
+  "id": "skill-mana-mirror",
+  "payload": {
+    "text": "a shimmering magical mirror rising with a bright glassy ring, a soft hum of mana and a gentle reflected echo, fantasy, high pitched, no bass, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-mana-mirror-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-mana-mirror-20261029T2134-1.mp3"
+  ],
+  "credits": 60
+}

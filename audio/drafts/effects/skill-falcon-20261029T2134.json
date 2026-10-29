@@ -1,0 +1,13 @@
+{
+  "id": "skill-falcon",
+  "payload": {
+    "text": "a falcon gives a sharp screech and dives with fast beating wings rushing through the air, close up, nature, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-falcon-20261029T2134-0.mp3",
+    "audio/drafts/effects/skill-falcon-20261029T2134-1.mp3"
+  ],
+  "credits": 60
+}
