@@ -105,7 +105,7 @@ test('every sprite on the list has its file at its size, and every class has its
     // The classes' portraits and their evolutions' (data/evolutions.json).
     portraits: [...data('classes'), ...data('evolutions').evolutions].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
     // The character walking on the Walka scene, one sheet for each portrait.
-    walkers: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
+    walkers: [...data('classes'), ...data('evolutions').evolutions].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
     // The introduction's one narrator (narrator.js).
     narrator: ['narrator'],
     // Materials, parts and the treasure chest of the report.

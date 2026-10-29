@@ -66,12 +66,13 @@ export function workScene(professionId, activity, { avatar = false } = {}) {
 }
 
 // The Walka scene of an exploration under way: the character in its own look
-// and skin tone, or the System's figure for a look not drawn walking yet.
+// and skin tone (or its evolution's), or the System's figure for a look not
+// drawn walking yet.
 export function walkScene(activity) {
   const walk = config()?.walk;
   if (!walk) return null;
-  const { classId, appearance, skin } = state.character ?? {};
-  const own = walkerSheet(classId, appearance, skin);
+  const { classId, appearance, skin, evolution } = state.character ?? {};
+  const own = walkerSheet(classId, appearance, skin, evolution?.current?.id);
   const figure = own ? { ...walk.figure, file: own } : walk.figure;
   const stage = h('div', { class: `scene-walk scene--${dayPart()}` }, h('div', { class: 'scene-path' }), frames(figure, 'scene-walker'));
   const land = walk.lands[activity.regionId];

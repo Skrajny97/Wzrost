@@ -112,11 +112,15 @@ export const SPRITES = {
   // The character walking in place on the Walka scene, <class>-<look>: four
   // frames of 48×48 in a row, facing right, drawn from the portraits. A skin
   // tone other than the one drawn has its own recoloured file, as a portrait
-  // does (tools/walker-tones.py).
+  // does (tools/walker-tones.py). The evolutions' <evolution>-<look> walk as
+  // drawn, as their portraits show, till their tones are done by hand.
   walkers: {
     width: 192,
     height: 48,
-    ids: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
+    ids: [
+      'warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male',
+      'guardian-female', 'guardian-male', 'sniper-female', 'sniper-male', 'ice-lord-female', 'ice-lord-male', 'priest-female', 'priest-male', 'assassin-female', 'assassin-male',
+    ],
   },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
   narrator: {
@@ -310,10 +314,12 @@ export function portraitSprite(classId, appearance, { bust = false, skin, evolut
   });
 }
 
-// The sheet of the character walking in its look and skin tone, as a path
-// from the site's root like the scenes' sheets (data/animations.json), or
-// null for a look without one.
-export function walkerSheet(classId, appearance, skin) {
+// The sheet of the character walking in its look and skin tone, or its
+// evolution's once it has one, as a path from the site's root like the
+// scenes' sheets (data/animations.json), or null for a look without one.
+export function walkerSheet(classId, appearance, skin, evolution) {
+  const evolved = evolution ? `${evolution}-${appearance}` : null;
+  if (evolved && available.walkers.has(evolved)) return `art/walkers/${evolved}.png`;
   const id = `${classId}-${appearance}`;
   return available.walkers.has(id) ? `art/walkers/${toneFile(id, skin)}.png` : null;
 }

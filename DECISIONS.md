@@ -2873,7 +2873,7 @@ Autor: „Kolejna rzecz to portrety dla wyewoluowanych klas, bez tego nie wdraż
     - Kapłan: dorysowany czubek głowy w kolorach reszty włosów.
     - Skrytobójca: szara skóra między kapturem a maską ma teraz jasny odcień, jak na portretach startowych. Oczy i obrys zostały.
 3. **Wspólna wielkość.** Wszystkie portrety ewolucji mają postać wysokości 118 px, ze stopami na tej samej linii co postacie startowe. Przy zmniejszaniu bez wygładzania wypadał rząd pikseli z oczami Snajpera, więc skalowanie wybiera przesunięcie, które zostawia najwięcej szczegółów twarzy. Popiersie w walce centruje się na środku skóry twarzy, bo łuki i kostury przy głowie przesuwały środek postaci.
-4. **Gdzie widać portret ewolucji.** Na ekranie Postaci, w popiersiu w odtwarzaniu walki i w profilu gracza (z czatu, rankingu i Znajomych). Ewolucja, która nie ma jeszcze portretu, pokazuje portret klasy (brakujący szczegół). Chód na ekranie Walka zostaje na razie chodem klasy.
+4. **Gdzie widać portret ewolucji.** Na ekranie Postaci, w popiersiu w odtwarzaniu walki i w profilu gracza (z czatu, rankingu i Znajomych). Ewolucja, która nie ma jeszcze portretu, pokazuje portret klasy (brakujący szczegół). Chód na ekranie Walka: punkt 8.
 5. **Kolory skóry.** Autor: „Pamietaj jeszcze o tych odcieniach skóry do zrobienia później ręcznie maskami i przerysowaniem”. Portrety ewolucji mają na razie tylko jasną skórę, w której są narysowane. Postać z innym kolorem skóry widzi do tego czasu portret ewolucji w jasnym odcieniu.
 6. **Pozostałe 10 ewolucji** dostają nowe portrety z Retro Diffusion (`evolutions` w `art/prompts.json`): po 2 wersje każdego wyglądu, w ramce portretów startowych, z włosami postaci startowej i bronią poniżej czubka głowy, żeby postacie skalowały się jak reszta. Szkice kosztowały 7,20 USD.
 7. **Wybór autora** (pozycje 6–15): „6. obydwa B 7. obydwa A 8. obydwa B 9. obydwa B 10. facet B, kobieta do przerobienia ani A ani B 11. obydwa B 12. facet B, kobieta A 13. obydwa A, ale do poprawy przycięte głowy 14. obydwa A, ale facetowi dorobić nogę, bo ucięło 15. obydwa A”. Wybrane portrety są w grze, z poprawkami:
@@ -2881,6 +2881,12 @@ Autor: „Kolejna rzecz to portrety dla wyewoluowanych klas, bez tego nie wdraż
     - Inkwizytor: dorysowany czubek głowy. Autor: „Inkwizytor juz widze ma zbyt scieta glowe”, więc głowy obojga są wyższe i okrąglejsze. Trzy (on) i cztery (ona) rzędy włosów wychodzą ponad wspólną linię głów, jak dorysowane włosy w `tools/normalize-portraits.py`. Jego lewy but dostał podeszwę i czubek, a mały przedmiot przy jego nodze zniknął. U niej generator uciął czoło, więc dorysowane są ciemne, zaczesane do tyłu włosy, a nie skóra.
     - Truciciel: dalsza noga kończyła się na kolanie, więc dostała but jak bliższa, o rząd wyżej, bo stoi dalej.
     - Elementalistka rysuje się od nowa (4 wersje), w stroju wybranego Elementalisty. Do czasu wyboru ma portret Maga.
+8. **Chody ewolucji na ekranie Walka.** Autor: „bedziesz musial jeszcze wygenerowac te drobne sprite'y z animacja chodu do wypraw (w tle)”. Szkice z Retro Diffusion (`four_angle_walking`, 0,07 USD za szkic) powstały z zatwierdzonych portretów; do gry trafia rząd postaci idącej w prawo. Wybór autora dla pięciu ewolucji z dawnymi portretami: „16. facet C, kobieta A 17. obydwa A 18. facet A, kobieta B po przerobieniu kosturu, źle trzyma i w ogóle 19. facet B, jeśli go dorobić, bo ucięty, kobieta A 20. obydwa A, ale kobiecie dorobić oczy”. Poprawki (do oceny autora):
+    - Władczyni Lodu: kostur narysowany od nowa, pionowo w zaciśniętej dłoni, w każdej klatce tak samo, z lodowym kryształem nad głową. W trzeciej klatce dłoń wraca na miejsce z pozostałych klatek.
+    - Kapłan: co drugą klatkę z pleców wystawała płaska listwa (tarcza widziana z boku) i plecy wyglądały na ucięte. Listwy nie ma, w każdej klatce widać plecy szaty.
+    - Skrytobójczyni: twarz była gołą skórą z plamką nisko. Ma oko pod brwią i ciemną maskę na nos i usta, jak na portrecie.
+    - Ewolucja bez własnego chodu idzie chodem klasy, w swoim kolorze skóry (brakujący szczegół). Chody ewolucji, jak ich portrety, mają na razie tylko skórę, w której są narysowane (punkt 5).
+    - Dziesięć nowych ewolucji dostanie chody z portretów, gdy autor wybierze Elementalistkę.
 
 ## Ewolucje: walka (29.10.2026, na wersji testowej)
 
