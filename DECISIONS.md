@@ -2879,7 +2879,7 @@ Autor: „ej a gra coś zacina, znasz tego powód? długie ladowania itp nie tyl
 
 Autor o pozycjach 24–42: „kobieta Inkwizytor wyglada jak facet, dorób jej chociaż lekki biust albo coś ręcznie / 24. A / […] / 25 Tak / 26 Popraw / 27 Tak / 28 Tak / 29 Młyn popraw, zlewa się / 30 Tak / 31 Popraw obydwa (pierwsze usuń tylko tło) / 32 Tak / 33 Popraw grot z zadziorem (parę pikseli zbędnych z prawej strony) / 34 Tak / 35 Tak / 36 Tak, tylko wygeneruj jeszcze postać żywiołaka do gry do walki w oparciu o wygląd z umiejętności) / 37 Tak, tylko w Cudzie pozbądź sie zbędnych pikseli / 38 Tak / 39 Tak / 40 Tak / 41 Tak, tylko więcej tego jadu troszkę, a Szlam musi być też postacią w grze do walki / 42 Taniec ostrzy do poprawy”.
 
-1. **Inkwizytorka.** Krzyż na łańcuszku wisi 2 piksele wyżej, a pod nim i obok widać lekki biust: jaśniejszy łuk u góry i cień pod spodem. Poły płaszcza rozchodzą się na wysokości biustu i schodzą się w talii, a pas jest węższy o 2 piksele.
+1. **Inkwizytorka.** Krzyż na łańcuszku wisi 2 piksele wyżej, a pod nim i obok widać lekki biust: jaśniejszy łuk u góry i cień pod spodem. Poły płaszcza rozchodzą się na wysokości biustu i schodzą się w talii, a pas jest węższy o 2 piksele. Pod ustami doszła pełniejsza dolna warga w kolorze różu (3 piksele), bo z nią twarz czyta się wyraźniej jako kobieca.
 2. **Elementalistka** (autor: „24. A”). Portret ma rozmiar pozostałych (postać wysokości 118 px). Chód: 4 szkice z portretu do wyboru autora. Na próbę w grze stoi szkic A, z płomykiem nad dłonią w każdej klatce.
 3. **Chód Kapłana** (autor: „26 Popraw”). Zamówienie chodu podawało „srebrną tarczę i kropidło”, a na portrecie Kapłan ma biało-złotą tarczę i buzdygan. Stąd tarcza widziana z boku w co drugiej klatce. Opis jest poprawiony i są 4 nowe szkice. Na próbę w grze stoi szkic D: ta sama postać w każdej klatce, bez tarczy. Szkic C ma tarczę, widać ją, gdy ręka idzie do tyłu.
 4. **Ikony umiejętności ewolucji:**
@@ -2892,7 +2892,10 @@ Autor o pozycjach 24–42: „kobieta Inkwizytor wyglada jak facet, dorób jej c
     - Taniec ostrzy: 3 nowe szkice, dwa sztylety wirujące w fioletowych smugach. Na próbę w grze stoi szkic A.
     - Pozostałe ikony z „Tak” są w grze bez zmian. Ikony są na ekranie Umiejętności i w podglądzie autora.
 5. **Żywiołak i Trujący Szlam w walce.** Przywołany stwór stoi w lewym górnym rogu karty przywołującego, przed jego popiersiem, od przywołania aż do upadku albo odejścia. Jego HP zostaje w wierszu stanu karty. Obrazki to szkice z Retro Diffusion na wzór ikon umiejętności, przycięte ciasno wokół postaci. Na próbę w grze stoją Żywiołak B i Szlam A, z 4 szkiców każdego.
-6. **Koszt:** chody 0,56 USD, ikony 1,08 USD (Taniec ostrzy powtórzony po błędzie serwera Retro Diffusion), stwory 1,44 USD. Zostało 48,10 USD.
+6. **Chody nowych ewolucji (43–52), na próbę.** Autor jeszcze ich nie wybrał, więc w grze stoją wersje najbliższe portretom, a przy ocenie można wybrać inną literę:
+    - Łowca A i Łowczyni A; Elementalista A; Arkanista A i Arkanistka A; Uzdrowiciel A i Uzdrowicielka B; Inkwizytor A i Inkwizytorka A; Truciciel A i Trucicielka B; Nocny Tancerz A i Nocna Tancerka A; Barbarzyńca A i Barbarzynka A; Gladiator A i Gladiatorka A; Strzelec Burzy A i Strzelczyni Burzy C.
+    - Poprawki ręczne: Elementalista traci kostur w klatkach 1 i 4, bo w klatkach 2 i 3 go nie miał (tak jak tarcza Kapłana, punkt 3); Gladiator traci miecz w klatce 2 z tego samego powodu; Barbarzynka dostaje topór także w klatce 3, przeniesiony z klatki 2; Arkanistka stoi 3–4 piksele wyżej, na linii stóp pozostałych postaci; jaskrawe różowe i purpurowe piksele u Łowcy, Łowczyni, Barbarzyńcy i Truciciela mają teraz brązy łuku i skóry albo kolor sąsiednich pikseli.
+7. **Koszt:** chody 0,56 USD, ikony 1,08 USD (Taniec ostrzy powtórzony po błędzie serwera Retro Diffusion), stwory 1,44 USD. Zostało 48,10 USD.
 
 ## Ewolucje: portrety (29.10.2026, na wersji testowej)
 

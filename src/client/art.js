@@ -127,7 +127,10 @@ export const SPRITES = {
     ids: [
       'warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male',
       'guardian-female', 'guardian-male', 'sniper-female', 'sniper-male', 'ice-lord-female', 'ice-lord-male', 'priest-female', 'priest-male', 'assassin-female', 'assassin-male',
-      'elementalist-female',
+      // The new evolutions' walks, the drafts in place till the author picks (DECISIONS.md).
+      'barbarian-female', 'barbarian-male', 'gladiator-female', 'gladiator-male', 'storm-archer-female', 'storm-archer-male', 'hunter-female', 'hunter-male',
+      'elementalist-female', 'elementalist-male', 'arcanist-female', 'arcanist-male', 'healer-female', 'healer-male', 'inquisitor-female', 'inquisitor-male',
+      'poisoner-female', 'poisoner-male', 'night-dancer-female', 'night-dancer-male',
     ],
   },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
