@@ -59,7 +59,9 @@ describe('events', () => {
     for (const areaId of ['spider-gully', 'reed-beds']) assert.ok(drawn(areaId).every((id) => id === 'fern-flower-calm'), areaId);
     // "Testuj zdarzenia" still brings it anywhere.
     assert.equal(eventFor({ hunt: { result: 'success', areaId: 'viper-heaps', minutes: 30 }, seed, forced: 'wounded-woman' }, always), woman);
-    const drafted = { ...always, events: { ...always.events, list: [...always.events.list, { ...woman, id: 'szkic', areas: undefined, draft: true }] } };
+    // A draft of its own, beside the approved events only.
+    const approved = always.events.list.filter((event) => !event.draft);
+    const drafted = { ...always, events: { ...always.events, list: [...approved, { ...woman, id: 'szkic', areas: undefined, draft: true }] } };
     assert.ok(drawn('viper-heaps', {}, drafted).every((id) => id === null));
     assert.ok(drawn('viper-heaps', { drafts: true }, drafted).every((id) => id === 'szkic'));
   });
@@ -248,6 +250,33 @@ describe('events', () => {
     assert.equal(resolveEvent({ hunt: base, event: calm, optionId: 'watch', character, equipped, name: 'Mira', seed }, content).gold, base.gold);
   });
 
+  test('the blue mushroom, a draft, comes in any land on its background: eaten, it faints, strengthens or gives a free stat point', () => {
+    const mushroom = content.eventsById['blue-mushroom'];
+    const always = { ...content, events: { ...content.events, chance: 1 } };
+    const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
+    const seeds = Array.from({ length: 30 }, (_, index) => `grzyb-${index}`);
+    for (const areaId of ['windfalls-edge', 'spider-gully', 'old-diggings']) {
+      assert.ok(seeds.every((one) => eventFor({ hunt: hunt(areaId), seed: one }, always)?.id !== mushroom.id), areaId);
+      assert.ok(seeds.some((one) => eventFor({ hunt: hunt(areaId), seed: one, drafts: true }, always)?.id === mushroom.id), areaId);
+    }
+    const eaten = (endingId, gold = base.gold) =>
+      resolveEvent({ hunt: { ...base, gold }, event: mushroom, optionId: 'eat', endingId, drafts: true, character, equipped, name: 'Mira', seed }, content);
+    // The scene is the land's: the background of the exploration's region.
+    assert.equal(eaten('point').event.scene, null);
+    assert.equal(eaten('point').event.land, content.areasById[base.areaId].regionId);
+    // A faint costs 30% of the exploration's gold, and says so when it took any.
+    const fainted = eaten('faint', 100);
+    assert.equal(fainted.gold, 70);
+    assert.match(fainted.event.option.text, /\(−30 złota\)\.$/);
+    assert.deepEqual(eaten('faint', 0).event.loss, { gold: 0 });
+    assert.doesNotMatch(eaten('faint', 0).event.option.text, /złota/);
+    // A buff for 30 minutes of explorations, or a free stat point.
+    assert.deepEqual(eaten('damage').event.reward.buff, { kind: 'damage', bonus: 0.1, minutes: 30 });
+    assert.equal(eaten('point').event.reward.points, 1);
+    assert.equal(eaten('point').gold, base.gold);
+    assert.equal(resolveEvent({ hunt: base, event: mushroom, optionId: 'leave', character, equipped, name: 'Mira', seed }, content).gold, base.gold);
+  });
+
   test('a draft ending comes only where drafts are on; "Testuj zdarzenia" chooses an ending', () => {
     // The Błędnica was a draft until the author approved it (0.0.44).
     const drafted = structuredClone(woman);
@@ -321,6 +350,20 @@ describe('events (API)', () => {
           endings: [
             { id: 'item', name: 'Zerwanie: zostaje przedmiot' },
             { id: 'blossom', name: 'Zerwanie: zostaje Kwiat paproci' },
+          ],
+        },
+        {
+          id: 'blue-mushroom',
+          title: 'Niebieski grzyb',
+          draft: true,
+          cases: [],
+          endings: [
+            { id: 'faint', name: 'Zjedzenie: omdlenie' },
+            { id: 'speed', name: 'Zjedzenie: lekkość' },
+            { id: 'armor', name: 'Zjedzenie: twarda skóra' },
+            { id: 'damage', name: 'Zjedzenie: siła' },
+            { id: 'focus', name: 'Zjedzenie: jasność umysłu' },
+            { id: 'point', name: 'Zjedzenie: Wolny Punkt Statystyk' },
           ],
         },
       ],
@@ -421,6 +464,33 @@ describe('events (API)', () => {
     const { report } = (await claim('pick')).data;
     assert.deepEqual(report.event.reward, { gold: 0, item: null, herbs: { 'fern-blossom': 1 } });
     assert.deepEqual(JSON.parse((await (await db()).prepare('SELECT herbs FROM characters').first()).herbs), { comfrey: 4, 'fern-blossom': 1 });
+  });
+
+  test('the blue mushroom gives a free stat point, a buff for the next explorations, or a faint that costs gold', async () => {
+    await pastTutorial();
+    const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
+    const eat = async (endingId) => {
+      await choose('blue-mushroom', null, endingId);
+      await explore();
+      assert.equal((await claim()).data.event.land, 'windfalls');
+      return (await claim('eat')).data.report;
+    };
+    assert.match((await eat('point')).event.option.text, /\(\+1 Wolny Punkt Statystyk\)\.$/);
+    // The point stays beside those of the levels (the exploration may have
+    // brought a level too), and the points spent before are 150 + 140.
+    assert.equal((await (await db()).prepare('SELECT bonus_points FROM characters').first()).bonus_points, 1);
+    const view = await character();
+    const perLevel = content.statIds.length;
+    assert.equal(view.freePoints, perLevel * (view.level - 1) + Math.floor(perLevel / 4) * (view.classLevel - 1) + 1 - 290);
+    await eat('damage');
+    assert.deepEqual(
+      (await character()).buffs.map(({ kind, ms, bonus }) => ({ kind, ms, bonus })),
+      [{ kind: 'damage', ms: 30 * 60000, bonus: 0.1 }],
+    );
+    const fainted = await eat('faint');
+    const lost = Number(/\(−(\d+) złota\)\.$/.exec(fainted.event.option.text)[1]);
+    assert.ok(lost > 0);
+    assert.ok(Math.abs(lost - Math.round(0.3 * (fainted.summary.gold + lost))) <= 1, `${lost} of ${fainted.summary.gold + lost}`);
   });
 
   test('chosen to be honest, the woman thanks with gold or an item that reach the character', async () => {

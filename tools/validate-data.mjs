@@ -612,7 +612,7 @@ function checkEvents(data, { monsters, rarities }) {
   uniqueIds(errors, 'events', events.list);
   const checkOutcome = (where, outcome) => {
     const fighting = outcome.foes || outcome.ambush || outcome.speedBonus || outcome.itemChance !== undefined || outcome.start;
-    const rewarding = outcome.gold !== undefined || outcome.itemRarities || outcome.herbs;
+    const rewarding = outcome.gold !== undefined || outcome.itemRarities || outcome.herbs || outcome.buff || outcome.points;
     if (outcome.kind === 'fight') {
       if (!outcome.foes) errors.push(`events.json: ${where} ma walkę bez przeciwników`);
       // People of the events, or creatures of monsters.json (the Błędnica).
@@ -622,13 +622,19 @@ function checkEvents(data, { monsters, rarities }) {
       errors.push(`events.json: ${where} ma ustawienia walki bez walki`);
     }
     if (outcome.kind === 'reward') {
-      if (!rewarding) errors.push(`events.json: ${where} ma nagrodę bez złota, przedmiotu i ziół`);
+      if (!rewarding) errors.push(`events.json: ${where} ma nagrodę bez złota, przedmiotu, ziół, wzmocnienia i punktów`);
       if (outcome.gold !== undefined && !outcome.text.includes('{gold}')) errors.push(`events.json: ${where} potrzebuje {gold} w tekście`);
       if (outcome.itemRarities && !outcome.text.includes('{item}')) errors.push(`events.json: ${where} potrzebuje {item} w tekście`);
       for (const id of Object.keys(outcome.itemRarities ?? {})) if (!rarities.has(id)) errors.push(`events.json: ${where} ma nieznaną rzadkość "${id}"`);
       for (const id of Object.keys(outcome.herbs ?? {})) if (!herbs.has(id)) errors.push(`events.json: ${where} ma nieznane zioło "${id}"`);
     } else if (rewarding) {
       errors.push(`events.json: ${where} ma nagrodę bez kind reward`);
+    }
+    if (outcome.kind === 'faint') {
+      if (!outcome.goldLoss) errors.push(`events.json: ${where} ma omdlenie bez goldLoss`);
+      if (!outcome.lossText?.includes('{gold}')) errors.push(`events.json: ${where} potrzebuje zdania lossText z {gold}`);
+    } else if (outcome.goldLoss !== undefined || outcome.lossText !== undefined) {
+      errors.push(`events.json: ${where} ma stratę złota bez kind faint`);
     }
   };
   // An outcome or a list of them, each drawn by its weight. An outcome of a

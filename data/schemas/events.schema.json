@@ -11,7 +11,7 @@
       "required": ["kind", "text"],
       "description": "Skutek opcji: tekst i co z niego wynika.",
       "properties": {
-        "kind": { "enum": ["none", "fight", "reward"] },
+        "kind": { "enum": ["none", "fight", "reward", "faint"], "description": "faint: postać traci przytomność i część złota z wyprawy (goldLoss, zdanie lossText z {gold})." },
         "weight": { "type": "number", "exclusiveMinimum": 0, "description": "Waga skutku na liście skutków, losowanych przy wyborze opcji." },
         "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Skutek z listy do wybrania w „Testuj zdarzenia”." },
         "name": { "type": "string", "minLength": 1, "description": "Nazwa skutku w „Testuj zdarzenia”." },
@@ -34,7 +34,21 @@
           "minProperties": 1,
           "additionalProperties": { "type": "integer", "minimum": 1 },
           "description": "Zioła nagrody, po id z professions.json (Kwiat paproci): trafiają do plecaka."
-        }
+        },
+        "buff": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "bonus", "minutes"],
+          "description": "Nagroda: wzmocnienie jak po miksturze na czas (szybkość, pancerz, obrażenia albo skupienie) na tyle minut wypraw.",
+          "properties": {
+            "kind": { "enum": ["speed", "armor", "damage", "focus"] },
+            "bonus": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+            "minutes": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "points": { "type": "integer", "minimum": 1, "description": "Nagroda: tyle Wolnych Punktów Statystyk ponad te z poziomów." },
+        "goldLoss": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Przy omdleniu: taka część złota z wyprawy przepada." },
+        "lossText": { "type": "string", "minLength": 1, "description": "Przy omdleniu: zdanie o straconym złocie, z {gold}, dopisane, gdy coś przepadło." }
       }
     },
     "outcomes": {

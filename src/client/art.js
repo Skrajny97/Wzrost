@@ -178,7 +178,7 @@ export const SPRITES = {
   events: {
     width: 96,
     height: 128,
-    ids: ['wounded-woman', 'fern-flower'],
+    ids: ['wounded-woman', 'fern-flower', 'blue-mushroom'],
   },
   'event-scenes': {
     width: 192,

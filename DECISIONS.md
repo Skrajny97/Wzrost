@@ -2808,6 +2808,17 @@ Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, now
     - **wzory w Warsztacie** (brakujący szczegół): wzór bazy od 25. poziomu klasy odsłania się na 25. poziomie Rzemieślnictwa, a od 50. na 50. Wcześniej każda dalsza baza miała wzór od `laterPatternLevel`, czyli od 10. Rozbiórka takiego przedmiotu nadal od razu uczy jego wzoru;
     - symulacja balansu (`tools/simulate.mjs`) liczy, jak dotąd, ekwipunek z pierwszych baz kategorii. Dalsze bazy są więc zapasem siły ponad nią i nie zmieniają jej tabel.
 
+## Uwagi autora po 0.0.52 (29.10.2026, w grze od 0.0.53)
+
+1. **Niebieski grzyb, zdarzenie ogólne (szkic na wersji testowej).** Autor: „Kolejna rzecz - jedno zdarzenie ogólne, mocno losowe, możliwe w każdej lokacji. Nie wiem co można wymyślic, ale musza tam byc albo zewnętrzne stwory tylko albo najlepiej ich brak” i „Co do tego zdarzenia to może natrafienie na nieznanego niebieskiego grzyba i decyzja o tym co z nim zrobić i losowo - utrata przytomności i części złota albo wzmocnienie na 30 minut jakieś albo zdobycie 1 Wolnego Punktu Statystyk”, „Tu byłoby używane tło danej krainy”.
+    - Zdarzenie przychodzi po wyprawie w każdym regionie wewnętrznym i na każdym poziomie, bez stworów. Tłem jest obraz krainy, w której była wyprawa (`scene` „land”).
+    - Opcje: „Zjedz grzyba” i „Zostaw go”. Zjedzenie losuje: omdlenie (waga 40), wzmocnienie na 30 minut wypraw (40, po 10 na każde z czterech) albo Wolny Punkt Statystyk (20).
+    - Omdlenie zabiera 30% złota z tej wyprawy (`goldLoss`), co najmniej 1, jeśli było jakieś złoto. Tekst dopisuje wtedy „Sakiewka jest wyraźnie lżejsza (−N złota).”
+    - Wzmocnienia działają jak mikstury na czas: lekkość (ruchy w walkach +25%), twarda skóra (pancerz +15%), siła (obrażenia +10%) albo jasność umysłu (Intelekt i Mądrość +10%), każde przez 30 minut wypraw. Dodają się do wypitych mikstur jak kolejna mikstura tego rodzaju.
+    - Wolny Punkt Statystyk zapisuje się osobno (`bonus_points`, migracja 0049) i liczy się do punktów z poziomów. Gra pokazuje go jak inne wolne punkty.
+    - To szkic: przychodzi tylko na wersji testowej i da się go wybrać w „Testuj zdarzenia”, także z konkretnym skutkiem. Do gry wejdzie po zatwierdzeniu przez autora razem z grafiką grzyba (jeden szkic Retro Diffusion).
+2. **Plecak: trzy zakładki.** Autor (ze zrzutem ekranu plecaka): „Podzielić na 3: Przedmioty, Materiały, Części”. Plecak ma zakładki „Przedmioty”, „Materiały” i „Części”, a przy dwóch ostatnich liczbę sztuk. Części, jak materiały, nie zajmują miejsca w plecaku. Stuknięta część pokazuje opis, liczbę sztuk i przycisk „Do Warsztatu”. Sakwa w górnym pasku zostaje bez zmian.
+
 ## Uwagi autora po 0.0.51 (29.10.2026, w grze od 0.0.52)
 
 1. **Ikonki zasobów.** Autor: „Wygenerujmy może też normalne ikonki zasobów” i o szkicach: „1 tak / 2 tak tylko usuń ziemie spod kamieni / 3 przemaluj ten brązowy kolor na pasujący pod żelazo”.

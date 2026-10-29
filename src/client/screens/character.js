@@ -197,6 +197,11 @@ export function mountCharacter(container) {
         label,
       );
     const stacked = materials.reduce((sum, material) => sum + material.count, 0);
+    // The parts for the Warsztat have their own tab (the author: "Podzielić
+    // na 3: Przedmioty, Materiały, Części").
+    const parts = state.character.crafting.parts.filter((part) => part.count > 0);
+    const partCount = parts.reduce((sum, part) => sum + part.count, 0);
+    const grids = { items: () => itemsGrid(bag), materials: () => materialsGrid(materials), parts: () => partsGrid(parts) };
     return h(
       'section',
       { class: 'bag', 'aria-labelledby': 'bag-title' },
@@ -206,8 +211,56 @@ export function mountCharacter(container) {
         { class: 'segmented bag-tabs', role: 'group', 'aria-label': 'Zawartość plecaka' },
         tab('items', 'Przedmioty'),
         tab('materials', stacked > 0 ? `Materiały (${formatNumber(stacked)})` : 'Materiały'),
+        tab('parts', partCount > 0 ? `Części (${formatNumber(partCount)})` : 'Części'),
       ),
-      bagTab === 'materials' ? materialsGrid(materials) : itemsGrid(bag),
+      (grids[bagTab] ?? grids.items)(),
+    );
+  }
+
+  // The parts for the Warsztat, a slot for each, outside the bag's room too.
+  function partsGrid(parts) {
+    if (parts.length === 0) return h('p', { class: 'muted', text: 'Nie masz jeszcze części. Stół rozbiórki robi je z materiałów i rozebranych przedmiotów.' });
+    return [
+      h('p', { class: 'bag-note', text: 'Części nie zajmują miejsca w plecaku.' }),
+      h(
+        'ul',
+        { class: 'bag-grid' },
+        parts.map((part) =>
+          h(
+            'li',
+            {},
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'slot slot--bag',
+                vars: { '--rarity': part.color },
+                'aria-label': `${part.name}, ${formatNumber(part.count)} szt.`,
+                onClick: () => partSheet(part),
+              },
+              materialIcon(part.id),
+              h('span', { class: 'slot-level', text: formatNumber(part.count) }),
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  function partSheet(part) {
+    const art = materialSprite(part.id);
+    const title = h('h2', { class: 'item-title', vars: { '--rarity': part.color }, text: part.name });
+    const meta = h('p', { class: 'item-meta', text: `${formatNumber(part.count)} szt.` });
+    const workshop = state.character.professions?.workshop;
+    openSheet(
+      h(
+        'div',
+        { class: 'item-details' },
+        art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art', vars: { '--rarity': part.color } }, art), h('div', {}, title, meta)) : [title, meta],
+        part.description && h('p', { class: 'sheet-text', text: part.description }),
+        h('p', { class: 'sheet-text', text: 'Z części Warsztat wykonuje przedmioty, a przy wymianie 10 części daje 1 część rzadszą.' }),
+      ),
+      workshop && h('a', { class: 'button button--world', href: '#/profesje/rzemieslnictwo', onClick: closeSheet, text: 'Do Warsztatu' }),
     );
   }
 

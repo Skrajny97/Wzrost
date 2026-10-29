@@ -59,12 +59,16 @@ export function eventFor({ hunt, seed, first = false, quick = false, forced = nu
   return open.length ? rng.weighted(open, (event) => event.weight ?? 1) : null;
 }
 
-// An event as the player first sees it: who, where, the text and the options.
-export const eventView = (event) => ({
+// An event as the player first sees it: who, where, the text and the
+// options. An event of any land (scene "land") stands in the land of the
+// exploration's inner region (`area`), on its background (the author: "Tu
+// byłoby używane tło danej krainy").
+export const eventView = (event, area = null) => ({
   id: event.id,
   title: event.title,
   art: event.art,
-  scene: event.scene,
+  scene: event.scene === 'land' ? null : event.scene,
+  ...(event.scene === 'land' && { land: area?.regionId ?? null }),
   figure: event.figure,
   text: event.text,
   options: event.options.map((option) => ({ id: option.id, label: option.label })),
@@ -111,7 +115,10 @@ function lootRules(character, equipped, area, content) {
 // character quicker. Won, the fight pays as one of the exploration's
 // reference fights does, and the foes leave gold and, with itemChance, now
 // and then an item; lost, the character faints (or, in a safe place, only
-// gets away) as after a lost fight on the way.
+// gets away) as after a lost fight on the way. A reward may also be a buff
+// for the next explorations, as a potion for a time gives (`buff`), or
+// free stat points (`points`); a faint loses `goldLoss` of the
+// exploration's gold, told by `lossText` when anything was lost.
 export function resolveEvent({ hunt, event, optionId, caseId = null, endingId = null, drafts = false, character, equipped, name, seed }, content) {
   const option = event.options.find((candidate) => candidate.id === optionId);
   const chosen = eventCase(event, seed, caseId);
@@ -121,9 +128,15 @@ export function resolveEvent({ hunt, event, optionId, caseId = null, endingId = 
   const outcome = Array.isArray(found) ? listOutcome(found, { endingId, drafts }, rng) : found;
   const area = content.areasById[hunt.areaId];
   const tell = (text) => ({ t, type: 'event', text: `${event.title}. ${option.label}: ${text}` });
-  const view = (text) => ({ ...eventView(event), case: chosen?.id ?? null, option: { id: option.id, label: option.label, text }, fight: null });
+  const view = (text) => ({ ...eventView(event, area), case: chosen?.id ?? null, option: { id: option.id, label: option.label, text }, fight: null });
 
   if (outcome.kind === 'none') return { ...hunt, entries: [...hunt.entries, tell(outcome.text)], event: view(outcome.text) };
+
+  if (outcome.kind === 'faint') {
+    const lost = Math.min(hunt.gold, Math.max(hunt.gold > 0 ? 1 : 0, Math.round(hunt.gold * outcome.goldLoss)));
+    const text = lost > 0 ? `${outcome.text} ${outcome.lossText.replace('{gold}', String(lost))}` : outcome.text;
+    return { ...hunt, gold: hunt.gold - lost, entries: [...hunt.entries, tell(text)], event: { ...view(text), loss: { gold: lost } } };
+  }
 
   if (outcome.kind === 'reward') {
     const gold = outcome.gold ? Math.round(content.balance.rewards.goldPerLevel * character.level * outcome.gold * rng.float(0.75, 1.25)) : 0;
@@ -143,7 +156,16 @@ export function resolveEvent({ hunt, event, optionId, caseId = null, endingId = 
       items,
       ...(outcome.herbs && { herbs }),
       entries: [...hunt.entries, tell(text)],
-      event: { ...view(text), reward: { gold, item: item ? items.length - 1 : null, herbs: outcome.herbs ?? null } },
+      event: {
+        ...view(text),
+        reward: {
+          gold,
+          item: item ? items.length - 1 : null,
+          herbs: outcome.herbs ?? null,
+          ...(outcome.buff && { buff: outcome.buff }),
+          ...(outcome.points && { points: outcome.points }),
+        },
+      },
     };
   }
 

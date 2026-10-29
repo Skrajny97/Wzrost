@@ -394,6 +394,16 @@ button {
   color: var(--system-text);
 }
 
+/* The bag's three tabs: items, materials and parts. */
+.bag-tabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.bag-tabs .segmented-option {
+  padding: 0 4px;
+  letter-spacing: 0.04em;
+}
+
 /* The Bestiariusz on an inner region's card, with its chest beside it (the
    quests' chest, styled for the dark card), and its list. */
 .bestiary-row {

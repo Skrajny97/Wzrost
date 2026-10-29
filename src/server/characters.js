@@ -370,6 +370,8 @@ export function engineCharacter(row) {
     classLevel: row.class_level,
     classXp: row.class_xp,
     points: JSON.parse(row.points),
+    // Free stat points an event gave beyond those of the levels.
+    bonusPoints: row.bonus_points ?? 0,
     position: row.position,
     appearance: row.appearance,
     skin: row.skin ?? content.defaultSkin,

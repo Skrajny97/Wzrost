@@ -205,7 +205,78 @@
         }
       ]
     }
-  ],
+,
+    {
+      "id": "blue-mushroom",
+      "draft": true,
+      "title": "Niebieski grzyb",
+      "art": "blue-mushroom",
+      "scene": "land",
+      "figure": { "left": 40, "bottom": 4, "height": 46 },
+      "text": "Przy ścieżce rośnie grzyb, jakiego nie znasz. Jego kapelusz świeci błękitem, a w powietrzu wokół unoszą się drobne, lśniące zarodniki. Pachnie słodko i obco.",
+      "options": [
+        {
+          "id": "eat",
+          "label": "Zjedz grzyba",
+          "outcome": [
+            {
+              "id": "faint",
+              "name": "Zjedzenie: omdlenie",
+              "weight": 40,
+              "kind": "faint",
+              "text": "Odgryzasz kawałek kapelusza. Świat zaczyna wirować, a błękitne światło zalewa ci oczy. Budzisz się na mchu, kiedy słońce stoi już nisko.",
+              "goldLoss": 0.3,
+              "lossText": "Sakiewka jest wyraźnie lżejsza (−{gold} złota)."
+            },
+            {
+              "id": "speed",
+              "name": "Zjedzenie: lekkość",
+              "weight": 10,
+              "kind": "reward",
+              "text": "Odgryzasz kawałek kapelusza. Nogi same rwą się do biegu, a każdy ruch przychodzi lekko (ruchy w walkach +25% przez 30 minut wypraw).",
+              "buff": { "kind": "speed", "bonus": 0.25, "minutes": 30 }
+            },
+            {
+              "id": "armor",
+              "name": "Zjedzenie: twarda skóra",
+              "weight": 10,
+              "kind": "reward",
+              "text": "Odgryzasz kawałek kapelusza. Skóra cierpnie i twardnieje jak kora starego dębu (pancerz +15% przez 30 minut wypraw).",
+              "buff": { "kind": "armor", "bonus": 0.15, "minutes": 30 }
+            },
+            {
+              "id": "damage",
+              "name": "Zjedzenie: siła",
+              "weight": 10,
+              "kind": "reward",
+              "text": "Odgryzasz kawałek kapelusza. Po ramionach rozlewa się ciepło, a dłonie same zaciskają się na broni (obrażenia +10% przez 30 minut wypraw).",
+              "buff": { "kind": "damage", "bonus": 0.1, "minutes": 30 }
+            },
+            {
+              "id": "focus",
+              "name": "Zjedzenie: jasność umysłu",
+              "weight": 10,
+              "kind": "reward",
+              "text": "Odgryzasz kawałek kapelusza. Myśli stają się jasne i ostre jak szron o świcie (Intelekt i Mądrość +10% przez 30 minut wypraw).",
+              "buff": { "kind": "focus", "bonus": 0.1, "minutes": 30 }
+            },
+            {
+              "id": "point",
+              "name": "Zjedzenie: Wolny Punkt Statystyk",
+              "weight": 20,
+              "kind": "reward",
+              "text": "Odgryzasz kawałek kapelusza. Przez chwilę widzisz las tak, jak widzi go System: linie, liczby i ścieżki między nimi. Kiedy obraz gaśnie, coś w tobie zostaje (+1 Wolny Punkt Statystyk).",
+              "points": 1
+            }
+          ]
+        },
+        {
+          "id": "leave",
+          "label": "Zostaw go",
+          "outcome": { "kind": "none", "text": "Nie wszystko, co świeci, nadaje się do jedzenia. Omijasz grzyb szerokim łukiem i wracasz na ścieżkę." }
+        }
+      ]
+    }  ],
   "foes": [
     {
       "id": "bandit-thug",

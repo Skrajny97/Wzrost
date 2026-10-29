@@ -4,7 +4,7 @@
 // it, and the report tells what came of it. Closed without a choice, the
 // event waits: the next "Odbierz raport" brings it again.
 
-import { eventFigure, eventScene } from './art.js';
+import { eventFigure, eventScene, landArt } from './art.js';
 import { h } from './dom.js';
 import { playSound } from './sound.js';
 import { call } from './state.js';
@@ -12,7 +12,8 @@ import { closeSheet, openSheet, withButton } from './ui.js';
 
 // `done` gets the report once an option is chosen.
 export function openEvent(event, done) {
-  const scene = eventScene(event.scene);
+  // An event of any land stands on the background of the land explored.
+  const scene = event.land ? landArt(event.land) : eventScene(event.scene);
   const figure = eventFigure(event.art);
   const options = event.options.map((option) =>
     h('button', {

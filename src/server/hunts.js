@@ -2,6 +2,7 @@
 // claim after the end runs the engine with that seed and saves the report.
 
 import {
+  addBuff,
   addQuestProgress,
   applyHunt,
   areaFor,
@@ -397,7 +398,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // draw.
   const [forcedEvent = null, forcedCase = null, forcedEnding = null] = row.event_test ? row.event_test.split(':').map((part) => part || null) : [];
   const event = eventsOn() ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn() }, content) : null;
-  if (event && choice === undefined) return { event: eventView(event) };
+  if (event && choice === undefined) return { event: eventView(event, content.areasById[hunt.areaId]) };
   if (event) {
     if (!event.options.some((option) => option.id === choice)) throw new ApiError(400, 'invalid_choice', 'Wybierz jedną z opcji.');
     hunt = resolveEvent(
@@ -504,6 +505,11 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const setMaterials = left.length
     ? `, materials = json_set(materials, ${left.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})`
     : '';
+  // An event's buff joins those of the potions drunk before (the blue
+  // mushroom), and its free stat points those of the levels.
+  const reward = hunt.event?.reward;
+  const eventBuffs = reward?.buff && addBuff(buffsOf(row, now), reward.buff.kind, reward.buff.minutes * 60000, reward.buff.bonus);
+  const eventPoints = reward?.points ?? 0;
   // An event's herbs that found their places.
   const storedHerbs = Object.entries(herbs.stored);
   const setHerbs = storedHerbs.length ? `, herbs = json_set(herbs, ${storedHerbs.map(() => '?, COALESCE(json_extract(herbs, ?), 0) + ?').join(', ')})` : '';
@@ -524,7 +530,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       db
         .prepare(
           `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ? + ${storedPrice.sql}${setResources}${setMaterials}${setHerbs},
-             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${drunk.length > 0 ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''},
+             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${drunk.length > 0 ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''}${eventBuffs ? ', buffs = ?' : ''}${eventPoints > 0 ? ', bonus_points = bonus_points + ?' : ''},
              version = version + 1
            WHERE id = ?`,
         )
@@ -545,6 +551,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
           row.quests,
           quests,
           ...(drunk.length > 0 ? [JSON.stringify(potionsLeft)] : []),
+          ...(eventBuffs ? [JSON.stringify(eventBuffs)] : []),
+          ...(eventPoints > 0 ? [eventPoints] : []),
           row.id,
         ),
       // Bag items the scrapper bought: paid for above, while they were still there.
