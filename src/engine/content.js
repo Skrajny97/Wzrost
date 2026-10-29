@@ -3,6 +3,23 @@
 
 const byId = (list) => Object.fromEntries(list.map((item) => [item.id, item]));
 
+// The evolutions' skills with what they take from their evolution: its class
+// and name (as a path), the class level of the first evolution and the
+// evolutions' top skill level.
+function evolutionSkills(raw) {
+  if (!raw.evolutions) return [];
+  const evolutions = byId(raw.evolutions.evolutions);
+  const classLevel = raw.balance.progression.classEvolutionLevels[0];
+  return raw.evolutions.skills.map((skill) => ({
+    ...skill,
+    classId: evolutions[skill.evolution]?.classId,
+    path: evolutions[skill.evolution]?.name,
+    classLevel,
+    maxLevel: raw.evolutions.skillMaxLevel,
+    rarity: 'epic',
+  }));
+}
+
 // Each region is split into inner regions (areas) of a few levels. An area is
 // what a character explores: it has its own levels and encounters, and takes
 // the safety and trait of its region, and its elite unless it has its own.
@@ -29,6 +46,7 @@ const creaturesOf = (area) =>
 
 export function buildContent(raw) {
   const { prefixes, suffixes, names } = raw.affixes;
+  const evolved = evolutionSkills(raw);
   // An item found in an area takes the names of its affixes from the
   // creatures living there: a prefix from those with an adjective, a suffix
   // from any of them.
@@ -98,9 +116,19 @@ export function buildContent(raw) {
     defaultSkin: raw.skins?.default,
     // The narrator's daily and weekly quests (quests.js).
     quests: raw.quests,
-    // The skills the classes choose from (skills.js).
+    // The skills the classes choose from (skills.js), and the class
+    // evolutions with their own skills (evolutions.js), known by id with the
+    // rest: each evolution skill takes its class, the class level of the
+    // first evolution and the evolutions' top skill level.
     skills: raw.skills ?? [],
-    skillsById: byId(raw.skills ?? []),
+    skillsById: byId([...(raw.skills ?? []), ...evolved]),
+    evolutions: raw.evolutions?.evolutions ?? [],
+    evolutionsById: byId(raw.evolutions?.evolutions ?? []),
+    evolutionSkills: evolved,
+    evolutionRules: raw.evolutions
+      ? { skillMaxLevel: raw.evolutions.skillMaxLevel, lastPointClassLevel: raw.evolutions.lastPointClassLevel, pointsPerClassLevel: raw.evolutions.pointsPerClassLevel }
+      : null,
+    evolutionTexts: raw.evolutions?.texts ?? null,
     // The professions, the System's words over them, the herbs gathered in
     // them, the gathering and the texts of their reports (professions.js),
     // and the brewing with its potions (brewing.js).

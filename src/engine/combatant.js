@@ -1,6 +1,7 @@
 // Combatants: the player character and monsters reduced to the same shape, so
 // the combat code treats both alike (and later companions or other players).
 
+import { perClassLevelOf } from './evolutions.js';
 import { budget, cappedChance, damageScale, maxHp, maxMana, speed, weaponDamage } from './formulas.js';
 import { upgradedItem } from './items.js';
 import { gearLevel, midGameShare } from './progression.js';
@@ -20,7 +21,8 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   // Szuwary: the back of the line hides in the reeds.
   const dodgeBonus = character.position === 'back' ? (area?.trait.backDodgeBonus ?? 0) : 0;
   const cls = content.classesById[character.classId];
-  const hpMax = maxHp(totals.vitality, character.classLevel, cls.perClassLevel, balance);
+  const perClassLevel = perClassLevelOf(character, content);
+  const hpMax = maxHp(totals.vitality, character.classLevel, perClassLevel, balance);
   return {
     id,
     side,
@@ -46,7 +48,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     speed: speed(totals.dexterity, character.level, balance),
     // Skills and the mana they spend, full at the start of every fight;
     // Wisdom also strengthens healing.
-    maxMana: maxMana(totals.wisdom, character.classLevel, cls.perClassLevel, balance),
+    maxMana: maxMana(totals.wisdom, character.classLevel, perClassLevel, balance),
     wisdom: totals.wisdom,
     skills: learnedSkills(character, content),
     recovery:

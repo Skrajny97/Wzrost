@@ -35,6 +35,7 @@ import {
 import { countEvents, createRng } from './rng.js';
 import { say } from './text.js';
 import { classUnlockMessages, unlockMessages } from './unlocks.js';
+import { classNameOf } from './evolutions.js';
 import { evolutionBlock, skillPoints } from './skills.js';
 
 // Value of [minutes, value] pairs at `minutes`, rising with the logarithm of
@@ -638,14 +639,16 @@ export function simulateHunt(
 // is the player's, so class XP equals the XP from fights. Fainting costs only
 // character XP, never a level, and never class XP. The class waits at its
 // first evolution level while the skills are not ready for it (the second
-// path and the Skill Points, evolutionBlock), and its XP adds up there until
-// then. `evolutionGate: false` lets the progression simulator measure a skill
-// alone, past the level where a player would need a second one.
+// path and the Skill Points) and then until the evolution is chosen, and
+// after it at the next evolution level while a Skill Point is left
+// (evolutionBlock); its XP adds up there until then. `evolutionGate: false`
+// lets the progression simulator measure a skill alone, past the level where
+// a player would need a second one.
 export function applyHunt(character, hunt, content, { evolutionGate = true } = {}) {
   const maxLevel = content.balance.progression.maxLevel;
-  const evolution = content.balance.progression.classEvolutionLevels[0];
   const block = evolutionGate ? evolutionBlock(character, content) : null;
   const waits = Boolean(block);
+  const evolution = block?.level ?? maxLevel;
   const next = gainXp(character.level, character.xp, hunt.xp, (level) => xpToNext(level, content), maxLevel);
   const toNextClass = (level) => classXpToNext(level, content);
   const nextClass = gainXp(character.classLevel, character.classXp, hunt.xp, toNextClass, waits ? evolution : maxLevel, waits);
@@ -654,8 +657,9 @@ export function applyHunt(character, hunt, content, { evolutionGate = true } = {
   const penalty = hunt.result === 'fainted' ? faintPenalty(next.level, next.xp, content) : 0;
 
   const messages = levelUpMessages(character, { level: next.level, classLevel: nextClass.level }, content);
-  const className = content.classesById[character.classId].name;
-  if (held) messages.push(say(content.texts, block.code === 'second_path' ? 'classWaitsPath' : 'classWaitsPoints', 0, { className, level: evolution }));
+  const className = classNameOf(character, content);
+  const waitText = { second_path: 'classWaitsPath', skill_points: 'classWaitsPoints', evolve: 'classWaitsEvolution' }[block?.code];
+  if (held) messages.push(say(content.texts, waitText, 0, { className, level: evolution }));
   if (penalty > 0) messages.push(say(content.texts, 'faintPenalty', 0, { xp: penalty }));
   // Every level brings Time Points, and so do the time shards found.
   const time = content.balance.timePoints;

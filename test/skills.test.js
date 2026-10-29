@@ -6,16 +6,17 @@ import {
   classXpToNext,
   createRng,
   evolutionBlock,
+  evolvedSkills,
   learnBlock,
   monsterCombatant,
   playerCombatant,
   raiseBlock,
+  sharedBonus,
   simulateFight,
   skillParams,
   skillPoints,
-  skillView,
-  sharedBonus,
   skillsView,
+  skillView,
 } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
@@ -164,7 +165,7 @@ describe('skills', () => {
     assert.equal(skillsView(warrior(9), content).ready, false);
   });
 
-  test('by class level 50, the first evolution, both paths are chosen and the Skill Points spent; until then the class waits there and keeps its XP', () => {
+  test('by class level 50, the first evolution, both paths are chosen, the Skill Points spent and the evolution taken; until then the class waits there and keeps its XP', () => {
     const warrior = (classLevel, skills, classXp = 0) => ({ classId: 'warrior', level: 50, xp: 0, classLevel, classXp, points: {}, skills });
     assert.equal(evolutionBlock(warrior(12, {}), content).code, 'second_path');
     assert.equal(evolutionBlock(warrior(30, { 'power-strike': 20 }), content).code, 'second_path');
@@ -173,10 +174,10 @@ describe('skills', () => {
     // and 49 are still due.
     assert.equal(skillPoints(warrior(47, { 'power-strike': 20, unyielding: 18 }), content).free, 0);
     assert.equal(evolutionBlock(warrior(47, { 'power-strike': 20, unyielding: 18 }), content).code, 'skill_points');
-    // Both at 20 take all the points, so nothing holds the class, and a
-    // class already past 50 waits for nothing.
-    assert.equal(evolutionBlock(warrior(49, { 'power-strike': 20, unyielding: 20 }), content), null);
-    assert.equal(evolutionBlock(warrior(50, { 'power-strike': 20, unyielding: 20 }), content), null);
+    // Both at 20 take all the points, so only the evolution holds the
+    // class, and a class already past 50 waits for nothing.
+    assert.deepEqual(evolutionBlock(warrior(49, { 'power-strike': 20, unyielding: 20 }), content), { code: 'evolve', level: 50 });
+    assert.deepEqual(evolutionBlock(warrior(50, { 'power-strike': 20, unyielding: 20 }), content), { code: 'evolve', level: 50 });
     assert.equal(evolutionBlock(warrior(60, { 'power-strike': 20 }), content), null);
 
     const toNext = (level) => classXpToNext(level, content);
@@ -192,10 +193,15 @@ describe('skills', () => {
     assert.equal(still.classLevel, 50);
     assert.equal(still.classXp, held.classXp + 100);
     assert.ok(still.messages.some((message) => message.includes('klasa czeka')));
-    // Ready, the XP it kept carries it on with the next exploration.
+    // Ready, it waits for the evolution, and once evolved the XP it kept
+    // carries it on with the next exploration.
     const ready = { ...alone, classLevel: 50, classXp: held.classXp, skills: { 'power-strike': 20, unyielding: 20 } };
-    assert.deepEqual(skillsView(ready, content).evolution, { level: 50, need: null });
-    const after = applyHunt(ready, { xp: 0, result: 'success' }, content);
+    assert.deepEqual(skillsView(ready, content).evolution, { level: 50, need: 'evolve' });
+    const unevolved = applyHunt(ready, { xp: 0, result: 'success' }, content);
+    assert.equal(unevolved.classLevel, 50);
+    assert.ok(unevolved.messages.includes('Wojownik: klasa czeka na 50. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach wybierzesz ewolucję. Zdobyte XP klasy nie przepada.'));
+    const evolved = { ...ready, evolution: 'barbarian', skills: evolvedSkills('barbarian', content) };
+    const after = applyHunt(evolved, { xp: 0, result: 'success' }, content);
     assert.equal(after.classLevel, 52);
     assert.equal(after.classXp, 7);
     assert.ok(!after.messages.some((message) => message.includes('klasa czeka')));

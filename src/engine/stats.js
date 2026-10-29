@@ -4,14 +4,20 @@
 import { upgradedItem } from './items.js';
 import { professionStats } from './professions.js';
 
-// Totals and their sources (the segments of the source bar on the stats screen).
+// Totals and their sources (the segments of the source bar on the stats
+// screen). After the class's evolution its levels grow by the evolution's
+// growth, from the level after the evolution on.
 export function computeStats(character, equipped, content) {
   const cls = content.classesById[character.classId];
   const totals = {};
   const sources = {};
   const fromProfessions = professionStats(character.professions, content);
+  const evolution = character.evolution ? content.evolutionsById[character.evolution] : null;
+  const evolvedAt = content.balance.progression.classEvolutionLevels[0];
+  const classLevels = evolution ? Math.min(character.classLevel, evolvedAt) - 1 : character.classLevel - 1;
+  const evolvedLevels = evolution ? Math.max(0, character.classLevel - evolvedAt) : 0;
   for (const stat of content.statIds) {
-    const fromClass = Math.floor(cls.baseStats[stat] + (cls.growth[stat] ?? 0) * (character.classLevel - 1));
+    const fromClass = Math.floor(cls.baseStats[stat] + (cls.growth[stat] ?? 0) * classLevels + (evolution?.growth[stat] ?? 0) * evolvedLevels);
     const fromPoints = character.points[stat] ?? 0;
     sources[stat] = { class: fromClass, character: fromPoints, professions: fromProfessions[stat] ?? 0, equipment: 0, core: 0 };
   }

@@ -1,12 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Efekty okresowe",
-  "description": "color: kolor napisu efektu i liczb traconego przez niego HP w odtwarzaniu walki.",
+  "description": "color: kolor napisu efektu i liczb traconego przez niego HP w odtwarzaniu walki. Efekt bez żywiołu (element) jest fizyczny: żadna odporność go nie zmniejsza, np. Krwawienie.",
   "type": "array",
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "name", "element", "color"],
+    "required": ["id", "name", "color"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
       "name": { "type": "string", "minLength": 1 },

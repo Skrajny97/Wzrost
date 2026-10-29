@@ -33,6 +33,7 @@ import chat from '../../data/chat.json' with { type: 'json' };
 import community from '../../data/community.json' with { type: 'json' };
 import events from '../../data/events.json' with { type: 'json' };
 import encyclopedia from '../../data/encyclopedia.json' with { type: 'json' };
+import evolutions from '../../data/evolutions.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -61,6 +62,7 @@ export const content = buildContent({
   community,
   events,
   encyclopedia,
+  evolutions,
 });
 
 // The parts of the game this deployment has on, for the System's messages

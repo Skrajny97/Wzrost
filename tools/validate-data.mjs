@@ -13,7 +13,7 @@ export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
-  'events', 'encyclopedia',
+  'events', 'encyclopedia', 'evolutions',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'professions', 'settlement', 'dungeons', 'core'];
@@ -57,6 +57,54 @@ function uniqueIds(errors, file, list) {
   return ids;
 }
 
+// The class evolutions (evolutions.json): one for every path of every
+// class, of a known class and path, with stats there are and two skills of
+// its own, the first the path's skill grown (from). Their skills have the
+// numbers their kind needs, an effect text naming only numbers they have,
+// and the points of the class levels after the evolution fill both to the
+// top level with none left (the author's 40 + 50 = 45 + 45).
+function checkEvolutions(data, { classIds, effectIds, elements, stats }) {
+  const errors = [];
+  const where = (id) => `evolutions.json: ${id}`;
+  const { evolutions, skills, skillMaxLevel, lastPointClassLevel, pointsPerClassLevel } = data.evolutions;
+  const evolutionIds = uniqueIds(errors, 'evolutions', evolutions);
+  const skillIds = uniqueIds(errors, 'evolutions (umiejętności)', skills);
+  for (const id of skillIds) if (data.skills.some((skill) => skill.id === id)) errors.push(`${where(id)}: to id ma już umiejętność klasy`);
+  const baseById = new Map(data.skills.map((skill) => [skill.id, skill]));
+  const paths = new Set();
+  for (const evolution of evolutions) {
+    if (!classIds.has(evolution.classId)) errors.push(`${where(evolution.id)} ma nieznaną klasę "${evolution.classId}"`);
+    const path = baseById.get(evolution.path);
+    if (!path || path.classId !== evolution.classId) errors.push(`${where(evolution.id)} prowadzi ścieżkę "${evolution.path}", której jego klasa nie ma`);
+    if (paths.has(evolution.path)) errors.push(`${where(evolution.id)}: ścieżkę "${evolution.path}" prowadzi już inna ewolucja`);
+    paths.add(evolution.path);
+    for (const stat of Object.keys(evolution.growth)) if (!stats.has(stat)) errors.push(`${where(evolution.id)} ma przyrost nieznanej statystyki "${stat}"`);
+    const own = evolution.skills.map((id) => skills.find((skill) => skill.id === id));
+    if (own.some((skill) => !skill || skill.evolution !== evolution.id)) errors.push(`${where(evolution.id)} ma umiejętność, która nie jest jego`);
+    else if (own[0].from !== evolution.path) errors.push(`${where(evolution.id)}: pierwsza umiejętność rozwija "${own[0].from}", a nie ścieżkę "${evolution.path}"`);
+  }
+  for (const skill of data.skills) if (!paths.has(skill.id)) errors.push(`skills.json: ścieżka ${skill.id} nie ma ewolucji`);
+  for (const skill of skills) {
+    const at = where(skill.id);
+    if (!evolutionIds.has(skill.evolution)) errors.push(`${at} ma nieznaną ewolucję "${skill.evolution}"`);
+    else if (!evolutions.find((evolution) => evolution.id === skill.evolution).skills.includes(skill.id)) errors.push(`${at}: ewolucja "${skill.evolution}" jej nie wymienia`);
+    if (skill.from !== undefined && !baseById.has(skill.from)) errors.push(`${at} rozwija nieznaną umiejętność "${skill.from}"`);
+    const params = skill.params;
+    if (params.dotEffect !== undefined && !effectIds.has(params.dotEffect)) errors.push(`${at} ma nieznany efekt "${params.dotEffect}"`);
+    for (const element of [params.element, ...String(params.elements ?? '').split(' ').filter(Boolean)]) {
+      if (element !== undefined && !elements.has(element)) errors.push(`${at} ma nieznany żywioł "${element}"`);
+    }
+    if (params.category !== undefined && !['physical', 'magical'].includes(params.category)) errors.push(`${at} ma nieznany rodzaj obrażeń "${params.category}"`);
+    for (const [, name] of skill.effect.matchAll(/\{(\w+)(?:%\.1|%| pp|\.1)?\}/g)) {
+      if (!(name in params) && name !== 'cooldown' && name !== 'critPower') errors.push(`${at} ma w opisie skutku nieznaną liczbę "${name}"`);
+    }
+  }
+  const before = (data.balance.skills.lastPointClassLevel - data.balance.skills.unlockClassLevel + 1) * data.balance.skills.pointsPerClassLevel;
+  const after = (lastPointClassLevel - data.balance.skills.lastPointClassLevel) * pointsPerClassLevel;
+  if (before + after !== 2 * skillMaxLevel) errors.push(`evolutions.json: ${before} punktów sprzed ewolucji i ${after} po niej nie dają dwóch umiejętności po ${skillMaxLevel} poziomów`);
+  return errors;
+}
+
 function checkReferences(data) {
   const errors = [];
   const stats = uniqueIds(errors, 'stats', data.stats);
@@ -88,7 +136,7 @@ function checkReferences(data) {
   };
 
   for (const effect of data.effects) {
-    if (!elements.has(effect.element)) errors.push(`effects.json: ${effect.id} ma nieznany żywioł "${effect.element}"`);
+    if (effect.element !== undefined && !elements.has(effect.element)) errors.push(`effects.json: ${effect.id} ma nieznany żywioł "${effect.element}"`);
   }
 
   const rarityAffixes = data.rarities.map((rarity) => rarity.affixes);
@@ -268,6 +316,8 @@ function checkReferences(data) {
     if (pathNames.has(key)) errors.push(`skills.json: ścieżka "${skill.path}" powtarza się w klasie ${skill.classId}`);
     pathNames.add(key);
   }
+
+  errors.push(...checkEvolutions(data, { classIds, effectIds, elements, stats }));
 
   // Every class has something for each slot its armour fills: a class
   // without a helmet of its own would leave the slot empty for good.

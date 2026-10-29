@@ -10,6 +10,11 @@
 // learns a skill or raises a learned one by a level, up to maxLevel. A skill's
 // numbers grow evenly from level 1 to the top level ([from, to] in its
 // params). The fight (combat.js) uses learned skills by their kind.
+//
+// After the class's evolution (evolutions.js) its skills are the
+// evolution's two: they start at level 0, take the points back, grow to the
+// evolutions' own top level (a skill's maxLevel) and the class levels after
+// the evolution bring more points for them.
 
 // Kinds used instead of a plain blow on the character's move, at the start of
 // a fight, and the moment its HP falls below the skill's mark.
@@ -19,10 +24,13 @@ export const WOUND_KINDS = new Set(['guard', 'shield', 'evade']);
 
 export const skillsOfClass = (classId, content) => content.skills.filter((skill) => skill.classId === classId);
 
+// The top level of a skill: an evolution's own, else that of the classes'.
+export const topLevel = (skill, content) => skill.maxLevel ?? content.balance.skills.maxLevel;
+
 // The numbers of a skill at a level: a pair grows evenly from level 1 to the
 // top level, a single value stays.
 export function skillParams(skill, level, content) {
-  const top = content.balance.skills.maxLevel;
+  const top = topLevel(skill, content);
   const share = (Math.min(Math.max(level, 1), top) - 1) / (top - 1);
   return Object.fromEntries(
     Object.entries(skill.params).map(([key, value]) => [key, Array.isArray(value) ? value[0] + (value[1] - value[0]) * share : value]),
@@ -38,7 +46,11 @@ export function skillParams(skill, level, content) {
 // with none left (tools/validate-data.mjs).
 export function skillPoints(character, content) {
   const { unlockClassLevel, lastPointClassLevel, pointsPerClassLevel } = content.balance.skills;
-  const earned = Math.max(0, Math.min(character.classLevel, lastPointClassLevel) - unlockClassLevel + 1) * pointsPerClassLevel;
+  let earned = Math.max(0, Math.min(character.classLevel, lastPointClassLevel) - unlockClassLevel + 1) * pointsPerClassLevel;
+  // After the evolution the class levels up to its last point bring more
+  // (the author: 40 back and 50 of class levels 50–99, 45 + 45).
+  const rules = content.evolutionRules;
+  if (character.evolution && rules) earned += Math.max(0, Math.min(character.classLevel, rules.lastPointClassLevel) - lastPointClassLevel) * rules.pointsPerClassLevel;
   const spent = Object.values(character.skills ?? {}).reduce((sum, level) => sum + level, 0);
   return { earned, spent, free: Math.max(0, earned - spent) };
 }
@@ -49,10 +61,11 @@ const knownOf = (pool, learned) =>
     .map((id) => pool.find((skill) => skill.id === id))
     .filter(Boolean);
 
-// The skills a character learned, with their numbers at their levels.
+// The skills a character learned, with their numbers at their levels; an
+// evolution's skill without a point yet does nothing.
 export function learnedSkills(character, content) {
   return Object.entries(character.skills ?? {})
-    .filter(([id]) => content.skillsById[id])
+    .filter(([id, level]) => content.skillsById[id] && level > 0)
     .map(([id, level]) => {
       const def = content.skillsById[id];
       return { id, name: def.name, kind: def.kind, mana: def.mana, cooldown: def.cooldown ?? 1, once: def.once === true, level, params: skillParams(def, level, content) };
@@ -66,6 +79,7 @@ export function learnedSkills(character, content) {
 export function learnBlock(character, skillId, content) {
   const skill = content.skillsById[skillId];
   if (!skill || skill.classId !== character.classId) return { code: 'unknown_skill', message: 'Twoja klasa nie ma takiej umiejętności.' };
+  if (character.evolution || skill.evolution) return { code: 'evolution', message: 'Umiejętności ewolucji przychodzą z ewolucją, a ścieżki klasy znikają po niej.' };
   if (character.classLevel < skill.classLevel) {
     return { code: 'class_level', message: `Tę umiejętność wybierzesz od poziomu klasy ${skill.classLevel}.` };
   }
@@ -89,11 +103,9 @@ export function learnBlock(character, skillId, content) {
 // milestone below it with `paths` skills known (code second_path), and no
 // Skill Point left that a known skill could take (skill_points). Counted with
 // the points the character has at that level, so a report of several class
-// levels cannot slip past it. Until then the class waits at that level
-// (applyHunt); a class already past it waits for nothing.
-export function evolutionBlock(character, content) {
+// levels cannot slip past it.
+export function skillsBlock(character, content) {
   const level = content.balance.progression.classEvolutionLevels[0];
-  if (character.classLevel > level) return null;
   const { maxLevel, paths } = content.balance.skills;
   const learned = character.skills ?? {};
   const pools = [...new Set(skillsOfClass(character.classId, content).map((skill) => skill.classLevel))].filter((classLevel) => classLevel < level);
@@ -109,11 +121,33 @@ export function evolutionBlock(character, content) {
   return null;
 }
 
+// Why the class waits at an evolution level, or null: { code, level }. Up
+// to the first evolution, while the skills are not ready for it
+// (skillsBlock), and when they are, until the evolution is chosen (evolve).
+// After it, at the next evolution level while a Skill Point is left (the
+// author, E8). The class waits there (applyHunt); a class already past the
+// level waits for nothing.
+export function evolutionBlock(character, content) {
+  const levels = content.balance.progression.classEvolutionLevels;
+  if (character.evolution) {
+    const level = levels[1];
+    if (level === undefined || character.classLevel > level) return null;
+    const { free } = skillPoints({ ...character, classLevel: Math.max(character.classLevel, level) }, content);
+    const raisable = Object.entries(character.skills ?? {}).some(([id, skillLevel]) => content.skillsById[id] && skillLevel < topLevel(content.skillsById[id], content));
+    return free > 0 && raisable ? { code: 'skill_points', level } : null;
+  }
+  const level = levels[0];
+  if (character.classLevel > level) return null;
+  const block = skillsBlock(character, content);
+  if (block) return { ...block, level };
+  return content.evolutions.some((evolution) => evolution.classId === character.classId) ? { code: 'evolve', level } : null;
+}
+
 // Why a learned skill cannot take a point, or null when it can.
 export function raiseBlock(character, skillId, content) {
   const level = character.skills?.[skillId];
-  if (!level) return { code: 'not_learned', message: 'Tej umiejętności jeszcze nie znasz.' };
-  if (level >= content.balance.skills.maxLevel) return { code: 'max_level', message: 'Ta umiejętność ma już najwyższy poziom.' };
+  if (level === undefined || !content.skillsById[skillId]) return { code: 'not_learned', message: 'Tej umiejętności jeszcze nie znasz.' };
+  if (level >= topLevel(content.skillsById[skillId], content)) return { code: 'max_level', message: 'Ta umiejętność ma już najwyższy poziom.' };
   if (skillPoints(character, content).free < 1) return { code: 'no_points', message: 'Nie masz wolnych Punktów Umiejętności.' };
   return null;
 }
@@ -148,7 +182,7 @@ export function skillCost(skill, content, params = skill.params) {
 
 // A skill's card: what it does at a level and, below the top, at the next.
 export function skillView(skill, level, content) {
-  const top = content.balance.skills.maxLevel;
+  const top = topLevel(skill, content);
   const shown = Math.max(1, level);
   return {
     id: skill.id,
@@ -179,35 +213,47 @@ export function skillView(skill, level, content) {
 export function skillsView(character, content) {
   const learned = character.skills ?? {};
   const points = skillPoints(character, content);
-  const { maxLevel, paths, secondClassLevel } = content.balance.skills;
+  const { paths, secondClassLevel } = content.balance.skills;
+  const evolution = character.evolution ? content.evolutionsById[character.evolution] : null;
   const levels = [...new Set(skillsOfClass(character.classId, content).map((skill) => skill.classLevel))].sort((a, b) => a - b);
-  const pools = levels.map((classLevel) => {
-    const options = skillsOfClass(character.classId, content).filter((skill) => skill.classLevel === classLevel);
-    const known = knownOf(options, learned).map((skill) => skill.id);
-    const stateOf = (skill) => {
-      if (known[0] === skill.id) return 'main';
-      if (known.includes(skill.id)) return 'second';
-      const block = learnBlock(character, skill.id, content);
-      if (!block) return 'pick';
-      if (block.code === 'chosen') return 'closed';
-      if (block.code === 'no_points') return 'points';
-      return known.length > 0 ? 'soon' : 'locked';
-    };
-    return {
-      classLevel,
-      open: character.classLevel >= classLevel,
-      chosen: known,
-      options: options.map((skill) => ({ ...skillView(skill, learned[skill.id] ?? 0, content), state: stateOf(skill) })),
-    };
-  });
-  const raisable = Object.entries(learned).some(([id, level]) => content.skillsById[id] && level < maxLevel);
+  const pools = evolution
+    ? // After the evolution: its two skills, the grown one of the path first.
+      [
+        {
+          classLevel: content.balance.progression.classEvolutionLevels[0],
+          open: true,
+          evolution: evolution.id,
+          chosen: evolution.skills,
+          options: evolution.skills.map((id, index) => ({ ...skillView(content.skillsById[id], learned[id] ?? 0, content), state: index === 0 ? 'main' : 'second' })),
+        },
+      ]
+    : levels.map((classLevel) => {
+        const options = skillsOfClass(character.classId, content).filter((skill) => skill.classLevel === classLevel);
+        const known = knownOf(options, learned).map((skill) => skill.id);
+        const stateOf = (skill) => {
+          if (known[0] === skill.id) return 'main';
+          if (known.includes(skill.id)) return 'second';
+          const block = learnBlock(character, skill.id, content);
+          if (!block) return 'pick';
+          if (block.code === 'chosen') return 'closed';
+          if (block.code === 'no_points') return 'points';
+          return known.length > 0 ? 'soon' : 'locked';
+        };
+        return {
+          classLevel,
+          open: character.classLevel >= classLevel,
+          chosen: known,
+          options: options.map((skill) => ({ ...skillView(skill, learned[skill.id] ?? 0, content), state: stateOf(skill) })),
+        };
+      });
+  const raisable = Object.entries(learned).some(([id, level]) => content.skillsById[id] && level < topLevel(content.skillsById[id], content));
   const block = evolutionBlock(character, content);
   return {
     unlockLevel: content.balance.skills.unlockClassLevel,
-    lastPointLevel: content.balance.skills.lastPointClassLevel,
+    lastPointLevel: evolution ? content.evolutionRules.lastPointClassLevel : content.balance.skills.lastPointClassLevel,
     secondLevel: secondClassLevel,
     paths,
-    evolution: { level: content.balance.progression.classEvolutionLevels[0], need: block?.code ?? null },
+    evolution: { level: block?.level ?? content.balance.progression.classEvolutionLevels[0], need: block?.code ?? null },
     points: points.free,
     pools,
     ready: pools.some((pool) => pool.options.some((skill) => skill.state === 'pick')) || (points.free > 0 && raisable),
