@@ -28,6 +28,8 @@ export const SPRITES = {
       'squirrel', 'grass-snake', 'raccoon-dog', 'antlion', 'capercaillie', 'weasel', 'stag-beetle', 'snake-hawk',
       'wildcat', 'black-stork', 'mossling', 'imp', 'cross-spider', 'mouflon', 'falcon', 'werewolf', 'wolf-shepherd',
       'aurochs', 'aesculapian-snake', 'strzyga',
+      // Four regular creatures per inner region of levels 66–100, from 29.10.2026.
+      'phantasm', 'black-grouse', 'diving-beetle', 'little-owl', 'zmij', 'fume-spirit', 'mine-spirit', 'giant-rat',
     ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved.
@@ -71,6 +73,9 @@ export const SPRITES = {
       'stag-beetle-horn', 'snake-hawk-talon', 'wildcat-fur', 'black-stork-feather', 'living-moss', 'imp-dust',
       'cross-spider-silk', 'mouflon-horn', 'falcon-feather', 'werewolf-fur', 'shepherd-crook', 'aurochs-horn',
       'aesculapian-skin', 'strzyga-fang',
+      // Four regular creatures per inner region of levels 66–100, from 29.10.2026.
+      'phantasm-shard', 'black-grouse-feather', 'diving-beetle-shell', 'little-owl-feather', 'zmij-scale', 'fume-ember',
+      'mine-lantern', 'rat-tail',
     ],
   },
   // The skills of the classes (data/skills.json), 48×48.

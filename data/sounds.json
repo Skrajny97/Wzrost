@@ -341,6 +341,38 @@
     "strzyga": {
       "hurt": { "files": ["audio/sfx/strzyga-hurt-1.mp3", "audio/sfx/strzyga-hurt-2.mp3"], "gain": 0.6 },
       "death": { "files": ["audio/sfx/strzyga-death-1.mp3", "audio/sfx/strzyga-death-2.mp3"], "gain": 0.7 }
+    },
+    "phantasm": {
+      "hurt": { "files": ["audio/sfx/phantasm-hurt-1.mp3", "audio/sfx/phantasm-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/phantasm-death-1.mp3", "audio/sfx/phantasm-death-2.mp3"], "gain": 0.7 }
+    },
+    "black-grouse": {
+      "hurt": { "files": ["audio/sfx/black-grouse-hurt-1.mp3", "audio/sfx/black-grouse-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/black-grouse-death-1.mp3", "audio/sfx/black-grouse-death-2.mp3"], "gain": 0.7 }
+    },
+    "diving-beetle": {
+      "hurt": { "files": ["audio/sfx/diving-beetle-hurt-1.mp3", "audio/sfx/diving-beetle-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/diving-beetle-death-1.mp3", "audio/sfx/diving-beetle-death-2.mp3"], "gain": 0.7 }
+    },
+    "little-owl": {
+      "hurt": { "files": ["audio/sfx/little-owl-hurt-1.mp3", "audio/sfx/little-owl-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/little-owl-death-1.mp3", "audio/sfx/little-owl-death-2.mp3"], "gain": 0.7 }
+    },
+    "zmij": {
+      "hurt": { "files": ["audio/sfx/zmij-hurt-1.mp3", "audio/sfx/zmij-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/zmij-death-1.mp3", "audio/sfx/zmij-death-2.mp3"], "gain": 0.7 }
+    },
+    "fume-spirit": {
+      "hurt": { "files": ["audio/sfx/fume-spirit-hurt-1.mp3", "audio/sfx/fume-spirit-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/fume-spirit-death-1.mp3", "audio/sfx/fume-spirit-death-2.mp3"], "gain": 0.7 }
+    },
+    "mine-spirit": {
+      "hurt": { "files": ["audio/sfx/mine-spirit-hurt-1.mp3", "audio/sfx/mine-spirit-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/mine-spirit-death-1.mp3", "audio/sfx/mine-spirit-death-2.mp3"], "gain": 0.7 }
+    },
+    "giant-rat": {
+      "hurt": { "files": ["audio/sfx/giant-rat-hurt-1.mp3", "audio/sfx/giant-rat-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/giant-rat-death-1.mp3", "audio/sfx/giant-rat-death-2.mp3"], "gain": 0.7 }
     }
   },
   "effects": {

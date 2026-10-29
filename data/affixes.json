@@ -109,6 +109,14 @@
     { "monster": "wolf-shepherd", "prefix": { "m": "Pasterski", "f": "Pasterska", "n": "Pasterskie", "pl": "Pasterskie" }, "suffix": "Pasterza" },
     { "monster": "aurochs", "prefix": { "m": "Turzy", "f": "Turza", "n": "Turze", "pl": "Turze" }, "suffix": "Tura" },
     { "monster": "aesculapian-snake", "prefix": { "m": "Połozowy", "f": "Połozowa", "n": "Połozowe", "pl": "Połozowe" }, "suffix": "Połoza" },
-    { "monster": "strzyga", "prefix": { "m": "Strzyży", "f": "Strzyża", "n": "Strzyże", "pl": "Strzyże" }, "suffix": "Strzygi" }
+    { "monster": "strzyga", "prefix": { "m": "Strzyży", "f": "Strzyża", "n": "Strzyże", "pl": "Strzyże" }, "suffix": "Strzygi" },
+    { "monster": "phantasm", "suffix": "Zwida" },
+    { "monster": "black-grouse", "prefix": { "m": "Cietrzewi", "f": "Cietrzewia", "n": "Cietrzewie", "pl": "Cietrzewie" }, "suffix": "Cietrzewia" },
+    { "monster": "diving-beetle", "suffix": "Pływaka" },
+    { "monster": "little-owl", "suffix": "Sowiszcza" },
+    { "monster": "zmij", "prefix": { "m": "Smoczy", "f": "Smocza", "n": "Smocze", "pl": "Smocze" }, "suffix": "Żmija" },
+    { "monster": "fume-spirit", "suffix": "Zaducha" },
+    { "monster": "mine-spirit", "suffix": "Skarbnika" },
+    { "monster": "giant-rat", "prefix": { "m": "Szczurzy", "f": "Szczurza", "n": "Szczurze", "pl": "Szczurze" }, "suffix": "Szczura" }
   ]
 }

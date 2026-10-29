@@ -79,7 +79,15 @@
     {"id": "shepherd-crook", "name": "Kostur pasterza", "gender": "m", "monster": "wolf-shepherd", "rarity": "unique", "description": "Krótki, sękaty kostur pokryty szronem, który nie topnieje."},
     {"id": "aurochs-horn", "name": "Róg tura", "gender": "m", "monster": "aurochs", "rarity": "epic", "description": "Ogromny róg z czarnym czubkiem. Dawniej robiono z takich puchary."},
     {"id": "aesculapian-skin", "name": "Skóra połoza", "gender": "f", "monster": "aesculapian-snake", "rarity": "epic", "description": "Długi pas oliwkowej skóry z żółtym spodem."},
-    {"id": "strzyga-fang", "name": "Kieł strzygi", "gender": "m", "monster": "strzyga", "rarity": "epic", "description": "Blady, długi kieł z kroplą krwi, która nie zasycha."}
+    {"id": "strzyga-fang", "name": "Kieł strzygi", "gender": "m", "monster": "strzyga", "rarity": "epic", "description": "Blady, długi kieł z kroplą krwi, która nie zasycha."},
+    {"id": "phantasm-shard", "name": "Okruch zwidu", "gender": "m", "monster": "phantasm", "rarity": "common", "description": "Okruch tęczowego szkła, w którym wiruje mgła."},
+    {"id": "black-grouse-feather", "name": "Pióro cietrzewia", "gender": "n", "monster": "black-grouse", "rarity": "unique", "description": "Granatowoczarne pióro z ogona, wygięte jak lira."},
+    {"id": "diving-beetle-shell", "name": "Pokrywa pływaka", "gender": "f", "monster": "diving-beetle", "rarity": "epic", "description": "Lśniąca, oliwkowa pokrywa skrzydeł z żółtym brzegiem."},
+    {"id": "little-owl-feather", "name": "Pióro sowiszcza", "gender": "n", "monster": "little-owl", "rarity": "rare", "description": "Brązowe pióro w białe cętki. Nie szeleści."},
+    {"id": "zmij-scale", "name": "Łuska żmija", "gender": "f", "monster": "zmij", "rarity": "epic", "description": "Czerwonoczarna łuska, której brzegi wciąż się żarzą."},
+    {"id": "fume-ember", "name": "Tlący węgielek", "gender": "m", "monster": "fume-spirit", "rarity": "common", "description": "Bryłka węgla z czerwonymi pęknięciami. Ciągle się tli."},
+    {"id": "mine-lantern", "name": "Lampka skarbnika", "gender": "f", "monster": "mine-spirit", "rarity": "rare", "description": "Stara mosiężna lampka z zielonym płomykiem, który nie gaśnie."},
+    {"id": "rat-tail", "name": "Szczurzy ogon", "gender": "m", "monster": "giant-rat", "rarity": "common", "description": "Długi, łysy ogon zwinięty w luźny krąg."}
   ],
   "parts": [
     { "id": "scraps", "name": "Ścinki", "gender": "pl", "rarity": "common", "description": "Skrawki skóry, kości i piór, oczyszczone i przycięte." },

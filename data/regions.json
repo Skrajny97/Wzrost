@@ -349,18 +349,21 @@
         "name": "Wierzbowe Kępy",
         "minLevel": 66,
         "maxLevel": 70,
-        "description": "Wyspy starych wierzb we mgle. Między pniami snują się zjawy i mgławice, w koronach szumią wierzbowe duchy, a nocą po wodzie tańczy topielica.",
+        "description": "Wyspy starych wierzb we mgle. Między pniami snują się zjawy i mgławice, z oparów wyłaniają się zwidy, w koronach szumią wierzbowe duchy, a nocą po wodzie tańczy topielica.",
         "encounters": [
           { "weight": 18, "monsters": ["willow-spirit"] },
           { "weight": 16, "monsters": ["wraith"] },
           { "weight": 12, "monsters": ["mistling", "mistling"] },
           { "weight": 12, "monsters": ["willow-spirit", "mistling"] },
-          { "weight": 10, "monsters": ["wraith", "mistling"] }
+          { "weight": 10, "monsters": ["wraith", "mistling"] },
+          { "weight": 14, "monsters": ["phantasm"] },
+          { "weight": 10, "monsters": ["phantasm", "wraith"] }
         ],
         "tough": [
           { "weight": 8, "monsters": ["willow-spirit", "wraith", "mistling"] },
           { "weight": 6, "monsters": ["wraith", "wraith"] },
-          { "weight": 6, "monsters": ["willow-spirit", "willow-spirit"] }
+          { "weight": 6, "monsters": ["willow-spirit", "willow-spirit"] },
+          { "weight": 6, "monsters": ["phantasm", "phantasm", "wraith"] }
         ]
       },
       {
@@ -407,18 +410,21 @@
         "name": "Żurawie Łąki",
         "minLevel": 76,
         "maxLevel": 80,
-        "description": "Otwarte mszary, na których tańczą żurawie. Pod mchem stoi woda, więc każdy krok się zapada, a łosie brodzą tu po pierś.",
+        "description": "Otwarte mszary, na których tańczą żurawie, a cietrzewie toczą boje o tokowiska. Pod mchem stoi woda, więc każdy krok się zapada, a łosie brodzą tu po pierś.",
         "encounters": [
           { "weight": 18, "monsters": ["elk"] },
           { "weight": 14, "monsters": ["crane", "crane"] },
           { "weight": 14, "monsters": ["leech"] },
           { "weight": 12, "monsters": ["elk", "crane"] },
-          { "weight": 10, "monsters": ["leech", "crane"] }
+          { "weight": 10, "monsters": ["leech", "crane"] },
+          { "weight": 14, "monsters": ["black-grouse"] },
+          { "weight": 10, "monsters": ["black-grouse", "elk"] }
         ],
         "tough": [
           { "weight": 8, "monsters": ["elk", "crane", "crane"] },
           { "weight": 6, "monsters": ["elk", "leech"] },
-          { "weight": 4, "monsters": ["elk", "elk"] }
+          { "weight": 4, "monsters": ["elk", "elk"] },
+          { "weight": 6, "monsters": ["black-grouse", "black-grouse", "crane"] }
         ]
       },
       {
@@ -426,18 +432,21 @@
         "name": "Pijawkowe Oczka",
         "minLevel": 81,
         "maxLevel": 85,
-        "description": "Okna czarnej wody w torfie, pełne pijawek i raków. Nad nimi krąży błotniak.",
+        "description": "Okna czarnej wody w torfie, pełne pijawek i raków. W głębinie polują pływaki, a nad wodą krąży błotniak.",
         "encounters": [
           { "weight": 16, "monsters": ["leech"] },
           { "weight": 16, "monsters": ["crayfish"] },
           { "weight": 12, "monsters": ["harrier"] },
           { "weight": 12, "monsters": ["leech", "harrier"] },
-          { "weight": 10, "monsters": ["crayfish", "leech"] }
+          { "weight": 10, "monsters": ["crayfish", "leech"] },
+          { "weight": 14, "monsters": ["diving-beetle"] },
+          { "weight": 10, "monsters": ["diving-beetle", "harrier"] }
         ],
         "tough": [
           { "weight": 8, "monsters": ["crayfish", "leech", "harrier"] },
           { "weight": 6, "monsters": ["leech", "leech", "harrier"] },
-          { "weight": 6, "monsters": ["crayfish", "crayfish"] }
+          { "weight": 6, "monsters": ["crayfish", "crayfish"] },
+          { "weight": 6, "monsters": ["diving-beetle", "leech", "harrier"] }
         ]
       },
       {
@@ -445,18 +454,21 @@
         "name": "Rosiczkowe Pole",
         "minLevel": 86,
         "maxLevel": 90,
-        "description": "Mech czerwony od rosiczek, które łowią owady. Między kępami kroczą torfiaki, a od oparów kręci się w głowie.",
+        "description": "Mech czerwony od rosiczek, które łowią owady. Między kępami kroczą torfiaki, nocą bezszelestnie poluje sowiszcze, a od oparów kręci się w głowie.",
         "encounters": [
           { "weight": 16, "monsters": ["sundew"] },
           { "weight": 16, "monsters": ["peatling"] },
           { "weight": 12, "monsters": ["sundew", "leech"] },
           { "weight": 12, "monsters": ["peatling", "leech"] },
-          { "weight": 8, "monsters": ["leech", "leech"] }
+          { "weight": 8, "monsters": ["leech", "leech"] },
+          { "weight": 14, "monsters": ["little-owl"] },
+          { "weight": 10, "monsters": ["little-owl", "peatling"] }
         ],
         "tough": [
           { "weight": 8, "monsters": ["sundew", "peatling", "leech"] },
           { "weight": 6, "monsters": ["peatling", "peatling"] },
-          { "weight": 6, "monsters": ["sundew", "sundew", "leech"] }
+          { "weight": 6, "monsters": ["sundew", "sundew", "leech"] },
+          { "weight": 6, "monsters": ["little-owl", "peatling", "leech"] }
         ]
       },
       {
@@ -464,17 +476,23 @@
         "name": "Tlące się Torfy",
         "minLevel": 91,
         "maxLevel": 95,
-        "description": "Pod ziemią tli się torf, a z dziur bije dym. Nocą między kępami wędrują ogniki, a w ciepłym popiele grzeją się salamandry.",
+        "description": "Pod ziemią tli się torf, a z dziur bije gryzący dym, w którym kryje się zaduch. Nocą między kępami wędrują ogniki, w ciepłym popiele grzeją się salamandry, a w żarze gnieździ się żmij.",
         "encounters": [
           { "weight": 18, "monsters": ["salamander"] },
           { "weight": 14, "monsters": ["will-o-wisp", "will-o-wisp"] },
           { "weight": 14, "monsters": ["salamander", "will-o-wisp"] },
-          { "weight": 10, "monsters": ["will-o-wisp"] }
+          { "weight": 10, "monsters": ["will-o-wisp"] },
+          { "weight": 14, "monsters": ["zmij"] },
+          { "weight": 14, "monsters": ["fume-spirit"] },
+          { "weight": 10, "monsters": ["zmij", "will-o-wisp"] },
+          { "weight": 8, "monsters": ["fume-spirit", "salamander"] }
         ],
         "tough": [
           { "weight": 8, "monsters": ["salamander", "salamander", "will-o-wisp"] },
           { "weight": 6, "monsters": ["will-o-wisp", "will-o-wisp", "will-o-wisp"] },
-          { "weight": 6, "monsters": ["salamander", "salamander"] }
+          { "weight": 6, "monsters": ["salamander", "salamander"] },
+          { "weight": 6, "monsters": ["zmij", "fume-spirit", "will-o-wisp"] },
+          { "weight": 4, "monsters": ["zmij", "zmij"] }
         ]
       },
       {
@@ -482,17 +500,23 @@
         "name": "Stare Wyrobisko",
         "minLevel": 96,
         "maxLevel": 100,
-        "description": "Opuszczona kopalnia torfu z kładkami z bali. Wciąż kopią tu torfiarze, których bagno nie oddało, w ścianach drążą czerwie, a na dnie wyrobiska ożywa sam torf.",
+        "description": "Opuszczona kopalnia torfu z kładkami z bali. Wciąż kopią tu torfiarze, których bagno nie oddało, z latarnią krąży skarbnik, w ścianach drążą czerwie, chodnikami biegają szczury, a na dnie wyrobiska ożywa sam torf.",
         "encounters": [
           { "weight": 18, "monsters": ["peat-cutter"] },
           { "weight": 14, "monsters": ["bog-worm"] },
           { "weight": 14, "monsters": ["peat-cutter", "bog-worm"] },
-          { "weight": 10, "monsters": ["bog-worm", "bog-worm"] }
+          { "weight": 10, "monsters": ["bog-worm", "bog-worm"] },
+          { "weight": 14, "monsters": ["mine-spirit"] },
+          { "weight": 14, "monsters": ["giant-rat"] },
+          { "weight": 10, "monsters": ["giant-rat", "giant-rat"] },
+          { "weight": 8, "monsters": ["mine-spirit", "peat-cutter"] }
         ],
         "tough": [
           { "weight": 8, "monsters": ["peat-cutter", "peat-cutter", "bog-worm"] },
           { "weight": 6, "monsters": ["bog-worm", "bog-worm", "bog-worm"] },
-          { "weight": 6, "monsters": ["peat-cutter", "peat-cutter"] }
+          { "weight": 6, "monsters": ["peat-cutter", "peat-cutter"] },
+          { "weight": 6, "monsters": ["giant-rat", "giant-rat", "mine-spirit"] },
+          { "weight": 4, "monsters": ["peat-cutter", "mine-spirit", "bog-worm"] }
         ],
         "champion": "mud-lord"
       }

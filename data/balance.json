@@ -147,7 +147,8 @@
     "chanceMinutes": 30,
     "laterCreatures": [
       "squirrel", "grass-snake", "raccoon-dog", "antlion", "capercaillie", "weasel", "stag-beetle", "snake-hawk", "wildcat", "black-stork",
-      "mossling", "imp", "cross-spider", "mouflon", "falcon", "werewolf", "wolf-shepherd", "aurochs", "aesculapian-snake", "strzyga"
+      "mossling", "imp", "cross-spider", "mouflon", "falcon", "werewolf", "wolf-shepherd", "aurochs", "aesculapian-snake", "strzyga",
+      "phantasm", "black-grouse", "diving-beetle", "little-owl", "zmij", "fume-spirit", "mine-spirit", "giant-rat"
     ]
   },
   "startingSupply": {

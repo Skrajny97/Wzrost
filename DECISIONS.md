@@ -2746,22 +2746,35 @@ Autor: „Wymyśl i zaproponuj nowe zdarzenie. Możesz je nawet wdrożyć na ser
 4. **Szkic.** Zdarzenie ma `draft`, więc przychodzi tylko w wersji testowej. W „Testuj zdarzenia” ma dopisek „(szkic)”. W grze głównej nie pojawi się, dopóki autor go nie zatwierdzi.
 5. **Grafiki** (kwiat i nocna polana z głazami) są z Retro Diffusion, po dwie wersje. Na wersji testowej stoją na próbę kwiat z drugiej wersji i polana z pierwszej, a kwiat stoi na środku polany (`figure`: 41% od lewej, 6% od dołu, 50% wysokości). Autor wybiera wersje rano.
 
-## Osiem stworów dla poziomów 66–100: propozycja (28.10.2026)
+## Osiem stworów dla poziomów 66–100 (0.0.47)
 
-Autor: „Zbuduj liste kolejnych stworów na kolejne poziomy i tak jak teraz opisy, materiały, dźwięki itd.” Regiony wewnętrzne poziomów 51–65 i Stare Koryto mają już po 4 zwykłe stwory. Pozostałym brakuje ośmiu.
+Autor: „Zbuduj liste kolejnych stworów na kolejne poziomy i tak jak teraz opisy, materiały, dźwięki itd.” Regiony wewnętrzne poziomów 51–65 i Stare Koryto miały już po 4 zwykłe stwory. Pozostałym brakowało ośmiu.
 
-1. **Lista do zatwierdzenia** (pozycja w walce, materiał, rzadkość materiału):
+1. **Stwory** (pozycja w walce, materiał, rzadkość materiału):
     - Wierzbowe Kępy (66–70): **Zwid** (tył), Okruch zwidu (pospolity).
     - Żurawie Łąki (76–80): **Cietrzew** (środek), Pióro cietrzewia (unikalne).
     - Pijawkowe Oczka (81–85): **Pływak** (środek), Pokrywa pływaka (epicka).
-    - Rosiczkowe Pole (86–90): **Pójdźka** (tył), Pióro pójdźki (rzadkie).
+    - Rosiczkowe Pole (86–90): **Sowiszcze** (tył), Pióro sowiszcza (rzadkie). Autor zmienił nazwę z proponowanej Pójdźki.
     - Tlące się Torfy (91–95): **Żmij** (przód), Łuska żmija (epicka), i **Zaduch** (środek), Tlący węgielek (pospolity).
     - Stare Wyrobisko (96–100): **Skarbnik** (tył), Lampka skarbnika (rzadka), i **Szczur** (środek), Szczurzy ogon (pospolity).
 
-    Rzadkości uzupełniają to, czego w danym regionie brakuje, tak żeby każdy miał materiał każdej z czterech rzadkości.
-2. **Szkice przed zatwierdzeniem.** Grafiki stworów (po 2 wersje), ikony materiałów (po 2) i okrzyki (po 2 okrzyki bólu i 2 okrzyki śmierci) powstały w nocy, żeby autor mógł wybierać od razu. Koszt: ok. 6,1 USD Retro Diffusion i 564 kredyty ElevenLabs. Pierwszy przebieg okrzyków nie ruszył, bo limit 400 kredytów był za niski.
-3. **Zaduch.** Pierwsza wersja miała dym ucięty prostą krawędzią kadru, a druga i dwie dorobione wypadły słabo (ciemna plama, czarne resztki tła). Pierwsza wersja jest przesunięta o 3 piksele w lewo, a jej dwie smugi dymu zwężają się w szpic przed krawędzią, tak jak ogon Połoza.
-4. **Dane czekają na autora.** Stwory nie trafiają do `data/` przed zatwierdzeniem listy, bo gałąź robocza trafia przy wdrożeniu do gry głównej. Po zatwierdzeniu: statystyki, ataki, materiały, afiksy, spotkania, opisy regionów, dźwięki i sprawdzenie balansu. Nazwa Żmija w afiksach może się mylić z Żmiją, więc afiks Żmija dostanie inną formę.
+    Rzadkości uzupełniają to, czego w danym regionie brakowało, więc każdy ma materiał każdej z czterech rzadkości.
+2. **Wybór autora** (29.10.2026): Zwid lewy, Cietrzew prawy, Pływak prawy, Sowiszcze prawe, Żmij prawy, Zaduch lewy, Skarbnik prawy i Szczur lewy, a materiały wszystkie z lewej. Okrzyki autor zatwierdził, więc w grze grają na zmianę obie wersje okrzyku bólu i śmierci. Identyfikatory zostają ze szkiców, np. `little-owl` dla Sowiszcza.
+3. **Szkice.** Grafiki i okrzyki powstały przed zatwierdzeniem listy, żeby autor mógł wybierać od razu. Kosztowały ok. 6,1 USD z Retro Diffusion i 564 kredyty ElevenLabs. Pierwszy przebieg okrzyków nie ruszył, bo limit 400 kredytów był za niski.
+4. **Zaduch.** Wybrana wersja miała dym ucięty prostą krawędzią kadru. Jest przesunięta o 3 piksele w lewo, a jej dwie smugi dymu zwężają się w szpic przed krawędzią, tak jak ogon Połoza.
+5. **Ataki** dobrane do stworów z tego samego regionu:
+    - Zwid: Omamiający blask (magia elektryczności, duży rozrzut);
+    - Cietrzew: Bitewny trzepot;
+    - Pływak: Chwyt żuwaczek, z pancerzem jak u raka i odpornością na wodę;
+    - Sowiszcze: Bezszelestne szpony;
+    - Żmij: Ognisty kęs z Oparzeniem; jest odporny na ogień i słaby na mróz;
+    - Zaduch: Gryzący dym z Zatruciem;
+    - Skarbnik: Blask latarni z Oparzeniem;
+    - Szczur: Zajadłe ugryzienie z Zatruciem.
+6. **Spotkania.** Każdy nowy stwór przychodzi sam, w parze ze stworem ze swojego regionu i w jednym spotkaniu wymagającym. Opisy sześciu regionów wymieniają nowe stwory.
+7. **Afiksy.** Żmij daje przedrostek „Smoczy”, bo „Żmijowy” należy już do Żmii, a przyrostek „Żmija”. Cietrzew daje „Cietrzewi” i „Cietrzewia”, a Szczur „Szczurzy” i „Szczura”. Pozostałe dają tylko przyrostki: Zwida, Pływaka, Sowiszcza, Zaducha i Skarbnika.
+8. **Bestiariusz.** Osiem stworów dochodzi do `laterCreatures`. Dzięki temu skrzynia otwarta przed 0.0.46, zapisana bez liczby stworów, też otwiera się znowu po poznaniu nowych stworów.
+9. **Balans** (`tools/simulate.mjs`, 1500 wypraw na wiersz, wyprawy 60-minutowe, poziomy 68, 78, 83, 88, 93 i 98). XP na godzinę, omdlenia i czas do poziomu są takie jak przed zmianą, w granicach losowości. Na 68. poziomie poziom trwa 8,7–8,9 godziny (cel 8,8), a wcześniej 8,4–8,5. Na 98. poziomie poziom trwa 9,5–11,4 godziny (cel 9,8), a wcześniej 9,3–10,7.
 
 ## Ewolucje i Osada: propozycje (28.10.2026)
 
