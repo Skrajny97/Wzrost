@@ -1,0 +1,25 @@
+{
+  "id": "poisoner-male",
+  "payload": {
+    "prompt": "young man poisoner, wiry, black spiky hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a dark green leather coat with the hood down, a cloth mask over the mouth, belts of small glass vials of green poison across the chest, holding a curved dagger dripping green venom, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 308703422,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793303974,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 61.58,
+    "request_id": "7204d2db-9e8f-4620-85d6-f0023dfe38d0",
+    "outputs_retained_until": 1793390328
+  }
+}

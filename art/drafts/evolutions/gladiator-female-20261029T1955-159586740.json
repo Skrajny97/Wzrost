@@ -1,0 +1,25 @@
+{
+  "id": "gladiator-female",
+  "payload": {
+    "prompt": "young woman gladiator, athletic, red hair tied back, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, an open bronze helmet with a red crest, one large iron shoulder guard and a quilted arm guard on the sword arm, a fitted leather breastplate, a short skirt of red leather strips, bronze greaves and sandals, holding a broad curved sword and a small round buckler, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 159586740,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793303775,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 63.02,
+    "request_id": "88c581f6-f3bc-4bdf-b13d-2d552bbcd3a0",
+    "outputs_retained_until": 1793390147
+  }
+}
