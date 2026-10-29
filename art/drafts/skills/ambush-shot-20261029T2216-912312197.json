@@ -1,0 +1,25 @@
+{
+  "id": "ambush-shot",
+  "payload": {
+    "prompt": "arrow flying out of a small round leafy green bush to the right, a hooded archer half hidden in the leaves, a white speed streak behind the arrow, fantasy RPG skill icon, bold readable shape, no background, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 912312197,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793312206,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 50.08,
+    "request_id": "5e5ae1fb-b78f-47e8-b138-a1bdfb3afa53",
+    "outputs_retained_until": 1793398567
+  }
+}
