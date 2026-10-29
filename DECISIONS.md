@@ -2833,6 +2833,23 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
     - Krainy w zakładce Bestiariusz zwijają się tak samo. Na start rozwinięta jest kraina poziomu postaci i każda z czekającą skrzynią.
     - Gra pamięta, co gracz zwinął albo rozwinął, dopóki jest otwarta.
 
+## Ewolucje: walka (29.10.2026, na wersji testowej)
+
+Wszystkie 30 umiejętności ewolucji i 15 cech działa w walce (`src/engine/combat.js`), a odtwarzanie walki pokazuje ich skutki. Liczby są robocze, do symulacji balansu (krok D). Brakujące szczegóły, rozstrzygnięte najprościej:
+
+1. **Postawy** (Krwawy szał, Wyzwanie, Chmura burzowa, Sokół, Psalm) budzą się na początku ruchu postaci, obok jej ciosu, i trwają tyle jej ruchów, ile podaje opis. Czas odnowienia liczy się od chwili, gdy się obudzą. Psalm czeka, aż ktoś z drużyny ma mniej niż 80% HP.
+2. **Przywołańce** (Żywiołak, Trujący Szlam) nie mają własnej karty w walce. Stoją przed postacią, a jej karta pokazuje ich HP, np. „Żywiołak · 282”. Biorą na siebie ciosy wrogów wymierzone w postać, bez uników, z pancerzem i odpornościami postaci. Działają w ruchu przywołania i w każdym kolejnym ruchu postaci, aż minie ich czas albo padną.
+3. **Wychłodzenie.** Zamieć wychładza trafionych do końca walki, co dopisano do jej opisu. Wychłodzony jest też ten, kto ma na sobie Wychłodzenie od stwora.
+4. **Odporności z cech.** „Odporność na mróz rośnie o 15%” (Zimowy oddech) i „odporność na truciznę rośnie o 20%” (Toksyny) to o tyle mniej obrażeń od tego żywiołu, z ciosów i z efektów. Samo mnożenie odporności nic by nie dało postaci bez odporności z przedmiotów. Opoka mnoży pancerz i odporności przez 1,1, a wrogowie biją w Strażnika dwa razy chętniej niż wynika to z jego miejsca.
+5. **Namaszczenie** mnoży premie Błogosławieństwa przez 1,25, a ich dzielenie się w drużynie jest o 25% słabsze. **Opiekun** mnoży leczenie przez 1,2, a każde leczenie umiejętnością zdejmuje najstarszy zły efekt.
+6. **Cud** płaci manę w chwili omdlenia. Może podnieść także samego Uzdrowiciela, bo ten zwykle walczy sam. Działa przed Kwiatem paproci, więc mikstura zostaje na później.
+7. **Zimna krew**: krytyczny jest pierwszy cios, który trafi. **Krok cienia**: premia po uniku działa na najbliższy własny cios, a nie na kontrę ani cięcie Tańca ostrzy.
+8. **Strzał z ukrycia** idzie w pierwszym ruchu przed innymi umiejętnościami. **Wyrok** czeka na wroga poniżej 40% HP. **Przebijający strzał** trafia wroga w najbliższym rzędzie za celem. **Znak śmierci** pada na wroga, w którego postać i tak bije.
+9. **Naelektryzowane groty** działają na każdy cios poza piorunami Chmury burzowej. **Tropiciel** daje 10% więcej materiałów ze stworów.
+10. **Zgodność.** Walki postaci bez ewolucji losują dokładnie to samo co wcześniej, co sprawdzono na 540 walkach, więc ich wyniki się nie zmieniają.
+11. **Podgląd autora** (Panel autora, „Podgląd umiejętności”) pokazuje też umiejętności ewolucji: postać na poziomie 60, umiejętność na poziomie 20. Panel działa w grze, więc ten podgląd będzie po wdrożeniu.
+12. **Do balansu (krok D).** Riposta Gladiatora działa po uniku, a Wojownik rzadko unika: w próbie wyszedł mniej więcej jeden unik na 80 ruchów. Uzdrowiciel zadaje mało obrażeń. Snajper i Skrytobójca mają bardzo mocny pierwszy cios.
+
 ## Ewolucje: budowa (29.10.2026, na wersji testowej)
 
 Ewolucje według „Ewolucji: odpowiedzi autora” i zatwierdzonej propozycji (cechy, przyrost statystyk, umiejętności). Dane są w `data/evolutions.json`, zasady w `src/engine/evolutions.js`. Liczby to brakujące szczegóły, rozstrzygnięte najprościej, do ustawienia w symulacji.
@@ -2848,7 +2865,7 @@ Ewolucje według „Ewolucji: odpowiedzi autora” i zatwierdzonej propozycji (c
 5. **Ceremonia.** Po wyborze otwiera się karta Systemu z nazwą ewolucji i cechą, a gra muzyka autora „Ewolucja klasy” (`evolution-v1`). Zdanie karty jest od autora: „Twoja nowa klasa to: Barbarzyńca. Rozdaj Punkty Umiejętności po ewolucji.” (autor: „Zamiast "Twoja klasa staje się:" to "Twoja nowa klasa to:" i po prostu "Rozdaj Punkty Umiejętności po ewolucji."”). Po zamknięciu karty wraca muzyka zakładki. Na razie ceremonia jest bez głosu narratora (brakujący szczegół): kwestie można dodać po zatwierdzeniu tekstów.
 6. **Testuj ewolucję** (wersja testowa, przycisk w Ustawieniach, obok „Testuj samouczki”). Daje każdą z trzech ewolucji klasy na dowolnym poziomie klasy. „Cofnij ewolucję” przywraca umiejętności sprzed testu.
 7. **Teksty i grafiki.** Zdania fabularne pod nazwami umiejętności ewolucji są robocze, do oceny autora. Do czasu nowych ikon rozwinięta umiejętność ma ikonę tej, z której wyrasta, a nowa pierwszą literę. Portrety ewolucji przyjdą osobno.
-8. **Walka.** Działanie nowych skutków umiejętności i cech w walce to następny krok. Do tego czasu rozwinięte umiejętności działają jak swoje podstawy z nowymi liczbami, a część nowych skutków jeszcze nie działa.
+8. **Walka.** Skutki umiejętności i cech działają w walce, zob. „Ewolucje: walka”.
 
 ## Encyklopedia (29.10.2026, w grze od 0.0.57)
 

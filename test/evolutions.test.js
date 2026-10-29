@@ -1,6 +1,7 @@
 // Class evolutions: the choices of the two paths, what an evolution asks
 // for, the skills and points after it, the growth of the stats, HP and mana
-// from the next class level on, and the class's new name.
+// from the next class level on, the class's new name, and the evolutions'
+// skills and traits in fights.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -8,16 +9,22 @@ import { beforeEach, describe, test } from 'node:test';
 import {
   classNameOf,
   computeStats,
+  createRng,
   evolutionChoices,
   evolutionView,
   evolveBlock,
   evolvedSkills,
   learnedSkills,
+  monsterCombatant,
   perClassLevelOf,
+  playerCombatant,
   raiseBlock,
+  simulateFight,
+  skillDemo,
   skillPoints,
   skillsView,
 } from '../src/engine/index.js';
+import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -87,6 +94,112 @@ describe('class evolutions in the engine', () => {
     assert.equal(card.pathName, 'Potężny cios');
     assert.equal(card.skills[0].from, 'Potężny cios');
     assert.equal(card.skills[0].effect, 'Cios za 260% obrażeń, który pomija 50% pancerza celu. Cel ma 25% szans stracić najbliższy ruch.');
+  });
+});
+
+describe('class evolutions in fights', () => {
+  // An evolved character of level 60 with the evolution's skills at
+  // `skillLevel` (`only`: just these of them).
+  function evolved(evolutionId, { skillLevel = 30, hpShare, only, classLevel = 60, id = 'a0', position } = {}) {
+    const evolution = content.evolutionsById[evolutionId];
+    const { character, equipped } = typicalCharacter(evolution.classId, 60, content);
+    const skills = Object.fromEntries(evolution.skills.filter((skill) => !only || only.includes(skill)).map((skill) => [skill, skillLevel]));
+    const unit = playerCombatant({ character: { ...character, classLevel, skills, evolution: evolutionId }, equipped, name: evolution.name, id }, content);
+    return { ...unit, ...(position && { position }), ...(hpShare !== undefined && { hp: Math.round(unit.maxHp * hpShare) }) };
+  }
+  const foe = (monsterId, level, id) => monsterCombatant({ monsterId, level, id }, content);
+  // A foe that does not fall quickly, so a fight lasts many moves.
+  const sturdy = (monsterId, level, id) => ({ ...foe(monsterId, level, id), hp: 20000, maxHp: 20000 });
+  const fight = (seed, allies, enemies) => simulateFight({ allies, enemies, rng: createRng(seed), content, record: true });
+  const blows = (result, actor) => result.events.filter((event) => event.actor === actor && ['hit', 'crit'].includes(event.kind) && !event.counter);
+
+  test('every evolution skill works in fights, and the account has no gaps in its texts', () => {
+    for (const evolution of content.evolutions) {
+      const used = new Set();
+      for (let seed = 0; seed < 10; seed++) {
+        const enemies = seed % 2 ? [foe('wolf', 56, 'e0'), foe('wolf', 56, 'e1'), foe('crow', 56, 'e2')] : [foe('boar', 58, 'e0')];
+        const result = fight(`ewolucja:${evolution.id}:${seed}`, [evolved(evolution.id, { hpShare: seed % 3 === 2 ? 0.45 : 1 })], enemies);
+        for (const event of result.events) {
+          if (event.skill) used.add(event.skill);
+          assert.doesNotMatch(event.text, /undefined|NaN|\{\w+\}/, `${evolution.id}: ${event.text}`);
+        }
+      }
+      // The miracle waits for a faint (its own test below).
+      for (const id of evolution.skills.filter((skill) => skill !== 'miracle')) assert.ok(used.has(id), `${evolution.id}: ${id}`);
+    }
+  });
+
+  test('the author\'s preview shows every evolution skill in its fight', () => {
+    for (const skill of content.evolutionSkills) {
+      const demo = skillDemo(skill.id, content);
+      assert.ok(demo.events.some((event) => event.skill === skill.id), skill.id);
+    }
+  });
+
+  test('a summon stands before its summoner and takes the foes\' blows until it falls or goes', () => {
+    const result = fight('przywołanie', [evolved('arcanist', { only: ['elemental-summon'] })], [sturdy('wolf', 58, 'e0')]);
+    const up = result.events.findIndex((event) => event.kind === 'summon' && event.state === 'up');
+    assert.ok(up >= 0);
+    const end = result.events.findIndex((event, index) => index > up && event.kind === 'summon' && ['fell', 'gone'].includes(event.state));
+    assert.ok(end > up);
+    const meanwhile = result.events.slice(up, end);
+    assert.ok(meanwhile.some((event) => event.kind === 'summon' && event.state === 'hit' && event.actor === 'e0'));
+    assert.ok(!meanwhile.some((event) => ['hit', 'crit', 'dodge'].includes(event.kind) && event.target === 'a0'));
+    assert.ok(meanwhile.some((event) => event.kind === 'hit' && event.actor === 'a0' && event.skill === 'elemental-summon'));
+  });
+
+  test('a challenge draws every foe\'s blow to the challenger, who throws a share of each back', () => {
+    const mage = { ...evolved('ice-lord', { only: [], id: 'a1' }), position: 'back' };
+    const result = fight('wyzwanie', [evolved('guardian', { only: ['challenge'] }), mage], [sturdy('wolf', 58, 'e0'), sturdy('crow', 58, 'e1')]);
+    const start = result.events.findIndex((event) => event.kind === 'skill' && event.skill === 'challenge');
+    const end = result.events.findIndex((event, index) => index > start && event.kind === 'fade' && event.skill === 'challenge');
+    assert.ok(start >= 0 && end > start);
+    const meanwhile = result.events.slice(start, end).filter((event) => event.actor?.startsWith('e') && ['hit', 'crit', 'dodge'].includes(event.kind));
+    assert.ok(meanwhile.length > 0);
+    for (const event of meanwhile) assert.equal(event.target, 'a0');
+    const reflects = result.events.slice(start, end).filter((event) => event.kind === 'reflect');
+    assert.ok(reflects.length > 0 && reflects.every((event) => event.actor === 'a0' && event.damage > 0));
+  });
+
+  test('a miracle raises the fainted once a fight, and Riposta answers a dodge with a bleeding blow', () => {
+    const raised = fight('cud', [evolved('healer', { only: ['miracle'], hpShare: 0.05 })], [sturdy('boar', 60, 'e0')]);
+    const miracles = raised.events.filter((event) => event.skill === 'miracle');
+    assert.equal(miracles.length, 1);
+    assert.ok(miracles[0].hp > 0);
+    assert.ok(raised.events.indexOf(miracles[0]) < raised.events.length - 1);
+    // A warrior seldom dodges: the first of a few fights where it does.
+    const dodged = (result) => result.events.findIndex((event) => event.kind === 'dodge' && event.target === 'a0');
+    const gladiator = Array.from({ length: 10 }, (_, seed) => fight(`riposta${seed}`, [evolved('gladiator', { only: ['riposte'] })], [sturdy('wolf', 58, 'e0')])).find((result) => dodged(result) >= 0);
+    const dodge = dodged(gladiator);
+    const answer = gladiator.events[dodge + 1];
+    assert.equal(answer.actor, 'a0');
+    assert.equal(answer.counter, true);
+    assert.equal(answer.skill, 'riposte');
+    assert.ok(gladiator.events.some((event) => event.kind === 'effect' && event.effect === 'Krwawienie'));
+  });
+
+  test('Zimna krew makes the first blow that lands critical; a mark of death strikes its echo', () => {
+    for (let seed = 0; seed < 5; seed++) {
+      const result = fight(`zimna-krew:${seed}`, [evolved('sniper', { only: [] })], [sturdy('boar', 58, 'e0')]);
+      assert.equal(blows(result, 'a0')[0].kind, 'crit');
+    }
+    const marked = fight('znak', [evolved('assassin', { only: ['death-mark'] })], [sturdy('boar', 58, 'e0')]);
+    const echo = marked.events.find((event) => event.skill === 'death-mark' && event.kind === 'hit');
+    assert.ok(echo && echo.damage > 0);
+  });
+
+  test('traits shape the character too: Opoka\'s armour, Arkana\'s mana, Krok cienia\'s speed, Zimowy oddech\'s shelter', () => {
+    const plain = (classId) => {
+      const { character, equipped } = typicalCharacter(classId, 60, content);
+      return playerCombatant({ character: { ...character, classLevel: 50, skills: {} }, equipped, name: 'Mira' }, content);
+    };
+    const at50 = (evolutionId) => evolved(evolutionId, { only: [], classLevel: 50 });
+    assert.equal(at50('guardian').armor, Math.round(plain('warrior').armor * 1.1));
+    assert.equal(at50('arcanist').maxMana, Math.round(plain('mage').maxMana * 1.15));
+    assert.ok(Math.abs(at50('night-dancer').speed - plain('shadow').speed * 1.1) < 1e-9);
+    assert.deepEqual(at50('ice-lord').shelter, { frost: 0.15 });
+    assert.equal(at50('barbarian').feat.kind, 'fury');
+    assert.equal(plain('warrior').feat, undefined);
   });
 });
 

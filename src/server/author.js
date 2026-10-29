@@ -83,7 +83,16 @@ export async function authorSkills(context) {
   const session = await requireSession(context);
   if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   return json({
-    skills: content.skills.map((skill) => ({ id: skill.id, name: skill.name, style: skill.style, className: content.classesById[skill.classId].name })),
+    skills: [
+      ...content.skills.map((skill) => ({ id: skill.id, name: skill.name, style: skill.style, className: content.classesById[skill.classId].name })),
+      // The evolutions' skills, under the evolution's name and its class's.
+      ...content.evolutionSkills.map((skill) => ({
+        id: skill.id,
+        name: skill.name,
+        style: skill.style,
+        className: `${content.evolutionsById[skill.evolution].name} (${content.classesById[skill.classId].name})`,
+      })),
+    ],
   });
 }
 

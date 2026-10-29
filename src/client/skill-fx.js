@@ -27,6 +27,38 @@ export const SKILL_LOOKS = {
   backstab: { color: '#a690e8', impact: 'shadow', teleport: true },
   'poisoned-blade': { color: '#9ccc65', cast: 'poison' },
   'shadow-dance': { color: '#a690e8', cast: 'dance' },
+  // The evolutions' skills (data/evolutions.json), in the looks of the
+  // skills they grow from until they have their own.
+  'crushing-blow': { color: '#f6ecd6', impact: 'heavy', big: true },
+  'blood-frenzy': { color: '#d9534f', cast: 'bless' },
+  millstone: { color: '#dfe7ea', cast: 'sweep' },
+  riposte: { color: '#e8d9a0' },
+  indomitable: { color: '#d9b45a', cast: 'guard' },
+  challenge: { color: '#e0a03c', cast: 'bless' },
+  'piercing-shot': { color: '#ef9a85', impact: 'aim', glow: true },
+  'ambush-shot': { color: '#c9b7ff', impact: 'aim', glow: true },
+  'arrow-storm': { color: '#b9a8ff', cast: 'rain' },
+  'storm-cloud': { color: '#b9a8ff', cast: 'holy' },
+  'barbed-arrow': { color: '#c49a6c', impact: 'pin', glow: true },
+  falcon: { color: '#d8c39a' },
+  'fire-burst': { color: '#ff8a3d', impact: 'fire', big: true },
+  'elemental-ray': { color: '#ffd27a', cast: 'holy' },
+  blizzard: { color: '#8fd3ff', cast: 'frost' },
+  'ice-lance': { color: '#bfe8ff', impact: 'heavy', glow: true },
+  'mana-mirror': { color: '#9fc8ff', cast: 'shield' },
+  'elemental-summon': { color: '#ffb36b', cast: 'bless' },
+  renewal: { color: '#a7c47f', cast: 'heal' },
+  miracle: { color: '#f2c14e', cast: 'heal' },
+  judgement: { color: '#f2d675', cast: 'holy' },
+  verdict: { color: '#f2d675', impact: 'heavy', glow: true },
+  'great-blessing': { color: '#f2d675', cast: 'bless' },
+  psalm: { color: '#cfe6a0', cast: 'bless' },
+  execution: { color: '#a690e8', impact: 'shadow', teleport: true },
+  'death-mark': { color: '#7b5fc7', impact: 'shadow' },
+  'black-venom': { color: '#7fa34a', cast: 'poison' },
+  'toxic-slime': { color: '#9ccc65', cast: 'poison' },
+  'blade-dance': { color: '#a690e8', cast: 'dance' },
+  'shadow-whirl': { color: '#a690e8', cast: 'sweep' },
 };
 
 const DEFAULT_LOOK = { color: '#8fe3ef' };
@@ -319,11 +351,14 @@ export function skillEffects(kit) {
   }
 
   // A heal: green sparks and the HP that came back. A guard instead flashes
-  // round the whole card, with the armour it gives.
+  // round the whole card, with the armour it gives. A heal that goes on for
+  // a few moves (a psalm) heals quietly, without its name each time.
   async function heal(event) {
     const look = lookOf(event);
-    playSkill(event.skill, 'effect');
-    callout(event.actor, event.skillName, look.color);
+    if (!event.quiet) {
+      playSkill(event.skill, 'effect');
+      callout(event.actor, event.skillName, look.color);
+    }
     kit.setHp(event.target, event.hp);
     kit.float(event.target, `+${event.amount}`, 'heal');
     if (look.cast === 'guard') {

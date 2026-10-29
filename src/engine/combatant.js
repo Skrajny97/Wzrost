@@ -1,7 +1,7 @@
 // Combatants: the player character and monsters reduced to the same shape, so
 // the combat code treats both alike (and later companions or other players).
 
-import { perClassLevelOf } from './evolutions.js';
+import { evolutionOf, perClassLevelOf } from './evolutions.js';
 import { budget, cappedChance, damageScale, maxHp, maxMana, speed, weaponDamage } from './formulas.js';
 import { upgradedItem } from './items.js';
 import { gearLevel, midGameShare } from './progression.js';
@@ -23,6 +23,19 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   const cls = content.classesById[character.classId];
   const perClassLevel = perClassLevelOf(character, content);
   const hpMax = maxHp(totals.vitality, character.classLevel, perClassLevel, balance);
+  // The evolution's trait (evolutions.js) works in fights (combat.js); some
+  // shape the character itself: Opoka's armour and resistances, Arkana's
+  // mana, Krok cienia's speed, and the shelter of Zimowy oddech and Toksyny
+  // (a share less of the damage of their element, blows and effects).
+  const evolution = evolutionOf(character, content);
+  const feat = evolution ? { kind: evolution.trait.kind, ...evolution.trait.params } : null;
+  const manaMax = maxMana(totals.wisdom, character.classLevel, perClassLevel, balance);
+  const resist = { ...bonuses.resist };
+  if (feat?.kind === 'bulwark') {
+    armor *= 1 + feat.armor;
+    for (const element of Object.keys(resist)) resist[element] = Math.round(resist[element] * (1 + feat.resist));
+  }
+  const shelter = { winter: 'frost', toxins: 'poison' }[feat?.kind];
   return {
     id,
     side,
@@ -41,16 +54,18 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     scalingValue: totals[weapon.scaling],
     damageScale: damageScale(totals[weapon.scaling], character.level, balance),
     armor: Math.round(armor),
-    resist: { ...bonuses.resist },
+    resist,
+    ...(shelter && { shelter: { [shelter]: feat.resist } }),
     dodgeRating: totals.dexterity * balance.combat.dodgePerDexterity * (1 + dodgeBonus),
     critRating: totals.perception * balance.combat.critPerPerception,
     willRating: totals.will * balance.combat.willPerPoint,
-    speed: speed(totals.dexterity, character.level, balance),
+    speed: speed(totals.dexterity, character.level, balance) * (feat?.kind === 'shadowStep' ? 1 + feat.speed : 1),
     // Skills and the mana they spend, full at the start of every fight;
     // Wisdom also strengthens healing.
-    maxMana: maxMana(totals.wisdom, character.classLevel, perClassLevel, balance),
+    maxMana: feat?.kind === 'arcana' ? Math.round(manaMax * (1 + feat.mana)) : manaMax,
     wisdom: totals.wisdom,
     skills: learnedSkills(character, content),
+    ...(feat && { feat }),
     recovery:
       balance.hunt.recoveryAfterFight +
       cls.recovery.base +

@@ -323,7 +323,7 @@
       "name": "Zamieć",
       "style": "kontrola",
       "description": "Mróz nie tylko spowalnia. Wróg, który się zatrzyma, zamarza w miejscu.",
-      "effect": "Zaklęcie mrozu na wszystkich wrogów zadaje {power%} obrażeń i spowalnia ich o {slow%}. Każdy trafiony ma {stunChance%} szans zamarznąć i stracić najbliższy ruch.",
+      "effect": "Zaklęcie mrozu na wszystkich wrogów zadaje {power%} obrażeń i spowalnia ich o {slow%}. Każdy trafiony ma {stunChance%} szans zamarznąć i stracić najbliższy ruch. Trafieni zostają wychłodzeni do końca walki.",
       "kind": "sweep",
       "mana": 16,
       "cooldown": 3,
@@ -363,7 +363,7 @@
       "kind": "summon",
       "mana": 18,
       "cooldown": 8,
-      "params": { "turns": 4, "hp": 0.3, "power": [0.2, 0.5], "summon": "elemental" }
+      "params": { "turns": 4, "hp": 0.3, "power": [0.2, 0.5], "summon": "elemental", "summonName": "Żywiołak" }
     },
     {
       "id": "renewal",
@@ -485,7 +485,7 @@
       "kind": "summon",
       "mana": 18,
       "cooldown": 8,
-      "params": { "turns": 4, "hp": 0.3, "summon": "slime", "dotEffect": "poisoned", "dotPower": [0.1, 0.25], "dotTicks": 3 }
+      "params": { "turns": 4, "hp": 0.3, "summon": "slime", "summonName": "Trujący Szlam", "dotEffect": "poisoned", "dotPower": [0.1, 0.25], "dotTicks": 3 }
     },
     {
       "id": "blade-dance",

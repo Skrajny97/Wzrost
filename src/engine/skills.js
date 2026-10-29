@@ -17,10 +17,13 @@
 // the evolution bring more points for them.
 
 // Kinds used instead of a plain blow on the character's move, at the start of
-// a fight, and the moment its HP falls below the skill's mark.
-export const ACTIVE_KINDS = new Set(['strike', 'sweep', 'heal']);
-export const START_KINDS = new Set(['buff', 'coat']);
+// a fight, and the moment its HP falls below the skill's mark; a stance
+// (evolutions) wakes at the start of the character's move, besides its blow,
+// and lasts a few of its moves.
+export const ACTIVE_KINDS = new Set(['strike', 'sweep', 'heal', 'summon', 'mark', 'whirl']);
+export const START_KINDS = new Set(['buff', 'coat', 'riposte']);
 export const WOUND_KINDS = new Set(['guard', 'shield', 'evade']);
+export const STANCE_KINDS = new Set(['stance']);
 
 export const skillsOfClass = (classId, content) => content.skills.filter((skill) => skill.classId === classId);
 
@@ -176,7 +179,7 @@ export function skillText(template, skill, params, content) {
 // a skill marked `once` works once a fight.
 export function skillCost(skill, content, params = skill.params) {
   if (typeof params.pool === 'number') return content.texts.skillCostPool[0].replace('{pool}', `${Math.round(params.pool * 100)}%`);
-  const key = skill.once ? 'skillCostOnce' : ACTIVE_KINDS.has(skill.kind) ? 'skillCostActive' : START_KINDS.has(skill.kind) ? 'skillCostStart' : 'skillCostOnce';
+  const key = skill.once ? 'skillCostOnce' : ACTIVE_KINDS.has(skill.kind) || STANCE_KINDS.has(skill.kind) ? 'skillCostActive' : START_KINDS.has(skill.kind) ? 'skillCostStart' : 'skillCostOnce';
   return content.texts[key][0].replace('{mana}', String(skill.mana)).replace('{cooldown}', String(skill.cooldown ?? 1));
 }
 

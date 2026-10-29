@@ -335,7 +335,9 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     entry.status.textContent = text;
   }
   function release(event) {
-    const id = event.kind === 'tick' ? event.target : MOVES.has(event.kind) && !event.counter ? event.actor : null;
+    // A blow at a summon (evolutions) is its attacker's move too.
+    const move = MOVES.has(event.kind) || (event.kind === 'summon' && event.state === 'hit');
+    const id = event.kind === 'tick' ? event.target : move && !event.counter ? event.actor : null;
     const entry = held.get(id);
     if (!entry) return;
     held.delete(id);
@@ -383,6 +385,30 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (entry && entry.status.textContent === text) entry.status.textContent = '';
   }
 
+  // A summon (evolutions: Żywiołak, Trujący Szlam) shows on its summoner's
+  // card, in the status line, with the HP it has left; gone, the line clears.
+  const summons = new Map(); // unit id → the text it shows
+  function summonState(event) {
+    const entry = cards.get(event.target);
+    if (!entry) return;
+    const before = summons.get(event.target);
+    if (event.summonHp > 0) {
+      const text = `${event.summon} · ${event.summonHp}`;
+      summons.set(event.target, text);
+      entry.status.textContent = text;
+      return;
+    }
+    summons.delete(event.target);
+    if (entry.status.textContent === before) entry.status.textContent = '';
+  }
+
+  // A stance or a guard that ends takes its name off the card.
+  function stanceDown(event) {
+    guardDown(event);
+    const entry = cards.get(event.target);
+    if (entry && entry.status.textContent === event.skillName) entry.status.textContent = '';
+  }
+
   // A fallen unit keeps no status: no burn, pin or shield on its card.
   function fallen(id) {
     const entry = cards.get(id);
@@ -390,6 +416,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     held.delete(id);
     guards.delete(id);
     shields.delete(id);
+    summons.delete(id);
     entry.status.textContent = '';
     entry.shieldBar.hidden = true;
     entry.card.classList.remove('unit--shielded');
@@ -399,7 +426,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
   // antidote that took it off.
   function effectOver(event) {
     const entry = cards.get(event.target);
-    const gone = event.kind === 'potion' ? event.cleared : event.left === 0 && event.effect;
+    const gone = event.cleared ?? (event.left === 0 && event.effect);
     if (gone && entry?.status.textContent === gone) entry.status.textContent = '';
   }
 
@@ -440,7 +467,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       return;
     }
     if (event.kind === 'fade') {
-      guardDown(event);
+      stanceDown(event);
       line();
       await wait(200 / speed);
       return;
@@ -471,6 +498,41 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       float(event.target, `+${event.amount}`, 'heal');
       line();
       await flash(event.target, '#a7c47f', 'rgba(167, 196, 127, 0.25)');
+      return;
+    }
+    // A share of a blow thrown back (Niezłomny, Wyzwanie, Lustro many).
+    if (event.kind === 'reflect') {
+      skills.callout(event.actor, 'Odbicie', '#f2c14e');
+      setHp(event.target, event.hp);
+      float(event.target, `−${event.damage}`, 'hit', 0, '#f2c14e');
+      line();
+      await flash(event.target, '#f2c14e', 'rgba(242, 193, 78, 0.3)');
+      return;
+    }
+    // A summon: it comes with its skill's look, takes the foes' blows meant
+    // for its summoner (they travel to the summoner's card) and goes.
+    if (event.kind === 'summon') {
+      if (event.state === 'hit') {
+        await strike(actor, target, () => {
+          playHit(actor.sound, false);
+          summonState(event);
+          float(target.id, `−${event.damage}`, 'absorb');
+          line();
+        });
+        return;
+      }
+      summonState(event);
+      if (event.state === 'up') await skills.cast(event);
+      else await flash(event.target, '#9fc8ff', 'rgba(159, 200, 255, 0.25)');
+      line();
+      return;
+    }
+    // Opiekun: a heal takes a bad effect off too.
+    if (event.kind === 'cleanse') {
+      effectOver(event);
+      float(event.target, `−${event.cleared}`, 'heal');
+      line();
+      await wait(240 / speed);
       return;
     }
     // A skill's blow shows its look; a sweep's blows land at once, as its
@@ -575,12 +637,13 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       fallen(event.target);
     }
     if (event.kind === 'skill' && !event.targets) cards.get(event.actor).status.textContent = event.skillName;
-    if (event.kind === 'skill' && event.skill === 'mana-shield') cards.get(event.actor).card.classList.add('unit--shielded');
+    if (event.kind === 'skill' && !event.targets && lookOf(event).cast === 'shield') cards.get(event.actor).card.classList.add('unit--shielded');
     if (event.kind === 'skill' && event.shield !== undefined) shieldUp(event);
     if (event.kind === 'hit' || event.kind === 'crit' || event.kind === 'tick') shieldLeft(event.target, event.shield);
-    if (event.kind === 'tick' || (event.kind === 'potion' && event.effect === 'cure')) effectOver(event);
+    if (event.kind === 'tick' || event.kind === 'cleanse' || (event.kind === 'potion' && event.effect === 'cure')) effectOver(event);
+    if (event.kind === 'summon') summonState(event);
     if (event.kind === 'heal' && event.armor) guardUp(event);
-    if (event.kind === 'fade') guardDown(event);
+    if (event.kind === 'fade') stanceDown(event);
     if (event.kind === 'stun') hold(event.target, event.label ?? 'przyszpilony');
     if (event.kind === 'slow') for (const id of event.targets) hold(id, event.effect ?? 'spowolniony');
     log.append(logLine(event));
@@ -599,6 +662,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     held.clear();
     shields.clear();
     guards.clear();
+    summons.clear();
     index = 0;
     log.replaceChildren();
     banner.classList.remove('arena-banner--shown');

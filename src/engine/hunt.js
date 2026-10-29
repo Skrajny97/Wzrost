@@ -35,7 +35,7 @@ import {
 import { countEvents, createRng } from './rng.js';
 import { say } from './text.js';
 import { classUnlockMessages, unlockMessages } from './unlocks.js';
-import { classNameOf } from './evolutions.js';
+import { classNameOf, evolutionOf } from './evolutions.js';
 import { evolutionBlock, skillPoints } from './skills.js';
 
 // Value of [minutes, value] pairs at `minutes`, rising with the logarithm of
@@ -418,6 +418,9 @@ export function simulateHunt(
   const items = [];
   const resources = {}; // { wood: 12, … } found for the camp
   let materials = {}; // { "wolf-pelt:common": 2, … } from beaten creatures
+  // Tropiciel (an evolution's trait): more materials from creatures.
+  const tracker = evolutionOf(character, content)?.trait;
+  const moreMaterials = tracker?.kind === 'tracker' ? 1 + tracker.params.materials : 1;
   const fights = [];
   const entries = [];
   let key = null;
@@ -547,7 +550,7 @@ export function simulateHunt(
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
         const goldFactor = rank * enemy.groupFactor * share;
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * goldFactor;
-        const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1);
+        const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials;
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, rng, content));
       }
       materials = addCounts(materials, summary.materials);
