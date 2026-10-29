@@ -567,7 +567,7 @@ function checkReferences(data) {
     if (!existsSync(new URL(track.file, CLIENT_DIR))) errors.push(`music.json: brak pliku src/client/${track.file}`);
   }
   if (!tracks.has(data.music.default)) errors.push(`music.json: nieznany utwór domyślny ${data.music.default}`);
-  const places = new Set(['camp', 'skills', 'professions', ...data.regions.flatMap((region) => [region.id, ...region.areas.map((area) => area.id)])]);
+  const places = new Set(['camp', 'skills', 'professions', 'evolution', ...data.regions.flatMap((region) => [region.id, ...region.areas.map((area) => area.id)])]);
   for (const [place, track] of Object.entries(data.music.places)) {
     if (!places.has(place)) errors.push(`music.json: nieznane miejsce ${place}`);
     if (!tracks.has(track)) errors.push(`music.json: ${place} ma nieznany utwór ${track}`);

@@ -41,7 +41,7 @@ export async function ranking(context) {
   const [rows, own] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.name, c.class_id, c.level, c.class_level, c.professions, u.login, u.google_sub, u.chat_moderator
+        `SELECT c.id, c.name, c.class_id, c.evolution, c.level, c.class_level, c.professions, u.login, u.google_sub, u.chat_moderator
          FROM characters c JOIN users u ON u.id = c.user_id
          WHERE c.role = 'player'${where} ORDER BY ${order} LIMIT ?`,
       )
@@ -56,7 +56,7 @@ export async function ranking(context) {
       place: index + 1,
       name: row.name,
       classId: row.class_id,
-      className: content.classesById[row.class_id]?.name ?? row.class_id,
+      className: content.evolutionsById[row.evolution]?.name ?? content.classesById[row.class_id]?.name ?? row.class_id,
       level: row.level,
       classLevel: row.class_level,
       profession: highestProfession(JSON.parse(row.professions ?? '{}'), content),

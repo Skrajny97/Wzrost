@@ -3,7 +3,7 @@
 // from the next class level on, and the class's new name.
 
 import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { beforeEach, describe, test } from 'node:test';
 
 import {
   classNameOf,
@@ -19,6 +19,7 @@ import {
   skillsView,
 } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
+import { useServer } from './helpers/server.js';
 
 const warrior = (classLevel, skills, extra = {}) => ({ classId: 'warrior', level: 50, xp: 0, classLevel, classXp: 0, points: {}, skills, ...extra });
 const ready = (classLevel = 50) => warrior(classLevel, { 'power-strike': 20, unyielding: 20 });
@@ -86,5 +87,60 @@ describe('class evolutions in the engine', () => {
     assert.equal(card.pathName, 'Potężny cios');
     assert.equal(card.skills[0].from, 'Potężny cios');
     assert.equal(card.skills[0].effect, 'Cios za 260% obrażeń, który pomija 50% pancerza celu. Cel ma 25% szans stracić najbliższy ruch.');
+  });
+});
+
+describe('class evolutions through the API', () => {
+  const { call, db, signUp } = useServer();
+  let cookie;
+
+  beforeEach(async () => {
+    ({ cookie } = await signUp('ewolucja'));
+    await call('POST', '/api/character', { cookie, body: { name: 'Ewolucja', classId: 'warrior', appearance: 'male' } });
+  });
+
+  const set = async (sql) => (await db()).prepare(`UPDATE characters SET ${sql}`).run();
+  const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
+
+  test('at class level 50 with both paths ready the character sees its two evolutions, takes one for good and gets the points back', async () => {
+    await set(`level = 50, class_level = 49, skills = '{"power-strike":20,"unyielding":20}'`);
+    assert.deepEqual((await character()).evolution, { current: null, choices: [] });
+    assert.equal((await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'barbarian' } })).data.error.code, 'class_level');
+    await set('class_level = 50');
+    const before = await character();
+    assert.deepEqual(before.evolution.choices.map((choice) => choice.name), ['Barbarzyńca', 'Strażnik']);
+    assert.equal(before.skills.evolution.need, 'evolve');
+    assert.equal((await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'gladiator' } })).status, 400);
+    const taken = await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'barbarian' } });
+    assert.equal(taken.status, 200, JSON.stringify(taken.data));
+    const after = taken.data.character;
+    assert.equal(after.className, 'Barbarzyńca');
+    assert.equal(after.baseClassName, 'Wojownik');
+    assert.equal(after.evolution.current.trait.name, 'Furia');
+    assert.equal(after.skills.points, 41);
+    assert.deepEqual(after.skills.pools[0].options.map((skill) => [skill.id, skill.level]), [
+      ['crushing-blow', 0],
+      ['blood-frenzy', 0],
+    ]);
+    assert.equal(after.evolutionUndo, false);
+    assert.equal((await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'guardian' } })).data.error.code, 'evolved');
+    const raised = await call('POST', '/api/skills/raise', { cookie, body: { skillId: 'crushing-blow' } });
+    assert.equal(raised.status, 200, JSON.stringify(raised.data));
+    assert.equal(raised.data.character.skills.points, 40);
+    assert.equal((await call('POST', '/api/evolution/undo', { cookie })).data.error.code, 'no_test_evolution');
+  });
+
+  test('on the test version any evolution of the class can be tried at any level and undone, back to the skills it had', async () => {
+    await set(`level = 20, class_level = 15, skills = '{"wide-sweep":6}'`);
+    const tried = await call('GET', '/api/evolution/test', { cookie });
+    assert.deepEqual(tried.data.evolutions.map((evolution) => evolution.id), ['barbarian', 'gladiator', 'guardian']);
+    const taken = await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'guardian', test: true } });
+    assert.equal(taken.status, 200, JSON.stringify(taken.data));
+    assert.equal(taken.data.character.className, 'Strażnik');
+    assert.equal(taken.data.character.evolutionUndo, true);
+    const undone = await call('POST', '/api/evolution/undo', { cookie });
+    assert.equal(undone.status, 200, JSON.stringify(undone.data));
+    assert.equal(undone.data.character.className, 'Wojownik');
+    assert.deepEqual(JSON.parse((await (await db()).prepare('SELECT skills FROM characters').first()).skills), { 'wide-sweep': 6 });
   });
 });

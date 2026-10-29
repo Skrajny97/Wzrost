@@ -9,6 +9,7 @@ import {
   campBonus,
   campLevels,
   canUse,
+  classNameOf,
   classXpToNext,
   collect,
   combatValues,
@@ -23,6 +24,7 @@ import {
   currentQuests,
   effectText,
   equipChange,
+  evolutionPanel,
   fireTrade,
   fireUnitsMade,
   freePoints,
@@ -401,6 +403,8 @@ export function engineCharacter(row) {
     skin: row.skin ?? content.defaultSkin,
     // The skills learned and their levels (skills.js).
     skills: JSON.parse(row.skills ?? '{}'),
+    // The evolution taken at class level 50 (evolutions.js), or null.
+    evolution: row.evolution ?? null,
     // The professions' levels and XP (professions.js).
     professions: JSON.parse(row.professions ?? '{}'),
   };
@@ -760,7 +764,10 @@ export function characterView(player, now) {
   return {
     name: row.name,
     classId: row.class_id,
-    className: content.classesById[row.class_id].name,
+    // The class goes by its evolution's name; the class itself stays a note
+    // on the character card.
+    className: classNameOf(character, content),
+    baseClassName: content.classesById[row.class_id].name,
     // The look: the portrait and the voice in fights, and the portrait's
     // skin tone.
     appearance: row.appearance,
@@ -803,6 +810,10 @@ export function characterView(player, now) {
     freePoints: freePoints(character, content),
     // The Umiejętności tab: the choices, the skills learned and the Skill Points.
     skills: skillsView(character, content),
+    // The evolution taken, or the two to choose from at class level 50.
+    evolution: evolutionPanel(character, content),
+    // On the test version, a test evolution can be undone (evolutions.js).
+    evolutionUndo: Boolean(row.evolution_undo),
     canResetPoints: row.level <= content.balance.progression.freeResetMaxLevel && spentPoints(character) > 0,
     stats: content.stats.map((stat) => ({
       id: stat.id,

@@ -2833,6 +2833,23 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
     - Krainy w zakładce Bestiariusz zwijają się tak samo. Na start rozwinięta jest kraina poziomu postaci i każda z czekającą skrzynią.
     - Gra pamięta, co gracz zwinął albo rozwinął, dopóki jest otwarta.
 
+## Ewolucje: budowa (29.10.2026, na wersji testowej)
+
+Ewolucje według „Ewolucji: odpowiedzi autora” i zatwierdzonej propozycji (cechy, przyrost statystyk, umiejętności). Dane są w `data/evolutions.json`, zasady w `src/engine/evolutions.js`. Liczby to brakujące szczegóły, rozstrzygnięte najprościej, do ustawienia w symulacji.
+
+1. **Wybór.** Na 50. poziomie klasy, gdy obie ścieżki są wybrane, a punkty rozdane, gracz widzi w Umiejętnościach dwie ewolucje swoich ścieżek, główną pierwszą. Każda karta ma przyrost statystyk, cechę i dwie umiejętności z liczbami na 45. poziomie. Wybór jest na stałe i potwierdzony jeszcze raz.
+    - Klasa czeka na 50. poziomie, aż gracz wybierze ewolucję, tak jak dziś czeka na drugą ścieżkę i punkty (brakujący szczegół). Zdobyte XP klasy nie przepada.
+    - Postać, która przekroczyła już 50. poziom bez ewolucji, wybiera ją w każdej chwili. Przyrost ewolucji liczy się wtedy od 51. poziomu.
+2. **Umiejętności i punkty.** Obie dotychczasowe umiejętności znikają, a w ich miejsce wchodzą dwie umiejętności ewolucji na poziomie 0. Wraca 40 Punktów Umiejętności, a poziomy klasy 50–99 dają po jednym, razem 90 na dwie umiejętności po 45 poziomów.
+    - Umiejętność ewolucji na poziomie 20 jest co najmniej tak silna jak stara na 20 i ma swój nowy skutek.
+    - Na 100. poziomie klasa czeka, dopóki zostają punkty (E8).
+3. **Statystyki.** Od 51. poziomu klasy statystyki rosną według ewolucji, a nie klasy. HP i mana na poziom klasy zostają jak w klasie, a Arkanista dostaje 4 many zamiast 3 (brakujący szczegół).
+4. **Nazwa.** Górny pasek pokazuje trzy pierwsze litery ewolucji, np. „BAR”, ranking jej pełną nazwę, a karta postaci dopisek „z klasy: Wojownik”. Czat zostaje przy znaku klasy.
+5. **Ceremonia.** Po wyborze otwiera się karta Systemu z nazwą ewolucji i cechą, a gra muzyka autora „Ewolucja klasy” (`evolution-v1`). Po zamknięciu karty wraca muzyka zakładki. Na razie ceremonia jest bez głosu narratora (brakujący szczegół): kwestie można dodać po zatwierdzeniu tekstów.
+6. **Testuj ewolucję** (wersja testowa, przycisk w Ustawieniach, obok „Testuj samouczki”). Daje każdą z trzech ewolucji klasy na dowolnym poziomie klasy. „Cofnij ewolucję” przywraca umiejętności sprzed testu.
+7. **Teksty i grafiki.** Zdania fabularne pod nazwami umiejętności ewolucji są robocze, do oceny autora. Do czasu nowych ikon rozwinięta umiejętność ma ikonę tej, z której wyrasta, a nowa pierwszą literę. Portrety ewolucji przyjdą osobno.
+8. **Walka.** Działanie nowych skutków umiejętności i cech w walce to następny krok. Do tego czasu rozwinięte umiejętności działają jak swoje podstawy z nowymi liczbami, a część nowych skutków jeszcze nie działa.
+
 ## Encyklopedia (29.10.2026, w grze od 0.0.57)
 
 To plan autora z „Uwag autora po 0.0.55”, punkty 5–7. Liczby i szczegóły to brakujące szczegóły, rozstrzygnięte najprościej.

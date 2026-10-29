@@ -187,6 +187,8 @@ export function skillView(skill, level, content) {
   return {
     id: skill.id,
     name: skill.name,
+    // An evolution's skill grown from one of the class's (evolutions.js).
+    from: skill.from ?? null,
     path: skill.path,
     style: skill.style,
     rarity: skill.rarity,

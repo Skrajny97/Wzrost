@@ -6550,6 +6550,73 @@ button.skill-row {
   box-shadow: 0 0 10px rgba(217, 180, 90, 0.35);
 }
 
+/* The class evolutions (evolution.js): the two to choose from at class
+   level 50, the one taken, and the ceremony. */
+.evolution-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.evolution-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-color: var(--rarity-epic, #a87fd6);
+}
+
+.evolution-name,
+.evolution-subtitle {
+  margin: 0;
+}
+
+.evolution-name {
+  color: #c9a8ef;
+  font-size: 22px;
+}
+
+.evolution-growth,
+.evolution-trait {
+  margin: 0;
+}
+
+.evolution-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.evolution-skills .skill-effect {
+  margin: 2px 0 0;
+}
+
+.evolution-current {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-color: #a87fd6;
+}
+
+.evolution-current .card-title {
+  margin: 0;
+  color: #c9a8ef;
+}
+
+.evolution-ceremony {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+
+.evolution-ceremony-title {
+  color: #c9a8ef;
+  font-size: 26px;
+}
+
 .skill-row--ready .skill-row-level {
   color: var(--gold);
 }

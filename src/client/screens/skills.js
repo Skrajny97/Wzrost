@@ -4,7 +4,9 @@
 // Skill Point, which closes the path left. Each path's name stands over its
 // skill. Each class level from 10 to 49 brings a Skill Point, and the points
 // raise the learned skills, up to level 20. Both paths and the points are due
-// by the first evolution (class level 50): until then the class waits there.
+// by the first evolution (class level 50): until then the class waits there,
+// and then for the evolution chosen of the two paths (evolution.js). After
+// it the tab holds the evolution's two skills, up to level 45.
 // The server sends every card ready to show (skillsView in the engine); a tap
 // on a learned skill opens its card. The narrator's tour of the tab
 // (narrator.js) points at the places marked data-guide.
@@ -12,13 +14,19 @@
 import { fill, h } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
 import { skillSprite } from '../art.js';
+import { chooseEvolution, evolutionCard } from '../evolution.js';
 import { motionOn } from '../motion.js';
 import { call, isUnlocked, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from '../ui.js';
 
-// The skill's icon: its sprite, or the first letter while it has none.
+// The skill's icon: its sprite, that of the skill it grew from while an
+// evolution's has none of its own, or its first letter.
 const skillIcon = (skill, size = 'large') =>
-  h('span', { class: `skill-icon skill-icon--${size}`, 'aria-hidden': 'true' }, skillSprite(skill.id) ?? h('span', { class: 'skill-letter', text: skill.name[0] }));
+  h(
+    'span',
+    { class: `skill-icon skill-icon--${size}`, 'aria-hidden': 'true' },
+    skillSprite(skill.id) ?? (skill.from && skillSprite(skill.from)) ?? h('span', { class: 'skill-letter', text: skill.name[0] }),
+  );
 
 const levelText = (skill) => `Poziom ${skill.level} / ${skill.maxLevel}`;
 const skillPoints = (count) => countOf(count, 'Punkt Umiejętności', 'Punkty Umiejętności', 'Punktów Umiejętności');
@@ -29,6 +37,9 @@ const PATH_LABELS = { main: 'Ścieżka główna', second: 'Ścieżka poboczna', 
 // The main path on top, the side path under it, the paths still open in
 // their order, and a closed one at the bottom.
 const PATH_ORDER = { main: 0, second: 1, closed: 3 };
+
+// What the class waits for at an evolution level, by the reason's code.
+const WAITS_FOR = { second_path: 'wybierzesz ścieżkę poboczną', skill_points: 'rozdasz Punkty Umiejętności', evolve: 'wybierzesz ewolucję' };
 
 export function mountSkills(container) {
   function render() {
@@ -55,13 +66,54 @@ export function mountSkills(container) {
       container,
       heading,
       waiting &&
-        systemPanel(
-          `Klasa czeka na ${evolution.level}. poziomie, u progu ewolucji. Urośnie dalej, gdy ${evolution.need === 'second_path' ? 'wybierzesz ścieżkę poboczną' : 'rozdasz Punkty Umiejętności'}. Zdobyte XP klasy nie przepada.`,
-        ),
+        systemPanel(`Klasa czeka na ${evolution.level}. poziomie, u progu ewolucji. Urośnie dalej, gdy ${WAITS_FOR[evolution.need]}. Zdobyte XP klasy nie przepada.`),
       busy && systemPanel('Postać jest na wyprawie. Umiejętności zmienisz po jej powrocie.'),
-      view.pools.map((pool) => poolSection(pool, view, busy)),
+      evolutionSection(character, busy),
+      view.pools.map((pool) => (pool.evolution ? evolutionPool(pool, view, busy) : poolSection(pool, view, busy))),
     );
     slidePaths(before);
+  }
+
+  // The evolution: the one taken, with its trait, or the two to choose from
+  // once the class may take one.
+  function evolutionSection(character, busy) {
+    const { current, choices } = character.evolution ?? { current: null, choices: [] };
+    const t = state.content.evolutionTexts;
+    if (current) {
+      return h(
+        'section',
+        { class: 'card evolution-current', 'aria-label': t.title },
+        h('h2', { class: 'card-title', text: current.name }),
+        h('p', { class: 'muted', text: t.baseClass.replace('{className}', character.baseClassName) }),
+        h('p', { class: 'evolution-trait' }, h('strong', { text: `${t.trait}: ${current.trait.name}. ` }), current.trait.text),
+      );
+    }
+    if (choices.length === 0) return null;
+    return h(
+      'section',
+      { class: 'evolution-choice', 'aria-label': t.title },
+      h('h2', { class: 'section-title', text: t.title }),
+      systemPanel(t.intro.replace('{level}', String(character.skills.evolution.level))),
+      choices.map((choice) => evolutionCard(choice, { busy, onChoose: (button, chosen) => chooseEvolution(button, chosen) })),
+    );
+  }
+
+  // The evolution's two skills, with the points to share between them.
+  function evolutionPool(pool, view, busy) {
+    const raisable = pool.options.some((skill) => skill.level < skill.maxLevel);
+    return h(
+      'section',
+      { class: 'skill-paths', 'aria-label': 'Umiejętności ewolucji' },
+      view.points > 0 && raisable && systemPanel(`Masz ${skillPoints(view.points)}. Dotknij umiejętności ewolucji, żeby dodać punkt. Każdy poziom klasy do ${view.lastPointLevel}. daje jeden.`),
+      pool.options.map((skill) =>
+        h(
+          'section',
+          { class: `skill-path skill-path--${skill.state}`, 'data-skill': skill.id, 'aria-label': `Umiejętność ewolucji: ${skill.name}` },
+          h('h2', { class: 'skill-path-title' }, h('span', { class: 'skill-path-label', text: 'Umiejętność ewolucji' }), h('span', { class: 'skill-path-name', text: skill.path })),
+          learnedRow(skill, view, busy),
+        ),
+      ),
+    );
   }
 
   // Where each path stands on the page, by its skill.
@@ -227,13 +279,13 @@ export function mountSkills(container) {
     openSheet(
       h('div', { class: 'skill-head' }, skillIcon(skill), h('div', {}, h('h2', { class: 'sheet-title', text: skill.name }), h('p', { class: 'skill-style', text: `${skill.style} · ${levelText(skill)}` }))),
       h('p', { class: 'skill-description', text: skill.description }),
-      h('h3', { class: 'skill-subtitle', text: 'Teraz' }),
+      h('h3', { class: 'skill-subtitle', text: skill.level > 0 ? 'Teraz' : 'Na poziomie 1' }),
       h('p', { class: 'skill-effect', text: skill.effect }),
       skill.next && h('h3', { class: 'skill-subtitle', text: `Na poziomie ${skill.level + 1}` }),
       skill.next && h('p', { class: 'skill-effect skill-effect--next', text: skill.next }),
       h('p', { class: 'skill-cost', text: skill.cost }),
       h('p', { class: 'muted', text: `Punkty Umiejętności: ${formatNumber(view.points)}. Każdy poziom klasy do ${view.lastPointLevel}. daje jeden.` }),
-      h('p', { class: 'muted', text: `Ścieżka: ${skill.path}. Zdecyduje o ewolucji klasy.` }),
+      h('p', { class: 'muted', text: state.character.evolution?.current ? `Umiejętność ewolucji: ${skill.path}.` : `Ścieżka: ${skill.path}. Zdecyduje o ewolucji klasy.` }),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: closeSheet, text: 'Zamknij' }), raise),
     );
   }

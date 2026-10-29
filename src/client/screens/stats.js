@@ -82,14 +82,15 @@ export function mountStats(container) {
     );
   }
 
-  // Before the first evolution, after it, or the class waiting at it for
-  // its skills (evolutionBlock in the engine).
+  // Before the first evolution, the class waiting at it for its skills or
+  // the choice (evolutionBlock in the engine), or the evolution taken.
   function evolutionHint(character, evolution) {
-    if (character.classLevel < evolution) return `PIERWSZA EWOLUCJA: POZ. KLASY ${evolution}`;
     const need = character.skills?.evolution?.need;
-    if (need === 'second_path') return 'KLASA CZEKA: WYBIERZ ŚCIEŻKĘ POBOCZNĄ';
     if (need === 'skill_points') return 'KLASA CZEKA: ROZDAJ PUNKTY UMIEJĘTNOŚCI';
-    return 'EWOLUCJA KLASY: WKRÓTCE';
+    if (character.evolution?.current) return `EWOLUCJA: ${character.className.toUpperCase()}`;
+    if (character.classLevel < evolution) return `PIERWSZA EWOLUCJA: POZ. KLASY ${evolution}`;
+    if (need === 'second_path') return 'KLASA CZEKA: WYBIERZ ŚCIEŻKĘ POBOCZNĄ';
+    return 'KLASA CZEKA: WYBIERZ EWOLUCJĘ W UMIEJĘTNOŚCIACH';
   }
 
   function levelsCard(character) {

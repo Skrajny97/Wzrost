@@ -16,3 +16,7 @@ export function testModeFor(env, login) {
 // "Testuj samouczki" (testing.js): every tutorial from its start, on the test
 // version only (TUTORIAL_TESTS "on"), for the accounts with test mode.
 export const tutorialTestsFor = (env, login) => env.TUTORIAL_TESTS === 'on' && testModeFor(env, login);
+
+// "Testuj ewolucję" (evolutions.js): any evolution of the class at any class
+// level, with a way back, where "Testuj samouczki" works.
+export const evolutionTestsFor = tutorialTestsFor;

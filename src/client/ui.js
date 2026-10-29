@@ -62,6 +62,18 @@ export function closeSheet() {
   if (dialog.open) dialog.close();
 }
 
+// Calls `then` once the sheet on show closes; the close of the one before
+// it, still on its way, does not count.
+export function afterSheet(then) {
+  const dialog = sheet();
+  const closed = () => {
+    if (dialog.open) return;
+    dialog.removeEventListener('close', closed);
+    then();
+  };
+  dialog.addEventListener('close', closed);
+}
+
 export function initSheet() {
   const dialog = sheet();
   // A tap on the dimmed backdrop (outside the sheet body) closes it.

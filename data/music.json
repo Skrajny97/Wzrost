@@ -5,10 +5,11 @@
     { "id": "defeat-v1", "name": "Omdlenie", "file": "audio/music/defeat-v1.mp3" },
     { "id": "skills-v1", "name": "Umiejętności", "file": "audio/music/skills-v1.mp3" },
     { "id": "professions-v1", "name": "Profesje", "file": "audio/music/professions-v1.mp3" },
-    { "id": "camp-v1", "name": "Obóz", "file": "audio/music/camp-v1.mp3" }
+    { "id": "camp-v1", "name": "Obóz", "file": "audio/music/camp-v1.mp3" },
+    { "id": "evolution-v1", "name": "Ewolucja klasy", "file": "audio/music/evolution-v1.mp3" }
   ],
   "default": "background-v1",
-  "places": { "camp": "camp-v1", "skills": "skills-v1", "professions": "professions-v1" },
+  "places": { "camp": "camp-v1", "skills": "skills-v1", "professions": "professions-v1", "evolution": "evolution-v1" },
   "reports": { "success": "victory-v1", "fainted": "defeat-v1" },
   "fadeOutSeconds": 5,
   "pauseSeconds": 2.5,

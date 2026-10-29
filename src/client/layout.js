@@ -222,8 +222,11 @@ export function updateTopbar(now = serverNow()) {
   const character = state.character;
   if (!topbar || !character) return;
   topbar.level.textContent = `POZ. ${character.level}`;
-  // The class by its short name, so the bar fits a phone (Woj for Wojownik).
-  const short = state.content?.classes.find((cls) => cls.id === character.classId)?.short ?? character.className;
+  // The class by its short name, so the bar fits a phone (Woj for Wojownik);
+  // an evolution by the first letters of its name (Bar for Barbarzyńca).
+  const short = character.evolution?.current
+    ? character.className.slice(0, 3)
+    : (state.content?.classes.find((cls) => cls.id === character.classId)?.short ?? character.className);
   topbar.className.textContent = short.toUpperCase();
   topbar.classNumber.textContent = String(character.classLevel);
   topbar.classLevel.setAttribute('aria-label', `${character.className} ${character.classLevel}`);

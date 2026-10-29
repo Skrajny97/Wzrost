@@ -104,6 +104,8 @@ export function publicContent() {
       description,
       position,
     })),
+    // The words of the class evolutions' choice and ceremony.
+    evolutionTexts: content.evolutionTexts,
     elements: content.elements.map(({ id, name, resistance, color }) => ({ id, name, resistance, color })),
     effects: content.effects.map(({ id, name, color }) => ({ id, name, color })),
     slots: content.slots,

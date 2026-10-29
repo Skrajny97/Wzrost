@@ -61,6 +61,16 @@ export function perClassLevelOf(character, content) {
   return { hp: mix('hp'), mana: mix('mana') };
 }
 
+// The evolution in the character's view: the one it took, with its card,
+// or, once it may take one (class level 50 and the skills ready), the cards
+// of its two to choose from.
+export function evolutionPanel(character, content) {
+  const current = evolutionOf(character, content);
+  if (current) return { current: evolutionView(current, content), choices: [] };
+  const ready = character.classLevel >= content.balance.progression.classEvolutionLevels[0] && !skillsBlock(character, content);
+  return { current: null, choices: ready ? evolutionChoices(character, content).map((evolution) => evolutionView(evolution, content)) : [] };
+}
+
 // An evolution's card: its name, path, growth per class level, trait and
 // skills with their numbers at the top level (the author: the numbers in
 // their descriptions are those of the top level).
@@ -69,6 +79,8 @@ export function evolutionView(evolution, content) {
   return {
     id: evolution.id,
     name: evolution.name,
+    // The level the skills' numbers are told at.
+    skillLevel: top,
     path: evolution.path,
     pathName: content.skillsById[evolution.path]?.name ?? null,
     growth: Object.entries(evolution.growth).map(([stat, value]) => ({ stat, name: content.statsById[stat].name, value })),
