@@ -162,7 +162,51 @@
       "bracers": "pair of brown leather bracers reinforced with iron strips, single inventory item icon",
       "pointed-shoes": "pair of soft brown leather shoes with long pointed toes, medieval poulaines, single inventory item icon",
       "reliquary": "small silver reliquary box pendant with an engraved lid, hung on a leather cord, single inventory item icon",
-      "signet-ring": "heavy gold signet ring with a flat engraved crest face, single inventory item icon"
+      "signet-ring": "heavy gold signet ring with a flat engraved crest face, single inventory item icon",
+      "saber": "curved single-edged steel sabre with a closed brass knuckle guard and a black leather grip, diagonal, single inventory item icon",
+      "bearded-axe": "slavic bearded axe, an iron head with a long lower blade hooked down like a beard, on a straight ash haft wrapped in leather, diagonal, single inventory item icon",
+      "kindjal": "long straight double-edged kindjal dagger with a wide blade and a central groove, a small silver guard and a dark horn grip with silver rivets, diagonal, single inventory item icon",
+      "longbow": "tall plain yew longbow, one long gently curved pale wooden stave with a leather grip in the middle, taut string, diagonal, single inventory item icon",
+      "posokh": "tall gnarled dark oak staff with a hooked crook at the top wrapped in silver wire, a glowing amber stone set in the crook, diagonal, single inventory item icon",
+      "rosary": "wooden prayer bead rosary with a small silver cross, the round beads glowing with warm golden holy light, single inventory item icon",
+      "kalkan": "round convex steel shield with a gilded central boss and engraved concentric rings, single inventory item icon",
+      "war-quiver": "tall stiff dark leather quiver reinforced with iron bands and rivets, full of arrows with grey goose fletching, single inventory item icon",
+      "parrying-dagger": "parrying dagger with a straight narrow steel blade, long curved quillons and a side ring guard, dark leather grip, diagonal, single inventory item icon",
+      "crystal": "faceted clear quartz crystal glowing with cold blue light inside, held in a small iron claw stand, single inventory item icon",
+      "hat": "wide-brimmed dark brown leather hat with a long pheasant feather tucked into the band, single inventory item icon",
+      "kettle-hat": "steel kettle hat helmet with a wide sloping brim all around and a riveted ridge over the crown, single inventory item icon",
+      "monk-hood": "deep brown wool monk hood with a short shoulder cape and a knotted rope cord, an empty garment with nobody wearing it, single inventory item icon",
+      "caftan": "long dark green caftan coat with a high collar and a row of round brass buttons down the front, an empty garment with nobody wearing it, single inventory item icon",
+      "cuirass": "polished steel cuirass breastplate with a raised central ridge, brass rivets and leather shoulder straps, an empty armor with nobody wearing it, single inventory item icon",
+      "rune-cloak": "long hooded midnight blue mage cloak with a border of faintly glowing silver runes, an empty garment with nobody wearing it, single inventory item icon",
+      "dalmatic": "white liturgical dalmatic tunic with wide short sleeves and two vertical gold-embroidered bands, an empty garment with nobody wearing it, single inventory item icon",
+      "vambraces": "pair of steel vambraces made of riveted plates over brown leather, single inventory item icon",
+      "laced-shoes": "pair of sturdy brown leather laced ankle boots with thick soles, single inventory item icon",
+      "pendant": "heavy pendant, a polished green stone in a silver setting hanging on a leather cord, single inventory item icon",
+      "band-ring": "plain wide polished gold band ring with a thin engraved line around it, single inventory item icon",
+      "fang-charm": "a large curved wolf fang hanging on a braided leather thong with two small wooden beads, single inventory item icon",
+      "estoc": "long straight thrusting sword with a narrow stiff blade, a cross guard with a side ring and a long grip wrapped in red leather, diagonal, single inventory item icon",
+      "berdiche": "berdiche polearm, a long crescent moon shaped axe blade fixed to a long wooden shaft with iron bands, diagonal, single inventory item icon",
+      "yataghan": "yataghan, a short forward-curving single-edged sword with no guard and a white bone handle with wide flared ears at the end, diagonal, single inventory item icon",
+      "horn-bow": "powerful dark composite horn bow, black and brown with ivory tips curving back and a red leather grip, taut string, diagonal, single inventory item icon",
+      "star-staff": "slender white ash staff topped with a silver crescent moon holding a glowing pale blue star, diagonal, single inventory item icon",
+      "crozier": "golden bishop crozier, a tall staff with an ornate spiral crook at the top set with a small white gem, diagonal, single inventory item icon",
+      "heraldic-shield": "heater shield painted with a silver wolf on a green field, with a steel rim, single inventory item icon",
+      "falcon-quiver": "elegant dark leather quiver with a tooled falcon and brass fittings, full of arrows with brown falcon feather fletching, single inventory item icon",
+      "poniard": "slim poniard dagger with a long thin four-sided needle blade, a small round guard and a black grip with a ring pommel, diagonal, single inventory item icon",
+      "grimoire": "thick black grimoire bound in dark leather with silver corner plates, an iron lock and a glowing purple sigil on the cover, single inventory item icon",
+      "mask": "black leather half mask covering the eyes and the nose, with a thin silver trim and ties, single inventory item icon",
+      "visored-helmet": "steel helmet with a hinged pointed visor with eye slits and a riveted neck guard, single inventory item icon",
+      "mitre": "tall white bishop mitre with two pointed peaks, gold embroidered bands and two hanging ribbons at the back, single inventory item icon",
+      "buff-coat": "buff coat, a thick tan leather long coat with sleeves and steel clasps down the front, an empty garment with nobody wearing it, single inventory item icon",
+      "scale-armor": "polish karacena scale armor, a breastplate covered in rows of overlapping round steel scales with brass trim, an empty armor with nobody wearing it, single inventory item icon",
+      "star-robe": "long flowing deep violet mage robe with wide sleeves, embroidered with silver stars and moons, an empty garment with nobody wearing it, single inventory item icon",
+      "cope": "long liturgical cope cloak of red and gold brocade with a golden clasp at the front, an empty garment with nobody wearing it, single inventory item icon",
+      "gauntlets": "pair of articulated steel plate gauntlets with pointed knuckles, single inventory item icon",
+      "greaves": "pair of polished steel greaves with round knee plates and leather straps, single inventory item icon",
+      "medallion": "round golden medallion with an embossed sun face, on a thick gold chain, single inventory item icon",
+      "family-ring": "heavy silver ring with a large oval engraved bezel showing a family crest, single inventory item icon",
+      "amber": "a polished golden amber stone with a tiny insect trapped inside, hanging on a leather cord, single inventory item icon"
     }
   },
   "materials": {
@@ -426,7 +470,17 @@
     "prompts": {
       "comfrey": "a bundle of fresh comfrey: broad hairy dark green leaves, a thick fleshy pale root and a few small bell-shaped purple flowers, single inventory item icon",
       "mugwort": "a sprig of mugwort with feathery silvery grey-green leaves and tiny yellow-brown flower heads, tied with twine, single inventory item icon",
-      "nettle": "a bunch of stinging nettle with serrated bright green leaves and fine stinging hairs on the stem, single inventory item icon"
+      "nettle": "a bunch of stinging nettle with serrated bright green leaves and fine stinging hairs on the stem, single inventory item icon",
+      "plantain": "a rosette of narrow lance-shaped ribbed green plantain leaves with two thin brown flower spikes, single inventory item icon",
+      "st-johns-wort": "a sprig of st john's wort with clusters of small bright yellow five-petal flowers and small oval leaves, single inventory item icon",
+      "calamus": "a few long sword-shaped green calamus leaves rising from a thick knobby pale root, single inventory item icon",
+      "arnica": "three orange-yellow arnica flowers with ragged daisy-like petals on hairy green stems, single inventory item icon",
+      "wormwood": "a sprig of wormwood with deeply cut frosty silver-white leaves and tiny pale yellow flower balls, single inventory item icon",
+      "valerian": "a valerian plant with a flat cluster of tiny pale pink flowers on a tall stem and a bundle of brown roots, single inventory item icon",
+      "cranberry": "a small sprig of bog cranberry with shiny bright red round berries and tiny dark green leaves, single inventory item icon",
+      "aconite": "a tall stem of aconite with hooded deep violet-blue flowers, single inventory item icon",
+      "mistletoe": "a sprig of mistletoe with forked yellow-green stems, paired leathery leaves and white berries, single inventory item icon",
+      "fern-blossom": "a glowing magical fern flower, a fiery red and gold blossom shining with light above small green fern fronds, single inventory item icon"
     }
   },
   "potions": {
@@ -437,7 +491,9 @@
     "prompts": {
       "lesser-healing": "a small round glass potion flask with a cork stopper, filled with glowing ruby red liquid, a tiny green comfrey leaf tied to its neck with twine, single inventory item icon, bold clean outline",
       "lesser-mana": "a small round glass potion flask with a cork stopper, filled with glowing deep sapphire blue liquid, a tiny silvery mugwort sprig tied to its neck with twine, single inventory item icon, bold clean outline",
-      "lesser-speed": "a small round glass potion flask with a cork stopper, filled with glowing bright yellow-green liquid with tiny swirls, a small nettle leaf tied to its neck with twine, single inventory item icon, bold clean outline"
+      "lesser-speed": "a small round glass potion flask with a cork stopper, filled with glowing bright yellow-green liquid with tiny swirls, a small nettle leaf tied to its neck with twine, single inventory item icon, bold clean outline",
+      "healing": "a medium pear-shaped glass potion bottle with a cork stopper and twine at the neck, filled with glowing ruby red liquid, single inventory item icon, bold clean outline",
+      "greater-healing": "a large round-bellied glass potion bottle with a long neck, a red wax-sealed cork and a small brass label, filled with glowing ruby red liquid, single inventory item icon, bold clean outline"
     }
   },
   "professions": {
