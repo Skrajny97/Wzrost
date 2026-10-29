@@ -1,0 +1,25 @@
+{
+  "id": "medallion",
+  "payload": {
+    "prompt": "round golden medallion with an embossed sun face, on a thick gold chain, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 46312942,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793262349,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 50.22,
+    "request_id": "3ed19682-10a2-44e4-ad93-ad0213b69467",
+    "outputs_retained_until": 1793348711
+  }
+}

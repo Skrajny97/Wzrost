@@ -1,0 +1,25 @@
+{
+  "id": "star-robe",
+  "payload": {
+    "prompt": "long flowing deep violet mage robe with wide sleeves, embroidered with silver stars and moons, an empty garment with nobody wearing it, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 183397767,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793262135,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 50.94,
+    "request_id": "c020c1eb-cd6a-47a6-85a4-f30f03bbebb1",
+    "outputs_retained_until": 1793348515
+  }
+}

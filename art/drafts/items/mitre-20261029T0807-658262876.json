@@ -1,0 +1,25 @@
+{
+  "id": "mitre",
+  "payload": {
+    "prompt": "tall white bishop mitre with two pointed peaks, gold embroidered bands and two hanging ribbons at the back, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 658262876,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793261878,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 51.48,
+    "request_id": "9791a453-f1aa-42da-a94a-e76163afa38e",
+    "outputs_retained_until": 1793348192
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "horn-bow",
+  "payload": {
+    "prompt": "powerful dark composite horn bow, black and brown with ivory tips curving back and a red leather grip, taut string, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 408020298,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793261437,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 53.1,
+    "request_id": "07d3753b-a1b9-4c1c-a842-1bb6b1483841",
+    "outputs_retained_until": 1793347795
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "amber",
+  "payload": {
+    "prompt": "a polished golden amber stone with a tiny insect trapped inside, hanging on a leather cord, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 922831418,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793262449,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.86,
+    "request_id": "d399f204-e847-4ef3-860a-52953ad98b09",
+    "outputs_retained_until": 1793348803
+  }
+}

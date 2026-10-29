@@ -1,0 +1,25 @@
+{
+  "id": "berdiche",
+  "payload": {
+    "prompt": "berdiche polearm, a long crescent moon shaped axe blade fixed to a long wooden shaft with iron bands, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 334579652,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793261304,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 53.46,
+    "request_id": "e5573a4f-e060-4a0f-8185-42036de7de08",
+    "outputs_retained_until": 1793347685
+  }
+}

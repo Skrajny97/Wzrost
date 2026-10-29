@@ -1,0 +1,25 @@
+{
+  "id": "falcon-quiver",
+  "payload": {
+    "prompt": "elegant dark leather quiver with a tooled falcon and brass fittings, full of arrows with brown falcon feather fletching, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 572834152,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793261640,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 52.38,
+    "request_id": "d2643c41-5a88-403f-99fa-59bc673316e4",
+    "outputs_retained_until": 1793347997
+  }
+}

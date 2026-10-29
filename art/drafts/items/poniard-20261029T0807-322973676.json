@@ -1,0 +1,25 @@
+{
+  "id": "poniard",
+  "payload": {
+    "prompt": "slim poniard dagger with a long thin four-sided needle blade, a small round guard and a black grip with a ring pommel, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 322973676,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793261665,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 52.2,
+    "request_id": "c4b3f1e8-89be-485e-a668-a8a5ecbfdaee",
+    "outputs_retained_until": 1793348043
+  }
+}
