@@ -483,6 +483,8 @@ function campView(player, levels, now) {
         maxLevel: building.maxLevel,
         // The Stół rozbiórki: its screen shows the table (crafting).
         crafts: building.effect.kind === 'craftSpeed',
+        // The Kowadło: its screen lists the items to upgrade.
+        upgrades: building.effect.kind === 'upgradeCap',
         effect: level > 0 ? effectText(building, level, content) : null,
         production: store && {
           resource: store.resource,

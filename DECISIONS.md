@@ -2887,6 +2887,7 @@ To cztery pierwsze z zastosowań materiałów wybranych przez autora („Uwagi a
     - Pasuje materiał dowolnego gatunku tej rzadkości. Domyślnie schodzi ze stosu z największą liczbą sztuk, a lista na karcie pozwala wybrać inny.
     - Porażka zabiera materiał, tak samo jak złoto i rudę.
     - Bez materiału przycisk pisze „Brakuje materiału”, a serwer odpowiada 409 `no_material`.
+    - Autor: „pamietaj, ze ulepsza sie przedmioty nie tylko na Kowadle, ale i z pozycji samego przedmiotu”. Ekran Kowadła w obozie ma teraz część „Ulepszanie przedmiotów”: listę przedmiotów, założonych i z plecaka. Dotknięcie otwiera kartę przedmiotu z tym samym ulepszeniem co w plecaku, z materiałem od +5. Serwer pilnuje materiału przy każdym ulepszeniu, skądkolwiek przyjdzie.
 5. **Sprawdzanie.** Walidator danych sprawdza, czy każdy katalizator to istniejący materiał. Testy obejmują sprzedaż, Wymianę, katalizatory i Kowadło.
 
 ## Uwagi autora po 0.0.55 (29.10.2026, na wersji testowej)

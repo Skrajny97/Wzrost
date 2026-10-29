@@ -19,6 +19,7 @@ import { call, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEnt
 import { skipControl } from '../time.js';
 import { confirmAction, guided, systemPanel, toast, withButton } from '../ui.js';
 import { scrapperSheet } from '../scrapper.js';
+import { itemSheet, itemSummary } from './character.js';
 import { dayPart } from '../scenes.js';
 
 const CAMP = '#/oboz';
@@ -443,6 +444,7 @@ function mountBuilding(container, id) {
       waitingNote(id),
       nextLevel(building),
       building.crafts && craftTableSection(ticks),
+      building.upgrades && upgradeList(building),
       h(
         'article',
         { class: 'card building-view', 'aria-label': building.name },
@@ -457,6 +459,50 @@ function mountBuilding(container, id) {
       ),
     );
     tick(serverNow());
+  }
+
+  // The Kowadło's work: the character's items, worn first, each opening its
+  // card with the upgrade, as from the backpack (character.js). The author:
+  // items are upgraded "nie tylko na Kowadle, ale i z pozycji samego
+  // przedmiotu".
+  function upgradeList(building) {
+    const character = state.character;
+    const items = [
+      ...Object.values(character.equipment)
+        .filter(Boolean)
+        .map((item) => ({ item, equipped: true })),
+      ...character.bag.map((item) => ({ item, equipped: false })),
+    ];
+    return h(
+      'section',
+      { class: 'card anvil-items', 'aria-labelledby': 'anvil-items' },
+      h('h2', { class: 'card-title', id: 'anvil-items', text: 'Ulepszanie przedmiotów' }),
+      h('p', {
+        class: 'muted',
+        text:
+          building.level > 0
+            ? `Dotknij przedmiotu, żeby go ulepszyć. Kowadło ulepsza do +${building.level}.`
+            : 'Zbuduj Kowadło, żeby ulepszać przedmioty. Ulepszysz je tu albo z karty przedmiotu w plecaku.',
+      }),
+      items.length === 0
+        ? h('p', { class: 'muted', text: 'Nie masz jeszcze przedmiotów.' })
+        : h(
+            'ul',
+            { class: 'item-list' },
+            items.map(({ item, equipped }) =>
+              h(
+                'li',
+                {},
+                h(
+                  'button',
+                  { type: 'button', class: 'item-row', onClick: () => itemSheet(item, { equipped }) },
+                  itemSummary(item),
+                  equipped && h('span', { class: 'chip', text: 'założony' }),
+                ),
+              ),
+            ),
+          ),
+    );
   }
 
   // The store of a production building: how full it is, when it fills up,
