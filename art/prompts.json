@@ -479,7 +479,7 @@
       "valerian": "a valerian plant with a flat cluster of tiny pale pink flowers on a tall stem and a bundle of brown roots, single inventory item icon",
       "cranberry": "a small sprig of bog cranberry with shiny bright red round berries and tiny dark green leaves, single inventory item icon",
       "aconite": "a tall stem of aconite with hooded deep violet-blue flowers, single inventory item icon",
-      "mistletoe": "a sprig of mistletoe with forked yellow-green stems, paired leathery leaves and white berries, single inventory item icon",
+      "mistletoe": "a round green sprig of mistletoe, forked green stems with many pairs of oval leathery green leaves and clusters of small round white berries in the forks, single inventory item icon",
       "fern-blossom": "a glowing magical fern flower, a fiery red and gold blossom shining with light above small green fern fronds, single inventory item icon"
     }
   },
@@ -493,7 +493,10 @@
       "lesser-mana": "a small round glass potion flask with a cork stopper, filled with glowing deep sapphire blue liquid, a tiny silvery mugwort sprig tied to its neck with twine, single inventory item icon, bold clean outline",
       "lesser-speed": "a small round glass potion flask with a cork stopper, filled with glowing bright yellow-green liquid with tiny swirls, a small nettle leaf tied to its neck with twine, single inventory item icon, bold clean outline",
       "healing": "a medium pear-shaped glass potion bottle with a cork stopper and twine at the neck, filled with glowing ruby red liquid, single inventory item icon, bold clean outline",
-      "greater-healing": "a large round-bellied glass potion bottle with a long neck, a red wax-sealed cork and a small brass label, filled with glowing ruby red liquid, single inventory item icon, bold clean outline"
+      "greater-healing": "a large conical glass potion flask with a wide flat bottom and a narrow neck closed with a cork, filled with glowing ruby red liquid, simple clean shape, single inventory item icon, bold clean outline",
+      "aconite-oil": "a slim tall dark glass vial with a long thin neck and a black stopper, filled with dark violet oily poison, a small blue-violet aconite flower tied to the neck with twine, single inventory item icon, bold clean outline",
+      "mistletoe-elixir": "an elegant faceted crystal elixir bottle with a silver stopper, filled with glowing pale white-green liquid, a small sprig of mistletoe with white berries tied to the neck, single inventory item icon, bold clean outline",
+      "fern-brew": "a round ornate golden glass flask with a golden stopper, filled with glowing golden liquid, a tiny fiery red fern flower floating inside, single inventory item icon, bold clean outline"
     }
   },
   "professions": {
