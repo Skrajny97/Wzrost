@@ -27,6 +27,7 @@ import {
   fireUnitsMade,
   freePoints,
   gainedTimePoints,
+  heldDiscoveries,
   bagStacks,
   hoursToNext,
   isUnlocked,
@@ -34,6 +35,7 @@ import {
   itemView,
   materialPrice,
   materialView,
+  mergeDiscoveries,
   nextHuntUnlock,
   plannedLevel,
   playerCombatant,
@@ -42,6 +44,7 @@ import {
   questPeriod,
   questsStale,
   questsView,
+  readyChests,
   regenPerMinute,
   resourceExchange,
   restBonus,
@@ -146,7 +149,23 @@ export async function requirePlayer(context) {
   await settleBuilds(context.env.DB, player, context.now);
   await settleTimePoints(context.env.DB, player.row, context.now);
   await settleQuests(context.env.DB, player, context.now);
+  await settleDiscoveries(context.env.DB, player, context.now);
   return { session, player };
+}
+
+// The Encyklopedia's record with what the character holds now: its items,
+// potions, herbs, materials and parts, those of the Stół rozbiórki's
+// finished orders too (encyclopedia.js in the engine). So whatever passes
+// through the bag between two requests is written down.
+export async function settleDiscoveries(db, player, now) {
+  const { row } = player;
+  const { materials, parts } = settleCrafting(craftingState(row), now);
+  const held = heldDiscoveries({ items: player.items, potions: JSON.parse(row.potions ?? '{}'), herbs: JSON.parse(row.herbs ?? '{}'), materials, parts }, content);
+  const merged = mergeDiscoveries(JSON.parse(row.discovered ?? '{}'), held);
+  if (!merged) return;
+  const discovered = JSON.stringify(merged);
+  const result = await db.prepare('UPDATE characters SET discovered = ? WHERE id = ? AND discovered = ?').bind(discovered, row.id, row.discovered ?? '{}').run();
+  row.discovered = result.meta.changes === 1 ? discovered : (await db.prepare('SELECT discovered FROM characters WHERE id = ?').bind(row.id).first()).discovered;
 }
 
 // The character as it is now, with the builds whose time has come started:
@@ -830,6 +849,9 @@ export function characterView(player, now) {
     // The inner regions and lands whose Bestiariusz chest is open for their
     // lists as they are now (bestiary.js).
     bestiary: openedChests(JSON.parse(row.bestiary ?? '[]'), content),
+    // The Encyklopedia's chests ready to open, for the top bar's light
+    // (encyclopedia.js).
+    encyclopedia: { ready: readyChests(JSON.parse(row.discovered ?? '{}'), JSON.parse(row.encyclopedia ?? '[]'), content) },
     // The potions for a time still working (potions.js).
     buffs: activeBuffs(player, now),
     // The narrator's daily and weekly quests (quests.js).

@@ -13,7 +13,7 @@ export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
-  'events',
+  'events', 'encyclopedia',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'professions', 'settlement', 'dungeons', 'core'];
@@ -598,6 +598,7 @@ function checkReferences(data) {
     if (!section || section.soon) errors.push(`community.json: brak otwartego działu ${id}`);
   }
   errors.push(...checkEvents(data, { monsters, rarities }));
+  errors.push(...checkEncyclopedia(data));
   return errors;
 }
 
@@ -780,6 +781,38 @@ function checkWorkshop(data, ids) {
   if (!data.materials.parts.some((part) => part.id === scroll.part)) errors.push(`professions.json: zwój robi się z nieznanej części "${scroll.part}"`);
   if (crafter && scroll.level > crafter.maxLevel) errors.push('professions.json: zwój wymaga poziomu ponad profesję');
   if (data['item-bases'].some((base) => base.id === scroll.id)) errors.push(`professions.json: id zwoju "${scroll.id}" jest już bazą przedmiotu`);
+  return errors;
+}
+
+// The Encyklopedia: its tiers rising, every item base worn from the class
+// level of a tier, the thresholds rising and within their tab's entries,
+// every tab once, and the sentences the engine says.
+const ENCYCLOPEDIA_TEXTS = [
+  'accessories', 'tierItems', 'tierItemsFirst', 'tierLevels', 'itemDrop', 'itemDropAny', 'itemClasses', 'itemClass', 'itemAnyClass',
+  'itemOtherClasses', 'itemWear', 'itemPattern', 'itemBest', 'potionRecipe', 'potionHerbs', 'potionCatalyst', 'herbGather', 'herbEvent',
+  'materialDrop', 'materialGrades', 'trophyNeeds', 'trophyWon', 'partTable', 'partExchange', 'partShop', 'unknown',
+];
+
+function checkEncyclopedia(data) {
+  const { tabs, tiers, milestones, texts } = data.encyclopedia;
+  const errors = [];
+  uniqueIds(errors, 'encyclopedia (zakładki)', tabs);
+  tiers.forEach((tier, index) => {
+    if (index > 0 && (tier.classLevel <= tiers[index - 1].classLevel || tier.upTo <= tiers[index - 1].upTo)) errors.push('encyclopedia.json: tiers muszą rosnąć');
+  });
+  if (tiers[0]?.classLevel !== 1) errors.push('encyclopedia.json: pierwszy tier musi być od 1. poziomu klasy');
+  const tierLevels = new Set(tiers.map((tier) => tier.classLevel));
+  for (const base of data['item-bases']) {
+    if (!tierLevels.has(base.classLevel ?? 1)) errors.push(`encyclopedia.json: baza ${base.id} (poziom klasy ${base.classLevel ?? 1}) nie ma swojego tieru`);
+  }
+  const totals = { potions: data.professions.potions.length, herbs: data.professions.herbs.length, materials: data.materials.materials.length, parts: data.materials.parts.length };
+  for (const [tab, counts] of Object.entries(milestones)) {
+    counts.forEach((count, index) => {
+      if (index > 0 && count <= counts[index - 1]) errors.push(`encyclopedia.json: progi ${tab} muszą rosnąć`);
+    });
+    if (counts.at(-1) > totals[tab]) errors.push(`encyclopedia.json: próg ${counts.at(-1)} w ${tab} jest większy niż liczba wpisów (${totals[tab]})`);
+  }
+  for (const key of ENCYCLOPEDIA_TEXTS) if (!texts[key]) errors.push(`encyclopedia.json: brak tekstu ${key}`);
   return errors;
 }
 

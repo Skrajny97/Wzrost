@@ -5,6 +5,7 @@ import {
   addBuff,
   addQuestProgress,
   applyHunt,
+  areaDangers,
   areaFor,
   areasOpened,
   areaUnlocked,
@@ -38,6 +39,7 @@ import {
   questCreatures,
   questPeriod,
   rareCatchUp,
+  trophyBonuses,
   sellPrice,
   resolveEvent,
   returnWindows,
@@ -265,10 +267,14 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
   const windows = buffWindows(buffs, minutes);
   const timed = Object.keys(windows).length > 0;
   const unknown = trackUnknown ? unknownCreatures(area, JSON.parse(player.row.met ?? '[]')) : [];
+  // The Encyklopedia's trophies for the creatures of this place, as at the
+  // start: the report comes out the same whenever it is claimed.
+  const trophies = trophyBonuses(JSON.parse(player.row.discovered ?? '{}'), content, areaDangers(area, content).map((danger) => danger.monsterId));
   const options = {
     ...(Object.keys(taken).length > 0 && { potions: taken, healBelow: healBelow ?? content.potionUse.healBelow }),
     ...(timed && { buffs: windows }),
     ...(unknown.length > 0 && { unknown }),
+    ...(Object.keys(trophies).length > 0 && { trophies }),
     ...(quick && { quick }),
     ...(flash && { flash }),
   };
@@ -406,6 +412,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       potions: options.potions ?? {},
       healBelow: options.healBelow,
       buffs: optionWindows(options),
+      trophies: options.trophies ?? {},
     },
     content,
   );

@@ -5,6 +5,7 @@ import { deleteAccount, login, logout, me, register } from './accounts.js';
 import { authorPanel, authorSkillDemo, authorSkills } from './author.js';
 import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
+import { openEncyclopediaChest, readEncyclopedia } from './encyclopedia.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyParts, cancelBuilding, collectProduction, exchangeResources, startBuilding, tradeAtFire } from './camp.js';
 import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
@@ -83,6 +84,8 @@ const routes = [
   ['POST', '/api/quests/claim-all', claimAllQuests],
   ['POST', '/api/quests/chest', openChest],
   ['POST', '/api/bestiary/chest', openBestiaryChest],
+  ['GET', '/api/encyclopedia', readEncyclopedia],
+  ['POST', '/api/encyclopedia/chest', openEncyclopediaChest],
   ['GET', '/api/hunts/options', huntOptions],
   ['POST', '/api/hunts', startHunt],
   ['POST', '/api/hunts/cancel', cancelHunt],

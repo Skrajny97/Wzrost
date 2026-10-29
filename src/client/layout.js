@@ -1,14 +1,15 @@
 // The frame around every game screen: the fixed top bar (levels, the
 // narrator's quests, HP and mana, character and class XP, gold and Punkty
 // Systemu with the camp's resources, the camp, current activity with the
-// pouch of parts beside it) and the two bottom bars, the main menu and the
+// Encyklopedia beside it) and the two bottom bars, the main menu and the
 // character bar with its own background.
 
-import { goldArt, materialSprite, narratorFace, resourceArt, timePointsArt } from './art.js';
+import { encyclopediaArt, goldArt, narratorFace, resourceArt, timePointsArt } from './art.js';
+import { bestiaryReady } from './bestiary.js';
 import { activeBuffs, updateBonusTimes } from './bonuses.js';
 import { communityNews, communityNewsText } from './chat-news.js';
 import { $, fill, h, icon } from './dom.js';
-import { countOf, formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
+import { formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
 import { SYSTEM_POINTS_ICON } from './icons.js';
 import { anyClaimable, showQuests } from './quests.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
@@ -59,21 +60,10 @@ export function buildTopbar(onSettings) {
   const wallet = h('ul', { class: 'wallet-list', id: 'wallet-list', hidden: true });
   // When the next Punkt Czasu comes, under its row.
   const timeNote = h('span', { class: 'wallet-note' });
-  // The parts for crafting apart from the wallet, by the current activity;
-  // the materials have their own tab in the backpack.
-  const pouch = h('div', { class: 'pouch-panel', id: 'pouch-panel', hidden: true });
-  const pouchButton = h(
-    'button',
-    {
-      type: 'button',
-      class: 'pouch-button',
-      'aria-label': 'Części do rzemiosła',
-      'aria-expanded': 'false',
-      'aria-controls': 'pouch-panel',
-      onClick: () => showPouch(pouch.hidden),
-    },
-    icon('pouch', { size: 24 }),
-  );
+  // The Encyklopedia by the current activity, where the pouch of parts was
+  // (the parts have their tab in the backpack); a dot when a chest waits
+  // there or in a Bestiariusz.
+  const encyclopedia = h('a', { class: 'encyclopedia-button', href: '#/encyklopedia', 'aria-label': 'Encyklopedia' }, encyclopediaArt(28));
   const goldButton = h(
     'button',
     {
@@ -147,7 +137,7 @@ export function buildTopbar(onSettings) {
     wallet,
     // Two rows: HP over mana, character XP over class XP.
     h('div', { class: 'meters' }, hp.element, xp.element, mana.element, classXp.element),
-    h('div', { class: 'activity-row' }, pouchButton, speed, activity, pouch),
+    h('div', { class: 'activity-row' }, encyclopedia, speed, activity),
   );
   topbar = {
     level,
@@ -160,8 +150,7 @@ export function buildTopbar(onSettings) {
     goldButton,
     wallet,
     timeNote,
-    pouch,
-    pouchButton,
+    encyclopedia,
     camp,
     campLabel,
     hp,
@@ -201,7 +190,6 @@ function walletRows(timePoints) {
 // Opens or closes the list of resources under the gold.
 export function showWallet(open) {
   if (!topbar) return;
-  if (open) showPouch(false);
   topbar.wallet.hidden = !open;
   topbar.goldButton.setAttribute('aria-expanded', String(open));
   topbar.walletKey = null;
@@ -219,72 +207,15 @@ function refreshWallet(now = serverNow()) {
   fill(topbar.wallet, ...walletRows(points));
 }
 
-// The parts made, with the way to the table.
-function pouchRows(character) {
-  const { crafting } = character;
-  const table = character.camp.buildings.find((building) => building.crafts);
-  const parts = crafting.parts.filter((part) => part.count > 0);
-  const row = (art, name, color, count) =>
-    h(
-      'li',
-      { class: 'wallet-item pouch-item' },
-      h('span', { class: 'pouch-art' }, art),
-      h('span', { class: 'wallet-name', vars: { '--rarity': color }, text: name }),
-      h('span', { class: 'wallet-amount', text: formatNumber(count) }),
-    );
-  const tableText =
-    crafting.queue.length > 0
-      ? `Na stole: ${countOf(crafting.queue.length, 'zlecenie', 'zlecenia', 'zleceń')}`
-      : table?.level > 0
-        ? 'Stół rozbiórki'
-        : 'Zbuduj Stół rozbiórki w obozie';
-  return [
-    h('p', { class: 'pouch-title', id: 'pouch-parts', text: 'Części do rzemiosła' }),
-    parts.length === 0
-      ? h('p', { class: 'pouch-empty', text: 'Stół rozbiórki robi je z materiałów i rozebranych przedmiotów.' })
-      : h(
-          'ul',
-          { class: 'pouch-list', 'aria-labelledby': 'pouch-parts' },
-          parts.map((part) => row(materialSprite(part.id) ?? icon('hammer', { size: 24 }), part.name, part.color, part.count)),
-        ),
-    table && h('a', { class: 'pouch-link', href: `#/oboz/${table.id}`, onClick: () => showPouch(false) }, h('span', { text: tableText }), icon('chevron', { size: 16 })),
-  ];
-}
-
-// Opens or closes the parts under the pouch; the wallet closes.
-export function showPouch(open) {
-  if (!topbar) return;
-  if (open) showWallet(false);
-  topbar.pouch.hidden = !open;
-  topbar.pouchButton.setAttribute('aria-expanded', String(open));
-  topbar.pouchKey = null;
-  if (open) refreshPouch();
-}
-
-// Redrawn only when a count or the queue changes.
-function refreshPouch() {
-  const character = state.character;
-  const { crafting } = character;
-  const table = character.camp.buildings.find((building) => building.crafts);
-  const key = JSON.stringify([crafting.parts.map((part) => part.count), crafting.queue.length, table?.level]);
-  if (key === topbar.pouchKey) return;
-  topbar.pouchKey = key;
-  fill(topbar.pouch, ...pouchRows(character));
-}
-
 // A tap anywhere else, or Escape, closes the list.
 document.addEventListener('click', (event) => {
   if (topbar && !topbar.wallet.hidden && !topbar.wallet.contains(event.target) && !topbar.goldButton.contains(event.target)) {
     showWallet(false);
   }
-  if (topbar && !topbar.pouch.hidden && !topbar.pouch.contains(event.target) && !topbar.pouchButton.contains(event.target)) {
-    showPouch(false);
-  }
 });
 document.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape' || !topbar) return;
   if (!topbar.wallet.hidden) showWallet(false);
-  if (!topbar.pouch.hidden) showPouch(false);
 });
 
 export function updateTopbar(now = serverNow()) {
@@ -303,7 +234,10 @@ export function updateTopbar(now = serverNow()) {
     `Złoto: ${formatNumber(character.gold)}, Punkty Systemu: ${formatNumber(character.systemPoints)}. Zasoby`,
   );
   if (!topbar.wallet.hidden) refreshWallet(now);
-  if (!topbar.pouch.hidden) refreshPouch();
+  // A dot when a chest of the Encyklopedia or a Bestiariusz waits.
+  const chests = (character.encyclopedia?.ready ?? 0) + bestiaryReady(character, state.content);
+  topbar.encyclopedia.classList.toggle('encyclopedia-button--ready', chests > 0);
+  topbar.encyclopedia.setAttribute('aria-label', chests > 0 ? 'Encyklopedia, skrzynie do otwarcia' : 'Encyklopedia');
   // A dot when a quest's reward or a chest waits.
   const waiting = anyClaimable(character);
   topbar.quests.classList.toggle('quest-button--ready', waiting);
@@ -415,6 +349,9 @@ export function updateNav({ kind, active, onBack }) {
   const camp = $('.camp-button');
   if (active === 'oboz') camp?.setAttribute('aria-current', 'page');
   else camp?.removeAttribute('aria-current');
+  const encyclopedia = $('.encyclopedia-button');
+  if (active === 'encyklopedia') encyclopedia?.setAttribute('aria-current', 'page');
+  else encyclopedia?.removeAttribute('aria-current');
   const main = $('#nav-main');
   const character = $('#nav-character');
   main.hidden = kind !== 'main';

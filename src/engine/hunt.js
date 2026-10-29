@@ -360,7 +360,7 @@ export function resourceBundle(area, total) {
 // potion alone, as explorations started before the other kinds kept it
 // (potions.js).
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null },
+  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {} },
   content,
 ) {
   const rng = createRng(seed);
@@ -490,6 +490,7 @@ export function simulateHunt(
       ...(on.ward && { ward: on.ward }),
       ...(on.poison && oil && !base.weapon.dot && { weapon: { ...base.weapon, dot: { ...oil, chance: on.poison } } }),
       ...(Object.keys(kit).length > 0 && { potions: kit }),
+      ...(Object.keys(trophies).length > 0 && { trophies }),
     };
     const fight = simulateFight({ allies: [ally], enemies, rng, content, record: true, trait: area.trait });
     const hpBefore = hpNow;

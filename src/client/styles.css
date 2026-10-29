@@ -926,75 +926,6 @@ button {
   border-top-color: var(--bark-line);
 }
 
-/* The pouch's materials and parts, under the activity, apart from the wallet. */
-.pouch-panel {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  z-index: 30;
-  width: min(300px, calc(100vw - 2 * var(--gutter)));
-  max-height: min(70vh, 560px);
-  overflow-y: auto;
-  padding: 4px 12px;
-  background: var(--surface);
-  border: 1px solid var(--bark-line);
-  border-radius: 4px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
-}
-
-.pouch-title {
-  margin: 10px 0 2px;
-  color: var(--text-muted);
-  font-family: var(--font-system);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.pouch-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.pouch-item .wallet-name {
-  color: var(--rarity, var(--text));
-}
-
-.pouch-art {
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-}
-
-.pouch-art .sprite {
-  width: 32px;
-  height: 32px;
-}
-
-.pouch-empty {
-  margin: 4px 0 8px;
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-.pouch-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-height: 44px;
-  margin-top: 6px;
-  border-top: 1px solid var(--bark-line);
-  color: var(--system-text);
-  font-family: var(--font-system);
-  font-size: 14px;
-  text-decoration: none;
-}
-
 .icon-button {
   display: flex;
   align-items: center;
@@ -1082,14 +1013,15 @@ button {
   text-overflow: ellipsis;
 }
 
-/* The current activity, and the pouch with the materials before it. */
+/* The current activity, and the Encyklopedia's book before it. */
 .activity-row {
   position: relative;
   display: flex;
   gap: 6px;
 }
 
-.pouch-button {
+.encyclopedia-button {
+  position: relative;
   display: flex;
   flex: none;
   align-items: center;
@@ -1102,9 +1034,26 @@ button {
   color: var(--text-muted);
 }
 
-.pouch-button[aria-expanded='true'] {
+.encyclopedia-button[aria-current='page'] {
   background: var(--bark-active);
-  color: var(--text);
+  box-shadow: inset 0 -2px 0 var(--system);
+}
+
+/* A chest waits in the Encyklopedia or a Bestiariusz: a gold dot. */
+.encyclopedia-button--ready {
+  border-color: var(--gold);
+}
+
+.encyclopedia-button--ready::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--bg-deep);
 }
 
 /* A speed potion at work: a flask and the time it still lasts. */
@@ -8193,4 +8142,113 @@ a.profession-square:active {
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
+}
+
+/* The Encyklopedia: six tabs in two rows, tiers of tiles (a shadow for
+   what is not got yet), the item sets with their chests, the chests of the
+   counts, and the lines of where to get an entry. */
+.encyclopedia-tabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.encyclopedia-tabs .segmented-option {
+  padding: 0 4px;
+  letter-spacing: 0.04em;
+}
+
+.encyclopedia-tabs .segmented-option:nth-child(3n + 1) {
+  border-left: 0;
+}
+
+.encyclopedia-tabs .segmented-option:nth-child(n + 4) {
+  border-top: 1px solid var(--system-line);
+}
+
+.encyclopedia {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.encyclopedia-summary,
+.encyclopedia-tier,
+.encyclopedia-area-name {
+  margin: 0;
+}
+
+.encyclopedia-set,
+.encyclopedia-land {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.encyclopedia-set-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.encyclopedia-set-head .card-title {
+  margin: 0;
+}
+
+.encyclopedia-tile {
+  position: relative;
+}
+
+.encyclopedia-tile--unknown {
+  color: #000;
+}
+
+.encyclopedia-tile--unknown .sprite {
+  filter: brightness(0);
+  opacity: 0.6;
+}
+
+.encyclopedia-trophy {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  color: var(--gold);
+}
+
+.encyclopedia-count-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.encyclopedia-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 76px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.encyclopedia-sources {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.encyclopedia-area {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--bark-line);
+}
+
+.encyclopedia-area-name {
+  font-weight: 600;
 }

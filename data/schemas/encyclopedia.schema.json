@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Encyklopedia",
+  "description": "Zakładki, tiery, skrzynie za zestawy przedmiotów i progi odkryć, trofea materiałów i zdania wskazówek Encyklopedii (src/engine/encyclopedia.js).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tabs", "tiers", "chests", "milestones", "trophy", "texts"],
+  "definitions": {
+    "counts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "integer", "minimum": 1 },
+      "description": "Progi odkryć, rosnąco; ostatni nie większy niż liczba wpisów zakładki."
+    }
+  },
+  "properties": {
+    "$comment": { "type": "string" },
+    "tabs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string", "enum": ["bestiary", "items", "potions", "herbs", "materials", "parts"] },
+          "name": { "type": "string" }
+        }
+      }
+    },
+    "tiers": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Kolejne tiery: przedmioty po poziomie klasy, od którego się je zakłada (classLevel bazy), a mikstury, zioła i materiały po poziomie, do którego sięga tier (upTo).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "classLevel", "upTo"],
+        "properties": {
+          "name": { "type": "string" },
+          "classLevel": { "type": "integer", "minimum": 1 },
+          "upTo": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "chests": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Skrzynie: zestaw przedmiotów bierze skrzynię swojego tieru, a kolejne progi kolejne skrzynie (ostatnia dla dalszych).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["gold", "timePoints"],
+        "properties": {
+          "gold": { "type": "integer", "minimum": 0 },
+          "timePoints": { "type": "integer", "minimum": 0 },
+          "systemPoints": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "milestones": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["potions", "herbs", "materials", "parts"],
+      "properties": {
+        "potions": { "$ref": "#/definitions/counts" },
+        "herbs": { "$ref": "#/definitions/counts" },
+        "materials": { "$ref": "#/definitions/counts" },
+        "parts": { "$ref": "#/definitions/counts" }
+      }
+    },
+    "trophy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grades", "damage"],
+      "properties": {
+        "grades": { "type": "integer", "minimum": 1, "description": "Ile stopni materiału, od stopnia gatunku w górę, daje trofeum." },
+        "damage": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "O ile rosną obrażenia przeciw stworowi materiału." }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "additionalProperties": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "$comment": "Encyklopedia (DECISIONS.md, „Encyklopedia”): wszystko, co postać już zdobyła, w zakładkach i tierach, ze wskazówką, skąd to wziąć. Przedmioty mają zestawy: w każdym tierze jeden na klasę i jeden z dodatkami dla wszystkich. Mikstury, zioła, materiały i części mają progi odkryć (milestones). Pełny zestaw albo próg otwiera skrzynię: zestaw ze skrzynią swojego tieru, kolejne progi z kolejnymi skrzyniami (chests). Materiał zdobyty w stopniu swojego gatunku i w trophy.grades - 1 wyższych to trofeum: obrażenia przeciw jego stworowi rosną o trophy.damage.",
+  "tabs": [
+    { "id": "bestiary", "name": "Bestiariusz" },
+    { "id": "items", "name": "Przedmioty" },
+    { "id": "potions", "name": "Mikstury" },
+    { "id": "herbs", "name": "Zioła" },
+    { "id": "materials", "name": "Materiały" },
+    { "id": "parts", "name": "Części" }
+  ],
+  "tiers": [
+    { "name": "Tier I", "classLevel": 1, "upTo": 25 },
+    { "name": "Tier II", "classLevel": 10, "upTo": 50 },
+    { "name": "Tier III", "classLevel": 25, "upTo": 75 },
+    { "name": "Tier IV", "classLevel": 50, "upTo": 100 }
+  ],
+  "chests": [
+    { "gold": 50, "timePoints": 5 },
+    { "gold": 150, "timePoints": 10 },
+    { "gold": 400, "timePoints": 20 },
+    { "gold": 1000, "timePoints": 40 }
+  ],
+  "milestones": {
+    "potions": [4, 8, 12, 16],
+    "herbs": [3, 6, 9, 13],
+    "materials": [10, 25, 50, 88],
+    "parts": [3, 5, 7]
+  },
+  "trophy": { "grades": 3, "damage": 0.05 },
+  "texts": {
+    "accessories": ["Dodatki"],
+    "tierItems": ["od {level}. poziomu klasy"],
+    "tierItemsFirst": ["od początku"],
+    "tierLevels": ["poziomy {from}–{to}"],
+    "itemDrop": ["Wyprawy: wypada od regionu {area} (poz. {levels})."],
+    "itemDropAny": ["Wyprawy: wypada w każdym regionie."],
+    "itemClasses": ["Dla klas: {classes}."],
+    "itemClass": ["Dla klasy: {classes}."],
+    "itemAnyClass": ["Dla każdej klasy."],
+    "itemOtherClasses": ["Przedmioty innych klas wypadają od {level}. poziomu postaci."],
+    "itemWear": ["Założysz od {level}. poziomu klasy."],
+    "itemPattern": ["Warsztat: wzór od {level}. poziomu Rzemieślnictwa."],
+    "itemBest": ["Najlepszy zdobyty: {rarity}."],
+    "potionRecipe": ["Alchemia: przepis od {level}. poziomu."],
+    "potionHerbs": ["Składniki: {herbs}."],
+    "potionCatalyst": ["Katalizator: {material}."],
+    "herbGather": ["Zielarstwo: od {level}. poziomu, w Zagajniku."],
+    "herbEvent": ["Czasem daje go też zdarzenie na wyprawie."],
+    "materialDrop": ["Zostawia: {monster} ({areas})."],
+    "materialGrades": ["Zdobyte stopnie: {grades}."],
+    "trophyNeeds": ["Trofeum: {grades}. Daje +{percent}% obrażeń przeciw temu stworowi."],
+    "trophyWon": ["Trofeum zdobyte: +{percent}% obrażeń przeciw: {monster}."],
+    "partTable": ["Stół rozbiórki: z materiałów i przedmiotów tej samej rzadkości."],
+    "partExchange": ["Wymiana w Warsztacie: {rate} × {part} za sztukę."],
+    "partShop": ["Lada złomiarza: od {level}. poziomu Skupu złomu."],
+    "unknown": ["???"]
+  }
+}

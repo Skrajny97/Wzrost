@@ -137,7 +137,7 @@ function dangersSheet(place, land = false) {
 const whose = (land) => (land ? 'tej krainy' : 'tego regionu');
 
 // The way to a Bestiariusz, of an inner region or a whole land, with its chest.
-function bestiaryRow(place, land = false) {
+export function bestiaryRow(place, land = false) {
   return h(
     'div',
     { class: 'bestiary-row' },

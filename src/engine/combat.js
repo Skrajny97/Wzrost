@@ -360,7 +360,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const defense = category === 'physical' ? target.armor * (1 - (move.armorIgnore ?? 0)) : (target.resist[element] ?? 0);
     const weak = (element && target.weak?.[element]) || 0;
     const ward = category === 'magical' ? (target.ward ?? 0) : 0;
-    let amount = Math.max(1, Math.round(raw * (critical ? tuning.critMultiplier : 1) * (1 - reduction(defense, actor.level, balance)) * (1 + weak) * (1 - ward)));
+    // A trophy of the Encyklopedia: blows against its creature hit harder.
+    const trophy = actor.trophies?.[target.monsterId] ?? 0;
+    let amount = Math.max(1, Math.round(raw * (critical ? tuning.critMultiplier : 1) * (1 - reduction(defense, actor.level, balance)) * (1 + weak) * (1 - ward) * (1 + trophy)));
     const absorbed = target.shield ? absorb(target, amount) : 0;
     amount -= absorbed;
     damage(target, amount, actor.id);

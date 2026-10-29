@@ -128,5 +128,7 @@ export function buildContent(raw) {
     // The events at the end of an exploration (events.js).
     events: raw.events ?? null,
     eventsById: byId(raw.events?.list ?? []),
+    // The Encyklopedia's tabs, tiers, chests and trophies (encyclopedia.js).
+    encyclopedia: raw.encyclopedia ?? null,
   };
 }

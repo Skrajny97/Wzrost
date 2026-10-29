@@ -252,6 +252,7 @@ function iconArt(id, size, fallback) {
 }
 export const goldArt = (size) => iconArt('gold', size, 'coin');
 export const timePointsArt = (size) => iconArt('time-points', size, 'hourglass');
+export const encyclopediaArt = (size) => iconArt('encyclopedia', size, 'book');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The figure of an event and the address of its scene, or null while there
 // is none.

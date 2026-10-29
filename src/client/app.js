@@ -8,9 +8,10 @@ import { emailRow, inviteToConfirm, mustConfirm, renderConfirm, takeEmailResult 
 import { countOf } from './format.js';
 import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
-import { buildTopbar, showPouch, showWallet, updateNav, updateTopbar } from './layout.js';
+import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { showQuests, watchQuests } from './quests.js';
 import { mountAuthor } from './screens/author.js';
+import { mountEncyclopedia } from './screens/encyclopedia.js';
 import { mountCamp } from './screens/camp.js';
 import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
@@ -61,6 +62,8 @@ const ROUTES = [
   // The camp is a tab of its own, in the top bar (`lit`), but not one to
   // come back to with "Powrót".
   { pattern: /^#\/oboz(?:\/(?<building>[a-z0-9-]+))?$/, nav: 'main', tab: null, lit: 'oboz', music: 'camp', mount: mountCamp },
+  // The Encyklopedia, from its book in the top bar, at one of its tabs.
+  { pattern: /^#\/encyklopedia(?:\/(?<tab>[a-z]+))?$/, nav: 'main', tab: null, lit: 'encyklopedia', mount: mountEncyclopedia },
   // The author's panel, from the settings of the author's account.
   { pattern: /^#\/autor$/, nav: 'main', tab: null, mount: mountAuthor },
 ];
@@ -275,7 +278,6 @@ function route() {
   current?.screen.unmount?.();
   closeSheet();
   showWallet(false);
-  showPouch(false);
   showQuests(false);
 
   if (candidate.nav === 'main') {

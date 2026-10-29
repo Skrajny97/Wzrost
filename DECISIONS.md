@@ -2819,6 +2819,46 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
 5. **Dodatkowy czas.** Punkty Czasu (1 na 30 minut oraz skrzynie zadań) przewijają ok. 1,5 godziny wypraw dziennie. Szybkie Polowania dają 45 minut dziennie, a Błyskawiczne 30–60 minut. Razem to do ok. 3 godzin dziennie. Najbardziej pomaga to graczom, którzy zaglądają rzadko i do 24. poziomu mają wyprawy najwyżej 30-minutowe. Zostaje tak, jak autor ustalił.
 6. **Narzędzie.** Symulacja przyjmuje teraz opcje wyprawy gracza (`hunt` w polityce, np. `seekRare`).
 
+## Encyklopedia (29.10.2026, na wersji testowej)
+
+To plan autora z „Uwag autora po 0.0.55”, punkty 5–7. Liczby i szczegóły to brakujące szczegóły, rozstrzygnięte najprościej.
+
+1. **Wejście.** Ikona Encyklopedii (zatwierdzona grafika) stoi w górnym pasku w miejscu sakwy, obok bieżącego zajęcia. Złota kropka świeci, gdy czeka skrzynia Encyklopedii albo Bestiariusza. Części do rzemiosła są na Postaci, w zakładce „Części” plecaka, więc lista pod sakwą zniknęła.
+2. **Zakładki.** Bestiariusz, Przedmioty, Mikstury, Zioła, Materiały i Części (`data/encyclopedia.json`).
+3. **Odkrycia.** Odkryta jest każda rzecz, którą postać kiedykolwiek miała: przedmiot (w plecaku albo założony), mikstura, zioło, materiał (każdy stopień osobno) i część.
+    - Serwer zapisuje je przy każdym żądaniu (`characters.discovered`), więc zostają po sprzedaży albo zużyciu.
+    - Przedmiot pamięta najrzadszy zdobyty egzemplarz.
+    - Liczy się od tej wersji: rzecz sprzedaną wcześniej trzeba zdobyć jeszcze raz.
+4. **Tiery.** Przedmioty dzielą się według poziomu klasy, od którego się je zakłada: Tier I od początku, II od 10., III od 25., IV od 50.
+    - Mikstury i zioła dzielą się według poziomu profesji, a materiały według najwyższego poziomu swojego stwora: I do 25, II do 50, III do 75, IV do 100.
+    - Części leżą w jednym rzędzie według rzadkości.
+5. **Wskazówki.** Każdy wpis, także nieodkryty, mówi, skąd go wziąć:
+    - przedmiot: od którego regionu wypada, dla jakich klas, od którego poziomu klasy się go zakłada i od którego poziomu Rzemieślnictwa Warsztat zna jego wzór;
+    - mikstura: od którego poziomu Alchemii jest przepis, a po odkryciu też składniki i katalizator;
+    - zioło: od którego poziomu Zielarstwa się je zbiera i czy daje je zdarzenie;
+    - materiał: który stwór go zostawia i gdzie żyje (nieznany stwór jako „???”), zdobyte stopnie i trofeum;
+    - część: Stół rozbiórki, wymiana w Warsztacie i od którego poziomu Skupu złomu sprzedaje ją Lada złomiarza.
+
+    Nieodkryty wpis to cień z nazwą „???”, jak w Bestiariuszu.
+6. **Zestawy przedmiotów.** W każdym tierze jest zestaw każdej klasy (jej bronie, druga ręka i zbroje) i zestaw „Dodatki” dla wszystkich (rękawice, buty, amulet, pierścień, talizman), razem 24 zestawy. Pełny zestaw otwiera skrzynię swojego tieru.
+7. **Progi odkryć.** Mikstury, zioła, materiały i części mają skrzynie za liczbę odkryć:
+    - mikstury: 4, 8, 12 i 16;
+    - zioła: 3, 6, 9 i 13;
+    - materiały (gatunki): 10, 25, 50 i 88;
+    - części: 3, 5 i 7.
+
+    Kolejne progi dają kolejne skrzynie.
+8. **Skrzynie.** Jak w Bestiariuszu, skrzynia otwiera się raz.
+    - Tier I daje 50 złota i 5 Punktów Czasu, II 150 i 10, III 400 i 20, a IV 1000 i 40.
+    - Punktów Systemu skrzynie nie dają. To pytanie do autora.
+    - Skrzynia zestawu, do którego dojdą później nowe przedmioty, zostaje otwarta.
+9. **Trofea** (zastosowanie materiałów 7). Materiał zdobyty w stopniu swojego gatunku i w dwóch wyższych to trofeum: ciosy przeciw jego stworowi zadają o 5% więcej (`trophy` w `data/encyclopedia.json`).
+    - Wymóg wszystkich stopni byłby dla wielu gatunków nieosiągalny. Stopień o 4 wyżej od gatunku wypada raz na kilka tysięcy sztuk, a o 5 wyżej raz na 40 000. Stopień o 2 wyżej wypada raz na 40–200 sztuk.
+    - Bonus działa na ciosy, bez obrażeń rozłożonych w czasie.
+    - Wyprawa bierze trofea swoich stworów przy starcie, więc raport wychodzi zawsze taki sam.
+10. **Bestiariusz** w Encyklopedii pokazuje każdą krainę i jej regiony wewnętrzne z tymi samymi listami i skrzyniami co w Walce. Skrzynie otwierają się w obu miejscach.
+11. **API.** `GET /api/encyclopedia` daje zakładki z wpisami i skrzyniami, a `POST /api/encyclopedia/chest` z `{ id }` otwiera skrzynię. Widok postaci ma `encyclopedia.ready`, liczbę skrzyń gotowych do otwarcia.
+
 ## Materiały: Skup złomu, Wymiana, katalizatory i Kowadło od +5 (29.10.2026, na wersji testowej)
 
 To cztery pierwsze z zastosowań materiałów wybranych przez autora („Uwagi autora po 0.0.55”, punkt 7). Liczby i szczegóły to brakujące szczegóły, rozstrzygnięte najprościej.
