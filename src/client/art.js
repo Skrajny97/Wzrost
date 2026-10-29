@@ -49,6 +49,12 @@ export const SPRITES = {
       // The second bases of the categories, from class level 10.
       'broadsword', 'war-axe', 'hunting-knife', 'recurve-bow', 'rune-staff', 'censer', 'pavise', 'bow-case', 'dirk', 'tome', 'fur-cap', 'peaked-helmet', 'biretta',
       'gambeson', 'brigandine', 'cloak', 'chasuble', 'bracers', 'pointed-shoes', 'reliquary', 'signet-ring',
+      // The third bases, from class level 25.
+      'saber', 'bearded-axe', 'kindjal', 'longbow', 'posokh', 'rosary', 'kalkan', 'war-quiver', 'parrying-dagger', 'quartz-crystal', 'hat', 'kettle-hat',
+      'monk-hood', 'caftan', 'cuirass', 'rune-cloak', 'dalmatic', 'vambraces', 'laced-shoes', 'pendant', 'band-ring', 'fang-charm',
+      // The fourth bases, from class level 50.
+      'estoc', 'berdiche', 'yataghan', 'horn-bow', 'star-staff', 'crozier', 'heraldic-shield', 'falcon-quiver', 'poniard', 'grimoire', 'mask', 'visored-helmet',
+      'mitre', 'buff-coat', 'scale-armor', 'star-robe', 'cope', 'gauntlets', 'greaves', 'medallion', 'family-ring', 'amber-charm',
     ],
   },
   // Materials left by creatures, the parts the Stół rozbiórki makes and

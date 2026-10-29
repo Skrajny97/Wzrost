@@ -172,7 +172,7 @@
       "kalkan": "round convex steel shield with a gilded central boss and engraved concentric rings, single inventory item icon",
       "war-quiver": "tall stiff dark leather quiver reinforced with iron bands and rivets, full of arrows with grey goose fletching, single inventory item icon",
       "parrying-dagger": "parrying dagger with a straight narrow steel blade, long curved quillons and a side ring guard, dark leather grip, diagonal, single inventory item icon",
-      "crystal": "faceted clear quartz crystal glowing with cold blue light inside, held in a small iron claw stand, single inventory item icon",
+      "quartz-crystal": "faceted clear quartz crystal glowing with cold blue light inside, held in a small iron claw stand, single inventory item icon",
       "hat": "wide-brimmed dark brown leather hat with a long pheasant feather tucked into the band, single inventory item icon",
       "kettle-hat": "steel kettle hat helmet with a wide sloping brim all around and a riveted ridge over the crown, single inventory item icon",
       "monk-hood": "deep brown wool monk hood with a short shoulder cape and a knotted rope cord, an empty garment with nobody wearing it, single inventory item icon",
@@ -206,7 +206,7 @@
       "greaves": "pair of polished steel greaves with round knee plates and leather straps, single inventory item icon",
       "medallion": "round golden medallion with an embossed sun face, on a thick gold chain, single inventory item icon",
       "family-ring": "heavy silver ring with a large oval engraved bezel showing a family crest, single inventory item icon",
-      "amber": "a polished golden amber stone with a tiny insect trapped inside, hanging on a leather cord, single inventory item icon"
+      "amber-charm": "a polished golden amber stone with a tiny insect trapped inside, hanging on a leather cord, single inventory item icon"
     }
   },
   "materials": {

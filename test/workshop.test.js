@@ -47,7 +47,7 @@ const base = (id) => content.basesById[id];
 const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9, `${actual} ≠ ${expected}`);
 
 describe('the Warsztat in the engine', () => {
-  test('the first base of each family is known at once, the later ones from level 10, and no jewellery', () => {
+  test('the first base of each family is known at once, the later ones from level 10 and their class levels, and no jewellery', () => {
     const first = knownPatterns(1, [], content).map((pattern) => pattern.id);
     assert.equal(first.length, 19);
     assert.ok(first.includes('sword') && first.includes('surplice') && first.includes('boots') && first.includes('misericorde'));
@@ -56,6 +56,16 @@ describe('the Warsztat in the engine', () => {
     const all = knownPatterns(10, [], content).map((pattern) => pattern.id);
     assert.equal(all.length, 38);
     assert.ok(all.includes('broadsword') && all.includes('pointed-shoes') && all.includes('dirk') && !all.includes('signet-ring'));
+    // The bases of class levels 25 and 50 open at the same profession levels.
+    assert.equal(knownPatterns(24, [], content).length, 38);
+    const at25 = knownPatterns(25, [], content).map((pattern) => pattern.id);
+    assert.equal(at25.length, 57);
+    assert.ok(at25.includes('saber') && at25.includes('laced-shoes') && !at25.includes('estoc') && !at25.includes('band-ring'));
+    const at50 = knownPatterns(50, [], content).map((pattern) => pattern.id);
+    assert.equal(at50.length, 76);
+    assert.ok(at50.includes('estoc') && at50.includes('greaves') && !at50.includes('family-ring'));
+    // Taking one apart teaches it earlier.
+    assert.ok(knownPatterns(10, ['estoc'], content).some((pattern) => pattern.id === 'estoc'));
   });
 
   test('the rarities open with the level: rare at 5, unique at 15 and divine at 80', () => {

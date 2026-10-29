@@ -2,17 +2,18 @@
 // in the Systemowy Warsztat, one pattern at a time, from parts of the item's
 // rarity and the camp's resources: stone for anything, and wood or iron ore
 // for the families made of them. The profession's level shows the patterns
-// (the later base of a family from laterPatternLevel on) and the rarities,
-// raises the chance each item comes out and makes each one quicker. All
-// that an order takes goes at the start. A failed item loses its parts and
-// gives its resources back; stopped early, the order keeps the items done
-// and gives back all the rest. A made item is the loot of its base and
-// rarity at the character's level, with affixes named by the creatures the
-// character has met. From the upgrades' levels of the profession on, a
-// made item may come out upgraded already, and from the scroll's level the
-// character also makes Zwoje ochronne for the Kowadło out of parts. Taking
-// apart an item of a pattern not shown yet teaches it at once (the author:
-// "rozbiórka pozwoli po prostu łatwiej i szybciej uzyskać dostęp").
+// (a later base of a family from laterPatternLevel, and not before its class
+// level) and the rarities, raises the chance each item comes out and makes
+// each one quicker. All that an order takes goes at the start. A failed item
+// loses its parts and gives its resources back; stopped early, the order
+// keeps the items done and gives back all the rest. A made item is the loot
+// of its base and rarity at the character's level, with affixes named by the
+// creatures the character has met. From the upgrades' levels of the
+// profession on, a made item may come out upgraded already, and from the
+// scroll's level the character also makes Zwoje ochronne for the Kowadło out
+// of parts. Taking apart an item of a pattern not shown yet teaches it at
+// once (the author: "rozbiórka pozwoli po prostu łatwiej i szybciej uzyskać
+// dostęp").
 
 import { generateItem, itemView } from './items.js';
 import { countList, professionLevelLines, professionProgress } from './professions.js';
@@ -23,8 +24,9 @@ import { say } from './text.js';
 export const craftableBases = (content) => content.bases.filter((base) => content.workshop.parts[base.slot]);
 
 // The profession level a base's pattern opens at: the first base of a family
-// at once, a later one (classLevel) from laterPatternLevel.
-export const patternLevel = (base, content) => (base.classLevel ? content.workshop.laterPatternLevel : 1);
+// at once, a later one from laterPatternLevel, and not before the class level
+// it asks for (classLevel), so the bases of class level 25 open at the 25th.
+export const patternLevel = (base, content) => (base.classLevel ? Math.max(content.workshop.laterPatternLevel, base.classLevel) : 1);
 
 // Whether the character knows a base's pattern: by the profession's level,
 // or learned by taking such an item apart (`learned`, base ids).

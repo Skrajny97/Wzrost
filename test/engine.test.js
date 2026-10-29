@@ -313,26 +313,57 @@ describe('items', () => {
     assert.deepEqual(autoEquip([], [stone], content, 'mage', 10), [0]);
   });
 
-  test('each second base of a category is a better version from class level 10', () => {
+  test('each later base of a category is a better version from its class level', () => {
     const later = content.bases.filter((base) => base.family);
-    assert.ok(later.length >= 21, `${later.length} later bases`);
+    assert.ok(later.length >= 63, `${later.length} later bases`);
     const key = { weapon: 'damageFactor', armor: 'armorFactor', implicit: 'statFactor' };
     const number = (item) => (item.damage ? (item.damage.min + item.damage.max) / 2 : item.armor ?? item.implicit.value);
     const rng = createRng('lepsze-wersje');
+    const rolls = (baseId, level) => Array.from({ length: 12 }, () => number(generateItem({ baseId, level }, rng, content)));
     for (const base of later) {
       const first = content.basesById[base.family];
-      assert.ok(base[key[base.kind]] > first[key[base.kind]] && base[key[base.kind]] <= first[key[base.kind]] * 1.2, base.id);
-      assert.equal(base.classLevel, 10, base.id);
+      // The base before it in its family: the one of the next lower class level.
+      const before = content.bases
+        .filter((other) => (other.family ?? other.id) === base.family && (other.classLevel ?? 1) < base.classLevel)
+        .reduce((best, other) => ((other.classLevel ?? 1) > (best.classLevel ?? 1) ? other : best));
+      assert.ok([10, 25, 50].includes(base.classLevel), base.id);
+      assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= first[key[base.kind]] * 1.2, base.id);
       for (const cls of content.classes) {
         assert.equal(canUse(base.id, cls.id, content), canUse(first.id, cls.id, content), `${base.id} for ${cls.id}`);
       }
-      // Even its weakest roll beats the first base at the same item level.
+      // Even its weakest roll beats the best roll of the base before it at
+      // the same item level.
       for (const level of [10, 100]) {
-        const plain = number(generateItem({ baseId: first.id, level }, rng, content));
-        const weakest = Math.min(...Array.from({ length: 12 }, () => number(generateItem({ baseId: base.id, level }, rng, content))));
-        assert.ok(weakest > plain, `${base.id} at level ${level}: ${weakest} against ${plain}`);
+        const weakest = Math.min(...rolls(base.id, level));
+        const best = Math.max(...rolls(before.id, level));
+        assert.ok(weakest > best, `${base.id} at level ${level}: ${weakest} against ${before.id} ${best}`);
       }
     }
+  });
+
+  test('every category has bases from class levels 10, 25 and 50, dropping from those levels', () => {
+    const firsts = content.bases.filter((base) => !base.family);
+    for (const first of firsts) {
+      const levels = content.bases.filter((base) => base.family === first.id).map((base) => base.classLevel);
+      assert.deepEqual(levels, [10, 25, 50], first.id);
+    }
+    assert.equal(canUse('saber', 'warrior', content, 24), false);
+    assert.equal(canUse('saber', 'warrior', content, 25), true);
+    assert.equal(canUse('estoc', 'warrior', content, 49), false);
+    assert.equal(canUse('estoc', 'warrior', content, 50), true);
+    assert.equal(canUse('estoc', 'mage', content, 50), false);
+    const rng = createRng('trzecie-bazy');
+    const swords = (maxClassLevel) => {
+      const found = new Set();
+      for (let index = 0; index < 600; index++) {
+        const item = randomItem(60, rng, content, { classId: 'warrior', maxClassLevel });
+        if (item.slot === 'weapon' && content.basesById[item.base].family === 'sword') found.add(item.base);
+      }
+      return [...found].sort();
+    };
+    assert.deepEqual(swords(24), ['broadsword']);
+    assert.deepEqual(swords(25), ['broadsword', 'saber']);
+    assert.deepEqual(swords(50), ['broadsword', 'estoc', 'saber']);
   });
 
   test('properties are described in Polish', () => {

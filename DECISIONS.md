@@ -2787,7 +2787,7 @@ Autor: „Do tego - trzeba dostosować zadania z odblokowywaniem regionów. Na n
 
 ## Krzywa XP zostaje (29.10.2026)
 
-Autor chciał, żeby pierwsza ewolucja przychodziła po ok. 30 godzinach wypraw zamiast 23. Liczba 23 pochodziła ze starej notatki sprzed spowolnień z 0.0.27, 0.0.28 i 0.0.30. Według obecnej krzywej 50. poziom klasy przychodzi po ok. 81 godzinach eksploracji, przy ok. 44. poziomie postaci, a 100. po ok. 400. Po tej informacji autor zdecydował: „Zostaw aktualny XP curve”.
+Prośba autora: pierwsza ewolucja po ok. 30 godzinach wypraw zamiast 23. Liczba 23 pochodziła ze starej notatki sprzed spowolnień z 0.0.27, 0.0.28 i 0.0.30. Według obecnej krzywej 50. poziom klasy przychodzi po ok. 81 godzinach eksploracji, przy ok. 44. poziomie postaci, a 100. po ok. 400. Po tej informacji decyzja autora: „Zostaw aktualny XP curve”.
 
 1. **Bez zmian.** Krzywa z 0.0.30 zostaje, z dalszym spowolnieniem po 50. poziomie klasy, jakie już ma.
 
@@ -2795,11 +2795,18 @@ Autor chciał, żeby pierwsza ewolucja przychodziła po ok. 30 godzinach wypraw 
 
 Autor: „Kolejnym krokiem będzie dodanie nowych przedmiotów do ekwipunku, nowych ziół i mikstur. Zajmiemy się tym jeszcze przed zajęciem ewolucją klas”. Propozycja: trzecia i czwarta baza w każdej z 22 kategorii, od 25. i od 50. poziomu klasy, z premią jak u przedmiotów od 10. poziomu, po jednym szkicu Retro Diffusion na przedmiot. Autor ocenia je w czacie, przedmiot po przedmiocie.
 
-1. **Od 25. poziomu klasy (1–22).** Autor zatwierdził wszystkie 22 szkice, z dwiema zmianami:
+1. **Od 25. poziomu klasy (1–22).** Wszystkie 22 szkice są zatwierdzone, z dwiema zmianami:
     - „Łuk długi” nazywa się **Długi łuk** (autor: „Długi łuk (zamień miejscami nazwę)”);
     - **Posoch**: opis zostaje, ale szkic do powtórki („opis dobry, ale wygeneruj nowe”). Nowy szkic pokazuje całą laskę od końca do końca.
-2. **Muzyka ewolucji.** Autor dał utwór z Suno „Ewolucja klasy” (3 min 25 s). Leży w `src/client/audio/music/evolution-v1.mp3`, bez okładki i metadanych, i zagra na ceremonii, gdy ewolucje powstaną.
+2. **Muzyka ewolucji.** Od autora jest utwór z Suno „Ewolucja klasy” (3 min 25 s). Leży w `src/client/audio/music/evolution-v1.mp3`, bez okładki i metadanych, i zagra na ceremonii, gdy ewolucje powstaną.
 3. **Kwiat paproci także ze zdarzenia.** Zioło Kwiat paproci daje Zielarstwo dopiero od 90. poziomu, po ok. 2000 godzinach zbierania. Wybór autora w czacie: w przypadku „Kwiat bez stróża” zdarzenia Kwiat paproci raz na 4 razy zamiast przedmiotu zostaje 1 Kwiat paproci.
+4. **Od 50. poziomu klasy (23–44).** Wszystkie 22 szkice są zatwierdzone. Tarcza herbowa: autor: „dokończ szary kontur i będzie super”, więc jasny stalowy brzeg w lewym górnym rogu jest dorysowany piksel po pikselu. Z dwóch nowych szkiców Posochu wybrana jest wersja B.
+5. **W grze od 0.0.49:**
+    - 44 nowe bazy w `data/item-bases.json`, po dwie w każdej z 22 kategorii: od 25. i od 50. poziomu klasy. Współczynnik to współczynnik pierwszej bazy razy 1,10 (od 25.) albo 1,15 (od 50.), zaokrąglony w górę do setnych, np. Miecz 1,2, Pałasz 1,26, Szabla 1,32, Koncerz 1,38. Premie są takie jak na kartach do oceny, np. Szabla +12–19, Koncerz +23–36;
+    - na wyprawach baza wypada tam, gdzie zakres poziomów miejsca sięga jej poziomu klasy, a w cotygodniowej skrzyni od tego poziomu klasy postaci. Kategoria z czterema bazami nie wypada częściej niż wcześniej: najpierw losuje się kategoria, a potem jedna z jej dostępnych baz;
+    - dwie bazy mają inne id niż szkice, bo te nazwy nosiły już inne rzeczy w grze: Kryształ to `quartz-crystal` (afiks `crystal`), a Bursztyn to `amber-charm` (część `amber`);
+    - **wzory w Warsztacie** (brakujący szczegół): wzór bazy od 25. poziomu klasy odsłania się na 25. poziomie Rzemieślnictwa, a od 50. na 50. Wcześniej każda dalsza baza miała wzór od `laterPatternLevel`, czyli od 10. Rozbiórka takiego przedmiotu nadal od razu uczy jego wzoru;
+    - symulacja balansu (`tools/simulate.mjs`) liczy, jak dotąd, ekwipunek z pierwszych baz kategorii. Dalsze bazy są więc zapasem siły ponad nią i nie zmieniają jej tabel.
 
 ## Ewolucje: odpowiedzi autora (29.10.2026)
 
