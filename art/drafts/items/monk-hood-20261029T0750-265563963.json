@@ -1,0 +1,25 @@
+{
+  "id": "monk-hood",
+  "payload": {
+    "prompt": "deep brown wool monk hood with a short shoulder cape and a knotted rope cord, an empty garment with nobody wearing it, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 265563963,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793260872,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 55.44,
+    "request_id": "f6133b42-6be1-4928-bad7-f37ffccd3b54",
+    "outputs_retained_until": 1793347216
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "band-ring",
+  "payload": {
+    "prompt": "plain wide polished gold band ring with a thin engraved line around it, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 944406709,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793261204,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 54,
+    "request_id": "c63dc418-131b-4353-9c4f-96cc4e09ceff",
+    "outputs_retained_until": 1793347560
+  }
+}

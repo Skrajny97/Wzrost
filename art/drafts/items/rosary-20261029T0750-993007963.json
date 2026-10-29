@@ -1,0 +1,25 @@
+{
+  "id": "rosary",
+  "payload": {
+    "prompt": "wooden prayer bead rosary with a small silver cross, the round beads glowing with warm golden holy light, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 993007963,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793260522,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 56.7,
+    "request_id": "e650bf39-1850-401d-adca-458d8e8f9eac",
+    "outputs_retained_until": 1793346860
+  }
+}

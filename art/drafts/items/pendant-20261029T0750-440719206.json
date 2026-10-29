@@ -1,0 +1,25 @@
+{
+  "id": "pendant",
+  "payload": {
+    "prompt": "heavy pendant, a polished green stone in a silver setting hanging on a leather cord, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 440719206,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793261158,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 54.18,
+    "request_id": "ac1d03fb-5bf6-41cf-9d45-91eabf46bf43",
+    "outputs_retained_until": 1793347510
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "war-quiver",
+  "payload": {
+    "prompt": "tall stiff dark leather quiver reinforced with iron bands and rivets, full of arrows with grey goose fletching, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 436403972,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793260598,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 56.34,
+    "request_id": "18287620-e12b-4b1e-b3f5-f77ddd1ee48b",
+    "outputs_retained_until": 1793346951
+  }
+}

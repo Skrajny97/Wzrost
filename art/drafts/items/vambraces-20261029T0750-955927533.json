@@ -1,0 +1,25 @@
+{
+  "id": "vambraces",
+  "payload": {
+    "prompt": "pair of steel vambraces made of riveted plates over brown leather, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 955927533,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793261052,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 54.54,
+    "request_id": "1765b400-2348-402f-8c0b-5d16d9e74949",
+    "outputs_retained_until": 1793347430
+  }
+}

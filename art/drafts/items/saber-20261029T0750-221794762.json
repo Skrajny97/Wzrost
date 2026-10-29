@@ -1,0 +1,25 @@
+{
+  "id": "saber",
+  "payload": {
+    "prompt": "curved single-edged steel sabre with a closed brass knuckle guard and a black leather grip, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 221794762,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793260276,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 57.6,
+    "request_id": "bc3d1db4-4d95-42b6-888b-03a1f440f7b7",
+    "outputs_retained_until": 1793346633
+  }
+}

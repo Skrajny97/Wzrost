@@ -1,0 +1,25 @@
+{
+  "id": "kindjal",
+  "payload": {
+    "prompt": "long straight double-edged kindjal dagger with a wide blade and a central groove, a small silver guard and a dark horn grip with silver rivets, diagonal, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 404338365,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793260387,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 57.24,
+    "request_id": "01f69b26-0769-4847-8f59-7e35b474bc17",
+    "outputs_retained_until": 1793346730
+  }
+}
