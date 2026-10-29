@@ -1,0 +1,25 @@
+{
+  "id": "aconite-oil",
+  "payload": {
+    "prompt": "a slim tall dark glass vial with a long thin neck and a black stopper, filled with dark violet oily poison, a small blue-violet aconite flower tied to the neck with twine, single inventory item icon, bold clean outline",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 891396138,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793266719,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 46.98,
+    "request_id": "27bc2626-4f3a-490a-9b77-933323723acb",
+    "outputs_retained_until": 1793353099
+  }
+}

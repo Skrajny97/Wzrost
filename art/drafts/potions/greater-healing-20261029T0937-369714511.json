@@ -1,0 +1,25 @@
+{
+  "id": "greater-healing",
+  "payload": {
+    "prompt": "a large conical glass potion flask with a wide flat bottom and a narrow neck closed with a cork, filled with glowing ruby red liquid, simple clean shape, single inventory item icon, bold clean outline",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 369714511,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793266698,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 47.16,
+    "request_id": "785edbe9-632b-495c-8804-dbec70f1f218",
+    "outputs_retained_until": 1793353043
+  }
+}
