@@ -314,6 +314,126 @@
         "text": "three fast high-pitched swishes of a silk cloak whipped through the air, crisp and airy, with a soft high breathy whisper, close up, dry, no bass, no rumble, no low frequencies, no music",
         "seconds": 1.5
       },
+      "skill-crushing-blow": {
+        "text": "a huge two-handed battle axe crashing down through armor into stony ground, a deep heavy crunch of splitting metal and cracking stone, then a short dull ring, fantasy battle, close up, dry, no music",
+        "seconds": 1.3
+      },
+      "skill-blood-frenzy": {
+        "text": "a fierce rising war cry turning into a low growl over a fast pounding heartbeat, raw and savage, fantasy battle, close up, dry, no music",
+        "seconds": 1.5
+      },
+      "skill-millstone": {
+        "text": "a heavy curved sword spun around in a full circle, two fast whooshes in a row with the blade scraping across shields and armor, fantasy battle, close up, no music",
+        "seconds": 1.5
+      },
+      "skill-riposte": {
+        "text": "a quick steel parry, a bright clang of two blades, instantly answered by one fast slicing counter cut, close up, dry, crisp, no music",
+        "seconds": 1.0
+      },
+      "skill-indomitable": {
+        "text": "a deep bronze gong struck once, swelling into a firm warm hum of protective magic, steady and solid, fantasy, no music",
+        "seconds": 1.5
+      },
+      "skill-challenge": {
+        "text": "a sword banged hard three times on a wooden shield, loud and defiant, with a short echo, fantasy battle, close up, no music",
+        "seconds": 1.4
+      },
+      "skill-piercing-shot": {
+        "text": "a heavy bow released with a deep thrum, the arrow tearing through the air with a sharp whistle and punching through wood with a loud crack, close up, dry, no music",
+        "seconds": 1.2
+      },
+      "skill-ambush-shot": {
+        "text": "rustling leaves in a bush, a soft held breath, then one sudden quiet bowstring snap and a swift arrow whoosh, close up, tense, no music",
+        "seconds": 1.3
+      },
+      "skill-arrow-storm": {
+        "text": "a volley of many arrows charged with electricity: whistling arrows crackling with sparks and buzzing static, ending in a scatter of electric snaps, fantasy battle, no music",
+        "seconds": 1.6
+      },
+      "skill-storm-cloud": {
+        "text": "a dark storm cloud gathering with a low distant thunder roll, then a sharp crack of a lightning strike, fantasy, no music",
+        "seconds": 1.8
+      },
+      "skill-barbed-arrow": {
+        "text": "a barbed arrow hits a thick leather hide with a heavy thud and a short tearing rip as the barbs catch, close up, dry, no music",
+        "seconds": 1.1
+      },
+      "skill-falcon": {
+        "text": "a falcon gives a sharp screech and dives with fast beating wings rushing through the air, close up, nature, no music",
+        "seconds": 1.5
+      },
+      "skill-fire-burst": {
+        "text": "a ball of fire bursting apart, a bright explosive whoomp of flame scattering crackling embers in every direction, fantasy magic, no music",
+        "seconds": 1.5
+      },
+      "skill-elemental-ray": {
+        "text": "a magic ray of three elements at once: a roaring flame, crackling ice and buzzing electric sparks woven into one bright beam, fantasy magic, no music",
+        "seconds": 1.6
+      },
+      "skill-blizzard": {
+        "text": "a howling blizzard sweeping in, a cold whistling wind full of hissing snow and tinkling ice shards, fantasy magic, no music",
+        "seconds": 1.8
+      },
+      "skill-ice-lance": {
+        "text": "a long spear of ice forming with a crystalline crackle and shooting forward with a cold whoosh, ending in a sharp glassy shatter, fantasy magic, close up, no music",
+        "seconds": 1.2
+      },
+      "skill-mana-mirror": {
+        "text": "a shimmering magical mirror rising with a bright glassy ring, a soft hum of mana and a gentle reflected echo, fantasy, high pitched, no bass, no music",
+        "seconds": 1.5
+      },
+      "skill-elemental-summon": {
+        "text": "a summoning spell: a swirling vortex of wind, crackling fire and grinding stones coming together into a living creature with a deep magical boom, fantasy, no music",
+        "seconds": 1.8
+      },
+      "skill-renewal": {
+        "text": "a gentle healing spell like spring: soft chiming bells with a warm rising shimmer and a quiet rustle of growing leaves, fantasy, no music",
+        "seconds": 1.6
+      },
+      "skill-miracle": {
+        "text": "a miracle: a warm heavenly choir hum swelling up with bright bells and a radiant shimmer, uplifting, fantasy, no music",
+        "seconds": 1.8
+      },
+      "skill-judgement": {
+        "text": "a holy judgement spell, a deep solemn bell toll with a bright radiant blast and a short echo, fantasy magic, no music",
+        "seconds": 1.5
+      },
+      "skill-verdict": {
+        "text": "a stern final verdict: one heavy wooden gavel strike merged with a holy ringing blast and a short solemn bell, close up, fantasy, no music",
+        "seconds": 1.2
+      },
+      "skill-great-blessing": {
+        "text": "a great blessing spell, a rich angelic choir hum swelling with golden chimes and a warm radiant shimmer, fantasy, no music",
+        "seconds": 1.8
+      },
+      "skill-psalm": {
+        "text": "a soft calm monk chant hum, warm and peaceful, with gentle sparkling chimes, fantasy, no music",
+        "seconds": 1.8
+      },
+      "skill-execution": {
+        "text": "a dagger driven in with a sudden swift stab, a sharp metallic slice and a quick heavy thud, close up, dry, crisp, no music",
+        "seconds": 1.1
+      },
+      "skill-death-mark": {
+        "text": "a dark curse sigil burned into the air: a low eerie whisper, a ghostly hiss and a cold ringing tone that fades, fantasy, no music",
+        "seconds": 1.5
+      },
+      "skill-black-venom": {
+        "text": "thick black venom dripping from a blade, slow heavy viscous drops sizzling and bubbling with acid, close up, dark, no music",
+        "seconds": 1.5
+      },
+      "skill-toxic-slime": {
+        "text": "a big blob of toxic green slime squelching and bubbling as it rises up from the ground, wet gloopy sounds with a soft acidic fizz, close up, no music",
+        "seconds": 1.6
+      },
+      "skill-blade-dance": {
+        "text": "two slim curved blades whirling in a fast elegant dance, a quick run of light airy swishes and soft metallic rings, close up, crisp, no bass, no music",
+        "seconds": 1.4
+      },
+      "skill-shadow-whirl": {
+        "text": "a whirlwind of shadows spinning fast, a dark swirling whoosh with a soft ghostly whisper and three quick blade slashes inside it, fantasy, no music",
+        "seconds": 1.6
+      },
       "potion": {
         "text": "a person drinks from a small glass bottle: two big gulps, the sound of liquid swallowed in the throat, close up, realistic foley, no music",
         "seconds": 1.5,
