@@ -603,5 +603,15 @@
       "bandit-knifer": {"prompt": "lean forest bandit holding two long knives, patched dark cloak, a cloth mask over the lower face, crouched ready to strike, full body, three-quarter view", "width": 48, "height": 48},
       "bandit-crossbow": {"prompt": "forest bandit aiming a wooden crossbow, leather cap, ragged green cloak and a quiver of bolts at the hip, full body, three-quarter view", "width": 48, "height": 48}
     }
+  },
+  "icons": {
+    "$comment": "Ikony interfejsu, np. w górnym pasku. Rysowane 32 × 32 i pokazywane 1:1, żeby piksele były ostre.",
+    "style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "references": [],
+    "prompts": {
+      "encyclopedia": "a thick closed leather-bound tome with brass corner caps and a small glowing blue gem on the front cover, a red ribbon bookmark hanging out at the bottom, slightly angled, bold readable shape, single inventory item icon"
+    }
   }
 }

@@ -31,6 +31,7 @@ on:
           - places
           - animations
           - events
+          - icons
       ids:
         description: Identyfikatory po przecinku albo all
         required: true
