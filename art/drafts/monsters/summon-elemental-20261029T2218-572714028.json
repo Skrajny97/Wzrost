@@ -1,0 +1,25 @@
+{
+  "id": "summon-elemental",
+  "payload": {
+    "prompt": "fire elemental summoned by a mage, a small humanoid figure of swirling orange and red flames around a dark glowing ember core, two bright yellow eyes, floating above a faint violet magic circle, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 4,
+    "seed": 572714028,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793312346,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.36,
+    "request_id": "78c4c30d-4673-4ee1-bf94-bd73b9a8c0f1",
+    "outputs_retained_until": 1793398722
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "summon-slime",
+  "payload": {
+    "prompt": "toxic slime, a wobbling blob of bright acid green ooze with two glowing yellow eyes, green drops dripping and bubbling, a small puddle of poison under it, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 4,
+    "seed": 786226351,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793312395,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 48.64,
+    "request_id": "b3353293-7d2c-41a4-8284-cc0d54452707",
+    "outputs_retained_until": 1793398748
+  }
+}
