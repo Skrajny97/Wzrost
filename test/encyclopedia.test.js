@@ -159,9 +159,9 @@ describe('the Encyklopedia through the API', () => {
     assert.equal((await call('GET', '/api/character', { cookie })).data.character.encyclopedia.ready, 1);
     const opened = await call('POST', '/api/encyclopedia/chest', { cookie, body: { id: 'parts:3' } });
     assert.equal(opened.status, 200, JSON.stringify(opened.data));
-    assert.deepEqual(opened.data.chest, { gold: 50, timePoints: 5, systemPoints: 10 });
+    assert.deepEqual(opened.data.chest, { gold: 50, timePoints: 5, systemPoints: 2 });
     assert.equal(opened.data.character.gold, 50);
-    assert.equal((await (await db()).prepare('SELECT system_points FROM characters').first()).system_points, 10);
+    assert.equal((await (await db()).prepare('SELECT system_points FROM characters').first()).system_points, 2);
     assert.equal(opened.data.character.encyclopedia.ready, 0);
     assert.equal(opened.data.encyclopedia.parts.chests[0].opened, true);
     assert.equal((await call('POST', '/api/encyclopedia/chest', { cookie, body: { id: 'parts:3' } })).data.error.code, 'opened');

@@ -2819,7 +2819,7 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
 5. **Dodatkowy czas.** Punkty Czasu (1 na 30 minut oraz skrzynie zadań) przewijają ok. 1,5 godziny wypraw dziennie. Szybkie Polowania dają 45 minut dziennie, a Błyskawiczne 30–60 minut. Razem to do ok. 3 godzin dziennie. Najbardziej pomaga to graczom, którzy zaglądają rzadko i do 24. poziomu mają wyprawy najwyżej 30-minutowe. Zostaje tak, jak autor ustalił.
 6. **Narzędzie.** Symulacja przyjmuje teraz opcje wyprawy gracza (`hunt` w polityce, np. `seekRare`).
 
-## Encyklopedia (29.10.2026, na wersji testowej)
+## Encyklopedia (29.10.2026, w grze od 0.0.57)
 
 To plan autora z „Uwag autora po 0.0.55”, punkty 5–7. Liczby i szczegóły to brakujące szczegóły, rozstrzygnięte najprościej.
 
@@ -2849,10 +2849,11 @@ To plan autora z „Uwag autora po 0.0.55”, punkty 5–7. Liczby i szczegóły
 
     Kolejne progi dają kolejne skrzynie.
 8. **Skrzynie.** Jak w Bestiariuszu, skrzynia otwiera się raz.
-    - Tier I daje 50 złota, 5 Punktów Czasu i 10 Punktów Systemu, II 150, 10 i 20, III 400, 20 i 20, a IV 1000, 40 i 20.
-    - Punkty Systemu są jak w Bestiariuszu. Autor: „Skrzynie Encyklopedii mają dawać Punkty Systemu tak jak w Bestiariuszu i zostawmy te 20.” Potem: „Jednak to bedzie za dużo za tier 1 musi być mniej”. Tier I ma więc połowę, 10, tak jak przy Punktach Czasu (5 wobec 10). To brakujący szczegół, rozstrzygnięty najprościej.
-    - Progi odkryć biorą skrzynie kolejnych tierów, więc pierwszy próg daje 10 Punktów Systemu, a dalsze po 20. Razem 39 skrzyń daje 680 Punktów Systemu, a Bestiariusz 500 (20 za region wewnętrzny, 25 za krainę).
-    - Skrzynie otwarte wcześniej na wersji testowej nie dostają Punktów Systemu wstecz. W grze głównej Encyklopedii jeszcze nie ma.
+    - Tier I daje 50 złota, 5 Punktów Czasu i 2 Punkty Systemu, II 150, 10 i 4, III 400, 20 i 8, a IV 1000, 40 i 16.
+    - Punkty Systemu są jak w Bestiariuszu, ale mniejsze. Autor: „Skrzynie Encyklopedii mają dawać Punkty Systemu tak jak w Bestiariuszu i zostawmy te 20.” Potem: „Jednak to bedzie za dużo za tier 1 musi być mniej”, „i za duzo tych Punktów by było” i „Wyskaluj dobrze te Punkty Systemu za Encyklopedie, ale dodaj je”.
+    - Skala to brakujący szczegół, rozstrzygnięty najprościej: Punkty Systemu rosną jak Punkty Czasu, dwa razy z każdym tierem, od 2 do 16. Progi odkryć biorą skrzynie kolejnych tierów, więc kolejne progi dają 2, 4, 8 i 16.
+    - Razem 39 skrzyń daje 284 Punkty Systemu: Tier I 20, II 40, III 80 i IV 144. Bestiariusz daje 500 (20 za region wewnętrzny, 25 za krainę).
+    - Skrzynie otwarte wcześniej na wersji testowej nie dostają Punktów Systemu wstecz. W grze Encyklopedia od początku daje je w skrzyniach.
     - Skrzynia zestawu, do którego dojdą później nowe przedmioty, zostaje otwarta.
 9. **Trofea** (zastosowanie materiałów 7). Materiał zdobyty w stopniu swojego gatunku i w dwóch wyższych to trofeum: ciosy przeciw jego stworowi zadają o 5% więcej (`trophy` w `data/encyclopedia.json`).
     - Wymóg wszystkich stopni byłby dla wielu gatunków nieosiągalny. Stopień o 4 wyżej od gatunku wypada raz na kilka tysięcy sztuk, a o 5 wyżej raz na 40 000. Stopień o 2 wyżej wypada raz na 40–200 sztuk.
@@ -2862,7 +2863,7 @@ To plan autora z „Uwag autora po 0.0.55”, punkty 5–7. Liczby i szczegóły
 10. **Bestiariusz** w Encyklopedii pokazuje każdą krainę i jej regiony wewnętrzne z tymi samymi listami i skrzyniami co w Walce. Skrzynie otwierają się w obu miejscach.
 11. **API.** `GET /api/encyclopedia` daje zakładki z wpisami i skrzyniami, a `POST /api/encyclopedia/chest` z `{ id }` otwiera skrzynię. Widok postaci ma `encyclopedia.ready`, liczbę skrzyń gotowych do otwarcia.
 
-## Materiały: Skup złomu, Wymiana, katalizatory i Kowadło od +5 (29.10.2026, na wersji testowej)
+## Materiały: Skup złomu, Wymiana, katalizatory i Kowadło od +5 (29.10.2026, w grze od 0.0.57)
 
 To cztery pierwsze z zastosowań materiałów wybranych przez autora („Uwagi autora po 0.0.55”, punkt 7). Liczby i szczegóły to brakujące szczegóły, rozstrzygnięte najprościej.
 
@@ -2893,7 +2894,7 @@ To cztery pierwsze z zastosowań materiałów wybranych przez autora („Uwagi a
     - Autor: „pamietaj, ze ulepsza sie przedmioty nie tylko na Kowadle, ale i z pozycji samego przedmiotu”. Ekran Kowadła w obozie ma teraz część „Ulepszanie przedmiotów”: listę przedmiotów, założonych i z plecaka. Dotknięcie otwiera kartę przedmiotu z tym samym ulepszeniem co w plecaku, z materiałem od +5. Serwer pilnuje materiału przy każdym ulepszeniu, skądkolwiek przyjdzie.
 5. **Sprawdzanie.** Walidator danych sprawdza, czy każdy katalizator to istniejący materiał. Testy obejmują sprzedaż, Wymianę, katalizatory i Kowadło.
 
-## Uwagi autora po 0.0.55 (29.10.2026, na wersji testowej)
+## Uwagi autora po 0.0.55 (29.10.2026, w grze od 0.0.56)
 
 1. **Wdrożenia na komendę autora.** Autor: „Od kolejnej rundy wdrożenia (poza awaryjnymi, które podpiszę) robimy rzadziej na moją komendę. Możesz sugerować wdrożenie, ale sam go nie bedziesz wykonywał.”
     - Zmiany trafiają na wersję testową (push na gałąź roboczą), jak dotąd. Do gry (push do `main`) wchodzą tylko na komendę autora albo jako wdrożenie awaryjne podpisane przez autora. Raport na koniec etapu mówi, czy wdrożenie jest zalecane.
