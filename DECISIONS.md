@@ -585,10 +585,10 @@ Zmiany poniżej wynikają z kolejnych wiadomości autora. Najważniejsze: grę m
 9. **Progi drabinki według nowej krzywej.** Poziom 25 przychodzi po ok. 8,7 godziny eksploracji, poziom 35 po ok. 15,4 godziny, a poziom 50 po ok. 31 godzinach. Punkt zastępuje te liczby z punktu 2 „Drabinki eksploracji i lochów”.
 10. **Kilka awansów w jednym wierszu.** Kilka poziomów naraz daje jeden wiersz dla postaci i jeden dla klasy, z sumą punktów. Komunikaty o odblokowaniach zostają osobno. Od 26.10.2026 każdy zysk ma osobny wiersz, np. „Osiągnięto poziom: 4” i „Zdobyto wolne punkty statystyk: +24” (punkt 4 „Awans odnawia HP i manę”).
 11. **Ewolucje klas.** Autor zaproponował pierwszą ewolucję na poziomie klasy 50, a kolejne co 100 poziomów, chyba że jest lepszy pomysł. Ewolucje są na poziomach klasy 50, 100, 200, 300, 400 i 500 (`classEvolutionLevels` w `data/balance.json`):
-    - druga przychodzi po ok. 100 godzinach eksploracji, a nie po ok. 260 przy progu 150,
+    - druga przychodziła według ówczesnej krzywej po ok. 100 godzinach eksploracji, a nie po ok. 260 przy progu 150,
     - ostatnia wypada na najwyższym poziomie klasy.
 
-    Według krzywej poziom klasy 50 przychodzi po ok. 23 godzinach eksploracji (postać ma wtedy ok. 43 poziom), 100 po ok. 100 godzinach, 200 po ok. 500, 300 po ok. 1260, 400 po ok. 2440, a 500 po ok. 4080. Ekran statystyk pokazuje „Pierwsza ewolucja: poz. klasy 50”. Same ewolucje powstaną w Etapie 3. Gdyby autor wolał progi 150, 250, 350 i 450, wystarczy zmienić listę. Punkt zastępuje poziom 30 z punktu 10 „Regionów wewnętrznych i obozu”.
+    Według krzywej z 0.0.30 poziom klasy 50 przychodzi po ok. 81 godzinach eksploracji (postać ma wtedy ok. 44 poziom), 100 po ok. 400 godzinach, 200 po ok. 1230, 300 po ok. 2210, 400 po ok. 3450, a 500 po ok. 5130. Przed spowolnieniami z 0.0.27, 0.0.28 i 0.0.30 było to 23, 100, 500, 1260, 2440 i 4080 godzin (liczby z 29.10.2026). Ekran statystyk pokazuje „Pierwsza ewolucja: poz. klasy 50”. Same ewolucje powstaną w Etapie 3. Gdyby autor wolał progi 150, 250, 350 i 450, wystarczy zmienić listę. Punkt zastępuje poziom 30 z punktu 10 „Regionów wewnętrznych i obozu”.
 
 ### Portrety i wygląd postaci
 
@@ -2733,7 +2733,7 @@ Autor: „Do Rankingu w Społeczności dodaj zakładkę "Poziom Profesji". Będz
 3. **Tylko pracujący.** W tym porządku są tylko postacie, które pracowały w jakiejś profesji. Postać bez profesji nie ma tu miejsca („Twoje miejsce” się wtedy nie pokazuje).
 4. **Kolumna Profesja** pokazuje się tylko w tej zakładce, żeby dwie pozostałe zostały czytelne na wąskim telefonie.
 
-## Kwiat paproci: nowe zdarzenie do sprawdzenia (28.10.2026, wersja testowa)
+## Kwiat paproci: nowe zdarzenie (28.10.2026, w grze od 0.0.48)
 
 Autor: „Wymyśl i zaproponuj nowe zdarzenie. Możesz je nawet wdrożyć na serwer testowy, jutro je sprawdzę”.
 
@@ -2743,8 +2743,8 @@ Autor: „Wymyśl i zaproponuj nowe zdarzenie. Możesz je nawet wdrożyć na ser
     - **„Obserwuj z ukrycia”** to ostrożność za małą nagrodę. Licho odchodzi i zostaje złoto (4 × złoto za poziom, jak u rannej kobiety 5), a bez strażnika kwiat gaśnie i nic się nie dzieje.
     - **„Odejdź”** nic nie daje i nic nie kosztuje.
 3. **Gdzie.** Tylko tam, gdzie żyje Licho, elita Uroczyska Kamieni: w Omszałych Głazach, na Rysiej Grani, w Wilczych Kręgach i w Sercu Uroczyska (tak jak ranna kobieta tylko przy Błędnicy).
-4. **Szkic.** Zdarzenie ma `draft`, więc przychodzi tylko w wersji testowej. W „Testuj zdarzenia” ma dopisek „(szkic)”. W grze głównej nie pojawi się, dopóki autor go nie zatwierdzi.
-5. **Grafiki** (kwiat i nocna polana z głazami) są z Retro Diffusion, po dwie wersje. Na wersji testowej stoją na próbę kwiat z drugiej wersji i polana z pierwszej, a kwiat stoi na środku polany (`figure`: 41% od lewej, 6% od dołu, 50% wysokości). Autor wybiera wersje rano.
+4. **Zatwierdzone.** Do 0.0.47 zdarzenie miało `draft`, więc przychodziło tylko w wersji testowej, z dopiskiem „(szkic)” w „Testuj zdarzenia”. Autor zatwierdził je 29.10.2026 („Zatwierdzam zdarzenie kwiatu paproci”), więc od 0.0.48 przychodzi też w grze głównej.
+5. **Grafiki** (kwiat i nocna polana z głazami) są z Retro Diffusion, po dwie wersje. Autor wybrał kwiat z drugiej wersji i polanę z pierwszej (29.10.2026). Kwiat stoi na środku polany (`figure`: 41% od lewej, 6% od dołu, 50% wysokości).
 
 ## Osiem stworów dla poziomów 66–100 (0.0.47)
 
@@ -2775,6 +2775,15 @@ Autor: „Zbuduj liste kolejnych stworów na kolejne poziomy i tak jak teraz opi
 7. **Afiksy.** Żmij daje przedrostek „Smoczy”, bo „Żmijowy” należy już do Żmii, a przyrostek „Żmija”. Cietrzew daje „Cietrzewi” i „Cietrzewia”, a Szczur „Szczurzy” i „Szczura”. Pozostałe dają tylko przyrostki: Zwida, Pływaka, Sowiszcza, Zaducha i Skarbnika.
 8. **Bestiariusz.** Osiem stworów dochodzi do `laterCreatures`. Dzięki temu skrzynia otwarta przed 0.0.46, zapisana bez liczby stworów, też otwiera się znowu po poznaniu nowych stworów.
 9. **Balans** (`tools/simulate.mjs`, 1500 wypraw na wiersz, wyprawy 60-minutowe, poziomy 68, 78, 83, 88, 93 i 98). XP na godzinę, omdlenia i czas do poziomu są takie jak przed zmianą, w granicach losowości. Na 68. poziomie poziom trwa 8,7–8,9 godziny (cel 8,8), a wcześniej 8,4–8,5. Na 98. poziomie poziom trwa 9,5–11,4 godziny (cel 9,8), a wcześniej 9,3–10,7.
+
+## Zadania „Odblokuj dostęp” tylko tygodniowe i coraz mniejsze (29.10.2026, 0.0.48)
+
+Autor: „Do tego - trzeba dostosować zadania z odblokowywaniem regionów. Na niższych lvlach tygodniowo max 3, a później 2 i 1, az całkiem te zadania znikają. Dziennie max 1, ale najlepiej, żeby wcale w dziennych tego nie było.”
+
+1. **Bez dziennych.** Rodzaj `unlock` nie ma już okresu `daily`, więc zadania dzienne nie proszą o regiony.
+2. **Tygodniowe coraz mniejsze** (`most` w `data/quests.json`). Do 9. poziomu klasy zadanie prosi o 2–3 regiony, od 10. poziomu o 2, a od 20. o 1. Od 30. poziomu znika (`untilClassLevel` z 25 na 30). Jak dotąd nie prosi o więcej regionów, niż otwiera się w zasięgu 15 poziomów klasy.
+3. **Skąd progi.** Według krzywej z 0.0.30 trzy regiony od 1. poziomu klasy to ok. 3,4 godziny wypraw. Dwa regiony od 10. poziomu to ok. 4 godziny, a jeden od 20. też ok. 4 godziny. Od 25. poziomu jeden region to ok. 6,5 godziny, a od 30. już ok. 10 godzin, więc tam zadanie znika.
+4. **Zastępuje** punkty 2 i 3 z „Zadania: „Odblokuj dostęp do N nowych regionów”” (28.10.2026). Zadania już wylosowane zostają do końca swojego okresu. Nowa postać dalej dostaje 5 zadań dziennych, wylosowanych spośród stworów Skraju, wszystkich stworów i czasu wypraw.
 
 ## Ewolucje i Osada: propozycje (28.10.2026)
 

@@ -288,6 +288,28 @@
           "type": "integer",
           "minimum": 1,
           "description": "Rodzaj unlock: na ile poziomów klasy w przód liczą się zamknięte regiony; zadanie prosi najwyżej o tyle, ile ich tam jest."
+        },
+        "most": {
+          "type": "array",
+          "description": "Rodzaj unlock: od poziomu klasy fromClassLevel zadanie prosi najwyżej o count regionów (progi rosnąco).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "fromClassLevel",
+              "count"
+            ],
+            "properties": {
+              "fromClassLevel": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
         }
       }
     },

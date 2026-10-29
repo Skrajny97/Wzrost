@@ -2158,9 +2158,10 @@ describe('quests from the narrator', () => {
     for (const periodId of ['daily', 'weekly']) {
       for (let seed = 0; seed < 30; seed++) {
         const quests = drawQuests(periodId, { character, hasTable: false, seed }, content);
-        // Skraj Wiatrołomów has two creatures: one quest for each, one for
-        // creatures of any kind, one for the time and one for the inner
-        // regions to open, five before the Stół rozbiórki stands.
+        // Skraj Wiatrołomów: a quest for each of its creatures, one for
+        // creatures of any kind, one for the time and, in the week, one for
+        // the inner regions to open; five of them before the Stół rozbiórki
+        // stands.
         assert.equal(quests.length, Math.min(5, content.quests.periods[periodId].count));
         const kills = quests.filter((quest) => quest.kind === 'kill');
         assert.ok(kills.every((quest) => prey.has(quest.target) && quest.count >= 1));
@@ -2175,7 +2176,7 @@ describe('quests from the narrator', () => {
     assert.notDeepEqual(drawQuests('daily', { character, hasTable: true, seed: 'a:daily:2026-10-25' }, content), drawQuests('daily', { character, hasTable: true, seed: 'a:daily:2026-10-26' }, content));
   });
 
-  test('a new character is asked to open inner regions: as many as lie within reach, only while new', () => {
+  test('a new character is asked to open inner regions: only in the week, fewer as its class grows, only while new', () => {
     const unlock = content.quests.kinds.find((kind) => kind.id === 'unlock');
     const asked = (character, periodId, data = content) =>
       Array.from({ length: 40 }, (_, seed) => drawQuests(periodId, { character, hasTable: true, seed }, data))
@@ -2185,19 +2186,26 @@ describe('quests from the narrator', () => {
     // Lisie Jary opens at class level 5, then one more every 5 levels.
     assert.equal(areasOpened(1, 5, content), 1);
     assert.equal(areasOpened(4, 20, content), 4);
-    assert.deepEqual(new Set(asked(newCharacter('warrior'), 'daily')), new Set([1]));
+    // Never in the day (the author: "najlepiej, żeby wcale w dziennych tego nie było").
+    assert.deepEqual(asked(newCharacter('warrior'), 'daily'), []);
+    // A week asks for 2–3, from class level 10 for 2 and from 20 for 1.
     assert.deepEqual(new Set(asked(newCharacter('warrior'), 'weekly')), new Set([2, 3]));
+    assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 12, classLevel: 10 }), 'weekly')), new Set([2]));
+    assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 22, classLevel: 20 }), 'weekly')), new Set([1]));
     // Near the last inner region of the game a week asks for no more than are left.
-    const always = { ...content, quests: { ...content.quests, kinds: content.quests.kinds.map((kind) => (kind.id === 'unlock' ? { ...kind, untilClassLevel: 100 } : kind)) } };
+    const always = {
+      ...content,
+      quests: { ...content.quests, kinds: content.quests.kinds.map((kind) => (kind.id === 'unlock' ? { ...kind, untilClassLevel: 100, weekly: { ...kind.weekly, most: [] } } : kind)) },
+    };
     assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 92, classLevel: 92 }), 'weekly', always)), new Set([1]));
     // Only while new.
-    assert.ok(asked(newCharacter('warrior', { level: 20, classLevel: unlock.untilClassLevel - 1 }), 'daily').length > 0);
-    assert.deepEqual(asked(newCharacter('warrior', { level: 30, classLevel: unlock.untilClassLevel }), 'daily'), []);
+    assert.ok(asked(newCharacter('warrior', { level: 28, classLevel: unlock.untilClassLevel - 1 }), 'weekly').length > 0);
+    assert.deepEqual(asked(newCharacter('warrior', { level: 30, classLevel: unlock.untilClassLevel }), 'weekly'), []);
     assert.deepEqual(asked(newCharacter('warrior', { level: 50, classLevel: 50 }), 'weekly'), []);
     // Progress: the inner regions a claim's new class levels open.
-    const quests = { daily: { period: 'd', quests: [{ kind: 'unlock', count: 1, progress: 0, claimed: false }], chest: false } };
-    assert.equal(addQuestProgress(quests, { opened: 2 }).daily.quests[0].progress, 1);
-    assert.equal(addQuestProgress(quests, { minutes: 30 }).daily.quests[0].progress, 0);
+    const quests = { weekly: { period: 'w', quests: [{ kind: 'unlock', count: 1, progress: 0, claimed: false }], chest: false } };
+    assert.equal(addQuestProgress(quests, { opened: 2 }).weekly.quests[0].progress, 1);
+    assert.equal(addQuestProgress(quests, { minutes: 30 }).weekly.quests[0].progress, 0);
     assert.equal(questText({ kind: 'unlock', count: 2 }, content), 'Odblokuj dostęp do 2 nowych regionów.');
     assert.equal(questText({ kind: 'unlock', count: 1 }, content), 'Odblokuj dostęp do 1 nowego regionu.');
   });
@@ -2206,7 +2214,7 @@ describe('quests from the narrator', () => {
     const character = newCharacter('archer', { level: 12, classLevel: 10 });
     const kinds = new Set();
     for (let seed = 0; seed < 40; seed++) for (const quest of drawQuests('daily', { character, hasTable: true, seed }, content)) kinds.add(quest.kind);
-    assert.deepEqual([...kinds].sort(), ['explore', 'kill', 'killAny', 'process', 'salvage', 'unlock']);
+    assert.deepEqual([...kinds].sort(), ['explore', 'kill', 'killAny', 'process', 'salvage']);
   });
 
   test('no quest sends a character to the creatures of a place too easy for it', () => {
@@ -2219,7 +2227,7 @@ describe('quests from the narrator', () => {
     // too easy at level 19, still fine at 18.
     const behind = newCharacter('archer', { level: 19, classLevel: 14 });
     assert.equal(questArea(behind, content).id, 'raven-hollows');
-    assert.deepEqual(kinds(behind), ['explore', 'process', 'salvage', 'unlock']);
+    assert.deepEqual(kinds(behind), ['explore', 'process', 'salvage']);
     assert.ok(kinds({ ...behind, level: 18 }).includes('kill'));
     // Past every place of the game the same.
     assert.ok(!kinds(newCharacter('archer', { level: 110, classLevel: 119 })).includes('kill'));
@@ -2451,7 +2459,9 @@ describe('quests from the narrator', () => {
 
   test('the page gets each period with its end, its quests and its chest', () => {
     const now = at('2026-10-25T10:00:00Z');
-    const quests = currentQuests({}, { character: newCharacter('shadow'), hasTable: false, seed: 1 }, now, content);
+    // A day drawn with a quest for the time of explorations.
+    const draw = (seed) => currentQuests({}, { character: newCharacter('shadow'), hasTable: false, seed }, now, content);
+    const quests = draw([...Array(20).keys()].find((seed) => draw(seed).daily.quests.some((quest) => quest.kind === 'explore')));
     const view = questsView(addQuestProgress(quests, { minutes: 240 }), now, content);
     assert.deepEqual(Object.keys(view), ['daily', 'weekly']);
     assert.equal(view.daily.name, 'Dzienne');

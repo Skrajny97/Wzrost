@@ -95,7 +95,6 @@
     },
     {
       "id": "fern-flower",
-      "draft": true,
       "areas": ["mossy-boulders", "lynx-ridge", "wolf-circles", "glade-heart"],
       "title": "Kwiat paproci",
       "art": "fern-flower",

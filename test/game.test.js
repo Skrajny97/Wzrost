@@ -2062,14 +2062,19 @@ describe('Zadania od narratora', () => {
   });
 
   test('a class level that opens an inner region counts toward "Odblokuj dostęp"', async () => {
-    // One class XP short of class level 5, which opens Lisie Jary.
+    // Only a week asks for it. One class XP short of class level 5, which
+    // opens Lisie Jary.
+    const quests = await stored();
+    quests.weekly.quests = [{ kind: 'unlock', count: 2, progress: 0, reward: { kind: 'gold', amount: 5 }, claimed: false }];
+    await store(quests);
     await (await db()).prepare('UPDATE characters SET class_level = 4, class_xp = ?').bind(classXpToNext(4, content) - 1).run();
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
     await finishHunt();
     const after = (await call('POST', '/api/hunts/claim', { cookie })).data.character;
     assert.equal(after.classLevel, 5);
-    const unlock = after.quests.daily.quests.find((quest) => quest.kind === 'unlock');
-    assert.deepEqual([unlock.progress, unlock.count, unlock.done, unlock.text], [1, 1, true, 'Odblokuj dostęp do 1 nowego regionu.']);
+    assert.ok(after.quests.daily.quests.every((quest) => quest.kind !== 'unlock'));
+    const unlock = after.quests.weekly.quests.find((quest) => quest.kind === 'unlock');
+    assert.deepEqual([unlock.progress, unlock.count, unlock.done, unlock.text], [1, 2, false, 'Odblokuj dostęp do 2 nowych regionów.']);
   });
 
   test('a quest done gives its reward once: gold, a resource or parts', async () => {

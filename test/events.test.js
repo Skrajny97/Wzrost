@@ -54,7 +54,7 @@ describe('events', () => {
     const seeds = Array.from({ length: 40 }, (_, index) => `region-${index}`);
     const drawn = (areaId, extra = {}, data = always) => seeds.map((one) => eventFor({ hunt: { result: 'success', areaId, minutes: 30 }, seed: one, ...extra }, data)?.id ?? null);
     for (const areaId of ['windfalls-edge', 'fox-ravines', 'raven-hollows']) assert.ok(drawn(areaId).every((id) => id === 'wounded-woman'), areaId);
-    for (const areaId of ['viper-heaps', 'mossy-boulders', 'reed-beds']) assert.ok(drawn(areaId).every((id) => id === null), areaId);
+    for (const areaId of ['viper-heaps', 'spider-gully', 'reed-beds']) assert.ok(drawn(areaId).every((id) => id === null), areaId);
     // "Testuj zdarzenia" still brings it anywhere.
     assert.equal(eventFor({ hunt: { result: 'success', areaId: 'viper-heaps', minutes: 30 }, seed, forced: 'wounded-woman' }, always), woman);
     const drafted = { ...always, events: { ...always.events, list: [...always.events.list, { ...woman, id: 'szkic', areas: undefined, draft: true }] } };
@@ -196,15 +196,16 @@ describe('events', () => {
     for (const one of woman.cases) assert.equal(resolve('leave', base, one.id).event.option.text, woman.options[2].outcome.text);
   });
 
-  test('the fern flower, a draft, comes only where Licho lives and drafts are on: picking it risks Licho for an item', () => {
+  test('the fern flower comes only where Licho lives: picking it risks Licho for an item', () => {
+    // A draft until the author approved it (0.0.48).
     const fern = content.eventsById['fern-flower'];
     const always = { ...content, events: { ...content.events, chance: 1 } };
     const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
     const seeds = Array.from({ length: 30 }, (_, index) => `paproc-${index}`);
-    assert.ok(seeds.every((one) => eventFor({ hunt: hunt('mossy-boulders'), seed: one }, always) === null));
-    assert.ok(seeds.every((one) => eventFor({ hunt: hunt('mossy-boulders'), seed: one, drafts: true }, always) === fern));
-    assert.equal(eventFor({ hunt: hunt('mossy-boulders'), seed, forced: 'fern-flower' }, always), null);
-    const resolveFern = (optionId, caseId) => resolveEvent({ hunt: base, event: fern, optionId, caseId, drafts: true, character, equipped, name: 'Mira', seed }, content);
+    assert.ok(seeds.every((one) => eventFor({ hunt: hunt('mossy-boulders'), seed: one }, always) === fern));
+    assert.ok(seeds.every((one) => eventFor({ hunt: hunt('raven-hollows'), seed: one }, always) !== fern));
+    assert.equal(eventFor({ hunt: hunt('mossy-boulders'), seed, forced: 'fern-flower' }, always), fern);
+    const resolveFern = (optionId, caseId) => resolveEvent({ hunt: base, event: fern, optionId, caseId, character, equipped, name: 'Mira', seed }, content);
     const fought = resolveFern('pick', 'guarded');
     assert.deepEqual(fought.fights.at(-1).enemies.map((enemy) => [enemy.monsterId, enemy.level]), [['likho', character.level]]);
     const found = resolveFern('pick', 'free');
@@ -270,7 +271,7 @@ describe('events (API)', () => {
         {
           id: 'fern-flower',
           title: 'Kwiat paproci',
-          draft: true,
+          draft: false,
           cases: [
             { id: 'guarded', name: 'Licho strzeże kwiatu' },
             { id: 'free', name: 'Kwiat bez stróża' },

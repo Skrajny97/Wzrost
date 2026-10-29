@@ -138,8 +138,8 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false, h
   return content.quests.kinds.flatMap((kind) => {
     if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions) || (kind.crafting && !hasCrafting)) return [];
     if ((kind.id === 'kill' || kind.id === 'killAny') && areas.length === 0) return [];
-    // Regions to open: only for a new character, and no more than open
-    // within reach of its class level.
+    // Regions to open: only for a new character, no more than open within
+    // reach of its class level, and fewer as the class grows (`most`).
     const ahead = kind.id === 'unlock' ? areasOpened(character.classLevel, character.classLevel + kind[periodId].reach, content) : 0;
     if (kind.id === 'unlock' && (character.classLevel >= kind.untilClassLevel || ahead === 0)) return [];
     const variants =
@@ -154,11 +154,15 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false, h
             : kind.id === 'brew'
               ? questPotions(character, content).map((potion) => ({ target: potion.id }))
               : kind.id === 'unlock'
-                ? [{ most: ahead }]
+                ? [{ most: Math.min(ahead, unlockMost(kind[periodId], character.classLevel)) }]
                 : [{}];
     return variants.map((variant) => ({ kind, weight: kind.weight / variants.length, ...variant }));
   });
 }
+
+// The most inner regions a period asks to open at a class level: the count
+// of the last `most` band the class has reached (quests.json), else no limit.
+const unlockMost = (tuning, classLevel) => tuning.most?.findLast((band) => band.fromClassLevel <= classLevel)?.count ?? Infinity;
 
 // How much a quest asks for: for creatures, as many as `fights` fights
 // bring on average, and never more than `most`.
