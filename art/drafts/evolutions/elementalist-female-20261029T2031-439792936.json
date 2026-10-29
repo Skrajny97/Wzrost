@@ -1,0 +1,25 @@
+{
+  "id": "elementalist-female",
+  "payload": {
+    "prompt": "young woman elementalist, slender, long brown hair, standing in the middle of the image, full body figure from the top of the head to the feet, as tall as a grown woman, empty space above the head and below the feet, a long deep red robe with orange trim, the hood down, a dark leather belt, a wooden staff with a glowing amber stone held firmly in one fist, the staff diagonal across the body, a ball of fire floating above the other open palm, confident stance, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 439792936,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793305952,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 60.08,
+    "request_id": "2c0e3336-d12f-474a-b074-081ce552c10e",
+    "outputs_retained_until": 1793392286
+  }
+}
