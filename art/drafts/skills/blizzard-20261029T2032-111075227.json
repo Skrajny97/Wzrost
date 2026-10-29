@@ -1,0 +1,25 @@
+{
+  "id": "blizzard",
+  "payload": {
+    "prompt": "swirling blizzard of snow and sharp ice shards around a frozen crystal, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 111075227,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793306708,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 57.38,
+    "request_id": "65c73a66-066d-4b44-80c1-c437cd075140",
+    "outputs_retained_until": 1793393047
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "elemental-ray",
+  "payload": {
+    "prompt": "one straight beam braided of red fire, light blue ice and yellow lightning, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 126847108,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793306646,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 57.56,
+    "request_id": "4be8a3a0-b78d-4e42-8263-fc444006485b",
+    "outputs_retained_until": 1793393026
+  }
+}

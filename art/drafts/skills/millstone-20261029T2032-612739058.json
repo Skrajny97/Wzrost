@@ -1,0 +1,25 @@
+{
+  "id": "millstone",
+  "payload": {
+    "prompt": "short gladiator sword spinning in a full grey circular blur like a turning millstone, small broken armour plates flying outward, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 612739058,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793306164,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 59.54,
+    "request_id": "6ca5db17-c65a-4826-b1e8-a14205b06dd9",
+    "outputs_retained_until": 1793392496
+  }
+}

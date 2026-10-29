@@ -1,0 +1,25 @@
+{
+  "id": "ambush-shot",
+  "payload": {
+    "prompt": "arrow shooting out of dark green bushes, one glowing eye watching from the shadow, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 497487872,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793306381,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 58.64,
+    "request_id": "f73df61e-7b21-4ba8-8938-dca524f17030",
+    "outputs_retained_until": 1793392751
+  }
+}

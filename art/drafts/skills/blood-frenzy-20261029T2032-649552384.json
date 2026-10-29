@@ -1,0 +1,25 @@
+{
+  "id": "blood-frenzy",
+  "payload": {
+    "prompt": "two crossed bloodied axes inside a pulsing crimson rage aura with red droplets, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 649552384,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793306092,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 59.72,
+    "request_id": "3fb9c6f0-2d20-4c5a-86ec-d44addf58ce8",
+    "outputs_retained_until": 1793392443
+  }
+}

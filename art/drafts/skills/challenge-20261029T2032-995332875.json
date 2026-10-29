@@ -1,0 +1,25 @@
+{
+  "id": "challenge",
+  "payload": {
+    "prompt": "sword striking a round iron shield, golden rings of sound spreading out from the hit, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 995332875,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793306305,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 59,
+    "request_id": "6943ab3b-820b-4c80-9653-ce574528d9a5",
+    "outputs_retained_until": 1793392677
+  }
+}

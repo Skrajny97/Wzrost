@@ -1,0 +1,25 @@
+{
+  "id": "judgement",
+  "payload": {
+    "prompt": "golden scales of judgement in radiant white holy light with a glowing brand mark, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 249868573,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793306923,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 56.3,
+    "request_id": "afa1848e-8091-44c9-809b-cfc9d7e1582d",
+    "outputs_retained_until": 1793393296
+  }
+}

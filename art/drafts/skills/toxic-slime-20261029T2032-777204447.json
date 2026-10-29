@@ -1,0 +1,25 @@
+{
+  "id": "toxic-slime",
+  "payload": {
+    "prompt": "bubbling green toxic slime blob with glowing eyes and dripping poison, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 777204447,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793307279,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 55.22,
+    "request_id": "bd6067d7-56a0-43ce-894a-bd549428f92c",
+    "outputs_retained_until": 1793393656
+  }
+}

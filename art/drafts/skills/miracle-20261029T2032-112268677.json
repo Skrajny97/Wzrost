@@ -1,0 +1,25 @@
+{
+  "id": "miracle",
+  "payload": {
+    "prompt": "white feather rising in a bright golden beam of light from above, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 112268677,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793306895,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 56.48,
+    "request_id": "cd37a60e-b8f9-4af6-a4ff-6f79a88ae60d",
+    "outputs_retained_until": 1793393272
+  }
+}

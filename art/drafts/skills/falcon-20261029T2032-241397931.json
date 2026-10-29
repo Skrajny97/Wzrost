@@ -1,0 +1,25 @@
+{
+  "id": "falcon",
+  "payload": {
+    "prompt": "brown falcon diving with spread wings and outstretched talons, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 241397931,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793306569,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 57.92,
+    "request_id": "5909a3f2-2916-440f-903a-50ad83860413",
+    "outputs_retained_until": 1793392924
+  }
+}

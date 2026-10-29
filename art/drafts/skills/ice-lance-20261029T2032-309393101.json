@@ -1,0 +1,25 @@
+{
+  "id": "ice-lance",
+  "payload": {
+    "prompt": "long sharp spear of glowing blue ice flying diagonally with frost mist, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 309393101,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793306741,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 57.2,
+    "request_id": "5b2d4042-2330-403c-9c2a-a9453c367c69",
+    "outputs_retained_until": 1793393112
+  }
+}

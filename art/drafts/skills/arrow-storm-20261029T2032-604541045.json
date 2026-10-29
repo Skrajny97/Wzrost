@@ -1,0 +1,25 @@
+{
+  "id": "arrow-storm",
+  "payload": {
+    "prompt": "many arrows falling in a wide fan, crackling with blue lightning, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 604541045,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793306449,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 58.46,
+    "request_id": "b6711f1d-671d-4546-a712-8596bd157d61",
+    "outputs_retained_until": 1793392785
+  }
+}

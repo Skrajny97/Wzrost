@@ -1,0 +1,25 @@
+{
+  "id": "black-venom",
+  "payload": {
+    "prompt": "dagger dripping thick black venom with dark green smoke, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 1,
+    "seed": 837044031,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793307253,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 55.4,
+    "request_id": "6a5fa812-598d-45b2-ab69-7b4934f58812",
+    "outputs_retained_until": 1793393625
+  }
+}
