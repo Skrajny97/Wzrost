@@ -331,3 +331,21 @@ describe('class evolutions through the API', () => {
     assert.deepEqual(await points(), { strength: 4 });
   });
 });
+
+describe('class evolutions where the deployment has them off (the live game in 0.0.58)', () => {
+  const { call, db, signUp } = useServer({ EVOLUTIONS: 'off' });
+
+  test('the class grows past class level 50 as before them, with no Ewolucja tab, choice or evolution to take', async () => {
+    const { cookie } = await signUp('bezewolucji');
+    await call('POST', '/api/character', { cookie, body: { name: 'Bezewolucji', classId: 'warrior', appearance: 'male' } });
+    await (await db()).prepare(`UPDATE characters SET level = 50, class_level = 50, skills = '{"power-strike":20,"unyielding":20}'`).run();
+    const character = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.equal(character.features.includes('evolution'), false);
+    assert.deepEqual(character.evolution, { current: null, choices: [] });
+    // Nothing for the class to wait for at class level 50: it grows on.
+    assert.equal(character.skills.evolution.need, null);
+    assert.equal((await call('GET', '/api/content')).data.unlocks.some((unlock) => unlock.id === 'evolution'), false);
+    assert.equal((await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'barbarian' } })).status, 404);
+    assert.equal((await call('GET', '/api/evolution/test', { cookie })).status, 404);
+  });
+});

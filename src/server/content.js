@@ -2,7 +2,7 @@
 // data/schemas before every deploy).
 
 import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, landBestiaryChest, meetingChances, regionDangers } from '../engine/index.js';
-import { craftingOn } from './features.js';
+import { craftingOn, evolutionsOn } from './features.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
 import classes from '../../data/classes.json' with { type: 'json' };
@@ -71,6 +71,18 @@ export const content = buildContent({
 // about them (unlocks.json `feature`): read when asked, as the switches are
 // read for each request (features.js).
 Object.defineProperty(content, 'features', { get: () => (craftingOn() ? ['crafting'] : []) });
+
+// The class evolutions, where the deployment has them on (features.js).
+// Where they are off the game plays as before them: the class grows past
+// the first evolution level once its skills are ready, no evolution is
+// offered and there is no Ewolucja tab (the unlock "evolution").
+const evolutionParts = {
+  on: { evolutions: content.evolutions, evolutionsById: content.evolutionsById, evolutionSkills: content.evolutionSkills, unlocks: content.unlocks },
+  off: { evolutions: [], evolutionsById: {}, evolutionSkills: [], unlocks: content.unlocks.filter((unlock) => unlock.id !== 'evolution') },
+};
+for (const key of Object.keys(evolutionParts.on)) {
+  Object.defineProperty(content, key, { get: () => evolutionParts[evolutionsOn() ? 'on' : 'off'][key] });
+}
 
 // The narrator's lines that are read once, in their order: cards and
 // pointers, and a lead marked `once`, whose tap changes no screen. Another

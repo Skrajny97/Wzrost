@@ -15,8 +15,14 @@ export function mountEvolution(container) {
     const character = state.character;
     const t = state.content.evolutionTexts;
     const heading = h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t.title }));
+    const unlock = unlockInfo('evolution');
+    // Where the deployment has the evolutions off there is no tab, and the
+    // address alone leads here.
+    if (!unlock) {
+      fill(container, heading, systemPanel('Ewolucja klasy: wkrótce.'));
+      return;
+    }
     if (!isUnlocked('evolution')) {
-      const unlock = unlockInfo('evolution');
       fill(container, heading, systemPanel(`Dostęp zablokowany. ${unlock.name}: od poziomu klasy ${unlock.classLevel}. Twój poziom klasy: ${character.classLevel}.`));
       return;
     }

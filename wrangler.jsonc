@@ -52,7 +52,11 @@
     // "on": events at the end of an exploration (src/engine/events.js), in
     // the live game from version 0.0.43, without the outcomes the author has
     // not approved yet (drafts), which the test version has ("test").
-    "EVENTS": "on"
+    "EVENTS": "on",
+    // "off" hides the class evolutions (src/server/evolutions.js): the
+    // class grows past class level 50 as before them. Hidden in the live
+    // game in version 0.0.58, until they are ready (the author).
+    "EVOLUTIONS": "off"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain
@@ -99,7 +103,9 @@
         "TUTORIAL_TESTS": "on",
         // "test": the events with their drafts, and "Testuj zdarzenia" in the
         // settings (TUTORIAL_TESTS).
-        "EVENTS": "test"
+        "EVENTS": "test",
+        // The class evolutions, with "Testuj ewolucję" (TUTORIAL_TESTS).
+        "EVOLUTIONS": "on"
       },
       "triggers": {
         "crons": ["* * * * *"]

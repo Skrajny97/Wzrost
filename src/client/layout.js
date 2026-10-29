@@ -365,8 +365,11 @@ export function updateNav({ kind, active, onBack }) {
   const character = $('#nav-character');
   main.hidden = kind !== 'main';
   character.hidden = kind !== 'character';
+  // A tab whose part the deployment has off (no unlock in the content, as
+  // the Ewolucja in the live game) is not there.
+  const characterTabs = CHARACTER_TABS.filter((tab) => !tab.unlock || unlockInfo(tab.unlock));
   if (kind === 'main') fill(main, ...MAIN_TABS.map((tab) => navButton(tab, active)));
-  else fill(character, ...CHARACTER_TABS.map((tab) => navButton(tab, active, onBack)));
+  else fill(character, ...characterTabs.map((tab) => navButton(tab, active, onBack)));
   updateNavTimers();
 }
 

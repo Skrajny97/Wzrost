@@ -2819,7 +2819,19 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
 5. **Dodatkowy czas.** Punkty Czasu (1 na 30 minut oraz skrzynie zadań) przewijają ok. 1,5 godziny wypraw dziennie. Szybkie Polowania dają 45 minut dziennie, a Błyskawiczne 30–60 minut. Razem to do ok. 3 godzin dziennie. Najbardziej pomaga to graczom, którzy zaglądają rzadko i do 24. poziomu mają wyprawy najwyżej 30-minutowe. Zostaje tak, jak autor ustalił.
 6. **Narzędzie.** Symulacja przyjmuje teraz opcje wyprawy gracza (`hunt` w polityce, np. `seekRare`).
 
-## Uwagi autora po 0.0.57 (29.10.2026, na wersji testowej)
+## Wersja 0.0.58 bez ewolucji klas (29.10.2026)
+
+Autor: „W nocy (około 23 w nocy, za godzinę) wdroż 0.0.58 bez tego co nie udało Ci sie zrobić”, „ukryj po prostu Ewolucje klas chwilowo i zrob wdrożenie reszty rzeczy co wykonałeś od 0.0.57”.
+
+1. **Ewolucje ukryte w grze.** Przełącznik `EVOLUTIONS` w `wrangler.jsonc` ma w grze wartość „off”, a na wersji testowej „on”. Bez ewolucji gra działa jak w 0.0.57: na 50. poziomie klasa czeka tylko na ścieżkę poboczną i Punkty Umiejętności, a potem rośnie dalej. Nie ma zakładki Ewolucja, wiadomości Systemu o jej odblokowaniu ani wyboru ewolucji. Statystyki mówią przy poziomie klasy „EWOLUCJA KLASY: WKRÓTCE”, a zapytania o ewolucję serwer odrzuca. Kolumny bazy dla ewolucji (migracje 0052 i 0054) powstają też w grze, ale zostają puste. Gdy ewolucje będą gotowe, wystarczy usunąć ten wpis i wdrożyć grę.
+2. **Co wchodzi do gry w 0.0.58:**
+    - złota kropka i ramka w Encyklopedii przy skrzyni do odebrania oraz zwijane tiery i krainy (zob. „Uwagi autora po 0.0.57”);
+    - kod podarunkowy JESTEMTESTEREM w Ustawieniach (zob. „Uwagi autora: kod podarunkowy i zakładka Ewolucja”, punkt 1). Wdrożenie jest 29 października, więc „2 tygodnie, licząc od jutra” liczą się od 30 października i kod działa do końca 12 listopada, jak było ustalone;
+    - szybszy start gry: okrzyki stworów ładują się z walką (zob. „Zacinanie i długie ładowanie: dźwięki stworów”).
+3. **Co czeka na wersji testowej:** ewolucje klas z umiejętnościami, cechami, portretami, chodem w walce, zerowaniem statystyk i „Testuj ewolucję”. Ich grafiki są już w plikach gry, ale gra ich nie pokazuje.
+4. **Napis w Statystykach na wersji testowej.** Klasa czekająca na wybór ewolucji ma napis „KLASA CZEKA: WYBIERZ EWOLUCJĘ”, bo wybór jest w zakładce Ewolucja, a nie w Umiejętnościach. Klasa, która przeszła 50. poziom przed ewolucjami, nie czeka, więc ma napis „WYBIERZ EWOLUCJĘ KLASY”.
+
+## Uwagi autora po 0.0.57 (29.10.2026, w grze od 0.0.58)
 
 1. **Kolejność pracy.** Autor: „Sklep Systemu jednak później.” Potem: „Najpierw te 2 punkty co mówisz, poźniej zwijanie Tierów w encyklopedii, zeby tez nie trzeba bylo tyle scrollować i wtedy Ewolucje.” Najpierw idą kropka z ramką w Encyklopedii i propozycja samouczka, potem zwijanie tierów, potem ewolucje, a Sklep Systemu po nich.
 2. **Kropka i ramka w Encyklopedii.** Autor: „Do Encyklopedii jesli nie dodales ramke i kółeczko żółte z powiadomieniem też dodaj jak ktoś zapełni cały tier czegokolwiek i jest skrzynka do odebrania.”
@@ -2833,7 +2845,7 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
     - Krainy w zakładce Bestiariusz zwijają się tak samo. Na start rozwinięta jest kraina poziomu postaci i każda z czekającą skrzynią.
     - Gra pamięta, co gracz zwinął albo rozwinął, dopóki jest otwarta.
 
-## Uwagi autora: kod podarunkowy i zakładka Ewolucja (29.10.2026, na wersji testowej)
+## Uwagi autora: kod podarunkowy i zakładka Ewolucja (29.10.2026, kod w grze od 0.0.58, zakładka na wersji testowej)
 
 1. **Kod podarunkowy.** Autor: „Wygeneruj tez w ustawieniach opcje dodania gift code: JESTEMTESTEREM. Pozniej w przyszłości moze inne jeszcze ale na razie ten. Niech daje 100 Punktów Systemu, 100 Punktów Czasu, 1000 złota i po 100 każdego z zasobów. Niech ma ważność 2 tygodnie, licząc od jutra. I oczywiscie ten gift code jednorazowy.”
     - W Ustawieniach jest wiersz „Kod podarunkowy” z przyciskiem „Wpisz kod”. Wielkość liter, spacje i myślniki nie mają znaczenia. Po przyjęciu kodu komunikat wymienia nagrody.
@@ -2855,7 +2867,7 @@ Autor: „Trzeba bedzie zbalansowac reszte rzeczy pod nowa formule polowan (albo
     - Na wersji testowej „Cofnij ewolucję” oddaje też punkty sprzed zerowania.
     - Przy okazji: na Statystykach trzy profesje z wysokimi poziomami nie mieściły się w jednym rzędzie na wąskim telefonie i rozpychały ekran, przez co okienka ucinały się u dołu. Teraz przechodzą do drugiego rzędu.
 
-## Zacinanie i długie ładowanie: dźwięki stworów (29.10.2026, na wersji testowej)
+## Zacinanie i długie ładowanie: dźwięki stworów (29.10.2026, w grze od 0.0.58)
 
 Autor: „ej a gra coś zacina, znasz tego powód? długie ladowania itp nie tylko u mnie”.
 
@@ -2865,7 +2877,7 @@ Autor: „ej a gra coś zacina, znasz tego powód? długie ladowania itp nie tyl
 
 ## Ewolucje: portrety (29.10.2026, na wersji testowej)
 
-Autor: „Kolejna rzecz to portrety dla wyewoluowanych klas, bez tego nie wdrażamy ewolucji też.”, „nie giftcode i wszystko zaczekaja”, „0.0.58 to bedzie duzy update po prostu”. Kod podarunkowy, Encyklopedia i ewolucje czekają więc na portrety i wejdą do gry razem, jako 0.0.58.
+Autor: „Kolejna rzecz to portrety dla wyewoluowanych klas, bez tego nie wdrażamy ewolucji też.”, „nie giftcode i wszystko zaczekaja”, „0.0.58 to bedzie duzy update po prostu”. Kod podarunkowy, Encyklopedia i ewolucje czekały więc na portrety, by wejść do gry razem, jako 0.0.58. Później plan się zmienia: 0.0.58 wchodzi do gry bez ewolucji (zob. „Wersja 0.0.58 bez ewolucji klas”).
 
 1. **Dawne portrety dla pięciu ewolucji.** Autor: „części może można użyć nawet zastanow sie czy mozna przyporządkować”. Dawne, bogatsze portrety klas (`art/evolution/portraits/`, zob. „Skromne portrety na start”, punkt 2) dostały ewolucje, do których pasują strojem i umiejętnościami: Strażnik (Wojownik), Snajper (Łucznik), Władca Lodu (Mag), Kapłan (Kleryk) i Skrytobójca (Cień). Autor zatwierdził wszystkie pięć, w trzech męskich wersjach z poprawkami: „1 tak 2 Snajper męski ma ucięty kaptur do ręcznej poprawy 3 tak 4 Kapłan męski ma ucięte wlosy 5 Skrytobójca męski ma od razu odcień skóry szary”.
 2. **Poprawki** (autor: „2 4 i 5 tak”):

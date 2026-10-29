@@ -90,7 +90,10 @@ export function mountStats(container) {
     if (character.evolution?.current) return `EWOLUCJA: ${character.className.toUpperCase()}`;
     if (character.classLevel < evolution) return `PIERWSZA EWOLUCJA: POZ. KLASY ${evolution}`;
     if (need === 'second_path') return 'KLASA CZEKA: WYBIERZ ŚCIEŻKĘ POBOCZNĄ';
-    return 'KLASA CZEKA: WYBIERZ EWOLUCJĘ W UMIEJĘTNOŚCIACH';
+    // Where the deployment has the evolutions off (the live game), they are
+    // still to come.
+    if (!unlockInfo('evolution')) return 'EWOLUCJA KLASY: WKRÓTCE';
+    return need === 'evolve' ? 'KLASA CZEKA: WYBIERZ EWOLUCJĘ' : 'WYBIERZ EWOLUCJĘ KLASY';
   }
 
   function levelsCard(character) {

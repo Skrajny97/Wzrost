@@ -5,14 +5,20 @@
 // the test can be undone. Like skills, an evolution is taken only at home,
 // and only if the character is as read (its version). After it the stat
 // points can be reset once, for free, decided at once (decidePointsReset).
+// Where the deployment has the evolutions off (features.js) there are none.
 
 import { evolutionChoices, evolutionView, evolveBlock, evolvedSkills, spentPoints } from '../engine/index.js';
 import { characterView, engineCharacter, loadPlayer, requireIdlePlayer } from './characters.js';
 import { content } from './content.js';
+import { evolutionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { evolutionTestsFor } from './test-mode.js';
 
 const conflict = () => new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
+
+function requireEvolutions() {
+  if (!evolutionsOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+}
 
 function requireTests(context, session) {
   if (!evolutionTestsFor(context.env, session.user.login)) throw new ApiError(403, 'no_tests', 'Test ewolucji działa tylko na wersji testowej.');
@@ -22,6 +28,7 @@ function requireTests(context, session) {
 // on the test version. With stat points spent, their free reset waits for
 // the player's decision.
 export async function takeEvolution(context) {
+  requireEvolutions();
   const { session, player } = await requireIdlePlayer(context);
   const body = await readJson(context.request);
   const test = body.test === true;
@@ -52,6 +59,7 @@ export async function takeEvolution(context) {
 // GET /api/evolution/test: every evolution of the class to try (test
 // version).
 export async function testEvolutions(context) {
+  requireEvolutions();
   const { session, player } = await requireIdlePlayer(context);
   requireTests(context, session);
   const character = engineCharacter(player.row);
@@ -64,6 +72,7 @@ export async function testEvolutions(context) {
 // Asked again (from another device, say), nothing changes. On the test
 // version the points before the reset wait for "Cofnij ewolucję".
 export async function decidePointsReset(context) {
+  requireEvolutions();
   const { session, player } = await requireIdlePlayer(context);
   const body = await readJson(context.request);
   const row = player.row;
@@ -82,6 +91,7 @@ export async function decidePointsReset(context) {
 // POST /api/evolution/undo: back to the class with the skills it had before
 // a test evolution, and the stat points if they were reset (test version).
 export async function undoEvolution(context) {
+  requireEvolutions();
   const { session, player } = await requireIdlePlayer(context);
   requireTests(context, session);
   if (!player.row.evolution_undo) throw new ApiError(409, 'no_test_evolution', 'Cofnąć można tylko ewolucję z testu.');
