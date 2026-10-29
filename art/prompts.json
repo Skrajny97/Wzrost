@@ -209,6 +209,17 @@
       "amber-charm": "a polished golden amber stone with a tiny insect trapped inside, hanging on a leather cord, single inventory item icon"
     }
   },
+  "resources": {
+    "style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "references": [],
+    "prompts": {
+      "wood": "a small stack of three chopped wooden logs with pale tree rings on the cut ends and brown bark, single inventory item icon",
+      "stone": "a few rough grey quarried stone blocks stacked together, chunky granite with light edges, single inventory item icon",
+      "iron-ore": "a chunk of dark grey rock with rusty orange-brown iron ore veins and small metallic glints, single inventory item icon"
+    }
+  },
   "materials": {
     "style": "rd_pro__fantasy",
     "width": 32,

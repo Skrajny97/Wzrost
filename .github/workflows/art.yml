@@ -17,6 +17,7 @@ on:
           - items
           - portraits
           - materials
+          - resources
           - narrator
           - skills
           - areas
