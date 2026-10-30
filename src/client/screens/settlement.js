@@ -9,6 +9,7 @@
 
 import { fill, h } from '../dom.js';
 import { formatCountdown, formatHours, formatNumber } from '../format.js';
+import { setMusicPlace } from '../music.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 
@@ -32,7 +33,10 @@ export function mountSettlement(container) {
     } catch (error) {
       failure = error;
     }
-    if (!gone) render();
+    if (gone) return;
+    // The Osada's own music (the author's, question 78 A), once it is open.
+    if (data) setMusicPlace(['settlement']);
+    render();
   }
 
   // What an action answers with: the Osada as it is after it.
