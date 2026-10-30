@@ -305,9 +305,10 @@ function checkReferences(data) {
     if (points !== paths * maxLevel) errors.push(`balance.json: poziomy klasy ${unlockClassLevel}–${lastPointClassLevel} dają ${points} Punktów Umiejętności, a ${paths} ścieżki po ${maxLevel} poziomów biorą ${paths * maxLevel}`);
     if (lastPointClassLevel >= data.balance.progression.classEvolutionLevels[0]) errors.push(`balance.json: ostatni Punkt Umiejętności (poziom klasy ${lastPointClassLevel}) przychodzi dopiero z pierwszą ewolucją albo po niej`);
   }
-  // A skill's own sound names a skill there is.
+  // A skill's own sound names a skill there is, of a class or of an evolution.
+  const soundSkills = new Set([...data.skills, ...data.evolutions.skills].map((skill) => `skill-${skill.id}`));
   for (const name of Object.keys(data.sounds.effects)) {
-    if (name.startsWith('skill-') && !data.skills.some((skill) => `skill-${skill.id}` === name)) errors.push(`sounds.json: effects ma dźwięk "${name}" nieznanej umiejętności`);
+    if (name.startsWith('skill-') && !soundSkills.has(name)) errors.push(`sounds.json: effects ma dźwięk "${name}" nieznanej umiejętności`);
   }
   // Each skill's path has its own name within its class.
   const pathNames = new Set();
