@@ -780,5 +780,19 @@
       "enchantress-3-plain": { "prompt": "a calm grey-eyed woman enchantress with short silver-streaked black hair under a dark charcoal hood with a thin grey woven border, a dark charcoal cloak over a dark dress, a necklace of carved bone and crystal charms, a faint violet glow on her raised hand, head and shoulders portrait, her shoulders and cloak fill the whole bottom of the picture from the left edge to the right edge, facing the viewer, three-quarter view, on a flat plain light beige background, slavic forest village fantasy, muted natural colours", "removeBackground": false},
       "enchantress-2-plain-clear": { "tool": "background_remover", "input": "art/inputs/residents/enchantress-2-plain.png", "options": { "force_solid_pixels": true } }
     }
+  },
+  "walks": {
+    "$comment": "Chody od zera (pytanie 189): postać z portretu idzie w prawo, 4 klatki, z samym portretem jako obrazkiem startowym, bez dawnych chodów. Portret 96 × 128 stoi pośrodku kwadratu 128 (albo zmniejszony o połowę na 64). Kolory skóry później.",
+    "style": "rd_advanced_animation__walking",
+    "width": 128,
+    "height": 128,
+    "removeBackground": false,
+    "animation": { "frames": 4 },
+    "prompts": {
+      "inquisitor-male": { "prompt": "a stern young man with short black hair, a long dark crimson coat over a black cassock, a silver holy symbol on a heavy chain, a flanged iron mace in one hand and a smoking censer on a chain in the other, walking to the right in place, side view, smooth seamless walk cycle loop", "startFrame": "art/references/walks/inquisitor-male.png" },
+      "inquisitor-male-64": { "prompt": "a stern young man with short black hair, a long dark crimson coat over a black cassock, a silver holy symbol on a heavy chain, a flanged iron mace in one hand and a smoking censer on a chain in the other, walking to the right in place, side view, smooth seamless walk cycle loop", "startFrame": "art/references/walks/inquisitor-male-64.png", "width": 64, "height": 64 },
+      "warrior-female": { "prompt": "a young woman with red hair tied up in a bun, a cream linen shirt with a rope belt, patched brown trousers, bare feet with cloth wraps, empty hands, walking to the right in place, side view, smooth seamless walk cycle loop", "startFrame": "art/references/walks/warrior-female.png" },
+      "warrior-female-64": { "prompt": "a young woman with red hair tied up in a bun, a cream linen shirt with a rope belt, patched brown trousers, bare feet with cloth wraps, empty hands, walking to the right in place, side view, smooth seamless walk cycle loop", "startFrame": "art/references/walks/warrior-female-64.png", "width": 64, "height": 64 }
+    }
   }
 }

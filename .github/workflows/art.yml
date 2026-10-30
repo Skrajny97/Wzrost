@@ -35,6 +35,7 @@ on:
           - icons
           - settlement
           - residents
+          - walks
       ids:
         description: Identyfikatory po przecinku albo all
         required: true
