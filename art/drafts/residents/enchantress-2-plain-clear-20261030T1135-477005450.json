@@ -1,0 +1,27 @@
+{
+  "id": "enchantress-2-plain-clear",
+  "tool": "background_remover",
+  "payload": {
+    "input_image": "art/inputs/residents/enchantress-2-plain.png",
+    "force_solid_pixels": true,
+    "seed": 477005450
+  },
+  "result": {
+    "tool_id": "background_remover",
+    "inference_id": "inf_6nEg7Aoj2O4DyqoPEWgQKPYkBeM1aWZ0",
+    "balance_cost": 0.01,
+    "credit_cost": 2,
+    "charged": true,
+    "remaining_balance": 36.690000000000026,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/fcea6a233749bdf06a39de8080f7168a.png"
+    ],
+    "output_width": 96,
+    "output_height": 128,
+    "toolId": "background_remover",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/fcea6a233749bdf06a39de8080f7168a.png",
+    "inferenceId": "inf_6nEg7Aoj2O4DyqoPEWgQKPYkBeM1aWZ0",
+    "balanceCost": 0.01,
+    "creditCost": 2
+  }
+}
