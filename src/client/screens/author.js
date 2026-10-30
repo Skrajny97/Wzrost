@@ -181,8 +181,10 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
             'p',
             { class: 'author-account-character' },
             account.character
-              ? `${account.character.name} · ${account.character.className}, poziom ${account.character.level}, klasa ${account.character.classLevel}`
-              : 'bez postaci',
+              ? `${account.character.name} · ${account.character.className}, poziom ${account.character.level}, klasa ${account.character.classLevel}${account.characters > 1 ? ` · postaci na koncie: ${account.characters}` : ''}`
+              : account.characters > 0
+                ? `postaci na koncie: ${account.characters}, żadna wybrana`
+                : 'bez postaci',
           ),
           h('p', { class: 'author-account-date', text: `Konto od ${dateTimeFormat.format(new Date(account.createdAt))}` }),
           chatRow(account),

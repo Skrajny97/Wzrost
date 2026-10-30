@@ -16,6 +16,7 @@ import { characterView, loadPlayer, requireIdle } from './characters.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
+import { OWN_CHARACTERS } from './roles.js';
 import { herbsOf, potionKnown, potionsOf } from './professions-view.js';
 
 const LIVE = ['proposed', 'open', 'locked'];
@@ -23,8 +24,10 @@ const LIVE = ['proposed', 'open', 'locked'];
 // turned down; the proposer's older ones go with its next proposal.
 const KEEP_MS = 24 * 3600000;
 const rules = () => content.community.trade;
-// Who asked the server within onlineSeconds is online (requireChatter).
+// Who asked the server within onlineSeconds is online (requireChatter), and
+// so is the character the player plays; one set aside waits offline.
 const onlineSince = (now) => now - rules().onlineSeconds * 1000;
+const playedOnline = (row, now) => row?.role === 'player' && (row.seen_at ?? 0) >= onlineSince(now);
 const path = (id) => `$."${id}"`;
 
 // Materials (keys "materialId:rarityId") take no places in the bag.
@@ -32,6 +35,19 @@ const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, material
 const offerOf = (raw) => ({ ...emptyOffer(), ...JSON.parse(raw || '{}') });
 const sideOf = (trade, characterId) => (trade.from_id === characterId ? 'from' : 'to');
 const offerColumn = (side) => (side === 'from' ? 'from_offer' : 'to_offer');
+
+const PLAYED = "SELECT id FROM characters WHERE user_id = ? AND role = 'player'";
+
+// The statement that ends the live Wymiana of the character the account
+// plays, when another one takes its place (characters.js): a trade is for
+// the characters played.
+export const tradesEnded = (db, userId, now) =>
+  db
+    .prepare(
+      `UPDATE trades SET state = 'expired', updated_at = ?
+       WHERE state IN ('proposed', 'open', 'locked') AND (from_id IN (${PLAYED}) OR to_id IN (${PLAYED}))`,
+    )
+    .bind(now, userId, userId);
 
 // A proposal waits for its answer, a trade for its next change.
 function lapsed(trade, now) {
@@ -86,7 +102,7 @@ async function tradeView(db, trade, character, now) {
   const theirs = offerOf(trade[offerColumn(side === 'from' ? 'to' : 'from')]);
   const ids = [...mine.items, ...theirs.items];
   const [others, items, viewers] = await db.batch([
-    db.prepare('SELECT c.id, c.name, u.seen_at FROM characters c JOIN users u ON u.id = c.user_id WHERE c.id = ?').bind(side === 'from' ? trade.to_id : trade.from_id),
+    db.prepare('SELECT c.id, c.name, c.role, u.seen_at FROM characters c JOIN users u ON u.id = c.user_id WHERE c.id = ?').bind(side === 'from' ? trade.to_id : trade.from_id),
     db.prepare(`SELECT id, data FROM items WHERE id IN (${ids.map(() => '?').join() || 'NULL'})`).bind(...ids),
     db.prepare('SELECT level, professions FROM characters WHERE id = ?').bind(character.id),
   ]);
@@ -114,7 +130,7 @@ async function tradeView(db, trade, character, now) {
     state: trade.state,
     version: trade.version,
     proposer: side === 'from',
-    other: { id: other?.id ?? null, name: other?.name ?? '', online: (other?.seen_at ?? 0) >= onlineSince(now) },
+    other: { id: other?.id ?? null, name: other?.name ?? '', online: playedOnline(other, now) },
     mine: offerView(mine),
     theirs: offerView(theirs),
     lockedBy: trade.locked_by === null ? null : trade.locked_by === character.id ? 'me' : 'them',
@@ -140,19 +156,21 @@ export async function readTrade(context) {
 }
 
 // POST /api/trade/propose {id}: a trade proposed to that character, whose
-// player is online, takes trades and takes them from this one.
+// player plays it online, takes trades and takes them from this one. Two
+// characters of one account never trade (the author's 177 A).
 export async function proposeTrade(context) {
   const { character, account, db, session } = await requireChatter(context);
   const body = await readJson(context.request);
   const now = context.now;
   const other = Number.isInteger(body.id)
     ? await db
-        .prepare("SELECT c.id, c.user_id, c.name, c.level, u.seen_at, u.trade_off FROM characters c JOIN users u ON u.id = c.user_id WHERE c.id = ? AND c.role = 'player'")
+        .prepare(`SELECT c.id, c.user_id, c.name, c.level, c.role, u.seen_at, u.trade_off FROM characters c JOIN users u ON u.id = c.user_id WHERE c.id = ? AND c.${OWN_CHARACTERS}`)
         .bind(body.id)
         .first()
     : null;
   if (!other) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
   if (other.id === character.id) throw new ApiError(400, 'self', 'Ze sobą się nie wymienisz.');
+  if (other.user_id === session.userId) throw new ApiError(403, 'own', 'Postacie jednego konta nie wymieniają się między sobą.');
   if (account.trade_off) throw new ApiError(403, 'trade_off', 'Wymiana jest u Ciebie wyłączona. Włączysz ją w Ustawieniach.');
   requireIdle(await loadPlayer(db, session.userId), now);
   if (!isUnlocked('community', other.level, content)) {
@@ -164,7 +182,7 @@ export async function proposeTrade(context) {
   ]);
   if (blocking.results.length > 0) throw new ApiError(403, 'blocking', `Wymiana z postacią ${other.name} jest u Ciebie zablokowana. Odblokujesz ją w karcie tej postaci.`);
   if (other.trade_off || blocked.results.length > 0) throw new ApiError(403, 'refused', `${other.name} nie przyjmuje wymian.`);
-  if (!((other.seen_at ?? 0) >= onlineSince(now))) throw new ApiError(409, 'offline', `Gracz ${other.name} nie jest online.`);
+  if (!playedOnline(other, now)) throw new ApiError(409, 'offline', `Gracz ${other.name} nie jest online.`);
   if (await db.prepare('SELECT 1 FROM activities WHERE character_id = ?').bind(other.id).first()) throw awayError(other.name);
   // Turned down too many times in a row: a pause from the last of them.
   const { rejectionsInRow, pauseMinutes } = rules();
@@ -197,8 +215,8 @@ export async function answerTrade(context) {
     return json({ trade: await tradeView(db, rejected, character, now) });
   }
   requireIdle(await loadPlayer(db, session.userId), now);
-  const proposer = await db.prepare('SELECT c.name, u.seen_at FROM characters c JOIN users u ON u.id = c.user_id WHERE c.id = ?').bind(trade.from_id).first();
-  if (!((proposer?.seen_at ?? 0) >= onlineSince(now))) {
+  const proposer = await db.prepare('SELECT c.name, c.role, u.seen_at FROM characters c JOIN users u ON u.id = c.user_id WHERE c.id = ?').bind(trade.from_id).first();
+  if (!playedOnline(proposer, now)) {
     await close(db, trade, 'expired', now);
     throw new ApiError(409, 'offline', `Gracz ${proposer?.name ?? ''} nie jest online.`);
   }
@@ -451,7 +469,7 @@ export async function blockTrades(context) {
     await unblock(body.user);
     return tradeSettings(context);
   }
-  const other = Number.isInteger(body.id) ? await db.prepare("SELECT user_id, name FROM characters WHERE id = ? AND role = 'player'").bind(body.id).first() : null;
+  const other = Number.isInteger(body.id) ? await db.prepare(`SELECT user_id, name FROM characters WHERE id = ? AND ${OWN_CHARACTERS}`).bind(body.id).first() : null;
   if (!other) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
   if (other.user_id === session.userId) throw new ApiError(400, 'self', 'Siebie nie zablokujesz.');
   if (body.blocked === false) await unblock(other.user_id);

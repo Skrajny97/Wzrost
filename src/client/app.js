@@ -20,6 +20,7 @@ import { mountCombat } from './screens/combat.js';
 import { mountCommunity } from './screens/community.js';
 import { checkChat, onChatNews } from './chat-news.js';
 import { renderCreate } from './screens/create.js';
+import { renderSelect } from './screens/select.js';
 import { mountJournal } from './screens/journal.js';
 import { lockedScreen } from './screens/locked.js';
 import { mountSettlement } from './screens/settlement.js';
@@ -44,6 +45,7 @@ const views = {
   loading: $('#view-loading'),
   auth: $('#view-auth'),
   create: $('#view-create'),
+  select: $('#view-select'),
   confirm: $('#view-confirm'),
   game: $('#view-game'),
 };
@@ -94,6 +96,9 @@ const GOOGLE_NOTES = {
   rewarded: 'Połączono konto Google. Możesz już logować się przyciskiem Google.',
   // A new account made with Google (googleNote adds its Punkty Systemu).
   created: 'Konto założone przez Google.',
+  // A sign-in into an account that exists: no note, the choice of the
+  // character comes as after a sign-in with the login.
+  signed: null,
   // An account with test mode (src/server/accounts.js).
   linkedOnly: 'Połączono konto Google. To konto otwiera się teraz tylko przez Google.',
   taken: 'To konto Google jest już połączone z innym kontem w grze.',
@@ -166,8 +171,8 @@ async function start() {
   try {
     const { user } = await request('GET', '/api/me');
     state.user = user;
-    await enterGame();
-    if (googleResult) toast(googleNote(googleResult, user));
+    await enterGame({ choose: googleResult === 'signed' });
+    if (googleResult && GOOGLE_NOTES[googleResult]) toast(googleNote(googleResult, user));
     if (emailResult) toast(emailResult);
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
@@ -179,7 +184,10 @@ async function start() {
   }
 }
 
-async function enterGame() {
+// `choose`: right after signing in, an account with more characters than
+// one chooses the one to play first (screens/select.js). One that plays none
+// of them chooses too, and one without any creates its first.
+async function enterGame({ choose = false } = {}) {
   await loadContent();
   // A new account plays once its e-mail is confirmed (email.js).
   if (mustConfirm(state.user)) {
@@ -189,6 +197,13 @@ async function enterGame() {
   // The phone's notifications follow the account signed in (push.js).
   syncPush();
   try {
+    if (choose) {
+      const list = await call('GET', '/api/characters');
+      if (list.characters.length > 1 && !list.parked) {
+        showChoice(list);
+        return;
+      }
+    }
     await call('GET', '/api/character');
   } catch (error) {
     if (error instanceof ApiError && error.code === 'email_unconfirmed') {
@@ -197,18 +212,62 @@ async function enterGame() {
       return;
     }
     if (error instanceof ApiError && error.code === 'no_character') {
-      show('create');
-      renderCreate($('#create-screen'), () => {
-        // A new character starts on the Walka tab.
-        history.replaceState(null, '', HOME);
-        openGame();
-      });
-      if (state.user.tutorialTests) offerBack($('#create-screen'));
+      const list = await call('GET', '/api/characters');
+      // The test version's introduction makes a new character while the
+      // player's own waits parked (offerBack).
+      if (list.characters.length > 0 && !list.parked) showChoice(list);
+      else showCreate(list);
       return;
     }
     throw error;
   }
   openGame();
+}
+
+// The creation of a character: the account's first, or one more beside
+// those it has, with the way back to choosing among them.
+function showCreate(list) {
+  setMusicPlace([]);
+  show('create');
+  const container = $('#create-screen');
+  renderCreate(container, () => {
+    // A new character starts on the Walka tab.
+    history.replaceState(null, '', HOME);
+    openGame();
+  });
+  if (list.parked) {
+    if (state.user.tutorialTests) offerBack(container);
+  } else if (list.characters.length > 0) {
+    container.append(h('div', { class: 'create-back' }, h('button', { type: 'button', class: 'button button--world', onClick: () => showChoice(list), text: 'Wróć do wyboru postaci' })));
+  }
+}
+
+// The choice of the character to play among the account's (screens/select.js).
+function showChoice(list) {
+  setMusicPlace([]);
+  show('select');
+  renderSelect($('#select-screen'), list, { onChoose: chooseCharacter, onCreate: () => showCreate(list), onLogout: () => signOut(true) });
+}
+
+// The account plays that character from now on: the game starts again with
+// it, from the Walka tab.
+async function chooseCharacter(id) {
+  await request('POST', '/api/characters/choose', { id });
+  await characterGone();
+}
+
+// "Zmień postać" in the Ustawienia: the game steps back to the choice.
+async function changeCharacter(event) {
+  await withButton(event.currentTarget, async () => {
+    const list = await call('GET', '/api/characters');
+    closeSheet();
+    clearInterval(ticker);
+    current?.screen.unmount?.();
+    current = null;
+    state.character = null;
+    narrate();
+    showChoice(list);
+  });
 }
 
 // The screen of a new account that waits for the link from its mail.
@@ -605,6 +664,7 @@ function openSettings() {
     state.user.tutorialTests && state.character && h('button', { type: 'button', class: 'button button--system', onClick: openSettlementTests, text: 'Testuj Osadę' }),
     installButton(),
     state.user.author && h('a', { class: 'button button--system', href: '#/autor', onClick: closeSheet, text: 'Panel autora' }),
+    h('button', { type: 'button', class: 'button button--world', onClick: changeCharacter, text: 'Zmień postać' }),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
     h('button', { type: 'button', class: 'button button--danger', onClick: startOver, text: 'Zacznij od nowa' }),
     h('button', { type: 'button', class: 'button button--danger', onClick: deleteAccount, text: 'Usuń konto' }),
@@ -647,7 +707,7 @@ async function deleteAccount() {
   const { login } = state.user;
   const sure = await confirmAction({
     title: 'Usunąć konto?',
-    text: `Konto ${login} zniknie na zawsze razem z postacią, przedmiotami, raportami i obozem. Tego nie da się cofnąć.`,
+    text: `Konto ${login} zniknie na zawsze razem ze wszystkimi postaciami, przedmiotami, raportami i obozem. Tego nie da się cofnąć.`,
     confirmLabel: 'Usuń konto',
     danger: true,
     typed: login,
@@ -940,9 +1000,18 @@ async function repeatEvolutionTour() {
 }
 
 async function startOver() {
+  let others = 0;
+  try {
+    others = (await call('GET', '/api/characters')).characters.length - 1;
+  } catch (error) {
+    toast(error.message);
+    return;
+  }
   const sure = await confirmAction({
     title: 'Zacząć od nowa?',
-    text: `${state.character.name} zniknie na zawsze razem z przedmiotami, złotem i raportami. Konto zostaje, a zaraz potem stworzysz nową postać.`,
+    text: `${state.character.name} zniknie na zawsze razem z przedmiotami, złotem i raportami. ${
+      others > 0 ? 'Konto i inne postacie zostają, a zaraz potem wybierzesz postać albo stworzysz nową.' : 'Konto zostaje, a zaraz potem stworzysz nową postać.'
+    }`,
     confirmLabel: 'Usuń postać',
     danger: true,
   });
@@ -964,6 +1033,10 @@ async function characterGone() {
   state.character = null;
   narrate();
   history.replaceState(null, '', HOME);
+  // The way back of the reports and screens starts anew too.
+  lastMainHash = HOME;
+  lastMainTab = 'walka';
+  lastTabHash = HOME;
   await enterGame();
 }
 
@@ -1048,7 +1121,7 @@ function bindForm(form, submit) {
       const { user } = await submit(Object.fromEntries(new FormData(form)));
       form.reset();
       state.user = user;
-      await enterGame();
+      await enterGame({ choose: true });
     } catch (error) {
       errorBox.textContent = error.message;
       errorBox.hidden = false;

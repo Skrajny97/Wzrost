@@ -2972,6 +2972,22 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
+## Pięć postaci na koncie (30.10.2026, na wersji testowej)
+
+Autor: „Następnie pięć postaci / 176 A / 177 A / 178 A” (zob. „Pięć postaci na koncie: decyzje autora”).
+
+1. **Do pięciu postaci.** Konto ma najwyżej 5 postaci (`account.characters` w `data/balance.json`). Gracz gra jedną naraz, a pozostałe czekają odłożone. Ich rozpoczęte wyprawy i prace trwają dalej (176 A), a obóz, odpoczynek i Punkty Czasu biegną tak, jak u postaci, do której gracz akurat nie zagląda. Raport z wyprawy odłożonej postaci czeka, aż gracz znów nią zagra.
+2. **Wybór postaci.** Po zalogowaniu, loginem albo przez Google, konto z więcej niż jedną postacią najpierw wybiera postać. Każda ma kartę z portretem, klasą, poziomami i tym, co robi („Eksploracja · Skraj Wiatrołomów · do 16:06”, „raport gotowy” albo „Odpoczynek”). Grana postać ma znaczek „Grasz teraz”. Konto z jedną postacią wchodzi od razu do gry. W Ustawieniach przycisk „Zmień postać” otwiera ten sam wybór. Po wyborze gra zaczyna od zakładki Walka.
+3. **Nowa postać.** Na ekranie wyboru przycisk „Nowa postać” otwiera tworzenie postaci, z przyciskiem „Wróć do wyboru postaci”. Nowa postać od razu staje się graną, a poprzednia czeka odłożona. Przy pięciu postaciach zamiast przycisku stoi: „Na koncie jest już 5 postaci. Nową stworzysz, gdy usuniesz jedną z nich.” Nowa postać dostaje wprowadzenie narratora jak każda nowa postać.
+4. **„Zacznij od nowa”** usuwa tylko graną postać. Pozostałe zostają, a gra otwiera wybór postaci albo, gdy żadnej nie ma, tworzenie nowej. „Usuń konto” usuwa wszystkie postacie konta.
+5. **Imiona** są niepowtarzalne wśród wszystkich postaci, także odłożonych (`migrations/0056_characters_aside.sql`).
+6. **Ranking, czat i znajomi.** Każda postać ma, jak dotąd, swoje miejsce w Rankingu, swoich znajomych, Upominki i rozmowy prywatne. Gracz występuje w nich jako postać, którą akurat gra: nią pisze na czacie, a „Twoje miejsce” w Rankingu i lista Znajomych dotyczą jej. Odłożone postacie zostają w Rankingu i na listach znajomych. Zaproszenie, Upominek albo prywatna wiadomość dla odłożonej postaci czekają, aż gracz nią zagra.
+7. **Między postaciami jednego konta (177 A)** nie ma wymiany ani znajomości, a więc i Upominków, ani prywatnych wiadomości. Karta własnej postaci, np. po stuknięciu jej imienia w Rankingu, nie ma przycisków. Wymiana idzie tylko z postacią, którą jej gracz akurat gra i jest online. Zmiana postaci kończy trwającą wymianę.
+8. **Punkty Systemu (178 A)** ma każda postać swoje. Kod podarunkowy działa raz na konto, jak dotąd. Punkty Systemu za e-mail albo Google przychodzą raz na konto, do postaci granej w tej chwili.
+9. **Powiadomienia na telefon** przychodzą dla postaci, którą gracz akurat gra. Wyprawa odłożonej postaci kończy się bez powiadomienia, a ekran wyboru pokazuje przy niej „raport gotowy”.
+10. **Panel autora** liczy wszystkie postacie, a przy koncie z kilkoma podaje, ile ich ma.
+11. **Wersja testowa.** Gdy w „Testuj samouczki” postać czeka z boku na czas wprowadzenia, nie da się zmienić postaci ani stworzyć kolejnej, dopóki ta nie wróci („Najpierw wróć do swojej postaci w „Testuj samouczki”.”).
+
 ## Uwagi autora po 0.0.61 (30.10.2026, na wersji testowej)
 
 1. **50. poziom klasy na próbę.** Autor: „Zmień moją postać na testowym by miała 50 poziom klasy, bo nie chce mi się przeklikiwać tego.” Stąd nie ma dostępu do bazy wersji testowej ani do konta autora, więc w „Testuj ewolucję” (Ustawienia, tylko wersja testowa) jest przycisk „Ustaw 50. poziom klasy”. Cofa ewolucję z testu, jeśli jest, i daje postaci 50. poziom klasy. Ewolucję wybiera się potem jak w grze. Postać po prawdziwej ewolucji zostaje bez zmian.

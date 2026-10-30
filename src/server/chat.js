@@ -20,6 +20,7 @@ import { content } from './content.js';
 import { friendNews } from './community.js';
 import { tradeNews } from './trades.js';
 import { ApiError, json, readJson } from './http.js';
+import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable, requireSession } from './sessions.js';
 
 const DAY = 24 * 3600000;
@@ -52,11 +53,12 @@ const PRIVATE = 'private';
 const PAIR = '((m.character_id = ? AND m.recipient_id = ?) OR (m.character_id = ? AND m.recipient_id = ?))';
 const pairOf = (one, other) => [one, other, other, one];
 
-// The other character of a private conversation: another player's.
-async function partnerOf(db, character, id) {
-  const other = id > 0 ? await db.prepare("SELECT id, user_id, name, level FROM characters WHERE id = ? AND role = 'player'").bind(id).first() : null;
+// The other character of a private conversation: another player's, played
+// now or set aside (it reads the message when its player plays it again).
+async function partnerOf(db, character, id, userId) {
+  const other = id > 0 ? await db.prepare(`SELECT id, user_id, name, level FROM characters WHERE id = ? AND ${OWN_CHARACTERS}`).bind(id).first() : null;
   if (!other) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
-  if (other.id === character.id) throw new ApiError(400, 'self', 'Do siebie nie napiszesz.');
+  if (other.id === character.id || other.user_id === userId) throw new ApiError(400, 'self', 'Do siebie nie napiszesz.');
   return other;
 }
 
@@ -74,7 +76,7 @@ const conversationsOf = (db, userId, characterId) =>
              GROUP BY other) s
        JOIN characters c ON c.id = s.other
        LEFT JOIN chat_closed x ON x.character_id = ? AND x.other_id = s.other
-       WHERE c.role = 'player' AND c.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?) AND (x.last_id IS NULL OR s.last > x.last_id)
+       WHERE c.${OWN_CHARACTERS} AND c.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?) AND (x.last_id IS NULL OR s.last > x.last_id)
        ORDER BY s.last DESC LIMIT ?`,
     )
     .bind(characterId, characterId, characterId, characterId, characterId, userId, content.chat.rules.conversations);
@@ -200,7 +202,7 @@ export async function readChat(context) {
   const { session, character, account, role, db } = await requireChatter(context);
   const url = new URL(context.request.url);
   const withId = whole(url.searchParams.get('with'));
-  const other = withId ? await partnerOf(db, character, withId) : null;
+  const other = withId ? await partnerOf(db, character, withId, session.userId) : null;
   const channel = other ? null : channelOf(url.searchParams.get('channel') ?? 'global');
   const where = other ? `m.channel = '${PRIVATE}' AND ${PAIR}` : 'm.channel = ?';
   const binds = other ? pairOf(character.id, other.id) : [channel.id];
@@ -285,7 +287,7 @@ async function privateAllowed(db, userId, other) {
 export async function sendChat(context) {
   const { session, character, account, db } = await requireChatter(context);
   const body = await readJson(context.request);
-  const other = Number.isInteger(body.with) ? await partnerOf(db, character, body.with) : null;
+  const other = Number.isInteger(body.with) ? await partnerOf(db, character, body.with, session.userId) : null;
   const channel = other ? null : channelOf(body.channel ?? 'global');
   const now = context.now;
   const { userId } = session;
@@ -322,9 +324,9 @@ export async function sendChat(context) {
 // leaves the tabs of this character until a message newer than its last one
 // comes, either way. Opening it from a character's sheet brings it back.
 export async function closeChat(context) {
-  const { character, db } = await requireChatter(context);
+  const { session, character, db } = await requireChatter(context);
   const body = await readJson(context.request);
-  const other = await partnerOf(db, character, Number.isInteger(body.with) ? body.with : 0);
+  const other = await partnerOf(db, character, Number.isInteger(body.with) ? body.with : 0, session.userId);
   await db
     .prepare(
       `INSERT INTO chat_closed (character_id, other_id, last_id)

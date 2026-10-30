@@ -1,0 +1,75 @@
+// Choosing the character to play (DECISIONS.md, "Pięć postaci na koncie"):
+// the account's characters, each with its portrait, name, class, levels and
+// what it is doing, the one played now marked, and "Nowa postać" while the
+// account has room for one more (GET /api/characters). The game comes with
+// the one chosen; the others wait aside, their explorations and works going
+// on meanwhile.
+
+import { portraitSprite } from '../art.js';
+import { classArt } from '../class-art.js';
+import { $, fill, h, icon } from '../dom.js';
+import { countOf, timeFormat } from '../format.js';
+import { CLASS_ICONS } from '../icons.js';
+import { systemPanel, withButton } from '../ui.js';
+
+const WORKS = { herbs: 'Zielarstwo', potions: 'Alchemia', items: 'Rzemieślnictwo' };
+
+// What the character is doing, in a few words.
+function doing(activity) {
+  if (!activity) return 'Odpoczynek';
+  const what = WORKS[activity.kind] ? `${WORKS[activity.kind]} · ${activity.placeName}` : `Eksploracja · ${activity.areaName}`;
+  return `${what} · ${activity.finished ? 'raport gotowy' : `do ${timeFormat.format(new Date(activity.endsAt))}`}`;
+}
+
+const bust = (character) =>
+  portraitSprite(character.classId, character.appearance, { bust: true, skin: character.skin, evolution: character.evolution }) ??
+  classArt(character.classId) ??
+  icon(CLASS_ICONS[character.classId] ?? 'person', { size: 26 });
+
+// `list`: the answer of GET /api/characters. `onChoose(id)` plays that
+// character, `onCreate()` opens the creation of a new one, `onLogout()`
+// signs out.
+export function renderSelect(container, list, { onChoose, onCreate, onLogout }) {
+  const { characters, max } = list;
+  const card = (character) =>
+    h(
+      'li',
+      {},
+      h(
+        'button',
+        {
+          type: 'button',
+          class: `select-card${character.played ? ' select-card--played' : ''}`,
+          onClick: (event) => withButton(event.currentTarget, () => onChoose(character.id)),
+        },
+        h('span', { class: 'select-portrait' }, bust(character)),
+        h(
+          'span',
+          { class: 'select-text' },
+          h('span', { class: 'select-name' }, character.name, character.played && h('span', { class: 'select-tag', text: 'Grasz teraz' })),
+          h('span', { class: 'select-levels', text: `${character.className} · poziom ${character.level} · klasa ${character.classLevel}` }),
+          h('span', { class: `select-doing${character.activity?.finished ? ' select-doing--ready' : ''}`, text: doing(character.activity) }),
+        ),
+      ),
+    );
+  fill(
+    container,
+    h(
+      'header',
+      { class: 'hero hero--small' },
+      h('h1', { class: 'hero-title', tabindex: '-1', text: 'Wybierz postać' }),
+      h('p', { class: 'hero-tagline', text: `Postacie na koncie: ${characters.length} z ${max}` }),
+    ),
+    systemPanel('Wybierz postać, którą chcesz grać. Pozostałe czekają, a ich wyprawy i prace trwają dalej.'),
+    h('ul', { class: 'select-list' }, characters.map(card)),
+    h(
+      'div',
+      { class: 'select-actions' },
+      characters.length < max
+        ? h('button', { type: 'button', class: 'button button--system', onClick: onCreate, text: 'Nowa postać' })
+        : h('p', { class: 'muted', text: `Na koncie jest już ${countOf(max, 'postać', 'postacie', 'postaci')}. Nową stworzysz, gdy usuniesz jedną z nich.` }),
+      h('button', { type: 'button', class: 'button button--world', onClick: (event) => withButton(event.currentTarget, onLogout), text: 'Wyloguj się' }),
+    ),
+  );
+  $('.hero-title', container).focus();
+}

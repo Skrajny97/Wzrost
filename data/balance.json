@@ -181,7 +181,8 @@
     "classEvolutionLevels": [50, 100, 200, 300, 400, 500]
   },
   "account": {
-    "emailSystemPoints": 10
+    "emailSystemPoints": 10,
+    "characters": 5
   },
   "quickHunt": {
     "perDay": 3,

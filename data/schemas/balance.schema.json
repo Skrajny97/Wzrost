@@ -1115,9 +1115,15 @@
       "description": "Konto gracza, poza postacią.",
       "additionalProperties": false,
       "required": [
-        "emailSystemPoints"
+        "emailSystemPoints",
+        "characters"
       ],
       "properties": {
+        "characters": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Najwięcej postaci na jednym koncie. Gracz gra jedną naraz, a pozostałe czekają odłożone."
+        },
         "emailSystemPoints": {
           "type": "integer",
           "minimum": 0,

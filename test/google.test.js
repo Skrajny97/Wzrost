@@ -144,7 +144,7 @@ describe('Google sign-in', () => {
     assert.equal(made.status, 201);
     assert.equal(made.data.character.systemPoints, 10);
     const again = await signIn(codeFor(claims('jan.kowalski')));
-    assert.equal(again.location, '/');
+    assert.equal(again.location, '/?google=signed');
     assert.equal((await call('GET', '/api/character', { cookie: again.session })).data.character.systemPoints, 10);
   });
 
@@ -208,7 +208,7 @@ describe('Google sign-in', () => {
   test('the next sign-in opens the same account', async () => {
     await signIn(codeFor(claims('stały')));
     const again = await signIn(codeFor(claims('stały', { email: 'nowy.adres@gmail.com' })));
-    assert.equal(again.location, '/');
+    assert.equal(again.location, '/?google=signed');
     assert.equal((await users()).length, 1);
     assert.equal((await call('GET', '/api/me', { cookie: again.session })).data.user.email, 'stały@gmail.com');
   });
@@ -239,7 +239,7 @@ describe('Google sign-in', () => {
 
     // From now on Google opens that account.
     const next = await signIn(codeFor(claims('google-karol', { email: 'karol@gmail.com' })));
-    assert.equal(next.location, '/');
+    assert.equal(next.location, '/?google=signed');
     assert.equal((await call('GET', '/api/me', { cookie: next.session })).data.user.login, 'karol');
   });
 

@@ -141,9 +141,8 @@ describe('character creation', () => {
     assert.equal((await call('GET', '/api/character', { cookie })).data.character.systemPoints, 0);
   });
 
-  test('allows one character per account and checks the input', async () => {
+  test('checks the input of a new character', async () => {
     assert.equal((await newCharacter(cookie)).status, 201);
-    assert.equal((await newCharacter(cookie)).data.error.code, 'character_exists');
     const other = await signUp('inny');
     assert.equal((await newCharacter(other, 'warrior', 'X')).data.error.code, 'invalid_name');
     assert.equal((await newCharacter(other, 'warrior', 'Bob<script>')).data.error.code, 'invalid_name');

@@ -10,6 +10,7 @@
 import { skillDemo } from '../engine/index.js';
 import { content } from './content.js';
 import { ApiError, json } from './http.js';
+import { OWN_CHARACTERS } from './roles.js';
 import { requireSession } from './sessions.js';
 
 const DAY = 24 * 3600000;
@@ -34,13 +35,14 @@ export async function authorPanel(context) {
            (SELECT COUNT(*) FROM users) AS accounts,
            (SELECT COUNT(*) FROM users WHERE google_sub IS NOT NULL) AS google,
            (SELECT COUNT(*) FROM users WHERE created_at >= ?) AS new_accounts,
-           (SELECT COUNT(*) FROM characters WHERE role = 'player') AS characters,
-           (SELECT COUNT(*) FROM characters WHERE role = 'player' AND created_at >= ?) AS new_characters`,
+           (SELECT COUNT(*) FROM characters WHERE ${OWN_CHARACTERS}) AS characters,
+           (SELECT COUNT(*) FROM characters WHERE ${OWN_CHARACTERS} AND created_at >= ?) AS new_characters`,
       )
       .bind(since, since),
     db.prepare(
       `SELECT u.login, u.email, u.google_sub IS NOT NULL AS google, u.email_confirmed_at IS NOT NULL AS email_confirmed, u.created_at, u.chat_muted_until, u.chat_moderator,
-         c.name, c.class_id, c.level, c.class_level, c.created_at AS character_created_at
+         c.name, c.class_id, c.level, c.class_level, c.created_at AS character_created_at,
+         (SELECT COUNT(*) FROM characters o WHERE o.user_id = u.id AND o.${OWN_CHARACTERS}) AS character_count
        FROM users u LEFT JOIN characters c ON c.user_id = u.id AND c.role = 'player'
        ORDER BY u.created_at DESC, u.id DESC
        LIMIT 1000`,
@@ -62,6 +64,8 @@ export async function authorPanel(context) {
       // Confirmed with the link, or by Google (sessions.js).
       emailConfirmed: Boolean(row.google) || Boolean(row.email_confirmed),
       createdAt: row.created_at,
+      // The character the account plays now, and how many it has.
+      characters: row.character_count,
       character: row.name && {
         name: row.name,
         className: content.classesById[row.class_id]?.name ?? row.class_id,

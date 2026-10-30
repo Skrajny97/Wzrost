@@ -11,6 +11,7 @@ import { characterView, loadPlayer } from './characters.js';
 import { chatRole, requireChatter } from './chat.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
+import { OWN_CHARACTERS } from './roles.js';
 
 const DAY = 86400000;
 const today = (now) => questPeriod('daily', now, content).key;
@@ -43,11 +44,11 @@ export async function ranking(context) {
       .prepare(
         `SELECT c.id, c.name, c.class_id, c.evolution, c.level, c.class_level, c.professions, u.login, u.google_sub, u.chat_moderator
          FROM characters c JOIN users u ON u.id = c.user_id
-         WHERE c.role = 'player'${where} ORDER BY ${order} LIMIT ?`,
+         WHERE c.${OWN_CHARACTERS}${where} ORDER BY ${order} LIMIT ?`,
       )
       .bind(content.community.ranking.size),
     db
-      .prepare(`SELECT place FROM (SELECT c.id, ROW_NUMBER() OVER (ORDER BY ${order}) AS place FROM characters c WHERE c.role = 'player'${where}) WHERE id = ?`)
+      .prepare(`SELECT place FROM (SELECT c.id, ROW_NUMBER() OVER (ORDER BY ${order}) AS place FROM characters c WHERE c.${OWN_CHARACTERS}${where}) WHERE id = ?`)
       .bind(character.id),
   ]);
   return json({
@@ -81,7 +82,7 @@ async function friendsOf(db, id, now) {
       .prepare(
         `SELECT f.id, f.character_id, f.friend_id, f.accepted_at, o.id AS other, o.name, o.class_id, o.level, o.class_level
          FROM friends f JOIN characters o ON o.id = CASE WHEN f.character_id = ? THEN f.friend_id ELSE f.character_id END
-         WHERE (f.character_id = ? OR f.friend_id = ?) AND o.role = 'player'
+         WHERE (f.character_id = ? OR f.friend_id = ?) AND o.${OWN_CHARACTERS}
          ORDER BY o.name_key`,
       )
       .bind(id, id, id),
@@ -124,7 +125,7 @@ export async function friendNews(db, id, now) {
               (SELECT COUNT(*) FROM gifts WHERE receiver_id = ? AND claimed_at IS NULL AND day >= ?) AS waiting,
               (SELECT COUNT(*) FROM gifts WHERE receiver_id = ? AND claimed_day = ?) AS claimed,
               (SELECT COUNT(*) FROM friends f JOIN characters o ON o.id = CASE WHEN f.character_id = ? THEN f.friend_id ELSE f.character_id END
-               WHERE (f.character_id = ? OR f.friend_id = ?) AND f.accepted_at IS NOT NULL AND o.role = 'player'
+               WHERE (f.character_id = ? OR f.friend_id = ?) AND f.accepted_at IS NOT NULL AND o.${OWN_CHARACTERS}
                  AND NOT EXISTS (SELECT 1 FROM gifts g WHERE g.sender_id = ? AND g.receiver_id = o.id AND g.day = ?)) AS unsent`,
     )
     .bind(id, id, firstKept(now), id, day, id, id, id, id, day)
@@ -157,14 +158,17 @@ const friendCount = (db, id) =>
 // POST /api/friends/invite { name }: an invitation to that character, which
 // accepts it in its Znajomi. One the other character sent first is accepted.
 export async function inviteFriend(context) {
-  const { character, db } = await requireChatter(context);
+  const { session, character, db } = await requireChatter(context);
   const body = await readJson(context.request);
   const target = await db
-    .prepare("SELECT id, name, level FROM characters WHERE name_key = ? AND role = 'player'")
+    .prepare(`SELECT id, user_id, name, level FROM characters WHERE name_key = ? AND ${OWN_CHARACTERS}`)
     .bind(String(body.name ?? '').toLowerCase())
     .first();
   if (!target) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
   if (target.id === character.id) throw new ApiError(400, 'self', 'Siebie nie zaprosisz.');
+  // Nor another character of the same account: an Upominek between them
+  // would be a trade (the author's 177 A).
+  if (target.user_id === session.userId) throw new ApiError(400, 'self', `${target.name} to Twoja postać. Swoich postaci nie zaprosisz.`);
   if (!isUnlocked('community', target.level, content)) {
     throw new ApiError(409, 'locked', `${target.name} nie ma jeszcze Społeczności. Otworzy się na ${content.unlocksById.community.level}. poziomie.`);
   }
@@ -226,7 +230,7 @@ export async function sendGift(context) {
   const row = await db
     .prepare(
       `SELECT o.id, o.name, o.level FROM friends f JOIN characters o ON o.id = CASE WHEN f.character_id = ? THEN f.friend_id ELSE f.character_id END
-       WHERE f.id = ? AND (f.character_id = ? OR f.friend_id = ?) AND f.accepted_at IS NOT NULL AND o.role = 'player'`,
+       WHERE f.id = ? AND (f.character_id = ? OR f.friend_id = ?) AND f.accepted_at IS NOT NULL AND o.${OWN_CHARACTERS}`,
     )
     .bind(character.id, Number(body.id), character.id, character.id)
     .first();

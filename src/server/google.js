@@ -99,8 +99,9 @@ export async function googleCallback({ request, env, now }) {
     if (session) await deleteSession(db, session.id);
     await db.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(now).run();
     const created = await createSession(db, user.id, now);
-    // A new account hears of its Punkty Systemu.
-    return finish(made ? '/?google=created' : '/', sessionCookie(created.token, created.expiresAt, now));
+    // A new account hears of its Punkty Systemu; one that exists chooses
+    // the character to play, as after a sign-in with the login (app.js).
+    return finish(made ? '/?google=created' : '/?google=signed', sessionCookie(created.token, created.expiresAt, now));
   } catch (error) {
     console.error(error);
     return finish('/?google=failed');

@@ -81,8 +81,9 @@ import { content } from './content.js';
 import { craftingOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
+import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
-import { tradeBlockOf } from './trades.js';
+import { tradeBlockOf, tradesEnded } from './trades.js';
 
 // 2 to 20 characters: letters and digits, spaces, hyphens, apostrophes and
 // underscores ("Justi_725"), from a letter to a letter or a digit. What a
@@ -119,9 +120,14 @@ export function validateName(value) {
 // (migrations/0009_unique_names.sql).
 const nameKey = (name) => name.toLowerCase();
 
+// The character the account plays, with all it has, or null.
 export async function loadPlayer(db, userId) {
   const row = await db.prepare("SELECT * FROM characters WHERE user_id = ? AND role = 'player'").bind(userId).first();
-  if (!row) return null;
+  return row ? playerOf(db, row) : null;
+}
+
+// A character's row with its items, activities and camp buildings.
+async function playerOf(db, row) {
   const [items, activities, avatarActivities, buildings] = await db.batch([
     db.prepare('SELECT id, slot, data FROM items WHERE character_id = ? ORDER BY id').bind(row.id),
     db.prepare('SELECT * FROM activities WHERE character_id = ?').bind(row.id),
@@ -952,13 +958,15 @@ export async function characterProfile(context) {
   const db = context.env.DB;
   const name = String(context.params.name ?? '');
   const found = await db
-    .prepare("SELECT c.id, c.user_id, u.login, u.google_sub, u.chat_moderator FROM characters c JOIN users u ON u.id = c.user_id WHERE c.name_key = ? AND c.role = 'player'")
+    .prepare(`SELECT c.*, u.login, u.google_sub, u.chat_moderator FROM characters c JOIN users u ON u.id = c.user_id WHERE c.name_key = ? AND c.${OWN_CHARACTERS}`)
     .bind(nameKey(name))
     .first();
   if (!found) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
-  const view = characterView(await loadPlayer(db, found.user_id), context.now);
-  // Whether the one who looks is a friend of this character (community.js).
+  const view = characterView(await playerOf(db, found), context.now);
+  // Whether the one who looks is a friend of this character (community.js);
+  // another character of the same account is the player's own.
   const own = await db.prepare("SELECT id FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId).first();
+  const mine = found.user_id === session.userId;
   const worn = (item) =>
     item && {
       name: item.name,
@@ -987,7 +995,7 @@ export async function characterProfile(context) {
       level: view.level,
       classLevel: view.classLevel,
       role: chatRole(context.env, found),
-      relation: own ? await relationTo(db, own.id, found.id, context.now) : null,
+      relation: mine ? { state: 'self' } : own ? await relationTo(db, own.id, found.id, context.now) : null,
       tradeBlocked: await tradeBlockOf(db, session.userId, found.user_id),
       equipment: content.slots.map((slot) => ({ slot: slot.id, slotName: slot.name, item: worn(view.equipment[slot.id]) })),
       skills: view.skills.pools.flatMap((pool) =>
@@ -1012,8 +1020,17 @@ export async function createCharacter(context) {
   const skin = body.skin === undefined ? content.defaultSkin : validSkin(body.skin);
 
   const db = context.env.DB;
-  const exists = () => new ApiError(409, 'character_exists', 'Masz już postać.');
-  if (await loadPlayer(db, session.userId)) throw exists();
+  const max = content.balance.account.characters;
+  const full = () => new ApiError(409, 'characters_full', `Masz już ${max} postaci. Usuń jedną z nich, żeby stworzyć nową.`);
+  const [counted, played, parked] = await db.batch([
+    db.prepare(`SELECT COUNT(*) AS count FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS}`).bind(session.userId),
+    db.prepare("SELECT 1 FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId),
+    db.prepare("SELECT 1 FROM characters WHERE user_id = ? AND role = 'parked'").bind(session.userId),
+  ]);
+  if (counted.results[0].count >= max) throw full();
+  // The test version's introduction makes its character while the player's
+  // own waits parked, and no other until that one is back (testing.js).
+  if (played.results.length > 0 && parked.results.length > 0) throw new ApiError(409, 'parked', PARKED_TEXT);
 
   const character = { classId: cls.id, level: 1, classLevel: 1, points: {}, position: cls.position };
   const hp = playerCombatant({ character, equipped: [], name }, content).maxHp;
@@ -1021,28 +1038,101 @@ export async function createCharacter(context) {
   const supply = content.balance.startingSupply;
   try {
     await db.batch([
-      // Punkty Systemu earned before there was a character, for the e-mail
-      // confirmed (email.js), come with it.
+      // The character played until now waits aside, with its exploration or
+      // work going on.
+      ...setAside(db, session.userId, now),
+      // Punkty Systemu earned while the account had no character to play,
+      // for the e-mail confirmed (email.js), come with the new one. The
+      // statement counts the room again, so two taps at once cannot make a
+      // character over the limit.
       db
         .prepare(
           `INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, skin, position, hp, hp_at, created_at, gold, resources, time_points, time_points_at, tutorial, system_points)
-           VALUES (?, 'player', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]', (SELECT system_points_waiting FROM users WHERE id = ?))`,
+           SELECT ?, 'player', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]', (SELECT system_points_waiting FROM users WHERE id = ?)
+           WHERE (SELECT COUNT(*) FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS}) < ?`,
         )
         .bind(
           session.userId, name, nameKey(name), cls.id, appearance, skin, cls.position, hp, now, now,
-          supply.gold, JSON.stringify(supply.resources), content.balance.timePoints.start, now, session.userId,
+          supply.gold, JSON.stringify(supply.resources), content.balance.timePoints.start, now, session.userId, session.userId, max,
         ),
-      db.prepare('UPDATE users SET system_points_waiting = 0 WHERE id = ?').bind(session.userId),
+      db.prepare("UPDATE users SET system_points_waiting = 0 WHERE id = ? AND EXISTS (SELECT 1 FROM characters WHERE user_id = ? AND role = 'player')").bind(session.userId, session.userId),
     ]);
   } catch (error) {
-    const message = String(error?.message);
-    if (message.includes('name_key')) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');
-    if (message.includes('UNIQUE')) throw exists();
+    if (String(error?.message).includes('name_key')) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');
     throw error;
   }
   const player = await loadPlayer(db, session.userId);
+  if (!player) throw full();
   await settleQuests(db, player, now);
   return json({ character: characterView(player, now) }, 201);
+}
+
+const PARKED_TEXT = 'Najpierw wróć do swojej postaci w „Testuj samouczki”.';
+
+// The statements that set the character the account plays aside: it keeps
+// its exploration or work, which go on (the author's 176 A), and its live
+// Wymiana ends, as the trade needs the character played (trades.js).
+function setAside(db, userId, now) {
+  return [
+    tradesEnded(db, userId, now),
+    db.prepare("UPDATE characters SET role = 'aside' WHERE user_id = ? AND role = 'player'").bind(userId),
+  ];
+}
+
+// GET /api/characters: the account's characters to choose the one to play,
+// each with its look, levels and what it is doing, how many the account
+// may have, and the name of the one parked for the test version's
+// introduction.
+export async function listCharacters(context) {
+  const session = await requirePlayable(context);
+  const db = context.env.DB;
+  const own = `SELECT id FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS}`;
+  const [rows, works, parked] = await db.batch([
+    db.prepare(`SELECT * FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS} ORDER BY id`).bind(session.userId),
+    db.prepare(`SELECT * FROM activities WHERE character_id IN (${own})`).bind(session.userId),
+    db.prepare("SELECT name FROM characters WHERE user_id = ? AND role = 'parked'").bind(session.userId),
+  ]);
+  const activities = new Map(works.results.map((row) => [row.character_id, row]));
+  return json({
+    characters: rows.results.map((row) => ({
+      id: row.id,
+      name: row.name,
+      classId: row.class_id,
+      className: classNameOf(engineCharacter(row), content),
+      appearance: row.appearance,
+      skin: row.skin ?? content.defaultSkin,
+      evolution: content.evolutionsById[row.evolution] ? row.evolution : null,
+      level: row.level,
+      classLevel: row.class_level,
+      played: row.role === 'player',
+      activity: activityView(activities.get(row.id) ?? null, row.level, context.now),
+    })),
+    max: content.balance.account.characters,
+    parked: parked.results[0]?.name ?? null,
+  });
+}
+
+// POST /api/characters/choose { id }: the account plays that character of
+// its own from now on, and the one played until then waits aside. Punkty
+// Systemu earned while the account played none come with the chosen one.
+export async function chooseCharacter(context) {
+  const session = await requirePlayable(context);
+  const body = await readJson(context.request);
+  const db = context.env.DB;
+  const chosen = Number.isInteger(body.id)
+    ? await db.prepare(`SELECT id, role FROM characters WHERE id = ? AND user_id = ? AND ${OWN_CHARACTERS}`).bind(body.id, session.userId).first()
+    : null;
+  if (!chosen) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci na Twoim koncie.');
+  if (chosen.role === 'player') return json({ ok: true });
+  if (await db.prepare("SELECT 1 FROM characters WHERE user_id = ? AND role = 'parked'").bind(session.userId).first()) throw new ApiError(409, 'parked', PARKED_TEXT);
+  await db.batch([
+    ...setAside(db, session.userId, context.now),
+    db
+      .prepare("UPDATE characters SET role = 'player', system_points = system_points + (SELECT system_points_waiting FROM users WHERE id = ?), version = version + 1 WHERE id = ? AND role = 'aside'")
+      .bind(session.userId, chosen.id),
+    db.prepare("UPDATE users SET system_points_waiting = 0 WHERE id = ? AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND role = 'player')").bind(session.userId, chosen.id),
+  ]);
+  return json({ ok: true });
 }
 
 // POST /api/character/name { name }: the new name of a character whose name
@@ -1098,8 +1188,9 @@ export async function setSkin(context) {
 }
 
 // "Zacznij od nowa": the character, its items, hunt, reports and messages in
-// the chat are removed; the account stays, with what it hides in the chat
-// and its silence there (chat.js), and a new character can be created.
+// the chat are removed; the account stays, with its other characters, what
+// it hides in the chat and its silence there (chat.js), and the player
+// chooses another character or creates a new one.
 export async function deleteCharacter(context) {
   const { player } = await requirePlayer(context);
   const db = context.env.DB;

@@ -7770,6 +7770,99 @@ a.profession-square:active {
   margin-top: 16px;
 }
 
+/* The choice of the character to play (screens/select.js): a card a
+   character, its bust beside its name, levels and what it is doing, the one
+   played now in the System's light. */
+.select-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.select-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+}
+
+.select-card--played {
+  border-color: var(--system);
+  background: linear-gradient(var(--system-fill), var(--system-fill)), var(--surface);
+  box-shadow: inset 0 0 0 1px var(--system);
+}
+
+.select-portrait {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: linear-gradient(#24301f, #141b11);
+}
+
+.select-portrait .class-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.select-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.select-name {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.select-tag {
+  padding: 2px 6px;
+  border: 1px solid var(--system-line);
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.select-levels,
+.select-doing {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.select-doing--ready {
+  color: var(--gold);
+}
+
+.select-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
 /* The Społeczność's list of parts (screens/community.js): the part shown on
    a bar under the title, the bell muting the chat's light beside it, and the
    list it unfolds over what is below; the parts still to come are marked
