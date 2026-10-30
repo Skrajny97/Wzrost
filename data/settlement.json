@@ -52,7 +52,7 @@
   ],
   "brotherhoods": [
     { "id": "herbalists", "name": "Bractwo Zielarzy", "goods": ["herb", "potion"] },
-    { "id": "smiths", "name": "Bractwo Kowali", "goods": ["part", "resource"] },
+    { "id": "smiths", "name": "Bractwo Kowali", "goods": ["part", "resource", "craft"] },
     { "id": "hunters", "name": "Bractwo Łowców", "goods": ["material"] },
     { "id": "merchants", "name": "Kompania Kupców", "goods": [] }
   ],
@@ -71,7 +71,7 @@
     "reputation": 10,
     "relationGain": 2,
     "weekly": { "count": 4, "reward": 5, "reputation": 50 },
-    "pay": { "herb": 1.6, "potion": 1.4, "material": 1.6, "resource": 0.8, "part": 0.45 },
+    "pay": { "herb": 1.6, "potion": 1.4, "material": 1.6, "resource": 0.8, "part": 0.45, "craft": 0.75 },
     "resourceGold": 4,
     "partGold": 40,
     "partRarity": "rare",
@@ -80,7 +80,8 @@
       "potion": { "min": 1, "max": 3, "perTenLevels": 1 },
       "material": { "min": 2, "max": 6, "perTenLevels": 1 },
       "resource": { "min": 10, "max": 30, "perTenLevels": 5 },
-      "part": { "min": 2, "max": 5, "perTenLevels": 1 }
+      "part": { "min": 2, "max": 5, "perTenLevels": 1 },
+      "craft": { "min": 1, "max": 2, "perTenLevels": 0 }
     },
     "quality": { "from": "regular", "chance": 0.3, "reward": 2 },
     "systemPoints": { "every": 3, "points": 1, "weekly": 5 },
@@ -106,6 +107,11 @@
       "part": [
         "Kowal ma więcej zamówień niż rąk. Przydadzą się gotowe części.",
         "Wóz kupca rozpadł się na trakcie. Trzeba go jakoś poskładać."
+      ],
+      "craft": [
+        "Strażnicy palisady chodzą w łachmanach. Wstyd przed kupcami.",
+        "Młody Radek idzie pierwszy raz za palisadę. Niech ma porządny sprzęt.",
+        "Kupiec z miasta bierze wszystko, co wyjdzie spod dobrej ręki."
       ]
     }
   },

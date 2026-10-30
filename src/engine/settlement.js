@@ -13,10 +13,13 @@
 
 import { knownPotions, potionPrice } from './brewing.js';
 import { materialPrice, parseStack, stackKey } from './crafting.js';
-import { affixShare, affixValue } from './items.js';
+import { fireBuilding, fireTrade } from './fire.js';
+import { affixShare, affixValue, sellPrice } from './items.js';
 import { knownHerbs, professionOpen, professionState } from './professions.js';
 import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
+import { partPrice, shopBuilding } from './shop.js';
+import { craftCost, knownPatterns } from './workshop.js';
 
 const rarityIndex = (rarityId, content) => content.rarities.findIndex((rarity) => rarity.id === rarityId);
 
@@ -35,24 +38,40 @@ const reached = (points, standingId, content) =>
 
 // The goods kept in the bag, which waits for the character's return from an
 // exploration or a profession's work: their orders are delivered at home,
-// as the scrapper buys them only then.
-export const BAG_GOODS = new Set(['herb', 'potion']);
+// as the scrapper buys them only then. A Warsztat's item is in the bag too.
+export const BAG_GOODS = new Set(['herb', 'potion', 'craft']);
 
 // The brotherhood that orders a kind of goods.
 const brotherhoodOf = (kind, content) => content.settlement.brotherhoods.find((brotherhood) => brotherhood.goods.includes(kind));
 
+// What a Warsztat's item of a pattern costs to make at `level` at the
+// cheapest: its common parts at the Lada złomiarza's top level and its
+// resources at the fire spirit's.
+export function craftBuyCost(baseId, level, content) {
+  const { parts, resources } = craftCost(content.basesById[baseId], 'common', 1, level, content);
+  const partGold = Object.entries(parts).reduce((sum, [partId, count]) => sum + count * partPrice(partId, shopBuilding(content).maxLevel, content), 0);
+  const resourceGold = Object.values(resources).reduce((sum, count) => sum + count, 0) * fireTrade(fireBuilding(content).maxLevel, content).unitGold;
+  return partGold + resourceGold;
+}
+
 // What one piece of a good fetches on the market: the scrapper's price of a
 // herb, a potion and a material, and the board's own prices of the camp's
 // resources and of the parts, which the fire spirit and the Lada złomiarza
-// sell for more.
-export function goodPrice({ kind, key }, content) {
+// sell for more. A Warsztat's item (`craft`, by its pattern) is priced at
+// what making it at `level` costs at the cheapest, so an order pays below
+// that and never for buying what it takes.
+export function goodPrice({ kind, key }, content, level = 1) {
   const { orders } = content.settlement;
   if (kind === 'herb') return content.herbsById[key].price;
   if (kind === 'potion') return potionPrice(content.potionsById[key], content);
   if (kind === 'material') return materialPrice(parseStack(key).rarityId, content);
   if (kind === 'resource') return orders.resourceGold;
+  if (kind === 'craft') return craftBuyCost(key, level, content);
   return orders.partGold * content.raritiesById[content.partsById[key].rarity].sell;
 }
+
+// What the scrapper pays for a common Warsztat's item of a pattern at `level`.
+export const craftSellPrice = (level, content) => sellPrice({ level, rarity: 'common' }, content);
 
 // The goods an order may ask for: only what the character can already get
 // (question 89 A): the herbs its Zielarstwo knows, the potions its Alchemia
@@ -74,6 +93,12 @@ export function orderGoods(character, content) {
     const monster = content.monstersById[monsterId];
     const material = content.materialsByMonster[monsterId];
     if (material && monster && !monster.elite && !monster.champion) goods.push({ kind: 'material', key: stackKey(material.id, material.rarity) });
+  }
+  // The patterns of Rzemieślnictwo the character knows (question 79 A: the
+  // smiths order the Warsztat's items too).
+  if (open(content.workshop)) {
+    const level = professionState(character.professions, content.workshop.profession).level;
+    for (const base of knownPatterns(level, character.patterns ?? [], content)) goods.push({ kind: 'craft', key: base.id });
   }
   for (const resource of content.resources) goods.push({ kind: 'resource', key: resource.id });
   const top = rarityIndex(content.settlement.orders.partRarity, content);
@@ -116,7 +141,7 @@ export function drawOrder({ character, reputation = {}, seed, weekly = false }, 
     }
   }
   if (weekly) count *= orders.weekly.count;
-  const gold = Math.max(1, Math.round(count * goodPrice({ kind, key }, content) * orders.pay[kind] * factor * (weekly ? orders.weekly.reward / orders.weekly.count : 1)));
+  const gold = Math.max(1, Math.round(count * goodPrice({ kind, key }, content, character.level) * orders.pay[kind] * factor * (weekly ? orders.weekly.reward / orders.weekly.count : 1)));
   return {
     kind,
     key,
@@ -164,10 +189,21 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
 }
 
 // How many pieces of a good the character holds: herbs, potions, materials,
-// resources and parts by key, as the store keeps them.
+// resources and parts by key, as the store keeps them, and the Warsztat's
+// items in the bag by pattern (`crafted`).
 export function goodStock({ kind, key }, stocks) {
-  const store = { herb: stocks.herbs, potion: stocks.potions, material: stocks.materials, resource: stocks.resources, part: stocks.parts }[kind];
+  const store = { herb: stocks.herbs, potion: stocks.potions, material: stocks.materials, resource: stocks.resources, part: stocks.parts, craft: stocks.crafted }[kind];
   return store?.[key] ?? 0;
+}
+
+// The Warsztat's items of a pattern an order takes from the bag: the
+// weakest first (rarity, upgrade, level), never one worn.
+export function craftedFor(items, baseId, count, content) {
+  const rank = (item) => content.rarities.findIndex((rarity) => rarity.id === item.rarity);
+  return items
+    .filter((item) => item.crafted && item.base === baseId && !item.equippedSlot)
+    .sort((a, b) => rank(a) - rank(b) || (a.upgrade ?? 0) - (b.upgrade ?? 0) || a.level - b.level || a.id - b.id)
+    .slice(0, count);
 }
 
 // The order of a slot, or the week's, by its id (`weekly` for the week's).

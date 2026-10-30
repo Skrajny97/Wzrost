@@ -87,7 +87,8 @@ export function mountSettlement(container) {
       h('p', { class: 'settlement-ask', text: `${formatNumber(order.count)} × ${order.label} (masz ${formatNumber(order.have)})` }),
       h('p', { class: 'muted', text: `Zapłata: ${formatNumber(order.gold)} złota, +${order.reputation} reputacji: ${order.brotherhoodName}` }),
       order.expiresAt && h('p', { class: 'muted', text: `Termin: jeszcze ${timeLeft(order.expiresAt - serverNow())}` }),
-      away && h('p', { class: 'muted', text: 'Zioła i mikstury oddasz po odebraniu raportu z wyprawy albo pracy.' }),
+      order.kind === 'craft' && h('p', { class: 'muted', text: 'Wyroby z Warsztatu oddajesz z plecaka, najpierw najsłabsze.' }),
+      away && h('p', { class: 'muted', text: order.kind === 'craft' ? 'Wyroby oddasz po odebraniu raportu z wyprawy albo pracy.' : 'Zioła i mikstury oddasz po odebraniu raportu z wyprawy albo pracy.' }),
       h('div', { class: 'settlement-actions' }, deliver, reject),
     );
   }

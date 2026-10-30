@@ -9,6 +9,7 @@
 import {
   BAG_GOODS,
   addQuestProgress,
+  craftedFor,
   createRng,
   deliverBlock,
   deliverOrder,
@@ -49,8 +50,8 @@ const jsonPath = (key) => `$."${key}"`;
 
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 
-// The column a kind of goods is kept in.
-const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', resource: 'resources', part: 'parts' };
+// The column a kind of goods is kept in; the Warsztat's items are rows.
+const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', resource: 'resources', part: 'parts', craft: 'crafted' };
 
 // The relations after a service: its resident's grows by its relationGain.
 const grow = (relations, { resident, relationGain }) => ({ ...relations, [resident]: (relations[resident] ?? 0) + relationGain });
@@ -105,6 +106,7 @@ function goodLabel({ kind, key }) {
     return label[0].toUpperCase() + label.slice(1);
   }
   if (kind === 'resource') return content.resourcesById[key].name;
+  if (kind === 'craft') return `${content.basesById[key].name} z Warsztatu`;
   return content.partsById[key].name;
 }
 
@@ -121,7 +123,7 @@ const orderView = (order, stocks) => ({
 // greeting of their relation's standing, the brotherhoods' standings and
 // the orders on the board, each with what the character holds of it.
 export function settlementView(player, stored, board, now) {
-  const stocks = settlementGoods(player.row);
+  const stocks = settlementGoods(player.row, player.items);
   const { name, description, places, residents, brotherhoods } = content.settlement;
   return {
     name,
@@ -210,7 +212,7 @@ export async function deliverSettlementOrder(context) {
   const body = await readJson(context.request);
   const stored = settlementOf(row);
   const board = settlementBoard(row, stored, context.now);
-  const block = deliverBlock(board, body.orderId, settlementGoods(row));
+  const block = deliverBlock(board, body.orderId, settlementGoods(row, player.items));
   if (block) throw new ApiError(block.code === 'no_order' ? 404 : 409, block.code, block.message);
   const done = deliverOrder(board, body.orderId, context.now, content);
   // The potions taken along leave the bag only when the report is claimed,
@@ -220,9 +222,19 @@ export async function deliverSettlementOrder(context) {
   const next = { ...stored, reputation: add(stored.reputation, done.reputation), relations: add(stored.relations, done.relation), board: done.board };
   // The narrator's quests "Wykonaj N zleceń w Osadzie" (question 95).
   const quests = JSON.stringify(addQuestProgress(questsNow(player, context.now), { orders: 1 }));
+  const db = context.env.DB;
+  if (done.take.kind === 'craft') {
+    await deliverCrafted(db, player, done, { settlement: JSON.stringify(next), quests });
+    const after = await loadPlayer(db, session.userId);
+    if (after.row.settlement !== JSON.stringify(next)) throw changed();
+    return json({
+      delivered: { gold: done.gold, systemPoints: done.systemPoints, reputation: done.reputation },
+      settlement: settlementView(after, next, done.board, context.now),
+      character: characterView(after, context.now),
+    });
+  }
   const column = COLUMNS[done.take.kind];
   const key = jsonPath(done.take.key);
-  const db = context.env.DB;
   const result = await db
     .prepare(
       `UPDATE characters SET gold = gold + ?, system_points = system_points + ?, settlement = ?, quests = ?,
@@ -239,6 +251,28 @@ export async function deliverSettlementOrder(context) {
     settlement: settlementView(after, next, done.board, context.now),
     character: characterView(after, context.now),
   });
+}
+
+// Delivering the Warsztat's items: they leave the bag, the weakest first,
+// and the order pays, all of it or nothing. The payment goes only if the
+// character is as read and every item is still in the bag; the items go
+// only if that payment was saved (its new Osada is unique to it).
+async function deliverCrafted(db, player, done, { settlement, quests }) {
+  const { row } = player;
+  const ids = craftedFor(player.items, done.take.key, done.take.count, content).map((item) => item.id);
+  if (ids.length < done.take.count) throw new ApiError(409, 'not_enough', 'Brakuje Ci jeszcze tego, o co proszą.');
+  const list = ids.map(() => '?').join(', ');
+  await db.batch([
+    db
+      .prepare(
+        `UPDATE characters SET gold = gold + ?, system_points = system_points + ?, settlement = ?, quests = ?, version = version + 1
+         WHERE id = ? AND version = ? AND (SELECT COUNT(*) FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${list})) = ?`,
+      )
+      .bind(done.gold, done.systemPoints, settlement, quests, row.id, row.version, row.id, ...ids, ids.length),
+    db
+      .prepare(`DELETE FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${list}) AND (SELECT settlement FROM characters WHERE id = ?) = ?`)
+      .bind(row.id, ...ids, row.id, settlement),
+  ]);
 }
 
 // { orderId }: takes an order off the board for free; a new one comes later.

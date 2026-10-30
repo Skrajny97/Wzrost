@@ -7,17 +7,18 @@
   "required": ["name", "description", "places", "residents", "brotherhoods", "standings", "orders", "reforge", "hermit"],
   "definitions": {
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
-    "goodKind": { "enum": ["herb", "potion", "material", "resource", "part"] },
+    "goodKind": { "enum": ["herb", "potion", "material", "resource", "part", "craft"] },
     "perKind": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["herb", "potion", "material", "resource", "part"],
+      "required": ["herb", "potion", "material", "resource", "part", "craft"],
       "properties": {
         "herb": { "$ref": "#/definitions/kindValue" },
         "potion": { "$ref": "#/definitions/kindValue" },
         "material": { "$ref": "#/definitions/kindValue" },
         "resource": { "$ref": "#/definitions/kindValue" },
-        "part": { "$ref": "#/definitions/kindValue" }
+        "part": { "$ref": "#/definitions/kindValue" },
+        "craft": { "$ref": "#/definitions/kindValue" }
       }
     },
     "kindValue": {}

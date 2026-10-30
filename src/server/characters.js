@@ -324,25 +324,30 @@ const settlementOpen = (row) =>
   settlementOn() && Boolean(content.settlement) && (row.level >= content.unlocksById.settlement.level || settlementTest(row));
 
 // What the character holds of the goods the Osada's orders ask for, by the
-// column each kind is kept in.
-export const settlementGoods = (row) =>
-  Object.fromEntries(['herbs', 'potions', 'materials', 'resources', 'parts'].map((column) => [column, JSON.parse(row[column] ?? '{}')]));
+// column each kind is kept in, and the Warsztat's items in the bag by
+// pattern (`crafted`).
+export function settlementGoods(row, items) {
+  const stocks = Object.fromEntries(['herbs', 'potions', 'materials', 'resources', 'parts'].map((column) => [column, JSON.parse(row[column] ?? '{}')]));
+  const crafted = {};
+  for (const item of items) if (item.crafted && !item.equippedSlot) crafted[item.base] = (crafted[item.base] ?? 0) + 1;
+  return { ...stocks, crafted };
+}
 
 // The Osada's board at `now` for the character as it is: the stored one
 // (settlement.js) with the orders whose time has come.
 export function settlementBoard(row, stored, now) {
-  const character = { ...engineCharacter(row), met: JSON.parse(row.met ?? '[]') };
+  const character = { ...engineCharacter(row), met: JSON.parse(row.met ?? '[]'), patterns: JSON.parse(row.patterns ?? '[]') };
   return settleBoard(stored.board, { character, reputation: stored.reputation, seed: `${row.id}:settlement` }, now, content);
 }
 
 // Whether an order on the board, the week's included, can be delivered
 // now: the dot on the Osada tab. While the character is `away`, the orders
 // for the bag's goods wait (BAG_GOODS).
-function settlementWaiting(row, now, away) {
+function settlementWaiting(row, items, now, away) {
   if (!settlementOpen(row)) return false;
   const stored = JSON.parse(row.settlement ?? '{}');
   const board = settlementBoard(row, { board: stored.board ?? null, reputation: stored.reputation ?? {} }, now);
-  const goods = settlementGoods(row);
+  const goods = settlementGoods(row, items);
   const weekly = board.weekly && !board.weekly.done ? board.weekly.order : null;
   return [...board.slots.map((slot) => slot.order), weekly].some((order) => order && !(away && BAG_GOODS.has(order.kind)) && goodStock(order, goods) >= order.count);
 }
@@ -846,7 +851,7 @@ export function characterView(player, now) {
       ...new Set([...unlockedFeatures(row.level, content, row.class_level), ...(row.evolution ? ['evolution'] : []), ...(settlementTest(row) ? ['settlement'] : [])]),
     ],
     // An order of the Osada that can be delivered now lights its tab.
-    settlementWaiting: settlementWaiting(row, now, Boolean(activity)),
+    settlementWaiting: settlementWaiting(row, items, now, Boolean(activity)),
     huntDurations: huntDurations(row.level, content),
     // Szybkie Polowania left today (hunts.js), or null below their level.
     quickHunts: quickHuntsView(row, now),

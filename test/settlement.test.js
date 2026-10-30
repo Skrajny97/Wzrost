@@ -19,6 +19,8 @@ import {
   generateItem,
   goodPrice,
   orderGoods,
+  craftBuyCost,
+  craftSellPrice,
   partPrice,
   pathResetCost,
   questPeriod,
@@ -83,6 +85,10 @@ describe('the Osada in the engine', () => {
         if (order.kind === 'resource' || order.kind === 'part') {
           const buy = cheapest(order) * order.count;
           assert.ok(order.gold <= buy, `${order.kind} ${order.gold} > ${buy}`);
+        } else if (order.kind === 'craft') {
+          // A Warsztat's item: more than the scrapper's, less than making it from bought parts.
+          assert.ok(order.gold < craftBuyCost(order.key, character.level, content) * order.count, `craft ${order.gold}`);
+          assert.ok(order.gold > craftSellPrice(character.level, content) * order.count, `craft ${order.gold}`);
         } else {
           const market = goodPrice(order, content) * order.count;
           assert.ok(order.gold > market, `${order.kind} ${order.gold} ≤ ${market}`);
@@ -266,9 +272,15 @@ describe('the Osada through the API', () => {
     assert.deepEqual((await view()).board, settlement.board);
   });
 
+  // The first order of a good kept in a column (not the Warsztat's items) and its slot.
+  const columnOrder = (settlement) => {
+    const index = settlement.board.slots.findIndex((slot) => slot.order.kind !== 'craft');
+    return { order: settlement.board.slots[index].order, index };
+  };
+
   test('delivering an order takes what it asks for and gives gold, reputation and a new order later', async () => {
     const settlement = await view();
-    const order = settlement.board.slots[0].order;
+    const { order, index } = columnOrder(settlement);
     const short = await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } });
     assert.equal(short.status, 409);
     assert.equal(short.data.error.code, 'not_enough');
@@ -278,7 +290,7 @@ describe('the Osada through the API', () => {
     assert.equal(done.status, 200);
     assert.equal(done.data.delivered.gold, order.gold);
     assert.equal(done.data.character.gold, 100000 + order.gold);
-    assert.equal(done.data.settlement.board.slots[0].readyAt > 0, true);
+    assert.equal(done.data.settlement.board.slots[index].readyAt > 0, true);
     const brotherhood = done.data.settlement.brotherhoods.find((one) => one.id === order.brotherhood);
     assert.equal(brotherhood.standing.toNext, content.settlement.standings[1].points - order.reputation);
     const row = await (await db()).prepare(`SELECT ${column} AS stock FROM characters`).first();
@@ -289,7 +301,7 @@ describe('the Osada through the API', () => {
 
   test('the Osada tab lights up when an order on the board can be delivered', async () => {
     await set(`herbs = '{}', potions = '{}', materials = '{}', resources = '{}', parts = '{}'`);
-    const order = (await view()).board.slots[0].order;
+    const { order } = columnOrder(await view());
     const lit = async () => (await call('GET', '/api/character', { cookie })).data.character.settlementWaiting;
     assert.equal(await lit(), false);
     const column = STORE[order.kind];
@@ -297,14 +309,15 @@ describe('the Osada through the API', () => {
     assert.equal(await lit(), true);
   });
 
-  test('herb and potion orders wait for the character at home, the others do not', async () => {
+  test('herb, potion and Warsztat orders wait for the character at home, the others do not', async () => {
     assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } })).status, 201);
     let orders = [];
-    for (let i = 0; i < 12 && !(orders.some((order) => order.home) && orders.some((order) => !order.home)); i++) {
+    const herbal = (order) => order.home && order.kind !== 'craft';
+    for (let i = 0; i < 20 && !(orders.some(herbal) && orders.some((order) => !order.home)); i++) {
       await call('POST', '/api/test/settlement', { cookie, body: { action: 'orders' } });
       orders = (await view()).board.slots.map((slot) => slot.order);
     }
-    const home = orders.find((order) => order.home);
+    const home = orders.find(herbal);
     const away = orders.find((order) => !order.home);
     assert.ok(['herb', 'potion'].includes(home.kind));
     assert.ok(!['herb', 'potion'].includes(away.kind));
@@ -319,6 +332,40 @@ describe('the Osada through the API', () => {
     await give(away);
     assert.equal(await lit(), true);
     assert.equal((await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: away.id } })).status, 200);
+  });
+
+  test('a Warsztat order takes the weakest of the pattern\'s items from the bag, never a worn one', async () => {
+    let order = null;
+    for (let i = 0; i < 30 && !order; i++) {
+      await call('POST', '/api/test/settlement', { cookie, body: { action: 'orders' } });
+      order = (await view()).board.slots.map((slot) => slot.order).find((one) => one.kind === 'craft') ?? null;
+    }
+    assert.ok(order, 'a Warsztat order comes');
+    assert.equal(order.home, true);
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    const made = (rarityId, seed) => ({
+      ...generateItem({ baseId: order.key, level: 20, rarityId, area: content.areas[0] }, createRng(seed), content),
+      crafted: { parts: 6, upgrade: 0 },
+    });
+    const insert = async (item, slot = null) =>
+      (await database.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, 0)').bind(id, slot, JSON.stringify(item)).run()).meta.last_row_id;
+    // A loot item of the same base does not count, nor does a worn one.
+    const loot = generateItem({ baseId: order.key, level: 20, rarityId: 'common', area: content.areas[0] }, createRng('loot'), content);
+    await insert(loot);
+    const worn = await insert(made('common', 'worn'), content.basesById[order.key].slot);
+    assert.equal((await view()).board.slots.find((slot) => slot.order?.id === order.id).order.have, 0);
+    const rare = await insert(made('rare', 'rare'));
+    const commons = [];
+    for (let n = 0; n < order.count; n++) commons.push(await insert(made('common', `c${n}`)));
+    assert.equal((await view()).board.slots.find((slot) => slot.order?.id === order.id).order.have, order.count + 1);
+    const before = (await database.prepare('SELECT gold FROM characters').first()).gold;
+    const done = await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } });
+    assert.equal(done.status, 200);
+    assert.equal(done.data.character.gold, before + order.gold);
+    const left = (await database.prepare('SELECT id FROM items WHERE character_id = ?').bind(id).all()).results.map((row) => row.id);
+    assert.ok(left.includes(worn) && left.includes(rare));
+    assert.ok(commons.every((one) => !left.includes(one)));
   });
 
   test('rejecting an order empties its slot for a while', async () => {
