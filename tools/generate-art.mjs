@@ -10,7 +10,8 @@
 // time, each as a PNG sheet of its frames; a prompt with `startFrame` (a PNG
 // in the repository) moves that picture in `frames` frames, and one with
 // `width` and `height` has its own size (and with `removeBackground` its own
-// background), and one with `seed` draws with that seed. A prompt with `tool`
+// background), one with `seed` draws with that seed and one with `strength`
+// changes its `startFrame` that much (0–1). A prompt with `tool`
 // runs a Retro Diffusion edit tool (outpainting, inpainting, image_edit…) on
 // the picture in `input` (with `mask`, `expand`, `prompt` and other `options`
 // as the tool takes them), and one with `request` downloads again what an earlier call
@@ -137,7 +138,7 @@ async function draw(id, count = variants) {
     // kind or of the prompt) keep it.
     ...((kind.prompts[id].removeBackground ?? kind.removeBackground) === false ? {} : { remove_bg: true, return_non_bg_removed: true }),
     ...(kind.animation && { return_spritesheet: true, ...(framesOf(id) && { frames_duration: framesOf(id) }) }),
-    ...(startOf(id) && { input_image: readFileSync(startOf(id)).toString('base64') }),
+    ...(startOf(id) && { input_image: readFileSync(startOf(id)).toString('base64'), ...(kind.prompts[id].strength !== undefined && { strength: kind.prompts[id].strength }) }),
   };
   const refs = references(id);
   if (refs.length) payload.reference_images = refs;
