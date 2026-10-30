@@ -6,9 +6,10 @@
 // Prompts, styles and sizes are in art/prompts.json; a prompt given as
 // { prompt, style } draws in its own style. The approved sprites listed
 // there as references (art/references/<kind>/<id>.png) keep the style of the new
-// ones consistent. A kind with `animation` draws looping animations, one at a
+// ones consistent, after a prompt's own `references` (PNGs in the repository,
+// e.g. the portrait a walk is drawn from). A kind with `animation` draws looping animations, one at a
 // time, each as a PNG sheet of its frames; a prompt with `startFrame` (a PNG
-// in the repository) moves that picture in `frames` frames, and one with
+// in the repository, or the kind's) moves that picture in `frames` frames, and one with
 // `width` and `height` has its own size (and with `removeBackground` its own
 // background), one with `seed` draws with that seed and one with `strength`
 // changes its `startFrame` that much (0–1). A prompt with `tool`
@@ -71,7 +72,7 @@ if (!(maxCost > 0)) fail('--max-cost musi być dodatnią kwotą w dolarach.');
 const styleOf = (id) => values.style || kind.prompts[id].style || kind.style;
 const promptOf = (id) => (typeof kind.prompts[id] === 'string' ? kind.prompts[id] : kind.prompts[id].prompt);
 // An animation's first frame and its number of frames, if the prompt gives them.
-const startOf = (id) => kind.prompts[id].startFrame;
+const startOf = (id) => kind.prompts[id].startFrame ?? kind.startFrame;
 const framesOf = (id) => kind.prompts[id].frames ?? kind.animation?.frames;
 
 const headers = { 'X-RD-Token': token, 'Content-Type': 'application/json' };
@@ -105,12 +106,13 @@ async function settle(data) {
   throw new Error('generowanie trwa zbyt długo');
 }
 
-// The approved sprites of this kind, as style references (not for themselves).
+// A prompt's own pictures, then the approved sprites of this kind, as style
+// references (not for themselves).
 const references = (id) =>
-  (kind.references ?? [])
-    .filter((ref) => ref !== id && existsSync(`art/references/${values.kind}/${ref}.png`))
+  [...(kind.prompts[id].references ?? []), ...(kind.references ?? []).filter((ref) => ref !== id).map((ref) => `art/references/${values.kind}/${ref}.png`)]
+    .filter((file) => existsSync(file))
     .slice(0, 9)
-    .map((ref) => readFileSync(`art/references/${values.kind}/${ref}.png`).toString('base64'));
+    .map((file) => readFileSync(file).toString('base64'));
 
 const outDir = `art/drafts/${values.kind}`;
 mkdirSync(outDir, { recursive: true });
