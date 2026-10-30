@@ -11,6 +11,196 @@
       "start": "art/references/walks/start/inquisitor-male.png",
       "pose": 2,
       "description": "stern young man with short black hair, a long dark crimson coat over a black cassock, a silver holy symbol on a heavy chain, a flanged iron mace in his right hand and a smoking censer on a chain in his left hand"
+    },
+    "warrior-male": {
+      "start": "art/references/walks/start/warrior-male.png",
+      "pose": 2,
+      "description": "a young man with short brown hair, a cream linen shirt with a rope belt, patched brown trousers, bare feet with cloth wraps, empty hands"
+    },
+    "archer-female": {
+      "start": "art/references/walks/start/archer-female.png",
+      "pose": 2,
+      "description": "a young woman in a brown hood and a short brown cape, a green tunic, dark green trousers, brown leather boots, a small leather pouch at the hip, empty hands"
+    },
+    "archer-male": {
+      "start": "art/references/walks/start/archer-male.png",
+      "pose": 2,
+      "description": "a young man with brown hair in a long brown hooded cloak, a green tunic, dark green trousers, brown leather boots, empty hands"
+    },
+    "mage-female": {
+      "start": "art/references/walks/start/mage-female.png",
+      "pose": 2,
+      "description": "a young woman with long brown hair, a patched blue robe with a rope belt, simple sandals, empty hands"
+    },
+    "mage-male": {
+      "start": "art/references/walks/start/mage-male.png",
+      "pose": 2,
+      "description": "a young man with brown hair, a patched blue tunic with a satchel strap across the chest, brown trousers, simple sandals, empty hands"
+    },
+    "cleric-female": {
+      "start": "art/references/walks/start/cleric-female.png",
+      "pose": 2,
+      "description": "a young woman with neat dark brown hair pulled back into one long braid down her back, a small clear face, a plain cream dress with a rope belt and a small wooden pendant, simple sandals, empty hands"
+    },
+    "cleric-male": {
+      "start": "art/references/walks/start/cleric-male.png",
+      "pose": 2,
+      "description": "a young man with dark blue-black hair, a ragged cream tunic with a rope belt and a small pendant, cloth-wrapped feet, empty hands"
+    },
+    "shadow-female": {
+      "start": "art/references/walks/start/shadow-female.png",
+      "pose": 2,
+      "description": "a young woman with brown hair, a dark grey scarf over her mouth and nose, a ragged dark grey tunic, olive trousers, cloth-wrapped feet, empty hands"
+    },
+    "shadow-male": {
+      "start": "art/references/walks/start/shadow-male.png",
+      "pose": 2,
+      "description": "a young man with messy black hair, a dark grey scarf over his mouth and nose, ragged dark clothes, olive trousers, cloth-wrapped feet, empty hands"
+    },
+    "guardian-female": {
+      "start": "art/references/walks/start/guardian-female.png",
+      "pose": 2,
+      "description": "a young woman in a dented iron helmet and chainmail, a sword in her right hand and a round wooden shield on her left arm"
+    },
+    "guardian-male": {
+      "start": "art/references/walks/start/guardian-male.png",
+      "pose": 2,
+      "description": "a young man in a dented iron helmet and chainmail with a red tabard, a sword in his right hand and a round wooden shield on his left arm"
+    },
+    "sniper-female": {
+      "start": "art/references/walks/start/sniper-female.png",
+      "pose": 2,
+      "description": "a young woman in a dark green hood and a brown leather jacket, a quiver of arrows on her back, a longbow in her left hand"
+    },
+    "sniper-male": {
+      "start": "art/references/walks/start/sniper-male.png",
+      "pose": 2,
+      "description": "a young man in a dark green hood and a brown leather jacket, a quiver of arrows on his back, a longbow in his left hand"
+    },
+    "ice-lord-female": {
+      "start": "art/references/walks/start/ice-lord-female.png",
+      "pose": 2,
+      "description": "a young woman in a long blue hooded robe with gold trim, a wooden staff with a glowing cyan crystal in her right hand"
+    },
+    "ice-lord-male": {
+      "start": "art/references/walks/start/ice-lord-male.png",
+      "pose": 2,
+      "description": "a young man in a long blue hooded robe with gold trim and a dark cloak, a wooden staff with a glowing cyan crystal in his left hand"
+    },
+    "priest-female": {
+      "start": "art/references/walks/start/priest-female.png",
+      "pose": 2,
+      "description": "a young woman with long brown hair and a thin gold circlet, a long white and gold robe with a holy symbol, a silver aspergillum in her right hand and a round silver shield on her left arm"
+    },
+    "priest-male": {
+      "start": "art/references/walks/start/priest-male.png",
+      "pose": 2,
+      "description": "a young man with messy brown hair, a long white robe with gold trim and a golden sun on the chest, a short silver mace in his right hand and a big round white and gold shield on his left arm"
+    },
+    "elementalist-female": {
+      "start": "art/references/walks/start/elementalist-female.png",
+      "pose": 2,
+      "description": "a young woman with very long flowing light brown hair, a long red and orange hooded mage robe with wide sleeves, a brown belt with pouches, a long wooden staff topped with a glowing orange crystal in her right hand, a small flame floating over her open left hand"
+    },
+    "elementalist-male": {
+      "start": "art/references/walks/start/elementalist-male.png",
+      "pose": 2,
+      "description": "a thin young man with brown hair, a long deep red and orange robe with amber trim and a dark sash, a short wooden staff with a glowing amber stone in his right hand, a small flame above his open left hand"
+    },
+    "assassin-female": {
+      "start": "art/references/walks/start/assassin-female.png",
+      "pose": 2,
+      "description": "a young woman in a black hood with a black mask over the mouth, black leather armour, a dagger in each hand"
+    },
+    "assassin-male": {
+      "start": "art/references/walks/start/assassin-male.png",
+      "pose": 2,
+      "description": "a young man in a black hood with a black mask over the mouth, black leather armour, a dagger in each hand"
+    },
+    "barbarian-male": {
+      "start": "art/references/walks/start/barbarian-male.png",
+      "pose": 2,
+      "description": "a broad-shouldered young man with short brown hair and a short beard, a grey wolf fur mantle over the shoulders, a sleeveless dark leather jerkin with a wide belt, fur-wrapped boots, a big two-handed battle axe in his right hand"
+    },
+    "barbarian-female": {
+      "start": "art/references/walks/start/barbarian-female.png",
+      "pose": 2,
+      "description": "a strong young woman with red hair in a thick braid, a grey wolf fur mantle over the shoulders, a sleeveless dark leather jerkin with a wide belt, fur-wrapped boots, a big two-handed battle axe in her right hand"
+    },
+    "gladiator-male": {
+      "start": "art/references/walks/start/gladiator-male.png",
+      "pose": 2,
+      "description": "an athletic young man, an open bronze helmet with a red crest, one large iron shoulder guard, a leather breastplate, a short skirt of red leather strips, bronze greaves and sandals, a broad curved sword in his right hand and a small round buckler on his left arm"
+    },
+    "gladiator-female": {
+      "start": "art/references/walks/start/gladiator-female.png",
+      "pose": 2,
+      "description": "an athletic young woman with red hair tied back, an open bronze helmet with a red crest, one large iron shoulder guard, a leather breastplate, a short skirt of red leather strips, bronze greaves and sandals, a broad curved sword in her right hand and a small round buckler on her left arm"
+    },
+    "storm-archer-male": {
+      "start": "art/references/walks/start/storm-archer-male.png",
+      "pose": 2,
+      "description": "a lean young man with messy brown hair, a long slate-blue cloak with silver lightning embroidery, a grey leather jacket, a quiver of arrows with glowing blue tips on his back, a recurve bow in his left hand"
+    },
+    "storm-archer-female": {
+      "start": "art/references/walks/start/storm-archer-female.png",
+      "pose": 2,
+      "description": "a lean young woman with long brown hair, a long slate-blue cloak with silver lightning embroidery, a grey leather jacket, a quiver of arrows with glowing blue tips on her back, a recurve bow in her left hand"
+    },
+    "hunter-male": {
+      "start": "art/references/walks/start/hunter-male.png",
+      "pose": 2,
+      "description": "a lean young man with messy brown hair, a brown leather jerkin with fur trim, a wolf pelt over the shoulders, soft leather boots, a short bow in his right hand, a brown falcon perched on his gloved left forearm"
+    },
+    "hunter-female": {
+      "start": "art/references/walks/start/hunter-female.png",
+      "pose": 2,
+      "description": "a lean young woman with a brown ponytail, a brown leather jerkin with fur trim, a wolf pelt over the shoulders, soft leather boots, a short bow in her right hand, a brown falcon perched on her gloved left forearm"
+    },
+    "arcanist-male": {
+      "start": "art/references/walks/start/arcanist-male.png",
+      "pose": 2,
+      "description": "a thin young man with brown hair, a long deep purple robe with silver star embroidery and a high collar, a glowing violet grimoire floating beside his right hand"
+    },
+    "arcanist-female": {
+      "start": "art/references/walks/start/arcanist-female.png",
+      "pose": 2,
+      "description": "a slender young woman with long brown hair, a long deep purple robe with silver star embroidery and a high collar, a glowing violet grimoire floating beside her right hand, a slim staff with a glowing violet orb in her left hand"
+    },
+    "healer-male": {
+      "start": "art/references/walks/start/healer-male.png",
+      "pose": 2,
+      "description": "a calm young man with short black hair, a long white linen robe with a soft green mantle, a satchel of herbs on the belt, a simple wooden staff with a sprouting green branch in his left hand"
+    },
+    "healer-female": {
+      "start": "art/references/walks/start/healer-female.png",
+      "pose": 2,
+      "description": "a calm young woman with dark hair in a braid, a long white linen robe with a soft green mantle, a satchel of herbs on the belt, a simple wooden staff with a sprouting green branch in her left hand"
+    },
+    "inquisitor-female": {
+      "start": "art/references/walks/start/inquisitor-female.png",
+      "pose": 2,
+      "description": "a stern young woman with dark hair in a tight braid, a long dark crimson coat over a black cassock, a silver holy symbol on a heavy chain, a flanged iron mace in her right hand and a smoking censer on a chain in her left hand"
+    },
+    "poisoner-male": {
+      "start": "art/references/walks/start/poisoner-male.png",
+      "pose": 2,
+      "description": "a wiry young man with black spiky hair, a dark green leather coat with the hood down, a cloth mask over the mouth, belts of small green glass vials across the chest, a curved dagger dripping green venom in his right hand"
+    },
+    "poisoner-female": {
+      "start": "art/references/walks/start/poisoner-female.png",
+      "pose": 2,
+      "description": "a wiry young woman with short brown hair, a dark green leather coat with the hood down, a cloth mask over the mouth, belts of small green glass vials across the chest, a curved dagger dripping green venom in her right hand"
+    },
+    "night-dancer-male": {
+      "start": "art/references/walks/start/night-dancer-male.png",
+      "pose": 2,
+      "description": "a lithe young man with black spiky hair, light flowing dark violet garments with long trailing scarves, a half mask over the mouth, soft boots, a slim curved blade in each hand"
+    },
+    "night-dancer-female": {
+      "start": "art/references/walks/start/night-dancer-female.png",
+      "pose": 2,
+      "description": "a lithe young woman with short brown hair, light flowing dark violet garments with long trailing scarves, a half mask over the mouth, soft boots, a slim curved blade in each hand"
     }
   }
 }
