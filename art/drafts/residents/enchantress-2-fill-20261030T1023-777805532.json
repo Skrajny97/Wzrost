@@ -1,0 +1,28 @@
+{
+  "id": "enchantress-2-fill",
+  "tool": "inpainting",
+  "payload": {
+    "input_image": "art/inputs/residents/enchantress-2.png",
+    "mask_image": "art/inputs/residents/enchantress-2-mask.png",
+    "prompt": "pixel art portrait of a calm woman enchantress: her chest and shoulders in the same dark charcoal hooded cloak over a dark dress, the necklace of carved bone and crystal charms on her chest, her forearm in a dark sleeve below the raised hand with a faint violet glow, the same colours, shading and dark outline as the rest of the picture",
+    "seed": 777805532
+  },
+  "result": {
+    "tool_id": "inpainting",
+    "inference_id": "inf_MeN8nlZXaEKkJQjPKRoGY4pr0LvPOz9W",
+    "balance_cost": 0.18,
+    "credit_cost": 20,
+    "charged": true,
+    "remaining_balance": 42.820000000000014,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/3eb0f1c88f7eaf336c1a200028f130e0.png"
+    ],
+    "output_width": 96,
+    "output_height": 128,
+    "toolId": "inpainting",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/3eb0f1c88f7eaf336c1a200028f130e0.png",
+    "inferenceId": "inf_MeN8nlZXaEKkJQjPKRoGY4pr0LvPOz9W",
+    "balanceCost": 0.18,
+    "creditCost": 20
+  }
+}

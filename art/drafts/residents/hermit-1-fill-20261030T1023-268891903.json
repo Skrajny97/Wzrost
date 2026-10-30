@@ -1,0 +1,28 @@
+{
+  "id": "hermit-1-fill",
+  "tool": "inpainting",
+  "payload": {
+    "input_image": "art/inputs/residents/hermit-1.png",
+    "mask_image": "art/inputs/residents/hermit-1-mask.png",
+    "prompt": "pixel art portrait of an old forest hermit: the lower corner of the same hooded patched grey cloak, the same colours, shading and dark outline as the rest of the cloak",
+    "seed": 268891903
+  },
+  "result": {
+    "tool_id": "inpainting",
+    "inference_id": "inf_pOKDN5om7Ak3PQDojYVqEadrveWVRMjX",
+    "balance_cost": 0.18,
+    "credit_cost": 20,
+    "charged": true,
+    "remaining_balance": 42.460000000000015,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/2c7be7b4c683129078884daa0c57e777.png"
+    ],
+    "output_width": 96,
+    "output_height": 128,
+    "toolId": "inpainting",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/2c7be7b4c683129078884daa0c57e777.png",
+    "inferenceId": "inf_pOKDN5om7Ak3PQDojYVqEadrveWVRMjX",
+    "balanceCost": 0.18,
+    "creditCost": 20
+  }
+}

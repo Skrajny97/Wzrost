@@ -1,0 +1,28 @@
+{
+  "id": "innkeeper-2-fill",
+  "tool": "inpainting",
+  "payload": {
+    "input_image": "art/inputs/residents/innkeeper-2.png",
+    "mask_image": "art/inputs/residents/innkeeper-2-mask.png",
+    "prompt": "pixel art portrait of a big broad-shouldered innkeeper: his broad shoulders and chest in a dark green woollen vest over a cream linen shirt, the white towel over his shoulder, the same colours, shading and dark outline as the rest of the picture",
+    "seed": 983760175
+  },
+  "result": {
+    "tool_id": "inpainting",
+    "inference_id": "inf_xL6l87ZNz2pm5wMoP2Mq9VAJg1WMePjn",
+    "balance_cost": 0.18,
+    "credit_cost": 20,
+    "charged": true,
+    "remaining_balance": 42.100000000000016,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/dedcfede87880f5984682d8916314b94.png"
+    ],
+    "output_width": 96,
+    "output_height": 128,
+    "toolId": "inpainting",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/dedcfede87880f5984682d8916314b94.png",
+    "inferenceId": "inf_xL6l87ZNz2pm5wMoP2Mq9VAJg1WMePjn",
+    "balanceCost": 0.18,
+    "creditCost": 20
+  }
+}

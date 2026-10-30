@@ -1,0 +1,28 @@
+{
+  "id": "headman-1-fill",
+  "tool": "inpainting",
+  "payload": {
+    "input_image": "art/inputs/residents/headman-1.png",
+    "mask_image": "art/inputs/residents/headman-1-mask.png",
+    "prompt": "pixel art portrait of an old village headman: his left shoulder and arm in the same fur-trimmed brown wool coat over a linen shirt, the same colours, shading and dark outline as the rest of the coat",
+    "seed": 251386853
+  },
+  "result": {
+    "tool_id": "inpainting",
+    "inference_id": "inf_DXbLOAaper0JPQAod3dGnjBlxWg1dK6R",
+    "balance_cost": 0.18,
+    "credit_cost": 20,
+    "charged": true,
+    "remaining_balance": 43.180000000000014,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/da94562d3028f7708d1d209175a4f7d5.png"
+    ],
+    "output_width": 96,
+    "output_height": 128,
+    "toolId": "inpainting",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/da94562d3028f7708d1d209175a4f7d5.png",
+    "inferenceId": "inf_DXbLOAaper0JPQAod3dGnjBlxWg1dK6R",
+    "balanceCost": 0.18,
+    "creditCost": 20
+  }
+}
