@@ -1,5 +1,5 @@
 {
-  "$comment": "Looping scenes while the character works or explores (src/client/scenes.js). A sheet is one row of square frames of `size` pixels, shown at twice the size. A work's moment is its rare event: a bird over the scene, or steam or sparks from the point x, y of a frame. The Walka scene walks the figure in place on the path while the land of the exploration's region drifts behind it, the land at landSpeed and the path at pathSpeed pixels a second. The first rare moment comes after firstSeconds, the next ones after seconds (a random time between the two numbers). dayParts: the light of the scene from that hour in Poland.",
+  "$comment": "Looping scenes while the character works or explores (src/client/scenes.js). A sheet is one row of square frames of `size` pixels, shown at twice the size. A work's moment is its rare event: a bird over the scene, or steam or sparks from the point x, y of a frame. The Walka scene walks the figure in place on the path while the land of the exploration's region drifts behind it, the land at landSpeed and the path at pathSpeed pixels a second. figure is the System's figure for a look without its own; walker is the size, frames, speed and scale of the characters' own walks (src/client/art/walkers, eight frames from PixelLab, a full step a second), and pathSpeed matches their stride: a foot on the ground goes back 47 pixels in half a second. The first rare moment comes after firstSeconds, the next ones after seconds (a random time between the two numbers). dayParts: the light of the scene from that hour in Poland.",
   "work": {
     "herbalism": { "file": "art/scenes/herbalism.png", "size": 128, "frames": 8, "fps": 8, "place": "system-grove", "moment": { "kind": "bird" } },
     "alchemy": { "file": "art/scenes/alchemy.png", "size": 128, "frames": 14, "fps": 8, "moment": { "kind": "steam", "x": 44, "y": 72 } },
@@ -7,6 +7,7 @@
   },
   "walk": {
     "figure": { "file": "art/scenes/walker.png", "size": 48, "frames": 4, "fps": 8 },
+    "walker": { "size": 128, "frames": 8, "fps": 8, "scale": 1 },
     "path": "art/scenes/path.png",
     "lands": {
       "windfalls": "art/scenes/lands/windfalls.png",
@@ -14,8 +15,8 @@
       "backwaters": "art/scenes/lands/backwaters.png",
       "peat-bogs": "art/scenes/lands/peat-bogs.png"
     },
-    "landSpeed": 20,
-    "pathSpeed": 60,
+    "landSpeed": 30,
+    "pathSpeed": 94,
     "moments": ["bird", "shadow"]
   },
   "bird": "art/scenes/bird.png",

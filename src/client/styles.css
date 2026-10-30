@@ -7614,6 +7614,10 @@ a.profession-square:active {
   left: calc(50% - var(--frame) / 2);
   bottom: 22px;
 }
+/* The character's own figure has less room under its feet in the frame. */
+.scene-walker--own {
+  bottom: 28px;
+}
 .scene--dawn {
   filter: brightness(1.04) sepia(0.18) saturate(1.1);
 }

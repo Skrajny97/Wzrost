@@ -51,9 +51,20 @@
     "walk": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["figure", "path", "lands", "landSpeed", "pathSpeed", "moments"],
+      "required": ["figure", "walker", "path", "lands", "landSpeed", "pathSpeed", "moments"],
       "properties": {
         "figure": { "$ref": "#/definitions/sheet" },
+        "walker": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["size", "frames", "fps", "scale"],
+          "properties": {
+            "size": { "type": "integer", "minimum": 8 },
+            "frames": { "type": "integer", "minimum": 1 },
+            "fps": { "type": "number", "exclusiveMinimum": 0 },
+            "scale": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
         "path": { "type": "string", "pattern": "^art/scenes/.+\\.png$" },
         "lands": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^art/scenes/.+\\.png$" } },
         "landSpeed": { "type": "number", "exclusiveMinimum": 0 },

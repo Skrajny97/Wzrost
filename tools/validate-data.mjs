@@ -538,7 +538,7 @@ function checkReferences(data) {
     for (const cls of data.classes) {
       for (const look of data.appearances) {
         // The portrait, and the walking figure of the Walka scene.
-        for (const [kind, tool] of [['portraits', 'skin-tones.py'], ['walkers', 'walker-tones.py']]) {
+        for (const [kind, tool] of [['portraits', 'skin-tones.py'], ['walkers', 'walk-tones.py']]) {
           const file = `art/${kind}/${cls.id}-${look.id}-${tone.id}.png`;
           if (existsSync(new URL(`art/${kind}/${cls.id}-${look.id}.png`, CLIENT_DIR)) && !existsSync(new URL(file, CLIENT_DIR))) {
             errors.push(`skins.json: brak pliku src/client/${file} (python3 tools/${tool})`);

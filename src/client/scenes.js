@@ -11,7 +11,8 @@ import { h } from './dom.js';
 import { motionOn } from './motion.js';
 import { state } from './state.js';
 
-// Sheets and lands are drawn at twice their size, the path at three times.
+// Sheets and lands are drawn at twice their size (a sheet with its own
+// scale at that), the path at three times.
 // A land's strip is two land pictures side by side (the second mirrored, so
 // it repeats without a seam), and the path one tile that repeats.
 const SCALE = 2;
@@ -38,7 +39,7 @@ export function dayPart() {
 // A sheet's frames, played in a loop.
 function frames(sheet, className) {
   const element = h('div', { class: `scene-frames ${className}` });
-  const size = sheet.size * SCALE;
+  const size = sheet.size * (sheet.scale ?? SCALE);
   element.style.setProperty('--sheet', `url("/${sheet.file}")`);
   element.style.setProperty('--frame', `${size}px`);
   element.style.setProperty('--sheet-width', `${size * sheet.frames}px`);
@@ -73,8 +74,8 @@ export function walkScene(activity) {
   if (!walk) return null;
   const { classId, appearance, skin, evolution } = state.character ?? {};
   const own = walkerSheet(classId, appearance, skin, evolution?.current?.id);
-  const figure = own ? { ...walk.figure, file: own } : walk.figure;
-  const stage = h('div', { class: `scene-walk scene--${dayPart()}` }, h('div', { class: 'scene-path' }), frames(figure, 'scene-walker'));
+  const figure = own ? frames({ ...walk.walker, file: own }, 'scene-walker scene-walker--own') : frames(walk.figure, 'scene-walker');
+  const stage = h('div', { class: `scene-walk scene--${dayPart()}` }, h('div', { class: 'scene-path' }), figure);
   const land = walk.lands[activity.regionId];
   if (land) stage.style.setProperty('--land', `url("/${land}")`);
   stage.style.setProperty('--land-width', `${LAND.width * SCALE}px`);

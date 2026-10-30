@@ -1,0 +1,16 @@
+{
+  "$comment": "Corrections of tools/walk-tones.py, figure by figure: skin colours to add or drop (hex; a dropped colour is never skin), boxes [left, top, right, bottom) of the 128-pixel frame where the skin's colours are not skin (not) or the only ones where they are (only), a fifth item \"head\" for a box that moves with the head, places of the skeleton in only (head, hands, upper-arms), open to leave out thin lines of the skin's colours, single pixels {frame: [[x, y], ...]} that are skin (pixels) or not (not_pixels), and span, the part of the tone's ramp the skin takes.",
+  "archer-female": { "add": ["bf907d", "a46d52", "b0836b"] },
+  "arcanist-female": { "only": ["head", "hands"] },
+  "assassin-female": { "add": ["b09b8e", "a98479"], "only": ["head"], "span": [0.45, 0.7] },
+  "elementalist-female": { "only": ["head", "hands"] },
+  "elementalist-male": { "only": ["head", "hands"] },
+  "gladiator-female": { "not": [[0, 0, 128, 26, "head"], [44, 24, 67, 38, "head"], [0, 99, 128, 128]] },
+  "gladiator-male": { "not": [[0, 0, 128, 26, "head"], [44, 24, 67, 38, "head"], [0, 99, 128, 128]] },
+  "ice-lord-male": { "drop": ["8d6750"], "only": ["head", "hands"] },
+  "night-dancer-female": { "only": ["head", "hands", "upper-arms"] },
+  "poisoner-female": { "only": ["head", "hands"] },
+  "poisoner-male": { "only": ["head", "hands"] },
+  "priest-female": { "only": ["head", "hands"] },
+  "priest-male": { "only": ["head", "hands"] }
+}

@@ -123,18 +123,17 @@ export const SPRITES = {
       'judgement', 'verdict', 'great-blessing', 'psalm', 'execution', 'death-mark', 'black-venom', 'toxic-slime', 'blade-dance', 'shadow-whirl',
     ],
   },
-  // The character walking in place on the Walka scene, <class>-<look>: four
-  // frames of 48×48 in a row, facing right, drawn from the portraits. A skin
-  // tone other than the one drawn has its own recoloured file, as a portrait
-  // does (tools/walker-tones.py), and so has an evolution's <evolution>-<look>
-  // (tools/evolution-walker-tones.py).
+  // The character walking in place on the Walka scene, <class>-<look> or an
+  // evolution's <evolution>-<look>: eight frames of 128×128 in a row, facing
+  // right, drawn from the portraits and animated by PixelLab (DECISIONS.md,
+  // "Chody od zera"). A skin tone other than the one drawn has its own
+  // recoloured file, as a portrait does (tools/walk-tones.py).
   walkers: {
-    width: 192,
-    height: 48,
+    width: 1024,
+    height: 128,
     ids: [
       'warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male',
       'guardian-female', 'guardian-male', 'sniper-female', 'sniper-male', 'ice-lord-female', 'ice-lord-male', 'priest-female', 'priest-male', 'assassin-female', 'assassin-male',
-      // The new evolutions' walks, the drafts in place till the author picks (DECISIONS.md).
       'barbarian-female', 'barbarian-male', 'gladiator-female', 'gladiator-male', 'storm-archer-female', 'storm-archer-male', 'hunter-female', 'hunter-male',
       'elementalist-female', 'elementalist-male', 'arcanist-female', 'arcanist-male', 'healer-female', 'healer-male', 'inquisitor-female', 'inquisitor-male',
       'poisoner-female', 'poisoner-male', 'night-dancer-female', 'night-dancer-male',
