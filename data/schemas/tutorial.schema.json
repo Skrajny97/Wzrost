@@ -178,7 +178,17 @@
               "crafting-welcome",
               "crafting-lead",
               "crafting-patterns",
-              "crafting-ending"
+              "crafting-ending",
+              "settlement-welcome",
+              "settlement-lead",
+              "settlement-board",
+              "settlement-brotherhoods",
+              "settlement-ending",
+              "evolution-welcome",
+              "evolution-lead",
+              "evolution-choice",
+              "evolution-points",
+              "evolution-ending"
             ]
           },
           "kind": {
@@ -243,7 +253,9 @@
               "skills",
               "professions",
               "community",
-              "crafting"
+              "crafting",
+              "settlement",
+              "evolution"
             ],
             "description": "Część po wprowadzeniu, do której należy kwestia (chapters). Jej kwestie przychodzą dopiero po zakończeniu wprowadzenia, w swoim momencie gry."
           },

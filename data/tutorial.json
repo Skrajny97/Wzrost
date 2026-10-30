@@ -28,6 +28,14 @@
     "crafting": {
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Rzemieślnictwo czeka w zakładce Profesje."
+    },
+    "settlement": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Osada czeka w zakładce Osada."
+    },
+    "evolution": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Ewolucja czeka w zakładce Postać."
     }
   },
   "lines": [
@@ -699,6 +707,91 @@
         "Każdy nowy poziom Rzemieślnictwa odsłoni Ci kolejne wzory. Zajrzyj tu też, gdy rozbierzesz na części wcześniej nierozbierany przedmiot."
       ],
       "voice": "audio/narration/crafting-ending.mp3"
+    },
+    {
+      "id": "settlement-welcome",
+      "kind": "card",
+      "chapter": "settlement",
+      "text": [
+        "Dwudziesty poziom postaci… Życie toczy się również poza puszczą. System otworzył przed Tobą Osadę."
+      ]
+    },
+    {
+      "id": "settlement-lead",
+      "kind": "lead",
+      "chapter": "settlement",
+      "text": [
+        "Osada czeka w tej zakładce. Zajrzyjmy na Rozstaje."
+      ]
+    },
+    {
+      "id": "settlement-board",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Na Tablicy Zleceń mieszkańcy zamieszczają swoje prośby. Zlecenia wiszą tu przez tydzień."
+      ]
+    },
+    {
+      "id": "settlement-brotherhoods",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Każde oddane zlecenie zwiększa respekt jaki budzisz wśród bractw. Im wyższy stopień poważania, tym na więcej Ci pozwolą."
+      ]
+    },
+    {
+      "id": "settlement-ending",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Zaklinaczka magicznie odmieni Twój przedmiot, a Pustelnik pomoże zacząć ścieżkę od nowa."
+      ]
+    },
+    {
+      "id": "evolution-welcome",
+      "kind": "card",
+      "chapter": "evolution",
+      "text": [
+        "Pięćdziesiąty poziom klasy… System otworzył przed Tobą Ewolucję."
+      ]
+    },
+    {
+      "id": "evolution-lead",
+      "kind": "lead",
+      "chapter": "evolution",
+      "text": [
+        "Ewolucja czeka w zakładce Postać. Zajrzyjmy tam."
+      ]
+    },
+    {
+      "id": "evolution-choice",
+      "kind": "point",
+      "chapter": "evolution",
+      "text": [
+        "Pora byś wybrał swoją ścieżkę. Dostępną masz jedną z dwóch ewolucji: swojej ścieżki głównej albo pobocznej. Każda da Ci nową nazwę klasy, stałą cechę i dwie nowe umiejętności."
+      ],
+      "female": {
+        "text": [
+          "Pora byś wybrała swoją ścieżkę. Dostępną masz jedną z dwóch ewolucji: swojej ścieżki głównej albo pobocznej. Każda da Ci nową nazwę klasy, stałą cechę i dwie nowe umiejętności."
+        ]
+      }
+    },
+    {
+      "id": "evolution-points",
+      "kind": "card",
+      "chapter": "evolution",
+      "text": [
+        "Punkty Umiejętności wrócą do rozdania na nowo, a statystyki możesz jednorazowo wyzerować za darmo."
+      ]
+    },
+    {
+      "id": "evolution-ending",
+      "kind": "card",
+      "chapter": "evolution",
+      "text": [
+        "Następna ewolucja czeka na setnym poziomie klasy."
+      ]
     }
   ]
 }

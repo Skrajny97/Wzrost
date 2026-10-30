@@ -45,11 +45,15 @@ export function mountEvolution(container) {
       return;
     }
     const busy = Boolean(character.activity);
+    const intro = systemPanel(t.intro.replace('{level}', String(character.skills.evolution.level)));
+    // Where the narrator's Ewolucja chapter points (narrator.js): the cards
+    // below are too tall to be lit whole.
+    intro.dataset.guide = 'evolution-choice';
     fill(
       container,
       heading,
       busy && systemPanel(t.busy),
-      systemPanel(t.intro.replace('{level}', String(character.skills.evolution.level))),
+      intro,
       choices.map((choice) => evolutionCard(choice, { busy, onChoose: (button, chosen) => chooseEvolution(button, chosen) })),
     );
   }

@@ -456,6 +456,8 @@ export function mountSettlement(container, { params = {} } = {}) {
         href: hash,
         style: { left: `${place.x}%`, top: `${place.y}%` },
         'aria-label': place.soon ? `${place.name}, wkrótce` : place.name,
+        // Where the narrator's Osada chapter points (narrator.js).
+        'data-guide': `osada-${place.id}`,
         onClick: (event) => openView(event, hash, HISTORY_KEY),
       },
       art ? h('span', { class: 'settlement-place-art-box' }, art) : h('span', { class: 'settlement-place-empty' }),

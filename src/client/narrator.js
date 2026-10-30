@@ -17,9 +17,11 @@
 // After the introduction come its chapters (a line's `chapter`), each at its
 // moment of the game: the Umiejętności at class level 10, the Profesje at
 // character level 10, never before the Umiejętności, the Społeczność at
-// character level 5, after both when they wait, and the Rzemieślnictwo at
-// character level 15, after all the others. A chapter's own "Pomiń" passes
-// only that chapter, and a line can be told for each class (`classes`).
+// character level 5, after both when they wait, the Rzemieślnictwo at
+// character level 15, the Osada at character level 20 and the Ewolucja at
+// class level 50, each after all the earlier ones. A chapter's own "Pomiń"
+// passes only that chapter, and a line can be told for each class
+// (`classes`).
 
 import { narratorSprite } from './art.js';
 import { aim } from './camera.js';
@@ -107,6 +109,46 @@ const craftingTour = (hash, read) => craftingDue(hash, read) && read.has('crafti
 const craftingHere = (hash, read) => onWorkshop(hash) && craftingTour(hash, read);
 // From the Profesje tab, which the lead opens, on to the Warsztat.
 const craftingTrip = (hash, read) => (hash === '#/profesje' && craftingTour(hash, read) && !read.has('crafting-patterns') ? '#/profesje/rzemieslnictwo' : null);
+// The Osada chapter: once the Osada opens (character level 20, where the
+// game has it), after the report that brought it there and only when no
+// other chapter waits. Not on the character's screens either. It leads to
+// the Osada tab and points there at the Tablica zleceń, then at the
+// Zaklinaczka's and the Pustelnik's places.
+const onSettlement = (hash) => hash === '#/osada';
+const craftingWaiting = (read) => Boolean(state.character.professions?.workshop) && !read.has('crafting-ending');
+const settlementDue = (hash, read) =>
+  Boolean(state.character.settlementOpen) &&
+  !onReport(hash) &&
+  !onCharacter(hash) &&
+  !skillsWaiting(read) &&
+  !professionsWaiting(read) &&
+  !communityWaiting(read) &&
+  !craftingWaiting(read) &&
+  !read.has('settlement-ending');
+const settlementTour = (hash, read) => settlementDue(hash, read) && read.has('settlement-welcome');
+const settlementHere = (hash, read) => onSettlement(hash) && settlementTour(hash, read);
+
+// The Ewolucja chapter: once the class can evolve (class level 50) and has
+// not yet, after the report that brought it there and only when no other
+// chapter waits. It leads to the Postać tab, from where the narrator itself
+// opens the Ewolucja, points at the two evolutions and ends there.
+const onEvolution = (hash) => hash === '#/postac/ewolucja';
+const settlementWaiting = (read) => Boolean(state.character.settlementOpen) && !read.has('settlement-ending');
+const evolutionDue = (hash, read) =>
+  isUnlocked('evolution') &&
+  (state.character.evolution?.choices.length ?? 0) > 0 &&
+  !onReport(hash) &&
+  !skillsWaiting(read) &&
+  !professionsWaiting(read) &&
+  !communityWaiting(read) &&
+  !craftingWaiting(read) &&
+  !settlementWaiting(read) &&
+  !read.has('evolution-ending');
+const evolutionTour = (hash, read) => evolutionDue(hash, read) && read.has('evolution-welcome');
+const evolutionHere = (hash, read) => onEvolution(hash) && evolutionTour(hash, read);
+// From the character's other screens, which the lead opens, on to the Ewolucja.
+const evolutionTrip = (hash, read) =>
+  hash.startsWith('#/postac') && !onEvolution(hash) && evolutionTour(hash, read) && !read.has('evolution-choice') ? '#/postac/ewolucja' : null;
 // From the chat only right after its rules, so a later visit stays there.
 const quickHuntTrip = (hash, read, passed) =>
   ((onCommunity(hash) && passed === 'community-rules') || hash.startsWith('#/walka')) &&
@@ -264,6 +306,18 @@ const BEATS = {
   'crafting-lead': { place: '.nav-item[href="#/profesje"]', when: (hash, read) => craftingTour(hash, read) && !hash.startsWith('#/profesje') },
   'crafting-patterns': { place: mark('workshop-patterns'), go: craftingTrip, when: craftingHere },
   'crafting-ending': { when: craftingHere },
+  // The Osada chapter, after the Rzemieślnictwo.
+  'settlement-welcome': { when: settlementDue },
+  'settlement-lead': { place: '.nav-item[href="#/osada"]', when: (hash, read) => settlementTour(hash, read) && !hash.startsWith('#/osada') },
+  'settlement-board': { place: mark('osada-board'), when: settlementHere },
+  'settlement-brotherhoods': { place: mark('osada-board'), when: settlementHere },
+  'settlement-ending': { place: `${mark('osada-enchanter')}, ${mark('osada-hermitage')}`, whole: true, when: settlementHere },
+  // The Ewolucja chapter, after all the others.
+  'evolution-welcome': { when: evolutionDue },
+  'evolution-lead': { place: '.nav-item[href="#/postac"]', when: (hash, read) => evolutionTour(hash, read) && !hash.startsWith('#/postac') },
+  'evolution-choice': { place: mark('evolution-choice'), go: evolutionTrip, when: evolutionHere },
+  'evolution-points': { when: evolutionHere },
+  'evolution-ending': { when: evolutionHere },
 };
 
 let place = '#/walka';

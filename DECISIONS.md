@@ -2969,6 +2969,15 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
+## Narrator: Osada i Ewolucja (30.10.2026, na wersji testowej)
+
+Kwestie z pytań 167 i 168 w brzmieniu z poprawkami autora (`data/tutorial.json`, części `settlement` i `evolution`). Każda część ma swój przycisk „Pomiń objaśnienie”.
+
+1. **Osada** (od 20. poziomu postaci, gdzie gra ma Osadę, po wszystkich wcześniejszych częściach): karta „Dwudziesty poziom postaci… Życie toczy się również poza puszczą. System otworzył przed Tobą Osadę.”, potem zakładka Osada („Osada czeka w tej zakładce. Zajrzyjmy na Rozstaje.”). Na planszy narrator wskazuje Tablicę zleceń przy dwóch kwestiach o zleceniach i bractwach, a na koniec Pracownię Zaklinaczki i Pustelnię razem.
+2. **Ewolucja** (od 50. poziomu klasy, dopóki ewolucja nie jest wybrana, po Osadzie): karta o Ewolucji, potem zakładka Postać, skąd narrator sam przechodzi do Ewolucji i wskazuje komunikat Systemu nad dwiema ewolucjami (karty ewolucji są za wysokie, żeby podświetlić je w całości). Kwestie o Punktach Umiejętności i o setnym poziomie klasy idą jako karty.
+3. **Wersja dla postaci kobiecej.** Kwestia 168.3 ma wariant „Pora byś wybrała swoją ścieżkę.”, a reszta zdania bez zmian.
+4. **Do sprawdzenia.** W trybie testowym Ustawienia mają „Objaśnienie Osady” i „Objaśnienie Ewolucji” od nowa, jak przy innych częściach. Nagrania (po 2 wersje) idą na stronę odsłuchu do wyboru autora.
+
 ## Więcej walk na dłuższych wyprawach (30.10.2026, na wersji testowej)
 
 Pytanie 166 wyszło z uwagi osoby testującej grę: dwie półgodzinne wyprawy dawały razem 6 walk, a jedna godzinna 4. Autor: „nie może być więcej walk w krótkiej wyprawie niż w długiej”, a dalej: „odpowiedź B, z lekką premią z C (obniżoną jednak mimo wszystko…)”.

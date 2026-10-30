@@ -850,6 +850,8 @@ export function characterView(player, now) {
     features: [
       ...new Set([...unlockedFeatures(row.level, content, row.class_level), ...(row.evolution ? ['evolution'] : []), ...(settlementTest(row) ? ['settlement'] : [])]),
     ],
+    // Whether the character has the Osada (the narrator's Osada chapter).
+    settlementOpen: settlementOpen(row),
     // An order of the Osada that can be delivered now lights its tab.
     settlementWaiting: settlementWaiting(row, items, now, Boolean(activity)),
     huntDurations: huntDurations(row.level, content),
