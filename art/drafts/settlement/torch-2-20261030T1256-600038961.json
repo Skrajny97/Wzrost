@@ -1,0 +1,25 @@
+{
+  "id": "torch-2",
+  "payload": {
+    "prompt": "isometric pixel art for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, a burning torch held in a black iron holder on a short carved wooden post, a small flame of orange and yellow fire, no ground tile, no base, no platform, no shadow, no people",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 64,
+    "height": 64,
+    "num_images": 3,
+    "seed": 600038961,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793365025,
+    "credit_cost": 3,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 35.43,
+    "request_id": "e738281a-7428-4e87-b18e-32463796cb52",
+    "outputs_retained_until": 1793451421
+  }
+}
