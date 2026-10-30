@@ -1,6 +1,8 @@
-# Draws sprite drafts with Retro Diffusion (tools/generate-art.mjs) and keeps
-# them on the art-drafts branch for review. Run by hand from the Actions tab or
-# the API; it never deploys anything. Needs the RETRO_DIFFUSION_API_KEY secret.
+# Draws sprite drafts with Retro Diffusion (tools/generate-art.mjs), or the
+# walks animated by PixelLab (kind walks-pixellab, tools/animate-walks.mjs),
+# and keeps them on the art-drafts branch for review. Run by hand from the
+# Actions tab or the API; it never deploys anything. Needs the
+# RETRO_DIFFUSION_API_KEY secret, and PIXELLAB_API_KEY for the walks.
 
 name: Grafiki (szkice)
 
@@ -36,6 +38,7 @@ on:
           - settlement
           - residents
           - walks
+          - walks-pixellab
       ids:
         description: Identyfikatory po przecinku albo all
         required: true
@@ -69,8 +72,9 @@ jobs:
   drafts:
     name: Szkice
     runs-on: ubuntu-latest
-    # A whole camp (27 pictures, about a minute each) needs more than half an hour.
-    timeout-minutes: 60
+    # A whole camp (27 pictures, about a minute each) needs more than half an
+    # hour, ten walks animated two at a time (3-5 minutes each) about as much.
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -79,6 +83,7 @@ jobs:
       - name: Generowanie
         env:
           RETRO_DIFFUSION_API_KEY: ${{ secrets.RETRO_DIFFUSION_API_KEY }}
+          PIXELLAB_API_KEY: ${{ secrets.PIXELLAB_API_KEY }}
           KIND: ${{ inputs.kind }}
           IDS: ${{ inputs.ids }}
           VARIANTS: ${{ inputs.variants }}
@@ -86,6 +91,12 @@ jobs:
           MAX_COST: ${{ inputs.max_cost }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
+          if [ "$KIND" = "walks-pixellab" ]; then
+            args=(--ids "$IDS" --variants "$VARIANTS" --max-cost "$MAX_COST")
+            if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+            node tools/animate-walks.mjs "${args[@]}"
+            exit
+          fi
           args=(--kind "$KIND" --ids "$IDS" --variants "$VARIANTS" --style "$STYLE" --max-cost "$MAX_COST")
           if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
           node tools/generate-art.mjs "${args[@]}"

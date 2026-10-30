@@ -4,11 +4,12 @@
 // start frame and the pose of tools/walk-skeleton.py it stands in), walks in
 // the skeleton's four poses (animate-with-skeleton-v3), so every frame keeps
 // its look, its hands and what they hold, and the walk loops. Run by the
-// "Animacje (szkice)" workflow, which keeps the drafts on the art-drafts
-// branch for review, each frame as a PNG of its own (-1 to -4):
-//   node tools/animate-walks.mjs --ids warrior-female,inquisitor-male --variants 2 --max-jobs 4 [--dry-run]
-// The balance is read first; a run makes at most --max-jobs animations (one
-// costs PixelLab 2-3 generations, about 0.05 USD).
+// "Grafiki (szkice)" workflow (kind walks-pixellab), which keeps the drafts
+// on the art-drafts branch for review, each frame as a PNG of its own (-1 to -4):
+//   node tools/animate-walks.mjs --ids warrior-female,inquisitor-male --variants 2 --max-cost 1 [--dry-run]
+// The balance is read first, and the run stops before its animations could
+// cost more than --max-cost dollars (one is 2-3 generations of PixelLab, at
+// most JOB_USD).
 
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { randomInt } from 'node:crypto';
@@ -18,12 +19,14 @@ const API = 'https://api.pixellab.ai/v2';
 const POLL_MS = 8000;
 // An animation takes 3-5 minutes; a queue for the GPU can add more.
 const POLL_LIMIT = 150;
+// The price list's dearest skeleton animation of up to 8 frames, with room.
+const JOB_USD = 0.06;
 
 const { values } = parseArgs({
   options: {
     ids: { type: 'string', default: 'all' },
     variants: { type: 'string', default: '1' },
-    'max-jobs': { type: 'string', default: '4' },
+    'max-cost': { type: 'string', default: '1' },
     'dry-run': { type: 'boolean', default: false },
   },
 });
@@ -46,8 +49,9 @@ const ids = values.ids === 'all' ? Object.keys(config.characters) : values.ids.s
 const unknown = ids.filter((id) => !config.characters[id]);
 if (unknown.length) fail(`Brak postaci w art/walks.json: ${unknown.join(', ')}.`);
 const variants = Math.max(1, Math.min(4, Number(values.variants) || 1));
-const maxJobs = Number(values['max-jobs']);
-if (!(maxJobs > 0)) fail('--max-jobs musi być dodatnią liczbą.');
+const maxCost = Number(values['max-cost']);
+if (!(maxCost > 0)) fail('--max-cost musi być dodatnią kwotą w dolarach.');
+const maxJobs = Math.floor(maxCost / JOB_USD);
 
 const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
 
@@ -153,7 +157,7 @@ summary(
     ...lines,
     '',
     `Saldo przed: ${describeBalance(before)}. Po: ${describeBalance(after)}.`,
-    ...(skipped ? [`Pominięte przez limit --max-jobs: ${skipped}.`] : []),
+    ...(skipped ? [`Pominięte, bo przekroczyłyby limit ${maxCost} USD: ${skipped}.`] : []),
   ].join('\n'),
 );
 console.log(lines.join('\n'));
