@@ -100,7 +100,7 @@
     "elementalist-female": {
       "start": "art/references/walks/start/elementalist-female.png",
       "pose": 2,
-      "description": "a young woman with very long flowing light brown hair, a long red and orange hooded mage robe with wide sleeves, a brown belt with pouches, a long wooden staff topped with a glowing orange crystal in her right hand, a small flame floating over her open left hand"
+      "description": "a young woman with very long flowing light brown hair, a long red and orange hooded mage robe with wide sleeves, a brown belt with pouches, a long wooden staff topped with a glowing orange crystal in her right hand, her left hand open and empty"
     },
     "elementalist-male": {
       "start": "art/references/walks/start/elementalist-male.png",
