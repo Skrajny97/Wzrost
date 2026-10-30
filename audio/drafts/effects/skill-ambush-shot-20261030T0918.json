@@ -1,14 +1,14 @@
 {
   "id": "skill-ambush-shot",
   "payload": {
-    "text": "a hunter bursts out from behind a dense bush: a loud clear rustle of leaves and snapping twigs, then right away one strong bowstring release and a sharp arrow whoosh, close up, crisp, no music",
-    "duration_seconds": 1.6,
-    "prompt_influence": 0.7
+    "text": "a person pushing out through a leafy forest bush: soft rustling of leaves and branches brushing against cloth, a short breath of silence, then the deep twang of a wooden longbow string and an arrow flying away with a whoosh, natural outdoor forest sounds, no electricity, no sparks, no crackle, no buzz, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.8
   },
   "files": [
     "audio/drafts/effects/skill-ambush-shot-20261030T0918-0.mp3",
     "audio/drafts/effects/skill-ambush-shot-20261030T0918-1.mp3",
     "audio/drafts/effects/skill-ambush-shot-20261030T0918-2.mp3"
   ],
-  "credits": 96
+  "credits": 120
 }
