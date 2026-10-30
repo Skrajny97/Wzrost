@@ -1,0 +1,62 @@
+{
+  "id": "settlement-tall-2",
+  "tool": "outpainting",
+  "payload": {
+    "input_image": "art/inputs/board/settlement-core.png",
+    "prompt": "top-down pixel art game map seen straight from above, more of the same old slavic village: flat green grass yards for houses, dirt footpaths, a few trees, bushes, stones and small vegetable patches behind low wattle fences, the dirt road continuing straight up to the top edge and straight down to the bottom edge, thin log walls along the left and right edges, no palisade across the map, no gates, no houses, no people",
+    "expand_top": 224,
+    "expand_bottom": 224,
+    "scheduled_region_mode": true,
+    "seed": 515666817
+  },
+  "result": {
+    "tool_id": "outpainting",
+    "inference_id": "inf_E2y4XLkzm3Vr6w7j8OzQlb9WDaYJvB87",
+    "balance_cost": 1.7999999999999998,
+    "credit_cost": 200,
+    "charged": true,
+    "remaining_balance": 38.50000000000002,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/555e6b71ba360549eb071fd91d1bdfe9.png"
+    ],
+    "output_width": 384,
+    "output_height": 768,
+    "scheduled_region_summary": {
+      "type": "outpainting",
+      "quality": "quality",
+      "totalWaves": 10,
+      "softInpaint": false,
+      "maxTileCount": 64,
+      "redGuideFeather": {
+        "radius": 8,
+        "enabled": true,
+        "maxBlend": 0.85,
+        "strength": 2
+      },
+      "totalGenerations": 10,
+      "minOverlapFraction": 0.6
+    },
+    "scheduled_region_job_id": 113,
+    "toolId": "outpainting",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/555e6b71ba360549eb071fd91d1bdfe9.png",
+    "inferenceId": "inf_E2y4XLkzm3Vr6w7j8OzQlb9WDaYJvB87",
+    "balanceCost": 1.7999999999999998,
+    "creditCost": 200,
+    "scheduledRegionSummary": {
+      "type": "outpainting",
+      "quality": "quality",
+      "totalWaves": 10,
+      "softInpaint": false,
+      "maxTileCount": 64,
+      "redGuideFeather": {
+        "radius": 8,
+        "enabled": true,
+        "maxBlend": 0.85,
+        "strength": 2
+      },
+      "totalGenerations": 10,
+      "minOverlapFraction": 0.6
+    },
+    "scheduledRegionJobId": 113
+  }
+}
