@@ -2927,6 +2927,22 @@ Wybory ze strony odsłuchu „Dźwięki Insight”.
 2. **Strzał z ukrycia.** Autor przy nowych wersjach: „brzmi jak rażenie prądem a nie wyjście z krzaków i strzał z łuku”. Opis nagrania prosi teraz o szelest liści, cięciwę drewnianego łuku i świst strzały, bez trzasków i brzęczenia; nowe wersje są na stronie odsłuchu.
 3. **Kwestie o Bestiariuszu i Encyklopedii.** Autor wybrał wersje 1 wszystkich czterech, czyli te, które już grają na wersji testowej.
 
+## Chody ewolucji: wybory i poprawki autora (30.10.2026, na wersji testowej)
+
+Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko kobiecie dorysować oczy / 46 Udzrowiciel A, kobieta B / 47 Inkwizytorzy B / 48 Truciciel A, kobieta B / 49 Nocny Tancerz - obydwa A / 50. Barbarzyńca A tylko bez tego czegoś wystającego z tyłu, kobieta B / 51. Gladiator A, kobieta C / 52. Strzelec Burzy Mężczyzna A, kobieta B” oraz „130 We WSZYSTKICH animacjach chodu, jeśli występują wystające elementy uzbrojenia (poza kosturem w jednej pozycji praktycznie) wyrzuć je, bo wygladają źle (patrz screen)”. O poprawkach (pytania 141–151): „141 tak / 142 ręka ucięta / 143 tak / 144 tak / 145 kobiety ręka ucięta / 146 chyba tak, ale pare pikseli z prawej niepokojące / 147 weź przed jednak / 148 twarz do przerobienia w ogole zniekształcona, oczy dorobić bardziej / 149 tak / 150 problemy z nogami widzę / 151 kobieta ma dziwnie wygietą rękę”.
+
+1. **Wybory.** W grze stoją: Elementalista A (przy 147 autor wraca do wersji sprzed wyboru B), Arkanista i Arkanistka A, Uzdrowiciel A i Uzdrowicielka B, Inkwizytor i Inkwizytorka B, Truciciel A i Trucicielka B, Nocny Tancerz i Nocna Tancerka A, Barbarzyńca A i Barbarzynka B, Gladiator A i Gladiatorka C, Strzelec Burzy A i Strzelczyni Burzy B. Łowca, Łowczyni i Elementalistka zostają przy wersjach na próbę (A), dopóki autor nie poda liter (pytania 43 i 44).
+2. **Bez wystającej broni.** Barbarzyńca nie ma topora, Gladiatorka miecza, Strażniczka tarczy, oboje Snajperzy łuków, Strzelec Burzy kołczana, Łowca łuku, Skrytobójca czubka sztyletu, a Nocny Tancerz i Nocna Tancerka sztyletów. Zarys postaci jest zamknięty tam, gdzie była broń. Władczyni Lodu trzyma kostur w jednej pozycji, a Inkwizytorka nie unosi już kadzielnicy w 1. klatce. Strzelczyni Burzy B nie ma kamiennego kręgu pod stopami.
+3. **Poprawki po ocenie** (GIF-y 142–151 w czacie, do oceny autora):
+    - Gladiatorka (142): wraca tylne ramię w brązowej zbroi, z dłonią.
+    - Strzelczyni Burzy (145): dłoń na końcu rękawa w każdej klatce.
+    - Łowca (146): bez pojedynczych ciemnych pikseli po usuniętym łuku, przy twarzy w 2. i 4. klatce i przy piersi w 3.
+    - Elementalista (147): wersja A, w czerwonej szacie.
+    - Arkanistka (148): twarz narysowana od nowa ręcznie: brew, oko z białkiem i źrenicą, nos z profilu i usta.
+    - Skrytobójca (150): w 1. klatce tylna noga stoi stopą na ziemi, a w 3. przednia noga schodzi do ziemi. Buty mają jasny połysk jak u Skrytobójczyni.
+    - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
+    - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
+
 ## Muzyka: lżejsze pliki, pobierane po starcie gry (30.10.2026, na wersji testowej)
 
 Autor: „53 B”.
