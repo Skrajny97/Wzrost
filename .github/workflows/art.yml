@@ -73,7 +73,7 @@ jobs:
     name: Szkice
     runs-on: ubuntu-latest
     # A whole camp (27 pictures, about a minute each) needs more than half an
-    # hour, ten walks animated two at a time (3-5 minutes each) about as much.
+    # hour, twenty walks animated four at a time (3-5 minutes each) about as much.
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v6

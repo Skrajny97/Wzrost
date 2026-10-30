@@ -125,7 +125,8 @@ const before = await request('GET', '/balance');
 if (values['dry-run']) {
   for (const id of jobs) lines.push(`| ${id} | do zrobienia (start: ${config.characters[id].start}, poza ${config.characters[id].pose}) |`);
 } else {
-  // Two at a time: a queue of jobs per account is short.
+  // Four at a time; when PixelLab's queue for the account is full (429), a
+  // job waits and tries again.
   const queue = [...jobs];
   async function worker() {
     while (queue.length) {
@@ -145,7 +146,7 @@ if (values['dry-run']) {
       }
     }
   }
-  await Promise.all([worker(), worker()]);
+  await Promise.all([worker(), worker(), worker(), worker()]);
 }
 const after = values['dry-run'] ? before : await request('GET', '/balance').catch(() => null);
 
