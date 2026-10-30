@@ -84,6 +84,7 @@
       "craft": { "min": 1, "max": 2, "perTenLevels": 0 }
     },
     "quality": { "from": "regular", "chance": 0.3, "reward": 2 },
+    "special": { "from": "trusted", "chance": 0.25, "reputation": 2, "systemPoints": 1 },
     "systemPoints": { "every": 3, "points": 1, "weekly": 5 },
     "stories": {
       "herb": [

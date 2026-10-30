@@ -1011,6 +1011,7 @@ function checkSettlement(data, { rarities }) {
     if (index > 0 && standing.points <= standings[index - 1].points) errors.push('settlement.json: progi stopni muszą rosnąć');
   });
   if (!standingIds.has(orders.quality.from)) errors.push(`settlement.json: orders.quality.from to nieznany stopień ${orders.quality.from}`);
+  if (!standingIds.has(orders.special.from)) errors.push(`settlement.json: orders.special.from to nieznany stopień ${orders.special.from}`);
   const standingAt = (id) => standings.findIndex((standing) => standing.id === id);
   reforge.choices.forEach((step, index) => {
     if (!standingIds.has(step.from)) errors.push(`settlement.json: reforge.choices ma nieznany stopień ${step.from}`);

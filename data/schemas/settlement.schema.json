@@ -90,7 +90,7 @@
     "orders": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["resident", "open", "refillMinutes", "expireDays", "reputation", "relationGain", "weekly", "pay", "resourceGold", "partGold", "partRarity", "counts", "quality", "systemPoints", "stories"],
+      "required": ["resident", "open", "refillMinutes", "expireDays", "reputation", "relationGain", "weekly", "pay", "resourceGold", "partGold", "partRarity", "counts", "quality", "special", "systemPoints", "stories"],
       "properties": {
         "open": { "type": "integer", "minimum": 1 },
         "refillMinutes": { "type": "integer", "minimum": 1 },
@@ -136,6 +136,18 @@
             "from": { "$ref": "#/definitions/id" },
             "chance": { "type": "number", "minimum": 0, "maximum": 1 },
             "reward": { "type": "number", "minimum": 1 }
+          }
+        },
+        "special": {
+          "type": "object",
+          "description": "Zlecenia specjalne od stopnia from: chance zleceń bractwa daje reputation razy więcej reputacji i systemPoints Punktów Systemu, przy tej samej zapłacie.",
+          "additionalProperties": false,
+          "required": ["from", "chance", "reputation", "systemPoints"],
+          "properties": {
+            "from": { "$ref": "#/definitions/id" },
+            "chance": { "type": "number", "minimum": 0, "maximum": 1 },
+            "reputation": { "type": "number", "minimum": 1 },
+            "systemPoints": { "type": "integer", "minimum": 0 }
           }
         },
         "systemPoints": {

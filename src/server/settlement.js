@@ -13,6 +13,9 @@ import {
   createRng,
   deliverBlock,
   deliverOrder,
+  evolutionChangePrice,
+  evolutionChanges,
+  evolvedSkills,
   itemName,
   materialView,
   parseStack,
@@ -23,6 +26,7 @@ import {
   reforgeCost,
   reforgeOptions,
   rejectOrder,
+  spentPoints,
   standingOf,
   statResetCost,
   upgradedItem,
@@ -41,7 +45,7 @@ import {
   settlementGoods,
 } from './characters.js';
 import { toHex } from './encoding.js';
-import { settlementOn } from './features.js';
+import { evolutionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { settlementTestsFor } from './test-mode.js';
 
@@ -61,8 +65,9 @@ const grow = (relations, { resident, relationGain }) => ({ ...relations, [reside
 const serviceOf = (residentId) => ['orders', 'reforge', 'hermit'].find((service) => content.settlement[service].resident === residentId) ?? null;
 
 // What the row keeps of the Osada: reputation and relations by id, the
-// board, a reforging's affixes waiting for the player's choice (`pending`)
-// and `test` once "Testuj Osadę" opened it below its level.
+// board, a reforging's affixes waiting for the player's choice (`pending`),
+// the changes of evolution made at the Pustelnik's and `test` once "Testuj
+// Osadę" opened it below its level.
 export function settlementOf(row) {
   const stored = JSON.parse(row.settlement ?? '{}');
   return {
@@ -70,7 +75,20 @@ export function settlementOf(row) {
     relations: stored.relations ?? {},
     board: stored.board ?? null,
     ...(stored.pending && { pending: stored.pending }),
+    ...(stored.evolutionChanges && { evolutionChanges: stored.evolutionChanges }),
     ...(stored.test && { test: true }),
+  };
+}
+
+// The change of evolution at the Pustelnik's, where the evolutions are on
+// and the character has one: its price and the evolutions it can go to.
+function evolutionChangeView(row, stored) {
+  const character = engineCharacter(row);
+  if (!evolutionsOn() || !character.evolution) return null;
+  return {
+    price: evolutionChangePrice(stored.evolutionChanges ?? 0, content),
+    current: content.evolutionsById[character.evolution].name,
+    choices: evolutionChanges(character, content).map(({ id, name }) => ({ id, name })),
   };
 }
 
@@ -144,7 +162,7 @@ export function settlementView(player, stored, board, now) {
       choices: choicesOf(stored),
       pending: pendingView(pendingOf(stored, player.items)),
     },
-    hermit: { path: pathResetCost(player.row.level, content), stats: statResetCost(player.row.level, content) },
+    hermit: { path: pathResetCost(player.row.level, content), stats: statResetCost(player.row.level, content), evolution: evolutionChangeView(player.row, stored) },
     now,
   };
 }
@@ -387,17 +405,21 @@ export async function chooseReforged(context) {
   return json({ item: saved, character: characterView(after, context.now) });
 }
 
-// { service: "path" | "stats" }: the Pustelnik's resets for gold. "path"
-// gives back the Skill Points of the class's skills, so the paths can be
-// chosen anew (question 122 A), not after an evolution, whose paths change
-// with it; "stats" gives back the stat points above the free reset's level
-// (question 124 A). At home only, like the stat points and the skills.
+// { service: "path" | "stats" | "evolution", evolutionId }: the Pustelnik's
+// services for gold. "path" gives back the Skill Points of the class's
+// skills, so the paths can be chosen anew (question 122 A), not after an
+// evolution, whose paths change with it; "stats" gives back the stat points
+// above the free reset's level (question 124 A); "evolution" changes the
+// evolution for another of the class (question 123 A), with its skills from
+// the start and the free reset of the stat points as after the first one.
+// At home only, like the stat points and the skills.
 export async function hermitService(context) {
   const { session, player } = await requireIdlePlayer(context);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
   const character = engineCharacter(row);
+  if (body.service === 'evolution') return changeEvolution(context, session, player, body);
   let gold;
   let set;
   let value;
@@ -427,6 +449,27 @@ export async function hermitService(context) {
     .run();
   if (result.meta.changes !== 1) throw changed();
   return json({ gold, character: characterView(await loadPlayer(db, session.userId), context.now) });
+}
+
+// The Pustelnik's change of evolution (hermitService).
+async function changeEvolution(context, session, player, body) {
+  const { row } = player;
+  const stored = settlementOf(row);
+  const offer = evolutionChangeView(row, stored);
+  if (!offer) throw new ApiError(409, 'not_evolved', 'Najpierw wybierz ewolucję w zakładce Ewolucja.');
+  if (!offer.choices.some((choice) => choice.id === body.evolutionId)) throw new ApiError(400, 'unknown_evolution', 'Ta ewolucja nie jest dla tej postaci.');
+  if (row.gold < offer.price) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota.');
+  const next = { ...stored, evolutionChanges: (stored.evolutionChanges ?? 0) + 1, relations: grow(stored.relations, content.settlement.hermit) };
+  const db = context.env.DB;
+  const result = await db
+    .prepare(
+      `UPDATE characters SET gold = gold - ?, evolution = ?, skills = ?, evolution_reset = ?, settlement = ?, version = version + 1
+       WHERE id = ? AND version = ? AND gold >= ? AND evolution IS NOT NULL`,
+    )
+    .bind(offer.price, body.evolutionId, JSON.stringify(evolvedSkills(body.evolutionId, content)), spentPoints(engineCharacter(row)) > 0 ? 1 : 0, JSON.stringify(next), row.id, row.version, offer.price)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  return json({ gold: offer.price, character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
 // "Testuj Osadę" on the test version, for the accounts with test mode

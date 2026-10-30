@@ -14,6 +14,8 @@ import {
   drawQuests,
   emptyBoard,
   evolutionChangeCost,
+  evolutionChangePrice,
+  evolutionChanges,
   fireBuilding,
   fireTrade,
   generateItem,
@@ -232,6 +234,29 @@ describe('the Osada in the engine', () => {
     assert.equal(reforgeBlock(rare, 5, { gold: first.gold, materials: { [stack]: need.count }, stack, times: 0 }, content).code, 'invalid_affix');
   });
 
+  test('from Zaufany a brotherhood\'s order may be special: more reputation and a Punkt Systemu for the same pay', () => {
+    const trusted = content.settlement.standings.find((standing) => standing.id === content.settlement.orders.special.from).points;
+    const reputation = Object.fromEntries(content.settlement.brotherhoods.map(({ id }) => [id, trusted]));
+    const drawn = Array.from({ length: 200 }, (_, i) => drawOrder({ character, reputation, seed: `sp:${i}` }, content));
+    const special = drawn.filter((order) => order.special);
+    assert.ok(special.length > 20 && special.length < 90, `${special.length} special of 200`);
+    // The same order without the special ones pays the same gold.
+    const { orders } = content.settlement;
+    const plainContent = { ...content, settlement: { ...content.settlement, orders: { ...orders, special: { ...orders.special, chance: 0 } } } };
+    for (const order of special) {
+      assert.equal(order.reputation, orders.reputation * orders.special.reputation);
+      const plain = drawOrder({ character, reputation, seed: `sp:${drawn.indexOf(order)}` }, plainContent);
+      assert.equal(plain.special, undefined);
+      assert.equal(order.gold, plain.gold);
+    }
+    // Never below the standing, never the week's.
+    assert.ok(Array.from({ length: 100 }, (_, i) => drawOrder({ character, seed: `sp:${i}` }, content)).every((order) => !order.special));
+    assert.ok(Array.from({ length: 50 }, (_, i) => drawOrder({ character, reputation, seed: `sw:${i}`, weekly: true }, content)).every((order) => !order.special));
+    // Delivered, a special order adds its Punkt Systemu to the every-third one.
+    const board = { ...emptyBoard(), slots: [{ order: { ...special[0], id: 1 } }], delivered: 0 };
+    assert.equal(deliverOrder(board, 1, NOW, content).systemPoints, content.settlement.orders.special.systemPoints);
+  });
+
   test('the Pustelnik\'s prices', () => {
     const { hermit } = content.settlement;
     assert.equal(pathResetCost(30, content), 30 * hermit.pathGoldPerLevel);
@@ -442,6 +467,33 @@ describe('the Osada through the API', () => {
     assert.equal(JSON.parse(row.materials)[stack], undefined);
     // The next one costs more.
     assert.ok(reforgeCost({ ...item, reforged: 1 }, 1, content).gold > cost.gold);
+  });
+
+  test('the Pustelnik changes the evolution, the first time free, then for more and more gold', async () => {
+    assert.equal(evolutionChangePrice(0, content), 0);
+    assert.equal(evolutionChangePrice(1, content), content.settlement.hermit.evolutionGold);
+    assert.equal(evolutionChangePrice(2, content), content.settlement.hermit.evolutionGold * content.settlement.hermit.evolutionGrowth);
+    assert.equal((await view()).hermit.evolution, null);
+    const notYet = await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'evolution', evolutionId: 'gladiator' } });
+    assert.equal(notYet.data.error.code, 'not_evolved');
+    await set(`evolution = 'guardian', class_level = 50, skills = ?`, JSON.stringify({ challenge: 5, indomitable: 3 }));
+    const offer = (await view()).hermit.evolution;
+    assert.equal(offer.price, 0);
+    assert.deepEqual(offer.choices.map((choice) => choice.id).sort(), evolutionChanges({ classId: 'warrior', evolution: 'guardian' }, content).map((one) => one.id).sort());
+    assert.ok(!offer.choices.some((choice) => choice.id === 'guardian'));
+    const free = await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'evolution', evolutionId: 'gladiator' } });
+    assert.equal(free.status, 200);
+    assert.equal(free.data.gold, 0);
+    let row = await (await db()).prepare('SELECT evolution, skills, gold FROM characters').first();
+    assert.equal(row.evolution, 'gladiator');
+    assert.deepEqual(JSON.parse(row.skills), Object.fromEntries(content.evolutionsById.gladiator.skills.map((id) => [id, 0])));
+    assert.equal(row.gold, 100000);
+    const paid = await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'evolution', evolutionId: 'guardian' } });
+    assert.equal(paid.data.gold, content.settlement.hermit.evolutionGold);
+    row = await (await db()).prepare('SELECT evolution, gold FROM characters').first();
+    assert.equal(row.evolution, 'guardian');
+    assert.equal(row.gold, 100000 - content.settlement.hermit.evolutionGold);
+    assert.equal((await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'evolution', evolutionId: 'gladiator' } })).data.error.code, 'not_enough_gold');
   });
 
   test('closer to the Zaklinaczka, the player keeps one of the affixes she draws', async () => {

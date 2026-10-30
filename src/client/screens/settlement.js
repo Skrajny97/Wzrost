@@ -83,9 +83,10 @@ export function mountSettlement(container) {
       'div',
       { class: 'card settlement-order' },
       order.weekly && h('p', { class: 'settlement-weekly', text: 'Zlecenie tygodnia' }),
+      order.special && h('p', { class: 'settlement-weekly', text: 'Zlecenie specjalne' }),
       h('p', { class: 'settlement-story', text: `„${order.story}”` }),
       h('p', { class: 'settlement-ask', text: `${formatNumber(order.count)} × ${order.label} (masz ${formatNumber(order.have)})` }),
-      h('p', { class: 'muted', text: `Zapłata: ${formatNumber(order.gold)} złota, +${order.reputation} reputacji: ${order.brotherhoodName}` }),
+      h('p', { class: 'muted', text: `Zapłata: ${formatNumber(order.gold)} złota, +${order.reputation} reputacji: ${order.brotherhoodName}${order.special ? ', +1 PS' : ''}` }),
       order.expiresAt && h('p', { class: 'muted', text: `Termin: jeszcze ${timeLeft(order.expiresAt - serverNow())}` }),
       order.kind === 'craft' && h('p', { class: 'muted', text: 'Wyroby z Warsztatu oddajesz z plecaka, najpierw najsłabsze.' }),
       away && h('p', { class: 'muted', text: order.kind === 'craft' ? 'Wyroby oddasz po odebraniu raportu z wyprawy albo pracy.' : 'Zioła i mikstury oddasz po odebraniu raportu z wyprawy albo pracy.' }),
@@ -220,6 +221,43 @@ export function mountSettlement(container) {
     );
   }
 
+  // The Pustelnik's change of evolution: the class's other evolutions, the
+  // first change free.
+  function evolutionSheet() {
+    const offer = data.hermit.evolution;
+    const price = offer.price > 0 ? `${formatNumber(offer.price)} złota` : 'za darmo, pierwszy raz';
+    openSheet(
+      h('h2', { class: 'sheet-title', text: 'Zmiana ewolucji' }),
+      h(
+        'div',
+        { class: 'settlement-choice' },
+        h('p', { class: 'muted', text: `Teraz: ${offer.current}. Zmiana: ${price}. Umiejętności nowej ewolucji zaczniesz od zera, a punkty z nich wrócą do rozdania.` }),
+        h(
+          'div',
+          { class: 'settlement-actions' },
+          offer.choices.map((choice) =>
+            h('button', {
+              type: 'button',
+              class: 'button button--world button--small',
+              text: choice.name,
+              disabled: state.character.gold < offer.price,
+              onClick: async (event) => {
+                const button = event.currentTarget;
+                if (!(await confirmAction({ title: `Zmienić ewolucję na: ${choice.name}?`, text: `Koszt: ${price}.`, confirmLabel: 'Zmień' }))) return;
+                withButton(button, async () => {
+                  await call('POST', '/api/settlement/hermit', { service: 'evolution', evolutionId: choice.id });
+                  closeSheet();
+                  toast(`Nowa ewolucja: ${choice.name}.`);
+                  load();
+                });
+              },
+            }),
+          ),
+        ),
+      ),
+    );
+  }
+
   function residentCard(resident) {
     const place = data.places.find((one) => one.resident === resident.id);
     const action =
@@ -233,6 +271,13 @@ export function mountSettlement(container) {
               { class: 'settlement-actions' },
               hermitButton('path', `Wyzeruj ścieżkę (${formatNumber(data.hermit.path)} zł.)`, 'Umiejętności klasy wrócą jako Punkty Umiejętności, a ścieżki wybierzesz od nowa.'),
               data.hermit.stats !== null && hermitButton('stats', `Wyzeruj statystyki (${formatNumber(data.hermit.stats)} zł.)`, 'Wszystkie rozdane punkty statystyk wrócą do rozdania.'),
+              data.hermit.evolution &&
+                h('button', {
+                  type: 'button',
+                  class: 'button button--small',
+                  text: data.hermit.evolution.price > 0 ? `Zmień ewolucję (${formatNumber(data.hermit.evolution.price)} zł.)` : 'Zmień ewolucję (pierwszy raz darmo)',
+                  onClick: evolutionSheet,
+                }),
             )
           : null;
     return h(

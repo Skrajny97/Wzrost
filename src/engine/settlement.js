@@ -142,15 +142,20 @@ export function drawOrder({ character, reputation = {}, seed, weekly = false }, 
   }
   if (weekly) count *= orders.weekly.count;
   const gold = Math.max(1, Math.round(count * goodPrice({ kind, key }, content, character.level) * orders.pay[kind] * factor * (weekly ? orders.weekly.reward / orders.weekly.count : 1)));
+  // From the special standing a brotherhood's order may be special
+  // (question 82): more reputation and Punkty Systemu for the same goods
+  // and gold, so it never pays for buying them.
+  const special = !weekly && reached(reputation[brotherhood.id] ?? 0, orders.special.from, content) && rng.chance(orders.special.chance);
   return {
     kind,
     key,
     brotherhood: brotherhood.id,
     count,
     gold,
-    reputation: weekly ? orders.weekly.reputation : orders.reputation,
+    reputation: weekly ? orders.weekly.reputation : orders.reputation * (special ? orders.special.reputation : 1),
     story: rng.pick(orders.stories[kind]),
     ...(weekly && { weekly: true }),
+    ...(special && { special: true }),
   };
 }
 
@@ -229,7 +234,9 @@ export function deliverOrder(board, orderId, now, content) {
   const order = findOrder(board, orderId);
   const weekly = orderId === 'weekly';
   const delivered = board.delivered + (weekly ? 0 : 1);
-  const systemPoints = weekly ? orders.systemPoints.weekly : delivered % orders.systemPoints.every === 0 ? orders.systemPoints.points : 0;
+  const systemPoints = weekly
+    ? orders.systemPoints.weekly
+    : (delivered % orders.systemPoints.every === 0 ? orders.systemPoints.points : 0) + (order.special ? orders.special.systemPoints : 0);
   return {
     board: {
       ...board,
@@ -327,5 +334,11 @@ export function reforgeItem(item, affixIndex, rng, content) {
 // reset from statsFromLevel on (question 124 A), null before.
 export const pathResetCost = (level, content) => level * content.settlement.hermit.pathGoldPerLevel;
 export const evolutionChangeCost = (paid, content) => content.settlement.hermit.evolutionGold * content.settlement.hermit.evolutionGrowth ** paid;
+// The next change of evolution after `changes` of them: the first free (the
+// author at E4: "tylko raz darmowo, a później baaaardzo baaaardzo drogo").
+export const evolutionChangePrice = (changes, content) => (changes > 0 ? evolutionChangeCost(changes - 1, content) : 0);
+// The evolutions a change can go to: the class's others.
+export const evolutionChanges = (character, content) =>
+  character.evolution ? content.evolutions.filter((evolution) => evolution.classId === character.classId && evolution.id !== character.evolution) : [];
 export const statResetCost = (level, content) =>
   level >= content.settlement.hermit.statsFromLevel ? level * content.settlement.hermit.statsGoldPerLevel : null;
