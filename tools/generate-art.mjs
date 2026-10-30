@@ -12,8 +12,8 @@
 // `width` and `height` has its own size (and with `removeBackground` its own
 // background), and one with `seed` draws with that seed. A prompt with `tool`
 // runs a Retro Diffusion edit tool (outpainting, inpainting, image_edit…) on
-// the picture in `input` (with `mask`, `expand` and `prompt` as the tool
-// takes them), and one with `request` downloads again what an earlier call
+// the picture in `input` (with `mask`, `expand`, `prompt` and other `options`
+// as the tool takes them), and one with `request` downloads again what an earlier call
 // returned, free, while Retro Diffusion keeps it (24 hours); `all` leaves
 // these two out. Every request is
 // priced first (free), and the run stops before it would spend more than
@@ -218,6 +218,9 @@ async function edit(id, entry, count) {
       ...(entry.mask && { mask_image: readFileSync(entry.mask).toString('base64') }),
       ...(entry.prompt && { prompt: entry.prompt }),
       ...Object.fromEntries(Object.entries(entry.expand ?? {}).map(([side, pixels]) => [`expand_${side}`, pixels])),
+      // The tool's other fields as they are, e.g. scheduled_region_mode,
+      // which outpaints a canvas larger than its 256 px window piece by piece.
+      ...entry.options,
       seed,
     };
     const quote = await request('POST', `${EDIT_API}/tools/${entry.tool}/estimate`, body);
