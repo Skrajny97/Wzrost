@@ -3001,6 +3001,9 @@ Autor: „Wdrażaj filtr nazw, „Dodaj 10 Punktów”, pięć postaci, Skrzynia
     - Najpierw próba na Wojowniczce (start z 195) i Inkwizytorze (start z drugiej klatki jego wersji B: buzdygan w prawej, bliższej ręce, kadzielnica w lewej), po dwie wersje.
     - **197.** Autor wykupuje plan PixelLab „Tier 1: Pixel Apprentice” (2000 generacji na miesiąc) i dodaje klucz: „masz podpięte API i zapasu na długo”.
     - Próba PixelLab (198–201): Wojowniczka i Inkwizytor po dwie wersje, każda animacja za 3 generacje (razem 12 z 2000). Cztery klatki kosztują tyle samo co osiem, bo PixelLab liczy czas generowania: 3 klatki to 2 generacje, a 8 klatek to 3.
+    - Autor: „199 tak, 201 tak, 202 tak, 203 tak”. Wojowniczka i Inkwizytor mają chody z PixelLab w wersjach B (199, 201).
+    - **8 klatek (202).** Chód gra cztery pozy kluczowe szkieletu, a po każdej pozę w połowie drogi do następnej, liczoną kąt po kącie. W grze pójdzie 16 klatek na sekundę, więc z tą samą prędkością co 4 klatki po 8 na sekundę. Przykład (204) czeka na ocenę autora.
+    - **Pozostałe 38 postaci (203).** Retro Diffusion rysuje każdą raz, w 2 wersjach, a opis mówi, co trzyma prawa, bliższa ręka, a co lewa, tak jak na portrecie (`art/prompts.json` i `art/walks.json`). Lepszą wersję klatki startowej wybieram sam, a PixelLab animuje każdą postać w 2 wersjach. Najpierw idzie 10 postaci z różnymi przedmiotami w rękach, potem reszta.
 5. **Raz, a dobrze.** Autor: „I pamietaj ze lepiej raz zainwestowac dobrze niz po troche i slaby efekt miec na końcu”. Przy wyborze narzędzia, planu albo liczby wersji liczy się efekt końcowy: lepsze narzędzie albo więcej wersji do wyboru od razu, zamiast poprawek po kawałku. Krótka próba do oceny autora i tak idzie przed każdą dużą partią.
 
 ## Skrzynia Konta, Encyklopedia z własnych zdobyczy i status znajomych (30.10.2026, na wersji testowej)
