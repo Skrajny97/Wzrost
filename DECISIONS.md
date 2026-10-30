@@ -2919,6 +2919,13 @@ Wszystko działa tylko tam, gdzie `SETTLEMENT` jest `on` (`wrangler.jsonc`, śro
 16. **Zapis.** Kolumna `characters.settlement` (migracja 0055) trzyma reputację, relacje, tablicę, licznik oddanych zleceń, przekucie czekające na wybór i liczbę zmian ewolucji jako JSON. Zlecenia losują się z ziarna postaci i kolejnego numeru, więc ta sama tablica wychodzi przy każdym odczycie, a zmiany zapisują się tylko, gdy postać jest taka jak odczytana.
 17. **Jeszcze nie ma:** planszy z obrazkami (pytania od 152), części narratora (teksty do zatwierdzenia), tytułu Przyjaciela w karcie postaci (87 A, gdy ktoś dojdzie do Przyjaciela, czyli po ok. 2 miesiącach) i usług z wyższych stopni relacji poza wyborem afiksu.
 
+## Osada: uwagi autora z wersji testowej (30.10.2026, na wersji testowej)
+
+1. **Zdania zleceń.** Autor: „"Strażnicy palisady chodzą bez uzbrojenia" w przypadku Broni.”, „"Most na brodzie" brzmi śmiesznie, do poprawy” i „"płaci za skóry" a chce żądła. Może "płaci za materiały"?”.
+    - Zlecenie na broń z Warsztatu może mieć zdanie „Strażnicy palisady chodzą bez uzbrojenia. Wstyd przed kupcami.”, a na pancerz, hełm, rękawice i buty „Strażnicy palisady chodzą w łachmanach. Wstyd przed kupcami.”. Pozostałe dwa zdania pasują do każdego wyrobu (`craftStories` w `data/settlement.json`).
+    - Zlecenie na surowce: „Most nad rzeką znowu się sypie.”, a na materiały: „Kuśnierz z miasta płaci za materiały więcej niż ktokolwiek tutaj.”.
+    - Zlecenia, które już wiszą na tablicy, dostają przy odczycie nowe zdanie najbliższe dawnemu, więc poprawki widać od razu.
+
 ## Dźwięki ewolucji i kwestie narratora: wybory autora (30.10.2026, na wersji testowej)
 
 Wybory ze strony odsłuchu „Dźwięki Insight”.

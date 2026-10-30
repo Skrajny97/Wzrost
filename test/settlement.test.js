@@ -21,6 +21,7 @@ import {
   generateItem,
   goodPrice,
   orderGoods,
+  orderStories,
   craftBuyCost,
   craftSellPrice,
   partPrice,
@@ -95,10 +96,36 @@ describe('the Osada in the engine', () => {
           const market = goodPrice(order, content) * order.count;
           assert.ok(order.gold > market, `${order.kind} ${order.gold} ≤ ${market}`);
         }
-        assert.ok(content.settlement.orders.stories[order.kind].includes(order.story));
+        assert.ok(orderStories(order.kind, order.key, content).includes(order.story));
         assert.equal(order.brotherhood, content.settlement.brotherhoods.find((one) => one.goods.includes(order.kind)).id);
       }
     }
+  });
+
+  test("a Warsztat's weapon is not wanted for guards in rags, armour is", () => {
+    const sword = orderStories('craft', 'sword', content);
+    const chest = content.bases.find((base) => base.slot === 'chest');
+    const armour = orderStories('craft', chest.id, content);
+    assert.ok(sword.some((story) => story.includes('bez uzbrojenia')));
+    assert.ok(!sword.some((story) => story.includes('łachmanach')));
+    assert.ok(armour.some((story) => story.includes('łachmanach')));
+    assert.ok(!armour.some((story) => story.includes('bez uzbrojenia')));
+  });
+
+  test('an order hung before its sentence was rewritten reads the new one', () => {
+    const now = Date.UTC(2026, 9, 30, 12);
+    const board = settleBoard(null, { character, reputation: {}, seed: 's' }, now, content);
+    const old = {
+      ...board,
+      slots: board.slots.map((slot, index) =>
+        index === 0 ? { ...slot, order: { ...slot.order, kind: 'craft', key: 'sword', story: 'Strażnicy palisady chodzą w łachmanach. Wstyd przed kupcami.' } } : slot,
+      ),
+      weekly: { ...board.weekly, order: { ...board.weekly.order, kind: 'resource', story: 'Most na brodzie znowu się sypie.' } },
+    };
+    const fresh = settleBoard(old, { character, reputation: {}, seed: 's' }, now, content);
+    assert.equal(fresh.slots[0].order.story, 'Strażnicy palisady chodzą bez uzbrojenia. Wstyd przed kupcami.');
+    assert.equal(fresh.weekly.order.story, 'Most nad rzeką znowu się sypie.');
+    assert.deepEqual(fresh.slots.slice(1), board.slots.slice(1));
   });
 
   test('each brotherhood with goods to order gets about as many orders as another', () => {

@@ -97,12 +97,12 @@
         "Mój brat wrócił z lasu blady jak płótno. Potrzebuję czegoś mocniejszego niż napar."
       ],
       "material": [
-        "Kuśnierz z miasta płaci za skóry więcej niż ktokolwiek tutaj.",
+        "Kuśnierz z miasta płaci za materiały więcej niż ktokolwiek tutaj.",
         "Chcę pokazać młodym, z czym przyjdzie im się mierzyć za palisadą.",
         "Na amulety. Nie pytaj, dla kogo."
       ],
       "resource": [
-        "Most na brodzie znowu się sypie.",
+        "Most nad rzeką znowu się sypie.",
         "Kuźnia stoi, bo zabrakło budulca."
       ],
       "part": [
@@ -110,11 +110,14 @@
         "Wóz kupca rozpadł się na trakcie. Trzeba go jakoś poskładać."
       ],
       "craft": [
-        "Strażnicy palisady chodzą w łachmanach. Wstyd przed kupcami.",
         "Młody Radek idzie pierwszy raz za palisadę. Niech ma porządny sprzęt.",
         "Kupiec z miasta bierze wszystko, co wyjdzie spod dobrej ręki."
       ]
-    }
+    },
+    "craftStories": [
+      { "slots": ["weapon"], "text": "Strażnicy palisady chodzą bez uzbrojenia. Wstyd przed kupcami." },
+      { "slots": ["chest", "head", "hands", "feet"], "text": "Strażnicy palisady chodzą w łachmanach. Wstyd przed kupcami." }
+    ]
   },
   "reforge": {
     "resident": "enchantress",

@@ -90,7 +90,7 @@
     "orders": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["resident", "open", "refillMinutes", "expireDays", "reputation", "relationGain", "weekly", "pay", "resourceGold", "partGold", "partRarity", "counts", "quality", "special", "systemPoints", "stories"],
+      "required": ["resident", "open", "refillMinutes", "expireDays", "reputation", "relationGain", "weekly", "pay", "resourceGold", "partGold", "partRarity", "counts", "quality", "special", "systemPoints", "stories", "craftStories"],
       "properties": {
         "open": { "type": "integer", "minimum": 1 },
         "refillMinutes": { "type": "integer", "minimum": 1 },
@@ -163,6 +163,19 @@
         "stories": {
           "allOf": [{ "$ref": "#/definitions/perKind" }],
           "additionalProperties": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+        },
+        "craftStories": {
+          "type": "array",
+          "description": "Zdania zleceń na wyroby Warsztatu, które pasują tylko do przedmiotów z tych miejsc (slots), obok ogólnych z stories.craft.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["slots", "text"],
+            "properties": {
+              "slots": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+              "text": { "type": "string", "minLength": 1 }
+            }
+          }
         }
       }
     },

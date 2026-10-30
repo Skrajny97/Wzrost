@@ -113,6 +113,17 @@ function finer(key, content) {
   return next ? stackKey(materialId, next.id) : key;
 }
 
+// The sentences an order may carry: its kind's, and for a Warsztat's item
+// also those of its slot (craftStories), so a sword is not wanted for
+// guards in rags (the author: "Strażnicy palisady chodzą bez uzbrojenia"
+// w przypadku Broni).
+export function orderStories(kind, key, content) {
+  const { orders } = content.settlement;
+  if (kind !== 'craft') return orders.stories[kind];
+  const slot = content.bases.find((base) => base.id === key)?.slot;
+  return [...orders.stories.craft, ...orders.craftStories.filter((story) => story.slots.includes(slot)).map((story) => story.text)];
+}
+
 // An order drawn from `seed`: a brotherhood, each as likely as another, so
 // each one's reputation grows at the same pace; one of its kinds of goods;
 // a good of that kind; the count for the character's level, the gold
@@ -153,7 +164,7 @@ export function drawOrder({ character, reputation = {}, seed, weekly = false }, 
     count,
     gold,
     reputation: weekly ? orders.weekly.reputation : orders.reputation * (special ? orders.special.reputation : 1),
-    story: rng.pick(orders.stories[kind]),
+    story: rng.pick(orderStories(kind, good.key, content)),
     ...(weekly && { weekly: true }),
     ...(special && { special: true }),
   };
@@ -190,7 +201,28 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
     board.weekly?.period === key
       ? board.weekly
       : { period: key, order: drawOrder({ character, reputation, seed: `${seed}:weekly:${key}`, weekly: true }, content), done: false };
-  return { ...board, slots: settled, weekly, turn };
+  return {
+    ...board,
+    slots: settled.map((slot) => (slot.order ? { ...slot, order: freshStory(slot.order, content) } : slot)),
+    weekly: weekly.order ? { ...weekly, order: freshStory(weekly.order, content) } : weekly,
+    turn,
+  };
+}
+
+// An order hung before its sentence was rewritten takes the new sentence
+// closest to the old one (the most words alike from the start), so the
+// board reads the corrected text at once.
+function freshStory(order, content) {
+  const stories = orderStories(order.kind, order.key, content);
+  if (!order.story || stories.includes(order.story)) return order;
+  const words = order.story.split(' ');
+  const alike = (story) => {
+    const other = story.split(' ');
+    let same = 0;
+    while (same < words.length && words[same] === other[same]) same += 1;
+    return same;
+  };
+  return { ...order, story: stories.reduce((best, story) => (alike(story) > alike(best) ? story : best), stories[0]) };
 }
 
 // How many pieces of a good the character holds: herbs, potions, materials,
