@@ -1,0 +1,17 @@
+{
+  "id": "settlement-welcome",
+  "payload": {
+    "text": "Dwudziesty poziom postaci… Życie toczy się również poza puszczą. System otworzył przed Tobą Osadę. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-welcome-20261030T1225-0.mp3",
+    "audio/drafts/narration/settlement-welcome-20261030T1225-1.mp3"
+  ],
+  "credits": 214
+}

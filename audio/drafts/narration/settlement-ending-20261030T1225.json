@@ -1,0 +1,17 @@
+{
+  "id": "settlement-ending",
+  "payload": {
+    "text": "Zaklinaczka magicznie odmieni Twój przedmiot, a Pustelnik pomoże zacząć ścieżkę od nowa. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-ending-20261030T1225-0.mp3",
+    "audio/drafts/narration/settlement-ending-20261030T1225-1.mp3"
+  ],
+  "credits": 194
+}

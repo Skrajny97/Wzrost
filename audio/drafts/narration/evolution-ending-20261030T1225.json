@@ -1,0 +1,17 @@
+{
+  "id": "evolution-ending",
+  "payload": {
+    "text": "Następna ewolucja czeka na setnym poziomie klasy. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/evolution-ending-20261030T1225-0.mp3",
+    "audio/drafts/narration/evolution-ending-20261030T1225-1.mp3"
+  ],
+  "credits": 116
+}

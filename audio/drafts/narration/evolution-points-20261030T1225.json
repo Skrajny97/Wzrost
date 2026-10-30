@@ -1,0 +1,17 @@
+{
+  "id": "evolution-points",
+  "payload": {
+    "text": "Punkty Umiejętności wrócą do rozdania na nowo, a statystyki możesz jednorazowo wyzerować za darmo. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/evolution-points-20261030T1225-0.mp3",
+    "audio/drafts/narration/evolution-points-20261030T1225-1.mp3"
+  ],
+  "credits": 214
+}
