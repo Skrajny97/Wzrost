@@ -500,13 +500,17 @@ export function narratorIdle() {
 }
 
 // The first line in the order that is due: a lead or a tap whenever its
-// moment holds, a card or a pointer only until it is read. After the ending
-// only a late line is left, and the chapters' lines come.
+// moment holds, a card or a pointer only until it is read, or while it is
+// lit (a late line is read as soon as it lights up). After the ending only a
+// late line is left, and the chapters' lines come.
 function nextLine() {
   const read = readNow();
   const over = read.has('ending');
   return state.content.tutorial.lines.find(
-    (line) => (!kept(line) || !read.has(line.id)) && (line.chapter ? over : !over || BEATS[line.id]?.late) && BEATS[line.id]?.when(place, read),
+    (line) =>
+      (!kept(line) || !read.has(line.id) || light?.line === line) &&
+      (line.chapter ? over : !over || BEATS[line.id]?.late) &&
+      BEATS[line.id]?.when(place, read),
   );
 }
 
@@ -843,6 +847,11 @@ async function survey(line) {
 
 function startLight(line) {
   const beat = BEATS[line.id];
+  // A late line, told to those who finished the introduction before it was
+  // written, is told once: it is read as soon as it lights up, so a game
+  // closed meanwhile does not bring it back (the author: "odtwarza mi sie
+  // samouczek encyklopedii [...] co jakis czas jak wchodze").
+  const tellOnce = beat.late && kept(line);
   const shade = h('div', { class: 'guide-shade', onClick: nudge });
   const rings = h('div', { class: 'guide-rings', 'aria-hidden': 'true' });
   const note = line.kind === 'tap' ? bubbleNote(line) : scrollNote(line);
@@ -851,6 +860,7 @@ function startLight(line) {
   const root = h('div', { class: 'guide' }, shade, rings, note.element, skip);
   document.body.append(root);
   light = { line, root, note, frame: 0, closing: false, nudge, sweep: beat.sweep ? { at: 0, move: null } : null };
+  if (tellOnce) markRead(line.id);
   hold();
   const corners = skip && skipCorners(skip);
   // The camera goes to the place, framing it with room for the narrator

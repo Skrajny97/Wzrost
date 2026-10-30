@@ -448,16 +448,17 @@ export function mountSettlement(container, { params = {} } = {}) {
   // A torch on the board, at its own size, standing on its spot: its flame
   // flickers and glows as the camp's fire does, more at dusk and at night
   // (the author: "pochodnie [...] które będą działać jak małe ogniska");
-  // each keeps its own beat. Still with the animations off.
-  function torchLight({ x, y }, index) {
-    const art = settlementTorchArt();
+  // each keeps its own beat. Still with the animations off. By day it is
+  // put out (the author: "Niech za dnia beda zgaszone te pochodnie całkiem").
+  function torchLight({ x, y }, index, lit) {
+    const art = settlementTorchArt(lit);
     if (!art) return null;
     const torch = h(
       'span',
       { class: 'settlement-torch', style: { left: `${x}%`, top: `${y}%` }, 'aria-hidden': 'true' },
       art,
-      h('span', { class: 'settlement-torch-glow', style: { animationDelay: `${-index * 0.61}s` } }),
-      h('span', { class: 'settlement-torch-flame', style: { animationDelay: `${-index * 0.29}s` } }),
+      lit && h('span', { class: 'settlement-torch-glow', style: { animationDelay: `${-index * 0.61}s` } }),
+      lit && h('span', { class: 'settlement-torch-flame', style: { animationDelay: `${-index * 0.29}s` } }),
     );
     const size = () => (torch.style.width = `${(art.naturalWidth / BOARD_WIDTH) * 100}%`);
     if (art.complete && art.naturalWidth) size();
@@ -498,15 +499,16 @@ export function mountSettlement(container, { params = {} } = {}) {
   // scrolling with the page, and its places.
   function boardView() {
     const ground = settlementGround();
+    const part = dayPart();
     fill(
       container,
       pageHeading(`Osada: ${data.name}`, data.description),
       h(
         'div',
         // The camp's light of the hour in Poland (scenes.js), as on its board.
-        { class: `settlement-map settlement-map--${dayPart()}`, role: 'group', 'aria-label': 'Plansza Osady' },
+        { class: `settlement-map settlement-map--${part}`, role: 'group', 'aria-label': 'Plansza Osady' },
         ground && h('img', { class: 'settlement-map-ground', src: ground, alt: '', decoding: 'async', draggable: 'false' }),
-        (data.torches ?? []).map(torchLight),
+        (data.torches ?? []).map((torch, index) => torchLight(torch, index, part !== 'day')),
         data.places.map(placeLink),
       ),
     );

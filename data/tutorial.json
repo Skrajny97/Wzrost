@@ -405,6 +405,7 @@
     {
       "id": "encyclopedia-lead",
       "kind": "lead",
+      "once": true,
       "text": [
         "Wszystko, co zdobędziesz, System zapisuje w Encyklopedii. Zajrzyjmy do niej."
       ],

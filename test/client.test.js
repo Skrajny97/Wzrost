@@ -115,7 +115,7 @@ test('every sprite on the list has its file at its size, and every class has its
     // The figures the evolutions' summoning skills put in fights.
     summons: data('evolutions').skills.filter((skill) => skill.kind === 'summon').map((skill) => skill.id),
     // The Osada's places and torch, its residents' busts and its board.
-    settlement: [...data('settlement').places.map((place) => place.id), ...(data('settlement').torches?.length ? ['torch'] : [])],
+    settlement: [...data('settlement').places.map((place) => place.id), ...(data('settlement').torches?.length ? ['torch', 'torch-off'] : [])],
     residents: data('settlement').residents.map((resident) => resident.id),
     'settlement-board': ['settlement'],
     // The inner regions' circles and the lands' cards on the Walka screen.
