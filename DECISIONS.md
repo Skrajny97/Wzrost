@@ -3004,6 +3004,7 @@ Autor: „Wdrażaj filtr nazw, „Dodaj 10 Punktów”, pięć postaci, Skrzynia
     - Autor: „199 tak, 201 tak, 202 tak, 203 tak”. Wojowniczka i Inkwizytor mają chody z PixelLab w wersjach B (199, 201).
     - **8 klatek (202).** Chód gra cztery pozy kluczowe szkieletu, a po każdej pozę w połowie drogi do następnej, liczoną kąt po kącie. W grze pójdzie 16 klatek na sekundę, więc z tą samą prędkością co 4 klatki po 8 na sekundę. Przykład (204) czeka na ocenę autora.
     - **Pozostałe 38 postaci (203).** Retro Diffusion rysuje każdą raz, w 2 wersjach, a opis mówi, co trzyma prawa, bliższa ręka, a co lewa, tak jak na portrecie (`art/prompts.json` i `art/walks.json`). Lepszą wersję klatki startowej wybieram sam, a PixelLab animuje każdą postać w 2 wersjach. Najpierw idzie 10 postaci z różnymi przedmiotami w rękach, potem reszta.
+    - Autor: „204 tak / ale wolniej niech chodzi, mniejsze FPS w grze”. Wszystkie chody mają 8 klatek, a w grze idą wolniej niż teraz: propozycja (205) to 8 klatek na sekundę, czyli pełny krok w sekundę. Tempo to jedna liczba w `data/animations.json`. Chód Wojowniczki to przykład z 204.
 5. **Raz, a dobrze.** Autor: „I pamietaj ze lepiej raz zainwestowac dobrze niz po troche i slaby efekt miec na końcu”. Przy wyborze narzędzia, planu albo liczby wersji liczy się efekt końcowy: lepsze narzędzie albo więcej wersji do wyboru od razu, zamiast poprawek po kawałku. Krótka próba do oceny autora i tak idzie przed każdą dużą partią.
 
 ## Skrzynia Konta, Encyklopedia z własnych zdobyczy i status znajomych (30.10.2026, na wersji testowej)
