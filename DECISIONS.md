@@ -2946,6 +2946,7 @@ Wybory ze strony odsłuchu „Dźwięki Insight”.
 1. **Umiejętności ewolucji.** Młyn i Egzekucja mają już własne dźwięki, Promień Żywiołów dostaje wersję „laserową” (3), a Psalm nucenie z dzwonkami (6). Wyrok gra na razie głośniejszą wersję 2, dopóki autor nie wybierze innej, a Sokół czeka na wybór.
 2. **Strzał z ukrycia.** Autor przy nowych wersjach: „brzmi jak rażenie prądem a nie wyjście z krzaków i strzał z łuku”. Opis nagrania prosi teraz o szelest liści, cięciwę drewnianego łuku i świst strzały, bez trzasków i brzęczenia; nowe wersje są na stronie odsłuchu.
     - Przy wersjach 5–7 autor: „dalej lipa brzmi jak prąd i brak strzału”. Wersje 8–10 są złożone z dwóch osobnych nagrań (szelest krzaka, a po nim cięciwa łuku i świst strzały), wyrównane do średnio ok. −15 dB jak inne krótkie dźwięki, i czekają na stronie odsłuchu.
+    - Przy 8–10 autor: „Strzał z ukrycia dalej slaby ten dźwięk, a z kolei reszte możesz dać już do zatwierdzonych a skompresowane background music tez jest okey”. Wersje 11–13: krótki szelest krzaka, a po nim mocny strzał z Przebijającego strzału, który już gra w grze. Lżejsze pliki muzyki są zatwierdzone, Wyrok zostaje w głośniejszej wersji, a Sokół, który nie miał jeszcze dźwięku, dostaje wersję 1.
 3. **Kwestie o Bestiariuszu i Encyklopedii.** Autor wybrał wersje 1 wszystkich czterech, czyli te, które już grają na wersji testowej.
 
 ## Chody ewolucji: wybory i poprawki autora (30.10.2026, na wersji testowej)

@@ -405,6 +405,7 @@
     "skill-arrow-storm": { "files": ["audio/sfx/skill-arrow-storm-1.mp3"], "gain": 0.7 },
     "skill-storm-cloud": { "files": ["audio/sfx/skill-storm-cloud-1.mp3"], "gain": 0.85 },
     "skill-barbed-arrow": { "files": ["audio/sfx/skill-barbed-arrow-1.mp3"], "gain": 0.7 },
+    "skill-falcon": { "files": ["audio/sfx/skill-falcon-1.mp3"], "gain": 0.7 },
     "skill-fire-burst": { "files": ["audio/sfx/skill-fire-burst-1.mp3"], "gain": 0.7 },
     "skill-elemental-ray": { "files": ["audio/sfx/skill-elemental-ray-1.mp3"], "gain": 0.7 },
     "skill-blizzard": { "files": ["audio/sfx/skill-blizzard-1.mp3"], "gain": 0.7 },
