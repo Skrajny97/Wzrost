@@ -2884,7 +2884,7 @@ Autor: „Pamietaj jeszcze o tych odcieniach skóry do zrobienia później ręcz
 3. **W grze.** Po ewolucji portret i chód mają kolor skóry postaci, tak jak przed nią. Inny wariant chodu z pytań 43–52 i 56 zmienia tylko maskę tego jednego chodu.
 4. **Sprawdzenie.** Na wersji testowej: Ustawienia → Testuj ewolucję, potem Ustawienia → Kolor skóry; portret widać na Postaci, a chód na Walce. Próbki dla autora: pytanie 130 i obrazki 130, 130b i 130c.
 
-## Ewolucje: balans (29.10.2026, symulacja; zmiany czekają na autora)
+## Ewolucje: balans (29–30.10.2026, na wersji testowej)
 
 `tools/evolution-sim.mjs` porównuje każdą ewolucję z jej klasą bez ewolucji: typowa postać z `tools/simulate.mjs` na danym poziomie, w obszarze dla tego poziomu, z tymi samymi przedmiotami, a Punkty Umiejętności ewolucji są rozdane po równo (40 zwróconych i 1 za każdy poziom klasy od 51.). Narzędzie mierzy omdlenia, XP na godzinę, HP na końcu, długość walki oraz obrażenia zadane i przyjęte w jednostce czasu walki, bo XP na godzinę zależy głównie od liczby walk na wyprawie.
 
@@ -2895,6 +2895,11 @@ Autor: „Pamietaj jeszcze o tych odcieniach skóry do zrobienia później ręcz
     - Nocny Tancerz zadaje o 16% mniej niż Cień, a przyjmuje mniej więcej tyle samo.
 3. **Sprawdzone poprawki** (w pamięci, dane bez zmian): spowolnienie Promienia Żywiołów jak w Mroźnym podmuchu (50–69%) daje 0–2% omdleń i o 21–53% więcej przyjętych obrażeń; Wyzwanie z ciosami silniejszymi o 50–100% daje o 6–16% mniej zadanych i o 11–12% mniej przyjętych obrażeń niż u Wojownika oraz więcej HP na końcu; Wir cieni po 30–60% zamiast 20–40% daje o 2–6% mniej zadanych niż u Cienia. Nie pomogły: więcej Siły w przyroście Strażnika, większe odbicie Wyzwania i Niezłomnego ani więcej Witalności Elementalisty.
 4. **Do autora.** Liczby umiejętności ewolucji pochodzą od autora albo z zatwierdzonej propozycji (zob. „Ewolucje: odpowiedzi autora”), więc te zmiany idą jako pytania 134–137 w czacie. Do odpowiedzi gra zostaje bez zmian.
+5. **Odpowiedzi autora** (30.10.2026): 134 A, 135 A i 137 A, a przy 136: „Czemu ewolucja ma zadawać mniej niż przed Ewolucją? czy chodziło Ci o inne ewolucje Cienia? jesli to drugie to A”. Cień w pytaniu 136 to ta sama postać przed ewolucją, więc Nocny Tancerz dostaje mocniejszy Wir cieni niż w propozycji: zadaje co najmniej tyle co Cień.
+    - Promień Żywiołów: mróz spowalnia trafionych o 50–69%.
+    - Wyzwanie: w czasie Wyzwania Strażnik zadaje o 50–100% więcej.
+    - Wir cieni: cztery ciosy po 45–90% zamiast 20–40%.
+    - W symulacji z tymi liczbami (postacie 50. i 75. poziomu, po 40 wypraw) Elementalista mdleje w 0–2,5% wypraw i zadaje o 20–46% więcej niż Mag, Strażnik zadaje o 4–15% mniej niż Wojownik i przyjmuje o 10–11% mniej, a Nocny Tancerz zadaje o 5–19% więcej niż Cień (o 3–20% więcej na poziomach 40–75) i przyjmuje o 2–15% więcej. Strażnik zostaje ewolucją obronną, która zadaje mniej: idzie to do autora jako pytanie 152.
 
 ## Grafiki ewolucji: poprawki po ocenie autora (29.10.2026, na wersji testowej)
 

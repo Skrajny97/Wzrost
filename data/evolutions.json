@@ -209,11 +209,11 @@
       "name": "Wyzwanie",
       "style": "kontrola",
       "description": "Strażnik uderza w tarczę i woła wrogów do siebie. Nikt nie zignoruje takiego wyzwania.",
-      "effect": "Przez {turns} swoje ruchy wrogowie biją tylko w postać, a ta odbija {reflect%} przyjętych obrażeń.",
+      "effect": "Przez {turns} swoje ruchy wrogowie biją tylko w postać, a ta odbija {reflect%} przyjętych obrażeń i zadaje o {damage%} więcej.",
       "kind": "stance",
       "mana": 12,
       "cooldown": 6,
-      "params": { "turns": 3, "provoke": true, "reflect": [0.1, 0.3] }
+      "params": { "turns": 3, "provoke": true, "reflect": [0.1, 0.3], "damage": [0.5, 1] }
     },
     {
       "id": "piercing-shot",
@@ -310,11 +310,11 @@
       "name": "Promień Żywiołów",
       "style": "grupa",
       "description": "Ogień, mróz i błyskawica splatają się w jeden promień.",
-      "effect": "Promień trafia każdego wroga za {power%} obrażeń, po równo od ognia, mrozu i elektryczności.",
+      "effect": "Promień trafia każdego wroga za {power%} obrażeń, po równo od ognia, mrozu i elektryczności. Mróz spowalnia trafionych o {slow%}.",
       "kind": "sweep",
       "mana": 16,
       "cooldown": 4,
-      "params": { "power": [0.4, 1.0], "category": "magical", "elements": "fire frost lightning" }
+      "params": { "power": [0.4, 1.0], "category": "magical", "elements": "fire frost lightning", "slow": [0.5, 0.69] }
     },
     {
       "id": "blizzard",
@@ -509,7 +509,7 @@
       "kind": "whirl",
       "mana": 14,
       "cooldown": 4,
-      "params": { "blows": 4, "power": [0.2, 0.4] }
+      "params": { "blows": 4, "power": [0.45, 0.9] }
     }
   ],
   "texts": {
