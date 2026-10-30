@@ -2972,6 +2972,15 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
+## Wersja 0.0.63 (30.10.2026, wdrożenie awaryjne)
+
+Autor: „207 tak wdróż na główny jako motyw awaryjnego wdrożenia”.
+
+1. **Co wchodzi do gry:** liczba postaci każdej klasy na ekranie „Nowa postać” (zob. „Postacie każdej klasy przy tworzeniu postaci”).
+2. **Co jeszcze przychodzi z gałęzi, poza grą:** narzędzia nowych chodów (szkielet, Retro Diffusion i PixelLab w przebiegu „Grafiki (szkice)”) i ich klatki startowe. Chody w grze zostają dawne do czasu wyboru autora.
+3. **Co zostaje ukryte:** Osada (bez `SETTLEMENT`).
+4. **Migracje bazy:** brak.
+
 ## Wersja 0.0.62 (30.10.2026)
 
 Autor: „Wdrażaj filtr nazw, „Dodaj 10 Punktów”, pięć postaci, Skrzynia Konta, Encyklopedia tylko z własnych zdobyczy i kropki znajomych w 0.0.62 i chód ten co jest, a w miedzyczasie zajmij sie generowaniem z RetroDiffusion od zera tego chodu.”
@@ -2985,13 +2994,14 @@ Autor: „Wdrażaj filtr nazw, „Dodaj 10 Punktów”, pięć postaci, Skrzynia
 3. **Co zostaje ukryte:** Osada (bez `SETTLEMENT`).
 4. **Migracje bazy:** `0056` (imiona niepowtarzalne także wśród postaci odłożonych) i `0057` (Skrzynia Konta i sztuki z wymiany poza Encyklopedią).
 
-## Postacie każdej klasy przy tworzeniu postaci (30.10.2026, na wersji testowej)
+## Postacie każdej klasy przy tworzeniu postaci (30.10.2026, w grze od 0.0.63)
 
 Autor: „chciałbym dorobić w miedzyczasie opcje wyswietlania ile w grze jest postaci danej klasy przy tworzeniu nowej -> po to by gracz wiedział jakiej klasy może brakować w grze komuś (w przyszlosci) do druzyny, jaka jest popularna itp.”
 
 1. Każda karta klasy na ekranie „Nowa postać” ma wiersz „W grze: N postaci tej klasy” (z odmianą: 1 postać, 2–4 postacie, 5 i więcej postaci). Przy zerze stoi „Nikt jeszcze nie gra tą klasą.”.
 2. Liczą się wszystkie postacie gry, grane i odłożone, a nie liczy się postać zaparkowana na czas „Testuj samouczki”. Ewolucja liczy się przy swojej klasie, bo ekran pokazuje pięć klas.
 3. Liczby przychodzą z listą postaci konta (`GET /api/characters`, pole `classes`), którą ekran i tak pobiera, więc nie dochodzi żadne nowe zapytanie.
+4. Autor: „207 tak” (zrzut ekranu „Nowa postać” z liczbami).
 
 ## Strona chodów i wpis na X (30.10.2026)
 
