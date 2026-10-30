@@ -8490,6 +8490,35 @@ a.profession-square:active {
   image-rendering: pixelated;
 }
 
+/* The camp's tones (camp-art.js): the ground muted and dimmed, the buildings
+   a little brighter than it; then the light of the hour, as on the camp's
+   board (the author: the Osada's saturation and its day and night as in the
+   Obóz). */
+.settlement-map-ground {
+  filter: saturate(0.5) brightness(0.7);
+}
+.settlement-place-art {
+  filter: saturate(0.5) brightness(0.72);
+}
+.settlement-map--dawn .settlement-map-ground {
+  filter: saturate(0.5) brightness(0.7) brightness(1.04) sepia(0.18) saturate(1.1);
+}
+.settlement-map--dawn .settlement-place-art {
+  filter: saturate(0.5) brightness(0.72) brightness(1.04) sepia(0.18) saturate(1.1);
+}
+.settlement-map--dusk .settlement-map-ground {
+  filter: saturate(0.5) brightness(0.7) brightness(0.82) sepia(0.3) saturate(1.15);
+}
+.settlement-map--dusk .settlement-place-art {
+  filter: saturate(0.5) brightness(0.72) brightness(0.82) sepia(0.3) saturate(1.15);
+}
+.settlement-map--night .settlement-map-ground {
+  filter: saturate(0.5) brightness(0.7) brightness(0.62) saturate(0.75);
+}
+.settlement-map--night .settlement-place-art {
+  filter: saturate(0.5) brightness(0.72) brightness(0.62) saturate(0.75);
+}
+
 .settlement-place {
   position: absolute;
   width: 26%;

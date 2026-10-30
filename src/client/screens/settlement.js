@@ -14,6 +14,7 @@ import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatHours, formatNumber } from '../format.js';
 import { leaveView, openView } from '../history.js';
 import { setMusicPlace } from '../music.js';
+import { dayPart } from '../scenes.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { itemSummary } from './character.js';
@@ -482,7 +483,8 @@ export function mountSettlement(container, { params = {} } = {}) {
       pageHeading(`Osada: ${data.name}`, data.description),
       h(
         'div',
-        { class: 'settlement-map', role: 'group', 'aria-label': 'Plansza Osady' },
+        // The camp's light of the hour in Poland (scenes.js), as on its board.
+        { class: `settlement-map settlement-map--${dayPart()}`, role: 'group', 'aria-label': 'Plansza Osady' },
         ground && h('img', { class: 'settlement-map-ground', src: ground, alt: '', decoding: 'async', draggable: 'false' }),
         data.places.map(placeLink),
       ),

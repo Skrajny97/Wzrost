@@ -5,7 +5,7 @@
   "places": [
     { "id": "board", "name": "Tablica zleceń", "x": 78, "y": 22, "resident": "headman" },
     { "id": "enchanter", "name": "Pracownia Zaklinaczki", "x": 21, "y": 23, "resident": "enchantress" },
-    { "id": "hermitage", "name": "Pustelnia", "x": 78, "y": 81, "resident": "hermit" },
+    { "id": "hermitage", "name": "Chata Pustelnika", "x": 78, "y": 81, "resident": "hermit" },
     { "id": "tavern", "name": "Karczma", "x": 84, "y": 43, "resident": "innkeeper", "soon": true },
     { "id": "market", "name": "Targowisko", "x": 45.5, "y": 46, "soon": true },
     { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist", "soon": true }
