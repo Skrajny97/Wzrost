@@ -16,7 +16,7 @@
 # Each skin colour keeps its place between the darkest and the lightest skin
 # colour of the portrait, on the tone's ramp from shadow to light.
 #
-# Usage: python3 tools/evolution-tones.py [--mask out-dir]
+# Usage: python3 tools/evolution-tones.py [--ids a,b] [--mask out-dir]
 import colorsys, json, os, sys
 from PIL import Image, ImageDraw
 
@@ -77,7 +77,10 @@ def main():
     masks = json.load(open(os.path.join(ROOT, 'tools', 'evolution-tones.json'), encoding='utf-8'))
     tones = [t for t in json.load(open(os.path.join(ROOT, 'data', 'skins.json'), encoding='utf-8'))['skins'] if t.get('ramp')]
     mask_dir = sys.argv[sys.argv.index('--mask') + 1] if '--mask' in sys.argv else None
+    only = set(sys.argv[sys.argv.index('--ids') + 1].split(',')) if '--ids' in sys.argv else None
     for name, cfg in masks.items():
+        if only and name not in only:
+            continue
         im = Image.open(os.path.join(PORTRAITS, name + '.png')).convert('RGBA')
         skin = skin_of(im, cfg)
         colours = {im.getpixel(p)[:3] for p in skin}
