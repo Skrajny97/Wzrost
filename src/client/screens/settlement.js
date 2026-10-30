@@ -428,8 +428,8 @@ export function mountSettlement(container, { params = {} } = {}) {
       h('p', {
         class: 'muted',
         text: rumor.used
-          ? `Wyprawa w miejsce ${rumor.area} już poszła tym tropem. Następna plotka jutro.`
-          : `Plotka do północy: najbliższa wyprawa w miejsce ${rumor.area} spotka elitę i czempiona ${factor} razy częściej (${rumor.monster}).`,
+          ? `Wyprawa już poszła tym tropem (${rumor.area}). Następna plotka jutro.`
+          : `Plotka ważna do północy. Miejsce: ${rumor.area}. Najbliższa wyprawa tam spotka elitę i czempiona ${factor} razy częściej.`,
       }),
     );
   }

@@ -9090,6 +9090,10 @@ a.profession-square:active {
   gap: 6px;
 }
 
+.settlement-companion > p {
+  margin: 0;
+}
+
 .settlement-companion-list {
   margin: 0;
   padding-left: 18px;
