@@ -1,0 +1,25 @@
+{
+  "id": "innkeeper-1",
+  "payload": {
+    "prompt": "a stout jolly innkeeper, bald head with a thick brown moustache, rosy cheeks, rolled linen sleeves and a leather apron, a wooden tankard in hand, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 792445527,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793351555,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 46.12,
+    "request_id": "5a576aeb-4b74-42bb-b0e1-3544e7f29218",
+    "outputs_retained_until": 1793437895
+  }
+}

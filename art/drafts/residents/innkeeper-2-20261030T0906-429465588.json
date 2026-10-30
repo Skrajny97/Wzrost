@@ -1,0 +1,25 @@
+{
+  "id": "innkeeper-2",
+  "payload": {
+    "prompt": "a big broad-shouldered innkeeper with a bushy red beard and a braided ponytail, a grin, a green woollen vest over a linen shirt, a towel over the shoulder, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 429465588,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793351595,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 45.94,
+    "request_id": "246d362a-1da7-4cb5-872b-a784afe349ed",
+    "outputs_retained_until": 1793437959
+  }
+}

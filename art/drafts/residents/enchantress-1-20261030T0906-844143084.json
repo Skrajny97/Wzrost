@@ -1,0 +1,25 @@
+{
+  "id": "enchantress-1",
+  "payload": {
+    "prompt": "a middle-aged village enchantress, a long dark braid with silver threads, sharp green eyes, faint glowing blue runes on her fingers, a deep blue wool dress with embroidered sleeves, amber beads, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 844143084,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793351314,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 46.84,
+    "request_id": "3ae2ddd3-744d-44ef-b451-b5b9a48285ae",
+    "outputs_retained_until": 1793437657
+  }
+}

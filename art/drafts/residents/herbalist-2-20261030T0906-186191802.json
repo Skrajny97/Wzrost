@@ -1,0 +1,25 @@
+{
+  "id": "herbalist-2",
+  "payload": {
+    "prompt": "a plump cheerful middle-aged herbalist woman with rosy cheeks, grey-blond hair in a bun, a flowered headscarf, a basket of herbs and mushrooms on her arm, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 186191802,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793351671,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 45.58,
+    "request_id": "42c4f8c8-8bbd-4d48-baa5-50e3ad660958",
+    "outputs_retained_until": 1793438020
+  }
+}
