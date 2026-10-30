@@ -1,0 +1,23 @@
+{
+  "id": "enchantress-3-plain",
+  "payload": {
+    "prompt": "a calm grey-eyed woman enchantress with short silver-streaked black hair under a dark charcoal hood with a thin grey woven border, a dark charcoal cloak over a dark dress, a necklace of carved bone and crystal charms, a faint violet glow on her raised hand, head and shoulders portrait, her shoulders and cloak fill the whole bottom of the picture from the left edge to the right edge, facing the viewer, three-quarter view, on a flat plain light beige background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 3,
+    "seed": 430392646,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793361147,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 35.79,
+    "request_id": "20b018bd-bac4-4a0d-a733-1c9fe18bbb79",
+    "outputs_retained_until": 1793447499
+  }
+}
