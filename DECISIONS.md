@@ -2972,6 +2972,28 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
+## Skrzynia Konta, Encyklopedia z własnych zdobyczy i status znajomych (30.10.2026, na wersji testowej)
+
+Autor: „180 ok / 181 ok”, „Niech wszystkie postaci znajduja sie w rankingu, jeśli się łapią na tę opcję.”, a dalej: „I w sumie może zróbmy w Obozie Skrzynię Konta wspólną dla wszystkich postaci. Mała liczba slotów na przedmioty. I tak większość jest obwarowana lvlami a czemu ktoś miałby nie mieć łatwiej na starcie jeśli włożył sporo czasu w pierwszą postać. Z Encyklopedii tylko wykluczyć zdobycze z wymian i Skrzyni Konta i powinno byc okey. Zrobić tak, ze postac sama musi wytworzyć przedmiot albo zdobyć żeby zaliczylo w Encyklopedii.” oraz „potrzeba statusu "online" "zajęty" i "offline" w Liście znajomych. Może to być po prostu kropka zielona żołta i czerwona. Status zajęty pokazywałby brak możliwości wymiany (bo nie wiemy tego czy postać coś robi i ma te możliwość do czasu kliknięcia Wymiany).”
+
+1. **180 i 181** są zatwierdzone: przycisk „Dodaj 10 Punktów” i ekran wyboru postaci zostają tak, jak na obrazkach.
+2. **Ranking.** Tak już jest od pięciu postaci: każda postać, także odłożona, stoi w Rankingu, gdy łapie się do pierwszej setki w wybranym porządku, a w porządku według Poziomu Profesji, gdy pracowała w którejś profesji.
+3. **Skrzynia Konta** (`src/server/chest.js`, `src/client/screens/chest.js`):
+    - Stoi na planszy obozu, między Magazynem a Ogniskiem, jako rysunek skrzyni skarbów, tej samej co przy skrzyniach Bestiariusza (`art/materials/chest.png`). Ma własny ekran, jak budynek.
+    - Mieści 5 przedmiotów (`account.chestSlots` w `data/balance.json`), wspólnych dla wszystkich postaci na koncie. Mieści tylko przedmioty: złoto, zasoby, zioła, mikstury i materiały zostają przy swojej postaci (177 A).
+    - Postać wkłada przedmiot z plecaka (nie założony) i wyjmuje go do plecaka, gdy ma w nim miejsce. Jak przy każdej zmianie plecaka, tylko wtedy, gdy jest w obozie.
+    - Postać, która włożyła przedmiot, wyjmuje go taki, jaki był. Inna postać dostaje go oznaczonego jako ze Skrzyni Konta: założy go od jego poziomu, jak przedmiot z wymiany („Przedmiot ze Skrzyni Konta założysz od poziomu postaci N.”), a Encyklopedia go nie zalicza. Większość przedmiotów i tak ma wymagany poziom klasy.
+    - Przy przedmiocie w skrzyni stoi, od której postaci jest, i czy obecna postać go założy.
+    - Skrzynia zostaje po „Zacznij od nowa” i znika razem z kontem (`migrations/0057_account_chest.sql`).
+4. **Encyklopedia tylko z własnych zdobyczy.** Encyklopedia nie zalicza przedmiotów z wymiany ani przedmiotów od innej postaci ze Skrzyni Konta. Zioła, mikstury i materiały z wymiany też się nie liczą. Gra pamięta, ile sztuk z wymiany postać ma (`characters.foreign_stacks`), i zalicza dopiero sztuki ponad nie, czyli zebrane, uwarzone albo zdobyte przez samą postać. Sztuki z wymiany zużywają się pierwsze. Odkrycia sprzed tej zmiany zostają, a trofea z materiałów liczą się tak samo jak odkrycia.
+5. **Status na liście znajomych.** Przed imieniem znajomego stoi kropka:
+    - zielona, online: gracz gra tą postacią i w ciągu ostatnich 2 minut miał grę otwartą, jak przy Wymianie;
+    - żółta, „zajęty”: gracz jest online, ale wymiany teraz nie zacznie, bo postać jest na wyprawie albo przy pracy profesji, jest w innej wymianie, ma wymiany wyłączone albo wymiana między wami jest zablokowana;
+    - czerwona, offline: także postać odłożona, gdy jej gracz gra inną.
+
+    Lista Znajomych sama odświeża się co 30 sekund, ale nie wtedy, gdy gracz wpisuje imię do zaproszenia.
+6. **Odpowiedzi autora:** „182 ok” (Skrzynia na planszy obozu), „183 ok” (ekran Skrzyni), „184 ok” (kropki znajomych). O komunikacie Systemu na ekranie Skrzyni: „Przedmiot od innej postaci będziesz mógł załozyć od jego poziomu możesz sobie darować, bo to się można domyślić. Czyli po prostu "Encyklopedia go nie zaliczy [...]" jeśli chodzi o drugie zdanie.” Drugie zdanie brzmi więc: „Encyklopedia go nie zaliczy: liczy się tylko to, co postać sama zdobędzie albo wytworzy.” Przy samym przedmiocie w skrzyni nadal stoi, od którego poziomu postać go założy.
+
 ## Pięć postaci na koncie (30.10.2026, na wersji testowej)
 
 Autor: „Następnie pięć postaci / 176 A / 177 A / 178 A” (zob. „Pięć postaci na koncie: decyzje autora”).
@@ -3002,7 +3024,7 @@ Autor: „Następnie pięć postaci / 176 A / 177 A / 178 A” (zob. „Pięć p
 
 Autor: „Wdrażaj 0.0.61”, a wcześniej: „Deploy 0.0.61 to Ewolucje klas.”
 
-1. **Co wchodzi do gry:** ewolucje klas na 50. poziomie klasy (przełącznik `EVOLUTIONS` w `wrangler.jsonc` ma teraz w grze wartość „on”): 30 ewolucji z cechami, umiejętnościami, ich ikonami i dźwiękami, portretami w odcieniach skóry i chodem w walce, zakładka Ewolucja z tłem źródła i portretem na karcie, ceremonia z muzyką, darmowe zerowanie statystyk po ewolucji, przywołańce we własnej karcie oraz rozdział narratora o Ewolucji z nagraniami.
+1. **Co wchodzi do gry:** ewolucje klas na 50. poziomie klasy (przełącznik `EVOLUTIONS` w `wrangler.jsonc` ma teraz w grze wartość „on”): 15 ewolucji (po trzy na klasę) z cechami, 30 umiejętnościami z ikonami i dźwiękami, portretami w odcieniach skóry i chodem w walce (każda w wersji kobiecej i męskiej), zakładka Ewolucja z tłem źródła i portretem na karcie, ceremonia z muzyką, darmowe zerowanie statystyk po ewolucji, przywołańce we własnej karcie oraz rozdział narratora o Ewolucji z nagraniami.
 2. **Co zostaje ukryte:** Osada (bez `SETTLEMENT`), a z nią zmiana ewolucji u Pustelnika.
 
 ## Pięć postaci na koncie: decyzje autora (30.10.2026)

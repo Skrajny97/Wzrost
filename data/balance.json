@@ -182,7 +182,8 @@
   },
   "account": {
     "emailSystemPoints": 10,
-    "characters": 5
+    "characters": 5,
+    "chestSlots": 5
   },
   "quickHunt": {
     "perDay": 3,

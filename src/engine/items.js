@@ -395,8 +395,10 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap } = {}) {
     // The class level it asks for, or null when it asks for none.
     classLevel: classLevel > 1 ? classLevel : null,
     price: sellPrice(item, content, sellBonus),
-    // Got in a Wymiana: worn from its own level on (src/server/inventory.js).
+    // Got in a Wymiana, or from another character through the Skrzynia
+    // Konta: worn from its own level on (src/server/inventory.js).
     ...(item.traded ? { traded: true } : {}),
+    ...(item.chest ? { chest: true } : {}),
     ...(upgradeCap === undefined ? {} : { anvil: upgradeView(item, upgradeCap, content) }),
   };
 }

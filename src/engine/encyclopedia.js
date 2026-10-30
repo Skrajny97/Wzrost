@@ -42,6 +42,36 @@ export function heldDiscoveries({ items = [], potions = {}, herbs = {}, material
   return found;
 }
 
+// The discoveries of what the character holds by its own doing (the
+// author: "postac sama musi wytworzyć przedmiot albo zdobyć żeby zaliczylo w
+// Encyklopedii"): no item got in a Wymiana or from another character
+// through the Skrzynia Konta (data.traded, data.chest), and of each stack of
+// potions, herbs and materials only what is over the pieces got in a trade.
+// `foreign` holds those pieces by key ("herb:comfrey": 2), used up first;
+// it comes back with what is still held of them.
+export function ownDiscoveries({ items = [], potions = {}, herbs = {}, materials = {}, parts = {} }, foreign, content) {
+  const left = {};
+  const own = (kind, held) =>
+    Object.fromEntries(
+      Object.entries(held).map(([id, count]) => {
+        const traded = Math.min(foreign[`${kind}:${id}`] ?? 0, count);
+        if (traded > 0) left[`${kind}:${id}`] = traded;
+        return [id, count - traded];
+      }),
+    );
+  const found = heldDiscoveries(
+    {
+      items: items.filter((item) => !item.traded && !item.chest),
+      potions: own('potion', potions),
+      herbs: own('herb', herbs),
+      materials: own('material', materials),
+      parts,
+    },
+    content,
+  );
+  return { found, foreign: left };
+}
+
 // The record with what is held now added, or null when nothing is new.
 export function mergeDiscoveries(stored, held) {
   let merged = null;

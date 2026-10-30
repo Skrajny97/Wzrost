@@ -74,6 +74,36 @@ describe('Wymiana', () => {
     assert.equal(await current(players.ala), null);
   });
 
+  test('what a trade brings stays out of the Encyklopedia until the character finds or makes its own', async () => {
+    const herb = content.herbs[0].id;
+    await (await db()).prepare('UPDATE characters SET herbs = ? WHERE name = ?').bind(JSON.stringify({ [herb]: 7 }), 'Ola').run();
+    const given = await inBag('Ala', amulet(10));
+    const id = await opened();
+    await trade(players.ala, 'offer', { id, offer: { items: [given] } });
+    const offered = await trade(players.ola, 'offer', { id, offer: { herbs: { [herb]: 5 } } });
+    const locked = await trade(players.ola, 'confirm', { id, version: offered.data.trade.version });
+    assert.equal((await trade(players.ala, 'confirm', { id, version: locked.data.trade.version })).status, 200);
+    for (const cookie of [players.ala, players.ola]) await call('GET', '/api/character', { cookie });
+    const record = async (name) => {
+      const found = await (await db()).prepare('SELECT discovered, foreign_stacks FROM characters WHERE name = ?').bind(name).first();
+      return { discovered: JSON.parse(found.discovered), foreign: JSON.parse(found.foreign_stacks) };
+    };
+    const ala = await record('Ala');
+    assert.equal(ala.discovered[`herb:${herb}`], undefined);
+    assert.deepEqual(ala.foreign, { [`herb:${herb}`]: 5 });
+    // Ola's own herbs count, the amulet from the trade does not.
+    const ola = await record('Ola');
+    assert.equal(ola.discovered[`herb:${herb}`], 1);
+    assert.equal(ola.discovered['item:amulet'], undefined);
+    // Ala gathers two of her own, then uses up all but one.
+    await (await db()).prepare('UPDATE characters SET herbs = ? WHERE name = ?').bind(JSON.stringify({ [herb]: 7 }), 'Ala').run();
+    await call('GET', '/api/character', { cookie: players.ala });
+    assert.equal((await record('Ala')).discovered[`herb:${herb}`], 1);
+    await (await db()).prepare('UPDATE characters SET herbs = ? WHERE name = ?').bind(JSON.stringify({ [herb]: 1 }), 'Ala').run();
+    await call('GET', '/api/character', { cookie: players.ala });
+    assert.deepEqual((await record('Ala')).foreign, { [`herb:${herb}`]: 1 });
+  });
+
   test('materials go in a trade too, of any grade, and take no places in the bag', async () => {
     const stock = (name, materials) => db().then((database) => database.prepare('UPDATE characters SET materials = ? WHERE name = ?').bind(JSON.stringify(materials), name).run());
     const materials = async (name) => JSON.parse((await (await db()).prepare('SELECT materials FROM characters WHERE name = ?').bind(name).first()).materials);

@@ -1116,13 +1116,19 @@
       "additionalProperties": false,
       "required": [
         "emailSystemPoints",
-        "characters"
+        "characters",
+        "chestSlots"
       ],
       "properties": {
         "characters": {
           "type": "integer",
           "minimum": 1,
           "description": "Najwięcej postaci na jednym koncie. Gracz gra jedną naraz, a pozostałe czekają odłożone."
+        },
+        "chestSlots": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Miejsca na przedmioty w Skrzyni Konta, wspólnej dla postaci na koncie (obóz)."
         },
         "emailSystemPoints": {
           "type": "integer",

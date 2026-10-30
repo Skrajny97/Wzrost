@@ -75,17 +75,37 @@ export async function friendsView(context) {
   return json(await friendsOf(db, character.id, context.now));
 }
 
+// A friend's dot in the Znajomi (the author: "statusu "online" "zajęty" i
+// "offline" w Liście znajomych"): online while its player plays it and asked
+// the server lately (as for a Wymiana, trades.js), busy while so but no trade
+// can start now (away on an exploration or a work, in another trade, trades
+// turned off or blocked between the two), offline otherwise, also when the
+// character waits aside.
+function friendStatus(row, now) {
+  const { onlineSeconds } = content.community.trade;
+  if (row.role !== 'player' || !((row.seen_at ?? 0) >= now - onlineSeconds * 1000)) return 'offline';
+  return row.away || row.trading || row.trade_off || row.blocked ? 'busy' : 'online';
+}
+
 async function friendsOf(db, id, now) {
   const day = today(now);
+  const { proposalSeconds, idleMinutes } = content.community.trade;
+  const viewer = '(SELECT user_id FROM characters WHERE id = ?)';
   const [rows, sent, waiting, claimed] = await db.batch([
     db
       .prepare(
-        `SELECT f.id, f.character_id, f.friend_id, f.accepted_at, o.id AS other, o.name, o.class_id, o.level, o.class_level
+        `SELECT f.id, f.character_id, f.friend_id, f.accepted_at, o.id AS other, o.name, o.class_id, o.level, o.class_level,
+                o.role, u.seen_at, u.trade_off,
+                EXISTS (SELECT 1 FROM activities a WHERE a.character_id = o.id) AS away,
+                EXISTS (SELECT 1 FROM trades t WHERE o.id IN (t.from_id, t.to_id)
+                          AND ((t.state = 'proposed' AND t.created_at > ?) OR (t.state IN ('open', 'locked') AND t.updated_at > ?))) AS trading,
+                EXISTS (SELECT 1 FROM trade_blocks b WHERE (b.user_id = o.user_id AND b.blocked_id = ${viewer}) OR (b.blocked_id = o.user_id AND b.user_id = ${viewer})) AS blocked
          FROM friends f JOIN characters o ON o.id = CASE WHEN f.character_id = ? THEN f.friend_id ELSE f.character_id END
+         JOIN users u ON u.id = o.user_id
          WHERE (f.character_id = ? OR f.friend_id = ?) AND o.${OWN_CHARACTERS}
          ORDER BY o.name_key`,
       )
-      .bind(id, id, id),
+      .bind(now - proposalSeconds * 1000, now - idleMinutes * 60000, id, id, id, id, id),
     db.prepare('SELECT receiver_id FROM gifts WHERE sender_id = ? AND day = ?').bind(id, day),
     db
       .prepare('SELECT sender_id, COUNT(*) AS count FROM gifts WHERE receiver_id = ? AND claimed_at IS NULL AND day >= ? GROUP BY sender_id')
@@ -101,7 +121,7 @@ async function friendsOf(db, id, now) {
   return {
     friends: rows.results
       .filter((row) => row.accepted_at !== null)
-      .map((row) => ({ ...person(row), sentToday: sentTo.has(row.other), waiting: from.get(row.other) ?? 0 })),
+      .map((row) => ({ ...person(row), status: friendStatus(row, now), sentToday: sentTo.has(row.other), waiting: from.get(row.other) ?? 0 })),
     incoming: pending.filter((row) => row.friend_id === id).map(person),
     outgoing: pending.filter((row) => row.character_id === id).map(person),
     gifts: {

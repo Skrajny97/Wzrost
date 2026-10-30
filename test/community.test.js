@@ -103,6 +103,26 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
     assert.equal((await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'Nikt' } })).status, 404);
   });
 
+  test('a friend\'s dot says online, busy (no trade now) or offline', async () => {
+    await befriend(players.ala, players.ola, 'Ola');
+    const status = async () => (await friends(players.ala)).friends[0].status;
+    await (await db()).prepare("UPDATE users SET seen_at = 0 WHERE id = (SELECT user_id FROM characters WHERE name = 'Ola')").run();
+    assert.equal(await status(), 'offline');
+    await call('GET', '/api/chat/latest', { cookie: players.ola });
+    assert.equal(await status(), 'online');
+    // Away on an exploration, or with trades turned off: no trade now.
+    assert.equal((await call('POST', '/api/hunts', { cookie: players.ola, body: { areaId: 'windfalls-edge', minutes: 5 } })).status, 201);
+    assert.equal(await status(), 'busy');
+    await call('POST', '/api/hunts/cancel', { cookie: players.ola });
+    assert.equal(await status(), 'online');
+    await call('POST', '/api/trade/settings', { cookie: players.ola, body: { off: true } });
+    assert.equal(await status(), 'busy');
+    await call('POST', '/api/trade/settings', { cookie: players.ola, body: { off: false } });
+    // Set aside for another character of the account: offline.
+    assert.equal((await call('POST', '/api/character', { cookie: players.ola, body: { name: 'Ola Druga', classId: 'mage', appearance: 'female' } })).status, 201);
+    assert.equal(await status(), 'offline');
+  });
+
   test('a character has at most 30 friends and invitations', async () => {
     const { max } = content.community.friends;
     const database = await db();

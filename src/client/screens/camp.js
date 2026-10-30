@@ -8,7 +8,7 @@
 // gold for resources a few times a day, and at the Skup złomu the scrap
 // dealer sells crafting parts. Opened with the camp button in the top bar.
 
-import { resourceArt } from '../art.js';
+import { materialSprite, resourceArt } from '../art.js';
 import { BOARD_HEIGHT, BOARD_WIDTH, CAMP_PLOTS, PLOT_HEIGHT, PLOT_WIDTH, boardArt, buildingTier, plotArt } from '../camp-art.js';
 import { craftTableSection, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -20,10 +20,15 @@ import { skipControl } from '../time.js';
 import { confirmAction, guided, systemPanel, toast, withButton } from '../ui.js';
 import { scrapperSheet } from '../scrapper.js';
 import { itemSheet, itemSummary } from './character.js';
+import { mountChest } from './chest.js';
 import { dayPart } from '../scenes.js';
 
 const CAMP = '#/oboz';
 const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
+// The Skrzynia Konta stands on the board beside the Magazyn, with a screen
+// of its own like a building's (screens/chest.js).
+const CHEST = 'skrzynia-konta';
+const CHEST_SPOT = { x: 170, y: 274 };
 // The pieces last picked on the fire spirit's slider, while its building's
 // screen stays open: a newly opened screen starts at one piece (the author:
 // "suwak był ustawiony na najniższą wartość").
@@ -34,6 +39,7 @@ const exchangeChoice = { from: null, amount: null };
 
 export function mountCamp(container, { params, backHash = '#/walka' }) {
   const id = params.building;
+  if (id === CHEST) return mountChest(container, () => leaveView(CAMP, 1, HISTORY_KEY));
   // An unknown building in the address leads back to the board. The camp's
   // own level has a screen like a building's.
   if (id && id !== campOf().id && !state.character.camp.buildings.some((building) => building.id === id)) {
@@ -257,6 +263,7 @@ function mountBoard(container, backHash) {
         { class: `camp-board camp-board--${dayPart()}`, role: 'group', 'aria-label': 'Plansza obozu' },
         boardArt(campOf().level),
         character.camp.buildings.map((building) => plot(building, running)),
+        chestLink(),
         campLevelButton(running),
       ),
       nothingBuilt &&
@@ -304,6 +311,23 @@ function mountBoard(container, backHash) {
       h('br'),
       'obozu',
       running?.buildingId === campOf().id && timer(running),
+    );
+  }
+
+  // The Skrzynia Konta: the chest's picture with its name, like a plot.
+  function chestLink() {
+    const hash = `${CAMP}/${CHEST}`;
+    return h(
+      'a',
+      {
+        class: 'camp-chest',
+        href: hash,
+        'aria-label': 'Skrzynia Konta',
+        style: { left: `${(CHEST_SPOT.x / BOARD_WIDTH) * 100}%`, top: `${(CHEST_SPOT.y / BOARD_HEIGHT) * 100}%` },
+        onClick: (event) => openView(event, hash, HISTORY_KEY),
+      },
+      h('span', { class: 'camp-chest-art' }, materialSprite('chest')),
+      h('span', { class: 'camp-plot-label' }, h('span', { text: 'Skrzynia Konta' })),
     );
   }
 

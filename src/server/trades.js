@@ -346,10 +346,24 @@ function exchange(db, trade, now, sides) {
     const herbs = change('herbs');
     const potions = change('potions');
     const materials = change('materials');
+    // The pieces got are from a trade, which the Encyklopedia leaves out
+    // (ownDiscoveries in the engine).
+    let foreign = 'foreign_stacks';
+    const got = [];
+    for (const [kind, key] of [
+      ['herbs', 'herb'],
+      ['potions', 'potion'],
+      ['materials', 'material'],
+    ]) {
+      for (const [stack, count] of Object.entries(taker.offer[kind])) {
+        foreign = `json_set(${foreign}, ?, COALESCE(json_extract(foreign_stacks, ?), 0) + ?)`;
+        got.push(path(`${key}:${stack}`), path(`${key}:${stack}`), count);
+      }
+    }
     moves.push(
       db
-        .prepare(`UPDATE characters SET gold = gold + ?, herbs = ${herbs.sql}, potions = ${potions.sql}, materials = ${materials.sql}, version = version + 1 WHERE id = ?`)
-        .bind(taker.offer.gold - giver.offer.gold, ...herbs.values, ...potions.values, ...materials.values, giver.id),
+        .prepare(`UPDATE characters SET gold = gold + ?, herbs = ${herbs.sql}, potions = ${potions.sql}, materials = ${materials.sql}, foreign_stacks = ${foreign}, version = version + 1 WHERE id = ?`)
+        .bind(taker.offer.gold - giver.offer.gold, ...herbs.values, ...potions.values, ...materials.values, ...got, giver.id),
     );
   }
   const emptied = (kind) => `(SELECT COALESCE(json_group_object(key, value), '{}') FROM json_each(characters.${kind}) WHERE value > 0)`;
@@ -379,6 +393,11 @@ export async function confirmTrade(context) {
   const owners = await db.prepare('SELECT id, user_id FROM characters WHERE id IN (?, ?)').bind(trade.from_id, trade.to_id).all();
   const userOf = (id) => owners.results.find((row) => row.id === id).user_id;
   const [fromPlayer, toPlayer] = await Promise.all([loadPlayer(db, userOf(trade.from_id)), loadPlayer(db, userOf(trade.to_id))]);
+  // A trade is for the characters played: one set aside meanwhile ends it.
+  if (fromPlayer?.row.id !== trade.from_id || toPlayer?.row.id !== trade.to_id) {
+    await close(db, trade, 'expired', now);
+    throw new ApiError(409, 'stale', 'Jedna z postaci jest teraz odłożona. Wymiana przepadła.');
+  }
   const [mine, theirs] = character.id === trade.from_id ? [fromPlayer, toPlayer] : [toPlayer, fromPlayer];
   requireIdle(mine, now);
   if (theirs.activity) throw awayError(theirs.row.name);

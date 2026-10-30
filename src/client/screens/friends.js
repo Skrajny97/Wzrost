@@ -15,6 +15,8 @@ import { toast, withButton } from '../ui.js';
 import { proposeTrade } from './trade.js';
 
 const resourceName = (id) => walletEntries().find((entry) => entry.id === id)?.name ?? id;
+// A friend's dot in words: green, yellow and red (styles.css).
+const STATUS = { online: 'online', busy: 'zajęty, teraz bez wymiany', offline: 'offline' };
 
 // What the Upominki collected held: "Punkty Czasu +3, Złoto +40, Drewno +5".
 export const giftText = (reward) =>
@@ -81,11 +83,13 @@ export function mountFriends(container) {
   const button = (label, run, kind = 'world', extra = {}) =>
     h('button', { type: 'button', class: `button button--${kind} button--small`, text: label, onClick: (event) => withButton(event.currentTarget, run), ...extra });
 
-  // A character in a row: its class, its name to tap and its level.
+  // A character in a row: a friend's dot first (online, busy, offline), its
+  // class, its name to tap and its level.
   const who = (person, ...more) =>
     h(
       'div',
       { class: 'friend-who' },
+      person.status && h('span', { class: `friend-status friend-status--${person.status}`, role: 'img', 'aria-label': STATUS[person.status], title: STATUS[person.status] }),
       icon(CLASS_ICONS[person.classId] ?? 'person', { size: 16, className: 'chat-class' }),
       h('button', {
         type: 'button',
@@ -226,9 +230,16 @@ export function mountFriends(container) {
   call('GET', '/api/friends').then(show, (error) => {
     if (!gone) fill(body, h('p', { class: 'chat-error', role: 'status', text: error.message }));
   });
+  // The friends' dots follow who plays now: the list comes anew every 30
+  // seconds while it is in front, but not while a name is being typed.
+  const refresh = setInterval(() => {
+    if (document.hidden || document.activeElement === name || !view) return;
+    call('GET', '/api/friends').then(show, () => {});
+  }, 30000);
   return {
     unmount() {
       gone = true;
+      clearInterval(refresh);
     },
   };
 }

@@ -31,7 +31,7 @@ import {
   freePoints,
   gainedTimePoints,
   goodStock,
-  heldDiscoveries,
+  ownDiscoveries,
   bagStacks,
   hoursToNext,
   isUnlocked,
@@ -171,12 +171,22 @@ export async function requirePlayer(context) {
 // The Encyklopedia's record with what the character holds now: its items,
 // potions, herbs, materials and parts, those of the Stół rozbiórki's
 // finished orders too (encyclopedia.js in the engine). So whatever passes
-// through the bag between two requests is written down.
+// through the bag between two requests is written down, but for what came
+// from a Wymiana or the Skrzynia Konta (ownDiscoveries): of the stacks from a
+// trade, only what the character still holds stays counted out.
 export async function settleDiscoveries(db, player, now) {
   const { row } = player;
   const { materials, parts } = settleCrafting(craftingState(row), now);
-  const held = heldDiscoveries({ items: player.items, potions: JSON.parse(row.potions ?? '{}'), herbs: JSON.parse(row.herbs ?? '{}'), materials, parts }, content);
-  const merged = mergeDiscoveries(JSON.parse(row.discovered ?? '{}'), held);
+  const stored = JSON.parse(row.foreign_stacks ?? '{}');
+  const holdings = { items: player.items, potions: JSON.parse(row.potions ?? '{}'), herbs: JSON.parse(row.herbs ?? '{}'), materials, parts };
+  const { found, foreign } = ownDiscoveries(holdings, stored, content);
+  // The trade pieces used up meanwhile are written down as gone.
+  if (Object.keys(stored).some((key) => foreign[key] !== stored[key])) {
+    const kept = JSON.stringify(foreign);
+    const result = await db.prepare('UPDATE characters SET foreign_stacks = ? WHERE id = ? AND foreign_stacks = ?').bind(kept, row.id, row.foreign_stacks ?? '{}').run();
+    if (result.meta.changes === 1) row.foreign_stacks = kept;
+  }
+  const merged = mergeDiscoveries(JSON.parse(row.discovered ?? '{}'), found);
   if (!merged) return;
   const discovered = JSON.stringify(merged);
   const result = await db.prepare('UPDATE characters SET discovered = ? WHERE id = ? AND discovered = ?').bind(discovered, row.id, row.discovered ?? '{}').run();

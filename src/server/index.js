@@ -39,6 +39,7 @@ import { pushKey, sendNotifications, subscribePush, testPush, unsubscribePush } 
 import { claimAllQuests, claimQuest, openChest } from './quests.js';
 import { getReport, listReports } from './reports.js';
 import { learnSkill, raiseSkill } from './skills.js';
+import { getChest, putInChest, takeFromChest } from './chest.js';
 import {
   backFromTest,
   chooseTestEvent,
@@ -84,6 +85,9 @@ const routes = [
   ['DELETE', '/api/character', deleteCharacter],
   ['GET', '/api/characters', listCharacters],
   ['POST', '/api/characters/choose', chooseCharacter],
+  ['GET', '/api/chest', getChest],
+  ['POST', '/api/chest/put', putInChest],
+  ['POST', '/api/chest/take', takeFromChest],
   ['POST', '/api/character/points', spendPoints],
   ['POST', '/api/character/points/auto', autoPoints],
   ['POST', '/api/character/points/reset', resetPoints],
