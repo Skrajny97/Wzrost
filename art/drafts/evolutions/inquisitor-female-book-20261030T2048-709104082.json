@@ -1,0 +1,25 @@
+{
+  "id": "inquisitor-female-book",
+  "payload": {
+    "prompt": "young woman inquisitor, stern, dark hair in a tight braid, standing in the middle of the image, small full body figure from the top of the head to the feet, the whole figure in view with the head and both boots, empty space above the head and below the feet, a long dark crimson coat over a black cassock with silver buckles, a silver holy symbol on a heavy chain, holding a flanged iron mace in her right hand and a thick holy book with golden corners against her chest in her left hand, no censer, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 3,
+    "seed": 709104082,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793393392,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 71.33,
+    "request_id": "e41c3413-d7d5-4242-a4d3-948873a68ba1",
+    "outputs_retained_until": 1793479704
+  }
+}
