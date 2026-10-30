@@ -542,6 +542,8 @@
     "test": "Testuj ewolucję",
     "testText": "Tylko na wersji testowej: wybór ewolucji bez względu na poziom klasy, z możliwością cofnięcia.",
     "undo": "Cofnij ewolucję",
-    "undone": "Ewolucja cofnięta. Klasa, umiejętności i statystyki są jak przed nią."
+    "undone": "Ewolucja cofnięta. Klasa, umiejętności i statystyki są jak przed nią.",
+    "testLevel": "Ustaw {level}. poziom klasy",
+    "testLevelDone": "Postać ma {level}. poziom klasy. Ewolucja czeka w zakładce Postać."
   }
 }

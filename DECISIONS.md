@@ -2972,6 +2972,10 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
+## Uwagi autora po 0.0.61 (30.10.2026, na wersji testowej)
+
+1. **50. poziom klasy na próbę.** Autor: „Zmień moją postać na testowym by miała 50 poziom klasy, bo nie chce mi się przeklikiwać tego.” Stąd nie ma dostępu do bazy wersji testowej ani do konta autora, więc w „Testuj ewolucję” (Ustawienia, tylko wersja testowa) jest przycisk „Ustaw 50. poziom klasy”. Cofa ewolucję z testu, jeśli jest, i daje postaci 50. poziom klasy. Ewolucję wybiera się potem jak w grze. Postać po prawdziwej ewolucji zostaje bez zmian.
+
 ## Wersja 0.0.61: ewolucje klas w grze (30.10.2026)
 
 Autor: „Wdrażaj 0.0.61”, a wcześniej: „Deploy 0.0.61 to Ewolucje klas.”

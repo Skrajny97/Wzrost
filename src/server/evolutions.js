@@ -90,6 +90,34 @@ export async function decidePointsReset(context) {
 
 // POST /api/evolution/undo: back to the class with the skills it had before
 // a test evolution, and the stat points if they were reset (test version).
+// POST /api/evolution/test-level: on the test version the character at the
+// first evolution's class level at once (the author: "Zmień moją postać na
+// testowym by miała 50 poziom klasy, bo nie chce mi się przeklikiwać
+// tego"); a test evolution is undone first, so the evolution is then chosen
+// as in the game. A character that took one for good stays as it is.
+export async function testClassLevel(context) {
+  requireEvolutions();
+  const { session, player } = await requireIdlePlayer(context);
+  requireTests(context, session);
+  const row = player.row;
+  if (row.evolution && !row.evolution_undo) throw new ApiError(409, 'evolved', 'Ta postać przeszła już ewolucję.');
+  const level = content.balance.progression.classEvolutionLevels[0];
+  const db = context.env.DB;
+  const result = await db
+    .prepare(
+      `UPDATE characters SET class_level = MAX(class_level, ?), class_xp = 0,
+         evolution = CASE WHEN evolution_undo IS NULL THEN evolution END, skills = COALESCE(evolution_undo, skills), evolution_undo = NULL,
+         points = COALESCE(points_undo, points), points_undo = NULL, evolution_reset = CASE WHEN evolution_undo IS NULL THEN evolution_reset ELSE 0 END,
+         version = version + 1
+       WHERE id = ? AND version = ?`,
+    )
+    .bind(level, row.id, row.version)
+    .run();
+  if (result.meta.changes !== 1) throw conflict();
+  const fresh = await loadPlayer(db, session.userId);
+  return json({ character: characterView(fresh, context.now) });
+}
+
 export async function undoEvolution(context) {
   requireEvolutions();
   const { session, player } = await requireIdlePlayer(context);

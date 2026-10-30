@@ -10,7 +10,7 @@ import { h } from './dom.js';
 import { formatNumber } from './format.js';
 import { setMusicPlace } from './music.js';
 import { narratorIdle } from './narrator.js';
-import { call, state } from './state.js';
+import { call, state, unlockInfo } from './state.js';
 import { afterSheet, closeSheet, confirmAction, openDecision, openSheet, toast, withButton } from './ui.js';
 
 const texts = () => state.content.evolutionTexts;
@@ -125,8 +125,27 @@ export function offerPointsReset() {
   );
 }
 
+// The character at the first evolution's class level at once, a test
+// evolution undone first (the author: "nie chce mi się przeklikiwać tego").
+function testLevelButton() {
+  const t = texts();
+  const level = String(unlockInfo('evolution')?.classLevel ?? '');
+  return h('button', {
+    type: 'button',
+    class: 'button button--system',
+    text: filled(t.testLevel, { level }),
+    onClick: (event) =>
+      withButton(event.currentTarget, async () => {
+        await call('POST', '/api/evolution/test-level');
+        closeSheet();
+        toast(filled(t.testLevelDone, { level }));
+      }),
+  });
+}
+
 // "Testuj ewolucję" on the test version: every evolution of the class to
-// try, or the way back from the one tried.
+// try, or the way back from the one tried, and the class level of the
+// first evolution at once.
 export async function openEvolutionTests() {
   const t = texts();
   const character = state.character;
@@ -148,6 +167,7 @@ export async function openEvolutionTests() {
               toast(t.undone);
             }),
         }),
+        testLevelButton(),
       ),
     );
     return;
@@ -160,6 +180,7 @@ export async function openEvolutionTests() {
   openSheet(
     h('h2', { class: 'sheet-title', text: t.test }),
     h('p', { class: 'muted', text: t.testText }),
+    h('div', { class: 'sheet-actions' }, testLevelButton()),
     evolutions.map((evolution) => evolutionCard(evolution, { onChoose: (button, chosen) => chooseEvolution(button, chosen, { test: true }) })),
   );
 }

@@ -285,6 +285,19 @@ describe('class evolutions through the API', () => {
     assert.deepEqual(JSON.parse((await (await db()).prepare('SELECT skills FROM characters').first()).skills), { 'wide-sweep': 6 });
   });
 
+  test('on the test version the character gets the class level of the first evolution at once, a test evolution undone first', async () => {
+    await set(`level = 20, class_level = 15, class_xp = 7, skills = '{"wide-sweep":6}'`);
+    const taken = await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'guardian', test: true } });
+    assert.equal(taken.status, 200, JSON.stringify(taken.data));
+    const raised = await call('POST', '/api/evolution/test-level', { cookie });
+    assert.equal(raised.status, 200, JSON.stringify(raised.data));
+    assert.equal(raised.data.character.classLevel, 50);
+    assert.equal(raised.data.character.className, 'Wojownik');
+    assert.equal(raised.data.character.evolutionUndo, false);
+    const row = await (await db()).prepare('SELECT class_xp, skills, evolution FROM characters').first();
+    assert.deepEqual([row.class_xp, JSON.parse(row.skills), row.evolution], [0, { 'wide-sweep': 6 }, null]);
+  });
+
   const points = async () => JSON.parse((await (await db()).prepare('SELECT points FROM characters').first()).points);
   const decide = (reset) => call('POST', '/api/evolution/points', { cookie, body: { reset } });
 
