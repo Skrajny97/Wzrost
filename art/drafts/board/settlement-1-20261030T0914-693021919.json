@@ -1,0 +1,24 @@
+{
+  "id": "settlement-1",
+  "payload": {
+    "prompt": "top-down pixel art game map of a large village square inside a tall palisade of sharpened logs at the edge of a dark pine and oak forest, a wide trodden dirt square in the middle with a round stone well under a small shingle roof, dirt roads from the square to a big wooden gatehouse with two watchtowers at the bottom, green grass between the roads with flowers, stones and a few vegetable patches behind low wattle fences, the rest of the ground open and empty for houses, no houses, no buildings except the well, the gatehouse and the palisade, no people, muted natural colours, dignified and much larger than a forest camp",
+    "prompt_style": "rd_plus__topdown_map",
+    "width": 384,
+    "height": 384,
+    "num_images": 1,
+    "seed": 693021919,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793351693,
+    "credit_cost": 9,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 45.52,
+    "request_id": "1cab005f-233f-4e8f-9b74-b9b05b15596f",
+    "outputs_retained_until": 1793438087,
+    "output_url_expires_at": 1793352593
+  }
+}
