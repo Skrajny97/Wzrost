@@ -514,7 +514,8 @@
   ],
   "texts": {
     "title": "Ewolucja klasy",
-    "intro": "Na {level}. poziomie klasy ścieżka dochodzi do progu. Wybierz ewolucję jednej z dwóch ścieżek. Druga ścieżka zniknie, a Punkty Umiejętności wrócą do rozdania na dwie umiejętności ewolucji.",
+    "intro": "Na {level}. poziomie klasy Twoja postać staje u progu ewolucji. Wybierz jedną z dwóch ścieżek. Druga ścieżka bezpowrotnie zniknie. Nie martw się jednak – zainwestowane w nią punkty będziesz mógł jednorazowo rozdysponować, na wyewoluowane Umiejętności.",
+    "introFemale": "Na {level}. poziomie klasy Twoja postać staje u progu ewolucji. Wybierz jedną z dwóch ścieżek. Druga ścieżka bezpowrotnie zniknie. Nie martw się jednak – zainwestowane w nią punkty będziesz mogła jednorazowo rozdysponować, na wyewoluowane Umiejętności.",
     "waiting": "Ewolucja czeka na {level}. poziomie klasy.",
     "notReady": "Przed ewolucją wybierz ścieżkę poboczną i rozdaj Punkty Umiejętności.",
     "growth": "Przyrost na poziom klasy",

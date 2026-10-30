@@ -45,7 +45,9 @@ export function mountEvolution(container) {
       return;
     }
     const busy = Boolean(character.activity);
-    const intro = systemPanel(t.intro.replace('{level}', String(character.skills.evolution.level)));
+    // The author's words, with "mogła" for a woman.
+    const said = character.appearance === 'female' ? t.introFemale : t.intro;
+    const intro = systemPanel(said.replace('{level}', String(character.skills.evolution.level)));
     // Where the narrator's Ewolucja chapter points (narrator.js): the cards
     // below are too tall to be lit whole.
     intro.dataset.guide = 'evolution-choice';
