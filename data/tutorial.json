@@ -714,7 +714,8 @@
       "chapter": "settlement",
       "text": [
         "Dwudziesty poziom postaci… Życie toczy się również poza puszczą. System otworzył przed Tobą Osadę."
-      ]
+      ],
+      "voice": "audio/narration/settlement-welcome.mp3"
     },
     {
       "id": "settlement-lead",
@@ -722,7 +723,8 @@
       "chapter": "settlement",
       "text": [
         "Osada czeka w tej zakładce. Zajrzyjmy na Rozstaje."
-      ]
+      ],
+      "voice": "audio/narration/settlement-lead.mp3"
     },
     {
       "id": "settlement-board",
@@ -730,7 +732,8 @@
       "chapter": "settlement",
       "text": [
         "Na Tablicy Zleceń mieszkańcy zamieszczają swoje prośby. Zlecenia wiszą tu przez tydzień."
-      ]
+      ],
+      "voice": "audio/narration/settlement-board.mp3"
     },
     {
       "id": "settlement-brotherhoods",
@@ -738,7 +741,8 @@
       "chapter": "settlement",
       "text": [
         "Każde oddane zlecenie zwiększa respekt jaki budzisz wśród bractw. Im wyższy stopień poważania, tym na więcej Ci pozwolą."
-      ]
+      ],
+      "voice": "audio/narration/settlement-brotherhoods.mp3"
     },
     {
       "id": "settlement-ending",
@@ -746,7 +750,8 @@
       "chapter": "settlement",
       "text": [
         "Zaklinaczka magicznie odmieni Twój przedmiot, a Pustelnik pomoże zacząć ścieżkę od nowa."
-      ]
+      ],
+      "voice": "audio/narration/settlement-ending.mp3"
     },
     {
       "id": "evolution-welcome",
@@ -754,7 +759,8 @@
       "chapter": "evolution",
       "text": [
         "Pięćdziesiąty poziom klasy… System otworzył przed Tobą Ewolucję."
-      ]
+      ],
+      "voice": "audio/narration/evolution-welcome.mp3"
     },
     {
       "id": "evolution-lead",
@@ -762,7 +768,8 @@
       "chapter": "evolution",
       "text": [
         "Ewolucja czeka w zakładce Postać. Zajrzyjmy tam."
-      ]
+      ],
+      "voice": "audio/narration/evolution-lead.mp3"
     },
     {
       "id": "evolution-choice",
@@ -771,10 +778,12 @@
       "text": [
         "Pora byś wybrał swoją ścieżkę. Dostępną masz jedną z dwóch ewolucji: swojej ścieżki głównej albo pobocznej. Każda da Ci nową nazwę klasy, stałą cechę i dwie nowe umiejętności."
       ],
+      "voice": "audio/narration/evolution-choice.mp3",
       "female": {
         "text": [
           "Pora byś wybrała swoją ścieżkę. Dostępną masz jedną z dwóch ewolucji: swojej ścieżki głównej albo pobocznej. Każda da Ci nową nazwę klasy, stałą cechę i dwie nowe umiejętności."
-        ]
+        ],
+        "voice": "audio/narration/evolution-choice-female.mp3"
       }
     },
     {
@@ -783,7 +792,8 @@
       "chapter": "evolution",
       "text": [
         "Punkty Umiejętności wrócą do rozdania na nowo, a statystyki możesz jednorazowo wyzerować za darmo."
-      ]
+      ],
+      "voice": "audio/narration/evolution-points.mp3"
     },
     {
       "id": "evolution-ending",
@@ -791,7 +801,8 @@
       "chapter": "evolution",
       "text": [
         "Następna ewolucja czeka na setnym poziomie klasy."
-      ]
+      ],
+      "voice": "audio/narration/evolution-ending.mp3"
     }
   ]
 }
