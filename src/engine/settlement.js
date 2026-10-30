@@ -133,19 +133,27 @@ export function drawOrder({ character, reputation = {}, seed, weekly = false }, 
 export const emptyBoard = () => ({ slots: [], weekly: null, delivered: 0, turn: 0 });
 
 // The board at `now`: each slot without an order gets one once its moment
-// has come, and the week's big order is this week's (drawn when the week
-// comes, kept until delivered, then none until the next week). `seed` is
-// the character's.
+// has come, and an order left for expireDays after it came goes, with a
+// new one in its place at once (question 93: "B, ale terminy tygodniowe").
+// The week's big order is this week's (drawn when the week comes, kept
+// until delivered, then none until the next week). `seed` is the
+// character's.
 export function settleBoard(stored, { character, reputation, seed }, now, content) {
   const { orders } = content.settlement;
   const board = { ...emptyBoard(), ...stored };
+  const term = orders.expireDays * 86400000;
   let turn = board.turn ?? 0;
   const slots = Array.from({ length: orders.open }, (_, index) => board.slots[index] ?? { readyAt: now });
-  const settled = slots.map((slot) => {
-    if (slot.order || slot.readyAt > now) return slot;
-    turn += 1;
-    const order = drawOrder({ character, reputation, seed: `${seed}:order:${turn}` }, content);
-    return order ? { order: { id: turn, ...order } } : slot;
+  const settled = slots.map((first) => {
+    let slot = first;
+    for (;;) {
+      if (slot.order && slot.order.expiresAt <= now) slot = { readyAt: slot.order.expiresAt };
+      if (slot.order || slot.readyAt > now) return slot;
+      turn += 1;
+      const order = drawOrder({ character, reputation, seed: `${seed}:order:${turn}` }, content);
+      if (!order) return slot;
+      slot = { order: { id: turn, ...order, expiresAt: slot.readyAt + term } };
+    }
   });
   const { key } = questPeriod('weekly', now, content);
   const weekly =

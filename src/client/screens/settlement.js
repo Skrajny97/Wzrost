@@ -8,9 +8,16 @@
 // level, the tab says so as the other locked modules do.
 
 import { fill, h } from '../dom.js';
-import { formatCountdown, formatNumber } from '../format.js';
+import { formatCountdown, formatHours, formatNumber } from '../format.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
+
+// What is left of an order's week on the board: days, then hours.
+function timeLeft(ms) {
+  const hours = Math.max(0, ms) / 3600000;
+  const days = Math.floor(hours / 24);
+  return days > 0 ? `${days} ${days === 1 ? 'dzień' : 'dni'}` : formatHours(Math.max(hours, 1 / 60));
+}
 
 export function mountSettlement(container) {
   let data = null;
@@ -79,6 +86,7 @@ export function mountSettlement(container) {
       h('p', { class: 'settlement-story', text: `„${order.story}”` }),
       h('p', { class: 'settlement-ask', text: `${formatNumber(order.count)} × ${order.label} (masz ${formatNumber(order.have)})` }),
       h('p', { class: 'muted', text: `Zapłata: ${formatNumber(order.gold)} złota, +${order.reputation} reputacji: ${order.brotherhoodName}` }),
+      order.expiresAt && h('p', { class: 'muted', text: `Termin: jeszcze ${timeLeft(order.expiresAt - serverNow())}` }),
       away && h('p', { class: 'muted', text: 'Zioła i mikstury oddasz po odebraniu raportu z wyprawy albo pracy.' }),
       h('div', { class: 'settlement-actions' }, deliver, reject),
     );

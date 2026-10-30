@@ -67,6 +67,7 @@
     "resident": "headman",
     "open": 3,
     "refillMinutes": 180,
+    "expireDays": 7,
     "reputation": 10,
     "relationGain": 2,
     "weekly": { "count": 4, "reward": 5, "reputation": 50 },

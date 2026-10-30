@@ -89,10 +89,11 @@
     "orders": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["resident", "open", "refillMinutes", "reputation", "relationGain", "weekly", "pay", "resourceGold", "partGold", "partRarity", "counts", "quality", "systemPoints", "stories"],
+      "required": ["resident", "open", "refillMinutes", "expireDays", "reputation", "relationGain", "weekly", "pay", "resourceGold", "partGold", "partRarity", "counts", "quality", "systemPoints", "stories"],
       "properties": {
         "open": { "type": "integer", "minimum": 1 },
         "refillMinutes": { "type": "integer", "minimum": 1 },
+        "expireDays": { "type": "integer", "minimum": 1, "description": "Ile dni zlecenie wisi na tablicy, zanim w jego miejsce przyjdzie nowe." },
         "reputation": { "type": "integer", "minimum": 1 },
         "resident": { "type": "string", "description": "Mieszkaniec, który wiesza zlecenia; relationGain to przyrost relacji z nim." },
         "relationGain": { "type": "integer", "minimum": 0 },

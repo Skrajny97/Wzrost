@@ -138,6 +138,19 @@ describe('the Osada in the engine', () => {
     assert.equal(rejectOrder(board, 'weekly', NOW, content), null);
   });
 
+  test('an order left on the board for a week goes, and a new one comes in its place', () => {
+    const week = content.settlement.orders.expireDays * 24 * HOUR;
+    const board = settleBoard(emptyBoard(), { character, seed: 'x' }, NOW, content);
+    const first = board.slots[0].order;
+    assert.equal(first.expiresAt, NOW + week);
+    assert.equal(settleBoard(board, { character, seed: 'x' }, NOW + week - 1, content).slots[0].order.id, first.id);
+    const later = settleBoard(board, { character, seed: 'x' }, NOW + week, content).slots[0].order;
+    assert.notEqual(later.id, first.id);
+    assert.equal(later.expiresAt, NOW + 2 * week);
+    // Two weeks away: the second week's orders have gone too.
+    assert.equal(settleBoard(board, { character, seed: 'x' }, NOW + 2 * week + HOUR, content).slots[0].order.expiresAt, NOW + 3 * week);
+  });
+
   test('every third order and the week\'s big one give Punkty Systemu', () => {
     const { systemPoints } = content.settlement.orders;
     let board = settleBoard(emptyBoard(), { character, seed: 'ps' }, NOW, content);
