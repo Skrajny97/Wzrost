@@ -151,6 +151,16 @@ test('every sprite on the list has its file at its size, and every class has its
     SPRITES.portraits.toned,
     data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)).filter((id) => SPRITES.portraits.ids.includes(id)),
   );
+  // So has every evolution's portrait, and every walking figure has its
+  // file for each tone too.
+  assert.deepEqual(
+    [...SPRITES.portraits.tonedEvolutions].sort(),
+    data('evolutions').evolutions.flatMap((evolution) => looks.map((look) => `${evolution.id}-${look}`)).filter((id) => SPRITES.portraits.ids.includes(id)).sort(),
+  );
+  const tones = data('skins').skins.filter((tone) => tone.ramp).map((tone) => tone.id);
+  for (const [kind, ids] of [['portraits', [...SPRITES.portraits.toned, ...SPRITES.portraits.tonedEvolutions]], ['walkers', SPRITES.walkers.ids]]) {
+    for (const id of ids) for (const tone of tones) assert.ok(existsSync(join(CLIENT, 'art', kind, `${id}-${tone}.png`)), `${kind}: ${id}-${tone}.png is missing`);
+  }
   // A bust centres on a face inside the portrait.
   for (const [id, face] of Object.entries(SPRITES.portraits.faces)) {
     assert.ok(SPRITES.portraits.ids.includes(id), `faces: no portrait ${id}`);

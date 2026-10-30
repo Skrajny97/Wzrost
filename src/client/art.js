@@ -39,8 +39,9 @@ export const SPRITES = {
   // in three quarters), as tools/normalize-portraits.py prints it, or for a
   // figure with a bow or a staff at its head, the middle of the face's skin.
   // Busts centre on the face; the whole figure stays centred. `toned`: the
-  // portraits with a file for every skin tone; the evolutions' get theirs
-  // later, by hand (the author), and show as drawn till then.
+  // classes' portraits with a file for every skin tone (the class cards fetch
+  // them ahead); `tonedEvolutions`: the evolutions' with theirs, recoloured
+  // through masks made by hand (tools/evolution-tones.py).
   portraits: {
     width: 96,
     height: 128,
@@ -61,6 +62,12 @@ export const SPRITES = {
       'night-dancer-female': 50, 'night-dancer-male': 47,
     },
     toned: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
+    tonedEvolutions: [
+      'guardian-female', 'guardian-male', 'sniper-female', 'sniper-male', 'ice-lord-female', 'ice-lord-male', 'priest-female', 'priest-male', 'assassin-female', 'assassin-male',
+      'barbarian-female', 'barbarian-male', 'gladiator-female', 'gladiator-male', 'storm-archer-female', 'storm-archer-male', 'hunter-female', 'hunter-male',
+      'elementalist-female', 'elementalist-male', 'arcanist-female', 'arcanist-male', 'healer-female', 'healer-male', 'inquisitor-female', 'inquisitor-male',
+      'poisoner-female', 'poisoner-male', 'night-dancer-female', 'night-dancer-male',
+    ],
   },
   items: {
     size: 32,
@@ -119,8 +126,8 @@ export const SPRITES = {
   // The character walking in place on the Walka scene, <class>-<look>: four
   // frames of 48×48 in a row, facing right, drawn from the portraits. A skin
   // tone other than the one drawn has its own recoloured file, as a portrait
-  // does (tools/walker-tones.py). The evolutions' <evolution>-<look> walk as
-  // drawn, as their portraits show, till their tones are done by hand.
+  // does (tools/walker-tones.py), and so has an evolution's <evolution>-<look>
+  // (tools/evolution-walker-tones.py).
   walkers: {
     width: 192,
     height: 48,
@@ -310,7 +317,7 @@ function toneFile(id, skin) {
   return tone && !tone.drawn ? `${id}-${tone.id}` : id;
 }
 
-const toned = new Set(SPRITES.portraits.toned);
+const toned = new Set([...SPRITES.portraits.toned, ...SPRITES.portraits.tonedEvolutions]);
 
 // A class's figure for a look, or its evolution's once it has one. `bust`
 // shows the head and shoulders at the image's own size, cut by the box it
@@ -339,8 +346,7 @@ export function portraitSprite(classId, appearance, { bust = false, skin, evolut
 // scenes' sheets (data/animations.json), or null for a look without one.
 export function walkerSheet(classId, appearance, skin, evolution) {
   const evolved = evolution ? `${evolution}-${appearance}` : null;
-  if (evolved && available.walkers.has(evolved)) return `art/walkers/${evolved}.png`;
-  const id = `${classId}-${appearance}`;
+  const id = evolved && available.walkers.has(evolved) ? evolved : `${classId}-${appearance}`;
   return available.walkers.has(id) ? `art/walkers/${toneFile(id, skin)}.png` : null;
 }
 

@@ -2875,6 +2875,15 @@ Autor: „ej a gra coś zacina, znasz tego powód? długie ladowania itp nie tyl
 2. **Poprawka.** Po pierwszym dotknięciu ładują się tylko odgłosy ciosów i dźwięki nazwane (zakładki, umiejętności): 48 plików zamiast 407. Okrzyki stworów i postaci z danej walki ładują się, gdy powstaje jej odtwarzanie. Rozpakowane zostają okrzyki ostatnich 24 stworów. Kwestia narratora, przeczytana raz, nie zostaje w pamięci. W przeglądarce ze spowolnionym procesorem (jak telefon) start gry trwał 2,9 s, a teraz trwa 0,8 s. Zapytań przy starcie było 502, a jest 143.
 3. **Muzyka.** Utwór miejsca pobiera się w całości przy pierwszym wejściu na jego ekran: 3,6–4,8 MB, w jakości ok. 170 kb/s. Lżejsze pliki (ok. 112 kb/s, o jedną trzecią mniejsze) są propozycją dla autora, bo zmieniają brzmienie jego utworów.
 
+## Ewolucje: kolory skóry (30.10.2026, na wersji testowej)
+
+Autor: „Pamietaj jeszcze o tych odcieniach skóry do zrobienia później ręcznie maskami i przerysowaniem” i „pamiętaj żeby potem dokanczac te animacje portrety”.
+
+1. **Maski.** Każdy z 30 portretów ewolucji i każdy z 30 chodów ma maskę skóry zrobioną ręcznie i sprawdzoną piksel po pikselu: twarz, szyja, dłonie, a gdzie je widać, także ramiona, kolana i bose stopy. Zbroja, skórzane rękawy, włosy, brody, malunki wojenne i drzewce broni zostają w kolorach szkicu, także gdy mają barwę skóry (brąz Gladiatora, rękawy Snajpera). Maski są w `tools/evolution-tones.json` i `tools/evolution-walker-tones.json`, a pliki odcieni robią `tools/evolution-tones.py` i `tools/evolution-walker-tones.py`.
+2. **Odcienie.** Każdy kolor skóry zachowuje swoje miejsce między najciemniejszym a najjaśniejszym kolorem skóry postaci, na skali odcienia, jak przy portretach klas. Twarz narysowana jednym kolorem albo bez cienia (np. Skrytobójczyni, Elementalista) zaczyna od środka skali, nie od cienia, żeby w każdym odcieniu nie wyszła za ciemna.
+3. **W grze.** Po ewolucji portret i chód mają kolor skóry postaci, tak jak przed nią. Inny wariant chodu z pytań 43–52 i 56 zmienia tylko maskę tego jednego chodu.
+4. **Sprawdzenie.** Na wersji testowej: Ustawienia → Testuj ewolucję, potem Ustawienia → Kolor skóry; portret widać na Postaci, a chód na Walce. Próbki dla autora: pytanie 130 i obrazki 130, 130b i 130c.
+
 ## Ewolucje: balans (29.10.2026, symulacja; zmiany czekają na autora)
 
 `tools/evolution-sim.mjs` porównuje każdą ewolucję z jej klasą bez ewolucji: typowa postać z `tools/simulate.mjs` na danym poziomie, w obszarze dla tego poziomu, z tymi samymi przedmiotami, a Punkty Umiejętności ewolucji są rozdane po równo (40 zwróconych i 1 za każdy poziom klasy od 51.). Narzędzie mierzy omdlenia, XP na godzinę, HP na końcu, długość walki oraz obrażenia zadane i przyjęte w jednostce czasu walki, bo XP na godzinę zależy głównie od liczby walk na wyprawie.
