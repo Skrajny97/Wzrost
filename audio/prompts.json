@@ -343,9 +343,9 @@
         "seconds": 1.2
       },
       "skill-ambush-shot": {
-        "text": "a hunter bursts out from behind a dense bush: a loud clear rustle of leaves and snapping twigs, then right away one strong bowstring release and a sharp arrow whoosh, close up, crisp, no music",
-        "seconds": 1.6,
-        "influence": 0.7
+        "text": "a person pushing out through a leafy forest bush: soft rustling of leaves and branches brushing against cloth, a short breath of silence, then the deep twang of a wooden longbow string and an arrow flying away with a whoosh, natural outdoor forest sounds, no electricity, no sparks, no crackle, no buzz, no music",
+        "seconds": 2,
+        "influence": 0.8
       },
       "skill-arrow-storm": {
         "text": "a volley of many arrows charged with electricity: whistling arrows crackling with sparks and buzzing static, ending in a scatter of electric snaps, fantasy battle, no music",
