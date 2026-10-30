@@ -1,0 +1,25 @@
+{
+  "id": "enchantress-2",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, made of logs, planks, thatch and wooden shingles, no stone houses and no tiled roofs, standing directly on bare ground with no ground tile, base or platform under it, a narrow two-storey log workshop with a steep wooden shingle roof and a crooked chimney puffing faint violet smoke, a round window glowing with blue light, shelves of jars and crystals by the door, a few runic stones in front",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 697412335,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793351076,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 47.86,
+    "request_id": "e95493f0-e593-4f8b-b94d-66c1e6d51e1d",
+    "outputs_retained_until": 1793437474
+  }
+}

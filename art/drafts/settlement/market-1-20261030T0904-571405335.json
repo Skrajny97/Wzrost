@@ -1,0 +1,25 @@
+{
+  "id": "market-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, made of logs, planks, thatch and wooden shingles, no stone houses and no tiled roofs, standing directly on bare ground with no ground tile, base or platform under it, a village market: three wooden stalls with striped canvas awnings in red, green and yellow, crates of vegetables, baskets, bolts of cloth and clay pots on the counters, no people",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 571405335,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793351087,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 47.68,
+    "request_id": "ea3220b9-a40f-4204-9822-516305e917ae",
+    "outputs_retained_until": 1793437484
+  }
+}

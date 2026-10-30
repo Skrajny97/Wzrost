@@ -1,0 +1,25 @@
+{
+  "id": "hermitage-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, made of logs, planks, thatch and wooden shingles, no stone houses and no tiled roofs, standing directly on bare ground with no ground tile, base or platform under it, the hermit's hut: a low hut of rough logs and bark half dug into a mossy hill, a door of old planks, a carved wooden figure of a forest spirit beside it, a ring of small standing stones and candles",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 705317104,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793351101,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 47.44,
+    "request_id": "cb4b2bdf-0240-44cd-8c94-7841fe7e70c7",
+    "outputs_retained_until": 1793437499
+  }
+}

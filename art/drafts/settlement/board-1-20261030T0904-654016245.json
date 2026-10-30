@@ -1,0 +1,25 @@
+{
+  "id": "board-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, made of logs, planks, thatch and wooden shingles, no stone houses and no tiled roofs, standing directly on bare ground with no ground tile, base or platform under it, the village headman's notice board: a big plank board under a small shingle roof on two carved posts, pinned paper notes and sealed letters, a log cabin of the headman with a shingle roof and a carved wooden sign behind it",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 654016245,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793351066,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 48.04,
+    "request_id": "695366cf-4b73-41f6-8070-ab74c54eaea6",
+    "outputs_retained_until": 1793437463
+  }
+}
