@@ -444,3 +444,24 @@ export function companionGift(companion, { character, seed }, now, content) {
   const count = rng.int(tuning.min, tuning.max) + Math.floor(tuning.perTenLevels * Math.floor(character.level / 10));
   return { week, kind, key, count };
 }
+
+// Jagna's Chata zielarki (part III, question 121 A): she buys herbs and
+// potions for more than the scrapper (120 A: "wyspecjalizowani kupcy płacą
+// więcej niż złomiarz"): his price with the camp's Skup bonus, and
+// `premium` more by the standing of the relation with her.
+export function herbalistPremium(points, content) {
+  const { premium } = content.settlement.herbalist;
+  return premium[Math.min(standingOf(points, content).index, premium.length - 1)];
+}
+
+// The reputation trade gives (120 A: the limit is on the reputation only):
+// a point for every goldPerPointPerLevel gold times the character's level,
+// at most `daily` a day. `stored` is the day's count so far ({ day, points
+// }); the answer has the points now and the day's count after them.
+export function tradePoints(gold, level, stored, now, content) {
+  const { goldPerPointPerLevel, daily } = content.settlement.herbalist.reputation;
+  const day = questPeriod('daily', now, content).key;
+  const before = stored?.day === day ? stored.points : 0;
+  const points = Math.max(0, Math.min(daily - before, Math.floor(gold / (goldPerPointPerLevel * level))));
+  return { points, trade: { day, points: before + points } };
+}

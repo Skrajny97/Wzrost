@@ -2987,6 +2987,16 @@ Autor: „Do tego możesz wstępnie zacząć robić resztę co istnieje z Osady 
 8. **Rany i Punkty Czasu (113 A).** „Przewiń” przy rannym towarzyszu skraca jego rany o minutę za każdy Punkt Czasu, tak jak odpoczynek postaci.
 9. **Jeszcze nie ma:** Kwater w obozie (104 A, potrzebują grafiki budynku do oceny autora), twarzy towarzyszy (107 B; próbne popiersia 231 i 232 czekają na ocenę, a w walce towarzysz ma na razie portret swojej klasy) i cech w zdarzeniach (część IV).
 
+## Osada, część III: Chata zielarki (31.10.2026, wstępnie, na wersji testowej)
+
+Autor: „Do tego możesz wstępnie zacząć robić resztę co istnieje z Osady i wrzucać na testowy.” Z części III na razie Chata zielarki, bo jej zasady są rozstrzygnięte (120 A, 121 A). Targowisko z ofertami graczy i zaklęcie żywiołu czekają.
+
+1. **Skup Jagny (121 A).** Zielarka Jagna kupuje zioła i mikstury z torby za cenę złomiarza, razem z premią Skupu złomu w obozie, i dokłada do tego więcej według stopnia relacji z nią: +10% u Obcego, +15% u Znajomego, +20% u Stałego klienta, +25% u Zaufanego i +30% u Przyjaciela. Autor przy 120: „wyspecjalizowani kupcy płacą więcej niż złomiarz”. Sprzedaje się w obozie, bo na wyprawie zioła i mikstury są w torbie.
+2. **Reputacja za handel (120 A).** Za każde 5 złota razy poziom postaci ze sprzedaży rośnie o punkt relacja z Jagną i reputacja Bractwa Zielarzy, najwyżej o 10 punktów dziennie. Limit dotyczy tylko reputacji, a sprzedawać można bez limitu.
+    - Brakujący szczegół: liczba punktów. 10 punktów dziennie daje Znajomego po 5 dniach, tak jak kufel w Karczmie.
+3. **Powitania Jagny** na każdy stopień relacji są w danych (`residents` w `data/settlement.json`).
+4. **Jeszcze nie ma:** nauki rzadkich receptur Alchemii od wyższej relacji (121 A). Potrzebuje nowych receptur w danych, więc to propozycja na później.
+
 ## Odcienie skóry chodów: przegląd i poprawki (30.10.2026, na wersji testowej)
 
 Autor: „Najważniejsze zrobić pełne portrety po ewolucji klas w roznych odcieniach oraz ich chód w różnych odcieniach. A no i pierwsze wybrane na starcie chody w różnych odcieniach, jesli jeszcze nie zrobiłeś.”

@@ -9104,6 +9104,24 @@ a.profession-square:active {
   gap: 2px;
 }
 
+/* The Chata zielarki: a row for each herb and potion in the bag. */
+.settlement-goods {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.settlement-good {
+  display: grid;
+  gap: 4px;
+}
+
+.settlement-good > p {
+  margin: 0;
+}
+
 .settlement-companion-list {
   margin: 0;
   padding-left: 18px;

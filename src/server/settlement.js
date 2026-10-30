@@ -11,6 +11,7 @@ import {
   COMPANION_SLOTS,
   addQuestProgress,
   bagCapacity,
+  campBonus,
   campLevels,
   craftedFor,
   createRng,
@@ -26,6 +27,7 @@ import {
   evolutionChangePrice,
   evolutionChanges,
   evolvedSkills,
+  herbalistPremium,
   hireCost,
   itemName,
   itemView,
@@ -33,7 +35,9 @@ import {
   mugCost,
   parseStack,
   pathResetCost,
+  potionPrice,
   propertyName,
+  questPeriod,
   reforgeBlock,
   reforgeChoices,
   reforgeCost,
@@ -44,6 +48,7 @@ import {
   spentPoints,
   standingOf,
   statResetCost,
+  tradePoints,
   upgradedItem,
   wearOnCompanion,
   withAffix,
@@ -79,8 +84,10 @@ const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', resou
 const grow = (relations, { resident, relationGain }) => ({ ...relations, [resident]: (relations[resident] ?? 0) + relationGain });
 
 // The service each resident gives on the page, as the data names them: the
-// board's orders, the reforging or the resets; none for the others.
-const serviceOf = (residentId) => ['orders', 'reforge', 'hermit', 'tavern'].find((service) => content.settlement[service].resident === residentId) ?? null;
+// board's orders, the reforging, the resets, the Karczma or the Chata
+// zielarki; none for the others.
+const serviceOf = (residentId) =>
+  ['orders', 'reforge', 'hermit', 'tavern', 'herbalist'].find((service) => content.settlement[service].resident === residentId) ?? null;
 
 // What the row keeps of the Osada: reputation and relations by id, the
 // board, a reforging's affixes waiting for the player's choice (`pending`),
@@ -97,6 +104,7 @@ export function settlementOf(row) {
     ...(stored.rumor && { rumor: stored.rumor }),
     ...(stored.companions && { companions: stored.companions }),
     ...(stored.dismissed && { dismissed: stored.dismissed }),
+    ...(stored.trade && { trade: stored.trade }),
     ...(stored.test && { test: true }),
   };
 }
@@ -186,6 +194,7 @@ export function settlementView(player, stored, board, now) {
     },
     tavern: tavernView(player.row, stored, now),
     companions: companionsView(player, stored, now),
+    herbalist: herbalistView(player, stored, now),
     // After an evolution the paths change with it, so no path reset.
     hermit: {
       path: player.row.evolution ? null : pathResetCost(player.row.level, content),
@@ -194,6 +203,68 @@ export function settlementView(player, stored, board, now) {
     },
     now,
   };
+}
+
+// What Jagna pays for one herb or potion now (part III, 121 A): the
+// scrapper's price with the camp's Skup bonus, and her premium on top.
+function herbalistPrices(player, stored, now) {
+  const premium = herbalistPremium(stored.relations[content.settlement.herbalist.resident] ?? 0, content);
+  const bonus = campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
+  const scrap = (kind, id) => (kind === 'herb' ? content.herbsById[id].price : potionPrice(content.potionsById[id], content)) * (1 + bonus);
+  return { premium, scrap, price: (kind, id) => scrap(kind, id) * (1 + premium) };
+}
+
+// The Chata zielarki for the page: each herb and potion in the bag with
+// Jagna's price of one and the scrapper's beside it, her premium, and the
+// trade's reputation today out of the day's limit (120 A).
+function herbalistView(player, stored, now) {
+  const { premium, scrap, price } = herbalistPrices(player, stored, now);
+  const held = { herb: JSON.parse(player.row.herbs ?? '{}'), potion: JSON.parse(player.row.potions ?? '{}') };
+  const goods = (kind, list) =>
+    list.filter((good) => (held[kind][good.id] ?? 0) > 0).map((good) => ({ kind, id: good.id, name: good.name, count: held[kind][good.id], price: price(kind, good.id), scrap: scrap(kind, good.id) }));
+  const day = questPeriod('daily', now, content).key;
+  return {
+    premium,
+    goods: [...goods('herb', content.herbs), ...goods('potion', content.potions)],
+    trade: { today: stored.trade?.day === day ? stored.trade.points : 0, daily: content.settlement.herbalist.reputation.daily },
+  };
+}
+
+// { kind: herb or potion, id, count }: Jagna buys herbs or potions from the
+// bag, at home, as the scrapper does; the trade raises the relation with
+// her and the reputation with the herbalists, up to the day's limit.
+export async function sellToHerbalist(context) {
+  const { session, player } = await requireIdlePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const column = { herb: 'herbs', potion: 'potions' }[body.kind];
+  const known = { herb: content.herbsById, potion: content.potionsById }[body.kind]?.[body.id];
+  if (!column || !known) throw new ApiError(400, 'invalid_goods', 'Zielarka kupuje tylko zioła i mikstury.');
+  const held = JSON.parse(row[column] ?? '{}')[body.id] ?? 0;
+  if (!Number.isInteger(body.count) || body.count < 1 || body.count > held) throw new ApiError(409, 'not_enough', 'Nie masz tylu w torbie.');
+  const stored = settlementOf(row);
+  const gold = Math.max(1, Math.round(herbalistPrices(player, stored, context.now).price(body.kind, body.id) * body.count));
+  const { herbalist } = content.settlement;
+  const { points, trade } = tradePoints(gold, row.level, stored.trade, context.now, content);
+  const add = (counts, id) => ({ ...counts, [id]: (counts[id] ?? 0) + points });
+  const next = { ...stored, relations: add(stored.relations, herbalist.resident), reputation: add(stored.reputation, herbalist.brotherhood), trade };
+  const key = jsonPath(body.id);
+  const result = await context.env.DB.prepare(
+    `UPDATE characters SET gold = gold + ?, settlement = ?,
+       ${column} = CASE WHEN json_extract(${column}, ?) > ? THEN json_set(${column}, ?, json_extract(${column}, ?) - ?) ELSE json_remove(${column}, ?) END,
+       version = version + 1
+     WHERE id = ? AND version = ? AND COALESCE(json_extract(${column}, ?), 0) >= ?`,
+  )
+    .bind(gold, JSON.stringify(next), key, body.count, key, key, body.count, key, row.id, row.version, key, body.count)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(context.env.DB, session.userId);
+  return json({
+    sold: { count: body.count, gold, points },
+    settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
+    character: characterView(after, context.now),
+  });
 }
 
 // The Karczma: the mug's price and today's rumor once told (its words, the

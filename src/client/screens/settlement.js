@@ -12,7 +12,7 @@
 import { residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
-import { formatCountdown, formatHours, formatNumber } from '../format.js';
+import { formatCountdown, formatDecimal, formatHours, formatNumber } from '../format.js';
 import { leaveView, openView } from '../history.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
@@ -575,11 +575,59 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
+  // The Chata zielarki (part III, questions 120 A and 121 A): Jagna buys the
+  // bag's herbs and potions for more than the scrapper, at home, and the
+  // trade raises the relation with her and the herbalists' reputation up to
+  // the day's limit.
+  function herbalistCard() {
+    const { premium, goods, trade } = data.herbalist;
+    const away = Boolean(state.character.activity);
+    const sell = (good) => (event) =>
+      withButton(event.currentTarget, async () => {
+        const answer = await call('POST', '/api/settlement/herbalist', { kind: good.kind, id: good.id, count: good.count });
+        apply(answer);
+        const { gold, points } = answer.sold;
+        toast(`Jagna płaci ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z nią i reputacja Bractwa Zielarzy +${points}.` : ''}`);
+      });
+    return h(
+      'section',
+      { class: 'stack' },
+      h('h2', { class: 'section-title', text: 'Skup ziół i mikstur' }),
+      h('p', {
+        class: 'muted',
+        text: `Jagna płaci o ${Math.round(premium * 100)}% więcej niż złomiarz, a z lepszą relacją jeszcze więcej. Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.`,
+      }),
+      away && h('p', { class: 'region-warning', text: 'Zioła i mikstury są w torbie na wyprawie. Sprzedasz je po powrocie.' }),
+      goods.length === 0
+        ? h('p', { class: 'muted', text: 'W torbie nie ma ziół ani mikstur.' })
+        : h(
+            'ul',
+            { class: 'settlement-goods' },
+            goods.map((good) =>
+              h(
+                'li',
+                { class: 'settlement-good' },
+                h('p', {}, h('strong', { text: `${good.name} × ${formatNumber(good.count)}` })),
+                h('p', { class: 'muted', text: `${formatDecimal(good.price)} zł. za sztukę, u złomiarza ${formatDecimal(good.scrap)} zł.` }),
+                h('button', {
+                  type: 'button',
+                  class: 'button button--world button--small',
+                  text: `Sprzedaj wszystkie (${formatNumber(Math.max(1, Math.round(good.price * good.count)))} zł.)`,
+                  disabled: away,
+                  onClick: sell(good),
+                }),
+              ),
+            ),
+          ),
+    );
+  }
+
   // A resident's services, on their place's screen.
   function services(resident) {
     if (resident.service === 'reforge')
       return data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij afiks', onClick: reforgeSheet });
     if (resident.service === 'tavern') return h('div', { class: 'stack' }, tavernCard(), companionsCard());
+    if (resident.service === 'herbalist') return herbalistCard();
     if (resident.service !== 'hermit') return null;
     return h(
       'div',
