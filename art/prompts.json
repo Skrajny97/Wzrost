@@ -754,7 +754,11 @@
       "enchantress-2-request": { "request": "8916f533-ee8e-4306-9399-903235430d53" },
       "hermit-1-request": { "request": "3123d1e7-0a5d-425d-a99b-96d8d21c6894" },
       "innkeeper-2-request": { "request": "246d362a-1da7-4cb5-872b-a784afe349ed" },
-      "herbalist-1-request": { "request": "0e2c8db1-4b56-42be-a283-d2e757df9df7" }
+      "herbalist-1-request": { "request": "0e2c8db1-4b56-42be-a283-d2e757df9df7" },
+      "headman-1-plain": { "prompt": "an old village headman, broad grey beard and grey hair, kind but stern eyes, weathered face, a fur-trimmed brown wool coat over a linen shirt, a carved wooden staff of office, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours", "seed": 57632178, "removeBackground": false },
+      "enchantress-2-plain": { "prompt": "a calm grey-eyed woman enchantress with short silver-streaked black hair under a dark hood, a necklace of carved bone and crystal charms, a faint violet glow on her raised hand, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours", "seed": 766691881, "removeBackground": false },
+      "hermit-1-plain": { "prompt": "an old forest hermit, long white hair and beard tangled with moss, deep wrinkles, calm wise eyes, a hooded patched grey cloak, a string of wooden beads, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours", "seed": 945007554, "removeBackground": false },
+      "innkeeper-2-plain": { "prompt": "a big broad-shouldered innkeeper with a bushy red beard and a braided ponytail, a grin, a green woollen vest over a linen shirt, a towel over the shoulder, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours", "seed": 429465588, "removeBackground": false }
     }
   }
 }
