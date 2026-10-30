@@ -1,0 +1,23 @@
+{
+  "id": "companion-mage-male-1",
+  "payload": {
+    "prompt": "a young wandering mage for hire, unkempt dark hair, a short beard, curious blue eyes, a patched deep blue hooded cloak over a brown tunic, a small glowing rune stone on a cord around his neck, head and shoulders portrait, his shoulders fill the whole bottom of the picture from the left edge to the right edge, facing the viewer, three-quarter view, on a flat plain light beige background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 705937749,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793398601,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 67.01,
+    "request_id": "0ba5e9b9-0dba-448c-89a4-6c7436341038",
+    "outputs_retained_until": 1793484955
+  }
+}
