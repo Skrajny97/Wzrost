@@ -1,0 +1,13 @@
+{
+  "id": "skill-psalm",
+  "payload": {
+    "text": "a soft calm monk chant hum, then after the humming a clear sequence of bright ringing chimes and small bells, warm and peaceful, fantasy, no music",
+    "duration_seconds": 2.4,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-psalm-20261030T0741-0.mp3",
+    "audio/drafts/effects/skill-psalm-20261030T0741-1.mp3"
+  ],
+  "credits": 96
+}

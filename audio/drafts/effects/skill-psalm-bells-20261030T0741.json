@@ -1,0 +1,13 @@
+{
+  "id": "skill-psalm-bells",
+  "payload": {
+    "text": "a short sequence of bright ringing chimes and small temple bells, clear and gentle, fading out, fantasy, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-psalm-bells-20261030T0741-0.mp3",
+    "audio/drafts/effects/skill-psalm-bells-20261030T0741-1.mp3"
+  ],
+  "credits": 48
+}

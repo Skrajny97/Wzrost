@@ -1,0 +1,13 @@
+{
+  "id": "skill-execution",
+  "payload": {
+    "text": "a killing blow: a sword blade plunged deep into flesh, a wet heavy stab with a short visceral squelch, then a body slumping to the ground with a dull thud, close up, brutal, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-execution-20261030T0741-0.mp3",
+    "audio/drafts/effects/skill-execution-20261030T0741-1.mp3"
+  ],
+  "credits": 52
+}

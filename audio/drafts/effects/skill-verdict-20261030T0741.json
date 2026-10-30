@@ -1,0 +1,13 @@
+{
+  "id": "skill-verdict",
+  "payload": {
+    "text": "an epic holy verdict: a massive heavy gavel strike like thunder, a huge radiant holy blast with a deep cathedral bell boom, loud, powerful, cinematic, fantasy, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-verdict-20261030T0741-0.mp3",
+    "audio/drafts/effects/skill-verdict-20261030T0741-1.mp3"
+  ],
+  "credits": 64
+}

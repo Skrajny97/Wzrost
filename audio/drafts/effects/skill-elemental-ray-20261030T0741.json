@@ -1,0 +1,13 @@
+{
+  "id": "skill-elemental-ray",
+  "payload": {
+    "text": "a fantasy laser beam: a bright buzzing energy ray fires with a rising electric hum, a sizzling zap and a sharp laser whine, sci-fi laser style magic, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-elemental-ray-20261030T0741-0.mp3",
+    "audio/drafts/effects/skill-elemental-ray-20261030T0741-1.mp3"
+  ],
+  "credits": 64
+}

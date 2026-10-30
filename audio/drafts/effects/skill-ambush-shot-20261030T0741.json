@@ -1,0 +1,13 @@
+{
+  "id": "skill-ambush-shot",
+  "payload": {
+    "text": "a hunter bursts out from behind a dense bush: a loud clear rustle of leaves and snapping twigs, then right away one strong bowstring release and a sharp arrow whoosh, close up, crisp, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-ambush-shot-20261030T0741-0.mp3",
+    "audio/drafts/effects/skill-ambush-shot-20261030T0741-1.mp3"
+  ],
+  "credits": 64
+}
