@@ -342,6 +342,8 @@
         "text": "a heavy bow released with a deep thrum, the arrow tearing through the air with a sharp whistle and punching through wood with a loud crack, close up, dry, no music",
         "seconds": 1.2
       },
+      "skill-ambush-rustle": {"text": "leaves and thin branches of a dense forest bush rustling and snapping softly as a person pushes out through it, close up, natural, dry, no music, no voice", "seconds": 1, "influence": 0.7},
+      "skill-ambush-bow": {"text": "a wooden longbow string released with a deep twang and an arrow whooshing away into the distance, close up, dry, no music, no impact", "seconds": 1, "influence": 0.7},
       "skill-ambush-shot": {
         "text": "a person pushing out through a leafy forest bush: soft rustling of leaves and branches brushing against cloth, a short breath of silence, then the deep twang of a wooden longbow string and an arrow flying away with a whoosh, natural outdoor forest sounds, no electricity, no sparks, no crackle, no buzz, no music",
         "seconds": 2,
