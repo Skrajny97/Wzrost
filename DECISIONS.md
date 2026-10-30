@@ -3014,6 +3014,7 @@ Autor: „Pamietaj jeszcze o tych odcieniach skóry do zrobienia później ręcz
     - Wyzwanie: w czasie Wyzwania Strażnik zadaje o 50–100% więcej.
     - Wir cieni: cztery ciosy po 45–90% zamiast 20–40%.
     - W symulacji z tymi liczbami (postacie 50. i 75. poziomu, po 40 wypraw) Elementalista mdleje w 0–2,5% wypraw i zadaje o 20–46% więcej niż Mag, Strażnik zadaje o 4–15% mniej niż Wojownik i przyjmuje o 10–11% mniej, a Nocny Tancerz zadaje o 5–19% więcej niż Cień (o 3–20% więcej na poziomach 40–75) i przyjmuje o 2–15% więcej. Strażnik zostaje ewolucją obronną, która zadaje mniej: idzie to do autora jako pytanie 152.
+6. **Odpowiedź 152** (30.10.2026): „152 dobrze zalecasz będzie B”. W czasie Wyzwania Strażnik zadaje o 75–150% więcej (zamiast 50–100%); w symulacji zadaje wtedy tyle co Wojownik na 50. poziomie i o 19% więcej na 75., a przyjmuje o 11–13% mniej.
 
 ## Grafiki ewolucji: poprawki po ocenie autora (29.10.2026, na wersji testowej)
 
