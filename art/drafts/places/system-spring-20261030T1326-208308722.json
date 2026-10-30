@@ -1,0 +1,23 @@
+{
+  "id": "system-spring",
+  "payload": {
+    "prompt": "pixel art landscape, a sacred clearing deep in an old forest: a small clear spring pool fed by water trickling between mossy stones, beside the pool a low ceremonial table of carved grey stone with a shallow stone bowl of water and a few unlit candles on it, thin ice-blue glowing crystal shards and faint luminous blue lines running along the ground towards it, soft mist over the water, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and blues with ice-blue accents, no text, no border, no people, no animals",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 3,
+    "seed": 208308722,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793366808,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 34.89,
+    "request_id": "f57996f1-58b4-401c-99af-64563f15eec9",
+    "outputs_retained_until": 1793453164
+  }
+}
