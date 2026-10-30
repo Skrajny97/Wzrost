@@ -2965,6 +2965,15 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
+## Więcej walk na dłuższych wyprawach (30.10.2026, na wersji testowej)
+
+Pytanie 166 wyszło z uwagi osoby testującej grę: dwie półgodzinne wyprawy dawały razem 6 walk, a jedna godzinna 4. Autor: „nie może być więcej walk w krótkiej wyprawie niż w długiej”, a dalej: „odpowiedź B, z lekką premią z C (obniżoną jednak mimo wszystko…)”.
+
+1. **Walki** (`fightsByMinutes`): 1 minuta to 1 walka, 5 minut 2, 15 minut 3, pół godziny 4, godzina 6, 2 godziny 8, a 4 godziny 10. Każda walka nadal odpowiada za swoją część czasu (minuty na walkę podzielone przez 12), więc XP, złoto i materiały na godzinę zostają te same. Mikstur każdego rodzaju można wziąć tyle, ile walk. Punkt zastępuje liczby z punktu 6 „Nowej skali i eksploracji”.
+2. **Lekka premia za długość** (`lengthBonusByMinutes`, obniżone C): do pół godziny bez premii, godzina +2% XP i złota, 2 godziny +4%, 4 godziny +6% (pomiędzy płynnie).
+3. **Dłuższy odpoczynek** (`restBonusByMinutes`): po wygranej walce postać odzyskuje o 10 punktów procentowych więcej brakującego HP na godzinnej wyprawie i o 20 więcej na 4-godzinnej; do pół godziny bez zmian. Bez tego więcej walk na długiej wyprawie oznaczałoby więcej omdleń.
+4. **Symulacja** (postać 50. poziomu): omdlenia przy 15 minutach 0,5%, pół godzinie 0,3%, godzinie 1,2%, 2 godzinach 1,3% i 4 godzinach 3,3% (wcześniej 0,5%, 0,3%, 0,8%, 1,3% i 4,8%). XP na godzinę prawie się nie zmienia, a na 4-godzinnej jest o ok. 6% wyższe.
+
 ## Muzyka: lżejsze pliki, pobierane po starcie gry (30.10.2026, na wersji testowej)
 
 Autor: „53 B”.

@@ -609,15 +609,23 @@ describe('hunts', () => {
     assert.notDeepEqual(hunt(), hunt({ seed: 'inne' }));
   });
 
-  test('fights grow slowly with the length, rewards with the time', () => {
-    // 1 minute: 1 fight, 5 minutes: 2, 15: 3, an hour: 4, 4 hours: 5.
-    assert.deepEqual([1, 5, 15, 60, 240].map((minutes) => hunt({ minutes }).fights.length), [1, 2, 3, 4, 5]);
+  test('fights grow with the length, never fewer on a longer one, rewards with the time', () => {
+    // 1 minute: 1 fight, 5 minutes: 2, 15: 3, half an hour: 4, an hour: 6,
+    // 2 hours: 8, 4 hours: 10 (the author, 166: "nie może być więcej walk w
+    // krótkiej wyprawie niż w długiej").
+    assert.deepEqual([1, 5, 15, 30, 60, 120, 240].map((minutes) => explorationPace(minutes, content).fights), [1, 2, 3, 4, 6, 8, 10]);
+    assert.deepEqual([1, 5, 15].map((minutes) => hunt({ minutes }).fights.length), [1, 2, 3]);
     // A character that does not outgrow the place earns with the time.
     const settled = typicalCharacter('warrior', 43, content);
     const xp = (minutes) => simulateHunt({ ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes, seed: 'czas' }, content).xp;
     assert.ok(xp(240) > xp(15) * 5);
     const pace = (minutes) => explorationPace(minutes, content);
-    assert.equal(pace(240).timeFactor, 240 / 5 / content.balance.hunt.minutesPerFightReference);
+    assert.equal(pace(240).timeFactor, 240 / 10 / content.balance.hunt.minutesPerFightReference);
+    // A light bonus for the length and a longer rest after each fight.
+    assert.equal(pace(30).lengthBonus, 0);
+    assert.ok(pace(60).lengthBonus > 0 && pace(60).lengthBonus < pace(240).lengthBonus && pace(240).lengthBonus <= 0.06);
+    assert.equal(pace(30).restBonus, 0);
+    assert.ok(pace(60).restBonus > 0 && pace(60).restBonus < pace(240).restBonus);
     // Longer explorations meet demanding encounters and the elite more often.
     assert.equal(pace(1).toughChance, 0);
     assert.ok(pace(30).toughChance < pace(120).toughChance && pace(120).toughChance < pace(240).toughChance);

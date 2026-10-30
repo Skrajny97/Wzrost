@@ -121,8 +121,6 @@ export function threatSamples({ character, equipped, areaId }, content) {
 // one for each fight of a length.
 export function faintChances({ character, equipped, hp, areaId, avoidRare = false, seekRare = false, catchUp = null, healing = null }, content, samples) {
   const { maxHp, recovery, regular, tough, elite, champion, safe } = samples ?? threatSamples({ character, equipped, areaId }, content);
-  // HP after the rest that follows a won fight, for each HP left after it.
-  const rested = Array.from({ length: STEPS + 1 }, (_, left) => Math.round(left + (STEPS - left) * recovery));
   const start = Math.round((Math.min(hp, maxHp) / maxHp) * STEPS);
   // A healing potion, in steps: what it heals, and the HP below which it is
   // drunk. The chances are kept for each number of potions left.
@@ -140,6 +138,10 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
   const result = {};
   for (const minutes of durationsUpTo(content.balance.hunt.maxMinutes, content)) {
     const pace = withRareOdds(explorationPace(minutes, content), { avoidRare, seekRare, catchUp }, content);
+    // HP after the rest that follows a won fight, for each HP left after it;
+    // a longer exploration rests a little longer (restBonusByMinutes).
+    const rest = Math.min(1, recovery + pace.restBonus);
+    const rested = Array.from({ length: STEPS + 1 }, (_, left) => Math.round(left + (STEPS - left) * rest));
     // The champion is drawn first, then the elite (rollEncounter); a
     // character who avoids them meets neither, one who seeks them both more
     // often.

@@ -120,7 +120,7 @@ describe('potions in fights', () => {
   });
 
   test('an exploration takes at most one potion of a kind for each fight, and drinks no more than it took', () => {
-    assert.deepEqual([1, 5, 15, 60, 240].map((minutes) => potionsPerKind(minutes, content)), [1, 2, 3, 4, 5]);
+    assert.deepEqual([1, 5, 15, 30, 60, 120, 240].map((minutes) => potionsPerKind(minutes, content)), [1, 2, 3, 4, 6, 8, 10]);
     const { character, equipped } = typicalCharacter('warrior', 26, content);
     let drunk = 0;
     for (let i = 0; i < 20; i++) {
@@ -243,7 +243,7 @@ describe('potions through the API', () => {
     assert.equal(await error({ potions: { 'lesser-speed': 1 } }), 'invalid_potions');
     assert.equal(await error({ potions: { nothing: 1 } }), 'invalid_potions');
     assert.equal(await error({ potions: { 'lesser-mana': 3 } }), 'invalid_potions');
-    assert.equal(await error({ potions: { 'lesser-healing': 4 } }), 'invalid_potions');
+    assert.equal(await error({ potions: { 'lesser-healing': 5 } }), 'invalid_potions');
     assert.equal(await error({ potions: { 'lesser-healing': 1 }, healBelow: 0.45 }), 'invalid_heal_below');
     const threat = await call('GET', '/api/hunts/options?area=fox-ravines&heal=3&below=0.5', { cookie });
     assert.equal(threat.status, 200);

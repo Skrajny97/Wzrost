@@ -1,7 +1,10 @@
 // An exploration (called a hunt in the code): fights and finds spread over the
-// chosen time in one inner region (an area). Fights grow slowly with time
-// (1 minute: 1 fight, an hour: 4), but each stands for its share of the time,
-// so XP, gold and materials follow the time spent. Beaten creatures leave
+// chosen time in one inner region (an area). Fights grow with time
+// (1 minute: 1 fight, half an hour: 4, an hour: 6, 4 hours: 10), but each
+// stands for its share of the time, so XP, gold and materials follow the
+// time spent; a longer exploration pays a little more XP and gold
+// (lengthBonusByMinutes) and rests a little longer after each fight
+// (restBonusByMinutes). Beaten creatures leave
 // materials, never items: items come in treasure chests, found on the way,
 // left by a beaten elite, and, for a character without a weapon, right after
 // its first won fight. Longer explorations meet demanding encounters more
@@ -67,6 +70,10 @@ export function explorationPace(minutes, content) {
     eliteChance: Math.min(1, tuning.eliteChancePerFight * timeFactor),
     championChance: Math.min(1, tuning.championChancePerFight * timeFactor),
     finds: minutes / tuning.findIntervalMinutes,
+    // The author (166): "nie może być więcej walk w krótkiej wyprawie niż w
+    // długiej", with a light bonus for the length.
+    lengthBonus: byMinutes(tuning.lengthBonusByMinutes, minutes),
+    restBonus: byMinutes(tuning.restBonusByMinutes, minutes),
   };
 }
 
@@ -548,7 +555,7 @@ export function simulateHunt(
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
-        const goldFactor = rank * enemy.groupFactor * share;
+        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus);
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * goldFactor;
         const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials;
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, rng, content));
@@ -572,12 +579,12 @@ export function simulateHunt(
         chests.push([randomItem(enemies[0].level, rng, content, { ...loot, rarityId }), 'championChest']);
       }
       for (const [item] of chests) summary.chests.push(take(item));
-      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share);
+      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus));
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
       xp += summary.xp;
       reached = gainXp(reached.level, reached.xp, summary.xp, (level) => xpToNext(level, content), maxLevel);
       gold += summary.gold;
-      summary.recovered = Math.round((player.maxHp - hpNow) * player.recovery);
+      summary.recovered = Math.round((player.maxHp - hpNow) * Math.min(1, player.recovery + pace.restBonus));
       hpNow += summary.recovered;
 
       lines.push(say(texts, 'victory', step), `HP: ${hpBefore} → ${summary.hpAfter}. +${summary.xp} XP, +${summary.gold} złota.`);
