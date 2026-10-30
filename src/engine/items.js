@@ -16,9 +16,8 @@ export function generateItem({ baseId, level, rarityId = 'common', element, affi
   const base = content.basesById[baseId];
   const rarity = content.raritiesById[rarityId];
   const tuning = content.balance.items;
-  const total = budget(level, rarity.budget, content.balance);
   const baseShare = budget(level, content.rarities[0].budget, content.balance);
-  const affixShare = rarity.affixes > 0 ? (total - baseShare) / rarity.affixes : 0;
+  const share = affixShare(level, rarityId, content);
 
   const item = { base: base.id, slot: base.slot, level, rarity: rarity.id, affixes: [] };
   // A later base of a family is stronger by a flat bonus drawn once
@@ -41,7 +40,7 @@ export function generateItem({ baseId, level, rarityId = 'common', element, affi
     for (const id of affixIds.slice(0, rarity.affixes)) {
       const affix = content.affixesById[id];
       const kind = content.prefixes.includes(affix) ? 'prefix' : 'suffix';
-      item.affixes.push({ id, kind, stat: affix.stat, value: affixValue(affix.stat, affixShare, tuning) });
+      item.affixes.push({ id, kind, stat: affix.stat, value: affixValue(affix.stat, share, tuning) });
     }
     if (area) nameAffixes(item.affixes, area, rng);
     return item;
@@ -53,7 +52,7 @@ export function generateItem({ baseId, level, rarityId = 'common', element, affi
     const pool = (kind === 'prefix' ? content.prefixes : content.suffixes).filter((affix) => !used.has(affix.id));
     const affix = rng.weighted(pool);
     used.add(affix.id);
-    item.affixes.push({ id: affix.id, kind, stat: affix.stat, value: affixValue(affix.stat, affixShare, tuning) });
+    item.affixes.push({ id: affix.id, kind, stat: affix.stat, value: affixValue(affix.stat, share, tuning) });
     kind = kind === 'prefix' ? 'suffix' : 'prefix';
   }
   if (area) nameAffixes(item.affixes, area, rng);
@@ -74,7 +73,16 @@ function nameAffixes(affixes, area, rng) {
   }
 }
 
-function affixValue(stat, share, tuning) {
+// The budget each affix of an item gets: what its rarity adds to the base's,
+// shared among the rarity's affixes.
+export function affixShare(level, rarityId, content) {
+  const rarity = content.raritiesById[rarityId];
+  if (rarity.affixes === 0) return 0;
+  return (budget(level, rarity.budget, content.balance) - budget(level, content.rarities[0].budget, content.balance)) / rarity.affixes;
+}
+
+// What an affix of a stat gives at a share of the budget.
+export function affixValue(stat, share, tuning) {
   const perBudget =
     stat === 'armor' ? tuning.armorPerBudget : stat.startsWith('resist.') ? tuning.resistancePerBudget : tuning.statPerBudget;
   return Math.max(1, Math.round(share * perBudget));

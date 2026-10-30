@@ -13,7 +13,7 @@ export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
-  'events', 'encyclopedia', 'evolutions', 'gift-codes',
+  'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'dungeons', 'core'];
@@ -666,6 +666,7 @@ function checkReferences(data) {
   }
   errors.push(...checkEvents(data, { monsters, rarities }));
   errors.push(...checkEncyclopedia(data));
+  errors.push(...checkSettlement(data, { rarities }));
   return errors;
 }
 
@@ -984,4 +985,40 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(1);
   }
   console.log(`Dane gry są poprawne (plików: ${DATA_FILES.length}).`);
+}
+
+// The Osada: places of residents who live there, each kind of goods ordered
+// by one brotherhood only, standings growing from 0, order counts and
+// rarities that exist, and every rarity with affixes priced for reforging.
+function checkSettlement(data, { rarities }) {
+  const errors = [];
+  const { places, residents, brotherhoods, standings, orders, reforge } = data.settlement;
+  uniqueIds(errors, 'settlement (miejsca)', places);
+  const residentIds = uniqueIds(errors, 'settlement (mieszkańcy)', residents);
+  uniqueIds(errors, 'settlement (bractwa)', brotherhoods);
+  const standingIds = uniqueIds(errors, 'settlement (stopnie)', standings);
+  for (const place of places) {
+    if (place.resident && !residentIds.has(place.resident)) errors.push(`settlement.json: miejsce ${place.id} ma nieznanego mieszkańca ${place.resident}`);
+  }
+  for (const service of ['orders', 'reforge', 'hermit']) {
+    const { resident } = data.settlement[service];
+    if (!residentIds.has(resident)) errors.push(`settlement.json: ${service}.resident to nieznany mieszkaniec ${resident}`);
+  }
+  const kinds = brotherhoods.flatMap((brotherhood) => brotherhood.goods);
+  if (new Set(kinds).size !== kinds.length) errors.push('settlement.json: ten sam rodzaj towaru zamawiają dwa bractwa');
+  if (standings[0].points !== 0) errors.push('settlement.json: pierwszy stopień musi być od 0 punktów');
+  standings.forEach((standing, index) => {
+    if (index > 0 && standing.points <= standings[index - 1].points) errors.push('settlement.json: progi stopni muszą rosnąć');
+  });
+  if (!standingIds.has(orders.quality.from)) errors.push(`settlement.json: orders.quality.from to nieznany stopień ${orders.quality.from}`);
+  if (!rarities.has(orders.partRarity)) errors.push(`settlement.json: orders.partRarity to nieznana rzadkość ${orders.partRarity}`);
+  for (const [kind, count] of Object.entries(orders.counts)) {
+    if (count.min > count.max) errors.push(`settlement.json: orders.counts.${kind}.min nie może być większe niż max`);
+  }
+  for (const rarity of data.rarities.filter((one) => one.affixes > 0)) {
+    const cost = reforge.materials[rarity.id];
+    if (!cost) errors.push(`settlement.json: brak kosztu przekucia dla rzadkości ${rarity.id}`);
+    else if (!rarities.has(cost.rarity)) errors.push(`settlement.json: przekucie ${rarity.id} bierze materiały nieznanej rzadkości ${cost.rarity}`);
+  }
+  return errors;
 }

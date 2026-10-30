@@ -20,3 +20,7 @@ export const tutorialTestsFor = (env, login) => env.TUTORIAL_TESTS === 'on' && t
 // "Testuj ewolucję" (evolutions.js): any evolution of the class at any class
 // level, with a way back, where "Testuj samouczki" works.
 export const evolutionTestsFor = tutorialTestsFor;
+
+// "Testuj Osadę" (settlement.js): the Osada below its level, one standing
+// with everyone and new orders at once, where "Testuj samouczki" works.
+export const settlementTestsFor = tutorialTestsFor;

@@ -162,5 +162,9 @@ export function buildContent(raw) {
     eventsById: byId(raw.events?.list ?? []),
     // The Encyklopedia's tabs, tiers, chests and trophies (encyclopedia.js).
     encyclopedia: raw.encyclopedia ?? null,
+    // The Osada: its places, residents, brotherhoods, standings, board of
+    // orders, Zaklinaczka and Pustelnik (settlement.js).
+    settlement: raw.settlement ?? null,
+    residentsById: byId(raw.settlement?.residents ?? []),
   };
 }

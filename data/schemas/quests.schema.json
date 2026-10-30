@@ -61,7 +61,8 @@
               "brew",
               "brewAny",
               "make",
-              "makeAny"
+              "makeAny",
+              "orders"
             ]
           },
           "text": {
@@ -101,6 +102,10 @@
           "crafting": {
             "type": "boolean",
             "description": "Tylko tam, gdzie działa Rzemieślnictwo (przełącznik CRAFTING)."
+          },
+          "settlement": {
+            "type": "boolean",
+            "description": "Tylko z otwartą Osadą (przełącznik SETTLEMENT i jej poziom)."
           },
           "rewardFactor": {
             "type": "number",

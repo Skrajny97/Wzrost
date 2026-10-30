@@ -8466,3 +8466,54 @@ a.profession-square:active {
   flex: none;
   width: auto;
 }
+
+/* The Osada (screens/settlement.js): the board of orders, the brotherhoods
+   and the residents, as a list until the board's art comes. */
+.settlement-board,
+.settlement-residents {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.settlement-order p,
+.settlement-resident p,
+.settlement-brotherhoods p {
+  margin: 0 0 6px;
+}
+
+.settlement-story,
+.settlement-greeting {
+  font-style: italic;
+}
+
+.settlement-ask {
+  font-weight: 600;
+}
+
+.settlement-weekly {
+  color: var(--gold, #e0b84c);
+  font-weight: 600;
+}
+
+.settlement-actions {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+}
+
+.settlement-resident--soon {
+  opacity: 0.7;
+}
+
+.settlement-reforge {
+  display: grid;
+  gap: 8px;
+}
+
+/* "Testuj Osadę" on the test version (app.js): one button per standing. */
+.settlement-test-standings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

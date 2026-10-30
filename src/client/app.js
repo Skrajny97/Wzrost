@@ -21,6 +21,7 @@ import { checkChat, onChatNews } from './chat-news.js';
 import { renderCreate } from './screens/create.js';
 import { mountJournal } from './screens/journal.js';
 import { lockedScreen } from './screens/locked.js';
+import { mountSettlement } from './screens/settlement.js';
 import { mountProfessions } from './screens/professions.js';
 import { mountReport } from './screens/report.js';
 import { mountSkills } from './screens/skills.js';
@@ -33,7 +34,7 @@ import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from 
 import { narrate } from './narrator.js';
 import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
-import { call, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn } from './state.js';
+import { call, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn, unlockInfo } from './state.js';
 import { offerPointsReset, openEvolutionTests } from './evolution.js';
 import { giftCodeRow } from './gift-code.js';
 import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, skinSwatches, toast, voiceSwitch, withButton } from './ui.js';
@@ -56,7 +57,7 @@ const ROUTES = [
   { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: lockedScreen('core', 'Rdzeń') },
   // Profesje, or one profession's screen (Zielarstwo).
   { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', music: 'professions', mount: mountProfessions },
-  { pattern: /^#\/osada$/, nav: 'main', tab: 'osada', mount: lockedScreen('settlement', 'Osada') },
+  { pattern: /^#\/osada$/, nav: 'main', tab: 'osada', mount: mountSettlement },
   { pattern: /^#\/spolecznosc$/, nav: 'main', tab: 'spolecznosc', mount: mountCommunity },
   // A Wymiana with another player's character, from the Społeczność.
   { pattern: /^#\/wymiana$/, nav: 'main', tab: null, lit: 'spolecznosc', mount: mountTrade },
@@ -598,6 +599,7 @@ function openSettings() {
     state.user.tutorialTests && h('button', { type: 'button', class: 'button button--system', onClick: openTutorialTests, text: 'Testuj samouczki' }),
     state.user.tutorialTests && h('button', { type: 'button', class: 'button button--system', onClick: openEventTests, text: 'Testuj zdarzenia' }),
     state.user.tutorialTests && state.character && h('button', { type: 'button', class: 'button button--system', onClick: () => openEvolutionTests().catch((error) => toast(error.message)), text: 'Testuj ewolucję' }),
+    state.user.tutorialTests && state.character && h('button', { type: 'button', class: 'button button--system', onClick: openSettlementTests, text: 'Testuj Osadę' }),
     installButton(),
     state.user.author && h('a', { class: 'button button--system', href: '#/autor', onClick: closeSheet, text: 'Panel autora' }),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
@@ -751,6 +753,49 @@ async function openEventTests() {
       ),
     ),
     data.next && h('button', { type: 'button', class: 'button button--world', text: 'Bez wybranego zdarzenia', onClick: choose(null) }),
+  );
+}
+
+// "Testuj Osadę" on the test version (settlement.js): the Osada below its
+// level, every brotherhood and resident at one standing, and new orders on
+// the whole board at once.
+async function openSettlementTests() {
+  let standings;
+  try {
+    ({ standings } = await call('GET', '/api/test/settlement'));
+  } catch (error) {
+    toast(error.message);
+    return;
+  }
+  const run = (body, message) => (event) =>
+    withButton(event.currentTarget, async () => {
+      await call('POST', '/api/test/settlement', body);
+      closeSheet();
+      toast(message);
+      navigate('#/osada');
+    });
+  const unlock = unlockInfo('settlement');
+  openSheet(
+    h('h2', { class: 'sheet-title', text: 'Testuj Osadę' }),
+    h('p', {
+      class: 'sheet-text',
+      text: 'Na wersji testowej ustawisz tu naraz stopień u wszystkich bractw i mieszkańców. „Nowe zlecenia” zmienia od razu wszystkie zlecenia na tablicy, a oddane zlecenie tygodnia wraca.',
+    }),
+    !isUnlocked('settlement') &&
+      h('button', { type: 'button', class: 'button button--world', text: `Otwórz Osadę przed ${unlock.level}. poziomem`, onClick: run({ action: 'open' }, 'Osada otwarta do testu.') }),
+    h(
+      'div',
+      { class: 'settlement-test-standings' },
+      standings.map((standing) =>
+        h('button', {
+          type: 'button',
+          class: 'button button--system button--small',
+          text: standing.name,
+          onClick: run({ action: 'standing', standing: standing.id }, `Stopień „${standing.name}” u wszystkich bractw i mieszkańców.`),
+        }),
+      ),
+    ),
+    h('button', { type: 'button', class: 'button button--system', text: 'Nowe zlecenia', onClick: run({ action: 'orders' }, 'Na tablicy wiszą nowe zlecenia.') }),
   );
 }
 

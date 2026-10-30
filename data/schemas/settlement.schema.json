@@ -1,0 +1,194 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Osada",
+  "description": "Osada, część I: plansza z miejscami, stali mieszkańcy, bractwa i stopnie reputacji, Tablica zleceń, Zaklinaczka i Pustelnik (src/engine/settlement.js).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "description", "places", "residents", "brotherhoods", "standings", "orders", "reforge", "hermit"],
+  "definitions": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "goodKind": { "enum": ["herb", "potion", "material", "resource", "part"] },
+    "perKind": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["herb", "potion", "material", "resource", "part"],
+      "properties": {
+        "herb": { "$ref": "#/definitions/kindValue" },
+        "potion": { "$ref": "#/definitions/kindValue" },
+        "material": { "$ref": "#/definitions/kindValue" },
+        "resource": { "$ref": "#/definitions/kindValue" },
+        "part": { "$ref": "#/definitions/kindValue" }
+      }
+    },
+    "kindValue": {}
+  },
+  "properties": {
+    "$comment": { "type": "string" },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "places": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "x", "y"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "name": { "type": "string", "minLength": 1 },
+          "x": { "type": "number", "minimum": 0, "maximum": 100 },
+          "y": { "type": "number", "minimum": 0, "maximum": 100 },
+          "resident": { "$ref": "#/definitions/id" },
+          "soon": { "type": "boolean", "description": "Miejsce widać na planszy, ale otwiera się w kolejnej części." }
+        }
+      }
+    },
+    "residents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "title", "greetings"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "name": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "greetings": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "Powitanie na każdym stopniu relacji, po kolei; ostatnie zostaje na wyższych." }
+        }
+      }
+    },
+    "brotherhoods": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "goods"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "name": { "type": "string", "minLength": 1 },
+          "goods": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/definitions/goodKind" } }
+        }
+      }
+    },
+    "standings": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "points"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "name": { "type": "string", "minLength": 1 },
+          "points": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "orders": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resident", "open", "refillMinutes", "reputation", "relationGain", "weekly", "pay", "resourceGold", "partGold", "partRarity", "counts", "quality", "systemPoints", "stories"],
+      "properties": {
+        "open": { "type": "integer", "minimum": 1 },
+        "refillMinutes": { "type": "integer", "minimum": 1 },
+        "reputation": { "type": "integer", "minimum": 1 },
+        "resident": { "type": "string", "description": "Mieszkaniec, który wiesza zlecenia; relationGain to przyrost relacji z nim." },
+        "relationGain": { "type": "integer", "minimum": 0 },
+        "weekly": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count", "reward", "reputation"],
+          "properties": {
+            "count": { "type": "number", "minimum": 1 },
+            "reward": { "type": "number", "minimum": 1 },
+            "reputation": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "pay": {
+          "allOf": [{ "$ref": "#/definitions/perKind" }],
+          "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }
+        },
+        "resourceGold": { "type": "number", "exclusiveMinimum": 0 },
+        "partGold": { "type": "number", "exclusiveMinimum": 0 },
+        "partRarity": { "$ref": "#/definitions/id" },
+        "counts": {
+          "allOf": [{ "$ref": "#/definitions/perKind" }],
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["min", "max", "perTenLevels"],
+            "properties": {
+              "min": { "type": "integer", "minimum": 1 },
+              "max": { "type": "integer", "minimum": 1 },
+              "perTenLevels": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "quality": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["from", "chance", "reward"],
+          "properties": {
+            "from": { "$ref": "#/definitions/id" },
+            "chance": { "type": "number", "minimum": 0, "maximum": 1 },
+            "reward": { "type": "number", "minimum": 1 }
+          }
+        },
+        "systemPoints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["every", "points", "weekly"],
+          "properties": {
+            "every": { "type": "integer", "minimum": 1 },
+            "points": { "type": "integer", "minimum": 0 },
+            "weekly": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "stories": {
+          "allOf": [{ "$ref": "#/definitions/perKind" }],
+          "additionalProperties": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    },
+    "reforge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resident", "goldPerLevel", "growth", "materials", "relationGain"],
+      "properties": {
+        "goldPerLevel": { "type": "number", "exclusiveMinimum": 0 },
+        "growth": { "type": "number", "minimum": 1 },
+        "materials": {
+          "type": "object",
+          "description": "Według rzadkości przedmiotu: rzadkość i liczba sztuk materiału stworów.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rarity", "count"],
+            "properties": {
+              "rarity": { "$ref": "#/definitions/id" },
+              "count": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        "resident": { "type": "string", "description": "Mieszkaniec tej usługi; relationGain to przyrost relacji z nim." },
+        "relationGain": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "hermit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resident", "pathGoldPerLevel", "evolutionGold", "evolutionGrowth", "statsFromLevel", "statsGoldPerLevel", "relationGain"],
+      "properties": {
+        "pathGoldPerLevel": { "type": "number", "exclusiveMinimum": 0 },
+        "evolutionGold": { "type": "integer", "minimum": 1 },
+        "evolutionGrowth": { "type": "number", "minimum": 1 },
+        "statsFromLevel": { "type": "integer", "minimum": 1 },
+        "statsGoldPerLevel": { "type": "number", "exclusiveMinimum": 0 },
+        "resident": { "type": "string", "description": "Mieszkaniec tej usługi; relationGain to przyrost relacji z nim." },
+        "relationGain": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

@@ -45,7 +45,9 @@
   {
     "id": "settlement",
     "name": "Osada",
-    "level": 20
+    "level": 20,
+    "feature": "settlement",
+    "message": "Odblokowano Osadę. Mieszkańcy czekają w zakładce Osada."
   },
   {
     "id": "hunts-1h",

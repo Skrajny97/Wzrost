@@ -17,6 +17,7 @@ let registration = true;
 let events = false;
 let eventDrafts = false;
 let evolutions = true;
+let settlement = false;
 
 export function readFeatures(env) {
   professions = env.PROFESSIONS === 'on';
@@ -25,6 +26,7 @@ export function readFeatures(env) {
   events = env.EVENTS === 'on' || env.EVENTS === 'test';
   eventDrafts = env.EVENTS === 'test';
   evolutions = env.EVOLUTIONS !== 'off';
+  settlement = env.SETTLEMENT === 'on';
 }
 
 export const professionsOn = () => professions;
@@ -36,3 +38,5 @@ export const eventsOn = () => events;
 export const eventDraftsOn = () => eventDrafts;
 // The class evolutions (evolutions.js) and their Ewolucja tab.
 export const evolutionsOn = () => evolutions;
+// The Osada (settlement.js), first only where SETTLEMENT is "on".
+export const settlementOn = () => settlement;

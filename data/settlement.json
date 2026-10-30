@@ -1,0 +1,127 @@
+{
+  "$comment": "Osada (src/engine/settlement.js), część I: plansza z miejscami (places, jak plansza obozu: x i y w procentach), stali mieszkańcy (residents, każdy w swoim miejscu) i bractwa (brotherhoods), u których rośnie reputacja. standings: stopnie reputacji bractwa i relacji z mieszkańcem, od points punktów. Zlecenia (orders): na tablicy wisi open zleceń naraz; w miejsce oddanego albo odrzuconego nowe przychodzi po refillMinutes minut, a co tydzień (zegar zadań narratora) wisi jedno duże (weekly: count razy więcej sztuk, reward razy większa nagroda, reputation punktów). Zlecenie prosi o to, co postać już umie zdobyć (goods: herb zioła, które zna Zielarstwo, potion mikstury znane w Alchemii, material materiały stworów, które postać spotkała, resource zasoby obozu, part części do rzemiosła do rzadkości z partRarity), w ilości z counts (od, do, na 10 poziomów postaci więcej o perTenLevels). Płaci pay razy cenę rynkową (herb: cena zioła, potion: potionPrice, material: materialPrice, resource: resourceGold, part: partGold razy mnożnik sprzedaży rzadkości), czyli powyżej ceny, którą daje złomiarz, ale poniżej ceny, za którą da się to kupić: zasób u ducha ognia, a część na Ladzie złomiarza, na ich najwyższym poziomie, także w zleceniu tygodnia (sprawdza to test/settlement.test.js); daje reputation punktów bractwu i relationGain punktów relacji z mieszkańcem, który je wiesza (resident). Od stopnia quality.from zlecenie z szansą quality.chance prosi o materiał rzadkości o jedną wyżej i płaci quality.reward razy więcej. Co systemPoints.every oddane zlecenie daje systemPoints.points Punktów Systemu, a tygodniowe systemPoints.weekly. stories: zdanie zamawiającego, po kilka na rodzaj. Zaklinaczka (reforge; resident to jej id wśród mieszkańców): przekucie jednego afiksu przedmiotu kosztuje goldPerLevel złota za poziom przedmiotu razy mnożnik sprzedaży rzadkości, razy growth za każde wcześniejsze przekucie tego przedmiotu, i materials: tyle sztuk materiału stworów danej rzadkości (rarity materiału według rzadkości przedmiotu). Pustelnik (hermit; resident to jego id wśród mieszkańców): zerowanie ścieżki za pathGoldPerLevel złota za poziom postaci; zmiana ewolucji pierwszy raz darmo, potem evolutionGold, każda kolejna evolutionGrowth razy drożej; zerowanie statystyk od statsFromLevel (po darmowym do 20. poziomu) za statsGoldPerLevel złota za poziom.",
+  "name": "Rozstaje",
+  "description": "Osada na skrzyżowaniu leśnych dróg, za puszczą. Ludzie stąd handlują ze wszystkimi, którzy wychodzą z lasu żywi.",
+  "places": [
+    { "id": "board", "name": "Tablica zleceń", "x": 50, "y": 54, "resident": "headman" },
+    { "id": "enchanter", "name": "Pracownia Zaklinaczki", "x": 26, "y": 38, "resident": "enchantress" },
+    { "id": "hermitage", "name": "Pustelnia", "x": 80, "y": 24, "resident": "hermit" },
+    { "id": "tavern", "name": "Karczma", "x": 70, "y": 62, "resident": "innkeeper", "soon": true },
+    { "id": "market", "name": "Targ", "x": 40, "y": 74, "soon": true },
+    { "id": "herbalist", "name": "Chata zielarki", "x": 16, "y": 66, "resident": "herbalist", "soon": true }
+  ],
+  "residents": [
+    {
+      "id": "headman",
+      "name": "Bogumił",
+      "title": "sołtys",
+      "greetings": [
+        "Nowa twarz. Na tablicy zawsze coś wisi, a my płacimy uczciwie.",
+        "Ludzie pytali, czy znowu przyjdziesz. Mam dla ciebie zlecenia.",
+        "Dla stałych klientów odkładam najlepsze zamówienia.",
+        "Tobie mogę powierzyć sprawy, o których nie mówi się na głos.",
+        "Rozstaje mają w tobie przyjaciela. To się tu pamięta."
+      ]
+    },
+    {
+      "id": "enchantress",
+      "name": "Wiedana",
+      "title": "zaklinaczka",
+      "greetings": [
+        "Nie dotykaj kryształów. Czego chcesz?",
+        "A, to ty. Pokaż, co masz z lasu.",
+        "Twoje przedmioty mają w sobie więcej, niż widać. Mogę to wydobyć.",
+        "Dla ciebie zostaję w pracowni dłużej.",
+        "Mało komu pokazuję, co naprawdę potrafię. Tobie pokażę."
+      ]
+    },
+    {
+      "id": "hermit",
+      "name": "Sambor",
+      "title": "pustelnik",
+      "greetings": [
+        "Każdą drogę można zacząć od nowa. Pytanie tylko, ile to dla ciebie warte.",
+        "Znowu tutaj. Coś cię uwiera w tym, kim się stajesz?",
+        "Siadaj. Zmiana wymaga spokoju.",
+        "Rzadko ktoś tu wraca tyle razy. Rozumiesz już, czego szukasz.",
+        "Jesteś jednym z niewielu, z którymi rozmawiam bez pośpiechu."
+      ]
+    },
+    { "id": "innkeeper", "name": "Zbylut", "title": "karczmarz", "greetings": ["Karczma jeszcze zamknięta. Remont."] },
+    { "id": "herbalist", "name": "Jagna", "title": "zielarka", "greetings": ["Przyjdź, gdy chata będzie gotowa."] }
+  ],
+  "brotherhoods": [
+    { "id": "herbalists", "name": "Bractwo Zielarzy", "goods": ["herb", "potion"] },
+    { "id": "smiths", "name": "Bractwo Kowali", "goods": ["part", "resource"] },
+    { "id": "hunters", "name": "Bractwo Łowców", "goods": ["material"] },
+    { "id": "merchants", "name": "Kompania Kupców", "goods": [] }
+  ],
+  "standings": [
+    { "id": "stranger", "name": "Obcy", "points": 0 },
+    { "id": "acquaintance", "name": "Znajomy", "points": 50 },
+    { "id": "regular", "name": "Stały klient", "points": 250 },
+    { "id": "trusted", "name": "Zaufany", "points": 700 },
+    { "id": "friend", "name": "Przyjaciel", "points": 1400 }
+  ],
+  "orders": {
+    "resident": "headman",
+    "open": 3,
+    "refillMinutes": 180,
+    "reputation": 10,
+    "relationGain": 2,
+    "weekly": { "count": 4, "reward": 5, "reputation": 50 },
+    "pay": { "herb": 1.6, "potion": 1.4, "material": 1.6, "resource": 0.8, "part": 0.45 },
+    "resourceGold": 4,
+    "partGold": 40,
+    "partRarity": "rare",
+    "counts": {
+      "herb": { "min": 4, "max": 10, "perTenLevels": 2 },
+      "potion": { "min": 1, "max": 3, "perTenLevels": 1 },
+      "material": { "min": 2, "max": 6, "perTenLevels": 1 },
+      "resource": { "min": 10, "max": 30, "perTenLevels": 5 },
+      "part": { "min": 2, "max": 5, "perTenLevels": 1 }
+    },
+    "quality": { "from": "regular", "chance": 0.3, "reward": 2 },
+    "systemPoints": { "every": 3, "points": 1, "weekly": 5 },
+    "stories": {
+      "herb": [
+        "Syn idzie jutro na Wiatrołomy, a ja nie mam czym opatrzyć mu ran.",
+        "Stara Dobrawa znowu kaszle. Zioła z lasu pomagają jej lepiej niż modlitwy.",
+        "Suszę na zimę, póki jeszcze można."
+      ],
+      "potion": [
+        "Karawana rusza o świcie, a nikt nie chce iść bez mikstur.",
+        "Mój brat wrócił z lasu blady jak płótno. Potrzebuję czegoś mocniejszego niż napar."
+      ],
+      "material": [
+        "Kuśnierz z miasta płaci za skóry więcej niż ktokolwiek tutaj.",
+        "Chcę pokazać młodym, z czym przyjdzie im się mierzyć za palisadą.",
+        "Na amulety. Nie pytaj, dla kogo."
+      ],
+      "resource": [
+        "Most na brodzie znowu się sypie.",
+        "Kuźnia stoi, bo zabrakło budulca."
+      ],
+      "part": [
+        "Kowal ma więcej zamówień niż rąk. Przydadzą się gotowe części.",
+        "Wóz kupca rozpadł się na trakcie. Trzeba go jakoś poskładać."
+      ]
+    }
+  },
+  "reforge": {
+    "resident": "enchantress",
+    "goldPerLevel": 30,
+    "growth": 1.25,
+    "materials": { "rare": { "rarity": "common", "count": 3 }, "unique": { "rarity": "common", "count": 5 }, "epic": { "rarity": "rare", "count": 3 }, "legendary": { "rarity": "rare", "count": 5 }, "mythic": { "rarity": "unique", "count": 3 }, "divine": { "rarity": "unique", "count": 5 } },
+    "relationGain": 5
+  },
+  "hermit": {
+    "resident": "hermit",
+    "pathGoldPerLevel": 200,
+    "evolutionGold": 100000,
+    "evolutionGrowth": 2,
+    "statsFromLevel": 21,
+    "statsGoldPerLevel": 100,
+    "relationGain": 10
+  }
+}

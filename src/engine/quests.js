@@ -130,13 +130,13 @@ const questPotions = (character, content) =>
 // author: "by ktoś z wyższym levelem nie był wysyłany na niskolevelowe
 // potwory"): when its class opens nothing harder, or it has outgrown every
 // place, the other kinds remain.
-function questOptions(periodId, { character, hasTable, hasProfessions = false, hasCrafting = false }, content) {
+function questOptions(periodId, { character, hasTable, hasProfessions = false, hasCrafting = false, hasSettlement = false }, content) {
   const areas = questAreas(periodId, character, content);
   // Each creature of those places, as often as a fight of its place brings it.
   const perFight = new Map();
   for (const area of areas) for (const [target, share] of creaturesPerFight(area, character.level)) perFight.set(target, Math.max(perFight.get(target) ?? 0, share));
   return content.quests.kinds.flatMap((kind) => {
-    if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions) || (kind.crafting && !hasCrafting)) return [];
+    if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions) || (kind.crafting && !hasCrafting) || (kind.settlement && !hasSettlement)) return [];
     if ((kind.id === 'kill' || kind.id === 'killAny') && areas.length === 0) return [];
     // Regions to open: only for a new character, no more than open within
     // reach of its class level, and fewer as the class grows (`most`).
@@ -205,9 +205,9 @@ const newQuest = (option, periodId, character, rng, content) => ({
 
 // A period's quests, drawn from `seed` for the character as it is: no
 // option twice, in the order of the kinds.
-export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, seed }, content) {
+export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, content) {
   const rng = createRng(seed);
-  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting }, content);
+  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement }, content);
   const drawn = [];
   while (drawn.length < content.quests.periods[periodId].count && options.length > 0) {
     const option = rng.weighted(options);
@@ -232,11 +232,11 @@ const lostQuest = (quest, character, content) => quest.kind === 'kill' && !quest
 // A kept period with each lost quest drawn anew in its place, among what the
 // character may get now and the period does not ask for yet; the other
 // quests stay as they are, with their progress and rewards.
-function healedPeriod(period, periodId, { character, hasTable, hasProfessions, hasCrafting, seed }, content) {
+function healedPeriod(period, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, content) {
   const lost = (quest) => lostQuest(quest, character, content);
   if (!period.quests.some(lost)) return period;
   const asked = (option) => period.quests.some((quest) => !lost(quest) && quest.kind === option.kind.id && quest.target === option.target);
-  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting }, content).filter((option) => !asked(option));
+  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement }, content).filter((option) => !asked(option));
   return {
     ...period,
     quests: period.quests.map((quest, index) => {
@@ -252,13 +252,13 @@ function healedPeriod(period, periodId, { character, hasTable, hasProfessions, h
 // Both periods' quests at `now`: those kept while their period lasts (with
 // the lost ones drawn anew), new ones once it has passed. `seed` is the
 // character's.
-export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, seed }, now, content) {
+export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, now, content) {
   return Object.fromEntries(
     QUEST_PERIODS.map((periodId) => {
       const { key } = questPeriod(periodId, now, content);
       const kept = stored?.[periodId];
-      if (kept?.period === key) return [periodId, healedPeriod(kept, periodId, { character, hasTable, hasProfessions, hasCrafting, seed }, content)];
-      const quests = drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, seed: `${seed}:${periodId}:${key}` }, content);
+      if (kept?.period === key) return [periodId, healedPeriod(kept, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, content)];
+      const quests = drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed: `${seed}:${periodId}:${key}` }, content);
       return [periodId, { period: key, quests, chest: false }];
     }),
   );
@@ -284,9 +284,9 @@ export function huntKills(hunt, content) {
 // explored, materials `processed`, items `salvaged`, herbs gathered (`herbs`
 // by id, all of those found, also those the bag lost), potions brewed
 // (`potions` by id, the same way), items `made` in the Warsztat (only
-// those that came out) and inner regions `opened` by new class levels. A
-// quest stops at its count.
-export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, opened = 0 }) {
+// those that came out), inner regions `opened` by new class levels and
+// `orders` delivered in the Osada. A quest stops at its count.
+export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, opened = 0, orders = 0 }) {
   const total = (counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
   const gathered = total(herbs);
   const gain = {
@@ -302,6 +302,7 @@ export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 
     brewAny: () => total(potions),
     make: () => made,
     makeAny: () => made,
+    orders: () => orders,
   };
   return Object.fromEntries(
     Object.entries(quests).map(([periodId, period]) => [

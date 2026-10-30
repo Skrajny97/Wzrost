@@ -29,6 +29,7 @@ import {
   fireUnitsMade,
   freePoints,
   gainedTimePoints,
+  goodStock,
   heldDiscoveries,
   bagStacks,
   hoursToNext,
@@ -52,6 +53,7 @@ import {
   restBonus,
   restedHp,
   salvageYield,
+  settleBoard,
   settleCrafting,
   shopBought,
   shopLeft,
@@ -69,12 +71,13 @@ import {
   buffLeft,
   optionWindows,
   TIMED_KINDS,
+  BAG_GOODS,
   timedKind,
 } from '../engine/index.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
 import { content } from './content.js';
-import { craftingOn, professionsOn } from './features.js';
+import { craftingOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
 import { requirePlayable } from './sessions.js';
@@ -312,9 +315,42 @@ async function settleTimePoints(db, row, now) {
   else Object.assign(row, await db.prepare('SELECT time_points, time_points_at FROM characters WHERE id = ?').bind(row.id).first());
 }
 
+// The Osada opened below its level by "Testuj Osadę" (settlement.js).
+const settlementTest = (row) => settlementOn() && JSON.parse(row.settlement ?? '{}').test === true;
+
+// Whether the character has the Osada: where the deployment has it on, from
+// its level, or opened by "Testuj Osadę".
+const settlementOpen = (row) =>
+  settlementOn() && Boolean(content.settlement) && (row.level >= content.unlocksById.settlement.level || settlementTest(row));
+
+// What the character holds of the goods the Osada's orders ask for, by the
+// column each kind is kept in.
+export const settlementGoods = (row) =>
+  Object.fromEntries(['herbs', 'potions', 'materials', 'resources', 'parts'].map((column) => [column, JSON.parse(row[column] ?? '{}')]));
+
+// The Osada's board at `now` for the character as it is: the stored one
+// (settlement.js) with the orders whose time has come.
+export function settlementBoard(row, stored, now) {
+  const character = { ...engineCharacter(row), met: JSON.parse(row.met ?? '[]') };
+  return settleBoard(stored.board, { character, reputation: stored.reputation, seed: `${row.id}:settlement` }, now, content);
+}
+
+// Whether an order on the board, the week's included, can be delivered
+// now: the dot on the Osada tab. While the character is `away`, the orders
+// for the bag's goods wait (BAG_GOODS).
+function settlementWaiting(row, now, away) {
+  if (!settlementOpen(row)) return false;
+  const stored = JSON.parse(row.settlement ?? '{}');
+  const board = settlementBoard(row, { board: stored.board ?? null, reputation: stored.reputation ?? {} }, now);
+  const goods = settlementGoods(row);
+  const weekly = board.weekly && !board.weekly.done ? board.weekly.order : null;
+  return [...board.slots.map((slot) => slot.order), weekly].some((order) => order && !(away && BAG_GOODS.has(order.kind)) && goodStock(order, goods) >= order.count);
+}
+
 // What a period's quests are drawn from: the character as it is, whether its
 // Stół rozbiórki stands, which professions it has (Rzemieślnictwo where it
-// works and from its own level), and its id for the seed (quests.js).
+// works and from its own level), whether its Osada is open, and its id for
+// the seed (quests.js).
 export function questContext(player, now) {
   const hasProfessions = professionsOn() && isUnlocked('professions', player.row.level, content);
   const crafting = content.professionsById[content.workshop.profession];
@@ -323,6 +359,7 @@ export function questContext(player, now) {
     hasTable: craftTable(campLevels(player.buildings, now, content), content).pace > 0,
     hasProfessions,
     hasCrafting: hasProfessions && craftingOn() && professionOpen(crafting, player.row.level, content),
+    hasSettlement: settlementOpen(player.row),
     seed: player.row.id,
   };
 }
@@ -804,8 +841,12 @@ export function characterView(player, now) {
     mana: values.mana,
     maxMana: values.mana,
     // An evolution tried below its class level on the test version opens
-    // its tab too.
-    features: [...new Set([...unlockedFeatures(row.level, content, row.class_level), ...(row.evolution ? ['evolution'] : [])])],
+    // its tab too, and so does the Osada opened by "Testuj Osadę".
+    features: [
+      ...new Set([...unlockedFeatures(row.level, content, row.class_level), ...(row.evolution ? ['evolution'] : []), ...(settlementTest(row) ? ['settlement'] : [])]),
+    ],
+    // An order of the Osada that can be delivered now lights its tab.
+    settlementWaiting: settlementWaiting(row, now, Boolean(activity)),
     huntDurations: huntDurations(row.level, content),
     // Szybkie Polowania left today (hunts.js), or null below their level.
     quickHunts: quickHuntsView(row, now),

@@ -296,11 +296,13 @@ export function updateTopbar(now = serverNow()) {
 // Free stat points light Postać and Statystyki with a gold dot, a skill to
 // choose or a Skill Point to spend lights Postać and Umiejętności, an
 // evolution to choose lights Postać and Ewolucja, and a message someone wrote
-// in the chat lights Społeczność (chat-news.js), as a quest's reward lights
-// the narrator's face in the top bar.
+// in the chat lights Społeczność (chat-news.js), an order of the Osada that
+// can be delivered lights Osada, as a quest's reward lights the narrator's
+// face in the top bar.
 const pointsWaiting = () => (state.character?.freePoints ?? 0) > 0 && isUnlocked('stats');
 const skillsWaiting = () => Boolean(state.character?.skills?.ready) && isUnlocked('skills');
 const evolutionWaiting = () => (state.character?.evolution?.choices?.length ?? 0) > 0 && isUnlocked('evolution');
+const settlementWaiting = () => Boolean(state.character?.settlementWaiting) && isUnlocked('settlement');
 // While the character explores or works in a profession, the tab of that
 // activity counts its time down in the System's light, as the camp counts a
 // build; then a dot says the report waits (updateNavTimers, every second).
@@ -323,10 +325,11 @@ const WAITING = {
   skills: skillsWaiting,
   evolution: evolutionWaiting,
   spolecznosc: communityNews,
+  osada: settlementWaiting,
   walka: () => tabTime('walka').ready,
   profesje: () => tabTime('profesje').ready,
 };
-const WAITING_TEXTS = { walka: 'raport czeka', profesje: 'raport czeka', evolution: 'ewolucja czeka' };
+const WAITING_TEXTS = { walka: 'raport czeka', profesje: 'raport czeka', evolution: 'ewolucja czeka', osada: 'zlecenie czeka' };
 function waitingText(id) {
   if (id === 'spolecznosc') return communityNewsText();
   if (WAITING_TEXTS[id]) return WAITING_TEXTS[id];

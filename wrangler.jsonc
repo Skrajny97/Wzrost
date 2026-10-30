@@ -105,7 +105,9 @@
         // settings (TUTORIAL_TESTS).
         "EVENTS": "test",
         // The class evolutions, with "Testuj ewolucję" (TUTORIAL_TESTS).
-        "EVOLUTIONS": "on"
+        "EVOLUTIONS": "on",
+        // The Osada (src/server/settlement.js), only here until it is ready.
+        "SETTLEMENT": "on"
       },
       "triggers": {
         "crons": ["* * * * *"]

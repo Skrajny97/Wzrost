@@ -2,7 +2,7 @@
 // data/schemas before every deploy).
 
 import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, landBestiaryChest, meetingChances, regionDangers } from '../engine/index.js';
-import { craftingOn, evolutionsOn } from './features.js';
+import { craftingOn, evolutionsOn, settlementOn } from './features.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
 import classes from '../../data/classes.json' with { type: 'json' };
@@ -35,6 +35,7 @@ import events from '../../data/events.json' with { type: 'json' };
 import encyclopedia from '../../data/encyclopedia.json' with { type: 'json' };
 import evolutions from '../../data/evolutions.json' with { type: 'json' };
 import giftCodes from '../../data/gift-codes.json' with { type: 'json' };
+import settlement from '../../data/settlement.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -65,12 +66,13 @@ export const content = buildContent({
   encyclopedia,
   evolutions,
   'gift-codes': giftCodes,
+  settlement,
 });
 
 // The parts of the game this deployment has on, for the System's messages
 // about them (unlocks.json `feature`): read when asked, as the switches are
 // read for each request (features.js).
-Object.defineProperty(content, 'features', { get: () => (craftingOn() ? ['crafting'] : []) });
+Object.defineProperty(content, 'features', { get: () => [...(craftingOn() ? ['crafting'] : []), ...(settlementOn() ? ['settlement'] : [])] });
 
 // The class evolutions, where the deployment has them on (features.js).
 // Where they are off the game plays as before them: the class grows past

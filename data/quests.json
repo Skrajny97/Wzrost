@@ -123,6 +123,15 @@
       "weight": 0.5,
       "rewardFactor": 2,
       "weekly": { "count": [5, 5] }
+    },
+    {
+      "id": "orders",
+      "text": "Wykonaj {count} {noun} w Osadzie.",
+      "counted": ["zlecenie", "zlecenia", "zleceń"],
+      "settlement": true,
+      "weight": 1,
+      "daily": { "count": [2, 2] },
+      "weekly": { "count": [8, 8] }
     }
   ],
   "rewards": {
