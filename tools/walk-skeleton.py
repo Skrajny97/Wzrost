@@ -3,12 +3,16 @@
 # walk that loops (contact, passing, contact with the other leg, passing),
 # the far limbs darker, the body lower at contact and higher when passing.
 # Frames of 128 x 128 on a flat background (Retro Diffusion takes an RGB
-# picture), in a 2 x 2 sheet. Needs Python 3 and Pillow:
-#   python3 tools/walk-skeleton.py art/references/walks/skeleton.png
-import math, sys
+# picture), in a 2 x 2 sheet, and the joints of each frame as PixelLab's
+# skeleton (tools/animate-walks.mjs): 18 joints, x and y as fractions of the
+# frame, the right side the near one (the figure faces right). Needs Python 3
+# and Pillow:
+#   python3 tools/walk-skeleton.py art/references/walks/skeleton.png art/references/walks/skeleton.json
+import json, math, sys
 from PIL import Image, ImageDraw
 
 OUT = sys.argv[1]
+JOINTS = sys.argv[2] if len(sys.argv) > 2 else None
 S = 128
 GROUND = 122
 BG = (214, 210, 200)
@@ -119,11 +123,39 @@ def frame(spec):
     d.point((head[0] + 4, head[1] - 1), fill=OUTLINE)
     d.point((head[0] + 4, head[1]), fill=OUTLINE)
     draw_layer(d, leg_shapes(near, 10), NEAR)
-    draw_layer(d, arm_shapes(arm(*shoulder, *spec['na']), 8), NEAR)
-    return im
+    near_arm = arm(*shoulder, *spec['na'])
+    far_arm = arm(shoulder[0] + 2, shoulder[1], *spec['fa'])
+    draw_layer(d, arm_shapes(near_arm, 8), NEAR)
+    # Behind the body 0, the body and head 1, in front of it 2.
+    joints = [
+        ('NOSE', (head[0] + HEAD_R + 1, head[1] + 2), 1),
+        ('NECK', neck, 1),
+        ('RIGHT EYE', (head[0] + 4, head[1] - 1), 1),
+        ('LEFT EYE', (head[0] + 5, head[1] - 1), 0),
+        ('RIGHT EAR', (head[0] - 2, head[1]), 1),
+        ('LEFT EAR', (head[0] - 1, head[1]), 0),
+        ('RIGHT SHOULDER', near_arm['shoulder'], 2),
+        ('RIGHT ELBOW', near_arm['elbow'], 2),
+        ('RIGHT ARM', near_arm['wrist'], 2),
+        ('LEFT SHOULDER', far_arm['shoulder'], 0),
+        ('LEFT ELBOW', far_arm['elbow'], 0),
+        ('LEFT ARM', far_arm['wrist'], 0),
+        ('RIGHT HIP', near['hip'], 2),
+        ('RIGHT KNEE', near['knee'], 2),
+        ('RIGHT LEG', near['ankle'], 2),
+        ('LEFT HIP', far['hip'], 0),
+        ('LEFT KNEE', far['knee'], 0),
+        ('LEFT LEG', far['ankle'], 0),
+    ]
+    skeleton = [{'label': label, 'x': round(x / S, 4), 'y': round(y / S, 4), 'z_index': z} for label, (x, y), z in joints]
+    return im, skeleton
 
 frames = [frame(spec) for spec in FRAMES]
 sheet = Image.new('RGB', (S * 2, S * 2), BG)
-for index, im in enumerate(frames):
+for index, (im, _) in enumerate(frames):
     sheet.paste(im, ((index % 2) * S, (index // 2) * S))
 sheet.save(OUT)
+if JOINTS:
+    with open(JOINTS, 'w', encoding='utf8') as file:
+        json.dump({'size': S, 'frames': [skeleton for _, skeleton in frames]}, file, indent=1)
+        file.write('\n')
