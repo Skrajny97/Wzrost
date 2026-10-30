@@ -2971,6 +2971,16 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
+## Wersja 0.0.59 (30.10.2026)
+
+Autor: „Możesz również zrobić deploy 0.0.59 z zakresem: więcej walk na dłuższych wyprawach (166), kwestie o Bestiariuszu i Encyklopedii oraz lżejsza muzyka.”
+
+1. **Co wchodzi do gry:**
+    - więcej walk na dłuższych wyprawach z lekką premią za długość i dłuższym odpoczynkiem (zob. „Więcej walk na dłuższych wyprawach”);
+    - kwestie narratora o Bestiariuszu i Encyklopedii w pierwszym wprowadzeniu (zob. „Wprowadzenie: Bestiariusz i Encyklopedia”);
+    - lżejsze pliki muzyki, pobierane po starcie gry (zob. „Muzyka: lżejsze pliki, pobierane po starcie gry”).
+2. **Co zostaje ukryte w grze:** ewolucje klas (`EVOLUTIONS` „off”) i Osada (bez `SETTLEMENT`), a z nimi wszystko, co od nich zależy: ich rozdziały narratora, dźwięki i chody ewolucji, przywołańce we własnej karcie i zwijane zlecenia. Ich kod i grafiki są w plikach gry, ale gra ich nie pokazuje.
+
 ## Narrator: Osada i Ewolucja (30.10.2026, na wersji testowej)
 
 Kwestie z pytań 167 i 168 w brzmieniu z poprawkami autora (`data/tutorial.json`, części `settlement` i `evolution`). Każda część ma swój przycisk „Pomiń objaśnienie”.
