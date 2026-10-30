@@ -2985,6 +2985,14 @@ Autor: „Wdrażaj filtr nazw, „Dodaj 10 Punktów”, pięć postaci, Skrzynia
 3. **Co zostaje ukryte:** Osada (bez `SETTLEMENT`).
 4. **Migracje bazy:** `0056` (imiona niepowtarzalne także wśród postaci odłożonych) i `0057` (Skrzynia Konta i sztuki z wymiany poza Encyklopedią).
 
+## Postacie każdej klasy przy tworzeniu postaci (30.10.2026, na wersji testowej)
+
+Autor: „chciałbym dorobić w miedzyczasie opcje wyswietlania ile w grze jest postaci danej klasy przy tworzeniu nowej -> po to by gracz wiedział jakiej klasy może brakować w grze komuś (w przyszlosci) do druzyny, jaka jest popularna itp.”
+
+1. Każda karta klasy na ekranie „Nowa postać” ma wiersz „W grze: N postaci tej klasy” (z odmianą: 1 postać, 2–4 postacie, 5 i więcej postaci). Przy zerze stoi „Nikt jeszcze nie gra tą klasą.”.
+2. Liczą się wszystkie postacie gry, grane i odłożone, a nie liczy się postać zaparkowana na czas „Testuj samouczki”. Ewolucja liczy się przy swojej klasie, bo ekran pokazuje pięć klas.
+3. Liczby przychodzą z listą postaci konta (`GET /api/characters`, pole `classes`), którą ekran i tak pobiera, więc nie dochodzi żadne nowe zapytanie.
+
 ## Strona chodów i wpis na X (30.10.2026)
 
 1. **Strona chodów.** Autor: „Wygeneruj mi później stronę tutaj gdzie sprawdze jedna po drugiej wszystkie animacje chodu”. Strona [Chody postaci](https://claude.ai/artifact/4HDDq5mRfAP9uT17PVwhfM) pokazuje po kolei 40 chodów z ekranu Walki (5 klas i 15 ewolucji, każda postać w wersji kobiecej i męskiej) w ośmiu odcieniach skóry, z czterema klatkami osobno na jasnym tle, na którym widać zbłąkane piksele. Zaznaczenia „Dobry” i „Do poprawy” z notatką trafiają do bazy strony (kolekcja `walks`), którą odczytuję. Notatka sama zaznacza „Do poprawy”.

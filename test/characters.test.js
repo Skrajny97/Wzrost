@@ -90,6 +90,14 @@ describe('five characters on one account', () => {
     assert.equal((await (await db()).prepare('SELECT system_points_waiting AS waiting FROM users').first()).waiting, 0);
   });
 
+  test("the list counts the game's characters of each class, those set aside too", async () => {
+    await create('Mira');
+    await create('Druga', 'mage');
+    const { cookie: other } = await signUp('inny');
+    await create('Obca', 'mage', other);
+    assert.deepEqual((await list()).classes, { warrior: 1, archer: 0, mage: 2, cleric: 0, shadow: 0 });
+  });
+
   test('each character keeps its own Punkty Systemu', async () => {
     await create('Mira');
     await (await db()).prepare("UPDATE characters SET system_points = 25 WHERE name = 'Mira'").run();
@@ -141,6 +149,8 @@ describe('five characters on one account', () => {
     assert.equal((await call('POST', '/api/test/introduction', { cookie })).status, 200);
     assert.equal((await list()).parked, 'Druga');
     assert.equal((await create('Testowa')).status, 201);
+    // The parked character is not one of the game's characters to count.
+    assert.equal((await list()).classes.warrior, 2);
     assert.equal((await choose('Mira')).data.error.code, 'parked');
     assert.equal((await create('Kolejna')).data.error.code, 'parked');
     assert.equal((await call('POST', '/api/test/back', { cookie })).status, 200);

@@ -230,11 +230,15 @@ function showCreate(list) {
   setMusicPlace([]);
   show('create');
   const container = $('#create-screen');
-  renderCreate(container, () => {
-    // A new character starts on the Walka tab.
-    history.replaceState(null, '', HOME);
-    openGame();
-  });
+  renderCreate(
+    container,
+    () => {
+      // A new character starts on the Walka tab.
+      history.replaceState(null, '', HOME);
+      openGame();
+    },
+    list.classes,
+  );
   if (list.parked) {
     if (state.user.tutorialTests) offerBack(container);
   } else if (list.characters.length > 0) {

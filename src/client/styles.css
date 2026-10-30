@@ -1809,6 +1809,13 @@ a.segmented-option {
   line-height: 1.4;
 }
 
+.class-count {
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Character screen */
 
 .portrait-wrap {

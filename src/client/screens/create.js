@@ -1,9 +1,11 @@
 // Creating the character: a look, one of five classes and a name, and
-// whether the narrator who comes next reads aloud.
+// whether the narrator who comes next reads aloud. Each class tells how many
+// characters of it the game has, so a player sees which class is rare.
 
 import { portraitSprite } from '../art.js';
 import { classArt } from '../class-art.js';
 import { $, fill, h, icon } from '../dom.js';
+import { countOf } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
 import { call, state } from '../state.js';
 import { skinSwatches, systemPanel, voiceSwitch } from '../ui.js';
@@ -11,7 +13,10 @@ import { skinSwatches, systemPanel, voiceSwitch } from '../ui.js';
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 const START_BADGES = { gentle: 'łagodniejszy start', hard: 'trudniejszy start' };
 
-export function renderCreate(container, onCreated) {
+const inGame = (count) => (count > 0 ? `W grze: ${countOf(count, 'postać', 'postacie', 'postaci')} tej klasy` : 'Nikt jeszcze nie gra tą klasą.');
+
+// `counts`: the game's characters of each class (GET /api/characters).
+export function renderCreate(container, onCreated, counts = null) {
   let selected = null;
   let look = null;
   let skin = state.content.skins.default;
@@ -51,6 +56,7 @@ export function renderCreate(container, onCreated) {
       ),
       h('span', { class: 'class-meta', text: `${cls.role} · pozycja: ${POSITION_NAMES[cls.position]}` }),
       h('span', { class: 'class-description', text: cls.description }),
+      counts && h('span', { class: 'class-count', text: inGame(counts[cls.id] ?? 0) }),
     ),
   );
 
