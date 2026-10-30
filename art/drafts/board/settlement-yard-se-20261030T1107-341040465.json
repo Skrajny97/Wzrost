@@ -1,0 +1,28 @@
+{
+  "id": "settlement-yard-se",
+  "tool": "inpainting",
+  "payload": {
+    "input_image": "art/inputs/board/yard-se.png",
+    "mask_image": "art/inputs/board/yard-se-mask.png",
+    "prompt": "top-down pixel art game map seen straight from above, plain green grass of a village yard with a few small flowers and pebbles, the same grass as around, no trees, no bushes, no fences, no garden beds, no houses, no people",
+    "seed": 341040465
+  },
+  "result": {
+    "tool_id": "inpainting",
+    "inference_id": "inf_pOKDN5om7Ak3PQDojaoqEadrveWVRMjX",
+    "balance_cost": 0.18,
+    "credit_cost": 20,
+    "charged": true,
+    "remaining_balance": 36.880000000000024,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/b6b2798ec6e94b37cc580e8d1efaada7.png"
+    ],
+    "output_width": 256,
+    "output_height": 256,
+    "toolId": "inpainting",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/b6b2798ec6e94b37cc580e8d1efaada7.png",
+    "inferenceId": "inf_pOKDN5om7Ak3PQDojaoqEadrveWVRMjX",
+    "balanceCost": 0.18,
+    "creditCost": 20
+  }
+}
