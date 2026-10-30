@@ -185,7 +185,7 @@
     "poisoner-male": {
       "start": "art/references/walks/start/poisoner-male.png",
       "pose": 2,
-      "description": "a wiry young man with black spiky hair, a dark green leather coat with the hood down, a cloth mask over the mouth, belts of small green glass vials across the chest, a single curved dagger dripping green venom in his right hand, his left hand empty and open, holding nothing"
+      "description": "a wiry young man with black spiky hair, a dark green leather coat with the hood down, a cloth mask over the mouth, belts of small green glass vials across the chest, a single curved dagger dripping green venom held point down in his right hand, the near hand, in front of his hip; his left hand, the far one, is open and empty and holds no weapon"
     },
     "poisoner-female": {
       "start": "art/references/walks/start/poisoner-female.png",
