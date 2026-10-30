@@ -1,0 +1,53 @@
+{
+  "id": "herbalist-1-request",
+  "request": "0e2c8db1-4b56-42be-a283-d2e757df9df7",
+  "result": {
+    "request_id": "0e2c8db1-4b56-42be-a283-d2e757df9df7",
+    "operation": "inference",
+    "status": "succeeded",
+    "mode": "async",
+    "token_id": 21306,
+    "token_prefix": "rdpk-sH0-ZzS...",
+    "created_at": 1793351598,
+    "updated_at": 1793351619,
+    "completed_at": 1793351619,
+    "request": {
+      "seed": 284038297,
+      "width": 96,
+      "height": 128,
+      "prompt": "a young village herbalist woman, freckled face, wavy chestnut hair under a green headscarf, a linen blouse, a wreath of dried herbs, a small bunch of chamomile in hand, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+      "tile_x": false,
+      "tile_y": false,
+      "strength": 0.75,
+      "remove_bg": true,
+      "num_images": 1,
+      "prompt_style": "rd_pro__fantasy",
+      "response_mode": "base64",
+      "has_input_image": false,
+      "has_input_palette": false,
+      "include_extra_data": false,
+      "return_pre_palette": false,
+      "return_spritesheet": false,
+      "reference_image_count": 0,
+      "return_non_bg_removed": true,
+      "upscale_output_factor": 1,
+      "bypass_prompt_expansion": false,
+      "include_downloadable_data": false
+    },
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "charged": true,
+    "http_status": 200,
+    "output_status": "available",
+    "outputs": [
+      {
+        "position": 0,
+        "media_type": "image/png",
+        "available": true,
+        "url": "https://retrodiffusionstack-retrodiffusionapioutputstorere-rg4v98h7gwoa.s3.amazonaws.com/api-activity/0e2c8db1-4b56-42be-a283-d2e757df9df7/0-76a9f343e4c04a09ab6b0f8630e30049.png?AWSAccessKeyId=AKIA55GSYAHSFAUCTWD2&Signature=Lxhh85HCqSJgCwqcmP%2Fzlb%2FJG8k%3D&Expires=1793355623",
+        "url_expires_at": 1793355623,
+        "retained_until": 1793437998
+      }
+    ]
+  }
+}

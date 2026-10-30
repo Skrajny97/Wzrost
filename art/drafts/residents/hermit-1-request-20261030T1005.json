@@ -1,0 +1,53 @@
+{
+  "id": "hermit-1-request",
+  "request": "3123d1e7-0a5d-425d-a99b-96d8d21c6894",
+  "result": {
+    "request_id": "3123d1e7-0a5d-425d-a99b-96d8d21c6894",
+    "operation": "inference",
+    "status": "succeeded",
+    "mode": "async",
+    "token_id": 21306,
+    "token_prefix": "rdpk-sH0-ZzS...",
+    "created_at": 1793351364,
+    "updated_at": 1793351461,
+    "completed_at": 1793351461,
+    "request": {
+      "seed": 945007554,
+      "width": 96,
+      "height": 128,
+      "prompt": "an old forest hermit, long white hair and beard tangled with moss, deep wrinkles, calm wise eyes, a hooded patched grey cloak, a string of wooden beads, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+      "tile_x": false,
+      "tile_y": false,
+      "strength": 0.75,
+      "remove_bg": true,
+      "num_images": 1,
+      "prompt_style": "rd_pro__fantasy",
+      "response_mode": "base64",
+      "has_input_image": false,
+      "has_input_palette": false,
+      "include_extra_data": false,
+      "return_pre_palette": false,
+      "return_spritesheet": false,
+      "reference_image_count": 0,
+      "return_non_bg_removed": true,
+      "upscale_output_factor": 1,
+      "bypass_prompt_expansion": false,
+      "include_downloadable_data": false
+    },
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "charged": true,
+    "http_status": 200,
+    "output_status": "available",
+    "outputs": [
+      {
+        "position": 0,
+        "media_type": "image/png",
+        "available": true,
+        "url": "https://retrodiffusionstack-retrodiffusionapioutputstorere-rg4v98h7gwoa.s3.amazonaws.com/api-activity/3123d1e7-0a5d-425d-a99b-96d8d21c6894/0-ea49e6d7c671484ab9b7ee30797d0342.png?AWSAccessKeyId=AKIA55GSYAHSFAUCTWD2&Signature=W6QBUH3r5ZMv%2F0jnJQHvl0VRvs4%3D&Expires=1793355623",
+        "url_expires_at": 1793355623,
+        "retained_until": 1793437764
+      }
+    ]
+  }
+}
