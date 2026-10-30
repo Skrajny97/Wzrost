@@ -27,6 +27,8 @@ const API = 'https://api.retrodiffusion.ai/v2/inferences';
 const EDIT_API = 'https://api.retrodiffusion.ai/v2/edit';
 const POLL_MS = 3000;
 const POLL_LIMIT = 100;
+// Outpainting a large canvas piece by piece takes many minutes.
+const EDIT_POLL_LIMIT = 400;
 
 const { values } = parseArgs({
   options: {
@@ -175,13 +177,22 @@ async function download(url) {
   return Buffer.from(await response.arrayBuffer());
 }
 
-// What an earlier call returned, from Retro Diffusion's activity list.
+// What an earlier call returned, from Retro Diffusion's activity list:
+// by its id, or "recent:<tool>" for the newest finished run of an edit tool
+// (one that outlasted the wait here).
 async function recover(id, requestId) {
   if (values['dry-run']) {
     lines.push(`| ${id} | wycena 0.000 USD (pobranie wyniku ${requestId}) | | |`);
     return;
   }
-  const data = await request('GET', `${API}/requests/${requestId}`);
+  let data;
+  if (requestId.startsWith('recent:')) {
+    const tool = requestId.slice('recent:'.length);
+    const { items = [] } = await request('GET', `${API}/requests?limit=50&status=succeeded`);
+    data = items.find((item) => item.operation === 'edit_tool' && item.request?.tool_id === tool);
+    if (!data) throw new Error(`brak ukończonego wyniku narzędzia ${tool}`);
+    data = await request('GET', `${API}/requests/${data.request_id}`);
+  } else data = await request('GET', `${API}/requests/${requestId}`);
   const urls = [...(data.outputs ?? []).map((output) => output.url), ...(data.output_urls ?? [])].filter(Boolean);
   const files = [];
   for (const [index, url] of urls.entries()) {
@@ -195,7 +206,7 @@ async function recover(id, requestId) {
 
 // A queued edit is polled until it ends.
 async function settleEdit(taskId) {
-  for (let attempt = 0; attempt < POLL_LIMIT; attempt++) {
+  for (let attempt = 0; attempt < EDIT_POLL_LIMIT; attempt++) {
     const task = await request('GET', `${EDIT_API}/tasks/${taskId}`);
     if (task.status === 'failed') {
       const reason = task.error?.message ?? JSON.stringify(task.error ?? 'bez opisu');
@@ -204,7 +215,7 @@ async function settleEdit(taskId) {
     if (task.status !== 'pending' && task.status !== 'running') return task.result ?? task;
     await new Promise((resolve) => setTimeout(resolve, POLL_MS));
   }
-  throw new Error('edycja trwa zbyt długo');
+  throw new Error(`edycja trwa zbyt długo (zadanie ${taskId}; wynik pobierze potem "request")`);
 }
 
 // An edit tool on a picture from the repository; each variant is a run of
