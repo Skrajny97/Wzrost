@@ -162,7 +162,12 @@ export function settlementView(player, stored, board, now) {
       choices: choicesOf(stored),
       pending: pendingView(pendingOf(stored, player.items)),
     },
-    hermit: { path: pathResetCost(player.row.level, content), stats: statResetCost(player.row.level, content), evolution: evolutionChangeView(player.row, stored) },
+    // After an evolution the paths change with it, so no path reset.
+    hermit: {
+      path: player.row.evolution ? null : pathResetCost(player.row.level, content),
+      stats: statResetCost(player.row.level, content),
+      evolution: evolutionChangeView(player.row, stored),
+    },
     now,
   };
 }
