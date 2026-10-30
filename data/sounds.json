@@ -402,6 +402,7 @@
     "skill-indomitable": { "files": ["audio/sfx/skill-indomitable-1.mp3"], "gain": 0.7 },
     "skill-challenge": { "files": ["audio/sfx/skill-challenge-1.mp3"], "gain": 0.7 },
     "skill-piercing-shot": { "files": ["audio/sfx/skill-piercing-shot-1.mp3"], "gain": 0.7 },
+    "skill-ambush-shot": { "files": ["audio/sfx/skill-ambush-shot-1.mp3"], "gain": 0.7 },
     "skill-arrow-storm": { "files": ["audio/sfx/skill-arrow-storm-1.mp3"], "gain": 0.7 },
     "skill-storm-cloud": { "files": ["audio/sfx/skill-storm-cloud-1.mp3"], "gain": 0.85 },
     "skill-barbed-arrow": { "files": ["audio/sfx/skill-barbed-arrow-1.mp3"], "gain": 0.7 },
