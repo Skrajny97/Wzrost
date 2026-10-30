@@ -1,11 +1,11 @@
 // Animates the walks with PixelLab (pixellab.ai), a pixel-art generator that
 // poses one drawing on a skeleton (DECISIONS.md, "Chody od zera"). Each
 // character, drawn once from the side by Retro Diffusion (art/walks.json: its
-// start frame and the pose of tools/walk-skeleton.py it stands in), walks in
-// the skeleton's four poses (animate-with-skeleton-v3), so every frame keeps
+// start frame and the key pose of tools/walk-skeleton.py it stands in), walks
+// in the skeleton's frames (animate-with-skeleton-v3), so every frame keeps
 // its look, its hands and what they hold, and the walk loops. Run by the
 // "Grafiki (szkice)" workflow (kind walks-pixellab), which keeps the drafts
-// on the art-drafts branch for review, each frame as a PNG of its own (-1 to -4):
+// on the art-drafts branch for review, each frame as a PNG of its own (-1, -2…):
 //   node tools/animate-walks.mjs --ids warrior-female,inquisitor-male --variants 2 --max-cost 1 [--dry-run]
 // The balance is read first, and the run stops before its animations could
 // cost more than --max-cost dollars (one is 2-3 generations of PixelLab, at
@@ -76,7 +76,8 @@ const describeBalance = (balance) =>
     .join(', ') || 'nieznane';
 
 // The frames of the walk, in the order they play.
-const keypoints = skeleton.frames.map((frame) => frame.map(({ label, x, y, z_index }) => ({ label, x, y, z_index })));
+const strip = (pose) => pose.map(({ label, x, y, z_index }) => ({ label, x, y, z_index }));
+const keypoints = skeleton.frames.map(strip);
 
 // One animation: sent, then polled until PixelLab has drawn it. A full queue
 // of jobs (429) waits and tries again.
@@ -88,7 +89,7 @@ async function animate(id, seed) {
     direction: 'east',
     view: 'side',
     first_frame: { type: 'base64', base64: readFileSync(character.start).toString('base64'), format: 'png' },
-    first_frame_keypoints: keypoints[character.pose - 1],
+    first_frame_keypoints: strip(skeleton.keys[character.pose - 1]),
     keypoints,
     seed,
     no_background: true,

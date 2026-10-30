@@ -1,5 +1,5 @@
 {
-  "$comment": "Chody z PixelLab (196, DECISIONS.md, „Chody od zera”): postać narysowana raz z boku przez Retro Diffusion (start, na szkielecie z tools/walk-skeleton.py w pozie pose, 1–4) idzie w czterech pozach szkieletu (tools/animate-walks.mjs). Opis to wygląd postaci: kolory, ubrania, co trzyma i w której ręce. Postać patrzy w prawo, więc prawa ręka jest bliżej patrzącego.",
+  "$comment": "Chody z PixelLab (196, DECISIONS.md, „Chody od zera”): postać narysowana raz z boku przez Retro Diffusion (start, na szkielecie z tools/walk-skeleton.py w pozie pose, 1–4) idzie w ośmiu klatkach szkieletu (202 tak, tools/animate-walks.mjs). Opis to wygląd postaci: kolory, ubrania, co trzyma i w której ręce. Postać patrzy w prawo, więc prawa ręka jest bliżej patrzącego.",
   "skeleton": "art/references/walks/skeleton.json",
   "characters": {
     "warrior-female": {

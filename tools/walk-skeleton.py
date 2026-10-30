@@ -3,10 +3,11 @@
 # walk that loops (contact, passing, contact with the other leg, passing),
 # the far limbs darker, the body lower at contact and higher when passing.
 # Frames of 128 x 128 on a flat background (Retro Diffusion takes an RGB
-# picture), in a 2 x 2 sheet, and the joints of each frame as PixelLab's
-# skeleton (tools/animate-walks.mjs): 18 joints, x and y as fractions of the
-# frame, the right side the near one (the figure faces right). Needs Python 3
-# and Pillow:
+# picture), in a 2 x 2 sheet, and the joints as PixelLab's skeleton
+# (tools/animate-walks.mjs): 18 joints, x and y as fractions of the frame, the
+# right side the near one (the figure faces right). `keys` are the four poses
+# of the sheet, `frames` the walk's eight: each key pose and, after it, the
+# pose halfway to the next (the author's 202). Needs Python 3 and Pillow:
 #   python3 tools/walk-skeleton.py art/references/walks/skeleton.png art/references/walks/skeleton.json
 import json, math, sys
 from PIL import Image, ImageDraw
@@ -150,12 +151,23 @@ def frame(spec):
     skeleton = [{'label': label, 'x': round(x / S, 4), 'y': round(y / S, 4), 'z_index': z} for label, (x, y), z in joints]
     return im, skeleton
 
+# The pose halfway between two, angle by angle, so no limb changes length.
+def halfway(a, b):
+    return {part: tuple((x + y) / 2 for x, y in zip(a[part], b[part])) for part in a}
+
 frames = [frame(spec) for spec in FRAMES]
 sheet = Image.new('RGB', (S * 2, S * 2), BG)
 for index, (im, _) in enumerate(frames):
     sheet.paste(im, ((index % 2) * S, (index // 2) * S))
 sheet.save(OUT)
 if JOINTS:
+    walk = [spec for index, key in enumerate(FRAMES) for spec in (key, halfway(key, FRAMES[(index + 1) % len(FRAMES)]))]
     with open(JOINTS, 'w', encoding='utf8') as file:
-        json.dump({'size': S, 'frames': [skeleton for _, skeleton in frames]}, file, indent=1)
+        json.dump({'size': S, 'keys': [skeleton for _, skeleton in frames], 'frames': [frame(spec)[1] for spec in walk]}, file, indent=1)
         file.write('\n')
+    # The walk's frames drawn, to see the motion: <OUT_JSON>-frames.png, not kept.
+    if len(sys.argv) > 3:
+        strip = Image.new('RGB', (S * len(walk), S), BG)
+        for index, spec in enumerate(walk):
+            strip.paste(frame(spec)[0], (index * S, 0))
+        strip.save(sys.argv[3])
