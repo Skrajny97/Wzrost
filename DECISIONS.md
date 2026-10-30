@@ -2972,6 +2972,19 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
+## Wersja 0.0.62 (30.10.2026)
+
+Autor: „Wdrażaj filtr nazw, „Dodaj 10 Punktów”, pięć postaci, Skrzynia Konta, Encyklopedia tylko z własnych zdobyczy i kropki znajomych w 0.0.62 i chód ten co jest, a w miedzyczasie zajmij sie generowaniem z RetroDiffusion od zera tego chodu.”
+
+1. **Co wchodzi do gry:**
+    - filtr niecenzuralnych nazw postaci i okno zmiany nazwy (zob. „Uwagi autora po 0.0.61”, punkt 2);
+    - „Dodaj 10 Punktów” na karcie umiejętności (punkt 3 tamże);
+    - pięć postaci na koncie z wyborem postaci po zalogowaniu i „Zmień postać” w Ustawieniach (zob. „Pięć postaci na koncie”);
+    - Skrzynia Konta w obozie, Encyklopedia tylko z własnych zdobyczy i kropki statusu na liście znajomych (zob. „Skrzynia Konta, Encyklopedia z własnych zdobyczy i status znajomych”).
+2. **Chody** zostają w grze takie, jakie są, do czasu nowych z Retro Diffusion.
+3. **Co zostaje ukryte:** Osada (bez `SETTLEMENT`).
+4. **Migracje bazy:** `0056` (imiona niepowtarzalne także wśród postaci odłożonych) i `0057` (Skrzynia Konta i sztuki z wymiany poza Encyklopedią).
+
 ## Strona chodów i wpis na X (30.10.2026)
 
 1. **Strona chodów.** Autor: „Wygeneruj mi później stronę tutaj gdzie sprawdze jedna po drugiej wszystkie animacje chodu”. Strona [Chody postaci](https://claude.ai/artifact/4HDDq5mRfAP9uT17PVwhfM) pokazuje po kolei 40 chodów z ekranu Walki (5 klas i 15 ewolucji, każda postać w wersji kobiecej i męskiej) w ośmiu odcieniach skóry, z czterema klatkami osobno na jasnym tle, na którym widać zbłąkane piksele. Zaznaczenia „Dobry” i „Do poprawy” z notatką trafiają do bazy strony (kolekcja `walks`), którą odczytuję. Notatka sama zaznacza „Do poprawy”.
@@ -2998,7 +3011,7 @@ Autor: „180 ok / 181 ok”, „Niech wszystkie postaci znajduja sie w rankingu
     - czerwona, offline: także postać odłożona, gdy jej gracz gra inną.
 
     Lista Znajomych sama odświeża się co 30 sekund, ale nie wtedy, gdy gracz wpisuje imię do zaproszenia.
-6. **Odpowiedzi autora:** „182 ok” (Skrzynia na planszy obozu), „183 ok” (ekran Skrzyni), „184 ok” (kropki znajomych). O komunikacie Systemu na ekranie Skrzyni: „Przedmiot od innej postaci będziesz mógł załozyć od jego poziomu możesz sobie darować, bo to się można domyślić. Czyli po prostu "Encyklopedia go nie zaliczy [...]" jeśli chodzi o drugie zdanie.” Drugie zdanie brzmi więc: „Encyklopedia go nie zaliczy: liczy się tylko to, co postać sama zdobędzie albo wytworzy.” Przy samym przedmiocie w skrzyni nadal stoi, od którego poziomu postać go założy.
+6. **Odpowiedzi autora:** „182 ok” (Skrzynia na planszy obozu), „183 ok” (ekran Skrzyni), „184 ok” (kropki znajomych). O komunikacie Systemu na ekranie Skrzyni: „Przedmiot od innej postaci będziesz mógł załozyć od jego poziomu możesz sobie darować, bo to się można domyślić. Czyli po prostu "Encyklopedia go nie zaliczy [...]" jeśli chodzi o drugie zdanie.” Potem: „Ad. Drugie zdanie komunikatu zmień na "Encyklopedia nie zaliczy przedmiotu: [...]"”. Drugie zdanie brzmi więc: „Encyklopedia nie zaliczy przedmiotu: liczy się tylko to, co postać sama zdobędzie albo wytworzy.” Przy samym przedmiocie w skrzyni nadal stoi, od którego poziomu postać go założy.
 
 ## Pięć postaci na koncie (30.10.2026, na wersji testowej)
 

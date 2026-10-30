@@ -50,8 +50,8 @@ export function mountChest(container, onBack) {
       ),
       systemPanel(
         `Skrzynia Konta mieści ${chest ? countOf(chest.slots, 'przedmiot', 'przedmioty', 'przedmiotów') : '…'} i jest wspólna dla wszystkich postaci na tym koncie.`,
-        // The author's words: "Encyklopedia go nie zaliczy [...]".
-        'Encyklopedia go nie zaliczy: liczy się tylko to, co postać sama zdobędzie albo wytworzy.',
+        // The author's words: "Encyklopedia nie zaliczy przedmiotu: [...]".
+        'Encyklopedia nie zaliczy przedmiotu: liczy się tylko to, co postać sama zdobędzie albo wytworzy.',
       ),
       away && h('p', { class: 'region-warning', text: 'Postać jest poza obozem. Skrzynię otworzysz, gdy wróci.' }),
       chest &&
