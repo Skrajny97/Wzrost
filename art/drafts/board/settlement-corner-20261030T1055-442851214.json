@@ -1,0 +1,28 @@
+{
+  "id": "settlement-corner",
+  "tool": "inpainting",
+  "payload": {
+    "input_image": "art/inputs/board/settlement-corner.png",
+    "mask_image": "art/inputs/board/settlement-corner-mask.png",
+    "prompt": "top-down pixel art game map seen straight from above, green grass yards of an old slavic village with a few trees, bushes, stones and a small vegetable patch behind a low wattle fence, matching the grass around, no road, no houses, no people",
+    "seed": 442851214
+  },
+  "result": {
+    "tool_id": "inpainting",
+    "inference_id": "inf_7kdjByXJOa2gbQyLopeqzNM3Vo18e5ZK",
+    "balance_cost": 0.18,
+    "credit_cost": 20,
+    "charged": true,
+    "remaining_balance": 38.32000000000002,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/b064161fa8b6c2209ce6b5a6b3feede7.png"
+    ],
+    "output_width": 256,
+    "output_height": 256,
+    "toolId": "inpainting",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/b064161fa8b6c2209ce6b5a6b3feede7.png",
+    "inferenceId": "inf_7kdjByXJOa2gbQyLopeqzNM3Vo18e5ZK",
+    "balanceCost": 0.18,
+    "creditCost": 20
+  }
+}
