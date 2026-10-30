@@ -10,7 +10,12 @@
 // time, each as a PNG sheet of its frames; a prompt with `startFrame` (a PNG
 // in the repository) moves that picture in `frames` frames, and one with
 // `width` and `height` has its own size (and with `removeBackground` its own
-// background). Every request is
+// background), and one with `seed` draws with that seed. A prompt with `tool`
+// runs a Retro Diffusion edit tool (outpainting, inpainting, image_edit…) on
+// the picture in `input` (with `mask`, `expand` and `prompt` as the tool
+// takes them), and one with `request` downloads again what an earlier call
+// returned, free, while Retro Diffusion keeps it (24 hours); `all` leaves
+// these two out. Every request is
 // priced first (free), and the run stops before it would spend more than
 // --max-cost dollars.
 
@@ -19,6 +24,7 @@ import { randomUUID } from 'node:crypto';
 import { parseArgs } from 'node:util';
 
 const API = 'https://api.retrodiffusion.ai/v2/inferences';
+const EDIT_API = 'https://api.retrodiffusion.ai/v2/edit';
 const POLL_MS = 3000;
 const POLL_LIMIT = 100;
 
@@ -49,7 +55,10 @@ if (!token) fail('Brak sekretu RETRO_DIFFUSION_API_KEY. Dodaj klucz Retro Diffus
 const config = JSON.parse(readFileSync('art/prompts.json', 'utf8'));
 const kind = config[values.kind];
 if (!kind) fail(`Nieznany rodzaj grafik: ${values.kind}. Dostępne: ${Object.keys(config).filter((key) => key !== '$comment').join(', ')}.`);
-const ids = values.ids === 'all' ? Object.keys(kind.prompts) : values.ids.split(',').map((id) => id.trim()).filter(Boolean);
+const ids =
+  values.ids === 'all'
+    ? Object.keys(kind.prompts).filter((id) => !kind.prompts[id].tool && !kind.prompts[id].request)
+    : values.ids.split(',').map((id) => id.trim()).filter(Boolean);
 const unknown = ids.filter((id) => !kind.prompts[id]);
 if (unknown.length) fail(`Brak opisu w art/prompts.json dla: ${unknown.join(', ')}.`);
 const variants = Math.max(1, Math.min(4, Number(values.variants) || 1));
@@ -111,7 +120,9 @@ let balance = null;
 // One drawing: priced, then drawn and saved with what came back. An
 // animation comes one at a time, so its variants are drawings of their own.
 async function draw(id, count = variants) {
-  const seed = values.seed ? Number(values.seed) : Math.floor(Math.random() * 1e9);
+  if (kind.prompts[id].request) return recover(id, kind.prompts[id].request);
+  if (kind.prompts[id].tool) return edit(id, kind.prompts[id], count);
+  const seed = values.seed ? Number(values.seed) : (kind.prompts[id].seed ?? Math.floor(Math.random() * 1e9));
   const style = styleOf(id);
   const payload = {
     prompt: promptOf(id),
@@ -155,6 +166,82 @@ async function draw(id, count = variants) {
   const extra = Object.fromEntries(Object.entries(result).filter(([key]) => key !== 'base64_images'));
   writeFileSync(`${outDir}/${id}-${stamp}-${seed}.json`, `${JSON.stringify({ id, payload: { ...payload, reference_images: refs.length }, result: extra }, null, 2)}\n`);
   lines.push(`| ${id} | ${files.length} obrazki, ${Number(result.balance_cost ?? cost).toFixed(3)} USD | ${style} | ${refs.length} |`);
+}
+
+// The picture of a finished call: inline, or (edit tools) at a signed address.
+async function download(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`pobranie obrazka nie powiodło się: ${response.status}`);
+  return Buffer.from(await response.arrayBuffer());
+}
+
+// What an earlier call returned, from Retro Diffusion's activity list.
+async function recover(id, requestId) {
+  if (values['dry-run']) {
+    lines.push(`| ${id} | wycena 0.000 USD (pobranie wyniku ${requestId}) | | |`);
+    return;
+  }
+  const data = await request('GET', `${API}/requests/${requestId}`);
+  const urls = [...(data.outputs ?? []).map((output) => output.url), ...(data.output_urls ?? [])].filter(Boolean);
+  const files = [];
+  for (const [index, url] of urls.entries()) {
+    const file = `${outDir}/${id}-${stamp}-${index}.png`;
+    writeFileSync(file, await download(url));
+    files.push(file);
+  }
+  writeFileSync(`${outDir}/${id}-${stamp}.json`, `${JSON.stringify({ id, request: requestId, result: data }, null, 2)}\n`);
+  lines.push(`| ${id} | ${files.length} obrazki z wyniku ${requestId}, 0 USD | | |`);
+}
+
+// A queued edit is polled until it ends.
+async function settleEdit(taskId) {
+  for (let attempt = 0; attempt < POLL_LIMIT; attempt++) {
+    const task = await request('GET', `${EDIT_API}/tasks/${taskId}`);
+    if (task.status === 'failed') {
+      const reason = task.error?.message ?? JSON.stringify(task.error ?? 'bez opisu');
+      throw new Error(`edycja nie powiodła się: ${reason.slice(0, 300)}`);
+    }
+    if (task.status !== 'pending' && task.status !== 'running') return task.result ?? task;
+    await new Promise((resolve) => setTimeout(resolve, POLL_MS));
+  }
+  throw new Error('edycja trwa zbyt długo');
+}
+
+// An edit tool on a picture from the repository; each variant is a run of
+// its own, with the next seed.
+async function edit(id, entry, count) {
+  const first = values.seed ? Number(values.seed) : (entry.seed ?? Math.floor(Math.random() * 1e9));
+  for (let take = 0; take < count; take++) {
+    const seed = first + take;
+    const body = {
+      input_image: readFileSync(entry.input).toString('base64'),
+      ...(entry.mask && { mask_image: readFileSync(entry.mask).toString('base64') }),
+      ...(entry.prompt && { prompt: entry.prompt }),
+      ...Object.fromEntries(Object.entries(entry.expand ?? {}).map(([side, pixels]) => [`expand_${side}`, pixels])),
+      seed,
+    };
+    const quote = await request('POST', `${EDIT_API}/tools/${entry.tool}/estimate`, body);
+    const cost = Number(quote.balance_cost ?? 0);
+    if (spent + cost > maxCost) {
+      lines.push(`| ${id} | pominięte: przekroczyłoby limit ${maxCost} USD | ${entry.tool} | |`);
+      return;
+    }
+    if (values['dry-run']) {
+      spent += cost;
+      lines.push(`| ${id} | wycena ${cost.toFixed(3)} USD | ${entry.tool} | |`);
+      continue;
+    }
+    const task = await request('POST', `${EDIT_API}/tools/${entry.tool}/tasks`, { ...body, custom_id: randomUUID() });
+    const result = await settleEdit(task.task_id);
+    spent += Number(result.balance_cost ?? cost);
+    balance = result.remaining_balance ?? balance;
+    const image = result.base64_images?.[0] ? Buffer.from(result.base64_images[0], 'base64') : await download(result.output_urls[0]);
+    writeFileSync(`${outDir}/${id}-${stamp}-${seed}-0.png`, image);
+    const extra = Object.fromEntries(Object.entries(result).filter(([key]) => key !== 'base64_images'));
+    const sent = { ...body, input_image: entry.input, ...(entry.mask && { mask_image: entry.mask }) };
+    writeFileSync(`${outDir}/${id}-${stamp}-${seed}.json`, `${JSON.stringify({ id, tool: entry.tool, payload: sent, result: extra }, null, 2)}\n`);
+    lines.push(`| ${id} | 1 obrazek, ${Number(result.balance_cost ?? cost).toFixed(3)} USD | ${entry.tool} | |`);
+  }
 }
 
 // A failed drawing does not stop the others, so the paid ones are kept.
