@@ -1,0 +1,26 @@
+{
+  "id": "inquisitor-male-64",
+  "payload": {
+    "prompt": "a stern young man with short black hair, a long dark crimson coat over a black cassock, a silver holy symbol on a heavy chain, a flanged iron mace in one hand and a smoking censer on a chain in the other, walking to the right in place, side view, smooth seamless walk cycle loop",
+    "prompt_style": "rd_advanced_animation__walking",
+    "width": 64,
+    "height": 64,
+    "num_images": 1,
+    "seed": 412049905,
+    "return_spritesheet": true,
+    "frames_duration": 4,
+    "input_image": "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",
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793379268,
+    "credit_cost": 1,
+    "balance_cost": 0.14,
+    "output_urls": [],
+    "model": "rd_fast",
+    "remaining_credits": 0,
+    "remaining_balance": 34.47,
+    "request_id": "363119c8-40f4-49a9-a91e-81ed5b90e01b",
+    "outputs_retained_until": 1793465602
+  }
+}
