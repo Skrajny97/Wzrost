@@ -1011,6 +1011,12 @@ function checkSettlement(data, { rarities }) {
     if (index > 0 && standing.points <= standings[index - 1].points) errors.push('settlement.json: progi stopni muszą rosnąć');
   });
   if (!standingIds.has(orders.quality.from)) errors.push(`settlement.json: orders.quality.from to nieznany stopień ${orders.quality.from}`);
+  const standingAt = (id) => standings.findIndex((standing) => standing.id === id);
+  reforge.choices.forEach((step, index) => {
+    if (!standingIds.has(step.from)) errors.push(`settlement.json: reforge.choices ma nieznany stopień ${step.from}`);
+    const before = reforge.choices[index - 1];
+    if (before && (standingAt(step.from) <= standingAt(before.from) || step.count <= before.count)) errors.push('settlement.json: reforge.choices muszą rosnąć ze stopniem');
+  });
   if (!rarities.has(orders.partRarity)) errors.push(`settlement.json: orders.partRarity to nieznana rzadkość ${orders.partRarity}`);
   for (const [kind, count] of Object.entries(orders.counts)) {
     if (count.min > count.max) errors.push(`settlement.json: orders.counts.${kind}.min nie może być większe niż max`);

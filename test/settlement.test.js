@@ -23,8 +23,10 @@ import {
   pathResetCost,
   questPeriod,
   reforgeBlock,
+  reforgeChoices,
   reforgeCost,
   reforgeItem,
+  reforgeOptions,
   rejectOrder,
   settleBoard,
   shopBuilding,
@@ -188,6 +190,23 @@ describe('the Osada in the engine', () => {
       assert.equal(done.reforged, 1);
       assert.equal(done.level, item.level);
     }
+  });
+
+  test('the Zaklinaczka offers more affixes to choose from as the relation grows, all different and new', () => {
+    const points = (id) => content.settlement.standings.find((standing) => standing.id === id).points;
+    assert.equal(reforgeChoices(0, content), 1);
+    assert.equal(reforgeChoices(points('acquaintance'), content), 2);
+    assert.equal(reforgeChoices(points('trusted'), content), 3);
+    const item = generateItem({ baseId: 'sword', level: 30, rarityId: 'epic', area: content.areas[0] }, createRng('options'), content);
+    const options = reforgeOptions(item, 0, 3, createRng('o'), content);
+    assert.equal(options.length, 3);
+    assert.equal(new Set(options.map((option) => option.id)).size, 3);
+    for (const option of options) {
+      assert.equal(option.kind, item.affixes[0].kind);
+      assert.ok(!item.affixes.some((affix) => affix.id === option.id));
+    }
+    // With nothing to choose, reforging draws the first of them.
+    assert.deepEqual(reforgeItem(item, 0, createRng('o'), content).affixes[0], options[0]);
   });
 
   test('reforging costs gold by level and rarity, more each time, and materials of the item\'s rarity class', () => {
@@ -376,6 +395,36 @@ describe('the Osada through the API', () => {
     assert.equal(JSON.parse(row.materials)[stack], undefined);
     // The next one costs more.
     assert.ok(reforgeCost({ ...item, reforged: 1 }, 1, content).gold > cost.gold);
+  });
+
+  test('closer to the Zaklinaczka, the player keeps one of the affixes she draws', async () => {
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    const item = generateItem({ baseId: 'sword', level: 20, rarityId: 'rare', area: content.areas[0] }, createRng('choice'), content);
+    const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, 0)').bind(id, JSON.stringify(item)).run();
+    const itemId = meta.last_row_id;
+    const trusted = content.settlement.standings.find((standing) => standing.id === 'trusted').points;
+    await set('settlement = ?', JSON.stringify({ relations: { [content.settlement.reforge.resident]: trusted } }));
+    const cost = reforgeCost(item, 0, content);
+    const stack = `${content.materialsByMonster.wolf.id}:${cost.materials.rarity}`;
+    await set('materials = json_set(materials, ?, ?)', `$."${stack}"`, cost.materials.count * 2);
+    const done = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0, material: stack } });
+    assert.equal(done.status, 200);
+    // Paid, but the item keeps its affix until the choice.
+    assert.equal(done.data.item.affixes[0].id, item.affixes[0].id);
+    assert.equal(done.data.pending.options.length, 3);
+    assert.equal(done.data.character.gold, 100000 - cost.gold);
+    const again = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0, material: stack } });
+    assert.equal(again.data.error.code, 'choose_first');
+    const view = await call('GET', '/api/settlement', { cookie });
+    assert.deepEqual(view.data.settlement.reforge.pending.options, done.data.pending.options);
+    const chosen = await call('POST', '/api/settlement/reforge/choose', { cookie, body: { option: 1 } });
+    assert.equal(chosen.status, 200);
+    const stored = JSON.parse((await database.prepare('SELECT settlement FROM characters').first()).settlement);
+    assert.equal(stored.pending, undefined);
+    assert.notEqual(chosen.data.item.affixes[0].id, item.affixes[0].id);
+    assert.deepEqual(chosen.data.item.affixes.slice(1), item.affixes.slice(1));
+    assert.equal((await call('POST', '/api/settlement/reforge/choose', { cookie, body: { option: 0 } })).data.error.code, 'no_choice');
   });
 });
 

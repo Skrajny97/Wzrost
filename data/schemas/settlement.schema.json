@@ -156,9 +156,22 @@
     "reforge": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["resident", "goldPerLevel", "growth", "materials", "relationGain"],
+      "required": ["resident", "goldPerLevel", "growth", "materials", "relationGain", "choices"],
       "properties": {
         "goldPerLevel": { "type": "number", "exclusiveMinimum": 0 },
+        "choices": {
+          "type": "array",
+          "description": "Od którego stopnia relacji z Zaklinaczką przekucie daje do wyboru więcej nowych afiksów (count); niżej jeden.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "count"],
+            "properties": {
+              "from": { "$ref": "#/definitions/id" },
+              "count": { "type": "integer", "minimum": 2 }
+            }
+          }
+        },
         "growth": { "type": "number", "minimum": 1 },
         "materials": {
           "type": "object",

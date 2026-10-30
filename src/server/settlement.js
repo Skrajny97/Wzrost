@@ -18,12 +18,14 @@ import {
   pathResetCost,
   propertyName,
   reforgeBlock,
+  reforgeChoices,
   reforgeCost,
-  reforgeItem,
+  reforgeOptions,
   rejectOrder,
   standingOf,
   statResetCost,
   upgradedItem,
+  withAffix,
 } from '../engine/index.js';
 import { content } from './content.js';
 import {
@@ -58,11 +60,35 @@ const grow = (relations, { resident, relationGain }) => ({ ...relations, [reside
 const serviceOf = (residentId) => ['orders', 'reforge', 'hermit'].find((service) => content.settlement[service].resident === residentId) ?? null;
 
 // What the row keeps of the Osada: reputation and relations by id, the
-// board, and `test` once "Testuj Osadę" opened it below its level.
+// board, a reforging's affixes waiting for the player's choice (`pending`)
+// and `test` once "Testuj Osadę" opened it below its level.
 export function settlementOf(row) {
   const stored = JSON.parse(row.settlement ?? '{}');
-  return { reputation: stored.reputation ?? {}, relations: stored.relations ?? {}, board: stored.board ?? null, ...(stored.test && { test: true }) };
+  return {
+    reputation: stored.reputation ?? {},
+    relations: stored.relations ?? {},
+    board: stored.board ?? null,
+    ...(stored.pending && { pending: stored.pending }),
+    ...(stored.test && { test: true }),
+  };
 }
+
+// How many affixes the Zaklinaczka offers at the character's relation.
+const choicesOf = (stored) => reforgeChoices(stored.relations[content.settlement.reforge.resident] ?? 0, content);
+
+// A reforging's affixes waiting for a choice, of an item the character
+// still has, not reforged since (the Kowadło's upgrades do not matter);
+// null without one.
+function pendingOf(stored, items) {
+  const item = stored.pending && items.find((candidate) => candidate.id === stored.pending.itemId);
+  return item && (item.reforged ?? 0) === stored.pending.reforged ? { item, ...stored.pending } : null;
+}
+
+// An affix as the item card shows it, with the Kowadło's upgrade.
+const affixLabel = (item, index) => {
+  const affix = upgradedItem(item, content).affixes[index];
+  return `${propertyName(affix.stat, content)}: +${affix.value}`;
+};
 
 function requireOpen(row) {
   const unlock = content.unlocksById.settlement;
@@ -111,7 +137,11 @@ export function settlementView(player, stored, board, now) {
       weekly: board.weekly?.order && !board.weekly.done ? orderView({ ...board.weekly.order, id: 'weekly' }, stocks) : null,
       weeklyDone: board.weekly?.done ?? false,
     },
-    reforge: { items: player.items.filter((item) => item.affixes?.length > 0).map((item) => reforgeView(item, stocks.materials)) },
+    reforge: {
+      items: player.items.filter((item) => item.affixes?.length > 0).map((item) => reforgeView(item, stocks.materials)),
+      choices: choicesOf(stored),
+      pending: pendingView(pendingOf(stored, player.items)),
+    },
     hermit: { path: pathResetCost(player.row.level, content), stats: statResetCost(player.row.level, content) },
     now,
   };
@@ -138,6 +168,19 @@ function reforgeView(item, materials) {
         .filter(([key, count]) => parseStack(key).rarityId === need.rarity && count >= need.count)
         .map(([key, count]) => ({ key, label: materialView(key, count, content).label, count })),
     },
+  };
+}
+
+// The affixes to choose from after a reforging: the item, the affix they
+// replace and each new one as the item would show it.
+function pendingView(pending) {
+  if (!pending) return null;
+  const { item, affix, options } = pending;
+  return {
+    itemId: item.id,
+    name: itemName(item, content),
+    old: affixLabel(item, affix),
+    options: options.map((option) => affixLabel(withAffix(item, affix, option), affix)),
   };
 }
 
@@ -217,12 +260,16 @@ export async function rejectSettlementOrder(context) {
 
 // { itemId, affix, material }: the Zaklinaczka draws one affix of an item
 // anew, for gold and creatures' materials (`material`: the stack paid with).
-// The character must be at home, as at the Kowadło.
+// From a closer relation she draws two or three and the player keeps one
+// (chooseReforged); until then they wait in the Osada and no other affix
+// can be reforged. The character must be at home, as at the Kowadło.
 export async function reforgeAtEnchantress(context) {
   const { session, player } = await requireIdlePlayer(context);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  if (pendingOf(stored, player.items)) throw new ApiError(409, 'choose_first', 'Najpierw wybierz afiks z poprzedniego przekucia.');
   const item = player.items.find((candidate) => String(candidate.id) === String(body.itemId));
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
   const times = item.reforged ?? 0;
@@ -231,36 +278,79 @@ export async function reforgeAtEnchantress(context) {
   if (block) throw new ApiError(block.code.startsWith('invalid') || block.code === 'no_affixes' ? 400 : 409, block.code, block.message);
   const cost = reforgeCost(item, times, content);
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const done = reforgeItem(item, body.affix, createRng(roll), content);
+  const options = reforgeOptions(item, body.affix, choicesOf(stored), createRng(roll), content);
+  // One affix goes on the item at once; more wait for the choice.
+  const affixes = options.length === 1 ? withAffix(item, body.affix, options[0]).affixes : item.affixes;
+  const { pending: _, ...rest } = stored;
+  const next = {
+    ...rest,
+    relations: grow(stored.relations, content.settlement.reforge),
+    ...(options.length > 1 && { pending: { itemId: item.id, affix: body.affix, options, roll, reforged: times + 1 } }),
+  };
   const stack = jsonPath(cost.materials ? body.material : 'none');
   const taken = cost.materials ? cost.materials.count : 0;
-  const stored = settlementOf(row);
-  const relations = grow(stored.relations, content.settlement.reforge);
   const db = context.env.DB;
-  // As at the Kowadło: the item changes only if it is as seen here and the
-  // price is still there, and the payment only if this roll was saved.
+  // As at the Kowadło: the item changes only if it and the character are as
+  // seen here, and the payment only if this roll was saved.
   await db.batch([
     db
       .prepare(
         `UPDATE items SET data = json_set(data, '$.affixes', json(?), '$.reforged', ?, '$.lastRoll', ?)
          WHERE id = ? AND character_id = ? AND COALESCE(json_extract(data, '$.reforged'), 0) = ?
-           AND (SELECT gold FROM characters WHERE id = ?) >= ?
-           AND COALESCE(json_extract((SELECT materials FROM characters WHERE id = ?), ?), 0) >= ?`,
+           AND (SELECT version FROM characters WHERE id = ?) = ?`,
       )
-      .bind(JSON.stringify(done.affixes), done.reforged, roll, item.id, row.id, times, row.id, cost.gold, row.id, stack, taken),
+      .bind(JSON.stringify(affixes), times + 1, roll, item.id, row.id, times, row.id, row.version),
     db
       .prepare(
         `UPDATE characters SET gold = gold - ?, settlement = ?,
            materials = CASE WHEN ? = 0 THEN materials WHEN json_extract(materials, ?) > ? THEN json_set(materials, ?, json_extract(materials, ?) - ?) ELSE json_remove(materials, ?) END,
            version = version + 1
-         WHERE id = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
+         WHERE id = ? AND version = ? AND gold >= ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
       )
-      .bind(cost.gold, JSON.stringify({ ...stored, relations }), taken, stack, taken, stack, stack, taken, stack, row.id, item.id, roll),
+      .bind(cost.gold, JSON.stringify(next), taken, stack, taken, stack, stack, taken, stack, row.id, row.version, cost.gold, item.id, roll),
   ]);
   const after = await loadPlayer(db, session.userId);
   const saved = after.items.find((candidate) => candidate.id === item.id);
   if (saved?.lastRoll !== roll) throw changed();
-  return json({ item: saved, gold: cost.gold, character: characterView(after, context.now) });
+  return json({
+    item: saved,
+    gold: cost.gold,
+    pending: pendingView(pendingOf(settlementOf(after.row), after.items)),
+    character: characterView(after, context.now),
+  });
+}
+
+// { option }: the affix the player keeps of those a reforging drew.
+export async function chooseReforged(context) {
+  const { session, player } = await requireIdlePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const pending = pendingOf(stored, player.items);
+  if (!pending) throw new ApiError(404, 'no_choice', 'Nie ma afiksów do wyboru.');
+  const option = pending.options[body.option];
+  if (!Number.isInteger(body.option) || !option) throw new ApiError(400, 'invalid_option', 'Wybierz jeden z afiksów.');
+  const { affixes } = withAffix(pending.item, pending.affix, option);
+  const db = context.env.DB;
+  // Both only while this choice still waits, so it is made once.
+  await db.batch([
+    db
+      .prepare(
+        `UPDATE items SET data = json_set(data, '$.affixes', json(?))
+         WHERE id = ? AND character_id = ? AND COALESCE(json_extract(data, '$.reforged'), 0) = ?
+           AND json_extract((SELECT settlement FROM characters WHERE id = ?), '$.pending.roll') = ?`,
+      )
+      .bind(JSON.stringify(affixes), pending.item.id, row.id, pending.reforged, row.id, pending.roll),
+    db
+      .prepare(`UPDATE characters SET settlement = json_remove(settlement, '$.pending'), version = version + 1 WHERE id = ? AND json_extract(settlement, '$.pending.roll') = ?`)
+      .bind(row.id, pending.roll),
+  ]);
+  const after = await loadPlayer(db, session.userId);
+  if (settlementOf(after.row).pending?.roll === pending.roll) throw changed();
+  const saved = after.items.find((candidate) => candidate.id === pending.item.id);
+  if (JSON.stringify(saved?.affixes) !== JSON.stringify(affixes)) throw changed();
+  return json({ item: saved, character: characterView(after, context.now) });
 }
 
 // { service: "path" | "stats" }: the Pustelnik's resets for gold. "path"

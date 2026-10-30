@@ -8506,6 +8506,16 @@ a.profession-square:active {
   opacity: 0.7;
 }
 
+/* The affixes a reforging drew: one under another, the one tapped stays. */
+.settlement-choice {
+  display: grid;
+  gap: 8px;
+}
+
+.settlement-choice .settlement-actions {
+  grid-template-columns: 1fr;
+}
+
 .settlement-reforge {
   display: grid;
   gap: 8px;

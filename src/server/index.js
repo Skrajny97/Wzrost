@@ -39,7 +39,7 @@ import {
   testIntroduction,
   tutorialTests,
 } from './testing.js';
-import { deliverSettlementOrder, getSettlement, hermitService, reforgeAtEnchantress, rejectSettlementOrder, settlementTests, testSettlement } from './settlement.js';
+import { chooseReforged, deliverSettlementOrder, getSettlement, hermitService, reforgeAtEnchantress, rejectSettlementOrder, settlementTests, testSettlement } from './settlement.js';
 import { skipWithTimePoints } from './time.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
 import { seeTutorial } from './tutorial.js';
@@ -121,6 +121,7 @@ const routes = [
   ['POST', '/api/settlement/deliver', deliverSettlementOrder],
   ['POST', '/api/settlement/reject', rejectSettlementOrder],
   ['POST', '/api/settlement/reforge', reforgeAtEnchantress],
+  ['POST', '/api/settlement/reforge/choose', chooseReforged],
   ['POST', '/api/settlement/hermit', hermitService],
   ['GET', '/api/test/settlement', settlementTests],
   ['POST', '/api/test/settlement', testSettlement],

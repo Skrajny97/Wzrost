@@ -247,21 +247,42 @@ export function reforgeBlock(item, affixIndex, { gold, materials, stack, times }
   return null;
 }
 
-// Reforging (question 97 A): the chosen affix draws anew among the other
-// affixes of its kind (a prefix stays a prefix), never one the item already
-// has, with the value its item level and rarity give that stat. The
-// creature that names it stays, so the new affix comes from the place the
-// item was found (question 98 A). The other affixes, the upgrade and the
-// level stay. Always succeeds (question 100 A).
-export function reforgeItem(item, affixIndex, rng, content) {
+// How many new affixes the Zaklinaczka offers to choose from at the
+// character's relation with her: one, and more from the standings in
+// reforge.choices on (question 97: "z czasem rozwoju Reputacji możliwość
+// wybrania afiksu z 2-3 dostępnych").
+export function reforgeChoices(points, content) {
+  const { index } = standingOf(points, content);
+  const at = (standingId) => content.settlement.standings.findIndex((standing) => standing.id === standingId);
+  return content.settlement.reforge.choices.reduce((count, step) => (index >= at(step.from) ? step.count : count), 1);
+}
+
+// The new affixes a reforging draws for the chosen one (question 97 A):
+// `count` different ones among the other affixes of its kind (a prefix
+// stays a prefix), never one the item already has, with the value its item
+// level and rarity give that stat. The creature that names it stays, so
+// the new affix comes from the place the item was found (question 98 A).
+export function reforgeOptions(item, affixIndex, count, rng, content) {
   const old = item.affixes[affixIndex];
-  const pool = (old.kind === 'prefix' ? content.prefixes : content.suffixes).filter((affix) => !item.affixes.some((other) => other.id === affix.id));
-  const affix = rng.weighted(pool);
+  let pool = (old.kind === 'prefix' ? content.prefixes : content.suffixes).filter((affix) => !item.affixes.some((other) => other.id === affix.id));
   const share = affixShare(item.level, item.rarity, content);
-  const affixes = item.affixes.map((other, index) =>
-    index === affixIndex ? { ...other, id: affix.id, stat: affix.stat, value: affixValue(affix.stat, share, content.balance.items) } : other,
-  );
-  return { ...item, affixes, reforged: (item.reforged ?? 0) + 1 };
+  const options = [];
+  while (options.length < count && pool.length > 0) {
+    const affix = rng.weighted(pool);
+    pool = pool.filter((other) => other.id !== affix.id);
+    options.push({ ...old, id: affix.id, stat: affix.stat, value: affixValue(affix.stat, share, content.balance.items) });
+  }
+  return options;
+}
+
+// The item with one affix in place of the one at `affixIndex`.
+export const withAffix = (item, affixIndex, affix) => ({ ...item, affixes: item.affixes.map((other, index) => (index === affixIndex ? affix : other)) });
+
+// Reforging with nothing to choose: the chosen affix draws anew. The other
+// affixes, the upgrade and the level stay. Always succeeds (question 100 A).
+export function reforgeItem(item, affixIndex, rng, content) {
+  const [affix] = reforgeOptions(item, affixIndex, 1, rng, content);
+  return { ...withAffix(item, affixIndex, affix), reforged: (item.reforged ?? 0) + 1 };
 }
 
 // The Pustelnik's prices: a path reset (question 122 A), a change of

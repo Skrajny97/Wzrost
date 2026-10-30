@@ -156,6 +156,7 @@ export function mountSettlement(container) {
         item.materials && h('label', { class: 'field-label', text: `Materiał: ${item.materials.count} szt., ${item.materials.rarityName}` }),
         item.materials && (stacks.length > 0 ? material : h('p', { class: 'muted', text: 'Nie masz dość materiałów tej rzadkości.' })),
         h('p', { class: 'muted', text: `Koszt: ${formatNumber(item.gold)} złota.` }),
+        data.reforge.choices > 1 && h('p', { class: 'muted', text: `Zaklinaczka wylosuje ${data.reforge.choices} nowe afiksy, a Ty zatrzymasz jeden z nich.` }),
         h('button', {
           type: 'button',
           class: 'button button--world',
@@ -163,9 +164,9 @@ export function mountSettlement(container) {
           disabled: !enough,
           onClick: (event) =>
             withButton(event.currentTarget, async () => {
-              await call('POST', '/api/settlement/reforge', { itemId: item.id, affix, material: item.materials ? material.value : undefined });
+              const answer = await call('POST', '/api/settlement/reforge', { itemId: item.id, affix, material: item.materials ? material.value : undefined });
               closeSheet();
-              toast('Zaklinaczka przekuła afiks.');
+              toast(answer.pending ? 'Wybierz jeden z nowych afiksów.' : 'Zaklinaczka przekuła afiks.');
               load();
             }),
         }),
@@ -192,11 +193,39 @@ export function mountSettlement(container) {
       },
     });
 
+  // The affixes a reforging drew, waiting for the one the player keeps.
+  function choiceCard({ name, old, options }) {
+    return h(
+      'div',
+      { class: 'settlement-choice' },
+      h('p', {}, h('strong', { text: name }), `: zamiast „${old}” wybierz jeden afiks.`),
+      h(
+        'div',
+        { class: 'settlement-actions' },
+        options.map((label, option) =>
+          h('button', {
+            type: 'button',
+            class: 'button button--world button--small',
+            text: label,
+            onClick: (event) =>
+              withButton(event.currentTarget, async () => {
+                await call('POST', '/api/settlement/reforge/choose', { option });
+                toast('Zaklinaczka przekuła afiks.');
+                load();
+              }),
+          }),
+        ),
+      ),
+    );
+  }
+
   function residentCard(resident) {
     const place = data.places.find((one) => one.resident === resident.id);
     const action =
       resident.service === 'reforge'
-        ? h('button', { type: 'button', class: 'button button--world', text: 'Przekuj afiks', onClick: reforgeSheet })
+        ? data.reforge.pending
+          ? choiceCard(data.reforge.pending)
+          : h('button', { type: 'button', class: 'button button--world', text: 'Przekuj afiks', onClick: reforgeSheet })
         : resident.service === 'hermit'
           ? h(
               'div',
