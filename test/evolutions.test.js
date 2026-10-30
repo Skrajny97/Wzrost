@@ -136,6 +136,8 @@ describe('class evolutions in fights', () => {
       const demo = skillDemo(skill.id, content);
       assert.ok(demo.events.some((event) => event.skill === skill.id), skill.id);
     }
+    // The miracle is shown by the fight it turns: the risen character wins.
+    assert.equal(skillDemo('miracle', content).won, true);
   });
 
   test('a summon stands before its summoner and takes the foes\' blows until it falls or goes', () => {
