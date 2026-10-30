@@ -1,0 +1,23 @@
+{
+  "id": "hermit-1-plain",
+  "payload": {
+    "prompt": "an old forest hermit, long white hair and beard tangled with moss, deep wrinkles, calm wise eyes, a hooded patched grey cloak, a string of wooden beads, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 945007554,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793355236,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 43.96,
+    "request_id": "a953cc42-ebda-41d8-9efe-a5baf8184d1f",
+    "outputs_retained_until": 1793441576
+  }
+}

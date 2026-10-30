@@ -1,0 +1,23 @@
+{
+  "id": "headman-1-plain",
+  "payload": {
+    "prompt": "an old village headman, broad grey beard and grey hair, kind but stern eyes, weathered face, a fur-trimmed brown wool coat over a linen shirt, a carved wooden staff of office, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 57632178,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793355124,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 44.32,
+    "request_id": "fa250df0-f604-48a6-b00a-beb02bf4c724",
+    "outputs_retained_until": 1793441482
+  }
+}
