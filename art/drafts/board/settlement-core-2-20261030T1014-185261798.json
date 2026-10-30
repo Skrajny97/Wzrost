@@ -1,0 +1,24 @@
+{
+  "id": "settlement-core-2",
+  "payload": {
+    "prompt": "top-down pixel art game map seen straight from above, a flat map view with no perspective and no isometric angle, the middle of a large old slavic village: a big round open square of trodden earth in the centre of the map, a wide dirt road running straight from the top edge of the map through the square to the bottom edge, narrow footpaths from the square to wide empty grass plots on the left and right, a tall palisade of sharpened logs running straight down along the left and right edges of the map with dark pine trees beyond it, flat green grass with small flowers, stones and bushes, a few vegetable patches behind low wattle fences, no houses, no buildings, no market stalls, no people, muted natural colours",
+    "prompt_style": "rd_plus__topdown_map",
+    "width": 384,
+    "height": 384,
+    "num_images": 2,
+    "seed": 185261798,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793355325,
+    "credit_cost": 18,
+    "balance_cost": 0.12,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 43.54,
+    "request_id": "0d04f5ff-8036-414d-bee1-283894e56dcf",
+    "outputs_retained_until": 1793441713,
+    "output_url_expires_at": 1793356226
+  }
+}
