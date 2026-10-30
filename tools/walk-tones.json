@@ -7,6 +7,7 @@
   "elementalist-male": { "only": ["head", "hands"] },
   "gladiator-female": { "not": [[0, 0, 128, 26, "head"], [44, 24, 67, 38, "head"], [0, 99, 128, 128]] },
   "gladiator-male": { "not": [[0, 0, 128, 26, "head"], [44, 24, 67, 38, "head"], [0, 99, 128, 128]] },
+  "inquisitor-female": { "near_not": { "colours": ["a17e4a", "9b6d2e", "623f1f", "a67537"], "radius": 2 } },
   "ice-lord-male": { "drop": ["8d6750"], "only": ["head", "hands"] },
   "night-dancer-female": { "only": ["head", "hands", "upper-arms"] },
   "poisoner-female": { "only": ["head", "hands"] },

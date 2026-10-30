@@ -17,6 +17,9 @@
 # of the skeleton in each frame instead of a box in "only" ("head", "hands",
 # "upper-arms": PixelLab keeps the joints where the skeleton has them), "open"
 # to leave out lines of the skin's colours a pixel or two thin (a blade),
+# "near_not" ({"colours": [...], "radius": n}) to leave out the skin's
+# colours within n pixels of colours only a thing has (a golden cross whose
+# light is the colour of a face),
 # single pixels ({frame: [[x, y], ...]}, "pixels" and "not_pixels"), and
 # "span", the part of the tone's ramp the skin takes (default [0, 1]), for a
 # skin of a colour or two, which would else take its whole ramp.
@@ -44,6 +47,8 @@ GROW = 2
 GROW_LIGHT = 0.5
 # The share of a shade's pixels next to the skin that makes it skin.
 PROMOTE = 0.5
+# The fewest pixels of a thing's own colours (near_not) that count as the thing.
+MARK_PART = 6
 SIDES = ((1, 0), (-1, 0), (0, 1), (0, -1))
 
 TO_LAB = ImageCms.buildTransform(ImageCms.createProfile('sRGB'), ImageCms.createProfile('LAB'), 'RGB', 'LAB')
@@ -215,8 +220,34 @@ def skin_pixels(im, colours, fix):
     }
     if fix.get('open'):
         pixels = opened(pixels)
+    if fix.get('near_not'):
+        marks = {rgb(code) for code in fix['near_not']['colours']}
+        reach = fix['near_not'].get('radius', 2)
+        marked = {(x, y) for y in range(im.height) for x in range(im.width) if px[x, y][3] >= 128 and px[x, y][:3] in marks}
+        # Only the thing itself, not a stray pixel of its colour in an eye.
+        marked = {p for part in parts(marked) if len(part) >= MARK_PART for p in part}
+        near = {(x + dx, y + dy) for x, y in marked for dx in range(-reach, reach + 1) for dy in range(-reach, reach + 1)}
+        pixels -= near
     listed = lambda key: {(int(frame) * FRAME + x, y) for frame, points in fix.get(key, {}).items() for x, y in points}
     return (pixels | listed('pixels')) - listed('not_pixels')
+
+
+def parts(pixels):
+    """The pixels in groups that touch, corners too."""
+    left, found = set(pixels), []
+    while left:
+        part, todo = set(), [left.pop()]
+        while todo:
+            x, y = todo.pop()
+            part.add((x, y))
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    p = (x + dx, y + dy)
+                    if p in left:
+                        left.remove(p)
+                        todo.append(p)
+        found.append(part)
+    return found
 
 
 def opened(pixels):
