@@ -151,7 +151,7 @@ export function mountSettlement(container, { params = {} } = {}) {
   // affix became, or the affixes she drew to keep one of.
   function reforgeSheet() {
     const body = h('div', { class: 'settlement-reforge' });
-    openSheet(h('h2', { class: 'sheet-title', text: 'Przekucie afiksu' }), body);
+    openSheet(h('h2', { class: 'sheet-title', text: 'Zaklęcie afiksu' }), body);
     if (data.reforge.pending) choose(data.reforge.pending);
     else pickItem();
 
@@ -160,9 +160,9 @@ export function mountSettlement(container, { params = {} } = {}) {
       fill(
         body,
         items.length === 0
-          ? h('p', { class: 'muted', text: 'Nie masz przedmiotów z afiksami do przekucia.' })
+          ? h('p', { class: 'muted', text: 'Nie masz przedmiotów z afiksami do zaklęcia.' })
           : [
-              h('p', { class: 'sheet-text', text: 'Wybierz przedmiot. Zaklinaczka przekuje jeden jego afiks: wylosuje go od nowa.' }),
+              h('p', { class: 'sheet-text', text: 'Wybierz przedmiot. Zaklinaczka zaklnie jeden jego afiks: wylosuje go od nowa.' }),
               h(
                 'ul',
                 { class: 'item-list' },
@@ -192,7 +192,7 @@ export function mountSettlement(container, { params = {} } = {}) {
           body,
           h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), 'Inny przedmiot'),
           h('div', { class: 'settlement-reforge-item' }, itemHead(item)),
-          h('p', { class: 'field-label', text: 'Afiks do przekucia' }),
+          h('p', { class: 'field-label', text: 'Afiks do zaklęcia' }),
           h(
             'div',
             { class: 'settlement-picks' },
@@ -243,7 +243,7 @@ export function mountSettlement(container, { params = {} } = {}) {
           h('button', {
             type: 'button',
             class: 'button button--world',
-            text: chosen === null ? 'Wybierz afiks' : 'Przekuj',
+            text: chosen === null ? 'Wybierz afiks' : 'Zaklnij',
             disabled: !ready,
             onClick: (event) =>
               withButton(event.currentTarget, async () => {
@@ -292,7 +292,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     function showResult(result, { affix = null, material = null } = {}) {
       fill(
         body,
-        h('p', { class: 'settlement-result-title', text: 'Zaklinaczka przekuła afiks' }),
+        h('p', { class: 'settlement-result-title', text: 'Zaklinaczka zaklęła afiks' }),
         h('div', { class: 'settlement-reforge-item' }, itemHead({ id: result.itemId, name: result.name })),
         h(
           'p',
@@ -304,7 +304,7 @@ export function mountSettlement(container, { params = {} } = {}) {
         h(
           'div',
           { class: 'sheet-actions' },
-          h('button', { type: 'button', class: 'button button--world', text: 'Przekuj ponownie', onClick: () => pickAffix(result.itemId, affix, material) }),
+          h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij ponownie', onClick: () => pickAffix(result.itemId, affix, material) }),
           h('button', { type: 'button', class: 'button button--system', text: 'Gotowe', onClick: closeSheet }),
         ),
       );
@@ -378,7 +378,7 @@ export function mountSettlement(container, { params = {} } = {}) {
   // A resident's services, on their place's screen.
   function services(resident) {
     if (resident.service === 'reforge')
-      return data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: 'Przekuj afiks', onClick: reforgeSheet });
+      return data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij afiks', onClick: reforgeSheet });
     if (resident.service !== 'hermit') return null;
     return h(
       'div',

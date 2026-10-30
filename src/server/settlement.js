@@ -326,7 +326,7 @@ export async function reforgeAtEnchantress(context) {
   requireOpen(row);
   const body = await readJson(context.request);
   const stored = settlementOf(row);
-  if (pendingOf(stored, player.items)) throw new ApiError(409, 'choose_first', 'Najpierw wybierz afiks z poprzedniego przekucia.');
+  if (pendingOf(stored, player.items)) throw new ApiError(409, 'choose_first', 'Najpierw wybierz afiks z poprzedniego zaklęcia.');
   const item = player.items.find((candidate) => String(candidate.id) === String(body.itemId));
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
   const times = item.reforged ?? 0;

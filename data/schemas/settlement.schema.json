@@ -188,7 +188,7 @@
         "goldPerLevel": { "type": "number", "exclusiveMinimum": 0 },
         "choices": {
           "type": "array",
-          "description": "Od którego stopnia relacji z Zaklinaczką przekucie daje do wyboru więcej nowych afiksów (count); niżej jeden.",
+          "description": "Od którego stopnia relacji z Zaklinaczką zaklęcie daje do wyboru więcej nowych afiksów (count); niżej jeden.",
           "items": {
             "type": "object",
             "additionalProperties": false,
