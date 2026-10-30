@@ -1,0 +1,48 @@
+{
+  "id": "settlement-tall-recent",
+  "request": "recent:outpainting",
+  "result": {
+    "request_id": "79c0bce5-5dac-5c38-a435-86c36dd95b97",
+    "operation": "edit_tool",
+    "status": "succeeded",
+    "mode": "async",
+    "token_id": 21306,
+    "token_prefix": "rdpk-sH0-ZzS...",
+    "created_at": 1793356889,
+    "updated_at": 1793357212,
+    "completed_at": 1793357212,
+    "request": {
+      "seed": 723023441,
+      "prompt": "top-down pixel art game map seen straight from above, more of the same large old slavic village inside a tall palisade of sharpened logs: wide empty grass yards for houses, dirt footpaths, a few trees, bushes, stones and vegetable patches behind low wattle fences, the dirt road continuing straight up and down, the tall palisade with a small wooden gate across the top edge of the map, the tall palisade with a big wooden main gate across the bottom edge of the map where the road leaves the village, thin log walls along the left and right edges, no houses, no people",
+      "tile_x": true,
+      "tile_y": false,
+      "tool_id": "outpainting",
+      "custom_id": "15bdf1b3-56e9-40a6-8dba-4c589bd7296c",
+      "dithering": false,
+      "operation": "edit_tool",
+      "expand_top": 224,
+      "soft_inpaint": false,
+      "expand_bottom": 224,
+      "has_input_image": true,
+      "has_input_palette": false,
+      "force_solid_pixels": true,
+      "reference_image_count": 0,
+      "scheduled_region_mode": true
+    },
+    "credit_cost": 200,
+    "balance_cost": 1.7999999999999998,
+    "charged": true,
+    "http_status": 200,
+    "output_status": "available",
+    "outputs": [
+      {
+        "position": 0,
+        "media_type": "image/png",
+        "available": true,
+        "url": "https://retrodiffusionstack-retrodiffusionapioutputstorere-rg4v98h7gwoa.s3.amazonaws.com/api-activity/79c0bce5-5dac-5c38-a435-86c36dd95b97/0-3b962f78122c462a8001ea03bfee6973.png?AWSAccessKeyId=AKIA55GSYAHSFAUCTWD2&Signature=4DhBbAHn21qmnU4UGYa0PRMwgJ0%3D&Expires=1793358259",
+        "url_expires_at": 1793358259,
+        "retained_until": 1793443289
+      }
+    ]
+  }
+}
