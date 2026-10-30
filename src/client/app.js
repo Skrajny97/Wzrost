@@ -57,7 +57,8 @@ const ROUTES = [
   { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: lockedScreen('core', 'Rdzeń') },
   // Profesje, or one profession's screen (Zielarstwo).
   { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', music: 'professions', mount: mountProfessions },
-  { pattern: /^#\/osada$/, nav: 'main', tab: 'osada', mount: mountSettlement },
+  // The Osada's board, or one of its places.
+  { pattern: /^#\/osada(?:\/(?<place>[a-z0-9-]+))?$/, nav: 'main', tab: 'osada', mount: mountSettlement },
   { pattern: /^#\/spolecznosc$/, nav: 'main', tab: 'spolecznosc', mount: mountCommunity },
   // A Wymiana with another player's character, from the Społeczność.
   { pattern: /^#\/wymiana$/, nav: 'main', tab: null, lit: 'spolecznosc', mount: mountTrade },

@@ -1,15 +1,18 @@
-// The Osada, part I (src/server/settlement.js): the Tablica zleceń with its
-// three orders and the week's big one, the brotherhoods' standings, the
-// residents with their greetings, the Zaklinaczka's reforging and the
-// Pustelnik's prices. A list for now: the board of places in the camp's
-// style comes with its art (question 73).
+// The Osada, part I (src/server/settlement.js): a board of places to tap in
+// the camp's style (question 73 A), twice as tall as the camp's, and a
+// screen for each place with its resident's bust, story and greeting
+// (question 76): the Tablica zleceń with its three orders, the week's big
+// one and the brotherhoods' standings, the Zaklinaczka's reforging and the
+// Pustelnik's prices. The places of the later parts show what is to come.
 //
 // Where the deployment has no Osada yet, or the character is below its
 // level, the tab says so as the other locked modules do.
 
+import { residentBust, settlementGround, settlementPlaceArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatHours, formatNumber } from '../format.js';
+import { leaveView, openView } from '../history.js';
 import { setMusicPlace } from '../music.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
@@ -22,7 +25,13 @@ function timeLeft(ms) {
   return days > 0 ? `${days} ${days === 1 ? 'dzień' : 'dni'}` : formatHours(Math.max(hours, 1 / 60));
 }
 
-export function mountSettlement(container) {
+const SETTLEMENT = '#/osada';
+const HISTORY_KEY = 'osada'; // a place's screen lies one view below the board
+// The board's ground, in its pixels: a place's picture keeps its own size on it.
+const BOARD_WIDTH = 384;
+
+export function mountSettlement(container, { params = {} } = {}) {
+  const placeId = params.place ?? null;
   let data = null;
   let failure = null;
   let gone = false;
@@ -366,37 +375,116 @@ export function mountSettlement(container) {
     );
   }
 
-  function residentCard(resident) {
-    const place = data.places.find((one) => one.resident === resident.id);
-    const action =
-      resident.service === 'reforge'
-        ? data.reforge.pending
-          ? choiceCard(data.reforge.pending)
-          : h('button', { type: 'button', class: 'button button--world', text: 'Przekuj afiks', onClick: reforgeSheet })
-        : resident.service === 'hermit'
-          ? h(
-              'div',
-              { class: 'settlement-actions' },
-              data.hermit.path !== null &&
-                hermitButton('path', `Wyzeruj ścieżkę (${formatNumber(data.hermit.path)} zł.)`, 'Umiejętności klasy wrócą jako Punkty Umiejętności, a ścieżki wybierzesz od nowa.'),
-              data.hermit.stats !== null && hermitButton('stats', `Wyzeruj statystyki (${formatNumber(data.hermit.stats)} zł.)`, 'Wszystkie rozdane punkty statystyk wrócą do rozdania.'),
-              data.hermit.evolution &&
-                h('button', {
-                  type: 'button',
-                  class: 'button button--small',
-                  text: data.hermit.evolution.price > 0 ? `Zmień ewolucję (${formatNumber(data.hermit.evolution.price)} zł.)` : 'Zmień ewolucję (pierwszy raz darmo)',
-                  onClick: evolutionSheet,
-                }),
-            )
-          : null;
+  // A resident's services, on their place's screen.
+  function services(resident) {
+    if (resident.service === 'reforge')
+      return data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: 'Przekuj afiks', onClick: reforgeSheet });
+    if (resident.service !== 'hermit') return null;
     return h(
       'div',
-      { class: `card settlement-resident${place?.soon ? ' settlement-resident--soon' : ''}` },
-      h('p', {}, h('strong', { text: `${resident.name}, ${resident.title}` }), place ? ` · ${place.name}${place.soon ? ' (wkrótce)' : ''}` : ''),
-      h('p', { class: 'muted', text: resident.story }),
+      { class: 'settlement-actions' },
+      data.hermit.path !== null &&
+        hermitButton('path', `Wyzeruj ścieżkę (${formatNumber(data.hermit.path)} zł.)`, 'Umiejętności klasy wrócą jako Punkty Umiejętności, a ścieżki wybierzesz od nowa.'),
+      data.hermit.stats !== null && hermitButton('stats', `Wyzeruj statystyki (${formatNumber(data.hermit.stats)} zł.)`, 'Wszystkie rozdane punkty statystyk wrócą do rozdania.'),
+      data.hermit.evolution &&
+        h('button', {
+          type: 'button',
+          class: 'button button--small',
+          text: data.hermit.evolution.price > 0 ? `Zmień ewolucję (${formatNumber(data.hermit.evolution.price)} zł.)` : 'Zmień ewolucję (pierwszy raz darmo)',
+          onClick: evolutionSheet,
+        }),
+    );
+  }
+
+  // The resident of a place (question 76): the bust, who they are, their
+  // story and how they greet the character at its relation.
+  const residentCard = (resident) =>
+    h(
+      'section',
+      { class: 'card settlement-resident' },
+      h(
+        'div',
+        { class: 'settlement-resident-head' },
+        h('span', { class: 'settlement-resident-bust' }, residentBust(resident.id)),
+        h(
+          'div',
+          {},
+          h('p', { class: 'settlement-resident-name', text: `${resident.name}, ${resident.title}` }),
+          h('p', { class: 'muted', text: `Relacja: ${resident.standing.name}` }),
+          h('p', { class: 'muted settlement-resident-story', text: resident.story }),
+        ),
+      ),
       h('p', { class: 'settlement-greeting', text: `„${resident.greeting}”` }),
-      h('p', { class: 'muted', text: `Relacja: ${resident.standing.name}` }),
-      !place?.soon && action,
+    );
+
+  // Whether the Tablica has an order to deliver now, for its dot on the board.
+  const deliverable = () =>
+    [...data.board.slots.map((slot) => slot.order), data.board.weekly].some((order) => order && order.have >= order.count && !(order.home && state.character.activity));
+
+  // A place on the board: its picture at its own size on the ground, its
+  // name, and a dot on the Tablica when an order waits.
+  function placeLink(place) {
+    const hash = `${SETTLEMENT}/${place.id}`;
+    const art = settlementPlaceArt(place.id);
+    const link = h(
+      'a',
+      {
+        class: `settlement-place${place.soon ? ' settlement-place--soon' : ''}`,
+        href: hash,
+        style: { left: `${place.x}%`, top: `${place.y}%` },
+        'aria-label': place.soon ? `${place.name}, wkrótce` : place.name,
+        onClick: (event) => openView(event, hash, HISTORY_KEY),
+      },
+      art ? h('span', { class: 'settlement-place-art-box' }, art) : h('span', { class: 'settlement-place-empty' }),
+      h('span', { class: 'settlement-place-label', text: place.name }),
+      place.id === 'board' && deliverable() && h('span', { class: 'settlement-place-dot', 'aria-hidden': 'true' }),
+    );
+    if (art) {
+      const size = () => (link.style.width = `${(art.naturalWidth / BOARD_WIDTH) * 100}%`);
+      if (art.complete && art.naturalWidth) size();
+      else art.addEventListener('load', size, { once: true });
+    }
+    return link;
+  }
+
+  // The board (question 73 A): the ground of Rozstaje, twice as tall as the
+  // camp's (the author: "Ja to bym dał nawet z 2 razy większą tę Osadę"),
+  // scrolling with the page, and its places.
+  function boardView() {
+    const ground = settlementGround();
+    fill(
+      container,
+      pageHeading(`Osada: ${data.name}`, data.description),
+      h(
+        'div',
+        { class: 'settlement-map', role: 'group', 'aria-label': 'Plansza Osady' },
+        ground && h('img', { class: 'settlement-map-ground', src: ground, alt: '', decoding: 'async', draggable: 'false' }),
+        data.places.map(placeLink),
+      ),
+    );
+  }
+
+  // A place's screen: its resident and what they do, the Tablica's orders
+  // and the brotherhoods; a place of a later part says so.
+  function placeView(place) {
+    const resident = data.residents.find((one) => one.id === place.resident);
+    fill(
+      container,
+      h(
+        'div',
+        { class: 'page-heading page-heading--back' },
+        h(
+          'div',
+          { class: 'page-heading-text' },
+          h('h1', { class: 'page-title', tabindex: '-1', text: place.name }),
+          h('p', { class: 'page-subtitle', text: resident ? `${resident.name}, ${resident.title}` : `Osada: ${data.name}` }),
+        ),
+        h('button', { type: 'button', class: 'button button--system back-button', onClick: () => leaveView(SETTLEMENT, 1, HISTORY_KEY) }, icon('back', { size: 20 }), 'Powrót'),
+      ),
+      place.soon && systemPanel(`${place.name} otworzy się w jednej z kolejnych aktualizacji gry.`),
+      resident && residentCard(resident),
+      !place.soon && resident && services(resident),
+      place.id === 'board' && [boardCard(), brotherhoodsCard()],
     );
   }
 
@@ -405,13 +493,11 @@ export function mountSettlement(container) {
     if (failure && (failure.status === 403 || failure.status === 404)) return locked();
     if (failure) return fill(container, pageHeading('Osada'), systemPanel(failure.message));
     if (!data) return fill(container, pageHeading('Osada'), h('p', { class: 'muted', text: 'Wczytywanie…' }));
-    fill(
-      container,
-      pageHeading(`Osada: ${data.name}`, data.description),
-      boardCard(),
-      brotherhoodsCard(),
-      h('section', { class: 'settlement-residents' }, h('h2', { class: 'section-title', text: 'Mieszkańcy' }), data.residents.map(residentCard)),
-    );
+    const place = placeId && data.places.find((one) => one.id === placeId);
+    // An unknown place in the address leads back to the board.
+    if (placeId && !place) return location.replace(SETTLEMENT);
+    if (place) placeView(place);
+    else boardView();
     // An empty slot fills when its time comes.
     const next = Math.min(...data.board.slots.filter((slot) => slot.readyAt).map((slot) => slot.readyAt));
     if (Number.isFinite(next)) timer = setTimeout(load, Math.max(1000, next - serverNow() + 1000));

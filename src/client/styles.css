@@ -8467,8 +8467,128 @@ a.profession-square:active {
   width: auto;
 }
 
-/* The Osada (screens/settlement.js): the board of orders, the brotherhoods
-   and the residents, as a list until the board's art comes. */
+/* The Osada (screens/settlement.js): its board, twice as tall as the camp's,
+   scrolling with the page, each place's picture at its own size on the
+   ground (its width set from the picture), its name under it. */
+.settlement-map {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto 16px;
+  aspect-ratio: 384 / 768;
+  overflow: hidden;
+  border: 1px solid var(--bark-line);
+  border-radius: 6px;
+  background: #151d12;
+}
+
+.settlement-map-ground {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.settlement-place {
+  position: absolute;
+  width: 26%;
+  transform: translate(-50%, -50%);
+  color: var(--text);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.settlement-place-art-box {
+  display: block;
+  transition: transform 0.12s ease;
+}
+
+.settlement-place:active .settlement-place-art-box {
+  transform: scale(0.95);
+}
+
+.settlement-place-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.settlement-place-empty {
+  display: block;
+  aspect-ratio: 4 / 3;
+  border: 1px dashed var(--bark-line);
+  border-radius: 50%;
+}
+
+.settlement-place-label {
+  position: absolute;
+  z-index: 2;
+  top: 100%;
+  left: 50%;
+  padding: 2px 7px;
+  transform: translate(-50%, -6px);
+  background: rgba(13, 17, 11, 0.86);
+  border: 1px solid var(--bark-line);
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.settlement-place--soon .settlement-place-label {
+  border-style: dashed;
+  color: var(--text-muted);
+}
+
+.settlement-place:focus-visible {
+  outline: 2px solid var(--system);
+  outline-offset: 2px;
+}
+
+/* An order to deliver at the Tablica. */
+.settlement-place-dot {
+  position: absolute;
+  top: 6%;
+  right: 8%;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #151d12;
+  border-radius: 50%;
+  background: var(--gold, #e0b84c);
+}
+
+/* A place's resident: the bust, who they are and their story. */
+.settlement-resident-head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.settlement-resident-bust {
+  flex: none;
+  width: 96px;
+  height: 128px;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: #151d12;
+  overflow: hidden;
+}
+
+.settlement-resident-bust .resident-bust {
+  display: block;
+  width: 96px;
+  height: 128px;
+  image-rendering: pixelated;
+}
+
+.settlement-resident-name {
+  font-weight: 600;
+}
+
+/* The Tablica's orders and the brotherhoods, on its screen. */
 .settlement-board,
 .settlement-residents {
   display: grid;

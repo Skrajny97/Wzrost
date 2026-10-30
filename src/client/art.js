@@ -242,6 +242,26 @@ export const SPRITES = {
     fit: true,
     ids: ['elemental-summon', 'toxic-slime'],
   },
+  // The Osada (data/settlement.json): its places on the board, by the
+  // place's id, each cut to its outline, the Targowisko in the middle the
+  // largest; the residents' busts, 96×128; and the board's ground, twice
+  // as tall as the camp's, which scrolls with the page.
+  settlement: {
+    width: 192,
+    height: 144,
+    fit: true,
+    ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist'],
+  },
+  residents: {
+    width: 96,
+    height: 128,
+    ids: ['headman', 'enchantress', 'hermit', 'innkeeper', 'herbalist'],
+  },
+  'settlement-board': {
+    width: 384,
+    height: 768,
+    ids: ['settlement'],
+  },
 };
 
 const available = Object.fromEntries(Object.entries(SPRITES).map(([kind, { ids }]) => [kind, new Set(ids)]));
@@ -309,6 +329,15 @@ export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/plac
 export const eventFigure = (id) =>
   available.events.has(id) ? h('img', { src: `/art/events/${id}.png`, alt: '', width: 96, height: 128, class: 'sprite event-figure', decoding: 'async', draggable: 'false' }) : null;
 export const eventScene = (id) => (available['event-scenes'].has(id) ? `/art/event-scenes/${id}.png` : null);
+// The Osada's place on its board, a resident's bust and the board's ground,
+// or null while there is none.
+export const settlementPlaceArt = (placeId) =>
+  available.settlement.has(placeId) ? h('img', { src: `/art/settlement/${placeId}.png`, alt: '', class: 'sprite settlement-place-art', decoding: 'async', draggable: 'false' }) : null;
+export const residentBust = (residentId) =>
+  available.residents.has(residentId)
+    ? h('img', { src: `/art/residents/${residentId}.png`, alt: '', width: 96, height: 128, class: 'sprite resident-bust', decoding: 'async', draggable: 'false' })
+    : null;
+export const settlementGround = () => (available['settlement-board'].has('settlement') ? '/art/settlement-board/settlement.png' : null);
 
 // A skin tone other than the one drawn has its own recoloured file
 // (data/skins.json, tools/skin-tones.py).
