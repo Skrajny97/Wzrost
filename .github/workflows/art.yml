@@ -33,6 +33,8 @@ on:
           - animations
           - events
           - icons
+          - settlement
+          - residents
       ids:
         description: Identyfikatory po przecinku albo all
         required: true
