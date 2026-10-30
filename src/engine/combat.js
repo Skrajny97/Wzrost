@@ -576,7 +576,14 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       const share = spread.reduce((sum, each) => sum + (1 - reduction(target.resist[each] ?? 0, actor.level, balance)) * (1 + (target.weak?.[each] ?? 0)), 0) / spread.length;
       amount = Math.max(1, Math.round(raw * critFactor * share * (1 - ward) * (1 + trophy) * evolved(actor, target, move, category, spread)));
     } else {
-      amount = Math.max(1, Math.round(raw * critFactor * (1 - reduction(defense, actor.level, balance)) * (1 + weak) * (1 - ward) * (1 + trophy)));
+      const plain = raw * critFactor * (1 - reduction(defense, actor.level, balance)) * (1 + weak) * (1 - ward) * (1 + trophy);
+      // A weapon's zaklęcie żywiołu turns a share of the blow into its
+      // element, against the target's resistance and weakness to it.
+      const imbue = weapon.imbue;
+      const imbued = imbue
+        ? raw * critFactor * (1 - reduction(target.resist[imbue.element] ?? 0, actor.level, balance)) * (1 + (target.weak?.[imbue.element] ?? 0)) * (1 - ward) * (1 + trophy)
+        : 0;
+      amount = Math.max(1, Math.round(imbue ? plain * (1 - imbue.share) + imbued * imbue.share : plain));
       if (evolving) {
         const shelter = target.shelter?.[element] ? 1 - target.shelter[element] : 1;
         amount = Math.max(1, Math.round(amount * evolved(actor, target, move, category, [element]) * shelter));

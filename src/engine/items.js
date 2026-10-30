@@ -334,6 +334,9 @@ export function itemProperties(raw, content) {
     lines.push(`${propertyName(stat, content)}: +${value}`);
   }
   if (armor && !raw.armor) lines.push(armor);
+  // The Zaklinaczka's zaklęcie żywiołu (settlement.js).
+  if (item.imbue?.share) lines.push(`Zaklęcie żywiołu: ${Math.round(item.imbue.share * 100)}% obrażeń jako ${content.elementsById[item.imbue.element].name}`);
+  if (item.imbue?.stat) lines.push(`Zaklęcie żywiołu: ${propertyName(item.imbue.stat, content)} +${item.imbue.value}`);
   return lines;
 }
 
@@ -347,7 +350,9 @@ export function itemLines(raw, content) {
     lines.push({ id: 'damage', label: 'Obrażenia', value: (item.damage.min + item.damage.max) / 2, text: `${item.damage.min}–${item.damage.max}` });
   }
   const stats = new Map(item.armor ? [['armor', item.armor]] : []);
-  for (const { stat, value } of [...(item.implicit ? [item.implicit] : []), ...item.affixes]) stats.set(stat, (stats.get(stat) ?? 0) + value);
+  for (const { stat, value } of [...(item.implicit ? [item.implicit] : []), ...item.affixes, ...(item.imbue?.stat ? [item.imbue] : [])]) {
+    stats.set(stat, (stats.get(stat) ?? 0) + value);
+  }
   for (const [stat, value] of stats) lines.push({ id: stat, label: propertyName(stat, content), value, text: `+${value}` });
   return lines;
 }

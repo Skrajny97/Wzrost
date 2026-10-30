@@ -175,6 +175,74 @@ export function mountSettlement(container, { params = {} } = {}) {
   // own rows (the author: "ekran wyboru przy afiksie powinien być
   // ingameowy"): the item, then its affix and the material, then what the
   // affix became, or the affixes she drew to keep one of.
+  // The zaklęcie żywiołu in a sheet (part III, question 101 A): a weapon or
+  // a body armour, then its element, each with what it gives and costs.
+  function imbueSheet() {
+    const body = h('div', { class: 'settlement-reforge' });
+    const capital = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+    openSheet(h('h2', { class: 'sheet-title', text: 'Zaklęcie żywiołu' }), body);
+    pickItem();
+
+    function pickItem() {
+      const { items } = data.imbue;
+      fill(
+        body,
+        items.length === 0
+          ? h('p', { class: 'muted', text: 'Nie masz broni ani pancerza do zaklęcia.' })
+          : [
+              h('p', { class: 'sheet-text', text: 'Wybierz broń albo pancerz. Broń zamieni część obrażeń na żywioł, a pancerz dostanie odporność na niego.' }),
+              h(
+                'ul',
+                { class: 'item-list' },
+                items.map((item) =>
+                  h(
+                    'li',
+                    {},
+                    h('button', { type: 'button', class: 'item-row', onClick: () => pickElement(item.id) }, itemHead(item), item.equipped && h('span', { class: 'chip', text: 'Założony' })),
+                  ),
+                ),
+              ),
+            ],
+      );
+    }
+
+    function pickElement(itemId) {
+      const item = data.imbue.items.find((one) => one.id === itemId);
+      if (!item) return pickItem();
+      const now = item.element && data.imbue.elements.find((one) => one.element === item.element);
+      fill(
+        body,
+        h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), 'Inny przedmiot'),
+        h('div', { class: 'settlement-reforge-item' }, itemHead(item)),
+        now && h('p', { class: 'muted', text: `Ma już żywioł: ${now.name}. Nowy zastąpi stary.` }),
+        data.imbue.elements.map((element) => {
+          const effect = item.effects[element.element];
+          const gives = effect.share ? `${Math.round(effect.share * 100)}% obrażeń jako ${element.name}` : `odporność na ${element.name} +${effect.value}`;
+          const ready = element.have >= element.count && state.character.gold >= item.gold && item.element !== element.element;
+          return h(
+            'div',
+            { class: 'settlement-choice' },
+            h('p', {}, h('strong', { text: capital(element.name) }), ` · ${gives}`),
+            h('p', { class: 'muted', text: `${formatNumber(item.gold)} zł. i ${element.count} × ${element.material} (masz ${formatNumber(element.have)})` }),
+            h('button', {
+              type: 'button',
+              class: 'button button--world button--small',
+              text: `Zaklnij: ${element.name}`,
+              disabled: !ready,
+              onClick: (event) =>
+                withButton(event.currentTarget, async () => {
+                  const answer = await call('POST', '/api/settlement/imbue', { itemId: item.id, element: element.element });
+                  apply(answer);
+                  closeSheet();
+                  toast(`Zaklinaczka zaklęła żywioł w przedmiot ${answer.imbued.item}: ${answer.imbued.element}.`);
+                }),
+            }),
+          );
+        }),
+      );
+    }
+  }
+
   function reforgeSheet() {
     const body = h('div', { class: 'settlement-reforge' });
     openSheet(h('h2', { class: 'sheet-title', text: 'Zaklęcie afiksu' }), body);
@@ -625,7 +693,12 @@ export function mountSettlement(container, { params = {} } = {}) {
   // A resident's services, on their place's screen.
   function services(resident) {
     if (resident.service === 'reforge')
-      return data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij afiks', onClick: reforgeSheet });
+      return h(
+        'div',
+        { class: 'stack' },
+        data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij afiks', onClick: reforgeSheet }),
+        data.imbue && h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij żywioł', onClick: imbueSheet }),
+      );
     if (resident.service === 'tavern') return h('div', { class: 'stack' }, tavernCard(), companionsCard());
     if (resident.service === 'herbalist') return herbalistCard();
     if (resident.service !== 'hermit') return null;

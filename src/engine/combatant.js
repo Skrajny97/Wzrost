@@ -91,6 +91,9 @@ function itemWeapon(worn, content) {
     scaling: base.scaling,
     min: item.damage.min,
     max: item.damage.max,
+    // The Zaklinaczka's zaklęcie żywiołu: a share of every blow in an
+    // element (settlement.js, combat.js).
+    ...(item.imbue?.share && { imbue: item.imbue }),
   };
 }
 

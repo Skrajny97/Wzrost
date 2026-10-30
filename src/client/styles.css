@@ -9078,6 +9078,10 @@ a.profession-square:active {
   grid-template-columns: 1fr;
 }
 
+.settlement-choice > p {
+  margin: 0;
+}
+
 .settlement-reforge {
   display: grid;
   gap: 8px;

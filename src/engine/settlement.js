@@ -465,3 +465,39 @@ export function tradePoints(gold, level, stored, now, content) {
   const points = Math.max(0, Math.min(daily - before, Math.floor(gold / (goldPerPointPerLevel * level))));
   return { points, trade: { day, points: before + points } };
 }
+
+// The Zaklinaczka's zaklęcie żywiołu (part III, question 101 A): a weapon
+// turns weaponShare of every blow's damage into the element (combat.js), a
+// body armour gets the element's resistance of a resistRarity affix at its
+// level (stats.js). Stored on the item as `imbue`.
+export function imbueEffect(item, element, content) {
+  const { weaponShare, resistRarity } = content.settlement.imbue;
+  if (item.slot === 'weapon') return { element, share: weaponShare };
+  const stat = `resist.${element}`;
+  return { element, stat, value: affixValue(stat, affixShare(item.level, resistRarity, content), content.balance.items) };
+}
+
+// What the zaklęcie costs: goldPerLevel gold for each level of the item
+// times its rarity's sale multiplier, and materialCount pieces of the
+// element's material, in that material's own rarity (`stack`).
+export function imbueCost(item, element, content) {
+  const { goldPerLevel, materialCount, elements } = content.settlement.imbue;
+  const material = content.materialsById[elements.find((one) => one.element === element)?.material];
+  return {
+    gold: Math.round(goldPerLevel * item.level * content.raritiesById[item.rarity].sell),
+    stack: material ? stackKey(material.id, material.rarity) : null,
+    count: materialCount,
+  };
+}
+
+// Why the item cannot take the element now, or null.
+export function imbueBlock(item, element, { gold, materials }, content) {
+  const { slots, elements } = content.settlement.imbue;
+  if (!slots.includes(item.slot)) return { code: 'wrong_slot', message: 'Żywioł da się zakląć tylko w broń i w pancerz.' };
+  if (!elements.some((one) => one.element === element)) return { code: 'invalid_element', message: 'Wybierz żywioł.' };
+  if (item.imbue?.element === element) return { code: 'same_element', message: 'Ten przedmiot ma już ten żywioł.' };
+  const cost = imbueCost(item, element, content);
+  if (gold < cost.gold) return { code: 'not_enough_gold', message: 'Brakuje złota na zaklęcie.' };
+  if ((materials[cost.stack] ?? 0) < cost.count) return { code: 'not_enough_materials', message: 'Brakuje materiału żywiołu.' };
+  return null;
+}

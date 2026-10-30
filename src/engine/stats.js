@@ -26,7 +26,8 @@ export function computeStats(character, equipped, content) {
   for (const worn of equipped) {
     const item = upgradedItem(worn, content);
     if (item.armor) bonuses.armor += item.armor;
-    const properties = [...(item.implicit ? [item.implicit] : []), ...item.affixes];
+    // A body armour's zaklęcie żywiołu adds its resistance (settlement.js).
+    const properties = [...(item.implicit ? [item.implicit] : []), ...item.affixes, ...(item.imbue?.stat ? [item.imbue] : [])];
     for (const { stat, value } of properties) {
       if (stat in sources) sources[stat].equipment += value;
       else if (stat === 'armor') bonuses.armor += value;

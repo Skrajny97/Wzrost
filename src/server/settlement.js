@@ -29,6 +29,9 @@ import {
   evolvedSkills,
   herbalistPremium,
   hireCost,
+  imbueBlock,
+  imbueCost,
+  imbueEffect,
   itemName,
   itemView,
   materialView,
@@ -195,6 +198,7 @@ export function settlementView(player, stored, board, now) {
     tavern: tavernView(player.row, stored, now),
     companions: companionsView(player, stored, now),
     herbalist: herbalistView(player, stored, now),
+    imbue: imbueView(player),
     // After an evolution the paths change with it, so no path reset.
     hermit: {
       path: player.row.evolution ? null : pathResetCost(player.row.level, content),
@@ -203,6 +207,76 @@ export function settlementView(player, stored, board, now) {
     },
     now,
   };
+}
+
+// The Zaklinaczka's zaklęcie żywiołu for the page (part III, 101 A): the
+// elements with the material each takes and how many the character holds,
+// and the weapons and body armours it can go on, worn or in the bag, each
+// with its element now and the price in gold.
+function imbueView(player) {
+  const { imbue } = content.settlement;
+  const materials = JSON.parse(player.row.materials ?? '{}');
+  const items = player.items.filter((item) => imbue.slots.includes(item.slot));
+  return {
+    elements: imbue.elements.map(({ element, material }) => {
+      const { stack, count } = imbueCost({ level: 1, rarity: 'common' }, element, content);
+      return { element, name: content.elementsById[element].name, material: content.materialsById[material].name, count, have: materials[stack] ?? 0 };
+    }),
+    items: items.map((item) => ({
+      id: item.id,
+      name: itemName(item, content),
+      equipped: Boolean(item.equippedSlot),
+      slot: item.slot,
+      element: item.imbue?.element ?? null,
+      gold: imbueCost(item, imbue.elements[0].element, content).gold,
+      effects: Object.fromEntries(imbue.elements.map(({ element }) => [element, imbueEffect(item, element, content)])),
+    })),
+  };
+}
+
+// { itemId, element }: the Zaklinaczka puts an element on a weapon or a
+// body armour, worn or in the bag, at home as every change of the gear;
+// one already there gives way. Gold and the element's material pay.
+export async function imbueAtEnchantress(context) {
+  const { session, player } = await requireIdlePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const item = player.items.find((candidate) => String(candidate.id) === String(body.itemId));
+  if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
+  const materials = JSON.parse(row.materials ?? '{}');
+  const block = imbueBlock(item, body.element, { gold: row.gold, materials }, content);
+  if (block) throw new ApiError(block.code === 'wrong_slot' || block.code === 'invalid_element' ? 400 : 409, block.code, block.message);
+  const cost = imbueCost(item, body.element, content);
+  const effect = imbueEffect(item, body.element, content);
+  const stored = settlementOf(row);
+  const next = { ...stored, relations: grow(stored.relations, content.settlement.imbue) };
+  const stack = jsonPath(cost.stack);
+  const db = context.env.DB;
+  // As the reforging: the item changes only if the character is as seen
+  // here, and the payment only if the item now holds this element.
+  await db.batch([
+    db
+      .prepare(`UPDATE items SET data = json_set(data, '$.imbue', json(?)) WHERE id = ? AND character_id = ? AND (SELECT version FROM characters WHERE id = ?) = ?`)
+      .bind(JSON.stringify(effect), item.id, row.id, row.id, row.version),
+    db
+      .prepare(
+        `UPDATE characters SET gold = gold - ?, settlement = ?,
+           materials = CASE WHEN json_extract(materials, ?) > ? THEN json_set(materials, ?, json_extract(materials, ?) - ?) ELSE json_remove(materials, ?) END,
+           version = version + 1
+         WHERE id = ? AND version = ? AND gold >= ? AND COALESCE(json_extract(materials, ?), 0) >= ?
+           AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.imbue.element') = ?)`,
+      )
+      .bind(cost.gold, JSON.stringify(next), stack, cost.count, stack, stack, cost.count, stack, row.id, row.version, cost.gold, stack, cost.count, item.id, body.element),
+  ]);
+  const after = await loadPlayer(db, session.userId);
+  const saved = after.items.find((candidate) => candidate.id === item.id);
+  if (saved?.imbue?.element !== body.element || after.row.gold !== row.gold - cost.gold) throw changed();
+  return json({
+    imbued: { item: itemName(item, content), element: content.elementsById[body.element].name },
+    settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
+    character: characterView(after, context.now),
+  });
 }
 
 // What Jagna pays for one herb or potion now (part III, 121 A): the
