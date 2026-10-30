@@ -26,6 +26,7 @@ let volume = readVolume();
 let wanted = null; // the track for the screen on show
 let playing = null; // the track in the element
 let touched = false; // browsers play sound only after a touch
+let gameShown = false; // the game's own screen is up (prefetchMusic)
 let audio = null;
 let level = null; // gain: the player's volume
 let fade = null; // gain: the end of a track and the change of tracks
@@ -62,9 +63,19 @@ export function setMusicVolume(value) {
 export function setMusicConfig(music) {
   config = music;
   wanted ??= music.default;
-  // The file is on its way before the first touch.
-  if (volume > 0) source(wanted).catch(() => {});
   update();
+}
+
+// The track of the screen on show is on its way before the first touch, a
+// moment after the game's own screen is up (app.js): sooner, its download
+// would hold up the start of the game and its pictures on a slow connection.
+const PREFETCH_DELAY = 3000;
+export function prefetchMusic() {
+  if (gameShown) return;
+  gameShown = true;
+  setTimeout(() => {
+    if (config && volume > 0) source(wanted).catch(() => {});
+  }, PREFETCH_DELAY);
 }
 
 // The places of the screen on show, the most specific first, e.g.

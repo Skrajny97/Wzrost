@@ -26,7 +26,7 @@ import { mountReport } from './screens/report.js';
 import { mountSkills } from './screens/skills.js';
 import { mountStats } from './screens/stats.js';
 import { mountTrade, offerTrade } from './screens/trade.js';
-import { musicVolume, setMusicConfig, setMusicPlace, setMusicVolume, startMusic } from './music.js';
+import { musicVolume, prefetchMusic, setMusicConfig, setMusicPlace, setMusicVolume, startMusic } from './music.js';
 import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
 import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
@@ -310,6 +310,7 @@ function route() {
   if (!fresh) state.freshReport = null;
   const places = [params.area, params.region, candidate.music].filter(Boolean);
   setMusicPlace(places, fresh ? reportCache.get(params.id)?.result : null);
+  prefetchMusic();
   renderNav();
   $('.page-title', container)?.focus({ preventScroll: true });
   // A new character's narrator: a card or the place to tap on this screen.
