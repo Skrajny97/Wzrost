@@ -1,0 +1,14 @@
+{
+  "id": "skill-ambush-rustle",
+  "payload": {
+    "text": "leaves and thin branches of a dense forest bush rustling and snapping softly as a person pushes out through it, close up, natural, dry, no music, no voice",
+    "duration_seconds": 1,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-ambush-rustle-20261030T1117-0.mp3",
+    "audio/drafts/effects/skill-ambush-rustle-20261030T1117-1.mp3",
+    "audio/drafts/effects/skill-ambush-rustle-20261030T1117-2.mp3"
+  ],
+  "credits": 60
+}

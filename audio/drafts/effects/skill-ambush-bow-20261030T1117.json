@@ -1,0 +1,14 @@
+{
+  "id": "skill-ambush-bow",
+  "payload": {
+    "text": "a wooden longbow string released with a deep twang and an arrow whooshing away into the distance, close up, dry, no music, no impact",
+    "duration_seconds": 1,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-ambush-bow-20261030T1117-0.mp3",
+    "audio/drafts/effects/skill-ambush-bow-20261030T1117-1.mp3",
+    "audio/drafts/effects/skill-ambush-bow-20261030T1117-2.mp3"
+  ],
+  "credits": 60
+}
