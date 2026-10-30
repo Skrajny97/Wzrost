@@ -3304,6 +3304,7 @@ img.area-art {
 }
 
 .unit-art .sprite--monster,
+.unit-art .sprite--summon,
 .unit-art .class-art {
   display: block;
   width: 100%;
@@ -3316,22 +3317,15 @@ img.area-art {
   border-radius: 4px;
 }
 
-/* A summoned figure (Żywiołak, Trujący Szlam) at its summoner's top left
-   corner, in front of the bust. */
-.unit-summon {
-  position: absolute;
-  top: 4px;
-  left: 2px;
-  z-index: 1;
-  width: 44px;
-  height: 44px;
-  pointer-events: none;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.7));
+/* A summon (Żywiołak, Trujący Szlam) in a card of its own before its
+   summoner: the figure fills the art like a creature's sprite, and a dashed
+   frame tells the card from a character's. */
+.unit-art .sprite--summon {
+  object-fit: contain;
 }
 
-.unit-summon .sprite--summon {
-  width: 100%;
-  height: 100%;
+.unit--summon {
+  border-style: dashed;
 }
 
 .unit-art .unit-level {

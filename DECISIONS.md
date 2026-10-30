@@ -2875,6 +2875,15 @@ Autor: „ej a gra coś zacina, znasz tego powód? długie ladowania itp nie tyl
 2. **Poprawka.** Po pierwszym dotknięciu ładują się tylko odgłosy ciosów i dźwięki nazwane (zakładki, umiejętności): 48 plików zamiast 407. Okrzyki stworów i postaci z danej walki ładują się, gdy powstaje jej odtwarzanie. Rozpakowane zostają okrzyki ostatnich 24 stworów. Kwestia narratora, przeczytana raz, nie zostaje w pamięci. W przeglądarce ze spowolnionym procesorem (jak telefon) start gry trwał 2,9 s, a teraz trwa 0,8 s. Zapytań przy starcie było 502, a jest 143.
 3. **Muzyka.** Utwór miejsca pobiera się w całości przy pierwszym wejściu na jego ekran: 3,6–4,8 MB, w jakości ok. 170 kb/s. Lżejsze pliki (ok. 112 kb/s, o jedną trzecią mniejsze) są propozycją dla autora, bo zmieniają brzmienie jego utworów.
 
+## Przywołańce we własnej karcie (30.10.2026, na wersji testowej)
+
+Autor (pytanie 132 B): „Przywołańce powinni stawać w osobnych kartach w walce, a jeśli wszystkie są zajęte powinna zostać dostawiana dodatkowa - można tak też zrobić od razu”.
+
+1. **Miejsce.** Żywiołak i Trujący Szlam stają we własnej karcie w szyku drużyny, przed postacią, która je przywołała: w najbliższym wolnym polu przed nią (z tyłu: środek, potem przód; ze środka: przód). Gdy wszystkie te pola są zajęte, karta przywołańca dochodzi jako dodatkowa w polu tuż przed postacią, a u postaci z przodu w jej własnym polu, przed nią.
+2. **Karta.** Figura przywołańca, jego nazwa, poziom postaci i pasek HP, w przerywanej ramce. Ciosy wrogów wymierzone w postać lecą do karty przywołańca, a jego ciosy i plucie jadem wychodzą z niej.
+3. **Koniec.** Przywołaniec, który padł, zostaje szary z krzyżykiem jak pokonany uczestnik walki, aż postać przywoła go znowu; Trujący Szlam rozpryskuje się z tej karty. Gdy minie jego czas albo padnie postać, karta znika.
+4. **Silnik bez zmian.** Przywołaniec dalej nie jest osobnym uczestnikiem walki: wrogowie wybierają cel po miejscu postaci, a cios przejmuje przywołaniec. Zmienia się tylko odtwarzanie walki (`src/client/arena.js`), więc także zapisane raporty pokazują przywołańców w ich kartach.
+
 ## Ewolucje: kolory skóry (30.10.2026, na wersji testowej)
 
 Autor: „Pamietaj jeszcze o tych odcieniach skóry do zrobienia później ręcznie maskami i przerysowaniem” i „pamiętaj żeby potem dokanczac te animacje portrety”.
@@ -2917,7 +2926,7 @@ Autor o pozycjach 24–42: „kobieta Inkwizytor wyglada jak facet, dorób jej c
     - Czarny jad: więcej jadu, czyli nowe strugi, kropla i ciemnozielony połysk.
     - Taniec ostrzy: 3 nowe szkice, dwa sztylety wirujące w fioletowych smugach. Na próbę w grze stoi szkic A.
     - Pozostałe ikony z „Tak” są w grze bez zmian. Ikony są na ekranie Umiejętności i w podglądzie autora.
-5. **Żywiołak i Trujący Szlam w walce.** Przywołany stwór stoi w lewym górnym rogu karty przywołującego, przed jego popiersiem, od przywołania aż do upadku albo odejścia. Jego HP zostaje w wierszu stanu karty. Obrazki to szkice z Retro Diffusion na wzór ikon umiejętności, przycięte ciasno wokół postaci. Na próbę w grze stoją Żywiołak B i Szlam A, z 4 szkiców każdego.
+5. **Żywiołak i Trujący Szlam w walce.** Przywołany stwór stoi w lewym górnym rogu karty przywołującego, przed jego popiersiem, od przywołania aż do upadku albo odejścia. Jego HP zostaje w wierszu stanu karty. Obrazki to szkice z Retro Diffusion na wzór ikon umiejętności, przycięte ciasno wokół postaci. Na próbę w grze stoją Żywiołak B i Szlam A, z 4 szkiców każdego. *Od 30.10 przywołaniec stoi we własnej karcie: zob. „Przywołańce we własnej karcie”.*
 6. **Chody nowych ewolucji (43–52), na próbę.** Autor jeszcze ich nie wybrał, więc w grze stoją wersje najbliższe portretom, a przy ocenie można wybrać inną literę:
     - Łowca A i Łowczyni A; Elementalista A; Arkanista A i Arkanistka A; Uzdrowiciel A i Uzdrowicielka B; Inkwizytor A i Inkwizytorka A; Truciciel A i Trucicielka B; Nocny Tancerz A i Nocna Tancerka A; Barbarzyńca A i Barbarzynka A; Gladiator A i Gladiatorka A; Strzelec Burzy A i Strzelczyni Burzy C.
     - Poprawki ręczne: Elementalista traci kostur w klatkach 1 i 4, bo w klatkach 2 i 3 go nie miał (tak jak tarcza Kapłana, punkt 3); Gladiator traci miecz w klatce 2 z tego samego powodu; Barbarzynka dostaje topór także w klatce 3, przeniesiony z klatki 2; Arkanistka stoi 3–4 piksele wyżej, na linii stóp pozostałych postaci; jaskrawe różowe i purpurowe piksele u Łowcy, Łowczyni, Barbarzyńcy i Truciciela mają teraz brązy łuku i skóry albo kolor sąsiednich pikseli.
@@ -2954,7 +2963,7 @@ Autor: „Kolejna rzecz to portrety dla wyewoluowanych klas, bez tego nie wdraż
 Wszystkie 30 umiejętności ewolucji i 15 cech działa w walce (`src/engine/combat.js`), a odtwarzanie walki pokazuje ich skutki. Liczby są robocze, do symulacji balansu (krok D). Brakujące szczegóły, rozstrzygnięte najprościej:
 
 1. **Postawy** (Krwawy szał, Wyzwanie, Chmura burzowa, Sokół, Psalm) budzą się na początku ruchu postaci, obok jej ciosu, i trwają tyle jej ruchów, ile podaje opis. Czas odnowienia liczy się od chwili, gdy się obudzą. Psalm czeka, aż ktoś z drużyny ma mniej niż 80% HP.
-2. **Przywołańce** (Żywiołak, Trujący Szlam) nie mają własnej karty w walce. Stoją przed postacią, a jej karta pokazuje ich HP, np. „Żywiołak · 282”. Biorą na siebie ciosy wrogów wymierzone w postać, bez uników, z pancerzem i odpornościami postaci. Działają w ruchu przywołania i w każdym kolejnym ruchu postaci, aż minie ich czas albo padną.
+2. **Przywołańce** (Żywiołak, Trujący Szlam) nie mają własnej karty w walce. Stoją przed postacią, a jej karta pokazuje ich HP, np. „Żywiołak · 282”. Biorą na siebie ciosy wrogów wymierzone w postać, bez uników, z pancerzem i odpornościami postaci. Działają w ruchu przywołania i w każdym kolejnym ruchu postaci, aż minie ich czas albo padną. *Karta przywołańca jest nieaktualna: od 30.10 przywołaniec ma własną kartę, zob. „Przywołańce we własnej karcie”.*
 3. **Wychłodzenie.** Zamieć wychładza trafionych do końca walki, co dopisano do jej opisu. Wychłodzony jest też ten, kto ma na sobie Wychłodzenie od stwora.
 4. **Odporności z cech.** „Odporność na mróz rośnie o 15%” (Zimowy oddech) i „odporność na truciznę rośnie o 20%” (Toksyny) to o tyle mniej obrażeń od tego żywiołu, z ciosów i z efektów. Samo mnożenie odporności nic by nie dało postaci bez odporności z przedmiotów. Opoka mnoży pancerz i odporności przez 1,1, a wrogowie biją w Strażnika dwa razy chętniej niż wynika to z jego miejsca.
 5. **Namaszczenie** mnoży premie Błogosławieństwa przez 1,25, a ich dzielenie się w drużynie jest o 25% słabsze. **Opiekun** mnoży leczenie przez 1,2, a każde leczenie umiejętnością zdejmuje najstarszy zły efekt.

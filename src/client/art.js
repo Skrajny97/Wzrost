@@ -236,7 +236,7 @@ export const SPRITES = {
   },
   // The figures the evolutions' skills summon in fights, by the skill's id
   // (Przywołanie żywiołaka, Trujący Szlam): square, cut close around the
-  // figure, shown at one size on the summoner's card.
+  // figure, shown in a card of its own before the summoner.
   summons: {
     size: 48,
     fit: true,

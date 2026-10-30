@@ -76,19 +76,21 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     const shieldFill = h('div', { class: 'unit-shield-fill' });
     const shieldBar = h('div', { class: 'unit-shield', hidden: true }, shieldFill);
     const level = h('span', { class: 'unit-level', text: `poz. ${unit.level}` });
-    // The character's head and shoulders (older reports have no look: male)
-    // or the monster's sprite, with the level in its corner; without one, the
-    // vector bust or the old line icon beside the level.
-    const art =
-      unit.side === 'ally'
+    // The character's head and shoulders (older reports have no look: male),
+    // the monster's sprite or a summon's figure, with the level in its
+    // corner; without one, the vector bust or the old line icon beside the
+    // level.
+    const art = unit.summon
+      ? summonSprite(unit.summon)
+      : unit.side === 'ally'
         ? portraitSprite(unit.classId, unit.appearance ?? 'male', { bust: true, skin: unit.skin, evolution: unit.evolution }) ?? classArt(unit.classId)
         : monsterSprite(unit.monsterId);
     const card = h(
       'div',
       {
-        class: `unit unit--${unit.side}${unit.champion ? ' unit--champion' : unit.elite ? ' unit--elite' : ''}`,
+        class: `unit unit--${unit.side}${unit.summon ? ' unit--summon' : unit.champion ? ' unit--champion' : unit.elite ? ' unit--elite' : ''}`,
         role: 'group',
-        'aria-label': `${unit.name}, poziom ${unit.level}${unit.champion ? ', czempion' : unit.elite ? ', elita' : ''}`,
+        'aria-label': `${unit.name}, poziom ${unit.level}${unit.summon ? ', przywołaniec' : unit.champion ? ', czempion' : unit.elite ? ', elita' : ''}`,
       },
       art
         ? h('span', { class: 'unit-art' }, art, level)
@@ -108,18 +110,21 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     return card;
   }
 
+  const fields = new Map(); // side and position → its field
   function row(side, list) {
     return h(
       'div',
       { class: `arena-row arena-row--${side}`, 'aria-label': side === 'enemy' ? 'Przeciwnicy' : 'Drużyna' },
-      FIELDS.map(([position, label]) =>
-        h(
+      FIELDS.map(([position, label]) => {
+        const field = h(
           'div',
           { class: 'arena-field' },
           h('span', { class: 'arena-field-label', text: label }),
           list.filter((unit) => unit.position === position).map(unitCard),
-        ),
-      ),
+        );
+        fields.set(`${side} ${position}`, field);
+        return field;
+      }),
     );
   }
 
@@ -386,41 +391,64 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (entry && entry.status.textContent === text) entry.status.textContent = '';
   }
 
-  // A summon (evolutions: Żywiołak, Trujący Szlam) shows on its summoner's
-  // card, in the status line, with the HP it has left, and as its figure at
-  // the card's corner, once its art is in (summonSprite); gone, both go.
-  const summons = new Map(); // unit id → the text it shows
-  const figures = new Map(); // unit id → its summon's figure
-  function summonState(event) {
-    const entry = cards.get(event.target);
-    if (!entry) return;
-    const before = summons.get(event.target);
-    if (event.summonHp > 0) {
-      const text = `${event.summon} · ${event.summonHp}`;
-      summons.set(event.target, text);
-      entry.status.textContent = text;
-      if (event.state === 'up') summonUp(entry, event);
-      return;
+  // A summon (evolutions: Żywiołak, Trujący Szlam) stands in a card of its
+  // own before its summoner, with its HP bar (the author's answer 132 B): in
+  // the nearest free field in front of the summoner or, when those are
+  // taken, as one more card in the field right before it (in its own field,
+  // ahead of it, at the front). The foes' blows meant for the summoner land
+  // on it, its blows and spit start from it, fallen it stays grey like a
+  // fallen unit until it is called again, and gone, its card goes.
+  const summoned = new Map(); // summoner's id → { unit, card, skill }
+  function summonPlace(owner, card) {
+    const at = FIELDS.findIndex(([position]) => position === owner.position);
+    const ahead = FIELDS.slice(0, Math.max(0, at)).reverse().map(([position]) => fields.get(`${owner.side} ${position}`));
+    const free = ahead.find((field) => !field.querySelector('.unit'));
+    if (free || ahead.length > 0) (free ?? ahead[0]).append(card);
+    else cards.get(owner.id)?.card.before(card);
+  }
+  function summonUp(event, quiet) {
+    const owner = byId.get(event.target);
+    if (!owner) return Promise.resolve();
+    let decoy = summoned.get(owner.id);
+    if (!decoy || decoy.skill !== event.skill) {
+      summonRemove(owner.id, true);
+      const unit = { id: `${owner.id}~summon`, side: owner.side, name: event.summon, level: owner.level, maxHp: event.summonHp, strike: 'magic', summon: event.skill };
+      decoy = { unit, card: unitCard(unit), skill: event.skill };
+      summoned.set(owner.id, decoy);
+      summonPlace(owner, decoy.card);
     }
-    summons.delete(event.target);
-    summonGone(event.target);
-    if (entry.status.textContent === before) entry.status.textContent = '';
+    decoy.unit.maxHp = event.summonHp;
+    setHp(decoy.unit.id, event.summonHp);
+    setDown(decoy.unit.id, false);
+    if (quiet || reducedMotion()) return Promise.resolve();
+    return animate(decoy.card, [{ opacity: 0, transform: 'scale(0.4)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' });
   }
-  function summonUp(entry, event) {
-    summonGone(event.target);
-    const art = summonSprite(event.skill);
-    if (!art) return;
-    const figure = h('span', { class: 'unit-summon', 'aria-hidden': 'true' }, art);
-    entry.card.append(figure);
-    figures.set(event.target, figure);
-    if (!reducedMotion()) animate(figure, [{ opacity: 0, transform: 'scale(0.4)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' });
+  function summonRemove(id, quiet = false) {
+    const decoy = summoned.get(id);
+    if (!decoy) return Promise.resolve();
+    summoned.delete(id);
+    cards.delete(decoy.unit.id);
+    if (quiet || reducedMotion() || !decoy.card.isConnected) {
+      decoy.card.remove();
+      return Promise.resolve();
+    }
+    return animate(decoy.card, [{ opacity: 1 }, { opacity: 0, transform: 'scale(0.6)' }], { duration: 260, easing: 'ease-in' }).then(() => decoy.card.remove());
   }
-  function summonGone(id) {
-    const figure = figures.get(id);
-    if (!figure) return;
-    figures.delete(id);
-    if (reducedMotion()) figure.remove();
-    else animate(figure, [{ opacity: 1 }, { opacity: 0, transform: 'scale(0.6)' }], { duration: 260, easing: 'ease-in' }).then(() => figure.remove());
+  // The summon's state after an event, at once; `up` and `gone` move cards.
+  function summonState(event) {
+    if (event.state === 'up') return summonUp(event, true);
+    if (event.state === 'gone') return summonRemove(event.target, true);
+    const decoy = summoned.get(event.target);
+    if (!decoy) return;
+    setHp(decoy.unit.id, event.summonHp);
+    if (event.state === 'fell') setDown(decoy.unit.id, true);
+  }
+  // Who acts in an event: the summon for its own blows and spit (its
+  // skill's events under its summoner's name), otherwise the unit itself.
+  function actorOf(event) {
+    const decoy = summoned.get(event.actor);
+    if (decoy && event.skill === decoy.skill && (MOVES.has(event.kind) || event.kind === 'skill')) return decoy.unit;
+    return byId.get(event.actor);
   }
 
   // A stance or a guard that ends takes its name off the card.
@@ -430,15 +458,15 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (entry && entry.status.textContent === event.skillName) entry.status.textContent = '';
   }
 
-  // A fallen unit keeps no status: no burn, pin or shield on its card.
-  function fallen(id) {
+  // A fallen unit keeps no status: no burn, pin or shield on its card, and
+  // its summon goes with it.
+  function fallen(id, quiet = false) {
     const entry = cards.get(id);
     if (!entry) return;
     held.delete(id);
     guards.delete(id);
     shields.delete(id);
-    summons.delete(id);
-    summonGone(id);
+    summonRemove(id, quiet);
     entry.status.textContent = '';
     entry.shieldBar.hidden = true;
     entry.card.classList.remove('unit--shielded');
@@ -454,7 +482,9 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
 
   async function show(event) {
     const target = byId.get(event.target);
-    const actor = byId.get(event.actor);
+    const actor = actorOf(event);
+    // The event as its actor's: the summon's own under its card.
+    const acting = actor && actor.id !== event.actor ? { ...event, actor: actor.id } : event;
     release(event);
     const line = () => {
       log.append(logLine(event));
@@ -465,7 +495,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       // A skill wakes: a sweep's wave over the foes, or an aura on its user.
       if (!event.targets) skills.status(event.actor, event.skillName);
       if (event.shield !== undefined) shieldUp(event);
-      await skills.cast(event);
+      await skills.cast(acting);
       line();
       return;
     }
@@ -531,22 +561,50 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       await flash(event.target, '#f2c14e', 'rgba(242, 193, 78, 0.3)');
       return;
     }
-    // A summon: it comes with its skill's look, takes the foes' blows meant
-    // for its summoner (they travel to the summoner's card) and goes.
+    // A summon: its card comes as its summoner calls it, takes the foes'
+    // blows meant for the summoner, greys out when it falls and goes when its
+    // time is up.
     if (event.kind === 'summon') {
+      const decoy = summoned.get(event.target);
+      if (event.state === 'up') {
+        const appear = summonUp(event, false);
+        await skills.cast(event);
+        await appear;
+        line();
+        return;
+      }
+      if (event.state === 'gone') {
+        line();
+        await summonRemove(event.target);
+        return;
+      }
+      if (!decoy) {
+        line();
+        return;
+      }
       if (event.state === 'hit') {
-        await strike(actor, target, () => {
+        await strike(actor, decoy.unit, () => {
           playHit(actor.sound, false);
           summonState(event);
-          float(target.id, `−${event.damage}`, 'absorb');
+          flash(decoy.unit.id, HIT_COLOR);
+          shake(decoy.unit.id, 5);
+          float(decoy.unit.id, `−${event.damage}`, 'hit');
           line();
         });
         return;
       }
-      summonState(event);
-      if (event.state === 'up') await skills.cast(event);
-      else await flash(event.target, '#9fc8ff', 'rgba(159, 200, 255, 0.25)');
+      const id = run;
+      setHp(decoy.unit.id, 0);
       line();
+      await animate(
+        decoy.card,
+        [
+          { opacity: 1, filter: 'grayscale(0)', transform: 'scale(1)' },
+          { opacity: 0.4, filter: 'grayscale(1)', transform: 'scale(0.93)' },
+        ],
+        { duration: 420, easing: 'ease-in' },
+      );
+      if (id === run) setDown(decoy.unit.id, true);
       return;
     }
     // Opiekun: a heal takes a bad effect off too.
@@ -568,7 +626,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
         return;
       }
       if (event.counter) skills.callout(actor.id, 'Kontra', '#a690e8');
-      if (look) skills.before(event);
+      if (look) skills.before(acting);
       await strike(actor, target, onImpact, style);
     };
     if (event.kind === 'hit' || event.kind === 'crit') {
@@ -656,7 +714,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (event.kind === 'effect') cards.get(event.target).status.textContent = event.effect;
     if (event.kind === 'kill') {
       setDown(event.target, true);
-      fallen(event.target);
+      fallen(event.target, true);
     }
     if (event.kind === 'skill' && !event.targets) cards.get(event.actor).status.textContent = event.skillName;
     if (event.kind === 'skill' && !event.targets && lookOf(event).cast === 'shield') cards.get(event.actor).card.classList.add('unit--shielded');
@@ -684,9 +742,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     held.clear();
     shields.clear();
     guards.clear();
-    summons.clear();
-    for (const figure of figures.values()) figure.remove();
-    figures.clear();
+    for (const id of [...summoned.keys()]) summonRemove(id, true);
     index = 0;
     log.replaceChildren();
     banner.classList.remove('arena-banner--shown');
