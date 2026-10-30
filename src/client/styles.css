@@ -8521,6 +8521,78 @@ a.profession-square:active {
   gap: 8px;
 }
 
+/* The Zaklinaczka's sheet: rows to tap for the item, its affix and the
+   material, then the affix before and after. */
+.settlement-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-self: start;
+  color: var(--text-muted);
+}
+
+.settlement-reforge-item {
+  padding: 4px 0 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.settlement-picks {
+  display: grid;
+  gap: 8px;
+}
+
+.settlement-pick {
+  justify-content: flex-start;
+  min-height: 48px;
+  color: var(--text);
+}
+
+.settlement-pick-text {
+  flex: 1;
+  font-family: var(--font-system);
+}
+
+.settlement-pick-art {
+  flex: none;
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+}
+
+.settlement-pick-art .sprite {
+  width: 28px;
+  height: 28px;
+}
+
+.settlement-result-title {
+  margin: 0;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.settlement-change {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 8px;
+  font-family: var(--font-system);
+  font-size: 17px;
+}
+
+.settlement-change-old {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.settlement-change-new {
+  color: var(--system);
+  font-weight: 600;
+}
+
 /* "Testuj Osadę" on the test version (app.js): one button per standing. */
 .settlement-test-standings {
   display: flex;

@@ -369,13 +369,20 @@ export async function reforgeAtEnchantress(context) {
   const after = await loadPlayer(db, session.userId);
   const saved = after.items.find((candidate) => candidate.id === item.id);
   if (saved?.lastRoll !== roll) throw changed();
+  const pending = pendingView(pendingOf(settlementOf(after.row), after.items));
   return json({
     item: saved,
     gold: cost.gold,
-    pending: pendingView(pendingOf(settlementOf(after.row), after.items)),
+    pending,
+    // What the affix became, shown at once (the author: "zaklinaczka
+    // przekuwa afiks a nie pokazuje na jaki").
+    result: pending ? null : reforgeResult(item, saved, body.affix),
     character: characterView(after, context.now),
   });
 }
+
+// An affix before and after a reforging, as the item card shows them.
+const reforgeResult = (before, after, affix) => ({ itemId: after.id, name: itemName(after, content), old: affixLabel(before, affix), new: affixLabel(after, affix) });
 
 // { option }: the affix the player keeps of those a reforging drew.
 export async function chooseReforged(context) {
@@ -407,7 +414,7 @@ export async function chooseReforged(context) {
   if (settlementOf(after.row).pending?.roll === pending.roll) throw changed();
   const saved = after.items.find((candidate) => candidate.id === pending.item.id);
   if (JSON.stringify(saved?.affixes) !== JSON.stringify(affixes)) throw changed();
-  return json({ item: saved, character: characterView(after, context.now) });
+  return json({ item: saved, result: reforgeResult(pending.item, saved, pending.affix), character: characterView(after, context.now) });
 }
 
 // { service: "path" | "stats" | "evolution", evolutionId }: the Pustelnik's

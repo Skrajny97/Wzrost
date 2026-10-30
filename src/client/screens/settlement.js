@@ -7,11 +7,13 @@
 // Where the deployment has no Osada yet, or the character is below its
 // level, the tab says so as the other locked modules do.
 
-import { fill, h } from '../dom.js';
+import { materialIcon } from '../craft-table.js';
+import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatHours, formatNumber } from '../format.js';
 import { setMusicPlace } from '../music.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
+import { itemSummary } from './character.js';
 
 // What is left of an order's week on the board: days, then hours.
 function timeLeft(ms) {
@@ -125,61 +127,179 @@ export function mountSettlement(container) {
       ),
     );
 
+  // An item the Zaklinaczka can reforge as the bag and the equipment show
+  // it, with its picture and rarity, or its name alone.
+  const itemView = (id) => (state.character.bag ?? []).find((one) => one.id === id) ?? Object.values(state.character.equipment ?? {}).find((one) => one?.id === id);
+  const itemHead = (item) => {
+    const view = itemView(item.id);
+    return view ? itemSummary(view) : h('span', { class: 'item-name', text: item.name });
+  };
+  const pickMark = () => h('span', { class: 'trade-pick-mark', 'aria-hidden': 'true' }, icon('check', { size: 18 }));
+
+  // The Zaklinaczka's reforging in a sheet, a step at a time, in the game's
+  // own rows (the author: "ekran wyboru przy afiksie powinien być
+  // ingameowy"): the item, then its affix and the material, then what the
+  // affix became, or the affixes she drew to keep one of.
   function reforgeSheet() {
-    const items = data.reforge.items;
-    if (items.length === 0) {
-      toast('Nie masz przedmiotów z afiksami do przekucia.');
-      return;
-    }
-    let item = items[0];
-    let affix = 0;
     const body = h('div', { class: 'settlement-reforge' });
-    const draw = () => {
-      const stacks = item.materials?.stacks ?? [];
-      const material = h('select', { class: 'input', 'aria-label': 'Materiał' }, stacks.map((stack) => h('option', { value: stack.key, text: `${stack.label} (${stack.count})` })));
-      const enough = state.character.gold >= item.gold && (!item.materials || stacks.length > 0);
+    openSheet(h('h2', { class: 'sheet-title', text: 'Przekucie afiksu' }), body);
+    if (data.reforge.pending) choose(data.reforge.pending);
+    else pickItem();
+
+    function pickItem() {
+      const items = data.reforge.items;
       fill(
         body,
-        h('label', { class: 'field-label', text: 'Przedmiot' }),
-        h(
-          'select',
-          {
-            class: 'input',
-            onChange: (event) => {
-              item = items.find((one) => String(one.id) === event.currentTarget.value);
-              affix = 0;
-              draw();
-            },
-          },
-          items.map((one) => h('option', { value: String(one.id), selected: one === item, text: `${one.name}${one.equipped ? ' (założony)' : ''}` })),
-        ),
-        h('label', { class: 'field-label', text: 'Afiks do przekucia' }),
-        h(
-          'select',
-          { class: 'input', onChange: (event) => (affix = Number(event.currentTarget.value)) },
-          item.affixes.map((label, index) => h('option', { value: String(index), selected: index === affix, text: label })),
-        ),
-        item.materials && h('label', { class: 'field-label', text: `Materiał: ${item.materials.count} szt., ${item.materials.rarityName}` }),
-        item.materials && (stacks.length > 0 ? material : h('p', { class: 'muted', text: 'Nie masz dość materiałów tej rzadkości.' })),
-        h('p', { class: 'muted', text: `Koszt: ${formatNumber(item.gold)} złota.` }),
-        data.reforge.choices > 1 && h('p', { class: 'muted', text: `Zaklinaczka wylosuje ${data.reforge.choices} nowe afiksy, a Ty zatrzymasz jeden z nich.` }),
-        h('button', {
-          type: 'button',
-          class: 'button button--world',
-          text: 'Przekuj',
-          disabled: !enough,
-          onClick: (event) =>
-            withButton(event.currentTarget, async () => {
-              const answer = await call('POST', '/api/settlement/reforge', { itemId: item.id, affix, material: item.materials ? material.value : undefined });
-              closeSheet();
-              toast(answer.pending ? 'Wybierz jeden z nowych afiksów.' : 'Zaklinaczka przekuła afiks.');
-              load();
-            }),
-        }),
+        items.length === 0
+          ? h('p', { class: 'muted', text: 'Nie masz przedmiotów z afiksami do przekucia.' })
+          : [
+              h('p', { class: 'sheet-text', text: 'Wybierz przedmiot. Zaklinaczka przekuje jeden jego afiks: wylosuje go od nowa.' }),
+              h(
+                'ul',
+                { class: 'item-list' },
+                items.map((item) =>
+                  h(
+                    'li',
+                    {},
+                    h('button', { type: 'button', class: 'item-row', onClick: () => pickAffix(item.id) }, itemHead(item), item.equipped && h('span', { class: 'chip', text: 'Założony' })),
+                  ),
+                ),
+              ),
+            ],
       );
-    };
-    draw();
-    openSheet(h('h2', { class: 'sheet-title', text: 'Przekucie afiksu' }), body);
+    }
+
+    function pickAffix(itemId, affix = null, stack = null) {
+      const item = data.reforge.items.find((one) => one.id === itemId);
+      if (!item) return pickItem();
+      const stacks = item.materials?.stacks ?? [];
+      // An item with one affix has nothing to choose.
+      let chosen = affix ?? (item.affixes.length === 1 ? 0 : null);
+      let material = stacks.some((one) => one.key === stack) ? stack : (stacks[0]?.key ?? null);
+      const draw = () => {
+        const short = item.gold - state.character.gold;
+        const ready = chosen !== null && short <= 0 && (!item.materials || material !== null);
+        fill(
+          body,
+          h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), 'Inny przedmiot'),
+          h('div', { class: 'settlement-reforge-item' }, itemHead(item)),
+          h('p', { class: 'field-label', text: 'Afiks do przekucia' }),
+          h(
+            'div',
+            { class: 'settlement-picks' },
+            item.affixes.map((label, index) =>
+              h(
+                'button',
+                {
+                  type: 'button',
+                  class: 'item-row trade-pick settlement-pick',
+                  'aria-pressed': String(index === chosen),
+                  onClick: () => {
+                    chosen = index;
+                    draw();
+                  },
+                },
+                h('span', { class: 'settlement-pick-text', text: label }),
+                pickMark(),
+              ),
+            ),
+          ),
+          item.materials && h('p', { class: 'field-label', text: `Materiał: ${item.materials.count} szt., ${item.materials.rarityName}` }),
+          item.materials &&
+            (stacks.length > 0
+              ? h(
+                  'div',
+                  { class: 'settlement-picks' },
+                  stacks.map((one) =>
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        class: 'item-row trade-pick settlement-pick',
+                        'aria-pressed': String(one.key === material),
+                        onClick: () => {
+                          material = one.key;
+                          draw();
+                        },
+                      },
+                      h('span', { class: 'settlement-pick-art' }, materialIcon(one.key.slice(0, one.key.lastIndexOf(':')), 28)),
+                      h('span', { class: 'settlement-pick-text', text: `${one.label} (${formatNumber(one.count)})` }),
+                      pickMark(),
+                    ),
+                  ),
+                )
+              : h('p', { class: 'muted', text: 'Nie masz dość materiałów tej rzadkości.' })),
+          h('p', { class: 'muted', text: `Koszt: ${formatNumber(item.gold)} złota${short > 0 ? `, brakuje Ci ${formatNumber(short)}` : ''}.` }),
+          data.reforge.choices > 1 && h('p', { class: 'muted', text: `Zaklinaczka wylosuje ${data.reforge.choices} nowe afiksy, a Ty zatrzymasz jeden z nich.` }),
+          h('button', {
+            type: 'button',
+            class: 'button button--world',
+            text: chosen === null ? 'Wybierz afiks' : 'Przekuj',
+            disabled: !ready,
+            onClick: (event) =>
+              withButton(event.currentTarget, async () => {
+                const answer = await call('POST', '/api/settlement/reforge', { itemId, affix: chosen, material: item.materials ? material : undefined });
+                await load();
+                if (answer.pending) choose(answer.pending, { affix: chosen, material });
+                else showResult(answer.result, { affix: chosen, material });
+              }),
+          }),
+        );
+      };
+      draw();
+    }
+
+    // The affixes she drew: the one tapped goes on the item.
+    function choose(pending, again = {}) {
+      fill(
+        body,
+        h('div', { class: 'settlement-reforge-item' }, itemHead({ id: pending.itemId, name: pending.name })),
+        h('p', { class: 'sheet-text', text: `Zaklinaczka wylosowała ${pending.options.length} afiksy. Wybierz ten, który zastąpi „${pending.old}”.` }),
+        h(
+          'div',
+          { class: 'settlement-picks' },
+          pending.options.map((label, option) =>
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'item-row settlement-pick',
+                onClick: (event) =>
+                  withButton(event.currentTarget, async () => {
+                    const answer = await call('POST', '/api/settlement/reforge/choose', { option });
+                    await load();
+                    showResult(answer.result, again);
+                  }),
+              },
+              h('span', { class: 'settlement-pick-text', text: label }),
+              icon('chevron', { size: 18 }),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // What the affix became; the same affix can be reforged again at once.
+    function showResult(result, { affix = null, material = null } = {}) {
+      fill(
+        body,
+        h('p', { class: 'settlement-result-title', text: 'Zaklinaczka przekuła afiks' }),
+        h('div', { class: 'settlement-reforge-item' }, itemHead({ id: result.itemId, name: result.name })),
+        h(
+          'p',
+          { class: 'settlement-change' },
+          h('span', { class: 'settlement-change-old', text: result.old }),
+          icon('chevron', { size: 18 }),
+          h('span', { class: 'settlement-change-new', text: result.new }),
+        ),
+        h(
+          'div',
+          { class: 'sheet-actions' },
+          h('button', { type: 'button', class: 'button button--world', text: 'Przekuj ponownie', onClick: () => pickAffix(result.itemId, affix, material) }),
+          h('button', { type: 'button', class: 'button button--system', text: 'Gotowe', onClick: closeSheet }),
+        ),
+      );
+    }
   }
 
   // A Pustelnik's reset, after the player says yes.
@@ -199,31 +319,15 @@ export function mountSettlement(container) {
       },
     });
 
-  // The affixes a reforging drew, waiting for the one the player keeps.
-  function choiceCard({ name, old, options }) {
-    return h(
+  // The affixes a reforging drew, waiting in the Osada for the one the
+  // player keeps: the sheet picks up there.
+  const choiceCard = ({ name, old }) =>
+    h(
       'div',
       { class: 'settlement-choice' },
-      h('p', {}, h('strong', { text: name }), `: zamiast „${old}” wybierz jeden afiks.`),
-      h(
-        'div',
-        { class: 'settlement-actions' },
-        options.map((label, option) =>
-          h('button', {
-            type: 'button',
-            class: 'button button--world button--small',
-            text: label,
-            onClick: (event) =>
-              withButton(event.currentTarget, async () => {
-                await call('POST', '/api/settlement/reforge/choose', { option });
-                toast('Zaklinaczka przekuła afiks.');
-                load();
-              }),
-          }),
-        ),
-      ),
+      h('p', {}, h('strong', { text: name }), `: Zaklinaczka czeka, aż wybierzesz afiks w miejsce „${old}”.`),
+      h('button', { type: 'button', class: 'button button--world', text: 'Wybierz afiks', onClick: reforgeSheet }),
     );
-  }
 
   // The Pustelnik's change of evolution: the class's other evolutions, the
   // first change free.

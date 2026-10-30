@@ -2925,6 +2925,10 @@ Wszystko działa tylko tam, gdzie `SETTLEMENT` jest `on` (`wrangler.jsonc`, śro
     - Zlecenie na broń z Warsztatu może mieć zdanie „Strażnicy palisady chodzą bez uzbrojenia. Wstyd przed kupcami.”, a na pancerz, hełm, rękawice i buty „Strażnicy palisady chodzą w łachmanach. Wstyd przed kupcami.”. Pozostałe dwa zdania pasują do każdego wyrobu (`craftStories` w `data/settlement.json`).
     - Zlecenie na surowce: „Most nad rzeką znowu się sypie.”, a na materiały: „Kuśnierz z miasta płaci za materiały więcej niż ktokolwiek tutaj.”.
     - Zlecenia, które już wiszą na tablicy, dostają przy odczycie nowe zdanie najbliższe dawnemu, więc poprawki widać od razu.
+2. **Przekucie u Zaklinaczki.** Autor: „ekran wyboru przy afiksie powinien być ingameowy a nie taki brzydki. Do tego zaklinaczka przekuwa afiks a nie pokazuje na jaki. Nienaturalne i nieintuicyjne.”
+    - Zamiast systemowych list arkusz ma wiersze z gry, krok po kroku: przedmioty z obrazkiem, rzadkością i znakiem „Założony”, potem afiksy wybranego przedmiotu (jedyny afiks jest od razu zaznaczony), materiały z obrazkami i liczbą sztuk, koszt i „Przekuj”. „Inny przedmiot” wraca do listy.
+    - Po przekuciu arkusz pokazuje przedmiot i zmianę, np. „~~Witalność: +54~~ › Wytrzymałość: +54”, z przyciskami „Przekuj ponownie” (ten sam afiks i materiał, nowy koszt) i „Gotowe”. Przy bliższej relacji najpierw przychodzi wybór jednego z 2–3 wylosowanych afiksów, a potem ta sama zmiana.
+    - Wybór, który czeka (arkusz zamknięty przed wyborem), zostaje w karcie Zaklinaczki z przyciskiem „Wybierz afiks”, który otwiera arkusz na tym kroku.
 
 ## Dźwięki ewolucji i kwestie narratora: wybory autora (30.10.2026, na wersji testowej)
 

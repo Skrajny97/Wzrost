@@ -490,6 +490,10 @@ describe('the Osada through the API', () => {
     assert.notEqual(done.data.item.affixes[0].id, item.affixes[0].id);
     assert.equal(done.data.item.reforged, 1);
     assert.equal(done.data.character.gold, 100000 - cost.gold);
+    // What the affix became, for the sheet to show.
+    assert.equal(done.data.result.itemId, itemId);
+    assert.match(done.data.result.old, /: \+\d+$/);
+    assert.match(done.data.result.new, /: \+\d+$/);
     const row = await database.prepare('SELECT materials FROM characters').first();
     assert.equal(JSON.parse(row.materials)[stack], undefined);
     // The next one costs more.
@@ -539,6 +543,7 @@ describe('the Osada through the API', () => {
     // Paid, but the item keeps its affix until the choice.
     assert.equal(done.data.item.affixes[0].id, item.affixes[0].id);
     assert.equal(done.data.pending.options.length, 3);
+    assert.equal(done.data.result, null);
     assert.equal(done.data.character.gold, 100000 - cost.gold);
     const again = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0, material: stack } });
     assert.equal(again.data.error.code, 'choose_first');
@@ -550,6 +555,8 @@ describe('the Osada through the API', () => {
     assert.equal(stored.pending, undefined);
     assert.notEqual(chosen.data.item.affixes[0].id, item.affixes[0].id);
     assert.deepEqual(chosen.data.item.affixes.slice(1), item.affixes.slice(1));
+    assert.equal(chosen.data.result.old, done.data.pending.old);
+    assert.equal(chosen.data.result.new, done.data.pending.options[1]);
     assert.equal((await call('POST', '/api/settlement/reforge/choose', { cookie, body: { option: 0 } })).data.error.code, 'no_choice');
   });
 });
