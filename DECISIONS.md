@@ -2972,6 +2972,12 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
+## Strona chodów i wpis na X (30.10.2026)
+
+1. **Strona chodów.** Autor: „Wygeneruj mi później stronę tutaj gdzie sprawdze jedna po drugiej wszystkie animacje chodu”. Strona [Chody postaci](https://claude.ai/artifact/4HDDq5mRfAP9uT17PVwhfM) pokazuje po kolei 40 chodów z ekranu Walki (5 klas i 15 ewolucji, każda postać w wersji kobiecej i męskiej) w ośmiu odcieniach skóry, z czterema klatkami osobno na jasnym tle, na którym widać zbłąkane piksele. Zaznaczenia „Dobry” i „Do poprawy” z notatką trafiają do bazy strony (kolekcja `walks`), którą odczytuję. Notatka sama zaznacza „Do poprawy”.
+2. **Wpis na X.** Autor: „Wygeneruj mi też wpis do 250 znaków na X taki luźny o tym co jest w grze do tej pory i w jaki sposób to tworzymy. [...] Duzo tutaj z Toba pisalem używaj mojego stylu. Możesz też dać jakieś atrakcyjne screeny z gry”. Wpis (pytanie 185) i zrzuty z lokalnej wersji gry, bez rzeczy, których w grze jeszcze nie ma. Autor: „186 tak / 187 tak / 188 nie - powinien być chociaż screen pełny a nie tak ucięty”, więc 188 to teraz cały ekran zakładki Ewolucja.
+3. **Liczba ewolucji.** Gra ma 15 ewolucji (po trzy na klasę), a 30 to ich umiejętności i portrety (kobieta i mężczyzna). Opis wersji 0.0.61 mówił o 30 ewolucjach i jest poprawiony.
+
 ## Skrzynia Konta, Encyklopedia z własnych zdobyczy i status znajomych (30.10.2026, na wersji testowej)
 
 Autor: „180 ok / 181 ok”, „Niech wszystkie postaci znajduja sie w rankingu, jeśli się łapią na tę opcję.”, a dalej: „I w sumie może zróbmy w Obozie Skrzynię Konta wspólną dla wszystkich postaci. Mała liczba slotów na przedmioty. I tak większość jest obwarowana lvlami a czemu ktoś miałby nie mieć łatwiej na starcie jeśli włożył sporo czasu w pierwszą postać. Z Encyklopedii tylko wykluczyć zdobycze z wymian i Skrzyni Konta i powinno byc okey. Zrobić tak, ze postac sama musi wytworzyć przedmiot albo zdobyć żeby zaliczylo w Encyklopedii.” oraz „potrzeba statusu "online" "zajęty" i "offline" w Liście znajomych. Może to być po prostu kropka zielona żołta i czerwona. Status zajęty pokazywałby brak możliwości wymiany (bo nie wiemy tego czy postać coś robi i ma te możliwość do czasu kliknięcia Wymiany).”
