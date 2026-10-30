@@ -1,0 +1,25 @@
+{
+  "id": "wandering-beggar",
+  "payload": {
+    "prompt": "an old wandering beggar with a long grey beard and a wide-brimmed straw hat, patched grey linen coat, a knotted walking staff and a worn canvas sack over his shoulder, kind tired eyes, a lyre hanging at his side, full body, three-quarter view, muted forest colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 142587061,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793397365,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 68.81,
+    "request_id": "84cc9baf-d519-4d5b-87a6-370ae125d6c6",
+    "outputs_retained_until": 1793483722
+  }
+}

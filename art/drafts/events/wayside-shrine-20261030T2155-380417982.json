@@ -1,0 +1,25 @@
+{
+  "id": "wayside-shrine",
+  "payload": {
+    "prompt": "an old wooden wayside shrine on a carved post with a small pitched roof, a cracked dark icon inside and a single candle burning with a cold pale flame, wilted wildflowers and wax offerings at its foot, faint ghostly mist around it, full object",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 380417982,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793397411,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 68.45,
+    "request_id": "c65f03a6-cd44-4584-949c-5cde54e6ab6d",
+    "outputs_retained_until": 1793483768
+  }
+}

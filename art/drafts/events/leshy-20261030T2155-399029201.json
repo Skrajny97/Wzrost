@@ -1,0 +1,25 @@
+{
+  "id": "leshy",
+  "payload": {
+    "prompt": "a leshy, a tall slavic forest spirit with bark-like skin, a long beard of moss and lichen, antlers of twisted branches, glowing green eyes and a sly grin, a coat of leaves and fern, leaning on a crooked branch, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 399029201,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793397546,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 67.73,
+    "request_id": "4426772b-7950-4d51-9e09-f40fd7d15fed",
+    "outputs_retained_until": 1793483847
+  }
+}

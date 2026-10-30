@@ -1,0 +1,25 @@
+{
+  "id": "rusalka",
+  "payload": {
+    "prompt": "a rusalka, a pale slavic river maiden with long wet hair the colour of reeds, a wreath of water lilies and wildflowers, a white linen shift dripping with water, bare feet in the grass, beckoning with one hand, an eerie gentle smile, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 738625683,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793397595,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 67.37,
+    "request_id": "3ce483da-033c-43a4-8e4c-ee25b15c1308",
+    "outputs_retained_until": 1793483948
+  }
+}
