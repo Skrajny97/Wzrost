@@ -9083,6 +9083,21 @@ a.profession-square:active {
   gap: 8px;
 }
 
+/* A companion or a candidate in the Karczma: its numbers, traits, skills
+   and gear in a short list. */
+.settlement-companion {
+  display: grid;
+  gap: 6px;
+}
+
+.settlement-companion-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 2px;
+  font-size: 0.92rem;
+}
+
 /* The Zaklinaczka's sheet: rows to tap for the item, its affix and the
    material, then the affix before and after. */
 .settlement-back {

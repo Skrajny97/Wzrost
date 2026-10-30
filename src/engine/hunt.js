@@ -40,6 +40,7 @@ import { say } from './text.js';
 import { classUnlockMessages, unlockMessages } from './unlocks.js';
 import { classNameOf, evolutionOf } from './evolutions.js';
 import { evolutionBlock, skillPoints } from './skills.js';
+import { companionCombatant } from './companions.js';
 
 // Value of [minutes, value] pairs at `minutes`, rising with the logarithm of
 // the time between pairs.
@@ -83,13 +84,15 @@ export const potionsPerKind = (minutes, content) => explorationPace(minutes, con
 
 // The pace with the elite and the champion avoided (none of them) or sought
 // (rareSeekFactor times as often, the author: "niech zwiększa to szansę
-// dwukrotnie"), and with those of `catchUp` (rareCatchUp) met in at least
-// rareCatchUpChance of the fights.
-export function withRareOdds(pace, { avoidRare = false, seekRare = false, catchUp = null }, content) {
+// dwukrotnie"), `rumor` times as often again after a rumor from the
+// Karczma about this place (settlement.js), and with those of `catchUp`
+// (rareCatchUp) met in at least rareCatchUpChance of the fights.
+export function withRareOdds(pace, { avoidRare = false, seekRare = false, catchUp = null, rumor = 1 }, content) {
   if (avoidRare) return { ...pace, eliteChance: 0, championChance: 0 };
-  if (!seekRare && !catchUp) return pace;
+  if (!seekRare && !catchUp && rumor === 1) return pace;
   const { rareSeekFactor, rareCatchUpChance } = content.balance.hunt;
-  const odds = (chance, unmet) => Math.min(1, Math.max(seekRare ? chance * rareSeekFactor : chance, unmet ? rareCatchUpChance : 0));
+  const factor = (seekRare ? rareSeekFactor : 1) * rumor;
+  const odds = (chance, unmet) => Math.min(1, Math.max(chance * factor, unmet ? rareCatchUpChance : 0));
   return { ...pace, eliteChance: odds(pace.eliteChance, catchUp?.elite), championChance: odds(pace.championChance, catchUp?.champion) };
 }
 
@@ -368,7 +371,7 @@ export function resourceBundle(area, total) {
 // potion alone, as explorations started before the other kinds kept it
 // (potions.js).
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {} },
+  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, rumor = 1, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [] },
   content,
 ) {
   const rng = createRng(seed);
@@ -379,6 +382,14 @@ export function simulateHunt(
   let worn = equipped;
   let player = playerCombatant({ character, equipped: worn, hp, name, area }, content);
   const durationMs = minutes * 60000;
+  // The companions hired in the Osada (companions.js) go along, up to two
+  // more members of the party, each with its own HP through the exploration
+  // and a rest after each won fight as the character's; once one falls, it
+  // keeps to the back for the rest of the way.
+  const mates = companions.map((companion, index) => {
+    const unit = companionCombatant(companion, { area, id: `a${index + 1}` }, content);
+    return { id: companion.id, unit, hp: unit.maxHp, out: false };
+  });
 
   // Each fight pays for the time it stands for (`share`), so every length
   // gives about the same per hour. The first exploration meets no demanding
@@ -387,7 +398,7 @@ export function simulateHunt(
   // character, those it has not met come far more often until the first
   // fight with them, and then as usual.
   let catchUp = first || avoidRare ? null : rareCatchUp(character.level, area, met, content);
-  const odds = () => withRareOdds(explorationPace(minutes, content), { avoidRare: first || avoidRare, seekRare, catchUp }, content);
+  const odds = () => withRareOdds(explorationPace(minutes, content), { avoidRare: first || avoidRare, seekRare, catchUp, rumor }, content);
   let pace = odds();
   if (first) pace = { ...pace, toughChance: 0 };
   const fightCount = pace.fights;
@@ -503,9 +514,12 @@ export function simulateHunt(
       ...(Object.keys(kit).length > 0 && { potions: kit }),
       ...(Object.keys(trophies).length > 0 && { trophies }),
     };
-    const fight = simulateFight({ allies: [ally], enemies, rng, content, record: true, trait: area.trait });
+    const fighting = mates.filter((mate) => !mate.out);
+    const allies = [ally, ...fighting.map((mate) => ({ ...mate.unit, hp: mate.hp }))];
+    const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
     const hpBefore = hpNow;
     hpNow = fight.units.find((unit) => unit.id === ally.id).hp;
+    for (const mate of fighting) mate.hp = Math.max(0, fight.units.find((unit) => unit.id === mate.unit.id).hp);
     for (const id of fight.drunk) {
       left[id] -= 1;
       potionsUsed[id] = (potionsUsed[id] ?? 0) + 1;
@@ -528,7 +542,7 @@ export function simulateHunt(
       materials: {},
       chests: [],
       recovered: 0,
-      allies: [combatantView(ally, enemies[0].level, content)],
+      allies: allies.map((unit) => combatantView(unit, enemies[0].level, content)),
       enemiesView: enemies.map((enemy) => combatantView(enemy, ally.level, content)),
       events: fight.events,
     };
@@ -546,6 +560,10 @@ export function simulateHunt(
     const enemyList = enemies.map((enemy) => `${enemy.name} (poz. ${enemy.level})`).join(', ');
     const start = encounter.champion ? 'championStart' : encounter.elite ? 'eliteStart' : encounter.tough ? 'toughStart' : 'fightStart';
     const lines = [say(texts, start, step, { enemies: enemyList })];
+    for (const mate of fighting.filter((one) => one.hp <= 0)) {
+      mate.out = true;
+      lines.push(say(texts, 'companionDown', step, { name: mate.unit.name }));
+    }
 
     if (fight.won === true) {
       let fightXp = 0;
@@ -586,6 +604,7 @@ export function simulateHunt(
       gold += summary.gold;
       summary.recovered = Math.round((player.maxHp - hpNow) * Math.min(1, player.recovery + pace.restBonus));
       hpNow += summary.recovered;
+      for (const mate of fighting.filter((one) => !one.out)) mate.hp += Math.round((mate.unit.maxHp - mate.hp) * Math.min(1, mate.unit.recovery + pace.restBonus));
 
       lines.push(say(texts, 'victory', step), `HP: ${hpBefore} → ${summary.hpAfter}. +${summary.xp} XP, +${summary.gold} złota.`);
       if (Object.keys(summary.materials).length > 0) {
@@ -642,6 +661,8 @@ export function simulateHunt(
     keyFight: key && { index: key.index },
     potionsUsed,
     buffFights,
+    // The companions at the end: their HP and whether they fell on the way.
+    ...(mates.length > 0 && { companions: mates.map((mate) => ({ id: mate.id, name: mate.unit.name, hpEnd: mate.hp, maxHp: mate.unit.maxHp, fainted: mate.out })) }),
   };
 }
 

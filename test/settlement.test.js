@@ -9,6 +9,12 @@ import {
   addQuestProgress,
   createRng,
   deliverBlock,
+  drawRumor,
+  explorationPace,
+  mugCost,
+  rumorFactor,
+  rumorText,
+  withRareOdds,
   deliverOrder,
   drawOrder,
   drawQuests,
@@ -58,6 +64,26 @@ describe('the Osada in the engine', () => {
     assert.equal(top.id, standings.at(-1).id);
     assert.equal(top.next, null);
     assert.equal(top.toNext, 0);
+  });
+
+  test('the Karczma\'s rumor names an elite or a champion of an open place, the same all day, and doubles them there', () => {
+    const rumor = drawRumor({ character, seed: 'k' }, NOW, content);
+    const area = content.areasById[rumor.areaId];
+    assert.ok([area.elite, area.champion].includes(rumor.monsterId));
+    assert.ok(area.minLevel - content.balance.hunt.areaUnlockLead <= character.classLevel);
+    assert.deepEqual(drawRumor({ character, seed: 'k' }, NOW + HOUR, content), rumor);
+    assert.match(rumorText(rumor, content), new RegExp(area.name));
+    assert.equal(mugCost(20, content), 20 * content.settlement.tavern.mugGoldPerLevel);
+    const { factor } = content.settlement.tavern.rumor;
+    assert.equal(rumorFactor(rumor, rumor.areaId, NOW, content), factor);
+    assert.equal(rumorFactor(rumor, 'windfalls-edge', NOW, content), 1);
+    assert.equal(rumorFactor({ ...rumor, used: true }, rumor.areaId, NOW, content), 1);
+    assert.equal(rumorFactor(rumor, rumor.areaId, NOW + 24 * HOUR, content), 1);
+    const pace = explorationPace(60, content);
+    const told = withRareOdds(pace, { rumor: factor }, content);
+    assert.equal(told.eliteChance, Math.min(1, pace.eliteChance * factor));
+    assert.equal(told.championChance, Math.min(1, pace.championChance * factor));
+    assert.equal(withRareOdds(pace, { avoidRare: true, rumor: factor }, content).eliteChance, 0);
   });
 
   test('orders ask only for what the character can get: met creatures without trophies, known herbs and potions, resources, lower parts', () => {
@@ -418,6 +444,28 @@ describe('the Osada through the API', () => {
     const left = (await database.prepare('SELECT id FROM items WHERE character_id = ?').bind(id).all()).results.map((row) => row.id);
     assert.ok(left.includes(worn) && left.includes(rare));
     assert.ok(commons.every((one) => !left.includes(one)));
+  });
+
+  test('a mug at the Karczma tells today\'s rumor once, and the next exploration there takes it along', async () => {
+    const gold = mugCost(20, content);
+    const bought = await call('POST', '/api/settlement/tavern', { cookie });
+    assert.equal(bought.status, 200);
+    const { rumor } = bought.data.settlement.tavern;
+    assert.ok(rumor.text.includes(rumor.area));
+    assert.equal(rumor.used, false);
+    assert.equal(bought.data.character.gold, 100000 - gold);
+    assert.equal(bought.data.character.rumor.areaId, rumor.areaId);
+    const innkeeper = bought.data.settlement.residents.find((resident) => resident.id === content.settlement.tavern.resident);
+    assert.equal(innkeeper.service, 'tavern');
+    const stored = async () => JSON.parse((await (await db()).prepare('SELECT settlement FROM characters').first()).settlement);
+    assert.equal((await stored()).relations[content.settlement.tavern.resident], content.settlement.tavern.relationGain);
+    assert.equal((await call('POST', '/api/settlement/tavern', { cookie })).data.error.code, 'told');
+    // An exploration elsewhere leaves it; one there uses it up.
+    await call('POST', '/api/hunts', { cookie, body: { areaId: rumor.areaId, minutes: 5 } });
+    const activity = await (await db()).prepare('SELECT options FROM activities').first();
+    assert.equal(JSON.parse(activity.options).rumor, content.settlement.tavern.rumor.factor);
+    assert.equal((await stored()).rumor.used, true);
+    assert.equal((await view()).tavern.rumor.used, true);
   });
 
   test('rejecting an order empties its slot for a while', async () => {

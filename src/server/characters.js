@@ -3,6 +3,7 @@
 
 import {
   blockedName,
+  rumorToday,
   areaFor,
   autoDistribute,
   bagCapacity,
@@ -332,6 +333,15 @@ async function settleTimePoints(db, row, now) {
     .run();
   if (result.meta.changes === 1) Object.assign(row, { time_points: row.time_points + points, time_points_at: since });
   else Object.assign(row, await db.prepare('SELECT time_points, time_points_at FROM characters WHERE id = ?').bind(row.id).first());
+}
+
+// Today's rumor from the Karczma not used yet by an exploration: the place
+// and the creature it names, or null.
+function rumorView(row, now) {
+  if (!settlementOpen(row)) return null;
+  const rumor = rumorToday(JSON.parse(row.settlement ?? '{}').rumor, now, content);
+  if (!rumor || rumor.used) return null;
+  return { areaId: rumor.areaId, monster: content.monstersById[rumor.monsterId].name, factor: content.settlement.tavern.rumor.factor };
 }
 
 // The Osada opened below its level by "Testuj Osadę" (settlement.js).
@@ -876,6 +886,9 @@ export function characterView(player, now) {
     nameBlocked: blockedName(row.name, content),
     // An order of the Osada that can be delivered now lights its tab.
     settlementWaiting: settlementWaiting(row, items, now, Boolean(activity)),
+    // Today's rumor from the Karczma, for the place it names on the Walka
+    // screen (settlement.js).
+    rumor: rumorView(row, now),
     huntDurations: huntDurations(row.level, content),
     // Szybkie Polowania left today (hunts.js), or null below their level.
     quickHunts: quickHuntsView(row, now),

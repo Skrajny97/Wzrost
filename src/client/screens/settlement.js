@@ -2,8 +2,9 @@
 // the camp's style (question 73 A), twice as tall as the camp's, and a
 // screen for each place with its resident's bust, story and greeting
 // (question 76): the Tablica zleceń with its three orders, the week's big
-// one and the brotherhoods' standings, the Zaklinaczka's reforging and the
-// Pustelnik's prices. The places of the later parts show what is to come.
+// one and the brotherhoods' standings, the Zaklinaczka's reforging, the
+// Pustelnik's prices and the Karczma's rumors (part II). The places of the
+// later parts show what is to come.
 //
 // Where the deployment has no Osada yet, or the character is below its
 // level, the tab says so as the other locked modules do.
@@ -399,10 +400,107 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
+  // The Karczma (question 116): a mug and, with it, today's rumor of an
+  // elite or a champion; one a day.
+  function tavernCard() {
+    const { mug, factor, rumor } = data.tavern;
+    if (!rumor) {
+      return h(
+        'div',
+        { class: 'settlement-choice' },
+        h('p', { class: 'muted', text: `Za kufel Zbylut zdradzi, gdzie dziś krąży elita albo czempion. Najbliższa wyprawa tam spotka ich ${factor} razy częściej.` }),
+        h('button', {
+          type: 'button',
+          class: 'button button--world',
+          text: `Postaw kufel (${formatNumber(mug)} zł.)`,
+          disabled: state.character.gold < mug,
+          onClick: (event) =>
+            withButton(event.currentTarget, async () => {
+              apply(await call('POST', '/api/settlement/tavern'));
+            }),
+        }),
+      );
+    }
+    return h(
+      'div',
+      { class: 'settlement-choice' },
+      h('p', { class: 'settlement-greeting', text: rumor.text }),
+      h('p', {
+        class: 'muted',
+        text: rumor.used
+          ? `Wyprawa w miejsce ${rumor.area} już poszła tym tropem. Następna plotka jutro.`
+          : `Plotka do północy: najbliższa wyprawa w miejsce ${rumor.area} spotka elitę i czempiona ${factor} razy częściej (${rumor.monster}).`,
+      }),
+    );
+  }
+
+  // A companion or a candidate (questions 104–113): class, level, numbers,
+  // traits, skills, gear and story, with what can be done with it.
+  function companionCard(companion, action) {
+    const wounded = companion.woundedUntil && companion.woundedUntil > serverNow();
+    return h(
+      'article',
+      { class: 'card settlement-companion' },
+      h('p', { class: 'settlement-resident-name', text: `${companion.name}, ${companion.className}, poz. ${companion.level}` }),
+      h('p', { class: 'muted', text: `HP ${formatNumber(companion.maxHp)} · pancerz ${formatNumber(companion.armor)}${companion.profession ? ` · ${companion.profession}` : ''}` }),
+      h('p', { class: 'muted settlement-resident-story', text: companion.story }),
+      h(
+        'ul',
+        { class: 'settlement-companion-list' },
+        companion.traits.map((trait) => h('li', {}, h('strong', { text: trait.name }), `: ${trait.text}`)),
+        companion.skills.map((skill) => h('li', { text: `${skill.name}${skill.level > 0 ? `, poz. ${skill.level}` : ', jeszcze nie umie'}` })),
+        h('li', { class: 'muted', text: `Sprzęt: ${companion.gear.join(', ')}` }),
+      ),
+      wounded && h('p', { class: 'region-warning', text: `Odpoczywa po ranach jeszcze ${formatCountdown(companion.woundedUntil - serverNow())} i nie pójdzie na wyprawę.` }),
+      action,
+    );
+  }
+
+  // The werbunek: the companions hired (they go on every exploration but a
+  // Szybkie Polowanie) and this week's candidates, from the standing with
+  // the innkeeper that gives a place.
+  function companionsCard() {
+    const { places, next, hired, candidates } = data.companions;
+    const full = hired.length >= places;
+    const dismiss = (companion) =>
+      h('button', {
+        type: 'button',
+        class: 'button button--small',
+        text: 'Odpraw',
+        onClick: async (event) => {
+          const button = event.currentTarget;
+          if (!(await confirmAction({ title: `Odprawić: ${companion.name}?`, text: `${companion.name} odejdzie na dobre.`, confirmLabel: 'Odpraw' }))) return;
+          withButton(button, async () => apply(await call('POST', '/api/settlement/dismiss', { companionId: companion.id })));
+        },
+      });
+    const hire = (candidate) =>
+      h('button', {
+        type: 'button',
+        class: 'button button--world button--small',
+        text: `Zwerbuj (${formatNumber(candidate.price)} zł.)`,
+        disabled: full || state.character.gold < candidate.price,
+        onClick: (event) => withButton(event.currentTarget, async () => apply(await call('POST', '/api/settlement/hire', { candidateId: candidate.id }))),
+      });
+    return h(
+      'section',
+      { class: 'stack' },
+      h('h2', { class: 'section-title', text: 'Towarzysze' }),
+      places === 0
+        ? h('p', { class: 'muted', text: `Zbylut poleci ci kogoś od stopnia ${next} w relacji z nim.` })
+        : h('p', { class: 'muted', text: `Towarzysze idą z tobą na każdą wyprawę poza Szybkim Polowaniem i rosną razem z tobą. Miejsca: ${hired.length} z ${places}.${next ? ` Kolejne od stopnia ${next}.` : ''}` }),
+      hired.map((companion) => companionCard(companion, dismiss(companion))),
+      h('h2', { class: 'section-title', text: 'Szukają pracy w tym tygodniu' }),
+      candidates.length === 0
+        ? h('p', { class: 'muted', text: 'Nikt więcej nie szuka pracy. Nowi przyjdą w poniedziałek.' })
+        : candidates.map((candidate) => companionCard(candidate, places > 0 ? hire(candidate) : null)),
+    );
+  }
+
   // A resident's services, on their place's screen.
   function services(resident) {
     if (resident.service === 'reforge')
       return data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij afiks', onClick: reforgeSheet });
+    if (resident.service === 'tavern') return h('div', { class: 'stack' }, tavernCard(), companionsCard());
     if (resident.service !== 'hermit') return null;
     return h(
       'div',

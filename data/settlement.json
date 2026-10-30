@@ -1,12 +1,12 @@
 {
-  "$comment": "Osada (src/engine/settlement.js), część I: plansza z miejscami (places, jak plansza obozu: x i y w procentach) i pochodniami (torches: miejsce podstawy pochodni, x i y w procentach), stali mieszkańcy (residents, każdy w swoim miejscu) i bractwa (brotherhoods), u których rośnie reputacja. standings: stopnie reputacji bractwa i relacji z mieszkańcem, od points punktów. Zlecenia (orders): na tablicy wisi open zleceń naraz; w miejsce oddanego albo odrzuconego nowe przychodzi po refillMinutes minut, a co tydzień (zegar zadań narratora) wisi jedno duże (weekly: count razy więcej sztuk, reward razy większa nagroda, reputation punktów). Zlecenie prosi o to, co postać już umie zdobyć (goods: herb zioła, które zna Zielarstwo, potion mikstury znane w Alchemii, material materiały stworów, które postać spotkała, resource zasoby obozu, part części do rzemiosła do rzadkości z partRarity), w ilości z counts (od, do, na 10 poziomów postaci więcej o perTenLevels). Płaci pay razy cenę rynkową (herb: cena zioła, potion: potionPrice, material: materialPrice, resource: resourceGold, part: partGold razy mnożnik sprzedaży rzadkości), czyli powyżej ceny, którą daje złomiarz, ale poniżej ceny, za którą da się to kupić: zasób u ducha ognia, a część na Ladzie złomiarza, na ich najwyższym poziomie, także w zleceniu tygodnia (sprawdza to test/settlement.test.js); daje reputation punktów bractwu i relationGain punktów relacji z mieszkańcem, który je wiesza (resident). Od stopnia quality.from zlecenie z szansą quality.chance prosi o materiał rzadkości o jedną wyżej i płaci quality.reward razy więcej. Co systemPoints.every oddane zlecenie daje systemPoints.points Punktów Systemu, a tygodniowe systemPoints.weekly. stories: zdanie zamawiającego, po kilka na rodzaj. Zaklinaczka (reforge; resident to jej id wśród mieszkańców): zaklęcie jednego afiksu przedmiotu (wylosowanie go od nowa) kosztuje goldPerLevel złota za poziom przedmiotu razy mnożnik sprzedaży rzadkości, razy growth za każde wcześniejsze zaklęcie tego przedmiotu, i materials: tyle sztuk materiału stworów danej rzadkości (rarity materiału według rzadkości przedmiotu). Pustelnik (hermit; resident to jego id wśród mieszkańców): zerowanie ścieżki za pathGoldPerLevel złota za poziom postaci; zmiana ewolucji pierwszy raz darmo, potem evolutionGold, każda kolejna evolutionGrowth razy drożej; zerowanie statystyk od statsFromLevel (po darmowym do 20. poziomu) za statsGoldPerLevel złota za poziom.",
+  "$comment": "Osada (src/engine/settlement.js), część I: plansza z miejscami (places, jak plansza obozu: x i y w procentach) i pochodniami (torches: miejsce podstawy pochodni, x i y w procentach), stali mieszkańcy (residents, każdy w swoim miejscu) i bractwa (brotherhoods), u których rośnie reputacja. standings: stopnie reputacji bractwa i relacji z mieszkańcem, od points punktów. Zlecenia (orders): na tablicy wisi open zleceń naraz; w miejsce oddanego albo odrzuconego nowe przychodzi po refillMinutes minut, a co tydzień (zegar zadań narratora) wisi jedno duże (weekly: count razy więcej sztuk, reward razy większa nagroda, reputation punktów). Zlecenie prosi o to, co postać już umie zdobyć (goods: herb zioła, które zna Zielarstwo, potion mikstury znane w Alchemii, material materiały stworów, które postać spotkała, resource zasoby obozu, part części do rzemiosła do rzadkości z partRarity), w ilości z counts (od, do, na 10 poziomów postaci więcej o perTenLevels). Płaci pay razy cenę rynkową (herb: cena zioła, potion: potionPrice, material: materialPrice, resource: resourceGold, part: partGold razy mnożnik sprzedaży rzadkości), czyli powyżej ceny, którą daje złomiarz, ale poniżej ceny, za którą da się to kupić: zasób u ducha ognia, a część na Ladzie złomiarza, na ich najwyższym poziomie, także w zleceniu tygodnia (sprawdza to test/settlement.test.js); daje reputation punktów bractwu i relationGain punktów relacji z mieszkańcem, który je wiesza (resident). Od stopnia quality.from zlecenie z szansą quality.chance prosi o materiał rzadkości o jedną wyżej i płaci quality.reward razy więcej. Co systemPoints.every oddane zlecenie daje systemPoints.points Punktów Systemu, a tygodniowe systemPoints.weekly. stories: zdanie zamawiającego, po kilka na rodzaj. Zaklinaczka (reforge; resident to jej id wśród mieszkańców): zaklęcie jednego afiksu przedmiotu (wylosowanie go od nowa) kosztuje goldPerLevel złota za poziom przedmiotu razy mnożnik sprzedaży rzadkości, razy growth za każde wcześniejsze zaklęcie tego przedmiotu, i materials: tyle sztuk materiału stworów danej rzadkości (rarity materiału według rzadkości przedmiotu). Pustelnik (hermit; resident to jego id wśród mieszkańców): zerowanie ścieżki za pathGoldPerLevel złota za poziom postaci; zmiana ewolucji pierwszy raz darmo, potem evolutionGold, każda kolejna evolutionGrowth razy drożej; zerowanie statystyk od statsFromLevel (po darmowym do 20. poziomu) za statsGoldPerLevel złota za poziom. Karczma (tavern, część II; resident to id karczmarza): kufel kosztuje mugGoldPerLevel złota za poziom postaci i daje relationGain punktów relacji, a z nim plotka dnia (pytanie 116): jeden z newest najnowszych regionów wewnętrznych otwartych dla klasy postaci, z elitą albo czempionem, nie za łatwy dla postaci; najbliższa wyprawa tam do północy spotyka elitę i czempiona factor razy częściej. lines: słowa karczmarza ({area}: nazwa miejsca, {creature}: stwór w bierniku, jak w liczeniu „1 odyńca”). Towarzysze (companions, część II): od stopni from relacji z karczmarzem pierwszy i drugi; candidates kandydatów co tydzień, każdy z klasą, poziomem postaci plus levelSpread, dwiema cechami (traits, z szansą thirdTraitChance trzema), dwiema umiejętnościami klasy (poziom co skillStep poziomów), profesją, historią (stories) i sprzętem, z którym przychodzi; werbunek kosztuje goldPerLevel złota za jego poziom. Towarzysz dostaje xpShare XP postaci z wyprawy, a catchUp więcej za każdy poziom poniżej postaci. Cechy: names (kobieta, mężczyzna), text i zmiany w walce (damage, armor, hp, dodge, crit, speed, will).",
   "name": "Rozstaje",
   "description": "Osada na skrzyżowaniu leśnych dróg, za puszczą. Ludzie stąd handlują ze wszystkimi, którzy wychodzą z lasu żywi.",
   "places": [
     { "id": "board", "name": "Tablica zleceń", "x": 78, "y": 22, "resident": "headman" },
     { "id": "enchanter", "name": "Pracownia Zaklinaczki", "x": 21, "y": 23, "resident": "enchantress" },
     { "id": "hermitage", "name": "Chata Pustelnika", "x": 78, "y": 81, "resident": "hermit" },
-    { "id": "tavern", "name": "Karczma", "x": 84, "y": 43, "resident": "innkeeper", "soon": true },
+    { "id": "tavern", "name": "Karczma", "x": 84, "y": 43, "resident": "innkeeper" },
     { "id": "market", "name": "Targowisko", "x": 45.5, "y": 46, "soon": true },
     { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist", "soon": true }
   ],
@@ -59,7 +59,7 @@
         "Jesteś jednym z niewielu, z którymi rozmawiam bez pośpiechu."
       ]
     },
-    { "id": "innkeeper", "name": "Zbylut", "title": "karczmarz", "story": "Zna wszystkie plotki z traktu i każdego, kto szuka pracy. U niego znajdziesz przyszłych towarzyszy.", "greetings": ["Karczma jeszcze zamknięta. Remont."] },
+    { "id": "innkeeper", "name": "Zbylut", "title": "karczmarz", "story": "Zna wszystkie plotki z traktu i każdego, kto szuka pracy. U niego znajdziesz przyszłych towarzyszy.", "greetings": ["Siadaj, gdzie wolne. Kufel piwa, a do niego plotka z traktu, jeśli kogoś to ciekawi.", "O, znowu ty. Ludzie z traktu zostawili tu dziś kilka ciekawych słów.", "Twoje miejsce przy ladzie czeka. I kufel, i świeże plotki.", "Tobie mówię to, czego nie mówię innym. Nachyl się bliżej.", "Dla przyjaciół Rozstajów kufel zawsze pełny, a drzwi na zaplecze otwarte."] },
     { "id": "herbalist", "name": "Jagna", "title": "zielarka", "story": "Zbiera zioła od świtu i suszy je pod strzechą. Za dobre zioła potrafi solidnie zapłacić, a zaufanym zdradza rzadkie receptury.", "greetings": ["Przyjdź, gdy chata będzie gotowa."] }
   ],
   "brotherhoods": [
@@ -150,5 +150,60 @@
     "statsFromLevel": 21,
     "statsGoldPerLevel": 100,
     "relationGain": 10
+  },
+  "tavern": {
+    "resident": "innkeeper",
+    "relationGain": 10,
+    "mugGoldPerLevel": 2,
+    "rumor": {
+      "factor": 2,
+      "newest": 3,
+      "lines": [
+        "„Słuchaj uważnie. {area}. Drwale widzieli tam {creature} i od tamtej pory nikt nie chodzi tam po drewno.”",
+        "„Kupcy z traktu gadali tylko o jednym: {area}. Podobno ktoś widział tam {creature}, i to z bliska.”",
+        "„Nie mów nikomu, skąd to wiesz. {area}. Myśliwi przysięgają, że tropili tam {creature}.”",
+        "„Wczoraj przy tym stole siedział zielarz blady jak ściana. {area}. Mówi, że widział tam {creature}.”",
+        "„{area}. Pasterze przegonili stamtąd owce, kiedy zobaczyli {creature}.”"
+      ]
+    }
+  },
+  "companions": {
+    "from": ["acquaintance", "trusted"],
+    "candidates": 4,
+    "levelSpread": [-3, 0],
+    "goldPerLevel": 30,
+    "xpShare": 1,
+    "catchUp": 0.1,
+    "skillStep": 4,
+    "thirdTraitChance": 0.25,
+    "names": {
+      "female": ["Dobrosława", "Milena", "Bogna", "Radosława", "Jarogniewa", "Ludmiła", "Sława", "Dobromira", "Wojsława", "Świętosława", "Bożena", "Mirosława"],
+      "male": ["Radosław", "Bogdan", "Wszebor", "Mścisław", "Dobrogost", "Siemowit", "Lubomir", "Ziemowit", "Bolko", "Przemko", "Jarosław", "Witosław"]
+    },
+    "traits": [
+      { "id": "fiery", "names": ["Zapalczywa", "Zapalczywy"], "text": "Obrażenia +10%, pancerz −10%.", "damage": 0.1, "armor": -0.1 },
+      { "id": "careful", "names": ["Ostrożna", "Ostrożny"], "text": "Pancerz +12%, obrażenia −5%.", "armor": 0.12, "damage": -0.05 },
+      { "id": "tough", "names": ["Twarda", "Twardy"], "text": "Maks. HP +10%.", "hp": 0.1 },
+      { "id": "nimble", "names": ["Zwinna", "Zwinny"], "text": "Uniki +20%.", "dodge": 0.2 },
+      { "id": "keen", "names": ["Bystrooka", "Bystrooki"], "text": "Trafienia krytyczne +20%.", "crit": 0.2 },
+      { "id": "swift", "names": ["Szybka", "Szybki"], "text": "Ruchy w walce +8%.", "speed": 0.08 },
+      { "id": "timid", "names": ["Lękliwa", "Lękliwy"], "text": "Ruchy w walce +12%, maks. HP −8%.", "speed": 0.12, "hp": -0.08 },
+      { "id": "stubborn", "names": ["Uparta", "Uparty"], "text": "Wola +20%.", "will": 0.2 }
+    ],
+    "professions": [
+      { "id": "gathering", "name": "Zielarstwo" },
+      { "id": "brewing", "name": "Alchemia" },
+      { "id": "crafting", "name": "Rzemieślnictwo" }
+    ],
+    "stories": [
+      "Zna trakt od dziecka i nie boi się nocy w puszczy.",
+      "Ucieka przed długami z dalekiego grodu i szuka uczciwej roboty.",
+      "Chce odłożyć złoto na własną zagrodę pod Rozstajami.",
+      "Wilki wybiły rodzinne stado. Teraz szuka okazji, żeby się odpłacić.",
+      "Na dworze możnego pana było nudno. Woli las, przygody i karczmę po powrocie.",
+      "Mówi niewiele, ale zawsze dotrzymuje słowa.",
+      "Szuka brata, który poszedł w głąb puszczy i nie wrócił.",
+      "Słyszy, że w puszczy czekają skarby, i chce sprawdzić, ile w tym prawdy."
+    ]
   }
 }

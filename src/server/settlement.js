@@ -12,12 +12,19 @@ import {
   craftedFor,
   createRng,
   deliverBlock,
+  companionCombatant,
+  companionPlaces,
+  companionSkillLevel,
   deliverOrder,
+  drawCandidates,
+  drawRumor,
   evolutionChangePrice,
   evolutionChanges,
   evolvedSkills,
+  hireCost,
   itemName,
   materialView,
+  mugCost,
   parseStack,
   pathResetCost,
   propertyName,
@@ -26,11 +33,14 @@ import {
   reforgeCost,
   reforgeOptions,
   rejectOrder,
+  rumorText,
+  rumorToday,
   spentPoints,
   standingOf,
   statResetCost,
   upgradedItem,
   withAffix,
+  xpToNext,
 } from '../engine/index.js';
 import { content } from './content.js';
 import {
@@ -62,7 +72,7 @@ const grow = (relations, { resident, relationGain }) => ({ ...relations, [reside
 
 // The service each resident gives on the page, as the data names them: the
 // board's orders, the reforging or the resets; none for the others.
-const serviceOf = (residentId) => ['orders', 'reforge', 'hermit'].find((service) => content.settlement[service].resident === residentId) ?? null;
+const serviceOf = (residentId) => ['orders', 'reforge', 'hermit', 'tavern'].find((service) => content.settlement[service].resident === residentId) ?? null;
 
 // What the row keeps of the Osada: reputation and relations by id, the
 // board, a reforging's affixes waiting for the player's choice (`pending`),
@@ -76,6 +86,9 @@ export function settlementOf(row) {
     board: stored.board ?? null,
     ...(stored.pending && { pending: stored.pending }),
     ...(stored.evolutionChanges && { evolutionChanges: stored.evolutionChanges }),
+    ...(stored.rumor && { rumor: stored.rumor }),
+    ...(stored.companions && { companions: stored.companions }),
+    ...(stored.dismissed && { dismissed: stored.dismissed }),
     ...(stored.test && { test: true }),
   };
 }
@@ -163,6 +176,8 @@ export function settlementView(player, stored, board, now) {
       choices: choicesOf(stored),
       pending: pendingView(pendingOf(stored, player.items)),
     },
+    tavern: tavernView(player.row, stored, now),
+    companions: companionsView(player.row, stored, now),
     // After an evolution the paths change with it, so no path reset.
     hermit: {
       path: player.row.evolution ? null : pathResetCost(player.row.level, content),
@@ -170,6 +185,74 @@ export function settlementView(player, stored, board, now) {
       evolution: evolutionChangeView(player.row, stored),
     },
     now,
+  };
+}
+
+// The Karczma: the mug's price and today's rumor once told (its words, the
+// place and whether an exploration there has used it).
+function tavernView(row, stored, now) {
+  const rumor = rumorToday(stored.rumor, now, content);
+  return {
+    mug: mugCost(row.level, content),
+    factor: content.settlement.tavern.rumor.factor,
+    rumor: rumor && {
+      text: rumorText(rumor, content),
+      areaId: rumor.areaId,
+      area: content.areasById[rumor.areaId].name,
+      monster: content.monstersById[rumor.monsterId].name,
+      used: rumor.used,
+    },
+  };
+}
+
+// A companion or a candidate as the Karczma shows it (companions.js): its
+// class and level, its numbers in a fight, its traits in its own form, its
+// skills at its level, the gear it wears, its profession and story, and
+// how long it is still wounded.
+function companionView(companion, now) {
+  const unit = companionCombatant(companion, {}, content);
+  const female = companion.appearance === 'female';
+  const { traits, professions, stories } = content.settlement.companions;
+  return {
+    id: companion.id,
+    name: companion.name,
+    appearance: companion.appearance,
+    classId: companion.classId,
+    className: content.classesById[companion.classId].name,
+    level: companion.level,
+    xp: companion.xp ?? 0,
+    xpToNext: xpToNext(companion.level, content),
+    maxHp: unit.maxHp,
+    armor: unit.armor,
+    traits: companion.traits.map((id) => {
+      const trait = traits.find((one) => one.id === id);
+      return { name: trait.names[female ? 0 : 1], text: trait.text };
+    }),
+    skills: companion.skills.map((id) => ({ name: content.skillsById[id].name, level: companionSkillLevel(id, companion.level, content) })),
+    gear: companion.gear.map((item) => itemName(item, content)),
+    profession: professions.find((one) => one.id === companion.profession)?.name ?? null,
+    story: stories[companion.story % stories.length],
+    woundedUntil: companion.woundedUntil > now ? companion.woundedUntil : null,
+  };
+}
+
+// The Karczma's werbunek (questions 104–106): the places the relation with
+// the innkeeper gives, the standing that opens the next one, the companions
+// hired and this week's candidates not hired yet, each with its price.
+function companionsView(row, stored, now) {
+  const { standings } = content.settlement;
+  const places = companionPlaces(stored.relations[content.settlement.tavern.resident] ?? 0, content);
+  const hired = stored.companions ?? [];
+  const nextId = content.settlement.companions.from[places];
+  const candidates = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, now, content, [
+    ...hired.map((companion) => companion.id),
+    ...(stored.dismissed ?? []),
+  ]);
+  return {
+    places,
+    next: nextId ? standings.find((standing) => standing.id === nextId).name : null,
+    hired: hired.map((companion) => companionView(companion, now)),
+    candidates: candidates.map((candidate) => ({ ...companionView(candidate, now), price: hireCost(candidate, content) })),
   };
 }
 
@@ -297,6 +380,75 @@ async function deliverCrafted(db, player, done, { settlement, quests }) {
       .prepare(`DELETE FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${list}) AND (SELECT settlement FROM characters WHERE id = ?) = ?`)
       .bind(row.id, ...ids, row.id, settlement),
   ]);
+}
+
+// A mug at the Karczma (question 116): for gold, the innkeeper tells
+// today's rumor (settlement.js in the engine), and the relation with him
+// grows. One a day: the day's rumor stays told until midnight.
+export async function buyMug(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const stored = settlementOf(row);
+  if (rumorToday(stored.rumor, context.now, content)) throw new ApiError(409, 'told', 'Zbylut nie słyszał dziś nic nowego. Zajrzyj jutro.');
+  const rumor = drawRumor({ character: engineCharacter(row), seed: `${row.id}:settlement` }, context.now, content);
+  if (!rumor) throw new ApiError(409, 'no_rumor', 'Zbylut nie słyszał o niczym groźnym w miejscach, do których chodzisz.');
+  const gold = mugCost(row.level, content);
+  if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota na kufel.');
+  const next = { ...stored, rumor, relations: grow(stored.relations, content.settlement.tavern) };
+  const result = await context.env.DB.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?')
+    .bind(gold, JSON.stringify(next), row.id, row.version, gold)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(context.env.DB, session.userId);
+  const board = settlementBoard(after.row, next, context.now);
+  return json({ settlement: settlementView(after, next, board, context.now), character: characterView(after, context.now) });
+}
+
+// { candidateId }: hires one of this week's candidates for gold, when the
+// relation with the innkeeper gives a free place (question 105 A). The
+// companion goes on the next exploration.
+export async function hireCompanion(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const hired = stored.companions ?? [];
+  if (hired.length >= companionPlaces(stored.relations[content.settlement.tavern.resident] ?? 0, content)) {
+    throw new ApiError(409, 'no_place', 'Zbylut nie zna cię jeszcze na tyle, żeby polecić więcej ludzi.');
+  }
+  const taken = [...hired.map((companion) => companion.id), ...(stored.dismissed ?? [])];
+  const candidate = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, context.now, content, taken).find((one) => one.id === body.candidateId);
+  if (!candidate) throw new ApiError(404, 'no_candidate', 'Tego kandydata już nie ma w Karczmie.');
+  const gold = hireCost(candidate, content);
+  if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota na werbunek.');
+  const next = { ...stored, companions: [...hired, candidate] };
+  const result = await context.env.DB.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?')
+    .bind(gold, JSON.stringify(next), row.id, row.version, gold)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(context.env.DB, session.userId);
+  return json({ settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now), character: characterView(after, context.now) });
+}
+
+// { companionId }: the companion leaves for good and does not come back as
+// a candidate this week. Not while it is out on an exploration.
+export async function dismissCompanion(context) {
+  const { session, player } = await requireIdlePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const hired = stored.companions ?? [];
+  if (!hired.some((companion) => companion.id === body.companionId)) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
+  const next = { ...stored, companions: hired.filter((companion) => companion.id !== body.companionId), dismissed: [...(stored.dismissed ?? []), body.companionId] };
+  const result = await context.env.DB.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
+    .bind(JSON.stringify(next), row.id, row.version)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(context.env.DB, session.userId);
+  return json({ settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now), character: characterView(after, context.now) });
 }
 
 // { orderId }: takes an order off the board for free; a new one comes later.

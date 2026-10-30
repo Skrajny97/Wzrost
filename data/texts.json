@@ -154,6 +154,7 @@
   "escape": ["{target} ledwo uchodzi z życiem.", "{target} wycofuje się, zanim będzie za późno."],
   "draw": ["Walka się przeciąga. {target} wycofuje się."],
   "recover": ["Odpoczynek: +{hp} HP.", "Krótki oddech: +{hp} HP."],
+  "companionDown": ["{name} pada bez sił i do końca wyprawy trzyma się z tyłu.", "{name} nie wstaje po ostatnim ciosie. Dalej idziesz bez wsparcia."],
   "findGold": ["W trawie leży sakiewka: {gold} złota.", "Znaleziono {gold} złota.", "Pod kamieniem błyszczą monety: {gold} złota."],
   "findChest": ["Pod korzeniami stoi skrzynia skarbów. W środku: {item}.", "Między głazami ktoś ukrył okutą skrzynkę. W środku: {item}.", "W dziupli starego dębu tkwi kuferek. W środku: {item}."],
   "findResource": ["Zebrano: {resources}.", "Po drodze udało się zebrać: {resources}.", "Przydatny zapas: {resources}."],

@@ -15,10 +15,12 @@ import { knownPotions, potionPrice } from './brewing.js';
 import { materialPrice, parseStack, stackKey } from './crafting.js';
 import { fireBuilding, fireTrade } from './fire.js';
 import { affixShare, affixValue, sellPrice } from './items.js';
+import { easyPlace } from './hunt.js';
 import { knownHerbs, professionOpen, professionState } from './professions.js';
 import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { partPrice, shopBuilding } from './shop.js';
+import { areaUnlocked } from './unlocks.js';
 import { craftCost, knownPatterns } from './workshop.js';
 
 const rarityIndex = (rarityId, content) => content.rarities.findIndex((rarity) => rarity.id === rarityId);
@@ -374,3 +376,47 @@ export const evolutionChanges = (character, content) =>
   character.evolution ? content.evolutions.filter((evolution) => evolution.classId === character.classId && evolution.id !== character.evolution) : [];
 export const statResetCost = (level, content) =>
   level >= content.settlement.hermit.statsFromLevel ? level * content.settlement.hermit.statsGoldPerLevel : null;
+
+// The Karczma (part II, question 116): a mug costs mugGoldPerLevel gold for
+// each level of the character, and with it the innkeeper tells where an
+// elite or a champion lurks today. The place is one of the `newest` inner
+// regions open to the character's class with an elite or a champion, not
+// too easy for the character; the rumor names the champion where there is
+// one, half the time, else the elite. One a day (the narrator's day), drawn
+// from the character's seed and the day, so a second mug tells the same.
+export const mugCost = (level, content) => level * content.settlement.tavern.mugGoldPerLevel;
+
+export function drawRumor({ character, seed }, now, content) {
+  const { rumor } = content.settlement.tavern;
+  const day = questPeriod('daily', now, content);
+  const areas = content.areas
+    .filter((area) => areaUnlocked(area, character.classLevel, content) && (area.elite || area.champion) && !easyPlace(character.level, area, content))
+    .sort((a, b) => b.minLevel - a.minLevel)
+    .slice(0, rumor.newest);
+  if (areas.length === 0) return null;
+  const rng = createRng(`${seed}:rumor:${day.key}`);
+  const area = rng.pick(areas);
+  const monsterId = area.champion && (!area.elite || rng.chance(0.5)) ? area.champion : area.elite;
+  return { day: day.key, areaId: area.id, monsterId, line: rng.int(0, rumor.lines.length - 1), used: false };
+}
+
+// Today's rumor as kept in the Osada, or null after the day it was told.
+export const rumorToday = (stored, now, content) => (stored?.day === questPeriod('daily', now, content).key ? stored : null);
+
+// The rumor's odds for an exploration of an inner region: rumor.factor
+// times more elites and champions when it is today's, about this place and
+// not yet used by an exploration, else 1.
+export function rumorFactor(stored, areaId, now, content) {
+  const rumor = rumorToday(stored, now, content);
+  return rumor && !rumor.used && rumor.areaId === areaId ? content.settlement.tavern.rumor.factor : 1;
+}
+
+// The innkeeper's words: the line with the place's name and the creature,
+// as the rumor's lines write it ({area}, {creature}: the creature as it is
+// counted once, "odyńca").
+export function rumorText(rumor, content) {
+  const area = content.areasById[rumor.areaId];
+  const monster = content.monstersById[rumor.monsterId];
+  const line = content.settlement.tavern.rumor.lines[rumor.line % content.settlement.tavern.rumor.lines.length];
+  return line.replaceAll('{area}', area.name).replaceAll('{creature}', monster.counted[0]);
+}

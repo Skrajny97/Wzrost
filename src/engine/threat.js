@@ -14,6 +14,7 @@
 
 import { playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
+import { companionCombatant } from './companions.js';
 import {
   championEncounter,
   eliteEncounter,
@@ -47,9 +48,9 @@ const LIMITS = [0.01, 0.05, 0.15];
 const sampleKind = (build, weight) => ({ build, weight, counts: new Array(LOST + 1).fill(0), fought: 0, lost: 0, worst: 0 });
 
 // A fight that drags on ends the exploration without fainting, so it is left out.
-function fightSamples(kind, times, player, rng, content, trait) {
+function fightSamples(kind, times, player, rng, content, trait, mates = []) {
   for (let i = 0; i < times; i++) {
-    const fight = simulateFight({ allies: [{ ...player }], enemies: encounterCombatants(kind.build(), content), rng, content, trait });
+    const fight = simulateFight({ allies: [{ ...player }, ...mates.map((mate) => ({ ...mate }))], enemies: encounterCombatants(kind.build(), content), rng, content, trait });
     if (fight.won === null) continue;
     kind.fought += 1;
     if (!fight.won) {
@@ -77,12 +78,13 @@ function mix(kinds) {
   return shares;
 }
 
-// The expensive part: sample fights for the character's current build. It
-// does not depend on HP or the length, so the server can keep it until the
-// build changes.
-export function threatSamples({ character, equipped, areaId }, content) {
+// The expensive part: sample fights for the character's current build, with
+// its companions (companions.js) at full HP beside it. It does not depend on
+// HP or the length, so the server can keep it until the build changes.
+export function threatSamples({ character, equipped, areaId, companions = [] }, content) {
   const area = content.areasById[areaId];
   const player = playerCombatant({ character, equipped, name: 'próba', area }, content);
+  const mates = companions.map((companion, index) => companionCombatant(companion, { area, id: `a${index + 1}` }, content));
   const rng = createRng(`threat:${areaId}:${character.level}`);
   const kinds = (encounters, options) =>
     encounters.map((encounter) =>
@@ -94,12 +96,12 @@ export function threatSamples({ character, equipped, areaId }, content) {
     elite: [sampleKind(() => eliteEncounter(area, content), 1)],
     champion: area.champion ? [sampleKind(() => championEncounter(area, content), 1)] : [],
   };
-  for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content, area.trait);
+  for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content, area.trait, mates);
   if (mix(groups.regular)[LOST] < LIMITS.at(-1)) {
     for (const [group, list] of Object.entries(groups)) {
       const total = list.reduce((sum, kind) => sum + kind.weight, 0);
       for (const kind of list.filter(inDoubt)) {
-        fightSamples(kind, Math.ceil((MORE_SAMPLES[group] * kind.weight) / total), player, rng, content, area.trait);
+        fightSamples(kind, Math.ceil((MORE_SAMPLES[group] * kind.weight) / total), player, rng, content, area.trait, mates);
       }
     }
   }

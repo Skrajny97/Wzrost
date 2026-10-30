@@ -55,7 +55,7 @@ import {
   testIntroduction,
   tutorialTests,
 } from './testing.js';
-import { chooseReforged, deliverSettlementOrder, getSettlement, hermitService, reforgeAtEnchantress, rejectSettlementOrder, settlementTests, testSettlement } from './settlement.js';
+import { buyMug, chooseReforged, deliverSettlementOrder, dismissCompanion, getSettlement, hermitService, hireCompanion, reforgeAtEnchantress, rejectSettlementOrder, settlementTests, testSettlement } from './settlement.js';
 import { skipWithTimePoints } from './time.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
 import { seeTutorial } from './tutorial.js';
@@ -146,6 +146,9 @@ const routes = [
   ['POST', '/api/settlement/reforge', reforgeAtEnchantress],
   ['POST', '/api/settlement/reforge/choose', chooseReforged],
   ['POST', '/api/settlement/hermit', hermitService],
+  ['POST', '/api/settlement/tavern', buyMug],
+  ['POST', '/api/settlement/hire', hireCompanion],
+  ['POST', '/api/settlement/dismiss', dismissCompanion],
   ['GET', '/api/test/settlement', settlementTests],
   ['POST', '/api/test/settlement', testSettlement],
   ['GET', '/api/chat', readChat],
