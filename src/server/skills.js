@@ -20,8 +20,7 @@ async function saveSkills(context, player, skills) {
   return json({ character: characterView(updated, context.now) });
 }
 
-async function skillOf(context) {
-  const body = await readJson(context.request);
+function skillOf(body) {
   if (typeof body.skillId !== 'string') throw new ApiError(400, 'invalid_skill', 'Wybierz umiejętność.');
   return body.skillId;
 }
@@ -29,19 +28,23 @@ async function skillOf(context) {
 // { skillId }: learn one of the skills of the class's milestone, at level 1.
 export async function learnSkill(context) {
   const { player } = await requireIdlePlayer(context);
-  const skillId = await skillOf(context);
+  const skillId = skillOf(await readJson(context.request));
   const character = engineCharacter(player.row);
   const block = learnBlock(character, skillId, content);
   if (block) throw new ApiError(block.code === 'unknown_skill' ? 400 : 409, block.code, block.message);
   return saveSkills(context, player, { ...character.skills, [skillId]: 1 });
 }
 
-// { skillId }: one Skill Point into a learned skill.
+// { skillId, count }: Skill Points into a learned skill, one unless `count`
+// says more ("Dodaj 10 Punktów" on the skill's card).
 export async function raiseSkill(context) {
   const { player } = await requireIdlePlayer(context);
-  const skillId = await skillOf(context);
+  const body = await readJson(context.request);
+  const skillId = skillOf(body);
+  const count = body.count ?? 1;
+  if (!Number.isInteger(count) || count < 1) throw new ApiError(400, 'invalid_count', 'Podaj liczbę punktów.');
   const character = engineCharacter(player.row);
-  const block = raiseBlock(character, skillId, content);
+  const block = raiseBlock(character, skillId, content, count);
   if (block) throw new ApiError(409, block.code, block.message);
-  return saveSkills(context, player, { ...character.skills, [skillId]: character.skills[skillId] + 1 });
+  return saveSkills(context, player, { ...character.skills, [skillId]: character.skills[skillId] + count });
 }

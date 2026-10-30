@@ -29,6 +29,8 @@ const skillIcon = (skill, size = 'large') =>
   );
 
 const levelText = (skill) => `Poziom ${skill.level} / ${skill.maxLevel}`;
+// How many points the card's second button adds at once.
+const RAISE_MANY = 10;
 const skillPoints = (count) => countOf(count, 'Punkt Umiejętności', 'Punkty Umiejętności', 'Punktów Umiejętności');
 
 // What stands before a path's name, by its state (skillsView).
@@ -235,23 +237,27 @@ export function mountSkills(container) {
   }
 
   // The card of a learned skill: what it does now and at the next level,
-  // and "Dodaj punkt" while there are points and levels left.
+  // "Dodaj punkt" while there are points and levels left, and "Dodaj 10
+  // Punktów" while there are ten of each (after an evolution a character has
+  // dozens of points to spend).
   function openCard(skillId, busy) {
     const view = state.character.skills;
     const skill = view.pools.flatMap((pool) => pool.options).find((option) => option.id === skillId);
     if (!skill) return;
-    const canRaise = view.points > 0 && skill.level < skill.maxLevel;
-    const raise = h('button', {
-      type: 'button',
-      class: 'button button--system',
-      disabled: busy || !canRaise,
-      text: 'Dodaj punkt',
-      onClick: (event) =>
-        withButton(event.currentTarget, async () => {
-          await call('POST', '/api/skills/raise', { skillId });
-          openCard(skillId, Boolean(state.character.activity));
-        }),
-    });
+    const raiseButton = (count, text) =>
+      h('button', {
+        type: 'button',
+        class: 'button button--system',
+        disabled: busy || view.points < count || skill.maxLevel - skill.level < count,
+        text,
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            await call('POST', '/api/skills/raise', { skillId, count });
+            openCard(skillId, Boolean(state.character.activity));
+          }),
+      });
+    const raise = raiseButton(1, 'Dodaj punkt');
+    const raiseTen = view.points >= RAISE_MANY && skill.maxLevel - skill.level >= RAISE_MANY && raiseButton(RAISE_MANY, `Dodaj ${RAISE_MANY} Punktów`);
     openSheet(
       h('div', { class: 'skill-head' }, skillIcon(skill), h('div', {}, h('h2', { class: 'sheet-title', text: skill.name }), h('p', { class: 'skill-style', text: `${skill.style} · ${levelText(skill)}` }))),
       h('p', { class: 'skill-description', text: skill.description }),
@@ -262,6 +268,7 @@ export function mountSkills(container) {
       h('p', { class: 'skill-cost', text: skill.cost }),
       h('p', { class: 'muted', text: `Punkty Umiejętności: ${formatNumber(view.points)}. Każdy poziom klasy do ${view.lastPointLevel}. daje jeden.` }),
       h('p', { class: 'muted', text: state.character.evolution?.current ? `Umiejętność ewolucji: ${skill.path}.` : `Ścieżka: ${skill.path}. Zdecyduje o ewolucji klasy.` }),
+      raiseTen && h('div', { class: 'sheet-actions' }, raiseTen),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: closeSheet, text: 'Zamknij' }), raise),
     );
   }

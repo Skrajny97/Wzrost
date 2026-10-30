@@ -146,12 +146,17 @@ export function evolutionBlock(character, content) {
   return content.evolutions.some((evolution) => evolution.classId === character.classId) ? { code: 'evolve', level } : null;
 }
 
-// Why a learned skill cannot take a point, or null when it can.
-export function raiseBlock(character, skillId, content) {
+// Why a learned skill cannot take `count` points at once, or null when it
+// can.
+export function raiseBlock(character, skillId, content, count = 1) {
   const level = character.skills?.[skillId];
   if (level === undefined || !content.skillsById[skillId]) return { code: 'not_learned', message: 'Tej umiejętności jeszcze nie znasz.' };
-  if (level >= topLevel(content.skillsById[skillId], content)) return { code: 'max_level', message: 'Ta umiejętność ma już najwyższy poziom.' };
-  if (skillPoints(character, content).free < 1) return { code: 'no_points', message: 'Nie masz wolnych Punktów Umiejętności.' };
+  const top = topLevel(content.skillsById[skillId], content);
+  if (level >= top) return { code: 'max_level', message: 'Ta umiejętność ma już najwyższy poziom.' };
+  if (level + count > top) return { code: 'max_level', message: 'Ta umiejętność nie ma już tylu poziomów do zdobycia.' };
+  const { free } = skillPoints(character, content);
+  if (free < 1) return { code: 'no_points', message: 'Nie masz wolnych Punktów Umiejętności.' };
+  if (free < count) return { code: 'no_points', message: 'Nie masz tylu wolnych Punktów Umiejętności.' };
   return null;
 }
 

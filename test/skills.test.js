@@ -150,6 +150,11 @@ describe('skills', () => {
     assert.equal(raiseBlock(warrior(12, { 'power-strike': 1 }), 'power-strike', content), null);
     assert.equal(raiseBlock(warrior(40, { 'power-strike': 20 }), 'power-strike', content).code, 'max_level');
     assert.equal(raiseBlock(warrior(40), 'power-strike', content).code, 'not_learned');
+    // "Dodaj 10 Punktów": ten at once only with ten points free and ten
+    // levels left.
+    assert.equal(raiseBlock(warrior(30, { 'power-strike': 1 }), 'power-strike', content, 10), null);
+    assert.equal(raiseBlock(warrior(15, { 'power-strike': 1 }), 'power-strike', content, 10).code, 'no_points');
+    assert.equal(raiseBlock(warrior(40, { 'power-strike': 12 }), 'power-strike', content, 10).code, 'max_level');
 
     const open = skillsView(warrior(10), content);
     assert.equal(open.ready, true);

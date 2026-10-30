@@ -266,6 +266,11 @@ describe('class evolutions through the API', () => {
     const raised = await call('POST', '/api/skills/raise', { cookie, body: { skillId: 'crushing-blow' } });
     assert.equal(raised.status, 200, JSON.stringify(raised.data));
     assert.equal(raised.data.character.skills.points, 40);
+    const raisedTen = await call('POST', '/api/skills/raise', { cookie, body: { skillId: 'crushing-blow', count: 10 } });
+    assert.equal(raisedTen.status, 200, JSON.stringify(raisedTen.data));
+    assert.equal(raisedTen.data.character.skills.points, 30);
+    assert.equal(raisedTen.data.character.skills.pools[0].options[0].level, 11);
+    assert.equal((await call('POST', '/api/skills/raise', { cookie, body: { skillId: 'crushing-blow', count: 0 } })).data.error.code, 'invalid_count');
     assert.equal((await call('POST', '/api/evolution/undo', { cookie })).data.error.code, 'no_test_evolution');
   });
 
