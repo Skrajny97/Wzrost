@@ -201,12 +201,6 @@
       "start": "art/references/walks/start/night-dancer-female.png",
       "pose": 2,
       "description": "a lithe young woman with short brown hair, light flowing dark violet garments with long trailing scarves, a half mask over the mouth, soft boots, a slim curved blade in each hand"
-    },
-    "poisoner-male-empty": {
-      "start": "art/references/walks/start/poisoner-male-empty.png",
-      "pose": 2,
-      "description": "a wiry young man with black spiky hair, a dark green leather coat with the hood down, a cloth mask over the mouth, belts of small green glass vials across the chest, both hands open and empty, no weapon in his hands, his curved dagger sheathed at his belt",
-      "$comment": "Temporary: the Truciciel with empty hands, one of two tries against the second dagger (DECISIONS.md, 208)."
     }
   }
 }
