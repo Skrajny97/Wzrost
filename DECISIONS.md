@@ -2875,6 +2875,21 @@ Autor: „ej a gra coś zacina, znasz tego powód? długie ladowania itp nie tyl
 2. **Poprawka.** Po pierwszym dotknięciu ładują się tylko odgłosy ciosów i dźwięki nazwane (zakładki, umiejętności): 48 plików zamiast 407. Okrzyki stworów i postaci z danej walki ładują się, gdy powstaje jej odtwarzanie. Rozpakowane zostają okrzyki ostatnich 24 stworów. Kwestia narratora, przeczytana raz, nie zostaje w pamięci. W przeglądarce ze spowolnionym procesorem (jak telefon) start gry trwał 2,9 s, a teraz trwa 0,8 s. Zapytań przy starcie było 502, a jest 143.
 3. **Muzyka.** Utwór miejsca pobiera się w całości przy pierwszym wejściu na jego ekran: 3,6–4,8 MB, w jakości ok. 170 kb/s. Lżejsze pliki (ok. 112 kb/s, o jedną trzecią mniejsze) są propozycją dla autora, bo zmieniają brzmienie jego utworów.
 
+## Muzyka: lżejsze pliki, pobierane po starcie gry (30.10.2026, na wersji testowej)
+
+Autor: „53 B”.
+
+1. **Lżejsze pliki.** Utwory są przekodowane ze zmienną przepływnością (LAME V5): 93–126 kb/s zamiast 171–190 kb/s, o 31–47% mniejsze, razem 17 MB zamiast 27 MB. Oba pliki każdego utworu są do porównania na słuch na stronie odsłuchu, w grupie „Muzyka: lżejsze pliki”.
+2. **Pobieranie.** Ekran logowania nie pobiera muzyki. Utwór pokazanego ekranu pobiera się 3 s po pokazaniu pierwszego ekranu gry albo przy pierwszym stuknięciu, więc na wolnym łączu nie opóźnia startu gry ani jej obrazków (`prefetchMusic` w `src/client/music.js`).
+
+## Wprowadzenie: Bestiariusz i Encyklopedia (30.10.2026, na wersji testowej)
+
+Autor: „138-140 A” i „Drobiazgi - zgadzam się”.
+
+1. **Bestiariusz.** Na Skraju Wiatrołomów, przed pierwszą wyprawą, narrator wskazuje Bestiariusz miejsca, w formie męskiej albo żeńskiej. Tylko nowe postacie.
+2. **Encyklopedia.** Po kwestii o zadaniach narrator wskazuje księgę w górnym pasku, a w Encyklopedii pierwszy zestaw klasy z bronią z pierwszej wyprawy. Te dwie kwestie przychodzą raz także do postaci, które przeszły wprowadzenie wcześniej, jak kiedyś kwestia o zadaniach.
+3. **Głos.** Każda kwestia ma 2 nagrania (ElevenLabs, głos i ustawienia jak w części o Rzemieślnictwie), przycięte tam, gdzie kończy się mowa. Na wersji testowej gra na razie wersja 1, a wybór jest na stronie odsłuchu, w grupie „Objaśnienie Encyklopedii i Bestiariusza”.
+
 ## Przywołańce we własnej karcie (30.10.2026, na wersji testowej)
 
 Autor (pytanie 132 B): „Przywołańce powinni stawać w osobnych kartach w walce, a jeśli wszystkie są zajęte powinna zostać dostawiana dodatkowa - można tak też zrobić od razu”.
