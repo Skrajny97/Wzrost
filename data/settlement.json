@@ -7,7 +7,7 @@
     { "id": "enchanter", "name": "Pracownia Zaklinaczki", "x": 26, "y": 38, "resident": "enchantress" },
     { "id": "hermitage", "name": "Pustelnia", "x": 80, "y": 24, "resident": "hermit" },
     { "id": "tavern", "name": "Karczma", "x": 70, "y": 62, "resident": "innkeeper", "soon": true },
-    { "id": "market", "name": "Targ", "x": 40, "y": 74, "soon": true },
+    { "id": "market", "name": "Targowisko", "x": 40, "y": 74, "soon": true },
     { "id": "herbalist", "name": "Chata zielarki", "x": 16, "y": 66, "resident": "herbalist", "soon": true }
   ],
   "residents": [
@@ -15,6 +15,7 @@
       "id": "headman",
       "name": "Bogumił",
       "title": "sołtys",
+      "story": "Prowadzi Rozstaje od trzydziestu zim. Pamięta każdy dług i każdą przysługę, a zlecenia wiesza na tablicy przed jego chatą.",
       "greetings": [
         "Nowa twarz. Na tablicy zawsze coś wisi, a my płacimy uczciwie.",
         "Ludzie pytali, czy znowu przyjdziesz. Mam dla ciebie zlecenia.",
@@ -27,6 +28,7 @@
       "id": "enchantress",
       "name": "Wiedana",
       "title": "zaklinaczka",
+      "story": "Przyszła z północy z jednym tobołkiem i księgą run. Mówi mało, ale w jej przypadku rzeczywiście mowa jest srebrem a milczenie złotem. Wsłuchuje się bowiem w przedmioty i potrafi je zaklinać.",
       "greetings": [
         "Nie dotykaj kryształów. Czego chcesz?",
         "A, to ty. Pokaż, co masz z lasu.",
@@ -39,6 +41,7 @@
       "id": "hermit",
       "name": "Sambor",
       "title": "pustelnik",
+      "story": "Mieszka pod lasem, z dala od placu. Kiedyś chodził na wyprawy, dziś pomaga zacząć drogę od nowa.",
       "greetings": [
         "Każdą drogę można zacząć od nowa. Pytanie tylko, ile to dla ciebie warte.",
         "Znowu tutaj. Coś cię uwiera w tym, kim się stajesz?",
@@ -47,8 +50,8 @@
         "Jesteś jednym z niewielu, z którymi rozmawiam bez pośpiechu."
       ]
     },
-    { "id": "innkeeper", "name": "Zbylut", "title": "karczmarz", "greetings": ["Karczma jeszcze zamknięta. Remont."] },
-    { "id": "herbalist", "name": "Jagna", "title": "zielarka", "greetings": ["Przyjdź, gdy chata będzie gotowa."] }
+    { "id": "innkeeper", "name": "Zbylut", "title": "karczmarz", "story": "Zna wszystkie plotki z traktu i każdego, kto szuka pracy. U niego znajdziesz przyszłych towarzyszy.", "greetings": ["Karczma jeszcze zamknięta. Remont."] },
+    { "id": "herbalist", "name": "Jagna", "title": "zielarka", "story": "Zbiera zioła od świtu i suszy je pod strzechą. Za dobre zioła potrafi solidnie zapłacić, a zaufanym zdradza rzadkie receptury.", "greetings": ["Przyjdź, gdy chata będzie gotowa."] }
   ],
   "brotherhoods": [
     { "id": "herbalists", "name": "Bractwo Zielarzy", "goods": ["herb", "potion"] },

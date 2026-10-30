@@ -50,11 +50,12 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "name", "title", "greetings"],
+        "required": ["id", "name", "title", "story", "greetings"],
         "properties": {
           "id": { "$ref": "#/definitions/id" },
           "name": { "type": "string", "minLength": 1 },
           "title": { "type": "string", "minLength": 1 },
+          "story": { "type": "string", "minLength": 1, "description": "Kilka zdań o mieszkańcu, w brzmieniu autora (pytania 159–163)." },
           "greetings": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "Powitanie na każdym stopniu relacji, po kolei; ostatnie zostaje na wyższych." }
         }
       }

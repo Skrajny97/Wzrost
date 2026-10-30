@@ -122,7 +122,7 @@ export function mountSettlement(container) {
           h('strong', { text: name }),
           `: ${standing.name}`,
           standing.next ? `, ${formatNumber(standing.toNext)} pkt do stopnia ${standing.next.name}` : '',
-          goods.length === 0 ? ' (handel na Targu, wkrótce)' : '',
+          goods.length === 0 ? ' (handel na Targowisku, wkrótce)' : '',
         ),
       ),
     );
@@ -393,6 +393,7 @@ export function mountSettlement(container) {
       'div',
       { class: `card settlement-resident${place?.soon ? ' settlement-resident--soon' : ''}` },
       h('p', {}, h('strong', { text: `${resident.name}, ${resident.title}` }), place ? ` · ${place.name}${place.soon ? ' (wkrótce)' : ''}` : ''),
+      h('p', { class: 'muted', text: resident.story }),
       h('p', { class: 'settlement-greeting', text: `„${resident.greeting}”` }),
       h('p', { class: 'muted', text: `Relacja: ${resident.standing.name}` }),
       !place?.soon && action,
