@@ -55,8 +55,8 @@
     "EVENTS": "on",
     // "off" hides the class evolutions (src/server/evolutions.js): the
     // class grows past class level 50 as before them. Hidden in the live
-    // game in version 0.0.58, until they are ready (the author).
-    "EVOLUTIONS": "off"
+    // game in versions 0.0.58–0.0.60, in it from version 0.0.61.
+    "EVOLUTIONS": "on"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain
