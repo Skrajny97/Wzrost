@@ -36,6 +36,9 @@ export function mountSettlement(container, { params = {} } = {}) {
   let failure = null;
   let gone = false;
   let timer = null;
+  // The orders the player unfolded: the Tablica lists them folded to their
+  // names (the author: "powinny być zwinięte do nazw").
+  const unfolded = new Set();
 
   async function load() {
     try {
@@ -94,18 +97,38 @@ export function mountSettlement(container, { params = {} } = {}) {
           withButton(button, async () => apply(await call('POST', '/api/settlement/reject', { orderId: order.id })));
         },
       });
+    // Folded, an order shows its name, and a gold dot when it can be delivered.
     return h(
-      'div',
-      { class: 'card settlement-order' },
-      order.weekly && h('p', { class: 'settlement-weekly', text: 'Zlecenie tygodnia' }),
-      order.special && h('p', { class: 'settlement-weekly', text: 'Zlecenie specjalne' }),
-      h('p', { class: 'settlement-story', text: `„${order.story}”` }),
-      h('p', { class: 'settlement-ask', text: `${formatNumber(order.count)} × ${order.label} (masz ${formatNumber(order.have)})` }),
-      h('p', { class: 'muted', text: `Zapłata: ${formatNumber(order.gold)} złota, +${order.reputation} reputacji: ${order.brotherhoodName}${order.special ? ', +1 PS' : ''}` }),
-      order.expiresAt && h('p', { class: 'muted', text: `Termin: jeszcze ${timeLeft(order.expiresAt - serverNow())}` }),
-      order.kind === 'craft' && h('p', { class: 'muted', text: 'Wyroby z Warsztatu oddajesz z plecaka, najpierw najsłabsze.' }),
-      away && h('p', { class: 'muted', text: order.kind === 'craft' ? 'Wyroby oddasz po odebraniu raportu z wyprawy albo pracy.' : 'Zioła i mikstury oddasz po odebraniu raportu z wyprawy albo pracy.' }),
-      h('div', { class: 'settlement-actions' }, deliver, reject),
+      'details',
+      {
+        class: 'card settlement-order settlement-fold',
+        open: unfolded.has(order.id),
+        onToggle: (event) => (event.currentTarget.open ? unfolded.add(order.id) : unfolded.delete(order.id)),
+      },
+      h(
+        'summary',
+        { class: 'settlement-fold-head' },
+        h(
+          'span',
+          { class: 'settlement-fold-name' },
+          order.weekly && h('span', { class: 'settlement-weekly', text: 'Zlecenie tygodnia' }),
+          order.special && h('span', { class: 'settlement-weekly', text: 'Zlecenie specjalne' }),
+          h('span', { class: 'settlement-ask', text: `${formatNumber(order.count)} × ${order.label}` }),
+        ),
+        enough && !away && [h('span', { class: 'settlement-fold-dot', 'aria-hidden': 'true' }), h('span', { class: 'visually-hidden', text: 'Można oddać' })],
+        icon('chevron', { size: 18, className: 'settlement-fold-chevron' }),
+      ),
+      h(
+        'div',
+        { class: 'settlement-fold-body' },
+        h('p', { class: 'settlement-story', text: `„${order.story}”` }),
+        h('p', { class: 'settlement-ask', text: `Masz ${formatNumber(order.have)} z ${formatNumber(order.count)}` }),
+        h('p', { class: 'muted', text: `Zapłata: ${formatNumber(order.gold)} złota, +${order.reputation} reputacji: ${order.brotherhoodName}${order.special ? ', +1 PS' : ''}` }),
+        order.expiresAt && h('p', { class: 'muted', text: `Termin: jeszcze ${timeLeft(order.expiresAt - serverNow())}` }),
+        order.kind === 'craft' && h('p', { class: 'muted', text: 'Wyroby z Warsztatu oddajesz z plecaka, najpierw najsłabsze.' }),
+        away && h('p', { class: 'muted', text: order.kind === 'craft' ? 'Wyroby oddasz po odebraniu raportu z wyprawy albo pracy.' : 'Zioła i mikstury oddasz po odebraniu raportu z wyprawy albo pracy.' }),
+        h('div', { class: 'settlement-actions' }, deliver, reject),
+      ),
     );
   }
 

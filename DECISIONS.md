@@ -2940,6 +2940,7 @@ Wszystko działa tylko tam, gdzie `SETTLEMENT` jest `on` (`wrangler.jsonc`, śro
     - Budynki i popiersia stoją na próbę, z wersji pokazanych w 153–163, do wyboru autora.
     - Autor: „aktualna plansza była już git” i „Saturacje w Osadzie zmniejsz zeby byla podobna do tej z Obozu jaskrawość”. Plansza zostaje ta sama, z saturacją niższą o 20%, a budynki o 10%. Pracownia Zaklinaczki to wersja A (154), a Targowisko wersja C (156).
 5. **Narzędzia grafik.** `tools/generate-art.mjs` uruchamia teraz narzędzia edycji Retro Diffusion (outpainting, inpainting, image_edit) na obrazkach z `art/inputs/`, pobiera ponownie wynik wcześniejszego wywołania (Retro Diffusion trzyma go 24 godziny) i rysuje z ziarnem podanym w opisie. Outpainting planszy szerszej niż 256 px idzie w trybie regionów (`scheduled_region_mode`, 10 okien po 0,18 USD).
+6. **Zlecenia zwinięte.** Autor: „Zleceń nie powinno się scrollować z automatu a powinny być zwinięte do nazw i ich kliknięcie powinno rozwinąć je dopiero.” Na Tablicy zleceń każde zlecenie pokazuje tylko nazwę (np. „11 × Kłujka komarzyska”), nad nią „Zlecenie tygodnia” albo „Zlecenie specjalne”, a złotą kropkę, gdy można je oddać. Stuknięcie rozwija resztę: zdanie zleceniodawcy, ile masz, zapłatę, termin i przyciski. Rozwinięte zostają rozwinięte, dopóki ekran jest otwarty.
 
 ## Dźwięki ewolucji i kwestie narratora: wybory autora (30.10.2026, na wersji testowej)
 

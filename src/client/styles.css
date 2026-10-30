@@ -8622,6 +8622,53 @@ a.profession-square:active {
   gap: 8px;
 }
 
+/* An order folded to its name; a tap unfolds the rest. */
+.settlement-fold-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.settlement-fold-head::-webkit-details-marker {
+  display: none;
+}
+
+.settlement-fold-name {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.settlement-fold-name .settlement-weekly {
+  font-size: 13px;
+}
+
+.settlement-fold-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gold, #e0b84c);
+}
+
+.settlement-fold-chevron {
+  flex: none;
+  color: var(--text-muted);
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.settlement-fold[open] > .settlement-fold-head .settlement-fold-chevron {
+  transform: rotate(-90deg);
+}
+
+.settlement-fold-body {
+  margin-top: 8px;
+}
+
 .settlement-resident--soon {
   opacity: 0.7;
 }
