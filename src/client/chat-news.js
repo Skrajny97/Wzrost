@@ -6,9 +6,10 @@
 // points, and so do their parts in its list and the chat's tabs
 // (screens/community.js). While the game is in front, the page asks for
 // them every 15 seconds (/api/chat/latest in src/server/chat.js), which
-// also keeps the player online for a Wymiana; the newest messages read stay
-// on the device, and so does the Globalny's light muted. Private messages
-// light it even then.
+// also keeps the player online for a Wymiana. The newest messages read go
+// to the server too (/api/chat/seen), so a message read on the computer
+// no longer waits as new on the phone; the Globalny's light muted stays on
+// the device. Private messages light it even then.
 
 import { request } from './api.js';
 import { isUnlocked, state } from './state.js';
@@ -92,17 +93,25 @@ export function conversationsSeen(list) {
   });
 }
 
+// Keeps the marks read on this device, and with `tell` on the server too,
+// for the character's other devices.
+function keep(tell) {
+  try {
+    localStorage.setItem(SEEN_KEY, String(seen));
+    localStorage.setItem(PRIVATE_KEY, JSON.stringify(privateSeen));
+  } catch {
+    // Kept for this page only.
+  }
+  if (tell) request('POST', '/api/chat/seen', tell).catch(() => {});
+}
+
 // The conversation with character `other` shows messages up to `id`.
 export function privateRead(other, id) {
   if (id <= (privateSeen[other] ?? 0)) return;
   update(() => {
     privateSeen = { ...privateSeen, [other]: id };
-    try {
-      localStorage.setItem(PRIVATE_KEY, JSON.stringify(privateSeen));
-    } catch {
-      // Kept for this page only.
-    }
   });
+  keep({ with: Number(other), id });
 }
 
 // A private conversation asked for on a character's sheet (profile.js),
@@ -123,12 +132,8 @@ export function chatSeen(id) {
   if (id <= seen) return;
   update(() => {
     seen = id;
-    try {
-      localStorage.setItem(SEEN_KEY, String(id));
-    } catch {
-      // Kept for this page only.
-    }
   });
+  keep({ global: id });
 }
 
 // "Wycisz powiadomienia czatu": new messages of the Globalny no longer
@@ -182,5 +187,9 @@ export async function checkChat({ now = false } = {}) {
     gifts = answer.gifts ?? 0;
     unsent = answer.unsent ?? 0;
     trade = answer.trade ?? null;
+    // What the character read on its other devices.
+    seen = Math.max(seen, answer.seen?.global ?? 0);
+    for (const [other, id] of Object.entries(answer.seen?.private ?? {})) privateSeen = { ...privateSeen, [other]: Math.max(privateSeen[other] ?? 0, id) };
   });
+  if (answer.seen) keep(null);
 }

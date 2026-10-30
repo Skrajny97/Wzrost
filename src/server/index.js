@@ -10,7 +10,7 @@ import { decidePointsReset, takeEvolution, testClassLevel, testEvolutions, undoE
 import { redeemGiftCode } from './gift-codes.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyParts, cancelBuilding, collectProduction, exchangeResources, startBuilding, tradeAtFire } from './camp.js';
-import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
+import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendGift } from './community.js';
 import { craftMaterials, salvageItem, sellMaterials, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
@@ -168,6 +168,7 @@ const routes = [
   ['POST', '/api/friends/claim', claimGifts],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],
+  ['POST', '/api/chat/seen', markChatSeen],
   ['POST', '/api/chat/close', closeChat],
   ['POST', '/api/chat/report', reportChat],
   ['POST', '/api/chat/block', blockInChat],

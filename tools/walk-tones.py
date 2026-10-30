@@ -15,14 +15,20 @@
 # where they are ("only"), a box with "head" moving up and down with the head
 # as the skeleton's nose does (art/references/walks/skeleton.json), places
 # of the skeleton in each frame instead of a box in "only" ("head", "hands",
-# "upper-arms": PixelLab keeps the joints where the skeleton has them), "open"
+# "upper-arms", "forearms", "thighs", "shins", "feet": PixelLab keeps the
+# joints where the skeleton has them), "rims_below" for outlines only
+# darker than that part of the skin's darkest colour (sandals), "open"
 # to leave out lines of the skin's colours a pixel or two thin (a blade),
 # "near_not" ({"colours": [...], "radius": n}) to leave out the skin's
 # colours within n pixels of colours only a thing has (a golden cross whose
 # light is the colour of a face),
-# single pixels ({frame: [[x, y], ...]}, "pixels" and "not_pixels"), and
+# single pixels ({frame: [[x, y], ...]}, "pixels" and "not_pixels"), boxes
+# of one frame that are not skin ({frame: [[left, top, right, bottom), ...]},
+# "not_boxes", a rope belt the hand passes), and
 # "span", the part of the tone's ramp the skin takes (default [0, 1]), for a
 # skin of a colour or two, which would else take its whole ramp.
+# "add_in" ([{"colours": [...], "places": [...]}]) adds colours that are
+# skin only in those places (a thigh's shadow the colour of a greave).
 # Shades of the skin the colours miss, such as a hand's shadow, count next
 # to the skin found.
 #
@@ -138,8 +144,9 @@ def skeleton_frames():
 
 FRAMES, START = skeleton_frames()
 # The places of the skeleton: around the head (between the nose and the ear),
-# the hands (the arm's end) and along the upper arms.
-HEAD_RADIUS, HAND_RADIUS, ARM_RADIUS = 13, 6, 6
+# the hands (the arm's end), along the upper arms, the forearms, the thighs
+# and the shins, and around the feet (the leg's end).
+HEAD_RADIUS, HAND_RADIUS, ARM_RADIUS, LEG_RADIUS, FOOT_RADIUS = 13, 6, 6, 7, 9
 
 
 def to_segment(p, a, b):
@@ -159,6 +166,14 @@ def in_place(place, frame, p):
         return min(distance(p, j['RIGHT ARM']), distance(p, j['LEFT ARM'])) <= HAND_RADIUS
     if place == 'upper-arms':
         return min(to_segment(p, j[f'{side} SHOULDER'], j[f'{side} ELBOW']) for side in ('RIGHT', 'LEFT')) <= ARM_RADIUS
+    if place == 'forearms':
+        return min(to_segment(p, j[f'{side} ELBOW'], j[f'{side} ARM']) for side in ('RIGHT', 'LEFT')) <= ARM_RADIUS
+    if place == 'thighs':
+        return min(to_segment(p, j[f'{side} HIP'], j[f'{side} KNEE']) for side in ('RIGHT', 'LEFT')) <= LEG_RADIUS
+    if place == 'shins':
+        return min(to_segment(p, j[f'{side} KNEE'], j[f'{side} LEG']) for side in ('RIGHT', 'LEFT')) <= LEG_RADIUS
+    if place == 'feet':
+        return min(distance(p, j['RIGHT LEG']), distance(p, j['LEFT LEG'])) <= FOOT_RADIUS
     raise ValueError(f'unknown place {place}')
 
 
@@ -191,6 +206,16 @@ def skin_pixels(im, colours, fix):
         for x in range(im.width)
         if px[x, y][3] >= 128 and px[x, y][:3] in colours and allowed(x, y)
     }
+    # Shades that are skin only in some places, such as a thigh's shadow
+    # the colour of a bronze greave.
+    for rule in fix.get('add_in', []):
+        shades = {rgb(code) for code in rule['colours']}
+        pixels |= {
+            (x, y)
+            for y in range(im.height)
+            for x in range(im.width)
+            if px[x, y][3] >= 128 and px[x, y][:3] in shades and allowed(x, y) and any(in_box(place, x, y) for place in rule['places'])
+        }
     # The shades of the skin the colours miss, such as the shadow of a hand,
     # count next to it, up to GROW pixels in.
     light = max((luminance(c) for c in colours), default=0)
@@ -229,7 +254,14 @@ def skin_pixels(im, colours, fix):
         near = {(x + dx, y + dy) for x, y in marked for dx in range(-reach, reach + 1) for dy in range(-reach, reach + 1)}
         pixels -= near
     listed = lambda key: {(int(frame) * FRAME + x, y) for frame, points in fix.get(key, {}).items() for x, y in points}
-    return (pixels | listed('pixels')) - listed('not_pixels')
+    boxed = {
+        (int(frame) * FRAME + x, y)
+        for frame, boxes in fix.get('not_boxes', {}).items()
+        for left, top, right, bottom in boxes
+        for x in range(left, right)
+        for y in range(top, bottom)
+    }
+    return (pixels | listed('pixels')) - listed('not_pixels') - boxed
 
 
 def parts(pixels):
@@ -258,8 +290,9 @@ def opened(pixels):
     return {(x + dx, y + dy) for x, y in core for dx, dy in square} & pixels
 
 
-def rim_pixels(im, skin, low):
-    """Dark, warm outlines next to the skin, darker than its darkest colour."""
+def rim_pixels(im, skin, low, below=1):
+    """Dark, warm outlines next to the skin, darker than its darkest colour
+    (or than `below` of it, so the straps of a sandal stay leather)."""
     px = im.load()
     rims = set()
     for x, y in skin:
@@ -268,7 +301,7 @@ def rim_pixels(im, skin, low):
             if p in skin or not (0 <= p[0] < im.width and 0 <= p[1] < im.height):
                 continue
             c = px[p]
-            if c[3] >= 128 and luminance(c[:3]) < low and warm(c[:3]):
+            if c[3] >= 128 and luminance(c[:3]) < low * below and warm(c[:3]):
                 rims.add(p)
     return rims
 
@@ -334,7 +367,7 @@ def main():
         lums = [luminance(im.getpixel(p)[:3]) for p in skin]
         low, high = (min(lums), max(lums)) if lums else (1, 1)
         span = fix.get('span', [0, 1])
-        rims = rim_pixels(im, skin, low)
+        rims = rim_pixels(im, skin, low, fix.get('rims_below', 1))
         toned = {}
         for tone in tones:
             out = recolour(im, skin, rims, low, high, [rgb(code) for code in tone['ramp']], span)
@@ -345,4 +378,5 @@ def main():
         print(name, len(skin), 'pixels of skin,', len(rims), 'of rim,', ' '.join(sorted(map(hexa, colours))))
 
 
-main()
+if __name__ == '__main__':
+    main()

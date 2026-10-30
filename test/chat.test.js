@@ -217,6 +217,23 @@ describe('Czat', () => {
     assert.equal(await latest(players.ala), 0);
   });
 
+  test('a message read on one device no longer waits as new on another', async () => {
+    const seen = async () => (await call('GET', '/api/chat/latest', { cookie: players.ala })).data.seen;
+    const mark = (body) => call('POST', '/api/chat/seen', { cookie: players.ala, body });
+    const { message } = (await send(players.ola, 'Hej!')).data;
+    assert.deepEqual(await seen(), { global: 0, private: {} });
+    assert.equal((await mark({ global: message.id })).status, 200);
+    assert.deepEqual(await seen(), { global: message.id, private: {} });
+    // A mark only goes forward, and only for the character's own reading.
+    await mark({ global: 1 });
+    assert.equal((await seen()).global, message.id);
+    assert.equal((await call('GET', '/api/chat/latest', { cookie: players.ola })).data.seen.global, 0);
+    const ola = (await (await db()).prepare("SELECT id FROM characters WHERE name = 'Ola'").first()).id;
+    await mark({ with: ola, id: 7 });
+    await mark({ with: ola, id: 3 });
+    assert.deepEqual((await seen()).private, { [ola]: 7 });
+  });
+
   test('the channel keeps its last messages and the reported ones, and they go with the character', async () => {
     const database = await db();
     const { message } = (await send(players.ola, 'Zgłoszona')).data;

@@ -237,14 +237,29 @@ export async function readChat(context) {
   });
 }
 
+// What a character has read, as POST /api/chat/seen keeps it: the newest
+// message of the Globalny and of each private conversation, by the other
+// character's id.
+function seenOf(text) {
+  let seen;
+  try {
+    seen = JSON.parse(text ?? '{}');
+  } catch {
+    seen = {};
+  }
+  const entries = Object.entries(seen?.private ?? {}).map(([other, id]) => [other, whole(String(id))]);
+  return { global: whole(String(seen?.global ?? 0)), private: Object.fromEntries(entries.filter(([other, id]) => whole(other) && id)) };
+}
+
 // GET /api/chat/latest: the newest message someone else wrote in the
 // Globalny that this player may read, the private conversations with the
 // newest message of each other character, the Upominki and invitations
 // waiting in Znajomi (community.js), for the light on the Społeczność tab,
-// and a Wymiana proposed or going on (trades.js).
+// a Wymiana proposed or going on (trades.js), and what the character has
+// read on any of its devices.
 export async function latestChat(context) {
   const { session, character, db } = await requireChatter(context);
-  const [row, conversations, friends, trade] = await Promise.all([
+  const [row, conversations, friends, trade, read] = await Promise.all([
     db
       .prepare(
         `SELECT MAX(id) AS id FROM chat_messages
@@ -255,8 +270,36 @@ export async function latestChat(context) {
     conversationsOf(db, session.userId, character.id).all(),
     friendNews(db, character.id, context.now),
     tradeNews(db, character.id, context.now),
+    db.prepare('SELECT chat_seen FROM characters WHERE id = ?').bind(character.id).first(),
   ]);
-  return json({ latest: row.id ?? 0, conversations: conversations.results.map(conversationView), ...friends, trade });
+  return json({ latest: row.id ?? 0, conversations: conversations.results.map(conversationView), ...friends, trade, seen: seenOf(read?.chat_seen) });
+}
+
+// POST /api/chat/seen {global: id}, or {with: character id, id}: the
+// character has read the Globalny, or its private conversation with that
+// character, up to message `id` on one of its devices; the others hear it
+// from /api/chat/latest and put out the light (the tester: a message read
+// on the computer still waited as new on the phone). A mark only goes
+// forward.
+export async function markChatSeen(context) {
+  const { character, db } = await requireChatter(context);
+  const body = await readJson(context.request);
+  const read = await db.prepare('SELECT chat_seen FROM characters WHERE id = ?').bind(character.id).first();
+  const seen = seenOf(read?.chat_seen);
+  const global = Number.isInteger(body.global) && body.global > 0 ? body.global : 0;
+  const other = Number.isInteger(body.with) && body.with > 0 ? body.with : 0;
+  const id = Number.isInteger(body.id) && body.id > 0 ? body.id : 0;
+  let changed = false;
+  if (global > seen.global) {
+    seen.global = global;
+    changed = true;
+  }
+  if (other && id > (seen.private[other] ?? 0)) {
+    seen.private[other] = id;
+    changed = true;
+  }
+  if (changed) await db.prepare('UPDATE characters SET chat_seen = ? WHERE id = ?').bind(JSON.stringify(seen), character.id).run();
+  return json({ seen });
 }
 
 // POST /api/chat/rules: the player accepts the rules of the chat.

@@ -2972,6 +2972,27 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
+## Odcienie skóry chodów: przegląd i poprawki (30.10.2026, na wersji testowej)
+
+Autor: „Najważniejsze zrobić pełne portrety po ewolucji klas w roznych odcieniach oraz ich chód w różnych odcieniach. A no i pierwsze wybrane na starcie chody w różnych odcieniach, jesli jeszcze nie zrobiłeś.”
+
+1. **Stan.** Wszystkie 40 portretów (10 klas i 30 ewolucji) i wszystkie 40 chodów mają pliki w siedmiu odcieniach z rampą, a ósmy odcień, Jasna, to sam rysunek. Wszystko to jest w grze od 0.0.64. U Skrytobójcy skóra to tylko pas przy oczach, bo resztę twarzy zasłania maska.
+2. **Przegląd chodów.** Każdy chód jest sprawdzony we wszystkich ośmiu klatkach w odcieniu Żółta, bo w nim najlepiej widać pomyłki maski. Poprawione są:
+    - Magini, Mag i Kleryczka: paski sandałów brały kolor skóry, bo ciemny brąz przy palcach liczył się jako obrys skóry. U tych postaci obrysem jest teraz tylko piksel ciemniejszy niż połowa najciemniejszego koloru skóry (`rims_below`), więc sandały zostają skórzane. Sznurowy pas Magini i wiązanie przy pasie Maga nie zmieniają już koloru.
+    - Inkwizytorka: głowica buzdygana, łańcuch i guziki płaszcza; Inkwizytor: żar w kadzielnicy; Snajperka, Snajper oraz Strzelczyni i Strzelec Burzy: końce łuków i sprzączka pasa; Uzdrowicielka: dolny koniec kostura. U nich, a także u Uzdrowiciela i obojga Łowców, skóra jest tylko na głowie i dłoniach, a u Strażniczki i Strażnika tylko na twarzy (ich dłonie są w rękawicach). Strażnicy nie mają już plamki skóry na tarczy ani na rąbku tuniki. Dłoń z kosturem u Uzdrowicieli i dłoń z krzyżem u Inkwizytorki mają własne ramki, bo trzymają je wyżej niż dłonie szkieletu.
+    - Łuczniczka i Łucznik: cholewy i sznurowanie butów zostają brązowe (ramka od 98. piksela w dół).
+    - Gladiatorka i Gladiator: uda zmieniają kolor w całości, a nie tylko w jaśniejszych miejscach, bo cień uda ma kolor brązu nagolennika. Umbo tarczy w dwóch klatkach nie zmienia już koloru.
+    - Cień: sprzączka pasa w dwóch klatkach.
+3. **Narzędzie.** `tools/walk-tones.py` zna nowe miejsca szkieletu: przedramiona, uda, golenie i stopy. Ma też kolory, które są skórą tylko w danym miejscu (`add_in`, cień uda Gladiatorów), ramki pojedynczych klatek (`not_boxes`, pas Magini i umbo tarczy) i próg obrysu (`rims_below`). Poprawki postaci są w `tools/walk-tones.json`.
+
+## Czat: przeczytane wiadomości na każdym urządzeniu (30.10.2026, na wersji testowej)
+
+Autor przekazuje uwagę osoby testującej grę (kuzyn autora), która grała na iPhonie, a potem na komputerze: „jak np masz powiadomienie w społeczności że ktoś na chacie napisal i np odczytam tą wiad na kompie to jak wejdę na telefonie to dalej jakbym miał powiadomienie o tej wiadomości co już widziałem”.
+
+1. **Przyczyna.** Ostatnia przeczytana wiadomość Globalnego i każdej rozmowy prywatnej była zapisana tylko w pamięci przeglądarki, więc inne urządzenie o niej nie wiedziało.
+2. **Zmiana.** Znacznik przeczytania trafia też na serwer, do postaci (`POST /api/chat/seen`, kolumna `characters.chat_seen`, migracja 0058). `GET /api/chat/latest`, o który gra pyta co 15 sekund, oddaje go każdemu urządzeniu. Znacznik tylko rośnie. Kropka na zakładce Społeczność i przy czacie gaśnie więc na każdym urządzeniu po najwyżej 15 sekundach od przeczytania wiadomości na jednym z nich, a po otwarciu gry od razu.
+3. **Wyciszenie** powiadomień Globalnego zostaje ustawieniem urządzenia.
+
 ## Wersja 0.0.64 (30.10.2026)
 
 Autor: „Po zrobieniu chodu 213 A i 214 A robisz wdrożenie”.
