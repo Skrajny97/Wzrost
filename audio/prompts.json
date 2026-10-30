@@ -343,8 +343,9 @@
         "seconds": 1.2
       },
       "skill-ambush-shot": {
-        "text": "rustling leaves in a bush, a soft held breath, then one sudden quiet bowstring snap and a swift arrow whoosh, close up, tense, no music",
-        "seconds": 1.3
+        "text": "a hunter bursts out from behind a dense bush: a loud clear rustle of leaves and snapping twigs, then right away one strong bowstring release and a sharp arrow whoosh, close up, crisp, no music",
+        "seconds": 1.6,
+        "influence": 0.7
       },
       "skill-arrow-storm": {
         "text": "a volley of many arrows charged with electricity: whistling arrows crackling with sparks and buzzing static, ending in a scatter of electric snaps, fantasy battle, no music",
@@ -367,8 +368,9 @@
         "seconds": 1.5
       },
       "skill-elemental-ray": {
-        "text": "a magic ray of three elements at once: a roaring flame, crackling ice and buzzing electric sparks woven into one bright beam, fantasy magic, no music",
-        "seconds": 1.6
+        "text": "a fantasy laser beam: a bright buzzing energy ray fires with a rising electric hum, a sizzling zap and a sharp laser whine, sci-fi laser style magic, close up, no music",
+        "seconds": 1.6,
+        "influence": 0.7
       },
       "skill-blizzard": {
         "text": "a howling blizzard sweeping in, a cold whistling wind full of hissing snow and tinkling ice shards, fantasy magic, no music",
@@ -399,20 +401,28 @@
         "seconds": 1.5
       },
       "skill-verdict": {
-        "text": "a stern final verdict: one heavy wooden gavel strike merged with a holy ringing blast and a short solemn bell, close up, fantasy, no music",
-        "seconds": 1.2
+        "text": "an epic holy verdict: a massive heavy gavel strike like thunder, a huge radiant holy blast with a deep cathedral bell boom, loud, powerful, cinematic, fantasy, no music",
+        "seconds": 1.6,
+        "influence": 0.7
       },
       "skill-great-blessing": {
         "text": "a great blessing spell, a rich angelic choir hum swelling with golden chimes and a warm radiant shimmer, fantasy, no music",
         "seconds": 1.8
       },
       "skill-psalm": {
-        "text": "a soft calm monk chant hum, warm and peaceful, with gentle sparkling chimes, fantasy, no music",
-        "seconds": 1.8
+        "text": "a soft calm monk chant hum, then after the humming a clear sequence of bright ringing chimes and small bells, warm and peaceful, fantasy, no music",
+        "seconds": 2.4,
+        "influence": 0.7
+      },
+      "skill-psalm-bells": {
+        "text": "a short sequence of bright ringing chimes and small temple bells, clear and gentle, fading out, fantasy, no music",
+        "seconds": 1.2,
+        "influence": 0.7
       },
       "skill-execution": {
-        "text": "a dagger driven in with a sudden swift stab, a sharp metallic slice and a quick heavy thud, close up, dry, crisp, no music",
-        "seconds": 1.1
+        "text": "a killing blow: a sword blade plunged deep into flesh, a wet heavy stab with a short visceral squelch, then a body slumping to the ground with a dull thud, close up, brutal, dry, no music",
+        "seconds": 1.3,
+        "influence": 0.7
       },
       "skill-death-mark": {
         "text": "a dark curse sigil burned into the air: a low eerie whisper, a ghostly hiss and a cold ringing tone that fades, fantasy, no music",
