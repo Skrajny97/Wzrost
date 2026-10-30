@@ -94,6 +94,18 @@
       "voice": "audio/narration/tap-area.mp3"
     },
     {
+      "id": "bestiary",
+      "kind": "point",
+      "text": [
+        "Tu jest Bestiariusz tego miejsca. Stwory, z którymi jeszcze nie walczyłeś, widzisz w nim tylko jako cienie. Poznaj wszystkie, a otworzysz skrzynię."
+      ],
+      "female": {
+        "text": [
+          "Tu jest Bestiariusz tego miejsca. Stwory, z którymi jeszcze nie walczyłaś, widzisz w nim tylko jako cienie. Poznaj wszystkie, a otworzysz skrzynię."
+        ]
+      }
+    },
+    {
       "id": "trial",
       "kind": "point",
       "text": [
@@ -379,6 +391,20 @@
         "Codziennie będę Ci zlecał zadania, w taki sposób utrzymamy naszą, mam nadzieję, owocną relację. Będę na Ciebie czekał tutaj."
       ],
       "voice": "audio/narration/quests.mp3"
+    },
+    {
+      "id": "encyclopedia-lead",
+      "kind": "lead",
+      "text": [
+        "Wszystko, co zdobędziesz, System zapisuje w Encyklopedii. Zajrzyjmy do niej."
+      ]
+    },
+    {
+      "id": "encyclopedia",
+      "kind": "point",
+      "text": [
+        "Broń z pierwszej wyprawy już tu jest. Każdy wpis podpowie Ci, skąd go zdobyć, nawet ten, którego jeszcze nie znasz. Za pełny zestaw czeka skrzynia, a złota kropka przy księdze powie Ci, gdy któraś będzie do otwarcia."
+      ]
     },
     {
       "id": "ending",

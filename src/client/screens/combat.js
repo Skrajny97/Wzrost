@@ -140,7 +140,7 @@ const whose = (land) => (land ? 'tej krainy' : 'tego regionu');
 export function bestiaryRow(place, land = false) {
   return h(
     'div',
-    { class: 'bestiary-row' },
+    { class: 'bestiary-row', 'data-guide': `bestiary-${place.id}` },
     h(
       'button',
       { type: 'button', class: 'danger-link', onClick: () => dangersSheet(place, land) },

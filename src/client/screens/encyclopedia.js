@@ -254,7 +254,15 @@ export function mountEncyclopedia(container, { params }) {
           tier.sets.map((set) =>
             h(
               'div',
-              { class: `card encyclopedia-set${set.ready ? ' encyclopedia-ready' : ''}` },
+              {
+                class: `card encyclopedia-set${set.ready ? ' encyclopedia-ready' : ''}`,
+                // The narrator points at the class's first set, with the
+                // weapon of the first exploration, and unfolds its tier.
+                ...(set.id === `items:1:${state.character.classId}` && {
+                  'data-guide': 'encyclopedia-set',
+                  onUnfold: (event) => event.currentTarget.closest('details')?.setAttribute('open', ''),
+                }),
+              },
               h('div', { class: 'encyclopedia-set-head' }, h('h3', { class: 'card-title', text: set.name }), chestButton(set, 'Zdobądź wszystkie przedmioty zestawu')),
               h(
                 'ul',

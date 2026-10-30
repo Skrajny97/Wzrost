@@ -166,6 +166,9 @@ const BEATS = {
   test: { when: () => true },
   'tap-region': { place: mark('region-windfalls'), when: (hash, read) => hash === '#/walka' && firstTrip(read) },
   'tap-area': { place: mark('area-windfalls-edge'), when: (hash, read) => hash === '#/walka/windfalls' && firstTrip(read) },
+  // The author: the introduction shows the Bestiariusz too, before the
+  // first exploration, while every creature in it is still a shadow.
+  bestiary: { place: mark('bestiary-windfalls-edge'), when: (hash, read) => hash === '#/walka/windfalls/windfalls-edge' && firstTrip(read) },
   trial: { place: mark('duration'), when: (hash, read) => hash === '#/walka/windfalls/windfalls-edge' && firstTrip(read) },
   'tap-start': { place: mark('start'), when: (hash, read) => hash === '#/walka/windfalls/windfalls-edge' && firstTrip(read) },
   skip: { place: mark('skip-activity'), when: (hash) => hash.startsWith('#/walka') && running() },
@@ -220,6 +223,16 @@ const BEATS = {
   wallet: { place: '.topbar .gold', when: campDone },
   settings: { place: '.topbar .icon-button[aria-label="Ustawienia"]', delay: 2500, when: campDone },
   quests: { place: mark('quests'), late: true, when: campDone },
+  // The author: and the Encyklopedia. The book in the top bar opens it, and
+  // there the narrator points at the class's first set, with the weapon of
+  // the first exploration. Told also to those who finished before, as the
+  // quests were.
+  'encyclopedia-lead': {
+    place: '.encyclopedia-button',
+    late: true,
+    when: (hash, read) => campDone(hash, read) && !hash.startsWith('#/encyklopedia') && !read.has('encyclopedia'),
+  },
+  encyclopedia: { place: mark('encyclopedia-set'), unfold: true, late: true, when: (hash, read) => campDone(hash, read) && hash.startsWith('#/encyklopedia') },
   ending: { when: campDone },
   // The Umiejętności chapter, after the introduction.
   'skills-welcome': { when: skillsDue },
