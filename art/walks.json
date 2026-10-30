@@ -180,7 +180,7 @@
     "inquisitor-female": {
       "start": "art/references/walks/start/inquisitor-female.png",
       "pose": 2,
-      "description": "a stern young woman with dark hair in a tight braid, a long dark crimson coat over a black cassock, a silver holy symbol on a heavy chain, a flanged iron mace in her right hand, the near hand, and an ornate golden cross held upright in her left hand, the far hand"
+      "description": "a stern young woman with dark hair in a tight braid, a long dark crimson coat over a black cassock, a silver holy symbol on a heavy chain, a flanged iron mace in her right hand, the near hand; her left hand, the far one, is open and empty and holds nothing"
     },
     "poisoner-male": {
       "start": "art/references/walks/start/poisoner-male.png",
