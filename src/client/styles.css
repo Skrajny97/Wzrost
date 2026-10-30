@@ -611,6 +611,11 @@ button {
   text-transform: uppercase;
 }
 
+/* The System's warning of a name the filter blocks (rename.js). */
+.rename-warning {
+  font-weight: 600;
+}
+
 .form-error {
   margin: 0;
   padding: 10px 12px;

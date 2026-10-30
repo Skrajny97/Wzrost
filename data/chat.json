@@ -1,5 +1,5 @@
 {
-  "$comment": "Czat w zakładce Społeczność (src/server/chat.js). channels: kanały czatu, Globalny i Wymiana, a obok nich prywatne rozmowy dwóch postaci; w kanale z items wiadomość może pokazać przedmioty z plecaka piszącego (najwyżej rules.items), jak były w chwili wysłania. rules: najdłuższa wiadomość w znakach, co ile sekund wolno pisać, ile ostatnich wiadomości kanału zostaje (zgłoszone zostają do decyzji autora), ile ostatnich wiadomości zostaje w prywatnej rozmowie, ile rozmów najwyżej pokazują zakładki, ile wiadomości przychodzi naraz, po ilu zgłoszeniach od różnych graczy wiadomość znika do sprawdzenia i co ile sekund otwarty czat pyta o nowe (najczęściej i najrzadziej, gdy długo nic nie przychodzi). words: początki albo części słów, które czat zamienia na gwiazdki (wielkość liter bez znaczenia). texts.rules: zasady, które gracz akceptuje przed pierwszą wiadomością.",
+  "$comment": "Czat w zakładce Społeczność (src/server/chat.js). channels: kanały czatu, Globalny i Wymiana, a obok nich prywatne rozmowy dwóch postaci; w kanale z items wiadomość może pokazać przedmioty z plecaka piszącego (najwyżej rules.items), jak były w chwili wysłania. rules: najdłuższa wiadomość w znakach, co ile sekund wolno pisać, ile ostatnich wiadomości kanału zostaje (zgłoszone zostają do decyzji autora), ile ostatnich wiadomości zostaje w prywatnej rozmowie, ile rozmów najwyżej pokazują zakładki, ile wiadomości przychodzi naraz, po ilu zgłoszeniach od różnych graczy wiadomość znika do sprawdzenia i co ile sekund otwarty czat pyta o nowe (najczęściej i najrzadziej, gdy długo nic nie przychodzi). words: początki albo części słów, które czat zamienia na gwiazdki (wielkość liter bez znaczenia). texts.rules: zasady, które gracz akceptuje przed pierwszą wiadomością. Słowa words służą też filtrowi imion postaci (src/engine/names.js): imię z takim słowem, także zapisanym cyframi, podobnymi literami, z podwojonymi literami albo z odstępami, nie przechodzi, a postać, która już je nosi, musi zmienić nazwę (names: teksty tego okna).",
   "channels": [
     { "id": "global", "name": "Globalny" },
     { "id": "trade", "name": "Wymiana", "items": true }
@@ -16,6 +16,13 @@
     "pollSeconds": { "min": 4, "max": 10 }
   },
   "words": ["kurw", "chuj", "huj", "pierd", "jeb", "pizd", "kutas", "dziwk", "cwel", "fuck", "shit", "bitch", "cunt", "nigg", "fagg"],
+  "names": {
+    "blocked": "UWAGA, nazwa Twojej postaci łamie zasady Google Play dotyczące nieodpowiednich treści. Musisz zmienić swoją nazwę.",
+    "refused": "To imię łamie zasady Google Play dotyczące nieodpowiednich treści. Wybierz inne.",
+    "label": "Nowa nazwa postaci",
+    "button": "Zmień nazwę",
+    "done": "Postać nazywa się teraz {name}."
+  },
   "texts": {
     "rules": [
       "Czat widzą wszyscy gracze. Pisz z szacunkiem: bez wulgaryzmów, obrażania, gróźb, treści dla dorosłych, spamu i linków.",

@@ -2,6 +2,7 @@
 // stat points.
 
 import {
+  blockedName,
   areaFor,
   autoDistribute,
   bagCapacity,
@@ -109,6 +110,8 @@ export function validateName(value) {
             ? 'Imię postaci musi kończyć się literą albo cyfrą.'
             : null;
   if (problem) throw new ApiError(400, 'invalid_name', problem);
+  // The mildest filter of vulgar names there can be (names.js).
+  if (blockedName(name, content)) throw new ApiError(400, 'invalid_name', content.chat.names.refused);
   return name;
 }
 
@@ -852,6 +855,9 @@ export function characterView(player, now) {
     ],
     // Whether the character has the Osada (the narrator's Osada chapter).
     settlementOpen: settlementOpen(row),
+    // A name the filter blocks (names.js): the game asks for a new one, and
+    // nothing else goes on until it has it.
+    nameBlocked: blockedName(row.name, content),
     // An order of the Osada that can be delivered now lights its tab.
     settlementWaiting: settlementWaiting(row, items, now, Boolean(activity)),
     huntDurations: huntDurations(row.level, content),
@@ -1037,6 +1043,27 @@ export async function createCharacter(context) {
   const player = await loadPlayer(db, session.userId);
   await settleQuests(db, player, now);
   return json({ character: characterView(player, now) }, 201);
+}
+
+// POST /api/character/name { name }: the new name of a character whose name
+// the filter blocks (names.js), checked as a new character's is; the chat's
+// messages it wrote take it too. Any other name stays as it is.
+export async function renameCharacter(context) {
+  const { session, player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  if (!blockedName(player.row.name, content)) throw new ApiError(409, 'name_allowed', 'Tej nazwy nie trzeba zmieniać.');
+  const name = validateName(body.name);
+  const db = context.env.DB;
+  try {
+    await db.batch([
+      db.prepare('UPDATE characters SET name = ?, name_key = ?, version = version + 1 WHERE id = ?').bind(name, nameKey(name), player.row.id),
+      db.prepare('UPDATE chat_messages SET name = ? WHERE character_id = ?').bind(name, player.row.id),
+    ]);
+  } catch (error) {
+    if (String(error?.message).includes('name_key')) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');
+    throw error;
+  }
+  return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
 const validAppearance = (id) => {

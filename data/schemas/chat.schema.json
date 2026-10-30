@@ -4,7 +4,7 @@
   "description": "Czat w zakładce Społeczność: kanały, zasady pisania, słowa zamieniane na gwiazdki i zasady czatu do zaakceptowania (src/server/chat.js).",
   "type": "object",
   "additionalProperties": false,
-  "required": ["channels", "rules", "words", "texts"],
+  "required": ["channels", "rules", "words", "names", "texts"],
   "properties": {
     "$comment": { "type": "string" },
     "channels": {
@@ -46,6 +46,19 @@
       }
     },
     "words": { "type": "array", "items": { "type": "string", "pattern": "^[a-ząćęłńóśźż]+$" } },
+    "names": {
+      "type": "object",
+      "description": "Filtr imion postaci (src/engine/names.js) z listą words: niepomijalny komunikat dla postaci, której imię łamie zasady, i odmowa przy tworzeniu postaci.",
+      "additionalProperties": false,
+      "required": ["blocked", "refused", "label", "button", "done"],
+      "properties": {
+        "blocked": { "type": "string", "minLength": 1 },
+        "refused": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "button": { "type": "string", "minLength": 1 },
+        "done": { "type": "string", "minLength": 1 }
+      }
+    },
     "texts": {
       "type": "object",
       "additionalProperties": false,

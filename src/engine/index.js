@@ -33,3 +33,4 @@ export * from './encyclopedia.js';
 export * from './evolutions.js';
 export * from './gift-codes.js';
 export * from './settlement.js';
+export * from './names.js';

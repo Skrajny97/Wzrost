@@ -14,7 +14,7 @@ import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, moder
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendGift } from './community.js';
 import { craftMaterials, salvageItem, sellMaterials, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
-import { autoPoints, characterProfile, createCharacter, deleteCharacter, getCharacter, resetPoints, setAppearance, setSkin, spendPoints } from './characters.js';
+import { autoPoints, characterProfile, createCharacter, deleteCharacter, getCharacter, renameCharacter, resetPoints, setAppearance, setSkin, spendPoints } from './characters.js';
 import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
@@ -67,6 +67,7 @@ const routes = [
   ['GET', '/api/character', getCharacter],
   ['GET', '/api/profile/:name', characterProfile],
   ['POST', '/api/character', createCharacter],
+  ['POST', '/api/character/name', renameCharacter],
   ['DELETE', '/api/character', deleteCharacter],
   ['POST', '/api/character/points', spendPoints],
   ['POST', '/api/character/points/auto', autoPoints],

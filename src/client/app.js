@@ -10,6 +10,7 @@ import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
 import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { showQuests, watchQuests } from './quests.js';
+import { offerRename } from './rename.js';
 import { mountAuthor } from './screens/author.js';
 import { mountEncyclopedia } from './screens/encyclopedia.js';
 import { mountEvolution } from './screens/evolution.js';
@@ -237,6 +238,7 @@ function openGame() {
     checkChat();
     offerTrade();
     offerPointsReset();
+    offerRename();
   }, 1000);
   checkChat({ now: true });
 }

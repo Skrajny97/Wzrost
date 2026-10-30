@@ -204,6 +204,8 @@ export function publicContent() {
       itemsMax: content.chat.rules.items,
       pollSeconds: content.chat.rules.pollSeconds,
       rules: content.chat.texts.rules,
+      // The window of a name the filter blocks (names.js).
+      names: content.chat.names,
     },
     // The Społeczność's drop-down list, and the limits of the Znajomi, the
     // Upominek and the Wymiana the page tells of (community.js, trade.js).
