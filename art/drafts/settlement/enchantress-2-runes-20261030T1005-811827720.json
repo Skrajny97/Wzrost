@@ -1,0 +1,27 @@
+{
+  "id": "enchantress-2-runes",
+  "tool": "image_edit",
+  "payload": {
+    "input_image": "art/inputs/settlement/enchantress-2.png",
+    "prompt": "add more purple ornaments to this log house: glowing violet runes carved into the log walls and around the door, a violet crystal hanging above the door and small violet charms under the eaves; keep the exact same house, shape, roof, colours and composition on the same plain white background",
+    "seed": 811827720
+  },
+  "result": {
+    "tool_id": "image_edit",
+    "inference_id": "inf_M0jyORNa2PWvmwZo6EJGdAe9bzn3rEYZ",
+    "balance_cost": 0.18,
+    "credit_cost": 20,
+    "charged": true,
+    "remaining_balance": 45.1,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/5e745831339b94cc0773155504f60d20.png"
+    ],
+    "output_width": 128,
+    "output_height": 96,
+    "toolId": "image_edit",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/5e745831339b94cc0773155504f60d20.png",
+    "inferenceId": "inf_M0jyORNa2PWvmwZo6EJGdAe9bzn3rEYZ",
+    "balanceCost": 0.18,
+    "creditCost": 20
+  }
+}

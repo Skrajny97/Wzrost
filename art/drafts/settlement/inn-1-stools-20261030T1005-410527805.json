@@ -1,0 +1,27 @@
+{
+  "id": "inn-1-stools",
+  "tool": "image_edit",
+  "payload": {
+    "input_image": "art/inputs/settlement/inn-1.png",
+    "prompt": "add three small round wooden stools on the ground beside the entrance door of this log tavern; keep the exact same building, shape, roof, colours and composition on the same plain white background",
+    "seed": 410527805
+  },
+  "result": {
+    "tool_id": "image_edit",
+    "inference_id": "inf_4KkM9n3eaxVZyQ25zRZqv2JzP1dNrRmD",
+    "balance_cost": 0.18,
+    "credit_cost": 20,
+    "charged": true,
+    "remaining_balance": 44.74,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/17534aa4f697787a475e345df751ca80.png"
+    ],
+    "output_width": 128,
+    "output_height": 96,
+    "toolId": "image_edit",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/17534aa4f697787a475e345df751ca80.png",
+    "inferenceId": "inf_4KkM9n3eaxVZyQ25zRZqv2JzP1dNrRmD",
+    "balanceCost": 0.18,
+    "creditCost": 20
+  }
+}

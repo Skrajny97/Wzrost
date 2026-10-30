@@ -1,0 +1,25 @@
+{
+  "id": "market-round-1",
+  "payload": {
+    "prompt": "isometric pixel art for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, made of logs, planks, thatch and wooden shingles, no stone houses and no tiled roofs, the village marketplace in the middle of the village: a round open market square of trodden earth ringed by six small wooden market stalls with striped canvas awnings in red, green and yellow, all facing a tall carved wooden pole with ribbons in the middle, crates of vegetables, baskets, bolts of cloth and clay pots on the counters, open to the sky, no walls, no people",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 192,
+    "height": 144,
+    "num_images": 2,
+    "seed": 656085968,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793354840,
+    "credit_cost": 4,
+    "balance_cost": 0.12,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 44.62,
+    "request_id": "4a0579a6-4963-47a7-b879-7d6b7cd96585",
+    "outputs_retained_until": 1793441236
+  }
+}
