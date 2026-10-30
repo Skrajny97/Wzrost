@@ -2972,7 +2972,11 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
-## Uwagi autora po 0.0.59 (30.10.2026, na wersji testowej)
+## Wersja 0.0.60 (30.10.2026)
+
+Autor: „Zrób wdrożenie 0.0.60”. Do gry wchodzi poprawka objaśnienia Encyklopedii, które pokazuje się teraz najwyżej raz (zob. „Uwagi autora po 0.0.59”, punkt 1). Osada z pochodniami, ewolucje klas i ich rozdziały narratora zostają w grze ukryte.
+
+## Uwagi autora po 0.0.59 (30.10.2026, w grze od 0.0.60 (punkt 1))
 
 1. **Objaśnienie Encyklopedii wracało.** Autor: „odtwarza mi sie samouczek encyklopedii na glownym serwerze co jakis czas jak wchodze chyba nie powinno tak być”. Wskazówka przy książce w górnym pasku była prowadzeniem (`lead`), a takie gra pamięta dopiero po stuknięciu. Gdy gra zamknęła się albo przeładowała, zanim gracz poszedł za wskazówką, wracała przy następnym wejściu, i tak do skutku. Teraz kwestia późna (`late`, dla postaci, które skończyły wprowadzenie przed jej dopisaniem: Encyklopedia i zadania) jest zapisana jako przeczytana, gdy tylko się pokaże. Każda pokazuje się więc najwyżej raz, a wskazówka przy książce ma `once`, żeby serwer ją pamiętał. Wskaźnik w samej Encyklopedii pokazuje się raz, przy pierwszym jej otwarciu.
 2. **Pochodnie za dnia.** Autor: „Niech za dnia beda zgaszone te pochodnie całkiem”. W dzień (od 8 do 18 według godziny w Polsce) pochodnie stoją zgaszone: osobny obrazek bez płomienia, z osmolonym czubkiem (`torch-off.png`, z tego samego rysunku), bez blasku i migotania. Świtem, o zmierzchu i w nocy płoną.
