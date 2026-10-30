@@ -244,13 +244,13 @@ export const SPRITES = {
   },
   // The Osada (data/settlement.json): its places on the board, by the
   // place's id, each cut to its outline, the Targowisko in the middle the
-  // largest; the residents' busts, 96×128; and the board's ground, twice
+  // largest, and the torch that stands in a few places on it; the residents' busts, 96×128; and the board's ground, twice
   // as tall as the camp's, which scrolls with the page.
   settlement: {
     width: 192,
     height: 144,
     fit: true,
-    ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist'],
+    ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist', 'torch'],
   },
   residents: {
     width: 96,
@@ -333,6 +333,8 @@ export const eventScene = (id) => (available['event-scenes'].has(id) ? `/art/eve
 // or null while there is none.
 export const settlementPlaceArt = (placeId) =>
   available.settlement.has(placeId) ? h('img', { src: `/art/settlement/${placeId}.png`, alt: '', class: 'sprite settlement-place-art', decoding: 'async', draggable: 'false' }) : null;
+export const settlementTorchArt = () =>
+  available.settlement.has('torch') ? h('img', { src: '/art/settlement/torch.png', alt: '', class: 'sprite settlement-torch-art', decoding: 'async', draggable: 'false' }) : null;
 export const residentBust = (residentId) =>
   available.residents.has(residentId)
     ? h('img', { src: `/art/residents/${residentId}.png`, alt: '', width: 96, height: 128, class: 'sprite resident-bust', decoding: 'async', draggable: 'false' })

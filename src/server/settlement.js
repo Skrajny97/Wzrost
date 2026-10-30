@@ -142,11 +142,12 @@ const orderView = (order, stocks) => ({
 // the orders on the board, each with what the character holds of it.
 export function settlementView(player, stored, board, now) {
   const stocks = settlementGoods(player.row, player.items);
-  const { name, description, places, residents, brotherhoods } = content.settlement;
+  const { name, description, places, torches = [], residents, brotherhoods } = content.settlement;
   return {
     name,
     description,
     places,
+    torches,
     residents: residents.map((resident) => {
       const standing = standingOf(stored.relations[resident.id] ?? 0, content);
       return { ...resident, service: serviceOf(resident.id), standing, greeting: resident.greetings[Math.min(standing.index, resident.greetings.length - 1)] };

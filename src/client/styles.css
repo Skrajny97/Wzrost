@@ -5864,6 +5864,8 @@ a.camp-level-button {
 .calm .camp-bubble--full,
 .calm .camp-fire-glow,
 .calm .camp-smoke,
+.calm .settlement-torch-glow,
+.calm .settlement-torch-flame,
 .calm .guide-ring,
 .calm .guide-ring--nudge,
 .calm .guide-note .sprite--narrator,
@@ -8497,26 +8499,104 @@ a.profession-square:active {
 .settlement-map-ground {
   filter: saturate(0.5) brightness(0.7);
 }
-.settlement-place-art {
+.settlement-place-art,
+.settlement-torch-art {
   filter: saturate(0.5) brightness(0.72);
 }
 .settlement-map--dawn .settlement-map-ground {
   filter: saturate(0.5) brightness(0.7) brightness(1.04) sepia(0.18) saturate(1.1);
 }
-.settlement-map--dawn .settlement-place-art {
+.settlement-map--dawn .settlement-place-art,
+.settlement-map--dawn .settlement-torch-art {
   filter: saturate(0.5) brightness(0.72) brightness(1.04) sepia(0.18) saturate(1.1);
 }
 .settlement-map--dusk .settlement-map-ground {
   filter: saturate(0.5) brightness(0.7) brightness(0.82) sepia(0.3) saturate(1.15);
 }
-.settlement-map--dusk .settlement-place-art {
+.settlement-map--dusk .settlement-place-art,
+.settlement-map--dusk .settlement-torch-art {
   filter: saturate(0.5) brightness(0.72) brightness(0.82) sepia(0.3) saturate(1.15);
 }
 .settlement-map--night .settlement-map-ground {
   filter: saturate(0.5) brightness(0.7) brightness(0.62) saturate(0.75);
 }
-.settlement-map--night .settlement-place-art {
+.settlement-map--night .settlement-place-art,
+.settlement-map--night .settlement-torch-art {
   filter: saturate(0.5) brightness(0.72) brightness(0.62) saturate(0.75);
+}
+
+/* A torch stands on its spot (its foot at x and y); its flame sits in the
+   top sixth of the picture. Taps go through it to the places. */
+.settlement-torch {
+  position: absolute;
+  width: 4%;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+}
+.settlement-torch-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+.settlement-torch-glow {
+  position: absolute;
+  left: 50%;
+  top: 15%;
+  width: 420%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 176 72 / 0.42), rgb(255 120 40 / 0.14) 45%, transparent 70%);
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+  animation: settlement-torch-glow 1.7s ease-in-out infinite alternate;
+}
+.settlement-map--dusk .settlement-torch-glow,
+.settlement-map--night .settlement-torch-glow {
+  width: 560%;
+  background: radial-gradient(circle, rgb(255 176 72 / 0.7), rgb(255 120 40 / 0.28) 45%, transparent 72%);
+}
+/* The flame's own quick flicker over the picture's flame. */
+.settlement-torch-flame {
+  position: absolute;
+  left: 50%;
+  top: 13%;
+  width: 90%;
+  aspect-ratio: 3 / 4;
+  border-radius: 50% 50% 45% 45%;
+  background: radial-gradient(ellipse at 50% 65%, rgb(255 236 150 / 0.75), rgb(255 150 50 / 0.35) 50%, transparent 72%);
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 80%;
+  animation: settlement-torch-flame 0.42s steps(3, end) infinite alternate;
+}
+@keyframes settlement-torch-glow {
+  0% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  40% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.03);
+  }
+  70% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+@keyframes settlement-torch-flame {
+  0% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.92, 0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.04, 1.12);
+  }
 }
 
 .settlement-place {

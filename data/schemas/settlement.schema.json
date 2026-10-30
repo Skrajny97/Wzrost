@@ -44,6 +44,19 @@
         }
       }
     },
+    "torches": {
+      "type": "array",
+      "description": "Pochodnie na planszy, które migoczą jak ognisko w obozie: miejsce podstawy pochodni w procentach planszy.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["x", "y"],
+        "properties": {
+          "x": { "type": "number", "minimum": 0, "maximum": 100 },
+          "y": { "type": "number", "minimum": 0, "maximum": 100 }
+        }
+      }
+    },
     "residents": {
       "type": "array",
       "minItems": 1,

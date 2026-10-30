@@ -8,7 +8,7 @@
 // Where the deployment has no Osada yet, or the character is below its
 // level, the tab says so as the other locked modules do.
 
-import { residentBust, settlementGround, settlementPlaceArt } from '../art.js';
+import { residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatHours, formatNumber } from '../format.js';
@@ -445,6 +445,26 @@ export function mountSettlement(container, { params = {} } = {}) {
   const deliverable = () =>
     [...data.board.slots.map((slot) => slot.order), data.board.weekly].some((order) => order && order.have >= order.count && !(order.home && state.character.activity));
 
+  // A torch on the board, at its own size, standing on its spot: its flame
+  // flickers and glows as the camp's fire does, more at dusk and at night
+  // (the author: "pochodnie [...] które będą działać jak małe ogniska");
+  // each keeps its own beat. Still with the animations off.
+  function torchLight({ x, y }, index) {
+    const art = settlementTorchArt();
+    if (!art) return null;
+    const torch = h(
+      'span',
+      { class: 'settlement-torch', style: { left: `${x}%`, top: `${y}%` }, 'aria-hidden': 'true' },
+      art,
+      h('span', { class: 'settlement-torch-glow', style: { animationDelay: `${-index * 0.61}s` } }),
+      h('span', { class: 'settlement-torch-flame', style: { animationDelay: `${-index * 0.29}s` } }),
+    );
+    const size = () => (torch.style.width = `${(art.naturalWidth / BOARD_WIDTH) * 100}%`);
+    if (art.complete && art.naturalWidth) size();
+    else art.addEventListener('load', size, { once: true });
+    return torch;
+  }
+
   // A place on the board: its picture at its own size on the ground, its
   // name, and a dot on the Tablica when an order waits.
   function placeLink(place) {
@@ -486,6 +506,7 @@ export function mountSettlement(container, { params = {} } = {}) {
         // The camp's light of the hour in Poland (scenes.js), as on its board.
         { class: `settlement-map settlement-map--${dayPart()}`, role: 'group', 'aria-label': 'Plansza Osady' },
         ground && h('img', { class: 'settlement-map-ground', src: ground, alt: '', decoding: 'async', draggable: 'false' }),
+        (data.torches ?? []).map(torchLight),
         data.places.map(placeLink),
       ),
     );
