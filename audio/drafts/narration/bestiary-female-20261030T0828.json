@@ -1,0 +1,17 @@
+{
+  "id": "bestiary-female",
+  "payload": {
+    "text": "Tu jest Bestiariusz tego miejsca. Stwory, z którymi jeszcze nie walczyłaś, widzisz w nim tylko jako cienie. Poznaj wszystkie, a otworzysz skrzynię. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/bestiary-female-20261030T0828-0.mp3",
+    "audio/drafts/narration/bestiary-female-20261030T0828-1.mp3"
+  ],
+  "credits": 312
+}

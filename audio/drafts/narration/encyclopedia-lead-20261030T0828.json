@@ -1,0 +1,17 @@
+{
+  "id": "encyclopedia-lead",
+  "payload": {
+    "text": "Wszystko, co zdobędziesz, System zapisuje w Encyklopedii. Zajrzyjmy do niej. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/encyclopedia-lead-20261030T0828-0.mp3",
+    "audio/drafts/narration/encyclopedia-lead-20261030T0828-1.mp3"
+  ],
+  "credits": 170
+}

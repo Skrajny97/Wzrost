@@ -1,0 +1,17 @@
+{
+  "id": "encyclopedia",
+  "payload": {
+    "text": "Broń z pierwszej wyprawy już tu jest. Każdy wpis podpowie Ci, skąd go zdobyć, nawet ten, którego jeszcze nie znasz. Za pełny zestaw czeka skrzynia, a złota kropka przy księdze powie Ci, gdy któraś będzie do otwarcia. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/encyclopedia-20261030T0828-0.mp3",
+    "audio/drafts/narration/encyclopedia-20261030T0828-1.mp3"
+  ],
+  "credits": 450
+}
