@@ -2972,6 +2972,13 @@ Autor o chodach (pytania 44–52 i 130): „44 facet B / 45 Arkaniści A, tylko 
     - Nocna Tancerka (151): w 1. klatce ręka nie wygina się do tyłu, tylko zwisa wzdłuż ciała.
     - Nowe dłonie i twarz są w maskach skóry (`tools/evolution-walker-tones.json`), więc zmieniają kolor razem ze skórą postaci.
 
+## Ewolucja przed 0.0.61: tło zakładki i portret na karcie (30.10.2026, na wersji testowej)
+
+Autor: „Deploy 0.0.61 to Ewolucje klas. Ale do tego potrzebujemy jeszcze odpowiedniego tła w zakładce - jakiegoś źródła wody ze stołem ceremonialnym.” oraz „przy wyborze ścieżki ewolucji powinien stac wizerunek nowej postaci z aktualnie nałożonym odcieniem skóry i płcią. [...] Sam wybierz co lepsze - bardziej estetyczne i wygodne dla gracza.”
+
+1. **Tło zakładki.** Nagłówek „Ewolucja klasy” stoi na obrazku źródła ze stołem ceremonialnym (`place` w `data/evolutions.json`, obrazek w `src/client/art/places/`, w stylu miejsc Profesji, 192 × 96), przygaszonym jak za kartami Profesji, z nazwą na dole. Wersję obrazka wybiera autor.
+2. **Portret na karcie ewolucji.** Na każdej karcie ewolucji, przy wyborze i po nim, z prawej strony stoi postać tak, jak rysuje ją ta ewolucja, w wyglądzie i odcieniu skóry postaci gracza (ok. 40% szerokości karty). Tekst opływa portret, a pod nim biegnie na całą szerokość. Półprzezroczysty portret pod tekstem byłby słabiej widać i gorzej by się go czytało, więc portret stoi obok tekstu.
+
 ## Wersja 0.0.60 (30.10.2026)
 
 Autor: „Zrób wdrożenie 0.0.60”. Do gry wchodzi poprawka objaśnienia Encyklopedii, które pokazuje się teraz najwyżej raz (zob. „Uwagi autora po 0.0.59”, punkt 1). Osada z pochodniami, ewolucje klas i ich rozdziały narratora zostają w grze ukryte.

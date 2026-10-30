@@ -129,6 +129,7 @@ export function buildContent(raw) {
       ? { skillMaxLevel: raw.evolutions.skillMaxLevel, lastPointClassLevel: raw.evolutions.lastPointClassLevel, pointsPerClassLevel: raw.evolutions.pointsPerClassLevel }
       : null,
     evolutionTexts: raw.evolutions?.texts ?? null,
+    evolutionPlace: raw.evolutions?.place ?? null,
     // The gift codes typed in the settings (gift-codes.js); only their
     // texts go to the page.
     giftCodes: raw['gift-codes']?.codes ?? [],

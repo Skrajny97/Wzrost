@@ -512,6 +512,7 @@
       "params": { "blows": 4, "power": [0.45, 0.9] }
     }
   ],
+  "place": "system-spring",
   "texts": {
     "title": "Ewolucja klasy",
     "intro": "Na {level}. poziomie klasy Twoja postać staje u progu ewolucji. Wybierz jedną z dwóch ścieżek. Druga ścieżka bezpowrotnie zniknie. Nie martw się jednak – zainwestowane w nią punkty będziesz mógł jednorazowo rozdysponować, na wyewoluowane Umiejętności.",

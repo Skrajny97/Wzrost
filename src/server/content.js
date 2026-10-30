@@ -120,8 +120,10 @@ export function publicContent() {
       description,
       position,
     })),
-    // The words of the class evolutions' choice and ceremony.
+    // The words of the class evolutions' choice and ceremony, and the
+    // picture behind the Ewolucja tab's heading.
     evolutionTexts: content.evolutionTexts,
+    evolutionPlace: content.evolutionPlace,
     giftTexts: content.giftTexts,
     elements: content.elements.map(({ id, name, resistance, color }) => ({ id, name, resistance, color })),
     effects: content.effects.map(({ id, name, color }) => ({ id, name, color })),

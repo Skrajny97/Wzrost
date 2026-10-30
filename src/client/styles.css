@@ -6588,11 +6588,79 @@ button.skill-row {
   gap: 12px;
 }
 
-.evolution-card {
+/* The Ewolucja tab's heading over its spring with the ceremonial table:
+   the picture dim, as behind the professions' cards, its name at the
+   bottom. */
+.evolution-heading {
+  position: relative;
+  isolation: isolate;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  justify-content: flex-end;
+  align-items: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  max-width: 560px;
+  margin: 0 auto 12px;
+  padding: 12px 14px;
+  overflow: hidden;
+  border: 1px solid var(--bark-line);
+  border-radius: 6px;
+}
+
+.evolution-heading::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--place-art) center / cover no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.8;
+}
+
+.evolution-heading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgba(13, 17, 11, 0.85), rgba(13, 17, 11, 0) 55%);
+}
+
+.evolution-heading .page-title {
+  margin: 0;
+}
+
+.evolution-card {
+  display: flow-root;
   border-color: var(--rarity-epic, #a87fd6);
+}
+
+.card.evolution-card > * + * {
+  margin-top: 8px;
+}
+
+.card.evolution-card > .evolution-portrait + * {
+  margin-top: 0;
+}
+
+/* The character as the evolution draws it, beside the words at the top of
+   the card; the words go on under it. */
+.evolution-card > .evolution-portrait {
+  float: right;
+  width: 42%;
+  max-width: 192px;
+  margin: 0 0 8px 12px;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: radial-gradient(circle at 50% 40%, rgb(168 127 214 / 0.22), transparent 70%), #151d12;
+  overflow: hidden;
+}
+
+.evolution-portrait .sprite--portrait {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
 }
 
 .evolution-name,

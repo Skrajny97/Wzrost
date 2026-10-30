@@ -5,6 +5,7 @@
 // paths' evolutions to choose one from, for good; after the choice, the
 // evolution's card. The choice and the ceremony are in evolution.js.
 
+import { placeArt } from '../art.js';
 import { fill, h } from '../dom.js';
 import { chooseEvolution, evolutionCard } from '../evolution.js';
 import { isUnlocked, state, unlockInfo } from '../state.js';
@@ -14,7 +15,11 @@ export function mountEvolution(container) {
   function render() {
     const character = state.character;
     const t = state.content.evolutionTexts;
-    const heading = h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t.title }));
+    // The heading over the tab's place, a spring with a ceremonial table
+    // (the author: "jakiegoś źródła wody ze stołem ceremonialnym").
+    const art = placeArt(state.content.evolutionPlace);
+    const heading = h('div', { class: `page-heading${art ? ' evolution-heading' : ''}` }, h('h1', { class: 'page-title', tabindex: '-1', text: t.title }));
+    if (art) heading.style.setProperty('--place-art', `url("${art}")`);
     const unlock = unlockInfo('evolution');
     // Where the deployment has the evolutions off there is no tab, and the
     // address alone leads here.

@@ -8,6 +8,7 @@
   "properties": {
     "$comment": { "type": "string" },
     "skillMaxLevel": { "type": "integer", "minimum": 2 },
+    "place": { "type": "string", "minLength": 1, "description": "Tło zakładki Ewolucja: źródło ze stołem ceremonialnym, obrazek z src/client/art/places." },
     "lastPointClassLevel": { "type": "integer", "minimum": 1, "description": "Ostatni poziom klasy, który daje Punkt Umiejętności po ewolucji." },
     "pointsPerClassLevel": { "type": "integer", "minimum": 1 },
     "evolutions": {

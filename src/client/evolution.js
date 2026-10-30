@@ -5,6 +5,7 @@
 // On the test version "Testuj ewolucję" (in the settings) opens every
 // evolution of the class at any level and can undo the test.
 
+import { portraitSprite } from './art.js';
 import { h } from './dom.js';
 import { formatNumber } from './format.js';
 import { setMusicPlace } from './music.js';
@@ -18,12 +19,18 @@ const filled = (template, vars) => template.replace(/\{(\w+)\}/g, (whole, key) =
 const traitLine = (trait) => h('p', { class: 'evolution-trait' }, h('strong', { text: `${texts().trait}: ${trait.name}. ` }), trait.text);
 
 // An evolution's card: its name and path, growth, trait and skills with
-// their numbers at the top level, and a button to choose it.
+// their numbers at the top level, and a button to choose it. Beside the
+// words stands the character as the evolution draws it, in its own look and
+// skin tone (the author: "wizerunek nowej postaci z aktualnie nałożonym
+// odcieniem skóry i płcią").
 export function evolutionCard(evolution, { onChoose = null, busy = false } = {}) {
   const t = texts();
+  const { classId, appearance, skin } = state.character ?? {};
+  const portrait = classId && portraitSprite(classId, appearance, { skin, evolution: evolution.id });
   return h(
     'article',
     { class: 'card evolution-card', 'aria-label': evolution.name },
+    portrait && h('div', { class: 'evolution-portrait' }, portrait),
     h('h3', { class: 'evolution-name', text: evolution.name }),
     evolution.pathName && h('p', { class: 'muted', text: `Ścieżka: ${evolution.pathName}` }),
     h('p', { class: 'evolution-growth' }, h('strong', { text: `${t.growth}: ` }), evolution.growth.map((entry) => `${entry.name} +${entry.value}`).join(', ')),
