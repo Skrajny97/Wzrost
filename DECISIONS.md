@@ -2919,6 +2919,14 @@ Wszystko działa tylko tam, gdzie `SETTLEMENT` jest `on` (`wrangler.jsonc`, śro
 16. **Zapis.** Kolumna `characters.settlement` (migracja 0055) trzyma reputację, relacje, tablicę, licznik oddanych zleceń, przekucie czekające na wybór i liczbę zmian ewolucji jako JSON. Zlecenia losują się z ziarna postaci i kolejnego numeru, więc ta sama tablica wychodzi przy każdym odczycie, a zmiany zapisują się tylko, gdy postać jest taka jak odczytana.
 17. **Jeszcze nie ma:** planszy z obrazkami (pytania od 152), części narratora (teksty do zatwierdzenia), tytułu Przyjaciela w karcie postaci (87 A, gdy ktoś dojdzie do Przyjaciela, czyli po ok. 2 miesiącach) i usług z wyższych stopni relacji poza wyborem afiksu.
 
+## Dźwięki ewolucji i kwestie narratora: wybory autora (30.10.2026, na wersji testowej)
+
+Wybory ze strony odsłuchu „Dźwięki Insight”.
+
+1. **Umiejętności ewolucji.** Młyn i Egzekucja mają już własne dźwięki, Promień Żywiołów dostaje wersję „laserową” (3), a Psalm nucenie z dzwonkami (6). Wyrok gra na razie głośniejszą wersję 2, dopóki autor nie wybierze innej, a Sokół czeka na wybór.
+2. **Strzał z ukrycia.** Autor przy nowych wersjach: „brzmi jak rażenie prądem a nie wyjście z krzaków i strzał z łuku”. Opis nagrania prosi teraz o szelest liści, cięciwę drewnianego łuku i świst strzały, bez trzasków i brzęczenia; nowe wersje są na stronie odsłuchu.
+3. **Kwestie o Bestiariuszu i Encyklopedii.** Autor wybrał wersje 1 wszystkich czterech, czyli te, które już grają na wersji testowej.
+
 ## Muzyka: lżejsze pliki, pobierane po starcie gry (30.10.2026, na wersji testowej)
 
 Autor: „53 B”.
