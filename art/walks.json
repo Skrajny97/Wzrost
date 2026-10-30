@@ -105,7 +105,7 @@
     "elementalist-male": {
       "start": "art/references/walks/start/elementalist-male.png",
       "pose": 2,
-      "description": "a thin young man with brown hair, a long deep red and orange robe with amber trim and a dark sash, a short wooden staff with a glowing amber stone in his right hand, a small flame above his open left hand"
+      "description": "a thin young man with brown hair, a long deep red and orange robe with amber trim and a dark sash, a short wooden staff with a glowing amber stone in his right hand, his left hand open and empty"
     },
     "assassin-female": {
       "start": "art/references/walks/start/assassin-female.png",
@@ -185,7 +185,7 @@
     "poisoner-male": {
       "start": "art/references/walks/start/poisoner-male.png",
       "pose": 2,
-      "description": "a wiry young man with black spiky hair, a dark green leather coat with the hood down, a cloth mask over the mouth, belts of small green glass vials across the chest, a curved dagger dripping green venom in his right hand"
+      "description": "a wiry young man with black spiky hair, a dark green leather coat with the hood down, a cloth mask over the mouth, belts of small green glass vials across the chest, a single curved dagger dripping green venom in his right hand, his left hand empty and open, holding nothing"
     },
     "poisoner-female": {
       "start": "art/references/walks/start/poisoner-female.png",
