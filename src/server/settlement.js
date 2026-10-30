@@ -8,13 +8,18 @@
 
 import {
   BAG_GOODS,
+  COMPANION_SLOTS,
   addQuestProgress,
+  bagCapacity,
+  campLevels,
   craftedFor,
   createRng,
   deliverBlock,
   companionCombatant,
+  companionGift,
   companionPlaces,
   companionSkillLevel,
+  companionWearBlock,
   deliverOrder,
   drawCandidates,
   drawRumor,
@@ -23,6 +28,7 @@ import {
   evolvedSkills,
   hireCost,
   itemName,
+  itemView,
   materialView,
   mugCost,
   parseStack,
@@ -39,11 +45,13 @@ import {
   standingOf,
   statResetCost,
   upgradedItem,
+  wearOnCompanion,
   withAffix,
   xpToNext,
 } from '../engine/index.js';
 import { content } from './content.js';
 import {
+  bagPlaces,
   characterView,
   engineCharacter,
   loadPlayer,
@@ -177,7 +185,7 @@ export function settlementView(player, stored, board, now) {
       pending: pendingView(pendingOf(stored, player.items)),
     },
     tavern: tavernView(player.row, stored, now),
-    companions: companionsView(player.row, stored, now),
+    companions: companionsView(player, stored, now),
     // After an evolution the paths change with it, so no path reset.
     hermit: {
       path: player.row.evolution ? null : pathResetCost(player.row.level, content),
@@ -230,17 +238,37 @@ function companionView(companion, now) {
     }),
     skills: companion.skills.map((id) => ({ name: content.skillsById[id].name, level: companionSkillLevel(id, companion.level, content) })),
     gear: companion.gear.map((item) => itemName(item, content)),
+    // What it wears in each of its places (question 108 A), and whether
+    // the item came from the character's bag.
+    wear: COMPANION_SLOTS.map((slot) => {
+      const worn = companion.gear.find((item) => item.slot === slot);
+      return { slot, slotName: content.slotsById[slot].name, item: worn ? { ...itemView(worn, content), given: Boolean(worn.given) } : null };
+    }),
     profession: professions.find((one) => one.id === companion.profession)?.name ?? null,
     story: stories[companion.story % stories.length],
     woundedUntil: companion.woundedUntil > now ? companion.woundedUntil : null,
   };
 }
 
+// The character as an order and a companion's gift see it: what it knows.
+const knowing = (row) => ({ ...engineCharacter(row), met: JSON.parse(row.met ?? '[]'), patterns: JSON.parse(row.patterns ?? '[]') });
+
+// A companion's gift of the week (question 112 A), with the goods' name.
+function giftOf(companion, row, now) {
+  const gift = companionGift(companion, { character: knowing(row), seed: `${row.id}:settlement` }, now, content);
+  if (!gift) return null;
+  const goods = { herb: content.herbsById, potion: content.potionsById, part: content.partsById }[gift.kind];
+  return { ...gift, name: goods[gift.key].name };
+}
+
 // The Karczma's werbunek (questions 104–106): the places the relation with
 // the innkeeper gives, the standing that opens the next one, the companions
-// hired and this week's candidates not hired yet, each with its price.
-function companionsView(row, stored, now) {
+// hired with this week's gift and this week's candidates not hired yet,
+// each with its price.
+function companionsView(player, stored, now) {
+  const { row } = player;
   const { standings } = content.settlement;
+  const bag = player.items.filter((item) => !item.equippedSlot);
   const places = companionPlaces(stored.relations[content.settlement.tavern.resident] ?? 0, content);
   const hired = stored.companions ?? [];
   const nextId = content.settlement.companions.from[places];
@@ -251,7 +279,12 @@ function companionsView(row, stored, now) {
   return {
     places,
     next: nextId ? standings.find((standing) => standing.id === nextId).name : null,
-    hired: hired.map((companion) => companionView(companion, now)),
+    // Each with this week's gift and the items in the bag it can wear.
+    hired: hired.map((companion) => ({
+      ...companionView(companion, now),
+      gift: giftOf(companion, row, now),
+      wearable: bag.filter((item) => !companionWearBlock(companion, item, content)).map((item) => item.id),
+    })),
     candidates: candidates.map((candidate) => ({ ...companionView(candidate, now), price: hireCost(candidate, content) })),
   };
 }
@@ -433,7 +466,9 @@ export async function hireCompanion(context) {
 }
 
 // { companionId }: the companion leaves for good and does not come back as
-// a candidate this week. Not while it is out on an exploration.
+// a candidate this week. It gives back the items it got from the bag, so
+// they need free places there, and takes its own gear along. Not while it
+// is out on an exploration.
 export async function dismissCompanion(context) {
   const { session, player } = await requireIdlePlayer(context);
   const { row } = player;
@@ -441,14 +476,97 @@ export async function dismissCompanion(context) {
   const body = await readJson(context.request);
   const stored = settlementOf(row);
   const hired = stored.companions ?? [];
-  if (!hired.some((companion) => companion.id === body.companionId)) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
-  const next = { ...stored, companions: hired.filter((companion) => companion.id !== body.companionId), dismissed: [...(stored.dismissed ?? []), body.companionId] };
-  const result = await context.env.DB.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
-    .bind(JSON.stringify(next), row.id, row.version)
+  const companion = hired.find((one) => one.id === body.companionId);
+  if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
+  const given = companion.gear.filter((item) => item.given);
+  if (bagPlaces(player) + given.length > bagCapacity(campLevels(player.buildings, context.now, content), content)) {
+    throw new ApiError(409, 'bag_full', `${companion.name} odda ${given.length === 1 ? 'przedmiot' : 'przedmioty'} z twojego plecaka, a brakuje w nim miejsca.`);
+  }
+  const next = { ...stored, companions: hired.filter((one) => one !== companion), dismissed: [...(stored.dismissed ?? []), body.companionId] };
+  const saved = JSON.stringify(next);
+  const db = context.env.DB;
+  const [result] = await db.batch([
+    db.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?').bind(saved, row.id, row.version),
+    ...given.map((item) => backToBag(db, row, item, saved, context.now)),
+  ]);
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(db, session.userId);
+  return json({ settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now), character: characterView(after, context.now) });
+}
+
+// An item a companion wore goes back to the bag, only after the change of
+// the Osada saved as `saved` (the batch's first statement) went through.
+const backToBag = (db, row, item, saved, now) => {
+  const { given, ...data } = item;
+  return db
+    .prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT ?, NULL, ?, ? WHERE EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ? AND settlement = ?)')
+    .bind(row.id, JSON.stringify(data), now, row.id, row.version + 1, saved);
+};
+
+// { companionId, itemId }: the companion puts on an item from the bag in
+// its place (question 108 A), and what it wore there goes back to the bag.
+// At home, as every change of the bag.
+export async function equipCompanion(context) {
+  const { session, player } = await requireIdlePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const hired = stored.companions ?? [];
+  const companion = hired.find((one) => one.id === body.companionId);
+  if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
+  const item = player.items.find((one) => one.id === body.itemId && !one.equippedSlot);
+  if (!item) throw new ApiError(404, 'item_not_found', 'Tego przedmiotu nie ma w plecaku.');
+  const block = companionWearBlock(companion, item, content);
+  if (block) throw new ApiError(403, block.code, block.message);
+  const { id, equippedSlot, ...data } = item;
+  const { companion: dressed, off } = wearOnCompanion(companion, data);
+  const next = { ...stored, companions: hired.map((one) => (one === companion ? dressed : one)) };
+  const saved = JSON.stringify(next);
+  const db = context.env.DB;
+  const [result] = await db.batch([
+    db
+      .prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ? AND slot IS NULL)')
+      .bind(saved, row.id, row.version, item.id, row.id),
+    db
+      .prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND slot IS NULL AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ? AND settlement = ?)')
+      .bind(item.id, row.id, row.id, row.version + 1, saved),
+    ...(off ? [backToBag(db, row, off, saved, context.now)] : []),
+  ]);
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(db, session.userId);
+  return json({ settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now), character: characterView(after, context.now) });
+}
+
+// { companionId }: the companion's gift of the week from its profession
+// (question 112 A) goes to the character's goods. At home, as herbs and
+// potions wait in the bag while the character is away.
+export async function takeCompanionGift(context) {
+  const { session, player } = await requireIdlePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const hired = stored.companions ?? [];
+  const companion = hired.find((one) => one.id === body.companionId);
+  if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
+  const gift = giftOf(companion, row, context.now);
+  if (!gift) throw new ApiError(409, 'gift_taken', 'Prezent z tego tygodnia jest już odebrany. Następny w poniedziałek.');
+  const next = { ...stored, companions: hired.map((one) => (one === companion ? { ...one, giftWeek: gift.week } : one)) };
+  const column = COLUMNS[gift.kind];
+  const key = jsonPath(gift.key);
+  const result = await context.env.DB.prepare(
+    `UPDATE characters SET settlement = ?, ${column} = json_set(${column}, ?, COALESCE(json_extract(${column}, ?), 0) + ?), version = version + 1 WHERE id = ? AND version = ?`,
+  )
+    .bind(JSON.stringify(next), key, key, gift.count, row.id, row.version)
     .run();
   if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(context.env.DB, session.userId);
-  return json({ settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now), character: characterView(after, context.now) });
+  return json({
+    gift: { name: gift.name, count: gift.count },
+    settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
+    character: characterView(after, context.now),
+  });
 }
 
 // { orderId }: takes an order off the board for free; a new one comes later.

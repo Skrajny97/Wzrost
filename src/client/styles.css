@@ -9094,6 +9094,16 @@ a.profession-square:active {
   margin: 0;
 }
 
+.settlement-companion-wear {
+  display: grid;
+  gap: 8px;
+}
+
+.settlement-companion-slot {
+  display: grid;
+  gap: 2px;
+}
+
 .settlement-companion-list {
   margin: 0;
   padding-left: 18px;

@@ -10,10 +10,11 @@
 // rest from nothing (question 113).
 //
 // Stored in the Osada: { id, name, appearance, classId, level, xp, traits,
-// skills, profession, story, gear: [items], woundedUntil }.
+// skills, profession, story, gear: [items], woundedUntil, giftWeek }. An
+// item of `gear` the player gave from the bag is marked `given`.
 
 import { playerCombatant } from './combatant.js';
-import { generateItem } from './items.js';
+import { baseClassLevel, canUse, generateItem } from './items.js';
 import { gainXp, regenPerMinute, xpToNext } from './progression.js';
 import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
@@ -158,3 +159,29 @@ export function companionAfterHunt(companion, { xp, fainted, endedAt }, characte
 // Whether the companion goes on an exploration starting `now`: not while
 // wounded.
 export const companionReady = (companion, now) => Boolean(companion) && !(companion.woundedUntil > now);
+
+// The places a companion wears items in (the design: "broń, pancerz,
+// talizman").
+export const COMPANION_SLOTS = ['weapon', 'chest', 'talisman'];
+
+// Why the companion cannot wear `item` from the character's bag (question
+// 108 A: "gracz zakłada towarzyszowi przedmioty jego klasy z plecaka"), or
+// null: one of its places, its class and its class level (its level), and
+// an item from a Wymiana or the Skrzynia Konta from the item's own level,
+// as for the character.
+export function companionWearBlock(companion, item, content) {
+  if (!COMPANION_SLOTS.includes(item.slot)) return { code: 'wrong_slot', message: 'Towarzysz nosi tylko broń, pancerz i talizman.' };
+  if (!canUse(item.base, companion.classId, content)) return { code: 'wrong_class', message: 'Klasa towarzysza nie może używać tego przedmiotu.' };
+  if (!canUse(item.base, companion.classId, content, companion.level)) {
+    return { code: 'class_level', message: `Ten przedmiot towarzysz założy od poziomu ${baseClassLevel(item.base, content)}.` };
+  }
+  if ((item.traded || item.chest) && item.level > companion.level) return { code: 'trade_level', message: `Ten przedmiot towarzysz założy od poziomu ${item.level}.` };
+  return null;
+}
+
+// The companion wearing `item` (marked as given) in its place, and the item
+// it wore there, which goes back to the bag (`off`, or null).
+export function wearOnCompanion(companion, item) {
+  const off = companion.gear.find((worn) => worn.slot === item.slot) ?? null;
+  return { companion: { ...companion, gear: [...companion.gear.filter((worn) => worn !== off), { ...item, given: true }] }, off };
+}

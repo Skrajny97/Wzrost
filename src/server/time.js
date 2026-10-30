@@ -1,5 +1,5 @@
 // Punkty Czasu (Time Points): 1 point skips 1 minute of the current wait, an
-// exploration, resting or a camp upgrade. One comes every half an hour by
+// exploration, resting, a camp upgrade or a companion's wounds (the Osada). One comes every half an hour by
 // itself, also while the player is away (characters.js: settleTimePoints),
 // and more from playing (the narrator, levels and rare finds); they are never
 // sold. With fewer points than minutes left, the wait gets as much shorter
@@ -20,19 +20,19 @@ const nothing = (message) => new ApiError(409, 'nothing_to_skip', message);
 export async function skipWithTimePoints(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
-  const spent = await spendTimePoints(context.env.DB, player, body.target, context.now);
+  const spent = await spendTimePoints(context.env.DB, player, body.target, context.now, body);
   // A build skipped to its end lets the next waiting one start at once.
   return json({ spent, character: characterView(await loadSettled(context.env.DB, session.userId, context.now), context.now) });
 }
 
-// Points for the minutes left of a wait (`target`: activity, avatar, rest or
-// build).
+// Points for the minutes left of a wait (`target`: activity, avatar, rest,
+// build or wounds, with `companionId` in `options`).
 // The skipped introduction pays for its first exploration this way too.
-export async function spendTimePoints(db, player, target, now) {
+export async function spendTimePoints(db, player, target, now, options = {}) {
   if (player.row.time_points < 1) throw new ApiError(409, 'no_time_points', 'Nie masz Punktów Czasu.');
-  const plan = { activity: skipActivity, avatar: skipAvatar, rest: skipRest, build: skipBuild }[target];
+  const plan = { activity: skipActivity, avatar: skipAvatar, rest: skipRest, build: skipBuild, wounds: skipWounds }[target];
   if (!plan) throw new ApiError(400, 'invalid_target', 'Nie wiadomo, co przewinąć.');
-  const { spent, statements } = plan(db, player, now);
+  const { spent, statements } = plan(db, player, now, options);
   // The first statement pays, only if the character and the wait are as seen
   // here; the second moves the wait, only if the first paid. Two taps at once
   // pay and skip once.
@@ -99,6 +99,26 @@ function skipRest(db, player, now) {
            WHERE id = ? AND version = ? AND time_points >= ? AND NOT EXISTS (SELECT 1 FROM activities WHERE character_id = ?)`,
         )
         .bind(spent, hpAfter, now, row.id, row.version, spent, row.id),
+    ],
+  };
+}
+
+// A companion's wounds (companions.js) end a minute sooner for each point,
+// as the character's rest does (question 113 A: "Punkty Czasu skracają to
+// tak samo").
+function skipWounds(db, player, now, { companionId } = {}) {
+  const { row } = player;
+  const stored = JSON.parse(row.settlement ?? '{}');
+  const companion = (stored.companions ?? []).find((one) => one.id === companionId);
+  if (!(companion?.woundedUntil > now)) throw nothing('Ten towarzysz nie jest ranny.');
+  const { spent, shift } = cost(companion.woundedUntil - now, row.time_points);
+  const companions = stored.companions.map((one) => (one === companion ? { ...one, woundedUntil: one.woundedUntil - shift } : one));
+  return {
+    spent,
+    statements: [
+      db
+        .prepare('UPDATE characters SET time_points = time_points - ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND time_points >= ?')
+        .bind(spent, JSON.stringify({ ...stored, companions }), row.id, row.version, spent),
     ],
   };
 }

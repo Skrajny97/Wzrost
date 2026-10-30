@@ -17,6 +17,7 @@ import { leaveView, openView } from '../history.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
+import { skipControl } from '../time.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { itemSummary } from './character.js';
 
@@ -436,6 +437,76 @@ export function mountSettlement(container, { params = {} } = {}) {
 
   // A companion or a candidate (questions 104–113): class, level, numbers,
   // traits, skills, gear and story, with what can be done with it.
+  // A companion's gift of the week from its profession (question 112 A),
+  // taken at home, as herbs and potions wait in the bag on an exploration.
+  function giftRow(companion) {
+    const { gift } = companion;
+    const away = Boolean(state.character.activity);
+    return h(
+      'div',
+      { class: 'settlement-choice' },
+      h('p', { class: 'muted', text: `Prezent tygodnia z profesji: ${gift.count} × ${gift.name}.${away ? ' Czeka na powrót z wyprawy.' : ''}` }),
+      h('button', {
+        type: 'button',
+        class: 'button button--world button--small',
+        text: 'Odbierz prezent',
+        disabled: away,
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            const answer = await call('POST', '/api/settlement/gift', { companionId: companion.id });
+            apply(answer);
+            toast(`Odebrano: ${answer.gift.count} × ${answer.gift.name}.`);
+          }),
+      }),
+    );
+  }
+
+  // What a hired companion wears in its three places, and a button to put
+  // on an item from the bag (question 108 A), at home as every change of
+  // the bag.
+  function wearList(companion) {
+    const away = Boolean(state.character.activity);
+    return h(
+      'div',
+      { class: 'settlement-companion-wear' },
+      companion.wear.map((place) =>
+        h(
+          'div',
+          { class: 'settlement-companion-slot' },
+          h('span', { class: 'field-label', text: place.slotName }),
+          place.item ? itemSummary(place.item) : h('span', { class: 'muted', text: 'Pusto' }),
+        ),
+      ),
+      h('button', { type: 'button', class: 'button button--small', text: 'Załóż z plecaka', disabled: away, onClick: () => wearSheet(companion) }),
+      away && h('p', { class: 'muted', text: 'Przedmioty zakłada się po powrocie z wyprawy.' }),
+    );
+  }
+
+  // The bag's items the companion can wear, to tap one; what it wore in
+  // that place goes back to the bag.
+  function wearSheet(companion) {
+    const items = companion.wearable.map((id) => itemView(id)).filter(Boolean);
+    const put = (item) => (event) =>
+      withButton(event.currentTarget, async () => {
+        apply(await call('POST', '/api/settlement/equip', { companionId: companion.id, itemId: item.id }));
+        closeSheet();
+        toast(`${companion.name} nosi teraz: ${item.name}.`);
+      });
+    openSheet(
+      h('h2', { class: 'sheet-title', text: `Sprzęt: ${companion.name}` }),
+      items.length === 0
+        ? h('p', { class: 'sheet-text', text: 'W plecaku nie ma nic, co ten towarzysz może założyć: broni ani pancerza swojej klasy na swój poziom, ani talizmanu.' })
+        : [
+            h('p', { class: 'sheet-text', text: 'Wybierz przedmiot. To, co towarzysz nosił w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co z niego dostał.' }),
+            h(
+              'ul',
+              { class: 'item-list' },
+              items.map((item) => h('li', {}, h('button', { type: 'button', class: 'item-row', onClick: put(item) }, itemSummary(item)))),
+            ),
+          ],
+    );
+  }
+
   function companionCard(companion, action) {
     const wounded = companion.woundedUntil && companion.woundedUntil > serverNow();
     return h(
@@ -449,9 +520,15 @@ export function mountSettlement(container, { params = {} } = {}) {
         { class: 'settlement-companion-list' },
         companion.traits.map((trait) => h('li', {}, h('strong', { text: trait.name }), `: ${trait.text}`)),
         companion.skills.map((skill) => h('li', { text: `${skill.name}${skill.level > 0 ? `, poz. ${skill.level}` : ', jeszcze nie umie'}` })),
-        h('li', { class: 'muted', text: `Sprzęt: ${companion.gear.join(', ')}` }),
+        !companion.wear && h('li', { class: 'muted', text: `Sprzęt: ${companion.gear.join(', ')}` }),
       ),
+      companion.wear && wearList(companion),
+      companion.gift && giftRow(companion),
       wounded && h('p', { class: 'region-warning', text: `Odpoczywa po ranach jeszcze ${formatCountdown(companion.woundedUntil - serverNow())} i nie pójdzie na wyprawę.` }),
+      // Punkty Czasu shorten the wounds as they shorten the character's rest
+      // (question 113 A).
+      wounded &&
+        skipControl('wounds', (now) => companion.woundedUntil - now, `Odpoczynek po ranach (${companion.name})`, { body: { companionId: companion.id }, after: load }).element,
       action,
     );
   }
@@ -469,7 +546,9 @@ export function mountSettlement(container, { params = {} } = {}) {
         text: 'Odpraw',
         onClick: async (event) => {
           const button = event.currentTarget;
-          if (!(await confirmAction({ title: `Odprawić: ${companion.name}?`, text: `${companion.name} odejdzie na dobre.`, confirmLabel: 'Odpraw' }))) return;
+          const given = companion.wear.some((place) => place.item?.given);
+          const text = `${companion.name} odejdzie na dobre${given ? ' i odda przedmioty z twojego plecaka' : ''}.`;
+          if (!(await confirmAction({ title: `Odprawić: ${companion.name}?`, text, confirmLabel: 'Odpraw' }))) return;
           withButton(button, async () => apply(await call('POST', '/api/settlement/dismiss', { companionId: companion.id })));
         },
       });
@@ -646,8 +725,10 @@ export function mountSettlement(container, { params = {} } = {}) {
     if (placeId && !place) return location.replace(SETTLEMENT);
     if (place) placeView(place);
     else boardView();
-    // An empty slot fills when its time comes.
-    const next = Math.min(...data.board.slots.filter((slot) => slot.readyAt).map((slot) => slot.readyAt));
+    // An empty slot fills when its time comes, and a wounded companion is
+    // ready again when its wounds end.
+    const wounds = (data.companions?.hired ?? []).map((companion) => companion.woundedUntil).filter((at) => at > serverNow());
+    const next = Math.min(...data.board.slots.filter((slot) => slot.readyAt).map((slot) => slot.readyAt), ...wounds);
     if (Number.isFinite(next)) timer = setTimeout(load, Math.max(1000, next - serverNow() + 1000));
   }
 

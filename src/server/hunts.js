@@ -91,7 +91,7 @@ function cachedSamples(player, character, equipped, areaId, now) {
   const ids = equipped.map((item) => item.id).sort((a, b) => a - b);
   // The companions ready to go along fight beside the character (companions.js).
   const companions = settlementOn() ? (JSON.parse(player.row.settlement ?? '{}').companions ?? []).filter((companion) => companionReady(companion, now)) : [];
-  const party = companions.map((companion) => [companion.id, companion.level, companion.gear.length]);
+  const party = companions.map((companion) => [companion.id, companion.level, companion.gear]);
   const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, ids, party]);
   let samples = samplesCache.get(key);
   if (!samples) {

@@ -1,6 +1,8 @@
 // Companions (the Osada, part II): the Karczma's four candidates a week, the
 // places the relation with the innkeeper gives, a companion in the fights of
-// an exploration, its XP and its wounds, and hiring one through the API.
+// an exploration, its XP and its wounds, hiring one through the API,
+// Punkty Czasu for its wounds, its profession's gift of the week and the
+// items it gets from the bag.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -8,10 +10,13 @@ import { beforeEach, describe, test } from 'node:test';
 import {
   companionAfterHunt,
   companionCombatant,
+  companionGift,
   companionPlaces,
   companionReady,
   companionXp,
+  createRng,
   drawCandidates,
+  generateItem,
   hireCost,
   simulateHunt,
 } from '../src/engine/index.js';
@@ -79,6 +84,23 @@ describe('companions in the engine', () => {
   });
 });
 
+describe('a companion\'s gift of the week', () => {
+  test('its profession brings goods the character knows, the same all week, once a week', () => {
+    const kinds = Object.fromEntries(tuning.professions.map((profession) => [profession.id, profession.goods]));
+    for (const profession of tuning.professions) {
+      const companion = { id: 'w:1', profession: profession.id };
+      const gift = companionGift(companion, { character, seed: 's' }, NOW, content);
+      assert.equal(gift.kind, kinds[profession.id]);
+      assert.ok(gift.count >= tuning.gifts[gift.kind].min);
+      const goods = { herb: content.herbsById, potion: content.potionsById, part: content.partsById }[gift.kind];
+      assert.ok(goods[gift.key], `${gift.kind} ${gift.key}`);
+      assert.deepEqual(companionGift(companion, { character, seed: 's' }, NOW + 3600000, content), gift);
+      assert.equal(companionGift({ ...companion, giftWeek: gift.week }, { character, seed: 's' }, NOW, content), null);
+      assert.notEqual(companionGift({ ...companion, giftWeek: gift.week }, { character, seed: 's' }, NOW + WEEK, content), null);
+    }
+  });
+});
+
 describe('companions through the API', () => {
   const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'on', SETTLEMENT: 'on' });
   let cookie;
@@ -121,5 +143,89 @@ describe('companions through the API', () => {
     const dismissed = await call('POST', '/api/settlement/dismiss', { cookie, body: { companionId: first.id } });
     assert.equal(dismissed.data.settlement.companions.hired.length, 0);
     assert.ok(!dismissed.data.settlement.companions.candidates.some((candidate) => candidate.id === first.id));
+  });
+
+  test('Punkty Czasu shorten a wounded companion\'s rest a minute each, as they shorten the character\'s (113 A)', async () => {
+    await relation(content.settlement.standings.find((standing) => standing.id === tuning.from[0]).points);
+    const [candidate] = (await settlement()).companions.candidates;
+    await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
+    assert.equal((await call('POST', '/api/time/skip', { cookie, body: { target: 'wounds', companionId: candidate.id } })).data.error.code, 'nothing_to_skip');
+    // Wounded for half an hour, with 10 points: 10 minutes less.
+    const database = await db();
+    const stored = JSON.parse((await database.prepare('SELECT settlement FROM characters').first()).settlement);
+    const until = Date.now() + 30 * 60000;
+    stored.companions[0].woundedUntil = until;
+    await database.prepare('UPDATE characters SET settlement = ?, time_points = 10, time_points_at = ?').bind(JSON.stringify(stored), Date.now()).run();
+    const some = await call('POST', '/api/time/skip', { cookie, body: { target: 'wounds', companionId: candidate.id } });
+    assert.equal(some.data.spent, 10);
+    assert.equal((await settlement()).companions.hired[0].woundedUntil, until - 10 * 60000);
+    // With enough points it is ready at once and goes on the next exploration.
+    await database.prepare('UPDATE characters SET time_points = 100').run();
+    const rest = await call('POST', '/api/time/skip', { cookie, body: { target: 'wounds', companionId: candidate.id } });
+    assert.ok(rest.data.spent >= 19 && rest.data.spent <= 21);
+    assert.equal((await settlement()).companions.hired[0].woundedUntil, null);
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    const options = JSON.parse((await database.prepare('SELECT options FROM activities').first()).options);
+    assert.deepEqual(options.companions.map((companion) => companion.id), [candidate.id]);
+  });
+
+  test('the gift of the week goes to the character\'s goods once a week, at home', async () => {
+    await relation(content.settlement.standings.find((standing) => standing.id === tuning.from[0]).points);
+    const [candidate] = (await settlement()).companions.candidates;
+    const hired = await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
+    const { gift } = hired.data.settlement.companions.hired[0];
+    assert.ok(gift.count > 0 && gift.name);
+    const column = { herb: 'herbs', potion: 'potions', part: 'parts' }[gift.kind];
+    const database = await db();
+    const before = JSON.parse((await database.prepare(`SELECT ${column} AS goods FROM characters`).first()).goods)[gift.key] ?? 0;
+    const taken = await call('POST', '/api/settlement/gift', { cookie, body: { companionId: candidate.id } });
+    assert.equal(taken.status, 200);
+    assert.deepEqual(taken.data.gift, { name: gift.name, count: gift.count });
+    assert.equal(taken.data.settlement.companions.hired[0].gift, null);
+    const after = JSON.parse((await database.prepare(`SELECT ${column} AS goods FROM characters`).first()).goods)[gift.key];
+    assert.equal(after, before + gift.count);
+    assert.equal((await call('POST', '/api/settlement/gift', { cookie, body: { companionId: candidate.id } })).data.error.code, 'gift_taken');
+  });
+
+  test('items of its class from the bag go on the companion, what it wore goes back, and it gives them back when dismissed (108 A)', async () => {
+    await relation(content.settlement.standings.find((standing) => standing.id === tuning.from[0]).points);
+    const [candidate] = (await settlement()).companions.candidates;
+    await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
+    const database = await db();
+    const rng = createRng('gear');
+    const cls = content.classesById[candidate.classId];
+    const familyBase = (family) => content.bases.find((base) => (base.family ?? base.id) === family && !(base.classLevel > candidate.level));
+    const other = content.bases.find((base) => base.slot === 'weapon' && !cls.weapons.includes(base.family ?? base.id));
+    const put = async (base) => {
+      const item = generateItem({ baseId: base.id, level: candidate.level }, rng, content);
+      const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(item)).run();
+      return meta.last_row_id;
+    };
+    const weapon = await put(familyBase(cls.weapons.at(-1)));
+    const talisman = await put(content.bases.find((base) => base.slot === 'talisman'));
+    const wrong = await put(other);
+    const bagCount = async () => (await database.prepare('SELECT COUNT(*) AS n FROM items WHERE slot IS NULL').first()).n;
+    let hired = (await settlement()).companions.hired[0];
+    assert.deepEqual(hired.wear.map((place) => place.slot), ['weapon', 'chest', 'talisman']);
+    assert.equal(hired.wear[2].item, null);
+    assert.ok(hired.wearable.includes(weapon) && hired.wearable.includes(talisman) && !hired.wearable.includes(wrong));
+    assert.equal((await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: wrong } })).data.error.code, 'wrong_class');
+    // The weapon takes the old one's place, and the old one goes to the bag.
+    const before = await bagCount();
+    const armed = await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: weapon } });
+    assert.equal(armed.status, 200);
+    assert.equal(await bagCount(), before);
+    hired = armed.data.settlement.companions.hired[0];
+    assert.equal(hired.wear[0].item.given, true);
+    assert.equal(await database.prepare('SELECT id FROM items WHERE id = ?').bind(weapon).first(), null);
+    // The talisman fills an empty place.
+    await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: talisman } });
+    assert.equal(await bagCount(), before - 1);
+    // Dismissed, it gives back the two items from the bag and keeps its own armour.
+    const dismissed = await call('POST', '/api/settlement/dismiss', { cookie, body: { companionId: candidate.id } });
+    assert.equal(dismissed.status, 200);
+    assert.equal(await bagCount(), before + 1);
+    const back = (await database.prepare('SELECT data FROM items WHERE slot IS NULL').all()).results.map((row) => JSON.parse(row.data));
+    assert.ok(back.some((item) => item.slot === 'talisman' && !item.given));
   });
 });

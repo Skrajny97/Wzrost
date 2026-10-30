@@ -420,3 +420,27 @@ export function rumorText(rumor, content) {
   const line = content.settlement.tavern.rumor.lines[rumor.line % content.settlement.tavern.rumor.lines.length];
   return line.replaceAll('{area}', area.name).replaceAll('{creature}', monster.counted[0]);
 }
+
+// A companion's gift of the week from its profession (part II, question
+// 112 A: "raz w tygodniu prezent z jego profesji"): goods of the kind its
+// profession makes (`goods` in companions.professions), of those the
+// character already knows as an order does, and before the character's
+// profession opens those of its first level; one of them, as many as
+// `gifts` gives for the character's level. Drawn from the seed, the
+// companion and the week, so it is the same all week; null once taken this
+// week (`giftWeek`).
+export function companionGift(companion, { character, seed }, now, content) {
+  const { professions, gifts } = content.settlement.companions;
+  const week = questPeriod('weekly', now, content).key;
+  if (companion.giftWeek === week) return null;
+  const kind = professions.find((one) => one.id === companion.profession)?.goods;
+  let goods = orderGoods(character, content).filter((good) => good.kind === kind);
+  if (goods.length === 0 && kind === 'herb') goods = knownHerbs(1, content).map((herb) => ({ kind, key: herb.id }));
+  if (goods.length === 0 && kind === 'potion') goods = knownPotions(1, content).map((potion) => ({ kind, key: potion.id }));
+  if (goods.length === 0) return null;
+  const rng = createRng(`${seed}:gift:${companion.id}:${week}`);
+  const { key } = rng.pick(goods);
+  const tuning = gifts[kind];
+  const count = rng.int(tuning.min, tuning.max) + Math.floor(tuning.perTenLevels * Math.floor(character.level / 10));
+  return { week, kind, key, count };
+}

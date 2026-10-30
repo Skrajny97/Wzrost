@@ -21,11 +21,12 @@ function plan(ms, now) {
   return { minutes, points, spend: Math.min(minutes, points) };
 }
 
-// A button for one kind of wait (target: activity, rest or build). `left`
-// gives the milliseconds the wait has left at a time; `update` keeps the
-// label right on every tick, and the button hides when there is nothing to
-// skip or no points.
-export function skipControl(target, left, name) {
+// A button for one kind of wait (target: activity, rest, build or wounds).
+// `left` gives the milliseconds the wait has left at a time; `update` keeps
+// the label right on every tick, and the button hides when there is nothing
+// to skip or no points. `body` goes along to the server (the companion of
+// the wounds), and `after` runs once the points are spent.
+export function skipControl(target, left, name, { body = {}, after } = {}) {
   const label = h('span', {});
   const cost = h('span', { class: 'time-cost' });
   const element = h(
@@ -34,7 +35,7 @@ export function skipControl(target, left, name) {
       type: 'button',
       class: 'button button--time',
       'data-guide': `skip-${target}`,
-      onClick: (event) => withButton(event.currentTarget, () => skip(target, left, name)),
+      onClick: (event) => withButton(event.currentTarget, () => skip(target, left, name, body, after)),
     },
     timePointsArt(20),
     label,
@@ -51,7 +52,7 @@ export function skipControl(target, left, name) {
   return { element, update };
 }
 
-async function skip(target, left, name) {
+async function skip(target, left, name, body, after) {
   const now = serverNow();
   const { minutes, points, spend } = plan(left(now), now);
   if (spend < 1) return;
@@ -61,7 +62,8 @@ async function skip(target, left, name) {
     confirmLabel: 'Przewiń',
   });
   if (!sure) return;
-  const { spent } = await call('POST', '/api/time/skip', { target });
+  const { spent } = await call('POST', '/api/time/skip', { ...body, target });
   playSound('system');
   toast(`Przewinięto ${formatMinutes(spent)}.`);
+  after?.();
 }
