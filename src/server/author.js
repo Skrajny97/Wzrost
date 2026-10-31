@@ -9,7 +9,7 @@
 
 import { skillDemo } from '../engine/index.js';
 import { content } from './content.js';
-import { ApiError, json } from './http.js';
+import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requireSession } from './sessions.js';
 
@@ -28,7 +28,7 @@ export async function authorPanel(context) {
   if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const db = context.env.DB;
   const since = context.now - DAY;
-  const [counts, rows] = await db.batch([
+  const [counts, rows, bugs] = await db.batch([
     db
       .prepare(
         `SELECT
@@ -47,10 +47,17 @@ export async function authorPanel(context) {
        ORDER BY u.created_at DESC, u.id DESC
        LIMIT 1000`,
     ),
+    // The players' bug reports (bugs.js): the open ones first, newest first.
+    db.prepare(
+      `SELECT b.*, u.login FROM bug_reports b LEFT JOIN users u ON u.id = b.user_id
+       ORDER BY b.resolved_at IS NOT NULL, b.created_at DESC, b.id DESC
+       LIMIT 200`,
+    ),
   ]);
   const total = counts.results[0];
   return json({
     counts: {
+      bugs: bugs.results.filter((bug) => bug.resolved_at === null).length,
       accounts: total.accounts,
       google: total.google,
       newAccounts: total.new_accounts,
@@ -78,7 +85,36 @@ export async function authorPanel(context) {
       chatMutedUntil: row.chat_muted_until > context.now ? row.chat_muted_until : null,
       chatModerator: row.chat_moderator === 1,
     })),
+    bugs: bugs.results.map((bug) => ({
+      id: bug.id,
+      login: bug.login ?? null,
+      character: bug.character,
+      text: bug.text,
+      screen: bug.screen,
+      version: bug.version,
+      device: bug.device,
+      createdAt: bug.created_at,
+      resolvedAt: bug.resolved_at,
+    })),
   });
+}
+
+// How many bug reports wait for the author, for the dot on the settings.
+export async function openBugReports(db) {
+  return (await db.prepare('SELECT COUNT(*) AS count FROM bug_reports WHERE resolved_at IS NULL').first()).count;
+}
+
+// { id, done }: the author marks a bug report done, or open again.
+export async function resolveBugReport(context) {
+  const session = await requireSession(context);
+  if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  const body = await readJson(context.request);
+  if (!Number.isInteger(body.id)) throw new ApiError(400, 'invalid_report', 'Nie ma takiego zgłoszenia.');
+  const result = await context.env.DB.prepare('UPDATE bug_reports SET resolved_at = ? WHERE id = ?')
+    .bind(body.done === false ? null : context.now, body.id)
+    .run();
+  if (result.meta.changes !== 1) throw new ApiError(404, 'invalid_report', 'Nie ma takiego zgłoszenia.');
+  return json({ ok: true, open: await openBugReports(context.env.DB) });
 }
 
 // The author's preview of the skills: every skill with its class, and a short

@@ -2,7 +2,8 @@
 // Assets before this code runs; only /api/* and unknown paths reach the Worker.
 
 import { deleteAccount, login, logout, me, register } from './accounts.js';
-import { authorPanel, authorSkillDemo, authorSkills } from './author.js';
+import { authorPanel, authorSkillDemo, authorSkills, resolveBugReport } from './author.js';
+import { reportBug } from './bugs.js';
 import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { openEncyclopediaChest, readEncyclopedia } from './encyclopedia.js';
@@ -76,6 +77,8 @@ const routes = [
   ['GET', '/api/me', me],
   ['DELETE', '/api/me', deleteAccount],
   ['GET', '/api/author', authorPanel],
+  ['POST', '/api/author/bugs/resolve', resolveBugReport],
+  ['POST', '/api/bug-reports', reportBug],
   ['GET', '/api/author/skills', authorSkills],
   ['GET', '/api/author/skills/:id', authorSkillDemo],
   ['POST', '/api/author/chat/unmute', unmuteInChat],

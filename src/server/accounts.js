@@ -7,7 +7,7 @@ import { ApiError, json, readJson } from './http.js';
 import { marketRemoval } from './market.js';
 import { hashPassword, needsRehash, verifyPassword } from './passwords.js';
 import { testModeFor, tutorialTestsFor } from './test-mode.js';
-import { isAuthor } from './author.js';
+import { isAuthor, openBugReports } from './author.js';
 import {
   clearedSessionCookie,
   createSession,
@@ -215,6 +215,7 @@ export async function deleteAccount(context) {
     db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM gift_codes_used WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM chest_items WHERE user_id = ?').bind(id),
+    db.prepare('DELETE FROM bug_reports WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM login_failures WHERE identifier IN (?, ?)').bind(login.toLowerCase(), email ?? ''),
     db.prepare('DELETE FROM users WHERE id = ?').bind(id),
   ]);
@@ -231,5 +232,7 @@ export async function me(context) {
     tutorialTests: tutorialTestsFor(context.env, session.user.login),
     author: isAuthor(context.env, session.user),
   };
+  // The author sees on the settings that players' bug reports wait.
+  if (user.author) user.bugReports = await openBugReports(context.env.DB);
   return json({ user }, 200, headers);
 }

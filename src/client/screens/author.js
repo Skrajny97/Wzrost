@@ -29,6 +29,8 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
     try {
       panel = await call('GET', '/api/author');
       error = null;
+      // The dot on the settings follows the reports still open.
+      state.user.bugReports = panel.counts.bugs;
     } catch (failure) {
       error = failure.message;
     }
@@ -107,10 +109,10 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
       h(
         'div',
         { class: 'page-heading page-heading--back' },
-        h('div', { class: 'page-heading-text' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Panel autora' }), h('p', { class: 'page-subtitle', text: 'Konta i postacie w grze' })),
+        h('div', { class: 'page-heading-text' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Panel autora' }), h('p', { class: 'page-subtitle', text: 'Zgłoszenia błędów, konta i postacie' })),
         h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
       ),
-      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [skillsToggle(), skillsPreview(), counts(panel.counts), accounts(panel.accounts)],
+      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [skillsToggle(), skillsPreview(), counts(panel.counts), bugs(panel.bugs), accounts(panel.accounts)],
       h('button', {
         type: 'button',
         class: 'button button--world',
@@ -157,6 +159,31 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
           change('/api/author/chat/moderator', { login: account.login, moderator: !account.chatModerator }),
           account.chatModerator ? 'danger' : 'world',
         ),
+    );
+  }
+
+  // The players' bug reports ("Zgłoś błąd", bugs.js): the open ones, newest
+  // first, each with who sent it, from which screen and version, and
+  // "Załatwione"; the done ones folded below, with "Przywróć".
+  function bugs(list) {
+    const open = list.filter((bug) => !bug.resolvedAt);
+    const done = list.filter((bug) => bug.resolvedAt);
+    const card = (bug) =>
+      h(
+        'li',
+        { class: 'card author-bug' },
+        h('p', { class: 'author-bug-head' }, h('strong', { text: bug.login ?? 'konto usunięte' }), bug.character && ` · ${bug.character}`),
+        h('p', { class: 'author-bug-text', text: bug.text }),
+        h('p', { class: 'author-bug-meta', text: [dateTimeFormat.format(new Date(bug.createdAt)), bug.screen && `ekran ${bug.screen}`, bug.version && `wersja ${bug.version}`].filter(Boolean).join(' · ') }),
+        bug.device && h('p', { class: 'author-bug-meta', text: bug.device }),
+        small(bug.resolvedAt ? 'Przywróć' : 'Załatwione', change('/api/author/bugs/resolve', { id: bug.id, done: !bug.resolvedAt })),
+      );
+    return h(
+      'section',
+      { class: 'stack author-bugs', 'aria-label': 'Zgłoszenia błędów' },
+      h('h2', { class: 'card-title', text: open.length > 0 ? `Zgłoszenia błędów: nowe ${open.length}` : 'Zgłoszenia błędów' }),
+      open.length === 0 ? h('p', { class: 'muted', text: 'Brak nowych zgłoszeń.' }) : h('ol', { class: 'author-bug-list' }, open.map(card)),
+      done.length > 0 && h('details', { class: 'author-bugs-done' }, h('summary', { text: `Załatwione (${done.length})` }), h('ol', { class: 'author-bug-list' }, done.map(card))),
     );
   }
 

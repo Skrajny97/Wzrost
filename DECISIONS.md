@@ -2996,6 +2996,20 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Zgłoś błąd (31.10.2026, na wersji testowej)
+
+Autor: „Trzeba dodac przycisk Zgłoś błąd i zeby przychodzil mi w Panel Autora albo gdzieś wiadomości skoro poszło delikatnie w sieć”.
+
+1. **Przycisk.** W Ustawieniach, zaraz pod „Dziennik”, jest „Zgłoś błąd”. Otwiera okno z polem na opis i przyciskiem „Wyślij”.
+2. **Co dochodzi samo:** ekran, na którym gracz był, numer wersji gry, postać (imię, klasa i poziomy) oraz przeglądarka telefonu.
+3. **Panel autora.** Zgłoszenia są na górze Panelu autora, nowe najpierw. Każde ma przycisk „Załatwione”. Załatwione zgłoszenia są zwinięte niżej, z przyciskiem „Przywróć”.
+4. **Kropka.** Gdy czekają nowe zgłoszenia, zębatka ustawień na koncie autora ma złotą kropkę, a przycisk „Panel autora” podaje ich liczbę.
+5. **Brakujące szczegóły:**
+    - opis ma od 10 do 2000 znaków;
+    - jedno konto wyśle najwyżej 5 zgłoszeń na dobę;
+    - zgłoszenia znikają razem z usuniętym kontem.
+6. **Migracja bazy:** 0062 (tabela `bug_reports`).
+
 ## Wersja 0.0.68 (31.10.2026)
 
 Autor: „Wdrażaj 0.0.68 z Osadą”.

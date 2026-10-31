@@ -666,6 +666,7 @@ function openSettings() {
     // The reports and System messages: the Dziennik has no tab in the bottom
     // bar.
     h('a', { class: 'button button--world settings-journal', href: '#/dziennik', onClick: closeSheet }, icon('book', { size: 20 }), 'Dziennik'),
+    h('button', { type: 'button', class: 'button button--world', onClick: openBugReport, text: 'Zgłoś błąd' }),
     h(
       'dl',
       { class: 'status-list' },
@@ -691,7 +692,13 @@ function openSettings() {
     state.user.tutorialTests && state.character && h('button', { type: 'button', class: 'button button--system', onClick: () => openEvolutionTests().catch((error) => toast(error.message)), text: 'Testuj ewolucję' }),
     state.user.tutorialTests && state.character && h('button', { type: 'button', class: 'button button--system', onClick: openSettlementTests, text: 'Testuj Osadę' }),
     installButton(),
-    state.user.author && h('a', { class: 'button button--system', href: '#/autor', onClick: closeSheet, text: 'Panel autora' }),
+    state.user.author &&
+      h('a', {
+        class: `button button--system${state.user.bugReports > 0 ? ' settings-author--news' : ''}`,
+        href: '#/autor',
+        onClick: closeSheet,
+        text: state.user.bugReports > 0 ? `Panel autora · nowe zgłoszenia: ${state.user.bugReports}` : 'Panel autora',
+      }),
     h('button', { type: 'button', class: 'button button--world', onClick: changeCharacter, text: 'Zmień postać' }),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
     h('button', { type: 'button', class: 'button button--danger', onClick: startOver, text: 'Zacznij od nowa' }),
@@ -704,6 +711,38 @@ function openSettings() {
     .catch(() => {
       version.textContent = 'brak połączenia';
     });
+}
+
+// "Zgłoś błąd" (the author: "Trzeba dodac przycisk Zgłoś błąd i zeby
+// przychodzil mi w Panel Autora"): what went wrong, in the player's words;
+// the server adds the game's version and the character, and this the screen
+// the player was on under the settings.
+function openBugReport() {
+  const screen = location.hash;
+  const text = h('textarea', { class: 'bug-text', id: 'bug-text', rows: '6', maxlength: '2000', placeholder: 'Np. po stuknięciu „Wyrusz” ekran przestał reagować.' });
+  openSheet(
+    h('h2', { class: 'sheet-title', text: 'Zgłoś błąd' }),
+    h('p', { class: 'sheet-text', text: 'Opisz, co się stało i co było wtedy na ekranie. Gra sama dołączy numer wersji, ekran, na którym jesteś, i Twoją postać.' }),
+    h('label', { class: 'field-label', for: 'bug-text', text: 'Opis błędu' }),
+    text,
+    h(
+      'div',
+      { class: 'sheet-actions' },
+      h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+      h('button', {
+        type: 'button',
+        class: 'button button--system',
+        text: 'Wyślij',
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            await call('POST', '/api/bug-reports', { text: text.value, screen });
+            closeSheet();
+            toast('Dzięki! Zgłoszenie trafiło do autora gry.');
+          }),
+      }),
+    ),
+  );
+  text.focus();
 }
 
 async function logout(event) {

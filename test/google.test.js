@@ -302,7 +302,7 @@ describe('Google sign-in', () => {
     assert.equal((await call('GET', '/api/me', { cookie: player.cookie })).data.user.author, false);
 
     const panel = (await call('GET', '/api/author', { cookie: author.cookie })).data;
-    assert.deepEqual(panel.counts, { accounts: 3, google: 2, newAccounts: 3, characters: 1, newCharacters: 1 });
+    assert.deepEqual(panel.counts, { bugs: 0, accounts: 3, google: 2, newAccounts: 3, characters: 1, newCharacters: 1 });
     assert.deepEqual(
       panel.accounts.map((account) => [account.login, account.email, account.google, account.emailConfirmed, account.character?.name ?? null]),
       [

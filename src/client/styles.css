@@ -8541,6 +8541,67 @@ a.profession-square:active {
   min-width: 0;
 }
 
+/* "Zgłoś błąd": the player's words, a few lines tall. */
+.bug-text {
+  width: 100%;
+  min-height: 140px;
+  padding: 10px 12px;
+  border: 1px solid var(--bark-line);
+  border-radius: 0;
+  background: var(--bg-deep);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.bug-text:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+/* The settings' gear with a dot when bug reports wait for the author. */
+.settings-button--ready {
+  position: relative;
+}
+
+.settings-button--ready::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--bg-deep);
+}
+
+/* The bug reports in the author's panel. */
+.author-bug-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.author-bug p {
+  margin: 0;
+}
+
+.author-bug-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.author-bug-meta {
+  color: var(--text-muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
 .trade-number {
   flex: none;
   width: 104px;

@@ -120,6 +120,9 @@ export function buildTopbar(onSettings) {
   const speedTime = h('span', { class: 'speed-chip-time' });
   const speed = h('a', { class: 'speed-chip', href: '#/postac', hidden: true }, icon('flask', { size: 16 }), speedTime);
 
+  // The settings, with a dot for the author when players' bug reports wait.
+  const settings = h('button', { type: 'button', class: 'icon-button', 'aria-label': 'Ustawienia', onClick: onSettings }, icon('gear'));
+
   const element = $('#topbar');
   fill(element,
     h(
@@ -132,7 +135,7 @@ export function buildTopbar(onSettings) {
         { class: 'topbar-right' },
         goldButton,
         camp,
-        h('button', { type: 'button', class: 'icon-button', 'aria-label': 'Ustawienia', onClick: onSettings }, icon('gear')),
+        settings,
       ),
     ),
     wallet,
@@ -141,6 +144,7 @@ export function buildTopbar(onSettings) {
     h('div', { class: 'activity-row' }, encyclopedia, speed, activity),
   );
   topbar = {
+    settings,
     level,
     classLevel,
     className,
@@ -238,6 +242,10 @@ export function updateTopbar(now = serverNow()) {
     `Złoto: ${formatNumber(character.gold)}, Punkty Systemu: ${formatNumber(character.systemPoints)}. Zasoby`,
   );
   if (!topbar.wallet.hidden) refreshWallet(now);
+  // A dot on the settings when players' bug reports wait for the author.
+  const reports = state.user?.bugReports ?? 0;
+  topbar.settings.classList.toggle('settings-button--ready', reports > 0);
+  topbar.settings.setAttribute('aria-label', reports > 0 ? `Ustawienia, nowe zgłoszenia błędów: ${reports}` : 'Ustawienia');
   // A dot when a chest of the Encyklopedia or a Bestiariusz waits.
   const chests = (character.encyclopedia?.ready ?? 0) + bestiaryReady(character, state.content);
   topbar.encyclopedia.classList.toggle('encyclopedia-button--ready', chests > 0);
