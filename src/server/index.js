@@ -33,7 +33,8 @@ import {
 import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
-import { readFeatures, registrationOpen } from './features.js';
+import { readFeatures, registrationOpen, settlementOn } from './features.js';
+import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, getMarket, listOffer, settleMarket } from './market.js';
 import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { discardHerbs, sellHerbs, startGathering } from './professions.js';
@@ -151,6 +152,13 @@ const routes = [
   ['POST', '/api/settlement/hermit', hermitService],
   ['POST', '/api/settlement/tavern', buyMug],
   ['POST', '/api/settlement/hire', hireCompanion],
+  ['GET', '/api/market', getMarket],
+  ['POST', '/api/market/list', listOffer],
+  ['POST', '/api/market/bid', bidOnOffer],
+  ['POST', '/api/market/buy', buyOffer],
+  ['POST', '/api/market/cancel', cancelOffer],
+  ['POST', '/api/market/collect', collectParcels],
+  ['POST', '/api/market/resident', buyFromResident],
   ['POST', '/api/settlement/dismiss', dismissCompanion],
   ['POST', '/api/settlement/gift', takeCompanionGift],
   ['POST', '/api/settlement/equip', equipCompanion],
@@ -263,6 +271,8 @@ export default {
   async scheduled(controller, env) {
     readFeatures(env);
     await renameBlockedNames(env, controller.scheduledTime);
+    // The Targowisko's offers that ended (market.js), where the Osada is.
+    if (settlementOn()) await settleMarket(env.DB, controller.scheduledTime);
     await sendNotifications(env, controller.scheduledTime);
   },
 };

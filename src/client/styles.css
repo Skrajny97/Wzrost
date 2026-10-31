@@ -9266,3 +9266,62 @@ a.profession-square:active {
   flex-wrap: wrap;
   gap: 8px;
 }
+
+/* The Targowisko (screens/market.js): its tabs, the offers as cards, and
+   the lists of goods to put up and of parcels to collect. */
+.market-tabs {
+  margin-top: 0;
+}
+
+.market-list,
+.market-picks {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.market-offer {
+  display: grid;
+  gap: 6px;
+}
+
+.market-offer p,
+.market-intro p {
+  margin: 0;
+}
+
+.market-intro {
+  display: grid;
+  gap: 6px;
+}
+
+.market-price {
+  font-family: var(--font-system);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.market-leading {
+  align-self: center;
+  color: var(--system);
+  font-weight: 600;
+}
+
+.market-pick {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.market-pick > .item-summary-art {
+  flex: 1;
+}
+
+.market-reason {
+  flex: none;
+  font-size: 13px;
+  text-align: right;
+}

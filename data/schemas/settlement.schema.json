@@ -246,6 +246,47 @@
       }
     },
     "tavern": { "type": "object", "additionalProperties": false, "required": ["resident", "relationGain", "mugGoldPerLevel", "rumor"], "properties": { "resident": { "type": "string", "description": "Karczmarz: id mieszkańca, przy którym rośnie relacja o relationGain za kufel." }, "relationGain": { "type": "integer", "minimum": 0 }, "mugGoldPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "rumor": { "type": "object", "additionalProperties": false, "required": ["factor", "newest", "lines"], "properties": { "factor": { "type": "number", "minimum": 1 }, "newest": { "type": "integer", "minimum": 1 }, "lines": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } } } },
+    "market": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hours", "fee", "offers", "brotherhood", "minRaise", "maxPrice", "kinds", "reputation", "merchant", "wanderer", "testSeller", "testMinutes"],
+      "description": "Targowisko (część III, pytania 237–242): oferty graczy jak aukcje i oferty mieszkańców (src/engine/market.js). Oferta trwa hours godzin, z ceną wywoławczą i opcjonalną ceną „Kup teraz”. Targowisko bierze fee ceny sprzedaży. Postać ma naraz offers ofert i jedną więcej na każdy stopień reputacji bractwa brotherhood ponad pierwszy. Kolejna oferta w licytacji to co najmniej minRaise więcej, nie mniej niż złoto więcej. Ceny do maxPrice. kinds: co da się wystawić. reputation: punkt reputacji bractwa za każde goldPerPointPerLevel złota razy poziom postaci z handlu, najwyżej daily dziennie. merchant: kupiec codziennie sprzedaje goods sztuk rodzajów (zioła, materiały rzadkości materialRarities, części rzadkości partRarities) po cenie margin razy więcej niż najwyższa cena skupu u NPC, razy wahanie dnia z zakresu swing; postać kupi dziennie do stock sztuk każdego. wanderer: raz w tygodniu, na dobę, wędrowny handlarz ma items przedmiotów na poziom postaci, rzadkości losowanych z wagami rarities, po cenie priceFactor razy tyle, ile płaci złomiarz. testSeller i testMinutes: na wersji testowej „Testuj Osadę” wystawia próbne oferty od tego handlarza, na tyle minut.",
+      "properties": {
+        "hours": { "type": "number", "exclusiveMinimum": 0 },
+        "fee": { "type": "number", "minimum": 0, "exclusiveMaximum": 1 },
+        "offers": { "type": "integer", "minimum": 1 },
+        "brotherhood": { "type": "string" },
+        "minRaise": { "type": "number", "minimum": 0 },
+        "maxPrice": { "type": "integer", "minimum": 1 },
+        "testSeller": { "type": "string", "minLength": 1 },
+        "testMinutes": { "type": "integer", "minimum": 1 },
+        "kinds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["item", "herb", "potion", "material", "part"] } },
+        "reputation": { "type": "object", "additionalProperties": false, "required": ["goldPerPointPerLevel", "daily"], "properties": { "goldPerPointPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "daily": { "type": "integer", "minimum": 0 } } },
+        "merchant": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["goods", "materialRarities", "partRarities", "margin", "swing", "stock"],
+          "properties": {
+            "goods": { "type": "object", "additionalProperties": false, "required": ["herb", "material", "part"], "properties": { "herb": { "type": "integer", "minimum": 0 }, "material": { "type": "integer", "minimum": 0 }, "part": { "type": "integer", "minimum": 0 } } },
+            "materialRarities": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "partRarities": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "margin": { "type": "number", "exclusiveMinimum": 1 },
+            "swing": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "exclusiveMinimum": 0 } },
+            "stock": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "wanderer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["items", "rarities", "priceFactor"],
+          "properties": {
+            "items": { "type": "integer", "minimum": 1 },
+            "rarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 } },
+            "priceFactor": { "type": "number", "exclusiveMinimum": 1 }
+          }
+        }
+      }
+    },
     "companions": { "type": "object", "additionalProperties": false, "required": ["priceByStanding", "candidates", "levelSpread", "goldPerLevel", "xpShare", "catchUp", "skillStep", "thirdTraitChance", "xpCost", "names", "traits", "professions", "gifts", "stories"], "properties": { "priceByStanding": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }, "description": "Mnożnik ceny werbunku przy każdym stopniu relacji z karczmarzem (id stopnia: mnożnik). Werbunek działa przy każdym stopniu; im wyższy stopień, tym taniej." }, "candidates": { "type": "integer", "minimum": 1 }, "levelSpread": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "integer" } }, "goldPerLevel": { "type": "number", "minimum": 0 }, "xpShare": { "type": "number", "minimum": 0 }, "catchUp": { "type": "number", "minimum": 0 }, "skillStep": { "type": "integer", "minimum": 1 }, "thirdTraitChance": { "type": "number", "minimum": 0, "maximum": 1 }, "xpCost": { "type": "number", "minimum": 0, "maximum": 1 }, "names": { "type": "object", "additionalProperties": false, "required": ["female", "male"], "properties": { "female": { "type": "array", "minItems": 4, "items": { "type": "string" } }, "male": { "type": "array", "minItems": 4, "items": { "type": "string" } } } }, "traits": { "type": "array", "minItems": 3, "items": { "type": "object", "additionalProperties": false, "required": ["id", "names", "text"], "properties": { "id": { "type": "string" }, "names": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } }, "text": { "type": "string" }, "damage": { "type": "number" }, "armor": { "type": "number" }, "hp": { "type": "number" }, "dodge": { "type": "number" }, "crit": { "type": "number" }, "speed": { "type": "number" }, "will": { "type": "number" } } } }, "professions": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["id", "name", "goods"], "properties": { "id": { "type": "string" }, "name": { "type": "string" }, "goods": { "type": "string", "enum": ["herb", "potion", "part"] } } } }, "gifts": { "type": "object", "additionalProperties": { "type": "object", "additionalProperties": false, "required": ["min", "max", "perTenLevels"], "properties": { "min": { "type": "integer", "minimum": 1 }, "max": { "type": "integer", "minimum": 1 }, "perTenLevels": { "type": "number", "minimum": 0 } } } }, "stories": { "type": "array", "minItems": 1, "items": { "type": "string" } } } },
     "imbue": { "type": "object", "additionalProperties": false, "required": ["resident", "relationGain", "goldPerLevel", "materialCount", "weaponShare", "resistRarity", "slots", "elements"], "properties": { "resident": { "type": "string", "description": "Zaklinaczka: id mieszkańca, przy którym rośnie relacja za zaklęcie." }, "relationGain": { "type": "integer", "minimum": 0 }, "goldPerLevel": { "type": "number", "minimum": 0 }, "materialCount": { "type": "integer", "minimum": 0 }, "weaponShare": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }, "resistRarity": { "type": "string" }, "slots": { "type": "array", "minItems": 1, "items": { "type": "string" } }, "elements": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["element", "material"], "properties": { "element": { "type": "string" }, "material": { "type": "string" } } } } } },
     "herbalist": { "type": "object", "additionalProperties": false, "required": ["resident", "brotherhood", "premium", "reputation"], "properties": { "resident": { "type": "string", "description": "Zielarka: id mieszkańca, przy którym rośnie relacja za handel." }, "brotherhood": { "type": "string", "description": "Bractwo, u którego rośnie reputacja za handel." }, "premium": { "type": "array", "minItems": 1, "items": { "type": "number", "minimum": 0 }, "description": "O ile więcej niż złomiarz płaci zielarka, według stopnia relacji z nią." }, "reputation": { "type": "object", "additionalProperties": false, "required": ["goldPerPointPerLevel", "daily"], "properties": { "goldPerPointPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "daily": { "type": "integer", "minimum": 0 } } } } }

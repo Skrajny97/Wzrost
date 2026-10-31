@@ -467,8 +467,8 @@ export function herbalistPremium(points, content) {
 // a point for every goldPerPointPerLevel gold times the character's level,
 // at most `daily` a day. `stored` is the day's count so far ({ day, points
 // }); the answer has the points now and the day's count after them.
-export function tradePoints(gold, level, stored, now, content) {
-  const { goldPerPointPerLevel, daily } = content.settlement.herbalist.reputation;
+export function tradePoints(gold, level, stored, now, content, tuning = content.settlement.herbalist.reputation) {
+  const { goldPerPointPerLevel, daily } = tuning;
   const day = questPeriod('daily', now, content).key;
   const before = stored?.day === day ? stored.points : 0;
   const points = Math.max(0, Math.min(daily - before, Math.floor(gold / (goldPerPointPerLevel * level))));

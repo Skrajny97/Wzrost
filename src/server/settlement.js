@@ -76,6 +76,7 @@ import {
 import { toHex } from './encoding.js';
 import { evolutionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
+import { testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
 
 // A JSON path for a key with a hyphen or a colon ("iron-ore", "wolf-pelt:rare").
@@ -111,6 +112,10 @@ export function settlementOf(row) {
     ...(stored.companions && { companions: stored.companions }),
     ...(stored.dismissed && { dismissed: stored.dismissed }),
     ...(stored.trade && { trade: stored.trade }),
+    // The Targowisko: the residents' goods bought today and this week, and
+    // the reputation its trade gave today (market.js).
+    ...(stored.market && { market: stored.market }),
+    ...(stored.marketTrade && { marketTrade: stored.marketTrade }),
     ...(stored.test && { test: true }),
   };
 }
@@ -144,7 +149,7 @@ const affixLabel = (item, index) => {
   return `${propertyName(affix.stat, content)}: +${affix.value}`;
 };
 
-function requireOpen(row) {
+export function requireOpen(row) {
   const unlock = content.unlocksById.settlement;
   if (!settlementOn() || !content.settlement) throw new ApiError(404, 'not_found', 'Osady jeszcze nie ma.');
   if (row.level < unlock.level && !settlementOf(row).test) throw new ApiError(403, 'locked', `Osadę odblokujesz na poziomie postaci ${unlock.level}.`);
@@ -203,6 +208,8 @@ export function settlementView(player, stored, board, now) {
       pending: pendingView(pendingOf(stored, player.items)),
     },
     tavern: tavernView(player.row, stored, now),
+    // The parcels waiting at the Targowisko (market.js), for its dot.
+    market: { waiting: player.marketWaiting ?? 0 },
     companions: companionsView(player, stored, now),
     herbalist: herbalistView(player, stored, now),
     imbue: imbueView(player),
@@ -945,8 +952,9 @@ export async function settlementTests(context) {
 
 // { action }: "open" opens the Osada below its level, "standing" (with
 // `standing`) puts every brotherhood's reputation and every resident's
-// relation at that standing's points, and "orders" brings new orders to
-// every slot of the board and this week's big one back.
+// relation at that standing's points, "orders" brings new orders to every
+// slot of the board and this week's big one back, and "market" and
+// "marketEnd" try the Targowisko (market.js).
 export async function testSettlement(context) {
   const { session, player } = await requireTester(context);
   const { row } = player;
@@ -962,6 +970,8 @@ export async function testSettlement(context) {
     next = { ...stored, reputation: everyone(content.settlement.brotherhoods), relations: everyone(content.settlement.residents) };
   } else if (body.action === 'orders') {
     next = { ...stored, board: stored.board && { ...stored.board, slots: stored.board.slots.map(() => ({ readyAt: context.now })), weekly: null } };
+  } else if (body.action === 'market' || body.action === 'marketEnd') {
+    next = await testMarket(context.env.DB, player, stored, body.action, context.now);
   } else {
     throw new ApiError(400, 'invalid_action', 'Nie ma takiego testu.');
   }

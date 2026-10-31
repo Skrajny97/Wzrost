@@ -850,8 +850,8 @@ async function openEventTests() {
 }
 
 // "Testuj Osadę" on the test version (settlement.js): the Osada below its
-// level, every brotherhood and resident at one standing, and new orders on
-// the whole board at once.
+// level, every brotherhood and resident at one standing, new orders on the
+// whole board at once, and the Targowisko's trial offers and their end.
 async function openSettlementTests() {
   let standings;
   try {
@@ -860,12 +860,12 @@ async function openSettlementTests() {
     toast(error.message);
     return;
   }
-  const run = (body, message) => (event) =>
+  const run = (body, message, hash = '#/osada') => (event) =>
     withButton(event.currentTarget, async () => {
       await call('POST', '/api/test/settlement', body);
       closeSheet();
       toast(message);
-      navigate('#/osada');
+      navigate(hash);
     });
   const unlock = unlockInfo('settlement');
   openSheet(
@@ -889,6 +889,16 @@ async function openSettlementTests() {
       ),
     ),
     h('button', { type: 'button', class: 'button button--system', text: 'Nowe zlecenia', onClick: run({ action: 'orders' }, 'Na tablicy wiszą nowe zlecenia.') }),
+    h('p', {
+      class: 'sheet-text',
+      text: 'Targowisko: „Próbne oferty” wystawiają przedmiot, zioła i materiał od handlarza próbnego na 15 minut, a wędrowny handlarz przychodzi dziś. „Zakończ licytacje” kończy od razu Twoje oferty i oferty handlarza próbnego.',
+    }),
+    h(
+      'div',
+      { class: 'settlement-test-standings' },
+      h('button', { type: 'button', class: 'button button--system button--small', text: 'Próbne oferty', onClick: run({ action: 'market' }, 'Na Targowisku czekają próbne oferty.', '#/osada/market') }),
+      h('button', { type: 'button', class: 'button button--system button--small', text: 'Zakończ licytacje', onClick: run({ action: 'marketEnd' }, 'Licytacje zakończone.', '#/osada/market') }),
+    ),
   );
 }
 

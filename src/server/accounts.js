@@ -4,6 +4,7 @@ import { sendLink } from './email.js';
 import { registrationOpen } from './features.js';
 import { googleConfigured } from './google.js';
 import { ApiError, json, readJson } from './http.js';
+import { marketRemoval } from './market.js';
 import { hashPassword, needsRehash, verifyPassword } from './passwords.js';
 import { testModeFor, tutorialTestsFor } from './test-mode.js';
 import { isAuthor } from './author.js';
@@ -208,6 +209,7 @@ export async function deleteAccount(context) {
     ...['reports', 'activities', 'avatar_activities', 'items', 'buildings'].map((table) =>
       db.prepare(`DELETE FROM ${table} WHERE character_id IN (${characters})`).bind(id),
     ),
+    ...marketRemoval(db, characters, [id]),
     db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(id),

@@ -81,6 +81,7 @@ import { relationTo } from './community.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
+import { marketRemoval } from './market.js';
 import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
@@ -129,11 +130,12 @@ export async function loadPlayer(db, userId) {
 
 // A character's row with its items, activities and camp buildings.
 async function playerOf(db, row) {
-  const [items, activities, avatarActivities, buildings] = await db.batch([
+  const [items, activities, avatarActivities, buildings, parcels] = await db.batch([
     db.prepare('SELECT id, slot, data FROM items WHERE character_id = ? ORDER BY id').bind(row.id),
     db.prepare('SELECT * FROM activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT * FROM avatar_activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT building_id, level, started_at, ends_at, collected_at FROM buildings WHERE character_id = ?').bind(row.id),
+    db.prepare('SELECT COUNT(*) AS waiting FROM market_parcels WHERE character_id = ?').bind(row.id),
   ]);
   return {
     row,
@@ -142,6 +144,8 @@ async function playerOf(db, row) {
     activity: activities.results[0] ?? null,
     // The work of the Awatar Systemu, kept as the character's own (avatar.js).
     avatarActivity: avatarActivities.results[0] ?? null,
+    // What waits to be collected at the Targowisko (market.js).
+    marketWaiting: parcels.results[0]?.waiting ?? 0,
     // { campfire: { level, startedAt, endsAt, collectedAt } }: see camp.js in the engine.
     buildings: Object.fromEntries(
       buildings.results.map((building) => [
@@ -366,10 +370,12 @@ export function settlementBoard(row, stored, now) {
 }
 
 // Whether an order on the board, the week's included, can be delivered
-// now: the dot on the Osada tab. The bag stays at hand while the character
-// is away, so every order counts then too.
-function settlementWaiting(row, items, now) {
+// now, or something waits at the Targowisko: the dot on the Osada tab. The
+// bag stays at hand while the character is away, so every order counts
+// then too.
+function settlementWaiting(row, items, now, parcels = 0) {
   if (!settlementOpen(row)) return false;
+  if (parcels > 0) return true;
   const stored = JSON.parse(row.settlement ?? '{}');
   const board = settlementBoard(row, { board: stored.board ?? null, reputation: stored.reputation ?? {} }, now);
   const goods = settlementGoods(row, items);
@@ -911,7 +917,7 @@ export function characterView(player, now) {
     canRename: !row.name_changed,
     nameNotice: row.name_notice ?? null,
     // An order of the Osada that can be delivered now lights its tab.
-    settlementWaiting: settlementWaiting(row, items, now),
+    settlementWaiting: settlementWaiting(row, items, now, player.marketWaiting),
     huntDurations: huntDurations(row.level, content),
     // Szybkie Polowania left today (hunts.js), or null below their level.
     quickHunts: quickHuntsView(row, now),
@@ -1316,6 +1322,7 @@ export function characterRemoval(db, id) {
     db.prepare('DELETE FROM avatar_activities WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM items WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
+    ...marketRemoval(db, '?', [id]),
     db.prepare('DELETE FROM characters WHERE id = ?').bind(id),
   ];
 }

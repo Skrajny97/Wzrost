@@ -7,7 +7,7 @@
     { "id": "enchanter", "name": "Pracownia Zaklinaczki", "x": 21, "y": 23, "resident": "enchantress" },
     { "id": "hermitage", "name": "Chata Pustelnika", "x": 78, "y": 81, "resident": "hermit" },
     { "id": "tavern", "name": "Karczma", "x": 84, "y": 43, "resident": "innkeeper" },
-    { "id": "market", "name": "Targowisko", "x": 45.5, "y": 46, "soon": true },
+    { "id": "market", "name": "Targowisko", "x": 45.5, "y": 46 },
     { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist" }
   ],
   "torches": [
@@ -187,6 +187,27 @@
     "brotherhood": "herbalists",
     "premium": [0.1, 0.15, 0.2, 0.25, 0.3],
     "reputation": { "goldPerPointPerLevel": 5, "daily": 10 }
+  },
+  "market": {
+    "hours": 24,
+    "fee": 0.05,
+    "offers": 5,
+    "brotherhood": "merchants",
+    "minRaise": 0.05,
+    "maxPrice": 100000000,
+    "kinds": ["item", "herb", "potion", "material", "part"],
+    "reputation": { "goldPerPointPerLevel": 5, "daily": 10 },
+    "merchant": {
+      "goods": { "herb": 2, "material": 2, "part": 2 },
+      "materialRarities": ["rare", "unique", "epic"],
+      "partRarities": ["common", "rare", "unique", "epic"],
+      "margin": 1.5,
+      "swing": [0.9, 1.15],
+      "stock": 10
+    },
+    "wanderer": { "items": 3, "rarities": { "rare": 3, "epic": 1 }, "priceFactor": 6 },
+    "testSeller": "Handlarz próbny",
+    "testMinutes": 15
   },
   "companions": {
     "priceByStanding": { "stranger": 2, "acquaintance": 1.6, "regular": 1.3, "trusted": 1.1, "friend": 1 },

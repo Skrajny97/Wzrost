@@ -19,6 +19,7 @@ import { dayPart } from '../scenes.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { itemSummary } from './character.js';
+import { mountMarket } from './market.js';
 
 // What is left of an order's week on the board: days, then hours.
 function timeLeft(ms) {
@@ -41,6 +42,16 @@ export function mountSettlement(container, { params = {} } = {}) {
   // The orders the player unfolded: the Tablica lists them folded to their
   // names (the author: "powinny być zwinięte do nazw").
   const unfolded = new Set();
+  // The Targowisko's panel, mounted once and kept while the screen redraws
+  // itself, so that a redraw does not ask the server for it again.
+  let market = null;
+  const marketPanel = () => {
+    if (!market) {
+      const holder = h('div', { class: 'market' });
+      market = { holder, ...mountMarket(holder) };
+    } else market.refresh();
+    return market.holder;
+  };
 
   async function load() {
     try {
@@ -153,7 +164,7 @@ export function mountSettlement(container, { params = {} } = {}) {
           h('strong', { text: name }),
           `: ${standing.name}`,
           standing.next ? `, ${formatNumber(standing.toNext)} pkt do stopnia ${standing.next.name}` : '',
-          goods.length === 0 ? ' (handel na Targowisku, wkrótce)' : '',
+          goods.length === 0 ? ' (handel na Targowisku)' : '',
         ),
       ),
     );
@@ -778,7 +789,8 @@ export function mountSettlement(container, { params = {} } = {}) {
   }
 
   // A place on the board: its picture at its own size on the ground, its
-  // name, and a dot on the Tablica when an order waits.
+  // name, and a dot on the Tablica when an order waits, on the Targowisko
+  // when a parcel does.
   function placeLink(place) {
     const hash = `${SETTLEMENT}/${place.id}`;
     const art = settlementPlaceArt(place.id);
@@ -795,7 +807,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       },
       art ? h('span', { class: 'settlement-place-art-box' }, art) : h('span', { class: 'settlement-place-empty' }),
       h('span', { class: 'settlement-place-label', text: place.name }),
-      place.id === 'board' && deliverable() && h('span', { class: 'settlement-place-dot', 'aria-hidden': 'true' }),
+      ((place.id === 'board' && deliverable()) || (place.id === 'market' && data.market?.waiting > 0)) && h('span', { class: 'settlement-place-dot', 'aria-hidden': 'true' }),
     );
     if (art) {
       const size = () => (link.style.width = `${(art.naturalWidth / BOARD_WIDTH) * 100}%`);
@@ -846,6 +858,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       resident && residentCard(resident),
       !place.soon && resident && services(resident),
       place.id === 'board' && [boardCard(), brotherhoodsCard()],
+      place.id === 'market' && !place.soon && marketPanel(),
     );
   }
 
@@ -873,6 +886,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     unmount() {
       gone = true;
       clearTimeout(timer);
+      market?.unmount();
     },
   };
 }

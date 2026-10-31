@@ -2996,6 +2996,28 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Osada, część III: Targowisko (31.10.2026, na wersji testowej)
+
+Autor przy pytaniach 237–242: „237 A / 238 A / 239 A / 240 A / 241 tak / 242 A”, a potem: „To szykuj Targowisko”.
+
+1. **Co się wystawia (237 A).** Przedmioty z plecaka (bez założonych), zioła, mikstury, materiały i części. Wystawione rzeczy od razu znikają z postaci i czekają na Targowisku.
+2. **Licytacja (238 A).** Oferta trwa 24 godziny. Ma cenę wywoławczą i, jeśli sprzedający chce, cenę „Kup teraz”. Licytujący płaci od razu, a gdy ktoś go przebije, złoto wraca do niego od razu. „Kup teraz” kończy ofertę na miejscu i oddaje złoto temu, kto prowadził.
+3. **Opłata (239 A).** Targowisko bierze 5% ceny sprzedaży, zaokrąglone w górę. Sprzedający dostaje resztę.
+4. **Limit ofert (240 A).** Postać ma naraz 5 ofert i jedną więcej na każdy stopień reputacji Kompanii Kupców ponad pierwszy, czyli 9 u Przyjaciela.
+5. **Jak Wymiana (241 tak).** Przedmiot z Targowiska zakłada się od jego poziomu. Postacie z jednego konta nie licytują ani nie kupują od siebie. Zioła, mikstury i materiały z Targowiska nie liczą się do Encyklopedii, jak te z Wymiany.
+6. **Mieszkańcy (242 A).**
+    - **Kupiec** codziennie sprzedaje 2 zioła, 2 materiały rzadkie, unikalne albo epickie i 2 części. Towar i ceny są takie same dla wszystkich i zmieniają się o północy. Postać kupi dziennie do 10 sztuk każdego towaru, a towar trafia od razu do postaci.
+    - **Wędrowny handlarz** przychodzi raz w tygodniu na jeden dzień, ten sam dla wszystkich. Ma 3 przedmioty na poziom postaci i dla jej klasy, rzadkie albo epickie (w proporcji 3 do 1). Każdy przedmiot kosztuje 6 razy tyle, ile płaci za niego złomiarz, i można go kupić raz. Trafia prosto do plecaka i zakłada się go od jego poziomu, jak z Wymiany.
+7. **Brakujące szczegóły:**
+    - **Odbiór.** To, co daje handel, czeka na Targowisku w „Do odebrania”: wygrany albo kupiony towar, towar z oferty bez kupca i złoto ze sprzedaży. „Odbierz wszystko” zabiera złoto, materiały i części zawsze, a przedmioty, zioła i mikstury, póki jest miejsce w plecaku. Gdy coś czeka, Targowisko na planszy Osady i zakładka Osada mają kropkę.
+    - **Wycofanie.** Ofertę da się wycofać tylko, dopóki nikt jej nie licytuje.
+    - **Przebicie.** Kolejna oferta musi być co najmniej o 5% wyższa, a przy małych kwotach o 1 złoto. Licytacja nie może sięgnąć ceny „Kup teraz”: wtedy kupuje się od razu.
+    - **Reputacja Kompanii Kupców.** Handel daje 1 punkt za każde 5 złota razy poziom postaci, najwyżej 10 punktów dziennie, jak u Jagny. Dostaje się je przy odbiorze (sprzedający i kupujący) i przy zakupach u mieszkańców. Towar, który wrócił, nie daje punktów.
+    - **Ceny kupca.** Cena to 1,5 raza tyle, ile za ten towar płaci najhojniejszy NPC (złomiarz z pełnym Skupem złomu, Jagna u Przyjaciela albo najlepsze zlecenie), z dziennym wahaniem od 0,9 do 1,15. Część nigdy nie jest tańsza niż u złomiarza w obozie na 1. poziomie. Dzięki temu zasada z dokumentu, że NPC nie płaci więcej, niż sam sprzedaje, dalej obowiązuje (sprawdza to test).
+    - **Usunięte konto.** Licytujący oferty usuniętej postaci dostają złoto z powrotem. Oferta, którą prowadziła usunięta postać, toczy się dalej bez jej licytacji.
+    - **Test na wersji testowej.** Na jednym koncie nie ma od kogo kupić, więc w „Testuj Osadę” są dwa nowe przyciski. „Próbne oferty”: Handlarz próbny wystawia przedmiot, zioła i materiał na 15 minut, a wędrowny handlarz przychodzi dziś do tej postaci. „Zakończ licytacje” kończy od razu oferty postaci i oferty Handlarza próbnego. Za oferty Handlarza próbnego nikt nie dostaje złota.
+8. **Jeszcze nie ma:** popiersia kupca na Targowisku. Na razie ekran Targowiska nie ma mieszkańca u góry.
+
 ## Werbunek przy każdym stopniu relacji (31.10.2026, na wersji testowej)
 
 Autor: „Są postacie do zwerbowania ale nie moge ich zwerbować. Nie uzależniaj mozliwosci a cene werbunku od stopnia znajomości. Powinienem móc ale drożej niż na wyższym stopniu.”
