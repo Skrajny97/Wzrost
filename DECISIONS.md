@@ -3000,7 +3000,7 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 
 Autor: „285 od nowa bo za dużo ucięte bo i waga i reszta rzeczy, daj zamiast tego coś pełnego”, „Po zwerbowaniu postac powinna zniknąć z Karczmy i pojawić się w Kwaterach - stamtąd ewentualne Odprawy, więcej info o postaci, rozmowa z nią, budowanie relacji, zmiana wyposażenia itp.” oraz „Do tego trzeba zrobić od nowa Samouczek Osady by obejmował wszystko krok po kroku -> Tablica zleceń już jest ale Karczma, Zaklinaczka, Pustelnik i Zielarka tylko pobieżnie albo wcale. Nie wspominając o samouczku Targowiska.”
 
-1. **Popiersie Gościwita (285 od nowa).** Nowe wersje pokazują kupca do pasa: z niską futrzaną czapką, całą wagą, pasem i sakiewką, na gładkim tle. Wysokiej czapki generator nie mieścił w obrazku.
+1. **Popiersie Gościwita (285 od nowa, potem „285 B”).** Nowe wersje pokazują kupca do pasa: z niską futrzaną czapką, całą wagą, pasem i sakiewką, na gładkim tle (wysokiej czapki generator nie mieścił w obrazku). Autor wybrał wersję B, wyciętą z tła razem z kieszonką tła przy łokciu.
 2. **Towarzysze w Kwaterach.** W Karczmie zostają tylko kandydaci z przyciskiem „Zwerbuj” oraz zdanie z liczbą posłań i odnośnikiem do Kwater. Zwerbowany towarzysz mieszka w Kwaterach w obozie. Tam jest jego karta (klasa, poziom, liczby, cechy, umiejętności, historia), sprzęt („Załóż z plecaka”), prezent tygodnia, rany i „Odpraw”.
 3. **Rozmowa i relacja z towarzyszem** to nowe mechaniki, więc czekają na decyzję autora (pytania 295 i 296).
 4. **Samouczek Osady.** Wycieczka po planszy zostaje (powitanie, Tablica zleceń, bractwa). Ostatnia kwestia wskazuje teraz wszystkie miejsca i zapowiada resztę. Potem narrator opowiada o każdym miejscu przy pierwszej wizycie, krok po kroku:
