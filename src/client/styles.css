@@ -3788,6 +3788,16 @@ img.area-art {
   font-style: italic;
 }
 
+/* Further on (a choice that led to another), the event's first words step
+   back, and each choice made reads in plain type below them. */
+.event-text--before {
+  color: var(--text-muted);
+}
+
+.event-step {
+  font-style: normal;
+}
+
 .event-options {
   display: grid;
   gap: 8px;

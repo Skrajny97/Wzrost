@@ -16,7 +16,12 @@
 // pojawić po zadaniu dodatkowych pytań albo umrzeć urażona"). Whether an
 // event comes, which, its case and an option's outcome all come from the
 // exploration's seed, so the same exploration always brings the same event
-// and ends the same way.
+// and ends the same way. An option may lead to a further choice (the author:
+// "z więcej niż jedną decyzją, po której kliknięciu dalej trzeba coś
+// decydować"): its outcome of kind "choice" tells what happened and offers
+// new options, and only the last option's outcome ends the event. A case
+// gives the outcome of an option further on by its path ("lead/look"), and
+// may tell a further choice its own way while its options stay.
 
 import { simulateFight } from './combat.js';
 import { combatantView, playerCombatant } from './combatant.js';
@@ -82,25 +87,41 @@ export function optionLock(option, { classId, level, purse }, content) {
   return null;
 }
 
-// An event as the player first sees it: who, where, the text and the
-// options. An event of any land (scene "land") stands in the land of the
-// exploration's inner region (`area`), on its background (the author: "Tu
-// byłoby używane tło danej krainy"). For the character (`who`: its class,
-// level and purse) an option shows its price and why it is locked.
-export const eventView = (event, area = null, who = null, content = null) => ({
-  id: event.id,
-  title: event.title,
-  art: event.art,
-  scene: event.scene === 'land' ? null : event.scene,
-  ...(event.scene === 'land' && { land: area?.regionId ?? null }),
-  figure: event.figure,
-  text: event.text,
-  options: event.options.map((option) => {
-    const cost = who ? optionCost(option, who.level) : 0;
-    const lock = who && content ? optionLock(option, who, content) : null;
-    return { id: option.id, label: option.label, ...(cost > 0 && { cost }), ...(lock && { locked: lock.text }) };
-  }),
-});
+// What the options of a path cost together, at the character's level.
+export const pathCost = (steps, level) => steps.reduce((sum, step) => sum + optionCost(step.option, level), 0);
+
+// The choices made so far as the player reads them: each option and what it
+// led to, its price so far as {cost}.
+const stepsView = (steps, level) =>
+  steps.map((step, index) => ({ label: step.option.label, text: step.outcome.text.replaceAll('{cost}', String(pathCost(steps.slice(0, index + 1), level))) }));
+
+// An event as the player sees it: who, where, the text and the options. An
+// event of any land (scene "land") stands in the land of the exploration's
+// inner region (`area`), on its background (the author: "Tu byłoby używane tło
+// danej krainy"). For the character (`who`: its class, level and purse) an
+// option shows its price and why it is locked. Further on (`walk`, from
+// eventChoices), the choices made so far come with their texts, and the
+// options are those of the last one; what they cost is already out of the
+// purse.
+export const eventView = (event, area = null, who = null, content = null, walk = null) => {
+  const level = who?.level ?? 1;
+  const spent = walk && who ? pathCost(walk.steps, level) : 0;
+  return {
+    id: event.id,
+    title: event.title,
+    art: event.art,
+    scene: event.scene === 'land' ? null : event.scene,
+    ...(event.scene === 'land' && { land: area?.regionId ?? null }),
+    figure: event.figure,
+    text: event.text,
+    ...(walk?.steps.length > 0 && { steps: stepsView(walk.steps, level) }),
+    options: (walk?.options ?? event.options).map((option) => {
+      const cost = who ? optionCost(option, who.level) : 0;
+      const lock = who && content ? optionLock(option, { ...who, purse: who.purse - spent }, content) : null;
+      return { id: option.id, label: option.label, ...(cost > 0 && { cost }), ...(lock && { locked: lock.text }) };
+    }),
+  };
+};
 
 // The case behind an event, drawn from the exploration's seed, or the one
 // "Testuj zdarzenia" chose (`forced`); null for an event without cases.
@@ -111,8 +132,56 @@ export function eventCase(event, seed, forced = null) {
 }
 
 // What an option leads to: its outcome in the case, or its own; either may
-// be a list of outcomes, drawn from by weight.
-export const eventOutcome = (option, chosen) => chosen?.outcomes[option.id] ?? option.outcome;
+// be a list of outcomes, drawn from by weight. Further on, the case names
+// the outcome by the option's path (`key`, "lead/look"). A case's further
+// choice without options tells it its own way, with the option's options.
+export function eventOutcome(option, chosen, key = option.id) {
+  const own = option.outcome;
+  const found = chosen?.outcomes[key] ?? own;
+  if (!Array.isArray(found) && found?.kind === 'choice' && !found.options && own?.kind === 'choice') return { ...own, ...found };
+  return found;
+}
+
+// A path of options chosen one after another (their ids): the case, each
+// step's option and outcome, and the options it stands before now, or null
+// once it has ended (its last outcome is not a further choice). Null for a
+// path the event does not have. Each step's outcome of a list is drawn as
+// at the event's end (resolveEvent), the same each time.
+export function eventChoices(event, path, { seed, caseId = null, endingId = null, drafts = false }) {
+  const chosen = eventCase(event, seed, caseId);
+  let options = event.options;
+  const steps = [];
+  for (const id of path) {
+    const option = options?.find((candidate) => candidate.id === id);
+    if (!option) return null;
+    const key = [...steps.map((step) => step.option.id), id].join('/');
+    const found = eventOutcome(option, chosen, key);
+    const outcome = Array.isArray(found) ? listOutcome(found, { endingId, drafts }, createRng(`${seed}:event:${key}`)) : found;
+    steps.push({ option, outcome, key });
+    options = outcome.kind === 'choice' ? outcome.options : null;
+  }
+  return { chosen, steps, options };
+}
+
+// Every outcome a case leads to (`chosen`, or none), further choices' too,
+// each list with all its outcomes.
+export function caseOutcomes(event, chosen) {
+  const all = [];
+  const walk = (options, prefix) => {
+    for (const option of options) {
+      const path = [...prefix, option.id];
+      for (const outcome of [eventOutcome(option, chosen, path.join('/'))].flat()) {
+        all.push(outcome);
+        if (outcome?.kind === 'choice' && outcome.options) walk(outcome.options, path);
+      }
+    }
+  };
+  walk(event.options, []);
+  return all;
+}
+
+// Every outcome of an event, in each of its cases.
+export const eventOutcomes = (event) => (event.cases ? event.cases.flatMap((one) => caseOutcomes(event, one)) : caseOutcomes(event, null));
 
 // One outcome of a list: the one "Testuj zdarzenia" chose (`endingId`), or
 // one drawn by weight. A draft, an outcome the author has not approved yet,
@@ -178,18 +247,33 @@ export function resolveEvent(
   { hunt, event, optionId, caseId = null, endingId = null, drafts = false, character, equipped, name, seed, purse = 0, rumor = null },
   content,
 ) {
-  const option = event.options.find((candidate) => candidate.id === optionId);
-  const chosen = eventCase(event, seed, caseId);
+  // `optionId` is the option chosen, or the path of options to it when the
+  // event led to further choices (eventChoices).
+  const path = [optionId].flat();
+  const before = eventChoices(event, path.slice(0, -1), { seed, caseId, endingId, drafts });
+  const option = before.options.find((candidate) => candidate.id === path.at(-1));
+  const chosen = before.chosen;
+  const key = path.join('/');
   const t = hunt.minutes * 60000;
-  const rng = createRng(`${seed}:event:${option.id}`);
-  const found = eventOutcome(option, chosen);
+  const rng = createRng(`${seed}:event:${key}`);
+  const found = eventOutcome(option, chosen, key);
   const outcome = Array.isArray(found) ? listOutcome(found, { endingId, drafts }, rng) : found;
   const area = content.areasById[hunt.areaId];
-  const cost = outcome.free ? 0 : optionCost(option, character.level);
+  // Every option of the path has its price, unless the outcome takes the
+  // gold another way.
+  const cost = outcome.free ? 0 : pathCost(before.steps, character.level) + optionCost(option, character.level);
   const spent = (hunt.spent ?? 0) + cost;
   const fill = (text, values = {}) => Object.entries({ cost, ...values }).reduce((done, [key, value]) => done.replaceAll(`{${key}}`, String(value)), text);
-  const tell = (text) => ({ t, type: 'event', text: `${event.title}. ${option.label}: ${text}` });
-  const view = (text) => ({ ...eventView(event, area), case: chosen?.id ?? null, option: { id: option.id, label: option.label, text }, fight: null, ...(cost > 0 && { cost }) });
+  const steps = stepsView(before.steps, character.level);
+  const tell = (text) => ({ t, type: 'event', text: `${event.title}. ${[...steps.map((step) => `${step.label}: ${step.text}`), `${option.label}: ${text}`].join(' ')}` });
+  const view = (text) => ({
+    ...eventView(event, area),
+    case: chosen?.id ?? null,
+    ...(steps.length > 0 && { steps }),
+    option: { id: option.id, label: option.label, text },
+    fight: null,
+    ...(cost > 0 && { cost }),
+  });
   const goldOf = (times) => Math.round(content.balance.rewards.goldPerLevel * character.level * times * rng.float(0.75, 1.25));
   const itemOf = (rarities) => {
     const [rarityId] = rng.weighted(Object.entries(rarities), ([, weight]) => weight);

@@ -604,6 +604,558 @@
           }
         }
       ]
+    },
+    {
+      "id": "lost-child",
+      "draft": true,
+      "minLevel": 6,
+      "title": "Zagubiona dziewczynka",
+      "art": "lost-child",
+      "scene": "land",
+      "figure": { "left": 44, "bottom": 2, "height": 50 },
+      "text": "Na środku ścieżki siedzi mała dziewczynka w lnianej koszuli i płacze, tuląc słomianą lalkę. Na twój widok podnosi głowę: „Zgubiłam się. Zaprowadzisz mnie do mamy?”.",
+      "options": [
+        {
+          "id": "lead",
+          "label": "Odprowadź ją do domu",
+          "outcome": {
+            "kind": "choice",
+            "text": "Dziewczynka chwyta cię za rękę. Jej dłoń jest zimna jak woda ze strumienia. Prowadzi cię coraz głębiej w las, aż staje przed spróchniałym dębem: „Mama mieszka tutaj”. Chaty nigdzie nie widać.",
+            "options": [
+              {
+                "id": "look",
+                "label": "Zajrzyj za dąb"
+              },
+              {
+                "id": "iron",
+                "label": "Pokaż jej żelazny nóż"
+              },
+              {
+                "id": "back",
+                "label": "Puść jej rękę i zawróć"
+              }
+            ]
+          }
+        },
+        {
+          "id": "ask",
+          "label": "Zapytaj, skąd się tu wzięła",
+          "outcome": {
+            "kind": "choice",
+            "text": "„Z Wierzbowej Wsi, za trzecim strumieniem” — szepcze dziewczynka i ociera łzy rękawem. Rękaw jest suchy, choć całą noc padało.",
+            "options": [
+              {
+                "id": "camp",
+                "label": "Weź ją ze sobą na noc"
+              },
+              {
+                "id": "food",
+                "label": "Daj jej jedzenie i wskaż drogę"
+              },
+              {
+                "id": "go",
+                "label": "Odejdź"
+              }
+            ]
+          }
+        },
+        {
+          "id": "leave",
+          "label": "Odejdź",
+          "outcome": {
+            "kind": "none",
+            "text": "Mijasz dziewczynkę. Jej płacz cichnie za twoimi plecami tak nagle, jakby ktoś zamknął drzwi."
+          }
+        }
+      ],
+      "cases": [
+        {
+          "id": "child",
+          "name": "Zagubione dziecko",
+          "weight": 60,
+          "outcomes": {
+            "lead/look": {
+              "kind": "reward",
+              "gold": 2,
+              "text": "Za dębem stoi chata smolarza, a w progu jej matka z rozwianymi włosami. Rzuca się córce na szyję, a tobie wciska w dłonie zawiniątko z całym ich srebrem (+{gold} złota)."
+            },
+            "lead/iron": {
+              "kind": "none",
+              "text": "Dziewczynka cofa się z płaczem i ucieka za dąb, gdzie stoi chata smolarza. Jej matka zatrzaskuje drzwi i krzyczy przez nie, że nie potrzebują tu szaleńców z nożami."
+            },
+            "lead/back": {
+              "kind": "none",
+              "text": "Zawracasz do drogi. Dziewczynka biegnie sama za dąb, prosto do chaty smolarza, nad którą unosi się dym z komina."
+            },
+            "ask/camp": {
+              "kind": "reward",
+              "itemRarities": {
+                "rare": 70,
+                "unique": 30
+              },
+              "text": "Dziewczynka zasypia przy ognisku, przytulona do lalki. O świcie przychodzi po nią ojciec, drwal z sąsiedniej doliny. Długo dziękuje i zostawia ci to, co ma najcenniejszego: {item}."
+            },
+            "ask/food": {
+              "kind": "reward",
+              "herbsKnown": {
+                "count": 3,
+                "gold": 1,
+                "goldText": "Dziewczynka zjada wszystko do okruszka i w podzięce oddaje ci garść drobnych monet ze swojego węzełka (+{gold} złota). Potem biegnie wskazaną ścieżką, a z lasu dobiega radosne wołanie: ktoś ją znalazł."
+              },
+              "text": "Dziewczynka zjada wszystko do okruszka i w podzięce oddaje ci koszyk ziół, które zbierała, zanim się zgubiła ({herbs}). Potem biegnie wskazaną ścieżką, a z lasu dobiega radosne wołanie: ktoś ją znalazł."
+            },
+            "ask/go": {
+              "kind": "none",
+              "text": "Odchodzisz. Za plecami słychać, jak dziewczynka nuci coś pod nosem i idzie w stronę wsi."
+            }
+          }
+        },
+        {
+          "id": "upior",
+          "name": "Upiór dziecka",
+          "weight": 40,
+          "outcomes": {
+            "lead/look": {
+              "kind": "fight",
+              "text": "Za dębem jest tylko rozkopany grób. Mała dłoń zaciska się na twojej jak kleszcze, a twarz dziewczynki szarzeje i zapada się. To Upiór, który szuka towarzysza do grobu!",
+              "foes": [
+                "upior"
+              ],
+              "ambush": true,
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2
+              },
+              "start": "Upiór atakuje pierwszy: {enemies}."
+            },
+            "lead/iron": {
+              "kind": "reward",
+              "itemRarities": {
+                "unique": 70,
+                "epic": 30
+              },
+              "text": "Na widok żelaza dziewczynka krzyczy nieludzkim głosem i rozpada się w kłąb mgły. Pod dębem zostaje tylko słomiana lalka, a w niej coś zaszytego: {item}."
+            },
+            "lead/back": {
+              "kind": "reward",
+              "buff": {
+                "kind": "curse",
+                "bonus": 0.1,
+                "minutes": 30
+              },
+              "text": "Puszczasz zimną rączkę i zawracasz. Przez całą drogę czujesz na karku lodowaty oddech, a ręce robią się ciężkie jak z ołowiu (klątwa: obrażenia −10% przez 30 minut wypraw)."
+            },
+            "ask/camp": {
+              "kind": "fight",
+              "text": "W nocy budzi cię przenikliwy chłód. Dziewczynka stoi nad tobą z szeroko otwartymi, pustymi oczami, a ognisko gaśnie. To Upiór!",
+              "foes": [
+                "upior"
+              ],
+              "ambush": true,
+              "itemChance": 0.35,
+              "start": "Upiór rzuca się na ciebie we śnie: {enemies}."
+            },
+            "ask/food": {
+              "kind": "reward",
+              "buff": {
+                "kind": "focus",
+                "bonus": 0.1,
+                "minutes": 30
+              },
+              "text": "Dziewczynka bierze jedzenie, ale go nie je. Uśmiecha się smutno: „Nikt mi dawno nic nie dał”. Rozwiewa się jak mgła, a ty zostajesz z dziwnym spokojem w sercu (skupienie +10% przez 30 minut wypraw)."
+            },
+            "ask/go": {
+              "kind": "none",
+              "text": "Odchodzisz szybkim krokiem. Płacz za plecami zamienia się w chichot, a potem nagle cichnie."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "forest-wedding",
+      "draft": true,
+      "title": "Wesele w borze",
+      "art": "forest-wedding",
+      "scene": "land",
+      "figure": { "left": 40, "bottom": 2, "height": 86 },
+      "text": "Spomiędzy drzew dobiega muzyka. Na polanie trwa wesele: płoną ogniska, rzępolą skrzypce, a pary wirują w tańcu. Starosta weselny w wyszywanej koszuli zastępuje ci drogę z rogiem miodu w dłoni: „Gość w dom! Nie odmówisz młodej parze?”.",
+      "options": [
+        {
+          "id": "join",
+          "label": "Dołącz do zabawy",
+          "outcome": {
+            "kind": "choice",
+            "text": "Starosta sadza cię przy stole i podaje róg pełen miodu: „Za zdrowie młodych, do dna!”. Muzyka gra coraz szybciej, a tańczący ani na chwilę nie przystają, choć nikt nie wygląda na zmęczonego.",
+            "options": [
+              {
+                "id": "drink",
+                "label": "Wypij do dna"
+              },
+              {
+                "id": "pour",
+                "label": "Wylej miód ukradkiem pod stół"
+              },
+              {
+                "id": "gift",
+                "label": "Wręcz młodej parze podarunek",
+                "goldPerLevel": 2
+              }
+            ]
+          }
+        },
+        {
+          "id": "watch",
+          "label": "Przyjrzyj się z ukrycia",
+          "outcome": {
+            "kind": "choice",
+            "text": "Z bliska widać zwykłe, wiejskie wesele: dzieci podkradają kołacz, a wuj panny młodej śpiewa fałszywie. Starosta dostrzega cię w krzakach i macha ręką: „Chodźże do nas!”.",
+            "options": [
+              {
+                "id": "greet",
+                "label": "Wyjdź z ukrycia i przywitaj się"
+              },
+              {
+                "id": "cross",
+                "label": "Przeżegnaj się"
+              },
+              {
+                "id": "run",
+                "label": "Uciekaj"
+              }
+            ]
+          }
+        },
+        {
+          "id": "leave",
+          "label": "Omiń polanę",
+          "outcome": {
+            "kind": "none",
+            "text": "Omijasz polanę szerokim łukiem. Muzyka jeszcze długo niesie się między drzewami."
+          }
+        }
+      ],
+      "cases": [
+        {
+          "id": "living",
+          "name": "Prawdziwe wesele",
+          "weight": 60,
+          "outcomes": {
+            "join/drink": {
+              "kind": "reward",
+              "buff": {
+                "kind": "damage",
+                "bonus": 0.1,
+                "minutes": 60
+              },
+              "text": "Miód jest mocny i słodki. Tańczysz z druhnami do białego rana, a gdy wreszcie ruszasz w drogę, w żyłach wciąż szumi weselna zabawa (obrażenia +10% przez 60 minut wypraw)."
+            },
+            "join/pour": {
+              "kind": "none",
+              "text": "Starosta widzi, jak wylewasz miód pod stół, i czerwienieje ze złości: „Obrażasz młodą parę!”. Muzyka milknie, a ty musisz odejść przy wtórze gwizdów."
+            },
+            "join/gift": {
+              "kind": "reward",
+              "itemRarities": {
+                "rare": 60,
+                "unique": 40
+              },
+              "text": "Panna młoda dziękuje za podarunek (−{cost} złota), a pan młody, syn kowala, wręcza ci w zamian coś ze swojej kuźni: {item}."
+            },
+            "watch/greet": {
+              "kind": "reward",
+              "buff": {
+                "kind": "focus",
+                "bonus": 0.1,
+                "minutes": 30
+              },
+              "text": "Wychodzisz z krzaków przy wtórze śmiechów. Dostajesz kawał kołacza, miejsce przy ogniu i błogosławieństwo starej swatki (skupienie +10% przez 30 minut wypraw)."
+            },
+            "watch/cross": {
+              "kind": "none",
+              "text": "Żegnasz się zamaszyście. Weselnicy patrzą na ciebie jak na dziwaka, a ktoś rzuca w twoją stronę ogryzioną kością."
+            },
+            "watch/run": {
+              "kind": "none",
+              "text": "Uciekasz w las. Za plecami słychać śmiech i skoczną przyśpiewkę o tchórzliwym wędrowcu."
+            }
+          }
+        },
+        {
+          "id": "dead",
+          "name": "Wesele umarłych",
+          "weight": 40,
+          "outcomes": {
+            "join/drink": {
+              "kind": "faint",
+              "goldLoss": 0.25,
+              "text": "Miód smakuje ziemią i dymem. Tańczysz, aż świat wiruje i gaśnie. Budzisz się o świcie na zarośniętym cmentarzu, z pustym rogiem w dłoni.",
+              "lossText": "Sakiewka jest lżejsza (−{gold} złota)."
+            },
+            "join/pour": {
+              "kind": "reward",
+              "gold": 3,
+              "text": "Miód syczy na ziemi jak żar. Muzyka urywa się w pół taktu, a goście odwracają ku tobie twarze bez oczu. Gdzieś daleko pieje kogut i polana pustoszeje. Na stole zostaje tylko stara srebrna zastawa (+{gold} złota)."
+            },
+            "join/gift": {
+              "kind": "reward",
+              "itemRarities": {
+                "unique": 60,
+                "epic": 40
+              },
+              "text": "Panna młoda bierze podarunek (−{cost} złota) lodowatą dłonią: „Nikt nie przyszedł na moje wesele od stu lat”. Zdejmuje z głowy zeschły wianek i podaje ci go. Wianek zmienia się w twoich palcach w {item}, a polana jest pusta."
+            },
+            "watch": {
+              "kind": "choice",
+              "text": "Im dłużej patrzysz, tym więcej widać: ogniska nie dają ciepła, a tańczący nie rzucają cieni. Starosta powoli odwraca głowę prosto w twoją stronę i uśmiecha się szeroko, za szeroko."
+            },
+            "watch/greet": {
+              "kind": "loss",
+              "resourcesShare": 0.2,
+              "text": "Weselnicy chwytają cię za ręce i wciągają w korowód, który nie ma końca. Gdy kogut pieje, zostajesz na pustej polanie, bez tchu i bez sił.",
+              "lossText": "Weselnicy wzięli też coś z plecaka ({resources})."
+            },
+            "watch/cross": {
+              "kind": "reward",
+              "xpFoes": [
+                "upior",
+                "upior"
+              ],
+              "text": "Żegnasz się, a muzyka urywa się jak ucięta nożem. Weselnicy jeden po drugim kłaniają ci się nisko i rozwiewają jak dym. Ostatni znika starosta, z wdzięcznym skinieniem głowy (+{xp} XP)."
+            },
+            "watch/run": {
+              "kind": "none",
+              "text": "Uciekasz, a muzyka długo niesie się za tobą. Nikt cię nie goni, ale do świtu nie oglądasz się za siebie."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "treasure-hunter",
+      "draft": true,
+      "minLevel": 6,
+      "title": "Poszukiwacz skarbów",
+      "art": "treasure-hunter",
+      "scene": "land",
+      "figure": { "left": 40, "bottom": 2, "height": 70 },
+      "text": "Przy starym kurhanie kopie zarośnięty mężczyzna w połatanym kubraku. Na twój widok prostuje się i macha pożółkłą mapą: „Tu leży zbójecki skarb! Pomożesz kopać, podzielimy się po połowie”.",
+      "options": [
+        {
+          "id": "dig",
+          "label": "Pomóż mu kopać",
+          "outcome": {
+            "kind": "choice",
+            "text": "Kopiecie do zmierzchu. Wreszcie łopata uderza w okute wieko skrzyni. Poszukiwacz odkłada łopatę i powoli sięga ręką za pas.",
+            "options": [
+              {
+                "id": "strike",
+                "label": "Uderz pierwszy"
+              },
+              {
+                "id": "open",
+                "label": "Otwórz skrzynię"
+              },
+              {
+                "id": "wait",
+                "label": "Cofnij się i patrz mu na ręce"
+              }
+            ]
+          }
+        },
+        {
+          "id": "map",
+          "label": "Odkup od niego mapę",
+          "goldPerLevel": 3,
+          "outcome": {
+            "kind": "choice",
+            "text": "Poszukiwacz chowa monety (−{cost} złota) i oddaje mapę z dziwnym pośpiechem. Krzyżyk na mapie prowadzi do starej sosny z dziuplą. W środku coś połyskuje, a na korze widać głębokie, świeże rysy.",
+            "options": [
+              {
+                "id": "reach",
+                "label": "Sięgnij do dziupli"
+              },
+              {
+                "id": "tracks",
+                "label": "Obejrzyj rysy na korze"
+              },
+              {
+                "id": "drop",
+                "label": "Zostaw to",
+                "outcome": {
+                  "kind": "none",
+                  "text": "Zostawiasz dziuplę w spokoju. Mapa ląduje w ognisku, a ty ruszasz dalej z lżejszą sakiewką."
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "leave",
+          "label": "Odejdź",
+          "outcome": {
+            "kind": "none",
+            "text": "Życzysz mu szczęścia i odchodzisz. Za plecami jeszcze długo słychać chrzęst łopaty."
+          }
+        }
+      ],
+      "cases": [
+        {
+          "id": "honest",
+          "name": "Uczciwy poszukiwacz",
+          "weight": 50,
+          "outcomes": {
+            "dig/strike": {
+              "kind": "none",
+              "text": "Uderzasz, ale poszukiwacz sięgał tylko po manierkę. Ucieka z krzykiem w las. W skrzyni są same zbutwiałe szmaty, a niesmak zostaje na długo."
+            },
+            "dig/open": {
+              "kind": "reward",
+              "gold": 3,
+              "text": "W skrzyni połyskują stare monety. Poszukiwacz liczy je przy latarni i dzieli uczciwie, co do grosza (+{gold} złota)."
+            },
+            "dig/wait": {
+              "kind": "reward",
+              "itemRarities": {
+                "rare": 70,
+                "unique": 30
+              },
+              "text": "Poszukiwacz wyciąga zza pasa manierkę i podaje ci pierwszy łyk. Otwieracie skrzynię razem: on bierze monety, a tobie zostawia to, co leżało na dnie: {item}."
+            },
+            "map/reach": {
+              "kind": "reward",
+              "itemRarities": {
+                "rare": 60,
+                "unique": 40
+              },
+              "text": "Rysy zostawił tylko dzik, który ocierał się o korę. W dziupli leży zawiniątko w natłuszczonej skórze, a w nim {item}."
+            },
+            "map/tracks": {
+              "kind": "reward",
+              "gold": 1,
+              "rumor": true,
+              "text": "Rysy są głębokie na palec. To ślady pazurów, a mapa okazuje się mapą łowiecką z zaznaczonymi legowiskami: „{area}. Tam widziano {creature}”. W dziupli leży jeszcze sakiewka myśliwego (+{gold} złota).",
+              "noRumorText": "Rysy zostawił dzik, który ocierał się o korę. Mapa okazuje się zwykłą mapą łowiecką, a w dziupli leży sakiewka myśliwego (+{gold} złota)."
+            }
+          }
+        },
+        {
+          "id": "robber",
+          "name": "Zbój z kompanem",
+          "weight": 30,
+          "outcomes": {
+            "dig/strike": {
+              "kind": "fight",
+              "text": "Uprzedzasz go o mgnienie oka: w jego dłoni błyska nóż, a z krzaków wyskakuje kompan z pałką.",
+              "foes": [
+                "bandit-knifer",
+                "bandit-thug"
+              ],
+              "speedBonus": 0.25,
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2
+              },
+              "start": "Zbóje rzucają się na ciebie, ale to ty zaczynasz: {enemies}."
+            },
+            "dig/open": {
+              "kind": "fight",
+              "text": "Gdy pochylasz się nad skrzynią, czujesz zimne ostrze przy karku. Z krzaków wyskakuje drugi zbój. Skarb był przynętą!",
+              "foes": [
+                "bandit-knifer",
+                "bandit-thug"
+              ],
+              "ambush": true,
+              "itemChance": 0.35,
+              "start": "Zasadzka! Zbóje atakują pierwsi: {enemies}."
+            },
+            "dig/wait": {
+              "kind": "fight",
+              "text": "Poszukiwacz wyciąga nóż, ale widzi, że patrzysz mu na ręce. Gwiżdże na kompana w krzakach i rzucają się na ciebie razem.",
+              "foes": [
+                "bandit-knifer",
+                "bandit-thug"
+              ],
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2
+              },
+              "start": "Zbóje atakują: {enemies}."
+            },
+            "map/reach": {
+              "kind": "none",
+              "text": "W dziupli leży kamień owinięty w szmatę. Zanim zdążysz się odwrócić, poszukiwacza już nie ma, a razem z nim twoich monet."
+            },
+            "map/tracks": {
+              "kind": "fight",
+              "text": "Rysy to nacięcia nożem, a od sosny prowadzi wydeptana ścieżka. Idziesz nią prosto do zbójeckiego obozowiska.",
+              "foes": [
+                "bandit-thug",
+                "bandit-crossbow"
+              ],
+              "itemChance": 0.35,
+              "win": {
+                "gold": 3
+              },
+              "start": "Zbóje zrywają się od ogniska: {enemies}."
+            }
+          }
+        },
+        {
+          "id": "guardian",
+          "name": "Strażnik kurhanu",
+          "weight": 20,
+          "outcomes": {
+            "dig/strike": {
+              "kind": "fight",
+              "text": "Ostrze przechodzi przez poszukiwacza jak przez dym. Śmieje się, a jego twarz zapada się w czaszkę. To Upiór, strażnik kurhanu!",
+              "foes": [
+                "upior"
+              ],
+              "itemChance": 0.35,
+              "win": {
+                "itemRarities": {
+                  "unique": 60,
+                  "epic": 40
+                },
+                "text": "W skrzyni, wśród pożółkłych kości, leży {item}."
+              },
+              "start": "{enemies} broni swojego skarbu."
+            },
+            "dig/open": {
+              "kind": "reward",
+              "gold": 2,
+              "buff": {
+                "kind": "curse",
+                "bonus": 0.1,
+                "minutes": 60
+              },
+              "text": "Skrzynia jest pełna złota. Gdy zanurzasz w nim dłonie, poszukiwacz zaczyna się śmiać, a połowa monet czernieje i rozsypuje się w węgle. Zostaje ci garść złota (+{gold} złota) i ciężar na sercu (klątwa: obrażenia −10% przez 60 minut wypraw)."
+            },
+            "dig/wait": {
+              "kind": "none",
+              "text": "Poszukiwacz wyjmuje zza pasa grudkę ziemi z kurhanu i rozkrusza ją w palcach. Kiedy pył opada, nie ma już ani jego, ani skrzyni. Został tylko dół i chłód w kościach."
+            },
+            "map/reach": {
+              "kind": "reward",
+              "buff": {
+                "kind": "curse",
+                "bonus": 0.1,
+                "minutes": 30
+              },
+              "text": "W dziupli leży pożółkła czaszka z monetą w zębach. Gdy jej dotykasz, robi ci się zimno aż do szpiku (klątwa: obrażenia −10% przez 30 minut wypraw)."
+            },
+            "map/tracks": {
+              "kind": "reward",
+              "itemRarities": {
+                "unique": 70,
+                "epic": 30
+              },
+              "text": "Rysy układają się w stare runy. Odczytujesz je i omijasz pułapkę zostawioną przez strażnika kurhanu. W dziupli leży {item}."
+            }
+          }
+        }
+      ]
     }
   ],
   "foes": [

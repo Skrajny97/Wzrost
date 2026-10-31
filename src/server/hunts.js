@@ -31,12 +31,14 @@ import {
   huntDurations,
   isUnlocked,
   huntKills,
+  eventChoices,
   eventFor,
   eventView,
   huntReport,
   longestHunt,
   lowerThreat,
   nextHuntUnlock,
+  optionCost,
   optionLock,
   optionWindows,
   potionsPerKind,
@@ -540,20 +542,39 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // An option's price comes from the purse, the character's gold with the
   // exploration's; an option of one class is greyed out for the others.
   const who = { classId: row.class_id, level: row.level, purse: row.gold + hunt.gold };
-  if (event && choice === undefined) return { event: eventView(event, content.areasById[hunt.areaId], who, content) };
+  // An event that led to a further choice goes on from there (`eventPath`,
+  // the options chosen so far): the choice made stays made, whether the
+  // sheet was closed or the page reloaded.
+  const eventArea = content.areasById[hunt.areaId];
+  const walkOptions = { seed: activity.seed, caseId: forcedCase, endingId: forcedEnding, drafts: eventDraftsOn() };
+  const storedPath = event && Array.isArray(options.eventPath) ? options.eventPath : [];
+  const before = event && (eventChoices(event, storedPath, walkOptions)?.options ? storedPath : []);
+  if (event && choice === undefined) return { event: eventView(event, eventArea, who, content, before.length > 0 ? eventChoices(event, before, walkOptions) : null) };
   // Today's rumor, as the Karczma told it, or as the beggar's song may.
   const kept = rumorToday(JSON.parse(row.settlement ?? '{}').rumor, now, content);
   if (event) {
-    const option = event.options.find((one) => one.id === choice);
-    if (!option) throw new ApiError(400, 'invalid_choice', 'Wybierz jedną z opcji.');
-    const lock = optionLock(option, who, content);
+    const path = [...before, choice];
+    const walk = typeof choice === 'string' ? eventChoices(event, path, walkOptions) : null;
+    if (!walk) throw new ApiError(400, 'invalid_choice', 'Wybierz jedną z opcji.');
+    const step = walk.steps.at(-1);
+    const lock = optionLock(step.option, { ...who, purse: who.purse - (walk.steps.slice(0, -1).reduce((sum, one) => sum + optionCost(one.option, row.level), 0)) }, content);
     if (lock) throw new ApiError(409, lock.code, lock.code === 'class_only' ? `Tę opcję wybiera ${lock.text}.` : 'Brakuje złota na tę opcję.');
+    // A further choice: kept with the activity, and shown; nothing else is
+    // saved until the event ends.
+    if (walk.options) {
+      const saved = await db
+        .prepare('UPDATE activities SET options = ? WHERE character_id = ? AND options = ?')
+        .bind(JSON.stringify({ ...options, eventPath: path }), row.id, activity.options ?? '{}')
+        .run();
+      if (saved.meta.changes !== 1) throw new ApiError(409, 'character_changed', 'Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz.');
+      return { event: eventView(event, eventArea, who, content, walk) };
+    }
     const rumor = kept ?? drawRumor({ character, seed: `${row.id}:settlement` }, now, content);
     hunt = resolveEvent(
       {
         hunt,
         event,
-        optionId: choice,
+        optionId: path,
         caseId: forcedCase,
         endingId: forcedEnding,
         drafts: eventDraftsOn(),

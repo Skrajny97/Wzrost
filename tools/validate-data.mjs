@@ -684,8 +684,9 @@ function checkEvents(data, { monsters, rarities }) {
   const checkRarities = (where, weights) => {
     for (const id of Object.keys(weights ?? {})) if (!rarities.has(id)) errors.push(`events.json: ${where} ma nieznaną rzadkość "${id}"`);
   };
-  // An outcome of an option (`option`) of an event (`event`).
-  const checkOutcome = (where, outcome, { event, option }) => {
+  // An outcome of an option (`option`) of an event (`event`); `priced` when
+  // an option of its path has a price.
+  const checkOutcome = (where, outcome, { event, option, priced = Boolean(option?.goldPerLevel), inherits = false }) => {
     const fighting =
       outcome.foes || outcome.ambush || outcome.speedBonus || outcome.itemChance !== undefined || outcome.start || outcome.win;
     const rewarding =
@@ -738,8 +739,23 @@ function checkEvents(data, { monsters, rarities }) {
     } else if (outcome.goldLoss !== undefined || (outcome.lossText !== undefined && outcome.kind !== 'loss')) {
       errors.push(`events.json: ${where} ma stratę złota bez kind faint`);
     }
-    // The option's price: told only where the option has one.
-    if (!option?.goldPerLevel && (outcome.free || outcome.text.includes('{cost}'))) errors.push(`events.json: ${where} mówi o cenie opcji, która jej nie ma`);
+    // A further choice: its own options, each with an outcome, or only its
+    // words in a case, which keeps the option's options (`inherits`).
+    if (outcome.kind === 'choice') {
+      if (outcome.options) {
+        uniqueIds(errors, `events (${where})`, outcome.options);
+        for (const next of outcome.options) {
+          for (const id of next.classes ?? []) if (!classes.has(id)) errors.push(`events.json: ${where}/${next.id} ma nieznaną klasę "${id}"`);
+          if (next.outcome) checkOutcomes(`${where}/${next.id}`, next.outcome, { event, option: next, priced: priced || Boolean(next.goldPerLevel) });
+        }
+      } else if (!inherits) {
+        errors.push(`events.json: ${where} ma dalszy wybór bez opcji`);
+      }
+    } else if (outcome.options) {
+      errors.push(`events.json: ${where} ma opcje bez kind choice`);
+    }
+    // The price: told only where an option of the path has one.
+    if (!priced && (outcome.free || outcome.text.includes('{cost}'))) errors.push(`events.json: ${where} mówi o cenie opcji, która jej nie ma`);
   };
   // An outcome or a list of them, each drawn by its weight. An outcome of a
   // list that "Testuj zdarzenia" can choose has both an id and a name, and
@@ -764,10 +780,13 @@ function checkEvents(data, { monsters, rarities }) {
       living.set(area.id, ids);
     }
   }
-  const outcomesOf = (event) =>
-    [...event.options.map((option) => option.outcome), ...(event.cases ?? []).flatMap((eventCase) => Object.values(eventCase.outcomes))]
+  // Every outcome, further choices' too.
+  const deep = (found) =>
+    [found]
+      .flat()
       .filter(Boolean)
-      .flatMap((outcome) => (Array.isArray(outcome) ? outcome : [outcome]));
+      .flatMap((outcome) => [outcome, ...(outcome.kind === 'choice' ? (outcome.options ?? []).flatMap((next) => deep(next.outcome)) : [])]);
+  const outcomesOf = (event) => [...event.options.flatMap((option) => deep(option.outcome)), ...(event.cases ?? []).flatMap((eventCase) => Object.values(eventCase.outcomes).flatMap(deep))];
   for (const event of events.list) {
     for (const id of event.exceptAreas ?? []) {
       if (!living.has(id)) errors.push(`events.json: ${event.id} ma nieznany region wewnętrzny "${id}" w exceptAreas`);
@@ -781,21 +800,35 @@ function checkEvents(data, { monsters, rarities }) {
         if (monsters.has(foe) && !living.get(id).has(foe)) errors.push(`events.json: ${event.id} przychodzi w ${id}, a tam nie żyje ${foe}`);
       }
     }
-    const options = uniqueIds(errors, `events (${event.id})`, event.options);
+    uniqueIds(errors, `events (${event.id})`, event.options);
     uniqueIds(errors, `events (${event.id}, przypadki)`, event.cases ?? []);
     for (const option of event.options) {
       for (const id of option.classes ?? []) if (!classes.has(id)) errors.push(`events.json: ${event.id}/${option.id} ma nieznaną klasę "${id}"`);
       if (option.outcome) checkOutcomes(`${event.id}/${option.id}`, option.outcome, { event, option });
     }
-    // Every option has an outcome in every case: its own or the case's.
+    // Every option, further choices' too, has an outcome in every case: its
+    // own or the case's, named by its path ("lead/look").
     for (const eventCase of event.cases ?? [{ id: null, outcomes: {} }]) {
-      for (const [id, outcome] of Object.entries(eventCase.outcomes)) {
-        if (!options.has(id)) errors.push(`events.json: ${event.id}/${eventCase.id} ma skutek nieznanej opcji "${id}"`);
-        checkOutcomes(`${event.id}/${eventCase.id}/${id}`, outcome, { event, option: event.options.find((option) => option.id === id) });
-      }
-      for (const option of event.options) {
-        if (!eventCase.outcomes[option.id] && !option.outcome) errors.push(`events.json: ${event.id}/${option.id} nie ma skutku${eventCase.id ? ` w przypadku ${eventCase.id}` : ''}`);
-      }
+      const paths = new Set();
+      const walk = (list, prefix, priced) => {
+        for (const option of list) {
+          const path = [...prefix, option.id];
+          const key = path.join('/');
+          paths.add(key);
+          const own = option.outcome;
+          const found = eventCase.outcomes[key];
+          const cost = priced || Boolean(option.goldPerLevel);
+          if (!found && !own) errors.push(`events.json: ${event.id}/${key} nie ma skutku${eventCase.id ? ` w przypadku ${eventCase.id}` : ''}`);
+          if (found) checkOutcomes(`${event.id}/${eventCase.id}/${key}`, found, { event, option, priced: cost, inherits: !Array.isArray(own) && own?.kind === 'choice' });
+          // Further on in this case: its own choice's options, or the option's.
+          for (const choice of [found ?? own].flat().filter((one) => one?.kind === 'choice')) {
+            const next = choice.options ?? (!Array.isArray(own) && own?.kind === 'choice' ? own.options : null);
+            if (next) walk(next, path, cost);
+          }
+        }
+      };
+      walk(event.options, [], false);
+      for (const key of Object.keys(eventCase.outcomes)) if (!paths.has(key)) errors.push(`events.json: ${event.id}/${eventCase.id} ma skutek nieznanej opcji "${key}"`);
     }
   }
   return errors;

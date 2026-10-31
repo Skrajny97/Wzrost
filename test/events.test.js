@@ -384,6 +384,14 @@ describe('events (API)', () => {
             endings: event.options.flatMap((option) => (Array.isArray(option.outcome) ? option.outcome.map(({ id: endingId, name }) => ({ id: endingId, name })) : [])),
           };
         }),
+        // The drafts with a further choice, on the test version only.
+        ...['lost-child', 'forest-wedding', 'treasure-hunter'].map((id) => ({
+          id,
+          title: content.eventsById[id].title,
+          draft: true,
+          cases: content.eventsById[id].cases.map(({ id: caseId, name }) => ({ id: caseId, name })),
+          endings: [],
+        })),
       ],
       next: null,
     });

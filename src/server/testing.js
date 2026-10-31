@@ -4,7 +4,7 @@
 // account without test mode, and with test mode off, these routes do not
 // exist.
 
-import { construction, eventOutcome } from '../engine/index.js';
+import { caseOutcomes, construction, eventOutcomes } from '../engine/index.js';
 import { content, tutorialPart } from './content.js';
 import { completeBuilding } from './camp.js';
 import { characterRemoval, characterView, currentHp, loadPlayer, loadSettled, requirePlayer } from './characters.js';
@@ -82,17 +82,12 @@ export async function tutorialTests(context) {
 }
 
 // The outcomes of an event's lists that "Testuj zdarzenia" can choose: those
-// with an id, drafts too.
-const eventEndings = (event) =>
-  [...event.options.map((option) => option.outcome), ...(event.cases ?? []).flatMap((one) => Object.values(one.outcomes))]
-    .filter(Array.isArray)
-    .flat()
-    .filter((outcome) => outcome.id);
+// with an id, drafts too, further choices' too, each once.
+const eventEndings = (event) => [...new Map(eventOutcomes(event).filter((outcome) => outcome?.id).map((outcome) => [outcome.id, outcome])).values()];
 
-// The first case of an event in which an option leads to a list with the
-// ending, or null.
-const caseWithEnding = (event, endingId) =>
-  (event.cases ?? []).find((one) => event.options.some((option) => [eventOutcome(option, one)].flat().some((outcome) => outcome?.id === endingId)))?.id ?? null;
+// The first case of an event in which an option, at once or further on,
+// leads to a list with the ending, or null.
+const caseWithEnding = (event, endingId) => (event.cases ?? []).find((one) => caseOutcomes(event, one).some((outcome) => outcome?.id === endingId))?.id ?? null;
 
 // The choice stored in event_test: "event", "event:case", "event::ending"
 // or "event:case:ending".

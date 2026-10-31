@@ -253,8 +253,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     return parts.length > 0 && ['Zasoby', parts.join(' · ')];
   }
 
-  // The event at the exploration's end: who was met, the option chosen and
-  // what came of it.
+  // The event at the exploration's end: who was met, the options chosen,
+  // one after another when one led to a further choice, and what came of
+  // them.
   function eventCard(event) {
     return h(
       'section',
@@ -265,6 +266,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         { class: 'report-event-text' },
         h('h2', { class: 'section-title', id: 'report-event-title', text: event.title }),
         h('p', { class: 'muted', text: event.text }),
+        (event.steps ?? []).map((step) => h('p', {}, h('strong', { text: `${step.label}. ` }), step.text)),
         h('p', {}, h('strong', { text: `${event.option.label}. ` }), event.option.text),
       ),
     );

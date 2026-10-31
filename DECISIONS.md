@@ -2996,6 +2996,23 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Zdarzenia z dalszym wyborem (31.10.2026, szkice na wersji testowej)
+
+Autor: „Niedługo będę nieobecny kilka godzin przygotuj kolejne 3 zdarzenia w tym czasie, bardziej rozbudowane (z więcej niż jedną decyzją, po której kliknięciu dalej trzeba coś decydować = 2 wybory)”.
+
+1. **Dalszy wybór.** Opcja zdarzenia może prowadzić do kolejnego wyboru (skutek `choice` w `data/events.json`): okienko mówi, co się stało, i daje nowe opcje. Zdarzenie kończy dopiero skutek ostatniej opcji, a raport pokazuje oba wybory po kolei.
+2. **Brakujące szczegóły:**
+    - **Wybór zapada na stałe.** Pierwszy wybór serwer zapamiętuje przy wyprawie. Zamknięte okienko albo odświeżona strona wracają do drugiego wyboru, więc nie da się podejrzeć, co kryje pierwsza opcja, i wybrać innej.
+    - **Ceny.** Opcja z ceną na pierwszym albo drugim kroku płaci na końcu zdarzenia, wszystkie ceny ścieżki razem. Opcja drugiego kroku jest wyszarzona, gdy w sakiewce nie zostaje na nią złota po cenie pierwszej.
+    - **Przypadki.** Przypadek (to, co naprawdę się dzieje, losowane raz na zdarzenie) podaje skutek opcji drugiego kroku po ścieżce, np. `lead/look`. Może też opowiedzieć dalszy wybór po swojemu (inny tekst, te same opcje), jak wesele umarłych, gdy patrzy się z ukrycia.
+    - **Testuj zdarzenia** wybiera zdarzenie i przypadek tak jak dotąd, a oba kroki wybiera się już w samym zdarzeniu.
+3. **Trzy nowe zdarzenia (szkice, tylko na wersji testowej, do oceny autora).** Każde ma 3 opcje. Dwie prowadzą do drugiego wyboru z 3 opcjami, a trzecia kończy zdarzenie od razu.
+    - **Zagubiona dziewczynka** (od regionów 6. poziomu). Przypadki: prawdziwe dziecko (60%) albo Upiór dziecka (40%). Nagrody to złoto, przedmiot rzadki albo unikalny, zioła, a u Upiora walka, przedmiot unikalny albo epicki, klątwa albo skupienie. Żelazo zdradza Upiora.
+    - **Wesele w borze** (wszędzie). Przypadki: prawdziwe wesele (60%) albo wesele umarłych (40%). Skutki: wzmocnienie, przedmiot za podarunek (2 złota za poziom), omdlenie po miodzie umarłych, utrata części zasobów, XP za odesłanie zmarłych znakiem krzyża. Bez walki.
+    - **Poszukiwacz skarbów** (od regionów 6. poziomu). Przypadki: uczciwy poszukiwacz (50%), zbój z kompanem (30%) albo Upiór, strażnik kurhanu (20%). Mapa kosztuje 3 złota za poziom. Skutki: złoto, przedmioty, plotka o elicie albo czempionie, walki ze zbójami albo z Upiorem, klątwa.
+    - **Przeciwnicy.** Walczy się tylko z ludźmi i duchami zdarzeń (zbóje, Upiór), więc te walki nie dodają nic do Bestiariusza.
+4. **Grafiki.** Postacie dziewczynki, starosty weselnego i poszukiwacza są w czterech wersjach do wyboru (279, 280 i 281). Do czasu wyboru autora wersja testowa pokazuje: 279 A, 280 B i 281 B.
+
 ## Osada, część III: Targowisko (31.10.2026, na wersji testowej)
 
 Autor przy pytaniach 237–242: „237 A / 238 A / 239 A / 240 A / 241 tak / 242 A”, a potem: „To szykuj Targowisko”.

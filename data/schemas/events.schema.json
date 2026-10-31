@@ -12,8 +12,8 @@
       "description": "Skutek opcji: tekst i co z niego wynika.",
       "properties": {
         "kind": {
-          "enum": ["none", "fight", "reward", "faint", "loss"],
-          "description": "faint: postać traci przytomność i część złota z wyprawy (goldLoss, zdanie lossText z {gold}). loss: postać traci część złota z sakiewki (goldShare, najwyżej goldCapPerLevel na poziom) albo część zebranych zasobów (resourcesShare), bez omdlenia, ze zdaniem lossText."
+          "enum": ["none", "fight", "reward", "faint", "loss", "choice"],
+          "description": "choice: dalszy wybór, czyli tekst o tym, co się stało, i nowe opcje (options); zdarzenie kończy dopiero skutek ostatniej wybranej opcji. faint: postać traci przytomność i część złota z wyprawy (goldLoss, zdanie lossText z {gold}). loss: postać traci część złota z sakiewki (goldShare, najwyżej goldCapPerLevel na poziom) albo część zebranych zasobów (resourcesShare), bez omdlenia, ze zdaniem lossText."
         },
         "weight": { "type": "number", "exclusiveMinimum": 0, "description": "Waga skutku na liście skutków, losowanych przy wyborze opcji." },
         "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Skutek z listy do wybrania w „Testuj zdarzenia”." },
@@ -99,7 +99,26 @@
           "type": "string",
           "minLength": 1,
           "description": "Przy omdleniu i stracie: zdanie o tym, co przepadło ({gold}, {resources}), dopisane, gdy coś przepadło."
+        },
+        "options": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/definitions/option" },
+          "description": "Opcje dalszego wyboru (kind choice). Przypadek może podać sam tekst dalszego wyboru, bez opcji: zostają wtedy opcje z opcji."
         }
+      }
+    },
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label"],
+      "description": "Opcja dalszego wyboru, jak opcja zdarzenia.",
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "label": { "type": "string", "minLength": 1 },
+        "goldPerLevel": { "type": "number", "exclusiveMinimum": 0, "description": "Cena opcji: tyle złota za poziom postaci, z sakiewki pomniejszonej o ceny wcześniejszych opcji." },
+        "classes": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "Opcja tylko dla tych klas i ich ewolucji." },
+        "outcome": { "$ref": "#/definitions/outcomes", "description": "Skutek opcji, gdy przypadek nie podaje własnego (po ścieżce opcji, np. lead/look)." }
       }
     },
     "outcomes": {
@@ -191,7 +210,7 @@
           "cases": {
             "type": "array",
             "minItems": 1,
-            "description": "Co naprawdę się dzieje, losowane raz na zdarzenie z wagą weight. Przypadek podaje skutki opcji (outcomes, po id opcji); opcja bez skutku w przypadku ma swój własny.",
+            "description": "Co naprawdę się dzieje, losowane raz na zdarzenie z wagą weight. Przypadek podaje skutki opcji (outcomes, po id opcji, a w dalszym wyborze po ścieżce opcji, np. lead/look); opcja bez skutku w przypadku ma swój własny.",
             "items": {
               "type": "object",
               "additionalProperties": false,
