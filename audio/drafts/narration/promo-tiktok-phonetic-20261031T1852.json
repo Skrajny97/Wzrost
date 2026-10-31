@@ -1,0 +1,17 @@
+{
+  "id": "promo-tiktok-phonetic",
+  "payload": {
+    "text": "Czy zastanawiałeś się kiedyś, jakby to było, jakby wziąć to, co najlepsze z Szejks end Fidżet, Margonem, wrzucić odrobinę Metina dwa, Tibii i strategii w stylu Plemiona, a na koniec doprawić własnymi pomysłami? Pewnie nie, ale ja tak. I stwierdziłem, że zaproszę Cię do tego projektu, jeśli tylko najdzie Cię ochota przetestować moją grę. Insajt er pe gie kropka kom. Zapraszam. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/promo-tiktok-phonetic-20261031T1852-0.mp3",
+    "audio/drafts/narration/promo-tiktok-phonetic-20261031T1852-1.mp3"
+  ],
+  "credits": 774
+}
