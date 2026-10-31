@@ -33,7 +33,6 @@ export function mountChest(container, onBack) {
 
   function render() {
     const character = state.character;
-    const away = Boolean(character.activity);
     const room = chest ? chest.slots - chest.items.length : 0;
     fill(
       container,
@@ -53,7 +52,6 @@ export function mountChest(container, onBack) {
         // The author's words: "Encyklopedia nie zaliczy przedmiotu: [...]".
         'Encyklopedia nie zaliczy przedmiotu: liczy się tylko to, co postać sama zdobędzie albo wytworzy.',
       ),
-      away && h('p', { class: 'region-warning', text: 'Postać jest poza obozem. Skrzynię otworzysz, gdy wróci.' }),
       chest &&
         h(
           'section',
@@ -72,7 +70,6 @@ export function mountChest(container, onBack) {
                     h('button', {
                       type: 'button',
                       class: 'button button--system button--small',
-                      disabled: away,
                       text: 'Wyjmij',
                       onClick: act('/api/chest/take', { id: item.id }, `${item.name}: w plecaku.`),
                     }),
@@ -98,7 +95,7 @@ export function mountChest(container, onBack) {
                     h('button', {
                       type: 'button',
                       class: 'button button--world button--small',
-                      disabled: away || room <= 0,
+                      disabled: room <= 0,
                       text: 'Włóż',
                       onClick: act('/api/chest/put', { itemId: item.id }, `${item.name}: w Skrzyni Konta.`),
                     }),

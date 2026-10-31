@@ -72,13 +72,11 @@ export function mountSettlement(container, { params = {} } = {}) {
 
   function orderCard(order) {
     const enough = order.have >= order.count;
-    // Herbs and potions wait in the bag until the report is claimed.
-    const away = order.home && Boolean(state.character.activity);
     const deliver = h('button', {
       type: 'button',
       class: 'button button--world',
       text: 'Oddaj',
-      disabled: !enough || away,
+      disabled: !enough,
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           const answer = await call('POST', '/api/settlement/deliver', { orderId: order.id });
@@ -117,7 +115,7 @@ export function mountSettlement(container, { params = {} } = {}) {
           order.special && h('span', { class: 'settlement-weekly', text: 'Zlecenie specjalne' }),
           h('span', { class: 'settlement-ask', text: `${formatNumber(order.count)} × ${order.label}` }),
         ),
-        enough && !away && [h('span', { class: 'settlement-fold-dot', 'aria-hidden': 'true' }), h('span', { class: 'visually-hidden', text: 'Można oddać' })],
+        enough && [h('span', { class: 'settlement-fold-dot', 'aria-hidden': 'true' }), h('span', { class: 'visually-hidden', text: 'Można oddać' })],
         icon('chevron', { size: 18, className: 'settlement-fold-chevron' }),
       ),
       h(
@@ -128,7 +126,6 @@ export function mountSettlement(container, { params = {} } = {}) {
         h('p', { class: 'muted', text: `Zapłata: ${formatNumber(order.gold)} złota, +${order.reputation} reputacji: ${order.brotherhoodName}${order.special ? ', +1 PS' : ''}` }),
         order.expiresAt && h('p', { class: 'muted', text: `Termin: jeszcze ${timeLeft(order.expiresAt - serverNow())}` }),
         order.kind === 'craft' && h('p', { class: 'muted', text: 'Wyroby z Warsztatu oddajesz z plecaka, najpierw najsłabsze.' }),
-        away && h('p', { class: 'muted', text: order.kind === 'craft' ? 'Wyroby oddasz po odebraniu raportu z wyprawy albo pracy.' : 'Zioła i mikstury oddasz po odebraniu raportu z wyprawy albo pracy.' }),
         h('div', { class: 'settlement-actions' }, deliver, reject),
       ),
     );
@@ -503,19 +500,17 @@ export function mountSettlement(container, { params = {} } = {}) {
   // A companion or a candidate (questions 104–113): class, level, numbers,
   // traits, skills, gear and story, with what can be done with it.
   // A companion's gift of the week from its profession (question 112 A),
-  // taken at home, as herbs and potions wait in the bag on an exploration.
+  // into the bag, also while the character is away.
   function giftRow(companion) {
     const { gift } = companion;
-    const away = Boolean(state.character.activity);
     return h(
       'div',
       { class: 'settlement-choice' },
-      h('p', { class: 'muted', text: `Prezent tygodnia z profesji: ${gift.count} × ${gift.name}.${away ? ' Czeka na powrót z wyprawy.' : ''}` }),
+      h('p', { class: 'muted', text: `Prezent tygodnia z profesji: ${gift.count} × ${gift.name}.` }),
       h('button', {
         type: 'button',
         class: 'button button--world button--small',
         text: 'Odbierz prezent',
-        disabled: away,
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
             const answer = await call('POST', '/api/settlement/gift', { companionId: companion.id });
@@ -668,7 +663,6 @@ export function mountSettlement(container, { params = {} } = {}) {
   // the day's limit.
   function herbalistCard() {
     const { premium, goods, trade } = data.herbalist;
-    const away = Boolean(state.character.activity);
     const sell = (good) => (event) =>
       withButton(event.currentTarget, async () => {
         const answer = await call('POST', '/api/settlement/herbalist', { kind: good.kind, id: good.id, count: good.count });
@@ -684,7 +678,6 @@ export function mountSettlement(container, { params = {} } = {}) {
         class: 'muted',
         text: `Jagna płaci o ${Math.round(premium * 100)}% więcej niż złomiarz, a z lepszą relacją jeszcze więcej. Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.`,
       }),
-      away && h('p', { class: 'region-warning', text: 'Zioła i mikstury są w torbie na wyprawie. Sprzedasz je po powrocie.' }),
       goods.length === 0
         ? h('p', { class: 'muted', text: 'W torbie nie ma ziół ani mikstur.' })
         : h(
@@ -700,7 +693,6 @@ export function mountSettlement(container, { params = {} } = {}) {
                   type: 'button',
                   class: 'button button--world button--small',
                   text: `Sprzedaj wszystkie (${formatNumber(Math.max(1, Math.round(good.price * good.count)))} zł.)`,
-                  disabled: away,
                   onClick: sell(good),
                 }),
               ),
@@ -760,7 +752,7 @@ export function mountSettlement(container, { params = {} } = {}) {
 
   // Whether the Tablica has an order to deliver now, for its dot on the board.
   const deliverable = () =>
-    [...data.board.slots.map((slot) => slot.order), data.board.weekly].some((order) => order && order.have >= order.count && !(order.home && state.character.activity));
+    [...data.board.slots.map((slot) => slot.order), data.board.weekly].some((order) => order && order.have >= order.count);
 
   // A torch on the board, at its own size, standing on its spot: its flame
   // flickers and glows as the camp's fire does, more at dusk and at night

@@ -85,7 +85,7 @@ describe('Skrzynia Konta', () => {
     assert.equal((await call('POST', `/api/items/${item.id}/equip`, { cookie })).status, 200);
   });
 
-  test('five places, at home only; the chest stays when its character goes and leaves with the account', async () => {
+  test('five places, also during an exploration; the chest stays when its character goes and leaves with the account', async () => {
     await create('Mira');
     const ids = [];
     for (let index = 0; index < 6; index += 1) ids.push(await inBag('Mira', amulet(5 + index)));
@@ -97,8 +97,12 @@ describe('Skrzynia Konta', () => {
     // Not an item of another character, nor a worn one.
     assert.equal((await put(999999)).data.error.code, 'item_not_found');
 
+    // The bag stays at hand while the character is away (the author: "Niech
+    // system pozwala na Wymianę i różne działania na przedmiotach w czasie
+    // zbierania ziół itp.").
     assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } })).status, 201);
-    assert.equal((await take((await chest()).items[0].id)).data.error.code, 'busy');
+    assert.equal((await take((await chest()).items[0].id)).status, 200);
+    assert.equal((await put(ids[5])).status, 200);
     await call('POST', '/api/hunts/cancel', { cookie });
 
     assert.equal((await call('DELETE', '/api/character', { cookie })).status, 200);

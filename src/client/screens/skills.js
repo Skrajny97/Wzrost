@@ -60,7 +60,8 @@ export function mountSkills(container) {
       fill(container, heading, systemPanel(`Umiejętności odblokujesz na poziomie klasy ${unlock.classLevel}. Twój poziom klasy: ${character.classLevel}.`));
       return;
     }
-    const busy = Boolean(character.activity);
+    // Only an exploration counts its fights with the skills (hunts.js).
+    const busy = character.activity?.kind === 'hunt';
     const evolution = view.evolution ?? {};
     const waiting = evolution.need && character.classLevel >= evolution.level;
     const before = pathTops();
@@ -253,7 +254,7 @@ export function mountSkills(container) {
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
             await call('POST', '/api/skills/raise', { skillId, count });
-            openCard(skillId, Boolean(state.character.activity));
+            openCard(skillId, state.character.activity?.kind === 'hunt');
           }),
       });
     const raise = raiseButton(1, 'Dodaj punkt');

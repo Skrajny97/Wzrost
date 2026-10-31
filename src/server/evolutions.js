@@ -8,7 +8,7 @@
 // Where the deployment has the evolutions off (features.js) there are none.
 
 import { evolutionChoices, evolutionView, evolveBlock, evolvedSkills, spentPoints } from '../engine/index.js';
-import { characterView, engineCharacter, loadPlayer, requireIdlePlayer } from './characters.js';
+import { characterView, engineCharacter, loadPlayer, requireBuildPlayer, requireIdlePlayer } from './characters.js';
 import { content } from './content.js';
 import { evolutionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
@@ -29,7 +29,7 @@ function requireTests(context, session) {
 // the player's decision.
 export async function takeEvolution(context) {
   requireEvolutions();
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requireBuildPlayer(context);
   const body = await readJson(context.request);
   const test = body.test === true;
   if (test) requireTests(context, session);
@@ -73,7 +73,7 @@ export async function testEvolutions(context) {
 // version the points before the reset wait for "Cofnij ewolucję".
 export async function decidePointsReset(context) {
   requireEvolutions();
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requireBuildPlayer(context);
   const body = await readJson(context.request);
   const row = player.row;
   if (!row.evolution_reset) return json({ reset: false, character: characterView(player, context.now) });
@@ -120,7 +120,7 @@ export async function testClassLevel(context) {
 
 export async function undoEvolution(context) {
   requireEvolutions();
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requireBuildPlayer(context);
   requireTests(context, session);
   if (!player.row.evolution_undo) throw new ApiError(409, 'no_test_evolution', 'Cofnąć można tylko ewolucję z testu.');
   const db = context.env.DB;

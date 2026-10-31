@@ -18,7 +18,7 @@ import {
   upgradeView,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireIdlePlayer, requirePlayer, walletOf } from './characters.js';
+import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireIdlePlayer, requirePlayer, requireUnworn, walletOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 
@@ -93,7 +93,7 @@ export async function unequipItem(context) {
 }
 
 export async function discardItem(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const item = findItem(player, context.params.id);
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
   await context.env.DB.prepare('DELETE FROM items WHERE id = ? AND character_id = ?').bind(item.id, player.row.id).run();
@@ -102,7 +102,7 @@ export async function discardItem(context) {
 
 // The scrapper buys every item in the bag of a rarity up to the chosen one.
 export async function sellItems(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const limit = content.rarities.findIndex((rarity) => rarity.id === body.maxRarity);
   if (limit === -1) throw new ApiError(400, 'invalid_rarity', 'Wybierz rzadkość.');
@@ -136,7 +136,7 @@ export async function sellItems(context) {
 // of its card (the author: "nie mogę sprzedać ulepszonych ... ani w skupie
 // ani nigdzie"). The price is counted from the item still there, as above.
 export async function sellItem(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const item = findItem(player, context.params.id);
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
   const db = context.env.DB;
@@ -198,8 +198,10 @@ function upgradeStack(row, need, chosen) {
 // rolled with a fresh seed (rollUpgrade in the engine). A failure takes the
 // payment and a level, and from +7 on may break the item.
 export async function upgradeItem(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const item = findItem(player, context.params.id);
+  // An item worn is upgraded at home; one in the bag also while away.
+  requireUnworn(player, item, context.now);
   const cap = campBonus(campLevels(player.buildings, context.now, content), 'upgradeCap', content);
   const view = upgradeView(item, cap, content);
   if (view.level >= view.max) throw new ApiError(409, 'max_upgrade', 'Ten przedmiot ma już najwyższe ulepszenie.');

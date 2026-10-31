@@ -4,7 +4,7 @@
 // keeps the character it started with.
 
 import { learnBlock, raiseBlock } from '../engine/index.js';
-import { characterView, engineCharacter, requireIdlePlayer } from './characters.js';
+import { characterView, engineCharacter, requireBuildPlayer } from './characters.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
 
@@ -27,7 +27,7 @@ function skillOf(body) {
 
 // { skillId }: learn one of the skills of the class's milestone, at level 1.
 export async function learnSkill(context) {
-  const { player } = await requireIdlePlayer(context);
+  const { player } = await requireBuildPlayer(context);
   const skillId = skillOf(await readJson(context.request));
   const character = engineCharacter(player.row);
   const block = learnBlock(character, skillId, content);
@@ -38,7 +38,7 @@ export async function learnSkill(context) {
 // { skillId, count }: Skill Points into a learned skill, one unless `count`
 // says more ("Dodaj 10 Punktów" on the skill's card).
 export async function raiseSkill(context) {
-  const { player } = await requireIdlePlayer(context);
+  const { player } = await requireBuildPlayer(context);
   const body = await readJson(context.request);
   const skillId = skillOf(body);
   const count = body.count ?? 1;

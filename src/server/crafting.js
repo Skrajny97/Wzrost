@@ -129,7 +129,7 @@ export async function craftMaterials(context) {
 // come when the order ends. With Rzemieślnictwo, an item of a pattern the
 // Warsztat does not show yet teaches it at once (patternFrom).
 export async function salvageItem(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const item = player.items.find((candidate) => String(candidate.id) === context.params.id);
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');

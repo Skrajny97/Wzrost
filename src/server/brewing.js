@@ -31,7 +31,7 @@ import {
   timedKind,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdlePlayer, requireWorker, workOf } from './characters.js';
+import { buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, insertWork, requireProfessions, takeFromBag, workGains } from './professions.js';
@@ -218,7 +218,7 @@ function potionCount(player, body) {
 // The scrapper buys potions for priceFactor times their herbs, with the
 // camp's Skup złomu.
 export async function sellPotions(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const taken = potionCount(player, body);
   const bonus = campBonus(campLevels(player.buildings, context.now, content), 'sellPrice', content);
@@ -233,7 +233,7 @@ export async function sellPotions(context) {
 // those still left (potions.js). A mana potion, an antidote and the fern
 // brew work only by themselves in fights.
 export async function drinkPotion(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const taken = potionCount(player, { potionId: body.potionId, count: 1 });
   const potion = content.potionsById[taken.id];
@@ -248,6 +248,8 @@ export async function drinkPotion(context) {
   let also;
   let text;
   if (potion.effect.heal) {
+    // On an exploration the HP is the report's: healing waits for the return.
+    if (player.activity?.kind === 'hunt') requireIdle(player, now);
     const { hp, maxHp } = currentHp(player, now);
     if (hp >= maxHp) throw new ApiError(409, 'full_hp', 'Postać ma pełne HP.');
     const healed = Math.min(maxHp - hp, Math.round(potion.effect.heal * maxHp));
@@ -268,7 +270,7 @@ export async function drinkPotion(context) {
 }
 
 export async function discardPotions(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const result = await takeFromBag(context.env.DB, player, 'potions', potionCount(player, body));
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Mikstury zmieniły się w międzyczasie. Spróbuj ponownie.');

@@ -401,29 +401,24 @@ describe('the Osada through the API', () => {
     assert.equal(await lit(), true);
   });
 
-  test('herb, potion and Warsztat orders wait for the character at home, the others do not', async () => {
+  test('herb and potion orders are delivered during an exploration too, as the others are', async () => {
     assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } })).status, 201);
     let orders = [];
-    const herbal = (order) => order.home && order.kind !== 'craft';
-    for (let i = 0; i < 20 && !(orders.some(herbal) && orders.some((order) => !order.home)); i++) {
+    const herbal = (order) => ['herb', 'potion'].includes(order.kind);
+    for (let i = 0; i < 20 && !orders.some(herbal); i++) {
       await call('POST', '/api/test/settlement', { cookie, body: { action: 'orders' } });
       orders = (await view()).board.slots.map((slot) => slot.order);
     }
-    const home = orders.find(herbal);
-    const away = orders.find((order) => !order.home);
-    assert.ok(['herb', 'potion'].includes(home.kind));
-    assert.ok(!['herb', 'potion'].includes(away.kind));
+    const order = orders.find(herbal);
+    // The bag stays at hand while the character is away (the author: "Niech
+    // system pozwala na Wymianę i różne działania na przedmiotach w czasie
+    // zbierania ziół itp.").
     const lit = async () => (await call('GET', '/api/character', { cookie })).data.character.settlementWaiting;
-    const give = (order) => set(`${STORE[order.kind]} = json_set(${STORE[order.kind]}, ?, ?)`, `$."${order.key}"`, order.count);
     await set(`herbs = '{}', potions = '{}', materials = '{}', resources = '{}', parts = '{}'`);
-    await give(home);
     assert.equal(await lit(), false);
-    const waiting = await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: home.id } });
-    assert.equal(waiting.status, 409);
-    assert.equal(waiting.data.error.code, 'busy');
-    await give(away);
+    await set(`${STORE[order.kind]} = json_set(${STORE[order.kind]}, ?, ?)`, `$."${order.key}"`, order.count);
     assert.equal(await lit(), true);
-    assert.equal((await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: away.id } })).status, 200);
+    assert.equal((await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } })).status, 200);
   });
 
   test('a Warsztat order takes the weakest of the pattern\'s items from the bag, never a worn one', async () => {
@@ -433,7 +428,6 @@ describe('the Osada through the API', () => {
       order = (await view()).board.slots.map((slot) => slot.order).find((one) => one.kind === 'craft') ?? null;
     }
     assert.ok(order, 'a Warsztat order comes');
-    assert.equal(order.home, true);
     const database = await db();
     const { id } = await database.prepare('SELECT id FROM characters').first();
     const made = (rarityId, seed) => ({

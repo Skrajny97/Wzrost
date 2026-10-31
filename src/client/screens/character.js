@@ -71,11 +71,13 @@ let bagTab = 'items';
 // "Rzadka skóra wilka" for a stack above its species' rarity.
 export const materialTitle = (material) => material.label.charAt(0).toUpperCase() + material.label.slice(1);
 
-// Why the gear cannot change now: the character is away.
+// Why the gear cannot change now: the character is away. The bag stays at
+// hand (the author: "Niech nie pozwala tylko na zakładanie i zmianę
+// ekwipunku").
 const BUSY_TEXTS = {
-  herbs: 'Postać zbiera zioła. Plecak i ekwipunek zmienisz po jej powrocie z Zagajnika.',
-  potions: 'Postać warzy mikstury. Plecak i ekwipunek zmienisz po jej powrocie z Pracowni.',
-  items: 'Postać wykonuje przedmioty. Plecak i ekwipunek zmienisz po jej powrocie z Warsztatu.',
+  herbs: 'Postać zbiera zioła. Ekwipunek zmienisz po jej powrocie z Zagajnika.',
+  potions: 'Postać warzy mikstury. Ekwipunek zmienisz po jej powrocie z Pracowni.',
+  items: 'Postać wykonuje przedmioty. Ekwipunek zmienisz po jej powrocie z Warsztatu.',
 };
 const busyText = (character) => BUSY_TEXTS[character.activity?.kind] ?? 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.';
 
@@ -430,11 +432,12 @@ export function mountCharacter(container) {
   function stackSheet(kind, entry) {
     const { art: artOf, api, key, discard: discardTitle } = STACKS[kind];
     const character = state.character;
-    const busy = Boolean(character.activity);
+    // On an exploration the HP is the report's: a healing potion waits.
+    const exploring = character.activity?.kind === 'hunt' && entry.fight === 'heal';
     let count = 1;
     const price = (amount) => Math.max(1, Math.round(entry.price * amount));
     const value = h('output', { class: 'herb-count-value' });
-    const sell = h('button', { type: 'button', class: 'button button--system', disabled: busy });
+    const sell = h('button', { type: 'button', class: 'button button--system' });
     const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
     const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
     const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(entry.count) });
@@ -478,30 +481,30 @@ export function mountCharacter(container) {
         h('p', { class: 'sheet-text', text: entry.description }),
         h('p', { class: 'sheet-text', text: `Jedno miejsce mieści ${character.herbStack} szt. Złomiarz płaci ${formatDecimal(entry.price)} złota za sztukę.` }),
       ),
-      busy
-        ? h('p', { class: 'muted', text: busyText(character) })
-        : [
-            // A healing potion or a potion for a time is drunk, or the oil put
-            // on the blade, one at a time (potions.js); one from a Wymiana
-            // waits for its recipe.
-            entry.known === false && h('p', { class: 'region-warning', text: 'Tej mikstury nie użyjesz, póki nie poznasz jej receptury w Alchemii.' }),
-            entry.drink &&
-              entry.known !== false &&
-              h('button', {
-                type: 'button',
-                class: 'button button--system',
-                text: entry.verb,
-                onClick: (event) =>
-                  withButton(event.currentTarget, async () => {
-                    const { text } = await call('POST', '/api/potions/drink', { potionId: entry.id });
-                    closeSheet();
-                    playSound('potion');
-                    toast(text);
-                  }),
+      [
+        // A healing potion or a potion for a time is drunk, or the oil put
+        // on the blade, one at a time (potions.js); one from a Wymiana waits
+        // for its recipe.
+        entry.known === false && h('p', { class: 'region-warning', text: 'Tej mikstury nie użyjesz, póki nie poznasz jej receptury w Alchemii.' }),
+        exploring && entry.known !== false && h('p', { class: 'muted', text: 'Leczyć się można po powrocie z wyprawy.' }),
+        entry.drink &&
+          entry.known !== false &&
+          h('button', {
+            type: 'button',
+            class: 'button button--system',
+            text: entry.verb,
+            disabled: exploring,
+            onClick: (event) =>
+              withButton(event.currentTarget, async () => {
+                const { text } = await call('POST', '/api/potions/drink', { potionId: entry.id });
+                closeSheet();
+                playSound('potion');
+                toast(text);
               }),
-            h('div', { class: 'herb-count' }, less, value, more, all),
-            h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: 'Wyrzuć' }), sell),
-          ],
+          }),
+        h('div', { class: 'herb-count' }, less, value, more, all),
+        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: 'Wyrzuć' }), sell),
+      ],
     );
   }
 
@@ -541,6 +544,8 @@ export function mountCharacter(container) {
 // its slot, and the actions.
 export function itemSheet(item, { equipped }) {
   const character = state.character;
+  // Away, the bag stays at hand: only wearing and taking off wait, and an
+  // item worn is changed at home (inventory.js).
   const busy = Boolean(character.activity);
   const usable = !item.classIds || item.classIds.includes(character.classId);
   // A later base of its kind waits for its class level (a Metin2-like tier).
@@ -587,22 +592,22 @@ export function itemSheet(item, { equipped }) {
     itemDetails(item),
     preview,
     usable && worn && compareTable(item, worn),
-    anvilSection(item, busy),
-    !equipped && salvageSection(item, busy),
+    anvilSection(item, busy && equipped),
+    !equipped && salvageSection(item, false),
     busy && h('p', { class: 'muted', text: busyText(character) }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
     early && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
     traded && h('p', { class: 'region-warning', text: `Ten przedmiot ${item.chest ? 'ze Skrzyni Konta' : 'z wymiany'} założysz od poziomu postaci ${item.level}.` }),
     !equipped &&
       item.price !== undefined &&
-      h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: sell, text: `Sprzedaj za ${formatNumber(item.price)} złota` }),
+      h('button', { type: 'button', class: 'button button--world', onClick: sell, text: `Sprzedaj za ${formatNumber(item.price)} złota` }),
     h(
       'div',
       { class: 'sheet-actions' },
       equipped
         ? h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: 'Zdejmij' })
         : [
-            h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: discard, text: 'Wyrzuć' }),
+            h('button', { type: 'button', class: 'button button--world', onClick: discard, text: 'Wyrzuć' }),
             h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early || traded, onClick: act('equip'), text: 'Załóż' }),
           ],
     ),

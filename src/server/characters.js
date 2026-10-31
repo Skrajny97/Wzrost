@@ -361,15 +361,15 @@ export function settlementBoard(row, stored, now) {
 }
 
 // Whether an order on the board, the week's included, can be delivered
-// now: the dot on the Osada tab. While the character is `away`, the orders
-// for the bag's goods wait (BAG_GOODS).
-function settlementWaiting(row, items, now, away) {
+// now: the dot on the Osada tab. The bag stays at hand while the character
+// is away, so every order counts then too.
+function settlementWaiting(row, items, now) {
   if (!settlementOpen(row)) return false;
   const stored = JSON.parse(row.settlement ?? '{}');
   const board = settlementBoard(row, { board: stored.board ?? null, reputation: stored.reputation ?? {} }, now);
   const goods = settlementGoods(row, items);
   const weekly = board.weekly && !board.weekly.done ? board.weekly.order : null;
-  return [...board.slots.map((slot) => slot.order), weekly].some((order) => order && !(away && BAG_GOODS.has(order.kind)) && goodStock(order, goods) >= order.count);
+  return [...board.slots.map((slot) => slot.order), weekly].some((order) => order && goodStock(order, goods) >= order.count);
 }
 
 // What a period's quests are drawn from: the character as it is, whether its
@@ -423,6 +423,29 @@ export function requireIdle(player, now) {
   throw activity.ends_at <= now
     ? new ApiError(409, 'claim_first', texts ? texts.claimFirst[0] : 'Wyprawa się skończyła. Najpierw odbierz raport.')
     : new ApiError(409, 'busy', texts ? texts.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
+}
+
+// While the character is away, its bag stays at hand (the author: "Niech
+// system pozwala na Wymianę i różne działania na przedmiotach w czasie
+// zbierania ziół itp. Niech nie pozwala tylko na zakładanie i zmianę
+// ekwipunku"): only what it wears waits for its return, so an item worn is
+// changed at home.
+export function requireUnworn(player, item, now) {
+  if (item?.equippedSlot) requireIdle(player, now);
+}
+
+// On an exploration also what its fights are counted with waits: the stat
+// points, the skills and the evolution, since the report is made with them
+// when it is claimed (hunts.js). The work of a profession needs none of it.
+export function requireNotExploring(player, now) {
+  if (player.activity?.kind === 'hunt') requireIdle(player, now);
+}
+
+// The character for a change of its stat points, skills or evolution (above).
+export async function requireBuildPlayer(context) {
+  const found = await requirePlayer(context);
+  requireNotExploring(found.player, context.now);
+  return found;
 }
 
 // Who does a profession's work: the character at home, or with `avatar` in
@@ -880,7 +903,7 @@ export function characterView(player, now) {
     canRename: !row.name_changed,
     nameNotice: row.name_notice ?? null,
     // An order of the Osada that can be delivered now lights its tab.
-    settlementWaiting: settlementWaiting(row, items, now, Boolean(activity)),
+    settlementWaiting: settlementWaiting(row, items, now),
     huntDurations: huntDurations(row.level, content),
     // Szybkie Polowania left today (hunts.js), or null below their level.
     quickHunts: quickHuntsView(row, now),
@@ -1303,7 +1326,7 @@ async function savePoints(context, player, points) {
 }
 
 export async function spendPoints(context) {
-  const { player } = await requireIdlePlayer(context);
+  const { player } = await requireBuildPlayer(context);
   const body = await readJson(context.request);
   const added = body.points;
   const invalid = new ApiError(400, 'invalid_points', 'Nieprawidłowy podział punktów.');
@@ -1325,7 +1348,7 @@ export async function spendPoints(context) {
 }
 
 export async function autoPoints(context) {
-  const { player } = await requireIdlePlayer(context);
+  const { player } = await requireBuildPlayer(context);
   const character = engineCharacter(player.row);
   if (freePoints(character, content) === 0) {
     throw new ApiError(400, 'no_free_points', 'Nie masz wolnych punktów.');
@@ -1334,7 +1357,7 @@ export async function autoPoints(context) {
 }
 
 export async function resetPoints(context) {
-  const { player } = await requireIdlePlayer(context);
+  const { player } = await requireBuildPlayer(context);
   if (player.row.level > content.balance.progression.freeResetMaxLevel) {
     throw new ApiError(
       403,

@@ -67,9 +67,10 @@ import {
   engineCharacter,
   loadPlayer,
   questsNow,
-  requireIdle,
+  requireBuildPlayer,
   requireIdlePlayer,
   requirePlayer,
+  requireUnworn,
   settlementBoard,
   settlementGoods,
 } from './characters.js';
@@ -173,8 +174,6 @@ const orderView = (order, stocks, sellBonus) => ({
   label: goodLabel(order),
   brotherhoodName: content.settlement.brotherhoods.find((one) => one.id === order.brotherhood).name,
   have: stocks[COLUMNS[order.kind]]?.[order.key] ?? 0,
-  // Delivered only at home (BAG_GOODS).
-  home: BAG_GOODS.has(order.kind),
 });
 
 // The Osada for the page: the board's places, the residents with the
@@ -247,12 +246,14 @@ function imbueView(player) {
 // body armour, worn or in the bag, at home as every change of the gear;
 // one already there gives way. Gold and the element's material pay.
 export async function imbueAtEnchantress(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
   const item = player.items.find((candidate) => String(candidate.id) === String(body.itemId));
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
+  // An item worn is changed at home; one in the bag also while away.
+  requireUnworn(player, item, context.now);
   const materials = JSON.parse(row.materials ?? '{}');
   const block = imbueBlock(item, body.element, { gold: row.gold, materials }, content);
   if (block) throw new ApiError(block.code === 'wrong_slot' || block.code === 'invalid_element' ? 400 : 409, block.code, block.message);
@@ -317,7 +318,7 @@ function herbalistView(player, stored, now) {
 // bag, at home, as the scrapper does; the trade raises the relation with
 // her and the reputation with the herbalists, up to the day's limit.
 export async function sellToHerbalist(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
@@ -516,9 +517,6 @@ export async function deliverSettlementOrder(context) {
   const block = deliverBlock(board, body.orderId, settlementGoods(row, player.items));
   if (block) throw new ApiError(block.code === 'no_order' ? 404 : 409, block.code, block.message);
   const done = deliverOrder(board, body.orderId, context.now, content, sellBonusOf(player, context.now));
-  // The potions taken along leave the bag only when the report is claimed,
-  // so herbs and potions wait for the character at home, as at the Skup.
-  if (BAG_GOODS.has(done.take.kind)) requireIdle(player, context.now);
   const add = (counts, more) => ({ ...counts, ...Object.fromEntries(Object.entries(more).map(([id, gain]) => [id, (counts[id] ?? 0) + gain])) });
   const next = { ...stored, reputation: add(stored.reputation, done.reputation), relations: add(stored.relations, done.relation), board: done.board };
   // The narrator's quests "Wykonaj N zleceń w Osadzie" (question 95).
@@ -634,7 +632,7 @@ export async function hireCompanion(context) {
 // they need free places there, and takes its own gear along. Not while it
 // is out on an exploration.
 export async function dismissCompanion(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
@@ -706,7 +704,7 @@ export async function equipCompanion(context) {
 // (question 112 A) goes to the character's goods. At home, as herbs and
 // potions wait in the bag while the character is away.
 export async function takeCompanionGift(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
@@ -756,7 +754,7 @@ export async function rejectSettlementOrder(context) {
 // (chooseReforged); until then they wait in the Osada and no other affix
 // can be reforged. The character must be at home, as at the Kowadło.
 export async function reforgeAtEnchantress(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
@@ -764,6 +762,7 @@ export async function reforgeAtEnchantress(context) {
   if (pendingOf(stored, player.items)) throw new ApiError(409, 'choose_first', 'Najpierw wybierz afiks z poprzedniego zaklęcia.');
   const item = player.items.find((candidate) => String(candidate.id) === String(body.itemId));
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
+  requireUnworn(player, item, context.now);
   const times = item.reforged ?? 0;
   const materials = JSON.parse(row.materials ?? '{}');
   const block = reforgeBlock(item, body.affix, { gold: row.gold, materials, stack: body.material, times }, content);
@@ -821,13 +820,14 @@ const reforgeResult = (before, after, affix) => ({ itemId: after.id, name: itemN
 
 // { option }: the affix the player keeps of those a reforging drew.
 export async function chooseReforged(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
   const stored = settlementOf(row);
   const pending = pendingOf(stored, player.items);
   if (!pending) throw new ApiError(404, 'no_choice', 'Nie ma afiksów do wyboru.');
+  requireUnworn(player, pending.item, context.now);
   const option = pending.options[body.option];
   if (!Number.isInteger(body.option) || !option) throw new ApiError(400, 'invalid_option', 'Wybierz jeden z afiksów.');
   const { affixes } = withAffix(pending.item, pending.affix, option);
@@ -861,7 +861,7 @@ export async function chooseReforged(context) {
 // the start and the free reset of the stat points as after the first one.
 // At home only, like the stat points and the skills.
 export async function hermitService(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requireBuildPlayer(context);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);

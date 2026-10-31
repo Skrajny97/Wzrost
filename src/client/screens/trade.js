@@ -241,7 +241,6 @@ export function mountTrade(container, { backHash }) {
       h('p', { class: 'trade-status', role: 'status', text: statusText() }),
       view.state === 'proposed' && countdown,
       live && !view.other.online && h('p', { class: 'region-warning', text: `Gracz ${view.other.name} nie jest teraz online.` }),
-      live && state.character.activity && h('p', { class: 'region-warning', text: 'Twoja postać jest poza obozem. Wymienisz się po jej powrocie.' }),
       ['open', 'locked', 'done'].includes(view.state) && [offerCard(true), offerCard(false)],
       actions(),
     );

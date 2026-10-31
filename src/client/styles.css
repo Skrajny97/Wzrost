@@ -4259,23 +4259,33 @@ a.camp-level-button {
 }
 
 /* The Skrzynia Konta beside the Magazyn (screens/camp.js): the chest's
-   picture at twice its size, its name under it like a plot's, in the board's
-   light of the hour. */
+   picture as a small thing standing on the glade, softened to sit among the
+   buildings' pictures (the author: "Ikona Skrzyni Konta powinna być
+   mniejsza i nie odstawać tak od reszty stylem"), its name under it like a
+   plot's, in the board's light of the hour. */
 .camp-chest {
   position: absolute;
   z-index: 1;
-  display: block;
-  width: 13%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 9.5%;
   transform: translate(-50%, -50%);
   color: var(--text);
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 }
 
+.camp-chest-art {
+  display: block;
+  width: 100%;
+}
+
 .camp-chest-art .sprite {
+  display: block;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.55));
+  filter: contrast(0.82) saturate(0.85) brightness(0.96) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
 }
 
 .camp-board--dawn .camp-chest-art {
@@ -4290,7 +4300,9 @@ a.camp-level-button {
   filter: brightness(0.62) saturate(0.75);
 }
 
+/* The name under the small chest, not over it. */
 .camp-chest .camp-plot-label {
+  transform: translate(-50%, 1px);
   white-space: nowrap;
 }
 

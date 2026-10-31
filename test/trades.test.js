@@ -142,16 +142,20 @@ describe('Wymiana', () => {
     assert.equal(await current(players.ola), null);
   });
 
-  test('waits for both characters at home, as every change of the bag does', async () => {
-    const id = await opened();
+  test('goes on while a character is away, on an exploration or at work', async () => {
+    // The author: "Niech system pozwala na Wymianę i różne działania na
+    // przedmiotach w czasie zbierania ziół itp."
     assert.equal((await call('POST', '/api/hunts', { cookie: players.ola, body: { areaId: 'windfalls-edge', minutes: 5 } })).status, 201);
-    assert.equal((await trade(players.ola, 'offer', { id, offer: { gold: 5 } })).data.error.code, 'busy');
-    const offered = await trade(players.ala, 'offer', { id, offer: { gold: 5 } });
+    const id = await opened();
+    await (await db()).prepare('UPDATE characters SET gold = 100').run();
+    assert.equal((await trade(players.ola, 'offer', { id, offer: { gold: 5 } })).status, 200);
+    const offered = await trade(players.ala, 'offer', { id, offer: { gold: 7 } });
     assert.equal(offered.status, 200);
-    assert.equal((await trade(players.ala, 'confirm', { id, version: offered.data.trade.version })).data.error.code, 'away');
-    await trade(players.ala, 'cancel', { id });
-    assert.equal((await trade(players.ala, 'propose', { id: (await row('Ola')).id })).data.error.code, 'away');
-    assert.equal((await trade(players.ola, 'propose', { id: (await row('Ala')).id })).data.error.code, 'busy');
+    const locked = await trade(players.ala, 'confirm', { id, version: offered.data.trade.version });
+    assert.equal(locked.status, 200, JSON.stringify(locked.data));
+    const done = await trade(players.ola, 'confirm', { id, version: locked.data.trade.version });
+    assert.equal(done.data.trade.state, 'done', JSON.stringify(done.data));
+    assert.deepEqual([(await row('Ala')).gold, (await row('Ola')).gold], [98, 102]);
   });
 
   test('only with a player online, who takes trades, and not after too many turned down', async () => {

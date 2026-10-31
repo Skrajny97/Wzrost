@@ -49,7 +49,8 @@ export function mountEvolution(container) {
       fill(container, heading, systemPanel(t.notReady), toSkills);
       return;
     }
-    const busy = Boolean(character.activity);
+    // Only an exploration counts its fights with the evolution (hunts.js).
+    const busy = character.activity?.kind === 'hunt';
     // The author's words, with "mogła" for a woman.
     const said = character.appearance === 'female' ? t.introFemale : t.intro;
     const intro = systemPanel(said.replace('{level}', String(character.skills.evolution.level)));

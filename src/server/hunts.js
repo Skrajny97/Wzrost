@@ -152,6 +152,15 @@ function takenPotions(player, asked, minutes) {
   return taken;
 }
 
+// The bag's potions with those set aside for the road back (`back`), less
+// those drunk on it.
+function potionsBack(row, back, drunk) {
+  const bag = { ...potionsOf(row) };
+  for (const [id, count] of Object.entries(back)) bag[id] = (bag[id] ?? 0) + count;
+  for (const [id, count] of Object.entries(drunk)) bag[id] = (bag[id] ?? 0) - count;
+  return Object.fromEntries(Object.entries(bag).filter(([, count]) => count > 0));
+}
+
 // Inner regions open with the class level (areaUnlockLevel).
 const areaLocked = (area) =>
   new ApiError(403, 'area_locked', `To miejsce odblokujesz na poziomie klasy ${areaUnlockLevel(area, content)}.`);
@@ -314,10 +323,22 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
           ...(healed && { companions: kept.companions.map(({ wounded: _, ...companion }) => companion) }),
         })
       : null;
+  // The potions taken along leave the bag for the road (the author: "Niech
+  // rezerwuje również ilości tego co zabiera w trasę - mikstury itp."), so
+  // the bag is free for other things while the character is away; what is
+  // not drunk comes back with the report (`reserved`).
+  const reserving = Object.keys(taken).length > 0;
+  const bagPotions = reserving
+    ? Object.fromEntries(
+        Object.entries(potionsOf(player.row))
+          .map(([id, count]) => [id, count - (taken[id] ?? 0)])
+          .filter(([, count]) => count > 0),
+      )
+    : null;
   const options = {
     ...(rumor > 1 && { rumor }),
     ...(party.length > 0 && { companions: party }),
-    ...(Object.keys(taken).length > 0 && { potions: taken, healBelow: healBelow ?? content.potionUse.healBelow }),
+    ...(reserving && { potions: taken, reserved: true, healBelow: healBelow ?? content.potionUse.healBelow }),
     ...(timed && { buffs: windows }),
     ...(unknown.length > 0 && { unknown }),
     ...(Object.keys(trophies).length > 0 && { trophies }),
@@ -351,8 +372,17 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
         ),
       // The HP rested so far is saved now, so it is not counted again later.
       db
-        .prepare(`UPDATE characters SET hp = ?, hp_at = ?${timed ? ', buffs = ?' : ''}${settlement ? ', settlement = ?' : ''}, version = version + 1 WHERE id = ?`)
-        .bind(hp, now, ...(timed ? [JSON.stringify(spendWindows(buffs, windows))] : []), ...(settlement ? [settlement] : []), player.row.id),
+        .prepare(
+          `UPDATE characters SET hp = ?, hp_at = ?${timed ? ', buffs = ?' : ''}${settlement ? ', settlement = ?' : ''}${reserving ? ', potions = ?' : ''}, version = version + 1 WHERE id = ?`,
+        )
+        .bind(
+          hp,
+          now,
+          ...(timed ? [JSON.stringify(spendWindows(buffs, windows))] : []),
+          ...(settlement ? [settlement] : []),
+          ...(reserving ? [JSON.stringify(bagPotions)] : []),
+          player.row.id,
+        ),
     ]);
   } catch (error) {
     if (String(error?.message).includes('constraint')) {
@@ -383,17 +413,25 @@ export async function cancelHunt(context) {
       character: characterView(await loadPlayer(db, session.userId), context.now),
     });
   }
-  // The potions for a time get back the time the exploration did not use.
-  const windows = optionWindows(JSON.parse(activity.options ?? '{}'));
+  // The potions for a time get back the time the exploration did not use,
+  // and the potions set aside for the road come back to the bag.
+  const options = JSON.parse(activity.options ?? '{}');
+  const windows = optionWindows(options);
   const used = context.now - activity.started_at;
   const unused = Object.values(windows).some((window) => window.ms > used);
+  const back = options.reserved ? options.potions ?? {} : {};
+  const returning = Object.keys(back).length > 0;
   await db.batch([
     db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(player.row.id, activity.started_at),
-    ...(unused
+    ...(unused || returning
       ? [
           db
-            .prepare('UPDATE characters SET buffs = ?, version = version + 1 WHERE id = ?')
-            .bind(JSON.stringify(returnWindows(buffsOf(player.row, context.now), windows, used)), player.row.id),
+            .prepare(`UPDATE characters SET ${[unused && 'buffs = ?', returning && 'potions = ?'].filter(Boolean).join(', ')}, version = version + 1 WHERE id = ?`)
+            .bind(
+              ...(unused ? [JSON.stringify(returnWindows(buffsOf(player.row, context.now), windows, used))] : []),
+              ...(returning ? [JSON.stringify(potionsBack(player.row, back, {}))] : []),
+              player.row.id,
+            ),
         ]
       : []),
   ]);
@@ -533,14 +571,13 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // The companions who went gain XP, one who fell is wounded, and an
   // event's reputation and rumor are kept (settlementAfterHunt).
   const settlementAfter = settlementAfterHunt(row, hunt, kept);
-  // The potions drunk leave the bag; the bag cannot change during the
-  // exploration, so they are still there.
+  // The potions taken along were set aside at the start (`reserved`): what
+  // was not drunk comes back to the bag. An exploration started before that
+  // takes the potions drunk from the bag, where they stayed.
   const drunk = Object.entries(hunt.potionsUsed);
-  const potionsLeft = Object.fromEntries(
-    Object.entries(potionsOf(row))
-      .map(([id, count]) => [id, count - (hunt.potionsUsed[id] ?? 0)])
-      .filter(([, count]) => count > 0),
-  );
+  const reservedPotions = options.reserved ? options.potions ?? {} : {};
+  const potionsChanged = drunk.length > 0 || Object.keys(reservedPotions).length > 0;
+  const potionsLeft = potionsBack(row, reservedPotions, hunt.potionsUsed);
   // A find for a slot with nothing in it is worn at once.
   const autoEquipped = autoEquip(equippedItems(player), hunt.items, content, row.class_id, row.class_level);
   // The rest goes to the bag. When it does not fit, the scrapper buys the
@@ -657,7 +694,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       db
         .prepare(
           `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setResources}${setMaterials}${setHerbs},
-             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${drunk.length > 0 ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''}${eventBuffs ? ', buffs = ?' : ''}${eventPoints > 0 ? ', bonus_points = bonus_points + ?' : ''}${settlementAfter ? ', settlement = ?' : ''},
+             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${potionsChanged ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''}${eventBuffs ? ', buffs = ?' : ''}${eventPoints > 0 ? ', bonus_points = bonus_points + ?' : ''}${settlementAfter ? ', settlement = ?' : ''},
              version = version + 1
            WHERE id = ?`,
         )
@@ -679,7 +716,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
           JSON.stringify(met),
           row.quests,
           quests,
-          ...(drunk.length > 0 ? [JSON.stringify(potionsLeft)] : []),
+          ...(potionsChanged ? [JSON.stringify(potionsLeft)] : []),
           ...(eventBuffs ? [JSON.stringify(eventBuffs)] : []),
           ...(eventPoints > 0 ? [eventPoints] : []),
           ...(settlementAfter ? [settlementAfter] : []),

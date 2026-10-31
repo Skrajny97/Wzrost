@@ -1351,14 +1351,19 @@ describe('upgrades on the Kowadło', () => {
     assert.ok(['success', 'failure'].includes(chosen.data.upgrade.result));
   });
 
-  test('nothing is upgraded during an exploration, and the scrapper does not sell upgraded items by the handful', async () => {
+  test('during an exploration a worn item waits, one in the bag is upgraded; the scrapper does not sell upgraded items by the handful', async () => {
     await anvilAt(3);
     await (await db()).prepare("UPDATE items SET data = json_set(data, '$.upgrade', 2)").run();
     const sale = await call('POST', '/api/items/sell', { cookie, body: { maxRarity: 'divine' } });
     assert.equal(sale.data.sold.count, 0);
-    await stock(1000, { wood: 0, stone: 0, 'iron-ore': 100 });
+    await stock(100000, { wood: 0, stone: 0, 'iron-ore': 1000 });
+    const helmet = { base: 'helmet', slot: 'head', level: 5, rarity: 'common', affixes: [], armor: 8 };
+    const { meta } = await (await db()).prepare("INSERT INTO items (character_id, slot, data, created_at) SELECT id, 'head', ?, 0 FROM characters").bind(JSON.stringify(helmet)).run();
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
-    assert.equal((await upgrade()).data.error.code, 'busy');
+    // The bag stays at hand (the author: "Niech nie pozwala tylko na
+    // zakładanie i zmianę ekwipunku").
+    assert.equal((await upgrade()).status, 200);
+    assert.equal((await call('POST', `/api/items/${meta.last_row_id}/upgrade`, { cookie })).data.error.code, 'busy');
   });
 
   test('the scrapper buys one item from its card, an upgraded one too, but not a worn one', async () => {
@@ -1887,7 +1892,7 @@ describe('Stół rozbiórki', () => {
     assert.equal(view.bag.length, 0);
   });
 
-  test('a worn item, or anything during an exploration, cannot be taken apart; the table works on', async () => {
+  test('a worn item cannot be taken apart; one in the bag can, also during an exploration, and the table works on', async () => {
     await tableAt(1);
     const { id } = await bagItem('common', 3);
     await call('POST', `/api/items/${id}/equip`, { cookie });
@@ -1895,7 +1900,7 @@ describe('Stół rozbiórki', () => {
     await call('POST', `/api/items/${id}/unequip`, { cookie });
     await stockMaterials({ 'fox-pelt:common': 1 });
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
-    assert.equal((await salvage(id)).data.error.code, 'busy');
+    assert.equal((await salvage(id)).status, 200);
     assert.equal((await craft({ all: true })).status, 200);
   });
 

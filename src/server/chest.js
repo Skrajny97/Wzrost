@@ -52,7 +52,7 @@ export async function getChest(context) {
 // removes the item only once the chest has it, so two taps at once cannot
 // overfill the chest.
 export async function putInChest(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const item = player.items.find((candidate) => candidate.id === body.itemId);
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
@@ -79,7 +79,7 @@ export async function putInChest(context) {
 // POST /api/chest/take { id }: an item from the chest into the bag, while the
 // bag has room; one the character put in itself comes back as it was.
 export async function takeFromChest(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const db = context.env.DB;
   const stored = Number.isInteger(body.id) ? await db.prepare('SELECT id FROM chest_items WHERE id = ? AND user_id = ?').bind(body.id, session.userId).first() : null;

@@ -22,7 +22,7 @@ import {
   workXp,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requireIdlePlayer, requireWorker, workOf } from './characters.js';
+import { bagPlaces, characterView, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { professionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
@@ -228,7 +228,7 @@ export function takeFromBag(db, player, column, { id, have, count }, gold = 0, a
 
 // The scrapper buys herbs at their price, with the camp's Skup złomu.
 export async function sellHerbs(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const taken = herbCount(player, body);
   const bonus = campBonus(campLevels(player.buildings, context.now, content), 'sellPrice', content);
@@ -239,7 +239,7 @@ export async function sellHerbs(context) {
 }
 
 export async function discardHerbs(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const result = await takeFromBag(context.env.DB, player, 'herbs', herbCount(player, body));
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Zioła zmieniły się w międzyczasie. Spróbuj ponownie.');

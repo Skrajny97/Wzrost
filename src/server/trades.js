@@ -7,12 +7,15 @@
 // moves at once, or rejects it. A proposal unanswered, or a trade left
 // alone, lapses (data/community.json "trade"). Who proposes to the same
 // player too many times in a row, each time turned down, waits a while; a
-// player may take no trades from one player, or from anyone. As every
-// change of the bag, a trade waits for both characters at home
-// (requireIdle): an exploration counts on the potions it took along.
+// player may take no trades from one player, or from anyone. The bags stay
+// at hand while the characters are away, on an exploration or at a
+// profession's work (the author: "Niech system pozwala na Wymianę i różne
+// działania na przedmiotach w czasie zbierania ziół itp."): the potions an
+// exploration took along left the bag for the road (hunts.js), and nothing
+// worn is traded.
 
 import { bagCapacity, bagStacks, campLevels, isUnlocked, itemView, knownStack, materialView } from '../engine/index.js';
-import { characterView, loadPlayer, requireIdle } from './characters.js';
+import { characterView, loadPlayer } from './characters.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
@@ -89,8 +92,6 @@ function requireLive(trade) {
   throw new ApiError(409, 'over', trade.state === 'done' ? 'Ta wymiana już się odbyła.' : 'Ta wymiana już przepadła.');
 }
 
-// The other character at home too, as this one (requireIdle).
-const awayError = (name) => new ApiError(409, 'away', `Postać ${name} jest teraz poza obozem. Wymienicie się, gdy wróci.`);
 
 // The trade as one of its two characters sees it: the other one (and
 // whether that player is online), both offers with the items described and
@@ -172,7 +173,6 @@ export async function proposeTrade(context) {
   if (other.id === character.id) throw new ApiError(400, 'self', 'Ze sobą się nie wymienisz.');
   if (other.user_id === session.userId) throw new ApiError(403, 'own', 'Postacie jednego konta nie wymieniają się między sobą.');
   if (account.trade_off) throw new ApiError(403, 'trade_off', 'Wymiana jest u Ciebie wyłączona. Włączysz ją w Ustawieniach.');
-  requireIdle(await loadPlayer(db, session.userId), now);
   if (!isUnlocked('community', other.level, content)) {
     throw new ApiError(409, 'locked', `${other.name} nie ma jeszcze Społeczności. Otworzy się na ${content.unlocksById.community.level}. poziomie.`);
   }
@@ -183,7 +183,6 @@ export async function proposeTrade(context) {
   if (blocking.results.length > 0) throw new ApiError(403, 'blocking', `Wymiana z postacią ${other.name} jest u Ciebie zablokowana. Odblokujesz ją w karcie tej postaci.`);
   if (other.trade_off || blocked.results.length > 0) throw new ApiError(403, 'refused', `${other.name} nie przyjmuje wymian.`);
   if (!playedOnline(other, now)) throw new ApiError(409, 'offline', `Gracz ${other.name} nie jest online.`);
-  if (await db.prepare('SELECT 1 FROM activities WHERE character_id = ?').bind(other.id).first()) throw awayError(other.name);
   // Turned down too many times in a row: a pause from the last of them.
   const { rejectionsInRow, pauseMinutes } = rules();
   const last = await db.prepare('SELECT state, updated_at FROM trades WHERE from_id = ? AND to_id = ? ORDER BY id DESC LIMIT ?').bind(character.id, other.id, rejectionsInRow).all();
@@ -214,7 +213,6 @@ export async function answerTrade(context) {
     const rejected = await close(db, trade, 'rejected', now);
     return json({ trade: await tradeView(db, rejected, character, now) });
   }
-  requireIdle(await loadPlayer(db, session.userId), now);
   const proposer = await db.prepare('SELECT c.name, c.role, u.seen_at FROM characters c JOIN users u ON u.id = c.user_id WHERE c.id = ?').bind(trade.from_id).first();
   if (!playedOnline(proposer, now)) {
     await close(db, trade, 'expired', now);
@@ -273,7 +271,6 @@ export async function setOffer(context) {
   if (trade.state === 'proposed') throw new ApiError(409, 'not_open', 'Wymiana jeszcze się nie zaczęła.');
   if (trade.state === 'locked') throw new ApiError(409, 'locked', 'Wymiana jest już zatwierdzona. Można ją tylko przyjąć albo odrzucić.');
   const player = await loadPlayer(db, session.userId);
-  requireIdle(player, now);
   const offer = cleanOffer(body.offer, player);
   const column = offerColumn(sideOf(trade, character.id));
   const changed = await db
@@ -301,7 +298,7 @@ function placesAfter(player, give, get) {
 // batch (json() of a state is no JSON) unless both still have what they
 // offered and the trade is as both saw it.
 function exchange(db, trade, now, sides) {
-  const conditions = ["t.state = 'locked'", 't.version = ?', 'NOT EXISTS (SELECT 1 FROM activities WHERE character_id IN (t.from_id, t.to_id))'];
+  const conditions = ["t.state = 'locked'", 't.version = ?'];
   const binds = [trade.version];
   for (const { id, offer } of sides) {
     if (offer.items.length > 0) {
@@ -389,7 +386,7 @@ export async function confirmTrade(context) {
   const to = offerOf(trade.to_offer);
   if (isEmpty(from) && isEmpty(to)) throw new ApiError(400, 'empty', 'Wymiana jest pusta. Dodajcie coś do ofert.');
   if (trade.locked_by === character.id) throw new ApiError(409, 'waiting', 'Wymiana czeka na drugą stronę.');
-  // Both characters at home.
+  // Both characters as they are played now, at home or away.
   const owners = await db.prepare('SELECT id, user_id FROM characters WHERE id IN (?, ?)').bind(trade.from_id, trade.to_id).all();
   const userOf = (id) => owners.results.find((row) => row.id === id).user_id;
   const [fromPlayer, toPlayer] = await Promise.all([loadPlayer(db, userOf(trade.from_id)), loadPlayer(db, userOf(trade.to_id))]);
@@ -398,9 +395,7 @@ export async function confirmTrade(context) {
     await close(db, trade, 'expired', now);
     throw new ApiError(409, 'stale', 'Jedna z postaci jest teraz odłożona. Wymiana przepadła.');
   }
-  const [mine, theirs] = character.id === trade.from_id ? [fromPlayer, toPlayer] : [toPlayer, fromPlayer];
-  requireIdle(mine, now);
-  if (theirs.activity) throw awayError(theirs.row.name);
+  const mine = character.id === trade.from_id ? fromPlayer : toPlayer;
   if (trade.state === 'open') {
     const locked = await db
       .prepare("UPDATE trades SET state = 'locked', locked_by = ?, updated_at = ? WHERE id = ? AND state = 'open' AND version = ?")

@@ -51,7 +51,8 @@ export function mountStats(container) {
 
     const pendingTotal = Object.values(pending).reduce((sum, value) => sum + value, 0);
     const free = character.freePoints - pendingTotal;
-    const busy = Boolean(character.activity);
+    // Only an exploration counts its fights with the points (hunts.js).
+    const busy = character.activity?.kind === 'hunt';
     const sources = SOURCES.filter((source) => !source.unlock || isUnlocked(source.unlock));
     const widest = Math.max(1, ...character.stats.map((stat) => stat.total + (pending[stat.id] ?? 0)));
 
@@ -327,7 +328,7 @@ export function mountStats(container) {
     update: () => {
       // Points the server no longer has room for are dropped.
       const total = Object.values(pending).reduce((sum, value) => sum + value, 0);
-      if (total > state.character.freePoints || state.character.activity) pending = {};
+      if (total > state.character.freePoints || state.character.activity?.kind === 'hunt') pending = {};
       render();
     },
   };

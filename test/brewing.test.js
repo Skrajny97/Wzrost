@@ -199,7 +199,10 @@ describe('brewing through the API', () => {
     const hunt = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 1 } });
     assert.equal(hunt.data.error.message, 'Postać warzy mikstury. Poczekaj na koniec warzenia.');
     assert.equal((await brew({ recipe: 'lesser-healing', count: 1 })).status, 409);
-    assert.equal((await call('POST', '/api/herbs/sell', { cookie, body: { herbId: 'mugwort', count: 1 } })).status, 409);
+    // The bag stays at hand during the work (the author: "Niech system
+    // pozwala na Wymianę i różne działania na przedmiotach w czasie zbierania
+    // ziół itp."): the herbs left can be sold.
+    assert.equal((await call('POST', '/api/herbs/sell', { cookie, body: { herbId: 'mugwort', count: 1 } })).status, 200);
   });
 
   test('the report brings the potions, the profession\'s levels and the character\'s XP', async () => {
