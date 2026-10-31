@@ -13,14 +13,21 @@
       "name": { "type": "string", "minLength": 1 },
       "description": { "type": "string", "minLength": 1 },
       "maxLevel": { "type": "integer", "minimum": 1 },
+      "settlement": { "type": "boolean", "description": "Budynek tylko tam, gdzie działa Osada (SETTLEMENT): bez niej nie ma go w obozie ani w Encyklopedii." },
+      "looks": {
+        "type": "array",
+        "minItems": 1,
+        "items": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "description": "Wygląd budynku (1–3) na poziomie 1, 2, … zamiast zwykłych wyglądów poziomów 1–3, 4–7 i 8–10; ostatni obowiązuje na dalszych poziomach."
+      },
       "effect": {
         "type": "object",
         "additionalProperties": false,
         "required": ["kind", "perLevel", "unit", "text"],
         "properties": {
           "kind": {
-            "enum": ["restSpeed", "bagSlots", "sellPrice", "production", "upgradeCap", "craftSpeed"],
-            "description": "restSpeed: szybszy odpoczynek między wyprawami (ułamek), bagSlots: miejsca w plecaku, sellPrice: wyższe ceny u złomiarza (ułamek), production: budynek wytwarza zasób (resource), upgradeCap: najwyższe ulepszenie przedmiotów (Kowadło), craftSpeed: szybsza przeróbka na Stole rozbiórki (ułamek). Bez budynku z craftSpeed nie ma przeróbki ani rozbiórki."
+            "enum": ["restSpeed", "bagSlots", "sellPrice", "production", "upgradeCap", "craftSpeed", "companionPlaces"],
+            "description": "restSpeed: szybszy odpoczynek między wyprawami (ułamek), bagSlots: miejsca w plecaku, sellPrice: wyższe ceny u złomiarza (ułamek), production: budynek wytwarza zasób (resource), upgradeCap: najwyższe ulepszenie przedmiotów (Kowadło), craftSpeed: szybsza przeróbka na Stole rozbiórki (ułamek), companionPlaces: miejsca dla towarzyszy zwerbowanych w Karczmie (Kwatery; towarzysz potrzebuje też stopnia relacji z karczmarzem). Bez budynku z craftSpeed nie ma przeróbki ani rozbiórki."
           },
           "perLevel": { "type": "number", "exclusiveMinimum": 0, "description": "Premia za poziom; przy production zasób na godzinę za poziom." },
           "resource": { "type": "string", "minLength": 1, "description": "Tylko production: wytwarzany zasób (resources.json) albo złoto (gold)." },

@@ -174,6 +174,13 @@ export const SPRITES = {
     height: 352,
     ids: ['camp-1', 'camp-2', 'camp-3'],
   },
+  // The same glades on the taller board the camp has with the Osada: a band
+  // of 144 rows drawn into their middle, below the campfire's row.
+  'board-tall': {
+    width: 320,
+    height: 496,
+    ids: ['camp-1', 'camp-2', 'camp-3'],
+  },
   // Each building cut to its outline, at most 128 × 96.
   camp: {
     width: 128,
@@ -183,6 +190,7 @@ export const SPRITES = {
       'sawmill-1', 'sawmill-2', 'sawmill-3', 'quarry-1', 'quarry-2', 'quarry-3', 'mine-1', 'mine-2', 'mine-3',
       'midas-lake-1', 'midas-lake-2', 'midas-lake-3', 'campfire-1', 'campfire-2', 'campfire-3', 'loot-shed-1', 'loot-shed-2', 'loot-shed-3',
       'scrap-bench-1', 'scrap-bench-2', 'scrap-bench-3', 'anvil-1', 'anvil-2', 'anvil-3', 'craft-table-1', 'craft-table-2', 'craft-table-3',
+      'quarters-1', 'quarters-2', 'quarters-3',
     ],
   },
   // The herbs of Zielarstwo, 32×32, filled in as they are approved.
@@ -269,6 +277,17 @@ export const SPRITES = {
     height: 128,
     ids: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
   },
+  // The companions' whole figures for fights (the author: "Do popiersi
+  // towarzyszy trzeba też wygenerować portrety do walki"), in the class
+  // portraits' frame and size (tools/normalize-portraits.py), filled in as
+  // the author approves them; `faces` as the class portraits'. Until a
+  // companion has one, its fight card shows its bust.
+  'companion-portraits': {
+    width: 96,
+    height: 128,
+    ids: [],
+    faces: {},
+  },
   'settlement-board': {
     width: 384,
     height: 768,
@@ -303,7 +322,10 @@ export const areaSprite = (areaId) => sprite('areas', areaId, 'area-art');
 export const landArt = (regionId) => (available.lands.has(regionId) ? `/art/lands/${regionId}.png` : null);
 // The address of the camp board's ground and of a camp building's picture at
 // a look (1–3), or null while it has none.
-export const boardGround = (tier) => (available.board.has(`camp-${tier}`) ? `/art/board/camp-${tier}.png` : null);
+export const boardGround = (tier, tall = false) => {
+  const kind = tall ? 'board-tall' : 'board';
+  return available[kind].has(`camp-${tier}`) ? `/art/${kind}/camp-${tier}.png` : null;
+};
 export const campArt = (buildingId, tier) => (available.camp.has(`${buildingId}-${tier}`) ? `/art/camp/${buildingId}-${tier}.png` : null);
 // A herb of Zielarstwo, a potion of Alchemia, a profession's square on the
 // Profesje tab, and the address of the background of a place where a
@@ -360,6 +382,24 @@ export function companionBust(classId, appearance) {
   return available.companions.has(id)
     ? h('img', { src: `/art/companions/${id}.png`, alt: '', width: 96, height: 128, class: 'sprite companion-bust', decoding: 'async', draggable: 'false' })
     : null;
+}
+// A companion's whole figure for fights, as a bust centred on its face like
+// a class portrait in the arena, or null while it has none.
+export function companionPortrait(classId, appearance) {
+  const id = `${classId}-${appearance}`;
+  if (!available['companion-portraits'].has(id)) return null;
+  const { width, height, faces } = SPRITES['companion-portraits'];
+  const off = (faces[id] ?? width / 2) - width / 2;
+  return h('img', {
+    src: `/art/companion-portraits/${id}.png`,
+    alt: '',
+    width,
+    height,
+    class: 'sprite sprite--portrait sprite--bust',
+    style: off ? { objectPosition: `calc(50% - ${off}px) 0` } : undefined,
+    decoding: 'async',
+    draggable: 'false',
+  });
 }
 export const settlementGround = () => (available['settlement-board'].has('settlement') ? '/art/settlement-board/settlement.png' : null);
 

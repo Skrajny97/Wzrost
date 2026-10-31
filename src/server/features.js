@@ -40,3 +40,6 @@ export const eventDraftsOn = () => eventDrafts;
 export const evolutionsOn = () => evolutions;
 // The Osada (settlement.js), first only where SETTLEMENT is "on".
 export const settlementOn = () => settlement;
+// A camp building of the Osada's (Kwatery, `settlement` in buildings.json)
+// stands only where the Osada is on; the others everywhere.
+export const buildingOn = (building) => !building.settlement || settlement;

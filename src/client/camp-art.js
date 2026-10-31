@@ -31,6 +31,18 @@ export const BOARD_HEIGHT = 400;
 export const PLOT_WIDTH = 104;
 export const PLOT_HEIGHT = 83;
 
+// With the Osada the board grows taller, as the Osada's does (the author:
+// "253 A, ale bedzie trzeba chyba planszę obozu rozbudować, żeby gdzies te
+// Kwatery zmieścić"): a band of glade TALL_BAND high lies across it at
+// TALL_CUT, below the campfire's row, and all below it moves down. The
+// ground's pictures have the same band drawn in (camp-<look>-tall).
+const TALL_CUT = 268;
+const TALL_BAND = 164;
+export const boardHeight = (tall) => BOARD_HEIGHT + (tall ? TALL_BAND : 0);
+export const stretchY = (y, tall) => (tall && y > TALL_CUT ? y + TALL_BAND : y);
+// The y of every "x y" pair in an SVG path or point list.
+const stretchPoints = (points, tall) => (tall ? points.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (_, x, y) => `${x} ${stretchY(Number(y), tall)}`) : points);
+
 // In the left column, plots one above another stay 21 apart: a name hangs
 // 11 below its plot, and the narrator's ring stands 6 off the plot it lights.
 export const CAMP_PLOTS = {
@@ -49,6 +61,17 @@ export const CAMP_PLOTS = {
   // Magazyn's name above it.
   'craft-table': { x: 124, y: 342 },
 };
+
+// The plots in the band of the taller board, for the Osada's buildings.
+const TALL_PLOTS = {
+  // The Kwatery, where the companions hired in the Karczma sleep, below the
+  // Magazyn.
+  quarters: { x: 96, y: 362 },
+};
+
+// The plots on the board, the taller one with the Osada.
+export const campPlots = (tall) =>
+  tall ? { ...Object.fromEntries(Object.entries(CAMP_PLOTS).map(([id, spot]) => [id, { ...spot, y: stretchY(spot.y, tall) }])), ...TALL_PLOTS } : CAMP_PLOTS;
 
 // The size of a building's drawing at a level.
 export const buildingTier = (level) => (level >= 8 ? 3 : level >= 4 ? 2 : 1);
@@ -235,6 +258,27 @@ ${pole(90, 58, 90, 26, 2)}${flame(90, 26, 5)}`,
   ],
 
   // A lean-to of branches with a sack; then a hut and a crate; then a storehouse.
+  // The Kwatery: a canvas tent with two beds; then two tents; then a log
+  // house with beds under its eaves.
+  quarters: [
+    () => `<path d="M14 68 L46 24 L80 68 Z" fill="${CLOTH}" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M46 24 L36 68 M46 24 L58 68" stroke="${WOOD_LIGHT}" stroke-width="1"></path>
+<path d="M38 68 L46 46 L55 68 Z" fill="${HOLE}"></path>
+<rect x="58" y="62" width="22" height="6" fill="${RUST}" stroke="${LINE}" stroke-width="0.6"></rect>
+<rect x="82" y="58" width="12" height="10" fill="${WOOD_LIGHT}" stroke="${LINE}" stroke-width="0.7"></rect>`,
+    () => `<path d="M6 68 L32 28 L58 68 Z" fill="${CLOTH}" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M27 68 L32 50 L38 68 Z" fill="${HOLE}"></path>
+<path d="M42 68 L68 22 L94 68 Z" fill="${CLOTH}" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M62 68 L68 46 L75 68 Z" fill="${HOLE}"></path>
+<rect x="80" y="62" width="14" height="6" fill="${WOOD_LIGHT}" stroke="${LINE}" stroke-width="0.7"></rect>`,
+    () => `<path d="M6 38 L48 12 L92 38 Z" fill="${CLOTH}" stroke="${LINE}" stroke-width="0.8"></path>
+<rect x="12" y="38" width="74" height="30" fill="${WOOD}" stroke="${LINE}" stroke-width="0.8"></rect>
+<path d="M12 46 h74 M12 54 h74 M12 62 h74" stroke="${WOOD_DARK}" stroke-width="0.8"></path>
+<rect x="42" y="48" width="14" height="20" fill="#2b2219" stroke="${LINE}" stroke-width="0.7"></rect>
+<rect x="18" y="56" width="18" height="6" fill="${RUST}" stroke="${LINE}" stroke-width="0.6"></rect>
+<rect x="62" y="56" width="18" height="6" fill="${RUST}" stroke="${LINE}" stroke-width="0.6"></rect>`,
+  ],
+
   'loot-shed': [
     () => `<path d="M16 68 L42 22 L70 68 Z" fill="#3a3124" stroke="${LINE}" stroke-width="0.8"></path>
 <path d="M42 22 L30 68 M42 22 L54 68 M24 54 L62 54 M30 42 L55 42" stroke="${WOOD_LIGHT}" stroke-width="1"></path>
@@ -406,25 +450,36 @@ const FIRS = [[96, 24, 20], [250, 26, 18], [18, 116, 18], [16, 230, 20], [344, 1
 const BOULDERS = [[318, 38, 14], [342, 60, 10], [296, 30, 8], [244, 42, 9], [232, 362, 7], [336, 334, 8], [300, 372, 6]];
 
 // The paths from the campfire to the plots: a dark edge and a lighter middle.
+// On the taller board the road out runs on down through the band, the paths
+// below it move down with their plots, and the Kopalnia's and the Kwatery's
+// leave the road instead of the campfire.
 const PATHS = 'M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96 M171 332 Q150 330 128 340';
-const paths = (edge, middle, extra = '') =>
-  `<g fill="none" stroke-linecap="round"${extra}><path d="${PATHS}" stroke="${edge}" stroke-width="16"></path><path d="${PATHS}" stroke="${middle}" stroke-width="10"></path></g>`;
+const TALL_PATHS =
+  'M176 574 Q168 494 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M173 470 Q214 474 252 502 M180 176 Q174 138 180 96 M173 496 Q150 494 128 504 M175 368 Q140 366 106 374';
+const paths = (edge, middle, extra = '', tall = false) => {
+  const d = tall ? TALL_PATHS : PATHS;
+  return `<g fill="none" stroke-linecap="round"${extra}><path d="${d}" stroke="${edge}" stroke-width="16"></path><path d="${d}" stroke="${middle}" stroke-width="10"></path></g>`;
+};
 
 // The glade drawn in vectors, for a board without its picture.
-const VECTOR_BOARD = `<defs><radialGradient id="camp-glade" cx="0.5" cy="0.52" r="0.62">
+const vectorBoard = (tall) => {
+  const at = (list) => list.map(([x, y, ...rest]) => [x, stretchY(y, tall), ...rest]);
+  const height = boardHeight(tall);
+  return `<defs><radialGradient id="camp-glade" cx="0.5" cy="0.52" r="0.62">
 <stop offset="0" stop-color="#2d3b24"></stop><stop offset="0.72" stop-color="#222e1c"></stop><stop offset="1" stop-color="#151d12"></stop>
 </radialGradient></defs>
-<rect width="360" height="400" fill="url(#camp-glade)"></rect>
-<path d="M212 400 Q236 300 300 286 Q340 280 360 296 V400 Z" fill="#1b2417"></path>
-${BOULDERS.map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.72}" fill="${STONE_DARK}" stroke="#2a3322" stroke-width="1"></ellipse><ellipse cx="${x - r * 0.2}" cy="${y - r * 0.28}" rx="${r * 0.55}" ry="${r * 0.3}" fill="${STONE}" opacity="0.7"></ellipse>`).join('')}
-${paths('#2a2218', '#352b1f')}
-${tufts([[128, 70], [232, 120], [140, 304], [326, 176], [36, 186], [212, 372], [118, 156], [252, 196], [150, 110], [40, 300], [320, 260]])}
-<ellipse cx="128" cy="388" rx="16" ry="5" fill="${WOOD}" stroke="${LINE}" stroke-width="0.6" opacity="0.8" transform="rotate(-12 128 388)"></ellipse>
+<rect width="360" height="${height}" fill="url(#camp-glade)"></rect>
+<path d="${stretchPoints('M212 400 Q236 300 300 286 Q340 280 360 296', tall)} V${height} Z" fill="#1b2417"></path>
+${at(BOULDERS).map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.72}" fill="${STONE_DARK}" stroke="#2a3322" stroke-width="1"></ellipse><ellipse cx="${x - r * 0.2}" cy="${y - r * 0.28}" rx="${r * 0.55}" ry="${r * 0.3}" fill="${STONE}" opacity="0.7"></ellipse>`).join('')}
+${paths('#2a2218', '#352b1f', '', tall)}
+${tufts(at([[128, 70], [232, 120], [140, 304], [326, 176], [36, 186], [212, 372], [118, 156], [252, 196], [150, 110], [40, 300], [320, 260]]))}
+<ellipse cx="128" cy="${stretchY(388, tall)}" rx="16" ry="5" fill="${WOOD}" stroke="${LINE}" stroke-width="0.6" opacity="0.8" transform="rotate(-12 128 ${stretchY(388, tall)})"></ellipse>
 <ellipse cx="330" cy="146" rx="7" ry="4" fill="${PLANK}" stroke="${LINE}" stroke-width="0.6" opacity="0.8"></ellipse>
-${FIRS.map(([x, y, size]) => `<path d="M${x} ${y - size} L${x + size * 0.55} ${y + size * 0.2} L${x + size * 0.3} ${y + size * 0.2} L${x + size * 0.7} ${y + size * 0.9} L${x - size * 0.7} ${y + size * 0.9} L${x - size * 0.3} ${y + size * 0.2} L${x - size * 0.55} ${y + size * 0.2} Z" fill="#132013" stroke="#1d2a19" stroke-width="1"></path>`).join('')}
-${TREES.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#101710"></circle><circle cx="${x - r * 0.25}" cy="${y - r * 0.25}" r="${r * 0.7}" fill="#162114"></circle><circle cx="${x - r * 0.4}" cy="${y - r * 0.4}" r="${r * 0.3}" fill="#1d2a19"></circle>`).join('')}
+${at(FIRS).map(([x, y, size]) => `<path d="M${x} ${y - size} L${x + size * 0.55} ${y + size * 0.2} L${x + size * 0.3} ${y + size * 0.2} L${x + size * 0.7} ${y + size * 0.9} L${x - size * 0.7} ${y + size * 0.9} L${x - size * 0.3} ${y + size * 0.2} L${x - size * 0.55} ${y + size * 0.2} Z" fill="#132013" stroke="#1d2a19" stroke-width="1"></path>`).join('')}
+${at(TREES).map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#101710"></circle><circle cx="${x - r * 0.25}" cy="${y - r * 0.25}" r="${r * 0.7}" fill="#162114"></circle><circle cx="${x - r * 0.4}" cy="${y - r * 0.4}" r="${r * 0.3}" fill="#1d2a19"></circle>`).join('')}
 <circle cx="150" cy="40" r="1.2" fill="${FIRE}" opacity="0.6"></circle><circle cx="214" cy="62" r="1" fill="${FIRE}" opacity="0.5"></circle>
 <circle cx="40" cy="250" r="1" fill="${FIRE}" opacity="0.5"></circle><circle cx="330" cy="200" r="1.2" fill="${FIRE}" opacity="0.5"></circle>`;
+};
 
 // How much of their colour and light the glade and the buildings keep on the
 // board: muted and dimmed, the buildings a little brighter than the ground
@@ -449,18 +504,19 @@ function toneMatrix({ saturation: s, light, floor = 0 }) {
 
 // The glade as a pixel-art picture (art.js), muted and darkened, with the
 // paths worn into it: earthen, soft-edged and partly see-through.
-const PICTURE_BOARD = (src) => `<filter id="camp-ground" color-interpolation-filters="sRGB">
+const pictureBoard = (src, tall) => `<filter id="camp-ground" color-interpolation-filters="sRGB">
 <feColorMatrix type="matrix" values="${toneMatrix(GROUND_TONE)}"></feColorMatrix>
 </filter>
 <filter id="camp-path"><feGaussianBlur stdDeviation="1.6"></feGaussianBlur></filter>
-<image href="${src}" width="360" height="400" preserveAspectRatio="xMidYMid slice" filter="url(#camp-ground)"></image>
-${paths('#3a2f1f', '#56462e', ' filter="url(#camp-path)" opacity="0.8"')}`;
+<image href="${src}" width="360" height="${boardHeight(tall)}" preserveAspectRatio="xMidYMid slice" filter="url(#camp-ground)"></image>
+${paths('#3a2f1f', '#56462e', ' filter="url(#camp-path)" opacity="0.8"', tall)}`;
 
 // The glade at the camp's level: its palisade grows with the camp as a
-// building does, in three looks. Without its picture, the vector glade.
-function board(level) {
-  const src = boardGround(buildingTier(level));
-  return src ? PICTURE_BOARD(src) : VECTOR_BOARD;
+// building does, in three looks, on the taller board with the Osada.
+// Without its picture, the vector glade.
+function board(level, tall) {
+  const src = boardGround(buildingTier(level), tall);
+  return src ? pictureBoard(src, tall) : vectorBoard(tall);
 }
 
 export const campArtIds = Object.keys(BUILDINGS);
@@ -512,18 +568,19 @@ function look(buildingId, tier, grey = false) {
 
 // The markup of a plot: the building at its level, an empty plot with a faint
 // grey picture of what will stand there, or either behind scaffolding. A
-// picture stands on its shadow; a vector drawing on the trodden earth.
-export function plotMarkup(buildingId, { level, building = false }) {
+// picture stands on its shadow; a vector drawing on the trodden earth. A
+// building with looks of its own (the Kwatery) names its look (`tier`).
+export function plotMarkup(buildingId, { level, building = false, tier: own }) {
   if (level <= 0) {
     const faint = campArt(buildingId, 1) ? (building ? 0.7 : 0.5) : building ? 0.45 : 0.22;
-    return `${EMPTY_PLOT}<g opacity="${faint}">${look(buildingId, 1, true)}</g>${building ? SCAFFOLD : ''}`;
+    return `${EMPTY_PLOT}<g opacity="${faint}">${look(buildingId, own ?? 1, true)}</g>${building ? SCAFFOLD : ''}`;
   }
-  const tier = buildingTier(level);
+  const tier = own ?? buildingTier(level);
   return `${campArt(buildingId, tier) ? '' : GROUND}${look(buildingId, tier)}${building ? SCAFFOLD : ''}`;
 }
 
-export const boardMarkup = (level = 1) => board(level);
+export const boardMarkup = (level = 1, tall = false) => board(level, tall);
 
-export const boardArt = (level = 1) => svgElement(`0 0 ${BOARD_WIDTH} ${BOARD_HEIGHT}`, 'camp-board-art', board(level));
+export const boardArt = (level = 1, tall = false) => svgElement(`0 0 ${BOARD_WIDTH} ${boardHeight(tall)}`, 'camp-board-art', board(level, tall));
 
 export const plotArt = (buildingId, state) => svgElement('0 0 100 80', 'camp-plot-art', plotMarkup(buildingId, state));

@@ -343,6 +343,11 @@ const settlementTest = (row) => settlementOn() && JSON.parse(row.settlement ?? '
 const settlementOpen = (row) =>
   settlementOn() && Boolean(content.settlement) && (row.level >= content.unlocksById.settlement.level || settlementTest(row));
 
+// A camp building of the Osada's (the Kwatery, `settlement` in
+// buildings.json) stands once the character has the Osada; the others
+// always.
+export const buildingOpen = (building, row) => !building.settlement || settlementOpen(row);
+
 // What the character holds of the goods the Osada's orders ask for, by the
 // column each kind is kept in, and the Warsztat's items in the bag by
 // pattern (`crafted`).
@@ -557,7 +562,7 @@ function campView(player, levels, now) {
     queue: queue.map((entry) => ({ ...entry, name: content.buildingsById[entry.buildingId]?.name ?? entry.buildingId })),
     queueSize: camp.queue,
     underWay: buildsUnderWay(player.buildings, queue, now),
-    buildings: content.buildings.map((building) => {
+    buildings: content.buildings.filter((building) => buildingOpen(building, player.row)).map((building) => {
       const level = levels[building.id];
       const planned = plannedLevel(building, player.buildings, queue);
       const next = planned < building.maxLevel ? planned + 1 : null;
@@ -571,6 +576,9 @@ function campView(player, levels, now) {
         description: building.description,
         level,
         maxLevel: building.maxLevel,
+        // A building with looks of its own (the Kwatery): the look at its
+        // level, the first one while it is not built yet.
+        ...(building.looks && { look: building.looks[Math.min(Math.max(level, 1), building.looks.length) - 1] }),
         // The Stół rozbiórki: its screen shows the table (crafting).
         crafts: building.effect.kind === 'craftSpeed',
         // The Kowadło: its screen lists the items to upgrade.

@@ -793,6 +793,8 @@ describe('camp', () => {
       [['sawmill', 0], ['quarry', 0], ['mine', 0], ['midas-lake', 0], ['campfire', 0], ['loot-shed', 0], ['scrap-bench', 0], ['anvil', 0], ['craft-table', 0]],
     );
     assert.equal(start.camp.construction, null);
+    // The Kwatery belong to the Osada: without it they are not in the camp.
+    assert.equal((await build('quarters')).data.error.code, 'invalid_building');
     const campfire = start.camp.buildings.find((building) => building.id === 'campfire');
     assert.deepEqual(campfire.next, { level: 1, effect: 'Odpoczynek między wyprawami szybszy o 10%', minutes: 1, cost: { gold: 5, wood: 4 } });
     assert.equal(campfire.production, null);

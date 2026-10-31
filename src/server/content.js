@@ -2,7 +2,7 @@
 // data/schemas before every deploy).
 
 import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, landBestiaryChest, meetingChances, regionDangers } from '../engine/index.js';
-import { craftingOn, evolutionsOn, settlementOn } from './features.js';
+import { buildingOn, craftingOn, evolutionsOn, settlementOn } from './features.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
 import classes from '../../data/classes.json' with { type: 'json' };
@@ -164,7 +164,7 @@ export function publicContent() {
     lengths: content.texts.lengths,
     unlocks: content.unlocks.map(({ id, name, level, classLevel, condition }) => ({ id, name, level, classLevel, condition })),
     resources: content.resources.map(({ id, name, description, system }) => ({ id, name, description, system: Boolean(system) })),
-    buildings: content.buildings.map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
+    buildings: content.buildings.filter(buildingOn).map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
     // With the family of the creature that leaves it, for its icon.
     materials: content.materials.map(({ id, name, gender, rarity, description, monster }) => ({
       id,

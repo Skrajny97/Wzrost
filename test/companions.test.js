@@ -113,15 +113,43 @@ describe('companions through the API', () => {
   const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'on', SETTLEMENT: 'on' });
   let cookie;
 
+  // The camp's Kwatery at a level: a bed for a companion on each.
+  const quarters = async (level) => {
+    const database = await db();
+    await database.prepare("DELETE FROM buildings WHERE building_id = 'quarters'").run();
+    if (level > 0) await database.prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'quarters', ?, 0, 0 FROM characters").bind(level).run();
+  };
+
   beforeEach(async () => {
     ({ cookie } = await signUp('karczmarka'));
     await call('POST', '/api/character', { cookie, body: { name: 'Karczmarka', classId: 'warrior', appearance: 'female' } });
     await (await db()).prepare(`UPDATE characters SET level = 25, class_level = 25, gold = 100000`).run();
+    await quarters(2);
   });
 
   const settlement = async () => (await call('GET', '/api/settlement', { cookie })).data.settlement;
   const relation = (points) =>
     (async () => (await db()).prepare('UPDATE characters SET settlement = ?').bind(JSON.stringify({ relations: { [content.settlement.tavern.resident]: points } })).run())();
+
+  test('each companion needs a bed in the camp\'s Kwatery, a level of them for each (104 A)', async () => {
+    await quarters(0);
+    const camp = (await call('GET', '/api/character', { cookie })).data.character.camp.buildings.find((building) => building.id === 'quarters');
+    assert.deepEqual([camp.level, camp.maxLevel, camp.look, camp.next.effect], [0, 2, 1, 'Miejsca dla towarzyszy: 1']);
+    await relation(content.settlement.standings.find((standing) => standing.id === tuning.from[1]).points);
+    let view = (await settlement()).companions;
+    assert.deepEqual([view.relation, view.beds, view.places], [2, 0, 0]);
+    const [first, second] = view.candidates;
+    assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: first.id } })).data.error.code, 'no_bed');
+    await quarters(1);
+    assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: first.id } })).status, 200);
+    assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: second.id } })).data.error.code, 'no_bed');
+    await quarters(2);
+    view = (await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: second.id } })).data.settlement.companions;
+    assert.deepEqual([view.hired.length, view.places], [2, 2]);
+    // The second look of the Kwatery stands at their second level.
+    const built = (await call('GET', '/api/character', { cookie })).data.character.camp.buildings.find((building) => building.id === 'quarters');
+    assert.deepEqual([built.level, built.look, built.effect], [2, 2, 'Miejsca dla towarzyszy: 2']);
+  });
 
   test('candidates wait in the Karczma, and one is hired once the innkeeper knows the character', async () => {
     let view = (await settlement()).companions;

@@ -9,7 +9,7 @@
 // dealer sells crafting parts. Opened with the camp button in the top bar.
 
 import { materialSprite, resourceArt } from '../art.js';
-import { BOARD_HEIGHT, BOARD_WIDTH, CAMP_PLOTS, PLOT_HEIGHT, PLOT_WIDTH, boardArt, buildingTier, plotArt } from '../camp-art.js';
+import { BOARD_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, plotArt } from '../camp-art.js';
 import { craftTableSection, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -51,6 +51,9 @@ export function mountCamp(container, { params, backHash = '#/walka' }) {
 
 // The camp's own level, which grows like a building but stands on no plot.
 const campOf = () => state.character.camp.level;
+// The taller board, with room for the Osada's buildings (the Kwatery), once
+// the character has the Osada.
+const tall = () => Boolean(state.character.settlementOpen);
 
 // The upgrade in progress, if its time has not passed yet.
 function runningBuild(now = serverNow()) {
@@ -259,9 +262,9 @@ function mountBoard(container, backHash) {
       h(
         'div',
         // The glade in the light of the hour in Poland, its palisade growing
-        // with the camp's level.
-        { class: `camp-board camp-board--${dayPart()}`, role: 'group', 'aria-label': 'Plansza obozu' },
-        boardArt(campOf().level),
+        // with the camp's level, taller once the character has the Osada.
+        { class: `camp-board camp-board--${dayPart()}${tall() ? ' camp-board--tall' : ''}`, role: 'group', 'aria-label': 'Plansza obozu' },
+        boardArt(campOf().level, tall()),
         character.camp.buildings.map((building) => plot(building, running)),
         chestLink(),
         campLevelButton(running),
@@ -323,7 +326,8 @@ function mountBoard(container, backHash) {
         class: 'camp-chest',
         href: hash,
         'aria-label': 'Skrzynia Konta',
-        style: { left: `${(CHEST_SPOT.x / BOARD_WIDTH) * 100}%`, top: `${(CHEST_SPOT.y / BOARD_HEIGHT) * 100}%` },
+        // Beside the Magazyn on either board, at the top of the taller one's band.
+        style: { left: `${(CHEST_SPOT.x / BOARD_WIDTH) * 100}%`, top: `${(CHEST_SPOT.y / boardHeight(tall())) * 100}%` },
         onClick: (event) => openView(event, hash, HISTORY_KEY),
       },
       h('span', { class: 'camp-chest-art' }, materialSprite('chest')),
@@ -332,7 +336,8 @@ function mountBoard(container, backHash) {
   }
 
   function plot(building, running) {
-    const spot = CAMP_PLOTS[building.id] ?? { x: BOARD_WIDTH / 2, y: BOARD_HEIGHT / 2 };
+    const height = boardHeight(tall());
+    const spot = campPlots(tall())[building.id] ?? { x: BOARD_WIDTH / 2, y: height / 2 };
     const underway = running?.buildingId === building.id;
     const waiting = !underway && building.queued.length > 0;
     const empty = building.level === 0;
@@ -347,7 +352,7 @@ function mountBoard(container, backHash) {
         'aria-label': said.filter(Boolean).join(', '),
         onClick: (event) => openView(event, hash, HISTORY_KEY),
       },
-      plotArt(building.id, { level: building.level, building: underway }),
+      plotArt(building.id, { level: building.level, building: underway, tier: building.look }),
       building.id === 'campfire' && !empty && campfireLight(buildingTier(building.level)),
       h(
         'span',
@@ -362,7 +367,7 @@ function mountBoard(container, backHash) {
         class: 'camp-plot-wrap',
         style: {
           left: `${((spot.x - PLOT_WIDTH / 2) / BOARD_WIDTH) * 100}%`,
-          top: `${((spot.y - PLOT_HEIGHT / 2) / BOARD_HEIGHT) * 100}%`,
+          top: `${((spot.y - PLOT_HEIGHT / 2) / height) * 100}%`,
           width: `${(PLOT_WIDTH / BOARD_WIDTH) * 100}%`,
         },
       },
@@ -472,7 +477,7 @@ function mountBuilding(container, id) {
       h(
         'article',
         { class: 'card building-view', 'aria-label': building.name },
-        !own && h('div', { class: 'building-art' }, plotArt(id, { level: building.level, building: underway })),
+        !own && h('div', { class: 'building-art' }, plotArt(id, { level: building.level, building: underway, tier: building.look })),
         h('p', { class: 'region-description', text: building.description }),
         building.effect && h('p', { class: 'building-effect' }, h('strong', { text: 'Teraz: ' }), building.effect),
         building.production && storeView(building),

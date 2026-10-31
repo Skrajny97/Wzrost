@@ -1282,6 +1282,8 @@ describe('camp', () => {
       'scrap-bench': 0,
       anvil: 0,
       'craft-table': 0,
+      // The Osada's Kwatery count too: built only where the Osada is open.
+      quarters: 0,
     });
     assert.equal(construction(stored, 4000).buildingId, 'campfire');
     assert.equal(construction(stored, 5000), null);

@@ -36,7 +36,7 @@ import {
   upgradeCost,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { buildQueue, characterView, currentHp, gainSql, loadPlayer, requirePlayer, restsDuring, walletOf } from './characters.js';
+import { buildQueue, buildingOpen, characterView, currentHp, gainSql, loadPlayer, requirePlayer, restsDuring, walletOf } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
@@ -60,7 +60,8 @@ const shortOf = (building) =>
 // building.
 export async function beginBuilding(db, player, buildingId, now) {
   const building = typeof buildingId === 'string' ? content.buildingsById[buildingId] : undefined;
-  if (!building) throw new ApiError(400, 'invalid_building', 'Nie ma takiego budynku.');
+  // The Osada's buildings (Kwatery) once the character has the Osada.
+  if (!building || !buildingOpen(building, player.row)) throw new ApiError(400, 'invalid_building', 'Nie ma takiego budynku.');
   const queue = buildQueue(player.row);
   if (buildsUnderWay(player.buildings, queue, now) > 0) {
     await queueBuilding(db, player, building, queue, now);

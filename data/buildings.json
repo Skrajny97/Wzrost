@@ -158,5 +158,21 @@
       { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 4 }
     ],
     "minutes": { "levels": [1, 10, 30, 60, 120, 240, 360, 600, 960, 1440] }
+  },
+  {
+    "id": "quarters",
+    "name": "Kwatery",
+    "description": "Namiot z posłaniami dla ludzi zwerbowanych w Karczmie w Osadzie. Każdy poziom Kwater to miejsce dla jednego towarzysza.",
+    "maxLevel": 2,
+    "settlement": true,
+    "looks": [1, 2],
+    "effect": { "kind": "companionPlaces", "perLevel": 1, "unit": "count", "text": "Miejsca dla towarzyszy: {value}" },
+    "costs": [
+      { "resource": "gold", "base": 1280, "growth": 4 },
+      { "resource": "wood", "base": 715, "growth": 3.6 },
+      { "resource": "stone", "base": 188, "growth": 3.6 },
+      { "resource": "iron-ore", "base": 74, "growth": 3.6 }
+    ],
+    "minutes": { "levels": [240, 1200] }
   }
 ]

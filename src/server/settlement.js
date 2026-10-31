@@ -420,24 +420,37 @@ function giftOf(companion, row, now) {
   return { ...gift, name: goods[gift.key].name };
 }
 
+// The places for companions: the relation with the innkeeper opens them
+// (question 105 A), and each needs a bed in the camp's Kwatery (104 A: the
+// companion lives in the camp).
+function placesOf(player, stored, now) {
+  const relation = companionPlaces(stored.relations[content.settlement.tavern.resident] ?? 0, content);
+  const beds = campBonus(campLevels(player.buildings, now, content), 'companionPlaces', content);
+  return { relation, beds, places: Math.min(relation, beds) };
+}
+
 // The Karczma's werbunek (questions 104–106): the places the relation with
-// the innkeeper gives, the standing that opens the next one, the companions
-// hired with this week's gift and this week's candidates not hired yet,
-// each with its price.
+// the innkeeper and the Kwatery give, the standing that opens the next one,
+// the companions hired with this week's gift and this week's candidates not
+// hired yet, each with its price.
 function companionsView(player, stored, now) {
   const { row } = player;
   const { standings } = content.settlement;
   const bag = player.items.filter((item) => !item.equippedSlot);
   const rested = (stored.companions ?? []).some((companion) => companion.wounded) ? restedAt(player, now) : now;
-  const places = companionPlaces(stored.relations[content.settlement.tavern.resident] ?? 0, content);
+  const { relation, beds, places } = placesOf(player, stored, now);
   const hired = stored.companions ?? [];
-  const nextId = content.settlement.companions.from[places];
+  const nextId = content.settlement.companions.from[relation];
   const candidates = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, now, content, [
     ...hired.map((companion) => companion.id),
     ...(stored.dismissed ?? []),
   ]);
   return {
     places,
+    // What the innkeeper's relation would allow and the beds in the camp's
+    // Kwatery, so that the page says which one is missing.
+    relation,
+    beds,
     next: nextId ? standings.find((standing) => standing.id === nextId).name : null,
     // Each with this week's gift and the items in the bag it can wear.
     hired: hired.map((companion) => ({
@@ -610,9 +623,9 @@ export async function hireCompanion(context) {
   const body = await readJson(context.request);
   const stored = settlementOf(row);
   const hired = stored.companions ?? [];
-  if (hired.length >= companionPlaces(stored.relations[content.settlement.tavern.resident] ?? 0, content)) {
-    throw new ApiError(409, 'no_place', 'Zbylut nie zna cię jeszcze na tyle, żeby polecić więcej ludzi.');
-  }
+  const { relation, beds } = placesOf(player, stored, context.now);
+  if (hired.length >= relation) throw new ApiError(409, 'no_place', 'Zbylut nie zna cię jeszcze na tyle, żeby polecić więcej ludzi.');
+  if (hired.length >= beds) throw new ApiError(409, 'no_bed', 'W Kwaterach w obozie nie ma wolnego posłania.');
   const taken = [...hired.map((companion) => companion.id), ...(stored.dismissed ?? [])];
   const candidate = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, context.now, content, taken).find((one) => one.id === body.candidateId);
   if (!candidate) throw new ApiError(404, 'no_candidate', 'Tego kandydata już nie ma w Karczmie.');

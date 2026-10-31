@@ -613,10 +613,18 @@ export function mountSettlement(container, { params = {} } = {}) {
 
   // The werbunek: the companions hired (they go on every exploration but a
   // Szybkie Polowanie) and this week's candidates, from the standing with
-  // the innkeeper that gives a place.
+  // the innkeeper that gives a place and a bed in the camp's Kwatery.
   function companionsCard() {
-    const { places, next, hired, candidates } = data.companions;
+    const { places, relation, beds, next, hired, candidates } = data.companions;
     const full = hired.length >= places;
+    // What opens the next place: the standing with Zbylut or a bed more.
+    const more = relation > beds ? ' Kolejne posłanie da rozbudowa Kwater w obozie.' : next ? ` Kolejne od stopnia ${next}.` : '';
+    const intro =
+      relation === 0
+        ? `Zbylut poleci ci kogoś od stopnia ${next} w relacji z nim.`
+        : beds === 0
+          ? 'Zbylut poleci ci kogoś, ale towarzysz potrzebuje posłania: zbuduj Kwatery w obozie.'
+          : `Towarzysze idą z tobą na każdą wyprawę poza Szybkim Polowaniem i rosną razem z tobą. Werbunek to jednorazowa opłata, bez żołdu. Miejsca: ${hired.length} z ${places}.${more}`;
     const dismiss = (companion) =>
       h('button', {
         type: 'button',
@@ -643,12 +651,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       'section',
       { class: 'stack' },
       h('h2', { class: 'section-title', text: 'Towarzysze' }),
-      places === 0
-        ? h('p', { class: 'muted', text: `Zbylut poleci ci kogoś od stopnia ${next} w relacji z nim.` })
-        : h('p', {
-            class: 'muted',
-            text: `Towarzysze idą z tobą na każdą wyprawę poza Szybkim Polowaniem i rosną razem z tobą. Werbunek to jednorazowa opłata, bez żołdu. Miejsca: ${hired.length} z ${places}.${next ? ` Kolejne od stopnia ${next}.` : ''}`,
-          }),
+      h('p', { class: 'muted', text: intro }),
       hired.map((companion) => companionCard(companion, dismiss(companion))),
       h('h2', { class: 'section-title', text: 'Szukają pracy w tym tygodniu' }),
       candidates.length === 0

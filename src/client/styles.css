@@ -4247,6 +4247,12 @@ a.camp-level-button {
   }
 }
 
+/* With the Osada the board is taller: a band of glade for the Kwatery
+   (camp-art.js: boardHeight). */
+.camp-board--tall {
+  aspect-ratio: 360 / 564;
+}
+
 .camp-board-art {
   position: absolute;
   inset: 0;

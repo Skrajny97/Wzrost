@@ -4,7 +4,7 @@
 // flies to it, and the hit flashes with the damage. The text log runs
 // underneath and "+" opens the participants' stats.
 
-import { companionBust, monsterSprite, portraitSprite, summonSprite } from './art.js';
+import { companionBust, companionPortrait, monsterSprite, portraitSprite, summonSprite } from './art.js';
 import { classArt } from './class-art.js';
 import { h, icon } from './dom.js';
 import { CLASS_ICONS } from './icons.js';
@@ -83,7 +83,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     const art = unit.summon
       ? summonSprite(unit.summon)
       : unit.side === 'ally'
-        ? ((unit.companion ? companionBust(unit.classId, unit.appearance ?? 'male') : null) ??
+        ? ((unit.companion ? (companionPortrait(unit.classId, unit.appearance ?? 'male') ?? companionBust(unit.classId, unit.appearance ?? 'male')) : null) ??
           portraitSprite(unit.classId, unit.appearance ?? 'male', { bust: true, skin: unit.skin, evolution: unit.evolution }) ??
           classArt(unit.classId))
         : monsterSprite(unit.monsterId);

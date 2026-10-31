@@ -72,21 +72,28 @@ test('every inner region has its picture', async () => {
 
 test('every building has its picture and a plot on the camp board, apart from the others', async () => {
   const art = await import('../src/client/camp-art.js');
-  const buildings = JSON.parse(readFileSync(new URL('../data/buildings.json', import.meta.url), 'utf8')).map((building) => building.id);
+  const all = JSON.parse(readFileSync(new URL('../data/buildings.json', import.meta.url), 'utf8'));
+  const buildings = all.map((building) => building.id);
   assert.deepEqual(buildings.filter((id) => !art.campArtIds.includes(id)), []);
-  assert.deepEqual(buildings.filter((id) => !art.CAMP_PLOTS[id]), []);
-  // Plots stay on the board and their pictures do not overlap.
-  const boxes = buildings.map((id) => {
-    const { x, y } = art.CAMP_PLOTS[id];
-    return { id, left: x - art.PLOT_WIDTH / 2, right: x + art.PLOT_WIDTH / 2, top: y - art.PLOT_HEIGHT / 2, bottom: y + art.PLOT_HEIGHT / 2 };
-  });
-  for (const box of boxes) {
-    assert.ok(box.left >= 0 && box.right <= art.BOARD_WIDTH && box.top >= 0 && box.bottom <= art.BOARD_HEIGHT, `${box.id} leaves the board`);
-  }
-  for (const [i, a] of boxes.entries()) {
-    for (const b of boxes.slice(i + 1)) {
-      const apart = a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top;
-      assert.ok(apart, `${a.id} overlaps ${b.id}`);
+  // The board without the Osada has the camp's own buildings; the taller one
+  // with it the Osada's too (the Kwatery).
+  for (const tall of [false, true]) {
+    const plots = art.campPlots(tall);
+    const on = all.filter((building) => tall || !building.settlement).map((building) => building.id);
+    assert.deepEqual(on.filter((id) => !plots[id]), []);
+    // Plots stay on the board and their pictures do not overlap.
+    const boxes = on.map((id) => {
+      const { x, y } = plots[id];
+      return { id, left: x - art.PLOT_WIDTH / 2, right: x + art.PLOT_WIDTH / 2, top: y - art.PLOT_HEIGHT / 2, bottom: y + art.PLOT_HEIGHT / 2 };
+    });
+    for (const box of boxes) {
+      assert.ok(box.left >= 0 && box.right <= art.BOARD_WIDTH && box.top >= 0 && box.bottom <= art.boardHeight(tall), `${box.id} leaves the board`);
+    }
+    for (const [i, a] of boxes.entries()) {
+      for (const b of boxes.slice(i + 1)) {
+        const apart = a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top;
+        assert.ok(apart, `${a.id} overlaps ${b.id}${tall ? ' on the taller board' : ''}`);
+      }
     }
   }
   // The look grows with the level: levels 1–3, 4–7 and 8–10.
@@ -119,12 +126,14 @@ test('every sprite on the list has its file at its size, and every class has its
     residents: data('settlement').residents.map((resident) => resident.id),
     // The companions' busts, one for each class and look.
     companions: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
+    'companion-portraits': data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     'settlement-board': ['settlement'],
     // The inner regions' circles and the lands' cards on the Walka screen.
     areas: data('regions').flatMap((region) => region.areas.map((area) => area.id)),
     lands: data('regions').map((region) => region.id),
     // The camp board's ground at the camp's three looks.
     board: ['camp-1', 'camp-2', 'camp-3'],
+    'board-tall': ['camp-1', 'camp-2', 'camp-3'],
     // The camp's buildings at their three looks.
     camp: data('buildings').flatMap((building) => [1, 2, 3].map((tier) => `${building.id}-${tier}`)),
     // Zielarstwo's herbs, Alchemia's potions, the professions' squares and the
