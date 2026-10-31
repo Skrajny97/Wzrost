@@ -1,0 +1,23 @@
+{
+  "id": "companion-mage-male-2",
+  "payload": {
+    "prompt": "a slavic mage for hire in his late thirties, long straight copper red hair tied back, a neat short red goatee, sharp green eyes, a narrow calm face, a deep blue hooded robe with silver runes embroidered along the edge of the hood, the hood down on his shoulders, a pendant with a small glowing blue crystal on a silver chain, the whole head inside the picture with a little empty space above the head, head and shoulders portrait, his shoulders fill the whole bottom of the picture from the left edge to the right edge, facing the viewer, three-quarter view, on a flat plain light beige background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 811147675,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793448184,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 48.59,
+    "request_id": "f3219e90-2e21-461f-a0b5-3a9f9adf145e",
+    "outputs_retained_until": 1793534527
+  }
+}
