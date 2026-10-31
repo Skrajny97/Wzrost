@@ -1,0 +1,28 @@
+{
+  "id": "camp-3-band-r",
+  "tool": "inpainting",
+  "payload": {
+    "input_image": "art/inputs/board/camp-3-band-r.png",
+    "mask_image": "art/inputs/board/camp-band-r-mask.png",
+    "prompt": "top-down pixel art game map seen straight from above, more of the same large forest clearing for a village builder game: soft green grass with small flowers, clover and a few grey stones, the same grass as above and below, dense dark green trees along the right edge, the same trees as above and below, muted natural colours, no palisade, no fence, no wall, no gates, no buildings, no paths, no water, no people",
+    "seed": 578588029
+  },
+  "result": {
+    "tool_id": "inpainting",
+    "inference_id": "inf_8ARrKDPyab2NdqWo9mYq1WJ0L34YjzMl",
+    "balance_cost": 0.18,
+    "credit_cost": 20,
+    "charged": true,
+    "remaining_balance": 50.74999999999997,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/c8f075aa8e5dbbfed1b055cce7a10008.png"
+    ],
+    "output_width": 256,
+    "output_height": 256,
+    "toolId": "inpainting",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/c8f075aa8e5dbbfed1b055cce7a10008.png",
+    "inferenceId": "inf_8ARrKDPyab2NdqWo9mYq1WJ0L34YjzMl",
+    "balanceCost": 0.18,
+    "creditCost": 20
+  }
+}
