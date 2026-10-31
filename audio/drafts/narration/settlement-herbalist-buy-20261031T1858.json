@@ -1,0 +1,17 @@
+{
+  "id": "settlement-herbalist-buy",
+  "payload": {
+    "text": "Jagna sprzedaje zioła. Na początek tylko trzy najprostsze, a z każdym stopniem relacji coraz więcej. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-herbalist-buy-20261031T1858-0.mp3",
+    "audio/drafts/narration/settlement-herbalist-buy-20261031T1858-1.mp3"
+  ],
+  "credits": 218
+}
