@@ -3026,6 +3026,14 @@ Autor przekazuje uwagę osoby testującej grę (kuzyn autora), która grała na 
 2. **Zmiana.** Znacznik przeczytania trafia też na serwer, do postaci (`POST /api/chat/seen`, kolumna `characters.chat_seen`, migracja 0058). `GET /api/chat/latest`, o który gra pyta co 15 sekund, oddaje go każdemu urządzeniu. Znacznik tylko rośnie. Kropka na zakładce Społeczność i przy czacie gaśnie więc na każdym urządzeniu po najwyżej 15 sekundach od przeczytania wiadomości na jednym z nich, a po otwarciu gry od razu.
 3. **Wyciszenie** powiadomień Globalnego zostaje ustawieniem urządzenia.
 
+## Wersja 0.0.65 (31.10.2026)
+
+Autor: „Wdróż 0.0.65 tak jak mówisz”.
+
+1. **Co wchodzi do gry:** poprawione odcienie skóry chodów (zob. „Odcienie skóry chodów: przegląd i poprawki”), nowy chód Inkwizytorki z samym buzdyganem (215 F) oraz czat, w którym wiadomość przeczytana na jednym urządzeniu nie świeci się jako nowa na drugim (zob. „Czat: przeczytane wiadomości na każdym urządzeniu”).
+2. **Co zostaje ukryte:** Osada (bez `SETTLEMENT`) z częściami II i III, które są na razie tylko na wersji testowej.
+3. **Migracje bazy:** 0058 (`characters.chat_seen`).
+
 ## Wersja 0.0.64 (30.10.2026)
 
 Autor: „Po zrobieniu chodu 213 A i 214 A robisz wdrożenie”.
