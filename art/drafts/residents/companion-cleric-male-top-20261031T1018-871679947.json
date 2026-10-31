@@ -1,0 +1,28 @@
+{
+  "id": "companion-cleric-male-top",
+  "tool": "outpainting",
+  "payload": {
+    "input_image": "art/references/companions/cleric-male.png",
+    "prompt": "pixel art head and shoulders portrait, the top of the same old man's head with long white hair combed back, the same flat plain light beige background above his head, nothing else above the head",
+    "expand_top": 24,
+    "seed": 871679947
+  },
+  "result": {
+    "tool_id": "outpainting",
+    "inference_id": "inf_ndJOXpRjv0Kk2GYoONxQby98ArNxzPL3",
+    "balance_cost": 0.18,
+    "credit_cost": 20,
+    "charged": true,
+    "remaining_balance": 59.56999999999996,
+    "output_urls": [
+      "https://da8ztllw6by0f.cloudfront.net/404af07ad0990dcfab838c73c9ed3cc1.png"
+    ],
+    "output_width": 96,
+    "output_height": 152,
+    "toolId": "outpainting",
+    "outputImageUrl": "https://da8ztllw6by0f.cloudfront.net/404af07ad0990dcfab838c73c9ed3cc1.png",
+    "inferenceId": "inf_ndJOXpRjv0Kk2GYoONxQby98ArNxzPL3",
+    "balanceCost": 0.18,
+    "creditCost": 20
+  }
+}
