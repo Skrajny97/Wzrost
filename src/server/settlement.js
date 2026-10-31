@@ -9,6 +9,7 @@
 import {
   BAG_GOODS,
   COMPANION_SLOTS,
+  addCounts,
   addQuestProgress,
   bagCapacity,
   bagStacks,
@@ -29,6 +30,7 @@ import {
   evolutionChangePrice,
   evolutionChanges,
   evolvedSkills,
+  goodStock,
   herbalistPremium,
   herbalistStock,
   relationDiscount,
@@ -36,9 +38,11 @@ import {
   imbueBlock,
   imbueCost,
   imbueEffect,
+  isAnyMaterial,
   itemName,
   itemView,
   materialView,
+  materialsTaken,
   mugCost,
   orderGold,
   parseStack,
@@ -167,6 +171,10 @@ export function requireOpen(row) {
 function goodLabel({ kind, key }) {
   if (kind === 'herb') return content.herbsById[key].name;
   if (kind === 'potion') return content.potionsById[key].name;
+  if (isAnyMaterial({ kind, key })) {
+    const [name] = content.settlement.orders.anyMaterial[parseStack(key).rarityId];
+    return name[0].toUpperCase() + name.slice(1);
+  }
   if (kind === 'material') {
     const { label } = materialView(key, 1, content);
     return label[0].toUpperCase() + label.slice(1);
@@ -180,13 +188,30 @@ function goodLabel({ kind, key }) {
 // camp's Skup bonus (orderGold, question 236 A).
 const sellBonusOf = (player, now) => campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
 
-const orderView = (order, stocks, sellBonus) => ({
-  ...order,
-  gold: orderGold(order, sellBonus, content),
-  label: goodLabel(order),
-  brotherhoodName: content.settlement.brotherhoods.find((one) => one.id === order.brotherhood).name,
-  have: stocks[COLUMNS[order.kind]]?.[order.key] ?? 0,
-});
+// An order for any materials of a rarity has the three forms of their
+// name (`forms`: "materiał pospolity", "materiały pospolite", "materiałów
+// pospolitych") and, once the character holds enough, the stacks
+// delivering it would take (`takes`).
+function orderView(order, stocks, sellBonus) {
+  const have = goodStock(order, stocks, content);
+  const any = isAnyMaterial(order);
+  const takes =
+    any && have >= order.count
+      ? Object.entries(materialsTaken(order, stocks.materials, content)).map(([key, count]) => {
+          const { label } = materialView(key, count, content);
+          return { name: label[0].toUpperCase() + label.slice(1), count };
+        })
+      : null;
+  return {
+    ...order,
+    gold: orderGold(order, sellBonus, content),
+    label: goodLabel(order),
+    ...(any && { forms: content.settlement.orders.anyMaterial[parseStack(order.key).rarityId] }),
+    ...(takes && { takes }),
+    brotherhoodName: content.settlement.brotherhoods.find((one) => one.id === order.brotherhood).name,
+    have,
+  };
+}
 
 // The Osada for the page: the board's places, the residents with the
 // greeting of their relation's standing, the brotherhoods' standings and
@@ -616,7 +641,8 @@ export async function deliverSettlementOrder(context) {
   const body = await readJson(context.request);
   const stored = settlementOf(row);
   const board = settlementBoard(row, stored, context.now);
-  const block = deliverBlock(board, body.orderId, settlementGoods(row, player.items));
+  const goods = settlementGoods(row, player.items);
+  const block = deliverBlock(board, body.orderId, goods, content);
   if (block) throw new ApiError(block.code === 'no_order' ? 404 : 409, block.code, block.message);
   const done = deliverOrder(board, body.orderId, context.now, content, sellBonusOf(player, context.now));
   const add = (counts, more) => ({ ...counts, ...Object.fromEntries(Object.entries(more).map(([id, gain]) => [id, (counts[id] ?? 0) + gain])) });
@@ -628,6 +654,26 @@ export async function deliverSettlementOrder(context) {
     await deliverCrafted(db, player, done, { settlement: JSON.stringify(next), quests });
     const after = await loadPlayer(db, session.userId);
     if (after.row.settlement !== JSON.stringify(next)) throw changed();
+    return json({
+      delivered: { gold: done.gold, systemPoints: done.systemPoints, reputation: done.reputation },
+      settlement: settlementView(after, next, done.board, context.now),
+      character: characterView(after, context.now),
+    });
+  }
+  if (done.take.kind === 'material') {
+    // Materials, any of a rarity from several stacks (materialsTaken), are
+    // saved whole, only if the character is as read.
+    const taken = materialsTaken(done.take, goods.materials, content);
+    const left = addCounts(goods.materials, Object.fromEntries(Object.entries(taken).map(([key, count]) => [key, -count])));
+    const result = await db
+      .prepare(
+        `UPDATE characters SET gold = gold + ?, system_points = system_points + ?, settlement = ?, quests = ?, materials = ?, version = version + 1
+         WHERE id = ? AND version = ? AND materials IS ?`,
+      )
+      .bind(done.gold, done.systemPoints, JSON.stringify(next), quests, JSON.stringify(left), row.id, row.version, row.materials)
+      .run();
+    if (result.meta.changes !== 1) throw changed();
+    const after = await loadPlayer(db, session.userId);
     return json({
       delivered: { gold: done.gold, systemPoints: done.systemPoints, reputation: done.reputation },
       settlement: settlementView(after, next, done.board, context.now),

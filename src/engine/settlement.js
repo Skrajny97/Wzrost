@@ -12,7 +12,7 @@
 // and the seed.
 
 import { knownPotions, potionPrice } from './brewing.js';
-import { materialPrice, parseStack, stackKey } from './crafting.js';
+import { knownStack, materialPrice, parseStack, stackKey } from './crafting.js';
 import { fireBuilding, fireTrade } from './fire.js';
 import { affixShare, affixValue, sellPrice } from './items.js';
 import { easyPlace } from './hunt.js';
@@ -75,11 +75,19 @@ export function goodPrice({ kind, key }, content, level = 1) {
 // What the scrapper pays for a common Warsztat's item of a pattern at `level`.
 export const craftSellPrice = (level, content) => sellPrice({ level, rarity: 'common' }, content);
 
+// An order for any creatures' materials of a rarity, keyed "any:rare" (the
+// author: "Powinno być prędzej oddaj 32 materiały pospolite/ileś
+// rzadkich/unikalnych"): any material of that rarity counts but an elite's
+// or a champion's trophy.
+const ANY = 'any';
+export const anyMaterialKey = (rarityId) => stackKey(ANY, rarityId);
+export const isAnyMaterial = ({ kind, key }) => kind === 'material' && parseStack(key).materialId === ANY;
+
 // The goods an order may ask for: only what the character can already get
 // (question 89 A): the herbs its Zielarstwo knows, the potions its Alchemia
-// knows, the materials of the creatures it has met, at their species'
-// rarity (no elite's or champion's trophy), the camp's resources and the
-// parts up to the board's partRarity.
+// knows, any materials of each rarity of the creatures it has met (no
+// elite's or champion's trophy, and only the rarities anyMaterial names),
+// the camp's resources and the parts up to the board's partRarity.
 export function orderGoods(character, content) {
   const goods = [];
   const open = (profession) => profession && professionOpen(content.professionsById[profession.profession], character.level, content);
@@ -91,10 +99,16 @@ export function orderGoods(character, content) {
     const level = professionState(character.professions, content.brewing.profession).level;
     for (const potion of knownPotions(level, content)) goods.push({ kind: 'potion', key: potion.id });
   }
+  // The author: "Te zlecenie powinny być losowane dla danej postaci na dany
+  // poziom, powinno ich być albo dużo albo ogólne (raczej ogólne)".
+  const met = new Set();
   for (const monsterId of character.met ?? []) {
     const monster = content.monstersById[monsterId];
     const material = content.materialsByMonster[monsterId];
-    if (material && monster && !monster.elite && !monster.champion) goods.push({ kind: 'material', key: stackKey(material.id, material.rarity) });
+    if (material && monster && !monster.elite && !monster.champion) met.add(material.rarity);
+  }
+  for (const rarity of content.rarities) {
+    if (met.has(rarity.id) && content.settlement.orders.anyMaterial[rarity.id]) goods.push({ kind: 'material', key: anyMaterialKey(rarity.id) });
   }
   // The patterns of Rzemieślnictwo the character knows (question 79 A: the
   // smiths order the Warsztat's items too).
@@ -108,11 +122,12 @@ export function orderGoods(character, content) {
   return goods.filter((good) => brotherhoodOf(good.kind, content));
 }
 
-// A material one rarity higher, for an order of quality.
+// Materials one rarity higher, for an order of quality, up to the last
+// rarity anyMaterial names.
 function finer(key, content) {
   const { materialId, rarityId } = parseStack(key);
   const next = content.rarities[rarityIndex(rarityId, content) + 1];
-  return next ? stackKey(materialId, next.id) : key;
+  return next && content.settlement.orders.anyMaterial[next.id] ? stackKey(materialId, next.id) : key;
 }
 
 // The sentences an order may carry: its kind's, and for a Warsztat's item
@@ -132,7 +147,9 @@ export function orderStories(kind, key, content) {
 // (`pay` times the market price) and the reputation, a quality one from
 // the brotherhood's quality standing on (question 90 A), and one sentence
 // of the one who orders (question 94 A). `weekly` makes the week's big
-// order.
+// order. Materials come materialStep times fewer for each rarity above
+// the first, so rarer ones are asked for in fewer pieces for about the
+// same gold.
 export function drawOrder({ character, reputation = {}, seed, weekly = false }, content) {
   const { orders } = content.settlement;
   const rng = createRng(seed);
@@ -154,6 +171,7 @@ export function drawOrder({ character, reputation = {}, seed, weekly = false }, 
     }
   }
   if (weekly) count *= orders.weekly.count;
+  if (kind === 'material') count = Math.max(1, Math.round(count * orders.materialStep ** rarityIndex(parseStack(key).rarityId, content)));
   const gold = Math.max(1, Math.round(count * goodPrice({ kind, key }, content, character.level) * orders.pay[kind] * factor * (weekly ? orders.weekly.reward / orders.weekly.count : 1)));
   // From the special standing a brotherhood's order may be special
   // (question 82): more reputation and Punkty Systemu for the same goods
@@ -205,10 +223,20 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
       : { period: key, order: drawOrder({ character, reputation, seed: `${seed}:weekly:${key}`, weekly: true }, content), done: false };
   return {
     ...board,
-    slots: settled.map((slot) => (slot.order ? { ...slot, order: freshStory(slot.order, content) } : slot)),
-    weekly: weekly.order ? { ...weekly, order: freshStory(weekly.order, content) } : weekly,
+    slots: settled.map((slot) => (slot.order ? { ...slot, order: freshStory(anyMaterial(slot.order, content), content) } : slot)),
+    weekly: weekly.order ? { ...weekly, order: freshStory(anyMaterial(weekly.order, content), content) } : weekly,
     turn,
   };
+}
+
+// An order for one creature's material, hung before the orders asked for
+// any materials of a rarity, asks for any of its rarity now, for the same
+// count and gold (the author: "Powinno być prędzej oddaj 32 materiały
+// pospolite"). One of a rarity anyMaterial does not name stays as it was.
+function anyMaterial(order, content) {
+  if (order.kind !== 'material' || isAnyMaterial(order)) return order;
+  const { rarityId } = parseStack(order.key);
+  return content.settlement.orders.anyMaterial[rarityId] ? { ...order, key: anyMaterialKey(rarityId) } : order;
 }
 
 // An order hung before its sentence was rewritten takes the new sentence
@@ -228,11 +256,45 @@ function freshStory(order, content) {
 }
 
 // How many pieces of a good the character holds: herbs, potions, materials,
-// resources and parts by key, as the store keeps them, and the Warsztat's
-// items in the bag by pattern (`crafted`).
-export function goodStock({ kind, key }, stocks) {
+// resources and parts by key, as the store keeps them, the Warsztat's items
+// in the bag by pattern (`crafted`), and for any materials of a rarity all
+// the stacks that count for them.
+export function goodStock({ kind, key }, stocks, content) {
+  if (isAnyMaterial({ kind, key })) return anyMaterialStacks(key, stocks.materials ?? {}, content).reduce((sum, [, count]) => sum + count, 0);
   const store = { herb: stocks.herbs, potion: stocks.potions, material: stocks.materials, resource: stocks.resources, part: stocks.parts, craft: stocks.crafted }[kind];
   return store?.[key] ?? 0;
+}
+
+// The stacks an order for any materials of a rarity takes from, in the
+// order it takes them: the biggest first, so the character keeps a bit of
+// each, and the materials of the Zaklinaczka's elements last, so they stay
+// for her while anything else will do. No trophy counts.
+export function anyMaterialStacks(key, materials, content) {
+  const { rarityId } = parseStack(key);
+  const kept = new Set(content.settlement.imbue?.elements.map((one) => one.material) ?? []);
+  const counts = (stack) => {
+    if (!knownStack(stack, content) || parseStack(stack).rarityId !== rarityId) return false;
+    const monster = content.monstersById[content.materialsById[parseStack(stack).materialId].monster];
+    return Boolean(monster) && !monster.elite && !monster.champion;
+  };
+  const last = (stack) => (kept.has(parseStack(stack).materialId) ? 1 : 0);
+  return Object.entries(materials)
+    .filter(([stack, count]) => count > 0 && counts(stack))
+    .sort(([a, x], [b, y]) => last(a) - last(b) || y - x || (a < b ? -1 : 1));
+}
+
+// The stacks a delivered order of materials takes, by key: its own, or for
+// any materials anyMaterialStacks in their order until the count is met.
+export function materialsTaken({ key, count }, materials, content) {
+  if (parseStack(key).materialId !== ANY) return { [key]: count };
+  const taken = {};
+  let left = count;
+  for (const [stack, held] of anyMaterialStacks(key, materials, content)) {
+    if (left === 0) break;
+    taken[stack] = Math.min(held, left);
+    left -= taken[stack];
+  }
+  return taken;
 }
 
 // The Warsztat's items of a pattern an order takes from the bag: the
@@ -250,10 +312,10 @@ const findOrder = (board, orderId) =>
   orderId === 'weekly' ? (board.weekly && !board.weekly.done ? board.weekly.order : null) : board.slots.find((slot) => slot.order?.id === orderId)?.order ?? null;
 
 // Why an order cannot be delivered now, or null.
-export function deliverBlock(board, orderId, stocks) {
+export function deliverBlock(board, orderId, stocks, content) {
   const order = findOrder(board, orderId);
   if (!order) return { code: 'no_order', message: 'Tego zlecenia nie ma już na tablicy.' };
-  if (goodStock(order, stocks) < order.count) return { code: 'not_enough', message: 'Brakuje Ci jeszcze tego, o co proszą.' };
+  if (goodStock(order, stocks, content) < order.count) return { code: 'not_enough', message: 'Brakuje Ci jeszcze tego, o co proszą.' };
   return null;
 }
 

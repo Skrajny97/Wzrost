@@ -2996,6 +2996,17 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Zlecenia na dowolne materiały (31.10.2026, na wersji testowej)
+
+Autor o zleceniu tygodnia „32 × Skóra lisa” na 28. poziomie postaci: „Takie zlecenie tygodnia na 28 poziomie jest bez sensu. I w ogóle bez sensu takie duże, skoro tak trudno te materiały trafić.”, „Powinno być prędzej oddaj 32 materiały pospolite/ileś rzadkich/unikalnych.” oraz „Te zlecenie powinny być losowane dla danej postaci na dany poziom, powinno ich być albo dużo albo ogólne (raczej ogólne).”
+
+1. **Zlecenia ogólne.** Bractwo Łowców nie prosi już o materiał jednego stwora, tylko o dowolne materiały jednej rzadkości, np. „32 materiały pospolite” albo „4 materiały unikalne”. Pasuje każdy materiał tej rzadkości, także materiał zwykłego stwora, który wypadł o rzadkość wyżej. Trofea elit i czempionów się nie liczą.
+2. **Rzadkość dla postaci.** Zlecenie losuje jedną z rzadkości materiałów stworów, które postać już spotkała. Liczba sztuk rośnie z poziomem postaci, jak dotąd.
+3. **Rzadszych mniej.** Na każdą rzadkość powyżej pospolitej przypada o połowę mniej sztuk (`materialStep`: 0,5). Złota jest mniej więcej tyle samo, bo rzadszy materiał jest dwa razy droższy. Na 28. poziomie zlecenie tygodnia prosi o 16–32 materiały pospolite, 8–16 rzadkich, 4–8 unikalnych albo 2–4 epickie. Zwykłe zlecenie prosi o 4–8 pospolitych, 2–4 rzadkie, 1–2 unikalne albo 1 epicki.
+4. **Zlecenie jakościowe.** Od stopnia „Stały klient” zlecenie bywa o rzadkość wyżej, najwyżej na materiały epickie. Prosi wtedy o mniej sztuk, a za sztukę płaci dwa razy więcej, jak dotąd.
+5. **Oddawanie.** Gra sama bierze materiały: najpierw z największych stosów, żeby postaci zostało po trochu z każdego. Materiały żywiołów Zaklinaczki (Iskra ognika, Skóra węgorza, Rosa rosiczki) idą na końcu. Zanim gracz odda zlecenie, karta pokazuje, co zabierze, np. „Oddasz: 20 × Skóra wilka, 12 × Skóra lisa.”
+6. **Zlecenia sprzed zmiany.** Zlecenie na materiał jednego stwora, które już wisi na tablicy, prosi teraz o dowolne materiały tej samej rzadkości, za tę samą liczbę sztuk i to samo złoto. „32 × Skóra lisa” ze zrzutu ekranu autora to teraz „32 materiały pospolite”.
+
 ## Wersja 0.0.69 (31.10.2026)
 
 Autor: „wrzuć od razu Zgłoś Bład jako 0.0.69 na main pozniej” oraz o tekstach sołtysa: „"zlecenia wiesza na tablicy przed swoją chatą" powinno być oraz "Na tablicy zawsze znajdziesz jakąś robotę. Płacimy tu uczciwie."”.

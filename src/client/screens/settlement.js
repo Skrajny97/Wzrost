@@ -12,7 +12,7 @@
 import { residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
-import { formatCountdown, formatDecimal, formatHours, formatNumber } from '../format.js';
+import { countOf, formatCountdown, formatDecimal, formatHours, formatNumber } from '../format.js';
 import { leaveView, openView } from '../history.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
@@ -128,7 +128,7 @@ export function mountSettlement(container, { params = {} } = {}) {
           { class: 'settlement-fold-name' },
           order.weekly && h('span', { class: 'settlement-weekly', text: 'Zlecenie tygodnia' }),
           order.special && h('span', { class: 'settlement-weekly', text: 'Zlecenie specjalne' }),
-          h('span', { class: 'settlement-ask', text: `${formatNumber(order.count)} × ${order.label}` }),
+          h('span', { class: 'settlement-ask', text: order.forms ? countOf(order.count, ...order.forms) : `${formatNumber(order.count)} × ${order.label}` }),
         ),
         enough && [h('span', { class: 'settlement-fold-dot', 'aria-hidden': 'true' }), h('span', { class: 'visually-hidden', text: 'Można oddać' })],
         icon('chevron', { size: 18, className: 'settlement-fold-chevron' }),
@@ -141,6 +141,12 @@ export function mountSettlement(container, { params = {} } = {}) {
         h('p', { class: 'muted', text: `Zapłata: ${formatNumber(order.gold)} złota, +${order.reputation} reputacji: ${order.brotherhoodName}${order.special ? ', +1 PS' : ''}` }),
         order.expiresAt && h('p', { class: 'muted', text: `Termin: jeszcze ${timeLeft(order.expiresAt - serverNow())}` }),
         order.kind === 'craft' && h('p', { class: 'muted', text: 'Wyroby z Warsztatu oddajesz z plecaka, najpierw najsłabsze.' }),
+        // Any materials of a rarity: what delivering takes, from the biggest stacks.
+        order.forms &&
+          h('p', {
+            class: 'muted',
+            text: order.takes ? `Oddasz: ${order.takes.map((one) => `${formatNumber(one.count)} × ${one.name}`).join(', ')}.` : `Pasuje każdy ${order.forms[0]}.`,
+          }),
         h('div', { class: 'settlement-actions' }, deliver, reject),
       ),
     );

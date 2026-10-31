@@ -380,7 +380,7 @@ function settlementWaiting(row, items, now, parcels = 0) {
   const board = settlementBoard(row, { board: stored.board ?? null, reputation: stored.reputation ?? {} }, now);
   const goods = settlementGoods(row, items);
   const weekly = board.weekly && !board.weekly.done ? board.weekly.order : null;
-  return [...board.slots.map((slot) => slot.order), weekly].some((order) => order && goodStock(order, goods) >= order.count);
+  return [...board.slots.map((slot) => slot.order), weekly].some((order) => order && goodStock(order, goods, content) >= order.count);
 }
 
 // What a period's quests are drawn from: the character as it is, whether its

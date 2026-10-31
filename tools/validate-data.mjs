@@ -1118,6 +1118,16 @@ function checkSettlement(data, { rarities }) {
     if (before && (standingAt(step.from) <= standingAt(before.from) || step.count <= before.count)) errors.push('settlement.json: reforge.choices muszą rosnąć ze stopniem');
   });
   if (!rarities.has(orders.partRarity)) errors.push(`settlement.json: orders.partRarity to nieznana rzadkość ${orders.partRarity}`);
+  // Orders for any materials of a rarity (the author: "oddaj 32 materiały
+  // pospolite/ileś rzadkich/unikalnych"): a name for each rarity of the
+  // creatures' own materials (no trophies), and only for known rarities.
+  for (const id of Object.keys(orders.anyMaterial)) if (!rarities.has(id)) errors.push(`settlement.json: orders.anyMaterial ma nieznaną rzadkość ${id}`);
+  for (const material of data.materials.materials) {
+    const monster = data.monsters.find((one) => one.id === material.monster);
+    if (monster && !monster.elite && !monster.champion && !orders.anyMaterial[material.rarity]) {
+      errors.push(`settlement.json: orders.anyMaterial nie nazywa materiałów rzadkości ${material.rarity} (${material.id})`);
+    }
+  }
   for (const [kind, count] of Object.entries(orders.counts)) {
     if (count.min > count.max) errors.push(`settlement.json: orders.counts.${kind}.min nie może być większe niż max`);
   }

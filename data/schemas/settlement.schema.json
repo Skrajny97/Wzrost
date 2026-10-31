@@ -104,7 +104,7 @@
     "orders": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["resident", "open", "refillMinutes", "expireDays", "reputation", "relationGain", "weekly", "pay", "resourceGold", "partGold", "overScrap", "partRarity", "counts", "quality", "special", "systemPoints", "stories", "craftStories"],
+      "required": ["resident", "open", "refillMinutes", "expireDays", "reputation", "relationGain", "weekly", "pay", "resourceGold", "partGold", "overScrap", "partRarity", "materialStep", "anyMaterial", "counts", "quality", "special", "systemPoints", "stories", "craftStories"],
       "properties": {
         "open": { "type": "integer", "minimum": 1 },
         "refillMinutes": { "type": "integer", "minimum": 1 },
@@ -130,6 +130,12 @@
         "partGold": { "type": "number", "exclusiveMinimum": 0 },
         "overScrap": { "type": "number", "minimum": 1, "description": "Za zioła, mikstury i materiały zlecenie płaci co najmniej tyle razy więcej, niż daje złomiarz postaci." },
         "partRarity": { "$ref": "#/definitions/id" },
+        "materialStep": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Zlecenie na dowolne materiały danej rzadkości: co rzadkość ponad pospolitą tyle razy mniej sztuk (0,5: o połowę mniej)." },
+        "anyMaterial": {
+          "type": "object",
+          "description": "Nazwa dowolnego materiału danej rzadkości (klucz: id rzadkości) w trzech formach: jeden, dwa, pięć.",
+          "additionalProperties": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string", "minLength": 1 } }
+        },
         "counts": {
           "allOf": [{ "$ref": "#/definitions/perKind" }],
           "additionalProperties": {

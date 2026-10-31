@@ -27,6 +27,8 @@ import {
   fireTrade,
   generateItem,
   goodPrice,
+  goodStock,
+  materialsTaken,
   orderGoods,
   orderStories,
   craftBuyCost,
@@ -53,6 +55,9 @@ const HOUR = 3600000;
 // A character of level 20 that has met a wolf and a crow, with both
 // professions of gathering and brewing at level 1.
 const character = newCharacter('warrior', { level: 20, classLevel: 20, met: ['wolf', 'crow'], professions: {} });
+// The stack that holds what an order asks for: for any materials of a
+// rarity, the wolf's pelt at that rarity.
+const heldKey = (order) => (order.kind === 'material' && order.key.startsWith('any:') ? `${content.materialsByMonster.wolf.id}:${order.key.slice(4)}` : order.key);
 
 describe('the Osada in the engine', () => {
   test('standings grow with points, the last one has no next', () => {
@@ -87,12 +92,16 @@ describe('the Osada in the engine', () => {
     assert.equal(withRareOdds(pace, { avoidRare: true, rumor: factor }, content).eliteChance, 0);
   });
 
-  test('orders ask only for what the character can get: met creatures without trophies, known herbs and potions, resources, lower parts', () => {
+  test('orders ask only for what the character can get: any materials of the met creatures\' rarities, known herbs and potions, resources, lower parts', () => {
     const goods = orderGoods(character, content);
     const kinds = new Set(goods.map((good) => good.kind));
     for (const kind of ['herb', 'potion', 'material', 'resource', 'part']) assert.ok(kinds.has(kind), kind);
     const materials = goods.filter((good) => good.kind === 'material').map((good) => good.key);
-    assert.deepEqual(materials.sort(), [`${content.materialsByMonster.crow.id}:${content.materialsByMonster.crow.rarity}`, `${content.materialsByMonster.wolf.id}:${content.materialsByMonster.wolf.rarity}`].sort());
+    assert.deepEqual(materials, [`any:${content.materialsByMonster.wolf.rarity}`, `any:${content.materialsByMonster.crow.rarity}`]);
+    // An elite's trophy adds no rarity of its own.
+    const elite = Object.values(content.monstersById).find((monster) => monster.elite && content.materialsByMonster[monster.id]);
+    const withElite = orderGoods({ ...character, met: [...character.met, elite.id] }, content).filter((good) => good.kind === 'material');
+    assert.deepEqual(withElite.map((good) => good.key), materials);
     const parts = goods.filter((good) => good.kind === 'part').map((good) => content.partsById[good.key].rarity);
     assert.deepEqual(parts, ['common', 'rare']);
     const herbs = goods.filter((good) => good.kind === 'herb');
@@ -178,15 +187,66 @@ describe('the Osada in the engine', () => {
     for (const count of Object.values(counts)) assert.ok(Math.abs(count - 1000) < 120, `${count}`);
   });
 
-  test('orders of quality ask for a finer material only from the quality standing on', () => {
+  test('orders of quality ask for finer materials only from the quality standing on', () => {
     const { quality } = content.settlement.orders;
     const hunters = content.settlement.standings.find((standing) => standing.id === quality.from).points;
+    // The wolf's and the crow's rarities, and a quality order one above them.
+    const met = new Set(['wolf', 'crow'].map((id) => `any:${content.materialsByMonster[id].rarity}`));
     const finer = (reputation) =>
-      Array.from({ length: 300 }, (_, i) => drawOrder({ character, reputation, seed: `q:${i}` }, content)).filter(
-        (order) => order.kind === 'material' && !order.key.endsWith(`:${content.materialsById[order.key.split(':')[0]].rarity}`),
-      ).length;
+      Array.from({ length: 300 }, (_, i) => drawOrder({ character, reputation, seed: `q:${i}` }, content)).filter((order) => order.kind === 'material' && !met.has(order.key)).length;
     assert.equal(finer({}), 0);
     assert.ok(finer({ hunters }) > 0);
+  });
+
+  test('a material order asks for any materials of a rarity, fewer of a rarer one, for about the same gold', () => {
+    const { counts, materialStep, weekly, anyMaterial } = content.settlement.orders;
+    const older = { ...character, level: 28, met: ['wolf', 'crow', ...Object.values(content.monstersById).filter((monster) => !monster.elite && !monster.champion).map((monster) => monster.id)] };
+    const seen = {};
+    for (let i = 0; i < 400; i++) {
+      const order = drawOrder({ character: older, seed: `any:${i}`, weekly: true }, content);
+      if (order.kind !== 'material') continue;
+      const rarityId = order.key.slice(4);
+      assert.ok(order.key.startsWith('any:') && anyMaterial[rarityId], order.key);
+      const step = materialStep ** content.rarities.findIndex((rarity) => rarity.id === rarityId);
+      const most = (counts.material.max + counts.material.perTenLevels * 2) * weekly.count;
+      assert.ok(order.count >= 1 && order.count <= Math.max(1, Math.round(most * step)), `${order.key} ${order.count}`);
+      seen[rarityId] = true;
+    }
+    // The author's example: up to 32 common ones a week at level 28.
+    assert.equal((counts.material.max + counts.material.perTenLevels * 2) * weekly.count, 32);
+    assert.deepEqual(Object.keys(seen).sort(), Object.keys(anyMaterial).sort());
+  });
+
+  test('any materials of a rarity count from every stack of it, the biggest go first and the elements\' last', () => {
+    const wolf = content.materialsByMonster.wolf;
+    const crow = content.materialsByMonster.crow;
+    const spark = content.settlement.imbue.elements.find((one) => content.materialsById[one.material].rarity === 'rare').material;
+    const materials = {
+      [`${wolf.id}:rare`]: 4,
+      [`${crow.id}:rare`]: 9,
+      [`${spark}:rare`]: 20,
+      [`${wolf.id}:common`]: 50,
+    };
+    const order = { kind: 'material', key: 'any:rare', count: 30 };
+    assert.equal(goodStock(order, { materials }, content), 33);
+    assert.deepEqual(materialsTaken(order, materials, content), { [`${crow.id}:rare`]: 9, [`${wolf.id}:rare`]: 4, [`${spark}:rare`]: 17 });
+    assert.deepEqual(materialsTaken({ ...order, count: 10 }, materials, content), { [`${crow.id}:rare`]: 9, [`${wolf.id}:rare`]: 1 });
+    // One material of an order hung before keeps its own stack.
+    assert.deepEqual(materialsTaken({ key: `${wolf.id}:common`, count: 5 }, materials, content), { [`${wolf.id}:common`]: 5 });
+    const board = { ...emptyBoard(), slots: [{ order: { ...order, id: 1, brotherhood: 'hunters', gold: 10, reputation: 10 } }] };
+    assert.equal(deliverBlock(board, 1, { materials }, content), null);
+    assert.equal(deliverBlock(board, 1, { materials: { ...materials, [`${spark}:rare`]: 16 } }, content).code, 'not_enough');
+  });
+
+  test('an order for one creature\'s material hung before asks for any of its rarity, for the same count and gold', () => {
+    const board = settleBoard(emptyBoard(), { character, seed: 'old' }, NOW, content);
+    const wolf = content.materialsByMonster.wolf;
+    const old = { kind: 'material', key: `${wolf.id}:${wolf.rarity}`, brotherhood: 'hunters', count: 32, gold: 128, reputation: 50, story: content.settlement.orders.stories.material[0] };
+    const stored = { ...board, slots: [{ order: { ...old, id: 99, expiresAt: NOW + HOUR } }, ...board.slots.slice(1)], weekly: { ...board.weekly, order: { ...old, weekly: true } } };
+    const fresh = settleBoard(stored, { character, seed: 'old' }, NOW, content);
+    assert.deepEqual(fresh.slots[0].order, { ...old, id: 99, expiresAt: NOW + HOUR, key: `any:${wolf.rarity}` });
+    assert.deepEqual(fresh.weekly.order, { ...old, weekly: true, key: `any:${wolf.rarity}` });
+    assert.deepEqual(settleBoard(fresh, { character, seed: 'old' }, NOW, content), fresh);
   });
 
   test('the board fills its slots, keeps them, and refills a delivered or rejected one after its time', () => {
@@ -196,10 +256,10 @@ describe('the Osada in the engine', () => {
     assert.deepEqual(settleBoard(board, { character, seed: 's' }, NOW + HOUR, content), board);
     const first = board.slots[0].order;
     const stocks = { herbs: {}, potions: {}, materials: {}, resources: {}, parts: {} };
-    assert.equal(deliverBlock(board, first.id, stocks).code, 'not_enough');
+    assert.equal(deliverBlock(board, first.id, stocks, content).code, 'not_enough');
     const store = { herb: 'herbs', potion: 'potions', material: 'materials', resource: 'resources', part: 'parts' }[first.kind];
-    stocks[store][first.key] = first.count;
-    assert.equal(deliverBlock(board, first.id, stocks), null);
+    stocks[store][heldKey(first)] = first.count;
+    assert.equal(deliverBlock(board, first.id, stocks, content), null);
     const done = deliverOrder(board, first.id, NOW, content);
     assert.deepEqual(done.take, { kind: first.kind, key: first.key, count: first.count });
     assert.equal(done.gold, first.gold);
@@ -244,7 +304,7 @@ describe('the Osada in the engine', () => {
     const done = deliverOrder(board, 'weekly', NOW, content);
     assert.equal(done.systemPoints, systemPoints.weekly);
     assert.equal(done.board.weekly.done, true);
-    assert.equal(deliverBlock(done.board, 'weekly', {}).code, 'no_order');
+    assert.equal(deliverBlock(done.board, 'weekly', {}, content).code, 'no_order');
     // A new week brings a new big order.
     const next = questPeriod('weekly', NOW, content).endsAt;
     assert.equal(settleBoard(done.board, { character, seed: 'ps' }, next, content).weekly.done, false);
@@ -347,6 +407,7 @@ describe('the Osada through the API', () => {
   const set = async (sql, ...binds) => (await db()).prepare(`UPDATE characters SET ${sql}`).bind(...binds).run();
   const view = async () => (await call('GET', '/api/settlement', { cookie })).data.settlement;
   const STORE = { herb: 'herbs', potion: 'potions', material: 'materials', resource: 'resources', part: 'parts' };
+  const hold = (order, count = order.count) => set(`${STORE[order.kind]} = json_set(${STORE[order.kind]}, ?, ?)`, `$."${heldKey(order)}"`, count);
 
   test('the Osada opens at its level, with three orders and the week\'s', async () => {
     await set('level = 19');
@@ -377,7 +438,7 @@ describe('the Osada through the API', () => {
     assert.equal(short.status, 409);
     assert.equal(short.data.error.code, 'not_enough');
     const column = STORE[order.kind];
-    await set(`${column} = json_set(${column}, ?, ?)`, `$."${order.key}"`, order.count + 1);
+    await hold(order, order.count + 1);
     const done = await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } });
     assert.equal(done.status, 200);
     assert.equal(done.data.delivered.gold, order.gold);
@@ -386,7 +447,7 @@ describe('the Osada through the API', () => {
     const brotherhood = done.data.settlement.brotherhoods.find((one) => one.id === order.brotherhood);
     assert.equal(brotherhood.standing.toNext, content.settlement.standings[1].points - order.reputation);
     const row = await (await db()).prepare(`SELECT ${column} AS stock FROM characters`).first();
-    assert.equal(JSON.parse(row.stock)[order.key], 1);
+    assert.equal(JSON.parse(row.stock)[heldKey(order)], 1);
     const again = await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } });
     assert.equal(again.status, 404);
   });
@@ -396,8 +457,7 @@ describe('the Osada through the API', () => {
     const { order } = columnOrder(await view());
     const lit = async () => (await call('GET', '/api/character', { cookie })).data.character.settlementWaiting;
     assert.equal(await lit(), false);
-    const column = STORE[order.kind];
-    await set(`${column} = json_set(${column}, ?, ?)`, `$."${order.key}"`, order.count);
+    await hold(order);
     assert.equal(await lit(), true);
   });
 
@@ -416,9 +476,34 @@ describe('the Osada through the API', () => {
     const lit = async () => (await call('GET', '/api/character', { cookie })).data.character.settlementWaiting;
     await set(`herbs = '{}', potions = '{}', materials = '{}', resources = '{}', parts = '{}'`);
     assert.equal(await lit(), false);
-    await set(`${STORE[order.kind]} = json_set(${STORE[order.kind]}, ?, ?)`, `$."${order.key}"`, order.count);
+    await hold(order);
     assert.equal(await lit(), true);
     assert.equal((await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } })).status, 200);
+  });
+
+  test('an order for any materials of a rarity takes them from several stacks, the biggest first', async () => {
+    let order = null;
+    for (let i = 0; i < 30 && !order; i++) {
+      await call('POST', '/api/test/settlement', { cookie, body: { action: 'orders' } });
+      order = (await view()).board.slots.map((slot) => slot.order).find((one) => one.kind === 'material') ?? null;
+    }
+    assert.ok(order, 'a material order comes');
+    const rarityId = order.key.slice(4);
+    const [one, few, many] = content.settlement.orders.anyMaterial[rarityId];
+    assert.deepEqual(order.forms, [one, few, many]);
+    const wolf = content.materialsByMonster.wolf.id;
+    const crow = content.materialsByMonster.crow.id;
+    const other = rarityId === 'common' ? 'rare' : 'common';
+    const materials = { [`${wolf}:${rarityId}`]: order.count, [`${crow}:${rarityId}`]: 1, [`${wolf}:${other}`]: 7 };
+    await set('materials = ?', JSON.stringify(materials));
+    const shown = (await view()).board.slots.find((slot) => slot.order?.id === order.id).order;
+    assert.equal(shown.have, order.count + 1);
+    assert.equal(shown.takes.length, 1);
+    assert.equal(shown.takes[0].count, order.count);
+    const done = await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } });
+    assert.equal(done.status, 200);
+    const row = await (await db()).prepare('SELECT materials FROM characters').first();
+    assert.deepEqual(JSON.parse(row.materials), { [`${crow}:${rarityId}`]: 1, [`${wolf}:${other}`]: 7 });
   });
 
   test('a Warsztat order takes the weakest of the pattern\'s items from the bag, never a worn one', async () => {
