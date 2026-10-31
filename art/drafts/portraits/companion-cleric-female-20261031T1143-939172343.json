@@ -1,0 +1,25 @@
+{
+  "id": "companion-cleric-female",
+  "payload": {
+    "prompt": "a small full body figure seen from afar, the whole figure from the top of the head to the feet inside the picture with empty space above the head and below the feet, a dignified middle-aged slavic woman healer for hire, greying chestnut hair under a white linen kerchief, warm brown eyes, a long cream linen robe with a red embroidered border, a dark green shawl, a carved wooden sun amulet on a cord, a wooden staff topped with a sun in her hand, standing in the middle of the image, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 939172343,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 1
+  },
+  "result": {
+    "created_at": 1793447106,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 50.03,
+    "request_id": "6fc3f631-35a8-4a59-b42e-313ed5ed5b5d",
+    "outputs_retained_until": 1793533390
+  }
+}

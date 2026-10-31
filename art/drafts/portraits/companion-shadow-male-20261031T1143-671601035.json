@@ -1,0 +1,25 @@
+{
+  "id": "companion-shadow-male",
+  "payload": {
+    "prompt": "a full body figure standing upright and still, the whole figure from the top of the head to the feet fills the height of the picture with a little empty space above the head and below the feet, a wiry young slavic thief for hire, messy black hair, a thin moustache, quick dark eyes, a dark leather hood down on his shoulders, a charcoal scarf pulled down under his chin, a dark padded jerkin, dark trousers and soft boots, a dagger in his hand, standing in the middle of the image, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 671601035,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 1
+  },
+  "result": {
+    "created_at": 1793447195,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 49.31,
+    "request_id": "0f52d6af-c97d-4f8d-845d-423de8d7ac93",
+    "outputs_retained_until": 1793533509
+  }
+}
