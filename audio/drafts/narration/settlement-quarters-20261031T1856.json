@@ -1,0 +1,17 @@
+{
+  "id": "settlement-quarters",
+  "payload": {
+    "text": "Tu mieszkają Twoi towarzysze. Z każdym porozmawiasz raz dziennie, a rozmowy i wspólne wyprawy budują relację. Tu też zmienisz im wyposażenie, odbierzesz prezenty albo ich odprawisz. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-quarters-20261031T1856-0.mp3",
+    "audio/drafts/narration/settlement-quarters-20261031T1856-1.mp3"
+  ],
+  "credits": 380
+}

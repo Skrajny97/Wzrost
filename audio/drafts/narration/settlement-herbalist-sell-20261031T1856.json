@@ -1,0 +1,17 @@
+{
+  "id": "settlement-herbalist-sell",
+  "payload": {
+    "text": "W zakładce Sprzedaj kupi od Ciebie zioła i mikstury drożej niż złomiarz. Im lepiej Cię zna, tym więcej płaci. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-herbalist-sell-20261031T1856-0.mp3",
+    "audio/drafts/narration/settlement-herbalist-sell-20261031T1856-1.mp3"
+  ],
+  "credits": 236
+}
