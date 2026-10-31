@@ -1,0 +1,25 @@
+{
+  "id": "companion-archer-female",
+  "payload": {
+    "prompt": "a young slavic huntress for hire, long black hair in a loose braid with a grey feather, freckles, sharp green eyes, a hooded moss-green cape over a leather jerkin, a quiver of fletched arrows on her back, leather trousers and soft boots, a wooden longbow in her hand, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 235157959,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 1
+  },
+  "result": {
+    "created_at": 1793442350,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 58.67,
+    "request_id": "b9ac3f1c-1a81-410d-9d4d-6ded967816ab",
+    "outputs_retained_until": 1793528646
+  }
+}

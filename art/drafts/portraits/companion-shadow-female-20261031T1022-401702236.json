@@ -1,0 +1,25 @@
+{
+  "id": "companion-shadow-female",
+  "payload": {
+    "prompt": "a young slavic woman rogue for hire, short dark red hair, a sly half smile, amber eyes, a dark grey hood half down, a black scarf around her neck, a dark leather jerkin, dark trousers and soft boots, a dagger in each hand, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 401702236,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 1
+  },
+  "result": {
+    "created_at": 1793442664,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 57.59,
+    "request_id": "d40f9407-6611-44c8-925f-535e3f7b7359",
+    "outputs_retained_until": 1793528963
+  }
+}
