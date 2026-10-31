@@ -2987,6 +2987,15 @@ Autor: „Do tego możesz wstępnie zacząć robić resztę co istnieje z Osady 
 8. **Rany (113 A, zmienione 31.10).** Rany towarzysza goją się razem z ranami postaci, więc „Przewiń” odpoczynku postaci skraca też je.
 9. **Jeszcze nie ma:** Kwater w obozie (104 A, potrzebują grafiki budynku do oceny autora), twarzy towarzyszy (107 B; próbne popiersia 231 i 232 czekają na ocenę, a w walce towarzysz ma na razie portret swojej klasy) i cech w zdarzeniach (część IV). *Od 31.10 towarzysze mają własne twarze: zob. „Twarze towarzyszy”.*
 
+## Oceny grafik 243–255 (31.10.2026)
+
+Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dostojniej / 248 B -> przycięta głowa (włosy), poza tym okey / 249 A, tylko tło to wycięcia / 250 A / 251 A / 252 A / 253 A, ale bedzie trzeba chyba planszę obozu rozbudować, żeby gdzies te Kwatery zmieścić (jeśli tak to motyw rozbudowania jak z Osadą będzie trzeba zrobić chyba -> rozszerzyć na większą ilość miejsca) / 254 A / 255 B - daj portret do pojedynku taki sam jak główny tylko zmniejszony” oraz „Do popiersi towarzyszy trzeba też wygenerować portrety do walki”.
+
+1. **Popiersia towarzyszy.** Wojownik, Łuczniczka, Łucznik, Magini, oba Cienie i dwa pierwsze popiersia (231, 232) są zatwierdzone. Cień kobieta ma tło wycięte, razem z domem i słupem za plecami. Kleryczka (247) jest rysowana od nowa, dostojniej, a Kleryk (248) od nowa z całą głową w obrazku. Za wzór służą im pierwsze wersje.
+2. **Portrety towarzyszy do walki.** Każdy towarzysz dostanie pełną postać do walki, jak klasy. Za wzór twarzy i stroju służy zatwierdzone popiersie (`art/references/companions`). Najpierw powstaje próba dwóch: Wojowniczki i Maga.
+3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
+4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
+
 ## Plecak poza obozem i mikstury na drogę (31.10.2026, na wersji testowej)
 
 Autor: „Niech system pozwala na Wymianę i różne działania na przedmiotach w czasie zbierania ziół itp. Niech nie pozwala tylko na zakładanie i zmianę ekwipunku. Niech rezerwuje również ilości tego co zabiera w trasę - mikstury itp. Najlepiej niech będą możliwe do wyekwipowania na karcie Postaci i znikną wtedy z pozycji Plecaka I problem rozwiązany.”, a potem: „Zależy nam na wdrożeniu wymiany w trakcie wypraw i profesji oraz zmiany nazwy.”
