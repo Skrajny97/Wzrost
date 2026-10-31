@@ -751,7 +751,8 @@
       "chapter": "settlement",
       "text": [
         "Zajrzyj też do pozostałych mieszkańców Rozstajów. Gdy wejdziesz do kogoś po raz pierwszy, opowiem Ci, czym się zajmuje."
-      ]
+      ],
+      "voice": "audio/narration/settlement-ending.mp3"
     },
     {
       "id": "settlement-tavern-mug",
@@ -759,7 +760,8 @@
       "chapter": "settlement",
       "text": [
         "Za kufel Zbylut zdradzi Ci plotkę z traktu. Słuchaj uważnie, nie każdy dzieli się takimi wieściami."
-      ]
+      ],
+      "voice": "audio/narration/settlement-tavern-mug.mp3"
     },
     {
       "id": "settlement-tavern-hire",
@@ -767,7 +769,8 @@
       "chapter": "settlement",
       "text": [
         "Tu najemnicy szukają pracy. Zwerbowany towarzysz rusza z Tobą na wyprawy i rośnie w siłę razem z Tobą."
-      ]
+      ],
+      "voice": "audio/narration/settlement-tavern-hire.mp3"
     },
     {
       "id": "settlement-tavern-quarters",
@@ -775,7 +778,8 @@
       "chapter": "settlement",
       "text": [
         "Każdy towarzysz potrzebuje posłania. Zbuduj Kwatery w obozie, tam też go potem znajdziesz."
-      ]
+      ],
+      "voice": "audio/narration/settlement-tavern-quarters.mp3"
     },
     {
       "id": "settlement-enchanter-affix",
@@ -783,7 +787,8 @@
       "chapter": "settlement",
       "text": [
         "Wiedana zaklina jeden afiks przedmiotu w inny, zawsze z powodzeniem. Płacisz złotem i materiałami stworów."
-      ]
+      ],
+      "voice": "audio/narration/settlement-enchanter-affix.mp3"
     },
     {
       "id": "settlement-enchanter-element",
@@ -791,7 +796,8 @@
       "chapter": "settlement",
       "text": [
         "Potrafi też zakląć żywioł. Broń zada część obrażeń ogniem, elektrycznością albo naturą, a pancerz się na nie uodporni."
-      ]
+      ],
+      "voice": "audio/narration/settlement-enchanter-element.mp3"
     },
     {
       "id": "settlement-enchanter-relation",
@@ -799,7 +805,8 @@
       "chapter": "settlement",
       "text": [
         "Im lepiej Cię pozna, tym więcej afiksów pokaże Ci do wyboru."
-      ]
+      ],
+      "voice": "audio/narration/settlement-enchanter-relation.mp3"
     },
     {
       "id": "settlement-hermit-reset",
@@ -807,7 +814,8 @@
       "chapter": "settlement",
       "text": [
         "Sambor pomoże Ci zacząć od nowa. Za złoto wyzeruje ścieżkę umiejętności albo rozdane statystyki."
-      ]
+      ],
+      "voice": "audio/narration/settlement-hermit-reset.mp3"
     },
     {
       "id": "settlement-hermit-evolution",
@@ -815,7 +823,8 @@
       "chapter": "settlement",
       "text": [
         "Po ewolucji klasy zmienisz u niego ewolucję na inną. Pierwsza zmiana jest darmowa."
-      ]
+      ],
+      "voice": "audio/narration/settlement-hermit-evolution.mp3"
     },
     {
       "id": "settlement-herbalist-buy",
@@ -850,7 +859,8 @@
       "chapter": "settlement",
       "text": [
         "Na Targowisku gracze licytują swoje towary. Licytacja trwa dobę, a przebity gracz od razu odzyskuje złoto."
-      ]
+      ],
+      "voice": "audio/narration/settlement-market-offers.mp3"
     },
     {
       "id": "settlement-market-mine",
@@ -858,7 +868,8 @@
       "chapter": "settlement",
       "text": [
         "Tutaj wystawisz własne towary i odbierzesz to, co kupisz albo sprzedasz."
-      ]
+      ],
+      "voice": "audio/narration/settlement-market-mine.mp3"
     },
     {
       "id": "settlement-market-residents",
@@ -866,7 +877,8 @@
       "chapter": "settlement",
       "text": [
         "Gościwit codziennie ma nowy towar. Raz w tygodniu zagląda tu też wędrowny handlarz z rzadkimi przedmiotami."
-      ]
+      ],
+      "voice": "audio/narration/settlement-market-residents.mp3"
     },
     {
       "id": "settlement-market-company",
@@ -874,7 +886,8 @@
       "chapter": "settlement",
       "text": [
         "Każdy handel buduje poważanie w Kompanii Kupców. Im jest wyższe, tym więcej ofert wystawisz naraz."
-      ]
+      ],
+      "voice": "audio/narration/settlement-market-company.mp3"
     },
     {
       "id": "settlement-quarters",

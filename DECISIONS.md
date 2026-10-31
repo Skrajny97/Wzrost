@@ -2996,6 +2996,14 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Odpowiedzi 302: głos całej Osady (31.10.2026, na wersji testowej)
+
+Autor: „288 B / 289-1 B / 290-1 B / 290-2 B / 293-1 B / 293-2 B / 293-3 B / 293-4 B”.
+
+1. **Nagrania.** Kwestie z tej listy czytają się w wersjach B. Przy kwestiach, których autor nie wymienił (289-2, 289-3, 290-3, 291-1 i 291-2), weszła wersja A. **Brakujący szczegół:** brak wyboru oznacza pierwszą wersję. Zmiana na drugą to podmiana jednego pliku.
+2. **Urwane nagrania.** Trzy nagrania odpadły przed odsłuchem, bo urywały się w pół słowa: raz przy licytacjach na Targowisku i dwa razy przy zaklęciu żywiołu. Te kwestie nagrały się jeszcze raz, więc każda miała dwie czyste wersje.
+3. **Cała Osada ma głos.** Każda kwestia narratora z rozdziału Osady ma nagranie, więc części I–III są gotowe do gry (299 A). W grze włącza je jedna zmiana: `"SETTLEMENT": "on"` w zmiennych gry w `wrangler.jsonc`, na komendę autora.
+
 ## Odpowiedzi 301 i teksty 288–293 (31.10.2026, na wersji testowej)
 
 Autor: „297.1 B / 297.2 B / 297.3 B / 298 B” i „Reszte tekstów też zatwierdzam (288, 289, 290, 291 i 293)”.
