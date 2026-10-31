@@ -2987,6 +2987,14 @@ Autor: „Do tego możesz wstępnie zacząć robić resztę co istnieje z Osady 
 8. **Rany (113 A, zmienione 31.10).** Rany towarzysza goją się razem z ranami postaci, więc „Przewiń” odpoczynku postaci skraca też je.
 9. **Jeszcze nie ma:** Kwater w obozie (104 A, potrzebują grafiki budynku do oceny autora), twarzy towarzyszy (107 B; próbne popiersia 231 i 232 czekają na ocenę, a w walce towarzysz ma na razie portret swojej klasy) i cech w zdarzeniach (część IV). *Od 31.10 towarzysze mają własne twarze: zob. „Twarze towarzyszy”.*
 
+## Nowe nazwy od Systemu i jednorazowa zmiana nazwy (31.10.2026, na wersji testowej)
+
+Autor: „W poniedziałek o godz. 1:00 czasu polskiego zmień nazwy postaci osób [...], które mają niecenzuralne na takie, które są akceptowalne. Po prostu im je wygeneruj. Daj też już każdemu w sumie opcję Zmiany nazwy postaci w Zębatce - jednorazowo, po czym opcja się blokuje.”
+
+1. **Nowe nazwy od Systemu.** Filtr imion z wersji 0.0.62 blokuje już obie nazwy, ale ich gracze od tamtej pory nie weszli do gry, więc okno wymuszonej zmiany jeszcze się im nie pokazało. Od poniedziałku 2.11.2026, godz. 1:00 czasu polskiego (00:00 UTC, `renameAt` w `data/chat.json`), serwer o każdej pełnej godzinie sam nadaje nową nazwę każdej postaci, której imię blokuje filtr. Robi to w zadaniu, które i tak wykonuje co minutę (powiadomienia). Imię pochodzi z listy słowiańskich imion według wyglądu postaci (`generated`): pierwsze wolne w kolejności wylosowanej z numeru postaci, a gdy wszystkie są zajęte, imię z tym numerem. Wiadomości tej postaci na czacie dostają nową nazwę. Gracz przy następnym wejściu widzi słowa Systemu: „Nazwa Twojej postaci łamała zasady Google Play dotyczące nieodpowiednich treści, więc System nadał jej nową: {nazwa}. Raz możesz ją zmienić w Ustawieniach (zębatka).”
+2. **Jednorazowa zmiana nazwy.** W Ustawieniach przy „Postać” stoi przycisk „Zmień nazwę”. Okno mówi: „Nazwę postaci można zmienić tylko raz. Potem ta opcja się zablokuje.” Nowa nazwa przechodzi te same sprawdzenia co przy tworzeniu postaci. Po zmianie przycisk jest wyszarzony z napisem „Zmiana nazwy wykorzystana”. Zmiana, do której zmusza filtr, i nazwa nadana przez System nie zużywają tej jednej zmiany. Zmiana działa też w czasie wyprawy, bo nic w niej nie zależy od nazwy.
+3. **Wdrożenie.** Zmiana nazw zadziała o 1:00 w poniedziałek tylko wtedy, gdy ta wersja będzie już w grze. Po późniejszym wdrożeniu nazwy zmienią się o najbliższej pełnej godzinie.
+
 ## Czat od razu przy najnowszych wiadomościach (31.10.2026)
 
 Autor: „I niech czat domyślnie wyświetla sam dół wszystkich wiadomości - najnowsze po prostu”. Czat przewijał się na dół, zanim pod wiadomościami pojawiło się pole do pisania, i to pole zasłaniało najnowszą wiadomość. Teraz po pierwszej odpowiedzi serwera, gdy pole już stoi, strona przewija się na dół jeszcze raz. To samo dzieje się po zmianie kanału i rozmowy. Ktoś, kto czyta starsze wiadomości wyżej, zostaje na swoim miejscu, jak dotąd.

@@ -1691,6 +1691,18 @@ a.segmented-option {
   align-items: center;
 }
 
+/* Postać: the name and, under it, its one change (greyed out once used). */
+.status-row--name {
+  align-items: center;
+}
+
+.status-row--name dd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
 /* Powiadomienia: the label with a line on what they tell, the switch beside. */
 .status-row--push {
   align-items: center;

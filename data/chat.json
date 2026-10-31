@@ -1,5 +1,5 @@
 {
-  "$comment": "Czat w zakładce Społeczność (src/server/chat.js). channels: kanały czatu, Globalny i Wymiana, a obok nich prywatne rozmowy dwóch postaci; w kanale z items wiadomość może pokazać przedmioty z plecaka piszącego (najwyżej rules.items), jak były w chwili wysłania. rules: najdłuższa wiadomość w znakach, co ile sekund wolno pisać, ile ostatnich wiadomości kanału zostaje (zgłoszone zostają do decyzji autora), ile ostatnich wiadomości zostaje w prywatnej rozmowie, ile rozmów najwyżej pokazują zakładki, ile wiadomości przychodzi naraz, po ilu zgłoszeniach od różnych graczy wiadomość znika do sprawdzenia i co ile sekund otwarty czat pyta o nowe (najczęściej i najrzadziej, gdy długo nic nie przychodzi). words: początki albo części słów, które czat zamienia na gwiazdki (wielkość liter bez znaczenia). texts.rules: zasady, które gracz akceptuje przed pierwszą wiadomością. Słowa words służą też filtrowi imion postaci (src/engine/names.js): imię z takim słowem, także zapisanym cyframi, podobnymi literami, z podwojonymi literami albo z odstępami, nie przechodzi, a postać, która już je nosi, musi zmienić nazwę (names: teksty tego okna).",
+  "$comment": "Czat w zakładce Społeczność (src/server/chat.js). channels: kanały czatu, Globalny i Wymiana, a obok nich prywatne rozmowy dwóch postaci; w kanale z items wiadomość może pokazać przedmioty z plecaka piszącego (najwyżej rules.items), jak były w chwili wysłania. rules: najdłuższa wiadomość w znakach, co ile sekund wolno pisać, ile ostatnich wiadomości kanału zostaje (zgłoszone zostają do decyzji autora), ile ostatnich wiadomości zostaje w prywatnej rozmowie, ile rozmów najwyżej pokazują zakładki, ile wiadomości przychodzi naraz, po ilu zgłoszeniach od różnych graczy wiadomość znika do sprawdzenia i co ile sekund otwarty czat pyta o nowe (najczęściej i najrzadziej, gdy długo nic nie przychodzi). words: początki albo części słów, które czat zamienia na gwiazdki (wielkość liter bez znaczenia). texts.rules: zasady, które gracz akceptuje przed pierwszą wiadomością. Słowa words służą też filtrowi imion postaci (src/engine/names.js): imię z takim słowem, także zapisanym cyframi, podobnymi literami, z podwojonymi literami albo z odstępami, nie przechodzi, a postać, która już je nosi, musi zmienić nazwę (names: teksty tego okna). Od chwili renameAt System sam nadaje nową nazwę postaci, która wciąż nosi takie imię (co godzinę, z listy generated według wyglądu postaci), a gracz dostaje słowa renamed. Każda postać może też raz zmienić nazwę w Ustawieniach (change, once; po zmianie used i locked); zmiana wymuszona przez filtr się do tego nie liczy.",
   "channels": [
     { "id": "global", "name": "Globalny" },
     { "id": "trade", "name": "Wymiana", "items": true }
@@ -21,7 +21,18 @@
     "refused": "To imię łamie zasady Google Play dotyczące nieodpowiednich treści. Wybierz inne.",
     "label": "Nowa nazwa postaci",
     "button": "Zmień nazwę",
-    "done": "Postać nazywa się teraz {name}."
+    "done": "Postać nazywa się teraz {name}.",
+    "renameAt": "2026-11-02T00:00:00Z",
+    "renamed": "Nazwa Twojej postaci łamała zasady Google Play dotyczące nieodpowiednich treści, więc System nadał jej nową: {name}. Raz możesz ją zmienić w Ustawieniach (zębatka).",
+    "seen": "Rozumiem",
+    "change": "Zmień nazwę",
+    "once": "Nazwę postaci można zmienić tylko raz. Potem ta opcja się zablokuje.",
+    "used": "Zmiana nazwy wykorzystana",
+    "locked": "Nazwę tej postaci zmieniono już raz.",
+    "generated": {
+      "female": ["Dobromira", "Wiesława", "Zdzisława", "Bogumiła", "Sławomira", "Jaromira", "Ludomiła", "Wszemiła", "Mirosława", "Radomiła", "Świętomira", "Gorzysława"],
+      "male": ["Dobromir", "Wiesław", "Zdzisław", "Bogumił", "Sławomir", "Jaromir", "Ludomił", "Wszemir", "Mirosław", "Radomił", "Świętomir", "Gorzysław"]
+    }
   },
   "texts": {
     "rules": [

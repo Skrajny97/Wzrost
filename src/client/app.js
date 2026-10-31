@@ -10,7 +10,7 @@ import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
 import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { showQuests, watchQuests } from './quests.js';
-import { offerRename } from './rename.js';
+import { offerNameNotice, offerRename, openNameChange } from './rename.js';
 import { mountAuthor } from './screens/author.js';
 import { mountEncyclopedia } from './screens/encyclopedia.js';
 import { mountEvolution } from './screens/evolution.js';
@@ -302,6 +302,7 @@ function openGame() {
     offerTrade();
     offerPointsReset();
     offerRename();
+    offerNameNotice();
   }, 1000);
   checkChat({ now: true });
 }
@@ -518,6 +519,29 @@ function lookRow() {
   );
 }
 
+// The character's name, with its one change (the author: "jednorazowo, po
+// czym opcja się blokuje"), greyed out once used.
+function nameRow() {
+  const t = state.content.chat.names;
+  return h(
+    'div',
+    { class: 'status-row status-row--name' },
+    h('dt', { text: 'Postać' }),
+    h(
+      'dd',
+      {},
+      h('span', { class: 'status-name', text: state.character.name }),
+      h('button', {
+        type: 'button',
+        class: 'button button--world button--small status-rename',
+        disabled: !state.character.canRename,
+        text: state.character.canRename ? t.change : t.used,
+        onClick: openNameChange,
+      }),
+    ),
+  );
+}
+
 // The skin tone of the portrait: a free change, like the look.
 function skinRow() {
   const dots = skinSwatches(state.character.skin, async (skin, dot) => {
@@ -647,7 +671,7 @@ function openSettings() {
       { class: 'status-list' },
       h('div', { class: 'status-row' }, h('dt', { text: 'Konto' }), h('dd', { text: state.user.login })),
       emailRow(),
-      h('div', { class: 'status-row' }, h('dt', { text: 'Postać' }), h('dd', { text: state.character.name })),
+      nameRow(),
       lookRow(),
       skinRow(),
       googleRow(),

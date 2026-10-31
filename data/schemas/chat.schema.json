@@ -50,13 +50,30 @@
       "type": "object",
       "description": "Filtr imion postaci (src/engine/names.js) z listą words: niepomijalny komunikat dla postaci, której imię łamie zasady, i odmowa przy tworzeniu postaci.",
       "additionalProperties": false,
-      "required": ["blocked", "refused", "label", "button", "done"],
+      "required": ["blocked", "refused", "label", "button", "done", "renameAt", "renamed", "seen", "change", "once", "used", "locked", "generated"],
       "properties": {
         "blocked": { "type": "string", "minLength": 1 },
         "refused": { "type": "string", "minLength": 1 },
         "label": { "type": "string", "minLength": 1 },
         "button": { "type": "string", "minLength": 1 },
-        "done": { "type": "string", "minLength": 1 }
+        "done": { "type": "string", "minLength": 1 },
+        "renameAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$", "description": "Od tej chwili System sam nadaje nową nazwę postaciom, które wciąż noszą imię blokowane przez filtr (co godzinę, src/server/characters.js)." },
+        "renamed": { "type": "string", "minLength": 1, "description": "Słowa Systemu dla gracza, którego postać dostała nową nazwę ({name})." },
+        "seen": { "type": "string", "minLength": 1 },
+        "change": { "type": "string", "minLength": 1 },
+        "once": { "type": "string", "minLength": 1 },
+        "used": { "type": "string", "minLength": 1 },
+        "locked": { "type": "string", "minLength": 1 },
+        "generated": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["female", "male"],
+          "description": "Imiona, które System nadaje postaciom z zablokowanym imieniem, według wyglądu postaci.",
+          "properties": {
+            "female": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 2, "maxLength": 20 } },
+            "male": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 2, "maxLength": 20 } }
+          }
+        }
       }
     },
     "texts": {

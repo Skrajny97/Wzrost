@@ -22,6 +22,8 @@ import {
   deleteCharacter,
   getCharacter,
   listCharacters,
+  nameNoticeSeen,
+  renameBlockedNames,
   renameCharacter,
   resetPoints,
   setAppearance,
@@ -82,6 +84,7 @@ const routes = [
   ['GET', '/api/profile/:name', characterProfile],
   ['POST', '/api/character', createCharacter],
   ['POST', '/api/character/name', renameCharacter],
+  ['POST', '/api/character/name/seen', nameNoticeSeen],
   ['DELETE', '/api/character', deleteCharacter],
   ['GET', '/api/characters', listCharacters],
   ['POST', '/api/characters/choose', chooseCharacter],
@@ -253,10 +256,13 @@ export default {
   },
 
   // The cron trigger (wrangler.jsonc), every minute: the phone notifications
-  // that came due (push.js). The scheduled minute is the clock here, so each
-  // run takes the time since the one before.
+  // that came due (push.js), and at the top of an hour the new names of
+  // characters whose names break the rules (characters.js). The scheduled
+  // minute is the clock here, so each run takes the time since the one
+  // before.
   async scheduled(controller, env) {
     readFeatures(env);
+    await renameBlockedNames(env, controller.scheduledTime);
     await sendNotifications(env, controller.scheduledTime);
   },
 };

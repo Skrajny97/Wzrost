@@ -3,6 +3,7 @@
 
 import {
   blockedName,
+  createRng,
   areaFor,
   autoDistribute,
   bagCapacity,
@@ -874,6 +875,10 @@ export function characterView(player, now) {
     // A name the filter blocks (names.js): the game asks for a new one, and
     // nothing else goes on until it has it.
     nameBlocked: blockedName(row.name, content),
+    // The one change of the name the Ustawienia offer, and the System's
+    // word after it gave the character a new name itself.
+    canRename: !row.name_changed,
+    nameNotice: row.name_notice ?? null,
     // An order of the Osada that can be delivered now lights its tab.
     settlementWaiting: settlementWaiting(row, items, now, Boolean(activity)),
     huntDurations: huntDurations(row.level, content),
@@ -1151,18 +1156,24 @@ export async function chooseCharacter(context) {
   return json({ ok: true });
 }
 
-// POST /api/character/name { name }: the new name of a character whose name
-// the filter blocks (names.js), checked as a new character's is; the chat's
-// messages it wrote take it too. Any other name stays as it is.
+// POST /api/character/name { name }: the new name, checked as a new
+// character's is; the chat's messages it wrote take it too. A character
+// whose name the filter blocks (names.js) must take one, and any character
+// may change its name once in the Ustawienia (the author: "jednorazowo, po
+// czym opcja się blokuje"); the change the filter forces does not count.
+// The name may change during an exploration: nothing there depends on it.
 export async function renameCharacter(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
-  if (!blockedName(player.row.name, content)) throw new ApiError(409, 'name_allowed', 'Tej nazwy nie trzeba zmieniać.');
+  const forced = blockedName(player.row.name, content);
+  if (!forced && player.row.name_changed) throw new ApiError(409, 'name_locked', content.chat.names.locked);
   const name = validateName(body.name);
   const db = context.env.DB;
   try {
     await db.batch([
-      db.prepare('UPDATE characters SET name = ?, name_key = ?, version = version + 1 WHERE id = ?').bind(name, nameKey(name), player.row.id),
+      db
+        .prepare('UPDATE characters SET name = ?, name_key = ?, name_changed = name_changed + ?, name_notice = NULL, version = version + 1 WHERE id = ?')
+        .bind(name, nameKey(name), forced ? 0 : 1, player.row.id),
       db.prepare('UPDATE chat_messages SET name = ? WHERE character_id = ?').bind(name, player.row.id),
     ]);
   } catch (error) {
@@ -1170,6 +1181,52 @@ export async function renameCharacter(context) {
     throw error;
   }
   return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
+}
+
+// POST /api/character/name/seen: the player read the System's word about
+// the name it gave the character.
+export async function nameNoticeSeen(context) {
+  const { session, player } = await requirePlayer(context);
+  await context.env.DB.prepare('UPDATE characters SET name_notice = NULL WHERE id = ?').bind(player.row.id).run();
+  return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
+}
+
+// The scheduled run (index.js), at the top of every hour from names.renameAt
+// on (the author: "W poniedziałek o godz. 1:00 czasu polskiego zmień nazwy
+// postaci [...], które mają niecenzuralne na takie, które są akceptowalne.
+// Po prostu im je wygeneruj."): every character whose name the filter
+// blocks gets a name from names.generated for its look, the first one free
+// in an order drawn from its id, or with its id after it when all are
+// taken; its chat messages take it too, and its player is told. Returns
+// the characters renamed.
+export async function renameBlockedNames(env, now) {
+  const words = content.chat.names;
+  const from = Date.parse(words.renameAt);
+  if (!(now >= from) || new Date(now).getUTCMinutes() !== 0) return 0;
+  const db = env.DB;
+  const { results } = await db.prepare('SELECT id, name, appearance FROM characters').all();
+  let renamed = 0;
+  for (const row of results.filter((one) => blockedName(one.name, content))) {
+    const pool = words.generated[row.appearance === 'female' ? 'female' : 'male'];
+    const rng = createRng(`name:${row.id}`);
+    const order = pool.map((name) => ({ name, key: rng.float(0, 1) })).sort((a, b) => a.key - b.key).map(({ name }) => name);
+    let name = null;
+    for (const candidate of order) {
+      if (!(await db.prepare('SELECT 1 FROM characters WHERE name_key = ?').bind(nameKey(candidate)).first())) {
+        name = candidate;
+        break;
+      }
+    }
+    name ??= `${order[0]}${row.id}`;
+    await db.batch([
+      db
+        .prepare('UPDATE characters SET name = ?, name_key = ?, name_notice = ?, version = version + 1 WHERE id = ?')
+        .bind(name, nameKey(name), words.renamed.replace('{name}', name), row.id),
+      db.prepare('UPDATE chat_messages SET name = ? WHERE character_id = ?').bind(name, row.id),
+    ]);
+    renamed += 1;
+  }
+  return renamed;
 }
 
 const validAppearance = (id) => {
