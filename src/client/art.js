@@ -285,8 +285,8 @@ export const SPRITES = {
   'companion-portraits': {
     width: 96,
     height: 128,
-    ids: [],
-    faces: {},
+    ids: ['warrior-male', 'archer-female', 'archer-male', 'mage-female', 'cleric-male', 'shadow-female'],
+    faces: { 'warrior-male': 52, 'archer-female': 48, 'archer-male': 44, 'mage-female': 47, 'cleric-male': 58, 'shadow-female': 45 },
   },
   'settlement-board': {
     width: 384,
