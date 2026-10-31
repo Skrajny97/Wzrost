@@ -2996,6 +2996,13 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Odpowiedzi 301 i teksty 288–293 (31.10.2026, na wersji testowej)
+
+Autor: „297.1 B / 297.2 B / 297.3 B / 298 B” i „Reszte tekstów też zatwierdzam (288, 289, 290, 291 i 293)”.
+
+1. **Nagrania (301).** Jagna (Kup, Sprzedaj, Bractwo Zielarzy) i Kwatery czytają się w wersjach B, przyciętych i wyrównanych do −18 LUFS jak inne kwestie. Jedna wersja kwestii o zakładce Kup odpadła przed odsłuchem, bo urywała się w pół słowa, więc nagrała się jeszcze dwa razy.
+2. **Teksty 288–293** są zatwierdzone: koniec wycieczki po planszy, Karczma, Zaklinaczka, Pustelnik i Targowisko. Idą do nagrania w dwóch wersjach każda, a autor wybiera na słuch. Po ich wgraniu cała Osada (części I–III) będzie gotowa do gry (299 A).
+
 ## Odpowiedzi 297–299 (31.10.2026)
 
 Autor: „297 akceptuje wszystkie / 298 akceptuje / 299 A”.

@@ -823,7 +823,8 @@
       "chapter": "settlement",
       "text": [
         "Jagna sprzedaje zioła. Na początek tylko trzy najprostsze, a z każdym stopniem relacji coraz więcej."
-      ]
+      ],
+      "voice": "audio/narration/settlement-herbalist-buy.mp3"
     },
     {
       "id": "settlement-herbalist-sell",
@@ -831,7 +832,8 @@
       "chapter": "settlement",
       "text": [
         "W zakładce Sprzedaj kupi od Ciebie zioła i mikstury drożej niż złomiarz. Im lepiej Cię zna, tym więcej płaci."
-      ]
+      ],
+      "voice": "audio/narration/settlement-herbalist-sell.mp3"
     },
     {
       "id": "settlement-herbalist-relation",
@@ -839,7 +841,8 @@
       "chapter": "settlement",
       "text": [
         "Handel z nią buduje też poważanie w Bractwie Zielarzy."
-      ]
+      ],
+      "voice": "audio/narration/settlement-herbalist-relation.mp3"
     },
     {
       "id": "settlement-market-offers",
@@ -879,7 +882,8 @@
       "chapter": "settlement",
       "text": [
         "Tu mieszkają Twoi towarzysze. Z każdym porozmawiasz raz dziennie, a rozmowy i wspólne wyprawy budują relację. Tu też zmienisz im wyposażenie, odbierzesz prezenty albo ich odprawisz."
-      ]
+      ],
+      "voice": "audio/narration/settlement-quarters.mp3"
     },
     {
       "id": "evolution-welcome",
