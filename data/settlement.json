@@ -24,9 +24,9 @@
       "id": "headman",
       "name": "Bogumił",
       "title": "sołtys",
-      "story": "Prowadzi Rozstaje od trzydziestu zim. Pamięta każdy dług i każdą przysługę, a zlecenia wiesza na tablicy przed jego chatą.",
+      "story": "Prowadzi Rozstaje od trzydziestu zim. Pamięta każdy dług i każdą przysługę, a zlecenia wiesza na tablicy przed swoją chatą.",
       "greetings": [
-        "Nowa twarz. Na tablicy zawsze coś wisi, a my płacimy uczciwie.",
+        "Nowa twarz. Na tablicy zawsze znajdziesz jakąś robotę. Płacimy tu uczciwie.",
         "Ludzie pytali, czy znowu przyjdziesz. Mam dla ciebie zlecenia.",
         "Dla stałych klientów odkładam najlepsze zamówienia.",
         "Tobie mogę powierzyć sprawy, o których nie mówi się na głos.",
@@ -61,7 +61,7 @@
     },
     { "id": "innkeeper", "name": "Zbylut", "title": "karczmarz", "story": "Zna wszystkie plotki z traktu i każdego, kto szuka pracy. U niego znajdziesz przyszłych towarzyszy.", "greetings": ["Siadaj, gdzie wolne. Kufel piwa, a do niego plotka z traktu, jeśli kogoś to ciekawi.", "O, znowu ty. Ludzie z traktu zostawili tu dziś kilka ciekawych informacji.", "Twoje miejsce przy ladzie czeka. I kufel, i świeże plotki.", "Tobie mówię to, czego nie mówię innym. Nachyl się bliżej.", "Dla przyjaciół Rozstajów kufel zawsze pełny, a drzwi na zaplecze otwarte."] },
     { "id": "herbalist", "name": "Jagna", "title": "zielarka", "story": "Zbiera zioła od świtu i suszy je pod strzechą. Za dobre zioła potrafi solidnie zapłacić, a zaufanym zdradza rzadkie receptury.", "greetings": ["Zioła przynosisz? Pokaż, co masz w koszyku. Za dobre płacę więcej niż złomiarz.", "O, znowu ty. Rumianek mi się kończy, a mikstur nigdy dość.", "Siadaj przy piecu. Najpierw zioła, potem herbata.", "Tobie płacę jak swoim. Kiedyś pokażę ci, co warzę w tym kotle.", "Dla przyjaciół drzwi mojej chaty zawsze otwarte, a kocioł zawsze ciepły."] },
-    { "id": "merchant", "name": "Gościwit", "title": "kupiec", "story": "Przyjechał z karawaną zza wielkiej rzeki i został, bo na Rozstajach spotykają się wszystkie drogi. Na jego straganie jest trochę wszystkiego, a o każdej rzeczy opowiada tak, jakby była skarbem.", "greetings": ["Patrz, wybieraj, tylko nie macaj bez potrzeby. Dziś mam towar, jakiego jutro już nie będzie.", "A, znajoma twarz! Mam coś, co ci się spodoba. Albo i nie, ale zobaczyć warto.", "Stały klient to skarb. Kto u mnie kupuje, ten wie, że nie oszukuję. Za bardzo.", "Tobie powiem, skąd mam towar. Innym nie mówię, bo zaraz pojechaliby tam beze mnie.", "Przyjacielu! Siadaj, napijemy się kwasu. O interesach pogadamy potem."] }
+    { "id": "merchant", "name": "Gościwit", "title": "kupiec", "story": "Przyjechał z karawaną zza wielkiej rzeki i został, bo na Rozstajach spotykają się wszystkie drogi. Na jego straganie jest trochę wszystkiego, a o każdej rzeczy opowiada tak, jakby była skarbem.", "greetings": ["Patrz, wybieraj, ale nie dotykaj. I pamiętaj, by się spieszyć z decyzją. Dzisiejszego towaru może jutro już nie być.", "A, znajoma twarz! Mam coś, co ci się spodoba. Albo i nie, ale zobaczyć warto.", "Stały klient to skarb. Kto u mnie kupuje, ten wie, że nie oszukuję. Za bardzo.", "Tobie powiem, skąd mam towar. Innym nie mówię, bo zaraz pojechaliby tam beze mnie.", "Przyjacielu! Siadaj, napijemy się kwasu. O interesach pogadamy potem."] }
   ],
   "brotherhoods": [
     { "id": "herbalists", "name": "Bractwo Zielarzy", "goods": ["herb", "potion"] },
