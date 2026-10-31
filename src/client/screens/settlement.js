@@ -9,7 +9,7 @@
 // Where the deployment has no Osada yet, or the character is below its
 // level, the tab says so as the other locked modules do.
 
-import { companionBust, residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
+import { residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatDecimal, formatHours, formatNumber } from '../format.js';
@@ -18,6 +18,7 @@ import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
+import { companionCard } from '../companions.js';
 import { itemSummary } from './character.js';
 import { mountMarket } from './market.js';
 
@@ -486,7 +487,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     if (!rumor) {
       return h(
         'div',
-        { class: 'settlement-choice' },
+        { class: 'settlement-choice', 'data-guide': 'tavern-mug' },
         h('p', { class: 'muted', text: 'Za kufel Zbylut chętnie podzieli się plotką z traktu.' }),
         h('button', {
           type: 'button',
@@ -502,176 +503,57 @@ export function mountSettlement(container, { params = {} } = {}) {
     }
     return h(
       'div',
-      { class: 'settlement-choice' },
+      { class: 'settlement-choice', 'data-guide': 'tavern-mug' },
       h('p', { class: 'settlement-greeting', text: rumor.text }),
       h('p', { class: 'muted', text: 'Następną plotkę Zbylut usłyszy jutro.' }),
     );
   }
 
-  // A companion or a candidate (questions 104–113): class, level, numbers,
-  // traits, skills, gear and story, with what can be done with it.
-  // A companion's gift of the week from its profession (question 112 A),
-  // into the bag, also while the character is away.
-  function giftRow(companion) {
-    const { gift } = companion;
-    return h(
-      'div',
-      { class: 'settlement-choice' },
-      h('p', { class: 'muted', text: `Prezent tygodnia z profesji: ${gift.count} × ${gift.name}.` }),
-      h('button', {
-        type: 'button',
-        class: 'button button--world button--small',
-        text: 'Odbierz prezent',
-        onClick: (event) =>
-          withButton(event.currentTarget, async () => {
-            const answer = await call('POST', '/api/settlement/gift', { companionId: companion.id });
-            apply(answer);
-            toast(`Odebrano: ${answer.gift.count} × ${answer.gift.name}.`);
-          }),
-      }),
-    );
-  }
-
-  // What a companion wears in its three places; one hired has a button to
-  // put on an item from the bag (question 108 A), at home as every change
-  // of the bag, while a candidate only shows what it comes with.
-  function wearList(companion) {
-    const hired = Boolean(companion.wearable);
-    const away = Boolean(state.character.activity);
-    return h(
-      'div',
-      { class: 'settlement-companion-wear' },
-      companion.wear.map((place) =>
-        h(
-          'div',
-          { class: 'settlement-companion-slot' },
-          h('span', { class: 'field-label', text: place.slotName }),
-          place.item ? itemSummary(place.item) : h('span', { class: 'muted', text: 'Pusto' }),
-        ),
-      ),
-      hired && h('button', { type: 'button', class: 'button button--small', text: 'Załóż z plecaka', disabled: away, onClick: () => wearSheet(companion) }),
-      hired && away && h('p', { class: 'muted', text: 'Przedmioty zakłada się po powrocie z wyprawy.' }),
-    );
-  }
-
-  // The bag's items the companion can wear, to tap one; what it wore in
-  // that place goes back to the bag.
-  function wearSheet(companion) {
-    const items = companion.wearable.map((id) => itemView(id)).filter(Boolean);
-    const put = (item) => (event) =>
-      withButton(event.currentTarget, async () => {
-        apply(await call('POST', '/api/settlement/equip', { companionId: companion.id, itemId: item.id }));
-        closeSheet();
-        toast(`${companion.name} nosi teraz: ${item.name}.`);
-      });
-    openSheet(
-      h('h2', { class: 'sheet-title', text: `Sprzęt: ${companion.name}` }),
-      items.length === 0
-        ? h('p', { class: 'sheet-text', text: 'W plecaku nie ma nic, co ten towarzysz może założyć: broni ani pancerza swojej klasy na swój poziom, ani talizmanu.' })
-        : [
-            h('p', {
-              class: 'sheet-text',
-              text:
-                companion.appearance === 'female'
-                  ? 'Wybierz przedmiot. To, co towarzyszka nosiła w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostała.'
-                  : 'Wybierz przedmiot. To, co towarzysz nosił w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostał.',
-            }),
-            h(
-              'ul',
-              { class: 'item-list' },
-              items.map((item) => h('li', {}, h('button', { type: 'button', class: 'item-row', onClick: put(item) }, itemSummary(item)))),
-            ),
-          ],
-    );
-  }
-
-  function companionCard(companion, action) {
-    // Its wounds heal with the character's rest (the author: "Niech rany
-    // towarzyszy goją się wraz z ranami postaci").
-    const wounded = companion.wounded
-      ? `${companion.appearance === 'female' ? 'Ranna' : 'Ranny'}. Wróci do sił, gdy postać ${companion.healsAt ? `odpocznie do pełna HP (jeszcze ${formatCountdown(companion.healsAt - serverNow())})` : 'po wyprawie odpocznie do pełna HP'}.`
-      : null;
-    // Its own face (question 107 B) beside who it is, as a resident's.
-    const bust = companionBust(companion.classId, companion.appearance);
-    return h(
-      'article',
-      { class: 'card settlement-companion' },
-      h(
-        'div',
-        { class: 'settlement-resident-head' },
-        bust && h('span', { class: 'settlement-resident-bust' }, bust),
-        h(
-          'div',
-          {},
-          h('p', { class: 'settlement-resident-name', text: `${companion.name}, ${companion.className}, poz. ${companion.level}` }),
-          h('p', { class: 'muted', text: `HP ${formatNumber(companion.maxHp)} · pancerz ${formatNumber(companion.armor)}${companion.profession ? ` · ${companion.profession}` : ''}` }),
-          h('p', { class: 'muted settlement-resident-story', text: companion.story }),
-        ),
-      ),
-      h(
-        'ul',
-        { class: 'settlement-companion-list' },
-        companion.traits.map((trait) => h('li', {}, h('strong', { text: trait.name }), `: ${trait.text}`)),
-        companion.skills.map((skill) => h('li', { text: `${skill.name}${skill.level > 0 ? `, poz. ${skill.level}` : ', jeszcze nie umie'}` })),
-        !companion.wear && h('li', { class: 'muted', text: `Sprzęt: ${companion.gear.join(', ')}` }),
-      ),
-      companion.wear && wearList(companion),
-      companion.gift && giftRow(companion),
-      wounded && h('p', { class: 'region-warning', text: wounded }),
-      action,
-    );
-  }
-
-  // The werbunek: the companions hired (they go on every exploration but a
-  // Szybkie Polowanie) and this week's candidates, from the standing with
-  // the innkeeper that gives a place and a bed in the camp's Kwatery.
+  // The werbunek: this week's candidates; the companions hired live in the
+  // camp's Kwatery (the author: "Po zwerbowaniu postac powinna zniknąć z
+  // Karczmy i pojawić się w Kwaterach"), each with a bed there.
   function companionsCard() {
     const { places, moreBeds, hired, candidates } = data.companions;
     const full = hired.length >= places;
     // The author's words, the camp's Kwatery stressed in them; every
-    // standing with Zbylut may hire, a lower one for more gold, and each
-    // companion needs a bed there.
+    // standing with Zbylut may hire, a lower one for more gold.
     const intro = h(
       'p',
       { class: 'muted' },
       'Towarzysze idą z tobą na każdą wyprawę poza Szybkim i Błyskawicznym Polowaniem. Rosną w siłę razem z tobą. Opłata za werbunek jest jednorazowa, a im lepiej zna cię Zbylut, tym jest tańsza. Towarzysz potrzebuje posłania: ',
-      h('strong', { class: 'text-stress', text: 'zbuduj Kwatery w obozie' }),
+      h('strong', { class: 'text-stress', 'data-guide': 'tavern-quarters', text: 'zbuduj Kwatery w obozie' }),
       '.',
     );
-    const beds = places > 0 && h('p', { class: 'muted', text: `Miejsca: ${hired.length} z ${places}.${full && moreBeds ? ' Kolejne posłanie da rozbudowa Kwater w obozie.' : ''}` });
-    const dismiss = (companion) =>
-      h('button', {
-        type: 'button',
-        class: 'button button--small',
-        text: 'Odpraw',
-        onClick: async (event) => {
-          const button = event.currentTarget;
-          const given = companion.wear.some((place) => place.item?.given);
-          const got = companion.appearance === 'female' ? 'dostała' : 'dostał';
-          const text = `${companion.name} odejdzie na dobre${given ? ` i odda wszystko, co od Ciebie ${got}` : ''}.`;
-          if (!(await confirmAction({ title: `Odprawić: ${companion.name}?`, text, confirmLabel: 'Odpraw' }))) return;
-          withButton(button, async () => apply(await call('POST', '/api/settlement/dismiss', { companionId: companion.id })));
-        },
-      });
+    const beds =
+      places > 0 &&
+      h(
+        'p',
+        { class: 'muted' },
+        `Posłania: ${hired.length} z ${places}.${full && moreBeds ? ' Kolejne da rozbudowa Kwater.' : ''} `,
+        hired.length > 0 && h('a', { href: '#/oboz/quarters', text: hired.length === 1 ? 'Twój towarzysz czeka w Kwaterach.' : 'Twoi towarzysze czekają w Kwaterach.' }),
+      );
     const hire = (candidate) =>
       h('button', {
         type: 'button',
         class: 'button button--world button--small',
         text: `Zwerbuj (${formatNumber(candidate.price)} zł.)`,
         disabled: full || state.character.gold < candidate.price,
-        onClick: (event) => withButton(event.currentTarget, async () => apply(await call('POST', '/api/settlement/hire', { candidateId: candidate.id }))),
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            apply(await call('POST', '/api/settlement/hire', { candidateId: candidate.id }));
+            toast(`${candidate.name} ${candidate.appearance === 'female' ? 'zamieszkała' : 'zamieszkał'} w Kwaterach w obozie.`);
+          }),
       });
     return h(
       'section',
-      { class: 'stack' },
+      { class: 'stack', 'data-guide': 'tavern-companions' },
       h('h2', { class: 'section-title', text: 'Towarzysze' }),
       intro,
       beds,
-      hired.map((companion) => companionCard(companion, dismiss(companion))),
       h('h2', { class: 'section-title', text: 'Szukają pracy w tym tygodniu' }),
       candidates.length === 0
         ? h('p', { class: 'muted', text: 'Nikt więcej nie szuka pracy. Nowi przyjdą w poniedziałek.' })
-        : candidates.map((candidate) => companionCard(candidate, hire(candidate))),
+        : candidates.map((candidate) => companionCard(candidate, hire(candidate), apply)),
     );
   }
 
@@ -690,7 +572,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       });
     return h(
       'section',
-      { class: 'stack' },
+      { class: 'stack', 'data-guide': 'herbalist-sell' },
       h('h2', { class: 'section-title', text: 'Skup ziół i mikstur' }),
       h('p', {
         class: 'muted',
@@ -724,7 +606,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     if (resident.service === 'reforge')
       return h(
         'div',
-        { class: 'stack' },
+        { class: 'stack', 'data-guide': 'enchanter-services' },
         data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij afiks', onClick: reforgeSheet }),
         data.imbue && h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij żywioł', onClick: imbueSheet }),
       );
@@ -733,7 +615,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     if (resident.service !== 'hermit') return null;
     return h(
       'div',
-      { class: 'settlement-actions' },
+      { class: 'settlement-actions', 'data-guide': 'hermit-services' },
       data.hermit.path !== null &&
         hermitButton('path', `Wyzeruj ścieżkę (${formatNumber(data.hermit.path)} zł.)`, 'Umiejętności klasy wrócą jako Punkty Umiejętności, a ścieżki wybierzesz od nowa.'),
       data.hermit.stats !== null && hermitButton('stats', `Wyzeruj statystyki (${formatNumber(data.hermit.stats)} zł.)`, 'Wszystkie rozdane punkty statystyk wrócą do rozdania.'),
@@ -752,7 +634,7 @@ export function mountSettlement(container, { params = {} } = {}) {
   const residentCard = (resident) =>
     h(
       'section',
-      { class: 'card settlement-resident' },
+      { class: 'card settlement-resident', 'data-guide': 'resident-card' },
       h(
         'div',
         { class: 'settlement-resident-head' },

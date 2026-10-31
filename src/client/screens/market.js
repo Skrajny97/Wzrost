@@ -516,7 +516,7 @@ export function mountMarket(holder) {
         { class: 'stack' },
         h(
           'section',
-          { class: 'card market-intro' },
+          { class: 'card market-intro', 'data-guide': 'market-intro' },
           h('p', { text: `Licytacja trwa ${market.hours} godziny. Przebity gracz od razu dostaje złoto z powrotem, a Targowisko bierze ${Math.round(market.fee * 100)}% ceny sprzedaży.` }),
           h('p', { class: 'muted', text: `Handel daje reputację Kompanii Kupców, dziś ${market.trade.today} z ${market.trade.daily} pkt. Postacie z jednego konta nie kupują od siebie.` }),
         ),
@@ -530,6 +530,7 @@ export function mountMarket(holder) {
                 type: 'button',
                 class: 'chat-tab',
                 role: 'tab',
+                'data-guide': `market-tab-${id}`,
                 'aria-selected': String(tab === id),
                 onClick: () => {
                   tab = id;

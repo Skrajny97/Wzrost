@@ -750,9 +750,128 @@
       "kind": "point",
       "chapter": "settlement",
       "text": [
-        "Zaklinaczka magicznie odmieni Twój przedmiot, a Pustelnik pomoże zacząć ścieżkę od nowa."
-      ],
-      "voice": "audio/narration/settlement-ending.mp3"
+        "Zajrzyj też do pozostałych mieszkańców Rozstajów. Gdy wejdziesz do kogoś po raz pierwszy, opowiem Ci, czym się zajmuje."
+      ]
+    },
+    {
+      "id": "settlement-tavern-mug",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Za kufel Zbylut zdradzi Ci plotkę z traktu. Słuchaj uważnie, nie każdy dzieli się takimi wieściami."
+      ]
+    },
+    {
+      "id": "settlement-tavern-hire",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Tu najemnicy szukają pracy. Zwerbowany towarzysz rusza z Tobą na wyprawy i rośnie w siłę razem z Tobą."
+      ]
+    },
+    {
+      "id": "settlement-tavern-quarters",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Każdy towarzysz potrzebuje posłania. Zbuduj Kwatery w obozie, tam też go potem znajdziesz."
+      ]
+    },
+    {
+      "id": "settlement-enchanter-affix",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Wiedana zaklina jeden afiks przedmiotu w inny, zawsze z powodzeniem. Płacisz złotem i materiałami stworów."
+      ]
+    },
+    {
+      "id": "settlement-enchanter-element",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Potrafi też zakląć żywioł. Broń zada część obrażeń ogniem, elektrycznością albo naturą, a pancerz się na nie uodporni."
+      ]
+    },
+    {
+      "id": "settlement-enchanter-relation",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Im lepiej Cię pozna, tym więcej afiksów pokaże Ci do wyboru."
+      ]
+    },
+    {
+      "id": "settlement-hermit-reset",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Sambor pomoże Ci zacząć od nowa. Za złoto wyzeruje ścieżkę umiejętności albo rozdane statystyki."
+      ]
+    },
+    {
+      "id": "settlement-hermit-evolution",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Po ewolucji klasy zmienisz u niego ewolucję na inną. Pierwsza zmiana jest darmowa."
+      ]
+    },
+    {
+      "id": "settlement-herbalist-sell",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Jagna kupuje zioła i mikstury drożej niż złomiarz. Im lepiej Cię zna, tym więcej płaci."
+      ]
+    },
+    {
+      "id": "settlement-herbalist-relation",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Handel z nią buduje też poważanie w Bractwie Zielarzy."
+      ]
+    },
+    {
+      "id": "settlement-market-offers",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Na Targowisku gracze licytują swoje towary. Licytacja trwa dobę, a przebity gracz od razu odzyskuje złoto."
+      ]
+    },
+    {
+      "id": "settlement-market-mine",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Tutaj wystawisz własne towary i odbierzesz to, co kupisz albo sprzedasz."
+      ]
+    },
+    {
+      "id": "settlement-market-residents",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Gościwit codziennie ma nowy towar. Raz w tygodniu zagląda tu też wędrowny handlarz z rzadkimi przedmiotami."
+      ]
+    },
+    {
+      "id": "settlement-market-company",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Każdy handel buduje poważanie w Kompanii Kupców. Im jest wyższe, tym więcej ofert wystawisz naraz."
+      ]
+    },
+    {
+      "id": "settlement-quarters",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Tu mieszkają Twoi towarzysze. Zmienisz im wyposażenie, odbierzesz prezenty albo ich odprawisz."
+      ]
     },
     {
       "id": "evolution-welcome",

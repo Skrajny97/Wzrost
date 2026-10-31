@@ -127,6 +127,20 @@ const settlementDue = (hash, read) =>
   !read.has('settlement-ending');
 const settlementTour = (hash, read) => settlementDue(hash, read) && read.has('settlement-welcome');
 const settlementHere = (hash, read) => onSettlement(hash) && settlementTour(hash, read);
+// After the board's tour, each of the Osada's places is told on its first
+// visit, step by step (the author: "Samouczek Osady by obejmował wszystko
+// krok po kroku"): the Karczma, the Zaklinaczka, the Pustelnik, the
+// Zielarka, the Targowisko, and the camp's Kwatery once they stand.
+const placesDue = (read) =>
+  Boolean(state.character.settlementOpen) &&
+  !skillsWaiting(read) &&
+  !professionsWaiting(read) &&
+  !communityWaiting(read) &&
+  !craftingWaiting(read) &&
+  read.has('settlement-ending');
+const onPlace = (placeId) => (hash, read) => hash === `#/osada/${placeId}` && placesDue(read);
+const onQuarters = (hash, read) =>
+  hash === '#/oboz/quarters' && placesDue(read) && (state.character.camp.buildings.find((building) => building.id === 'quarters')?.level ?? 0) > 0;
 
 // The Ewolucja chapter: once the class can evolve (class level 50) and has
 // not yet, after the report that brought it there and only when no other
@@ -311,7 +325,27 @@ const BEATS = {
   'settlement-lead': { place: '.nav-item[href="#/osada"]', when: (hash, read) => settlementTour(hash, read) && !hash.startsWith('#/osada') },
   'settlement-board': { place: mark('osada-board'), when: settlementHere },
   'settlement-brotherhoods': { place: mark('osada-board'), when: settlementHere },
-  'settlement-ending': { place: `${mark('osada-enchanter')}, ${mark('osada-hermitage')}`, whole: true, when: settlementHere },
+  'settlement-ending': {
+    place: ['tavern', 'enchanter', 'hermitage', 'herbalist', 'market'].map((id) => mark(`osada-${id}`)).join(', '),
+    whole: true,
+    when: settlementHere,
+  },
+  // The places, each on its first visit after the board's tour.
+  'settlement-tavern-mug': { place: mark('tavern-mug'), when: onPlace('tavern') },
+  'settlement-tavern-hire': { place: mark('tavern-companions'), when: onPlace('tavern') },
+  'settlement-tavern-quarters': { place: mark('tavern-quarters'), when: onPlace('tavern') },
+  'settlement-enchanter-affix': { place: mark('enchanter-services'), when: onPlace('enchanter') },
+  'settlement-enchanter-element': { place: mark('enchanter-services'), when: onPlace('enchanter') },
+  'settlement-enchanter-relation': { place: mark('resident-card'), when: onPlace('enchanter') },
+  'settlement-hermit-reset': { place: mark('hermit-services'), when: onPlace('hermitage') },
+  'settlement-hermit-evolution': { place: mark('hermit-services'), when: onPlace('hermitage') },
+  'settlement-herbalist-sell': { place: mark('herbalist-sell'), when: onPlace('herbalist') },
+  'settlement-herbalist-relation': { place: mark('resident-card'), when: onPlace('herbalist') },
+  'settlement-market-offers': { place: mark('market-tab-offers'), when: onPlace('market') },
+  'settlement-market-mine': { place: mark('market-tab-mine'), when: onPlace('market') },
+  'settlement-market-residents': { place: mark('market-tab-residents'), when: onPlace('market') },
+  'settlement-market-company': { place: mark('market-intro'), when: onPlace('market') },
+  'settlement-quarters': { place: mark('quarters-companions'), when: onQuarters },
   // The Ewolucja chapter, after all the others.
   'evolution-welcome': { when: evolutionDue },
   'evolution-lead': { place: '.nav-item[href="#/postac"]', when: (hash, read) => evolutionTour(hash, read) && !hash.startsWith('#/postac') },

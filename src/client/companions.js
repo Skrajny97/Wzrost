@@ -1,0 +1,199 @@
+// A companion's card (questions 104–113), shared by the Karczma, where the
+// candidates wait for the werbunek, and the camp's Kwatery, where the hired
+// companions live (the author: "Po zwerbowaniu postac powinna zniknąć z
+// Karczmy i pojawić się w Kwaterach - stamtąd ewentualne Odprawy, więcej
+// info o postaci [...] zmiana wyposażenia"): class, level, numbers, traits,
+// skills, gear and story, its gift of the week and wounds, with what can be
+// done with it. `apply` takes an action's answer (the Osada after it).
+
+import { companionBust } from './art.js';
+import { h } from './dom.js';
+import { formatCountdown, formatNumber } from './format.js';
+import { call, serverNow, state } from './state.js';
+import { closeSheet, confirmAction, openSheet, toast, withButton } from './ui.js';
+import { itemSummary } from './screens/character.js';
+
+// An item of the character's, from the bag or worn.
+const itemView = (id) => (state.character.bag ?? []).find((one) => one.id === id) ?? Object.values(state.character.equipment ?? {}).find((one) => one?.id === id);
+
+// A companion's gift of the week from its profession (question 112 A),
+// into the bag, also while the character is away.
+function giftRow(companion, apply) {
+  const { gift } = companion;
+  return h(
+    'div',
+    { class: 'settlement-choice' },
+    h('p', { class: 'muted', text: `Prezent tygodnia z profesji: ${gift.count} × ${gift.name}.` }),
+    h('button', {
+      type: 'button',
+      class: 'button button--world button--small',
+      text: 'Odbierz prezent',
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          const answer = await call('POST', '/api/settlement/gift', { companionId: companion.id });
+          apply(answer);
+          toast(`Odebrano: ${answer.gift.count} × ${answer.gift.name}.`);
+        }),
+    }),
+  );
+}
+
+// The bag's items the companion can wear, to tap one; what it wore in
+// that place goes back to the bag.
+function wearSheet(companion, apply) {
+  const items = companion.wearable.map((id) => itemView(id)).filter(Boolean);
+  const put = (item) => (event) =>
+    withButton(event.currentTarget, async () => {
+      apply(await call('POST', '/api/settlement/equip', { companionId: companion.id, itemId: item.id }));
+      closeSheet();
+      toast(`${companion.name} nosi teraz: ${item.name}.`);
+    });
+  openSheet(
+    h('h2', { class: 'sheet-title', text: `Sprzęt: ${companion.name}` }),
+    items.length === 0
+      ? h('p', { class: 'sheet-text', text: 'W plecaku nie ma nic, co ten towarzysz może założyć: broni ani pancerza swojej klasy na swój poziom, ani talizmanu.' })
+      : [
+          h('p', {
+            class: 'sheet-text',
+            text:
+              companion.appearance === 'female'
+                ? 'Wybierz przedmiot. To, co towarzyszka nosiła w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostała.'
+                : 'Wybierz przedmiot. To, co towarzysz nosił w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostał.',
+          }),
+          h(
+            'ul',
+            { class: 'item-list' },
+            items.map((item) => h('li', {}, h('button', { type: 'button', class: 'item-row', onClick: put(item) }, itemSummary(item)))),
+          ),
+        ],
+  );
+}
+
+// What a companion wears in its three places; one hired has a button to
+// put on an item from the bag (question 108 A), at home as every change of
+// the bag, while a candidate only shows what it comes with.
+function wearList(companion, apply) {
+  const hired = Boolean(companion.wearable);
+  const away = Boolean(state.character.activity);
+  return h(
+    'div',
+    { class: 'settlement-companion-wear' },
+    companion.wear.map((place) =>
+      h(
+        'div',
+        { class: 'settlement-companion-slot' },
+        h('span', { class: 'field-label', text: place.slotName }),
+        place.item ? itemSummary(place.item) : h('span', { class: 'muted', text: 'Pusto' }),
+      ),
+    ),
+    hired && h('button', { type: 'button', class: 'button button--small', text: 'Załóż z plecaka', disabled: away, onClick: () => wearSheet(companion, apply) }),
+    hired && away && h('p', { class: 'muted', text: 'Przedmioty zakłada się po powrocie z wyprawy.' }),
+  );
+}
+
+export function companionCard(companion, action, apply) {
+  // Its wounds heal with the character's rest (the author: "Niech rany
+  // towarzyszy goją się wraz z ranami postaci").
+  const wounded = companion.wounded
+    ? `${companion.appearance === 'female' ? 'Ranna' : 'Ranny'}. Wróci do sił, gdy postać ${companion.healsAt ? `odpocznie do pełna HP (jeszcze ${formatCountdown(companion.healsAt - serverNow())})` : 'po wyprawie odpocznie do pełna HP'}.`
+    : null;
+  // Its own face (question 107 B) beside who it is, as a resident's.
+  const bust = companionBust(companion.classId, companion.appearance);
+  return h(
+    'article',
+    { class: 'card settlement-companion' },
+    h(
+      'div',
+      { class: 'settlement-resident-head' },
+      bust && h('span', { class: 'settlement-resident-bust' }, bust),
+      h(
+        'div',
+        {},
+        h('p', { class: 'settlement-resident-name', text: `${companion.name}, ${companion.className}, poz. ${companion.level}` }),
+        h('p', { class: 'muted', text: `HP ${formatNumber(companion.maxHp)} · pancerz ${formatNumber(companion.armor)}${companion.profession ? ` · ${companion.profession}` : ''}` }),
+        h('p', { class: 'muted settlement-resident-story', text: companion.story }),
+      ),
+    ),
+    h(
+      'ul',
+      { class: 'settlement-companion-list' },
+      companion.traits.map((trait) => h('li', {}, h('strong', { text: trait.name }), `: ${trait.text}`)),
+      companion.skills.map((skill) => h('li', { text: `${skill.name}${skill.level > 0 ? `, poz. ${skill.level}` : ', jeszcze nie umie'}` })),
+      !companion.wear && h('li', { class: 'muted', text: `Sprzęt: ${companion.gear.join(', ')}` }),
+    ),
+    companion.wear && wearList(companion, apply),
+    companion.gift && giftRow(companion, apply),
+    wounded && h('p', { class: 'region-warning', text: wounded }),
+    action,
+  );
+}
+
+// "Odpraw": the companion leaves for good, giving back what it got from the
+// bag; asked first.
+export const dismissButton = (companion, apply) =>
+  h('button', {
+    type: 'button',
+    class: 'button button--small',
+    text: 'Odpraw',
+    onClick: async (event) => {
+      const button = event.currentTarget;
+      const given = companion.wear.some((place) => place.item?.given);
+      const got = companion.appearance === 'female' ? 'dostała' : 'dostał';
+      const text = `${companion.name} odejdzie na dobre${given ? ` i odda wszystko, co od Ciebie ${got}` : ''}.`;
+      if (!(await confirmAction({ title: `Odprawić: ${companion.name}?`, text, confirmLabel: 'Odpraw' }))) return;
+      withButton(button, async () => apply(await call('POST', '/api/settlement/dismiss', { companionId: companion.id })));
+    },
+  });
+
+// The camp's Kwatery: the companions who live there, each with its card,
+// gear, gift and "Odpraw", and how many beds there are. It loads the Osada
+// for them and redraws itself after each action; `holder` keeps it.
+export function mountQuarters(holder) {
+  let companions = null;
+  let failure = null;
+  let gone = false;
+  const apply = (answer) => {
+    if (answer.settlement) companions = answer.settlement.companions;
+    if (!gone) render();
+  };
+  async function load() {
+    try {
+      companions = (await call('GET', '/api/settlement')).settlement.companions;
+      failure = null;
+    } catch (error) {
+      failure = error;
+    }
+    if (!gone) render();
+  }
+  function render() {
+    if (failure) {
+      holder.replaceChildren(h('p', { class: 'muted', text: failure.message }));
+      return;
+    }
+    if (!companions) {
+      holder.replaceChildren(h('p', { class: 'muted', text: 'Wczytywanie towarzyszy…' }));
+      return;
+    }
+    const { hired, places } = companions;
+    holder.replaceChildren(
+      h(
+        'section',
+        { class: 'stack' },
+        h('h2', { class: 'section-title', text: `Towarzysze: ${hired.length} z ${places}` }),
+        hired.length === 0
+          ? h('p', { class: 'muted' }, 'Nikt tu jeszcze nie mieszka. Towarzyszy zwerbujesz w ', h('a', { href: '#/osada/tavern', text: 'Karczmie' }), ' w Osadzie.')
+          : hired.map((companion) => companionCard(companion, dismissButton(companion, apply), apply)),
+      ),
+    );
+  }
+  render();
+  load();
+  return {
+    refresh: () => {
+      if (!gone) render();
+    },
+    unmount() {
+      gone = true;
+    },
+  };
+}

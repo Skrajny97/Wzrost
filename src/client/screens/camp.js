@@ -21,6 +21,7 @@ import { confirmAction, guided, systemPanel, toast, withButton } from '../ui.js'
 import { scrapperSheet } from '../scrapper.js';
 import { itemSheet, itemSummary } from './character.js';
 import { mountChest } from './chest.js';
+import { mountQuarters } from '../companions.js';
 import { dayPart } from '../scenes.js';
 
 const CAMP = '#/oboz';
@@ -448,6 +449,16 @@ function mountBuilding(container, id) {
   let shownBuild = null;
   fireChoice = null;
   exchangeChoice.amount = null;
+  // The Kwatery's companions (companions.js), mounted once and kept while
+  // the screen redraws itself, so a redraw does not load them again.
+  let quarters = null;
+  const quartersPanel = () => {
+    if (!quarters) {
+      const holder = h('div', { class: 'quarters-companions', 'data-guide': 'quarters-companions' });
+      quarters = { holder, ...mountQuarters(holder) };
+    } else quarters.refresh();
+    return quarters.holder;
+  };
 
   function render() {
     const own = id === campOf().id;
@@ -474,6 +485,9 @@ function mountBuilding(container, id) {
       nextLevel(building),
       building.crafts && craftTableSection(ticks),
       building.upgrades && upgradeList(building),
+      // The companions live in the Kwatery once they stand (the author: "Po
+      // zwerbowaniu postac powinna [...] pojawić się w Kwaterach").
+      id === 'quarters' && building.level > 0 && quartersPanel(),
       h(
         'article',
         { class: 'card building-view', 'aria-label': building.name },
@@ -947,5 +961,11 @@ function mountBuilding(container, id) {
   }
 
   render();
-  return { update: render, tick };
+  return {
+    update: render,
+    tick,
+    unmount() {
+      quarters?.unmount();
+    },
+  };
 }
