@@ -141,15 +141,42 @@ export function orderStories(kind, key, content) {
   return [...orders.stories.craft, ...orders.craftStories.filter((story) => story.slots.includes(slot)).map((story) => story.text)];
 }
 
+// The hours one potion takes to make at the first level of the professions:
+// gathering its herbs at their perHour and brewing it.
+const potionHours = (potion, content) =>
+  Object.entries(potion.herbs).reduce((hours, [herbId, count]) => hours + count / content.herbsById[herbId].perHour, 0) + content.brewing.potionMinutes / 60;
+
+// The share of an order's count a good asks for (the author: "przez noc
+// popraw zlecenia i dopasuj je sensownie"): a herb as its perHour against
+// the quickest herb's, so a slow herb is asked for in as many hours as a
+// quick one, not in as many pieces; a potion as the hours of the quickest
+// potion against its own; any materials and parts materialStep times fewer
+// for each rarity above the first, for about the same gold.
+export function goodShare({ kind, key }, content) {
+  const { orders } = content.settlement;
+  if (kind === 'herb') return content.herbsById[key].perHour / Math.max(...content.herbs.map((herb) => herb.perHour));
+  if (kind === 'potion') return Math.min(...content.potions.map((potion) => potionHours(potion, content))) / potionHours(content.potionsById[key], content);
+  if (kind === 'material') return orders.materialStep ** rarityIndex(parseStack(key).rarityId, content);
+  if (kind === 'part') return orders.materialStep ** rarityIndex(content.partsById[key].rarity, content);
+  return 1;
+}
+
+// The most of a good an order asks for at the character's level, the
+// week's or another.
+export function orderCeiling({ kind, key }, level, weekly, content) {
+  const { orders } = content.settlement;
+  const tuning = orders.counts[kind];
+  const most = (tuning.max + tuning.perTenLevels * Math.floor(level / 10)) * (weekly ? orders.weekly.count : 1);
+  return Math.max(1, Math.round(most * goodShare({ kind, key }, content)));
+}
+
 // An order drawn from `seed`: a brotherhood, each as likely as another, so
 // each one's reputation grows at the same pace; one of its kinds of goods;
-// a good of that kind; the count for the character's level, the gold
-// (`pay` times the market price) and the reputation, a quality one from
-// the brotherhood's quality standing on (question 90 A), and one sentence
-// of the one who orders (question 94 A). `weekly` makes the week's big
-// order. Materials come materialStep times fewer for each rarity above
-// the first, so rarer ones are asked for in fewer pieces for about the
-// same gold.
+// a good of that kind; the count for the character's level and the good's
+// share (goodShare), the gold (`pay` times the market price) and the
+// reputation, a quality one from the brotherhood's quality standing on
+// (question 90 A), and one sentence of the one who orders (question 94 A).
+// `weekly` makes the week's big order.
 export function drawOrder({ character, reputation = {}, seed, weekly = false }, content) {
   const { orders } = content.settlement;
   const rng = createRng(seed);
@@ -171,7 +198,7 @@ export function drawOrder({ character, reputation = {}, seed, weekly = false }, 
     }
   }
   if (weekly) count *= orders.weekly.count;
-  if (kind === 'material') count = Math.max(1, Math.round(count * orders.materialStep ** rarityIndex(parseStack(key).rarityId, content)));
+  count = Math.max(1, Math.round(count * goodShare({ kind, key }, content)));
   const gold = Math.max(1, Math.round(count * goodPrice({ kind, key }, content, character.level) * orders.pay[kind] * factor * (weekly ? orders.weekly.reward / orders.weekly.count : 1)));
   // From the special standing a brotherhood's order may be special
   // (question 82): more reputation and Punkty Systemu for the same goods
@@ -208,7 +235,7 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
   const settled = slots.map((first) => {
     let slot = first;
     for (;;) {
-      if (slot.order && outdated(slot.order)) slot = { readyAt: now };
+      if (slot.order && outdated(slot.order, character, content)) slot = { readyAt: now };
       if (slot.order && slot.order.expiresAt <= now) slot = { readyAt: slot.order.expiresAt };
       if (slot.order || slot.readyAt > now) return slot;
       turn += 1;
@@ -219,7 +246,7 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
   });
   const { key } = questPeriod('weekly', now, content);
   const weekly =
-    board.weekly?.period === key && (board.weekly.done || !board.weekly.order || !outdated(board.weekly.order))
+    board.weekly?.period === key && (board.weekly.done || !board.weekly.order || !outdated(board.weekly.order, character, content))
       ? board.weekly
       : { period: key, order: drawOrder({ character, reputation, seed: `${seed}:weekly:${key}`, weekly: true }, content), done: false };
   return {
@@ -230,10 +257,12 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
   };
 }
 
-// An order for one creature's material, hung before the orders asked for
-// any materials of a rarity, is drawn anew, the week's too (the author:
-// "Zlecenia aktualne jeśli są z tych dziwacznych - przelosuj każdemu").
-const outdated = (order) => order.kind === 'material' && !isAnyMaterial(order);
+// An order hung before the rules of today, one for one creature's material
+// or one asking for more than an order asks for now (orderCeiling), is
+// drawn anew, the week's too (the author: "Zlecenia aktualne jeśli są z
+// tych dziwacznych - przelosuj każdemu").
+const outdated = (order, character, content) =>
+  (order.kind === 'material' && !isAnyMaterial(order)) || order.count > orderCeiling(order, character.level, order.weekly === true, content);
 
 // An order hung before its sentence was rewritten takes the new sentence
 // closest to the old one (the most words alike from the start), so the

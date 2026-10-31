@@ -27,7 +27,9 @@ import {
   fireTrade,
   generateItem,
   goodPrice,
+  goodShare,
   goodStock,
+  orderCeiling,
   materialsTaken,
   orderGoods,
   orderStories,
@@ -167,7 +169,7 @@ describe('the Osada in the engine', () => {
     const old = {
       ...board,
       slots: board.slots.map((slot, index) =>
-        index === 0 ? { ...slot, order: { ...slot.order, kind: 'craft', key: 'sword', story: 'Strażnicy palisady chodzą w łachmanach. Wstyd przed kupcami.' } } : slot,
+        index === 0 ? { ...slot, order: { ...slot.order, kind: 'craft', key: 'sword', count: 1, story: 'Strażnicy palisady chodzą w łachmanach. Wstyd przed kupcami.' } } : slot,
       ),
       weekly: { ...board.weekly, order: { ...board.weekly.order, kind: 'resource', story: 'Most na brodzie znowu się sypie.' } },
     };
@@ -215,6 +217,25 @@ describe('the Osada in the engine', () => {
     // The author's example: up to 32 common ones a week at level 28.
     assert.equal((counts.material.max + counts.material.perTenLevels * 2) * weekly.count, 32);
     assert.deepEqual(Object.keys(seen).sort(), Object.keys(anyMaterial).sort());
+  });
+
+  test('slow herbs, long potions and rare parts come in fewer pieces, and an order above today\'s ceiling is drawn anew', () => {
+    const comfrey = { kind: 'herb', key: 'comfrey' };
+    const fern = { kind: 'herb', key: 'fern-blossom' };
+    assert.equal(goodShare(comfrey, content), 1);
+    assert.ok(orderCeiling(fern, 28, true, content) * 10 < orderCeiling(comfrey, 28, true, content));
+    assert.ok(goodShare({ kind: 'potion', key: 'fern-brew' }, content) < goodShare({ kind: 'potion', key: 'lesser-healing' }, content));
+    const [common, rare] = ['common', 'rare'].map((rarity) => content.parts.find((part) => part.rarity === rarity));
+    assert.equal(orderCeiling({ kind: 'part', key: rare.id }, 28, true, content) * 2, orderCeiling({ kind: 'part', key: common.id }, 28, true, content));
+    for (let i = 0; i < 300; i++) {
+      const order = drawOrder({ character, seed: `share:${i}`, weekly: i % 2 === 0 }, content);
+      assert.ok(order.count <= orderCeiling(order, character.level, order.weekly === true, content), JSON.stringify(order));
+    }
+    const board = settleBoard(emptyBoard(), { character, seed: 'big' }, NOW, content);
+    const big = { kind: 'herb', key: 'comfrey', brotherhood: 'herbalists', count: 500, gold: 10, reputation: 10, story: content.settlement.orders.stories.herb[0], id: 77, expiresAt: NOW + HOUR };
+    const hung = (order) => settleBoard({ ...board, slots: [{ order }, ...board.slots.slice(1)] }, { character, seed: 'big' }, NOW, content).slots[0].order;
+    assert.notEqual(hung(big).id, 77);
+    assert.equal(hung({ ...big, count: orderCeiling(big, character.level, false, content) }).id, 77);
   });
 
   test('any materials of a rarity count from every stack of it, the biggest go first and the elements\' last', () => {

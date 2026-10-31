@@ -2996,6 +2996,26 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Zlecenia na miarę (31.10.2026, na wersji testowej)
+
+Autor: „przez noc popraw zlecenia i dopasuj je sensownie” oraz „Zlecenia aktualne jeśli są z tych dziwacznych - przelosuj każdemu.”
+
+1. **Mniej sztuk tego, co zdobywa się wolniej.** Zlecenie prosi o tyle sztuk, ile da się zdobyć w podobnym czasie:
+    - zioła według tempa zbioru: Żywokost (6 na godzinę) jak dotąd, Kozłek (2 na godzinę) trzy razy mniej, a Kwiat paproci (0,5 na godzinę) dwanaście razy mniej;
+    - mikstury według godzin zbioru ich ziół i warzenia, w porównaniu z Mniejszą miksturą leczenia;
+    - materiały i części o połowę mniej na każdą rzadkość wyżej.
+2. **Przykład.** Zlecenie tygodnia na 28. poziomie postaci prosi o 32–56 Żywokostów albo 3–5 Kwiatów paproci, a wcześniej o 32–56 sztuk każdego zioła. Mikstur: 12–20 Mniejszych mikstur leczenia albo 3–4 Napary z kwiatu paproci.
+3. **Złoto za sztukę bez zmian**, więc zlecenie na wolniej zdobywaną rzecz płaci za godzinę mniej więcej tyle samo.
+4. **Przelosowanie.** Zlecenie, które prosi o więcej sztuk, niż dziś prosi zlecenie na tę rzecz przy poziomie postaci, losuje się od nowa, z tygodniem terminu. Zlecenie tygodnia też, chyba że jest już oddane.
+
+## Częstotliwość zdarzeń (31.10.2026, zbadane)
+
+Autor: „zbadaj czestotliwosc zdarzen, niech lacznie wystepuja w 10% przypadkow wypraw nie kazde ma 10%, tylko sumarycznie”.
+
+1. **Tak już jest.** Wyprawa zakończona zgodnie z planem losuje raz, z szansą 10%, czy przyniesie zdarzenie, a dopiero potem które z tych, które pasują do regionu. Zmierzone na 100 000 wypraw: zdarzenie przyszło w 9,98% z nich, a pojedyncze zdarzenia w 0,25–1,3%.
+2. **Bez zdarzeń:** pierwsza wyprawa (samouczek), Szybkie i Błyskawiczne Polowanie oraz wyprawa przerwana albo przegrana.
+3. **Wersja testowa.** „Testuj zdarzenia” sprowadza wybrane zdarzenie na najbliższą wyprawę, potem już nie.
+
 ## Wersja 0.0.70 (31.10.2026)
 
 Autor: „Wdrażaj 0.0.70 awaryjnie”.
