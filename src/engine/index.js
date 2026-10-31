@@ -36,3 +36,4 @@ export * from './settlement.js';
 export * from './companions.js';
 export * from './market.js';
 export * from './names.js';
+export * from './towers.js';

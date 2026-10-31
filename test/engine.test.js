@@ -1049,15 +1049,15 @@ describe('tutorial unlocks', () => {
     assert.equal(nextHuntUnlock(50, content), null);
     assert.deepEqual(unlockedFeatures(1, content), []);
     assert.deepEqual(unlockedFeatures(2, content), ['stats']);
-    // Each step has its System message, and dungeons open with the longest hunts.
-    assert.deepEqual(unlockMessages(25, content), ['Odblokowano eksploracje do 1 godziny.']);
+    // Each step has its System message, and the towers open with the longest hunts.
+    assert.deepEqual(unlockMessages(25, content), [content.unlocksById.party.message, 'Odblokowano eksploracje do 1 godziny.']);
     assert.deepEqual(unlockMessages(10, content), ['Odblokowano Profesje. Zajrzyj do zakładki Profesje.']);
     // Rzemieślnictwo's message only where the game has it on.
     assert.deepEqual(unlockMessages(15, content), []);
     assert.deepEqual(unlockMessages(15, { ...content, features: ['crafting'] }), ['Odblokowano Rzemieślnictwo. Systemowy Warsztat czeka w zakładce Profesje.']);
     assert.deepEqual(
-      ['professions', 'settlement', 'dungeons'].map((id) => content.unlocksById[id].level),
-      [10, 20, 50],
+      ['professions', 'settlement', 'party', 'towers'].map((id) => content.unlocksById[id].level),
+      [10, 20, 25, 50],
     );
     // The skills open with the class level, not the character's.
     assert.equal(content.unlocksById.skills.classLevel, 10);

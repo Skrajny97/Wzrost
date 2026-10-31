@@ -9467,3 +9467,38 @@ a.profession-square:active {
   text-decoration-skip-ink: none;
   text-underline-offset: 3px;
 }
+
+/* The Drużyna (screens/party.js): the leader's mark by its name, the words
+   of an invitation, "Opuść drużynę" under the cards; and the party's names
+   at the top of a report (screens/report.js). */
+.party-leader {
+  flex: none;
+  padding: 1px 8px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  color: var(--gold);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.party-invite {
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.party-leave {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 16px;
+}
+
+.party-choice {
+  display: grid;
+  gap: 4px;
+}
+
+.report-party {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+}

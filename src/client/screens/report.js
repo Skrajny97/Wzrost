@@ -103,6 +103,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         report.flash ? 'Błyskawiczne polowanie' : report.quick ? 'Szybkie Polowanie' : 'Raport z wyprawy',
         `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
       ),
+      // An exploration of a Drużyna names those who went (parties.js).
+      report.party?.length > 1 && h('p', { class: 'report-party', text: `W drużynie: ${report.party.join(', ')}.` }),
       summaryCard(report),
       report.event && eventCard(report.event),
       report.system.length > 0 && guided(systemPanel(...report.system), 'report-system'),

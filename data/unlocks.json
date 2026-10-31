@@ -50,6 +50,12 @@
     "message": "Odblokowano Osadę. Mieszkańcy czekają w zakładce Osada."
   },
   {
+    "id": "party",
+    "name": "Drużyna",
+    "level": 25,
+    "message": "Odblokowano Drużynę. Załóż ją albo przyjmij zaproszenie w zakładce Społeczność, w części Drużyna, i wyruszajcie razem na wyprawy."
+  },
+  {
     "id": "hunts-1h",
     "name": "Eksploracje do 1 godziny",
     "level": 25,
@@ -71,8 +77,8 @@
     "message": "Odblokowano eksploracje do 4 godzin."
   },
   {
-    "id": "dungeons",
-    "name": "Lochy",
+    "id": "towers",
+    "name": "Wieże",
     "level": 50
   },
   {

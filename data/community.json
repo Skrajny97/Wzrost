@@ -5,7 +5,7 @@
     { "id": "friends", "name": "Znajomi" },
     { "id": "ranking", "name": "Ranking postaci" },
     { "id": "guilds", "name": "Gildie", "soon": true },
-    { "id": "party", "name": "Drużyna", "soon": true }
+    { "id": "party", "name": "Drużyna" }
   ],
   "ranking": { "size": 100 },
   "friends": { "max": 30 },

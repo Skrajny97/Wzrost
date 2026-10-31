@@ -267,7 +267,17 @@ export async function startHunt(context) {
 // The skipped introduction sends the first one this way too (tutorial.js).
 // A Szybkie Polowanie (`quick`) is over as it starts: it began `minutes`
 // ago; a Błyskawiczne polowanie is one too (`flash`, for its report's name).
-export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow } = {}, now, { quick = false, flash = false } = {}) {
+// An exploration of a Drużyna (parties.js) keeps the party (its id, leader
+// and the names of those who went) and the other players as they set out
+// (`partners`), who fight beside the character; its companions take only
+// the places left in the party.
+export async function beginHunt(
+  db,
+  player,
+  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow } = {},
+  now,
+  { quick = false, flash = false, party: crew = null, partners = [] } = {},
+) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
   const area = typeof id === 'string' ? areaFor(id, player.row.level, content) : undefined;
@@ -316,7 +326,7 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
   // wounded one once the character has rested to full HP, and then its
   // wounds are healed for good. Not on a Szybkie Polowanie.
   const healed = kept && restedNow(player, now) && (kept.companions ?? []).some((companion) => companion.wounded);
-  const party = kept && !quick ? partyOf(player, now) : [];
+  const party = kept && !quick ? partyOf(player, now).slice(0, Math.max(0, content.balance.parties.size - 1 - partners.length)) : [];
   const settlement =
     rumor > 1 || healed
       ? JSON.stringify({
@@ -340,6 +350,8 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
   const options = {
     ...(rumor > 1 && { rumor }),
     ...(party.length > 0 && { companions: party }),
+    ...(crew && { party: crew }),
+    ...(partners.length > 0 && { partners }),
     ...(reserving && { potions: taken, reserved: true, healBelow: healBelow ?? content.potionUse.healBelow }),
     ...(timed && { buffs: windows }),
     ...(unknown.length > 0 && { unknown }),
@@ -521,6 +533,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       seekRare: activity.seek_rare === 1,
       rumor: options.rumor ?? 1,
       companions: options.companions ?? [],
+      partners: options.partners ?? [],
       tracked: JSON.parse(activity.tracked ?? '[]'),
       unknown: options.unknown ?? [],
       // The creatures met before this exploration: it changes them only
@@ -642,6 +655,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
     ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped, overflow }, content),
     ...(options.quick && { quick: true }),
     ...(options.flash && { flash: true }),
+    // The Drużyna that went, by name (parties.js).
+    ...(options.party && { party: options.party.names }),
   };
   const summary = {
     areaName: report.areaName,

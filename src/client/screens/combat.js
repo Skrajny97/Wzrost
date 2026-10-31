@@ -375,7 +375,7 @@ export function mountCombat(container, { params, navigate }) {
       'div',
       { class: 'segmented', role: 'group', 'aria-label': 'Rodzaj walki' },
       tab('Eksploracja'),
-      tab('Lochy', 'dungeons'),
+      tab('Wieże', 'towers'),
     );
   }
 
@@ -757,6 +757,10 @@ export function mountCombat(container, { params, navigate }) {
       longer && h('p', { class: 'duration-lock', text: `Dłuższe wyprawy, do ${formatMinutes(longer.minutes)}, od poziomu ${longer.level}.` }),
     );
 
+    // A Drużyna's leader takes the members free now along (parties.js):
+    // the box comes once the party is known, ticked; the party goes only as
+    // far and as long as its lowest member may (the server says so).
+    const party = !first && partyChoice();
     const start = h('button', {
       type: 'button',
       class: 'button button--system',
@@ -765,7 +769,8 @@ export function mountCombat(container, { params, navigate }) {
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           remember();
-          await call('POST', '/api/hunts', {
+          const along = party?.along();
+          await call('POST', along ? '/api/party/hunt' : '/api/hunts', {
             areaId: area.id,
             minutes,
             avoidRare: avoiding(),
@@ -774,6 +779,7 @@ export function mountCombat(container, { params, navigate }) {
             trackUnknown: tracingUnknown(),
             ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
           });
+          if (along) toast(`Drużyna wyrusza: ${along.join(', ')}.`);
           leaveView(HOME, 2);
         }),
     });
@@ -828,11 +834,40 @@ export function mountCombat(container, { params, navigate }) {
         // card). The narrator's first exploration has only its length.
         first ? durations : huntOptions(summary, [durations, potions?.element, choices]),
         threatLine,
+        party?.element,
         start,
         quick,
       ),
       h('p', { class: 'muted threat-note', text: 'Zagrożenie to szansa omdlenia na wyprawie.' }),
     );
+  }
+
+  // The box "Z drużyną" over "Wyrusz", for a party's leader with members
+  // free now; along() gives their names while it is ticked, else null.
+  function partyChoice() {
+    const element = h('div', { class: 'party-choice', hidden: true });
+    let free = [];
+    let ticked = true;
+    if (isUnlocked('party')) {
+      call('GET', '/api/party')
+        .then(({ party }) => {
+          const own = party?.members.find((member) => member.own);
+          free = party ? party.members.filter((member) => !member.own && member.status === 'free').map((member) => member.name) : [];
+          if (!own?.leader || free.length === 0) return;
+          const box = h('input', { type: 'checkbox', id: 'party-along', class: 'avoid-rare-box', checked: true, onChange: () => (ticked = box.checked) });
+          fill(
+            element,
+            h('label', { class: 'avoid-rare', for: 'party-along' }, box, h('span', { text: `Z drużyną: ${free.join(', ')}` })),
+            h('p', {
+              class: 'muted',
+              text: `Drużyna idzie najwyżej na ${formatMinutes(party.limits.minutes)} (${party.limits.minutesBy}) i tylko tam, gdzie wejdzie ${party.limits.classLevelBy} (poziom klasy ${party.limits.classLevel}).`,
+            }),
+          );
+          element.hidden = false;
+        })
+        .catch(() => {});
+    }
+    return { element, along: () => (ticked && free.length > 0 && !element.hidden ? free : null) };
   }
 
   // "Szybkie Polowanie" under "Wyrusz", with how many are left today.

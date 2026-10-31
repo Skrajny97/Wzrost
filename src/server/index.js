@@ -13,6 +13,7 @@ import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewin
 import { buyParts, cancelBuilding, collectProduction, exchangeResources, startBuilding, tradeAtFire } from './camp.js';
 import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendGift } from './community.js';
+import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
 import { craftMaterials, salvageItem, sellMaterials, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
@@ -189,6 +190,14 @@ const routes = [
   ['POST', '/api/friends/remove', removeFriend],
   ['POST', '/api/friends/gift', sendGift],
   ['POST', '/api/friends/claim', claimGifts],
+  ['GET', '/api/party', getParty],
+  ['POST', '/api/party/invite', inviteToParty],
+  ['POST', '/api/party/accept', acceptPartyInvite],
+  ['POST', '/api/party/decline', declinePartyInvite],
+  ['POST', '/api/party/cancel', cancelPartyInvite],
+  ['POST', '/api/party/leave', leaveParty],
+  ['POST', '/api/party/kick', kickFromParty],
+  ['POST', '/api/party/hunt', partyHunt],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],
   ['POST', '/api/chat/seen', markChatSeen],

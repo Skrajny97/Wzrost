@@ -1,0 +1,8 @@
+{
+  "$comment": "Wieże Systemu (src/engine/towers.js), na razie podwaliny: jeszcze nie w grze (DECISIONS.md, „Wieże i Gildia: podwaliny”). Dawne Lochy (autor: „Lochy, którym ostatecznie zmienimy nazwę na Wieże”). towers: Wieża Solo i Wieża Drużyn; members: najmniej i najwięcej postaci graczy (Wieża Drużyn także w duecie), companions: czy wolne miejsca do size zajmują towarzysze z Kwater (autor: „Wieże Drużyn można robić ze zwerbowanymi postaciami”), size: najwięcej walczących po stronie drużyny. Piętro f ma stwory jednego regionu wewnętrznego, po kolei od pierwszego (piętro 1 Skraj Wiatrołomów, 2 Lisie Jary…, a po ostatnim znów od pierwszego), na poziomie f, więc wspinaczka prowadzi przez stwory wszystkich krain na poziomie postaci (autor: „Pomoże to uzupełniać zaległe Bestiariusze po Ewolucji Klasy by się nie cofać”). Co eliteEvery piętro czeka elita tego regionu, a na innych piętrach z szansą eliteChance (autor: „Elity mogą częściej”), co championEvery piętro czempion (gdy region go nie ma, elita). Najwyższe otwarte piętro to poziom postaci, a w drużynie poziom najniższej postaci (autor: „Maksymalny odblokowany stopień Wieży bedzie na poziomie najniższego w Drużynie”).",
+  "towers": [
+    { "id": "solo", "name": "Wieża Solo", "members": [1, 1], "companions": false, "size": 1 },
+    { "id": "party", "name": "Wieża Drużyn", "members": [2, 3], "companions": true, "size": 3 }
+  ],
+  "floors": { "eliteEvery": 5, "eliteChance": 0.1, "championEvery": 10 }
+}

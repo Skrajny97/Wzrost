@@ -38,6 +38,8 @@ let invites = 0;
 let gifts = 0;
 // Friends without an Upominek from this character today.
 let unsent = 0;
+// Invitations to a Drużyna waiting (parties.js).
+let partyInvites = 0;
 // The character's live Wymiana: { id, state, proposer, other }, or null.
 let trade = null;
 let askedAt = 0;
@@ -48,10 +50,11 @@ export const globalNews = () => open() && !muted && latest > seen;
 export const conversationNews = (id, newest = conversations.find((entry) => entry.id === id)?.latest ?? 0) => open() && newest > (privateSeen[id] ?? 0);
 export const chatNews = () => globalNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest));
 export const friendNews = () => open() && invites + gifts + unsent > 0;
+export const partyNews = () => open() && isUnlocked('party') && partyInvites > 0;
 export const liveTrade = () => (open() ? trade : null);
 // A proposal to this character, or a trade going on.
 export const tradeNews = () => Boolean(liveTrade()) && !(trade.state === 'proposed' && trade.proposer);
-export const communityNews = () => chatNews() || friendNews() || tradeNews();
+export const communityNews = () => chatNews() || friendNews() || partyNews() || tradeNews();
 export const chatMuted = () => muted;
 
 // The tab's light in words, for a screen reader.
@@ -62,7 +65,9 @@ export const communityNewsText = () =>
       : 'trwa wymiana'
     : chatNews()
       ? 'nowe wiadomości na czacie'
-      : invites > 0
+      : partyNews()
+        ? 'zaproszenie do drużyny czeka'
+        : invites > 0
         ? 'zaproszenie do znajomych czeka'
         : gifts > 0
           ? 'upominek czeka'
@@ -77,7 +82,7 @@ export function onChatNews(callback) {
 
 // The lights as words, to tell when one changed.
 const lights = () =>
-  [globalNews(), friendNews(), trade && `${trade.id}:${trade.state}:${trade.proposer}`, ...conversations.map((entry) => `${entry.id}:${conversationNews(entry.id, entry.latest)}`)].join();
+  [globalNews(), friendNews(), partyNews(), trade && `${trade.id}:${trade.state}:${trade.proposer}`, ...conversations.map((entry) => `${entry.id}:${conversationNews(entry.id, entry.latest)}`)].join();
 
 // Runs `change` and tells the listeners if a light changed.
 function update(change) {
@@ -167,6 +172,14 @@ export function friendsSeen(view) {
   });
 }
 
+// The Drużyna as its screen last saw it (screens/party.js): the invitations
+// waiting.
+export function partySeen(view) {
+  update(() => {
+    partyInvites = view.invites?.length ?? 0;
+  });
+}
+
 // Asks the server for the newest message, what waits in the Znajomi and the
 // Wymiana, at most every 15 seconds unless `now` is set; nothing while the
 // page is in the background.
@@ -186,6 +199,7 @@ export async function checkChat({ now = false } = {}) {
     invites = answer.invites ?? 0;
     gifts = answer.gifts ?? 0;
     unsent = answer.unsent ?? 0;
+    partyInvites = answer.partyInvites ?? 0;
     trade = answer.trade ?? null;
     // What the character read on its other devices.
     seen = Math.max(seen, answer.seen?.global ?? 0);

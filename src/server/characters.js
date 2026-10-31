@@ -82,6 +82,7 @@ import { content } from './content.js';
 import { craftingOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { marketRemoval } from './market.js';
+import { partyRemoval } from './parties.js';
 import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
@@ -125,6 +126,13 @@ const nameKey = (name) => name.toLowerCase();
 // The character the account plays, with all it has, or null.
 export async function loadPlayer(db, userId) {
   const row = await db.prepare("SELECT * FROM characters WHERE user_id = ? AND role = 'player'").bind(userId).first();
+  return row ? playerOf(db, row) : null;
+}
+
+// Any character by its id, played or aside, as loadPlayer gives it (a
+// member of a Drużyna, parties.js), or null.
+export async function loadCharacter(db, id) {
+  const row = await db.prepare('SELECT * FROM characters WHERE id = ?').bind(id).first();
   return row ? playerOf(db, row) : null;
 }
 
@@ -1323,6 +1331,7 @@ export function characterRemoval(db, id) {
     db.prepare('DELETE FROM items WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
     ...marketRemoval(db, '?', [id]),
+    ...partyRemoval(db, '?', [id]),
     db.prepare('DELETE FROM characters WHERE id = ?').bind(id),
   ];
 }

@@ -20,7 +20,8 @@
     "progression",
     "account",
     "quickHunt",
-    "flashHunt"
+    "flashHunt",
+    "parties"
   ],
   "properties": {
     "combat": {
@@ -1071,9 +1072,21 @@
         "budgetBase",
         "damageMultiplier",
         "gearLagMinutes",
-        "midGame"
+        "midGame",
+        "coop"
       ],
       "properties": {
+        "coop": {
+          "type": "object",
+          "description": "Od fromLevel stwory biją o damage mocniej i mają o hp więcej HP, z myślą o grze w drużynie (autor: „zwiększ poziom trudności o trochę od 25 lvla Postaci, czyli od Omszałych Głazów w górę w związku z mozliwoscia co-opa, nawet mimo kary za drużynę”).",
+          "additionalProperties": false,
+          "required": ["fromLevel", "damage", "hp"],
+          "properties": {
+            "fromLevel": { "type": "integer", "minimum": 1 },
+            "damage": { "type": "number", "minimum": 0 },
+            "hp": { "type": "number", "minimum": 0 }
+          }
+        },
         "hpBase": {
           "type": "number",
           "minimum": 0
@@ -1156,6 +1169,16 @@
         "count": { "type": "integer", "minimum": 1 },
         "minutes": { "type": "integer", "minimum": 1 },
         "refillHours": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "parties": {
+      "type": "object",
+      "description": "Drużyny graczy (src/server/parties.js): najwyżej size postaci razem z liderem. Każdy członek, który idzie z drużyną na wyprawę, zabiera każdemu z pozostałych xpCost jego XP z walk (premia za skład z dokumentu projektowego: solo +10%, duo +5%, trio bez premii). Wolne miejsca do size zajmują towarzysze z Kwater, każdy za swój xpCost z settlement.json.",
+      "additionalProperties": false,
+      "required": ["size", "xpCost"],
+      "properties": {
+        "size": { "type": "integer", "minimum": 2 },
+        "xpCost": { "type": "number", "minimum": 0, "maximum": 0.5 }
       }
     }
   }

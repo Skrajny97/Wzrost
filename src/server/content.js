@@ -36,6 +36,7 @@ import encyclopedia from '../../data/encyclopedia.json' with { type: 'json' };
 import evolutions from '../../data/evolutions.json' with { type: 'json' };
 import giftCodes from '../../data/gift-codes.json' with { type: 'json' };
 import settlement from '../../data/settlement.json' with { type: 'json' };
+import towers from '../../data/towers.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -67,6 +68,7 @@ export const content = buildContent({
   evolutions,
   'gift-codes': giftCodes,
   settlement,
+  towers,
 });
 
 // The parts of the game this deployment has on, for the System's messages

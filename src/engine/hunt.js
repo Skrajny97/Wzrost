@@ -371,7 +371,7 @@ export function resourceBundle(area, total) {
 // potion alone, as explorations started before the other kinds kept it
 // (potions.js).
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, rumor = 1, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [] },
+  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, rumor = 1, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [] },
   content,
 ) {
   const rng = createRng(seed);
@@ -388,11 +388,23 @@ export function simulateHunt(
   // keeps to the back for the rest of the way.
   // Each companion along takes xpCost of the character's XP (question 235
   // B: alone, the character gets as much as before).
-  const partyXp = 1 - companions.length * content.settlement.companions.xpCost;
-  const mates = companions.map((companion, index) => {
-    const unit = companionCombatant(companion, { area, id: `a${index + 1}` }, content);
-    return { id: companion.id, unit, hp: unit.maxHp, out: false };
+  // The other players of a Drużyna (src/server/parties.js) fight beside the
+  // character as they were when the leader set out, each with its own HP,
+  // out once fallen, as the companions, first in the line after the
+  // character; each one along takes parties.xpCost of the character's XP
+  // (the design document: solo +10% XP, duo +5%, a full party no bonus).
+  const partyXp = 1 - companions.length * content.settlement.companions.xpCost - partners.length * content.balance.parties.xpCost;
+  const friends = partners.map((partner, index) => {
+    const unit = playerCombatant({ character: partner.character, equipped: partner.equipped, hp: partner.hp, name: partner.name, area, id: `p${index + 1}` }, content);
+    return { id: partner.id, unit, hp: Math.min(unit.maxHp, partner.hp ?? unit.maxHp), out: false };
   });
+  const mates = [
+    ...friends,
+    ...companions.map((companion, index) => {
+      const unit = companionCombatant(companion, { area, id: `a${index + 1}` }, content);
+      return { id: companion.id, unit, hp: unit.maxHp, out: false };
+    }),
+  ];
 
   // Each fight pays for the time it stands for (`share`), so every length
   // gives about the same per hour. The first exploration meets no demanding
@@ -665,8 +677,12 @@ export function simulateHunt(
     keyFight: key && { index: key.index },
     potionsUsed,
     buffFights,
-    // The companions at the end: their HP and whether they fell on the way.
-    ...(mates.length > 0 && { companions: mates.map((mate) => ({ id: mate.id, name: mate.unit.name, hpEnd: mate.hp, maxHp: mate.unit.maxHp, fainted: mate.out })) }),
+    // The companions at the end: their HP and whether they fell on the way;
+    // the party's players too.
+    ...(companions.length > 0 && {
+      companions: mates.filter((mate) => !friends.includes(mate)).map((mate) => ({ id: mate.id, name: mate.unit.name, hpEnd: mate.hp, maxHp: mate.unit.maxHp, fainted: mate.out })),
+    }),
+    ...(friends.length > 0 && { partners: friends.map((mate) => ({ id: mate.id, name: mate.unit.name, hpEnd: mate.hp, maxHp: mate.unit.maxHp, fainted: mate.out })) }),
   };
 }
 

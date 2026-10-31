@@ -2996,7 +2996,47 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
-## Zlecenia na miarę (31.10.2026, na wersji testowej)
+## Wersja 0.0.71 (1.11.2026)
+
+Autor: „Następnie przygotuj podwaliny a najlepiej cały system Drużyn. Wdróż potem na main od 25 poziomu postaci inaczej niż Osada, która wlatuje na 20, zeby nie za duzo na raz było.”
+
+1. **Co wchodzi do gry:**
+    - Drużyny od 25. poziomu postaci (zob. „Drużyny”);
+    - stwory od 26. poziomu trochę silniejsze (zob. „Trudniej od Omszałych Głazów”);
+    - zlecenia na miarę wysiłku i przelosowanie dziwacznych (zob. „Zlecenia na miarę”);
+    - Lochy przemianowane na Wieże, dalej zablokowane (zob. „Wieże i Gildia: podwaliny”).
+2. **Migracja bazy:** 0063 (tabele drużyn).
+
+## Drużyny (1.11.2026, w grze od 0.0.71)
+
+Autor: „Następnie przygotuj podwaliny a najlepiej cały system Drużyn. Wdróż potem na main od 25 poziomu postaci inaczej niż Osada, która wlatuje na 20, zeby nie za duzo na raz było.” oraz „Niech Drużyna ma maksymalnie 3 członków i lidera  który decyduje o polowaniu. Drużyny powinny łatwo łączyć się, 1 członek wychodzić z nich jak stwierdzi ze potrzebuje Profesje robić. Drużyny poki co są tylko na wyprawy (mogą chodzić maksymalnie na tak długie i taki region jaki odblokowala postac z najnizszym lvlem w drużynie).”
+
+1. **Skład.** Drużyna to najwyżej 3 postacie różnych graczy, razem z liderem. To brakujący szczegół: „3 członków i lidera” czytam jako trzy postacie z liderem, jak „Tercet” w Wieżach i drużyna trzech postaci w dokumencie projektowym. Drużyna otwiera się na 25. poziomie postaci, w Społeczności, w części Drużyna.
+2. **Łączenie.** Lider zaprasza postać jednym stuknięciem z listy swoich Znajomych albo po imieniu. Pierwsze zaproszenie zakłada drużynę. Zaproszona postać stuka „Dołącz”, a zaproszenie zapala kropkę na Społeczności. Własnej postaci z tego samego konta nie da się zaprosić, a gracze, z których jeden ukrył drugiego na czacie, nie zaproszą się nawzajem.
+3. **Wychodzenie.** Członek opuszcza drużynę jednym przyciskiem, np. gdy chce zająć się profesjami. Lider może też usunąć członka i cofnąć zaproszenie. Gdy lider odchodzi, drużynę prowadzi ta postać, która dołączyła najwcześniej. Drużyna bez członków znika.
+4. **Wyprawa drużyny.** Lider wybiera w Walce miejsce i czas, zaznacza „Z drużyną: …” i stuka „Wyrusz”. Idą ci członkowie, którzy nie mają innych zajęć i grają tą postacią. Każdy z nich musi mieć to miejsce i ten czas odblokowane, więc drużyna idzie najwyżej tam i tak długo, jak najniższa postać. Postać z innymi zajęciami zostaje w obozie.
+5. **Walka i łupy.** Każdy członek dostaje własną wyprawę w to samo miejsce, na ten sam czas, a pozostali walczą przy nim tacy, jacy byli przy wyjściu, każdy z własnym HP. Każdy dostaje własny raport, złoto, przedmioty i materiały. Raport podaje skład drużyny. Mikstury i tropienie lider wybiera tylko dla siebie (brakujący szczegół).
+6. **Kara za skład.** Jak w dokumencie projektowym: solo +10% XP, w duecie +5%, w trio bez premii. Każdy członek drużyny zabiera pozostałym 4,5% ich XP z walk. Wolne miejsca do trzech zajmują towarzysze z Kwater: w trio żaden nie idzie, a w duecie jeden.
+7. **Na razie bez:** Szybkiego Polowania drużyną i wspólnego zagrożenia przed wyprawą (lider widzi zagrożenie swojej postaci). Wieże dojdą później.
+8. **Migracja bazy:** 0063 (tabele `parties`, `party_members`, `party_invites`).
+
+## Trudniej od Omszałych Głazów (1.11.2026, w grze od 0.0.71)
+
+Autor: „Do tego zwiększ poziom trudności o trochę od 25 lvla Postaci, czyli od Omszałych Głazów w górę w związku z mozliwoscia co-opa, nawet mimo kary za drużynę.”
+
+1. **Zmiana.** Stwory od 26. poziomu, czyli od Omszałych Głazów w górę, zadają o 10% więcej obrażeń i mają o 10% więcej HP. Dotyczy to też elit, czempionów i przeciwników ze zdarzeń na tych poziomach. Zagrożenie przed wyprawą to uwzględnia.
+
+## Wieże i Gildia: podwaliny (1.11.2026, na razie poza grą)
+
+Autor: „Następnie przygotuj podwaliny pod Gildię i Lochy, którym ostatecznie zmienimy nazwę na Wieże.”, „Będą to Wieże Systemu które będzie robić się niezależnie od wypraw, profesji. Bedzie podział na Wieże Solo i w Tercecie. Wieża Solo i Wieża Drużyn - takie nazwy.”, „Wieże Drużyn bedzie można robić w duecie. Maksymalny odblokowany stopień Wieży bedzie na poziomie najniższego w Drużynie. Znajdą się tam zwykłe stwory od pierwszego regionu na wyzszych lvlach + elity i czempioni na co 5 i 10 poziomie, średnio. Elity mogą częściej. Pomoże to uzupełniać zaległe Bestiariusze po Ewolucji Klasy by się nie cofać.” oraz „Werbunek zostaje na aktualnym poziomie. Wieże Drużyn można robić ze zwerbowanymi postaciami.”
+
+1. **Nazwa.** Lochy nazywają się teraz Wieże. Zakładka w Walce brzmi „Wieże” i dalej czeka zablokowana, od 50. poziomu.
+2. **Dwie wieże** (`data/towers.json`): Wieża Solo dla jednej postaci i Wieża Drużyn dla 2–3 postaci graczy. W Wieży Drużyn wolne miejsca zajmują zwerbowani towarzysze.
+3. **Piętra** (`src/engine/towers.js`, z testami). Piętro f ma zwykłe stwory jednego regionu wewnętrznego na poziomie f. Regiony idą po kolei od pierwszego (piętro 1 Skraj Wiatrołomów, 2 Lisie Jary…), a po ostatnim znów od pierwszego, więc wspinaczka prowadzi przez stwory wszystkich krain. Co 5. piętro czeka elita regionu, a na innych piętrach elita trafia się z szansą 10%. Co 10. piętro czeka czempion, a gdy region go nie ma, elita. Najwyższe otwarte piętro to poziom postaci, a w drużynie poziom najniższej postaci.
+4. **Werbunek** kosztuje tyle co dotąd.
+5. **Czeka na decyzje autora:** jak wspinaczka ma się mieć do wypraw i profesji, od którego poziomu Wieże się otwierają, co daje Gildia i ile osób ją tworzy (pytania 304–307).
+
+## Zlecenia na miarę (31.10.2026, w grze od 0.0.71)
 
 Autor: „przez noc popraw zlecenia i dopasuj je sensownie” oraz „Zlecenia aktualne jeśli są z tych dziwacznych - przelosuj każdemu.”
 

@@ -1,7 +1,8 @@
 // The Społeczność tab, from character level 5. A list at its top, folded to
 // the part shown, picks one of its parts (data/community.json): the Czat,
 // the Znajomi with their daily Upominek (friends.js), the Ranking postaci
-// (ranking.js), and the Gildie and the Drużyna still to come ("Wkrótce").
+// (ranking.js), the Drużyna (party.js), and the Gildie still to come
+// ("Wkrótce").
 // It opens on the part with news (chat-news.js), else on the one last shown
 // on the device; while the narrator has not shown the chat's rules yet
 // (narrator.js), on the Czat. News in a part not shown lights the folded
@@ -37,6 +38,7 @@ import {
   conversationsSeen,
   friendNews,
   globalNews,
+  partyNews,
   onChatNews,
   privateRead,
   setChatMuted,
@@ -48,6 +50,7 @@ import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, openSheet, pageHeading, toast, withButton } from '../ui.js';
 import { itemDetails, itemSummary } from './character.js';
 import { mountFriends } from './friends.js';
+import { mountParty } from './party.js';
 import { lockedScreen } from './locked.js';
 import { mountRanking } from './ranking.js';
 import { tradeBanner } from './trade.js';
@@ -61,11 +64,11 @@ const untilText = (until) => (until >= FOREVER ? 'na stałe' : `do ${dateTimeFor
 
 const SECTION_KEY = 'insight-community-section';
 const SECTION_ICONS = { chat: 'chat', friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords' };
-const SECTION_NEWS = { chat: chatNews, friends: friendNews };
+const SECTION_NEWS = { chat: chatNews, friends: friendNews, party: partyNews };
 
 export function mountCommunity(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Społeczność')(container, context);
-  const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking };
+  const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking, party: mountParty };
   const sections = state.content.community.sections;
   const asked = takeConversation();
   let current = asked ? 'chat' : firstSection(sections);

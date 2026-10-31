@@ -121,14 +121,18 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   // with each level (midGameShare in progression.js).
   const mid = balance.monsters.midGame;
   const stronger = midGameShare(level, mid);
+  // From Omszałe Głazy on (coop.fromLevel), a little harder for the parties
+  // that may go there (parties.js; the author: "zwiększ poziom trudności o
+  // trochę od 25 lvla Postaci, czyli od Omszałych Głazów w górę").
+  const coop = level >= balance.monsters.coop.fromLevel ? balance.monsters.coop : { damage: 0, hp: 0 };
   const average =
-    weaponDamage(hide, monster.attack.damageFactor, balance) * balance.monsters.damageMultiplier * groupFactor * (1 + mid.damage * stronger);
+    weaponDamage(hide, monster.attack.damageFactor, balance) * balance.monsters.damageMultiplier * groupFactor * (1 + mid.damage * stronger) * (1 + coop.damage);
   const resist = {};
   for (const [element, value] of Object.entries(monster.resistances ?? {})) {
     resist[element] = Math.round(value.base + value.perLevel * (level - 1));
   }
   const rawHp = balance.monsters.hpBase + balance.character.hpPerVitality * stat('vitality') + balance.monsters.hpPerLevel * level;
-  const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger)));
+  const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp)));
   return {
     id,
     side,

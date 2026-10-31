@@ -5,6 +5,7 @@ import { registrationOpen } from './features.js';
 import { googleConfigured } from './google.js';
 import { ApiError, json, readJson } from './http.js';
 import { marketRemoval } from './market.js';
+import { partyRemoval } from './parties.js';
 import { hashPassword, needsRehash, verifyPassword } from './passwords.js';
 import { testModeFor, tutorialTestsFor } from './test-mode.js';
 import { isAuthor, openBugReports } from './author.js';
@@ -210,6 +211,7 @@ export async function deleteAccount(context) {
       db.prepare(`DELETE FROM ${table} WHERE character_id IN (${characters})`).bind(id),
     ),
     ...marketRemoval(db, characters, [id]),
+    ...partyRemoval(db, characters, [id]),
     db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(id),

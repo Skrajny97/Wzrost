@@ -13,10 +13,10 @@ export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
-  'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement',
+  'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers',
 ];
 // Unlocks the code refers to by id.
-const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'dungeons', 'core'];
+const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'core'];
 const POSITIONS = ['front', 'middle', 'back'];
 
 function readJson(path) {

@@ -18,6 +18,7 @@ import { isUnlocked, itemView } from '../engine/index.js';
 import { isAuthor } from './author.js';
 import { content } from './content.js';
 import { friendNews } from './community.js';
+import { partyNews } from './parties.js';
 import { tradeNews } from './trades.js';
 import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
@@ -259,7 +260,7 @@ function seenOf(text) {
 // read on any of its devices.
 export async function latestChat(context) {
   const { session, character, db } = await requireChatter(context);
-  const [row, conversations, friends, trade, read] = await Promise.all([
+  const [row, conversations, friends, trade, read, partyInvites] = await Promise.all([
     db
       .prepare(
         `SELECT MAX(id) AS id FROM chat_messages
@@ -271,8 +272,9 @@ export async function latestChat(context) {
     friendNews(db, character.id, context.now),
     tradeNews(db, character.id, context.now),
     db.prepare('SELECT chat_seen FROM characters WHERE id = ?').bind(character.id).first(),
+    partyNews(db, character.id),
   ]);
-  return json({ latest: row.id ?? 0, conversations: conversations.results.map(conversationView), ...friends, trade, seen: seenOf(read?.chat_seen) });
+  return json({ latest: row.id ?? 0, conversations: conversations.results.map(conversationView), ...friends, partyInvites, trade, seen: seenOf(read?.chat_seen) });
 }
 
 // POST /api/chat/seen {global: id}, or {with: character id, id}: the
