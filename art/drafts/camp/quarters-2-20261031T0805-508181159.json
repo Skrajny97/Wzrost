@@ -1,0 +1,25 @@
+{
+  "id": "quarters-2",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a rustic camp in a forest, made of wood, canvas, rope and hand-stacked stone, no tiled roofs and no stone houses, two cream canvas sleeping tents side by side on wooden frames like the reference, joined by a rope line with cloaks drying on it, red bedrolls at their entrances, a small wooden chest and a wooden rack with a spear and a round shield, no lanterns and no lamps, standing directly on bare ground with no ground tile, base or platform under it",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 2,
+    "seed": 508181159,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 1
+  },
+  "result": {
+    "created_at": 1793433941,
+    "credit_cost": 2,
+    "balance_cost": 0.12,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 63.11,
+    "request_id": "53a548db-a10b-46cf-b2a5-ec6f2ccdf4d7",
+    "outputs_retained_until": 1793520336
+  }
+}
