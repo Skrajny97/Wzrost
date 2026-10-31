@@ -25,9 +25,11 @@ import {
   listBlock,
   materialPrice,
   materialView,
+  merchantPrice,
   merchantStock,
   minimumBid,
   offerLimit,
+  relationDiscount,
   parseStack,
   potionPrice,
   questPeriod,
@@ -199,18 +201,20 @@ function wandererFor(row, stored, now) {
 }
 
 // The residents' offers (242 A): the merchant's goods of the day with what
-// the character may still buy of each, and the wandering trader's items on
-// his day.
+// the character may still buy of each, at its relation with him (287 A),
+// and the wandering trader's items on his day.
 function residentsView(player, stored, now) {
   const stock = merchantStock(now, content);
   const bought = stored.market?.day === stock.day ? (stored.market.bought ?? {}) : {};
   const { row } = player;
   const wanderer = wandererFor(row, stored, now);
   const taken = stored.market?.wandererDay === wanderer.comes.key ? (stored.market.wanderer ?? []) : [];
+  const points = merchantPoints(stored);
   return {
     merchant: {
       endsAt: stock.endsAt,
-      goods: stock.goods.map((good) => ({ ...goodsView(good.kind, good.key, 1), id: good.id, price: good.price, left: Math.max(0, good.stock - (bought[good.id] ?? 0)) })),
+      discount: relationDiscount(points, content),
+      goods: stock.goods.map((good) => ({ ...goodsView(good.kind, good.key, 1), id: good.id, price: merchantPrice(good, points, content), left: Math.max(0, good.stock - (bought[good.id] ?? 0)) })),
     },
     wanderer: {
       startsAt: wanderer.comes.startsAt,
@@ -427,6 +431,10 @@ function marketReputation(row, stored, value, now, { relation = false } = {}) {
   };
 }
 
+// The character's relation points with the merchant, which lower his
+// prices (287 A).
+const merchantPoints = (stored) => stored.relations[tuning().resident] ?? 0;
+
 // The bag's free places, and the places stacks of herbs or potions take
 // after adding `adds`.
 const stackPlaces = (counts, adds) => {
@@ -530,7 +538,7 @@ export async function buyFromResident(context) {
   const bought = stored.market?.day === stock.day ? (stored.market.bought ?? {}) : {};
   const count = body.count;
   if (!Number.isInteger(count) || count < 1 || count > good.stock - (bought[good.id] ?? 0)) throw new ApiError(409, 'sold_out', 'Kupiec nie ma już tyle.');
-  const price = good.price * count;
+  const price = merchantPrice(good, merchantPoints(stored), content) * count;
   if (row.gold < price) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota.');
   if (good.kind === 'herb' && stackPlaces(herbsOf(row), { [good.key]: count }) - bagStacks(herbsOf(row), content) > free) {
     throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');

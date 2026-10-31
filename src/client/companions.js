@@ -8,7 +8,7 @@
 
 import { companionBust } from './art.js';
 import { h } from './dom.js';
-import { formatCountdown, formatNumber } from './format.js';
+import { formatCountdown, formatDecimal, formatNumber } from './format.js';
 import { call, serverNow, state } from './state.js';
 import { closeSheet, confirmAction, openSheet, toast, withButton } from './ui.js';
 import { itemSummary } from './screens/character.js';
@@ -91,6 +91,22 @@ function wearList(companion, apply) {
   );
 }
 
+// The relation with a hired companion (296 A) and what it told in talks
+// (295 A): its standing, its bonus in a fight, the points to the next
+// standing, and the pieces of its story, folded.
+function bondBlock(bond) {
+  const parts = [`Relacja: ${bond.standing}`];
+  if (bond.bonus > 0) parts.push(`w walce +${formatDecimal(bond.bonus * 100)}% obrażeń i HP`);
+  if (bond.next) parts.push(`do stopnia ${bond.next.name}: ${formatNumber(bond.next.points - bond.points)} pkt`);
+  return h(
+    'div',
+    { class: 'settlement-companion-bond' },
+    h('p', { class: 'muted', text: `${parts.join(' · ')}.` }),
+    bond.told.length > 0 &&
+      h('details', { class: 'settlement-companion-talks' }, h('summary', { text: `Z rozmów (${bond.told.length})` }), h('ul', {}, bond.told.map((piece) => h('li', { text: `„${piece}”` })))),
+  );
+}
+
 export function companionCard(companion, action, apply) {
   // Its wounds heal with the character's rest (the author: "Niech rany
   // towarzyszy goją się wraz z ranami postaci").
@@ -121,6 +137,7 @@ export function companionCard(companion, action, apply) {
       companion.skills.map((skill) => h('li', { text: `${skill.name}${skill.level > 0 ? `, poz. ${skill.level}` : ', jeszcze nie umie'}` })),
       !companion.wear && h('li', { class: 'muted', text: `Sprzęt: ${companion.gear.join(', ')}` }),
     ),
+    companion.bond && bondBlock(companion.bond),
     companion.wear && wearList(companion, apply),
     companion.gift && giftRow(companion, apply),
     wounded && h('p', { class: 'region-warning', text: wounded }),
@@ -143,6 +160,33 @@ export const dismissButton = (companion, apply) =>
       if (!(await confirmAction({ title: `Odprawić: ${companion.name}?`, text, confirmLabel: 'Odpraw' }))) return;
       withButton(button, async () => apply(await call('POST', '/api/settlement/dismiss', { companionId: companion.id })));
     },
+  });
+
+// What a companion said in a talk, with its face, and what it brought.
+function talkSheet(companion, talk) {
+  const bust = companionBust(companion.classId, companion.appearance);
+  openSheet(
+    h('div', { class: 'settlement-resident-head' }, bust && h('span', { class: 'settlement-resident-bust' }, bust), h('h2', { class: 'sheet-title', text: companion.name })),
+    h('p', { class: 'sheet-text settlement-talk', text: `„${talk.text}”` }),
+    h('p', { class: 'muted', text: `${talk.story ? 'Nowy kawałek historii. ' : ''}Relacja +${talk.points} pkt.` }),
+    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Zamknij', onClick: closeSheet })),
+  );
+}
+
+// "Porozmawiaj", once a day with each companion (295 A: "w Kwaterach
+// przycisk „Porozmawiaj” raz dziennie").
+const talkButton = (companion, apply) =>
+  h('button', {
+    type: 'button',
+    class: 'button button--world button--small',
+    text: 'Porozmawiaj',
+    disabled: companion.bond.talked,
+    onClick: (event) =>
+      withButton(event.currentTarget, async () => {
+        const answer = await call('POST', '/api/settlement/talk', { companionId: companion.id });
+        apply(answer);
+        talkSheet(companion, answer.talk);
+      }),
   });
 
 // The camp's Kwatery: the companions who live there, each with its card,
@@ -182,7 +226,16 @@ export function mountQuarters(holder) {
         h('h2', { class: 'section-title', text: `Towarzysze: ${hired.length} z ${places}` }),
         hired.length === 0
           ? h('p', { class: 'muted' }, 'Nikt tu jeszcze nie mieszka. Towarzyszy zwerbujesz w ', h('a', { href: '#/osada/tavern', text: 'Karczmie' }), ' w Osadzie.')
-          : hired.map((companion) => companionCard(companion, dismissButton(companion, apply), apply)),
+          : hired.map((companion) =>
+              companionCard(
+                companion,
+                [
+                  h('div', { class: 'settlement-actions' }, talkButton(companion, apply), dismissButton(companion, apply)),
+                  companion.bond.talked && h('p', { class: 'muted', text: 'Następna rozmowa jutro.' }),
+                ],
+                apply,
+              ),
+            ),
       ),
     );
   }

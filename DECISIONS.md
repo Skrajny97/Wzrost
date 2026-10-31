@@ -2996,6 +2996,27 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Odpowiedzi 286, 287, 295 i 296 (31.10.2026, na wersji testowej)
+
+Autor: „295 A / 296 A / 286 i 287 tak”.
+
+1. **Teksty Gościwita (286).** Historia i pięć powitań zostają bez zmian.
+2. **Relacja obniża ceny (287 A).** U Gościwita ceny są niższe o 2,5% przy stopniu Znajomy, o 5% przy Stałym kliencie, o 7,5% przy Zaufanym i o 10% przy Przyjacielu (`relationDiscount` w `data/settlement.json`).
+    - Ceny dalej są wyższe niż to, co płacą NPC, a część nigdy nie kosztuje mniej niż na Ladzie złomiarza przy jej pierwszym poziomie.
+    - Te same upusty ma Jagna, jak zapowiadał wpis „Zielarka sprzedaje zioła”.
+    - **Brakujący szczegół:** cena wyjściowa Jagny rośnie z 1,5 do 1,67 raza tyle, ile najwięcej płaci za zioło ktokolwiek. Dzięki temu przy Przyjacielu cena wynosi dalej 1,5 raza tyle, a mikstura z kupionych ziół nadal nie daje zysku. Przykład: Żywokost kosztuje 9 zł przy stopniu Obcy i 8 zł przy Przyjacielu.
+    - Targowisko i Chata zielarki podają, o ile relacja obniża teraz ceny.
+3. **Rozmowa z towarzyszem (295 A).** W Kwaterach każdy towarzysz ma przycisk „Porozmawiaj”, raz dziennie.
+    - Towarzysz opowiada kolejny kawałek swojej historii. Każda z 8 historii ma 5 kawałków, po jednym na stopień relacji: pierwszy od razu, a następny dopiero przy kolejnym stopniu.
+    - Gdy nowego kawałka jeszcze nie ma, towarzysz mówi coś na dziś, np. o pogodzie albo o Zbylucie.
+    - Rozmowa daje 10 punktów relacji. Opowiedziane kawałki zostają na karcie towarzysza pod „Z rozmów”.
+    - Teksty mają formy dla towarzyszki i towarzysza.
+4. **Relacja z towarzyszem (296 A).** Stopnie są jak u mieszkańców: Obcy od 0 punktów, Znajomy od 50, Stały klient od 250, Zaufany od 700 i Przyjaciel od 1400.
+    - Każdy stopień ponad Obcego daje towarzyszowi w walce +2% obrażeń i HP, czyli przy Przyjacielu +8%.
+    - Karta towarzysza pokazuje stopień, premię i punkty do następnego stopnia.
+    - **Brakujący szczegół: ile punktów.** Wspólna wyprawa daje 4 punkty za godzinę i co najmniej punkt za wyprawę, a rozmowa 10. Przy 4 godzinach wypraw dziennie i jednej rozmowie relacja dochodzi do stopnia Znajomy po 2 dniach, a do stopnia Przyjaciel po około 2 miesiącach.
+5. **Samouczek Kwater.** Pytanie 294 jest wycofane, bo doszły rozmowy. Nowa kwestia czeka na akceptację w pytaniu 298.
+
 ## Wersja 0.0.67 (31.10.2026)
 
 Autor: „Wdrażaj 0.0.67 też”.

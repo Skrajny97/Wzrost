@@ -459,14 +459,15 @@ export async function claimHunt(context) {
   });
 }
 
-// The Osada after an exploration: each companion who went gains its share
-// of the XP, and one who fell is wounded until the character rests to full
-// HP (companions.js), while a companion dismissed meanwhile is not brought
+// The Osada after an exploration of `minutes`: each companion who went
+// gains its share of the XP and the relation the time together brings (296
+// A), and one who fell is wounded until the character rests to full HP
+// (companions.js), while a companion dismissed meanwhile is not brought
 // back; an event's reputation joins the brotherhoods' (question 225); and
 // the beggar's song tells today's rumor where the Karczma has not told it
 // yet (`kept`), marked as the song's, so the mug still pays the innkeeper's
 // relation and tells the same. Null when nothing changed.
-function settlementAfterHunt(row, hunt, kept) {
+function settlementAfterHunt(row, hunt, kept, minutes) {
   const reward = hunt.event?.reward;
   const went = hunt.companions?.length > 0;
   const heard = reward?.rumor && !kept ? reward.rumor : null;
@@ -476,7 +477,7 @@ function settlementAfterHunt(row, hunt, kept) {
   if (went) {
     next.companions = (stored.companions ?? []).map((companion) => {
       const one = hunt.companions.find((member) => member.id === companion.id);
-      return one ? companionAfterHunt(companion, { xp: hunt.xp, fainted: one.fainted }, row.level, content) : companion;
+      return one ? companionAfterHunt(companion, { xp: hunt.xp, fainted: one.fainted, minutes }, row.level, content) : companion;
     });
   }
   if (reward?.reputation) {
@@ -591,7 +592,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const applied = applyHunt(character, hunt, content);
   // The companions who went gain XP, one who fell is wounded, and an
   // event's reputation and rumor are kept (settlementAfterHunt).
-  const settlementAfter = settlementAfterHunt(row, hunt, kept);
+  const settlementAfter = settlementAfterHunt(row, hunt, kept, activity.minutes);
   // The potions taken along were set aside at the start (`reserved`): what
   // was not drunk comes back to the bag. An exploration started before that
   // takes the potions drunk from the bag, where they stayed.

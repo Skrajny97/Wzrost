@@ -19,7 +19,7 @@ import { materialPrice, parseStack, stackKey } from './crafting.js';
 import { randomItem, sellPrice } from './items.js';
 import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
-import { standingOf } from './settlement.js';
+import { relationDiscount, standingOf } from './settlement.js';
 import { partPrice } from './shop.js';
 
 const DAY = 86400000;
@@ -136,11 +136,20 @@ export function merchantStock(now, content) {
   };
 }
 
+// The merchant's price of a good for a character at `points` of the
+// relation with him (287 A): the day's price less the standing's discount,
+// a part still never below the camp's counter at its first level.
+export function merchantPrice(good, points, content) {
+  const price = Math.ceil(good.price * (1 - relationDiscount(points, content)));
+  return good.kind === 'part' ? Math.max(price, partPrice(good.key, 1, content)) : price;
+}
+
 // The herbs Jagna sells at the standing of the relation with her (the
 // author: "Niech ma na początku 3 podstawowe zioła, a w miarę zwiekszania
 // znajomości coraz więcej"): the first `stock` herbs by their Zielarstwo
 // level, each `margin` above the most anyone pays for it ("Kup oczywiście
-// zawsze drożej"). `next` names the standing that adds more, with them.
+// zawsze drożej"), less the standing's discount (287 A). `next` names the
+// standing that adds more, with them.
 export function herbalistStock(points, content) {
   const { stock, margin } = content.settlement.herbalist.sell;
   const standing = standingOf(points, content);
@@ -149,7 +158,7 @@ export function herbalistStock(points, content) {
   const count = countAt(standing.index);
   const more = standing.next ? herbs.slice(count, countAt(standing.index + 1)) : [];
   return {
-    herbs: herbs.slice(0, count).map((herb) => ({ id: herb.id, price: Math.ceil(buyCeiling({ kind: 'herb', key: herb.id }, content) * margin) })),
+    herbs: herbs.slice(0, count).map((herb) => ({ id: herb.id, price: Math.ceil(buyCeiling({ kind: 'herb', key: herb.id }, content) * margin * (1 - relationDiscount(points, content))) })),
     next: more.length > 0 ? { standing: standing.next.name, herbs: more.map((herb) => herb.id) } : null,
   };
 }

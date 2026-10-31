@@ -1090,6 +1090,21 @@ function checkSettlement(data, { rarities }) {
   for (const id of Object.keys(prices)) if (!standingIds.has(id)) errors.push(`settlement.json: companions.priceByStanding ma nieznany stopień ${id}`);
   const ordered = standings.filter((standing) => standing.id in prices).map((standing) => prices[standing.id]);
   if (ordered.some((factor, index) => index > 0 && factor > ordered[index - 1])) errors.push('settlement.json: companions.priceByStanding nie może rosnąć ze stopniem');
+  // A companion's talks (295 A): a piece of each story for each standing,
+  // and the forms for a woman and a man written as [a|b].
+  const { stories, talks } = data.settlement.companions;
+  if (talks.stories.length !== stories.length) errors.push('settlement.json: companions.talks.stories musi mieć tyle historii, ile companions.stories');
+  talks.stories.forEach((pieces, index) => {
+    if (pieces.length !== standings.length) errors.push(`settlement.json: historia ${index} w companions.talks ma ${pieces.length} kawałków, a stopni jest ${standings.length}`);
+  });
+  for (const line of [...talks.stories.flat(), ...talks.chatter]) {
+    if (line.replace(/\[[^\[\]|]*\|[^\[\]|]*\]/g, '').match(/[[\]|]/)) errors.push(`settlement.json: zła forma [kobieta|mężczyzna] w „${line}”`);
+  }
+  // The residents who sell take less with each standing (287 A), never
+  // more at a higher one.
+  const discounts = data.settlement.relationDiscount;
+  if (discounts.length > standings.length) errors.push('settlement.json: relationDiscount ma więcej liczb niż stopni');
+  if (discounts.some((discount, index) => index > 0 && discount < discounts[index - 1])) errors.push('settlement.json: relationDiscount nie może maleć ze stopniem');
   // Jagna's herbs for sale: a few at first and more with each standing (the
   // author: "Niech ma na początku 3 podstawowe zioła, a w miarę zwiekszania
   // znajomości coraz więcej"), never more than there are herbs.

@@ -50,11 +50,15 @@ describe('the Chata zielarki in the engine', () => {
     assert.equal(stocks.at(-1).next, null);
   });
 
-  test('her price is always above the most anyone in the game pays for the herb', () => {
+  test('her price is always above the most anyone in the game pays for the herb, and falls with the relation (287 A)', () => {
     for (const { id, price } of herbalistStock(standings.at(-1).points, content).herbs) {
       assert.ok(price > buyCeiling({ kind: 'herb', key: id }, content), id);
       // Jagna herself at her best, with the Skup złomu at its top.
       assert.ok(price > content.herbsById[id].price * 2 * (1 + Math.max(...tuning.premium)), id);
+      const prices = standings.map((standing) => herbalistStock(standing.points, content).herbs.find((herb) => herb.id === id)?.price).filter(Boolean);
+      prices.forEach((one, index) => index > 0 && assert.ok(one <= prices[index - 1], id));
+      // A herb she has from a lower standing on costs less with a better one.
+      if (prices.length > 1) assert.ok(prices[0] > prices.at(-1), id);
     }
   });
 

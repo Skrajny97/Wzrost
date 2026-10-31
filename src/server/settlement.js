@@ -17,7 +17,9 @@ import {
   craftedFor,
   createRng,
   deliverBlock,
+  bondBonus,
   companionCombatant,
+  companionStanding,
   companionGift,
   companionSkillLevel,
   companionWearBlock,
@@ -29,6 +31,7 @@ import {
   evolvedSkills,
   herbalistPremium,
   herbalistStock,
+  relationDiscount,
   hireCost,
   imbueBlock,
   imbueCost,
@@ -54,6 +57,9 @@ import {
   spentPoints,
   standingOf,
   statResetCost,
+  talkWith,
+  talkedToday,
+  toldPieces,
   tradePoints,
   upgradedItem,
   wearOnCompanion,
@@ -317,7 +323,8 @@ function herbalistView(player, stored, now) {
   const goods = (kind, list) =>
     list.filter((good) => (held[kind][good.id] ?? 0) > 0).map((good) => ({ kind, id: good.id, name: good.name, count: held[kind][good.id], price: price(kind, good.id), scrap: scrap(kind, good.id) }));
   const day = questPeriod('daily', now, content).key;
-  const { herbs, next } = herbalistStock(stored.relations[content.settlement.herbalist.resident] ?? 0, content);
+  const points = stored.relations[content.settlement.herbalist.resident] ?? 0;
+  const { herbs, next } = herbalistStock(points, content);
   const { stack } = content.professionRules;
   const free = Math.max(0, bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player));
   const room = (count) => (count % stack === 0 ? 0 : stack - (count % stack));
@@ -333,6 +340,7 @@ function herbalistView(player, stored, now) {
         return { kind: 'herb', key: id, name: herb.name, description: herb.description, scrap: herb.price, gatherLevel: herb.level, price: cost, fits: free * stack + room(held.herb[id] ?? 0) };
       }),
       next: next && { standing: next.standing, herbs: next.herbs.map((id) => content.herbsById[id].name) },
+      discount: relationDiscount(points, content),
     },
   };
 }
@@ -524,8 +532,24 @@ function companionsView(player, stored, now) {
       ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
       gift: giftOf(companion, row, now),
       wearable: bag.filter((item) => !companionWearBlock(companion, item, content)).map((item) => item.id),
+      bond: bondView(companion, now),
     })),
     candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content, points) })),
+  };
+}
+
+// The relation with a hired companion (296 A) and its talks (295 A): its
+// standing and the next, its bonus in a fight, the pieces of its story it
+// has told, and whether it was talked to today.
+function bondView(companion, now) {
+  const standing = companionStanding(companion, content);
+  return {
+    standing: standing.name,
+    points: standing.points,
+    next: standing.next && { name: standing.next.name, points: standing.next.points },
+    bonus: bondBonus(companion, content),
+    told: toldPieces(companion, content),
+    talked: talkedToday(companion, now, content),
   };
 }
 
@@ -804,6 +828,33 @@ export async function takeCompanionGift(context) {
     gift: { name: gift.name, count: gift.count },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
+  });
+}
+
+// { companionId }: a talk with a companion in the Kwatery, once a day (295
+// A): it tells the next piece of its story once the relation has reached
+// it, else a word of the day, and the relation grows (296 A).
+export async function talkWithCompanion(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const hired = stored.companions ?? [];
+  const companion = hired.find((one) => one.id === body.companionId);
+  if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
+  if (talkedToday(companion, context.now, content)) throw new ApiError(409, 'talked', 'Na dziś wystarczy. Porozmawiacie jutro.');
+  const { talk, companion: after } = talkWith(companion, { seed: `${row.id}:settlement`, now: context.now }, content);
+  const next = { ...stored, companions: hired.map((one) => (one === companion ? after : one)) };
+  const result = await context.env.DB.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
+    .bind(JSON.stringify(next), row.id, row.version)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  const loaded = await loadPlayer(context.env.DB, session.userId);
+  return json({
+    talk,
+    settlement: settlementView(loaded, next, settlementBoard(loaded.row, next, context.now), context.now),
+    character: characterView(loaded, context.now),
   });
 }
 

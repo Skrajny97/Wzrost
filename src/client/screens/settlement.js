@@ -603,7 +603,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       h('h2', { class: 'section-title', text: 'Zioła Jagny' }),
       h('p', {
         class: 'muted',
-        text: `Jagna sprzedaje zioła drożej, niż je skupuje. Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.`,
+        text: `Jagna sprzedaje zioła drożej, niż je skupuje. ${shop.discount > 0 ? `Dzięki relacji z nią ceny są niższe o ${formatDecimal(shop.discount * 100)}%.` : 'Z lepszą relacją ceny będą niższe.'} Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.`,
       }),
       shop.goods.some((good) => good.fits < 1) && h('p', { class: 'region-warning', text: 'Plecak jest pełny. Zrób w nim miejsce, żeby kupić więcej ziół.' }),
       h(

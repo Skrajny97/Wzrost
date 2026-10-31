@@ -463,6 +463,14 @@ export function herbalistPremium(points, content) {
   return premium[Math.min(standingOf(points, content).index, premium.length - 1)];
 }
 
+// What a resident who sells takes off the price at `points` of the
+// relation with them (287 A: "Znajomy płaci 2,5% mniej, Stały klient 5%,
+// Zaufany 7,5%, a Przyjaciel 10%"): Gościwit on the Targowisko and Jagna.
+export function relationDiscount(points, content) {
+  const discounts = content.settlement.relationDiscount;
+  return discounts[Math.min(standingOf(points, content).index, discounts.length - 1)];
+}
+
 // The reputation trade gives (120 A: the limit is on the reputation only):
 // a point for every goldPerPointPerLevel gold times the character's level,
 // at most `daily` a day. `stored` is the day's count so far ({ day, points

@@ -11,6 +11,7 @@ import {
   createRng,
   itemBuyCeiling,
   listBlock,
+  merchantPrice,
   merchantStock,
   minimumBid,
   offerLimit,
@@ -101,6 +102,20 @@ describe('the Targowisko in the engine', () => {
     for (let day = 0; day < 60; day += 1) {
       for (const good of merchantStock(NOW + day * DAY, content).goods) {
         assert.ok(good.price > buyCeiling(good, content), `${good.kind} ${good.key} on day ${day}: ${good.price} ≤ ${buyCeiling(good, content)}`);
+      }
+    }
+    // Nor with the relation's discount (287 A): his prices fall with each
+    // standing, and stay above every buy price.
+    const { standings } = content.settlement;
+    for (let day = 0; day < 20; day += 1) {
+      for (const good of merchantStock(NOW + day * DAY, content).goods) {
+        const prices = standings.map((standing) => merchantPrice(good, standing.points, content));
+        assert.equal(prices[0], good.price);
+        prices.forEach((price, index) => {
+          if (index > 0) assert.ok(price <= prices[index - 1]);
+          assert.ok(price > buyCeiling(good, content), `${good.kind} ${good.key} at ${standings[index].id}: ${price}`);
+        });
+        if (good.kind !== 'part') assert.equal(prices.at(-1), Math.ceil(good.price * (1 - content.settlement.relationDiscount.at(-1))));
       }
     }
     // The ceiling is at least the scrapper's price with the top Skup złomu,
@@ -360,6 +375,22 @@ describe('the Targowisko through the API', () => {
     assert.equal(settlement.places.find((place) => place.id === 'market').resident, 'merchant');
     const merchant = settlement.residents.find((resident) => resident.id === 'merchant');
     assert.deepEqual([merchant.name, merchant.title, merchant.greeting], ['Gościwit', 'kupiec', content.settlement.residents.find((one) => one.id === 'merchant').greetings[0]]);
+  });
+
+  test('a better relation with Gościwit lowers his prices, and he charges what he shows (287 A)', async () => {
+    const friend = content.settlement.standings.at(-1).points;
+    await (await db()).prepare("UPDATE characters SET settlement = json_set(settlement, '$.relations.merchant', ?) WHERE name = 'Kupiec'").bind(friend).run();
+    const view = await market('Kupiec');
+    assert.equal(view.merchant.discount, content.settlement.relationDiscount.at(-1));
+    const stock = merchantStock(Date.now(), content);
+    const good = view.merchant.goods.find((one) => one.kind === 'herb');
+    const base = stock.goods.find((one) => one.id === good.id);
+    assert.equal(good.price, merchantPrice(base, friend, content));
+    assert.ok(good.price < base.price);
+    assert.equal((await market('Druga')).merchant.goods.find((one) => one.id === good.id).price, base.price);
+    const bought = await act('Kupiec', 'resident', { from: 'merchant', id: good.id, count: 2 });
+    assert.equal(bought.status, 200, JSON.stringify(bought.data));
+    assert.equal(bought.data.character.gold, 100000 - good.price * 2);
   });
 
   test('on the test version the wandering trader comes today and a trial trader puts up offers that pay no one', async () => {

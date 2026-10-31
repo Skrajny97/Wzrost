@@ -405,6 +405,11 @@ export function mountMarket(holder) {
         { class: 'stack' },
         h('h2', { class: 'section-title', text: 'Kupiec' }),
         h('p', { class: 'muted' }, 'Towar i ceny zmieniają się codziennie. Nowe za ', clock(merchant.endsAt), '.'),
+        // The relation with him lowers his prices (287 A).
+        h('p', {
+          class: 'muted',
+          text: merchant.discount > 0 ? `Dzięki relacji z Gościwitem ceny są niższe o ${formatDecimal(merchant.discount * 100)}%.` : 'Z lepszą relacją z Gościwitem ceny będą niższe.',
+        }),
         h(
           'ul',
           { class: 'stack market-list' },

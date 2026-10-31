@@ -9360,6 +9360,28 @@ a.profession-square:active {
   line-height: 1;
 }
 
+/* A companion's words in a talk, and what it told before, folded. */
+.settlement-talk {
+  font-style: italic;
+}
+
+.settlement-companion-bond {
+  display: grid;
+  gap: 4px;
+}
+
+.settlement-companion-bond p,
+.settlement-companion-talks ul {
+  margin: 0;
+}
+
+.settlement-companion-talks ul {
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  font-style: italic;
+}
+
 /* Jagna's herbs for sale, one to a row: the herb with its price, opening
    its card under a tap, and "Kup" beside it. */
 .herbalist-good {

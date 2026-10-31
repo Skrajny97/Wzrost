@@ -114,12 +114,62 @@ export function traitBonuses(companion, content) {
   return total;
 }
 
-// The companion in a fight: a character of its class with its gear, and
-// its traits on top. `hp` its HP now (full when not given).
+// The standing of the relation with a companion (296 A: "stopnie są jak u
+// mieszkańców (od Obcego do Przyjaciela)"): its index and name, the points
+// and the next standing.
+export function companionStanding(companion, content) {
+  const { standings } = content.settlement;
+  const points = companion.relation ?? 0;
+  const index = Math.max(0, standings.findLastIndex((standing) => standing.points <= points));
+  return { index, name: standings[index].name, points, next: standings[index + 1] ?? null };
+}
+
+// What the relation gives in a fight (296 A: "każdy stopień daje mu w walce
+// +2% obrażeń i HP"): `bonus` for each standing above the first.
+export const bondBonus = (companion, content) => companionStanding(companion, content).index * tuning(content).relation.bonus;
+
+// The relation an exploration of `minutes` together brings (296 A: "rośnie
+// z każdą wspólną wyprawą"): perHour points an hour, at least one.
+export const bondPoints = (minutes, content) => Math.max(1, Math.floor((minutes * tuning(content).relation.perHour) / 60));
+
+// A text in the form for a woman or a man: "[a|b]" is a for her, b for him.
+export const gendered = (text, appearance) => text.replace(/\[([^[\]|]*)\|([^[\]|]*)\]/g, (_, female, male) => (appearance === 'female' ? female : male));
+
+// The pieces of its story a companion has told in talks (295 A).
+export function toldPieces(companion, content) {
+  const { talks } = tuning(content);
+  return talks.stories[companion.story % talks.stories.length].slice(0, companion.told ?? 0).map((piece) => gendered(piece, companion.appearance));
+}
+
+// Whether the character has talked with the companion today.
+export const talkedToday = (companion, now, content) => companion.talkedOn === questPeriod('daily', now, content).key;
+
+// A talk with a companion, once a day (295 A: "towarzysz opowiada kawałek
+// swojej historii, kolejne kawałki odsłaniają się z relacją, a rozmowa ją
+// podnosi"): the next piece of its story once the relation has reached
+// that piece's standing, else a word of chatter picked by the day; and the
+// companion after it, `talk` points closer.
+export function talkWith(companion, { seed, now }, content) {
+  const t = tuning(content);
+  const day = questPeriod('daily', now, content).key;
+  const pieces = t.talks.stories[companion.story % t.talks.stories.length];
+  const told = companion.told ?? 0;
+  const story = told < pieces.length && told <= companionStanding(companion, content).index;
+  const text = story ? pieces[told] : createRng(`${seed}:talk:${companion.id}:${day}`).pick(t.talks.chatter);
+  return {
+    talk: { text: gendered(text, companion.appearance), story, points: t.relation.talk },
+    companion: { ...companion, relation: (companion.relation ?? 0) + t.relation.talk, ...(story && { told: told + 1 }), talkedOn: day },
+  };
+}
+
+// The companion in a fight: a character of its class with its gear, its
+// traits on top, and the relation's bonus (296 A). `hp` its HP now (full
+// when not given).
 export function companionCombatant(companion, { hp, area, id = 'a1' } = {}, content) {
   const unit = playerCombatant({ character: companionCharacter(companion, content), equipped: companion.gear, hp, name: companion.name, area, id }, content);
   const bonus = traitBonuses(companion, content);
-  const maxHp = Math.max(1, Math.round(unit.maxHp * (1 + (bonus.hp ?? 0))));
+  const bond = bondBonus(companion, content);
+  const maxHp = Math.max(1, Math.round(unit.maxHp * (1 + (bonus.hp ?? 0) + bond)));
   return {
     ...unit,
     isPlayer: false,
@@ -127,7 +177,7 @@ export function companionCombatant(companion, { hp, area, id = 'a1' } = {}, cont
     maxHp,
     hp: Math.min(hp ?? maxHp, maxHp),
     armor: Math.round(unit.armor * (1 + (bonus.armor ?? 0))),
-    ...(bonus.damage && { damageBonus: bonus.damage }),
+    ...((bonus.damage || bond) && { damageBonus: (bonus.damage ?? 0) + bond }),
     dodgeRating: unit.dodgeRating * (1 + (bonus.dodge ?? 0)),
     critRating: unit.critRating * (1 + (bonus.crit ?? 0)),
     willRating: unit.willRating * (1 + (bonus.will ?? 0)),
@@ -143,11 +193,13 @@ export function companionXp(companion, xp, characterLevel, content) {
   return Math.round(xp * t.xpShare * (1 + t.catchUp * Math.max(0, characterLevel - companion.level)));
 }
 
-// The companion after an exploration: its XP and levels, and wounded when
-// it fainted, until the character rests to full HP (companionReady).
-export function companionAfterHunt(companion, { xp, fainted }, characterLevel, content) {
+// The companion after an exploration of `minutes`: its XP and levels, the
+// relation the time together brings (296 A), and wounded when it fainted,
+// until the character rests to full HP (companionReady).
+export function companionAfterHunt(companion, { xp, fainted, minutes }, characterLevel, content) {
   const next = gainXp(companion.level, companion.xp ?? 0, companionXp(companion, xp, characterLevel, content), (level) => xpToNext(level, content), content.balance.progression.maxLevel);
-  const { woundedUntil: _, ...after } = { ...companion, level: next.level, xp: next.xp };
+  const relation = minutes ? { relation: (companion.relation ?? 0) + bondPoints(minutes, content) } : {};
+  const { woundedUntil: _, ...after } = { ...companion, level: next.level, xp: next.xp, ...relation };
   return fainted ? { ...after, wounded: true } : after;
 }
 
