@@ -2996,6 +2996,14 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Karta przedmiotu z wymiany podaje jeden poziom (31.10.2026, na wersji testowej)
+
+Autor o karcie broni „Puchaczowa Bradatka Muflona +2” (na zrzucie „poz. 36” i „Od poziomu klasy 25”): „to od poziomu klasy 25 czy 36? jakiś błąd totalny.”
+
+1. **Błąd.** Linia „Od poziomu klasy” na karcie podawała tylko wymóg samej broni (Bradatka: 25). Przedmiot z Wymiany, Targowiska albo Skrzyni Konta zakłada się jednak dopiero od poziomu klasy równego poziomowi przedmiotu (tu 36), zgodnie z zasadą z wersji 0.0.67. Jej punkt 3 mówi, że karta podaje wtedy wyższą liczbę, a ta linia tego nie robiła.
+2. **Poprawka.** Karta takiego przedmiotu podaje w linii „Od poziomu klasy” wyższą z dwóch liczb, tak samo jak ostrzeżenie pod nią. Lista w Skrzyni Konta też podaje wyższą liczbę, również wtedy, gdy wyższy jest wymóg samej broni.
+3. **Własny łup bez zmian.** Przedmiot zdobyty samemu zakłada się od wymogu samej broni (Bradatka od poziomu klasy 25), choćby miał wyższy poziom.
+
 ## Zlecenia na dowolne materiały (31.10.2026, na wersji testowej)
 
 Autor o zleceniu tygodnia „32 × Skóra lisa” na 28. poziomie postaci: „Takie zlecenie tygodnia na 28 poziomie jest bez sensu. I w ogóle bez sensu takie duże, skoro tak trudno te materiały trafić.”, „Powinno być prędzej oddaj 32 materiały pospolite/ileś rzadkich/unikalnych.” oraz „Te zlecenie powinny być losowane dla danej postaci na dany poziom, powinno ich być albo dużo albo ogólne (raczej ogólne).”

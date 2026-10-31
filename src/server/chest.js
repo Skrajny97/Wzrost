@@ -28,14 +28,17 @@ async function chestView(db, player) {
     items: rows.results.map((row) => {
       const item = JSON.parse(row.data);
       const own = row.character_id === player.row.id;
+      // Another character's item comes out as the Skrzynia Konta's (take),
+      // worn from its own level and its base's, whichever is higher.
+      const view = itemView(own ? item : { ...item, chest: 1 }, content);
       return {
-        ...itemView(item, content),
+        ...view,
         id: row.id,
         from: row.name ?? null,
         own,
         // Its class can wear it, and from which level of the class.
         usable: canUse(item.base, player.row.class_id, content),
-        wornFrom: own && !item.traded && !item.chest ? null : item.level,
+        wornFrom: view.classLevel,
       };
     }),
   };

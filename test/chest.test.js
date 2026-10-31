@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { ownDiscoveries } from '../src/engine/index.js';
+import { createRng, generateItem, ownDiscoveries } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -74,6 +74,15 @@ describe('Skrzynia Konta', () => {
     assert.equal(worn.data.error.message, 'Przedmiot ze Skrzyni Konta założysz od poziomu klasy 30.');
     assert.equal((await discovered('Druga'))['item:amulet'], undefined);
     assert.equal((await discovered('Mira'))['item:amulet'], 1);
+  });
+
+  test('another character\'s item is worn from its level or its base\'s class level, whichever is higher', async () => {
+    await create('Mira');
+    const stone = generateItem({ baseId: 'holed-stone', level: 5 }, createRng('stone'), content);
+    assert.equal((await put(await inBag('Mira', stone))).status, 200);
+    await create('Druga');
+    const [seen] = (await chest()).items;
+    assert.deepEqual([seen.wornFrom, seen.classLevel], [10, 10]);
   });
 
   test('the character that put an item in takes it back as it was', async () => {

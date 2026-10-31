@@ -381,7 +381,11 @@ export function autoEquip(equipped, items, content, classId, classLevel) {
 export function itemView(item, content, { sellBonus = 0, upgradeCap } = {}) {
   const rarity = content.raritiesById[item.rarity];
   const classIds = baseClasses(item.base, content);
-  const classLevel = baseClassLevel(item.base, content);
+  // An item from a Wymiana, the Targowisko or the Skrzynia Konta waits also
+  // for the class to reach its own level (src/server/inventory.js), so its
+  // card gives the higher of the two (the author: "to od poziomu klasy 25
+  // czy 36?").
+  const classLevel = item.traded || item.chest ? Math.max(baseClassLevel(item.base, content), item.level) : baseClassLevel(item.base, content);
   return {
     name: itemName(item, content),
     base: item.base,
@@ -397,7 +401,7 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap } = {}) {
     // null: any class can use it.
     classIds,
     classNames: classIds && classIds.map((id) => content.classesById[id].name),
-    // The class level it asks for, or null when it asks for none.
+    // The class level it is worn from, or null when it asks for none.
     classLevel: classLevel > 1 ? classLevel : null,
     price: sellPrice(item, content, sellBonus),
     // Got in a Wymiana, or from another character through the Skrzynia
