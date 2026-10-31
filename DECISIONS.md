@@ -2996,6 +2996,26 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.67 (31.10.2026)
+
+Autor: „Wdrażaj 0.0.67 też”.
+
+1. **Co wchodzi do gry:**
+    - poprawka „Klasa czeka” w Statystykach (zob. „Uwagi autora z 31.10, po odpowiedziach 278–284”);
+    - trzy zdarzenia z dalszym wyborem: Zagubiona dziewczynka, Wesele w borze i Poszukiwacz skarbów (zob. „Zdarzenia z dalszym wyborem” i „Odpowiedzi 278–284”);
+    - przedmiot z wymiany albo ze Skrzyni Konta zakłada się od poziomu klasy (zob. „Przedmiot z wymiany od poziomu klasy”).
+2. **Co zostaje ukryte:** Osada (bez `SETTLEMENT`), a z nią Targowisko z Gościwitem, sprzedaż ziół u Jagny, towarzysze w Kwaterach i samouczek miejsc Osady.
+3. **Migracje bazy:** 0061 (Targowisko: tabele ofert i paczek; w grze stoją puste, bo Osada jest ukryta).
+
+## Przedmiot z wymiany od poziomu klasy (31.10.2026, w grze od 0.0.67)
+
+Autor: „Mialo byc od poziomu klasy.” Na zrzucie: „Ten przedmiot z wymiany założysz od poziomu postaci 36.”
+
+1. **Zasada.** Przedmiot z Wymiany albo ze Skrzyni Konta (od innej postaci) zakłada się, gdy poziom klasy dojdzie do poziomu przedmiotu. Poziom postaci się już nie liczy. Komunikat brzmi: „Przedmiot z wymiany założysz od poziomu klasy 36.” Ta zasada zastępuje „od poziomu postaci” z wpisu o Wymianie i ze Skrzyni Konta.
+2. **Targowisko** liczy tak samo (241: „jak Wymiana”).
+3. **Dwa wymagania naraz.** Gdy przedmiot ma też własny wymagany poziom klasy, a ten jest wyższy, karta przedmiotu i oferty podają wyższą liczbę.
+4. **Towarzysz bez zmian.** Jego poziom jest zarazem poziomem klasy.
+
 ## Zielarka sprzedaje zioła (31.10.2026, na wersji testowej)
 
 Autor: „Zielarce trzeba dać też taką funkcję żeby to ona zioła sprzedawała, więc trzeba zacząć u niej od zakładki Kup/Sprzedaj / Kup oczywiście zawsze drożej. / Niech ma na początku 3 podstawowe zioła, a w miarę zwiekszania znajomości coraz więcej.”
