@@ -36,11 +36,13 @@ import {
   itemView,
   materialView,
   mugCost,
+  orderGold,
   parseStack,
   pathResetCost,
   potionPrice,
   propertyName,
   questPeriod,
+  regenPerMinute,
   reforgeBlock,
   reforgeChoices,
   reforgeCost,
@@ -61,6 +63,7 @@ import { content } from './content.js';
 import {
   bagPlaces,
   characterView,
+  currentHp,
   engineCharacter,
   loadPlayer,
   questsNow,
@@ -160,8 +163,13 @@ function goodLabel({ kind, key }) {
   return content.partsById[key].name;
 }
 
-const orderView = (order, stocks) => ({
+// The orders pay at least overScrap times the scrapper's price with the
+// camp's Skup bonus (orderGold, question 236 A).
+const sellBonusOf = (player, now) => campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
+
+const orderView = (order, stocks, sellBonus) => ({
   ...order,
+  gold: orderGold(order, sellBonus, content),
   label: goodLabel(order),
   brotherhoodName: content.settlement.brotherhoods.find((one) => one.id === order.brotherhood).name,
   have: stocks[COLUMNS[order.kind]]?.[order.key] ?? 0,
@@ -174,6 +182,7 @@ const orderView = (order, stocks) => ({
 // the orders on the board, each with what the character holds of it.
 export function settlementView(player, stored, board, now) {
   const stocks = settlementGoods(player.row, player.items);
+  const sellBonus = sellBonusOf(player, now);
   const { name, description, places, torches = [], residents, brotherhoods } = content.settlement;
   return {
     name,
@@ -186,8 +195,8 @@ export function settlementView(player, stored, board, now) {
     }),
     brotherhoods: brotherhoods.map((brotherhood) => ({ ...brotherhood, standing: standingOf(stored.reputation[brotherhood.id] ?? 0, content) })),
     board: {
-      slots: board.slots.map((slot) => (slot.order ? { order: orderView(slot.order, stocks) } : { readyAt: slot.readyAt })),
-      weekly: board.weekly?.order && !board.weekly.done ? orderView({ ...board.weekly.order, id: 'weekly' }, stocks) : null,
+      slots: board.slots.map((slot) => (slot.order ? { order: orderView(slot.order, stocks, sellBonus) } : { readyAt: slot.readyAt })),
+      weekly: board.weekly?.order && !board.weekly.done ? orderView({ ...board.weekly.order, id: 'weekly' }, stocks, sellBonus) : null,
       weeklyDone: board.weekly?.done ?? false,
     },
     reforge: {
@@ -341,20 +350,14 @@ export async function sellToHerbalist(context) {
   });
 }
 
-// The Karczma: the mug's price and today's rumor once told (its words, the
-// place and whether an exploration there has used it).
+// The Karczma: the mug's price and today's rumor once told.
 function tavernView(row, stored, now) {
   const rumor = rumorToday(stored.rumor, now, content);
   return {
     mug: mugCost(row.level, content),
-    factor: content.settlement.tavern.rumor.factor,
-    rumor: rumor && {
-      text: rumorText(rumor, content),
-      areaId: rumor.areaId,
-      area: content.areasById[rumor.areaId].name,
-      monster: content.monstersById[rumor.monsterId].name,
-      used: rumor.used,
-    },
+    // The innkeeper's words only: the place and what it means are the
+    // player's to work out.
+    rumor: rumor && { text: rumorText(rumor, content) },
   };
 }
 
@@ -362,7 +365,7 @@ function tavernView(row, stored, now) {
 // class and level, its numbers in a fight, its traits in its own form, its
 // skills at its level, the gear it wears, its profession and story, and
 // how long it is still wounded.
-function companionView(companion, now) {
+function companionView(companion) {
   const unit = companionCombatant(companion, {}, content);
   const female = companion.appearance === 'female';
   const { traits, professions, stories } = content.settlement.companions;
@@ -391,8 +394,17 @@ function companionView(companion, now) {
     }),
     profession: professions.find((one) => one.id === companion.profession)?.name ?? null,
     story: stories[companion.story % stories.length],
-    woundedUntil: companion.woundedUntil > now ? companion.woundedUntil : null,
   };
+}
+
+// When the character will have rested to full HP, the moment its wounded
+// companions heal (companions.js): now when it is full, null while it is
+// away, as it rests only at home.
+function restedAt(player, now) {
+  if (player.activity) return null;
+  const { hp, maxHp, vitality, rest } = currentHp(player, now);
+  if (hp >= maxHp) return now;
+  return Math.ceil(now + ((maxHp - hp) / regenPerMinute(maxHp, vitality, content, rest.change?.bonus ?? rest.bonus)) * 60000);
 }
 
 // The character as an order and a companion's gift see it: what it knows.
@@ -414,6 +426,7 @@ function companionsView(player, stored, now) {
   const { row } = player;
   const { standings } = content.settlement;
   const bag = player.items.filter((item) => !item.equippedSlot);
+  const rested = (stored.companions ?? []).some((companion) => companion.wounded) ? restedAt(player, now) : now;
   const places = companionPlaces(stored.relations[content.settlement.tavern.resident] ?? 0, content);
   const hired = stored.companions ?? [];
   const nextId = content.settlement.companions.from[places];
@@ -426,11 +439,13 @@ function companionsView(player, stored, now) {
     next: nextId ? standings.find((standing) => standing.id === nextId).name : null,
     // Each with this week's gift and the items in the bag it can wear.
     hired: hired.map((companion) => ({
-      ...companionView(companion, now),
+      ...companionView(companion),
+      // Wounded until the character rests to full HP, and when that is.
+      ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
       gift: giftOf(companion, row, now),
       wearable: bag.filter((item) => !companionWearBlock(companion, item, content)).map((item) => item.id),
     })),
-    candidates: candidates.map((candidate) => ({ ...companionView(candidate, now), price: hireCost(candidate, content) })),
+    candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content) })),
   };
 }
 
@@ -499,7 +514,7 @@ export async function deliverSettlementOrder(context) {
   const board = settlementBoard(row, stored, context.now);
   const block = deliverBlock(board, body.orderId, settlementGoods(row, player.items));
   if (block) throw new ApiError(block.code === 'no_order' ? 404 : 409, block.code, block.message);
-  const done = deliverOrder(board, body.orderId, context.now, content);
+  const done = deliverOrder(board, body.orderId, context.now, content, sellBonusOf(player, context.now));
   // The potions taken along leave the bag only when the report is claimed,
   // so herbs and potions wait for the character at home, as at the Skup.
   if (BAG_GOODS.has(done.take.kind)) requireIdle(player, context.now);

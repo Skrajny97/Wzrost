@@ -17,7 +17,6 @@ import { leaveView, openView } from '../history.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
-import { skipControl } from '../time.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { itemSummary } from './character.js';
 
@@ -471,13 +470,16 @@ export function mountSettlement(container, { params = {} } = {}) {
 
   // The Karczma (question 116): a mug and, with it, today's rumor of an
   // elite or a champion; one a day.
+  // The rumor is the innkeeper's words alone: what it means, the player
+  // finds out (the author: "nie informuj z pozycji Systemu co oznacza
+  // plotka, zeby gracz sie domyślił").
   function tavernCard() {
-    const { mug, factor, rumor } = data.tavern;
+    const { mug, rumor } = data.tavern;
     if (!rumor) {
       return h(
         'div',
         { class: 'settlement-choice' },
-        h('p', { class: 'muted', text: `Za kufel Zbylut zdradzi, gdzie dziś krąży elita albo czempion. Najbliższa wyprawa tam spotka ich ${factor} razy częściej.` }),
+        h('p', { class: 'muted', text: 'Za kufel Zbylut chętnie podzieli się plotką z traktu.' }),
         h('button', {
           type: 'button',
           class: 'button button--world',
@@ -494,12 +496,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       'div',
       { class: 'settlement-choice' },
       h('p', { class: 'settlement-greeting', text: rumor.text }),
-      h('p', {
-        class: 'muted',
-        text: rumor.used
-          ? `Wyprawa już poszła tym tropem (${rumor.area}). Następna plotka jutro.`
-          : `Plotka ważna do północy. Miejsce: ${rumor.area}. Najbliższa wyprawa tam spotka elitę i czempiona ${factor} razy częściej.`,
-      }),
+      h('p', { class: 'muted', text: 'Następną plotkę Zbylut usłyszy jutro.' }),
     );
   }
 
@@ -565,7 +562,13 @@ export function mountSettlement(container, { params = {} } = {}) {
       items.length === 0
         ? h('p', { class: 'sheet-text', text: 'W plecaku nie ma nic, co ten towarzysz może założyć: broni ani pancerza swojej klasy na swój poziom, ani talizmanu.' })
         : [
-            h('p', { class: 'sheet-text', text: 'Wybierz przedmiot. To, co towarzysz nosił w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co z niego dostał.' }),
+            h('p', {
+              class: 'sheet-text',
+              text:
+                companion.appearance === 'female'
+                  ? 'Wybierz przedmiot. To, co towarzyszka nosiła w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostała.'
+                  : 'Wybierz przedmiot. To, co towarzysz nosił w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostał.',
+            }),
             h(
               'ul',
               { class: 'item-list' },
@@ -576,7 +579,11 @@ export function mountSettlement(container, { params = {} } = {}) {
   }
 
   function companionCard(companion, action) {
-    const wounded = companion.woundedUntil && companion.woundedUntil > serverNow();
+    // Its wounds heal with the character's rest (the author: "Niech rany
+    // towarzyszy goją się wraz z ranami postaci").
+    const wounded = companion.wounded
+      ? `${companion.appearance === 'female' ? 'Ranna' : 'Ranny'}. Wróci do sił, gdy postać ${companion.healsAt ? `odpocznie do pełna HP (jeszcze ${formatCountdown(companion.healsAt - serverNow())})` : 'po wyprawie odpocznie do pełna HP'}.`
+      : null;
     return h(
       'article',
       { class: 'card settlement-companion' },
@@ -592,11 +599,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       ),
       companion.wear && wearList(companion),
       companion.gift && giftRow(companion),
-      wounded && h('p', { class: 'region-warning', text: `Odpoczywa po ranach jeszcze ${formatCountdown(companion.woundedUntil - serverNow())} i nie pójdzie na wyprawę.` }),
-      // Punkty Czasu shorten the wounds as they shorten the character's rest
-      // (question 113 A).
-      wounded &&
-        skipControl('wounds', (now) => companion.woundedUntil - now, `Odpoczynek po ranach (${companion.name})`, { body: { companionId: companion.id }, after: load }).element,
+      wounded && h('p', { class: 'region-warning', text: wounded }),
       action,
     );
   }
@@ -615,7 +618,8 @@ export function mountSettlement(container, { params = {} } = {}) {
         onClick: async (event) => {
           const button = event.currentTarget;
           const given = companion.wear.some((place) => place.item?.given);
-          const text = `${companion.name} odejdzie na dobre${given ? ' i odda przedmioty z twojego plecaka' : ''}.`;
+          const got = companion.appearance === 'female' ? 'dostała' : 'dostał';
+          const text = `${companion.name} odejdzie na dobre${given ? ` i odda wszystko, co od Ciebie ${got}` : ''}.`;
           if (!(await confirmAction({ title: `Odprawić: ${companion.name}?`, text, confirmLabel: 'Odpraw' }))) return;
           withButton(button, async () => apply(await call('POST', '/api/settlement/dismiss', { companionId: companion.id })));
         },
@@ -634,7 +638,10 @@ export function mountSettlement(container, { params = {} } = {}) {
       h('h2', { class: 'section-title', text: 'Towarzysze' }),
       places === 0
         ? h('p', { class: 'muted', text: `Zbylut poleci ci kogoś od stopnia ${next} w relacji z nim.` })
-        : h('p', { class: 'muted', text: `Towarzysze idą z tobą na każdą wyprawę poza Szybkim Polowaniem i rosną razem z tobą. Miejsca: ${hired.length} z ${places}.${next ? ` Kolejne od stopnia ${next}.` : ''}` }),
+        : h('p', {
+            class: 'muted',
+            text: `Towarzysze idą z tobą na każdą wyprawę poza Szybkim Polowaniem i rosną razem z tobą. Werbunek to jednorazowa opłata, bez żołdu. Miejsca: ${hired.length} z ${places}.${next ? ` Kolejne od stopnia ${next}.` : ''}`,
+          }),
       hired.map((companion) => companionCard(companion, dismiss(companion))),
       h('h2', { class: 'section-title', text: 'Szukają pracy w tym tygodniu' }),
       candidates.length === 0
@@ -847,8 +854,8 @@ export function mountSettlement(container, { params = {} } = {}) {
     if (place) placeView(place);
     else boardView();
     // An empty slot fills when its time comes, and a wounded companion is
-    // ready again when its wounds end.
-    const wounds = (data.companions?.hired ?? []).map((companion) => companion.woundedUntil).filter((at) => at > serverNow());
+    // ready again when the character has rested to full HP.
+    const wounds = (data.companions?.hired ?? []).map((companion) => companion.healsAt).filter((at) => at > serverNow());
     const next = Math.min(...data.board.slots.filter((slot) => slot.readyAt).map((slot) => slot.readyAt), ...wounds);
     if (Number.isFinite(next)) timer = setTimeout(load, Math.max(1000, next - serverNow() + 1000));
   }

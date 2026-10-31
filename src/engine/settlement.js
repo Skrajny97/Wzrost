@@ -263,7 +263,16 @@ export function deliverBlock(board, orderId, stocks) {
 // systemPoints.every delivered order and for the week's, Punkty Systemu,
 // question 91 A) and the board after, whose slot waits refillMinutes for the
 // next order (question 88 A).
-export function deliverOrder(board, orderId, now, content) {
+// What an order pays now: its own gold, and for herbs, potions and
+// materials at least overScrap times what the scrapper pays the character
+// for them, with the camp's Skup bonus (`sellBonus`, question 236 A).
+export function orderGold(order, sellBonus, content) {
+  if (!['herb', 'potion', 'material'].includes(order.kind)) return order.gold;
+  const scrap = goodPrice(order, content) * (1 + sellBonus) * order.count;
+  return Math.max(order.gold, Math.ceil(scrap * content.settlement.orders.overScrap));
+}
+
+export function deliverOrder(board, orderId, now, content, sellBonus = 0) {
   const { orders } = content.settlement;
   const order = findOrder(board, orderId);
   const weekly = orderId === 'weekly';
@@ -279,7 +288,7 @@ export function deliverOrder(board, orderId, now, content) {
       weekly: weekly ? { ...board.weekly, done: true } : board.weekly,
     },
     take: { kind: order.kind, key: order.key, count: order.count },
-    gold: order.gold,
+    gold: orderGold(order, sellBonus, content),
     reputation: { [order.brotherhood]: order.reputation },
     relation: { [orders.resident]: orders.relationGain },
     systemPoints,

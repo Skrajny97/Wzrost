@@ -820,12 +820,6 @@ export function mountCombat(container, { params, navigate }) {
         h('p', { class: 'region-description', text: area.description }),
         area.dangers?.length > 0 && bestiaryRow(area),
         levelNote,
-        // Today's rumor from the Karczma about this place (the Osada).
-        character.rumor?.areaId === area.id &&
-          h('p', {
-            class: 'system-hint',
-            text: `Plotka z Karczmy: krąży tu ${character.rumor.monster}. Najbliższa wyprawa tutaj spotka elitę i czempiona ${character.rumor.factor} razy częściej (nie Szybkie Polowanie i nie przy omijaniu elit).`,
-          }),
         // The bonuses that will work on this exploration, before it is set
         // up (the author: "powinny byc bonusy przed wyprawą napisane").
         bonusList(character),

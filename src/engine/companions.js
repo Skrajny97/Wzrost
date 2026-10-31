@@ -6,16 +6,16 @@
 // points of its level spread by its class, its skills growing with its
 // level, the gear it came with and its traits, and gains XP with the
 // character, faster while it is below it. Without wages (question 110).
-// Fainted in a fight, it is wounded for as long as the character would
-// rest from nothing (question 113).
+// Fainted in a fight, it is wounded until the character has rested to full
+// HP (the author: "Niech rany towarzyszy goją się wraz z ranami postaci").
 //
 // Stored in the Osada: { id, name, appearance, classId, level, xp, traits,
-// skills, profession, story, gear: [items], woundedUntil, giftWeek }. An
+// skills, profession, story, gear: [items], wounded, giftWeek }. An
 // item of `gear` the player gave from the bag is marked `given`.
 
 import { playerCombatant } from './combatant.js';
 import { baseClassLevel, canUse, generateItem } from './items.js';
-import { gainXp, regenPerMinute, xpToNext } from './progression.js';
+import { gainXp, xpToNext } from './progression.js';
 import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { topLevel } from './skills.js';
@@ -144,21 +144,17 @@ export function companionXp(companion, xp, characterLevel, content) {
 }
 
 // The companion after an exploration: its XP and levels, and wounded when
-// it fainted, until it would have rested from nothing to full at the camp's
-// fire as the character does (`restBonus`, question 113).
-export function companionAfterHunt(companion, { xp, fainted, endedAt }, characterLevel, content, restBonus = 0) {
+// it fainted, until the character rests to full HP (companionReady).
+export function companionAfterHunt(companion, { xp, fainted }, characterLevel, content) {
   const next = gainXp(companion.level, companion.xp ?? 0, companionXp(companion, xp, characterLevel, content), (level) => xpToNext(level, content), content.balance.progression.maxLevel);
-  const after = { ...companion, level: next.level, xp: next.xp };
-  if (!fainted) return after;
-  const unit = companionCombatant(after, {}, content);
-  const vitality = companionCharacter(after, content).points.vitality ?? 0;
-  const minutes = unit.maxHp / regenPerMinute(unit.maxHp, vitality, content, restBonus);
-  return { ...after, woundedUntil: Math.round(endedAt + minutes * 60000) };
+  const { woundedUntil: _, ...after } = { ...companion, level: next.level, xp: next.xp };
+  return fainted ? { ...after, wounded: true } : after;
 }
 
-// Whether the companion goes on an exploration starting `now`: not while
-// wounded.
-export const companionReady = (companion, now) => Boolean(companion) && !(companion.woundedUntil > now);
+// Whether the companion goes on an exploration: a wounded one only once
+// the character has rested to full HP (`rested`), as its wounds heal with
+// the character's.
+export const companionReady = (companion, rested) => Boolean(companion) && (!companion.wounded || rested);
 
 // The places a companion wears items in (the design: "broń, pancerz,
 // talizman").

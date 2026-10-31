@@ -386,6 +386,9 @@ export function simulateHunt(
   // more members of the party, each with its own HP through the exploration
   // and a rest after each won fight as the character's; once one falls, it
   // keeps to the back for the rest of the way.
+  // Each companion along takes xpCost of the character's XP (question 235
+  // B: alone, the character gets as much as before).
+  const partyXp = 1 - companions.length * content.settlement.companions.xpCost;
   const mates = companions.map((companion, index) => {
     const unit = companionCombatant(companion, { area, id: `a${index + 1}` }, content);
     return { id: companion.id, unit, hp: unit.maxHp, out: false };
@@ -597,7 +600,7 @@ export function simulateHunt(
         chests.push([randomItem(enemies[0].level, rng, content, { ...loot, rarityId }), 'championChest']);
       }
       for (const [item] of chests) summary.chests.push(take(item));
-      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus));
+      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp);
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
       xp += summary.xp;
       reached = gainXp(reached.level, reached.xp, summary.xp, (level) => xpToNext(level, content), maxLevel);

@@ -17,6 +17,7 @@ import {
   withRareOdds,
   deliverOrder,
   drawOrder,
+  orderGold,
   drawQuests,
   emptyBoard,
   evolutionChangeCost,
@@ -124,6 +125,19 @@ describe('the Osada in the engine', () => {
         }
         assert.ok(orderStories(order.kind, order.key, content).includes(order.story));
         assert.equal(order.brotherhood, content.settlement.brotherhoods.find((one) => one.goods.includes(order.kind)).id);
+      }
+    }
+  });
+
+  test('an order of herbs, potions or materials pays at least 20% over what the scrapper pays the character (236 A)', () => {
+    const { overScrap } = content.settlement.orders;
+    for (let i = 0; i < 200; i++) {
+      const order = drawOrder({ character, seed: `skup:${i}` }, content);
+      for (const bonus of [0, 0.5, 1]) {
+        const gold = orderGold(order, bonus, content);
+        assert.ok(gold >= order.gold);
+        if (['herb', 'potion', 'material'].includes(order.kind)) assert.ok(gold >= goodPrice(order, content) * (1 + bonus) * order.count * overScrap - 1e-9, `${order.kind} ${gold}`);
+        else assert.equal(gold, order.gold);
       }
     }
   });
@@ -450,22 +464,25 @@ describe('the Osada through the API', () => {
     const gold = mugCost(20, content);
     const bought = await call('POST', '/api/settlement/tavern', { cookie });
     assert.equal(bought.status, 200);
-    const { rumor } = bought.data.settlement.tavern;
-    assert.ok(rumor.text.includes(rumor.area));
-    assert.equal(rumor.used, false);
+    const stored = async () => JSON.parse((await (await db()).prepare('SELECT settlement FROM characters').first()).settlement);
+    const told = (await stored()).rumor;
+    // The page has the innkeeper's words only, with the place's name; what
+    // the rumor means is not told (the author).
+    assert.deepEqual(Object.keys(bought.data.settlement.tavern.rumor), ['text']);
+    assert.ok(bought.data.settlement.tavern.rumor.text.includes(content.areasById[told.areaId].name));
+    assert.equal(told.used, false);
     assert.equal(bought.data.character.gold, 100000 - gold);
-    assert.equal(bought.data.character.rumor.areaId, rumor.areaId);
+    assert.equal(bought.data.character.rumor, undefined);
     const innkeeper = bought.data.settlement.residents.find((resident) => resident.id === content.settlement.tavern.resident);
     assert.equal(innkeeper.service, 'tavern');
-    const stored = async () => JSON.parse((await (await db()).prepare('SELECT settlement FROM characters').first()).settlement);
     assert.equal((await stored()).relations[content.settlement.tavern.resident], content.settlement.tavern.relationGain);
     assert.equal((await call('POST', '/api/settlement/tavern', { cookie })).data.error.code, 'told');
-    // An exploration elsewhere leaves it; one there uses it up.
-    await call('POST', '/api/hunts', { cookie, body: { areaId: rumor.areaId, minutes: 5 } });
+    // An exploration there uses it up, and the words stay on the page all day.
+    await call('POST', '/api/hunts', { cookie, body: { areaId: told.areaId, minutes: 5 } });
     const activity = await (await db()).prepare('SELECT options FROM activities').first();
     assert.equal(JSON.parse(activity.options).rumor, content.settlement.tavern.rumor.factor);
     assert.equal((await stored()).rumor.used, true);
-    assert.equal((await view()).tavern.rumor.used, true);
+    assert.ok((await view()).tavern.rumor.text);
   });
 
   test('rejecting an order empties its slot for a while', async () => {

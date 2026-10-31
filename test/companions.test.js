@@ -1,8 +1,8 @@
 // Companions (the Osada, part II): the Karczma's four candidates a week, the
 // places the relation with the innkeeper gives, a companion in the fights of
-// an exploration, its XP and its wounds, hiring one through the API,
-// Punkty Czasu for its wounds, its profession's gift of the week and the
-// items it gets from the bag.
+// an exploration, its XP and its wounds, which heal with the character's
+// rest, hiring one through the API, its profession's gift of the week and
+// the items it gets from the bag.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -72,15 +72,23 @@ describe('companions in the engine', () => {
     assert.equal(party.fights[0].allies[1].name, candidates[0].name);
     assert.equal(party.companions[0].id, candidates[0].id);
     assert.equal(simulateHunt(hunt, content).companions, undefined);
+    // Each companion along takes xpCost of the character's XP (235 B): the
+    // same hunt without that cost has the same fights and 3% more XP.
+    const free = { ...content, settlement: { ...content.settlement, companions: { ...tuning, xpCost: 0 } } };
+    const full = simulateHunt({ ...hunt, companions: [candidates[0]] }, free);
+    assert.ok(full.xp > 0);
+    assert.ok(Math.abs(party.xp - full.xp * (1 - tuning.xpCost)) <= full.fights.length, `${full.xp} → ${party.xp}`);
     const below = { ...candidates[0], level: character.level - 5 };
     assert.equal(companionXp(below, 1000, character.level, content), Math.round(1000 * tuning.xpShare * (1 + tuning.catchUp * 5)));
-    const after = companionAfterHunt(below, { xp: 100000, fainted: false, endedAt: NOW }, character.level, content);
+    const after = companionAfterHunt(below, { xp: 100000, fainted: false }, character.level, content);
     assert.ok(after.level > below.level);
-    assert.equal(after.woundedUntil, undefined);
-    const hurt = companionAfterHunt(below, { xp: 0, fainted: true, endedAt: NOW }, character.level, content);
-    assert.ok(hurt.woundedUntil > NOW);
-    assert.equal(companionReady(hurt, NOW), false);
-    assert.equal(companionReady(hurt, hurt.woundedUntil), true);
+    assert.equal(after.wounded, undefined);
+    // Fainted, it is wounded until the character has rested to full HP.
+    const hurt = companionAfterHunt(below, { xp: 0, fainted: true }, character.level, content);
+    assert.equal(hurt.wounded, true);
+    assert.equal(companionReady(hurt, false), false);
+    assert.equal(companionReady(hurt, true), true);
+    assert.equal(companionReady(after, false), true);
   });
 });
 
@@ -145,28 +153,30 @@ describe('companions through the API', () => {
     assert.ok(!dismissed.data.settlement.companions.candidates.some((candidate) => candidate.id === first.id));
   });
 
-  test('Punkty Czasu shorten a wounded companion\'s rest a minute each, as they shorten the character\'s (113 A)', async () => {
+  test('a wounded companion heals with the character: it stays behind until the character has rested to full HP', async () => {
     await relation(content.settlement.standings.find((standing) => standing.id === tuning.from[0]).points);
     const [candidate] = (await settlement()).companions.candidates;
     await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
-    assert.equal((await call('POST', '/api/time/skip', { cookie, body: { target: 'wounds', companionId: candidate.id } })).data.error.code, 'nothing_to_skip');
-    // Wounded for half an hour, with 10 points: 10 minutes less.
     const database = await db();
     const stored = JSON.parse((await database.prepare('SELECT settlement FROM characters').first()).settlement);
-    const until = Date.now() + 30 * 60000;
-    stored.companions[0].woundedUntil = until;
-    await database.prepare('UPDATE characters SET settlement = ?, time_points = 10, time_points_at = ?').bind(JSON.stringify(stored), Date.now()).run();
-    const some = await call('POST', '/api/time/skip', { cookie, body: { target: 'wounds', companionId: candidate.id } });
-    assert.equal(some.data.spent, 10);
-    assert.equal((await settlement()).companions.hired[0].woundedUntil, until - 10 * 60000);
-    // With enough points it is ready at once and goes on the next exploration.
-    await database.prepare('UPDATE characters SET time_points = 100').run();
-    const rest = await call('POST', '/api/time/skip', { cookie, body: { target: 'wounds', companionId: candidate.id } });
-    assert.ok(rest.data.spent >= 19 && rest.data.spent <= 21);
-    assert.equal((await settlement()).companions.hired[0].woundedUntil, null);
+    stored.companions[0].wounded = true;
+    await database.prepare('UPDATE characters SET settlement = ?, hp = 1, hp_at = ?').bind(JSON.stringify(stored), Date.now()).run();
+    const hurt = (await settlement()).companions.hired[0];
+    assert.equal(hurt.wounded, true);
+    assert.ok(hurt.healsAt > Date.now());
+    // Not yet rested: an exploration goes without it.
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    const alone = JSON.parse((await database.prepare('SELECT options FROM activities').first()).options);
+    assert.equal(alone.companions, undefined);
+    await call('POST', '/api/hunts/cancel', { cookie });
+    // Rested to full HP: healed, and it goes along.
+    await database.prepare('UPDATE characters SET hp = 100000, hp_at = ?').bind(Date.now()).run();
+    assert.equal((await settlement()).companions.hired[0].wounded, undefined);
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
     const options = JSON.parse((await database.prepare('SELECT options FROM activities').first()).options);
     assert.deepEqual(options.companions.map((companion) => companion.id), [candidate.id]);
+    const after = JSON.parse((await database.prepare('SELECT settlement FROM characters').first()).settlement);
+    assert.equal(after.companions[0].wounded, undefined);
   });
 
   test('the gift of the week goes to the character\'s goods once a week, at home', async () => {
