@@ -3785,6 +3785,16 @@ img.area-art {
   width: 100%;
 }
 
+/* Why an option is greyed out ("tylko Kleryk", question 223 B), under its
+   words. */
+.event-option-note {
+  display: block;
+  font-size: 0.8em;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 .report-event {
   display: flex;
   gap: 12px;

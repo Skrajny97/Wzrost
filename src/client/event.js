@@ -6,6 +6,7 @@
 
 import { eventFigure, eventScene, landArt } from './art.js';
 import { h } from './dom.js';
+import { formatNumber } from './format.js';
 import { playSound } from './sound.js';
 import { call } from './state.js';
 import { closeSheet, openSheet, withButton } from './ui.js';
@@ -15,18 +16,25 @@ export function openEvent(event, done) {
   // An event of any land stands on the background of the land explored.
   const scene = event.land ? landArt(event.land) : eventScene(event.scene);
   const figure = eventFigure(event.art);
+  // An option with a price shows it; one the character cannot take (of
+  // another class, or above the purse) stays in sight, greyed out, with why.
   const options = event.options.map((option) =>
-    h('button', {
-      type: 'button',
-      class: 'button button--world event-option',
-      text: option.label,
-      onClick: (click) =>
-        withButton(click.currentTarget, async () => {
-          const { report } = await call('POST', '/api/hunts/claim', { choice: option.id });
-          closeSheet();
-          done(report);
-        }),
-    }),
+    h(
+      'button',
+      {
+        type: 'button',
+        class: 'button button--world event-option',
+        disabled: Boolean(option.locked),
+        onClick: (click) =>
+          withButton(click.currentTarget, async () => {
+            const { report } = await call('POST', '/api/hunts/claim', { choice: option.id });
+            closeSheet();
+            done(report);
+          }),
+      },
+      option.cost ? `${option.label} (${formatNumber(option.cost)} zł)` : option.label,
+      option.locked && h('span', { class: 'event-option-note', text: option.locked }),
+    ),
   );
   playSound('system');
   // The person sits in their place in the scene (event.figure, in percent

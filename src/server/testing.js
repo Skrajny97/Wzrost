@@ -8,7 +8,7 @@ import { construction, eventOutcome } from '../engine/index.js';
 import { content, tutorialPart } from './content.js';
 import { completeBuilding } from './camp.js';
 import { characterRemoval, characterView, currentHp, loadPlayer, loadSettled, requirePlayer } from './characters.js';
-import { eventDraftsOn, eventsOn } from './features.js';
+import { eventDraftsOn, eventsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { requireSession } from './sessions.js';
 import { testMode, testModeFor, tutorialTestsFor } from './test-mode.js';
@@ -120,8 +120,8 @@ export async function eventTests(context) {
 }
 
 // The events "Testuj zdarzenia" offers: every one, the drafts only where
-// they are on (the test version).
-const testableEvents = () => content.events.list.filter((event) => eventDraftsOn() || !event.draft);
+// they are on (the test version), and those of the Osada only where it is.
+const testableEvents = () => content.events.list.filter((event) => (eventDraftsOn() || !event.draft) && (settlementOn() || !event.settlement));
 
 // "Przy następnym raporcie": the next exploration that ends as planned
 // brings this event (`eventId`), in this case (`caseId`) or a drawn one

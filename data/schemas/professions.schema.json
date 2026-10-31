@@ -816,9 +816,10 @@
             "damage",
             "focus",
             "poison",
-            "ward"
+            "ward",
+            "curse"
           ],
-          "description": "Działający bonus na czas po rodzaju, z mikstury albo ze zdarzenia (np. niebieskiego grzyba): nazwa działania, dwukropek i działanie ({bonus} w procentach). Widać go na Postaci, przed wyprawą i w górnym pasku.",
+          "description": "Działający bonus na czas po rodzaju, z mikstury albo ze zdarzenia (np. niebieskiego grzyba), także klątwa zdarzenia: nazwa działania, dwukropek i działanie ({bonus} w procentach). Widać go na Postaci, przed wyprawą i w górnym pasku.",
           "properties": {
             "speed": {
               "type": "string",
@@ -841,6 +842,10 @@
               "minLength": 1
             },
             "ward": {
+              "type": "string",
+              "minLength": 1
+            },
+            "curse": {
               "type": "string",
               "minLength": 1
             }
@@ -878,7 +883,8 @@
             "damageFights",
             "focusFights",
             "poisonFights",
-            "wardFights"
+            "wardFights",
+            "curseFights"
           ],
           "properties": {
             "drinkHeal": {
@@ -1018,6 +1024,14 @@
               }
             },
             "wardFights": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "curseFights": {
               "type": "array",
               "minItems": 1,
               "items": {

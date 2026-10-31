@@ -678,43 +678,78 @@ function checkEvents(data, { monsters, rarities }) {
   const foes = uniqueIds(errors, 'events', events.foes);
   for (const id of foes) if (monsters.has(id)) errors.push(`events.json: przeciwnik ${id} ma id stwora z monsters.json`);
   const herbs = new Set(data.professions.herbs.map((herb) => herb.id));
+  const classes = new Set(data.classes.map((cls) => cls.id));
+  const brotherhoods = new Set(data.settlement.brotherhoods.map((brotherhood) => brotherhood.id));
   uniqueIds(errors, 'events', events.list);
-  const checkOutcome = (where, outcome) => {
-    const fighting = outcome.foes || outcome.ambush || outcome.speedBonus || outcome.itemChance !== undefined || outcome.start;
-    const rewarding = outcome.gold !== undefined || outcome.itemRarities || outcome.herbs || outcome.buff || outcome.points;
+  const checkRarities = (where, weights) => {
+    for (const id of Object.keys(weights ?? {})) if (!rarities.has(id)) errors.push(`events.json: ${where} ma nieznaną rzadkość "${id}"`);
+  };
+  // An outcome of an option (`option`) of an event (`event`).
+  const checkOutcome = (where, outcome, { event, option }) => {
+    const fighting =
+      outcome.foes || outcome.ambush || outcome.speedBonus || outcome.itemChance !== undefined || outcome.start || outcome.win;
+    const rewarding =
+      outcome.gold !== undefined ||
+      outcome.itemRarities ||
+      outcome.herbs ||
+      outcome.buff ||
+      outcome.points ||
+      outcome.herbsKnown ||
+      outcome.xpFoes ||
+      outcome.reputation ||
+      outcome.rumor;
+    const losing = outcome.goldShare !== undefined || outcome.goldCapPerLevel !== undefined || outcome.resourcesShare !== undefined;
     if (outcome.kind === 'fight') {
       if (!outcome.foes) errors.push(`events.json: ${where} ma walkę bez przeciwników`);
       // People of the events, or creatures of monsters.json (the Błędnica).
       for (const id of outcome.foes ?? []) if (!foes.has(id) && !monsters.has(id)) errors.push(`events.json: ${where} ma nieznanego przeciwnika "${id}"`);
       if (!outcome.start?.includes('{enemies}')) errors.push(`events.json: ${where} potrzebuje zdania start z {enemies}`);
+      checkRarities(where, outcome.win?.itemRarities);
+      if (outcome.win?.itemRarities && !outcome.win.text?.includes('{item}')) errors.push(`events.json: ${where} potrzebuje zdania win.text z {item}`);
     } else if (fighting) {
       errors.push(`events.json: ${where} ma ustawienia walki bez walki`);
     }
     if (outcome.kind === 'reward') {
-      if (!rewarding) errors.push(`events.json: ${where} ma nagrodę bez złota, przedmiotu, ziół, wzmocnienia i punktów`);
+      if (!rewarding) errors.push(`events.json: ${where} ma nagrodę bez złota, przedmiotu, ziół, wzmocnienia, punktów, XP, reputacji i plotki`);
       if (outcome.gold !== undefined && !outcome.text.includes('{gold}')) errors.push(`events.json: ${where} potrzebuje {gold} w tekście`);
       if (outcome.itemRarities && !outcome.text.includes('{item}')) errors.push(`events.json: ${where} potrzebuje {item} w tekście`);
-      for (const id of Object.keys(outcome.itemRarities ?? {})) if (!rarities.has(id)) errors.push(`events.json: ${where} ma nieznaną rzadkość "${id}"`);
+      checkRarities(where, outcome.itemRarities);
       for (const id of Object.keys(outcome.herbs ?? {})) if (!herbs.has(id)) errors.push(`events.json: ${where} ma nieznane zioło "${id}"`);
+      if (outcome.herbsKnown && !outcome.text.includes('{herbs}')) errors.push(`events.json: ${where} potrzebuje {herbs} w tekście`);
+      if (outcome.herbsKnown && !outcome.herbsKnown.goldText.includes('{gold}')) errors.push(`events.json: ${where} potrzebuje {gold} w herbsKnown.goldText`);
+      for (const id of outcome.xpFoes ?? []) if (!foes.has(id) && !monsters.has(id)) errors.push(`events.json: ${where} ma nieznanego przeciwnika "${id}" w xpFoes`);
+      if (outcome.xpFoes && !outcome.text.includes('{xp}')) errors.push(`events.json: ${where} potrzebuje {xp} w tekście`);
+      for (const id of Object.keys(outcome.reputation ?? {})) if (!brotherhoods.has(id)) errors.push(`events.json: ${where} ma nieznane bractwo "${id}"`);
+      if (outcome.reputation && !event.settlement) errors.push(`events.json: ${where} daje reputację Osady, a zdarzenie nie ma settlement`);
+      if (outcome.rumor && !(outcome.text.includes('{area}') && outcome.noRumorText)) errors.push(`events.json: ${where} potrzebuje plotki z {area} w tekście i zdania noRumorText`);
     } else if (rewarding) {
       errors.push(`events.json: ${where} ma nagrodę bez kind reward`);
+    }
+    if (outcome.kind === 'loss') {
+      if (outcome.goldShare === undefined && outcome.resourcesShare === undefined) errors.push(`events.json: ${where} ma stratę bez goldShare i resourcesShare`);
+      if (outcome.goldShare !== undefined && !outcome.lossText?.includes('{gold}')) errors.push(`events.json: ${where} potrzebuje zdania lossText z {gold}`);
+      if (outcome.resourcesShare !== undefined && !outcome.lossText?.includes('{resources}')) errors.push(`events.json: ${where} potrzebuje zdania lossText z {resources}`);
+    } else if (losing) {
+      errors.push(`events.json: ${where} ma stratę z sakiewki albo zasobów bez kind loss`);
     }
     if (outcome.kind === 'faint') {
       if (!outcome.goldLoss) errors.push(`events.json: ${where} ma omdlenie bez goldLoss`);
       if (!outcome.lossText?.includes('{gold}')) errors.push(`events.json: ${where} potrzebuje zdania lossText z {gold}`);
-    } else if (outcome.goldLoss !== undefined || outcome.lossText !== undefined) {
+    } else if (outcome.goldLoss !== undefined || (outcome.lossText !== undefined && outcome.kind !== 'loss')) {
       errors.push(`events.json: ${where} ma stratę złota bez kind faint`);
     }
+    // The option's price: told only where the option has one.
+    if (!option?.goldPerLevel && (outcome.free || outcome.text.includes('{cost}'))) errors.push(`events.json: ${where} mówi o cenie opcji, która jej nie ma`);
   };
   // An outcome or a list of them, each drawn by its weight. An outcome of a
   // list that "Testuj zdarzenia" can choose has both an id and a name, and
   // the live game, which leaves the drafts out, needs one to draw.
-  const checkOutcomes = (where, outcomes) => {
-    if (!Array.isArray(outcomes)) return checkOutcome(where, outcomes);
+  const checkOutcomes = (where, outcomes, context) => {
+    if (!Array.isArray(outcomes)) return checkOutcome(where, outcomes, context);
     outcomes.forEach((outcome, index) => {
       if (outcome.weight === undefined) errors.push(`events.json: ${where} [${index}] na liście skutków potrzebuje wagi`);
       if ((outcome.id === undefined) !== (outcome.name === undefined)) errors.push(`events.json: ${where} [${index}] potrzebuje i id, i name albo żadnego z nich`);
-      checkOutcome(`${where} [${index}]`, outcome);
+      checkOutcome(`${where} [${index}]`, outcome, context);
     });
     uniqueIds(errors, `events (${where})`, outcomes.filter((outcome) => outcome.id));
     if (outcomes.every((outcome) => outcome.draft)) errors.push(`events.json: ${where} ma same szkice, więc w grze nie byłoby czego losować`);
@@ -748,12 +783,15 @@ function checkEvents(data, { monsters, rarities }) {
     }
     const options = uniqueIds(errors, `events (${event.id})`, event.options);
     uniqueIds(errors, `events (${event.id}, przypadki)`, event.cases ?? []);
-    for (const option of event.options) if (option.outcome) checkOutcomes(`${event.id}/${option.id}`, option.outcome);
+    for (const option of event.options) {
+      for (const id of option.classes ?? []) if (!classes.has(id)) errors.push(`events.json: ${event.id}/${option.id} ma nieznaną klasę "${id}"`);
+      if (option.outcome) checkOutcomes(`${event.id}/${option.id}`, option.outcome, { event, option });
+    }
     // Every option has an outcome in every case: its own or the case's.
     for (const eventCase of event.cases ?? [{ id: null, outcomes: {} }]) {
       for (const [id, outcome] of Object.entries(eventCase.outcomes)) {
         if (!options.has(id)) errors.push(`events.json: ${event.id}/${eventCase.id} ma skutek nieznanej opcji "${id}"`);
-        checkOutcomes(`${event.id}/${eventCase.id}/${id}`, outcome);
+        checkOutcomes(`${event.id}/${eventCase.id}/${id}`, outcome, { event, option: event.options.find((option) => option.id === id) });
       }
       for (const option of event.options) {
         if (!eventCase.outcomes[option.id] && !option.outcome) errors.push(`events.json: ${event.id}/${option.id} nie ma skutku${eventCase.id ? ` w przypadku ${eventCase.id}` : ''}`);

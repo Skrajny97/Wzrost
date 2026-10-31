@@ -11,17 +11,36 @@
       "required": ["kind", "text"],
       "description": "Skutek opcji: tekst i co z niego wynika.",
       "properties": {
-        "kind": { "enum": ["none", "fight", "reward", "faint"], "description": "faint: postać traci przytomność i część złota z wyprawy (goldLoss, zdanie lossText z {gold})." },
+        "kind": {
+          "enum": ["none", "fight", "reward", "faint", "loss"],
+          "description": "faint: postać traci przytomność i część złota z wyprawy (goldLoss, zdanie lossText z {gold}). loss: postać traci część złota z sakiewki (goldShare, najwyżej goldCapPerLevel na poziom) albo część zebranych zasobów (resourcesShare), bez omdlenia, ze zdaniem lossText."
+        },
         "weight": { "type": "number", "exclusiveMinimum": 0, "description": "Waga skutku na liście skutków, losowanych przy wyborze opcji." },
         "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Skutek z listy do wybrania w „Testuj zdarzenia”." },
         "name": { "type": "string", "minLength": 1, "description": "Nazwa skutku w „Testuj zdarzenia”." },
         "draft": { "type": "boolean", "description": "Szkic, którego autor jeszcze nie zatwierdził: losuje się tylko w wersji testowej." },
-        "text": { "type": "string", "minLength": 1, "description": "Tekst skutku; przy nagrodzie z {gold} albo {item}, a zioła wymienia sam." },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Tekst skutku; przy nagrodzie z {gold}, {item}, {herbs} albo {xp}, przy plotce z {area} i {creature}, a cena opcji to {cost}."
+        },
+        "free": { "type": "boolean", "description": "Przy tym skutku cena opcji nie przepada (złodziej wyrywa sakiewkę, zanim monety trafią do kubka)." },
         "foes": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "string", "minLength": 1 } },
         "ambush": { "type": "boolean", "description": "Wrogowie ruszają pierwsi, wszyscy przed postacią." },
         "speedBonus": { "type": "number", "exclusiveMinimum": 0, "description": "Postać jest w tej walce szybsza o taką część." },
         "itemChance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa, że pokonany wróg zostawi przedmiot." },
         "start": { "type": "string", "minLength": 1, "description": "Zdanie relacji przed walką, z {enemies}." },
+        "win": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "description": "Co zostaje po wygranej walce oprócz łupu przeciwników: złoto (gold, jak w nagrodzie) albo przedmiot (itemRarities, ze zdaniem text z {item}).",
+          "properties": {
+            "gold": { "type": "number", "exclusiveMinimum": 0 },
+            "itemRarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 } },
+            "text": { "type": "string", "minLength": 1 }
+          }
+        },
         "gold": { "type": "number", "exclusiveMinimum": 0, "description": "Złoto nagrody: tyle razy rewards.goldPerLevel × poziom postaci, ±25%." },
         "itemRarities": {
           "type": "object",
@@ -39,16 +58,48 @@
           "type": "object",
           "additionalProperties": false,
           "required": ["kind", "bonus", "minutes"],
-          "description": "Nagroda: wzmocnienie jak po miksturze na czas (szybkość, pancerz, obrażenia albo skupienie) na tyle minut wypraw.",
+          "description": "Nagroda: wzmocnienie jak po miksturze na czas (szybkość, pancerz, obrażenia albo skupienie) na tyle minut wypraw, albo klątwa (curse: obrażenia mniejsze o bonus).",
           "properties": {
-            "kind": { "enum": ["speed", "armor", "damage", "focus"] },
+            "kind": { "enum": ["speed", "armor", "damage", "focus", "curse"] },
             "bonus": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
             "minutes": { "type": "integer", "minimum": 1 }
           }
         },
         "points": { "type": "integer", "minimum": 1, "description": "Nagroda: tyle Wolnych Punktów Statystyk ponad te z poziomów." },
+        "herbsKnown": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count", "gold", "goldText"],
+          "description": "Nagroda: tyle ziół, które zna Zielarstwo postaci ({herbs}), a bez Zielarstwa złoto (gold, jak w nagrodzie) ze zdaniem goldText z {gold}.",
+          "properties": {
+            "count": { "type": "integer", "minimum": 1 },
+            "gold": { "type": "number", "exclusiveMinimum": 0 },
+            "goldText": { "type": "string", "minLength": 1 }
+          }
+        },
+        "xpFoes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Nagroda: XP jak za pokonanie tych przeciwników na poziomie postaci ({xp}), bez walki."
+        },
+        "reputation": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": "integer", "minimum": 1 },
+          "description": "Nagroda: punkty reputacji bractw Osady, po id z settlement.json (pytanie 225)."
+        },
+        "rumor": { "type": "boolean", "description": "Nagroda: dzisiejsza plotka o elicie albo czempionie, jak z Karczmy ({area}, {creature}); bez plotki zdanie noRumorText." },
+        "noRumorText": { "type": "string", "minLength": 1, "description": "Tekst skutku z plotką, gdy postać nie ma miejsca z elitą ani czempionem do plotki." },
         "goldLoss": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Przy omdleniu: taka część złota z wyprawy przepada." },
-        "lossText": { "type": "string", "minLength": 1, "description": "Przy omdleniu: zdanie o straconym złocie, z {gold}, dopisane, gdy coś przepadło." }
+        "goldShare": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Przy stracie: taka część złota z sakiewki (złota postaci razem ze złotem z wyprawy) przepada." },
+        "goldCapPerLevel": { "type": "number", "exclusiveMinimum": 0, "description": "Przy stracie: najwyżej tyle złota za poziom postaci." },
+        "resourcesShare": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Przy stracie: taka część zasobów zebranych na wyprawie przepada." },
+        "lossText": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Przy omdleniu i stracie: zdanie o tym, co przepadło ({gold}, {resources}), dopisane, gdy coś przepadło."
+        }
       }
     },
     "outcomes": {
@@ -111,6 +162,7 @@
           },
           "name": { "type": "string", "minLength": 1, "description": "Nazwa w „Testuj zdarzenia”, gdy tytuł jest taki sam jak innego zdarzenia." },
           "draft": { "type": "boolean", "description": "Zdarzenie, którego autor jeszcze nie zatwierdził: przychodzi tylko w wersji testowej." },
+          "settlement": { "type": "boolean", "description": "Zdarzenie Osady (np. z reputacją bractwa): przychodzi tylko tam, gdzie Osada jest otwarta." },
           "options": {
             "type": "array",
             "minItems": 2,
@@ -121,6 +173,17 @@
               "properties": {
                 "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
                 "label": { "type": "string", "minLength": 1 },
+                "goldPerLevel": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "description": "Cena opcji: tyle złota za poziom postaci, z sakiewki; bez tyle złota opcja jest wyszarzona."
+                },
+                "classes": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "type": "string", "minLength": 1 },
+                  "description": "Opcja tylko dla tych klas i ich ewolucji; inne widzą ją wyszarzoną z dopiskiem (pytanie 223 B)."
+                },
                 "outcome": { "$ref": "#/definitions/outcomes", "description": "Skutek opcji, gdy przypadek nie podaje własnego." }
               }
             }

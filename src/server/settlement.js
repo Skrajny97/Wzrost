@@ -350,14 +350,15 @@ export async function sellToHerbalist(context) {
   });
 }
 
-// The Karczma: the mug's price and today's rumor once told.
+// The Karczma: the mug's price and today's rumor once the innkeeper told
+// it (not the beggar's song: the mug still tells it, for the relation).
 function tavernView(row, stored, now) {
   const rumor = rumorToday(stored.rumor, now, content);
   return {
     mug: mugCost(row.level, content),
     // The innkeeper's words only: the place and what it means are the
     // player's to work out.
-    rumor: rumor && { text: rumorText(rumor, content) },
+    rumor: rumor && !rumor.song ? { text: rumorText(rumor, content) } : null,
   };
 }
 
@@ -583,9 +584,12 @@ export async function buyMug(context) {
   const { row } = player;
   requireOpen(row);
   const stored = settlementOf(row);
-  if (rumorToday(stored.rumor, context.now, content)) throw new ApiError(409, 'told', 'Zbylut nie słyszał dziś nic nowego. Zajrzyj jutro.');
-  const rumor = drawRumor({ character: engineCharacter(row), seed: `${row.id}:settlement` }, context.now, content);
-  if (!rumor) throw new ApiError(409, 'no_rumor', 'Zbylut nie słyszał o niczym groźnym w miejscach, do których chodzisz.');
+  // The day's rumor the beggar's song told is the same the innkeeper tells,
+  // still unused or used as it was.
+  const today = rumorToday(stored.rumor, context.now, content);
+  if (today && !today.song) throw new ApiError(409, 'told', 'Zbylut nie słyszał dziś nic nowego. Zajrzyj jutro.');
+  const { song: _, ...rumor } = today ?? drawRumor({ character: engineCharacter(row), seed: `${row.id}:settlement` }, context.now, content) ?? {};
+  if (!rumor.areaId) throw new ApiError(409, 'no_rumor', 'Zbylut nie słyszał o niczym groźnym w miejscach, do których chodzisz.');
   const gold = mugCost(row.level, content);
   if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota na kufel.');
   const next = { ...stored, rumor, relations: grow(stored.relations, content.settlement.tavern) };

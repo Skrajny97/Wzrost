@@ -12,9 +12,11 @@
 // not drunk stay in the bag.
 
 // The kinds of a potion that works by itself in fights and of a potion for a
-// time, as keys of its effect.
+// time, as keys of its effect; a curse of an event (the god chased off, the
+// soul robbed of its offerings) weakens the blows for a time as a potion
+// strengthens them, and no potion has it.
 export const FIGHT_KINDS = ['heal', 'mana', 'cure', 'revive'];
-export const TIMED_KINDS = ['speed', 'armor', 'damage', 'focus', 'poison', 'ward'];
+export const TIMED_KINDS = ['speed', 'armor', 'damage', 'focus', 'poison', 'ward', 'curse'];
 
 // The kind of a potion that works by itself in fights, or null for one drunk
 // from the bag.

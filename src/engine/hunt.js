@@ -511,7 +511,8 @@ export function simulateHunt(
       hp: hpNow,
       ...(on.speed && { speed: base.speed * (1 + on.speed) }),
       ...(on.armor && { armor: Math.round(base.armor * (1 + on.armor)) }),
-      ...(on.damage && { damageBonus: on.damage }),
+      // A curse takes off what a strength potion adds.
+      ...((on.damage || on.curse) && { damageBonus: (on.damage ?? 0) - (on.curse ?? 0) }),
       ...(on.ward && { ward: on.ward }),
       ...(on.poison && oil && !base.weapon.dot && { weapon: { ...base.weapon, dot: { ...oil, chance: on.poison } } }),
       ...(Object.keys(kit).length > 0 && { potions: kit }),

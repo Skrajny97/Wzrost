@@ -31,6 +31,9 @@ export const SPRITES = {
       'aurochs', 'aesculapian-snake', 'strzyga',
       // Four regular creatures per inner region of levels 66–100, from 29.10.2026.
       'phantasm', 'black-grouse', 'diving-beetle', 'little-owl', 'zmij', 'fume-spirit', 'mine-spirit', 'giant-rat',
+      // The Upiór of the haunted shrine and the leshy of the duel, events'
+      // foes from 31.10.2026.
+      'upior', 'leshy',
     ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved,
@@ -227,7 +230,7 @@ export const SPRITES = {
   events: {
     width: 96,
     height: 128,
-    ids: ['wounded-woman', 'fern-flower', 'blue-mushroom'],
+    ids: ['wounded-woman', 'fern-flower', 'blue-mushroom', 'wandering-beggar', 'wayside-shrine', 'stuck-merchant', 'leshy'],
   },
   'event-scenes': {
     width: 192,

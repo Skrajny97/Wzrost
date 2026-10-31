@@ -13,6 +13,10 @@ import { useServer } from './helpers/server.js';
 
 const bandits = ['bandit-thug', 'bandit-knifer', 'bandit-crossbow'];
 const woman = content.eventsById['wounded-woman'];
+// The events with tests of their own that come anywhere, or in the whole
+// forest (the leshy), left out where another event's places are checked.
+const elsewhere = new Set(['blue-mushroom', 'wandering-beggar', 'haunted-shrine', 'stuck-merchant', 'leshy']);
+const placed = (list) => list.filter((event) => !elsewhere.has(event.id));
 
 // Whether every enemy moved before the first move of `allyId`.
 const enemiesFirst = (fight, allyId, enemyIds) => {
@@ -51,8 +55,8 @@ describe('events', () => {
 
   test('the wounded woman comes only where the Błędnica lives; a draft event only where drafts are on', () => {
     const always = { ...content, events: { ...content.events, chance: 1 } };
-    // Apart from the blue mushroom, which comes anywhere (its own test).
-    const regional = { ...always, events: { ...always.events, list: always.events.list.filter((event) => event.id !== 'blue-mushroom') } };
+    // Apart from the events that come anywhere (their own tests).
+    const regional = { ...always, events: { ...always.events, list: placed(always.events.list) } };
     const seeds = Array.from({ length: 40 }, (_, index) => `region-${index}`);
     const drawn = (areaId, extra = {}, data = regional) => seeds.map((one) => eventFor({ hunt: { result: 'success', areaId, minutes: 30 }, seed: one, ...extra }, data)?.id ?? null);
     for (const areaId of ['windfalls-edge', 'fox-ravines', 'raven-hollows']) assert.ok(drawn(areaId).every((id) => id === 'wounded-woman'), areaId);
@@ -205,8 +209,8 @@ describe('events', () => {
   test('the fern flower comes only where Licho lives: picking it risks Licho for an item', () => {
     // A draft until the author approved it (0.0.48).
     const fern = content.eventsById['fern-flower'];
-    // Without the blue mushroom, which comes anywhere (its own test).
-    const always = { ...content, events: { ...content.events, chance: 1, list: content.events.list.filter((event) => event.id !== 'blue-mushroom') } };
+    // Without the events that come anywhere (their own tests).
+    const always = { ...content, events: { ...content.events, chance: 1, list: placed(content.events.list) } };
     const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
     const seeds = Array.from({ length: 30 }, (_, index) => `paproc-${index}`);
     assert.ok(seeds.every((one) => eventFor({ hunt: hunt('mossy-boulders'), seed: one }, always) === fern));
@@ -235,7 +239,7 @@ describe('events', () => {
   test('the fern flower without Licho comes in every region from level 26 but where the full one does, its blossom rarer', () => {
     const calm = content.eventsById['fern-flower-calm'];
     const full = content.eventsById['fern-flower'];
-    const always = { ...content, events: { ...content.events, chance: 1, list: content.events.list.filter((event) => event.id !== 'blue-mushroom') } };
+    const always = { ...content, events: { ...content.events, chance: 1, list: placed(content.events.list) } };
     const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
     const seeds = Array.from({ length: 30 }, (_, index) => `spokoj-${index}`);
     const brought = (areaId) => new Set(seeds.map((one) => eventFor({ hunt: hunt(areaId), seed: one }, always)?.id));
@@ -369,6 +373,17 @@ describe('events (API)', () => {
             { id: 'point', name: 'Zjedzenie: Wolny Punkt Statystyk' },
           ],
         },
+        // The merchant of the Osada only where the Osada is open.
+        ...['wandering-beggar', 'haunted-shrine', 'leshy'].map((id) => {
+          const event = content.eventsById[id];
+          return {
+            id,
+            title: event.title,
+            draft: false,
+            cases: (event.cases ?? []).map(({ id: caseId, name }) => ({ id: caseId, name })),
+            endings: event.options.flatMap((option) => (Array.isArray(option.outcome) ? option.outcome.map(({ id: endingId, name }) => ({ id: endingId, name })) : [])),
+          };
+        }),
       ],
       next: null,
     });

@@ -21,6 +21,7 @@ import {
   campLevels,
   carryLimit,
   countList,
+  drawRumor,
   durationsUpTo,
   estimateThreat,
   fightKind,
@@ -36,12 +37,14 @@ import {
   longestHunt,
   lowerThreat,
   nextHuntUnlock,
+  optionLock,
   optionWindows,
   potionsPerKind,
   questCreatures,
   questPeriod,
   rareCatchUp,
   rumorFactor,
+  rumorToday,
   trophyBonuses,
   sellPrice,
   resolveEvent,
@@ -290,11 +293,13 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
   // The Encyklopedia's trophies for the creatures of this place, as at the
   // start: the report comes out the same whenever it is claimed.
   const trophies = trophyBonuses(JSON.parse(player.row.discovered ?? '{}'), content, areaDangers(area, content).map((danger) => danger.monsterId));
-  // A rumor from the Karczma about this place (settlement.js): the
-  // exploration meets its elite and champion rumor.factor times as often,
-  // and uses the rumor up. Not a Szybkie Polowanie, nor one avoiding them.
-  const kept = settlementOn() ? JSON.parse(player.row.settlement ?? '{}') : null;
-  const rumor = kept && !quick && !avoidRare ? rumorFactor(kept.rumor, area.id, now, content) : 1;
+  // A rumor about this place, from the Karczma or from the beggar's song
+  // (an event, also without the Osada; settlement.js): the exploration
+  // meets its elite and champion rumor.factor times as often, and uses the
+  // rumor up. Not a Szybkie Polowanie, nor one avoiding them.
+  const stored = JSON.parse(player.row.settlement ?? '{}');
+  const kept = settlementOn() ? stored : null;
+  const rumor = !quick && !avoidRare ? rumorFactor(stored.rumor, area.id, now, content) : 1;
   // The companions hired in the Osada go along, as they are now
   // (companions.js), so the report comes out the same whenever claimed; a
   // wounded one once the character has rested to full HP, and then its
@@ -304,8 +309,8 @@ export async function beginHunt(db, player, { areaId, regionId, minutes, avoidRa
   const settlement =
     rumor > 1 || healed
       ? JSON.stringify({
-          ...kept,
-          ...(rumor > 1 && { rumor: { ...kept.rumor, used: true } }),
+          ...stored,
+          ...(rumor > 1 && { rumor: { ...stored.rumor, used: true } }),
           ...(healed && { companions: kept.companions.map(({ wounded: _, ...companion }) => companion) }),
         })
       : null;
@@ -414,18 +419,32 @@ export async function claimHunt(context) {
   });
 }
 
-// The Osada after an exploration with companions: each who went gains its
-// share of the XP, and one who fell is wounded until the character rests
-// to full HP (companions.js); a companion dismissed meanwhile is not
-// brought back. Null when none went.
-function companionsAfter(row, hunt) {
-  if (!hunt.companions?.length) return null;
+// The Osada after an exploration: each companion who went gains its share
+// of the XP, and one who fell is wounded until the character rests to full
+// HP (companions.js), while a companion dismissed meanwhile is not brought
+// back; an event's reputation joins the brotherhoods' (question 225); and
+// the beggar's song tells today's rumor where the Karczma has not told it
+// yet (`kept`), marked as the song's, so the mug still pays the innkeeper's
+// relation and tells the same. Null when nothing changed.
+function settlementAfterHunt(row, hunt, kept) {
+  const reward = hunt.event?.reward;
+  const went = hunt.companions?.length > 0;
+  const heard = reward?.rumor && !kept ? reward.rumor : null;
+  if (!went && !reward?.reputation && !heard) return null;
   const stored = JSON.parse(row.settlement ?? '{}');
-  const companions = (stored.companions ?? []).map((companion) => {
-    const went = hunt.companions.find((one) => one.id === companion.id);
-    return went ? companionAfterHunt(companion, { xp: hunt.xp, fainted: went.fainted }, row.level, content) : companion;
-  });
-  return JSON.stringify({ ...stored, companions });
+  const next = { ...stored };
+  if (went) {
+    next.companions = (stored.companions ?? []).map((companion) => {
+      const one = hunt.companions.find((member) => member.id === companion.id);
+      return one ? companionAfterHunt(companion, { xp: hunt.xp, fainted: one.fainted }, row.level, content) : companion;
+    });
+  }
+  if (reward?.reputation) {
+    next.reputation = { ...stored.reputation };
+    for (const [id, points] of Object.entries(reward.reputation)) next.reputation[id] = (next.reputation[id] ?? 0) + points;
+  }
+  if (heard) next.rumor = { ...heard, song: true };
+  return JSON.stringify(next);
 }
 
 // The report of a finished exploration: the engine runs it with the seed
@@ -477,18 +496,43 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // and the ending chosen for it if any ("event:case:ending"), without the
   // draw.
   const [forcedEvent = null, forcedCase = null, forcedEnding = null] = row.event_test ? row.event_test.split(':').map((part) => part || null) : [];
-  const event = eventsOn() ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn() }, content) : null;
-  if (event && choice === undefined) return { event: eventView(event, content.areasById[hunt.areaId]) };
+  const event = eventsOn()
+    ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn(), settlement: settlementOn() }, content)
+    : null;
+  // An option's price comes from the purse, the character's gold with the
+  // exploration's; an option of one class is greyed out for the others.
+  const who = { classId: row.class_id, level: row.level, purse: row.gold + hunt.gold };
+  if (event && choice === undefined) return { event: eventView(event, content.areasById[hunt.areaId], who, content) };
+  // Today's rumor, as the Karczma told it, or as the beggar's song may.
+  const kept = rumorToday(JSON.parse(row.settlement ?? '{}').rumor, now, content);
   if (event) {
-    if (!event.options.some((option) => option.id === choice)) throw new ApiError(400, 'invalid_choice', 'Wybierz jedną z opcji.');
+    const option = event.options.find((one) => one.id === choice);
+    if (!option) throw new ApiError(400, 'invalid_choice', 'Wybierz jedną z opcji.');
+    const lock = optionLock(option, who, content);
+    if (lock) throw new ApiError(409, lock.code, lock.code === 'class_only' ? `Tę opcję wybiera ${lock.text}.` : 'Brakuje złota na tę opcję.');
+    const rumor = kept ?? drawRumor({ character, seed: `${row.id}:settlement` }, now, content);
     hunt = resolveEvent(
-      { hunt, event, optionId: choice, caseId: forcedCase, endingId: forcedEnding, drafts: eventDraftsOn(), character, equipped: equippedItems(player), name: row.name, seed: activity.seed },
+      {
+        hunt,
+        event,
+        optionId: choice,
+        caseId: forcedCase,
+        endingId: forcedEnding,
+        drafts: eventDraftsOn(),
+        character,
+        equipped: equippedItems(player),
+        name: row.name,
+        seed: activity.seed,
+        purse: row.gold,
+        rumor,
+      },
       content,
     );
   }
   const applied = applyHunt(character, hunt, content);
-  // The companions who went gain XP, and one who fell is wounded (companions.js).
-  const settlementAfter = companionsAfter(row, hunt);
+  // The companions who went gain XP, one who fell is wounded, and an
+  // event's reputation and rumor are kept (settlementAfterHunt).
+  const settlementAfter = settlementAfterHunt(row, hunt, kept);
   // The potions drunk leave the bag; the bag cannot change during the
   // exploration, so they are still there.
   const drunk = Object.entries(hunt.potionsUsed);
@@ -612,7 +656,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       ),
       db
         .prepare(
-          `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = gold + ? + ${storedPrice.sql}${setResources}${setMaterials}${setHerbs},
+          `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setResources}${setMaterials}${setHerbs},
              time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${drunk.length > 0 ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''}${eventBuffs ? ', buffs = ?' : ''}${eventPoints > 0 ? ', bonus_points = bonus_points + ?' : ''}${settlementAfter ? ', settlement = ?' : ''},
              version = version + 1
            WHERE id = ?`,
@@ -622,7 +666,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
           applied.xp,
           applied.classLevel,
           applied.classXp,
-          hunt.gold + soldFoundGold,
+          // What an event took from the purse (an option's price, a thief's
+          // grab) comes off the exploration's gold.
+          hunt.gold + soldFoundGold - (hunt.spent ?? 0),
           ...storedPrice.binds,
           ...found.flatMap(([id, amount]) => [resourcePath(id), resourcePath(id), amount]),
           ...left.flatMap(([key, count]) => [resourcePath(key), resourcePath(key), count]),

@@ -189,7 +189,8 @@
       "damage": "Siła: obrażenia +{bonus}%",
       "focus": "Skupienie: Intelekt i Mądrość +{bonus}%",
       "poison": "Trucizna na broni: {bonus}% szans na Zatrucie przy ciosie",
-      "ward": "Osłona przed magią: obrażenia od magii −{bonus}%"
+      "ward": "Osłona przed magią: obrażenia od magii −{bonus}%",
+      "curse": "Klątwa: obrażenia −{bonus}%"
     },
     "texts": {
       "drinkHeal": ["{actor} wypija {potion}: +{amount} HP."],
@@ -209,7 +210,8 @@
       "damageFights": ["Wywar siły działał w walkach: {fights} z {all}."],
       "focusFights": ["Mikstura skupienia działała w walkach: {fights} z {all}."],
       "poisonFights": ["Olejek z tojadu działał w walkach: {fights} z {all}."],
-      "wardFights": ["Eliksir jemiołowy działał w walkach: {fights} z {all}."]
+      "wardFights": ["Eliksir jemiołowy działał w walkach: {fights} z {all}."],
+      "curseFights": ["Klątwa osłabiała ciosy w walkach: {fights} z {all}."]
     }
   },
   "herbs": [

@@ -22,6 +22,7 @@ import { simulateFight } from './combat.js';
 import { combatantView, playerCombatant } from './combatant.js';
 import { encounterCombatants } from './hunt.js';
 import { itemName, randomItem } from './items.js';
+import { countList, knownHerbs, professionOpen, professionState } from './professions.js';
 import { monsterXp } from './progression.js';
 import { createRng } from './rng.js';
 import { say } from './text.js';
@@ -37,11 +38,14 @@ export const eventChance = (content) => content.events.chance;
 // the regions of that level and higher (the author of the fern flower
 // without Licho: "powinno moc sie tez wyswietlac wszędzie", "ale nie na
 // startowych lvlach"). A draft, an event the author has not approved yet,
-// comes only where `drafts` are on (the test version).
-export const eventsIn = (areaId, drafts, content) =>
+// comes only where `drafts` are on (the test version), and an event of the
+// Osada (`settlement`: the merchant who pays in the Kompania Kupców'
+// reputation) only where the Osada is open.
+export const eventsIn = (areaId, drafts, content, settlement = false) =>
   content.events.list.filter(
     (event) =>
       (drafts || !event.draft) &&
+      (settlement || !event.settlement) &&
       (!event.areas || event.areas.includes(areaId)) &&
       !event.exceptAreas?.includes(areaId) &&
       (content.areasById[areaId]?.minLevel ?? 0) >= (event.minLevel ?? 0),
@@ -50,20 +54,40 @@ export const eventsIn = (areaId, drafts, content) =>
 // The event an exploration brings, or null. `forced` (an event's id, from
 // "Testuj zdarzenia" on the test version) brings that one without the draw,
 // in any region, still only after an exploration that ended as planned.
-export function eventFor({ hunt, seed, first = false, quick = false, forced = null, drafts = false }, content) {
+export function eventFor({ hunt, seed, first = false, quick = false, forced = null, drafts = false, settlement = false }, content) {
   if (!content.events || first || quick || hunt.result !== 'success') return null;
-  if (forced) return content.eventsById[forced] && (drafts || !content.eventsById[forced].draft) ? content.eventsById[forced] : null;
+  if (forced) {
+    const event = content.eventsById[forced];
+    return event && (drafts || !event.draft) && (settlement || !event.settlement) ? event : null;
+  }
   const rng = createRng(`${seed}:event`);
   if (!rng.chance(eventChance(content))) return null;
-  const open = eventsIn(hunt.areaId, drafts, content);
+  const open = eventsIn(hunt.areaId, drafts, content, settlement);
   return open.length ? rng.weighted(open, (event) => event.weight ?? 1) : null;
+}
+
+// An option's price in gold (`goldPerLevel` for each level of the
+// character: the beggar's coins, the leshy's bread and coins), paid from the
+// purse, the character's gold with the exploration's.
+export const optionCost = (option, level) => (option.goldPerLevel ? Math.round(option.goldPerLevel * level) : 0);
+
+// Why the character cannot take an option, or null: one of `classes` only
+// (the exorcism, the Kleryk's and its evolutions'; the others see it greyed
+// out, question 223 B), or a price above the purse.
+export function optionLock(option, { classId, level, purse }, content) {
+  if (option.classes && !option.classes.includes(classId)) {
+    return { code: 'class_only', text: `tylko ${option.classes.map((id) => content.classesById[id].name).join(' i ')}` };
+  }
+  if (optionCost(option, level) > purse) return { code: 'not_enough_gold', text: 'za mało złota' };
+  return null;
 }
 
 // An event as the player first sees it: who, where, the text and the
 // options. An event of any land (scene "land") stands in the land of the
 // exploration's inner region (`area`), on its background (the author: "Tu
-// byłoby używane tło danej krainy").
-export const eventView = (event, area = null) => ({
+// byłoby używane tło danej krainy"). For the character (`who`: its class,
+// level and purse) an option shows its price and why it is locked.
+export const eventView = (event, area = null, who = null, content = null) => ({
   id: event.id,
   title: event.title,
   art: event.art,
@@ -71,7 +95,11 @@ export const eventView = (event, area = null) => ({
   ...(event.scene === 'land' && { land: area?.regionId ?? null }),
   figure: event.figure,
   text: event.text,
-  options: event.options.map((option) => ({ id: option.id, label: option.label })),
+  options: event.options.map((option) => {
+    const cost = who ? optionCost(option, who.level) : 0;
+    const lock = who && content ? optionLock(option, who, content) : null;
+    return { id: option.id, label: option.label, ...(cost > 0 && { cost }), ...(lock && { locked: lock.text }) };
+  }),
 });
 
 // The case behind an event, drawn from the exploration's seed, or the one
@@ -101,25 +129,55 @@ function lootRules(character, equipped, area, content) {
   return { filled: new Set(equipped.map((item) => item.slot)), classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare };
 }
 
+// Herbs the character's Zielarstwo knows, once it is open, or none.
+function herbsKnown(character, content) {
+  const profession = content.gathering && content.professionsById[content.gathering.profession];
+  if (!profession || !professionOpen(profession, character.level, content)) return [];
+  return knownHerbs(professionState(character.professions, content.gathering.profession).level, content);
+}
+
+// Resources lost, as "Drewno −12, Kamień −5".
+const resourceLoss = (lost, content) =>
+  Object.entries(lost)
+    .map(([id, count]) => `${content.resourcesById[id].name} −${count}`)
+    .join(', ');
+
 // The exploration with the event's outcome for the option chosen, at the
 // exploration's end, in the event's case (`caseId` from "Testuj zdarzenia",
 // or drawn), with the outcome of a list that "Testuj zdarzenia" chose
 // (`endingId`) or a drawn one, drafts only with `drafts`: the outcome's
-// text, and what it brings. A reward is gold
-// (`gold` times rewards.goldPerLevel at the character's level, ±25%), an
-// item at the character's level of a rarity drawn from `itemRarities` or
-// `herbs` for the bag (the Kwiat paproci), kept in the exploration's `herbs`. A
-// fight is against the foes at the character's level (the events' people, or
-// a creature, as the Błędnica), with the character's HP of the exploration's
-// end. In an ambush the foes all move first; a speed bonus makes the
-// character quicker. Won, the fight pays as one of the exploration's
-// reference fights does, and the foes leave gold and, with itemChance, now
-// and then an item; lost, the character faints (or, in a safe place, only
-// gets away) as after a lost fight on the way. A reward may also be a buff
-// for the next explorations, as a potion for a time gives (`buff`), or
-// free stat points (`points`); a faint loses `goldLoss` of the
+// text, and what it brings. The option's price ({cost} in the texts) is paid
+// from the purse, the character's gold (`purse`) with the exploration's,
+// unless the outcome takes the gold another way (`free`); what the event
+// takes from the purse is the exploration's `spent`.
+//
+// A reward is gold (`gold` times rewards.goldPerLevel at the character's
+// level, ±25%), an item at the character's level of a rarity drawn from
+// `itemRarities`, `herbs` for the bag (the Kwiat paproci), kept in the
+// exploration's `herbs`, or `herbsKnown.count` herbs the character's
+// Zielarstwo knows ({herbs}), and without Zielarstwo gold (`herbsKnown.gold`,
+// told by its goldText), the XP of beating `xpFoes` at the character's level
+// ({xp}), reputation with brotherhoods of the Osada (`reputation`), or today's
+// rumor of an elite or a champion (`rumor`: the one the server passes, told
+// with {area} and {creature}; noRumorText without one). It may also be a
+// buff for the next explorations, as a potion for a time gives (`buff`, also
+// a curse), or free stat points (`points`). A loss takes `goldShare` of the
+// purse, at most `goldCapPerLevel` gold a level, or `resourcesShare` of the
+// resources the exploration gathered, told by `lossText` ({gold},
+// {resources}) when anything was lost. A faint loses `goldLoss` of the
 // exploration's gold, told by `lossText` when anything was lost.
-export function resolveEvent({ hunt, event, optionId, caseId = null, endingId = null, drafts = false, character, equipped, name, seed }, content) {
+//
+// A fight is against the foes at the character's level, with the
+// character's HP of the exploration's end. In an ambush the foes all move first; a speed bonus
+// makes the character quicker. Won, the fight pays as one of the
+// exploration's reference fights does, the foes leave gold and, with
+// itemChance, now and then an item, and `win` adds gold or an item of its
+// rarities (told by its text, {item}); lost, the character faints (or, in a
+// safe place, only gets away) as after a lost fight on the way.
+export function resolveEvent(
+  { hunt, event, optionId, caseId = null, endingId = null, drafts = false, character, equipped, name, seed, purse = 0, rumor = null },
+  content,
+) {
   const option = event.options.find((candidate) => candidate.id === optionId);
   const chosen = eventCase(event, seed, caseId);
   const t = hunt.minutes * 60000;
@@ -127,43 +185,102 @@ export function resolveEvent({ hunt, event, optionId, caseId = null, endingId = 
   const found = eventOutcome(option, chosen);
   const outcome = Array.isArray(found) ? listOutcome(found, { endingId, drafts }, rng) : found;
   const area = content.areasById[hunt.areaId];
+  const cost = outcome.free ? 0 : optionCost(option, character.level);
+  const spent = (hunt.spent ?? 0) + cost;
+  const fill = (text, values = {}) => Object.entries({ cost, ...values }).reduce((done, [key, value]) => done.replaceAll(`{${key}}`, String(value)), text);
   const tell = (text) => ({ t, type: 'event', text: `${event.title}. ${option.label}: ${text}` });
-  const view = (text) => ({ ...eventView(event, area), case: chosen?.id ?? null, option: { id: option.id, label: option.label, text }, fight: null });
+  const view = (text) => ({ ...eventView(event, area), case: chosen?.id ?? null, option: { id: option.id, label: option.label, text }, fight: null, ...(cost > 0 && { cost }) });
+  const goldOf = (times) => Math.round(content.balance.rewards.goldPerLevel * character.level * times * rng.float(0.75, 1.25));
+  const itemOf = (rarities) => {
+    const [rarityId] = rng.weighted(Object.entries(rarities), ([, weight]) => weight);
+    return randomItem(character.level, rng, content, { ...lootRules(character, equipped, area, content), rarityId });
+  };
 
-  if (outcome.kind === 'none') return { ...hunt, entries: [...hunt.entries, tell(outcome.text)], event: view(outcome.text) };
+  if (outcome.kind === 'none') {
+    const text = fill(outcome.text);
+    return { ...hunt, spent, entries: [...hunt.entries, tell(text)], event: view(text) };
+  }
 
   if (outcome.kind === 'faint') {
     const lost = Math.min(hunt.gold, Math.max(hunt.gold > 0 ? 1 : 0, Math.round(hunt.gold * outcome.goldLoss)));
-    const text = lost > 0 ? `${outcome.text} ${outcome.lossText.replace('{gold}', String(lost))}` : outcome.text;
-    return { ...hunt, gold: hunt.gold - lost, entries: [...hunt.entries, tell(text)], event: { ...view(text), loss: { gold: lost } } };
+    const text = fill(lost > 0 ? `${outcome.text} ${outcome.lossText}` : outcome.text, { gold: lost });
+    return { ...hunt, spent, gold: hunt.gold - lost, entries: [...hunt.entries, tell(text)], event: { ...view(text), loss: { gold: lost } } };
+  }
+
+  if (outcome.kind === 'loss') {
+    const left = Math.max(0, purse + hunt.gold - spent);
+    const cap = outcome.goldCapPerLevel ? outcome.goldCapPerLevel * character.level : Infinity;
+    const gold = outcome.goldShare ? Math.min(left, Math.round(Math.min(left * outcome.goldShare, cap))) : 0;
+    const resources = {};
+    const lost = {};
+    for (const [id, amount] of Object.entries(hunt.resources ?? {})) {
+      const taken = Math.round(amount * (outcome.resourcesShare ?? 0));
+      if (taken > 0) lost[id] = taken;
+      if (amount - taken > 0) resources[id] = amount - taken;
+    }
+    const any = gold > 0 || Object.keys(lost).length > 0;
+    const text = fill(any ? `${outcome.text} ${outcome.lossText}` : outcome.text, { gold, resources: resourceLoss(lost, content) });
+    return {
+      ...hunt,
+      spent: spent + gold,
+      ...(outcome.resourcesShare && { resources }),
+      entries: [...hunt.entries, tell(text)],
+      event: { ...view(text), loss: { gold, resources: lost } },
+    };
   }
 
   if (outcome.kind === 'reward') {
-    const gold = outcome.gold ? Math.round(content.balance.rewards.goldPerLevel * character.level * outcome.gold * rng.float(0.75, 1.25)) : 0;
+    let gold = outcome.gold ? goldOf(outcome.gold) : 0;
     const items = [...hunt.items];
-    let item = null;
-    if (outcome.itemRarities) {
-      const [rarityId] = rng.weighted(Object.entries(outcome.itemRarities), ([, weight]) => weight);
-      item = randomItem(character.level, rng, content, { ...lootRules(character, equipped, area, content), rarityId });
-      items.push(item);
-    }
+    const item = outcome.itemRarities ? itemOf(outcome.itemRarities) : null;
+    if (item) items.push(item);
     const herbs = { ...hunt.herbs };
-    for (const [id, count] of Object.entries(outcome.herbs ?? {})) herbs[id] = (herbs[id] ?? 0) + count;
-    const text = outcome.text.replace('{gold}', String(gold)).replace('{item}', item ? itemName(item, content) : '');
+    const given = { ...outcome.herbs };
+    let told = outcome.text;
+    if (outcome.herbsKnown) {
+      const known = herbsKnown(character, content);
+      if (known.length > 0) {
+        for (let i = 0; i < outcome.herbsKnown.count; i++) {
+          const herb = rng.pick(known);
+          given[herb.id] = (given[herb.id] ?? 0) + 1;
+        }
+      } else {
+        gold += goldOf(outcome.herbsKnown.gold);
+        told = outcome.herbsKnown.goldText;
+      }
+    }
+    for (const [id, count] of Object.entries(given)) herbs[id] = (herbs[id] ?? 0) + count;
+    const xp = outcome.xpFoes ? Math.round(outcome.xpFoes.reduce((sum, id) => sum + monsterXp(content.monstersById[id], character.level, content), 0) * (1 + content.balance.hunt.soloXpBonus)) : 0;
+    const heard = outcome.rumor ? rumor : null;
+    if (outcome.rumor && !heard) told = outcome.noRumorText;
+    const text = fill(told, {
+      gold,
+      item: item ? itemName(item, content) : '',
+      herbs: countList(given, content.herbsById),
+      xp,
+      area: heard ? content.areasById[heard.areaId].name : '',
+      creature: heard ? content.monstersById[heard.monsterId].counted[0] : '',
+    });
+    const herbsGiven = Object.keys(given).length > 0;
     return {
       ...hunt,
+      spent,
       gold: hunt.gold + gold,
+      xp: hunt.xp + xp,
       items,
-      ...(outcome.herbs && { herbs }),
+      ...(herbsGiven && { herbs }),
       entries: [...hunt.entries, tell(text)],
       event: {
         ...view(text),
         reward: {
           gold,
           item: item ? items.length - 1 : null,
-          herbs: outcome.herbs ?? null,
+          herbs: herbsGiven ? given : null,
+          ...(xp > 0 && { xp }),
           ...(outcome.buff && { buff: outcome.buff }),
           ...(outcome.points && { points: outcome.points }),
+          ...(outcome.reputation && { reputation: outcome.reputation }),
+          ...(heard && { rumor: heard }),
         },
       },
     };
@@ -213,12 +330,19 @@ export function resolveEvent({ hunt, event, optionId, caseId = null, endingId = 
       fightGold += rewards.goldPerLevel * enemy.level * foe.reward.gold * rng.float(0.5, 1.5) * enemy.groupFactor;
       if (rng.chance(outcome.itemChance ?? 0)) summary.chests.push(items.push(randomItem(enemy.level, rng, content, loot)) - 1);
     }
+    // What the win leaves besides: the offerings' silver, the leshy's gift.
+    if (outcome.win?.gold) fightGold += goldOf(outcome.win.gold);
+    const won = outcome.win?.itemRarities ? itemOf(outcome.win.itemRarities) : null;
     summary.xp = Math.round(fightXp * (1 + content.balance.hunt.soloXpBonus));
     summary.gold = Math.round(fightGold);
     summary.recovered = Math.round((player.maxHp - hpNow) * player.recovery);
     hpNow += summary.recovered;
     lines.push(say(texts, 'victory', index), `HP: ${hpBefore} → ${summary.hpAfter}. +${summary.xp} XP, +${summary.gold} złota.`);
     summary.chests.forEach((itemIndex, i) => lines.push(say(content.events.texts, 'loot', i, { item: itemName(items[itemIndex], content) })));
+    if (won) {
+      summary.chests.push(items.push(won) - 1);
+      lines.push(outcome.win.text.replace('{item}', itemName(won, content)));
+    }
     if (summary.recovered > 0) lines.push(say(texts, 'recover', index, { hp: summary.recovered }));
   } else {
     result = fight.won === false && !area.safe ? 'fainted' : 'escaped';
@@ -227,17 +351,19 @@ export function resolveEvent({ hunt, event, optionId, caseId = null, endingId = 
     summary.hpAfter = hpNow;
   }
 
+  const told = fill(outcome.text);
   return {
     ...hunt,
+    spent,
     result,
     xp: hunt.xp + summary.xp,
     gold: hunt.gold + summary.gold,
     items,
     hpEnd: hpNow,
     fights: [...hunt.fights, summary],
-    entries: [...hunt.entries, tell(outcome.text), { t, type: 'fight', fight: index, text: lines.join(' ') }],
+    entries: [...hunt.entries, tell(told), { t, type: 'fight', fight: index, text: lines.join(' ') }],
     // The report opens on the event's fight.
     keyFight: { index },
-    event: { ...view(outcome.text), fight: index },
+    event: { ...view(told), fight: index },
   };
 }
