@@ -1,0 +1,23 @@
+{
+  "id": "merchant-1",
+  "payload": {
+    "prompt": "a shrewd slavic merchant in his fifties, a lean face with sharp grey eyes and a knowing smile, a neatly trimmed dark beard streaked with grey, a tall felt cap with a dark fur brim, a dark green kaftan with a row of brass buttons and a gold embroidered collar, a small brass balance scale hanging from one hand beside his shoulder, the whole head and the cap inside the picture with a little empty space above the cap, head and shoulders portrait, his shoulders fill the whole bottom of the picture from the left edge to the right edge, facing the viewer, three-quarter view, on a flat plain light beige background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 256762247,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793465101,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 44.27,
+    "request_id": "0686896e-8fd6-4929-903b-a38c39d86dd6",
+    "outputs_retained_until": 1793551453
+  }
+}
