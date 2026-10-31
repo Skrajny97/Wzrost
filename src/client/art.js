@@ -279,14 +279,14 @@ export const SPRITES = {
   },
   // The companions' whole figures for fights (the author: "Do popiersi
   // towarzyszy trzeba też wygenerować portrety do walki"), in the class
-  // portraits' frame and size (tools/normalize-portraits.py), filled in as
-  // the author approves them; `faces` as the class portraits'. Until a
-  // companion has one, its fight card shows its bust.
+  // portraits' frame and size (tools/normalize-portraits.py), as the author
+  // picked them; `faces` as the class portraits'. A companion without one
+  // would show its bust.
   'companion-portraits': {
     width: 96,
     height: 128,
-    ids: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
-    faces: { 'warrior-female': 54, 'warrior-male': 52, 'archer-female': 48, 'archer-male': 44, 'mage-female': 47, 'cleric-female': 53, 'cleric-male': 58, 'shadow-female': 45, 'shadow-male': 46 },
+    ids: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
+    faces: { 'warrior-female': 54, 'warrior-male': 52, 'archer-female': 48, 'archer-male': 44, 'mage-female': 47, 'mage-male': 45, 'cleric-female': 53, 'cleric-male': 58, 'shadow-female': 45, 'shadow-male': 46 },
   },
   'settlement-board': {
     width: 384,
