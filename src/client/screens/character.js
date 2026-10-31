@@ -5,14 +5,14 @@
 
 import { herbSprite, itemSprite, materialSprite, portraitSprite, potionSprite, resourceArt } from '../art.js';
 import { bonusList } from '../bonuses.js';
-import { MATERIALS_HINT, materialIcon } from '../craft-table.js';
+import { MATERIALS_HINT, craft, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, timeFormat } from '../format.js';
 import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { portrait } from '../portraits.js';
 import { playSound } from '../sound.js';
 import { call, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
-import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
+import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 
@@ -297,16 +297,23 @@ export function mountCharacter(container) {
     ];
   }
 
-  // A material's card: what it is and what the table makes of it, and
-  // selling as many as chosen to the scrapper (proposal 1: "Skup złomu
-  // kupuje materiały"), one to start with, as for herbs and potions.
-  function materialSheet(material) {
+  // A material's card: what it is and what the table makes of it, the
+  // whole stack to the table's queue from here (the author: "dodac przerób
+  // tak jak przedmioty z pozycji plecaka samego"), and selling as many as
+  // chosen to the scrapper (proposal 1: "Skup złomu kupuje materiały"), one
+  // to start with, as for herbs and potions, once the player confirms (the
+  // author: "delikatne, ale zeby trzeba bylo potwierdzic").
+  function materialSheet(material, start = 1) {
     const description = state.content.materials?.find((candidate) => candidate.id === material.materialId)?.description;
     const table = state.character.camp.buildings.find((building) => building.crafts);
+    const crafting = state.character.crafting;
+    const built = crafting?.pace > 0;
+    const full = Boolean(crafting) && crafting.queue.length >= crafting.limit;
+    const needs = crafting?.materials.find((one) => one.key === material.key)?.needs ?? null;
     const art = materialSprite(material.materialId);
     const title = h('h2', { class: 'item-title', vars: { '--rarity': material.color }, text: materialTitle(material) });
     const meta = h('p', { class: 'item-meta', text: `${material.rarityName} · ${formatNumber(material.count)} szt.` });
-    let count = 1;
+    let count = start;
     const price = (amount) => Math.max(1, Math.round(material.price * amount));
     const value = h('output', { class: 'herb-count-value' });
     const sell = h('button', { type: 'button', class: 'button button--system' });
@@ -321,14 +328,36 @@ export function mountCharacter(container) {
       more.disabled = count === material.count;
     }
     set(count);
-    sell.addEventListener('click', (event) =>
-      withButton(event.currentTarget, async () => {
+    sell.addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      const sure = await confirmAction({
+        title: 'Sprzedać materiał?',
+        text: `Złomiarz kupi: ${materialTitle(material)} ×${formatNumber(count)} za ${formatNumber(price(count))} złota. Stół rozbiórki zrobiłby z tego: ${material.part} ×${formatNumber(count)}.`,
+        confirmLabel: 'Sprzedaj',
+      });
+      // Not sold: back to the material's card as it was, once the
+      // confirmation's sheet has finished closing.
+      if (!sure) return afterSheet(() => materialSheet(material, count));
+      withButton(button, async () => {
         const { sold } = await call('POST', '/api/materials/sell', { key: material.key, count });
         closeSheet();
         playSound('coin');
         toast(`Złomiarz kupił ${formatNumber(sold.count)} szt. za ${formatNumber(sold.gold)} złota.`);
-      }),
-    );
+      });
+    });
+    const process = built
+      ? h('button', {
+          type: 'button',
+          class: 'button button--world',
+          disabled: full || needs !== null,
+          text: `Przerób ×${formatNumber(material.count)}`,
+          onClick: (event) =>
+            withButton(event.currentTarget, async () => {
+              await craft({ keys: [material.key] });
+              closeSheet();
+            }),
+        })
+      : table && h('a', { class: 'button button--world', href: `#/oboz/${table.id}`, onClick: closeSheet, text: 'Zbuduj Stół rozbiórki' });
     openSheet(
       h(
         'div',
@@ -337,14 +366,11 @@ export function mountCharacter(container) {
         description && h('p', { class: 'sheet-text', text: description }),
         h('p', { class: 'sheet-text', text: `Stół rozbiórki zrobi z tego: ${material.part} ×${formatNumber(material.count)}.` }),
         h('p', { class: 'sheet-text', text: `Złomiarz płaci ${formatDecimal(material.price)} złota za sztukę.` }),
+        built && needs !== null && h('p', { class: 'system-hint', text: `Ten materiał Stół rozbiórki przerobi od swojego poziomu ${needs}.` }),
+        built && needs === null && full && h('p', { class: 'system-hint', text: `Kolejka stołu jest pełna (${crafting.limit} zleceń). Poczekaj, aż skończy się pierwsze.` }),
       ),
       h('div', { class: 'herb-count' }, less, value, more, all),
-      h(
-        'div',
-        { class: 'sheet-actions' },
-        table && h('a', { class: 'button button--world', href: `#/oboz/${table.id}`, onClick: closeSheet, text: table.level > 0 ? 'Do Stołu rozbiórki' : 'Zbuduj Stół rozbiórki' }),
-        sell,
-      ),
+      h('div', { class: 'sheet-actions' }, process, sell),
     );
   }
 

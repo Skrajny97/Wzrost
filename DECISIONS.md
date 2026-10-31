@@ -2987,6 +2987,13 @@ Autor: „Do tego możesz wstępnie zacząć robić resztę co istnieje z Osady 
 8. **Rany (113 A, zmienione 31.10).** Rany towarzysza goją się razem z ranami postaci, więc „Przewiń” odpoczynku postaci skraca też je.
 9. **Jeszcze nie ma:** Kwater w obozie (104 A, potrzebują grafiki budynku do oceny autora), twarzy towarzyszy (107 B; próbne popiersia 231 i 232 czekają na ocenę, a w walce towarzysz ma na razie portret swojej klasy) i cech w zdarzeniach (część IV).
 
+## Materiały w plecaku: potwierdzenie sprzedaży i przerób (31.10.2026)
+
+Autor: „Na przycisk sprzedaj przy sprzedawaniu materialow trzeba nalozyc ostrzezenie, czy na pewno chcemy sprzedac dany material”, „delikatne, ale zeby trzeba bylo potwierdzic” oraz „dodac przerób tak jak przedmioty z pozycji plecaka samego bo niepotrzebnie człowiek lata z tym klika”.
+
+1. **Potwierdzenie.** „Sprzedaj za N złota” przy materiale pyta najpierw: „Sprzedać materiał?”, z tym, co kupi złomiarz i co zrobiłby z tego Stół rozbiórki. „Anuluj” wraca do karty materiału z tą samą liczbą sztuk.
+2. **Przerób z plecaka.** Karta materiału ma „Przerób ×N”, które oddaje cały stos na Stół rozbiórki, tak jak „Przerób” na ekranie stołu. Gdy stół jest za niski na tę rzadkość albo kolejka jest pełna, przycisk jest wyłączony z wyjaśnieniem. Bez zbudowanego stołu zostaje „Zbuduj Stół rozbiórki”.
+
 ## Osada: uwagi autora z 31.10 (na wersji testowej)
 
 1. **Zbylut.** Autor: „"kilka ciekawych informacji" zamiast "ciekawych słów"”. Powitanie Znajomego brzmi teraz: „O, znowu ty. Ludzie z traktu zostawili tu dziś kilka ciekawych informacji.”

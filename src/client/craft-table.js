@@ -18,7 +18,9 @@ export function materialIcon(materialId, size = 24) {
   return materialSprite(materialId) ?? icon(family ?? 'hammer', { size });
 }
 
-async function craft(body) {
+// Materials to the table's queue, from its screen or from the bag (the
+// author: "dodac przerób tak jak przedmioty z pozycji plecaka samego").
+export async function craft(body) {
   const { ordered, skipped } = await call('POST', '/api/craft/materials', body);
   playSound('build');
   const waiting = skipped > 0 ? ` Na wyższy poziom stołu ${skipped === 1 ? 'czeka' : 'czekają'}: ${countOf(skipped, 'materiał', 'materiały', 'materiałów')}.` : '';
