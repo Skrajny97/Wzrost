@@ -214,16 +214,14 @@ export const COMPANION_SLOTS = ['weapon', 'chest', 'talisman'];
 
 // Why the companion cannot wear `item` from the character's bag (question
 // 108 A: "gracz zakłada towarzyszowi przedmioty jego klasy z plecaka"), or
-// null: one of its places, its class and its class level (its level), and
-// an item from a Wymiana or the Skrzynia Konta from the item's own level,
-// as for the character.
+// null: one of its places, its class, and its class level (its level) for
+// the item's Tier, wherever the item came from, as for the character.
 export function companionWearBlock(companion, item, content) {
   if (!COMPANION_SLOTS.includes(item.slot)) return { code: 'wrong_slot', message: 'Towarzysz nosi tylko broń, pancerz i talizman.' };
   if (!canUse(item.base, companion.classId, content)) return { code: 'wrong_class', message: 'Klasa towarzysza nie może używać tego przedmiotu.' };
   if (!canUse(item.base, companion.classId, content, companion.level)) {
     return { code: 'class_level', message: `Ten przedmiot towarzysz założy od poziomu ${baseClassLevel(item.base, content)}.` };
   }
-  if ((item.traded || item.chest) && item.level > companion.level) return { code: 'trade_level', message: `Ten przedmiot towarzysz założy od poziomu ${item.level}.` };
   return null;
 }
 

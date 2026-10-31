@@ -143,7 +143,7 @@
   },
   "reforge": {
     "resident": "enchantress",
-    "goldPerLevel": 30,
+    "goldPerLevel": 3,
     "growth": 1.25,
     "materials": { "rare": { "rarity": "common", "count": 3 }, "unique": { "rarity": "common", "count": 5 }, "epic": { "rarity": "rare", "count": 3 }, "legendary": { "rarity": "rare", "count": 5 }, "mythic": { "rarity": "unique", "count": 3 }, "divine": { "rarity": "unique", "count": 5 } },
     "relationGain": 5,
@@ -180,7 +180,7 @@
   "imbue": {
     "resident": "enchantress",
     "relationGain": 5,
-    "goldPerLevel": 40,
+    "goldPerLevel": 4,
     "materialCount": 3,
     "weaponShare": 0.15,
     "resistRarity": "rare",

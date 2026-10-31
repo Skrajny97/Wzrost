@@ -2996,15 +2996,33 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
-## Karta przedmiotu z wymiany podaje jeden poziom (31.10.2026, na wersji testowej)
+## Wersja 0.0.70 (31.10.2026)
 
-Autor o karcie broni „Puchaczowa Bradatka Muflona +2” (na zrzucie „poz. 36” i „Od poziomu klasy 25”): „to od poziomu klasy 25 czy 36? jakiś błąd totalny.”
+Autor: „Wdrażaj 0.0.70 awaryjnie”.
 
-1. **Błąd.** Linia „Od poziomu klasy” na karcie podawała tylko wymóg samej broni (Bradatka: 25). Przedmiot z Wymiany, Targowiska albo Skrzyni Konta zakłada się jednak dopiero od poziomu klasy równego poziomowi przedmiotu (tu 36), zgodnie z zasadą z wersji 0.0.67. Jej punkt 3 mówi, że karta podaje wtedy wyższą liczbę, a ta linia tego nie robiła.
-2. **Poprawka.** Karta takiego przedmiotu podaje w linii „Od poziomu klasy” wyższą z dwóch liczb, tak samo jak ostrzeżenie pod nią. Lista w Skrzyni Konta też podaje wyższą liczbę, również wtedy, gdy wyższy jest wymóg samej broni.
-3. **Własny łup bez zmian.** Przedmiot zdobyty samemu zakłada się od wymogu samej broni (Bradatka od poziomu klasy 25), choćby miał wyższy poziom.
+1. **Co wchodzi do gry:**
+    - przedmioty z Wymiany, Targowiska i Skrzyni Konta zakłada się według Tieru, a karta przedmiotu podaje Tier (zob. „Przedmioty według Tieru”);
+    - tańsza Zaklinaczka (zob. „Tańsza Zaklinaczka”);
+    - zlecenia na dowolne materiały jednej rzadkości, a stare zlecenia na materiał jednego stwora losują się od nowa (zob. „Zlecenia na dowolne materiały”).
+2. **Migracje bazy:** brak.
 
-## Zlecenia na dowolne materiały (31.10.2026, na wersji testowej)
+## Przedmioty według Tieru (31.10.2026, w grze od 0.0.70)
+
+Autor o karcie broni „Puchaczowa Bradatka Muflona +2” (na zrzucie „poz. 36” i „Od poziomu klasy 25”): „to od poziomu klasy 25 czy 36? jakiś błąd totalny.” Potem: „Niech przedmioty z Wymian i Targowiska działają w oparciu o Tiery a nie poziomy samej broni (co tez jest niepotrzebne szczególnie IMO). DO POPRAWY I AWARYJNEGO WDROŻENIA MOTYW. Działaj. Mozesz dopisywać Tiery do przedmiotów.”
+
+1. **Zasada.** Każdy przedmiot zakłada się od poziomu klasy swojego Tieru, czyli od wymogu swojej bazy, jak w Encyklopedii: Tier I od początku, II od 10., III od 25., IV od 50. poziomu klasy. Poziom samego przedmiotu się nie liczy, także dla przedmiotu z Wymiany, z Targowiska i ze Skrzyni Konta od innej postaci. Bradatka poz. 36 (Tier III) wchodzi od 25. poziomu klasy. Ta zasada zastępuje wpis „Przedmiot z wymiany od poziomu klasy”.
+2. **Tier na karcie.** Karta przedmiotu podaje Tier po rzadkości, slocie i poziomie, np. „unikalny · Broń · poz. 36 · Tier III”. Linia „Od poziomu klasy”, ostrzeżenie pod kartą, oferty Wymiany i Targowiska oraz lista Skrzyni podają ten sam wymóg.
+3. **Towarzysze** zakładają przedmioty według tej samej zasady.
+4. **Skutek.** Silny przedmiot z niskiego Tieru od innego gracza, np. Topór poz. 80 (Tier I), postać założy od razu.
+
+## Tańsza Zaklinaczka (31.10.2026, w grze od 0.0.70)
+
+Autor: „Zmniejsz cene u Zaklinaczki również, zdecydowanie za dużo woła za niskiej wartosci afiksy czy żywioły. Tak o jeden rząd wielkości nawet. Sprawdzilem na wlasnej skórze. Później moze to rosnac, ale złoto jest wszedzie potrzebne i caly czas się leci póki co w grze na deficycie.” oraz „Werbunek zostaje na aktualnym poziomie.”
+
+1. **Ceny.** Zaklęcie afiksu kosztuje 3 złota za poziom przedmiotu razy mnożnik sprzedaży jego rzadkości (było 30), a zaklęcie żywiołu 4 (było 40). Unikalny przedmiot poz. 36: afiks 432 złota zamiast 4320, żywioł 576 zamiast 5760. Każde kolejne zaklęcie afiksu tego samego przedmiotu dalej drożeje 1,25 raza, a materiały się nie zmieniają.
+2. **Werbunek** towarzyszy kosztuje tyle co dotąd.
+
+## Zlecenia na dowolne materiały (31.10.2026, w grze od 0.0.70)
 
 Autor o zleceniu tygodnia „32 × Skóra lisa” na 28. poziomie postaci: „Takie zlecenie tygodnia na 28 poziomie jest bez sensu. I w ogóle bez sensu takie duże, skoro tak trudno te materiały trafić.”, „Powinno być prędzej oddaj 32 materiały pospolite/ileś rzadkich/unikalnych.” oraz „Te zlecenie powinny być losowane dla danej postaci na dany poziom, powinno ich być albo dużo albo ogólne (raczej ogólne).”
 
@@ -3013,7 +3031,7 @@ Autor o zleceniu tygodnia „32 × Skóra lisa” na 28. poziomie postaci: „Ta
 3. **Rzadszych mniej.** Na każdą rzadkość powyżej pospolitej przypada o połowę mniej sztuk (`materialStep`: 0,5). Złota jest mniej więcej tyle samo, bo rzadszy materiał jest dwa razy droższy. Na 28. poziomie zlecenie tygodnia prosi o 16–32 materiały pospolite, 8–16 rzadkich, 4–8 unikalnych albo 2–4 epickie. Zwykłe zlecenie prosi o 4–8 pospolitych, 2–4 rzadkie, 1–2 unikalne albo 1 epicki.
 4. **Zlecenie jakościowe.** Od stopnia „Stały klient” zlecenie bywa o rzadkość wyżej, najwyżej na materiały epickie. Prosi wtedy o mniej sztuk, a za sztukę płaci dwa razy więcej, jak dotąd.
 5. **Oddawanie.** Gra sama bierze materiały: najpierw z największych stosów, żeby postaci zostało po trochu z każdego. Materiały żywiołów Zaklinaczki (Iskra ognika, Skóra węgorza, Rosa rosiczki) idą na końcu. Zanim gracz odda zlecenie, karta pokazuje, co zabierze, np. „Oddasz: 20 × Skóra wilka, 12 × Skóra lisa.”
-6. **Zlecenia sprzed zmiany.** Zlecenie na materiał jednego stwora, które już wisi na tablicy, prosi teraz o dowolne materiały tej samej rzadkości, za tę samą liczbę sztuk i to samo złoto. „32 × Skóra lisa” ze zrzutu ekranu autora to teraz „32 materiały pospolite”.
+6. **Zlecenia sprzed zmiany.** Autor: „Zlecenia aktualne jeśli są z tych dziwacznych - przelosuj każdemu.” Zlecenie na materiał jednego stwora, które już wisi na tablicy, losuje się od nowa według nowych zasad, z tygodniem terminu od chwili losowania. Zlecenie tygodnia też, chyba że jest już oddane.
 
 ## Wersja 0.0.69 (31.10.2026)
 
@@ -3118,6 +3136,8 @@ Autor: „Mialo byc od poziomu klasy.” Na zrzucie: „Ten przedmiot z wymiany 
 2. **Targowisko** liczy tak samo (241: „jak Wymiana”).
 3. **Dwa wymagania naraz.** Gdy przedmiot ma też własny wymagany poziom klasy, a ten jest wyższy, karta przedmiotu i oferty podają wyższą liczbę.
 4. **Towarzysz bez zmian.** Jego poziom jest zarazem poziomem klasy.
+
+*Od 0.0.70 zastąpione: przedmioty z Wymiany, Targowiska i Skrzyni zakłada się według Tieru, nie według ich poziomu (zob. „Przedmioty według Tieru”).*
 
 ## Zielarka sprzedaje zioła (31.10.2026, na wersji testowej)
 

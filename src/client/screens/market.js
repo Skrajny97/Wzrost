@@ -117,7 +117,7 @@ function itemEntry(item, key, opened) {
   const character = state.character;
   const notes = [
     item.classIds && !item.classIds.includes(character.classId) && 'Twoja klasa nie może go używać.',
-    character.classLevel < Math.max(item.level, item.classLevel ?? 0) && `Założysz go od poziomu klasy ${Math.max(item.level, item.classLevel ?? 0)}.`,
+    character.classLevel < (item.classLevel ?? 1) && `Założysz go od poziomu klasy ${item.classLevel}.`,
   ].filter(Boolean);
   return [
     h(

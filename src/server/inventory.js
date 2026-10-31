@@ -59,14 +59,12 @@ export async function equipItem(context) {
   if (!canUse(item.base, player.row.class_id, content)) {
     throw new ApiError(403, 'wrong_class', 'Twoja klasa nie może używać tego przedmiotu.');
   }
+  // Every item, an own find or one from a Wymiana, the Targowisko or the
+  // Skrzynia Konta, is worn from its Tier, the class level its base asks
+  // for, whatever its own level (the author: "Niech przedmioty z Wymian i
+  // Targowiska działają w oparciu o Tiery a nie poziomy samej broni").
   if (!canUse(item.base, player.row.class_id, content, player.row.class_level)) {
     throw new ApiError(403, 'class_level', `Ten przedmiot założysz od poziomu klasy ${baseClassLevel(item.base, content)}.`);
-  }
-  // A strong item from a friend, or from another character of the account
-  // through the Skrzynia Konta, waits for the class to grow into it
-  // (trades.js, chest.js; the author: "Mialo byc od poziomu klasy").
-  if ((item.traded || item.chest) && item.level > player.row.class_level) {
-    throw new ApiError(403, 'trade_level', `Przedmiot ${item.chest ? 'ze Skrzyni Konta' : 'z wymiany'} założysz od poziomu klasy ${item.level}.`);
   }
 
   // Whatever was in the slot goes back to the bag first.

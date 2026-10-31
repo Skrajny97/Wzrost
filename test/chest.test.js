@@ -1,7 +1,7 @@
 // The Skrzynia Konta in the camp (src/server/chest.js): a few places for the
 // items an account's characters share. An item from another character is
-// worn from its own level and the Encyklopedia leaves it out; the one that
-// put it in takes it back as it was.
+// worn by its Tier, as an own find, and the Encyklopedia leaves it out; the
+// one that put it in takes it back as it was.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -48,7 +48,7 @@ describe('Skrzynia Konta', () => {
     ({ cookie } = await signUp('skrzynia'));
   });
 
-  test('an item another character put in comes marked: worn from its own level and left out of the Encyklopedia', async () => {
+  test('an item another character put in comes marked: worn by its Tier and left out of the Encyklopedia', async () => {
     await create('Mira');
     const given = await inBag('Mira', amulet(30));
     await call('GET', '/api/character', { cookie });
@@ -63,20 +63,21 @@ describe('Skrzynia Konta', () => {
 
     await create('Druga');
     const seen = await chest();
-    assert.deepEqual([seen.items[0].own, seen.items[0].from, seen.items[0].wornFrom], [false, 'Mira', 30]);
+    assert.deepEqual([seen.items[0].own, seen.items[0].from, seen.items[0].wornFrom], [false, 'Mira', null]);
     const taken = await take(seen.items[0].id);
     assert.equal(taken.status, 200, JSON.stringify(taken.data));
     assert.equal(taken.data.chest.items.length, 0);
     const item = taken.data.character.bag[0];
     assert.equal(item.chest, true);
+    // A level 30 amulet (Tier I) on a new character (the author: "Niech
+    // przedmioty z Wymian i Targowiska działają w oparciu o Tiery").
     const worn = await call('POST', `/api/items/${item.id}/equip`, { cookie });
-    assert.equal(worn.data.error.code, 'trade_level');
-    assert.equal(worn.data.error.message, 'Przedmiot ze Skrzyni Konta założysz od poziomu klasy 30.');
+    assert.equal(worn.status, 200, JSON.stringify(worn.data));
     assert.equal((await discovered('Druga'))['item:amulet'], undefined);
     assert.equal((await discovered('Mira'))['item:amulet'], 1);
   });
 
-  test('another character\'s item is worn from its level or its base\'s class level, whichever is higher', async () => {
+  test('another character\'s item is worn from its Tier, its base\'s class level', async () => {
     await create('Mira');
     const stone = generateItem({ baseId: 'holed-stone', level: 5 }, createRng('stone'), content);
     assert.equal((await put(await inBag('Mira', stone))).status, 200);

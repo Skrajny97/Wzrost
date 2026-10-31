@@ -296,15 +296,14 @@ describe('items', () => {
     assert.equal(canUse('holed-stone', 'mage', content), true);
     assert.equal(itemView(generateItem({ baseId: 'holed-stone', level: 10 }, rng, content), content).classLevel, 10);
     assert.equal(itemView(generateItem({ baseId: 'talisman', level: 10 }, rng, content), content).classLevel, null);
-    // An item from a Wymiana, the Targowisko or the Skrzynia Konta is worn
-    // from its own level too: the card gives the higher number (the author:
-    // "to od poziomu klasy 25 czy 36?").
+    // Every item is worn by its Tier, the Encyklopedia's, wherever it came
+    // from (the author: "Niech przedmioty z Wymian i Targowiska działają w
+    // oparciu o Tiery a nie poziomy samej broni"), and the card names it.
     const axe = generateItem({ baseId: 'bearded-axe', level: 36 }, rng, content);
-    assert.equal(itemView(axe, content).classLevel, 25);
-    assert.equal(itemView({ ...axe, traded: 1 }, content).classLevel, 36);
-    assert.equal(itemView({ ...axe, chest: 1 }, content).classLevel, 36);
-    assert.equal(itemView({ ...axe, level: 20, traded: 1 }, content).classLevel, 25);
-    assert.equal(itemView({ ...generateItem({ baseId: 'talisman', level: 12 }, rng, content), traded: 1 }, content).classLevel, 12);
+    for (const from of [{}, { traded: 1 }, { chest: 1 }]) assert.equal(itemView({ ...axe, ...from }, content).classLevel, 25);
+    assert.equal(itemView(axe, content).tier, 'Tier III');
+    assert.equal(itemView(generateItem({ baseId: 'talisman', level: 60 }, rng, content), content).tier, 'Tier I');
+    assert.equal(itemView(generateItem({ baseId: 'holed-stone', level: 10 }, rng, content), content).tier, 'Tier II');
     // Stronger by a slightly higher factor (0.32 against 0.3) and a flat
     // +2–4 Witalność on top: the lead grows only a little with the level.
     let lowLead = 0;

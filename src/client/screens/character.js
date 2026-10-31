@@ -548,11 +548,9 @@ export function itemSheet(item, { equipped }) {
   // item worn is changed at home (inventory.js).
   const busy = Boolean(character.activity);
   const usable = !item.classIds || item.classIds.includes(character.classId);
-  // A later base of its kind waits for its class level (a Metin2-like tier).
+  // A later base of its kind waits for its class level (a Metin2-like tier),
+  // an item from another player too, whatever its own level (inventory.js).
   const early = usable && item.classLevel !== null && character.classLevel < item.classLevel;
-  // One from a Wymiana, or from another character through the Skrzynia
-  // Konta, is worn from its own level of the class on (inventory.js).
-  const traded = !equipped && (item.traded || item.chest) && item.level > character.classLevel;
   const worn = equipped ? null : character.equipment[item.slot];
   const act = (path) => async (event) =>
     withButton(event.currentTarget, async () => {
@@ -596,12 +594,7 @@ export function itemSheet(item, { equipped }) {
     !equipped && salvageSection(item, false),
     busy && h('p', { class: 'muted', text: busyText(character) }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
-    early && !traded && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
-    traded &&
-      h('p', {
-        class: 'region-warning',
-        text: `Ten przedmiot ${item.chest ? 'ze Skrzyni Konta' : 'z wymiany'} założysz od poziomu klasy ${Math.max(item.level, early ? item.classLevel : 0)}.`,
-      }),
+    early && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
     !equipped &&
       item.price !== undefined &&
       h('button', { type: 'button', class: 'button button--world', onClick: sell, text: `Sprzedaj za ${formatNumber(item.price)} złota` }),
@@ -612,7 +605,7 @@ export function itemSheet(item, { equipped }) {
         ? h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: 'Zdejmij' })
         : [
             h('button', { type: 'button', class: 'button button--world', onClick: discard, text: 'Wyrzuć' }),
-            h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early || traded, onClick: act('equip'), text: 'Załóż' }),
+            h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early, onClick: act('equip'), text: 'Załóż' }),
           ],
     ),
   );
@@ -919,7 +912,7 @@ export function itemSummary(item) {
 
 export function itemDetails(item, { small = false } = {}) {
   const title = h(small ? 'p' : 'h2', { class: 'item-title', vars: { '--rarity': item.color }, text: itemTitle(item) });
-  const meta = h('p', { class: 'item-meta', text: `${item.rarityName} · ${item.slotName} · poz. ${item.level}` });
+  const meta = h('p', { class: 'item-meta', text: [item.rarityName, item.slotName, `poz. ${item.level}`, item.tier].filter(Boolean).join(' · ') });
   // The card of an item shows its sprite large, on a frame in its rarity colour.
   const art = !small && itemSprite(item);
   return h(

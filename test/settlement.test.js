@@ -238,15 +238,23 @@ describe('the Osada in the engine', () => {
     assert.equal(deliverBlock(board, 1, { materials: { ...materials, [`${spark}:rare`]: 16 } }, content).code, 'not_enough');
   });
 
-  test('an order for one creature\'s material hung before asks for any of its rarity, for the same count and gold', () => {
+  test('an order for one creature\'s material hung before is drawn anew, the week\'s too, and a delivered week stays', () => {
     const board = settleBoard(emptyBoard(), { character, seed: 'old' }, NOW, content);
     const wolf = content.materialsByMonster.wolf;
     const old = { kind: 'material', key: `${wolf.id}:${wolf.rarity}`, brotherhood: 'hunters', count: 32, gold: 128, reputation: 50, story: content.settlement.orders.stories.material[0] };
     const stored = { ...board, slots: [{ order: { ...old, id: 99, expiresAt: NOW + HOUR } }, ...board.slots.slice(1)], weekly: { ...board.weekly, order: { ...old, weekly: true } } };
-    const fresh = settleBoard(stored, { character, seed: 'old' }, NOW, content);
-    assert.deepEqual(fresh.slots[0].order, { ...old, id: 99, expiresAt: NOW + HOUR, key: `any:${wolf.rarity}` });
-    assert.deepEqual(fresh.weekly.order, { ...old, weekly: true, key: `any:${wolf.rarity}` });
-    assert.deepEqual(settleBoard(fresh, { character, seed: 'old' }, NOW, content), fresh);
+    const fresh = settleBoard(stored, { character, seed: 'old' }, NOW + HOUR / 2, content);
+    const first = fresh.slots[0].order;
+    assert.notEqual(first.id, 99);
+    assert.equal(first.expiresAt, NOW + HOUR / 2 + content.settlement.orders.expireDays * 24 * HOUR);
+    assert.ok(first.kind !== 'material' || first.key.startsWith('any:'));
+    assert.deepEqual(fresh.slots.slice(1), board.slots.slice(1));
+    assert.equal(fresh.weekly.done, false);
+    assert.ok(fresh.weekly.order.kind !== 'material' || fresh.weekly.order.key.startsWith('any:'));
+    assert.deepEqual(settleBoard(fresh, { character, seed: 'old' }, NOW + HOUR, content), fresh);
+    // A week's order already delivered stays delivered.
+    const done = { ...stored, weekly: { ...stored.weekly, done: true } };
+    assert.deepEqual(settleBoard(done, { character, seed: 'old' }, NOW, content).weekly, done.weekly);
   });
 
   test('the board fills its slots, keeps them, and refills a delivered or rejected one after its time', () => {

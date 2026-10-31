@@ -208,6 +208,7 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
   const settled = slots.map((first) => {
     let slot = first;
     for (;;) {
+      if (slot.order && outdated(slot.order)) slot = { readyAt: now };
       if (slot.order && slot.order.expiresAt <= now) slot = { readyAt: slot.order.expiresAt };
       if (slot.order || slot.readyAt > now) return slot;
       turn += 1;
@@ -218,26 +219,21 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
   });
   const { key } = questPeriod('weekly', now, content);
   const weekly =
-    board.weekly?.period === key
+    board.weekly?.period === key && (board.weekly.done || !board.weekly.order || !outdated(board.weekly.order))
       ? board.weekly
       : { period: key, order: drawOrder({ character, reputation, seed: `${seed}:weekly:${key}`, weekly: true }, content), done: false };
   return {
     ...board,
-    slots: settled.map((slot) => (slot.order ? { ...slot, order: freshStory(anyMaterial(slot.order, content), content) } : slot)),
-    weekly: weekly.order ? { ...weekly, order: freshStory(anyMaterial(weekly.order, content), content) } : weekly,
+    slots: settled.map((slot) => (slot.order ? { ...slot, order: freshStory(slot.order, content) } : slot)),
+    weekly: weekly.order ? { ...weekly, order: freshStory(weekly.order, content) } : weekly,
     turn,
   };
 }
 
 // An order for one creature's material, hung before the orders asked for
-// any materials of a rarity, asks for any of its rarity now, for the same
-// count and gold (the author: "Powinno być prędzej oddaj 32 materiały
-// pospolite"). One of a rarity anyMaterial does not name stays as it was.
-function anyMaterial(order, content) {
-  if (order.kind !== 'material' || isAnyMaterial(order)) return order;
-  const { rarityId } = parseStack(order.key);
-  return content.settlement.orders.anyMaterial[rarityId] ? { ...order, key: anyMaterialKey(rarityId) } : order;
-}
+// any materials of a rarity, is drawn anew, the week's too (the author:
+// "Zlecenia aktualne jeśli są z tych dziwacznych - przelosuj każdemu").
+const outdated = (order) => order.kind === 'material' && !isAnyMaterial(order);
 
 // An order hung before its sentence was rewritten takes the new sentence
 // closest to the old one (the most words alike from the start), so the

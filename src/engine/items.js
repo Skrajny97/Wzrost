@@ -381,17 +381,18 @@ export function autoEquip(equipped, items, content, classId, classLevel) {
 export function itemView(item, content, { sellBonus = 0, upgradeCap } = {}) {
   const rarity = content.raritiesById[item.rarity];
   const classIds = baseClasses(item.base, content);
-  // An item from a Wymiana, the Targowisko or the Skrzynia Konta waits also
-  // for the class to reach its own level (src/server/inventory.js), so its
-  // card gives the higher of the two (the author: "to od poziomu klasy 25
-  // czy 36?").
-  const classLevel = item.traded || item.chest ? Math.max(baseClassLevel(item.base, content), item.level) : baseClassLevel(item.base, content);
+  const classLevel = baseClassLevel(item.base, content);
+  // Its Tier, as the Encyklopedia sorts the bases (encyclopedia.json:
+  // "Tier III" from class level 25), on the card (the author: "Mozesz
+  // dopisywać Tiery do przedmiotów").
+  const tier = content.encyclopedia.tiers.findLast((one) => one.classLevel <= classLevel);
   return {
     name: itemName(item, content),
     base: item.base,
     slot: item.slot,
     slotName: content.slotsById[item.slot].name,
     level: item.level,
+    tier: tier?.name ?? null,
     upgrade: item.upgrade ?? 0,
     rarity: rarity.id,
     rarityName: rarity.name,
@@ -401,7 +402,8 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap } = {}) {
     // null: any class can use it.
     classIds,
     classNames: classIds && classIds.map((id) => content.classesById[id].name),
-    // The class level it is worn from, or null when it asks for none.
+    // The class level it is worn from by its Tier, wherever it came from, or
+    // null when it asks for none.
     classLevel: classLevel > 1 ? classLevel : null,
     price: sellPrice(item, content, sellBonus),
     // Got in a Wymiana, or from another character through the Skrzynia
