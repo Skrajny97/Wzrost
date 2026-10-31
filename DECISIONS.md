@@ -2996,6 +2996,16 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.69 (31.10.2026)
+
+Autor: „wrzuć od razu Zgłoś Bład jako 0.0.69 na main pozniej” oraz o tekstach sołtysa: „"zlecenia wiesza na tablicy przed swoją chatą" powinno być oraz "Na tablicy zawsze znajdziesz jakąś robotę. Płacimy tu uczciwie."”.
+
+1. **Co wchodzi do gry:**
+    - „Zgłoś błąd” w Ustawieniach i zgłoszenia w Panelu autora (zob. „Zgłoś błąd”);
+    - poprawione teksty sołtysa Bogumiła, w brzmieniu autora: „zlecenia wiesza na tablicy przed swoją chatą” i powitanie Obcego „Nowa twarz. Na tablicy zawsze znajdziesz jakąś robotę. Płacimy tu uczciwie.”
+    - nowe powitanie Obcego u Gościwita, w brzmieniu autora (autor: „tu z kolei "Patrz, wybieraj, ale nie dotykaj. I pamietaj by sie spieszyć z decyzją. Dzisiejszego towaru może jutro już nie być."”), z polskimi znakami i przecinkiem przed „by”: „Patrz, wybieraj, ale nie dotykaj. I pamiętaj, by się spieszyć z decyzją. Dzisiejszego towaru może jutro już nie być.”
+2. **Migracje bazy:** 0062 (tabela `bug_reports`).
+
 ## Zgłoś błąd (31.10.2026, na wersji testowej)
 
 Autor: „Trzeba dodac przycisk Zgłoś błąd i zeby przychodzil mi w Panel Autora albo gdzieś wiadomości skoro poszło delikatnie w sieć”.
