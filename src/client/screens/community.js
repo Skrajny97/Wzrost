@@ -456,6 +456,12 @@ function mountChat(container, { bar, person = null }) {
 
   const atBottom = () => window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
   const toBottom = () => window.scrollTo({ top: document.documentElement.scrollHeight });
+  // Whether the page follows the messages down once the answer is shown:
+  // the line to write in comes under them with the first answer, after
+  // they are added, and would hide the newest (the author: "niech czat
+  // domyślnie wyświetla sam dół wszystkich wiadomości - najnowsze po
+  // prostu").
+  let following = false;
 
   function messageItem(message) {
     const time = new Date(message.createdAt);
@@ -504,6 +510,7 @@ function mountChat(container, { bar, person = null }) {
       list.firstElementChild?.remove();
     }
     if (follow) toBottom();
+    following = following || follow;
     if (talk) privateRead(talk.id, messages.at(-1).id);
     else chatSeen(messages.at(-1).id);
     return true;
@@ -776,6 +783,12 @@ function mountChat(container, { bar, person = null }) {
     }
     renderTabs();
     render();
+    if (following) {
+      following = false;
+      toBottom();
+      // Once more after the browser lays the page out anew.
+      requestAnimationFrame(toBottom);
+    }
     if (!document.hidden) timer = setTimeout(ask, delay * 1000);
   }
 

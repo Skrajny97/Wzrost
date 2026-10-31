@@ -2987,6 +2987,10 @@ Autor: „Do tego możesz wstępnie zacząć robić resztę co istnieje z Osady 
 8. **Rany (113 A, zmienione 31.10).** Rany towarzysza goją się razem z ranami postaci, więc „Przewiń” odpoczynku postaci skraca też je.
 9. **Jeszcze nie ma:** Kwater w obozie (104 A, potrzebują grafiki budynku do oceny autora), twarzy towarzyszy (107 B; próbne popiersia 231 i 232 czekają na ocenę, a w walce towarzysz ma na razie portret swojej klasy) i cech w zdarzeniach (część IV). *Od 31.10 towarzysze mają własne twarze: zob. „Twarze towarzyszy”.*
 
+## Czat od razu przy najnowszych wiadomościach (31.10.2026)
+
+Autor: „I niech czat domyślnie wyświetla sam dół wszystkich wiadomości - najnowsze po prostu”. Czat przewijał się na dół, zanim pod wiadomościami pojawiło się pole do pisania, i to pole zasłaniało najnowszą wiadomość. Teraz po pierwszej odpowiedzi serwera, gdy pole już stoi, strona przewija się na dół jeszcze raz. To samo dzieje się po zmianie kanału i rozmowy. Ktoś, kto czyta starsze wiadomości wyżej, zostaje na swoim miejscu, jak dotąd.
+
 ## Zdarzenia na drodze: dziad, kapliczka, kupiec i Leszy (31.10.2026, na wersji testowej)
 
 Autor: „216 ok / 217 ok / 218 tak, ale obrazek ma uciętą nogę / 219 tak, tylko obrazek Leszego jest ucięty, oraz trzeba zmienić opcje dialogowe delikatnie "Zmień swoje ubranie na lewą stronę" / 220 ok obrazek, ale samo zdarzenie niezrozumiałe, zostawmy obrazek na przyszlosc i to jedne zdarzenie robi aut, nie realizujemy”, a dalej: „221 Weles zostaje / 222 A / 223 B / 224 A / 225 tak / 226 A / 227 B” i „230 Kolejność - wszystkie w jednym wdrożeniu, więc obojętnie”. Cztery zdarzenia wchodzą razem, a Rusałki (220) odpadają.
