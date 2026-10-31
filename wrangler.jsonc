@@ -56,7 +56,11 @@
     // "off" hides the class evolutions (src/server/evolutions.js): the
     // class grows past class level 50 as before them. Hidden in the live
     // game in versions 0.0.58–0.0.60, in it from version 0.0.61.
-    "EVOLUTIONS": "on"
+    "EVOLUTIONS": "on",
+    // "on" opens the Osada (src/server/settlement.js) from character level
+    // 20: parts I–III, in the live game from version 0.0.68 (the author:
+    // "Wdrażaj 0.0.68 z Osadą"). Its auctions settle with the cron below.
+    "SETTLEMENT": "on"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain
