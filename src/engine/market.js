@@ -14,6 +14,7 @@
 // a wandering trader brings rare or epic items at the character's level.
 // The server passes the time and the seeds.
 
+import { potionPrice } from './brewing.js';
 import { materialPrice, parseStack, stackKey } from './crafting.js';
 import { randomItem, sellPrice } from './items.js';
 import { questPeriod } from './quests.js';
@@ -88,9 +89,9 @@ export function buyCeiling({ kind, key }, content) {
   const { orders, herbalist } = content.settlement;
   const skup = 1 + topSellBonus(content);
   const weekly = orders.weekly.reward / orders.weekly.count;
-  if (kind === 'herb') {
-    const base = content.herbsById[key].price;
-    return Math.max(base * skup * (1 + Math.max(...herbalist.premium)), base * orders.pay.herb * weekly, base * skup * orders.overScrap);
+  if (kind === 'herb' || kind === 'potion') {
+    const base = kind === 'herb' ? content.herbsById[key].price : potionPrice(content.potionsById[key], content);
+    return Math.max(base * skup * (1 + Math.max(...herbalist.premium)), base * orders.pay[kind] * weekly, base * skup * orders.overScrap);
   }
   if (kind === 'material') {
     const base = materialPrice(parseStack(key).rarityId, content);
@@ -132,6 +133,24 @@ export function merchantStock(now, content) {
       const price = Math.ceil(buyCeiling(good, content) * merchant.margin * rng.float(...merchant.swing));
       return { id: `${day.key}:${index}`, ...good, price: good.kind === 'part' ? Math.max(price, partPrice(good.key, 1, content)) : price, stock: merchant.stock };
     }),
+  };
+}
+
+// The herbs Jagna sells at the standing of the relation with her (the
+// author: "Niech ma na początku 3 podstawowe zioła, a w miarę zwiekszania
+// znajomości coraz więcej"): the first `stock` herbs by their Zielarstwo
+// level, each `margin` above the most anyone pays for it ("Kup oczywiście
+// zawsze drożej"). `next` names the standing that adds more, with them.
+export function herbalistStock(points, content) {
+  const { stock, margin } = content.settlement.herbalist.sell;
+  const standing = standingOf(points, content);
+  const countAt = (index) => stock[Math.min(index, stock.length - 1)];
+  const herbs = [...content.herbs].sort((a, b) => a.level - b.level || a.price - b.price);
+  const count = countAt(standing.index);
+  const more = standing.next ? herbs.slice(count, countAt(standing.index + 1)) : [];
+  return {
+    herbs: herbs.slice(0, count).map((herb) => ({ id: herb.id, price: Math.ceil(buyCeiling({ kind: 'herb', key: herb.id }, content) * margin) })),
+    next: more.length > 0 ? { standing: standing.next.name, herbs: more.map((herb) => herb.id) } : null,
   };
 }
 

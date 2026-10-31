@@ -818,11 +818,19 @@
       ]
     },
     {
+      "id": "settlement-herbalist-buy",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Jagna sprzedaje zioła. Na początek tylko trzy najprostsze, a z każdym stopniem relacji coraz więcej."
+      ]
+    },
+    {
       "id": "settlement-herbalist-sell",
       "kind": "point",
       "chapter": "settlement",
       "text": [
-        "Jagna kupuje zioła i mikstury drożej niż złomiarz. Im lepiej Cię zna, tym więcej płaci."
+        "W zakładce Sprzedaj kupi od Ciebie zioła i mikstury drożej niż złomiarz. Im lepiej Cię zna, tym więcej płaci."
       ]
     },
     {

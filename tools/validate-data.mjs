@@ -1071,7 +1071,7 @@ function checkSettlement(data, { rarities }) {
   for (const place of places) {
     if (place.resident && !residentIds.has(place.resident)) errors.push(`settlement.json: miejsce ${place.id} ma nieznanego mieszkańca ${place.resident}`);
   }
-  for (const service of ['orders', 'reforge', 'hermit', 'market']) {
+  for (const service of ['orders', 'reforge', 'hermit', 'herbalist', 'market']) {
     const { resident } = data.settlement[service];
     if (!residentIds.has(resident)) errors.push(`settlement.json: ${service}.resident to nieznany mieszkaniec ${resident}`);
   }
@@ -1090,6 +1090,13 @@ function checkSettlement(data, { rarities }) {
   for (const id of Object.keys(prices)) if (!standingIds.has(id)) errors.push(`settlement.json: companions.priceByStanding ma nieznany stopień ${id}`);
   const ordered = standings.filter((standing) => standing.id in prices).map((standing) => prices[standing.id]);
   if (ordered.some((factor, index) => index > 0 && factor > ordered[index - 1])) errors.push('settlement.json: companions.priceByStanding nie może rosnąć ze stopniem');
+  // Jagna's herbs for sale: a few at first and more with each standing (the
+  // author: "Niech ma na początku 3 podstawowe zioła, a w miarę zwiekszania
+  // znajomości coraz więcej"), never more than there are herbs.
+  const { stock } = data.settlement.herbalist.sell;
+  if (stock.length > standings.length) errors.push('settlement.json: herbalist.sell.stock ma więcej liczb niż stopni');
+  if (stock.some((count, index) => index > 0 && count < stock[index - 1])) errors.push('settlement.json: herbalist.sell.stock nie może maleć ze stopniem');
+  if (Math.max(...stock) > data.professions.herbs.length) errors.push('settlement.json: herbalist.sell.stock podaje więcej ziół, niż jest w grze');
   reforge.choices.forEach((step, index) => {
     if (!standingIds.has(step.from)) errors.push(`settlement.json: reforge.choices ma nieznany stopień ${step.from}`);
     const before = reforge.choices[index - 1];

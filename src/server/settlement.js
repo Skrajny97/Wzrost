@@ -11,6 +11,7 @@ import {
   COMPANION_SLOTS,
   addQuestProgress,
   bagCapacity,
+  bagStacks,
   campBonus,
   campLevels,
   craftedFor,
@@ -27,6 +28,7 @@ import {
   evolutionChanges,
   evolvedSkills,
   herbalistPremium,
+  herbalistStock,
   hireCost,
   imbueBlock,
   imbueCost,
@@ -76,7 +78,7 @@ import {
 import { toHex } from './encoding.js';
 import { evolutionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
-import { testMarket } from './market.js';
+import { counted, foreign, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
 
 // A JSON path for a key with a hyphen or a colon ("iron-ore", "wolf-pelt:rare").
@@ -306,17 +308,32 @@ function herbalistPrices(player, stored, now) {
 
 // The Chata zielarki for the page: each herb and potion in the bag with
 // Jagna's price of one and the scrapper's beside it, her premium, and the
-// trade's reputation today out of the day's limit (120 A).
+// trade's reputation today out of the day's limit (120 A). `shop` has the
+// herbs she sells at the relation with her, each with its price and how
+// many more of it the bag takes, and the standing that brings more.
 function herbalistView(player, stored, now) {
   const { premium, scrap, price } = herbalistPrices(player, stored, now);
   const held = { herb: JSON.parse(player.row.herbs ?? '{}'), potion: JSON.parse(player.row.potions ?? '{}') };
   const goods = (kind, list) =>
     list.filter((good) => (held[kind][good.id] ?? 0) > 0).map((good) => ({ kind, id: good.id, name: good.name, count: held[kind][good.id], price: price(kind, good.id), scrap: scrap(kind, good.id) }));
   const day = questPeriod('daily', now, content).key;
+  const { herbs, next } = herbalistStock(stored.relations[content.settlement.herbalist.resident] ?? 0, content);
+  const { stack } = content.professionRules;
+  const free = Math.max(0, bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player));
+  const room = (count) => (count % stack === 0 ? 0 : stack - (count % stack));
   return {
     premium,
+    // At her best price already: no "more with a better relation".
+    best: premium >= Math.max(...content.settlement.herbalist.premium),
     goods: [...goods('herb', content.herbs), ...goods('potion', content.potions)],
     trade: { today: stored.trade?.day === day ? stored.trade.points : 0, daily: content.settlement.herbalist.reputation.daily },
+    shop: {
+      goods: herbs.map(({ id, price: cost }) => {
+        const herb = content.herbsById[id];
+        return { kind: 'herb', key: id, name: herb.name, description: herb.description, scrap: herb.price, gatherLevel: herb.level, price: cost, fits: free * stack + room(held.herb[id] ?? 0) };
+      }),
+      next: next && { standing: next.standing, herbs: next.herbs.map((id) => content.herbsById[id].name) },
+    },
   };
 }
 
@@ -352,6 +369,48 @@ export async function sellToHerbalist(context) {
   const after = await loadPlayer(context.env.DB, session.userId);
   return json({
     sold: { count: body.count, gold, points },
+    settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
+    character: characterView(after, context.now),
+  });
+}
+
+// { id, count }: Jagna sells herbs (the author: "Zielarce trzeba dać też
+// taką funkcję żeby to ona zioła sprzedawała"), those she has at the
+// relation with her, into the bag while it has places, as bought goods
+// the Encyklopedia leaves out. The trade raises the relation with her and
+// the herbalists' reputation as selling does, in the same day's limit.
+export async function buyFromHerbalist(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const { herbalist } = content.settlement;
+  const good = herbalistStock(stored.relations[herbalist.resident] ?? 0, content).herbs.find((one) => one.id === body.id);
+  if (!good) throw new ApiError(404, 'no_goods', 'Jagna nie sprzedaje Ci jeszcze tego zioła.');
+  if (!Number.isInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Podaj, ile sztuk kupić.');
+  const gold = good.price * body.count;
+  if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota.');
+  const held = JSON.parse(row.herbs ?? '{}');
+  const free = bagCapacity(campLevels(player.buildings, context.now, content), content) - bagPlaces(player);
+  if (bagStacks({ ...held, [good.id]: (held[good.id] ?? 0) + body.count }, content) - bagStacks(held, content) > free) {
+    throw new ApiError(409, 'bag_full', 'Tyle nie zmieści się w plecaku.');
+  }
+  const { points, trade } = tradePoints(gold, row.level, stored.trade, context.now, content);
+  const add = (counts, id) => ({ ...counts, [id]: (counts[id] ?? 0) + points });
+  const next = { ...stored, relations: add(stored.relations, herbalist.resident), reputation: add(stored.reputation, herbalist.brotherhood), trade };
+  const herbs = counted('herbs', { [good.id]: body.count });
+  const others = foreign({ herb: { [good.id]: body.count } });
+  const result = await context.env.DB.prepare(
+    `UPDATE characters SET gold = gold - ?, herbs = ${herbs.sql}, foreign_stacks = ${others.sql}, settlement = ?, version = version + 1
+     WHERE id = ? AND version = ? AND gold >= ?`,
+  )
+    .bind(gold, ...herbs.binds, ...others.binds, JSON.stringify(next), row.id, row.version, gold)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(context.env.DB, session.userId);
+  return json({
+    bought: { name: content.herbsById[good.id].name, count: body.count, gold, points },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
   });

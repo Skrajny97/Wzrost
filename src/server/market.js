@@ -395,7 +395,7 @@ export async function cancelOffer(context) {
 
 // One change of a JSON column of counts: `adds` by key, each its own
 // json_set, with what the SQL needs bound in order.
-function counted(column, adds) {
+export function counted(column, adds) {
   let sql = column;
   const binds = [];
   for (const [key, count] of Object.entries(adds)) {
@@ -407,7 +407,7 @@ function counted(column, adds) {
 
 // The goods got from other players count as a trade's for the Encyklopedia
 // (ownDiscoveries in the engine), as those of the Wymiana do.
-function foreign(adds) {
+export function foreign(adds) {
   const keyed = {};
   for (const kind of ['herb', 'potion', 'material']) for (const [key, count] of Object.entries(adds[kind] ?? {})) keyed[`${kind}:${key}`] = count;
   return counted('foreign_stacks', keyed);

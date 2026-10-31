@@ -20,7 +20,7 @@ import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { companionCard } from '../companions.js';
 import { itemSummary } from './character.js';
-import { mountMarket } from './market.js';
+import { mountMarket, numberField, stackButton } from './market.js';
 
 // What is left of an order's week on the board: days, then hours.
 function timeLeft(ms) {
@@ -43,6 +43,9 @@ export function mountSettlement(container, { params = {} } = {}) {
   // The orders the player unfolded: the Tablica lists them folded to their
   // names (the author: "powinny być zwinięte do nazw").
   const unfolded = new Set();
+  // Jagna's tab: Kup first (the author: "trzeba zacząć u niej od zakładki
+  // Kup/Sprzedaj"), kept while the screen redraws.
+  let herbalistTab = 'buy';
   // The Targowisko's panel, mounted once and kept while the screen redraws
   // itself, so that a redraw does not ask the server for it again.
   let market = null;
@@ -557,12 +560,111 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
-  // The Chata zielarki (part III, questions 120 A and 121 A): Jagna buys the
-  // bag's herbs and potions for more than the scrapper, at home, and the
-  // trade raises the relation with her and the herbalists' reputation up to
-  // the day's limit.
+  // Jagna's herb for sale: how many the gold and the bag allow, typed in.
+  function herbalistBuySheet(good) {
+    const most = Math.min(good.fits, Math.floor(state.character.gold / good.price));
+    const field = numberField('herbalist-buy-count', 'Ile sztuk', 1, 1, Math.max(1, most));
+    openSheet(
+      h('h2', { class: 'sheet-title', text: good.name }),
+      h('p', { class: 'sheet-text', text: `${formatNumber(good.price)} zł. za sztukę. Za Twoje złoto i na miejsce w plecaku: najwyżej ${formatNumber(most)} szt.` }),
+      field.element,
+      h(
+        'div',
+        { class: 'sheet-actions' },
+        h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+        h('button', {
+          type: 'button',
+          class: 'button button--system',
+          text: 'Kup',
+          onClick: (event) =>
+            withButton(event.currentTarget, async () => {
+              const answer = await call('POST', '/api/settlement/herbalist/buy', { id: good.key, count: field.read() });
+              closeSheet();
+              apply(answer);
+              const { name, count, gold, points } = answer.bought;
+              toast(`Kupione: ${name} ×${formatNumber(count)} za ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z Jagną i reputacja Bractwa Zielarzy +${points}.` : ''}`);
+            }),
+        }),
+      ),
+    );
+  }
+
+  // Jagna's Kup tab: the herbs she sells at the relation with her (the
+  // author: "Niech ma na początku 3 podstawowe zioła, a w miarę zwiekszania
+  // znajomości coraz więcej"), each opening its card under a tap, dearer
+  // than anyone buys them ("Kup oczywiście zawsze drożej"), and the standing
+  // that brings more.
+  function herbalistShop() {
+    const { shop, trade } = data.herbalist;
+    const gold = state.character.gold;
+    return h(
+      'section',
+      { class: 'stack', 'data-guide': 'herbalist-buy' },
+      h('h2', { class: 'section-title', text: 'Zioła Jagny' }),
+      h('p', {
+        class: 'muted',
+        text: `Jagna sprzedaje zioła drożej, niż je skupuje. Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.`,
+      }),
+      shop.goods.some((good) => good.fits < 1) && h('p', { class: 'region-warning', text: 'Plecak jest pełny. Zrób w nim miejsce, żeby kupić więcej ziół.' }),
+      h(
+        'ul',
+        { class: 'stack market-list' },
+        shop.goods.map((good) => {
+          const button = (small) =>
+            h('button', {
+              type: 'button',
+              class: `button button--world${small ? ' button--small' : ''}`,
+              text: 'Kup',
+              disabled: good.fits < 1 || gold < good.price,
+              onClick: () => herbalistBuySheet(good),
+            });
+          const price = `${formatNumber(good.price)} zł. za sztukę`;
+          return h(
+            'li',
+            { class: 'card herbalist-good' },
+            stackButton(good, { count: false, meta: price }, () => [h('p', { class: 'market-price', text: `Jagna: ${price}.` }), button(false)]),
+            button(true),
+          );
+        }),
+      ),
+      shop.next && h('p', { class: 'muted', text: `Od stopnia relacji ${shop.next.standing} dojdą: ${shop.next.herbs.join(', ')}.` }),
+    );
+  }
+
+  // The Chata zielarki (part III, questions 120 A and 121 A): the tabs Kup
+  // and Sprzedaj. In Sprzedaj Jagna buys the bag's herbs and potions for more
+  // than the scrapper, and the trade raises the relation with her and the
+  // herbalists' reputation up to the day's limit.
   function herbalistCard() {
-    const { premium, goods, trade } = data.herbalist;
+    const tabs = h(
+      'div',
+      { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': 'Chata zielarki' },
+      [
+        ['buy', 'Kup'],
+        ['sell', 'Sprzedaj'],
+      ].map(([id, label]) =>
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'chat-tab',
+            role: 'tab',
+            'data-guide': `herbalist-tab-${id}`,
+            'aria-selected': String(herbalistTab === id),
+            onClick: () => {
+              herbalistTab = id;
+              render();
+            },
+          },
+          h('span', { class: 'chat-tab-name', text: label }),
+        ),
+      ),
+    );
+    return h('div', { class: 'stack' }, tabs, herbalistTab === 'buy' ? herbalistShop() : herbalistSale());
+  }
+
+  function herbalistSale() {
+    const { premium, best, goods, trade } = data.herbalist;
     const sell = (good) => (event) =>
       withButton(event.currentTarget, async () => {
         const answer = await call('POST', '/api/settlement/herbalist', { kind: good.kind, id: good.id, count: good.count });
@@ -576,7 +678,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       h('h2', { class: 'section-title', text: 'Skup ziół i mikstur' }),
       h('p', {
         class: 'muted',
-        text: `Jagna płaci o ${Math.round(premium * 100)}% więcej niż złomiarz, a z lepszą relacją jeszcze więcej. Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.`,
+        text: `Jagna płaci o ${Math.round(premium * 100)}% więcej niż złomiarz${best ? '' : ', a z lepszą relacją jeszcze więcej'}. Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.`,
       }),
       goods.length === 0
         ? h('p', { class: 'muted', text: 'W torbie nie ma ziół ani mikstur.' })

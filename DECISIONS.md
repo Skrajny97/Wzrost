@@ -2996,6 +2996,21 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Zielarka sprzedaje zioła (31.10.2026, na wersji testowej)
+
+Autor: „Zielarce trzeba dać też taką funkcję żeby to ona zioła sprzedawała, więc trzeba zacząć u niej od zakładki Kup/Sprzedaj / Kup oczywiście zawsze drożej. / Niech ma na początku 3 podstawowe zioła, a w miarę zwiekszania znajomości coraz więcej.”
+
+1. **Zakładki.** Chata zielarki zaczyna się od zakładek „Kup” i „Sprzedaj”. Najpierw otwiera się „Kup”. „Sprzedaj” to dotychczasowy skup ziół i mikstur.
+2. **Ile ziół (brakujący szczegół).** Jagna sprzedaje zioła od najniższego poziomu Zielarstwa. Przy stopniu Obcy ma 3 (Żywokost, Bylica, Pokrzywa), przy Znajomym 5, przy Stałym kliencie 7, przy Zaufanym 10, a przy Przyjacielu wszystkie 13, razem z Kwiatem paproci. Pod listą jest zdanie, które zioła dojdą przy następnym stopniu.
+3. **Cena (brakujący szczegół).** Każde zioło kosztuje 1,5 raza tyle, ile najwięcej płaci za nie ktokolwiek w grze: złomiarz przy najwyższym Skupie złomu, Jagna przy Przyjacielu albo najlepsze zlecenie. Gościwit liczy tak samo, ale jego ceny zmieniają się codziennie, a ceny Jagny stoją w miejscu. Przy tej cenie mikstura uwarzona z kupionych ziół najwyżej zwraca ich koszt, więc nie da się na tym zarobić. Pilnuje tego test.
+4. **Relacja a ceny.** Ceny Jagny nie zależą od relacji. Jeśli w pytaniu 287 relacja obniży ceny Gościwita, to samo dotyczy Jagny.
+5. **Bez dziennego limitu (brakujący szczegół).** Zakupy ogranicza tylko złoto i miejsce w plecaku. Okno zakupu podaje, ile najwyżej można kupić.
+6. **Relacja i reputacja.** Zakup daje relację z Jagną i reputację Bractwa Zielarzy jak sprzedaż, w tym samym dziennym limicie 10 punktów.
+7. **Encyklopedia.** Kupione zioła liczą się jak towar z handlu, więc nie odkrywają wpisów w Encyklopedii.
+8. **Karta zioła.** Stuknięcie zioła otwiera jego kartę jak na Targowisku: obrazek, opis, cena u złomiarza, poziom Zielarstwa i liczba sztuk w plecaku, a pod spodem cena u Jagny i „Kup”.
+9. **Samouczek.** Przy Jagnie narrator ma teraz trzy kwestie: o zakładce „Kup”, o zakładce „Sprzedaj” i o Bractwie Zielarzy. Pytanie 292 jest wycofane, a jego miejsce zajmuje pytanie 297.
+10. **Drobna poprawka.** Przy najwyższej relacji zakładka „Sprzedaj” nie obiecuje już, że „z lepszą relacją” Jagna zapłaci więcej.
+
 ## Towarzysze w Kwaterach i samouczek Osady krok po kroku (31.10.2026, na wersji testowej)
 
 Autor: „285 od nowa bo za dużo ucięte bo i waga i reszta rzeczy, daj zamiast tego coś pełnego”, „Po zwerbowaniu postac powinna zniknąć z Karczmy i pojawić się w Kwaterach - stamtąd ewentualne Odprawy, więcej info o postaci, rozmowa z nią, budowanie relacji, zmiana wyposażenia itp.” oraz „Do tego trzeba zrobić od nowa Samouczek Osady by obejmował wszystko krok po kroku -> Tablica zleceń już jest ale Karczma, Zaklinaczka, Pustelnik i Zielarka tylko pobieżnie albo wcale. Nie wspominając o samouczku Targowiska.”

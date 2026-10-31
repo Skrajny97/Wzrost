@@ -9360,6 +9360,20 @@ a.profession-square:active {
   line-height: 1;
 }
 
+/* Jagna's herbs for sale, one to a row: the herb with its price, opening
+   its card under a tap, and "Kup" beside it. */
+.herbalist-good {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+}
+
+.herbalist-good .market-goods-button {
+  flex: 1;
+  min-width: 0;
+}
+
 /* Words to act on inside a muted line (the author: "ładnie wytłuszczyć,
    podkreślić"), as the Kwatery to build for a companion's bed. */
 .text-stress {

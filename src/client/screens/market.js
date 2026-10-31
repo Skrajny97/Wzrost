@@ -42,8 +42,9 @@ function stackArt(goods, size = 24) {
   return icon('coin', { size });
 }
 
-// A stack, or a parcel's gold, in one line.
-function stackLine(goods, { count = true } = {}) {
+// A stack, or a parcel's gold, in one line; `meta` in place of its kind,
+// as a price.
+function stackLine(goods, { count = true, meta } = {}) {
   const rarity = rarityOf(goods.rarity);
   const name = goods.kind === 'gold' ? `${formatNumber(goods.count)} zł` : count ? `${goods.name} ×${formatNumber(goods.count)}` : goods.name;
   return h(
@@ -54,7 +55,7 @@ function stackLine(goods, { count = true } = {}) {
       'span',
       { class: 'item-summary' },
       h('span', { class: 'item-name', vars: rarity ? { '--rarity': rarity.color } : {}, text: name }),
-      goods.kind !== 'gold' && h('span', { class: 'item-meta', text: [KIND_NAMES[goods.kind], rarity?.name].filter(Boolean).join(' · ') }),
+      goods.kind !== 'gold' && h('span', { class: 'item-meta', text: meta ?? [KIND_NAMES[goods.kind], rarity?.name].filter(Boolean).join(' · ') }),
     ),
   );
 }
@@ -104,8 +105,8 @@ function goodsSheet(goods, actions = null) {
   );
 }
 
-// A stack in one line that opens its card under a tap.
-const stackButton = (goods, options, actions) =>
+// A stack in one line that opens its card under a tap (Jagna's herbs too).
+export const stackButton = (goods, options, actions) =>
   h('button', { type: 'button', class: 'market-goods-button', 'aria-label': `${goods.name}: szczegóły`, onClick: () => goodsSheet(goods, actions?.()) }, stackLine(goods, options));
 
 // An item to buy, its properties under a tap, and when the character can
@@ -143,7 +144,7 @@ function itemEntry(item, key, opened) {
 
 // A whole number typed into a sheet, from `least` to `most`; an optional
 // one may stay empty.
-function numberField(id, label, value, least, most) {
+export function numberField(id, label, value, least, most) {
   const input = h('input', { type: 'number', id, class: 'trade-number', min: String(least), max: String(most), step: '1', inputmode: 'numeric', value: value === null ? '' : String(value) });
   const element = h('div', { class: 'trade-field' }, h('label', { for: id, class: 'trade-field-label', text: label }), input);
   const read = (optional = false) => {
