@@ -500,6 +500,24 @@
       "languageCode": "pl"
     },
     "prompts": {
+      "promo-tiktok": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Czy zastanawiałeś się kiedyś, jakby to było, jakby wziąć to, co najlepsze z Shakes and Fidget, Margonem, wrzucić odrobinę Metina dwa, Tibii i strategii w stylu Plemiona, a na koniec doprawić własnymi pomysłami? Pewnie nie, ale ja tak. I stwierdziłem, że zaproszę Cię do tego projektu, jeśli tylko najdzie Cię ochota przetestować moją grę. Insight RPG kropka com. Zapraszam."
+      },
+      "promo-tiktok-phonetic": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Czy zastanawiałeś się kiedyś, jakby to było, jakby wziąć to, co najlepsze z Szejks end Fidżet, Margonem, wrzucić odrobinę Metina dwa, Tibii i strategii w stylu Plemiona, a na koniec doprawić własnymi pomysłami? Pewnie nie, ale ja tak. I stwierdziłem, że zaproszę Cię do tego projektu, jeśli tylko najdzie Cię ochota przetestować moją grę. Insajt er pe gie kropka kom. Zapraszam."
+      },
       "character": {
         "say": [
           [
