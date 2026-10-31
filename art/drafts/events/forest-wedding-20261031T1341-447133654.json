@@ -1,0 +1,25 @@
+{
+  "id": "forest-wedding",
+  "payload": {
+    "prompt": "a small full body figure seen from afar, the whole figure from the top of the hat to the boots inside the picture with empty space above the hat and below the boots, a jovial bearded slavic wedding host in a white linen shirt embroidered in red, a wide woven sash and a bunch of wedding ribbons pinned to his chest, a felt hat with ribbons and flowers, holding a large drinking horn of mead at chest height, a pale face with a wide fixed smile, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 447133654,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793454181,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 44.99,
+    "request_id": "940df59d-32cf-49c9-b407-f9c461cfa47a",
+    "outputs_retained_until": 1793540501
+  }
+}
