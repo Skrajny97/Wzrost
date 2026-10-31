@@ -566,7 +566,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     const field = numberField('herbalist-buy-count', 'Ile sztuk', 1, 1, Math.max(1, most));
     openSheet(
       h('h2', { class: 'sheet-title', text: good.name }),
-      h('p', { class: 'sheet-text', text: `${formatNumber(good.price)} zł. za sztukę. Za Twoje złoto i na miejsce w plecaku: najwyżej ${formatNumber(most)} szt.` }),
+      h('p', { class: 'sheet-text', text: `${formatNumber(good.price)} zł. za sztukę. Możesz kupić najwyżej ${formatNumber(most)} szt.: na tyle starczy złota i miejsca w plecaku.` }),
       field.element,
       h(
         'div',
