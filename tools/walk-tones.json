@@ -16,7 +16,7 @@
   "hunter-female": { "only": ["head", "hands"] },
   "hunter-male": { "only": ["head", "hands"] },
   "ice-lord-male": { "drop": ["8d6750"], "only": ["head", "hands"] },
-  "inquisitor-female": { "near_not": { "colours": ["a17e4a", "9b6d2e", "623f1f", "a67537"], "radius": 2 }, "only": ["head", "hands", [76, 40, 98, 54]] },
+  "inquisitor-female": { "only": ["head", "hands"] },
   "inquisitor-male": { "only": ["head", "hands"] },
   "mage-female": { "rims_below": 0.5, "only": ["head", "hands", "forearms", "shins", "feet"], "not_boxes": { "6": [[66, 58, 75, 82], [58, 58, 66, 65]] } },
   "mage-male": { "rims_below": 0.5, "only": ["head", "hands", "shins", "feet"] },

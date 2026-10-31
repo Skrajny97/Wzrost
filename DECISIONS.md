@@ -2987,6 +2987,12 @@ Autor: „Do tego możesz wstępnie zacząć robić resztę co istnieje z Osady 
 8. **Rany i Punkty Czasu (113 A).** „Przewiń” przy rannym towarzyszu skraca jego rany o minutę za każdy Punkt Czasu, tak jak odpoczynek postaci.
 9. **Jeszcze nie ma:** Kwater w obozie (104 A, potrzebują grafiki budynku do oceny autora), twarzy towarzyszy (107 B; próbne popiersia 231 i 232 czekają na ocenę, a w walce towarzysz ma na razie portret swojej klasy) i cech w zdarzeniach (część IV).
 
+## Inkwizytorka bez krzyża (31.10.2026)
+
+Autor: „Inkwizytorce wyrasta 3 ręka. Wyrzuć calkowicie krzyż, niech idzie tylko z buzdyganem.” Nowe klatki startowe Retro Diffusion powstały z portretu z odciętym krzyżem (dwie pozy), a PixelLab animował każdą w 3 wersjach. Wersja E miała w dwóch klatkach drugi buzdygan, więc odpadła. Autor wybrał „215 F”: druga klatka startowa (`inquisitor-female.png`, dawna `-b`), trzecia wersja PixelLab. Skóra chodu jest tylko na głowie i dłoniach (`tools/walk-tones.json`). Portret (213 A) zostaje z krzyżem.
+
+Autor o odcieniach skóry (233): „zero zastrzeżeń juz co do portretów i chodu”.
+
 ## Osada, część III: Chata zielarki i zaklęcie żywiołu (31.10.2026, wstępnie, na wersji testowej)
 
 Autor: „Do tego możesz wstępnie zacząć robić resztę co istnieje z Osady i wrzucać na testowy.” Z części III na razie Chata zielarki i zaklęcie żywiołu, bo ich zasady są rozstrzygnięte (101 A, 120 A, 121 A). Targowisko z ofertami graczy czeka.
