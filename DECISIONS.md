@@ -2996,6 +2996,23 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.68 (31.10.2026)
+
+Autor: „Wdrażaj 0.0.68 z Osadą”.
+
+1. **Co wchodzi do gry:** Osada, części I–III, od 20. poziomu postaci (`"SETTLEMENT": "on"` w zmiennych gry w `wrangler.jsonc`):
+    - Tablica zleceń z bractwami, Zaklinaczka (afiksy i żywioły) i Pustelnik;
+    - Karczma z kuflem, plotką i werbunkiem, a w obozie Kwatery z towarzyszami, rozmowami z nimi i relacją;
+    - Chata zielarki z zakładkami Kup i Sprzedaj;
+    - Targowisko z licytacjami graczy, Gościwitem i wędrownym handlarzem;
+    - niższe ceny u Gościwita i Jagny przy lepszej relacji;
+    - samouczek Osady z głosem narratora przy każdym miejscu;
+    - wyższa plansza obozu z Kwaterami i zdarzenia, które wymagają Osady, np. kupiec z utkniętym wozem.
+2. **Licytacje** rozlicza co minutę to samo zadanie serwera, które wysyła powiadomienia na telefon.
+3. **Testy** dalej działają domyślnie bez Osady, jak przed jej wejściem do gry. Testy Osady włączają ją same.
+4. **Migracje bazy:** brak nowych. Tabele Targowiska weszły z 0.0.67.
+5. **Część IV** (wątki mieszkańców, dary, robotnicy w obozie, cechy towarzyszy w zdarzeniach i rzadkie receptury u Jagny) dojdzie później.
+
 ## Odpowiedzi 302: głos całej Osady (31.10.2026, na wersji testowej)
 
 Autor: „288 B / 289-1 B / 290-1 B / 290-2 B / 293-1 B / 293-2 B / 293-3 B / 293-4 B”.
