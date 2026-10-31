@@ -1,0 +1,25 @@
+{
+  "id": "companion-warrior-female",
+  "payload": {
+    "prompt": "a young slavic woman warrior for hire, short auburn hair, a thin scar on her chin, determined grey eyes, a chainmail coif pushed back over a padded brown gambeson, a leather belt, brown trousers and leather boots, a sword in her right hand, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 876614210,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 1
+  },
+  "result": {
+    "created_at": 1793441754,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 61.19,
+    "request_id": "a333c603-6f2a-4d79-9c3a-2d5630378c79",
+    "outputs_retained_until": 1793528090
+  }
+}
