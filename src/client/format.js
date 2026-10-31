@@ -30,6 +30,11 @@ export function plural(count, one, few, many) {
 
 export const countOf = (count, one, few, many) => `${formatNumber(count)} ${plural(count, one, few, many)}`;
 
+// What the scrapper or Jagna pays for `count` pieces at `unit` gold a piece,
+// as the server counts it (saleGold in src/engine/items.js): rounded down,
+// at least a coin.
+export const saleGold = (unit, count) => Math.max(1, Math.floor(unit * count + 1e-9));
+
 // "5 min", "1 h", "4 h".
 // "45 min", "2 h", "1 h 25 min".
 export function formatMinutes(minutes) {

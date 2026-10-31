@@ -12,7 +12,7 @@
 import { residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
-import { countOf, formatCountdown, formatDecimal, formatHours, formatNumber } from '../format.js';
+import { countOf, formatCountdown, formatDecimal, formatHours, formatNumber, saleGold } from '../format.js';
 import { leaveView, openView } from '../history.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
@@ -669,15 +669,43 @@ export function mountSettlement(container, { params = {} } = {}) {
     return h('div', { class: 'stack' }, tabs, herbalistTab === 'buy' ? herbalistShop() : herbalistSale());
   }
 
-  function herbalistSale() {
-    const { premium, best, goods, trade } = data.herbalist;
-    const sell = (good) => (event) =>
+  // Selling to Jagna: as many pieces as chosen, one at first (the author:
+  // "Powinno się móc tez sprzedać pojedyncze sztuki tego co mam u Zielarki
+  // a nie tylko wszystko"), as at the scrapper's in the bag.
+  function herbalistSellSheet(good) {
+    let count = 1;
+    const value = h('output', { class: 'herb-count-value' });
+    const sell = h('button', { type: 'button', class: 'button button--system' });
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
+    const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(good.count) });
+    function set(next) {
+      count = Math.min(good.count, Math.max(1, next));
+      value.textContent = `${formatNumber(count)} szt.`;
+      sell.textContent = `Sprzedaj za ${formatNumber(saleGold(good.price, count))} zł.`;
+      less.disabled = count === 1;
+      more.disabled = count === good.count;
+    }
+    set(count);
+    sell.addEventListener('click', (event) =>
       withButton(event.currentTarget, async () => {
-        const answer = await call('POST', '/api/settlement/herbalist', { kind: good.kind, id: good.id, count: good.count });
+        const answer = await call('POST', '/api/settlement/herbalist', { kind: good.kind, id: good.id, count });
+        closeSheet();
         apply(answer);
         const { gold, points } = answer.sold;
         toast(`Jagna płaci ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z nią i reputacja Bractwa Zielarzy +${points}.` : ''}`);
-      });
+      }),
+    );
+    openSheet(
+      h('h2', { class: 'sheet-title', text: good.name }),
+      h('p', { class: 'sheet-text', text: `Masz ${formatNumber(good.count)} szt. Jagna płaci ${formatDecimal(good.price)} zł. za sztukę, złomiarz ${formatDecimal(good.scrap)} zł.` }),
+      h('div', { class: 'herb-count' }, less, value, more, all),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }), sell),
+    );
+  }
+
+  function herbalistSale() {
+    const { premium, best, goods, trade } = data.herbalist;
     return h(
       'section',
       { class: 'stack', 'data-guide': 'herbalist-sell' },
@@ -700,8 +728,8 @@ export function mountSettlement(container, { params = {} } = {}) {
                 h('button', {
                   type: 'button',
                   class: 'button button--world button--small',
-                  text: `Sprzedaj wszystkie (${formatNumber(Math.max(1, Math.round(good.price * good.count)))} zł.)`,
-                  onClick: sell(good),
+                  text: 'Sprzedaj',
+                  onClick: () => herbalistSellSheet(good),
                 }),
               ),
             ),

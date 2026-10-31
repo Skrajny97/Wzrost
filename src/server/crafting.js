@@ -23,6 +23,7 @@ import {
   parseStack,
   patternFrom,
   settleCrafting,
+  saleGold,
 } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, craftingState, loadPlayer, questsNow, requireIdlePlayer, requirePlayer } from './characters.js';
@@ -91,7 +92,7 @@ export async function sellMaterials(context) {
   if (have === 0) throw new ApiError(404, 'no_materials', 'Nie masz tego materiału.');
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > have) throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${have} sztuk.`);
   const bonus = campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
-  const gold = Math.max(1, Math.round(materialPrice(parseStack(body.key).rarityId, content) * body.count * (1 + bonus)));
+  const gold = saleGold(materialPrice(parseStack(body.key).rarityId, content) * (1 + bonus), body.count);
   const state = { ...settled, materials: addCounts(settled.materials, { [body.key]: -body.count }) };
   const db = context.env.DB;
   const result = await saveState(db, player.row, state, { gold }).run();

@@ -2996,6 +2996,13 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Sprzedaż pojedynczych sztuk u Jagny (1.11.2026, na wersji testowej)
+
+Autor: „Powinno się móc tez sprzedać pojedyncze sztuki tego co mam u Zielarki a nie tylko wszystko.”
+
+1. **Wybór liczby.** „Sprzedaj” przy ziele albo miksturze otwiera okno jak u złomiarza w plecaku. Na start wybrana jest 1 sztuka, są przyciski −, + i „wszystkie”, a przycisk sprzedaży podaje, ile Jagna zapłaci.
+2. **Zaokrąglanie w dół (brakujący szczegół).** Za sprzedane sztuki u Jagny i u złomiarza (zioła, mikstury, materiały) gra płaci w dół do pełnej monety, najmniej 1 zł. Wcześniej zaokrąglała do najbliższej monety, więc sprzedaż po jednej sztuce bywała korzystniejsza niż wszystkich naraz (np. 3 sztuki po 2,6 zł: osobno 9 zł, razem 8 zł). Teraz sprzedaż po sztuce nigdy nie daje więcej niż razem.
+
 ## Wersja 0.0.71 (1.11.2026)
 
 Autor: „Następnie przygotuj podwaliny a najlepiej cały system Drużyn. Wdróż potem na main od 25 poziomu postaci inaczej niż Osada, która wlatuje na 20, zeby nie za duzo na raz było.”

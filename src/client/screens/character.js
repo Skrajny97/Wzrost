@@ -7,7 +7,7 @@ import { herbSprite, itemSprite, materialSprite, portraitSprite, potionSprite, r
 import { bonusList } from '../bonuses.js';
 import { MATERIALS_HINT, craft, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
-import { formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, timeFormat } from '../format.js';
+import { formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, saleGold, timeFormat } from '../format.js';
 import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { portrait } from '../portraits.js';
 import { playSound } from '../sound.js';
@@ -316,7 +316,7 @@ export function mountCharacter(container) {
     const title = h('h2', { class: 'item-title', vars: { '--rarity': material.color }, text: materialTitle(material) });
     const meta = h('p', { class: 'item-meta', text: `${material.rarityName} · ${formatNumber(material.count)} szt.` });
     let count = start;
-    const price = (amount) => Math.max(1, Math.round(material.price * amount));
+    const price = (amount) => saleGold(material.price, amount);
     const value = h('output', { class: 'herb-count-value' });
     const sell = h('button', { type: 'button', class: 'button button--system' });
     const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
@@ -435,7 +435,7 @@ export function mountCharacter(container) {
     // On an exploration the HP is the report's: a healing potion waits.
     const exploring = character.activity?.kind === 'hunt' && entry.fight === 'heal';
     let count = 1;
-    const price = (amount) => Math.max(1, Math.round(entry.price * amount));
+    const price = (amount) => saleGold(entry.price, amount);
     const value = h('output', { class: 'herb-count-value' });
     const sell = h('button', { type: 'button', class: 'button button--system' });
     const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });

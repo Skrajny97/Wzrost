@@ -168,6 +168,13 @@ function otherClassFamily(classId, rng, content) {
 // raises the item's own price only, so an upgrade never pays for itself. An
 // item made upgraded in the Warsztat (`crafted`) cost no gold for the
 // upgrades it came with, so only those of the Kowadło above them count.
+// What the scrapper or Jagna pays for `count` pieces at `unit` gold a
+// piece: rounded down, so selling one piece at a time never pays more than
+// selling them all at once (the author: "Powinno się móc tez sprzedać
+// pojedyncze sztuki tego co mam u Zielarki a nie tylko wszystko"); at least
+// a coin.
+export const saleGold = (unit, count) => Math.max(1, Math.floor(unit * count + 1e-9));
+
 export function sellPrice(item, content, bonus = 0) {
   const rarity = content.raritiesById[item.rarity];
   const price = Math.max(1, Math.round(item.level * content.balance.items.sellGoldPerLevel * rarity.sell * (1 + bonus)));

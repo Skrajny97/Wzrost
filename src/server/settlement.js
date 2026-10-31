@@ -69,6 +69,7 @@ import {
   wearOnCompanion,
   withAffix,
   xpToNext,
+  saleGold,
 } from '../engine/index.js';
 import { content } from './content.js';
 import {
@@ -384,7 +385,7 @@ export async function sellToHerbalist(context) {
   const held = JSON.parse(row[column] ?? '{}')[body.id] ?? 0;
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > held) throw new ApiError(409, 'not_enough', 'Nie masz tylu w torbie.');
   const stored = settlementOf(row);
-  const gold = Math.max(1, Math.round(herbalistPrices(player, stored, context.now).price(body.kind, body.id) * body.count));
+  const gold = saleGold(herbalistPrices(player, stored, context.now).price(body.kind, body.id), body.count);
   const { herbalist } = content.settlement;
   const { points, trade } = tradePoints(gold, row.level, stored.trade, context.now, content);
   const add = (counts, id) => ({ ...counts, [id]: (counts[id] ?? 0) + points });

@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { buyCeiling, herbalistPremium, herbalistStock, tradePoints } from '../src/engine/index.js';
+import { buyCeiling, herbalistPremium, herbalistStock, saleGold, tradePoints } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -16,6 +16,14 @@ const NOW = Date.UTC(2026, 9, 30, 10, 0);
 const tuning = content.settlement.herbalist;
 
 describe('the Chata zielarki in the engine', () => {
+  test('a sale is rounded down, so one piece at a time never pays more than many at once', () => {
+    for (const unit of [2, 2.2, 2.5, 2.6, 2.99, 3.3, 60.75]) {
+      for (const count of [1, 2, 3, 7, 10, 100]) assert.ok(saleGold(unit, 1) * count <= saleGold(unit, count), `${unit} × ${count}`);
+      assert.equal(saleGold(unit, 10), Math.floor(unit * 10 + 1e-9));
+    }
+    assert.equal(saleGold(0.3, 1), 1);
+  });
+
   test('Jagna pays more over the scrapper with each standing of the relation', () => {
     const premiums = content.settlement.standings.map((standing) => herbalistPremium(standing.points, content));
     assert.ok(premiums[0] > 0);
@@ -89,14 +97,21 @@ describe('the Chata zielarki through the API', () => {
     assert.ok(good.price > good.scrap);
     const sold = await call('POST', '/api/settlement/herbalist', { cookie, body: { kind: 'herb', id: herb.id, count: 100 } });
     assert.equal(sold.status, 200);
-    assert.equal(sold.data.sold.gold, Math.max(1, Math.round(good.price * 100)));
+    assert.equal(sold.data.sold.gold, saleGold(good.price, 100));
     assert.equal(sold.data.character.gold, sold.data.sold.gold);
     const stored = JSON.parse((await (await db()).prepare('SELECT settlement, herbs FROM characters').first()).settlement);
     assert.equal(stored.relations[tuning.resident] ?? 0, sold.data.sold.points);
     assert.equal(stored.reputation[tuning.brotherhood] ?? 0, sold.data.sold.points);
     assert.equal(JSON.parse((await (await db()).prepare('SELECT herbs FROM characters').first()).herbs)[herb.id], 300);
+    // A single piece too (the author: "Powinno się móc tez sprzedać
+    // pojedyncze sztuki"), never for more than its share of many at once.
+    const one = await call('POST', '/api/settlement/herbalist', { cookie, body: { kind: 'herb', id: herb.id, count: 1 } });
+    assert.equal(one.status, 200);
+    assert.equal(one.data.sold.gold, saleGold(good.price, 1));
+    assert.ok(one.data.sold.gold * 100 <= sold.data.sold.gold);
+    assert.equal(JSON.parse((await (await db()).prepare('SELECT herbs FROM characters').first()).herbs)[herb.id], 299);
     // No more than the bag holds, and only herbs and potions.
-    assert.equal((await call('POST', '/api/settlement/herbalist', { cookie, body: { kind: 'herb', id: herb.id, count: 301 } })).data.error.code, 'not_enough');
+    assert.equal((await call('POST', '/api/settlement/herbalist', { cookie, body: { kind: 'herb', id: herb.id, count: 300 } })).data.error.code, 'not_enough');
     assert.equal((await call('POST', '/api/settlement/herbalist', { cookie, body: { kind: 'part', id: herb.id, count: 1 } })).data.error.code, 'invalid_goods');
   });
 

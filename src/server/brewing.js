@@ -29,6 +29,7 @@ import {
   professionState,
   storeStacks,
   timedKind,
+  saleGold,
 } from '../engine/index.js';
 import { content } from './content.js';
 import { buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf } from './characters.js';
@@ -222,7 +223,7 @@ export async function sellPotions(context) {
   const body = await readJson(context.request);
   const taken = potionCount(player, body);
   const bonus = campBonus(campLevels(player.buildings, context.now, content), 'sellPrice', content);
-  const gold = Math.max(1, Math.round(taken.price * taken.count * (1 + bonus)));
+  const gold = saleGold(taken.price * (1 + bonus), taken.count);
   const result = await takeFromBag(context.env.DB, player, 'potions', taken, gold);
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Mikstury zmieniły się w międzyczasie. Spróbuj ponownie.');
   return json({ sold: { count: taken.count, gold }, character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
