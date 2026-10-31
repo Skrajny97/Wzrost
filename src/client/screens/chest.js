@@ -109,7 +109,7 @@ export function mountChest(container, onBack) {
   // Who put the item in, and whether this character wears it at once.
   function note(item, character) {
     const from = item.own ? 'Twój przedmiot' : item.from ? `Od postaci ${item.from}` : 'Od postaci, której już nie ma';
-    const wear = !item.usable ? 'nie dla tej klasy' : item.wornFrom && item.wornFrom > character.level ? `założysz od poziomu ${item.wornFrom}` : null;
+    const wear = !item.usable ? 'nie dla tej klasy' : item.wornFrom && item.wornFrom > character.classLevel ? `założysz od poziomu klasy ${item.wornFrom}` : null;
     return [from, wear].filter(Boolean).join(' · ');
   }
 

@@ -110,15 +110,14 @@ export const stackButton = (goods, options, actions) =>
   h('button', { type: 'button', class: 'market-goods-button', 'aria-label': `${goods.name}: szczegóły`, onClick: () => goodsSheet(goods, actions?.()) }, stackLine(goods, options));
 
 // An item to buy, its properties under a tap, and when the character can
-// wear it: an item from the Targowisko is worn from its own level on, as
-// one from the Wymiana (241). `opened` keeps the unfolded ones by `key`
+// wear it: an item from the Targowisko is worn from its own level of the
+// class on, as one from the Wymiana (241). `opened` keeps the unfolded ones by `key`
 // through the panel's redraws.
 function itemEntry(item, key, opened) {
   const character = state.character;
   const notes = [
     item.classIds && !item.classIds.includes(character.classId) && 'Twoja klasa nie może go używać.',
-    item.level > character.level && `Założysz go od poziomu postaci ${item.level}.`,
-    item.classLevel && character.classLevel < item.classLevel && `Założysz go od poziomu klasy ${item.classLevel}.`,
+    character.classLevel < Math.max(item.level, item.classLevel ?? 0) && `Założysz go od poziomu klasy ${Math.max(item.level, item.classLevel ?? 0)}.`,
   ].filter(Boolean);
   return [
     h(

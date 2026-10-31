@@ -271,8 +271,8 @@ export function mountTrade(container, { backHash }) {
       ? []
       : [
           item.classIds && !item.classIds.includes(character.classId) && 'Twoja klasa nie może go używać.',
-          item.level > character.level && `Założysz go od poziomu postaci ${item.level}.`,
-          item.classLevel && character.classLevel < item.classLevel && `Założysz go od poziomu klasy ${item.classLevel}.`,
+          // From its own level of the class on, as one from a Wymiana is.
+          character.classLevel < Math.max(item.level, item.classLevel ?? 0) && `Założysz go od poziomu klasy ${Math.max(item.level, item.classLevel ?? 0)}.`,
         ].filter(Boolean);
     return [
       h(

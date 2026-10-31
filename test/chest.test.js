@@ -71,7 +71,7 @@ describe('Skrzynia Konta', () => {
     assert.equal(item.chest, true);
     const worn = await call('POST', `/api/items/${item.id}/equip`, { cookie });
     assert.equal(worn.data.error.code, 'trade_level');
-    assert.equal(worn.data.error.message, 'Przedmiot ze Skrzyni Konta założysz od poziomu postaci 30.');
+    assert.equal(worn.data.error.message, 'Przedmiot ze Skrzyni Konta założysz od poziomu klasy 30.');
     assert.equal((await discovered('Druga'))['item:amulet'], undefined);
     assert.equal((await discovered('Mira'))['item:amulet'], 1);
   });

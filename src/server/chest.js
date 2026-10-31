@@ -33,7 +33,7 @@ async function chestView(db, player) {
         id: row.id,
         from: row.name ?? null,
         own,
-        // Its class can wear it, and from which level of the character.
+        // Its class can wear it, and from which level of the class.
         usable: canUse(item.base, player.row.class_id, content),
         wornFrom: own && !item.traded && !item.chest ? null : item.level,
       };

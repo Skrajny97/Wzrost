@@ -193,7 +193,7 @@ describe('Wymiana', () => {
     assert.equal((await call('GET', '/api/profile/Ala', { cookie: players.ola })).data.profile.tradeBlocked, false);
   });
 
-  test('a potion from a trade waits for its recipe, an item for the character\'s level', async () => {
+  test('a potion from a trade waits for its recipe, an item for the level of the class', async () => {
     const potion = content.potions.find((entry) => entry.effect.heal);
     // Below the Profesje's level the recipe is unknown.
     await (await db()).prepare("UPDATE characters SET level = 6, potions = ? WHERE name = 'Ala'").bind(JSON.stringify({ [potion.id]: 3 })).run();
@@ -203,11 +203,17 @@ describe('Wymiana', () => {
     assert.equal(hunt.data.error.code, 'unknown_recipe');
     const character = (await call('GET', '/api/character', { cookie: players.ala })).data.character;
     assert.equal(character.professions, null);
-    // An amulet above the character's level, got in a trade.
+    // An amulet above the level of the class, got in a trade (the author:
+    // "Mialo byc od poziomu klasy"): the character's own level does not
+    // count, the class's does.
+    await (await db()).prepare("UPDATE characters SET level = 30, class_level = 19 WHERE name = 'Ala'").run();
     const strong = await inBag('Ala', { ...amulet(20), traded: 1 });
     const worn = await call('POST', `/api/items/${strong}/equip`, { cookie: players.ala });
     assert.equal(worn.data.error.code, 'trade_level');
+    assert.equal(worn.data.error.message, 'Przedmiot z wymiany założysz od poziomu klasy 20.');
     const own = await inBag('Ala', amulet(20));
     assert.equal((await call('POST', `/api/items/${own}/equip`, { cookie: players.ala })).status, 200);
+    await (await db()).prepare("UPDATE characters SET level = 6, class_level = 20 WHERE name = 'Ala'").run();
+    assert.equal((await call('POST', `/api/items/${strong}/equip`, { cookie: players.ala })).status, 200);
   });
 });

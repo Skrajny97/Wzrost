@@ -551,8 +551,8 @@ export function itemSheet(item, { equipped }) {
   // A later base of its kind waits for its class level (a Metin2-like tier).
   const early = usable && item.classLevel !== null && character.classLevel < item.classLevel;
   // One from a Wymiana, or from another character through the Skrzynia
-  // Konta, is worn from its own level on (inventory.js).
-  const traded = !equipped && (item.traded || item.chest) && item.level > character.level;
+  // Konta, is worn from its own level of the class on (inventory.js).
+  const traded = !equipped && (item.traded || item.chest) && item.level > character.classLevel;
   const worn = equipped ? null : character.equipment[item.slot];
   const act = (path) => async (event) =>
     withButton(event.currentTarget, async () => {
@@ -596,8 +596,12 @@ export function itemSheet(item, { equipped }) {
     !equipped && salvageSection(item, false),
     busy && h('p', { class: 'muted', text: busyText(character) }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
-    early && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
-    traded && h('p', { class: 'region-warning', text: `Ten przedmiot ${item.chest ? 'ze Skrzyni Konta' : 'z wymiany'} założysz od poziomu postaci ${item.level}.` }),
+    early && !traded && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
+    traded &&
+      h('p', {
+        class: 'region-warning',
+        text: `Ten przedmiot ${item.chest ? 'ze Skrzyni Konta' : 'z wymiany'} założysz od poziomu klasy ${Math.max(item.level, early ? item.classLevel : 0)}.`,
+      }),
     !equipped &&
       item.price !== undefined &&
       h('button', { type: 'button', class: 'button button--world', onClick: sell, text: `Sprzedaj za ${formatNumber(item.price)} złota` }),
