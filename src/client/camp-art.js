@@ -579,8 +579,6 @@ export function plotMarkup(buildingId, { level, building = false, tier: own }) {
   return `${campArt(buildingId, tier) ? '' : GROUND}${look(buildingId, tier)}${building ? SCAFFOLD : ''}`;
 }
 
-export const boardMarkup = (level = 1, tall = false) => board(level, tall);
-
 export const boardArt = (level = 1, tall = false) => svgElement(`0 0 ${BOARD_WIDTH} ${boardHeight(tall)}`, 'camp-board-art', board(level, tall));
 
 export const plotArt = (buildingId, state) => svgElement('0 0 100 80', 'camp-plot-art', plotMarkup(buildingId, state));

@@ -3,3 +3,16 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: same-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Pictures and sounds: kept by the phone for 10 minutes, then shown from its
+# store while a fresh copy is asked for in the background, so a screen opened
+# again does not wait for the server for each picture (the author: "zakładam,
+# że będzie działać gra sprawniej"). A picture or a sound changed in a new
+# version shows at most one view later. The game's scripts and styles keep
+# asking each time, so a new version reaches every player at once.
+/art/*
+  Cache-Control: public, max-age=600, stale-while-revalidate=86400
+/audio/*
+  Cache-Control: public, max-age=600, stale-while-revalidate=86400
+/fonts/*
+  Cache-Control: public, max-age=604800
