@@ -1,0 +1,25 @@
+{
+  "id": "upior",
+  "payload": {
+    "prompt": "Upior, a slavic revenant risen from a grave: a gaunt grey corpse-like man with sunken red glowing eyes, long tangled black hair, bloodless lips over sharp teeth, a torn grey burial shroud, long clawed hands reaching forward, full body, three-quarter view, isolated figure on a plain background, no scenery and no ground",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 82372431,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793434088,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 62.63,
+    "request_id": "41a0adc5-46e4-4fb4-870b-af87f6f0a2c9",
+    "outputs_retained_until": 1793520457
+  }
+}
