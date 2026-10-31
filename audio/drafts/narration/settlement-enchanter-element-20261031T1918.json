@@ -1,0 +1,17 @@
+{
+  "id": "settlement-enchanter-element",
+  "payload": {
+    "text": "Potrafi też zakląć żywioł. Broń zada część obrażeń ogniem, elektrycznością albo naturą, a pancerz się na nie uodporni. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-enchanter-element-20261031T1918-0.mp3",
+    "audio/drafts/narration/settlement-enchanter-element-20261031T1918-1.mp3"
+  ],
+  "credits": 254
+}

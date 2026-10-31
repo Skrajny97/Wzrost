@@ -1,0 +1,17 @@
+{
+  "id": "settlement-enchanter-affix",
+  "payload": {
+    "text": "Wiedana zaklina jeden afiks przedmiotu w inny, zawsze z powodzeniem. Płacisz złotem i materiałami stworów. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-enchanter-affix-20261031T1918-0.mp3",
+    "audio/drafts/narration/settlement-enchanter-affix-20261031T1918-1.mp3"
+  ],
+  "credits": 230
+}
