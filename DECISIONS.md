@@ -2996,6 +2996,15 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Odpowiedzi 256–272 (31.10.2026)
+
+Autor: „256 A wrzuć wszystko co na testowym jest (poza Osadą) na main / 257 B, ale niech pobiera i zwraca te mikstury jeśli chodzi o wyprawy / 258 A / 259 A / 262 A / 263 A / 264 B / 265 A / 266 D / 267 D / 268 B / 269 D do poprawy - za mały lub ucięty / 270 D / 271 A / 272 A”.
+
+1. **Wdrożenie (256 A):** wersja 0.0.66 ze wszystkim z wersji testowej poza Osadą (zob. „Wersja 0.0.66”).
+2. **Mikstury na drogę (257 B):** pasa na mikstury na karcie Postaci nie ma. Zostaje rezerwacja przy wyjściu: wyprawa bierze wybrane mikstury z plecaka przy „Wyrusz”, a niewypite oddaje z raportem (przy odwołaniu wszystkie), tak jak działa od 31.10.
+3. **Jagna i zlecenia (258 A):** Jagna u Przyjaciela płaci o 30% więcej niż złomiarz, a zlecenia co najmniej o 20% więcej, bez zmian.
+4. **Grafiki.** Zatwierdzone: portret Leszego do pojedynku (259 A), nowa Kleryczka A (262), Kleryk z całą głową (263 A), wyższa plansza obozu (271 A) i trzy wyglądy polany (272 A). Portrety do walki: Łucznik B (264), Cień kobieta (265 A), Wojownik D (266), Łuczniczka D (267), Magini B (268) i Kleryk D (270). Portret Cienia mężczyzny (269) jest do poprawy, bo autor ocenił go jako „za mały lub ucięty”. Na próby Wojowniczki (260) i Maga (261) oraz na pytanie o poziomy Kwater (273) odpowiedzi jeszcze nie ma.
+
 ## Zadania tygodniowe na cały tydzień (31.10.2026, na wersji testowej)
 
 Autor: „Tygodniowe zadania powinny być bardziej ogólne, bo obecnie z Szybkimi Polowaniami i Błyskawicznymi idzie je zrobić w pare godzin”.
@@ -3122,6 +3131,21 @@ Autor przekazuje uwagę osoby testującej grę (kuzyn autora), która grała na 
 1. **Przyczyna.** Ostatnia przeczytana wiadomość Globalnego i każdej rozmowy prywatnej była zapisana tylko w pamięci przeglądarki, więc inne urządzenie o niej nie wiedziało.
 2. **Zmiana.** Znacznik przeczytania trafia też na serwer, do postaci (`POST /api/chat/seen`, kolumna `characters.chat_seen`, migracja 0058). `GET /api/chat/latest`, o który gra pyta co 15 sekund, oddaje go każdemu urządzeniu. Znacznik tylko rośnie. Kropka na zakładce Społeczność i przy czacie gaśnie więc na każdym urządzeniu po najwyżej 15 sekundach od przeczytania wiadomości na jednym z nich, a po otwarciu gry od razu.
 3. **Wyciszenie** powiadomień Globalnego zostaje ustawieniem urządzenia.
+
+## Wersja 0.0.66 (31.10.2026)
+
+Autor: „256 A wrzuć wszystko co na testowym jest (poza Osadą) na main”.
+
+1. **Co wchodzi do gry:**
+    - plecak w czasie wypraw i profesji oraz mikstury rezerwowane na drogę (zob. „Plecak poza obozem i mikstury na drogę”);
+    - jednorazowa zmiana nazwy w Ustawieniach i nowe nazwy od Systemu od poniedziałku 2.11.2026, godz. 1:00 (zob. „Nowe nazwy od Systemu i jednorazowa zmiana nazwy”);
+    - czat otwierany przy najnowszych wiadomościach;
+    - mniejsza Skrzynia Konta na planszy obozu;
+    - potwierdzenie sprzedaży materiału i „Przerób” prosto z plecaka;
+    - trzy nowe zdarzenia na drodze: dziad z lirą, nawiedzona kapliczka i Leszy z pojedynkiem (zob. „Zdarzenia na drodze: dziad, kapliczka, kupiec i Leszy”);
+    - zadania tygodniowe na cały tydzień, losowane od poniedziałku (zob. „Zadania tygodniowe na cały tydzień”).
+2. **Co zostaje ukryte:** Osada (bez `SETTLEMENT`), a z nią kupiec z utkniętym wozem, towarzysze z popiersiami, Kwatery i wyższa plansza obozu.
+3. **Migracje bazy:** 0059 (`characters.name_changed`, `characters.name_notice`) i 0060 (Kwatery dla postaci, które mają już towarzyszy; w grze nikogo nie dotyczy).
 
 ## Wersja 0.0.65 (31.10.2026)
 
