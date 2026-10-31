@@ -1,0 +1,23 @@
+{
+  "id": "companion-shadow-male-1",
+  "payload": {
+    "prompt": "a wiry young slavic thief for hire, messy black hair, a thin moustache, quick dark eyes, a dark leather hood down on his shoulders, a charcoal scarf pulled down under his chin, head and shoulders portrait, his shoulders fill the whole bottom of the picture from the left edge to the right edge, facing the viewer, three-quarter view, on a flat plain light beige background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 321744128,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793433637,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 63.95,
+    "request_id": "00b11e7a-fd9c-41c2-8d82-f48ae78d440a",
+    "outputs_retained_until": 1793519917
+  }
+}

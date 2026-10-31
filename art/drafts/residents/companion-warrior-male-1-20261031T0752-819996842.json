@@ -1,0 +1,23 @@
+{
+  "id": "companion-warrior-male-1",
+  "payload": {
+    "prompt": "a broad-shouldered slavic man warrior for hire in his forties, a shaved head and a thick fair beard braided in two, a once broken nose, calm hazel eyes, a studded leather jerkin over a mail shirt, the haft of an axe over his shoulder, head and shoulders portrait, his shoulders fill the whole bottom of the picture from the left edge to the right edge, facing the viewer, three-quarter view, on a flat plain light beige background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 819996842,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793433167,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 66.47,
+    "request_id": "5b799f8d-924e-47b3-a2e8-b2731e9b9392",
+    "outputs_retained_until": 1793519547
+  }
+}

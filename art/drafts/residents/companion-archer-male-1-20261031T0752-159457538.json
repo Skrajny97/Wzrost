@@ -1,0 +1,23 @@
+{
+  "id": "companion-archer-male-1",
+  "payload": {
+    "prompt": "a lean slavic hunter for hire in his thirties, short brown hair, a weathered face with stubble and a scar across one eyebrow, a fur-trimmed leather hood down on his shoulders, a quiver strap across his chest, head and shoulders portrait, his shoulders fill the whole bottom of the picture from the left edge to the right edge, facing the viewer, three-quarter view, on a flat plain light beige background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 159457538,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793433258,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 65.75,
+    "request_id": "3ce354ce-ca35-4179-a056-3bd1ea766d3b",
+    "outputs_retained_until": 1793519614
+  }
+}

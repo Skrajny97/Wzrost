@@ -1,0 +1,23 @@
+{
+  "id": "companion-cleric-female-1",
+  "payload": {
+    "prompt": "a kind middle-aged slavic woman healer for hire, greying chestnut hair under a white linen kerchief, warm brown eyes, laugh lines, a cream linen robe with a simple carved wooden sun amulet, head and shoulders portrait, her shoulders fill the whole bottom of the picture from the left edge to the right edge, facing the viewer, three-quarter view, on a flat plain light beige background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 866757519,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793433324,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 65.03,
+    "request_id": "4d09ee86-f5a9-4159-9b9d-b336d37324c4",
+    "outputs_retained_until": 1793519706
+  }
+}

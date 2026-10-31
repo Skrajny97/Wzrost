@@ -1,0 +1,23 @@
+{
+  "id": "companion-archer-female-1",
+  "payload": {
+    "prompt": "a young slavic huntress for hire, long black hair in a loose braid with a grey feather, freckles, sharp green eyes, a hooded moss-green cape over a leather jerkin, a quiver strap across her chest and fletched arrows over her shoulder, head and shoulders portrait, her shoulders fill the whole bottom of the picture from the left edge to the right edge, facing the viewer, three-quarter view, on a flat plain light beige background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 244798949,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793433212,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 66.11,
+    "request_id": "81bec267-7b70-495a-bcdd-a10266b33793",
+    "outputs_retained_until": 1793519570
+  }
+}
