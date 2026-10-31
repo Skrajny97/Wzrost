@@ -83,15 +83,15 @@ export function drawCandidates({ character, seed }, now, content, taken = []) {
 }
 
 // What hiring one costs: goldPerLevel for each of its levels.
-export const hireCost = (companion, content) => companion.level * tuning(content).goldPerLevel;
-
-// How many companions the character may have at its relation with the
-// innkeeper (question 105 A): the first from the first standing in `from`,
-// the second from the next.
-export function companionPlaces(points, content) {
+// What hiring costs at `points` of the relation with the innkeeper: the
+// companion's level times goldPerLevel, times its standing's priceByStanding.
+// Any standing may hire, a lower one for more (the author: "Nie uzależniaj
+// możliwości a cenę werbunku od stopnia znajomości. Powinienem móc ale
+// drożej niż na wyższym stopniu").
+export function hireCost(companion, content, points = 0) {
   const { standings } = content.settlement;
-  const index = standings.findLastIndex((standing) => standing.points <= points);
-  return tuning(content).from.filter((standingId) => standings.findIndex((standing) => standing.id === standingId) <= index).length;
+  const standing = standings.findLast((one) => one.points <= points) ?? standings[0];
+  return Math.round(companion.level * tuning(content).goldPerLevel * (tuning(content).priceByStanding[standing.id] ?? 1));
 }
 
 // The companion as the engine's character: its points spread by its class

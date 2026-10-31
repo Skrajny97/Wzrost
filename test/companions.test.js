@@ -1,5 +1,5 @@
 // Companions (the Osada, part II): the Karczma's four candidates a week, the
-// places the relation with the innkeeper gives, a companion in the fights of
+// price the relation with the innkeeper sets, a companion in the fights of
 // an exploration, its XP and its wounds, which heal with the character's
 // rest, hiring one through the API, its profession's gift of the week and
 // the items it gets from the bag.
@@ -11,7 +11,6 @@ import {
   companionAfterHunt,
   companionCombatant,
   companionGift,
-  companionPlaces,
   companionReady,
   companionXp,
   createRng,
@@ -42,17 +41,21 @@ describe('companions in the engine', () => {
       assert.equal(candidate.skills.length, 2);
       assert.ok(candidate.skills.every((id) => content.skillsById[id].classId === candidate.classId));
       assert.ok(candidate.gear.some((item) => item.slot === 'weapon'));
-      assert.equal(hireCost(candidate, content), candidate.level * tuning.goldPerLevel);
+      assert.equal(hireCost(candidate, content, Infinity), candidate.level * tuning.goldPerLevel);
     }
     // A hired one no longer waits.
     assert.equal(drawCandidates({ character, seed: 's' }, NOW, content, [candidates[0].id]).length, candidates.length - 1);
   });
 
-  test('the relation with the innkeeper gives the first place at its first standing and the second later', () => {
-    const points = (id) => content.settlement.standings.find((standing) => standing.id === id).points;
-    assert.equal(companionPlaces(0, content), 0);
-    assert.equal(companionPlaces(points(tuning.from[0]), content), 1);
-    assert.equal(companionPlaces(points(tuning.from[1]), content), 2);
+  test('any standing with the innkeeper may hire, a lower one for more gold', () => {
+    // The author: "Nie uzależniaj mozliwosci a cene werbunku od stopnia
+    // znajomości. Powinienem móc ale drożej niż na wyższym stopniu".
+    const candidate = { level: 30 };
+    const prices = content.settlement.standings.map((standing) => hireCost(candidate, content, standing.points));
+    assert.ok(prices.every((price, index) => index === 0 || price <= prices[index - 1]), String(prices));
+    assert.equal(prices[0], 30 * tuning.goldPerLevel * tuning.priceByStanding.stranger);
+    assert.equal(prices.at(-1), 30 * tuning.goldPerLevel);
+    assert.ok(prices[0] > prices.at(-1));
   });
 
   test('traits change the companion in a fight', () => {
@@ -135,9 +138,8 @@ describe('companions through the API', () => {
     await quarters(0);
     const camp = (await call('GET', '/api/character', { cookie })).data.character.camp.buildings.find((building) => building.id === 'quarters');
     assert.deepEqual([camp.level, camp.maxLevel, camp.look, camp.next.effect], [0, 2, 1, 'Miejsca dla towarzyszy: 1']);
-    await relation(content.settlement.standings.find((standing) => standing.id === tuning.from[1]).points);
     let view = (await settlement()).companions;
-    assert.deepEqual([view.relation, view.beds, view.places], [2, 0, 0]);
+    assert.deepEqual([view.places, view.moreBeds], [0, true]);
     const [first, second] = view.candidates;
     assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: first.id } })).data.error.code, 'no_bed');
     await quarters(1);
@@ -151,21 +153,28 @@ describe('companions through the API', () => {
     assert.deepEqual([built.level, built.look, built.effect], [2, 2, 'Miejsca dla towarzyszy: 2']);
   });
 
-  test('candidates wait in the Karczma, and one is hired once the innkeeper knows the character', async () => {
+  test('candidates wait in the Karczma, and a stranger to the innkeeper hires one too, for more gold', async () => {
+    // A friend of Zbylut pays the plain price.
+    await relation(content.settlement.standings.at(-1).points);
+    const friendly = (await settlement()).companions;
+    assert.deepEqual(
+      friendly.candidates.map((candidate) => candidate.price),
+      friendly.candidates.map((candidate) => candidate.level * tuning.goldPerLevel),
+    );
+    assert.equal(friendly.cheaper, false);
+    // A stranger pays more, and may hire all the same.
+    await relation(0);
     let view = (await settlement()).companions;
-    assert.equal(view.places, 0);
+    assert.deepEqual([view.places, view.cheaper], [2, true]);
     assert.equal(view.candidates.length, tuning.candidates);
-    const [first, second] = view.candidates;
-    assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: first.id } })).data.error.code, 'no_place');
-    const known = content.settlement.standings.find((standing) => standing.id === tuning.from[0]).points;
-    await relation(known);
+    const [first] = view.candidates;
+    assert.equal(first.price, Math.round(first.level * tuning.goldPerLevel * tuning.priceByStanding.stranger));
     const hired = await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: first.id } });
     assert.equal(hired.status, 200);
     assert.equal(hired.data.character.gold, 100000 - first.price);
     view = hired.data.settlement.companions;
     assert.deepEqual(view.hired.map((companion) => companion.id), [first.id]);
     assert.equal(view.candidates.length, tuning.candidates - 1);
-    assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: second.id } })).data.error.code, 'no_place');
     // It goes on the next exploration and gains XP from it.
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
     const options = JSON.parse((await (await db()).prepare('SELECT options FROM activities').first()).options);
@@ -182,7 +191,6 @@ describe('companions through the API', () => {
   });
 
   test('a wounded companion heals with the character: it stays behind until the character has rested to full HP', async () => {
-    await relation(content.settlement.standings.find((standing) => standing.id === tuning.from[0]).points);
     const [candidate] = (await settlement()).companions.candidates;
     await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
     const database = await db();
@@ -208,7 +216,6 @@ describe('companions through the API', () => {
   });
 
   test('the gift of the week goes to the character\'s goods once a week, at home', async () => {
-    await relation(content.settlement.standings.find((standing) => standing.id === tuning.from[0]).points);
     const [candidate] = (await settlement()).companions.candidates;
     const hired = await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
     const { gift } = hired.data.settlement.companions.hired[0];
@@ -226,7 +233,6 @@ describe('companions through the API', () => {
   });
 
   test('items of its class from the bag go on the companion, what it wore goes back, and it gives them back when dismissed (108 A)', async () => {
-    await relation(content.settlement.standings.find((standing) => standing.id === tuning.from[0]).points);
     const [candidate] = (await settlement()).companions.candidates;
     await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
     const database = await db();

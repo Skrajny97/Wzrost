@@ -1051,6 +1051,12 @@ function checkSettlement(data, { rarities }) {
   if (!standingIds.has(orders.quality.from)) errors.push(`settlement.json: orders.quality.from to nieznany stopień ${orders.quality.from}`);
   if (!standingIds.has(orders.special.from)) errors.push(`settlement.json: orders.special.from to nieznany stopień ${orders.special.from}`);
   const standingAt = (id) => standings.findIndex((standing) => standing.id === id);
+  // The price of hiring companions at each standing: known standings, and
+  // never dearer at a higher one.
+  const prices = data.settlement.companions?.priceByStanding ?? {};
+  for (const id of Object.keys(prices)) if (!standingIds.has(id)) errors.push(`settlement.json: companions.priceByStanding ma nieznany stopień ${id}`);
+  const ordered = standings.filter((standing) => standing.id in prices).map((standing) => prices[standing.id]);
+  if (ordered.some((factor, index) => index > 0 && factor > ordered[index - 1])) errors.push('settlement.json: companions.priceByStanding nie może rosnąć ze stopniem');
   reforge.choices.forEach((step, index) => {
     if (!standingIds.has(step.from)) errors.push(`settlement.json: reforge.choices ma nieznany stopień ${step.from}`);
     const before = reforge.choices[index - 1];

@@ -18,7 +18,6 @@ import {
   deliverBlock,
   companionCombatant,
   companionGift,
-  companionPlaces,
   companionSkillLevel,
   companionWearBlock,
   deliverOrder,
@@ -420,38 +419,38 @@ function giftOf(companion, row, now) {
   return { ...gift, name: goods[gift.key].name };
 }
 
-// The places for companions: the relation with the innkeeper opens them
-// (question 105 A), and each needs a bed in the camp's Kwatery (104 A: the
-// companion lives in the camp).
-function placesOf(player, stored, now) {
-  const relation = companionPlaces(stored.relations[content.settlement.tavern.resident] ?? 0, content);
+// The places for companions: a bed in the camp's Kwatery for each (104 A:
+// the companion lives in the camp), and how many beds the Kwatery have at
+// their highest level. The relation with the innkeeper sets the price only.
+function placesOf(player, now) {
   const beds = campBonus(campLevels(player.buildings, now, content), 'companionPlaces', content);
-  return { relation, beds, places: Math.min(relation, beds) };
+  const most = content.buildings.filter((building) => building.effect.kind === 'companionPlaces').reduce((sum, building) => sum + building.effect.perLevel * building.maxLevel, 0);
+  return { places: beds, most };
 }
 
-// The Karczma's werbunek (questions 104–106): the places the relation with
-// the innkeeper and the Kwatery give, the standing that opens the next one,
+// The innkeeper's relation points, which set the price of hiring.
+const innkeeperPoints = (stored) => stored.relations[content.settlement.tavern.resident] ?? 0;
+
+// The Karczma's werbunek (questions 104–106): the places the Kwatery give,
 // the companions hired with this week's gift and this week's candidates not
-// hired yet, each with its price.
+// hired yet, each with its price at the standing with the innkeeper.
 function companionsView(player, stored, now) {
   const { row } = player;
-  const { standings } = content.settlement;
   const bag = player.items.filter((item) => !item.equippedSlot);
   const rested = (stored.companions ?? []).some((companion) => companion.wounded) ? restedAt(player, now) : now;
-  const { relation, beds, places } = placesOf(player, stored, now);
+  const { places, most } = placesOf(player, now);
   const hired = stored.companions ?? [];
-  const nextId = content.settlement.companions.from[relation];
+  const points = innkeeperPoints(stored);
   const candidates = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, now, content, [
     ...hired.map((companion) => companion.id),
     ...(stored.dismissed ?? []),
   ]);
   return {
     places,
-    // What the innkeeper's relation would allow and the beds in the camp's
-    // Kwatery, so that the page says which one is missing.
-    relation,
-    beds,
-    next: nextId ? standings.find((standing) => standing.id === nextId).name : null,
+    // Whether the Kwatery can give another bed, and whether a higher
+    // standing with the innkeeper would make hiring cheaper.
+    moreBeds: places < most,
+    cheaper: hireCost({ level: 1 }, content, points) > hireCost({ level: 1 }, content, Infinity),
     // Each with this week's gift and the items in the bag it can wear.
     hired: hired.map((companion) => ({
       ...companionView(companion),
@@ -460,7 +459,7 @@ function companionsView(player, stored, now) {
       gift: giftOf(companion, row, now),
       wearable: bag.filter((item) => !companionWearBlock(companion, item, content)).map((item) => item.id),
     })),
-    candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content) })),
+    candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content, points) })),
   };
 }
 
@@ -614,8 +613,8 @@ export async function buyMug(context) {
 }
 
 // { candidateId }: hires one of this week's candidates for gold, when the
-// relation with the innkeeper gives a free place (question 105 A). The
-// companion goes on the next exploration.
+// camp's Kwatery have a free bed. Any standing with the innkeeper may hire,
+// a lower one for more gold. The companion goes on the next exploration.
 export async function hireCompanion(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -623,13 +622,11 @@ export async function hireCompanion(context) {
   const body = await readJson(context.request);
   const stored = settlementOf(row);
   const hired = stored.companions ?? [];
-  const { relation, beds } = placesOf(player, stored, context.now);
-  if (hired.length >= relation) throw new ApiError(409, 'no_place', 'Zbylut nie zna cię jeszcze na tyle, żeby polecić więcej ludzi.');
-  if (hired.length >= beds) throw new ApiError(409, 'no_bed', 'W Kwaterach w obozie nie ma wolnego posłania.');
+  if (hired.length >= placesOf(player, context.now).places) throw new ApiError(409, 'no_bed', 'W Kwaterach w obozie nie ma wolnego posłania.');
   const taken = [...hired.map((companion) => companion.id), ...(stored.dismissed ?? [])];
   const candidate = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, context.now, content, taken).find((one) => one.id === body.candidateId);
   if (!candidate) throw new ApiError(404, 'no_candidate', 'Tego kandydata już nie ma w Karczmie.');
-  const gold = hireCost(candidate, content);
+  const gold = hireCost(candidate, content, innkeeperPoints(stored));
   if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota na werbunek.');
   const next = { ...stored, companions: [...hired, candidate] };
   const result = await context.env.DB.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?')

@@ -615,16 +615,15 @@ export function mountSettlement(container, { params = {} } = {}) {
   // Szybkie Polowanie) and this week's candidates, from the standing with
   // the innkeeper that gives a place and a bed in the camp's Kwatery.
   function companionsCard() {
-    const { places, relation, beds, next, hired, candidates } = data.companions;
+    const { places, moreBeds, cheaper, hired, candidates } = data.companions;
     const full = hired.length >= places;
-    // What opens the next place: the standing with Zbylut or a bed more.
-    const more = relation > beds ? ' Kolejne posłanie da rozbudowa Kwater w obozie.' : next ? ` Kolejne od stopnia ${next}.` : '';
-    const intro =
-      relation === 0
-        ? `Zbylut poleci ci kogoś od stopnia ${next} w relacji z nim.`
-        : beds === 0
-          ? 'Zbylut poleci ci kogoś, ale towarzysz potrzebuje posłania: zbuduj Kwatery w obozie.'
-          : `Towarzysze idą z tobą na każdą wyprawę poza Szybkim Polowaniem i rosną razem z tobą. Werbunek to jednorazowa opłata, bez żołdu. Miejsca: ${hired.length} z ${places}.${more}`;
+    // Every standing with Zbylut may hire, a lower one for more gold; each
+    // companion needs a bed in the camp's Kwatery.
+    const beds =
+      places === 0
+        ? ' Towarzysz potrzebuje posłania: zbuduj Kwatery w obozie.'
+        : ` Miejsca: ${hired.length} z ${places}.${full && moreBeds ? ' Kolejne posłanie da rozbudowa Kwater w obozie.' : ''}`;
+    const intro = `Towarzysze idą z tobą na każdą wyprawę poza Szybkim Polowaniem i rosną razem z tobą. Werbunek to jednorazowa opłata, bez żołdu${cheaper ? ', a im lepiej zna cię Zbylut, tym jest tańszy' : ''}.${beds}`;
     const dismiss = (companion) =>
       h('button', {
         type: 'button',
@@ -656,7 +655,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       h('h2', { class: 'section-title', text: 'Szukają pracy w tym tygodniu' }),
       candidates.length === 0
         ? h('p', { class: 'muted', text: 'Nikt więcej nie szuka pracy. Nowi przyjdą w poniedziałek.' })
-        : candidates.map((candidate) => companionCard(candidate, places > 0 ? hire(candidate) : null)),
+        : candidates.map((candidate) => companionCard(candidate, hire(candidate))),
     );
   }
 
