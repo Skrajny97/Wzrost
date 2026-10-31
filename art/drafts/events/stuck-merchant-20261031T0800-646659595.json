@@ -1,0 +1,25 @@
+{
+  "id": "stuck-merchant",
+  "payload": {
+    "prompt": "a stout travelling merchant in a fur hat and a long red coat with brass buttons, waving both hands for help, a coin purse on his belt, mud on his boots, standing firmly on both legs in brown boots, the whole figure from the hat to the boots with empty space around it, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 646659595,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793433674,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 63.59,
+    "request_id": "9808d454-6f12-4d76-882b-bd1e0e6700e0",
+    "outputs_retained_until": 1793520053
+  }
+}
