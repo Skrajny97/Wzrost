@@ -1,0 +1,17 @@
+{
+  "id": "settlement-hermit-reset",
+  "payload": {
+    "text": "Sambor pomoże Ci zacząć od nowa. Za złoto wyzeruje ścieżkę umiejętności albo rozdane statystyki. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-hermit-reset-20261031T1902-0.mp3",
+    "audio/drafts/narration/settlement-hermit-reset-20261031T1902-1.mp3"
+  ],
+  "credits": 210
+}

@@ -1,0 +1,17 @@
+{
+  "id": "settlement-market-company",
+  "payload": {
+    "text": "Każdy handel buduje poważanie w Kompanii Kupców. Im jest wyższe, tym więcej ofert wystawisz naraz. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-market-company-20261031T1902-0.mp3",
+    "audio/drafts/narration/settlement-market-company-20261031T1902-1.mp3"
+  ],
+  "credits": 214
+}

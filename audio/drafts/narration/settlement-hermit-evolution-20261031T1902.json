@@ -1,0 +1,17 @@
+{
+  "id": "settlement-hermit-evolution",
+  "payload": {
+    "text": "Po ewolucji klasy zmienisz u niego ewolucję na inną. Pierwsza zmiana jest darmowa. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-hermit-evolution-20261031T1902-0.mp3",
+    "audio/drafts/narration/settlement-hermit-evolution-20261031T1902-1.mp3"
+  ],
+  "credits": 182
+}

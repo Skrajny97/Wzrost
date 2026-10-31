@@ -1,0 +1,17 @@
+{
+  "id": "settlement-market-mine",
+  "payload": {
+    "text": "Tutaj wystawisz własne towary i odbierzesz to, co kupisz albo sprzedasz. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-market-mine-20261031T1902-0.mp3",
+    "audio/drafts/narration/settlement-market-mine-20261031T1902-1.mp3"
+  ],
+  "credits": 162
+}
