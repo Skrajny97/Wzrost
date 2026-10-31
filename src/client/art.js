@@ -258,6 +258,14 @@ export const SPRITES = {
     height: 128,
     ids: ['headman', 'enchantress', 'hermit', 'innkeeper', 'herbalist'],
   },
+  // The companions hired in the Karczma: a bust for each class and look,
+  // other faces than the players' portraits (question 107 B), cut off the
+  // plain background they were drawn on (tools/cut-bust.py).
+  companions: {
+    width: 96,
+    height: 128,
+    ids: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
+  },
   'settlement-board': {
     width: 384,
     height: 768,
@@ -343,6 +351,13 @@ export const residentBust = (residentId) =>
   available.residents.has(residentId)
     ? h('img', { src: `/art/residents/${residentId}.png`, alt: '', width: 96, height: 128, class: 'sprite resident-bust', decoding: 'async', draggable: 'false' })
     : null;
+// A companion's bust, by its class and look, or null while it has none.
+export function companionBust(classId, appearance) {
+  const id = `${classId}-${appearance}`;
+  return available.companions.has(id)
+    ? h('img', { src: `/art/companions/${id}.png`, alt: '', width: 96, height: 128, class: 'sprite companion-bust', decoding: 'async', draggable: 'false' })
+    : null;
+}
 export const settlementGround = () => (available['settlement-board'].has('settlement') ? '/art/settlement-board/settlement.png' : null);
 
 // A skin tone other than the one drawn has its own recoloured file

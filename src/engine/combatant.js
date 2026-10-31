@@ -190,6 +190,8 @@ export function combatantView(unit, opponentLevel, content) {
     skin: unit.skin,
     evolution: unit.evolution,
     monsterId: unit.monsterId,
+    // A companion from the Karczma shows its own bust (question 107 B).
+    ...(unit.companion && { companion: true }),
     elite: unit.elite,
     champion: unit.champion ?? false,
     maxHp: unit.maxHp,

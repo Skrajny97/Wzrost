@@ -117,6 +117,8 @@ test('every sprite on the list has its file at its size, and every class has its
     // The Osada's places and torch, its residents' busts and its board.
     settlement: [...data('settlement').places.map((place) => place.id), ...(data('settlement').torches?.length ? ['torch', 'torch-off'] : [])],
     residents: data('settlement').residents.map((resident) => resident.id),
+    // The companions' busts, one for each class and look.
+    companions: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     'settlement-board': ['settlement'],
     // The inner regions' circles and the lands' cards on the Walka screen.
     areas: data('regions').flatMap((region) => region.areas.map((area) => area.id)),

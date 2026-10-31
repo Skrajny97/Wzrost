@@ -5000,6 +5000,19 @@ a.camp-level-button {
   mask-image: linear-gradient(#000 72%, transparent);
 }
 
+/* A companion's own bust in its fight card: the head and shoulders, the
+   top of the picture, fading out at the bottom like the characters'. */
+.unit-art .companion-bust {
+  display: block;
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  object-position: 50% 0;
+  image-rendering: pixelated;
+  -webkit-mask-image: linear-gradient(#000 72%, transparent);
+  mask-image: linear-gradient(#000 72%, transparent);
+}
+
 .class-icon .sprite--bust {
   background: linear-gradient(#24301f, #141b11);
 }
@@ -8972,7 +8985,8 @@ a.profession-square:active {
   overflow: hidden;
 }
 
-.settlement-resident-bust .resident-bust {
+.settlement-resident-bust .resident-bust,
+.settlement-resident-bust .companion-bust {
   display: block;
   width: 96px;
   height: 128px;

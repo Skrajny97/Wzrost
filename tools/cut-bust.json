@@ -1,0 +1,9 @@
+{
+  "$comment": "Poprawki wycinania tła popiersi towarzyszy (tools/cut-bust.py), według klasy i wyglądu: seed to dodatkowy punkt tła innego odcienia, flood wypełnia tło aż do ciemnego konturu postaci, erase czyści prostokąt (x0, y0, x1, y1).",
+  "warrior-female": {"seed": [[2, 50], [3, 72], [90, 75], [92, 104]]},
+  "warrior-male": {"seed": [[2, 60], [80, 40], [92, 54]]},
+  "archer-female": {"seed": [[2, 70], [93, 70], [2, 95]]},
+  "archer-male": {"erase": [[0, 56, 1, 58]]},
+  "mage-male": {"erase": [[87, 100, 95, 127]]},
+  "shadow-female": {"flood": [[2, 30], [40, 2], [92, 60], [92, 120], [5, 75]], "erase": [[54, 3, 57, 5]]}
+}

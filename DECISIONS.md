@@ -2985,7 +2985,16 @@ Autor: „Do tego możesz wstępnie zacząć robić resztę co istnieje z Osady 
 6. **Sprzęt z plecaka (108 A).** Towarzysz ma trzy miejsca: broń, pancerz i talizman. Przycisk „Załóż z plecaka” na jego karcie pokazuje przedmioty z plecaka, które może nosić: broń i pancerz swojej klasy, na swój poziom (poziom klasy towarzysza to jego poziom), i każdy talizman. Przedmiot z Wymiany albo ze Skrzyni Konta zakłada od poziomu przedmiotu, jak postać. To, co nosił w tym miejscu, wraca do plecaka. Przy odprawie oddaje wszystko, co dostał z plecaka (potrzebne jest na to miejsce w plecaku), a swój sprzęt z werbunku zabiera ze sobą. Przedmioty zakłada się w obozie, jak każdą zmianę plecaka.
 7. **Prezent z profesji (112 A).** Raz w tygodniu każdy towarzysz przynosi prezent ze swojej profesji: z Zielarstwa zioła, z Alchemii mikstury, a z Rzemieślnictwa części. Prezent zawiera jeden rodzaj towaru, który postać już zna, jak w zleceniach. Zanim postać otworzy daną profesję, dostaje towar z jej pierwszego poziomu. Ilość wynosi 3–6 ziół, 1–2 mikstury albo 2–4 części, a na każde 10 poziomów postaci dochodzi 1 zioło, pół mikstury albo 1 część. Na 80. poziomie to np. 5–6 mikstur. Prezent jest ten sam przez cały tydzień, a odbiera się go w obozie, bo zioła i mikstury czekają w torbie.
 8. **Rany (113 A, zmienione 31.10).** Rany towarzysza goją się razem z ranami postaci, więc „Przewiń” odpoczynku postaci skraca też je.
-9. **Jeszcze nie ma:** Kwater w obozie (104 A, potrzebują grafiki budynku do oceny autora), twarzy towarzyszy (107 B; próbne popiersia 231 i 232 czekają na ocenę, a w walce towarzysz ma na razie portret swojej klasy) i cech w zdarzeniach (część IV).
+9. **Jeszcze nie ma:** Kwater w obozie (104 A, potrzebują grafiki budynku do oceny autora), twarzy towarzyszy (107 B; próbne popiersia 231 i 232 czekają na ocenę, a w walce towarzysz ma na razie portret swojej klasy) i cech w zdarzeniach (część IV). *Od 31.10 towarzysze mają własne twarze: zob. „Twarze towarzyszy”.*
+
+## Twarze towarzyszy (31.10.2026, na wersji testowej)
+
+Autor przy próbnych popiersiach 231 i 232: „231 A / 232 A”, a potem: „a i zero zastrzeżeń juz co do portretów i chodu działaj”. Pozostałe osiem popiersi (243–250) stoi w grze na próbę, do oceny autora.
+
+1. **Popiersie według klasy i płci.** Każda klasa ma dwa popiersia towarzyszy, kobiety i mężczyzny, inne niż portrety graczy (107 B). Towarzysz pokazuje popiersie swojej klasy i płci, więc dwoje towarzyszy tej samej klasy i płci ma na razie tę samą twarz.
+2. **Gdzie widać twarz.** Karta towarzysza w Karczmie ma popiersie obok imienia, tak jak ekran mieszkańca, u zwerbowanych i u kandydatów. W walce karta towarzysza pokazuje głowę i ramiona z jego popiersia, a dół łagodnie zanika, jak u postaci. Walki z raportów sprzed tej zmiany pokazują portret klasy.
+3. **Bez tła.** Popiersia są narysowane na gładkim jasnym tle, jak Sołtys i Zaklinaczka. `tools/cut-bust.py` zdejmuje tło od górnej krawędzi w dół, więc ramiona sięgają brzegów obrazka, a jasne drobinki tła między pasmami włosów znikają. Kilka obrazków miało w tle trawę, a Cień (kobieta) dom i słup: poprawki dla nich stoją w `tools/cut-bust.json`.
+4. **Kandydat bez „Załóż z plecaka”.** Kandydat w Karczmie pokazuje tylko sprzęt, z którym przychodzi. Przycisk „Załóż z plecaka” ma dopiero towarzysz zwerbowany.
 
 ## Materiały w plecaku: potwierdzenie sprzedaży i przerób (31.10.2026)
 

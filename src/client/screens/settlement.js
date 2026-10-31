@@ -9,7 +9,7 @@
 // Where the deployment has no Osada yet, or the character is below its
 // level, the tab says so as the other locked modules do.
 
-import { residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
+import { companionBust, residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatDecimal, formatHours, formatNumber } from '../format.js';
@@ -526,10 +526,11 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
-  // What a hired companion wears in its three places, and a button to put
-  // on an item from the bag (question 108 A), at home as every change of
-  // the bag.
+  // What a companion wears in its three places; one hired has a button to
+  // put on an item from the bag (question 108 A), at home as every change
+  // of the bag, while a candidate only shows what it comes with.
   function wearList(companion) {
+    const hired = Boolean(companion.wearable);
     const away = Boolean(state.character.activity);
     return h(
       'div',
@@ -542,8 +543,8 @@ export function mountSettlement(container, { params = {} } = {}) {
           place.item ? itemSummary(place.item) : h('span', { class: 'muted', text: 'Pusto' }),
         ),
       ),
-      h('button', { type: 'button', class: 'button button--small', text: 'Załóż z plecaka', disabled: away, onClick: () => wearSheet(companion) }),
-      away && h('p', { class: 'muted', text: 'Przedmioty zakłada się po powrocie z wyprawy.' }),
+      hired && h('button', { type: 'button', class: 'button button--small', text: 'Załóż z plecaka', disabled: away, onClick: () => wearSheet(companion) }),
+      hired && away && h('p', { class: 'muted', text: 'Przedmioty zakłada się po powrocie z wyprawy.' }),
     );
   }
 
@@ -584,12 +585,23 @@ export function mountSettlement(container, { params = {} } = {}) {
     const wounded = companion.wounded
       ? `${companion.appearance === 'female' ? 'Ranna' : 'Ranny'}. Wróci do sił, gdy postać ${companion.healsAt ? `odpocznie do pełna HP (jeszcze ${formatCountdown(companion.healsAt - serverNow())})` : 'po wyprawie odpocznie do pełna HP'}.`
       : null;
+    // Its own face (question 107 B) beside who it is, as a resident's.
+    const bust = companionBust(companion.classId, companion.appearance);
     return h(
       'article',
       { class: 'card settlement-companion' },
-      h('p', { class: 'settlement-resident-name', text: `${companion.name}, ${companion.className}, poz. ${companion.level}` }),
-      h('p', { class: 'muted', text: `HP ${formatNumber(companion.maxHp)} · pancerz ${formatNumber(companion.armor)}${companion.profession ? ` · ${companion.profession}` : ''}` }),
-      h('p', { class: 'muted settlement-resident-story', text: companion.story }),
+      h(
+        'div',
+        { class: 'settlement-resident-head' },
+        bust && h('span', { class: 'settlement-resident-bust' }, bust),
+        h(
+          'div',
+          {},
+          h('p', { class: 'settlement-resident-name', text: `${companion.name}, ${companion.className}, poz. ${companion.level}` }),
+          h('p', { class: 'muted', text: `HP ${formatNumber(companion.maxHp)} · pancerz ${formatNumber(companion.armor)}${companion.profession ? ` · ${companion.profession}` : ''}` }),
+          h('p', { class: 'muted settlement-resident-story', text: companion.story }),
+        ),
+      ),
       h(
         'ul',
         { class: 'settlement-companion-list' },
