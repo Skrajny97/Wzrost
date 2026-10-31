@@ -1,8 +1,9 @@
 // Events with a further choice (the author: "z więcej niż jedną decyzją, po
 // której kliknięciu dalej trzeba coś decydować"): an option of kind
 // "choice" tells what happened and offers new options, and only the last
-// one ends the event. The three drafts that use it: the lost girl, the
-// wedding in the forest and the treasure hunter.
+// one ends the event. The three events that use it, approved by the author
+// (282-284): the lost girl, the wedding in the forest and the treasure
+// hunter.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -84,7 +85,7 @@ describe('events with a further choice', () => {
 
   test('each event: two steps in every case, and each path of two choices ends in every case', () => {
     for (const event of [child, wedding, hunter]) {
-      assert.equal(event.draft, true);
+      assert.equal(event.draft, undefined);
       for (const one of event.cases) {
         for (const first of event.options) {
           const walk = eventChoices(event, [first.id], { seed, caseId: one.id });

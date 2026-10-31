@@ -84,10 +84,14 @@ export function mountStats(container) {
   }
 
   // Before the first evolution, the class waiting at it for its skills or
-  // the choice (evolutionBlock in the engine), or the evolution taken.
+  // the choice (evolutionBlock in the engine), or the evolution taken. The
+  // engine names what the skills will still need at the evolution's level,
+  // counting the points of the levels to come, so the class waits only once
+  // it stands at that level (as on the Umiejętności screen); before, the
+  // hint shows where the evolution is.
   function evolutionHint(character, evolution) {
-    const need = character.skills?.evolution?.need;
-    if (need === 'skill_points') return 'KLASA CZEKA: ROZDAJ PUNKTY UMIEJĘTNOŚCI';
+    const { need, level = evolution } = character.skills?.evolution ?? {};
+    if (need === 'skill_points' && character.classLevel >= level) return 'KLASA CZEKA: ROZDAJ PUNKTY UMIEJĘTNOŚCI';
     if (character.evolution?.current) return `EWOLUCJA: ${character.className.toUpperCase()}`;
     if (character.classLevel < evolution) return `PIERWSZA EWOLUCJA: POZ. KLASY ${evolution}`;
     if (need === 'second_path') return 'KLASA CZEKA: WYBIERZ ŚCIEŻKĘ POBOCZNĄ';

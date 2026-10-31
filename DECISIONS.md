@@ -2996,7 +2996,24 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
-## Zdarzenia z dalszym wyborem (31.10.2026, szkice na wersji testowej)
+## Uwagi autora z 31.10, po odpowiedziach 278–284 (na wersji testowej)
+
+1. **„Klasa czeka” bez punktów.** Autor: „Skąd ten tekst że klasa czeka na rozdanie punktów skoro nie mam punktów?” (Łucznik, 34. poziom klasy).
+    - **Przyczyna:** silnik sprawdza, czy przy pierwszej ewolucji (50. poziom klasy) zostaną nierozdane Punkty Umiejętności. Liczy przy tym też punkty z poziomów, których klasa jeszcze nie ma. Ekran Umiejętności pokazywał „klasa czeka” dopiero na poziomie ewolucji, a karta Statystyki od razu.
+    - **Poprawka:** Statystyki mówią „Klasa czeka: rozdaj Punkty Umiejętności” dopiero wtedy, gdy klasa stoi na poziomie ewolucji. Wcześniej pokazują „Pierwsza ewolucja: poz. klasy 50”. Ten błąd jest też w grze.
+2. **Tekst o towarzyszach w Karczmie**, w brzmieniu autora: „Towarzysze idą z tobą na każdą wyprawę poza Szybkim i Błyskawicznym Polowaniem. Rosną w siłę razem z tobą. Opłata za werbunek jest jednorazowa, a im lepiej zna cię Zbylut, tym jest tańsza. Towarzysz potrzebuje posłania: zbuduj Kwatery w obozie”. Słowa „zbuduj Kwatery w obozie” są wytłuszczone i podkreślone (autor: „to w <> jakos ladnie wytluszczyc, podkreślić”). Liczba zajętych posłań („Miejsca: 1 z 2”) jest w osobnym zdaniu pod spodem, gdy Kwatery już stoją.
+3. **Podgląd towaru u kupca.** Autor: „zrob tez tak bym mogl kliknac przedmiot i go sprawdzić u kupca na targowisku”. Stuknięcie zioła, mikstury, materiału albo części na Targowisku (u kupca i w ofertach graczy) otwiera kartę towaru. Karta ma obrazek, opis, cenę u złomiarza, poziom Zielarstwa, od którego zbiera się to zioło, i liczbę sztuk, które postać już ma. U kupca karta pokazuje też jego cenę i przycisk „Kup”.
+
+## Odpowiedzi 278–284 (31.10.2026)
+
+Autor: „278 A / 279 B / 280 D / 281 B / 282 tak / 283 tak / 284 tak”.
+
+1. **Zdarzenia zatwierdzone (282–284).** Zagubiona dziewczynka, Wesele w borze i Poszukiwacz skarbów nie są już szkicami. Na wersji testowej przychodzą jak każde inne zdarzenie, a w grze pojawią się po najbliższym wdrożeniu.
+2. **Postacie zdarzeń (279–281).** Dziewczynka jest w wersji B, poszukiwacz w D, a starosta weselny w B.
+3. **Kupiec Targowiska (278 A).** Na Targowisku mieszka Gościwit, kupiec. Ma historię i powitania na każdy stopień relacji (do akceptacji autora, pytanie 286), a popiersie czeka na wybór (285).
+    - **Brakujący szczegół: relacja.** Zakupy na jego straganie dają relację z nim, tyle samo punktów, co reputacji Kompanii Kupców (najwyżej 10 dziennie). Na razie relacja zmienia tylko powitanie, a czy ma też obniżać ceny, rozstrzyga pytanie 287.
+
+## Zdarzenia z dalszym wyborem (31.10.2026, na wersji testowej)
 
 Autor: „Niedługo będę nieobecny kilka godzin przygotuj kolejne 3 zdarzenia w tym czasie, bardziej rozbudowane (z więcej niż jedną decyzją, po której kliknięciu dalej trzeba coś decydować = 2 wybory)”.
 

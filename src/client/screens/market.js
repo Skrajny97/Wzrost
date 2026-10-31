@@ -9,7 +9,7 @@
 import { herbSprite, potionSprite } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { h, icon } from '../dom.js';
-import { countOf, formatNumber } from '../format.js';
+import { countOf, formatDecimal, formatNumber } from '../format.js';
 import { call, serverNow, state } from '../state.js';
 import { closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { itemSummary } from './character.js';
@@ -58,6 +58,55 @@ function stackLine(goods, { count = true } = {}) {
     ),
   );
 }
+
+// How many of a stack's goods the character already has.
+function owned(goods) {
+  const character = state.character;
+  if (goods.kind === 'herb') return character.herbs?.find((one) => one.id === goods.key)?.count ?? 0;
+  if (goods.kind === 'potion') return character.potions?.find((one) => one.id === goods.key)?.count ?? 0;
+  if (goods.kind === 'material') return character.crafting?.materials.find((one) => one.key === goods.key)?.count ?? 0;
+  if (goods.kind === 'part') return character.crafting?.parts.find((one) => one.id === goods.key)?.count ?? 0;
+  return 0;
+}
+
+// A stack's card (the author: "bym mogl kliknac przedmiot i go sprawdzić u
+// kupca"): its picture, what it is, what the scrapper pays for a piece, the
+// Zielarstwo level that gathers a herb, and how many the character has;
+// `actions` below, as the merchant's "Kup".
+function goodsSheet(goods, actions = null) {
+  const rarity = rarityOf(goods.rarity);
+  const colour = rarity ? { '--rarity': rarity.color } : {};
+  openSheet(
+    h(
+      'div',
+      { class: 'item-details' },
+      h(
+        'div',
+        { class: 'item-head' },
+        h('span', { class: 'item-art', vars: colour }, stackArt(goods, 32)),
+        h(
+          'div',
+          {},
+          h('h2', { class: 'item-title', vars: colour, text: goods.name }),
+          h('p', { class: 'item-meta', text: [KIND_NAMES[goods.kind], rarity?.name].filter(Boolean).join(' · ') }),
+        ),
+      ),
+      goods.description && h('p', { class: 'sheet-text', text: goods.description }),
+      h(
+        'ul',
+        { class: 'item-properties' },
+        goods.scrap !== undefined && goods.scrap !== null && h('li', { class: 'item-price', text: `U złomiarza: ${formatDecimal(goods.scrap)} złota za sztukę` }),
+        goods.gatherLevel && h('li', { text: `Do zebrania w Zielarstwie od poziomu ${goods.gatherLevel}.` }),
+        h('li', { text: `Masz: ${formatNumber(owned(goods))} szt.` }),
+      ),
+    ),
+    actions,
+  );
+}
+
+// A stack in one line that opens its card under a tap.
+const stackButton = (goods, options, actions) =>
+  h('button', { type: 'button', class: 'market-goods-button', 'aria-label': `${goods.name}: szczegóły`, onClick: () => goodsSheet(goods, actions?.()) }, stackLine(goods, options));
 
 // An item to buy, its properties under a tap, and when the character can
 // wear it: an item from the Targowisko is worn from its own level on, as
@@ -123,7 +172,7 @@ export function mountMarket(holder) {
     clocks.push({ element, at });
     return element;
   };
-  const goodsEntry = (goods, key) => (goods.kind === 'item' ? itemEntry(goods.item, key, opened) : stackLine(goods));
+  const goodsEntry = (goods, key) => (goods.kind === 'item' ? itemEntry(goods.item, key, opened) : stackButton(goods));
 
   async function load() {
     try {
@@ -363,7 +412,16 @@ export function mountMarket(holder) {
             h(
               'li',
               { class: 'card market-offer' },
-              stackLine(good, { count: false }),
+              stackButton(good, { count: false }, () => [
+                h('p', { class: 'market-price', text: `Kupiec: ${formatNumber(good.price)} zł za sztukę, dziś jeszcze ${formatNumber(good.left)} szt.` }),
+                h('button', {
+                  type: 'button',
+                  class: 'button button--world',
+                  text: 'Kup',
+                  disabled: good.left < 1 || state.character.gold < good.price,
+                  onClick: () => merchantSheet(good),
+                }),
+              ]),
               h('p', { class: 'market-price', text: `${formatNumber(good.price)} zł za sztukę` }),
               h('p', { class: 'muted', text: good.left > 0 ? `Dziś jeszcze ${formatNumber(good.left)} szt.` : 'Na dziś wykupione.' }),
               h(

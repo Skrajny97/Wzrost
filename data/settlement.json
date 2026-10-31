@@ -7,7 +7,7 @@
     { "id": "enchanter", "name": "Pracownia Zaklinaczki", "x": 21, "y": 23, "resident": "enchantress" },
     { "id": "hermitage", "name": "Chata Pustelnika", "x": 78, "y": 81, "resident": "hermit" },
     { "id": "tavern", "name": "Karczma", "x": 84, "y": 43, "resident": "innkeeper" },
-    { "id": "market", "name": "Targowisko", "x": 45.5, "y": 46 },
+    { "id": "market", "name": "Targowisko", "x": 45.5, "y": 46, "resident": "merchant" },
     { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist" }
   ],
   "torches": [
@@ -60,7 +60,8 @@
       ]
     },
     { "id": "innkeeper", "name": "Zbylut", "title": "karczmarz", "story": "Zna wszystkie plotki z traktu i każdego, kto szuka pracy. U niego znajdziesz przyszłych towarzyszy.", "greetings": ["Siadaj, gdzie wolne. Kufel piwa, a do niego plotka z traktu, jeśli kogoś to ciekawi.", "O, znowu ty. Ludzie z traktu zostawili tu dziś kilka ciekawych informacji.", "Twoje miejsce przy ladzie czeka. I kufel, i świeże plotki.", "Tobie mówię to, czego nie mówię innym. Nachyl się bliżej.", "Dla przyjaciół Rozstajów kufel zawsze pełny, a drzwi na zaplecze otwarte."] },
-    { "id": "herbalist", "name": "Jagna", "title": "zielarka", "story": "Zbiera zioła od świtu i suszy je pod strzechą. Za dobre zioła potrafi solidnie zapłacić, a zaufanym zdradza rzadkie receptury.", "greetings": ["Zioła przynosisz? Pokaż, co masz w koszyku. Za dobre płacę więcej niż złomiarz.", "O, znowu ty. Rumianek mi się kończy, a mikstur nigdy dość.", "Siadaj przy piecu. Najpierw zioła, potem herbata.", "Tobie płacę jak swoim. Kiedyś pokażę ci, co warzę w tym kotle.", "Dla przyjaciół drzwi mojej chaty zawsze otwarte, a kocioł zawsze ciepły."] }
+    { "id": "herbalist", "name": "Jagna", "title": "zielarka", "story": "Zbiera zioła od świtu i suszy je pod strzechą. Za dobre zioła potrafi solidnie zapłacić, a zaufanym zdradza rzadkie receptury.", "greetings": ["Zioła przynosisz? Pokaż, co masz w koszyku. Za dobre płacę więcej niż złomiarz.", "O, znowu ty. Rumianek mi się kończy, a mikstur nigdy dość.", "Siadaj przy piecu. Najpierw zioła, potem herbata.", "Tobie płacę jak swoim. Kiedyś pokażę ci, co warzę w tym kotle.", "Dla przyjaciół drzwi mojej chaty zawsze otwarte, a kocioł zawsze ciepły."] },
+    { "id": "merchant", "name": "Gościwit", "title": "kupiec", "story": "Przyjechał z karawaną zza wielkiej rzeki i został, bo na Rozstajach spotykają się wszystkie drogi. Na jego straganie jest trochę wszystkiego, a o każdej rzeczy opowiada tak, jakby była skarbem.", "greetings": ["Patrz, wybieraj, tylko nie macaj bez potrzeby. Dziś mam towar, jakiego jutro już nie będzie.", "A, znajoma twarz! Mam coś, co ci się spodoba. Albo i nie, ale zobaczyć warto.", "Stały klient to skarb. Kto u mnie kupuje, ten wie, że nie oszukuję. Za bardzo.", "Tobie powiem, skąd mam towar. Innym nie mówię, bo zaraz pojechaliby tam beze mnie.", "Przyjacielu! Siadaj, napijemy się kwasu. O interesach pogadamy potem."] }
   ],
   "brotherhoods": [
     { "id": "herbalists", "name": "Bractwo Zielarzy", "goods": ["herb", "potion"] },
@@ -207,7 +208,8 @@
     },
     "wanderer": { "items": 3, "rarities": { "rare": 3, "epic": 1 }, "priceFactor": 6 },
     "testSeller": "Handlarz próbny",
-    "testMinutes": 15
+    "testMinutes": 15,
+    "resident": "merchant"
   },
   "companions": {
     "priceByStanding": { "stranger": 2, "acquaintance": 1.6, "regular": 1.3, "trusted": 1.1, "friend": 1 },

@@ -249,7 +249,7 @@
     "market": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["hours", "fee", "offers", "brotherhood", "minRaise", "maxPrice", "kinds", "reputation", "merchant", "wanderer", "testSeller", "testMinutes"],
+      "required": ["hours", "fee", "offers", "brotherhood", "minRaise", "maxPrice", "kinds", "reputation", "merchant", "wanderer", "testSeller", "testMinutes", "resident"],
       "description": "Targowisko (część III, pytania 237–242): oferty graczy jak aukcje i oferty mieszkańców (src/engine/market.js). Oferta trwa hours godzin, z ceną wywoławczą i opcjonalną ceną „Kup teraz”. Targowisko bierze fee ceny sprzedaży. Postać ma naraz offers ofert i jedną więcej na każdy stopień reputacji bractwa brotherhood ponad pierwszy. Kolejna oferta w licytacji to co najmniej minRaise więcej, nie mniej niż złoto więcej. Ceny do maxPrice. kinds: co da się wystawić. reputation: punkt reputacji bractwa za każde goldPerPointPerLevel złota razy poziom postaci z handlu, najwyżej daily dziennie. merchant: kupiec codziennie sprzedaje goods sztuk rodzajów (zioła, materiały rzadkości materialRarities, części rzadkości partRarities) po cenie margin razy więcej niż najwyższa cena skupu u NPC, razy wahanie dnia z zakresu swing; postać kupi dziennie do stock sztuk każdego. wanderer: raz w tygodniu, na dobę, wędrowny handlarz ma items przedmiotów na poziom postaci, rzadkości losowanych z wagami rarities, po cenie priceFactor razy tyle, ile płaci złomiarz. testSeller i testMinutes: na wersji testowej „Testuj Osadę” wystawia próbne oferty od tego handlarza, na tyle minut.",
       "properties": {
         "hours": { "type": "number", "exclusiveMinimum": 0 },
@@ -259,6 +259,7 @@
         "minRaise": { "type": "number", "minimum": 0 },
         "maxPrice": { "type": "integer", "minimum": 1 },
         "testSeller": { "type": "string", "minLength": 1 },
+        "resident": { "type": "string", "minLength": 1, "description": "Kupiec Targowiska: id mieszkańca. Zakupy u kupca dają relację z nim, tyle samo punktów co reputacji." },
         "testMinutes": { "type": "integer", "minimum": 1 },
         "kinds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["item", "herb", "potion", "material", "part"] } },
         "reputation": { "type": "object", "additionalProperties": false, "required": ["goldPerPointPerLevel", "daily"], "properties": { "goldPerPointPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "daily": { "type": "integer", "minimum": 0 } } },

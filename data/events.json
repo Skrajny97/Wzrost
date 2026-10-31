@@ -607,7 +607,6 @@
     },
     {
       "id": "lost-child",
-      "draft": true,
       "minLevel": 6,
       "title": "Zagubiona dziewczynka",
       "art": "lost-child",
@@ -774,7 +773,6 @@
     },
     {
       "id": "forest-wedding",
-      "draft": true,
       "title": "Wesele w borze",
       "art": "forest-wedding",
       "scene": "land",
@@ -933,7 +931,6 @@
     },
     {
       "id": "treasure-hunter",
-      "draft": true,
       "minLevel": 6,
       "title": "Poszukiwacz skarbów",
       "art": "treasure-hunter",

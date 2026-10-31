@@ -626,15 +626,19 @@ export function mountSettlement(container, { params = {} } = {}) {
   // Szybkie Polowanie) and this week's candidates, from the standing with
   // the innkeeper that gives a place and a bed in the camp's Kwatery.
   function companionsCard() {
-    const { places, moreBeds, cheaper, hired, candidates } = data.companions;
+    const { places, moreBeds, hired, candidates } = data.companions;
     const full = hired.length >= places;
-    // Every standing with Zbylut may hire, a lower one for more gold; each
-    // companion needs a bed in the camp's Kwatery.
-    const beds =
-      places === 0
-        ? ' Towarzysz potrzebuje posłania: zbuduj Kwatery w obozie.'
-        : ` Miejsca: ${hired.length} z ${places}.${full && moreBeds ? ' Kolejne posłanie da rozbudowa Kwater w obozie.' : ''}`;
-    const intro = `Towarzysze idą z tobą na każdą wyprawę poza Szybkim Polowaniem i rosną razem z tobą. Werbunek to jednorazowa opłata, bez żołdu${cheaper ? ', a im lepiej zna cię Zbylut, tym jest tańszy' : ''}.${beds}`;
+    // The author's words, the camp's Kwatery stressed in them; every
+    // standing with Zbylut may hire, a lower one for more gold, and each
+    // companion needs a bed there.
+    const intro = h(
+      'p',
+      { class: 'muted' },
+      'Towarzysze idą z tobą na każdą wyprawę poza Szybkim i Błyskawicznym Polowaniem. Rosną w siłę razem z tobą. Opłata za werbunek jest jednorazowa, a im lepiej zna cię Zbylut, tym jest tańsza. Towarzysz potrzebuje posłania: ',
+      h('strong', { class: 'text-stress', text: 'zbuduj Kwatery w obozie' }),
+      '.',
+    );
+    const beds = places > 0 && h('p', { class: 'muted', text: `Miejsca: ${hired.length} z ${places}.${full && moreBeds ? ' Kolejne posłanie da rozbudowa Kwater w obozie.' : ''}` });
     const dismiss = (companion) =>
       h('button', {
         type: 'button',
@@ -661,7 +665,8 @@ export function mountSettlement(container, { params = {} } = {}) {
       'section',
       { class: 'stack' },
       h('h2', { class: 'section-title', text: 'Towarzysze' }),
-      h('p', { class: 'muted', text: intro }),
+      intro,
+      beds,
       hired.map((companion) => companionCard(companion, dismiss(companion))),
       h('h2', { class: 'section-title', text: 'Szukają pracy w tym tygodniu' }),
       candidates.length === 0

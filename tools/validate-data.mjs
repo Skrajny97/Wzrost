@@ -1071,7 +1071,7 @@ function checkSettlement(data, { rarities }) {
   for (const place of places) {
     if (place.resident && !residentIds.has(place.resident)) errors.push(`settlement.json: miejsce ${place.id} ma nieznanego mieszkańca ${place.resident}`);
   }
-  for (const service of ['orders', 'reforge', 'hermit']) {
+  for (const service of ['orders', 'reforge', 'hermit', 'market']) {
     const { resident } = data.settlement[service];
     if (!residentIds.has(resident)) errors.push(`settlement.json: ${service}.resident to nieznany mieszkaniec ${resident}`);
   }

@@ -343,6 +343,23 @@ describe('the Targowisko through the API', () => {
     const part = view.merchant.goods.find((one) => one.kind === 'part');
     await act('Kupiec', 'resident', { from: 'merchant', id: part.id, count: 1 });
     assert.equal(JSON.parse((await row('Kupiec')).parts)[part.key], 1);
+    // Buying at his stall brings the relation with Gościwit, as many points
+    // as the Kompania Kupców' reputation: a point for each 5 gold times the
+    // character's level in a purchase (278 A).
+    await act('Kupiec', 'resident', { from: 'merchant', id: good.id, count: tuning.merchant.stock - 3 });
+    const perPoint = tuning.reputation.goldPerPointPerLevel * 25;
+    const expected = Math.min(
+      tuning.reputation.daily,
+      [good.price * 3, part.price, good.price * (tuning.merchant.stock - 3)].reduce((sum, value) => sum + Math.floor(value / perPoint), 0),
+    );
+    const stored = JSON.parse((await row('Kupiec')).settlement);
+    assert.equal(stored.reputation.merchants, expected);
+    assert.equal(stored.relations.merchant, expected);
+    // He stands at the Targowisko as its resident, at his standing.
+    const { settlement } = (await call('GET', '/api/settlement', { cookie: cookies.Kupiec })).data;
+    assert.equal(settlement.places.find((place) => place.id === 'market').resident, 'merchant');
+    const merchant = settlement.residents.find((resident) => resident.id === 'merchant');
+    assert.deepEqual([merchant.name, merchant.title, merchant.greeting], ['Gościwit', 'kupiec', content.settlement.residents.find((one) => one.id === 'merchant').greetings[0]]);
   });
 
   test('on the test version the wandering trader comes today and a trial trader puts up offers that pay no one', async () => {

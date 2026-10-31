@@ -23,11 +23,13 @@ import {
   itemName,
   itemView,
   listBlock,
+  materialPrice,
   materialView,
   merchantStock,
   minimumBid,
   offerLimit,
   parseStack,
+  potionPrice,
   questPeriod,
   randomItem,
   sellerShare,
@@ -62,7 +64,10 @@ async function atomically(db, statements) {
   }
 }
 
-// A stack's goods by kind and key, as a parcel or an offer shows them.
+// A stack's goods by kind and key, as a parcel or an offer shows them, with
+// what its card tells (the author: "bym mogl kliknac przedmiot i go
+// sprawdzić u kupca"): its description, what the scrapper pays for a piece
+// (`scrap`) and, for a herb, the Zielarstwo level that gathers it.
 function goodsView(kind, key, count, item) {
   if (kind === 'item') {
     const data = JSON.parse(item);
@@ -70,11 +75,21 @@ function goodsView(kind, key, count, item) {
   }
   if (kind === 'material') {
     const material = materialView(key, count, content);
-    return { kind, key, count, name: material.label.charAt(0).toUpperCase() + material.label.slice(1), rarity: material.rarity, material };
+    const { description } = content.materialsById[material.materialId];
+    return { kind, key, count, name: material.label.charAt(0).toUpperCase() + material.label.slice(1), rarity: material.rarity, material, description, scrap: materialPrice(material.rarity, content) };
   }
-  if (kind === 'part') return { kind, key, count, name: content.partsById[key]?.name ?? key, rarity: content.partsById[key]?.rarity };
-  if (kind === 'herb') return { kind, key, count, name: content.herbsById[key]?.name ?? key };
-  if (kind === 'potion') return { kind, key, count, name: content.potionsById[key]?.name ?? key };
+  if (kind === 'part') {
+    const part = content.partsById[key];
+    return { kind, key, count, name: part?.name ?? key, rarity: part?.rarity, description: part?.description };
+  }
+  if (kind === 'herb') {
+    const herb = content.herbsById[key];
+    return { kind, key, count, name: herb?.name ?? key, description: herb?.description, scrap: herb?.price, gatherLevel: herb?.level };
+  }
+  if (kind === 'potion') {
+    const potion = content.potionsById[key];
+    return { kind, key, count, name: potion?.name ?? key, description: potion?.description, scrap: potion && potionPrice(potion, content) };
+  }
   return { kind: 'gold', count };
 }
 
@@ -398,11 +413,18 @@ function foreign(adds) {
   return counted('foreign_stacks', keyed);
 }
 
-// The day's reputation with the Kompania Kupców for trade worth `value`.
-function marketReputation(row, stored, value, now) {
+// The day's reputation with the Kompania Kupców for trade worth `value`;
+// buying at the merchant's stall (`relation`) brings as many points of the
+// relation with him (question 278 A).
+function marketReputation(row, stored, value, now, { relation = false } = {}) {
   const { points, trade } = tradePoints(value, row.level, stored.marketTrade, now, content, tuning().reputation);
-  const { brotherhood } = tuning();
-  return { ...stored, reputation: { ...stored.reputation, [brotherhood]: (stored.reputation[brotherhood] ?? 0) + points }, marketTrade: trade };
+  const { brotherhood, resident } = tuning();
+  return {
+    ...stored,
+    reputation: { ...stored.reputation, [brotherhood]: (stored.reputation[brotherhood] ?? 0) + points },
+    ...(relation && { relations: { ...stored.relations, [resident]: (stored.relations[resident] ?? 0) + points } }),
+    marketTrade: trade,
+  };
 }
 
 // The bag's free places, and the places stacks of herbs or potions take
@@ -514,7 +536,7 @@ export async function buyFromResident(context) {
     throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
   }
   const market = { ...stored.market, day: stock.day, bought: { ...bought, [good.id]: (bought[good.id] ?? 0) + count } };
-  const next = marketReputation(row, { ...stored, market }, price, now);
+  const next = marketReputation(row, { ...stored, market }, price, now, { relation: true });
   const column = COLUMNS[good.kind];
   const change = counted(column, { [good.key]: count });
   // Bought, not found: the Encyklopedia leaves it out, as a trade's.

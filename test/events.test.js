@@ -15,7 +15,7 @@ const bandits = ['bandit-thug', 'bandit-knifer', 'bandit-crossbow'];
 const woman = content.eventsById['wounded-woman'];
 // The events with tests of their own that come anywhere, or in the whole
 // forest (the leshy), left out where another event's places are checked.
-const elsewhere = new Set(['blue-mushroom', 'wandering-beggar', 'haunted-shrine', 'stuck-merchant', 'leshy']);
+const elsewhere = new Set(['blue-mushroom', 'wandering-beggar', 'haunted-shrine', 'stuck-merchant', 'leshy', 'lost-child', 'forest-wedding', 'treasure-hunter']);
 const placed = (list) => list.filter((event) => !elsewhere.has(event.id));
 
 // Whether every enemy moved before the first move of `allyId`.
@@ -262,7 +262,8 @@ describe('events', () => {
     const mushroom = content.eventsById['blue-mushroom'];
     const always = { ...content, events: { ...content.events, chance: 1 } };
     const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
-    const seeds = Array.from({ length: 30 }, (_, index) => `grzyb-${index}`);
+    // More events, so more explorations until the mushroom comes in each land.
+    const seeds = Array.from({ length: 80 }, (_, index) => `grzyb-${index}`);
     for (const areaId of ['windfalls-edge', 'viper-heaps', 'spider-gully', 'old-diggings']) {
       assert.ok(seeds.some((one) => eventFor({ hunt: hunt(areaId), seed: one }, always)?.id === mushroom.id), areaId);
     }
@@ -384,11 +385,11 @@ describe('events (API)', () => {
             endings: event.options.flatMap((option) => (Array.isArray(option.outcome) ? option.outcome.map(({ id: endingId, name }) => ({ id: endingId, name })) : [])),
           };
         }),
-        // The drafts with a further choice, on the test version only.
+        // The events with a further choice.
         ...['lost-child', 'forest-wedding', 'treasure-hunter'].map((id) => ({
           id,
           title: content.eventsById[id].title,
-          draft: true,
+          draft: false,
           cases: content.eventsById[id].cases.map(({ id: caseId, name }) => ({ id: caseId, name })),
           endings: [],
         })),
