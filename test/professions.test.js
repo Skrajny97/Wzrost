@@ -185,8 +185,8 @@ describe('herbalism in the engine', () => {
     assert.ok(daily.every((quest) => quest.target === 'comfrey' && quest.count === 12));
     assert.equal(questText(daily[0], content), 'Zbierz 12 sztuk Żywokostu.');
     const weekly = drawn(true, 'weekly').filter((quest) => quest.kind.startsWith('gather'));
-    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'gatherAny' && quest.count === 60));
-    assert.equal(questText(weekly[0], content), 'Zbierz łącznie 60 ziół.');
+    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'gatherAny' && quest.count === 150));
+    assert.equal(questText(weekly[0], content), 'Zbierz łącznie 150 ziół.');
     const quests = {
       daily: { period: 'd', chest: false, quests: [{ kind: 'gather', target: 'comfrey', count: 12, progress: 5, claimed: false }] },
       weekly: { period: 'w', chest: false, quests: [{ kind: 'gatherAny', count: 60, progress: 0, claimed: false }] },

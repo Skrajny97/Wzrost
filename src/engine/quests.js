@@ -284,15 +284,17 @@ export function huntKills(hunt, content) {
 // explored, materials `processed`, items `salvaged`, herbs gathered (`herbs`
 // by id, all of those found, also those the bag lost), potions brewed
 // (`potions` by id, the same way), items `made` in the Warsztat (only
-// those that came out), inner regions `opened` by new class levels and
-// `orders` delivered in the Osada. A quest stops at its count.
-export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, opened = 0, orders = 0 }) {
+// those that came out), inner regions `opened` by new class levels,
+// `orders` delivered in the Osada and the daily quests' `chests` opened
+// (one a day at most). A quest stops at its count.
+export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, opened = 0, orders = 0, chests = 0 }) {
   const total = (counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
   const gathered = total(herbs);
   const gain = {
     kill: (quest) => kills[quest.target] ?? 0,
     killAny: () => total(kills),
     explore: () => minutes,
+    dailies: () => chests,
     unlock: () => opened,
     process: () => processed,
     salvage: () => salvaged,

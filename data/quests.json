@@ -1,5 +1,5 @@
 {
-  "$comment": "Zadania dzienne i tygodniowe od narratora (src/engine/quests.js). Dzienne odnawiają się o północy, tygodniowe w nocy z niedzieli na poniedziałek, według zegara strefy timeZone. Każdy okres ma swoją liczbę zadań (count) i skrzynię za wykonanie wszystkich, z napisem pod zadaniami (chest.text), który podaje te same liczby co skrzynia. Rodzaje zadań (kinds) losują się bez powtórzeń: waga rodzaju (weight) dzieli się między jego warianty, np. różne stwory. Postęp liczy kod według id rodzaju: kill – stwory pokonane na wyprawach, killAny – wszystkie stwory pokonane na wyprawach, explore – minuty wypraw, unlock – regiony wewnętrzne, do których klasa otwiera dostęp nowymi poziomami (tylko dla nowych postaci: póki poziom klasy jest niższy niż untilClassLevel, najwyżej tyle, ile zamkniętych regionów otwiera się w zasięgu reach poziomów klasy, a od poziomu klasy fromClassLevel z listy most najwyżej count), process – materiały oddane do przeróbki na Stole rozbiórki, salvage – przedmioty oddane tam do rozebrania, gather – sztuki danego zioła zebrane w Zielarstwie (jedno ze znanych ziół, {herb} w dopełniaczu), gatherAny – wszystkie zebrane zioła, brew – mikstury danego przepisu uwarzone w Alchemii (jeden ze znanych przepisów; {noun} to nazwa mikstury po liczbie, counted z professions.json), brewAny – wszystkie uwarzone mikstury, make i makeAny – przedmioty wykonane w Rzemieślnictwie (liczą się tylko udane). table: rodzaj tylko z postawionym Stołem rozbiórki. professions: rodzaj tylko z dostępnymi profesjami. crafting: rodzaj tylko tam, gdzie działa Rzemieślnictwo. Rodzaj bez daily albo weekly nie trafia do tego okresu. rewardFactor: tyle razy większa nagroda za rzadszy rodzaj. Ile trzeba zrobić, losuje się z zakresu okresu (count, co step), a w kill i killAny z liczby walk (fights): tyle danych stworów (w killAny wszystkich), ile średnio przynosi tyle walk w najnowszym miejscu wypraw otwartym dla postaci. W tekście {count} to ta liczba, a {noun} rzeczownik w formie do niej (counted: 1, 2–4, 5 i więcej; w kill z monsters.json). Nagroda za zadanie losuje się z rewards.weights: złoto, zasób albo części, w ilości base + perLevel × poziom postaci, ± spread; zasób razy swój udział (resources), części według levels. levels: od którego poziomu postaci jaka część jest nagrodą i z jakimi wagami losuje się rzadkość przedmiotu ze skrzyni tygodniowej.",
+  "$comment": "Zadania dzienne i tygodniowe od narratora (src/engine/quests.js). Dzienne odnawiają się o północy, tygodniowe w nocy z niedzieli na poniedziałek, według zegara strefy timeZone. Każdy okres ma swoją liczbę zadań (count) i skrzynię za wykonanie wszystkich, z napisem pod zadaniami (chest.text), który podaje te same liczby co skrzynia. Rodzaje zadań (kinds) losują się bez powtórzeń: waga rodzaju (weight) dzieli się między jego warianty, np. różne stwory. Postęp liczy kod według id rodzaju: kill – stwory pokonane na wyprawach, killAny – wszystkie stwory pokonane na wyprawach, explore – minuty wypraw, dailies – skrzynie dziennych zadań otwarte w danym tygodniu (najwyżej jedna na dzień), unlock – regiony wewnętrzne, do których klasa otwiera dostęp nowymi poziomami (tylko dla nowych postaci: póki poziom klasy jest niższy niż untilClassLevel, najwyżej tyle, ile zamkniętych regionów otwiera się w zasięgu reach poziomów klasy, a od poziomu klasy fromClassLevel z listy most najwyżej count), process – materiały oddane do przeróbki na Stole rozbiórki, salvage – przedmioty oddane tam do rozebrania, gather – sztuki danego zioła zebrane w Zielarstwie (jedno ze znanych ziół, {herb} w dopełniaczu), gatherAny – wszystkie zebrane zioła, brew – mikstury danego przepisu uwarzone w Alchemii (jeden ze znanych przepisów; {noun} to nazwa mikstury po liczbie, counted z professions.json), brewAny – wszystkie uwarzone mikstury, make i makeAny – przedmioty wykonane w Rzemieślnictwie (liczą się tylko udane). table: rodzaj tylko z postawionym Stołem rozbiórki. professions: rodzaj tylko z dostępnymi profesjami. crafting: rodzaj tylko tam, gdzie działa Rzemieślnictwo. Rodzaj bez daily albo weekly nie trafia do tego okresu. rewardFactor: tyle razy większa nagroda za rzadszy rodzaj. Ile trzeba zrobić, losuje się z zakresu okresu (count, co step), a w kill i killAny z liczby walk (fights): tyle danych stworów (w killAny wszystkich), ile średnio przynosi tyle walk w najnowszym miejscu wypraw otwartym dla postaci. W tekście {count} to ta liczba, a {noun} rzeczownik w formie do niej (counted: 1, 2–4, 5 i więcej; w kill z monsters.json). Nagroda za zadanie losuje się z rewards.weights: złoto, zasób albo części, w ilości base + perLevel × poziom postaci, ± spread; zasób razy swój udział (resources), części według levels. levels: od którego poziomu postaci jaka część jest nagrodą i z jakimi wagami losuje się rzadkość przedmiotu ze skrzyni tygodniowej.",
   "timeZone": "Europe/Warsaw",
   "periods": {
     "daily": {
@@ -28,8 +28,7 @@
       "id": "kill",
       "text": "Pokonaj {count} {noun}.",
       "weight": 3,
-      "daily": { "fights": [5, 8] },
-      "weekly": { "fights": [25, 40] }
+      "daily": { "fights": [5, 8] }
     },
     {
       "id": "killAny",
@@ -37,7 +36,7 @@
       "counted": ["stwora", "stwory", "stworów"],
       "weight": 1,
       "daily": { "fights": [5, 8] },
-      "weekly": { "fights": [25, 40] }
+      "weekly": { "fights": [120, 200] }
     },
     {
       "id": "explore",
@@ -45,7 +44,14 @@
       "counted": ["minutę", "minuty", "minut"],
       "weight": 1,
       "daily": { "count": [30, 90], "step": 15 },
-      "weekly": { "count": [300, 600], "step": 60 }
+      "weekly": { "count": [900, 1800], "step": 60 }
+    },
+    {
+      "id": "dailies",
+      "text": "Otwórz skrzynię dziennych zadań {count} {noun}.",
+      "counted": ["raz", "razy", "razy"],
+      "weight": 2,
+      "weekly": { "count": [3, 4] }
     },
     {
       "id": "unlock",
@@ -62,7 +68,7 @@
       "table": true,
       "weight": 1,
       "daily": { "count": [2, 4] },
-      "weekly": { "count": [10, 20] }
+      "weekly": { "count": [30, 60], "step": 5 }
     },
     {
       "id": "salvage",
@@ -71,7 +77,7 @@
       "table": true,
       "weight": 1,
       "daily": { "count": [1, 2] },
-      "weekly": { "count": [5, 10] }
+      "weekly": { "count": [15, 30], "step": 5 }
     },
     {
       "id": "gather",
@@ -87,7 +93,7 @@
       "counted": ["zioło", "zioła", "ziół"],
       "professions": true,
       "weight": 1,
-      "weekly": { "count": [60, 60] }
+      "weekly": { "count": [150, 150] }
     },
     {
       "id": "brew",
@@ -102,7 +108,7 @@
       "counted": ["miksturę", "mikstury", "mikstur"],
       "professions": true,
       "weight": 1,
-      "weekly": { "count": [15, 15] }
+      "weekly": { "count": [40, 40] }
     },
     {
       "id": "make",
@@ -122,7 +128,7 @@
       "crafting": true,
       "weight": 0.5,
       "rewardFactor": 2,
-      "weekly": { "count": [5, 5] }
+      "weekly": { "count": [10, 10] }
     },
     {
       "id": "orders",
@@ -131,7 +137,7 @@
       "settlement": true,
       "weight": 1,
       "daily": { "count": [2, 2] },
-      "weekly": { "count": [8, 8] }
+      "weekly": { "count": [12, 12] }
     }
   ],
   "rewards": {

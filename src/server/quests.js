@@ -4,7 +4,7 @@
 // its quests are. Each saves only if the character is as read (its version),
 // so two taps give one reward.
 
-import { QUEST_PERIODS, bagCapacity, campLevels, chestItem, chestReady, createRng, itemName, questDone, withChest, withClaimed } from '../engine/index.js';
+import { QUEST_PERIODS, addQuestProgress, bagCapacity, campLevels, chestItem, chestReady, createRng, itemName, questDone, withChest, withClaimed } from '../engine/index.js';
 import { content } from './content.js';
 import { bagPlaces, characterView, equippedItems, loadPlayer, questsNow, requirePlayer } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
@@ -107,10 +107,13 @@ export async function openChest(context) {
     const rng = createRng(`${row.id}:${periodId}:${period.period}:chest`);
     item = chestItem({ level: row.level, classId: row.class_id, classLevel: row.class_level }, equippedItems(player).map((worn) => worn.slot), rng, content);
   }
+  // The daily chest counts towards the week's quest of opening it on a few
+  // days (dailies in quests.json).
+  const after = periodId === 'daily' ? addQuestProgress(withChest(quests, periodId), { chests: 1 }) : withChest(quests, periodId);
   const [opened] = await db.batch([
     db
       .prepare('UPDATE characters SET time_points = time_points + ?, system_points = system_points + ?, quests = ?, version = version + 1 WHERE id = ? AND version = ?')
-      .bind(chest.timePoints, chest.systemPoints, JSON.stringify(withChest(quests, periodId)), row.id, row.version),
+      .bind(chest.timePoints, chest.systemPoints, JSON.stringify(after), row.id, row.version),
     // The item only with the chest opened above.
     ...(item
       ? [

@@ -2230,19 +2230,21 @@ describe('quests from the narrator', () => {
     const area = questArea(character, content);
     assert.equal(area.id, 'windfalls-edge');
     const prey = new Set(area.encounters.flatMap((encounter) => encounter.monsters));
+    // Skraj Wiatrołomów, before the Stół rozbiórki stands: in the day five
+    // of its creatures, creatures of any kind and the time; the week asks
+    // for the general ones only (the author: "Tygodniowe zadania powinny być
+    // bardziej ogólne"): creatures of any kind, the time, the daily chest on
+    // a few days and the inner regions to open.
+    const kinds = { daily: ['kill', 'killAny', 'explore'], weekly: ['killAny', 'explore', 'dailies', 'unlock'] };
     for (const periodId of ['daily', 'weekly']) {
       for (let seed = 0; seed < 30; seed++) {
         const quests = drawQuests(periodId, { character, hasTable: false, seed }, content);
-        // Skraj Wiatrołomów: a quest for each of its creatures, one for
-        // creatures of any kind, one for the time and, in the week, one for
-        // the inner regions to open; five of them before the Stół rozbiórki
-        // stands.
-        assert.equal(quests.length, Math.min(5, content.quests.periods[periodId].count));
+        assert.equal(quests.length, periodId === 'daily' ? 5 : 4);
         const kills = quests.filter((quest) => quest.kind === 'kill');
         assert.ok(kills.every((quest) => prey.has(quest.target) && quest.count >= 1));
         assert.equal(new Set(kills.map((quest) => quest.target)).size, kills.length, 'a creature twice');
         // Nothing for the Stół rozbiórki before it stands.
-        assert.ok(quests.every((quest) => ['kill', 'killAny', 'explore', 'unlock'].includes(quest.kind)));
+        assert.ok(quests.every((quest) => kinds[periodId].includes(quest.kind)));
         assert.ok(quests.every((quest) => quest.progress === 0 && !quest.claimed && quest.reward.amount >= 1));
       }
     }
@@ -2285,6 +2287,27 @@ describe('quests from the narrator', () => {
     assert.equal(questText({ kind: 'unlock', count: 1 }, content), 'Odblokuj dostęp do 1 nowego regionu.');
   });
 
+  test('the week asks for the daily chest on a few days: each daily chest opened counts once', () => {
+    const quests = {
+      daily: { period: 'd', quests: [{ kind: 'explore', count: 30, progress: 30, claimed: true }], chest: true },
+      weekly: {
+        period: 'w',
+        quests: [
+          { kind: 'dailies', count: 3, progress: 2, claimed: false },
+          { kind: 'explore', count: 900, progress: 0, claimed: false },
+        ],
+        chest: false,
+      },
+    };
+    const after = addQuestProgress(quests, { chests: 1 });
+    assert.deepEqual(after.weekly.quests.map((quest) => quest.progress), [3, 0]);
+    assert.deepEqual(after.daily, quests.daily);
+    assert.equal(addQuestProgress(quests, { minutes: 60 }).weekly.quests[0].progress, 2);
+    assert.equal(questText({ kind: 'dailies', count: 3 }, content), 'Otwórz skrzynię dziennych zadań 3 razy.');
+    const dailies = content.quests.kinds.find((kind) => kind.id === 'dailies');
+    assert.ok(dailies.weekly && !dailies.daily);
+  });
+
   test('with the table built, its work comes into the draw', () => {
     const character = newCharacter('archer', { level: 12, classLevel: 10 });
     const kinds = new Set();
@@ -2308,23 +2331,24 @@ describe('quests from the narrator', () => {
     assert.ok(!kinds(newCharacter('archer', { level: 110, classLevel: 119 })).includes('kill'));
   });
 
-  test('a quest asks for as many creatures as its fights bring, and rare ones only for the week', () => {
+  test('a quest asks for as many creatures as its fights bring; the week for creatures of any kind only', () => {
     // Skraj Wiatrołomów at level 1: wolves come in 30 fights of 84, badgers
     // in 20, squirrels in 18 and grass snakes in 16, and each fight brings
     // one creature.
     const character = newCharacter('mage');
     const shares = { wolf: 30 / 84, badger: 20 / 84, squirrel: 18 / 84, 'grass-snake': 16 / 84 };
     for (const periodId of ['daily', 'weekly']) {
-      const [fewest, most] = content.quests.kinds.find((kind) => kind.id === 'kill')[periodId].fights;
       for (let seed = 0; seed < 30; seed++) {
         for (const quest of drawQuests(periodId, { character, hasTable: false, seed }, content).filter((candidate) => candidate.kind.startsWith('kill'))) {
+          const [fewest, most] = content.quests.kinds.find((kind) => kind.id === quest.kind)[periodId].fights;
           const share = quest.kind === 'killAny' ? 1 : shares[quest.target];
           assert.ok(quest.count >= Math.max(1, Math.round(fewest * share)) && quest.count <= Math.round(most * share), `${periodId} ${quest.target} ${quest.count}`);
+          assert.ok(periodId === 'daily' || quest.kind === 'killAny', 'a single creature for the week');
         }
       }
     }
     // A creature of few fights in the place (here a bat in Wilcze Kręgi of
-    // the test): never a daily quest, sometimes a weekly one.
+    // the test): never a quest of its own.
     const later = newCharacter('mage', { level: 42, classLevel: 40 });
     assert.equal(questArea(later, content).id, 'wolf-circles');
     const rare = { ...content.areasById['wolf-circles'], encounters: [{ weight: 60, monsters: ['she-wolf'] }, { weight: 4, monsters: ['bat'] }] };
@@ -2332,11 +2356,11 @@ describe('quests from the narrator', () => {
     const targets = (periodId, who = later, data = rareContent) =>
       new Set(Array.from({ length: 60 }, (_, seed) => drawQuests(periodId, { character: who, hasTable: false, seed }, data)).flat().map((quest) => quest.target));
     assert.ok(!targets('daily').has('bat'));
-    assert.ok(targets('weekly').has('bat'));
+    assert.ok(!targets('weekly').has('bat'));
     // The champion is never a quest's target.
     const last = newCharacter('mage', { level: 23, classLevel: 22 });
     assert.equal(questArea(last, content).id, 'boar-thicket');
-    assert.ok(!targets('weekly', last, content).has('tusker'));
+    assert.ok(!targets('daily', last, content).has('tusker'));
   });
 
   test('rewards: gold, resources and parts, more for a higher level and for the week', () => {
@@ -2377,7 +2401,7 @@ describe('quests from the narrator', () => {
     assert.equal(next.weekly, busy.weekly);
   });
 
-  test('the day asks for creatures of the newest open inner region and the one before it, the week of the newest', () => {
+  test('the day asks for creatures of the newest open inner region and the one before it, the week for none', () => {
     const character = newCharacter('cleric', { level: 23, classLevel: 27 });
     const targets = (periodId) =>
       new Set(
@@ -2387,7 +2411,7 @@ describe('quests from the narrator', () => {
           .map((quest) => quest.target),
       );
     assert.deepEqual([...targets('daily')].sort(), ['bat', 'black-stork', 'boar', 'imp', 'mossling', 'stag', 'stoneling', 'wildcat']);
-    assert.deepEqual([...targets('weekly')].sort(), ['bat', 'imp', 'mossling', 'stoneling']);
+    assert.deepEqual([...targets('weekly')], []);
   });
 
   test('a kept quest for a creature the class cannot reach is drawn anew, the others stay', () => {

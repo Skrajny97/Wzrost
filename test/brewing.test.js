@@ -127,8 +127,8 @@ describe('brewing in the engine', () => {
     assert.equal(questText(daily[0], content), 'Uwarz 3 Mniejsze mikstury leczenia.');
     assert.equal(questText({ ...daily[0], count: 1 }, content), 'Uwarz 1 Mniejszą miksturę leczenia.');
     const weekly = drawn(true, 'weekly').filter((quest) => quest.kind.startsWith('brew'));
-    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'brewAny' && quest.count === 15));
-    assert.equal(questText(weekly[0], content), 'Uwarz łącznie 15 mikstur.');
+    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'brewAny' && quest.count === 40));
+    assert.equal(questText(weekly[0], content), 'Uwarz łącznie 40 mikstur.');
     const quests = {
       daily: { period: 'd', chest: false, quests: [{ kind: 'brew', target: 'lesser-healing', count: 3, progress: 1, claimed: false }] },
       weekly: { period: 'w', chest: false, quests: [{ kind: 'brewAny', count: 15, progress: 0, claimed: false }] },

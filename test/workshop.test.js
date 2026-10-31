@@ -242,8 +242,8 @@ describe('the Warsztat in the engine', () => {
     assert.ok(gold(made).every((amount) => amount >= 92), gold(made).join());
     assert.ok(gold(daily.filter((quest) => quest.kind === 'explore')).every((amount) => amount <= 70));
     const weekly = drawn(true, 'weekly').filter((quest) => quest.kind.startsWith('make'));
-    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'makeAny' && quest.count === 5));
-    assert.equal(questText(weekly[0], content), 'Wykonaj łącznie 5 przedmiotów.');
+    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'makeAny' && quest.count === 10));
+    assert.equal(questText(weekly[0], content), 'Wykonaj łącznie 10 przedmiotów.');
     const quests = {
       daily: { period: 'd', chest: false, quests: [{ kind: 'make', count: 1, progress: 0, claimed: false }] },
       weekly: { period: 'w', chest: false, quests: [{ kind: 'makeAny', count: 5, progress: 1, claimed: false }] },

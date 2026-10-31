@@ -2996,6 +2996,21 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Zadania tygodniowe na cały tydzień (31.10.2026, na wersji testowej)
+
+Autor: „Tygodniowe zadania powinny być bardziej ogólne, bo obecnie z Szybkimi Polowaniami i Błyskawicznymi idzie je zrobić w pare godzin”.
+
+1. **Skąd to się brało.** Krótkie wyprawy dają najwięcej walk na minutę: 5 minut to 2 walki, a 4 godziny to 10 walk. Szybkie i Błyskawiczne Polowania dają od ręki ok. 24 walk dziennie. Tygodniowe zadania na stwory prosiły o tyle stworów, ile przynosi 25–40 walk, więc wpadały w kilka godzin.
+2. **Tydzień prosi tylko o ogólne cele.** Nie ma już tygodniowych zadań na jeden wybrany gatunek stwora (zostają w dziennych). Tydzień prosi o:
+    - stwory dowolnego rodzaju z 120–200 walk zamiast z 25–40;
+    - 15–30 godzin wypraw zamiast 5–10;
+    - nowe zadanie „Otwórz skrzynię dziennych zadań 3 razy” (3–4 razy). Skrzynia dzienna otwiera się raz dziennie, więc to zadanie wymaga 3–4 różnych dni;
+    - na Stole rozbiórki 30–60 materiałów i 15–30 przedmiotów zamiast 10–20 i 5–10;
+    - z profesji łącznie 150 ziół, 40 mikstur i 10 przedmiotów zamiast 60, 15 i 5, a w Osadzie 12 zleceń zamiast 8.
+3. **Bez zmian.** Zadania dzienne, nagrody za zadania i skrzynia tygodniowa zostają jak były. Szybkie i Błyskawiczne Polowania nadal się liczą, ale przy tych liczbach dają tylko część tygodnia.
+4. **Brakujący szczegół: nowa postać.** Póki nie stoi Stół rozbiórki i nie ma profesji, ogólnych rodzajów zadań jest tylko cztery, więc nowa postać dostaje 4 zadania tygodniowe zamiast 5.
+5. **Od kiedy.** Nowe zadania tygodniowe losują się od następnego tygodnia (od poniedziałku). Zadania z bieżącego tygodnia zostają takie, jakie się wylosowały.
+
 ## Kwatery w obozie i wyższa plansza (31.10.2026, na wersji testowej)
 
 Autor przy 253: „253 A, ale bedzie trzeba chyba planszę obozu rozbudować, żeby gdzies te Kwatery zmieścić (jeśli tak to motyw rozbudowania jak z Osadą będzie trzeba zrobić chyba -> rozszerzyć na większą ilość miejsca)”. Kwatery są budynkiem obozu z pytania 104 A: towarzysz zwerbowany w Karczmie mieszka w obozie.

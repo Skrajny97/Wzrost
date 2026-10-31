@@ -63,7 +63,7 @@ function rewardChip(reward) {
 
 // The picture of a quest: the creature to beat (a shadow until met), or what
 // the work is done with.
-const QUEST_ICONS = { explore: 'swords', unlock: 'unlocked' };
+const QUEST_ICONS = { explore: 'swords', unlock: 'unlocked', dailies: 'gift' };
 
 function questArt(quest) {
   if (quest.kind === 'kill') {
