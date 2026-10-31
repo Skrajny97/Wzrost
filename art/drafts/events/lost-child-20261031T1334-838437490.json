@@ -1,0 +1,25 @@
+{
+  "id": "lost-child",
+  "payload": {
+    "prompt": "a small barefoot peasant girl of about six in a long plain white linen shirt, tangled flaxen hair with a wilted wreath of field flowers, clutching a small straw doll to her chest with both hands, a pale tear-stained face and big dark eyes, faintly eerie, the whole figure from the wreath to the bare feet with empty space around it, full body, three-quarter view, muted forest colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 838437490,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793453706,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 47.15,
+    "request_id": "b6646402-0aac-474e-8b9a-9ea6eec5e55b",
+    "outputs_retained_until": 1793540054
+  }
+}
