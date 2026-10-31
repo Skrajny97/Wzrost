@@ -1,0 +1,25 @@
+{
+  "id": "companion-cleric-male",
+  "payload": {
+    "prompt": "a small full body figure seen from afar, the whole figure from the top of the head to the feet inside the picture with empty space above the head and below the feet, an old slavic wandering priest for hire, a long white beard, bushy eyebrows, a brown woollen habit with a rope belt reaching to the ankles, a small bronze sun pendant on a leather cord, sandals, a tall wooden staff topped with a bronze sun in his hand, standing in the middle of the image, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 356074617,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 1
+  },
+  "result": {
+    "created_at": 1793444197,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 52.19,
+    "request_id": "77648d67-fd49-454d-ad69-858b98001081",
+    "outputs_retained_until": 1793530463
+  }
+}

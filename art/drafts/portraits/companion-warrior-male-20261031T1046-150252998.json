@@ -1,0 +1,25 @@
+{
+  "id": "companion-warrior-male",
+  "payload": {
+    "prompt": "a small full body figure seen from afar, the whole figure from the top of the head to the feet inside the picture with empty space above the head and below the feet, a broad-shouldered slavic man warrior for hire in his forties, a shaved head and a thick fair beard braided in two, calm hazel eyes, a studded leather jerkin over a mail shirt, a wide belt, dark trousers and leather boots, a big axe resting on his shoulder, standing in the middle of the image, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 150252998,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 1
+  },
+  "result": {
+    "created_at": 1793443750,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 55.07,
+    "request_id": "e03c3626-d324-4459-9cb7-c15f17e48b45",
+    "outputs_retained_until": 1793529973
+  }
+}

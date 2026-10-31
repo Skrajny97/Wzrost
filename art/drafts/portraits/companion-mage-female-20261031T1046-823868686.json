@@ -1,0 +1,25 @@
+{
+  "id": "companion-mage-female",
+  "payload": {
+    "prompt": "a small full body figure seen from afar, the whole figure from the top of the head to the feet inside the picture with empty space above the head and below the feet, a young slavic woman mage for hire, silver-white hair tied back with a red ribbon, pale violet eyes, a dark green cloak embroidered with small runes over a long dress, a crystal pendant glowing faint blue at her throat, a slender wooden staff in her hand, standing in the middle of the image, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 4,
+    "seed": 823868686,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 1
+  },
+  "result": {
+    "created_at": 1793443989,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 53.63,
+    "request_id": "9c2fb8a5-8d25-4bea-9b89-e69397bad3f0",
+    "outputs_retained_until": 1793530327
+  }
+}
