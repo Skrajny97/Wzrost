@@ -18,7 +18,7 @@ import {
   upgradeView,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireIdlePlayer, requirePlayer, requireUnworn, walletOf } from './characters.js';
+import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, requireUnworn, walletOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 
@@ -51,8 +51,11 @@ async function respond(context, session) {
   return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
 }
 
+// Worn and taken off at home or at a profession's work; an exploration
+// keeps what it set out with (characters.js: requireNotExploring).
 export async function equipItem(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
+  requireNotExploring(player, context.now);
   const item = findItem(player, context.params.id);
   if (item.equippedSlot) throw new ApiError(409, 'already_equipped', 'Ten przedmiot jest już założony.');
   if (content.slotsById[item.slot].locked) throw new ApiError(403, 'slot_locked', 'Ten slot jest jeszcze zablokowany.');
@@ -77,7 +80,8 @@ export async function equipItem(context) {
 }
 
 export async function unequipItem(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
+  requireNotExploring(player, context.now);
   const item = findItem(player, context.params.id);
   if (!item.equippedSlot) throw new ApiError(409, 'not_equipped', 'Ten przedmiot nie jest założony.');
   const capacity = bagCapacity(campLevels(player.buildings, context.now, content), content);

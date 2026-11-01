@@ -3860,6 +3860,12 @@ img.area-art {
   text-align: right;
 }
 
+/* A link under an item's part (the Kowadło) stands at the right, its line
+   only under its words (the author: "tylko sam napis w prawym dolnym rogu"). */
+.compare > .link-button {
+  align-self: flex-end;
+}
+
 .link-button:has(.sprite) {
   display: inline-flex;
   align-items: center;

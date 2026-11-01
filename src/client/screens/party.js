@@ -13,6 +13,11 @@ import { openProfile } from '../profile.js';
 import { call, isUnlocked, state, unlockInfo } from '../state.js';
 import { confirmAction, toast, withButton } from '../ui.js';
 
+// Who goes on the party's exploration and who stays (the author's words of
+// 1.11.2026, "poziomu" for the slip "poziomem").
+const GOERS =
+  'Na wyprawę ruszają członkowie bez zajęć w trakcie, z dopasowaniem do najniższego poziomu klasy z drużyny. Kto zajmuje się profesją albo jest na solo wyprawie, zostaje w drużynie, ale nie uczestniczy we wspólnej wyprawie.';
+
 // A member's dot (the Znajomi's colours, styles.css) and its words; the
 // busy ones say it beside the name too, as they stay home when the party
 // goes (screens/combat.js).
@@ -174,14 +179,13 @@ export function mountParty(container) {
           ),
         ),
       ),
-      // A member busy elsewhere stays in the party and stays home (the
-      // author: "Niech po prostu nie idzie z drużyną jesli jest zajety
-      // wykonywaniem Profesji, nie musi wychodzić z niej.").
+      // Who goes and who stays: the author's words (1.11.2026: "zły opis,
+      // powinno być …"), on both cards.
       h('p', {
         class: 'muted',
         text: own?.leader
-          ? `Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”. Idą członkowie bez innych zajęć, teraz najwyżej na ${formatMinutes(party.limits.minutes)} i tylko tam, gdzie wejdzie ${party.limits.classLevelBy} (poziom klasy ${party.limits.classLevel}). Kto pracuje w profesji albo jest na wyprawie, zostaje w drużynie i pójdzie z nią następnym razem. Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim. Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.`
-          : 'Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle. Gdy pracujesz w profesji albo jesteś na własnej wyprawie, drużyna wyrusza bez Ciebie i nie musisz jej opuszczać. Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.',
+          ? `Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”. ${GOERS} Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim. Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.`
+          : `Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle. ${GOERS} Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.`,
       }),
     );
   }

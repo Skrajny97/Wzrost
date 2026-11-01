@@ -70,11 +70,12 @@ function wearSheet(companion, apply) {
 }
 
 // What a companion wears in its three places; one hired has a button to
-// put on an item from the bag (question 108 A), at home as every change of
-// the bag, while a candidate only shows what it comes with.
+// put on an item from the bag (question 108 A), at home or at a profession's
+// work, as the character's own equipment (an exploration keeps what it set
+// out with), while a candidate only shows what it comes with.
 function wearList(companion, apply) {
   const hired = Boolean(companion.wearable);
-  const away = Boolean(state.character.activity);
+  const away = state.character.activity?.kind === 'hunt';
   return h(
     'div',
     { class: 'settlement-companion-wear' },

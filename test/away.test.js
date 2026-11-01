@@ -2,9 +2,11 @@
 // Wymianę i różne działania na przedmiotach w czasie zbierania ziół itp.
 // Niech nie pozwala tylko na zakładanie i zmianę ekwipunku. Niech
 // rezerwuje również ilości tego co zabiera w trasę - mikstury itp."): the
-// bag stays at hand, what is worn waits for the return, on an exploration
-// also the stat points, and the potions taken along leave the bag for the
-// road and come back, those not drunk, with the report.
+// bag stays at hand; on an exploration what is worn and the stat points
+// wait for the return, at a profession's work nothing does (the author: "W
+// trakcie wykonywania Profesji.. w sumie powinniśmy być w stanie zarządzać
+// Ekwipunkiem?"); and the potions taken along leave the bag for the road
+// and come back, those not drunk, with the report.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -74,13 +76,17 @@ describe('the bag while the character is away', () => {
     assert.equal((await call('POST', `/api/items/${bag}/sell`, { cookie })).status, 200);
   });
 
-  test('at a profession\'s work the stat points and healing are at hand too, but not what is worn', async () => {
+  test('at a profession\'s work the equipment, the stat points and healing are at hand too', async () => {
     const bag = await item();
     // Hurt just now, so the rest has not healed it yet.
     await (await db()).prepare("UPDATE characters SET hp = 10, hp_at = CAST(strftime('%s', 'now') AS INTEGER) * 1000").run();
     const gathering = await call('POST', '/api/professions/gather', { cookie, body: { herbs: ['comfrey'], minutes: 60 } });
     assert.equal(gathering.status, 201, JSON.stringify(gathering.data));
-    assert.equal((await call('POST', `/api/items/${bag}/equip`, { cookie })).data.error.code, 'busy');
+    // The author: "W trakcie wykonywania Profesji.. w sumie powinniśmy być w
+    // stanie zarządzać Ekwipunkiem?"
+    const worn = await call('POST', `/api/items/${bag}/equip`, { cookie });
+    assert.equal(worn.status, 200, JSON.stringify(worn.data));
+    assert.equal((await call('POST', `/api/items/${bag}/unequip`, { cookie })).status, 200);
     const points = await call('POST', '/api/character/points', { cookie, body: { points: { strength: 1 } } });
     assert.equal(points.status, 200, JSON.stringify(points.data));
     const drunk = await call('POST', '/api/potions/drink', { cookie, body: { potionId: 'lesser-healing' } });

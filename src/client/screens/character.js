@@ -72,15 +72,12 @@ let bagTab = 'items';
 // "Rzadka skóra wilka" for a stack above its species' rarity.
 export const materialTitle = (material) => material.label.charAt(0).toUpperCase() + material.label.slice(1);
 
-// Why the gear cannot change now: the character is away. The bag stays at
-// hand (the author: "Niech nie pozwala tylko na zakładanie i zmianę
-// ekwipunku").
-const BUSY_TEXTS = {
-  herbs: 'Postać zbiera zioła. Ekwipunek zmienisz po jej powrocie z Zagajnika.',
-  potions: 'Postać warzy mikstury. Ekwipunek zmienisz po jej powrocie z Pracowni.',
-  items: 'Postać wykonuje przedmioty. Ekwipunek zmienisz po jej powrocie z Warsztatu.',
-};
-const busyText = (character) => BUSY_TEXTS[character.activity?.kind] ?? 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.';
+// Why the gear cannot change now: the character is on an exploration, whose
+// report is made with what it wears (inventory.js). At a profession's work
+// the gear is at hand (the author: "W trakcie wykonywania Profesji.. w sumie
+// powinniśmy być w stanie zarządzać Ekwipunkiem?"), and the bag always.
+const onExploration = (character) => character.activity?.kind === 'hunt';
+const BUSY_TEXT = 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.';
 
 // A herb's or a potion's stacks in the bag: full ones, then the rest.
 function stacksOf(entry, stack) {
@@ -99,7 +96,7 @@ const STACKS = {
 export function mountCharacter(container) {
   function render() {
     const character = state.character;
-    const busy = Boolean(character.activity);
+    const busy = onExploration(character);
     const slots = state.content.slots;
 
     const frame = h('div', { class: `portrait${gearHidden ? ' portrait--bare' : ''}` });
@@ -553,9 +550,10 @@ export function mountCharacter(container) {
 // `anvil`: the Kowadło part open, as after an upgrade.
 export function itemSheet(item, { equipped, anvil = false }) {
   const character = state.character;
-  // Away, the bag stays at hand: only wearing and taking off wait, and an
-  // item worn is changed at home (inventory.js).
-  const busy = Boolean(character.activity);
+  // On an exploration the bag stays at hand: only wearing and taking off
+  // wait, and an item worn is changed at home or at a profession's work
+  // (inventory.js).
+  const busy = onExploration(character);
   const usable = !item.classIds || item.classIds.includes(character.classId);
   // A later base of its kind waits for its class level (a Metin2-like tier),
   // an item from another player too, whatever its own level (inventory.js).
@@ -601,7 +599,7 @@ export function itemSheet(item, { equipped, anvil = false }) {
     usable && worn && compareTable(item, worn),
     anvilSection(item, busy && equipped, anvil),
     !equipped && salvageSection(item, false),
-    busy && h('p', { class: 'muted', text: busyText(character) }),
+    busy && h('p', { class: 'muted', text: BUSY_TEXT }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
     early && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
     !equipped &&
@@ -975,7 +973,7 @@ export function itemDetails(item, { small = false } = {}) {
 
 // The System's words over the bag, with the way to where they point.
 function characterMessage(character, busy) {
-  if (busy) return [busyText(character)];
+  if (busy) return [BUSY_TEXT];
   if (character.freePoints > 0 && isUnlocked('stats')) {
     return [
       `Masz ${formatNumber(character.freePoints)} ${plural(character.freePoints, 'wolny punkt', 'wolne punkty', 'wolnych punktów')} statystyk. Rozdziel je w Statystykach.`,

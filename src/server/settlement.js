@@ -79,7 +79,7 @@ import {
   loadPlayer,
   questsNow,
   requireBuildPlayer,
-  requireIdlePlayer,
+  requireNotExploring,
   requirePlayer,
   requireUnworn,
   settlementBoard,
@@ -839,9 +839,11 @@ const backToBag = (db, row, item, saved, now) => {
 
 // { companionId, itemId }: the companion puts on an item from the bag in
 // its place (question 108 A), and what it wore there goes back to the bag.
-// At home, as every change of the bag.
+// At home or at a profession's work, as the character's own equipment
+// (inventory.js); an exploration keeps what it set out with.
 export async function equipCompanion(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  const { session, player } = await requirePlayer(context);
+  requireNotExploring(player, context.now);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);

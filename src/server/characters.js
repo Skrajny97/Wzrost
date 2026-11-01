@@ -477,16 +477,19 @@ export function requireIdle(player, now) {
 
 // While the character is away, its bag stays at hand (the author: "Niech
 // system pozwala na Wymianę i różne działania na przedmiotach w czasie
-// zbierania ziół itp. Niech nie pozwala tylko na zakładanie i zmianę
-// ekwipunku"): only what it wears waits for its return, so an item worn is
-// changed at home.
+// zbierania ziół itp."). What it wears waits only for the return from an
+// exploration, whose report is made with it; at a profession's work the
+// equipment is at hand too (the author: "W trakcie wykonywania Profesji..
+// w sumie powinniśmy być w stanie zarządzać Ekwipunkiem? Czemu to miałoby
+// przeszkadzać w gruncie rzeczy?"), as nothing of the work depends on it.
 export function requireUnworn(player, item, now) {
-  if (item?.equippedSlot) requireIdle(player, now);
+  if (item?.equippedSlot) requireNotExploring(player, now);
 }
 
-// On an exploration also what its fights are counted with waits: the stat
-// points, the skills and the evolution, since the report is made with them
-// when it is claimed (hunts.js). The work of a profession needs none of it.
+// On an exploration also what its fights are counted with waits: the
+// equipment, the stat points, the skills and the evolution, since the report
+// is made with them when it is claimed (hunts.js). The work of a profession
+// needs none of it.
 export function requireNotExploring(player, now) {
   if (player.activity?.kind === 'hunt') requireIdle(player, now);
 }
