@@ -1,0 +1,31 @@
+{
+  "id": "priest-male",
+  "payload": {
+    "prompt": "Redraw the grey mannequin as a young man with messy brown hair, a long white robe with gold trim and a golden sun on the chest, a short silver mace at his belt and a big round white and gold shield on his back, the character from the reference picture, sitting astride and riding, both hands in front holding the reins, seen from the side, facing right. Keep the pose, size and place of the mannequin exactly, nothing under the rider, a plain flat background.",
+    "prompt_style": "rd_pro__edit",
+    "width": 64,
+    "height": 96,
+    "num_images": 2,
+    "seed": 936247389,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "input_image": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABgCAIAAAAip+O/AAAC/0lEQVR4nO2ZO27jMBCGmUWKPYGP4MJHCHICI4UKFYJrn4IH4ClcCyxcuAh8hq23SLFH2AMstthii0EIgpIoznA4lBH+SBHJjjOf5k0/ffz8oR5Z32obkKsGUFsNoLYaQG01gNpqALXVAGqrAdRWA6it55w/7vqzf3m7XvKMoYgIAKYbY6Y3hTEoITRrvbsTuKW0iDkwtT5+v5zQAF1/jltpjJF0wsNXIRzA6uMHSTqB0wNaa8ZPSxQngHwGq3I5IAZTMIk/fv0u9+FOOIDb9ZIS6Frrw3532O+oViH0xcqoSnCC1lpyHCJ6YIlBvpI+0b7g8PuUKzhgvfA0ShmnwXprR7gchhP8UmUfQIcQFEdnvf+78CANQgNorX3rQXDHGCNT+319vTK6JGtHSOJNb2QQIS5rZ3U8vm16oYlMaeCE19eXPJNwIobQdpxAAVh1glLqeHyjG4URAiAokREn3O/vSiqbs45VZhlcl5AJJHoZje9c4ASBQEqdhZZa7DCcZhuzc87q+an/BsI0lTqNLgHMThZqEl3OFeCZQPAqvIRlSAKITDhQc2YZfM1myzTACAy5AGrZCXE5pADjfn9HAVQb5qwdAXs2qNK17oHg8ftLo7+LEZwAAleQ0wDnATDU/fgw8eEiIkdOS2LESjl9zHA5DCdjzGG/6/pYX4uLZr1KB4gECdzv+tPsvw+oph8CriPv01lf8vmydvz7Tw1DiBFcOh7nvel7UEoto6g0nWIEyuy+vtg84MvaEZ70knGMBzCIRkaolfkRsipcJ85puoUw0EeLwbFcugphEM9GlVJdf6Zh8DLQZ6Hb9fL9+Q+2AVs78q5pucMcAYOXgWcavV0v5FkoU2zjNC2i8sW8D8hjFFlo4hi8hagdry+I1iUIkvbAhhrZRtQAaqsB1FYDqK0iAGJdTAl7gL2LKfkQYv/WTBTg8xDyzIhBX+qXlJgAXOHE7IH09OXajFsZrS3+nThxIebKAf4kVmm1kqshFAGQVMuB2moAtdUAauvhAf4D4zqcFPyw03YAAAAASUVORK5CYII=",
+    "reference_images": 1
+  },
+  "result": {
+    "created_at": 1793556853,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 27.59,
+    "request_id": "549c3368-a3ad-4e08-8162-41867319c760",
+    "outputs_retained_until": 1793643191,
+    "billing": {
+      "source": "balance",
+      "balance_left": 27.59,
+      "balance_charged": 0.36
+    }
+  }
+}
