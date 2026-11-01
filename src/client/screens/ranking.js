@@ -10,7 +10,7 @@ import { formatNumber } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call } from '../state.js';
-import { withButton } from '../ui.js';
+import { guildTag, withButton } from '../ui.js';
 
 const ORDERS = [
   { id: 'level', name: 'Poziom postaci', column: 'Poziom' },
@@ -121,6 +121,7 @@ export function mountRanking(container) {
                     'aria-label': `${row.name}: zobacz postać`,
                     onClick: (event) => withButton(event.currentTarget, () => openProfile(row.name)),
                   }),
+                  guildTag(row.guildTag),
                   row.role && h('span', { class: `chat-role chat-role--${row.role}`, text: `(${row.role})` }),
                 ),
               ),

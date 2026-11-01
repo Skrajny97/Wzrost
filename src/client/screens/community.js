@@ -51,7 +51,7 @@ import {
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
-import { closeSheet, openSheet, pageHeading, toast, withButton } from '../ui.js';
+import { closeSheet, guildTag, openSheet, pageHeading, toast, withButton } from '../ui.js';
 import { itemDetails, itemSummary } from './character.js';
 import { mountFriends } from './friends.js';
 import { mountGuild } from './guild.js';
@@ -468,6 +468,7 @@ function mountChat(container, { bar, person = null }) {
           'aria-label': `${message.name}: zobacz postać`,
           onClick: (event) => withButton(event.currentTarget, () => openProfile(message.name)),
         }),
+        guildTag(message.guildTag),
         message.role && h('span', { class: `chat-role chat-role--${message.role}`, text: `(${message.role})` }),
         h('span', { class: 'chat-level', text: `poz. ${message.level}` }),
         h('time', { class: 'chat-time', datetime: time.toISOString(), text: (today ? timeFormat : dateTimeFormat).format(time) }),

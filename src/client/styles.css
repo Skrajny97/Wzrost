@@ -3862,6 +3862,15 @@ img.area-art {
 
 /* A link under an item's part (the Kowadło) stands at the right, its line
    only under its words (the author: "tylko sam napis w prawym dolnym rogu"). */
+/* A guild's tag in square brackets beside a character's name (ui.js). */
+.guild-tag {
+  color: var(--accent, currentColor);
+  font-family: var(--font-system);
+  font-size: 0.78em;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
 .compare > .link-button {
   align-self: flex-end;
 }

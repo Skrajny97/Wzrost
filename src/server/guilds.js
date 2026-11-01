@@ -22,6 +22,13 @@ const ROLES = { leader: 'lider', deputy: 'zastępca', member: 'członek' };
 // The chat channel of a guild (chat.js).
 export const guildChannel = (guildId) => `guild:${guildId}`;
 
+// SQL for the tag of the guild of the character whose id `column` holds, or
+// NULL: shown in square brackets beside its name in the chat, the Ranking,
+// the Znajomi, the Drużyna and on its card (the author: "koło nicka na
+// czacie ogólnym i wszędzie powinien wyśiwetlać sie tez skrót nazwy Gildii
+// [....] w kwadratowym nawiasie").
+export const guildTagSql = (column) => `(SELECT g.tag FROM guild_members gm JOIN guilds g ON g.id = gm.guild_id WHERE gm.character_id = ${column})`;
+
 async function requireGuildPlayer(context) {
   const found = await requirePlayer(context);
   if (!isUnlocked('community', found.player.row.level, content)) {

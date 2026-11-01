@@ -2996,6 +2996,13 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Skrót gildii przy imieniu (1.11.2026, na wersji testowej)
+
+Autor: „koło nicka na czacie ogólnym i wszędzie powinien wyśiwetlać sie tez skrót nazwy Gildii [....] w kwadratowym nawiasie”.
+
+1. **Gdzie.** Skrót gildii w kwadratowym nawiasie stoi za imieniem postaci w czacie (Globalny, Gildia i rozmowy prywatne), w Rankingu, w Znajomych, w Drużynie, na karcie postaci po stuknięciu imienia i przy własnym imieniu na ekranie Postać, np. „Radomir [SP]”.
+2. **Który skrót (brakujący szczegół).** Zawsze skrót obecnej gildii postaci, także przy jej starszych wiadomościach w czacie. Po wyjściu z gildii skrót znika, a po wejściu do innej pokazuje się nowy.
+
 ## Wersja 0.0.75 (1.11.2026)
 
 Autor: „pozniej pushnij awaryjne poprawki i zmiany na main” oraz „Awaryjne 0.0.75 wdrażaj natychmiast”.

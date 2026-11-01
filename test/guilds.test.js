@@ -82,6 +82,25 @@ describe('the Gildia through the API', () => {
     assert.equal(await count('guild_members'), 0);
   });
 
+  test('the guild\'s tag stands beside its members\' names: the chat, the Ranking, the Drużyna and their own view', async () => {
+    await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' });
+    // The chat: the writer's guild now.
+    await as('mistrz', 'POST', '/api/chat/rules');
+    assert.equal((await as('mistrz', 'POST', '/api/chat', { channel: 'global', text: 'Witajcie' })).status, 201);
+    const chat = (await as('druh', 'GET', '/api/chat?channel=global')).data;
+    assert.equal(chat.messages.find((message) => message.name === 'Mistrz').guildTag, 'LB');
+    const ranking = (await as('druh', 'GET', '/api/ranking')).data;
+    assert.deepEqual(
+      ranking.rows.filter((row) => ['Mistrz', 'Druh'].includes(row.name)).map((row) => [row.name, row.guildTag]),
+      [
+        ['Mistrz', 'LB'],
+        ['Druh', null],
+      ],
+    );
+    assert.equal((await as('mistrz', 'GET', '/api/character')).data.character.guildTag, 'LB');
+    assert.equal((await as('druh', 'GET', '/api/character')).data.character.guildTag, null);
+  });
+
   test('the leader and the deputies see the friends they may invite at a tap, members do not', async () => {
     await player('trzeci', 'Trzeci');
     // Mistrz's friends: Druh and Trzeci.

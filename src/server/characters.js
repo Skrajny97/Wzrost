@@ -82,7 +82,7 @@ import { craftingOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
-import { guildOf, guildRemoval } from './guilds.js';
+import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { partyRemoval } from './parties.js';
 import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
@@ -144,7 +144,8 @@ async function playerOf(db, row) {
     db.prepare('SELECT * FROM activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT * FROM avatar_activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT building_id, level, started_at, ends_at, collected_at FROM buildings WHERE character_id = ?').bind(row.id),
-    db.prepare('SELECT COUNT(*) AS waiting FROM market_parcels WHERE character_id = ?').bind(row.id),
+    // With the tag of its guild, for its own name (guilds.js).
+    db.prepare(`SELECT (SELECT COUNT(*) FROM market_parcels WHERE character_id = ?) AS waiting, ${guildTagSql('?')} AS guild_tag`).bind(row.id, row.id),
   ]);
   return {
     row,
@@ -155,6 +156,7 @@ async function playerOf(db, row) {
     avatarActivity: avatarActivities.results[0] ?? null,
     // What waits to be collected at the Targowisko (market.js).
     marketWaiting: parcels.results[0]?.waiting ?? 0,
+    guildTag: parcels.results[0]?.guild_tag ?? null,
     // { campfire: { level, startedAt, endsAt, collectedAt } }: see camp.js in the engine.
     buildings: Object.fromEntries(
       buildings.results.map((building) => [
@@ -916,6 +918,8 @@ export function characterView(player, now) {
 
   return {
     name: row.name,
+    // Its guild's tag, in square brackets beside its name (guilds.js).
+    guildTag: player.guildTag ?? null,
     classId: row.class_id,
     // The class goes by its evolution's name; the class itself stays a note
     // on the character card.

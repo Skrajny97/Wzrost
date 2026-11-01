@@ -11,7 +11,7 @@ import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { playSound } from '../sound.js';
 import { call, state, walletEntries } from '../state.js';
-import { howItWorks, toast, withButton } from '../ui.js';
+import { guildTag, howItWorks, toast, withButton } from '../ui.js';
 import { proposeTrade } from './trade.js';
 
 const resourceName = (id) => walletEntries().find((entry) => entry.id === id)?.name ?? id;
@@ -98,6 +98,7 @@ export function mountFriends(container) {
         'aria-label': `${person.name}: zobacz postać`,
         onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name, { onChange: show })),
       }),
+      guildTag(person.guildTag),
       h('span', { class: 'chat-level', text: `poz. ${person.level}` }),
       more,
     );

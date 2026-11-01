@@ -29,6 +29,7 @@
 import { areaFor, areaUnlocked, huntDurations, isUnlocked, longestHunt } from '../engine/index.js';
 import { characterView, currentHp, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
+import { guildTagSql } from './guilds.js';
 import { beginHunt } from './hunts.js';
 import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
@@ -85,7 +86,7 @@ export async function partyView(db, characterId, now) {
   const [members, sent, invites] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.name, c.class_id, c.level, c.class_level, c.role, u.seen_at,
+        `SELECT c.id, c.name, c.class_id, c.level, c.class_level, c.role, u.seen_at, ${guildTagSql('c.id')} AS guild_tag,
                 (SELECT a.kind FROM activities a WHERE a.character_id = c.id) AS activity
          FROM party_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
          WHERE m.party_id = ? ORDER BY m.joined_at, m.character_id`,
@@ -105,6 +106,7 @@ export async function partyView(db, characterId, now) {
   const list = members.results.map((row) => ({
     id: row.id,
     name: row.name,
+    guildTag: row.guild_tag ?? null,
     classId: row.class_id,
     className: content.classesById[row.class_id]?.name ?? '',
     level: row.level,

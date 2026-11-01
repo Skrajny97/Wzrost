@@ -11,7 +11,7 @@ import { friendsSeen, wantConversation } from './chat-news.js';
 import { h, icon } from './dom.js';
 import { SLOT_ICONS } from './icons.js';
 import { call, state } from './state.js';
-import { closeSheet, confirmAction, openSheet, toast, withButton } from './ui.js';
+import { closeSheet, confirmAction, guildTag, openSheet, toast, withButton } from './ui.js';
 import { itemSummary } from './screens/character.js';
 import { proposeTrade } from './screens/trade.js';
 
@@ -31,6 +31,7 @@ export async function openProfile(name, { onChange } = {}) {
           'h2',
           { class: 'sheet-title chat-sheet' },
           profile.name,
+          profile.guild && [' ', guildTag(profile.guild.tag)],
           profile.role && h('span', { class: `chat-role chat-role--${profile.role}`, text: ` (${profile.role})` }),
         ),
         h('p', { class: 'profile-levels', text: `${profile.className} · poziom ${profile.level} · klasa ${profile.classLevel}` }),

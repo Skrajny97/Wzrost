@@ -11,7 +11,7 @@ import { formatMinutes } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, state, unlockInfo } from '../state.js';
-import { confirmAction, toast, withButton } from '../ui.js';
+import { confirmAction, guildTag, toast, withButton } from '../ui.js';
 
 // Who goes on the party's exploration and who stays (the author's words of
 // 1.11.2026, "poziomu" for the slip "poziomem").
@@ -108,6 +108,7 @@ export function mountParty(container) {
         'aria-label': `${person.name}: zobacz postać`,
         onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)),
       }),
+      guildTag(person.guildTag),
       person.level && h('span', { class: 'chat-level', text: `poz. ${person.level}` }),
       BUSY[person.status] && h('span', { class: 'chat-level party-busy', text: BUSY[person.status] }),
       more,

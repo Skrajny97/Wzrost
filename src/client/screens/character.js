@@ -126,7 +126,7 @@ export function mountCharacter(container) {
     frame.append(h('div', { class: 'portrait-art' }, art), column('left'), column('right'), eye);
 
     fill(container,
-      pageHeading(character.name, `${character.className}${character.evolution?.current ? ` (z klasy: ${character.baseClassName})` : ''} · ${POSITION_NAMES[character.position]} · solo`),
+      pageHeading(character.name, `${character.className}${character.evolution?.current ? ` (z klasy: ${character.baseClassName})` : ''} · ${POSITION_NAMES[character.position]} · solo`, { tag: character.guildTag }),
       // What works on the character now, over its figure (the author).
       bonusList(character),
       h('div', { class: 'portrait-wrap' }, frame),

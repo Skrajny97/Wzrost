@@ -40,17 +40,22 @@ export function splitLead(text) {
 // button under its words.
 export const systemLink = (href, text) => h('a', { class: 'button button--system button--small system-action', href, text });
 
+// The tag of a character's guild in square brackets beside its name, or
+// nothing (the author: "koło nicka na czacie ogólnym i wszędzie powinien
+// wyśiwetlać sie tez skrót nazwy Gildii [....] w kwadratowym nawiasie").
+export const guildTag = (tag) => (tag ? h('span', { class: 'guild-tag', text: `[${tag}]` }) : null);
+
 // A place the narrator can point at (narrator.js).
 export function guided(element, guide) {
   element.dataset.guide = guide;
   return element;
 }
 
-export function pageHeading(title, subtitle) {
+export function pageHeading(title, subtitle, { tag = null } = {}) {
   return h(
     'div',
     { class: 'page-heading' },
-    h('h1', { class: 'page-title', tabindex: '-1', text: title }),
+    h('h1', { class: 'page-title', tabindex: '-1' }, title, tag && [' ', guildTag(tag)]),
     subtitle && h('p', { class: 'page-subtitle', text: subtitle }),
   );
 }

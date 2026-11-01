@@ -18,7 +18,7 @@ import { isUnlocked, itemView } from '../engine/index.js';
 import { isAuthor } from './author.js';
 import { content } from './content.js';
 import { friendNews } from './community.js';
-import { guildChannel, guildNews, guildOf } from './guilds.js';
+import { guildChannel, guildNews, guildOf, guildTagSql } from './guilds.js';
 import { partyNews } from './parties.js';
 import { tradeNews } from './trades.js';
 import { ApiError, json, readJson } from './http.js';
@@ -121,6 +121,8 @@ const messageView = (row, userId, env) => ({
   id: row.id,
   characterId: row.character_id,
   name: row.name,
+  // The writer's guild now, in square brackets beside its name (guilds.js).
+  guildTag: row.guild_tag ?? null,
   level: row.level,
   classId: row.class_id,
   text: row.text,
@@ -226,7 +228,8 @@ export async function readChat(context) {
   const [messages, hidden, blocked, reports, conversations] = await db.batch([
     db
       .prepare(
-        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, u.login, u.google_sub, u.chat_moderator
+        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, u.login, u.google_sub, u.chat_moderator,
+                ${guildTagSql('m.character_id')} AS guild_tag
          FROM chat_messages m JOIN users u ON u.id = m.user_id LEFT JOIN characters c ON c.id = m.character_id
          WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)
          ORDER BY m.id DESC LIMIT ?`,
