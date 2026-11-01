@@ -36,6 +36,7 @@ on:
           - events
           - icons
           - cosmetics
+          - mounts
           - settlement
           - residents
           - walks

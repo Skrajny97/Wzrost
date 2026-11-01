@@ -774,6 +774,18 @@
       "bg-camp": { "prompt": "a small forest camp at night, a campfire with warm orange light, a leather tent and a fallen log, dark spruce trees around and a starry sky, open ground in the middle, no people, tall vertical scene", "width": 96, "height": 128, "removeBackground": false }
     }
   },
+  "mounts": {
+    "$comment": "Wierzchowce ze Stajni (data/settlement.json, stable.mounts: Kuc, Koń wierzchowy, Rumak) z boku, przodem w prawo, osiodłane: obrazki do Stajni i pierwsze klatki jazdy w scenie Walki. Rozmiary rosną ze stopniem, w skali chodów postaci (ok. 110 px wzrostu).",
+    "style": "rd_pro__fantasy",
+    "width": 144,
+    "height": 112,
+    "references": [],
+    "prompts": {
+      "pony": { "prompt": "a sturdy small pony with a brown and white patched coat, a thick shaggy dark mane and tail, short strong legs, a simple worn brown leather saddle over a woollen blanket, a plain leather bridle with reins lying on its neck, standing calmly, seen exactly from the side in profile facing right, full body from the ears to the hooves, all four legs visible", "width": 120, "height": 96 },
+      "horse": { "prompt": "a strong bay riding horse with a reddish brown coat, a black mane, tail and lower legs, a sturdy brown leather saddle with stirrups over a dark red saddle cloth, a leather bridle with reins lying on its neck, standing calmly, seen exactly from the side in profile facing right, full body from the ears to the hooves, all four legs visible", "width": 144, "height": 112 },
+      "steed": { "prompt": "a tall noble black warhorse with a long flowing mane and tail and white feathering above the hooves, a fine dark leather saddle with silver fittings and stirrups over a deep blue saddle cloth with silver trim, a bridle with silver studs and reins lying on its neck, standing proudly, seen exactly from the side in profile facing right, full body from the ears to the hooves, all four legs visible", "width": 160, "height": 128 }
+    }
+  },
   "settlement": {
     "style": "rd_plus__isometric_asset",
     "width": 128,
