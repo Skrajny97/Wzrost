@@ -1,0 +1,31 @@
+{
+  "id": "warrior-female",
+  "payload": {
+    "prompt": "Redraw the grey mannequin as a young woman with red hair tied up in a bun, a cream linen shirt with a rope belt, patched brown trousers and cloth-wrapped feet, the character from the reference picture, sitting astride and riding, both hands in front holding the reins, seen from the side, facing right. Keep the pose, size and place of the mannequin exactly, nothing under the rider, a plain flat background.",
+    "prompt_style": "rd_pro__edit",
+    "width": 128,
+    "height": 128,
+    "num_images": 2,
+    "seed": 857997996,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "input_image": "iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAAABMXPacAAADwUlEQVR4nO2cMW7bQBBFx4GLnMBHcKEjBD6B4EKFCkK1TsED8BSqBRYqVBg6Q+oULnwEHyBIkSLFIMSCIpcSLfjPX/8HFSIlGIt5nJndJa27118/TeD4hh7AV0cCwEgAGAkAIwFgJACMBICRADASAEYCwEgAGAkAIwFgJACMBICRADASAEYCwEgAGAkAIwFgJACMBICRADASAEYCwEgAGAkAIwFgJACMBICRADASAEYCwEgAGAkAIwFg7tEDuI7VepseHg871EhuBY0AD33TNOcnqTVwlKDB6HdnemnBBYcAG4p+/jwLBAJW620+yk3T8CYBgYCyiS5g8vJ3eJMguoA8dV2jh/BRuAWwd2BjF5BCKqMcAWb2+vaOHsLVRBdwPOwuKfR1XS8eHxaPD58wpNsSXUDxEAiYTIK6rnm3gwgEOGMO2Geidyw/2peus7oJj0ef9/I3lu1oj37b7v2wqjb+hjr0DkEJ8sllF/30Pen2QwqBgLqu0+g7fqZpGsa5fwqBgLIhFtC2e2/C1IUougCvMF3XHWS5fOZ1EF2AZXfZPAmenn585nhuC4EAp9Qk4BAwmQRmtlw+f+KIbkZoAb0pZiYJTqcX4+zGoQWkeBIMOuhWCYyFiEaATd3z8iSgK0Rx94LGlrhVtRlcGHfJMfn8aPoF+G5S3N3QMQGDOxN2Vp26VPDM6OGf+kdYB0EFZHZ4fM4z6CBlsFucFyi4Az4BNp4EeTolPQ2n0wtQAFMT/iBtu3dtg0UJRcQM6F3+6U3H9F7YjCRwPBWCtIHoGeCB7l6pjPzmRIbOHDz6FnkaakOXuR9W1aZpmsXjw2qdW5fliRB9iywgU2T8/Gq9GQxfz8r5H/HUgYfeiStgkrbd//lrVdXX0DvsfHTZc/4dIBGbsJm9vr1f1WbPNfQItfpNIc6AlLbd+5U+FtxQQU+JmwE2a64ZrcJMElqAfWzRS6EhqICU3mNxl0OhgUBAx2q9nachsoPoK+GU42H3/f73tQvgtt1Hvk3GJMCZoSGyAz4BzvGwm70XFApWATa3IkWDWIDDroFegJPXEHkiVIgAXsoRMG+VAKccAWNErj/2FQQERwLASAAYCQAjAWAkAIwEgClEAOkqzIoRMEbwVZgVL8DC/+de4QL+P8S4DauB6ab8GBc2gJjliD4DLm+/Me8M0wtgRwLA0Au4/PGImD2ghCZsl801A0bfihHAC30JYkcCwEgAGAkAIwFgJACMBICRADASAEYCwEgAGAkAIwFgJACMBICRADASAEYCwEgAmH9g/5xUh39khgAAAABJRU5ErkJggg==",
+    "reference_images": 1
+  },
+  "result": {
+    "created_at": 1793554980,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 34.43,
+    "request_id": "9c3bdfba-dfde-4759-8bdd-d181c46c29cf",
+    "outputs_retained_until": 1793641311,
+    "billing": {
+      "source": "balance",
+      "balance_left": 34.43,
+      "balance_charged": 0.36
+    }
+  }
+}
