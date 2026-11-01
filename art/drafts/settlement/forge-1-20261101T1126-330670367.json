@@ -1,0 +1,30 @@
+{
+  "id": "forge-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, made of logs, planks, thatch and wooden shingles, no stone houses and no tiled roofs, standing directly on bare ground with no ground tile, base or platform under it, the village smithy: an open-sided log forge under a wooden shingle roof, a glowing stone hearth with big leather bellows, a heavy anvil on a tree stump, tongs, hammers and horseshoes hanging on a plank wall, a water trough and a stack of iron bars",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 330670367,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793532406,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 41.69,
+    "request_id": "920fb7ad-2453-46b0-a71b-0ccb1d29d55d",
+    "outputs_retained_until": 1793618802,
+    "billing": {
+      "source": "balance",
+      "balance_left": 41.69,
+      "balance_charged": 0.06
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "stable-1",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, made of logs, planks, thatch and wooden shingles, no stone houses and no tiled roofs, standing directly on bare ground with no ground tile, base or platform under it, the village stable: a long log stable with a thatched roof and open stall doors, a brown horse looking out of a stall, hay bales, a wooden water trough, saddles and bridles on a fence rail",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 653350768,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793532423,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 41.45,
+    "request_id": "f0b856af-0c43-4e50-ae10-74fee15a2051",
+    "outputs_retained_until": 1793618820,
+    "billing": {
+      "source": "balance",
+      "balance_left": 41.45,
+      "balance_charged": 0.06
+    }
+  }
+}
