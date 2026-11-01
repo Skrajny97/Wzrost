@@ -35,6 +35,7 @@ on:
           - animations
           - events
           - icons
+          - cosmetics
           - settlement
           - residents
           - walks

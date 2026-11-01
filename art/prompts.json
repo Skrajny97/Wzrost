@@ -756,6 +756,21 @@
       "time-points": "a small hourglass with a dark wooden frame and brass caps, glowing warm amber orange sand pouring from the top bulb into the bottom one, bold readable shape, single inventory item icon"
     }
   },
+  "cosmetics": {
+    "$comment": "Przedmioty kosmetyczne za Punkty Systemu, na razie szkice do planu: ramki portretu 120 × 160 (ich środek wycina kod, więc generator może w nim narysować cokolwiek) i pionowe tła portretu 96 × 128.",
+    "style": "rd_pro__fantasy",
+    "width": 120,
+    "height": 160,
+    "references": [],
+    "prompts": {
+      "frame-gold": "an ornate rectangular golden picture frame seen straight from the front, a thick gilded border with carved leaf filigree and scrollwork, a large red ruby set in each of the four corners, bright polished highlights and deep shadows, the whole frame fills the image edge to edge, the inside of the frame is empty flat black, symmetrical",
+      "frame-system": "a rectangular magic frame seen straight from the front, dark blue steel edges with glowing ice-blue light lines and small arcane runes running along all four sides, sharp angular corner brackets that glow brighter, like a mystical hologram window, the whole frame fills the image edge to edge, the inside of the frame is empty flat black, symmetrical",
+      "frame-forest": "a rectangular frame made of twisted dark tree roots and gnarled branches seen straight from the front, green moss, small ferns and tiny red-capped mushrooms growing on it, a few small glowing yellow fireflies, the whole frame fills the image edge to edge, the inside of the frame is empty flat black, symmetrical",
+      "bg-spring": { "prompt": "a quiet forest clearing at night with a small spring of glowing ice-blue water among mossy stones, faint blue light rising like mist, tall dark spruce trees on both sides, open ground in the middle, no people, tall vertical scene", "width": 96, "height": 128, "removeBackground": false },
+      "bg-tower": { "prompt": "the foot of an enormous dark stone tower rising into storm clouds, faint ice-blue runes glowing on its walls, a stone path leading to its gate, open ground in the middle, no people, tall vertical scene", "width": 96, "height": 128, "removeBackground": false },
+      "bg-camp": { "prompt": "a small forest camp at night, a campfire with warm orange light, a leather tent and a fallen log, dark spruce trees around and a starry sky, open ground in the middle, no people, tall vertical scene", "width": 96, "height": 128, "removeBackground": false }
+    }
+  },
   "settlement": {
     "style": "rd_plus__isometric_asset",
     "width": 128,
