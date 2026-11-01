@@ -538,7 +538,8 @@ function mountBuilding(container, id) {
                 {},
                 h(
                   'button',
-                  { type: 'button', class: 'item-row', onClick: () => itemSheet(item, { equipped }) },
+                  // Tapped here to be upgraded: the card opens with the Kowadło unfolded.
+                  { type: 'button', class: 'item-row', onClick: () => itemSheet(item, { equipped, anvil: true }) },
                   itemSummary(item),
                   equipped && h('span', { class: 'chip', text: 'założony' }),
                 ),
