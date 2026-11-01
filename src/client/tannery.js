@@ -60,7 +60,7 @@ function shop(view, apply) {
   const gold = state.character.gold;
   return h(
     'section',
-    { class: 'stack', 'data-guide': 'tannery-buy' },
+    { class: 'stack' },
     h('h2', { class: 'section-title', text: 'Towar Wszebora' }),
     h('p', {
       class: 'muted',

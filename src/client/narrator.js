@@ -130,7 +130,8 @@ const settlementHere = (hash, read) => onSettlement(hash) && settlementTour(hash
 // After the board's tour, each of the Osada's places is told on its first
 // visit, step by step (the author: "Samouczek Osady by obejmował wszystko
 // krok po kroku"): the Karczma, the Zaklinaczka, the Pustelnik, the
-// Zielarka, the Targowisko, and the camp's Kwatery once they stand.
+// Zielarka, the Targowisko, the Kuźnia, the Garbarnia, the Stajnia, and
+// the camp's Kwatery once they stand.
 const placesDue = (read) =>
   Boolean(state.character.settlementOpen) &&
   !skillsWaiting(read) &&
@@ -329,7 +330,7 @@ const BEATS = {
   'settlement-board': { place: mark('osada-board'), when: settlementHere },
   'settlement-brotherhoods': { place: mark('osada-board'), when: settlementHere },
   'settlement-ending': {
-    place: ['tavern', 'enchanter', 'hermitage', 'herbalist', 'market'].map((id) => mark(`osada-${id}`)).join(', '),
+    place: ['tavern', 'enchanter', 'hermitage', 'herbalist', 'market', 'forge', 'tannery', 'stable'].map((id) => mark(`osada-${id}`)).join(', '),
     whole: true,
     when: settlementHere,
   },
@@ -349,6 +350,17 @@ const BEATS = {
   'settlement-market-mine': { place: mark('market-tab-mine'), when: onPlace('market') },
   'settlement-market-residents': { place: mark('market-tab-residents'), when: onPlace('market') },
   'settlement-market-company': { place: mark('market-intro'), when: onPlace('market') },
+  // The Kuźnia, the Garbarnia and the Stajnia (the author: "Zrób też
+  // Samouczki analogiczne do reszty lokacji w Osadzie").
+  'settlement-forge-scrolls': { place: mark('forge-scrolls'), when: onPlace('forge') },
+  'settlement-forge-raise': { place: mark('forge-raise'), when: onPlace('forge') },
+  'settlement-forge-relation': { place: mark('resident-card'), when: onPlace('forge') },
+  // The Kup tab rather than its list, which is taller than a phone's screen.
+  'settlement-tannery-buy': { place: mark('tannery-tab-buy'), when: onPlace('tannery') },
+  'settlement-tannery-sell': { place: mark('tannery-tab-sell'), when: onPlace('tannery') },
+  'settlement-tannery-relation': { place: mark('resident-card'), when: onPlace('tannery') },
+  'settlement-stable-mounts': { place: mark('stable-mounts'), when: onPlace('stable') },
+  'settlement-stable-party': { place: mark('stable-mounts'), when: onPlace('stable') },
   'settlement-quarters': { place: mark('quarters-companions'), when: onQuarters },
   // The Ewolucja chapter, after all the others.
   'evolution-welcome': { when: evolutionDue },

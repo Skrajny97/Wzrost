@@ -940,10 +940,10 @@ export function mountSettlement(container, { params = {} } = {}) {
     const raisable = items.some((item) => item.gold !== undefined);
     return h(
       'div',
-      { class: 'stack', 'data-guide': 'forge-services' },
+      { class: 'stack' },
       h(
         'section',
-        { class: 'card stack' },
+        { class: 'card stack', 'data-guide': 'forge-scrolls' },
         h('h2', { class: 'section-title', text: 'Zwoje ochronne' }),
         h('p', {
           class: 'muted',
@@ -959,7 +959,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       ),
       h(
         'section',
-        { class: 'card stack' },
+        { class: 'card stack', 'data-guide': 'forge-raise' },
         h('h2', { class: 'section-title', text: 'Przekucie na wyższą rzadkość' }),
         h('p', {
           class: 'muted',

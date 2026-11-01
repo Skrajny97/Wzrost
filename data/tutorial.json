@@ -661,7 +661,8 @@
       "chapter": "community",
       "text": [
         "U góry przełączasz zakładki: Czat, Znajomi i Ranking. Gildia i Drużyna otworzą się, gdy urośniesz w siłę."
-      ]
+      ],
+      "voice": "audio/narration/community-tabs.mp3"
     },
     {
       "id": "community-rules",
@@ -896,6 +897,70 @@
         "Każdy handel buduje poważanie w Kompanii Kupców. Im jest wyższe, tym więcej ofert wystawisz naraz."
       ],
       "voice": "audio/narration/settlement-market-company.mp3"
+    },
+    {
+      "id": "settlement-forge-scrolls",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Żelisław sprzedaje Zwoje ochronne, najwyżej trzy dziennie. Zwój chroni przedmiot przed rozpadem na Kowadle."
+      ]
+    },
+    {
+      "id": "settlement-forge-raise",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Za złoto i materiały przekuje przedmiot o stopień rzadkości wyżej. Każdy przedmiot tylko raz."
+      ]
+    },
+    {
+      "id": "settlement-forge-relation",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Im lepiej Cię pozna, tym rzadsze przedmioty wykuje. Poważanie w Bractwie Kowali obniży jego ceny."
+      ]
+    },
+    {
+      "id": "settlement-tannery-buy",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Wszebor sprzedaje materiały ze stworów: skóry, łuski, pióra i kły. Przydadzą się, gdy zabraknie Ci czegoś do zlecenia."
+      ]
+    },
+    {
+      "id": "settlement-tannery-sell",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "W zakładce Sprzedaj kupi od Ciebie materiały drożej niż złomiarz. Im lepiej Cię zna, tym więcej płaci."
+      ]
+    },
+    {
+      "id": "settlement-tannery-relation",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Handel z nim buduje też poważanie w Bractwie Łowców, a z każdym stopniem relacji Wszebor ma więcej towaru."
+      ]
+    },
+    {
+      "id": "settlement-stable-mounts",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Mirosław sprzedaje wierzchowce na stałe. Z wierzchowcem wyprawy kończą się szybciej, a łupy są jak za pełny czas."
+      ]
+    },
+    {
+      "id": "settlement-stable-party",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Na wyprawie drużyny wszyscy jadą tempem najwolniejszego wierzchowca."
+      ]
     },
     {
       "id": "settlement-quarters",

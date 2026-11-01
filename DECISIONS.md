@@ -3025,6 +3025,24 @@ Autor: „331 D / 333 A / 334 A / 335 A / 332 A / 330 B” oraz „336 A, reszt�
 2. **336 A.** Skóry od Wszebora zostają w obecnych cenach, także gdy ktoś rozbiera je na Stole rozbiórki na części.
 3. **329.** Zostaje dotychczasowe zachowanie (A): wolne miejsce w wyprawie drużyny zajmuje towarzysz lidera z Kwater.
 
+## Samouczek Kuźni, Garbarni i Stajni (1.11.2026, na wersji testowej)
+
+Autor: „Zrób też Samouczki analogiczne do reszty lokacji w Osadzie”.
+
+1. **Kroki**, jak w pozostałych miejscach Osady, przy pierwszej wizycie po wycieczce po planszy:
+    - Kuźnia: Zwoje ochronne, przekucie na wyższą rzadkość, relacja z Żelisławem i Bractwo Kowali;
+    - Garbarnia: zakładka „Kup”, zakładka „Sprzedaj”, relacja z Wszeborem i Bractwo Łowców;
+    - Stajnia: wierzchowce oraz tempo najwolniejszego wierzchowca w drużynie.
+2. **Ostatnia kwestia wycieczki po planszy** („Zajrzyj też do pozostałych mieszkańców Rozstajów…”) wskazuje teraz także Kuźnię, Garbarnię i Stajnię. Tekst się nie zmienia, więc nagranie zostaje.
+3. **Brakujący szczegół: pierwszy krok Garbarni** wskazuje zakładkę „Kup”, a nie listę towaru. Lista Wszebora jest dłuższa niż ekran telefonu, a pierścień wskazania obejmuje tylko to, co widać.
+4. **Kto usłyszy.** Postać, która była już w tych miejscach, usłyszy ich kwestie przy następnej wizycie, tak jak przy wcześniejszych miejscach Osady.
+5. **Głos.** Teksty czekają na akceptację autora (pytania 347–349). Do tego czasu kroki mają sam tekst, a nagrania powstaną po akceptacji.
+6. **Sprawdzone w przeglądarce** na 390×844, 360×640 i 1280×800: każdy krok ma pierścień na swoim miejscu.
+
+## Odpowiedź autora 337: nagranie kroku o zakładkach (1.11.2026, na wersji testowej)
+
+Autor: „337 A”. Krok Społeczności o zakładkach ma nagranie głosem narratora, w pierwszej z dwóch wersji. Druga wersja czeka w szkicach, gdyby autor wolał ją na słuch.
+
 ## Osada: budynki przodem do drogi (1.11.2026, na wersji testowej)
 
 Autor: „zrób też rotate/odbicia lustrzane budynków tak by byly skierowane ich obrazki w stronę drogi głównej”.
