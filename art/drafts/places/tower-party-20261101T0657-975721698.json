@@ -1,0 +1,28 @@
+{
+  "id": "tower-party",
+  "payload": {
+    "prompt": "pixel art landscape, a colossal fortress tower of dark stone with three massive buttresses and three glowing gates at its base, standing on a rocky hill above an old forest and rising into a stormy sky, its top lost in swirling clouds, ice-blue glowing runes and luminous blue lines running up its walls, torn banners in the wind, terrifying and awe-inspiring, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, greys and blues with ice-blue accents, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 3,
+    "seed": 975721698,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793516292,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 41.75,
+    "request_id": "ae31b0f3-0123-47f2-8b35-0f74b87f6fcc",
+    "outputs_retained_until": 1793602663,
+    "billing": {
+      "source": "balance",
+      "balance_left": 41.75,
+      "balance_charged": 0.54
+    }
+  }
+}

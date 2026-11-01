@@ -1,0 +1,28 @@
+{
+  "id": "tower-solo",
+  "payload": {
+    "prompt": "pixel art landscape, an enormous ancient tower of dark stone rising alone from a black forest into a stormy night sky, so tall that its top vanishes in the clouds, its walls cracked and scarred, thin ice-blue glowing runes and luminous blue lines spiralling up around it, a single narrow lit doorway at its foot, crows circling high above, terrifying and awe-inspiring, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, greys and blues with ice-blue accents, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 3,
+    "seed": 111306460,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793516262,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 42.29,
+    "request_id": "66d14997-8358-4be9-a557-e07d2a47ad94",
+    "outputs_retained_until": 1793602620,
+    "billing": {
+      "source": "balance",
+      "balance_left": 42.29,
+      "balance_charged": 0.54
+    }
+  }
+}
