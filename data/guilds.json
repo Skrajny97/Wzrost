@@ -14,5 +14,66 @@
     "min": 2,
     "max": 4
   },
-  "invites": 10
+  "invites": 10,
+  "beast": {
+    "$comment": "Bestia Gildii (src/engine/guild-beast.js, src/server/guild-beast.js, src/client/guild-beast.js; DECISIONS.md, „Bestia Gildii”). Autor: „344 A”: cotygodniowe polowanie całej gildii na jedną ogromną bestię, bez grania w tym samym czasie. Tydzień jak przy zadaniach tygodniowych: od poniedziałku, od północy czasu polskiego. Bestia to czempion jednego z regionów, losowany z ziarna gildii i tygodnia, na zaokrąglonym średnim poziomie postaci członków z chwili, gdy przychodzi (pierwsze spojrzenie albo atak w tygodniu). HP bestii: członkowie z tej chwili × memberAttacks × damage, tak że memberAttacks typowych ataków jednej postaci (3 dziennie przez 4 dni) zbija 1/członków paska. damage: [poziom bestii, średnie obrażenia jednego ataku], zmierzone typowymi postaciami z tools/simulate.mjs (typicalCharacter): pięć klas, czterech czempionów, po 40 walk na każdą parę; między punktami po prostej, poniżej pierwszego jak w pierwszym, powyżej ostatniego proporcjonalnie do poziomu. attacksPerDay: ataki postaci na dobę (od północy czasu polskiego), osobno od wejść do Wież, liczone na postać, także po zmianie gildii. chests: Skrzynia Bestii dla każdej postaci, która w tygodniu zaatakowała bestię choć raz, jedna na tydzień (po zmianie gildii w tygodniu liczy się najlepsza z jej bestii); liczy się pierwsza skrzynia, której share (część paska zbita przez gildię) bestia osiągnęła, a share 1 to bestia powalona. item: przedmiot klasy postaci, który może ona założyć, na jej poziomie, z rzadkością jak w skrzyni czempiona. materials: ile razy losuje się materiał bestii, każdy raz jak po pokonanym czempionie, na poziomie bestii, co najmniej jedna sztuka. Poniżej najmniejszego share skrzyni nie ma. Skrzynię otwiera się od upadku bestii albo od końca tygodnia, najpóźniej do końca następnego tygodnia. texts: słowa karty Bestii i odpowiedzi gry; {…} wypełnia gra.",
+    "attacksPerDay": 3,
+    "memberAttacks": 12,
+    "damage": [
+      [5, 270], [10, 500], [15, 740], [20, 970], [25, 1380], [30, 1800], [35, 2260], [40, 2640], [45, 3260], [50, 3520],
+      [60, 4350], [70, 5130], [80, 6000], [90, 6800], [100, 7450], [125, 9630], [150, 11680], [200, 15600]
+    ],
+    "chests": [
+      { "share": 1, "item": true, "materials": 4 },
+      { "share": 0.75, "item": false, "materials": 3 },
+      { "share": 0.5, "item": false, "materials": 2 },
+      { "share": 0.25, "item": false, "materials": 1 }
+    ],
+    "texts": {
+      "title": "Bestia Gildii",
+      "lead": "Co tydzień cała gildia poluje na jedną bestię. Obrażenia zostają na jej wspólnym pasku HP.",
+      "rules": [
+        "Bestia to czempion jednej z krain, na średnim poziomie członków gildii. Im więcej członków, tym więcej ma HP.",
+        "Każda postać atakuje {attacks} razy dziennie, osobno od wejść do Wież. Nowe ataki przychodzą o północy.",
+        "Atak to jedna walka z pełnym HP i bez mikstur, z wynikiem od razu. Nie daje XP, złota ani łupów. W czasie wyprawy i przed odebraniem jej raportu bestia czeka.",
+        "Bestia zostaje do niedzieli, do północy. W poniedziałek przychodzi nowa.",
+        "Każda postać, która choć raz zaatakuje bestię, dostaje Skrzynię Bestii. Gdy bestia padnie, w skrzyni czeka przedmiot klasy postaci na jej poziomie i materiały bestii.",
+        "Gdy bestia przetrwa tydzień, w skrzyni są same materiały: tym więcej, im więcej paska zbiła gildia (od 25, 50 i 75%). Poniżej 25% skrzyni nie ma.",
+        "Skrzynię otworzysz od upadku bestii albo od końca tygodnia, najpóźniej do końca następnego tygodnia."
+      ],
+      "level": "poz. {level}",
+      "attacksLeft": "Ataki na dziś: {left} z {perDay}",
+      "newAttacks": "Nowe o północy.",
+      "attackForms": ["atak", "ataki", "ataków"],
+      "attack": "Atakuj",
+      "lastAttack": "Ostatni atak zabrał bestii {damage} HP.",
+      "fell": "Bestia pada!",
+      "fallen": "Bestia padła {at}.",
+      "lastBlow": "Ostatni cios: {name}.",
+      "until": "Bestia zostaje do niedzieli, do północy.",
+      "exploring": "Postać jest na wyprawie. Bestia poczeka na jej powrót.",
+      "claimFirst": "Wyprawa się skończyła. Odbierz raport w Walce, a potem atakuj.",
+      "log": "Przebieg walki",
+      "contribution": "Wkład tygodnia",
+      "noHits": "Bestia czeka na pierwszy atak.",
+      "own": "Twój wkład: {damage} HP.",
+      "chestTitle": "Skrzynia Bestii",
+      "chestFallen": "Tydzień {week}: bestia padła. W środku przedmiot Twojej klasy i materiały bestii.",
+      "chestShare": "Tydzień {week}: gildia zbiła {share}% paska. W środku materiały bestii.",
+      "chestUntil": "Otworzysz ją do {until}.",
+      "open": "Otwórz skrzynię",
+      "opened": "Skrzynia Bestii otwarta. W środku: {contents}.",
+      "noGuild": "Na Bestię Gildii poluje cała gildia. Dołącz do gildii albo załóż własną.",
+      "errors": {
+        "locked": "Gildie odblokujesz na poziomie postaci {level}.",
+        "noGuild": "Nie należysz do gildii.",
+        "fallen": "Bestia już padła. Nowa przyjdzie w poniedziałek.",
+        "noAttacks": "Ataki na dziś się skończyły. Nowe od północy.",
+        "raced": "Bestia albo postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.",
+        "noChest": "Nie ma takiej skrzyni do otwarcia.",
+        "claimed": "Ta skrzynia jest już otwarta.",
+        "bagFull": "Plecak jest pełny. Zrób w nim miejsce, żeby otworzyć skrzynię."
+      }
+    }
+  }
 }

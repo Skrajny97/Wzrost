@@ -9863,3 +9863,153 @@ a.profession-square:active {
 .guild-tag-input {
   text-transform: uppercase;
 }
+
+/* The Bestia Gildii (guild-beast.js): its card on the Gildia's page, the
+   champion in the blood red of its frame in fights, its HP bar thicker. */
+.guild-beast p {
+  margin: 0;
+}
+
+.guild-beast .how-more > p + p {
+  margin-top: 6px;
+}
+
+.guild-beast-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.guild-beast-art {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border: 1px solid #e8414d;
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+
+.guild-beast-art .sprite {
+  width: 96px;
+  height: 96px;
+}
+
+.guild-beast-who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.guild-beast-name {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.guild-beast-meta {
+  color: #e8414d;
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.guild-beast-hp .meter-label {
+  font-size: 12px;
+}
+
+.guild-beast-hp .meter-track,
+.guild-beast-hp .meter-fill {
+  height: 12px;
+}
+
+.guild-beast-attacks {
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.guild-beast-fallen,
+.guild-beast-opened {
+  color: var(--accent);
+}
+
+.guild-beast-waiting {
+  color: var(--danger);
+}
+
+.guild-beast-subtitle {
+  margin: 8px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.guild-beast-own {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.guild-beast-log ol {
+  max-height: 240px;
+  margin: 0;
+  padding-left: 22px;
+  overflow-y: auto;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.guild-beast-chests {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.guild-beast-chest {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+
+.guild-beast-ranking {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guild-beast-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.guild-beast-row + .guild-beast-row {
+  border-top: 1px solid var(--line);
+}
+
+.guild-beast-row-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.guild-beast-row--own .guild-beast-row-name {
+  color: var(--system-text);
+  font-weight: 700;
+}
+
+.guild-beast-row-damage {
+  flex: none;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}

@@ -16,6 +16,7 @@ import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFri
 import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
 import { enterTower, getTowers } from './towers.js';
 import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, setGuildRole } from './guilds.js';
+import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-beast.js';
 import { craftMaterials, salvageItem, sellMaterials, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
@@ -220,6 +221,10 @@ const routes = [
   ['POST', '/api/guild/kick', kickFromGuild],
   ['POST', '/api/guild/role', setGuildRole],
   ['POST', '/api/guild/lead', handGuildLead],
+  // The Bestia Gildii (guild-beast.js).
+  ['GET', '/api/guild/beast', getGuildBeast],
+  ['POST', '/api/guild/beast/attack', attackGuildBeast],
+  ['POST', '/api/guild/beast/claim', claimGuildBeastChest],
   ['POST', '/api/towers/enter', enterTower],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],
