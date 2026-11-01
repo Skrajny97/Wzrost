@@ -2996,6 +2996,14 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Odpowiedź autora 365: etapy od razu w grze (1.11.2026)
+
+Autor: „to co na testowym dawaj na main od razu, bo nie chce mi sie używać testowego” i „365 A”.
+
+1. **Od razu do gry.** Każdy skończony etap trafia do gry zaraz po pełnych testach i przejściu wprowadzenia nową postacią w przeglądarce, na telefonie i na komputerze, bez czekania na komendę autora. Zastępuje to zasadę wdrożeń tylko na komendę autora. Zasada jest też w `CLAUDE.md`.
+2. **Wersja testowa** dalej dostaje każdą zmianę, ale autor nie musi jej używać.
+3. **Notatki** (DECISIONS, `CLAUDE.md`, opisy grafik) nie są etapem i nie podnoszą numeru wersji. Trafiają do gry z najbliższym etapem.
+
 ## Wersja 0.0.78 (1.11.2026)
 
 Autor: „co stoi na testowym a co na main? to co na testowym dawaj na main od razu, bo nie chce mi sie używać testowego”.
