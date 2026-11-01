@@ -1,0 +1,31 @@
+{
+  "id": "steed",
+  "payload": {
+    "prompt": "a tall noble black warhorse with a long flowing mane and tail and white feathering above the hooves, a fine dark leather saddle with silver fittings and stirrups over a deep blue saddle cloth with silver trim, a bridle with silver studs and reins lying on its neck, standing proudly, seen exactly from the side in profile facing right, full body from the ears to the hooves, all four legs visible",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 160,
+    "height": 128,
+    "num_images": 3,
+    "seed": 215058696,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793553717,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 35.15,
+    "request_id": "464b249a-193d-4742-9c26-18f0172d9ba8",
+    "outputs_retained_until": 1793640060,
+    "output_url_expires_at": 1793554617,
+    "billing": {
+      "source": "balance",
+      "balance_left": 35.15,
+      "balance_charged": 0.54
+    }
+  }
+}

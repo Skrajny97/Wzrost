@@ -1,0 +1,30 @@
+{
+  "id": "pony",
+  "payload": {
+    "prompt": "a sturdy small pony with a brown and white patched coat, a thick shaggy dark mane and tail, short strong legs, a simple worn brown leather saddle over a woollen blanket, a plain leather bridle with reins lying on its neck, standing calmly, seen exactly from the side in profile facing right, full body from the ears to the hooves, all four legs visible",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 120,
+    "height": 96,
+    "num_images": 3,
+    "seed": 291907217,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793553611,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 36.23,
+    "request_id": "dc8f8d77-7b3f-4537-8efc-11e87a99e6ed",
+    "outputs_retained_until": 1793639881,
+    "billing": {
+      "source": "balance",
+      "balance_left": 36.23,
+      "balance_charged": 0.54
+    }
+  }
+}

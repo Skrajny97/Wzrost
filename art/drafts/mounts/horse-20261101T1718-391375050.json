@@ -1,0 +1,30 @@
+{
+  "id": "horse",
+  "payload": {
+    "prompt": "a strong bay riding horse with a reddish brown coat, a black mane, tail and lower legs, a sturdy brown leather saddle with stirrups over a dark red saddle cloth, a leather bridle with reins lying on its neck, standing calmly, seen exactly from the side in profile facing right, full body from the ears to the hooves, all four legs visible",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 144,
+    "height": 112,
+    "num_images": 3,
+    "seed": 391375050,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793553659,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 35.69,
+    "request_id": "b421d816-50dc-41a2-9459-681d02f3bbd5",
+    "outputs_retained_until": 1793640015,
+    "billing": {
+      "source": "balance",
+      "balance_left": 35.69,
+      "balance_charged": 0.54
+    }
+  }
+}
