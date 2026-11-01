@@ -5,9 +5,12 @@
 // Drużyna), with its report at once; the entries of a day are counted
 // together for both towers, from midnight in Poland. The climb does not
 // keep the character from anything (the author: "wspinaczka nie zajmuje
-// postaci"): it goes in also while it is away on an exploration or a work,
-// at full HP and with no potions, and its HP stays as it was, unless a new
-// level heals it. A win pays as a fight of an exploration and writes the
+// postaci"): it goes in also while it works in a profession, at full HP and
+// with no potions, and its HP stays as it was, unless a new level heals it.
+// Not while it is on an exploration, nor before its report is claimed: the
+// report is made with the character as it is then (the author: "by nie
+// można było robić natychmiastowych Wież w trakcie Wypraw (bo może to
+// zmienić stan Postaci przed ukończeniem Wyprawy)"). A win pays as a fight of an exploration and writes the
 // creatures into the Bestiariusz; a floor of every chestEvery won the
 // first time in a tower brings the tower's chest. Everything is saved in
 // one batch only while the character is as read (atomic.js).
@@ -34,7 +37,7 @@ import {
   trophyBonuses,
 } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
-import { bagPlaces, characterView, engineCharacter, equippedItems, loadCharacter, loadPlayer, questsNow, requirePlayer } from './characters.js';
+import { bagPlaces, characterView, engineCharacter, equippedItems, loadCharacter, loadPlayer, questsNow, requireNotExploring, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
@@ -132,6 +135,7 @@ export async function enterTower(context) {
   requireUnlocked(row);
   const db = context.env.DB;
   const now = context.now;
+  requireNotExploring(player, now);
   const body = await readJson(context.request);
   const tower = rules().towers.find((one) => one.id === body.tower);
   if (!tower) throw new ApiError(400, 'invalid_tower', 'Wybierz wieżę.');

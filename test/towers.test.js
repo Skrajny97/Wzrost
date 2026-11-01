@@ -3,7 +3,7 @@
 // elites and champions on the fifth and tenth floors, the top open to a
 // party; an entry's fight and its pay; and the towers through the API,
 // from level 50, with the entries of a day, the chest of a tenth floor
-// once, the Wieża Drużyn with a Drużyna, also while the character is away.
+// once, the Wieża Drużyn with a Drużyna, never on an exploration.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -179,12 +179,19 @@ describe('the Wieże through the API', () => {
     assert.ok(entered.data.report.fights[0].allies.some((unit) => unit.name === 'Druh'));
   });
 
-  test('the climb does not wait for the character: it goes in while away on an exploration, and its HP stays', async () => {
+  test('no climb on an exploration or before its report: the report is made with the character as it is then', async () => {
     assert.equal((await as('wspinacz', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
-    const before = await (await db()).prepare('SELECT hp, hp_at FROM characters').first();
+    assert.equal((await enter('wspinacz', { tower: 'solo', floor: 2 })).data.error.code, 'busy');
+    await (await db()).prepare('UPDATE activities SET started_at = started_at - 300000, ends_at = ends_at - 300000').run();
+    assert.equal((await enter('wspinacz', { tower: 'solo', floor: 2 })).data.error.code, 'claim_first');
+    let claimed = await as('wspinacz', 'POST', '/api/hunts/claim');
+    if (claimed.data.event) claimed = await as('wspinacz', 'POST', '/api/hunts/claim', { choice: claimed.data.event.options[0].id });
+    assert.equal(claimed.status, 200);
+    // Home again: in it goes, and its HP stays.
+    const before = await (await db()).prepare('SELECT hp, hp_at, level FROM characters').first();
     const entered = await enter('wspinacz', { tower: 'solo', floor: 2 });
     assert.equal(entered.status, 200, JSON.stringify(entered.data).slice(0, 300));
-    const after = await (await db()).prepare('SELECT hp, hp_at FROM characters').first();
-    if (entered.data.report.summary.levelAfter === 60) assert.deepEqual(after, before);
+    const after = await (await db()).prepare('SELECT hp, hp_at, level FROM characters').first();
+    if (after.level === before.level) assert.deepEqual(after, before);
   });
 });

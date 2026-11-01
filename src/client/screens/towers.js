@@ -3,13 +3,14 @@
 // picked with the slider or − and +; the card shows its inner region, its
 // level and what waits there (an elite, a champion, the tower's chest not
 // taken yet), who climbs beside the character in the Wieża Drużyn, and
-// "Wejdź", whose report opens at once. The floor picked is remembered on
-// this device.
+// "Wejdź", whose report opens at once. While the character is on an
+// exploration, or its report waits, the towers wait for it (towers.js). The
+// floor picked is remembered on this device.
 
 import { areaArt } from '../area-art.js';
 import { fill, h } from '../dom.js';
 import { formatNumber } from '../format.js';
-import { call, isUnlocked, reportCache, state, unlockInfo } from '../state.js';
+import { activityFinished, call, isUnlocked, reportCache, state, unlockInfo } from '../state.js';
 import { lockLabel, systemPanel, withButton } from '../ui.js';
 
 const PICKS_KEY = 'insight.towerFloors';
@@ -79,11 +80,22 @@ export function mountTowers(container, { navigate }) {
         h('p', { class: 'towers-entries', text: `Wejścia na dziś: ${view.left} z ${view.perDay}. Nowe od północy.` }),
         h('p', {
           class: 'muted',
-          text: `Wejście to jedna walka na wybranym piętrze, z wynikiem od razu. Postać walczy z pełnym HP i bez mikstur, a Wieże nie przerywają wyprawy ani pracy. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. Co ${view.eliteEvery}. piętro czeka elita, co ${view.championEvery}. czempion, a co ${view.chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży.`,
+          text: `Wejście to jedna walka na wybranym piętrze, z wynikiem od razu. Postać walczy z pełnym HP i bez mikstur. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. Co ${view.eliteEvery}. piętro czeka elita, co ${view.championEvery}. czempion, a co ${view.chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży.`,
         }),
       ),
+      exploring() && systemPanel(exploring()),
       view.towers.map(towerCard),
     );
+  }
+
+  // Why the towers wait: an exploration under way, or its report to claim;
+  // null when the character may go in.
+  function exploring() {
+    const activity = state.character.activity;
+    if (activity?.kind !== 'hunt') return null;
+    return activityFinished(activity)
+      ? 'Wyprawa się skończyła. Odbierz raport w Walce, a potem wejdź do Wieży.'
+      : 'Postać jest na wyprawie. Wieże poczekają na jej powrót, bo raport z wyprawy liczy się z postacią taką, jaka jest na jej końcu.';
   }
 
   // The floor a tower's card starts at: the one picked before, else the
@@ -106,7 +118,7 @@ export function mountTowers(container, { navigate }) {
     const enter = h('button', {
       type: 'button',
       class: 'button button--system',
-      disabled: view.left === 0 || Boolean(tower.missing),
+      disabled: view.left === 0 || Boolean(tower.missing) || Boolean(exploring()),
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           const { report } = await call('POST', '/api/towers/enter', { tower: tower.id, floor });
@@ -173,6 +185,11 @@ export function mountTowers(container, { navigate }) {
     .catch((error) => show(error.message ?? 'Nie udało się wczytać Wież.'));
 
   return {
+    // The character changed (an exploration began or its report was
+    // claimed): the cards again, as they are now.
+    update() {
+      if (view) show();
+    },
     unmount() {
       gone = true;
     },
