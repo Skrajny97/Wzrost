@@ -3,7 +3,8 @@
 # same limbs and colours) sitting astride a saddle that is not drawn, seen
 # from the side and facing right, both hands in front holding the reins.
 # Only the near leg shows: the mount covers the far one. One frame of
-# 128 x 128 on a flat background (Retro Diffusion takes an RGB picture), and
+# 64 x 96 on a flat background (Retro Diffusion takes an RGB picture; on a
+# roomier 128 x 128 it drew some riders half as big again), and
 # the point the rider sits on (the hip, `seat`), which goes on the mount's
 # saddle when the riding frames are put together (tools/ride-sheets.py).
 # Needs Python 3 and Pillow:
@@ -13,7 +14,7 @@ from PIL import Image, ImageDraw
 
 OUT = sys.argv[1]
 JOINTS = sys.argv[2] if len(sys.argv) > 2 else None
-S = 128
+W, H = 64, 96
 BG = (214, 210, 200)
 OUTLINE = (38, 38, 44)
 NEAR = (206, 206, 210)
@@ -27,7 +28,7 @@ THIGH, SHIN, FOOT = round(26 * R), round(25 * R), round(12 * R)
 UPPER, FORE = round(19 * R), round(17 * R)
 TORSO = round(32 * R)
 HEAD_R = round(8 * R)
-HIP = (56, 76)
+HIP = (18, 56)
 LEAN = 8
 
 # Angles in degrees from straight down, positive = forward (to the right).
@@ -110,7 +111,7 @@ neck = point(hx, hy, 180 - LEAN, TORSO)
 shoulder = (neck[0] - 1, neck[1] + 4)
 head = (neck[0] + 1, neck[1] - HEAD_R - 1)
 
-im = Image.new('RGB', (S, S), BG)
+im = Image.new('RGB', (W, H), BG)
 d = ImageDraw.Draw(im)
 draw_layer(d, arm_shapes(arm(shoulder[0] + 2, shoulder[1], *FAR_ARM), 5), FAR)
 top = (neck[0], neck[1] + 2)
@@ -127,5 +128,5 @@ draw_layer(d, arm_shapes(arm(*shoulder, *NEAR_ARM), 6), NEAR)
 im.save(OUT)
 if JOINTS:
     with open(JOINTS, 'w', encoding='utf8') as file:
-        json.dump({'size': S, 'seat': [hx, hy + 3]}, file, indent=1)
+        json.dump({'size': [W, H], 'seat': [hx, hy + 3]}, file, indent=1)
         file.write('\n')

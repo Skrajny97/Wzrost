@@ -789,8 +789,8 @@
   "riders": {
     "$comment": "Jeźdźcy na wierzchowcach (scena Walki z wierzchowcem): szkielet jazdy (manekin chodów pomniejszony, okrakiem w siodle, którego nie widać, obie ręce z przodu na wodzach, widać tylko bliższą nogę) rysuje tools/ride-skeleton.py, a Retro Diffusion (rd_pro__edit) ubiera go w postać z portretu. Jeden jeździec na postać pasuje do każdego wierzchowca; tools/ride-sheets.py sadza go w siodle każdej klatki kłusa. Kolory skóry później, jak przy chodach.",
     "style": "rd_pro__edit",
-    "width": 128,
-    "height": 128,
+    "width": 64,
+    "height": 96,
     "startFrame": "art/references/riders/skeleton.png",
     "prompts": {
       "inquisitor-male": { "prompt": "Redraw the grey mannequin as a stern young man with short black hair, a long dark crimson coat over a black cassock, a silver holy symbol on a heavy chain and a flanged iron mace hanging at his belt, the character from the reference picture, sitting astride and riding, both hands in front holding the reins, seen from the side, facing right. Keep the pose, size and place of the mannequin exactly, nothing under the rider, a plain flat background.", "references": ["src/client/art/portraits/inquisitor-male.png"] },
