@@ -21,6 +21,8 @@ import sys
 
 from PIL import Image
 
+# walk-tones.py is loaded as a module; no __pycache__ left in tools/.
+sys.dont_write_bytecode = True
 spec = importlib.util.spec_from_file_location('walk_tones', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'walk-tones.py'))
 walk = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(walk)
