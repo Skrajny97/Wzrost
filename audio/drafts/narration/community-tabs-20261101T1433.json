@@ -1,0 +1,17 @@
+{
+  "id": "community-tabs",
+  "payload": {
+    "text": "U góry przełączasz zakładki: Czat, Znajomi i Ranking. Gildia i Drużyna otworzą się, gdy urośniesz w siłę. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/community-tabs-20261101T1433-0.mp3",
+    "audio/drafts/narration/community-tabs-20261101T1433-1.mp3"
+  ],
+  "credits": 228
+}
