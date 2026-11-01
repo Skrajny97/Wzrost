@@ -145,17 +145,12 @@ function firstSection(sections) {
   return open.includes(kept) ? kept : open[0];
 }
 
-// The bar with the part shown and the list it unfolds; a tap outside folds
-// it again. The parts still to come cannot be picked yet.
+// The parts as a row of tabs scrolling sideways, each with its light of
+// news, one tap away (the author: 321 A, instead of a list to unfold), and
+// the bell muting the chat's light beside them. The parts still to come
+// cannot be picked yet.
 function sectionPicker(sections, current, choose) {
-  const list = h('ul', { class: 'community-sections', id: 'community-sections', hidden: true });
-  const toggle = h('button', {
-    type: 'button',
-    class: 'community-toggle',
-    'aria-expanded': 'false',
-    'aria-controls': 'community-sections',
-    onClick: () => unfold(list.hidden),
-  });
+  const tabs = h('div', { class: 'community-tabs', role: 'tablist', 'aria-label': 'Części Społeczności' });
   const bell = h('button', {
     type: 'button',
     class: 'community-bell',
@@ -166,12 +161,7 @@ function sectionPicker(sections, current, choose) {
     },
   });
   const bar = h('div', { class: 'community-bar' });
-  const element = h('div', { class: 'community-picker' }, h('div', { class: 'community-picker-row' }, toggle, bell, list), bar);
-
-  function unfold(open) {
-    list.hidden = !open;
-    toggle.setAttribute('aria-expanded', String(open));
-  }
+  const element = h('div', { class: 'community-picker' }, h('div', { class: 'community-picker-row' }, tabs, bell), bar);
 
   const label = (section) => [
     icon(SECTION_ICONS[section.id] ?? 'unknown', { size: 20, className: 'community-icon' }),
@@ -182,36 +172,27 @@ function sectionPicker(sections, current, choose) {
 
   function render() {
     const shown = sections.find((section) => section.id === current());
-    const elsewhere = sections.some((section) => section.id !== shown.id && SECTION_NEWS[section.id]?.());
     fill(
-      toggle,
-      label(shown),
-      elsewhere && h('span', { class: 'community-dot community-dot--elsewhere', role: 'img', 'aria-label': 'nowe w innej części' }),
-      icon('chevron', { size: 18, className: 'community-chevron' }),
-    );
-    fill(
-      list,
+      tabs,
       sections.map((section) =>
         h(
-          'li',
-          {},
-          h(
-            'button',
-            {
-              type: 'button',
-              class: 'community-section',
-              disabled: Boolean(section.soon),
-              'aria-current': section.id === shown.id ? 'true' : undefined,
-              onClick: () => {
-                unfold(false);
-                if (section.id !== current()) choose(section.id);
-              },
+          'button',
+          {
+            type: 'button',
+            role: 'tab',
+            class: 'community-tab',
+            disabled: Boolean(section.soon),
+            'aria-selected': String(section.id === shown.id),
+            onClick: () => {
+              if (section.id !== current()) choose(section.id);
             },
-            label(section),
-          ),
+          },
+          label(section),
         ),
       ),
     );
+    // The part shown stays in sight in the row.
+    tabs.querySelector('[aria-selected="true"]')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     const muted = chatMuted();
     bell.hidden = shown.id !== 'chat';
     bell.setAttribute('aria-pressed', String(muted));
@@ -220,17 +201,12 @@ function sectionPicker(sections, current, choose) {
     fill(bell, icon(muted ? 'bell-off' : 'bell', { size: 20 }));
   }
 
-  const outside = (event) => {
-    if (!list.hidden && !element.contains(event.target)) unfold(false);
-  };
-  document.addEventListener('pointerdown', outside);
   const stop = onChatNews(render);
   return {
     element,
     bar,
     render,
     unmount() {
-      document.removeEventListener('pointerdown', outside);
       stop();
     },
   };

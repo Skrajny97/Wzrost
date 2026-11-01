@@ -784,7 +784,13 @@ function closeCard() {
 
 // The places of a line drawn on the screen now.
 function places(line) {
-  return [...document.querySelectorAll(BEATS[line.id].place)].filter((element) => !element.hidden && element.getClientRects().length > 0);
+  const found = [...document.querySelectorAll(BEATS[line.id].place)];
+  // A place folded under "Jak to działa?" (ui.js, howItWorks) opens for him.
+  for (const element of found) {
+    const folded = element.closest('details:not([open])');
+    if (folded) folded.open = true;
+  }
+  return found.filter((element) => !element.hidden && element.getClientRects().length > 0);
 }
 
 // A place the player can see and tap: on the screen and not under a bar that

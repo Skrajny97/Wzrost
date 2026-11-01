@@ -19,7 +19,7 @@ import { workScene } from '../scenes.js';
 import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
-import { confirmAction, systemPanel, toast, withButton } from '../ui.js';
+import { confirmAction, howItWorks, splitLead, systemPanel, toast, withButton } from '../ui.js';
 import { findMark, itemSummary } from './character.js';
 import { lockedScreen } from './locked.js';
 
@@ -215,7 +215,9 @@ export function mountProfessions(container, { params, navigate }) {
       return;
     }
     // The System's words over the squares, which the narrator points at.
-    const intro = character.professions.intro && systemPanel(character.professions.intro);
+    // Its first sentence, the rest under "Jak to działa?" (315 A).
+    const [lead, rest] = splitLead(character.professions.intro ?? '');
+    const intro = character.professions.intro && systemPanel(rest ? howItWorks(lead, rest, { system: true }) : lead);
     if (intro) intro.dataset.guide = 'professions-intro';
     fill(
       container,

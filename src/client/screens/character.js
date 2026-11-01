@@ -11,8 +11,9 @@ import { formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise,
 import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { portrait } from '../portraits.js';
 import { playSound } from '../sound.js';
-import { call, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
-import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
+import { call, costShortfall, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
+import { scrapperSheet } from '../scrapper.js';
+import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemLink, systemPanel, toast, withButton } from '../ui.js';
 
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 
@@ -132,7 +133,7 @@ export function mountCharacter(container) {
       // What works on the character now, over its figure (the author).
       bonusList(character),
       h('div', { class: 'portrait-wrap' }, frame),
-      systemPanel(characterMessage(character, busy)),
+      systemPanel(...characterMessage(character, busy)),
       bagSection(character.bag),
     );
   }
@@ -210,7 +211,14 @@ export function mountCharacter(container) {
     return h(
       'section',
       { class: 'bag', 'aria-labelledby': 'bag-title' },
-      h('h2', { class: 'section-title', id: 'bag-title' }, 'Plecak ', count),
+      h(
+        'div',
+        { class: 'bag-head' },
+        h('h2', { class: 'section-title', id: 'bag-title' }, 'Plecak ', count),
+        // The scrapper's sale by the handful, without going to the camp (320 A).
+        bag.some((item) => !(item.upgrade > 0)) &&
+          h('button', { type: 'button', class: 'button button--world button--small bag-sell', text: 'Sprzedaj zbędne', onClick: scrapperSheet }),
+      ),
       h(
         'div',
         { class: 'segmented bag-tabs', role: 'group', 'aria-label': 'Zawartość plecaka' },
@@ -737,7 +745,7 @@ function anvilSection(item, busy, open = false) {
       anvil.cap === 0
         ? 'Zbuduj Kowadło w obozie, żeby ulepszać przedmioty.'
         : `Kowadło na poziomie ${anvil.cap} ulepsza do +${anvil.cap}. Rozbuduj je w obozie, żeby iść wyżej.`;
-    return h('div', { class: 'compare' }, title, h('p', { class: 'system-hint', text: hint }));
+    return h('div', { class: 'compare' }, title, h('p', { class: 'system-hint', text: hint }), h('a', { class: 'link-button', href: '#/oboz/anvil', onClick: closeSheet, text: 'Przejdź do Kowadła' }));
   }
   const have = Object.fromEntries(walletEntries().map((entry) => [entry.id, entry]));
   const short = Object.entries(next.cost).some(([resource, amount]) => (have[resource]?.amount ?? 0) < amount);
@@ -851,7 +859,7 @@ function anvilSection(item, busy, open = false) {
       class: 'button button--system',
       disabled: busy || missing,
       onClick: upgrade,
-      text: short ? 'Brakuje złota albo rudy żelaza' : missing ? 'Brakuje materiału' : `Ulepsz do +${next.level}`,
+      text: short ? `Brakuje: ${costShortfall(next.cost).join(', ')}` : missing ? 'Brakuje materiału' : `Ulepsz do +${next.level}`,
     }),
   );
   if (open) return full;
@@ -860,13 +868,7 @@ function anvilSection(item, busy, open = false) {
   // czego brakuje jeśli nie da się ulepszyć").
   const nearest = need && !chosen ? ((state.character.crafting?.materials ?? []).filter((material) => material.rarity === need.rarity).sort((a, b) => b.count - a.count)[0] ?? null) : null;
   const rarityName = need ? (state.content.rarities.find((rarity) => rarity.id === need.rarity)?.name ?? need.rarity) : '';
-  const lacking = [
-    ...Object.entries(next.cost).map(([resource, amount]) => {
-      const short = amount - (have[resource]?.amount ?? 0);
-      return short > 0 && `${formatNumber(short)} ${COST_GENITIVES[resource] ?? (have[resource]?.name ?? resource).toLowerCase()}`;
-    }),
-    need && !chosen && `${formatNumber(need.count - (nearest?.count ?? 0))} szt. materiału (${rarityName})`,
-  ].filter(Boolean);
+  const lacking = [...costShortfall(next.cost), need && !chosen && `${formatNumber(need.count - (nearest?.count ?? 0))} szt. materiału (${rarityName})`].filter(Boolean);
   const note = h('p', { class: 'region-warning', role: 'status', hidden: true });
   const folded = h(
     'div',
@@ -892,8 +894,6 @@ function anvilSection(item, busy, open = false) {
   return folded;
 }
 
-// The Kowadło's costs after "Brakuje", in the genitive.
-const COST_GENITIVES = { gold: 'złota', 'iron-ore': 'rudy żelaza' };
 
 // The combat values an item changes, named as on the stats screen, with
 // their units; a resistance ("resist.fire") is named by its element.
@@ -973,12 +973,16 @@ export function itemDetails(item, { small = false } = {}) {
   );
 }
 
+// The System's words over the bag, with the way to where they point.
 function characterMessage(character, busy) {
-  if (busy) return busyText(character);
+  if (busy) return [busyText(character)];
   if (character.freePoints > 0 && isUnlocked('stats')) {
-    return `Masz ${formatNumber(character.freePoints)} ${plural(character.freePoints, 'wolny punkt', 'wolne punkty', 'wolnych punktów')} statystyk. Rozdziel je w Statystykach.`;
+    return [
+      `Masz ${formatNumber(character.freePoints)} ${plural(character.freePoints, 'wolny punkt', 'wolne punkty', 'wolnych punktów')} statystyk. Rozdziel je w Statystykach.`,
+      systemLink('#/postac/statystyki', 'Rozdziel punkty'),
+    ];
   }
-  return `Doświadczenie: ${formatNumber(character.xp)} / ${formatNumber(character.xpToNext)}. Do poziomu ${
-    character.level + 1
-  } zostało ok. ${formatHours(character.hoursToNext)} eksploracji.`;
+  return [
+    `Doświadczenie: ${formatNumber(character.xp)} / ${formatNumber(character.xpToNext)}. Do poziomu ${character.level + 1} zostało ok. ${formatHours(character.hoursToNext)} eksploracji.`,
+  ];
 }

@@ -11,7 +11,7 @@ import { materialIcon } from '../craft-table.js';
 import { h, icon } from '../dom.js';
 import { countOf, formatDecimal, formatNumber } from '../format.js';
 import { call, serverNow, state } from '../state.js';
-import { closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from '../ui.js';
+import { closeSheet, confirmAction, howItWorks, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { compareTable, itemSummary } from './character.js';
 
 const TABS = [
@@ -480,7 +480,8 @@ export function mountMarket(holder) {
             ]
           : wanderer.startsAt > serverNow()
             ? h('p', { class: 'muted' }, 'Przychodzi raz w tygodniu na jeden dzień. Będzie za ', clock(wanderer.startsAt), '.')
-            : h('p', { class: 'muted', text: 'W tym tygodniu już był. Przyjdzie w następnym.' }),
+            // The author's words (1.11.2026).
+            : h('p', { class: 'muted', text: 'W tym tygodniu już go tu nie uświadczysz. Wyczekuj w kolejnym.' }),
       ),
     ];
   }
@@ -535,8 +536,10 @@ export function mountMarket(holder) {
         h(
           'section',
           { class: 'card market-intro', 'data-guide': 'market-intro' },
-          h('p', { text: `Licytacja trwa ${market.hours} godziny. Przebity gracz od razu dostaje złoto z powrotem, a Targowisko bierze ${Math.round(market.fee * 100)}% ceny sprzedaży.` }),
-          h('p', { class: 'muted', text: `Handel daje reputację Kompanii Kupców, dziś ${market.trade.today} z ${market.trade.daily} pkt. Postacie z jednego konta nie kupują od siebie.` }),
+          howItWorks(`Licytacja trwa ${market.hours} godziny.`, [
+            `Przebity gracz od razu dostaje złoto z powrotem, a Targowisko bierze ${Math.round(market.fee * 100)}% ceny sprzedaży.`,
+            `Handel daje reputację Kompanii Kupców, dziś ${market.trade.today} z ${market.trade.daily} pkt. Postacie z jednego konta nie kupują od siebie.`,
+          ]),
         ),
         h(
           'div',

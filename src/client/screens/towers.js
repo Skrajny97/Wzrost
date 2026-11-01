@@ -14,7 +14,7 @@ import { placeArt } from '../art.js';
 import { fill, h } from '../dom.js';
 import { formatNumber } from '../format.js';
 import { activityFinished, call, isUnlocked, reportCache, state, unlockInfo } from '../state.js';
-import { lockLabel, systemPanel, withButton } from '../ui.js';
+import { howItWorks, lockLabel, systemLink, systemPanel, withButton } from '../ui.js';
 
 const PICKS_KEY = 'insight.towerFloors';
 
@@ -81,12 +81,12 @@ export function mountTowers(container, { navigate }) {
         'section',
         { class: 'card towers-intro' },
         h('p', { class: 'towers-entries', text: `Wejścia na dziś: ${view.left} z ${view.perDay}. Nowe od północy.` }),
-        h('p', {
-          class: 'muted',
-          text: `Wejście to jedna walka na wybranym piętrze, z wynikiem od razu. Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. Co ${view.eliteEvery}. piętro czeka elita, co ${view.championEvery}. czempion, a co ${view.chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży.`,
-        }),
+        howItWorks(
+          'Wejście to jedna walka na wybranym piętrze, z wynikiem od razu.',
+          `Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. Co ${view.eliteEvery}. piętro czeka elita, co ${view.championEvery}. czempion, a co ${view.chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży.`,
+        ),
       ),
-      exploring() && systemPanel(exploring()),
+      exploring() && systemPanel(exploring(), activityFinished(state.character.activity) && systemLink('#/walka', 'Odbierz raport')),
       view.towers.map(towerCard),
     );
   }

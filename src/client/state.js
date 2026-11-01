@@ -2,6 +2,7 @@
 // the character as the server last described it, and the server clock.
 
 import { ApiError, request } from './api.js';
+import { formatNumber } from './format.js';
 
 export const state = {
   user: null,
@@ -109,9 +110,19 @@ export const restRate = (character = state.character) => character.regen?.change
 
 // Gold and the camp's materials, with their names, in the order to show them.
 export const walletEntries = (character = state.character) => [
-  { id: 'gold', name: 'Złoto', amount: character.gold },
-  ...state.content.resources.map((resource) => ({ id: resource.id, name: resource.name, amount: character.resources[resource.id] ?? 0 })),
+  { id: 'gold', name: 'Złoto', genitive: 'złota', amount: character.gold },
+  ...state.content.resources.map((resource) => ({ id: resource.id, name: resource.name, genitive: resource.genitive, amount: character.resources[resource.id] ?? 0 })),
 ];
+
+// What a cost lacks of what the character has, as "199 drewna", for "Brakuje:
+// …" on a button or under it (the author: buttons say what is missing, 311).
+export function costShortfall(cost, character = state.character) {
+  const wallet = Object.fromEntries(walletEntries(character).map((entry) => [entry.id, entry]));
+  return Object.entries(cost).flatMap(([id, amount]) => {
+    const short = amount - (wallet[id]?.amount ?? 0);
+    return short > 0 ? [`${formatNumber(short)} ${wallet[id]?.genitive ?? id}`] : [];
+  });
+}
 
 // What a production building's store holds at `now`, as production() in the
 // engine counts it.

@@ -5830,6 +5830,26 @@ a.camp-level-button {
   font-style: italic;
 }
 
+/* A quest's way (quests.js): where its creature lives and "Idź". */
+.quest-where {
+  margin: 2px 0 0;
+  color: #7a5c34;
+  font-size: 13px;
+}
+
+.quest-go {
+  width: auto;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid #6d5233;
+  border-radius: 4px;
+  background: #3b2c1d;
+  color: #f3e8cf;
+  font-family: var(--font-world);
+  font-size: 15px;
+  font-weight: 600;
+}
+
 /* "Przelosuj zadania" on the parchment, quieter than the claims. */
 .quests-reroll {
   align-self: flex-start;
@@ -7987,10 +8007,9 @@ a.profession-square:active {
   margin-top: 16px;
 }
 
-/* The Społeczność's list of parts (screens/community.js): the part shown on
-   a bar under the title, the bell muting the chat's light beside it, and the
-   list it unfolds over what is below; the parts still to come are marked
-   "Wkrótce". */
+/* The Społeczność's parts (screens/community.js): a row of tabs under the
+   title, the bell muting the chat's light beside it; the parts still to come
+   are marked "Wkrótce". */
 .community-picker {
   position: sticky;
   top: var(--community-top, 0px);
@@ -8007,12 +8026,25 @@ a.profession-square:active {
   gap: 8px;
 }
 
-.community-toggle,
-.community-section {
+/* The parts as tabs in a row scrolling sideways (321 A). */
+.community-tabs {
   display: flex;
+  flex: 1;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.community-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.community-tab {
+  display: flex;
+  flex: none;
   align-items: center;
-  gap: 10px;
-  width: 100%;
+  gap: 8px;
   min-height: 48px;
   padding: 8px 12px;
   border: 1px solid var(--bark-line);
@@ -8020,13 +8052,22 @@ a.profession-square:active {
   background: var(--bark);
   color: var(--text);
   font-family: var(--font-world);
-  font-size: 17px;
-  text-align: left;
+  font-size: 16px;
+  white-space: nowrap;
 }
 
-.community-toggle {
-  flex: 1;
-  min-width: 0;
+.community-tab[aria-selected='true'] {
+  border-color: var(--gold);
+  background: var(--bark-active);
+}
+
+.community-tab:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.community-tab:disabled .community-icon {
+  color: var(--icon-muted);
 }
 
 .community-icon {
@@ -8035,22 +8076,7 @@ a.profession-square:active {
 }
 
 .community-name {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.community-chevron {
-  flex: none;
-  color: var(--text-muted);
-  transform: rotate(90deg);
-  transition: transform 0.2s ease;
-}
-
-.community-toggle[aria-expanded='true'] .community-chevron {
-  transform: rotate(-90deg);
 }
 
 .community-bell {
@@ -8067,45 +8093,6 @@ a.profession-square:active {
 
 .community-bell[aria-pressed='true'] {
   color: var(--text-muted);
-}
-
-.community-sections {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  left: 0;
-  display: grid;
-  gap: 2px;
-  margin: 0;
-  padding: 6px;
-  border: 1px solid var(--bark-line);
-  border-radius: 4px;
-  background: var(--bg-deep);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
-  list-style: none;
-}
-
-.community-sections[hidden] {
-  display: none;
-}
-
-.community-section {
-  border-color: transparent;
-  background: transparent;
-}
-
-.community-section[aria-current='true'] {
-  border-color: var(--bark-line);
-  background: var(--bark-active);
-}
-
-.community-section:disabled {
-  color: var(--text-muted);
-  cursor: default;
-}
-
-.community-section:disabled .community-icon {
-  color: var(--icon-muted);
 }
 
 .community-dot {
@@ -9459,6 +9446,155 @@ a.profession-square:active {
 .report-party {
   margin: 0 0 8px;
   color: var(--text-muted);
+}
+
+/* "Wyrusz" held above the bottom tabs on a place's screen (combat.js). */
+.start-bar {
+  position: sticky;
+  bottom: calc(var(--nav-height) + 8px + env(safe-area-inset-bottom));
+  z-index: 4;
+  padding: 6px 0;
+  background: linear-gradient(to top, var(--surface) 70%, transparent);
+}
+
+/* The bag's heading with "Sprzedaj zbędne" (character.js). */
+.bag-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.bag-sell {
+  flex: none;
+  width: auto;
+}
+
+/* The Zaklinaczka's hints on the affixes (settlement.js). */
+.affix-star {
+  color: var(--gold, #e0b04a);
+}
+
+.affix-worth {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border: 1px solid var(--system);
+  border-radius: 999px;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 12px;
+}
+
+/* The Ranking's gap and "Pokaż całą setkę" (ranking.js). */
+.ranking-gap td {
+  padding: 2px 0;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.ranking-whole {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* The Dziennik's filter and its days (journal.js). */
+.journal-filters {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin: 0 0 10px;
+  padding-bottom: 2px;
+}
+
+.journal-filter {
+  flex: none;
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.journal-filter[aria-pressed='true'] {
+  border-color: var(--system);
+  color: var(--system);
+}
+
+.journal-day {
+  margin: 14px 0 6px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* The Karczma's candidates, one line each (settlement.js). */
+.tavern-candidate-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.tavern-candidate[open] > .tavern-candidate-line {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.tavern-candidate-name {
+  font-weight: 600;
+}
+
+.tavern-candidate-price {
+  flex: none;
+  color: var(--gold, #e0b04a);
+  font-family: var(--font-system);
+}
+
+/* A long explanation folded under "Jak to działa?" (ui.js, howItWorks). */
+.how > p,
+.how-more > p {
+  margin: 0;
+}
+
+.how-more {
+  margin-top: 4px;
+}
+
+.how-toggle {
+  display: inline-block;
+  padding: 4px 0;
+  color: var(--accent);
+  font-family: var(--font-system);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.how-more[open] > .how-toggle {
+  margin-bottom: 4px;
+}
+
+.how-more--system .how-toggle {
+  color: var(--system);
+}
+
+/* A System message's button to where it points (ui.js, systemLink). */
+.system-action {
+  align-self: flex-start;
+  width: auto;
+  margin-top: 8px;
 }
 
 /* The Wieże in the Walka (screens/towers.js): a tower's card with its floor

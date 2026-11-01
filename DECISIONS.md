@@ -2996,6 +2996,24 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wygodniejszy interfejs: propozycje 311–321 (1.11.2026, na wersji testowej)
+
+Autor: „311 A / 312 A / 313 A / 314 A / 315 A / 316 A / 317 A / 318 A / 319 A / 320 A / 321 A”.
+
+1. **311, przyciski mówią, czego brakuje.** Budowy w obozie i Kowadło piszą np. „Brakuje: 199 drewna, 678 kamienia” zamiast „Brakuje złota albo zasobów”. Zasoby mają w danych nazwę w dopełniaczu (`resources.json`, `genitive`).
+2. **312, „Wyrusz” w zasięgu kciuka.** Na ekranie miejsca przycisk „Wyrusz · 30 min” (z wybraną długością) trzyma się nad dolnymi zakładkami, póki karta miejsca jest na ekranie.
+3. **313, zadania prowadzą do celu.** Zadanie na stwora mówi „Gdzie: Lisie Jary” (najnowsze otwarte dla klasy miejsce z tym stworem, także przy „???”). Każde niewykonane zadanie ma przycisk „Idź” do swojego miejsca albo zakładki (Walka, Stół rozbiórki, Zielarstwo, Alchemia, Rzemieślnictwo, Tablica zleceń).
+4. **314, komunikaty Systemu z przyciskiem.** „Masz N wolnych punktów statystyk” ma przycisk „Rozdziel punkty”. Wieże po skończonej wyprawie mają przycisk „Odbierz raport”. Karta przedmiotu bez Kowadła ma odnośnik „Przejdź do Kowadła”.
+5. **315, „Jak to działa?”.** Wstępy Wież, Targowiska, Karczmy, Profesji i Upominków pokazują pierwsze zdanie, a resztę pod „Jak to działa?”. Gdy narrator wskazuje coś w zwiniętym tekście, tekst sam się rozwija.
+6. **316, Karczma.** Każdy kandydat to jedna linia: imię, klasa, poziom i cena. Pełna karta rozwija się po stuknięciu.
+7. **317, Dziennik.** Raporty są pod nagłówkami „Dziś”, „Wczoraj” i datą, z godziną przy raporcie. Filtr Wszystko, Wyprawy, Wieże i Profesje zapamiętuje się na urządzeniu.
+8. **318, Ranking.** Widać pierwszą dziesiątkę, a potem miejsce postaci z dwiema postaciami nad nią i dwiema pod nią. Pełną listę pokazuje przycisk „Pokaż całą setkę”.
+9. **319, podpowiedzi u Zaklinaczki.** Afiksy ze statystykami, w które klasa wkłada dużo punktów („Rozdaj według klasy”, `autoPoints`), mają ★. Najsłabszy dla klasy afiks ze statystyką, jeśli sam nie jest ważny, ma dopisek „Warto zakląć”. Pancerz i odporności przydają się każdej klasie, więc nie dostają żadnego znaku (brakujący szczegół).
+10. **320, „Sprzedaj zbędne” w plecaku.** Przycisk przy nagłówku plecaka otwiera okno złomiarza.
+11. **321, Społeczność w zakładkach.** Części Społeczności to rząd zakładek przewijany w bok, z kropkami nowości, zamiast listy do rozwinięcia. Dzwonek czatu został obok.
+12. **Opis Wędrownego handlarza.** Autor: „"W tym tygodniu już go tu nie uświadczysz. Wyczekuj w kolejnym." - zmiana opisu.” Tekst stoi dosłownie.
+13. **Drużyna i solo.** Autor: „mam nadzieje ze to liczy z najniższego poziomem gracza i jeśli dołączą do mojej drużyny ludzie to będzie niżej i że można dalej solo latać z pozycji członka drużyny”. Tak było od początku (zob. „Drużyny”, punkt 4): długość wyprawy liczy się od najniższego poziomu postaci, a miejsca od najniższego poziomu klasy. Lider bez zaznaczenia „Z drużyną” wyrusza sam, a członek drużyny może w każdej chwili iść sam. Karta drużyny lidera mówi to teraz wprost.
+
 ## Mikstury przy odbiorze raportu, „Ulepsz” z brakami, Wieże bez mikstur (1.11.2026, na wersji testowej)
 
 Autor: „Zrobmy też tak, że bonusy wszelkie za picie mikstur itp. nie zużywają się na bieżąco, a po samej wyprawie / Odbierz raport zużywa czas mikstury.”, „Niech Ulepsz jeśli chodzi o przedmiot nie otwiera się tylko pokazuje czego brakuje jeśli nie da się ulepszyć” i „mikstury niech nie działają w Wieżach albo zużywają się po 3 poziomach”.

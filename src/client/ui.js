@@ -17,6 +17,29 @@ export function systemPanel(...lines) {
 
 const systemLine = (line) => (line instanceof Node ? line : h('p', { class: 'system-text', text: line }));
 
+// A long explanation folded (the author: 315 A): its first words in sight,
+// the rest under "Jak to działa?"; `rest` may hold elements. `system` gives
+// the System's look, for inside its panel.
+export function howItWorks(lead, rest, { system = false } = {}) {
+  const line = (part) => (part instanceof Node ? part : h('p', { class: system ? 'system-text' : 'muted', text: part }));
+  return h(
+    'div',
+    { class: 'how' },
+    line(lead),
+    h('details', { class: `how-more${system ? ' how-more--system' : ''}` }, h('summary', { class: 'how-toggle', text: 'Jak to działa?' }), [rest].flat().map(line)),
+  );
+}
+
+// A text's first sentence and the rest, for howItWorks.
+export function splitLead(text) {
+  const cut = text.indexOf('. ');
+  return cut < 0 ? [text, null] : [text.slice(0, cut + 1), text.slice(cut + 2)];
+}
+
+// A System message's way to where it points (the author: 314 A), as a
+// button under its words.
+export const systemLink = (href, text) => h('a', { class: 'button button--system button--small system-action', href, text });
+
 // A place the narrator can point at (narrator.js).
 export function guided(element, guide) {
   element.dataset.guide = guide;

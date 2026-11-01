@@ -161,7 +161,7 @@ export function mountParty(container) {
       h('p', {
         class: 'muted',
         text: own?.leader
-          ? `Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”. Idą wszyscy wolni, najwyżej na ${formatMinutes(party.limits.minutes)} i tylko tam, gdzie wejdzie ${party.limits.classLevelBy} (poziom klasy ${party.limits.classLevel}).`
+          ? `Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”. Idą wszyscy wolni, najwyżej na ${formatMinutes(party.limits.minutes)} i tylko tam, gdzie wejdzie ${party.limits.classLevelBy} (poziom klasy ${party.limits.classLevel}). Bez „Z drużyną” wyruszasz sam, a członkowie też mogą chodzić sami.`
           : 'Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle. Gdy chcesz zająć się profesjami, opuść drużynę.',
       }),
     );

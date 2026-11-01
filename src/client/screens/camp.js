@@ -15,7 +15,7 @@ import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { leaveView, openView } from '../history.js';
 import { playSound } from '../sound.js';
-import { call, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
+import { call, costShortfall, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, guided, systemPanel, toast, withButton } from '../ui.js';
 import { scrapperSheet } from '../scrapper.js';
@@ -889,15 +889,15 @@ function mountBuilding(container, id) {
     const own = building.id === campOf().id;
     if (!next) return h('p', { class: 'muted', text: building.evolution ?? (building.queued.length > 0 ? 'Najwyższy poziom jest już w kolejce.' : 'Najwyższy poziom.') });
     const have = Object.fromEntries(walletEntries().map((entry) => [entry.id, entry.amount]));
-    const missing = Object.entries(next.cost).some(([resource, amount]) => (have[resource] ?? 0) < amount);
+    // What is missing, named (311).
+    const lacking = costShortfall(next.cost);
+    const missing = lacking.length > 0;
     const busy = underWay();
     const full = busy >= state.character.camp.queueSize;
     const label = full
       ? 'Kolejka budowy pełna'
       : missing
-        ? own
-          ? 'Brakuje złota'
-          : 'Brakuje złota albo zasobów'
+        ? `Brakuje: ${lacking.join(', ')}`
         : busy > 0
           ? `Dodaj do kolejki: poziom ${next.level}`
           : own

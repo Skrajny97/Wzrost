@@ -2,16 +2,19 @@
   {
     "id": "wood",
     "name": "Drewno",
+    "genitive": "drewna",
     "description": "Pnie i gałęzie z wiatrołomów. Potrzebne do niemal każdej budowy."
   },
   {
     "id": "stone",
     "name": "Kamień",
+    "genitive": "kamienia",
     "description": "Głazy i odłamki skał na paleniska i fundamenty."
   },
   {
     "id": "iron-ore",
     "name": "Ruda żelaza",
+    "genitive": "rudy żelaza",
     "description": "Rdzawe bryły spod korzeni i ze skał. Na okucia i narzędzia."
   }
 ]

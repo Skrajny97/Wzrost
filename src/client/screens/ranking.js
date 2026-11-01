@@ -22,9 +22,16 @@ const ORDERS = [
 const professionLevel = (profession) =>
   profession && h('span', { class: 'ranking-profession' }, professionSprite(profession.id) ?? icon('leaf', { size: 14 }), formatNumber(profession.level));
 
+// The first places, then the character's own with two above and two
+// below; the whole hundred under a tap (the author: 318 A).
+const TOP = 10;
+const AROUND = 2;
+
 export function mountRanking(container) {
   let by = 'level';
   let gone = false;
+  let whole = false;
+  let last = null;
   const switcher = h(
     'div',
     { class: 'segmented ranking-by', role: 'group', 'aria-label': 'Kolejność rankingu' },
@@ -37,6 +44,7 @@ export function mountRanking(container) {
         onClick: () => {
           if (by === order.id) return;
           by = order.id;
+          whole = false;
           load();
         },
       }),
@@ -59,8 +67,17 @@ export function mountRanking(container) {
     if (!gone && asked === by) show(answer);
   }
 
-  function show({ rows, place: own }) {
+  function show(answer) {
+    last = answer;
+    const { rows, place: own } = answer;
     place.textContent = own ? `Twoje miejsce: ${formatNumber(own)}.` : '';
+    const mine = rows.findIndex((row) => row.own);
+    // The rows shown, with a gap (null) where some are left out.
+    const picked = whole || rows.length <= TOP + AROUND * 2 + 1
+      ? rows
+      : mine < TOP + AROUND
+        ? rows.slice(0, Math.max(TOP, mine + AROUND + 1))
+        : [...rows.slice(0, TOP), null, ...rows.slice(mine - AROUND, mine + AROUND + 1)];
     const sorted = (id) => (id === by ? 'ranking-sorted' : undefined);
     // A column of its own order shows only there.
     const columns = ORDERS.filter((order) => !order.own || order.id === by);
@@ -83,8 +100,10 @@ export function mountRanking(container) {
         h(
           'tbody',
           {},
-          rows.map((row) =>
-            h(
+          picked.map((row) =>
+            row === null
+              ? h('tr', { class: 'ranking-gap', 'aria-hidden': 'true' }, h('td', { colspan: String(columns.length + 2), text: '…' }))
+              : h(
               'tr',
               { class: row.own ? 'ranking-own' : undefined },
               h('td', { class: 'ranking-number', text: formatNumber(row.place) }),
@@ -112,6 +131,16 @@ export function mountRanking(container) {
           ),
         ),
       ),
+      picked.length < rows.length &&
+        h('button', {
+          type: 'button',
+          class: 'button button--world button--small ranking-whole',
+          text: `Pokaż całą ${rows.length === 100 ? 'setkę' : 'listę'}`,
+          onClick: () => {
+            whole = true;
+            show(last);
+          },
+        }),
     );
   }
 

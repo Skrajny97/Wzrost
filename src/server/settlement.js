@@ -238,7 +238,7 @@ export function settlementView(player, stored, board, now) {
       refillMinutes: content.settlement.orders.refillMinutes,
     },
     reforge: {
-      items: player.items.filter((item) => item.affixes?.length > 0).map((item) => reforgeView(item, stocks.materials)),
+      items: player.items.filter((item) => item.affixes?.length > 0).map((item) => reforgeView(item, stocks.materials, player.row.class_id)),
       choices: choicesOf(stored),
       pending: pendingView(pendingOf(stored, player.items)),
     },
@@ -584,8 +584,8 @@ function bondView(companion, now) {
 
 // An item the Zaklinaczka can reforge: its affixes as the item card shows
 // them (with the Kowadło's upgrade) and the price, with the character's
-// stacks of the materials it takes.
-function reforgeView(item, materials) {
+// stacks of the materials it takes, and which affixes matter to its class.
+function reforgeView(item, materials, classId) {
   const shown = upgradedItem(item, content);
   const cost = reforgeCost(item, item.reforged ?? 0, content);
   const need = cost.materials;
@@ -595,6 +595,7 @@ function reforgeView(item, materials) {
     rarity: item.rarity,
     equipped: Boolean(item.equippedSlot),
     affixes: shown.affixes.map((affix) => `${propertyName(affix.stat, content)}: +${affix.value}`),
+    hints: affixHints(shown.affixes, classId),
     gold: cost.gold,
     materials: need && {
       ...need,
@@ -604,6 +605,27 @@ function reforgeView(item, materials) {
         .map(([key, count]) => ({ key, label: materialView(key, count, content).label, count })),
     },
   };
+}
+
+// Which of an item's affixes matter to a class and which is worth
+// reforging (the author: 319 A), by the class's spread of points
+// (autoPoints): a stat it puts much into is important; of the stats, the one
+// it puts least into, the smallest of them on a tie, is worth reforging
+// unless it is important too. Armor and resistances help every class and are
+// neither.
+function affixHints(affixes, classId) {
+  const weights = content.classesById[classId]?.autoPoints ?? {};
+  const top = Math.max(0, ...Object.values(weights));
+  const weightOf = (affix) => (content.statIds.includes(affix.stat) ? (weights[affix.stat] ?? 0) : null);
+  const stats = affixes.map((affix, index) => ({ index, weight: weightOf(affix), value: affix.value })).filter((one) => one.weight !== null);
+  const worst = stats.sort((a, b) => a.weight - b.weight || a.value - b.value)[0];
+  return affixes.map((affix, index) => {
+    const weight = weightOf(affix);
+    return {
+      important: weight !== null && top > 0 && weight * 2 >= top,
+      worth: Boolean(worst) && worst.index === index && worst.weight * 2 < top,
+    };
+  });
 }
 
 // The affixes to choose from after a reforging: the item, the affix they

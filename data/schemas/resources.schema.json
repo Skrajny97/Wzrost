@@ -7,10 +7,11 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "name", "description"],
+    "required": ["id", "name", "genitive", "description"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
       "name": { "type": "string", "minLength": 1 },
+      "genitive": { "type": "string", "minLength": 1, "description": "Po liczbie w dopełniaczu, np. „Brakuje: 200 drewna”." },
       "description": { "type": "string", "minLength": 1 }
     }
   }

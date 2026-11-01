@@ -17,7 +17,7 @@ import { leaveView, openView } from '../history.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
-import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
+import { closeSheet, confirmAction, howItWorks, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { companionCard } from '../companions.js';
 import { itemSummary, materialTitle } from './character.js';
 import { mountMarket, numberField, stackButton } from './market.js';
@@ -353,22 +353,32 @@ export function mountSettlement(container, { params = {} } = {}) {
           h(
             'div',
             { class: 'settlement-picks' },
-            item.affixes.map((label, index) =>
-              h(
+            item.affixes.map((label, index) => {
+              // ★ for a stat the class needs, and the one worth reforging
+              // (319 A).
+              const hint = item.hints?.[index] ?? {};
+              return h(
                 'button',
                 {
                   type: 'button',
                   class: 'item-row trade-pick settlement-pick',
                   'aria-pressed': String(index === chosen),
+                  'aria-label': [label, hint.important && 'ważne dla Twojej klasy', hint.worth && 'warto zakląć'].filter(Boolean).join(', '),
                   onClick: () => {
                     chosen = index;
                     draw();
                   },
                 },
-                h('span', { class: 'settlement-pick-text', text: label }),
+                h(
+                  'span',
+                  { class: 'settlement-pick-text' },
+                  hint.important && h('span', { class: 'affix-star', 'aria-hidden': 'true', text: '★ ' }),
+                  label,
+                  hint.worth && h('span', { class: 'affix-worth', text: 'Warto zakląć' }),
+                ),
                 pickMark(),
-              ),
-            ),
+              );
+            }),
           ),
           // Which material to give, where more than one is enough.
           stacks.length > 1 && h('p', { class: 'field-label', text: 'Materiał do zaklęcia' }),
@@ -570,12 +580,15 @@ export function mountSettlement(container, { params = {} } = {}) {
     const full = hired.length >= places;
     // The author's words, the camp's Kwatery stressed in them; every
     // standing with Zbylut may hire, a lower one for more gold.
-    const intro = h(
-      'p',
-      { class: 'muted' },
-      'Towarzysze idą z tobą na każdą wyprawę poza Szybkim i Błyskawicznym Polowaniem. Rosną w siłę razem z tobą. Opłata za werbunek jest jednorazowa, a im lepiej zna cię Zbylut, tym jest tańsza. Towarzysz potrzebuje posłania: ',
-      h('strong', { class: 'text-stress', 'data-guide': 'tavern-quarters', text: 'zbuduj Kwatery w obozie' }),
-      '.',
+    const intro = howItWorks(
+      'Towarzysze idą z tobą na każdą wyprawę poza Szybkim i Błyskawicznym Polowaniem.',
+      h(
+        'p',
+        { class: 'muted' },
+        'Rosną w siłę razem z tobą. Opłata za werbunek jest jednorazowa, a im lepiej zna cię Zbylut, tym jest tańsza. Towarzysz potrzebuje posłania: ',
+        h('strong', { class: 'text-stress', 'data-guide': 'tavern-quarters', text: 'zbuduj Kwatery w obozie' }),
+        '.',
+      ),
     );
     const beds =
       places > 0 &&
@@ -606,7 +619,20 @@ export function mountSettlement(container, { params = {} } = {}) {
       h('h2', { class: 'section-title', text: 'Szukają pracy w tym tygodniu' }),
       candidates.length === 0
         ? h('p', { class: 'muted', text: 'Nikt więcej nie szuka pracy. Nowi przyjdą w poniedziałek.' })
-        : candidates.map((candidate) => companionCard(candidate, hire(candidate), apply)),
+        : candidates.map((candidate) =>
+            // One line each, the whole card under a tap (316 A).
+            h(
+              'details',
+              { class: 'tavern-candidate' },
+              h(
+                'summary',
+                { class: 'tavern-candidate-line' },
+                h('span', { class: 'tavern-candidate-name', text: `${candidate.name}, ${candidate.className}, poz. ${candidate.level}` }),
+                h('span', { class: 'tavern-candidate-price', text: `${formatNumber(candidate.price)} zł.` }),
+              ),
+              companionCard(candidate, hire(candidate), apply),
+            ),
+          ),
     );
   }
 

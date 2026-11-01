@@ -2,8 +2,8 @@
 // of System messages.
 
 import { fill, h, icon } from '../dom.js';
-import { dateTimeFormat, formatMinutes, formatNumber } from '../format.js';
-import { call } from '../state.js';
+import { dateTimeFormat, formatMinutes, formatNumber, timeFormat } from '../format.js';
+import { call, serverNow } from '../state.js';
 import { systemPanel } from '../ui.js';
 import { workSummaryText } from './professions.js';
 
@@ -11,10 +11,41 @@ const RESULT_NAMES = { success: 'sukces', fainted: 'omdlenie', escaped: 'odwrót
 // A profession's work, by the kind of its report, and its chip.
 const WORK_CHIPS = { herbs: 'zbieranie', potions: 'warzenie', items: 'wyrób' };
 
+// The reports by day, under "Dziś", "Wczoraj" or the date, and a filter of
+// their kinds, remembered on this device (the author: 317 A).
+const FILTERS = [
+  ['all', 'Wszystko'],
+  ['hunts', 'Wyprawy'],
+  ['towers', 'Wieże'],
+  ['work', 'Profesje'],
+];
+const FILTER_KEY = 'insight.journalFilter';
+const kindOf = (report) => (report.tower ? 'towers' : WORK_CHIPS[report.kind] ? 'work' : 'hunts');
+const dayKey = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
+const dayName = new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'long' });
+
+function dayHeading(ms) {
+  const key = dayKey.format(ms);
+  const now = serverNow();
+  if (key === dayKey.format(now)) return 'Dziś';
+  if (key === dayKey.format(now - 86400000)) return 'Wczoraj';
+  return dayName.format(ms);
+}
+
+function loadFilter() {
+  try {
+    const kept = localStorage.getItem(FILTER_KEY);
+    return FILTERS.some(([id]) => id === kept) ? kept : 'all';
+  } catch {
+    return 'all';
+  }
+}
+
 export function mountJournal(container, { params }) {
   const tab = params.tab === 'system' ? 'system' : 'reports';
   let reports = null;
   let error = null;
+  let filter = loadFilter();
 
   async function load() {
     try {
@@ -40,10 +71,44 @@ export function mountJournal(container, { params }) {
 
   function reportList() {
     if (reports.length === 0) return h('p', { class: 'muted', text: 'Brak raportów. Wyrusz na pierwszą eksplorację w zakładce Walka.' });
+    const shown = reports.filter((report) => filter === 'all' || kindOf(report) === filter);
+    const filters = h(
+      'div',
+      { class: 'journal-filters', role: 'group', 'aria-label': 'Rodzaj raportów' },
+      FILTERS.map(([id, label]) =>
+        h('button', {
+          type: 'button',
+          class: 'journal-filter',
+          'aria-pressed': String(id === filter),
+          text: label,
+          onClick: () => {
+            filter = id;
+            try {
+              localStorage.setItem(FILTER_KEY, id);
+            } catch {
+              // Remembered for this visit only.
+            }
+            render();
+          },
+        }),
+      ),
+    );
+    if (shown.length === 0) return [filters, h('p', { class: 'muted', text: 'Nie ma tu jeszcze takich raportów.' })];
+    // The days in the order of the reports, newest first.
+    const days = [];
+    for (const report of shown) {
+      const heading = dayHeading(report.createdAt);
+      if (days.at(-1)?.heading !== heading) days.push({ heading, reports: [] });
+      days.at(-1).reports.push(report);
+    }
+    return [filters, days.map((day) => [h('h2', { class: 'journal-day', text: day.heading }), reportRows(day.reports)])];
+  }
+
+  function reportRows(list) {
     return h(
       'ul',
       { class: 'report-list' },
-      reports.map((report) =>
+      list.map((report) =>
         h(
           'li',
           {},
@@ -79,7 +144,7 @@ export function mountJournal(container, { params }) {
               WORK_CHIPS[report.kind] && h('span', { class: 'report-row-herbs', text: workSummaryText(report) }),
               report.bestFind && h('span', { class: 'item-name', vars: { '--rarity': report.bestFind.color }, text: report.bestFind.name }),
             ),
-            h('span', { class: 'report-row-date', text: dateTimeFormat.format(new Date(report.createdAt)) }),
+            h('span', { class: 'report-row-date', text: timeFormat.format(new Date(report.createdAt)) }),
             icon('chevron', { size: 18 }),
           ),
         ),

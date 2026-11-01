@@ -738,7 +738,13 @@ export function mountCombat(container, { params, navigate }) {
       more.disabled = index === allowed.length - 1;
       potions?.update(minutes);
       showThreat();
+      startLabel();
     }
+    // "Wyrusz" with the length chosen, as it stays in sight (312 A).
+    let start = null;
+    const startLabel = () => {
+      if (start) start.textContent = `Wyrusz · ${formatMinutes(minutes)}`;
+    };
     set(index);
 
     const durations = h(
@@ -759,7 +765,7 @@ export function mountCombat(container, { params, navigate }) {
     // the box comes once the party is known, ticked; the party goes only as
     // far and as long as its lowest member may (the server says so).
     const party = !first && partyChoice();
-    const start = h('button', {
+    start = h('button', {
       type: 'button',
       class: 'button button--system',
       'data-guide': 'start',
@@ -781,6 +787,7 @@ export function mountCombat(container, { params, navigate }) {
           leaveView(HOME, 2);
         }),
     });
+    startLabel();
 
     // Szybkie Polowanie and Błyskawiczne polowanie: the same choices as
     // "Wyrusz", their own lengths and the report at once, a few times a day
@@ -833,7 +840,9 @@ export function mountCombat(container, { params, navigate }) {
         first ? durations : huntOptions(summary, [durations, potions?.element, choices]),
         threatLine,
         party?.element,
-        start,
+        // Held in sight above the tabs while the card goes on below (the
+        // author: 312 A); the narrator's first exploration keeps it plain.
+        first ? start : h('div', { class: 'start-bar' }, start),
         quick,
       ),
       h('p', { class: 'muted threat-note', text: 'Zagrożenie to szansa omdlenia na wyprawie.' }),

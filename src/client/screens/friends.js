@@ -11,7 +11,7 @@ import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { playSound } from '../sound.js';
 import { call, state, walletEntries } from '../state.js';
-import { toast, withButton } from '../ui.js';
+import { howItWorks, toast, withButton } from '../ui.js';
 import { proposeTrade } from './trade.js';
 
 const resourceName = (id) => walletEntries().find((entry) => entry.id === id)?.name ?? id;
@@ -110,10 +110,10 @@ export function mountFriends(container) {
       'section',
       { class: 'card friends-gifts', 'aria-labelledby': 'friends-gifts-title' },
       h('h2', { class: 'card-title', id: 'friends-gifts-title' }, icon('gift', { size: 22 }), 'Upominki'),
-      h('p', {
-        class: 'muted',
-        text: `Każdego dnia możesz wysłać każdemu znajomemu jeden ${gift.name}: ${countOf(gift.timePoints, 'Punkt Czasu', 'Punkty Czasu', 'Punktów Czasu')} i trochę złota albo surowców. Dziennie odbierzesz do ${claimsPerDay}.`,
-      }),
+      howItWorks(
+        `Każdego dnia możesz wysłać każdemu znajomemu jeden ${gift.name}: ${countOf(gift.timePoints, 'Punkt Czasu', 'Punkty Czasu', 'Punktów Czasu')} i trochę złota albo surowców.`,
+        `Dziennie odbierzesz do ${claimsPerDay}.`,
+      ),
       h('p', {
         class: 'friends-gifts-count',
         text: `${waiting === 0 ? 'Żaden upominek nie czeka.' : `Czeka: ${countOf(waiting, 'upominek', 'upominki', 'upominków')}.`} Dziś odebrano ${claimedToday} z ${claimsPerDay}.`,

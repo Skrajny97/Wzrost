@@ -73,13 +73,53 @@ function questArt(quest) {
   return h('span', { class: 'quest-art', 'aria-hidden': 'true' }, icon(QUEST_ICONS[quest.kind] ?? 'hammer', { size: 24 }));
 }
 
+// Where a quest leads (the author: 313 A): a creature's to the newest place
+// open to the class where it lives, named even while the creature is "???",
+// the rest to their screen.
+const WAYS = {
+  killAny: '#/walka',
+  explore: '#/walka',
+  unlock: '#/walka',
+  process: '#/oboz/craft-table',
+  salvage: '#/oboz/craft-table',
+  gather: '#/profesje/zielarstwo',
+  gatherAny: '#/profesje/zielarstwo',
+  brew: '#/profesje/alchemia',
+  brewAny: '#/profesje/alchemia',
+  make: '#/profesje/rzemieslnictwo',
+  makeAny: '#/profesje/rzemieslnictwo',
+  orders: '#/osada/board',
+};
+
+function questWay(quest) {
+  if (quest.kind === 'kill' && quest.monsterId) {
+    const place = state.content.regions
+      .flatMap((region) => region.areas.map((area) => ({ region, area })))
+      .filter(({ area }) => area.unlockClassLevel <= state.character.classLevel && area.dangers.some((danger) => danger.monsterId === quest.monsterId))
+      .sort((a, b) => b.area.minLevel - a.area.minLevel)[0];
+    if (place) return { href: `#/walka/${place.region.id}/${place.area.id}`, where: place.area.name };
+  }
+  return WAYS[quest.kind] ? { href: WAYS[quest.kind], where: null } : null;
+}
+
 function questRow(periodId, quest) {
   const share = Math.min(1, quest.progress / quest.count);
+  const way = !quest.done && !quest.claimed ? questWay(quest) : null;
   const status = quest.claimed
     ? h('span', { class: 'quest-taken', text: 'Odebrano' })
     : quest.done
       ? h('button', { type: 'button', class: 'button quest-claim', text: 'Odbierz', onClick: (event) => withButton(event.currentTarget, () => claimReward(periodId, quest)) })
-      : null;
+      : way &&
+        h('button', {
+          type: 'button',
+          class: 'button quest-go',
+          text: 'Idź',
+          'aria-label': way.where ? `Idź: ${way.where}` : `Idź do zadania: ${quest.text}`,
+          onClick: () => {
+            showQuests(false);
+            location.hash = way.href;
+          },
+        });
   return h(
     'li',
     { class: `quest${quest.done ? ' quest--done' : ''}${quest.claimed ? ' quest--claimed' : ''}` },
@@ -88,6 +128,7 @@ function questRow(periodId, quest) {
       'div',
       { class: 'quest-body' },
       h('p', { class: 'quest-text', text: quest.text }),
+      way?.where && h('p', { class: 'quest-where', text: `Gdzie: ${way.where}` }),
       h(
         'div',
         { class: 'quest-progress' },
