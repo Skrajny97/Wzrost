@@ -1164,26 +1164,20 @@ function checkStable(data) {
   return errors;
 }
 
-// The Garbarnia (325 A): its tanner and brotherhood exist, its hides are
-// creatures' materials but no elite's or champion's trophy, he pays more
-// with each standing, and he sells a few hides at first and more with each
-// standing, as Jagna her herbs, never more than his list has.
+// The Garbarnia (325 A): its tanner and brotherhood exist, he pays more
+// with each standing, and he sells a share of the ordinary creatures'
+// materials at first and more with each standing, all of them at the last,
+// as Jagna her herbs.
 function checkTannery(data) {
   const errors = [];
   const { tannery, residents, brotherhoods, standings } = data.settlement;
   if (!tannery) return errors;
   if (!residents.some((resident) => resident.id === tannery.resident)) errors.push(`settlement.json: tannery.resident to nieznany mieszkaniec ${tannery.resident}`);
   if (!brotherhoods.some((brotherhood) => brotherhood.id === tannery.brotherhood)) errors.push(`settlement.json: tannery.brotherhood to nieznane bractwo ${tannery.brotherhood}`);
-  for (const id of tannery.hides) {
-    const material = data.materials.materials.find((one) => one.id === id);
-    const monster = material && data.monsters.find((one) => one.id === material.monster);
-    if (!material) errors.push(`settlement.json: tannery.hides ma nieznany materiał ${id}`);
-    else if (!monster || monster.elite || monster.champion) errors.push(`settlement.json: tannery.hides ma ${id}, a to nie materiał zwykłego stwora`);
-  }
   if (tannery.premium.some((premium, index) => index > 0 && premium < tannery.premium[index - 1])) errors.push('settlement.json: tannery.premium nie może maleć ze stopniem');
   const { stock } = tannery.sell;
   if (stock.length > standings.length) errors.push('settlement.json: tannery.sell.stock ma więcej liczb niż stopni');
-  if (stock.some((count, index) => index > 0 && count < stock[index - 1])) errors.push('settlement.json: tannery.sell.stock nie może maleć ze stopniem');
-  if (Math.max(...stock) > tannery.hides.length) errors.push('settlement.json: tannery.sell.stock podaje więcej skór, niż jest na liście hides');
+  if (stock.some((share, index) => index > 0 && share < stock[index - 1])) errors.push('settlement.json: tannery.sell.stock nie może maleć ze stopniem');
+  if (stock.at(-1) !== 1) errors.push('settlement.json: tannery.sell.stock na ostatnim stopniu musi być 1 (wszystkie materiały)');
   return errors;
 }

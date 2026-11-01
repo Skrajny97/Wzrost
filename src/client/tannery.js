@@ -1,12 +1,13 @@
 // The Garbarnia in the Osada (src/server/tannery.js; the author's 325 A:
-// "Niech sprzedaje i skupuje skóry (drożej) na podobieństwo Jagny"):
-// Wszebor's tabs Kup and Sprzedaj, as Jagna's in the Chata zielarki. Kup
-// lists the hides he sells at the relation with him, each opening its card
-// under a tap; Sprzedaj the character's hides, which he buys for more than
+// "Niech sprzedaje i skupuje skóry (drożej) na podobieństwo Jagny", then
+// "wszystkimi materiałami włącznie z łuskami żmii i podobnymi"): Wszebor's
+// tabs Kup and Sprzedaj, as Jagna's in the Chata zielarki. Kup lists the
+// creatures' materials he sells at the relation with him, each opening its
+// card under a tap; Sprzedaj the character's, which he buys for more than
 // the scrapper. The Osada's place screen keeps the open tab as it redraws.
 
 import { h } from './dom.js';
-import { formatDecimal, formatNumber, saleGold } from './format.js';
+import { countOf, formatDecimal, formatNumber, saleGold } from './format.js';
 import { call, state } from './state.js';
 import { closeSheet, openSheet, toast, withButton } from './ui.js';
 import { numberField, stackButton } from './screens/market.js';
@@ -19,8 +20,8 @@ const TABS = [
 // The trade's reputation today out of the day's limit, under both tabs.
 const tradeLine = (trade) => `Handel daje relację z nim i reputację Bractwa Łowców: dziś ${trade.today} z ${trade.daily} punktów.`;
 
-// A hide he sells: as many pieces as the gold allows, typed in. Hides are
-// materials, so the bag's places do not matter.
+// A material he sells: as many pieces as the gold allows, typed in.
+// Materials take no place in the bag.
 function buySheet(good, apply) {
   const most = Math.floor(state.character.gold / good.price);
   const field = numberField('tannery-buy-count', 'Ile sztuk', 1, 1, Math.max(1, most));
@@ -49,7 +50,7 @@ function buySheet(good, apply) {
   );
 }
 
-// The Kup tab: the hides he sells at the relation with him, dearer than he
+// The Kup tab: the materials he sells at the relation with him, dearer than he
 // buys them, each opening its card under a tap, and the standing that
 // brings more. They count for the Tablica's orders for materials (the
 // author: "ułatwi dodatkowo sprawę tym, którym braknie pare materiałów do
@@ -60,12 +61,12 @@ function shop(view, apply) {
   return h(
     'section',
     { class: 'stack', 'data-guide': 'tannery-buy' },
-    h('h2', { class: 'section-title', text: 'Skóry Wszebora' }),
+    h('h2', { class: 'section-title', text: 'Towar Wszebora' }),
     h('p', {
       class: 'muted',
-      text: `Wszebor sprzedaje skóry drożej, niż je skupuje. ${offer.discount > 0 ? `Dzięki relacji z nim ceny są niższe o ${formatDecimal(offer.discount * 100)}%.` : 'Z lepszą relacją ceny będą niższe.'} ${tradeLine(trade)}`,
+      text: `Wszebor sprzedaje materiały ze stworów drożej, niż je skupuje. ${offer.discount > 0 ? `Dzięki relacji z nim ceny są niższe o ${formatDecimal(offer.discount * 100)}%.` : 'Z lepszą relacją ceny będą niższe.'} ${tradeLine(trade)}`,
     }),
-    h('p', { class: 'muted', text: 'Kupione skóry pasują do zleceń na materiały z Tablicy zleceń.' }),
+    h('p', { class: 'muted', text: 'Kupione materiały pasują do zleceń z Tablicy zleceń.' }),
     h(
       'ul',
       { class: 'stack market-list' },
@@ -87,7 +88,7 @@ function shop(view, apply) {
         );
       }),
     ),
-    offer.next && h('p', { class: 'muted', text: `Od stopnia relacji ${offer.next.standing} dojdą: ${offer.next.hides.join(', ')}.` }),
+    offer.next && h('p', { class: 'muted', text: `Od stopnia relacji ${offer.next.standing} dojdą kolejne: ${countOf(offer.next.count, 'materiał', 'materiały', 'materiałów')}.` }),
   );
 }
 
@@ -124,20 +125,20 @@ function sellSheet(good, apply) {
   );
 }
 
-// The Sprzedaj tab: the character's hides, which he buys for more than the
+// The Sprzedaj tab: the character's materials, which he buys for more than the
 // scrapper, and for more again with a better relation.
 function sale(view, apply) {
   const { premium, best, goods, trade } = view;
   return h(
     'section',
     { class: 'stack', 'data-guide': 'tannery-sell' },
-    h('h2', { class: 'section-title', text: 'Skup skór' }),
+    h('h2', { class: 'section-title', text: 'Skup materiałów' }),
     h('p', {
       class: 'muted',
       text: `Wszebor płaci o ${Math.round(premium * 100)}% więcej niż złomiarz${best ? '' : ', a z lepszą relacją jeszcze więcej'}. ${tradeLine(trade)}`,
     }),
     goods.length === 0
-      ? h('p', { class: 'muted', text: 'W plecaku nie ma skór ani futer.' })
+      ? h('p', { class: 'muted', text: 'Nie masz materiałów ze stworów, które Wszebor kupuje.' })
       : h(
           'ul',
           { class: 'settlement-goods' },

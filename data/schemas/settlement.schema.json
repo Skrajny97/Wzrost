@@ -328,8 +328,8 @@
     "tannery": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["resident", "brotherhood", "premium", "reputation", "sell", "hides"],
-      "description": "Garbarnia (pytanie 325 A, src/engine/tannery.js): garbarz skupuje i sprzedaje skóry, jak zielarka zioła. Skóry to materiały stworów z listy hides, w każdej rzadkości. Garbarz płaci za nie cenę złomiarza (z premią Skupu złomu w obozie) i o premium więcej, według stopnia relacji z nim. Przy każdym stopniu relacji sprzedaje tyle skór, ile podaje stock: najpierw pospolite, potem rzadkie, unikalne i epickie, a w jednej rzadkości w kolejności z listy. Każdą sprzedaje w rzadkości jej gatunku, margin razy drożej niż najwięcej, ile płaci za nią ktokolwiek w grze (buyCeiling w src/engine/market.js), mniej upust relacji (relationDiscount). Za handel rośnie relacja z nim i reputacja bractwa brotherhood: punkt za każde goldPerPointPerLevel złota razy poziom postaci, najwyżej daily punktów dziennie, osobno od limitu u zielarki.",
+      "required": ["resident", "brotherhood", "premium", "reputation", "sell"],
+      "description": "Garbarnia (pytanie 325 A, src/engine/tannery.js): garbarz skupuje i sprzedaje materiały zwykłych stworów, jak zielarka zioła (autor: „Niech Garbarnia zajmuje się nie tylko skórami ale wszystkimi materiałami włącznie z łuskami żmii i podobnymi”), w każdej rzadkości; trofea elit i czempionów nie są jego. Płaci za nie cenę złomiarza (z premią Skupu złomu w obozie) i o premium więcej, według stopnia relacji z nim. Przy każdym stopniu relacji sprzedaje udział stock wszystkich tych materiałów: najpierw pospolite, potem rzadkie, unikalne i epickie, a w jednej rzadkości w kolejności z data/materials.json. Każdy sprzedaje w rzadkości jego gatunku, margin razy drożej niż najwięcej, ile płaci za niego ktokolwiek w grze (buyCeiling w src/engine/market.js), mniej upust relacji (relationDiscount). Za handel rośnie relacja z nim i reputacja bractwa brotherhood: punkt za każde goldPerPointPerLevel złota razy poziom postaci, najwyżej daily punktów dziennie, osobno od limitu u zielarki.",
       "properties": {
         "resident": { "type": "string", "description": "Garbarz: id mieszkańca, przy którym rośnie relacja za handel." },
         "brotherhood": { "type": "string", "description": "Bractwo, u którego rośnie reputacja za handel." },
@@ -339,18 +339,11 @@
           "type": "object",
           "additionalProperties": false,
           "required": ["margin", "stock"],
-          "description": "Skóry, które garbarz sprzedaje.",
+          "description": "Materiały, które garbarz sprzedaje.",
           "properties": {
-            "margin": { "type": "number", "exclusiveMinimum": 1, "description": "Ile razy drożej niż najwięcej, ile za skórę płaci ktokolwiek w grze." },
-            "stock": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 }, "description": "Ile skór sprzedaje przy każdym stopniu relacji z nim." }
+            "margin": { "type": "number", "exclusiveMinimum": 1, "description": "Ile razy drożej niż najwięcej, ile za materiał płaci ktokolwiek w grze." },
+            "stock": { "type": "array", "minItems": 1, "items": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }, "description": "Jaką część materiałów zwykłych stworów sprzedaje przy każdym stopniu relacji z nim; ostatni stopień 1, czyli wszystkie." }
           }
-        },
-        "hides": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": { "$ref": "#/definitions/id" },
-          "description": "Materiały stworów, które garbarz skupuje i sprzedaje: skóry, futra, sierść i wylinka węża (bez łusek, piór, kłów i trofeów elit i czempionów). W jednej rzadkości sprzedaje je w tej kolejności."
         }
       }
     },

@@ -15,7 +15,7 @@
 // The server passes the time and the seeds.
 
 import { potionPrice } from './brewing.js';
-import { materialPrice, parseStack, stackKey } from './crafting.js';
+import { materialPrice, ordinaryMaterial, parseStack, stackKey } from './crafting.js';
 import { randomItem, sellPrice } from './items.js';
 import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
@@ -83,8 +83,8 @@ const topSellBonus = (content) =>
 // The most any resident or the camp pays for one piece of a good. The design:
 // "Najwyższa cena skupu u dowolnego NPC musi być niższa od najniższej ceny
 // sprzedaży tego samego przedmiotu". The scrapper with the Skup złomu at its
-// top, Jagna at her top premium, the tanner at his for hides, and the orders
-// at their best (the week's, of a higher quality).
+// top, Jagna at her top premium, the tanner at his for creatures' materials,
+// and the orders at their best (the week's, of a higher quality).
 export function buyCeiling({ kind, key }, content) {
   const { orders, herbalist, tannery } = content.settlement;
   const skup = 1 + topSellBonus(content);
@@ -96,7 +96,7 @@ export function buyCeiling({ kind, key }, content) {
   if (kind === 'material') {
     const { materialId, rarityId } = parseStack(key);
     const base = materialPrice(rarityId, content);
-    const tanner = tannery?.hides.includes(materialId) ? base * skup * (1 + Math.max(...tannery.premium)) : 0;
+    const tanner = tannery && ordinaryMaterial(materialId, content) ? base * skup * (1 + Math.max(...tannery.premium)) : 0;
     return Math.max(base * skup, tanner, base * orders.pay.material * orders.quality.reward * weekly, base * skup * orders.overScrap);
   }
   return orders.partGold * content.raritiesById[content.partsById[key].rarity].sell * orders.pay.part * weekly;

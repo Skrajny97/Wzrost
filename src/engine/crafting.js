@@ -29,6 +29,14 @@ export function knownStack(key, content) {
   return Object.hasOwn(content.materialsById, materialId) && Object.hasOwn(content.raritiesById, rarityId);
 }
 
+// Whether a material is an ordinary creature's, not an elite's or a
+// champion's trophy (the Garbarnia trades in these; settlement orders ask
+// for them too).
+export function ordinaryMaterial(materialId, content) {
+  const monster = content.monstersById[content.materialsById[materialId]?.monster];
+  return Boolean(monster && !monster.elite && !monster.champion);
+}
+
 // What the scrapper pays for one piece of a material, before the camp's Skup
 // złomu: sellGold times the sell factor of its rarity (proposal 1: "cena
 // rośnie z rzadkością").

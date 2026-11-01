@@ -1,15 +1,15 @@
 // The Garbarnia in the Osada (the author's 325 A; the engine's tannery.js
-// has the rules): Wszebor the tanner buys the character's hides for more
-// than the scrapper and sells hides, more of them and cheaper with a better
-// relation, as Jagna does herbs in the Chata zielarki. Both raise the
-// relation with him and the reputation with his brotherhood, up to the
-// day's limit. Hides are materials: they take no place in the bag, so the
-// trade works also during an exploration, as the scrapper's does.
+// has the rules): Wszebor the tanner buys the character's materials of
+// ordinary creatures (skins, scales, feathers, fangs...) for more than the
+// scrapper and sells them, more of them and cheaper with a better relation,
+// as Jagna does herbs in the Chata zielarki. Both raise the relation with
+// him and the reputation with his brotherhood, up to the day's limit.
+// Materials take no place in the bag, so the trade works also during an
+// exploration, as the scrapper's does.
 
 import {
   campBonus,
   campLevels,
-  isHide,
   materialPrice,
   materialView,
   parseStack,
@@ -18,6 +18,7 @@ import {
   saleGold,
   tanneryPremium,
   tanneryStock,
+  tannerTakes,
   tradePoints,
 } from '../engine/index.js';
 import { characterView, loadPlayer, requirePlayer, settlementBoard } from './characters.js';
@@ -32,11 +33,11 @@ const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła 
 const tuning = () => content.settlement.tannery;
 const rarityIndex = (id) => content.rarities.findIndex((rarity) => rarity.id === id);
 
-// A stack of hides as the page shows it, as the Targowisko's goods: its
+// A stack of materials as the page shows it, as the Targowisko's goods: its
 // name, with the rarity when above its species', the material for its
 // picture, its description and what the scrapper pays for a piece
 // (`scrap`), with the camp's Skup bonus when given.
-function hideView(key, count, bonus = 0) {
+function goodView(key, count, bonus = 0) {
   const material = materialView(key, count, content);
   return {
     kind: 'material',
@@ -58,30 +59,30 @@ function tanneryPrices(player, stored, now) {
   return { premium, bonus, price: (key) => materialPrice(parseStack(key).rarityId, content) * (1 + bonus) * (1 + premium) };
 }
 
-// The Garbarnia for the page: each stack of hides the character holds with
-// Wszebor's price of a piece and the scrapper's beside it, his premium, the
-// trade's reputation today out of the day's limit, and `shop`: the hides he
-// sells at the relation with him, each with its price, and the standing
-// that brings more.
+// The Garbarnia for the page: each stack of materials he takes the
+// character holds, with Wszebor's price of a piece and the scrapper's
+// beside it, his premium, the trade's reputation today out of the day's
+// limit, and `shop`: the materials he sells at the relation with him, each
+// with its price, and the standing that brings more (how many).
 export function tanneryView(player, stored, now) {
   const { resident, reputation } = tuning();
   const points = stored.relations[resident] ?? 0;
   const { premium, bonus, price } = tanneryPrices(player, stored, now);
   const materials = JSON.parse(player.row.materials ?? '{}');
   const day = questPeriod('daily', now, content).key;
-  const { hides, next } = tanneryStock(points, content);
+  const { goods: offered, next } = tanneryStock(points, content);
   return {
     premium,
     // At his best price already: no "more with a better relation".
     best: premium >= Math.max(...tuning().premium),
     goods: Object.entries(materials)
-      .filter(([key, count]) => count > 0 && isHide(key, content))
-      .map(([key, count]) => ({ ...hideView(key, count, bonus), price: price(key) }))
+      .filter(([key, count]) => count > 0 && tannerTakes(key, content))
+      .map(([key, count]) => ({ ...goodView(key, count, bonus), price: price(key) }))
       .sort((a, b) => rarityIndex(a.rarity) - rarityIndex(b.rarity) || a.name.localeCompare(b.name, 'pl')),
     trade: { today: stored.tanneryTrade?.day === day ? stored.tanneryTrade.points : 0, daily: reputation.daily },
     shop: {
-      goods: hides.map(({ key, price: cost }) => ({ ...hideView(key, 1), price: cost })),
-      next: next && { standing: next.standing, hides: next.hides.map((key) => hideView(key, 1).name) },
+      goods: offered.map(({ key, price: cost }) => ({ ...goodView(key, 1), price: cost })),
+      next: next && { standing: next.standing, count: next.goods.length },
       discount: relationDiscount(points, content),
     },
   };
@@ -108,13 +109,13 @@ async function answer(context, session, next, result) {
 }
 
 // POST /api/settlement/tannery { key, count }: Wszebor buys pieces of a
-// stack of hides, the rarer for more.
+// stack of an ordinary creature's material, the rarer for more.
 export async function sellToTanner(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
-  if (!isHide(body.key, content)) throw new ApiError(400, 'invalid_goods', 'Garbarz kupuje tylko skóry i futra.');
+  if (!tannerTakes(body.key, content)) throw new ApiError(400, 'invalid_goods', 'Wszebor kupuje materiały ze stworów, ale nie trofea elit i czempionów.');
   const held = JSON.parse(row.materials ?? '{}')[body.key] ?? 0;
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > held) throw new ApiError(409, 'not_enough', 'Nie masz tylu.');
   const stored = settlementOf(row);
@@ -130,11 +131,11 @@ export async function sellToTanner(context) {
     .bind(gold, JSON.stringify(next.stored), key, body.count, key, key, body.count, key, row.id, row.version, key, body.count)
     .run();
   if (result.meta.changes !== 1) throw changed();
-  return answer(context, session, next.stored, { sold: { name: hideView(body.key, body.count).name, count: body.count, gold, points: next.points } });
+  return answer(context, session, next.stored, { sold: { name: goodView(body.key, body.count).name, count: body.count, gold, points: next.points } });
 }
 
-// POST /api/settlement/tannery/buy { key, count }: Wszebor sells a hide he
-// has at the relation with him, as many pieces as the gold pays for, straight
+// POST /api/settlement/tannery/buy { key, count }: Wszebor sells a material
+// he has at the relation with him, as many pieces as the gold pays for, straight
 // to the character's materials, as bought goods the Encyklopedia leaves out.
 export async function buyFromTanner(context) {
   const { session, player } = await requirePlayer(context);
@@ -142,8 +143,8 @@ export async function buyFromTanner(context) {
   requireOpen(row);
   const body = await readJson(context.request);
   const stored = settlementOf(row);
-  const good = tanneryStock(stored.relations[tuning().resident] ?? 0, content).hides.find((one) => one.key === body.key);
-  if (!good) throw new ApiError(404, 'no_goods', 'Wszebor nie sprzedaje Ci jeszcze tej skóry.');
+  const good = tanneryStock(stored.relations[tuning().resident] ?? 0, content).goods.find((one) => one.key === body.key);
+  if (!good) throw new ApiError(404, 'no_goods', 'Wszebor nie sprzedaje Ci jeszcze tego materiału.');
   if (!Number.isInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Podaj, ile sztuk kupić.');
   const gold = good.price * body.count;
   if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota.');
@@ -157,5 +158,5 @@ export async function buyFromTanner(context) {
     .bind(gold, ...materials.binds, ...others.binds, JSON.stringify(next.stored), row.id, row.version, gold)
     .run();
   if (result.meta.changes !== 1) throw changed();
-  return answer(context, session, next.stored, { bought: { name: hideView(good.key, body.count).name, count: body.count, gold, points: next.points } });
+  return answer(context, session, next.stored, { bought: { name: goodView(good.key, body.count).name, count: body.count, gold, points: next.points } });
 }

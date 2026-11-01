@@ -3025,6 +3025,15 @@ Autor: „331 D / 333 A / 334 A / 335 A / 332 A / 330 B” oraz „336 A, reszt�
 2. **336 A.** Skóry od Wszebora zostają w obecnych cenach, także gdy ktoś rozbiera je na Stole rozbiórki na części.
 3. **329.** Zostaje dotychczasowe zachowanie (A): wolne miejsce w wyprawie drużyny zajmuje towarzysz lidera z Kwater.
 
+## Garbarnia: wszystkie materiały stworów (1.11.2026, na wersji testowej)
+
+Autor: „Niech Garbarnia zajmuje się nie tylko skórami ale wszystkimi materiałami włącznie z łuskami żmii i podobnymi”.
+
+1. **Co kupuje i sprzedaje.** Wszebor handluje wszystkimi materiałami zwykłych stworów: skórami, futrami, łuskami, piórami, kłami, rogami i podobnymi. Dziś to 78 materiałów, w każdej rzadkości przy skupie i w rzadkości gatunku przy sprzedaży. Listy nie trzeba już wpisywać do danych: gra liczy ją ze stworów, więc materiał nowego stwora dochodzi sam.
+2. **Bez trofeów (brakujący szczegół).** Trofea elit i czempionów (np. Kieł ptasznika) nie są jego, ani do skupu, ani na sprzedaż. Tablica zleceń też o nie nie prosi, a kupione trofeum ominęłoby polowanie na elity i czempiony.
+3. **Ile sprzedaje.** Przy każdym stopniu relacji część wszystkich materiałów, najpierw najpospolitsze: u Obcego 20% (16), u Znajomego 40% (32), u Stałego klienta 60% (47), u Zaufanego 80% (63), a u Przyjaciela wszystkie (`tannery.sell.stock`). Pod listą stoi, ile materiałów dojdzie przy następnym stopniu.
+4. **Teksty.** Karta „Towar Wszebora” i „Skup materiałów” zamiast skór, historia Wszebora mówi o skórach, łuskach, piórach i kłach, a jego pierwsze powitanie brzmi: „Nie zatykaj nosa, do zapachu się przywyka. Masz coś ze stworów? Za porządny towar płacę więcej niż złomiarz.” Ceny, premia i dzienny limit relacji zostają jak dotąd.
+
 ## Drużyna: najwyżej 5 poziomów klasy różnicy i tempo wierzchowców (1.11.2026, na wersji testowej)
 
 Autor: „Rozpiętość poziomu klas w Drużynie maks 5 lvl musi być też by nie było za dużego carrowania”.
@@ -3072,13 +3081,7 @@ Autor: „325 A”, czyli Garbarnia z garbarzem Wszeborem (Bractwo Łowców), z 
 
 1. **Miejsce.** Garbarnia stoi na planszy Osady po lewej stronie placu, nad Chatą zielarki (`x` 13, `y` 53). Bliżej placu (`x` 17, `y` 45) zasłaniałaby lewy stragan Targowiska. Gospodarzem jest garbarz Wszebor z Bractwa Łowców. Ma historię i pięć powitań, po jednym na stopień relacji, bez form męskich i żeńskich wobec gracza (`residents` w `data/settlement.json`). Teksty to propozycja do poprawy przez autora.
 2. **Zakładki.** Jak u Jagny: najpierw otwiera się „Kup”, a obok jest „Sprzedaj”. Stuknięcie skóry w „Kup” otwiera jej kartę: obrazek, opis, cenę u złomiarza i liczbę sztuk, a pod spodem cenę u Wszebora i „Kup”.
-3. **Co jest skórą (brakujący szczegół).** Skóry to materiały stworów z listy `tannery.hides`: każdy, którego nazwa zaczyna się od „Skóra”, „Futro”, „Futerko” albo „Sierść”, i Wylinka zaskrońca, czyli zrzucona skóra węża. Razem 16:
-    - pospolite: Skóra wilka, Skóra lisa, Futro jenota, Wylinka zaskrońca;
-    - rzadkie: Futro kuny, Futerko łasicy, Futro żbika;
-    - unikalne: Futro rysia, Futro wadery, Sierść wilkołaka, Futro wydry, Skóra węgorza, Skóra salamandry;
-    - epickie: Skóra niedźwiedzia, Skóra połoza, Skóra krokodyla.
-
-    Łuski, pióra, kły, Pajęcze wylinki (skorupki pająków) i trofea elit i czempionów nie są skórami. Nową skórę dopisuje się do listy w danych. Walidator nie wpuszcza na nią trofeów, a test pilnuje, żeby nie zabrakło na niej żadnej skóry ani futra.
+3. **Co jest skórą (brakujący szczegół).** *Zmienione 1.11.2026, zob. „Garbarnia: wszystkie materiały stworów”.* Na początku skóry to była lista 16 materiałów stworów (`tannery.hides`): każdy, którego nazwa zaczynała się od „Skóra”, „Futro”, „Futerko” albo „Sierść”, i Wylinka zaskrońca.
 4. **Skup.** Wszebor kupuje skóry w każdej rzadkości, także te rzadsze niż ich gatunek, np. rzadką skórę wilka. Płaci cenę złomiarza z premią Skupu złomu, a do tego 10% więcej u Obcego, 15% u Znajomego, 20% u Stałego klienta, 25% u Zaufanego i 30% u Przyjaciela, jak Jagna. Sprzedaje się po sztuce albo wszystkie naraz, z zaokrągleniem w dół jak u Jagny. Skup działa też w czasie wyprawy, bo materiały nie leżą w torbie.
 5. **Sprzedaż.** Wszebor sprzedaje skóry w rzadkości ich gatunku: najpierw pospolite, potem rzadkie, unikalne i epickie. U Obcego ma 3 (Skóra wilka, Skóra lisa, Futro jenota), u Znajomego 6, u Stałego klienta 9, u Zaufanego 12, a u Przyjaciela wszystkie 16, razem z epickimi. Pod listą stoi, które skóry dojdą przy następnym stopniu.
     - **Cena (brakujący szczegół).** Jak u Jagny: 1,67 raza tyle, ile najwięcej płaci za skórę ktokolwiek w grze, mniej upust relacji (287 A), czyli u Przyjaciela ok. 1,5 raza. Najwięcej płaci najlepsze zlecenie tygodnia, więc pospolita skóra kosztuje 14 zł u Obcego i 13 zł u Przyjaciela, rzadka 27 zł u Znajomego i 25 zł u Przyjaciela, unikalna 51 zł u Stałego klienta i 49 zł u Przyjaciela, a epicka 97 zł. Zlecenie płaci za materiał mniej, niż kosztuje skóra, więc skóry kupuje się na brakujące sztuki, a nie dla zysku.
