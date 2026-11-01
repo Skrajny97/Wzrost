@@ -2996,7 +2996,30 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
-## Wprowadzenie: „Wyrusz” przy pierwszej wyprawie (1.11.2026, na wersji testowej)
+## Wersja 0.0.75 (1.11.2026)
+
+Autor: „pozniej pushnij awaryjne poprawki i zmiany na main” oraz „Awaryjne 0.0.75 wdrażaj natychmiast”.
+
+1. **Co wchodzi do gry:**
+    - awaryjnie: pierwsza wyprawa wprowadzenia znów rusza po „Wyrusz” (zob. „Wprowadzenie: „Wyrusz” przy pierwszej wyprawie”);
+    - wspólny czas wyprawy drużyny, komunikat „… przewinął czas o …” i walki tylko tych, którzy wyruszyli (zob. „Wspólny czas wyprawy drużyny”);
+    - opis drużyny słowami autora, „Przejdź do Kowadła” podkreślone tylko pod napisem, ekwipunek pod ręką przy profesji (zob. „Opis drużyny, link do Kowadła i ekwipunek przy profesji”).
+2. **Migracje bazy:** brak.
+3. **Przed wdrożeniem:** nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na 390×844, 1366×768 i 1920×1080.
+
+## Odpowiedzi autora 323–328 (1.11.2026)
+
+Autor: „Kowal i to i rzadkość, niech to Bractwo ma zastosowanie jakieś / 323 A / 324 A / 325 A / 326 A / 327 A / 328 A / znajomych oczywiście”.
+
+1. **323 A:** rolka w stylu oldskulowym bez lektora, według scenariusza z czatu, przed 18:00.
+2. **324 A:** najpierw sklep kosmetyczny za Punkty Systemu, waluta premium razem z wejściem do Sklepu Play.
+3. **325 A:** Garbarnia z garbarzem Wszeborem (Bractwo Łowców), z zakładkami Kup i Sprzedaj jak u Jagny.
+4. **326 A:** Kuźnia z kowalem Żelisławem (Bractwo Kowali): Zwój ochronny za 1000 złota, najwyżej 3 dziennie, i podniesienie rzadkości o stopień, raz na przedmiot. Najwyższa rzadkość zależy od relacji z kowalem. Autor dodał: „Kowal i to i rzadkość, niech to Bractwo ma zastosowanie jakieś”, więc handel u kowala daje też reputację Bractwa Kowali, a jej stopnie mają w Kuźni swoje korzyści.
+5. **327 A:** Stajnia z koniuszym Mirosławem. Wierzchowiec kupiony na stałe skraca wyprawy o 5, 10 albo 15%.
+6. **328 A:** sześć grafik, czyli budynek i popiersie dla każdego z trzech miejsc, pokazane autorowi po jednej. Samouczki narratora tych miejsc przyjdą później.
+7. **„znajomych oczywiście”:** Gildia zaprasza znajomych jednym stuknięciem, tak jak już działa od 0.0.74.
+
+## Wprowadzenie: „Wyrusz” przy pierwszej wyprawie (1.11.2026, w grze od 0.0.75)
 
 Autor: „sprawdz klatka po klatce to wideo i zobacz ze na komputerze nie da sie przejść samouczka nawet / trzeba prześledzić gierke z pozycji kompa” oraz „pilnuj tego na przyszlosc nie może tak byc, poczatek jest najwazniejszy”.
 
@@ -3004,12 +3027,14 @@ Autor: „sprawdz klatka po klatce to wideo i zobacz ze na komputerze nie da sie
 2. **Poprawka.** Przy pierwszej wyprawie pole drużyny jest puste. Przejście wprowadzenia od pierwszej karty do pierwszej wyprawy sprawdzone w przeglądarce na 390×844 (telefon), 1366×768 i 1920×1080 (komputer). Bez poprawki to samo przejście staje na „Wyrusz” z tym samym komunikatem.
 3. **Na przyszłość.** Przejście wprowadzenia nowej postaci w przeglądarce, na telefonie i komputerze, jest stałym punktem przed każdym wdrożeniem (CLAUDE.md).
 
-## Opis drużyny, link do Kowadła i ekwipunek przy profesji (1.11.2026, na wersji testowej)
+## Opis drużyny, link do Kowadła i ekwipunek przy profesji (1.11.2026, w grze od 0.0.75)
 
 1. **Opis drużyny.** Autor: „zły opis, powinno być "Na wyprawę ruszają członkowie bez zajęć w trakcie, z dopasowaniem do najniższego poziomem klasy z drużyny. Kto zajmuje się profesją albo jest na solo wyprawie, zostaje w drużynie, ale nie uczestniczy we wspólnej wyprawie."” Oba zdania stoją na karcie lidera i członka w miejscu zdań o tym, kto idzie i kto zostaje. Jedyna zmiana to „poziomu” zamiast literówki „poziomem”. Dokładne limity, np. „najwyżej na 1 h”, zostały pod „Z drużyną” w Walce.
 2. **„Przejdź do Kowadła”.** Autor: „Przejdź do Kowadła nie powinno podświetlać tych spacji czy kropek tylko sam napis w prawym dolnym rogu”. Odnośnik stoi po prawej, a linia jest tylko pod napisem.
 3. **Ekwipunek przy profesji.** Autor: „W trakcie wykonywania Profesji.. w sumie powinniśmy być w stanie zarządzać Ekwipunkiem? Czemu to miałoby przeszkadzać w gruncie rzeczy?” Blokada pochodziła z wcześniejszej notatki autora: „Niech nie pozwala tylko na zakładanie i zmianę ekwipunku” (zob. „Plecak poza obozem i mikstury na drogę”). Wynik pracy w profesji nie zależy od ekwipunku. Dlatego przy zbieraniu ziół, warzeniu i w Warsztacie można teraz zakładać i zdejmować przedmioty, ulepszać i zaklinać te założone, a także zakładać przedmioty towarzyszom. Na wyprawie wszystko to dalej czeka na powrót, bo jej raport liczy się z ekwipunkiem przy odbiorze.
 
+
+## Wspólny czas wyprawy drużyny (1.11.2026, w grze od 0.0.75)
 
 Autor: „Postać z drużyny moze przewijać eksplorację ale to nie przewija wszystkim, a musi nawet jesli nie jest liderem. Musi być wspólny timer. Niech ta drużyna daje jakies korzyści sensowne w ten sposób.”, „I niech sie wyswietla komunikat na górze innym graczom z drużyny w ekranie Walki i w raporcie - xxx przewinął czas o xxx” oraz „I jeśli dwie osoby z drużyny pójdą na wyprawę  a trzecia w tym czasie nie mogła to niech się nie okaże, że jednak 3 walczą”.
 
