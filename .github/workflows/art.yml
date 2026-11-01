@@ -37,6 +37,8 @@ on:
           - icons
           - cosmetics
           - mounts
+          - mounts-pixellab
+          - riders
           - settlement
           - residents
           - walks
@@ -97,6 +99,12 @@ jobs:
             args=(--ids "$IDS" --variants "$VARIANTS" --max-cost "$MAX_COST")
             if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
             node tools/animate-walks.mjs "${args[@]}"
+            exit
+          fi
+          if [ "$KIND" = "mounts-pixellab" ]; then
+            args=(--ids "$IDS" --variants "$VARIANTS" --max-cost "$MAX_COST")
+            if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+            node tools/animate-mounts.mjs "${args[@]}"
             exit
           fi
           args=(--kind "$KIND" --ids "$IDS" --variants "$VARIANTS" --style "$STYLE" --max-cost "$MAX_COST")

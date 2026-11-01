@@ -1,0 +1,10 @@
+{
+  "$comment": "Wierzchowce w kłusie (tools/animate-mounts.mjs, PixelLab animate-with-text-v3). start: wybrany obrazek wierzchowca z art/drafts/mounts, przycięty i postawiony na płótnie z miejscem na ruch nóg, przodem w prawo. Jeźdźcy siadają na nich później (tools/ride-sheets.py).",
+  "action": "trotting at a steady pace in place, seen from the side and facing right, the four legs moving in a smooth seamless trot loop, the head and body bobbing slightly, the saddle and bridle stay in place",
+  "frames": 8,
+  "mounts": {
+    "pony": { "start": "art/references/mounts/pony.png" },
+    "horse": { "start": "art/references/mounts/horse.png" },
+    "steed": { "start": "art/references/mounts/steed.png" }
+  }
+}
