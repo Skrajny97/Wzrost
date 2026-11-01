@@ -8274,10 +8274,18 @@ a.profession-square:active {
 .friend-who {
   flex: 1 1 150px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 0 6px;
   min-width: 0;
   font-size: 13px;
+}
+
+/* The name keeps its room: the levels and the state go under it when the
+   line is short (a Drużyna's member with "Usuń z drużyny" beside it). */
+.friend-who .chat-name {
+  flex-shrink: 0;
+  max-width: 100%;
 }
 
 .friend-actions {

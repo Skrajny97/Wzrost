@@ -37,7 +37,7 @@ import {
 } from '../state.js';
 import { playSound } from '../sound.js';
 import { skipControl, timePoints } from '../time.js';
-import { formatWait, stableNote } from '../stable.js';
+import { formatWait, stableNote, stableWait } from '../stable.js';
 import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { openEvent } from '../event.js';
 import { BUSY, skipLines } from './party.js';
@@ -707,8 +707,20 @@ export function mountCombat(container, { params, navigate }) {
     // A slider with buttons for one step at a time, and the length's name.
     const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
     const kind = h('span', { class: 'duration-kind' });
-    // With the Stajnia's mount the wait is shorter than the length (327 A).
+    // With the Stajnia's mount the wait is shorter than the length (327 A);
+    // a Drużyna's trip waits as long as its slowest mount (parties.js), so
+    // with "Z drużyną" ticked the line says the party's (`partyRide`).
     const riding = character.mount ? h('p', { class: 'duration-lock duration-mount' }) : null;
+    let partyRide;
+    const showRide = () => {
+      if (!riding) return;
+      riding.textContent =
+        partyRide === undefined
+          ? stableNote(minutes, character.mount)
+          : partyRide.shorter > 0
+            ? `Z wierzchowcami drużyny: ${formatWait(stableWait(minutes, partyRide))} (najwolniejszy ma ${partyRide.by})`
+            : `Wyprawa drużyny trwa pełny czas: ${partyRide.by} nie ma wierzchowca.`;
+    };
     const slider = h('input', {
       type: 'range',
       class: 'duration-slider',
@@ -746,7 +758,7 @@ export function mountCombat(container, { params, navigate }) {
       slider.style.setProperty('--fill', `${(index / Math.max(1, allowed.length - 1)) * 100}%`);
       value.textContent = formatMinutes(minutes);
       kind.textContent = lengthName(minutes);
-      if (riding) riding.textContent = stableNote(minutes, character.mount);
+      showRide();
       less.disabled = index === 0;
       more.disabled = index === allowed.length - 1;
       potions?.update(minutes);
@@ -782,7 +794,12 @@ export function mountCombat(container, { params, navigate }) {
     // false, since "Wyrusz" asks it for along() (since 0.0.71 a false here
     // threw "party?.along is not a function" and the introduction stopped
     // at its first exploration; the author's video).
-    const party = first ? null : partyChoice();
+    const party = first
+      ? null
+      : partyChoice((ride) => {
+          partyRide = ride;
+          showRide();
+        });
     start = h('button', {
       type: 'button',
       class: 'button button--system',
@@ -879,7 +896,9 @@ export function mountCombat(container, { params, navigate }) {
   // free now; along() gives their names while it is ticked, else null. The
   // members busy elsewhere stay home and in the party (parties.js), and the
   // lines under the box name them; with none free, only those lines.
-  function partyChoice() {
+  // `onRide` hears the party's slowest mount while "Z drużyną" is ticked,
+  // and undefined when the trip is the character's own.
+  function partyChoice(onRide) {
     const element = h('div', { class: 'party-choice', hidden: true });
     let free = [];
     if (isUnlocked('party')) {
@@ -896,7 +915,17 @@ export function mountCombat(container, { params, navigate }) {
             element.hidden = false;
             return;
           }
-          const box = h('input', { type: 'checkbox', id: 'party-along', class: 'avoid-rare-box', checked: partyTicked, onChange: () => (partyTicked = box.checked) });
+          const box = h('input', {
+            type: 'checkbox',
+            id: 'party-along',
+            class: 'avoid-rare-box',
+            checked: partyTicked,
+            onChange: () => {
+              partyTicked = box.checked;
+              onRide(partyTicked ? party.limits.mount : undefined);
+            },
+          });
+          onRide(partyTicked ? party.limits.mount : undefined);
           fill(
             element,
             h('label', { class: 'avoid-rare', for: 'party-along' }, box, h('span', { text: `Z drużyną: ${free.join(', ')}` })),

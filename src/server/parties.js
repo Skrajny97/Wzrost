@@ -8,7 +8,11 @@
 // 25 (data/unlocks.json, party). A member at a profession's work stays in
 // the party and the party goes without it (the author: "Niech po prostu nie
 // idzie z drużyną jesli jest zajety wykonywaniem Profesji, nie musi
-// wychodzić z niej.").
+// wychodzić z niej."). The members' class levels differ by at most
+// parties.classSpread (the author: "Rozpiętość poziomu klas w Drużynie maks
+// 5 lvl musi być też by nie było za dużego carrowania"; engine parties.js):
+// an invitation and a joining keep to it, and as levels grow apart, a trip
+// takes only those it fits, the others staying in the party.
 //
 // The leader invites a character by its name; a party comes with the first
 // invitation. The invited one accepts or declines; a member leaves when it
@@ -26,9 +30,10 @@
 // moves them all, and the others hear who skipped (time.js; the author:
 // "Musi być wspólny timer").
 
-import { areaFor, areaUnlocked, huntDurations, isUnlocked, longestHunt } from '../engine/index.js';
+import { areaFor, areaUnlocked, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyGoers, partyRange } from '../engine/index.js';
 import { characterView, currentHp, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
+import { settlementOn } from './features.js';
 import { guildTagSql } from './guilds.js';
 import { beginHunt } from './hunts.js';
 import { toHex } from './encoding.js';
@@ -37,6 +42,28 @@ import { OWN_CHARACTERS } from './roles.js';
 
 // The most invitations one party may have waiting.
 const MAX_INVITES = 5;
+
+// The class levels of a party's members, in its order.
+async function classLevels(db, partyId) {
+  const { results } = await db
+    .prepare('SELECT c.class_level FROM party_members m JOIN characters c ON c.id = m.character_id WHERE m.party_id = ? ORDER BY m.joined_at, m.character_id')
+    .bind(partyId)
+    .all();
+  return results.map((row) => row.class_level);
+}
+
+// Why a character of `classLevel` cannot be in a party of `levels`, or
+// null; `who` says whose level it is.
+function levelGap(who, classLevel, levels) {
+  const { from, to } = partyRange(levels, content);
+  if (classLevel >= from && classLevel <= to) return null;
+  const { classSpread } = content.balance.parties;
+  return new ApiError(
+    409,
+    'level_gap',
+    `${who} ${classLevel}. poziom klasy. Poziomy klas w drużynie mogą się różnić najwyżej o ${classSpread}, więc teraz dołączy postać z poziomem klasy od ${from} do ${to}.`,
+  );
+}
 
 const unlock = () => content.unlocksById.party;
 const size = () => content.balance.parties.size;
@@ -72,22 +99,28 @@ export async function partyOf(db, characterId) {
 
 // A member's state for the party's list: free (its character played and at
 // home), away (on an exploration), working (at a profession's work) or
-// aside (its player plays another character). Only the free go along.
+// aside (its player plays another character). Only the free go along, and
+// of them only those within the class levels' spread (the view marks the
+// others `gap`).
 function memberStatus(row) {
   if (row.role !== 'player') return 'aside';
   if (!row.activity) return 'free';
   return row.activity === 'hunt' ? 'away' : 'working';
 }
 
+// The stage of the Stajnia's mount of a character's row (327 A): a party's
+// trip waits as long as the slowest mount of those who go.
+const mountOfRow = (row) => (settlementOn() ? mountStage(JSON.parse(row.settlement ?? '{}'), content) : 0);
+
 // The Drużyna for the page: the party, with its members, the invitations it
 // sent and the limits of its explorations (the lowest member's), and the
 // invitations waiting for this character.
 export async function partyView(db, characterId, now) {
   const party = await partyOf(db, characterId);
-  const [members, sent, invites] = await db.batch([
+  const [members, sent, invites, self] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.name, c.class_id, c.level, c.class_level, c.role, u.seen_at, ${guildTagSql('c.id')} AS guild_tag,
+        `SELECT c.id, c.name, c.class_id, c.level, c.class_level, c.role, c.settlement, u.seen_at, ${guildTagSql('c.id')} AS guild_tag,
                 (SELECT a.kind FROM activities a WHERE a.character_id = c.id) AS activity
          FROM party_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
          WHERE m.party_id = ? ORDER BY m.joined_at, m.character_id`,
@@ -102,6 +135,7 @@ export async function partyView(db, characterId, now) {
          WHERE i.character_id = ? ORDER BY i.created_at DESC`,
       )
       .bind(characterId),
+    db.prepare('SELECT class_level FROM characters WHERE id = ?').bind(characterId),
   ]);
   const { onlineSeconds } = content.community.trade;
   const list = members.results.map((row) => ({
@@ -116,12 +150,21 @@ export async function partyView(db, characterId, now) {
     own: row.id === characterId,
     status: memberStatus(row),
     online: row.role === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000,
+    mount: mountOfRow(row),
   }));
+  // Of the free members, those too far in class level from the leader and
+  // the others going stay home (the spread).
+  const leader = list.find((member) => member.leader);
+  const { going, gap } = leader ? partyGoers(leader, list.filter((member) => !member.leader && member.status === 'free'), content) : { going: [], gap: [] };
+  for (const member of gap) member.status = 'gap';
   // The limits of the lowest of those who would go now, the leader and the
-  // free members, as the start checks them: the longest exploration of the
-  // lowest character level and the places of the lowest class level. One
-  // busy elsewhere stays home, so it limits nothing.
-  const goers = list.filter((member) => member.leader || member.status === 'free');
+  // free members within the spread, as the start checks them: the longest
+  // exploration of the lowest character level, the places of the lowest
+  // class level and the slowest mount. One busy elsewhere stays home, so it
+  // limits nothing.
+  const goers = leader ? [leader, ...going] : [];
+  const slowest = goers.length > 0 ? goers.reduce((low, member) => (member.mount < low.mount ? member : low)) : null;
+  const levels = list.length > 0 ? list.map((member) => member.classLevel) : [self.results[0]?.class_level ?? 1];
   const lowest = goers.length > 0 ? goers.reduce((low, member) => (member.level < low.level ? member : low)) : null;
   const lowestClass = goers.length > 0 ? goers.reduce((low, member) => (member.classLevel < low.classLevel ? member : low)) : null;
   return {
@@ -130,8 +173,16 @@ export async function partyView(db, characterId, now) {
       size: size(),
       members: list,
       invited: sent.results.map((row) => ({ id: row.id, name: row.name })),
-      limits: lowest && { minutes: longestHunt(lowest.level, content), minutesBy: lowest.name, classLevel: lowestClass.classLevel, classLevelBy: lowestClass.name },
+      limits: lowest && {
+        minutes: longestHunt(lowest.level, content),
+        minutesBy: lowest.name,
+        classLevel: lowestClass.classLevel,
+        classLevelBy: lowestClass.name,
+        mount: { shorter: mountOf(slowest.mount, content)?.shorter ?? 0, by: slowest.name },
+      },
     },
+    // The class levels a character invited now may have, and the spread.
+    range: { ...partyRange(levels, content), spread: content.balance.parties.classSpread },
     invites: invites.results.map((row) => ({ partyId: row.party_id, invitedBy: row.invited_by, members: row.members ?? '', at: row.created_at })),
     unlockLevel: unlock().level,
   };
@@ -156,7 +207,7 @@ export async function inviteToParty(context) {
   const name = typeof body.name === 'string' ? body.name.trim() : '';
   if (!name) throw new ApiError(400, 'no_name', 'Wpisz imię postaci.');
   const target = await db
-    .prepare(`SELECT id, user_id, name, level FROM characters WHERE name_key = ? AND ${OWN_CHARACTERS}`)
+    .prepare(`SELECT id, user_id, name, level, class_level FROM characters WHERE name_key = ? AND ${OWN_CHARACTERS}`)
     .bind(name.toLowerCase())
     .first();
   if (!target) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
@@ -174,6 +225,8 @@ export async function inviteToParty(context) {
   if (party && party.leaderId !== player.row.id) throw new ApiError(403, 'not_leader', 'Do drużyny zaprasza lider.');
   if (party?.memberIds.includes(target.id)) throw new ApiError(409, 'member', `${target.name} jest już w Twojej drużynie.`);
   if (party && party.memberIds.length >= size()) throw new ApiError(409, 'full', `Drużyna jest pełna: ${size()} postacie.`);
+  const gap = levelGap(`${target.name} ma`, target.class_level, party ? await classLevels(db, party.id) : [player.row.class_level]);
+  if (gap) throw gap;
   if (!party) {
     // The party and its leader at once, in one transaction.
     let made;
@@ -212,22 +265,28 @@ export async function acceptPartyInvite(context) {
   const invite = await db.prepare('SELECT party_id FROM party_invites WHERE party_id = ? AND character_id = ?').bind(partyIdOf(body), player.row.id).first();
   if (!invite) throw new ApiError(404, 'no_invite', 'Tego zaproszenia już nie ma.');
   if (await partyOf(db, player.row.id)) throw new ApiError(409, 'in_party', 'Najpierw opuść swoją drużynę.');
-  // Joins only while the party has a place (the count in the same statement);
-  // two invitations accepted at once join one party.
+  // Joins only while the party has a place and the character's class level
+  // keeps the party within the spread (both in the same statement), so two
+  // invitations accepted at once join one party.
   let joined;
   try {
     joined = await db
       .prepare(
         `INSERT INTO party_members (character_id, party_id, joined_at)
-         SELECT ?, ?, ? WHERE EXISTS (SELECT 1 FROM parties WHERE id = ?) AND (SELECT COUNT(*) FROM party_members WHERE party_id = ?) < ?`,
+         SELECT ?, ?, ? WHERE EXISTS (SELECT 1 FROM parties WHERE id = ?) AND (SELECT COUNT(*) FROM party_members WHERE party_id = ?) < ?
+           AND (SELECT MAX(MAX(c.class_level), ?) - MIN(MIN(c.class_level), ?) FROM party_members m JOIN characters c ON c.id = m.character_id WHERE m.party_id = ?) <= ?`,
       )
-      .bind(player.row.id, invite.party_id, context.now, invite.party_id, invite.party_id, size())
+      .bind(player.row.id, invite.party_id, context.now, invite.party_id, invite.party_id, size(), player.row.class_level, player.row.class_level, invite.party_id, content.balance.parties.classSpread)
       .run();
   } catch {
     throw new ApiError(409, 'in_party', 'Najpierw opuść swoją drużynę.');
   }
   await db.prepare('DELETE FROM party_invites WHERE character_id = ? AND (party_id = ? OR ? = 1)').bind(player.row.id, invite.party_id, joined.meta.changes).run();
-  if (joined.meta.changes !== 1) throw new ApiError(409, 'full', 'Ta drużyna jest już pełna albo jej nie ma.');
+  if (joined.meta.changes !== 1) {
+    const levels = await classLevels(db, invite.party_id);
+    const gap = levels.length > 0 && levels.length < size() && levelGap('Masz', player.row.class_level, levels);
+    throw gap || new ApiError(409, 'full', 'Ta drużyna jest już pełna albo jej nie ma.');
+  }
   return answer(db, player.row.id, context.now, { text: 'Jesteś w drużynie. Lider zabierze Cię na najbliższą wyprawę, gdy nie będziesz mieć innych zajęć.' });
 }
 
@@ -302,10 +361,12 @@ function snapshot(member, now) {
 }
 
 // POST /api/party/hunt { areaId, minutes, ... as "Wyrusz" }: the leader
-// sends the party out. The members free now go; each of them, the leader
+// sends the party out. The members free now go, those within the class
+// levels' spread with the leader and each other; each of them, the leader
 // too, must have the place and the length open, so the party goes only as
-// far and as long as its lowest member may. The leader's choices of potions
-// and tracking are its own; the others go without them.
+// far and as long as its lowest member may, and waits as long as its slowest
+// mount (the Stajnia, 327 A). The leader's choices of potions and tracking
+// are its own; the others go without them.
 export async function partyHunt(context) {
   const { session, player } = await requireIdlePlayer(context);
   requireUnlocked(player.row);
@@ -316,8 +377,18 @@ export async function partyHunt(context) {
   if (!party) throw new ApiError(409, 'no_party', 'Nie masz drużyny.');
   if (party.leaderId !== player.row.id) throw new ApiError(403, 'not_leader', 'Na wyprawę drużynę wysyła lider.');
   const others = (await Promise.all(party.memberIds.filter((id) => id !== player.row.id).map((id) => loadCharacter(db, id)))).filter(Boolean);
-  const going = others.filter((other) => other.row.role === 'player' && !other.activity);
-  if (going.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
+  const free = others.filter((other) => other.row.role === 'player' && !other.activity);
+  if (free.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
+  // Of them, those the class levels' spread lets go (engine parties.js).
+  const fit = partyGoers({ classLevel: player.row.class_level }, free.map((member) => ({ classLevel: member.row.class_level, member })), content).going;
+  const going = fit.map((one) => one.member);
+  if (going.length === 0) {
+    throw new ApiError(
+      409,
+      'party_level_gap',
+      `Wolni członkowie drużyny mają poziom klasy różny od Twojego o więcej niż ${content.balance.parties.classSpread}, więc nie pójdą na wspólną wyprawę. Odznacz „Z drużyną”, żeby wyruszyć bez drużyny.`,
+    );
+  }
   const area = typeof body.areaId === 'string' ? areaFor(body.areaId, player.row.level, content) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
   for (const member of [player, ...going]) {
@@ -329,6 +400,8 @@ export async function partyHunt(context) {
     }
   }
   const everyone = [player, ...going];
+  // One time for the whole trip: the slowest mount of those going.
+  const mount = Math.min(...everyone.map((member) => mountOfRow(member.row)));
   const shots = new Map(everyone.map((member) => [member.row.id, snapshot(member, now)]));
   const names = everyone.map((member) => member.row.name);
   const partnersOf = (member, list) => list.filter((other) => other !== member).map((other) => shots.get(other.row.id));
@@ -339,13 +412,14 @@ export async function partyHunt(context) {
   // healing mark, tracking), so a wrong one sends nobody (the code review);
   // then the members, each without the leader's choices. One that got busy
   // meanwhile stays home.
-  const setups = new Map([[player.row.id, await beginHunt(db, player, body, now, { party: party_, partners: partnersOf(player, everyone) })]]);
+  const setups = new Map([[player.row.id, await beginHunt(db, player, body, now, { party: party_, partners: partnersOf(player, everyone), mount })]]);
   const went = [];
   for (const member of going) {
     try {
       const setup = await beginHunt(db, member, { areaId: area.id, minutes: body.minutes, avoidRare: body.avoidRare === true, seekRare: body.seekRare === true && body.avoidRare !== true }, now, {
         party: party_,
         partners: partnersOf(member, everyone),
+        mount,
       });
       setups.set(member.row.id, setup);
       went.push(member);

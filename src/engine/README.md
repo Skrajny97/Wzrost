@@ -27,6 +27,8 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `settlement.js`, `companions.js`, `market.js` | Osada: reputacja, relacje, Tablica zleceń, usługi mieszkańców, towarzysze i Targowisko |
 | `stable.js` | Stajnia w Osadzie: wierzchowce kupowane na stałe, po kolei, i krótsze czekanie na koniec wyprawy |
 | `tannery.js` | Garbarnia w Osadzie: skóry, które garbarz skupuje i sprzedaje |
+| `forge.js` | Kuźnia w Osadzie: Zwoje ochronne i przekucie przedmiotu na wyższą rzadkość |
+| `parties.js` | Drużyna: rozpiętość poziomów klas i kto idzie na wspólną wyprawę |
 | `towers.js` | Wieże Systemu: podwaliny, jeszcze poza grą |
 | `gifts.js`, `gift-codes.js` | Upominek między znajomymi i kody podarunkowe |
 | `names.js`, `text.js`, `mail.js`, `notifications.js` | filtr imion postaci, warianty tekstów raportu, treść e-maila i powiadomienia na telefon |

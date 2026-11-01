@@ -195,5 +195,5 @@
     "minutes": 10,
     "refillHours": 12
   },
-  "parties": { "size": 3, "xpCost": 0.045 }
+  "parties": { "size": 3, "xpCost": 0.045, "classSpread": 5 }
 }

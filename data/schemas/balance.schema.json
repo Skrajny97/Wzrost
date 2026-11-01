@@ -1173,12 +1173,13 @@
     },
     "parties": {
       "type": "object",
-      "description": "Drużyny graczy (src/server/parties.js): najwyżej size postaci razem z liderem. Każdy członek, który idzie z drużyną na wyprawę, zabiera każdemu z pozostałych xpCost jego XP z walk (premia za skład z dokumentu projektowego: solo +10%, duo +5%, trio bez premii). Wolne miejsca do size zajmują towarzysze z Kwater, każdy za swój xpCost z settlement.json.",
+      "description": "Drużyny graczy (src/server/parties.js): najwyżej size postaci razem z liderem. Każdy członek, który idzie z drużyną na wyprawę, zabiera każdemu z pozostałych xpCost jego XP z walk (premia za skład z dokumentu projektowego: solo +10%, duo +5%, trio bez premii). Wolne miejsca do size zajmują towarzysze z Kwater, każdy za swój xpCost z settlement.json. Poziomy klas członków drużyny różnią się najwyżej o classSpread (autor: „Rozpiętość poziomu klas w Drużynie maks 5 lvl musi być też by nie było za dużego carrowania”): tyle sprawdza zaproszenie i dołączenie, a na wyprawę drużyny idą tylko ci, z którymi rozpiętość się mieści.",
       "additionalProperties": false,
-      "required": ["size", "xpCost"],
+      "required": ["size", "xpCost", "classSpread"],
       "properties": {
         "size": { "type": "integer", "minimum": 2 },
-        "xpCost": { "type": "number", "minimum": 0, "maximum": 0.5 }
+        "xpCost": { "type": "number", "minimum": 0, "maximum": 0.5 },
+        "classSpread": { "type": "integer", "minimum": 0 }
       }
     }
   }

@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { simulateHunt } from '../src/engine/index.js';
+import { huntWait, simulateHunt } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -97,7 +97,9 @@ describe('Drużyna through the API', () => {
   });
 
   test('the party goes only as far and as long as its lowest member may', async () => {
-    await (await db()).prepare("UPDATE characters SET level = 26, class_level = 20 WHERE name = 'Druh'").run();
+    // Within the class levels' spread, Druh's keeps the Omszałe Głazy shut to it.
+    await (await db()).prepare("UPDATE characters SET level = 26, class_level = 24 WHERE name = 'Druh'").run();
+    await (await db()).prepare("UPDATE characters SET class_level = 29 WHERE name = 'Lider'").run();
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
     const view = (await as('lider', 'GET', '/api/party')).data.party;
@@ -120,8 +122,10 @@ describe('Drużyna through the API', () => {
 
   test('a member at a profession\'s work stays in the party, stays home and limits nothing', async () => {
     await player('trzeci', 'Trzeci');
-    // Druh's class level keeps the Omszałe Głazy shut to it.
-    await (await db()).prepare("UPDATE characters SET level = 26, class_level = 20 WHERE name = 'Druh'").run();
+    // Druh's class level keeps the Omszałe Głazy shut to it, within the
+    // class levels' spread.
+    await (await db()).prepare("UPDATE characters SET level = 26, class_level = 24 WHERE name = 'Druh'").run();
+    await (await db()).prepare("UPDATE characters SET class_level = 29 WHERE name IN ('Lider', 'Trzeci')").run();
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
@@ -296,6 +300,54 @@ describe('Drużyna through the API', () => {
     assert.equal(own.data.error.code, 'own');
   });
 
+  test('the class levels in a party differ by at most the spread: an invitation and a joining keep to it', async () => {
+    const { classSpread } = content.balance.parties;
+    const level = (name, classLevel) => db().then((database) => database.prepare('UPDATE characters SET class_level = ? WHERE name = ?').bind(classLevel, name).run());
+    await level('Druh', 30 + classSpread + 1);
+    const far = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    assert.equal(far.data.error.code, 'level_gap');
+    assert.match(far.data.error.message, new RegExp(`od ${30 - classSpread} do ${30 + classSpread}\\.`));
+    await level('Druh', 30 + classSpread);
+    const near = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    assert.equal(near.status, 200, JSON.stringify(near.data));
+    assert.deepEqual(near.data.range, { from: 30 - classSpread, to: 30 + classSpread, spread: classSpread });
+    // The leader's level is checked again when the invitation is accepted.
+    await level('Lider', 29);
+    const refused = await as('druh', 'POST', '/api/party/accept', { partyId: near.data.party.id });
+    assert.equal(refused.data.error.code, 'level_gap');
+    assert.match(refused.data.error.message, new RegExp(`^Masz ${30 + classSpread}\\. poziom klasy`));
+    await level('Lider', 30);
+    const again = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    assert.equal((await as('druh', 'POST', '/api/party/accept', { partyId: again.data.party.id })).status, 200);
+  });
+
+  test('as class levels grow apart, a trip takes only those within the spread; the others stay in the party', async () => {
+    await player('trzeci', 'Trzeci');
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    await as('trzeci', 'POST', '/api/party/accept', { partyId: data.party.id });
+    await (await db()).prepare('UPDATE characters SET class_level = ? WHERE name = ?').bind(30 + content.balance.parties.classSpread + 1, 'Druh').run();
+    const view = (await as('lider', 'GET', '/api/party')).data.party;
+    assert.equal(view.members.find((one) => one.name === 'Druh').status, 'gap');
+    assert.equal(view.members.find((one) => one.name === 'Trzeci').status, 'free');
+    const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
+    assert.equal(went.status, 201, JSON.stringify(went.data));
+    assert.deepEqual(went.data.went, ['Trzeci']);
+    assert.deepEqual(went.data.party.members.map((one) => one.name), ['Lider', 'Druh', 'Trzeci']);
+    const druh = await (await db()).prepare("SELECT COUNT(*) AS count FROM activities a JOIN characters c ON c.id = a.character_id WHERE c.name = 'Druh'").first();
+    assert.equal(druh.count, 0);
+  });
+
+  test('a party whose free members are all beyond the spread does not go', async () => {
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    await (await db()).prepare('UPDATE characters SET class_level = ? WHERE name = ?').bind(30 + content.balance.parties.classSpread + 1, 'Druh').run();
+    const gap = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
+    assert.equal(gap.data.error.code, 'party_level_gap');
+    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM activities').first()).count, 0);
+  });
+
   test('a deleted account leaves its party', async () => {
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
@@ -303,5 +355,43 @@ describe('Drużyna through the API', () => {
     assert.equal(gone.status, 200, JSON.stringify(gone.data));
     const view = (await as('lider', 'GET', '/api/party')).data.party;
     assert.deepEqual(view.members.map((one) => one.name), ['Lider']);
+  });
+});
+
+describe("a Drużyna's trip and the Stajnia's mounts", () => {
+  const { call, db, signUp } = useServer({ PROFESSIONS: 'on', SETTLEMENT: 'on' });
+  const cookies = {};
+  async function player(login, name, mount) {
+    ({ cookie: cookies[login] } = await signUp(login));
+    await call('POST', '/api/character', { cookie: cookies[login], body: { name, classId: 'warrior', appearance: 'female' } });
+    await (await db()).prepare('UPDATE characters SET level = 30, class_level = 30, settlement = ? WHERE name = ?').bind(JSON.stringify(mount ? { mount } : {}), name).run();
+  }
+  const as = (login, method, path, body) => call(method, path, { cookie: cookies[login], body });
+  async function trip() {
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    const view = (await as('lider', 'GET', '/api/party')).data.party;
+    const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'mossy-boulders', minutes: 30 });
+    assert.equal(went.status, 201, JSON.stringify(went.data));
+    const rows = (await (await db()).prepare('SELECT started_at, ends_at, minutes FROM activities').all()).results;
+    assert.equal(rows.length, 2);
+    for (const row of rows) assert.equal(row.minutes, 30);
+    return { view, waits: rows.map((row) => row.ends_at - row.started_at) };
+  }
+
+  test('a trip waits as long as the slowest mount of those who go', async () => {
+    await player('lider', 'Lider', 2);
+    await player('druh', 'Druh', 1);
+    const { view, waits } = await trip();
+    assert.deepEqual(view.limits.mount, { shorter: content.settlement.stable.mounts[0].shorter, by: 'Druh' });
+    assert.deepEqual(waits, [huntWait(30, 1, content), huntWait(30, 1, content)]);
+  });
+
+  test('one without a mount makes the whole trip go its full length', async () => {
+    await player('lider', 'Lider', 3);
+    await player('druh', 'Druh', null);
+    const { view, waits } = await trip();
+    assert.deepEqual(view.limits.mount, { shorter: 0, by: 'Druh' });
+    assert.deepEqual(waits, [30 * 60000, 30 * 60000]);
   });
 });

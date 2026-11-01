@@ -11,7 +11,7 @@ import { formatMinutes } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, state, unlockInfo } from '../state.js';
-import { confirmAction, guildTag, toast, withButton } from '../ui.js';
+import { confirmAction, guildTag, howItWorks, toast, withButton } from '../ui.js';
 
 // Who goes on the party's exploration and who stays (the author's words of
 // 1.11.2026, "poziomu" for the slip "poziomem").
@@ -21,9 +21,15 @@ const GOERS =
 // A member's dot (the Znajomi's colours, styles.css) and its words; the
 // busy ones say it beside the name too, as they stay home when the party
 // goes (screens/combat.js).
-const DOTS = { free: 'online', away: 'busy', working: 'busy', aside: 'offline' };
-const STATES = { free: 'może iść na wyprawę', away: 'na wyprawie', working: 'pracuje w profesji', aside: 'gra teraz inną postacią' };
-export const BUSY = { away: 'na wyprawie', working: 'w profesji', aside: 'gra inną postacią' };
+// One free whose class level is too far from the leader's and the others'
+// (`gap`, parties.js) stays home too.
+const DOTS = { free: 'online', away: 'busy', working: 'busy', aside: 'offline', gap: 'busy' };
+const STATES = { free: 'może iść na wyprawę', away: 'na wyprawie', working: 'pracuje w profesji', aside: 'gra teraz inną postacią', gap: 'nie pójdzie: za duża różnica poziomu klasy' };
+export const BUSY = { away: 'na wyprawie', working: 'w profesji', aside: 'gra inną postacią', gap: 'za duża różnica poziomu klasy' };
+
+// The class levels' spread (the author: "Rozpiętość poziomu klas w Drużynie
+// maks 5 lvl musi być też by nie było za dużego carrowania").
+const spreadText = (spread) => `Poziomy klas w drużynie mogą się różnić najwyżej o ${spread}. Kto odstaje bardziej, zostaje w drużynie, ale nie idzie na wspólną wyprawę.`;
 
 // The time other members of a Drużyna's trip skipped for everyone
 // (src/server/time.js), one line each, their skips added up (the author:
@@ -109,7 +115,9 @@ export function mountParty(container) {
         onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)),
       }),
       guildTag(person.guildTag),
-      person.level && h('span', { class: 'chat-level', text: `poz. ${person.level}` }),
+      // The class level too, as the profile says it: the party's spread is
+      // of class levels.
+      person.level && h('span', { class: 'chat-level', text: person.classLevel ? `poz. ${person.level} · klasa ${person.classLevel}` : `poz. ${person.level}` }),
       BUSY[person.status] && h('span', { class: 'chat-level party-busy', text: BUSY[person.status] }),
       more,
     );
@@ -181,13 +189,21 @@ export function mountParty(container) {
         ),
       ),
       // Who goes and who stays: the author's words (1.11.2026: "zły opis,
-      // powinno być …"), on both cards.
-      h('p', {
-        class: 'muted',
-        text: own?.leader
-          ? `Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”. ${GOERS} Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim. Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.`
-          : `Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle. ${GOERS} Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.`,
-      }),
+      // powinno być …"), on both cards, folded under "Jak to działa?" (the
+      // author: "ten taki długi tekst o Drużynie schowaj pod "Jak to
+      // działa?"") with the first sentence in sight.
+      own?.leader
+        ? howItWorks('Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”.', [
+            GOERS,
+            spreadText(view.range.spread),
+            'Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.',
+            'Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.',
+          ])
+        : howItWorks('Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle.', [
+            GOERS,
+            spreadText(view.range.spread),
+            'Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.',
+          ]),
     );
   }
 
@@ -197,13 +213,24 @@ export function mountParty(container) {
     if (party && (!own?.leader || party.members.length >= party.size)) return null;
     const inParty = new Set(party ? party.members.map((member) => member.name) : []);
     const invited = new Set(party ? party.invited.map((one) => one.name) : []);
-    const ready = friends.filter((friend) => !inParty.has(friend.name) && !invited.has(friend.name) && friend.level >= view.unlockLevel);
+    // Only the friends whose class level fits the party's spread.
+    const { from, to, spread } = view.range;
+    const ready = friends.filter(
+      (friend) => !inParty.has(friend.name) && !invited.has(friend.name) && friend.level >= view.unlockLevel && friend.classLevel >= from && friend.classLevel <= to,
+    );
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'party-invite-title' },
       h('h2', { class: 'card-title', id: 'party-invite-title', text: 'Zaproś do drużyny' }),
       // The author's words (1.11.2026), over the friends and the name field.
       h('p', { class: 'muted', text: `Zaproś postaci od ${view.unlockLevel}. poziomu wzwyż. Poniżej możesz to zrobić z listy znajomych lub dodać kogokolwiek ręcznie spoza niej.` }),
+      h('p', {
+        class: 'muted',
+        text:
+          from <= to
+            ? `Poziomy klas w drużynie mogą się różnić najwyżej o ${spread}, więc teraz dołączy postać z poziomem klasy od ${from} do ${to}.`
+            : `Poziomy klas w drużynie mogą się różnić najwyżej o ${spread}, a w tej drużynie różnią się już bardziej, więc nikt nowy teraz nie dołączy.`,
+      }),
       ready.length > 0 &&
         h(
           'ul',

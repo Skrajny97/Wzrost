@@ -30,6 +30,7 @@ import {
   huntKills,
   huntReport,
   isUnlocked,
+  partyGoers,
   questPeriod,
   sellPrice,
   towerArea,
@@ -70,19 +71,28 @@ function recordOf(row) {
 const entriesUsed = (record, now) => (record.day === questPeriod('daily', now, content).key ? record.used : 0);
 
 // Who climbs a tower beside the character: in the Wieża Drużyn the other
-// players of its Drużyna as they are, and its companions in the places
-// left (a wounded one too: the tower takes nobody's HP); in the Wieża Solo
+// players of its Drużyna as they are, those within the class levels'
+// spread with the character (parties.js; the author: "maks 5 lvl [...] by
+// nie było za dużego carrowania"), and its companions in the places left
+// (a wounded one too: the tower takes nobody's HP); in the Wieża Solo
 // nobody. `top` is the highest floor open, `missing` why the tower is shut.
 async function climbersFor(db, player, tower) {
   const row = player.row;
   if (tower.members[1] === 1) return { partners: [], companions: [], top: row.level, missing: null };
   const party = await partyOf(db, row.id);
-  const others = party ? (await Promise.all(party.memberIds.filter((id) => id !== row.id).map((id) => loadCharacter(db, id)))).filter(Boolean) : [];
+  const loaded = party ? (await Promise.all(party.memberIds.filter((id) => id !== row.id).map((id) => loadCharacter(db, id)))).filter(Boolean) : [];
+  const others = partyGoers({ classLevel: row.class_level }, loaded.map((other) => ({ classLevel: other.row.class_level, other })), content).going.map((one) => one.other);
+  const apart = loaded.length - others.length;
   const partners = others.slice(0, tower.members[1] - 1).map((other) => ({ id: other.row.id, name: other.row.name, level: other.row.level, character: engineCharacter(other.row), equipped: equippedItems(other) }));
   const places = Math.max(0, tower.size - 1 - partners.length);
   const hired = tower.companions ? (JSON.parse(row.settlement ?? '{}').companions ?? []).filter((companion) => companionReady(companion, true)) : [];
   const companions = hired.slice(0, places);
-  const missing = 1 + partners.length < tower.members[0] ? `Do Wieży Drużyn wchodzi się z drużyną: co najmniej ${tower.members[0]} postacie graczy. Drużynę założysz w Społeczności.` : null;
+  const missing =
+    1 + partners.length < tower.members[0]
+      ? apart > 0
+        ? `Do Wieży Drużyn wchodzi się z drużyną: co najmniej ${tower.members[0]} postacie graczy, z poziomami klas różnymi najwyżej o ${content.balance.parties.classSpread}.`
+        : `Do Wieży Drużyn wchodzi się z drużyną: co najmniej ${tower.members[0]} postacie graczy. Drużynę założysz w Społeczności.`
+      : null;
   return { partners, companions, top: Math.min(row.level, ...partners.map((partner) => partner.level)), missing };
 }
 
