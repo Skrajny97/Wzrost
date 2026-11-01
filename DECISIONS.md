@@ -2996,6 +2996,20 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.76 (1.11.2026)
+
+Autor: „wdrażaj grafiki wybrałem”.
+
+1. **Co wchodzi do gry:**
+    - skrót gildii w kwadratowym nawiasie przy imieniu postaci (zob. „Skrót gildii przy imieniu”);
+    - jedne walki dla całej wyprawy drużyny, z osobnymi łupami, XP i zdarzeniami (zob. „Wspólne walki wyprawy drużyny”);
+    - drużyna z poziomami klas różnymi najwyżej o 5, długi opis pod „Jak to działa?” i tempo najwolniejszego wierzchowca (zob. „Drużyna: najwyżej 5 poziomów klasy różnicy i tempo wierzchowców”);
+    - nowe miejsca Osady z grafikami wybranymi przez autora: Kuźnia (zob. „Kuźnia”), Stajnia (zob. „Stajnia: Mirosław i wierzchowce”) i Garbarnia (zob. „Garbarnia: Wszebor, skóry na sprzedaż i w skupie”), a także odpowiedzi 330–336;
+    - krok samouczka Społeczności o zakładkach, na razie bez nagrania (zob. „Samouczek Społeczności pod zakładki”);
+    - test przejścia wprowadzenia w GitHubie przed każdym wdrożeniem.
+2. **Migracje bazy:** brak.
+3. **Przed wdrożeniem:** wszystkie testy (770) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na 390×844, 1366×768 i 1920×1080.
+
 ## Samouczek Społeczności pod zakładki (1.11.2026, na wersji testowej)
 
 Autor: „Przebuduj Samouczek społecznosci pod nowy tryb zakładek”.
