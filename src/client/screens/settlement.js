@@ -20,6 +20,7 @@ import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { companionCard } from '../companions.js';
 import { stableCard } from '../stable.js';
+import { tanneryCard } from '../tannery.js';
 import { itemSummary, materialTitle } from './character.js';
 import { mountMarket, numberField, stackButton } from './market.js';
 
@@ -47,6 +48,8 @@ export function mountSettlement(container, { params = {} } = {}) {
   // Jagna's tab: Kup first (the author: "trzeba zacząć u niej od zakładki
   // Kup/Sprzedaj"), kept while the screen redraws.
   let herbalistTab = 'buy';
+  // Wszebor's tab in the Garbarnia (tannery.js), as Jagna's.
+  let tanneryTab = 'buy';
   // The Targowisko's panel, mounted once and kept while the screen redraws
   // itself, so that a redraw does not ask the server for it again.
   let market = null;
@@ -983,6 +986,13 @@ export function mountSettlement(container, { params = {} } = {}) {
     if (resident.service === 'tavern') return h('div', { class: 'stack' }, tavernCard(), companionsCard());
     if (resident.service === 'herbalist') return herbalistCard();
     if (resident.service === 'forge') return forgeCard();
+    if (resident.service === 'tannery') {
+      const pick = (id) => {
+        tanneryTab = id;
+        render();
+      };
+      return tanneryCard(data.tannery, { tab: tanneryTab, pick, apply });
+    }
     if (resident.service !== 'hermit') return null;
     return h(
       'div',

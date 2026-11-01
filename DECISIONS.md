@@ -3027,6 +3027,28 @@ Autor: „postawimy Stajnie w Osadzie, gdzie możliwy będzie zakup Wierzchowcó
 9. **Zapis.** Stopień wierzchowca trzyma kolumna `characters.settlement` (`mount`: 1, 2 albo 3), więc migracja bazy nie jest potrzebna. Zasady liczy `src/engine/stable.js`, zakup `src/server/stable.js` (`POST /api/settlement/stable`), a sekcję w Stajni i linijkę w Walce `src/client/stable.js`.
 10. **Jeszcze nie ma:** grafik Stajni i Mirosława (328 A, autor wybiera) i samouczka narratora tego miejsca (przyjdzie później, 328 A).
 
+## Garbarnia: Wszebor, skóry na sprzedaż i w skupie (1.11.2026, na wersji testowej)
+
+Autor: „325 A”, czyli Garbarnia z garbarzem Wszeborem (Bractwo Łowców), z zakładkami Kup i Sprzedaj jak u Jagny. O garbarzu: „Niech sprzedaje i skupuje skóry (drożej) na podobieństwo Jagny / To troche ułatwi dodatkowo sprawę tym, którym braknie pare materiałów do Zleceń w Osadzie”.
+
+1. **Miejsce.** Garbarnia stoi na planszy Osady po lewej stronie placu, nad Chatą zielarki (`x` 13, `y` 53). Bliżej placu (`x` 17, `y` 45) zasłaniałaby lewy stragan Targowiska. Gospodarzem jest garbarz Wszebor z Bractwa Łowców. Ma historię i pięć powitań, po jednym na stopień relacji, bez form męskich i żeńskich wobec gracza (`residents` w `data/settlement.json`). Teksty to propozycja do poprawy przez autora.
+2. **Zakładki.** Jak u Jagny: najpierw otwiera się „Kup”, a obok jest „Sprzedaj”. Stuknięcie skóry w „Kup” otwiera jej kartę: obrazek, opis, cenę u złomiarza i liczbę sztuk, a pod spodem cenę u Wszebora i „Kup”.
+3. **Co jest skórą (brakujący szczegół).** Skóry to materiały stworów z listy `tannery.hides`: każdy, którego nazwa zaczyna się od „Skóra”, „Futro”, „Futerko” albo „Sierść”, i Wylinka zaskrońca, czyli zrzucona skóra węża. Razem 16:
+    - pospolite: Skóra wilka, Skóra lisa, Futro jenota, Wylinka zaskrońca;
+    - rzadkie: Futro kuny, Futerko łasicy, Futro żbika;
+    - unikalne: Futro rysia, Futro wadery, Sierść wilkołaka, Futro wydry, Skóra węgorza, Skóra salamandry;
+    - epickie: Skóra niedźwiedzia, Skóra połoza, Skóra krokodyla.
+
+    Łuski, pióra, kły, Pajęcze wylinki (skorupki pająków) i trofea elit i czempionów nie są skórami. Nową skórę dopisuje się do listy w danych. Walidator nie wpuszcza na nią trofeów, a test pilnuje, żeby nie zabrakło na niej żadnej skóry ani futra.
+4. **Skup.** Wszebor kupuje skóry w każdej rzadkości, także te rzadsze niż ich gatunek, np. rzadką skórę wilka. Płaci cenę złomiarza z premią Skupu złomu, a do tego 10% więcej u Obcego, 15% u Znajomego, 20% u Stałego klienta, 25% u Zaufanego i 30% u Przyjaciela, jak Jagna. Sprzedaje się po sztuce albo wszystkie naraz, z zaokrągleniem w dół jak u Jagny. Skup działa też w czasie wyprawy, bo materiały nie leżą w torbie.
+5. **Sprzedaż.** Wszebor sprzedaje skóry w rzadkości ich gatunku: najpierw pospolite, potem rzadkie, unikalne i epickie. U Obcego ma 3 (Skóra wilka, Skóra lisa, Futro jenota), u Znajomego 6, u Stałego klienta 9, u Zaufanego 12, a u Przyjaciela wszystkie 16, razem z epickimi. Pod listą stoi, które skóry dojdą przy następnym stopniu.
+    - **Cena (brakujący szczegół).** Jak u Jagny: 1,67 raza tyle, ile najwięcej płaci za skórę ktokolwiek w grze, mniej upust relacji (287 A), czyli u Przyjaciela ok. 1,5 raza. Najwięcej płaci najlepsze zlecenie tygodnia, więc pospolita skóra kosztuje 14 zł u Obcego i 13 zł u Przyjaciela, rzadka 27 zł u Znajomego i 25 zł u Przyjaciela, unikalna 51 zł u Stałego klienta i 49 zł u Przyjaciela, a epicka 97 zł. Zlecenie płaci za materiał mniej, niż kosztuje skóra, więc skóry kupuje się na brakujące sztuki, a nie dla zysku.
+    - Najwyższa cena skupu u Wszebora liczy się do najwyższej ceny skupu w grze (`buyCeiling`), więc ani on, ani Gościwit nie sprzedadzą skóry taniej, niż ktoś za nią zapłaci.
+    - Zakupy ogranicza tylko złoto, bo materiały nie zajmują miejsca w plecaku. Kupione skóry trafiają od razu do materiałów i liczą się jak towar z handlu, więc nie odkrywają wpisów w Encyklopedii.
+    - Zauważone: skóra przerobiona na Stole rozbiórki daje część taniej niż Lada złomiarza. Ścinki ze skóry wychodzą po ok. 13 zł, a na Ladzie kosztują od 40 zł na 1. poziomie do 23 zł na 10. To samo dzieje się już z materiałami Gościwita. Gdyby cena skóry liczyła też część, którą skóra daje, skóry byłyby ok. 2,7 raza droższe. Pytanie do autora.
+6. **Relacja i reputacja.** Handel w obie strony daje relację ze Wszeborem i reputację Bractwa Łowców: punkt za każde 5 złota razy poziom postaci, najwyżej 10 punktów dziennie. Ten limit jest osobny od limitu u Jagny.
+7. **Grafiki i samouczek.** Budynek (`tannery`) i popiersie (`tanner`) dojdą po wyborze autora (328 A). Do tego czasu na planszy stoi przerywany owal z nazwą, a karta Wszebora ma puste miejsce na popiersie. Samouczek narratora Garbarni przyjdzie później.
+
 ## Wspólne walki wyprawy drużyny (1.11.2026, na wersji testowej)
 
 Autor: „Wydaje mi się albo postacie z drużyny mają inne raporty odbytych walk. To nie powinni mieć miejsca - powinny być wspólne jedynie łupy, XP itp. osobne.” oraz „Ewentualne zdarzenia również osobno.”

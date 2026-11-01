@@ -9403,16 +9403,19 @@ a.profession-square:active {
   font-style: italic;
 }
 
-/* Jagna's herbs for sale, one to a row: the herb with its price, opening
-   its card under a tap, and "Kup" beside it. */
-.herbalist-good {
+/* Jagna's herbs and Wszebor's hides for sale, one to a row: the herb or
+   the hide with its price, opening its card under a tap, and "Kup" beside
+   it. */
+.herbalist-good,
+.tannery-good {
   flex-direction: row;
   align-items: center;
   gap: 12px;
   padding: 8px 14px;
 }
 
-.herbalist-good .market-goods-button {
+.herbalist-good .market-goods-button,
+.tannery-good .market-goods-button {
   flex: 1;
   min-width: 0;
 }

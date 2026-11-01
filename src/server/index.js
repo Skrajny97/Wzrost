@@ -64,6 +64,7 @@ import {
 } from './testing.js';
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyFromHerbalist, buyMug, chooseReforged, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, settlementTests, takeCompanionGift, testSettlement } from './settlement.js';
+import { buyFromTanner, sellToTanner } from './tannery.js';
 import { skipWithTimePoints } from './time.js';
 import { buyMount } from './stable.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
@@ -174,6 +175,8 @@ const routes = [
   ['POST', '/api/settlement/equip', equipCompanion],
   ['POST', '/api/settlement/herbalist', sellToHerbalist],
   ['POST', '/api/settlement/herbalist/buy', buyFromHerbalist],
+  ['POST', '/api/settlement/tannery', sellToTanner],
+  ['POST', '/api/settlement/tannery/buy', buyFromTanner],
   ['POST', '/api/settlement/talk', talkWithCompanion],
   ['POST', '/api/settlement/imbue', imbueAtEnchantress],
   ['POST', '/api/settlement/forge/scrolls', buyScrolls],

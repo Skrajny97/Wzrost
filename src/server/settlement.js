@@ -92,6 +92,7 @@ import { forgeView } from './forge.js';
 import { counted, foreign, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
 import { stableView } from './stable.js';
+import { tanneryView } from './tannery.js';
 
 // A JSON path for a key with a hyphen or a colon ("iron-ore", "wolf-pelt:rare").
 const jsonPath = (key) => `$."${key}"`;
@@ -106,9 +107,9 @@ const grow = (relations, { resident, relationGain }) => ({ ...relations, [reside
 
 // The service each resident gives on the page, as the data names them: the
 // board's orders, the reforging, the resets, the Karczma, the Chata
-// zielarki or the Kuźnia; none for the others.
+// zielarki, the Kuźnia or the Garbarnia; none for the others.
 const serviceOf = (residentId) =>
-  ['orders', 'reforge', 'hermit', 'tavern', 'herbalist', 'forge'].find((service) => content.settlement[service].resident === residentId) ?? null;
+  ['orders', 'reforge', 'hermit', 'tavern', 'herbalist', 'forge', 'tannery'].find((service) => content.settlement[service].resident === residentId) ?? null;
 
 // What the row keeps of the Osada: reputation and relations by id, the
 // board, a reforging's affixes waiting for the player's choice (`pending`),
@@ -126,6 +127,8 @@ export function settlementOf(row) {
     ...(stored.companions && { companions: stored.companions }),
     ...(stored.dismissed && { dismissed: stored.dismissed }),
     ...(stored.trade && { trade: stored.trade }),
+    // The reputation the Garbarnia's trade gave today (tannery.js).
+    ...(stored.tanneryTrade && { tanneryTrade: stored.tanneryTrade }),
     // The Targowisko: the residents' goods bought today and this week, and
     // the reputation its trade gave today (market.js).
     ...(stored.market && { market: stored.market }),
@@ -258,6 +261,7 @@ export function settlementView(player, stored, board, now) {
     companions: companionsView(player, stored, now),
     herbalist: herbalistView(player, stored, now),
     forge: forgeView(player, stored, now),
+    tannery: tanneryView(player, stored, now),
     imbue: imbueView(player),
     // After an evolution the paths change with it, so no path reset.
     hermit: {

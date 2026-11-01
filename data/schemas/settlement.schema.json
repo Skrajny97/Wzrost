@@ -325,6 +325,35 @@
     "imbue": { "type": "object", "additionalProperties": false, "required": ["resident", "relationGain", "goldPerLevel", "materialCount", "weaponShare", "resistRarity", "slots", "elements"], "properties": { "resident": { "type": "string", "description": "Zaklinaczka: id mieszkańca, przy którym rośnie relacja za zaklęcie." }, "relationGain": { "type": "integer", "minimum": 0 }, "goldPerLevel": { "type": "number", "minimum": 0 }, "materialCount": { "type": "integer", "minimum": 0 }, "weaponShare": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }, "resistRarity": { "type": "string" }, "slots": { "type": "array", "minItems": 1, "items": { "type": "string" } }, "elements": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["element", "material"], "properties": { "element": { "type": "string" }, "material": { "type": "string" } } } } } },
     "relationDiscount": { "type": "array", "minItems": 1, "items": { "type": "number", "minimum": 0, "exclusiveMaximum": 1 }, "description": "O ile mniej biorą mieszkańcy, którzy sprzedają, przy każdym stopniu relacji z nimi (287 A)." },
     "forge": { "type": "object", "additionalProperties": false, "required": ["resident", "brotherhood", "scroll", "raise", "topRarity", "discount", "reputation"], "properties": { "$comment": { "type": "string" }, "resident": { "type": "string", "description": "Kowal: id mieszkańca, przy którym rośnie relacja za handel." }, "brotherhood": { "type": "string", "description": "Bractwo, u którego rośnie reputacja za handel i którego reputacja obniża ceny Kuźni." }, "scroll": { "type": "object", "additionalProperties": false, "required": ["gold", "daily"], "properties": { "gold": { "type": "integer", "minimum": 1 }, "daily": { "type": "integer", "minimum": 1 } } }, "raise": { "type": "object", "additionalProperties": false, "required": ["goldPerLevel", "materials"], "properties": { "goldPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "materials": { "type": "integer", "minimum": 1 } } }, "topRarity": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "Najwyższa rzadkość według stopnia relacji z kowalem." }, "discount": { "type": "array", "minItems": 1, "items": { "type": "number", "minimum": 0, "maximum": 0.9 }, "description": "Zniżka złota według stopnia reputacji Bractwa." }, "reputation": { "type": "object", "additionalProperties": false, "required": ["goldPerPointPerLevel", "daily"], "properties": { "goldPerPointPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "daily": { "type": "integer", "minimum": 0 } } } } },
+    "tannery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resident", "brotherhood", "premium", "reputation", "sell", "hides"],
+      "description": "Garbarnia (pytanie 325 A, src/engine/tannery.js): garbarz skupuje i sprzedaje skóry, jak zielarka zioła. Skóry to materiały stworów z listy hides, w każdej rzadkości. Garbarz płaci za nie cenę złomiarza (z premią Skupu złomu w obozie) i o premium więcej, według stopnia relacji z nim. Przy każdym stopniu relacji sprzedaje tyle skór, ile podaje stock: najpierw pospolite, potem rzadkie, unikalne i epickie, a w jednej rzadkości w kolejności z listy. Każdą sprzedaje w rzadkości jej gatunku, margin razy drożej niż najwięcej, ile płaci za nią ktokolwiek w grze (buyCeiling w src/engine/market.js), mniej upust relacji (relationDiscount). Za handel rośnie relacja z nim i reputacja bractwa brotherhood: punkt za każde goldPerPointPerLevel złota razy poziom postaci, najwyżej daily punktów dziennie, osobno od limitu u zielarki.",
+      "properties": {
+        "resident": { "type": "string", "description": "Garbarz: id mieszkańca, przy którym rośnie relacja za handel." },
+        "brotherhood": { "type": "string", "description": "Bractwo, u którego rośnie reputacja za handel." },
+        "premium": { "type": "array", "minItems": 1, "items": { "type": "number", "minimum": 0 }, "description": "O ile więcej niż złomiarz płaci garbarz, według stopnia relacji z nim." },
+        "reputation": { "type": "object", "additionalProperties": false, "required": ["goldPerPointPerLevel", "daily"], "properties": { "goldPerPointPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "daily": { "type": "integer", "minimum": 0 } } },
+        "sell": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["margin", "stock"],
+          "description": "Skóry, które garbarz sprzedaje.",
+          "properties": {
+            "margin": { "type": "number", "exclusiveMinimum": 1, "description": "Ile razy drożej niż najwięcej, ile za skórę płaci ktokolwiek w grze." },
+            "stock": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 }, "description": "Ile skór sprzedaje przy każdym stopniu relacji z nim." }
+          }
+        },
+        "hides": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/definitions/id" },
+          "description": "Materiały stworów, które garbarz skupuje i sprzedaje: skóry, futra, sierść i wylinka węża (bez łusek, piór, kłów i trofeów elit i czempionów). W jednej rzadkości sprzedaje je w tej kolejności."
+        }
+      }
+    },
     "herbalist": { "type": "object", "additionalProperties": false, "required": ["resident", "brotherhood", "premium", "reputation", "sell"], "properties": { "resident": { "type": "string", "description": "Zielarka: id mieszkańca, przy którym rośnie relacja za handel." }, "brotherhood": { "type": "string", "description": "Bractwo, u którego rośnie reputacja za handel." }, "premium": { "type": "array", "minItems": 1, "items": { "type": "number", "minimum": 0 }, "description": "O ile więcej niż złomiarz płaci zielarka, według stopnia relacji z nią." }, "reputation": { "type": "object", "additionalProperties": false, "required": ["goldPerPointPerLevel", "daily"], "properties": { "goldPerPointPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "daily": { "type": "integer", "minimum": 0 } } }, "sell": { "type": "object", "additionalProperties": false, "required": ["margin", "stock"], "description": "Zioła, które zielarka sprzedaje.", "properties": { "margin": { "type": "number", "exclusiveMinimum": 1, "description": "Ile razy drożej niż najwięcej, ile za zioło płaci ktokolwiek w grze." }, "stock": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 }, "description": "Ile ziół, od najniższego poziomu Zielarstwa, sprzedaje przy każdym stopniu relacji z nią." } } } } }
   }
 }

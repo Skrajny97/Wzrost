@@ -562,7 +562,8 @@ export function herbalistPremium(points, content) {
 
 // What a resident who sells takes off the price at `points` of the
 // relation with them (287 A: "Znajomy płaci 2,5% mniej, Stały klient 5%,
-// Zaufany 7,5%, a Przyjaciel 10%"): Gościwit on the Targowisko and Jagna.
+// Zaufany 7,5%, a Przyjaciel 10%"): Gościwit on the Targowisko, Jagna and
+// Wszebor in the Garbarnia (tannery.js).
 export function relationDiscount(points, content) {
   const discounts = content.settlement.relationDiscount;
   return discounts[Math.min(standingOf(points, content).index, discounts.length - 1)];
