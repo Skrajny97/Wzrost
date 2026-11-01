@@ -848,10 +848,21 @@ function anvilSection(item, busy, open = false) {
         h('span', { text: `Użyj Zwoju ochronnego (masz ${formatNumber(scrolls)})` }),
       ),
     ward && h('p', { class: 'muted', id: `ward-note-${item.id}`, text: 'Zwój chroni przed rozpadem, ale nie przed spadkiem ulepszenia. Przepada przy tej próbie.' }),
+    // Where a Zwój ochronny comes from: the Systemowy Warsztat, and the
+    // smith in the Osada's Kuźnia (326 A).
     next.breakChance > 0 &&
       !ward &&
-      state.character.professions?.workshop &&
-      h('p', { class: 'system-hint', text: 'Zwój ochronny z Systemowego Warsztatu chroni przed rozpadem na Kowadle.' }),
+      (state.character.professions?.workshop || state.character.settlementOpen) &&
+      h('p', {
+        class: 'system-hint',
+        text: `Zwój ochronny chroni przed rozpadem na Kowadle. ${
+          !state.character.settlementOpen
+            ? 'Zrobisz go w Systemowym Warsztacie.'
+            : state.character.professions?.workshop
+              ? 'Zrobisz go w Systemowym Warsztacie albo kupisz u kowala w Kuźni w Osadzie.'
+              : 'Kupisz go u kowala w Kuźni w Osadzie.'
+        }`,
+      }),
     h('button', {
       type: 'button',
       class: 'button button--system',

@@ -2996,6 +2996,19 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Kuźnia (1.11.2026, na wersji testowej)
+
+Autor: „326 A” oraz „Kowal i to i rzadkość, niech to Bractwo ma zastosowanie jakieś”.
+
+1. **Miejsce.** Kuźnia stoi na planszy Osady w wolnym miejscu między Tablicą zleceń a Targowiskiem. Mieszka w niej kowal Żelisław z Bractwa Kowali. Dopóki autor nie wybierze budynku i popiersia (pytania 330–335), Kuźnia ma na planszy puste miejsce z nazwą.
+2. **Zwoje ochronne.** Kowal sprzedaje Zwój ochronny za 1000 złota, najwyżej 3 dziennie (doba jak przy zadaniach dziennych). Kupiony zwój trafia do tego samego licznika co zwoje z Warsztatu i tak samo chroni przed rozpadem na Kowadle. Podpowiedź na Kowadle mówi teraz, że zwój można też kupić u kowala.
+3. **Przekucie na wyższą rzadkość.** Kowal podnosi rzadkość przedmiotu o jeden stopień, raz na przedmiot. Afiksy przedmiotu rosną do wartości nowej rzadkości na jego poziomie, a afiks już wyższy zostaje. Przedmiot dostaje też jeden nowy afiks: tego rodzaju (przedrostek albo przyrostek), którego ma mniej, i inny niż te, które już ma. Przekuty przedmiot ma więc tyle afiksów co zwykły przedmiot nowej rzadkości. Ulepszenie z Kowadła, żywioł i zaklęte afiksy zostają.
+4. **Koszt przekucia (brakujący szczegół).** Złoto: 25 za poziom przedmiotu razy mnożnik sprzedaży nowej rzadkości, czyli 25 razy tyle, ile złomiarz płaci za przedmiot nowej rzadkości. Do tego 5 sztuk jednego materiału nowej rzadkości, tak jak Kowadło bierze materiał rzadkości przedmiotu. Przykład: rzadki miecz 20. poziomu przekuty na unikalny kosztuje 2000 złota i 5 sztuk unikalnego materiału.
+5. **Relacja z kowalem (brakujący szczegół).** Najwyższa rzadkość, do której kowal przekuwa, rośnie ze stopniem relacji z nim: Obcy do unikalnej, Znajomy do epickiej, Stały klient do legendarnej, Zaufany do mitycznej, Przyjaciel do boskiej.
+6. **Bractwo Kowali.** Reputacja Bractwa Kowali obniża ceny kowala w złocie, za zwój i za przekucie, o 0, 5, 10, 15 albo 20% według jej stopnia. To odpowiedź na „niech to Bractwo ma zastosowanie jakieś”. Bractwo Kowali zbiera też reputację za zlecenia na części, zasoby i wyroby Warsztatu.
+7. **Handel daje relację i reputację.** Zakup zwojów i przekucie dają relację z kowalem i reputację Bractwa Kowali tak jak handel u Jagny: punkt za każde 5 złota razy poziom postaci, najwyżej 10 punktów dziennie. Kuźnia ma własny dzienny limit, osobny od handlu u Jagny i w Garbarni.
+8. **Przedmiot założony** można przekuć poza wyprawą, tak jak u Zaklinaczki.
+
 ## Wspólne walki wyprawy drużyny (1.11.2026, na wersji testowej)
 
 Autor: „Wydaje mi się albo postacie z drużyny mają inne raporty odbytych walk. To nie powinni mieć miejsca - powinny być wspólne jedynie łupy, XP itp. osobne.” oraz „Ewentualne zdarzenia również osobno.”

@@ -8,7 +8,8 @@
     { "id": "hermitage", "name": "Chata Pustelnika", "x": 78, "y": 81, "resident": "hermit" },
     { "id": "tavern", "name": "Karczma", "x": 84, "y": 43, "resident": "innkeeper" },
     { "id": "market", "name": "Targowisko", "x": 45.5, "y": 46, "resident": "merchant" },
-    { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist" }
+    { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist" },
+    { "id": "forge", "name": "Kuźnia", "x": 62, "y": 31, "resident": "smith" }
   ],
   "torches": [
     { "x": 32, "y": 12.5 },
@@ -61,7 +62,8 @@
     },
     { "id": "innkeeper", "name": "Zbylut", "title": "karczmarz", "story": "Zna wszystkie plotki z traktu i każdego, kto szuka pracy. U niego znajdziesz przyszłych towarzyszy.", "greetings": ["Siadaj, gdzie wolne. Kufel piwa, a do niego plotka z traktu, jeśli kogoś to ciekawi.", "O, znowu ty. Ludzie z traktu zostawili tu dziś kilka ciekawych informacji.", "Twoje miejsce przy ladzie czeka. I kufel, i świeże plotki.", "Tobie mówię to, czego nie mówię innym. Nachyl się bliżej.", "Dla przyjaciół Rozstajów kufel zawsze pełny, a drzwi na zaplecze otwarte."] },
     { "id": "herbalist", "name": "Jagna", "title": "zielarka", "story": "Zbiera zioła od świtu i suszy je pod strzechą. Za dobre zioła potrafi solidnie zapłacić, a zaufanym zdradza rzadkie receptury.", "greetings": ["Zioła przynosisz? Pokaż, co masz w koszyku. Za dobre płacę więcej niż złomiarz.", "O, znowu ty. Rumianek mi się kończy, a mikstur nigdy dość.", "Siadaj przy piecu. Najpierw zioła, potem herbata.", "Tobie płacę jak swoim. Kiedyś pokażę ci, co warzę w tym kotle.", "Dla przyjaciół drzwi mojej chaty zawsze otwarte, a kocioł zawsze ciepły."] },
-    { "id": "merchant", "name": "Gościwit", "title": "kupiec", "story": "Przyjechał z karawaną zza wielkiej rzeki i został, bo na Rozstajach spotykają się wszystkie drogi. Na jego straganie jest trochę wszystkiego, a o każdej rzeczy opowiada tak, jakby była skarbem.", "greetings": ["Patrz, wybieraj, ale nie dotykaj. I pamiętaj, by się spieszyć z decyzją. Dzisiejszego towaru może jutro już nie być.", "A, znajoma twarz! Mam coś, co ci się spodoba. Albo i nie, ale zobaczyć warto.", "Stały klient to skarb. Kto u mnie kupuje, ten wie, że nie oszukuję. Za bardzo.", "Tobie powiem, skąd mam towar. Innym nie mówię, bo zaraz pojechaliby tam beze mnie.", "Przyjacielu! Siadaj, napijemy się kwasu. O interesach pogadamy potem."] }
+    { "id": "merchant", "name": "Gościwit", "title": "kupiec", "story": "Przyjechał z karawaną zza wielkiej rzeki i został, bo na Rozstajach spotykają się wszystkie drogi. Na jego straganie jest trochę wszystkiego, a o każdej rzeczy opowiada tak, jakby była skarbem.", "greetings": ["Patrz, wybieraj, ale nie dotykaj. I pamiętaj, by się spieszyć z decyzją. Dzisiejszego towaru może jutro już nie być.", "A, znajoma twarz! Mam coś, co ci się spodoba. Albo i nie, ale zobaczyć warto.", "Stały klient to skarb. Kto u mnie kupuje, ten wie, że nie oszukuję. Za bardzo.", "Tobie powiem, skąd mam towar. Innym nie mówię, bo zaraz pojechaliby tam beze mnie.", "Przyjacielu! Siadaj, napijemy się kwasu. O interesach pogadamy potem."] },
+    { "id": "smith", "name": "Żelisław", "title": "kowal", "story": "Kuje od świtu do zmroku i rzadko odkłada młot. Sprzedaje Zwoje ochronne do Kowadła i przekuwa przedmioty o stopień rzadkości wyżej: im lepiej kogoś zna, tym rzadsze przedmioty mu wykuwa. Należy do Bractwa Kowali, więc kto ma dobrą reputację Bractwa, płaci u niego mniej.", "greetings": ["Czego szukasz? Mów szybko, żelazo stygnie.", "A, znajoma twarz. Zwoje mam świeże, a palenisko gorące.", "Przynieś dobry materiał, a podniosę twój przedmiot o stopień.", "Zaufanym kuję staranniej. Pokaż, co dziś przynosisz.", "Dla przyjaciół wykuję nawet boski przedmiot. Co podnosimy?"] }
   ],
   "brotherhoods": [
     { "id": "herbalists", "name": "Bractwo Zielarzy", "goods": ["herb", "potion"] },
@@ -190,6 +192,16 @@
       { "element": "lightning", "material": "eel-skin" },
       { "element": "nature", "material": "sundew-dew" }
     ]
+  },
+  "forge": {
+    "$comment": "Kuźnia (pytanie 326 A): kowal Żelisław z Bractwa Kowali. Zwój ochronny za scroll.gold złota, najwyżej scroll.daily dziennie. Podniesienie rzadkości o stopień, raz na przedmiot: raise.goldPerLevel złota za poziom przedmiotu razy sell nowej rzadkości, i raise.materials sztuk jednego materiału nowej rzadkości. topRarity: najwyższa rzadkość według stopnia relacji z kowalem. discount: o ile taniej (złoto) według stopnia reputacji Bractwa Kowali. reputation: jak u zielarki.",
+    "resident": "smith",
+    "brotherhood": "smiths",
+    "scroll": { "gold": 1000, "daily": 3 },
+    "raise": { "goldPerLevel": 25, "materials": 5 },
+    "topRarity": ["unique", "epic", "legendary", "mythic", "divine"],
+    "discount": [0, 0.05, 0.1, 0.15, 0.2],
+    "reputation": { "goldPerPointPerLevel": 5, "daily": 10 }
   },
   "herbalist": {
     "resident": "herbalist",

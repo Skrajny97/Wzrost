@@ -1,0 +1,165 @@
+// The Kuźnia in the Osada (question 326 A; the engine's forge.js): Żelisław
+// of the Bractwo Kowali sells the Zwój ochronny for the Kowadło, a few a
+// day, and raises an item's rarity by one step, once per item, for gold
+// and pieces of one material of the new rarity. Each trade grows the
+// relation with him and the Bractwo Kowali's reputation, up to his own
+// day's limit (tradePoints), as the Garbarnia's trade has its own.
+
+import { createRng, forgeDiscount, forgeTopRarity, itemName, knownStack, materialView, parseStack, questPeriod, raiseOffer, raiseRarity, scrollPrice, tradePoints } from '../engine/index.js';
+import { characterView, loadPlayer, requirePlayer, requireUnworn, settlementBoard } from './characters.js';
+import { content } from './content.js';
+import { toHex } from './encoding.js';
+import { ApiError, json, readJson } from './http.js';
+import { requireOpen, settlementOf, settlementView } from './settlement.js';
+
+const jsonPath = (key) => `$."${key}"`;
+const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
+const forge = () => content.settlement.forge;
+
+// The Zwoje bought today, as kept in the Osada's JSON.
+const boughtToday = (stored, now) => (stored.forge?.day === questPeriod('daily', now, content).key ? stored.forge.scrolls : 0);
+
+// The Osada after a trade at the Kuźnia, as the other places answer.
+function osada(after, now) {
+  const stored = settlementOf(after.row);
+  return settlementView(after, stored, settlementBoard(after.row, stored, now), now);
+}
+
+// What the page needs: the scroll's price and the ones left today, the
+// highest rarity the relation lets him reach, the Bractwo's discount, and
+// for each item, worn or in the bag, what raising it takes or why it
+// cannot be raised.
+export function forgeView(player, stored, now) {
+  const { row } = player;
+  const relation = stored.relations?.[forge().resident] ?? 0;
+  const reputation = stored.reputation?.[forge().brotherhood] ?? 0;
+  const materials = JSON.parse(row.materials ?? '{}');
+  const day = questPeriod('daily', now, content).key;
+  return {
+    scroll: { price: scrollPrice(reputation, content), daily: forge().scroll.daily, left: Math.max(0, forge().scroll.daily - boughtToday(stored, now)), have: row.scrolls ?? 0 },
+    topName: content.raritiesById[forgeTopRarity(relation, content)].name,
+    // Whether a better relation lets him go no higher.
+    best: forgeTopRarity(relation, content) === forge().topRarity.at(-1),
+    discount: forgeDiscount(reputation, content),
+    // The relation and the reputation the trade gave today, of the day's limit.
+    trade: { today: stored.forgeTrade?.day === day ? stored.forgeTrade.points : 0, daily: forge().reputation.daily },
+    items: player.items.map((item) => {
+      const offer = raiseOffer(item, relation, reputation, content);
+      // The materials of the new rarity the character has enough of, as the
+      // Zaklinaczka lists them.
+      const stacks = offer.gold
+        ? Object.entries(materials)
+            .filter(([key, count]) => knownStack(key, content) && parseStack(key).rarityId === offer.next && count >= offer.materials)
+            .map(([key, count]) => ({ key, label: materialView(key, count, content).label, count }))
+        : [];
+      return {
+        id: item.id,
+        name: itemName(item, content),
+        rarity: item.rarity,
+        rarityName: content.raritiesById[item.rarity].name,
+        equipped: Boolean(item.equippedSlot),
+        ...offer,
+        ...(offer.next && { nextName: content.raritiesById[offer.next].name }),
+        ...(offer.top && { topName: content.raritiesById[offer.top].name }),
+        stacks,
+      };
+    }),
+  };
+}
+
+// The relation and the reputation a trade of `gold` grows, as at Jagna's.
+function grown(stored, gold, level, now) {
+  const { points, trade } = tradePoints(gold, level, stored.forgeTrade, now, content, forge().reputation);
+  const add = (counts, id) => ({ ...counts, [id]: (counts?.[id] ?? 0) + points });
+  return { points, next: { ...stored, relations: add(stored.relations, forge().resident), reputation: add(stored.reputation, forge().brotherhood), forgeTrade: trade } };
+}
+
+// POST /api/settlement/forge/scrolls { count }: Zwoje ochronne, a few a day.
+export async function buyScrolls(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const left = forge().scroll.daily - boughtToday(stored, context.now);
+  if (!Number.isInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Podaj, ile zwojów kupić.');
+  if (body.count > left) throw new ApiError(409, 'sold_out', left > 0 ? `Dziś kowal sprzeda jeszcze ${left}.` : 'Na dziś kowal nie ma już zwojów. Wróć jutro.');
+  const reputation = stored.reputation?.[forge().brotherhood] ?? 0;
+  const gold = scrollPrice(reputation, content) * body.count;
+  if (row.gold < gold) throw new ApiError(409, 'no_gold', 'Brakuje złota.');
+  const { points, next } = grown(stored, gold, row.level, context.now);
+  const day = questPeriod('daily', context.now, content).key;
+  const saved = { ...next, forge: { day, scrolls: boughtToday(stored, context.now) + body.count } };
+  const result = await context.env.DB.prepare('UPDATE characters SET gold = gold - ?, scrolls = scrolls + ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?')
+    .bind(gold, body.count, JSON.stringify(saved), row.id, row.version, gold)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(context.env.DB, session.userId);
+  return json({ bought: { count: body.count, gold, points }, settlement: osada(after, context.now), character: characterView(after, context.now) });
+}
+
+// POST /api/settlement/forge/raise { itemId, material }: one rarity up, once
+// per item, for gold and pieces of one material of the new rarity (its key
+// "material:rarity"). A worn item waits for the return from an exploration.
+export async function raiseAtForge(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const item = player.items.find((candidate) => String(candidate.id) === String(body.itemId));
+  if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
+  requireUnworn(player, item, context.now);
+  const stored = settlementOf(row);
+  const relation = stored.relations?.[forge().resident] ?? 0;
+  const reputation = stored.reputation?.[forge().brotherhood] ?? 0;
+  const offer = raiseOffer(item, relation, reputation, content);
+  if (offer.reason === 'raised') throw new ApiError(409, 'raised', 'Ten przedmiot kowal już raz przekuł.');
+  if (offer.reason === 'top') throw new ApiError(409, 'top', 'Wyżej tej rzadkości już nie ma.');
+  if (offer.reason === 'relation') throw new ApiError(409, 'relation', `Na razie kowal przekuwa przedmioty najwyżej do rzadkości „${content.raritiesById[offer.top].name}”. Lepsza relacja z nim pozwoli iść wyżej.`);
+  const key = typeof body.material === 'string' ? body.material : '';
+  const materials = JSON.parse(row.materials ?? '{}');
+  if (!knownStack(key, content) || parseStack(key).rarityId !== offer.next) {
+    throw new ApiError(400, 'invalid_material', `Wybierz materiał o rzadkości „${content.raritiesById[offer.next].name}”.`);
+  }
+  if ((materials[key] ?? 0) < offer.materials) throw new ApiError(409, 'no_material', `Potrzeba ${offer.materials} szt. tego materiału.`);
+  if (row.gold < offer.gold) throw new ApiError(409, 'no_gold', 'Brakuje złota.');
+  const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
+  const raised = raiseRarity(item, createRng(roll), content);
+  const { points, next } = grown(stored, offer.gold, row.level, context.now);
+  const path = jsonPath(key);
+  const db = context.env.DB;
+  // As at the Zaklinaczka: the item changes only if it and the character are
+  // as seen here, and the payment only if this raise was saved.
+  await db.batch([
+    db
+      .prepare(
+        `UPDATE items SET data = json_set(data, '$.rarity', ?, '$.affixes', json(?), '$.raised', json('true'), '$.lastRoll', ?)
+         WHERE id = ? AND character_id = ? AND json_extract(data, '$.raised') IS NULL AND (SELECT version FROM characters WHERE id = ?) = ?`,
+      )
+      .bind(raised.rarity, JSON.stringify(raised.affixes), roll, item.id, row.id, row.id, row.version),
+    db
+      .prepare(
+        `UPDATE characters SET gold = gold - ?, settlement = ?,
+           materials = CASE WHEN json_extract(materials, ?) > ? THEN json_set(materials, ?, json_extract(materials, ?) - ?) ELSE json_remove(materials, ?) END,
+           version = version + 1
+         WHERE id = ? AND version = ? AND gold >= ? AND COALESCE(json_extract(materials, ?), 0) >= ?
+           AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
+      )
+      .bind(offer.gold, JSON.stringify(next), path, offer.materials, path, path, offer.materials, path, row.id, row.version, offer.gold, path, offer.materials, item.id, roll),
+  ]);
+  const after = await loadPlayer(db, session.userId);
+  const saved = after.items.find((candidate) => candidate.id === item.id);
+  if (saved?.lastRoll !== roll || saved.rarity !== raised.rarity) throw changed();
+  return json({
+    raised: {
+      itemId: saved.id,
+      name: itemName(saved, content),
+      beforeName: content.raritiesById[item.rarity].name,
+      afterName: content.raritiesById[saved.rarity].name,
+      gold: offer.gold,
+      points,
+    },
+    settlement: osada(after, context.now),
+    character: characterView(after, context.now),
+  });
+}

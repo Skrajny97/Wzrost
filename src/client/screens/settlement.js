@@ -198,6 +198,59 @@ export function mountSettlement(container, { params = {} } = {}) {
   };
   const pickMark = () => h('span', { class: 'trade-pick-mark', 'aria-hidden': 'true' }, icon('check', { size: 18 }));
 
+  // What a service takes, as the Kowadło shows it: gold and the material,
+  // each as had / needed, red while short, the stack nearest to enough when
+  // none is, and what is missing (a tester via the author: "Co masz ile ci
+  // czego brakuje", "Może żeby jakoś graficznie to przedstawić"). `need` is
+  // the material's count, rarity and the stacks of it that are enough, or
+  // null; `takes` begins the sentence on the material.
+  function costPart({ gold, need, material, title, takes }) {
+    const goldShort = Math.max(0, gold - state.character.gold);
+    const chip = (art, label, have, wanted) =>
+      h('li', { class: `cost${have < wanted ? ' cost--missing' : ''}` }, art, h('span', { text: label }), h('strong', { text: `${formatNumber(have)} / ${formatNumber(wanted)}` }));
+    const picked = need?.stacks.find((one) => one.key === material) ?? null;
+    // None of the rarity is enough: the stack of it with the most pieces.
+    const nearest = need && !picked ? ((state.character.crafting?.materials ?? []).filter((one) => one.rarity === need.rarity).sort((a, b) => b.count - a.count)[0] ?? null) : null;
+    const materialShort = need && !picked ? Math.max(0, need.count - (nearest?.count ?? 0)) : 0;
+    const materialChip =
+      need &&
+      (picked
+        ? chip(materialIcon(picked.key.slice(0, picked.key.lastIndexOf(':')), 16), materialTitle(picked), picked.count, need.count)
+        : chip(nearest ? materialIcon(nearest.materialId, 16) : icon('unknown', { size: 16 }), nearest ? materialTitle(nearest) : `Materiał: ${need.rarityName}`, nearest?.count ?? 0, need.count));
+    const missing = [goldShort > 0 && `${formatNumber(goldShort)} złota`, materialShort > 0 && `${formatNumber(materialShort)} szt. materiału`].filter(Boolean);
+    return {
+      goldShort,
+      // The material there to give, or none needed.
+      materialReady: !need || Boolean(picked),
+      element: [
+        h('p', { class: 'field-label', text: title }),
+        h('ul', { class: 'cost-list', 'aria-label': title }, chip(resourceArt('gold', 16), 'Złoto', state.character.gold, gold), materialChip),
+        need && h('p', { class: 'muted', text: `${takes} ${formatNumber(need.count)} szt. jednego materiału o rzadkości „${need.rarityName}”.` }),
+        missing.length > 0 && h('p', { class: 'region-warning', text: `Brakuje: ${missing.join(', ')}.` }),
+        materialShort > 0 && h('p', { class: 'system-hint', text: 'Materiały tej rzadkości wypadają ze stworów na wyprawach. Kupisz je też na Targowisku.' }),
+      ],
+    };
+  }
+
+  // Which of the stacks that are enough to give, where more than one is.
+  const materialPicks = (label, stacks, material, choose) =>
+    stacks.length > 1 && [
+      h('p', { class: 'field-label', text: label }),
+      h(
+        'div',
+        { class: 'settlement-picks' },
+        stacks.map((one) =>
+          h(
+            'button',
+            { type: 'button', class: 'item-row trade-pick settlement-pick', 'aria-pressed': String(one.key === material), onClick: () => choose(one.key) },
+            h('span', { class: 'settlement-pick-art' }, materialIcon(one.key.slice(0, one.key.lastIndexOf(':')), 28)),
+            h('span', { class: 'settlement-pick-text', text: `${one.label} (${formatNumber(one.count)})` }),
+            pickMark(),
+          ),
+        ),
+      ),
+    ];
+
   // The Zaklinaczka's reforging in a sheet, a step at a time, in the game's
   // own rows (the author: "ekran wyboru przy afiksie powinien być
   // ingameowy"): the item, then its affix and the material, then what the
@@ -299,40 +352,6 @@ export function mountSettlement(container, { params = {} } = {}) {
       );
     }
 
-    // What the reforging takes, as the Kowadło shows it: gold and the
-    // material, each as had / needed, red while short, the stack nearest to
-    // enough when none is, and what is missing (a tester via the author: "Co
-    // masz ile ci czego brakuje", "Może żeby jakoś graficznie to
-    // przedstawić").
-    function costPart(item, material) {
-      const need = item.materials;
-      const goldShort = Math.max(0, item.gold - state.character.gold);
-      const chip = (art, label, have, wanted) =>
-        h('li', { class: `cost${have < wanted ? ' cost--missing' : ''}` }, art, h('span', { text: label }), h('strong', { text: `${formatNumber(have)} / ${formatNumber(wanted)}` }));
-      const picked = need?.stacks.find((one) => one.key === material) ?? null;
-      // None of the rarity is enough: the stack of it with the most pieces.
-      const nearest = need && !picked ? ((state.character.crafting?.materials ?? []).filter((one) => one.rarity === need.rarity).sort((a, b) => b.count - a.count)[0] ?? null) : null;
-      const materialShort = need && !picked ? Math.max(0, need.count - (nearest?.count ?? 0)) : 0;
-      const materialChip =
-        need &&
-        (picked
-          ? chip(materialIcon(picked.key.slice(0, picked.key.lastIndexOf(':')), 16), materialTitle(picked), picked.count, need.count)
-          : chip(nearest ? materialIcon(nearest.materialId, 16) : icon('unknown', { size: 16 }), nearest ? materialTitle(nearest) : `Materiał: ${need.rarityName}`, nearest?.count ?? 0, need.count));
-      const missing = [goldShort > 0 && `${formatNumber(goldShort)} złota`, materialShort > 0 && `${formatNumber(materialShort)} szt. materiału`].filter(Boolean);
-      return {
-        goldShort,
-        // The material there to give, or none needed.
-        materialReady: !need || Boolean(picked),
-        element: [
-          h('p', { class: 'field-label', text: 'Koszt zaklęcia' }),
-          h('ul', { class: 'cost-list', 'aria-label': 'Koszt zaklęcia' }, chip(resourceArt('gold', 16), 'Złoto', state.character.gold, item.gold), materialChip),
-          need && h('p', { class: 'muted', text: `Zaklęcie bierze ${formatNumber(need.count)} szt. jednego materiału o rzadkości „${need.rarityName}”.` }),
-          missing.length > 0 && h('p', { class: 'region-warning', text: `Brakuje: ${missing.join(', ')}.` }),
-          materialShort > 0 && h('p', { class: 'system-hint', text: 'Materiały tej rzadkości wypadają ze stworów na wyprawach. Kupisz je też na Targowisku.' }),
-        ],
-      };
-    }
-
     function pickAffix(itemId, affix = null, stack = null) {
       const item = data.reforge.items.find((one) => one.id === itemId);
       if (!item) return pickItem();
@@ -341,7 +360,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       let chosen = affix ?? (item.affixes.length === 1 ? 0 : null);
       let material = stacks.some((one) => one.key === stack) ? stack : (stacks[0]?.key ?? null);
       const draw = () => {
-        const cost = costPart(item, material);
+        const cost = costPart({ gold: item.gold, need: item.materials, material, title: 'Koszt zaklęcia', takes: 'Zaklęcie bierze' });
         const ready = chosen !== null && cost.goldShort === 0 && cost.materialReady;
         fill(
           body,
@@ -381,29 +400,10 @@ export function mountSettlement(container, { params = {} } = {}) {
             }),
           ),
           // Which material to give, where more than one is enough.
-          stacks.length > 1 && h('p', { class: 'field-label', text: 'Materiał do zaklęcia' }),
-          stacks.length > 1 &&
-            h(
-              'div',
-              { class: 'settlement-picks' },
-              stacks.map((one) =>
-                    h(
-                      'button',
-                      {
-                        type: 'button',
-                        class: 'item-row trade-pick settlement-pick',
-                        'aria-pressed': String(one.key === material),
-                        onClick: () => {
-                          material = one.key;
-                          draw();
-                        },
-                      },
-                      h('span', { class: 'settlement-pick-art' }, materialIcon(one.key.slice(0, one.key.lastIndexOf(':')), 28)),
-                      h('span', { class: 'settlement-pick-text', text: `${one.label} (${formatNumber(one.count)})` }),
-                      pickMark(),
-                    ),
-                ),
-            ),
+          materialPicks('Materiał do zaklęcia', stacks, material, (key) => {
+            material = key;
+            draw();
+          }),
           data.reforge.choices > 1 && h('p', { class: 'muted', text: `Zaklinaczka wylosuje ${data.reforge.choices} nowe afiksy, a Ty zatrzymasz jeden z nich.` }),
           h('button', {
             type: 'button',
@@ -807,6 +807,169 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
+  // The Kuźnia's Zwoje ochronne: as many as today's left and the gold allow.
+  function scrollSheet() {
+    const { scroll } = data.forge;
+    const most = Math.min(scroll.left, Math.floor(state.character.gold / scroll.price));
+    const field = numberField('forge-scroll-count', 'Ile zwojów', 1, 1, Math.max(1, most));
+    openSheet(
+      h('h2', { class: 'sheet-title', text: 'Zwoje ochronne' }),
+      h('p', { class: 'sheet-text', text: `${formatNumber(scroll.price)} zł. za sztukę. Możesz kupić najwyżej ${formatNumber(most)}: tyle kowal ma dziś dla Ciebie i na tyle starczy złota.` }),
+      field.element,
+      h(
+        'div',
+        { class: 'sheet-actions' },
+        h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+        h('button', {
+          type: 'button',
+          class: 'button button--system',
+          text: 'Kup',
+          onClick: (event) =>
+            withButton(event.currentTarget, async () => {
+              const answer = await call('POST', '/api/settlement/forge/scrolls', { count: field.read() });
+              closeSheet();
+              apply(answer);
+              const { count, gold, points } = answer.bought;
+              toast(`Kupione: Zwój ochronny ×${formatNumber(count)} za ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z Żelisławem i reputacja Bractwa Kowali +${points}.` : ''}`);
+            }),
+        }),
+      ),
+    );
+  }
+
+  // The raise of an item's rarity in a sheet, as the Zaklinaczka's
+  // reforging: the item, then what it takes and the material, then what the
+  // item became.
+  function raiseSheet() {
+    const body = h('div', { class: 'settlement-reforge' });
+    openSheet(h('h2', { class: 'sheet-title', text: 'Przekucie na wyższą rzadkość' }), body);
+    pickItem();
+
+    function pickItem() {
+      const items = data.forge.items.filter((item) => item.gold !== undefined);
+      fill(
+        body,
+        h('p', { class: 'sheet-text', text: `Kowal przekuje przedmiot o stopień rzadkości wyżej, raz na przedmiot, teraz najwyżej do rzadkości „${data.forge.topName}”.` }),
+        items.length === 0
+          ? h('p', { class: 'muted', text: 'Nie masz przedmiotu, który kowal może teraz przekuć.' })
+          : h(
+              'ul',
+              { class: 'item-list' },
+              items.map((item) =>
+                h(
+                  'li',
+                  {},
+                  h('button', { type: 'button', class: 'item-row', onClick: () => pickMaterial(item.id) }, itemHead(item), item.equipped && h('span', { class: 'chip', text: 'Założony' })),
+                ),
+              ),
+            ),
+      );
+    }
+
+    function pickMaterial(itemId, stack = null) {
+      const item = data.forge.items.find((one) => one.id === itemId && one.gold !== undefined);
+      if (!item) return pickItem();
+      let material = item.stacks.some((one) => one.key === stack) ? stack : (item.stacks[0]?.key ?? null);
+      const draw = () => {
+        const need = { count: item.materials, rarity: item.next, rarityName: item.nextName, stacks: item.stacks };
+        const cost = costPart({ gold: item.gold, need, material, title: 'Koszt przekucia', takes: 'Kowal bierze' });
+        const ready = cost.goldShort === 0 && cost.materialReady;
+        fill(
+          body,
+          h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), 'Inny przedmiot'),
+          h('div', { class: 'settlement-reforge-item' }, itemHead(item)),
+          h(
+            'p',
+            { class: 'settlement-change' },
+            h('span', { class: 'settlement-change-old', text: item.rarityName }),
+            icon('chevron', { size: 18 }),
+            h('span', { class: 'settlement-change-new', text: item.nextName }),
+          ),
+          h('p', { class: 'muted', text: 'Afiksy urosną do wartości nowej rzadkości, a przedmiot dostanie jeden nowy afiks. Drugi raz kowal go nie przekuje.' }),
+          cost.element,
+          materialPicks('Materiał do przekucia', item.stacks, material, (key) => {
+            material = key;
+            draw();
+          }),
+          h('button', {
+            type: 'button',
+            class: 'button button--world',
+            text: cost.goldShort > 0 ? 'Brakuje złota' : !cost.materialReady ? 'Brakuje materiału' : 'Przekuj',
+            disabled: !ready,
+            onClick: (event) =>
+              withButton(event.currentTarget, async () => {
+                const answer = await call('POST', '/api/settlement/forge/raise', { itemId, material });
+                apply(answer);
+                showResult(answer.raised);
+              }),
+          }),
+        );
+      };
+      draw();
+    }
+
+    function showResult(raised) {
+      fill(
+        body,
+        h('p', { class: 'settlement-result-title', text: 'Kowal przekuł przedmiot' }),
+        h('div', { class: 'settlement-reforge-item' }, itemHead({ id: raised.itemId, name: raised.name })),
+        h(
+          'p',
+          { class: 'settlement-change' },
+          h('span', { class: 'settlement-change-old', text: raised.beforeName }),
+          icon('chevron', { size: 18 }),
+          h('span', { class: 'settlement-change-new', text: raised.afterName }),
+        ),
+        raised.points > 0 && h('p', { class: 'muted', text: `Relacja z Żelisławem i reputacja Bractwa Kowali +${raised.points}.` }),
+        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--system', text: 'Gotowe', onClick: closeSheet })),
+      );
+    }
+  }
+
+  // The Kuźnia (question 326 A): Żelisław's Zwoje ochronne, a few a day,
+  // and the raise of an item's rarity by one step, once per item; the
+  // Bractwo Kowali's reputation lowers his gold prices (the author: "Kowal i
+  // to i rzadkość, niech to Bractwo ma zastosowanie jakieś").
+  function forgeCard() {
+    const { scroll, topName, best, discount, trade, items } = data.forge;
+    const most = Math.min(scroll.left, Math.floor(state.character.gold / scroll.price));
+    const raisable = items.some((item) => item.gold !== undefined);
+    return h(
+      'div',
+      { class: 'stack', 'data-guide': 'forge-services' },
+      h(
+        'section',
+        { class: 'card stack' },
+        h('h2', { class: 'section-title', text: 'Zwoje ochronne' }),
+        h('p', {
+          class: 'muted',
+          text: `Zwój ochronny chroni przedmiot przed rozpadem na Kowadle. ${formatNumber(scroll.price)} zł. za sztukę. Dziś kowal sprzeda jeszcze ${scroll.left} z ${scroll.daily}. Masz: ${formatNumber(scroll.have)}.`,
+        }),
+        h('button', {
+          type: 'button',
+          class: 'button button--world',
+          text: scroll.left === 0 ? 'Na dziś koniec zwojów' : most < 1 ? 'Brakuje złota' : 'Kup zwoje',
+          disabled: most < 1,
+          onClick: scrollSheet,
+        }),
+      ),
+      h(
+        'section',
+        { class: 'card stack' },
+        h('h2', { class: 'section-title', text: 'Przekucie na wyższą rzadkość' }),
+        h('p', {
+          class: 'muted',
+          text: `Kowal przekuwa przedmiot o stopień rzadkości wyżej, raz na przedmiot: afiksy rosną do wartości nowej rzadkości i dochodzi jeden nowy. Teraz najwyżej do rzadkości „${topName}”.${best ? '' : ' Lepsza relacja z nim pozwoli iść wyżej.'}`,
+        }),
+        h('button', { type: 'button', class: 'button button--world', text: raisable ? 'Wybierz przedmiot' : 'Brak przedmiotów do przekucia', disabled: !raisable, onClick: raiseSheet }),
+      ),
+      h('p', {
+        class: 'muted',
+        text: `${discount > 0 ? `Reputacja Bractwa Kowali obniża ceny kowala w złocie o ${formatDecimal(discount * 100)}%.` : 'Z lepszą reputacją Bractwa Kowali ceny kowala w złocie będą niższe.'} Handel daje relację z kowalem i reputację Bractwa Kowali: dziś ${trade.today} z ${trade.daily} punktów.`,
+      }),
+    );
+  }
+
   // A resident's services, on their place's screen.
   function services(resident) {
     if (resident.service === 'reforge')
@@ -818,6 +981,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       );
     if (resident.service === 'tavern') return h('div', { class: 'stack' }, tavernCard(), companionsCard());
     if (resident.service === 'herbalist') return herbalistCard();
+    if (resident.service === 'forge') return forgeCard();
     if (resident.service !== 'hermit') return null;
     return h(
       'div',

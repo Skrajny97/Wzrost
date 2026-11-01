@@ -88,6 +88,7 @@ import {
 import { toHex } from './encoding.js';
 import { evolutionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
+import { forgeView } from './forge.js';
 import { counted, foreign, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
 
@@ -103,10 +104,10 @@ const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', resou
 const grow = (relations, { resident, relationGain }) => ({ ...relations, [resident]: (relations[resident] ?? 0) + relationGain });
 
 // The service each resident gives on the page, as the data names them: the
-// board's orders, the reforging, the resets, the Karczma or the Chata
-// zielarki; none for the others.
+// board's orders, the reforging, the resets, the Karczma, the Chata
+// zielarki or the Kuźnia; none for the others.
 const serviceOf = (residentId) =>
-  ['orders', 'reforge', 'hermit', 'tavern', 'herbalist'].find((service) => content.settlement[service].resident === residentId) ?? null;
+  ['orders', 'reforge', 'hermit', 'tavern', 'herbalist', 'forge'].find((service) => content.settlement[service].resident === residentId) ?? null;
 
 // What the row keeps of the Osada: reputation and relations by id, the
 // board, a reforging's affixes waiting for the player's choice (`pending`),
@@ -128,6 +129,10 @@ export function settlementOf(row) {
     // the reputation its trade gave today (market.js).
     ...(stored.market && { market: stored.market }),
     ...(stored.marketTrade && { marketTrade: stored.marketTrade }),
+    // The Kuźnia: the Zwoje ochronne bought today and the relation and
+    // reputation its trade gave today (forge.js).
+    ...(stored.forge && { forge: stored.forge }),
+    ...(stored.forgeTrade && { forgeTrade: stored.forgeTrade }),
     ...(stored.test && { test: true }),
   };
 }
@@ -247,6 +252,7 @@ export function settlementView(player, stored, board, now) {
     market: { waiting: player.marketWaiting ?? 0 },
     companions: companionsView(player, stored, now),
     herbalist: herbalistView(player, stored, now),
+    forge: forgeView(player, stored, now),
     imbue: imbueView(player),
     // After an evolution the paths change with it, so no path reset.
     hermit: {
