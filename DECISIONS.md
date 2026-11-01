@@ -2996,7 +2996,17 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
-## Drużyna a profesje, zapraszanie do Gildii ze znajomych (1.11.2026, na wersji testowej)
+## Wersja 0.0.74 (1.11.2026)
+
+Autor: „pchaj to od razu na main wszystko, mi sie nie chce testowac a od czego są testerzy”.
+
+1. **Co wchodzi do gry:**
+    - czas mikstur i premii schodzi przy „Odbierz raport”, a nie w trakcie wyprawy; Wieże są bez mikstur; „Ulepsz” mówi, czego brakuje (zob. „Mikstury przy odbiorze raportu, „Ulepsz” z brakami, Wieże bez mikstur”);
+    - wygodniejszy interfejs z propozycji 311–321 i nowy opis Wędrownego handlarza (zob. „Wygodniejszy interfejs: propozycje 311–321”);
+    - członek drużyny przy profesji zostaje w drużynie, a Gildia zaprasza znajomych jednym stuknięciem (zob. „Drużyna a profesje, zapraszanie do Gildii ze znajomych”).
+2. **Migracje bazy:** brak.
+
+## Drużyna a profesje, zapraszanie do Gildii ze znajomych (1.11.2026, w grze od 0.0.74)
 
 Autor: „I co jeśli ktoś dołączy do drużyny w trakcie wykonywania Profesji? Widze ze to mu tego nie wyłącza. Niech po prostu nie idzie z drużyną jesli jest zajety wykonywaniem Profesji, nie musi wychodzić z niej. Trzeba zmienić opis i działanie tego.” oraz „Do Gildii tez powinna być opcja zapraszania z pozycji ekranu Gildii”.
 
@@ -3006,7 +3016,7 @@ Autor: „I co jeśli ktoś dołączy do drużyny w trakcie wykonywania Profesji
 4. **Nowe opisy.** Członek widzi: „Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle. Gdy pracujesz w profesji albo jesteś na własnej wyprawie, drużyna wyrusza bez Ciebie i nie musisz jej opuszczać.” Lider widzi: „Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”. Idą członkowie bez innych zajęć, teraz najwyżej na … i tylko tam, gdzie wejdzie … (poziom klasy …). Kto pracuje w profesji albo jest na wyprawie, zostaje w drużynie i pójdzie z nią następnym razem. Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.” Zniknęło też „wyruszasz sam” i „Wyrusz sam”, bo mówią do gracza w rodzaju męskim. Komunikat startu bez wolnych członków brzmi: „Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.”
 5. **Gildia: znajomi jednym stuknięciem.** Karta „Zaproś do gildii”, którą widzą lider i zastępcy, ma teraz listę znajomych z przyciskiem „Zaproś”, tak jak Drużyna. Na liście są znajomi bez gildii, których gildia jeszcze nie zaprosiła. Pod listą zostało pole na imię dowolnej postaci. Opis karty idzie za słowami autora z Drużyny: „Poniżej możesz zaprosić kogoś z listy znajomych lub dodać kogokolwiek ręcznie spoza niej.”
 
-## Wygodniejszy interfejs: propozycje 311–321 (1.11.2026, na wersji testowej)
+## Wygodniejszy interfejs: propozycje 311–321 (1.11.2026, w grze od 0.0.74)
 
 Autor: „311 A / 312 A / 313 A / 314 A / 315 A / 316 A / 317 A / 318 A / 319 A / 320 A / 321 A”.
 
@@ -3024,7 +3034,7 @@ Autor: „311 A / 312 A / 313 A / 314 A / 315 A / 316 A / 317 A / 318 A / 319 A 
 12. **Opis Wędrownego handlarza.** Autor: „"W tym tygodniu już go tu nie uświadczysz. Wyczekuj w kolejnym." - zmiana opisu.” Tekst stoi dosłownie.
 13. **Drużyna i solo.** Autor: „mam nadzieje ze to liczy z najniższego poziomem gracza i jeśli dołączą do mojej drużyny ludzie to będzie niżej i że można dalej solo latać z pozycji członka drużyny”. Tak było od początku (zob. „Drużyny”, punkt 4): długość wyprawy liczy się od najniższego poziomu postaci, a miejsca od najniższego poziomu klasy. Lider bez zaznaczenia „Z drużyną” wyrusza bez drużyny, a członek drużyny może w każdej chwili wyruszyć na własną wyprawę. Karta drużyny lidera mówi to teraz wprost (zob. też „Drużyna a profesje, zapraszanie do Gildii ze znajomych”).
 
-## Mikstury przy odbiorze raportu, „Ulepsz” z brakami, Wieże bez mikstur (1.11.2026, na wersji testowej)
+## Mikstury przy odbiorze raportu, „Ulepsz” z brakami, Wieże bez mikstur (1.11.2026, w grze od 0.0.74)
 
 Autor: „Zrobmy też tak, że bonusy wszelkie za picie mikstur itp. nie zużywają się na bieżąco, a po samej wyprawie / Odbierz raport zużywa czas mikstury.”, „Niech Ulepsz jeśli chodzi o przedmiot nie otwiera się tylko pokazuje czego brakuje jeśli nie da się ulepszyć” i „mikstury niech nie działają w Wieżach albo zużywają się po 3 poziomach”.
 
