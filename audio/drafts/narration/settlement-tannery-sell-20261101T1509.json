@@ -1,0 +1,17 @@
+{
+  "id": "settlement-tannery-sell",
+  "payload": {
+    "text": "W zakładce Sprzedaj kupi od Ciebie materiały drożej niż złomiarz. Im lepiej Cię zna, tym więcej płaci. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-tannery-sell-20261101T1509-0.mp3",
+    "audio/drafts/narration/settlement-tannery-sell-20261101T1509-1.mp3"
+  ],
+  "credits": 222
+}

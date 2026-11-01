@@ -1,0 +1,17 @@
+{
+  "id": "settlement-stable-party",
+  "payload": {
+    "text": "Na wyprawie drużyny wszyscy jadą tempem najwolniejszego wierzchowca. Gdy ktoś nie ma wierzchowca, wyprawa trwa pełny czas. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-stable-party-20261101T1509-0.mp3",
+    "audio/drafts/narration/settlement-stable-party-20261101T1509-1.mp3"
+  ],
+  "credits": 262
+}
