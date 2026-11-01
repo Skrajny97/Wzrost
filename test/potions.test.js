@@ -283,26 +283,34 @@ describe('potions through the API', () => {
     assert.equal(speedBuff(again.data.character).ms, 60 * 60000);
     assert.equal(again.data.character.potions.find((potion) => potion.id === 'lesser-speed'), undefined);
 
-    // An exploration takes 30 minutes of it and goes faster all along; the
-    // rest waits for the next one.
+    // An exploration goes faster all along; its 30 minutes are used up only
+    // as its report is claimed (the author: "Odbierz raport zużywa czas
+    // mikstury"), and the rest waits for the next one.
     await set('hp = ?, hp_at = ?', maxHp, Date.now());
-    const started = Date.now();
     await hunt({});
     const during = speedBuff(await character());
-    assert.equal(during.ms, 30 * 60000);
-    assert.ok(during.until >= started + 30 * 60000 && during.until <= Date.now() + 30 * 60000);
+    assert.deepEqual([during.ms, during.until], [60 * 60000, null]);
     await finish();
     const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
     assert.deepEqual(report.summary.potions, [`Mikstura szybkości działała w walkach: ${report.fights.length} z ${report.fights.length}.`]);
     assert.deepEqual(after.buffs, [{ kind: 'speed', ms: 30 * 60000, until: null, bonus: 0.15, label: 'Szybkość: ruchy w walkach +15%', potion: 'lesser-speed' }]);
 
-    // One called back at once gives back the time it did not use.
+    // One called back uses up nothing.
     await hunt({});
-    assert.equal(speedBuff(await character()).ms, 0);
+    assert.equal(speedBuff(await character()).ms, 30 * 60000);
     await call('POST', '/api/hunts/cancel', { cookie });
     const back = speedBuff(await character());
-    assert.ok(back.ms > 29 * 60000 && back.ms <= 30 * 60000, `${back.ms}`);
-    assert.equal(back.until, null);
+    assert.deepEqual([back.ms, back.until], [30 * 60000, null]);
+
+    // One started before 0.0.74 had its time taken at its start: its claim
+    // takes nothing more.
+    await hunt({});
+    const database = await db();
+    await database.prepare("UPDATE activities SET options = json_remove(options, '$.spend')").run();
+    await set(`buffs = '{"speed":{"ms":600000,"bonus":0.15}}'`);
+    await finish();
+    await call('POST', '/api/hunts/claim', { cookie });
+    assert.equal(speedBuff(await character()).ms, 10 * 60000);
   });
 
   test('the potions of later levels: what goes along, what is drunk or put on the blade', async () => {

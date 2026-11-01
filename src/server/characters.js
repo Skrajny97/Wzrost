@@ -236,12 +236,14 @@ export function buffsOf(row, now) {
 
 // The potions for a time drunk from the bag and the strengthenings of events
 // (the blue mushroom's) that still work (potions.js), by kind: the time of
-// explorations they have left after the one under way, until when they work
-// in it, their bonus, the words for it and the first potion of the kind for
-// its picture.
+// explorations they have left, their bonus, the words for it and the first
+// potion of the kind for its picture. The time goes when a report is
+// claimed, so it stands still on an exploration; one started before 0.0.74
+// had it taken at its start, and runs down until `until` in it.
 function activeBuffs(player, now) {
   const buffs = buffsOf(player.row, now);
-  const windows = player.activity?.kind === 'hunt' ? optionWindows(JSON.parse(player.activity.options ?? '{}')) : {};
+  const options = player.activity?.kind === 'hunt' ? JSON.parse(player.activity.options ?? '{}') : {};
+  const windows = options.spend === 'claim' ? {} : optionWindows(options);
   const active = [];
   for (const kind of TIMED_KINDS) {
     const window = windows[kind];

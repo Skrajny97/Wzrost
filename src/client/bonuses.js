@@ -11,8 +11,9 @@ import { h, icon } from './dom.js';
 import { formatMinutes } from './format.js';
 import { serverNow } from './state.js';
 
-// What a bonus has left now: its own time and, of an exploration under way,
-// what is still ahead of it. The time passes only on explorations.
+// What a bonus has left now: its own time and, of an exploration started
+// before 0.0.74, what is still ahead of it. The time goes when a report is
+// claimed (characters.js), so it stands still on an exploration.
 const timeLeft = (buff, now) => buff.ms + Math.max(0, (buff.until ?? 0) - now);
 
 export const activeBuffs = (character, now = serverNow()) =>

@@ -83,7 +83,7 @@ export function mountTowers(container, { navigate }) {
         h('p', { class: 'towers-entries', text: `Wejścia na dziś: ${view.left} z ${view.perDay}. Nowe od północy.` }),
         h('p', {
           class: 'muted',
-          text: `Wejście to jedna walka na wybranym piętrze, z wynikiem od razu. Postać walczy z pełnym HP i bez mikstur. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. Co ${view.eliteEvery}. piętro czeka elita, co ${view.championEvery}. czempion, a co ${view.chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży.`,
+          text: `Wejście to jedna walka na wybranym piętrze, z wynikiem od razu. Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. Co ${view.eliteEvery}. piętro czeka elita, co ${view.championEvery}. czempion, a co ${view.chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży.`,
         }),
       ),
       exploring() && systemPanel(exploring()),

@@ -855,6 +855,19 @@ function anvilSection(item, busy, open = false) {
     }),
   );
   if (open) return full;
+  // What the try lacks, said under "Ulepsz" instead of unfolding (the author:
+  // "Niech Ulepsz jeśli chodzi o przedmiot nie otwiera się tylko pokazuje
+  // czego brakuje jeśli nie da się ulepszyć").
+  const nearest = need && !chosen ? ((state.character.crafting?.materials ?? []).filter((material) => material.rarity === need.rarity).sort((a, b) => b.count - a.count)[0] ?? null) : null;
+  const rarityName = need ? (state.content.rarities.find((rarity) => rarity.id === need.rarity)?.name ?? need.rarity) : '';
+  const lacking = [
+    ...Object.entries(next.cost).map(([resource, amount]) => {
+      const short = amount - (have[resource]?.amount ?? 0);
+      return short > 0 && `${formatNumber(short)} ${COST_GENITIVES[resource] ?? (have[resource]?.name ?? resource).toLowerCase()}`;
+    }),
+    need && !chosen && `${formatNumber(need.count - (nearest?.count ?? 0))} szt. materiału (${rarityName})`,
+  ].filter(Boolean);
+  const note = h('p', { class: 'region-warning', role: 'status', hidden: true });
   const folded = h(
     'div',
     { class: 'compare anvil' },
@@ -865,13 +878,22 @@ function anvilSection(item, busy, open = false) {
       'aria-expanded': 'false',
       text: 'Ulepsz',
       onClick: () => {
+        if (lacking.length > 0) {
+          note.textContent = `Brakuje: ${lacking.join(', ')}.`;
+          note.hidden = false;
+          return;
+        }
         folded.replaceWith(full);
         step.focus({ preventScroll: true });
       },
     }),
+    note,
   );
   return folded;
 }
+
+// The Kowadło's costs after "Brakuje", in the genitive.
+const COST_GENITIVES = { gold: 'złota', 'iron-ore': 'rudy żelaza' };
 
 // The combat values an item changes, named as on the stats screen, with
 // their units; a resistance ("resist.fire") is named by its element.

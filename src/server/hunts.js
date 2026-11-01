@@ -310,7 +310,10 @@ export async function beginHunt(
   }
   const taken = takenPotions(player, potions, minutes);
   // The potions for a time drunk before cover what they can of the
-  // exploration, and that much of their time is used up (potions.js).
+  // exploration; that much of their time is used up only when its report is
+  // claimed (the author: "bonusy wszelkie za picie mikstur itp. nie zużywają
+  // się na bieżąco, a po samej wyprawie / Odbierz raport zużywa czas
+  // mikstury"), so the start leaves them as they are (potions.js).
   const buffs = buffsOf(player.row, now);
   const windows = buffWindows(buffs, minutes);
   const timed = Object.keys(windows).length > 0;
@@ -357,7 +360,7 @@ export async function beginHunt(
     ...(crew && { party: crew }),
     ...(partners.length > 0 && { partners }),
     ...(reserving && { potions: taken, reserved: true, healBelow: healBelow ?? content.potionUse.healBelow }),
-    ...(timed && { buffs: windows }),
+    ...(timed && { buffs: windows, spend: 'claim' }),
     ...(unknown.length > 0 && { unknown }),
     ...(Object.keys(trophies).length > 0 && { trophies }),
     ...(quick && { quick }),
@@ -394,12 +397,11 @@ export async function beginHunt(
       // The HP rested so far is saved now, so it is not counted again later.
       db
         .prepare(
-          `UPDATE characters SET hp = ?, hp_at = ?${timed ? ', buffs = ?' : ''}${settlement ? ', settlement = ?' : ''}${reserving ? ', potions = ?' : ''}, version = version + 1 WHERE id = ?`,
+          `UPDATE characters SET hp = ?, hp_at = ?${settlement ? ', settlement = ?' : ''}${reserving ? ', potions = ?' : ''}, version = version + 1 WHERE id = ?`,
         )
         .bind(
           hp,
           now,
-          ...(timed ? [JSON.stringify(spendWindows(buffs, windows))] : []),
           ...(settlement ? [settlement] : []),
           ...(reserving ? [JSON.stringify(bagPotions)] : []),
           player.row.id,
@@ -416,8 +418,10 @@ export async function beginHunt(
 
 // Calling the character back early gives nothing and costs nothing. A
 // brewing keeps the potions done and an order in the Warsztat the items
-// done, with their report (brewing.js, workshop.js), and the potions for a
-// time the time they did not use.
+// done, with their report (brewing.js, workshop.js). The potions for a time
+// lose none of theirs: it goes only with a report claimed (an exploration
+// started before 0.0.74 had it taken at its start and gets back what it did
+// not use).
 export async function cancelHunt(context) {
   const { session, player } = await requirePlayer(context);
   const activity = player.activity;
@@ -435,10 +439,9 @@ export async function cancelHunt(context) {
       character: characterView(await loadPlayer(db, session.userId), context.now),
     });
   }
-  // The potions for a time get back the time the exploration did not use,
-  // and the potions set aside for the road come back to the bag.
+  // The potions set aside for the road come back to the bag.
   const options = JSON.parse(activity.options ?? '{}');
-  const windows = optionWindows(options);
+  const windows = options.spend === 'claim' ? {} : optionWindows(options);
   const used = context.now - activity.started_at;
   const unused = Object.values(windows).some((window) => window.ms > used);
   const back = options.reserved ? options.potions ?? {} : {};
@@ -729,7 +732,11 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // An event's buff joins those of the potions drunk before (the blue
   // mushroom), and its free stat points those of the levels.
   const reward = hunt.event?.reward;
-  const eventBuffs = reward?.buff && addBuff(buffsOf(row, now), reward.buff.kind, reward.buff.minutes * 60000, reward.buff.bonus);
+  // The potions for a time used up now, as the report is claimed, and an
+  // event's strengthening or curse added after that.
+  const claimWindows = options.spend === 'claim' ? optionWindows(options) : {};
+  const spentBuffs = Object.keys(claimWindows).length > 0 ? spendWindows(buffsOf(row, now), claimWindows) : null;
+  const eventBuffs = reward?.buff ? addBuff(spentBuffs ?? buffsOf(row, now), reward.buff.kind, reward.buff.minutes * 60000, reward.buff.bonus) : spentBuffs;
   const eventPoints = reward?.points ?? 0;
   // An event's herbs that found their places.
   const storedHerbs = Object.entries(herbs.stored);

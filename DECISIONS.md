@@ -2996,6 +2996,14 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Mikstury przy odbiorze raportu, „Ulepsz” z brakami, Wieże bez mikstur (1.11.2026, na wersji testowej)
+
+Autor: „Zrobmy też tak, że bonusy wszelkie za picie mikstur itp. nie zużywają się na bieżąco, a po samej wyprawie / Odbierz raport zużywa czas mikstury.”, „Niech Ulepsz jeśli chodzi o przedmiot nie otwiera się tylko pokazuje czego brakuje jeśli nie da się ulepszyć” i „mikstury niech nie działają w Wieżach albo zużywają się po 3 poziomach”.
+
+1. **Czas mikstur przy odbiorze raportu.** Mikstury na czas (szybkość, pancerz, obrażenia, skupienie, olejek, osłona) i bonusy ze zdarzeń działają w walkach wyprawy jak dotąd, ale ich czas schodzi dopiero przy „Odbierz raport”. W trakcie wyprawy licznik bonusu stoi. Odwołana wyprawa nie zużywa nic (brakujący szczegół: odwołanie nic nie daje i nic nie kosztuje). Wyprawa rozpoczęta przed tą zmianą ma czas odjęty już na starcie, więc przy odbiorze nie traci go drugi raz.
+2. **„Ulepsz” z brakami.** Gdy ulepszenie nie jest możliwe, przycisk „Ulepsz” w karcie przedmiotu się nie rozwija, tylko pisze pod sobą, czego brakuje, np. „Brakuje: 64 złota, 1 szt. materiału (pospolity).”
+3. **Wieże bez mikstur.** W Wieżach mikstury i ich bonusy nie działają (tak było od początku). Wstęp Wież mówi to teraz wprost: „Postać walczy z pełnym HP, bez mikstur i bez ich bonusów.”
+
 ## Wersja 0.0.73 (1.11.2026)
 
 Autor: „i od razu pushuj zmienione na main” i „Pozniej wdrożenie”.
