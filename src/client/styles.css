@@ -9000,6 +9000,11 @@ a.profession-square:active {
   transform: scale(0.95);
 }
 
+/* A building mirrored so its front faces the main road (data: `flip`). */
+.settlement-place--flip .settlement-place-art {
+  transform: scaleX(-1);
+}
+
 .settlement-place-art {
   display: block;
   width: 100%;

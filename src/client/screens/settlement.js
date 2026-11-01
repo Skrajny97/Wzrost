@@ -1065,7 +1065,8 @@ export function mountSettlement(container, { params = {} } = {}) {
     const link = h(
       'a',
       {
-        class: `settlement-place${place.soon ? ' settlement-place--soon' : ''}`,
+        // `flip`: the building's picture mirrored, its front to the main road.
+        class: `settlement-place${place.soon ? ' settlement-place--soon' : ''}${place.flip ? ' settlement-place--flip' : ''}`,
         href: hash,
         style: { left: `${place.x}%`, top: `${place.y}%` },
         'aria-label': place.soon ? `${place.name}, wkrótce` : place.name,

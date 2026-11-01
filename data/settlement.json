@@ -5,12 +5,12 @@
   "places": [
     { "id": "board", "name": "Tablica zleceń", "x": 78, "y": 22, "resident": "headman" },
     { "id": "enchanter", "name": "Pracownia Zaklinaczki", "x": 21, "y": 23, "resident": "enchantress" },
-    { "id": "hermitage", "name": "Chata Pustelnika", "x": 78, "y": 81, "resident": "hermit" },
+    { "id": "hermitage", "name": "Chata Pustelnika", "x": 78, "y": 81, "resident": "hermit", "flip": true },
     { "id": "stable", "name": "Stajnia", "x": 80, "y": 62, "resident": "groom" },
     { "id": "tavern", "name": "Karczma", "x": 84, "y": 43, "resident": "innkeeper" },
     { "id": "market", "name": "Targowisko", "x": 45.5, "y": 46, "resident": "merchant" },
-    { "id": "tannery", "name": "Garbarnia", "x": 13, "y": 53, "resident": "tanner" },
-    { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist" },
+    { "id": "tannery", "name": "Garbarnia", "x": 13, "y": 53, "resident": "tanner", "flip": true },
+    { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist", "flip": true },
     { "id": "forge", "name": "Kuźnia", "x": 56, "y": 31, "resident": "smith" }
   ],
   "torches": [

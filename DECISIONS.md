@@ -3025,6 +3025,13 @@ Autor: „331 D / 333 A / 334 A / 335 A / 332 A / 330 B” oraz „336 A, reszt�
 2. **336 A.** Skóry od Wszebora zostają w obecnych cenach, także gdy ktoś rozbiera je na Stole rozbiórki na części.
 3. **329.** Zostaje dotychczasowe zachowanie (A): wolne miejsce w wyprawie drużyny zajmuje towarzysz lidera z Kwater.
 
+## Osada: budynki przodem do drogi (1.11.2026, na wersji testowej)
+
+Autor: „zrób też rotate/odbicia lustrzane budynków tak by byly skierowane ich obrazki w stronę drogi głównej”.
+
+1. **Które odbite.** Przodem od drogi stały trzy budynki: Garbarnia i Chata zielarki po lewej stronie drogi oraz Chata Pustelnika po prawej. Ich obrazki są teraz odbite w poziomie (`flip` przy miejscu w `data/settlement.json`), więc wejściem patrzą na drogę. Pracownia Zaklinaczki, Tablica zleceń, Kuźnia, Karczma i Stajnia już patrzyły na drogę, a Targowisko stoi na środku placu.
+2. **Jak (brakujący szczegół).** Odbija się sam obrazek budynku, bez napisu z nazwą i bez zmiany miejsca na planszy. Nowy budynek dostaje `flip`, gdy jego wejście patrzy od drogi.
+
 ## Odpowiedzi autora 338–343: poprawki mechanik (1.11.2026, na wersji testowej)
 
 Autor: „338 A / 339 A / 340 A / 341 A / 342 A / 343 A”. Liczby pochodzą z symulacji silnika gry.
