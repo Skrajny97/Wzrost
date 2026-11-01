@@ -2996,6 +2996,13 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Rezygnacja z Mocy postaci (1.11.2026)
+
+Autor: „Moc postaci - rezygnujemy z tego”.
+
+1. **Bez Mocy.** Gra nie liczy Mocy postaci. Zaczęty szkic wzoru (dwie próbne walki silnika: z manekinem i z przeciwnikiem na poziomie postaci) nie wszedł do kodu.
+2. **Ranking Gildii.** Miał się liczyć według Mocy. Gdy przyjdzie jego kolej, trzeba go będzie oprzeć na czymś innym.
+
 ## Przejście gry na komputerze (1.11.2026, na wersji testowej)
 
 Autor (wcześniej): „trzeba prześledzić gierke z pozycji kompa”.
@@ -3364,7 +3371,7 @@ Autor: „303 A / 304 A, ale kilkanaście wejść dziennie / 305 A, Lochy zamien
 13. **Społeczność.** Część „Gildia” jest już otwarta (wcześniej „Wkrótce”). Zaproszenie do gildii zapala kropkę na zakładce Społeczność. Karta postaci pokazuje jej gildię z nazwą i skrótem.
 14. **Migracje bazy:** 0064 (zapis Wież postaci) i 0065 (gildie).
 15. **Opis Gildii.** Autor: „Zmiana opisu na "Gildia to miejsce dla Twojej własnej społeczności w grze. Gwarantuje dodatkowe aktywności i współpracę z innymi graczami. Do gildii dołączysz na zaproszenie liderów lub możesz założyć ją sam." Info o nazwach i skrótach może zostać.” Karta zakładania gildii ma ten opis, a pod nim zasady nazwy i skrótu.
-16. **Plany na później.** Autor: „Gildia musi mieć osobną zakładkę docelowo, inwestowanie wspólne w jakieś dodatkowe budynki, które dają uczestnikom bonusy różne, technologie na podobnej zasadzie. Wojny Gildii w przyszłości, ranking Gildii analogicznt do Rankingu Postaci (wyliczany na podstawie Mocy)” oraz „Moc to będzie nowy współczynnik wyliczający siłę bojową i przydatność postaci. Trzeba to dobrze ustawić, by wyliczało sensownie. Trochę jak Combat Power w innych grach.” Te punkty czekają na kolejne etapy: osobna zakładka Gildii, wspólne budynki i technologie gildii z premiami dla członków, Wojny Gildii, ranking Gildii według Mocy i sama Moc postaci.
+16. **Plany na później.** Autor: „Gildia musi mieć osobną zakładkę docelowo, inwestowanie wspólne w jakieś dodatkowe budynki, które dają uczestnikom bonusy różne, technologie na podobnej zasadzie. Wojny Gildii w przyszłości, ranking Gildii analogicznt do Rankingu Postaci (wyliczany na podstawie Mocy)” oraz „Moc to będzie nowy współczynnik wyliczający siłę bojową i przydatność postaci. Trzeba to dobrze ustawić, by wyliczało sensownie. Trochę jak Combat Power w innych grach.” Te punkty czekają na kolejne etapy: osobna zakładka Gildii, wspólne budynki i technologie gildii z premiami dla członków, Wojny Gildii, ranking Gildii według Mocy i sama Moc postaci. *Od 1.11.2026 Gildia ma osobną stronę (zob. „Gildia na osobnej stronie”), a z Mocy postaci autor zrezygnował: „Moc postaci - rezygnujemy z tego” (zob. „Rezygnacja z Mocy postaci”).*
 
 ## Wersja 0.0.72 (1.11.2026)
 
