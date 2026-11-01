@@ -769,7 +769,11 @@ export function mountCombat(container, { params, navigate }) {
     // A Drużyna's leader takes the members free now along (parties.js):
     // the box comes once the party is known, ticked; the party goes only as
     // far and as long as its lowest member may (the server says so).
-    const party = !first && partyChoice();
+    // Not on the narrator's first exploration: there the box is null, never
+    // false, since "Wyrusz" asks it for along() (since 0.0.71 a false here
+    // threw "party?.along is not a function" and the introduction stopped
+    // at its first exploration; the author's video).
+    const party = first ? null : partyChoice();
     start = h('button', {
       type: 'button',
       class: 'button button--system',

@@ -2996,6 +2996,14 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wprowadzenie: „Wyrusz” przy pierwszej wyprawie (1.11.2026, na wersji testowej)
+
+Autor: „sprawdz klatka po klatce to wideo i zobacz ze na komputerze nie da sie przejść samouczka nawet / trzeba prześledzić gierke z pozycji kompa” oraz „pilnuj tego na przyszlosc nie może tak byc, poczatek jest najwazniejszy”.
+
+1. **Przyczyna.** Na wideo „Wyrusz” przy pierwszej wyprawie wprowadzenia pokazuje u góry „party?.along is not a function” i wyprawa nie rusza. Od wersji 0.0.71 (Drużyny) ekran Walki przy pierwszej wyprawie zapisywał pole drużyny jako fałsz zamiast pustego, a „Wyrusz” pytało je o skład. Błąd dotyczył każdej nowej postaci, która nie pominęła wprowadzenia, na komputerze i na telefonie.
+2. **Poprawka.** Przy pierwszej wyprawie pole drużyny jest puste. Przejście wprowadzenia od pierwszej karty do pierwszej wyprawy sprawdzone w przeglądarce na 390×844 (telefon), 1366×768 i 1920×1080 (komputer). Bez poprawki to samo przejście staje na „Wyrusz” z tym samym komunikatem.
+3. **Na przyszłość.** Przejście wprowadzenia nowej postaci w przeglądarce, na telefonie i komputerze, jest stałym punktem przed każdym wdrożeniem (CLAUDE.md).
+
 ## Opis drużyny, link do Kowadła i ekwipunek przy profesji (1.11.2026, na wersji testowej)
 
 1. **Opis drużyny.** Autor: „zły opis, powinno być "Na wyprawę ruszają członkowie bez zajęć w trakcie, z dopasowaniem do najniższego poziomem klasy z drużyny. Kto zajmuje się profesją albo jest na solo wyprawie, zostaje w drużynie, ale nie uczestniczy we wspólnej wyprawie."” Oba zdania stoją na karcie lidera i członka w miejscu zdań o tym, kto idzie i kto zostaje. Jedyna zmiana to „poziomu” zamiast literówki „poziomem”. Dokładne limity, np. „najwyżej na 1 h”, zostały pod „Z drużyną” w Walce.
