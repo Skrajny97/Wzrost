@@ -1,7 +1,8 @@
 // The Gildia in the Społeczność (src/server/guilds.js): the invitations
 // waiting for this character; its guild with the members, the leader and
-// the deputies marked, and what its role lets it do (invite, take an
-// invitation back, remove, name a deputy, hand the lead over); "Opuść
+// the deputies marked, and what its role lets it do (invite a friend at a
+// tap or anyone by name, take an invitation back, remove, name a deputy,
+// hand the lead over); "Opuść
 // gildię"; and, outside a guild, founding one from its level for its gold.
 // The guild's channel is a tab of the Czat (community.js).
 
@@ -149,16 +150,25 @@ export function mountGuild(container) {
     );
   }
 
-  // Inviting by name, for the leader and the deputies.
+  // Inviting a friend at a tap or anyone by name, for the leader and the
+  // deputies, as in the Drużyna (screens/party.js).
   function inviteCard() {
     const { guild } = view;
     if (guild.role === 'member' || guild.members.length >= guild.size) return null;
+    const friends = guild.friends ?? [];
     const name = h('input', { type: 'text', id: 'guild-invite-name', maxlength: '20', autocomplete: 'off', autocapitalize: 'none', enterkeyhint: 'send', placeholder: 'Imię postaci', 'aria-label': 'Imię postaci do zaproszenia do gildii' });
     const send = h('button', { type: 'submit', class: 'button button--system chat-send', text: 'Zaproś' });
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'guild-invite-title' },
       h('h2', { class: 'card-title', id: 'guild-invite-title', text: 'Zaproś do gildii' }),
+      h('p', { class: 'muted', text: 'Poniżej możesz zaprosić kogoś z listy znajomych lub dodać kogokolwiek ręcznie spoza niej.' }),
+      friends.length > 0 &&
+        h(
+          'ul',
+          { class: 'friends-list' },
+          friends.map((friend) => h('li', { class: 'friend' }, who(friend), h('div', { class: 'friend-actions' }, button('Zaproś', act('/api/guild/invite', { name: friend.name }), 'system')))),
+        ),
       h(
         'form',
         {

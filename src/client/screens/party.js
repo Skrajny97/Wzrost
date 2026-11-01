@@ -1,7 +1,7 @@
 // The Drużyna in the Społeczność (src/server/parties.js), from character
 // level 25: the invitations waiting for this character; its party with the
-// members and their state (free, away, playing another character), the
-// leader marked; the friends to invite at a tap and a name to invite; the
+// members and their state (free, on an exploration, at a profession's work,
+// playing another character), the leader marked; the friends to invite at a tap and a name to invite; the
 // invitations sent; and "Opuść drużynę". The leader sends the party out
 // from "Wyrusz" in the Walka (screens/combat.js, "Z drużyną").
 
@@ -13,9 +13,12 @@ import { openProfile } from '../profile.js';
 import { call, isUnlocked, state, unlockInfo } from '../state.js';
 import { confirmAction, toast, withButton } from '../ui.js';
 
-// A member's dot (the Znajomi's colours, styles.css) and its words.
-const DOTS = { free: 'online', away: 'busy', aside: 'offline' };
-const STATES = { free: 'wolny', away: 'na wyprawie albo przy pracy', aside: 'gra teraz inną postacią' };
+// A member's dot (the Znajomi's colours, styles.css) and its words; the
+// busy ones say it beside the name too, as they stay home when the party
+// goes (screens/combat.js).
+const DOTS = { free: 'online', away: 'busy', working: 'busy', aside: 'offline' };
+const STATES = { free: 'może iść na wyprawę', away: 'na wyprawie', working: 'pracuje w profesji', aside: 'gra teraz inną postacią' };
+export const BUSY = { away: 'na wyprawie', working: 'w profesji', aside: 'gra inną postacią' };
 
 export function mountParty(container) {
   let view = null;
@@ -89,6 +92,7 @@ export function mountParty(container) {
         onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)),
       }),
       person.level && h('span', { class: 'chat-level', text: `poz. ${person.level}` }),
+      BUSY[person.status] && h('span', { class: 'chat-level party-busy', text: BUSY[person.status] }),
       more,
     );
 
@@ -158,11 +162,14 @@ export function mountParty(container) {
           ),
         ),
       ),
+      // A member busy elsewhere stays in the party and stays home (the
+      // author: "Niech po prostu nie idzie z drużyną jesli jest zajety
+      // wykonywaniem Profesji, nie musi wychodzić z niej.").
       h('p', {
         class: 'muted',
         text: own?.leader
-          ? `Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”. Idą wszyscy wolni, najwyżej na ${formatMinutes(party.limits.minutes)} i tylko tam, gdzie wejdzie ${party.limits.classLevelBy} (poziom klasy ${party.limits.classLevel}). Bez „Z drużyną” wyruszasz sam, a członkowie też mogą chodzić sami.`
-          : 'Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle. Gdy chcesz zająć się profesjami, opuść drużynę.',
+          ? `Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”. Idą członkowie bez innych zajęć, teraz najwyżej na ${formatMinutes(party.limits.minutes)} i tylko tam, gdzie wejdzie ${party.limits.classLevelBy} (poziom klasy ${party.limits.classLevel}). Kto pracuje w profesji albo jest na wyprawie, zostaje w drużynie i pójdzie z nią następnym razem. Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.`
+          : 'Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle. Gdy pracujesz w profesji albo jesteś na własnej wyprawie, drużyna wyrusza bez Ciebie i nie musisz jej opuszczać.',
       }),
     );
   }

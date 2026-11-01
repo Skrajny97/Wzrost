@@ -48,10 +48,13 @@ export async function guildOf(db, characterId) {
 // The Gildia for the page: the guild with its members (the leader first,
 // then the deputies, each in the order they joined) and the invitations it
 // sent, the invitations waiting for this character, and the rules of
-// founding one.
+// founding one. The leader and the deputies get the friends they may
+// invite at a tap, those in no guild and not invited yet (the author: "Do
+// Gildii tez powinna być opcja zapraszania z pozycji ekranu Gildii").
 export async function guildView(db, characterId, now) {
   const guild = await guildOf(db, characterId);
-  const [members, sent, invites] = await db.batch([
+  const inviting = guild !== null && guild.role !== 'member';
+  const [members, sent, invites, friends] = await db.batch([
     db
       .prepare(
         `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, m.role, u.seen_at
@@ -68,8 +71,19 @@ export async function guildView(db, characterId, now) {
          WHERE i.character_id = ? ORDER BY i.created_at DESC`,
       )
       .bind(characterId),
+    db
+      .prepare(
+        `SELECT o.id, o.name, o.class_id, o.level, o.role AS played, u.seen_at
+         FROM friends f JOIN characters o ON o.id = CASE WHEN f.character_id = ? THEN f.friend_id ELSE f.character_id END JOIN users u ON u.id = o.user_id
+         WHERE (f.character_id = ? OR f.friend_id = ?) AND f.accepted_at IS NOT NULL AND ? AND o.${OWN_CHARACTERS}
+           AND NOT EXISTS (SELECT 1 FROM guild_members m WHERE m.character_id = o.id)
+           AND NOT EXISTS (SELECT 1 FROM guild_invites i WHERE i.character_id = o.id AND i.guild_id = ?)
+         ORDER BY o.name`,
+      )
+      .bind(characterId, characterId, characterId, inviting ? 1 : 0, guild?.id ?? 0),
   ]);
   const { onlineSeconds } = content.community.trade;
+  const online = (row) => row.played === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000;
   const { found, size, name, tag } = rules();
   return {
     guild: guild && {
@@ -86,9 +100,10 @@ export async function guildView(db, characterId, now) {
         role: row.role,
         roleName: ROLES[row.role] ?? ROLES.member,
         own: row.id === characterId,
-        online: row.played === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000,
+        online: online(row),
       })),
       invited: sent.results.map((row) => ({ id: row.id, name: row.name })),
+      friends: friends.results.map((row) => ({ id: row.id, name: row.name, classId: row.class_id, level: row.level, online: online(row) })),
     },
     invites: invites.results.map((row) => ({ guildId: row.guild_id, name: row.name, tag: row.tag, invitedBy: row.invited_by, members: row.members, at: row.created_at })),
     rules: { foundLevel: found.level, foundGold: found.gold, size, name, tag },

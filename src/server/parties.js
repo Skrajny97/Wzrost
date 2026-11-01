@@ -5,7 +5,10 @@
 // stwierdzi ze potrzebuje Profesje robić. Drużyny poki co są tylko na
 // wyprawy (mogą chodzić maksymalnie na tak długie i taki region jaki
 // odblokowala postac z najnizszym lvlem w drużynie)"). From character level
-// 25 (data/unlocks.json, party).
+// 25 (data/unlocks.json, party). A member at a profession's work stays in
+// the party and the party goes without it (the author: "Niech po prostu nie
+// idzie z drużyną jesli jest zajety wykonywaniem Profesji, nie musi
+// wychodzić z niej.").
 //
 // The leader invites a character by its name; a party comes with the first
 // invitation. The invited one accepts or declines; a member leaves when it
@@ -14,7 +17,8 @@
 //
 // An exploration of the party: every member free now (its character played,
 // at home, with nothing going on) goes with the leader to the place and for
-// the length the leader chose, if each of them has them open. Each one gets
+// the length the leader chose, if each of them has them open; the others
+// stay in the party and go the next time they are free. Each one gets
 // an exploration of its own (hunts.js), with the others fighting beside it
 // as they are when they set out, and its own report and finds; the free
 // places of the party, up to parties.size, take its companions.
@@ -62,11 +66,12 @@ export async function partyOf(db, characterId) {
 }
 
 // A member's state for the party's list: free (its character played and at
-// home), away (on an exploration or a work) or aside (its player plays
-// another character).
+// home), away (on an exploration), working (at a profession's work) or
+// aside (its player plays another character). Only the free go along.
 function memberStatus(row) {
   if (row.role !== 'player') return 'aside';
-  return row.away ? 'away' : 'free';
+  if (!row.activity) return 'free';
+  return row.activity === 'hunt' ? 'away' : 'working';
 }
 
 // The Drużyna for the page: the party, with its members, the invitations it
@@ -78,7 +83,7 @@ export async function partyView(db, characterId, now) {
     db
       .prepare(
         `SELECT c.id, c.name, c.class_id, c.level, c.class_level, c.role, u.seen_at,
-                EXISTS (SELECT 1 FROM activities a WHERE a.character_id = c.id) AS away
+                (SELECT a.kind FROM activities a WHERE a.character_id = c.id) AS activity
          FROM party_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
          WHERE m.party_id = ? ORDER BY m.joined_at, m.character_id`,
       )
@@ -106,17 +111,20 @@ export async function partyView(db, characterId, now) {
     status: memberStatus(row),
     online: row.role === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000,
   }));
-  // The lowest member's limits: the longest exploration of the lowest
-  // character level and the places of the lowest class level.
-  const lowest = list.length > 0 ? list.reduce((low, member) => (member.level < low.level ? member : low)) : null;
-  const lowestClass = list.length > 0 ? list.reduce((low, member) => (member.classLevel < low.classLevel ? member : low)) : null;
+  // The limits of the lowest of those who would go now, the leader and the
+  // free members, as the start checks them: the longest exploration of the
+  // lowest character level and the places of the lowest class level. One
+  // busy elsewhere stays home, so it limits nothing.
+  const goers = list.filter((member) => member.leader || member.status === 'free');
+  const lowest = goers.length > 0 ? goers.reduce((low, member) => (member.level < low.level ? member : low)) : null;
+  const lowestClass = goers.length > 0 ? goers.reduce((low, member) => (member.classLevel < low.classLevel ? member : low)) : null;
   return {
     party: party && {
       id: party.id,
       size: size(),
       members: list,
       invited: sent.results.map((row) => ({ id: row.id, name: row.name })),
-      limits: { minutes: longestHunt(lowest.level, content), minutesBy: lowest.name, classLevel: lowestClass.classLevel, classLevelBy: lowestClass.name },
+      limits: lowest && { minutes: longestHunt(lowest.level, content), minutesBy: lowest.name, classLevel: lowestClass.classLevel, classLevelBy: lowestClass.name },
     },
     invites: invites.results.map((row) => ({ partyId: row.party_id, invitedBy: row.invited_by, members: row.members ?? '', at: row.created_at })),
     unlockLevel: unlock().level,
@@ -245,9 +253,10 @@ export function partyRemoval(db, characters, binds) {
 
 const leaveStatements = (db, characterId) => partyRemoval(db, '?', [characterId]);
 
-// POST /api/party/leave: the character leaves, e.g. for the professions
-// (the author: "1 członek wychodzić z nich jak stwierdzi ze potrzebuje
-// Profesje robić"). An exploration already under way goes on as it began.
+// POST /api/party/leave: the character leaves (the author: "1 członek
+// wychodzić z nich jak stwierdzi ze potrzebuje Profesje robić"; since
+// 1.11.2026 the professions need no leaving, see the top). An exploration
+// already under way goes on as it began.
 export async function leaveParty(context) {
   const { player } = await requirePartyPlayer(context);
   const db = context.env.DB;
@@ -302,7 +311,7 @@ export async function partyHunt(context) {
   if (party.leaderId !== player.row.id) throw new ApiError(403, 'not_leader', 'Na wyprawę drużynę wysyła lider.');
   const others = (await Promise.all(party.memberIds.filter((id) => id !== player.row.id).map((id) => loadCharacter(db, id)))).filter(Boolean);
   const going = others.filter((other) => other.row.role === 'player' && !other.activity);
-  if (going.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Wyrusz sam albo poczekaj na drużynę.');
+  if (going.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
   const area = typeof body.areaId === 'string' ? areaFor(body.areaId, player.row.level, content) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
   for (const member of [player, ...going]) {

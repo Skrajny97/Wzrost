@@ -1,7 +1,8 @@
 // Drużyny (src/server/parties.js): from character level 25, up to three
 // characters of different players with a leader, who sends those free on an
 // exploration as far and as long as the lowest of them may; each goes with
-// the others beside it and gets its own report.
+// the others beside it and gets its own report. One at a profession's work
+// stays in the party and stays home.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -30,7 +31,7 @@ describe('a party in the engine', () => {
 });
 
 describe('Drużyna through the API', () => {
-  const { call, db, signUp } = useServer();
+  const { call, db, signUp } = useServer({ PROFESSIONS: 'on' });
   const cookies = {};
 
   async function player(login, name, { level = 30, classLevel = 30 } = {}) {
@@ -117,7 +118,28 @@ describe('Drużyna through the API', () => {
     assert.equal(nobody.data.error.code, 'nobody_free');
   });
 
-  test('a member leaves for its professions, a leader who leaves passes the lead, and a party nobody is in goes', async () => {
+  test('a member at a profession\'s work stays in the party, stays home and limits nothing', async () => {
+    await player('trzeci', 'Trzeci');
+    // Druh's class level keeps the Omszałe Głazy shut to it.
+    await (await db()).prepare("UPDATE characters SET level = 26, class_level = 20 WHERE name = 'Druh'").run();
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    await as('trzeci', 'POST', '/api/party/accept', { partyId: data.party.id });
+    const gathering = await as('druh', 'POST', '/api/professions/gather', { herbs: ['comfrey'], minutes: 60 });
+    assert.equal(gathering.status, 201, JSON.stringify(gathering.data));
+    const view = (await as('lider', 'GET', '/api/party')).data.party;
+    assert.equal(view.members.find((one) => one.name === 'Druh').status, 'working');
+    assert.notEqual(view.limits.classLevelBy, 'Druh');
+    const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'mossy-boulders', minutes: 30 });
+    assert.equal(went.status, 201, JSON.stringify(went.data));
+    assert.deepEqual(went.data.went, ['Trzeci']);
+    assert.deepEqual(went.data.party.members.map((one) => one.name), ['Lider', 'Druh', 'Trzeci']);
+    const druh = await (await db()).prepare("SELECT a.kind FROM activities a JOIN characters c ON c.id = a.character_id WHERE c.name = 'Druh'").first();
+    assert.equal(druh.kind, 'herbs');
+  });
+
+  test('a member leaves when it wants, a leader who leaves passes the lead, and a party nobody is in goes', async () => {
     await player('trzeci', 'Trzeci');
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });

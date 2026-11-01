@@ -39,6 +39,7 @@ import { playSound } from '../sound.js';
 import { skipControl, timePoints } from '../time.js';
 import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { openEvent } from '../event.js';
+import { BUSY } from './party.js';
 import { combatModes } from './towers.js';
 
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -850,7 +851,9 @@ export function mountCombat(container, { params, navigate }) {
   }
 
   // The box "Z drużyną" over "Wyrusz", for a party's leader with members
-  // free now; along() gives their names while it is ticked, else null.
+  // free now; along() gives their names while it is ticked, else null. The
+  // members busy elsewhere stay home and in the party (parties.js), and the
+  // lines under the box name them; with none free, only those lines.
   function partyChoice() {
     const element = h('div', { class: 'party-choice', hidden: true });
     let free = [];
@@ -859,8 +862,15 @@ export function mountCombat(container, { params, navigate }) {
       partyAsked
         .then(({ party }) => {
           const own = party?.members.find((member) => member.own);
-          free = party ? party.members.filter((member) => !member.own && member.status === 'free').map((member) => member.name) : [];
-          if (!own?.leader || free.length === 0) return;
+          if (!own?.leader || party.members.length < 2) return;
+          const others = party.members.filter((member) => !member.own);
+          free = others.filter((member) => member.status === 'free').map((member) => member.name);
+          const busy = others.filter((member) => member.status !== 'free').map((member) => `${member.name} (${BUSY[member.status] ?? 'zajęte'})`);
+          if (free.length === 0) {
+            fill(element, h('p', { class: 'muted', text: `Z drużyny nikt teraz nie pójdzie: ${busy.join(', ')}. Wyprawa będzie tylko Twoja.` }));
+            element.hidden = false;
+            return;
+          }
           const box = h('input', { type: 'checkbox', id: 'party-along', class: 'avoid-rare-box', checked: partyTicked, onChange: () => (partyTicked = box.checked) });
           fill(
             element,
@@ -869,6 +879,7 @@ export function mountCombat(container, { params, navigate }) {
               class: 'muted',
               text: `Drużyna idzie najwyżej na ${formatMinutes(party.limits.minutes)} (${party.limits.minutesBy}) i tylko tam, gdzie wejdzie ${party.limits.classLevelBy} (poziom klasy ${party.limits.classLevel}).`,
             }),
+            busy.length > 0 && h('p', { class: 'muted', text: `${busy.length === 1 ? 'Nie idzie' : 'Nie idą'}, ale ${busy.length === 1 ? 'zostaje' : 'zostają'} w drużynie: ${busy.join(', ')}.` }),
           );
           element.hidden = false;
         })

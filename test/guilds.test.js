@@ -1,6 +1,7 @@
 // The players' Gildie (src/server/guilds.js): founding one from level 30
 // for 1000 gold, with a unique name and tag; invitations by the leader and
-// the deputies; the roles; a leader who leaves passes the lead on, and a
+// the deputies, also of their friends at a tap; the roles; a leader who
+// leaves passes the lead on, and a
 // guild nobody is in goes; its chat channel only its members read and
 // write in; a deleted character leaves its guild.
 
@@ -79,6 +80,26 @@ describe('the Gildia through the API', () => {
     await as('druh', 'POST', '/api/guild/leave');
     assert.equal(await count('guilds'), 0);
     assert.equal(await count('guild_members'), 0);
+  });
+
+  test('the leader and the deputies see the friends they may invite at a tap, members do not', async () => {
+    await player('trzeci', 'Trzeci');
+    // Mistrz's friends: Druh and Trzeci.
+    for (const [login, name] of [['druh', 'Mistrz'], ['trzeci', 'Mistrz']]) {
+      await as(login, 'POST', '/api/friends/invite', { name });
+      const invitation = (await as('mistrz', 'GET', '/api/friends')).data.incoming[0];
+      assert.equal((await as('mistrz', 'POST', '/api/friends/accept', { id: invitation.id })).status, 200);
+    }
+    const made = await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' });
+    assert.deepEqual(made.data.guild.friends.map((friend) => friend.name), ['Druh', 'Trzeci']);
+    // One invited is not offered again, and one in a guild neither.
+    const invited = await as('mistrz', 'POST', '/api/guild/invite', { name: 'Druh' });
+    assert.deepEqual(invited.data.guild.friends.map((friend) => friend.name), ['Trzeci']);
+    await as('trzeci', 'POST', '/api/guild/found', { name: 'Inni', tag: 'IN' });
+    assert.deepEqual((await as('mistrz', 'GET', '/api/guild')).data.guild.friends, []);
+    // A member is offered nobody.
+    await as('druh', 'POST', '/api/guild/accept', { guildId: made.data.guild.id });
+    assert.deepEqual((await as('druh', 'GET', '/api/guild')).data.guild.friends, []);
   });
 
   test('a full guild takes no more, and the lead is handed over by the leader', async () => {
