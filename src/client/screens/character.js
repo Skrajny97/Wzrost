@@ -614,8 +614,9 @@ export function itemSheet(item, { equipped }) {
 
 // The item beside the one worn in its slot, number by number: the damage of
 // a weapon, the armor and each stat, and by how much the item has more or
-// less of it (for damage, of its average).
-function compareTable(item, worn) {
+// less of it (for damage, of its average). Also for an item of the
+// Targowisko (market.js).
+export function compareTable(item, worn) {
   const ids = [...new Set([...item.lines, ...worn.lines].map((line) => line.id))];
   const lineOf = (of, id) => of.lines.find((line) => line.id === id);
   return h(

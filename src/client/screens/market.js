@@ -12,7 +12,7 @@ import { h, icon } from '../dom.js';
 import { countOf, formatDecimal, formatNumber } from '../format.js';
 import { call, serverNow, state } from '../state.js';
 import { closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from '../ui.js';
-import { itemSummary } from './character.js';
+import { compareTable, itemSummary } from './character.js';
 
 const TABS = [
   ['offers', 'Oferty graczy'],
@@ -109,14 +109,18 @@ function goodsSheet(goods, actions = null) {
 export const stackButton = (goods, options, actions) =>
   h('button', { type: 'button', class: 'market-goods-button', 'aria-label': `${goods.name}: szczegóły`, onClick: () => goodsSheet(goods, actions?.()) }, stackLine(goods, options));
 
-// An item to buy, its properties under a tap, and when the character can
-// wear it: an item from the Targowisko is worn from its own level of the
-// class on, as one from the Wymiana (241). `opened` keeps the unfolded ones by `key`
-// through the panel's redraws.
+// An item to buy, its properties under a tap with the comparison to the
+// one the character wears in its slot (the author: "jak klikamy dany
+// przedmiot to nie tylko pojawiają się dane przedmiotu, ale i otwiera
+// porównywarka z aktualnym przedmiotem"), and when the character can wear
+// it: from its Tier, as every item. `opened` keeps the unfolded ones by
+// `key` through the panel's redraws.
 function itemEntry(item, key, opened) {
   const character = state.character;
+  const usable = !item.classIds || item.classIds.includes(character.classId);
+  const worn = character.equipment?.[item.slot] ?? null;
   const notes = [
-    item.classIds && !item.classIds.includes(character.classId) && 'Twoja klasa nie może go używać.',
+    !usable && 'Twoja klasa nie może go używać.',
     character.classLevel < (item.classLevel ?? 1) && `Założysz go od poziomu klasy ${item.classLevel}.`,
   ].filter(Boolean);
   return [
@@ -135,6 +139,7 @@ function itemEntry(item, key, opened) {
         item.classNames && h('li', { class: 'item-classes', text: `${item.classNames.length > 1 ? 'Dla klas' : 'Dla klasy'}: ${item.classNames.join(', ')}` }),
         item.price !== undefined && h('li', { class: 'item-price', text: `U złomiarza: ${formatNumber(item.price)} złota` }),
       ),
+      usable && (worn ? compareTable(item, worn) : h('p', { class: 'muted', text: `W miejscu „${item.slotName}” postać nic teraz nie nosi.` })),
     ),
     notes.map((note) => h('p', { class: 'region-warning trade-note', text: note })),
   ];
