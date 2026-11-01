@@ -177,11 +177,12 @@ describe('the Wieże through the API', () => {
     assert.equal(entered.status, 200, JSON.stringify(entered.data).slice(0, 300));
     assert.deepEqual(entered.data.report.tower.partners, ['Druh']);
     assert.ok(entered.data.report.fights[0].allies.some((unit) => unit.name === 'Druh'));
-    // One beyond the class levels' spread does not climb along (parties.js).
+    // One grown beyond the class levels' spread leaves the party, so it
+    // climbs no more (parties.js).
     await (await db()).prepare("UPDATE characters SET class_level = ? WHERE name = 'Druh'").bind(50 + content.balance.parties.classSpread + 1).run();
     const apart = (await as('wspinacz', 'GET', '/api/towers')).data.towers.towers.find((tower) => tower.id === 'party');
     assert.deepEqual(apart.partners, []);
-    assert.match(apart.missing, /poziomami klas/);
+    assert.match(apart.missing, /co najmniej/);
   });
 
   test('no climb on an exploration or before its report: the report is made with the character as it is then', async () => {

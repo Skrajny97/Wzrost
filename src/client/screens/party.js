@@ -21,15 +21,14 @@ const GOERS =
 // A member's dot (the Znajomi's colours, styles.css) and its words; the
 // busy ones say it beside the name too, as they stay home when the party
 // goes (screens/combat.js).
-// One free whose class level is too far from the leader's and the others'
-// (`gap`, parties.js) stays home too.
-const DOTS = { free: 'online', away: 'busy', working: 'busy', aside: 'offline', gap: 'busy' };
-const STATES = { free: 'może iść na wyprawę', away: 'na wyprawie', working: 'pracuje w profesji', aside: 'gra teraz inną postacią', gap: 'nie pójdzie: za duża różnica poziomu klasy' };
-export const BUSY = { away: 'na wyprawie', working: 'w profesji', aside: 'gra inną postacią', gap: 'za duża różnica poziomu klasy' };
+const DOTS = { free: 'online', away: 'busy', working: 'busy', aside: 'offline' };
+const STATES = { free: 'może iść na wyprawę', away: 'na wyprawie', working: 'pracuje w profesji', aside: 'gra teraz inną postacią' };
+export const BUSY = { away: 'na wyprawie', working: 'w profesji', aside: 'gra inną postacią' };
 
 // The class levels' spread (the author: "Rozpiętość poziomu klas w Drużynie
-// maks 5 lvl musi być też by nie było za dużego carrowania").
-const spreadText = (spread) => `Poziomy klas w drużynie mogą się różnić najwyżej o ${spread}. Kto odstaje bardziej, zostaje w drużynie, ale nie idzie na wspólną wyprawę.`;
+// maks 5 lvl", "niech nie będzie możliwości w ogole bycia w drużynie z kimś
+// o rozpiętości lvli wyzszej niz 5"; src/server/parties.js).
+const spreadText = (spread) => `Poziomy klas w drużynie mogą się różnić najwyżej o ${spread}. Kto przez awans odstanie bardziej, wypada z drużyny.`;
 
 // The time other members of a Drużyna's trip skipped for everyone
 // (src/server/time.js), one line each, their skips added up (the author:
@@ -224,13 +223,7 @@ export function mountParty(container) {
       h('h2', { class: 'card-title', id: 'party-invite-title', text: 'Zaproś do drużyny' }),
       // The author's words (1.11.2026), over the friends and the name field.
       h('p', { class: 'muted', text: `Zaproś postaci od ${view.unlockLevel}. poziomu wzwyż. Poniżej możesz to zrobić z listy znajomych lub dodać kogokolwiek ręcznie spoza niej.` }),
-      h('p', {
-        class: 'muted',
-        text:
-          from <= to
-            ? `Poziomy klas w drużynie mogą się różnić najwyżej o ${spread}, więc teraz dołączy postać z poziomem klasy od ${from} do ${to}.`
-            : `Poziomy klas w drużynie mogą się różnić najwyżej o ${spread}, a w tej drużynie różnią się już bardziej, więc nikt nowy teraz nie dołączy.`,
-      }),
+      h('p', { class: 'muted', text: `Poziomy klas w drużynie mogą się różnić najwyżej o ${spread}, więc teraz dołączy postać z poziomem klasy od ${from} do ${to}.` }),
       ready.length > 0 &&
         h(
           'ul',

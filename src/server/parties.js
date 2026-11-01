@@ -10,9 +10,10 @@
 // idzie z drużyną jesli jest zajety wykonywaniem Profesji, nie musi
 // wychodzić z niej."). The members' class levels differ by at most
 // parties.classSpread (the author: "Rozpiętość poziomu klas w Drużynie maks
-// 5 lvl musi być też by nie było za dużego carrowania"; engine parties.js):
-// an invitation and a joining keep to it, and as levels grow apart, a trip
-// takes only those it fits, the others staying in the party.
+// 5 lvl musi być też by nie było za dużego carrowania", and "niech nie
+// będzie możliwości w ogole bycia w drużynie z kimś o rozpiętości lvli
+// wyzszej niz 5"; engine parties.js): an invitation and a joining keep to
+// it, and one whose level grows out of it leaves the party (partyOf).
 //
 // The leader invites a character by its name; a party comes with the first
 // invitation. The invited one accepts or declines; a member leaves when it
@@ -30,7 +31,7 @@
 // moves them all, and the others hear who skipped (time.js; the author:
 // "Musi być wspólny timer").
 
-import { areaFor, areaUnlocked, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyGoers, partyRange } from '../engine/index.js';
+import { areaFor, areaUnlocked, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange } from '../engine/index.js';
 import { characterView, currentHp, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { settlementOn } from './features.js';
@@ -86,7 +87,9 @@ export async function partyOf(db, characterId) {
   if (!membership) return null;
   const [party, members] = await db.batch([
     db.prepare('SELECT id, leader_id FROM parties WHERE id = ?').bind(membership.party_id),
-    db.prepare('SELECT character_id FROM party_members WHERE party_id = ? ORDER BY joined_at, character_id').bind(membership.party_id),
+    db
+      .prepare('SELECT m.character_id, c.class_level FROM party_members m JOIN characters c ON c.id = m.character_id WHERE m.party_id = ? ORDER BY m.joined_at, m.character_id')
+      .bind(membership.party_id),
   ]);
   const row = party.results[0];
   if (!row) {
@@ -94,14 +97,23 @@ export async function partyOf(db, characterId) {
     await db.prepare('DELETE FROM party_members WHERE character_id = ? AND party_id = ?').bind(characterId, membership.party_id).run();
     return null;
   }
-  return { id: row.id, leaderId: row.leader_id, memberIds: members.results.map((member) => member.character_id) };
+  // One whose class level grew more than the spread apart leaves (engine
+  // partyFit): the leader stays, and the members in the party's order who
+  // fit with those staying.
+  const list = members.results.map((member) => ({ id: member.character_id, classLevel: member.class_level }));
+  const leader = list.find((member) => member.id === row.leader_id);
+  const { apart } = leader ? partyFit(leader, list.filter((member) => member !== leader), content) : { apart: [] };
+  if (apart.length > 0) {
+    const ids = apart.map((member) => member.id);
+    await db.batch(partyRemoval(db, ids.map(() => '?').join(', '), ids));
+    if (ids.includes(characterId)) return null;
+  }
+  return { id: row.id, leaderId: row.leader_id, memberIds: list.filter((member) => !apart.includes(member)).map((member) => member.id) };
 }
 
 // A member's state for the party's list: free (its character played and at
 // home), away (on an exploration), working (at a profession's work) or
-// aside (its player plays another character). Only the free go along, and
-// of them only those within the class levels' spread (the view marks the
-// others `gap`).
+// aside (its player plays another character). Only the free go along.
 function memberStatus(row) {
   if (row.role !== 'player') return 'aside';
   if (!row.activity) return 'free';
@@ -152,17 +164,11 @@ export async function partyView(db, characterId, now) {
     online: row.role === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000,
     mount: mountOfRow(row),
   }));
-  // Of the free members, those too far in class level from the leader and
-  // the others going stay home (the spread).
-  const leader = list.find((member) => member.leader);
-  const { going, gap } = leader ? partyGoers(leader, list.filter((member) => !member.leader && member.status === 'free'), content) : { going: [], gap: [] };
-  for (const member of gap) member.status = 'gap';
   // The limits of the lowest of those who would go now, the leader and the
-  // free members within the spread, as the start checks them: the longest
-  // exploration of the lowest character level, the places of the lowest
-  // class level and the slowest mount. One busy elsewhere stays home, so it
-  // limits nothing.
-  const goers = leader ? [leader, ...going] : [];
+  // free members, as the start checks them: the longest exploration of the
+  // lowest character level, the places of the lowest class level and the
+  // slowest mount. One busy elsewhere stays home, so it limits nothing.
+  const goers = list.filter((member) => member.leader || member.status === 'free');
   const slowest = goers.length > 0 ? goers.reduce((low, member) => (member.mount < low.mount ? member : low)) : null;
   const levels = list.length > 0 ? list.map((member) => member.classLevel) : [self.results[0]?.class_level ?? 1];
   const lowest = goers.length > 0 ? goers.reduce((low, member) => (member.level < low.level ? member : low)) : null;
@@ -361,8 +367,7 @@ function snapshot(member, now) {
 }
 
 // POST /api/party/hunt { areaId, minutes, ... as "Wyrusz" }: the leader
-// sends the party out. The members free now go, those within the class
-// levels' spread with the leader and each other; each of them, the leader
+// sends the party out. The members free now go; each of them, the leader
 // too, must have the place and the length open, so the party goes only as
 // far and as long as its lowest member may, and waits as long as its slowest
 // mount (the Stajnia, 327 A). The leader's choices of potions and tracking
@@ -377,18 +382,8 @@ export async function partyHunt(context) {
   if (!party) throw new ApiError(409, 'no_party', 'Nie masz drużyny.');
   if (party.leaderId !== player.row.id) throw new ApiError(403, 'not_leader', 'Na wyprawę drużynę wysyła lider.');
   const others = (await Promise.all(party.memberIds.filter((id) => id !== player.row.id).map((id) => loadCharacter(db, id)))).filter(Boolean);
-  const free = others.filter((other) => other.row.role === 'player' && !other.activity);
-  if (free.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
-  // Of them, those the class levels' spread lets go (engine parties.js).
-  const fit = partyGoers({ classLevel: player.row.class_level }, free.map((member) => ({ classLevel: member.row.class_level, member })), content).going;
-  const going = fit.map((one) => one.member);
-  if (going.length === 0) {
-    throw new ApiError(
-      409,
-      'party_level_gap',
-      `Wolni członkowie drużyny mają poziom klasy różny od Twojego o więcej niż ${content.balance.parties.classSpread}, więc nie pójdą na wspólną wyprawę. Odznacz „Z drużyną”, żeby wyruszyć bez drużyny.`,
-    );
-  }
+  const going = others.filter((other) => other.row.role === 'player' && !other.activity);
+  if (going.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
   const area = typeof body.areaId === 'string' ? areaFor(body.areaId, player.row.level, content) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
   for (const member of [player, ...going]) {

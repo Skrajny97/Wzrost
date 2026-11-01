@@ -321,31 +321,35 @@ describe('Drużyna through the API', () => {
     assert.equal((await as('druh', 'POST', '/api/party/accept', { partyId: again.data.party.id })).status, 200);
   });
 
-  test('as class levels grow apart, a trip takes only those within the spread; the others stay in the party', async () => {
+  test('one whose class level grows more than the spread apart leaves the party; the leader stays', async () => {
+    const { classSpread } = content.balance.parties;
     await player('trzeci', 'Trzeci');
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
     await as('trzeci', 'POST', '/api/party/accept', { partyId: data.party.id });
-    await (await db()).prepare('UPDATE characters SET class_level = ? WHERE name = ?').bind(30 + content.balance.parties.classSpread + 1, 'Druh').run();
+    // Druh grows out of the spread: out of the party, the others stay.
+    await (await db()).prepare('UPDATE characters SET class_level = ? WHERE name = ?').bind(30 + classSpread + 1, 'Druh').run();
     const view = (await as('lider', 'GET', '/api/party')).data.party;
-    assert.equal(view.members.find((one) => one.name === 'Druh').status, 'gap');
-    assert.equal(view.members.find((one) => one.name === 'Trzeci').status, 'free');
+    assert.deepEqual(view.members.map((one) => one.name), ['Lider', 'Trzeci']);
+    assert.equal((await as('druh', 'GET', '/api/party')).data.party, null);
     const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
     assert.equal(went.status, 201, JSON.stringify(went.data));
     assert.deepEqual(went.data.went, ['Trzeci']);
-    assert.deepEqual(went.data.party.members.map((one) => one.name), ['Lider', 'Druh', 'Trzeci']);
     const druh = await (await db()).prepare("SELECT COUNT(*) AS count FROM activities a JOIN characters c ON c.id = a.character_id WHERE c.name = 'Druh'").first();
     assert.equal(druh.count, 0);
   });
 
-  test('a party whose free members are all beyond the spread does not go', async () => {
+  test('a leader who grows out of the spread keeps the lead; the members it no longer fits leave', async () => {
+    const { classSpread } = content.balance.parties;
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
-    await (await db()).prepare('UPDATE characters SET class_level = ? WHERE name = ?').bind(30 + content.balance.parties.classSpread + 1, 'Druh').run();
-    const gap = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
-    assert.equal(gap.data.error.code, 'party_level_gap');
-    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM activities').first()).count, 0);
+    await (await db()).prepare('UPDATE characters SET class_level = ? WHERE name = ?').bind(30 + classSpread + 1, 'Lider').run();
+    // Seen first from the member's side: the member is out, the leader alone.
+    assert.equal((await as('druh', 'GET', '/api/party')).data.party, null);
+    const view = (await as('lider', 'GET', '/api/party')).data.party;
+    assert.deepEqual(view.members.map((one) => [one.name, one.leader]), [['Lider', true]]);
+    assert.equal((await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 })).data.error.code, 'nobody_free');
   });
 
   test('a deleted account leaves its party', async () => {
