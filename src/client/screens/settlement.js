@@ -19,6 +19,7 @@ import { dayPart } from '../scenes.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { companionCard } from '../companions.js';
+import { stableCard } from '../stable.js';
 import { itemSummary, materialTitle } from './character.js';
 import { mountMarket, numberField, stackButton } from './market.js';
 
@@ -1116,6 +1117,8 @@ export function mountSettlement(container, { params = {} } = {}) {
       !place.soon && resident && services(resident),
       place.id === 'board' && [boardCard(), brotherhoodsCard()],
       place.id === 'market' && !place.soon && marketPanel(),
+      // The Stajnia's mounts (327 A), under Mirosław's card.
+      place.id === 'stable' && !place.soon && data.stable && stableCard(data.stable, apply),
     );
   }
 

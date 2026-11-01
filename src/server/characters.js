@@ -75,6 +75,7 @@ import {
   TIMED_KINDS,
   timedKind,
 } from '../engine/index.js';
+import { mountView } from '../engine/stable.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
 import { content } from './content.js';
@@ -979,6 +980,9 @@ export function characterView(player, now) {
     quickHunts: quickHuntsView(row, now),
     // The next longer exploration and its level, for the hint under the slider.
     huntNext: nextHuntUnlock(row.level, content),
+    // The Stajnia's mount, which shortens the wait under the slider too
+    // (stable.js in the engine), or null.
+    mount: settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content) : null,
     freePoints: freePoints(character, content),
     // The Umiejętności tab: the choices, the skills learned and the Skill Points.
     skills: skillsView(character, content),

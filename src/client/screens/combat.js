@@ -37,6 +37,7 @@ import {
 } from '../state.js';
 import { playSound } from '../sound.js';
 import { skipControl, timePoints } from '../time.js';
+import { formatWait, stableNote } from '../stable.js';
 import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { openEvent } from '../event.js';
 import { BUSY, skipLines } from './party.js';
@@ -459,6 +460,10 @@ export function mountCombat(container, { params, navigate }) {
         ...(activity.avoidRare ? [h('p', { class: 'system-hint', text: 'Postać omija elity i czempionów.' })] : []),
         ...(activity.seekRare ? [h('p', { class: 'system-hint', text: 'Postać tropi elity i czempiony.' })] : []),
         ...(activity.tracksQuests ? [h('p', { class: 'system-hint', text: 'Postać tropi stwory z zadań.' })] : []),
+        // The Stajnia's mount made the wait shorter than the length (327 A).
+        ...(activity.endsAt - activity.startedAt < activity.minutes * 60000
+          ? [h('p', { class: 'system-hint', text: `Z wierzchowcem: ${formatWait(activity.endsAt - activity.startedAt)}.` })]
+          : []),
         ...(activity.party ? [h('p', { class: 'system-hint', text: 'Wyprawa drużyny ma wspólny czas: przewinięcie skraca ją wszystkim.' })] : []),
         h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
       ),
@@ -702,6 +707,8 @@ export function mountCombat(container, { params, navigate }) {
     // A slider with buttons for one step at a time, and the length's name.
     const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
     const kind = h('span', { class: 'duration-kind' });
+    // With the Stajnia's mount the wait is shorter than the length (327 A).
+    const riding = character.mount ? h('p', { class: 'duration-lock duration-mount' }) : null;
     const slider = h('input', {
       type: 'range',
       class: 'duration-slider',
@@ -739,6 +746,7 @@ export function mountCombat(container, { params, navigate }) {
       slider.style.setProperty('--fill', `${(index / Math.max(1, allowed.length - 1)) * 100}%`);
       value.textContent = formatMinutes(minutes);
       kind.textContent = lengthName(minutes);
+      if (riding) riding.textContent = stableNote(minutes, character.mount);
       less.disabled = index === 0;
       more.disabled = index === allowed.length - 1;
       potions?.update(minutes);
@@ -763,6 +771,7 @@ export function mountCombat(container, { params, navigate }) {
         h('span', { text: formatMinutes(allowed[0]) }),
         h('span', { text: formatMinutes(allowed.at(-1)) }),
       ),
+      riding,
       longer && h('p', { class: 'duration-lock', text: `Dłuższe wyprawy, do ${formatMinutes(longer.minutes)}, od poziomu ${longer.level}.` }),
     );
 

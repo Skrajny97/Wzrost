@@ -65,6 +65,7 @@ import {
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyFromHerbalist, buyMug, chooseReforged, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, settlementTests, takeCompanionGift, testSettlement } from './settlement.js';
 import { skipWithTimePoints } from './time.js';
+import { buyMount } from './stable.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
 import { seeTutorial } from './tutorial.js';
 import { exchangeParts, startCrafting } from './workshop.js';
@@ -160,6 +161,7 @@ const routes = [
   ['POST', '/api/settlement/hermit', hermitService],
   ['POST', '/api/settlement/tavern', buyMug],
   ['POST', '/api/settlement/hire', hireCompanion],
+  ['POST', '/api/settlement/stable', buyMount],
   ['GET', '/api/market', getMarket],
   ['POST', '/api/market/list', listOffer],
   ['POST', '/api/market/bid', bidOnOffer],

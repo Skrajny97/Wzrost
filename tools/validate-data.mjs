@@ -667,6 +667,7 @@ function checkReferences(data) {
   errors.push(...checkEvents(data, { monsters, rarities }));
   errors.push(...checkEncyclopedia(data));
   errors.push(...checkSettlement(data, { rarities }));
+  errors.push(...checkStable(data));
   return errors;
 }
 
@@ -1141,5 +1142,23 @@ function checkSettlement(data, { rarities }) {
     if (!cost) errors.push(`settlement.json: brak kosztu przekucia dla rzadkości ${rarity.id}`);
     else if (!rarities.has(cost.rarity)) errors.push(`settlement.json: przekucie ${rarity.id} bierze materiały nieznanej rzadkości ${cost.rarity}`);
   }
+  return errors;
+}
+
+// The Stajnia (327 A): its koniuszy lives in the Osada, in a place on the
+// board, and each next mount, bought after the one before, is quicker,
+// dearer and from a level no lower.
+function checkStable(data) {
+  const errors = [];
+  const { stable, residents, places } = data.settlement;
+  if (!stable) return errors;
+  if (!residents.some((resident) => resident.id === stable.resident)) errors.push(`settlement.json: stable.resident to nieznany mieszkaniec ${stable.resident}`);
+  if (!places.some((place) => place.resident === stable.resident)) errors.push(`settlement.json: koniuszy ${stable.resident} nie ma miejsca na planszy`);
+  stable.mounts.forEach((mount, index) => {
+    const before = stable.mounts[index - 1];
+    if (before && (mount.shorter <= before.shorter || mount.gold <= before.gold || mount.level < before.level)) {
+      errors.push(`settlement.json: wierzchowiec ${mount.name} musi być szybszy i droższy od poprzedniego, od poziomu nie niższego`);
+    }
+  });
   return errors;
 }

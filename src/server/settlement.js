@@ -91,6 +91,7 @@ import { ApiError, json, readJson } from './http.js';
 import { forgeView } from './forge.js';
 import { counted, foreign, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
+import { stableView } from './stable.js';
 
 // A JSON path for a key with a hyphen or a colon ("iron-ore", "wolf-pelt:rare").
 const jsonPath = (key) => `$."${key}"`;
@@ -133,6 +134,8 @@ export function settlementOf(row) {
     // reputation its trade gave today (forge.js).
     ...(stored.forge && { forge: stored.forge }),
     ...(stored.forgeTrade && { forgeTrade: stored.forgeTrade }),
+    // The Stajnia's mount, by its stage (stable.js).
+    ...(stored.mount && { mount: stored.mount }),
     ...(stored.test && { test: true }),
   };
 }
@@ -248,6 +251,8 @@ export function settlementView(player, stored, board, now) {
       pending: pendingView(pendingOf(stored, player.items)),
     },
     tavern: tavernView(player.row, stored, now),
+    // The Stajnia's mounts and the character's (stable.js).
+    stable: stableView(stored),
     // The parcels waiting at the Targowisko (market.js), for its dot.
     market: { waiting: player.marketWaiting ?? 0 },
     companions: companionsView(player, stored, now),

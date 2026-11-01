@@ -58,6 +58,7 @@ import {
   unknownCreatures,
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
+import { huntWait, mountStage } from '../engine/stable.js';
 import { finishBrewing } from './brewing.js';
 import { content } from './content.js';
 import {
@@ -275,13 +276,14 @@ export async function startHunt(context) {
 // An exploration of a Drużyna (parties.js) keeps the party (its id, leader
 // and the names of those who went) and the other players as they set out
 // (`partners`), who fight beside the character; its companions take only
-// the places left in the party.
+// the places left in the party. `mount`: the stage of the Stajnia's mount
+// the exploration goes at, which the party code gives a Drużyna's trip.
 export async function beginHunt(
   db,
   player,
   { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow } = {},
   now,
-  { quick = false, flash = false, party: crew = null, partners = [] } = {},
+  { quick = false, flash = false, party: crew = null, partners = [], mount = null } = {},
 ) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
@@ -368,6 +370,15 @@ export async function beginHunt(
     ...(flash && { flash }),
   };
   const startsAt = quick ? now - minutes * 60000 : now;
+  // The Stajnia's mount (327 A, stable.js in the engine) shortens only the
+  // wait: an hour with the first stage (5%) ends after 57 minutes, while
+  // `minutes` stays the length chosen, so the fights, the rewards, the XP
+  // and the report's minutes are those of the full hour. Not a Szybkie or a
+  // Błyskawiczne polowanie, over as they start. A Drużyna's trip keeps one
+  // time for all who go: it takes the stage the party code gives (`mount`,
+  // the slowest mount among them), and without one goes the full length.
+  const stage = quick ? 0 : (mount ?? (crew ? 0 : mountStage(kept, content)));
+  const endsAt = startsAt + huntWait(minutes, stage, content);
 
   const { hp } = currentHp(player, now);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
@@ -387,7 +398,7 @@ export async function beginHunt(
           area.id,
           minutes,
           startsAt,
-          startsAt + minutes * 60000,
+          endsAt,
           seed,
           hp,
           avoidRare ? 1 : 0,

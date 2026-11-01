@@ -251,6 +251,33 @@
         "relationGain": { "type": "integer", "minimum": 0 }
       }
     },
+    "stable": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Stajnia (327 A; src/engine/stable.js): koniuszy (resident, id mieszkańca) sprzedaje wierzchowce na stałe, po kolei, a wyższy stopień zastępuje niższy. Każdy kupiony daje relationGain punktów relacji z nim. Wierzchowiec skraca czekanie na koniec każdej wyprawy postaci o shorter (0,05 to 5%: godzinna trwa 57 minut), poza Szybkim i Błyskawicznym Polowaniem; nagrody, doświadczenie i minuty raportu zostają jak za wybrany czas.",
+      "required": ["resident", "relationGain", "mounts"],
+      "properties": {
+        "resident": { "type": "string", "description": "Koniuszy: id mieszkańca, przy którym rośnie relacja o relationGain za każdy kupiony wierzchowiec." },
+        "relationGain": { "type": "integer", "minimum": 0 },
+        "mounts": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Stopnie wierzchowca, od pierwszego; postać trzyma numer stopnia (mount w characters.settlement).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "description", "shorter", "gold", "level"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "description": { "type": "string", "minLength": 1 },
+              "shorter": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1, "description": "O jaką część krócej czeka się na koniec wyprawy." },
+              "gold": { "type": "integer", "minimum": 1, "description": "Cena w złocie." },
+              "level": { "type": "integer", "minimum": 1, "description": "Od którego poziomu postaci można go kupić." }
+            }
+          }
+        }
+      }
+    },
     "tavern": { "type": "object", "additionalProperties": false, "required": ["resident", "relationGain", "mugGoldPerLevel", "rumor"], "properties": { "resident": { "type": "string", "description": "Karczmarz: id mieszkańca, przy którym rośnie relacja o relationGain za kufel." }, "relationGain": { "type": "integer", "minimum": 0 }, "mugGoldPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "rumor": { "type": "object", "additionalProperties": false, "required": ["factor", "newest", "lines"], "properties": { "factor": { "type": "number", "minimum": 1 }, "newest": { "type": "integer", "minimum": 1 }, "lines": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } } } },
     "market": {
       "type": "object",

@@ -25,6 +25,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `events.js` | zdarzenia na koniec wyprawy |
 | `quests.js` | zadania dzienne i tygodniowe narratora |
 | `settlement.js`, `companions.js`, `market.js` | Osada: reputacja, relacje, Tablica zleceń, usługi mieszkańców, towarzysze i Targowisko |
+| `stable.js` | Stajnia w Osadzie: wierzchowce kupowane na stałe, po kolei, i krótsze czekanie na koniec wyprawy |
 | `towers.js` | Wieże Systemu: podwaliny, jeszcze poza grą |
 | `gifts.js`, `gift-codes.js` | Upominek między znajomymi i kody podarunkowe |
 | `names.js`, `text.js`, `mail.js`, `notifications.js` | filtr imion postaci, warianty tekstów raportu, treść e-maila i powiadomienia na telefon |

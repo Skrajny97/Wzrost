@@ -3009,6 +3009,24 @@ Autor: „326 A” oraz „Kowal i to i rzadkość, niech to Bractwo ma zastosow
 7. **Handel daje relację i reputację.** Zakup zwojów i przekucie dają relację z kowalem i reputację Bractwa Kowali tak jak handel u Jagny: punkt za każde 5 złota razy poziom postaci, najwyżej 10 punktów dziennie. Kuźnia ma własny dzienny limit, osobny od handlu u Jagny i w Garbarni.
 8. **Przedmiot założony** można przekuć poza wyprawą, tak jak u Zaklinaczki.
 
+## Stajnia: Mirosław i wierzchowce (1.11.2026, na wersji testowej)
+
+Autor: „postawimy Stajnie w Osadzie, gdzie możliwy będzie zakup Wierzchowców na stałe pozwalający przyspieszyć wyprawy. 3 stopnie rozwoju Wierzchowca na start - przyspieszenie o 5, 10 i 15%” i wybór 327 A (zob. „Odpowiedzi autora 323–328”).
+
+1. **Stajnia na planszy.** Nowe miejsce „Stajnia” stoi po prawej stronie planszy Osady, na trawie między Karczmą a Chatą Pustelnika (x 80, y 62 w `places` w `data/settlement.json`). Mieszka w niej koniuszy Mirosław. Grafiki przyjdą później (328 A): budynek pod id `stable`, a popiersie pod id `groom` (`src/client/art.js`). Do tego czasu plansza pokazuje w tym miejscu napis „Stajnia” pod pustym, przerywanym zarysem, a ekran Stajni puste okienko na popiersie.
+2. **Wierzchowce (327 A).** Trzy stopnie, kupowane na stałe i po kolei, a wyższy zastępuje niższy. Liczby są w bloku `stable` w `data/settlement.json`, a jego schemat w `data/schemas/settlement.schema.json`. Nazwy i opisy koni to propozycje do poprawy przez autora:
+    - Kuc: wyprawy krótsze o 5%, 5 000 złota, od 20. poziomu postaci;
+    - Koń wierzchowy: o 10%, 30 000 złota, od 50. poziomu;
+    - Rumak: o 15%, 150 000 złota, od 100. poziomu.
+3. **Krótsze jest tylko czekanie.** Wierzchowiec przesuwa wcześniej koniec wyprawy postaci: godzinna wyprawa z Kucem kończy się po 57 minutach, z Koniem wierzchowym po 54, a z Rumakiem po 51. Walki, nagrody, doświadczenie, minuty w raporcie, minuty wypraw w zadaniach narratora, czas mikstur i relacja z towarzyszami liczą się jak za wybraną długość. Brakujący szczegół: czas liczy się co do sekundy, więc 1-minutowa wyprawa z Kucem trwa 57 s, a 30-minutowa 28 min 30 s.
+4. **Gdzie nie działa.** Szybkie i Błyskawiczne polowanie oraz Wieże kończą się od razu, więc wierzchowiec ich nie zmienia. Wyprawa, która trwa w chwili zakupu, kończy się o swojej porze, a wierzchowiec działa od następnej.
+5. **Drużyna.** Wyprawa drużyny ma jeden czas dla wszystkich, więc na razie idzie pełną długość. Zasadę „drużyna jedzie tak długo, jak najwolniejszy wierzchowiec wśród tych, którzy wyruszają” dokłada praca nad wyprawami drużyny: `beginHunt` przyjmuje od niej stopień wierzchowca (`mount`).
+6. **Zakup.** Ekran Stajni ma pod kartą Mirosława sekcję „Wierzchowce”: przy każdym koniu opis, o ile krótsza jest wyprawa, ile trwa godzinna, cena i poziom, a przy posiadanym znak „Twój”. Kupić można tylko następnego, po potwierdzeniu, a przycisk mówi, czego brakuje („Od 50. poziomu postaci”, „Brakuje złota”). Zakup działa także w czasie wyprawy, jak handel u Jagny.
+7. **Relacja i bractwo (brakujące szczegóły).** Każdy kupiony wierzchowiec daje 50 punktów relacji z Mirosławem, więc po pierwszym Mirosław jest Znajomym i wita inaczej. Autor nie wskazał bractwa, więc Stajnia nie daje reputacji żadnemu. Mirosław ma historię i pięć powitań, po jednym na stopień relacji, bez form męskich i żeńskich wobec postaci; to propozycje do poprawy przez autora.
+8. **Walka.** Pod suwakiem długości wyprawy stoi „Z wierzchowcem: 27 min” (30 minut z Koniem wierzchowym), a przy wyprawie w toku „Z wierzchowcem: …” pod odliczaniem. Przycisk dalej mówi „Wyrusz · 30 min”, bo nagrody są za 30 minut.
+9. **Zapis.** Stopień wierzchowca trzyma kolumna `characters.settlement` (`mount`: 1, 2 albo 3), więc migracja bazy nie jest potrzebna. Zasady liczy `src/engine/stable.js`, zakup `src/server/stable.js` (`POST /api/settlement/stable`), a sekcję w Stajni i linijkę w Walce `src/client/stable.js`.
+10. **Jeszcze nie ma:** grafik Stajni i Mirosława (328 A, autor wybiera) i samouczka narratora tego miejsca (przyjdzie później, 328 A).
+
 ## Wspólne walki wyprawy drużyny (1.11.2026, na wersji testowej)
 
 Autor: „Wydaje mi się albo postacie z drużyny mają inne raporty odbytych walk. To nie powinni mieć miejsca - powinny być wspólne jedynie łupy, XP itp. osobne.” oraz „Ewentualne zdarzenia również osobno.”

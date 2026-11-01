@@ -6,6 +6,7 @@
     { "id": "board", "name": "Tablica zleceń", "x": 78, "y": 22, "resident": "headman" },
     { "id": "enchanter", "name": "Pracownia Zaklinaczki", "x": 21, "y": 23, "resident": "enchantress" },
     { "id": "hermitage", "name": "Chata Pustelnika", "x": 78, "y": 81, "resident": "hermit" },
+    { "id": "stable", "name": "Stajnia", "x": 80, "y": 62, "resident": "groom" },
     { "id": "tavern", "name": "Karczma", "x": 84, "y": 43, "resident": "innkeeper" },
     { "id": "market", "name": "Targowisko", "x": 45.5, "y": 46, "resident": "merchant" },
     { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist" },
@@ -58,6 +59,19 @@
         "Siadaj. Zmiana wymaga spokoju.",
         "Rzadko ktoś tu wraca tyle razy. Rozumiesz już, czego szukasz.",
         "Jesteś jednym z niewielu, z którymi rozmawiam bez pośpiechu."
+      ]
+    },
+    {
+      "id": "groom",
+      "name": "Mirosław",
+      "title": "koniuszy",
+      "story": "Wychował się w stajni przy trakcie i do dziś śpi bliżej koni niż ludzi. Jego wierzchowce znają leśne ścieżki, więc kto na nich jeździ, szybciej wraca z puszczy.",
+      "greetings": [
+        "Nie podchodź do konia od tyłu, bo kopnie. Szukasz wierzchowca?",
+        "O, znowu ty. Konie już poznają cię po kroku.",
+        "Dla stałych klientów zawsze mam osiodłanego konia i pełny żłób.",
+        "Tobie dałbym nawet moją najlepszą klacz. A ja nikomu jej nie daję.",
+        "Konie na twój widok rżą z radości. Ja też się cieszę, tylko ciszej."
       ]
     },
     { "id": "innkeeper", "name": "Zbylut", "title": "karczmarz", "story": "Zna wszystkie plotki z traktu i każdego, kto szuka pracy. U niego znajdziesz przyszłych towarzyszy.", "greetings": ["Siadaj, gdzie wolne. Kufel piwa, a do niego plotka z traktu, jeśli kogoś to ciekawi.", "O, znowu ty. Ludzie z traktu zostawili tu dziś kilka ciekawych informacji.", "Twoje miejsce przy ladzie czeka. I kufel, i świeże plotki.", "Tobie mówię to, czego nie mówię innym. Nachyl się bliżej.", "Dla przyjaciół Rozstajów kufel zawsze pełny, a drzwi na zaplecze otwarte."] },
@@ -162,6 +176,15 @@
     "statsFromLevel": 21,
     "statsGoldPerLevel": 100,
     "relationGain": 10
+  },
+  "stable": {
+    "resident": "groom",
+    "relationGain": 50,
+    "mounts": [
+      { "name": "Kuc", "description": "Krępy i cierpliwy. Nie wygra wyścigu, ale nie zgubi ścieżki.", "shorter": 0.05, "gold": 5000, "level": 20 },
+      { "name": "Koń wierzchowy", "description": "Wytrwały gniadosz z Rozstajów. Idzie cały dzień bez postoju.", "shorter": 0.1, "gold": 30000, "level": 50 },
+      { "name": "Rumak", "description": "Najlepszy koń w stajni. Przeskoczy zwalony pień, a w lesie nie zna strachu.", "shorter": 0.15, "gold": 150000, "level": 100 }
+    ]
   },
   "tavern": {
     "resident": "innkeeper",
