@@ -1,0 +1,70 @@
+{
+  "id": "frame-system-raw",
+  "request": "63171617-1597-4f5a-ba6d-2ba5d2a6ca3b",
+  "result": {
+    "request_id": "63171617-1597-4f5a-ba6d-2ba5d2a6ca3b",
+    "operation": "inference",
+    "status": "succeeded",
+    "mode": "async",
+    "token_id": 21306,
+    "token_prefix": "rdpk-sH0-ZzS...",
+    "created_at": 1793552362,
+    "updated_at": 1793552412,
+    "completed_at": 1793552412,
+    "request": {
+      "seed": 753928966,
+      "width": 120,
+      "height": 160,
+      "prompt": "a rectangular magic frame seen straight from the front, dark blue steel edges with glowing ice-blue light lines and small arcane runes running along all four sides, sharp angular corner brackets that glow brighter, like a mystical hologram window, the whole frame fills the image edge to edge, the inside of the frame is empty flat black, symmetrical",
+      "tile_x": false,
+      "tile_y": false,
+      "strength": 0.75,
+      "remove_bg": true,
+      "num_images": 3,
+      "prompt_style": "rd_pro__fantasy",
+      "response_mode": "base64",
+      "billing_source": "balance",
+      "has_input_image": false,
+      "has_input_palette": false,
+      "include_extra_data": false,
+      "return_pre_palette": false,
+      "return_spritesheet": false,
+      "reference_image_count": 0,
+      "return_non_bg_removed": true,
+      "upscale_output_factor": 1,
+      "bypass_prompt_expansion": false,
+      "include_downloadable_data": false
+    },
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "charged": true,
+    "http_status": 200,
+    "output_status": "available",
+    "outputs": [
+      {
+        "position": 0,
+        "media_type": "image/png",
+        "available": true,
+        "url": "https://retrodiffusionstack-retrodiffusionapioutputstorere-rg4v98h7gwoa.s3.amazonaws.com/api-activity/63171617-1597-4f5a-ba6d-2ba5d2a6ca3b/0-2c29510c866f4369ad6915e9f3d3ce93.png?AWSAccessKeyId=AKIA55GSYAHSFAUCTWD2&Signature=ZzXjAGE%2Fbz3eVlROPYGGYRhyd7Y%3D&Expires=1793553568",
+        "url_expires_at": 1793553568,
+        "retained_until": 1793638762
+      },
+      {
+        "position": 1,
+        "media_type": "image/png",
+        "available": true,
+        "url": "https://retrodiffusionstack-retrodiffusionapioutputstorere-rg4v98h7gwoa.s3.amazonaws.com/api-activity/63171617-1597-4f5a-ba6d-2ba5d2a6ca3b/1-0e2537adb1c14549bcb404c2938d1122.png?AWSAccessKeyId=AKIA55GSYAHSFAUCTWD2&Signature=VGIdX40JKqynM0%2FWG%2F8BKi4CDGE%3D&Expires=1793553568",
+        "url_expires_at": 1793553568,
+        "retained_until": 1793638762
+      },
+      {
+        "position": 2,
+        "media_type": "image/png",
+        "available": true,
+        "url": "https://retrodiffusionstack-retrodiffusionapioutputstorere-rg4v98h7gwoa.s3.amazonaws.com/api-activity/63171617-1597-4f5a-ba6d-2ba5d2a6ca3b/2-bec5e79788b34a29b8dd057aa14342f1.png?AWSAccessKeyId=AKIA55GSYAHSFAUCTWD2&Signature=VZAn7VX8%2FcjV5jMZA%2B1jA%2F4goso%3D&Expires=1793553568",
+        "url_expires_at": 1793553568,
+        "retained_until": 1793638762
+      }
+    ]
+  }
+}

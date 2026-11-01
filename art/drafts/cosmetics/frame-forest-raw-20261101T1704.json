@@ -1,0 +1,70 @@
+{
+  "id": "frame-forest-raw",
+  "request": "d94cb1a6-9d9c-4155-9800-9f94830e2a53",
+  "result": {
+    "request_id": "d94cb1a6-9d9c-4155-9800-9f94830e2a53",
+    "operation": "inference",
+    "status": "succeeded",
+    "mode": "async",
+    "token_id": 21306,
+    "token_prefix": "rdpk-sH0-ZzS...",
+    "created_at": 1793552416,
+    "updated_at": 1793552465,
+    "completed_at": 1793552465,
+    "request": {
+      "seed": 301864621,
+      "width": 120,
+      "height": 160,
+      "prompt": "a rectangular frame made of twisted dark tree roots and gnarled branches seen straight from the front, green moss, small ferns and tiny red-capped mushrooms growing on it, a few small glowing yellow fireflies, the whole frame fills the image edge to edge, the inside of the frame is empty flat black, symmetrical",
+      "tile_x": false,
+      "tile_y": false,
+      "strength": 0.75,
+      "remove_bg": true,
+      "num_images": 3,
+      "prompt_style": "rd_pro__fantasy",
+      "response_mode": "base64",
+      "billing_source": "balance",
+      "has_input_image": false,
+      "has_input_palette": false,
+      "include_extra_data": false,
+      "return_pre_palette": false,
+      "return_spritesheet": false,
+      "reference_image_count": 0,
+      "return_non_bg_removed": true,
+      "upscale_output_factor": 1,
+      "bypass_prompt_expansion": false,
+      "include_downloadable_data": false
+    },
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "charged": true,
+    "http_status": 200,
+    "output_status": "available",
+    "outputs": [
+      {
+        "position": 0,
+        "media_type": "image/png",
+        "available": true,
+        "url": "https://retrodiffusionstack-retrodiffusionapioutputstorere-rg4v98h7gwoa.s3.amazonaws.com/api-activity/d94cb1a6-9d9c-4155-9800-9f94830e2a53/0-9a14f972a7144b099e5463ede443f69f.png?AWSAccessKeyId=AKIA55GSYAHSFAUCTWD2&Signature=t5ntsmrc6jOlXVcWJSbhTNoAS50%3D&Expires=1793553568",
+        "url_expires_at": 1793553568,
+        "retained_until": 1793638816
+      },
+      {
+        "position": 1,
+        "media_type": "image/png",
+        "available": true,
+        "url": "https://retrodiffusionstack-retrodiffusionapioutputstorere-rg4v98h7gwoa.s3.amazonaws.com/api-activity/d94cb1a6-9d9c-4155-9800-9f94830e2a53/1-bf598b96a866475eb93e55477c9b0af5.png?AWSAccessKeyId=AKIA55GSYAHSFAUCTWD2&Signature=rY2RT8AK%2Bb5jh%2B5jKuDgwDM1LDg%3D&Expires=1793553568",
+        "url_expires_at": 1793553568,
+        "retained_until": 1793638816
+      },
+      {
+        "position": 2,
+        "media_type": "image/png",
+        "available": true,
+        "url": "https://retrodiffusionstack-retrodiffusionapioutputstorere-rg4v98h7gwoa.s3.amazonaws.com/api-activity/d94cb1a6-9d9c-4155-9800-9f94830e2a53/2-da342da8f1db4535a3833fcf07343777.png?AWSAccessKeyId=AKIA55GSYAHSFAUCTWD2&Signature=KlSU%2FPNhHboBe1IXbBQPWmMvSlQ%3D&Expires=1793553568",
+        "url_expires_at": 1793553568,
+        "retained_until": 1793638816
+      }
+    ]
+  }
+}
