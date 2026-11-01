@@ -1,0 +1,28 @@
+{
+  "id": "guild-keep",
+  "payload": {
+    "prompt": "pixel art landscape, a fortified guild house of dark timber and stone on a hill above a misty forest at dusk, a palisade with a gate and a long banner over it, warm light in the windows, a wooden watch tower, thin ice-blue glowing runes over the gate and faint luminous blue lines along the path leading up to it, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, greys and blues with warm window light and ice-blue accents, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 2,
+    "seed": 331638479,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793546732,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 39.47,
+    "request_id": "5b117c3e-ca51-45e3-a14f-903a730fc61e",
+    "outputs_retained_until": 1793633102,
+    "billing": {
+      "source": "balance",
+      "balance_left": 39.47,
+      "balance_charged": 0.36
+    }
+  }
+}

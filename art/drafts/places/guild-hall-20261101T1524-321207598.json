@@ -1,0 +1,28 @@
+{
+  "id": "guild-hall",
+  "payload": {
+    "prompt": "pixel art landscape, the inside of a great old timber guild hall at night: a long heavy oak table with an unrolled map and a few candles, carved wooden pillars, banners and round painted shields hanging on the walls, a big stone hearth with a warm fire, empty benches, thin ice-blue glowing runes carved into the main roof beam and faint luminous blue lines along the floor, wide panorama for a dim background behind text, low contrast, muted dark palette of deep browns, greens and blues with warm firelight and ice-blue accents, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 2,
+    "seed": 321207598,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793546699,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 39.83,
+    "request_id": "0c5a95e2-a7af-4086-899a-a30edcffcf04",
+    "outputs_retained_until": 1793633080,
+    "billing": {
+      "source": "balance",
+      "balance_left": 39.83,
+      "balance_charged": 0.36
+    }
+  }
+}
