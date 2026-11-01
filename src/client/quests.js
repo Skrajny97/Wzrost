@@ -169,6 +169,8 @@ function draw(now = serverNow()) {
       'div',
       { class: 'quests-panel', id: 'quests-panel', role: 'tabpanel', 'aria-labelledby': `quests-tab-${tab}` },
       h('p', { class: 'quests-reset' }, 'Nowe zadania za ', open.countdown),
+      // A week drawn while it was under way asks for less (quests.json, late).
+      period.late && h('p', { class: 'quests-note', text: period.late }),
       period.quests.length > 0
         ? h('ul', { class: 'quests-list' }, period.quests.map((quest) => questRow(tab, quest)))
         : h('p', { class: 'quests-empty', text: 'Na razie nie mam dla Ciebie zadań.' }),

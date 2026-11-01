@@ -2996,6 +2996,14 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Krótszy tydzień zadań (1.11.2026, na wersji testowej)
+
+Autor przekazał uwagę osoby testującej grę: „Bardziej wyważone tygodniowe zadania / Nowa postać / Dzisiaj kończą się tygodniowe a ten mi karze 4 dzienne skrzynki otworzyć” i „Tak samo te 1320 minuty na walce”. Autor: „błąd mocny”.
+
+1. **Tydzień wylosowany w trakcie (brakujący szczegół).** Zadania tygodniowe losują się przy pierwszej wizycie postaci w tygodniu. Gdy to nie poniedziałek (nowa postać albo pierwsze wejście w późniejszym dniu), zadania proszą o tyle siódmych części wylosowanej liczby, ile dni zostało do końca tygodnia, licząc dzień losowania: w niedzielę 1/7, w czwartek 4/7. Liczba zaokrągla się do kroku zadania (minuty wypraw co 60) i nie spada poniżej jednego kroku, więc skrzyń dziennych nigdy nie trzeba otworzyć więcej, niż zostało dni. Nagrody za zadania i skrzynia tygodnia zostają całe.
+2. **Napis.** Pod zadaniami takiego tygodnia stoi: „Ten tydzień zaczął się dla Ciebie później, więc zadania są na 1 z 7 dni.” (z liczbą dni, które zostały).
+3. **Postacie z bieżącego tygodnia.** Postać stworzona w tym tygodniu, której zadania wylosowały się jeszcze na cały tydzień, dostaje je przycięte do dni, które zostały w dniu jej stworzenia. Postęp zostaje, a odebrane zadania się nie zmieniają. W grze zadziała to dopiero po wdrożeniu: nowa postać osoby testującej grę skorzysta, jeśli wdrożenie nastąpi przed północą z niedzieli na poniedziałek.
+
 ## Porównywarka na Targowisku i tła Wież (1.11.2026, na wersji testowej)
 
 Autor: „Do Targowiska trzeba dodać opcję, że jak klikamy dany przedmiot to nie tylko pojawiają się dane orzedmiotu, ale i otwiera porównywarka z aktualnym przedmiotem”.

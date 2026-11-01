@@ -2241,7 +2241,8 @@ describe('Zadania od narratora', () => {
     assert.ok(opened.data.character.quests.daily.quests.every((quest) => quest.done && !quest.claimed));
     // The week's quest of the daily chest counts it once.
     const days = opened.data.character.quests.weekly.quests.find((quest) => quest.kind === 'dailies');
-    assert.deepEqual([days.progress, days.text], [1, `Otwórz skrzynię dziennych zadań ${days.count} razy.`]);
+    // A week drawn late asks for fewer: on a Sunday one (quests.js).
+    assert.deepEqual([days.progress, days.text], [1, `Otwórz skrzynię dziennych zadań ${days.count} ${days.count === 1 ? 'raz' : 'razy'}.`]);
   });
 
   test('the weekly chest also holds an item of the level for the class, with room in the backpack', async () => {

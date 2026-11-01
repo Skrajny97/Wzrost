@@ -421,8 +421,8 @@ function settlementWaiting(row, items, now, parcels = 0) {
 
 // What a period's quests are drawn from: the character as it is, whether its
 // Stół rozbiórki stands, which professions it has (Rzemieślnictwo where it
-// works and from its own level), whether its Osada is open, and its id for
-// the seed (quests.js).
+// works and from its own level), whether its Osada is open, its id for the
+// seed and the moment it came, for its first week (quests.js).
 export function questContext(player, now) {
   const hasProfessions = professionsOn() && isUnlocked('professions', player.row.level, content);
   const crafting = content.professionsById[content.workshop.profession];
@@ -433,6 +433,7 @@ export function questContext(player, now) {
     hasCrafting: hasProfessions && craftingOn() && professionOpen(crafting, player.row.level, content),
     hasSettlement: settlementOpen(player.row),
     seed: player.row.id,
+    createdAt: player.row.created_at,
   };
 }
 

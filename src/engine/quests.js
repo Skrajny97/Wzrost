@@ -10,7 +10,10 @@
 // explorations, gatherings and brewings and the table's orders move them
 // on; a quest
 // done gives its reward when claimed, and all of a period's quests done open
-// its chest.
+// its chest. A week's quests drawn while it is under way (a new character,
+// or the first visit of the week on a later day) ask for as many sevenths
+// of the usual numbers as days are left, today among them (the author,
+// with a tester's note: "błąd mocny").
 
 import { knownPotions } from './brewing.js';
 import { easyPlace, encountersFor } from './hunt.js';
@@ -65,6 +68,10 @@ function sinceMonday(ms, timeZone) {
   const { year, month, day } = zoneClock(ms, timeZone);
   return (new Date(Date.UTC(year, month - 1, day)).getUTCDay() + 6) % 7;
 }
+
+// The days left of the week at `now`, today among them: 7 on a Monday, 1 on
+// a Sunday.
+export const weekDaysLeft = (now, content) => 7 - sinceMonday(now, content.quests.timeZone);
 
 // The last period of each kind worked out: every moment inside it has the
 // same one, so it is kept (the code review: a character view asked for the
@@ -174,13 +181,22 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false, h
 const unlockMost = (tuning, classLevel) => tuning.most?.findLast((band) => band.fromClassLevel <= classLevel)?.count ?? Infinity;
 
 // How much a quest asks for: for creatures, as many as `fights` fights
-// bring on average, and never more than `most`.
-function questCount({ kind, perFight, most = Infinity }, periodId, rng) {
+// bring on average, and never more than `most`; for a week drawn late,
+// `days` sevenths of it (lateCount).
+function questCount({ kind, perFight, most = Infinity }, periodId, rng, days = 7) {
   const tuning = kind[periodId];
-  if (tuning.fights) return Math.max(1, Math.round(rng.int(...tuning.fights) * perFight));
+  if (tuning.fights) return lateCount(Math.max(1, Math.round(rng.int(...tuning.fights) * perFight)), tuning, days);
   const [min, max] = tuning.count;
   const step = tuning.step ?? 1;
-  return Math.min(most, min + step * rng.int(0, Math.floor((max - min) / step)));
+  return lateCount(Math.min(most, min + step * rng.int(0, Math.floor((max - min) / step))), tuning, days);
+}
+
+// A week's count cut to the `days` left of it: `days` sevenths, to the
+// kind's step, at least one step.
+function lateCount(count, tuning, days) {
+  if (days >= 7) return count;
+  const step = tuning.fights ? 1 : (tuning.step ?? 1);
+  return Math.max(step, Math.round((count * days) / 7 / step) * step);
 }
 
 // The band of levels the character is in (levels in quests.json).
@@ -202,19 +218,20 @@ function questReward(periodId, level, rng, content, factor = 1) {
   return { kind, id: questLevel(level, content).part, amount: amount() };
 }
 
-// A quest of a drawn option, with its count and reward.
-const newQuest = (option, periodId, character, rng, content) => ({
+// A quest of a drawn option, with its count and reward; its reward stays
+// whole in a week drawn late.
+const newQuest = (option, periodId, character, rng, content, days = 7) => ({
   kind: option.kind.id,
   ...(option.target && { target: option.target }),
-  count: questCount(option, periodId, rng),
+  count: questCount(option, periodId, rng, days),
   progress: 0,
   reward: questReward(periodId, character.level, rng, content, option.kind.rewardFactor),
   claimed: false,
 });
 
 // A period's quests, drawn from `seed` for the character as it is: no
-// option twice, in the order of the kinds.
-export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, content) {
+// option twice, in the order of the kinds; a week's with `days` of it left.
+export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed, days = 7 }, content) {
   const rng = createRng(seed);
   let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement }, content);
   const drawn = [];
@@ -224,7 +241,7 @@ export function drawQuests(periodId, { character, hasTable, hasProfessions, hasC
     drawn.push(option);
   }
   const { kinds } = content.quests;
-  return drawn.sort((a, b) => kinds.indexOf(a.kind) - kinds.indexOf(b.kind)).map((option) => newQuest(option, periodId, character, rng, content));
+  return drawn.sort((a, b) => kinds.indexOf(a.kind) - kinds.indexOf(b.kind)).map((option) => newQuest(option, periodId, character, rng, content, days));
 }
 
 // Whether a creature lives in an inner region open to the character's class.
@@ -253,24 +270,50 @@ function healedPeriod(period, periodId, { character, hasTable, hasProfessions, h
       const rng = createRng(`${seed}:${periodId}:${period.period}:${index}`);
       const option = rng.weighted(options);
       options = options.filter((other) => other !== option);
-      return newQuest(option, periodId, character, rng, content);
+      return newQuest(option, periodId, character, rng, content, period.days);
     }),
   };
 }
 
 // Both periods' quests at `now`: those kept while their period lasts (with
-// the lost ones drawn anew), new ones once it has passed. `seed` is the
-// character's.
-export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, now, content) {
+// the lost ones drawn anew), new ones once it has passed; a week drawn
+// while it is under way keeps the `days` left of it then. `seed` is the
+// character's, `createdAt` the moment it came.
+export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed, createdAt }, now, content) {
   return Object.fromEntries(
     QUEST_PERIODS.map((periodId) => {
-      const { key } = questPeriod(periodId, now, content);
+      const { key, startsAt } = questPeriod(periodId, now, content);
       const kept = stored?.[periodId];
-      if (kept?.period === key) return [periodId, healedPeriod(kept, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, content)];
-      const quests = drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed: `${seed}:${periodId}:${key}` }, content);
-      return [periodId, { period: key, quests, chest: false }];
+      if (kept?.period === key) {
+        const shortened = periodId === 'weekly' ? lateWeek(kept, createdAt, startsAt, content) : kept;
+        return [periodId, healedPeriod(shortened, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, content)];
+      }
+      const days = periodId === 'weekly' ? weekDaysLeft(now, content) : 7;
+      const quests = drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed: `${seed}:${periodId}:${key}`, days }, content);
+      return [periodId, { period: key, quests, chest: false, ...(days < 7 && { days }) }];
     }),
   );
+}
+
+// A kept week drawn whole for a character that came after it began: before
+// 0.0.73 a week drawn late asked for all of it (the tester's new character
+// on a Sunday: "Dzisiaj kończą się tygodniowe a ten mi karze 4 dzienne
+// skrzynki otworzyć"). Its quests not claimed yet are cut to the days left
+// on the day the character came, their progress kept.
+function lateWeek(period, createdAt, startsAt, content) {
+  if (period.days || createdAt === undefined || createdAt < startsAt) return period;
+  const days = weekDaysLeft(createdAt, content);
+  if (days >= 7) return period;
+  const tuning = (quest) => content.quests.kinds.find((kind) => kind.id === quest.kind)?.weekly;
+  return {
+    ...period,
+    days,
+    quests: period.quests.map((quest) => {
+      if (quest.claimed || !tuning(quest)) return quest;
+      const count = Math.min(quest.count, lateCount(quest.count, tuning(quest), days));
+      return { ...quest, count, progress: Math.min(quest.progress, count) };
+    }),
+  };
 }
 
 export const questsStale = (stored, now, content) =>
@@ -419,6 +462,9 @@ export function questsView(quests, now, content, met = null) {
               : [],
           ),
           chest: { ...chest, ready: chestReady(period), opened: period.chest },
+          // A week drawn late: the days left of it then, and the words
+          // under its quests.
+          ...(period.days && { days: period.days, late: content.quests.periods[periodId].late?.replace('{days}', String(period.days)) ?? null }),
         },
       ];
     }),

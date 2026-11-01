@@ -2408,6 +2408,62 @@ describe('quests from the narrator', () => {
     assert.equal(next.weekly, busy.weekly);
   });
 
+  test('a week drawn while it is under way asks for the days left of it, its rewards whole', () => {
+    // The tester's new character on a Sunday (the author: "błąd mocny"): 4
+    // daily chests and 1320 minutes of explorations with 15 hours left.
+    const context = { character: newCharacter('cleric'), hasTable: false, seed: 11 };
+    const monday = currentQuests({}, context, at('2026-10-26T08:00:00Z'), content).weekly;
+    const sunday = currentQuests({}, context, at('2026-11-01T08:00:00Z'), content).weekly;
+    const thursday = currentQuests({}, context, at('2026-10-29T08:00:00Z'), content).weekly;
+    assert.equal(monday.days, undefined);
+    assert.equal(sunday.days, 1);
+    assert.equal(thursday.days, 4);
+    // The same quests and rewards; the counts are sevenths of Monday's, to the
+    // kind's step, at least one.
+    assert.deepEqual(sunday.quests.map((quest) => [quest.kind, quest.reward]), monday.quests.map((quest) => [quest.kind, quest.reward]));
+    const count = (period, kind) => period.quests.find((quest) => quest.kind === kind)?.count;
+    assert.ok(count(monday, 'explore') >= 900);
+    assert.equal(count(sunday, 'explore'), Math.max(60, Math.round(count(monday, 'explore') / 7 / 60) * 60));
+    assert.equal(count(thursday, 'explore'), Math.max(60, Math.round((count(monday, 'explore') * 4) / 7 / 60) * 60));
+    for (const period of [sunday, thursday]) {
+      for (const quest of period.quests) assert.ok(quest.count >= 1 && quest.count <= count(monday, quest.kind), JSON.stringify(quest));
+      // Never more daily chests than days left.
+      if (count(period, 'dailies') !== undefined) assert.ok(count(period, 'dailies') <= period.days);
+    }
+    // The words under the week's quests.
+    const view = questsView({ daily: currentQuests({}, context, at('2026-11-01T08:00:00Z'), content).daily, weekly: sunday }, at('2026-11-01T08:00:00Z'), content);
+    assert.equal(view.weekly.late, 'Ten tydzień zaczął się dla Ciebie później, więc zadania są na 1 z 7 dni.');
+    assert.equal(view.daily.late, undefined);
+  });
+
+  test('a week drawn whole for a character that came during it is cut to the days left on that day, once', () => {
+    // As drawn before 0.0.73: the whole week's numbers for a character made on
+    // Saturday, seen on Sunday.
+    const saturday = at('2026-10-31T10:00:00Z');
+    const now = at('2026-11-01T08:00:00Z');
+    const context = { character: newCharacter('cleric'), hasTable: false, seed: 11 };
+    const whole = currentQuests({}, context, at('2026-10-26T08:00:00Z'), content);
+    const explore = whole.weekly.quests.findIndex((quest) => quest.kind === 'explore');
+    const stored = {
+      ...whole,
+      daily: currentQuests({}, context, now, content).daily,
+      weekly: { ...whole.weekly, quests: whole.weekly.quests.map((quest, index) => (index === explore ? { ...quest, progress: 270 } : quest)) },
+    };
+    const late = currentQuests(stored, { ...context, createdAt: saturday }, now, content).weekly;
+    assert.equal(late.days, 2);
+    late.quests.forEach((quest, index) => {
+      const before = stored.weekly.quests[index];
+      assert.deepEqual([quest.kind, quest.reward, quest.claimed], [before.kind, before.reward, before.claimed]);
+      assert.ok(quest.count <= before.count && quest.progress <= quest.count);
+    });
+    assert.equal(late.quests[explore].count, Math.max(60, Math.round((stored.weekly.quests[explore].count * 2) / 7 / 60) * 60));
+    assert.equal(late.quests[explore].progress, Math.min(270, late.quests[explore].count));
+    // Once: the cut week stays as it is.
+    assert.equal(currentQuests({ ...stored, weekly: late }, { ...context, createdAt: saturday }, now, content).weekly, late);
+    // A character there before the week began keeps its week whole.
+    assert.equal(currentQuests(stored, { ...context, createdAt: at('2026-10-20T10:00:00Z') }, now, content).weekly, stored.weekly);
+  });
+
   test('the day asks for creatures of the newest open inner region and the one before it, the week for none', () => {
     const character = newCharacter('cleric', { level: 23, classLevel: 27 });
     const targets = (periodId) =>

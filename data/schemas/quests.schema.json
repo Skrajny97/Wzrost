@@ -264,6 +264,11 @@
               "description": "Napis pod zadaniami okresu: co daje skrzynia."
             }
           }
+        },
+        "late": {
+          "type": "string",
+          "pattern": "\\{days\\}",
+          "description": "Napis pod zadaniami tygodnia wylosowanego w jego trakcie; {days}: dni, które zostały."
         }
       }
     },

@@ -389,7 +389,8 @@ describe('the Warsztat through the API', () => {
     const now = Date.now();
     const quest = (kind, count) => ({ kind, count, progress: 0, reward: { kind: 'gold', amount: 10 }, claimed: false });
     const period = (periodId, quests) => ({ period: questPeriod(periodId, now, content).key, chest: false, quests });
-    await set('quests = ?', JSON.stringify({ daily: period('daily', [quest('make', 1)]), weekly: period('weekly', [quest('makeAny', 5)]) }));
+    // A character there since before the week, whose week is whole on any day.
+    await set('quests = ?, created_at = 0', JSON.stringify({ daily: period('daily', [quest('make', 1)]), weekly: period('weekly', [quest('makeAny', 5)]) }));
     await craft({ baseId: 'axe', rarity: 'common', count: 2 });
     await age(120);
     const claimed = await call('POST', '/api/hunts/claim', { cookie });
