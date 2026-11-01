@@ -2996,6 +2996,19 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.78 (1.11.2026)
+
+Autor: „co stoi na testowym a co na main? to co na testowym dawaj na main od razu, bo nie chce mi sie używać testowego”.
+
+1. **Co wchodzi do gry:**
+    - Gildia na osobnej stronie, otwieranej zakładką w Społeczności, z tłem warownego dworu na wzgórzu (353 C; zob. „Gildia na osobnej stronie”);
+    - trudność od 50. poziomu: od 50. do 100. poziomu stwory rosną do kolejnych +25% obrażeń i HP, a Wieże razem z nimi (zob. „Odpowiedzi autora 351–353 i trudność od 50. poziomu”, punkt 4);
+    - kwestia narratora o tempie drużyny w Stajni w wersji B (352);
+    - na komputerze pasek u góry i menu trzymają się kolumny ekranów, a przyciski Pustelnika mają wygląd przycisków Osady (zob. „Przejście gry na komputerze”).
+2. **Jeszcze nie w grze:** Bestia, Próby i Prośby Gildii (344–346 A) są w budowie. Kosmetyki (355–364) i wierzchowce w scenie Walki czekają na grafiki i odpowiedzi autora. Opisy grafik (ramki, tła, wierzchowce) są w repozytorium, ale gra ich nie używa.
+3. **Migracje bazy:** brak.
+4. **Przed wdrożeniem:** wszystkie testy (771) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na 390×844, 1366×768 i 1920×1080.
+
 ## Rezygnacja z Mocy postaci (1.11.2026)
 
 Autor: „Moc postaci - rezygnujemy z tego”.
