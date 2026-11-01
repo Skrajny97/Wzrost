@@ -14,6 +14,10 @@
     "$comment": {
       "type": "string"
     },
+    "place": {
+      "description": "Obrazek z art/places za nagłówkiem strony Gildii (autor: 353 C, warowny dwór gildii na wzgórzu).",
+      "type": "string"
+    },
     "found": {
       "type": "object",
       "additionalProperties": false,

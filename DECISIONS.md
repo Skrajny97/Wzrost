@@ -2996,6 +2996,15 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Odpowiedzi autora 351–353 i trudność od 50. poziomu (1.11.2026, na wersji testowej)
+
+Autor: „347.1 do 349.1 wszystko A tylko 349.2 B”, poprawki tekstu rolki o walce, „353 C” oraz „Od 50 lvla zwiększamy curve trudności, bo wchodza na pełnej i towarzysze i ewolucje, pamiętaj o tym na przyszłość”.
+
+1. **352.** Kwestie 347.1–349.1 zostają w wersjach A, a kwestia 349.2 (Stajnia, tempo drużyny) ma wersję B. W grze 0.0.77 jest jeszcze jej wersja A. Wersja B wejdzie z najbliższym wdrożeniem.
+2. **351, tekst rolki o walce.** Autor wyrzucił zdanie o Kowadle, Zaklinaczce i Kuźni, więc 351.4 brzmi tylko „Ekwipunek ma rzadkość i afiksy.”. Kwestia 351.6 kończy się słowami „a elity i czempioni biją mocniej w porównaniu do zwykłych stworów”. Pozostałe kwestie zostają bez zmian. Do nagrania nazwa gry jest zapisana fonetycznie („Insajt”, „Insajt er pe gie kropka kom”), a w napisach rolki jak zwykle.
+3. **353 C.** Tłem strony Gildii jest warowny dwór gildii na wzgórzu z wieżą po lewej (`place` w `data/guilds.json`: `guild-keep`).
+4. **Zasada na przyszłość: trudność od 50. poziomu.** Od 50. poziomu krzywa trudności ma rosnąć, bo wtedy w pełni działają towarzysze i ewolucje. Dziś siła stworów rośnie od 15. do 50. poziomu (do +25% obrażeń i HP) i dalej stoi w miejscu, a od 26. poziomu dochodzi stałe +10%. Każda kolejna zmiana balansu po 50. poziomie bierze tę zasadę pod uwagę. Czy i jak mocno podnieść trudność już teraz, rozstrzyga pytanie 354.
+
 ## Gildia na osobnej stronie (1.11.2026, na wersji testowej)
 
 Autor: „Wygeneruj też tło do zakładki Gildii, ona powinna uruchamiać osobną stronę, a może nawet planszę (ale raczej strony z tłem).”

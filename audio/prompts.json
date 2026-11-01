@@ -500,6 +500,96 @@
       "languageCode": "pl"
     },
     "prompts": {
+      "reel-fight-01": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Walka w Insajt toczy się sama. Ale to Ty decydujesz, jak się skończy."
+      },
+      "reel-fight-02": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Zanim padnie pierwszy cios, System liczy wszystko: siłę, pancerz, trafienia krytyczne, uniki i żywioły."
+      },
+      "reel-fight-03": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Klasa stawia postać z przodu albo z tyłu szyku. Umiejętności, które wybierasz i rozwijasz, mówią jej, co robić w każdej turze."
+      },
+      "reel-fight-04": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Ekwipunek ma rzadkość i afiksy."
+      },
+      "reel-fight-05": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Do tego mikstury na drogę, towarzysze z Karczmy i drużyna. Każde z nich zmienia przebieg walki."
+      },
+      "reel-fight-06": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Przeciwnicy też się różnią. Każda kraina ma swoją cechę, stwory mają słabości, a elity i czempioni biją mocniej w porównaniu do zwykłych stworów."
+      },
+      "reel-fight-07": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Trofea z Encyklopedii dają przewagę nad stworami, które dobrze znasz."
+      },
+      "reel-fight-08": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Walka jest automatyczna. Przygotowanie do niej już nie."
+      },
+      "reel-fight-09": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Raport pokaże każdy cios. Wyciągnij wnioski i wróć silniejszy."
+      },
+      "reel-fight-10": {
+        "voice": "Narrator",
+        "model": "eleven_v3",
+        "settings": {
+          "stability": 0.5
+        },
+        "ending": " [pauses]",
+        "text": "Insajt er pe gie kropka kom. System czeka."
+      },
       "promo-tiktok": {
         "voice": "Narrator",
         "model": "eleven_v3",
