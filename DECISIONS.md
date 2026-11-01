@@ -2996,6 +2996,14 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Porównywarka na Targowisku i tła Wież (1.11.2026, na wersji testowej)
+
+Autor: „Do Targowiska trzeba dodać opcję, że jak klikamy dany przedmiot to nie tylko pojawiają się dane orzedmiotu, ale i otwiera porównywarka z aktualnym przedmiotem”.
+
+1. **Porównywarka.** Rozwinięty przedmiot na Targowisku (w ofertach, w „Moje” i u Mieszkańców) pokazuje pod swoimi danymi tę samą tabelę co w plecaku: „Porównanie z założonym”, wartość po wartości, z różnicą. Gdy postać nic w tym miejscu nie nosi, karta mówi to jednym zdaniem. Przedmiot, którego klasa postaci nie może używać, nie ma porównania, tylko uwagę „Twoja klasa nie może go używać.”.
+2. **Tła Wież.** Autor: „Musimy też zrobić tla do Wież czyli właśnie ogromne budzące grozę Wieże”. Nad kartą każdej wieży stoi jej obraz od krawędzi do krawędzi, a nazwa wieży jest na jego dole. Obraz wskazują dane (`towers.json`, `place`). Powstały po 3 szkice na wieżę (pytania 309 i 310). Autor: „309 A i 310 B to dobre wybory”.
+3. **Komunikat odblokowania Wież** mówi teraz „kilkanaście walk dziennie, między wyprawami i także w czasie pracy w profesji” zamiast „obok wypraw i profesji”, zgodnie z zakazem wejść w czasie wyprawy.
+
 ## Wolniej nowe zlecenia (1.11.2026, na wersji testowej)
 
 Autor: „Zmieniamy tempo generowania nowych zleceń na tablicy (jest chyba co 4 godziny ustalmy co 12)”.

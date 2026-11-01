@@ -5,9 +5,12 @@
 // taken yet), who climbs beside the character in the Wieża Drużyn, and
 // "Wejdź", whose report opens at once. While the character is on an
 // exploration, or its report waits, the towers wait for it (towers.js). The
-// floor picked is remembered on this device.
+// floor picked is remembered on this device. Over each card its tower,
+// huge and grim (data/towers.json, place; the author: "ogromne budzące
+// grozę Wieże").
 
 import { areaArt } from '../area-art.js';
+import { placeArt } from '../art.js';
 import { fill, h } from '../dom.js';
 import { formatNumber } from '../format.js';
 import { activityFinished, call, isUnlocked, reportCache, state, unlockInfo } from '../state.js';
@@ -153,6 +156,9 @@ export function mountTowers(container, { navigate }) {
     }
     pick(floor);
 
+    const art = tower.place && placeArt(tower.place);
+    const head = h('div', { class: `tower-head${art ? ' tower-head--art' : ''}` }, h('h2', { class: 'card-title', text: tower.name }));
+    if (art) head.style.setProperty('--place-art', `url("${art}")`);
     const climbers =
       tower.missing ??
       (tower.partners.length > 0 || tower.companions.length > 0
@@ -161,7 +167,7 @@ export function mountTowers(container, { navigate }) {
     return h(
       'section',
       { class: 'card tower-card', 'aria-label': tower.name },
-      h('h2', { class: 'card-title', text: tower.name }),
+      head,
       h('p', { class: 'muted', text: `Otwarte piętra: 1–${formatNumber(tower.top)}. Najwyżej zdobyte: ${tower.best > 0 ? `piętro ${formatNumber(tower.best)}` : 'jeszcze żadne'}.` }),
       climbers && h('p', { class: tower.missing ? 'tower-missing' : 'muted', text: climbers }),
       details,

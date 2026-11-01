@@ -107,6 +107,7 @@ async function towersView(db, player, now) {
         return {
           id: tower.id,
           name: tower.name,
+          place: tower.place ?? null,
           top: climbers.top,
           best: record.best[tower.id] ?? 0,
           chests: record.chests[tower.id] ?? [],

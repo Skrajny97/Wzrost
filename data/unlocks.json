@@ -86,7 +86,7 @@
     "id": "towers",
     "name": "Wieże",
     "level": 50,
-    "message": "Odblokowano Wieże Systemu. Wejdź do nich w zakładce Walka, w części Wieże: kilkanaście walk dziennie, obok wypraw i profesji."
+    "message": "Odblokowano Wieże Systemu. Wejdź do nich w zakładce Walka, w części Wieże: kilkanaście walk dziennie, między wyprawami i także w czasie pracy w profesji."
   },
   {
     "id": "core",

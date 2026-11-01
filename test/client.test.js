@@ -136,12 +136,12 @@ test('every sprite on the list has its file at its size, and every class has its
     'board-tall': ['camp-1', 'camp-2', 'camp-3'],
     // The camp's buildings at their three looks.
     camp: data('buildings').flatMap((building) => [1, 2, 3].map((tier) => `${building.id}-${tier}`)),
-    // Zielarstwo's herbs, Alchemia's potions, the professions' squares and the
-    // places they work in.
+    // Zielarstwo's herbs, Alchemia's potions, the professions' squares, the
+    // places they work in, the Ewolucja's spring and the Wieże.
     herbs: data('professions').herbs.map((herb) => herb.id),
     potions: data('professions').potions.map((potion) => potion.id),
     professions: data('professions').professions.map((profession) => profession.id),
-    places: [...['gathering', 'brewing', 'workshop'].map((work) => data('professions')[work].place.id), data('evolutions').place],
+    places: [...['gathering', 'brewing', 'workshop'].map((work) => data('professions')[work].place.id), data('evolutions').place, ...data('towers').towers.map((tower) => tower.place)],
     events: data('events').list.map((event) => event.art),
     'event-scenes': data('events').list.map((event) => event.scene),
     // The camp's resources in place of their line icons.
