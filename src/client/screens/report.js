@@ -103,10 +103,14 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
 
     fill(
       container,
-      heading(
-        report.flash ? 'Błyskawiczne polowanie' : report.quick ? 'Szybkie Polowanie' : 'Raport z wyprawy',
-        `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
-      ),
+      // An entry to a Wieża (towers.js): its tower and floor, no length.
+      report.tower
+        ? heading(report.tower.name, `Piętro ${report.tower.floor} · ${report.areaName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)
+        : heading(
+            report.flash ? 'Błyskawiczne polowanie' : report.quick ? 'Szybkie Polowanie' : 'Raport z wyprawy',
+            `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
+          ),
+      report.tower && (report.tower.partners.length > 0 || report.tower.companions.length > 0) && h('p', { class: 'report-party', text: `Z postacią: ${[...report.tower.partners, ...report.tower.companions].join(', ')}.` }),
       // An exploration of a Drużyna names those who went (parties.js).
       report.party?.length > 1 && h('p', { class: 'report-party', text: `W drużynie: ${report.party.join(', ')}.` }),
       summaryCard(report),
@@ -196,7 +200,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         fight.tough && h('span', { class: 'chip chip--tough', text: 'wymagająca' }),
         fight.event && h('span', { class: 'chip chip--event', text: 'zdarzenie' }),
       ),
-      h('p', { class: 'fight-meta', text: `${formatOffset(fight.t)} · ${enemies}` }),
+      h('p', { class: 'fight-meta', text: `${report.tower ? `Piętro ${report.tower.floor}` : formatOffset(fight.t)} · ${enemies}` }),
       h('p', { class: `fight-outcome fight-outcome--${String(fight.won)}`, text: outcome }),
     );
 
@@ -289,8 +293,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       resourcesRow(summary.resources),
       summary.materials?.length > 0 && ['Materiały', capitalized(materialsText(summary.materials))],
       summary.timePoints > 0 && ['Punkty Czasu', `+${formatNumber(summary.timePoints)}`],
-      ['Walki', formatNumber(summary.fights)],
-      ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
+      // A Wieża's floor is one fight, and the tower keeps no HP (towers.js).
+      !report.tower && ['Walki', formatNumber(summary.fights)],
+      !report.tower && ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
     ].filter(Boolean);
     const best = summary.bestFind;
     return h(
@@ -415,7 +420,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const list = h(
       'ol',
       { class: 'account', hidden: true, 'data-guide': 'report-account' },
-      report.entries.map((entry) => h('li', {}, h('span', { class: 'account-time', text: formatOffset(entry.t) }), h('span', { text: entry.text }))),
+      report.entries.map((entry) => h('li', {}, !report.tower && h('span', { class: 'account-time', text: formatOffset(entry.t) }), h('span', { text: entry.text }))),
     );
     const show = (open) => {
       list.hidden = !open;
@@ -463,6 +468,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       h('button', { type: 'button', class: 'button button--world', onClick: scrapperSheet, text: 'Sprzedaj zbędne przedmioty u złomiarza' });
     fill(
       actionBox,
+      report.tower && h('a', { class: 'button button--system', href: '#/wieze', text: 'Wróć do Wież' }),
       again,
       scrap,
       waiting && h('a', { class: 'button button--system', href: '#/walka', text: 'Kolejny raport czeka na odbiór' }),

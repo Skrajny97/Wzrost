@@ -34,12 +34,12 @@ import {
   testModeOn,
   trackQuestsOn,
   trackUnknownOn,
-  unlockInfo,
 } from '../state.js';
 import { playSound } from '../sound.js';
 import { skipControl, timePoints } from '../time.js';
 import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { openEvent } from '../event.js';
+import { combatModes } from './towers.js';
 
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
 const CHOICE_KEY = 'wzrost.hunt-choice';
@@ -374,29 +374,8 @@ export function mountCombat(container, { params, navigate }) {
     );
   }
 
-  function modeTabs() {
-    const tab = (label, unlock) => {
-      const locked = unlock && !isUnlocked(unlock);
-      const info = unlock && unlockInfo(unlock);
-      return h(
-        'button',
-        {
-          type: 'button',
-          class: 'segmented-option',
-          'aria-pressed': !unlock,
-          disabled: Boolean(unlock),
-          onClick: () => {},
-        },
-        locked ? [label, ' ', lockLabel(`poz. ${info.level}`)] : unlock ? `${label} · wkrótce` : label,
-      );
-    };
-    return h(
-      'div',
-      { class: 'segmented', role: 'group', 'aria-label': 'Rodzaj walki' },
-      tab('Eksploracja'),
-      tab('Wieże', 'towers'),
-    );
-  }
+  // "Eksploracja" and "Wieże" (screens/towers.js), the Wieże from their level.
+  const modeTabs = () => combatModes('explore', navigate);
 
   function activityCard(activity) {
     // A gathering of herbs, a brewing of potions and an order of items live

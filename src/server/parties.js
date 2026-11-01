@@ -43,8 +43,9 @@ async function requirePartyPlayer(context) {
 }
 
 // The party a character is in: its id, leader and members (character ids
-// in the order they joined), or null.
-async function partyOf(db, characterId) {
+// in the order they joined), or null. The Wieża Drużyn climbs with it
+// (towers.js).
+export async function partyOf(db, characterId) {
   const membership = await db.prepare('SELECT party_id FROM party_members WHERE character_id = ?').bind(characterId).first();
   if (!membership) return null;
   const [party, members] = await db.batch([

@@ -9445,3 +9445,59 @@ a.profession-square:active {
   margin: 0 0 8px;
   color: var(--text-muted);
 }
+
+/* The Wieże in the Walka (screens/towers.js): a tower's card with its floor
+   picked by the slider and the buttons beside it. */
+.towers-entries {
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+.tower-card {
+  display: grid;
+  gap: 10px;
+}
+
+.tower-card .card-title,
+.tower-card p {
+  margin: 0;
+}
+
+.tower-floor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tower-circle {
+  flex: none;
+  width: min(96px, 26vw);
+}
+
+.tower-floor-text p {
+  margin: 0 0 4px;
+}
+
+.tower-floor-title {
+  font-family: var(--font-system);
+}
+
+.tower-waits {
+  color: var(--accent);
+}
+
+.tower-missing {
+  color: var(--danger);
+}
+
+.tower-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tower-slider {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--accent);
+}

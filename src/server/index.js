@@ -14,6 +14,7 @@ import { buyParts, cancelBuilding, collectProduction, exchangeResources, startBu
 import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendGift } from './community.js';
 import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
+import { enterTower, getTowers } from './towers.js';
 import { craftMaterials, salvageItem, sellMaterials, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
@@ -198,6 +199,8 @@ const routes = [
   ['POST', '/api/party/leave', leaveParty],
   ['POST', '/api/party/kick', kickFromParty],
   ['POST', '/api/party/hunt', partyHunt],
+  ['GET', '/api/towers', getTowers],
+  ['POST', '/api/towers/enter', enterTower],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],
   ['POST', '/api/chat/seen', markChatSeen],

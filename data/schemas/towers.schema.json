@@ -3,7 +3,7 @@
   "title": "Wieże Systemu",
   "type": "object",
   "additionalProperties": false,
-  "required": ["towers", "floors"],
+  "required": ["towers", "floors", "entries", "rewardMinutes", "chestEvery", "texts"],
   "properties": {
     "$comment": { "type": "string" },
     "towers": {
@@ -31,6 +31,28 @@
         "eliteChance": { "type": "number", "minimum": 0, "maximum": 1 },
         "championEvery": { "type": "integer", "minimum": 1 }
       }
+    },
+    "entries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["perDay"],
+      "properties": { "perDay": { "type": "integer", "minimum": 1 } }
+    },
+    "rewardMinutes": { "type": "integer", "minimum": 1 },
+    "chestEvery": { "type": "integer", "minimum": 1 },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["won", "lost", "defeat", "chest"],
+      "properties": {
+        "won": { "$ref": "#/definitions/variants" },
+        "lost": { "$ref": "#/definitions/variants" },
+        "defeat": { "$ref": "#/definitions/variants" },
+        "chest": { "$ref": "#/definitions/variants" }
+      }
     }
+  },
+  "definitions": {
+    "variants": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
   }
 }

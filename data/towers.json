@@ -1,8 +1,50 @@
 {
-  "$comment": "Wieże Systemu (src/engine/towers.js), na razie podwaliny: jeszcze nie w grze (DECISIONS.md, „Wieże i Gildia: podwaliny”). Dawne Lochy (autor: „Lochy, którym ostatecznie zmienimy nazwę na Wieże”). towers: Wieża Solo i Wieża Drużyn; members: najmniej i najwięcej postaci graczy (Wieża Drużyn także w duecie), companions: czy wolne miejsca do size zajmują towarzysze z Kwater (autor: „Wieże Drużyn można robić ze zwerbowanymi postaciami”), size: najwięcej walczących po stronie drużyny. Piętro f ma stwory jednego regionu wewnętrznego, po kolei od pierwszego (piętro 1 Skraj Wiatrołomów, 2 Lisie Jary…, a po ostatnim znów od pierwszego), na poziomie f, więc wspinaczka prowadzi przez stwory wszystkich krain na poziomie postaci (autor: „Pomoże to uzupełniać zaległe Bestiariusze po Ewolucji Klasy by się nie cofać”). Co eliteEvery piętro czeka elita tego regionu, a na innych piętrach z szansą eliteChance (autor: „Elity mogą częściej”), co championEvery piętro czempion (gdy region go nie ma, elita). Najwyższe otwarte piętro to poziom postaci, a w drużynie poziom najniższej postaci (autor: „Maksymalny odblokowany stopień Wieży bedzie na poziomie najniższego w Drużynie”).",
+  "$comment": "Wieże Systemu (src/engine/towers.js, src/server/towers.js; DECISIONS.md, „Wieże Systemu i Gildia”). Dawne Lochy (autor: „Lochy zamieniamy na Wieże”), od 50. poziomu postaci (unlocks.json, towers). towers: Wieża Solo i Wieża Drużyn; members: najmniej i najwięcej postaci graczy (Wieża Drużyn także w duecie), companions: czy wolne miejsca do size zajmują towarzysze z Kwater (autor: „Wieże Drużyn można robić ze zwerbowanymi postaciami”), size: najwięcej walczących po stronie drużyny. Piętro f ma stwory jednego regionu wewnętrznego, po kolei od pierwszego (piętro 1 Skraj Wiatrołomów, 2 Lisie Jary…, a po ostatnim znów od pierwszego), na poziomie f (autor: „Pomoże to uzupełniać zaległe Bestiariusze po Ewolucji Klasy by się nie cofać”). Co eliteEvery piętro czeka elita tego regionu, a na innych piętrach z szansą eliteChance (autor: „Elity mogą częściej”), co championEvery piętro czempion (gdy region go nie ma, elita). Najwyższe otwarte piętro to poziom postaci, a w drużynie poziom najniższej postaci gracza. entries.perDay: wejścia na dobę, wspólne dla obu wież, od północy czasu polskiego (autor: „kilkanaście wejść dziennie”); wejście to jedna walka na wybranym piętrze, z wynikiem od razu, także w czasie wyprawy i pracy (autor: „wspinaczka nie zajmuje postaci”). Wygrana płaci jak jedna walka wyprawy trwającej rewardMinutes, na poziomie piętra, a elita i czempion jak zwykły stwór (bez mnożników z wypraw, żeby wejścia nie służyły do farmienia czempionów). chestEvery: piętro, które przy pierwszej wygranej w danej wieży daje skrzynię z przedmiotem klasy postaci, jak skrzynia czempiona. texts: zdania raportu.",
   "towers": [
-    { "id": "solo", "name": "Wieża Solo", "members": [1, 1], "companions": false, "size": 1 },
-    { "id": "party", "name": "Wieża Drużyn", "members": [2, 3], "companions": true, "size": 3 }
+    {
+      "id": "solo",
+      "name": "Wieża Solo",
+      "members": [
+        1,
+        1
+      ],
+      "companions": false,
+      "size": 1
+    },
+    {
+      "id": "party",
+      "name": "Wieża Drużyn",
+      "members": [
+        2,
+        3
+      ],
+      "companions": true,
+      "size": 3
+    }
   ],
-  "floors": { "eliteEvery": 5, "eliteChance": 0.1, "championEvery": 10 }
+  "floors": {
+    "eliteEvery": 5,
+    "eliteChance": 0.1,
+    "championEvery": 10
+  },
+  "entries": {
+    "perDay": 15
+  },
+  "rewardMinutes": 60,
+  "chestEvery": 10,
+  "texts": {
+    "won": [
+      "Piętro {floor} zdobyte."
+    ],
+    "lost": [
+      "Piętro {floor} nie zostało zdobyte."
+    ],
+    "defeat": [
+      "System wyprowadza {target} z Wieży.",
+      "Walka przegrana. System wyprowadza {target} z Wieży."
+    ],
+    "chest": [
+      "Na tym piętrze czeka skrzynia Wieży. W środku: {item}."
+    ]
+  }
 }

@@ -53,7 +53,12 @@ export function mountJournal(container, { params }) {
             h(
               'span',
               { class: 'report-row-main' },
-              h('span', { class: 'report-row-title', text: `${report.areaName ?? report.regionName ?? report.placeName} · ${formatMinutes(report.minutes)}` }),
+              h('span', {
+                class: 'report-row-title',
+                text: report.tower
+                  ? `${report.tower.name} · piętro ${report.tower.floor}`
+                  : `${report.areaName ?? report.regionName ?? report.placeName} · ${formatMinutes(report.minutes)}`,
+              }),
               WORK_CHIPS[report.kind]
                 ? h(
                     'span',
@@ -64,7 +69,11 @@ export function mountJournal(container, { params }) {
                 : h(
                     'span',
                     { class: 'report-row-meta' },
-                    h('span', { class: `chip chip--${report.result}`, text: RESULT_NAMES[report.result] ?? report.result }),
+                    h('span', {
+                      class: `chip chip--${report.result}`,
+                      // A floor of a Wieża is won or lost, not explored.
+                      text: report.tower ? (report.result === 'success' ? 'zdobyte' : 'porażka') : (RESULT_NAMES[report.result] ?? report.result),
+                    }),
                     ` +${formatNumber(report.xp)} XP · +${formatNumber(report.gold)} złota`,
                   ),
               WORK_CHIPS[report.kind] && h('span', { class: 'report-row-herbs', text: workSummaryText(report) }),
