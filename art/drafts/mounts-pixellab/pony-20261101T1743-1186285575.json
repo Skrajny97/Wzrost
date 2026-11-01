@@ -1,0 +1,15 @@
+{
+  "id": "pony",
+  "payload": {
+    "first_frame": "art/references/mounts/pony.png",
+    "action": "trotting at a steady pace in place, seen from the side and facing right, the four legs moving in a smooth seamless trot loop, the head and body bobbing slightly, the saddle and bridle stay in place",
+    "frame_count": 8,
+    "seed": 1186285575,
+    "no_background": true
+  },
+  "usage": {
+    "type": "generations",
+    "generations": 2
+  },
+  "frames": 9
+}
