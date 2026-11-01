@@ -5830,6 +5830,21 @@ a.camp-level-button {
   font-style: italic;
 }
 
+/* "Przelosuj zadania" on the parchment, quieter than the claims. */
+.quests-reroll {
+  align-self: flex-start;
+  width: auto;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid #6d5233;
+  border-radius: 4px;
+  background: transparent;
+  color: #4a3520;
+  font-family: var(--font-world);
+  font-size: 15px;
+  font-weight: 600;
+}
+
 .quests-list {
   display: flex;
   flex-direction: column;

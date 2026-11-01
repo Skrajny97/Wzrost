@@ -133,7 +133,9 @@ import {
   questText,
   questsStale,
   questsView,
+  rerolledQuests,
   unknownCreatures,
+  weekShare,
   withChest,
   withClaimed,
 } from '../src/engine/index.js';
@@ -2210,6 +2212,9 @@ describe('Bestiariusz', () => {
 describe('quests from the narrator', () => {
   const at = (iso) => Date.parse(iso);
   const iso = (ms) => new Date(ms).toISOString();
+  // The data with the week's whole numbers at every level, for what the
+  // drawing does before the level's share (weekShare).
+  const wholeWeek = { ...content, quests: { ...content.quests, periods: { ...content.quests.periods, weekly: { ...content.quests.periods.weekly, curve: [[1, 1]] } } } };
 
   test('a day starts at midnight Polish time and a week on Monday, also when the clocks change', () => {
     // 25 October 2026: the clocks go back an hour, so the day has 25 hours.
@@ -2240,13 +2245,14 @@ describe('quests from the narrator', () => {
     // Skraj Wiatrołomów, before the Stół rozbiórki stands: in the day five
     // of its creatures, creatures of any kind and the time; the week asks
     // for the general ones only (the author: "Tygodniowe zadania powinny być
-    // bardziej ogólne"): creatures of any kind, the time, the daily chest on
-    // a few days and the inner regions to open.
-    const kinds = { daily: ['kill', 'killAny', 'explore'], weekly: ['killAny', 'explore', 'dailies', 'unlock'] };
+    // bardziej ogólne"): creatures of any kind, the time and the inner
+    // regions to open; no daily chests (the author: "nie rób otwierania
+    // skrzynek zadań jako zadania").
+    const kinds = { daily: ['kill', 'killAny', 'explore'], weekly: ['killAny', 'explore', 'unlock'] };
     for (const periodId of ['daily', 'weekly']) {
       for (let seed = 0; seed < 30; seed++) {
         const quests = drawQuests(periodId, { character, hasTable: false, seed }, content);
-        assert.equal(quests.length, periodId === 'daily' ? 5 : 4);
+        assert.equal(quests.length, periodId === 'daily' ? 5 : 3);
         const kills = quests.filter((quest) => quest.kind === 'kill');
         assert.ok(kills.every((quest) => prey.has(quest.target) && quest.count >= 1));
         assert.equal(new Set(kills.map((quest) => quest.target)).size, kills.length, 'a creature twice');
@@ -2272,14 +2278,16 @@ describe('quests from the narrator', () => {
     assert.equal(areasOpened(4, 20, content), 4);
     // Never in the day (the author: "najlepiej, żeby wcale w dziennych tego nie było").
     assert.deepEqual(asked(newCharacter('warrior'), 'daily'), []);
-    // A week asks for 2–3, from class level 10 for 2 and from 20 for 1.
-    assert.deepEqual(new Set(asked(newCharacter('warrior'), 'weekly')), new Set([2, 3]));
-    assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 12, classLevel: 10 }), 'weekly')), new Set([2]));
-    assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 22, classLevel: 20 }), 'weekly')), new Set([1]));
+    // A week's whole numbers are 2–3, from class level 10 for 2 and from 20
+    // for 1; at a new character's level its share of them is one.
+    assert.deepEqual(new Set(asked(newCharacter('warrior'), 'weekly', wholeWeek)), new Set([2, 3]));
+    assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 12, classLevel: 10 }), 'weekly', wholeWeek)), new Set([2]));
+    assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 22, classLevel: 20 }), 'weekly', wholeWeek)), new Set([1]));
+    assert.deepEqual(new Set(asked(newCharacter('warrior'), 'weekly')), new Set([1]));
     // Near the last inner region of the game a week asks for no more than are left.
     const always = {
-      ...content,
-      quests: { ...content.quests, kinds: content.quests.kinds.map((kind) => (kind.id === 'unlock' ? { ...kind, untilClassLevel: 100, weekly: { ...kind.weekly, most: [] } } : kind)) },
+      ...wholeWeek,
+      quests: { ...wholeWeek.quests, kinds: content.quests.kinds.map((kind) => (kind.id === 'unlock' ? { ...kind, untilClassLevel: 100, weekly: { ...kind.weekly, most: [] } } : kind)) },
     };
     assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 92, classLevel: 92 }), 'weekly', always)), new Set([1]));
     // Only while new.
@@ -2294,25 +2302,80 @@ describe('quests from the narrator', () => {
     assert.equal(questText({ kind: 'unlock', count: 1 }, content), 'Odblokuj dostęp do 1 nowego regionu.');
   });
 
-  test('the week asks for the daily chest on a few days: each daily chest opened counts once', () => {
-    const quests = {
-      daily: { period: 'd', quests: [{ kind: 'explore', count: 30, progress: 30, claimed: true }], chest: true },
-      weekly: {
-        period: 'w',
-        quests: [
-          { kind: 'dailies', count: 3, progress: 2, claimed: false },
-          { kind: 'explore', count: 900, progress: 0, claimed: false },
-        ],
-        chest: false,
-      },
+  test('the week asks much less up to level 50 and more as the character grows', () => {
+    // The author: "do 50 lvla o wiele lżejsze i z czassem trudniej troche".
+    const share = (level, days = 7) => weekShare(level, days, content);
+    assert.equal(share(1), 0.3);
+    assert.equal(share(50), 0.5);
+    assert.equal(share(200), 1);
+    assert.equal(share(450), 1);
+    assert.ok(share(10) < share(40) && share(40) < share(60) && share(60) < share(150) && share(150) < share(199));
+    assert.equal(share(50, 1), 0.5 / 7);
+    // The minutes of explorations a week asks for, at level 10 and at 200.
+    const minutes = (level) =>
+      Array.from({ length: 40 }, (_, seed) => drawQuests('weekly', { character: newCharacter('cleric', { level, classLevel: level }), hasTable: false, seed }, content))
+        .flat()
+        .filter((quest) => quest.kind === 'explore')
+        .map((quest) => quest.count);
+    const low = minutes(10);
+    const high = minutes(200);
+    assert.ok(low.length > 0 && high.length > 0);
+    assert.ok(low.every((count) => count % 60 === 0 && count >= 240 && count <= 600), String(low));
+    assert.ok(high.every((count) => count >= 900 && count <= 1800), String(high));
+  });
+
+  test('the quests not done yet are drawn anew once a period; done and claimed ones stay', () => {
+    // The author: "jednorazowa możliwość przelosowania zadań dziennych -
+    // dziennie i tygodniowych - tygodniowo".
+    const character = newCharacter('cleric', { level: 12, classLevel: 12 });
+    const context = { character, hasTable: true, seed: 9 };
+    const monday = at('2026-10-26T08:00:00Z');
+    const drawn = currentQuests({}, context, monday, content);
+    const done = { ...drawn.daily.quests[0], progress: drawn.daily.quests[0].count };
+    const claimed = { ...drawn.daily.quests[1], progress: drawn.daily.quests[1].count, claimed: true };
+    // The rest begun, not done.
+    const quests = { ...drawn, daily: { ...drawn.daily, quests: [done, claimed, ...drawn.daily.quests.slice(2).map((quest) => ({ ...quest, progress: quest.count - 1 }))] } };
+    const next = rerolledQuests(quests, 'daily', context, monday, content);
+    assert.equal(next.daily.rerolled, true);
+    assert.deepEqual(next.daily.quests.slice(0, 2), [done, claimed]);
+    // The others anew, from the start, none twice and others than before.
+    const key = (quest) => `${quest.kind}:${quest.target ?? ''}`;
+    assert.equal(new Set(next.daily.quests.map(key)).size, next.daily.quests.length);
+    assert.ok(next.daily.quests.slice(2).every((quest) => quest.progress === 0 && !quest.claimed));
+    assert.ok(next.daily.quests.slice(2).some((quest, index) => key(quest) !== key(quests.daily.quests[index + 2])));
+    assert.equal(next.weekly, quests.weekly);
+    assert.equal(questsView(next, monday, content).daily.rerolled, true);
+    // Once a period, and only with something left to draw anew.
+    assert.equal(rerolledQuests(next, 'daily', context, monday, content), null);
+    const all = { ...drawn, weekly: { ...drawn.weekly, quests: drawn.weekly.quests.map((quest) => ({ ...quest, progress: quest.count })) } };
+    assert.equal(rerolledQuests(all, 'weekly', context, monday, content), null);
+    // A week's on its last day: what can be done in it, a seventh of level
+    // 12's share (an hour of explorations at most).
+    const sunday = rerolledQuests(drawn, 'weekly', context, at('2026-11-01T08:00:00Z'), content).weekly;
+    assert.ok(sunday.quests.every((quest) => quest.count <= 60), JSON.stringify(sunday.quests));
+  });
+
+  test('no quest asks to open the daily chest; a kept one is drawn anew, to be done in what is left of the week', () => {
+    assert.ok(!content.quests.kinds.some((kind) => kind.id === 'dailies'));
+    const character = newCharacter('cleric', { level: 12, classLevel: 12 });
+    const context = { character, hasTable: false, seed: 4, createdAt: at('2026-10-01T10:00:00Z') };
+    const sunday = at('2026-11-01T08:00:00Z');
+    const quest = (kind, extra = {}) => ({ kind, count: 4, progress: 1, reward: { kind: 'gold', amount: 9 }, claimed: false, ...extra });
+    const stored = {
+      daily: currentQuests({}, context, sunday, content).daily,
+      weekly: { period: '2026-10-26', chest: false, scaled: true, quests: [quest('dailies'), quest('explore', { count: 120, progress: 60 }), quest('dailies', { progress: 4, claimed: true })] },
     };
-    const after = addQuestProgress(quests, { chests: 1 });
-    assert.deepEqual(after.weekly.quests.map((quest) => quest.progress), [3, 0]);
-    assert.deepEqual(after.daily, quests.daily);
-    assert.equal(addQuestProgress(quests, { minutes: 60 }).weekly.quests[0].progress, 2);
-    assert.equal(questText({ kind: 'dailies', count: 3 }, content), 'Otwórz skrzynię dziennych zadań 3 razy.');
-    const dailies = content.quests.kinds.find((kind) => kind.id === 'dailies');
-    assert.ok(dailies.weekly && !dailies.daily);
+    const healed = currentQuests(stored, context, sunday, content).weekly;
+    const [fresh, kept, claimed] = healed.quests;
+    assert.ok(['killAny', 'unlock'].includes(fresh.kind), fresh.kind);
+    assert.deepEqual([fresh.progress, fresh.claimed], [0, false]);
+    // On the last day: a seventh of the share at level 12.
+    if (fresh.kind === 'killAny') assert.ok(fresh.count <= Math.ceil(200 * 2 * weekShare(12, 1, content)), String(fresh.count));
+    assert.deepEqual(kept, stored.weekly.quests[1]);
+    // One claimed stays as it was, hidden from the page.
+    assert.deepEqual(claimed, stored.weekly.quests[2]);
+    assert.ok(!questsView({ daily: stored.daily, weekly: healed }, sunday, content).weekly.quests.some((one) => one.kind === 'dailies'));
+    assert.deepEqual(currentQuests({ ...stored, weekly: healed }, context, sunday, content).weekly, healed);
   });
 
   test('with the table built, its work comes into the draw', () => {
@@ -2346,7 +2409,7 @@ describe('quests from the narrator', () => {
     const shares = { wolf: 30 / 84, badger: 20 / 84, squirrel: 18 / 84, 'grass-snake': 16 / 84 };
     for (const periodId of ['daily', 'weekly']) {
       for (let seed = 0; seed < 30; seed++) {
-        for (const quest of drawQuests(periodId, { character, hasTable: false, seed }, content).filter((candidate) => candidate.kind.startsWith('kill'))) {
+        for (const quest of drawQuests(periodId, { character, hasTable: false, seed }, wholeWeek).filter((candidate) => candidate.kind.startsWith('kill'))) {
           const [fewest, most] = content.quests.kinds.find((kind) => kind.id === quest.kind)[periodId].fights;
           const share = quest.kind === 'killAny' ? 1 : shares[quest.target];
           assert.ok(quest.count >= Math.max(1, Math.round(fewest * share)) && quest.count <= Math.round(most * share), `${periodId} ${quest.target} ${quest.count}`);
@@ -2409,26 +2472,25 @@ describe('quests from the narrator', () => {
   });
 
   test('a week drawn while it is under way asks for the days left of it, its rewards whole', () => {
-    // The tester's new character on a Sunday (the author: "błąd mocny"): 4
-    // daily chests and 1320 minutes of explorations with 15 hours left.
+    // The tester's new character on a Sunday (the author: "błąd mocny",
+    // "ustaw na robienie do końca czasu pozostałego"): 1320 minutes of
+    // explorations with 15 hours left.
     const context = { character: newCharacter('cleric'), hasTable: false, seed: 11 };
     const monday = currentQuests({}, context, at('2026-10-26T08:00:00Z'), content).weekly;
     const sunday = currentQuests({}, context, at('2026-11-01T08:00:00Z'), content).weekly;
     const thursday = currentQuests({}, context, at('2026-10-29T08:00:00Z'), content).weekly;
-    assert.equal(monday.days, undefined);
+    assert.deepEqual([monday.days, monday.scaled], [undefined, true]);
     assert.equal(sunday.days, 1);
     assert.equal(thursday.days, 4);
-    // The same quests and rewards; the counts are sevenths of Monday's, to the
-    // kind's step, at least one.
+    // The same quests and rewards; fewer of each, the fewer days are left.
     assert.deepEqual(sunday.quests.map((quest) => [quest.kind, quest.reward]), monday.quests.map((quest) => [quest.kind, quest.reward]));
     const count = (period, kind) => period.quests.find((quest) => quest.kind === kind)?.count;
-    assert.ok(count(monday, 'explore') >= 900);
-    assert.equal(count(sunday, 'explore'), Math.max(60, Math.round(count(monday, 'explore') / 7 / 60) * 60));
-    assert.equal(count(thursday, 'explore'), Math.max(60, Math.round((count(monday, 'explore') * 4) / 7 / 60) * 60));
+    // At level 1: 0.3 of 900–1800 minutes in the week, an hour on its last day.
+    assert.ok(count(monday, 'explore') >= 240 && count(monday, 'explore') <= 540, String(count(monday, 'explore')));
+    assert.equal(count(sunday, 'explore'), 60);
+    assert.ok(count(thursday, 'explore') >= 120 && count(thursday, 'explore') <= 300 && count(thursday, 'explore') % 60 === 0);
     for (const period of [sunday, thursday]) {
       for (const quest of period.quests) assert.ok(quest.count >= 1 && quest.count <= count(monday, quest.kind), JSON.stringify(quest));
-      // Never more daily chests than days left.
-      if (count(period, 'dailies') !== undefined) assert.ok(count(period, 'dailies') <= period.days);
     }
     // The words under the week's quests.
     const view = questsView({ daily: currentQuests({}, context, at('2026-11-01T08:00:00Z'), content).daily, weekly: sunday }, at('2026-11-01T08:00:00Z'), content);
@@ -2436,32 +2498,38 @@ describe('quests from the narrator', () => {
     assert.equal(view.daily.late, undefined);
   });
 
-  test('a week drawn whole for a character that came during it is cut to the days left on that day, once', () => {
-    // As drawn before 0.0.73: the whole week's numbers for a character made on
+  test('a week drawn before 0.0.73 is cut to the level\'s share and, for a character that came during it, the days left then; once', () => {
+    // The tester's week as drawn before: a character of level 12 made on
     // Saturday, seen on Sunday.
     const saturday = at('2026-10-31T10:00:00Z');
     const now = at('2026-11-01T08:00:00Z');
-    const context = { character: newCharacter('cleric'), hasTable: false, seed: 11 };
-    const whole = currentQuests({}, context, at('2026-10-26T08:00:00Z'), content);
-    const explore = whole.weekly.quests.findIndex((quest) => quest.kind === 'explore');
+    const character = newCharacter('cleric', { level: 12, classLevel: 12 });
+    const context = { character, hasTable: false, seed: 11 };
+    const quest = (kind, count, progress, extra = {}) => ({ kind, count, progress, reward: { kind: 'gold', amount: 50 }, claimed: false, ...extra });
     const stored = {
-      ...whole,
       daily: currentQuests({}, context, now, content).daily,
-      weekly: { ...whole.weekly, quests: whole.weekly.quests.map((quest, index) => (index === explore ? { ...quest, progress: 270 } : quest)) },
+      weekly: {
+        period: '2026-10-26',
+        chest: false,
+        quests: [quest('killAny', 150, 55), quest('explore', 1320, 270), quest('dailies', 4, 1), quest('unlock', 3, 3, { claimed: true })],
+      },
     };
+    const share = weekShare(12, 2, content);
     const late = currentQuests(stored, { ...context, createdAt: saturday }, now, content).weekly;
-    assert.equal(late.days, 2);
-    late.quests.forEach((quest, index) => {
-      const before = stored.weekly.quests[index];
-      assert.deepEqual([quest.kind, quest.reward, quest.claimed], [before.kind, before.reward, before.claimed]);
-      assert.ok(quest.count <= before.count && quest.progress <= quest.count);
-    });
-    assert.equal(late.quests[explore].count, Math.max(60, Math.round((stored.weekly.quests[explore].count * 2) / 7 / 60) * 60));
-    assert.equal(late.quests[explore].progress, Math.min(270, late.quests[explore].count));
+    assert.deepEqual([late.days, late.scaled], [2, true]);
+    const [kills, minutes, ...rest] = late.quests;
+    assert.deepEqual([kills.count, kills.progress], [Math.round(150 * share), Math.round(150 * share)]);
+    assert.deepEqual([minutes.count, minutes.progress], [Math.max(60, Math.round((1320 * share) / 60) * 60), Math.max(60, Math.round((1320 * share) / 60) * 60)]);
+    // The daily chests' quest has nothing to be drawn for in its place: it
+    // goes, and the claimed one stays, so the week's chest opens.
+    assert.deepEqual(rest, [stored.weekly.quests[3]]);
+    assert.ok(chestReady(late));
     // Once: the cut week stays as it is.
     assert.equal(currentQuests({ ...stored, weekly: late }, { ...context, createdAt: saturday }, now, content).weekly, late);
-    // A character there before the week began keeps its week whole.
-    assert.equal(currentQuests(stored, { ...context, createdAt: at('2026-10-20T10:00:00Z') }, now, content).weekly, stored.weekly);
+    // A character there before the week began: the level's share only.
+    const older = currentQuests(stored, { ...context, createdAt: at('2026-10-20T10:00:00Z') }, now, content).weekly;
+    assert.equal(older.days, undefined);
+    assert.equal(older.quests[1].count, Math.round((1320 * weekShare(12, 7, content)) / 60) * 60);
   });
 
   test('the day asks for creatures of the newest open inner region and the one before it, the week for none', () => {

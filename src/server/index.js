@@ -43,7 +43,7 @@ import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunt
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { discardHerbs, sellHerbs, startGathering } from './professions.js';
 import { pushKey, sendNotifications, subscribePush, testPush, unsubscribePush } from './push.js';
-import { claimAllQuests, claimQuest, openChest } from './quests.js';
+import { claimAllQuests, claimQuest, openChest, rerollQuests } from './quests.js';
 import { getReport, listReports } from './reports.js';
 import { learnSkill, raiseSkill } from './skills.js';
 import { getChest, putInChest, takeFromChest } from './chest.js';
@@ -124,6 +124,7 @@ const routes = [
   ['POST', '/api/quests/claim', claimQuest],
   ['POST', '/api/quests/claim-all', claimAllQuests],
   ['POST', '/api/quests/chest', openChest],
+  ['POST', '/api/quests/reroll', rerollQuests],
   ['POST', '/api/bestiary/chest', openBestiaryChest],
   ['GET', '/api/encyclopedia', readEncyclopedia],
   ['POST', '/api/encyclopedia/chest', openEncyclopediaChest],

@@ -2996,21 +2996,35 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
-## Kowadło, Zaklinaczka i opisy Drużyny (1.11.2026, na wersji testowej)
+## Wersja 0.0.73 (1.11.2026)
+
+Autor: „i od razu pushuj zmienione na main” i „Pozniej wdrożenie”.
+
+1. **Co wchodzi do gry:**
+    - Wieże Systemu od 50. poziomu, z obrazami wież nad kartami, i Gildia od 30. poziomu (zob. „Wieże Systemu i Gildia” i „Porównywarka na Targowisku i tła Wież”);
+    - nowe zlecenie na Tablicy 12 godzin po oddanym albo odrzuconym (zob. „Wolniej nowe zlecenia”);
+    - porównanie z założonym przedmiotem na Targowisku;
+    - zadania tygodniowe według krzywej poziomu i dni, które zostały, bez skrzyń dziennych, z przelosowaniem zadań (zob. „Zadania tygodniowe: krzywa, krótszy tydzień i przelosowanie”);
+    - Kowadło za przyciskiem „Ulepsz”, koszt u Zaklinaczki i nowe opisy Drużyny (zob. „Kowadło, Zaklinaczka i opisy Drużyny”).
+2. **Migracje bazy:** 0064 (zapis Wież postaci) i 0065 (gildie).
+
+## Kowadło, Zaklinaczka i opisy Drużyny (1.11.2026, w grze od 0.0.73)
 
 1. **Kowadło za przyciskiem.** Autor: „To "Kowadło" powinno się rozwijać przyciskiem "Ulepsz" i dopiero wtedy pelny opis przedmiotu.” Karta przedmiotu pokazuje w części „Kowadło” sam przycisk „Ulepsz”. Dopiero on rozwija ulepszenie: wartości po nim, szansę, koszt, ryzyko, Zwój ochronny i przycisk „Ulepsz do +N”. Po próbie ulepszenia karta otwiera się z Kowadłem rozwiniętym, żeby dało się próbować dalej. Tak samo otwiera się przedmiot stuknięty na liście „Ulepszanie przedmiotów” w budynku Kowadła, bo tam gracz przychodzi ulepszać.
 2. **Koszt u Zaklinaczki.** Autor przekazał uwagę osoby testującej grę: „Żeby bardziej widoczne było co potrzebujesz / Co masz ile ci czego brakuje”, „Może żeby jakoś graficznie to przedstawić”, „Bo teraz 3 razy klikałem i nie widziałem XD”. Autor: „no w sumie”. Zaklęcie afiksu pokazuje koszt zaraz pod przedmiotem, jak Kowadło: złoto i materiał jako „masz / potrzeba”, na czerwono, gdy brakuje. Gdy żaden materiał nie wystarcza, widać ten tej rzadkości, którego jest najwięcej, i zdanie „Brakuje: N szt. materiału.” z podpowiedzią, skąd go wziąć (wyprawy, Targowisko). Zaklęcie bierze sztuki jednego materiału, więc karta mówi to wprost. Przycisk mówi, czego brakuje („Brakuje złota”, „Brakuje materiału”), zamiast być po prostu nieaktywny.
 3. **Opisy Drużyny.** Autor: „Drużyna może składać się z maksymalnie 3 osób. Lider drużyny zarządza wspólnymi wyprawami wolnych towarzyszy. Każda z osób otrzymuje własne łupy.” i „Zaproś postaci od 25. poziomu wzwyż. Poniżej możesz to zrobić z listy znajomych lub dodać kogokolwiek ręcznie spoza niej.” Oba teksty stoją dosłownie. Drugi stoi teraz nad listą znajomych i polem imienia, bo mówi „Poniżej”.
 
-## Krótszy tydzień zadań (1.11.2026, na wersji testowej)
+## Zadania tygodniowe: krzywa, krótszy tydzień i przelosowanie (1.11.2026, w grze od 0.0.73)
 
-Autor przekazał uwagę osoby testującej grę: „Bardziej wyważone tygodniowe zadania / Nowa postać / Dzisiaj kończą się tygodniowe a ten mi karze 4 dzienne skrzynki otworzyć” i „Tak samo te 1320 minuty na walce”. Autor: „błąd mocny”.
+Autor przekazał uwagę osoby testującej grę: „Bardziej wyważone tygodniowe zadania / Nowa postać / Dzisiaj kończą się tygodniowe a ten mi karze 4 dzienne skrzynki otworzyć” i „Tak samo te 1320 minuty na walce”. Autor: „błąd mocny”, a potem: „Niech curve tygodniowych zadań rośnie z czasem, Ty zle zrozumiales to robienie w 4 dni, ustaw na robienie do końca czasu pozostałego + do 50 lvla o wiele lżejsze i z czassem trudniej troche. i nie rób otwierania skrzynek zadań jako zadania / graczom przelosuj takie zadania na adekwatne” oraz „Niech będzie tez jednorazowa możliwość przelosowania zadań dziennych - dziennie i tygodniowych - tygodniowo.”
 
-1. **Tydzień wylosowany w trakcie (brakujący szczegół).** Zadania tygodniowe losują się przy pierwszej wizycie postaci w tygodniu. Gdy to nie poniedziałek (nowa postać albo pierwsze wejście w późniejszym dniu), zadania proszą o tyle siódmych części wylosowanej liczby, ile dni zostało do końca tygodnia, licząc dzień losowania: w niedzielę 1/7, w czwartek 4/7. Liczba zaokrągla się do kroku zadania (minuty wypraw co 60) i nie spada poniżej jednego kroku, więc skrzyń dziennych nigdy nie trzeba otworzyć więcej, niż zostało dni. Nagrody za zadania i skrzynia tygodnia zostają całe.
-2. **Napis.** Pod zadaniami takiego tygodnia stoi: „Ten tydzień zaczął się dla Ciebie później, więc zadania są na 1 z 7 dni.” (z liczbą dni, które zostały).
-3. **Postacie z bieżącego tygodnia.** Postać stworzona w tym tygodniu, której zadania wylosowały się jeszcze na cały tydzień, dostaje je przycięte do dni, które zostały w dniu jej stworzenia. Postęp zostaje, a odebrane zadania się nie zmieniają. W grze zadziała to dopiero po wdrożeniu: nowa postać osoby testującej grę skorzysta, jeśli wdrożenie nastąpi przed północą z niedzieli na poniedziałek.
+1. **Krzywa według poziomu.** Zadania tygodniowe proszą o część zwykłych liczb według poziomu postaci: 30% na 1. poziomie, 35% na 25., 50% na 50., 75% na 100. i całość od 200. poziomu, a pomiędzy udział rośnie równo (`quests.json`, `weekly.curve`). Postać na 12. poziomie ma w pełnym tygodniu 300–600 minut wypraw zamiast 900–1800.
+2. **Do końca pozostałego czasu.** Tydzień wylosowany później niż w poniedziałek (nowa postać albo pierwsze wejście w tygodniu) bierze z tego tyle siódmych części, ile dni zostało, licząc dzień losowania. Liczba zaokrągla się do kroku zadania (minuty wypraw co 60) i nie spada poniżej jednego kroku. Nagrody zostają całe. Pod zadaniami takiego tygodnia stoi: „Ten tydzień zaczął się dla Ciebie później, więc zadania są na 1 z 7 dni.” (z liczbą dni).
+3. **Bez skrzyń dziennych.** Nie ma już zadania „Otwórz skrzynię dziennych zadań”. U graczy niewykonane takie zadanie losuje się od nowa na inne, do zrobienia do końca tygodnia. Gdy nie ma już czego wylosować, zadanie znika, żeby nie blokowało skrzyni tygodnia.
+4. **Tydzień wylosowany przed 0.0.73.** Nieodebrane zadania bieżącego tygodnia dostają liczby z krzywej według obecnego poziomu postaci. Postać stworzona w tym tygodniu ma je dodatkowo przycięte do dni, które zostały w dniu jej stworzenia. Postęp zostaje, odebrane zadania się nie zmieniają.
+5. **Przelosowanie.** W oknie zadań jest przycisk „Przelosuj zadania”: dla dziennych raz na dzień, dla tygodniowych raz na tydzień. Niewykonane zadania zmieniają się na inne (póki starcza innych niż dotąd), a ich postęp przepada. Wykonane i odebrane zostają. Nowe zadania tygodnia są do zrobienia w dniach, które zostały (brakujący szczegół).
 
-## Porównywarka na Targowisku i tła Wież (1.11.2026, na wersji testowej)
+## Porównywarka na Targowisku i tła Wież (1.11.2026, w grze od 0.0.73)
 
 Autor: „Do Targowiska trzeba dodać opcję, że jak klikamy dany przedmiot to nie tylko pojawiają się dane orzedmiotu, ale i otwiera porównywarka z aktualnym przedmiotem”.
 
@@ -3018,14 +3032,14 @@ Autor: „Do Targowiska trzeba dodać opcję, że jak klikamy dany przedmiot to 
 2. **Tła Wież.** Autor: „Musimy też zrobić tla do Wież czyli właśnie ogromne budzące grozę Wieże”. Nad kartą każdej wieży stoi jej obraz od krawędzi do krawędzi, a nazwa wieży jest na jego dole. Obraz wskazują dane (`towers.json`, `place`). Powstały po 3 szkice na wieżę (pytania 309 i 310). Autor: „309 A i 310 B to dobre wybory”.
 3. **Komunikat odblokowania Wież** mówi teraz „kilkanaście walk dziennie, między wyprawami i także w czasie pracy w profesji” zamiast „obok wypraw i profesji”, zgodnie z zakazem wejść w czasie wyprawy.
 
-## Wolniej nowe zlecenia (1.11.2026, na wersji testowej)
+## Wolniej nowe zlecenia (1.11.2026, w grze od 0.0.73)
 
 Autor: „Zmieniamy tempo generowania nowych zleceń na tablicy (jest chyba co 4 godziny ustalmy co 12)”.
 
 1. **12 godzin.** Nowe zlecenie przychodzi na Tablicę 12 godzin po oddaniu albo odrzuceniu poprzedniego (`refillMinutes` 720, wcześniej 180, czyli 3 godziny). Miejsca, które już czekają, dostaną zlecenie w dawnym terminie.
 2. **Okno „Odrzucić zlecenie?”** podaje teraz ten czas z danych gry zamiast „za kilka godzin”.
 
-## Wieże Systemu i Gildia (1.11.2026, na wersji testowej)
+## Wieże Systemu i Gildia (1.11.2026, w grze od 0.0.73)
 
 Autor: „303 A / 304 A, ale kilkanaście wejść dziennie / 305 A, Lochy zamieniamy na Wieże / 306 A / 307 A, ale za 1000 złota”.
 

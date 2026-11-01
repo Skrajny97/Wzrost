@@ -1007,6 +1007,11 @@ function checkQuests(data, { resources, rarities }) {
     errors.push(`quests.json: nieznana strefa czasu "${quests.timeZone}"`);
   }
   uniqueIds(errors, 'quests', quests.kinds);
+  // The weekly curve goes up the levels, its share never falling.
+  const curve = quests.periods.weekly.curve ?? [];
+  curve.forEach(([level, share], index) => {
+    if (index > 0 && (level <= curve[index - 1][0] || share < curve[index - 1][1])) errors.push(`quests.json: krzywa tygodnia psuje się na poziomie ${level}`);
+  });
   // The note under a period's quests names what its chest gives.
   for (const [periodId, { chest }] of Object.entries(quests.periods)) {
     for (const amount of [chest.timePoints, chest.systemPoints]) {

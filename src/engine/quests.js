@@ -10,10 +10,13 @@
 // explorations, gatherings and brewings and the table's orders move them
 // on; a quest
 // done gives its reward when claimed, and all of a period's quests done open
-// its chest. A week's quests drawn while it is under way (a new character,
-// or the first visit of the week on a later day) ask for as many sevenths
-// of the usual numbers as days are left, today among them (the author,
-// with a tester's note: "błąd mocny").
+// its chest. A week's quests ask for a share of the usual numbers by the
+// character's level, much less up to level 50 and more as it grows
+// (weekly.curve; the author: "do 50 lvla o wiele lżejsze i z czasem
+// trudniej troche"), and those drawn while the week is under way (a new
+// character, or the first visit of the week on a later day) only as many
+// sevenths of that as days are left, today among them (the author:
+// "ustaw na robienie do końca czasu pozostałego").
 
 import { knownPotions } from './brewing.js';
 import { easyPlace, encountersFor } from './hunt.js';
@@ -72,6 +75,23 @@ function sinceMonday(ms, timeZone) {
 // The days left of the week at `now`, today among them: 7 on a Monday, 1 on
 // a Sunday.
 export const weekDaysLeft = (now, content) => 7 - sinceMonday(now, content.quests.timeZone);
+
+// How much of the usual numbers a week's quests ask for: the share at the
+// character's level on the curve (quests.json, weekly.curve: points of a
+// level and a share, straight between them, the last one's beyond it),
+// times the `days` of the week left in sevenths.
+export function weekShare(level, days, content) {
+  const curve = content.quests.periods.weekly.curve ?? [[1, 1]];
+  const next = curve.findIndex(([fromLevel]) => fromLevel > level);
+  let share = curve.at(-1)[1];
+  if (next === 0) share = curve[0][1];
+  else if (next > 0) {
+    const [fromLevel, fromShare] = curve[next - 1];
+    const [toLevel, toShare] = curve[next];
+    share = fromShare + ((toShare - fromShare) * (level - fromLevel)) / (toLevel - fromLevel);
+  }
+  return (share * Math.min(7, Math.max(1, days))) / 7;
+}
 
 // The last period of each kind worked out: every moment inside it has the
 // same one, so it is kept (the code review: a character view asked for the
@@ -181,22 +201,21 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false, h
 const unlockMost = (tuning, classLevel) => tuning.most?.findLast((band) => band.fromClassLevel <= classLevel)?.count ?? Infinity;
 
 // How much a quest asks for: for creatures, as many as `fights` fights
-// bring on average, and never more than `most`; for a week drawn late,
-// `days` sevenths of it (lateCount).
-function questCount({ kind, perFight, most = Infinity }, periodId, rng, days = 7) {
+// bring on average, and never more than `most`; for a week, its `share`
+// (weekShare).
+function questCount({ kind, perFight, most = Infinity }, periodId, rng, share = 1) {
   const tuning = kind[periodId];
-  if (tuning.fights) return lateCount(Math.max(1, Math.round(rng.int(...tuning.fights) * perFight)), tuning, days);
+  if (tuning.fights) return shareCount(Math.max(1, Math.round(rng.int(...tuning.fights) * perFight)), tuning, share);
   const [min, max] = tuning.count;
   const step = tuning.step ?? 1;
-  return lateCount(Math.min(most, min + step * rng.int(0, Math.floor((max - min) / step))), tuning, days);
+  return shareCount(Math.min(most, min + step * rng.int(0, Math.floor((max - min) / step))), tuning, share);
 }
 
-// A week's count cut to the `days` left of it: `days` sevenths, to the
-// kind's step, at least one step.
-function lateCount(count, tuning, days) {
-  if (days >= 7) return count;
+// A count cut to its `share`: to the kind's step, at least one step.
+function shareCount(count, tuning, share) {
+  if (share >= 1) return count;
   const step = tuning.fights ? 1 : (tuning.step ?? 1);
-  return Math.max(step, Math.round((count * days) / 7 / step) * step);
+  return Math.min(count, Math.max(step, Math.round((count * share) / step) * step));
 }
 
 // The band of levels the character is in (levels in quests.json).
@@ -218,21 +237,23 @@ function questReward(periodId, level, rng, content, factor = 1) {
   return { kind, id: questLevel(level, content).part, amount: amount() };
 }
 
-// A quest of a drawn option, with its count and reward; its reward stays
-// whole in a week drawn late.
-const newQuest = (option, periodId, character, rng, content, days = 7) => ({
+// A quest of a drawn option, with its count (`share` of it, for a week)
+// and its reward, always whole.
+const newQuest = (option, periodId, character, rng, content, share = 1) => ({
   kind: option.kind.id,
   ...(option.target && { target: option.target }),
-  count: questCount(option, periodId, rng, days),
+  count: questCount(option, periodId, rng, share),
   progress: 0,
   reward: questReward(periodId, character.level, rng, content, option.kind.rewardFactor),
   claimed: false,
 });
 
 // A period's quests, drawn from `seed` for the character as it is: no
-// option twice, in the order of the kinds; a week's with `days` of it left.
+// option twice, in the order of the kinds; a week's by the character's
+// level and the `days` of it left.
 export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed, days = 7 }, content) {
   const rng = createRng(seed);
+  const share = periodId === 'weekly' ? weekShare(character.level, days, content) : 1;
   let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement }, content);
   const drawn = [];
   while (drawn.length < content.quests.periods[periodId].count && options.length > 0) {
@@ -241,78 +262,126 @@ export function drawQuests(periodId, { character, hasTable, hasProfessions, hasC
     drawn.push(option);
   }
   const { kinds } = content.quests;
-  return drawn.sort((a, b) => kinds.indexOf(a.kind) - kinds.indexOf(b.kind)).map((option) => newQuest(option, periodId, character, rng, content, days));
+  return drawn.sort((a, b) => kinds.indexOf(a.kind) - kinds.indexOf(b.kind)).map((option) => newQuest(option, periodId, character, rng, content, share));
 }
 
 // Whether a creature lives in an inner region open to the character's class.
 const reachable = (monsterId, character, content) =>
   content.areas.some((area) => areaUnlocked(area, character.classLevel, content) && area.encounters.some((encounter) => encounter.monsters.includes(monsterId)));
 
-// A kept quest that cannot be done any more: a creature's, neither done nor
-// claimed, whose creature lives nowhere the character can go. Quests drawn
-// before the creatures moved to inner regions of their own (0.0.27) asked
-// for such (the author: "kuzynka nawet nie ma dostępu do tych potworów za
-// niski poziom klasy").
-const lostQuest = (quest, character, content) => quest.kind === 'kill' && !quest.claimed && !questDone(quest) && !reachable(quest.target, character, content);
+// A kept quest that cannot be done any more, neither done nor claimed: a
+// creature's whose creature lives nowhere the character can go (quests
+// drawn before the creatures moved to inner regions of their own, 0.0.27;
+// the author: "kuzynka nawet nie ma dostępu do tych potworów za niski
+// poziom klasy"), or one of a kind the period no longer has, as opening the
+// daily quests' chest (the author: "nie rób otwierania skrzynek zadań jako
+// zadania / graczom przelosuj takie zadania na adekwatne").
+const lostQuest = (quest, periodId, character, content) =>
+  !quest.claimed &&
+  !questDone(quest) &&
+  (!content.quests.kinds.some((kind) => kind.id === quest.kind && kind[periodId]) || (quest.kind === 'kill' && !reachable(quest.target, character, content)));
 
 // A kept period with each lost quest drawn anew in its place, among what the
-// character may get now and the period does not ask for yet; the other
-// quests stay as they are, with their progress and rewards.
-function healedPeriod(period, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, content) {
-  const lost = (quest) => lostQuest(quest, character, content);
+// character may get now and the period does not ask for yet, a week's to
+// be done in the days left of it at `now`; with nothing left to draw, one of
+// a kind gone from the data goes too, so it does not keep the chest shut.
+// The other quests stay as they are, with their progress and rewards.
+function healedPeriod(period, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, now, content) {
+  const lost = (quest) => lostQuest(quest, periodId, character, content);
   if (!period.quests.some(lost)) return period;
+  const gone = (quest) => !content.quests.kinds.some((kind) => kind.id === quest.kind && kind[periodId]);
   const asked = (option) => period.quests.some((quest) => !lost(quest) && quest.kind === option.kind.id && quest.target === option.target);
   let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement }, content).filter((option) => !asked(option));
   return {
     ...period,
-    quests: period.quests.map((quest, index) => {
-      if (!lost(quest) || options.length === 0) return quest;
+    quests: period.quests.flatMap((quest, index) => {
+      if (!lost(quest)) return [quest];
+      if (options.length === 0) return gone(quest) ? [] : [quest];
       const rng = createRng(`${seed}:${periodId}:${period.period}:${index}`);
       const option = rng.weighted(options);
       options = options.filter((other) => other !== option);
-      return newQuest(option, periodId, character, rng, content, period.days);
+      return [newQuest(option, periodId, character, rng, content, periodId === 'weekly' ? weekShare(character.level, weekDaysLeft(now, content), content) : 1)];
     }),
   };
 }
 
 // Both periods' quests at `now`: those kept while their period lasts (with
-// the lost ones drawn anew), new ones once it has passed; a week drawn
-// while it is under way keeps the `days` left of it then. `seed` is the
+// the lost ones drawn anew), new ones once it has passed; a week marked
+// `scaled`, with the `days` left of it when drawn under way. `seed` is the
 // character's, `createdAt` the moment it came.
 export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed, createdAt }, now, content) {
+  const context = { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed };
   return Object.fromEntries(
     QUEST_PERIODS.map((periodId) => {
       const { key, startsAt } = questPeriod(periodId, now, content);
       const kept = stored?.[periodId];
       if (kept?.period === key) {
-        const shortened = periodId === 'weekly' ? lateWeek(kept, createdAt, startsAt, content) : kept;
-        return [periodId, healedPeriod(shortened, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, content)];
+        const scaled = periodId === 'weekly' ? scaledWeek(kept, character, createdAt, startsAt, content) : kept;
+        return [periodId, healedPeriod(scaled, periodId, context, now, content)];
       }
-      const days = periodId === 'weekly' ? weekDaysLeft(now, content) : 7;
-      const quests = drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed: `${seed}:${periodId}:${key}`, days }, content);
-      return [periodId, { period: key, quests, chest: false, ...(days < 7 && { days }) }];
+      const weekly = periodId === 'weekly';
+      const days = weekly ? weekDaysLeft(now, content) : 7;
+      const quests = drawQuests(periodId, { ...context, seed: `${seed}:${periodId}:${key}`, days }, content);
+      return [periodId, { period: key, quests, chest: false, ...(weekly && { scaled: true }), ...(days < 7 && { days }) }];
     }),
   );
 }
 
-// A kept week drawn whole for a character that came after it began: before
-// 0.0.73 a week drawn late asked for all of it (the tester's new character
-// on a Sunday: "Dzisiaj kończą się tygodniowe a ten mi karze 4 dzienne
-// skrzynki otworzyć"). Its quests not claimed yet are cut to the days left
-// on the day the character came, their progress kept.
-function lateWeek(period, createdAt, startsAt, content) {
-  if (period.days || createdAt === undefined || createdAt < startsAt) return period;
-  const days = weekDaysLeft(createdAt, content);
-  if (days >= 7) return period;
+// A kept week drawn before 0.0.73, at the whole week's numbers for every
+// level: its quests not claimed yet ask for the share at the character's
+// level, and for a character that came during the week, of the days left
+// on the day it came (the tester's new character on a Sunday: "Dzisiaj
+// kończą się tygodniowe a ten mi karze 4 dzienne skrzynki otworzyć"),
+// their progress kept. Marked `scaled`, so once.
+function scaledWeek(period, character, createdAt, startsAt, content) {
+  if (period.scaled) return period;
+  const days = createdAt !== undefined && createdAt >= startsAt ? weekDaysLeft(createdAt, content) : 7;
+  const share = weekShare(character.level, days, content);
   const tuning = (quest) => content.quests.kinds.find((kind) => kind.id === quest.kind)?.weekly;
   return {
     ...period,
-    days,
+    scaled: true,
+    ...(days < 7 && { days }),
     quests: period.quests.map((quest) => {
       if (quest.claimed || !tuning(quest)) return quest;
-      const count = Math.min(quest.count, lateCount(quest.count, tuning(quest), days));
+      const count = shareCount(quest.count, tuning(quest), share);
       return { ...quest, count, progress: Math.min(quest.progress, count) };
     }),
+  };
+}
+
+// A period's quests not done yet drawn anew, once a period (the author:
+// "Niech będzie tez jednorazowa możliwość przelosowania zadań dziennych -
+// dziennie i tygodniowych - tygodniowo"): those done or claimed stay, the
+// others give way to quests the period does not ask for yet, others than
+// themselves while enough are left, a week's to be done in the days left of
+// it at `now`. Null when there is nothing to draw anew or it was done.
+export function rerolledQuests(quests, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, now, content) {
+  const period = quests[periodId];
+  if (period.rerolled || period.chest) return null;
+  const replaced = (quest) => !quest.claimed && !questDone(quest);
+  const count = period.quests.filter(replaced).length;
+  if (count === 0) return null;
+  const same = (option, quest) => quest.kind === option.kind.id && quest.target === option.target;
+  const options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement }, content).filter(
+    (option) => !period.quests.some((quest) => !replaced(quest) && same(option, quest)),
+  );
+  const fresh = options.filter((option) => !period.quests.some((quest) => replaced(quest) && same(option, quest)));
+  let pool = fresh.length >= count ? fresh : options;
+  const share = periodId === 'weekly' ? weekShare(character.level, weekDaysLeft(now, content), content) : 1;
+  const rng = createRng(`${seed}:${periodId}:${period.period}:reroll`);
+  return {
+    ...quests,
+    [periodId]: {
+      ...period,
+      rerolled: true,
+      quests: period.quests.map((quest) => {
+        if (!replaced(quest) || pool.length === 0) return quest;
+        const option = rng.weighted(pool);
+        pool = pool.filter((other) => other !== option);
+        return newQuest(option, periodId, character, rng, content, share);
+      }),
+    },
   };
 }
 
@@ -336,17 +405,15 @@ export function huntKills(hunt, content) {
 // explored, materials `processed`, items `salvaged`, herbs gathered (`herbs`
 // by id, all of those found, also those the bag lost), potions brewed
 // (`potions` by id, the same way), items `made` in the Warsztat (only
-// those that came out), inner regions `opened` by new class levels,
-// `orders` delivered in the Osada and the daily quests' `chests` opened
-// (one a day at most). A quest stops at its count.
-export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, opened = 0, orders = 0, chests = 0 }) {
+// those that came out), inner regions `opened` by new class levels and
+// `orders` delivered in the Osada. A quest stops at its count.
+export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, opened = 0, orders = 0 }) {
   const total = (counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
   const gathered = total(herbs);
   const gain = {
     kill: (quest) => kills[quest.target] ?? 0,
     killAny: () => total(kills),
     explore: () => minutes,
-    dailies: () => chests,
     unlock: () => opened,
     process: () => processed,
     salvage: () => salvaged,
@@ -462,6 +529,8 @@ export function questsView(quests, now, content, met = null) {
               : [],
           ),
           chest: { ...chest, ready: chestReady(period), opened: period.chest },
+          // Its quests drawn anew already this period.
+          rerolled: Boolean(period.rerolled),
           // A week drawn late: the days left of it then, and the words
           // under its quests.
           ...(period.days && { days: period.days, late: content.quests.periods[periodId].late?.replace('{days}', String(period.days)) ?? null }),

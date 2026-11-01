@@ -2076,19 +2076,19 @@ describe('Zadania od narratora', () => {
   }
 
   // Skraj Wiatrołomów has two creatures: a new character gets five quests
-  // a day (each creature, creatures of any kind and the time) and four a
-  // week, the general ones (creatures of any kind, the time, the daily
-  // chest and the inner regions to open).
-  test('a new character gets five daily and four general weekly quests, which end at midnight Polish time', async () => {
+  // a day (each creature, creatures of any kind and the time) and three a
+  // week, the general ones (creatures of any kind, the time and the inner
+  // regions to open).
+  test('a new character gets five daily and three general weekly quests, which end at midnight Polish time', async () => {
     const created = await newCharacter(await signUp('ola'), 'mage', 'Ola');
     assert.equal(created.data.character.quests.daily.quests.length, 5);
     const view = (await character()).quests;
     const now = Date.now();
     // The week's general quests before the Stół rozbiórki stands: creatures
-    // of any kind, the time, the daily chest and the inner regions.
-    assert.deepEqual(view.weekly.quests.map((quest) => quest.kind).sort(), ['dailies', 'explore', 'killAny', 'unlock']);
+    // of any kind, the time and the inner regions.
+    assert.deepEqual(view.weekly.quests.map((quest) => quest.kind).sort(), ['explore', 'killAny', 'unlock']);
     for (const periodId of ['daily', 'weekly']) {
-      assert.equal(view[periodId].quests.length, periodId === 'daily' ? 5 : 4);
+      assert.equal(view[periodId].quests.length, periodId === 'daily' ? 5 : 3);
       assert.equal(view[periodId].endsAt, questPeriod(periodId, now, content).endsAt);
       assert.ok(view[periodId].quests.every((quest) => quest.progress === 0 && !quest.done && !quest.claimed && quest.text.endsWith('.')));
       assert.deepEqual(view[periodId].chest, { ...content.quests.periods[periodId].chest, ready: false, opened: false });
@@ -2239,10 +2239,20 @@ describe('Zadania od narratora', () => {
     assert.equal((await chest('daily')).data.error.code, 'opened');
     // The quests' own rewards wait to be claimed.
     assert.ok(opened.data.character.quests.daily.quests.every((quest) => quest.done && !quest.claimed));
-    // The week's quest of the daily chest counts it once.
-    const days = opened.data.character.quests.weekly.quests.find((quest) => quest.kind === 'dailies');
-    // A week drawn late asks for fewer: on a Sunday one (quests.js).
-    assert.deepEqual([days.progress, days.text], [1, `Otwórz skrzynię dziennych zadań ${days.count} ${days.count === 1 ? 'raz' : 'razy'}.`]);
+    // No quest of the week asks for daily chests (the author: "nie rób
+    // otwierania skrzynek zadań jako zadania").
+    assert.ok(!opened.data.character.quests.weekly.quests.some((quest) => quest.kind === 'dailies'));
+  });
+
+  test('the quests not done yet are drawn anew once a day, the week\'s once a week', async () => {
+    const rolled = await call('POST', '/api/quests/reroll', { cookie, body: { period: 'daily' } });
+    assert.equal(rolled.status, 200, JSON.stringify(rolled.data));
+    assert.equal(rolled.data.character.quests.daily.rerolled, true);
+    assert.ok(rolled.data.character.quests.daily.quests.every((quest) => quest.progress === 0 && !quest.claimed));
+    assert.equal((await call('POST', '/api/quests/reroll', { cookie, body: { period: 'daily' } })).data.error.code, 'rerolled');
+    assert.equal((await call('POST', '/api/quests/reroll', { cookie, body: { period: 'weekly' } })).status, 200);
+    assert.equal((await call('POST', '/api/quests/reroll', { cookie, body: { period: 'weekly' } })).data.error.code, 'rerolled');
+    assert.equal((await call('POST', '/api/quests/reroll', { cookie, body: { period: 'monthly' } })).data.error.code, 'invalid_period');
   });
 
   test('the weekly chest also holds an item of the level for the class, with room in the backpack', async () => {
@@ -2286,7 +2296,7 @@ describe('Zadania od narratora', () => {
     assert.equal(now.daily.period, questPeriod('daily', Date.now(), content).key);
     assert.deepEqual(now.weekly, week);
     await (await db()).prepare("UPDATE characters SET quests = '{}'").run();
-    assert.equal((await character()).quests.weekly.quests.length, 4);
+    assert.equal((await character()).quests.weekly.quests.length, 3);
     assert.ok((await stored()).weekly.period);
   });
 });

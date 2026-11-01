@@ -11,6 +11,7 @@ import {
   bagStacks,
   computeStats,
   drawQuests,
+  weekShare,
   expectedHerbs,
   gatherHerbs,
   gatheringMinutes,
@@ -184,9 +185,11 @@ describe('herbalism in the engine', () => {
     assert.ok(daily.length > 0);
     assert.ok(daily.every((quest) => quest.target === 'comfrey' && quest.count === 12));
     assert.equal(questText(daily[0], content), 'Zbierz 12 sztuk Żywokostu.');
+    // The week's 150 at level 12's share (weekly.curve).
+    const week = Math.round(150 * weekShare(12, 7, content));
     const weekly = drawn(true, 'weekly').filter((quest) => quest.kind.startsWith('gather'));
-    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'gatherAny' && quest.count === 150));
-    assert.equal(questText(weekly[0], content), 'Zbierz łącznie 150 ziół.');
+    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'gatherAny' && quest.count === week));
+    assert.equal(questText(weekly[0], content), `Zbierz łącznie ${week} ziół.`);
     const quests = {
       daily: { period: 'd', chest: false, quests: [{ kind: 'gather', target: 'comfrey', count: 12, progress: 5, claimed: false }] },
       weekly: { period: 'w', chest: false, quests: [{ kind: 'gatherAny', count: 60, progress: 0, claimed: false }] },

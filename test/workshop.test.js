@@ -17,6 +17,7 @@ import {
   craftUpgrades,
   craftableBases,
   drawQuests,
+  weekShare,
   itemMinutes,
   itemUpgradeCost,
   knownPatterns,
@@ -241,9 +242,11 @@ describe('the Warsztat in the engine', () => {
     const gold = (quests) => quests.filter((quest) => quest.reward.kind === 'gold').map((quest) => quest.reward.amount);
     assert.ok(gold(made).every((amount) => amount >= 92), gold(made).join());
     assert.ok(gold(daily.filter((quest) => quest.kind === 'explore')).every((amount) => amount <= 70));
+    // The week's 10 at level 12's share (weekly.curve).
+    const week = Math.round(10 * weekShare(12, 7, content));
     const weekly = drawn(true, 'weekly').filter((quest) => quest.kind.startsWith('make'));
-    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'makeAny' && quest.count === 10));
-    assert.equal(questText(weekly[0], content), 'Wykonaj łącznie 10 przedmiotów.');
+    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'makeAny' && quest.count === week));
+    assert.equal(questText(weekly[0], content), `Wykonaj łącznie ${week} przedmioty.`);
     const quests = {
       daily: { period: 'd', chest: false, quests: [{ kind: 'make', count: 1, progress: 0, claimed: false }] },
       weekly: { period: 'w', chest: false, quests: [{ kind: 'makeAny', count: 5, progress: 1, claimed: false }] },
@@ -388,9 +391,9 @@ describe('the Warsztat through the API', () => {
   test('the report brings the items into the bag, the profession\'s levels, the quests and the character\'s XP', async () => {
     const now = Date.now();
     const quest = (kind, count) => ({ kind, count, progress: 0, reward: { kind: 'gold', amount: 10 }, claimed: false });
-    const period = (periodId, quests) => ({ period: questPeriod(periodId, now, content).key, chest: false, quests });
-    // A character there since before the week, whose week is whole on any day.
-    await set('quests = ?, created_at = 0', JSON.stringify({ daily: period('daily', [quest('make', 1)]), weekly: period('weekly', [quest('makeAny', 5)]) }));
+    // A week as drawn now (`scaled`), kept as it is.
+    const period = (periodId, quests) => ({ period: questPeriod(periodId, now, content).key, chest: false, quests, ...(periodId === 'weekly' && { scaled: true }) });
+    await set('quests = ?', JSON.stringify({ daily: period('daily', [quest('make', 1)]), weekly: period('weekly', [quest('makeAny', 5)]) }));
     await craft({ baseId: 'axe', rarity: 'common', count: 2 });
     await age(120);
     const claimed = await call('POST', '/api/hunts/claim', { cookie });

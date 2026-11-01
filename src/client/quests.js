@@ -11,7 +11,7 @@ import { rod, roll, stopRoll } from './parchment.js';
 import { playSound } from './sound.js';
 import { call, onCharacterChange, serverNow, state } from './state.js';
 import { timePoints } from './time.js';
-import { toast, withButton } from './ui.js';
+import { confirmAction, toast, withButton } from './ui.js';
 
 const PERIODS = ['daily', 'weekly'];
 
@@ -62,7 +62,7 @@ function rewardChip(reward) {
 
 // The picture of a quest: the creature to beat (a shadow until met), or what
 // the work is done with.
-const QUEST_ICONS = { explore: 'swords', unlock: 'unlocked', dailies: 'gift' };
+const QUEST_ICONS = { explore: 'swords', unlock: 'unlocked' };
 
 function questArt(quest) {
   if (quest.kind === 'kill') {
@@ -174,6 +174,7 @@ function draw(now = serverNow()) {
       period.quests.length > 0
         ? h('ul', { class: 'quests-list' }, period.quests.map((quest) => questRow(tab, quest)))
         : h('p', { class: 'quests-empty', text: 'Na razie nie mam dla Ciebie zadań.' }),
+      rerollPart(tab, period),
       h('p', { class: 'quests-note', text: period.chest.text }),
     ),
     h(
@@ -205,6 +206,29 @@ export function watchQuests(now) {
   if (!quests || now < Math.min(...PERIODS.map((periodId) => quests[periodId].endsAt)) + 1000 || now < questsRetryAt) return;
   questsRetryAt = now + 30000;
   call('GET', '/api/character').catch((error) => toast(error.message));
+}
+
+// "Przelosuj zadania": the quests not done yet drawn anew, once a day for
+// the daily ones and once a week for the weekly ones (the author).
+function rerollPart(periodId, period) {
+  if (period.rerolled) {
+    return h('p', { class: 'quests-note', text: periodId === 'daily' ? 'Dzisiejsze zadania są już przelosowane.' : 'Zadania tego tygodnia są już przelosowane.' });
+  }
+  if (period.chest.opened || !period.quests.some((quest) => !quest.done && !quest.claimed)) return null;
+  return h('button', { type: 'button', class: 'button quests-reroll', text: 'Przelosuj zadania', onClick: (event) => withButton(event.currentTarget, () => reroll(periodId)) });
+}
+
+async function reroll(periodId) {
+  const when = periodId === 'daily' ? 'raz na dzień' : 'raz na tydzień';
+  const sure = await confirmAction({
+    title: 'Przelosować zadania?',
+    text: `Niewykonane zadania zmienią się na inne, a ich postęp przepadnie. Wykonane zostają. Przelosować możesz ${when}.`,
+    confirmLabel: 'Przelosuj',
+  });
+  if (!sure) return;
+  await call('POST', '/api/quests/reroll', { period: periodId });
+  playSound('system');
+  toast('Narrator ma dla Ciebie nowe zadania.');
 }
 
 async function claimReward(periodId, quest) {

@@ -53,7 +53,6 @@
               "kill",
               "killAny",
               "explore",
-              "dailies",
               "unlock",
               "process",
               "salvage",
@@ -269,6 +268,20 @@
           "type": "string",
           "pattern": "\\{days\\}",
           "description": "Napis pod zadaniami tygodnia wylosowanego w jego trakcie; {days}: dni, które zostały."
+        },
+        "curve": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Udział zwykłych liczb zadań tygodnia według poziomu postaci: punkty [poziom, udział], rosnąco po poziomie.",
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": [
+              { "type": "integer", "minimum": 1 },
+              { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+            ]
+          }
         }
       }
     },

@@ -12,6 +12,7 @@ import {
   brewingReport,
   catalystChance,
   drawQuests,
+  weekShare,
   knownPotions,
   mostPotions,
   notificationsDue,
@@ -126,9 +127,11 @@ describe('brewing in the engine', () => {
     assert.ok(daily.every((quest) => quest.target === 'lesser-healing' && quest.count === 3));
     assert.equal(questText(daily[0], content), 'Uwarz 3 Mniejsze mikstury leczenia.');
     assert.equal(questText({ ...daily[0], count: 1 }, content), 'Uwarz 1 Mniejszą miksturę leczenia.');
+    // The week's 40 at level 12's share (weekly.curve).
+    const week = Math.round(40 * weekShare(12, 7, content));
     const weekly = drawn(true, 'weekly').filter((quest) => quest.kind.startsWith('brew'));
-    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'brewAny' && quest.count === 40));
-    assert.equal(questText(weekly[0], content), 'Uwarz łącznie 40 mikstur.');
+    assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'brewAny' && quest.count === week));
+    assert.equal(questText(weekly[0], content), `Uwarz łącznie ${week} mikstur.`);
     const quests = {
       daily: { period: 'd', chest: false, quests: [{ kind: 'brew', target: 'lesser-healing', count: 3, progress: 1, claimed: false }] },
       weekly: { period: 'w', chest: false, quests: [{ kind: 'brewAny', count: 15, progress: 0, claimed: false }] },

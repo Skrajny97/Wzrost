@@ -4,9 +4,9 @@
 // its quests are. Each saves only if the character is as read (its version),
 // so two taps give one reward.
 
-import { QUEST_PERIODS, addQuestProgress, bagCapacity, campLevels, chestItem, chestReady, createRng, itemName, questDone, withChest, withClaimed } from '../engine/index.js';
+import { QUEST_PERIODS, bagCapacity, campLevels, chestItem, chestReady, createRng, itemName, questDone, rerolledQuests, withChest, withClaimed } from '../engine/index.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, equippedItems, loadPlayer, questsNow, requirePlayer } from './characters.js';
+import { bagPlaces, characterView, equippedItems, loadPlayer, questContext, questsNow, requirePlayer } from './characters.js';
 import { atomically, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 
@@ -108,9 +108,7 @@ export async function openChest(context) {
     const rng = createRng(`${row.id}:${periodId}:${period.period}:chest`);
     item = chestItem({ level: row.level, classId: row.class_id, classLevel: row.class_level }, equippedItems(player).map((worn) => worn.slot), rng, content);
   }
-  // The daily chest counts towards the week's quest of opening it on a few
-  // days (dailies in quests.json).
-  const after = periodId === 'daily' ? addQuestProgress(withChest(quests, periodId), { chests: 1 }) : withChest(quests, periodId);
+  const after = withChest(quests, periodId);
   // The batch holds only while the character is as read (atomic.js), so the
   // item comes only with the chest opened by this request (the code review:
   // another change meanwhile let the item come without the chest opening).
@@ -137,4 +135,25 @@ export async function openChest(context) {
     },
     character: characterView(await loadPlayer(db, session.userId), now),
   });
+}
+
+// { period }: the period's quests not done yet drawn anew, once a day for the
+// daily ones and once a week for the weekly ones (quests.js).
+export async function rerollQuests(context) {
+  const { session, player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  const periodId = periodOf(body);
+  const now = context.now;
+  const quests = questsNow(player, now);
+  const next = rerolledQuests(quests, periodId, questContext(player, now), now, content);
+  if (!next) {
+    throw quests[periodId].rerolled
+      ? new ApiError(409, 'rerolled', periodId === 'daily' ? 'Dzisiejsze zadania były już przelosowane.' : 'Zadania tego tygodnia były już przelosowane.')
+      : new ApiError(409, 'nothing_to_reroll', 'Nie ma zadań do przelosowania.');
+  }
+  const db = context.env.DB;
+  const row = player.row;
+  const result = await db.prepare('UPDATE characters SET quests = ?, version = version + 1 WHERE id = ? AND version = ?').bind(JSON.stringify(next), row.id, row.version).run();
+  if (result.meta.changes !== 1) throw changed();
+  return json({ character: characterView(await loadPlayer(db, session.userId), now) });
 }
