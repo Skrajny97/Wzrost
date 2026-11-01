@@ -262,12 +262,12 @@ export const SPRITES = {
     width: 192,
     height: 144,
     fit: true,
-    ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist', 'torch', 'torch-off'],
+    ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist', 'forge', 'tannery', 'stable', 'torch', 'torch-off'],
   },
   residents: {
     width: 96,
     height: 128,
-    ids: ['headman', 'enchantress', 'hermit', 'innkeeper', 'herbalist', 'merchant'],
+    ids: ['headman', 'enchantress', 'hermit', 'innkeeper', 'herbalist', 'merchant', 'smith', 'tanner', 'groom'],
   },
   // The companions hired in the Karczma: a bust for each class and look,
   // other faces than the players' portraits (question 107 B), cut off the

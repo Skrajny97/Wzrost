@@ -2996,6 +2996,14 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Odpowiedzi autora 330–336 (1.11.2026)
+
+Autor: „331 D / 333 A / 334 A / 335 A / 332 A / 330 B” oraz „336 A, resztę pisałem”.
+
+1. **Grafiki nowych miejsc Osady.** W grze są budynki: Kuźnia 330 B, Garbarnia 331 D i Stajnia 332 A, oraz popiersia: kowal Żelisław 333 A, garbarz Wszebor 334 A i koniuszy Mirosław 335 A. Budynki są przycięte do obrysu jak pozostałe na planszy.
+2. **336 A.** Skóry od Wszebora zostają w obecnych cenach, także gdy ktoś rozbiera je na Stole rozbiórki na części.
+3. **329.** Zostaje dotychczasowe zachowanie (A): wolne miejsce w wyprawie drużyny zajmuje towarzysz lidera z Kwater.
+
 ## Drużyna: najwyżej 5 poziomów klasy różnicy i tempo wierzchowców (1.11.2026, na wersji testowej)
 
 Autor: „Rozpiętość poziomu klas w Drużynie maks 5 lvl musi być też by nie było za dużego carrowania”.
