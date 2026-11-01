@@ -1,0 +1,28 @@
+{
+  "id": "bg-spring",
+  "payload": {
+    "prompt": "a quiet forest clearing at night with a small spring of glowing ice-blue water among mossy stones, faint blue light rising like mist, tall dark spruce trees on both sides, open ground in the middle, no people, tall vertical scene",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 821230732,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793552571,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 37.49,
+    "request_id": "f09a6d9e-e3be-4e2a-9423-f3f3bb0826e0",
+    "outputs_retained_until": 1793638943,
+    "billing": {
+      "source": "balance",
+      "balance_left": 37.49,
+      "balance_charged": 0.36
+    }
+  }
+}

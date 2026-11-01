@@ -1,0 +1,28 @@
+{
+  "id": "bg-tower",
+  "payload": {
+    "prompt": "the foot of an enormous dark stone tower rising into storm clouds, faint ice-blue runes glowing on its walls, a stone path leading to its gate, open ground in the middle, no people, tall vertical scene",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 786630070,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793552618,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 37.13,
+    "request_id": "92f29f8d-d93a-4cb3-9b7e-be7123610a6a",
+    "outputs_retained_until": 1793638974,
+    "billing": {
+      "source": "balance",
+      "balance_left": 37.13,
+      "balance_charged": 0.36
+    }
+  }
+}
