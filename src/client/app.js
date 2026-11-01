@@ -19,6 +19,7 @@ import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
 import { mountTowers } from './screens/towers.js';
 import { mountCommunity } from './screens/community.js';
+import { mountGuildPage } from './screens/guild.js';
 import { checkChat, onActivityEnds, onChatNews } from './chat-news.js';
 import { renderCreate } from './screens/create.js';
 import { renderSelect } from './screens/select.js';
@@ -65,6 +66,8 @@ const ROUTES = [
   // The Osada's board, or one of its places.
   { pattern: /^#\/osada(?:\/(?<place>[a-z0-9-]+))?$/, nav: 'main', tab: 'osada', mount: mountSettlement },
   { pattern: /^#\/spolecznosc$/, nav: 'main', tab: 'spolecznosc', mount: mountCommunity },
+  // The Gildia's own page, from its tab in the Społeczność.
+  { pattern: /^#\/gildia$/, nav: 'main', tab: null, lit: 'spolecznosc', mount: mountGuildPage },
   // A Wymiana with another player's character, from the Społeczność.
   { pattern: /^#\/wymiana$/, nav: 'main', tab: null, lit: 'spolecznosc', mount: mountTrade },
   { pattern: /^#\/dziennik(?:\/(?<tab>system))?$/, nav: 'main', tab: 'dziennik', mount: mountJournal },

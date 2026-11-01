@@ -6760,6 +6760,50 @@ button.skill-row {
   gap: 12px;
 }
 
+/* The Gildia page's heading over its picture, as the Ewolucja's, and the
+   way back to the Społeczność above it. */
+.guild-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 8px;
+}
+
+.guild-heading {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  max-width: 560px;
+  margin: 0 auto 12px;
+  padding: 12px 14px;
+  overflow: hidden;
+  border: 1px solid var(--bark-line);
+  border-radius: 6px;
+}
+
+.guild-heading::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--place-art) center / cover no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.85;
+}
+
+.guild-heading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgba(13, 17, 11, 0.85), rgba(13, 17, 11, 0) 55%);
+}
+
 /* The Ewolucja tab's heading over its spring with the ceremonial table:
    the picture dim, as behind the professions' cards, its name at the
    bottom. */

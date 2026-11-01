@@ -1,20 +1,36 @@
-// The Gildia in the Społeczność (src/server/guilds.js): the invitations
-// waiting for this character; its guild with the members, the leader and
-// the deputies marked, and what its role lets it do (invite a friend at a
-// tap or anyone by name, take an invitation back, remove, name a deputy,
-// hand the lead over); "Opuść
-// gildię"; and, outside a guild, founding one from its level for its gold.
-// The guild's channel is a tab of the Czat (community.js).
+// The Gildia's own page (#/gildia; src/server/guilds.js), opened from its
+// tab in the Społeczność (the author: "Wygeneruj też tło do zakładki
+// Gildii, ona powinna uruchamiać osobną stronę ... raczej strony z tłem"):
+// its picture behind the heading, the way back to the Społeczność, the
+// invitations waiting for this character; its guild with the members, the
+// leader and the deputies marked, and what its role lets it do (invite a
+// friend at a tap or anyone by name, take an invitation back, remove, name
+// a deputy, hand the lead over); "Opuść gildię"; and, outside a guild,
+// founding one from its level for its gold. The guild's channel is a tab
+// of the Czat (community.js).
 
+import { placeArt } from '../art.js';
 import { guildSeen } from '../chat-news.js';
 import { fill, h, icon } from '../dom.js';
 import { formatNumber } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
-import { call, state } from '../state.js';
+import { call, isUnlocked, state } from '../state.js';
 import { confirmAction, toast, withButton } from '../ui.js';
+import { lockedScreen } from './locked.js';
 
-export function mountGuild(container) {
+export function mountGuildPage(container, context) {
+  if (!isUnlocked('community')) return lockedScreen('community', 'Gildia')(container, context);
+  const art = placeArt(state.content.guildPlace);
+  const heading = h('div', { class: `page-heading${art ? ' guild-heading' : ''}` }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Gildia' }));
+  if (art) heading.style.setProperty('--place-art', `url("${art}")`);
+  const back = h('a', { class: 'link-button guild-back', href: '#/spolecznosc' }, icon('back', { size: 16 }), 'Społeczność');
+  const body = h('div');
+  fill(container, back, heading, body);
+  return mountGuild(body);
+}
+
+function mountGuild(container) {
   let view = null;
   let gone = false;
   const body = h('div', { class: 'friends guild' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));

@@ -54,7 +54,6 @@ import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, guildTag, openSheet, pageHeading, toast, withButton } from '../ui.js';
 import { itemDetails, itemSummary } from './character.js';
 import { mountFriends } from './friends.js';
-import { mountGuild } from './guild.js';
 import { mountParty } from './party.js';
 import { lockedScreen } from './locked.js';
 import { mountRanking } from './ranking.js';
@@ -71,12 +70,14 @@ const FOREVER = 8.64e15;
 const untilText = (until) => (until >= FOREVER ? 'na stałe' : `do ${dateTimeFormat.format(new Date(until))}`);
 
 const SECTION_KEY = 'insight-community-section';
+// The part whose tab opens the Gildia's own page (screens/guild.js).
+const GUILD_PAGE_SECTION = 'guilds';
 const SECTION_ICONS = { chat: 'chat', friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords' };
 const SECTION_NEWS = { chat: chatNews, friends: friendNews, party: partyNews, guilds: guildNews };
 
 export function mountCommunity(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Społeczność')(container, context);
-  const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking, party: mountParty, guilds: mountGuild };
+  const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking, party: mountParty };
   const sections = state.content.community.sections;
   const asked = takeConversation();
   let current = asked ? 'chat' : firstSection(sections);
@@ -97,6 +98,12 @@ export function mountCommunity(container, context) {
   // A part shown, with the bar under the list for its own row (the chat's
   // tabs); `person` is the private conversation for the chat to open.
   function show(id, person = null) {
+    // The Gildia has a page of its own (the author: "ona powinna uruchamiać
+    // osobną stronę"), so its tab leads there.
+    if (id === GUILD_PAGE_SECTION) {
+      location.hash = '#/gildia';
+      return;
+    }
     current = id;
     try {
       localStorage.setItem(SECTION_KEY, id);
@@ -133,7 +140,7 @@ export function mountCommunity(container, context) {
 
 function firstSection(sections) {
   if (!state.character.tutorial.includes('community-rules')) return 'chat';
-  const open = sections.filter((section) => !section.soon).map((section) => section.id);
+  const open = sections.filter((section) => !section.soon && section.id !== GUILD_PAGE_SECTION).map((section) => section.id);
   const news = open.find((id) => SECTION_NEWS[id]?.());
   if (news) return news;
   let kept = null;
