@@ -31,13 +31,16 @@ describe('the Wieże Systemu', () => {
     assert.deepEqual(towerFloor(3, 'climb', content), floor);
   });
 
-  test('every fifth floor an elite, every tenth a champion, and elites now and then on other floors', () => {
+  test('every fifth floor an elite, every fifteenth a champion (342 A), and elites now and then on other floors', () => {
     for (let floor = 5; floor <= 200; floor += 5) {
       const { encounter } = towerFloor(floor, 'climb', content);
       const area = towerArea(floor, content);
-      if (floor % 10 === 0 && area.champion) assert.equal(encounter.members[0].monsterId, area.champion, `floor ${floor}`);
+      if (floor % 15 === 0 && area.champion) assert.equal(encounter.members[0].monsterId, area.champion, `floor ${floor}`);
       else if (area.elite) assert.equal(encounter.members[0].monsterId, area.elite, `floor ${floor}`);
     }
+    // Champions of four lands, not of two (342 A).
+    const champions = new Set(Array.from({ length: 20 }, (_, index) => (index + 1) * 15).map((floor) => towerFloor(floor, 'climb', content).encounter).filter((encounter) => encounter.champion).map((encounter) => encounter.members[0].monsterId));
+    assert.ok(champions.size >= 4, [...champions].join(', '));
     const others = Array.from({ length: 1000 }, (_, index) => index + 1).filter((floor) => floor % 5 !== 0);
     const elites = others.filter((floor) => towerFloor(floor, 'climb', content).encounter.elite).length;
     assert.ok(elites > others.length * 0.05 && elites < others.length * 0.2, `${elites}`);
@@ -57,7 +60,7 @@ describe('an entry\'s fight', () => {
     // The same seed, the same fight.
     assert.deepEqual(towerFight({ character, equipped: [], name: 'Wspinacz', floor: 3, seed: 'a' }, content), won);
     // A champion floor: no champion's multiplier on the pay.
-    const champion = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 10, seed: 'b' }, content);
+    const champion = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 15, seed: 'b' }, content);
     assert.equal(champion.fights[0].champion, true);
     const monster = content.monstersById[champion.fights[0].enemies[0].monsterId];
     const { xpBase, xpExponent } = content.balance.rewards;

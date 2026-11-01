@@ -19,8 +19,10 @@ const character = newCharacter('warrior', { level: 25, classLevel: 25 });
 const [candidate] = drawCandidates({ character, seed: 'bond' }, NOW, content);
 
 describe('the relation with a companion in the engine', () => {
-  test('it grows with the time out together, a point at least for each exploration (296 A)', () => {
-    assert.equal(bondPoints(5, content), 1);
+  test('it grows with the time out together, to the fraction of a point (296 A, 341 A)', () => {
+    // To the fraction, no least point a trip (341 A).
+    assert.ok(Math.abs(bondPoints(5, content) - (5 * tuning.relation.perHour) / 60) < 1e-12);
+    assert.ok(Math.abs(bondPoints(1, content) * 60 - tuning.relation.perHour) < 1e-9);
     assert.equal(bondPoints(60, content), tuning.relation.perHour);
     assert.equal(bondPoints(240, content), 4 * tuning.relation.perHour);
     const after = companionAfterHunt({ ...candidate, relation: 7 }, { xp: 10, fainted: false, minutes: 120 }, 25, content);

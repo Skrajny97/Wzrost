@@ -129,8 +129,9 @@ export function companionStanding(companion, content) {
 export const bondBonus = (companion, content) => companionStanding(companion, content).index * tuning(content).relation.bonus;
 
 // The relation an exploration of `minutes` together brings (296 A: "rośnie
-// z każdą wspólną wyprawą"): perHour points an hour, at least one.
-export const bondPoints = (minutes, content) => Math.max(1, Math.floor((minutes * tuning(content).relation.perHour) / 60));
+// z każdą wspólną wyprawą"): perHour points an hour, to the fraction, with
+// no least point a trip (341 A: very short explorations farmed it).
+export const bondPoints = (minutes, content) => (minutes * tuning(content).relation.perHour) / 60;
 
 // A text in the form for a woman or a man: "[a|b]" is a for her, b for him.
 export const gendered = (text, appearance) => text.replace(/\[([^[\]|]*)\|([^[\]|]*)\]/g, (_, female, male) => (appearance === 'female' ? female : male));

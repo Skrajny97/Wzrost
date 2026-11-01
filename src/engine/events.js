@@ -32,8 +32,11 @@ import { monsterXp } from './progression.js';
 import { createRng } from './rng.js';
 import { say } from './text.js';
 
-// The chance an exploration that ended as planned brings an event.
-export const eventChance = (content) => content.events.chance;
+// The chance an exploration of `minutes` that ended as planned brings an
+// event: the full `chance` from fullChanceMinutes on, a share of it below,
+// so a short exploration brings events no more often per hour than a long
+// one (the author's 338 A: very short explorations farmed them).
+export const eventChance = (content, minutes = content.events.fullChanceMinutes) => content.events.chance * Math.min(1, minutes / content.events.fullChanceMinutes);
 
 // The events that can come after an exploration of an inner region: those
 // that name it among their `areas`, or any region when they name none (the
@@ -66,7 +69,7 @@ export function eventFor({ hunt, seed, first = false, quick = false, forced = nu
     return event && (drafts || !event.draft) && (settlement || !event.settlement) ? event : null;
   }
   const rng = createRng(`${seed}:event`);
-  if (!rng.chance(eventChance(content))) return null;
+  if (!rng.chance(eventChance(content, hunt.minutes))) return null;
   const open = eventsIn(hunt.areaId, drafts, content, settlement);
   return open.length ? rng.weighted(open, (event) => event.weight ?? 1) : null;
 }

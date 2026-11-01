@@ -2644,7 +2644,7 @@ Autor: „Trzeba zrobić tak by te zdarzenie miało różne możliwości docelow
 
 Autor: „Niech te zdarzenia działają na zasadzie losowości, niech trafiaja sie w 10% przypadków, a jakie.. no na razie jest to jedno tylko, ale zrobimy więcej i każde będzie miało równe prawdopodobieństwo”, „w sumie dodaj tylko to ze Blednica moze sie pojawic po zadaniu dodatkowych pytań albo umrzec urażona”, „nieee, ona ma sie ta kobieta zamieniać w Błędnice” i „Tylko niech zamiana w Błednice tez uzupelni pozniej Bestiariusz normalnie - dopilnuj tego”.
 
-1. **Szansa.** Zdarzenie przychodzi po 10% wypraw zakończonych zgodnie z planem, bez względu na ich długość (`chance` w `data/events.json`). Wyjątki bez zmian: pierwsza wyprawa (samouczek), Szybkie Polowanie, omdlenie i odwrót. Każde zdarzenie z listy ma tę samą szansę.
+1. **Szansa.** Zdarzenie przychodzi po 10% wypraw zakończonych zgodnie z planem, bez względu na ich długość (`chance` w `data/events.json`). *Zmienione 1.11.2026 (338 A): pełne 10% od 30 minut wyprawy, krótsze proporcjonalnie mniej.* Wyjątki bez zmian: pierwsza wyprawa (samouczek), Szybkie Polowanie, omdlenie i odwrót. Każde zdarzenie z listy ma tę samą szansę.
 2. **Pytania, gdy kobieta jest uczciwa.** „Zadaj dodatkowe pytania” w przypadkach „Wdzięczność” kończy się na jeden z dwóch sposobów, po 50%. Los rozstrzyga to dopiero po wyborze opcji:
     - kobieta umiera urażona na oczach postaci i postać nic nie zyskuje;
     - kobieta zamienia się w Błędnicę i postać walczy z nią sama, na poziomie postaci, z HP z końca wyprawy. Wygrana daje XP i złoto jak za Błędnicę spotkaną na wyprawie. Przedmiotów ani materiałów nie ma, jak w walce z bandytami. Przegrana to omdlenie, a w bezpiecznym miejscu odwrót. Błędnica w zdarzeniu nie ma premii poziomu: według symulacji postać wygrywa prawie zawsze i traci ok. 30–40% HP, czyli podobnie jak w zasadzce.
@@ -3025,6 +3025,17 @@ Autor: „331 D / 333 A / 334 A / 335 A / 332 A / 330 B” oraz „336 A, reszt�
 2. **336 A.** Skóry od Wszebora zostają w obecnych cenach, także gdy ktoś rozbiera je na Stole rozbiórki na części.
 3. **329.** Zostaje dotychczasowe zachowanie (A): wolne miejsce w wyprawie drużyny zajmuje towarzysz lidera z Kwater.
 
+## Odpowiedzi autora 338–343: poprawki mechanik (1.11.2026, na wersji testowej)
+
+Autor: „338 A / 339 A / 340 A / 341 A / 342 A / 343 A”. Liczby pochodzą z symulacji silnika gry.
+
+1. **338 A, zdarzenia a długość wyprawy.** Szansa na zdarzenie jest pełna (10%) od 30 minut wyprawy (`fullChanceMinutes` w `data/events.json`). Krótsza wyprawa ma ją proporcjonalnie mniejszą: 15 minut 5%, 5 minut ok. 1,7%, minuta ok. 0,33%. Dzięki temu na godzinę nie przychodzi więcej zdarzeń niż przy wyprawach półgodzinnych. Wcześniej minutowe wyprawy dawały 6 zdarzeń na godzinę, a z nimi o 74–118% więcej XP i ok. 2 przedmioty unikalne lub lepsze na godzinę.
+2. **339 A, Kuźnia.** Przekucie bierze 5 sztuk jednego materiału obecnej rzadkości przedmiotu, jak Kowadło (np. epicki na legendarny za 5 epickich). Wcześniej brało materiał nowej rzadkości, a materiałów legendarnych i rzadszych nikt nie sprzedaje, więc przekucie na legendarny, mityczny i boski było praktycznie niemożliwe.
+3. **340 A, Kowadło.** Szanse ulepszenia na +7, +8, +9 i +10 to teraz 50, 45, 40 i 35% (wcześniej 45, 35, 25 i 15%). Epicki przedmiot 50. poziomu na +10 kosztuje średnio ok. 210 tys. złota i ok. 190 sztuk materiału zamiast ok. 1 mln i ok. 930. Rozpad od +7 i spadek o poziom przy porażce zostają.
+4. **341 A, relacja z towarzyszem.** Wspólna wyprawa daje 4 punkty relacji za godzinę, co do ułamka, bez minimum punktu za wyprawę. Karta towarzysza zaokrągla brakujące punkty w górę.
+5. **342 A, czempioni w Wieżach.** Czempion czeka co 15. piętro (`championEvery` w `data/towers.json`). Wcześniej co 10. trafiał zawsze do tych samych dwóch regionów, więc pojawiali się tylko Bazyliszek i Król Błót. Teraz kolejno Wodnik, Bazyliszek, Odyniec i Król Błót.
+6. **343 A, Kuc.** Pierwszy wierzchowiec kosztuje 2 500 złota zamiast 5 000, żeby dało się go kupić niedługo po 20. poziomie.
+
 ## Garbarnia: wszystkie materiały stworów (1.11.2026, na wersji testowej)
 
 Autor: „Niech Garbarnia zajmuje się nie tylko skórami ale wszystkimi materiałami włącznie z łuskami żmii i podobnymi”.
@@ -3051,7 +3062,7 @@ Autor: „326 A” oraz „Kowal i to i rzadkość, niech to Bractwo ma zastosow
 1. **Miejsce.** Kuźnia stoi na planszy Osady w wolnym miejscu między Tablicą zleceń a Targowiskiem, przy drodze (x 56, y 31), tak żeby nie zasłaniała napisu Tablicy zleceń. Mieszka w niej kowal Żelisław z Bractwa Kowali. Dopóki autor nie wybierze budynku i popiersia (pytania 330–335), Kuźnia ma na planszy puste miejsce z nazwą.
 2. **Zwoje ochronne.** Kowal sprzedaje Zwój ochronny za 1000 złota, najwyżej 3 dziennie (doba jak przy zadaniach dziennych). Kupiony zwój trafia do tego samego licznika co zwoje z Warsztatu i tak samo chroni przed rozpadem na Kowadle. Podpowiedź na Kowadle mówi teraz, że zwój można też kupić u kowala.
 3. **Przekucie na wyższą rzadkość.** Kowal podnosi rzadkość przedmiotu o jeden stopień, raz na przedmiot. Afiksy przedmiotu rosną do wartości nowej rzadkości na jego poziomie, a afiks już wyższy zostaje. Przedmiot dostaje też jeden nowy afiks: tego rodzaju (przedrostek albo przyrostek), którego ma mniej, i inny niż te, które już ma. Przekuty przedmiot ma więc tyle afiksów co zwykły przedmiot nowej rzadkości. Ulepszenie z Kowadła, żywioł i zaklęte afiksy zostają.
-4. **Koszt przekucia (brakujący szczegół).** Złoto: 25 za poziom przedmiotu razy mnożnik sprzedaży nowej rzadkości, czyli 25 razy tyle, ile złomiarz płaci za przedmiot nowej rzadkości. Do tego 5 sztuk jednego materiału nowej rzadkości, tak jak Kowadło bierze materiał rzadkości przedmiotu. Przykład: rzadki miecz 20. poziomu przekuty na unikalny kosztuje 2000 złota i 5 sztuk unikalnego materiału.
+4. **Koszt przekucia (brakujący szczegół).** Złoto: 25 za poziom przedmiotu razy mnożnik sprzedaży nowej rzadkości, czyli 25 razy tyle, ile złomiarz płaci za przedmiot nowej rzadkości. Do tego 5 sztuk jednego materiału obecnej rzadkości przedmiotu, tak jak Kowadło bierze materiał rzadkości przedmiotu (*zmienione 1.11.2026, 339 A*: wcześniej materiał nowej rzadkości, przez co przekucie na legendarny i rzadsze było praktycznie niemożliwe). Przykład: rzadki miecz 20. poziomu przekuty na unikalny kosztuje 2000 złota i 5 sztuk rzadkiego materiału.
 5. **Relacja z kowalem (brakujący szczegół).** Najwyższa rzadkość, do której kowal przekuwa, rośnie ze stopniem relacji z nim: Obcy do unikalnej, Znajomy do epickiej, Stały klient do legendarnej, Zaufany do mitycznej, Przyjaciel do boskiej.
 6. **Bractwo Kowali.** Reputacja Bractwa Kowali obniża ceny kowala w złocie, za zwój i za przekucie, o 0, 5, 10, 15 albo 20% według jej stopnia. To odpowiedź na „niech to Bractwo ma zastosowanie jakieś”. Bractwo Kowali zbiera też reputację za zlecenia na części, zasoby i wyroby Warsztatu.
 7. **Handel daje relację i reputację.** Zakup zwojów i przekucie dają relację z kowalem i reputację Bractwa Kowali tak jak handel u Jagny: punkt za każde 5 złota razy poziom postaci, najwyżej 10 punktów dziennie. Kuźnia ma własny dzienny limit, osobny od handlu u Jagny i w Garbarni.
@@ -3063,7 +3074,7 @@ Autor: „postawimy Stajnie w Osadzie, gdzie możliwy będzie zakup Wierzchowcó
 
 1. **Stajnia na planszy.** Nowe miejsce „Stajnia” stoi po prawej stronie planszy Osady, na trawie między Karczmą a Chatą Pustelnika (x 80, y 62 w `places` w `data/settlement.json`). Mieszka w niej koniuszy Mirosław. Grafiki przyjdą później (328 A): budynek pod id `stable`, a popiersie pod id `groom` (`src/client/art.js`). Do tego czasu plansza pokazuje w tym miejscu napis „Stajnia” pod pustym, przerywanym zarysem, a ekran Stajni puste okienko na popiersie.
 2. **Wierzchowce (327 A).** Trzy stopnie, kupowane na stałe i po kolei, a wyższy zastępuje niższy. Liczby są w bloku `stable` w `data/settlement.json`, a jego schemat w `data/schemas/settlement.schema.json`. Nazwy i opisy koni to propozycje do poprawy przez autora:
-    - Kuc: wyprawy krótsze o 5%, 5 000 złota, od 20. poziomu postaci;
+    - Kuc: wyprawy krótsze o 5%, 5 000 złota (*od 1.11.2026 2 500, 343 A*), od 20. poziomu postaci;
     - Koń wierzchowy: o 10%, 30 000 złota, od 50. poziomu;
     - Rumak: o 15%, 150 000 złota, od 100. poziomu.
 3. **Krótsze jest tylko czekanie.** Wierzchowiec przesuwa wcześniej koniec wyprawy postaci: godzinna wyprawa z Kucem kończy się po 57 minutach, z Koniem wierzchowym po 54, a z Rumakiem po 51. Walki, nagrody, doświadczenie, minuty w raporcie, minuty wypraw w zadaniach narratora, czas mikstur i relacja z towarzyszami liczą się jak za wybraną długość. Brakujący szczegół: czas liczy się co do sekundy, więc 1-minutowa wyprawa z Kucem trwa 57 s, a 30-minutowa 28 min 30 s.
@@ -3353,7 +3364,7 @@ Autor: „Następnie przygotuj podwaliny pod Gildię i Lochy, którym ostateczni
 
 1. **Nazwa.** Lochy nazywają się teraz Wieże. Zakładka w Walce brzmi „Wieże” i dalej czeka zablokowana, od 50. poziomu.
 2. **Dwie wieże** (`data/towers.json`): Wieża Solo dla jednej postaci i Wieża Drużyn dla 2–3 postaci graczy. W Wieży Drużyn wolne miejsca zajmują zwerbowani towarzysze.
-3. **Piętra** (`src/engine/towers.js`, z testami). Piętro f ma zwykłe stwory jednego regionu wewnętrznego na poziomie f. Regiony idą po kolei od pierwszego (piętro 1 Skraj Wiatrołomów, 2 Lisie Jary…), a po ostatnim znów od pierwszego, więc wspinaczka prowadzi przez stwory wszystkich krain. Co 5. piętro czeka elita regionu, a na innych piętrach elita trafia się z szansą 10%. Co 10. piętro czeka czempion, a gdy region go nie ma, elita. Najwyższe otwarte piętro to poziom postaci, a w drużynie poziom najniższej postaci.
+3. **Piętra** (`src/engine/towers.js`, z testami). Piętro f ma zwykłe stwory jednego regionu wewnętrznego na poziomie f. Regiony idą po kolei od pierwszego (piętro 1 Skraj Wiatrołomów, 2 Lisie Jary…), a po ostatnim znów od pierwszego, więc wspinaczka prowadzi przez stwory wszystkich krain. Co 5. piętro czeka elita regionu, a na innych piętrach elita trafia się z szansą 10%. Co 10. piętro czeka czempion, a gdy region go nie ma, elita (*od 1.11.2026 co 15., 342 A*). Najwyższe otwarte piętro to poziom postaci, a w drużynie poziom najniższej postaci.
 4. **Werbunek** kosztuje tyle co dotąd.
 5. **Czeka na decyzje autora:** jak wspinaczka ma się mieć do wypraw i profesji, od którego poziomu Wieże się otwierają, co daje Gildia i ile osób ją tworzy (pytania 304–307). *Rozstrzygnięte: zob. „Wieże Systemu i Gildia”.*
 
@@ -3495,7 +3506,7 @@ Autor: „295 A / 296 A / 286 i 287 tak”.
 4. **Relacja z towarzyszem (296 A).** Stopnie są jak u mieszkańców: Obcy od 0 punktów, Znajomy od 50, Stały klient od 250, Zaufany od 700 i Przyjaciel od 1400.
     - Każdy stopień ponad Obcego daje towarzyszowi w walce +2% obrażeń i HP, czyli przy Przyjacielu +8%.
     - Karta towarzysza pokazuje stopień, premię i punkty do następnego stopnia.
-    - **Brakujący szczegół: ile punktów.** Wspólna wyprawa daje 4 punkty za godzinę i co najmniej punkt za wyprawę, a rozmowa 10. Przy 4 godzinach wypraw dziennie i jednej rozmowie relacja dochodzi do stopnia Znajomy po 2 dniach, a do stopnia Przyjaciel po około 2 miesiącach.
+    - **Brakujący szczegół: ile punktów.** Wspólna wyprawa daje 4 punkty za godzinę i co najmniej punkt za wyprawę, a rozmowa 10. *Zmienione 1.11.2026 (341 A): bez minimum punktu za wyprawę, punkty liczą się co do ułamka.* Przy 4 godzinach wypraw dziennie i jednej rozmowie relacja dochodzi do stopnia Znajomy po 2 dniach, a do stopnia Przyjaciel po około 2 miesiącach.
 5. **Samouczek Kwater.** Pytanie 294 jest wycofane, bo doszły rozmowy. Nowa kwestia czeka na akceptację w pytaniu 298.
 
 ## Wersja 0.0.67 (31.10.2026)

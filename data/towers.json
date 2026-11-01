@@ -27,7 +27,7 @@
   "floors": {
     "eliteEvery": 5,
     "eliteChance": 0.1,
-    "championEvery": 10
+    "championEvery": 15
   },
   "entries": {
     "perDay": 15

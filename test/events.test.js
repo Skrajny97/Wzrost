@@ -41,13 +41,18 @@ describe('events', () => {
     assert.equal(eventFor({ hunt, seed, forced }, content), woman);
   });
 
-  test('the seed decides whether one comes, in a tenth of explorations however long', () => {
+  test('the seed decides whether one comes: in a tenth of explorations from 30 minutes on, fewer of the shorter (338 A)', () => {
     assert.equal(eventChance(content), 0.1);
+    assert.equal(eventChance(content, 240), 0.1);
+    assert.equal(eventChance(content, 15), 0.05);
+    assert.ok(Math.abs(eventChance(content, 1) - 0.1 / 30) < 1e-12);
+    // Never more events an hour than at the full length.
+    for (const minutes of [1, 5, 10, 15, 20, 30, 60, 240]) assert.ok((eventChance(content, minutes) * 60) / minutes <= (0.1 * 60) / 30 + 1e-12, String(minutes));
     const seeds = Array.from({ length: 2000 }, (_, index) => `ziarno-${index}`);
-    for (const minutes of [5, 240]) {
+    for (const minutes of [5, 30, 240]) {
       const hunt = { result: 'success', areaId: 'windfalls-edge', minutes };
       const drawn = seeds.filter((one) => eventFor({ hunt, seed: one }, content));
-      assert.ok(Math.abs(drawn.length / seeds.length - eventChance(content)) < 0.025, `${minutes}: ${drawn.length}`);
+      assert.ok(Math.abs(drawn.length / seeds.length - eventChance(content, minutes)) < 0.025, `${minutes}: ${drawn.length}`);
     }
     const hunt = { result: 'success', areaId: 'windfalls-edge', minutes: 30 };
     for (const one of seeds.slice(0, 50)) assert.equal(eventFor({ hunt, seed: one }, content), eventFor({ hunt, seed: one }, content));

@@ -1601,8 +1601,8 @@ describe('upgrades', () => {
     }
   });
 
-  test('the chance falls from 95% to 15%, and from +7 a failure may break the item', () => {
-    assert.deepEqual([1, 2, 5, 10].map((target) => upgradeChance(target, content)), [0.95, 0.9, 0.65, 0.15]);
+  test('the chance falls from 95% to 35% (340 A), and from +7 a failure may break the item', () => {
+    assert.deepEqual([1, 2, 5, 7, 8, 9, 10].map((target) => upgradeChance(target, content)), [0.95, 0.9, 0.65, 0.5, 0.45, 0.4, 0.35]);
     assert.deepEqual([0, 6, 7, 9].map((level) => breakChance(level, content)), [0, 0, 0.1, 0.1]);
   });
 
@@ -1613,12 +1613,12 @@ describe('upgrades', () => {
     assert.deepEqual(rollUpgrade(mail, rolls(0.99, 0), content), { result: 'failure', upgrade: 0 });
     assert.deepEqual(rollUpgrade({ ...mail, upgrade: 7 }, rolls(0.99, 0.05), content), { result: 'broken', upgrade: 7 });
     assert.deepEqual(rollUpgrade({ ...mail, upgrade: 7 }, rolls(0.99, 0.5), content), { result: 'failure', upgrade: 6 });
-    // On real random numbers: at +8, about 25% success and 7.5% broken.
+    // On real random numbers: at +8, about 40% success and 6% broken.
     const rng = createRng('anvil');
     const counts = { success: 0, failure: 0, broken: 0 };
     for (let i = 0; i < 20000; i++) counts[rollUpgrade({ ...mail, upgrade: 8 }, rng, content).result]++;
-    assert.ok(Math.abs(counts.success / 20000 - 0.25) < 0.02, JSON.stringify(counts));
-    assert.ok(Math.abs(counts.broken / 20000 - 0.075) < 0.015, JSON.stringify(counts));
+    assert.ok(Math.abs(counts.success / 20000 - 0.4) < 0.02, JSON.stringify(counts));
+    assert.ok(Math.abs(counts.broken / 20000 - 0.06) < 0.015, JSON.stringify(counts));
   });
 
   test('the Kowadło allows as many levels as its own level, up to +10', () => {

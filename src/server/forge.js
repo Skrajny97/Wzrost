@@ -1,7 +1,7 @@
 // The Kuźnia in the Osada (question 326 A; the engine's forge.js): Żelisław
 // of the Bractwo Kowali sells the Zwój ochronny for the Kowadło, a few a
 // day, and raises an item's rarity by one step, once per item, for gold
-// and pieces of one material of the new rarity. Each trade grows the
+// and pieces of one material of the item's rarity. Each trade grows the
 // relation with him and the Bractwo Kowali's reputation, up to his own
 // day's limit (tradePoints), as the Garbarnia's trade has its own.
 
@@ -45,11 +45,11 @@ export function forgeView(player, stored, now) {
     trade: { today: stored.forgeTrade?.day === day ? stored.forgeTrade.points : 0, daily: forge().reputation.daily },
     items: player.items.map((item) => {
       const offer = raiseOffer(item, relation, reputation, content);
-      // The materials of the new rarity the character has enough of, as the
+      // The materials of the item's rarity the character has enough of, as the
       // Zaklinaczka lists them.
       const stacks = offer.gold
         ? Object.entries(materials)
-            .filter(([key, count]) => knownStack(key, content) && parseStack(key).rarityId === offer.next && count >= offer.materials)
+            .filter(([key, count]) => knownStack(key, content) && parseStack(key).rarityId === offer.material && count >= offer.materials)
             .map(([key, count]) => ({ key, label: materialView(key, count, content).label, count }))
         : [];
       return {
@@ -60,6 +60,7 @@ export function forgeView(player, stored, now) {
         equipped: Boolean(item.equippedSlot),
         ...offer,
         ...(offer.next && { nextName: content.raritiesById[offer.next].name }),
+        ...(offer.material && { materialName: content.raritiesById[offer.material].name }),
         ...(offer.top && { topName: content.raritiesById[offer.top].name }),
         stacks,
       };
@@ -99,8 +100,8 @@ export async function buyScrolls(context) {
 }
 
 // POST /api/settlement/forge/raise { itemId, material }: one rarity up, once
-// per item, for gold and pieces of one material of the new rarity (its key
-// "material:rarity"). A worn item waits for the return from an exploration.
+// per item, for gold and pieces of one material of the item's rarity (its
+// key "material:rarity"). A worn item waits for the return from an exploration.
 export async function raiseAtForge(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -118,8 +119,8 @@ export async function raiseAtForge(context) {
   if (offer.reason === 'relation') throw new ApiError(409, 'relation', `Na razie kowal przekuwa przedmioty najwyżej do rzadkości „${content.raritiesById[offer.top].name}”. Lepsza relacja z nim pozwoli iść wyżej.`);
   const key = typeof body.material === 'string' ? body.material : '';
   const materials = JSON.parse(row.materials ?? '{}');
-  if (!knownStack(key, content) || parseStack(key).rarityId !== offer.next) {
-    throw new ApiError(400, 'invalid_material', `Wybierz materiał o rzadkości „${content.raritiesById[offer.next].name}”.`);
+  if (!knownStack(key, content) || parseStack(key).rarityId !== offer.material) {
+    throw new ApiError(400, 'invalid_material', `Wybierz materiał o rzadkości „${content.raritiesById[offer.material].name}”.`);
   }
   if ((materials[key] ?? 0) < offer.materials) throw new ApiError(409, 'no_material', `Potrzeba ${offer.materials} szt. tego materiału.`);
   if (row.gold < offer.gold) throw new ApiError(409, 'no_gold', 'Brakuje złota.');

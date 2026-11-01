@@ -875,7 +875,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       if (!item) return pickItem();
       let material = item.stacks.some((one) => one.key === stack) ? stack : (item.stacks[0]?.key ?? null);
       const draw = () => {
-        const need = { count: item.materials, rarity: item.next, rarityName: item.nextName, stacks: item.stacks };
+        const need = { count: item.materials, rarity: item.material, rarityName: item.materialName, stacks: item.stacks };
         const cost = costPart({ gold: item.gold, need, material, title: 'Koszt przekucia', takes: 'Kowal bierze' });
         const ready = cost.goldShort === 0 && cost.materialReady;
         fill(

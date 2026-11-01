@@ -33,9 +33,10 @@ describe('the Kuźnia in the engine', () => {
     prices.forEach((price, index) => index > 0 && assert.ok(price < prices[index - 1], standings[index].id));
   });
 
-  test('raising takes gold by the level and the new rarity and pieces of a material of it, once per item', () => {
+  test('raising takes gold by the level and the new rarity and pieces of a material of the item\'s rarity, once per item', () => {
     const offer = raiseOffer(sword, 0, 0, content);
-    assert.deepEqual(offer, { next: 'unique', gold: tuning.raise.goldPerLevel * 20 * content.raritiesById.unique.sell, materials: tuning.raise.materials });
+    // The material of the item's own rarity (339 A), as the Kowadło takes.
+    assert.deepEqual(offer, { next: 'unique', gold: tuning.raise.goldPerLevel * 20 * content.raritiesById.unique.sell, materials: tuning.raise.materials, material: 'rare' });
     const cheaper = raiseOffer(sword, 0, standings[1].points, content);
     assert.equal(cheaper.gold, Math.round(offer.gold * (1 - tuning.discount[1])));
     assert.deepEqual(raiseOffer({ ...sword, raised: true }, 0, 0, content), { reason: 'raised' });
@@ -70,7 +71,7 @@ describe('the Kuźnia in the engine', () => {
 describe('the Kuźnia through the API', () => {
   const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'on', SETTLEMENT: 'on' });
   let cookie;
-  const material = `${content.materials[0].id}:unique`;
+  const material = `${content.materials[0].id}:rare`;
 
   beforeEach(async () => {
     ({ cookie } = await signUp('kuznia'));
@@ -110,14 +111,14 @@ describe('the Kuźnia through the API', () => {
     assert.equal(bought.data.bought.gold, Math.round(tuning.scroll.gold * (1 - tuning.discount[1])));
   });
 
-  test('the smith raises a rare sword to unikalny for gold and five pieces of a unique material, once', async () => {
+  test('the smith raises a rare sword to unikalny for gold and five pieces of a rare material, once', async () => {
     const database = await db();
     const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(sword)).run();
     const id = meta.last_row_id;
     const raise = (body) => call('POST', '/api/settlement/forge/raise', { cookie, body: { itemId: id, ...body } });
     const offer = raiseOffer(sword, 0, 0, content);
     assert.equal((await raise({})).data.error.code, 'invalid_material');
-    assert.equal((await raise({ material: `${content.materials[0].id}:rare` })).data.error.code, 'invalid_material');
+    assert.equal((await raise({ material: `${content.materials[0].id}:unique` })).data.error.code, 'invalid_material');
     assert.equal((await raise({ material })).data.error.code, 'no_material');
     await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ [material]: offer.materials })).run();
     const shown = (await call('GET', '/api/settlement', { cookie })).data.settlement.forge.items.find((item) => item.id === id);
@@ -145,9 +146,9 @@ describe('the Kuźnia through the API', () => {
     const database = await db();
     const unique = { ...sword, rarity: 'unique' };
     const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(unique)).run();
-    const epic = `${content.materials[0].id}:epic`;
-    await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ [epic]: 20 })).run();
-    const raise = () => call('POST', '/api/settlement/forge/raise', { cookie, body: { itemId: meta.last_row_id, material: epic } });
+    const uniqueMaterial = `${content.materials[0].id}:unique`;
+    await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ [uniqueMaterial]: 20 })).run();
+    const raise = () => call('POST', '/api/settlement/forge/raise', { cookie, body: { itemId: meta.last_row_id, material: uniqueMaterial } });
     assert.equal((await raise()).data.error.code, 'relation');
     await database.prepare('UPDATE characters SET settlement = ?').bind(JSON.stringify({ relations: { [tuning.resident]: standings[1].points } })).run();
     const raised = await raise();

@@ -98,7 +98,8 @@ function wearList(companion, apply) {
 function bondBlock(bond) {
   const parts = [`Relacja: ${bond.standing}`];
   if (bond.bonus > 0) parts.push(`w walce +${formatDecimal(bond.bonus * 100)}% obrażeń i HP`);
-  if (bond.next) parts.push(`do stopnia ${bond.next.name}: ${formatNumber(bond.next.points - bond.points)} pkt`);
+  // The points grow by fractions of a point (341 A): the rest rounded up.
+  if (bond.next) parts.push(`do stopnia ${bond.next.name}: ${formatNumber(Math.ceil(bond.next.points - bond.points))} pkt`);
   return h(
     'div',
     { class: 'settlement-companion-bond' },

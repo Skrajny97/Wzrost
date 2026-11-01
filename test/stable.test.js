@@ -16,11 +16,11 @@ const MINUTE = 60000;
 const { stable } = content.settlement;
 
 describe('the Stajnia in the engine', () => {
-  test("three stages as the author set them: 5, 10 and 15% for 5 000, 30 000 and 150 000 gold, from levels 20, 50 and 100", () => {
+  test("three stages as the author set them: 5, 10 and 15% for 2 500 (343 A), 30 000 and 150 000 gold, from levels 20, 50 and 100", () => {
     assert.deepEqual(
       stable.mounts.map(({ shorter, gold, level }) => [shorter, gold, level]),
       [
-        [0.05, 5000, 20],
+        [0.05, 2500, 20],
         [0.1, 30000, 50],
         [0.15, 150000, 100],
       ],
@@ -72,9 +72,9 @@ describe('the Stajnia in the engine', () => {
     assert.equal(mountBlock(1, 2, rich, content).code, 'owned');
     assert.equal(mountBlock(4, 3, rich, content).code, 'invalid_mount');
     assert.equal(mountBlock('1', 0, rich, content).code, 'invalid_mount');
-    assert.equal(mountBlock(1, 0, { level: 19, gold: 5000 }, content).code, 'locked');
-    assert.equal(mountBlock(1, 0, { level: 20, gold: 4999 }, content).code, 'not_enough_gold');
-    assert.equal(mountBlock(1, 0, { level: 20, gold: 5000 }, content), null);
+    assert.equal(mountBlock(1, 0, { level: 19, gold: 2500 }, content).code, 'locked');
+    assert.equal(mountBlock(1, 0, { level: 20, gold: 2499 }, content).code, 'not_enough_gold');
+    assert.equal(mountBlock(1, 0, { level: 20, gold: 2500 }, content), null);
     assert.equal(mountBlock(3, 2, { level: 99, gold: 1e9 }, content).code, 'locked');
   });
 });
@@ -86,7 +86,7 @@ describe('the Stajnia through the API', () => {
   beforeEach(async () => {
     ({ cookie } = await signUp('koniuszy'));
     await call('POST', '/api/character', { cookie, body: { name: 'Jezdziec', classId: 'warrior', appearance: 'female' } });
-    await set('level = 20, class_level = 20, gold = 4999, hp = 99999');
+    await set('level = 20, class_level = 20, gold = 2499, hp = 99999');
   });
 
   const set = async (sql, ...binds) => (await db()).prepare(`UPDATE characters SET ${sql}`).bind(...binds).run();
@@ -99,7 +99,7 @@ describe('the Stajnia through the API', () => {
     assert.deepEqual(
       view.stable.mounts.map(({ stage, gold, level }) => [stage, gold, level]),
       [
-        [1, 5000, 20],
+        [1, 2500, 20],
         [2, 30000, 50],
         [3, 150000, 100],
       ],
@@ -109,7 +109,7 @@ describe('the Stajnia through the API', () => {
     assert.equal((await buy(1)).data.error.code, 'not_enough_gold');
     assert.equal((await buy(2)).data.error.code, 'mount_order');
     assert.equal((await buy(4)).status, 400);
-    await set('gold = 5000');
+    await set('gold = 2500');
     const first = await buy(1);
     assert.equal(first.status, 200);
     assert.equal(first.data.character.gold, 0);
@@ -146,7 +146,7 @@ describe('the Stajnia through the API', () => {
   });
 
   test('an exploration ends sooner with a mount, and its report keeps the length chosen', async () => {
-    await set('gold = 5000');
+    await set('gold = 2500');
     assert.equal((await buy(1)).status, 200);
     const start = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } });
     assert.equal(start.status, 201);
@@ -173,7 +173,7 @@ describe('the Stajnia through the API', () => {
     assert.equal(plain.data.character.activity.endsAt - plain.data.character.activity.startedAt, 30 * MINUTE);
     await call('POST', '/api/hunts/cancel', { cookie });
 
-    await set('gold = 5000');
+    await set('gold = 2500');
     assert.equal((await buy(1)).status, 200);
     const quick = await call('POST', '/api/hunts/quick', { cookie, body: { areaId: 'windfalls-edge' } });
     assert.equal(quick.status, 200);

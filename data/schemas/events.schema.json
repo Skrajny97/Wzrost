@@ -3,7 +3,7 @@
   "title": "Zdarzenia na końcu wyprawy",
   "type": "object",
   "additionalProperties": false,
-  "required": ["chance", "texts", "list", "foes"],
+  "required": ["chance", "fullChanceMinutes", "texts", "list", "foes"],
   "definitions": {
     "outcome": {
       "type": "object",
@@ -129,6 +129,7 @@
   "properties": {
     "$comment": { "type": "string" },
     "chance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa na zdarzenie po wyprawie zakończonej zgodnie z planem." },
+    "fullChanceMinutes": { "type": "integer", "minimum": 1, "description": "Od tylu minut wyprawy szansa na zdarzenie jest pełna; krótsza wyprawa ma ją proporcjonalnie mniejszą (338 A)." },
     "texts": {
       "type": "object",
       "additionalProperties": false,
