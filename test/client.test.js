@@ -148,6 +148,9 @@ test('every sprite on the list has its file at its size, and every class has its
     resources: data('resources').map((resource) => resource.id),
     // Gold, Punkty Czasu and the Encyclopedia's corner.
     icons: ['gold', 'time-points', 'encyclopedia'],
+    // The Stajnia's mounts, and the character riding them, one for each walk.
+    mounts: data('settlement').stable.mounts.map((mount) => mount.id),
+    riders: [...data('classes'), ...data('evolutions').evolutions].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
   };
   for (const [kind, { size, width = size, height = size, fit = false, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);
@@ -173,7 +176,7 @@ test('every sprite on the list has its file at its size, and every class has its
     data('evolutions').evolutions.flatMap((evolution) => looks.map((look) => `${evolution.id}-${look}`)).filter((id) => SPRITES.portraits.ids.includes(id)).sort(),
   );
   const tones = data('skins').skins.filter((tone) => tone.ramp).map((tone) => tone.id);
-  for (const [kind, ids] of [['portraits', [...SPRITES.portraits.toned, ...SPRITES.portraits.tonedEvolutions]], ['walkers', SPRITES.walkers.ids]]) {
+  for (const [kind, ids] of [['portraits', [...SPRITES.portraits.toned, ...SPRITES.portraits.tonedEvolutions]], ['walkers', SPRITES.walkers.ids], ['riders', SPRITES.riders.ids]]) {
     for (const id of ids) for (const tone of tones) assert.ok(existsSync(join(CLIENT, 'art', kind, `${id}-${tone}.png`)), `${kind}: ${id}-${tone}.png is missing`);
   }
   // A bust centres on a face inside the portrait.

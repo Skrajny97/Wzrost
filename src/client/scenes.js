@@ -6,7 +6,7 @@
 // rare moment: a bird crossing the sky, steam from the cauldron, sparks from
 // the hammer, or the shadow of a creature of the place passing far away.
 
-import { herbSprite, itemSprite, monsterSprite, placeArt, potionSprite, walkerSheet } from './art.js';
+import { herbSprite, itemSprite, monsterSprite, placeArt, potionSprite, riderFile, walkerSheet } from './art.js';
 import { h } from './dom.js';
 import { motionOn } from './motion.js';
 import { state } from './state.js';
@@ -74,7 +74,7 @@ export function walkScene(activity) {
   if (!walk) return null;
   const { classId, appearance, skin, evolution } = state.character ?? {};
   const own = walkerSheet(classId, appearance, skin, evolution?.current?.id);
-  const figure = own ? frames({ ...walk.walker, file: own }, 'scene-walker scene-walker--own') : frames(walk.figure, 'scene-walker');
+  const figure = ride(walk, state.character) ?? (own ? frames({ ...walk.walker, file: own }, 'scene-walker scene-walker--own') : frames(walk.figure, 'scene-walker'));
   const stage = h('div', { class: `scene-walk scene--${dayPart()}` }, h('div', { class: 'scene-path' }), figure);
   const land = walk.lands[activity.regionId];
   if (land) stage.style.setProperty('--land', `url("/${land}")`);
@@ -87,6 +87,41 @@ export function walkScene(activity) {
   stage.style.setProperty('--path-duration', `${(PATH.width * PATH.scale) / walk.pathSpeed}s`);
   nowAndThen(stage, () => (pick(walk.moments) === 'shadow' ? shadow(stage, activity) : bird(stage)));
   return { element: h('div', { class: 'scene', 'aria-hidden': 'true' }, stage), update: () => {} };
+}
+
+// With a mount from the Stajnia the character rides it (the author:
+// "zbudować szkielet jazdy na każdym wierzchowcu i przerobić na niego
+// wszystkie portrety, czy chody"): the mount's trot (walk.mounts in
+// data/animations.json) and over it the rider in the character's look and
+// skin tone, sitting where the saddle is in each frame (`seats`, found by
+// tools/ride-sheets.py; the rider's own `seat` in walk.rider). The rider's
+// rise and fall is the mount's keyframes in styles.css (ride-<id>), started
+// with its frames, so the two keep in step. Null without a mount, or while
+// the mount or the look has no pictures.
+function ride(walk, character) {
+  const trot = character?.mount && walk.mounts?.[character.mount.id];
+  const file = trot && riderFile(character.classId, character.appearance, character.skin, character.evolution?.current?.id);
+  if (!file) return null;
+  const [x, y] = trot.seats[0];
+  const [seatX, seatY] = walk.rider.seat;
+  const top = Math.max(0, seatY - Math.min(...trot.seats.map((seat) => seat[1])));
+  const element = h(
+    'div',
+    { class: 'scene-ride' },
+    h('div', { class: 'scene-ride-mount' }),
+    h('img', { src: `/${file}`, alt: '', width: walk.rider.width, height: walk.rider.height, class: 'scene-ride-rider', draggable: 'false' }),
+  );
+  element.style.setProperty('--ride-width', `${trot.width}px`);
+  element.style.setProperty('--ride-height', `${trot.height + top}px`);
+  element.style.setProperty('--mount-height', `${trot.height}px`);
+  element.style.setProperty('--sheet', `url("/${trot.file}")`);
+  element.style.setProperty('--sheet-width', `${trot.width * trot.frames}px`);
+  element.style.setProperty('--frames', String(trot.frames));
+  element.style.setProperty('--duration', `${trot.frames / trot.fps}s`);
+  element.style.setProperty('--rider-x', `${x - seatX}px`);
+  element.style.setProperty('--rider-y', `${top + y - seatY}px`);
+  element.style.setProperty('--ride', `ride-${character.mount.id}`);
+  return element;
 }
 
 // Herbs in the basket, potions on the shelf, items on the table: the things

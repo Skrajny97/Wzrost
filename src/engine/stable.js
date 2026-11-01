@@ -32,11 +32,12 @@ export function huntWait(minutes, stage, content) {
   return Math.round(minutes * 60 * (1 - shorter)) * 1000;
 }
 
-// The character's mount for the page: its stage, name and share, or null.
+// The character's mount for the page: its stage, id (its pictures), name
+// and share, or null.
 export function mountView(stored, content) {
   const stage = mountStage(stored, content);
   const mount = mountOf(stage, content);
-  return mount && { stage, name: mount.name, shorter: mount.shorter };
+  return mount && { stage, id: mount.id, name: mount.name, shorter: mount.shorter };
 }
 
 // Why the character, with the mount of `owned` (0 for none), its `level`

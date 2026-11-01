@@ -7739,6 +7739,33 @@ a.profession-square:active {
 .scene-walker--own {
   bottom: 28px;
 }
+/* The character riding its mount (scenes.js ride): the mount's trot as frames,
+   and the rider in the saddle, rising and falling with it (ride-<id> below). */
+.scene-ride {
+  position: absolute;
+  z-index: 2;
+  left: calc(50% - var(--ride-width) / 2);
+  bottom: 18px;
+  width: var(--ride-width);
+  height: var(--ride-height);
+}
+.scene-ride-mount {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--ride-width);
+  height: var(--mount-height);
+  background: var(--sheet) 0 0 / var(--sheet-width) var(--mount-height) no-repeat;
+  image-rendering: pixelated;
+  animation: scene-frames var(--duration) steps(var(--frames)) infinite;
+}
+.scene-ride-rider {
+  position: absolute;
+  left: var(--rider-x);
+  top: var(--rider-y);
+  image-rendering: pixelated;
+  animation: var(--ride) var(--duration) step-end infinite;
+}
 .scene--dawn {
   filter: brightness(1.04) sepia(0.18) saturate(1.1);
 }
@@ -9180,6 +9207,13 @@ a.profession-square:active {
 }
 
 /* The Pustelnik's services, one under another, each the whole width. */
+/* A mount on its Stajnia card, at the size it trots in the Walka scene. */
+.mount-art {
+  display: block;
+  margin: 0 auto 4px;
+  image-rendering: pixelated;
+}
+
 .settlement-actions--stack {
   grid-template-columns: 1fr;
 }

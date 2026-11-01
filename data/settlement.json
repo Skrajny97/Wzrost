@@ -183,9 +183,9 @@
     "resident": "groom",
     "relationGain": 50,
     "mounts": [
-      { "name": "Kuc", "description": "Krępy i cierpliwy. Nie wygra wyścigu, ale nie zgubi ścieżki.", "shorter": 0.05, "gold": 2500, "level": 20 },
-      { "name": "Koń wierzchowy", "description": "Wytrwały gniadosz z Rozstajów. Idzie cały dzień bez postoju.", "shorter": 0.1, "gold": 30000, "level": 50 },
-      { "name": "Rumak", "description": "Najlepszy koń w stajni. Przeskoczy zwalony pień, a w lesie nie zna strachu.", "shorter": 0.15, "gold": 150000, "level": 100 }
+      { "id": "pony", "name": "Kuc", "description": "Krępy i cierpliwy. Nie wygra wyścigu, ale nie zgubi ścieżki.", "shorter": 0.05, "gold": 2500, "level": 20 },
+      { "id": "horse", "name": "Koń wierzchowy", "description": "Wytrwały gniadosz z Rozstajów. Idzie cały dzień bez postoju.", "shorter": 0.1, "gold": 30000, "level": 50 },
+      { "id": "steed", "name": "Rumak", "description": "Najlepszy koń w stajni. Przeskoczy zwalony pień, a w lesie nie zna strachu.", "shorter": 0.15, "gold": 150000, "level": 100 }
     ]
   },
   "tavern": {

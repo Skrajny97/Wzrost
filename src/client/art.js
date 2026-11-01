@@ -293,6 +293,25 @@ export const SPRITES = {
     height: 768,
     ids: ['settlement'],
   },
+  // The Stajnia's mounts (data/settlement.json, stable.mounts, by id), saddled
+  // and seen from the side, cut to their outline, on their cards in the
+  // Stajnia. Their trot for the Walka scene is a sheet of its own
+  // (data/animations.json, walk.mounts).
+  mounts: {
+    width: 168,
+    height: 144,
+    fit: true,
+    ids: [],
+  },
+  // The character riding, <class>-<look> or an evolution's
+  // <evolution>-<look>: one picture sitting in a saddle that is not drawn
+  // (tools/ride-skeleton.py), put on the mount's trot in the Walka scene. A
+  // skin tone other than the one drawn has its own file, as a walk does.
+  riders: {
+    width: 64,
+    height: 96,
+    ids: [],
+  },
 };
 
 const available = Object.fromEntries(Object.entries(SPRITES).map(([kind, { ids }]) => [kind, new Set(ids)]));
@@ -441,6 +460,18 @@ export function walkerSheet(classId, appearance, skin, evolution) {
   const evolved = evolution ? `${evolution}-${appearance}` : null;
   const id = evolved && available.walkers.has(evolved) ? evolved : `${classId}-${appearance}`;
   return available.walkers.has(id) ? `art/walkers/${toneFile(id, skin)}.png` : null;
+}
+
+// A mount of the Stajnia on its card, or null while it has no picture.
+export const mountArt = (id) =>
+  available.mounts.has(id) ? h('img', { src: `/art/mounts/${id}.png`, alt: '', class: 'sprite mount-art', decoding: 'async', draggable: 'false' }) : null;
+
+// The character riding, in its look and skin tone (or its evolution's), as a
+// path from the site's root, or null for a look without one.
+export function riderFile(classId, appearance, skin, evolution) {
+  const evolved = evolution ? `${evolution}-${appearance}` : null;
+  const id = evolved && available.riders.has(evolved) ? evolved : `${classId}-${appearance}`;
+  return available.riders.has(id) ? `art/riders/${toneFile(id, skin)}.png` : null;
 }
 
 // The narrator's hooded face, for the quests in the top bar (quests.js).

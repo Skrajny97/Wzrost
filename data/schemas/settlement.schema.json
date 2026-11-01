@@ -267,8 +267,9 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["name", "description", "shorter", "gold", "level"],
+            "required": ["id", "name", "description", "shorter", "gold", "level"],
             "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z-]*$", "description": "Id grafik wierzchowca: obrazek w Stajni (art/mounts/<id>.png) i kłus w scenie Walki (art/mounts/<id>-trot.png)." },
               "name": { "type": "string", "minLength": 1 },
               "description": { "type": "string", "minLength": 1 },
               "shorter": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1, "description": "O jaką część krócej czeka się na koniec wyprawy." },

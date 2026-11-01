@@ -5,6 +5,7 @@
 // src/engine/stable.js): the length less the mount's share, to the whole
 // second. Only the wait is shorter; the rewards stay those of the length.
 
+import { mountArt } from './art.js';
 import { h } from './dom.js';
 import { formatMinutes, formatNumber } from './format.js';
 import { call, state } from './state.js';
@@ -87,6 +88,9 @@ export function stableCard({ stage, mounts }, apply) {
         h(
           'li',
           { class: 'card settlement-good' },
+          // The mount itself (the author: "wygenerować grafiki wierzchowców i
+          // wkleić do stajni"), at the size it trots in the Walka scene.
+          mountArt(mount.id),
           h('p', {}, h('strong', { text: mount.name }), mount.stage === stage && [' ', h('span', { class: 'chip chip--success', text: 'Twój' })]),
           h('p', { class: 'muted', text: mount.description }),
           h('p', { text: `Wyprawy krótsze o ${percent(mount.shorter)}: godzinna trwa ${formatWait(stableWait(60, mount))}.` }),

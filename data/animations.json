@@ -7,6 +7,8 @@
   },
   "walk": {
     "figure": { "file": "art/scenes/walker.png", "size": 48, "frames": 4, "fps": 8 },
+    "rider": { "width": 64, "height": 96, "seat": [18, 59] },
+    "mounts": {},
     "walker": { "size": 128, "frames": 8, "fps": 8, "scale": 1 },
     "path": "art/scenes/path.png",
     "lands": {

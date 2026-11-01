@@ -59,7 +59,7 @@ describe('the Stajnia in the engine', () => {
     assert.equal(mountStage({ mount: 9 }, content), stable.mounts.length);
     assert.equal(mountStage({ mount: 'tak' }, content), 0);
     assert.equal(mountView({}, content), null);
-    assert.deepEqual(mountView({ mount: 1 }, content), { stage: 1, name: stable.mounts[0].name, shorter: 0.05 });
+    assert.deepEqual(mountView({ mount: 1 }, content), { stage: 1, id: 'pony', name: stable.mounts[0].name, shorter: 0.05 });
   });
 
   test('mounts are bought in order, each from its level and for its gold', () => {
@@ -114,7 +114,7 @@ describe('the Stajnia through the API', () => {
     assert.equal(first.status, 200);
     assert.equal(first.data.character.gold, 0);
     assert.equal(first.data.settlement.stable.stage, 1);
-    assert.deepEqual(first.data.character.mount, { stage: 1, name: stable.mounts[0].name, shorter: 0.05 });
+    assert.deepEqual(first.data.character.mount, { stage: 1, id: 'pony', name: stable.mounts[0].name, shorter: 0.05 });
     // Mirosław's relation grows with each mount bought, and his greeting
     // with it; no brotherhood's reputation does.
     const groom = first.data.settlement.residents.find((resident) => resident.id === stable.resident);
