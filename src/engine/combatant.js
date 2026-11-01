@@ -125,14 +125,24 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   // that may go there (parties.js; the author: "zwiększ poziom trudności o
   // trochę od 25 lvla Postaci, czyli od Omszałych Głazów w górę").
   const coop = level >= balance.monsters.coop.fromLevel ? balance.monsters.coop : { damage: 0, hp: 0 };
+  // From level 50 on, where companions and evolutions are in full play, they
+  // grow stronger again, the same way (the author: "Od 50 lvla zwiększamy
+  // curve trudności, bo wchodza na pełnej i towarzysze i ewolucje").
+  const late = balance.monsters.lateGame;
+  const later = midGameShare(level, late);
   const average =
-    weaponDamage(hide, monster.attack.damageFactor, balance) * balance.monsters.damageMultiplier * groupFactor * (1 + mid.damage * stronger) * (1 + coop.damage);
+    weaponDamage(hide, monster.attack.damageFactor, balance) *
+    balance.monsters.damageMultiplier *
+    groupFactor *
+    (1 + mid.damage * stronger) *
+    (1 + coop.damage) *
+    (1 + late.damage * later);
   const resist = {};
   for (const [element, value] of Object.entries(monster.resistances ?? {})) {
     resist[element] = Math.round(value.base + value.perLevel * (level - 1));
   }
   const rawHp = balance.monsters.hpBase + balance.character.hpPerVitality * stat('vitality') + balance.monsters.hpPerLevel * level;
-  const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp)));
+  const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp) * (1 + late.hp * later)));
   return {
     id,
     side,

@@ -1073,7 +1073,8 @@
         "damageMultiplier",
         "gearLagMinutes",
         "midGame",
-        "coop"
+        "coop",
+        "lateGame"
       ],
       "properties": {
         "coop": {
@@ -1112,6 +1113,18 @@
         "midGame": {
           "type": "object",
           "description": "Środek gry: od fromLevel potwory zadają o damage więcej obrażeń i mają o hp więcej HP, rosnąco do pełnej wartości na toLevel i dalej. Wcześniejsze poziomy bez zmian.",
+          "additionalProperties": false,
+          "required": ["fromLevel", "toLevel", "damage", "hp"],
+          "properties": {
+            "fromLevel": { "type": "integer", "minimum": 1 },
+            "toLevel": { "type": "integer", "minimum": 2 },
+            "damage": { "type": "number", "minimum": 0 },
+            "hp": { "type": "number", "minimum": 0 }
+          }
+        },
+        "lateGame": {
+          "type": "object",
+          "description": "Od fromLevel, gdzie w pełni działają towarzysze i ewolucje, potwory znów rosną w siłę: o damage więcej obrażeń i o hp więcej HP, rosnąco do pełnej wartości na toLevel i dalej (autor: „Od 50 lvla zwiększamy curve trudności, bo wchodza na pełnej i towarzysze i ewolucje”).",
           "additionalProperties": false,
           "required": ["fromLevel", "toLevel", "damage", "hp"],
           "properties": {

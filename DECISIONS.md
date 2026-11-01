@@ -3003,7 +3003,9 @@ Autor: „347.1 do 349.1 wszystko A tylko 349.2 B”, poprawki tekstu rolki o wa
 1. **352.** Kwestie 347.1–349.1 zostają w wersjach A, a kwestia 349.2 (Stajnia, tempo drużyny) ma wersję B. W grze 0.0.77 jest jeszcze jej wersja A. Wersja B wejdzie z najbliższym wdrożeniem.
 2. **351, tekst rolki o walce.** Autor wyrzucił zdanie o Kowadle, Zaklinaczce i Kuźni, więc 351.4 brzmi tylko „Ekwipunek ma rzadkość i afiksy.”. Kwestia 351.6 kończy się słowami „a elity i czempioni biją mocniej w porównaniu do zwykłych stworów”. Pozostałe kwestie zostają bez zmian. Do nagrania nazwa gry jest zapisana fonetycznie („Insajt”, „Insajt er pe gie kropka kom”), a w napisach rolki jak zwykle.
 3. **353 C.** Tłem strony Gildii jest warowny dwór gildii na wzgórzu z wieżą po lewej (`place` w `data/guilds.json`: `guild-keep`).
-4. **Zasada na przyszłość: trudność od 50. poziomu.** Od 50. poziomu krzywa trudności ma rosnąć, bo wtedy w pełni działają towarzysze i ewolucje. Dziś siła stworów rośnie od 15. do 50. poziomu (do +25% obrażeń i HP) i dalej stoi w miejscu, a od 26. poziomu dochodzi stałe +10%. Każda kolejna zmiana balansu po 50. poziomie bierze tę zasadę pod uwagę. Czy i jak mocno podnieść trudność już teraz, rozstrzyga pytanie 354.
+4. **Trudność od 50. poziomu.** Od 50. poziomu krzywa trudności rośnie, bo wtedy w pełni działają towarzysze i ewolucje. Każda kolejna zmiana balansu po 50. poziomie bierze tę zasadę pod uwagę.
+    - **Brakujący szczegół: o ile.** Najprościej tak samo jak w środku gry. Siła stworów rosła dotąd od 15. do 50. poziomu (do +25% obrażeń i HP) i dalej stała w miejscu. Od stałego +10% od 26. poziomu dochodzi teraz drugi przyrost: od 50. do 100. poziomu stwory rosną do kolejnych +25% obrażeń i HP (`lateGame` w `data/balance.json`). Na 75. poziomie to +12,5%, od 100. poziomu pełne +25%. Do 50. poziomu nic się nie zmienia.
+    - **Wieże.** Wieże dziedziczą tę zmianę, bo stwory pięter liczą się tak samo. Przy próbnych wejściach postać 80. poziomu (Inkwizytor) wygrała z czempionem na 30. piętrze, a przegrała na 45., 60. i 75., jeszcze przed tą zmianą.
 
 ## Gildia na osobnej stronie (1.11.2026, na wersji testowej)
 

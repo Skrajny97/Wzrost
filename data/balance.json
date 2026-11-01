@@ -41,7 +41,8 @@
     "damageMultiplier": 1.4,
     "gearLagMinutes": 45,
     "midGame": { "fromLevel": 15, "toLevel": 50, "damage": 0.25, "hp": 0.25 },
-    "coop": { "fromLevel": 26, "damage": 0.1, "hp": 0.1 }
+    "coop": { "fromLevel": 26, "damage": 0.1, "hp": 0.1 },
+    "lateGame": { "fromLevel": 50, "toLevel": 100, "damage": 0.25, "hp": 0.25 }
   },
   "items": {
     "budgetBase": 10,
