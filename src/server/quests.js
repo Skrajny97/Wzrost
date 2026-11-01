@@ -7,6 +7,7 @@
 import { QUEST_PERIODS, addQuestProgress, bagCapacity, campLevels, chestItem, chestReady, createRng, itemName, questDone, withChest, withClaimed } from '../engine/index.js';
 import { content } from './content.js';
 import { bagPlaces, characterView, equippedItems, loadPlayer, questsNow, requirePlayer } from './characters.js';
+import { atomically, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 
 // A JSON path for an id with a hyphen ("iron-ore").
@@ -110,7 +111,11 @@ export async function openChest(context) {
   // The daily chest counts towards the week's quest of opening it on a few
   // days (dailies in quests.json).
   const after = periodId === 'daily' ? addQuestProgress(withChest(quests, periodId), { chests: 1 }) : withChest(quests, periodId);
-  const [opened] = await db.batch([
+  // The batch holds only while the character is as read (atomic.js), so the
+  // item comes only with the chest opened by this request (the code review:
+  // another change meanwhile let the item come without the chest opening).
+  const [, opened] = await atomically(db, [
+    sameVersion(db, row),
     db
       .prepare('UPDATE characters SET time_points = time_points + ?, system_points = system_points + ?, quests = ?, version = version + 1 WHERE id = ? AND version = ?')
       .bind(chest.timePoints, chest.systemPoints, JSON.stringify(after), row.id, row.version),

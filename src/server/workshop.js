@@ -31,6 +31,7 @@ import {
 import { content } from './content.js';
 import { bagPlaces, characterView, craftingState, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, walletOf, workOf } from './characters.js';
 import { toHex } from './encoding.js';
+import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { craftingOn } from './features.js';
 import { addTo, insertWork, requireProfessions, workGains } from './professions.js';
@@ -83,7 +84,10 @@ export async function startCrafting(context) {
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const { row } = player;
   const db = context.env.DB;
-  const [taken] = await db.batch([
+  // The batch holds only while the character is as read (atomic.js), so
+  // the work starts only with what it takes taken by this request.
+  const [, taken] = await atomically(db, [
+    sameVersion(db, row),
     // The HP rested so far is saved, and resting goes on from now; the
     // Awatar's work leaves it be.
     db
@@ -169,6 +173,9 @@ function scrollOrder(level, count) {
 // item, it only gives everything back and makes no report (null). With
 // `avatar`, the order of the Awatar Systemu (avatar.js), whose work brings
 // the items alone.
+// A work claimed or called back by another request a moment ago.
+const alreadyDone = () => new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+
 export async function finishCrafting(db, player, now, { stop = false, avatar = false } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
@@ -198,13 +205,18 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
   // Only while the activity is as seen, so two calls at once give back once.
   const ongoing = `EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ?)`;
   const end = db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at);
+  // Each batch holds only while the work is still there (atomic.js), so a
+  // "Wróć wcześniej" and a claim at once give back or give the items, never
+  // both (the code review).
+  const stillThere = assertion(db, ongoing, [row.id, activity.started_at]);
   if (done === 0) {
-    await db.batch([
+    await atomically(db, [
+      stillThere,
       db
         .prepare(`UPDATE characters SET version = version + 1${back.map((each) => each.sql).join('')} WHERE id = ? AND ${ongoing}`)
         .bind(...back.flatMap((each) => each.binds), row.id, row.id, activity.started_at),
       end,
-    ]);
+    ], alreadyDone);
     return null;
   }
 
@@ -250,6 +262,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
   let saved;
   try {
     saved = await db.batch([
+      stillThere,
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'items', now, JSON.stringify(summary), JSON.stringify(report)),
@@ -267,8 +280,8 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
       end,
     ]);
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE')) throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+    if (String(error?.message).includes('UNIQUE') || raced(error)) throw alreadyDone();
     throw error;
   }
-  return { id: saved[0].meta.last_row_id, report };
+  return { id: saved[1].meta.last_row_id, report };
 }

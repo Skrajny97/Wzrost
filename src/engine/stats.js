@@ -63,8 +63,10 @@ export function earnedPoints(character, content) {
   return pointSources(character, content).total;
 }
 
+// Only whole numbers count, so a stored value of another kind cannot turn
+// the sum into text or NaN.
 export function spentPoints(character) {
-  return Object.values(character.points).reduce((sum, value) => sum + value, 0);
+  return Object.values(character.points).reduce((sum, value) => sum + (Number.isInteger(value) ? value : 0), 0);
 }
 
 export function freePoints(character, content) {

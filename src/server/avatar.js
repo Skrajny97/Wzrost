@@ -47,8 +47,11 @@ export async function claimAvatar(context) {
   const activity = avatarWork(player);
   if (activity.ends_at > now) throw new ApiError(409, 'not_finished', 'Praca Awatara Systemu jeszcze trwa.');
   const db = context.env.DB;
-  const { id, report } = await FINISH[activity.kind](db, player, now, { avatar: true });
-  return json({ report: { id, createdAt: now, ...report }, character: characterView(await loadPlayer(db, session.userId), now) });
+  const done = await FINISH[activity.kind](db, player, now, { avatar: true });
+  // A work whose recipe or pattern the game no longer has gave back what it
+  // took and made no report (the code review: it answered with an error).
+  const character = characterView(await loadPlayer(db, session.userId), now);
+  return json(done ? { report: { id: done.id, createdAt: now, ...done.report }, character } : { character });
 }
 
 // Calling the Awatar back early, as the character: a gathering brings

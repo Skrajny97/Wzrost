@@ -52,7 +52,12 @@ async function partyOf(db, characterId) {
     db.prepare('SELECT character_id FROM party_members WHERE party_id = ? ORDER BY joined_at, character_id').bind(membership.party_id),
   ]);
   const row = party.results[0];
-  return row ? { id: row.id, leaderId: row.leader_id, memberIds: members.results.map((member) => member.character_id) } : null;
+  if (!row) {
+    // A membership whose party is gone (made and emptied at once) goes too.
+    await db.prepare('DELETE FROM party_members WHERE character_id = ? AND party_id = ?').bind(characterId, membership.party_id).run();
+    return null;
+  }
+  return { id: row.id, leaderId: row.leader_id, memberIds: members.results.map((member) => member.character_id) };
 }
 
 // A member's state for the party's list: free (its character played and at
@@ -155,16 +160,18 @@ export async function inviteToParty(context) {
   if (party?.memberIds.includes(target.id)) throw new ApiError(409, 'member', `${target.name} jest już w Twojej drużynie.`);
   if (party && party.memberIds.length >= size()) throw new ApiError(409, 'full', `Drużyna jest pełna: ${size()} postacie.`);
   if (!party) {
-    const made = await db.prepare('INSERT INTO parties (leader_id, created_at) VALUES (?, ?)').bind(player.row.id, context.now).run();
-    const id = made.meta.last_row_id;
+    // The party and its leader at once, in one transaction.
+    let made;
     try {
-      await db.prepare('INSERT INTO party_members (character_id, party_id, joined_at) VALUES (?, ?, ?)').bind(player.row.id, id, context.now).run();
+      [made] = await db.batch([
+        db.prepare('INSERT INTO parties (leader_id, created_at) VALUES (?, ?)').bind(player.row.id, context.now),
+        db.prepare('INSERT INTO party_members (character_id, party_id, joined_at) VALUES (?, last_insert_rowid(), ?)').bind(player.row.id, context.now),
+      ]);
     } catch {
       // Another request made one meanwhile.
-      await db.prepare('DELETE FROM parties WHERE id = ?').bind(id).run();
       throw new ApiError(409, 'changed', 'Drużyna zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
     }
-    party = { id, leaderId: player.row.id, memberIds: [player.row.id] };
+    party = { id: made.meta.last_row_id, leaderId: player.row.id, memberIds: [player.row.id] };
   }
   const waiting = await db.prepare('SELECT COUNT(*) AS count FROM party_invites WHERE party_id = ?').bind(party.id).first();
   if (waiting.count >= MAX_INVITES) throw new ApiError(409, 'too_many_invites', `Na odpowiedź czeka już ${MAX_INVITES} zaproszeń.`);
@@ -177,21 +184,33 @@ export async function inviteToParty(context) {
 
 // POST /api/party/accept { partyId }: joins the party that invited this
 // character, while it has a place; the character's other invitations go.
+// A party's id from a request.
+function partyIdOf(body) {
+  if (!Number.isInteger(body.partyId) || body.partyId < 1) throw new ApiError(400, 'invalid_party', 'Nie ma takiej drużyny.');
+  return body.partyId;
+}
+
 export async function acceptPartyInvite(context) {
   const { player } = await requirePartyPlayer(context);
   const db = context.env.DB;
   const body = await readJson(context.request);
-  const invite = await db.prepare('SELECT party_id FROM party_invites WHERE party_id = ? AND character_id = ?').bind(body.partyId, player.row.id).first();
+  const invite = await db.prepare('SELECT party_id FROM party_invites WHERE party_id = ? AND character_id = ?').bind(partyIdOf(body), player.row.id).first();
   if (!invite) throw new ApiError(404, 'no_invite', 'Tego zaproszenia już nie ma.');
   if (await partyOf(db, player.row.id)) throw new ApiError(409, 'in_party', 'Najpierw opuść swoją drużynę.');
-  // Joins only while the party has a place (the count in the same statement).
-  const joined = await db
-    .prepare(
-      `INSERT INTO party_members (character_id, party_id, joined_at)
-       SELECT ?, ?, ? WHERE EXISTS (SELECT 1 FROM parties WHERE id = ?) AND (SELECT COUNT(*) FROM party_members WHERE party_id = ?) < ?`,
-    )
-    .bind(player.row.id, invite.party_id, context.now, invite.party_id, invite.party_id, size())
-    .run();
+  // Joins only while the party has a place (the count in the same statement);
+  // two invitations accepted at once join one party.
+  let joined;
+  try {
+    joined = await db
+      .prepare(
+        `INSERT INTO party_members (character_id, party_id, joined_at)
+         SELECT ?, ?, ? WHERE EXISTS (SELECT 1 FROM parties WHERE id = ?) AND (SELECT COUNT(*) FROM party_members WHERE party_id = ?) < ?`,
+      )
+      .bind(player.row.id, invite.party_id, context.now, invite.party_id, invite.party_id, size())
+      .run();
+  } catch {
+    throw new ApiError(409, 'in_party', 'Najpierw opuść swoją drużynę.');
+  }
   await db.prepare('DELETE FROM party_invites WHERE character_id = ? AND (party_id = ? OR ? = 1)').bind(player.row.id, invite.party_id, joined.meta.changes).run();
   if (joined.meta.changes !== 1) throw new ApiError(409, 'full', 'Ta drużyna jest już pełna albo jej nie ma.');
   return answer(db, player.row.id, context.now, { text: 'Jesteś w drużynie. Lider zabierze Cię na najbliższą wyprawę, gdy nie będziesz mieć innych zajęć.' });
@@ -202,7 +221,7 @@ export async function declinePartyInvite(context) {
   const { player } = await requirePartyPlayer(context);
   const db = context.env.DB;
   const body = await readJson(context.request);
-  await db.prepare('DELETE FROM party_invites WHERE party_id = ? AND character_id = ?').bind(body.partyId, player.row.id).run();
+  await db.prepare('DELETE FROM party_invites WHERE party_id = ? AND character_id = ?').bind(partyIdOf(body), player.row.id).run();
   return answer(db, player.row.id, context.now);
 }
 
@@ -298,8 +317,11 @@ export async function partyHunt(context) {
   const names = everyone.map((member) => member.row.name);
   const partnersOf = (member, list) => list.filter((other) => other !== member).map((other) => shots.get(other.row.id));
   const party_ = { id: party.id, leader: player.row.name, names };
-  // The members first, each with what it chose itself left out; one that
-  // got busy meanwhile stays home. Then the leader, with those who went.
+  // The leader first, with its own choices checked there (potions, the
+  // healing mark, tracking), so a wrong one sends nobody (the code review);
+  // then the members, each without the leader's choices. One that got busy
+  // meanwhile stays home.
+  await beginHunt(db, player, body, now, { party: party_, partners: partnersOf(player, everyone) });
   const went = [];
   for (const member of going) {
     try {
@@ -312,8 +334,6 @@ export async function partyHunt(context) {
       if (!(error instanceof ApiError)) throw error;
     }
   }
-  if (went.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Wyrusz sam albo poczekaj na drużynę.');
-  await beginHunt(db, player, body, now, { party: { ...party_, names: [player.row.name, ...went.map((member) => member.row.name)] }, partners: partnersOf(player, [player, ...went]) });
   return json(
     { character: characterView(await loadPlayer(db, session.userId), now), ...(await partyView(db, player.row.id, now)), went: went.map((member) => member.row.name) },
     201,

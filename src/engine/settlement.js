@@ -38,11 +38,6 @@ export function standingOf(points, content) {
 const reached = (points, standingId, content) =>
   standingOf(points, content).index >= content.settlement.standings.findIndex((standing) => standing.id === standingId);
 
-// The goods kept in the bag, which waits for the character's return from an
-// exploration or a profession's work: their orders are delivered at home,
-// as the scrapper buys them only then. A Warsztat's item is in the bag too.
-export const BAG_GOODS = new Set(['herb', 'potion', 'craft']);
-
 // The brotherhood that orders a kind of goods.
 const brotherhoodOf = (kind, content) => content.settlement.brotherhoods.find((brotherhood) => brotherhood.goods.includes(kind));
 
@@ -234,13 +229,28 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
   const slots = Array.from({ length: orders.open }, (_, index) => board.slots[index] ?? { readyAt: now });
   const settled = slots.map((first) => {
     let slot = first;
+    // The terms gone by since an order went, while nobody looked: each
+    // would draw an order only for it to go, so the last term's is drawn at
+    // once, at its turn, as one by one (the code review: the work grew with
+    // the board's age). With nothing to order the slot waits from the first.
+    let skipped = 0;
+    let gone = null;
     for (;;) {
       if (slot.order && outdated(slot.order, character, content)) slot = { readyAt: now };
-      if (slot.order && slot.order.expiresAt <= now) slot = { readyAt: slot.order.expiresAt };
+      if (slot.order && slot.order.expiresAt <= now) {
+        gone = slot.order.expiresAt;
+        skipped = Math.floor((now - gone) / term);
+        turn += skipped;
+        slot = { readyAt: gone + skipped * term };
+      }
       if (slot.order || slot.readyAt > now) return slot;
       turn += 1;
       const order = drawOrder({ character, reputation, seed: `${seed}:order:${turn}` }, content);
-      if (!order) return slot;
+      if (!order) {
+        turn -= skipped;
+        return skipped > 0 ? { readyAt: gone } : slot;
+      }
+      skipped = 0;
       slot = { order: { id: turn, ...order, expiresAt: slot.readyAt + term } };
     }
   });

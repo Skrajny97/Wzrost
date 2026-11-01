@@ -481,6 +481,27 @@ describe('the Osada through the API', () => {
     assert.equal(again.status, 404);
   });
 
+  test('parts done on the Stół rozbiórki count for a parts order at once (the code review)', async () => {
+    let order = null;
+    for (let i = 0; i < 40 && !order; i++) {
+      await call('POST', '/api/test/settlement', { cookie, body: { action: 'orders' } });
+      order = (await view()).board.slots.map((slot) => slot.order).find((one) => one.kind === 'part') ?? null;
+    }
+    assert.ok(order, 'a parts order comes');
+    // Some in the bag, the rest from a table order that ended a minute ago.
+    const key = heldKey(order);
+    const bag = Math.floor(order.count / 2);
+    const queue = [{ id: 'gotowe', partId: key, parts: order.count - bag, bonus: 0, startsAt: Date.now() - 120000, endsAt: Date.now() - 60000 }];
+    await set('parts = ?, crafting = ?', JSON.stringify(bag > 0 ? { [key]: bag } : {}), JSON.stringify(queue));
+    const shown = (await view()).board.slots.find((slot) => slot.order?.id === order.id).order;
+    assert.equal(shown.have, order.count);
+    const done = await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } });
+    assert.equal(done.status, 200, JSON.stringify(done.data));
+    const row = await (await db()).prepare('SELECT parts, crafting FROM characters').first();
+    assert.equal(JSON.parse(row.parts)[key] ?? 0, 0);
+    assert.deepEqual(JSON.parse(row.crafting), []);
+  });
+
   test('the Osada tab lights up when an order on the board can be delivered', async () => {
     await set(`herbs = '{}', potions = '{}', materials = '{}', resources = '{}', parts = '{}'`);
     const { order } = columnOrder(await view());

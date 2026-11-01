@@ -60,14 +60,18 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
     );
 
+  // A report that comes after the player has left the screen is only kept
+  // for later, not shown and not played (the code review: its sounds played
+  // on the next screen).
+  let gone = false;
   async function load() {
     try {
       const data = await call('GET', `/api/reports/${params.id}`);
       report = data.report;
       reportCache.set(params.id, report);
-      render();
+      if (!gone) render();
     } catch (error) {
-      fill(container, heading('Raport'), systemPanel(error.message));
+      if (!gone) fill(container, heading('Raport'), systemPanel(error.message));
     }
   }
 
@@ -474,6 +478,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     update: () => {
       if (report) renderActions();
     },
-    unmount: () => arena?.stop(),
+    unmount: () => {
+      gone = true;
+      arena?.stop();
+    },
   };
 }

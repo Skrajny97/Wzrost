@@ -66,16 +66,25 @@ function sinceMonday(ms, timeZone) {
   return (new Date(Date.UTC(year, month - 1, day)).getUTCDay() + 6) % 7;
 }
 
+// The last period of each kind worked out: every moment inside it has the
+// same one, so it is kept (the code review: a character view asked for the
+// period dozens of times, each with some time-zone arithmetic).
+const lastPeriods = new Map();
+
 // The period around `now`: its key (the date it starts on, on the zone's
 // clock), its start and its end.
 export function questPeriod(periodId, now, content) {
   const { timeZone } = content.quests;
+  const id = `${timeZone}:${periodId}`;
+  const last = lastPeriods.get(id);
+  if (last && last.startsAt <= now && now < last.endsAt) return { ...last };
   const weekly = periodId === 'weekly';
   const back = weekly ? sinceMonday(now, timeZone) : 0;
   const startsAt = zoneMidnight(now, timeZone, -back);
   const endsAt = zoneMidnight(now, timeZone, (weekly ? 7 : 1) - back);
   const { year, month, day } = zoneClock(startsAt, timeZone);
   const key = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  lastPeriods.set(id, { key, startsAt, endsAt });
   return { key, startsAt, endsAt };
 }
 

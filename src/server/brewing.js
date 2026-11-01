@@ -34,6 +34,7 @@ import {
 import { content } from './content.js';
 import { buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
+import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, insertWork, requireProfessions, takeFromBag, workGains } from './professions.js';
 import { herbsOf, potionKnown, potionsOf } from './professions-view.js';
@@ -78,7 +79,10 @@ export async function startBrewing(context) {
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const { row } = player;
   const db = context.env.DB;
-  const [taken] = await db.batch([
+  // The batch holds only while the character is as read (atomic.js), so
+  // the work starts only with what it takes taken by this request.
+  const [, taken] = await atomically(db, [
+    sameVersion(db, row),
     // The HP rested so far is saved, and resting goes on from now; the
     // Awatar's work leaves it be.
     db
@@ -144,13 +148,22 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
   // Only while the activity is as seen, so two calls at once give back once.
   const ongoing = `EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ?)`;
   const end = db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at);
+  // Each batch holds only while the work is still there (atomic.js), so a
+  // "Wróć wcześniej" and a claim at once never leave a report without its
+  // potions (the code review, as in the Warsztat).
+  const stillThere = assertion(db, ongoing, [row.id, activity.started_at]);
   if (done === 0) {
-    await db.batch([
-      db
-        .prepare(`UPDATE characters SET version = version + 1${herbsBack.sql}${catalystsBack.sql} WHERE id = ? AND ${ongoing}`)
-        .bind(...herbsBack.binds, ...catalystsBack.binds, row.id, row.id, activity.started_at),
-      end,
-    ]);
+    await atomically(
+      db,
+      [
+        stillThere,
+        db
+          .prepare(`UPDATE characters SET version = version + 1${herbsBack.sql}${catalystsBack.sql} WHERE id = ? AND ${ongoing}`)
+          .bind(...herbsBack.binds, ...catalystsBack.binds, row.id, row.id, activity.started_at),
+        end,
+      ],
+      alreadyDone,
+    );
     return null;
   }
 
@@ -184,6 +197,7 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
   let results;
   try {
     results = await db.batch([
+      stillThere,
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'potions', now, JSON.stringify(summary), JSON.stringify(report)),
@@ -199,10 +213,15 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
       end,
     ]);
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE')) throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+    if (String(error?.message).includes('UNIQUE') || raced(error)) throw alreadyDone();
     throw error;
   }
-  return { id: results[0].meta.last_row_id, report };
+  return { id: results[1].meta.last_row_id, report };
+}
+
+// A work claimed or called back by another request a moment ago.
+function alreadyDone() {
+  return new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
 }
 
 // How many of a potion the request names: a whole number from 1 to what the

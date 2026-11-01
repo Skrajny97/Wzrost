@@ -13,6 +13,7 @@
 // odblokowany stopień Wieży bedzie na poziomie najniższego w Drużynie").
 // Pure: the seed is the server's.
 
+import { encountersFor } from './hunt.js';
 import { createRng } from './rng.js';
 
 // The highest floor open to characters of these levels.
@@ -26,7 +27,8 @@ export function towerArea(floor, content) {
 
 // What waits on floor `floor` of a climb with `seed`: the region, the level
 // and the encounter, as the hunt's encounters are (hunt.js), regular,
-// elite or champion.
+// elite or champion. A regular one is of those the floor's level lets come
+// (the pairs at the end of the first land from level 5, encountersFor).
 export function towerFloor(floor, seed, content) {
   const { floors } = content.towers;
   const area = towerArea(floor, content);
@@ -35,6 +37,7 @@ export function towerFloor(floor, seed, content) {
   const elite = !champion && (floor % floors.eliteEvery === 0 || floor % floors.championEvery === 0 || rng.chance(floors.eliteChance)) && area.elite;
   if (champion) return { floor, level: floor, areaId: area.id, encounter: { elite: false, champion: true, members: [{ monsterId: area.champion, level: floor }] } };
   if (elite) return { floor, level: floor, areaId: area.id, encounter: { elite: true, members: [{ monsterId: area.elite, level: floor }] } };
-  const group = rng.weighted(area.encounters, (encounter) => encounter.weight ?? 1);
+  const open = encountersFor(area, floor);
+  const group = rng.weighted(open.length > 0 ? open : area.encounters, (encounter) => encounter.weight ?? 1);
   return { floor, level: floor, areaId: area.id, encounter: { elite: false, members: group.monsters.map((monsterId) => ({ monsterId, level: floor })) } };
 }

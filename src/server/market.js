@@ -42,6 +42,7 @@ import {
 } from '../engine/index.js';
 import { bagPlaces, characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
+import { assertion, atomically as atomicBatch, raced } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { herbsOf, potionsOf } from './professions-view.js';
 import { requireOpen, settlementOf } from './settlement.js';
@@ -52,19 +53,8 @@ const tuning = () => content.settlement.market;
 const jsonPath = (key) => `$."${key}"`;
 const changed = () => new ApiError(409, 'character_changed', 'Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz.');
 
-// A statement that fails its whole batch unless `condition` holds: json() of
-// plain text is no JSON.
-const assertion = (db, condition, binds) => db.prepare(`SELECT CASE WHEN ${condition} THEN 1 ELSE json('nie') END AS ok`).bind(...binds);
-const race = (error) => /malformed JSON/i.test(String(error?.message ?? error));
-
-async function atomically(db, statements) {
-  try {
-    return await db.batch(statements);
-  } catch (error) {
-    if (race(error)) throw changed();
-    throw error;
-  }
-}
+// A batch that fails as a whole unless its assertion holds (atomic.js).
+const atomically = (db, statements) => atomicBatch(db, statements, changed);
 
 // A stack's goods by kind and key, as a parcel or an offer shows them, with
 // what its card tells (the author: "bym mogl kliknac przedmiot i go
@@ -163,7 +153,7 @@ export async function settleMarket(db, now) {
         ...(sold ? goldParcel(db, offer, offer.bid, now) : []),
       ]);
     } catch (error) {
-      if (!race(error)) console.error(error);
+      if (!raced(error)) console.error(error);
     }
   }
 }

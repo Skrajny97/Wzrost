@@ -26,6 +26,7 @@ import { content } from './content.js';
 import { bagPlaces, characterView, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { professionsOn } from './features.js';
+import { assertion, raced } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { herbsOf } from './professions-view.js';
 import { KEPT_REPORTS } from './reports.js';
@@ -71,7 +72,9 @@ export function workGains(player, profession, before, minutes, avatar, now) {
 // The start of a work that takes things from the bag or the camp (brewing.js,
 // workshop.js): its activity, for the character with its HP at the start or
 // for its Awatar Systemu, saved only once the statement before has taken
-// them, so two taps at once start one work.
+// them, so two taps at once start one work. Its batch begins with the
+// assertion that the row is as read (atomic.js), so the version one higher
+// here is the statement before's own.
 export function insertWork(db, avatar, row, { kind, placeId, minutes, now, seed, hp, options }) {
   const columns = ['character_id', 'kind', 'region_id', 'minutes', 'started_at', 'ends_at', 'seed', ...(avatar ? [] : ['hp_at_start']), 'options'];
   const values = [row.id, kind, placeId, minutes, now, now + minutes * 60000, seed, ...(avatar ? [] : [hp]), JSON.stringify(options)];
@@ -183,6 +186,9 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
   let results;
   try {
     results = await db.batch([
+      // Only while the gathering is still there (atomic.js): one called
+      // back a moment ago brings no report (the code review).
+      assertion(db, `EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ?)`, [row.id, activity.started_at]),
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'herbs', now, JSON.stringify(summary), JSON.stringify(report)),
@@ -195,10 +201,10 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE')) throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+    if (String(error?.message).includes('UNIQUE') || raced(error)) throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
     throw error;
   }
-  return { id: results[0].meta.last_row_id, report };
+  return { id: results[1].meta.last_row_id, report };
 }
 
 // How many of a herb the request names: a whole number from 1 to what the

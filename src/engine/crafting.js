@@ -130,13 +130,15 @@ export function materialsText(found, content) {
 // Parts from taking an item apart: more for a higher item level and for each
 // upgrade, of the item's rarity. An item made in the Warsztat (`crafted`)
 // gives back half the parts it took, rounded down (the author: "Oddaje
-// połowę zużytych części"), and one more for each upgrade of the Kowadło
-// above those it came with.
+// połowę zużytych części"), of the rarity ordered, also when luck made it
+// rarer (the code review: a lucky item gave back rarer parts than it took),
+// and one more for each upgrade of the Kowadło above those it came with.
+// Items made before the ordered rarity was kept give their own.
 export function salvageYield(item, content) {
   const { salvageBase, salvageLevelStep } = content.balance.crafting;
   const upgrade = item.upgrade ?? 0;
   return {
-    partId: content.partsByRarity[item.rarity].id,
+    partId: content.partsByRarity[(item.crafted && content.partsByRarity[item.crafted.rarity] ? item.crafted.rarity : item.rarity)].id,
     count: item.crafted
       ? Math.floor(item.crafted.parts / 2) + Math.max(0, upgrade - item.crafted.upgrade)
       : salvageBase + Math.floor(item.level / salvageLevelStep) + upgrade,

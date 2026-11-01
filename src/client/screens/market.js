@@ -179,6 +179,14 @@ export function mountMarket(holder) {
       ({ market } = await call('GET', '/api/market'));
       failure = null;
     } catch (error) {
+      // With the Targowisko already on the screen, it stays and the game
+      // asks again in half a minute (as the Osada does).
+      if (market) {
+        if (gone) return;
+        clearTimeout(timer);
+        timer = setTimeout(load, 30000);
+        return;
+      }
       failure = error;
     }
     if (!gone) render();

@@ -132,9 +132,20 @@ export function trophyBonuses(discovered, content, only = null) {
   return bonuses;
 }
 
+// Built once for each content, as the game's data does not change while it
+// runs (the code review: the sets and the chests were built anew for every
+// character view). What comes back is shared: callers only read it.
+const once = (build) => {
+  const built = new WeakMap();
+  return (content) => {
+    if (!built.has(content)) built.set(content, build(content));
+    return built.get(content);
+  };
+};
+
 // The item sets: in every tier one for each class, of the bases it wears,
 // and one of the bases for all ("Dodatki").
-export function itemSets(content) {
+export const itemSets = once((content) => {
   const sets = [];
   content.encyclopedia.tiers.forEach((tier, index) => {
     const bases = content.bases.filter((base) => baseTier(base.id, content) === index);
@@ -146,7 +157,7 @@ export function itemSets(content) {
     if (shared.length > 0) sets.push({ id: `items:${index + 1}:accessories`, tier: index, name: text(content, 'accessories'), bases: shared.map((base) => base.id) });
   });
   return sets;
-}
+});
 
 // What counts for a tab's thresholds: discovered entries (a material by
 // any of its grades).
@@ -160,26 +171,29 @@ const TALLIES = {
 
 // Every chest of the Encyklopedia: the item sets with the chest of their
 // tier, and each tab's thresholds with its chests in turn.
-export function encyclopediaChests(content) {
+export const encyclopediaChests = once((content) => {
   const { chests, milestones } = content.encyclopedia;
   const chestAt = (index) => chests[Math.min(index, chests.length - 1)];
   return [
     ...itemSets(content).map((set) => ({ id: set.id, tab: 'items', set, chest: chestAt(set.tier) })),
     ...Object.entries(milestones).flatMap(([tab, counts]) => counts.map((count, step) => ({ id: `${tab}:${count}`, tab, count, chest: chestAt(step) }))),
   ];
-}
+});
 
 // How far a chest's list is: what is discovered of it and what it asks for.
-function chestProgress(entry, discovered, content) {
+// `tally` counts a tab's discoveries.
+function chestProgress(entry, discovered, tally) {
   if (entry.set) return { have: entry.set.bases.filter((id) => discovered[`item:${id}`]).length, need: entry.set.bases.length };
-  return { have: Math.min(entry.count, TALLIES[entry.tab](discovered, content)), need: entry.count };
+  return { have: Math.min(entry.count, tally(entry.tab)), need: entry.count };
 }
 
 // The chests with how far each is, whether it is ready to open and whether
-// it is open already.
+// it is open already. Each tab's discoveries are counted once.
 export function chestStates(discovered, claimed, content) {
+  const tallies = {};
+  const tally = (tab) => (tallies[tab] ??= TALLIES[tab](discovered, content));
   return encyclopediaChests(content).map((entry) => {
-    const { have, need } = chestProgress(entry, discovered, content);
+    const { have, need } = chestProgress(entry, discovered, tally);
     const opened = claimed.includes(entry.id);
     return { ...entry, have, need, opened, ready: !opened && have >= need };
   });

@@ -272,6 +272,15 @@ export async function setOffer(context) {
   if (trade.state === 'locked') throw new ApiError(409, 'locked', 'Wymiana jest już zatwierdzona. Można ją tylko przyjąć albo odrzucić.');
   const player = await loadPlayer(db, session.userId);
   const offer = cleanOffer(body.offer, player);
+  // Each offered item as stored now, so the exchange gives exactly this
+  // item: not another one that got its number meanwhile, nor this one
+  // changed by the Kowadło or the Zaklinaczka after the offer (the code
+  // review).
+  if (offer.items.length > 0) {
+    const rows = await db.prepare(`SELECT id, data FROM items WHERE character_id = ? AND id IN (${offer.items.map(() => '?').join()})`).bind(player.row.id, ...offer.items).all();
+    const stored = new Map(rows.results.map((row) => [row.id, row.data]));
+    offer.itemData = offer.items.map((id) => stored.get(id) ?? '');
+  }
   const column = offerColumn(sideOf(trade, character.id));
   const changed = await db
     .prepare(`UPDATE trades SET ${column} = ?, version = version + 1, updated_at = ? WHERE id = ? AND state = 'open'`)
@@ -302,8 +311,14 @@ function exchange(db, trade, now, sides) {
   const binds = [trade.version];
   for (const { id, offer } of sides) {
     if (offer.items.length > 0) {
-      conditions.push(`(SELECT COUNT(*) FROM items WHERE id IN (${offer.items.map(() => '?').join()}) AND character_id = ? AND slot IS NULL) = ?`);
-      binds.push(...offer.items, id, offer.items.length);
+      // Each item as it was offered (setOffer), where the offer keeps it.
+      const exact = Array.isArray(offer.itemData) && offer.itemData.length === offer.items.length;
+      conditions.push(
+        exact
+          ? `(SELECT COUNT(*) FROM items WHERE character_id = ? AND slot IS NULL AND (${offer.items.map(() => '(id = ? AND data = ?)').join(' OR ')})) = ?`
+          : `(SELECT COUNT(*) FROM items WHERE id IN (${offer.items.map(() => '?').join()}) AND character_id = ? AND slot IS NULL) = ?`,
+      );
+      binds.push(...(exact ? [id, ...offer.items.flatMap((item, index) => [item, offer.itemData[index]]), offer.items.length] : [...offer.items, id, offer.items.length]));
     }
     if (offer.gold > 0) {
       conditions.push('(SELECT gold FROM characters WHERE id = ?) >= ?');

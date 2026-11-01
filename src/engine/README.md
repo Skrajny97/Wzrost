@@ -17,5 +17,16 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `preview.js` | wartości bojowe i skutek jednego punktu statystyki |
 | `unlocks.js` | kolejność odblokowań samouczka, długości wypraw i regiony wewnętrzne otwierane poziomem klasy |
 | `camp.js` | obóz: poziomy budynków w czasie, koszty i czasy budowy, premie (odpoczynek, plecak, ceny złomiarza), magazyny budynków produkcyjnych i zbieranie |
+| `exchange.js`, `fire.js`, `shop.js` | wymiana zasobów przy Stole rozbiórki, duch Ogniska (złoto na zasoby) i lada Skupu złomu (części za złoto) |
+| `skills.js`, `evolutions.js`, `skill-demo.js` | umiejętności klas, ewolucje klas i podgląd animacji umiejętności dla autora |
+| `potions.js` | mikstury na wyprawach: kiedy postać je pije |
+| `professions.js`, `brewing.js`, `workshop.js`, `crafting.js` | profesje: Zielarstwo, Alchemia, Rzemieślnictwo oraz materiały i Stół rozbiórki |
+| `encyclopedia.js` | Encyklopedia: co postać już zdobyła, w zakładkach i Tierach |
+| `events.js` | zdarzenia na koniec wyprawy |
+| `quests.js` | zadania dzienne i tygodniowe narratora |
+| `settlement.js`, `companions.js`, `market.js` | Osada: reputacja, relacje, Tablica zleceń, usługi mieszkańców, towarzysze i Targowisko |
+| `towers.js` | Wieże Systemu: podwaliny, jeszcze poza grą |
+| `gifts.js`, `gift-codes.js` | Upominek między znajomymi i kody podarunkowe |
+| `names.js`, `text.js`, `mail.js`, `notifications.js` | filtr imion postaci, warianty tekstów raportu, treść e-maila i powiadomienia na telefon |
 
-Na razie silnik działa tylko na serwerze (DECISIONS.md, Etap 1, punkt 28). Każde wywołanie musi zmieścić się w limicie 10 ms CPU.
+Silnik działa tylko na serwerze (DECISIONS.md, Etap 1, punkt 28). Gra jest na planie Workers Paid (do 30 s CPU na żądanie), ale każde wywołanie ma być szybkie: liczy się każde żądanie gracza.

@@ -7,7 +7,6 @@
 import { materialSprite, monsterSprite, resourceArt } from './art.js';
 import { $, fill, h, icon } from './dom.js';
 import { countOf, formatCountdown, formatNumber } from './format.js';
-import { SYSTEM_POINTS_ICON } from './icons.js';
 import { rod, roll, stopRoll } from './parchment.js';
 import { playSound } from './sound.js';
 import { call, onCharacterChange, serverNow, state } from './state.js';

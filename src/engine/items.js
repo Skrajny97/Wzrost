@@ -62,11 +62,14 @@ export function generateItem({ baseId, level, rarityId = 'common', element, affi
 // Each affix gets a creature of the place to name it (`monster`), after the
 // numbers are drawn, so they stay as they would be anywhere: a prefix one
 // with an adjective, a suffix any. A creature names one affix of an item
-// while others are left, so there is no "Lisi Hełm Lisa".
+// while others are left, so there is no "Lisi Hełm Lisa". With no creature
+// for its kind (only creatures without an adjective met, in the Warsztat)
+// the affix keeps its own word (the code review: it threw).
 function nameAffixes(affixes, area, rng) {
   const named = new Set();
   for (const affix of affixes) {
     const names = area.affixNames[affix.kind];
+    if (names.length === 0) continue;
     const fresh = names.filter((name) => !named.has(name.monster));
     affix.monster = rng.pick(fresh.length > 0 ? fresh : names).monster;
     named.add(affix.monster);
@@ -162,19 +165,20 @@ function otherClassFamily(classId, rng, content) {
   return rng.pick(theirs.length > 0 ? theirs : firsts).id;
 }
 
+// What the scrapper or Jagna pays for `count` pieces at `unit` gold a
+// piece: rounded down, so selling one piece at a time never pays more than
+// selling them all at once (the author: "Powinno się móc tez sprzedać
+// pojedyncze sztuki tego co mam u Zielarki a nie tylko wszystko"); at least
+// a coin (every good is worth 2 gold or more a piece, so the coin never
+// pays a piece above its worth).
+export const saleGold = (unit, count) => Math.max(1, Math.floor(unit * count + 1e-9));
+
 // Gold from the scrapper: level × goldPerLevel × the rarity's multiplier, and
 // for an upgraded item a share of the gold its upgrades cost (sellRefund).
 // `bonus`: the share the camp adds to the scrapper's prices (Skup złomu). It
 // raises the item's own price only, so an upgrade never pays for itself. An
 // item made upgraded in the Warsztat (`crafted`) cost no gold for the
 // upgrades it came with, so only those of the Kowadło above them count.
-// What the scrapper or Jagna pays for `count` pieces at `unit` gold a
-// piece: rounded down, so selling one piece at a time never pays more than
-// selling them all at once (the author: "Powinno się móc tez sprzedać
-// pojedyncze sztuki tego co mam u Zielarki a nie tylko wszystko"); at least
-// a coin.
-export const saleGold = (unit, count) => Math.max(1, Math.floor(unit * count + 1e-9));
-
 export function sellPrice(item, content, bonus = 0) {
   const rarity = content.raritiesById[item.rarity];
   const price = Math.max(1, Math.round(item.level * content.balance.items.sellGoldPerLevel * rarity.sell * (1 + bonus)));

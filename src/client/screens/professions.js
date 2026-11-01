@@ -509,7 +509,9 @@ export function mountProfessions(container, { params, navigate }) {
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           const { report } = await call('POST', avatar ? '/api/avatar/claim' : '/api/hunts/claim');
-          openReport(report);
+          // A work the game can no longer finish gave back what it took.
+          if (report) openReport(report);
+          else toast('Tej pracy nie da się już dokończyć. Zabrane rzeczy wróciły.');
         }),
     });
   }

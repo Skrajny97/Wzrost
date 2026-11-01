@@ -68,13 +68,18 @@ function saveChoice(choice, key = CHOICE_KEY) {
 const fightsFor = (use, minutes) => use.fightsByMinutes.filter(([from]) => from <= minutes).at(-1)?.[1] ?? 1;
 
 // What the threat rating depends on, apart from HP.
+// Each item whole (an upgrade, a reforged affix or an element keeps its
+// id), the skills and the evolution, which goes by the class's name (the
+// code review: the threat stayed as before them).
 const buildKey = (character) =>
   JSON.stringify([
     character.level,
     character.classLevel,
+    character.className,
     character.maxHp,
     character.stats.map((stat) => stat.total),
-    Object.values(character.equipment).map((item) => item?.id ?? null),
+    Object.values(character.equipment),
+    character.skills,
   ]);
 
 // "bardzo krótka", "krótka"… for a length, from the content.
@@ -226,6 +231,11 @@ export function mountCombat(container, { params, navigate }) {
   let shownSkip = null;
   // "Przewiń" for the exploration or the rest on the screen, kept right every second.
   let skipper = null;
+  // The Drużyna for "Z drużyną", asked once a visit, and the box's tick,
+  // kept over the screen's renders (the code review: each render asked the
+  // server again and ticked the box anew, also after the leader unticked it).
+  let partyAsked = null;
+  let partyTicked = true;
 
   // HP in tenths of the maximum: resting moves the threat now and then.
   const hpStep = (character, now) => Math.floor((currentHp(character, now) / character.maxHp) * 10);
@@ -235,11 +245,17 @@ export function mountCombat(container, { params, navigate }) {
   // character, so a change of level, class level, stats, equipment or HP
   // asks again. Until the new answer comes, a new build shows "…", while
   // resting keeps the old rating.
+  // After a failed request the threat waits half a minute before asking
+  // again and says so once (the code review: offline, it asked and showed a
+  // message every second).
+  let retryAt = 0;
+  let failed = false;
   async function loadOptions() {
     if (loading) {
       loadAgain = true;
       return;
     }
+    if (Date.now() < retryAt) return;
     loading = true;
     try {
       do {
@@ -256,8 +272,11 @@ export function mountCombat(container, { params, navigate }) {
         options[areaId] = { build, hp, healing, threat: areas[0].threat, threatAvoiding: areas[0].threatAvoiding };
         showThreat?.();
       } while (loadAgain);
+      failed = false;
     } catch (error) {
-      toast(error.message);
+      retryAt = Date.now() + 30000;
+      if (!failed) toast(error.message);
+      failed = true;
     } finally {
       loading = false;
     }
@@ -847,14 +866,14 @@ export function mountCombat(container, { params, navigate }) {
   function partyChoice() {
     const element = h('div', { class: 'party-choice', hidden: true });
     let free = [];
-    let ticked = true;
     if (isUnlocked('party')) {
-      call('GET', '/api/party')
+      partyAsked ??= call('GET', '/api/party');
+      partyAsked
         .then(({ party }) => {
           const own = party?.members.find((member) => member.own);
           free = party ? party.members.filter((member) => !member.own && member.status === 'free').map((member) => member.name) : [];
           if (!own?.leader || free.length === 0) return;
-          const box = h('input', { type: 'checkbox', id: 'party-along', class: 'avoid-rare-box', checked: true, onChange: () => (ticked = box.checked) });
+          const box = h('input', { type: 'checkbox', id: 'party-along', class: 'avoid-rare-box', checked: partyTicked, onChange: () => (partyTicked = box.checked) });
           fill(
             element,
             h('label', { class: 'avoid-rare', for: 'party-along' }, box, h('span', { text: `Z drużyną: ${free.join(', ')}` })),
@@ -865,9 +884,11 @@ export function mountCombat(container, { params, navigate }) {
           );
           element.hidden = false;
         })
-        .catch(() => {});
+        .catch(() => {
+          partyAsked = null;
+        });
     }
-    return { element, along: () => (ticked && free.length > 0 && !element.hidden ? free : null) };
+    return { element, along: () => (partyTicked && free.length > 0 && !element.hidden ? free : null) };
   }
 
   // "Szybkie Polowanie" under "Wyrusz", with how many are left today.

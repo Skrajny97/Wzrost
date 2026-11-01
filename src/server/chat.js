@@ -286,22 +286,32 @@ export async function latestChat(context) {
 export async function markChatSeen(context) {
   const { character, db } = await requireChatter(context);
   const body = await readJson(context.request);
-  const read = await db.prepare('SELECT chat_seen FROM characters WHERE id = ?').bind(character.id).first();
-  const seen = seenOf(read?.chat_seen);
   const global = Number.isInteger(body.global) && body.global > 0 ? body.global : 0;
   const other = Number.isInteger(body.with) && body.with > 0 ? body.with : 0;
   const id = Number.isInteger(body.id) && body.id > 0 ? body.id : 0;
-  let changed = false;
-  if (global > seen.global) {
-    seen.global = global;
-    changed = true;
+  // A conversation is marked only by a message of it, so the record keeps
+  // real conversations only (the code review: any number grew it).
+  const known =
+    other > 0 && id > 0 && (await db.prepare(`SELECT 1 AS ok FROM chat_messages m WHERE m.id = ? AND m.channel = ? AND ${PAIR}`).bind(id, PRIVATE, ...pairOf(character.id, other)).first());
+  // Saved only over the record as read, read again when another device
+  // saved meanwhile, so a mark never goes back.
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const read = await db.prepare('SELECT chat_seen FROM characters WHERE id = ?').bind(character.id).first();
+    const seen = seenOf(read?.chat_seen);
+    let changed = false;
+    if (global > seen.global) {
+      seen.global = global;
+      changed = true;
+    }
+    if (known && id > (seen.private[other] ?? 0)) {
+      seen.private[other] = id;
+      changed = true;
+    }
+    if (!changed) return json({ seen });
+    const saved = await db.prepare('UPDATE characters SET chat_seen = ? WHERE id = ? AND chat_seen IS ?').bind(JSON.stringify(seen), character.id, read?.chat_seen ?? null).run();
+    if (saved.meta.changes === 1) return json({ seen });
   }
-  if (other && id > (seen.private[other] ?? 0)) {
-    seen.private[other] = id;
-    changed = true;
-  }
-  if (changed) await db.prepare('UPDATE characters SET chat_seen = ? WHERE id = ?').bind(JSON.stringify(seen), character.id).run();
-  return json({ seen });
+  throw new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 }
 
 // POST /api/chat/rules: the player accepts the rules of the chat.

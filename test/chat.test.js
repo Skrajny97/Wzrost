@@ -228,10 +228,20 @@ describe('Czat', () => {
     await mark({ global: 1 });
     assert.equal((await seen()).global, message.id);
     assert.equal((await call('GET', '/api/chat/latest', { cookie: players.ola })).data.seen.global, 0);
-    const ola = (await (await db()).prepare("SELECT id FROM characters WHERE name = 'Ola'").first()).id;
-    await mark({ with: ola, id: 7 });
-    await mark({ with: ola, id: 3 });
-    assert.deepEqual((await seen()).private, { [ola]: 7 });
+    const id = async (name) => (await (await db()).prepare('SELECT id FROM characters WHERE name = ?').bind(name).first()).id;
+    const [ala, ola] = [await id('Ala'), await id('Ola')];
+    const whisper = async (text) => {
+      await age();
+      return (await call('POST', '/api/chat', { cookie: players.ola, body: { with: ala, text } })).data.message.id;
+    };
+    const [first, second] = [await whisper('Raz'), await whisper('Dwa')];
+    await mark({ with: ola, id: second });
+    await mark({ with: ola, id: first });
+    assert.deepEqual((await seen()).private, { [ola]: second });
+    // Only a message of the conversation marks it (the code review).
+    await mark({ with: ola + 1000, id: second });
+    await mark({ with: ola, id: message.id + 1000 });
+    assert.deepEqual((await seen()).private, { [ola]: second });
   });
 
   test('the channel keeps its last messages and the reported ones, and they go with the character', async () => {

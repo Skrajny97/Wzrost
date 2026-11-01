@@ -73,7 +73,6 @@ import {
   buffLeft,
   optionWindows,
   TIMED_KINDS,
-  BAG_GOODS,
   timedKind,
 } from '../engine/index.js';
 import { chatRole } from './chat.js';
@@ -81,6 +80,7 @@ import { relationTo } from './community.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
+import { raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
 import { partyRemoval } from './parties.js';
 import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
@@ -176,6 +176,7 @@ export async function requirePlayer(context) {
   if (!player) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
   await settleBuilds(context.env.DB, player, context.now);
   await settleTimePoints(context.env.DB, player.row, context.now);
+  await settleTable(context.env.DB, player.row, context.now);
   await settleQuests(context.env.DB, player, context.now);
   await settleDiscoveries(context.env.DB, player, context.now);
   return { session, player };
@@ -312,8 +313,15 @@ async function settleBuilds(db, player, now) {
           .bind(row.id, building.id, entry.level, at, entry.endsAt, producing ? entry.endsAt : null, row.id, row.version + 1),
       );
     }
-    const [moved] = await db.batch(statements);
-    if (moved.meta.changes !== 1) {
+    // The batch holds only while the character is as read (atomic.js), so
+    // the building starts only with its queue moved by this request.
+    let moved = null;
+    try {
+      [, moved] = await db.batch([sameVersion(db, row), ...statements]);
+    } catch (error) {
+      if (!raced(error)) throw error;
+    }
+    if (moved?.meta.changes !== 1) {
       Object.assign(player, await loadPlayer(db, row.user_id));
       continue;
     }
@@ -347,6 +355,23 @@ async function settleTimePoints(db, row, now) {
   else Object.assign(row, await db.prepare('SELECT time_points, time_points_at FROM characters WHERE id = ?').bind(row.id).first());
 }
 
+// The Stół rozbiórki's orders done by now leave the queue for their parts,
+// so whatever reads the parts sees them: the Osada's orders, the Targowisko,
+// the Wymiana (the code review: they waited for the next action at the
+// table). Saved only if the row is as read; the version stays, as nothing
+// the player did changed, and the result is the same whoever settles it.
+async function settleTable(db, row, now) {
+  const state = craftingState(row);
+  if (!state.queue.some((order) => order.endsAt <= now)) return;
+  const { parts, queue } = settleCrafting(state, now);
+  const next = { parts: JSON.stringify(parts), crafting: JSON.stringify(queue) };
+  const result = await db
+    .prepare('UPDATE characters SET parts = ?, crafting = ? WHERE id = ? AND parts IS ? AND crafting IS ?')
+    .bind(next.parts, next.crafting, row.id, row.parts, row.crafting)
+    .run();
+  if (result.meta.changes === 1) Object.assign(row, next);
+}
+
 // The Osada opened below its level by "Testuj Osadę" (settlement.js).
 const settlementTest = (row) => settlementOn() && JSON.parse(row.settlement ?? '{}').test === true;
 
@@ -361,10 +386,12 @@ const settlementOpen = (row) =>
 export const buildingOpen = (building, row) => !building.settlement || settlementOpen(row);
 
 // What the character holds of the goods the Osada's orders ask for, by the
-// column each kind is kept in, and the Warsztat's items in the bag by
-// pattern (`crafted`).
-export function settlementGoods(row, items) {
-  const stocks = Object.fromEntries(['herbs', 'potions', 'materials', 'resources', 'parts'].map((column) => [column, JSON.parse(row[column] ?? '{}')]));
+// column each kind is kept in, the parts of the Stół rozbiórki's orders
+// done by `now` among them, and the Warsztat's items in the bag by pattern
+// (`crafted`).
+export function settlementGoods(row, items, now) {
+  const stocks = Object.fromEntries(['herbs', 'potions', 'materials', 'resources'].map((column) => [column, JSON.parse(row[column] ?? '{}')]));
+  stocks.parts = settleCrafting(craftingState(row), now).parts;
   const crafted = {};
   for (const item of items) if (item.crafted && !item.equippedSlot) crafted[item.base] = (crafted[item.base] ?? 0) + 1;
   return { ...stocks, crafted };
@@ -386,7 +413,7 @@ function settlementWaiting(row, items, now, parcels = 0) {
   if (parcels > 0) return true;
   const stored = JSON.parse(row.settlement ?? '{}');
   const board = settlementBoard(row, { board: stored.board ?? null, reputation: stored.reputation ?? {} }, now);
-  const goods = settlementGoods(row, items);
+  const goods = settlementGoods(row, items, now);
   const weekly = board.weekly && !board.weekly.done ? board.weekly.order : null;
   return [...board.slots.map((slot) => slot.order), weekly].some((order) => order && goodStock(order, goods, content) >= order.count);
 }
@@ -493,6 +520,12 @@ export function workOf(player, avatar) {
   };
 }
 
+// The stat points as stored, only those of known stats in whole numbers, so
+// whatever else a request might once have stored counts for nothing (the
+// code review).
+const statPoints = (stored) =>
+  Object.fromEntries(Object.entries(stored ?? {}).filter(([stat, value]) => Object.hasOwn(content.statsById, stat) && Number.isInteger(value)));
+
 export function engineCharacter(row) {
   return {
     classId: row.class_id,
@@ -500,7 +533,7 @@ export function engineCharacter(row) {
     xp: row.xp,
     classLevel: row.class_level,
     classXp: row.class_xp,
-    points: JSON.parse(row.points),
+    points: statPoints(JSON.parse(row.points)),
     // Free stat points an event gave beyond those of the levels.
     bonusPoints: row.bonus_points ?? 0,
     position: row.position,
@@ -1365,7 +1398,7 @@ export async function spendPoints(context) {
     total += value;
   }
   if (total === 0) throw invalid;
-  if (total > freePoints(character, content)) {
+  if (!(total <= freePoints(character, content))) {
     throw new ApiError(400, 'not_enough_points', 'Nie masz tylu wolnych punktów.');
   }
   return savePoints(context, player, points);

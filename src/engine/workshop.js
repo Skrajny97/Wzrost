@@ -186,9 +186,9 @@ function rollCraftUpgrade(level, rng, content) {
 
 // The `count` items of an order, one after another from the seed: whether
 // each came out and, if so, the item, of the ordered rarity or a luckier one,
-// upgraded or not. A made item keeps the parts it took and the upgrade it
-// came with (`crafted`) for the scrapper's price and the Stół rozbiórki. An
-// order stopped early keeps the draws of the items it made.
+// upgraded or not. A made item keeps the parts it took, their rarity and the
+// upgrade it came with (`crafted`) for the scrapper's price and the Stół
+// rozbiórki. An order stopped early keeps the draws of the items it made.
 export function craftItems({ baseId, rarityId, count, level, professionLevel, met = [], seed }, content) {
   const rng = createRng(seed);
   const chance = craftChance(rarityId, professionLevel, content);
@@ -203,7 +203,7 @@ export function craftItems({ baseId, rarityId, count, level, professionLevel, me
     }
     const item = generateItem({ baseId, level, rarityId: luckyRarity(rarityId, professionLevel, rng, content), area }, rng, content);
     const upgrade = rollCraftUpgrade(professionLevel, rng, content);
-    results.push({ made, item: { ...item, ...(upgrade > 0 && { upgrade }), crafted: { parts, upgrade } } });
+    results.push({ made, item: { ...item, ...(upgrade > 0 && { upgrade }), crafted: { parts, rarity: rarityId, upgrade } } });
   }
   return results;
 }

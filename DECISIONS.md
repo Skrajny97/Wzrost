@@ -2996,6 +2996,40 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Przegląd kodu (1.11.2026, na wersji testowej)
+
+Autor: „Na sam koniec nocnych działań przejrzyj kod gry, wyszukaj błędy, ureguluj je, oczyść ze śmieci itp. (zakładam, że będzie działać gra sprawniej). Zrób to ostrożnie, skrupulatnie i z testami, wyczuciem.”
+
+Przegląd objął silnik, serwer i grę w przeglądarce. Każdą poprawkę sprawdza test, a każde przyspieszenie porównano ze starym kodem na tysiącach przypadków: wyniki są identyczne.
+
+1. **Zapis tylko wtedy, gdy postać się nie zmieniła.** Wyprawy (start, odbiór, odwołanie), przewijanie czasu, skrzynie zadań, początek warzenia i zamówienia w Warsztacie, kody podarunkowe i budowy w obozie zapisują się w jednej paczce. Paczka przechodzi tylko wtedy, gdy postać jest taka, jak przy odczycie. Inaczej nic się nie zapisuje, a gracz widzi „Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.” Wcześniej dwa żądania naraz mogły na przykład oddać mikstury sprzedane w trakcie odbioru wyprawy, przewinąć czas za darmo, podwoić przedmiot ze skrzyni zadań albo zużyć kod bez nagrody.
+2. **Punkty statystyk.** Żądanie z nazwą statystyki w rodzaju „constructor” jest odrzucane. Wcześniej pozwalało rozdać dowolnie wiele punktów. Tak samo odrzucane są wygląd, klasa, miejsce i cel przewinięcia o takich nazwach (wcześniej był to błąd serwera).
+3. **Wymiana.** Druga strona dostaje dokładnie te przedmioty, które były w ofercie. Przedmiot zmieniony po złożeniu oferty (zaklęty, przekuty albo podmieniony) zatrzymuje wymianę.
+4. **Profesje i Awatar.** „Wróć wcześniej” i odbiór w tej samej chwili dają albo zwrot, albo łupy, nigdy jedno i drugie, i nie zostawiają raportu bez mikstur czy ziół. Odbiór pracy, której przepisu albo wzoru gra już nie ma, kończy się zwrotem zamiast błędu.
+5. **Drużyny.** Drużyna powstaje w jednym kroku, więc nikt nie zostaje zablokowany w drużynie, której już nie ma. Wybory lidera są sprawdzane, zanim wyruszą członkowie. Błędny numer drużyny daje komunikat zamiast błędu serwera.
+6. **Osada.** Części gotowe na Stole rozbiórki liczą się od razu w zleceniach, na Targowisku i w Wymianie. Wcześniej czekały na kolejną czynność przy stole. Prezent towarzysza w ziołach albo miksturach czeka, gdy plecak jest pełny. Wcześniej przepełniał plecak, a następna wyprawa sprzedawała najsłabsze przedmioty.
+7. **Silnik.** Po ewolucji awans poziomu klasy podaje zdobyte Punkty Umiejętności i nazwę ewolucji. Broń znaleziona w trakcie wyprawy idzie do ręki tylko wtedy, gdy pozwala na to poziom klasy. Rozebranie przedmiotu z Warsztatu, który szczęśliwie wyszedł rzadszy, oddaje części zamówionej rzadkości. Odnowa bez swojej ewolucji nie przerywa walki. Warsztat nazywa przedmiot także po stworach bez przymiotnika. Piętra Wież losują tylko spotkania dozwolone na ich poziomie.
+8. **Zagrożenie przed wyprawą.** Liczy się z ulepszeniami, zaklęciami i przekuciami przedmiotów, z ewolucją i z poziomami profesji. Wcześniej zostawało takie jak przed nimi, aż zmienił się poziom albo przedmiot.
+9. **Gra w telefonie.**
+    - Bez sieci zagrożenie nie pyta serwera co sekundę: ponawia po 30 s i pokazuje komunikat raz.
+    - Osada i Targowisko po nieudanym odświeżeniu zostawiają to, co pokazywały, i próbują znowu po 30 s.
+    - Raport i podgląd umiejętności w Panelu Autora milkną po wyjściu z ekranu.
+    - Wylogowanie zwija pergaminy zadań i e-maila.
+    - Pole „Z drużyną” pamięta wybór i pyta serwer raz na wizytę.
+    - Telefon krótko pamięta grafiki, dźwięki i czcionki.
+10. **Serwer.**
+    - Zły adres daje „Nie znaleziono” zamiast błędu serwera.
+    - Zadania co minutę działają każde osobno, więc błąd jednego nie zatrzymuje powiadomień.
+    - Powiadomienia trafiają tylko do znanych usług.
+    - Panel Autora liczy wszystkie otwarte zgłoszenia błędów, także ponad 200.
+    - Znacznik „przeczytane” w czacie przyjmuje tylko prawdziwe rozmowy i nigdy się nie cofa.
+11. **Szybciej.**
+    - Zestawy i skrzynie Encyklopedii budują się raz na uruchomienie serwera. Licznik skrzyń w każdym widoku postaci działa 5× szybciej.
+    - Okres zadań (dzień, tydzień) jest zapamiętany: jedno wywołanie jest ok. 145× szybsze, a widok postaci woła je kilkadziesiąt razy.
+    - Tablica zleceń przeskakuje przegapione terminy od razu: tablica sprzed roku liczy się 25× szybciej, z tymi samymi zleceniami.
+12. **Porządki.** Usunięte zostały nieużywane style, importy i stałe. Nieaktualne komentarze są poprawione, a opis silnika uzupełniony.
+13. **Na później.** Bez zmian zostają: pobieranie muzyki i dźwięków (ustalone wcześniej z autorem), łączenie zapytań czatu (idą już równolegle) i lżejszy podgląd profilu innej postaci. Zysk jest tam mały, a ryzyko większe.
+
 ## Sprzedaż pojedynczych sztuk u Jagny (1.11.2026, na wersji testowej)
 
 Autor: „Powinno się móc tez sprzedać pojedyncze sztuki tego co mam u Zielarki a nie tylko wszystko.”

@@ -1,5 +1,6 @@
-// The journal: past reports of the player's character, of explorations and
-// of gatherings (`kind`: hunt or herbs).
+// The journal: past reports of the player's character, of explorations, of
+// gatherings, of brewing and of the Warsztat (`kind`: hunt, herbs, potions
+// or items).
 
 import { requirePlayer } from './characters.js';
 import { ApiError, json } from './http.js';

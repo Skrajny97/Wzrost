@@ -244,7 +244,9 @@ async function vapidKeys(db) {
 }
 
 // The subscription's address, when it leads to a known push service. Tests
-// send to a stand-in on their own machine (PUSH_TEST_HOSTS).
+// send to a stand-in on their own machine (PUSH_TEST_HOSTS); without one no
+// empty name passes (the code review: "data:" and "file:" addresses, which
+// have no host, slipped through).
 function pushAddress(value, env) {
   if (typeof value !== 'string' || value.length > 1024) return null;
   let url;
@@ -253,7 +255,7 @@ function pushAddress(value, env) {
   } catch {
     return null;
   }
-  if ((env.PUSH_TEST_HOSTS ?? '').split(',').includes(url.hostname)) return url;
+  if ((env.PUSH_TEST_HOSTS ?? '').split(',').filter(Boolean).includes(url.hostname)) return url;
   return url.protocol === 'https:' && PUSH_HOSTS.some((suffix) => url.hostname.endsWith(suffix)) ? url : null;
 }
 

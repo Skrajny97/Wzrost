@@ -763,8 +763,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           }));
           if (care > 1) cleanse(member, actor, t);
         }
-        // Odnowa goes on healing for a few of the healer's next moves.
-        if (p.hot) {
+        // Odnowa goes on healing for a few of the healer's next moves, in a
+        // fight with evolutions' state (the code review: a skill of an
+        // evolution no longer on crashed the fight without it).
+        if (evolving && p.hot) {
           const turns = Math.round(p.hotTurns);
           actor.stances.push({ skill, until: actor.moves + 1 + turns, regen: true, heal: p.hot * care });
           log(() => ({ ...base, kind: 'skill', target: actor.id, text: say(texts, 'renewalHot', actions, { turns, hot: Math.round(p.hot * care * 100) }) }));

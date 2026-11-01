@@ -7,6 +7,7 @@
 import { giftCodeOf, giftRewardsText, withGiftResources } from '../engine/index.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
+import { raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 
 const usedText = () => content.giftTexts.used;
@@ -28,7 +29,10 @@ export async function redeemGiftCode(context) {
   const resources = withGiftResources(JSON.parse(row.resources ?? '{}'), gift.rewards);
   let updated;
   try {
-    [updated] = await db.batch([
+    // The batch holds only while the character is as read (atomic.js), so the
+    // code is marked used only with its rewards given (the code review).
+    [, updated] = await db.batch([
+      sameVersion(db, row),
       db
         .prepare(
           `UPDATE characters SET gold = gold + ?, time_points = time_points + ?, system_points = system_points + ?, resources = ?, version = version + 1
@@ -40,6 +44,7 @@ export async function redeemGiftCode(context) {
         .bind(session.userId, gift.id, row.id, context.now, row.id, row.version + 1),
     ]);
   } catch (error) {
+    if (raced(error)) throw new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
     // The same code taken a moment ago, in another tab: the batch is undone.
     if (/UNIQUE|PRIMARY KEY|constraint/i.test(String(error?.message))) throw new ApiError(409, 'used_code', usedText());
     throw error;

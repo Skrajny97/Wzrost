@@ -75,6 +75,7 @@ import {
   requirePlayer,
 } from './characters.js';
 import { toHex } from './encoding.js';
+import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { eventDraftsOn, eventsOn, settlementOn } from './features.js';
 import { soldGold } from './inventory.js';
@@ -106,11 +107,14 @@ function partyOf(player, now) {
 }
 
 function cachedSamples(player, character, equipped, areaId, now) {
-  const ids = equipped.map((item) => item.id).sort((a, b) => a - b);
+  // Each item worn whole: an upgrade, a reforged affix or an element keeps
+  // the item's id; and the evolution and the professions, whose levels give
+  // stats (the code review: the threat stayed as before them).
+  const gear = [...equipped].sort((a, b) => a.id - b.id).map((item) => JSON.stringify(item));
   // The companions ready to go along fight beside the character (companions.js).
   const companions = settlementOn() ? partyOf(player, now) : [];
   const party = companions.map((companion) => [companion.id, companion.level, companion.gear]);
-  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, ids, party]);
+  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party]);
   let samples = samplesCache.get(key);
   if (!samples) {
     samples = threatSamples({ character, equipped, areaId, companions }, content);
@@ -366,6 +370,9 @@ export async function beginHunt(
   const tracked = trackQuests ? questCreatures(questsNow(player, now), area) : [];
   try {
     await db.batch([
+      // The HP, potions, buffs and the Osada below are computed from the row
+      // read: the whole start holds only while it is as read (atomic.js).
+      sameVersion(db, player.row),
       db
         .prepare(
           'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, avoid_rare, seek_rare, tracked, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -399,6 +406,7 @@ export async function beginHunt(
         ),
     ]);
   } catch (error) {
+    if (raced(error)) throw characterChanged();
     if (String(error?.message).includes('constraint')) {
       throw new ApiError(409, 'busy', 'Postać jest już na wyprawie.');
     }
@@ -435,7 +443,16 @@ export async function cancelHunt(context) {
   const unused = Object.values(windows).some((window) => window.ms > used);
   const back = options.reserved ? options.potions ?? {} : {};
   const returning = Object.keys(back).length > 0;
-  await db.batch([
+  // The potions and buffs written back are computed from the row read: the
+  // call holds only while the row is as read and the exploration still
+  // goes on, so a claim or a sale meanwhile is not undone (atomic.js).
+  await atomically(db, [
+    assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND EXISTS (SELECT 1 FROM activities WHERE character_id = ? AND started_at = ?)', [
+      player.row.id,
+      player.row.version,
+      player.row.id,
+      activity.started_at,
+    ]),
     db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(player.row.id, activity.started_at),
     ...(unused || returning
       ? [
@@ -462,6 +479,9 @@ export async function claimHunt(context) {
   const body = (context.request.headers.get('Content-Type') ?? '').startsWith('application/json') ? await readJson(context.request) : {};
   const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting }[player.activity?.kind];
   const done = finish && player.activity.ends_at <= now ? await finish(context.env.DB, player, now) : await finishHunt(context.env.DB, player, now, { choice: body.choice });
+  // A work whose recipe or pattern the game no longer has gave back what it
+  // took and made no report.
+  if (!done) return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), now) });
   // The event comes first: the report waits for the player's choice.
   if (done.event) return json({ event: done.event });
   const { id, report } = done;
@@ -717,7 +737,12 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   let results;
   try {
     results = await db.batch([
-      // First, so that a second claim of the same hunt fails as a whole.
+      // The level, the potions, the buffs, the Osada and the rest below are
+      // computed from the row read: the claim holds only while it is as
+      // read, so a potion sold or an order delivered meanwhile is not undone
+      // (atomic.js); a retry claims anew.
+      sameVersion(db, row),
+      // Then the report, so that a second claim of the same hunt fails as a whole.
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, `${row.id}:${activity.started_at}`, 'hunt', now, JSON.stringify(summary), JSON.stringify(report)),
@@ -769,8 +794,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
     if (String(error?.message).includes('UNIQUE')) {
       throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
     }
+    if (raced(error)) throw characterChanged();
     throw error;
   }
 
-  return { id: results[0].meta.last_row_id, report };
+  return { id: results[1].meta.last_row_id, report };
 }

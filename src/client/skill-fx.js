@@ -7,7 +7,7 @@
 // has a look below, by its id in data/skills.json.
 
 import { h } from './dom.js';
-import { playSkill, playSound } from './sound.js';
+import { playSkill } from './sound.js';
 
 // cast: what plays when the skill wakes or a sweep starts; impact: extra
 // on the target of the skill's own blow; color: its light.

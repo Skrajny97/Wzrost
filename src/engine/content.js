@@ -1,7 +1,11 @@
 // Turns the raw data files into lookups used by the engine. Pure: the caller
 // loads the JSON (the Worker bundles it, tools read it from disk).
 
-const byId = (list) => Object.fromEntries(list.map((item) => [item.id, item]));
+// A lookup without the object prototype, so an id from a request such as
+// "constructor" or "toString" finds nothing in it (the code review: free stat
+// points through `{"points": {"constructor": 1}}`).
+const lookup = (entries) => Object.assign(Object.create(null), Object.fromEntries(entries));
+const byId = (list) => lookup(list.map((item) => [item.id, item]));
 
 // The evolutions' skills with what they take from their evolution: its class
 // and name (as a path), the class level of the first evolution and the
@@ -78,7 +82,7 @@ export function buildContent(raw) {
     prefixes,
     suffixes,
     affixesById: byId([...prefixes, ...suffixes]),
-    affixNamesByMonster: Object.fromEntries(names.map((name) => [name.monster, name])),
+    affixNamesByMonster: lookup(names.map((name) => [name.monster, name])),
     // The creatures, and the foes of the events' fights (events.json), who
     // fight the same way but live in no region and have no Bestiariusz.
     monstersById: byId([...raw.monsters, ...(raw.events?.foes ?? [])]),
@@ -104,10 +108,10 @@ export function buildContent(raw) {
     // rozbiórki makes from materials and from taken-apart items, one per rarity.
     materials: raw.materials.materials,
     materialsById: byId(raw.materials.materials),
-    materialsByMonster: Object.fromEntries(raw.materials.materials.map((material) => [material.monster, material])),
+    materialsByMonster: lookup(raw.materials.materials.map((material) => [material.monster, material])),
     parts: raw.materials.parts,
     partsById: byId(raw.materials.parts),
-    partsByRarity: Object.fromEntries(raw.materials.parts.map((part) => [part.rarity, part])),
+    partsByRarity: lookup(raw.materials.parts.map((part) => [part.rarity, part])),
     appearances: raw.appearances ?? [],
     appearancesById: byId(raw.appearances ?? []),
     // The skin tones of the portrait and the one a new character starts with.

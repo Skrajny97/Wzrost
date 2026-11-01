@@ -8,6 +8,7 @@
 import { construction, regenPerMinute, shiftQueue } from '../engine/index.js';
 import { content } from './content.js';
 import { buildQueue, characterView, currentHp, loadSettled, requirePlayer } from './characters.js';
+import { atomically, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 
 const MINUTE = 60000;
@@ -30,13 +31,15 @@ export async function skipWithTimePoints(context) {
 // The skipped introduction pays for its first exploration this way too.
 export async function spendTimePoints(db, player, target, now) {
   if (player.row.time_points < 1) throw new ApiError(409, 'no_time_points', 'Nie masz Punktów Czasu.');
-  const plan = { activity: skipActivity, avatar: skipAvatar, rest: skipRest, build: skipBuild }[target];
-  if (!plan) throw new ApiError(400, 'invalid_target', 'Nie wiadomo, co przewinąć.');
-  const { spent, statements } = plan(db, player, now);
-  // The first statement pays, only if the character and the wait are as seen
-  // here; the second moves the wait, only if the first paid. Two taps at once
-  // pay and skip once.
-  const [paid] = await db.batch(statements);
+  const plans = { activity: skipActivity, avatar: skipAvatar, rest: skipRest, build: skipBuild };
+  if (typeof target !== 'string' || !Object.hasOwn(plans, target)) throw new ApiError(400, 'invalid_target', 'Nie wiadomo, co przewinąć.');
+  const { spent, statements } = plans[target](db, player, now);
+  // The batch holds only while the character is as read (atomic.js); then
+  // the first statement pays, only if the wait is as seen here, and the
+  // second moves the wait, only if the first paid. Two taps at once pay and
+  // skip once, and no other change meanwhile lets a wait move unpaid (the
+  // code review).
+  const [, paid] = await atomically(db, [sameVersion(db, player.row), ...statements]);
   if (paid.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
   return spent;
 }

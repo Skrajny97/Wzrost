@@ -4,7 +4,7 @@
 
 import { ApiError, request } from './api.js';
 import { $, $$, clear, fill, h, icon } from './dom.js';
-import { emailRow, inviteToConfirm, mustConfirm, renderConfirm, takeEmailResult } from './email.js';
+import { emailRow, hideInvite, inviteToConfirm, mustConfirm, renderConfirm, takeEmailResult } from './email.js';
 import { countOf } from './format.js';
 import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
@@ -1119,6 +1119,10 @@ async function characterGone() {
 
 function leaveGame() {
   closeSheet();
+  // The parchments of quests and of the e-mail go with the game (the code
+  // review: they stayed over the login screen).
+  showQuests(false);
+  hideInvite();
   clearInterval(ticker);
   current?.screen.unmount?.();
   current = null;

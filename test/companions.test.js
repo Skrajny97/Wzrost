@@ -232,6 +232,34 @@ describe('companions through the API', () => {
     assert.equal((await call('POST', '/api/settlement/gift', { cookie, body: { companionId: candidate.id } })).data.error.code, 'gift_taken');
   });
 
+  test('a gift of herbs waits while the bag has no room for it (the code review)', async () => {
+    const [candidate] = (await settlement()).companions.candidates;
+    await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
+    // The companion turns herbalist: its gift is herbs.
+    const database = await db();
+    const herbalist = content.settlement.companions.professions.find((one) => one.goods === 'herb').id;
+    const stored = JSON.parse((await database.prepare('SELECT settlement FROM characters').first()).settlement);
+    stored.companions[0].profession = herbalist;
+    await database.prepare("UPDATE characters SET settlement = ?, herbs = '{}', potions = '{}'").bind(JSON.stringify(stored)).run();
+    const { gift } = (await settlement()).companions.hired[0];
+    assert.equal(gift.kind, 'herb');
+    // Every place of the bag taken by full stacks of another herb.
+    const { stack } = content.professionRules;
+    const other = content.herbs.find((herb) => herb.id !== gift.key).id;
+    const { bagUsed, bagCapacity } = (await call('GET', '/api/character', { cookie })).data.character;
+    const fill = (places) => database.prepare('UPDATE characters SET herbs = ?').bind(JSON.stringify({ [other]: places * stack })).run();
+    await fill(bagCapacity - bagUsed);
+    const full = await call('POST', '/api/settlement/gift', { cookie, body: { companionId: candidate.id } });
+    assert.equal(full.status, 409);
+    assert.equal(full.data.error.code, 'bag_full');
+    assert.ok((await settlement()).companions.hired[0].gift, 'the gift still waits');
+    // Room made: it goes in.
+    await fill(bagCapacity - bagUsed - Math.ceil(gift.count / stack));
+    const taken = await call('POST', '/api/settlement/gift', { cookie, body: { companionId: candidate.id } });
+    assert.equal(taken.status, 200, JSON.stringify(taken.data));
+    assert.equal(JSON.parse((await database.prepare('SELECT herbs FROM characters').first()).herbs)[gift.key], gift.count);
+  });
+
   test('items of its class from the bag go on the companion, what it wore goes back, and it gives them back when dismissed (108 A)', async () => {
     const [candidate] = (await settlement()).companions.candidates;
     await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });

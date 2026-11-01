@@ -23,6 +23,9 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
   let skills = null;
   let skillsOpen = false;
   let arena = null;
+  // Answers that come after the panel was left are dropped (the code
+  // review: a skill's fight played on with sound on the next screen).
+  let gone = false;
   const preview = h('div', { class: 'author-skill-preview', 'aria-live': 'polite' });
 
   async function load() {
@@ -34,12 +37,13 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
     } catch (failure) {
       error = failure.message;
     }
-    render();
+    if (!gone) render();
   }
 
   // One skill's fight, played at once; the one before stops.
   async function play(skill) {
     const { fight } = await call('GET', `/api/author/skills/${skill.id}`);
+    if (gone) return;
     arena?.stop();
     arena = createArena(fight, { autoplay: 'now' });
     fill(preview, h('h3', { class: 'author-skill-title', text: `${skill.name} · ${skill.className}` }), arena.element);
@@ -224,6 +228,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
   load();
   return {
     unmount() {
+      gone = true;
       arena?.stop();
     },
   };

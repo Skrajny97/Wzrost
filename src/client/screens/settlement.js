@@ -62,6 +62,15 @@ export function mountSettlement(container, { params = {} } = {}) {
       data = (await call('GET', '/api/settlement')).settlement;
       failure = null;
     } catch (error) {
+      // With the Osada already on the screen, it stays and the game asks
+      // again in half a minute (the code review: one refresh failed as the
+      // phone woke without a network left an error for good).
+      if (data && error.status !== 403 && error.status !== 404) {
+        if (gone) return;
+        clearTimeout(timer);
+        timer = setTimeout(load, 30000);
+        return;
+      }
       failure = error;
     }
     if (gone) return;

@@ -5,11 +5,12 @@
 // materials stay with their character (177 A). A character puts and takes
 // at home, as every change of the bag. The character that put an item in
 // takes it back as it was; another one gets it marked as from the chest
-// (data.chest): worn from the item's own level, as one from a Wymiana, and
-// left out of its Encyklopedia (ownDiscoveries in the engine).
+// (data.chest): worn from its Tier as every item (DECISIONS.md, "Przedmioty
+// według Tieru") and left out of its Encyklopedia (ownDiscoveries in the
+// engine).
 
 import { bagCapacity, campLevels, canUse, itemView } from '../engine/index.js';
-import { bagPlaces, characterView, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
+import { bagPlaces, characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
 

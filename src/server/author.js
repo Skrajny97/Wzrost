@@ -36,7 +36,8 @@ export async function authorPanel(context) {
            (SELECT COUNT(*) FROM users WHERE google_sub IS NOT NULL) AS google,
            (SELECT COUNT(*) FROM users WHERE created_at >= ?) AS new_accounts,
            (SELECT COUNT(*) FROM characters WHERE ${OWN_CHARACTERS}) AS characters,
-           (SELECT COUNT(*) FROM characters WHERE ${OWN_CHARACTERS} AND created_at >= ?) AS new_characters`,
+           (SELECT COUNT(*) FROM characters WHERE ${OWN_CHARACTERS} AND created_at >= ?) AS new_characters,
+           (SELECT COUNT(*) FROM bug_reports WHERE resolved_at IS NULL) AS open_bugs`,
       )
       .bind(since, since),
     db.prepare(
@@ -57,7 +58,8 @@ export async function authorPanel(context) {
   const total = counts.results[0];
   return json({
     counts: {
-      bugs: bugs.results.filter((bug) => bug.resolved_at === null).length,
+      // All the open ones, also beyond the list's 200 (the code review).
+      bugs: total.open_bugs,
       accounts: total.accounts,
       google: total.google,
       newAccounts: total.new_accounts,

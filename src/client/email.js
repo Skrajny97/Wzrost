@@ -266,6 +266,9 @@ function drawSent(page, email) {
   );
 }
 
+// The parchment rolled up when the player leaves the game (app.js).
+export const hideInvite = () => closeInvite(false);
+
 async function closeInvite(later) {
   if (!open || open.closing) return;
   const current = open;

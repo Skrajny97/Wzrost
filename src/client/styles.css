@@ -328,10 +328,6 @@ button {
   color: var(--leaf);
 }
 
-.status-error {
-  color: var(--danger);
-}
-
 /* System layer */
 
 .system-panel {
@@ -3989,42 +3985,6 @@ img.area-art {
   font-weight: 400;
 }
 
-.fight-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.fight-item {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 2px 10px;
-  padding: 8px 10px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  font-size: 15px;
-}
-
-.fight-time {
-  grid-row: span 2;
-  color: var(--text-muted);
-  font-family: var(--font-system);
-  font-size: 12px;
-}
-
-.fight-result {
-  color: var(--leaf);
-  font-family: var(--font-system);
-  font-size: 12px;
-}
-
-.fight-item--lost .fight-result {
-  color: var(--danger);
-}
-
 .account {
   display: flex;
   flex-direction: column;
@@ -6853,18 +6813,6 @@ button.skill-row {
   margin: 2px 0 0;
 }
 
-.evolution-current {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  border-color: #a87fd6;
-}
-
-.evolution-current .card-title {
-  margin: 0;
-  color: #c9a8ef;
-}
-
 .evolution-ceremony {
   display: flex;
   flex-direction: column;
@@ -9109,8 +9057,7 @@ a.profession-square:active {
 }
 
 /* The Tablica's orders and the brotherhoods, on its screen. */
-.settlement-board,
-.settlement-residents {
+.settlement-board {
   display: grid;
   gap: 10px;
   margin-bottom: 16px;
@@ -9187,10 +9134,6 @@ a.profession-square:active {
 
 .settlement-fold-body {
   margin-top: 8px;
-}
-
-.settlement-resident--soon {
-  opacity: 0.7;
 }
 
 /* The affixes a reforging drew: one under another, the one tapped stays. */

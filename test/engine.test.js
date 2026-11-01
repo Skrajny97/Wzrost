@@ -12,7 +12,6 @@ import {
   fireTrade,
   fireTradeBlock,
   fireUnitsMade,
-  partPrice,
   resourceExchange,
   shopBlock,
   shopLevelFor,

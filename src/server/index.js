@@ -231,14 +231,21 @@ const routes = [
   ['POST', '/api/test/back', backFromTest],
 ].map(([method, pattern, handler]) => ({ method, parts: pattern.split('/'), handler }));
 
-// Returns the :params of a matching pattern, or null.
+// Returns the :params of a matching pattern, or null. A parameter that is
+// not a valid escape ("%E0%A4%A") matches nothing, so the address is not
+// found (the code review: it was a server error).
 function match(parts, path) {
   const segments = path.split('/');
   if (segments.length !== parts.length) return null;
   const params = {};
   for (let i = 0; i < parts.length; i++) {
-    if (parts[i].startsWith(':')) params[parts[i].slice(1)] = decodeURIComponent(segments[i]);
-    else if (parts[i] !== segments[i]) return null;
+    if (parts[i].startsWith(':')) {
+      try {
+        params[parts[i].slice(1)] = decodeURIComponent(segments[i]);
+      } catch {
+        return null;
+      }
+    } else if (parts[i] !== segments[i]) return null;
   }
   return params;
 }
@@ -281,13 +288,23 @@ export default {
   // that came due (push.js), and at the top of an hour the new names of
   // characters whose names break the rules (characters.js). The scheduled
   // minute is the clock here, so each run takes the time since the one
-  // before.
+  // before. Each job runs even when one before it fails (the code review:
+  // a failed rename stopped the Targowisko and the notifications).
   async scheduled(controller, env) {
     readFeatures(env);
-    await renameBlockedNames(env, controller.scheduledTime);
-    // The Targowisko's offers that ended (market.js), where the Osada is.
-    if (settlementOn()) await settleMarket(env.DB, controller.scheduledTime);
-    await sendNotifications(env, controller.scheduledTime);
+    const jobs = [
+      () => renameBlockedNames(env, controller.scheduledTime),
+      // The Targowisko's offers that ended (market.js), where the Osada is.
+      () => settlementOn() && settleMarket(env.DB, controller.scheduledTime),
+      () => sendNotifications(env, controller.scheduledTime),
+    ];
+    for (const job of jobs) {
+      try {
+        await job();
+      } catch (error) {
+        console.error(error);
+      }
+    }
   },
 };
 

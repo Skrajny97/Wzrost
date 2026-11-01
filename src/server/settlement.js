@@ -7,7 +7,6 @@
 // level, puts everyone at one standing and brings new orders at once.
 
 import {
-  BAG_GOODS,
   COMPANION_SLOTS,
   addCounts,
   addQuestProgress,
@@ -218,7 +217,7 @@ function orderView(order, stocks, sellBonus) {
 // greeting of their relation's standing, the brotherhoods' standings and
 // the orders on the board, each with what the character holds of it.
 export function settlementView(player, stored, board, now) {
-  const stocks = settlementGoods(player.row, player.items);
+  const stocks = settlementGoods(player.row, player.items, now);
   const sellBonus = sellBonusOf(player, now);
   const { name, description, places, torches = [], residents, brotherhoods } = content.settlement;
   return {
@@ -283,8 +282,9 @@ function imbueView(player) {
 }
 
 // { itemId, element }: the Zaklinaczka puts an element on a weapon or a
-// body armour, worn or in the bag, at home as every change of the gear;
-// one already there gives way. Gold and the element's material pay.
+// body armour, a worn one at home as every change of the gear, one in the
+// bag also while away; one already there gives way. Gold and the element's
+// material pay.
 export async function imbueAtEnchantress(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -372,8 +372,9 @@ function herbalistView(player, stored, now) {
 }
 
 // { kind: herb or potion, id, count }: Jagna buys herbs or potions from the
-// bag, at home, as the scrapper does; the trade raises the relation with
-// her and the reputation with the herbalists, up to the day's limit.
+// bag, also while the character is away, as the scrapper does (DECISIONS.md,
+// "Plecak pod ręką"); the trade raises the relation with her and the
+// reputation with the herbalists, up to the day's limit.
 export async function sellToHerbalist(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -642,7 +643,7 @@ export async function deliverSettlementOrder(context) {
   const body = await readJson(context.request);
   const stored = settlementOf(row);
   const board = settlementBoard(row, stored, context.now);
-  const goods = settlementGoods(row, player.items);
+  const goods = settlementGoods(row, player.items, context.now);
   const block = deliverBlock(board, body.orderId, goods, content);
   if (block) throw new ApiError(block.code === 'no_order' ? 404 : 409, block.code, block.message);
   const done = deliverOrder(board, body.orderId, context.now, content, sellBonusOf(player, context.now));
@@ -776,8 +777,8 @@ export async function hireCompanion(context) {
 
 // { companionId }: the companion leaves for good and does not come back as
 // a candidate this week. It gives back the items it got from the bag, so
-// they need free places there, and takes its own gear along. Not while it
-// is out on an exploration.
+// they need free places there, and takes its own gear along. Also while it
+// is out on an exploration: it is not brought back from it (hunts.js).
 export async function dismissCompanion(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -848,8 +849,9 @@ export async function equipCompanion(context) {
 }
 
 // { companionId }: the companion's gift of the week from its profession
-// (question 112 A) goes to the character's goods. At home, as herbs and
-// potions wait in the bag while the character is away.
+// (question 112 A) goes to the character's goods, also while the
+// character is away, as the bag stays at hand (DECISIONS.md, "Plecak pod
+// ręką").
 export async function takeCompanionGift(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -863,6 +865,16 @@ export async function takeCompanionGift(context) {
   if (!gift) throw new ApiError(409, 'gift_taken', 'Prezent z tego tygodnia jest już odebrany. Następny w poniedziałek.');
   const next = { ...stored, companions: hired.map((one) => (one === companion ? { ...one, giftWeek: gift.week } : one)) };
   const column = COLUMNS[gift.kind];
+  // Herbs and potions take places in the bag, as Jagna's do: a gift that
+  // does not fit waits for room (the code review: it overfilled the bag and
+  // the next exploration sold the weakest items).
+  if (gift.kind === 'herb' || gift.kind === 'potion') {
+    const held = JSON.parse(row[column] ?? '{}');
+    const free = bagCapacity(campLevels(player.buildings, context.now, content), content) - bagPlaces(player);
+    if (bagStacks({ ...held, [gift.key]: (held[gift.key] ?? 0) + gift.count }, content) - bagStacks(held, content) > free) {
+      throw new ApiError(409, 'bag_full', `${companion.name} ma dla Ciebie prezent, ale nie zmieści się w plecaku. Zrób w nim miejsce.`);
+    }
+  }
   const key = jsonPath(gift.key);
   const result = await context.env.DB.prepare(
     `UPDATE characters SET settlement = ?, ${column} = json_set(${column}, ?, COALESCE(json_extract(${column}, ?), 0) + ?), version = version + 1 WHERE id = ? AND version = ?`,
@@ -926,7 +938,8 @@ export async function rejectSettlementOrder(context) {
 // anew, for gold and creatures' materials (`material`: the stack paid with).
 // From a closer relation she draws two or three and the player keeps one
 // (chooseReforged); until then they wait in the Osada and no other affix
-// can be reforged. The character must be at home, as at the Kowadło.
+// can be reforged. A worn item waits for the character at home, as at the
+// Kowadło; one in the bag is reforged also while it is away.
 export async function reforgeAtEnchantress(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;

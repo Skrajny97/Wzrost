@@ -5,8 +5,9 @@
 import { fromBase64, toBase64 } from './encoding.js';
 
 const SCHEME = 'pbkdf2-sha256';
-// About 5 ms of CPU, which fits the 10 ms limit of the Workers Free plan
-// (100 000 iterations, the runtime maximum, takes about 17 ms).
+// About 5 ms of CPU, chosen for the 10 ms limit of the Workers Free plan.
+// On Workers Paid it may go up to the runtime maximum, 100 000 (about
+// 17 ms); each stored hash would then be upgraded at its next login.
 export const ITERATIONS = 30_000;
 const SALT_BYTES = 16;
 const HASH_BITS = 256;

@@ -26,7 +26,7 @@ import {
   saleGold,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, craftingState, loadPlayer, questsNow, requireIdlePlayer, requirePlayer } from './characters.js';
+import { characterView, craftingState, loadPlayer, questsNow, requirePlayer } from './characters.js';
 import { toHex } from './encoding.js';
 import { craftingOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';

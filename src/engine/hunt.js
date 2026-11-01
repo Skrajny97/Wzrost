@@ -25,7 +25,7 @@
 import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
-import { itemName, itemRank, itemView, randomItem } from './items.js';
+import { canUse, itemName, itemRank, itemView, randomItem } from './items.js';
 import { TIMED_KINDS, fightPotions } from './potions.js';
 import {
   classXpToNext,
@@ -466,10 +466,11 @@ export function simulateHunt(
   const buffFights = {};
   const oil = content.potions.find((potion) => potion.effect.poison)?.dot;
   // An item from a chest. A character without a weapon holds a found one at
-  // once, for the rest of the exploration.
+  // once, for the rest of the exploration, when its class level lets it wear
+  // it (the code review: it fought with a weapon it could not put on after).
   const take = (item) => {
     items.push(item);
-    if (item.slot === 'weapon' && !worn.some((held) => held.slot === 'weapon')) {
+    if (item.slot === 'weapon' && !worn.some((held) => held.slot === 'weapon') && canUse(item.base, character.classId, content, character.classLevel)) {
       worn = [...worn, item];
       player = playerCombatant({ character, equipped: worn, hp: hpNow, name, area }, content);
     }
@@ -743,11 +744,14 @@ export function levelUpMessages(character, { level, classLevel = character.class
   const perLevel = content.statIds.length;
   const time = content.balance.timePoints;
   const unlockLevel = content.unlocksById.stats.level;
-  // Skill Points come with each class level from the one the skills open at.
-  const skillGain = skillPoints({ classLevel }, content).earned - skillPoints({ classLevel: character.classLevel }, content).earned;
+  // Skill Points come with each class level from the one the skills open at,
+  // and after the evolution with those it adds; the class goes by its
+  // evolution's name (the code review: both left the evolution out).
+  const { evolution } = character;
+  const skillGain = skillPoints({ classLevel, evolution }, content).earned - skillPoints({ classLevel: character.classLevel, evolution }, content).earned;
   const messages = [];
   if (levels > 0) messages.push(say(texts, 'levelUp', 0, { level }));
-  if (classLevels > 0) messages.push(say(texts, 'classLevelUp', 0, { className: content.classesById[character.classId].name, level: classLevel }));
+  if (classLevels > 0) messages.push(say(texts, 'classLevelUp', 0, { className: classNameOf(character, content), level: classLevel }));
   messages.push(
     say(texts, level < unlockLevel ? 'statPointsWaiting' : 'statPointsGained', 0, { points: perLevel * levels + Math.floor(perLevel / 4) * classLevels, unlockLevel }),
     say(texts, 'timePointsGained', 0, { time: time.perLevel * levels + time.perClassLevel * classLevels }),

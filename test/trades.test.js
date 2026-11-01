@@ -75,6 +75,21 @@ describe('Wymiana', () => {
     assert.equal(await current(players.ala), null);
   });
 
+  test('the exchange gives exactly the item offered, not one changed after the offer (the code review)', async () => {
+    const given = await inBag('Ala', amulet(10));
+    const id = await opened();
+    const offered = await trade(players.ala, 'offer', { id, offer: { items: [given] } });
+    const locked = await trade(players.ola, 'confirm', { id, version: offered.data.trade.version });
+    assert.equal(locked.data.trade.state, 'locked');
+    // After Ola's confirmation the item changes (as the Kowadło or the
+    // Zaklinaczka, or another item taking its number, would change it).
+    await (await db()).prepare("UPDATE items SET data = json_set(data, '$.level', 1) WHERE id = ?").bind(given).run();
+    const done = await trade(players.ala, 'confirm', { id, version: locked.data.trade.version });
+    assert.notEqual(done.status, 200);
+    const kept = await (await db()).prepare('SELECT character_id FROM items WHERE id = ?').bind(given).first();
+    assert.equal(kept.character_id, (await row('Ala')).id);
+  });
+
   test('what a trade brings stays out of the Encyklopedia until the character finds or makes its own', async () => {
     const herb = content.herbs[0].id;
     await (await db()).prepare('UPDATE characters SET herbs = ? WHERE name = ?').bind(JSON.stringify({ [herb]: 7 }), 'Ola').run();
