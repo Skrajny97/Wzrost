@@ -3025,6 +3025,19 @@ Autor: „331 D / 333 A / 334 A / 335 A / 332 A / 330 B” oraz „336 A, reszt�
 2. **336 A.** Skóry od Wszebora zostają w obecnych cenach, także gdy ktoś rozbiera je na Stole rozbiórki na części.
 3. **329.** Zostaje dotychczasowe zachowanie (A): wolne miejsce w wyprawie drużyny zajmuje towarzysz lidera z Kwater.
 
+## ElevenLabs: nowy model efektów dźwiękowych (1.11.2026)
+
+Autor przekazał mail ElevenLabs: model efektów dźwiękowych `eleven_text_to_sound_v2` działa do 1 lutego 2027, a jego następcą jest `eleven_text_to_sound_v3`. Zapytania bez `model_id` same przejdą na v3.
+
+1. **Nic do zmiany teraz.** `tools/generate-sfx.mjs` nie podaje `model_id` przy efektach dźwiękowych, więc po tej dacie sam przejdzie na v3. Narrator korzysta z innego modelu (`eleven_v3`), którego zmiana nie dotyczy.
+2. **Gotowe dźwięki zostają.** Gra odtwarza zapisane pliki MP3, więc dźwięki w grze się nie zmienią. Nowe szkice od lutego mogą brzmieć trochę inaczej, a autor i tak sprawdza każdy na słuch.
+
+## Uwagi autora: Stajnia i kolory rzadkości w Kuźni (1.11.2026, na wersji testowej)
+
+1. **Opis Stajni.** Autor: „Zdanie nad jak to działa ładujemy pod jak to działa, a ostatnie o Szybkim Polowaniu wywalamy”. Pod tytułem „Wierzchowce” jest teraz od razu „Jak to działa?”. Po rozwinięciu: „Wierzchowiec zostaje na stałe i skraca czekanie na koniec każdej wyprawy. Nagrody, doświadczenie i walki są jak za pełny czas wyprawy. Wierzchowce kupuje się po kolei, a lepszy zastępuje słabszego.” Zdanie o Szybkim i Błyskawicznym Polowaniu zniknęło, a sama zasada się nie zmienia.
+2. **Kolory rzadkości w Kuźni.** Autor: „kolory są źle ustawione "rzadki" jest bowiem zielony”. Przy przekuciu („pospolity > rzadki”) i w wyniku przekucia nazwy rzadkości mają kolory rzadkości z gry, np. „rzadki” zielony, a „unikalny” niebieski. Wcześniej nowa rzadkość miała zawsze kolor Systemu. Przekreślona dawna rzadkość ma swój kolor, nieco przygaszony.
+3. **Zrzut z gry.** Na zrzucie autora kowal bierze materiał o rzadkości „rzadki” do przekucia pospolitego przedmiotu, czyli jeszcze według zasady sprzed 339 A. Na wersji testowej bierze już materiał obecnej rzadkości przedmiotu (pospolity), a do gry ta zmiana trafi z najbliższym wdrożeniem.
+
 ## Samouczek Kuźni, Garbarni i Stajni (1.11.2026, na wersji testowej)
 
 Autor: „Zrób też Samouczki analogiczne do reszty lokacji w Osadzie”.
@@ -3032,7 +3045,7 @@ Autor: „Zrób też Samouczki analogiczne do reszty lokacji w Osadzie”.
 1. **Kroki**, jak w pozostałych miejscach Osady, przy pierwszej wizycie po wycieczce po planszy:
     - Kuźnia: Zwoje ochronne, przekucie na wyższą rzadkość, relacja z Żelisławem i Bractwo Kowali;
     - Garbarnia: zakładka „Kup”, zakładka „Sprzedaj”, relacja z Wszeborem i Bractwo Łowców;
-    - Stajnia: wierzchowce oraz tempo najwolniejszego wierzchowca w drużynie.
+    - Stajnia: wierzchowce oraz tempo najwolniejszego wierzchowca w drużynie (a bez wierzchowca choćby u jednej osoby pełny czas).
 2. **Ostatnia kwestia wycieczki po planszy** („Zajrzyj też do pozostałych mieszkańców Rozstajów…”) wskazuje teraz także Kuźnię, Garbarnię i Stajnię. Tekst się nie zmienia, więc nagranie zostaje.
 3. **Brakujący szczegół: pierwszy krok Garbarni** wskazuje zakładkę „Kup”, a nie listę towaru. Lista Wszebora jest dłuższa niż ekran telefonu, a pierścień wskazania obejmuje tylko to, co widać.
 4. **Kto usłyszy.** Postać, która była już w tych miejscach, usłyszy ich kwestie przy następnej wizycie, tak jak przy wcześniejszych miejscach Osady.

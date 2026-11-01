@@ -73,10 +73,12 @@ export function stableCard({ stage, mounts }, apply) {
     'section',
     { class: 'stack', 'data-guide': 'stable-mounts' },
     h('h2', { class: 'section-title', text: 'Wierzchowce' }),
-    howItWorks('Wierzchowiec zostaje na stałe i skraca czekanie na koniec każdej wyprawy.', [
+    // All under "Jak to działa?" (the author: "Zdanie nad jak to działa
+    // ładujemy pod jak to działa, a ostatnie o Szybkim Polowaniu wywalamy").
+    howItWorks(null, [
+      'Wierzchowiec zostaje na stałe i skraca czekanie na koniec każdej wyprawy.',
       'Nagrody, doświadczenie i walki są jak za pełny czas wyprawy.',
       'Wierzchowce kupuje się po kolei, a lepszy zastępuje słabszego.',
-      'Nie działają w Szybkim i Błyskawicznym Polowaniu, które kończą się od razu.',
     ]),
     h(
       'ul',

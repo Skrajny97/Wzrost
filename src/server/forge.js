@@ -155,7 +155,9 @@ export async function raiseAtForge(context) {
     raised: {
       itemId: saved.id,
       name: itemName(saved, content),
+      before: item.rarity,
       beforeName: content.raritiesById[item.rarity].name,
+      after: saved.rarity,
       afterName: content.raritiesById[saved.rarity].name,
       gold: offer.gold,
       points,

@@ -24,6 +24,9 @@ import { tanneryCard } from '../tannery.js';
 import { itemSummary, materialTitle } from './character.js';
 import { mountMarket, numberField, stackButton } from './market.js';
 
+// A rarity's colour in the game (data/rarities.json), as items show it.
+const rarityColor = (id) => state.content.rarities.find((rarity) => rarity.id === id)?.color;
+
 // What is left of an order's week on the board: days, then hours.
 function timeLeft(ms) {
   const hours = Math.max(0, ms) / 3600000;
@@ -885,9 +888,9 @@ export function mountSettlement(container, { params = {} } = {}) {
           h(
             'p',
             { class: 'settlement-change' },
-            h('span', { class: 'settlement-change-old', text: item.rarityName }),
+            h('span', { class: 'settlement-change-old settlement-change-rarity', vars: { '--rarity': rarityColor(item.rarity) }, text: item.rarityName }),
             icon('chevron', { size: 18 }),
-            h('span', { class: 'settlement-change-new', text: item.nextName }),
+            h('span', { class: 'settlement-change-new settlement-change-rarity', vars: { '--rarity': rarityColor(item.next) }, text: item.nextName }),
           ),
           h('p', { class: 'muted', text: 'Afiksy urosną do wartości nowej rzadkości, a przedmiot dostanie jeden nowy afiks. Drugi raz kowal go nie przekuje.' }),
           cost.element,
@@ -920,9 +923,9 @@ export function mountSettlement(container, { params = {} } = {}) {
         h(
           'p',
           { class: 'settlement-change' },
-          h('span', { class: 'settlement-change-old', text: raised.beforeName }),
+          h('span', { class: 'settlement-change-old settlement-change-rarity', vars: { '--rarity': rarityColor(raised.before) }, text: raised.beforeName }),
           icon('chevron', { size: 18 }),
-          h('span', { class: 'settlement-change-new', text: raised.afterName }),
+          h('span', { class: 'settlement-change-new settlement-change-rarity', vars: { '--rarity': rarityColor(raised.after) }, text: raised.afterName }),
         ),
         raised.points > 0 && h('p', { class: 'muted', text: `Relacja z Żelisławem i reputacja Bractwa Kowali +${raised.points}.` }),
         h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--system', text: 'Gotowe', onClick: closeSheet })),

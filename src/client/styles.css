@@ -9304,6 +9304,16 @@ a.profession-square:active {
   font-weight: 600;
 }
 
+/* A rarity's name in the game's colour of it (the Kuźnia's raise; the
+   author: "kolory są źle ustawione „rzadki” jest bowiem zielony"). */
+.settlement-change-rarity {
+  color: var(--rarity);
+}
+
+.settlement-change-old.settlement-change-rarity {
+  opacity: 0.75;
+}
+
 /* "Testuj Osadę" on the test version (app.js): one button per standing. */
 .settlement-test-standings {
   display: flex;

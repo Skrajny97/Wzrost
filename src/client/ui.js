@@ -25,7 +25,7 @@ export function howItWorks(lead, rest, { system = false } = {}) {
   return h(
     'div',
     { class: 'how' },
-    line(lead),
+    lead && line(lead),
     h('details', { class: `how-more${system ? ' how-more--system' : ''}` }, h('summary', { class: 'how-toggle', text: 'Jak to działa?' }), [rest].flat().map(line)),
   );
 }

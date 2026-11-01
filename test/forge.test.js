@@ -130,6 +130,8 @@ describe('the Kuźnia through the API', () => {
     const raised = await raise({ material });
     assert.equal(raised.status, 200);
     assert.equal(raised.data.raised.afterName, content.raritiesById.unique.name);
+    // The rarities by id too, for their colours on the page.
+    assert.deepEqual([raised.data.raised.before, raised.data.raised.after], ['rare', 'unique']);
     assert.equal(raised.data.character.gold, 100000 - offer.gold);
     const row = await database.prepare('SELECT materials, settlement FROM characters').first();
     assert.equal(JSON.parse(row.materials)[material], undefined);
