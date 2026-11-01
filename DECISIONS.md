@@ -2996,7 +2996,16 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
-## Przegląd kodu (1.11.2026, na wersji testowej)
+## Wersja 0.0.72 (1.11.2026)
+
+Autor: „Wdrażaj 0.0.72”.
+
+1. **Co wchodzi do gry:**
+    - sprzedaż wybranej liczby sztuk u Jagny i płatność w dół do pełnej monety za sprzedane sztuki (zob. „Sprzedaż pojedynczych sztuk u Jagny”);
+    - poprawki, przyspieszenia i porządki z przeglądu kodu, w tym krótka pamięć telefonu na grafiki, dźwięki i czcionki (zob. „Przegląd kodu”).
+2. **Migracje bazy:** brak.
+
+## Przegląd kodu (1.11.2026, w grze od 0.0.72)
 
 Autor: „Na sam koniec nocnych działań przejrzyj kod gry, wyszukaj błędy, ureguluj je, oczyść ze śmieci itp. (zakładam, że będzie działać gra sprawniej). Zrób to ostrożnie, skrupulatnie i z testami, wyczuciem.”
 
@@ -3030,7 +3039,7 @@ Przegląd objął silnik, serwer i grę w przeglądarce. Każdą poprawkę spraw
 12. **Porządki.** Usunięte zostały nieużywane style, importy i stałe. Nieaktualne komentarze są poprawione, a opis silnika uzupełniony.
 13. **Na później.** Bez zmian zostają: pobieranie muzyki i dźwięków (ustalone wcześniej z autorem), łączenie zapytań czatu (idą już równolegle) i lżejszy podgląd profilu innej postaci. Zysk jest tam mały, a ryzyko większe.
 
-## Sprzedaż pojedynczych sztuk u Jagny (1.11.2026, na wersji testowej)
+## Sprzedaż pojedynczych sztuk u Jagny (1.11.2026, w grze od 0.0.72)
 
 Autor: „Powinno się móc tez sprzedać pojedyncze sztuki tego co mam u Zielarki a nie tylko wszystko.”
 
