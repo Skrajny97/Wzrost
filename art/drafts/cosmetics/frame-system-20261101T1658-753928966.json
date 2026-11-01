@@ -1,0 +1,30 @@
+{
+  "id": "frame-system",
+  "payload": {
+    "prompt": "a rectangular magic frame seen straight from the front, dark blue steel edges with glowing ice-blue light lines and small arcane runes running along all four sides, sharp angular corner brackets that glow brighter, like a mystical hologram window, the whole frame fills the image edge to edge, the inside of the frame is empty flat black, symmetrical",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 120,
+    "height": 160,
+    "num_images": 3,
+    "seed": 753928966,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793552412,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 38.39,
+    "request_id": "63171617-1597-4f5a-ba6d-2ba5d2a6ca3b",
+    "outputs_retained_until": 1793638762,
+    "billing": {
+      "source": "balance",
+      "balance_left": 38.39,
+      "balance_charged": 0.54
+    }
+  }
+}
