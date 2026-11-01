@@ -1,0 +1,30 @@
+{
+  "id": "tanner-2",
+  "payload": {
+    "prompt": "a stocky hunter and hide trader with a shaggy brown beard, a wolf-fur cloak over his shoulders, a skinning knife on his belt, a bundle of leather hides on his shoulder, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 795692037,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793532613,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 40.67,
+    "request_id": "8b582806-5ddf-4544-aa06-d0ed218136ac",
+    "outputs_retained_until": 1793618965,
+    "billing": {
+      "source": "balance",
+      "balance_left": 40.67,
+      "balance_charged": 0.18
+    }
+  }
+}

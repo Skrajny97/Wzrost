@@ -1,0 +1,30 @@
+{
+  "id": "smith-2",
+  "payload": {
+    "prompt": "a broad-shouldered grey-bearded master smith with a bald head and bushy eyebrows, a leather apron and thick gloves, holding red-hot tongs, warm forge light on his face, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 1,
+    "seed": 927148592,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793532532,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 41.03,
+    "request_id": "0cb60a04-0432-4ba3-8e16-8ecb2223a795",
+    "outputs_retained_until": 1793618905,
+    "billing": {
+      "source": "balance",
+      "balance_left": 41.03,
+      "balance_charged": 0.18
+    }
+  }
+}
