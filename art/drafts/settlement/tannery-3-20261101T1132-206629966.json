@@ -1,0 +1,30 @@
+{
+  "id": "tannery-3",
+  "payload": {
+    "prompt": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, made of logs, planks, thatch and wooden shingles, no stone houses and no tiled roofs, standing directly on bare ground with no ground tile, base or platform under it, the tannery: a small log hut with a thatched roof and, in front of it, three big brown animal hides stretched flat on square wooden drying frames, clearly visible from the front, a wooden tanning vat and a scraping beam beside them",
+    "prompt_style": "rd_plus__isometric_asset",
+    "width": 128,
+    "height": 96,
+    "num_images": 1,
+    "seed": 206629966,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793532742,
+    "credit_cost": 1,
+    "balance_cost": 0.06,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 40.25,
+    "request_id": "318f7b97-0828-4ad7-b9f4-df8521d59dcd",
+    "outputs_retained_until": 1793619139,
+    "billing": {
+      "source": "balance",
+      "balance_left": 40.25,
+      "balance_charged": 0.06
+    }
+  }
+}
