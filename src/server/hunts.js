@@ -415,6 +415,8 @@ export async function beginHunt(
     }
     throw error;
   }
+  // What it set out with, for the roster of a Drużyna's trip (parties.js).
+  return { windows, trophies, taken, healBelow: healBelow ?? content.potionUse.healBelow, tracked, unknown, rumor, avoidRare, seekRare, companions: party };
 }
 
 // Calling the character back early gives nothing and costs nothing. A
@@ -546,6 +548,10 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // The potions taken along and the windows of the potions for a time
   // (beginHunt).
   const options = JSON.parse(activity.options ?? '{}');
+  // A Drużyna's trip: its fights from the trip's roster and seed, the same
+  // for every member, as its leader leads them; what this member finds and
+  // earns from its own seed (trips.js, simulateHunt).
+  const trip = options.party?.seed && options.party.roster?.length > 0 ? options.party : null;
   let hunt = simulateHunt(
     {
       character,
@@ -554,18 +560,20 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       name: row.name,
       areaId: area.id,
       minutes: activity.minutes,
-      seed: activity.seed,
+      seed: trip ? trip.seed : activity.seed,
+      ...(trip && { lootSeed: activity.seed, roster: trip.roster, self: row.id }),
       first,
-      avoidRare: activity.avoid_rare === 1,
-      seekRare: activity.seek_rare === 1,
-      rumor: options.rumor ?? 1,
-      companions: options.companions ?? [],
-      partners: options.partners ?? [],
-      tracked: JSON.parse(activity.tracked ?? '[]'),
-      unknown: options.unknown ?? [],
+      avoidRare: trip ? trip.encounter.avoidRare === true : activity.avoid_rare === 1,
+      seekRare: trip ? trip.encounter.seekRare === true : activity.seek_rare === 1,
+      rumor: (trip ? trip.encounter.rumor : options.rumor) ?? 1,
+      companions: (trip ? trip.companions : options.companions) ?? [],
+      partners: trip ? [] : (options.partners ?? []),
+      tracked: trip ? (trip.encounter.tracked ?? []) : JSON.parse(activity.tracked ?? '[]'),
+      unknown: (trip ? trip.encounter.unknown : options.unknown) ?? [],
       // The creatures met before this exploration: it changes them only
-      // when claimed, so the report comes out the same every time.
-      met: JSON.parse(row.met ?? '[]'),
+      // when claimed, so the report comes out the same every time (on a
+      // trip, those its leader had met as it set out).
+      met: trip ? (trip.encounter.met ?? []) : JSON.parse(row.met ?? '[]'),
       potions: options.potions ?? {},
       healBelow: options.healBelow,
       buffs: optionWindows(options),
@@ -632,7 +640,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const applied = applyHunt(character, hunt, content);
   // The companions who went gain XP, one who fell is wounded, and an
   // event's reputation and rumor are kept (settlementAfterHunt).
-  const settlementAfter = settlementAfterHunt(row, hunt, kept, activity.minutes);
+  const settlementAfter = settlementAfterHunt(row, trip && trip.roster[0].id !== row.id ? { ...hunt, companions: [] } : hunt, kept, activity.minutes);
   // The potions taken along were set aside at the start (`reserved`): what
   // was not drunk comes back to the bag. An exploration started before that
   // takes the potions drunk from the bag, where they stayed.

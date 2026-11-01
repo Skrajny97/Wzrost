@@ -31,6 +31,7 @@ import { characterView, currentHp, engineCharacter, equippedItems, loadCharacter
 import { content } from './content.js';
 import { guildTagSql } from './guilds.js';
 import { beginHunt } from './hunts.js';
+import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
 
@@ -338,37 +339,52 @@ export async function partyHunt(context) {
   // healing mark, tracking), so a wrong one sends nobody (the code review);
   // then the members, each without the leader's choices. One that got busy
   // meanwhile stays home.
-  await beginHunt(db, player, body, now, { party: party_, partners: partnersOf(player, everyone) });
+  const setups = new Map([[player.row.id, await beginHunt(db, player, body, now, { party: party_, partners: partnersOf(player, everyone) })]]);
   const went = [];
   for (const member of going) {
     try {
-      await beginHunt(db, member, { areaId: area.id, minutes: body.minutes, avoidRare: body.avoidRare === true, seekRare: body.seekRare === true && body.avoidRare !== true }, now, {
+      const setup = await beginHunt(db, member, { areaId: area.id, minutes: body.minutes, avoidRare: body.avoidRare === true, seekRare: body.seekRare === true && body.avoidRare !== true }, now, {
         party: party_,
         partners: partnersOf(member, everyone),
       });
+      setups.set(member.row.id, setup);
       went.push(member);
     } catch (error) {
       if (!(error instanceof ApiError)) throw error;
     }
   }
-  // One that could not go after all (it got busy, or its character changed
-  // meanwhile) fights in nobody's exploration (the author: "niech się nie
-  // okaże, że jednak 3 walczą"): those who went keep only each other, and
-  // a leader left alone goes as on its own.
-  if (went.length < going.length) {
-    const actual = [player, ...went];
-    const crew = { ...party_, names: actual.map((member) => member.row.name) };
-    const trip = `json_extract(options, '$.party.trip') = ? AND json_extract(options, '$.party.id') = ?`;
-    await db.batch(
-      actual.map((member) =>
-        went.length > 0
-          ? db
-              .prepare(`UPDATE activities SET options = json_set(options, '$.party', json(?), '$.partners', json(?)) WHERE character_id = ? AND kind = 'hunt' AND ${trip}`)
-              .bind(JSON.stringify(crew), JSON.stringify(partnersOf(member, actual)), member.row.id, now, party.id)
-          : db.prepare(`UPDATE activities SET options = json_remove(options, '$.party', '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`).bind(member.row.id, now, party.id),
-      ),
-    );
-  }
+  // The trip as it set out, kept by each of its explorations (trips.js): its
+  // own seed and its roster, those who went in its order with what each
+  // brought, the leader's companions in the places left and how the leader
+  // leads it, so its fights come out the same in every member's report (the
+  // author: "postacie z drużyny mają inne raporty odbytych walk. To nie
+  // powinno mieć miejsca"). One that could not go after all (it got busy,
+  // or its character changed meanwhile) fights in nobody's exploration (the
+  // author: "niech się nie okaże, że jednak 3 walczą"), and a leader left
+  // alone goes as on its own.
+  const actual = [player, ...went];
+  const lead = setups.get(player.row.id);
+  const crew = {
+    ...party_,
+    names: actual.map((member) => member.row.name),
+    seed: toHex(crypto.getRandomValues(new Uint8Array(16))),
+    roster: actual.map((member) => {
+      const setup = setups.get(member.row.id);
+      return { ...shots.get(member.row.id), windows: setup.windows, trophies: setup.trophies, ...(member === player && { potions: setup.taken, healBelow: setup.healBelow }) };
+    }),
+    companions: lead.companions,
+    encounter: { avoidRare: lead.avoidRare, seekRare: lead.seekRare, rumor: lead.rumor, tracked: lead.tracked, unknown: lead.unknown, met: JSON.parse(player.row.met ?? '[]') },
+  };
+  const trip = `json_extract(options, '$.party.trip') = ? AND json_extract(options, '$.party.id') = ?`;
+  await db.batch(
+    actual.map((member) =>
+      went.length > 0
+        ? db
+            .prepare(`UPDATE activities SET options = json_remove(json_set(options, '$.party', json(?)), '$.partners'${member === player ? '' : ", '$.companions'"}) WHERE character_id = ? AND kind = 'hunt' AND ${trip}`)
+            .bind(JSON.stringify(crew), member.row.id, now, party.id)
+        : db.prepare(`UPDATE activities SET options = json_remove(options, '$.party', '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`).bind(member.row.id, now, party.id),
+    ),
+  );
   return json(
     { character: characterView(await loadPlayer(db, session.userId), now), ...(await partyView(db, player.row.id, now)), went: went.map((member) => member.row.name) },
     201,

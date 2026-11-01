@@ -30,14 +30,17 @@ export function shiftTrip(db, trip, startedAt, shift, record, also = { sql: '', 
 }
 
 // A member called back from a trip leaves the others' fights and names: each
-// other exploration of the trip keeps its partners and names without it.
+// other exploration of the trip keeps its roster (or, from before the
+// roster, its partners) and names without it.
 export function leaveTrip(db, trip, row) {
+  const without = (path) => `json((SELECT json_group_array(json(value)) FROM json_each(activities.options, '${path}') WHERE json_extract(value, '$.id') != ?))`;
   return db
     .prepare(
-      `UPDATE activities SET options = json_set(options,
-         '$.partners', json((SELECT json_group_array(json(value)) FROM json_each(activities.options, '$.partners') WHERE json_extract(value, '$.id') != ?)),
-         '$.party.names', json((SELECT json_group_array(value) FROM json_each(activities.options, '$.party.names') WHERE value != ?)))
+      `UPDATE activities SET options = CASE WHEN json_type(options, '$.party.roster') = 'array'
+         THEN json_set(options, '$.party.roster', ${without('$.party.roster')}, '$.party.names', json((SELECT json_group_array(value) FROM json_each(activities.options, '$.party.names') WHERE value != ?)))
+         ELSE json_set(options, '$.partners', ${without('$.partners')}, '$.party.names', json((SELECT json_group_array(value) FROM json_each(activities.options, '$.party.names') WHERE value != ?)))
+       END
        WHERE kind = 'hunt' AND character_id != ? AND json_extract(options, '$.party.id') = ? AND json_extract(options, '$.party.trip') = ?`,
     )
-    .bind(row.id, row.name, row.id, trip.id, trip.trip);
+    .bind(row.id, row.name, row.id, row.name, row.id, trip.id, trip.trip);
 }

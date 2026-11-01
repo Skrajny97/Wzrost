@@ -371,16 +371,34 @@ export function resourceBundle(area, total) {
 // potion alone, as explorations started before the other kinds kept it
 // (potions.js).
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, first = false, avoidRare = false, seekRare = false, rumor = 1, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [] },
+  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [] },
   content,
 ) {
+  // A Drużyna's trip (src/server/trips.js) gives `roster`, its players in
+  // the trip's order, each with what it brought (its potions for a time and
+  // trophies, the leader's potions), and `seed`, the trip's: its timeline
+  // and fights come out the same in every member's report (the author:
+  // "postacie z drużyny mają inne raporty odbytych walk. To nie powinno mieć
+  // miejsca - powinny być wspólne jedynie łupy, XP itp. osobne"). What the
+  // member (`self`, its id) finds and earns comes from its own seed
+  // (`lootSeed`) and its own character. Alone, one seed gives both, as ever.
   const rng = createRng(seed);
+  const lootRng = lootSeed ? createRng(lootSeed) : rng;
   const tuning = content.balance.hunt;
   const rewards = content.balance.rewards;
   const texts = content.texts;
   const area = content.areasById[areaId];
-  let worn = equipped;
-  let player = playerCombatant({ character, equipped: worn, hp, name, area }, content);
+  // The players who fight, each with its HP through the exploration, the
+  // potions it still carries and drank, and the fights its potions for a
+  // time worked in: the trip's roster, or the character alone.
+  const fighters = (roster ?? [{ id: null, character, equipped, hp, name, potions, healBelow, windows: { ...(speed && { speed }), ...buffs }, trophies }]).map((one, index) => {
+    const unit = playerCombatant({ character: one.character, equipped: one.equipped, hp: one.hp, name: one.name, area, id: index === 0 ? 'a0' : `p${index}` }, content);
+    return { ...one, worn: one.equipped, unit, hp: unit.hp, left: { ...(one.potions ?? {}) }, potionsUsed: {}, buffFights: {}, windows: one.windows ?? {}, trophies: one.trophies ?? {} };
+  });
+  const me = (roster && fighters.find((one) => one.id === self)) || fighters[0];
+  // The trip's encounters follow its leader (its level and the creatures it
+  // has met), the same for everyone.
+  const lead = fighters[0].character;
   const durationMs = minutes * 60000;
   // The companions hired in the Osada (companions.js) go along, up to two
   // more members of the party, each with its own HP through the exploration
@@ -393,8 +411,11 @@ export function simulateHunt(
   // out once fallen, as the companions, first in the line after the
   // character; each one along takes parties.xpCost of the character's XP
   // (the design document: solo +10% XP, duo +5%, a full party no bonus).
-  const partyXp = 1 - companions.length * content.settlement.companions.xpCost - partners.length * content.balance.parties.xpCost;
-  const friends = partners.map((partner, index) => {
+  const others = roster ? fighters.length - 1 : partners.length;
+  const partyXp = 1 - companions.length * content.settlement.companions.xpCost - others * content.balance.parties.xpCost;
+  // Before the trips' roster, the other players fought beside the character
+  // as mates, out once fallen; on a trip they fight as the character does.
+  const friends = (roster ? [] : partners).map((partner, index) => {
     const unit = playerCombatant({ character: partner.character, equipped: partner.equipped, hp: partner.hp, name: partner.name, area, id: `p${index + 1}` }, content);
     return { id: partner.id, unit, hp: Math.min(unit.maxHp, partner.hp ?? unit.maxHp), out: false };
   });
@@ -412,7 +433,7 @@ export function simulateHunt(
   // seeking one meets them more often. In a place too easy for the
   // character, those it has not met come far more often until the first
   // fight with them, and then as usual.
-  let catchUp = first || avoidRare ? null : rareCatchUp(character.level, area, met, content);
+  let catchUp = first || avoidRare ? null : rareCatchUp(lead.level, area, met, content);
   const odds = () => withRareOdds(explorationPace(minutes, content), { avoidRare: first || avoidRare, seekRare, catchUp, rumor }, content);
   let pace = odds();
   if (first) pace = { ...pace, toughChance: 0 };
@@ -435,8 +456,7 @@ export function simulateHunt(
   const otherClass = content.balance.items.otherClass;
   const otherClassShare = character.level >= otherClass.fromLevel ? otherClass.share : 0;
   const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare };
-  const hpStart = player.hp;
-  let hpNow = player.hp;
+  const hpStart = me.hp;
   let result = 'success';
   let endedAt = durationMs; // a faint or an escape ends the exploration early
   let xp = 0;
@@ -457,22 +477,17 @@ export function simulateHunt(
   const fights = [];
   const entries = [];
   let key = null;
-  // The potions still carried and those drunk, by id, and, by kind, the
-  // fights the potions for a time worked in. The aconite oil coats a blade
-  // that has no coat of its own yet.
-  const left = { ...potions };
-  const potionsUsed = {};
-  const windows = { ...(speed && { speed }), ...buffs };
-  const buffFights = {};
+  // The aconite oil coats a blade that has no coat of its own yet.
   const oil = content.potions.find((potion) => potion.effect.poison)?.dot;
   // An item from a chest. A character without a weapon holds a found one at
   // once, for the rest of the exploration, when its class level lets it wear
   // it (the code review: it fought with a weapon it could not put on after).
+  // Not on a trip, whose fights stay the same for every member.
   const take = (item) => {
     items.push(item);
-    if (item.slot === 'weapon' && !worn.some((held) => held.slot === 'weapon') && canUse(item.base, character.classId, content, character.classLevel)) {
-      worn = [...worn, item];
-      player = playerCombatant({ character, equipped: worn, hp: hpNow, name, area }, content);
+    if (!roster && item.slot === 'weapon' && !me.worn.some((held) => held.slot === 'weapon') && canUse(item.base, character.classId, content, character.classLevel)) {
+      me.worn = [...me.worn, item];
+      me.unit = playerCombatant({ character, equipped: me.worn, hp: me.hp, name, area }, content);
     }
     return items.length - 1;
   };
@@ -482,18 +497,18 @@ export function simulateHunt(
       // A find is gold, a treasure chest with an item of the place's level,
       // resources for the camp, nothing of interest or, rarely, a shard of
       // time (Time Points).
-      const findLevel = areaLevel(area, rng, content);
+      const findLevel = areaLevel(area, lootRng, content);
       const outcomes = Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest'));
-      const outcome = rng.weighted(outcomes, ([, weight]) => weight)[0];
+      const outcome = lootRng.weighted(outcomes, ([, weight]) => weight)[0];
       if (outcome === 'gold') {
-        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * rng.float(0.5, 1.5)));
+        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5)));
         gold += amount;
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findGold', step, { gold: amount }) });
       } else if (outcome === 'chest') {
-        const item = randomItem(findLevel, rng, content, loot);
+        const item = randomItem(findLevel, lootRng, content, loot);
         entries.push({ t: event.t, type: 'find', item: take(item), text: say(texts, 'findChest', step, { item: itemName(item, content) }) });
       } else if (outcome === 'resource') {
-        const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * rng.float(0.5, 1.5));
+        const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * lootRng.float(0.5, 1.5));
         for (const [id, amount] of found) resources[id] = (resources[id] ?? 0) + amount;
         const list = found.map(([id, amount]) => `${content.resourcesById[id].name.toLowerCase()} +${amount}`).join(', ');
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findResource', step, { resources: list }) });
@@ -507,41 +522,50 @@ export function simulateHunt(
       continue;
     }
 
-    const encounter = rollEncounter(area, rng, content, character.level, pace, tracked, unknown);
+    const encounter = rollEncounter(area, rng, content, lead.level, pace, tracked, unknown);
     if (catchUp && (encounter.elite || encounter.champion)) {
       catchUp = { elite: catchUp.elite && !encounter.elite, champion: catchUp.champion && !encounter.champion };
       if (!catchUp.elite && !catchUp.champion) catchUp = null;
       pace = odds();
     }
     const enemies = encounterCombatants(encounter, content);
-    const kit = fightPotions(left, healBelow ?? content.potionUse?.healBelow, content);
-    const on = {};
-    for (const [kind, window] of Object.entries(windows)) if (event.t < window.ms) on[kind] = window.bonus;
-    // Focus raises Intelekt and Mądrość, which the character's numbers grow from.
-    const base = on.focus ? playerCombatant({ character, equipped: worn, hp: hpNow, name, area, statBoost: { intellect: on.focus, wisdom: on.focus } }, content) : player;
-    const ally = {
-      ...base,
-      hp: hpNow,
-      ...(on.speed && { speed: base.speed * (1 + on.speed) }),
-      ...(on.armor && { armor: Math.round(base.armor * (1 + on.armor)) }),
-      // A curse takes off what a strength potion adds.
-      ...((on.damage || on.curse) && { damageBonus: (on.damage ?? 0) - (on.curse ?? 0) }),
-      ...(on.ward && { ward: on.ward }),
-      ...(on.poison && oil && !base.weapon.dot && { weapon: { ...base.weapon, dot: { ...oil, chance: on.poison } } }),
-      ...(Object.keys(kit).length > 0 && { potions: kit }),
-      ...(Object.keys(trophies).length > 0 && { trophies }),
-    };
+    // Each player as it fights now: its potions for a time still working,
+    // the potions it carries and its trophies.
+    const players = fighters.map((fighter) => {
+      const kit = fightPotions(fighter.left, fighter.healBelow ?? content.potionUse?.healBelow, content);
+      const on = {};
+      for (const [kind, window] of Object.entries(fighter.windows)) if (event.t < window.ms) on[kind] = window.bonus;
+      for (const kind of Object.keys(on)) fighter.buffFights[kind] = (fighter.buffFights[kind] ?? 0) + 1;
+      // Focus raises Intelekt and Mądrość, which the character's numbers grow from.
+      const base = on.focus
+        ? playerCombatant({ character: fighter.character, equipped: fighter.worn, hp: fighter.hp, name: fighter.name, area, id: fighter.unit.id, statBoost: { intellect: on.focus, wisdom: on.focus } }, content)
+        : fighter.unit;
+      return {
+        ...base,
+        hp: fighter.hp,
+        ...(on.speed && { speed: base.speed * (1 + on.speed) }),
+        ...(on.armor && { armor: Math.round(base.armor * (1 + on.armor)) }),
+        // A curse takes off what a strength potion adds.
+        ...((on.damage || on.curse) && { damageBonus: (on.damage ?? 0) - (on.curse ?? 0) }),
+        ...(on.ward && { ward: on.ward }),
+        ...(on.poison && oil && !base.weapon.dot && { weapon: { ...base.weapon, dot: { ...oil, chance: on.poison } } }),
+        ...(Object.keys(kit).length > 0 && { potions: kit }),
+        ...(Object.keys(fighter.trophies).length > 0 && { trophies: fighter.trophies }),
+      };
+    });
+    const ally = players[fighters.indexOf(me)];
     const fighting = mates.filter((mate) => !mate.out);
-    const allies = [ally, ...fighting.map((mate) => ({ ...mate.unit, hp: mate.hp }))];
+    const allies = [...players, ...fighting.map((mate) => ({ ...mate.unit, hp: mate.hp }))];
     const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
-    const hpBefore = hpNow;
-    hpNow = fight.units.find((unit) => unit.id === ally.id).hp;
+    const hpBefore = me.hp;
+    for (const fighter of fighters) fighter.hp = fight.units.find((unit) => unit.id === fighter.unit.id).hp;
     for (const mate of fighting) mate.hp = Math.max(0, fight.units.find((unit) => unit.id === mate.unit.id).hp);
+    // A potion drunk is the one player's that carries it (on a trip, the leader's).
     for (const id of fight.drunk) {
-      left[id] -= 1;
-      potionsUsed[id] = (potionsUsed[id] ?? 0) + 1;
+      const drinker = fighters.find((fighter) => (fighter.left[id] ?? 0) > 0) ?? me;
+      drinker.left[id] = (drinker.left[id] ?? 0) - 1;
+      drinker.potionsUsed[id] = (drinker.potionsUsed[id] ?? 0) + 1;
     }
-    for (const kind of Object.keys(on)) buffFights[kind] = (buffFights[kind] ?? 0) + 1;
 
     // Every fight keeps what its playback needs: the sides and the events.
     const summary = {
@@ -553,7 +577,7 @@ export function simulateHunt(
       enemies: enemies.map((enemy) => ({ name: enemy.name, level: enemy.level, monsterId: enemy.monsterId })),
       won: fight.won,
       hpBefore,
-      hpAfter: hpNow,
+      hpAfter: me.hp,
       xp: 0,
       gold: 0,
       materials: {},
@@ -591,9 +615,9 @@ export function simulateHunt(
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
         const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus);
-        fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * goldFactor;
+        fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * lootRng.float(0.5, 1.5) * goldFactor;
         const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials;
-        summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, rng, content));
+        summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, lootRng, content));
       }
       materials = addCounts(materials, summary.materials);
       // A character without a weapon, and with none found yet, finds a chest
@@ -603,15 +627,15 @@ export function simulateHunt(
       // epic or rarer item.
       const chests = [];
       if (!filled.has('weapon')) {
-        const weapon = randomItem(enemies[0].level, rng, content, first ? { ...loot, rarityId: content.rarities[0].id } : loot);
+        const weapon = randomItem(enemies[0].level, lootRng, content, first ? { ...loot, rarityId: content.rarities[0].id } : loot);
         chests.push([weapon, 'firstChest']);
       }
       if (encounter.elite) {
-        chests.push([randomItem(enemies[0].level, rng, content, { ...loot, rarityBonus: rewards.eliteRarityBonus }), 'eliteChest']);
+        chests.push([randomItem(enemies[0].level, lootRng, content, { ...loot, rarityBonus: rewards.eliteRarityBonus }), 'eliteChest']);
       }
-      if (encounter.champion && rng.chance(rewards.championItemChance)) {
-        const rarityId = championItemRarity(enemies[0].level, rng, content);
-        chests.push([randomItem(enemies[0].level, rng, content, { ...loot, rarityId }), 'championChest']);
+      if (encounter.champion && lootRng.chance(rewards.championItemChance)) {
+        const rarityId = championItemRarity(enemies[0].level, lootRng, content);
+        chests.push([randomItem(enemies[0].level, lootRng, content, { ...loot, rarityId }), 'championChest']);
       }
       for (const [item] of chests) summary.chests.push(take(item));
       summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp);
@@ -619,8 +643,11 @@ export function simulateHunt(
       xp += summary.xp;
       reached = gainXp(reached.level, reached.xp, summary.xp, (level) => xpToNext(level, content), maxLevel);
       gold += summary.gold;
-      summary.recovered = Math.round((player.maxHp - hpNow) * Math.min(1, player.recovery + pace.restBonus));
-      hpNow += summary.recovered;
+      for (const fighter of fighters) {
+        const back = Math.round((fighter.unit.maxHp - fighter.hp) * Math.min(1, fighter.unit.recovery + pace.restBonus));
+        if (fighter === me) summary.recovered = back;
+        fighter.hp += back;
+      }
       for (const mate of fighting.filter((one) => !one.out)) mate.hp += Math.round((mate.unit.maxHp - mate.hp) * Math.min(1, mate.unit.recovery + pace.restBonus));
 
       lines.push(say(texts, 'victory', step), `HP: ${hpBefore} → ${summary.hpAfter}. +${summary.xp} XP, +${summary.gold} złota.`);
@@ -635,16 +662,16 @@ export function simulateHunt(
 
     if (fight.won === false) {
       result = (encounter.elite || encounter.champion) && area.safe ? 'escaped' : 'fainted';
-      hpNow = Math.max(1, Math.round(player.maxHp * tuning.hpAfterFaint));
-      lines.push(say(texts, result === 'fainted' ? 'defeat' : 'escape', step, { target: player.name }));
+      for (const fighter of fighters) fighter.hp = Math.max(1, Math.round(fighter.unit.maxHp * tuning.hpAfterFaint));
+      lines.push(say(texts, result === 'fainted' ? 'defeat' : 'escape', step, { target: me.unit.name }));
       endedAt = event.t;
     } else {
       result = 'escaped';
-      hpNow = Math.max(1, hpNow);
-      lines.push(say(texts, 'draw', step, { target: player.name }));
+      for (const fighter of fighters) fighter.hp = Math.max(1, fighter.hp);
+      lines.push(say(texts, 'draw', step, { target: me.unit.name }));
       endedAt = event.t;
     }
-    summary.hpAfter = hpNow;
+    summary.hpAfter = me.hp;
     entries.push({ t: event.t, type: 'fight', fight: summary.index, text: lines.join(' ') });
     break;
   }
@@ -671,19 +698,20 @@ export function simulateHunt(
     timePoints,
     items,
     hpStart,
-    hpEnd: hpNow,
-    maxHp: player.maxHp,
+    hpEnd: me.hp,
+    maxHp: me.unit.maxHp,
     fights,
     entries,
     keyFight: key && { index: key.index },
-    potionsUsed,
-    buffFights,
+    potionsUsed: me.potionsUsed,
+    buffFights: me.buffFights,
     // The companions at the end: their HP and whether they fell on the way;
     // the party's players too.
     ...(companions.length > 0 && {
       companions: mates.filter((mate) => !friends.includes(mate)).map((mate) => ({ id: mate.id, name: mate.unit.name, hpEnd: mate.hp, maxHp: mate.unit.maxHp, fainted: mate.out })),
     }),
     ...(friends.length > 0 && { partners: friends.map((mate) => ({ id: mate.id, name: mate.unit.name, hpEnd: mate.hp, maxHp: mate.unit.maxHp, fainted: mate.out })) }),
+    ...(roster && { partners: fighters.filter((fighter) => fighter !== me).map((fighter) => ({ id: fighter.id, name: fighter.unit.name, hpEnd: fighter.hp, maxHp: fighter.unit.maxHp, fainted: false })) }),
   };
 }
 

@@ -83,8 +83,8 @@ describe('Drużyna through the API', () => {
       assert.equal(activity.region_id, 'mossy-boulders');
       assert.equal(activity.minutes, 30);
       assert.deepEqual(options.party.names.sort(), ['Druh', 'Lider']);
-      assert.equal(options.partners.length, 1);
-      assert.notEqual(options.partners[0].id, activity.character_id);
+      // The trip's roster, both players in the trip's order.
+      assert.deepEqual(options.party.roster.map((one) => one.name), ['Lider', 'Druh']);
     }
     await (await db()).prepare('UPDATE activities SET started_at = started_at - ?, ends_at = ends_at - ?').bind(1800000, 1800000).run();
     for (const login of ['lider', 'druh']) {
@@ -217,10 +217,10 @@ describe('Drużyna through the API', () => {
       assert.deepEqual(went.data.went, ['Druh']);
       const hunts = (await (await db()).prepare("SELECT c.name, a.options FROM activities a JOIN characters c ON c.id = a.character_id WHERE a.kind = 'hunt' ORDER BY c.name").all()).results;
       assert.deepEqual(
-        hunts.map((row) => [row.name, JSON.parse(row.options).party.names, JSON.parse(row.options).partners.map((partner) => partner.name)]),
+        hunts.map((row) => [row.name, JSON.parse(row.options).party.names, JSON.parse(row.options).party.roster.map((one) => one.name)]),
         [
-          ['Druh', ['Lider', 'Druh'], ['Lider']],
-          ['Lider', ['Lider', 'Druh'], ['Druh']],
+          ['Druh', ['Lider', 'Druh'], ['Lider', 'Druh']],
+          ['Lider', ['Lider', 'Druh'], ['Lider', 'Druh']],
         ],
       );
     } finally {
@@ -238,12 +238,35 @@ describe('Drużyna through the API', () => {
     assert.equal((await as('trzeci', 'POST', '/api/hunts/cancel')).status, 200);
     const hunts = (await (await db()).prepare("SELECT c.name, a.options FROM activities a JOIN characters c ON c.id = a.character_id WHERE a.kind = 'hunt' ORDER BY c.name").all()).results;
     assert.deepEqual(
-      hunts.map((row) => [row.name, JSON.parse(row.options).party.names, JSON.parse(row.options).partners.map((partner) => partner.name)]),
+      hunts.map((row) => [row.name, JSON.parse(row.options).party.names, JSON.parse(row.options).party.roster.map((one) => one.name)]),
       [
-        ['Druh', ['Lider', 'Druh'], ['Lider']],
-        ['Lider', ['Lider', 'Druh'], ['Druh']],
+        ['Druh', ['Lider', 'Druh'], ['Lider', 'Druh']],
+        ['Lider', ['Lider', 'Druh'], ['Lider', 'Druh']],
       ],
     );
+  });
+
+  test('a trip\'s fights are the same in every member\'s report; finds, XP and events are each one\'s own', async () => {
+    await (await db()).prepare("UPDATE characters SET level = 26, class_level = 30 WHERE name = 'Druh'").run();
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    assert.equal((await as('lider', 'POST', '/api/party/hunt', { areaId: 'mossy-boulders', minutes: 60 })).status, 201);
+    // The trip's seed and roster, the same in both explorations; each keeps its own seed.
+    const rows = (await (await db()).prepare("SELECT c.name, a.seed, a.options FROM activities a JOIN characters c ON c.id = a.character_id ORDER BY c.name").all()).results;
+    const [druh, lider] = rows.map((row) => ({ ...row, options: JSON.parse(row.options) }));
+    assert.equal(druh.options.party.seed, lider.options.party.seed);
+    assert.deepEqual(druh.options.party.roster.map((one) => one.name), ['Lider', 'Druh']);
+    assert.notEqual(druh.seed, lider.seed);
+    await (await db()).prepare('UPDATE activities SET started_at = started_at - ?, ends_at = ends_at - ?').bind(3600000, 3600000).run();
+    const reports = await claimBoth();
+    const fights = (report) => report.fights.map((fight) => [fight.enemies.map((enemy) => `${enemy.monsterId}:${enemy.level}`).join(','), fight.won, fight.allies.map((ally) => ally.name).join(','), JSON.stringify(fight.events)]);
+    assert.ok(reports.lider.fights.length > 0);
+    assert.deepEqual(fights(reports.druh), fights(reports.lider));
+    // Each one's own XP: from the same won fights, by its own level.
+    const won = reports.lider.fights.filter((fight) => fight.won === true).length;
+    for (const report of [reports.lider, reports.druh]) {
+      assert.equal(report.fights.filter((fight) => fight.won === true && fight.xp > 0).length, won, JSON.stringify(report.summary));
+    }
   });
 
   test('a member leaves when it wants, a leader who leaves passes the lead, and a party nobody is in goes', async () => {

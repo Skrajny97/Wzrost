@@ -2996,6 +2996,16 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wspólne walki wyprawy drużyny (1.11.2026, na wersji testowej)
+
+Autor: „Wydaje mi się albo postacie z drużyny mają inne raporty odbytych walk. To nie powinni mieć miejsca - powinny być wspólne jedynie łupy, XP itp. osobne.” oraz „Ewentualne zdarzenia również osobno.”
+
+1. **Wspólne walki.** Wyprawa drużyny ma swoje ziarno losowania i skład zapisany przy wyjściu: graczy w kolejności drużyny (lider pierwszy), każdego z jego miksturami na czas i trofeami, miksturami lidera na drogę oraz towarzyszami lidera z Kwater na wolnych miejscach. Z tego jednego zapisu każdy członek dostaje te same walki: tych samych przeciwników, ten sam przebieg i ten sam wynik wyprawy.
+2. **Osobno.** Znaleziska, złoto, materiały, skrzynie i przedmioty losują się z własnego ziarna każdej postaci, a XP liczy się z jej własnego poziomu. Zdarzenie na końcu wyprawy też jest osobne dla każdego.
+3. **Prowadzi lider (brakujący szczegół).** Spotkania wyprawy idą za liderem: jego poziomem, omijaniem albo tropieniem elit, tropieniem stworów z zadań, plotką z Karczmy i stworami, które już spotkał. Towarzysze z Kwater w wyprawie drużyny są lidera, więc tylko jego raport zmienia ich XP i rany.
+4. **Gracze w walce (brakujący szczegół).** Na wyprawie drużyny gracz, który padnie w wygranej walce, odpoczywa po niej jak każdy i walczy dalej. Przegrana walka kończy wyprawę wszystkim. Znaleziona broń nie zmienia uzbrojenia w trakcie wyprawy drużyny, żeby walki zostały wspólne.
+5. **Wyprawy sprzed zmiany** liczą się jak dotąd, każda osobno.
+
 ## Skrót gildii przy imieniu (1.11.2026, na wersji testowej)
 
 Autor: „koło nicka na czacie ogólnym i wszędzie powinien wyśiwetlać sie tez skrót nazwy Gildii [....] w kwadratowym nawiasie”.
