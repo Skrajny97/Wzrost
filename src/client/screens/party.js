@@ -125,9 +125,10 @@ export function mountParty(container) {
         'section',
         { class: 'card', 'aria-labelledby': 'party-title' },
         h('h2', { class: 'card-title', id: 'party-title' }, icon('swords', { size: 22 }), 'Drużyna'),
+        // The author's words (1.11.2026).
         h('p', {
           class: 'muted',
-          text: 'Drużyna to do trzech postaci różnych graczy. Lider wybiera miejsce i czas, a wszyscy wolni idą razem i walczą ramię w ramię. Każdy dostaje własny raport i łupy. Zaproś kogoś poniżej, a drużyna powstanie.',
+          text: 'Drużyna może składać się z maksymalnie 3 osób. Lider drużyny zarządza wspólnymi wyprawami wolnych towarzyszy. Każda z osób otrzymuje własne łupy.',
         }),
       );
     }
@@ -177,13 +178,14 @@ export function mountParty(container) {
       'section',
       { class: 'card', 'aria-labelledby': 'party-invite-title' },
       h('h2', { class: 'card-title', id: 'party-invite-title', text: 'Zaproś do drużyny' }),
+      // The author's words (1.11.2026), over the friends and the name field.
+      h('p', { class: 'muted', text: `Zaproś postaci od ${view.unlockLevel}. poziomu wzwyż. Poniżej możesz to zrobić z listy znajomych lub dodać kogokolwiek ręcznie spoza niej.` }),
       ready.length > 0 &&
         h(
           'ul',
           { class: 'friends-list' },
           ready.map((friend) => h('li', { class: 'friend' }, who(friend), h('div', { class: 'friend-actions' }, button('Zaproś', act('/api/party/invite', { name: friend.name }), 'system')))),
         ),
-      h('p', { class: 'muted', text: `Zaprosisz postać od ${view.unlockLevel}. poziomu: znajomego wyżej albo dowolną postać po imieniu.` }),
       inviteForm,
     );
   }

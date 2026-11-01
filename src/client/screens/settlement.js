@@ -9,7 +9,7 @@
 // Where the deployment has no Osada yet, or the character is below its
 // level, the tab says so as the other locked modules do.
 
-import { residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
+import { resourceArt, residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatCountdown, formatDecimal, formatHours, formatMinutes, formatNumber, saleGold } from '../format.js';
@@ -19,7 +19,7 @@ import { dayPart } from '../scenes.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { companionCard } from '../companions.js';
-import { itemSummary } from './character.js';
+import { itemSummary, materialTitle } from './character.js';
 import { mountMarket, numberField, stackButton } from './market.js';
 
 // What is left of an order's week on the board: days, then hours.
@@ -299,6 +299,40 @@ export function mountSettlement(container, { params = {} } = {}) {
       );
     }
 
+    // What the reforging takes, as the Kowadło shows it: gold and the
+    // material, each as had / needed, red while short, the stack nearest to
+    // enough when none is, and what is missing (a tester via the author: "Co
+    // masz ile ci czego brakuje", "Może żeby jakoś graficznie to
+    // przedstawić").
+    function costPart(item, material) {
+      const need = item.materials;
+      const goldShort = Math.max(0, item.gold - state.character.gold);
+      const chip = (art, label, have, wanted) =>
+        h('li', { class: `cost${have < wanted ? ' cost--missing' : ''}` }, art, h('span', { text: label }), h('strong', { text: `${formatNumber(have)} / ${formatNumber(wanted)}` }));
+      const picked = need?.stacks.find((one) => one.key === material) ?? null;
+      // None of the rarity is enough: the stack of it with the most pieces.
+      const nearest = need && !picked ? ((state.character.crafting?.materials ?? []).filter((one) => one.rarity === need.rarity).sort((a, b) => b.count - a.count)[0] ?? null) : null;
+      const materialShort = need && !picked ? Math.max(0, need.count - (nearest?.count ?? 0)) : 0;
+      const materialChip =
+        need &&
+        (picked
+          ? chip(materialIcon(picked.key.slice(0, picked.key.lastIndexOf(':')), 16), materialTitle(picked), picked.count, need.count)
+          : chip(nearest ? materialIcon(nearest.materialId, 16) : icon('unknown', { size: 16 }), nearest ? materialTitle(nearest) : `Materiał: ${need.rarityName}`, nearest?.count ?? 0, need.count));
+      const missing = [goldShort > 0 && `${formatNumber(goldShort)} złota`, materialShort > 0 && `${formatNumber(materialShort)} szt. materiału`].filter(Boolean);
+      return {
+        goldShort,
+        // The material there to give, or none needed.
+        materialReady: !need || Boolean(picked),
+        element: [
+          h('p', { class: 'field-label', text: 'Koszt zaklęcia' }),
+          h('ul', { class: 'cost-list', 'aria-label': 'Koszt zaklęcia' }, chip(resourceArt('gold', 16), 'Złoto', state.character.gold, item.gold), materialChip),
+          need && h('p', { class: 'muted', text: `Zaklęcie bierze ${formatNumber(need.count)} szt. jednego materiału o rzadkości „${need.rarityName}”.` }),
+          missing.length > 0 && h('p', { class: 'region-warning', text: `Brakuje: ${missing.join(', ')}.` }),
+          materialShort > 0 && h('p', { class: 'system-hint', text: 'Materiały tej rzadkości wypadają ze stworów na wyprawach. Kupisz je też na Targowisku.' }),
+        ],
+      };
+    }
+
     function pickAffix(itemId, affix = null, stack = null) {
       const item = data.reforge.items.find((one) => one.id === itemId);
       if (!item) return pickItem();
@@ -307,12 +341,14 @@ export function mountSettlement(container, { params = {} } = {}) {
       let chosen = affix ?? (item.affixes.length === 1 ? 0 : null);
       let material = stacks.some((one) => one.key === stack) ? stack : (stacks[0]?.key ?? null);
       const draw = () => {
-        const short = item.gold - state.character.gold;
-        const ready = chosen !== null && short <= 0 && (!item.materials || material !== null);
+        const cost = costPart(item, material);
+        const ready = chosen !== null && cost.goldShort === 0 && cost.materialReady;
         fill(
           body,
           h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), 'Inny przedmiot'),
           h('div', { class: 'settlement-reforge-item' }, itemHead(item)),
+          // The cost first, seen at once.
+          cost.element,
           h('p', { class: 'field-label', text: 'Afiks do zaklęcia' }),
           h(
             'div',
@@ -334,13 +370,13 @@ export function mountSettlement(container, { params = {} } = {}) {
               ),
             ),
           ),
-          item.materials && h('p', { class: 'field-label', text: `Materiał: ${item.materials.count} szt., ${item.materials.rarityName}` }),
-          item.materials &&
-            (stacks.length > 0
-              ? h(
-                  'div',
-                  { class: 'settlement-picks' },
-                  stacks.map((one) =>
+          // Which material to give, where more than one is enough.
+          stacks.length > 1 && h('p', { class: 'field-label', text: 'Materiał do zaklęcia' }),
+          stacks.length > 1 &&
+            h(
+              'div',
+              { class: 'settlement-picks' },
+              stacks.map((one) =>
                     h(
                       'button',
                       {
@@ -356,15 +392,13 @@ export function mountSettlement(container, { params = {} } = {}) {
                       h('span', { class: 'settlement-pick-text', text: `${one.label} (${formatNumber(one.count)})` }),
                       pickMark(),
                     ),
-                  ),
-                )
-              : h('p', { class: 'muted', text: 'Nie masz dość materiałów tej rzadkości.' })),
-          h('p', { class: 'muted', text: `Koszt: ${formatNumber(item.gold)} złota${short > 0 ? `, brakuje Ci ${formatNumber(short)}` : ''}.` }),
+                ),
+            ),
           data.reforge.choices > 1 && h('p', { class: 'muted', text: `Zaklinaczka wylosuje ${data.reforge.choices} nowe afiksy, a Ty zatrzymasz jeden z nich.` }),
           h('button', {
             type: 'button',
             class: 'button button--world',
-            text: chosen === null ? 'Wybierz afiks' : 'Zaklnij',
+            text: chosen === null ? 'Wybierz afiks' : cost.goldShort > 0 ? 'Brakuje złota' : !cost.materialReady ? 'Brakuje materiału' : 'Zaklnij',
             disabled: !ready,
             onClick: (event) =>
               withButton(event.currentTarget, async () => {

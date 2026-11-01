@@ -542,7 +542,8 @@ export function mountCharacter(container) {
 // An item from the bag or the equipment: its properties, what wearing it
 // changes (for an item the class can wear), the item beside the one worn in
 // its slot, and the actions.
-export function itemSheet(item, { equipped }) {
+// `anvil`: the Kowadło part open, as after an upgrade.
+export function itemSheet(item, { equipped, anvil = false }) {
   const character = state.character;
   // Away, the bag stays at hand: only wearing and taking off wait, and an
   // item worn is changed at home (inventory.js).
@@ -590,7 +591,7 @@ export function itemSheet(item, { equipped }) {
     itemDetails(item),
     preview,
     usable && worn && compareTable(item, worn),
-    anvilSection(item, busy && equipped),
+    anvilSection(item, busy && equipped, anvil),
     !equipped && salvageSection(item, false),
     busy && h('p', { class: 'muted', text: busyText(character) }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
@@ -721,8 +722,9 @@ function salvageSection(item, busy) {
 // The Kowadło part of the item card: the next upgrade with its price, chance
 // and risk, or why there is none, and where the item may break, a Zwój
 // ochronny from the Warsztat to put on the Kowadło. The server rolls the
-// outcome.
-function anvilSection(item, busy) {
+// outcome. Folded behind "Ulepsz" until `open` (the author: "Kowadło
+// powinno się rozwijać przyciskiem "Ulepsz" i dopiero wtedy pelny opis").
+function anvilSection(item, busy, open = false) {
   const anvil = item.anvil;
   if (!anvil) return null;
   const title = h('p', { class: 'compare-title', text: 'Kowadło' });
@@ -804,14 +806,15 @@ function anvilSection(item, busy) {
         );
       }
       const owned = ownedItem(done.itemId);
-      if (owned) itemSheet(owned.item, { equipped: owned.equipped });
+      if (owned) itemSheet(owned.item, { equipped: owned.equipped, anvil: true });
       else closeSheet();
     });
-  return h(
+  const step = h('p', { class: 'anvil-step', tabindex: '-1', text: `Ulepszenie +${anvil.level} → +${next.level}` });
+  const full = h(
     'div',
     { class: 'compare anvil' },
     title,
-    h('p', { class: 'anvil-step', text: `Ulepszenie +${anvil.level} → +${next.level}` }),
+    step,
     h('ul', { class: 'preview-list' }, next.properties.map((line) => h('li', { class: 'preview-up', text: line }))),
     h('p', { class: 'anvil-chance', text: `Szansa powodzenia: ${percent(next.chance)}` }),
     h(
@@ -851,6 +854,23 @@ function anvilSection(item, busy) {
       text: short ? 'Brakuje złota albo rudy żelaza' : missing ? 'Brakuje materiału' : `Ulepsz do +${next.level}`,
     }),
   );
+  if (open) return full;
+  const folded = h(
+    'div',
+    { class: 'compare anvil' },
+    h('p', { class: 'compare-title', text: 'Kowadło' }),
+    h('button', {
+      type: 'button',
+      class: 'button button--world',
+      'aria-expanded': 'false',
+      text: 'Ulepsz',
+      onClick: () => {
+        folded.replaceWith(full);
+        step.focus({ preventScroll: true });
+      },
+    }),
+  );
+  return folded;
 }
 
 // The combat values an item changes, named as on the stats screen, with

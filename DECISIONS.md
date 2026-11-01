@@ -2996,6 +2996,12 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Kowadło, Zaklinaczka i opisy Drużyny (1.11.2026, na wersji testowej)
+
+1. **Kowadło za przyciskiem.** Autor: „To "Kowadło" powinno się rozwijać przyciskiem "Ulepsz" i dopiero wtedy pelny opis przedmiotu.” Karta przedmiotu pokazuje w części „Kowadło” sam przycisk „Ulepsz”. Dopiero on rozwija ulepszenie: wartości po nim, szansę, koszt, ryzyko, Zwój ochronny i przycisk „Ulepsz do +N”. Po próbie ulepszenia karta otwiera się z Kowadłem rozwiniętym, żeby dało się próbować dalej.
+2. **Koszt u Zaklinaczki.** Autor przekazał uwagę osoby testującej grę: „Żeby bardziej widoczne było co potrzebujesz / Co masz ile ci czego brakuje”, „Może żeby jakoś graficznie to przedstawić”, „Bo teraz 3 razy klikałem i nie widziałem XD”. Autor: „no w sumie”. Zaklęcie afiksu pokazuje koszt zaraz pod przedmiotem, jak Kowadło: złoto i materiał jako „masz / potrzeba”, na czerwono, gdy brakuje. Gdy żaden materiał nie wystarcza, widać ten tej rzadkości, którego jest najwięcej, i zdanie „Brakuje: N szt. materiału.” z podpowiedzią, skąd go wziąć (wyprawy, Targowisko). Zaklęcie bierze sztuki jednego materiału, więc karta mówi to wprost. Przycisk mówi, czego brakuje („Brakuje złota”, „Brakuje materiału”), zamiast być po prostu nieaktywny.
+3. **Opisy Drużyny.** Autor: „Drużyna może składać się z maksymalnie 3 osób. Lider drużyny zarządza wspólnymi wyprawami wolnych towarzyszy. Każda z osób otrzymuje własne łupy.” i „Zaproś postaci od 25. poziomu wzwyż. Poniżej możesz to zrobić z listy znajomych lub dodać kogokolwiek ręcznie spoza niej.” Oba teksty stoją dosłownie. Drugi stoi teraz nad listą znajomych i polem imienia, bo mówi „Poniżej”.
+
 ## Krótszy tydzień zadań (1.11.2026, na wersji testowej)
 
 Autor przekazał uwagę osoby testującej grę: „Bardziej wyważone tygodniowe zadania / Nowa postać / Dzisiaj kończą się tygodniowe a ten mi karze 4 dzienne skrzynki otworzyć” i „Tak samo te 1320 minuty na walce”. Autor: „błąd mocny”.
