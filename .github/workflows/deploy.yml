@@ -33,7 +33,9 @@ jobs:
   test:
     name: Testy
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # The whole suite takes about 15 minutes on GitHub's runner (0.0.74 was
+    # cut off at 15), so it gets twice that.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
       # A working branch at the commit main has just tested (main merged in
