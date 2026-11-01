@@ -3042,7 +3042,7 @@ Autor: „sprawdz klatka po klatce to wideo i zobacz ze na komputerze nie da sie
 
 1. **Przyczyna.** Na wideo „Wyrusz” przy pierwszej wyprawie wprowadzenia pokazuje u góry „party?.along is not a function” i wyprawa nie rusza. Od wersji 0.0.71 (Drużyny) ekran Walki przy pierwszej wyprawie zapisywał pole drużyny jako fałsz zamiast pustego, a „Wyrusz” pytało je o skład. Błąd dotyczył każdej nowej postaci, która nie pominęła wprowadzenia, na komputerze i na telefonie.
 2. **Poprawka.** Przy pierwszej wyprawie pole drużyny jest puste. Przejście wprowadzenia od pierwszej karty do pierwszej wyprawy sprawdzone w przeglądarce na 390×844 (telefon), 1366×768 i 1920×1080 (komputer). Bez poprawki to samo przejście staje na „Wyrusz” z tym samym komunikatem.
-3. **Na przyszłość.** Przejście wprowadzenia nowej postaci w przeglądarce, na telefonie i komputerze, jest stałym punktem przed każdym wdrożeniem (CLAUDE.md).
+3. **Na przyszłość.** Przejście wprowadzenia nowej postaci w przeglądarce, na telefonie i komputerze, jest stałym punktem przed każdym wdrożeniem (CLAUDE.md). Robi to skrypt `tools/first-steps.cjs`: nowe konto, nowa postać i narrator od pierwszej karty do pierwszej wyprawy na 390×844, 1366×768 i 1920×1080. GitHub uruchamia go przed każdym wdrożeniem (krok „Pierwsze kroki nowej postaci”), więc gra bez ruszającej pierwszej wyprawy się nie wdroży.
 
 ## Opis drużyny, link do Kowadła i ekwipunek przy profesji (1.11.2026, w grze od 0.0.75)
 
