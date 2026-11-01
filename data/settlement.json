@@ -11,7 +11,7 @@
     { "id": "market", "name": "Targowisko", "x": 45.5, "y": 46, "resident": "merchant" },
     { "id": "tannery", "name": "Garbarnia", "x": 13, "y": 53, "resident": "tanner" },
     { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist" },
-    { "id": "forge", "name": "Kuźnia", "x": 62, "y": 31, "resident": "smith" }
+    { "id": "forge", "name": "Kuźnia", "x": 56, "y": 31, "resident": "smith" }
   ],
   "torches": [
     { "x": 32, "y": 12.5 },
