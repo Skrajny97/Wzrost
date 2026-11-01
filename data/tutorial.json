@@ -904,7 +904,8 @@
       "chapter": "settlement",
       "text": [
         "Żelisław sprzedaje Zwoje ochronne, najwyżej trzy dziennie. Zwój chroni przedmiot przed rozpadem na Kowadle."
-      ]
+      ],
+      "voice": "audio/narration/settlement-forge-scrolls.mp3"
     },
     {
       "id": "settlement-forge-raise",
@@ -912,7 +913,8 @@
       "chapter": "settlement",
       "text": [
         "Za złoto i materiały przekuje przedmiot o stopień rzadkości wyżej. Każdy przedmiot tylko raz."
-      ]
+      ],
+      "voice": "audio/narration/settlement-forge-raise.mp3"
     },
     {
       "id": "settlement-forge-relation",
@@ -920,7 +922,8 @@
       "chapter": "settlement",
       "text": [
         "Im lepiej Cię pozna, tym rzadsze przedmioty wykuje. Poważanie w Bractwie Kowali obniży jego ceny."
-      ]
+      ],
+      "voice": "audio/narration/settlement-forge-relation.mp3"
     },
     {
       "id": "settlement-tannery-buy",
@@ -928,7 +931,8 @@
       "chapter": "settlement",
       "text": [
         "Wszebor sprzedaje materiały ze stworów: skóry, łuski, pióra i kły. Przydadzą się, gdy zabraknie Ci czegoś do zlecenia."
-      ]
+      ],
+      "voice": "audio/narration/settlement-tannery-buy.mp3"
     },
     {
       "id": "settlement-tannery-sell",
@@ -936,7 +940,8 @@
       "chapter": "settlement",
       "text": [
         "W zakładce Sprzedaj kupi od Ciebie materiały drożej niż złomiarz. Im lepiej Cię zna, tym więcej płaci."
-      ]
+      ],
+      "voice": "audio/narration/settlement-tannery-sell.mp3"
     },
     {
       "id": "settlement-tannery-relation",
@@ -944,7 +949,8 @@
       "chapter": "settlement",
       "text": [
         "Handel z nim buduje też poważanie w Bractwie Łowców, a z każdym stopniem relacji Wszebor ma więcej towaru."
-      ]
+      ],
+      "voice": "audio/narration/settlement-tannery-relation.mp3"
     },
     {
       "id": "settlement-stable-mounts",
@@ -952,7 +958,8 @@
       "chapter": "settlement",
       "text": [
         "Mirosław sprzedaje wierzchowce na stałe. Z wierzchowcem wyprawy kończą się szybciej, a łupy są jak za pełny czas."
-      ]
+      ],
+      "voice": "audio/narration/settlement-stable-mounts.mp3"
     },
     {
       "id": "settlement-stable-party",
@@ -960,7 +967,8 @@
       "chapter": "settlement",
       "text": [
         "Na wyprawie drużyny wszyscy jadą tempem najwolniejszego wierzchowca. Gdy ktoś nie ma wierzchowca, wyprawa trwa pełny czas."
-      ]
+      ],
+      "voice": "audio/narration/settlement-stable-party.mp3"
     },
     {
       "id": "settlement-quarters",

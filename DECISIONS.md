@@ -2996,6 +2996,28 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.77 (1.11.2026)
+
+Autor: „Wdrożenie po nagraniach 0.0.77”.
+
+1. **Co wchodzi do gry:**
+    - Garbarnia handluje wszystkimi materiałami zwykłych stworów (zob. „Garbarnia: wszystkie materiały stworów”);
+    - poprawki mechanik 338–343 (zob. „Odpowiedzi autora 338–343: poprawki mechanik”);
+    - budynki Osady przodem do drogi (zob. „Osada: budynki przodem do drogi”);
+    - samouczki Kuźni, Garbarni i Stajni z nagraniami (zob. „Samouczek Kuźni, Garbarni i Stajni”) oraz nagranie kroku o zakładkach Społeczności (337 A, 350 A);
+    - opis Stajni pod „Jak to działa?” i kolory rzadkości w Kuźni (zob. „Uwagi autora: Stajnia i kolory rzadkości w Kuźni”).
+2. **Migracje bazy:** brak.
+3. **Przed wdrożeniem:** wszystkie testy (770) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na 390×844, 1366×768 i 1920×1080.
+
+## Odpowiedzi autora 344–350 (1.11.2026)
+
+Autor: „350 A / 344 A / 345 A / 346 A / 347 A / 348 A / 349 A”, „Wdrożenie po nagraniach 0.0.77” oraz „Nie czekaj z raportami do wdrożenia na testowy ani tym bardziej na main. Raport daj szybciej zebym mogl go przegladac. Jak deploy robisz to i tak trzeba czekać paręnaście minut bezczynnie, a w tym czasie ja moge przygotować odpowiedzi, zalecenia.”
+
+1. **350 A.** Krok o zakładkach Społeczności zostaje w wersji A.
+2. **347–349 A.** Teksty samouczków Kuźni, Garbarni i Stajni są zatwierdzone i nagrane, każdy w dwóch wersjach. W grze są wersje A, a autor dostał obie do odsłuchu.
+3. **344–346 A.** Powstają trzy aktywności Gildii: Bestia Gildii z trzema osobnymi atakami dziennie, Próby Gildii, w których każdy sam wybiera próbę z tablicy, i Prośby Gildii z nagrodą wyłącznie społeczną (dane sztuki liczą się do Prób Gildii). Najpierw trafią na wersję testową.
+4. **Raporty od razu.** Raport przychodzi zaraz po wypchnięciu zmian, bez czekania na koniec wdrożenia. Wynik wdrożenia dochodzi później krótką wiadomością. Zasada jest też w `CLAUDE.md`.
+
 ## Wersja 0.0.76 (1.11.2026)
 
 Autor: „wdrażaj grafiki wybrałem”.
@@ -3049,12 +3071,12 @@ Autor: „Zrób też Samouczki analogiczne do reszty lokacji w Osadzie”.
 2. **Ostatnia kwestia wycieczki po planszy** („Zajrzyj też do pozostałych mieszkańców Rozstajów…”) wskazuje teraz także Kuźnię, Garbarnię i Stajnię. Tekst się nie zmienia, więc nagranie zostaje.
 3. **Brakujący szczegół: pierwszy krok Garbarni** wskazuje zakładkę „Kup”, a nie listę towaru. Lista Wszebora jest dłuższa niż ekran telefonu, a pierścień wskazania obejmuje tylko to, co widać.
 4. **Kto usłyszy.** Postać, która była już w tych miejscach, usłyszy ich kwestie przy następnej wizycie, tak jak przy wcześniejszych miejscach Osady.
-5. **Głos.** Teksty czekają na akceptację autora (pytania 347–349). Do tego czasu kroki mają sam tekst, a nagrania powstaną po akceptacji.
+5. **Głos.** Teksty czekały na akceptację autora (pytania 347–349). *Od odpowiedzi 347–349 A kroki mają nagrania (wersje A).*
 6. **Sprawdzone w przeglądarce** na 390×844, 360×640 i 1280×800: każdy krok ma pierścień na swoim miejscu.
 
 ## Odpowiedź autora 337: nagranie kroku o zakładkach (1.11.2026, na wersji testowej)
 
-Autor: „337 A”. Krok Społeczności o zakładkach ma nagranie głosem narratora, w pierwszej z dwóch wersji. Druga wersja czeka w szkicach, gdyby autor wolał ją na słuch.
+Autor: „337 A”. Krok Społeczności o zakładkach ma nagranie głosem narratora, w pierwszej z dwóch wersji. Autor wybrał właśnie ją (350 A).
 
 ## Osada: budynki przodem do drogi (1.11.2026, na wersji testowej)
 
