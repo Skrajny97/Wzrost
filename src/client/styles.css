@@ -1159,6 +1159,22 @@ button {
   border-top: 1px solid;
 }
 
+/* On a computer the top bar and the menu keep to the screens' column, as
+   on a phone, instead of stretching over the whole width (the desktop
+   pass; the author: "trzeba prześledzić gierke z pozycji kompa"). Their
+   backgrounds still run edge to edge. */
+@media (min-width: 640px) {
+  .topbar {
+    padding-right: max(var(--gutter), calc((100% - 440px) / 2 + var(--gutter)));
+    padding-left: max(var(--gutter), calc((100% - 440px) / 2 + var(--gutter)));
+  }
+
+  .nav {
+    padding-right: max(0px, calc((100% - 520px) / 2));
+    padding-left: max(0px, calc((100% - 520px) / 2));
+  }
+}
+
 /* As many equal columns as the bar has tabs. */
 .nav--main {
   grid-auto-columns: minmax(0, 1fr);
@@ -6773,8 +6789,8 @@ button.skill-row {
   position: relative;
   isolation: isolate;
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-end;
+  justify-content: flex-end;
+  align-items: flex-start;
   box-sizing: border-box;
   width: 100%;
   aspect-ratio: 2 / 1;
@@ -9161,6 +9177,11 @@ a.profession-square:active {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 8px;
+}
+
+/* The Pustelnik's services, one under another, each the whole width. */
+.settlement-actions--stack {
+  grid-template-columns: 1fr;
 }
 
 /* An order folded to its name; a tap unfolds the rest. */

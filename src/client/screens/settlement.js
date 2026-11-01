@@ -487,7 +487,7 @@ export function mountSettlement(container, { params = {} } = {}) {
   const hermitButton = (service, label, text) =>
     h('button', {
       type: 'button',
-      class: 'button button--small',
+      class: 'button button--world button--small',
       text: label,
       onClick: async (event) => {
         const button = event.currentTarget;
@@ -999,14 +999,14 @@ export function mountSettlement(container, { params = {} } = {}) {
     if (resident.service !== 'hermit') return null;
     return h(
       'div',
-      { class: 'settlement-actions', 'data-guide': 'hermit-services' },
+      { class: 'settlement-actions settlement-actions--stack', 'data-guide': 'hermit-services' },
       data.hermit.path !== null &&
         hermitButton('path', `Wyzeruj ścieżkę (${formatNumber(data.hermit.path)} zł.)`, 'Umiejętności klasy wrócą jako Punkty Umiejętności, a ścieżki wybierzesz od nowa.'),
       data.hermit.stats !== null && hermitButton('stats', `Wyzeruj statystyki (${formatNumber(data.hermit.stats)} zł.)`, 'Wszystkie rozdane punkty statystyk wrócą do rozdania.'),
       data.hermit.evolution &&
         h('button', {
           type: 'button',
-          class: 'button button--small',
+          class: 'button button--world button--small',
           text: data.hermit.evolution.price > 0 ? `Zmień ewolucję (${formatNumber(data.hermit.evolution.price)} zł.)` : 'Zmień ewolucję (pierwszy raz darmo)',
           onClick: evolutionSheet,
         }),

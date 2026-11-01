@@ -2996,6 +2996,15 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Przejście gry na komputerze (1.11.2026, na wersji testowej)
+
+Autor (wcześniej): „trzeba prześledzić gierke z pozycji kompa”.
+
+1. **Co sprawdzone.** 27 ekranów gry na 1366×768: Walka, region, Wieże, Postać, Statystyki, Umiejętności, Ewolucja, Profesje (z Zielarstwem, Alchemią i Rzemieślnictwem), plansza Osady i jej miejsca, Społeczność, Gildia, Dziennik, Obóz, Encyklopedia i raport. Żaden ekran nie przewija się w bok i nie ma błędów skryptu. Przejście wprowadzenia działa na 390×844, 1366×768 i 1920×1080.
+2. **Pasek u góry i menu.** Na komputerze rozciągały się na całą szerokość ekranu, a treść stała wąską kolumną pośrodku. Teraz od 640 px szerokości trzymają się tej samej kolumny co ekrany: ich tło dalej sięga krawędzi, a przyciski i paski HP oraz XP stoją nad treścią. Na telefonie nic się nie zmienia.
+3. **Przyciski Pustelnika.** „Wyzeruj statystyki” i „Zmień ewolucję” miały domyślny, jasnoszary wygląd przeglądarki i nierówne szerokości. Teraz mają wygląd przycisków Osady i stoją jeden pod drugim na całą szerokość, także na telefonie.
+4. **Nagłówek Gildii.** Napis „Gildia” stoi w lewym dolnym rogu obrazka, na przyciemnieniu, jak nagłówek Ewolucji.
+
 ## Odpowiedzi autora 351–353 i trudność od 50. poziomu (1.11.2026, na wersji testowej)
 
 Autor: „347.1 do 349.1 wszystko A tylko 349.2 B”, poprawki tekstu rolki o walce, „353 C” oraz „Od 50 lvla zwiększamy curve trudności, bo wchodza na pełnej i towarzysze i ewolucje, pamiętaj o tym na przyszłość”.
