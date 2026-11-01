@@ -656,6 +656,14 @@
       "voice": "audio/narration/community-lead.mp3"
     },
     {
+      "id": "community-tabs",
+      "kind": "point",
+      "chapter": "community",
+      "text": [
+        "U góry przełączasz zakładki: Czat, Znajomi i Ranking. Gildia i Drużyna otworzą się, gdy urośniesz w siłę."
+      ]
+    },
+    {
       "id": "community-rules",
       "kind": "point",
       "chapter": "community",

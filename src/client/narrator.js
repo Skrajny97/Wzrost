@@ -70,11 +70,11 @@ const professionsHere = (hash, read) => onProfessions(hash) && professionsTour(h
 // The Społeczność chapter: once the character reaches level 5, after the
 // report that brought it there, and only when the Umiejętności and the
 // Profesje chapters are not waiting. Not on the character's screens either.
-// It leads to the Społeczność tab and points at the chat's rules. Then the
-// narrator itself opens the inner region the player hunts in and points
-// there at Szybkie Polowanie, under "Wyrusz", with nothing to tap but
-// "Dalej". While the character is away it waits, and goes there from the
-// Walka tab once the character is back.
+// It leads to the Społeczność tab, points at its tabs and at the chat's
+// rules. Then the narrator itself opens the inner region the player hunts
+// in and points there at Szybkie Polowanie, under "Wyrusz", with nothing to
+// tap but "Dalej". While the character is away it waits, and goes there
+// from the Walka tab once the character is back.
 const onCommunity = (hash) => hash === '#/spolecznosc';
 const professionsWaiting = (read) => Boolean(state.character.professions) && !read.has('professions-ending');
 const communityDue = (hash, read) =>
@@ -313,6 +313,9 @@ const BEATS = {
     place: '.nav-item[href="#/spolecznosc"]',
     when: (hash, read) => communityTour(hash, read) && !onCommunity(hash) && !read.has('community-rules'),
   },
+  // The tabs first (the author: "Przebuduj Samouczek społecznosci pod nowy
+  // tryb zakładek"), then the chat's rules.
+  'community-tabs': { place: mark('community-tabs'), when: communityHere },
   'community-rules': { place: mark('community-rules'), when: communityHere },
   'community-ending': { place: mark('quick-hunt'), go: quickHuntTrip, when: quickHuntHere },
   // The Rzemieślnictwo chapter, after all the others.

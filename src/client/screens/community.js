@@ -150,7 +150,8 @@ function firstSection(sections) {
 // the bell muting the chat's light beside them. The parts still to come
 // cannot be picked yet.
 function sectionPicker(sections, current, choose) {
-  const tabs = h('div', { class: 'community-tabs', role: 'tablist', 'aria-label': 'Części Społeczności' });
+  // The row the narrator's Społeczność chapter points at (narrator.js).
+  const tabs = h('div', { class: 'community-tabs', role: 'tablist', 'aria-label': 'Części Społeczności', 'data-guide': 'community-tabs' });
   const bell = h('button', {
     type: 'button',
     class: 'community-bell',

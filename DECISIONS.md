@@ -2996,6 +2996,13 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Samouczek Społeczności pod zakładki (1.11.2026, na wersji testowej)
+
+Autor: „Przebuduj Samouczek społecznosci pod nowy tryb zakładek”.
+
+1. **Nowy krok.** Rozdział Społeczności narratora prowadzi jak dotąd do zakładki Społeczność. Potem wskazuje rząd zakładek u góry (Czat, Znajomi, Ranking postaci, Gildia, Drużyna), a dopiero na końcu zasady czatu i Szybkie Polowanie. Tekst kroku: „U góry przełączasz zakładki: Czat, Znajomi i Ranking. Gildia i Drużyna otworzą się, gdy urośniesz w siłę.” Czeka na zatwierdzenie autora (pytanie 337), a nagranie powstanie dopiero po nim. Do tego czasu krok ma sam tekst.
+2. **Sprawdzone w przeglądarce** narzędziem testowym „Objaśnienie Społeczności i Szybkiego Polowania” na 390×844 i 1366×768. Pierścień obejmuje rząd zakładek, a potem pole wiadomości czatu.
+
 ## Odpowiedzi autora 330–336 (1.11.2026)
 
 Autor: „331 D / 333 A / 334 A / 335 A / 332 A / 330 B” oraz „336 A, resztę pisałem”.
