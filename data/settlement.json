@@ -80,7 +80,7 @@
   "orders": {
     "resident": "headman",
     "open": 3,
-    "refillMinutes": 180,
+    "refillMinutes": 720,
     "expireDays": 7,
     "reputation": 10,
     "relationGain": 2,

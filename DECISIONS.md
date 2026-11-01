@@ -2996,6 +2996,13 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wolniej nowe zlecenia (1.11.2026, na wersji testowej)
+
+Autor: „Zmieniamy tempo generowania nowych zleceń na tablicy (jest chyba co 4 godziny ustalmy co 12)”.
+
+1. **12 godzin.** Nowe zlecenie przychodzi na Tablicę 12 godzin po oddaniu albo odrzuceniu poprzedniego (`refillMinutes` 720, wcześniej 180, czyli 3 godziny). Miejsca, które już czekają, dostaną zlecenie w dawnym terminie.
+2. **Okno „Odrzucić zlecenie?”** podaje teraz ten czas z danych gry zamiast „za kilka godzin”.
+
 ## Wieże Systemu i Gildia (1.11.2026, na wersji testowej)
 
 Autor: „303 A / 304 A, ale kilkanaście wejść dziennie / 305 A, Lochy zamieniamy na Wieże / 306 A / 307 A, ale za 1000 złota”.

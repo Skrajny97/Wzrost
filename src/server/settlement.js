@@ -234,6 +234,8 @@ export function settlementView(player, stored, board, now) {
       slots: board.slots.map((slot) => (slot.order ? { order: orderView(slot.order, stocks, sellBonus) } : { readyAt: slot.readyAt })),
       weekly: board.weekly?.order && !board.weekly.done ? orderView({ ...board.weekly.order, id: 'weekly' }, stocks, sellBonus) : null,
       weeklyDone: board.weekly?.done ?? false,
+      // The wait for a new order in a slot emptied (data/settlement.json).
+      refillMinutes: content.settlement.orders.refillMinutes,
     },
     reforge: {
       items: player.items.filter((item) => item.affixes?.length > 0).map((item) => reforgeView(item, stocks.materials)),

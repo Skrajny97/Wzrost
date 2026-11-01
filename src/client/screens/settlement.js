@@ -12,7 +12,7 @@
 import { residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
-import { countOf, formatCountdown, formatDecimal, formatHours, formatNumber, saleGold } from '../format.js';
+import { countOf, formatCountdown, formatDecimal, formatHours, formatMinutes, formatNumber, saleGold } from '../format.js';
 import { leaveView, openView } from '../history.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
@@ -117,7 +117,8 @@ export function mountSettlement(container, { params = {} } = {}) {
         text: 'Odrzuć',
         onClick: async (event) => {
           const button = event.currentTarget;
-          if (!(await confirmAction({ title: 'Odrzucić zlecenie?', text: 'Nowe zlecenie przyjdzie za kilka godzin.', confirmLabel: 'Odrzuć' }))) return;
+          const wait = data.board.refillMinutes ? `za ${formatMinutes(data.board.refillMinutes)}` : 'za kilka godzin';
+          if (!(await confirmAction({ title: 'Odrzucić zlecenie?', text: `Nowe zlecenie przyjdzie ${wait}.`, confirmLabel: 'Odrzuć' }))) return;
           withButton(button, async () => apply(await call('POST', '/api/settlement/reject', { orderId: order.id })));
         },
       });
