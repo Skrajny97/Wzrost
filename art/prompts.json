@@ -768,6 +768,9 @@
       "frame-forest": "a rectangular frame made of twisted dark tree roots and gnarled branches seen straight from the front, green moss, small ferns and tiny red-capped mushrooms growing on it, a few small glowing yellow fireflies, the whole frame fills the image edge to edge, the inside of the frame is empty flat black, symmetrical",
       "bg-spring": { "prompt": "a quiet forest clearing at night with a small spring of glowing ice-blue water among mossy stones, faint blue light rising like mist, tall dark spruce trees on both sides, open ground in the middle, no people, tall vertical scene", "width": 96, "height": 128, "removeBackground": false },
       "bg-tower": { "prompt": "the foot of an enormous dark stone tower rising into storm clouds, faint ice-blue runes glowing on its walls, a stone path leading to its gate, open ground in the middle, no people, tall vertical scene", "width": 96, "height": 128, "removeBackground": false },
+      "frame-gold-raw": { "request": "26476d6d-2217-4580-8b22-11109bd90dfa" },
+      "frame-system-raw": { "request": "63171617-1597-4f5a-ba6d-2ba5d2a6ca3b" },
+      "frame-forest-raw": { "request": "d94cb1a6-9d9c-4155-9800-9f94830e2a53" },
       "bg-camp": { "prompt": "a small forest camp at night, a campfire with warm orange light, a leather tent and a fallen log, dark spruce trees around and a starry sky, open ground in the middle, no people, tall vertical scene", "width": 96, "height": 128, "removeBackground": false }
     }
   },
