@@ -39,7 +39,7 @@ import { playSound } from '../sound.js';
 import { skipControl, timePoints } from '../time.js';
 import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { openEvent } from '../event.js';
-import { BUSY } from './party.js';
+import { BUSY, skipLines } from './party.js';
 import { combatModes } from './towers.js';
 
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -422,6 +422,7 @@ export function mountCombat(container, { params, navigate }) {
       return h(
         'div',
         { class: 'stack' },
+        partySkips(activity),
         systemPanel(`Eksploracja zakończona: ${activity.areaName}, ${formatMinutes(activity.minutes)}.`, 'Raport czeka na odbiór.', claim),
       );
     }
@@ -443,11 +444,13 @@ export function mountCombat(container, { params, navigate }) {
         if (sure) await withButton(button, () => call('POST', '/api/hunts/cancel'));
       },
     });
-    skipper = skipControl('activity', (now) => activity.endsAt - now, 'Eksploracja');
+    // A Drużyna's trip shares its timer: a skip shortens it for everyone.
+    skipper = skipControl('activity', (now) => activity.endsAt - now, activity.party ? 'Wyprawa drużyny, dla wszystkich' : 'Eksploracja');
     const scene = walkScene(activity);
     const card = h(
       'div',
       { class: 'stack' },
+      partySkips(activity),
       ...(scene ? [scene.element] : []),
       systemPanel(
         `Eksploracja w toku: ${activity.areaName}, ${formatMinutes(activity.minutes)}.`,
@@ -456,6 +459,7 @@ export function mountCombat(container, { params, navigate }) {
         ...(activity.avoidRare ? [h('p', { class: 'system-hint', text: 'Postać omija elity i czempionów.' })] : []),
         ...(activity.seekRare ? [h('p', { class: 'system-hint', text: 'Postać tropi elity i czempiony.' })] : []),
         ...(activity.tracksQuests ? [h('p', { class: 'system-hint', text: 'Postać tropi stwory z zadań.' })] : []),
+        ...(activity.party ? [h('p', { class: 'system-hint', text: 'Wyprawa drużyny ma wspólny czas: przewinięcie skraca ją wszystkim.' })] : []),
         h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
       ),
       skipper.element,
@@ -775,7 +779,7 @@ export function mountCombat(container, { params, navigate }) {
         withButton(event.currentTarget, async () => {
           remember();
           const along = party?.along();
-          await call('POST', along ? '/api/party/hunt' : '/api/hunts', {
+          const answer = await call('POST', along ? '/api/party/hunt' : '/api/hunts', {
             areaId: area.id,
             minutes,
             avoidRare: avoiding(),
@@ -784,7 +788,8 @@ export function mountCombat(container, { params, navigate }) {
             trackUnknown: tracingUnknown(),
             ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
           });
-          if (along) toast(`Drużyna wyrusza: ${along.join(', ')}.`);
+          // Those who went, as the server says: one may have got busy meanwhile.
+          if (along) toast(answer.went?.length > 0 ? `Drużyna wyrusza: ${answer.went.join(', ')}.` : 'Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.');
           leaveView(HOME, 2);
         }),
     });
@@ -848,6 +853,13 @@ export function mountCombat(container, { params, navigate }) {
       ),
       h('p', { class: 'muted threat-note', text: 'Zagrożenie to szansa omdlenia na wyprawie.' }),
     );
+  }
+
+  // At the top of a Drużyna's exploration, the time the others skipped for
+  // everyone (parties.js: the trip's shared timer).
+  function partySkips(activity) {
+    const lines = skipLines(activity.party?.skips);
+    return lines.length > 0 ? systemPanel(...lines) : null;
   }
 
   // The box "Z drużyną" over "Wyrusz", for a party's leader with members

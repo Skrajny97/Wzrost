@@ -1,5 +1,6 @@
 // Punkty Czasu (Time Points): 1 point skips 1 minute of the current wait, an
-// exploration, resting or a camp upgrade. One comes every half an hour by
+// exploration, resting or a camp upgrade. An exploration of a Drużyna moves
+// with the others of its trip (parties.js). One comes every half an hour by
 // itself, also while the player is away (characters.js: settleTimePoints),
 // and more from playing (the narrator, levels and rare finds); they are never
 // sold. With fewer points than minutes left, the wait gets as much shorter
@@ -10,6 +11,7 @@ import { content } from './content.js';
 import { buildQueue, characterView, currentHp, loadSettled, requirePlayer } from './characters.js';
 import { atomically, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
+import { shiftTrip, skipRecord, tripOf } from './trips.js';
 
 const MINUTE = 60000;
 // The page shows a report a second after the end, so a wait skipped to its
@@ -55,6 +57,7 @@ function cost(left, available) {
 // from the seed saved at its start.
 const skipActivity = (db, player, now) => skipWork(db, player, now, 'activities', player.activity, 'Nie trwa żadna wyprawa.');
 
+
 // The work of the Awatar Systemu (avatar.js) moves the same way.
 const skipAvatar = (db, player, now) => skipWork(db, player, now, 'avatar_activities', player.avatarActivity, 'Awatar Systemu teraz nie pracuje.');
 
@@ -62,6 +65,13 @@ function skipWork(db, player, now, table, activity, none) {
   const { row } = player;
   if (!activity || activity.ends_at <= now) throw nothing(none);
   const { spent, shift } = cost(activity.ends_at - now, row.time_points);
+  // A Drużyna's trip shares its timer: every exploration of it moves, not
+  // only the skipper's, and each keeps who skipped and by how much, for the
+  // others' Walka screen and report (the author: "Postać z drużyny moze
+  // przewijać eksplorację ale to nie przewija wszystkim, a musi nawet jesli
+  // nie jest liderem. Musi być wspólny timer." and "xxx przewinął czas o
+  // xxx").
+  const trip = table === 'activities' ? tripOf(activity) : null;
   return {
     spent,
     statements: [
@@ -72,12 +82,17 @@ function skipWork(db, player, now, table, activity, none) {
              AND EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ? AND ends_at = ?)`,
         )
         .bind(spent, row.id, row.version, spent, row.id, activity.started_at, activity.ends_at),
-      db
-        .prepare(
-          `UPDATE ${table} SET started_at = started_at - ?, ends_at = ends_at - ?
-           WHERE character_id = ? AND started_at = ? AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ?)`,
-        )
-        .bind(shift, shift, row.id, activity.started_at, row.id, row.version + 1),
+      trip
+        ? shiftTrip(db, trip, activity.started_at, shift, skipRecord(row, spent), {
+            sql: ' AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ?)',
+            binds: [row.id, row.version + 1],
+          })
+        : db
+            .prepare(
+              `UPDATE ${table} SET started_at = started_at - ?, ends_at = ends_at - ?
+               WHERE character_id = ? AND started_at = ? AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ?)`,
+            )
+            .bind(shift, shift, row.id, activity.started_at, row.id, row.version + 1),
     ],
   };
 }

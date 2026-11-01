@@ -814,9 +814,13 @@ function activityPlace(activity, level) {
 
 // An activity as the page shows it, of the character or of its Awatar.
 function activityView(activity, level, now) {
+  // A Drużyna's exploration (parties.js): who went, and the time the others
+  // skipped for everyone (time.js), said on the Walka screen.
+  const options = activity?.kind === 'hunt' ? JSON.parse(activity.options ?? '{}') : {};
   return (
     activity && {
       kind: activity.kind,
+      ...(options.party && { party: { names: options.party.names ?? [], skips: (options.skips ?? []).filter((skip) => skip.id !== activity.character_id) } }),
       ...activityPlace(activity, level),
       minutes: activity.minutes,
       startedAt: activity.started_at,

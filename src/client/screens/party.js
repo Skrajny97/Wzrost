@@ -20,6 +20,18 @@ const DOTS = { free: 'online', away: 'busy', working: 'busy', aside: 'offline' }
 const STATES = { free: 'może iść na wyprawę', away: 'na wyprawie', working: 'pracuje w profesji', aside: 'gra teraz inną postacią' };
 export const BUSY = { away: 'na wyprawie', working: 'w profesji', aside: 'gra inną postacią' };
 
+// The time other members of a Drużyna's trip skipped for everyone
+// (src/server/time.js), one line each, their skips added up (the author:
+// "xxx przewinął czas o xxx").
+export function skipLines(skips = []) {
+  const byWho = new Map();
+  for (const skip of skips) {
+    const seen = byWho.get(skip.id);
+    byWho.set(skip.id, seen ? { ...seen, minutes: seen.minutes + skip.minutes } : skip);
+  }
+  return [...byWho.values()].map((skip) => `${skip.name} ${skip.female ? 'przewinęła' : 'przewinął'} czas o ${formatMinutes(skip.minutes)}.`);
+}
+
 export function mountParty(container) {
   let view = null;
   let friends = [];
@@ -168,8 +180,8 @@ export function mountParty(container) {
       h('p', {
         class: 'muted',
         text: own?.leader
-          ? `Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”. Idą członkowie bez innych zajęć, teraz najwyżej na ${formatMinutes(party.limits.minutes)} i tylko tam, gdzie wejdzie ${party.limits.classLevelBy} (poziom klasy ${party.limits.classLevel}). Kto pracuje w profesji albo jest na wyprawie, zostaje w drużynie i pójdzie z nią następnym razem. Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.`
-          : 'Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle. Gdy pracujesz w profesji albo jesteś na własnej wyprawie, drużyna wyrusza bez Ciebie i nie musisz jej opuszczać.',
+          ? `Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”. Idą członkowie bez innych zajęć, teraz najwyżej na ${formatMinutes(party.limits.minutes)} i tylko tam, gdzie wejdzie ${party.limits.classLevelBy} (poziom klasy ${party.limits.classLevel}). Kto pracuje w profesji albo jest na wyprawie, zostaje w drużynie i pójdzie z nią następnym razem. Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim. Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.`
+          : 'Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle. Gdy pracujesz w profesji albo jesteś na własnej wyprawie, drużyna wyrusza bez Ciebie i nie musisz jej opuszczać. Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.',
       }),
     );
   }

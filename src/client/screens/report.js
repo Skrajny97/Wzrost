@@ -13,6 +13,7 @@ import { guided, openSheet, systemPanel, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { scrapperSheet } from '../scrapper.js';
 import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy } from './character.js';
+import { skipLines } from './party.js';
 import { herbsReport, itemsReport, potionsReport } from './professions.js';
 
 // "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
@@ -113,6 +114,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       report.tower && (report.tower.partners.length > 0 || report.tower.companions.length > 0) && h('p', { class: 'report-party', text: `Z postacią: ${[...report.tower.partners, ...report.tower.companions].join(', ')}.` }),
       // An exploration of a Drużyna names those who went (parties.js).
       report.party?.length > 1 && h('p', { class: 'report-party', text: `W drużynie: ${report.party.join(', ')}.` }),
+      // The time the others skipped for the whole party (the author: "xxx
+      // przewinął czas o xxx").
+      skipLines(report.skips).map((line) => h('p', { class: 'report-party', text: line })),
       summaryCard(report),
       report.event && eventCard(report.event),
       report.system.length > 0 && guided(systemPanel(...report.system), 'report-system'),

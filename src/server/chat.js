@@ -269,15 +269,16 @@ function seenOf(text) {
 // Globalny that this player may read, the private conversations with the
 // newest message of each other character, the Upominki and invitations
 // waiting in Znajomi (community.js), for the light on the Społeczność tab,
-// a Wymiana proposed or going on (trades.js), and what the character has
-// read on any of its devices.
+// a Wymiana proposed or going on (trades.js), what the character has read
+// on any of its devices, and when its activity ends: a Drużyna's trip moves
+// when another member skips its time (time.js), and the page follows.
 export async function latestChat(context) {
   const { session, character, db } = await requireChatter(context);
   // The guild's channel and the invitations to guilds (guilds.js).
   const guild = await guildOf(db, character.id);
   const newest = `SELECT MAX(id) AS id FROM chat_messages
          WHERE channel = ? AND hidden_at IS NULL AND user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)`;
-  const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites] = await Promise.all([
+  const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites, activity] = await Promise.all([
     db
       .prepare(
         `SELECT MAX(id) AS id FROM chat_messages
@@ -292,6 +293,7 @@ export async function latestChat(context) {
     partyNews(db, character.id),
     guild ? db.prepare(newest).bind(guildChannel(guild.id), session.userId, session.userId).first() : null,
     guildNews(db, character.id),
+    db.prepare('SELECT ends_at FROM activities WHERE character_id = ?').bind(character.id).first(),
   ]);
   return json({
     latest: row.id ?? 0,
@@ -302,6 +304,7 @@ export async function latestChat(context) {
     guild: guild && { name: guild.name, tag: guild.tag, latest: guildRow?.id ?? 0 },
     guildInvites,
     seen: seenOf(read?.chat_seen),
+    activityEndsAt: activity?.ends_at ?? null,
   });
 }
 

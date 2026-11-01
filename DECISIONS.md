@@ -2996,6 +2996,16 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wspólny czas wyprawy drużyny (1.11.2026, na wersji testowej)
+
+Autor: „Postać z drużyny moze przewijać eksplorację ale to nie przewija wszystkim, a musi nawet jesli nie jest liderem. Musi być wspólny timer. Niech ta drużyna daje jakies korzyści sensowne w ten sposób.”, „I niech sie wyswietla komunikat na górze innym graczom z drużyny w ekranie Walki i w raporcie - xxx przewinął czas o xxx” oraz „I jeśli dwie osoby z drużyny pójdą na wyprawę  a trzecia w tym czasie nie mogła to niech się nie okaże, że jednak 3 walczą”.
+
+1. **Wspólny czas.** Wyprawy członków z jednego wyjścia drużyny mają wspólny czas. „Przewiń” dowolnego członka, także nie lidera, skraca je wszystkim o tyle samo. Płaci Punktami Czasu tylko ta osoba, która przewija, i na tym polega korzyść z drużyny. Testowy przycisk „Pomiń czas” na wersji testowej też kończy wyprawę całej drużynie.
+2. **Komunikat.** Pozostali widzą u góry ekranu Walki w czasie wyprawy i w raporcie: „Radomir przewinął czas o 8 min.” Słowo dopasowuje się do wyglądu postaci, „przewinęła” przy postaci kobiecej, jak w kwestiach narratora i towarzyszy (brakujący szczegół). Kilka przewinięć jednej osoby sumuje się w jeden wpis. Ekran otwarty u innych członków dowiaduje się o przewinięciu przy sprawdzaniu czatu, najpóźniej po 15 sekundach, i odświeża czas.
+3. **Walczą tylko ci, którzy wyruszyli.** Członek przy profesji albo na własnej wyprawie i tak nie wyrusza. Jeśli ktoś zajmie się czymś w tej samej chwili, w której lider wyrusza, wyprawy pozostałych zapisują się bez niego: nie walczy u nich i nie ma go w składzie. Gdy członek przerwie wyprawę w trakcie, znika z walk i ze składu pozostałych (brakujący szczegół). Wolne miejsca w drużynie zajmują jak dotąd towarzysze z Kwater, więc przy dwóch graczach w walce mogą stać trzy postacie: dwie graczy i towarzysz.
+4. **Opis.** Karta drużyny mówi: „Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.”, a ekran wyprawy: „Wyprawa drużyny ma wspólny czas: przewinięcie skraca ją wszystkim.” Okno „Przewinąć czas?” zaczyna się od „Wyprawa drużyny, dla wszystkich”.
+5. **Wyprawy sprzed zmiany** nie mają znacznika wyjścia, więc przewija się tylko własną.
+
 ## Wersja 0.0.74 (1.11.2026)
 
 Autor: „pchaj to od razu na main wszystko, mi sie nie chce testowac a od czego są testerzy”.
@@ -3005,6 +3015,7 @@ Autor: „pchaj to od razu na main wszystko, mi sie nie chce testowac a od czego
     - wygodniejszy interfejs z propozycji 311–321 i nowy opis Wędrownego handlarza (zob. „Wygodniejszy interfejs: propozycje 311–321”);
     - członek drużyny przy profesji zostaje w drużynie, a Gildia zaprasza znajomych jednym stuknięciem (zob. „Drużyna a profesje, zapraszanie do Gildii ze znajomych”).
 2. **Migracje bazy:** brak.
+3. **Wdrożenie.** Pierwszą próbę GitHub przerwał po 15 minutach testów, bo tyle wynosił limit, a testy trwają już około 15 minut. Limit testów jest teraz 30 minut (`.github/workflows/deploy.yml`).
 
 ## Drużyna a profesje, zapraszanie do Gildii ze znajomych (1.11.2026, w grze od 0.0.74)
 

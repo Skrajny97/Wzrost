@@ -139,6 +139,113 @@ describe('Drużyna through the API', () => {
     assert.equal(druh.kind, 'herbs');
   });
 
+  // Both explorations of a trip claimed, an event at the end answered.
+  async function claimBoth() {
+    const reports = {};
+    for (const login of ['lider', 'druh']) {
+      let claimed = await as(login, 'POST', '/api/hunts/claim');
+      if (claimed.data.event) claimed = await as(login, 'POST', '/api/hunts/claim', { choice: claimed.data.event.options.find((option) => !option.disabled)?.id ?? claimed.data.event.options[0].id });
+      assert.equal(claimed.status, 200, JSON.stringify(claimed.data).slice(0, 400));
+      reports[login] = claimed.data.report;
+    }
+    return reports;
+  }
+
+  test('the explorations of a trip share their timer: any member\'s "Przewiń" moves them all, and the others hear of it', async () => {
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    assert.equal((await as('lider', 'POST', '/api/party/hunt', { areaId: 'mossy-boulders', minutes: 30 })).status, 201);
+    const ends = async () => (await (await db()).prepare('SELECT c.name, a.ends_at FROM activities a JOIN characters c ON c.id = a.character_id ORDER BY c.name').all()).results;
+    const before = await ends();
+    // The member, not the leader, skips 10 minutes: both explorations move.
+    await (await db()).prepare("UPDATE characters SET time_points = 10 WHERE name = 'Druh'").run();
+    const skipped = await as('druh', 'POST', '/api/time/skip', { target: 'activity' });
+    assert.equal(skipped.status, 200, JSON.stringify(skipped.data));
+    assert.equal(skipped.data.spent, 10);
+    const after = await ends();
+    assert.deepEqual(
+      after.map((row, index) => [row.name, before[index].ends_at - row.ends_at]),
+      [
+        ['Druh', 600000],
+        ['Lider', 600000],
+      ],
+    );
+    // The leader hears who skipped; the skipper's own screen does not.
+    const leader = (await as('lider', 'GET', '/api/character')).data.character;
+    assert.deepEqual(leader.activity.party.skips.map((skip) => [skip.name, skip.minutes]), [['Druh', 10]]);
+    assert.deepEqual((await as('druh', 'GET', '/api/character')).data.character.activity.party.skips, []);
+    // The chat's check tells the new end, for the leader's page to follow.
+    assert.equal((await as('lider', 'GET', '/api/chat/latest')).data.activityEndsAt, after.find((row) => row.name === 'Lider').ends_at);
+    // The leader skips the rest for both; each report names the other's skip.
+    await (await db()).prepare("UPDATE characters SET time_points = 100 WHERE name = 'Lider'").run();
+    assert.equal((await as('lider', 'POST', '/api/time/skip', { target: 'activity' })).data.spent, 20);
+    const reports = await claimBoth();
+    assert.deepEqual(reports.lider.skips.map((skip) => [skip.name, skip.minutes]), [['Druh', 10]]);
+    assert.deepEqual(reports.druh.skips.map((skip) => [skip.name, skip.minutes]), [['Lider', 20]]);
+  });
+
+  test('the test version\'s "Pomiń czas" ends the whole trip too', async () => {
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    assert.equal((await as('lider', 'POST', '/api/party/hunt', { areaId: 'mossy-boulders', minutes: 30 })).status, 201);
+    assert.equal((await as('druh', 'POST', '/api/test/skip-time')).status, 200);
+    const reports = await claimBoth();
+    assert.deepEqual(reports.lider.skips.map((skip) => [skip.name, skip.minutes]), [['Druh', 30]]);
+    assert.equal(reports.druh.skips, undefined);
+  });
+
+  test('one that could not set out after all fights in nobody\'s exploration', async () => {
+    await player('trzeci', 'Trzeci');
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    await as('trzeci', 'POST', '/api/party/accept', { partyId: data.party.id });
+    // Trzeci gets busy just as the leader sets out: free when counted, busy
+    // when its own exploration would begin.
+    await (await db())
+      .prepare(
+        `CREATE TRIGGER busy_trzeci AFTER INSERT ON activities WHEN NEW.character_id = (SELECT id FROM characters WHERE name = 'Lider')
+         BEGIN
+           INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options)
+           VALUES ((SELECT id FROM characters WHERE name = 'Trzeci'), 'herbs', 'windfalls-edge', 60, NEW.started_at, NEW.started_at + 3600000, 'race', 100, '{}');
+         END`,
+      )
+      .run();
+    try {
+      const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'mossy-boulders', minutes: 30 });
+      assert.equal(went.status, 201, JSON.stringify(went.data));
+      assert.deepEqual(went.data.went, ['Druh']);
+      const hunts = (await (await db()).prepare("SELECT c.name, a.options FROM activities a JOIN characters c ON c.id = a.character_id WHERE a.kind = 'hunt' ORDER BY c.name").all()).results;
+      assert.deepEqual(
+        hunts.map((row) => [row.name, JSON.parse(row.options).party.names, JSON.parse(row.options).partners.map((partner) => partner.name)]),
+        [
+          ['Druh', ['Lider', 'Druh'], ['Lider']],
+          ['Lider', ['Lider', 'Druh'], ['Druh']],
+        ],
+      );
+    } finally {
+      await (await db()).prepare('DROP TRIGGER IF EXISTS busy_trzeci').run();
+    }
+  });
+
+  test('one called back from a trip fights in nobody\'s exploration of it any more', async () => {
+    await player('trzeci', 'Trzeci');
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    await as('trzeci', 'POST', '/api/party/accept', { partyId: data.party.id });
+    assert.deepEqual((await as('lider', 'POST', '/api/party/hunt', { areaId: 'mossy-boulders', minutes: 30 })).data.went, ['Druh', 'Trzeci']);
+    assert.equal((await as('trzeci', 'POST', '/api/hunts/cancel')).status, 200);
+    const hunts = (await (await db()).prepare("SELECT c.name, a.options FROM activities a JOIN characters c ON c.id = a.character_id WHERE a.kind = 'hunt' ORDER BY c.name").all()).results;
+    assert.deepEqual(
+      hunts.map((row) => [row.name, JSON.parse(row.options).party.names, JSON.parse(row.options).partners.map((partner) => partner.name)]),
+      [
+        ['Druh', ['Lider', 'Druh'], ['Lider']],
+        ['Lider', ['Lider', 'Druh'], ['Druh']],
+      ],
+    );
+  });
+
   test('a member leaves when it wants, a leader who leaves passes the lead, and a party nobody is in goes', async () => {
     await player('trzeci', 'Trzeci');
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });

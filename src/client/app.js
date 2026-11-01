@@ -19,7 +19,7 @@ import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
 import { mountTowers } from './screens/towers.js';
 import { mountCommunity } from './screens/community.js';
-import { checkChat, onChatNews } from './chat-news.js';
+import { checkChat, onActivityEnds, onChatNews } from './chat-news.js';
 import { renderCreate } from './screens/create.js';
 import { renderSelect } from './screens/select.js';
 import { mountJournal } from './screens/journal.js';
@@ -433,6 +433,15 @@ document.addEventListener('visibilitychange', () => {
     call('GET', '/api/character').catch((error) => toast(error.message));
     checkChat({ now: true });
   }
+});
+
+// A Drużyna's exploration moved by another member's "Przewiń" (the trip's
+// shared timer, src/server/time.js): the chat's check hears its new end, and
+// the character is fetched again, so the timers and the Walka screen follow.
+onActivityEnds((endsAt) => {
+  const activity = state.character?.activity;
+  if (!activity?.party || endsAt === null || endsAt === activity.endsAt) return;
+  call('GET', '/api/character').catch(() => {});
 });
 
 // Someone wrote in the chat, or the player read it: the bar shows it. A

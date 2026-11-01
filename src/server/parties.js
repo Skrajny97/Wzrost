@@ -21,7 +21,10 @@
 // stay in the party and go the next time they are free. Each one gets
 // an exploration of its own (hunts.js), with the others fighting beside it
 // as they are when they set out, and its own report and finds; the free
-// places of the party, up to parties.size, take its companions.
+// places of the party, up to parties.size, take its companions. The
+// explorations of one trip share their timer: a "Przewiń" of any of them
+// moves them all, and the others hear who skipped (time.js; the author:
+// "Musi być wspólny timer").
 
 import { areaFor, areaUnlocked, huntDurations, isUnlocked, longestHunt } from '../engine/index.js';
 import { characterView, currentHp, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
@@ -326,7 +329,9 @@ export async function partyHunt(context) {
   const shots = new Map(everyone.map((member) => [member.row.id, snapshot(member, now)]));
   const names = everyone.map((member) => member.row.name);
   const partnersOf = (member, list) => list.filter((other) => other !== member).map((other) => shots.get(other.row.id));
-  const party_ = { id: party.id, leader: player.row.name, names };
+  // `trip` marks the explorations of this setting out, for their shared
+  // timer (time.js).
+  const party_ = { id: party.id, leader: player.row.name, names, trip: now };
   // The leader first, with its own choices checked there (potions, the
   // healing mark, tracking), so a wrong one sends nobody (the code review);
   // then the members, each without the leader's choices. One that got busy
@@ -343,6 +348,24 @@ export async function partyHunt(context) {
     } catch (error) {
       if (!(error instanceof ApiError)) throw error;
     }
+  }
+  // One that could not go after all (it got busy, or its character changed
+  // meanwhile) fights in nobody's exploration (the author: "niech się nie
+  // okaże, że jednak 3 walczą"): those who went keep only each other, and
+  // a leader left alone goes as on its own.
+  if (went.length < going.length) {
+    const actual = [player, ...went];
+    const crew = { ...party_, names: actual.map((member) => member.row.name) };
+    const trip = `json_extract(options, '$.party.trip') = ? AND json_extract(options, '$.party.id') = ?`;
+    await db.batch(
+      actual.map((member) =>
+        went.length > 0
+          ? db
+              .prepare(`UPDATE activities SET options = json_set(options, '$.party', json(?), '$.partners', json(?)) WHERE character_id = ? AND kind = 'hunt' AND ${trip}`)
+              .bind(JSON.stringify(crew), JSON.stringify(partnersOf(member, actual)), member.row.id, now, party.id)
+          : db.prepare(`UPDATE activities SET options = json_remove(options, '$.party', '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`).bind(member.row.id, now, party.id),
+      ),
+    );
   }
   return json(
     { character: characterView(await loadPlayer(db, session.userId), now), ...(await partyView(db, player.row.id, now)), went: went.map((member) => member.row.name) },

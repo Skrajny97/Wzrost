@@ -52,6 +52,8 @@ let partyInvites = 0;
 let trade = null;
 let askedAt = 0;
 const listeners = new Set();
+// Told the end of the character's activity at each check (app.js).
+let activityListener = null;
 
 const open = () => Boolean(state.character) && isUnlocked('community');
 export const globalNews = () => open() && !muted && latest > seen;
@@ -251,4 +253,11 @@ export async function checkChat({ now = false } = {}) {
     for (const [other, id] of Object.entries(answer.seen?.private ?? {})) privateSeen = { ...privateSeen, [other]: Math.max(privateSeen[other] ?? 0, id) };
   });
   if (answer.seen) keep(null);
+  if (answer.activityEndsAt !== undefined) activityListener?.(answer.activityEndsAt);
+}
+
+// The end of the character's activity, as each check hears it: a Drużyna's
+// trip moves when another member skips its time (src/server/time.js).
+export function onActivityEnds(listener) {
+  activityListener = listener;
 }

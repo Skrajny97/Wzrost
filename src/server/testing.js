@@ -12,6 +12,7 @@ import { eventDraftsOn, eventsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { requireSession } from './sessions.js';
 import { testMode, testModeFor, tutorialTestsFor } from './test-mode.js';
+import { shiftTrip, skipRecord, tripOf } from './trips.js';
 
 const notFound = () => new ApiError(404, 'not_found', 'Nie znaleziono.');
 
@@ -35,7 +36,12 @@ export async function skipTime(context) {
       .run();
   };
   if (player.avatarActivity) await end('avatar_activities', player.avatarActivity);
-  if (activity) {
+  // A Drużyna's trip ends for all its members, as with "Przewiń" (time.js).
+  const trip = activity && tripOf(activity);
+  if (trip) {
+    const shift = Math.max(0, activity.ends_at - (now - 2000));
+    await shiftTrip(db, trip, activity.started_at, shift, skipRecord(player.row, Math.max(1, Math.round(shift / 60000)))).run();
+  } else if (activity) {
     await end('activities', activity);
   } else {
     const { maxHp } = currentHp(player, now);

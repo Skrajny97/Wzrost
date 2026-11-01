@@ -82,6 +82,7 @@ import { soldGold } from './inventory.js';
 import { finishGathering } from './professions.js';
 import { herbsOf, knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
 import { KEPT_REPORTS } from './reports.js';
+import { leaveTrip, tripOf } from './trips.js';
 import { finishCrafting } from './workshop.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
@@ -448,7 +449,9 @@ export async function cancelHunt(context) {
   const returning = Object.keys(back).length > 0;
   // The potions and buffs written back are computed from the row read: the
   // call holds only while the row is as read and the exploration still
-  // goes on, so a claim or a sale meanwhile is not undone (atomic.js).
+  // goes on, so a claim or a sale meanwhile is not undone (atomic.js). One
+  // called back from a Drużyna's trip leaves the others' fights (trips.js).
+  const trip = tripOf(activity);
   await atomically(db, [
     assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND EXISTS (SELECT 1 FROM activities WHERE character_id = ? AND started_at = ?)', [
       player.row.id,
@@ -468,6 +471,7 @@ export async function cancelHunt(context) {
             ),
         ]
       : []),
+    ...(trip ? [leaveTrip(db, trip, player.row)] : []),
   ]);
   return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
@@ -678,8 +682,10 @@ export async function finishHunt(db, player, now, { choice } = {}) {
     ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped, overflow }, content),
     ...(options.quick && { quick: true }),
     ...(options.flash && { flash: true }),
-    // The Drużyna that went, by name (parties.js).
+    // The Drużyna that went, by name (parties.js), and the time the others
+    // skipped for everyone (time.js).
     ...(options.party && { party: options.party.names }),
+    ...((options.skips ?? []).some((skip) => skip.id !== row.id) && { skips: options.skips.filter((skip) => skip.id !== row.id) }),
   };
   const summary = {
     areaName: report.areaName,
