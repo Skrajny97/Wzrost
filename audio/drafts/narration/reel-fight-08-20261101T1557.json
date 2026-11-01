@@ -1,0 +1,17 @@
+{
+  "id": "reel-fight-08",
+  "payload": {
+    "text": "Walka jest automatyczna. Przygotowanie do niej już nie. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/reel-fight-08-20261101T1557-0.mp3",
+    "audio/drafts/narration/reel-fight-08-20261101T1557-1.mp3"
+  ],
+  "credits": 128
+}
