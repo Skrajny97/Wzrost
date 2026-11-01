@@ -82,6 +82,7 @@ import { craftingOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
+import { guildOf, guildRemoval } from './guilds.js';
 import { partyRemoval } from './parties.js';
 import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
@@ -1088,6 +1089,8 @@ export async function characterProfile(context) {
       level: view.level,
       classLevel: view.classLevel,
       role: chatRole(context.env, found),
+      // Its guild, by name and tag (guilds.js), or null.
+      guild: await guildOf(db, found.id).then((guild) => guild && { name: guild.name, tag: guild.tag }),
       relation: mine ? { state: 'self' } : own ? await relationTo(db, own.id, found.id, context.now) : null,
       tradeBlocked: await tradeBlockOf(db, session.userId, found.user_id),
       equipment: content.slots.map((slot) => ({ slot: slot.id, slotName: slot.name, item: worn(view.equipment[slot.id]) })),
@@ -1365,6 +1368,7 @@ export function characterRemoval(db, id) {
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
     ...marketRemoval(db, '?', [id]),
     ...partyRemoval(db, '?', [id]),
+    ...guildRemoval(db, '?', [id]),
     db.prepare('DELETE FROM characters WHERE id = ?').bind(id),
   ];
 }

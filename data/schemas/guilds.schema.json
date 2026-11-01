@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Gildie",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "found",
+    "size",
+    "name",
+    "tag",
+    "invites"
+  ],
+  "properties": {
+    "$comment": {
+      "type": "string"
+    },
+    "found": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "gold"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "gold": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "size": {
+      "type": "integer",
+      "minimum": 2
+    },
+    "name": {
+      "$ref": "#/definitions/range"
+    },
+    "tag": {
+      "$ref": "#/definitions/range"
+    },
+    "invites": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "definitions": {
+    "range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

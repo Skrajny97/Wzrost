@@ -15,18 +15,26 @@ import { request } from './api.js';
 import { isUnlocked, state } from './state.js';
 
 const SEEN_KEY = 'insight-chat-seen';
+const GUILD_KEY = 'insight-chat-guild-seen';
 const PRIVATE_KEY = 'insight-chat-private-seen';
 const MUTED_KEY = 'insight-chat-muted';
 const EVERY_MS = 15000;
 
 let latest = 0;
 let seen = 0;
+// The character's guild (src/server/guilds.js) with the newest message of
+// its channel by someone else, or null, and the newest one read there.
+let guild = null;
+let guildSeenId = 0;
+// Invitations to guilds waiting.
+let guildInvites = 0;
 // The newest message read in each private conversation, by the other
 // character's id.
 let privateSeen = {};
 let muted = false;
 try {
   seen = Number(localStorage.getItem(SEEN_KEY)) || 0;
+  guildSeenId = Number(localStorage.getItem(GUILD_KEY)) || 0;
   privateSeen = JSON.parse(localStorage.getItem(PRIVATE_KEY) ?? '{}') ?? {};
   muted = localStorage.getItem(MUTED_KEY) === '1';
 } catch {
@@ -48,13 +56,17 @@ const listeners = new Set();
 const open = () => Boolean(state.character) && isUnlocked('community');
 export const globalNews = () => open() && !muted && latest > seen;
 export const conversationNews = (id, newest = conversations.find((entry) => entry.id === id)?.latest ?? 0) => open() && newest > (privateSeen[id] ?? 0);
-export const chatNews = () => globalNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest));
+// The guild's channel: messages there light the chat like private ones.
+export const guildChannel = () => (open() ? guild : null);
+export const guildChannelNews = () => Boolean(guildChannel()) && guild.latest > guildSeenId;
+export const chatNews = () => globalNews() || guildChannelNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest));
 export const friendNews = () => open() && invites + gifts + unsent > 0;
 export const partyNews = () => open() && isUnlocked('party') && partyInvites > 0;
+export const guildNews = () => open() && guildInvites > 0;
 export const liveTrade = () => (open() ? trade : null);
 // A proposal to this character, or a trade going on.
 export const tradeNews = () => Boolean(liveTrade()) && !(trade.state === 'proposed' && trade.proposer);
-export const communityNews = () => chatNews() || friendNews() || partyNews() || tradeNews();
+export const communityNews = () => chatNews() || friendNews() || partyNews() || guildNews() || tradeNews();
 export const chatMuted = () => muted;
 
 // The tab's light in words, for a screen reader.
@@ -67,7 +79,9 @@ export const communityNewsText = () =>
       ? 'nowe wiadomości na czacie'
       : partyNews()
         ? 'zaproszenie do drużyny czeka'
-        : invites > 0
+        : guildNews()
+          ? 'zaproszenie do gildii czeka'
+          : invites > 0
         ? 'zaproszenie do znajomych czeka'
         : gifts > 0
           ? 'upominek czeka'
@@ -82,7 +96,16 @@ export function onChatNews(callback) {
 
 // The lights as words, to tell when one changed.
 const lights = () =>
-  [globalNews(), friendNews(), partyNews(), trade && `${trade.id}:${trade.state}:${trade.proposer}`, ...conversations.map((entry) => `${entry.id}:${conversationNews(entry.id, entry.latest)}`)].join();
+  [
+    globalNews(),
+    guildChannelNews(),
+    friendNews(),
+    partyNews(),
+    guildNews(),
+    guild?.name,
+    trade && `${trade.id}:${trade.state}:${trade.proposer}`,
+    ...conversations.map((entry) => `${entry.id}:${conversationNews(entry.id, entry.latest)}`),
+  ].join();
 
 // Runs `change` and tells the listeners if a light changed.
 function update(change) {
@@ -103,6 +126,7 @@ export function conversationsSeen(list) {
 function keep(tell) {
   try {
     localStorage.setItem(SEEN_KEY, String(seen));
+    localStorage.setItem(GUILD_KEY, String(guildSeenId));
     localStorage.setItem(PRIVATE_KEY, JSON.stringify(privateSeen));
   } catch {
     // Kept for this page only.
@@ -130,6 +154,24 @@ export function takeConversation() {
   const person = wanted;
   wanted = null;
   return person;
+}
+
+// The guild's channel shows messages up to `id`.
+export function guildRead(id) {
+  if (id <= guildSeenId) return;
+  update(() => {
+    guildSeenId = id;
+  });
+  keep({ guild: id });
+}
+
+// The Gildia as its screen last saw it (screens/guild.js): the guild, for
+// the chat's tab, and the invitations waiting.
+export function guildSeen(view) {
+  update(() => {
+    guild = view.guild ? { name: view.guild.name, tag: view.guild.tag, latest: guild?.latest ?? 0 } : null;
+    guildInvites = view.invites?.length ?? 0;
+  });
 }
 
 // The Globalny shows messages up to `id`.
@@ -200,9 +242,12 @@ export async function checkChat({ now = false } = {}) {
     gifts = answer.gifts ?? 0;
     unsent = answer.unsent ?? 0;
     partyInvites = answer.partyInvites ?? 0;
+    guild = answer.guild ?? null;
+    guildInvites = answer.guildInvites ?? 0;
     trade = answer.trade ?? null;
     // What the character read on its other devices.
     seen = Math.max(seen, answer.seen?.global ?? 0);
+    guildSeenId = Math.max(guildSeenId, answer.seen?.guild ?? 0);
     for (const [other, id] of Object.entries(answer.seen?.private ?? {})) privateSeen = { ...privateSeen, [other]: Math.max(privateSeen[other] ?? 0, id) };
   });
   if (answer.seen) keep(null);

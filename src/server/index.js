@@ -15,6 +15,7 @@ import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, markC
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendGift } from './community.js';
 import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
 import { enterTower, getTowers } from './towers.js';
+import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, setGuildRole } from './guilds.js';
 import { craftMaterials, salvageItem, sellMaterials, skipCrafting } from './crafting.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
@@ -200,6 +201,16 @@ const routes = [
   ['POST', '/api/party/kick', kickFromParty],
   ['POST', '/api/party/hunt', partyHunt],
   ['GET', '/api/towers', getTowers],
+  ['GET', '/api/guild', getGuild],
+  ['POST', '/api/guild/found', foundGuild],
+  ['POST', '/api/guild/invite', inviteToGuild],
+  ['POST', '/api/guild/accept', acceptGuildInvite],
+  ['POST', '/api/guild/decline', declineGuildInvite],
+  ['POST', '/api/guild/cancel', cancelGuildInvite],
+  ['POST', '/api/guild/leave', leaveGuild],
+  ['POST', '/api/guild/kick', kickFromGuild],
+  ['POST', '/api/guild/role', setGuildRole],
+  ['POST', '/api/guild/lead', handGuildLead],
   ['POST', '/api/towers/enter', enterTower],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],

@@ -2996,6 +2996,27 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wieże Systemu i Gildia (1.11.2026, na wersji testowej)
+
+Autor: „303 A / 304 A, ale kilkanaście wejść dziennie / 305 A, Lochy zamieniamy na Wieże / 306 A / 307 A, ale za 1000 złota”.
+
+1. **Złoto (303 A).** Zostaje jak w 0.0.72: złoto jest całe, cena za sztukę u Jagny i złomiarza ma cyfrę po przecinku, a za sprzedane sztuki gra płaci w dół do pełnej monety.
+2. **Wieże od 50. poziomu (305 A).** Lochy są teraz Wieżami Systemu. Zakładka „Wieże” w Walce otwiera się na 50. poziomie postaci, a awans na ten poziom ogłasza to komunikatem Systemu.
+3. **Wejścia (304 A).** Na dobę jest 15 wejść, wspólnych dla obu wież, a nowe przychodzą o północy czasu polskiego. Wejście to jedna walka na wybranym piętrze, z raportem od razu. Wspinaczka nie zajmuje postaci, więc wejść można też w czasie wyprawy i pracy. Postać walczy z pełnym HP i bez mikstur. Po walce HP zostaje takie jak przed nią, chyba że awans je odnowi.
+4. **Piętra.** Gracz wybiera dowolne piętro od 1 do najwyższego otwartego. Najwyższe otwarte piętro to poziom postaci, a w Wieży Drużyn poziom najniższej postaci gracza w drużynie. Piętro f ma stwory jednego regionu wewnętrznego na poziomie f, a regiony idą po kolei przez wszystkie krainy. Co 5. piętro czeka elita, a co 10. czempion (gdy region go nie ma, elita). Elita trafia się czasem też na innych piętrach.
+5. **Nagrody (306 A).** Wygrana płaci jak jedna walka godzinnej wyprawy na poziomie piętra: XP postaci i klasy, złoto i materiały. Pokonane stwory trafiają do Bestiariusza i liczą się do zadań. Przegrana nic nie daje i nic nie zabiera.
+6. **Elita i czempion płacą jak zwykły stwór (brakujący szczegół).** W Wieży elita i czempion nie mają mnożników nagród z wypraw (×3 i ×5). Inaczej wejścia służyłyby do farmienia czempionów: 15 walk z czempionem dziennie dawałoby tyle, co kilkanaście godzin wypraw. Elity i czempioni dalej trafiają do Bestiariusza, a czempion zostawia swoje materiały jak na wyprawie.
+7. **Skrzynia Wieży (306 A).** Co 10. piętro (10, 20, 30…) przy pierwszym zwycięstwie w danej wieży daje skrzynię. W środku jest przedmiot klasy postaci, który może ona założyć, na poziomie piętra i z rzadkością jak w skrzyni czempiona. Przedmiot sam trafia w pusty slot, a inaczej do plecaka. Gdy w plecaku brakuje miejsca, złomiarz kupuje najsłabsze przedmioty, jak po wyprawie.
+8. **Wieża Drużyn.** Wchodzi do niej postać, która ma Drużynę z co najmniej dwiema postaciami graczy. Pozostali gracze walczą obok w takim stanie, w jakim są, jak na wyprawie drużyny. Wolne miejsca do trzech zajmują towarzysze z Kwater. Każdy członek wchodzi sam, na swoje wejścia, i dostaje własny raport. Za każdego gracza i towarzysza obok postać oddaje część XP, jak na wyprawie.
+9. **Gildia (307 A).** Gildię zakłada postać od 30. poziomu za 1000 złota. Gildia ma nazwę (3–24 znaki) i skrót (2–4 litery albo cyfry), oba unikalne. Nazwę i skrót sprawdza ten sam filtr co imiona postaci. Gildia mieści 20 postaci: lidera, zastępców i członków.
+10. **Dołączanie (brakujący szczegół).** Do gildii może dołączyć każda postać, która ma już Społeczność (od 5. poziomu). Dołącza na zaproszenie lidera albo zastępcy, wysłane po imieniu postaci. Gildia może mieć naraz najwyżej 10 zaproszeń, a postać należy do jednej gildii.
+11. **Role (brakujący szczegół).** Lider mianuje i odwołuje zastępców (bez limitu), usuwa każdego i może przekazać przywództwo. Zastępca zaprasza i usuwa zwykłych członków. Gdy lider odejdzie, przywództwo przejmuje pierwszy zastępca, a bez zastępców członek z najdłuższym stażem. Gildia bez członków znika razem z zaproszeniami i kanałem.
+12. **Kanał Gildii.** W Czacie dochodzi zakładka „Gildia” z kropką nowych wiadomości. Widzą ją i piszą w niej tylko członkowie. Zgłoszona wiadomość trafia do moderacji jak każda inna.
+13. **Społeczność.** Część „Gildia” jest już otwarta (wcześniej „Wkrótce”). Zaproszenie do gildii zapala kropkę na zakładce Społeczność. Karta postaci pokazuje jej gildię z nazwą i skrótem.
+14. **Migracje bazy:** 0064 (zapis Wież postaci) i 0065 (gildie).
+15. **Opis Gildii.** Autor: „Zmiana opisu na "Gildia to miejsce dla Twojej własnej społeczności w grze. Gwarantuje dodatkowe aktywności i współpracę z innymi graczami. Do gildii dołączysz na zaproszenie liderów lub możesz założyć ją sam." Info o nazwach i skrótach może zostać.” Karta zakładania gildii ma ten opis, a pod nim zasady nazwy i skrótu.
+16. **Plany na później.** Autor: „Gildia musi mieć osobną zakładkę docelowo, inwestowanie wspólne w jakieś dodatkowe budynki, które dają uczestnikom bonusy różne, technologie na podobnej zasadzie. Wojny Gildii w przyszłości, ranking Gildii analogicznt do Rankingu Postaci (wyliczany na podstawie Mocy)” oraz „Moc to będzie nowy współczynnik wyliczający siłę bojową i przydatność postaci. Trzeba to dobrze ustawić, by wyliczało sensownie. Trochę jak Combat Power w innych grach.” Te punkty czekają na kolejne etapy: osobna zakładka Gildii, wspólne budynki i technologie gildii z premiami dla członków, Wojny Gildii, ranking Gildii według Mocy i sama Moc postaci.
+
 ## Wersja 0.0.72 (1.11.2026)
 
 Autor: „Wdrażaj 0.0.72”.
@@ -3084,7 +3105,7 @@ Autor: „Następnie przygotuj podwaliny pod Gildię i Lochy, którym ostateczni
 2. **Dwie wieże** (`data/towers.json`): Wieża Solo dla jednej postaci i Wieża Drużyn dla 2–3 postaci graczy. W Wieży Drużyn wolne miejsca zajmują zwerbowani towarzysze.
 3. **Piętra** (`src/engine/towers.js`, z testami). Piętro f ma zwykłe stwory jednego regionu wewnętrznego na poziomie f. Regiony idą po kolei od pierwszego (piętro 1 Skraj Wiatrołomów, 2 Lisie Jary…), a po ostatnim znów od pierwszego, więc wspinaczka prowadzi przez stwory wszystkich krain. Co 5. piętro czeka elita regionu, a na innych piętrach elita trafia się z szansą 10%. Co 10. piętro czeka czempion, a gdy region go nie ma, elita. Najwyższe otwarte piętro to poziom postaci, a w drużynie poziom najniższej postaci.
 4. **Werbunek** kosztuje tyle co dotąd.
-5. **Czeka na decyzje autora:** jak wspinaczka ma się mieć do wypraw i profesji, od którego poziomu Wieże się otwierają, co daje Gildia i ile osób ją tworzy (pytania 304–307).
+5. **Czeka na decyzje autora:** jak wspinaczka ma się mieć do wypraw i profesji, od którego poziomu Wieże się otwierają, co daje Gildia i ile osób ją tworzy (pytania 304–307). *Rozstrzygnięte: zob. „Wieże Systemu i Gildia”.*
 
 ## Zlecenia na miarę (31.10.2026, w grze od 0.0.71)
 

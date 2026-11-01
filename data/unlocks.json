@@ -56,6 +56,12 @@
     "message": "Odblokowano Drużynę. Załóż ją albo przyjmij zaproszenie w zakładce Społeczność, w części Drużyna, i wyruszajcie razem na wyprawy."
   },
   {
+    "id": "guild",
+    "name": "Gildia",
+    "level": 30,
+    "message": "Odblokowano zakładanie Gildii. Załóż ją w zakładce Społeczność, w części Gildia."
+  },
+  {
     "id": "hunts-1h",
     "name": "Eksploracje do 1 godziny",
     "level": 25,
@@ -79,7 +85,8 @@
   {
     "id": "towers",
     "name": "Wieże",
-    "level": 50
+    "level": 50,
+    "message": "Odblokowano Wieże Systemu. Wejdź do nich w zakładce Walka, w części Wieże: kilkanaście walk dziennie, obok wypraw i profesji."
   },
   {
     "id": "core",

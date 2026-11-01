@@ -1,0 +1,17 @@
+{
+  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz.",
+  "found": {
+    "level": 30,
+    "gold": 1000
+  },
+  "size": 20,
+  "name": {
+    "min": 3,
+    "max": 24
+  },
+  "tag": {
+    "min": 2,
+    "max": 4
+  },
+  "invites": 10
+}

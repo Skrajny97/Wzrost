@@ -1,8 +1,7 @@
 // The Społeczność tab, from character level 5. A list at its top, folded to
 // the part shown, picks one of its parts (data/community.json): the Czat,
 // the Znajomi with their daily Upominek (friends.js), the Ranking postaci
-// (ranking.js), the Drużyna (party.js), and the Gildie still to come
-// ("Wkrótce").
+// (ranking.js), the Drużyna (party.js) and the Gildia (guild.js).
 // It opens on the part with news (chat-news.js), else on the one last shown
 // on the device; while the narrator has not shown the chat's rules yet
 // (narrator.js), on the Czat. News in a part not shown lights the folded
@@ -10,7 +9,8 @@
 // it waits a Wymiana proposed or going on (trade.js).
 //
 // The chat (src/server/chat.js) has a tab for each channel, Globalny and
-// Wymiana, and one for each private conversation, which only its two
+// Wymiana, the Gildia's of the character's guild, which only its members
+// see (guilds.js), and one for each private conversation, which only its two
 // characters see; "Prywatna wiadomość" on a character's sheet opens one
 // (profile.js), and its × closes it until a newer message comes. In the
 // Wymiana a message can show up to three items of the bag, picked under the
@@ -38,6 +38,10 @@ import {
   conversationsSeen,
   friendNews,
   globalNews,
+  guildChannel,
+  guildChannelNews,
+  guildNews,
+  guildRead,
   partyNews,
   onChatNews,
   privateRead,
@@ -50,6 +54,7 @@ import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, openSheet, pageHeading, toast, withButton } from '../ui.js';
 import { itemDetails, itemSummary } from './character.js';
 import { mountFriends } from './friends.js';
+import { mountGuild } from './guild.js';
 import { mountParty } from './party.js';
 import { lockedScreen } from './locked.js';
 import { mountRanking } from './ranking.js';
@@ -58,17 +63,20 @@ import { tradeBanner } from './trade.js';
 // The most messages the page keeps; older ones leave from the top.
 const SHOWN = 200;
 
+// The guild's channel among the chat's tabs (chat.js resolves it).
+const GUILD = { id: 'guild', name: 'Gildia' };
+
 // A silence "na stałe" (chat.js).
 const FOREVER = 8.64e15;
 const untilText = (until) => (until >= FOREVER ? 'na stałe' : `do ${dateTimeFormat.format(new Date(until))}`);
 
 const SECTION_KEY = 'insight-community-section';
 const SECTION_ICONS = { chat: 'chat', friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords' };
-const SECTION_NEWS = { chat: chatNews, friends: friendNews, party: partyNews };
+const SECTION_NEWS = { chat: chatNews, friends: friendNews, party: partyNews, guilds: guildNews };
 
 export function mountCommunity(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Społeczność')(container, context);
-  const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking, party: mountParty };
+  const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking, party: mountParty, guilds: mountGuild };
   const sections = state.content.community.sections;
   const asked = takeConversation();
   let current = asked ? 'chat' : firstSection(sections);
@@ -407,16 +415,17 @@ function mountChat(container, { bar, person = null }) {
       ),
     );
 
-  // The channels first, then the conversations, the most recent first; one
-  // opened from a sheet shows before its first message too. The Globalny's
-  // tab lights for its news.
+  // The channels first, the guild's among them while the character is in
+  // one, then the conversations, the most recent first; one opened from a
+  // sheet shows before its first message too. The Globalny's and the
+  // guild's tabs light for their news.
   function renderTabs() {
     const entries = talk && !conversations.some((entry) => entry.id === talk.id) ? [{ ...talk, latest: 0 }, ...conversations] : conversations;
+    const channels = [...chat.channels, ...(guildChannel() ? [GUILD] : [])];
+    const lit = (entry, index) => (Boolean(talk) || channel.id !== entry.id) && (entry === GUILD ? guildChannelNews() : index === 0 && globalNews());
     fill(
       tabs,
-      chat.channels.map((entry, index) =>
-        tab(entry.name, !talk && entry.id === channel.id, index === 0 && (Boolean(talk) || channel.id !== entry.id) && globalNews(), () => switchTo(entry, null)),
-      ),
+      channels.map((entry, index) => tab(entry.name, !talk && entry.id === channel.id, lit(entry, index), () => switchTo(entry, null))),
       entries.map(privateTab),
     );
   }
@@ -515,6 +524,7 @@ function mountChat(container, { bar, person = null }) {
     if (follow) toBottom();
     following = following || follow;
     if (talk) privateRead(talk.id, messages.at(-1).id);
+    else if (channel.id === GUILD.id) guildRead(messages.at(-1).id);
     else chatSeen(messages.at(-1).id);
     return true;
   }
@@ -769,6 +779,11 @@ function mountChat(container, { bar, person = null }) {
     // Another tab was opened meanwhile: this answer is not for it.
     if (asked !== talk || askedChannel !== channel) {
       ask();
+      return;
+    }
+    // Out of the guild meanwhile: back to the Globalny.
+    if (failure?.code === 'no_guild' && askedChannel === GUILD) {
+      switchTo(chat.channels[0], null);
       return;
     }
     if (failure) {

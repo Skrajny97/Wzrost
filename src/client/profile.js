@@ -34,6 +34,7 @@ export async function openProfile(name, { onChange } = {}) {
           profile.role && h('span', { class: `chat-role chat-role--${profile.role}`, text: ` (${profile.role})` }),
         ),
         h('p', { class: 'profile-levels', text: `${profile.className} · poziom ${profile.level} · klasa ${profile.classLevel}` }),
+        profile.guild && h('p', { class: 'profile-levels', text: `Gildia: ${profile.guild.name} [${profile.guild.tag}]` }),
       ),
     ),
     profile.relation?.state !== 'self' && friendship(profile, onChange),

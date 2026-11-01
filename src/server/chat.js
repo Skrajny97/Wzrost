@@ -18,6 +18,7 @@ import { isUnlocked, itemView } from '../engine/index.js';
 import { isAuthor } from './author.js';
 import { content } from './content.js';
 import { friendNews } from './community.js';
+import { guildChannel, guildNews, guildOf } from './guilds.js';
 import { partyNews } from './parties.js';
 import { tradeNews } from './trades.js';
 import { ApiError, json, readJson } from './http.js';
@@ -50,6 +51,16 @@ const whole = (value) => (/^\d{1,15}$/.test(value ?? '') ? Number(value) : 0);
 
 // The channel of the private messages, each with its recipient.
 const PRIVATE = 'private';
+// The channel of the character's guild (guilds.js), kept as "guild:<id>".
+const GUILD = 'guild';
+
+// The guild channel a request names: the one of the asking character's
+// guild, which only its members read and write in.
+async function guildChannelFor(db, character) {
+  const guild = await guildOf(db, character.id);
+  if (!guild) throw new ApiError(403, 'no_guild', 'Nie należysz do gildii.');
+  return guildChannel(guild.id);
+}
 // The messages between two characters, either way (`m` is chat_messages).
 const PAIR = '((m.character_id = ? AND m.recipient_id = ?) OR (m.character_id = ? AND m.recipient_id = ?))';
 const pairOf = (one, other) => [one, other, other, one];
@@ -204,9 +215,11 @@ export async function readChat(context) {
   const url = new URL(context.request.url);
   const withId = whole(url.searchParams.get('with'));
   const other = withId ? await partnerOf(db, character, withId, session.userId) : null;
-  const channel = other ? null : channelOf(url.searchParams.get('channel') ?? 'global');
+  const asked = url.searchParams.get('channel') ?? 'global';
+  const guild = !other && asked === GUILD ? await guildChannelFor(db, character) : null;
+  const channel = other || guild ? null : channelOf(asked);
   const where = other ? `m.channel = '${PRIVATE}' AND ${PAIR}` : 'm.channel = ?';
-  const binds = other ? pairOf(character.id, other.id) : [channel.id];
+  const binds = other ? pairOf(character.id, other.id) : [guild ?? channel.id];
   const after = whole(url.searchParams.get('after'));
   const from = whole(url.searchParams.get('from'));
   const { userId } = session;
@@ -225,7 +238,7 @@ export async function readChat(context) {
     conversationsOf(db, userId, character.id),
   ]);
   return json({
-    channel: other ? PRIVATE : channel.id,
+    channel: other ? PRIVATE : guild ? GUILD : channel.id,
     with: other && { id: other.id, name: other.name },
     messages: messages.results.reverse().map((row) => messageView(row, userId, context.env)),
     hidden: hidden.results.map((row) => row.id),
@@ -249,7 +262,7 @@ function seenOf(text) {
     seen = {};
   }
   const entries = Object.entries(seen?.private ?? {}).map(([other, id]) => [other, whole(String(id))]);
-  return { global: whole(String(seen?.global ?? 0)), private: Object.fromEntries(entries.filter(([other, id]) => whole(other) && id)) };
+  return { global: whole(String(seen?.global ?? 0)), guild: whole(String(seen?.guild ?? 0)), private: Object.fromEntries(entries.filter(([other, id]) => whole(other) && id)) };
 }
 
 // GET /api/chat/latest: the newest message someone else wrote in the
@@ -260,7 +273,11 @@ function seenOf(text) {
 // read on any of its devices.
 export async function latestChat(context) {
   const { session, character, db } = await requireChatter(context);
-  const [row, conversations, friends, trade, read, partyInvites] = await Promise.all([
+  // The guild's channel and the invitations to guilds (guilds.js).
+  const guild = await guildOf(db, character.id);
+  const newest = `SELECT MAX(id) AS id FROM chat_messages
+         WHERE channel = ? AND hidden_at IS NULL AND user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)`;
+  const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites] = await Promise.all([
     db
       .prepare(
         `SELECT MAX(id) AS id FROM chat_messages
@@ -273,8 +290,19 @@ export async function latestChat(context) {
     tradeNews(db, character.id, context.now),
     db.prepare('SELECT chat_seen FROM characters WHERE id = ?').bind(character.id).first(),
     partyNews(db, character.id),
+    guild ? db.prepare(newest).bind(guildChannel(guild.id), session.userId, session.userId).first() : null,
+    guildNews(db, character.id),
   ]);
-  return json({ latest: row.id ?? 0, conversations: conversations.results.map(conversationView), ...friends, partyInvites, trade, seen: seenOf(read?.chat_seen) });
+  return json({
+    latest: row.id ?? 0,
+    conversations: conversations.results.map(conversationView),
+    ...friends,
+    partyInvites,
+    trade,
+    guild: guild && { name: guild.name, tag: guild.tag, latest: guildRow?.id ?? 0 },
+    guildInvites,
+    seen: seenOf(read?.chat_seen),
+  });
 }
 
 // POST /api/chat/seen {global: id}, or {with: character id, id}: the
@@ -287,6 +315,7 @@ export async function markChatSeen(context) {
   const { character, db } = await requireChatter(context);
   const body = await readJson(context.request);
   const global = Number.isInteger(body.global) && body.global > 0 ? body.global : 0;
+  const guild = Number.isInteger(body.guild) && body.guild > 0 ? body.guild : 0;
   const other = Number.isInteger(body.with) && body.with > 0 ? body.with : 0;
   const id = Number.isInteger(body.id) && body.id > 0 ? body.id : 0;
   // A conversation is marked only by a message of it, so the record keeps
@@ -301,6 +330,10 @@ export async function markChatSeen(context) {
     let changed = false;
     if (global > seen.global) {
       seen.global = global;
+      changed = true;
+    }
+    if (guild > seen.guild) {
+      seen.guild = guild;
       changed = true;
     }
     if (known && id > (seen.private[other] ?? 0)) {
@@ -343,7 +376,8 @@ export async function sendChat(context) {
   const { session, character, account, db } = await requireChatter(context);
   const body = await readJson(context.request);
   const other = Number.isInteger(body.with) ? await partnerOf(db, character, body.with, session.userId) : null;
-  const channel = other ? null : channelOf(body.channel ?? 'global');
+  const guild = !other && body.channel === GUILD ? await guildChannelFor(db, character) : null;
+  const channel = other || guild ? null : channelOf(body.channel ?? 'global');
   const now = context.now;
   const { userId } = session;
   if (!account.chat_rules_at) throw new ApiError(403, 'rules', 'Najpierw zaakceptuj zasady czatu.');
@@ -354,14 +388,14 @@ export async function sendChat(context) {
   const items = offered && JSON.stringify(offered);
   const { everySeconds, keep, privateKeep } = content.chat.rules;
   const where = other ? `m.channel = '${PRIVATE}' AND ${PAIR}` : 'm.channel = ?';
-  const binds = other ? pairOf(character.id, other.id) : [channel.id];
+  const binds = other ? pairOf(character.id, other.id) : [guild ?? channel.id];
   const [sent] = await db.batch([
     db
       .prepare(
         `INSERT INTO chat_messages (channel, user_id, character_id, recipient_id, name, level, class_id, text, items, created_at)
          SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id = ? AND created_at > ?)`,
       )
-      .bind(other ? PRIVATE : channel.id, userId, character.id, other?.id ?? null, character.name, character.level, character.class_id, text, items, now, userId, now - everySeconds * 1000),
+      .bind(other ? PRIVATE : (guild ?? channel.id), userId, character.id, other?.id ?? null, character.name, character.level, character.class_id, text, items, now, userId, now - everySeconds * 1000),
     db
       .prepare(
         `DELETE FROM chat_messages WHERE id IN (SELECT m.id FROM chat_messages m WHERE ${where}
@@ -407,7 +441,9 @@ async function namedMessage(db, body, character = null) {
         .first()
     : null;
   const unseen = message?.channel === PRIVATE && character && ![message.character_id, message.recipient_id].includes(character.id);
-  if (!message || unseen) throw new ApiError(404, 'no_message', 'Tej wiadomości już nie ma.');
+  // A guild's message only its members see, and the moderation.
+  const outside = message?.channel.startsWith(`${GUILD}:`) && character && (await guildOf(db, character.id).then((guild) => !guild || guildChannel(guild.id) !== message.channel));
+  if (!message || unseen || outside) throw new ApiError(404, 'no_message', 'Tej wiadomości już nie ma.');
   return message;
 }
 
@@ -475,6 +511,7 @@ export async function chatReports(context) {
       role: chatRole(context.env, row),
       text: row.text,
       private: row.channel === PRIVATE,
+      guild: row.channel.startsWith(`${GUILD}:`),
       createdAt: row.created_at,
       hidden: row.hidden_at !== null,
       reports: row.reports,

@@ -4,7 +4,7 @@
     { "id": "chat", "name": "Czat" },
     { "id": "friends", "name": "Znajomi" },
     { "id": "ranking", "name": "Ranking postaci" },
-    { "id": "guilds", "name": "Gildie", "soon": true },
+    { "id": "guilds", "name": "Gildia" },
     { "id": "party", "name": "Drużyna" }
   ],
   "ranking": { "size": 100 },

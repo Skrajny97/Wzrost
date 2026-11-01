@@ -170,8 +170,10 @@ export function buildContent(raw) {
     // The Osada: its places, residents, brotherhoods, standings, board of
     // orders, Zaklinaczka and Pustelnik (settlement.js).
     settlement: raw.settlement ?? null,
-    // The Wieże Systemu, groundwork (towers.js).
+    // The Wieże Systemu (towers.js).
     towers: raw.towers ?? null,
+    // The players' Gildie (src/server/guilds.js).
+    guilds: raw.guilds ?? null,
     residentsById: byId(raw.settlement?.residents ?? []),
   };
 }
