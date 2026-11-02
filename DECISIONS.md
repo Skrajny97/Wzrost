@@ -3019,7 +3019,8 @@ Po 0.0.99 numeracja idzie dalej od 0.1.0, jak ustalił autor.
 
 1. **Co wchodzi do gry:** filtry kategorii na Targowisku i delikatne tła i gradienty w układzie na komputer (zob. wyżej).
 2. **Baza danych:** bez migracji.
-3. **Przed wdrożeniem:** pełne testy (869 z 869) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków); filtry w przeglądarce na telefonach 390×844 i 360×780 i na komputerze 1440×900 (wybór, liczby, brak przesuwania na boki, wybór po odświeżeniu, powrót do „Wszystko”, reset po wyjściu); tła na komputerze 1920×1080 i 1366×768 (Walka, Postać, Obóz, Społeczność).
+3. **Test ceny u Gościwita.** Pierwsze wdrożenie 0.1.0 zatrzymało się na teście „lepsza relacja z Gościwitem obniża jego ceny”, choć gra liczy dobrze. Test brał pierwsze zioło dnia, a 3.11 kosztuje ono 8 zł: 10% rabatu, zaokrąglone w górę, nic nie zmienia, więc cena zostaje ta sama (tak wypada w ok. 7% dni). Test bierze teraz najdroższy towar dnia poza częściami, na którym rabat widać każdego dnia (sprawdzone na dwa lata naprzód). Kod gry bez zmian.
+4. **Przed wdrożeniem:** pełne testy (869 z 869) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków); filtry w przeglądarce na telefonach 390×844 i 360×780 i na komputerze 1440×900 (wybór, liczby, brak przesuwania na boki, wybór po odświeżeniu, powrót do „Wszystko”, reset po wyjściu); tła na komputerze 1920×1080 i 1366×768 (Walka, Postać, Obóz, Społeczność).
 
 ## Kod podarunkowy TIGER (2.11.2026)
 

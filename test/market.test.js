@@ -380,8 +380,11 @@ describe('the Targowisko through the API', () => {
     const view = await market('Kupiec');
     assert.equal(view.merchant.discount, content.settlement.relationDiscount.at(-1));
     const stock = merchantStock(Date.now(), content);
-    const good = view.merchant.goods.find((one) => one.kind === 'herb');
-    const base = stock.goods.find((one) => one.id === good.id);
+    // The day's dearest good, but a part (whose price has a floor): the
+    // discount, rounded up, shows on any day's (on a cheap herb, 10% of
+    // 8 gold rounds away, as on 3 November 2026).
+    const base = stock.goods.filter((one) => one.kind !== 'part').reduce((dearest, one) => (one.price > dearest.price ? one : dearest));
+    const good = view.merchant.goods.find((one) => one.id === base.id);
     assert.equal(good.price, merchantPrice(base, friend, content));
     assert.ok(good.price < base.price);
     assert.equal((await market('Druga')).merchant.goods.find((one) => one.id === good.id).price, base.price);
