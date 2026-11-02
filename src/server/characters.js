@@ -15,6 +15,7 @@ import {
   classXpToNext,
   collect,
   combatValues,
+  extraValues,
   computeStats,
   construction,
   craftLevelFor,
@@ -1029,6 +1030,10 @@ export function characterView(player, now) {
       maxMana: values.mana,
       // What every class level adds to both, without any points.
       perClassLevel: content.classesById[character.classId].perClassLevel,
+      // The Parametry dodatkowe window: the total armour, the chances with
+      // their ratings, the resistances (preview.js); the HP at rest at the
+      // Ognisko's pace of now.
+      extra: extraValues(character, equipped, content, { rest: rest.change?.bonus ?? rest.bonus }),
     },
     equipment: Object.fromEntries(
       content.slots.map((slot) => {

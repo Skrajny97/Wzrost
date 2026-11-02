@@ -111,6 +111,8 @@ import {
   settleCrafting,
   simulateHunt,
   statEffects,
+  extraValues,
+  combatValues,
   equipChange,
   itemLines,
   THREAT_LEVELS,
@@ -1095,6 +1097,45 @@ describe('stat previews', () => {
     assert.equal(mage.strength.damage, undefined);
     const cleric = statEffects(newCharacter('cleric'), kit('cleric'), content);
     assert.ok(cleric.wisdom.recovery > 0 && cleric.wisdom.mana > 0);
+  });
+});
+
+describe('Parametry dodatkowe', () => {
+  test('show the total armour with its sources, the chances under their caps and every resistance', () => {
+    const character = newCharacter('warrior');
+    const worn = kit('warrior');
+    const extra = extraValues(character, worn, content);
+    const values = combatValues(character, worn, content);
+    const tuning = content.balance.combat;
+    assert.ok(extra.armor.equipment > 0 && extra.armor.endurance > 0);
+    assert.equal(extra.armor.total, extra.armor.equipment + extra.armor.endurance);
+    assert.equal(extra.armor.trait, null);
+    assert.equal(extra.armor.reduction, values.reduction);
+    assert.equal(extra.dodge.chance, values.dodge);
+    assert.equal(extra.crit.chance, values.crit);
+    assert.equal(extra.effectResist.chance, values.effectResist);
+    for (const [chance, cap] of [[extra.dodge, tuning.dodgeCap], [extra.crit, tuning.critCap], [extra.effectResist, tuning.willCap]]) {
+      assert.equal(chance.cap, cap);
+      assert.ok(chance.chance > 0 && chance.chance < cap);
+    }
+    assert.equal(extra.crit.multiplier, tuning.critMultiplier);
+    assert.equal(extra.speed, values.speed);
+    assert.equal(extra.regen, values.regen);
+    assert.equal(extra.recovery, values.recovery);
+    assert.deepEqual(extra.resist.map((element) => element.id), content.elements.map((element) => element.id));
+    // The Ognisko's share speeds up the HP at rest.
+    assert.ok(extraValues(character, worn, content, { rest: 0.5 }).regen > extra.regen);
+  });
+
+  test('name the trait that raises the armour, and the one that makes crits hit harder', () => {
+    const guardian = { ...newCharacter('warrior'), evolution: 'guardian' };
+    const worn = kit('warrior');
+    const plain = extraValues(newCharacter('warrior'), worn, content);
+    const extra = extraValues(guardian, worn, content);
+    assert.deepEqual(extra.armor.trait, { name: 'Opoka', share: 0.1 });
+    assert.equal(extra.armor.total, Math.round((plain.armor.equipment + plain.armor.endurance) * 1.1));
+    const sniper = extraValues({ ...newCharacter('archer'), evolution: 'sniper' }, kit('archer'), content);
+    assert.equal(sniper.crit.multiplier, content.balance.combat.critMultiplier * 1.25);
   });
 });
 

@@ -3,6 +3,7 @@
 // measured against an opponent of the character's own level.
 
 import { playerCombatant } from './combatant.js';
+import { evolutionOf } from './evolutions.js';
 import { cappedChance, reduction } from './formulas.js';
 import { regenPerMinute } from './progression.js';
 import { computeStats } from './stats.js';
@@ -29,6 +30,46 @@ export function combatValues(character, equipped, content) {
     recovery: unit.recovery,
     // Each element's resistance as the share of its damage it takes away.
     resist: Object.fromEntries(content.elements.map(({ id }) => [id, reduction(unit.resist[id] ?? 0, level, balance)])),
+  };
+}
+
+// The stats screen's Parametry dodatkowe (the author, after a player asked
+// for the total armour: "Mozna zbudować jakies okno w statystykach
+// <Parametry dodatkowe>"): the ratings behind the combat values and what
+// they give against an opponent of the character's own level. The armour
+// with its sources (the items, Wytrzymałość, and the evolution's trait that
+// raises it by a share), the chances with their caps, the crit's multiplier,
+// the speed, the HP at rest (with `rest`, the share the Ognisko adds, as the
+// character rests now) and after each fight, and each element's resistance,
+// with the share less of its damage a trait shelters from.
+export function extraValues(character, equipped, content, { rest = 0 } = {}) {
+  const balance = content.balance;
+  const tuning = balance.combat;
+  const unit = playerCombatant({ character, equipped, name: '' }, content);
+  const { totals, bonuses } = computeStats(character, equipped, content);
+  const level = character.level;
+  const feat = unit.feat;
+  const trait = feat?.kind === 'bulwark' ? { name: evolutionOf(character, content).trait.name, share: feat.armor } : null;
+  const chance = (rating, cap) => ({ rating: Math.round(rating), chance: cappedChance(rating, level, cap, balance), cap });
+  return {
+    level,
+    armor: {
+      total: unit.armor,
+      equipment: Math.round(bonuses.armor),
+      endurance: Math.round(totals.endurance * tuning.armorPerEndurance),
+      trait,
+      reduction: reduction(unit.armor, level, balance),
+    },
+    dodge: chance(unit.dodgeRating, tuning.dodgeCap),
+    crit: { ...chance(unit.critRating, tuning.critCap), multiplier: tuning.critMultiplier * (1 + (feat?.critDamage ?? 0)) },
+    effectResist: chance(unit.willRating, tuning.willCap),
+    speed: unit.speed,
+    regen: regenPerMinute(unit.maxHp, totals.vitality, content, rest),
+    recovery: unit.recovery,
+    resist: content.elements.map(({ id, name }) => {
+      const rating = unit.resist[id] ?? 0;
+      return { id, name, rating, reduction: reduction(rating, level, balance), shelter: unit.shelter?.[id] ?? 0 };
+    }),
   };
 }
 

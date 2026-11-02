@@ -2996,6 +2996,19 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Statystyki: okno „Parametry dodatkowe” (2.11.2026)
+
+Autor przysłał zrzut czatu, w którym gracz pyta, czy gdzieś widać łączny pancerz; gra pokazywała tylko redukcję obrażeń w procentach. Autor: „Potrzebujemy takiego czegoś w statystykach gdzieś. Mozna zbudować jakies okno w statystykach <Parametry dodatkowe> albo coś w tym stylu”.
+
+1. **Gdzie.** W zakładce Statystyki, pod Wartościami bojowymi, jest przycisk „Parametry dodatkowe”. Otwiera okno z liczbami, których walka używa, a ekran dotąd nie pokazywał.
+2. **Co pokazuje.**
+    - Obrona: łączny pancerz z rozbiciem na ekwipunek, Wytrzymałość i cechę ewolucji (Opoka +10%), z redukcją obrażeń fizycznych; unik i odporność na efekty z oceną i najwyższą możliwą wartością.
+    - Atak: trafienie krytyczne z oceną i najwyższą wartością, mnożnik krytyka (×1,5, więcej z cechą Zimna krew albo Zabójcza precyzja) i szybkość.
+    - Zdrowie: regeneracja HP między wyprawami z premią Ogniska i odzysk brakującego HP po każdej walce na wyprawie.
+    - Odporności na wszystkie osiem żywiołów: ocena i procent obrażeń, o który mniej się dostaje, a przy Zimowym oddechu i Toksynach także osłona cechy.
+3. **Przeciw komu (brakujący szczegół).** Procenty liczą się przeciw przeciwnikowi na poziomie postaci, tak jak redukcja w Wartościach bojowych. Okno mówi to u góry.
+4. Liczy je silnik (`extraValues` w `src/engine/preview.js`), a serwer wysyła je razem z postacią (`combat.extra`).
+
 ## Wersja 0.0.90 (2.11.2026)
 
 1. **Co wchodzi do gry:** poprawka aury w scenie Walki. Drobinki Aury Systemu i iskry Aury Żaru stały w lewym górnym rogu sceny, bo reguła drobinek z portretu, dalej w arkuszu stylów, rozciągała ich pole na róg sceny. Teraz krążą wokół idącej postaci, a na wierzchowcu wokół jeźdźca i wierzchowca. Portret, karta postaci i sklep były dobre.

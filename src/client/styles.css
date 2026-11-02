@@ -2577,6 +2577,51 @@ a.segmented-option {
   background: var(--surface);
 }
 
+/* Parametry dodatkowe (stats.js openExtra): the button under the combat
+   values, and in its window the groups of rows, a name and its value on one
+   line and the notes under them. */
+.combat-extra {
+  align-self: flex-start;
+}
+.extra-intro {
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+.extra-title {
+  margin: 12px 0 4px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.extra-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+.extra-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.extra-row dt {
+  min-width: 0;
+}
+.extra-row dd {
+  margin: 0;
+}
+.extra-row .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.extra-row .extra-note {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
 .value-label,
 .value-note {
   color: var(--text-muted);

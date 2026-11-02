@@ -1,10 +1,11 @@
 // The stats screen: levels, the eight stats with their source bars, free
-// points (chosen here, sent together with "Zatwierdź") and combat values.
+// points (chosen here, sent together with "Zatwierdź") and combat values,
+// with the Parametry dodatkowe window behind them.
 
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatNumber, formatPrecise, plural } from '../format.js';
 import { call, isUnlocked, state, unlockInfo } from '../state.js';
-import { confirmAction, systemPanel, withButton } from '../ui.js';
+import { confirmAction, openSheet, systemPanel, withButton } from '../ui.js';
 
 // Segments of the source bar; profession and Core segments appear once unlocked.
 const SOURCES = [
@@ -32,6 +33,68 @@ const EFFECTS = [
 
 function percentPoints(value) {
   return `+${formatPrecise(value * 100)}%`;
+}
+
+const percent = (value) => `${formatDecimal(value * 100)}%`;
+
+// Parametry dodatkowe (the author, after a player asked whether the total
+// armour shows anywhere: "Mozna zbudować jakies okno w statystykach
+// <Parametry dodatkowe>"): a window with the numbers behind the combat
+// values, for those who like them. Each row is a name, its value and a note
+// on where it comes from or what it does.
+function openExtra(character) {
+  const extra = character.combat.extra;
+  const { armor, dodge, crit, effectResist } = extra;
+  const row = (label, value, ...notes) =>
+    h(
+      'div',
+      { class: 'extra-row' },
+      h('dt', { text: label }),
+      h('dd', { class: 'num', text: value }),
+      notes.filter(Boolean).map((note) => h('dd', { class: 'extra-note', text: note })),
+    );
+  const rating = (value, stat, cap) => `ocena ${formatNumber(value)} (${stat}), najwyżej ${percent(cap)}`;
+  const group = (title, ...rows) => [h('h3', { class: 'extra-title', text: title }), h('dl', { class: 'extra-list' }, rows)];
+  const armorFrom = [
+    `ekwipunek ${formatNumber(armor.equipment)}`,
+    `Wytrzymałość ${formatNumber(armor.endurance)}`,
+    armor.trait && `cecha ${armor.trait.name} +${formatDecimal(armor.trait.share * 100)}%`,
+  ].filter(Boolean);
+  openSheet(
+    h('h2', { class: 'sheet-title', text: 'Parametry dodatkowe' }),
+    h('p', {
+      class: 'muted extra-intro',
+      text: `Procenty liczą się przeciw przeciwnikowi na Twoim poziomie (${formatNumber(extra.level)}). Silniejszy przeciwnik je zmniejsza, a słabszy zwiększa.`,
+    }),
+    group(
+      'Obrona',
+      row('Pancerz', formatNumber(armor.total), armorFrom.join(' · '), `redukcja obrażeń fizycznych ${percent(armor.reduction)}`),
+      row('Unik', percent(dodge.chance), rating(dodge.rating, 'Zręczność', dodge.cap)),
+      row('Odporność na efekty', percent(effectResist.chance), rating(effectResist.rating, 'Wola', effectResist.cap)),
+    ),
+    group(
+      'Atak',
+      row('Trafienie krytyczne', percent(crit.chance), rating(crit.rating, 'Percepcja', crit.cap)),
+      row('Mnożnik krytyka', `×${formatPrecise(crit.multiplier)}`, 'tyle razy mocniej uderza cios krytyczny'),
+      row('Szybkość', formatPrecise(extra.speed), 'im wyższa, tym częściej postać rusza się w walce (Zręczność)'),
+    ),
+    group(
+      'Zdrowie',
+      row('Regeneracja', `${formatPrecise(extra.regen)} HP/min`, 'między wyprawami, z premią Ogniska'),
+      row('Odzysk HP po walce', percent(Math.min(1, extra.recovery)), 'tyle brakującego HP wraca po każdej walce na wyprawie'),
+    ),
+    group(
+      'Odporności na żywioły',
+      extra.resist.map((element) =>
+        row(
+          element.name[0].toUpperCase() + element.name.slice(1),
+          percent(element.reduction),
+          `odporność ${formatNumber(element.rating)}`,
+          element.shelter > 0 && `cecha: o ${formatDecimal(element.shelter * 100)}% mniej obrażeń`,
+        ),
+      ),
+    ),
+  );
 }
 
 export function mountStats(container) {
@@ -294,6 +357,13 @@ export function mountStats(container) {
           ),
         ),
       ),
+      character.combat.extra &&
+        h('button', {
+          type: 'button',
+          class: 'button button--world button--small combat-extra',
+          text: 'Parametry dodatkowe',
+          onClick: () => openExtra(character),
+        }),
     );
   }
 
