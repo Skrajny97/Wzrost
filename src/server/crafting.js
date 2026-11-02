@@ -29,6 +29,7 @@ import { content } from './content.js';
 import { characterView, craftingState, loadPlayer, questsNow, requirePlayer } from './characters.js';
 import { toHex } from './encoding.js';
 import { craftingOn } from './features.js';
+import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { testMode, testModeFor } from './test-mode.js';
 
@@ -121,7 +122,13 @@ export async function craftMaterials(context) {
   const processed = Object.entries(settled.materials).reduce((sum, [key, count]) => sum + count - (state.materials[key] ?? 0), 0);
   const quests = addQuestProgress(questsNow(player, now), { processed });
   const db = context.env.DB;
-  const result = await saveState(db, player.row, withIds(settled.queue.length, state), { quests }).run();
+  const saved = withIds(settled.queue.length, state);
+  const [result] = await db.batch([
+    saveState(db, player.row, saved, { quests }),
+    // The Próby Gildii's trial too, only with the queue saved above, whose
+    // new orders' ids are this request's own (guild-trials.js).
+    ...trialProgress(db, player.row.id, { processed }, now, { sql: '(SELECT crafting FROM characters WHERE id = ?) = ?', binds: [player.row.id, JSON.stringify(saved.queue)] }),
+  ]);
   if (result.meta.changes !== 1) throw changed();
   return json({ ordered, skipped: rare, character: characterView(await loadPlayer(db, session.userId), now) });
 }
@@ -155,6 +162,8 @@ export async function salvageItem(context) {
       condition: ' AND EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ? AND slot IS NULL)',
       binds: [item.id, row.id],
     }),
+    // The Próby Gildii's trial too, only with that order (guild-trials.js).
+    ...trialProgress(db, row.id, { salvaged: 1 }, now, { sql: 'EXISTS (SELECT 1 FROM characters WHERE id = ? AND instr(crafting, ?) > 0)', binds: [row.id, `"id":"${order.id}"`] }),
     db
       .prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND instr(crafting, ?) > 0)')
       .bind(item.id, row.id, row.id, `"id":"${order.id}"`),

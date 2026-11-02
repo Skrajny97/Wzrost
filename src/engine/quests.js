@@ -137,8 +137,9 @@ function questAreas(periodId, character, content) {
 }
 
 // How many of each creature a fight there brings on average, among the
-// regular encounters at the character's level.
-function creaturesPerFight(area, level) {
+// regular encounters at the character's level (also the Próby Gildii's,
+// guild-trials.js).
+export function creaturesPerFight(area, level) {
   const encounters = encountersFor(area, level);
   const total = encounters.reduce((sum, encounter) => sum + encounter.weight, 0);
   const shares = new Map();

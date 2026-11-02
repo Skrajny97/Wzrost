@@ -1,7 +1,7 @@
 // Game content bundled into the Worker from data/ (validated against
 // data/schemas before every deploy).
 
-import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, landBestiaryChest, meetingChances, regionDangers } from '../engine/index.js';
+import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, landBestiaryChest, meetingChances, ordinaryMaterial, regionDangers } from '../engine/index.js';
 import { buildingOn, craftingOn, evolutionsOn, settlementOn } from './features.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
@@ -132,6 +132,12 @@ export function publicContent() {
     evolutionPlace: content.evolutionPlace,
     // The picture behind the Gildia page's heading, once one is chosen.
     guildPlace: content.guilds.place ?? null,
+    // The tabs of the Gildia page: its members, the Bestia, the Próby and
+    // the Prośby Gildii.
+    guildTabs: content.guilds.tabs,
+    // The words of "Poproś gildię", shown where pieces are missing, before
+    // the Prośby Gildii answer (src/client/guild-requests.js).
+    guildAsk: content.guilds.requests.texts.ask,
     // The Sklep Systemu (cosmetics.js): its cosmetics with their prices and
     // looks, for the shop and for every portrait and name that wears one,
     // and the words of its page.
@@ -177,7 +183,9 @@ export function publicContent() {
     unlocks: content.unlocks.map(({ id, name, level, classLevel, condition }) => ({ id, name, level, classLevel, condition })),
     resources: content.resources.map(({ id, name, genitive, description, system }) => ({ id, name, genitive, description, system: Boolean(system) })),
     buildings: content.buildings.filter(buildingOn).map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
-    // With the family of the creature that leaves it, for its icon.
+    // With the family of the creature that leaves it, for its icon, and
+    // `trophy` for an elite's or a champion's, which no order for any
+    // materials takes ("Poproś gildię", src/client/guild-requests.js).
     materials: content.materials.map(({ id, name, gender, rarity, description, monster }) => ({
       id,
       name,
@@ -185,6 +193,7 @@ export function publicContent() {
       rarity,
       description,
       family: content.monstersById[monster].family,
+      ...(!ordinaryMaterial(id, content) && { trophy: true }),
     })),
     parts: content.parts.map(({ id, name, rarity, description }) => ({ id, name, rarity, description })),
     appearances: content.appearances,

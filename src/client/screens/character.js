@@ -8,6 +8,7 @@ import { bonusList } from '../bonuses.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
 import { MATERIALS_HINT, craft, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
+import { askGuildButton } from '../guild-requests.js';
 import { formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, saleGold, timeFormat } from '../format.js';
 import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { playSound } from '../sound.js';
@@ -844,6 +845,8 @@ function anvilSection(item, busy, open = false) {
     ),
     picker,
     need && !chosen && h('p', { class: 'system-hint', text: `To ulepszenie bierze też ${formatNumber(need.count)} szt. materiału tej samej rzadkości co przedmiot.` }),
+    // One material of the item's rarity, from the guild (346 A).
+    need && !chosen && askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }),
     h('p', { class: 'muted', text: risk }),
     ward &&
       h(
@@ -884,6 +887,10 @@ function anvilSection(item, busy, open = false) {
   const rarityName = need ? (state.content.rarities.find((rarity) => rarity.id === need.rarity)?.name ?? need.rarity) : '';
   const lacking = [...costShortfall(next.cost), need && !chosen && `${formatNumber(need.count - (nearest?.count ?? 0))} szt. materiału (${rarityName})`].filter(Boolean);
   const note = h('p', { class: 'region-warning', role: 'status', hidden: true });
+  // The material the try lacks, from the guild (346 A), under what is
+  // missing once "Ulepsz" says it.
+  const ask = need && !chosen ? askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }) : null;
+  if (ask) ask.hidden = true;
   const folded = h(
     'div',
     { class: 'compare anvil' },
@@ -897,6 +904,7 @@ function anvilSection(item, busy, open = false) {
         if (lacking.length > 0) {
           note.textContent = `Brakuje: ${lacking.join(', ')}.`;
           note.hidden = false;
+          if (ask) ask.hidden = false;
           return;
         }
         folded.replaceWith(full);
@@ -904,6 +912,7 @@ function anvilSection(item, busy, open = false) {
       },
     }),
     note,
+    ask,
   );
   return folded;
 }
