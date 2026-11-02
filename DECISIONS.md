@@ -2996,6 +2996,18 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.91 (2.11.2026)
+
+1. **Co wchodzi do gry:**
+    - poprawka z 0.0.90, której wdrożenie przerwał limit czasu: drobinki i iskry aury w scenie Walki krążą wokół postaci;
+    - okno „Parametry dodatkowe” w Statystykach (zob. „Statystyki: okno »Parametry dodatkowe«”);
+    - handel u Jagny, Wszebora, kowala i na Targowisku: drobne zakupy sumują się w ciągu dnia, a strona mówi, ile złota daje punkt (zob. „Handel: drobne zakupy sumują się w ciągu dnia”);
+    - Obóz zapowiada Warownię zamiast Wioski: opis, zdanie o najwyższym poziomie, zdanie towarzysza i nowe nagranie narratora przy wejściu do Obozu (wersja B, 433 B);
+    - sprawdzenie po wdrożeniu czeka do 10 minut, a testy na GitHubie mają 45 minut.
+    Razem z tym idą notatki i pliki, których gra jeszcze nie używa: plan Warowni (419–432), klatki startowe i opisy chodów drugich form.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** na tym komputerze przeszło 850 z 851 testów. Nie przeszedł tylko test czasu szacowania zagrożenia (średnio 6 ms), bo w tym samym czasie liczyła się symulacja trudności. Ten sam pomiar dla wersji 0.0.88 daje tu tyle samo (6,0–6,5 ms), a GitHub i tak powtarza wszystkie testy przed wdrożeniem. Nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Okno parametrów i teksty handlu sprawdzono w przeglądarce na 390×844 i 1280×800.
+
 ## Druga ewolucja czeka na chody i jazdę (2.11.2026)
 
 Autor, po pierwszych klatkach chodów drugich form (434.1–434.15): „To jak chcesz wdrażać ewolucje bez chodów i jazdy? nie moze tak być mistrzu”, „pierwsze klatki to ciul, przerysuj tych mezczyzn i wdrażaj później jak animacje beda git, tylko mi je pokażesz, pamietaj ze tam też są odcienie skory” i „niby mozesz wdrazac czesciami bez tego, bo nikt nie dobił jeszcze 50tego nawet, ale informuj na przyszłość o takich rzeczach”.
