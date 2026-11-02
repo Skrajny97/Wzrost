@@ -1,0 +1,30 @@
+{
+  "id": "arena-champion-male",
+  "payload": {
+    "prompt": "young man arena champion, athletic, short dark hair, standing in the middle of the image, full body figure from the top of the head to the feet, about nine tenths of the image height, a little empty space above the head and below the feet, a polished bronze helmet with a tall red plume, an ornate gilded shoulder guard and arm guard on the sword arm, a bronze breastplate with a lion face, a skirt of red leather strips with gold edges, bronze greaves, a short red cape, holding a broad curved sword and a round bronze shield with a laurel wreath, proud stance, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 905639173,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793620070,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 11.75,
+    "request_id": "a8185919-b8e9-42ea-b439-8679545c9e86",
+    "outputs_retained_until": 1793706441,
+    "billing": {
+      "source": "balance",
+      "balance_left": 11.75,
+      "balance_charged": 0.36
+    }
+  }
+}

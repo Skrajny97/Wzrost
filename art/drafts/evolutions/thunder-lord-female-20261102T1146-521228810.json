@@ -1,0 +1,30 @@
+{
+  "id": "thunder-lord-female",
+  "payload": {
+    "prompt": "young woman thunder archer queen, blond hair blown by the wind, standing in the middle of the image, full body figure from the top of the head to the feet, about nine tenths of the image height, a little empty space above the head and below the feet, a long dark blue coat with silver lightning patterns, a silver circlet, leather bracers, holding a long silver bow crackling with blue lightning, small blue sparks around the hands, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 521228810,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793620376,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 9.95,
+    "request_id": "8fe30a32-9d14-44e4-85b6-5a5bbf334e9d",
+    "outputs_retained_until": 1793706728,
+    "billing": {
+      "source": "balance",
+      "balance_left": 9.95,
+      "balance_charged": 0.36
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "berserker-female",
+  "payload": {
+    "prompt": "young woman berserker, tall and muscular, wild red hair with small braids, standing in the middle of the image, full body figure from the top of the head to the feet, about nine tenths of the image height, a little empty space above the head and below the feet, a bear skull helmet with the bear fur hanging over the back, a dark leather and fur armour over the chest, scarred bare arms with red war paint, iron arm rings, a heavy fur kilt with a wide belt and fur-wrapped boots, holding a big battle axe in each hand, fierce, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 490487980,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793620037,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 12.11,
+    "request_id": "3382b32a-9097-4922-9291-228af05dc329",
+    "outputs_retained_until": 1793706381,
+    "billing": {
+      "source": "balance",
+      "balance_left": 12.11,
+      "balance_charged": 0.36
+    }
+  }
+}

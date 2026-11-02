@@ -1,0 +1,30 @@
+{
+  "id": "bastion-female",
+  "payload": {
+    "prompt": "young woman bastion knight, broad and steady, dark hair in a short braid, standing in the middle of the image, full body figure from the top of the head to the feet, about nine tenths of the image height, a little empty space above the head and below the feet, a heavy plate armour of dark steel with gold trim, a dark blue surcoat, holding a huge tower shield with a stone tower emblem in front of the body and a heavy flanged mace, steadfast stance, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 399642424,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793620295,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 10.67,
+    "request_id": "40a75ebd-cc01-4f94-9444-60fd6cd29d61",
+    "outputs_retained_until": 1793706588,
+    "billing": {
+      "source": "balance",
+      "balance_left": 10.67,
+      "balance_charged": 0.36
+    }
+  }
+}

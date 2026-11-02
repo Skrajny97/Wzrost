@@ -1,0 +1,30 @@
+{
+  "id": "high-priest-male",
+  "payload": {
+    "prompt": "young man high priest, golden hair, standing in the middle of the image, full body figure from the top of the head to the feet, about nine tenths of the image height, a little empty space above the head and below the feet, a white and gold ceremonial robe with a long golden stole, a simple golden circlet, holding a golden staff topped with a radiant sun disc, soft rays of light, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 325287190,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793620891,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 7.07,
+    "request_id": "cf7a7d0f-d275-4848-b24b-3543e6bf3323",
+    "outputs_retained_until": 1793707244,
+    "billing": {
+      "source": "balance",
+      "balance_left": 7.07,
+      "balance_charged": 0.36
+    }
+  }
+}

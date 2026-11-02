@@ -1,0 +1,30 @@
+{
+  "id": "marksman-female",
+  "payload": {
+    "prompt": "young woman legendary master marksman, lean, dark hair in a tight braid, standing in the middle of the image, full body figure from the top of the head to the feet, about nine tenths of the image height, a little empty space above the head and below the feet, an ornate black leather armour with polished silver plates on the shoulders and forearms, a long dark green cloak with a high collar and a silver hawk clasp, a silver circlet with a hawk emblem, a tall black longbow with silver inlays and a glowing silver arrowhead nocked, a quiver of white-fletched arrows on the back, calm focused look, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 837295989,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793620574,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 8.51,
+    "request_id": "443accf8-084e-4ca5-aac8-bacc3f080c1d",
+    "outputs_retained_until": 1793706953,
+    "billing": {
+      "source": "balance",
+      "balance_left": 8.51,
+      "balance_charged": 0.36
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "phantom-female",
+  "payload": {
+    "prompt": "young woman phantom blade dancer, pale, silver hair, standing in the middle of the image, full body figure from the top of the head to the feet, about nine tenths of the image height, a little empty space above the head and below the feet, a shadowy cloak dissolving into smoke at the edges, a dark grey leather armour, holding two thin curved blades, faint ghostly afterimages of the blades, solid figure, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 613628219,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793620972,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 6.35,
+    "request_id": "1d90fd1d-f63c-42fc-9d4b-b6bf92ea88a3",
+    "outputs_retained_until": 1793707322,
+    "billing": {
+      "source": "balance",
+      "balance_left": 6.35,
+      "balance_charged": 0.36
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "archmage-female",
+  "payload": {
+    "prompt": "young woman archmage of the elements, long brown hair, standing in the middle of the image, full body figure from the top of the head to the feet, about nine tenths of the image height, a little empty space above the head and below the feet, a grand robe split in red, blue and gold, three small glowing orbs of fire, ice and lightning floating around her, holding a tall staff crowned with three gems, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 811517665,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793620499,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 9.23,
+    "request_id": "a3b5909a-ad52-4212-b70a-5a2acf116dc5",
+    "outputs_retained_until": 1793706850,
+    "billing": {
+      "source": "balance",
+      "balance_left": 9.23,
+      "balance_charged": 0.36
+    }
+  }
+}

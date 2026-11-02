@@ -1,0 +1,30 @@
+{
+  "id": "bastion-male",
+  "payload": {
+    "prompt": "young man bastion knight, broad and steady, short dark hair, standing in the middle of the image, full body figure from the top of the head to the feet, about nine tenths of the image height, a little empty space above the head and below the feet, a heavy plate armour of dark steel with gold trim, a dark blue surcoat, holding a huge tower shield with a stone tower emblem in front of the body and a heavy flanged mace, steadfast stance, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 572913424,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793620185,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 11.03,
+    "request_id": "8a397c45-7292-4b1b-a369-f6a3f1392094",
+    "outputs_retained_until": 1793706541,
+    "billing": {
+      "source": "balance",
+      "balance_left": 11.03,
+      "balance_charged": 0.36
+    }
+  }
+}
