@@ -2996,6 +2996,11 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Sprawdzenie po wdrożeniu czeka dłużej (2.11.2026)
+
+1. **Co się stało.** Wdrożenie 0.0.89 wysłało nową wersję do Cloudflare bez błędu, ale gra jeszcze przez około pół godziny odpowiadała jako 0.0.88. Sprawdzenie po wdrożeniu (`tools/smoke-test.mjs`) czekało tylko minutę, więc przebieg na GitHubie skończył się błędem, choć wersja weszła sama. Cloudflare nie zgłaszał wtedy awarii.
+2. **Zmiana.** Sprawdzenie czeka teraz do 10 minut (60 prób co 10 sekund). Gdy gra odpowiada poprawnie, ale wciąż poprzednią wersją, przebieg kończy się ostrzeżeniem, a nie błędem: wersja wejdzie sama. Błędem kończy się dalej gra, która nie odpowiada albo odpowiada błędem. Domeny gry sprawdzają się jak dotąd przez minutę i tylko ostrzegają.
+
 ## Ceny Warowni i wierzchowców, trudność: odpowiedzi autora 430–432 (2.11.2026)
 
 Autor przy 419: „sprawdz czy gracz jest w stanie tyle zarobić w ogole sensownie, tez nie wiem czy wierzchowce nie są za drogie, nie wiem czy balans nie idzie na zbyt hard mimo gry na lata”. Po analizie: „430 A”, „431 A”, „432 A, jesli bierzesz pod uwage ekwipunek i towarzyszy, ludzie mowia ze jest za łatwo i tak” i „na pierwszych poziomach do 50ego może być łatwiej, ale pozniej curve trudnosci musi troche rosnac i od 100ego być mid mid”.
