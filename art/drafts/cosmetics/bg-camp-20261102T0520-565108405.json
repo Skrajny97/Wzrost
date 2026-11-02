@@ -1,0 +1,28 @@
+{
+  "id": "bg-camp",
+  "payload": {
+    "prompt": "a small forest camp at night, the campfire at the far left edge of the picture with its warm orange light on the trees, a leather tent at the far right edge, a fallen log, open dark ground in the middle with nothing on it, dark spruce trees around and a starry sky, no people, tall vertical scene",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 565108405,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793596916,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 18.59,
+    "request_id": "e8a81780-ac01-494e-a973-9bc5cfa14318",
+    "outputs_retained_until": 1793683235,
+    "billing": {
+      "source": "balance",
+      "balance_left": 18.59,
+      "balance_charged": 0.36
+    }
+  }
+}
