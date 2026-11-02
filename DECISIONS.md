@@ -2996,6 +2996,22 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Druga ewolucja: odpowiedzi autora na trzecią rundę portretów (2.11.2026)
+
+Autor: „397 git / 402 git / 404 git / 406 git / 407 git / 409 git” i „czyli PixelLab lepszy używamy jako główny Retro-Diffusion do teł może albo na inne rzeczy jak Pixel bedzie zamulał”.
+
+1. **Zatwierdzone portrety:**
+    - Czempion Areny (397): Czempion z PixelLab, Czempionka zatwierdzona wcześniej;
+    - Arcymag Żywiołów (402): oboje;
+    - Druid (404): Druidka z PixelLab, Druid zatwierdzony wcześniej;
+    - Wielki Inkwizytor (406): oboje, z młotem bez ognia;
+    - Arcykapłan (407): oboje;
+    - Nekromanta (409): oboje.
+
+    Razem z 398, 401 i 405 zatwierdzonych jest 9 z 15 par. Na ocenę czekają jeszcze 396, 399, 400, 403, 408 i 410.
+2. **Narzędzia.** Głównym narzędziem do grafik jest PixelLab. Retro Diffusion rysuje tła albo inne grafiki wtedy, gdy PixelLab się zacina.
+3. **Gdzie leżą zatwierdzone portrety.** Są w `art/references/evolutions`, jako `<forma>-<płeć>.png`. Służą za wzory dla chodów i kolejnych grafik. Do gry wchodzą razem z drugą ewolucją, z odcieniami skóry.
+
 ## Druga ewolucja: portrety z PixelLab (2.11.2026)
 
 Autor: „uzupełniłem bilans w retrodiffusion ale oszczędzaj”, „A nie lepiej generować dalej w PixelLab gdzie mam duży zapas i suba, zamiast top-upować zawodne RetroDiffusion?” i „412 A, Kolejność prac akceptowalna”.

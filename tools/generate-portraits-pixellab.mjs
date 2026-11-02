@@ -1,14 +1,18 @@
 // Draws portrait drafts with PixelLab's Pro image generation
-// (generate-image-v2; pixellab.ai), in place of Retro Diffusion where the
-// author asked for it (DECISIONS.md, "Druga ewolucja: portrety z PixelLab").
-// Each prompt of a kind in art/prompts.json is drawn at the kind's size on a
+// (generate-image-v2; pixellab.ai), PixelLab being the main tool for the
+// game's art (DECISIONS.md, "Druga ewolucja: portrety z PixelLab" and
+// "Druga ewolucja: odpowiedzi autora na trzecią rundę portretów"). Each
+// prompt of a kind in art/prompts.json is drawn at the kind's size on a
 // transparent background, in the style of the kind's style image
-// (pixellab.style: an approved portrait, for its pixel size, outline, shading
-// and detail, not its colours), with up to four subject references of its
-// own (pixellab.references[id]: for example the approved other half of a
-// man-and-woman pair, so both wear the same). One call gives four versions at
-// the portraits' 96 x 128. Run by the "Grafiki (szkice)" workflow (kind
-// evolutions-pixellab), which keeps the drafts on the art-drafts branch:
+// (pixellab.style: an approved picture, for its pixel size, outline, shading
+// and detail, not its colours), with up to four references of its own
+// (pixellab.references[id]): a path, used as the other half of a
+// man-and-woman pair so both wear the same (or as pixellab.usage says), or
+// {path, usage} with its own words, e.g. the approved portrait for the look
+// and the grey mannequin of the walk for the pose (kind walk-starts, the start
+// frames of the walks). One call gives four versions. Run by the
+// "Grafiki (szkice)" workflow (kinds evolutions-pixellab and
+// walk-starts-pixellab), which keeps the drafts on the art-drafts branch:
 //   node tools/generate-portraits-pixellab.mjs --kind evolutions --ids a,b [--calls 1] [--max-cost 1] [--dry-run]
 // The balance is read first, and the run stops before its calls could cost
 // more than --max-cost dollars (one call at most CALL_USD).
@@ -20,7 +24,7 @@ import { parseArgs } from 'node:util';
 const API = 'https://api.pixellab.ai/v2';
 const POLL_MS = 6000;
 const POLL_LIMIT = 100;
-// A Pro image call of four 96 x 128 versions, with room.
+// A Pro image call of four small versions, with room.
 const CALL_USD = 0.1;
 
 const { values } = parseArgs({
@@ -98,7 +102,12 @@ async function draw(id, seed) {
       style_image: reference(settings.style),
       style_options: { color_palette: false, outline: true, detail: true, shading: true },
     }),
-    ...(refs.length && { reference_images: refs.slice(0, 4).map((path) => ({ ...reference(path), usage_description: 'the same character and outfit, the other gender' })) }),
+    ...(refs.length && {
+      reference_images: refs.slice(0, 4).map((ref) => {
+        const { path, usage } = typeof ref === 'string' ? { path: ref, usage: settings.usage ?? 'the same character and outfit, the other gender' } : ref;
+        return { ...reference(path), usage_description: usage };
+      }),
+    }),
   };
   let job;
   for (let attempt = 0; ; attempt++) {
