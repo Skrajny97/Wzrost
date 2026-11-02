@@ -1,0 +1,30 @@
+{
+  "id": "master-hunter-male",
+  "payload": {
+    "prompt": "young man master hunter, strong, short light brown hair and a short beard, standing in the middle of the image, the whole figure from the top of the head to the feet inside the image, about four fifths of the image height, empty space above the head and below the feet, a grey wolf pelt hood with the wolf head over his own, a leather armour with fur trim, a falcon perched on the shoulder, a quiver of arrows at the hip, holding a long hunting bow with a taut bowstring and a long knife, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 512059900,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793621434,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 4.55,
+    "request_id": "d00a3be3-1fcb-4b26-834e-0d62037376a6",
+    "outputs_retained_until": 1793707718,
+    "billing": {
+      "source": "balance",
+      "balance_left": 4.55,
+      "balance_charged": 0.36
+    }
+  }
+}
