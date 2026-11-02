@@ -3000,6 +3000,7 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 
 1. **Co się stało.** Wdrożenie 0.0.89 wysłało nową wersję do Cloudflare bez błędu, ale gra jeszcze przez około pół godziny odpowiadała jako 0.0.88. Sprawdzenie po wdrożeniu (`tools/smoke-test.mjs`) czekało tylko minutę, więc przebieg na GitHubie skończył się błędem, choć wersja weszła sama. Cloudflare nie zgłaszał wtedy awarii.
 2. **Zmiana.** Sprawdzenie czeka teraz do 10 minut (60 prób co 10 sekund). Gdy gra odpowiada poprawnie, ale wciąż poprzednią wersją, przebieg kończy się ostrzeżeniem, a nie błędem: wersja wejdzie sama. Błędem kończy się dalej gra, która nie odpowiada albo odpowiada błędem. Domeny gry sprawdzają się jak dotąd przez minutę i tylko ostrzegają.
+3. **0.0.90 przerwane.** Przebieg 0.0.90 przerwał limit 30 minut na testy: same testy trwały 19 minut, a instalacja przeglądarki do przejścia wprowadzenia tym razem 10 minut. Wprowadzenie przeszło na wszystkich trzech ekranach kilka sekund przed limitem, ale wdrożenie już nie ruszyło. Testy mają teraz 45 minut. Poprawka z 0.0.90 wchodzi z 0.0.91.
 
 ## Ceny Warowni i wierzchowców, trudność: odpowiedzi autora 430–432 (2.11.2026)
 
