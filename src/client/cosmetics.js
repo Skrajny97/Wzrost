@@ -1,9 +1,10 @@
 // The Sklep Systemu's look (data/cosmetics.json; src/server/cosmetics.js): a
 // portrait on the background worn, in place of the forest, and in the frame
 // worn, with the frame's light, on Postać, in the shop's previews and on the
-// card another player sees. In a frame the background and the figure stand
-// in its window, smaller. The game's switch of animations stills the light
-// (.calm in styles.css). A name in its frame's colour is ui.js framedName.
+// card another player sees, and the aura worn lighting the figure. In a
+// frame the background and the figure stand in its window, smaller. The
+// game's switch of animations stills the light (.calm in styles.css). A name
+// in its frame's colour is ui.js framedName.
 
 import { cosmeticArt, portraitSprite } from './art.js';
 import { h } from './dom.js';
@@ -18,6 +19,13 @@ const down = (y) => `${(y / FRAME.height) * 100}%`;
 // The fireflies' ways, in the frame's pixels, one after another.
 const FLIGHTS = [[3, -4], [-4, -2], [2, 4], [-3, 3], [4, 1], [-2, -4], [3, 3], [-4, 1], [1, -3]];
 
+// An aura's motes: where each starts, in percent of the portrait across and
+// down, and its way, in percent of the portrait, one after another.
+const MOTES = [
+  [22, 70, 6, -10], [74, 62, -5, -12], [30, 38, -6, -8], [68, 30, 5, -9], [16, 52, 4, -14], [82, 78, -6, -10],
+  [40, 84, 3, -16], [58, 18, -4, -7], [26, 22, 5, -6], [76, 46, 4, -11], [48, 92, -3, -12], [62, 70, 6, -9],
+];
+
 // A cosmetic of the data by its id, or null.
 export const cosmeticOf = (id) => (id ? (state.content?.cosmetics?.items.find((item) => item.id === id) ?? null) : null);
 
@@ -30,9 +38,10 @@ export const characterLook = (character) => ({
 });
 
 // The layers of a portrait of `look` ({ classId, appearance, skin,
-// evolution }): the forest, or the background worn, with the figure over it;
-// with a frame worn, these two in its window and the frame over them.
-export function portraitLayers(look, { frame = null, background = null } = {}) {
+// evolution }): the forest, or the background worn, with the figure over it,
+// lit by the aura worn; with a frame worn, these two in its window and the
+// frame over them.
+export function portraitLayers(look, { frame = null, background = null, aura = null } = {}) {
   const figure = portraitSprite(look.classId, look.appearance, { skin: look.skin, evolution: look.evolution });
   const back = cosmeticArt(cosmeticOf(background)?.art);
   // A look without its figure keeps the drawn stand-in, with its own forest.
@@ -44,6 +53,8 @@ export function portraitLayers(look, { frame = null, background = null } = {}) {
   // The forest covers a frame's window, narrower than the portrait.
   if (scenery instanceof SVGElement) scenery.setAttribute('preserveAspectRatio', 'xMidYMid slice');
   const art = h('div', { class: 'portrait-art' }, scenery, figure);
+  const lit = cosmeticOf(aura)?.aura;
+  if (figure && lit) light(art, figure, lit);
   const framed = cosmeticOf(frame);
   const layer = framed && frameLayer(framed);
   if (!layer) return [art];
@@ -98,4 +109,29 @@ function frameLayer(item) {
     layer.append(spark);
   });
   return layer;
+}
+
+// An aura (the Sklep Systemu; the author: "416 akcept", "417 akcept"): its
+// light around the figure's outline, a halo behind it that swells and fades,
+// and its motes drifting about the figure (drift) or sparks rising from it
+// (rise). The halo is the figure again, under it, all in the light; the game's
+// switch of animations stills it all (.calm in styles.css).
+export function light(art, figure, { glow, spark, sparks }) {
+  art.style.setProperty('--aura-glow', glow);
+  art.style.setProperty('--aura-spark', spark);
+  figure.classList.add('aura-figure');
+  const halo = figure.cloneNode(true);
+  halo.classList.replace('aura-figure', 'aura-halo');
+  figure.before(halo);
+  const motes = h('div', { class: `aura-motes aura-motes--${sparks}` });
+  MOTES.forEach(([x, y, dx, dy], index) => {
+    const mote = h('span');
+    mote.style.left = `${x}%`;
+    mote.style.top = `${y}%`;
+    mote.style.setProperty('--dx', `${dx}cqw`);
+    mote.style.setProperty('--dy', `${sparks === 'rise' ? -14 - (index % 4) * 4 : dy}cqh`);
+    mote.style.animationDelay = `${(-index * 0.53).toFixed(2)}s`;
+    motes.append(mote);
+  });
+  art.append(motes);
 }

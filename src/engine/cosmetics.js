@@ -3,14 +3,17 @@
 // and a "Tygrys szablozębny" for 1000 Punktów Systemu): cosmetics bought
 // for Punkty Systemu that change only the look, each the character's that
 // bought it, as its Punkty Systemu are. A frame and a background dress the
-// portrait, and a mount's look (mountSkin) changes the Stajnia's mount in
-// the Walka scene, never what the mount does.
+// portrait, a mount's look (mountSkin) changes the Stajnia's mount in the
+// Walka scene, never what the mount does, an aura lights the figure on the
+// portrait and in the Walka scene, and a trail (the author: "416 akcept",
+// "417 akcept", "418 akcept") leaves glowing footprints behind it there.
 //
 // Stored state (characters.cosmetics): {"owned": [ids], "frame": id,
-// "background": id, "mountSkin": id, "nameFromFrame": true}.
+// "background": id, "mountSkin": id, "aura": id, "trail": id,
+// "nameFromFrame": true}.
 
 // The places a cosmetic is worn in, one of each kind at a time.
-export const COSMETIC_KINDS = ['frame', 'background', 'mountSkin'];
+export const COSMETIC_KINDS = ['frame', 'background', 'mountSkin', 'aura', 'trail'];
 
 const itemOf = (id, content) => (typeof id === 'string' ? (content.cosmeticsById?.[id] ?? null) : null);
 
@@ -27,6 +30,8 @@ export function cosmeticsOf(stored, content) {
     frame: worn('frame'),
     background: worn('background'),
     mountSkin: worn('mountSkin'),
+    aura: worn('aura'),
+    trail: worn('trail'),
     nameFromFrame: stored?.nameFromFrame === true,
   };
 }

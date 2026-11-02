@@ -7763,6 +7763,50 @@ a.profession-square:active {
 .scene-walker--own {
   bottom: 28px;
 }
+/* The aura on the way (scenes.js lightWalker): the walking figure, or the
+   rider with the mount, in its light, and its motes about it. */
+.scene-aura {
+  filter: drop-shadow(0 0 2px var(--aura-glow)) drop-shadow(0 0 5px var(--aura-glow));
+}
+.scene-aura-motes {
+  z-index: 3;
+  inset: auto;
+  left: calc(50% - 40px);
+  bottom: 30px;
+  width: 80px;
+  height: 110px;
+}
+/* The trail on the way (scenes.js footprints): a glowing footprint where a
+   foot fell, drifting away with the path and fading; the far foot's a little
+   higher. With the animations off a few stand behind the figure. */
+.scene-step {
+  position: absolute;
+  z-index: 1;
+  left: calc(50% - 5px);
+  width: 8px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--trail);
+  box-shadow: 0 0 4px var(--trail), 0 0 8px var(--trail);
+  animation: scene-step var(--life) linear forwards;
+}
+.scene-step--far {
+  left: calc(50% + 1px);
+  width: 7px;
+}
+.scene-step--still {
+  animation: none;
+}
+@keyframes scene-step {
+  from {
+    transform: translateX(0);
+    opacity: 0.95;
+  }
+  to {
+    transform: translateX(var(--away));
+    opacity: 0;
+  }
+}
 /* The character riding its mount (scenes.js ride): the mount's trot as frames,
    and the rider in the saddle, rising and falling with it: ride-<frames>
    below moves the rider in each frame by --rx<i>, --ry<i>, where the saddle
@@ -10788,8 +10832,17 @@ a.profession-square:active {
   color: var(--system);
 }
 
+/* Five tabs in two rows: three over two, each row filling the width. */
 .shop-tabs {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.shop-tabs > * {
+  grid-column: span 2;
+}
+
+.shop-tabs > :nth-child(n + 4) {
+  grid-column: span 3;
 }
 
 .shop-items {
@@ -10844,6 +10897,44 @@ a.profession-square:active {
   width: 120px;
 }
 
+/* A trail's preview (shop.js): the character still on a bit of the path,
+   its footprints glowing behind it, fainter the further. */
+.shop-trail {
+  position: relative;
+  flex: none;
+  width: 120px;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: var(--path) 0 100% / 96px 24px repeat-x, #1a2316;
+  image-rendering: pixelated;
+}
+
+.shop-trail-walker {
+  position: absolute;
+  left: calc(50% - 48px);
+  bottom: 13px;
+  width: 96px;
+  height: 96px;
+  background: 0 0 / 768px 96px no-repeat;
+  image-rendering: pixelated;
+}
+
+.shop-trail-step {
+  position: absolute;
+  bottom: 14px;
+  width: 7px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--trail);
+  box-shadow: 0 0 4px var(--trail), 0 0 8px var(--trail);
+}
+
+.shop-trail-step--far {
+  bottom: 17px;
+}
+
 .shop-switch {
   display: flex;
   align-items: center;
@@ -10888,6 +10979,77 @@ a.profession-square:active {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* An aura (cosmetics.js light): the figure's outline in its light, a halo
+   behind it that swells and fades, and its motes drifting about the figure
+   or sparks rising from it. With the animations off it all stands lit. */
+.aura-figure {
+  filter: drop-shadow(0 0 1px var(--aura-glow)) drop-shadow(0 0 2px var(--aura-glow));
+}
+
+.portrait-art .aura-halo {
+  filter: drop-shadow(0 0 4px var(--aura-glow)) drop-shadow(0 0 8px var(--aura-glow));
+  opacity: 0.55;
+  animation: aura-halo 2.6s ease-in-out infinite;
+  will-change: opacity;
+}
+
+@keyframes aura-halo {
+  50% {
+    opacity: 1;
+  }
+}
+
+.aura-motes {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  pointer-events: none;
+}
+
+.aura-motes span {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--aura-spark);
+  box-shadow: 0 0 4px var(--aura-spark);
+  opacity: 0;
+  animation: aura-mote 4.2s ease-in-out infinite;
+}
+
+.aura-motes--rise span {
+  width: 2px;
+  height: 2px;
+  animation-duration: 2.8s;
+  animation-timing-function: ease-out;
+}
+
+@keyframes aura-mote {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy));
+  }
+}
+
+.calm .portrait-art .aura-halo {
+  animation: none;
+  opacity: 0.8;
+}
+
+.calm .aura-motes span {
+  animation: none;
+  opacity: 0.7;
 }
 
 /* The frame over the portrait art, under the slots and the eye, and its

@@ -1,12 +1,13 @@
 // The Sklep Systemu (src/server/cosmetics.js; DECISIONS.md, "Sklep Systemu:
 // ramki, tła i tygrys szablozębny"), from the stall in the top bar: frames,
-// backgrounds and the mount's look for Punkty Systemu, in three tabs. Each
-// shows itself on the character's own portrait, with what else it wears
-// (the mount's look its picture, once it has one), its words and its price.
+// backgrounds, auras, trails and the mount's look for Punkty Systemu, in
+// five tabs. Each shows itself on the character's own portrait, with what
+// else it wears (a trail behind the character walking on the path, the
+// mount's look its picture, once it has one), its words and its price.
 // "Kup" asks first; what is owned has "Załóż" or "Zdejmij" in its place. With
 // a frame worn, the switch "Kolor imienia jak ramka".
 
-import { mountArt } from '../art.js';
+import { mountArt, walkerSheet } from '../art.js';
 import { characterLook, portraitBox } from '../cosmetics.js';
 import { fill, h, icon } from '../dom.js';
 import { formatNumber } from '../format.js';
@@ -19,6 +20,8 @@ const HOME = '#/sklep';
 const TABS = [
   { id: 'ramki', kind: 'frame', name: 'Ramki' },
   { id: 'tla', kind: 'background', name: 'Tła' },
+  { id: 'aury', kind: 'aura', name: 'Aury' },
+  { id: 'slady', kind: 'trail', name: 'Ślady' },
   { id: 'wierzchowiec', kind: 'mountSkin', name: 'Wierzchowiec' },
 ];
 
@@ -82,13 +85,31 @@ export function mountShop(container, { params }) {
     );
   }
 
-  // The item on the character's own portrait, with the frame or the
-  // background it wears besides; the mount's look as its picture, or none
-  // while it has none.
+  // The item on the character's own portrait, with the frame, the
+  // background and the aura it wears besides; a trail behind the character
+  // on the path; the mount's look as its picture, or none while it has none.
   function preview(item, character) {
     if (item.kind === 'mountSkin') return mountArt(item.art);
-    const { frame, background } = character.cosmetics;
-    return portraitBox(characterLook(character), { frame, background, [item.kind]: item.id }, 'shop-preview');
+    if (item.kind === 'trail') return trailPreview(item, character);
+    const { frame, background, aura } = character.cosmetics;
+    return portraitBox(characterLook(character), { frame, background, aura, [item.kind]: item.id }, 'shop-preview');
+  }
+
+  // A trail as the Walka scene shows it: the character on a bit of the path,
+  // still, with its footprints glowing behind it, fainter the further.
+  function trailPreview(item, character) {
+    const sheet = walkerSheet(character.classId, character.appearance, character.skin, character.evolution?.current?.id);
+    const box = h('div', { class: 'shop-trail', 'aria-hidden': 'true' });
+    box.style.setProperty('--trail', item.trail.color);
+    box.style.setProperty('--path', `url("/${state.content.animations.walk.path}")`);
+    for (let index = 0; index < 4; index += 1) {
+      const print = h('span', { class: `shop-trail-step${index % 2 ? ' shop-trail-step--far' : ''}` });
+      print.style.left = `${46 - index * 12}%`;
+      print.style.opacity = String(1 - index * 0.22);
+      box.append(print);
+    }
+    if (sheet) box.append(h('span', { class: 'shop-trail-walker', style: { backgroundImage: `url("/${sheet}")` } }));
+    return box;
   }
 
   // "Kup" for its price, or what is missing; "Załóż" and "Zdejmij" once owned.

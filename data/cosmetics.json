@@ -1,5 +1,5 @@
 {
-  "$comment": "Sklep Systemu (src/engine/cosmetics.js, src/server/cosmetics.js, src/client/screens/shop.js; DECISIONS.md, „Sklep Systemu: ramki, tła i tygrys szablozębny”). Autor: „tylko ramki i tła wchodzą póki co do gry, wszystkie”, imię w kolorze ramki i wierzchowiec-kosmetyk „Tygrys szablozębny” za 1000 Punktów Systemu. Przedmioty zmieniają tylko wygląd i należą do postaci, która je kupiła, tak jak jej Punkty Systemu. kind: frame (ramka portretu), background (tło portretu za postacią, w miejsce lasu) albo mountSkin (wygląd wierzchowca ze Stajni w scenie Walki). price: cena w Punktach Systemu. art: obrazek bez .png, ramki i tła w src/client/art/cosmetics, wygląd wierzchowca w src/client/art/mounts, a jego kłus pod tym samym kluczem w walk.mounts (data/animations.json); bez nich gra pokazuje wierzchowca ze Stajni, a karta w sklepie jest bez obrazka. window: przezroczyste okno ramki w obrazku 120 × 160 jako [lewo, góra, prawo, dół] włącznie; tło i postać stoją w nim, pomniejszone. nameColor: kolor imienia postaci, gdy nosi ramkę i włączy „Kolor imienia jak ramka”. effect: animacja ramki: shine (pas światła po ramce i błyski w points), pulse (pulsująca poświata i jasna linia w dół ramki) albo fireflies (świetliki w points); points w pikselach obrazka 120 × 160. texts: słowa pod „Jak to działa?” w sklepie.",
+  "$comment": "Sklep Systemu (src/engine/cosmetics.js, src/server/cosmetics.js, src/client/screens/shop.js; DECISIONS.md, „Sklep Systemu: ramki, tła i tygrys szablozębny”). Autor: „tylko ramki i tła wchodzą póki co do gry, wszystkie”, imię w kolorze ramki i wierzchowiec-kosmetyk „Tygrys szablozębny” za 1000 Punktów Systemu. Przedmioty zmieniają tylko wygląd i należą do postaci, która je kupiła, tak jak jej Punkty Systemu. kind: frame (ramka portretu), background (tło portretu za postacią, w miejsce lasu) albo mountSkin (wygląd wierzchowca ze Stajni w scenie Walki), aura (światło wokół postaci na portrecie i w scenie Walki) albo trail (świecące ślady za postacią w scenie Walki); autor: „416 akcept”, „417 akcept”, „418 akcept”. price: cena w Punktach Systemu. art: obrazek bez .png, ramki i tła w src/client/art/cosmetics, wygląd wierzchowca w src/client/art/mounts, a jego kłus pod tym samym kluczem w walk.mounts (data/animations.json); bez nich gra pokazuje wierzchowca ze Stajni, a karta w sklepie jest bez obrazka. window: przezroczyste okno ramki w obrazku 120 × 160 jako [lewo, góra, prawo, dół] włącznie; tło i postać stoją w nim, pomniejszone. nameColor: kolor imienia postaci, gdy nosi ramkę i włączy „Kolor imienia jak ramka”. effect: animacja ramki: shine (pas światła po ramce i błyski w points), pulse (pulsująca poświata i jasna linia w dół ramki) albo fireflies (świetliki w points); points w pikselach obrazka 120 × 160. aura: glow (kolor poświaty wokół sylwetki), spark (kolor drobinek) i sparks (drift: drobinki krążą wokół postaci, rise: iskry lecą w górę). trail: color (kolor śladów). Aura i ślady nie mają obrazka (art): rysuje je gra. texts: słowa pod „Jak to działa?” w sklepie.",
   "items": [
     {
       "id": "frame-gold",
@@ -65,6 +65,30 @@
       "description": "Postać jedzie na tygrysie szablozębnym zamiast na wierzchowcu ze Stajni.",
       "price": 1000,
       "art": "sabertooth"
+    },
+    {
+      "id": "aura-system",
+      "kind": "aura",
+      "name": "Aura Systemu",
+      "description": "Wokół postaci lśni chłodne światło Systemu, a w powietrzu krążą jasne drobinki.",
+      "price": 500,
+      "aura": { "glow": "#8fe3ef", "spark": "#d6f6fa", "sparks": "drift" }
+    },
+    {
+      "id": "aura-ember",
+      "kind": "aura",
+      "name": "Aura Żaru",
+      "description": "Postać otacza żar jak od ogniska, a w górę lecą iskry.",
+      "price": 500,
+      "aura": { "glow": "#ec7828", "spark": "#ffc45a", "sparks": "rise" }
+    },
+    {
+      "id": "trail-light",
+      "kind": "trail",
+      "name": "Świetliste ślady",
+      "description": "Za postacią w scenie Walki zostają świecące ślady, które powoli gasną.",
+      "price": 300,
+      "trail": { "color": "#8fe3ef" }
     }
   ],
   "texts": {
@@ -73,7 +97,8 @@
       "Przedmiot należy do postaci, która go kupiła, tak jak jej Punkty Systemu.",
       "Ramka i tło zdobią portret w zakładce Postać i na karcie postaci, którą widzą inni gracze.",
       "Z założoną ramką imię postaci może mieć kolor ramki: na czacie, w Rankingu, u Znajomych, w Drużynie i w Gildii.",
-      "Wierzchowiec zmienia tylko wygląd kupionego ze Stajni, więc kupi go postać, która ma już wierzchowca."
+      "Wierzchowiec zmienia tylko wygląd kupionego ze Stajni, więc kupi go postać, która ma już wierzchowca.",
+      "Aura świeci wokół postaci na portrecie, na karcie postaci i w scenie Walki. Świetliste ślady zostają za postacią w scenie Walki, także za jej wierzchowcem."
     ]
   }
 }

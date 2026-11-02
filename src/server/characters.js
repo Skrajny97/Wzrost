@@ -1138,10 +1138,11 @@ export async function characterProfile(context) {
       skin: view.skin,
       // The evolution's portrait (art.js), once the character has one.
       evolution: view.evolution.current?.id ?? null,
-      // The frame and the background of its portrait, and its name's
-      // colour from the frame (cosmetics.js).
+      // The frame, the background and the aura of its portrait, and its
+      // name's colour from the frame (cosmetics.js).
       frame: view.cosmetics.frame,
       background: view.cosmetics.background,
+      aura: view.cosmetics.aura,
       nameColor: view.nameColor,
       level: view.level,
       classLevel: view.classLevel,

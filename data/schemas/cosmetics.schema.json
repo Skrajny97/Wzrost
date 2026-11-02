@@ -22,8 +22,7 @@
           "kind",
           "name",
           "description",
-          "price",
-          "art"
+          "price"
         ],
         "properties": {
           "id": {
@@ -31,11 +30,13 @@
             "pattern": "^[a-z0-9-]+$"
           },
           "kind": {
-            "description": "frame: ramka portretu, background: tło portretu, mountSkin: wygląd wierzchowca ze Stajni.",
+            "description": "frame: ramka portretu, background: tło portretu, mountSkin: wygląd wierzchowca ze Stajni, aura: światło wokół postaci, trail: świecące ślady za postacią w scenie Walki.",
             "enum": [
               "frame",
               "background",
-              "mountSkin"
+              "mountSkin",
+              "aura",
+              "trail"
             ]
           },
           "name": {
@@ -93,43 +94,154 @@
                 }
               }
             }
-          }
-        },
-        "if": {
-          "properties": {
-            "kind": {
-              "const": "frame"
+          },
+          "aura": {
+            "description": "Światło aury: kolor poświaty (glow), kolor drobinek (spark) i ich ruch (sparks: drift krąży, rise leci w górę).",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "glow",
+              "spark",
+              "sparks"
+            ],
+            "properties": {
+              "glow": {
+                "type": "string",
+                "pattern": "^#[0-9a-f]{6}$"
+              },
+              "spark": {
+                "type": "string",
+                "pattern": "^#[0-9a-f]{6}$"
+              },
+              "sparks": {
+                "enum": [
+                  "drift",
+                  "rise"
+                ]
+              }
+            }
+          },
+          "trail": {
+            "description": "Kolor świecących śladów.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "color"
+            ],
+            "properties": {
+              "color": {
+                "type": "string",
+                "pattern": "^#[0-9a-f]{6}$"
+              }
             }
           }
         },
-        "then": {
-          "required": [
-            "window",
-            "nameColor",
-            "effect"
-          ]
-        },
-        "else": {
-          "not": {
-            "anyOf": [
-              {
-                "required": [
-                  "window"
-                ]
-              },
-              {
-                "required": [
-                  "nameColor"
-                ]
-              },
-              {
-                "required": [
-                  "effect"
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "frame"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "window",
+                "nameColor",
+                "effect"
+              ]
+            },
+            "else": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "window"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "nameColor"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "effect"
+                    ]
+                  }
                 ]
               }
-            ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "frame",
+                    "background",
+                    "mountSkin"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "art"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "art"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "aura"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "aura"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "aura"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "trail"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "trail"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "trail"
+                ]
+              }
+            }
           }
-        }
+        ]
       }
     },
     "texts": {

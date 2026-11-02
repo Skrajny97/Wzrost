@@ -1,5 +1,6 @@
 // The Sklep Systemu (src/server/cosmetics.js, src/engine/cosmetics.js): the
-// three frames, the three backgrounds and the Tygrys szablozębny, bought for
+// three frames, the three backgrounds, the Tygrys szablozębny, the two auras
+// and the glowing trail, bought for
 // Punkty Systemu once each, never below none, a second quick tap buying
 // nothing more; the tiger only with a mount from the Stajnia. What is owned
 // is worn and taken off, and with a frame the name may take its colour in
@@ -16,7 +17,7 @@ import { useServer } from './helpers/server.js';
 const item = (id) => content.cosmeticsById[id];
 
 describe('the Sklep Systemu in the engine', () => {
-  test('all three frames and backgrounds and the tiger, at the prices set', () => {
+  test('all three frames and backgrounds, the tiger, the auras and the trail, at the prices set', () => {
     assert.deepEqual(
       content.cosmetics.map(({ id, kind, name, price }) => [id, kind, name, price]),
       [
@@ -27,6 +28,9 @@ describe('the Sklep Systemu in the engine', () => {
         ['bg-tower', 'background', 'Wieża', 150],
         ['bg-camp', 'background', 'Obóz nocą', 150],
         ['sabertooth', 'mountSkin', 'Tygrys szablozębny', 1000],
+        ['aura-system', 'aura', 'Aura Systemu', 500],
+        ['aura-ember', 'aura', 'Aura Żaru', 500],
+        ['trail-light', 'trail', 'Świetliste ślady', 300],
       ],
     );
     // A name in its frame's colour: gold brighter than the names' own gold.
@@ -37,7 +41,7 @@ describe('the Sklep Systemu in the engine', () => {
   });
 
   test('the stored state holds only what the data has, owned once, worn only when owned and of its kind', () => {
-    assert.deepEqual(cosmeticsOf(null, content), { owned: [], frame: null, background: null, mountSkin: null, nameFromFrame: false });
+    assert.deepEqual(cosmeticsOf(null, content), { owned: [], frame: null, background: null, mountSkin: null, aura: null, trail: null, nameFromFrame: false });
     assert.deepEqual(cosmeticsOf({}, content), cosmeticsOf(null, content));
     const stored = {
       owned: ['frame-gold', 'frame-gold', 'nope', 'bg-camp', 'constructor'],
@@ -46,7 +50,7 @@ describe('the Sklep Systemu in the engine', () => {
       mountSkin: 'bg-camp',
       nameFromFrame: 'tak',
     };
-    assert.deepEqual(cosmeticsOf(stored, content), { owned: ['frame-gold', 'bg-camp'], frame: 'frame-gold', background: null, mountSkin: null, nameFromFrame: false });
+    assert.deepEqual(cosmeticsOf(stored, content), { owned: ['frame-gold', 'bg-camp'], frame: 'frame-gold', background: null, mountSkin: null, aura: null, trail: null, nameFromFrame: false });
     assert.deepEqual(cosmeticsOf({ owned: 'frame-gold', frame: 'frame-gold' }, content).owned, []);
   });
 
@@ -71,6 +75,25 @@ describe('the Sklep Systemu in the engine', () => {
     assert.equal(wearBlock('frame', 'bg-camp', stored, content).code, 'invalid_cosmetic');
     assert.equal(wearBlock('frame', 'nope', stored, content).code, 'invalid_cosmetic');
     for (const kind of ['owned', 'nameFromFrame', 'constructor', undefined]) assert.equal(wearBlock(kind, null, stored, content).code, 'invalid_kind');
+  });
+
+  test('an aura and a trail are worn in their own places, one of each, only when owned', () => {
+    const stored = { owned: ['aura-system', 'aura-ember', 'trail-light'], aura: 'aura-ember', trail: 'trail-light' };
+    assert.equal(wearBlock('aura', 'aura-system', stored, content), null);
+    assert.equal(wearBlock('trail', 'trail-light', stored, content), null);
+    assert.equal(wearBlock('aura', 'trail-light', stored, content).code, 'invalid_cosmetic');
+    assert.equal(wearBlock('trail', 'aura-system', stored, content).code, 'invalid_cosmetic');
+    assert.equal(wearBlock('aura', 'aura-system', { owned: [] }, content).code, 'not_owned');
+    const worn = cosmeticsOf(stored, content);
+    assert.equal(worn.aura, 'aura-ember');
+    assert.equal(worn.trail, 'trail-light');
+    // Worn only when owned and of its kind.
+    assert.equal(cosmeticsOf({ owned: ['aura-system'], aura: 'aura-ember', trail: 'aura-system' }, content).aura, null);
+    assert.equal(cosmeticsOf({ owned: ['aura-system'], aura: 'aura-ember', trail: 'aura-system' }, content).trail, null);
+    // The aura's light and the trail's colour are the data's.
+    assert.deepEqual(item('aura-system').aura, { glow: '#8fe3ef', spark: '#d6f6fa', sparks: 'drift' });
+    assert.deepEqual(item('aura-ember').aura, { glow: '#ec7828', spark: '#ffc45a', sparks: 'rise' });
+    assert.deepEqual(item('trail-light').trail, { color: '#8fe3ef' });
   });
 
   test("the name takes the frame's colour only with a frame worn and the switch on", () => {
@@ -104,7 +127,7 @@ describe('the Sklep Systemu through the API', () => {
 
   test('a new character owns nothing and wears nothing', async () => {
     const { character } = (await as('kupiec', 'GET', '/api/character')).data;
-    assert.deepEqual(character.cosmetics, { owned: [], frame: null, background: null, mountSkin: null, nameFromFrame: false });
+    assert.deepEqual(character.cosmetics, { owned: [], frame: null, background: null, mountSkin: null, aura: null, trail: null, nameFromFrame: false });
     assert.equal(character.nameColor, null);
     // The page has the cosmetics and the words of the shop.
     const { cosmetics } = (await call('GET', '/api/content')).data;

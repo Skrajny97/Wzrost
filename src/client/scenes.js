@@ -4,7 +4,9 @@
 // drifts behind it. With the game's animations off (motion.js) they stand
 // still. They take the light of the hour in Poland, and now and then show a
 // rare moment: a bird crossing the sky, steam from the cauldron, sparks from
-// the hammer, or the shadow of a creature of the place passing far away.
+// the hammer, or the shadow of a creature of the place passing far away. On
+// the way the character's aura lights it, and its trail glows behind it (the
+// Sklep Systemu).
 
 import { herbSprite, itemSprite, monsterSprite, placeArt, potionSprite, riderFile, walkerSheet } from './art.js';
 import { cosmeticOf } from './cosmetics.js';
@@ -21,6 +23,8 @@ const LAND = { width: 384, height: 96 };
 const PATH = { width: 64, height: 16, scale: 3 };
 // The bird is two frames of 11 × 5, drawn at three times.
 const BIRD = { width: 11, height: 5, scale: 3 };
+// How long a footprint of a trail glows, in seconds, drifting away with the path.
+const STEP_LIFE = 2.6;
 // The shelf under a work holds this many things done.
 const SHELF = 6;
 
@@ -69,7 +73,7 @@ export function workScene(professionId, activity, { avatar = false } = {}) {
 
 // The Walka scene of an exploration under way: the character in its own look
 // and skin tone (or its evolution's), or the System's figure for a look not
-// drawn walking yet.
+// drawn walking yet, in the light of its aura and with its trail behind.
 export function walkScene(activity) {
   const walk = config()?.walk;
   if (!walk) return null;
@@ -77,6 +81,11 @@ export function walkScene(activity) {
   const own = walkerSheet(classId, appearance, skin, evolution?.current?.id);
   const figure = ride(walk, state.character) ?? (own ? frames({ ...walk.walker, file: own }, 'scene-walker scene-walker--own') : frames(walk.figure, 'scene-walker'));
   const stage = h('div', { class: `scene-walk scene--${dayPart()}` }, h('div', { class: 'scene-path' }), figure);
+  const worn = state.character?.cosmetics;
+  const aura = cosmeticOf(worn?.aura)?.aura;
+  if (aura) lightWalker(stage, figure, aura);
+  const trail = cosmeticOf(worn?.trail)?.trail;
+  if (trail) footprints(stage, trail, walk, figure.classList.contains('scene-ride'));
   const land = walk.lands[activity.regionId];
   if (land) stage.style.setProperty('--land', `url("/${land}")`);
   stage.style.setProperty('--land-width', `${LAND.width * SCALE}px`);
@@ -88,6 +97,65 @@ export function walkScene(activity) {
   stage.style.setProperty('--path-duration', `${(PATH.width * PATH.scale) / walk.pathSpeed}s`);
   nowAndThen(stage, () => (pick(walk.moments) === 'shadow' ? shadow(stage, activity) : bird(stage)));
   return { element: h('div', { class: 'scene', 'aria-hidden': 'true' }, stage), update: () => {} };
+}
+
+// The aura on the way: its light around the walking figure (or the rider and
+// the mount), and its motes about it, or sparks rising, as on the portrait.
+function lightWalker(stage, figure, { glow, spark, sparks }) {
+  stage.style.setProperty('--aura-glow', glow);
+  stage.style.setProperty('--aura-spark', spark);
+  figure.classList.add('scene-aura');
+  const motes = h('div', { class: `scene-aura-motes aura-motes aura-motes--${sparks}` });
+  for (let index = 0; index < 8; index += 1) {
+    const mote = h('span');
+    mote.style.left = `${20 + ((index * 37) % 60)}%`;
+    mote.style.top = `${15 + ((index * 53) % 70)}%`;
+    mote.style.setProperty('--dx', `${(index % 2 ? 1 : -1) * (4 + (index % 3) * 3)}px`);
+    mote.style.setProperty('--dy', `${sparks === 'rise' ? -40 - (index % 4) * 10 : -10 - (index % 3) * 6}px`);
+    mote.style.animationDelay = `${(-index * 0.6).toFixed(1)}s`;
+    motes.append(mote);
+  }
+  figure.after(motes);
+}
+
+// The trail on the way: a glowing footprint under the figure at each step
+// (two to a stride of the walk, or of the mount's trot), each staying where it
+// fell as the path drifts on, fading. Only while the scene is on the screen,
+// the page in view and the animations on; with the animations off a few
+// footprints stand behind the figure.
+function footprints(stage, { color }, walk, riding) {
+  stage.style.setProperty('--trail', color);
+  const bottom = riding ? 20 : 28;
+  const step = (offset, age = 0) => {
+    const print = h('span', { class: `scene-step${offset % 2 ? ' scene-step--far' : ''}` });
+    print.style.bottom = `${bottom + (offset % 2 ? 4 : 0)}px`;
+    print.style.setProperty('--away', `${-walk.pathSpeed * STEP_LIFE}px`);
+    print.style.setProperty('--life', `${STEP_LIFE}s`);
+    if (age) {
+      print.style.transform = `translateX(${-walk.pathSpeed * age}px)`;
+      print.style.opacity = String(Math.max(0.15, 1 - age / STEP_LIFE));
+      print.classList.add('scene-step--still');
+    }
+    stage.append(print);
+    return print;
+  };
+  if (!motionOn()) {
+    for (let index = 1; index <= 4; index += 1) step(index, index * 0.5);
+    return;
+  }
+  const stride = (walk.walker.frames / walk.walker.fps) / 2;
+  let count = 0;
+  const next = () =>
+    setTimeout(() => {
+      if (!stage.isConnected) return;
+      if (motionOn() && !document.hidden) {
+        const print = step(count);
+        setTimeout(() => print.remove(), STEP_LIFE * 1000);
+        count += 1;
+      }
+      next();
+    }, stride * 1000);
+  next();
 }
 
 // With a mount from the Stajnia the character rides it (the author:

@@ -1191,7 +1191,7 @@ function checkTannery(data) {
 }
 
 // The Sklep Systemu (data/cosmetics.json): a frame's and a background's
-// picture is there (art/cosmetics), a frame's window and the points of its
+// picture is there (art/cosmetics; an aura and a trail are drawn by the game), a frame's window and the points of its
 // light lie inside its 120 × 160 picture, the light that needs points has
 // them, and a mount's look does not take the key of a Stajnia's mount, under
 // which its trot would stand in walk.mounts (animations.json).
@@ -1203,7 +1203,8 @@ function checkCosmetics(data) {
   const inside = ([x, y]) => x < FRAME.width && y < FRAME.height;
   const mounts = new Set((data.settlement.stable?.mounts ?? []).map((mount) => mount.id));
   for (const item of data.cosmetics.items) {
-    if (item.kind !== 'mountSkin' && !existsSync(new URL(`art/cosmetics/${item.art}.png`, CLIENT_DIR))) {
+    // An aura and a trail have no picture: the game draws them.
+    if ((item.kind === 'frame' || item.kind === 'background') && !existsSync(new URL(`art/cosmetics/${item.art}.png`, CLIENT_DIR))) {
       errors.push(`${where(item.id)}: brak obrazka src/client/art/cosmetics/${item.art}.png`);
     }
     if (item.kind === 'mountSkin' && (mounts.has(item.id) || mounts.has(item.art))) errors.push(`${where(item.id)} ma id albo obrazek wierzchowca ze Stajni`);

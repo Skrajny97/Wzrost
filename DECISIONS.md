@@ -2996,6 +2996,27 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Kosmetyki: Aura Systemu, Aura Żaru i Świetliste ślady (2.11.2026)
+
+Autor: „416 akcept”, „417 akcept”, „418 akcept”.
+
+1. **W Sklepie Systemu** są dwie nowe zakładki, Aury i Ślady. Razem pięć zakładek stoi w dwóch rzędach: Ramki, Tła i Aury nad Śladami i Wierzchowcem.
+    - Aura Systemu i Aura Żaru kosztują po 500 PS, a Świetliste ślady 300 PS.
+    - Postać nosi naraz jedną aurę i jedne ślady. Zakłada je i zdejmuje w sklepie, tak jak ramki.
+    - Należą do postaci, która je kupiła.
+2. **Aura** świeci wokół sylwetki postaci:
+    - Pokazuje się na portrecie w zakładce Postać, na karcie postaci, którą widzą inni gracze, w podglądzie w sklepie i w scenie Walki.
+    - Kontur postaci ma światło aury, a za postacią wzbiera i gaśnie poświata.
+    - Aura Systemu ma błękitne drobinki krążące wokół postaci. Aura Żaru ma pomarańczowy żar i iskry lecące w górę.
+    - Na koniu i na tygrysie świeci jeździec razem z wierzchowcem.
+    - Barwy aury są w danych (`aura` w `data/cosmetics.json`). Aura nie ma obrazka, rysuje ją gra.
+3. **Świetliste ślady** zostają za postacią w scenie Walki:
+    - Przy każdym kroku pod postacią zapala się ślad stopy. Ślad odjeżdża razem z drogą i gaśnie w 2,6 sekundy.
+    - Ślady zostają także za wierzchowcem.
+    - W sklepie podgląd pokazuje postać na kawałku drogi z czterema śladami za nią.
+4. **Przy wyłączonych animacjach** aura świeci bez ruchu, a za postacią stoją cztery gasnące ślady.
+5. **Bez migracji bazy.** Aura i ślady to dwa nowe miejsca w stanie kosmetyków postaci (`aura`, `trail`).
+
 ## Druga ewolucja: odcienie skóry 30 portretów (2.11.2026)
 
 Autor: „Portrety masz zatwierdzone musisz zrobić maski na odcienie i wykonać je”.

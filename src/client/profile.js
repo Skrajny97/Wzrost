@@ -28,7 +28,7 @@ export async function openProfile(name, { onChange } = {}) {
     h(
       'div',
       { class: 'profile-head' },
-      portraitBox(profile, { frame: profile.frame, background: profile.background }, 'profile-portrait'),
+      portraitBox(profile, { frame: profile.frame, background: profile.background, aura: profile.aura }, 'profile-portrait'),
       h(
         'div',
         { class: 'profile-title' },
