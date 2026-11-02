@@ -90,15 +90,22 @@ def gait(points, size, spec):
             'top': t,
             'rest': e,
         }
+    base = dict(pos)
     if spec.get('cross'):
         # The two legs of a pair swing around one place under the body, so
         # they pass each other, as a walking cat's paws do; the start frame
-        # may stand with them apart.
-        for pair in ('front', 'hind'):
+        # may stand with them apart. Seen from the side, the two hips (and
+        # the two shoulders) are one above the other.
+        for pair, top in (('front', 'SHOULDER'), ('hind', 'HIP')):
             left, right = legs[f'{pair}_left'], legs[f'{pair}_right']
-            x = (left['rest'][0] + right['rest'][0]) / 2
+            tx = (base[f'LEFT {top}'][0] + base[f'RIGHT {top}'][0]) / 2
+            # Halfway between where the paws stand and under the joint above,
+            # so a leg does not lean back the whole step.
+            x = ((left['rest'][0] + right['rest'][0]) / 2 + tx) / 2
             y = max(left['rest'][1], right['rest'][1])
             left['rest'] = right['rest'] = (x, y)
+            for side in ('LEFT', 'RIGHT'):
+                base[f'{side} {top}'] = (tx, base[f'{side} {top}'][1])
     length = sum(l['upper'] + l['lower'] for l in legs.values()) / 4
     stride = spec.get('stride', 0.45 if kind == 'trot' else 0.4) * length
     lift = spec.get('lift', 0.22 if kind == 'trot' else 0.14) * length
@@ -111,8 +118,8 @@ def gait(points, size, spec):
         # sway with each step (walk).
         dy = bob * math.cos(2 * math.pi * phi * (2 if kind == 'trot' else 4))
         head = nod * math.sin(2 * math.pi * phi * 2)
-        frame = dict(pos)
-        for label, (x, y) in pos.items():
+        frame = dict(base)
+        for label, (x, y) in base.items():
             frame[label] = (x, y + dy + (head if label in HEAD else 0))
         for leg, (top, mid, end) in LEGS.items():
             info = legs[leg]

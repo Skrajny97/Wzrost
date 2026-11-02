@@ -21,7 +21,13 @@ A "trot" in art/mounts.json:
          posed walks of tools/animate-mounts-skeleton.mjs are in
          mounts-skeleton);
   "seat_in": "start" when "seat" is the saddle in the start frame
-             (art/references/mounts) rather than in the first frame.
+             (art/references/mounts) rather than in the first frame;
+  "patch": gaps in the mount where the background shows through (the
+           pony's back between its rump and saddle): boxes [left, top,
+           right, bottom) of the start frame, moved in each frame with the
+           saddle; a clear pixel in one with the mount on both sides and
+           below takes the coat colour "coat", the "outline" where it meets
+           the clear above.
 
     python3 -I tools/mount-trots.py [DRAFTS_DIR]
 
@@ -90,6 +96,32 @@ def clean(frame, rules):
     return frame
 
 
+def patch(frame, rules, shift):
+    px = frame.load()
+    W, H = frame.size
+    opaque = lambda x, y: 0 <= x < W and 0 <= y < H and px[x, y][3] >= 128
+    for rule in rules:
+        x0, y0, x1, y1 = rule['box']
+        dx, dy = shift
+        filled = []
+        for y in range(y0 + dy, y1 + dy):
+            for x in range(x0 + dx, x1 + dx):
+                if opaque(x, y) or not (0 <= x < W and 0 <= y < H):
+                    continue
+                left = any(opaque(x - k, y) for k in range(1, x - (x0 + dx) + 4))
+                right = any(opaque(x + k, y) for k in range(1, (x1 + dx) - x + 4))
+                below = any(opaque(x, y + k) for k in range(1, 6))
+                if left and right and below:
+                    filled.append((x, y))
+        coat, line = walk.rgb(rule['coat']), walk.rgb(rule['outline'])
+        for (x, y) in filled:
+            px[x, y] = (*coat, 255)
+        for (x, y) in filled:
+            if not opaque(x, y - 1):
+                px[x, y] = (*line, 255)
+    return frame
+
+
 def main():
     drafts = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'art', 'drafts', 'mounts-pixellab')
     config = json.load(open(os.path.join(ROOT, 'art', 'mounts.json'), encoding='utf8'))
@@ -111,6 +143,9 @@ def main():
             seats = ride.seats([start] + frames, tuple(trot['seat']))[1:]
         else:
             seats = ride.seats(frames, tuple(trot['seat']))
+        if trot.get('patch'):
+            sx, sy = trot['seat'] if trot.get('seat_in') == 'start' else seats[0]
+            frames = [patch(frame, trot['patch'], (x - sx, y - sy)) for frame, (x, y) in zip(frames, seats)]
         sheet = Image.new('RGBA', (width * len(frames), height), (0, 0, 0, 0))
         for index, frame in enumerate(frames):
             sheet.alpha_composite(frame, (index * width, 0))

@@ -7,7 +7,7 @@
       "start": "art/references/mounts/pony.png",
       "gait": { "kind": "trot", "template": "horse", "frames": 8 },
       "description": "a small stocky piebald pony, brown with white patches, a white blaze, a brown leather saddle on a dark red saddle cloth and a leather bridle with reins",
-      "trot": { "dir": "mounts-skeleton", "draft": "pony-20261102T0545-1578550929", "frames": [1, 2, 3, 4, 5, 6, 7, 8], "seat": [41, 36], "seat_in": "start", "fps": 8 }
+      "trot": { "dir": "mounts-skeleton", "draft": "pony-20261102T0545-1578550929", "frames": [1, 2, 3, 4, 5, 6, 7, 8], "seat": [41, 36], "seat_in": "start", "fps": 8, "patch": [{ "box": [33, 33, 42, 41], "coat": "6c3820", "outline": "080001" }, { "box": [49, 37, 55, 47], "coat": "6c3820", "outline": "080001" }] }
     },
     "horse": {
       "start": "art/references/mounts/horse.png",
