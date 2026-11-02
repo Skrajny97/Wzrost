@@ -6,6 +6,7 @@
 // a shield or a dance of shadows wraps the character in its aura. Each skill
 // has a look below, by its id in data/skills.json.
 
+import { artChain } from './art.js';
 import { h } from './dom.js';
 import { playSkill } from './sound.js';
 
@@ -59,10 +60,45 @@ export const SKILL_LOOKS = {
   'toxic-slime': { color: '#9ccc65', cast: 'poison' },
   'blade-dance': { color: '#a690e8', cast: 'dance' },
   'shadow-whirl': { color: '#a690e8', cast: 'sweep' },
+  // The second forms' skills ("Druga ewolucja klas"), brighter or heavier
+  // than the skills they grow from, until they have their own.
+  'shattering-blow': { color: '#ffe2a8', impact: 'heavy', big: true, glow: true },
+  'berserker-roar': { color: '#e8462f', cast: 'bless' },
+  'steel-whirl': { color: '#f0f4f6', cast: 'sweep' },
+  duel: { color: '#f2c14e', impact: 'aim' },
+  unbending: { color: '#f2c14e', cast: 'guard' },
+  'shield-wall': { color: '#d9b45a', cast: 'shield' },
+  'heart-shot': { color: '#ff7a6b', impact: 'aim', glow: true, big: true },
+  'target-lock': { color: '#ff7a6b', impact: 'aim' },
+  'sky-thunder': { color: '#c9b7ff', cast: 'rain' },
+  'thunder-orb': { color: '#c9b7ff', impact: 'aim', glow: true },
+  harpoon: { color: '#b07d4f', impact: 'pin', glow: true, big: true },
+  'wolf-call': { color: '#c8b49a', cast: 'bless' },
+  'meteor-shower': { color: '#ff6a2a', cast: 'rain' },
+  'elemental-harmony': { color: '#ffd27a', cast: 'bless' },
+  'ice-star': { color: '#d6f1ff', impact: 'heavy', glow: true, big: true },
+  'ice-armor': { color: '#a8e0ff', cast: 'shield' },
+  'ent-summon': { color: '#7fb069', cast: 'bless' },
+  'bear-summon': { color: '#a0784f', cast: 'bless' },
+  'great-renewal': { color: '#b9d98f', cast: 'heal' },
+  'life-aura': { color: '#d9f0a3', cast: 'bless' },
+  'final-verdict': { color: '#ffe08a', impact: 'heavy', glow: true, big: true },
+  pyre: { color: '#ffb347', cast: 'holy' },
+  choir: { color: '#e6f2b8', cast: 'bless' },
+  'divine-shield': { color: '#f2d675', cast: 'shield' },
+  beheading: { color: '#b9a3f0', impact: 'shadow', teleport: true, big: true },
+  vanish: { color: '#5d4a8f', cast: 'dance' },
+  'raise-dead': { color: '#8fbf5a', cast: 'poison' },
+  'curse-of-decay': { color: '#6b8f3a', cast: 'poison' },
+  'blade-storm': { color: '#b9a3f0', cast: 'sweep' },
+  'shadow-double': { color: '#4b3a73', cast: 'dance' },
+  // The skeleton Żniwo raises (combat.js RISEN).
+  risen: { color: '#8fbf5a', cast: 'poison' },
 };
 
 const DEFAULT_LOOK = { color: '#8fe3ef' };
-export const lookOf = (event) => SKILL_LOOKS[event.skill] ?? DEFAULT_LOOK;
+// A skill's look, or that of the skill it stands in with (art.js artChain).
+export const lookOf = (event) => artChain(event.skill).map((id) => SKILL_LOOKS[id]).find(Boolean) ?? DEFAULT_LOOK;
 
 // `kit` is what the arena shares: its cards, its effects layer and its
 // animation helpers, so every animation here can be cancelled with the rest.
@@ -316,7 +352,7 @@ export function skillEffects(kit) {
   // the skill's own sound, or a plain one while it has none.
   async function cast(event) {
     const look = lookOf(event);
-    playSkill(event.skill, look.cast === 'sweep' ? 'swing' : look.cast === 'rain' ? 'shot' : 'magic');
+    playSkill(artChain(event.skill), look.cast === 'sweep' ? 'swing' : look.cast === 'rain' ? 'shot' : 'magic');
     callout(event.actor, event.skillName, look.color);
     const targets = event.targets ?? [];
     switch (look.cast) {
@@ -356,7 +392,7 @@ export function skillEffects(kit) {
   async function heal(event) {
     const look = lookOf(event);
     if (!event.quiet) {
-      playSkill(event.skill, 'effect');
+      playSkill(artChain(event.skill), 'effect');
       callout(event.actor, event.skillName, look.color);
     }
     kit.setHp(event.target, event.hp);
@@ -373,7 +409,7 @@ export function skillEffects(kit) {
   // target.
   function before(event) {
     const look = lookOf(event);
-    playSkill(event.skill);
+    playSkill(artChain(event.skill));
     callout(event.actor, event.skillName, look.color);
     if (look.impact === 'aim') ring(event.target, look.color, 70, 420);
   }

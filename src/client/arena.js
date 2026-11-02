@@ -81,7 +81,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     // corner; without one, the vector bust or the old line icon beside the
     // level.
     const art = unit.summon
-      ? summonSprite(unit.summon)
+      ? summonSprite(unit.summon, unit.figure)
       : unit.side === 'ally'
         ? ((unit.companion ? (companionPortrait(unit.classId, unit.appearance ?? 'male') ?? companionBust(unit.classId, unit.appearance ?? 'male')) : null) ??
           portraitSprite(unit.classId, unit.appearance ?? 'male', { bust: true, skin: unit.skin, evolution: unit.evolution }) ??
@@ -355,13 +355,17 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
 
   // A mana shield's card shows how much damage it can still take, in words
   // and as a bar under the HP on the same scale as the HP, so it reads as
-  // the few points it adds; spent, the shield goes out.
+  // the few points it adds; spent, the shield goes out. A shield over the
+  // whole party (Boska ochrona) names the others' shields too (`guarded`).
   const shields = new Map(); // unit id → { name, full }
   function shieldUp(event) {
-    const entry = cards.get(event.actor);
-    shields.set(event.actor, { name: event.skillName, full: Math.max(1, event.shield) });
-    shieldLeft(event.actor, event.shield);
-    if (event.shield > 0) entry.shieldBar.hidden = false;
+    for (const { id, shield } of [{ id: event.actor, shield: event.shield }, ...(event.guarded ?? [])]) {
+      const entry = cards.get(id);
+      if (!entry) continue;
+      shields.set(id, { name: event.skillName, full: Math.max(1, shield) });
+      shieldLeft(id, shield);
+      if (shield > 0) entry.shieldBar.hidden = false;
+    }
   }
   function shieldLeft(id, left) {
     const entry = cards.get(id);
@@ -414,7 +418,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     let decoy = summoned.get(owner.id);
     if (!decoy || decoy.skill !== event.skill) {
       summonRemove(owner.id, true);
-      const unit = { id: `${owner.id}~summon`, side: owner.side, name: event.summon, level: owner.level, maxHp: event.summonHp, strike: 'magic', summon: event.skill };
+      const unit = { id: `${owner.id}~summon`, side: owner.side, name: event.summon, level: owner.level, maxHp: event.summonHp, strike: 'magic', summon: event.skill, figure: event.figure };
       decoy = { unit, card: unitCard(unit), skill: event.skill };
       summoned.set(owner.id, decoy);
       summonPlace(owner, decoy.card);
@@ -652,7 +656,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (event.kind === 'dodge') {
       await land(() => {
         playMoment('dodge');
-        float(target.id, 'unik', 'dodge');
+        float(target.id, event.blocked ? 'blok' : 'unik', 'dodge');
         const card = cards.get(target.id).card;
         if (!reducedMotion()) {
           animate(card, [{ transform: 'translateX(0)' }, { transform: 'translateX(16px)' }, { transform: 'translateX(0)' }], {

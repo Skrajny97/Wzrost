@@ -3,7 +3,10 @@
 // class level of the first evolution, once the class's two paths are ready
 // (both chosen, the Skill Points spent), it holds the cards of the two
 // paths' evolutions to choose one from, for good; after the choice, the
-// evolution's card. The choice and the ceremony are in evolution.js.
+// evolution's card and when the next one comes. At class level 100, once
+// the points are spent, the card of the one form the evolution grows into,
+// to take; after it, that form's card. The choice and the ceremony are in
+// evolution.js.
 
 import { placeArt } from '../art.js';
 import { fill, h } from '../dom.js';
@@ -31,15 +34,37 @@ export function mountEvolution(container) {
       fill(container, heading, systemPanel(`Dostęp zablokowany. ${unlock.name}: od poziomu klasy ${unlock.classLevel}. Twój poziom klasy: ${character.classLevel}.`));
       return;
     }
-    const { current, choices } = character.evolution ?? { current: null, choices: [] };
+    const { current, choices, next, nextLevel } = character.evolution ?? { current: null, choices: [] };
     const toSkills = h('a', { class: 'button button--system', href: '#/postac/umiejetnosci', text: t.toSkills });
-    if (current) {
-      // The evolution taken; the points for its skills, while some are left.
+    // Only an exploration counts its fights with the evolution (hunts.js).
+    const busy = character.activity?.kind === 'hunt';
+    const base = current && h('p', { class: 'muted evolution-base', text: t.baseClass.replace('{className}', character.baseClassName) });
+    if (next) {
+      // The one form the evolution grows into, to take (the author's
+      // words, with "mogła" for a woman); no narrator here (385 B).
+      const said = character.appearance === 'female' ? t.nextIntroFemale : t.nextIntro;
       fill(
         container,
         heading,
-        h('p', { class: 'muted evolution-base', text: t.baseClass.replace('{className}', character.baseClassName) }),
-        (character.skills?.points ?? 0) > 0 && h('div', { class: 'evolution-spend' }, systemPanel(t.spend), toSkills),
+        base,
+        busy && systemPanel(t.busy),
+        systemPanel(said.replace('{level}', String(nextLevel))),
+        evolutionCard(next, { busy, onChoose: (button, chosen) => chooseEvolution(button, chosen) }),
+      );
+      return;
+    }
+    if (current) {
+      // The evolution taken; the points for its skills, while some are
+      // left, and when the next evolution comes: at its level the points
+      // are due first.
+      const points = (character.skills?.points ?? 0) > 0;
+      const waiting = nextLevel && character.classLevel >= nextLevel;
+      fill(
+        container,
+        heading,
+        base,
+        points && h('div', { class: 'evolution-spend' }, systemPanel(waiting ? t.nextNotReady : t.spend), toSkills),
+        nextLevel && !waiting && systemPanel(t.nextWaiting.replace('{level}', String(nextLevel))),
         evolutionCard(current),
       );
       return;
@@ -49,8 +74,6 @@ export function mountEvolution(container) {
       fill(container, heading, systemPanel(t.notReady), toSkills);
       return;
     }
-    // Only an exploration counts its fights with the evolution (hunts.js).
-    const busy = character.activity?.kind === 'hunt';
     // The author's words, with "mogła" for a woman.
     const said = character.appearance === 'female' ? t.introFemale : t.intro;
     const intro = systemPanel(said.replace('{level}', String(character.skills.evolution.level)));
