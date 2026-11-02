@@ -16,7 +16,12 @@ A "trot" in art/mounts.json:
   "fps": the frames a second,
   "clean": boxes [left, top, right, bottom) where reddish pixels PixelLab
            left (the steed's ears turned red) take the colour "to";
-           and specks cut off from the mount go in every frame.
+           and specks cut off from the mount go in every frame;
+  "dir": the drafts' folder next to DRAFTS_DIR when not that one (the
+         posed walks of tools/animate-mounts-skeleton.mjs are in
+         mounts-skeleton);
+  "seat_in": "start" when "seat" is the saddle in the start frame
+             (art/references/mounts) rather than in the first frame.
 
     python3 -I tools/mount-trots.py [DRAFTS_DIR]
 
@@ -96,9 +101,16 @@ def main():
         trot = mount.get('trot')
         if not trot:
             continue
-        frames = [clean(Image.open(os.path.join(drafts, f"{trot['draft']}-{n}.png")).convert('RGBA'), trot.get('clean', [])) for n in trot['frames']]
+        folder = os.path.join(os.path.dirname(drafts), trot['dir']) if trot.get('dir') else drafts
+        frames = [clean(Image.open(os.path.join(folder, f"{trot['draft']}-{n}.png")).convert('RGBA'), trot.get('clean', [])) for n in trot['frames']]
         width, height = frames[0].size
-        seats = ride.seats(frames, tuple(trot['seat']))
+        if trot.get('seat_in') == 'start':
+            # The posed frames (tools/animate-mounts-skeleton.mjs) are all
+            # new drawings: the saddle is looked for from the start frame.
+            start = Image.open(os.path.join(ROOT, mount['start'])).convert('RGBA')
+            seats = ride.seats([start] + frames, tuple(trot['seat']))[1:]
+        else:
+            seats = ride.seats(frames, tuple(trot['seat']))
         sheet = Image.new('RGBA', (width * len(frames), height), (0, 0, 0, 0))
         for index, frame in enumerate(frames):
             sheet.alpha_composite(frame, (index * width, 0))
