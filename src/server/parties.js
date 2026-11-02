@@ -25,13 +25,20 @@
 // the length the leader chose, if each of them has them open; the others
 // stay in the party and go the next time they are free. Each one gets
 // an exploration of its own (hunts.js), with the others fighting beside it
-// as they are when they set out, and its own report and finds; the free
-// places of the party, up to parties.size, take its companions. The
+// as they are when they set out, and its own report and finds. The
 // explorations of one trip share their timer: a "Przewiń" of any of them
 // moves them all, and the others hear who skipped (time.js; the author:
 // "Musi być wspólny timer").
+//
+// A party hunts without companions (the author: "jeśli ktoś ma zwerbowanego
+// towarzysza to nie może być w drużynie, dopóki nie kliknie na nim [Zostań w
+// kwaterze]; wtedy nie poluje się z towarzyszem, tylko samemu/z drużyną"): a
+// character whose companion still goes on explorations neither makes a
+// party nor joins one, and in a party every companion stays in the Kwatery
+// (companionStays in the engine), also one of a character that was in a
+// party before this rule came.
 
-import { areaFor, areaUnlocked, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange } from '../engine/index.js';
+import { areaFor, areaUnlocked, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyRefusal } from '../engine/index.js';
 import { characterView, currentHp, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
@@ -78,6 +85,16 @@ async function requirePartyPlayer(context) {
   const found = await requirePlayer(context);
   requireUnlocked(found.player.row);
   return found;
+}
+
+// Why a character of `row` cannot make or join a party, or null: its
+// companions who do not stay in the Kwatery, where the Osada is on.
+const companionsOut = (row) => (settlementOn() ? partyRefusal(JSON.parse(row.settlement ?? '{}').companions ?? [], content) : null);
+
+// A character makes or joins a party only once its companions stay.
+function requireCompanionsStay(row) {
+  const refusal = companionsOut(row);
+  if (refusal) throw new ApiError(409, 'companion_goes', refusal);
 }
 
 // The party a character is in: its id, leader and members (character ids
@@ -148,7 +165,7 @@ export async function partyView(db, characterId, now) {
          WHERE i.character_id = ? ORDER BY i.created_at DESC`,
       )
       .bind(characterId),
-    db.prepare('SELECT class_level FROM characters WHERE id = ?').bind(characterId),
+    db.prepare('SELECT class_level, settlement FROM characters WHERE id = ?').bind(characterId),
   ]);
   const { onlineSeconds } = content.community.trade;
   const list = members.results.map((row) => ({
@@ -193,7 +210,18 @@ export async function partyView(db, characterId, now) {
     range: { ...partyRange(levels, content), spread: content.balance.parties.classSpread },
     invites: invites.results.map((row) => ({ partyId: row.party_id, invitedBy: row.invited_by, members: row.members ?? '', at: row.created_at })),
     unlockLevel: unlock().level,
+    // Out of a party, the companions who still go on explorations keep the
+    // character from making or joining one: why, and the way to the
+    // Kwatery, where they are told to stay.
+    companions: !party && self.results[0] ? companionsBlock(self.results[0]) : null,
   };
+}
+
+// The words of a character kept out of a party by its companions, with the
+// link to the Kwatery, or null.
+function companionsBlock(row) {
+  const text = companionsOut(row);
+  return text && { text, link: content.settlement.companions.texts.toQuarters };
 }
 
 const answer = async (db, characterId, now, extra = {}) => json({ ...(await partyView(db, characterId, now)), ...extra });
@@ -231,6 +259,9 @@ export async function inviteToParty(context) {
   if (blocked) throw new ApiError(409, 'blocked', `${target.name} nie przyjmuje teraz zaproszeń od Ciebie.`);
   let party = await partyOf(db, player.row.id);
   if (party && party.leaderId !== player.row.id) throw new ApiError(403, 'not_leader', 'Do drużyny zaprasza lider.');
+  // The first invitation makes the party: not while a companion goes on
+  // the inviting character's explorations.
+  if (!party) requireCompanionsStay(player.row);
   if (party?.memberIds.includes(target.id)) throw new ApiError(409, 'member', `${target.name} jest już w Twojej drużynie.`);
   if (party && party.memberIds.length >= size()) throw new ApiError(409, 'full', `Drużyna jest pełna: ${size()} postacie.`);
   const gap = levelGap(`${target.name} ma`, target.class_level, party ? await classLevels(db, party.id) : [player.row.class_level]);
@@ -273,6 +304,7 @@ export async function acceptPartyInvite(context) {
   const invite = await db.prepare('SELECT party_id FROM party_invites WHERE party_id = ? AND character_id = ?').bind(partyIdOf(body), player.row.id).first();
   if (!invite) throw new ApiError(404, 'no_invite', 'Tego zaproszenia już nie ma.');
   if (await partyOf(db, player.row.id)) throw new ApiError(409, 'in_party', 'Najpierw opuść swoją drużynę.');
+  requireCompanionsStay(player.row);
   // Joins only while the party has a place and the character's class level
   // keeps the party within the spread (both in the same statement), so two
   // invitations accepted at once join one party.
@@ -426,8 +458,8 @@ export async function partyHunt(context) {
   }
   // The trip as it set out, kept by each of its explorations (trips.js): its
   // own seed and its roster, those who went in its order with what each
-  // brought, the leader's companions in the places left and how the leader
-  // leads it, so its fights come out the same in every member's report (the
+  // brought, and how the leader leads it (with no companions: hunts.js), so
+  // its fights come out the same in every member's report (the
   // author: "postacie z drużyny mają inne raporty odbytych walk. To nie
   // powinno mieć miejsca"). One that could not go after all (it got busy,
   // or its character changed meanwhile) fights in nobody's exploration (the
@@ -443,7 +475,6 @@ export async function partyHunt(context) {
       const setup = setups.get(member.row.id);
       return { ...shots.get(member.row.id), windows: setup.windows, trophies: setup.trophies, ...(member === player && { potions: setup.taken, healBelow: setup.healBelow }) };
     }),
-    companions: lead.companions,
     encounter: { avoidRare: lead.avoidRare, seekRare: lead.seekRare, rumor: lead.rumor, tracked: lead.tracked, unknown: lead.unknown, met: JSON.parse(player.row.met ?? '[]') },
   };
   const trip = `json_extract(options, '$.party.trip') = ? AND json_extract(options, '$.party.id') = ?`;
@@ -451,7 +482,7 @@ export async function partyHunt(context) {
     actual.map((member) =>
       went.length > 0
         ? db
-            .prepare(`UPDATE activities SET options = json_remove(json_set(options, '$.party', json(?)), '$.partners'${member === player ? '' : ", '$.companions'"}) WHERE character_id = ? AND kind = 'hunt' AND ${trip}`)
+            .prepare(`UPDATE activities SET options = json_remove(json_set(options, '$.party', json(?)), '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`)
             .bind(JSON.stringify(crew), member.row.id, now, party.id)
         : db.prepare(`UPDATE activities SET options = json_remove(options, '$.party', '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`).bind(member.row.id, now, party.id),
     ),

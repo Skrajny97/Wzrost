@@ -147,8 +147,15 @@ async function playerOf(db, row) {
     db.prepare('SELECT * FROM activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT * FROM avatar_activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT building_id, level, started_at, ends_at, collected_at FROM buildings WHERE character_id = ?').bind(row.id),
-    // With the tag of its guild, for its own name (guilds.js).
-    db.prepare(`SELECT (SELECT COUNT(*) FROM market_parcels WHERE character_id = ?) AS waiting, ${guildTagSql('?')} AS guild_tag`).bind(row.id, row.id),
+    // With the tag of its guild, for its own name (guilds.js), and whether
+    // it is in a Drużyna, where its companions stay in the Kwatery
+    // (parties.js, companions.js in the engine).
+    db
+      .prepare(
+        `SELECT (SELECT COUNT(*) FROM market_parcels WHERE character_id = ?) AS waiting, ${guildTagSql('?')} AS guild_tag,
+           EXISTS (SELECT 1 FROM party_members WHERE character_id = ?) AS in_party`,
+      )
+      .bind(row.id, row.id, row.id),
   ]);
   return {
     row,
@@ -160,6 +167,7 @@ async function playerOf(db, row) {
     // What waits to be collected at the Targowisko (market.js).
     marketWaiting: parcels.results[0]?.waiting ?? 0,
     guildTag: parcels.results[0]?.guild_tag ?? null,
+    inParty: Boolean(parcels.results[0]?.in_party),
     // { campfire: { level, startedAt, endsAt, collectedAt } }: see camp.js in the engine.
     buildings: Object.fromEntries(
       buildings.results.map((building) => [

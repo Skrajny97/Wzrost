@@ -22,6 +22,7 @@ import {
   companionStanding,
   companionGift,
   companionSkillLevel,
+  companionStays,
   companionText,
   companionWearBlock,
   deliverOrder,
@@ -62,6 +63,7 @@ import {
   spentPoints,
   standingOf,
   statResetCost,
+  staying,
   talkWith,
   talkedToday,
   toldPieces,
@@ -595,6 +597,7 @@ function companionsView(player, stored, now) {
         away: away ? companionText('away', companion, content) : null,
         // The line of its item's card: who wears it and who pays.
         wornBy: companionText('wornBy', companion, content),
+        stay: stayView(companion, player.inParty, away),
       };
     }),
     candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content, points) })),
@@ -603,7 +606,8 @@ function companionsView(player, stored, now) {
 
 // Whether a hired companion is out on the character's exploration now: it
 // set out with it (the exploration keeps it as it went, hunts.js) and comes
-// back with its report. One who stayed behind wounded is at home.
+// back with its report. One who stayed in the Kwatery, or stayed behind
+// wounded, is at home.
 function companionAway(player, companion) {
   if (player.activity?.kind !== 'hunt') return false;
   return (JSON.parse(player.activity.options ?? '{}').companions ?? []).some((one) => one.id === companion.id);
@@ -616,6 +620,20 @@ function requireCompanionHome(player, companion, now) {
   if (companionAway(player, companion)) requireIdle(player, now);
 }
 
+// Whether a companion goes on the explorations or stays in the Kwatery (the
+// author: "[Zostań w kwaterze]"), in its words, with the switch to the
+// other (`action`: the label and the `stays` to send). In a Drużyna every
+// companion stays, with no switch. One set to stay while out on an
+// exploration stays from its return on.
+function stayView(companion, inParty, away) {
+  if (inParty) return { stays: true, text: companionText('inParty', companion, content), action: null };
+  const stays = companionStays(companion);
+  return {
+    stays,
+    text: companionText(stays ? (away ? 'stayingAfter' : 'staying') : 'going', companion, content),
+    action: { stays: !stays, label: companionText(stays ? 'go' : 'stay', companion, content) },
+  };
+}
 
 // The relation with a hired companion (296 A) and its talks (295 A): its
 // standing and the next, its bonus in a fight, the pieces of its story it
@@ -906,7 +924,7 @@ const backToBag = (db, row, item, saved, now) => {
 // its place (question 108 A), and what it wore there goes back to the bag.
 // At home or at a profession's work, as the character's own equipment
 // (inventory.js); an exploration keeps what it set out with, so one away
-// on it waits for its return.
+// on it waits for its return (one who stayed in the Kwatery does not).
 export async function equipCompanion(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -1001,6 +1019,36 @@ export async function upgradeCompanionItem(context) {
       ...(plan.warded && { warded: true }),
       ...(outcome.saved && { saved: true }),
     },
+    settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
+    character: characterView(after, context.now),
+  });
+}
+
+// { companionId, stays }: the companion stays in the Kwatery (`stays`
+// true, "Zostań w kwaterze") or goes on the explorations again ("Idź na
+// wyprawy"), from the next one on. In a Drużyna every companion stays (the
+// author: "nie może być w drużynie, dopóki nie kliknie na nim [Zostań w
+// kwaterze]"), so none goes out again while the character is in one.
+// Saved only while the character is as read.
+export async function setCompanionStay(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const hired = stored.companions ?? [];
+  const companion = hired.find((one) => one.id === body.companionId);
+  if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
+  if (typeof body.stays !== 'boolean') throw new ApiError(400, 'invalid_stay', companionText('invalidStay', companion, content));
+  if (!body.stays && player.inParty) throw new ApiError(409, 'in_party', companionText('inParty', companion, content));
+  const next = { ...stored, companions: hired.map((one) => (one === companion ? staying(one, body.stays) : one)) };
+  const result = await context.env.DB.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
+    .bind(JSON.stringify(next), row.id, row.version)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(context.env.DB, session.userId);
+  return json({
+    text: companionText(body.stays ? 'stayed' : 'goes', companion, content),
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
   });

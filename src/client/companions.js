@@ -134,6 +134,30 @@ function wearList(companion, apply) {
   );
 }
 
+// Whether the companion goes on the explorations or stays in the Kwatery
+// (the author: "[Zostań w kwaterze]"), and the switch: none while the
+// character is in a Drużyna, where every companion stays, but the reason.
+function stayBlock(companion, apply) {
+  const { stay } = companion;
+  return h(
+    'div',
+    { class: 'settlement-companion-stay' },
+    h('p', { class: 'muted', text: stay.text }),
+    stay.action &&
+      h('button', {
+        type: 'button',
+        class: 'button button--small',
+        text: stay.action.label,
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            const answer = await call('POST', '/api/settlement/companion-stay', { companionId: companion.id, stays: stay.action.stays });
+            apply(answer);
+            toast(answer.text);
+          }),
+      }),
+  );
+}
+
 // The relation with a hired companion (296 A) and what it told in talks
 // (295 A): its standing, its bonus in a fight, the points to the next
 // standing, and the pieces of its story, folded.
@@ -185,6 +209,7 @@ export function companionCard(companion, action, apply) {
     companion.wear && wearList(companion, apply),
     companion.gift && giftRow(companion, apply),
     wounded && h('p', { class: 'region-warning', text: wounded }),
+    companion.stay && stayBlock(companion, apply),
     action,
   );
 }

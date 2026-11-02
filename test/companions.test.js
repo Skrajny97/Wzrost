@@ -2,7 +2,8 @@
 // price the relation with the innkeeper sets, a companion in the fights of
 // an exploration, its XP and its wounds, which heal with the character's
 // rest, hiring one through the API, its profession's gift of the week, the
-// items it gets from the bag and their upgrades on the Kowadło.
+// items it gets from the bag and their upgrades on the Kowadło, and
+// "Zostań w kwaterze".
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -11,13 +12,17 @@ import {
   companionAfterHunt,
   companionCombatant,
   companionGift,
+  companionGoes,
   companionReady,
+  companionStays,
   companionXp,
   createRng,
   drawCandidates,
   generateItem,
   hireCost,
+  partyRefusal,
   simulateHunt,
+  staying,
   upgradedOnCompanion,
 } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
@@ -93,6 +98,33 @@ describe('companions in the engine', () => {
     assert.equal(companionReady(hurt, false), false);
     assert.equal(companionReady(hurt, true), true);
     assert.equal(companionReady(after, false), true);
+  });
+
+  test('one told to stay in the Kwatery goes on no exploration, nor does any while the character is in a Drużyna', () => {
+    const [candidate] = drawCandidates({ character, seed: 's' }, NOW, content);
+    assert.deepEqual([companionStays(candidate), companionGoes(candidate, { rested: false })], [false, true]);
+    const stays = staying(candidate, true);
+    assert.deepEqual([stays.stays, companionStays(stays), companionGoes(stays, { rested: true })], [true, true, false]);
+    // Told to go again, it is as it was.
+    assert.deepEqual(staying(stays, false), candidate);
+    // In a Drużyna every companion stays (the author: "wtedy nie poluje się
+    // z towarzyszem, tylko samemu/z drużyną").
+    assert.deepEqual([companionStays(candidate, true), companionGoes(candidate, { rested: true, inParty: true })], [true, false]);
+    // A wounded one still waits for the character's rest.
+    assert.deepEqual([companionGoes({ ...candidate, wounded: true }, { rested: false }), companionGoes({ ...candidate, wounded: true }, { rested: true })], [false, true]);
+  });
+
+  test('the companions going on explorations keep the character out of a Drużyna, named in their forms', () => {
+    const [candidate] = drawCandidates({ character, seed: 's' }, NOW, content);
+    const she = { ...candidate, name: 'Milena', appearance: 'female' };
+    const he = { ...candidate, name: 'Bogdan', appearance: 'male' };
+    const tail = 'Drużyna poluje bez towarzyszy z Kwater.';
+    assert.equal(partyRefusal([], content), null);
+    assert.equal(partyRefusal([staying(she, true), staying(he, true)], content), null);
+    assert.equal(partyRefusal([she], content), `Najpierw zostaw towarzyszkę w kwaterze: Milena. ${tail}`);
+    assert.equal(partyRefusal([he, staying(she, true)], content), `Najpierw zostaw towarzysza w kwaterze: Bogdan. ${tail}`);
+    assert.equal(partyRefusal([she, he], content), `Najpierw zostaw towarzyszy w kwaterze: Milena, Bogdan. ${tail}`);
+    assert.equal(partyRefusal([she, { ...she, name: 'Bogna' }], content), `Najpierw zostaw towarzyszki w kwaterze: Milena, Bogna. ${tail}`);
   });
 
   test("an upgrade on a companion changes only the item in its place: the level and the try's seed, or the item gone when it broke", () => {
@@ -397,5 +429,49 @@ describe('companions through the API', () => {
     const next = placeOf(made.settlement, 'weapon').item.roll;
     assert.equal(next, (await storedItem('weapon')).lastRoll);
     assert.equal((await upgrade(candidate.id, 'weapon', { roll: next })).status, 200);
+  });
+
+  test('"Zostań w kwaterze": a companion who stays goes on no exploration and gains nothing from it, and its gear is at hand meanwhile', async () => {
+    const candidate = await hireFirst();
+    await anvil(3);
+    await stock(100000, 1000);
+    const database = await db();
+    const options = async () => JSON.parse((await database.prepare('SELECT options FROM activities').first()).options);
+    let hired = (await settlement()).companions.hired[0];
+    assert.deepEqual([hired.stay.stays, hired.stay.action.label, hired.away], [false, 'Zostań w kwaterze', null]);
+    // Out on an exploration with the character: its gear waits.
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.deepEqual((await options()).companions.map((companion) => companion.id), [candidate.id]);
+    hired = (await settlement()).companions.hired[0];
+    assert.match(hired.away, /na wyprawie/);
+    assert.equal((await upgrade(candidate.id, 'weapon')).data.error.code, 'busy');
+    await call('POST', '/api/hunts/cancel', { cookie });
+    // Told to stay, it stays home while the character explores alone.
+    const told = await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: candidate.id, stays: true } });
+    assert.equal(told.status, 200, JSON.stringify(told.data));
+    assert.equal(told.data.text, `${candidate.name} zostaje w kwaterze.`);
+    hired = told.data.settlement.companions.hired[0];
+    assert.deepEqual([hired.stay.stays, hired.stay.action.label], [true, 'Idź na wyprawy']);
+    assert.equal((await stored()).companions[0].stays, true);
+    const before = (await stored()).companions[0];
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.equal((await options()).companions, undefined);
+    // At home meanwhile: its item is upgraded.
+    assert.equal((await settlement()).companions.hired[0].away, null);
+    assert.equal((await upgrade(candidate.id, 'weapon')).status, 200);
+    // The report brings it no XP and no relation.
+    await database.prepare('UPDATE activities SET started_at = started_at - ?, ends_at = ends_at - ?').bind(300000, 300000).run();
+    assert.equal((await call('POST', '/api/hunts/claim', { cookie })).status, 200);
+    const after = (await stored()).companions[0];
+    assert.deepEqual([after.level, after.xp ?? 0, after.relation ?? 0], [before.level, before.xp ?? 0, before.relation ?? 0]);
+    // Talks go on as ever.
+    assert.equal((await call('POST', '/api/settlement/talk', { cookie, body: { companionId: candidate.id } })).status, 200);
+    // "Idź na wyprawy": it goes along again.
+    const back = await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: candidate.id, stays: false } });
+    assert.equal(back.data.text, `${candidate.name} chodzi teraz z postacią na wyprawy.`);
+    assert.equal((await stored()).companions[0].stays, undefined);
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.deepEqual((await options()).companions.map((companion) => companion.id), [candidate.id]);
+    assert.equal((await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: candidate.id } })).data.error.code, 'invalid_stay');
   });
 });

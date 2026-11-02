@@ -17,7 +17,7 @@ import {
   buffWindows,
   campBonus,
   companionAfterHunt,
-  companionReady,
+  companionGoes,
   campLevels,
   carryLimit,
   countList,
@@ -103,10 +103,14 @@ export function restedNow(player, now) {
   return hp >= maxHp;
 }
 
-// The companions hired in the Osada who would go on an exploration now.
-function partyOf(player, now) {
+// The companions hired in the Osada who would go on an exploration now:
+// those who do not stay in the Kwatery, and none while the character is in
+// a Drużyna (companionGoes in the engine), a wounded one once the character
+// has rested to full HP; with the character, at most parties.size.
+function companionsGoing(player, now) {
   const rested = restedNow(player, now);
-  return (JSON.parse(player.row.settlement ?? '{}').companions ?? []).filter((companion) => companionReady(companion, rested));
+  const hired = JSON.parse(player.row.settlement ?? '{}').companions ?? [];
+  return hired.filter((companion) => companionGoes(companion, { rested, inParty: player.inParty })).slice(0, content.balance.parties.size - 1);
 }
 
 function cachedSamples(player, character, equipped, areaId, now) {
@@ -114,8 +118,8 @@ function cachedSamples(player, character, equipped, areaId, now) {
   // the item's id; and the evolution and the professions, whose levels give
   // stats (the code review: the threat stayed as before them).
   const gear = [...equipped].sort((a, b) => a.id - b.id).map((item) => JSON.stringify(item));
-  // The companions ready to go along fight beside the character (companions.js).
-  const companions = settlementOn() ? partyOf(player, now) : [];
+  // The companions who would go along fight beside the character (companions.js).
+  const companions = settlementOn() ? companionsGoing(player, now) : [];
   const party = companions.map((companion) => [companion.id, companion.level, companion.gear]);
   const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party]);
   let samples = samplesCache.get(key);
@@ -276,9 +280,10 @@ export async function startHunt(context) {
 // ago; a Błyskawiczne polowanie is one too (`flash`, for its report's name).
 // An exploration of a Drużyna (parties.js) keeps the party (its id, leader
 // and the names of those who went) and the other players as they set out
-// (`partners`), who fight beside the character; its companions take only
-// the places left in the party. `mount`: the stage of the Stajnia's mount
-// the exploration goes at, which the party code gives a Drużyna's trip.
+// (`partners`), who fight beside the character; it goes without companions
+// (the author: "wtedy nie poluje się z towarzyszem, tylko samemu/z
+// drużyną"). `mount`: the stage of the Stajnia's mount the exploration goes
+// at, which the party code gives a Drużyna's trip.
 export async function beginHunt(
   db,
   player,
@@ -332,12 +337,13 @@ export async function beginHunt(
   const stored = JSON.parse(player.row.settlement ?? '{}');
   const kept = settlementOn() ? stored : null;
   const rumor = !quick && !avoidRare ? rumorFactor(stored.rumor, area.id, now, content) : 1;
-  // The companions hired in the Osada go along, as they are now
-  // (companions.js), so the report comes out the same whenever claimed; a
-  // wounded one once the character has rested to full HP, and then its
-  // wounds are healed for good. Not on a Szybkie Polowanie.
+  // The companions hired in the Osada who do not stay in the Kwatery go
+  // along, as they are now (companions.js), so the report comes out the same
+  // whenever claimed; a wounded one once the character has rested to full
+  // HP. Resting to full HP heals the wounds of them all for good, of those
+  // who stay too. Not on a Szybkie Polowanie, nor on a Drużyna's trip.
   const healed = kept && restedNow(player, now) && (kept.companions ?? []).some((companion) => companion.wounded);
-  const party = kept && !quick ? partyOf(player, now).slice(0, Math.max(0, content.balance.parties.size - 1 - partners.length)) : [];
+  const party = kept && !quick && !crew ? companionsGoing(player, now) : [];
   const settlement =
     rumor > 1 || healed
       ? JSON.stringify({
@@ -428,7 +434,7 @@ export async function beginHunt(
     throw error;
   }
   // What it set out with, for the roster of a Drużyna's trip (parties.js).
-  return { windows, trophies, taken, healBelow: healBelow ?? content.potionUse.healBelow, tracked, unknown, rumor, avoidRare, seekRare, companions: party };
+  return { windows, trophies, taken, healBelow: healBelow ?? content.potionUse.healBelow, tracked, unknown, rumor, avoidRare, seekRare };
 }
 
 // Calling the character back early gives nothing and costs nothing. A
@@ -578,6 +584,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       avoidRare: trip ? trip.encounter.avoidRare === true : activity.avoid_rare === 1,
       seekRare: trip ? trip.encounter.seekRare === true : activity.seek_rare === 1,
       rumor: (trip ? trip.encounter.rumor : options.rumor) ?? 1,
+      // A trip goes without companions; one that set out before 2.11.2026
+      // keeps its leader's, so its fights stay the same for everyone.
       companions: (trip ? trip.companions : options.companions) ?? [],
       partners: trip ? [] : (options.partners ?? []),
       tracked: trip ? (trip.encounter.tracked ?? []) : JSON.parse(activity.tracked ?? '[]'),
@@ -651,7 +659,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   }
   const applied = applyHunt(character, hunt, content);
   // The companions who went gain XP, one who fell is wounded, and an
-  // event's reputation and rumor are kept (settlementAfterHunt).
+  // event's reputation and rumor are kept (settlementAfterHunt); of an
+  // older trip's, only in its leader's report.
   const settlementAfter = settlementAfterHunt(row, trip && trip.roster[0].id !== row.id ? { ...hunt, companions: [] } : hunt, kept, activity.minutes);
   // The potions taken along were set aside at the start (`reserved`): what
   // was not drunk comes back to the bag. An exploration started before that
