@@ -1,0 +1,30 @@
+{
+  "id": "marksman-female",
+  "payload": {
+    "prompt": "young woman master marksman, lean, dark hair in a tight braid, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a hooded dark green cloak, a fitted leather armour with a quiver of black-fletched arrows on the back, holding a long recurve bow of dark wood with silver tips, an arrow nocked, calm focused look, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 527650104,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793617059,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 17.15,
+    "request_id": "42e9e742-1616-475e-aaf8-ec2fcbfe247b",
+    "outputs_retained_until": 1793703395,
+    "billing": {
+      "source": "balance",
+      "balance_left": 17.15,
+      "balance_charged": 0.36
+    }
+  }
+}

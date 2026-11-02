@@ -1,0 +1,30 @@
+{
+  "id": "winter-lord-female",
+  "payload": {
+    "prompt": "young woman queen of winter, long white hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a pale blue gown with a white fur mantle, a crown of icicles, holding a staff of clear ice with a frost crystal on top, snowflakes swirling around, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 698144919,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793617338,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 15.71,
+    "request_id": "20279cf0-429c-4b8d-bf87-e668c130ca48",
+    "outputs_retained_until": 1793703695,
+    "billing": {
+      "source": "balance",
+      "balance_left": 15.71,
+      "balance_charged": 0.36
+    }
+  }
+}
