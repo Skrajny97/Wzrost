@@ -2996,6 +2996,24 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.82 (2.11.2026)
+
+1. **Co wchodzi do gry:** poprawki z uwag autora (zob. sekcję niżej) oraz drapieżny chód Tygrysa szablozębnego (zob. „Tygrys szablozębny 371 B…”).
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** wszystkie testy (TESTS) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Atak na Bestię z odtworzeniem walki, Tablicę prób na górze, nową listę w „Poproś gildię”, zwiniętą listę członków i „Zaproś do gildii” w karcie postaci sprawdzono w przeglądarce na 390×844.
+
+## Uwagi autora: Gildia, Upominki i tygrys (2.11.2026)
+
+Autor: „całość tekstu schowaj pod »Jak to działa?«” (Upominki), „usuń drugie zdanie z opisu” (Tygrys szablozębny), „lista członków Gildii powinna być rozwijana”, „Po Atakuj w Bestii Gildii niech pokaże się ta walka symulacja”, „Tablicę prób w próbach daj na sam szczyt”, „lista ta w prośbach Gildii musi być interfejsem w grze” i „w karcie postaci powinno być Zaproś do gildii, jeśli jeszcze nie ma”.
+
+1. **Upominki.** Cały opis karty Upominków (co dzień jeden Upominek dla każdego znajomego i najwyżej 10 odebranych dziennie) jest pod „Jak to działa?”. Na wierzchu zostaje tylko to, ile upominków czeka i ile odebrano dziś.
+2. **Opis tygrysa** w Sklepie Systemu ma jedno zdanie: „Postać jedzie na tygrysie szablozębnym zamiast na wierzchowcu ze Stajni.” O tym, że wierzchowiec zmienia tylko wygląd, mówi „Jak to działa?” Sklepu.
+3. **Członkowie Gildii** są zwinięci pod „Członkowie (N/20)” w zakładce Gildia. Tytuł karty to nazwa i skrót gildii.
+4. **Atak na Bestię.** Po „Atakuj” otwiera się „Atak na bestię”: walka odtwarza się od razu, tak jak walka z raportu wyprawy, z portretami, paskami HP, „Pomiń”, tempem i przebiegiem walki. Nad walką stoi, ile HP atak zabrał bestii.
+5. **Tablica prób** stoi w zakładce Próby na samej górze, zaraz pod tytułem. Pod nią są opis, pasek gildii, skrzynie, wzięta próba i wkład tygodnia.
+6. **Lista w „Poproś gildię”** jest listą gry, nie systemową listą telefonu. Każda pozycja ma obrazek, nazwę w kolorze rzadkości i „Masz: N”. Przy prośbie o cokolwiek pozycje są pogrupowane: Materiały, Zioła, Mikstury. Wybraną pozycję podświetla kolor Systemu.
+7. **„Zaproś do gildii” w karcie postaci.** Lider i zastępcy gildii widzą ten przycisk w karcie postaci innego gracza, która nie jest w żadnej gildii i ma już Społeczność. Przycisk wysyła zwykłe zaproszenie gildii, z tymi samymi zasadami co w zakładce Gildia: miejsce w gildii, limit czekających zaproszeń, blokada. Po wysłaniu karta mówi „Zaproszenie do gildii wysłane.”, dopóki zaproszenie czeka. Zwykły członek gildii tego przycisku nie widzi.
+
 ## Wersja 0.0.81 (2.11.2026)
 
 1. **Co wchodzi do gry:**

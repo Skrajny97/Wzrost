@@ -4,9 +4,11 @@
 // frame's colour when so chosen, levels, what it wears and the skills
 // it has learned (characterProfile in src/server/characters.js), with a
 // private message to it in the chat, a Wymiana (screens/trade.js) and what
-// the player can do with it as a friend (src/server/community.js); last,
-// trades from its player blocked or not. A tap on a piece of gear shows its
-// properties. `onChange` gets the Znajomi anew after a friend's action.
+// the player can do with it as a friend (src/server/community.js), an
+// invitation to the player's guild for its leader and deputies
+// (src/server/guilds.js); last, trades from its player blocked or not. A
+// tap on a piece of gear shows its properties. `onChange` gets the Znajomi
+// anew after a friend's action.
 
 import { skillSprite } from './art.js';
 import { friendsSeen, wantConversation } from './chat-news.js';
