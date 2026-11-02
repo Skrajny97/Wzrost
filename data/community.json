@@ -3,7 +3,7 @@
   "sections": [
     { "id": "chat", "name": "Czat" },
     { "id": "friends", "name": "Znajomi" },
-    { "id": "ranking", "name": "Ranking postaci" },
+    { "id": "ranking", "name": "Ranking" },
     { "id": "guilds", "name": "Gildia" },
     { "id": "party", "name": "Drużyna" }
   ],

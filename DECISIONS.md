@@ -2996,6 +2996,52 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.86 (2.11.2026)
+
+1. **Co wchodzi do gry:** Wymiana zasobów w Gildii oraz Ranking gildii ze Sławą tygodnia i złotym skrótem najlepszej gildii (zob. sekcje niżej). Zakładka Społeczności „Ranking postaci” nazywa się teraz „Ranking”.
+2. **Baza danych:** migracje 0070 (oferty Wymiany w Gildii) i 0071 (zapisane tygodnie Sławy).
+3. **Przed wdrożeniem:** wszystkie testy (847) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Po zmianie nazwy zakładki przeszły jeszcze sprawdzenie danych oraz testy Społeczności i klienta. Zakładki Wymiana i Ranking → Gildie sprawdzono w przeglądarce na 390×844.
+
+## Wymiana zasobów w Gildii (2.11.2026)
+
+Autor: „Dodatkowa funkcja w Gildii -> wymiana zasobów. Można wystawić, że chce się wymienić x kamienia na x drewna i odwrotnie, każdy zasób na inny.” oraz „376 A”, „377 A” i „378 A”.
+
+1. **Piąta zakładka (378 A).** Strona Gildii ma piątą zakładkę, „Wymiana”, z ikoną dwóch strzałek, jak Wymiana między graczami. Ikona każdej zakładki stoi teraz nad jej nazwą, więc wszystkie pięć mieści się w jednym rzędzie na telefonie i na komputerze.
+2. **Oferta (376 A).** Członek gildii wystawia ofertę: sztuki jednego zasobu obozu (drewno, kamień albo ruda żelaza) za sztuki innego, od 1 do 1000 z każdej strony. Obie liczby wpisuje wystawiający, np. 50 kamienia za 80 drewna. Przełącznik `sameCount` w danych wymaga tej samej liczby po obu stronach, a okno oferty samo przepisuje wtedy drugą liczbę. Na razie jest wyłączony.
+3. **Sztuki odłożone.** Dawane sztuki schodzą z zasobów od razu, przy wystawieniu, i czekają w ofercie. Bez nich oferty nie da się wystawić.
+4. **Limity.** Postać ma naraz najwyżej 3 otwarte oferty. Oferta wisi najwyżej 48 godzin.
+5. **Wymiana w całości (377 A).** Inny członek tej samej gildii stuka „Wymień” i potwierdza. Oddaje chciane sztuki i dostaje dawane, a wystawiający dostaje chciane. Wszystko dzieje się naraz. Gdy stukną dwie osoby naraz, wymienia tylko jedna.
+6. **Kto nie wymieni.** Bez chcianych sztuk zamiast „Wymień” stoi, ile ich postać ma i ile brakuje. Własnej oferty się nie bierze. Postacie jednego konta nie wymieniają się ze sobą, jak w Prośbach.
+7. **Zwrot sztuk.** Wystawiający wycofuje otwartą ofertę, kiedy chce. Sztuki wracają w całości od razu po wycofaniu, po wyjściu z gildii i po usunięciu z niej. Gdy minie czas oferty, wracają przy następnym wejściu wystawiającego do Wymiany albo na stronę Gildii. Gildia znika dopiero po wyjściu ostatniego członka, więc i wtedy sztuki wracają. Nic nie ginie i nic się nie podwaja.
+8. **Zakładka (brakujący szczegół).** U góry stoi opis z „Jak to działa?”. Niżej są oferty postaci: otwarte z „Wycofaj” i 5 ostatnich zamkniętych z tym, jak się skończyły (z kim wymieniono, wycofana, czas minął). Pod nimi jest „Wystaw ofertę”, a na dole oferty innych członków: imię, „Daje X · Chce Y” z obrazkami zasobów i „Wymień” albo powód.
+9. **Okno oferty (brakujący szczegół).** „Wystaw ofertę” otwiera okno gry, bez systemowej listy telefonu. „Dajesz” i „Chcesz” mają po trzy przyciski zasobów z obrazkiem i liczbą posiadanych sztuk, a pod każdym jest pole na liczbę. Zasobu wybranego w „Dajesz” nie da się wybrać w „Chcesz”.
+10. **Potwierdzenie (brakujący szczegół).** „Wymień” i „Wycofaj” pytają o potwierdzenie i mówią, co komu przypada.
+11. **Zamknięte oferty.** Oferty wzięte, wycofane i te, którym minął czas, zostają z godziną zamknięcia i biorącym. Ranking gildii liczy z nich wymiany tygodnia. Oferty zamknięte przed początkiem poprzedniego tygodnia znikają przy kolejnej ofercie.
+12. **Tylko zasoby obozu.** Złoto, przedmioty, materiały, zioła i mikstury zostają poza Wymianą w Gildii. Wymiana nie daje nagród Systemu.
+13. **Teksty** karty i okna oferty to propozycja do poprawy przez autora (`data/guilds.json`, `exchange.texts`).
+14. **Migracja bazy:** 0070 (oferty Wymiany w Gildii).
+
+## Ranking gildii: Sława tygodnia (2.11.2026)
+
+Autor: „379 A”, „380 C” i „381 A”.
+
+1. **Sława tygodnia (379 A).** Gildia zbiera Sławę za to, co członkowie robią razem w tygodniu, od poniedziałku od północy czasu polskiego, jak przy Bestii i Próbach:
+    - Bestia Gildii: 1 punkt za każdy pełny 1% paska bestii tygodnia i 50 punktów za jej upadek;
+    - Próby Gildii: 10 punktów za każdą wykonaną próbę, z jednej postaci najwyżej 10 prób, jak na pasku Prób;
+    - Prośby Gildii: 1 punkt za każdą sztukę daną członkowi gildii, z jednej postaci najwyżej 30 sztuk;
+    - Wymiana: 2 punkty za każdą wziętą ofertę, z jednej postaci, która bierze oferty, najwyżej 10 wymian.
+2. **Najpierw limity postaci,** potem suma gildii. Liczby są w `data/guilds.json`, `fame`.
+3. **Zapis tygodnia.** Pierwsze w nowym tygodniu wejście do gry, do rankingu gildii albo na stronę Gildii zapisuje raz Sławę poprzedniego tygodnia każdej gildii. Bestia, Próby, Prośby i Wymiana trzymają wiersze poprzedniego tygodnia do końca bieżącego, więc przed zapisem nic nie znika.
+4. **Ranking (381 A).** Ranking w Społeczności ma u góry dwie zakładki: „Postacie”, czyli dotychczasowy ranking bez zmian, i „Gildie”. W „Gildiach” przełącznik wybiera „Ten tydzień” albo „Od początku”. Wiersz ma miejsce, skrót i nazwę gildii, liczbę członków i Sławę. Gildia postaci jest podświetlona, a nad tabelą stoi jej miejsce. Zasady liczenia są pod „Jak to działa?”.
+5. **Od początku** to zapisane tygodnie i Sława bieżącego tygodnia.
+6. **Kolejność (brakujący szczegół).** Przy równej Sławie wyżej stoi starsza gildia. Tabela pokazuje do 100 gildii, jak Ranking postaci, także te bez Sławy.
+7. **Najlepsza gildia (380 C).** Gildia z największą Sławą poprzedniego tygodnia ma przez cały bieżący tydzień złoty skrót wszędzie, gdzie skrót stoi: w czacie, w Rankingu, w Znajomych, w Drużynie, na stronie Gildii i na karcie postaci. Jej strona Gildii mówi: „Najlepsza gildia poprzedniego tygodnia”. Przy remisie wygrywa starsza gildia.
+8. **Złoty skrót (brakujący szczegół).** Złoty skrót ma jasnozłote litery w cienkiej złotej ramce z lekką poświatą, bo zwykłe skróty i imiona są już złotawe. Gdy w poprzednim tygodniu żadna gildia nie zdobyła Sławy, żaden skrót nie jest złoty.
+9. **Skrót na stronie Gildii (brakujący szczegół).** Tytuł karty Gildii pokazuje skrót tak jak przy imionach, mniejszymi literami, żeby mógł być złoty.
+10. **Gildia, która znika,** zabiera swoje zapisane tygodnie.
+11. **Migracja bazy:** 0071 (zapisane tygodnie Sławy).
+12. **Nazwa zakładki (brakujący szczegół).** Zakładka Społeczności „Ranking postaci” nazywa się teraz „Ranking”, bo mieści postacie i gildie. Tak mówi też narrator: „Czat, Znajomi i Ranking”.
+
 ## Wersja 0.0.85 (2.11.2026)
 
 1. **Co wchodzi do gry:** do Prób Gildii liczą się tylko wyprawy, zbieranie i warzenie rozpoczęte po wzięciu próby, a pod licznikiem wyprawy i profesji zamiast „Możesz zamknąć grę” stoi zachęta do obozu i zadań (zob. sekcje niżej).
