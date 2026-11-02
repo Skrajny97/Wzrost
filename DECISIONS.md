@@ -2996,6 +2996,20 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Druga ewolucja: portrety z PixelLab (2.11.2026)
+
+Autor: „uzupełniłem bilans w retrodiffusion ale oszczędzaj”, „A nie lepiej generować dalej w PixelLab gdzie mam duży zapas i suba, zamiast top-upować zawodne RetroDiffusion?” i „412 A, Kolejność prac akceptowalna”.
+
+1. **Drugą ewolucję w grze buduje pomocnik w tle (412 A).** Kolejność prac zostaje taka sama: najpierw druga ewolucja, potem Warownia (387–394), a na końcu Górnictwo i Jubilerstwo (395).
+2. **Portrety z PixelLab.** Portrety rysuje teraz `tools/generate-portraits-pixellab.mjs` w PixelLab (generate-image-v2, wersja Pro), uruchamiany w przebiegu „Grafiki (szkice)” jako rodzaj `evolutions-pixellab`.
+    - Jedno wywołanie daje 4 wersje 96 × 128 na przezroczystym tle i kosztuje 10 generacji z planu autora.
+    - Wzorem stylu jest zatwierdzona Mistrzyni Łowów (401). Narzędzie bierze z niej wielkość pikseli, kontur, cieniowanie i szczegóły, ale nie kolory.
+    - Gdy jedna połowa pary jest już zatwierdzona albo wybrana, idzie jako wzór stroju dla drugiej (`pixellab.references` w `art/prompts.json`), więc mężczyzna i kobieta noszą to samo.
+3. **Porównanie z Retro Diffusion.**
+    - PixelLab, próba na Władcy Piorunów w obu wersjach: wszystkie 8 obrazków jest całych, 7–8 pikseli od krawędzi.
+    - Retro Diffusion, trzecia runda (16 portretów po 3 wersje, 8,64 USD; na koncie zostaje 47,13 USD): ucięte są wszystkie wersje Druidki, Wielkiej Inkwizytorki, Arcykapłana, Nekromanty i Władczyni Piorunów. Przy Czempionie Areny, Władcy Piorunów i Arcymagu przekroczony był czas rysowania.
+4. **Od teraz** brakujące i poprawiane portrety rysuje PixelLab. Retro Diffusion zostaje tylko dla grafik, których PixelLab nie robi, i używany jest oszczędnie.
+
 ## Druga ewolucja: odpowiedzi autora na pary portretów (2.11.2026)
 
 Autor: „396 kobietę albo dorysować albo od nowa, bo ucięta, opisy zatwierdzam / 397 czempion ucięty hełm / 398 zatwierdzam / 399 kobiecie wygenerował się tylko tułów, resztę zatwierdzam (przeglądaj do cholery te propozycje przed wysłaniem) / 400 zbyt mała rozdzielczość i poucinane piksele (…), opisy zatwierdzam / 402 to samo zbyt mała rozdzielczość/dokładność, opisy zatwierdzam / 403 to samo (…), opisy zatwierdzam / 404 jest okey, ale kobieta ucięta, opisy zatwierdzam, ale druga umiejętność to też niech będzie przywołanie, na przykład Niedźwiedzia / 409 Nekromanci fajnie wyglądają, ale ucięte portrety, opisy zmiany: »Trucizna to był tylko początek. Nekromanta nabywa cech nekrotycznych.« Umiejętności zatwierdzam / 401 zatwierdzam wygląd i opisy, wzorowe / 405 zatwierdzam wygląd z drobnymi pikselami do poprawy, zatwierdzam opisy / 407 zbyt niska rozdzielczość/dokładność, zatwierdzam opisy / 408 zbyt mało epickie jak na kolejną ewolucję w tym kierunku, opisy zatwierdzam / 410 zatwierdzam, ale kobiecie ucięło miecz i rękę, opisy zatwierdzam / 406 jest okey, choć trochę wygląda podobnie do zwykłego Inkwizytora, zbyt mało epicko, opisy zatwierdzam”.
