@@ -22,6 +22,7 @@ import {
   companionStanding,
   companionGift,
   companionSkillLevel,
+  companionText,
   companionWearBlock,
   deliverOrder,
   drawCandidates,
@@ -55,6 +56,7 @@ import {
   reforgeCost,
   reforgeOptions,
   rejectOrder,
+  rollUpgrade,
   rumorText,
   rumorToday,
   spentPoints,
@@ -65,6 +67,7 @@ import {
   toldPieces,
   tradePoints,
   upgradedItem,
+  upgradedOnCompanion,
   wearOnCompanion,
   withAffix,
   xpToNext,
@@ -79,7 +82,7 @@ import {
   loadPlayer,
   questsNow,
   requireBuildPlayer,
-  requireNotExploring,
+  requireIdle,
   requirePlayer,
   requireUnworn,
   settlementBoard,
@@ -90,6 +93,7 @@ import { evolutionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { forgeView } from './forge.js';
 import { trialProgress } from './guild-trials.js';
+import { upgradePayment, upgradePlan } from './inventory.js';
 import { counted, foreign, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
 import { stableView } from './stable.js';
@@ -485,8 +489,11 @@ function tavernView(row, stored, now) {
 // A companion or a candidate as the Karczma shows it (companions.js): its
 // class and level, its numbers in a fight, its traits in its own form, its
 // skills at its level, the gear it wears, its profession and story, and
-// how long it is still wounded.
-function companionView(companion) {
+// how long it is still wounded. With `upgradeCap` (the Kowadło's level,
+// for a hired one) each item it wears has the Kowadło's part of its card,
+// and `roll`, the seed of its last try on the Kowadło, which the next try
+// names (upgradeCompanionItem).
+function companionView(companion, { upgradeCap } = {}) {
   const unit = companionCombatant(companion, {}, content);
   const female = companion.appearance === 'female';
   const { traits, professions, stories } = content.settlement.companions;
@@ -511,7 +518,8 @@ function companionView(companion) {
     // the item came from the character's bag.
     wear: COMPANION_SLOTS.map((slot) => {
       const worn = companion.gear.find((item) => item.slot === slot);
-      return { slot, slotName: content.slotsById[slot].name, item: worn ? { ...itemView(worn, content), given: Boolean(worn.given) } : null };
+      const shown = worn && { ...itemView(worn, content, { upgradeCap }), given: Boolean(worn.given), ...(upgradeCap !== undefined && { roll: worn.lastRoll ?? '' }) };
+      return { slot, slotName: content.slotsById[slot].name, item: shown || null };
     }),
     profession: professions.find((one) => one.id === companion.profession)?.name ?? null,
     story: stories[companion.story % stories.length],
@@ -559,6 +567,7 @@ function companionsView(player, stored, now) {
   const bag = player.items.filter((item) => !item.equippedSlot);
   const rested = (stored.companions ?? []).some((companion) => companion.wounded) ? restedAt(player, now) : now;
   const { places, most } = placesOf(player, now);
+  const upgradeCap = campBonus(campLevels(player.buildings, now, content), 'upgradeCap', content);
   const hired = stored.companions ?? [];
   const points = innkeeperPoints(stored);
   const candidates = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, now, content, [
@@ -572,17 +581,41 @@ function companionsView(player, stored, now) {
     moreBeds: places < most,
     cheaper: hireCost({ level: 1 }, content, points) > hireCost({ level: 1 }, content, Infinity),
     // Each with this week's gift and the items in the bag it can wear.
-    hired: hired.map((companion) => ({
-      ...companionView(companion),
-      // Wounded until the character rests to full HP, and when that is.
-      ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
-      gift: giftOf(companion, row, now),
-      wearable: bag.filter((item) => !companionWearBlock(companion, item, content)).map((item) => item.id),
-      bond: bondView(companion, now),
-    })),
+    hired: hired.map((companion) => {
+      const away = companionAway(player, companion);
+      return {
+        ...companionView(companion, { upgradeCap }),
+        // Wounded until the character rests to full HP, and when that is.
+        ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
+        gift: giftOf(companion, row, now),
+        wearable: bag.filter((item) => !companionWearBlock(companion, item, content)).map((item) => item.id),
+        bond: bondView(companion, now),
+        // Out on the character's exploration: its gear waits for its return,
+        // in its words; null at home.
+        away: away ? companionText('away', companion, content) : null,
+        // The line of its item's card: who wears it and who pays.
+        wornBy: companionText('wornBy', companion, content),
+      };
+    }),
     candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content, points) })),
   };
 }
+
+// Whether a hired companion is out on the character's exploration now: it
+// set out with it (the exploration keeps it as it went, hunts.js) and comes
+// back with its report. One who stayed behind wounded is at home.
+function companionAway(player, companion) {
+  if (player.activity?.kind !== 'hunt') return false;
+  return (JSON.parse(player.activity.options ?? '{}').companions ?? []).some((one) => one.id === companion.id);
+}
+
+// While a companion is away, the changes of its gear wait for its return,
+// as the character's own equipment waits on an exploration (characters.js):
+// putting on an item from the bag and upgrading one it wears.
+function requireCompanionHome(player, companion, now) {
+  if (companionAway(player, companion)) requireIdle(player, now);
+}
+
 
 // The relation with a hired companion (296 A) and its talks (295 A): its
 // standing and the next, its bonus in a fight, the pieces of its story it
@@ -872,10 +905,10 @@ const backToBag = (db, row, item, saved, now) => {
 // { companionId, itemId }: the companion puts on an item from the bag in
 // its place (question 108 A), and what it wore there goes back to the bag.
 // At home or at a profession's work, as the character's own equipment
-// (inventory.js); an exploration keeps what it set out with.
+// (inventory.js); an exploration keeps what it set out with, so one away
+// on it waits for its return.
 export async function equipCompanion(context) {
   const { session, player } = await requirePlayer(context);
-  requireNotExploring(player, context.now);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
@@ -883,6 +916,7 @@ export async function equipCompanion(context) {
   const hired = stored.companions ?? [];
   const companion = hired.find((one) => one.id === body.companionId);
   if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
+  requireCompanionHome(player, companion, context.now);
   const item = player.items.find((one) => one.id === body.itemId && !one.equippedSlot);
   if (!item) throw new ApiError(404, 'item_not_found', 'Tego przedmiotu nie ma w plecaku.');
   const block = companionWearBlock(companion, item, content);
@@ -904,6 +938,72 @@ export async function equipCompanion(context) {
   if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(db, session.userId);
   return json({ settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now), character: characterView(after, context.now) });
+}
+
+// { companionId, slot, roll, ward, material }: one try at upgrading the item
+// a hired companion wears in `slot` on the camp's Kowadło (the author:
+// "niech tu będzie opcja kliknięcia w przedmiot i ulepszania go jak na
+// Kowadle"), by the same rules as the character's own items (inventory.js):
+// the Kowadło's levels, the chances, the price in the character's gold, iron
+// ore and materials, and a Zwój ochronny where the item may break. Only the
+// companion's item changes, kept in the Osada; a broken one is gone from
+// its place. While the companion is away on an exploration it waits, as
+// "Załóż z plecaka" does. The Osada and the payment are saved in one
+// statement, only while the character is as read (its version), so two
+// taps at once make and pay one try; and `roll`, the seed of the item's
+// last try as the card showed it, makes a second tap of the same card no
+// try even when it comes after the first is done.
+export async function upgradeCompanionItem(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const hired = stored.companions ?? [];
+  const companion = hired.find((one) => one.id === body.companionId);
+  if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
+  const item = COMPANION_SLOTS.includes(body.slot) ? companion.gear.find((one) => one.slot === body.slot) : null;
+  if (!item) throw new ApiError(404, 'item_not_found', companionText('noItem', companion, content));
+  const changedItem = () => new ApiError(409, 'item_changed', 'Przedmiot albo zapasy zmieniły się w międzyczasie. Spróbuj jeszcze raz.');
+  if (typeof body.roll === 'string' && body.roll !== (item.lastRoll ?? '')) throw changedItem();
+  requireCompanionHome(player, companion, context.now);
+  const plan = upgradePlan(player, item, body, context.now);
+  const pay = upgradePayment(plan);
+  const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
+  const outcome = rollUpgrade(item, createRng(roll), content, { warded: plan.warded });
+  const next = { ...stored, companions: hired.map((one) => (one === companion ? upgradedOnCompanion(one, body.slot, outcome, roll) : one)) };
+  const saved = JSON.stringify(next);
+  const db = context.env.DB;
+  const [result] = await db.batch([
+    db
+      .prepare(`UPDATE characters SET settlement = ?, ${pay.set}, version = version + 1 WHERE id = ? AND version = ? AND ${pay.enough}`)
+      .bind(saved, ...pay.binds, row.id, row.version, ...pay.enoughBinds),
+    // An upgrade that came off moves the Próby Gildii's trial on, as one of
+    // the character's own items does, only with this try saved (its seed
+    // makes the Osada saved its own).
+    ...trialProgress(db, row.id, { upgrades: outcome.result === 'success' ? 1 : 0 }, context.now, {
+      sql: '(SELECT settlement FROM characters WHERE id = ?) = ?',
+      binds: [row.id, saved],
+    }),
+  ]);
+  if (result.meta.changes !== 1) throw changedItem();
+  const after = await loadPlayer(db, session.userId);
+  return json({
+    upgrade: {
+      companionId: companion.id,
+      slot: body.slot,
+      name: itemName(item, content),
+      result: outcome.result,
+      from: plan.view.level,
+      to: outcome.upgrade,
+      cost: plan.cost,
+      ...(plan.stack && { material: { key: plan.stack, count: plan.taken } }),
+      ...(plan.warded && { warded: true }),
+      ...(outcome.saved && { saved: true }),
+    },
+    settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
+    character: characterView(after, context.now),
+  });
 }
 
 // { companionId }: the companion's gift of the week from its profession

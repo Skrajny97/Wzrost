@@ -209,6 +209,26 @@ export function companionAfterHunt(companion, { xp, fainted, minutes }, characte
 // the character's.
 export const companionReady = (companion, rested) => Boolean(companion) && (!companion.wounded || rested);
 
+// One of the companions' texts (texts in data/settlement.json) for a
+// companion: in its own form ([a|b]), with its {name} and `vars` filled in.
+export function companionText(key, companion, content, vars = {}) {
+  const words = { name: companion.name, ...vars };
+  return gendered(tuning(content).texts[key], companion.appearance).replace(/\{(\w+)\}/g, (_, name) => String(words[name] ?? ''));
+}
+
+// The companion after a try at upgrading the item it wears in `slot` on the
+// Kowadło (rollUpgrade in items.js; the author: "niech tu będzie opcja
+// kliknięcia w przedmiot i ulepszania go jak na Kowadle"): the item at its
+// new level, with the try's seed (`roll`) as the character's items keep it,
+// or gone from its place when it broke.
+export function upgradedOnCompanion(companion, slot, outcome, roll) {
+  const gear =
+    outcome.result === 'broken'
+      ? companion.gear.filter((item) => item.slot !== slot)
+      : companion.gear.map((item) => (item.slot === slot ? { ...item, upgrade: outcome.upgrade, lastRoll: roll } : item));
+  return { ...companion, gear };
+}
+
 // The places a companion wears items in (the design: "broń, pancerz,
 // talizman").
 export const COMPANION_SLOTS = ['weapon', 'chest', 'talisman'];
