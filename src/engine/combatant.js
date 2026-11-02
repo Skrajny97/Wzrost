@@ -130,19 +130,24 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   // curve trudności, bo wchodza na pełnej i towarzysze i ewolucje").
   const late = balance.monsters.lateGame;
   const later = midGameShare(level, late);
+  // Past the second evolution (endGame), as the characters' skills and gear
+  // keep growing, they grow on once more, the same way.
+  const end = balance.monsters.endGame;
+  const latest = midGameShare(level, end);
   const average =
     weaponDamage(hide, monster.attack.damageFactor, balance) *
     balance.monsters.damageMultiplier *
     groupFactor *
     (1 + mid.damage * stronger) *
     (1 + coop.damage) *
-    (1 + late.damage * later);
+    (1 + late.damage * later) *
+    (1 + end.damage * latest);
   const resist = {};
   for (const [element, value] of Object.entries(monster.resistances ?? {})) {
     resist[element] = Math.round(value.base + value.perLevel * (level - 1));
   }
   const rawHp = balance.monsters.hpBase + balance.character.hpPerVitality * stat('vitality') + balance.monsters.hpPerLevel * level;
-  const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp) * (1 + late.hp * later)));
+  const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp) * (1 + late.hp * later) * (1 + end.hp * latest)));
   return {
     id,
     side,

@@ -1074,7 +1074,8 @@
         "gearLagMinutes",
         "midGame",
         "coop",
-        "lateGame"
+        "lateGame",
+        "endGame"
       ],
       "properties": {
         "coop": {
@@ -1125,6 +1126,18 @@
         "lateGame": {
           "type": "object",
           "description": "Od fromLevel, gdzie w pełni działają towarzysze i ewolucje, potwory znów rosną w siłę: o damage więcej obrażeń i o hp więcej HP, rosnąco do pełnej wartości na toLevel i dalej (autor: „Od 50 lvla zwiększamy curve trudności, bo wchodza na pełnej i towarzysze i ewolucje”).",
+          "additionalProperties": false,
+          "required": ["fromLevel", "toLevel", "damage", "hp"],
+          "properties": {
+            "fromLevel": { "type": "integer", "minimum": 1 },
+            "toLevel": { "type": "integer", "minimum": 2 },
+            "damage": { "type": "number", "minimum": 0 },
+            "hp": { "type": "number", "minimum": 0 }
+          }
+        },
+        "endGame": {
+          "type": "object",
+          "description": "Od fromLevel, po drugiej ewolucji klasy, gdy umiejętności i ekwipunek postaci dalej rosną, potwory rosną w siłę jeszcze raz, tak samo jak w lateGame: o damage więcej obrażeń i o hp więcej HP, rosnąco do pełnej wartości na toLevel i dalej (autor: „od 100ego być mid”).",
           "additionalProperties": false,
           "required": ["fromLevel", "toLevel", "damage", "hp"],
           "properties": {
