@@ -232,6 +232,26 @@ describe('the Próby Gildii through the API', () => {
     assert.ok(row.done_at > 0);
   });
 
+  test('only an exploration that set out after the trial was taken moves it on, though a skip moves its start back', async () => {
+    await as('mistrz', 'GET', '/api/guild/trials');
+    await setBoard([{ kind: 'explore', size: 0, roll: 0 }]);
+    // On its way when the trial is taken: its report moves the trial not
+    // (the author: "żeby się nie naliczała wyprawa jedna do obu zadań").
+    assert.equal((await as('mistrz', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    await as('mistrz', 'POST', '/api/guild/trials/take', { index: 0 });
+    await as('mistrz', 'POST', '/api/test/skip-time');
+    assert.equal((await as('mistrz', 'POST', '/api/hunts/claim')).status, 200);
+    assert.equal((await as('mistrz', 'GET', '/api/guild/trials')).data.taken.progress, 0);
+    // Set out after the taking: it does, though the skip moved its start
+    // back before the taking.
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    await as('mistrz', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 });
+    await as('mistrz', 'POST', '/api/test/skip-time');
+    assert.equal((await as('mistrz', 'POST', '/api/hunts/claim')).status, 200);
+    assert.equal((await as('mistrz', 'GET', '/api/guild/trials')).data.taken.progress, 5);
+  });
+
   test('a trial of a guild left behind moves no more, and the next guild\'s trial takes its place', async () => {
     await as('druh', 'GET', '/api/guild/trials');
     await setBoard([{ kind: 'explore', size: 0, roll: 0 }]);

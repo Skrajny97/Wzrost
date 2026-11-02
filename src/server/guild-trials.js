@@ -92,6 +92,13 @@ export function trialProgress(db, characterId, progress, now, guard = null) {
   ];
 }
 
+// The guard of trialProgress for what an activity of some length brings (an
+// exploration, a gathering, a brewing): only a trial taken by the time it
+// really began (`begun` in its options, which a "Przewiń" leaves as it was)
+// moves on, as a trial's progress counts from its taking; none for an
+// activity begun before it was kept.
+export const takenBefore = (begun) => (Number.isFinite(begun) ? { sql: 'taken_at <= ?', binds: [begun] } : null);
+
 // What the character has of the parts of the game the trials need
 // (trialLock): true, false while it has not reached them, "off" where this
 // deployment has them not.

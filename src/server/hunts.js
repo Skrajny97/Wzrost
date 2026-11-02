@@ -79,7 +79,7 @@ import { toHex } from './encoding.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { eventDraftsOn, eventsOn, settlementOn } from './features.js';
-import { trialProgress } from './guild-trials.js';
+import { takenBefore, trialProgress } from './guild-trials.js';
 import { soldGold } from './inventory.js';
 import { finishGathering } from './professions.js';
 import { herbsOf, knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
@@ -365,6 +365,10 @@ export async function beginHunt(
       )
     : null;
   const options = {
+    // When it really set out, which a "Przewiń" leaves as it was (started_at
+    // moves back with a skip): a trial of the Próby Gildii moves on only
+    // with what set out after its taking (takenBefore in guild-trials.js).
+    begun: now,
     ...(rumor > 1 && { rumor }),
     ...(party.length > 0 && { companions: party }),
     ...(crew && { party: crew }),
@@ -827,8 +831,14 @@ export async function finishHunt(db, player, now, { choice } = {}) {
           ...(settlementAfter ? [settlementAfter] : []),
           row.id,
         ),
-      // The Próby Gildii's trial too (guild-trials.js).
-      ...trialProgress(db, row.id, progress, now),
+      // The Próby Gildii's trial too (guild-trials.js), one taken before the
+      // exploration set out: a trial's progress counts from its taking, so
+      // an exploration on its way when a trial is taken moves it not (the
+      // author: "żeby się nie naliczała wyprawa jedna do obu zadań"). A
+      // Szybkie or Błyskawiczne polowanie, over as it starts, counts from
+      // the moment it is made. One that set out before this rule moves the
+      // trial on as before.
+      ...trialProgress(db, row.id, progress, now, takenBefore(options.begun)),
       // Bag items the scrapper bought: paid for above, while they were still there.
       ...(soldStored.length > 0
         ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${soldStored.map(() => '?').join(', ')})`).bind(row.id, ...soldStored)]

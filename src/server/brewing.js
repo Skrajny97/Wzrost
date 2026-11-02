@@ -35,7 +35,7 @@ import { content } from './content.js';
 import { buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
-import { trialProgress } from './guild-trials.js';
+import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, insertWork, requireProfessions, takeFromBag, workGains } from './professions.js';
 import { herbsOf, potionKnown, potionsOf } from './professions-view.js';
@@ -106,7 +106,8 @@ export async function startBrewing(context) {
       now,
       seed,
       hp,
-      options: { recipe: potion.id, count: body.count, herbs: used, ...(catalyst && { catalyst }) },
+      // `begun`: when it really began, for the Próby Gildii (takenBefore).
+      options: { recipe: potion.id, count: body.count, herbs: used, ...(catalyst && { catalyst }), begun: now },
     }),
   ]);
   if (taken.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
@@ -212,7 +213,8 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
         )
         .bind(row.quests, quests, ...sets.binds, ...herbsBack.binds, ...catalystsBack.binds, ...potions.binds, row.id, row.id, activity.started_at),
       // The Próby Gildii's trial too (guild-trials.js).
-      ...trialProgress(db, row.id, { potions: { [potion.id]: made.count } }, now),
+      // A trial taken before the brewing began (takenBefore).
+      ...trialProgress(db, row.id, { potions: { [potion.id]: made.count } }, now, takenBefore(options.begun)),
       end,
     ]);
   } catch (error) {

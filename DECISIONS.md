@@ -2996,6 +2996,13 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Próby Gildii: tylko wyprawy rozpoczęte po wzięciu próby (2.11.2026)
+
+Autor: „uważaj z tym, żeby się nie naliczała wyprawa jedna do obu zadań, zaliczyło mi próbę, mimo że nie odebrałem raportu” (zrzut: „Spędź na wyprawach łącznie 45 minut” wykonana, „… 105 minut” wzięta).
+
+1. **Kiedy wyprawa liczy się do próby.** Próba rośnie przy „Odbierz raport”, a Szybkie i Błyskawiczne Polowanie liczą się od razu, bo dają raport od razu. Teraz liczy się tylko wyprawa, która wyruszyła po wzięciu próby. Wyprawa będąca w drodze, gdy postać bierze próbę, tej próby nie posuwa, więc jedna wyprawa nie zaliczy dwóch prób jedna po drugiej. To samo dotyczy zbierania ziół i warzenia mikstur, bo też trwają w czasie.
+2. **„Przewiń” niczego nie psuje (brakujący szczegół).** „Przewiń” przesuwa zapisany początek wyprawy wstecz, więc gra zapisuje osobno chwilę, w której wyprawa naprawdę wyruszyła (`begun`). Szybkie i Błyskawiczne Polowanie liczą się od chwili, w której gracz je zlecił. Wyprawy, zbieranie i warzenie rozpoczęte przed tą zmianą liczą się po staremu.
+
 ## Wersja 0.0.84 (2.11.2026)
 
 1. **Co wchodzi do gry:** prośba w Gildii wycofana, zanim ktoś coś dał, znika, więc nową dodasz od razu (zob. sekcję niżej).
