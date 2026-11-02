@@ -3,14 +3,14 @@
 // The item card also upgrades the item on the camp's Kowadło and takes a bag
 // item apart on the Stół rozbiórki.
 
-import { herbSprite, itemSprite, materialSprite, portraitSprite, potionSprite, resourceArt } from '../art.js';
+import { herbSprite, itemSprite, materialSprite, potionSprite, resourceArt } from '../art.js';
 import { bonusList } from '../bonuses.js';
+import { characterLook, portraitLayers } from '../cosmetics.js';
 import { MATERIALS_HINT, craft, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { askGuildButton } from '../guild-requests.js';
 import { formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, saleGold, timeFormat } from '../format.js';
 import { SLOT_ICONS, itemIcon } from '../icons.js';
-import { portrait } from '../portraits.js';
 import { playSound } from '../sound.js';
 import { call, costShortfall, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
 import { scrapperSheet } from '../scrapper.js';
@@ -121,13 +121,18 @@ export function mountCharacter(container) {
         { class: `slots slots--${side}` },
         slots.filter((slot) => slot.column === side).map((slot) => slotButton(slot, character.equipment[slot.id])),
       );
-    // The forest, and over it the class's figure in the character's look.
-    const figure = portraitSprite(character.classId, character.appearance, { skin: character.skin, evolution: character.evolution?.current?.id });
-    const art = figure ? [portrait(character.classId, { figure: false }), figure] : [portrait(character.classId)];
-    frame.append(h('div', { class: 'portrait-art' }, art), column('left'), column('right'), eye);
+    // The forest, or the background bought in the Sklep Systemu, and over it
+    // the class's figure in the character's look; with a frame worn, both in
+    // its window, under the frame, the slots and the eye (cosmetics.js).
+    const layers = portraitLayers(characterLook(character), character.cosmetics);
+    frame.classList.toggle('portrait--framed', layers.length > 1);
+    frame.append(...layers, column('left'), column('right'), eye);
 
     fill(container,
-      pageHeading(character.name, `${character.className}${character.evolution?.current ? ` (z klasy: ${character.baseClassName})` : ''} · ${POSITION_NAMES[character.position]} · solo`, { tag: character.guildTag }),
+      pageHeading(character.name, `${character.className}${character.evolution?.current ? ` (z klasy: ${character.baseClassName})` : ''} · ${POSITION_NAMES[character.position]} · solo`, {
+        tag: character.guildTag,
+        nameColor: character.nameColor,
+      }),
       // What works on the character now, over its figure (the author).
       bonusList(character),
       h('div', { class: 'portrait-wrap' }, frame),

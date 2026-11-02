@@ -20,6 +20,7 @@ import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-b
 import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, takeGuildTrial } from './guild-trials.js';
 import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, thankForGuildGift } from './guild-requests.js';
 import { craftMaterials, salvageItem, sellMaterials, skipCrafting } from './crafting.js';
+import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
   autoPoints,
@@ -117,6 +118,10 @@ const routes = [
   ['POST', '/api/evolution/test-level', testClassLevel],
   ['POST', '/api/evolution/points', decidePointsReset],
   ['POST', '/api/gift-code', redeemGiftCode],
+  // The Sklep Systemu (cosmetics.js).
+  ['POST', '/api/cosmetics/buy', buyCosmetic],
+  ['POST', '/api/cosmetics/wear', wearCosmetic],
+  ['POST', '/api/cosmetics/name-color', setNameColor],
   ['POST', '/api/items/:id/equip', equipItem],
   ['POST', '/api/items/:id/unequip', unequipItem],
   ['POST', '/api/items/:id/discard', discardItem],

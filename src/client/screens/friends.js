@@ -11,7 +11,7 @@ import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { playSound } from '../sound.js';
 import { call, state, walletEntries } from '../state.js';
-import { guildTag, howItWorks, toast, withButton } from '../ui.js';
+import { framedName, guildTag, howItWorks, toast, withButton } from '../ui.js';
 import { proposeTrade } from './trade.js';
 
 const resourceName = (id) => walletEntries().find((entry) => entry.id === id)?.name ?? id;
@@ -91,13 +91,16 @@ export function mountFriends(container) {
       { class: 'friend-who' },
       person.status && h('span', { class: `friend-status friend-status--${person.status}`, role: 'img', 'aria-label': STATUS[person.status], title: STATUS[person.status] }),
       icon(CLASS_ICONS[person.classId] ?? 'person', { size: 16, className: 'chat-class' }),
-      h('button', {
-        type: 'button',
-        class: 'chat-name',
-        text: person.name,
-        'aria-label': `${person.name}: zobacz postać`,
-        onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name, { onChange: show })),
-      }),
+      framedName(
+        h('button', {
+          type: 'button',
+          class: 'chat-name',
+          text: person.name,
+          'aria-label': `${person.name}: zobacz postać`,
+          onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name, { onChange: show })),
+        }),
+        person.nameColor,
+      ),
       guildTag(person.guildTag),
       h('span', { class: 'chat-level', text: `poz. ${person.level}` }),
       more,

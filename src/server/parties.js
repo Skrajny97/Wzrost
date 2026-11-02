@@ -34,6 +34,7 @@
 import { areaFor, areaUnlocked, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange } from '../engine/index.js';
 import { characterView, currentHp, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
+import { nameColorOf } from './cosmetics.js';
 import { settlementOn } from './features.js';
 import { guildTagSql } from './guilds.js';
 import { beginHunt } from './hunts.js';
@@ -132,7 +133,7 @@ export async function partyView(db, characterId, now) {
   const [members, sent, invites, self] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.name, c.class_id, c.level, c.class_level, c.role, c.settlement, u.seen_at, ${guildTagSql('c.id')} AS guild_tag,
+        `SELECT c.id, c.name, c.class_id, c.level, c.class_level, c.role, c.settlement, c.cosmetics, u.seen_at, ${guildTagSql('c.id')} AS guild_tag,
                 (SELECT a.kind FROM activities a WHERE a.character_id = c.id) AS activity
          FROM party_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
          WHERE m.party_id = ? ORDER BY m.joined_at, m.character_id`,
@@ -154,6 +155,7 @@ export async function partyView(db, characterId, now) {
     id: row.id,
     name: row.name,
     guildTag: row.guild_tag ?? null,
+    nameColor: nameColorOf(row.cosmetics),
     classId: row.class_id,
     className: content.classesById[row.class_id]?.name ?? '',
     level: row.level,

@@ -7,6 +7,7 @@
 // the hammer, or the shadow of a creature of the place passing far away.
 
 import { herbSprite, itemSprite, monsterSprite, placeArt, potionSprite, riderFile, walkerSheet } from './art.js';
+import { cosmeticOf } from './cosmetics.js';
 import { h } from './dom.js';
 import { motionOn } from './motion.js';
 import { state } from './state.js';
@@ -97,9 +98,12 @@ export function walkScene(activity) {
 // tools/ride-sheets.py; the rider's own `seat` in walk.rider). The rider's
 // rise and fall is the mount's keyframes in styles.css (ride-<id>), started
 // with its frames, so the two keep in step. Null without a mount, or while
-// the mount or the look has no pictures.
+// the mount or the look has no pictures. A mount's look from the Sklep
+// Systemu (the Tygrys szablozębny) trots in its place, by its own key in
+// walk.mounts, once that is drawn; till then the mount itself does.
 function ride(walk, character) {
-  const trot = character?.mount && walk.mounts?.[character.mount.id];
+  const id = mountLook(walk, character);
+  const trot = id && walk.mounts?.[id];
   const file = trot && riderFile(character.classId, character.appearance, character.skin, character.evolution?.current?.id);
   if (!file) return null;
   const [x, y] = trot.seats[0];
@@ -120,8 +124,21 @@ function ride(walk, character) {
   element.style.setProperty('--duration', `${trot.frames / trot.fps}s`);
   element.style.setProperty('--rider-x', `${x - seatX}px`);
   element.style.setProperty('--rider-y', `${top + y - seatY}px`);
-  element.style.setProperty('--ride', `ride-${character.mount.id}`);
+  // The rider follows the saddle frame by frame (ride-<frames> in styles.css).
+  trot.seats.forEach(([seatXi, seatYi], i) => {
+    element.style.setProperty(`--rx${i}`, `${seatXi - x}px`);
+    element.style.setProperty(`--ry${i}`, `${seatYi - y}px`);
+  });
+  element.style.setProperty('--ride', `ride-${trot.frames}`);
   return element;
+}
+
+// The key of the trot the character rides in walk.mounts: its mount's look
+// worn, while that has a trot, else its Stajnia's mount; null without one.
+function mountLook(walk, character) {
+  if (!character?.mount) return null;
+  const look = cosmeticOf(character.cosmetics?.mountSkin);
+  return look && walk.mounts?.[look.art] ? look.art : character.mount.id;
 }
 
 // Herbs in the basket, potions on the shelf, items on the table: the things

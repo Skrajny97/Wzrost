@@ -13,6 +13,7 @@ import { blockedName, isUnlocked } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
+import { nameColorOf } from './cosmetics.js';
 import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
 
@@ -64,7 +65,7 @@ export async function guildView(db, characterId, now) {
   const [members, sent, invites, friends] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, m.role, u.seen_at
+        `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, c.cosmetics, m.role, u.seen_at
          FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
          WHERE m.guild_id = ? ORDER BY CASE m.role WHEN 'leader' THEN 0 WHEN 'deputy' THEN 1 ELSE 2 END, m.joined_at, m.character_id`,
       )
@@ -80,7 +81,7 @@ export async function guildView(db, characterId, now) {
       .bind(characterId),
     db
       .prepare(
-        `SELECT o.id, o.name, o.class_id, o.level, o.role AS played, u.seen_at
+        `SELECT o.id, o.name, o.class_id, o.level, o.role AS played, o.cosmetics, u.seen_at
          FROM friends f JOIN characters o ON o.id = CASE WHEN f.character_id = ? THEN f.friend_id ELSE f.character_id END JOIN users u ON u.id = o.user_id
          WHERE (f.character_id = ? OR f.friend_id = ?) AND f.accepted_at IS NOT NULL AND ? AND o.${OWN_CHARACTERS}
            AND NOT EXISTS (SELECT 1 FROM guild_members m WHERE m.character_id = o.id)
@@ -102,6 +103,8 @@ export async function guildView(db, characterId, now) {
       members: members.results.map((row) => ({
         id: row.id,
         name: row.name,
+        // Its name in its frame's colour, or null (cosmetics.js).
+        nameColor: nameColorOf(row.cosmetics),
         classId: row.class_id,
         level: row.level,
         role: row.role,
@@ -110,7 +113,7 @@ export async function guildView(db, characterId, now) {
         online: online(row),
       })),
       invited: sent.results.map((row) => ({ id: row.id, name: row.name })),
-      friends: friends.results.map((row) => ({ id: row.id, name: row.name, classId: row.class_id, level: row.level, online: online(row) })),
+      friends: friends.results.map((row) => ({ id: row.id, name: row.name, nameColor: nameColorOf(row.cosmetics), classId: row.class_id, level: row.level, online: online(row) })),
     },
     invites: invites.results.map((row) => ({ guildId: row.guild_id, name: row.name, tag: row.tag, invitedBy: row.invited_by, members: row.members, at: row.created_at })),
     rules: { foundLevel: found.level, foundGold: found.gold, size, name, tag },

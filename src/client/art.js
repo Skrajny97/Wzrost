@@ -295,13 +295,24 @@ export const SPRITES = {
   },
   // The Stajnia's mounts (data/settlement.json, stable.mounts, by id), saddled
   // and seen from the side, cut to their outline, on their cards in the
-  // Stajnia. Their trot for the Walka scene is a sheet of its own
-  // (data/animations.json, walk.mounts).
+  // Stajnia, and the look a mount can wear from the Sklep Systemu
+  // ("sabertooth", the Tygrys szablozębny). Their trot for the Walka scene
+  // is a sheet of its own (data/animations.json, walk.mounts).
   mounts: {
     width: 168,
     height: 144,
     fit: true,
-    ids: [],
+    ids: ['pony', 'horse', 'steed', 'sabertooth'],
+  },
+  // The Sklep Systemu's frames of the portrait, 120×160 with a window in the
+  // middle, and its backgrounds behind the figure, 96×128
+  // (data/cosmetics.json, by their art). A mount's look has its picture
+  // among the mounts.
+  cosmetics: {
+    width: 120,
+    height: 160,
+    fit: true,
+    ids: ['frame-gold', 'frame-system', 'frame-forest', 'bg-spring', 'bg-tower', 'bg-camp'],
   },
   // The character riding, <class>-<look> or an evolution's
   // <evolution>-<look>: one picture sitting in a saddle that is not drawn
@@ -467,6 +478,10 @@ export function walkerSheet(classId, appearance, skin, evolution) {
   const id = evolved && available.walkers.has(evolved) ? evolved : `${classId}-${appearance}`;
   return available.walkers.has(id) ? `art/walkers/${toneFile(id, skin)}.png` : null;
 }
+
+// The address of a frame's or a background's picture (the Sklep Systemu),
+// or null while it has none.
+export const cosmeticArt = (art) => (available.cosmetics.has(art) ? `/art/cosmetics/${art}.png` : null);
 
 // A mount of the Stajnia on its card, or null while it has no picture.
 export const mountArt = (id) =>

@@ -13,7 +13,7 @@ import { formatCountdown, formatMinutes, formatNumber, formatShort } from './for
 import { SYSTEM_POINTS_ICON } from './icons.js';
 import { anyClaimable, showQuests } from './quests.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
-import { meter, toast } from './ui.js';
+import { meter } from './ui.js';
 
 // A profession's work, by the kind of its activity: its screen and its name
 // in the top bar.
@@ -92,20 +92,9 @@ export function buildTopbar(onSettings) {
     },
     narratorFace(),
   );
-  // The place of the Sklep Systemu beside him, locked like the Rdzeń until
-  // it comes (the author: "na razie tylko jakąś specjalną ikonę i
-  // zablokowane kłódką jak Rdzeń").
-  const shop = h(
-    'button',
-    {
-      type: 'button',
-      class: 'system-shop',
-      'aria-label': 'Sklep Systemu, zablokowane',
-      onClick: () => toast('Sklep Systemu dojdzie w jednej z kolejnych aktualizacji.'),
-    },
-    icon('shop', { size: 24 }),
-    icon('lock', { size: 12, className: 'system-shop-lock' }),
-  );
+  // The Sklep Systemu beside him, the System's stall (the author: "jakąś
+  // specjalną ikonę"), open since its cosmetics came (screens/shop.js).
+  const shop = h('a', { class: 'system-shop', href: '#/sklep', 'aria-label': 'Sklep Systemu' }, icon('shop', { size: 24 }));
   const campLabel = h('span', { class: 'camp-label' });
   const camp = h('a', { class: 'camp-button', href: '#/oboz', 'aria-label': 'Obóz' }, icon('tent'), campLabel);
   const hp = meter({ label: 'HP', value: 0, max: 0, kind: 'hp' });
@@ -372,6 +361,9 @@ export function updateNav({ kind, active, onBack }) {
   const encyclopedia = $('.encyclopedia-button');
   if (active === 'encyklopedia') encyclopedia?.setAttribute('aria-current', 'page');
   else encyclopedia?.removeAttribute('aria-current');
+  const shop = $('.system-shop');
+  if (active === 'sklep') shop?.setAttribute('aria-current', 'page');
+  else shop?.removeAttribute('aria-current');
   const main = $('#nav-main');
   const character = $('#nav-character');
   main.hidden = kind !== 'main';

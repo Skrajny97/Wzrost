@@ -174,6 +174,10 @@ export function buildContent(raw) {
     towers: raw.towers ?? null,
     // The players' Gildie (src/server/guilds.js).
     guilds: raw.guilds ?? null,
+    // The Sklep Systemu's cosmetics (cosmetics.js) and the words of its page.
+    cosmetics: raw.cosmetics?.items ?? [],
+    cosmeticsById: byId(raw.cosmetics?.items ?? []),
+    cosmeticTexts: raw.cosmetics?.texts ?? null,
     residentsById: byId(raw.settlement?.residents ?? []),
   };
 }

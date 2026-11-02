@@ -18,6 +18,7 @@ import { isUnlocked, itemView } from '../engine/index.js';
 import { isAuthor } from './author.js';
 import { content } from './content.js';
 import { friendNews } from './community.js';
+import { nameColorOf } from './cosmetics.js';
 import { guildChannel, guildNews, guildOf, guildTagSql } from './guilds.js';
 import { partyNews } from './parties.js';
 import { tradeNews } from './trades.js';
@@ -123,6 +124,8 @@ const messageView = (row, userId, env) => ({
   name: row.name,
   // The writer's guild now, in square brackets beside its name (guilds.js).
   guildTag: row.guild_tag ?? null,
+  // The writer's name in its frame's colour now, or null (cosmetics.js).
+  nameColor: nameColorOf(row.cosmetics),
   level: row.level,
   classId: row.class_id,
   text: row.text,
@@ -176,7 +179,7 @@ export async function requireChatter(context) {
   const session = await requirePlayable(context);
   const db = context.env.DB;
   const [characters, accounts] = await db.batch([
-    db.prepare("SELECT id, name, level, class_id FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId),
+    db.prepare("SELECT id, name, level, class_id, cosmetics FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId),
     db.prepare('SELECT login, google_sub, chat_moderator, chat_rules_at, chat_muted_until, trade_off, seen_at FROM users WHERE id = ?').bind(session.userId),
   ]);
   const character = characters.results[0];
@@ -229,7 +232,7 @@ export async function readChat(context) {
     db
       .prepare(
         `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, u.login, u.google_sub, u.chat_moderator,
-                ${guildTagSql('m.character_id')} AS guild_tag
+                c.cosmetics, ${guildTagSql('m.character_id')} AS guild_tag
          FROM chat_messages m JOIN users u ON u.id = m.user_id LEFT JOIN characters c ON c.id = m.character_id
          WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)
          ORDER BY m.id DESC LIMIT ?`,
@@ -411,7 +414,19 @@ export async function sendChat(context) {
       .bind(...binds, ...binds, other ? privateKeep : keep),
   ]);
   if (sent.meta.changes !== 1) throw new ApiError(429, 'too_fast', `Za szybko. Kolejną wiadomość wyślesz po ${everySeconds} sekundach.`);
-  const row = { ...account, id: sent.meta.last_row_id, user_id: userId, character_id: character.id, name: character.name, level: character.level, class_id: character.class_id, text, items, created_at: now };
+  const row = {
+    ...account,
+    id: sent.meta.last_row_id,
+    user_id: userId,
+    character_id: character.id,
+    name: character.name,
+    level: character.level,
+    class_id: character.class_id,
+    cosmetics: character.cosmetics,
+    text,
+    items,
+    created_at: now,
+  };
   return json({ message: messageView(row, userId, context.env) }, 201);
 }
 

@@ -26,7 +26,7 @@ import { mountGuildTrials } from '../guild-trials.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, state } from '../state.js';
-import { confirmAction, toast, withButton } from '../ui.js';
+import { confirmAction, framedName, toast, withButton } from '../ui.js';
 import { lockedScreen } from './locked.js';
 
 const PAGE = '#/gildia';
@@ -143,7 +143,10 @@ function mountGuild(container) {
       { class: 'friend-who' },
       person.online !== undefined && h('span', { class: `friend-status friend-status--${person.online ? 'online' : 'offline'}`, role: 'img', 'aria-label': person.online ? 'w grze' : 'poza grą' }),
       icon(CLASS_ICONS[person.classId] ?? 'person', { size: 16, className: 'chat-class' }),
-      h('button', { type: 'button', class: 'chat-name', text: person.name, 'aria-label': `${person.name}: zobacz postać`, onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)) }),
+      framedName(
+        h('button', { type: 'button', class: 'chat-name', text: person.name, 'aria-label': `${person.name}: zobacz postać`, onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)) }),
+        person.nameColor,
+      ),
       person.level && h('span', { class: 'chat-level', text: `poz. ${person.level}` }),
       more,
     );

@@ -30,6 +30,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `forge.js` | Kuźnia w Osadzie: Zwoje ochronne i przekucie przedmiotu na wyższą rzadkość |
 | `parties.js` | Drużyna: rozpiętość poziomów klas i kto zostaje w drużynie, gdy poziomy się rozjadą |
 | `towers.js` | Wieże Systemu: podwaliny, jeszcze poza grą |
+| `cosmetics.js` | Sklep Systemu: ramki, tła i wygląd wierzchowca za Punkty Systemu, co postać ma i nosi, oraz kolor imienia z ramki |
 | `gifts.js`, `gift-codes.js` | Upominek między znajomymi i kody podarunkowe |
 | `names.js`, `text.js`, `mail.js`, `notifications.js` | filtr imion postaci, warianty tekstów raportu, treść e-maila i powiadomienia na telefon |
 

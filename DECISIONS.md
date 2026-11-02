@@ -2996,6 +2996,33 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Tygrys szablozębny 371 B, szaty jeźdźców i tło obozu 372 B (2.11.2026)
+
+Autor: „371 B”, „372 B” i „Problemem są trochę postacie w szatach, bo u nich się to inaczej układają te szaty przy jeździe, ale podejrzewam, że szkoda zachodu i nic się nie udałoby z tym zrobić, wyszłoby tylko gorzej”.
+
+1. **Tygrys szablozębny** to najpierw wersja B, a po uwadze autora o chodzie („tylne łapy w ogóle się nie przecinają, a w chodzie powinny”; „wybierz inną z możliwych opcji tygrysa”) wersja A, która stoi z tylnymi łapami pod biodrem: pręgowany, z długimi kłami, ogonem, siodłem na futrzanej derce z kościanymi ozdobami i uzdą. Obrazek przycięty do konturu jest w `src/client/art/mounts/sabertooth.png`, a pierwsza klatka jego chodu, z miejscem na ruch łap, w `art/references/mounts/sabertooth.png`. Chód rysuje PixelLab według szkieletu, jak kłus koni (`tools/mount-gait.py`, `tools/animate-mounts-skeleton.mjs`): krok dużego kota, łapa po łapie, 12 klatek, 10 na sekundę. Po uwagach autora („Tygrys teraz chodzi jak koń”, „wygląda, jakby miał złamane te łapy albo się skradał, nie jak tygrys”) tułów i głowa zostają na wysokości z obrazka. Łapa, która stoi, jest prosta, a łapa w kroku zgina się w nadgarstku. Tylne łapy mijają się w kroku. Barki i biodra unoszą się lekko nad łapą, która stoi.
+2. **Szaty jeźdźców zostają takie, jak są.** Postacie w długich szatach siedzą w nich tak, jak narysował je Retro Diffusion. Znika tylko druga stopa spod szaty.
+3. **Tło „Obóz nocą” (372 B):** nowa wersja z ogniskiem bliżej środka i namiotem za postacią. Zastępuje pierwszą, z ogniskiem pod postacią. Plik ten sam: `src/client/art/cosmetics/bg-camp.png`.
+
+## Wersja 0.0.79 (2.11.2026)
+
+Zasada 365 A: skończony etap trafia do gry od razu.
+
+1. **Co wchodzi do gry:**
+    - wierzchowce ze Stajni kłusują w scenie Walki, a postać jedzie na nich w siodle, z jedną nogą po bliższej stronie (zob. sekcję niżej);
+    - Kuc, Koń wierzchowy i Rumak mają w Stajni swoje obrazki;
+    - przycisk „Usuń postać” w Ustawieniach (dawniej „Zacznij od nowa”), z wpisaniem imienia postaci.
+2. **Pierwsze wdrożenie zatrzymane.** Pierwsze wdrożenie 0.0.79 zostało przerwane przed wejściem do gry, bo autor uznał, że zwierzęta źle chodzą, a tygrys utyka. Gra została wtedy na 0.0.78. Wersja 0.0.79 wchodzi z nowym kłusem i pod tym samym numerem.
+3. **Kłus według szkieletu.** PixelLab nie dostaje już opisu kłusu słowami. Rysuje wierzchowca w pozach ustawionych szkieletem, klatka po klatce. `tools/mount-gait.py` liczy pozy kłusa: przekątne pary nóg idą razem, a tułów jest najniżej, gdy para stoi pod nim. Kopyto sunie po ziemi do tyłu, potem unosi się i przechodzi do przodu. Kolano przednie zgina się do przodu, a staw skokowy do tyłu. `tools/animate-mounts-skeleton.mjs` wysyła te pozy do PixelLab. Każdy wierzchowiec ma 8 klatek, 8 na sekundę. Siodło w każdej klatce znajduje `tools/ride-sheets.py`, szukając go od obrazka startowego wierzchowca, a jeździec unosi się i opada razem z nim. Przy wyłączonych animacjach scena stoi, jak przy chodzie. Autor przyjął kłus Konia i Rumaka.
+4. **Grzbiet Kuca.** Kuc był narysowany z wcięciem w grzbiecie za siodłem i z luką pod siodłem, więc prześwitywało tło, także pod jeźdźcem. `tools/mount-trots.py` wypełnia te luki od dołu, kolorem sierści obok (`patch` w `art/mounts.json`), w każdej klatce i na obrazku w Stajni. Kremowa łata z zadu przechodzi pod siodło, a stary brzeg zadu nie zostawia ciemnej kreski.
+5. **Jeszcze nie w grze:**
+    - Próby i Prośby Gildii;
+    - ekran Bestii Gildii (serwer Bestii już jest, ale strona Gildii go jeszcze nie pokazuje);
+    - Sklep Systemu z ramkami, tłami i Tygrysem szablozębnym.
+
+   Arkusz chodu tygrysa jest już w plikach gry, ale nie używa go nic, dopóki nie wejdzie Sklep.
+6. **Przed wdrożeniem:** wszystkie testy (787) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na telefonie i na komputerze (`tools/first-steps.cjs`).
+
 ## Wierzchowce, jeźdźcy, kosmetyki i „Usuń postać”: odpowiedzi autora 366–368 (2.11.2026)
 
 Autor: „366 C, 367 B, 368 C”, „Postacie powinny mieć tylko jedną nogę widoczną jadąc na wierzchowcu (bo drugą mają przewieszoną na drugą stronę siedząc)”, „nie te nogę usuwasz”, „ma znikać noga, która jest z drugiego boku wierzcha, ma być widoczna tylko jedna przednia”, „Co do kosmetyków to miałeś zrobić je wspólne dla wszystkich, a nie przemalować szatę jednej klasy. Ergo tylko ramki i tła wchodzą póki co do gry, wszystkie. Wraz z ramkami wchodzi opcja zmiany wyświetlanego koloru na czacie na ten z ramki”, „Do tego dorób jednego wierzchowca w formie kosmetyku za 1000 Punktów Systemu i niech wygląda jak tygrys szablozębny i tak się nazywa” i „Dodaj też opcję »Usuń postać«, bo jest tylko »Usuń konto«”.

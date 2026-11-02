@@ -38,6 +38,7 @@ import giftCodes from '../../data/gift-codes.json' with { type: 'json' };
 import settlement from '../../data/settlement.json' with { type: 'json' };
 import towers from '../../data/towers.json' with { type: 'json' };
 import guilds from '../../data/guilds.json' with { type: 'json' };
+import cosmetics from '../../data/cosmetics.json' with { type: 'json' };
 
 export const content = buildContent({
   stats,
@@ -71,6 +72,7 @@ export const content = buildContent({
   settlement,
   towers,
   guilds,
+  cosmetics,
 });
 
 // The parts of the game this deployment has on, for the System's messages
@@ -136,6 +138,10 @@ export function publicContent() {
     // The words of "Poproś gildię", shown where pieces are missing, before
     // the Prośby Gildii answer (src/client/guild-requests.js).
     guildAsk: content.guilds.requests.texts.ask,
+    // The Sklep Systemu (cosmetics.js): its cosmetics with their prices and
+    // looks, for the shop and for every portrait and name that wears one,
+    // and the words of its page.
+    cosmetics: { items: content.cosmetics, texts: content.cosmeticTexts },
     giftTexts: content.giftTexts,
     elements: content.elements.map(({ id, name, resistance, color }) => ({ id, name, resistance, color })),
     effects: content.effects.map(({ id, name, color }) => ({ id, name, color })),
