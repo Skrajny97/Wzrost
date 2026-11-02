@@ -1,0 +1,21 @@
+{
+  "id": "winter-lord-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "an old king of winter with white hair and a white beard, an ice crown, a long dark blue coat with white frost embroidery, a white fur mantle with ice pauldrons, dark boots, a sword at his hip and a staff topped with a big ice crystal in his right hand, seen from the side, facing and walking to the right, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "references": [
+    {
+      "path": "art/references/evolutions/winter-lord-male.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

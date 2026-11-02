@@ -1,0 +1,21 @@
+{
+  "id": "berserker-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a huge bearded barbarian berserker with a whole bear head and pelt over his head and shoulders, a bare scarred muscular chest, leather bracers with iron bands, a fur kilt with a wide belt, fur-wrapped boots, a big axe in his right hand, seen from the side, facing and walking to the right, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "references": [
+    {
+      "path": "art/references/evolutions/berserker-male.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
