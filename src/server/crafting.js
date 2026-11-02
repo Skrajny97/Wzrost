@@ -20,6 +20,7 @@ import {
   materialPrice,
   orderMaterials,
   orderSalvage,
+  orderSalvageMany,
   parseStack,
   patternFrom,
   settleCrafting,
@@ -176,6 +177,76 @@ export async function salvageItem(context) {
       parts: order.parts,
       endsAt: order.endsAt,
       ...(pattern && { pattern: content.basesById[pattern].name }),
+    },
+    character: characterView(await loadPlayer(db, session.userId), now),
+  });
+}
+
+// Several items from the bag taken apart at once, { ids: [...] } ("Rozbierz
+// kilka", the author: "zaznaczać które chcemy (i możemy) przedmioty i dać do
+// rozbiórki"): one order for each kind of part (orderSalvageMany), the parts
+// and the time as one by one. All or none: the orders are saved only while
+// every item is still in the bag, and the items go only with those orders.
+export async function salvageItems(context) {
+  const { session, player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  const ids = Array.isArray(body.ids) ? [...new Set(body.ids.filter((id) => Number.isSafeInteger(id)))] : [];
+  if (ids.length === 0) throw new ApiError(400, 'invalid_items', 'Zaznacz przedmioty do rozbiórki.');
+  const items = ids.map((id) => player.items.find((candidate) => candidate.id === id));
+  if (items.includes(undefined)) throw new ApiError(404, 'item_not_found', 'Któregoś z tych przedmiotów nie masz już w plecaku.');
+  if (items.some((item) => item.equippedSlot)) throw new ApiError(409, 'equipped', 'Założonych przedmiotów nie rozbierzesz. Najpierw je zdejmij.');
+  const now = context.now;
+  const table = tableOf(player, now);
+  const rare = items.find((item) => !craftTakes(table, item.rarity, content));
+  if (rare) throw tooRare(rare.rarity);
+  const settled = settleCrafting(craftingState(player.row), now);
+  const entries = items.map((item) => ({ item, name: itemName(item, content) }));
+  const state = withIds(settled.queue.length, orderSalvageMany(settled, entries, table, now, newRng(), content));
+  const orders = state.queue.slice(settled.queue.length);
+  const { queueLimit } = content.balance.crafting;
+  if (state.queue.length > queueLimit) {
+    const room = Math.max(0, queueLimit - settled.queue.length);
+    throw new ApiError(
+      409,
+      'queue_full',
+      room === 0
+        ? `Kolejka stołu jest pełna (${queueLimit} zleceń). Poczekaj, aż skończy się któreś.`
+        : `Każda rzadkość części to osobne zlecenie stołu. Zaznaczone przedmioty potrzebują ich: ${orders.length}, a wolne miejsca w kolejce: ${room}. Zaznacz mniej rzadkości albo poczekaj, aż stół skończy któreś zlecenie.`,
+    );
+  }
+  const db = context.env.DB;
+  const row = player.row;
+  const quests = addQuestProgress(questsNow(player, now), { salvaged: items.length });
+  // With Rzemieślnictwo, every item of a pattern the Warsztat does not show
+  // yet teaches it, each pattern once.
+  const learned = JSON.parse(row.patterns ?? '[]');
+  const patterns = craftingOn()
+    ? items.reduce((known, item) => {
+        const pattern = patternFrom(item, known, content);
+        return pattern ? [...known, pattern] : known;
+      }, learned)
+    : learned;
+  const taught = patterns.slice(learned.length);
+  const list = JSON.stringify(ids);
+  const saved = `EXISTS (SELECT 1 FROM characters WHERE id = ? AND instr(crafting, ?) > 0)`;
+  const marker = [row.id, `"id":"${orders[0].id}"`];
+  const [result] = await db.batch([
+    saveState(db, row, state, {
+      quests,
+      ...(taught.length > 0 && { patterns }),
+      condition: ' AND (SELECT COUNT(*) FROM items WHERE character_id = ? AND slot IS NULL AND id IN (SELECT value FROM json_each(?))) = ?',
+      binds: [row.id, list, ids.length],
+    }),
+    // The Próby Gildii's trial too, only with those orders (guild-trials.js).
+    ...trialProgress(db, row.id, { salvaged: items.length }, now, { sql: saved, binds: marker }),
+    db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (SELECT value FROM json_each(?)) AND ${saved}`).bind(row.id, list, ...marker),
+  ]);
+  if (result.meta.changes !== 1) throw changed();
+  return json({
+    salvaged: {
+      count: items.length,
+      orders: orders.map((order) => ({ part: content.partsById[order.partId].name, parts: order.parts, endsAt: order.endsAt })),
+      patterns: taught.map((id) => content.basesById[id].name),
     },
     character: characterView(await loadPlayer(db, session.userId), now),
   });

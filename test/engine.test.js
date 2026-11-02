@@ -98,6 +98,7 @@ import {
   monsterCombatant,
   orderMaterials,
   orderSalvage,
+  orderSalvageMany,
   playerCombatant,
   randomItem,
   rarityUpChances,
@@ -2062,6 +2063,25 @@ describe('Stół rozbiórki', () => {
     assert.equal(ordered, content.balance.crafting.queueLimit);
     assert.equal(Object.keys(state.materials).length, content.materials.length - ordered);
     for (let i = 1; i < state.queue.length; i++) assert.equal(state.queue[i].startsAt, state.queue[i - 1].endsAt);
+  });
+
+  test('several items taken apart at once: one order for each kind of part, its parts and minutes added up ("Rozbierz kilka")', () => {
+    const items = [
+      { rarity: 'rare', level: 25 },
+      { rarity: 'common', level: 3 },
+      { rarity: 'rare', level: 5, upgrade: 1 },
+    ];
+    const entries = items.map((item, index) => ({ item, name: `Przedmiot ${index}` }));
+    const state = orderSalvageMany(empty, entries, plain, 10 * MINUTE, rng(), content);
+    // 4 Rzemienie (32 minutes) and 3 (24); 2 Ścinki (10 minutes) after them.
+    assert.deepEqual(
+      state.queue.map((order) => [order.kind, order.name, order.count, order.rarity, order.partId, order.parts, order.startsAt / MINUTE, order.endsAt / MINUTE]),
+      [
+        ['item', undefined, 2, 'rare', 'straps', 7, 10, 66],
+        ['item', 'Przedmiot 1', undefined, 'common', 'scraps', 2, 66, 76],
+      ],
+    );
+    assert.deepEqual(settleCrafting(state, 76 * MINUTE).parts, { straps: 7, scraps: 2 });
   });
 
   test('taking an item apart gives more parts for a higher level and each upgrade', () => {

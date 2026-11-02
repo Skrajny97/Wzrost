@@ -10022,9 +10022,64 @@ a.profession-square:active {
   gap: 10px;
 }
 
-.bag-sell {
-  flex: none;
+/* Under the bag's title: "Sprzedaj zbędne" and "Rozbierz kilka". */
+.bag-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bag-actions .button {
+  flex: 1 1 0;
   width: auto;
+  min-width: max-content;
+}
+
+/* "Rozbierz kilka" (character.js): the bag's items to mark, a tick on the
+   marked ones, and the sum with "Rozbierz" kept in sight at the bottom. */
+.salvage-grid {
+  padding: 6px 0 0 6px;
+}
+
+.salvage-pick[aria-pressed='true'] {
+  box-shadow: 0 0 0 2px var(--system);
+}
+
+.salvage-pick:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.salvage-check {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--system);
+  color: var(--bg-deep);
+}
+
+.salvage-pick[aria-pressed='true'] .salvage-check {
+  display: flex;
+}
+
+.salvage-bar {
+  position: sticky;
+  /* Down over the sheet's own bottom padding, which a stuck bar keeps
+     clear of. */
+  bottom: calc(-20px - env(safe-area-inset-bottom));
+  z-index: 1;
+  display: grid;
+  gap: 10px;
+  margin: 0 calc(-1 * var(--gutter)) calc(-20px - env(safe-area-inset-bottom));
+  padding: 12px var(--gutter) calc(20px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--bark-line);
+  background: var(--surface);
 }
 
 /* The Zaklinaczka's hints on the affixes (settlement.js). */
