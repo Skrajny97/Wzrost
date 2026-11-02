@@ -1401,12 +1401,12 @@ export async function setSkin(context) {
 export async function deleteCharacter(context) {
   const { player } = await requirePlayer(context);
   const db = context.env.DB;
-  await db.batch(characterRemoval(db, player.row.id));
+  await db.batch(characterRemoval(db, player.row.id, context.now));
   return json({ ok: true });
 }
 
-// The statements that remove a character with all it has.
-export function characterRemoval(db, id) {
+// The statements that remove a character with all it has, at `now`.
+export function characterRemoval(db, id, now) {
   return [
     db.prepare('DELETE FROM friends WHERE character_id = ? OR friend_id = ?').bind(id, id),
     db.prepare('DELETE FROM gifts WHERE sender_id = ? OR receiver_id = ?').bind(id, id),
@@ -1421,7 +1421,7 @@ export function characterRemoval(db, id) {
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
     ...marketRemoval(db, '?', [id]),
     ...partyRemoval(db, '?', [id]),
-    ...guildRemoval(db, '?', [id]),
+    ...guildRemoval(db, '?', [id], now),
     db.prepare('DELETE FROM characters WHERE id = ?').bind(id),
   ];
 }

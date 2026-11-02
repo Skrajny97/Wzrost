@@ -213,7 +213,7 @@ export async function deleteAccount(context) {
     ),
     ...marketRemoval(db, characters, [id]),
     ...partyRemoval(db, characters, [id]),
-    ...guildRemoval(db, characters, [id]),
+    ...guildRemoval(db, characters, [id], context.now),
     db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(id),

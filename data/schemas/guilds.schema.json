@@ -11,7 +11,8 @@
     "invites",
     "tabs",
     "trials",
-    "requests"
+    "requests",
+    "exchange"
   ],
   "properties": {
     "$comment": {
@@ -56,8 +57,8 @@
     "tabs": {
       "description": "Zakładki strony Gildii (src/client/screens/guild.js), w tej kolejności.",
       "type": "array",
-      "minItems": 4,
-      "maxItems": 4,
+      "minItems": 5,
+      "maxItems": 5,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -71,7 +72,8 @@
               "guild",
               "beast",
               "trials",
-              "requests"
+              "requests",
+              "exchange"
             ]
           },
           "name": {
@@ -228,6 +230,9 @@
     },
     "requests": {
       "$ref": "#/definitions/requests"
+    },
+    "exchange": {
+      "$ref": "#/definitions/exchange"
     }
   },
   "definitions": {
@@ -813,6 +818,172 @@
                   "type": "string",
                   "minLength": 1
                 }
+              }
+            }
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "exchange": {
+      "description": "Wymiana zasobów w Gildii (src/server/guild-exchange.js, src/client/guild-exchange.js).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "most",
+        "sameCount",
+        "offers",
+        "openHours",
+        "closedShown",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "most": {
+          "description": "Najwięcej sztuk po jednej stronie oferty.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "sameCount": {
+          "description": "Czy po obu stronach oferty musi być tyle samo sztuk.",
+          "type": "boolean"
+        },
+        "offers": {
+          "description": "Najwięcej otwartych ofert jednej postaci naraz.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "openHours": {
+          "description": "Ile godzin najdłużej wisi oferta.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "closedShown": {
+          "description": "Ile ostatnich zamkniętych ofert postać widzi pod swoimi.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "texts": {
+          "type": "object",
+          "required": [
+            "title",
+            "intro",
+            "how",
+            "countsFree",
+            "countsSame",
+            "offerForms",
+            "hourForms",
+            "post",
+            "postLead",
+            "give",
+            "want",
+            "count",
+            "have",
+            "send",
+            "full",
+            "mine",
+            "mineEmpty",
+            "states",
+            "withdraw",
+            "withdrawTitle",
+            "withdrawText",
+            "others",
+            "empty",
+            "gives",
+            "wants",
+            "take",
+            "takeTitle",
+            "takeText",
+            "short",
+            "sameAccount",
+            "noGuild",
+            "posted",
+            "took",
+            "withdrawn",
+            "errors"
+          ],
+          "properties": {
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "offerForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "hourForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "states": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "open",
+                "taken",
+                "withdrawn",
+                "expired"
+              ],
+              "properties": {
+                "open": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "taken": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "withdrawn": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expired": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "errors": {
+              "type": "object",
+              "required": [
+                "locked",
+                "noGuild",
+                "invalidResource",
+                "sameResource",
+                "invalidCount",
+                "sameCount",
+                "notEnough",
+                "notHeld",
+                "noOffer",
+                "notOwn",
+                "own",
+                "closed",
+                "sameAccount",
+                "short",
+                "changed"
+              ],
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
               }
             }
           },

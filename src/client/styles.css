@@ -10095,17 +10095,20 @@ a.profession-square:active {
 
 /* The Bestia Gildii (guild-beast.js): its card on the Gildia's page, the
    champion in the blood red of its frame in fights, its HP bar thicker.
-   The Próby and the Prośby Gildii (guild-trials.js, guild-requests.js)
-   share its subtitles and its rows of names. */
+   The Próby, the Prośby Gildii and the Wymiana (guild-trials.js,
+   guild-requests.js, guild-exchange.js) share its subtitles and its rows
+   of names. */
 .guild-beast p,
 .guild-trials p,
-.guild-requests p {
+.guild-requests p,
+.guild-exchange p {
   margin: 0;
 }
 
 .guild-beast .how-more > p + p,
 .guild-trials .how-more > p + p,
-.guild-requests .how-more > p + p {
+.guild-requests .how-more > p + p,
+.guild-exchange .how-more > p + p {
   margin-top: 6px;
 }
 
@@ -10257,12 +10260,16 @@ a.profession-square:active {
 }
 
 /* The Gildia's tabs (screens/guild.js): the Społeczność's row of tabs, the
-   four of them sharing its width, so a phone shows all four at once. */
+   five of them sharing its width, each with its icon over its name, so all
+   five fit in one row on a phone and in the computer's column. */
 .guild-picker .community-tab {
   flex: 1 0 auto;
+  flex-direction: column;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 6px;
+  gap: 2px;
+  padding: 6px 4px;
+  font-size: 15px;
+  line-height: 1.2;
 }
 
 /* A part of a guild activity's card, under its subtitle (guild-trials.js,
@@ -10615,6 +10622,96 @@ a.profession-square:active {
   color: var(--text-muted);
   font-family: var(--font-system);
   font-size: 13px;
+}
+
+/* The Wymiana (guild-exchange.js): an offer as "Daje X · Chce Y", each side
+   with its resource's picture and kept whole; on a narrow phone the second
+   side goes under the first. Each side starts with its dot, and the sides
+   stand 18 px left of their line, where the line's box hides the dot of
+   the side that begins it. Under the offer: the time it hangs, what the
+   character holds and the offer's button. The sheet of a new offer picks
+   the resources from three buttons side by side, as the list of "Poproś
+   gildię" lights the picked one. */
+.guild-exchange-deal {
+  overflow: hidden;
+}
+
+.guild-exchange-sides {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin-left: -18px;
+}
+
+.guild-exchange-side {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.guild-exchange-side::before {
+  content: '·';
+  width: 12px;
+  text-align: center;
+}
+
+.guild-exchange-label,
+.guild-exchange-side::before {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.guild-exchange-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.guild-offer-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 10px;
+}
+
+.guild-offer--closed .guild-exchange-deal {
+  opacity: 0.7;
+}
+
+.guild-offer-post {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.guild-exchange-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+
+.guild-exchange-choice {
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 4px;
+  text-align: center;
+}
+
+.guild-exchange-choice:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.guild-exchange-name {
+  font-size: 15px;
+  line-height: 1.2;
 }
 
 /* The Sklep Systemu (screens/shop.js): the Punkty Systemu, three tabs and a

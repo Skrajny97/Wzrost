@@ -19,6 +19,7 @@ import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, g
 import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-beast.js';
 import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, takeGuildTrial } from './guild-trials.js';
 import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, thankForGuildGift } from './guild-requests.js';
+import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } from './guild-exchange.js';
 import { craftMaterials, salvageItem, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
 import { confirmEmail, requestLink } from './email.js';
@@ -244,6 +245,11 @@ const routes = [
   ['POST', '/api/guild/requests/cancel', cancelGuildRequest],
   ['POST', '/api/guild/requests/give', giveToGuildRequest],
   ['POST', '/api/guild/requests/thank', thankForGuildGift],
+  // The Wymiana in the Gildia (guild-exchange.js).
+  ['GET', '/api/guild/exchange', getGuildExchange],
+  ['POST', '/api/guild/exchange', postGuildOffer],
+  ['POST', '/api/guild/exchange/take', takeGuildOffer],
+  ['POST', '/api/guild/exchange/withdraw', withdrawGuildOffer],
   ['POST', '/api/towers/enter', enterTower],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],

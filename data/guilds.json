@@ -1,5 +1,5 @@
 {
-  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz. tabs: zakładki strony Gildii (#/gildia/<id>), po kolei: gildia z członkami, Bestia, Próby i Prośby Gildii.",
+  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz. tabs: zakładki strony Gildii (#/gildia/<id>), po kolei: gildia z członkami, Bestia, Próby, Prośby Gildii i Wymiana.",
   "place": "guild-keep",
   "found": {
     "level": 30,
@@ -19,7 +19,8 @@
     { "id": "guild", "name": "Gildia" },
     { "id": "beast", "name": "Bestia" },
     { "id": "trials", "name": "Próby" },
-    { "id": "requests", "name": "Prośby" }
+    { "id": "requests", "name": "Prośby" },
+    { "id": "exchange", "name": "Wymiana" }
   ],
   "beast": {
     "$comment": "Bestia Gildii (src/engine/guild-beast.js, src/server/guild-beast.js, src/client/guild-beast.js; DECISIONS.md, „Bestia Gildii”). Autor: „344 A”: cotygodniowe polowanie całej gildii na jedną ogromną bestię, bez grania w tym samym czasie. Tydzień jak przy zadaniach tygodniowych: od poniedziałku, od północy czasu polskiego. Bestia to czempion jednego z regionów, losowany z ziarna gildii i tygodnia, na zaokrąglonym średnim poziomie postaci członków z chwili, gdy przychodzi (pierwsze spojrzenie albo atak w tygodniu). HP bestii: członkowie z tej chwili × memberAttacks × damage, tak że memberAttacks typowych ataków jednej postaci (3 dziennie przez 4 dni) zbija 1/członków paska. damage: [poziom bestii, średnie obrażenia jednego ataku], zmierzone typowymi postaciami z tools/simulate.mjs (typicalCharacter): pięć klas, czterech czempionów, po 40 walk na każdą parę; między punktami po prostej, poniżej pierwszego jak w pierwszym, powyżej ostatniego proporcjonalnie do poziomu. attacksPerDay: ataki postaci na dobę (od północy czasu polskiego), osobno od wejść do Wież, liczone na postać, także po zmianie gildii. chests: Skrzynia Bestii dla każdej postaci, która w tygodniu zaatakowała bestię choć raz, jedna na tydzień (po zmianie gildii w tygodniu liczy się najlepsza z jej bestii); liczy się pierwsza skrzynia, której share (część paska zbita przez gildię) bestia osiągnęła, a share 1 to bestia powalona. item: przedmiot klasy postaci, który może ona założyć, na jej poziomie, z rzadkością jak w skrzyni czempiona. materials: ile razy losuje się materiał bestii, każdy raz jak po pokonanym czempionie, na poziomie bestii, co najmniej jedna sztuka. Poniżej najmniejszego share skrzyni nie ma. Skrzynię otwiera się od upadku bestii albo od końca tygodnia, najpóźniej do końca następnego tygodnia. texts: słowa karty Bestii i odpowiedzi gry; {…} wypełnia gra.",
@@ -259,6 +260,79 @@
         "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz.",
         "noGift": "Nie ma takiego daru.",
         "thanked": "Za ten dar podziękowanie już poszło."
+      }
+    }
+  },
+  "exchange": {
+    "$comment": "Wymiana zasobów w Gildii (src/server/guild-exchange.js, src/client/guild-exchange.js; DECISIONS.md, „Wymiana zasobów w Gildii”). Autor: „Dodatkowa funkcja w Gildii -> wymiana zasobów. Można wystawić, że chce się wymienić x kamienia na x drewna i odwrotnie, każdy zasób na inny.” Członek gildii wystawia ofertę: sztuki jednego zasobu obozu (data/resources.json) za sztuki innego, od 1 do most z każdej strony. Obie liczby wpisuje wystawiający; przy sameCount: true druga liczba musi równać się pierwszej, a okno oferty ją powtarza. Dawane sztuki od razu schodzą z zasobów i czekają w ofercie. Naraz najwyżej offers otwartych ofert postaci, każda wisi najwyżej openHours godzin. Inny członek tej samej gildii bierze całą ofertę („Wymień”): oddaje chciane sztuki i dostaje dawane, a wystawiający dostaje chciane, wszystko naraz. Postacie jednego konta nie wymieniają się ze sobą. Wystawiający wycofuje otwartą ofertę, kiedy chce; sztuki wracają w całości także wtedy, gdy czas oferty minie (przy jego następnym wejściu do Wymiany albo na stronę Gildii), i gdy opuści gildię albo zostanie z niej usunięty (od razu). closedShown: ile ostatnich zamkniętych ofert postać widzi pod swoimi otwartymi. Oferty zamknięte (wzięte, wycofane i te, którym minął czas) zostają z godziną i biorącym, a te zamknięte przed początkiem poprzedniego tygodnia znikają przy kolejnej ofercie. texts: słowa karty Wymiany, okna oferty i odpowiedzi gry; {…} wypełnia gra (offerForms i hourForms: rzeczownik po liczbie ofert i godzin).",
+    "most": 1000,
+    "sameCount": false,
+    "offers": 3,
+    "openHours": 48,
+    "closedShown": 5,
+    "texts": {
+      "title": "Wymiana zasobów",
+      "intro": "Za dużo kamienia, a za mało drewna? Wystaw ofertę, a ktoś z gildii ją przyjmie.",
+      "how": [
+        "Oferta to sztuki jednego zasobu za sztuki innego, od 1 do {most} z każdej strony. {counts}",
+        "Sztuki, które dajesz, od razu schodzą z zasobów i czekają w ofercie.",
+        "Ofertę bierze się w całości. Kto stuknie „Wymień”, oddaje to, czego chcesz, i dostaje to, co dajesz. Twoja część trafia do Ciebie od razu.",
+        "Naraz wystawisz najwyżej {offers}. Każda wisi najwyżej {open}, a wycofasz ją w każdej chwili.",
+        "Sztuki z oferty wracają do Ciebie w całości, gdy ją wycofasz, gdy minie jej czas albo gdy opuścisz gildię.",
+        "Postacie jednego konta nie wymieniają się ze sobą."
+      ],
+      "countsFree": "Ile dajesz i ile chcesz, wpisujesz w ofercie, np. 50 kamienia za 80 drewna.",
+      "countsSame": "Dostajesz tyle samo sztuk, ile dajesz.",
+      "offerForms": ["ofertę", "oferty", "ofert"],
+      "hourForms": ["godzinę", "godziny", "godzin"],
+      "post": "Wystaw ofertę",
+      "postLead": "Wybierz, co dajesz i co chcesz w zamian. Sztuki, które dajesz, od razu schodzą z zasobów i czekają w ofercie.",
+      "give": "Dajesz",
+      "want": "Chcesz",
+      "count": "Ile sztuk",
+      "have": "Masz: {have}",
+      "send": "Wystaw",
+      "full": "Naraz wystawisz najwyżej {offers}. Wycofaj jedną albo poczekaj na wymianę.",
+      "mine": "Twoje oferty",
+      "mineEmpty": "Nie masz teraz ofert.",
+      "states": {
+        "open": "Wisi do {until}.",
+        "taken": "Wymieniono z postacią {name}.",
+        "withdrawn": "Wycofana. Sztuki wróciły.",
+        "expired": "Czas minął. Sztuki wróciły."
+      },
+      "withdraw": "Wycofaj",
+      "withdrawTitle": "Wycofać ofertę?",
+      "withdrawText": "Sztuki z oferty wrócą do Ciebie: {give}.",
+      "others": "Oferty członków",
+      "empty": "Nikt z gildii nie wystawia teraz ofert.",
+      "gives": "Daje",
+      "wants": "Chce",
+      "take": "Wymień",
+      "takeTitle": "Wymienić?",
+      "takeText": "Oddajesz {want}, a dostajesz {give}.",
+      "short": "Masz: {have}. Brakuje: {missing}.",
+      "sameAccount": "To postać z Twojego konta. Postacie jednego konta nie wymieniają się ze sobą.",
+      "noGuild": "Z Wymiany korzystają członkowie gildii. Dołącz do gildii albo załóż własną.",
+      "posted": "Oferta wystawiona: {give} za {want}.",
+      "took": "Wymiana z postacią {name}: dostajesz {give} za {want}.",
+      "withdrawn": "Oferta wycofana. Wraca: {give}.",
+      "errors": {
+        "locked": "Gildie odblokujesz na poziomie postaci {level}.",
+        "noGuild": "Nie należysz do gildii.",
+        "invalidResource": "Nie ma takiego zasobu.",
+        "sameResource": "Wybierz dwa różne zasoby.",
+        "invalidCount": "Wpisz od 1 do {most} sztuk.",
+        "sameCount": "Po obu stronach oferty musi być tyle samo sztuk.",
+        "notEnough": "Masz tylko {have} {genitive}.",
+        "notHeld": "Nie masz {genitive}.",
+        "noOffer": "Tej oferty już nie ma.",
+        "notOwn": "To nie Twoja oferta.",
+        "own": "To Twoja oferta.",
+        "closed": "Ta oferta jest już zamknięta.",
+        "sameAccount": "Postacie jednego konta nie wymieniają się ze sobą.",
+        "short": "Brakuje: {missing} {genitive}.",
+        "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz."
       }
     }
   }
