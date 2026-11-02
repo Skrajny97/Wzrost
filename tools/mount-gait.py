@@ -21,8 +21,10 @@ ELBOW, ARM), the hind legs on the legs' (HIP, KNEE, LEG).
 SKELETONS_DIR holds <id>-skeleton.json from the estimate step
 (art/drafts/mounts-skeleton). Each mount's gait, frames and sizes are in
 art/mounts.json under "gait"; a joint the estimate put wrong can be set by
-hand there ("fix": {"LABEL": [x, y]} in pixels of the start frame). Writes
-art/mount-gaits.json.
+hand there ("fix": {"LABEL": [x, y]} in pixels of the start frame), and
+"cross": true makes the two legs of a pair swing around one place, so they
+pass each other (the tiger stood with its hind legs apart and they never
+crossed). Writes art/mount-gaits.json.
 """
 import json
 import math
@@ -88,6 +90,15 @@ def gait(points, size, spec):
             'top': t,
             'rest': e,
         }
+    if spec.get('cross'):
+        # The two legs of a pair swing around one place under the body, so
+        # they pass each other, as a walking cat's paws do; the start frame
+        # may stand with them apart.
+        for pair in ('front', 'hind'):
+            left, right = legs[f'{pair}_left'], legs[f'{pair}_right']
+            x = (left['rest'][0] + right['rest'][0]) / 2
+            y = max(left['rest'][1], right['rest'][1])
+            left['rest'] = right['rest'] = (x, y)
     length = sum(l['upper'] + l['lower'] for l in legs.values()) / 4
     stride = spec.get('stride', 0.45 if kind == 'trot' else 0.4) * length
     lift = spec.get('lift', 0.22 if kind == 'trot' else 0.14) * length
