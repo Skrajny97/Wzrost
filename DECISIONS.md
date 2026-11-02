@@ -3008,7 +3008,7 @@ Autor: „przygotuj kod podarunkowy ważny tydzien "TIGER" dajacy 500 Punktów S
 
 Autor: „Pamietaj by ten przycisk nie działał jeśli ktoś nie ma Stołu do rozbiórki zbudowanego i w ogole ze to się łączy ze sobą”. Tak działa od 0.0.96: bez Stołu rozbiórki w obozie przycisku „Rozbierz kilka” w Plecaku nie ma, a serwer i tak odmawia („Najpierw zbuduj Stół rozbiórki w obozie.”). Rozbiórka idzie do kolejki tego stołu, a jego poziom decyduje, jakie rzadkości stół bierze i jak szybko pracuje. Nowy test sprawdza odmowę serwera bez stołu.
 
-## Pytania 479–496 (2.11.2026, w nocy)
+## Pytania 479–497 (2.11.2026, w nocy)
 
 Autor nie mógł spać i poprosił o poranny materiał od razu („zacznij od chodów i jazdy”). Wysłane w czacie, każda pozycja z numerem:
 
@@ -3016,12 +3016,12 @@ Autor nie mógł spać i poprosił o poranny materiał od razu („zacznij od ch
 - 480.1–480.30: jazda wierzchem drugich form, wszystkie 30;
 - 439–461: Czarne Bagno (kraina z dwoma tłami do wyboru, pięć regionów, 17 stworów z materiałami), 462–465 Szumiący Bór, 466 trzecia ewolucja, 467–471 Sklep Play;
 - 481: czy zmienić zasadę „jednego materiału” w Kowadle; 482: czy długie wyprawy mają dawać rzadsze przedmioty;
-- 483–488: decyzje z przeglądu Wież; 489–496: plan wersji angielskiej;
+- 483–489: decyzje z przeglądu Wież (trofea czempionów, 16 stworów poza Wieżami, losowe elity, Dziennik, skrzynie Bestiariusza, próba gildii na 1. piętrze, trudność Wieży Solo); 490–497: plan wersji angielskiej;
 - ponownie 472, 476, 477 (wersje A są w grze od 0.0.97 i 0.0.98) i 478 (zdarzenia na długich wyprawach).
 
 ## Wersja 0.0.99 (2.11.2026)
 
-1. **Co wchodzi do gry:** kod podarunkowy TIGER (500 Punktów Systemu do końca 9.11) i test, że „Rozbierz kilka” bez Stołu rozbiórki nic nie robi (zob. wyżej). Razem z tym idzie notatka o pytaniach 479–496.
+1. **Co wchodzi do gry:** kod podarunkowy TIGER (500 Punktów Systemu do końca 9.11) i test, że „Rozbierz kilka” bez Stołu rozbiórki nic nie robi (zob. wyżej). Razem z tym idzie notatka o pytaniach 479–497.
 2. **Baza danych:** bez migracji.
 3. **Przed wdrożeniem:** pełne testy (868 z 868) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków).
 
