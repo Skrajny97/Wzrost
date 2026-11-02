@@ -1,0 +1,30 @@
+{
+  "id": "druid-female",
+  "payload": {
+    "prompt": "adult woman druid, long auburn hair in braids with small leaves, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, a long hooded robe of moss green and brown bark-like leather, a mantle of leaves and moss over the shoulders, a small crown of twigs like little antlers inside the image, holding a gnarled wooden staff with a glowing green crystal wrapped in roots, the whole staff inside the image, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 3,
+    "seed": 312213553,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 4
+  },
+  "result": {
+    "created_at": 1793627919,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 51.99,
+    "request_id": "9668e1da-92a3-4283-8173-3dc72e35f82d",
+    "outputs_retained_until": 1793714027,
+    "billing": {
+      "source": "balance",
+      "balance_left": 51.99,
+      "balance_charged": 0.54
+    }
+  }
+}

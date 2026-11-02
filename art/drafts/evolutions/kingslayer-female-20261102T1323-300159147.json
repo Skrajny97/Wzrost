@@ -1,0 +1,30 @@
+{
+  "id": "kingslayer-female",
+  "payload": {
+    "prompt": "adult woman legendary kingslayer assassin, lean, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, epic and menacing, a dark crimson and black hooded cloak, a black mask over the lower face, ornate blackened leather armour with silver filigree, a broken golden crown hanging at the belt as a trophy, two long curved daggers glowing with a faint red light held close to the body, crouched ready stance, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 3,
+    "seed": 300159147,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 4
+  },
+  "result": {
+    "created_at": 1793628842,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 48.75,
+    "request_id": "edc08af9-e233-4ae1-8f9f-d98442555c42",
+    "outputs_retained_until": 1793715201,
+    "billing": {
+      "source": "balance",
+      "balance_left": 48.75,
+      "balance_charged": 0.54
+    }
+  }
+}

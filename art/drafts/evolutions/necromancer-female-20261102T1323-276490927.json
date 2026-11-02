@@ -1,0 +1,30 @@
+{
+  "id": "necromancer-female",
+  "payload": {
+    "prompt": "adult woman necromancer, pale, long black hair, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, a black gown with dark purple and bone-white trim, a hooded mantle, a necklace of small bones, holding a tall dark staff topped with a horned skull glowing with sickly green light, the whole staff and skull inside the image, faint green mist close to the hands, menacing, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 3,
+    "seed": 276490927,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 4
+  },
+  "result": {
+    "created_at": 1793629145,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 47.67,
+    "request_id": "107e367d-3f06-480d-89bd-a7c3d9e3da95",
+    "outputs_retained_until": 1793715476,
+    "billing": {
+      "source": "balance",
+      "balance_left": 47.67,
+      "balance_charged": 0.54
+    }
+  }
+}

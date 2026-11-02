@@ -1,0 +1,30 @@
+{
+  "id": "phantom-female",
+  "payload": {
+    "prompt": "young woman phantom blade dancer, pale, silver hair, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, a shadowy cloak with smoky edges, a dark grey leather armour, holding two thin curved blades close to the body, both hands and both whole blades inside the image, solid figure, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 3,
+    "seed": 480023766,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 4
+  },
+  "result": {
+    "created_at": 1793629198,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 47.13,
+    "request_id": "e5dd032e-ae6c-4605-8517-44a47a6be467",
+    "outputs_retained_until": 1793715548,
+    "billing": {
+      "source": "balance",
+      "balance_left": 47.13,
+      "balance_charged": 0.54
+    }
+  }
+}

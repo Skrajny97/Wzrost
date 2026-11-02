@@ -1,0 +1,30 @@
+{
+  "id": "archmage-female",
+  "payload": {
+    "prompt": "adult woman archmage of the elements, long brown hair, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, an ornate layered robe in red, blue and gold with intricate embroidered runes, a high stiff collar, golden jewelry and a wide ornamented belt, holding a tall golden staff crowned with three glowing gems of fire, ice and lightning, the three elements only in the gems, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 3,
+    "seed": 197835515,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 4
+  },
+  "result": {
+    "created_at": 1793627299,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 53.61,
+    "request_id": "bd76c7dd-3b22-44c2-9a05-4e7eeb779909",
+    "outputs_retained_until": 1793713622,
+    "billing": {
+      "source": "balance",
+      "balance_left": 53.61,
+      "balance_charged": 0.54
+    }
+  }
+}

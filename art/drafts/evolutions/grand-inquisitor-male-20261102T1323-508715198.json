@@ -1,0 +1,30 @@
+{
+  "id": "grand-inquisitor-male",
+  "payload": {
+    "prompt": "adult man grand inquisitor, stern scarred face, short dark hair, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, epic and imposing, an ornate blackened steel plate armour engraved with golden sacred symbols, a tall stiff collar, a long crimson cape with a gold trim, a golden holy sigil on the chest, a heavy warhammer wreathed in white holy fire held in both hands, a chained glowing holy tome at the belt, far grander than a common inquisitor, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 3,
+    "seed": 508715198,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 4
+  },
+  "result": {
+    "created_at": 1793628018,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 51.45,
+    "request_id": "6b5043a7-1d26-4193-9ccd-ff842122ba9e",
+    "outputs_retained_until": 1793714319,
+    "billing": {
+      "source": "balance",
+      "balance_left": 51.45,
+      "balance_charged": 0.54
+    }
+  }
+}
