@@ -10532,9 +10532,16 @@ a.profession-square:active {
   margin: 0;
 }
 
-/* The goods of a request, picked from the game's own list: a scrolling
-   box with each one's picture, name and the pieces held, under the kinds'
-   headings, the picked one lit in the System's colour. */
+/* The goods of a request, picked from the game's own list: tabs by kind
+   over a scrolling box with each one's picture, name and the pieces held,
+   the materials under their rarities' headings in the rarity's colour, the
+   picked one lit in the System's colour. */
+.guild-ask-goods {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .guild-ask-picker {
   display: flex;
   flex-direction: column;
@@ -10549,7 +10556,7 @@ a.profession-square:active {
 
 .guild-ask-group {
   margin: 6px 4px 2px;
-  color: var(--text-muted);
+  color: var(--rarity, var(--text-muted));
   font-family: var(--font-system);
   font-size: 12px;
   letter-spacing: 0.08em;

@@ -21,6 +21,7 @@ import { call, state } from './state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
+const KINDS = ['material', 'herb', 'potion'];
 const rarityOf = (id) => state.content.rarities.find((rarity) => rarity.id === id);
 
 // The picture of goods: a material's, a herb's or a potion's.
@@ -122,7 +123,15 @@ function fillAskSheet(body, view, ask, onAsked) {
   const toCard = () => h('a', { class: 'button button--world', href: '#/gildia/requests', onClick: closeSheet, text: texts.title });
   if (view.waiting) return fill(body, h('p', { class: 'sheet-text', text: texts.askWaiting }), view.mine && h('p', { class: 'guild-mine-goods' }, goodsLine(view.mine.goods, h('span', { class: 'muted', text: ` × ${formatNumber(view.mine.count)}` }))), toCard());
   if (view.nextAt) return fill(body, h('p', { class: 'sheet-text', text: filled(texts.waitNext, { at: dateTimeFormat.format(new Date(view.nextAt)) }) }), toCard());
-  const list = choices(view.known, ask);
+  // A list of all the goods known goes in the order shown: by kind, a
+  // material by its rarity, then by name.
+  const mixed = !(ask.rarity || ask.key);
+  const order = (id) => state.content.rarities.findIndex((one) => one.id === id);
+  const list = mixed
+    ? [...choices(view.known, ask)].sort(
+        (a, b) => KINDS.indexOf(a.kind) - KINDS.indexOf(b.kind) || (a.kind === 'material' ? order(a.rarity) - order(b.rarity) : 0) || a.name.localeCompare(b.name, 'pl'),
+      )
+    : choices(view.known, ask);
   if (list.length === 0) return fill(body, h('p', { class: 'sheet-text', text: texts.noGoods }));
   let picked = list[0];
   // What the request starts at: what is missing, of the stack picked where
@@ -132,9 +141,12 @@ function fillAskSheet(body, view, ask, onAsked) {
   const goods = h('div', { class: 'guild-ask-goods' });
   // The goods to pick as the game's own list (the author: "lista ta w
   // prośbach Gildii musi być interfejsem w grze"): each with its picture,
-  // its name and how many the character holds, under the kind's heading
-  // when the list mixes kinds; the picked one marked.
-  const mixed = !(ask.rarity || ask.key);
+  // its name and how many the character holds; the picked one marked. A
+  // list of all the goods known is sorted in tabs by kind (the author:
+  // "segregowana lista, z zakładkami"), the materials under their rarities;
+  // a tab opened picks its first goods, so the one asked for is in sight.
+  const kinds = mixed ? KINDS.filter((kind) => list.some((one) => one.kind === kind)) : [];
+  let tab = picked.kind;
   const choice = (one) =>
     h(
       'button',
@@ -151,23 +163,50 @@ function fillAskSheet(body, view, ask, onAsked) {
       goodsLine(one),
       h('span', { class: 'guild-ask-have', text: filled(texts.have, { have: formatNumber(held(one)) }) }),
     );
+  // The materials of a tab under their rarities' headings, each heading in
+  // its rarity's colour ("Pospolite", "Rzadkie"…).
+  const byRarity = (some) =>
+    state.content.rarities.map((rarity) => {
+      const these = some.filter((one) => one.rarity === rarity.id);
+      if (these.length === 0) return null;
+      const heading = rarity.forms.pl.charAt(0).toUpperCase() + rarity.forms.pl.slice(1);
+      return [h('p', { class: 'guild-ask-group', vars: { '--rarity': rarity.color }, text: heading }), these.map(choice)];
+    });
+  const tabs = () =>
+    kinds.length > 1 &&
+    h(
+      'div',
+      { class: 'chat-tabs market-tabs guild-ask-tabs', role: 'tablist', 'aria-label': texts.goods },
+      kinds.map((kind) =>
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'chat-tab',
+            role: 'tab',
+            'aria-selected': String(tab === kind),
+            onClick: () => {
+              if (tab === kind) return;
+              tab = kind;
+              picked = list.find((one) => one.kind === kind);
+              count.value = String(start());
+              showGoods();
+            },
+          },
+          h('span', { class: 'chat-tab-name', text: texts.kindGroups[kind] }),
+        ),
+      ),
+    );
   const showGoods = () => {
     if (list.length === 1) {
       fill(goods, h('p', { class: 'guild-ask-one' }, goodsLine(picked, h('span', { class: 'muted', text: ` · ${filled(texts.have, { have: formatNumber(held(picked)) })}` }))));
       return;
     }
-    const kinds = mixed ? ['material', 'herb', 'potion'] : [null];
+    const some = mixed ? list.filter((one) => one.kind === tab) : list;
     fill(
       goods,
-      h(
-        'div',
-        { class: 'guild-ask-picker', role: 'group', 'aria-label': texts.goods },
-        kinds.map((kind) => {
-          const some = kind ? list.filter((one) => one.kind === kind) : list;
-          if (some.length === 0) return null;
-          return [kind && h('p', { class: 'guild-ask-group', text: texts.kindGroups[kind] }), some.map(choice)];
-        }),
-      ),
+      tabs(),
+      h('div', { class: 'guild-ask-picker', role: 'group', 'aria-label': mixed ? texts.kindGroups[tab] : texts.goods }, mixed && tab === 'material' ? byRarity(some) : some.map(choice)),
     );
   };
   showGoods();
