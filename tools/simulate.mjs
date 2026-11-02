@@ -16,15 +16,15 @@ import { loadData } from './validate-data.mjs';
 // have the level gearLevel gives (found half the exploring time ago, at most
 // 45 minutes), and rare ones with the class's main stat replace common ones
 // slot by slot, one per 3 hours.
-const KIT = {
+export const KIT = {
   warrior: { chest: 'chainmail', offhand: 'shield', head: 'helmet' },
   archer: { chest: 'tunic', offhand: 'quiver', head: 'hood' },
   mage: { chest: 'robe', offhand: 'focus', head: 'hood' },
   cleric: { chest: 'surplice', offhand: 'shield', head: 'cowl' },
   shadow: { chest: 'tunic', offhand: 'misericorde', head: 'hood' },
 };
-const SLOT_ORDER = ['weapon', 'chest', 'offhand', 'head', 'feet', 'hands', 'amulet', 'ring', 'talisman'];
-const OTHER_BASES = { feet: 'boots', hands: 'gloves', amulet: 'amulet', ring: 'ring', talisman: 'talisman' };
+export const SLOT_ORDER = ['weapon', 'chest', 'offhand', 'head', 'feet', 'hands', 'amulet', 'ring', 'talisman'];
+export const OTHER_BASES = { feet: 'boots', hands: 'gloves', amulet: 'amulet', ring: 'ring', talisman: 'talisman' };
 
 // Hours of exploring it takes to reach a level.
 export function hoursToReach(level, content) {

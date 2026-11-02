@@ -73,20 +73,11 @@ import { fileURLToPath } from 'node:url';
 import { writeFileSync } from 'node:fs';
 import * as engine from '../src/engine/index.js';
 import { loadData } from './validate-data.mjs';
-import { typicalCharacter } from './simulate.mjs';
+import { KIT, OTHER_BASES, SLOT_ORDER, hoursToReach, itemsPerHour, typicalCharacter } from './simulate.mjs';
 import { evolvedSkills } from './evolution-sim.mjs';
 
 export const LEVELS = [10, 20, 30, 40, 50, 60, 75, 90, 100, 110, 125, 150];
 
-const KIT = {
-  warrior: { chest: 'chainmail', offhand: 'shield', head: 'helmet' },
-  archer: { chest: 'tunic', offhand: 'quiver', head: 'hood' },
-  mage: { chest: 'robe', offhand: 'focus', head: 'hood' },
-  cleric: { chest: 'surplice', offhand: 'shield', head: 'cowl' },
-  shadow: { chest: 'tunic', offhand: 'misericorde', head: 'hood' },
-};
-const SLOT_ORDER = ['weapon', 'chest', 'offhand', 'head', 'feet', 'hands', 'amulet', 'ring', 'talisman'];
-const OTHER_BASES = { feet: 'boots', hands: 'gloves', amulet: 'amulet', ring: 'ring', talisman: 'talisman' };
 const RARITY_STEPS = ['common', 'rare', 'unique', 'epic', 'legendary', 'mythic', 'divine'];
 
 // The newest inner region of a level (see above), `offset` regions of five
@@ -190,9 +181,8 @@ function realisticGear(classId, level, classLevel, plan, content, set = 0) {
   const rng = engine.createRng(`realistic-gear:${classId}:${level}:${plan.variant}:${set}`);
   const itemLevel = Math.max(1, Math.min(level - 1, engine.gearLevel(level, content)));
   const families = { weapon: cls.weapons[0], ...KIT[classId], ...OTHER_BASES };
-  const hours = hoursToReach(level, content);
-  const itemsPerHour = (60 / content.balance.hunt.findIntervalMinutes) * (content.balance.rewards.findOutcomes.chest / Object.values(content.balance.rewards.findOutcomes).reduce((a, b) => a + b, 0));
-  const count = level === 1 ? 0 : Math.min(SLOT_ORDER.length, 1 + Math.floor(0.75 * itemsPerHour * hours) + plan.extraSlots);
+  // The slots the typical character has filled by now, and extraSlots more.
+  const count = level === 1 ? 0 : Math.min(SLOT_ORDER.length, 1 + Math.floor(0.75 * itemsPerHour(content) * hoursToReach(level, content)) + plan.extraSlots);
   const mainStat = mainStatOf(classId, content);
   return SLOT_ORDER.slice(0, count).map((slot) => {
     const base = plan.tiers ? bestBase(families[slot], Math.min(classLevel, itemLevel), content) : content.basesById[families[slot]];
@@ -205,12 +195,6 @@ function realisticGear(classId, level, classLevel, plan, content, set = 0) {
 
 // How many draws of the realistic gear a measurement goes through.
 export const GEAR_SETS = 8;
-
-function hoursToReach(level, content) {
-  let hours = 0;
-  for (let l = 1; l < level; l++) hours += engine.huntingHours(l, content);
-  return hours;
-}
 
 // The main path's evolution at the class level: the first from class level
 // 50, its second form from 100.
