@@ -2996,6 +2996,23 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Kamień węgielny Warowni w Obozie (2.11.2026)
+
+Autor (zrzut planszy Obozu z wolnym miejscem między Skrzynią Konta a Kopalnią): „tutaj w Obozie jest wolne miejsce... jakiś pomysł na to co z tym zrobić?”, a potem „435 A”.
+
+1. **Co stoi.** Na wolnym miejscu leży duży kamień z wyrytym znakiem: Kamień węgielny Warowni.
+2. **Po stuknięciu** widać, ile brakuje do Warowni: ile budynków ma już najwyższy poziom (np. „3 z 10”) i poziom Obozu (np. „6 z 10”).
+3. **Później** w tym miejscu zaczyna się przemiana w Warownię: rusztowanie, potem kamienne mury.
+4. **Kolejność.** Najpierw grafika kamienia na planszę, do oceny autora, potem kod.
+
+## Prośby Gildii: wycofana prośba znika (2.11.2026)
+
+Autor (zrzut „Futro żbika × 10, Dane: 0 z 10. Wycofana.”): „Wycofane prośby powinny znikac i tylko pokazywać czas przed kolejną prośbą.”
+
+1. **Karta.** Wycofana prośba znika z części „Twoja prośba”. Gdy kolejną można dodać dopiero później, zostaje tylko zdanie „Kolejną prośbę dodasz od …”. Prośba spełniona albo ta, której czas minął, dalej widnieje do 48 godzin po dodaniu, bo przy niej się dziękuje.
+2. **Podziękowania (brakujący szczegół).** Wycofana prośba nie ma już przycisków „Podziękuj”, więc przy wycofaniu każdy dar, za który proszący jeszcze nie podziękował, dostaje podziękowanie od razu. Dający nie tracą go w rankingu Dobroczyńców tygodnia. Okno wycofania mówi o tym: „Dane sztuki zostają u Ciebie, a za każdy dar podziękujesz od razu.”
+3. Prośba bez darów znika przy wycofaniu jak dotąd i nową można dodać od razu.
+
 ## Wersja 0.0.91 (2.11.2026)
 
 1. **Co wchodzi do gry:**

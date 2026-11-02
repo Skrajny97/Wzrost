@@ -78,8 +78,12 @@ describe('the Prośby Gildii through the API', () => {
     assert.equal((await give('druh', again.data.mine.id, 1)).status, 200);
     const cancelled = await as('mistrz', 'POST', '/api/guild/requests/cancel');
     assert.equal(cancelled.data.text, rules.texts.cancelled);
-    assert.deepEqual([cancelled.data.mine.state, cancelled.data.mine.given], ['cancelled', 1]);
+    // The request taken back leaves the card; only the wait for the next one
+    // shows (the author: "Wycofane prośby powinny znikac i tylko pokazywać
+    // czas przed kolejną prośbą"), and its gift is thanked at once.
+    assert.equal(cancelled.data.mine, null);
     assert.ok(cancelled.data.nextAt > Date.now());
+    assert.deepEqual(cancelled.data.ranking.map((one) => [one.name, one.pieces, one.thanks]), [['Druh', 1, 1]]);
     assert.equal((await ask('mistrz', { kind: 'herb', key: 'comfrey', count: 1 })).data.error.code, 'wait');
     await run('UPDATE guild_requests SET created_at = created_at - ?', rules.waitHours * HOUR + 60000);
     assert.equal((await ask('mistrz', { kind: 'herb', key: 'comfrey', count: 1 })).status, 200);

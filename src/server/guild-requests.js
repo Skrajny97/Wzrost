@@ -140,7 +140,11 @@ async function requestsView(db, player, guild, now) {
       .bind(guild.id, week.startsAt),
   ]);
   const last = latest.results[0] ?? null;
-  const shown = last && last.guild_id === guild.id && (stateOf(last, now) === 'open' || last.created_at > now - openHours * HOUR) ? last : null;
+  // A request taken back is gone from the card; only the wait for the next
+  // one shows (the author: "Wycofane prośby powinny znikac i tylko pokazywać
+  // czas przed kolejną prośbą").
+  const shown =
+    last && last.guild_id === guild.id && last.state !== 'cancelled' && (stateOf(last, now) === 'open' || last.created_at > now - openHours * HOUR) ? last : null;
   const gifts = shown
     ? (
         await db
@@ -249,8 +253,9 @@ export async function askGuild(context) {
 }
 
 // POST /api/guild/requests/cancel: the character takes its open request
-// back; the gifts it got stay, and the wait for the next one counts from the
-// one taken back. One nobody gave anything to goes as if never made, so the
+// back; the gifts it got stay, each thanked at once (the request leaves the
+// card, and the givers keep their thanks in the week's ranking), and the wait
+// for the next one counts from the one taken back. One nobody gave anything to goes as if never made, so the
 // next one may be made at once (the author: "wycofanie prośby w Gildii przy
 // braku realizacji aktualnej daje możliwość od razu wystawienia nowej
 // prośby"); in one batch, so a gift cannot slip in between.
@@ -260,6 +265,9 @@ export async function cancelGuildRequest(context) {
   const [dropped, cancelled] = await db.batch([
     db.prepare("DELETE FROM guild_requests WHERE character_id = ? AND state = 'open' AND ends_at > ? AND given = 0").bind(player.row.id, now),
     db.prepare("UPDATE guild_requests SET state = 'cancelled', closed_at = ? WHERE character_id = ? AND state = 'open' AND ends_at > ?").bind(now, player.row.id, now),
+    db
+      .prepare("UPDATE guild_gifts SET thanked_at = ? WHERE thanked_at IS NULL AND request_id IN (SELECT id FROM guild_requests WHERE character_id = ? AND state = 'cancelled' AND closed_at = ?)")
+      .bind(now, player.row.id, now),
   ]);
   if (dropped.meta.changes !== 1 && cancelled.meta.changes !== 1) throw new ApiError(409, 'no_request', errors().noRequest);
   return answer(db, player, guild, now, { text: dropped.meta.changes === 1 ? words().cancelledFree : words().cancelled });
