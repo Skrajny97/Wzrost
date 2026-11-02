@@ -26,7 +26,7 @@
       "gait": { "kind": "walk", "template": "lion", "frames": 12, "cross": true, "pendulum": true, "behind": 0.1, "fold": true, "fix": { "RIGHT ELBOW": [104, 100], "LEFT ELBOW": [114, 98] }, "stride": 0.55, "lift": 0.12, "bob": 0, "nod": 0 },
       "description": "a huge saber-toothed tiger with orange fur, black stripes and two long curved fangs, a dark leather saddle on a fur saddle cloth with bone trinkets and a leather bridle with reins",
       "action": "walking at a steady pace in place like a big cat, seen from the side and facing right, the four legs moving in a smooth seamless walk loop, the head and body swaying slightly, the tail swaying, the saddle and bridle stay in place",
-      "trot": { "dir": "mounts-skeleton", "draft": "sabertooth-20261102T0620-280066554", "frames": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "seat": [64, 36], "seat_in": "start", "fps": 10 }
+      "trot": { "dir": "mounts-skeleton", "draft": "sabertooth-20261102T0640-107511907", "frames": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "seat": [64, 36], "seat_in": "start", "fps": 10 }
     }
   }
 }
