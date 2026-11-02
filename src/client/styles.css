@@ -7866,6 +7866,111 @@ a.profession-square:active {
     transform: translate(var(--rx8), var(--ry8));
   }
 }
+@keyframes ride-10 {
+  0% {
+    transform: translate(var(--rx0), var(--ry0));
+  }
+  10% {
+    transform: translate(var(--rx1), var(--ry1));
+  }
+  20% {
+    transform: translate(var(--rx2), var(--ry2));
+  }
+  30% {
+    transform: translate(var(--rx3), var(--ry3));
+  }
+  40% {
+    transform: translate(var(--rx4), var(--ry4));
+  }
+  50% {
+    transform: translate(var(--rx5), var(--ry5));
+  }
+  60% {
+    transform: translate(var(--rx6), var(--ry6));
+  }
+  70% {
+    transform: translate(var(--rx7), var(--ry7));
+  }
+  80% {
+    transform: translate(var(--rx8), var(--ry8));
+  }
+  90% {
+    transform: translate(var(--rx9), var(--ry9));
+  }
+}
+@keyframes ride-11 {
+  0% {
+    transform: translate(var(--rx0), var(--ry0));
+  }
+  9.0909% {
+    transform: translate(var(--rx1), var(--ry1));
+  }
+  18.1818% {
+    transform: translate(var(--rx2), var(--ry2));
+  }
+  27.2727% {
+    transform: translate(var(--rx3), var(--ry3));
+  }
+  36.3636% {
+    transform: translate(var(--rx4), var(--ry4));
+  }
+  45.4545% {
+    transform: translate(var(--rx5), var(--ry5));
+  }
+  54.5455% {
+    transform: translate(var(--rx6), var(--ry6));
+  }
+  63.6364% {
+    transform: translate(var(--rx7), var(--ry7));
+  }
+  72.7273% {
+    transform: translate(var(--rx8), var(--ry8));
+  }
+  81.8182% {
+    transform: translate(var(--rx9), var(--ry9));
+  }
+  90.9091% {
+    transform: translate(var(--rx10), var(--ry10));
+  }
+}
+@keyframes ride-12 {
+  0% {
+    transform: translate(var(--rx0), var(--ry0));
+  }
+  8.3333% {
+    transform: translate(var(--rx1), var(--ry1));
+  }
+  16.6667% {
+    transform: translate(var(--rx2), var(--ry2));
+  }
+  25% {
+    transform: translate(var(--rx3), var(--ry3));
+  }
+  33.3333% {
+    transform: translate(var(--rx4), var(--ry4));
+  }
+  41.6667% {
+    transform: translate(var(--rx5), var(--ry5));
+  }
+  50% {
+    transform: translate(var(--rx6), var(--ry6));
+  }
+  58.3333% {
+    transform: translate(var(--rx7), var(--ry7));
+  }
+  66.6667% {
+    transform: translate(var(--rx8), var(--ry8));
+  }
+  75% {
+    transform: translate(var(--rx9), var(--ry9));
+  }
+  83.3333% {
+    transform: translate(var(--rx10), var(--ry10));
+  }
+  91.6667% {
+    transform: translate(var(--rx11), var(--ry11));
+  }
+}
 .scene--dawn {
   filter: brightness(1.04) sepia(0.18) saturate(1.1);
 }

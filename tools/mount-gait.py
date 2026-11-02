@@ -24,7 +24,9 @@ art/mounts.json under "gait"; a joint the estimate put wrong can be set by
 hand there ("fix": {"LABEL": [x, y]} in pixels of the start frame), and
 "cross": true makes the two legs of a pair swing around one place, so they
 pass each other (the tiger stood with its hind legs apart and they never
-crossed). Writes art/mount-gaits.json.
+crossed). "stride", "lift", "bob" and "nod" size the steps (shares of a
+leg's length); "crouch", "roll" and "head_drop" make a big cat's walk (the
+author: the tiger walked like a horse). Writes art/mount-gaits.json.
 """
 import json
 import math
@@ -111,13 +113,19 @@ def gait(points, size, spec):
     lift = spec.get('lift', 0.22 if kind == 'trot' else 0.14) * length
     bob = spec.get('bob', 0.04 if kind == 'trot' else 0.015) * length
     nod = spec.get('nod', 0.02 if kind == 'trot' else 0.04) * length
+    # A big cat walks low: the body lowered on bent legs ("crouch"), the
+    # shoulder or hip above a standing leg higher than above a swinging one
+    # ("roll"), the head carried low ("head_drop").
+    crouch = spec.get('crouch', 0) * length
+    roll = spec.get('roll', 0) * length
+    head_drop = spec.get('head_drop', 0) * length
     out = []
     for i in range(frames):
         phi = i / frames
         # The body: lowest when a pair stands under it (trot), or a slight
         # sway with each step (walk).
-        dy = bob * math.cos(2 * math.pi * phi * (2 if kind == 'trot' else 4))
-        head = nod * math.sin(2 * math.pi * phi * 2)
+        dy = bob * math.cos(2 * math.pi * phi * (2 if kind == 'trot' else 4)) + crouch
+        head = nod * math.sin(2 * math.pi * phi * 2) + head_drop
         frame = dict(base)
         for label, (x, y) in base.items():
             frame[label] = (x, y + dy + (head if label in HEAD else 0))
@@ -125,6 +133,9 @@ def gait(points, size, spec):
             info = legs[leg]
             phase = (phi - PHASES[kind][leg]) % 1
             fx, fy = foot(phase, STANCE[kind], stride, lift * (1.15 if leg.startswith('front') else 1))
+            if roll:
+                tx, ty = frame[top]
+                frame[top] = (tx, ty - roll * math.cos(2 * math.pi * (phase - STANCE[kind] / 2)))
             t = frame[top]
             e = (info['rest'][0] + fx, info['rest'][1] + fy)
             # The leg cannot stretch: a hoof too far for it rises a little,
