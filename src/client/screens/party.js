@@ -11,7 +11,7 @@ import { formatMinutes } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, state, unlockInfo } from '../state.js';
-import { confirmAction, guildTag, howItWorks, toast, withButton } from '../ui.js';
+import { confirmAction, framedName, guildTag, howItWorks, toast, withButton } from '../ui.js';
 
 // Who goes on the party's exploration and who stays (the author's words of
 // 1.11.2026, "poziomu" for the slip "poziomem").
@@ -106,13 +106,16 @@ export function mountParty(container) {
       { class: 'friend-who' },
       person.status && h('span', { class: `friend-status friend-status--${DOTS[person.status] ?? person.status}`, role: 'img', 'aria-label': STATES[person.status] ?? person.status, title: STATES[person.status] ?? person.status }),
       icon(CLASS_ICONS[person.classId] ?? 'person', { size: 16, className: 'chat-class' }),
-      h('button', {
-        type: 'button',
-        class: 'chat-name',
-        text: person.name,
-        'aria-label': `${person.name}: zobacz postać`,
-        onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)),
-      }),
+      framedName(
+        h('button', {
+          type: 'button',
+          class: 'chat-name',
+          text: person.name,
+          'aria-label': `${person.name}: zobacz postać`,
+          onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)),
+        }),
+        person.nameColor,
+      ),
       guildTag(person.guildTag),
       // The class level too, as the profile says it: the party's spread is
       // of class levels.

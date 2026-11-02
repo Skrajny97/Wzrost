@@ -10,6 +10,7 @@ import { giftReward, highestProfession, isUnlocked, questPeriod } from '../engin
 import { characterView, loadPlayer } from './characters.js';
 import { chatRole, requireChatter } from './chat.js';
 import { content } from './content.js';
+import { nameColorOf } from './cosmetics.js';
 import { guildTagSql } from './guilds.js';
 import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
@@ -44,7 +45,7 @@ export async function ranking(context) {
     db
       .prepare(
         `SELECT c.id, c.name, c.class_id, c.evolution, c.level, c.class_level, c.professions, u.login, u.google_sub, u.chat_moderator,
-                ${guildTagSql('c.id')} AS guild_tag
+                c.cosmetics, ${guildTagSql('c.id')} AS guild_tag
          FROM characters c JOIN users u ON u.id = c.user_id
          WHERE c.${OWN_CHARACTERS}${where} ORDER BY ${order} LIMIT ?`,
       )
@@ -59,6 +60,7 @@ export async function ranking(context) {
       place: index + 1,
       name: row.name,
       guildTag: row.guild_tag ?? null,
+      nameColor: nameColorOf(row.cosmetics),
       classId: row.class_id,
       className: content.evolutionsById[row.evolution]?.name ?? content.classesById[row.class_id]?.name ?? row.class_id,
       level: row.level,
@@ -98,7 +100,7 @@ async function friendsOf(db, id, now) {
     db
       .prepare(
         `SELECT f.id, f.character_id, f.friend_id, f.accepted_at, o.id AS other, o.name, o.class_id, o.level, o.class_level,
-                o.role, u.seen_at, u.trade_off, ${guildTagSql('o.id')} AS guild_tag,
+                o.role, o.cosmetics, u.seen_at, u.trade_off, ${guildTagSql('o.id')} AS guild_tag,
                 EXISTS (SELECT 1 FROM activities a WHERE a.character_id = o.id) AS away,
                 EXISTS (SELECT 1 FROM trades t WHERE o.id IN (t.from_id, t.to_id)
                           AND ((t.state = 'proposed' AND t.created_at > ?) OR (t.state IN ('open', 'locked') AND t.updated_at > ?))) AS trading,
@@ -117,7 +119,16 @@ async function friendsOf(db, id, now) {
   ]);
   const sentTo = new Set(sent.results.map((row) => row.receiver_id));
   const from = new Map(waiting.results.map((row) => [row.sender_id, row.count]));
-  const person = (row) => ({ id: row.id, characterId: row.other, name: row.name, guildTag: row.guild_tag ?? null, classId: row.class_id, level: row.level, classLevel: row.class_level });
+  const person = (row) => ({
+    id: row.id,
+    characterId: row.other,
+    name: row.name,
+    guildTag: row.guild_tag ?? null,
+    nameColor: nameColorOf(row.cosmetics),
+    classId: row.class_id,
+    level: row.level,
+    classLevel: row.class_level,
+  });
   const pending = rows.results.filter((row) => row.accepted_at === null);
   const { max } = content.community.friends;
   const { claimsPerDay } = content.community.gift;

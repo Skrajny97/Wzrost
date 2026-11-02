@@ -10,7 +10,7 @@ import { formatNumber } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call } from '../state.js';
-import { guildTag, withButton } from '../ui.js';
+import { framedName, guildTag, withButton } from '../ui.js';
 
 const ORDERS = [
   { id: 'level', name: 'Poziom postaci', column: 'Poziom' },
@@ -114,13 +114,16 @@ export function mountRanking(container) {
                   'span',
                   { class: 'ranking-who' },
                   icon(CLASS_ICONS[row.classId] ?? 'person', { size: 14, className: 'chat-class' }),
-                  h('button', {
-                    type: 'button',
-                    class: 'chat-name',
-                    text: row.name,
-                    'aria-label': `${row.name}: zobacz postać`,
-                    onClick: (event) => withButton(event.currentTarget, () => openProfile(row.name)),
-                  }),
+                  framedName(
+                    h('button', {
+                      type: 'button',
+                      class: 'chat-name',
+                      text: row.name,
+                      'aria-label': `${row.name}: zobacz postać`,
+                      onClick: (event) => withButton(event.currentTarget, () => openProfile(row.name)),
+                    }),
+                    row.nameColor,
+                  ),
                   guildTag(row.guildTag),
                   row.role && h('span', { class: `chat-role chat-role--${row.role}`, text: `(${row.role})` }),
                 ),

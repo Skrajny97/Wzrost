@@ -149,8 +149,17 @@ test('every sprite on the list has its file at its size, and every class has its
     // Gold, Punkty Czasu and the Encyclopedia's corner.
     icons: ['gold', 'time-points', 'encyclopedia'],
     // The Stajnia's mounts and the looks a mount can wear (each with its
-    // trot), and the character riding them, one for each walk.
-    mounts: [...new Set([...data('settlement').stable.mounts.map((mount) => mount.id), ...Object.keys(data('animations').walk.mounts)])],
+    // trot, and the Sklep Systemu's mount looks), and the character riding
+    // them, one for each walk.
+    mounts: [
+      ...new Set([
+        ...data('settlement').stable.mounts.map((mount) => mount.id),
+        ...Object.keys(data('animations').walk.mounts),
+        ...data('cosmetics').items.filter((item) => item.kind === 'mountSkin').map((item) => item.art),
+      ]),
+    ],
+    // The Sklep Systemu's frames and backgrounds.
+    cosmetics: data('cosmetics').items.filter((item) => item.kind !== 'mountSkin').map((item) => item.art),
     riders: [...data('classes'), ...data('evolutions').evolutions].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
   };
   for (const [kind, { size, width = size, height = size, fit = false, ids }] of Object.entries(SPRITES)) {
@@ -218,9 +227,12 @@ test('the narrator knows when and where each of its lines shows', () => {
 test("the narrator's quests sit in the top bar, where his line points", () => {
   const layout = readFileSync(join(CLIENT, 'layout.js'), 'utf8');
   assert.match(layout, /'data-guide': 'quests'/);
-  // Between the levels and the gold, with the locked Sklep Systemu beside him.
+  // Between the levels and the gold, with the Sklep Systemu's stall beside
+  // him, which opens the shop's page.
   assert.match(layout, /h\('div', \{ class: 'topbar-badges' \}, level, classLevel\),\s*h\('div', \{ class: 'topbar-middle' \}, quests, shop\),/);
-  assert.match(layout, /'Sklep Systemu dojdzie w jednej z kolejnych aktualizacji\.'/);
+  assert.match(layout, /h\('a', \{ class: 'system-shop', href: '#\/sklep', 'aria-label': 'Sklep Systemu' \}/);
+  assert.doesNotMatch(layout, /dojdzie w jednej z kolejnych aktualizacji/);
+  assert.match(readFileSync(join(CLIENT, 'app.js'), 'utf8'), /pattern: \/\^#\\\/sklep\b[^\n]*mount: mountShop/);
   const quests = readFileSync(join(CLIENT, 'quests.js'), 'utf8');
   for (const path of ['/api/quests/claim', '/api/quests/claim-all', '/api/quests/chest']) assert.ok(quests.includes(`'${path}'`), path);
 });
