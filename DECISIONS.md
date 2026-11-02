@@ -2996,6 +2996,41 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Osobny wygląd na komputer: plan i pytania 472–477 (2.11.2026)
+
+Autor: „zaimplementowałeś też GUI z telefonu bezpośrednio na pc a musi być kompletnie osobne, jakoś to na pewno da się ustawić i wykrywać”. Zmienia to dotychczasową zasadę z przeglądu na komputerze (górny pasek i menu trzymają się kolumny telefonu). Plan z makietami (prawdziwa gra z nałożonym szkicem układu, `scratchpad`, nie w grze) poszedł do autora jako pytania, z zaleceniami:
+
+- 472: jedna gra, dwa układy (A), a nie osobna aplikacja (B);
+- 473: wykrywanie samo (szeroki ekran od ok. 1100 px i mysz) z przełącznikiem „Układ ekranu: Sam / Telefon / Komputer” w Ustawieniach (A), tylko samo (B) albo osobny adres (C);
+- 474: trzy kolumny, menu, gra, zadania i czat (A), albo dwie (B);
+- 475: okna na środku (A) albo panel z prawej (B);
+- 476: najpierw szkielet dla wszystkich ekranów, potem ekran po ekranie (A), albo najpierw cała Postać (B);
+- 477: od razu podpowiedzi po najechaniu myszą, Esc i klawisze 1–5 (A), albo później (B).
+
+Autor: „473 A / 474 A / 475 A”, a o 476 i 477: „nie napisałeś o co chodzi” (opisy tych dwóch pytań do autora nie dotarły). Wysłane jeszcze raz, dokładniej; 472 bez odpowiedzi, przyjęte A, bo 473–475 A do tego pasują, z prośbą o znak, jeśli ma być inaczej. Ustalone więc:
+
+1. **Wykrywanie (473 A).** Układ komputera sam na szerokim ekranie (od ok. 1100 px) z myszą, telefon i tablet w układzie telefonu; w Ustawieniach „Układ ekranu: Sam / Telefon / Komputer”, zapamiętany na urządzeniu.
+2. **Trzy kolumny (474 A).** Menu z lewej (pod „Postać” jej zakładki), gra na środku, z prawej zadania narratora i czat; na mniejszym laptopie prawa kolumna chowa się pod przycisk.
+3. **Okna na środku (475 A).** Karty przedmiotów i inne okna na środku ekranu, zamykane Esc albo kliknięciem obok.
+
+Do odpowiedzi na 476 i 477 komputer zostaje przy obecnym wyglądzie. Aplikacja ze Sklepu Play zostaje przy układzie telefonu.
+
+## Plecak: „Rozbierz kilka” (2.11.2026)
+
+Autor: „Trzeba tez zrobic przycisk "Rozbierz kilka" w Plecaku tak by można bylo zaznaczać które chcemy (i możemy) przedmioty i dać do rozbiórki”.
+
+1. **Przycisk.** Pod tytułem Plecaka, obok „Sprzedaj zbędne”, gdy w obozie stoi Stół rozbiórki, a w plecaku są przedmioty. Oba przyciski są teraz w osobnym rzędzie pod tytułem, żeby zmieściły się na wąskim telefonie.
+2. **Zaznaczanie.** Okno pokazuje przedmioty z plecaka jak w Plecaku: dotknięcie zaznacza przedmiot (obwódka i znaczek ✓), drugie dotknięcie odznacza. Przedmioty rzadkości, której stół jeszcze nie bierze, są przyciemnione i nie da się ich zaznaczyć („i możemy”). Założonych przedmiotów w plecaku nie ma, więc nie ma ich też tu. Ulepszone przedmioty i lepsze od założonych można zaznaczyć, ale mają swoje znaczki (+N, strzałka), a pytanie „Rozebrać przedmioty?” podaje, ile wśród zaznaczonych jest ulepszonych.
+3. **Suma zawsze na widoku.** Na dole okna jest, ile przedmiotów zaznaczono, jakie części zrobi z nich stół i w jakim czasie, oraz przycisk „Rozbierz (N)”. Po „Anuluj” w pytaniu okno wraca z tymi samymi zaznaczeniami.
+4. **Kolejka stołu (brakujący szczegół).** Przedmioty, z których powstaje ten sam rodzaj części, idą jednym zleceniem, w kolejce opisanym jako „Przedmioty ×N”. Kilka przedmiotów zajmuje więc tyle miejsc w kolejce, ile jest rodzajów części, a nie po jednym na przedmiot (kolejka mieści 10 zleceń). Części i czas są takie same jak przy rozbieraniu po jednym. Gdy w kolejce brakuje miejsca na wszystkie rodzaje części, okno mówi to przed rozbiórką i nic się nie dzieje.
+5. **Wszystko albo nic.** Gdy któregoś z zaznaczonych przedmiotów nie ma już w plecaku (np. po drugim dotknięciu na innym urządzeniu), nic się nie rozbiera. Zadania narratora i Próby Gildii liczą każdy rozebrany przedmiot. Wzory do Warsztatu odsłaniają się tak jak przy rozbiórce jednego przedmiotu, każdy raz.
+
+## Wersja 0.0.96 (2.11.2026)
+
+1. **Co wchodzi do gry:** „Rozbierz kilka” w Plecaku (zob. wyżej).
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (865 z 865), przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków) i „Rozbierz kilka” w przeglądarce na telefonie 390×844 i 360×640 (zaznaczanie, suma na dole, pytanie, rozbiórka trzech przedmiotów jednym zleceniem).
+
 ## Wieże: przegląd i poprawki tekstów (2.11.2026)
 
 Autor: „Rozumiem, że Wieże śmigają bez problemu? Możesz sie im przyjrzeć też.” Przegląd kodu, symulacje i równoczesne wejścia na żywym serwerze: testy Wież przechodzą, nic się nie wywraca, trzy równoczesne wejścia nie dają podwójnych wejść ani skrzyń, wejście w czasie wyprawy jest zablokowane, piętra do 500 działają. Poprawione od razu, bo to błędy, a nie decyzje:
