@@ -1,0 +1,30 @@
+{
+  "id": "kingslayer-male",
+  "payload": {
+    "prompt": "young man kingslayer assassin, lean, dark hair, standing in the middle of the image, the whole figure from the top of the head to the feet inside the image, about four fifths of the image height, empty space above the head and below the feet, a black hood and a black cloth mask over the lower face, a dark leather armour with a long red sash, holding two long daggers in a reverse grip, crouched ready stance, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 254677011,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793621579,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 3.83,
+    "request_id": "19214cfe-12d8-4a7e-9653-dedd2e13b2e9",
+    "outputs_retained_until": 1793707948,
+    "billing": {
+      "source": "balance",
+      "balance_left": 3.83,
+      "balance_charged": 0.36
+    }
+  }
+}
