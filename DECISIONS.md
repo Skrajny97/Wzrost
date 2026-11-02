@@ -2996,6 +2996,24 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Plan: druga ewolucja, Warownia i dwie nowe profesje (2.11.2026)
+
+Autor: „I oczywiście kolejna Ewolucja klasy na 100 poziomie”, „kolejną sprawą będzie rozwinięcie Obozu – uzależnione od wbicia wszystkich lvli budynków na 10 maksymalny poziom i rozwinięcia samego Poziomu Obozu na maksymalny. Wtedy Obóz będzie przekształcał się nie w Wioskę, jak wcześniej zakładaliśmy, a coś innego, bo jednak focus jest na rozwijanie postaci i Obóz oraz jego Ewolucja muszą być komplementarne” i „Następnie trzeba jeszcze zrobić ze dwie nowe Profesje”. Odpowiedzi 382–395:
+
+1. **Druga ewolucja klasy (382 A, 383 A, 384 A, 385 B).** Na 100. poziomie klasy każda z 15 ewolucji ma jedną dalszą postać, więc dochodzi 15 nowych klas. Każda ma nową nazwę i portret, mocniejszą wersję dotychczasowej cechy, większy przyrost statystyk na poziom klasy i 2 nowe umiejętności: rozwinięcie jednej umiejętności z pierwszej ewolucji i jedną zupełnie nową. Grafika jest pełna, jak przy pierwszej ewolucji: portrety kobiety i mężczyzny, postać w scenie Walki, także na wierzchowcu, oraz ikony i dźwięki umiejętności. Narratora nie ma (385 B: „bo mechanizm znany”). Propozycje idą do autora pojedynczo, z portretem, nazwą i opisem.
+2. **Warownia (386 A).** Gdy wszystkie budynki obozu i sam Obóz mają 10. poziom, Obóz może stać się Warownią, a nie Wioską. Warownia wspiera rozwój postaci. To zastępuje zapowiedź Wioski w danych Obozu.
+3. **Co daje Warownia.**
+    - Plac treningowy (387 A): codzienny trening daje XP klasy, także w czasie wyprawy.
+    - Zbrojownia (388 A): 2–3 zapisane zestawy ekwipunku przełączane jednym stuknięciem.
+    - Sala trofeów (389 A): stałe małe premie za stwory poznane w Bestiariuszu.
+    - Strażnica (390 A): przed wyprawą szanse na elitę, czempiona i zdarzenie, a wyżej tropienie stwora.
+    - Ołtarz Systemu (391 A): raz dziennie jedno z trzech błogosławieństw na wyprawy.
+    - Szklarnia (393 A): sama hoduje znane zioła.
+    - Kapliczka (394 A): po omdleniu na wyprawie zostaje część łupów.
+    - Bez Mistrzowskiej kuźni (392 B): Kowadło zostaje przy obecnym maksimum.
+4. **Dwie nowe profesje (395 A): Górnictwo i Jubilerstwo.** Górnictwo wydobywa w Systemowej Kopalni kamienie szlachetne i rzadkie rudy. Jubilerstwo robi z nich pierścienie, amulety i talizmany oraz oprawia kamienie w przedmioty.
+5. **Kolejność:** druga ewolucja, potem Warownia, potem profesje.
+
 ## Próby Gildii: tylko wyprawy rozpoczęte po wzięciu próby (2.11.2026)
 
 Autor: „uważaj z tym, żeby się nie naliczała wyprawa jedna do obu zadań, zaliczyło mi próbę, mimo że nie odebrałem raportu” (zrzut: „Spędź na wyprawach łącznie 45 minut” wykonana, „… 105 minut” wzięta).
