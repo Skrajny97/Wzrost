@@ -145,18 +145,30 @@ export function toldPieces(companion, content) {
 // Whether the character has talked with the companion today.
 export const talkedToday = (companion, now, content) => companion.talkedOn === questPeriod('daily', now, content).key;
 
+// A word of the day for a companion at the standing `index` (the author:
+// "więcej opcji rozmów na różne stopnie"): one of that standing's chatter,
+// or, with lowerChance, one of the standing just below, so the words repeat
+// less. `rng` is seeded by the seed, the companion and the day, so the same
+// three give the same word.
+function chatterLine(index, rng, content) {
+  const { chatter, lowerChance } = tuning(content).talks;
+  const below = index > 0 && rng.chance(lowerChance);
+  return rng.pick(chatter[content.settlement.standings[below ? index - 1 : index].id]);
+}
+
 // A talk with a companion, once a day (295 A: "towarzysz opowiada kawałek
 // swojej historii, kolejne kawałki odsłaniają się z relacją, a rozmowa ją
 // podnosi"): the next piece of its story once the relation has reached
-// that piece's standing, else a word of chatter picked by the day; and the
-// companion after it, `talk` points closer.
+// that piece's standing, else a word of chatter of its standing, picked by
+// the day; and the companion after it, `talk` points closer.
 export function talkWith(companion, { seed, now }, content) {
   const t = tuning(content);
   const day = questPeriod('daily', now, content).key;
   const pieces = t.talks.stories[companion.story % t.talks.stories.length];
   const told = companion.told ?? 0;
-  const story = told < pieces.length && told <= companionStanding(companion, content).index;
-  const text = story ? pieces[told] : createRng(`${seed}:talk:${companion.id}:${day}`).pick(t.talks.chatter);
+  const { index } = companionStanding(companion, content);
+  const story = told < pieces.length && told <= index;
+  const text = story ? pieces[told] : chatterLine(index, createRng(`${seed}:talk:${companion.id}:${day}`), content);
   return {
     talk: { text: gendered(text, companion.appearance), story, points: t.relation.talk },
     companion: { ...companion, relation: (companion.relation ?? 0) + t.relation.talk, ...(story && { told: told + 1 }), talkedOn: day },

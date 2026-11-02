@@ -1,5 +1,5 @@
 {
-  "$comment": "Osada (src/engine/settlement.js), część I: plansza z miejscami (places, jak plansza obozu: x i y w procentach) i pochodniami (torches: miejsce podstawy pochodni, x i y w procentach), stali mieszkańcy (residents, każdy w swoim miejscu) i bractwa (brotherhoods), u których rośnie reputacja. standings: stopnie reputacji bractwa i relacji z mieszkańcem, od points punktów. Zlecenia (orders): na tablicy wisi open zleceń naraz; w miejsce oddanego albo odrzuconego nowe przychodzi po refillMinutes minut, a co tydzień (zegar zadań narratora) wisi jedno duże (weekly: count razy więcej sztuk, reward razy większa nagroda, reputation punktów). Zlecenie prosi o to, co postać już umie zdobyć (goods: herb zioła, które zna Zielarstwo, potion mikstury znane w Alchemii, material dowolne materiały zwykłych stworów (bez trofeów elit i czempionów) w rzadkości materiału stworów, które postać spotkała, co rzadkość ponad pospolitą materialStep razy mniej sztuk, nazwane według anyMaterial (jedna, dwie, pięć sztuk; autor: „Powinno być prędzej oddaj 32 materiały pospolite/ileś rzadkich/unikalnych”), resource zasoby obozu, part części do rzemiosła do rzadkości z partRarity), w ilości z counts (od, do, na 10 poziomów postaci więcej o perTenLevels), razy udział rzeczy (goodShare w src/engine/settlement.js: zioło według perHour względem najszybszego zioła, mikstura według godzin zbioru jej ziół i warzenia względem najszybszej mikstury, materiały i części materialStep razy mniej na każdą rzadkość wyżej; autor: „przez noc popraw zlecenia i dopasuj je sensownie”); zlecenie ponad dzisiejszy limit (orderCeiling) losuje się od nowa. Płaci pay razy cenę rynkową, a za zioła, mikstury i materiały co najmniej overScrap razy tyle, ile za nie daje złomiarz tej postaci, z premią Skupu złomu (pytanie 236 A) (herb: cena zioła, potion: potionPrice, material: materialPrice, resource: resourceGold, part: partGold razy mnożnik sprzedaży rzadkości), czyli powyżej ceny, którą daje złomiarz, ale poniżej ceny, za którą da się to kupić: zasób u ducha ognia, a część na Ladzie złomiarza, na ich najwyższym poziomie, także w zleceniu tygodnia (sprawdza to test/settlement.test.js); daje reputation punktów bractwu i relationGain punktów relacji z mieszkańcem, który je wiesza (resident). Od stopnia quality.from zlecenie z szansą quality.chance prosi o materiał rzadkości o jedną wyżej i płaci quality.reward razy więcej. Co systemPoints.every oddane zlecenie daje systemPoints.points Punktów Systemu, a tygodniowe systemPoints.weekly. stories: zdanie zamawiającego, po kilka na rodzaj. Zaklinaczka (reforge; resident to jej id wśród mieszkańców): zaklęcie jednego afiksu przedmiotu (wylosowanie go od nowa) kosztuje goldPerLevel złota za poziom przedmiotu razy mnożnik sprzedaży rzadkości, razy growth za każde wcześniejsze zaklęcie tego przedmiotu, i materials: tyle sztuk materiału stworów danej rzadkości (rarity materiału według rzadkości przedmiotu). Pustelnik (hermit; resident to jego id wśród mieszkańców): zerowanie ścieżki za pathGoldPerLevel złota za poziom postaci; zmiana ewolucji pierwszy raz darmo, potem evolutionGold, każda kolejna evolutionGrowth razy drożej; zerowanie statystyk od statsFromLevel (po darmowym do 20. poziomu) za statsGoldPerLevel złota za poziom. Karczma (tavern, część II; resident to id karczmarza): kufel kosztuje mugGoldPerLevel złota za poziom postaci i daje relationGain punktów relacji, a z nim plotka dnia (pytanie 116): jeden z newest najnowszych regionów wewnętrznych otwartych dla klasy postaci, z elitą albo czempionem, nie za łatwy dla postaci; najbliższa wyprawa tam do północy spotyka elitę i czempiona factor razy częściej. lines: słowa karczmarza ({area}: nazwa miejsca, {creature}: stwór w bierniku, jak w liczeniu „1 odyńca”). Towarzysze (companions, część II): werbunek przy każdym stopniu relacji z karczmarzem, za cenę razy priceByStanding tego stopnia (im wyższy stopień, tym taniej), a miejsca dają posłania w Kwaterach obozu; candidates kandydatów co tydzień, każdy z klasą, poziomem postaci plus levelSpread, dwiema cechami (traits, z szansą thirdTraitChance trzema), dwiema umiejętnościami klasy (poziom co skillStep poziomów), profesją, historią (stories) i sprzętem, z którym przychodzi; werbunek kosztuje goldPerLevel złota za jego poziom. Towarzysz dostaje xpShare XP postaci z wyprawy, a catchUp więcej za każdy poziom poniżej postaci. Każdy towarzysz na wyprawie zabiera postaci xpCost jej XP (pytanie 235 B: gra solo zostaje jak dotąd, z premią solo). Cechy: names (kobieta, mężczyzna), text i zmiany w walce (damage, armor, hp, dodge, crit, speed, will). Zaklęcie żywiołu (imbue, część III, pytanie 101 A; resident to Zaklinaczka): broń (slots) zamienia weaponShare obrażeń każdego ciosu na wybrany żywioł, a pancerz dostaje odporność na niego, równą rzadkiemu afiksowi (resistRarity) odporności na jego poziomie. Żywioł daje materiał stwora, który nim atakuje (elements: element i material), materialCount sztuk w rzadkości tego materiału, a złoto to goldPerLevel za poziom przedmiotu razy mnożnik sprzedaży jego rzadkości; relacja z Zaklinaczką rośnie o relationGain. Chata zielarki (herbalist, część III, pytania 120 A i 121 A; resident to id zielarki): zielarka kupuje zioła i mikstury za cenę złomiarza (z premią Skupu złomu w obozie) i o premium więcej, według stopnia relacji z nią (Obcy, Znajomy…); za handel rośnie relacja z nią i reputacja bractwa brotherhood: punkt za każde goldPerPointPerLevel złota razy poziom postaci, najwyżej daily punktów dziennie. Zielarka też sprzedaje zioła (sell; autor: „Kup oczywiście zawsze drożej”): przy każdym stopniu relacji z nią tyle ziół, ile podaje stock (najpierw te z najniższym poziomem Zielarstwa), każde margin razy drożej niż najwięcej, ile za nie płaci ktokolwiek w grze (buyCeiling w src/engine/market.js), mniej upust relacji, a i tak mikstura z kupionych ziół nie daje zysku (sprawdza to test/herbalist.test.js); zakup trafia do plecaka i daje relację oraz reputację jak sprzedaż, w tym samym dziennym limicie. Relacja z towarzyszem (relation, pytanie 296 A): rośnie o perHour punktów za każdą godzinę wspólnej wyprawy, co do ułamka (341 A) i o talk punktów za rozmowę, a stopnie są jak u mieszkańców; każdy stopień ponad pierwszy daje mu w walce bonus więcej obrażeń i HP. Rozmowa (talks, pytanie 295 A): raz dziennie z każdym towarzyszem; opowiada kolejny kawałek swojej historii (stories: po kawałku na stopień, dla każdej historii z listy stories), gdy relacja doszła do jego stopnia, a inaczej mówi coś z chatter; [a|b] to forma dla kobiety i dla mężczyzny. Upust relacji (relationDiscount, pytanie 287 A): mieszkańcy, którzy sprzedają (Gościwit na Targowisku i Jagna), biorą o tyle mniej przy każdym stopniu relacji z nimi (Obcy, Znajomy…), a cena dalej jest wyższa niż to, co płacą NPC. Profesja towarzysza (professions) daje raz w tygodniu prezent (pytanie 112 A): goods jednego rodzaju, które postać już zna (zioła z jej Zielarstwa, mikstury z jej Alchemii, a przed otwarciem profesji te z jej pierwszego poziomu; części do rzadkości partRarity), w liczbie z gifts (od, do, na 10 poziomów postaci więcej o perTenLevels, w dół do pełnej sztuki).",
+  "$comment": "Osada (src/engine/settlement.js), część I: plansza z miejscami (places, jak plansza obozu: x i y w procentach) i pochodniami (torches: miejsce podstawy pochodni, x i y w procentach), stali mieszkańcy (residents, każdy w swoim miejscu) i bractwa (brotherhoods), u których rośnie reputacja. standings: stopnie reputacji bractwa i relacji z mieszkańcem, od points punktów. Zlecenia (orders): na tablicy wisi open zleceń naraz; w miejsce oddanego albo odrzuconego nowe przychodzi po refillMinutes minut, a co tydzień (zegar zadań narratora) wisi jedno duże (weekly: count razy więcej sztuk, reward razy większa nagroda, reputation punktów). Zlecenie prosi o to, co postać już umie zdobyć (goods: herb zioła, które zna Zielarstwo, potion mikstury znane w Alchemii, material dowolne materiały zwykłych stworów (bez trofeów elit i czempionów) w rzadkości materiału stworów, które postać spotkała, co rzadkość ponad pospolitą materialStep razy mniej sztuk, nazwane według anyMaterial (jedna, dwie, pięć sztuk; autor: „Powinno być prędzej oddaj 32 materiały pospolite/ileś rzadkich/unikalnych”), resource zasoby obozu, part części do rzemiosła do rzadkości z partRarity), w ilości z counts (od, do, na 10 poziomów postaci więcej o perTenLevels), razy udział rzeczy (goodShare w src/engine/settlement.js: zioło według perHour względem najszybszego zioła, mikstura według godzin zbioru jej ziół i warzenia względem najszybszej mikstury, materiały i części materialStep razy mniej na każdą rzadkość wyżej; autor: „przez noc popraw zlecenia i dopasuj je sensownie”); zlecenie ponad dzisiejszy limit (orderCeiling) losuje się od nowa. Płaci pay razy cenę rynkową, a za zioła, mikstury i materiały co najmniej overScrap razy tyle, ile za nie daje złomiarz tej postaci, z premią Skupu złomu (pytanie 236 A) (herb: cena zioła, potion: potionPrice, material: materialPrice, resource: resourceGold, part: partGold razy mnożnik sprzedaży rzadkości), czyli powyżej ceny, którą daje złomiarz, ale poniżej ceny, za którą da się to kupić: zasób u ducha ognia, a część na Ladzie złomiarza, na ich najwyższym poziomie, także w zleceniu tygodnia (sprawdza to test/settlement.test.js); daje reputation punktów bractwu i relationGain punktów relacji z mieszkańcem, który je wiesza (resident). Od stopnia quality.from zlecenie z szansą quality.chance prosi o materiał rzadkości o jedną wyżej i płaci quality.reward razy więcej. Co systemPoints.every oddane zlecenie daje systemPoints.points Punktów Systemu, a tygodniowe systemPoints.weekly. stories: zdanie zamawiającego, po kilka na rodzaj. Zaklinaczka (reforge; resident to jej id wśród mieszkańców): zaklęcie jednego afiksu przedmiotu (wylosowanie go od nowa) kosztuje goldPerLevel złota za poziom przedmiotu razy mnożnik sprzedaży rzadkości, razy growth za każde wcześniejsze zaklęcie tego przedmiotu, i materials: tyle sztuk materiału stworów danej rzadkości (rarity materiału według rzadkości przedmiotu). Pustelnik (hermit; resident to jego id wśród mieszkańców): zerowanie ścieżki za pathGoldPerLevel złota za poziom postaci; zmiana ewolucji pierwszy raz darmo, potem evolutionGold, każda kolejna evolutionGrowth razy drożej; zerowanie statystyk od statsFromLevel (po darmowym do 20. poziomu) za statsGoldPerLevel złota za poziom. Karczma (tavern, część II; resident to id karczmarza): kufel kosztuje mugGoldPerLevel złota za poziom postaci i daje relationGain punktów relacji, a z nim plotka dnia (pytanie 116): jeden z newest najnowszych regionów wewnętrznych otwartych dla klasy postaci, z elitą albo czempionem, nie za łatwy dla postaci; najbliższa wyprawa tam do północy spotyka elitę i czempiona factor razy częściej. lines: słowa karczmarza ({area}: nazwa miejsca, {creature}: stwór w bierniku, jak w liczeniu „1 odyńca”). Towarzysze (companions, część II): werbunek przy każdym stopniu relacji z karczmarzem, za cenę razy priceByStanding tego stopnia (im wyższy stopień, tym taniej), a miejsca dają posłania w Kwaterach obozu; candidates kandydatów co tydzień, każdy z klasą, poziomem postaci plus levelSpread, dwiema cechami (traits, z szansą thirdTraitChance trzema), dwiema umiejętnościami klasy (poziom co skillStep poziomów), profesją, historią (stories) i sprzętem, z którym przychodzi; werbunek kosztuje goldPerLevel złota za jego poziom. Towarzysz dostaje xpShare XP postaci z wyprawy, a catchUp więcej za każdy poziom poniżej postaci. Każdy towarzysz na wyprawie zabiera postaci xpCost jej XP (pytanie 235 B: gra solo zostaje jak dotąd, z premią solo). Cechy: names (kobieta, mężczyzna), text i zmiany w walce (damage, armor, hp, dodge, crit, speed, will). Zaklęcie żywiołu (imbue, część III, pytanie 101 A; resident to Zaklinaczka): broń (slots) zamienia weaponShare obrażeń każdego ciosu na wybrany żywioł, a pancerz dostaje odporność na niego, równą rzadkiemu afiksowi (resistRarity) odporności na jego poziomie. Żywioł daje materiał stwora, który nim atakuje (elements: element i material), materialCount sztuk w rzadkości tego materiału, a złoto to goldPerLevel za poziom przedmiotu razy mnożnik sprzedaży jego rzadkości; relacja z Zaklinaczką rośnie o relationGain. Chata zielarki (herbalist, część III, pytania 120 A i 121 A; resident to id zielarki): zielarka kupuje zioła i mikstury za cenę złomiarza (z premią Skupu złomu w obozie) i o premium więcej, według stopnia relacji z nią (Obcy, Znajomy…); za handel rośnie relacja z nią i reputacja bractwa brotherhood: punkt za każde goldPerPointPerLevel złota razy poziom postaci, najwyżej daily punktów dziennie. Zielarka też sprzedaje zioła (sell; autor: „Kup oczywiście zawsze drożej”): przy każdym stopniu relacji z nią tyle ziół, ile podaje stock (najpierw te z najniższym poziomem Zielarstwa), każde margin razy drożej niż najwięcej, ile za nie płaci ktokolwiek w grze (buyCeiling w src/engine/market.js), mniej upust relacji, a i tak mikstura z kupionych ziół nie daje zysku (sprawdza to test/herbalist.test.js); zakup trafia do plecaka i daje relację oraz reputację jak sprzedaż, w tym samym dziennym limicie. Relacja z towarzyszem (relation, pytanie 296 A): rośnie o perHour punktów za każdą godzinę wspólnej wyprawy, co do ułamka (341 A) i o talk punktów za rozmowę, a stopnie są jak u mieszkańców; każdy stopień ponad pierwszy daje mu w walce bonus więcej obrażeń i HP. Rozmowa (talks, pytanie 295 A): raz dziennie z każdym towarzyszem; opowiada kolejny kawałek swojej historii (stories: po kawałku na stopień, dla każdej historii z listy stories), gdy relacja doszła do jego stopnia, a inaczej mówi zdanie dnia ze swojego stopnia relacji (chatter: zdania według id stopnia), z szansą lowerChance ze stopnia o jeden niżej; [a|b] to forma dla kobiety i dla mężczyzny. Upust relacji (relationDiscount, pytanie 287 A): mieszkańcy, którzy sprzedają (Gościwit na Targowisku i Jagna), biorą o tyle mniej przy każdym stopniu relacji z nimi (Obcy, Znajomy…), a cena dalej jest wyższa niż to, co płacą NPC. Profesja towarzysza (professions) daje raz w tygodniu prezent (pytanie 112 A): goods jednego rodzaju, które postać już zna (zioła z jej Zielarstwa, mikstury z jej Alchemii, a przed otwarciem profesji te z jej pierwszego poziomu; części do rzadkości partRarity), w liczbie z gifts (od, do, na 10 poziomów postaci więcej o perTenLevels, w dół do pełnej sztuki).",
   "name": "Rozstaje",
   "description": "Osada na skrzyżowaniu leśnych dróg, za puszczą. Ludzie stąd handlują ze wszystkimi, którzy wychodzą z lasu żywi.",
   "places": [
@@ -368,17 +368,100 @@
           "Druga połowa mapy się znalazła. U Gościwita, za trzy grosze. Jak wrócimy z wyprawy, pójdziemy razem sprawdzić ten krzyżyk."
         ]
       ],
-      "chatter": [
-        "Dobrze się dziś szło. Nogi bolą, ale głowa spokojna.",
-        "Słyszysz? Tylko wiatr. Lubię takie wieczory.",
-        "Zbylut znowu podlał piwo wodą. Ale co tam, przynajmniej zimne.",
-        "Jagna dała mi napar na plecy. Śmierdzi jak bagno, ale pomaga.",
-        "Pada od rana. W taką pogodę nawet wilki siedzą w norach.",
-        "Sołtys pytał o ciebie. Chyba ma nowe zlecenie.",
-        "Śniło mi się, że w Wiatrołomach rosną złote grzyby. Wiem, głupi sen.",
-        "Opowiesz mi kiedyś, skąd przychodzisz? Nie dziś. Kiedyś.",
-        "Odpoczywaj. Jutro też jest dzień."
-      ]
+      "lowerChance": 0.25,
+      "chatter": {
+        "stranger": [
+          "Dobrze się dziś szło. Nogi bolą, ale głowa spokojna.",
+          "Pada od rana. W taką pogodę nawet wilki siedzą w norach.",
+          "Jeszcze nie wiem, co o tobie myśleć. Daj mi kilka wypraw.",
+          "Nie musisz mnie lubić. Wystarczy, że nie zostawisz mnie w lesie.",
+          "Twoich łupów nie ruszam. Swoje zdobędę [sama|sam].",
+          "Jak w nocy coś usłyszysz, budź mnie. Śpię czujnie.",
+          "Od ziemi ciągnie chłodem. Przydałaby się druga skóra na posłanie.",
+          "Kawał drogi za nami. Buty wytrzymały, ja też.",
+          "Walczysz pewnie. Ciekawe, jak będzie w prawdziwych tarapatach.",
+          "Jaskółki latają nisko. Jutro będzie lało.",
+          "Rano napełnię bukłaki. Nie z każdego strumienia da się pić.",
+          "Zbylut mówi, że można ci ufać. Zobaczymy.",
+          "Kiedy zrobi się gorąco, nie uciekaj. Ja też nie ucieknę.",
+          "Nie pytam, czego szukasz w puszczy. Ty mnie też nie pytaj.",
+          "Porządny obóz. Widać, że ktoś tu myśli o jutrze."
+        ],
+        "acquaintance": [
+          "Zbylut znowu podlał piwo wodą. Ale co tam, przynajmniej zimne.",
+          "Jagna dała mi napar na plecy. Śmierdzi jak bagno, ale pomaga.",
+          "Sołtys pytał o ciebie. Chyba ma nowe zlecenie.",
+          "Gościwit próbował mi wcisnąć róg tura. Głowę dam, że był krowi.",
+          "Wiedana kazała mi nie dotykać kryształów. Nawet nie [zdążyłam|zdążyłem] wyciągnąć ręki.",
+          "Koniuszy mówi, że konie są mądrzejsze od ludzi. Po wieczorze w Karczmie trudno się z nim kłócić.",
+          "Smród z Garbarni dochodzi dziś aż do palisady. Garbarz mówi, że tak pachnie dobry zarobek.",
+          "Kowal rzadko odkłada młot. A kiedy odłoży, na Rozstajach robi się dziwnie cicho.",
+          "Na Tablicy zleceń znowu ktoś prosi o zioła na kaszel. Pewnie dla starej Dobrawy.",
+          "Wiewiórki ze Skraju Wiatrołomów rzucają szyszkami celniej niż niejeden łucznik.",
+          "Jenot wygląda jak lis przebrany za borsuka. Puszcza ma poczucie humoru.",
+          "Duch ognia zasyczał na mnie, kiedy [dorzuciłam|dorzuciłem] mokrego drewna. Obraził się do wieczora.",
+          "Złomiarz chciał mi sprzedać dziurawy hełm. Mówił, że to dla przewiewu.",
+          "Bogumił pamięta każdy dług na Rozstajach. Lepiej nie pożyczać od niego nawet łyżki.",
+          "Sambor znowu siedział przed chatą i patrzył w las. Co on tam widzi?",
+          "Kuna kiedyś ukradła mi suchar prosto z sakwy. Złodziejka, ale ładna.",
+          "Woda ze studni na Rozstajach jest najzimniejsza, jaką [piłam|piłem]. Aż zęby bolą."
+        ],
+        "regular": [
+          "Śniło mi się, że w Wiatrołomach rosną złote grzyby. Wiem, głupi sen.",
+          "Przed każdym wymarszem dwa razy poprawiasz pas. Myślisz, że nikt nie widzi?",
+          "Mruczysz pod nosem, kiedy liczysz złoto. Wiesz o tym?",
+          "Do dziś czuję w butach tamtą ulewę z drogi powrotnej.",
+          "Pamiętasz, jak [zgubiłam|zgubiłem] drogę we mgle? Tylko nie mów nikomu w Karczmie.",
+          "Uroczysko Kamieni nie daje mi spokoju. Przysięgam, że te głazy patrzą.",
+          "Na Zarośniętych Rozlewiskach komary są większe od wróbli. I głodniejsze.",
+          "Na Torfowych Mszarach każdy krok się zapada. Nienawidzę tego mlaskania pod butami.",
+          "Ze wszystkich stworów najbardziej nie znoszę pijawek. Wilk przynajmniej gryzie uczciwie.",
+          "Odyniec to nie dzik, tylko góra złości na czterech nogach.",
+          "Licho nie śpi, tak mówią. Ja tam wolę, żeby spało.",
+          "Przed snem obchodzę Kwatery dookoła. Stary nawyk, nie śmiej się.",
+          "Ile to już wypraw razem? [Przestałam|Przestałem] liczyć.",
+          "Następnym razem ja wybieram drogę. Twoje skróty zawsze prowadzą przez błoto.",
+          "W Zatopionym Lesie każda kłoda może być krokodylem. Dlatego nie siadam tam na kłodach.",
+          "Znowu zgarniasz najlepsze łupy. Kiedyś cię na tym przyłapię."
+        ],
+        "trusted": [
+          "Opowiesz mi kiedyś, skąd przychodzisz? Nie dziś. Kiedyś.",
+          "Czasem boję się, że po którejś walce już nie wstanę. Tobie mogę to powiedzieć.",
+          "Przed długą wyprawą źle śpię. Leżę i liczę, co może pójść nie tak.",
+          "[Chciałabym|Chciałbym] zobaczyć, co leży za Torfowymi Mszarami. Mówią, że tylko bagno, ale ja w to nie wierzę.",
+          "Na starość chcę mieć chatę z widokiem na las. Las jest najpiękniejszy z daleka.",
+          "Rada na drogę: nigdy nie siadaj plecami do wody. Na Zarośniętych Rozlewiskach to się mści.",
+          "Nie bierz wszystkiego, co błyszczy. Błotne gobliny też od tego zaczynały.",
+          "Odpocznij do pełna, zanim znowu ruszysz. Puszcza nigdzie nie ucieknie.",
+          "Posłuchaj czasem Sambora. Zanim zamieszkał pod lasem, zaszedł podobno dalej niż ktokolwiek z Rozstajów.",
+          "Matka mówiła, że las oddaje to, co mu się da. Długo nie [rozumiałam|rozumiałem], o co jej chodziło.",
+          "Jako dziecko [bałam|bałem] się burzy. Teraz boję się tylko płanetnika.",
+          "Za młodu [miałam|miałem] psa, który chodził za mną wszędzie. W lesie czasem jeszcze się za nim oglądam.",
+          "Kiedy pierwszy raz [zgubiłam|zgubiłem] się w puszczy, wyprowadził mnie lis. Do dziś nie wiem, czy przypadkiem.",
+          "Rzadko komuś ufam. Tobie zaczynam i trochę mnie to niepokoi.",
+          "Za dużo bierzesz na siebie. Zostaw czasem coś dla mnie.",
+          "Gdy wyruszasz beze mnie, nie mogę sobie znaleźć miejsca. Wracaj szybko."
+        ],
+        "friend": [
+          "Słyszysz? Tylko wiatr. Lubię takie wieczory.",
+          "Odpoczywaj. Jutro też jest dzień.",
+          "Nie musimy rozmawiać. Posiedźmy po prostu przy ogniu.",
+          "Z tobą nawet puszcza nocą nie jest taka straszna.",
+          "Nie [szukałam|szukałem] domu, a jednak go tu [znalazłam|znalazłem].",
+          "Dokądkolwiek pójdziesz, idę z tobą. Nie musisz nawet pytać.",
+          "Zbylut pytał, czy nie szukam nowej roboty. [Wyśmiałam|Wyśmiałem] go.",
+          "[Myślałam|Myślałem] dziś o tym, co po nas zostanie. Może wystarczy, że ktoś opowie w Karczmie o naszych wyprawach.",
+          "Zjedz coś ciepłego przed wymarszem. Ktoś musi o ciebie dbać.",
+          "Masz zmęczone oczy. Idź spać, ja popilnuję ognia.",
+          "Wiem, że jeśli padnę w walce, nie zostawisz mnie w lesie. Rzadko można to o kimś powiedzieć.",
+          "Puszcza jest wielka, a dobrych ludzi mało. Dobrze, że [trafiłam|trafiłem] właśnie na ciebie.",
+          "Obóz kiedyś zmieni się w wioskę. Chcę wtedy mieszkać w chacie najbliżej twojej.",
+          "Rzadko dziękuję, więc powiem raz, a porządnie: dziękuję. Za wszystko.",
+          "Nie wiem, co czeka dalej w puszczy. Wiem tylko, że chcę to zobaczyć z tobą.",
+          "Dawniej [myślałam|myślałem], że najemnik ma tylko tych, którzy mu płacą. [Myliłam|Myliłem] się.",
+          "Pamiętasz naszą pierwszą rozmowę? [Byłam|Byłem] wtedy jak jeż. Dobrze, że cię to nie odstraszyło."
+        ]
+      }
     }
   }
 }

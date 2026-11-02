@@ -1105,9 +1105,16 @@ function checkSettlement(data, { rarities }) {
   talks.stories.forEach((pieces, index) => {
     if (pieces.length !== standings.length) errors.push(`settlement.json: historia ${index} w companions.talks ma ${pieces.length} kawałków, a stopni jest ${standings.length}`);
   });
-  for (const line of [...talks.stories.flat(), ...talks.chatter]) {
+  for (const line of [...talks.stories.flat(), ...Object.values(talks.chatter).flat()]) {
     if (line.replace(/\[[^\[\]|]*\|[^\[\]|]*\]/g, '').match(/[[\]|]/)) errors.push(`settlement.json: zła forma [kobieta|mężczyzna] w „${line}”`);
   }
+  // The words of the day by the standing of the relation (the author:
+  // "więcej opcji rozmów na różne stopnie"): a list for every standing, for
+  // no other, and no line twice.
+  for (const standing of standings) if (!talks.chatter[standing.id]?.length) errors.push(`settlement.json: companions.talks.chatter nie ma zdań dla stopnia ${standing.id}`);
+  for (const id of Object.keys(talks.chatter)) if (!standingIds.has(id)) errors.push(`settlement.json: companions.talks.chatter ma nieznany stopień ${id}`);
+  const chatter = Object.values(talks.chatter).flat();
+  for (const line of new Set(chatter.filter((one, index) => chatter.indexOf(one) !== index))) errors.push(`settlement.json: zdanie „${line}” stoi w companions.talks.chatter dwa razy`);
   // The residents who sell take less with each standing (287 A), never
   // more at a higher one.
   const discounts = data.settlement.relationDiscount;
