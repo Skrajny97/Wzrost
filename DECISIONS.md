@@ -3000,7 +3000,7 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 
 1. **Co wchodzi do gry:** poprawki z uwag autora (zob. sekcję niżej) oraz drapieżny chód Tygrysa szablozębnego (zob. „Tygrys szablozębny 371 B…”).
 2. **Baza danych:** bez migracji.
-3. **Przed wdrożeniem:** wszystkie testy (TESTS) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Atak na Bestię z odtworzeniem walki, Tablicę prób na górze, nową listę w „Poproś gildię”, zwiniętą listę członków i „Zaproś do gildii” w karcie postaci oraz zakładki w „Poproś gildię” sprawdzono w przeglądarce na 390×844.
+3. **Przed wdrożeniem:** wszystkie testy (822) przechodzą (test czasu oceny zagrożenia przeszedł przy ponownym uruchomieniu, gdy maszyna przestała liczyć równocześnie testy pomocników; ta sama ocena trwa tyle samo w wersji 0.0.81), a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Atak na Bestię z odtworzeniem walki, Tablicę prób na górze, nową listę w „Poproś gildię”, zwiniętą listę członków i „Zaproś do gildii” w karcie postaci oraz zakładki w „Poproś gildię” sprawdzono w przeglądarce na 390×844.
 
 ## Uwagi autora: Gildia, Upominki i tygrys (2.11.2026)
 
