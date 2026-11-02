@@ -2996,6 +2996,13 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Uwagi autora: wycofana prośba i Wieża Drużyn (2.11.2026)
+
+Autor: „375 A” i „wycofanie prośby w Gildii przy braku realizacji aktualnej daje możliwość od razu wystawienia nowej prośby”.
+
+1. **Wycofana prośba bez darów.** Prośba, na którą nikt nic jeszcze nie dał, po wycofaniu znika, jakby jej nie było. Nową prośbę można więc dodać od razu, bez 8 godzin czekania. Okno wycofania mówi wtedy: „Nikt jeszcze nic nie dał, więc nową prośbę dodasz od razu.” Prośba, na którą ktoś już coś dał, zostaje po wycofaniu na karcie z darami, a kolejną dodasz jak dotąd 8 godzin po niej. To zmienia punkt 9 „Prób i Próśb Gildii”.
+2. **Wieża Drużyn (375 A).** Wolne miejsca w Wieży Drużyn dalej zajmują towarzysze z Kwater, także ci, którzy zostają w kwaterze.
+
 ## Wersja 0.0.83 (2.11.2026)
 
 1. **Co wchodzi do gry:** ulepszanie przedmiotów towarzyszy na Kowadle, „Zostań w kwaterze” i Drużyna bez towarzyszy z Kwater oraz rozmowy z towarzyszami na każdy stopień relacji (zob. dwie sekcje niżej). Do tego chód Tygrysa szablozębnego z głową poruszającą się w rytm kroków i jego nowy obrazek na karcie (373, 374; zob. „Tygrys szablozębny 371 B…”, punkt 1 i nowy punkt 4).
@@ -3018,7 +3025,7 @@ Autor: „niech tu będzie opcja kliknięcia w przedmiot i ulepszania go jak na 
 10. **Wyprawa drużyny.** Wolnych miejsc w wyprawie drużyny nie zajmują już towarzysze lidera. To zastępuje zdanie o wolnych miejscach w punkcie 6 „Drużyn” i towarzyszy lidera w punkcie 1 „Wspólnych walk wyprawy drużyny”. Wyprawa, która wyruszyła przed tą zmianą, kończy się tak, jak zaczęła.
 11. **Kto już jest w drużynie (brakujący szczegół).** Bez migracji bazy: towarzysze postaci w drużynie zostają w kwaterze, nawet gdy nikt nie stuknął „Zostań w kwaterze”. Po wyjściu z drużyny taki towarzysz znowu chodzi na wyprawy. Tak samo jest z towarzyszem zwerbowanym w czasie bycia w drużynie.
 12. **Zagrożenie przed wyprawą** liczy tylko towarzyszy, którzy idą.
-13. **Wieża Drużyn bez zmian (brakujący szczegół).** W Wieży Drużyn wolne miejsca dalej zajmują towarzysze z Kwater, także ci, którzy zostają w kwaterze. Autor chciał Wież Drużyn „ze zwerbowanymi postaciami”, a nowa zasada mówi o polowaniu. Wieżę bez towarzyszy daje jedna zmiana w danych (`companions` w `data/towers.json`).
+13. **Wieża Drużyn bez zmian (375 A).** W Wieży Drużyn wolne miejsca dalej zajmują towarzysze z Kwater, także ci, którzy zostają w kwaterze. Autor chciał Wież Drużyn „ze zwerbowanymi postaciami”, a nowa zasada mówi o polowaniu. Wieżę bez towarzyszy daje jedna zmiana w danych (`companions` w `data/towers.json`).
 14. **Teksty** stoją w `data/settlement.json` (`companions.texts`).
 
 ## Rozmowy z towarzyszami na każdy stopień (2.11.2026)
@@ -3085,7 +3092,7 @@ Autor: „345 A” i „346 A”.
 6. **Pasek i progi (brakujący szczegół).** Każda wykonana próba to punkt na pasku gildii. Pasek ma 4 progi: 2, 4, 6 i 8 prób na aktywnego członka. Aktywny jest członek, którego konto było w grze w ostatnich 7 dniach. Liczy się ich tylu, ilu było przy losowaniu tablicy, co najmniej jeden. Jedna postać dokłada do paska najwyżej 10 prób w tygodniu. Osiągnięty próg zostaje, także gdy ktoś odejdzie z gildii.
 7. **Skrzynie (brakujący szczegół).** Każdy osiągnięty próg daje skrzynię każdej postaci, która w tym tygodniu wykonała w tej gildii choć jedną próbę. W skrzyni jest złoto zależne od poziomu postaci (od 10 + 4 za poziom przy 1. progu do 30 + 12 za poziom przy 4.), od 10 do 30 Punktów Czasu i od 2 do 5 sztuk materiału zwykłego stwora z miejsca, do którego chodzi klasa postaci. Ostatni próg daje też 5 Punktów Systemu. Skrzynię odbiera się do końca następnego tygodnia, raz na postać, tydzień i próg.
 8. **Prośby Gildii (346 A).** Gdy do zlecenia na Tablicy zleceń, na Kowadle, w Kuźni albo u Zaklinaczki brakuje materiału, zioła albo mikstury, postać w gildii widzi przycisk „Poproś gildię”. W zakładce Prośby można też poprosić o wszystko, co postać ma albo zna z Encyklopedii. Prośba to od 1 do 10 sztuk jednego materiału, zioła albo mikstury. O przedmioty i złoto prosić nie można.
-9. **Jedna prośba naraz (brakujący szczegół).** Postać ma naraz jedną otwartą prośbę. Kolejną doda 8 godzin po dodaniu poprzedniej, także po jej wycofaniu. Prośba wisi, aż ktoś ją spełni albo postać ją wycofa, najdłużej 48 godzin.
+9. **Jedna prośba naraz (brakujący szczegół).** Postać ma naraz jedną otwartą prośbę. Kolejną doda 8 godzin po dodaniu poprzedniej, także po jej wycofaniu. *Prośba wycofana, zanim ktoś coś dał, nie liczy się do tych 8 godzin: zob. „Uwagi autora: wycofana prośba i Wieża Drużyn”.* Prośba wisi, aż ktoś ją spełni albo postać ją wycofa, najdłużej 48 godzin.
 10. **Dawanie.** Inni członkowie dają ze swoich zapasów, kiedy chcą, najwyżej tyle, ile brakuje. Sztuki trafiają od razu do postaci, która prosi, z imieniem dającej. Zioła i mikstury potrzebują miejsca w jej plecaku. Postacie jednego konta nic sobie nie dają, jak w Wymianie. Encyklopedia nie zalicza danych sztuk.
 11. **Za dawanie tylko wdzięczność.** System nic za dawanie nie płaci. Dająca postać dostaje miejsce w rankingu „Dobroczyńcy tygodnia” (sztuki dane od poniedziałku) i podziękowanie, raz za każdy dar. Dane sztuki liczą się do Prób Gildii.
 12. **O co prosi przycisk (brakujący szczegół).** Przy zleceniu przycisk prosi o jego zioło, miksturę albo materiał. Przy zleceniu na dowolne materiały jednej rzadkości lista nie ma trofeów elit i czempionów, bo zlecenie ich nie bierze. Na Kowadle, w Kuźni i u Zaklinaczki przycisk prosi o materiał potrzebnej rzadkości albo żywiołu. Na Kowadle pojawia się razem z tym, czego brakuje, po stuknięciu „Ulepsz”.

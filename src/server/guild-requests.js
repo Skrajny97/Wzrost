@@ -250,16 +250,19 @@ export async function askGuild(context) {
 
 // POST /api/guild/requests/cancel: the character takes its open request
 // back; the gifts it got stay, and the wait for the next one counts from the
-// one taken back.
+// one taken back. One nobody gave anything to goes as if never made, so the
+// next one may be made at once (the author: "wycofanie prośby w Gildii przy
+// braku realizacji aktualnej daje możliwość od razu wystawienia nowej
+// prośby"); in one batch, so a gift cannot slip in between.
 export async function cancelGuildRequest(context) {
   const { player, guild, db } = await member(context);
   const now = context.now;
-  const result = await db
-    .prepare("UPDATE guild_requests SET state = 'cancelled', closed_at = ? WHERE character_id = ? AND state = 'open' AND ends_at > ?")
-    .bind(now, player.row.id, now)
-    .run();
-  if (result.meta.changes !== 1) throw new ApiError(409, 'no_request', errors().noRequest);
-  return answer(db, player, guild, now, { text: words().cancelled });
+  const [dropped, cancelled] = await db.batch([
+    db.prepare("DELETE FROM guild_requests WHERE character_id = ? AND state = 'open' AND ends_at > ? AND given = 0").bind(player.row.id, now),
+    db.prepare("UPDATE guild_requests SET state = 'cancelled', closed_at = ? WHERE character_id = ? AND state = 'open' AND ends_at > ?").bind(now, player.row.id, now),
+  ]);
+  if (dropped.meta.changes !== 1 && cancelled.meta.changes !== 1) throw new ApiError(409, 'no_request', errors().noRequest);
+  return answer(db, player, guild, now, { text: dropped.meta.changes === 1 ? words().cancelledFree : words().cancelled });
 }
 
 // POST /api/guild/requests/give { requestId, count }: a member gives pieces

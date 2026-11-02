@@ -190,7 +190,7 @@
       "title": "Prośby Gildii",
       "intro": "Brakuje materiału, zioła albo mikstury? Poproś gildię, a inni dadzą ze swoich zapasów.",
       "how": [
-        "Naraz wisi jedna Twoja prośba, do {most} sztuk jednego materiału, zioła albo mikstury. Kolejną dodasz {wait} godzin po poprzedniej.",
+        "Naraz wisi jedna Twoja prośba, do {most} sztuk jednego materiału, zioła albo mikstury. Kolejną dodasz {wait} godzin po poprzedniej. Prośbę, na którą nikt nic jeszcze nie dał, wycofasz i od razu dodasz nową.",
         "Prośba wisi, aż ktoś ją spełni, aż ją wycofasz albo przez {open} godzin. Dane sztuki trafiają od razu do Ciebie, z imieniem dającego, a za każdy dar podziękujesz jednym stuknięciem.",
         "Zioła i mikstury trafiają do plecaka, więc potrzebują w nim miejsca. O przedmioty i złoto prosić nie można. Encyklopedia nie zaliczy danych sztuk: liczy się tylko to, co postać sama zdobędzie albo wytworzy.",
         "Dawanie nie przynosi złota ani nagród Systemu. Liczy się do rankingu Dobroczyńcy tygodnia i do Prób Gildii. Postacie jednego konta nic sobie nie dają."
@@ -218,6 +218,7 @@
       "cancel": "Wycofaj",
       "cancelTitle": "Wycofać prośbę?",
       "cancelText": "Dane sztuki zostają u Ciebie. Kolejną prośbę dodasz {wait} godzin po tej.",
+      "cancelTextFree": "Nikt jeszcze nic nie dał, więc nową prośbę dodasz od razu.",
       "waitNext": "Kolejną prośbę dodasz od {at}.",
       "others": "Prośby członków",
       "empty": "Nikt z gildii o nic teraz nie prosi.",
@@ -236,6 +237,7 @@
       "gave": "Dane: {goods} × {count} dla postaci {name}.",
       "thankedToast": "Podziękowanie poszło.",
       "cancelled": "Prośba wycofana.",
+      "cancelledFree": "Prośba wycofana. Nikt nic jeszcze nie dał, więc nową dodasz od razu.",
       "errors": {
         "locked": "Gildie odblokujesz na poziomie postaci {level}.",
         "noGuild": "Nie należysz do gildii.",

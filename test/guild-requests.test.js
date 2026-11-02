@@ -1,6 +1,7 @@
 // The Prośby Gildii (src/server/guild-requests.js; the author's 346 A): one
 // open request a member, 1 to 10 pieces of a material, a herb or a potion,
-// never items or gold; the next one 8 hours after the last; a gift moves the
+// never items or gold; the next one 8 hours after the last, at once after
+// one taken back before anybody gave anything; a gift moves the
 // pieces at once, never more than held or still missing, as goods the
 // Encyklopedia leaves out, and moves the giver's trial of the Próby Gildii
 // on; thanks once; the week's ranking; a request's time running out; herbs
@@ -60,12 +61,25 @@ describe('the Prośby Gildii through the API', () => {
       [['Mistrz', 'wolf-pelt:common', 5, 0, 0]],
     );
     assert.equal((await ask('mistrz', { kind: 'herb', key: 'comfrey', count: 1 })).data.error.code, 'open_request');
-    // Taken back: the next one waits for the hours after the last one made.
-    const cancelled = await as('mistrz', 'POST', '/api/guild/requests/cancel');
-    assert.equal(cancelled.data.mine.state, 'cancelled');
-    assert.ok(cancelled.data.nextAt > Date.now());
+    // Taken back before anybody gave anything: as if never made, so the next
+    // one may be made at once (the author: "wycofanie prośby w Gildii przy
+    // braku realizacji aktualnej daje możliwość od razu wystawienia nowej").
+    const dropped = await as('mistrz', 'POST', '/api/guild/requests/cancel');
+    assert.equal(dropped.data.text, rules.texts.cancelledFree);
+    assert.equal(dropped.data.mine, null);
+    assert.equal(dropped.data.nextAt, null);
     assert.deepEqual((await as('druh', 'GET', '/api/guild/requests')).data.requests, []);
     assert.equal((await as('mistrz', 'POST', '/api/guild/requests/cancel')).data.error.code, 'no_request');
+    // Taken back after a gift: the gift stays, and the next one waits for the
+    // hours after the last one made.
+    const again = await ask('mistrz', { kind: 'material', key: 'wolf-pelt:common', count: 5 });
+    assert.equal(again.status, 200, JSON.stringify(again.data).slice(0, 300));
+    await setStacks('Druh', 'materials', { 'wolf-pelt:common': 1 });
+    assert.equal((await give('druh', again.data.mine.id, 1)).status, 200);
+    const cancelled = await as('mistrz', 'POST', '/api/guild/requests/cancel');
+    assert.equal(cancelled.data.text, rules.texts.cancelled);
+    assert.deepEqual([cancelled.data.mine.state, cancelled.data.mine.given], ['cancelled', 1]);
+    assert.ok(cancelled.data.nextAt > Date.now());
     assert.equal((await ask('mistrz', { kind: 'herb', key: 'comfrey', count: 1 })).data.error.code, 'wait');
     await run('UPDATE guild_requests SET created_at = created_at - ?', rules.waitHours * HOUR + 60000);
     assert.equal((await ask('mistrz', { kind: 'herb', key: 'comfrey', count: 1 })).status, 200);

@@ -663,6 +663,7 @@
             "cancel",
             "cancelTitle",
             "cancelText",
+            "cancelTextFree",
             "waitNext",
             "others",
             "empty",
@@ -681,6 +682,7 @@
             "gave",
             "thankedToast",
             "cancelled",
+            "cancelledFree",
             "errors"
           ],
           "properties": {

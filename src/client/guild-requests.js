@@ -310,7 +310,10 @@ export function mountGuildRequests(container) {
               text: texts.cancel,
               onClick: (event) =>
                 withButton(event.currentTarget, async () => {
-                  if (!(await confirmAction({ title: texts.cancelTitle, text: texts.cancelText, confirmLabel: texts.cancel }))) return;
+                  // One nobody gave anything to goes as if never made: a new
+                  // one may be made at once.
+                  const text = mine.given > 0 ? texts.cancelText : texts.cancelTextFree;
+                  if (!(await confirmAction({ title: texts.cancelTitle, text, confirmLabel: texts.cancel }))) return;
                   await act('/api/guild/requests/cancel');
                 }),
             }),
