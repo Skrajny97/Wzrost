@@ -837,11 +837,11 @@ describe('camp', () => {
     const table = (view) => view.camp.buildings.find((building) => building.id === 'craft-table');
     await (await db()).prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'craft-table', 1, 0, 1 FROM characters").run();
     assert.equal(table(await character()).next.minutes, 9);
-    // The highest level leaves only the village to come.
+    // The highest level leaves only the Warownia to come.
     await (await db()).prepare("UPDATE buildings SET level = 10 WHERE building_id = 'camp'").run();
     const top = (await character()).camp.level;
     assert.deepEqual([top.level, top.next, top.effect], [10, null, 'Budowy szybsze o 90%']);
-    assert.match(top.evolution, /Wioską/);
+    assert.match(top.evolution, /Warownią/);
     await stock(10 ** 9, {});
     assert.equal((await build('camp')).data.error.code, 'max_level');
   });
