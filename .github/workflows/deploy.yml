@@ -142,6 +142,11 @@ jobs:
           # deployowanych też 0.0.1 -> 0.0.2 itd."), then the commit.
           APP_VERSION="$(node -p "require('./package.json').version") (${GITHUB_SHA::7})"
           echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
+          # The stylesheet's address carries the commit, so a phone never keeps an
+          # older styles.css under the new scripts (the Sklep Systemu broken on an
+          # iPhone, 2.11.2026). Only this checkout's index.html changes.
+          sed -i "s|href=\"/styles.css\"|href=\"/styles.css?v=${GITHUB_SHA::7}\"|" src/client/index.html
+          grep -q "href=\"/styles.css?v=${GITHUB_SHA::7}\"" src/client/index.html
           secrets=()
           if [ -f "$RUNNER_TEMP/worker-secrets.json" ]; then secrets=(--secrets-file "$RUNNER_TEMP/worker-secrets.json"); fi
           npx wrangler deploy --var "APP_VERSION:$APP_VERSION" "${secrets[@]}" | tee deploy.log
@@ -181,6 +186,11 @@ jobs:
           # The number of the game this test version comes from, then its commit.
           APP_VERSION="$(node -p "require('./package.json').version") (${GITHUB_SHA::7})"
           echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
+          # The stylesheet's address carries the commit, so a phone never keeps an
+          # older styles.css under the new scripts (the Sklep Systemu broken on an
+          # iPhone, 2.11.2026). Only this checkout's index.html changes.
+          sed -i "s|href=\"/styles.css\"|href=\"/styles.css?v=${GITHUB_SHA::7}\"|" src/client/index.html
+          grep -q "href=\"/styles.css?v=${GITHUB_SHA::7}\"" src/client/index.html
           npx wrangler deploy --env test --var "APP_VERSION:$APP_VERSION" | tee deploy.log
       - name: Sprawdzenie działania wersji testowej
         run: node tools/smoke-test.mjs deploy.log "$APP_VERSION"

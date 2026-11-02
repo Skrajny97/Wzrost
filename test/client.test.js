@@ -266,8 +266,12 @@ test('a service worker makes the game installable and shows a page offline', () 
   assert.match(worker, /const OFFLINE_PAGE = '\/offline';/);
   const files = JSON.parse(/const OFFLINE_FILES = (\[[^\]]*\])/.exec(worker)[1].replace(/OFFLINE_PAGE/, "'/offline.html'").replaceAll("'", '"'));
   for (const file of files) assert.ok(existsSync(join(CLIENT, file)), `${file} is missing`);
+  // The game's stylesheet never passes through the worker, so an old copy
+  // of it cannot stand in for the current one; the offline page has its own.
+  assert.ok(!files.includes('/styles.css'));
   const offline = readFileSync(join(CLIENT, 'offline.html'), 'utf8');
-  assert.match(offline, /href="\/styles\.css"/);
+  assert.match(offline, /href="\/offline\.css"/);
+  assert.doesNotMatch(offline, /styles\.css/);
   assert.match(offline, /href="\/">Spróbuj ponownie</);
 });
 
