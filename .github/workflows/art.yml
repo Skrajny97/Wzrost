@@ -1,4 +1,6 @@
-# Draws sprite drafts with Retro Diffusion (tools/generate-art.mjs), or the
+# Draws sprite drafts with Retro Diffusion (tools/generate-art.mjs), the
+# evolution portraits with PixelLab (kind evolutions-pixellab, "variants" are
+# calls of four versions each, tools/generate-portraits-pixellab.mjs), or the
 # walks animated by PixelLab (kind walks-pixellab, tools/animate-walks.mjs),
 # the mounts posed frame by frame (mounts-skeleton, tools/animate-mounts-skeleton.mjs),
 # and keeps them on the art-drafts branch for review. Run by hand from the
@@ -20,6 +22,7 @@ on:
           - items
           - portraits
           - evolutions
+          - evolutions-pixellab
           - materials
           - resources
           - narrator
@@ -109,6 +112,12 @@ jobs:
             if [ "$KIND" = "mounts-skeleton-estimate" ]; then args+=(--estimate); fi
             if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
             node tools/animate-mounts-skeleton.mjs "${args[@]}"
+            exit
+          fi
+          if [ "$KIND" = "evolutions-pixellab" ]; then
+            args=(--kind evolutions --ids "$IDS" --calls "$VARIANTS" --max-cost "$MAX_COST")
+            if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+            node tools/generate-portraits-pixellab.mjs "${args[@]}"
             exit
           fi
           if [ "$KIND" = "mounts-pixellab" ]; then
