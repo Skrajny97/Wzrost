@@ -3000,7 +3000,7 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 
 Autor: „371 B”, „372 B” i „Problemem są trochę postacie w szatach, bo u nich się to inaczej układają te szaty przy jeździe, ale podejrzewam, że szkoda zachodu i nic się nie udałoby z tym zrobić, wyszłoby tylko gorzej”.
 
-1. **Tygrys szablozębny** to wersja B: pręgowany, z łbem uniesionym, ogonem z ciemnym końcem, siodłem na futrzanej derce z kościanymi ozdobami i uzdą. Obrazek przycięty do konturu jest w `src/client/art/mounts/sabertooth.png`, a pierwsza klatka jego chodu, z miejscem na ruch łap, w `art/references/mounts/sabertooth.png`. Chód robi PixelLab, jak kłus koni (`tools/animate-mounts.mjs`, dla tygrysa krok dużego kota z kołyszącym się ogonem).
+1. **Tygrys szablozębny** to najpierw wersja B, a po uwadze autora o chodzie („tylne łapy w ogóle się nie przecinają, a w chodzie powinny”; „wybierz inną z możliwych opcji tygrysa”) wersja A, która stoi z tylnymi łapami pod biodrem: pręgowany, z długimi kłami, ogonem, siodłem na futrzanej derce z kościanymi ozdobami i uzdą. Obrazek przycięty do konturu jest w `src/client/art/mounts/sabertooth.png`, a pierwsza klatka jego chodu, z miejscem na ruch łap, w `art/references/mounts/sabertooth.png`. Chód robi PixelLab, jak kłus koni (`tools/animate-mounts.mjs`, dla tygrysa krok dużego kota z kołyszącym się ogonem).
 2. **Szaty jeźdźców zostają takie, jak są.** Postacie w długich szatach siedzą w nich tak, jak narysował je Retro Diffusion. Znika tylko druga stopa spod szaty.
 3. **Tło „Obóz nocą” (372 B):** nowa wersja z ogniskiem bliżej środka i namiotem za postacią. Zastępuje pierwszą, z ogniskiem pod postacią. Plik ten sam: `src/client/art/cosmetics/bg-camp.png`.
 
