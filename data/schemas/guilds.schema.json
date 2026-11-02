@@ -8,7 +8,9 @@
     "size",
     "name",
     "tag",
-    "invites"
+    "invites",
+    "trials",
+    "requests"
   ],
   "properties": {
     "$comment": {
@@ -191,6 +193,12 @@
           }
         }
       }
+    },
+    "trials": {
+      "$ref": "#/definitions/trials"
+    },
+    "requests": {
+      "$ref": "#/definitions/requests"
     }
   },
   "definitions": {
@@ -209,6 +217,551 @@
         "max": {
           "type": "integer",
           "minimum": 1
+        }
+      }
+    },
+    "pair": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "trialKind": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text",
+        "counted",
+        "weight"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "count"
+          ]
+        },
+        {
+          "required": [
+            "fights"
+          ]
+        }
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "killAny",
+            "explore",
+            "towers",
+            "gatherAny",
+            "brewAny",
+            "makeAny",
+            "process",
+            "salvage",
+            "orders",
+            "upgrade",
+            "gifts"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "pattern": "\\{count\\}"
+        },
+        "counted": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requires": {
+          "enum": [
+            "towers",
+            "professions",
+            "crafting",
+            "table",
+            "settlement",
+            "anvil"
+          ]
+        },
+        "weight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "count": {
+          "$ref": "#/definitions/pair"
+        },
+        "fights": {
+          "$ref": "#/definitions/pair"
+        },
+        "step": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "trialChest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gold",
+        "timePoints",
+        "materials"
+      ],
+      "properties": {
+        "gold": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "base",
+            "perLevel"
+          ],
+          "properties": {
+            "base": {
+              "type": "number",
+              "minimum": 0
+            },
+            "perLevel": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "timePoints": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "materials": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "systemPoints": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "trials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "board",
+        "cap",
+        "activeDays",
+        "steps",
+        "sizes",
+        "kinds",
+        "locks",
+        "chests",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "board": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cap": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "activeDays": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "sizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "factor",
+              "weight"
+            ],
+            "properties": {
+              "factor": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "weight": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          }
+        },
+        "kinds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/trialKind"
+          }
+        },
+        "locks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "towers",
+            "professions",
+            "crafting",
+            "table",
+            "settlement",
+            "anvil",
+            "off"
+          ],
+          "properties": {
+            "towers": {
+              "type": "string",
+              "minLength": 1
+            },
+            "professions": {
+              "type": "string",
+              "minLength": 1
+            },
+            "crafting": {
+              "type": "string",
+              "minLength": 1
+            },
+            "table": {
+              "type": "string",
+              "minLength": 1
+            },
+            "settlement": {
+              "type": "string",
+              "minLength": 1
+            },
+            "anvil": {
+              "type": "string",
+              "minLength": 1
+            },
+            "off": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "chests": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/trialChest"
+          }
+        },
+        "texts": {
+          "type": "object",
+          "required": [
+            "title",
+            "intro",
+            "how",
+            "bar",
+            "barValue",
+            "threshold",
+            "trialForms",
+            "chest",
+            "open",
+            "claimed",
+            "contribute",
+            "taken",
+            "progress",
+            "noTaken",
+            "drop",
+            "dropTitle",
+            "dropText",
+            "board",
+            "take",
+            "done",
+            "takenMark",
+            "busy",
+            "previous",
+            "previousUntil",
+            "members",
+            "capped",
+            "empty",
+            "took",
+            "dropped",
+            "opened",
+            "gold",
+            "timePointForms",
+            "systemPointForms",
+            "errors"
+          ],
+          "properties": {
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "trialForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "timePointForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "systemPointForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "errors": {
+              "type": "object",
+              "required": [
+                "locked",
+                "noGuild",
+                "noTrial",
+                "busy",
+                "done",
+                "notTaken",
+                "tooLate",
+                "noThreshold",
+                "noBoard",
+                "claimed",
+                "notReached"
+              ],
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "requests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kinds",
+        "most",
+        "waitHours",
+        "openHours",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "kinds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "material",
+              "herb",
+              "potion"
+            ]
+          }
+        },
+        "most": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "waitHours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "openHours": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "texts": {
+          "type": "object",
+          "required": [
+            "title",
+            "intro",
+            "how",
+            "ask",
+            "askLead",
+            "kindNames",
+            "goods",
+            "count",
+            "send",
+            "noGoods",
+            "mine",
+            "states",
+            "given",
+            "noGifts",
+            "thank",
+            "thanked",
+            "cancel",
+            "cancelTitle",
+            "cancelText",
+            "waitNext",
+            "others",
+            "empty",
+            "left",
+            "have",
+            "give",
+            "giveCount",
+            "sameAccount",
+            "rankingTitle",
+            "ranking",
+            "rankingEmpty",
+            "pieceForms",
+            "thankForms",
+            "asked",
+            "gave",
+            "thankedToast",
+            "cancelled",
+            "errors"
+          ],
+          "properties": {
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "kindNames": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "material",
+                "herb",
+                "potion"
+              ],
+              "properties": {
+                "material": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "herb": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "potion": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "states": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "open",
+                "filled",
+                "cancelled",
+                "expired"
+              ],
+              "properties": {
+                "open": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "filled": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "cancelled": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expired": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "pieceForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "thankForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "errors": {
+              "type": "object",
+              "required": [
+                "locked",
+                "noGuild",
+                "invalidKind",
+                "invalidGoods",
+                "invalidCount",
+                "open",
+                "wait",
+                "bagFull",
+                "noRequest",
+                "gone",
+                "own",
+                "closed",
+                "sameAccount",
+                "giveCount",
+                "tooMany",
+                "notEnough",
+                "notHeld",
+                "askerRoom",
+                "askerFull",
+                "changed",
+                "noGift",
+                "thanked"
+              ],
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     }
