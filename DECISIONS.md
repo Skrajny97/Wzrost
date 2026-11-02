@@ -2996,6 +2996,12 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.90 (2.11.2026)
+
+1. **Co wchodzi do gry:** poprawka aury w scenie Walki. Drobinki Aury Systemu i iskry Aury Żaru stały w lewym górnym rogu sceny, bo reguła drobinek z portretu, dalej w arkuszu stylów, rozciągała ich pole na róg sceny. Teraz krążą wokół idącej postaci, a na wierzchowcu wokół jeźdźca i wierzchowca. Portret, karta postaci i sklep były dobre.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** wszystkie testy (848) przechodzą, a nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy, na telefonie, na komputerze i na dużym monitorze (`tools/first-steps.cjs`). Scenę Walki sprawdzono w przeglądarce na 390×844 z obiema aurami, pieszo i na tygrysie, a kartę postaci z Aurą Systemu.
+
 ## Wersja 0.0.89 (2.11.2026)
 
 1. **Co wchodzi do gry:** Aura Systemu, Aura Żaru i Świetliste ślady w Sklepie Systemu, z nowymi zakładkami Aury i Ślady (zob. sekcję niżej). Razem z nimi idą notatki i pliki z gałęzi roboczej, których gra jeszcze nie używa: 30 portretów drugiej ewolucji z maskami skóry i siedmioma odcieniami, opisy klatek startowych chodów drugich form oraz zasada numerów wersji po 0.0.99.
