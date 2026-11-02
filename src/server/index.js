@@ -67,7 +67,7 @@ import {
   tutorialTests,
 } from './testing.js';
 import { buyScrolls, raiseAtForge } from './forge.js';
-import { buyFromHerbalist, buyMug, chooseReforged, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, settlementTests, takeCompanionGift, testSettlement } from './settlement.js';
+import { buyFromHerbalist, buyMug, chooseReforged, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, upgradeCompanionItem } from './settlement.js';
 import { buyFromTanner, sellToTanner } from './tannery.js';
 import { skipWithTimePoints } from './time.js';
 import { buyMount } from './stable.js';
@@ -181,6 +181,8 @@ const routes = [
   ['POST', '/api/settlement/dismiss', dismissCompanion],
   ['POST', '/api/settlement/gift', takeCompanionGift],
   ['POST', '/api/settlement/equip', equipCompanion],
+  ['POST', '/api/settlement/companion-upgrade', upgradeCompanionItem],
+  ['POST', '/api/settlement/companion-stay', setCompanionStay],
   ['POST', '/api/settlement/herbalist', sellToHerbalist],
   ['POST', '/api/settlement/herbalist/buy', buyFromHerbalist],
   ['POST', '/api/settlement/tannery', sellToTanner],

@@ -196,16 +196,16 @@ function upgradeStack(row, need, chosen) {
   return (fits.find(([key]) => key === chosen) ?? fits.sort((a, b) => b[1] - a[1])[0])?.[0] ?? null;
 }
 
-// One try at upgrading an item on the camp's Kowadło, paid in gold and iron
-// ore, from materialFrom on also in a material of the item's rarity, and
-// rolled with a fresh seed (rollUpgrade in the engine). A failure takes the
-// payment and a level, and from +7 on may break the item.
-export async function upgradeItem(context) {
-  const { session, player } = await requirePlayer(context);
-  const item = findItem(player, context.params.id);
-  // An item worn is upgraded at home; one in the bag also while away.
-  requireUnworn(player, item, context.now);
-  const cap = campBonus(campLevels(player.buildings, context.now, content), 'upgradeCap', content);
+// What one try at upgrading `item` on the camp's Kowadło takes, checked
+// against what the character holds, or the error of what it lacks: the
+// Kowadło's next level (`view`) with its price in gold and iron ore, from
+// materialFrom on also the stack of a material of the item's rarity
+// (`stack`, `taken` pieces of it; the player's choice in `body.material`),
+// and a Zwój ochronny where the item may break and the player asked for it
+// (`body.ward`). The same for an item a companion wears, paid by the
+// character (settlement.js).
+export function upgradePlan(player, item, body, now) {
+  const cap = campBonus(campLevels(player.buildings, now, content), 'upgradeCap', content);
   const view = upgradeView(item, cap, content);
   if (view.level >= view.max) throw new ApiError(409, 'max_upgrade', 'Ten przedmiot ma już najwyższe ulepszenie.');
   if (!view.next) {
@@ -220,22 +220,49 @@ export async function upgradeItem(context) {
     throw new ApiError(409, 'not_enough', 'Brakuje złota albo rudy żelaza na to ulepszenie.');
   }
   // `ward`: a Zwój ochronny on the Kowadło, only where the item may break.
-  const body = context.request.headers.get('Content-Type') ? await readJson(context.request) : {};
   const warded = body.ward === true && view.next.breakChance > 0;
-  const row = player.row;
-  if (warded && row.scrolls < 1) throw new ApiError(409, 'no_scroll', 'Nie masz Zwoju ochronnego. Zrobisz go w Systemowym Warsztacie.');
+  if (warded && player.row.scrolls < 1) throw new ApiError(409, 'no_scroll', 'Nie masz Zwoju ochronnego. Zrobisz go w Systemowym Warsztacie.');
   const need = view.next.materials;
-  const stack = need ? upgradeStack(row, need, body.material) : null;
+  const stack = need ? upgradeStack(player.row, need, body.material) : null;
   if (need && !stack) {
     throw new ApiError(409, 'no_material', `To ulepszenie bierze też ${need.count} szt. materiału tej samej rzadkości co przedmiot (${content.raritiesById[need.rarity].name}).`);
   }
-  // No material: a path that is never there, which asks for 0.
-  const taken = stack ? need.count : 0;
+  return { view, cost, warded, stack, taken: stack ? need.count : 0 };
+}
+
+// A try's payment (upgradePlan) as the characters row's SQL: gold, iron ore,
+// the scroll and the material go (`set`, with its `binds`), and `enough`
+// holds (with `enoughBinds`) while they are all there. Without a material,
+// a path that is never there, which asks for 0.
+export function upgradePayment({ cost, warded, stack, taken }) {
+  const ore = '$."iron-ore"';
   const material = `$."${stack ?? 'none'}"`;
+  return {
+    set: `gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?), scrolls = scrolls - ?,
+           materials = CASE WHEN ? = 0 THEN materials WHEN json_extract(materials, ?) > ? THEN json_set(materials, ?, json_extract(materials, ?) - ?) ELSE json_remove(materials, ?) END`,
+    binds: [cost.gold, ore, ore, cost['iron-ore'], warded ? 1 : 0, taken, material, taken, material, material, taken, material],
+    enough: `gold >= ? AND COALESCE(json_extract(resources, ?), 0) >= ? AND COALESCE(json_extract(materials, ?), 0) >= ? AND scrolls >= ?`,
+    enoughBinds: [cost.gold, ore, cost['iron-ore'], material, taken, warded ? 1 : 0],
+  };
+}
+
+// One try at upgrading an item on the camp's Kowadło, paid in gold and iron
+// ore, from materialFrom on also in a material of the item's rarity, and
+// rolled with a fresh seed (rollUpgrade in the engine). A failure takes the
+// payment and a level, and from +7 on may break the item.
+export async function upgradeItem(context) {
+  const { session, player } = await requirePlayer(context);
+  const item = findItem(player, context.params.id);
+  // An item worn is upgraded at home; one in the bag also while away.
+  requireUnworn(player, item, context.now);
+  const body = context.request.headers.get('Content-Type') ? await readJson(context.request) : {};
+  const plan = upgradePlan(player, item, body, context.now);
+  const { view, cost, warded, stack, taken } = plan;
+  const row = player.row;
+  const pay = upgradePayment(plan);
 
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const outcome = rollUpgrade(item, createRng(roll), content, { warded });
-  const ore = '$."iron-ore"';
   const db = context.env.DB;
   // The item changes only if it is as seen here (its level and last roll) and
   // the price (and the scroll) is still there; the payment only if this roll
@@ -247,20 +274,12 @@ export async function upgradeItem(context) {
         `UPDATE items SET data = json_set(data, '$.upgrade', ?, '$.lastRoll', ?)
          WHERE id = ? AND character_id = ?
            AND COALESCE(json_extract(data, '$.upgrade'), 0) = ? AND COALESCE(json_extract(data, '$.lastRoll'), '') = ?
-           AND (SELECT gold FROM characters WHERE id = ?) >= ?
-           AND COALESCE(json_extract((SELECT resources FROM characters WHERE id = ?), ?), 0) >= ?
-           AND COALESCE(json_extract((SELECT materials FROM characters WHERE id = ?), ?), 0) >= ?
-           AND (SELECT scrolls FROM characters WHERE id = ?) >= ?`,
+           AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND ${pay.enough})`,
       )
-      .bind(outcome.upgrade, roll, item.id, row.id, view.level, item.lastRoll ?? '', row.id, cost.gold, row.id, ore, cost['iron-ore'], row.id, material, taken, row.id, warded ? 1 : 0),
+      .bind(outcome.upgrade, roll, item.id, row.id, view.level, item.lastRoll ?? '', row.id, ...pay.enoughBinds),
     db
-      .prepare(
-        `UPDATE characters SET gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?), scrolls = scrolls - ?,
-           materials = CASE WHEN ? = 0 THEN materials WHEN json_extract(materials, ?) > ? THEN json_set(materials, ?, json_extract(materials, ?) - ?) ELSE json_remove(materials, ?) END,
-           version = version + 1
-         WHERE id = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
-      )
-      .bind(cost.gold, ore, ore, cost['iron-ore'], warded ? 1 : 0, taken, material, taken, material, material, taken, material, row.id, item.id, roll),
+      .prepare(`UPDATE characters SET ${pay.set}, version = version + 1 WHERE id = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`)
+      .bind(...pay.binds, row.id, item.id, roll),
     // An upgrade that came off moves the Próby Gildii's trial on, only with
     // this roll saved (guild-trials.js).
     ...trialProgress(db, row.id, { upgrades: outcome.result === 'success' ? 1 : 0 }, context.now, {

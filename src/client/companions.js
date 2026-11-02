@@ -11,7 +11,7 @@ import { h } from './dom.js';
 import { formatCountdown, formatDecimal, formatNumber } from './format.js';
 import { call, serverNow, state } from './state.js';
 import { closeSheet, confirmAction, openSheet, toast, withButton } from './ui.js';
-import { itemSummary } from './screens/character.js';
+import { anvilSection, itemDetails, itemSummary } from './screens/character.js';
 
 // An item of the character's, from the bag or worn.
 const itemView = (id) => (state.character.bag ?? []).find((one) => one.id === id) ?? Object.values(state.character.equipment ?? {}).find((one) => one?.id === id);
@@ -69,13 +69,51 @@ function wearSheet(companion, apply) {
   );
 }
 
+// The card of an item a hired companion wears, as the card of the
+// character's own (screens/character.js), with the same Kowadło (the
+// author: "niech tu będzie opcja kliknięcia w przedmiot i ulepszania go jak
+// na Kowadle"): the character pays from its own stock, and only the
+// companion's item changes. While the companion is away on an exploration
+// the try waits, as "Załóż z plecaka" does. A try names the item's last one
+// as the card shows it (`roll`), so a second tap makes none. After a try
+// the card opens again with the Kowadło unfolded, or closes when the item
+// broke; when the item changed meanwhile, the Kwatery load it anew.
+function companionItemSheet(companion, slot, apply, anvil = false) {
+  const item = companion.wear.find((place) => place.slot === slot)?.item;
+  if (!item) {
+    closeSheet();
+    return;
+  }
+  const send = async (choices) => {
+    try {
+      const answer = await call('POST', '/api/settlement/companion-upgrade', { companionId: companion.id, slot, roll: item.roll, ...choices });
+      apply(answer);
+      return answer;
+    } catch (error) {
+      if (error.status === 409) call('GET', '/api/settlement').then(apply, () => {});
+      throw error;
+    }
+  };
+  const reopen = (done, answer) => {
+    const after = answer.settlement?.companions.hired.find((one) => one.id === companion.id);
+    if (after) companionItemSheet(after, slot, apply, true);
+    else closeSheet();
+  };
+  openSheet(
+    itemDetails(item),
+    h('p', { class: 'muted', text: companion.wornBy }),
+    anvilSection(item, Boolean(companion.away), anvil, { send, reopen }),
+    companion.away && h('p', { class: 'muted', text: companion.away }),
+  );
+}
+
 // What a companion wears in its three places; one hired has a button to
 // put on an item from the bag (question 108 A), at home or at a profession's
 // work, as the character's own equipment (an exploration keeps what it set
-// out with), while a candidate only shows what it comes with.
+// out with, so one away on it waits for its return), and each item it wears
+// opens its card under a tap; a candidate only shows what it comes with.
 function wearList(companion, apply) {
   const hired = Boolean(companion.wearable);
-  const away = state.character.activity?.kind === 'hunt';
   return h(
     'div',
     { class: 'settlement-companion-wear' },
@@ -84,11 +122,39 @@ function wearList(companion, apply) {
         'div',
         { class: 'settlement-companion-slot' },
         h('span', { class: 'field-label', text: place.slotName }),
-        place.item ? itemSummary(place.item) : h('span', { class: 'muted', text: 'Pusto' }),
+        !place.item
+          ? h('span', { class: 'muted', text: 'Pusto' })
+          : hired
+            ? h('button', { type: 'button', class: 'item-row', onClick: () => companionItemSheet(companion, place.slot, apply) }, itemSummary(place.item))
+            : itemSummary(place.item),
       ),
     ),
-    hired && h('button', { type: 'button', class: 'button button--small', text: 'Załóż z plecaka', disabled: away, onClick: () => wearSheet(companion, apply) }),
-    hired && away && h('p', { class: 'muted', text: 'Przedmioty zakłada się po powrocie z wyprawy.' }),
+    hired && h('button', { type: 'button', class: 'button button--small', text: 'Załóż z plecaka', disabled: Boolean(companion.away), onClick: () => wearSheet(companion, apply) }),
+    hired && companion.away && h('p', { class: 'muted', text: companion.away }),
+  );
+}
+
+// Whether the companion goes on the explorations or stays in the Kwatery
+// (the author: "[Zostań w kwaterze]"), and the switch: none while the
+// character is in a Drużyna, where every companion stays, but the reason.
+function stayBlock(companion, apply) {
+  const { stay } = companion;
+  return h(
+    'div',
+    { class: 'settlement-companion-stay' },
+    h('p', { class: 'muted', text: stay.text }),
+    stay.action &&
+      h('button', {
+        type: 'button',
+        class: 'button button--small',
+        text: stay.action.label,
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            const answer = await call('POST', '/api/settlement/companion-stay', { companionId: companion.id, stays: stay.action.stays });
+            apply(answer);
+            toast(answer.text);
+          }),
+      }),
   );
 }
 
@@ -143,6 +209,7 @@ export function companionCard(companion, action, apply) {
     companion.wear && wearList(companion, apply),
     companion.gift && giftRow(companion, apply),
     wounded && h('p', { class: 'region-warning', text: wounded }),
+    companion.stay && stayBlock(companion, apply),
     action,
   );
 }

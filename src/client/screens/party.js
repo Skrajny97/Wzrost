@@ -88,8 +88,30 @@ export function mountParty(container) {
     if (gone) return;
     view = next;
     partySeen(view);
-    fill(body, invitesCard(), partyCard(), inviteCard(), sentCard(), leaveCard());
+    // No party is made or joined while a companion goes on explorations.
+    inviteButton.disabled = Boolean(view.companions);
+    fill(body, companionsCard(), invitesCard(), partyCard(), inviteCard(), sentCard(), leaveCard());
   }
+
+  // While a companion goes on the character's explorations, it neither
+  // makes a party nor joins one (the author: "nie może być w drużynie,
+  // dopóki nie kliknie na nim [Zostań w kwaterze]"): why, and the way to
+  // the Kwatery, where the companion is told to stay.
+  function companionsCard() {
+    if (!view.companions) return null;
+    return h(
+      'section',
+      { class: 'card party-companions', role: 'status' },
+      h('p', { class: 'region-warning', text: view.companions.text }),
+      h('a', { class: 'button button--world button--small', href: '#/oboz/quarters', text: view.companions.link }),
+    );
+  }
+
+  // "Dołącz" and "Zaproś" wait for the companions to stay (companionsCard).
+  const unlessCompanions = (element) => {
+    element.disabled = Boolean(view.companions);
+    return element;
+  };
 
   // An action answered with the Drużyna anew, its words in a toast.
   const act = (path, data, said) => async () => {
@@ -141,7 +163,7 @@ export function mountParty(container) {
             h(
               'div',
               { class: 'friend-actions' },
-              button('Dołącz', act('/api/party/accept', { partyId: invite.partyId }), 'system'),
+              unlessCompanions(button('Dołącz', act('/api/party/accept', { partyId: invite.partyId }), 'system')),
               button('Odrzuć', act('/api/party/decline', { partyId: invite.partyId }, 'Zaproszenie odrzucone.')),
             ),
           ),
@@ -231,7 +253,7 @@ export function mountParty(container) {
         h(
           'ul',
           { class: 'friends-list' },
-          ready.map((friend) => h('li', { class: 'friend' }, who(friend), h('div', { class: 'friend-actions' }, button('Zaproś', act('/api/party/invite', { name: friend.name }), 'system')))),
+          ready.map((friend) => h('li', { class: 'friend' }, who(friend), h('div', { class: 'friend-actions' }, unlessCompanions(button('Zaproś', act('/api/party/invite', { name: friend.name }), 'system'))))),
         ),
       inviteForm,
     );

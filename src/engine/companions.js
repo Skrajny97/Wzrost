@@ -10,8 +10,9 @@
 // HP (the author: "Niech rany towarzyszy goją się wraz z ranami postaci").
 //
 // Stored in the Osada: { id, name, appearance, classId, level, xp, traits,
-// skills, profession, story, gear: [items], wounded, giftWeek }. An
-// item of `gear` the player gave from the bag is marked `given`.
+// skills, profession, story, gear: [items], wounded, giftWeek, stays }. An
+// item of `gear` the player gave from the bag is marked `given`; `stays`
+// marks one told to stay in the Kwatery (companionStays).
 
 import { playerCombatant } from './combatant.js';
 import { baseClassLevel, canUse, generateItem } from './items.js';
@@ -220,6 +221,57 @@ export function companionAfterHunt(companion, { xp, fainted, minutes }, characte
 // the character has rested to full HP (`rested`), as its wounds heal with
 // the character's.
 export const companionReady = (companion, rested) => Boolean(companion) && (!companion.wounded || rested);
+
+// Whether a hired companion stays in the Kwatery (the author: "jeśli ktoś
+// ma zwerbowanego towarzysza to nie może być w drużynie, dopóki nie kliknie
+// na nim [Zostań w kwaterze]; wtedy nie poluje się z towarzyszem, tylko
+// samemu/z drużyną"): told to stay (`stays`), or while the character is in
+// a Drużyna (`inParty`), whose explorations go without companions. One who
+// stays goes on no exploration, so it gains no XP and no relation from
+// them; its talks, its gift and the healing of its wounds go on.
+export const companionStays = (companion, inParty = false) => inParty || companion.stays === true;
+
+// Whether the companion goes on the character's exploration now: one who
+// does not stay, a wounded one once the character has rested to full HP.
+export const companionGoes = (companion, { rested, inParty = false }) => !companionStays(companion, inParty) && companionReady(companion, rested);
+
+// The companion told to stay in the Kwatery (`stays`) or to go on the
+// explorations again.
+export function staying(companion, stays) {
+  const { stays: _, ...rest } = companion;
+  return stays ? { ...rest, stays: true } : rest;
+}
+
+// One of the companions' texts (texts in data/settlement.json) for a
+// companion: in its own form ([a|b]), with its {name} and `vars` filled in.
+export function companionText(key, companion, content, vars = {}) {
+  const words = { name: companion.name, ...vars };
+  return gendered(tuning(content).texts[key], companion.appearance).replace(/\{(\w+)\}/g, (_, name) => String(words[name] ?? ''));
+}
+
+// Why a character cannot make or join a Drużyna, or null: its companions
+// who do not stay in the Kwatery, named ("Najpierw zostaw towarzysza w
+// kwaterze"), "towarzyszki" for women only.
+export function partyRefusal(companions, content) {
+  const going = companions.filter((companion) => !companionStays(companion));
+  if (going.length === 0) return null;
+  const { texts } = tuning(content);
+  const look = going.every((companion) => companion.appearance === 'female') ? 'female' : 'male';
+  return gendered(going.length === 1 ? texts.partyOne : texts.partyMany, look).replace('{names}', going.map((companion) => companion.name).join(', '));
+}
+
+// The companion after a try at upgrading the item it wears in `slot` on the
+// Kowadło (rollUpgrade in items.js; the author: "niech tu będzie opcja
+// kliknięcia w przedmiot i ulepszania go jak na Kowadle"): the item at its
+// new level, with the try's seed (`roll`) as the character's items keep it,
+// or gone from its place when it broke.
+export function upgradedOnCompanion(companion, slot, outcome, roll) {
+  const gear =
+    outcome.result === 'broken'
+      ? companion.gear.filter((item) => item.slot !== slot)
+      : companion.gear.map((item) => (item.slot === slot ? { ...item, upgrade: outcome.upgrade, lastRoll: roll } : item));
+  return { ...companion, gear };
+}
 
 // The places a companion wears items in (the design: "broń, pancerz,
 // talizman").

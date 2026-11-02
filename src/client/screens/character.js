@@ -731,12 +731,24 @@ function salvageSection(item, busy) {
   );
 }
 
+// The card of a character's item after an upgrade: open again with the
+// Kowadło unfolded, or closed when the item broke.
+function reopenOwned(done) {
+  const owned = ownedItem(done.itemId);
+  if (owned) itemSheet(owned.item, { equipped: owned.equipped, anvil: true });
+  else closeSheet();
+}
+
 // The Kowadło part of the item card: the next upgrade with its price, chance
 // and risk, or why there is none, and where the item may break, a Zwój
 // ochronny from the Warsztat to put on the Kowadło. The server rolls the
 // outcome. Folded behind "Ulepsz" until `open` (the author: "Kowadło
 // powinno się rozwijać przyciskiem "Ulepsz" i dopiero wtedy pelny opis").
-function anvilSection(item, busy, open = false) {
+// The character pays from its own stock. `send` makes the try with the
+// player's choices and gives the server's answer, and `reopen` shows the
+// card after it: by default those of the character's own item; a
+// companion's item has its own (companions.js).
+export function anvilSection(item, busy, open = false, { send = (choices) => call('POST', `/api/items/${item.id}/upgrade`, choices), reopen = reopenOwned } = {}) {
   const anvil = item.anvil;
   if (!anvil) return null;
   const title = h('p', { class: 'compare-title', text: 'Kowadło' });
@@ -801,7 +813,8 @@ function anvilSection(item, busy, open = false) {
     next.breakChance > 0 && scrolls > 0 ? h('input', { type: 'checkbox', class: 'avoid-rare-box', id: `ward-${item.id}`, 'aria-describedby': `ward-note-${item.id}` }) : null;
   const upgrade = (event) =>
     withButton(event.currentTarget, async () => {
-      const { upgrade: done } = await call('POST', `/api/items/${item.id}/upgrade`, { ward: Boolean(ward?.checked), ...(chosen && { material: chosen.key }) });
+      const answer = await send({ ward: Boolean(ward?.checked), ...(chosen && { material: chosen.key }) });
+      const done = answer.upgrade;
       if (done.result === 'success') {
         playSound('done');
         toast(`Udało się: ${done.name} +${done.to}.`);
@@ -817,9 +830,7 @@ function anvilSection(item, busy, open = false) {
                 : `Nie udało się: ${done.name} zostaje na +0.`,
         );
       }
-      const owned = ownedItem(done.itemId);
-      if (owned) itemSheet(owned.item, { equipped: owned.equipped, anvil: true });
-      else closeSheet();
+      reopen(done, answer);
     });
   const step = h('p', { class: 'anvil-step', tabindex: '-1', text: `Ulepszenie +${anvil.level} → +${next.level}` });
   const full = h(

@@ -1,8 +1,9 @@
 // Companions (the Osada, part II): the Karczma's four candidates a week, the
 // price the relation with the innkeeper sets, a companion in the fights of
 // an exploration, its XP and its wounds, which heal with the character's
-// rest, hiring one through the API, its profession's gift of the week and
-// the items it gets from the bag.
+// rest, hiring one through the API, its profession's gift of the week, the
+// items it gets from the bag and their upgrades on the Kowadło, and
+// "Zostań w kwaterze".
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -11,13 +12,18 @@ import {
   companionAfterHunt,
   companionCombatant,
   companionGift,
+  companionGoes,
   companionReady,
+  companionStays,
   companionXp,
   createRng,
   drawCandidates,
   generateItem,
   hireCost,
+  partyRefusal,
   simulateHunt,
+  staying,
+  upgradedOnCompanion,
 } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -92,6 +98,47 @@ describe('companions in the engine', () => {
     assert.equal(companionReady(hurt, false), false);
     assert.equal(companionReady(hurt, true), true);
     assert.equal(companionReady(after, false), true);
+  });
+
+  test('one told to stay in the Kwatery goes on no exploration, nor does any while the character is in a Drużyna', () => {
+    const [candidate] = drawCandidates({ character, seed: 's' }, NOW, content);
+    assert.deepEqual([companionStays(candidate), companionGoes(candidate, { rested: false })], [false, true]);
+    const stays = staying(candidate, true);
+    assert.deepEqual([stays.stays, companionStays(stays), companionGoes(stays, { rested: true })], [true, true, false]);
+    // Told to go again, it is as it was.
+    assert.deepEqual(staying(stays, false), candidate);
+    // In a Drużyna every companion stays (the author: "wtedy nie poluje się
+    // z towarzyszem, tylko samemu/z drużyną").
+    assert.deepEqual([companionStays(candidate, true), companionGoes(candidate, { rested: true, inParty: true })], [true, false]);
+    // A wounded one still waits for the character's rest.
+    assert.deepEqual([companionGoes({ ...candidate, wounded: true }, { rested: false }), companionGoes({ ...candidate, wounded: true }, { rested: true })], [false, true]);
+  });
+
+  test('the companions going on explorations keep the character out of a Drużyna, named in their forms', () => {
+    const [candidate] = drawCandidates({ character, seed: 's' }, NOW, content);
+    const she = { ...candidate, name: 'Milena', appearance: 'female' };
+    const he = { ...candidate, name: 'Bogdan', appearance: 'male' };
+    const tail = 'Drużyna poluje bez towarzyszy z Kwater.';
+    assert.equal(partyRefusal([], content), null);
+    assert.equal(partyRefusal([staying(she, true), staying(he, true)], content), null);
+    assert.equal(partyRefusal([she], content), `Najpierw zostaw towarzyszkę w kwaterze: Milena. ${tail}`);
+    assert.equal(partyRefusal([he, staying(she, true)], content), `Najpierw zostaw towarzysza w kwaterze: Bogdan. ${tail}`);
+    assert.equal(partyRefusal([she, he], content), `Najpierw zostaw towarzyszy w kwaterze: Milena, Bogdan. ${tail}`);
+    assert.equal(partyRefusal([she, { ...she, name: 'Bogna' }], content), `Najpierw zostaw towarzyszki w kwaterze: Milena, Bogna. ${tail}`);
+  });
+
+  test("an upgrade on a companion changes only the item in its place: the level and the try's seed, or the item gone when it broke", () => {
+    const [candidate] = drawCandidates({ character, seed: 's' }, NOW, content);
+    const weapon = candidate.gear.find((item) => item.slot === 'weapon');
+    const body = candidate.gear.find((item) => item.slot === 'chest');
+    const up = upgradedOnCompanion(candidate, 'weapon', { result: 'success', upgrade: 1 }, 'r1');
+    assert.deepEqual(up.gear.find((item) => item.slot === 'weapon'), { ...weapon, upgrade: 1, lastRoll: 'r1' });
+    assert.deepEqual(up.gear.find((item) => item.slot === 'chest'), body);
+    assert.deepEqual({ ...up, gear: candidate.gear }, candidate);
+    const down = upgradedOnCompanion({ ...up, gear: [{ ...weapon, upgrade: 3 }, body] }, 'weapon', { result: 'failure', upgrade: 2 }, 'r2');
+    assert.equal(down.gear.find((item) => item.slot === 'weapon').upgrade, 2);
+    const broken = upgradedOnCompanion({ ...up, gear: [{ ...weapon, upgrade: 8 }, body] }, 'weapon', { result: 'broken', upgrade: 8 }, 'r3');
+    assert.deepEqual(broken.gear, [body]);
   });
 });
 
@@ -299,5 +346,132 @@ describe('companions through the API', () => {
     assert.equal(await bagCount(), before + 1);
     const back = (await database.prepare('SELECT data FROM items WHERE slot IS NULL').all()).results.map((row) => JSON.parse(row.data));
     assert.ok(back.some((item) => item.slot === 'talisman' && !item.given));
+  });
+
+  // The camp's Kowadło at a level, and the character's gold and iron ore.
+  const anvil = async (level) =>
+    (await db())
+      .prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'anvil', ?, 0, 0 FROM characters WHERE true ON CONFLICT (character_id, building_id) DO UPDATE SET level = excluded.level")
+      .bind(level)
+      .run();
+  const stock = async (gold, ore) => (await db()).prepare('UPDATE characters SET gold = ?, resources = ?').bind(gold, JSON.stringify({ wood: 0, stone: 0, 'iron-ore': ore })).run();
+  // The Osada as stored, and the item the first companion wears in a place.
+  const stored = async () => JSON.parse((await (await db()).prepare('SELECT settlement FROM characters').first()).settlement);
+  const storedItem = async (slot) => (await stored()).companions[0].gear.find((item) => item.slot === slot);
+  const hireFirst = async () => {
+    const [candidate] = (await settlement()).companions.candidates;
+    await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
+    return candidate;
+  };
+  const upgrade = (companionId, slot, body = {}) => call('POST', '/api/settlement/companion-upgrade', { cookie, body: { companionId, slot, ...body } });
+  const placeOf = (view, slot) => view.companions.hired[0].wear.find((place) => place.slot === slot);
+
+  test("an item the companion wears is upgraded as on the Kowadło, paid from the character's own gold, ore and materials", async () => {
+    const candidate = await hireFirst();
+    // Without the Kowadło, the card says so and there is no try.
+    assert.deepEqual(placeOf(await settlement(), 'weapon').item.anvil, { level: 0, cap: 0, max: 10, next: null });
+    assert.equal((await upgrade(candidate.id, 'weapon')).data.error.code, 'anvil_level');
+    await anvil(10);
+    await stock(100000, 1000);
+    const { next } = placeOf(await settlement(), 'weapon').item.anvil;
+    assert.equal(next.level, 1);
+    const bagBefore = (await call('GET', '/api/character', { cookie })).data.character.bag.length;
+    const chest = await storedItem('chest');
+    const tried = await upgrade(candidate.id, 'weapon');
+    assert.equal(tried.status, 200, JSON.stringify(tried.data));
+    assert.deepEqual([tried.data.upgrade.companionId, tried.data.upgrade.slot, tried.data.upgrade.from], [candidate.id, 'weapon', 0]);
+    assert.deepEqual(tried.data.upgrade.cost, next.cost);
+    assert.ok(['success', 'failure'].includes(tried.data.upgrade.result));
+    // The character pays; only the companion's item changes.
+    assert.equal(tried.data.character.gold, 100000 - next.cost.gold);
+    assert.equal(tried.data.character.resources['iron-ore'], 1000 - next.cost['iron-ore']);
+    assert.equal(tried.data.character.bag.length, bagBefore);
+    assert.equal(placeOf(tried.data.settlement, 'weapon').item.upgrade, tried.data.upgrade.to);
+    assert.equal((await storedItem('weapon')).upgrade, tried.data.upgrade.to);
+    assert.deepEqual(await storedItem('chest'), chest);
+    // From +5 on, a material of the item's rarity, from the character's own.
+    const database = await db();
+    const osada = await stored();
+    osada.companions[0].gear = osada.companions[0].gear.map((item) => (item.slot === 'weapon' ? { ...item, upgrade: 4 } : item));
+    await database.prepare("UPDATE characters SET settlement = ?, materials = '{}'").bind(JSON.stringify(osada)).run();
+    const rarity = (await storedItem('weapon')).rarity;
+    assert.deepEqual(placeOf(await settlement(), 'weapon').item.anvil.next.materials, { rarity, count: 1 });
+    assert.equal((await upgrade(candidate.id, 'weapon')).data.error.code, 'no_material');
+    await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ [`wolf-pelt:${rarity}`]: 3 })).run();
+    const fifth = await upgrade(candidate.id, 'weapon');
+    assert.equal(fifth.status, 200, JSON.stringify(fifth.data));
+    assert.deepEqual(fifth.data.upgrade.material, { key: `wolf-pelt:${rarity}`, count: 1 });
+    assert.deepEqual(JSON.parse((await database.prepare('SELECT materials FROM characters').first()).materials), { [`wolf-pelt:${rarity}`]: 2 });
+    // A place with nothing in it has nothing to upgrade.
+    const empty = await upgrade(candidate.id, 'talisman');
+    assert.deepEqual([empty.status, empty.data.error.code], [404, 'item_not_found']);
+  });
+
+  test('two quick taps on "Ulepsz" make and pay one try', async () => {
+    const candidate = await hireFirst();
+    await anvil(3);
+    await stock(100000, 1000);
+    // Both taps of the same card name the item's last try as it showed it.
+    const { roll } = placeOf(await settlement(), 'weapon').item;
+    assert.equal(roll, '');
+    const taps = await Promise.all([upgrade(candidate.id, 'weapon', { roll }), upgrade(candidate.id, 'weapon', { roll })]);
+    assert.deepEqual(
+      taps.map((tap) => tap.status).sort(),
+      [200, 409],
+    );
+    const made = taps.find((tap) => tap.status === 200).data;
+    assert.equal(taps.find((tap) => tap.status === 409).data.error.code, 'item_changed');
+    const row = await (await db()).prepare('SELECT gold, resources FROM characters').first();
+    assert.equal(row.gold, 100000 - made.upgrade.cost.gold);
+    assert.equal(JSON.parse(row.resources)['iron-ore'], 1000 - made.upgrade.cost['iron-ore']);
+    assert.equal((await storedItem('weapon')).upgrade, made.upgrade.to);
+    // The card after the try names it, and the next tap is a try again.
+    const next = placeOf(made.settlement, 'weapon').item.roll;
+    assert.equal(next, (await storedItem('weapon')).lastRoll);
+    assert.equal((await upgrade(candidate.id, 'weapon', { roll: next })).status, 200);
+  });
+
+  test('"Zostań w kwaterze": a companion who stays goes on no exploration and gains nothing from it, and its gear is at hand meanwhile', async () => {
+    const candidate = await hireFirst();
+    await anvil(3);
+    await stock(100000, 1000);
+    const database = await db();
+    const options = async () => JSON.parse((await database.prepare('SELECT options FROM activities').first()).options);
+    let hired = (await settlement()).companions.hired[0];
+    assert.deepEqual([hired.stay.stays, hired.stay.action.label, hired.away], [false, 'Zostań w kwaterze', null]);
+    // Out on an exploration with the character: its gear waits.
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.deepEqual((await options()).companions.map((companion) => companion.id), [candidate.id]);
+    hired = (await settlement()).companions.hired[0];
+    assert.match(hired.away, /na wyprawie/);
+    assert.equal((await upgrade(candidate.id, 'weapon')).data.error.code, 'busy');
+    await call('POST', '/api/hunts/cancel', { cookie });
+    // Told to stay, it stays home while the character explores alone.
+    const told = await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: candidate.id, stays: true } });
+    assert.equal(told.status, 200, JSON.stringify(told.data));
+    assert.equal(told.data.text, `${candidate.name} zostaje w kwaterze.`);
+    hired = told.data.settlement.companions.hired[0];
+    assert.deepEqual([hired.stay.stays, hired.stay.action.label], [true, 'Idź na wyprawy']);
+    assert.equal((await stored()).companions[0].stays, true);
+    const before = (await stored()).companions[0];
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.equal((await options()).companions, undefined);
+    // At home meanwhile: its item is upgraded.
+    assert.equal((await settlement()).companions.hired[0].away, null);
+    assert.equal((await upgrade(candidate.id, 'weapon')).status, 200);
+    // The report brings it no XP and no relation.
+    await database.prepare('UPDATE activities SET started_at = started_at - ?, ends_at = ends_at - ?').bind(300000, 300000).run();
+    assert.equal((await call('POST', '/api/hunts/claim', { cookie })).status, 200);
+    const after = (await stored()).companions[0];
+    assert.deepEqual([after.level, after.xp ?? 0, after.relation ?? 0], [before.level, before.xp ?? 0, before.relation ?? 0]);
+    // Talks go on as ever.
+    assert.equal((await call('POST', '/api/settlement/talk', { cookie, body: { companionId: candidate.id } })).status, 200);
+    // "Idź na wyprawy": it goes along again.
+    const back = await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: candidate.id, stays: false } });
+    assert.equal(back.data.text, `${candidate.name} chodzi teraz z postacią na wyprawy.`);
+    assert.equal((await stored()).companions[0].stays, undefined);
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.deepEqual((await options()).companions.map((companion) => companion.id), [candidate.id]);
+    assert.equal((await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: candidate.id } })).data.error.code, 'invalid_stay');
   });
 });
