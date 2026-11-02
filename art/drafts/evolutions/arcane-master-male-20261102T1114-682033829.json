@@ -1,0 +1,30 @@
+{
+  "id": "arcane-master-male",
+  "payload": {
+    "prompt": "adult man arcane master in his thirties, a stern mature face, short black hair and a short trimmed black beard, tall and upright, standing in the middle of the image, full body figure from the top of the head to the feet, about four fifths of the image height, a little empty space above the head and below the feet, a deep purple robe with glowing violet runes, an open spellbook floating beside him, holding a staff topped with a floating violet crystal, faint violet light around the hands, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 682033829,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793618194,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 12.47,
+    "request_id": "0776cbfa-a9e9-4ef2-bee9-1ed5ca47055e",
+    "outputs_retained_until": 1793704523,
+    "billing": {
+      "source": "balance",
+      "balance_left": 12.47,
+      "balance_charged": 0.36
+    }
+  }
+}
