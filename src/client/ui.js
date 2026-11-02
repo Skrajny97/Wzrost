@@ -43,7 +43,13 @@ export const systemLink = (href, text) => h('a', { class: 'button button--system
 // The tag of a character's guild in square brackets beside its name, or
 // nothing (the author: "koło nicka na czacie ogólnym i wszędzie powinien
 // wyśiwetlać sie tez skrót nazwy Gildii [....] w kwadratowym nawiasie").
-export const guildTag = (tag) => (tag ? h('span', { class: 'guild-tag', text: `[${tag}]` }) : null);
+// The best guild of last week has its tag in gold (380 C), its words under
+// a pointer.
+export function guildTag(tag) {
+  if (!tag) return null;
+  const champion = tag === state.championTag;
+  return h('span', { class: champion ? 'guild-tag guild-tag--champion' : 'guild-tag', title: champion ? state.content?.guildFame?.champion : null, text: `[${tag}]` });
+}
 
 // A character's name in its frame's colour, with a soft glow (the Sklep
 // Systemu's "Kolor imienia jak ramka"), wherever its guild's tag goes with

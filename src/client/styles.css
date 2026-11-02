@@ -115,6 +115,7 @@
   --bark-active: #3a2e22;
   --accent: #c9a14a;
   --gold: #d9b45a;
+  --champion-gold: #f7d36a;
   /* Punkty Czasu: the amber of an hourglass's sand. */
   --time: #e39b5b;
   --hp: #c8553d;
@@ -3885,6 +3886,29 @@ img.area-art {
   font-size: 0.78em;
   letter-spacing: 0.04em;
   white-space: nowrap;
+}
+
+/* The tag of last week's best guild (guild-fame.js, 380 C): bright gold
+   in a thin gold frame with a soft glow, apart from the other tags and the
+   gold names beside them; and the line on its Gildia page. */
+.guild-tag--champion {
+  padding: 0 4px;
+  border: 1px solid rgba(247, 211, 106, 0.75);
+  border-radius: 3px;
+  background: rgba(247, 211, 106, 0.14);
+  color: var(--champion-gold);
+  font-weight: 700;
+  text-shadow: 0 0 6px rgba(247, 211, 106, 0.55);
+}
+
+.guild-champion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--champion-gold);
+  font-family: var(--font-system);
+  font-size: 14px;
 }
 
 .compare > .link-button {
@@ -8429,15 +8453,42 @@ a.profession-square:active {
   gap: 16px;
 }
 
-/* The Ranking postaci (screens/ranking.js): the order to pick, the
-   player's place, and the table with both levels, the column of the order
-   in gold and the player's own row in the System's light. */
+/* The Ranking (screens/ranking.js): the tabs "Postacie" and "Gildie" in
+   the look of the Społeczność's parts, sharing the row (381 A). */
+.ranking-tabs .community-tab {
+  flex: 1 0 auto;
+  justify-content: center;
+}
+
+.ranking-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* The Ranking postaci: the order to pick, the player's place, and the table
+   with both levels, the column of the order in gold and the player's own
+   row in the System's light. The guilds' one the same way: this week or
+   from the start, its rules folded over the table. */
 .ranking-by {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .ranking-by .segmented-option {
   line-height: 1.2;
+}
+
+.ranking-guilds {
+  gap: 10px;
+}
+
+.ranking-guilds .how-more > p + p {
+  margin-top: 6px;
+}
+
+.ranking-guild {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ranking-place {
@@ -10095,17 +10146,20 @@ a.profession-square:active {
 
 /* The Bestia Gildii (guild-beast.js): its card on the Gildia's page, the
    champion in the blood red of its frame in fights, its HP bar thicker.
-   The Próby and the Prośby Gildii (guild-trials.js, guild-requests.js)
-   share its subtitles and its rows of names. */
+   The Próby, the Prośby Gildii and the Wymiana (guild-trials.js,
+   guild-requests.js, guild-exchange.js) share its subtitles and its rows
+   of names. */
 .guild-beast p,
 .guild-trials p,
-.guild-requests p {
+.guild-requests p,
+.guild-exchange p {
   margin: 0;
 }
 
 .guild-beast .how-more > p + p,
 .guild-trials .how-more > p + p,
-.guild-requests .how-more > p + p {
+.guild-requests .how-more > p + p,
+.guild-exchange .how-more > p + p {
   margin-top: 6px;
 }
 
@@ -10257,12 +10311,16 @@ a.profession-square:active {
 }
 
 /* The Gildia's tabs (screens/guild.js): the Społeczność's row of tabs, the
-   four of them sharing its width, so a phone shows all four at once. */
+   five of them sharing its width, each with its icon over its name, so all
+   five fit in one row on a phone and in the computer's column. */
 .guild-picker .community-tab {
   flex: 1 0 auto;
+  flex-direction: column;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 6px;
+  gap: 2px;
+  padding: 6px 4px;
+  font-size: 15px;
+  line-height: 1.2;
 }
 
 /* A part of a guild activity's card, under its subtitle (guild-trials.js,
@@ -10615,6 +10673,96 @@ a.profession-square:active {
   color: var(--text-muted);
   font-family: var(--font-system);
   font-size: 13px;
+}
+
+/* The Wymiana (guild-exchange.js): an offer as "Daje X · Chce Y", each side
+   with its resource's picture and kept whole; on a narrow phone the second
+   side goes under the first. Each side starts with its dot, and the sides
+   stand 18 px left of their line, where the line's box hides the dot of
+   the side that begins it. Under the offer: the time it hangs, what the
+   character holds and the offer's button. The sheet of a new offer picks
+   the resources from three buttons side by side, as the list of "Poproś
+   gildię" lights the picked one. */
+.guild-exchange-deal {
+  overflow: hidden;
+}
+
+.guild-exchange-sides {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin-left: -18px;
+}
+
+.guild-exchange-side {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.guild-exchange-side::before {
+  content: '·';
+  width: 12px;
+  text-align: center;
+}
+
+.guild-exchange-label,
+.guild-exchange-side::before {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.guild-exchange-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.guild-offer-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 10px;
+}
+
+.guild-offer--closed .guild-exchange-deal {
+  opacity: 0.7;
+}
+
+.guild-offer-post {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.guild-exchange-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+
+.guild-exchange-choice {
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 4px;
+  text-align: center;
+}
+
+.guild-exchange-choice:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.guild-exchange-name {
+  font-size: 15px;
+  line-height: 1.2;
 }
 
 /* The Sklep Systemu (screens/shop.js): the Punkty Systemu, three tabs and a

@@ -85,6 +85,7 @@ import { craftingOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
+import { championOf } from './guild-fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { partyRemoval } from './parties.js';
 import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
@@ -1074,9 +1075,13 @@ export function characterView(player, now) {
   };
 }
 
+// With the tag of last week's best guild, in gold wherever a guild's tag
+// shows (380 C): asking for it the first time in a new week freezes the
+// Sława of the week before (guild-fame.js).
 export async function getCharacter(context) {
   const { player } = await requirePlayer(context);
-  return json({ character: characterView(player, context.now) });
+  const champion = await championOf(context.env.DB, context.now);
+  return json({ character: characterView(player, context.now), championTag: champion?.tag ?? null });
 }
 
 // GET /api/profile/:name: another player's character as everyone may see
@@ -1401,12 +1406,12 @@ export async function setSkin(context) {
 export async function deleteCharacter(context) {
   const { player } = await requirePlayer(context);
   const db = context.env.DB;
-  await db.batch(characterRemoval(db, player.row.id));
+  await db.batch(characterRemoval(db, player.row.id, context.now));
   return json({ ok: true });
 }
 
-// The statements that remove a character with all it has.
-export function characterRemoval(db, id) {
+// The statements that remove a character with all it has, at `now`.
+export function characterRemoval(db, id, now) {
   return [
     db.prepare('DELETE FROM friends WHERE character_id = ? OR friend_id = ?').bind(id, id),
     db.prepare('DELETE FROM gifts WHERE sender_id = ? OR receiver_id = ?').bind(id, id),
@@ -1421,7 +1426,7 @@ export function characterRemoval(db, id) {
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
     ...marketRemoval(db, '?', [id]),
     ...partyRemoval(db, '?', [id]),
-    ...guildRemoval(db, '?', [id]),
+    ...guildRemoval(db, '?', [id], now),
     db.prepare('DELETE FROM characters WHERE id = ?').bind(id),
   ];
 }

@@ -7,13 +7,18 @@
 // leader names and unnames deputies and hands the lead over; a deputy
 // invites and removes members, the leader anyone. A leader who leaves
 // passes the lead to the first deputy, else to the member there longest,
-// and a guild nobody is in goes with its invitations and its channel.
+// and a guild nobody is in goes with its invitations and its channel. A
+// character that leaves or is removed gets back the pieces of its open
+// offers in the Wymiana (guild-exchange.js) at once. The best guild of last
+// week says so on its page (guild-fame.js).
 
 import { blockedName, isUnlocked } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
+import { offersReturned, settleOffers } from './guild-exchange.js';
+import { championFrom, championOf, championStatement } from './guild-fame.js';
 import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
 
@@ -59,10 +64,11 @@ export async function guildOf(db, characterId) {
 // founding one. The leader and the deputies get the friends they may
 // invite at a tap, those in no guild and not invited yet (the author: "Do
 // Gildii tez powinna być opcja zapraszania z pozycji ekranu Gildii").
+// `champion`: whether the guild was the best of last week (380 C).
 export async function guildView(db, characterId, now) {
   const guild = await guildOf(db, characterId);
   const inviting = guild !== null && guild.role !== 'member';
-  const [members, sent, invites, friends] = await db.batch([
+  const [members, sent, invites, friends, best] = await db.batch([
     db
       .prepare(
         `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, c.cosmetics, m.role, u.seen_at
@@ -89,6 +95,7 @@ export async function guildView(db, characterId, now) {
          ORDER BY o.name`,
       )
       .bind(characterId, characterId, characterId, inviting ? 1 : 0, guild?.id ?? 0),
+    championStatement(db, now),
   ]);
   const { onlineSeconds } = content.community.trade;
   const online = (row) => row.played === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000;
@@ -100,6 +107,7 @@ export async function guildView(db, characterId, now) {
       tag: guild.tag,
       size,
       role: guild.role,
+      champion: championFrom(best.results[0])?.id === guild.id,
       members: members.results.map((row) => ({
         id: row.id,
         name: row.name,
@@ -122,10 +130,16 @@ export async function guildView(db, characterId, now) {
 
 const answer = async (db, characterId, now, extra = {}) => json({ ...(await guildView(db, characterId, now)), ...extra });
 
-// GET /api/guild
+// GET /api/guild: the character's offers in the Wymiana whose time is up
+// give their pieces back first (guild-exchange.js), and the character comes
+// with the answer when they did. The first look of a new week freezes the
+// Sława of the week before (guild-fame.js).
 export async function getGuild(context) {
-  const { player } = await requireGuildPlayer(context);
-  return answer(context.env.DB, player.row.id, context.now);
+  const { session, player } = await requireGuildPlayer(context);
+  const db = context.env.DB;
+  await championOf(db, context.now);
+  const settled = await settleOffers(db, player.row.id, context.now);
+  return answer(db, player.row.id, context.now, settled ? { character: characterView(await loadPlayer(db, session.userId), context.now) } : {});
 }
 
 // A guild's name from a request: letters, digits, spaces, hyphens and
@@ -283,13 +297,16 @@ export async function cancelGuildInvite(context) {
 }
 
 // The statements that take characters out of their guilds (`characters`:
-// SQL for their ids, with `binds`): a guild left without its leader gets
-// its first deputy as leader, else the member there longest, and a guild
-// left empty goes with its invitations and its channel's messages. Also
-// for a deleted character or account (characters.js, accounts.js).
-export function guildRemoval(db, characters, binds) {
+// SQL for their ids, with `binds`) at `now`: their open offers in the
+// Wymiana close with the pieces back to them (guild-exchange.js), a guild
+// left without its leader gets its first deputy as leader, else the member
+// there longest, and a guild left empty goes with its invitations and its
+// channel's messages. Also for a deleted character or account
+// (characters.js, accounts.js).
+export function guildRemoval(db, characters, binds, now) {
   const gone = "channel LIKE 'guild:%' AND channel NOT IN (SELECT 'guild:' || guild_id FROM guild_members)";
   return [
+    ...offersReturned(db, characters, binds, now),
     db.prepare(`DELETE FROM guild_members WHERE character_id IN (${characters})`).bind(...binds),
     db.prepare(`DELETE FROM guild_invites WHERE character_id IN (${characters}) OR invited_by IN (${characters})`).bind(...binds, ...binds),
     db.prepare(
@@ -305,13 +322,14 @@ export function guildRemoval(db, characters, binds) {
   ];
 }
 
-// POST /api/guild/leave
+// POST /api/guild/leave: with the character, whose offers in the Wymiana
+// gave their pieces back.
 export async function leaveGuild(context) {
-  const { player } = await requireGuildPlayer(context);
+  const { session, player } = await requireGuildPlayer(context);
   const db = context.env.DB;
   const guild = await ownGuild(db, player.row.id);
-  await db.batch(guildRemoval(db, '?', [player.row.id]));
-  return answer(db, player.row.id, context.now, { text: `Opuszczasz gildię ${guild.name}.` });
+  await db.batch(guildRemoval(db, '?', [player.row.id], context.now));
+  return answer(db, player.row.id, context.now, { text: `Opuszczasz gildię ${guild.name}.`, character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
 // The member a request names, in the guild of the one who asks.
@@ -335,7 +353,7 @@ export async function kickFromGuild(context) {
   const member = await memberOf(db, guild, body);
   if (member.character_id === player.row.id) throw new ApiError(400, 'self', 'Siebie nie usuniesz. Możesz opuścić gildię.');
   if (guild.role === 'deputy' && member.role !== 'member') throw new ApiError(403, 'not_allowed', 'Zastępca usuwa tylko członków.');
-  await db.batch(guildRemoval(db, '?', [member.character_id]));
+  await db.batch(guildRemoval(db, '?', [member.character_id], context.now));
   return answer(db, player.row.id, context.now, { text: `${member.name} nie jest już w gildii.` });
 }
 

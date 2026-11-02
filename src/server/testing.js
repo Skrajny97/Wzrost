@@ -165,7 +165,7 @@ export async function backFromTest(context) {
   const parked = await parkedOf(db, session.userId);
   if (!parked) throw new ApiError(409, 'not_parked', 'Żadna postać nie czeka.');
   const test = await db.prepare("SELECT id FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId).first();
-  await db.batch([...(test ? characterRemoval(db, test.id) : []), db.prepare("UPDATE characters SET role = 'player' WHERE id = ?").bind(parked.id)]);
+  await db.batch([...(test ? characterRemoval(db, test.id, context.now) : []), db.prepare("UPDATE characters SET role = 'player' WHERE id = ?").bind(parked.id)]);
   return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
