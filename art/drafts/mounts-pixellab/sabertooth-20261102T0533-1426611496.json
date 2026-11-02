@@ -1,0 +1,15 @@
+{
+  "id": "sabertooth",
+  "payload": {
+    "first_frame": "art/references/mounts/sabertooth.png",
+    "action": "walking at a steady pace in place like a big cat, seen from the side and facing right, the four legs moving in a smooth seamless walk loop, the head and body swaying slightly, the tail swaying, the saddle and bridle stay in place",
+    "frame_count": 8,
+    "seed": 1426611496,
+    "no_background": true
+  },
+  "usage": {
+    "type": "generations",
+    "generations": 3
+  },
+  "frames": 9
+}
