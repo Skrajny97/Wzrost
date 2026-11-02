@@ -2996,6 +2996,14 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Układ na komputer: delikatne tła i gradienty (2.11.2026)
+
+Autor o makietach i układzie na komputer: „Makieta bardzo szeroka brakuje czasem teł jakichś delikatnych albo gradientów ale wygląda git to na komputer”. Szerokości zostają, dochodzi światło i głębia, tylko w układzie komputera (telefon bez zmian):
+
+1. **Kolumna gry.** Nad nią słaba poświata Systemu z góry i ciepła z dołu, a brzegi strony są odrobinę ciemniejsze. Światło stoi w miejscu, gdy strona się przewija. Sama kolumna jest od góry lekko rozjaśniona, więc puste miejsce pod krótszą treścią nie jest płaskie.
+2. **Menu i kolumna zadań i czatu.** Ciemnieją ku dołowi od jaśniejszej, ciepłej (menu) albo chłodnej (zadania i czat) góry, z miękkim cieniem od strony gry.
+3. **Górny pasek** to lekko oświetlony pas z linią Systemu, która gaśnie na końcach. Napis „Insight” w menu ma złote podkreślenie.
+
 ## Targowisko: filtry według kategorii (2.11.2026)
 
 Autor: „filtracja potrzebna w targowisku zeby szukac itemy po kategoriach, bo jak jest duzo w plecaku to lista przytłaczająca”.
@@ -3004,6 +3012,14 @@ Autor: „filtracja potrzebna w targowisku zeby szukac itemy po kategoriach, bo 
 2. **Kategorie (brakujący szczegół).** Najpierw przedmioty według miejsca, z nazwami i w kolejności z `data/slots.json`: Hełm, Amulet, Pancerz, Rękawice, Buty, Broń, Druga ręka, Pierścień, Talizman. Amulet, Pierścień i Talizman zostają osobno, bez wspólnej „Biżuterii”, bo tak najprościej, a nazwy są te same co na karcie przedmiotu. Po nich Zioła, Mikstury, Materiały i Części.
 3. **Wybór (brakujący szczegół).** Wybrana kategoria zostaje, gdy Targowisko się odświeża i gdy okno „Wystaw” otwiera się znowu; każda z dwóch list ma swój wybór. Gdy w wybranej kategorii nic już nie ma, np. po wystawieniu ostatniego pierścienia, wraca „Wszystko”. Po wyjściu z Targowiska obie listy znów zaczynają od „Wszystko”.
 4. **Jedna kategoria.** Gdy wszystko na liście należy do jednej kategorii, przycisków nie ma, bo nie ma czego wybierać.
+
+## Wersja 0.1.0 (3.11.2026)
+
+Po 0.0.99 numeracja idzie dalej od 0.1.0, jak ustalił autor.
+
+1. **Co wchodzi do gry:** filtry kategorii na Targowisku i delikatne tła i gradienty w układzie na komputer (zob. wyżej).
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (869 z 869) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków); filtry w przeglądarce na telefonach 390×844 i 360×780 i na komputerze 1440×900 (wybór, liczby, brak przesuwania na boki, wybór po odświeżeniu, powrót do „Wszystko”, reset po wyjściu); tła na komputerze 1920×1080 i 1366×768 (Walka, Postać, Obóz, Społeczność).
 
 ## Kod podarunkowy TIGER (2.11.2026)
 
