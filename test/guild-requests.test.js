@@ -168,6 +168,36 @@ describe('the Prośby Gildii through the API', () => {
     assert.equal((await give('druh', mine.id, 1)).status, 200);
   });
 
+  test('a request of a member who left hangs no more; the requests closed before last week go with their gifts', async () => {
+    await setStacks('Druh', 'materials', { 'wolf-pelt:common': 5 });
+    const { mine } = (await ask('mistrz', { kind: 'material', key: 'wolf-pelt:common', count: 3 })).data;
+    // The goods to ask for: those the character holds or has in its Encyklopedia.
+    const seen = (await as('druh', 'GET', '/api/guild/requests')).data;
+    assert.ok(seen.known.some((goods) => goods.kind === 'material' && goods.key === 'wolf-pelt:common'));
+    assert.equal(seen.requests.length, 1);
+    assert.equal((await as('mistrz', 'POST', '/api/guild/leave')).status, 200);
+    assert.deepEqual((await as('druh', 'GET', '/api/guild/requests')).data.requests, []);
+    assert.equal((await give('druh', mine.id, 1)).data.error.code, 'closed');
+    // A request filled a fortnight ago, with its gift.
+    const druh = (await first("SELECT id FROM characters WHERE name = 'Druh'")).id;
+    const mistrz = (await first("SELECT id FROM characters WHERE name = 'Mistrz'")).id;
+    const guild = (await first('SELECT guild_id FROM guild_members WHERE character_id = ?', druh)).guild_id;
+    const old = Date.now() - 14 * 24 * HOUR;
+    const { meta } = await run(
+      "INSERT INTO guild_requests (guild_id, character_id, kind, good, count, given, state, created_at, ends_at, closed_at) VALUES (?, ?, 'herb', 'comfrey', 1, 1, 'filled', ?, ?, ?)",
+      guild,
+      druh,
+      old,
+      old + rules.openHours * HOUR,
+      old + HOUR,
+    );
+    await run('INSERT INTO guild_gifts (request_id, guild_id, giver_id, count, created_at) VALUES (?, ?, ?, 1, ?)', meta.last_row_id, guild, mistrz, old + HOUR);
+    assert.equal((await ask('druh', { kind: 'material', key: 'wolf-pelt:rare', count: 2 })).status, 200);
+    assert.equal((await first('SELECT COUNT(*) AS count FROM guild_requests WHERE id = ?', meta.last_row_id)).count, 0);
+    assert.equal((await first('SELECT COUNT(*) AS count FROM guild_gifts')).count, 0);
+    assert.equal((await first('SELECT COUNT(*) AS count FROM guild_requests')).count, 2);
+  });
+
   test('characters of one account give each other nothing', async () => {
     await setStacks('Mistrz', 'materials', { 'wolf-pelt:common': 5 });
     const { mine } = (await ask('mistrz', { kind: 'material', key: 'wolf-pelt:common', count: 3 })).data;

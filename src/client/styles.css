@@ -10026,3 +10026,316 @@ a.profession-square:active {
   font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
+
+/* The Gildia's tabs (screens/guild.js): the Społeczność's row of tabs, the
+   four of them sharing its width, so a phone shows all four at once. */
+.guild-picker .community-tab {
+  flex: 1 0 auto;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 6px;
+}
+
+/* A part of a guild activity's card, under its subtitle (guild-trials.js,
+   guild-requests.js). */
+.guild-part {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.guild-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.guild-chip {
+  gap: 4px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.guild-chip--done {
+  border-color: var(--system-line);
+  color: var(--system-text);
+}
+
+.guild-chip--taken {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* The Próby Gildii (guild-trials.js): the bar with a mark at each threshold
+   but the last, the thresholds with their chests, the character's trial and
+   the board, a trial to a row with its picture, words and "Weź". */
+.guild-meter .meter-track {
+  position: relative;
+}
+
+.guild-meter .meter-track,
+.guild-meter .meter-fill {
+  height: 10px;
+}
+
+.guild-meter-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--surface);
+}
+
+.guild-thresholds,
+.guild-trials-list,
+.guild-requests-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guild-threshold {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.guild-threshold + .guild-threshold,
+.guild-trial + .guild-trial,
+.guild-request + .guild-request {
+  border-top: 1px solid var(--line);
+}
+
+.guild-threshold-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.guild-threshold-name {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.guild-threshold--reached .guild-threshold-name {
+  color: var(--system-text);
+}
+
+.guild-threshold-reached {
+  display: inline-flex;
+  color: var(--system);
+}
+
+.guild-chest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.guild-chest li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.guild-chest .sprite {
+  width: 16px;
+  height: 16px;
+}
+
+.guild-chest-system {
+  flex: none;
+  color: var(--system);
+}
+
+.guild-trial-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.guild-trial-icon {
+  flex: none;
+  color: var(--gold);
+}
+
+.guild-trial-note {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.guild-trial {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.guild-trial-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.guild-trial > .button,
+.guild-trial > .chip {
+  flex: none;
+}
+
+.guild-trial--done .guild-trial-words,
+.guild-trial--locked .guild-trial-words {
+  color: var(--text-muted);
+}
+
+.guild-trial--locked .guild-trial-icon {
+  color: var(--icon-muted);
+}
+
+.guild-trial-lock {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+}
+
+.guild-trial-lock svg {
+  flex: none;
+}
+
+/* The Prośby Gildii (guild-requests.js): goods with their picture, the
+   character's request with its gifts and "Podziękuj", the others' requests
+   with "Daj", and "Poproś gildię" where pieces are missing. */
+.guild-goods {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.guild-goods-art {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--gold);
+}
+
+.guild-goods-art .sprite {
+  width: 24px;
+  height: 24px;
+}
+
+.guild-who {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.guild-requests .guild-row {
+  align-items: center;
+}
+
+.guild-mine-state,
+.guild-request-state {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.guild-request {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+}
+
+.guild-request-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 10px;
+}
+
+.guild-request-head .guild-who {
+  flex: 0 1 auto;
+}
+
+.guild-give {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.guild-give .trade-number {
+  width: 88px;
+}
+
+.guild-ask {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  align-self: flex-start;
+  justify-self: start;
+}
+
+.settlement-fold-body > .guild-ask {
+  margin-top: 8px;
+}
+
+.guild-ask svg {
+  flex: none;
+  color: var(--gold);
+}
+
+.guild-ask-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.guild-ask-sheet p {
+  margin: 0;
+}
+
+.guild-ask-select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+  color: var(--text);
+  /* 16 px keeps iOS from zooming in on focus. */
+  font-family: var(--font-system);
+  font-size: 16px;
+}

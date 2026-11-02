@@ -1,16 +1,18 @@
 // The Próby Gildii (src/engine/guild-trials.js, src/server/guild-trials.js;
 // the author's 345 A): a guild's board of a week, the same for its members
 // and drawn from the guild and the week; one trial at a time, sized to the
-// taker's level, locked while its part of the game is shut; what a claimed
-// exploration brings moves it on in the same batch; the bar of finished
-// trials with thresholds from the members active when the board was drawn
-// and each member's trials up to the cap; and the chests, once and only for
-// those who finished a trial that week.
+// taker's level, locked while its part of the game is shut; what an action
+// brings (an exploration, the Stół rozbiórki, the Kowadło, a Wieża, an
+// order of the Osada) moves it on only with that action's own save; the bar
+// of finished trials with thresholds from the members active when the board
+// was drawn and each member's trials up to the cap; and the chests, once and
+// only for those who finished a trial that week.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import { drawTrialBoard, questPeriod, trialChest, trialCount, trialGains, trialLock, trialPoints, trialText, trialThresholds, weekShare } from '../src/engine/index.js';
+import { trialProgress } from '../src/server/guild-trials.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -339,5 +341,103 @@ describe('the Próby Gildii through the API', () => {
     );
     assert.equal((await as('mistrz', 'POST', '/api/guild/trials/claim', { week: last, threshold: 1 })).status, 200);
     assert.equal((await as('mistrz', 'POST', '/api/guild/trials/claim', { week: older, threshold: 0 })).data.error.code, 'too_late');
+  });
+
+  test('a trial moves only with the condition of its action\'s own save, and only by what its kind counts', async () => {
+    await as('mistrz', 'GET', '/api/guild/trials');
+    await setBoard([{ kind: 'explore', size: 0, roll: 0 }]);
+    await as('mistrz', 'POST', '/api/guild/trials/take', { index: 0 });
+    await run("UPDATE guild_trials SET count = 100 WHERE state = 'active'");
+    const database = await db();
+    const id = await idOf('Mistrz');
+    const progress = async () => (await first("SELECT progress FROM guild_trials WHERE state = 'active'")).progress;
+    // A second tap whose save did not land: its condition fails, so does the trial's move.
+    await database.batch(trialProgress(database, id, { minutes: 30 }, Date.now(), { sql: '(SELECT version FROM characters WHERE id = ?) = ?', binds: [id, -1] }));
+    assert.equal(await progress(), 0);
+    await database.batch(trialProgress(database, id, { minutes: 30 }, Date.now(), { sql: '(SELECT version FROM characters WHERE id = ?) >= ?', binds: [id, 0] }));
+    assert.equal(await progress(), 30);
+    // What another kind counts, or nothing, moves it not.
+    await database.batch(trialProgress(database, id, { herbs: { comfrey: 5 }, kills: { wolf: 2 } }, Date.now()));
+    assert.deepEqual(trialProgress(database, id, {}, Date.now()), []);
+    assert.equal(await progress(), 30);
+    // Its count reached, it is done.
+    await database.batch(trialProgress(database, id, { minutes: 90 }, Date.now()));
+    const row = await first('SELECT progress, state FROM guild_trials');
+    assert.deepEqual([row.progress, row.state], [100, 'done']);
+  });
+
+  test('the Stół rozbiórki, the Kowadło and the Wieże move a trial on with their own save; a second tap that saves nothing moves nothing', async () => {
+    const id = await idOf('Mistrz');
+    await run('UPDATE characters SET level = 60, class_level = 50, gold = 5000, resources = json_set(resources, ?, 50) WHERE id = ?', '$."iron-ore"', id);
+    for (const [building, level] of [
+      ['craft-table', 1],
+      ['anvil', 2],
+    ]) {
+      await run('INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) VALUES (?, ?, ?, 0, 1)', id, building, level);
+    }
+    await as('mistrz', 'GET', '/api/guild/trials');
+    await setBoard(['process', 'salvage', 'upgrade', 'towers'].map((kind) => ({ kind, size: 0, roll: 0 })));
+    const progress = async () => (await first("SELECT progress FROM guild_trials WHERE state = 'active'")).progress;
+    // The trial of the board's place, far from done, so each step shows.
+    async function take(index) {
+      await as('mistrz', 'POST', '/api/guild/trials/drop');
+      const taken = await as('mistrz', 'POST', '/api/guild/trials/take', { index });
+      assert.equal(taken.status, 200, JSON.stringify(taken.data).slice(0, 300));
+      await run("UPDATE guild_trials SET count = 100 WHERE state = 'active'");
+    }
+    const bagItem = async () =>
+      (await run('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, 0)', id, JSON.stringify({ base: 'chainmail', slot: 'chest', level: 5, rarity: 'common', affixes: [], armor: 15 })))
+        .meta.last_row_id;
+
+    // Three materials handed to the table, by two taps: counted once.
+    await take(0);
+    await run('UPDATE characters SET materials = ? WHERE id = ?', JSON.stringify({ 'wolf-pelt:common': 3 }), id);
+    const taps = await Promise.all([1, 2].map(() => as('mistrz', 'POST', '/api/craft/materials', { keys: ['wolf-pelt:common'] })));
+    assert.equal(taps.filter((tap) => tap.status === 200).length, 1, JSON.stringify(taps.map((tap) => tap.data)).slice(0, 300));
+    assert.equal(await progress(), 3);
+
+    // An item taken apart.
+    await take(1);
+    assert.equal((await as('mistrz', 'POST', `/api/items/${await bagItem()}/salvage`)).status, 200);
+    assert.equal(await progress(), 1);
+
+    // An upgrade counts when it comes off.
+    await take(2);
+    const upgraded = await as('mistrz', 'POST', `/api/items/${await bagItem()}/upgrade`);
+    assert.equal(upgraded.status, 200, JSON.stringify(upgraded.data).slice(0, 300));
+    assert.equal(await progress(), upgraded.data.upgrade.result === 'success' ? 1 : 0);
+
+    // A fight won in a Wieża.
+    await take(3);
+    const entered = await as('mistrz', 'POST', '/api/towers/enter', { tower: 'solo', floor: 1 });
+    assert.equal(entered.status, 200, JSON.stringify(entered.data).slice(0, 300));
+    assert.equal(await progress(), entered.data.report.tower.won ? 1 : 0);
+  });
+});
+
+describe('the Próby Gildii and the Osada', () => {
+  const { call, db, signUp } = useServer({ SETTLEMENT: 'on' });
+  const STORE = { herb: 'herbs', potion: 'potions', material: 'materials', resource: 'resources', part: 'parts' };
+
+  test('an order delivered moves a trial of orders on with its own save; a second tap that saves nothing moves nothing', async () => {
+    const { cookie } = await signUp('soltys');
+    await call('POST', '/api/character', { cookie, body: { name: 'Soltys', classId: 'warrior', appearance: 'female' } });
+    const run = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).run();
+    await run(`UPDATE characters SET level = 30, class_level = 25, met = '["wolf"]', gold = 100000`);
+    assert.equal((await call('POST', '/api/guild/found', { cookie, body: { name: 'Sołtysi', tag: 'SO' } })).status, 200);
+    await call('GET', '/api/guild/trials', { cookie });
+    await run('UPDATE guild_trial_boards SET trials = ?', JSON.stringify([{ kind: 'orders', size: 0, roll: 0 }]));
+    const taken = await call('POST', '/api/guild/trials/take', { cookie, body: { index: 0 } });
+    assert.equal(taken.status, 200, JSON.stringify(taken.data).slice(0, 300));
+    await run("UPDATE guild_trials SET count = 100 WHERE state = 'active'");
+    // An order of goods kept in a column, held in full: an order for any
+    // materials of a rarity takes the wolves'.
+    const { settlement } = (await call('GET', '/api/settlement', { cookie })).data;
+    const order = settlement.board.slots.map((slot) => slot.order).find((one) => one && one.kind !== 'craft');
+    const key = order.kind === 'material' && order.key.startsWith('any:') ? `${content.materialsByMonster.wolf.id}:${order.key.slice(4)}` : order.key;
+    await run(`UPDATE characters SET ${STORE[order.kind]} = json_set(${STORE[order.kind]}, ?, ?)`, `$."${key}"`, order.count);
+    const taps = await Promise.all([1, 2].map(() => call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } })));
+    assert.equal(taps.filter((tap) => tap.status === 200).length, 1, JSON.stringify(taps.map((tap) => tap.data)).slice(0, 300));
+    assert.equal((await (await db()).prepare("SELECT progress FROM guild_trials WHERE state = 'active'").first()).progress, 1);
   });
 });

@@ -46,8 +46,8 @@ function goodsLine(goods, extra = null) {
 // A material at a rarity, as the server names it: "Skóra wilka", "Rzadka
 // skóra wilka" (materialView in the engine).
 function materialAt(material, rarityId) {
-  const rarity = rarityOf(rarityId);
-  const label = rarityId === material.rarity ? material.name : `${rarity.forms[material.gender]} ${material.name.toLowerCase()}`;
+  const name = material.name.toLowerCase();
+  const label = rarityId === material.rarity ? name : `${rarityOf(rarityId).forms[material.gender]} ${name}`;
   return { kind: 'material', key: `${material.id}:${rarityId}`, name: label.charAt(0).toUpperCase() + label.slice(1), rarity: rarityId, materialId: material.id };
 }
 
@@ -61,15 +61,17 @@ function held(goods) {
 
 // The goods to ask for: those named (`key`), or the materials of a rarity
 // the character knows of any rarity, raised to it where a material can be
-// found that rare (a material is never under its creature's rarity), the
-// most held first; or all the goods it knows (`known`, from the server).
-function choices(known, { kind, key, name, rarity }) {
+// found that rare (a material is never under its creature's rarity), with
+// `ordinary` no elite's or champion's trophy (an order for any materials
+// takes none), the most held first; or all the goods it knows (`known`,
+// from the server).
+function choices(known, { kind, key, name, rarity, ordinary = false }) {
   if (key) return [known.find((goods) => goods.kind === kind && goods.key === key) ?? { kind, key, name, ...(kind === 'material' && materialFields(key)) }];
   if (!rarity) return known;
   const order = (id) => state.content.rarities.findIndex((one) => one.id === id);
   const ids = new Set(known.filter((goods) => goods.kind === 'material').map((goods) => goods.materialId));
   return state.content.materials
-    .filter((material) => ids.has(material.id) && order(material.rarity) <= order(rarity))
+    .filter((material) => ids.has(material.id) && order(material.rarity) <= order(rarity) && !(ordinary && material.trophy))
     .map((material) => materialAt(material, rarity))
     .sort((a, b) => held(b) - held(a) || a.name.localeCompare(b.name, 'pl'));
 }
@@ -83,15 +85,21 @@ function materialFields(key) {
 
 // "Poproś gildię" where pieces are missing, for a character in a guild
 // (null outside one): `kind` and `key` (with its `name`) of the goods, or a
-// material's `rarity`; `missing` pieces, or `need` of one stack (then the
-// count starts at what the picked stack lacks).
+// material's `rarity` (with `ordinary`, no trophy); `missing` pieces, or
+// `need` of one stack (then the count starts at what the picked stack
+// lacks).
 export function askGuildButton(ask) {
   if (!state.character?.guildTag) return null;
-  return h('button', {
-    type: 'button',
-    class: 'button button--world button--small guild-ask',
-    onClick: () => openAskSheet(ask),
-  }, icon('banner', { size: 16 }), state.content.guildAsk);
+  return h(
+    'button',
+    {
+      type: 'button',
+      class: 'button button--world button--small guild-ask',
+      onClick: () => openAskSheet(ask),
+    },
+    icon('banner', { size: 18 }),
+    h('span', { text: state.content.guildAsk }),
+  );
 }
 
 // The sheet of a request: the goods and how many, or why the character

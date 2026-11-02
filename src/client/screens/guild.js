@@ -81,6 +81,11 @@ export function mountGuildPage(container, context) {
     fill(body);
     part = TAB_MOUNTS[id](body);
     render();
+    // A tab picked with the page scrolled down opens at its top, under the
+    // row of tabs as far as the page has it there.
+    const under = picker.getBoundingClientRect().bottom + (parseFloat(getComputedStyle(container).rowGap) || 0);
+    const top = body.getBoundingClientRect().top;
+    if (top < under) window.scrollBy(0, top - under);
   }
 
   function render() {

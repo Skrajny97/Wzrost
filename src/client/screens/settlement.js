@@ -171,14 +171,15 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
-  // "Poproś gildię" for what an order lacks (346 A): its herb or potion, or
-  // a material of its rarity when any will do.
+  // "Poproś gildię" for what an order lacks (346 A): its herb or potion, its
+  // material, or, when any materials of a rarity will do, one of them that
+  // is no trophy (as the order takes them).
   function orderAsk(order) {
     const missing = order.count - order.have;
     if (order.kind === 'herb' || order.kind === 'potion') return askGuildButton({ kind: order.kind, key: order.key, name: order.label, missing });
     if (order.kind !== 'material') return null;
-    const at = order.key.lastIndexOf(':');
-    return order.forms ? askGuildButton({ kind: 'material', rarity: order.key.slice(at + 1), missing }) : askGuildButton({ kind: 'material', key: order.key, name: order.label, missing });
+    const rarity = order.key.slice(order.key.lastIndexOf(':') + 1);
+    return order.forms ? askGuildButton({ kind: 'material', rarity, ordinary: true, missing }) : askGuildButton({ kind: 'material', key: order.key, name: order.label, missing });
   }
 
   function boardCard() {

@@ -882,6 +882,10 @@ function anvilSection(item, busy, open = false) {
   const rarityName = need ? (state.content.rarities.find((rarity) => rarity.id === need.rarity)?.name ?? need.rarity) : '';
   const lacking = [...costShortfall(next.cost), need && !chosen && `${formatNumber(need.count - (nearest?.count ?? 0))} szt. materiału (${rarityName})`].filter(Boolean);
   const note = h('p', { class: 'region-warning', role: 'status', hidden: true });
+  // The material the try lacks, from the guild (346 A), under what is
+  // missing once "Ulepsz" says it.
+  const ask = need && !chosen ? askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }) : null;
+  if (ask) ask.hidden = true;
   const folded = h(
     'div',
     { class: 'compare anvil' },
@@ -895,6 +899,7 @@ function anvilSection(item, busy, open = false) {
         if (lacking.length > 0) {
           note.textContent = `Brakuje: ${lacking.join(', ')}.`;
           note.hidden = false;
+          if (ask) ask.hidden = false;
           return;
         }
         folded.replaceWith(full);
@@ -902,8 +907,7 @@ function anvilSection(item, busy, open = false) {
       },
     }),
     note,
-    // The material the try lacks, from the guild (346 A), at once.
-    need && !chosen && askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }),
+    ask,
   );
   return folded;
 }
