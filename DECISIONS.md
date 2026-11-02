@@ -2996,6 +2996,22 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Zadania od narratora: „Odbierz wszystkie” zawsze na widoku (2.11.2026)
+
+Autor: „przez Przelosowanie zadań chowa sie troche klawisz »Odbierz wszystko«”. Na telefonach o niższym ekranie (sprawdzone 360×640 i 412×732) pięć zadań, „Przelosuj zadania” i zdanie o skrzyni nie mieściły się na pergaminie, więc rząd „Odbierz wszystkie” i „Zwiń” na dole strony wypadał poza widok (o 93–205 px) i trzeba było go przewinąć.
+
+1. **Rząd przycisków przyklejony do dołu pergaminu** (`.quests-page .narrator-actions`, `position: sticky`): lista przewija się pod nim, a nad przyciskami jest krótkie przejście w kolor pergaminu, żeby tekst nie urywał się ostro. Przycisk sięga do samej dolnej krawędzi, także w miejsce wewnętrznego marginesu strony.
+2. Na wysokim ekranie, gdzie wszystko się mieści, nic się nie zmienia: przyciski stoją pod listą jak dotąd.
+
+## Wersja 0.0.94 (2.11.2026)
+
+1. **Co wchodzi do gry:** „Odbierz wszystkie” i „Zwiń” zawsze na widoku na pergaminie zadań (zob. wyżej). Razem z tym idą opisy szkiców Czarnego Bagna (`art/prompts.json`), których gra nie używa.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:**
+    - Na tym komputerze przeszły wszystkie testy (857). Test dwóch równoczesnych odbiorów raportu przyjmuje teraz także „character_changed”: przegrany wyścig dostaje 409 i nic nie zarabia, tak jak przy dwóch dotychczasowych kodach, a pod obciążeniem test czasem trafiał na ten trzeci.
+    - Nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`).
+    - Pergamin zadań sprawdzono w przeglądarce na telefonach 360×640, 390×844 i 412×732: „Odbierz wszystkie” cały na widoku, także po przewinięciu listy do końca.
+
 ## Gildia: żółte kropki przy rzeczach do zrobienia (2.11.2026)
 
 Autor: „Jeśli zadna proba jest niewzieta z Prob gildii niech podswietla sie ikonka powiadomienia zolta kropką i podobnie inne rzeczy w Gildii do zrobienia”.

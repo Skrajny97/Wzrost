@@ -6118,6 +6118,20 @@ a.camp-level-button {
   text-transform: none;
 }
 
+/* "Odbierz wszystkie" and "Zwiń" stay in sight at the bottom of a long
+   parchment, over the list that scrolls beneath them (the author: "przez
+   Przelosowanie zadań chowa sie troche klawisz »Odbierz wszystko«"). */
+.quests-page .narrator-actions {
+  position: sticky;
+  /* Down over the page's own bottom padding, which a stuck bar keeps
+     clear of. */
+  bottom: -14px;
+  z-index: 1;
+  margin: 0 -16px -14px;
+  padding: 10px 16px 14px;
+  background: linear-gradient(rgba(223, 208, 171, 0), #dfd0ab 10px);
+}
+
 /* As large as "Zwiń" beside it. */
 .quests-claim-all {
   min-height: 0;

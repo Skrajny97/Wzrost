@@ -560,7 +560,9 @@ describe('hunts and reports', () => {
     const claims = [first, second].sort((a, b) => a.status - b.status);
     assert.equal(claims[0].status, 200);
     assert.equal(claims[1].status, 409);
-    assert.ok(['already_claimed', 'no_activity'].includes(claims[1].data.error.code));
+    // The one that loses the race finds the report claimed, the exploration
+    // gone, or the character changed under it (a 409 each way, no payout).
+    assert.ok(['already_claimed', 'no_activity', 'character_changed'].includes(claims[1].data.error.code), claims[1].data.error.code);
 
     const { report, character } = claims[0].data;
     assert.deepEqual([report.areaId, report.areaName, report.regionName], ['windfalls-edge', 'Skraj Wiatrołomów', 'Wiatrołomy']);
