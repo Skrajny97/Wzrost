@@ -4,7 +4,7 @@
   "description": "Poziom samego obozu: od startLevel do maxLevel, za samo złoto, a każdy poziom ponad pierwszy przyspiesza budowy budynków.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "description", "startLevel", "maxLevel", "effect", "costs", "minutes", "evolution", "queue"],
+  "required": ["id", "name", "description", "startLevel", "maxLevel", "effect", "costs", "minutes", "evolution", "cornerstone", "queue"],
   "properties": {
     "$comment": { "type": "string" },
     "id": { "const": "camp" },
@@ -55,6 +55,20 @@
       }
     },
     "evolution": { "type": "string", "minLength": 1, "description": "Zapowiedź ewolucji po najwyższym poziomie." },
+    "cornerstone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "label", "text", "buildings", "camp", "ready"],
+      "description": "Kamień węgielny Warowni na planszy z Osadą: jego nazwa, podpis na planszy, opis, nazwy dwóch rzędów postępu i zdanie, gdy wszystko jest gotowe.",
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "text": { "type": "string", "minLength": 1 },
+        "buildings": { "type": "string", "minLength": 1 },
+        "camp": { "type": "string", "minLength": 1 },
+        "ready": { "type": "string", "minLength": 1 }
+      }
+    },
     "queue": { "type": "integer", "minimum": 1, "maximum": 10, "description": "Ile budów obóz ma naraz, razem z trwającą; reszta czeka w kolejce." }
   }
 }

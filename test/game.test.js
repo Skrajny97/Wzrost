@@ -842,6 +842,18 @@ describe('camp', () => {
     const top = (await character()).camp.level;
     assert.deepEqual([top.level, top.next, top.effect], [10, null, 'Budowy szybsze o 90%']);
     assert.match(top.evolution, /Warownią/);
+    // The Kamień węgielny Warowni counts the buildings at their highest level
+    // and the camp's level; with all of them full it says the camp is ready.
+    const waiting = (await character()).camp.cornerstone;
+    assert.equal(waiting.name, 'Kamień węgielny Warowni');
+    assert.deepEqual(waiting.rows.map((row) => [row.done, row.of]), [[0, 9], [10, 10]]);
+    assert.equal(waiting.ready, null);
+    const ids = ['sawmill', 'quarry', 'mine', 'midas-lake', 'campfire', 'loot-shed', 'scrap-bench', 'anvil', 'craft-table'];
+    await (await db()).prepare("DELETE FROM buildings WHERE building_id != 'camp'").run();
+    for (const id of ids) await (await db()).prepare('INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, ?, 10, 0, 1 FROM characters').bind(id).run();
+    const ready = (await character()).camp.cornerstone;
+    assert.deepEqual(ready.rows.map((row) => row.done), [9, 10]);
+    assert.match(ready.ready, /Warownię/);
     await stock(10 ** 9, {});
     assert.equal((await build('camp')).data.error.code, 'max_level');
   });

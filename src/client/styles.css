@@ -4562,6 +4562,31 @@ a.camp-level-button {
   }
 }
 
+/* The Kamień węgielny Warowni on the board with the Osada: a button that
+   looks like a plot, and the two bars of its window. */
+.camp-cornerstone {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cornerstone-rows {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.meter--cornerstone .meter-track {
+  background: var(--xp-track);
+}
+
+.meter--cornerstone .meter-fill {
+  background: var(--gold);
+}
+
 /* The name and level under a plot; it may reach past the plot's width, and
    stays above the pictures of the plots around it. */
 .camp-plot-label {

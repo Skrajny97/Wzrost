@@ -2996,6 +2996,22 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Chody drugich form do oceny autora (2.11.2026)
+
+1. **Wybór wersji.** PixelLab narysował każdy chód w dwóch wersjach (`tools/animate-walks.mjs`, 8 klatek 128 × 128). Z każdej pary wybrana jest ta, w której broń nie znika w żadnej klatce i nic nie odpada od postaci. Na przykład:
+    - Nekromanta B, bo w A kostur znikał od drugiej klatki;
+    - Arcykapłanka B, bo w A kosmyk włosów odrywał się w szóstej klatce;
+    - Władczyni Piorunów B, bo w A przy łuku była plama;
+    - Pani Zimy B, bo w A kostur znikał w piątej klatce;
+    - Strzelczyni Wyborowa A, bo w B łuk znikał.
+    Królobójca, Strzelec Wyborowy i Nekromanta (mężczyźni) chodzą z nowych klatek startowych z profilu.
+2. **Kolory.** Każda klatka przechodzi przez `tools/walk-palette.py`, jak chody pierwszych form.
+3. **Do oceny.** 30 animacji poszło do autora w czacie jako GIF-y 437.1–437.30, jedna po drugiej.
+4. **Dalej:**
+    - odcienie skóry chodów (`tools/walk-tones.py`, poprawki w `tools/walk-tones.json`);
+    - jeźdźcy: opisy 30 drugich form na wierzchowcu są w `art/prompts.json` (rodzaj `riders`). Broń jest schowana: kostury i łuki na plecach, miecze i sztylety w pochwach, buławy, młoty i topory u pasa albo na plecach, tarcze na plecach. Retro Diffusion rysuje po dwie wersje, za około 11 USD.
+    Druga ewolucja wchodzi do gry dopiero z tym wszystkim (zob. „Druga ewolucja czeka na chody i jazdę”).
+
 ## Kamień węgielny Warowni w Obozie (2.11.2026)
 
 Autor (zrzut planszy Obozu z wolnym miejscem między Skrzynią Konta a Kopalnią): „tutaj w Obozie jest wolne miejsce... jakiś pomysł na to co z tym zrobić?”, a potem „435 A”.

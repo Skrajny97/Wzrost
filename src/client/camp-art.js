@@ -553,10 +553,9 @@ const blend = (id, grey = false) => `<filter id="${id}" x="-10%" y="-10%" width=
 // A building's look: its picture, standing on the bottom of the plot over its
 // soft shadow, or its vector stand-in. The picture's address is one of the fixed
 // ones in art.js.
-function look(buildingId, tier, grey = false) {
+function look(buildingId, tier, grey = false, size = ART_SIZES[tier - 1]) {
   const src = campArt(buildingId, tier);
   if (!src) return (BUILDINGS[buildingId] ?? BUILDINGS.campfire)[tier - 1]();
-  const size = ART_SIZES[tier - 1];
   const width = 100 * size;
   const height = 78 * size;
   filters += 1;
@@ -582,3 +581,7 @@ export function plotMarkup(buildingId, { level, building = false, tier: own }) {
 export const boardArt = (level = 1, tall = false) => svgElement(`0 0 ${BOARD_WIDTH} ${boardHeight(tall)}`, 'camp-board-art', board(level, tall));
 
 export const plotArt = (buildingId, state) => svgElement('0 0 100 80', 'camp-plot-art', plotMarkup(buildingId, state));
+
+// The Kamień węgielny Warowni on the board with the Osada, as big as a
+// building's middle look.
+export const cornerstoneArt = () => svgElement('0 0 100 80', 'camp-plot-art', look('cornerstone', 1, false, ART_SIZES[1]));
