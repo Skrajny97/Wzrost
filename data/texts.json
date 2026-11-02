@@ -100,6 +100,10 @@
     "Pancerz rośnie o {armor}% na {turns} ruchy.",
     "Pancerz twardnieje: +{armor}% na {turns} ruchy."
   ],
+  "guardArmorMany": [
+    "Pancerz rośnie o {armor}% na {turns} ruchów.",
+    "Pancerz twardnieje: +{armor}% na {turns} ruchów."
+  ],
   "skillEnd": [
     "{skill} przestaje działać.",
     "{actor}: {skill} słabnie."
@@ -127,6 +131,7 @@
   "lifesteal": ["{actor} leczy się z zadanej rany: +{amount} HP."],
   "regen": ["{skill}: {target} odzyskuje {amount} HP."],
   "renewalHot": ["Przez {turns} kolejne ruchy każdy odzyskuje co ruch po {hot}% maks. HP."],
+  "renewalHotMany": ["Przez {turns} kolejnych ruchów każdy odzyskuje co ruch po {hot}% maks. HP."],
   "miracle": ["{actor}: {skill}! {target} wstaje z {amount} HP."],
   "cleansed": ["{target}: {effect} znika."],
   "summonUp": ["{actor} przywołuje: {summon}, {hp} HP."],

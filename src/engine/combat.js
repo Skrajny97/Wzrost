@@ -343,7 +343,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           armor: percent,
           turns,
           hp: unit.hp,
-          text: `${say(texts, 'skillHeal', actions, { ...vars, amount })} ${say(texts, 'guardArmor', actions, { armor: percent, turns })}${reflect}`,
+          text: `${say(texts, 'skillHeal', actions, { ...vars, amount })} ${say(texts, turns >= 5 ? 'guardArmorMany' : 'guardArmor', actions, { armor: percent, turns })}${reflect}`,
         }));
       } else {
         let text = say(texts, 'skillUse', actions, vars);
@@ -986,7 +986,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         if (evolving && p.hot) {
           const turns = Math.round(p.hotTurns);
           actor.stances.push({ skill, until: actor.moves + 1 + turns, regen: true, heal: p.hot * care });
-          log(() => ({ ...base, kind: 'skill', target: actor.id, text: say(texts, 'renewalHot', actions, { turns, hot: Math.round(p.hot * care * 100) }) }));
+          log(() => ({ ...base, kind: 'skill', target: actor.id, text: say(texts, turns >= 5 ? 'renewalHotMany' : 'renewalHot', actions, { turns, hot: Math.round(p.hot * care * 100) }) }));
         }
       } else if (skill.kind === 'strike') {
         const target = skillTarget(actor, opponents, p);

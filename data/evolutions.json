@@ -169,7 +169,7 @@
       "from": "guardian",
       "name": "Bastion",
       "description": "Żywa twierdza. Za jego tarczą cała drużyna może odetchnąć.",
-      "growth": { "endurance": 4, "vitality": 4, "strength": 1 },
+      "growth": { "strength": 5, "endurance": 2, "vitality": 2 },
       "trait": { "name": "Twierdza", "text": "+20% pancerza i odporności, wrogowie jeszcze częściej biją w Bastion niż w resztę drużyny, a 10% ciosów zatrzymuje tarcza.", "kind": "bulwark", "params": { "armor": 0.2, "resist": 0.2, "aggro": 3, "block": 0.1 } },
       "skills": ["unbending", "shield-wall"]
     },
@@ -213,7 +213,7 @@
       "name": "Arcymag Żywiołów",
       "nameFemale": "Arcymagini Żywiołów",
       "description": "Ogień, lód i błyskawica słuchają go jak jeden żywioł.",
-      "growth": { "intellect": 4, "wisdom": 2, "vitality": 1 },
+      "growth": { "intellect": 4, "vitality": 2, "wisdom": 1 },
       "trait": { "name": "Władanie żywiołami", "text": "Zaklęcia ognia, mrozu i elektryczności są o 25% silniejsze, a ich efekty trwają 2 ruchy dłużej.", "kind": "elements", "params": { "damage": 0.25, "elements": ["fire", "frost", "lightning"], "ticks": 2 } },
       "skills": ["meteor-shower", "elemental-harmony"]
     },
@@ -247,7 +247,7 @@
       "name": "Cudotwórca",
       "nameFemale": "Cudotwórczyni",
       "description": "Jego dotyk zamyka rany szybciej, niż wróg zdąży je zadać.",
-      "growth": { "wisdom": 4, "vitality": 2, "endurance": 1 },
+      "growth": { "intellect": 3, "wisdom": 2, "vitality": 2 },
       "trait": { "name": "Łaska", "text": "Leczenie jest o 35% silniejsze i zdejmuje wszystkie złe efekty.", "kind": "caretaker", "params": { "heal": 0.35, "cleanseAll": true } },
       "skills": ["great-renewal", "life-aura"]
     },
@@ -258,7 +258,7 @@
       "name": "Wielki Inkwizytor",
       "nameFemale": "Wielka Inkwizytorka",
       "description": "Jego wyrok nie zna łaski. Duchy uciekają, zanim jeszcze przemówi.",
-      "growth": { "wisdom": 3, "intellect": 2, "strength": 1, "vitality": 1 },
+      "growth": { "intellect": 3, "wisdom": 2, "strength": 1, "vitality": 1 },
       "trait": { "name": "Święty ogień", "text": "Sakrum jest o 30% silniejsze, a przeciw duchom o 60%. Trafione duchy płoną: przez 3 ruchy tracą po 20% obrażeń ciosu.", "kind": "zeal", "params": { "damage": 0.3, "spirits": 0.6, "element": "sacred", "burn": 0.2, "burnTicks": 3 } },
       "skills": ["final-verdict", "pyre"]
     },
@@ -733,10 +733,10 @@
       "name": "Nieugięty",
       "style": "obrona",
       "description": "Bastion nie ugnie się pod żadnym ciosem. Rany się zasklepiają, a napastnik dostaje swoje z powrotem.",
-      "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, odzyskuje {heal%} maks. HP i na {turns} swoje ruchy zyskuje {armor%} pancerza więcej. W tym czasie odbija {reflect%} przyjętych obrażeń.",
+      "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, odzyskuje {heal%} maks. HP i na {turns} swoich ruchów zyskuje {armor%} pancerza więcej. W tym czasie odbija {reflect%} przyjętych obrażeń.",
       "kind": "guard",
       "mana": 16,
-      "params": { "below": 0.5, "heal": [0.2, 0.35], "armor": [3.0, 4.0], "turns": [5, 6], "reflect": [0.2, 0.35] }
+      "params": { "below": 0.9, "heal": [0.35, 0.5], "armor": [3.0, 4.0], "turns": [8, 10], "reflect": [1.0, 2.0] }
     },
     {
       "id": "shield-wall",
@@ -747,8 +747,8 @@
       "effect": "Przez {turns} swoje ruchy cała drużyna ma o {wall%} więcej pancerza.",
       "kind": "stance",
       "mana": 16,
-      "cooldown": 6,
-      "params": { "turns": 3, "wall": [0.3, 0.6], "words": "stanceWall" }
+      "cooldown": 5,
+      "params": { "turns": 4, "wall": [1.0, 1.8], "words": "stanceWall" }
     },
     {
       "id": "heart-shot",
@@ -811,7 +811,7 @@
       "kind": "strike",
       "mana": 16,
       "cooldown": 4,
-      "params": { "power": [1.8, 2.8], "stun": true, "stunLabel": "przyszpilony", "dotEffect": "bleeding", "dotChance": 1, "dotPower": [0.25, 0.4], "dotTicks": 5 }
+      "params": { "power": [1.8, 2.6], "stun": true, "stunLabel": "przyszpilony", "dotEffect": "bleeding", "dotChance": 1, "dotPower": [0.25, 0.4], "dotTicks": 5 }
     },
     {
       "id": "wolf-call",
@@ -819,11 +819,11 @@
       "name": "Wilk",
       "style": "atak",
       "description": "Na gwizd Mistrza Łowów z gęstwiny wypada wilk. Staje przy łowcy i nie odstępuje go na krok.",
-      "effect": "Przywołuje wilka na {turns} swoich ruchów. Wilk staje przed postacią z {hp%} jej maks. HP i przyjmuje ciosy wrogów. Co ruch gryzie losowego wroga za {power%} obrażeń.",
+      "effect": "Przywołuje wilka na {turns} swoje ruchy. Wilk staje przed postacią z {hp%} jej maks. HP i przyjmuje ciosy wrogów. Co ruch gryzie losowego wroga za {power%} obrażeń.",
       "kind": "summon",
       "mana": 18,
-      "cooldown": 8,
-      "params": { "turns": 5, "hp": [0.35, 0.5], "power": [0.4, 0.8], "physical": true, "summon": "wolf", "summonName": "Wilk" }
+      "cooldown": 9,
+      "params": { "turns": 4, "hp": [0.25, 0.35], "power": [0.4, 0.8], "physical": true, "summon": "wolf", "summonName": "Wilk" }
     },
     {
       "id": "meteor-shower",
@@ -836,7 +836,7 @@
       "kind": "sweep",
       "mana": 18,
       "cooldown": 3,
-      "params": { "power": [1.3, 2.0], "single": [2.3, 3.4], "category": "magical", "element": "fire", "dotEffect": "burning", "dotChance": [0.85, 1], "dotPower": [0.25, 0.4], "dotTicks": 3 }
+      "params": { "power": [1.8, 2.8], "single": [2.8, 4.2], "category": "magical", "element": "fire", "dotEffect": "burning", "dotChance": [0.9, 1], "dotPower": [0.3, 0.45], "dotTicks": 3 }
     },
     {
       "id": "elemental-harmony",
@@ -847,7 +847,7 @@
       "effect": "Na początku walki, do jej końca: każdy żywioł użyty przez postać w zaklęciach tej walki wzmacnia jej następne zaklęcia o {bonus%}.",
       "kind": "harmony",
       "mana": 16,
-      "params": { "bonus": [0.08, 0.16] }
+      "params": { "bonus": [0.1, 0.2] }
     },
     {
       "id": "ice-star",
@@ -860,7 +860,7 @@
       "kind": "strike",
       "mana": 16,
       "cooldown": 3,
-      "params": { "power": [2.2, 3.4], "category": "magical", "element": "frost", "chilledBonus": [0.5, 0.8] }
+      "params": { "power": [2.4, 3.8], "category": "magical", "element": "frost", "chilledBonus": [0.5, 0.9] }
     },
     {
       "id": "ice-armor",
@@ -871,7 +871,7 @@
       "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, zamienia {pool%} maks. many w lodową zbroję, która zatrzymuje obrażenia równe {ratio%} wziętej many. Kto uderzy w zbroję, zwalnia o {slow%}.",
       "kind": "shield",
       "mana": 0,
-      "params": { "below": 0.6, "pool": 0.3, "ratio": [2.0, 3.0], "slow": [0.3, 0.5] }
+      "params": { "below": 0.85, "pool": 0.35, "ratio": [1.8, 2.6], "slow": [0.4, 0.6] }
     },
     {
       "id": "ent-summon",
@@ -880,11 +880,11 @@
       "name": "Przywołanie enta",
       "style": "obrona",
       "description": "Z ziemi wyrasta drzewiec o korze twardej jak kamień. Ściąga na siebie ciosy i oddaje gałęziami.",
-      "effect": "Przywołuje enta na {turns} swoich ruchów. Ent staje przed postacią z {hp%} jej maks. HP i przyjmuje ciosy wrogów. Co ruch bije gałęziami losowego wroga za {power%} obrażeń.",
+      "effect": "Przywołuje enta na {turns} swoje ruchy. Ent staje przed postacią z {hp%} jej maks. HP i przyjmuje ciosy wrogów. Co ruch bije gałęziami losowego wroga za {power%} obrażeń.",
       "kind": "summon",
       "mana": 20,
-      "cooldown": 8,
-      "params": { "turns": 5, "hp": [0.5, 0.8], "power": [0.5, 0.9], "physical": true, "summon": "ent", "summonName": "Ent" }
+      "cooldown": 10,
+      "params": { "turns": 4, "hp": [0.3, 0.45], "power": [0.5, 0.9], "physical": true, "summon": "ent", "summonName": "Ent" }
     },
     {
       "id": "bear-summon",
@@ -892,11 +892,11 @@
       "name": "Przywołanie niedźwiedzia",
       "style": "atak",
       "description": "Z gęstwiny wychodzi niedźwiedź i staje między Druidem a wrogami. Kto podejdzie bliżej, poczuje jego pazury.",
-      "effect": "Przywołuje niedźwiedzia na {turns} swoich ruchów. Niedźwiedź staje przed postacią z {hp%} jej maks. HP i przyjmuje ciosy wrogów. Co ruch rwie pazurami losowego wroga za {power%} obrażeń.",
+      "effect": "Przywołuje niedźwiedzia na {turns} swoje ruchy. Niedźwiedź staje przed postacią z {hp%} jej maks. HP i przyjmuje ciosy wrogów. Co ruch rwie pazurami losowego wroga za {power%} obrażeń.",
       "kind": "summon",
       "mana": 20,
-      "cooldown": 8,
-      "params": { "turns": 5, "hp": [0.35, 0.55], "power": [0.7, 1.2], "physical": true, "summon": "bear", "summonName": "Niedźwiedź" }
+      "cooldown": 10,
+      "params": { "turns": 4, "hp": [0.25, 0.35], "power": [0.7, 1.2], "physical": true, "summon": "bear", "summonName": "Niedźwiedź" }
     },
     {
       "id": "great-renewal",
@@ -921,7 +921,7 @@
       "kind": "stance",
       "mana": 16,
       "cooldown": 6,
-      "params": { "turns": 4, "regen": true, "heal": [0.06, 0.12], "below": 0.8, "words": "stanceAura" }
+      "params": { "turns": 4, "regen": true, "heal": [0.1, 0.16], "below": 0.9, "words": "stanceAura" }
     },
     {
       "id": "final-verdict",
@@ -934,7 +934,7 @@
       "kind": "strike",
       "mana": 16,
       "cooldown": 3,
-      "params": { "power": [2.2, 3.4], "category": "magical", "element": "sacred", "below": 0.5 }
+      "params": { "power": [2.4, 3.8], "category": "magical", "element": "sacred", "below": 0.5 }
     },
     {
       "id": "pyre",
@@ -945,8 +945,8 @@
       "effect": "Przez {turns} swoje ruchy święty ogień pali wrogów: co ruch postaci każdy wróg dostaje {power%} obrażeń sakrum.",
       "kind": "stance",
       "mana": 18,
-      "cooldown": 6,
-      "params": { "turns": 3, "cloud": true, "power": [0.3, 0.6], "category": "magical", "element": "sacred", "words": "stancePyre", "tickWords": "pyreStrike" }
+      "cooldown": 5,
+      "params": { "turns": 3, "cloud": true, "power": [0.4, 0.8], "category": "magical", "element": "sacred", "words": "stancePyre", "tickWords": "pyreStrike" }
     },
     {
       "id": "choir",
@@ -958,8 +958,8 @@
       "effect": "Przez {turns} swoje ruchy cała drużyna odzyskuje co ruch po {heal%} maks. HP i zadaje o {chorus%} więcej obrażeń.",
       "kind": "stance",
       "mana": 18,
-      "cooldown": 6,
-      "params": { "turns": 3, "regen": true, "heal": [0.1, 0.16], "chorus": [0.1, 0.25], "words": "stanceChoir" }
+      "cooldown": 5,
+      "params": { "turns": 4, "regen": true, "heal": [0.08, 0.14], "chorus": [0.2, 0.4], "words": "stanceChoir" }
     },
     {
       "id": "divine-shield",
@@ -970,7 +970,7 @@
       "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, cała drużyna dostaje osłonę, która zatrzymuje obrażenia równe {guard%} maks. HP każdego.",
       "kind": "shield",
       "mana": 20,
-      "params": { "below": 0.6, "party": true, "guard": [0.2, 0.35] }
+      "params": { "below": 0.75, "party": true, "guard": [0.3, 0.5] }
     },
     {
       "id": "beheading",
@@ -983,7 +983,7 @@
       "kind": "strike",
       "mana": 14,
       "cooldown": 4,
-      "params": { "power": [2.3, 3.5], "alwaysCrit": true, "target": "back", "executeBelow": 0.35, "executeBonus": [1.0, 1.6] }
+      "params": { "power": [2.2, 3.0], "alwaysCrit": true, "target": "back", "executeBelow": 0.35, "executeBonus": [1.0, 1.6] }
     },
     {
       "id": "vanish",
@@ -994,8 +994,8 @@
       "effect": "Postać znika na jeden ruch: wrogowie nie mogą jej trafić, a jej następny cios jest krytyczny i zadaje o {power%} więcej obrażeń.",
       "kind": "stance",
       "mana": 14,
-      "cooldown": 5,
-      "params": { "turns": 1, "vanish": true, "power": [0.2, 0.6], "words": "stanceVanish" }
+      "cooldown": 6,
+      "params": { "turns": 1, "vanish": true, "power": [0.1, 0.4], "words": "stanceVanish" }
     },
     {
       "id": "raise-dead",
@@ -1008,7 +1008,7 @@
       "kind": "summon",
       "mana": 20,
       "cooldown": 8,
-      "params": { "turns": 5, "hp": [0.35, 0.55], "power": [0.5, 0.9], "physical": true, "summon": "skeleton", "summonName": "Szkielet wojownik", "dotEffect": "poisoned", "dotPower": [0.25, 0.4], "dotTicks": 3 }
+      "params": { "turns": 5, "hp": [0.3, 0.45], "power": [0.5, 0.9], "physical": true, "summon": "skeleton", "summonName": "Szkielet wojownik", "dotEffect": "poisoned", "dotPower": [0.25, 0.4], "dotTicks": 3 }
     },
     {
       "id": "curse-of-decay",
@@ -1020,7 +1020,7 @@
       "kind": "sweep",
       "mana": 16,
       "cooldown": 5,
-      "params": { "curse": true, "dotEffect": "poisoned", "dotChance": 1, "dotPower": [0.3, 0.5], "dotTicks": 4, "decay": [0.03, 0.06] }
+      "params": { "curse": true, "dotEffect": "poisoned", "dotChance": 1, "dotPower": [0.25, 0.4], "dotTicks": 4, "decay": [0.03, 0.06] }
     },
     {
       "id": "blade-storm",
@@ -1033,7 +1033,7 @@
       "kind": "whirl",
       "mana": 16,
       "cooldown": 4,
-      "params": { "blows": 6, "power": [0.9, 1.4] }
+      "params": { "blows": 5, "power": [0.9, 1.2] }
     },
     {
       "id": "shadow-double",
@@ -1045,7 +1045,7 @@
       "kind": "stance",
       "mana": 16,
       "cooldown": 6,
-      "params": { "turns": 3, "mirror": true, "power": [0.35, 0.7], "words": "stanceDouble" }
+      "params": { "turns": 3, "mirror": true, "power": [0.3, 0.5], "words": "stanceDouble" }
     }
   ],
   "place": "system-spring",
