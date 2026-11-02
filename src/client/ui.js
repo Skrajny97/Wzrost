@@ -45,17 +45,28 @@ export const systemLink = (href, text) => h('a', { class: 'button button--system
 // wyśiwetlać sie tez skrót nazwy Gildii [....] w kwadratowym nawiasie").
 export const guildTag = (tag) => (tag ? h('span', { class: 'guild-tag', text: `[${tag}]` }) : null);
 
+// A character's name in its frame's colour, with a soft glow (the Sklep
+// Systemu's "Kolor imienia jak ramka"), wherever its guild's tag goes with
+// it; without a colour, as it was.
+export function framedName(element, color) {
+  if (color) {
+    element.classList.add('name--framed');
+    element.style.setProperty('--name-color', color);
+  }
+  return element;
+}
+
 // A place the narrator can point at (narrator.js).
 export function guided(element, guide) {
   element.dataset.guide = guide;
   return element;
 }
 
-export function pageHeading(title, subtitle, { tag = null } = {}) {
+export function pageHeading(title, subtitle, { tag = null, nameColor = null } = {}) {
   return h(
     'div',
     { class: 'page-heading' },
-    h('h1', { class: 'page-title', tabindex: '-1' }, title, tag && [' ', guildTag(tag)]),
+    h('h1', { class: 'page-title', tabindex: '-1' }, nameColor ? framedName(h('span', { text: title }), nameColor) : title, tag && [' ', guildTag(tag)]),
     subtitle && h('p', { class: 'page-subtitle', text: subtitle }),
   );
 }

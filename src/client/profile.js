@@ -1,17 +1,20 @@
 // Another player's character, from a tap on its name in the chat, the
-// Ranking or the Znajomi: its portrait, levels, what it wears and the skills
+// Ranking or the Znajomi: its portrait, large, in the frame and on the
+// background it wears (the Sklep Systemu, cosmetics.js), its name in the
+// frame's colour when so chosen, levels, what it wears and the skills
 // it has learned (characterProfile in src/server/characters.js), with a
 // private message to it in the chat, a Wymiana (screens/trade.js) and what
 // the player can do with it as a friend (src/server/community.js); last,
 // trades from its player blocked or not. A tap on a piece of gear shows its
 // properties. `onChange` gets the Znajomi anew after a friend's action.
 
-import { portraitSprite, skillSprite } from './art.js';
+import { skillSprite } from './art.js';
 import { friendsSeen, wantConversation } from './chat-news.js';
+import { portraitBox } from './cosmetics.js';
 import { h, icon } from './dom.js';
 import { SLOT_ICONS } from './icons.js';
 import { call, state } from './state.js';
-import { closeSheet, confirmAction, guildTag, openSheet, toast, withButton } from './ui.js';
+import { closeSheet, confirmAction, framedName, guildTag, openSheet, toast, withButton } from './ui.js';
 import { itemSummary } from './screens/character.js';
 import { proposeTrade } from './screens/trade.js';
 
@@ -23,14 +26,14 @@ export async function openProfile(name, { onChange } = {}) {
     h(
       'div',
       { class: 'profile-head' },
-      h('span', { class: 'profile-portrait' }, portraitSprite(profile.classId, profile.appearance, { skin: profile.skin, evolution: profile.evolution })),
+      portraitBox(profile, { frame: profile.frame, background: profile.background }, 'profile-portrait'),
       h(
         'div',
         { class: 'profile-title' },
         h(
           'h2',
           { class: 'sheet-title chat-sheet' },
-          profile.name,
+          framedName(h('span', { text: profile.name }), profile.nameColor),
           profile.guild && [' ', guildTag(profile.guild.tag)],
           profile.role && h('span', { class: `chat-role chat-role--${profile.role}`, text: ` (${profile.role})` }),
         ),

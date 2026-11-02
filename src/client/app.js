@@ -26,6 +26,7 @@ import { renderSelect } from './screens/select.js';
 import { mountJournal } from './screens/journal.js';
 import { lockedScreen } from './screens/locked.js';
 import { mountSettlement } from './screens/settlement.js';
+import { mountShop } from './screens/shop.js';
 import { mountProfessions } from './screens/professions.js';
 import { mountReport } from './screens/report.js';
 import { mountSkills } from './screens/skills.js';
@@ -78,6 +79,8 @@ const ROUTES = [
   { pattern: /^#\/oboz(?:\/(?<building>[a-z0-9-]+))?$/, nav: 'main', tab: null, lit: 'oboz', music: 'camp', mount: mountCamp },
   // The Encyklopedia, from its book in the top bar, at one of its tabs.
   { pattern: /^#\/encyklopedia(?:\/(?<tab>[a-z]+))?$/, nav: 'main', tab: null, lit: 'encyklopedia', mount: mountEncyclopedia },
+  // The Sklep Systemu, from its stall in the top bar, at one of its tabs.
+  { pattern: /^#\/sklep(?:\/(?<tab>[a-z]+))?$/, nav: 'main', tab: null, lit: 'sklep', mount: mountShop },
   // The author's panel, from the settings of the author's account.
   { pattern: /^#\/autor$/, nav: 'main', tab: null, mount: mountAuthor },
 ];

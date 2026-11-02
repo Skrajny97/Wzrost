@@ -303,6 +303,16 @@ export const SPRITES = {
     fit: true,
     ids: [],
   },
+  // The Sklep Systemu's frames of the portrait, 120×160 with a window in the
+  // middle, and its backgrounds behind the figure, 96×128
+  // (data/cosmetics.json, by their art). A mount's look has its picture
+  // among the mounts.
+  cosmetics: {
+    width: 120,
+    height: 160,
+    fit: true,
+    ids: ['frame-gold', 'frame-system', 'frame-forest', 'bg-spring', 'bg-tower', 'bg-camp'],
+  },
   // The character riding, <class>-<look> or an evolution's
   // <evolution>-<look>: one picture sitting in a saddle that is not drawn
   // (tools/ride-skeleton.py), put on the mount's trot in the Walka scene. A
@@ -467,6 +477,10 @@ export function walkerSheet(classId, appearance, skin, evolution) {
   const id = evolved && available.walkers.has(evolved) ? evolved : `${classId}-${appearance}`;
   return available.walkers.has(id) ? `art/walkers/${toneFile(id, skin)}.png` : null;
 }
+
+// The address of a frame's or a background's picture (the Sklep Systemu),
+// or null while it has none.
+export const cosmeticArt = (art) => (available.cosmetics.has(art) ? `/art/cosmetics/${art}.png` : null);
 
 // A mount of the Stajnia on its card, or null while it has no picture.
 export const mountArt = (id) =>

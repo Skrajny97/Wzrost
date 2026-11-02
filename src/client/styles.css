@@ -5617,8 +5617,8 @@ a.camp-level-button {
   gap: 4px;
 }
 
-/* The Sklep Systemu, still locked: the System's stall, dimmed, with the
-   padlock of the locked tabs at its corner (the Rdzeń's). */
+/* The Sklep Systemu (screens/shop.js): the System's stall, lit like the
+   current tab of the bottom bar while the shop is open. */
 .system-shop {
   position: relative;
   display: grid;
@@ -5633,15 +5633,9 @@ a.camp-level-button {
   color: var(--system);
 }
 
-.system-shop > svg:first-child {
-  opacity: 0.6;
-}
-
-.system-shop-lock {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  color: var(--text-muted);
+.system-shop[aria-current='page'] {
+  border-color: var(--system-line);
+  box-shadow: inset 0 -2px 0 var(--system);
 }
 
 .narrator-face {
@@ -6500,35 +6494,29 @@ a.camp-level-button {
   margin-top: 12px;
 }
 
-/* Another player's character (profile.js). */
+/* Another player's character (profile.js): its portrait large, in the
+   frame and on the background it wears (a portrait-box, cosmetics.js), over
+   its name and levels. */
 .profile-head {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 12px;
-  padding-right: 40px;
+  text-align: center;
 }
 
 .profile-portrait {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 72px;
-  height: 96px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--bg-deep);
-}
-
-.profile-portrait .sprite--portrait {
-  width: 72px;
-  height: auto;
+  width: 168px;
 }
 
 .profile-title {
   display: grid;
   gap: 4px;
   min-width: 0;
+}
+
+.profile-head .sheet-title {
+  padding-right: 0;
 }
 
 .profile-levels {
@@ -10012,4 +10000,290 @@ a.profession-square:active {
   font-family: var(--font-system);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
+}
+
+/* The Sklep Systemu (screens/shop.js): the Punkty Systemu, three tabs and a
+   card for each cosmetic, its preview on the character's own portrait at
+   the frames' own size, 120 × 160. */
+.shop-points {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 15px;
+}
+
+.shop-points svg,
+.shop-points strong {
+  color: var(--system);
+}
+
+.shop-tabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.shop-items {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shop-item {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* The mount's look over its words, as in the Stajnia. */
+.shop-item--mount {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.shop-item--worn {
+  border-color: var(--system-line);
+}
+
+.shop-item-text {
+  display: grid;
+  flex: 1;
+  gap: 6px;
+  min-width: 0;
+  justify-items: start;
+}
+
+.shop-item-name {
+  margin: 0;
+  font-size: 18px;
+}
+
+.shop-price {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.shop-preview {
+  width: 120px;
+}
+
+.shop-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--system-line);
+  background: var(--system-fill);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 15px;
+}
+
+/* A portrait in a box of its own (cosmetics.js): a shop's preview, the card
+   another player sees. Its art is never dimmed, as on Postać with the gear
+   shown. */
+.portrait-box {
+  position: relative;
+  flex: none;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: #1a2316;
+}
+
+.portrait-box .portrait-art {
+  opacity: 1;
+}
+
+/* In a frame the portrait has no edge of its own: the frame is its edge. */
+.portrait--framed,
+.portrait-box--framed {
+  border-color: transparent;
+  background: transparent;
+}
+
+/* A background bought in the Sklep Systemu, in place of the forest. */
+.portrait-art .portrait-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The frame over the portrait art, under the slots and the eye, and its
+   light. Its units follow the frame's size (cq), so the light keeps its
+   place on a large portrait and on a small one. */
+.portrait-frame {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  pointer-events: none;
+}
+
+.portrait-frame-art {
+  width: 100%;
+  height: 100%;
+}
+
+/* The band and the line light only the frame's own pixels (its picture as
+   the mask, set in cosmetics.js). */
+.portrait-frame-light {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* The gold: a band of light across it every five seconds, and the rubies'
+   glints as it passes them. */
+.portrait-frame--shine .portrait-frame-light {
+  background: linear-gradient(110deg, transparent 40%, rgba(255, 246, 214, 0.85) 50%, transparent 60%) no-repeat;
+  background-position: 100% 0;
+  background-size: 250% 100%;
+  animation: portrait-frame-sweep 5s ease-in-out infinite;
+}
+
+@keyframes portrait-frame-sweep {
+  from {
+    background-position: 100% 0;
+  }
+
+  30%,
+  to {
+    background-position: 0% 0;
+  }
+}
+
+.portrait-frame-glint {
+  position: absolute;
+  width: 10cqw;
+  height: 10cqw;
+  translate: -50% -50%;
+  background:
+    linear-gradient(90deg, transparent 40%, #fff8e0 50%, transparent 60%) center / 100% 16% no-repeat,
+    linear-gradient(0deg, transparent 40%, #fff8e0 50%, transparent 60%) center / 16% 100% no-repeat,
+    radial-gradient(circle, rgba(255, 238, 200, 0.95) 0 10%, transparent 38%);
+  opacity: 0;
+  animation: portrait-frame-glint 5s ease-out infinite;
+}
+
+@keyframes portrait-frame-glint {
+  from {
+    opacity: 0;
+    scale: 0.2;
+    rotate: 0deg;
+  }
+
+  6% {
+    opacity: 1;
+    scale: 1;
+    rotate: 45deg;
+  }
+
+  16%,
+  to {
+    opacity: 0;
+    scale: 0.2;
+    rotate: 90deg;
+  }
+}
+
+/* The System's: a pulsing ice-blue glow and a line of light running down. */
+.portrait-frame--pulse .portrait-frame-art {
+  animation: portrait-frame-pulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes portrait-frame-pulse {
+  from {
+    filter: drop-shadow(0 0 0.5cqw rgba(143, 227, 239, 0.45));
+  }
+
+  to {
+    filter: drop-shadow(0 0 2.5cqw rgba(143, 227, 239, 0.95));
+  }
+}
+
+.portrait-frame--pulse .portrait-frame-light {
+  background: linear-gradient(180deg, transparent, rgba(214, 246, 250, 0.95), transparent) no-repeat;
+  background-position: 0 -10%;
+  background-size: 100% 8%;
+  animation: portrait-frame-line 4s linear infinite;
+}
+
+@keyframes portrait-frame-line {
+  from {
+    background-position: 0 -10%;
+  }
+
+  to {
+    background-position: 0 110%;
+  }
+}
+
+/* The forest's: fireflies drifting and blinking about it (their ways and
+   pace set in cosmetics.js). */
+.portrait-frame-firefly {
+  position: absolute;
+  width: 3cqw;
+  height: 3cqw;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fbffc4 0 28%, rgba(214, 255, 120, 0.65) 46%, transparent 72%);
+  box-shadow: 0 0 2cqw 0.6cqw rgba(200, 255, 120, 0.4);
+  animation:
+    portrait-frame-drift var(--drift, 5s) ease-in-out infinite alternate,
+    portrait-frame-blink var(--blink, 2.4s) ease-in-out infinite;
+}
+
+@keyframes portrait-frame-drift {
+  to {
+    transform: translate(calc(var(--dx, 2) * 0.8333cqw), calc(var(--dy, -2) * 0.625cqh));
+  }
+}
+
+@keyframes portrait-frame-blink {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* A name in its frame's colour (ui.js framedName), with a soft glow. */
+.name--framed {
+  color: var(--name-color);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--name-color) 55%, transparent);
+}
+
+/* With the animations off the frames stand still: no band, line or glints,
+   the fireflies lit, the System's frame in a steady glow. */
+.calm .portrait-frame-light,
+.calm .portrait-frame-glint {
+  display: none;
+}
+
+.calm .portrait-frame-art,
+.calm .portrait-frame-firefly {
+  animation: none;
+}
+
+.calm .portrait-frame--pulse .portrait-frame-art {
+  filter: drop-shadow(0 0 1.5cqw rgba(143, 227, 239, 0.7));
 }

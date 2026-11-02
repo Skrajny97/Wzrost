@@ -51,7 +51,7 @@ import {
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
-import { closeSheet, guildTag, openSheet, pageHeading, toast, withButton } from '../ui.js';
+import { closeSheet, framedName, guildTag, openSheet, pageHeading, toast, withButton } from '../ui.js';
 import { itemDetails, itemSummary } from './character.js';
 import { mountFriends } from './friends.js';
 import { mountParty } from './party.js';
@@ -469,13 +469,16 @@ function mountChat(container, { bar, person = null }) {
         'div',
         { class: 'chat-head' },
         icon(CLASS_ICONS[message.classId] ?? 'person', { size: 14, className: 'chat-class' }),
-        h('button', {
-          type: 'button',
-          class: 'chat-name',
-          text: message.name,
-          'aria-label': `${message.name}: zobacz postać`,
-          onClick: (event) => withButton(event.currentTarget, () => openProfile(message.name)),
-        }),
+        framedName(
+          h('button', {
+            type: 'button',
+            class: 'chat-name',
+            text: message.name,
+            'aria-label': `${message.name}: zobacz postać`,
+            onClick: (event) => withButton(event.currentTarget, () => openProfile(message.name)),
+          }),
+          message.nameColor,
+        ),
         guildTag(message.guildTag),
         message.role && h('span', { class: `chat-role chat-role--${message.role}`, text: `(${message.role})` }),
         h('span', { class: 'chat-level', text: `poz. ${message.level}` }),
