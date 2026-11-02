@@ -1,0 +1,28 @@
+{
+  "id": "black-alder-carr",
+  "payload": {
+    "prompt": "a dark swamp forest of black alder trees standing on tall stilt roots above still black water, mist between the trunks, a pond turtle resting on a root, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 3,
+    "seed": 687722627,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793646299,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 32.13,
+    "request_id": "4b561f83-741e-4b0b-81ee-dbbb59e4b9eb",
+    "outputs_retained_until": 1793732634,
+    "billing": {
+      "source": "balance",
+      "balance_left": 32.13,
+      "balance_charged": 0.54
+    }
+  }
+}

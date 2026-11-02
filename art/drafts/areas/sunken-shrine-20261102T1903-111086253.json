@@ -1,0 +1,28 @@
+{
+  "id": "sunken-shrine",
+  "payload": {
+    "prompt": "an ancient Slavic pagan wooden temple sunk in a black bog, tall carved wooden idol pillars leaning out of dark water, a rotten palisade, old offerings of bones and amber on a stone, mist, night, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 3,
+    "seed": 111086253,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793646497,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 31.05,
+    "request_id": "daa68b09-7385-46b3-8260-0d50c43233cc",
+    "outputs_retained_until": 1793732788,
+    "billing": {
+      "source": "balance",
+      "balance_left": 31.05,
+      "balance_charged": 0.54
+    }
+  }
+}
