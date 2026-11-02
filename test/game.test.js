@@ -858,6 +858,15 @@ describe('camp', () => {
     assert.equal((await build('camp')).data.error.code, 'max_level');
   });
 
+  test('the strong inner regions say to go there with two companions (438.2 A)', async () => {
+    const { data } = await call('GET', '/api/content');
+    const areas = data.regions.flatMap((region) => region.areas);
+    const advice = (id) => areas.find((area) => area.id === id).companionsAdvice ?? null;
+    assert.equal(advice('drowned-forest'), null);
+    assert.match(advice('willow-isles'), /dwoma towarzyszami/);
+    assert.match(advice('old-diggings'), /dwoma towarzyszami/);
+  });
+
   test('a building is paid in gold and resources and takes time', async () => {
     await stock(0, {});
     assert.equal((await build('campfire')).data.error.code, 'not_enough');

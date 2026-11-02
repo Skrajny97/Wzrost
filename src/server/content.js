@@ -172,6 +172,9 @@ export function publicContent() {
           maxLevel: area.maxLevel,
           description: area.description,
           unlockClassLevel: areaUnlockLevel(area, content),
+          // From the strong inner regions on, the card says to go with two
+          // companions (the author: 438.2 A).
+          ...(area.minLevel >= content.balance.hunt.companionsAdvice.fromLevel && { companionsAdvice: content.balance.hunt.companionsAdvice.text }),
           // The Bestiariusz: the page shows a creature by name only once
           // the character has met it (`met` in the character's view), with
           // its chance of coming in a fight from the start, and its chest

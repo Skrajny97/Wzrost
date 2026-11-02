@@ -43,7 +43,8 @@
     "midGame": { "fromLevel": 15, "toLevel": 50, "damage": 0.25, "hp": 0.25 },
     "coop": { "fromLevel": 26, "damage": 0.1, "hp": 0.1 },
     "lateGame": { "fromLevel": 50, "toLevel": 100, "damage": 2.75, "hp": 2.75 },
-    "endGame": { "fromLevel": 100, "toLevel": 200, "damage": 0.35, "hp": 0.35 }
+    "endGame": { "fromLevel": 100, "toLevel": 200, "damage": 0.35, "hp": 0.35 },
+    "soloGrowth": 0.5
   },
   "items": {
     "budgetBase": 10,
@@ -98,6 +99,7 @@
     "recoveryAfterFight": 0.3,
     "soloXpBonus": 0.1,
     "lowLevelFreeDiff": 3,
+    "companionsAdvice": { "fromLevel": 66, "text": "Od tej krainy stwory są bardzo silne. Idź tu z dwoma towarzyszami z Karczmy." },
     "lowLevelStepPenalty": 0.1,
     "lowLevelMinMultiplier": 0.5,
     "faintXpPenalty": 0.5,

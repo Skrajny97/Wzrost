@@ -67,7 +67,9 @@ export function guildBeastFight({ character, equipped, name, beast, seed, trophi
   const area = content.areasById[beast.areaId];
   const player = playerCombatant({ character, equipped, name, area }, content);
   const ally = Object.keys(trophies).length > 0 ? { ...player, trophies } : player;
-  const [unit] = encounterCombatants({ elite: false, champion: true, members: [{ monsterId: beast.monsterId, level: beast.level }] }, content);
+  // The character attacks alone: the beast hits with only a share of the
+  // late and end game's growth, as in the Wieża Solo (438.3 A).
+  const [unit] = encounterCombatants({ elite: false, champion: true, members: [{ monsterId: beast.monsterId, level: beast.level }] }, content, { growth: content.balance.monsters.soloGrowth });
   const foe = { ...unit, maxHp: beast.maxHp, hp: beast.hp };
   const fight = simulateFight({ allies: [ally], enemies: [foe], rng: createRng(`${seed}:beast`), content, record: true, trait: area.trait });
   const left = fight.units.find((one) => one.id === foe.id).hp;

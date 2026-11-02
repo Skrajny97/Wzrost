@@ -109,7 +109,10 @@ function unarmed(level, content) {
 
 // `groupFactor` weakens each member of a group, so two or three monsters are
 // harder than one, but not two or three times harder.
-export function monsterCombatant({ monsterId, level, id, name, position, side = 'enemy', groupFactor = 1 }, content) {
+// `growth` is the share of the late and end game's growth the monster has:
+// a fight where the character stands alone (the Wieża Solo, an event's
+// fight) gives it balance.monsters.soloGrowth of it (the author: 438.3 A).
+export function monsterCombatant({ monsterId, level, id, name, position, side = 'enemy', groupFactor = 1, growth = 1 }, content) {
   const balance = content.balance;
   const monster = content.monstersById[monsterId];
   const stat = (key) => (monster.stats.base[key] ?? 0) + (monster.stats.growth[key] ?? 0) * (level - 1);
@@ -129,11 +132,11 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   // grow stronger again, the same way (the author: "Od 50 lvla zwiększamy
   // curve trudności, bo wchodza na pełnej i towarzysze i ewolucje").
   const late = balance.monsters.lateGame;
-  const later = midGameShare(level, late);
+  const later = midGameShare(level, late) * growth;
   // Past the second evolution (endGame), as the characters' skills and gear
   // keep growing, they grow on once more, the same way.
   const end = balance.monsters.endGame;
-  const latest = midGameShare(level, end);
+  const latest = midGameShare(level, end) * growth;
   const average =
     weaponDamage(hide, monster.attack.damageFactor, balance) *
     balance.monsters.damageMultiplier *

@@ -419,6 +419,7 @@
         "recoveryAfterFight",
         "soloXpBonus",
         "lowLevelFreeDiff",
+        "companionsAdvice",
         "lowLevelStepPenalty",
         "lowLevelMinMultiplier",
         "faintXpPenalty",
@@ -585,6 +586,16 @@
         "soloXpBonus": {
           "type": "number",
           "minimum": 0
+        },
+        "companionsAdvice": {
+          "type": "object",
+          "description": "Zdanie na karcie krainy od fromLevel jej najniższego poziomu: tam bez dwóch towarzyszy stwory szybko przewyższają postać (autor: 438.2 A).",
+          "additionalProperties": false,
+          "required": ["fromLevel", "text"],
+          "properties": {
+            "fromLevel": { "type": "integer", "minimum": 1 },
+            "text": { "type": "string", "minLength": 1 }
+          }
         },
         "lowLevelFreeDiff": {
           "type": "number",
@@ -1075,7 +1086,8 @@
         "midGame",
         "coop",
         "lateGame",
-        "endGame"
+        "endGame",
+        "soloGrowth"
       ],
       "properties": {
         "coop": {
@@ -1134,6 +1146,12 @@
             "damage": { "type": "number", "minimum": 0 },
             "hp": { "type": "number", "minimum": 0 }
           }
+        },
+        "soloGrowth": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Jaka część wzrostu z lateGame i endGame działa w walkach, w których postać jest sama: w Wieży Solo, w walkach zdarzeń i w atakach na Bestię Gildii (autor: 438.3 A, połowa krzywej)."
         },
         "endGame": {
           "type": "object",

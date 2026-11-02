@@ -331,8 +331,10 @@ export function championItemRarity(level, rng, content) {
   return rng.weighted(Object.entries(step.rarities), ([, weight]) => weight)[0];
 }
 
-// Repeated monsters get numbers: "Wilk 1", "Wilk 2".
-export function encounterCombatants(encounter, content) {
+// Repeated monsters get numbers: "Wilk 1", "Wilk 2". `growth`: the share of
+// the late and end game's growth (monsterCombatant), less in a fight where
+// the character stands alone.
+export function encounterCombatants(encounter, content, { growth = 1 } = {}) {
   const counts = {};
   for (const member of encounter.members) counts[member.monsterId] = (counts[member.monsterId] ?? 0) + 1;
   const seen = {};
@@ -341,7 +343,7 @@ export function encounterCombatants(encounter, content) {
     seen[member.monsterId] = (seen[member.monsterId] ?? 0) + 1;
     const baseName = content.monstersById[member.monsterId].name;
     const name = counts[member.monsterId] > 1 ? `${baseName} ${seen[member.monsterId]}` : baseName;
-    return monsterCombatant({ ...member, id: `e${index}`, name, groupFactor }, content);
+    return monsterCombatant({ ...member, id: `e${index}`, name, groupFactor, growth }, content);
   });
 }
 

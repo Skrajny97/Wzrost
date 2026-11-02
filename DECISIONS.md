@@ -2996,6 +2996,40 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.93 (2.11.2026)
+
+1. **Co wchodzi do gry:** trudność po 50. poziomie według 438 B/A/A (zob. „Trudność po 50. poziomie: odpowiedzi autora 438”):
+    - krzywa B od 50 do 200;
+    - przy krainach od 66. poziomu zdanie o dwóch towarzyszach;
+    - w Wieży Solo, w walkach zdarzeń i w atakach na Bestię Gildii połowa wzrostu.
+    
+    Do 50. poziomu nic się nie zmienia. Razem z tym idą narzędzie `tools/difficulty-sim.mjs` i nowe opisy trzech chodów drugich form do narysowania od nowa.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** zob. opis wersji w historii zmian.
+
+## Trudność po 50. poziomie: odpowiedzi autora 438 (2.11.2026)
+
+Autor (432 A): „na pierwszych poziomach do 50ego może być łatwiej, ale pozniej curve trudnosci musi troche rosnac i od 100ego być mid”. Odpowiedzi: „438.1 B / 438.2 A / 438.3 A”.
+
+1. **Co pokazała symulacja** (`tools/difficulty-sim.mjs`: pięć modeli graczy, 200 wypraw na każdą klasę, poziom i model):
+    - Dziś gracz z dwoma towarzyszami z Karczmy nie mdleje wcale na żadnym poziomie od 10 do 150, nawet w najnowszej krainie. Kończy wyprawy z 98–100% HP.
+    - Dawne „~30% omdleń przy 90–100” (430–432) liczyło postać bez ewolucji i tylko z przedmiotami Tier I, a takiej w grze nie ma.
+    - „Mid” od 100 dla gracza z dwoma towarzyszami i średnim ekwipunkiem wymaga stworów mniej więcej trzy razy silniejszych na 100. poziomie.
+2. **Krzywa B (438.1 B).**
+    - **Wzrost stworów.** Od 50 do 100 stwory zyskują +275% HP i obrażeń (`lateGame`, wcześniej +25%), a od 100 do 200 jeszcze +35% (`endGame`, nowy etap).
+    - **Względem dzisiejszych:** ×1,48 na 60, ×2,11 na 75, ×3 na 100 i ×3,53 na 150. Do 50 nic się nie zmienia.
+    - **Średni gracz z dwoma towarzyszami** mdleje na ok. 1% wypraw przy 100 i na 3,5–6% przy 110–150. Kończy wyprawy z 85–91% HP.
+    - **Najlepiej wyposażony gracz** w najnowszej krainie, jaką otwiera mu poziom klasy, mdleje na 0–9% wypraw.
+3. **Gracz bez towarzyszy (438.2 A).** Od ok. 70. poziomu najnowsze krainy są dla gracza bez towarzyszy za trudne. Karta każdej krainy od 66. poziomu, czyli od Wierzbowych Kęp, mówi: „Od tej krainy stwory są bardzo silne. Idź tu z dwoma towarzyszami z Karczmy.” Tekst i próg są w `companionsAdvice` w `data/balance.json`.
+4. **Walki w pojedynkę (438.3 A).**
+    - Gdy postać walczy sama, stwory mają tylko połowę wzrostu z `lateGame` i `endGame` (`soloGrowth` 0,5). Dotyczy to Wieży Solo i walk w zdarzeniach.
+    - Brakujący szczegół: atak na Bestię Gildii to też walka w pojedynkę, więc działa tak samo.
+    - Wyprawy bez towarzyszy mają pełną krzywą (438.2 A).
+5. **Podgląd umiejętności** (`src/engine/skill-demo.js`) pokazuje umiejętność na stworach bez wzrostu późnej gry. Postać w zwykłym ekwipunku i bez towarzyszy nie wytrzymałaby tam dość długo.
+6. **Dalej:**
+    - Po wdrożeniu trzeba zmierzyć prawdziwe omdlenia według poziomu z zapisanych raportów. Ekwipunek prawdziwych graczy to największa niewiadoma.
+    - Jeśli na 100 dalej będzie za łatwo, następnym krokiem jest B+ (×3,2 na 100).
+
 ## Wersja 0.0.92 (2.11.2026)
 
 1. **Co wchodzi do gry:**

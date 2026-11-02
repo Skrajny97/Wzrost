@@ -867,6 +867,8 @@ export function mountCombat(container, { params, navigate }) {
         h('p', { class: 'region-description', text: area.description }),
         area.dangers?.length > 0 && bestiaryRow(area),
         levelNote,
+        // From the strong inner regions on (content.js, 438.2 A).
+        area.companionsAdvice && h('p', { class: 'region-warning', text: area.companionsAdvice }),
         // The bonuses that will work on this exploration, before it is set
         // up (the author: "powinny byc bonusy przed wyprawą napisane").
         bonusList(character),

@@ -66,3 +66,18 @@ test('the stages add up: at 150 a monster has both, one on top of the other', ()
   assert.ok(Math.abs(now.weapon.max / before.weapon.max - 1.5 * 1.2) < 1e-9);
   assert.ok(Math.abs(now.maxHp / before.maxHp - 1.6 * 1.15) < 0.01);
 });
+
+test('alone, a monster has half of the late and end game growth (438.3 A): the Wieża Solo and events', () => {
+  assert.equal(content.balance.monsters.soloGrowth, 0.5);
+  const { lateGame, endGame } = content.balance.monsters;
+  const flat = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0, hp: 0 }, endGame: { ...endGame, damage: 0, hp: 0 } } } };
+  for (const level of [40, 75, 100, 150]) {
+    const before = monster(level, flat);
+    const full = monsterCombatant({ monsterId, level, id: 'a' }, content);
+    const alone = monsterCombatant({ monsterId, level, id: 'a', growth: 0.5 }, content);
+    const share = (stage) => Math.min(1, Math.max(0, (level - stage.fromLevel) / (stage.toLevel - stage.fromLevel)));
+    const expected = (part) => (1 + lateGame.damage * share(lateGame) * part) * (1 + endGame.damage * share(endGame) * part);
+    assert.ok(Math.abs(full.weapon.max / before.weapon.max - expected(1)) < 1e-9, `full at ${level}`);
+    assert.ok(Math.abs(alone.weapon.max / before.weapon.max - expected(0.5)) < 1e-9, `alone at ${level}`);
+  }
+});
