@@ -4,8 +4,9 @@
 // pieces at once, never more than held or still missing, as goods the
 // Encyklopedia leaves out, and moves the giver's trial of the Próby Gildii
 // on; thanks once; the week's ranking; a request's time running out; herbs
-// and potions only with room in the bag; characters of one account give
-// each other nothing.
+// and potions only with room in the bag; a member who left has no request
+// hanging, and old requests go with their gifts; characters of one account
+// give each other nothing.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
