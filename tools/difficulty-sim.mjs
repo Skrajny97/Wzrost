@@ -203,7 +203,8 @@ export function mainEvolution(classId, classLevel, content) {
   if (classLevel < levelOne) return null;
   const main = content.skills.find((skill) => skill.classId === classId);
   const first = content.evolutions.find((evolution) => evolution.classId === classId && !evolution.from && evolution.path === main.id);
-  return classLevel >= levelTwo ? (engine.nextFormOf(first, content) ?? first) : first;
+  // Without the second evolution in the game the first form stays.
+  return classLevel >= levelTwo ? (engine.nextFormOf?.(first, content) ?? first) : first;
 }
 
 // The character and gear of a model: `typical` (tools/simulate.mjs) or a

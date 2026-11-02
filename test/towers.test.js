@@ -50,6 +50,24 @@ describe('the Wieże Systemu', () => {
 describe('an entry\'s fight', () => {
   const character = newCharacter('warrior', { level: 60, classLevel: 50 });
 
+  test('alone on a floor the monsters have half the late growth, with a partner all of it; up to 50 the same (438.3 A)', () => {
+    const climber = newCharacter('warrior', { level: 110, classLevel: 100 });
+    const partner = { character: newCharacter('mage', { level: 110, classLevel: 100 }), equipped: [], name: 'Druh' };
+    const hp = (floor, partners) => towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor, seed: 'g', partners }, content).fights[0].enemiesView[0].maxHp;
+    assert.equal(hp(40, []), hp(40, [partner]));
+    for (const floor of [100, 140]) assert.ok(hp(floor, []) < hp(floor, [partner]) * 0.8, `${floor}: ${hp(floor, [])} vs ${hp(floor, [partner])}`);
+  });
+
+  test('a floor starts and ends in the towers\' own words, the name after a colon', () => {
+    const won = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 3, seed: 'a' }, content);
+    const starts = [...content.towers.texts.fightStart, ...content.towers.texts.eliteStart, ...content.towers.texts.championStart].map((line) => line.split('{enemies}')[0]);
+    assert.ok(starts.some((start) => won.entries[0].text.startsWith(start)), won.entries[0].text);
+    assert.ok(!/zarośli|drzewami|las /i.test(won.entries[0].text), won.entries[0].text);
+    const weak = { ...newCharacter('mage', { level: 60, classLevel: 50 }), stats: { ...newCharacter('mage').stats } };
+    const lost = towerFight({ character: weak, equipped: [], name: 'Słaby', floor: 60, seed: 'd' }, content);
+    if (!lost.tower.won) assert.match(lost.entries[0].text, /z Wieży: Słaby\./);
+  });
+
   test('a won floor pays as a fight of an hour\'s exploration, an elite and a champion as a regular creature', () => {
     const won = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 3, seed: 'a' }, content);
     assert.equal(won.tower.won, true);

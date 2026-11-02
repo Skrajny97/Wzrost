@@ -44,11 +44,14 @@
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["won", "lost", "defeat", "chest"],
+      "required": ["won", "lost", "defeat", "fightStart", "eliteStart", "championStart", "chest"],
       "properties": {
         "won": { "$ref": "#/definitions/variants" },
         "lost": { "$ref": "#/definitions/variants" },
         "defeat": { "$ref": "#/definitions/variants" },
+        "fightStart": { "$ref": "#/definitions/variants", "description": "Początek walki na piętrze; {enemies}: przeciwnicy z poziomami." },
+        "eliteStart": { "$ref": "#/definitions/variants" },
+        "championStart": { "$ref": "#/definitions/variants" },
         "chest": { "$ref": "#/definitions/variants" }
       }
     }

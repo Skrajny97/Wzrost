@@ -855,7 +855,7 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
       materialLine,
     ),
     picker,
-    need && !chosen && h('p', { class: 'system-hint', text: `To ulepszenie bierze też ${formatNumber(need.count)} szt. materiału tej samej rzadkości co przedmiot.` }),
+    need && !chosen && h('p', { class: 'system-hint', text: `To ulepszenie bierze też ${formatNumber(need.count)} szt. jednego materiału tej samej rzadkości co przedmiot. Różne materiały się nie sumują.` }),
     // One material of the item's rarity, from the guild (346 A).
     need && !chosen && askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }),
     h('p', { class: 'muted', text: risk }),
@@ -896,7 +896,7 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
   // czego brakuje jeśli nie da się ulepszyć").
   const nearest = need && !chosen ? ((state.character.crafting?.materials ?? []).filter((material) => material.rarity === need.rarity).sort((a, b) => b.count - a.count)[0] ?? null) : null;
   const rarityName = need ? (state.content.rarities.find((rarity) => rarity.id === need.rarity)?.name ?? need.rarity) : '';
-  const lacking = [...costShortfall(next.cost), need && !chosen && `${formatNumber(need.count - (nearest?.count ?? 0))} szt. materiału (${rarityName})`].filter(Boolean);
+  const lacking = [...costShortfall(next.cost), need && !chosen && `${formatNumber(need.count - (nearest?.count ?? 0))} szt. jednego materiału (${rarityName}): to ulepszenie bierze ${formatNumber(need.count)} szt. tego samego materiału`].filter(Boolean);
   const note = h('p', { class: 'region-warning', role: 'status', hidden: true });
   // The material the try lacks, from the guild (346 A), under what is
   // missing once "Ulepsz" says it.

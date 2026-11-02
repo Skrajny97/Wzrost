@@ -2996,6 +2996,33 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wieże: przegląd i poprawki tekstów (2.11.2026)
+
+Autor: „Rozumiem, że Wieże śmigają bez problemu? Możesz sie im przyjrzeć też.” Przegląd kodu, symulacje i równoczesne wejścia na żywym serwerze: testy Wież przechodzą, nic się nie wywraca, trzy równoczesne wejścia nie dają podwójnych wejść ani skrzyń, wejście w czasie wyprawy jest zablokowane, piętra do 500 działają. Poprawione od razu, bo to błędy, a nie decyzje:
+
+1. **Zdanie porażki po polsku.** „System wyprowadza {target} z Wieży” stawiało imię w mianowniku tam, gdzie polski chce biernika („wyprowadza Jagna”). Teraz imię stoi po dwukropku: „System wyprowadza z Wieży: Jagna.”
+2. **Własne zdania początku walki.** Piętra zaczynały się zdaniami z wypraw („Z zarośli wychodzą…”, „Cały las cichnie…”). Wieże mają swoje (`fightStart`, `eliteStart`, `championStart` w `data/towers.json`): „Na piętrze czekają: …”, „Piętro milknie. Elita Wieży: …”, „Cała Wieża cichnie i czeka. Wychodzi czempion: …”.
+3. **Test połowy wzrostu w pojedynkę (438.3).** Sprawdza, że w Wieży Solo stwory od 50. poziomu mają mniej HP niż przy partnerze (na 100. piętrze ok. 63%, na 140. ok. 59%), a do 50. tyle samo.
+4. **Narzędzie** `tools/difficulty-sim.mjs` nie wywraca się już od 100. poziomu klasy, gdy w grze nie ma drugiej ewolucji (pierwsza forma zostaje).
+
+Do decyzji autora (pytania w porannym raporcie): czempioni na niskich piętrach dają boskie trofea w ok. 90% wejść, czyli ok. 13 dziennie (wyprawy: jeden czempion na 33–66 h); 16 stworów ostatnich regionów każdej krainy nigdy nie pojawia się w Wieżach, bo ich piętra to zawsze elita albo czempion; losowe elity na zwykłych piętrach (10%) nie są zapowiadane; raporty z Wież wypychają raporty wypraw z Dziennika (wspólne 50); skrzynie Bestiariusza bez progu poziomu.
+
+## Kowadło: „jeden materiał”, nie suma materiałów (2.11.2026)
+
+Autor przysłał dwa zrzuty: w Plecaku kilka unikalnych (niebieskich) materiałów, a na karcie przedmiotu unikalnego +5 Kowadło pisze „Brakuje: 1 szt. materiału (unikalny)”. Tak działa ustalona zasada: ulepszenie od +6 bierze kilka sztuk **jednego** materiału o rzadkości przedmiotu (+6 dwie sztuki, +7 trzy i tak dalej), a różne materiały tej samej rzadkości się nie sumują. Dwa różne unikalne materiały po jednej sztuce nie wystarczą na +6. Teksty tego nie mówiły, więc teraz mówią:
+
+1. Podpowiedź pod Kowadłem: „To ulepszenie bierze też 2 szt. jednego materiału tej samej rzadkości co przedmiot. Różne materiały się nie sumują.”
+2. „Brakuje” po „Ulepsz”: „1 szt. jednego materiału (unikalny): to ulepszenie bierze 2 szt. tego samego materiału”.
+3. Komunikat serwera przy próbie bez materiału mówi tak samo („jednego materiału”).
+
+Sama zasada się nie zmienia: tak samo biorą Kuźnia (339 A: „5 sztuk jednego materiału obecnej rzadkości przedmiotu, jak Kowadło”) i Zaklinaczka, a Prośby Gildii proszą o sztuki jednego materiału.
+
+## Wersja 0.0.95 (2.11.2026)
+
+1. **Co wchodzi do gry:** poprawki Wież z przeglądu (zob. wyżej): zdanie porażki, własne zdania początku walki, test połowy wzrostu i narzędzie symulacji. Teksty Kowadła o jednym materiale (zob. wyżej).
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (859 z 859) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`, po 11 kroków do pierwszej wyprawy).
+
 ## Zadania od narratora: „Odbierz wszystkie” zawsze na widoku (2.11.2026)
 
 Autor: „przez Przelosowanie zadań chowa sie troche klawisz »Odbierz wszystko«”. Na telefonach o niższym ekranie (sprawdzone 360×640 i 412×732) pięć zadań, „Przelosuj zadania” i zdanie o skrzyni nie mieściły się na pergaminie, więc rząd „Odbierz wszystkie” i „Zwiń” na dole strony wypadał poza widok (o 93–205 px) i trzeba było go przewinąć.
