@@ -336,6 +336,21 @@
       "start": "art/references/walks/start/winter-lord-male.png",
       "pose": 2,
       "description": "an old king of winter with white hair and a white beard, an ice crown, a long dark blue coat with white frost embroidery, a white fur mantle with ice pauldrons, dark boots, a sword at his hip and a staff topped with a big ice crystal in his right hand"
+    },
+    "kingslayer-male": {
+      "start": "art/references/walks/start/kingslayer-male.png",
+      "pose": 2,
+      "description": "a hooded man assassin in a dark red hood and cloak, a black mask over the lower face, dark chainmail and leather armour, a broken golden crown hanging at the belt, a glowing red curved dagger in his right hand"
+    },
+    "marksman-male": {
+      "start": "art/references/walks/start/marksman-male.png",
+      "pose": 2,
+      "description": "a young man marksman with short black hair and a silver circlet, dark leather armour with a silver pauldron, a long green cloak, a quiver of white-fletched arrows on his back, brown boots, a long black bow held vertically in his right hand"
+    },
+    "necromancer-male": {
+      "start": "art/references/walks/start/necromancer-male.png",
+      "pose": 2,
+      "description": "a pale gaunt man necromancer with long black hair, a long black and purple robe with bone-white trim and a high collar, a staff topped with a ram skull in his right hand, a small green flame floating above his left hand held before his chest"
     }
   }
 }
