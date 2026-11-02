@@ -74,6 +74,8 @@ import {
   optionWindows,
   TIMED_KINDS,
   timedKind,
+  cosmeticsOf,
+  nameColor,
 } from '../engine/index.js';
 import { mountView } from '../engine/stable.js';
 import { chatRole } from './chat.js';
@@ -916,11 +918,14 @@ export function characterView(player, now) {
     canUse(item.base, row.class_id, content) && !content.slotsById[item.slot].locked ? equipChange(character, equipped, item, content, values).verdict : null;
   const { gold, ...resources } = walletOf(row);
   const weapon = combatant.weapon;
+  const cosmetics = JSON.parse(row.cosmetics ?? '{}');
 
   return {
     name: row.name,
     // Its guild's tag, in square brackets beside its name (guilds.js).
     guildTag: player.guildTag ?? null,
+    // Its name in its frame's colour, or null (cosmetics.js).
+    nameColor: nameColor(cosmetics, content),
     classId: row.class_id,
     // The class goes by its evolution's name; the class itself stays a note
     // on the character card.
@@ -939,6 +944,10 @@ export function characterView(player, now) {
     classXpToNext: classXpToNext(row.class_level, content),
     gold,
     systemPoints: row.system_points,
+    // The Sklep Systemu (cosmetics.js): the cosmetics bought for Punkty
+    // Systemu and those worn, and whether the name shows in the frame's
+    // colour.
+    cosmetics: cosmeticsOf(cosmetics, content),
     // Punkty Czasu: 1 point skips 1 minute of a wait (time.js). One more
     // comes every `minutes` from `since`; the page counts them up the same way.
     timePoints: row.time_points,
@@ -1104,6 +1113,11 @@ export async function characterProfile(context) {
       skin: view.skin,
       // The evolution's portrait (art.js), once the character has one.
       evolution: view.evolution.current?.id ?? null,
+      // The frame and the background of its portrait, and its name's
+      // colour from the frame (cosmetics.js).
+      frame: view.cosmetics.frame,
+      background: view.cosmetics.background,
+      nameColor: view.nameColor,
       level: view.level,
       classLevel: view.classLevel,
       role: chatRole(context.env, found),
