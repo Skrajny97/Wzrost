@@ -7740,7 +7740,9 @@ a.profession-square:active {
   bottom: 28px;
 }
 /* The character riding its mount (scenes.js ride): the mount's trot as frames,
-   and the rider in the saddle, rising and falling with it (ride-<id> below). */
+   and the rider in the saddle, rising and falling with it: ride-<frames>
+   below moves the rider in each frame by --rx<i>, --ry<i>, where the saddle
+   is then (data/animations.json, walk.mounts). */
 .scene-ride {
   position: absolute;
   z-index: 2;
@@ -7765,6 +7767,104 @@ a.profession-square:active {
   top: var(--rider-y);
   image-rendering: pixelated;
   animation: var(--ride) var(--duration) step-end infinite;
+}
+@keyframes ride-6 {
+  0% {
+    transform: translate(var(--rx0), var(--ry0));
+  }
+  16.6667% {
+    transform: translate(var(--rx1), var(--ry1));
+  }
+  33.3333% {
+    transform: translate(var(--rx2), var(--ry2));
+  }
+  50% {
+    transform: translate(var(--rx3), var(--ry3));
+  }
+  66.6667% {
+    transform: translate(var(--rx4), var(--ry4));
+  }
+  83.3333% {
+    transform: translate(var(--rx5), var(--ry5));
+  }
+}
+@keyframes ride-7 {
+  0% {
+    transform: translate(var(--rx0), var(--ry0));
+  }
+  14.2857% {
+    transform: translate(var(--rx1), var(--ry1));
+  }
+  28.5714% {
+    transform: translate(var(--rx2), var(--ry2));
+  }
+  42.8571% {
+    transform: translate(var(--rx3), var(--ry3));
+  }
+  57.1429% {
+    transform: translate(var(--rx4), var(--ry4));
+  }
+  71.4286% {
+    transform: translate(var(--rx5), var(--ry5));
+  }
+  85.7143% {
+    transform: translate(var(--rx6), var(--ry6));
+  }
+}
+@keyframes ride-8 {
+  0% {
+    transform: translate(var(--rx0), var(--ry0));
+  }
+  12.5% {
+    transform: translate(var(--rx1), var(--ry1));
+  }
+  25% {
+    transform: translate(var(--rx2), var(--ry2));
+  }
+  37.5% {
+    transform: translate(var(--rx3), var(--ry3));
+  }
+  50% {
+    transform: translate(var(--rx4), var(--ry4));
+  }
+  62.5% {
+    transform: translate(var(--rx5), var(--ry5));
+  }
+  75% {
+    transform: translate(var(--rx6), var(--ry6));
+  }
+  87.5% {
+    transform: translate(var(--rx7), var(--ry7));
+  }
+}
+@keyframes ride-9 {
+  0% {
+    transform: translate(var(--rx0), var(--ry0));
+  }
+  11.1111% {
+    transform: translate(var(--rx1), var(--ry1));
+  }
+  22.2222% {
+    transform: translate(var(--rx2), var(--ry2));
+  }
+  33.3333% {
+    transform: translate(var(--rx3), var(--ry3));
+  }
+  44.4444% {
+    transform: translate(var(--rx4), var(--ry4));
+  }
+  55.5556% {
+    transform: translate(var(--rx5), var(--ry5));
+  }
+  66.6667% {
+    transform: translate(var(--rx6), var(--ry6));
+  }
+  77.7778% {
+    transform: translate(var(--rx7), var(--ry7));
+  }
+  88.8889% {
+    transform: translate(var(--rx8), var(--ry8));
+  }
 }
 .scene--dawn {
   filter: brightness(1.04) sepia(0.18) saturate(1.1);

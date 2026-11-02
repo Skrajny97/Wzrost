@@ -1,10 +1,19 @@
 {
-  "$comment": "Wierzchowce w kłusie (tools/animate-mounts.mjs, PixelLab animate-with-text-v3). start: wybrany obrazek wierzchowca z art/drafts/mounts, przycięty i postawiony na płótnie z miejscem na ruch nóg, przodem w prawo. Jeźdźcy siadają na nich później (tools/ride-sheets.py).",
+  "$comment": "Wierzchowce w kłusie (tools/animate-mounts.mjs, PixelLab animate-with-text-v3). start: wybrany obrazek wierzchowca z art/drafts/mounts, przycięty i postawiony na płótnie z miejscem na ruch nóg, przodem w prawo. Jeźdźcy siadają na nich później (tools/ride-sheets.py). trot: wybrane klatki szkicu w kolejności pętli, miejsce siodła w pierwszej z nich, klatki na sekundę i poprawki (clean); z nich tools/mount-trots.py robi arkusz kłusu do sceny Walki i wpis w data/animations.json.",
   "action": "trotting at a steady pace in place, seen from the side and facing right, the four legs moving in a smooth seamless trot loop, the head and body bobbing slightly, the saddle and bridle stay in place",
   "frames": 8,
   "mounts": {
-    "pony": { "start": "art/references/mounts/pony.png" },
-    "horse": { "start": "art/references/mounts/horse.png" },
-    "steed": { "start": "art/references/mounts/steed.png" }
+    "pony": {
+      "start": "art/references/mounts/pony.png",
+      "trot": { "draft": "pony-20261102T0429-549998924", "frames": [1, 2, 3, 4, 5, 6, 7, 8, 9], "seat": [41, 36], "fps": 8 }
+    },
+    "horse": {
+      "start": "art/references/mounts/horse.png",
+      "trot": { "draft": "horse-20261101T1743-167264084", "frames": [3, 4, 5, 6, 7, 8], "seat": [48, 42], "fps": 8 }
+    },
+    "steed": {
+      "start": "art/references/mounts/steed.png",
+      "trot": { "draft": "steed-20261102T0429-667845418", "frames": [1, 2, 3, 4, 5, 6], "seat": [57, 52], "fps": 8, "clean": [{ "box": [104, 4, 130, 24], "to": "3e4340" }] }
+    }
   }
 }

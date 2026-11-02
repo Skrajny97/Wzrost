@@ -186,6 +186,23 @@ test('every sprite on the list has its file at its size, and every class has its
   }
 });
 
+// The Walka scene's riding (scenes.js ride): each mount's trot is a row of
+// frames with the saddle's place in each, and the rider follows it with the
+// keyframes for that many frames.
+test("every mount's trot has its sheet, a saddle in each frame and the rider's steps", () => {
+  const walk = JSON.parse(readFileSync(new URL('../data/animations.json', import.meta.url), 'utf8')).walk;
+  const css = readFileSync(join(CLIENT, 'styles.css'), 'utf8');
+  for (const [id, trot] of Object.entries(walk.mounts)) {
+    const path = join(CLIENT, trot.file);
+    assert.ok(existsSync(path), `${id}: no ${trot.file}`);
+    const png = readFileSync(path);
+    assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [trot.width * trot.frames, trot.height], `${id}: the sheet is not ${trot.frames} frames of ${trot.width} × ${trot.height}`);
+    assert.equal(trot.seats.length, trot.frames, `${id}: a saddle for each frame`);
+    const steps = css.match(new RegExp(`@keyframes ride-${trot.frames} \\{([^@]*)`))?.[1] ?? '';
+    for (let i = 0; i < trot.frames; i++) assert.match(steps, new RegExp(`var\\(--rx${i}\\), var\\(--ry${i}\\)`), `${id}: ride-${trot.frames} has no step ${i}`);
+  }
+});
+
 test('the narrator knows when and where each of its lines shows', () => {
   const tutorial = JSON.parse(readFileSync(new URL('../data/tutorial.json', import.meta.url), 'utf8'));
   const beats = /const BEATS = \{([\s\S]*?)\n\};/.exec(readFileSync(join(CLIENT, 'narrator.js'), 'utf8'))[1];

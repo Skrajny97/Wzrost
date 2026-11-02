@@ -8,7 +8,11 @@
   "walk": {
     "figure": { "file": "art/scenes/walker.png", "size": 48, "frames": 4, "fps": 8 },
     "rider": { "width": 64, "height": 96, "seat": [18, 59] },
-    "mounts": {},
+    "mounts": {
+      "pony": { "file": "art/scenes/mounts/pony.png", "width": 104, "height": 90, "frames": 9, "fps": 8, "seats": [[41, 36], [41, 35], [41, 34], [41, 34], [40, 36], [40, 36], [40, 35], [41, 34], [41, 36]] },
+      "horse": { "file": "art/scenes/mounts/horse.png", "width": 126, "height": 108, "frames": 6, "fps": 8, "seats": [[48, 42], [48, 42], [48, 44], [48, 44], [48, 42], [48, 42]] },
+      "steed": { "file": "art/scenes/mounts/steed.png", "width": 148, "height": 132, "frames": 6, "fps": 8, "seats": [[57, 52], [57, 51], [57, 50], [57, 51], [57, 52], [57, 52]] }
+    },
     "walker": { "size": 128, "frames": 8, "fps": 8, "scale": 1 },
     "path": "art/scenes/path.png",
     "lands": {

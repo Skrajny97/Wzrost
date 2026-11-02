@@ -301,7 +301,7 @@ export const SPRITES = {
     width: 168,
     height: 144,
     fit: true,
-    ids: [],
+    ids: ['pony', 'horse', 'steed'],
   },
   // The character riding, <class>-<look> or an evolution's
   // <evolution>-<look>: one picture sitting in a saddle that is not drawn

@@ -120,7 +120,12 @@ function ride(walk, character) {
   element.style.setProperty('--duration', `${trot.frames / trot.fps}s`);
   element.style.setProperty('--rider-x', `${x - seatX}px`);
   element.style.setProperty('--rider-y', `${top + y - seatY}px`);
-  element.style.setProperty('--ride', `ride-${character.mount.id}`);
+  // The rider follows the saddle frame by frame (ride-<frames> in styles.css).
+  trot.seats.forEach(([seatXi, seatYi], i) => {
+    element.style.setProperty(`--rx${i}`, `${seatXi - x}px`);
+    element.style.setProperty(`--ry${i}`, `${seatYi - y}px`);
+  });
+  element.style.setProperty('--ride', `ride-${trot.frames}`);
   return element;
 }
 
