@@ -11,6 +11,8 @@ import { inAppBrowser, installBlock, installButton } from './install.js';
 import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { layoutChoice, layoutOffered, onLayoutChange, setLayoutChoice } from './layout-mode.js';
 import { updateSide } from './side.js';
+// The computer's keys 1–5 for the main tabs (477 A).
+import './keys.js';
 import { showQuests, watchQuests } from './quests.js';
 import { offerNameNotice, offerRename, openNameChange } from './rename.js';
 import { mountAuthor } from './screens/author.js';

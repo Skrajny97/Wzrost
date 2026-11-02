@@ -14,6 +14,7 @@ import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { playSound } from '../sound.js';
 import { call, costShortfall, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
 import { scrapperSheet } from '../scrapper.js';
+import { itemTip, setTipRenderer } from '../item-tip.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemLink, systemPanel, toast, withButton } from '../ui.js';
 
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
@@ -177,18 +178,21 @@ export function mountCharacter(container) {
         icon(SLOT_ICONS[slot.id], { size: 24 }),
       );
     }
-    return h(
-      'button',
-      {
-        type: 'button',
-        class: 'slot',
-        'data-guide': `slot-${slot.id}`,
-        vars: { '--rarity': item.color },
-        'aria-label': `${slot.name}: ${itemTitle(item)}, ${item.rarityName}`,
-        onClick: () => itemSheet(item, { equipped: true }),
-      },
-      itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
-      upgradeBadge(item),
+    return itemTip(
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'slot',
+          'data-guide': `slot-${slot.id}`,
+          vars: { '--rarity': item.color },
+          'aria-label': `${slot.name}: ${itemTitle(item)}, ${item.rarityName}`,
+          onClick: () => itemSheet(item, { equipped: true }),
+        },
+        itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
+        upgradeBadge(item),
+      ),
+      item,
     );
   }
 
@@ -439,20 +443,23 @@ export function mountCharacter(container) {
         h(
           'li',
           {},
-          h(
-            'button',
-            {
-              type: 'button',
-              class: 'slot slot--bag',
-              vars: { '--rarity': item.color },
-              'aria-label': [itemTitle(item), item.rarityName, item.slotName, `poziom ${item.level}`, verdictMark(item.verdict) && VERDICTS[item.verdict].text]
-                .filter(Boolean)
-                .join(', '),
-              onClick: () => itemSheet(item, { equipped: false }),
-            },
-            itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
-            verdictMark(item.verdict, { tile: true }),
-            upgradeBadge(item),
+          itemTip(
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'slot slot--bag',
+                vars: { '--rarity': item.color },
+                'aria-label': [itemTitle(item), item.rarityName, item.slotName, `poziom ${item.level}`, verdictMark(item.verdict) && VERDICTS[item.verdict].text]
+                  .filter(Boolean)
+                  .join(', '),
+                onClick: () => itemSheet(item, { equipped: false }),
+              },
+              itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
+              verdictMark(item.verdict, { tile: true }),
+              upgradeBadge(item),
+            ),
+            item,
           ),
         ),
       ),
@@ -1139,6 +1146,17 @@ export function itemDetails(item, { small = false } = {}) {
     ),
   );
 }
+
+// The small card of an item under the mouse on a computer (item-tip.js,
+// 477 A): its name, kind and properties, and what wearing it changes.
+setTipRenderer((item) =>
+  h(
+    'div',
+    {},
+    itemDetails(item, { small: true }),
+    VERDICTS[item.verdict] && h('p', { class: `item-tip-verdict item-tip-verdict--${item.verdict}`, text: VERDICTS[item.verdict].line }),
+  ),
+);
 
 // The System's words over the bag, with the way to where they point.
 function characterMessage(character, busy) {

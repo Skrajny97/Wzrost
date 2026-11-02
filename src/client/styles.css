@@ -11690,3 +11690,62 @@ a.profession-square:active {
 :root[data-layout='desktop'] .character-columns > .bag {
   min-width: 0;
 }
+
+/* The item under the mouse on a computer (item-tip.js, 477 A). */
+.item-tip {
+  position: fixed;
+  z-index: 60;
+  max-width: 300px;
+  padding: 10px 12px;
+  border: 1px solid var(--bark-line);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.97);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.item-tip .item-title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.item-tip .item-properties {
+  margin: 6px 0 0;
+}
+
+.item-tip-verdict {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.item-tip-verdict--better {
+  color: var(--leaf);
+}
+
+.item-tip-verdict--worse {
+  color: var(--danger);
+}
+
+/* Walka on a computer: the lands two by two in a wider column (476 A). */
+:root[data-layout='desktop'] .screen--game:has(.stack > .region-card) {
+  max-width: 1120px;
+}
+
+:root[data-layout='desktop'] .stack:has(> .region-card) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+:root[data-layout='desktop'] .stack:has(> .region-card) > :not(.region-card) {
+  grid-column: 1 / -1;
+}
+
+/* Obóz and Osada on a computer: bigger boards (476 A); their places stand
+   in percents of the board, so they grow with it. */
+:root[data-layout='desktop'] .camp-board,
+:root[data-layout='desktop'] .settlement-map {
+  max-width: 720px;
+}
