@@ -1,0 +1,30 @@
+{
+  "id": "veles-serpent",
+  "payload": {
+    "prompt": "ancient horned water serpent of the Slavic god Veles, a huge black snake with a pair of curved horns, golden eyes, dark scales with faint golden Slavic patterns, coiled and rising from black water, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 82158277,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793646683,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 29.43,
+    "request_id": "3d819594-fc6d-4b93-8662-9d41e9502c0f",
+    "outputs_retained_until": 1793733037,
+    "billing": {
+      "source": "balance",
+      "balance_left": 29.43,
+      "balance_charged": 0.54
+    }
+  }
+}

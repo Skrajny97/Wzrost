@@ -1,0 +1,30 @@
+{
+  "id": "bog-demon",
+  "payload": {
+    "prompt": "bagiennik bog demon from Slavic legend, a tall lanky creature with skin like wet black bark, a beard of hanging moss and reeds, very long arms with root-like fingers, two huge round glowing yellow eyes like lanterns, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 272287721,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793646759,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 28.35,
+    "request_id": "5d71e399-5039-48e2-90ab-cfe4b2141dd8",
+    "outputs_retained_until": 1793733113,
+    "billing": {
+      "source": "balance",
+      "balance_left": 28.35,
+      "balance_charged": 0.54
+    }
+  }
+}

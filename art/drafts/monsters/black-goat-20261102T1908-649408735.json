@@ -1,0 +1,30 @@
+{
+  "id": "black-goat",
+  "payload": {
+    "prompt": "huge black billy goat, long twisted horns, shaggy black fur, a long beard, glowing red eyes, front hooves raised to charge, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 649408735,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793646991,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 26.19,
+    "request_id": "3975256c-2501-4df3-869a-adddfcc3924e",
+    "outputs_retained_until": 1793733315,
+    "billing": {
+      "source": "balance",
+      "balance_left": 26.19,
+      "balance_charged": 0.54
+    }
+  }
+}

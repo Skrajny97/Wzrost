@@ -1,0 +1,30 @@
+{
+  "id": "klobuk",
+  "payload": {
+    "prompt": "klobuk demon from Polish folklore, a wet bedraggled black chicken with ruffled soaked feathers, glowing yellow eyes and a long tail of bright flames, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 308024686,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647020,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 25.65,
+    "request_id": "42adef0b-eb55-4c0e-aaab-603e2dc9a7e6",
+    "outputs_retained_until": 1793733393,
+    "billing": {
+      "source": "balance",
+      "balance_left": 25.65,
+      "balance_charged": 0.54
+    }
+  }
+}

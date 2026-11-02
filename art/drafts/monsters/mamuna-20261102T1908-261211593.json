@@ -1,0 +1,30 @@
+{
+  "id": "mamuna",
+  "payload": {
+    "prompt": "mamuna, a Slavic bog demon woman, gaunt and tall with tangled black hair down to the ground, sagging grey skin, a ragged black dress dripping with swamp water, long clawed fingers reaching forward, pale glowing eyes, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 261211593,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647067,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 25.11,
+    "request_id": "cf422735-083a-41b8-8d4f-380ae25f75df",
+    "outputs_retained_until": 1793733422,
+    "billing": {
+      "source": "balance",
+      "balance_left": 25.11,
+      "balance_charged": 0.54
+    }
+  }
+}

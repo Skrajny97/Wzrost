@@ -1,0 +1,30 @@
+{
+  "id": "wooden-idol",
+  "payload": {
+    "prompt": "living Slavic pagan idol, a tall carved dark oak pillar with a stern bearded face and a round cap, short arms carved in relief holding a horn, moss and water marks at its base, glowing amber eyes, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 63690522,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793646635,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 29.97,
+    "request_id": "3c011b02-3ddd-4f01-b1c6-ee9e0535aaee",
+    "outputs_retained_until": 1793732983,
+    "billing": {
+      "source": "balance",
+      "balance_left": 29.97,
+      "balance_charged": 0.54
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "rokita",
+  "payload": {
+    "prompt": "Rokita, a Polish swamp devil, a tall thin devil with dark green-black skin, long curved horns, a pointed goatee, a long thin tail, an old-fashioned dark green nobleman coat with gold buttons and a black hat with a feather, one goat hoof, holding a willow staff burning with green fire, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 294127378,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647101,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 24.57,
+    "request_id": "1f5c07ae-db7f-4229-b4a3-7e9dbc3c1dc9",
+    "outputs_retained_until": 1793733469,
+    "billing": {
+      "source": "balance",
+      "balance_left": 24.57,
+      "balance_charged": 0.54
+    }
+  }
+}
