@@ -2996,6 +2996,26 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.88 (2.11.2026)
+
+1. **Co wchodzi do gry:** postęp wziętej próby w Tablicy prób (zob. sekcję niżej). Razem z nim idą notatki i pliki z gałęzi roboczej, których gra jeszcze nie używa: zatwierdzone portrety drugiej ewolucji jako wzory i narzędzie PixelLab do klatek startowych chodów.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** wszystkie testy (847) przechodzą, a nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy, na telefonie i na komputerze (`tools/first-steps.cjs`). Tablicę prób sprawdzono w przeglądarce na 390×844 i 1280×800: wzięta próba pokazuje pasek „Postęp 45 z 75”, a strona nie przewija się na boki.
+
+## Kosmetyki i pary portretów: odpowiedzi autora 396–418 (2.11.2026)
+
+Autor: „413 akcept, jeśli zanimujesz tego lisa co nie będzie łatwe / 414 akcept, ale ten sam problem co 413 / 416 akcept / 417 akcept / 418 akcept / 396 akcept / 399 akcept / 400 akcept / 403 akcept / 408 akcept / 410 akcept ale mężczyzna taki powinien miec kolor skóry na szarym odcieniu” i „Portrety masz zatwierdzone musisz zrobić maski na odcienie i wykonać je”.
+
+1. **Kosmetyki do zrobienia.** Wszystkie pasują do każdej klasy i zmieniają tylko wygląd:
+    - Chowaniec: Lis (413, 600 PS), z animacją: lis biegnie przy postaci;
+    - Chowaniec: Kruk (414, 600 PS), z animacją: kruk macha skrzydłami;
+    - Aura Systemu (416, 500 PS);
+    - Aura Żaru (417, 500 PS);
+    - Świetliste ślady (418, 300 PS).
+2. **Błędny ognik (415)** został bez odpowiedzi, więc na razie nie powstaje.
+3. **Portrety drugiej ewolucji:** zatwierdzonych jest wszystkie 15 par (396–410). Każdy portret dostaje maskę skóry i wersje we wszystkich odcieniach, tak jak portrety pierwszej ewolucji.
+4. **Widmo-mężczyzna (410).** Szara skóra z jego portretu to odcień „szary”. Wersja podstawowa dostaje zwykłą skórę, jak pozostałe portrety.
+
 ## Postęp próby w Tablicy prób (2.11.2026)
 
 Autor (zrzut zakładki Próby): „niech tutaj pokazuje ile już ukończone jest z danej próby”.
