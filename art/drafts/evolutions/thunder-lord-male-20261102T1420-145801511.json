@@ -1,0 +1,12 @@
+{
+  "id": "thunder-lord-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "young man thunder archer lord, blond hair, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, a long dark blue coat with intricate silver lightning embroidery and ornate silver pauldrons, a silver circlet with a glowing storm crystal, leather bracers with silver studs, holding an ornate silver longbow with glowing blue runes along it, a few small sparks only along the bow, no separate floating lightning, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
