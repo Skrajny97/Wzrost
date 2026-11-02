@@ -11427,6 +11427,21 @@ a.profession-square:active {
   --side-width: 360px;
 }
 
+/* Delicate light on the computer (the author: "brakuje czasem teł jakichś
+   delikatnych albo gradientów"): over the game's column a faint glow of the
+   System from above and a warm one from below, the page's edges a little
+   darker; the menu and the side column darken downwards from a lit top. The
+   light stays put while the page scrolls. */
+:root[data-layout='desktop'] body {
+  --game-middle: calc(var(--menu-width) + (100% - var(--menu-width) - var(--side-width)) / 2);
+  background-image:
+    radial-gradient(ellipse 46% 55% at var(--game-middle) 0%, rgba(143, 227, 239, 0.09), transparent 72%),
+    radial-gradient(ellipse 52% 45% at var(--game-middle) 100%, rgba(201, 161, 74, 0.075), transparent 72%),
+    radial-gradient(ellipse 75% 85% at var(--game-middle) 45%, transparent 50%, rgba(0, 0, 0, 0.38) 100%),
+    repeating-linear-gradient(125deg, transparent 0 6px, rgba(37, 48, 31, 0.45) 6px 7px);
+  background-attachment: fixed;
+}
+
 :root[data-layout='desktop'] #view-game:not([hidden]) {
   display: grid;
   grid-template-columns: var(--menu-width) minmax(0, 1fr) var(--side-width);
@@ -11444,6 +11459,22 @@ a.profession-square:active {
   align-items: center;
   gap: 28px;
   padding: 10px 28px;
+  border-bottom-color: transparent;
+  background:
+    linear-gradient(90deg, rgba(201, 161, 74, 0.05), transparent 35%, transparent 65%, rgba(143, 227, 239, 0.05)),
+    linear-gradient(180deg, #131a10, var(--bg-deep));
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
+}
+
+:root[data-layout='desktop'] .topbar::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line), rgba(143, 227, 239, 0.32) 50%, var(--line));
+  pointer-events: none;
 }
 
 :root[data-layout='desktop'] .topbar-row {
@@ -11467,13 +11498,21 @@ a.profession-square:active {
   padding: 20px 14px;
   overflow-y: auto;
   border-right: 1px solid var(--line);
-  background: var(--bg-deep);
+  background:
+    radial-gradient(120% 30% at 0% 0%, rgba(201, 161, 74, 0.1), transparent 70%),
+    radial-gradient(100% 35% at 50% 100%, rgba(143, 227, 239, 0.045), transparent 70%),
+    linear-gradient(180deg, #161d12 0%, var(--bg-deep) 45%, #0a0d08 100%);
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
 }
 
 :root[data-layout='desktop'] .menu-brand {
   display: block;
   order: 0;
   margin: 0 0 18px 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, rgba(201, 161, 74, 0.45), transparent 85%) 1;
+  text-shadow: 0 0 18px rgba(201, 161, 74, 0.25);
   color: var(--accent);
   font-family: var(--font-world);
   font-size: 30px;
@@ -11553,6 +11592,7 @@ a.profession-square:active {
   grid-area: main;
   max-width: 760px;
   padding: 24px 32px 48px;
+  background: radial-gradient(50% 70% at 50% 0%, rgba(36, 48, 30, 0.55), rgba(36, 48, 30, 0.2) 60%, transparent);
 }
 
 /* The side column, under the top bar while the page scrolls. */
@@ -11567,7 +11607,11 @@ a.profession-square:active {
   padding: 16px;
   overflow: hidden;
   border-left: 1px solid var(--line);
-  background: var(--bg-deep);
+  background:
+    radial-gradient(110% 28% at 100% 0%, rgba(143, 227, 239, 0.06), transparent 70%),
+    radial-gradient(100% 30% at 50% 100%, rgba(201, 161, 74, 0.05), transparent 70%),
+    linear-gradient(180deg, #141a10 0%, var(--bg-deep) 50%, #0a0d08 100%);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
 }
 
 .side .side-quests {
@@ -11695,6 +11739,10 @@ a.profession-square:active {
 
   :root[data-layout='desktop'] .side {
     display: none !important;
+  }
+
+  :root[data-layout='desktop'] {
+    --side-width: 0px;
   }
 
   :root[data-layout='desktop'] .pending-bar {
