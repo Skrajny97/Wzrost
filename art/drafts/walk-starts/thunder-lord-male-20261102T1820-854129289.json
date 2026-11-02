@@ -1,0 +1,25 @@
+{
+  "id": "thunder-lord-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a young blond man thunder lord with a silver circlet with a blue storm crystal, a long dark blue coat with silver lightning embroidery, silver pauldrons, leather bracers, a quiver of arrows on his back, brown boots, one single ornate silver longbow with glowing blue runes held upright in his right hand at his side, only one bow, no second bow, no arrow on the string, seen from the side in strict profile: the face, chest, hips and feet all turned fully to the right, only one eye visible, facing and walking to the right, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "references": [
+    {
+      "path": "art/references/evolutions/thunder-lord-male.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    },
+    {
+      "path": "art/references/walks/start/marksman-male.png",
+      "usage": "how to hold the bow: one longbow upright in the front hand at the side, seen from the side; only the bow, not this figure's look"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
