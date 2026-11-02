@@ -2996,6 +2996,15 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Druga ewolucja: odpowiedzi autora na pary portretów (2.11.2026)
+
+Autor: „396 kobietę albo dorysować albo od nowa, bo ucięta, opisy zatwierdzam / 397 czempion ucięty hełm / 398 zatwierdzam / 399 kobiecie wygenerował się tylko tułów, resztę zatwierdzam (przeglądaj do cholery te propozycje przed wysłaniem) / 400 zbyt mała rozdzielczość i poucinane piksele (…), opisy zatwierdzam / 402 to samo zbyt mała rozdzielczość/dokładność, opisy zatwierdzam / 403 to samo (…), opisy zatwierdzam / 404 jest okey, ale kobieta ucięta, opisy zatwierdzam, ale druga umiejętność to też niech będzie przywołanie, na przykład Niedźwiedzia / 409 Nekromanci fajnie wyglądają, ale ucięte portrety, opisy zmiany: »Trucizna to był tylko początek. Nekromanta nabywa cech nekrotycznych.« Umiejętności zatwierdzam / 401 zatwierdzam wygląd i opisy, wzorowe / 405 zatwierdzam wygląd z drobnymi pikselami do poprawy, zatwierdzam opisy / 407 zbyt niska rozdzielczość/dokładność, zatwierdzam opisy / 408 zbyt mało epickie jak na kolejną ewolucję w tym kierunku, opisy zatwierdzam / 410 zatwierdzam, ale kobiecie ucięło miecz i rękę, opisy zatwierdzam / 406 jest okey, choć trochę wygląda podobnie do zwykłego Inkwizytora, zbyt mało epicko, opisy zatwierdzam”.
+
+1. **Opisy wszystkich 15 form są zatwierdzone.** Druid dostaje jako drugą umiejętność Przywołanie niedźwiedzia (zamiast Splątania), a opis Nekromanty brzmi słowami autora: „Trucizna to był tylko początek. Nekromanta nabywa cech nekrotycznych.”
+2. **Zatwierdzone portrety:** Bastion (398, oba), Mistrz Łowów (401, oba, wzór dla pozostałych), Cudotwórca (405, oba, z poprawionymi drobnymi pikselami: domknięty ciemny kontur na brzegach płaszczy i Cudotwórczyni podniesiona o 2 piksele nad dolną krawędź) i Widmo (410, mężczyzna).
+3. **Od nowa:** kobiety z 396, 399, 404 i 410, mężczyzna z 397 oraz obie płcie 400, 402, 403, 406, 407, 408 i 409. Zatwierdzone portrety 401 i 398 są teraz wzorem stylu dla generatora (`art/references/evolutions`). Opisy każą zmieścić całą postać z bronią w obrazku z zapasem z każdej strony, dodają zdobienia szatom (400, 402, 403, 407), a Wielki Inkwizytor i Królobójca są wyraźnie bardziej epiccy: zbroja ze złotymi znakami i młot w świętym ogniu, złamana korona przy pasie.
+4. **Przegląd przed wysłaniem (brakujący szczegół).** Każdy portret przed pokazaniem autorowi przechodzi sprawdzenie: nic nie dotyka krawędzi obrazka, postać jest cała, bez zabłąkanych pikseli. Potem portret jest oglądany w powiększeniu na jaskrawym tle, bo usuwanie tła potrafi wyciąć broń albo dłoń w środku obrazka.
+
 ## Wersja 0.0.87 (2.11.2026)
 
 1. **Co wchodzi do gry:** naprawa Sklepu Systemu na iPhonie (zob. sekcję niżej).
