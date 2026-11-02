@@ -203,6 +203,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     if (target.doom) target.doom.taken += amount;
   };
 
+  // Borowina (the place's trait `healBonus`): the allies' healing, by
+  // skills and potions, gives back a share more HP. No random numbers.
+  const mend = (unit, amount) => heal(unit, unit.side === 'ally' ? amount * (1 + (trait?.healBonus ?? 0)) : amount);
+
   // A potion of a kind (`heal`, `mana`, `cure` or `revive`) the unit carries
   // and has not drunk yet in this fight. Gives whether it drank.
   const drink = (unit, kind, t) => {
@@ -213,7 +217,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const vars = { actor: unit.name, potion: potion.accusative };
     const potionTexts = content.potionUse.texts;
     if (kind === 'heal') {
-      const amount = heal(unit, potion.amount * unit.maxHp);
+      const amount = mend(unit, potion.amount * unit.maxHp);
       log(() => ({ t, kind: 'potion', effect: 'heal', actor: unit.id, target: unit.id, potion: potion.id, amount, hp: unit.hp, text: say(potionTexts, 'drinkHeal', actions, { ...vars, amount }) }));
     } else if (kind === 'cure') {
       // The effect goes and stays off to the end of the fight.
@@ -294,7 +298,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       const reflect = p.reflect ? ` ${say(texts, skill.kind === 'shield' ? 'skillShieldReflect' : 'guardReflect', actions, { reflect: Math.round(p.reflect * 100) })}` : '';
       if (skill.kind === 'guard') {
         // A little HP back, and armour for the unit's next few moves.
-        const amount = heal(unit, p.heal * unit.maxHp);
+        const amount = mend(unit, p.heal * unit.maxHp);
         const turns = Math.round(p.turns);
         const armor = Math.round(unit.armor * p.armor);
         unit.armor += armor;
@@ -751,7 +755,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         const care = evolving && actor.feat?.kind === 'caretaker' ? 1 + actor.feat.heal : 1;
         const party = p.party ? units.filter((unit) => unit.side === actor.side && unit.hp > 0) : [actor];
         for (const member of party) {
-          const amount = heal(member, (p.heal * member.maxHp + (actor.wisdom ?? 0) / p.wisdomPerHp) * care);
+          const amount = mend(member, (p.heal * member.maxHp + (actor.wisdom ?? 0) / p.wisdomPerHp) * care);
           const own = member === actor;
           log(() => ({
             ...base,
@@ -923,7 +927,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       } else if (stance.regen) {
         for (const member of units) {
           if (member.side !== actor.side || member.hp <= 0) continue;
-          const amount = heal(member, stance.heal * member.maxHp);
+          const amount = mend(member, stance.heal * member.maxHp);
           if (amount > 0) {
             log(() => ({ t, kind: 'heal', actor: actor.id, target: member.id, skill: skill.id, skillName: skill.name, amount, hp: member.hp, quiet: true, text: say(texts, 'regen', actions, { skill: skill.name, target: member.name, amount }) }));
           }

@@ -521,5 +521,127 @@
         "champion": "mud-lord"
       }
     ]
+  },
+  {
+    "id": "black-bog",
+    "land": "Torfowiska",
+    "name": "Czarne Bagno",
+    "minLevel": 101,
+    "maxLevel": 125,
+    "safe": false,
+    "description": "Najgłębsza część Torfowisk, gdzie woda jest czarna jak smoła. Olsy stoją tu na szczudłach korzeni, z toni wystają słupy dawnej gontyny, a w gąszczu wierzby rokity mieszka diabeł Rokita.",
+    "trait": {
+      "name": "Borowina",
+      "description": "Leczenie umiejętności i mikstur przywraca o 5% więcej HP.",
+      "healBonus": 0.05
+    },
+    "elite": "mamuna",
+    "resources": { "wood": 3, "stone": 1, "iron-ore": 6 },
+    "areas": [
+      {
+        "id": "black-alder-carr",
+        "name": "Czarny Ols",
+        "minLevel": 101,
+        "maxLevel": 105,
+        "description": "Las olszy czarnej na szczudłach korzeni, po kolana w czarnej wodzie. Na korzeniach wygrzewają się żółwie błotne, między pniami przemyka norka, a nad wodą polują wielkie ważki.",
+        "encounters": [
+          { "weight": 18, "monsters": ["pond-turtle"] },
+          { "weight": 14, "monsters": ["mink"] },
+          { "weight": 14, "monsters": ["dragonfly", "dragonfly"] },
+          { "weight": 12, "monsters": ["pond-turtle", "dragonfly"] },
+          { "weight": 12, "monsters": ["mink", "mink"] },
+          { "weight": 10, "monsters": ["pond-turtle", "mink"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["pond-turtle", "mink", "dragonfly"] },
+          { "weight": 6, "monsters": ["pond-turtle", "pond-turtle"] },
+          { "weight": 6, "monsters": ["mink", "dragonfly", "dragonfly"] }
+        ]
+      },
+      {
+        "id": "black-tarn",
+        "name": "Czarna Toń",
+        "minLevel": 106,
+        "maxLevel": 110,
+        "description": "Okrągłe jezioro czarnej wody bez dna, otoczone kożuchem mchu. W toni czeka szczupak, w srebrnych bańkach powietrza mieszka topik, a nad wodą krzyczą rybitwy.",
+        "encounters": [
+          { "weight": 18, "monsters": ["pike"] },
+          { "weight": 14, "monsters": ["water-spider"] },
+          { "weight": 14, "monsters": ["black-tern", "black-tern"] },
+          { "weight": 12, "monsters": ["pike", "black-tern"] },
+          { "weight": 10, "monsters": ["water-spider", "black-tern"] },
+          { "weight": 10, "monsters": ["pike", "water-spider"] },
+          { "weight": 8, "monsters": ["dragonfly", "black-tern"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["pike", "water-spider", "black-tern"] },
+          { "weight": 6, "monsters": ["pike", "pike"] },
+          { "weight": 6, "monsters": ["water-spider", "water-spider", "black-tern"] }
+        ]
+      },
+      {
+        "id": "sunken-shrine",
+        "name": "Zatopiona Gontyna",
+        "minLevel": 111,
+        "maxLevel": 115,
+        "description": "Pogańska świątynia, którą dawno wzięło bagno. Z wody wystają rzeźbione słupy, a niektóre wciąż się poruszają. W toni krąży wąż Welesa, a duch żercy wciąż odprawia tu obrzędy.",
+        "encounters": [
+          { "weight": 18, "monsters": ["wooden-idol"] },
+          { "weight": 14, "monsters": ["veles-serpent"] },
+          { "weight": 14, "monsters": ["pagan-priest"] },
+          { "weight": 12, "monsters": ["wooden-idol", "pagan-priest"] },
+          { "weight": 10, "monsters": ["veles-serpent", "pagan-priest"] },
+          { "weight": 10, "monsters": ["wooden-idol", "veles-serpent"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["wooden-idol", "veles-serpent", "pagan-priest"] },
+          { "weight": 6, "monsters": ["wooden-idol", "wooden-idol", "pagan-priest"] },
+          { "weight": 6, "monsters": ["veles-serpent", "pagan-priest", "pagan-priest"] }
+        ]
+      },
+      {
+        "id": "quaking-bog",
+        "name": "Trzęsawisko",
+        "minLevel": 116,
+        "maxLevel": 120,
+        "description": "Cienki kożuch mchu nad bezdennymi oknami czarnej wody. Ziemia drży pod każdym krokiem, z mroku patrzą latarnie oczu bagiennika, w mchu czają się kleszcze, a o zmierzchu poluje ślepowron.",
+        "encounters": [
+          { "weight": 18, "monsters": ["bog-demon"] },
+          { "weight": 14, "monsters": ["tick"] },
+          { "weight": 14, "monsters": ["night-heron"] },
+          { "weight": 12, "monsters": ["bog-demon", "night-heron"] },
+          { "weight": 10, "monsters": ["tick", "tick"] },
+          { "weight": 10, "monsters": ["bog-demon", "tick"] },
+          { "weight": 8, "monsters": ["tick", "night-heron"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["bog-demon", "tick", "night-heron"] },
+          { "weight": 6, "monsters": ["bog-demon", "bog-demon"] },
+          { "weight": 6, "monsters": ["tick", "tick", "night-heron"] }
+        ]
+      },
+      {
+        "id": "rokita-deep",
+        "name": "Rokitowe Bezdno",
+        "minLevel": 121,
+        "maxLevel": 125,
+        "description": "Najczarniejsze miejsce bagna, w gąszczu starych wierzb rokit. Na wodzie pali się zielony ogień, czarne kozły i biesy pilnują drogi, a kłobuki noszą swojemu panu łupy. Tu mieszka diabeł Rokita.",
+        "encounters": [
+          { "weight": 18, "monsters": ["bies"] },
+          { "weight": 14, "monsters": ["black-goat"] },
+          { "weight": 14, "monsters": ["klobuk"] },
+          { "weight": 12, "monsters": ["bies", "klobuk"] },
+          { "weight": 10, "monsters": ["black-goat", "black-goat"] },
+          { "weight": 10, "monsters": ["black-goat", "klobuk"] },
+          { "weight": 8, "monsters": ["bies", "black-goat"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["bies", "black-goat", "klobuk"] },
+          { "weight": 6, "monsters": ["bies", "bies"] },
+          { "weight": 6, "monsters": ["black-goat", "klobuk", "klobuk"] }
+        ],
+        "champion": "rokita"
+      }
+    ]
   }
 ]

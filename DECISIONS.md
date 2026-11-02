@@ -3220,6 +3220,23 @@ Autor: „przez Przelosowanie zadań chowa sie troche klawisz »Odbierz wszystko
     - Na tym komputerze przeszły wszystkie testy (857). Test dwóch równoczesnych odbiorów raportu przyjmuje teraz także „character_changed”: przegrany wyścig dostaje 409 i nic nie zarabia, tak jak przy dwóch dotychczasowych kodach, a pod obciążeniem test czasem trafiał na ten trzeci.
     - Nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`).
     - Pergamin zadań sprawdzono w przeglądarce na telefonach 360×640, 390×844 i 412×732: „Odbierz wszystkie” cały na widoku, także po przewinięciu listy do końca.
+## Czarne Bagno: poziomy 101–125 (propozycja 439–461, 2.11.2026)
+
+Autor: „Od 20:00 popracujesz nad kolejnymi krainami i regionami wewnętrznymi + ich stworami.” Dokument projektowy zapowiada trzecią część Torfowisk, Czarne Bagno. To propozycja do oceny autora, pozycja po pozycji (439–461), i nie wchodzi do gry bez zatwierdzonych grafik.
+
+1. **Kraina** `black-bog` (`land` Torfowiska), poziomy 101–125, pięć regionów wewnętrznych: Czarny Ols, Czarna Toń, Zatopiona Gontyna, Trzęsawisko, Rokitowe Bezdno. Elita całej krainy: Mamuna. Czempion: Rokita w Rokitowym Bezdnie. Zasoby: drewno 3, kamień 1, ruda żelaza 6 (dawne bagna dawały rudę darniową).
+2. **Cecha „Borowina”**: leczenie umiejętności i mikstur przywraca postaciom o 5% więcej HP (`healBonus` w `regions.json`, `mend` w `combat.js`). To drobny buff dla klas wspierających, jak każe dokument do 150. poziomu. Nie losuje liczb, więc walki w innych krainach się nie zmieniają.
+3. **Stwory**, po trzy w każdym regionie wewnętrznym, z przymiotnikiem do nazw przedmiotów w każdym:
+    - Czarny Ols: Żółw błotny (przód, bardzo gruby pancerz), Norka (środek, Krwawienie), Ważka (tył, dużo uniku);
+    - Czarna Toń: Szczupak (przód, mocny cios i krytyki), Topik (środek, Zatrucie), Rybitwa (tył);
+    - Zatopiona Gontyna: Drewniany bożek (przód, słaby na ogień), Wąż Welesa (środek, magia wody z Ugrzęźnięciem), Żerca (tył, „Gniew Peruna”, elektryczność);
+    - Trzęsawisko: Bagiennik (przód, Ugrzęźnięcie), Kleszcz (środek, Wysysanie i Zatrucie), Ślepowron (tył);
+    - Rokitowe Bezdno: Bies (przód, słaby na sakrum), Czarny kozioł (środek, słaby na sakrum), Kłobuk (tył, ogień z Oparzeniem, słaby na wodę);
+    - elita Mamuna (środek, magia wody z Wysysaniem i Ugrzęźnięciem) i czempion Rokita (przód, „Piekielny ogień” z Oparzeniem, słaby na sakrum).
+   Materiały: od pospolitych (Skrzydło ważki, Pióro rybitwy, Pancerzyk kleszcza) po Warkocz mamuny (mityczny) i Cyrograf (boski).
+4. **Równowaga** (`tools/difficulty-sim.mjs`, 100–150 wypraw na wiersz, gracz „casual” z towarzyszami i „realistyczny”, na gałęzi z drugą ewolucją): po dostrojeniu nagród XP i złoto na godzinę u gracza realistycznego mieszczą się w ±2–4% zastępczej krainy z krzywej (stwory Starego Wyrobiska na tych poziomach), a omdleń brak. Gracz casual mdleje rzadziej niż w zastępczej krainie, najwięcej w Rokitowym Bezdnie (średnio ok. 13% w godzinę i 29% w cztery godziny). Mamuna wypada jak Kikimora, a Rokita trochę trudniej niż Król Błót na tych samych poziomach (casual wygrywa w 40–95% pojedynków, realistyczny prawie zawsze).
+5. **Narzędzie** `tools/difficulty-sim.mjs` na poziomach 100+ potrzebuje `nextFormOf` z drugiej ewolucji, więc bez niej model realistyczny na tych poziomach się wywraca; działa po scaleniu drugiej ewolucji.
+
 
 ## Gildia: żółte kropki przy rzeczach do zrobienia (2.11.2026)
 

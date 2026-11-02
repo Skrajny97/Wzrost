@@ -117,6 +117,23 @@
     { "monster": "zmij", "prefix": { "m": "Smoczy", "f": "Smocza", "n": "Smocze", "pl": "Smocze" }, "suffix": "Żmija" },
     { "monster": "fume-spirit", "suffix": "Zaducha" },
     { "monster": "mine-spirit", "suffix": "Skarbnika" },
-    { "monster": "giant-rat", "prefix": { "m": "Szczurzy", "f": "Szczurza", "n": "Szczurze", "pl": "Szczurze" }, "suffix": "Szczura" }
+    { "monster": "giant-rat", "prefix": { "m": "Szczurzy", "f": "Szczurza", "n": "Szczurze", "pl": "Szczurze" }, "suffix": "Szczura" },
+    { "monster": "pond-turtle", "prefix": { "m": "Żółwi", "f": "Żółwia", "n": "Żółwie", "pl": "Żółwie" }, "suffix": "Żółwia Błotnego" },
+    { "monster": "mink", "prefix": { "m": "Norczy", "f": "Norcza", "n": "Norcze", "pl": "Norcze" }, "suffix": "Norki" },
+    { "monster": "dragonfly", "suffix": "Ważki" },
+    { "monster": "pike", "prefix": { "m": "Szczupaczy", "f": "Szczupacza", "n": "Szczupacze", "pl": "Szczupacze" }, "suffix": "Szczupaka" },
+    { "monster": "water-spider", "suffix": "Topika" },
+    { "monster": "black-tern", "suffix": "Rybitwy" },
+    { "monster": "wooden-idol", "prefix": { "m": "Dębowy", "f": "Dębowa", "n": "Dębowe", "pl": "Dębowe" }, "suffix": "Bożka" },
+    { "monster": "veles-serpent", "prefix": { "m": "Welesowy", "f": "Welesowa", "n": "Welesowe", "pl": "Welesowe" }, "suffix": "Węża Welesa" },
+    { "monster": "pagan-priest", "prefix": { "m": "Pogański", "f": "Pogańska", "n": "Pogańskie", "pl": "Pogańskie" }, "suffix": "Żercy" },
+    { "monster": "bog-demon", "suffix": "Bagiennika" },
+    { "monster": "tick", "prefix": { "m": "Kleszczowy", "f": "Kleszczowa", "n": "Kleszczowe", "pl": "Kleszczowe" }, "suffix": "Kleszcza" },
+    { "monster": "night-heron", "suffix": "Ślepowrona" },
+    { "monster": "bies", "prefix": { "m": "Czarci", "f": "Czarcia", "n": "Czarcie", "pl": "Czarcie" }, "suffix": "Biesa" },
+    { "monster": "black-goat", "prefix": { "m": "Kozi", "f": "Kozia", "n": "Kozie", "pl": "Kozie" }, "suffix": "Czarnego Kozła" },
+    { "monster": "klobuk", "suffix": "Kłobuka" },
+    { "monster": "mamuna", "suffix": "Mamuny" },
+    { "monster": "rokita", "prefix": { "m": "Diabelski", "f": "Diabelska", "n": "Diabelskie", "pl": "Diabelskie" }, "suffix": "Rokity" }
   ]
 }

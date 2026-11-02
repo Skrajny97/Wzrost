@@ -847,7 +847,7 @@ describe('inner regions', () => {
     }
     // Wiatrołomy: Błędnica in the first three inner regions, Płanetnik deeper.
     assert.deepEqual(content.regionsById.windfalls.areas.map((area) => area.elite), ['wisp', 'wisp', 'wisp', 'planetnik', 'planetnik']);
-    assert.deepEqual(content.regions.map((region) => region.areas.at(-1).champion), ['tusker', 'basilisk', 'water-spirit', 'mud-lord']);
+    assert.deepEqual(content.regions.map((region) => region.areas.at(-1).champion), ['tusker', 'basilisk', 'water-spirit', 'mud-lord', 'rokita']);
   });
 
   test('Uroczysko Kamieni has its own creatures, none from Wiatrołomy', () => {
@@ -1095,7 +1095,7 @@ describe('tutorial unlocks', () => {
   });
 
   test('an inner region opens when the class reaches the level before its lowest one', () => {
-    assert.deepEqual(content.areas.map((area) => areaUnlockLevel(area, content)), [1, ...Array.from({ length: 19 }, (_, i) => 5 * (i + 1))]);
+    assert.deepEqual(content.areas.map((area) => areaUnlockLevel(area, content)), [1, ...Array.from({ length: 24 }, (_, i) => 5 * (i + 1))]);
     // A class at level 5 may go to the places of levels 1–5 and 6–10, not further.
     const open = content.areas.filter((area) => areaUnlocked(area, 5, content)).map((area) => area.id);
     assert.deepEqual(open, ['windfalls-edge', 'fox-ravines']);
@@ -2371,9 +2371,9 @@ describe('quests from the narrator', () => {
     // Near the last inner region of the game a week asks for no more than are left.
     const always = {
       ...wholeWeek,
-      quests: { ...wholeWeek.quests, kinds: content.quests.kinds.map((kind) => (kind.id === 'unlock' ? { ...kind, untilClassLevel: 100, weekly: { ...kind.weekly, most: [] } } : kind)) },
+      quests: { ...wholeWeek.quests, kinds: content.quests.kinds.map((kind) => (kind.id === 'unlock' ? { ...kind, untilClassLevel: 125, weekly: { ...kind.weekly, most: [] } } : kind)) },
     };
-    assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 92, classLevel: 92 }), 'weekly', always)), new Set([1]));
+    assert.deepEqual(new Set(asked(newCharacter('warrior', { level: 117, classLevel: 117 }), 'weekly', always)), new Set([1]));
     // Only while new.
     assert.ok(asked(newCharacter('warrior', { level: 28, classLevel: unlock.untilClassLevel - 1 }), 'weekly').length > 0);
     assert.deepEqual(asked(newCharacter('warrior', { level: 30, classLevel: unlock.untilClassLevel }), 'weekly'), []);
@@ -2482,7 +2482,7 @@ describe('quests from the narrator', () => {
     assert.deepEqual(kinds(behind), ['explore', 'process', 'salvage']);
     assert.ok(kinds({ ...behind, level: 18 }).includes('kill'));
     // Past every place of the game the same.
-    assert.ok(!kinds(newCharacter('archer', { level: 110, classLevel: 119 })).includes('kill'));
+    assert.ok(!kinds(newCharacter('archer', { level: 135, classLevel: 144 })).includes('kill'));
   });
 
   test('a quest asks for as many creatures as its fights bring; the week for creatures of any kind only', () => {

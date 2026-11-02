@@ -62,6 +62,15 @@ describe('potions in fights', () => {
     assert.equal(drinks(fight('lecz', ally), 'heal').length, 0);
   });
 
+  test('Borowina, the trait of Czarne Bagno, makes healing give back 5% more HP', () => {
+    const ally = fighter('warrior', null, 0.6);
+    const trait = content.regionsById['black-bog'].trait;
+    assert.equal(trait.healBonus, 0.05);
+    const result = simulateFight({ allies: [{ ...ally, potions: { heal } }], enemies: [sturdy('boar', 12)], rng: createRng('lecz'), content, record: true, trait });
+    const [drunk] = drinks(result, 'heal');
+    assert.equal(drunk.amount, Math.round(0.2 * ally.maxHp * 1.05));
+  });
+
   test('a mana potion is drunk once, when a skill lacks mana, and the skill goes on', () => {
     const ally = fighter('warrior', 'power-strike');
     const uses = (result) => result.events.filter((event) => event.skill === 'power-strike' && ['hit', 'crit', 'dodge'].includes(event.kind)).length;
