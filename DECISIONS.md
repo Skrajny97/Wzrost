@@ -2996,11 +2996,34 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.80 (2.11.2026)
+
+1. **Co wchodzi do gry:** Sklep Systemu z trzema ramkami, trzema tłami, kolorem imienia jak ramka i Tygrysem szablozębnym (zob. sekcję niżej).
+2. **Baza danych:** migracja 0069 dodaje postaciom kolumnę `cosmetics` z kupionymi i założonymi kosmetykami. Numery 0067 i 0068 czekają na Próby i Prośby Gildii.
+3. **Jeszcze nie w grze:** Próby i Prośby Gildii oraz ekran Bestii Gildii.
+4. **Przed wdrożeniem:** wszystkie testy (799) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Sklep, portret z ramką i tłem, kolor imienia na czacie i jazdę na tygrysie sprawdzono w przeglądarce na 390×844, a Sklep także na 1366×768.
+
+## Sklep Systemu: ramki, tła i tygrys szablozębny (2.11.2026)
+
+Autor: „tylko ramki i tła wchodzą póki co do gry, wszystkie”, „Wraz z ramkami wchodzi opcja zmiany wyświetlanego koloru na czacie na ten z ramki” i „Do tego dorób jednego wierzchowca w formie kosmetyku za 1000 Punktów Systemu i niech wygląda jak tygrys szablozębny i tak się nazywa”.
+
+1. **Sklep Systemu** otwiera ikona straganu w górnym pasku. Strona pokazuje Punkty Systemu postaci, krótkie „Jak to działa?” i trzy zakładki: Ramki, Tła i Wierzchowiec.
+2. **Przedmioty i ceny** są w `data/cosmetics.json`:
+    - Złota ramka i Ramka Systemu po 300 PS, Leśna ramka 250 PS;
+    - tła Źródło Systemu, Wieża i Obóz nocą, po 150 PS;
+    - Tygrys szablozębny, 1000 PS.
+3. **Karta przedmiotu** pokazuje podgląd na portrecie własnej postaci, nazwę, opis i cenę. „Kup” pyta o potwierdzenie. Kupiony przedmiot ma w tym samym miejscu „Załóż” albo „Zdejmij”. Gdy brakuje Punktów, przycisk podaje, ilu.
+4. **Zakup** to jeden zapis w bazie: Punkty schodzą, a przedmiot dochodzi, tylko raz. Dwa szybkie stuknięcia nie kupią dwa razy, a Punkty nie spadną poniżej zera.
+5. **Przedmiot należy do postaci, która go kupiła**, tak jak jej Punkty Systemu.
+6. **Ramka i tło** zdobią portret w zakładce Postać i większy portret na karcie postaci, którą widzą inni gracze. W ramce postać jest mniejsza, żeby zmieściła się w jej oknie. Po Złotej ramce co kilka sekund przebiega blask, a rubiny lśnią. Ramka Systemu pulsuje i przesuwa się po niej jasna linia. Wokół Leśnej ramki krążą świetliki. Przy wyłączonych animacjach ramki stoją.
+7. **Kolor imienia.** Z założoną ramką przełącznik „Kolor imienia jak ramka” barwi imię postaci kolorem ramki: na czacie (globalnym, gildii i prywatnym), w Rankingu, u Znajomych, w Drużynie, w Gildii, na karcie postaci i w nagłówku zakładki Postać.
+8. **Tygrys szablozębny** kupi tylko postać, która ma wierzchowca ze Stajni. Bez niego przycisk mówi „Najpierw kup wierzchowca w Stajni”. Założony tygrys zastępuje w scenie Walki wygląd wierzchowca ze Stajni, a wyprawy skraca dalej wierzchowiec ze Stajni. Jego chód opisuje sekcja „Tygrys szablozębny 371 B…” niżej.
+
 ## Tygrys szablozębny 371 B, szaty jeźdźców i tło obozu 372 B (2.11.2026)
 
 Autor: „371 B”, „372 B” i „Problemem są trochę postacie w szatach, bo u nich się to inaczej układają te szaty przy jeździe, ale podejrzewam, że szkoda zachodu i nic się nie udałoby z tym zrobić, wyszłoby tylko gorzej”.
 
-1. **Tygrys szablozębny** to najpierw wersja B, a po uwadze autora o chodzie („tylne łapy w ogóle się nie przecinają, a w chodzie powinny”; „wybierz inną z możliwych opcji tygrysa”) wersja A, która stoi z tylnymi łapami pod biodrem: pręgowany, z długimi kłami, ogonem, siodłem na futrzanej derce z kościanymi ozdobami i uzdą. Obrazek przycięty do konturu jest w `src/client/art/mounts/sabertooth.png`, a pierwsza klatka jego chodu, z miejscem na ruch łap, w `art/references/mounts/sabertooth.png`. Chód rysuje PixelLab według szkieletu, jak kłus koni (`tools/mount-gait.py`, `tools/animate-mounts-skeleton.mjs`): krok dużego kota, łapa po łapie, 12 klatek, 10 na sekundę. Po uwagach autora („Tygrys teraz chodzi jak koń”, „wygląda, jakby miał złamane te łapy albo się skradał, nie jak tygrys”) tułów i głowa zostają na wysokości z obrazka. Łapa, która stoi, jest prosta, a łapa w kroku zgina się w nadgarstku. Tylne łapy mijają się w kroku. Barki i biodra unoszą się lekko nad łapą, która stoi.
+1. **Tygrys szablozębny** to najpierw wersja B, a po uwadze autora o chodzie („tylne łapy w ogóle się nie przecinają, a w chodzie powinny”; „wybierz inną z możliwych opcji tygrysa”) wersja A, która stoi z tylnymi łapami pod biodrem: pręgowany, z długimi kłami, ogonem, siodłem na futrzanej derce z kościanymi ozdobami i uzdą. Obrazek przycięty do konturu jest w `src/client/art/mounts/sabertooth.png`, a pierwsza klatka jego chodu, z miejscem na ruch łap, w `art/references/mounts/sabertooth.png`. Chód rysuje PixelLab według szkieletu, jak kłus koni (`tools/mount-gait.py`, `tools/animate-mounts-skeleton.mjs`): krok dużego kota, łapa po łapie, 12 klatek, 10 na sekundę. Po uwagach autora („Tygrys teraz chodzi jak koń”, „wygląda, jakby miał złamane te łapy albo się skradał, nie jak tygrys”) tułów i głowa zostają na wysokości z obrazka. Łapa, która stoi, jest prosta, a łapa w kroku zgina się w nadgarstku. Tylne łapy mijają się w kroku. Po kolejnej uwadze („teraz łapy dobrze, ale w ogóle jego tułów i głowa się nie ruszają, a to ma być przedmiot kosmetyczny, musi być dobry”) bark albo biodro opada, gdy jego łapa jest w powietrzu, i wraca, gdy łapa staje, więc barki i biodra kołyszą się na przemian. Głowa kiwa się w rytm przednich łap, o około 3 piksele, a ogon kołysze się płynnie. Z czterech rysunków wybrany jest ten, w którym ogon najmniej skacze. Autor: „nowa wersja jest git”.
 2. **Szaty jeźdźców zostają takie, jak są.** Postacie w długich szatach siedzą w nich tak, jak narysował je Retro Diffusion. Znika tylko druga stopa spod szaty.
 3. **Tło „Obóz nocą” (372 B):** nowa wersja z ogniskiem bliżej środka i namiotem za postacią. Zastępuje pierwszą, z ogniskiem pod postacią. Plik ten sam: `src/client/art/cosmetics/bg-camp.png`.
 
