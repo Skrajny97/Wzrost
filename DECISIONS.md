@@ -2996,6 +2996,32 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.87 (2.11.2026)
+
+1. **Co wchodzi do gry:** naprawa Sklepu Systemu na iPhonie (zob. sekcję niżej).
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem (awaryjnie, na prośbę autora: „Wdrożysz poprawki do Sklepu Systemu awaryjnie, przejrzyj wszystko dokładnie”):** GitHub przed wdrożeniem przepuszcza wszystkie testy i przejście wprowadzenia, jak zawsze. Sklep sprawdzono w przeglądarce w wymiarach iPhone'a 15 (393×852): trzy zakładki w jednym rzędzie, lista bez wcięcia, portret w oknie ramki, pełne kolory, strona bez przewijania na boki, a strona „Brak połączenia” z własnym arkuszem.
+
+## iPhone: stary arkusz stylów pod nowym kodem gry (2.11.2026)
+
+Autor: „coś jest mocno zbugowane, telefon iPhone” (zrzut Sklepu Systemu) i „Na Androidzie u mnie działa normalnie sklep”.
+
+1. **Co było widać.** Na iPhonie zakładki Sklepu stały w dwóch rzędach, lista miała wcięcie przeglądarki, a portret postaci wisiał duży i przygaszony nad stroną, z pustym oknem ramki. Wszystkie te style dodała wersja 0.0.80, więc iPhone miał nowy kod gry i arkusz stylów sprzed Sklepu.
+2. **Skąd stary arkusz.** Część gry, która pokazuje stronę „Brak połączenia” (service worker, `sw.js`), trzymała kopię `styles.css` i oddawała ją, gdy pobranie arkusza z sieci się nie udało. iPhone może tak zgubić pobranie przy wybudzaniu aplikacji.
+3. **Naprawa.** Strona „Brak połączenia” ma własny mały arkusz `offline.css`, a service worker nie dotyka już arkusza gry. Jego stary schowek z kopią `styles.css` znika przy pierwszym uruchomieniu nowej wersji. Każde wdrożenie dopisuje też do adresu arkusza w `index.html` numer commita (`/styles.css?v=…`), więc żaden telefon nie weźmie starej kopii pod nowy kod.
+4. **Na iPhonie po wdrożeniu** gra przeładuje się sama przy powrocie do niej, jak po każdej nowej wersji.
+
+## Druga ewolucja: odpowiedzi autora 396–402 (2.11.2026)
+
+Autor: „396 A tylko uzupełnij brakujące piksele, lewej nogi chociażby / 397 A, choć widzę czempionkę na tym zdjęciu / 398 B, styl zbyt pikselowy, odbiega od standardów / 399 B, za mały rozwój wizualny / 400 B, styl zbyt pikselowy, odbiega od standardów / 401 A, tylko uzupełnij brakujące piksele cięciwy chociażby / 402 B, styl zbyt pikselowy, odbiega od standardów”, „Truciciel ma ewoluować w Nekromantę, Arkanista w Druida - zapomniałeś”, „Pamiętaj o wersjach dwóch - kobiecej i męskiej, odcienie skóry później sam robisz”, „Od nowa wszystko podaj w dwóch wersjach od razu też” i „I o chodzie pamiętaj (…), ale to po zatwierdzeniu portretów”.
+
+1. **Zatwierdzone:** Berserker (396), Czempion Areny (397) i Mistrz Łowów (401). W portrecie Berserkera lewy but dostał brakujące piksele i pełną podeszwę, a w portrecie Mistrzyni Łowów cięciwa biegnie ciągłą linią od końca łuku do dłoni.
+2. **Portrety od nowa:** Bastion (398), Władca Piorunów (400) i Arcymag Żywiołów (402). W odrzuconych postać zajmowała mniej niż dwie trzecie wysokości obrazka, więc w grze wyszłaby grubszym pikselem niż portrety w grze. Nowe opisy każą postaci zajmować około dziewięciu dziesiątych wysokości, jak w zatwierdzonych.
+3. **Strzelec Wyborowy (399)** dostaje strój wyraźnie ponad Snajpera: czarną skórzaną zbroję ze srebrnymi płytami, ciemnozielony płaszcz z wysokim kołnierzem i srebrną zapinką w kształcie jastrzębia, srebrny diadem oraz wysoki czarny łuk ze srebrnymi zdobieniami.
+4. **Druid i Nekromanta.** Arkanista ewoluuje w Druida / Druidkę, a Truciciel w Nekromantę / Nekromantkę, jak autor zapowiedział wcześniej (26.10: Nekromanta „docelowo, nie przy pierwszej ewolucji”; 27.10: Druid „będzie ewolucją Arkanisty”). Zastępują propozycje Mistrza Arkanów i Mistrza Jadów (404 i 409), z nowym opisem, cechą i umiejętnościami.
+5. **Dwie wersje.** Każda propozycja idzie do autora od razu z portretem kobiety i mężczyzny, także te już zatwierdzone. Odcienie skóry powstają potem w kodzie, jak przy pierwszej ewolucji.
+6. **Chód** (postać w scenie Walki, też na wierzchowcu) powstaje po zatwierdzeniu portretów.
+
 ## Wersja 0.0.86 (2.11.2026)
 
 1. **Co wchodzi do gry:** Wymiana zasobów w Gildii oraz Ranking gildii ze Sławą tygodnia i złotym skrótem najlepszej gildii (zob. sekcje niżej). Zakładka Społeczności „Ranking postaci” nazywa się teraz „Ranking”.
