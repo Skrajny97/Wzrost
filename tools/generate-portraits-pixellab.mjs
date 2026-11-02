@@ -86,7 +86,13 @@ const describeBalance = (balance) =>
 const width = kind.width;
 const height = kind.height;
 const png = (path) => ({ type: 'base64', base64: readFileSync(path).toString('base64'), format: 'png' });
-const reference = (path) => ({ image: png(path), size: { width, height } });
+// A reference goes with its own size (PixelLab refuses one that is not the
+// size given): a PNG keeps it in its header, after the signature.
+const sizeOf = (path) => {
+  const bytes = readFileSync(path);
+  return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+};
+const reference = (path) => ({ image: png(path), size: sizeOf(path) });
 const promptOf = (id) => (typeof kind.prompts[id] === 'string' ? kind.prompts[id] : kind.prompts[id].prompt);
 
 // One call: sent, then polled until PixelLab has drawn its four versions. A
