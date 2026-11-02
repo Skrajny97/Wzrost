@@ -31,7 +31,10 @@ A "trot" in art/mounts.json:
            if given, where it meets the clear above ("seam": the outline
            on the gap's left, inside the mount now, takes the coat beside
            it); a deep gap fills from the bottom up. The Stajnia's picture
-           takes the same patch.
+           takes the same patch;
+  "picture": the frame of the loop (counted from 1) that is the mount's
+             picture on its card in the Stajnia and the Sklep Systemu, cut
+             to the mount, so the card shows the mount as it walks.
 
     python3 -I tools/mount-trots.py [DRAFTS_DIR]
 
@@ -186,6 +189,13 @@ def main():
             start = Image.open(os.path.join(ROOT, mount['start'])).convert('RGBA')
             picture = patch(start.copy(), trot['patch'], (0, 0)).crop(start.getbbox())
             picture.save(os.path.join(ROOT, 'src', 'client', 'art', 'mounts', f'{mount_id}.png'), optimize=True)
+        if trot.get('picture'):
+            # The picture on the mount's card (the Stajnia, the Sklep Systemu)
+            # is a frame of its walk ("picture", counted from 1), cut to the
+            # mount, so the card shows it as it walks in the game (the
+            # author: "zmienić wygląd w karcie na najnowszy, jeśli jest nowy").
+            shown = frames[trot['picture'] - 1]
+            shown.crop(shown.getbbox()).save(os.path.join(ROOT, 'src', 'client', 'art', 'mounts', f'{mount_id}.png'), optimize=True)
         sheet = Image.new('RGBA', (width * len(frames), height), (0, 0, 0, 0))
         for index, frame in enumerate(frames):
             sheet.alpha_composite(frame, (index * width, 0))

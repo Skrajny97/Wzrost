@@ -12,7 +12,7 @@
       "pony": { "file": "art/scenes/mounts/pony.png", "width": 104, "height": 90, "frames": 8, "fps": 8, "seats": [[41, 37], [41, 36], [41, 35], [41, 36], [41, 37], [41, 36], [41, 35], [41, 36]] },
       "horse": { "file": "art/scenes/mounts/horse.png", "width": 126, "height": 108, "frames": 8, "fps": 8, "seats": [[48, 44], [48, 43], [48, 41], [48, 43], [48, 44], [48, 43], [48, 42], [48, 43]] },
       "steed": { "file": "art/scenes/mounts/steed.png", "width": 148, "height": 132, "frames": 8, "fps": 8, "seats": [[57, 53], [57, 52], [57, 50], [57, 52], [57, 54], [57, 52], [57, 50], [57, 52]] },
-      "sabertooth": { "file": "art/scenes/mounts/sabertooth.png", "width": 204, "height": 119, "frames": 12, "fps": 10, "seats": [[93, 37], [93, 37], [93, 37], [93, 37], [93, 37], [93, 37], [93, 37], [93, 37], [93, 37], [93, 36], [93, 36], [93, 37]] }
+      "sabertooth": { "file": "art/scenes/mounts/sabertooth.png", "width": 204, "height": 119, "frames": 12, "fps": 10, "seats": [[93, 37], [93, 37], [93, 37], [94, 38], [94, 38], [94, 38], [93, 37], [93, 37], [93, 37], [93, 36], [93, 37], [93, 37]] }
     },
     "walker": { "size": 128, "frames": 8, "fps": 8, "scale": 1 },
     "path": "art/scenes/path.png",
