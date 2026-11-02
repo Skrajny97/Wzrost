@@ -644,6 +644,28 @@ describe('hunts', () => {
     assert.ok(pace(15).eliteChance < pace(240).eliteChance);
   });
 
+  test('a longer exploration pays off more: from half an hour on, the elite, the champion and finds come more often in an hour', () => {
+    const pace = (minutes) => explorationPace(minutes, content);
+    // Meetings and finds a minute.
+    const elites = (minutes) => (pace(minutes).eliteChance * pace(minutes).fights) / minutes;
+    const champions = (minutes) => (pace(minutes).championChance * pace(minutes).fights) / minutes;
+    const finds = (minutes) => pace(minutes).finds / minutes;
+    const near = (a, b) => Math.abs(a - b) < 1e-12;
+    // Up to half an hour the same in an hour, as before.
+    for (const minutes of [1, 5, 15]) {
+      assert.ok(near(elites(minutes), elites(30)), `${minutes}`);
+      assert.ok(near(champions(minutes), champions(30)), `${minutes}`);
+      assert.ok(near(finds(minutes), finds(30)), `${minutes}`);
+    }
+    // Then more and more: twice the elites and champions and a fifth more
+    // finds in an hour of a four-hour exploration.
+    assert.ok(elites(30) < elites(60) && elites(60) < elites(120) && elites(120) < elites(240));
+    assert.ok(near(elites(240), 2 * elites(30)));
+    assert.ok(near(champions(240), 2 * champions(30)));
+    assert.ok(finds(30) < finds(60) && finds(60) < finds(240));
+    assert.ok(near(finds(240), 1.2 * finds(30)));
+  });
+
   test('demanding encounters are stronger and leave more materials', () => {
     const level = 20;
     const withTough = (chance) => ({ ...content, balance: { ...content.balance, hunt: { ...content.balance.hunt, toughChanceByMinutes: [[1, chance]] } } });
@@ -1702,7 +1724,8 @@ describe('champions', () => {
     assert.ok(!areaDangers(content.areasById['viper-heaps'], content).some((danger) => danger.champion));
     // The rarest meeting of all: less often than the elite.
     const pace = explorationPace(60, content);
-    assert.equal(pace.championChance, content.balance.hunt.championChancePerFight * pace.timeFactor);
+    const longer = Object.fromEntries(content.balance.hunt.rareLengthFactorByMinutes)[60];
+    assert.equal(pace.championChance, content.balance.hunt.championChancePerFight * pace.timeFactor * longer);
     assert.ok(pace.championChance < pace.eliteChance);
   });
 

@@ -2996,6 +2996,30 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Długie wyprawy opłacają się bardziej, elita częściej na długich (2.11.2026)
+
+Autor: „chodzi czy bardziej sie oplacaja krotkie wyprawy czy długie, bo powinny mimo wszystko długie w pewnym stopniu” i „i czy szansa na spotkanie elity jest wyższa w dłuższej wyprawie czy krótszej? bo powinna w dłuższej”.
+
+1. **Jak było** (symulacja `tools/difficulty-sim.mjs`, gracz z towarzyszami i gracz realistyczny, poziomy 30, 50 i 75, wyprawa 4-godzinna wobec półgodzinnej): na godzinę o 16–21% więcej XP i o 11–12% więcej złota (lekka premia za długość i częstsze wymagające spotkania), tyle samo przedmiotów, elit i czempionów, a zdarzeń ośmiokrotnie mniej, bo zdarzenie przychodzi z szansą 10% na wyprawę. Szansa na elitę na jedną wyprawę rosła z długością (pół godziny ok. 1,5%, 4 godziny ok. 12%), ale na godzinę była ta sama.
+2. **Zmiana (brakujący szczegół w kierunku wskazanym przez autora).** Od pół godziny elita i czempion przychodzą na godzinę coraz częściej: godzina ×1,25, 2 godziny ×1,5, 4 godziny ×2 (`rareLengthFactorByMinutes`). Znaleziska (skrzynie skarbów i złoto) też: godzina ×1,05, 2 godziny ×1,1, 4 godziny ×1,2 (`findLengthFactorByMinutes`). Pomiędzy wartości rosną płynnie. Do pół godziny bez zmian, więc procenty w Bestiariuszu, liczone dla wyprawy półgodzinnej, zostają takie same.
+3. **Jak jest:** 4-godzinna wyprawa daje na godzinę o 18–24% więcej XP i o 21–23% więcej złota niż półgodzinna, ok. 20% więcej przedmiotów i dwa razy więcej elit i czempionów. Elita na jedną wyprawę: pół godziny ok. 1,5%, godzina ok. 3,8%, 2 godziny ok. 9%, 4 godziny ok. 24% (wcześniej 1,5%, 3%, 6% i 12%); czempion o połowę rzadziej. Omdlenia: 0% na poziomach 30 i 50, na 75 przy 4 godzinach 1,1% → 2,0% u gracza z towarzyszami i 0% u realistycznego.
+4. **Zdarzenia zostają przy 10% na wyprawę**, jak ustalił autor („10% wypraw”, 338 A). Czy długie wyprawy mają mieć ich więcej, to pytanie do autora w porannym raporcie.
+
+## Układ na komputer, drugi etap (2.11.2026)
+
+Według 476 A i 477 A (przyjęte przed snem autora, zob. „Osobny wygląd na komputer: plan i pytania 472–477”):
+
+1. **Przedmiot pod myszą (477 A).** Na komputerze najechanie myszą na przedmiot w plecaku albo na postaci pokazuje obok małą kartę: nazwę, rzadkość, miejsce, poziom i Tier, właściwości, cenę u złomiarza i zdanie „Lepiej / Gorzej / Coś za coś”, bez klikania (`src/client/item-tip.js`). Kliknięcie, klawisz albo przewinięcie chowa kartę.
+2. **Klawisze 1–5 (477 A).** Otwierają główne zakładki jak menu z lewej: 1 Postać, 2 Walka, 3 Profesje, 4 Osada, 5 Społeczność (`src/client/keys.js`). Nie działają przy pisaniu (czat, pola), nad otwartym oknem ani z Ctrl, Alt, Shift i Cmd. Esc zamyka okna sam (okna przeglądarki).
+3. **Walka (476 A).** Krainy stoją po dwie obok siebie, w szerszej kolumnie (do 1120 px).
+4. **Obóz i Osada (476 A).** Plansze są większe (do 720 px szerokości zamiast 560); budynki stoją w procentach planszy, więc rosną razem z nią.
+
+## Wersja 0.0.98 (2.11.2026)
+
+1. **Co wchodzi do gry:** długie wyprawy opłacają się bardziej, a elita i czempion przychodzą na nich częściej, oraz drugi etap układu na komputer: karta przedmiotu pod myszą, klawisze 1–5, krainy po dwie w Walce i większe plansze Obozu i Osady (zob. wyżej). Test mikstur na wyprawie pije teraz od 70% HP, bo ze zmianą losowania jego 20 wypraw przy progu 40% nie wypiło ani jednej mikstury.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (866 z 866) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków); w przeglądarce karta przedmiotu pod myszą, klawisze 1–5 (także że nie przełączają przy pisaniu w czacie), krainy po dwie i większe plansze; symulacje długości wypraw przed zmianą i po niej (zob. wyżej).
+
 ## Układ na komputer, pierwszy etap (2.11.2026)
 
 Według 473 A, 474 A i 475 A (zob. niżej „Osobny wygląd na komputer: plan i pytania 472–477”):
