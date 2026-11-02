@@ -146,18 +146,21 @@ export async function testClassLevel(context) {
 
 // POST /api/evolution/undo: back to where the test started, the class or
 // the first evolution taken for good, with the skills it had then, and the
-// stat points if they were reset (test version).
+// stat points if they were reset (test version). Back at a first
+// evolution taken for good, its free reset of the stat points, if still
+// waiting, waits on.
 export async function undoEvolution(context) {
   requireEvolutions();
   const { session, player } = await requireBuildPlayer(context);
   requireTests(context, session);
   if (!player.row.evolution_undo) throw new ApiError(409, 'no_test_evolution', 'Cofnąć można tylko ewolucję z testu.');
+  const back = evolutionBefore(player.row.evolution_undo);
   const db = context.env.DB;
   const result = await db
     .prepare(
-      'UPDATE characters SET evolution = ?, skills = evolution_undo, evolution_undo = NULL, points = COALESCE(points_undo, points), points_undo = NULL, evolution_reset = 0, version = version + 1 WHERE id = ? AND version = ?',
+      'UPDATE characters SET evolution = ?, skills = evolution_undo, evolution_undo = NULL, points = COALESCE(points_undo, points), points_undo = NULL, evolution_reset = ?, version = version + 1 WHERE id = ? AND version = ?',
     )
-    .bind(evolutionBefore(player.row.evolution_undo), player.row.id, player.row.version)
+    .bind(back, back ? (player.row.evolution_reset ?? 0) : 0, player.row.id, player.row.version)
     .run();
   if (result.meta.changes !== 1) throw conflict();
   const fresh = await loadPlayer(db, session.userId);
