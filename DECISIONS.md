@@ -3000,7 +3000,7 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 
 1. **Co wchodzi do gry:** ulepszanie przedmiotów towarzyszy na Kowadle, „Zostań w kwaterze” i Drużyna bez towarzyszy z Kwater oraz rozmowy z towarzyszami na każdy stopień relacji (zob. dwie sekcje niżej). Do tego chód Tygrysa szablozębnego z głową poruszającą się w rytm kroków i jego nowy obrazek na karcie (373, 374; zob. „Tygrys szablozębny 371 B…”, punkt 1 i nowy punkt 4).
 2. **Baza danych:** bez migracji.
-3. **Przed wdrożeniem:** wszystkie testy (TESTS) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Kartę towarzysza z przedmiotami, Kowadło przy przedmiocie towarzysza, „Zostań w kwaterze” i odmowę w Drużynie sprawdzono w przeglądarce na 390×844.
+3. **Przed wdrożeniem:** wszystkie testy (834) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Kartę towarzysza z przedmiotami, Kowadło przy przedmiocie towarzysza, „Zostań w kwaterze” i odmowę w Drużynie sprawdzono w przeglądarce na 390×844.
 
 ## Towarzysze: ulepszanie przedmiotów i pobyt w kwaterze (2.11.2026)
 
