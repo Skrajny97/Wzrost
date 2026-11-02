@@ -9,6 +9,8 @@ import { countOf } from './format.js';
 import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
 import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
+import { layoutChoice, layoutOffered, onLayoutChange, setLayoutChoice } from './layout-mode.js';
+import { updateSide } from './side.js';
 import { showQuests, watchQuests } from './quests.js';
 import { offerNameNotice, offerRename, openNameChange } from './rename.js';
 import { mountAuthor } from './screens/author.js';
@@ -95,7 +97,15 @@ let ticker = null;
 
 function show(name) {
   for (const [key, view] of Object.entries(views)) view.hidden = key !== name;
+  updateSide();
 }
+
+// Another layout (the settings, or the window grown or shrunk past a
+// computer's width): the menu and the side column as it wants them.
+onLayoutChange(() => {
+  renderNav();
+  updateSide();
+});
 
 // How a return from Google sign-in went: the server sends the browser to
 // /?google=<result> (src/server/google.js).
@@ -414,6 +424,8 @@ onCharacterChange(() => {
   if (views.game.hidden || !current) return;
   updateTopbar();
   renderNav();
+  // The chat in the side column once the Społeczność opens.
+  updateSide();
   current.screen.update?.();
   narrate();
   // The narrator's lines read: the invitation may come once he is done.
@@ -490,6 +502,35 @@ function volumeRow(id, label, value, change, preview) {
 
 // The size of the game on the screen (zoom.js): "−" takes it farther, "+"
 // closer, 5% at a time.
+// "Układ ekranu" (473 A): the computer's layout on its own on a wide screen
+// with a mouse, or the phone's or the computer's always, on this device.
+const LAYOUTS = [
+  { id: 'auto', name: 'Sam' },
+  { id: 'phone', name: 'Telefon' },
+  { id: 'desktop', name: 'Komputer' },
+];
+
+function layoutRow() {
+  const buttons = LAYOUTS.map((layout) =>
+    h('button', {
+      type: 'button',
+      class: 'segmented-option',
+      'aria-pressed': String(layoutChoice() === layout.id),
+      text: layout.name,
+      onClick: () => {
+        setLayoutChoice(layout.id);
+        for (const [index, button] of buttons.entries()) button.setAttribute('aria-pressed', String(LAYOUTS[index].id === layoutChoice()));
+      },
+    }),
+  );
+  return h(
+    'div',
+    { class: 'status-row status-row--layout' },
+    h('dt', { id: 'layout-label', text: 'Układ ekranu' }),
+    h('dd', {}, h('div', { class: 'segmented segmented--three', role: 'group', 'aria-labelledby': 'layout-label' }, buttons)),
+  );
+}
+
 function zoomRow() {
   const output = h('output', { class: 'zoom-value', 'aria-live': 'polite' });
   const step = (direction) => {
@@ -688,6 +729,7 @@ function openSettings() {
     h(
       'dl',
       { class: 'status-list' },
+      layoutOffered() && layoutRow(),
       h('div', { class: 'status-row' }, h('dt', { text: 'Konto' }), h('dd', { text: state.user.login })),
       emailRow(),
       nameRow(),

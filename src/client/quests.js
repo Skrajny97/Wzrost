@@ -168,48 +168,50 @@ function chestButton(periodId, period) {
   );
 }
 
-function tabButton(periodId, quests) {
+function tabButton(periodId, quests, id) {
   const count = claimable(quests, periodId);
   return h(
     'button',
     {
       type: 'button',
       role: 'tab',
-      id: `quests-tab-${periodId}`,
+      id: `${id}-tab-${periodId}`,
       class: `quests-tab${count > 0 ? ' quests-tab--ready' : ''}`,
       'aria-selected': String(tab === periodId),
-      'aria-controls': 'quests-panel',
+      'aria-controls': `${id}-panel`,
       tabindex: tab === periodId ? '0' : '-1',
       onClick: () => {
         tab = periodId;
-        draw();
+        drawAll();
       },
     },
     quests[periodId].name,
   );
 }
 
-// The page of the open parchment, drawn again on every change.
-function draw(now = serverNow()) {
-  if (!open) return;
+// The quests drawn into a place: the open parchment, or the side column on
+// a computer (side.js), each with its own ids (`id`) and its countdown;
+// the parchment closes with "Zwiń" (`fold`).
+function drawPage(place, now = serverNow()) {
   const quests = state.character.quests;
   const period = quests[tab];
   const waiting = period.quests.some((quest) => quest.done && !quest.claimed);
-  open.endsAt = period.endsAt;
-  open.countdown = h('span', { class: 'quests-timer', text: untilNew(period.endsAt - now) });
+  const { id } = place;
+  place.endsAt = period.endsAt;
+  place.countdown = h('span', { class: 'quests-timer', text: untilNew(period.endsAt - now) });
   fill(
-    open.page,
-    h('p', { class: 'narrator-label quests-label', id: 'quests-label', text: 'Zadania od narratora' }),
+    place.page,
+    h('p', { class: 'narrator-label quests-label', id: `${id}-label`, text: 'Zadania od narratora' }),
     h(
       'div',
       { class: 'quests-head' },
-      h('div', { class: 'quests-tabs', role: 'tablist', 'aria-labelledby': 'quests-label' }, PERIODS.map((periodId) => tabButton(periodId, quests))),
+      h('div', { class: 'quests-tabs', role: 'tablist', 'aria-labelledby': `${id}-label` }, PERIODS.map((periodId) => tabButton(periodId, quests, id))),
       chestButton(tab, period),
     ),
     h(
       'div',
-      { class: 'quests-panel', id: 'quests-panel', role: 'tabpanel', 'aria-labelledby': `quests-tab-${tab}` },
-      h('p', { class: 'quests-reset' }, 'Nowe zadania za ', open.countdown),
+      { class: 'quests-panel', id: `${id}-panel`, role: 'tabpanel', 'aria-labelledby': `${id}-tab-${tab}` },
+      h('p', { class: 'quests-reset' }, 'Nowe zadania za ', place.countdown),
       // A week drawn while it was under way asks for less (quests.json, late).
       period.late && h('p', { class: 'quests-note', text: period.late }),
       period.quests.length > 0
@@ -218,24 +220,57 @@ function draw(now = serverNow()) {
       rerollPart(tab, period),
       h('p', { class: 'quests-note', text: period.chest.text }),
     ),
-    h(
-      'div',
-      { class: 'narrator-actions' },
-      waiting &&
-        h('button', {
-          type: 'button',
-          class: 'button quest-claim quests-claim-all',
-          text: 'Odbierz wszystkie',
-          onClick: (event) => withButton(event.currentTarget, () => claimAll(tab)),
-        }),
-      h('button', { type: 'button', class: 'button narrator-next', text: 'Zwiń', onClick: () => showQuests(false) }),
-    ),
+    (waiting || place.fold) &&
+      h(
+        'div',
+        { class: 'narrator-actions' },
+        waiting &&
+          h('button', {
+            type: 'button',
+            class: 'button quest-claim quests-claim-all',
+            text: 'Odbierz wszystkie',
+            onClick: (event) => withButton(event.currentTarget, () => claimAll(tab)),
+          }),
+        place.fold && h('button', { type: 'button', class: 'button narrator-next', text: 'Zwiń', onClick: () => showQuests(false) }),
+      ),
   );
+}
+
+// The page of the open parchment, drawn again on every change.
+function draw(now = serverNow()) {
+  if (open) drawPage(open, now);
+}
+
+// The quests in the side column on a computer, while it is there.
+let panel = null; // { id, page, timer, endsAt, countdown }
+
+// The parchment and the side column both, after a change of tab.
+function drawAll() {
+  draw();
+  if (panel && state.character?.quests) drawPage(panel);
+}
+
+// The quests always in sight in the side column on a computer (474 A):
+// the parchment's page without the parchment. Returns its unmount.
+export function mountQuestsPanel(container) {
+  const page = h('div', { class: 'narrator-page quests-page quests-page--side' });
+  fill(container, page);
+  const place = { id: 'side-quests', page, timer: setInterval(() => tickPlace(place), 1000) };
+  panel = place;
+  if (state.character?.quests) drawPage(place);
+  return () => {
+    clearInterval(place.timer);
+    if (panel === place) panel = null;
+  };
+}
+
+function tickPlace(place) {
+  if (place.countdown) place.countdown.textContent = untilNew(place.endsAt - serverNow());
 }
 
 // Every second the time to the new quests counts down.
 function tick() {
-  if (open && !open.closing && open.countdown) open.countdown.textContent = untilNew(open.endsAt - serverNow());
+  if (open && !open.closing) tickPlace(open);
 }
 
 // When a period ends, the character is fetched again with its new quests
@@ -324,7 +359,7 @@ export function showQuests(show = true) {
     closeQuests();
   });
   document.body.append(dialog);
-  open = { dialog, sheet, page, timer: setInterval(tick, 1000) };
+  open = { id: 'quests', fold: true, dialog, sheet, page, timer: setInterval(tick, 1000) };
   draw();
   dialog.showModal();
   playSound('open');
@@ -346,7 +381,10 @@ async function closeQuests() {
   if (open === current) open = null;
 }
 
-// An open parchment follows the character: progress, rewards taken.
+// An open parchment and the side column follow the character: progress,
+// rewards taken.
 onCharacterChange(() => {
-  if (open && !open.closing && state.character?.quests) draw();
+  if (!state.character?.quests) return;
+  if (open && !open.closing) draw();
+  if (panel) drawPage(panel);
 });

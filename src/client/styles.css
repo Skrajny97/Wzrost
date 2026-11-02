@@ -11365,3 +11365,328 @@ a.profession-square:active {
 .calm .portrait-frame--pulse .portrait-frame-art {
   filter: drop-shadow(0 0 1.5cqw rgba(143, 227, 239, 0.7));
 }
+
+/* The menu's wrapper has no box of its own on a phone, where the two bars
+   stay at the bottom; the computer's menu down the left (below). */
+.menu {
+  display: contents;
+}
+
+.menu-brand {
+  display: none;
+}
+
+/* The computer's own layout (layout-mode.js; the author: "musi być
+   kompletnie osobne"): the menu down the left with the character's tabs
+   under its Postać, the top bar in one line, the game in the middle, the
+   narrator's quests and the chat on the right (474 A), and windows in the
+   middle of the screen (475 A). Nothing here touches the phone's layout. */
+:root[data-layout='desktop'] {
+  --nav-height: 0px;
+  --menu-width: 236px;
+  --side-width: 360px;
+}
+
+:root[data-layout='desktop'] #view-game:not([hidden]) {
+  display: grid;
+  grid-template-columns: var(--menu-width) minmax(0, 1fr) var(--side-width);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas:
+    'menu top top'
+    'menu main side';
+  min-height: 100vh;
+}
+
+:root[data-layout='desktop'] .topbar {
+  grid-area: top;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(280px, 380px);
+  align-items: center;
+  gap: 28px;
+  padding: 10px 28px;
+}
+
+:root[data-layout='desktop'] .topbar-row {
+  gap: 18px;
+}
+
+:root[data-layout='desktop'] .meters {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 18px;
+}
+
+:root[data-layout='desktop'] .menu {
+  grid-area: menu;
+  position: sticky;
+  top: 0;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100vh;
+  padding: 20px 14px;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+  background: var(--bg-deep);
+}
+
+:root[data-layout='desktop'] .menu-brand {
+  display: block;
+  order: 0;
+  margin: 0 0 18px 14px;
+  color: var(--accent);
+  font-family: var(--font-world);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* The main tabs as the menu's own rows, Postać first with the character's
+   tabs right under it. */
+:root[data-layout='desktop'] #nav-main {
+  display: contents;
+}
+
+:root[data-layout='desktop'] #nav-main > .nav-item {
+  order: 3;
+}
+
+:root[data-layout='desktop'] #nav-main > .nav-item[href='#/postac'] {
+  order: 1;
+}
+
+:root[data-layout='desktop'] #nav-character:not([hidden]) {
+  order: 2;
+  position: static;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  height: auto;
+  margin: 2px 0 8px 22px;
+  padding: 0 0 0 10px;
+  border: 0;
+  border-left: 1px solid var(--bark-line);
+  background: none;
+}
+
+/* "Powrót" is not needed with the whole menu in sight. */
+:root[data-layout='desktop'] #nav-character button.nav-item {
+  display: none;
+}
+
+:root[data-layout='desktop'] .menu .nav-item {
+  flex: none;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 14px;
+  height: 50px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font-size: 18px;
+}
+
+:root[data-layout='desktop'] #nav-character .nav-item {
+  height: 40px;
+  font-size: 16px;
+}
+
+:root[data-layout='desktop'] .menu .nav-hint {
+  margin-left: auto;
+}
+
+:root[data-layout='desktop'] .nav--main .nav-item[aria-current='page'] {
+  box-shadow: inset 3px 0 0 var(--system);
+}
+
+:root[data-layout='desktop'] .nav--character .nav-item[aria-current='page'] {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+:root[data-layout='desktop'] .menu .nav-item:hover {
+  background: rgba(143, 227, 239, 0.06);
+  color: var(--text);
+}
+
+/* The game: for now each screen as on a phone, in a wider column; the
+   screens get their own columns one by one. */
+:root[data-layout='desktop'] .screen--game {
+  grid-area: main;
+  max-width: 760px;
+  padding: 24px 32px 48px;
+}
+
+/* The side column, under the top bar while the page scrolls. */
+:root[data-layout='desktop'] .side:not([hidden]) {
+  grid-area: side;
+  position: sticky;
+  top: var(--topbar-height, 72px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: calc(100vh - var(--topbar-height, 72px));
+  padding: 16px;
+  overflow: hidden;
+  border-left: 1px solid var(--line);
+  background: var(--bg-deep);
+}
+
+.side .side-quests {
+  flex: 0 1 auto;
+  max-height: 55%;
+  overflow-y: auto;
+  border-radius: 4px;
+  color: #33281c;
+}
+
+.side .quests-page {
+  max-height: none;
+  overflow: visible;
+}
+
+.side-chat {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.side-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.side-chat-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.side .chat-room {
+  min-height: 100%;
+}
+
+.side .chat-footer:has(.chat-form) {
+  bottom: 0;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.side-note {
+  margin: 0;
+}
+
+/* The line to write in gives way in the narrow column, "Wyślij" stays. */
+.side .chat-form {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.side .chat-form input {
+  width: 0;
+}
+
+/* Windows in the middle of the screen (475 A). */
+:root[data-layout='desktop'] .sheet {
+  inset: 0;
+  width: min(560px, calc(100vw - 64px));
+  max-width: 560px;
+  height: fit-content;
+  max-height: 88vh;
+  margin: auto;
+  border: 1px solid var(--bark-line);
+  border-radius: 8px;
+}
+
+/* The stats' bar of points to confirm, over the game only. */
+:root[data-layout='desktop'] .pending-bar {
+  right: var(--side-width);
+  left: var(--menu-width);
+}
+
+/* Three choices side by side ("Układ ekranu"). */
+.segmented--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* A laptop's narrower screen: the top bar in two lines, the four meters
+   across the whole second one. */
+@media (max-width: 1499px) {
+  :root[data-layout='desktop'] .topbar {
+    grid-template-columns: auto minmax(0, 1fr);
+    row-gap: 8px;
+  }
+
+  :root[data-layout='desktop'] .topbar .meters {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+
+  :root[data-layout='desktop'] .activity-row {
+    justify-self: end;
+    width: min(100%, 420px);
+  }
+
+  :root[data-layout='desktop'] {
+    --side-width: 320px;
+  }
+
+  :root[data-layout='desktop'] .screen--game {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+
+  :root[data-layout='desktop'] .character-columns {
+    grid-template-columns: 360px minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+
+/* Narrower still, the side column gives way to the game: the quests unroll
+   from the narrator's face and the chat is in the Społeczność, as on a
+   phone (side.js). */
+@media (max-width: 1279px) {
+  :root[data-layout='desktop'] #view-game:not([hidden]) {
+    grid-template-columns: var(--menu-width) minmax(0, 1fr);
+    grid-template-areas:
+      'menu top'
+      'menu main';
+  }
+
+  :root[data-layout='desktop'] .side {
+    display: none !important;
+  }
+
+  :root[data-layout='desktop'] .pending-bar {
+    right: 0;
+  }
+}
+
+/* Postać: the figure in its frame and the bag, one under the other on a
+   phone (the wrappers have no box), side by side on a computer. */
+.character-columns,
+.character-figure {
+  display: contents;
+}
+
+:root[data-layout='desktop'] .screen--game:has(.character-columns) {
+  max-width: 1120px;
+}
+
+:root[data-layout='desktop'] .character-columns {
+  display: grid;
+  grid-template-columns: 420px minmax(0, 1fr);
+  align-items: start;
+  gap: 32px;
+}
+
+:root[data-layout='desktop'] .character-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+:root[data-layout='desktop'] .character-columns > .bag {
+  min-width: 0;
+}

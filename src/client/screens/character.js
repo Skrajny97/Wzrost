@@ -133,11 +133,21 @@ export function mountCharacter(container) {
         tag: character.guildTag,
         nameColor: character.nameColor,
       }),
-      // What works on the character now, over its figure (the author).
-      bonusList(character),
-      h('div', { class: 'portrait-wrap' }, frame),
-      systemPanel(...characterMessage(character, busy)),
-      bagSection(character.bag),
+      // On a computer the figure and the bag side by side (styles.css); on
+      // a phone these wrappers have no box of their own.
+      h(
+        'div',
+        { class: 'character-columns' },
+        h(
+          'div',
+          { class: 'character-figure' },
+          // What works on the character now, over its figure (the author).
+          bonusList(character),
+          h('div', { class: 'portrait-wrap' }, frame),
+          systemPanel(...characterMessage(character, busy)),
+        ),
+        bagSection(character.bag),
+      ),
     );
   }
 

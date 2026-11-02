@@ -223,7 +223,10 @@ function sectionPicker(sections, current, choose) {
 
 // The Czat: its tabs, its notices, the players hidden and the room of
 // messages. `person` is the private conversation to open first.
-function mountChat(container, { bar, person = null }) {
+// Also in the side column on a computer (side.js), with its own `id` for
+// the line to write in, scrolling in its own box (`scroller`) and not the
+// page.
+export function mountChat(container, { bar, person = null, id = 'chat', scroller = null }) {
   const chat = state.content.chat;
   // The channel shown, or the other character of the private conversation
   // shown (null on a channel), and the private conversations for the tabs.
@@ -248,7 +251,7 @@ function mountChat(container, { bar, person = null }) {
   const placeholder = () => (talk ? `Do postaci ${talk.name}…` : channel.items ? 'Napisz ofertę…' : 'Napisz wiadomość…');
   const text = h('input', {
     type: 'text',
-    id: 'chat-text',
+    id: `${id}-text`,
     maxlength: String(chat.maxLength),
     autocomplete: 'off',
     enterkeyhint: 'send',
@@ -451,8 +454,11 @@ function mountChat(container, { bar, person = null }) {
     room.style.setProperty('--chat-top', `${top}px`);
   }
 
-  const atBottom = () => window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
-  const toBottom = () => window.scrollTo({ top: document.documentElement.scrollHeight });
+  const atBottom = () =>
+    scroller
+      ? scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 80
+      : window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+  const toBottom = () => (scroller ? scroller.scrollTo({ top: scroller.scrollHeight }) : window.scrollTo({ top: document.documentElement.scrollHeight }));
   // Whether the page follows the messages down once the answer is shown:
   // the line to write in comes under them with the first answer, after
   // they are added, and would hide the newest (the author: "niech czat
