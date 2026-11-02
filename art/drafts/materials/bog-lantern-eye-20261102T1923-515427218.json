@@ -1,0 +1,30 @@
+{
+  "id": "bog-lantern-eye",
+  "payload": {
+    "prompt": "round glowing yellow eye like a small lantern, wrapped in wet moss, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 515427218,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647854,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 20.61,
+    "request_id": "37de61e1-634a-481b-877a-9450bf027280",
+    "outputs_retained_until": 1793734227,
+    "billing": {
+      "source": "balance",
+      "balance_left": 20.61,
+      "balance_charged": 0.18
+    }
+  }
+}

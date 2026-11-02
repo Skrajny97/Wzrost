@@ -1,0 +1,30 @@
+{
+  "id": "bog-oak",
+  "payload": {
+    "prompt": "piece of pitch-black bog oak wood, hard and polished, with fine grain, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 481960215,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647749,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 21.15,
+    "request_id": "e45a04ea-dda7-45ba-924f-c41094967237",
+    "outputs_retained_until": 1793734104,
+    "billing": {
+      "source": "balance",
+      "balance_left": 21.15,
+      "balance_charged": 0.18
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "veles-scale",
+  "payload": {
+    "prompt": "large black serpent scale with faint golden Slavic patterns, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 557882099,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647801,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 20.97,
+    "request_id": "dac7f8ae-1066-4a44-acff-b307a35effaf",
+    "outputs_retained_until": 1793734151,
+    "billing": {
+      "source": "balance",
+      "balance_left": 20.97,
+      "balance_charged": 0.18
+    }
+  }
+}

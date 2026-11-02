@@ -1,0 +1,30 @@
+{
+  "id": "tern-feather",
+  "payload": {
+    "prompt": "slender dark grey feather with a black tip, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 784283849,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647703,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 21.33,
+    "request_id": "dc601cae-5b6c-4282-8cf9-c9ed181572d8",
+    "outputs_retained_until": 1793734051,
+    "billing": {
+      "source": "balance",
+      "balance_left": 21.33,
+      "balance_charged": 0.18
+    }
+  }
+}

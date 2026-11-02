@@ -1,0 +1,30 @@
+{
+  "id": "tick-shell",
+  "payload": {
+    "prompt": "small hard dark red-brown tick shell, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 1,
+    "seed": 980910133,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647899,
+    "credit_cost": 1,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 20.43,
+    "request_id": "7fe4827b-5bd5-49a7-b563-101a08a8df99",
+    "outputs_retained_until": 1793734255,
+    "billing": {
+      "source": "balance",
+      "balance_left": 20.43,
+      "balance_charged": 0.18
+    }
+  }
+}
