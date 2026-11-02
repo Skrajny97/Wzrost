@@ -7,7 +7,8 @@
 // by the first evolution (class level 50): until then the class waits there,
 // and then for the evolution chosen of the two paths in the Ewolucja tab
 // (screens/evolution.js). After it this tab holds the evolution's two
-// skills, up to level 45.
+// skills, up to level 45, and after the second form (class level 100) the
+// form's two, up to level 95.
 // The server sends every card ready to show (skillsView in the engine); a tap
 // on a learned skill opens its card. The narrator's tour of the tab
 // (narrator.js) points at the places marked data-guide.
@@ -19,8 +20,9 @@ import { motionOn } from '../motion.js';
 import { call, isUnlocked, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from '../ui.js';
 
-// The skill's icon: its sprite, that of the skill it grew from while an
-// evolution's has none of its own, or its first letter.
+// The skill's icon: its sprite (a second form's skill: its stand-in,
+// art.js), that of the skill it grew from while an evolution's has none of
+// its own, or its first letter.
 const skillIcon = (skill, size = 'large') =>
   h(
     'span',

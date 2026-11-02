@@ -6979,6 +6979,12 @@ button.skill-row {
   margin: 0;
 }
 
+/* A second form's description under its name. */
+.evolution-description {
+  margin: 0;
+  font-style: italic;
+}
+
 .evolution-skills {
   display: flex;
   flex-direction: column;

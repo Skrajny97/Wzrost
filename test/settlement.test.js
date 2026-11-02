@@ -721,6 +721,33 @@ describe('the Osada through the API', () => {
     assert.equal((await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'evolution', evolutionId: 'gladiator' } })).data.error.code, 'not_enough_gold');
   });
 
+  test('with a second form the Pustelnik changes the path for another path\'s second form, its skills from 0 and every point back', async () => {
+    await set(`level = 80, class_level = 120, evolution = 'berserker', skills = ?`, JSON.stringify({ 'shattering-blow': 60, 'berserker-roar': 50 }));
+    const offer = (await view()).hermit.evolution;
+    // The character is a woman: the forms go by their women's names.
+    assert.equal(offer.current, 'Berserkerka');
+    assert.deepEqual(offer.choices, [
+      { id: 'arena-champion', name: 'Czempionka Areny' },
+      { id: 'bastion', name: 'Bastion' },
+    ]);
+    assert.equal((await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'evolution', evolutionId: 'gladiator' } })).status, 400);
+    const changed = await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'evolution', evolutionId: 'arena-champion' } });
+    assert.equal(changed.status, 200, JSON.stringify(changed.data));
+    const row = await (await db()).prepare('SELECT evolution, skills FROM characters').first();
+    assert.equal(row.evolution, 'arena-champion');
+    assert.deepEqual(JSON.parse(row.skills), { 'steel-whirl': 0, duel: 0 });
+    const character = changed.data.character;
+    assert.equal(character.className, 'Czempionka Areny');
+    // 90 points back and 21 of class levels 100–120, for skills up to 95.
+    assert.equal(character.skills.points, 111);
+    assert.deepEqual(character.skills.pools[0].options.map((skill) => [skill.id, skill.maxLevel]), [
+      ['steel-whirl', 95],
+      ['duel', 95],
+    ]);
+    // The first evolutions keep their one name.
+    assert.equal(character.evolution.current.fromName, 'Gladiator');
+  });
+
   test('closer to the Zaklinaczka, the player keeps one of the affixes she draws', async () => {
     const database = await db();
     const { id } = await database.prepare('SELECT id FROM characters').first();

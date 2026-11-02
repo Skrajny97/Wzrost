@@ -8,10 +8,14 @@
 //
 //   node tools/evolution-sim.mjs                         levels 50, 60, 70, 80
 //   node tools/evolution-sim.mjs --levels 60 --hunts 300 --minutes 60
+//   node tools/evolution-sim.mjs --second                levels 85, 90, 95, 100
 //
 // An evolved character takes back the 40 Skill Points of its two skills and
 // gets one more for each class level up to 99, spread evenly over the
 // evolution's two skills, as a player who spends them as they come.
+// `--second` compares each first evolution, its skills at the top level,
+// with its second form at the same class level (past 100): the form takes
+// back the 90 points and gets one for each class level from 100 on.
 
 import { fileURLToPath } from 'node:url';
 import * as engine from '../src/engine/index.js';
@@ -19,10 +23,16 @@ import { loadData } from './validate-data.mjs';
 import { areaForLevel, typicalCharacter } from './simulate.mjs';
 
 export function evolvedSkills(evolution, classLevel, content) {
-  const { skillMaxLevel, lastPointClassLevel, pointsPerClassLevel } = content.evolutionRules;
-  const from = content.balance.progression.classEvolutionLevels[0];
-  const returned = 2 * content.balance.skills.maxLevel;
-  let points = returned + pointsPerClassLevel * Math.max(0, Math.min(classLevel, lastPointClassLevel) - from);
+  const stage = evolution.stage ?? 1;
+  const rules = content.evolutionStages?.[stage - 1] ?? content.evolutionRules;
+  const { skillMaxLevel, pointsPerClassLevel } = rules;
+  const levels = content.balance.progression.classEvolutionLevels;
+  const from = levels[stage - 1];
+  // The points the skills before had, all back: the class's two at their
+  // top level, or the first evolution's two at theirs.
+  const returned = stage === 1 ? 2 * content.balance.skills.maxLevel : 2 * (content.evolutionStages?.[stage - 2] ?? content.evolutionRules).skillMaxLevel;
+  const lastPointClassLevel = rules.lastPointClassLevel;
+  let points = returned + pointsPerClassLevel * Math.max(0, Math.min(classLevel, lastPointClassLevel) - from + (stage === 1 ? 0 : 1));
   const skills = Object.fromEntries(evolution.skills.map((id) => [id, 0]));
   for (let i = 0; points > 0; i = (i + 1) % evolution.skills.length) {
     const id = evolution.skills[i];
@@ -94,38 +104,59 @@ function parseArgs(argv) {
   return options;
 }
 
+// The rows of one class at one level: the class and its three evolutions,
+// or (second) each first evolution and its second form, one pair at a time.
+function rowsOf(cls, base, content, second) {
+  const evolved = (evolution) => {
+    const character = { ...base.character, evolution: evolution.id, skills: evolvedSkills(evolution, base.character.classLevel, content) };
+    character.points = engine.autoDistribute(character, content);
+    return { name: evolution.name, character };
+  };
+  const firsts = content.evolutions.filter((e) => e.classId === cls.id && !e.from);
+  if (!second) return [[{ name: cls.name, character: base.character }, ...firsts.map(evolved)]];
+  return firsts.map((first) => [evolved(first), evolved(engine.nextFormOf(first, content))]);
+}
+
 function main() {
   const options = parseArgs(process.argv.slice(2));
   const content = engine.buildContent(loadData());
-  const levels = (typeof options.levels === 'string' ? options.levels.split(',') : ['50', '60', '70', '80']).map(Number);
+  const second = Boolean(options.second);
+  const levels = (typeof options.levels === 'string' ? options.levels.split(',') : second ? ['85', '90', '95', '100'] : ['50', '60', '70', '80']).map(Number);
   const minutes = Number(options.minutes ?? 60);
   const hunts = Number(options.hunts ?? 200);
-  const from = content.balance.progression.classEvolutionLevels[0];
+  const from = content.balance.progression.classEvolutionLevels[second ? 1 : 0];
+  const only = typeof options.only === 'string' ? options.only.split(',') : null;
   console.log(`${hunts} wypraw po ${minutes} min na wiersz.`);
-  console.log('klasa / ewolucja         poz  klasa  HP maks.  omdlenia   XP/h  HP na końcu  walka  zadane  przyjęte  zadane wobec klasy  przyjęte wobec klasy');
+  const against = second ? 'ewolucji' : 'klasy';
+  console.log(`klasa / ewolucja         poz  klasa  HP maks.  omdlenia   XP/h  HP na końcu  walka  zadane  przyjęte  zadane wobec ${against}  przyjęte wobec ${against}  wymiana`);
   for (const cls of content.classes) {
     for (const level of levels) {
       const base = typicalCharacter(cls.id, level, content);
       if (base.character.classLevel <= from) continue;
-      const rows = [{ name: cls.name, character: base.character }];
-      for (const evolution of content.evolutions.filter((e) => e.classId === cls.id)) {
-        const character = { ...base.character, evolution: evolution.id, skills: evolvedSkills(evolution, base.character.classLevel, content) };
-        character.points = engine.autoDistribute(character, content);
-        rows.push({ name: evolution.name, character });
-      }
-      let first = null;
-      for (const row of rows) {
-        const r = simulateCharacter({ character: row.character, equipped: base.equipped, level, minutes, hunts, tag: row.name }, content);
-        first ??= r;
-        const pct = (value) => `${(value * 100).toFixed(1)}%`;
-        const vs = (value) => `${value >= 0 ? '+' : ''}${(value * 100).toFixed(0)}%`;
-        console.log(
-          `${row.name.padEnd(24)} ${String(level).padStart(3)} ${String(row.character.classLevel).padStart(6)} ${String(r.maxHp).padStart(9)} ${pct(r.faintRate).padStart(9)}` +
-            ` ${r.netXpPerHour.toFixed(0).padStart(6)} ${pct(r.endHp).padStart(12)} ${r.fightTime.toFixed(0).padStart(6)} ${r.dealtPerTime.toFixed(2).padStart(7)} ${r.takenPerTime.toFixed(2).padStart(9)}` +
-            ` ${vs(r.dealtPerTime / first.dealtPerTime - 1).padStart(19)} ${vs(r.takenPerTime / first.takenPerTime - 1).padStart(21)}`,
-        );
+      for (const rows of rowsOf(cls, base, content, second)) {
+        if (only && !rows.some((row) => only.includes(row.character.evolution))) continue;
+        printRows(rows, { level, minutes, hunts, base }, content);
       }
     }
+  }
+}
+
+// One row per character, each measured against the first of `rows`. The
+// last column is the exchange: damage dealt for each point of HP taken, as
+// a fight's HP loss is its foes' HP times taken / dealt.
+function printRows(rows, { level, minutes, hunts, base }, content) {
+  let first = null;
+  for (const row of rows) {
+    const r = simulateCharacter({ character: row.character, equipped: base.equipped, level, minutes, hunts, tag: row.name }, content);
+    first ??= r;
+    const pct = (value) => `${(value * 100).toFixed(1)}%`;
+    const vs = (value) => `${value >= 0 ? '+' : ''}${(value * 100).toFixed(0)}%`;
+    const exchange = (one) => one.dealtPerTime / Math.max(1e-9, one.takenPerTime);
+    console.log(
+      `${row.name.padEnd(24)} ${String(level).padStart(3)} ${String(row.character.classLevel).padStart(6)} ${String(r.maxHp).padStart(9)} ${pct(r.faintRate).padStart(9)}` +
+        ` ${r.netXpPerHour.toFixed(0).padStart(6)} ${pct(r.endHp).padStart(12)} ${r.fightTime.toFixed(0).padStart(6)} ${r.dealtPerTime.toFixed(2).padStart(7)} ${r.takenPerTime.toFixed(2).padStart(9)}` +
+        ` ${vs(r.dealtPerTime / first.dealtPerTime - 1).padStart(19)} ${vs(r.takenPerTime / first.takenPerTime - 1).padStart(21)} ${vs(exchange(r) / exchange(first) - 1).padStart(9)}`,
+    );
   }
 }
 

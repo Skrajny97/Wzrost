@@ -7,21 +7,43 @@
 const lookup = (entries) => Object.assign(Object.create(null), Object.fromEntries(entries));
 const byId = (list) => lookup(list.map((item) => [item.id, item]));
 
-// The evolutions' skills with what they take from their evolution: its class
-// and name (as a path), the class level of the first evolution and the
-// evolutions' top skill level.
-function evolutionSkills(raw) {
+// The evolutions with their stage: 1 for the first, chosen at the first
+// class level of balance.progression.classEvolutionLevels, 2 for the second
+// form that grows out of one (`from`), at the second.
+function stagedEvolutions(raw) {
+  const list = raw.evolutions?.evolutions ?? [];
+  const byOwnId = new Map(list.map((evolution) => [evolution.id, evolution]));
+  const stageOf = (evolution) => (evolution.from && byOwnId.has(evolution.from) ? stageOf(byOwnId.get(evolution.from)) + 1 : 1);
+  return list.map((evolution) => ({ ...evolution, stage: stageOf(evolution) }));
+}
+
+// The rules of each stage's skills and points: the first evolution's, then
+// the second forms' (data/evolutions.json, secondForms).
+function stageRules(raw) {
   if (!raw.evolutions) return [];
-  const evolutions = byId(raw.evolutions.evolutions);
-  const classLevel = raw.balance.progression.classEvolutionLevels[0];
-  return raw.evolutions.skills.map((skill) => ({
-    ...skill,
-    classId: evolutions[skill.evolution]?.classId,
-    path: evolutions[skill.evolution]?.name,
-    classLevel,
-    maxLevel: raw.evolutions.skillMaxLevel,
-    rarity: 'epic',
-  }));
+  const { skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms } = raw.evolutions;
+  return [{ skillMaxLevel, lastPointClassLevel, pointsPerClassLevel }, ...(secondForms ? [secondForms] : [])];
+}
+
+// The evolutions' skills with what they take from their evolution: its class
+// and name (as a path), the class level of its stage and that stage's top
+// skill level.
+function evolutionSkills(raw, evolutions, stages) {
+  if (!raw.evolutions) return [];
+  const byOwnId = byId(evolutions);
+  const levels = raw.balance.progression.classEvolutionLevels;
+  return raw.evolutions.skills.map((skill) => {
+    const evolution = byOwnId[skill.evolution];
+    const stage = evolution?.stage ?? 1;
+    return {
+      ...skill,
+      classId: evolution?.classId,
+      path: evolution?.name,
+      classLevel: levels[stage - 1],
+      maxLevel: stages[stage - 1]?.skillMaxLevel ?? raw.evolutions.skillMaxLevel,
+      rarity: 'epic',
+    };
+  });
 }
 
 // Each region is split into inner regions (areas) of a few levels. An area is
@@ -50,7 +72,9 @@ const creaturesOf = (area) =>
 
 export function buildContent(raw) {
   const { prefixes, suffixes, names } = raw.affixes;
-  const evolved = evolutionSkills(raw);
+  const evolutions = stagedEvolutions(raw);
+  const stages = stageRules(raw);
+  const evolved = evolutionSkills(raw, evolutions, stages);
   // An item found in an area takes the names of its affixes from the
   // creatures living there: a prefix from those with an adjective, a suffix
   // from any of them.
@@ -122,16 +146,18 @@ export function buildContent(raw) {
     quests: raw.quests,
     // The skills the classes choose from (skills.js), and the class
     // evolutions with their own skills (evolutions.js), known by id with the
-    // rest: each evolution skill takes its class, the class level of the
-    // first evolution and the evolutions' top skill level.
+    // rest: each evolution skill takes its class, the class level of its
+    // evolution's stage and that stage's top skill level. The evolutions,
+    // the first ones and their second forms, carry their stage.
     skills: raw.skills ?? [],
     skillsById: byId([...(raw.skills ?? []), ...evolved]),
-    evolutions: raw.evolutions?.evolutions ?? [],
-    evolutionsById: byId(raw.evolutions?.evolutions ?? []),
+    evolutions,
+    evolutionsById: byId(evolutions),
     evolutionSkills: evolved,
-    evolutionRules: raw.evolutions
-      ? { skillMaxLevel: raw.evolutions.skillMaxLevel, lastPointClassLevel: raw.evolutions.lastPointClassLevel, pointsPerClassLevel: raw.evolutions.pointsPerClassLevel }
-      : null,
+    // The first evolution's skills and points (evolutionRules) and every
+    // stage's, the second forms' after them (evolutionStages).
+    evolutionRules: stages[0] ?? null,
+    evolutionStages: stages,
     evolutionTexts: raw.evolutions?.texts ?? null,
     evolutionPlace: raw.evolutions?.place ?? null,
     // The gift codes typed in the settings (gift-codes.js); only their

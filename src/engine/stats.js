@@ -1,23 +1,22 @@
 // Character statistics: where each point comes from, free points and
 // distributing them by class.
 
+import { classSpans, levelsIn } from './evolutions.js';
 import { upgradedItem } from './items.js';
 import { professionStats } from './professions.js';
 
 // Totals and their sources (the segments of the source bar on the stats
 // screen). After the class's evolution its levels grow by the evolution's
-// growth, from the level after the evolution on.
+// growth, from the level after the evolution on, and after the second form
+// by the form's, from the level after it (classSpans).
 export function computeStats(character, equipped, content) {
   const cls = content.classesById[character.classId];
   const totals = {};
   const sources = {};
   const fromProfessions = professionStats(character.professions, content);
-  const evolution = character.evolution ? content.evolutionsById[character.evolution] : null;
-  const evolvedAt = content.balance.progression.classEvolutionLevels[0];
-  const classLevels = evolution ? Math.min(character.classLevel, evolvedAt) - 1 : character.classLevel - 1;
-  const evolvedLevels = evolution ? Math.max(0, character.classLevel - evolvedAt) : 0;
+  const spans = classSpans(character, content).map((span) => ({ growth: span.owner.growth, levels: levelsIn(span, 2, character.classLevel) }));
   for (const stat of content.statIds) {
-    const fromClass = Math.floor(cls.baseStats[stat] + (cls.growth[stat] ?? 0) * classLevels + (evolution?.growth[stat] ?? 0) * evolvedLevels);
+    const fromClass = Math.floor(spans.reduce((sum, span) => sum + (span.growth[stat] ?? 0) * span.levels, cls.baseStats[stat]));
     const fromPoints = character.points[stat] ?? 0;
     sources[stat] = { class: fromClass, character: fromPoints, professions: fromProfessions[stat] ?? 0, equipment: 0, core: 0 };
   }
