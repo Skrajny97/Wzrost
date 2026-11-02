@@ -1,9 +1,9 @@
 // The players' Gildie (src/server/guilds.js): founding one from level 30
 // for 1000 gold, with a unique name and tag; invitations by the leader and
-// the deputies, also of their friends at a tap; the roles; a leader who
-// leaves passes the lead on, and a
-// guild nobody is in goes; its chat channel only its members read and
-// write in; a deleted character leaves its guild.
+// the deputies, also of their friends at a tap and from a character's card;
+// the roles; a leader who leaves passes the lead on, and a guild nobody is
+// in goes; its chat channel only its members read and write in; a deleted
+// character leaves its guild.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -119,6 +119,29 @@ describe('the Gildia through the API', () => {
     // A member is offered nobody.
     await as('druh', 'POST', '/api/guild/accept', { guildId: made.data.guild.id });
     assert.deepEqual((await as('druh', 'GET', '/api/guild')).data.guild.friends, []);
+  });
+
+  test('the character card offers "Zaproś do gildii" to the leader and the deputies, for a character in no guild', async () => {
+    await player('trzeci', 'Trzeci', { level: 12 });
+    const offer = async (login, name) => (await as(login, 'GET', `/api/profile/${name}`)).data.profile.guildInvite;
+    // Without a guild there is nothing to offer, nor on one's own card.
+    assert.equal(await offer('mistrz', 'Druh'), null);
+    const made = await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' });
+    assert.equal(await offer('mistrz', 'Druh'), 'can');
+    assert.equal(await offer('mistrz', 'Mistrz'), null);
+    // Once invited, the card says so.
+    await as('mistrz', 'POST', '/api/guild/invite', { name: 'Druh' });
+    assert.equal(await offer('mistrz', 'Druh'), 'sent');
+    // A member does not invite, and one in a guild is not offered.
+    await as('druh', 'POST', '/api/guild/accept', { guildId: made.data.guild.id });
+    assert.equal(await offer('druh', 'Trzeci'), null);
+    assert.equal(await offer('mistrz', 'Druh'), null);
+    // A deputy does invite.
+    await as('mistrz', 'POST', '/api/guild/role', { characterId: await idOf('Druh'), role: 'deputy' });
+    assert.equal(await offer('druh', 'Trzeci'), 'can');
+    // A character without the Społeczność is not offered.
+    await (await db()).prepare("UPDATE characters SET level = 1 WHERE name = 'Trzeci'").run();
+    assert.equal(await offer('druh', 'Trzeci'), null);
   });
 
   test('a full guild takes no more, and the lead is handed over by the leader', async () => {

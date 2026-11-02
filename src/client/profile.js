@@ -132,7 +132,23 @@ function friendship(profile, onChange) {
               'danger',
             ),
           ];
-  return h('div', { class: 'profile-friend' }, whisper(profile), tradeButton(profile), parts, tradeBlock(profile, again));
+  // "Zaproś do gildii", for the leader or a deputy, to a character in no
+  // guild (the server's profile says when: guildInvite).
+  const guildInvite =
+    profile.guildInvite === 'can'
+      ? button(
+          'Zaproś do gildii',
+          async () => {
+            const answer = await call('POST', '/api/guild/invite', { name });
+            toast(answer.text);
+            await again();
+          },
+          'system',
+        )
+      : profile.guildInvite === 'sent'
+        ? note('Zaproszenie do gildii wysłane.')
+        : null;
+  return h('div', { class: 'profile-friend' }, whisper(profile), tradeButton(profile), parts, guildInvite, tradeBlock(profile, again));
 }
 
 // "Wymiana": a trade proposed to the character, while both players are

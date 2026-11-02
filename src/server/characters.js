@@ -1088,6 +1088,18 @@ export async function characterProfile(context) {
   // another character of the same account is the player's own.
   const own = await db.prepare("SELECT id FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId).first();
   const mine = found.user_id === session.userId;
+  const guild = await guildOf(db, found.id);
+  // "Zaproś do gildii" (the author: "w karcie postaci powinno być Zaproś do
+  // gildii, jeśli jeszcze nie ma"): for the leader or a deputy of a guild,
+  // to a character of another player in no guild that has the Społeczność;
+  // 'sent' once its invitation waits (guilds.js, inviteToGuild).
+  const viewerGuild = own && !mine && !guild ? await guildOf(db, own.id) : null;
+  const guildInvite =
+    viewerGuild && ['leader', 'deputy'].includes(viewerGuild.role) && isUnlocked('community', found.level, content)
+      ? (await db.prepare('SELECT 1 FROM guild_invites WHERE guild_id = ? AND character_id = ?').bind(viewerGuild.id, found.id).first())
+        ? 'sent'
+        : 'can'
+      : null;
   const worn = (item) =>
     item && {
       name: item.name,
@@ -1122,7 +1134,8 @@ export async function characterProfile(context) {
       classLevel: view.classLevel,
       role: chatRole(context.env, found),
       // Its guild, by name and tag (guilds.js), or null.
-      guild: await guildOf(db, found.id).then((guild) => guild && { name: guild.name, tag: guild.tag }),
+      guild: guild && { name: guild.name, tag: guild.tag },
+      guildInvite,
       relation: mine ? { state: 'self' } : own ? await relationTo(db, own.id, found.id, context.now) : null,
       tradeBlocked: await tradeBlockOf(db, session.userId, found.user_id),
       equipment: content.slots.map((slot) => ({ slot: slot.id, slotName: slot.name, item: worn(view.equipment[slot.id]) })),
