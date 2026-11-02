@@ -2996,6 +2996,53 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.83 (2.11.2026)
+
+1. **Co wchodzi do gry:** ulepszanie przedmiotów towarzyszy na Kowadle, „Zostań w kwaterze” i Drużyna bez towarzyszy z Kwater oraz rozmowy z towarzyszami na każdy stopień relacji (zob. dwie sekcje niżej).
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** wszystkie testy (TESTS) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Kartę towarzysza z przedmiotami, Kowadło przy przedmiocie towarzysza, „Zostań w kwaterze” i odmowę w Drużynie sprawdzono w przeglądarce na 390×844.
+
+## Towarzysze: ulepszanie przedmiotów i pobyt w kwaterze (2.11.2026)
+
+Autor: „niech tu będzie opcja kliknięcia w przedmiot i ulepszania go jak na Kowadle” oraz „zrób też tak, że jeśli ktoś ma zwerbowanego towarzysza to nie może być w drużynie, dopóki nie kliknie na nim [Zostań w kwaterze]; wtedy nie poluje się z towarzyszem, tylko samemu/z drużyną”.
+
+1. **Przedmioty towarzysza na Kowadle.** Na karcie towarzysza w Kwaterach broń, pancerz i talizman otwierają się stuknięciem, jak przedmioty postaci. Karta przedmiotu ma tę samą część „Kowadło” z przyciskiem „Ulepsz”: te same poziomy Kowadła, szanse, koszty, materiał od +5 i Zwój ochronny. Płaci postać ze swojego złota, rudy żelaza i materiałów. Zmienia się tylko przedmiot towarzysza. Karta mówi np.: „Ziemowit nosi ten przedmiot. Ulepszenie opłacasz ze swoich zapasów.”
+2. **Rozpad i odprawa.** Przedmiot, który rozpadnie się na Kowadle, znika z miejsca towarzysza, jak przedmiot postaci. Przedmiot dany z plecaka towarzysz oddaje przy odprawie razem z ulepszeniem.
+3. **Próby Gildii (brakujący szczegół).** Udane ulepszenie przedmiotu towarzysza liczy się do Prób Gildii jak każde udane ulepszenie na Kowadle.
+4. **Dwa szybkie stuknięcia (brakujący szczegół).** Próba zapisuje się tylko wtedy, gdy postać jest taka jak przy odczycie, jak każda zmiana Osady. Karta podaje też, którą próbę widziała, więc drugie stuknięcie tej samej karty nie robi drugiej próby, nawet gdy przyjdzie po pierwszej.
+5. **Towarzysz na wyprawie (brakujący szczegół).** Towarzysz, który wyruszył z postacią, jest poza obozem aż do odbioru raportu. Wtedy czekają i „Załóż z plecaka”, i ulepszanie jego przedmiotów, a karta mówi: „Towarzysz jest na wyprawie. Przedmioty zakłada się i ulepsza po powrocie.” Towarzysz, który został w kwaterze albo ranny w obozie, jest w domu. Jego sprzęt można więc zmieniać i ulepszać także w czasie wyprawy postaci. Wcześniej „Załóż z plecaka” czekało przy każdej wyprawie postaci.
+6. **„Zostań w kwaterze”.** Karta towarzysza mówi, czy chodzi z postacią na wyprawy, i ma przycisk „Zostań w kwaterze” albo „Idź na wyprawy”. Towarzysz, który zostaje, nie chodzi na wyprawy, więc nie dostaje z nich XP ani relacji. Rozmowy, prezent tygodnia i gojenie ran działają jak dotąd.
+7. **Od następnej wyprawy (brakujący szczegół).** Wybór działa od następnej wyprawy. Towarzysz, który już wyruszył, wraca z raportem, a karta mówi: „Po powrocie z tej wyprawy zostanie w kwaterze.”
+8. **Drużyna bez towarzyszy.** Postać, której towarzysz chodzi na wyprawy, nie założy drużyny ani do niej nie dołączy. Drużyna pokazuje wtedy na górze: „Najpierw zostaw towarzysza w kwaterze: Ziemowit. Drużyna poluje bez towarzyszy z Kwater.” i przycisk „Przejdź do Kwater”. „Dołącz” przy zaproszeniach i „Zaproś” czekają, aż towarzysz zostanie. Zdanie ma też formy dla towarzyszki i dla dwojga towarzyszy. Zaproszenia od innych postaci przychodzą jak dotąd.
+9. **W drużynie towarzysze zostają.** Póki postać jest w drużynie, jej towarzysze zostają w kwaterze, także przy jej własnych wyprawach. Zamiast „Idź na wyprawy” karta mówi: „Póki postać jest w drużynie, towarzysz zostaje w kwaterze: drużyna poluje bez towarzyszy z Kwater.”
+10. **Wyprawa drużyny.** Wolnych miejsc w wyprawie drużyny nie zajmują już towarzysze lidera. To zastępuje zdanie o wolnych miejscach w punkcie 6 „Drużyn” i towarzyszy lidera w punkcie 1 „Wspólnych walk wyprawy drużyny”. Wyprawa, która wyruszyła przed tą zmianą, kończy się tak, jak zaczęła.
+11. **Kto już jest w drużynie (brakujący szczegół).** Bez migracji bazy: towarzysze postaci w drużynie zostają w kwaterze, nawet gdy nikt nie stuknął „Zostań w kwaterze”. Po wyjściu z drużyny taki towarzysz znowu chodzi na wyprawy. Tak samo jest z towarzyszem zwerbowanym w czasie bycia w drużynie.
+12. **Zagrożenie przed wyprawą** liczy tylko towarzyszy, którzy idą.
+13. **Wieża Drużyn bez zmian (brakujący szczegół).** W Wieży Drużyn wolne miejsca dalej zajmują towarzysze z Kwater, także ci, którzy zostają w kwaterze. Autor chciał Wież Drużyn „ze zwerbowanymi postaciami”, a nowa zasada mówi o polowaniu. Wieżę bez towarzyszy daje jedna zmiana w danych (`companions` w `data/towers.json`).
+14. **Teksty** stoją w `data/settlement.json` (`companions.texts`).
+
+## Rozmowy z towarzyszami na każdy stopień (2.11.2026)
+
+Autor: „wygeneruj więcej opcji rozmów na różne stopnie dla towarzyszy”.
+
+1. **Kwestie na każdy stopień.** Gdy towarzysz nie ma do opowiedzenia nowego kawałka historii, mówi kwestię na dziś ze swojego stopnia relacji. Każdy stopień ma własną listę kwestii: Obcy 15, Znajomy 17, Stały klient 16, Zaufany 16 i Przyjaciel 17. Razem to 81 kwestii, z czego 72 są nowe (`companions.talks.chatter` w `data/settlement.json`). Kwestie są tylko tekstem, bez nagrania.
+2. **Ton rośnie z relacją.**
+    - Obcy mówi krótko i ostrożnie: o drodze, pogodzie i łupach. Przygląda się też postaci.
+    - Znajomy gawędzi o Rozstajach, mieszkańcach i spotkanych stworach, czasem z żartem.
+    - Stały klient wspomina wspólne wyprawy, przekomarza się i ma swoje zdanie o miejscach i stworach.
+    - Zaufany mówi o swoich obawach, nadziejach i przeszłości. Daje też rady.
+    - Przyjaciel jest ciepły i lojalny, ufa bez słów i troszczy się o postać.
+3. **Dawne kwestie zostają.** Dziewięć dotychczasowych kwestii trafiło do pasujących stopni: dwie do Obcego, trzy do Znajomego, jedna do Stałego klienta, jedna do Zaufanego i dwie do Przyjaciela.
+4. **Czasem kwestia ze stopnia niżej (brakujący szczegół).** Mniej więcej co czwarta taka rozmowa daje kwestię ze stopnia o jeden niżej (`lowerChance`: 0,25), żeby kwestie rzadziej się powtarzały. Obcy mówi tylko kwestie Obcego. Przyjaciel ma więc do wyboru 33 kwestie.
+5. **Jedna kwestia na dzień.** Jak dotąd kwestia zależy od postaci, towarzysza i dnia.
+6. **Zasady kwestii.**
+    - Każda ma od jednego do trzech krótkich zdań, bez anachronizmów.
+    - Pasuje do każdej klasy, więc nie zakłada miecza ani innej broni.
+    - Formy dla towarzyszki i towarzysza są zapisane jako [a|b].
+    - Do gracza zwraca się w drugiej osobie, bez form, które zdradzają płeć postaci.
+    - Nazwy miejsc, stworów i mieszkańców pochodzą z gry.
+7. **Sprawdzanie.** `tools/validate-data.mjs` wymaga listy dla każdego stopnia i żadnej innej, a ta sama kwestia nie może stać na listach dwa razy. Testy sprawdzają kwestie każdego stopnia, udział kwestii ze stopnia niżej, tę samą kwestię w ciągu dnia oraz formy dla kobiety i mężczyzny.
+
 ## Wersja 0.0.82 (2.11.2026)
 
 1. **Co wchodzi do gry:** poprawki z uwag autora (zob. sekcję niżej) oraz drapieżny chód Tygrysa szablozębnego (zob. „Tygrys szablozębny 371 B…”).
@@ -3348,7 +3395,7 @@ Autor: „325 A”, czyli Garbarnia z garbarzem Wszeborem (Bractwo Łowców), z 
 
 Autor: „Wydaje mi się albo postacie z drużyny mają inne raporty odbytych walk. To nie powinni mieć miejsca - powinny być wspólne jedynie łupy, XP itp. osobne.” oraz „Ewentualne zdarzenia również osobno.”
 
-1. **Wspólne walki.** Wyprawa drużyny ma swoje ziarno losowania i skład zapisany przy wyjściu: graczy w kolejności drużyny (lider pierwszy), każdego z jego miksturami na czas i trofeami, miksturami lidera na drogę oraz towarzyszami lidera z Kwater na wolnych miejscach. Z tego jednego zapisu każdy członek dostaje te same walki: tych samych przeciwników, ten sam przebieg i ten sam wynik wyprawy.
+1. **Wspólne walki.** Wyprawa drużyny ma swoje ziarno losowania i skład zapisany przy wyjściu: graczy w kolejności drużyny (lider pierwszy), każdego z jego miksturami na czas i trofeami, miksturami lidera na drogę oraz towarzyszami lidera z Kwater na wolnych miejscach. Z tego jednego zapisu każdy członek dostaje te same walki: tych samych przeciwników, ten sam przebieg i ten sam wynik wyprawy. *Od 0.0.83 bez towarzyszy lidera: zob. „Towarzysze: ulepszanie przedmiotów i pobyt w kwaterze”, punkt 10.*
 2. **Osobno.** Znaleziska, złoto, materiały, skrzynie i przedmioty losują się z własnego ziarna każdej postaci, a XP liczy się z jej własnego poziomu. Zdarzenie na końcu wyprawy też jest osobne dla każdego.
 3. **Prowadzi lider (brakujący szczegół).** Spotkania wyprawy idą za liderem: jego poziomem, omijaniem albo tropieniem elit, tropieniem stworów z zadań, plotką z Karczmy i stworami, które już spotkał. Towarzysze z Kwater w wyprawie drużyny są lidera, więc tylko jego raport zmienia ich XP i rany.
 4. **Gracze w walce (brakujący szczegół).** Na wyprawie drużyny gracz, który padnie w wygranej walce, odpoczywa po niej jak każdy i walczy dalej. Przegrana walka kończy wyprawę wszystkim. Znaleziona broń nie zmienia uzbrojenia w trakcie wyprawy drużyny, żeby walki zostały wspólne.
@@ -3590,7 +3637,7 @@ Autor: „Następnie przygotuj podwaliny a najlepiej cały system Drużyn. Wdró
 3. **Wychodzenie.** Członek opuszcza drużynę jednym przyciskiem, np. gdy chce zająć się profesjami. *Zmienione 1.11.2026: przy profesji nie trzeba wychodzić z drużyny, zob. „Drużyna a profesje, zapraszanie do Gildii ze znajomych”.* Lider może też usunąć członka i cofnąć zaproszenie. Gdy lider odchodzi, drużynę prowadzi ta postać, która dołączyła najwcześniej. Drużyna bez członków znika.
 4. **Wyprawa drużyny.** Lider wybiera w Walce miejsce i czas, zaznacza „Z drużyną: …” i stuka „Wyrusz”. Idą ci członkowie, którzy nie mają innych zajęć i grają tą postacią. Każdy z nich musi mieć to miejsce i ten czas odblokowane, więc drużyna idzie najwyżej tam i tak długo, jak najniższa postać. Postać z innymi zajęciami zostaje w obozie.
 5. **Walka i łupy.** Każdy członek dostaje własną wyprawę w to samo miejsce, na ten sam czas, a pozostali walczą przy nim tacy, jacy byli przy wyjściu, każdy z własnym HP. Każdy dostaje własny raport, złoto, przedmioty i materiały. Raport podaje skład drużyny. Mikstury i tropienie lider wybiera tylko dla siebie (brakujący szczegół).
-6. **Kara za skład.** Jak w dokumencie projektowym: solo +10% XP, w duecie +5%, w trio bez premii. Każdy członek drużyny zabiera pozostałym 4,5% ich XP z walk. Wolne miejsca do trzech zajmują towarzysze z Kwater: w trio żaden nie idzie, a w duecie jeden.
+6. **Kara za skład.** Jak w dokumencie projektowym: solo +10% XP, w duecie +5%, w trio bez premii. Każdy członek drużyny zabiera pozostałym 4,5% ich XP z walk. Wolne miejsca do trzech zajmują towarzysze z Kwater: w trio żaden nie idzie, a w duecie jeden. *Od 0.0.83 drużyna poluje bez towarzyszy z Kwater: zob. „Towarzysze: ulepszanie przedmiotów i pobyt w kwaterze”, punkt 10.*
 7. **Na razie bez:** Szybkiego Polowania drużyną i wspólnego zagrożenia przed wyprawą (lider widzi zagrożenie swojej postaci). Wieże dojdą później.
 8. **Migracja bazy:** 0063 (tabele `parties`, `party_members`, `party_invites`).
 
