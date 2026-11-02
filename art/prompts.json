@@ -771,7 +771,7 @@
       "frame-gold-raw": { "request": "26476d6d-2217-4580-8b22-11109bd90dfa" },
       "frame-system-raw": { "request": "63171617-1597-4f5a-ba6d-2ba5d2a6ca3b" },
       "frame-forest-raw": { "request": "d94cb1a6-9d9c-4155-9800-9f94830e2a53" },
-      "bg-camp": { "prompt": "a small forest camp at night, a campfire with warm orange light, a leather tent and a fallen log, dark spruce trees around and a starry sky, open ground in the middle, no people, tall vertical scene", "width": 96, "height": 128, "removeBackground": false }
+      "bg-camp": { "prompt": "a small forest camp at night, the campfire at the far left edge of the picture with its warm orange light on the trees, a leather tent at the far right edge, a fallen log, open dark ground in the middle with nothing on it, dark spruce trees around and a starry sky, no people, tall vertical scene", "width": 96, "height": 128, "removeBackground": false }
     }
   },
   "mounts": {

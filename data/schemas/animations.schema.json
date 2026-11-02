@@ -68,7 +68,7 @@
         },
         "mounts": {
           "type": "object",
-          "description": "Kłus wierzchowców ze Stajni w scenie Walki, po id wierzchowca (data/settlement.json): arkusz klatek w rzędzie i miejsce siodła w każdej klatce (tools/ride-sheets.py).",
+          "description": "Kłus wierzchowców ze Stajni w scenie Walki, po id wierzchowca (data/settlement.json) albo wyglądu wierzchowca ze Sklepu Systemu (sabertooth): arkusz klatek w rzędzie i miejsce siodła w każdej klatce (tools/ride-sheets.py).",
           "additionalProperties": {
             "type": "object",
             "additionalProperties": false,
