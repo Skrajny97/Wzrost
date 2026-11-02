@@ -2996,6 +2996,12 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.84 (2.11.2026)
+
+1. **Co wchodzi do gry:** prośba w Gildii wycofana, zanim ktoś coś dał, znika, więc nową dodasz od razu (zob. sekcję niżej).
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** wszystkie testy (834) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Wycofanie prośby bez darów i od razu nową prośbę sprawdzono w przeglądarce na 390×844.
+
 ## Uwagi autora: wycofana prośba i Wieża Drużyn (2.11.2026)
 
 Autor: „375 A” i „wycofanie prośby w Gildii przy braku realizacji aktualnej daje możliwość od razu wystawienia nowej prośby”.
