@@ -2996,6 +2996,14 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Druga ewolucja czeka na chody i jazdę (2.11.2026)
+
+Autor, po pierwszych klatkach chodów drugich form (434.1–434.15): „To jak chcesz wdrażać ewolucje bez chodów i jazdy? nie moze tak być mistrzu”, „pierwsze klatki to ciul, przerysuj tych mezczyzn i wdrażaj później jak animacje beda git, tylko mi je pokażesz, pamietaj ze tam też są odcienie skory” i „niby mozesz wdrazac czesciami bez tego, bo nikt nie dobił jeszcze 50tego nawet, ale informuj na przyszłość o takich rzeczach”.
+
+1. **Druga ewolucja wchodzi do gry razem z grafiką.** Kod drugiej ewolucji jest scalony i przechodzi testy (878), ale do gry trafi dopiero z chodami 30 drugich form, z jazdą wierzchem na każdym wierzchowcu i z siedmioma odcieniami skóry, tak jak przy pierwszych ewolucjach.
+2. **Pierwsze klatki bez oceny autora.** Autor ocenia chody jako gotowe animacje. Pierwsze klatki dobiera się samemu: trzech mężczyzn (Strzelec Wyborowy, Królobójca, Nekromanta) rysuje się od nowa, bo stali przodem.
+3. **Na przyszłość:** przed wdrożeniem czegoś bez pełnej grafiki trzeba to autorowi powiedzieć (zasada w `CLAUDE.md`).
+
 ## Sprawdzenie po wdrożeniu czeka dłużej (2.11.2026)
 
 1. **Co się stało.** Wdrożenie 0.0.89 wysłało nową wersję do Cloudflare bez błędu, ale gra jeszcze przez około pół godziny odpowiadała jako 0.0.88. Sprawdzenie po wdrożeniu (`tools/smoke-test.mjs`) czekało tylko minutę, więc przebieg na GitHubie skończył się błędem, choć wersja weszła sama. Cloudflare nie zgłaszał wtedy awarii.
