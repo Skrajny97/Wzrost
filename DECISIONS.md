@@ -2996,6 +2996,22 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Układ na komputer, pierwszy etap (2.11.2026)
+
+Według 473 A, 474 A i 475 A (zob. niżej „Osobny wygląd na komputer: plan i pytania 472–477”):
+
+1. **Wykrywanie (473 A).** Układ komputera włącza się sam w oknie od 1100 px szerokości z myszą; telefon i tablet dostają układ telefonu. Na ekranie od 1000 px (albo gdy wybrano coś innego niż „Sam”) Ustawienia mają „Układ ekranu: Sam / Telefon / Komputer”, zapamiętany w tej przeglądarce. Strona nosi układ jako `data-layout` (`src/client/layout-mode.js`), a style komputera działają tylko pod `:root[data-layout='desktop']`, więc układ telefonu się nie zmienia.
+2. **Menu z boku (474 A).** Główne zakładki w kolumnie z lewej, z napisem „Insight” u góry; pod „Postać” jej zakładki (Statystyki, Umiejętności, Ewolucja, Rdzeń), bez „Powrót”. Górny pasek w jednej linii, a na ekranie węższym niż 1500 px w dwóch (poziomy, złoto i obóz z wyprawą w pierwszej, cztery paski w drugiej).
+3. **Prawa kolumna (474 A).** Zadania narratora na pergaminie, te same co pod twarzą narratora (zakładki, skrzynia, „Odbierz”, „Odbierz wszystkie”, „Przelosuj zadania”), i czat z zakładkami kanałów i polem do pisania. Czat pojawia się razem ze Społecznością; wcześniej kolumna mówi, na którym poziomie się otworzy. Na ekranie węższym niż 1280 px kolumny nie ma, a zadania i czat są tam, gdzie na telefonie (`src/client/side.js`).
+4. **Okna na środku (475 A).** Karty przedmiotów, pytania i inne okna stoją na środku ekranu (do 560 px szerokości), zamykane krzyżykiem, Esc albo kliknięciem obok.
+5. **Gra na środku.** Ekrany jak na telefonie, w szerszej kolumnie (do 760 px). Postać ma już swoje kolumny: postać w ramie obok plecaka. Kamera narratora na komputerze tylko przewija, bez przybliżania. Kolejne ekrany dostają swoje kolumny po kolei (476 A), a wygody myszy i klawiatury przyjdą w następnych wersjach (477 A).
+
+## Wersja 0.0.97 (2.11.2026)
+
+1. **Co wchodzi do gry:** układ na komputer, pierwszy etap (zob. wyżej).
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (865 z 865), przejście wprowadzenia na telefonie (układ telefonu) oraz na komputerze 1366×768 i 1920×1080 (już w układzie komputera), po 11 kroków; w przeglądarce wszystkie główne ekrany w układzie komputera (bez błędów strony), przełącznik „Układ ekranu” w obie strony i telefon 390×844 bez zmian.
+
 ## Osobny wygląd na komputer: plan i pytania 472–477 (2.11.2026)
 
 Autor: „zaimplementowałeś też GUI z telefonu bezpośrednio na pc a musi być kompletnie osobne, jakoś to na pewno da się ustawić i wykrywać”. Zmienia to dotychczasową zasadę z przeglądu na komputerze (górny pasek i menu trzymają się kolumny telefonu). Plan z makietami (prawdziwa gra z nałożonym szkicem układu, `scratchpad`, nie w grze) poszedł do autora jako pytania, z zaleceniami:
@@ -3013,7 +3029,7 @@ Autor: „473 A / 474 A / 475 A”, a o 476 i 477: „nie napisałeś o co chodz
 2. **Trzy kolumny (474 A).** Menu z lewej (pod „Postać” jej zakładki), gra na środku, z prawej zadania narratora i czat; na mniejszym laptopie prawa kolumna chowa się pod przycisk.
 3. **Okna na środku (475 A).** Karty przedmiotów i inne okna na środku ekranu, zamykane Esc albo kliknięciem obok.
 
-Do odpowiedzi na 476 i 477 komputer zostaje przy obecnym wyglądzie. Aplikacja ze Sklepu Play zostaje przy układzie telefonu.
+Autor przed snem: „dobra ja musze spać, zrób to wszystko dobrze i porządnie”. Przyjęte więc zalecane 476 A (najpierw szkielet dla wszystkich ekranów, potem ekran po ekranie) i 477 A (podpowiedzi po najechaniu myszą, Esc, klawisze 1–5) oraz 472 A. Aplikacja ze Sklepu Play zostaje przy układzie telefonu.
 
 ## Plecak: „Rozbierz kilka” (2.11.2026)
 
