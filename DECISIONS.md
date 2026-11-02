@@ -3006,7 +3006,7 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
     - Strzelczyni Wyborowa A, bo w B łuk znikał.
     Królobójca, Strzelec Wyborowy i Nekromanta (mężczyźni) chodzą z nowych klatek startowych z profilu.
 2. **Kolory.** Każda klatka przechodzi przez `tools/walk-palette.py`, jak chody pierwszych form.
-3. **Do oceny.** 30 animacji poszło do autora w czacie jako GIF-y 437.1–437.30, jedna po drugiej.
+3. **Do oceny.** 30 animacji poszło do autora w czacie, jedna po drugiej, jako 437.1–437.30. Najpierw poszły jako GIF-y, które się u autora nie odtwarzają. Autor: „Ale Ty mi to miales w mp4 podać zebym mogl obejrzec znowu zapomniales ze nie działa gif xD”. Poszły więc jeszcze raz jako MP4: 3× powiększone, 8 klatek na sekundę, sześć pętli. Zasada jest w `CLAUDE.md`.
 4. **Dalej:**
     - odcienie skóry chodów (`tools/walk-tones.py`, poprawki w `tools/walk-tones.json`);
     - jeźdźcy: opisy 30 drugich form na wierzchowcu są w `art/prompts.json` (rodzaj `riders`). Broń jest schowana: kostury i łuki na plecach, miecze i sztylety w pochwach, buławy, młoty i topory u pasa albo na plecach, tarcze na plecach. Retro Diffusion rysuje po dwie wersje, za około 11 USD.

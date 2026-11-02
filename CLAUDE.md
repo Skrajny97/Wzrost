@@ -7,6 +7,7 @@
 - Teksty czytane głosem, np. kwestie narratora, daj autorowi do zatwierdzenia przed nagraniem. Autor usuwa z nich naleciałości AI.
 - Nagrania autor sprawdza sam, na słuch: wrzucaj mu je w czacie albo na stronę odsłuchu. Nie pobieraj programów do rozpoznawania mowy ani innych modeli.
 - Nowe grafiki pokazuj autorowi do oceny pojedynczo, jedną po drugiej, zaraz po powstaniu, gdy autor nie śpi.
+- Animacje (chody, jazdę wierzchem, każdy ruch) wysyłaj autorowi jako MP4 (H.264, kilka pętli), nigdy jako GIF, bo GIF-y się u autora nie odtwarzają. Autor: „Ale Ty mi to miales w mp4 podać zebym mogl obejrzec znowu zapomniales ze nie działa gif xD” (2.11.2026).
 - Nowej klasy, ewolucji ani postaci nie wdrażaj bez pełnej grafiki (portrety, chody, jazda wierzchem, odcienie skóry), a jeśli chcesz wdrożyć część wcześniej, najpierw powiedz o tym autorowi. Autor: „To jak chcesz wdrażać ewolucje bez chodów i jazdy? nie moze tak być mistrzu” i „informuj na przyszłość o takich rzeczach” (2.11.2026). Chody autor ocenia jako gotowe animacje, a nie pierwsze klatki („pierwsze klatki to ciul”).
 - Z autorem rozmawiaj po polsku. Kod, nazwy plików i identyfikatory są po angielsku, a teksty widoczne w grze po polsku.
 - Autor pracuje wyłącznie z telefonu. Każdą czynność po jego stronie opisz krok po kroku dla przeglądarki mobilnej.
