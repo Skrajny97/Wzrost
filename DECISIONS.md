@@ -2996,6 +2996,22 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.92 (2.11.2026)
+
+1. **Co wchodzi do gry:**
+    - Prośby Gildii: wycofana prośba znika z karty, a zostaje tylko czas do następnej. Za dary podziękowania idą od razu (zob. „Prośby Gildii: wycofana prośba znika”).
+    - Kamień węgielny Warowni w Obozie z Osadą, rysunek 436 A, z okienkiem postępu do Warowni (zob. „Kamień węgielny Warowni w Obozie”).
+    
+    Razem z tym idą notatki i pliki, których gra jeszcze nie używa:
+    - opisy jeźdźców drugich form;
+    - zasada, że animacje autor dostaje jako MP4;
+    - notatki o chodach drugich form.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:**
+    - Na tym komputerze przeszły wszystkie testy (851).
+    - Nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`).
+    - Kamień i jego okienko sprawdzono w przeglądarce na 390×844 i 1280×800.
+
 ## Chody drugich form do oceny autora (2.11.2026)
 
 1. **Wybór wersji.** PixelLab narysował każdy chód w dwóch wersjach (`tools/animate-walks.mjs`, 8 klatek 128 × 128). Z każdej pary wybrana jest ta, w której broń nie znika w żadnej klatce i nic nie odpada od postaci. Na przykład:
@@ -3020,6 +3036,12 @@ Autor (zrzut planszy Obozu z wolnym miejscem między Skrzynią Konta a Kopalnią
 2. **Po stuknięciu** widać, ile brakuje do Warowni: ile budynków ma już najwyższy poziom (np. „3 z 10”) i poziom Obozu (np. „6 z 10”).
 3. **Później** w tym miejscu zaczyna się przemiana w Warownię: rusztowanie, potem kamienne mury.
 4. **Kolejność.** Najpierw grafika kamienia na planszę, do oceny autora, potem kod.
+5. **Rysunek: „436 A”.** Retro Diffusion narysował cztery wersje (rodzaj `camp`, `cornerstone-1` w `art/prompts.json`). Autor dostał dwie najlepsze przymierzone na planszy i wybrał A: granitowy blok z okrągłym, świecącym znakiem i drewnianym palikiem. Obrazek jest przycięty do zarysu, jak budynki (`src/client/art/camp/cornerstone-1.png`).
+6. **W grze od 0.0.92:**
+    - **Miejsce.** Kamień stoi na planszy z Osadą, w miejscu (262, 372) planszy. Ma wielkość średniego wyglądu budynku, a kolory i światło pory dnia takie jak budynki.
+    - **Bez Osady kamienia nie ma (brakujący szczegół).** Wolne miejsce jest tylko na wyższej planszy, a do Warowni liczą się wszystkie budynki, także Kwatery z Osady.
+    - **Okienko.** Po stuknięciu pokazuje nazwę, opis i dwa paski: „Budynki na najwyższym poziomie” (np. 3 / 10) i „Poziom Obozu” (np. 6 / 10). Gdy wszystko jest gotowe, dochodzi zdanie: „Obóz jest gotowy. Przemiana w Warownię zacznie się tutaj, gdy wejdzie do gry.”
+    - **Gdzie co jest.** Teksty są w `data/camp.json` (`cornerstone`), a liczy serwer.
 
 ## Prośby Gildii: wycofana prośba znika (2.11.2026)
 
