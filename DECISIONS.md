@@ -2996,6 +2996,13 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Postęp próby w Tablicy prób (2.11.2026)
+
+Autor (zrzut zakładki Próby): „niech tutaj pokazuje ile już ukończone jest z danej próby”.
+
+1. **Wzięta próba** ma w Tablicy prób, pod swoją treścią, pasek „Postęp” z liczbami, np. „45 z 75”. To ten sam pasek co w części „Twoja próba” niżej.
+2. **Pozostałe próby** nie mają paska. Wykonana ma znak „Wykonana”. Niewzięta nie ma postępu, bo postęp liczy się od chwili wzięcia próby.
+
 ## Druga ewolucja: odpowiedzi autora na trzecią rundę portretów (2.11.2026)
 
 Autor: „397 git / 402 git / 404 git / 406 git / 407 git / 409 git” i „czyli PixelLab lepszy używamy jako główny Retro-Diffusion do teł może albo na inne rzeczy jak Pixel bedzie zamulał”.

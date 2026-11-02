@@ -10491,6 +10491,11 @@ a.profession-square:active {
   flex: none;
 }
 
+/* The taken trial's progress, under its words on the board. */
+.guild-trial-body .guild-meter {
+  margin-top: 4px;
+}
+
 .guild-trial--done .guild-trial-words,
 .guild-trial--locked .guild-trial-words {
   color: var(--text-muted);

@@ -224,6 +224,18 @@ export function mountGuildTrials(container) {
               h('p', { class: 'guild-trial-words', text: trial.text }),
               trial.note && h('p', { class: 'guild-trial-note', text: trial.note }),
               trial.lock && h('p', { class: 'guild-trial-lock' }, icon('lock', { size: 14 }), h('span', { text: trial.lock })),
+              // The taken trial shows how far it is right on the board (the
+              // author: "niech tutaj pokazuje ile już ukończone jest z danej
+              // próby"), as the "Twoja próba" part below does.
+              trial.state === 'taken' &&
+                taken?.index === trial.index &&
+                meter({
+                  label: texts.progress,
+                  value: taken.progress,
+                  max: taken.count,
+                  text: filled(texts.progressValue, { progress: formatNumber(taken.progress), count: formatNumber(taken.count) }),
+                  kind: 'class-xp',
+                }),
             ),
             trialAction(trial),
           ),
