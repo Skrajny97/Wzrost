@@ -32,6 +32,9 @@ A "trot" in art/mounts.json:
            on the gap's left, inside the mount now, takes the coat beside
            it); a deep gap fills from the bottom up. The Stajnia's picture
            takes the same patch;
+  "graft": parts of a frame drawn anew from another frame of the loop:
+           {"frame": n, "from": m, "box": [left, top, right, bottom),
+           "shift": [x, y]}, frames counted from 1 in the loop's order;
   "picture": the frame of the loop (counted from 1) that is the mount's
              picture on its card in the Stajnia and the Sklep Systemu, cut
              to the mount, so the card shows the mount as it walks.
@@ -161,6 +164,23 @@ def patch(frame, rules, shift):
     return frame
 
 
+def graft(frame, source, rule):
+    """A part of the loop's frame `frame` drawn anew from another one: the
+    box [left, top, right, bottom) of `frame` cleared, and `source`'s box
+    put there moved by "shift" [x, y] (the tiger's first frame lost the
+    black tip of its tail; the author: "ma ucięty odrobinę ogon")."""
+    left, top, right, bottom = rule['box']
+    dx, dy = rule.get('shift', [0, 0])
+    out = frame.copy()
+    px = out.load()
+    for y in range(top, bottom):
+        for x in range(left, right):
+            px[x, y] = (0, 0, 0, 0)
+    part = source.crop((left, top, right, bottom))
+    out.alpha_composite(part, (left + dx, top + dy))
+    return out
+
+
 def main():
     drafts = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'art', 'drafts', 'mounts-pixellab')
     config = json.load(open(os.path.join(ROOT, 'art', 'mounts.json'), encoding='utf8'))
@@ -174,6 +194,8 @@ def main():
             continue
         folder = os.path.join(os.path.dirname(drafts), trot['dir']) if trot.get('dir') else drafts
         frames = [clean(Image.open(os.path.join(folder, f"{trot['draft']}-{n}.png")).convert('RGBA'), trot.get('clean', [])) for n in trot['frames']]
+        for rule in trot.get('graft', []):
+            frames[rule['frame'] - 1] = graft(frames[rule['frame'] - 1], frames[rule['from'] - 1], rule)
         width, height = frames[0].size
         if trot.get('seat_in') == 'start':
             # The posed frames (tools/animate-mounts-skeleton.mjs) are all
