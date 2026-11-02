@@ -7,6 +7,7 @@ import { herbSprite, itemSprite, materialSprite, portraitSprite, potionSprite, r
 import { bonusList } from '../bonuses.js';
 import { MATERIALS_HINT, craft, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
+import { askGuildButton } from '../guild-requests.js';
 import { formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, saleGold, timeFormat } from '../format.js';
 import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { portrait } from '../portraits.js';
@@ -839,6 +840,8 @@ function anvilSection(item, busy, open = false) {
     ),
     picker,
     need && !chosen && h('p', { class: 'system-hint', text: `To ulepszenie bierze też ${formatNumber(need.count)} szt. materiału tej samej rzadkości co przedmiot.` }),
+    // One material of the item's rarity, from the guild (346 A).
+    need && !chosen && askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }),
     h('p', { class: 'muted', text: risk }),
     ward &&
       h(
@@ -899,6 +902,8 @@ function anvilSection(item, busy, open = false) {
       },
     }),
     note,
+    // The material the try lacks, from the guild (346 A), at once.
+    need && !chosen && askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }),
   );
   return folded;
 }

@@ -19,6 +19,7 @@ import { dayPart } from '../scenes.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { companionCard } from '../companions.js';
+import { askGuildButton } from '../guild-requests.js';
 import { stableCard } from '../stable.js';
 import { tanneryCard } from '../tannery.js';
 import { itemSummary, materialTitle } from './character.js';
@@ -165,8 +166,19 @@ export function mountSettlement(container, { params = {} } = {}) {
             text: order.takes ? `Oddasz: ${order.takes.map((one) => `${formatNumber(one.count)} × ${one.name}`).join(', ')}.` : `Pasuje każdy ${order.forms[0]}.`,
           }),
         h('div', { class: 'settlement-actions' }, deliver, reject),
+        !enough && orderAsk(order),
       ),
     );
+  }
+
+  // "Poproś gildię" for what an order lacks (346 A): its herb or potion, or
+  // a material of its rarity when any will do.
+  function orderAsk(order) {
+    const missing = order.count - order.have;
+    if (order.kind === 'herb' || order.kind === 'potion') return askGuildButton({ kind: order.kind, key: order.key, name: order.label, missing });
+    if (order.kind !== 'material') return null;
+    const at = order.key.lastIndexOf(':');
+    return order.forms ? askGuildButton({ kind: 'material', rarity: order.key.slice(at + 1), missing }) : askGuildButton({ kind: 'material', key: order.key, name: order.label, missing });
   }
 
   function boardCard() {
@@ -235,6 +247,8 @@ export function mountSettlement(container, { params = {} } = {}) {
         need && h('p', { class: 'muted', text: `${takes} ${formatNumber(need.count)} szt. jednego materiału o rzadkości „${need.rarityName}”.` }),
         missing.length > 0 && h('p', { class: 'region-warning', text: `Brakuje: ${missing.join(', ')}.` }),
         materialShort > 0 && h('p', { class: 'system-hint', text: 'Materiały tej rzadkości wypadają ze stworów na wyprawach. Kupisz je też na Targowisku.' }),
+        // One material of the rarity, from the guild (346 A).
+        materialShort > 0 && askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }),
       ],
     };
   }
@@ -311,6 +325,8 @@ export function mountSettlement(container, { params = {} } = {}) {
             { class: 'settlement-choice' },
             h('p', {}, h('strong', { text: capital(element.name) }), ` · ${gives}`),
             h('p', { class: 'muted', text: `${formatNumber(item.gold)} zł. i ${element.count} × ${element.material} (masz ${formatNumber(element.have)})` }),
+            // The element's material, from the guild (346 A).
+            element.have < element.count && askGuildButton({ kind: 'material', key: element.key, name: element.material, missing: element.count - element.have }),
             h('button', {
               type: 'button',
               class: 'button button--world button--small',

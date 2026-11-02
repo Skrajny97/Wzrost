@@ -66,8 +66,9 @@ const ROUTES = [
   // The Osada's board, or one of its places.
   { pattern: /^#\/osada(?:\/(?<place>[a-z0-9-]+))?$/, nav: 'main', tab: 'osada', mount: mountSettlement },
   { pattern: /^#\/spolecznosc$/, nav: 'main', tab: 'spolecznosc', mount: mountCommunity },
-  // The Gildia's own page, from its tab in the Społeczność.
-  { pattern: /^#\/gildia$/, nav: 'main', tab: null, lit: 'spolecznosc', mount: mountGuildPage },
+  // The Gildia's own page, from its tab in the Społeczność, at one of its
+  // tabs (data/guilds.json, tabs).
+  { pattern: /^#\/gildia(?:\/(?<tab>[a-z]+))?$/, nav: 'main', tab: null, lit: 'spolecznosc', mount: mountGuildPage },
   // A Wymiana with another player's character, from the Społeczność.
   { pattern: /^#\/wymiana$/, nav: 'main', tab: null, lit: 'spolecznosc', mount: mountTrade },
   { pattern: /^#\/dziennik(?:\/(?<tab>system))?$/, nav: 'main', tab: 'dziennik', mount: mountJournal },

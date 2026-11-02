@@ -9,6 +9,7 @@
     "name",
     "tag",
     "invites",
+    "tabs",
     "trials",
     "requests"
   ],
@@ -51,6 +52,34 @@
     "invites": {
       "type": "integer",
       "minimum": 1
+    },
+    "tabs": {
+      "description": "Zakładki strony Gildii (src/client/screens/guild.js), w tej kolejności.",
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "enum": [
+              "guild",
+              "beast",
+              "trials",
+              "requests"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
     },
     "beast": {
       "type": "object",
@@ -616,6 +645,7 @@
             "how",
             "ask",
             "askLead",
+            "askWaiting",
             "kindNames",
             "goods",
             "count",

@@ -9865,12 +9865,18 @@ a.profession-square:active {
 }
 
 /* The Bestia Gildii (guild-beast.js): its card on the Gildia's page, the
-   champion in the blood red of its frame in fights, its HP bar thicker. */
-.guild-beast p {
+   champion in the blood red of its frame in fights, its HP bar thicker.
+   The Próby and the Prośby Gildii (guild-trials.js, guild-requests.js)
+   share its subtitles and its rows of names. */
+.guild-beast p,
+.guild-trials p,
+.guild-requests p {
   margin: 0;
 }
 
-.guild-beast .how-more > p + p {
+.guild-beast .how-more > p + p,
+.guild-trials .how-more > p + p,
+.guild-requests .how-more > p + p {
   margin-top: 6px;
 }
 
@@ -9939,7 +9945,8 @@ a.profession-square:active {
   color: var(--danger);
 }
 
-.guild-beast-subtitle {
+.guild-beast-subtitle,
+.guild-subtitle {
   margin: 8px 0 0;
   font-size: 17px;
   font-weight: 700;
@@ -9975,7 +9982,8 @@ a.profession-square:active {
   background: var(--bg-deep);
 }
 
-.guild-beast-ranking {
+.guild-beast-ranking,
+.guild-ranking {
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -9983,30 +9991,35 @@ a.profession-square:active {
   list-style: none;
 }
 
-.guild-beast-row {
+.guild-beast-row,
+.guild-row {
   display: flex;
   justify-content: space-between;
   gap: 8px;
   padding: 6px 0;
 }
 
-.guild-beast-row + .guild-beast-row {
+.guild-beast-row + .guild-beast-row,
+.guild-row + .guild-row {
   border-top: 1px solid var(--line);
 }
 
-.guild-beast-row-name {
+.guild-beast-row-name,
+.guild-row-name {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.guild-beast-row--own .guild-beast-row-name {
+.guild-beast-row--own .guild-beast-row-name,
+.guild-row--own .guild-row-name {
   color: var(--system-text);
   font-weight: 700;
 }
 
-.guild-beast-row-damage {
+.guild-beast-row-damage,
+.guild-row-value {
   flex: none;
   color: var(--text-muted);
   font-family: var(--font-system);

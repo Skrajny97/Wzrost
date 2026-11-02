@@ -130,6 +130,9 @@ export function publicContent() {
     evolutionPlace: content.evolutionPlace,
     // The picture behind the Gildia page's heading, once one is chosen.
     guildPlace: content.guilds.place ?? null,
+    // The tabs of the Gildia page: its members, the Bestia, the Próby and
+    // the Prośby Gildii.
+    guildTabs: content.guilds.tabs,
     // The words of "Poproś gildię", shown where pieces are missing, before
     // the Prośby Gildii answer (src/client/guild-requests.js).
     guildAsk: content.guilds.requests.texts.ask,

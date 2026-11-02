@@ -1,5 +1,5 @@
 {
-  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz.",
+  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz. tabs: zakładki strony Gildii (#/gildia/<id>), po kolei: gildia z członkami, Bestia, Próby i Prośby Gildii.",
   "place": "guild-keep",
   "found": {
     "level": 30,
@@ -15,6 +15,12 @@
     "max": 4
   },
   "invites": 10,
+  "tabs": [
+    { "id": "guild", "name": "Gildia" },
+    { "id": "beast", "name": "Bestia" },
+    { "id": "trials", "name": "Próby" },
+    { "id": "requests", "name": "Prośby" }
+  ],
   "beast": {
     "$comment": "Bestia Gildii (src/engine/guild-beast.js, src/server/guild-beast.js, src/client/guild-beast.js; DECISIONS.md, „Bestia Gildii”). Autor: „344 A”: cotygodniowe polowanie całej gildii na jedną ogromną bestię, bez grania w tym samym czasie. Tydzień jak przy zadaniach tygodniowych: od poniedziałku, od północy czasu polskiego. Bestia to czempion jednego z regionów, losowany z ziarna gildii i tygodnia, na zaokrąglonym średnim poziomie postaci członków z chwili, gdy przychodzi (pierwsze spojrzenie albo atak w tygodniu). HP bestii: członkowie z tej chwili × memberAttacks × damage, tak że memberAttacks typowych ataków jednej postaci (3 dziennie przez 4 dni) zbija 1/członków paska. damage: [poziom bestii, średnie obrażenia jednego ataku], zmierzone typowymi postaciami z tools/simulate.mjs (typicalCharacter): pięć klas, czterech czempionów, po 40 walk na każdą parę; między punktami po prostej, poniżej pierwszego jak w pierwszym, powyżej ostatniego proporcjonalnie do poziomu. attacksPerDay: ataki postaci na dobę (od północy czasu polskiego), osobno od wejść do Wież, liczone na postać, także po zmianie gildii. chests: Skrzynia Bestii dla każdej postaci, która w tygodniu zaatakowała bestię choć raz, jedna na tydzień (po zmianie gildii w tygodniu liczy się najlepsza z jej bestii); liczy się pierwsza skrzynia, której share (część paska zbita przez gildię) bestia osiągnęła, a share 1 to bestia powalona. item: przedmiot klasy postaci, który może ona założyć, na jej poziomie, z rzadkością jak w skrzyni czempiona. materials: ile razy losuje się materiał bestii, każdy raz jak po pokonanym czempionie, na poziomie bestii, co najmniej jedna sztuka. Poniżej najmniejszego share skrzyni nie ma. Skrzynię otwiera się od upadku bestii albo od końca tygodnia, najpóźniej do końca następnego tygodnia. texts: słowa karty Bestii i odpowiedzi gry; {…} wypełnia gra.",
     "attacksPerDay": 3,
@@ -188,6 +194,7 @@
       ],
       "ask": "Poproś gildię",
       "askLead": "Wybierz, czego brakuje i ile sztuk. Prośba zawiśnie na stronie Gildii, w Prośbach.",
+      "askWaiting": "Twoja prośba wciąż wisi na stronie Gildii. Wycofaj ją tam, żeby poprosić o coś innego.",
       "kindNames": { "material": "Materiał", "herb": "Zioło", "potion": "Mikstura" },
       "goods": "Czego brakuje",
       "count": "Ile sztuk",

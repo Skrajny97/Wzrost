@@ -8,16 +8,45 @@
 // a deputy, hand the lead over); "Opuść gildię"; and, outside a guild,
 // founding one from its level for its gold. The guild's channel is a tab
 // of the Czat (community.js).
+//
+// Under the heading, the page's tabs (data/guilds.json, tabs), in the look
+// of the Społeczność's row of parts: "Gildia" with all the above, then the
+// guild's activities, "Bestia" (guild-beast.js), "Próby" (guild-trials.js)
+// and "Prośby" (guild-requests.js). The address keeps the tab
+// (#/gildia/<id>), and the page opens on the one shown last on the device,
+// or on "Gildia" outside a guild.
 
 import { placeArt } from '../art.js';
 import { guildSeen } from '../chat-news.js';
-import { fill, h, icon } from '../dom.js';
+import { $, fill, h, icon } from '../dom.js';
 import { formatNumber } from '../format.js';
+import { mountGuildBeast } from '../guild-beast.js';
+import { mountGuildRequests } from '../guild-requests.js';
+import { mountGuildTrials } from '../guild-trials.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, state } from '../state.js';
 import { confirmAction, toast, withButton } from '../ui.js';
 import { lockedScreen } from './locked.js';
+
+const PAGE = '#/gildia';
+const TAB_KEY = 'insight-guild-tab';
+const TAB_ICONS = { guild: 'banner', beast: 'beast', trials: 'trophy', requests: 'gift' };
+const TAB_MOUNTS = { guild: mountGuild, beast: mountGuildBeast, trials: mountGuildTrials, requests: mountGuildRequests };
+
+// The tab to open: the address's, else the one shown last on the device
+// for a character in a guild, else the first.
+function firstTab(tabs, asked) {
+  const ids = tabs.map((tab) => tab.id);
+  if (ids.includes(asked)) return asked;
+  let kept = null;
+  try {
+    kept = localStorage.getItem(TAB_KEY);
+  } catch {
+    // The first tab, then.
+  }
+  return state.character.guildTag && ids.includes(kept) ? kept : ids[0];
+}
 
 export function mountGuildPage(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Gildia')(container, context);
@@ -25,9 +54,65 @@ export function mountGuildPage(container, context) {
   const heading = h('div', { class: `page-heading${art ? ' guild-heading' : ''}` }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Gildia' }));
   if (art) heading.style.setProperty('--place-art', `url("${art}")`);
   const back = h('a', { class: 'link-button guild-back', href: '#/spolecznosc' }, icon('back', { size: 16 }), 'Społeczność');
-  const body = h('div');
-  fill(container, back, heading, body);
-  return mountGuild(body);
+  const tabs = state.content.guildTabs;
+  const row = h('div', { class: 'community-tabs', role: 'tablist', 'aria-label': 'Części Gildii' });
+  // The row stays under the top bar while the page scrolls, as the
+  // Społeczność's does (styles.css).
+  const picker = h('div', { class: 'community-picker guild-picker' }, row);
+  const body = h('div', { class: 'guild-body' });
+  fill(container, back, heading, picker, body);
+  const topbar = $('.topbar');
+  const stick = () => picker.style.setProperty('--community-top', `${topbar?.offsetHeight ?? 0}px`);
+  const watcher = topbar && typeof ResizeObserver === 'function' ? new ResizeObserver(stick) : null;
+  watcher?.observe(topbar);
+  stick();
+
+  let current = null;
+  let part = null;
+  function show(id) {
+    current = id;
+    try {
+      localStorage.setItem(TAB_KEY, id);
+    } catch {
+      // Remembered for this visit only.
+    }
+    history.replaceState(history.state, '', id === tabs[0].id ? PAGE : `${PAGE}/${id}`);
+    part?.unmount();
+    fill(body);
+    part = TAB_MOUNTS[id](body);
+    render();
+  }
+
+  function render() {
+    fill(
+      row,
+      tabs.map((tab) =>
+        h(
+          'button',
+          {
+            type: 'button',
+            role: 'tab',
+            class: 'community-tab',
+            'aria-selected': String(tab.id === current),
+            onClick: () => {
+              if (tab.id !== current) show(tab.id);
+            },
+          },
+          icon(TAB_ICONS[tab.id] ?? 'unknown', { size: 20, className: 'community-icon' }),
+          h('span', { class: 'community-name', text: tab.name }),
+        ),
+      ),
+    );
+    row.querySelector('[aria-selected="true"]')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  }
+
+  show(firstTab(tabs, context?.params?.tab));
+  return {
+    unmount() {
+      part?.unmount();
+      watcher?.disconnect();
+    },
+  };
 }
 
 function mountGuild(container) {
