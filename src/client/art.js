@@ -295,13 +295,14 @@ export const SPRITES = {
   },
   // The Stajnia's mounts (data/settlement.json, stable.mounts, by id), saddled
   // and seen from the side, cut to their outline, on their cards in the
-  // Stajnia. Their trot for the Walka scene is a sheet of its own
-  // (data/animations.json, walk.mounts).
+  // Stajnia, and the look a mount can wear from the Sklep Systemu
+  // ("sabertooth", the Tygrys szablozębny). Their trot for the Walka scene
+  // is a sheet of its own (data/animations.json, walk.mounts).
   mounts: {
     width: 168,
     height: 144,
     fit: true,
-    ids: ['pony', 'horse', 'steed'],
+    ids: ['pony', 'horse', 'steed', 'sabertooth'],
   },
   // The character riding, <class>-<look> or an evolution's
   // <evolution>-<look>: one picture sitting in a saddle that is not drawn

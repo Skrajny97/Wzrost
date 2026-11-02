@@ -148,8 +148,9 @@ test('every sprite on the list has its file at its size, and every class has its
     resources: data('resources').map((resource) => resource.id),
     // Gold, Punkty Czasu and the Encyclopedia's corner.
     icons: ['gold', 'time-points', 'encyclopedia'],
-    // The Stajnia's mounts, and the character riding them, one for each walk.
-    mounts: data('settlement').stable.mounts.map((mount) => mount.id),
+    // The Stajnia's mounts and the looks a mount can wear (each with its
+    // trot), and the character riding them, one for each walk.
+    mounts: [...new Set([...data('settlement').stable.mounts.map((mount) => mount.id), ...Object.keys(data('animations').walk.mounts)])],
     riders: [...data('classes'), ...data('evolutions').evolutions].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
   };
   for (const [kind, { size, width = size, height = size, fit = false, ids }] of Object.entries(SPRITES)) {
