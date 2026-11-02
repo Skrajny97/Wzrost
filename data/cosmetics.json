@@ -62,7 +62,7 @@
       "id": "sabertooth",
       "kind": "mountSkin",
       "name": "Tygrys szablozębny",
-      "description": "Postać jedzie na tygrysie szablozębnym zamiast na wierzchowcu ze Stajni. Zmienia się tylko wygląd: wyprawy skraca wierzchowiec ze Stajni, tak jak dotąd.",
+      "description": "Postać jedzie na tygrysie szablozębnym zamiast na wierzchowcu ze Stajni.",
       "price": 1000,
       "art": "sabertooth"
     }

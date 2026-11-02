@@ -114,10 +114,11 @@ export function mountFriends(container) {
       'section',
       { class: 'card friends-gifts', 'aria-labelledby': 'friends-gifts-title' },
       h('h2', { class: 'card-title', id: 'friends-gifts-title' }, icon('gift', { size: 22 }), 'Upominki'),
-      howItWorks(
+      // The author: all of it under "Jak to działa?".
+      howItWorks(null, [
         `Każdego dnia możesz wysłać każdemu znajomemu jeden ${gift.name}: ${countOf(gift.timePoints, 'Punkt Czasu', 'Punkty Czasu', 'Punktów Czasu')} i trochę złota albo surowców.`,
         `Dziennie odbierzesz do ${claimsPerDay}.`,
-      ),
+      ]),
       h('p', {
         class: 'friends-gifts-count',
         text: `${waiting === 0 ? 'Żaden upominek nie czeka.' : `Czeka: ${countOf(waiting, 'upominek', 'upominki', 'upominków')}.`} Dziś odebrano ${claimedToday} z ${claimsPerDay}.`,
