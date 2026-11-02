@@ -73,7 +73,7 @@
       "Przedmiot należy do postaci, która go kupiła, tak jak jej Punkty Systemu.",
       "Ramka i tło zdobią portret w zakładce Postać i na karcie postaci, którą widzą inni gracze.",
       "Z założoną ramką imię postaci może mieć kolor ramki: na czacie, w Rankingu, u Znajomych, w Drużynie i w Gildii.",
-      "Tygrys szablozębny zmienia tylko wygląd wierzchowca ze Stajni, więc kupi go postać, która ma już wierzchowca."
+      "Wierzchowiec zmienia tylko wygląd kupionego ze Stajni, więc kupi go postać, która ma już wierzchowca."
     ]
   }
 }

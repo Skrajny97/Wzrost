@@ -2996,6 +2996,50 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.81 (2.11.2026)
+
+1. **Co wchodzi do gry:**
+    - strona Gildii z czterema zakładkami: Gildia, Bestia, Próby i Prośby;
+    - Bestia Gildii, Próby Gildii i Prośby Gildii (zob. sekcje niżej);
+    - przycisk „Poproś gildię” przy zleceniach, na Kowadle, w Kuźni i u Zaklinaczki;
+    - Tygrys szablozębny z całym ogonem i bez zacięcia w pętli (zob. „Tygrys szablozębny 371 B…”);
+    - w „Jak to działa?” Sklepu zdanie autora „Wierzchowiec zmienia tylko wygląd kupionego ze Stajni”, bo kiedyś dojdą inne wierzchowce niż tygrys.
+2. **Baza danych:** migracje 0067 (Próby Gildii) i 0068 (Prośby Gildii). Bestia Gildii ma swoją tabelę od wersji 0.0.79 (migracja 0066). Migracja 0069 Sklepu weszła wcześniej niż 0067 i 0068; wrangler dokłada brakujące migracje bez względu na kolejność numerów, co sprawdza lokalna baza.
+3. **Przed wdrożeniem:** wszystkie testy (821) przechodzą (test czasu oceny zagrożenia przeszedł przy ponownym uruchomieniu, bo za pierwszym razem maszyna liczyła równocześnie inne testy), a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Zakładki Gildii, wzięcie i postęp próby, prośbę, dar, podziękowanie, ranking Dobroczyńców i przycisk „Poproś gildię” w czterech miejscach sprawdzono w przeglądarce na 390×844 dwiema postaciami jednej gildii, a widok postaci spoza gildii osobno.
+
+## Próby i Prośby Gildii (2.11.2026)
+
+Autor: „345 A” i „346 A”.
+
+1. **Zakładki strony Gildii.** Pod nagłówkiem strony Gildii stoi rząd zakładek jak w Społeczności: Gildia (członkowie, zaproszenia i wyjście), Bestia, Próby i Prośby. Na telefonie wszystkie cztery mieszczą się w jednym rzędzie. Strona otwiera się na zakładce oglądanej ostatnio na tym urządzeniu. Postać spoza gildii widzi najpierw zakładkę Gildia, a w pozostałych tylko opis.
+2. **Tablica Prób (345 A).** Co tydzień, od poniedziałku od północy czasu polskiego, gildia ma tablicę 12 prób z całej gry: stwory, minuty wypraw, walki wygrane w Wieżach, zioła, mikstury, wyroby Warsztatu, Stół rozbiórki, zlecenia Osady, udane ulepszenia na Kowadle i sztuki dane w Prośbach Gildii. Tablica losuje się, gdy ktoś z gildii pierwszy raz zajrzy do niej w tygodniu. Jest wspólna dla całej gildii.
+3. **Wielkość próby (brakujący szczegół).** Próba prosi o tyle, ile pasuje do poziomu postaci w chwili wzięcia, według tej samej krzywej co zadania tygodniowe. Do 50. poziomu prosi więc o dużo mniej. Część prób ma podwójną wielkość.
+4. **Jedna próba naraz.** Postać sama wybiera próbę z tablicy i bierze jedną naraz. Postęp liczy się od chwili wzięcia, w zwykłej grze, razem z zapisem samej czynności. Porzucona próba traci postęp, ale można ją wziąć znowu. Każdą próbę z tablicy postać wykona raz w tygodniu.
+5. **Próby zamknięte (brakujący szczegół).** Próba z części gry, której postać jeszcze nie ma, jest zamknięta i podaje powód: poziom, od którego otwierają się Wieże, Profesje albo Osada, albo budowę Stołu rozbiórki czy Kowadła.
+6. **Pasek i progi (brakujący szczegół).** Każda wykonana próba to punkt na pasku gildii. Pasek ma 4 progi: 2, 4, 6 i 8 prób na aktywnego członka. Aktywny jest członek, którego konto było w grze w ostatnich 7 dniach. Liczy się ich tylu, ilu było przy losowaniu tablicy, co najmniej jeden. Jedna postać dokłada do paska najwyżej 10 prób w tygodniu. Osiągnięty próg zostaje, także gdy ktoś odejdzie z gildii.
+7. **Skrzynie (brakujący szczegół).** Każdy osiągnięty próg daje skrzynię każdej postaci, która w tym tygodniu wykonała w tej gildii choć jedną próbę. W skrzyni jest złoto zależne od poziomu postaci (od 10 + 4 za poziom przy 1. progu do 30 + 12 za poziom przy 4.), od 10 do 30 Punktów Czasu i od 2 do 5 sztuk materiału zwykłego stwora z miejsca, do którego chodzi klasa postaci. Ostatni próg daje też 5 Punktów Systemu. Skrzynię odbiera się do końca następnego tygodnia, raz na postać, tydzień i próg.
+8. **Prośby Gildii (346 A).** Gdy do zlecenia na Tablicy zleceń, na Kowadle, w Kuźni albo u Zaklinaczki brakuje materiału, zioła albo mikstury, postać w gildii widzi przycisk „Poproś gildię”. W zakładce Prośby można też poprosić o wszystko, co postać ma albo zna z Encyklopedii. Prośba to od 1 do 10 sztuk jednego materiału, zioła albo mikstury. O przedmioty i złoto prosić nie można.
+9. **Jedna prośba naraz (brakujący szczegół).** Postać ma naraz jedną otwartą prośbę. Kolejną doda 8 godzin po dodaniu poprzedniej, także po jej wycofaniu. Prośba wisi, aż ktoś ją spełni albo postać ją wycofa, najdłużej 48 godzin.
+10. **Dawanie.** Inni członkowie dają ze swoich zapasów, kiedy chcą, najwyżej tyle, ile brakuje. Sztuki trafiają od razu do postaci, która prosi, z imieniem dającej. Zioła i mikstury potrzebują miejsca w jej plecaku. Postacie jednego konta nic sobie nie dają, jak w Wymianie. Encyklopedia nie zalicza danych sztuk.
+11. **Za dawanie tylko wdzięczność.** System nic za dawanie nie płaci. Dająca postać dostaje miejsce w rankingu „Dobroczyńcy tygodnia” (sztuki dane od poniedziałku) i podziękowanie, raz za każdy dar. Dane sztuki liczą się do Prób Gildii.
+12. **O co prosi przycisk (brakujący szczegół).** Przy zleceniu przycisk prosi o jego zioło, miksturę albo materiał. Przy zleceniu na dowolne materiały jednej rzadkości lista nie ma trofeów elit i czempionów, bo zlecenie ich nie bierze. Na Kowadle, w Kuźni i u Zaklinaczki przycisk prosi o materiał potrzebnej rzadkości albo żywiołu. Na Kowadle pojawia się razem z tym, czego brakuje, po stuknięciu „Ulepsz”.
+13. **Zmiana gildii (brakujący szczegół).** Próba wzięta w poprzedniej gildii przestaje rosnąć, a otwarta prośba przestaje tam wisieć. Wykonane próby usuniętej postaci dalej liczą się do paska, już bez jej imienia.
+14. **Bez linii w czacie.** Próby i Prośby nie piszą w kanale gildii, bo czat nie ma linii Systemu, tak jak przy Bestii.
+15. **Porządki (brakujący szczegół).** Tablice, próby i skrzynie sprzed poprzedniego tygodnia znikają, gdy przychodzi nowa tablica. Prośby zamknięte przed poprzednim tygodniem znikają razem z darami przy kolejnej prośbie.
+16. **Migracje bazy:** 0067 (tablice, próby i skrzynie Prób Gildii) i 0068 (prośby i dary).
+
+## Bestia Gildii (2.11.2026)
+
+Autor: „344 A”.
+
+1. **Bestia tygodnia.** Co tydzień, od poniedziałku od północy czasu polskiego, gildia ma jedną bestię: czempiona jednego z regionów, wylosowanego dla gildii i tygodnia. Bestia przychodzi, gdy ktoś z gildii pierwszy raz na nią spojrzy albo ją zaatakuje. Jej poziom to zaokrąglony średni poziom postaci członków z tej chwili.
+2. **HP bestii (brakujący szczegół)** rośnie z liczbą członków: 12 typowych ataków jednej postaci (3 dziennie przez 4 dni) zbija mniej więcej jej część paska. Typowe obrażenia zmierzyła symulacja walk pięciu klas z czterema czempionami na poziomach od 5 do 200 (`data/guilds.json`, `beast`).
+3. **Ataki.** Postać w gildii atakuje 3 razy na dobę, od północy czasu polskiego, także przy pracy w profesji, ale nie w trakcie wyprawy ani przed odebraniem jej raportu, jak w Wieżach. Atak to jedna walka jak wejście do Wieży: sama, z pełnym HP, bez mikstur. Trofeum z Encyklopedii przeciw bestii i cecha jej regionu się liczą. Bestia zaczyna walkę z HP, które jej zostało, a atak zbija tyle, ile straciła. Atak nie daje XP, złota ani łupów.
+4. **Skrzynia Bestii (brakujący szczegół).** Każda postać, która w tygodniu choć raz zaatakowała, otwiera jedną Skrzynię Bestii. Gdy bestia padnie, w skrzyni jest przedmiot klasy postaci na jej poziomie, w rzadkości czempiona, i 4 losowania materiału bestii. Gdy bestia przeżyje tydzień, są tylko materiały: 3, 2 albo 1 losowanie za zbite 75%, 50% albo 25% paska, a poniżej 25% nic. Skrzynię otwiera się od upadku bestii albo przez cały następny tydzień. Skrzynia z przedmiotem czeka zamknięta, gdy plecak jest pełny.
+5. **Porządki.** Bestie sprzed poprzedniego tygodnia znikają razem z atakami i skrzyniami, gdy przychodzi nowa bestia.
+6. **Bez linii w czacie**, bo czat nie ma linii Systemu.
+7. **Migracja bazy:** 0066, w grze od wersji 0.0.79.
+
 ## Wersja 0.0.80 (2.11.2026)
 
 1. **Co wchodzi do gry:** Sklep Systemu z trzema ramkami, trzema tłami, kolorem imienia jak ramka i Tygrysem szablozębnym (zob. sekcję niżej).
@@ -3017,7 +3061,7 @@ Autor: „tylko ramki i tła wchodzą póki co do gry, wszystkie”, „Wraz z r
 5. **Przedmiot należy do postaci, która go kupiła**, tak jak jej Punkty Systemu.
 6. **Ramka i tło** zdobią portret w zakładce Postać i większy portret na karcie postaci, którą widzą inni gracze. W ramce postać jest mniejsza, żeby zmieściła się w jej oknie. Po Złotej ramce co kilka sekund przebiega blask, a rubiny lśnią. Ramka Systemu pulsuje i przesuwa się po niej jasna linia. Wokół Leśnej ramki krążą świetliki. Przy wyłączonych animacjach ramki stoją.
 7. **Kolor imienia.** Z założoną ramką przełącznik „Kolor imienia jak ramka” barwi imię postaci kolorem ramki: na czacie (globalnym, gildii i prywatnym), w Rankingu, u Znajomych, w Drużynie, w Gildii, na karcie postaci i w nagłówku zakładki Postać.
-8. **Tygrys szablozębny** kupi tylko postać, która ma wierzchowca ze Stajni. Bez niego przycisk mówi „Najpierw kup wierzchowca w Stajni”. Założony tygrys zastępuje w scenie Walki wygląd wierzchowca ze Stajni, a wyprawy skraca dalej wierzchowiec ze Stajni. Jego chód opisuje sekcja „Tygrys szablozębny 371 B…” niżej.
+8. **Tygrys szablozębny** kupi tylko postać, która ma wierzchowca ze Stajni. Bez niego przycisk mówi „Najpierw kup wierzchowca w Stajni”. Założony tygrys zastępuje w scenie Walki wygląd wierzchowca ze Stajni, a wyprawy skraca dalej wierzchowiec ze Stajni. Jego chód opisuje sekcja „Tygrys szablozębny 371 B…” niżej. Od wersji 0.0.81 „Jak to działa?” mówi o wierzchowcach ogólnie, słowami autora: „Wierzchowiec zmienia tylko wygląd kupionego ze Stajni” (autor: „kiedyś dojdą inne niż tygrys”).
 
 ## Tygrys szablozębny 371 B, szaty jeźdźców i tło obozu 372 B (2.11.2026)
 
