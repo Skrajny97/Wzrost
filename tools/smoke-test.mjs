@@ -2,15 +2,21 @@
 //   node tools/smoke-test.mjs <wrangler output file> <expected version>
 // Finds the game URL in the wrangler output, waits until /api/health answers
 // with the new version, checks that the game content is served and puts the
-// URL in the run summary. The game's own domains, listed in the output as
+// URL in the run summary. Cloudflare may take minutes to serve a new version
+// (0.0.89 came up about half an hour after its upload, 2.11.2026), so the
+// check waits up to ten minutes; a game that still answers well, only with
+// the version before, gets a warning instead of a failure. The game's own domains, listed in the output as
 // "(custom domain)", are checked too; a new one may need a few minutes for
 // its certificate, so a domain that does not answer yet only warns.
 
 import { appendFileSync, readFileSync } from 'node:fs';
 
 const [logFile, expectedVersion] = process.argv.slice(2);
-const ATTEMPTS = 12;
-const DELAY_MS = 5000;
+const ATTEMPTS = 60;
+const DELAY_MS = 10000;
+// The domains only warn, so they get the minute they always had.
+const DOMAIN_ATTEMPTS = 12;
+const DOMAIN_DELAY_MS = 5000;
 
 function summary(markdown) {
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${markdown}\n`);
@@ -31,7 +37,7 @@ summary(
 async function checkDomains() {
   for (const domain of domains) {
     let problem = '';
-    for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
+    for (let attempt = 1; attempt <= DOMAIN_ATTEMPTS; attempt++) {
       try {
         const response = await fetch(`${domain}/api/health`, { headers: { 'Cache-Control': 'no-cache' } });
         const data = await response.json().catch(() => null);
@@ -44,7 +50,7 @@ async function checkDomains() {
       } catch (error) {
         problem = error.cause?.code ?? error.message;
       }
-      if (attempt < ATTEMPTS) await new Promise((resolve) => setTimeout(resolve, DELAY_MS));
+      if (attempt < DOMAIN_ATTEMPTS) await new Promise((resolve) => setTimeout(resolve, DOMAIN_DELAY_MS));
     }
     if (problem) console.log(`::warning::Domena ${domain} jeszcze nie odpowiada (${problem}). Nowa domena może potrzebować kilku minut na certyfikat.`);
   }
@@ -62,6 +68,7 @@ async function checkContent() {
 }
 
 let gotResponse = false;
+let stillOld = false;
 let lastProblem = '';
 for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
   try {
@@ -79,13 +86,21 @@ for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
       process.exit(0);
     }
     lastProblem = `HTTP ${response.status}, wersja ${data?.version ?? 'nieznana'}`;
+    stillOld = response.ok && data?.ok === true && typeof data.version === 'string';
   } catch (error) {
     lastProblem = error.cause?.code ?? error.message;
+    stillOld = false;
   }
   console.log(`Próba ${attempt}/${ATTEMPTS}: ${lastProblem}`);
   if (attempt < ATTEMPTS) await new Promise((resolve) => setTimeout(resolve, DELAY_MS));
 }
 
+// The upload went through and the game answers, with the version before:
+// Cloudflare has not switched to the new one yet.
+if (stillOld) {
+  console.log(`::warning::Gra pod ${url} działa, ale Cloudflare jeszcze nie przełączył wersji (${lastProblem}). Nowa wersja powinna wejść sama w ciągu kilkudziesięciu minut.`);
+  process.exit(0);
+}
 if (gotResponse) {
   console.log(`::error::Gra pod ${url} nie odpowiada poprawnie (${lastProblem}).`);
   process.exit(1);

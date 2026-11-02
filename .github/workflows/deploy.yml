@@ -34,8 +34,10 @@ jobs:
     name: Testy
     runs-on: ubuntu-latest
     # The whole suite takes about 15 minutes on GitHub's runner (0.0.74 was
-    # cut off at 15), so it gets twice that.
-    timeout-minutes: 30
+    # cut off at 15), and installing the browser for the first steps may take
+    # ten more (0.0.90 was cut off at 30, 2.11.2026, after 19 minutes of tests
+    # and 10 of the browser), so it gets 45.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v6
       # A working branch at the commit main has just tested (main merged in

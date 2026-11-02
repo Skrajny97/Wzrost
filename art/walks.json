@@ -201,6 +201,156 @@
       "start": "art/references/walks/start/night-dancer-female.png",
       "pose": 2,
       "description": "a lithe young woman with short brown hair, light flowing dark violet garments with long trailing scarves, a half mask over the mouth, soft boots, a slim curved blade in each hand"
+    },
+    "archmage-female": {
+      "start": "art/references/walks/start/archmage-female.png",
+      "pose": 2,
+      "description": "an adult woman archmage of the elements with long brown hair, a long red robe with dark blue panels, golden ornaments and a high dark blue collar, a golden staff topped with fire and ice crystals held upright in her right hand"
+    },
+    "archmage-male": {
+      "start": "art/references/walks/start/archmage-male.png",
+      "pose": 2,
+      "description": "an adult man archmage of the elements with long brown hair and a short beard, a long red robe with dark blue panels, golden ornaments and a high dark blue collar, a golden staff topped with fire and ice crystals held upright in his right hand"
+    },
+    "arena-champion-female": {
+      "start": "art/references/walks/start/arena-champion-female.png",
+      "pose": 2,
+      "description": "a young woman arena champion in polished bronze armour with a breastplate, a bronze helmet with a tall red crest, a red cloak and a red pleated skirt, bronze greaves and sandals, a round bronze shield on her left arm and a short sword in her right hand"
+    },
+    "arena-champion-male": {
+      "start": "art/references/walks/start/arena-champion-male.png",
+      "pose": 2,
+      "description": "a young man arena champion in polished bronze armour with a lion breastplate, a bronze helmet with a tall red crest, a red cloak and a red pleated skirt, bronze greaves and sandals, a round bronze shield on his left arm and a short sword in his right hand"
+    },
+    "bastion-female": {
+      "start": "art/references/walks/start/bastion-female.png",
+      "pose": 2,
+      "description": "a stern woman knight with dark hair to the shoulders, dark steel plate armour with golden trim, a dark blue tabard with a belt, a tall kite shield with a tower emblem on her left arm and a flanged mace in her right hand"
+    },
+    "bastion-male": {
+      "start": "art/references/walks/start/bastion-male.png",
+      "pose": 2,
+      "description": "a stern man knight with short black hair, dark steel plate armour with golden trim, a dark blue tabard with a belt, a tall kite shield with a tower emblem on his left arm and a flanged mace in his right hand"
+    },
+    "berserker-female": {
+      "start": "art/references/walks/start/berserker-female.png",
+      "pose": 2,
+      "description": "a muscular woman berserker with long red hair, a bear skull over her head and a fur pelt over her shoulders, bare arms with war paint, a leather top and a fur skirt with a wide belt, fur-wrapped boots, an axe in her right hand"
+    },
+    "berserker-male": {
+      "start": "art/references/walks/start/berserker-male.png",
+      "pose": 2,
+      "description": "a huge bearded barbarian berserker with a whole bear head and pelt over his head and shoulders, a bare scarred muscular chest, leather bracers with iron bands, a fur kilt with a wide belt, fur-wrapped boots, a big axe in his right hand"
+    },
+    "druid-female": {
+      "start": "art/references/walks/start/druid-female.png",
+      "pose": 2,
+      "description": "a young woman druid with long auburn hair in braids and a crown of antlers, a mantle of green leaves over a green and brown robe with a wide belt, a gnarled wooden staff topped with a green crystal in her right hand"
+    },
+    "druid-male": {
+      "start": "art/references/walks/start/druid-male.png",
+      "pose": 2,
+      "description": "an old druid with a long brown beard and a crown of antlers, a mantle of green leaves over a brown bark-like robe with a wide belt and pouches, a gnarled wooden staff topped with a green crystal in his right hand"
+    },
+    "grand-inquisitor-female": {
+      "start": "art/references/walks/start/grand-inquisitor-female.png",
+      "pose": 2,
+      "description": "a stern woman grand inquisitor with dark hair tied back, blackened plate armour with golden holy symbols, a long red cape and a red tabard, a heavy warhammer in her right hand"
+    },
+    "grand-inquisitor-male": {
+      "start": "art/references/walks/start/grand-inquisitor-male.png",
+      "pose": 2,
+      "description": "a stern man grand inquisitor with short dark hair, blackened plate armour with golden holy symbols, a long red cape and a red tabard, a heavy warhammer in his right hand"
+    },
+    "high-priest-female": {
+      "start": "art/references/walks/start/high-priest-female.png",
+      "pose": 2,
+      "description": "a woman high priestess with long golden hair, a tall white and gold mitre, long white and gold ceremonial robes, a tall golden staff topped with a sun in her right hand"
+    },
+    "high-priest-male": {
+      "start": "art/references/walks/start/high-priest-male.png",
+      "pose": 2,
+      "description": "an old high priest with a golden beard, a tall white and gold mitre, long white and gold ceremonial robes with golden embroidery, a tall golden staff topped with a sun in his right hand"
+    },
+    "kingslayer-female": {
+      "start": "art/references/walks/start/kingslayer-female.png",
+      "pose": 2,
+      "description": "a hooded woman assassin in a dark red hood and cloak, a black mask over the lower face, dark chainmail and leather armour, a broken golden crown hanging at the belt, a glowing red curved dagger in her right hand"
+    },
+    "marksman-female": {
+      "start": "art/references/walks/start/marksman-female.png",
+      "pose": 2,
+      "description": "a young woman marksman with long black hair and a silver circlet, dark leather armour with a silver pauldron, a long green cloak, a quiver of white-fletched arrows on her back, brown boots, a long black bow in her right hand"
+    },
+    "master-hunter-female": {
+      "start": "art/references/walks/start/master-hunter-female.png",
+      "pose": 2,
+      "description": "a young woman hunter with fair hair, a grey wolf pelt and the wolf head over her head, a brown leather jerkin with fur trim, green trousers, fur-topped boots, a falcon perched on her shoulder, a wooden bow in her left hand and a hunting knife in her right hand"
+    },
+    "master-hunter-male": {
+      "start": "art/references/walks/start/master-hunter-male.png",
+      "pose": 2,
+      "description": "a bearded man hunter with a grey wolf pelt and the wolf head over his head, a brown leather jerkin with fur trim, leather trousers, fur-topped boots, a falcon perched on his shoulder, a wooden longbow in his left hand and a curved hunting knife in his right hand"
+    },
+    "miracle-worker-female": {
+      "start": "art/references/walks/start/miracle-worker-female.png",
+      "pose": 2,
+      "description": "a young woman healer with black hair in a bun, a long white robe with wide sleeves, an olive-yellow mantle, a wooden staff with small white flowers in her right hand"
+    },
+    "miracle-worker-male": {
+      "start": "art/references/walks/start/miracle-worker-male.png",
+      "pose": 2,
+      "description": "a young man healer with short black hair, a long white robe with a brown belt, an olive-yellow hooded mantle, brown shoes, a wooden shepherd staff with small white flowers in his right hand"
+    },
+    "necromancer-female": {
+      "start": "art/references/walks/start/necromancer-female.png",
+      "pose": 2,
+      "description": "a pale woman necromancer with long black hair, a long black and purple robe with bone-white trim, a staff topped with a ram skull in her right hand"
+    },
+    "phantom-female": {
+      "start": "art/references/walks/start/phantom-female.png",
+      "pose": 2,
+      "description": "a young woman with long silver-white hair, dark grey leather armour, a long tattered dark cloak, a curved sword in each hand"
+    },
+    "phantom-male": {
+      "start": "art/references/walks/start/phantom-male.png",
+      "pose": 2,
+      "description": "a young man with silver-white hair, dark grey leather armour and a dark cloak, a long curved sword in his right hand"
+    },
+    "thunder-lord-female": {
+      "start": "art/references/walks/start/thunder-lord-female.png",
+      "pose": 2,
+      "description": "a young blond woman thunder lord with a long braid and a silver circlet with a blue storm crystal, a long dark blue coat with silver lightning embroidery, leather bracers, a quiver on her back, brown boots, an ornate silver longbow with glowing blue runes in her right hand"
+    },
+    "thunder-lord-male": {
+      "start": "art/references/walks/start/thunder-lord-male.png",
+      "pose": 2,
+      "description": "a young blond man thunder lord with a silver circlet with a blue storm crystal, a long dark blue coat with silver lightning embroidery, silver pauldrons, leather bracers, a quiver on his back, brown boots, an ornate silver longbow with glowing blue runes in his right hand"
+    },
+    "winter-lord-female": {
+      "start": "art/references/walks/start/winter-lord-female.png",
+      "pose": 2,
+      "description": "a queen of winter with long white hair and an ice crown, a long dark blue gown with silver frost embroidery, a white fur mantle, a staff topped with an ice crystal in her right hand"
+    },
+    "winter-lord-male": {
+      "start": "art/references/walks/start/winter-lord-male.png",
+      "pose": 2,
+      "description": "an old king of winter with white hair and a white beard, an ice crown, a long dark blue coat with white frost embroidery, a white fur mantle with ice pauldrons, dark boots, a sword at his hip and a staff topped with a big ice crystal in his right hand"
+    },
+    "kingslayer-male": {
+      "start": "art/references/walks/start/kingslayer-male.png",
+      "pose": 2,
+      "description": "a hooded man assassin in a dark red hood and cloak, a black mask over the lower face, dark chainmail and leather armour, a broken golden crown hanging at the belt, a glowing red curved dagger in his right hand"
+    },
+    "marksman-male": {
+      "start": "art/references/walks/start/marksman-male.png",
+      "pose": 2,
+      "description": "a young man marksman with short black hair and a silver circlet, dark leather armour with a silver pauldron, a long green cloak, a quiver of white-fletched arrows on his back, brown boots, a long black bow held vertically in his right hand"
+    },
+    "necromancer-male": {
+      "start": "art/references/walks/start/necromancer-male.png",
+      "pose": 2,
+      "description": "a pale gaunt man necromancer with long black hair, a long black and purple robe with bone-white trim and a high collar, a staff topped with a ram skull in his right hand, a small green flame floating above his left hand held before his chest"
     }
   }
 }

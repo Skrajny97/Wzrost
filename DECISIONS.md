@@ -2996,6 +2996,49 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Kamień węgielny Warowni w Obozie (2.11.2026)
+
+Autor (zrzut planszy Obozu z wolnym miejscem między Skrzynią Konta a Kopalnią): „tutaj w Obozie jest wolne miejsce... jakiś pomysł na to co z tym zrobić?”, a potem „435 A”.
+
+1. **Co stoi.** Na wolnym miejscu leży duży kamień z wyrytym znakiem: Kamień węgielny Warowni.
+2. **Po stuknięciu** widać, ile brakuje do Warowni: ile budynków ma już najwyższy poziom (np. „3 z 10”) i poziom Obozu (np. „6 z 10”).
+3. **Później** w tym miejscu zaczyna się przemiana w Warownię: rusztowanie, potem kamienne mury.
+4. **Kolejność.** Najpierw grafika kamienia na planszę, do oceny autora, potem kod.
+
+## Prośby Gildii: wycofana prośba znika (2.11.2026)
+
+Autor (zrzut „Futro żbika × 10, Dane: 0 z 10. Wycofana.”): „Wycofane prośby powinny znikac i tylko pokazywać czas przed kolejną prośbą.”
+
+1. **Karta.** Wycofana prośba znika z części „Twoja prośba”. Gdy kolejną można dodać dopiero później, zostaje tylko zdanie „Kolejną prośbę dodasz od …”. Prośba spełniona albo ta, której czas minął, dalej widnieje do 48 godzin po dodaniu, bo przy niej się dziękuje.
+2. **Podziękowania (brakujący szczegół).** Wycofana prośba nie ma już przycisków „Podziękuj”, więc przy wycofaniu każdy dar, za który proszący jeszcze nie podziękował, dostaje podziękowanie od razu. Dający nie tracą go w rankingu Dobroczyńców tygodnia. Okno wycofania mówi o tym: „Dane sztuki zostają u Ciebie, a za każdy dar podziękujesz od razu.”
+3. Prośba bez darów znika przy wycofaniu jak dotąd i nową można dodać od razu.
+
+## Wersja 0.0.91 (2.11.2026)
+
+1. **Co wchodzi do gry:**
+    - poprawka z 0.0.90, której wdrożenie przerwał limit czasu: drobinki i iskry aury w scenie Walki krążą wokół postaci;
+    - okno „Parametry dodatkowe” w Statystykach (zob. „Statystyki: okno »Parametry dodatkowe«”);
+    - handel u Jagny, Wszebora, kowala i na Targowisku: drobne zakupy sumują się w ciągu dnia, a strona mówi, ile złota daje punkt (zob. „Handel: drobne zakupy sumują się w ciągu dnia”);
+    - Obóz zapowiada Warownię zamiast Wioski: opis, zdanie o najwyższym poziomie, zdanie towarzysza i nowe nagranie narratora przy wejściu do Obozu (wersja B, 433 B);
+    - sprawdzenie po wdrożeniu czeka do 10 minut, a testy na GitHubie mają 45 minut.
+    Razem z tym idą notatki i pliki, których gra jeszcze nie używa: plan Warowni (419–432), klatki startowe i opisy chodów drugich form.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** na tym komputerze przeszło 850 z 851 testów. Nie przeszedł tylko test czasu szacowania zagrożenia (średnio 6 ms), bo w tym samym czasie liczyła się symulacja trudności. Ten sam pomiar dla wersji 0.0.88 daje tu tyle samo (6,0–6,5 ms), a GitHub i tak powtarza wszystkie testy przed wdrożeniem. Nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`). Okno parametrów i teksty handlu sprawdzono w przeglądarce na 390×844 i 1280×800.
+
+## Druga ewolucja czeka na chody i jazdę (2.11.2026)
+
+Autor, po pierwszych klatkach chodów drugich form (434.1–434.15): „To jak chcesz wdrażać ewolucje bez chodów i jazdy? nie moze tak być mistrzu”, „pierwsze klatki to ciul, przerysuj tych mezczyzn i wdrażaj później jak animacje beda git, tylko mi je pokażesz, pamietaj ze tam też są odcienie skory” i „niby mozesz wdrazac czesciami bez tego, bo nikt nie dobił jeszcze 50tego nawet, ale informuj na przyszłość o takich rzeczach”.
+
+1. **Druga ewolucja wchodzi do gry razem z grafiką.** Kod drugiej ewolucji jest scalony i przechodzi testy (878), ale do gry trafi dopiero z chodami 30 drugich form, z jazdą wierzchem na każdym wierzchowcu i z siedmioma odcieniami skóry, tak jak przy pierwszych ewolucjach.
+2. **Pierwsze klatki bez oceny autora.** Autor ocenia chody jako gotowe animacje. Pierwsze klatki dobiera się samemu: trzech mężczyzn (Strzelec Wyborowy, Królobójca, Nekromanta) rysuje się od nowa, bo stali przodem.
+3. **Na przyszłość:** przed wdrożeniem czegoś bez pełnej grafiki trzeba to autorowi powiedzieć (zasada w `CLAUDE.md`).
+
+## Sprawdzenie po wdrożeniu czeka dłużej (2.11.2026)
+
+1. **Co się stało.** Wdrożenie 0.0.89 wysłało nową wersję do Cloudflare bez błędu, ale gra jeszcze przez około pół godziny odpowiadała jako 0.0.88. Sprawdzenie po wdrożeniu (`tools/smoke-test.mjs`) czekało tylko minutę, więc przebieg na GitHubie skończył się błędem, choć wersja weszła sama. Cloudflare nie zgłaszał wtedy awarii.
+2. **Zmiana.** Sprawdzenie czeka teraz do 10 minut (60 prób co 10 sekund). Gdy gra odpowiada poprawnie, ale wciąż poprzednią wersją, przebieg kończy się ostrzeżeniem, a nie błędem: wersja wejdzie sama. Błędem kończy się dalej gra, która nie odpowiada albo odpowiada błędem. Domeny gry sprawdzają się jak dotąd przez minutę i tylko ostrzegają.
+3. **0.0.90 przerwane.** Przebieg 0.0.90 przerwał limit 30 minut na testy: same testy trwały 19 minut, a instalacja przeglądarki do przejścia wprowadzenia tym razem 10 minut. Wprowadzenie przeszło na wszystkich trzech ekranach kilka sekund przed limitem, ale wdrożenie już nie ruszyło. Testy mają teraz 45 minut. Poprawka z 0.0.90 wchodzi z 0.0.91.
+
 ## Ceny Warowni i wierzchowców, trudność: odpowiedzi autora 430–432 (2.11.2026)
 
 Autor przy 419: „sprawdz czy gracz jest w stanie tyle zarobić w ogole sensownie, tez nie wiem czy wierzchowce nie są za drogie, nie wiem czy balans nie idzie na zbyt hard mimo gry na lata”. Po analizie: „430 A”, „431 A”, „432 A, jesli bierzesz pod uwage ekwipunek i towarzyszy, ludzie mowia ze jest za łatwo i tak” i „na pierwszych poziomach do 50ego może być łatwiej, ale pozniej curve trudnosci musi troche rosnac i od 100ego być mid mid”.
@@ -3060,7 +3103,7 @@ Autor: „Zaplanujmy zatem Warownię może w miedzyczasie? Teksty, opisy..”, a
 9. **Teksty Obozu (428 A).**
     - Opis Obozu: „Polana na skraju puszczy, która z czasem stanie się warownią. Każdy poziom obozu przyspiesza budowę wszystkich budynków.”
     - Zapowiedź: „Gdy Obóz i wszystkie jego budynki dojdą do najwyższego poziomu, Obóz będzie mógł stać się Warownią.”
-    - Kwestia narratora `lead-camp` mówi o wiosce. Jej nowy tekst idzie do autora przed nagraniem (pytanie 429), a potem nagranie od nowa.
+    - Kwestia narratora `lead-camp` mówi teraz: „Żadna szanująca się postać nie pozbawi siebie opcji budowania obozu, a kto wie, może z czasem i całej warowni. Zajrzyjmy do Twojego obozu.” (429: „zgadzam sie na zmiane wioski na warownie”). ElevenLabs nagrał ją dwa razy tym samym głosem i modelem co resztę wprowadzenia (294 kredyty). Nagrania są przycięte za ostatnim słowem, wyrównane do −18 LUFS i zapisane w mono 56 kb/s. Autor wybrał wersję B (433 B).
     - Zdanie towarzysza o wiosce (`data/settlement.json`) też mówi już o warowni.
 10. **Kolejność** zostaje: druga ewolucja, potem Warownia, potem Górnictwo i Jubilerstwo. Grafiki Warowni powstaną po tekstach i pójdą do autora pojedynczo.
 
