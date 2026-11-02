@@ -223,10 +223,11 @@ describe('the second evolution in the engine', () => {
     state.content = { evolutionArt: art };
     try {
       // The form's own art first, so a file and its id on the list are all
-      // it takes; then the first evolution's, then the class's.
+      // it takes; then the first evolution's, then the class's. Every second
+      // form walks and rides in its own look.
       assert.deepEqual(lookIds('warrior', 'female', 'berserker'), ['berserker-female', 'barbarian-female', 'warrior-female']);
-      assert.equal(walkerSheet('warrior', 'female', undefined, 'berserker'), 'art/walkers/barbarian-female.png');
-      assert.equal(riderFile('cleric', 'male', undefined, 'high-priest'), 'art/riders/priest-male.png');
+      assert.equal(walkerSheet('warrior', 'female', undefined, 'berserker'), 'art/walkers/berserker-female.png');
+      assert.equal(riderFile('cleric', 'male', undefined, 'high-priest'), 'art/riders/high-priest-male.png');
       assert.deepEqual(artChain('ent-summon'), ['ent-summon', 'elemental-summon']);
       assert.deepEqual(artChain('power-strike'), ['power-strike']);
     } finally {
@@ -491,9 +492,16 @@ describe('the second forms in fights', () => {
     // they come (tools/evolution-sim.mjs). The form faints less often and
     // ends them with no less HP, or (where neither faints much) with clearly
     // more HP; a healer ends them near full HP either way.
+    // The forms were set against the monsters of then (+25% from 50 to 100,
+    // nothing past it): against the steeper late game (balance.monsters) a
+    // typical character, without companions or upgrades, faints on every
+    // such exploration with either form, so the comparison keeps them.
     const level = 90;
     const area = areaForLevel(level + 8, content);
-    const local = area.id in content.areasById ? content : { ...content, areasById: { ...content.areasById, [area.id]: area } };
+    const { lateGame, endGame } = content.balance.monsters;
+    const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0.25, hp: 0.25 }, endGame: { ...endGame, damage: 0, hp: 0 } };
+    const then = { ...content, balance: { ...content.balance, monsters } };
+    const local = { ...then, areasById: { ...content.areasById, [area.id]: area } };
     const explore = (evolution) => {
       const base = typicalCharacter(evolution.classId, level, content);
       const character = { ...base.character, evolution: evolution.id, skills: simulatedSkills(evolution, base.character.classLevel, content) };
