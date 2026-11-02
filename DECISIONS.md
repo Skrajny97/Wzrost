@@ -3018,7 +3018,10 @@ Autor: „Jeśli zadna proba jest niewzieta z Prob gildii niech podswietla sie i
     - żółte kropki przy rzeczach do zrobienia w Gildii (zob. „Gildia: żółte kropki przy rzeczach do zrobienia”).
      Razem z tym idą narzędzie `tools/difficulty-sim.mjs` i nowe opisy trzech chodów drugich form do narysowania od nowa.
 2. **Baza danych:** bez migracji.
-3. **Przed wdrożeniem:** zob. opis wersji w historii zmian.
+3. **Przed wdrożeniem:**
+    - Na tym komputerze przeszły wszystkie testy (857).
+    - Nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`).
+    - Kropki Gildii sprawdzono w przeglądarce na telefonie: zakładka Społeczność i część „Bestia” strony Gildii.
 
 ## Trudność po 50. poziomie: odpowiedzi autora 438 (2.11.2026)
 
