@@ -16,6 +16,12 @@
 # Each skin colour keeps its place between the darkest and the lightest skin
 # colour of the portrait, on the tone's ramp from shadow to light.
 #
+# A portrait drawn in another skin than the plain one (the Widmo-mężczyzna's
+# grey: DECISIONS.md, "Kosmetyki i pary portretów: odpowiedzi autora
+# 396–418") names its drawing as "source" and the ramp of the plain skin as
+# "drawnRamp": the tones come from the drawing, and the portrait file itself
+# is the drawing with its skin on that ramp.
+#
 # Usage: python3 tools/evolution-tones.py [--ids a,b] [--mask out-dir]
 import colorsys, json, os, sys
 from PIL import Image, ImageDraw
@@ -81,18 +87,24 @@ def main():
     for name, cfg in masks.items():
         if only and name not in only:
             continue
-        im = Image.open(os.path.join(PORTRAITS, name + '.png')).convert('RGBA')
+        source = os.path.join(ROOT, cfg['source']) if 'source' in cfg else os.path.join(PORTRAITS, name + '.png')
+        im = Image.open(source).convert('RGBA')
         skin = skin_of(im, cfg)
         colours = {im.getpixel(p)[:3] for p in skin}
         low, high = min(map(lum, colours)), max(map(lum, colours))
-        for tone in tones:
-            ramp = [rgb(c) for c in tone['ramp']]
+
+        def recoloured(ramp):
             out = im.copy()
             px = out.load()
             for x, y in skin:
                 c = px[x, y]
                 px[x, y] = (*on_ramp(ramp, (lum(c[:3]) - low) / (high - low or 1)), c[3])
-            out.save(os.path.join(PORTRAITS, f"{name}-{tone['id']}.png"), optimize=True)
+            return out
+
+        for tone in tones:
+            recoloured([rgb(c) for c in tone['ramp']]).save(os.path.join(PORTRAITS, f"{name}-{tone['id']}.png"), optimize=True)
+        if 'drawnRamp' in cfg:
+            recoloured([rgb(c) for c in cfg['drawnRamp']]).save(os.path.join(PORTRAITS, name + '.png'), optimize=True)
         if mask_dir:
             view = im.copy()
             for p in skin:

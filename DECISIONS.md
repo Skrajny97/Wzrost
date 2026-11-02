@@ -2996,6 +2996,25 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Druga ewolucja: odcienie skóry 30 portretów (2.11.2026)
+
+Autor: „Portrety masz zatwierdzone musisz zrobić maski na odcienie i wykonać je”.
+
+1. **Maski.** Każdy z 30 portretów drugiej formy ma maskę skóry w `tools/evolution-tones.json`, w tym samym zapisie co portrety pierwszej ewolucji. Maska to barwy skóry portretu, obszary, w których skóra jest widoczna (twarz, szyja, ręce, dłonie, nogi), oraz poprawki pojedynczych pikseli.
+2. **Jak powstały maski.**
+    - Barwy skóry podpowiedziało 40 portretów, które mają już sprawdzone odcienie. Barwa nowego portretu jest skórą, gdy najbliższe jej znane barwy są skórą.
+    - Obszary są wyznaczone ręcznie, a każdy portret obejrzany w powiększeniu razem z maską. Z masek wycięte zostały:
+        - trzonek u Berserkerki;
+        - brzeg tarczy u Czempiona;
+        - sokół u Mistrzów Łowów;
+        - jasne włosy i warkocz u Władców Piorunów;
+        - obszycie szaty u Nekromantki.
+    - Blada i szara skóra Nekromantów i Widm wzięła barwy z policzka.
+    - Skóra w cieniu jest dobrana z odcieni sąsiadujących z resztą skóry.
+3. **Odcienie.** `tools/evolution-tones.py` zrobił 7 odcieni każdego portretu, razem 210 plików w `src/client/art/portraits`. Sprawdzone na zestawieniu: twarze i dłonie zmieniają kolor, a włosy, zbroje, szaty i broń zostają takie same.
+4. **Widmo-mężczyzna.** Jego rysunek (`art/references/evolutions/phantom-male.png`) ma szarą skórę i to on jest odcieniem „szary”. Plik podstawowy ma skórę jasną. Narzędzie robi go z rysunku według dwóch nowych pól: `source` (rysunek) i `drawnRamp` (barwy jasnej skóry).
+5. **Do gry** portrety wchodzą razem z drugą ewolucją. Po scaleniu pracy pomocnika lista portretów gry (`SPRITES.portraits`) dostanie 30 nowych pozycji.
+
 ## Wersja 0.0.88 (2.11.2026)
 
 1. **Co wchodzi do gry:** postęp wziętej próby w Tablicy prób (zob. sekcję niżej). Razem z nim idą notatki i pliki z gałęzi roboczej, których gra jeszcze nie używa: zatwierdzone portrety drugiej ewolucji jako wzory i narzędzie PixelLab do klatek startowych chodów.
