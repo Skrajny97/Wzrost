@@ -43,9 +43,11 @@
 //   weapon (epic chest, off-hand and head) from 100, legendary weapon and
 //   chest (epic elsewhere) from 150;
 // - upgrades on the Kowadło: +1 at 10, +2 at 20, +3 at 30, +4 at 40, +5
-//   from 50, +6 from 90, +7 from 125, the weapon one more from 50 (what a
-//   tenth to a third of the gold of the levels before pays for; the
-//   Kowadło itself costs little);
+//   from 50, +6 from 90, +7 from 125, the weapon one more from 50: a player
+//   who puts most of its gold into gear (taking one whole set of items of
+//   the level from +0 there costs, on average with the failures, 40–70% of
+//   all the gold explored until then, e.g. about 40 000 of 60 000 at 50;
+//   the Kowadło itself costs little), so an upper bound;
 // - companions: none before 30 (the Osada opens at 20, the Kwatery and a
 //   hire cost about 2 500 gold, ten hours of exploring then), one from 30,
 //   two from 50 (the second bed costs 5 120 gold and 20 hours of building).
@@ -62,8 +64,9 @@
 // - trophies (+5% damage) against the creatures of the place's usual
 //   encounters from 30.
 // The `low` variant is a weaker but still engaged player: one rarity lower
-// everywhere, two upgrades fewer, companions with the gear they come with
-// (a common weapon and body armour of their level) and the first standing,
+// everywhere, two upgrades fewer (a whole set from +0 costs 6–12% of the
+// gold explored until then), companions with the gear they come with (a
+// common weapon and body armour of their level) and the first standing,
 // one potion strength lower and fewer of them, no trophies.
 
 import { fileURLToPath } from 'node:url';
