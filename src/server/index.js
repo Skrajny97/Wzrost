@@ -22,7 +22,7 @@ import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, tha
 import { getGuildTodo } from './guild-todo.js';
 import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } from './guild-exchange.js';
 import { guildRanking } from './guild-fame.js';
-import { craftMaterials, salvageItem, sellMaterials, skipCrafting } from './crafting.js';
+import { craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
@@ -132,6 +132,7 @@ const routes = [
   ['POST', '/api/items/:id/upgrade', upgradeItem],
   ['POST', '/api/items/sell', sellItems],
   ['POST', '/api/items/:id/sell', sellItem],
+  ['POST', '/api/items/salvage', salvageItems],
   ['POST', '/api/items/:id/salvage', salvageItem],
   ['POST', '/api/craft/materials', craftMaterials],
   ['POST', '/api/materials/sell', sellMaterials],

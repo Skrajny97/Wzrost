@@ -243,3 +243,33 @@ export function orderSalvage(state, item, name, table, now, rng, content) {
   const order = { kind: 'item', name, rarity: item.rarity, partId, parts: count, bonus: bonusParts(count, table, rng) };
   return { ...state, queue: append(state.queue, order, craftMinutes(item.rarity, count, table.pace, content), now) };
 }
+
+// Orders to take several items apart at once ("Rozbierz kilka", the author:
+// "zaznaczać które chcemy (i możemy) przedmioty i dać do rozbiórki"): one
+// order for each kind of part, so a handful of items takes a place or two in
+// the queue and not one each. The parts and the minutes are those of taking
+// the items apart one by one, added up. `entries` are { item, name }; an
+// order of one item keeps its name, one of more has `count` items and no
+// name. The caller checks as for orderSalvage, and room for every order.
+export function orderSalvageMany(state, entries, table, now, rng, content) {
+  const groups = new Map();
+  for (const { item, name } of entries) {
+    const { partId, count } = salvageYield(item, content);
+    const group = groups.get(partId) ?? { name, rarity: item.rarity, items: 0, parts: 0, minutes: 0 };
+    groups.set(partId, {
+      ...group,
+      items: group.items + 1,
+      parts: group.parts + count,
+      minutes: group.minutes + craftMinutes(item.rarity, count, table.pace, content),
+    });
+  }
+  let { queue } = state;
+  for (const [partId, group] of groups) {
+    const order =
+      group.items === 1
+        ? { kind: 'item', name: group.name, rarity: group.rarity, partId, parts: group.parts }
+        : { kind: 'item', count: group.items, rarity: content.partsById[partId].rarity, partId, parts: group.parts };
+    queue = append(queue, { ...order, bonus: bonusParts(group.parts, table, rng) }, group.minutes, now);
+  }
+  return { ...state, queue };
+}

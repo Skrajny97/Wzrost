@@ -799,8 +799,9 @@ function craftingView(row, levels, now) {
         id: order.id,
         kind: order.kind,
         materialId: material?.materialId ?? null,
-        name: material ? material.name : order.name,
-        count: order.kind === 'material' ? order.count : 1,
+        // A handful taken apart at once ("Rozbierz kilka") has no one name.
+        name: material ? material.name : (order.name ?? 'Przedmioty'),
+        count: order.count ?? 1,
         rarity,
         color: content.raritiesById[rarity].color,
         part: content.partsById[order.partId].name,
