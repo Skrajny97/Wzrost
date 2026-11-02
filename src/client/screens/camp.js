@@ -9,7 +9,7 @@
 // dealer sells crafting parts. Opened with the camp button in the top bar.
 
 import { materialSprite, resourceArt } from '../art.js';
-import { BOARD_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, plotArt } from '../camp-art.js';
+import { BOARD_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, cornerstoneArt, plotArt } from '../camp-art.js';
 import { craftTableSection, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -17,7 +17,7 @@ import { leaveView, openView } from '../history.js';
 import { playSound } from '../sound.js';
 import { call, costShortfall, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
 import { skipControl } from '../time.js';
-import { confirmAction, guided, systemPanel, toast, withButton } from '../ui.js';
+import { confirmAction, guided, meter, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { scrapperSheet } from '../scrapper.js';
 import { itemSheet, itemSummary } from './character.js';
 import { mountChest } from './chest.js';
@@ -30,6 +30,9 @@ const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
 // of its own like a building's (screens/chest.js).
 const CHEST = 'skrzynia-konta';
 const CHEST_SPOT = { x: 170, y: 274 };
+// The Kamień węgielny Warowni on the free place of the board with the Osada,
+// between the Skrzynia Konta and the Kopalnia (the author's "435 A").
+const CORNERSTONE_SPOT = { x: 262, y: 372 };
 // The pieces last picked on the fire spirit's slider, while its building's
 // screen stays open: a newly opened screen starts at one piece (the author:
 // "suwak był ustawiony na najniższą wartość").
@@ -55,6 +58,21 @@ const campOf = () => state.character.camp.level;
 // The taller board, with room for the Osada's buildings (the Kwatery), once
 // the character has the Osada.
 const tall = () => Boolean(state.character.settlementOpen);
+
+// The Kamień węgielny Warowni's window: what it is and how many buildings
+// stand at their highest level, and the camp's level, out of all.
+function cornerstoneSheet(stone) {
+  openSheet(
+    h('h2', { class: 'sheet-title', text: stone.name }),
+    h('p', { class: 'muted cornerstone-text', text: stone.text }),
+    h(
+      'div',
+      { class: 'cornerstone-rows' },
+      stone.rows.map((row) => meter({ label: row.label, value: row.done, max: row.of, kind: 'cornerstone' }).element),
+    ),
+    stone.ready && h('p', { class: 'system-hint', text: stone.ready }),
+  );
+}
 
 // The upgrade in progress, if its time has not passed yet.
 function runningBuild(now = serverNow()) {
@@ -268,6 +286,7 @@ function mountBoard(container, backHash) {
         boardArt(campOf().level, tall()),
         character.camp.buildings.map((building) => plot(building, running)),
         chestLink(),
+        tall() && cornerstone(),
         campLevelButton(running),
       ),
       nothingBuilt &&
@@ -333,6 +352,29 @@ function mountBoard(container, backHash) {
       },
       h('span', { class: 'camp-chest-art' }, materialSprite('chest')),
       h('span', { class: 'camp-plot-label' }, h('span', { text: 'Skrzynia Konta' })),
+    );
+  }
+
+  // The Kamień węgielny Warowni, like a plot: a tap shows how far the camp
+  // is from the Warownia.
+  function cornerstone() {
+    const stone = state.character.camp.cornerstone;
+    return h(
+      'div',
+      {
+        class: 'camp-plot-wrap',
+        style: {
+          left: `${((CORNERSTONE_SPOT.x - PLOT_WIDTH / 2) / BOARD_WIDTH) * 100}%`,
+          top: `${((CORNERSTONE_SPOT.y - PLOT_HEIGHT / 2) / boardHeight(true)) * 100}%`,
+          width: `${(PLOT_WIDTH / BOARD_WIDTH) * 100}%`,
+        },
+      },
+      h(
+        'button',
+        { type: 'button', class: 'camp-plot camp-cornerstone', 'data-guide': 'plot-cornerstone', 'aria-label': stone.name, onClick: () => cornerstoneSheet(stone) },
+        cornerstoneArt(),
+        h('span', { class: 'camp-plot-label' }, h('span', { text: stone.label })),
+      ),
     );
   }
 

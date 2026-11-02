@@ -11,6 +11,7 @@
 
 import { createArena } from './arena.js';
 import { monsterSprite } from './art.js';
+import { checkGuildTodo } from './chat-news.js';
 import { fill, h } from './dom.js';
 import { dateTimeFormat, formatNumber, plural } from './format.js';
 import { activityFinished, call, onCharacterChange, state } from './state.js';
@@ -55,6 +56,7 @@ export function mountGuildBeast(container) {
 
   async function attack() {
     const answer = await call('POST', '/api/guild/beast/attack');
+    checkGuildTodo({ now: true });
     last = answer.attack;
     opened = null;
     show(answer);
@@ -74,6 +76,7 @@ export function mountGuildBeast(container) {
 
   async function claim(week) {
     const answer = await call('POST', '/api/guild/beast/claim', { week });
+    checkGuildTodo({ now: true });
     opened = answer.chest.text;
     show(answer);
     toast(answer.chest.text);

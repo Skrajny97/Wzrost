@@ -2996,6 +2996,104 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Zadania od narratora: „Odbierz wszystkie” zawsze na widoku (2.11.2026)
+
+Autor: „przez Przelosowanie zadań chowa sie troche klawisz »Odbierz wszystko«”. Na telefonach o niższym ekranie (sprawdzone 360×640 i 412×732) pięć zadań, „Przelosuj zadania” i zdanie o skrzyni nie mieściły się na pergaminie, więc rząd „Odbierz wszystkie” i „Zwiń” na dole strony wypadał poza widok (o 93–205 px) i trzeba było go przewinąć.
+
+1. **Rząd przycisków przyklejony do dołu pergaminu** (`.quests-page .narrator-actions`, `position: sticky`): lista przewija się pod nim, a nad przyciskami jest krótkie przejście w kolor pergaminu, żeby tekst nie urywał się ostro. Przycisk sięga do samej dolnej krawędzi, także w miejsce wewnętrznego marginesu strony.
+2. Na wysokim ekranie, gdzie wszystko się mieści, nic się nie zmienia: przyciski stoją pod listą jak dotąd.
+
+## Wersja 0.0.94 (2.11.2026)
+
+1. **Co wchodzi do gry:** „Odbierz wszystkie” i „Zwiń” zawsze na widoku na pergaminie zadań (zob. wyżej). Razem z tym idą opisy szkiców Czarnego Bagna (`art/prompts.json`), których gra nie używa.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:**
+    - Na tym komputerze przeszły wszystkie testy (857). Test dwóch równoczesnych odbiorów raportu przyjmuje teraz także „character_changed”: przegrany wyścig dostaje 409 i nic nie zarabia, tak jak przy dwóch dotychczasowych kodach, a pod obciążeniem test czasem trafiał na ten trzeci.
+    - Nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`).
+    - Pergamin zadań sprawdzono w przeglądarce na telefonach 360×640, 390×844 i 412×732: „Odbierz wszystkie” cały na widoku, także po przewinięciu listy do końca.
+
+## Gildia: żółte kropki przy rzeczach do zrobienia (2.11.2026)
+
+Autor: „Jeśli zadna proba jest niewzieta z Prob gildii niech podswietla sie ikonka powiadomienia zolta kropką i podobnie inne rzeczy w Gildii do zrobienia”.
+
+1. **Gdzie świeci.** Kropka świeci na zakładce Społeczność, na części „Gildia” w Społeczności i na tej części strony Gildii, w której coś czeka:
+    - **Próby:** żadna próba nie jest wzięta, a na tablicy jest próba do wzięcia; albo czeka skrzynia prób do odebrania (z tego albo z zeszłego tygodnia);
+    - **Bestia:** zostały dziś ataki, a Bestia żyje; albo czeka jej skrzynia;
+    - **Prośby:** za dar do własnej prośby nie ma jeszcze podziękowania.
+2. **Wymiana bez kropki (brakujący szczegół).** W Wymianie nic nie czeka na gracza, bo oferty rozliczają się same.
+3. **Skąd gra wie.** Gra pyta serwer (`/api/guild/todo`) mniej więcej co minutę, gdy jest otwarta na ekranie, i od razu po akcji w Gildii. Serwer liczy to tak samo jak karty Prób, Bestii i Próśb.
+
+## Wersja 0.0.93 (2.11.2026)
+
+1. **Co wchodzi do gry:**
+    - trudność po 50. poziomie według 438 B/A/A (zob. „Trudność po 50. poziomie: odpowiedzi autora 438”):
+        - krzywa B od 50 do 200;
+        - przy krainach od 66. poziomu zdanie o dwóch towarzyszach;
+        - w Wieży Solo, w walkach zdarzeń i w atakach na Bestię Gildii połowa wzrostu;
+        - do 50. poziomu nic się nie zmienia;
+    - żółte kropki przy rzeczach do zrobienia w Gildii (zob. „Gildia: żółte kropki przy rzeczach do zrobienia”).
+     Razem z tym idą narzędzie `tools/difficulty-sim.mjs` i nowe opisy trzech chodów drugich form do narysowania od nowa.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:**
+    - Na tym komputerze przeszły wszystkie testy (857).
+    - Nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`).
+    - Kropki Gildii sprawdzono w przeglądarce na telefonie: zakładka Społeczność i część „Bestia” strony Gildii.
+
+## Trudność po 50. poziomie: odpowiedzi autora 438 (2.11.2026)
+
+Autor (432 A): „na pierwszych poziomach do 50ego może być łatwiej, ale pozniej curve trudnosci musi troche rosnac i od 100ego być mid”. Odpowiedzi: „438.1 B / 438.2 A / 438.3 A”.
+
+1. **Co pokazała symulacja** (`tools/difficulty-sim.mjs`: pięć modeli graczy, 200 wypraw na każdą klasę, poziom i model):
+    - Dziś gracz z dwoma towarzyszami z Karczmy nie mdleje wcale na żadnym poziomie od 10 do 150, nawet w najnowszej krainie. Kończy wyprawy z 98–100% HP.
+    - Dawne „~30% omdleń przy 90–100” (430–432) liczyło postać bez ewolucji i tylko z przedmiotami Tier I, a takiej w grze nie ma.
+    - „Mid” od 100 dla gracza z dwoma towarzyszami i średnim ekwipunkiem wymaga stworów mniej więcej trzy razy silniejszych na 100. poziomie.
+2. **Krzywa B (438.1 B).**
+    - **Wzrost stworów.** Od 50 do 100 stwory zyskują +275% HP i obrażeń (`lateGame`, wcześniej +25%), a od 100 do 200 jeszcze +35% (`endGame`, nowy etap).
+    - **Względem dzisiejszych:** ×1,48 na 60, ×2,11 na 75, ×3 na 100 i ×3,53 na 150. Do 50 nic się nie zmienia.
+    - **Średni gracz z dwoma towarzyszami** mdleje na ok. 1% wypraw przy 100 i na 3,5–6% przy 110–150. Kończy wyprawy z 85–91% HP.
+    - **Najlepiej wyposażony gracz** w najnowszej krainie, jaką otwiera mu poziom klasy, mdleje na 0–9% wypraw.
+3. **Gracz bez towarzyszy (438.2 A).** Od ok. 70. poziomu najnowsze krainy są dla gracza bez towarzyszy za trudne. Karta każdej krainy od 66. poziomu, czyli od Wierzbowych Kęp, mówi: „Od tej krainy stwory są bardzo silne. Idź tu z dwoma towarzyszami z Karczmy.” Tekst i próg są w `companionsAdvice` w `data/balance.json`.
+4. **Walki w pojedynkę (438.3 A).**
+    - Gdy postać walczy sama, stwory mają tylko połowę wzrostu z `lateGame` i `endGame` (`soloGrowth` 0,5). Dotyczy to Wieży Solo i walk w zdarzeniach.
+    - Brakujący szczegół: atak na Bestię Gildii to też walka w pojedynkę, więc działa tak samo.
+    - Wyprawy bez towarzyszy mają pełną krzywą (438.2 A).
+5. **Podgląd umiejętności** (`src/engine/skill-demo.js`) pokazuje umiejętność na stworach bez wzrostu późnej gry. Postać w zwykłym ekwipunku i bez towarzyszy nie wytrzymałaby tam dość długo.
+6. **Dalej:**
+    - Po wdrożeniu trzeba zmierzyć prawdziwe omdlenia według poziomu z zapisanych raportów. Ekwipunek prawdziwych graczy to największa niewiadoma.
+    - Jeśli na 100 dalej będzie za łatwo, następnym krokiem jest B+ (×3,2 na 100).
+
+## Wersja 0.0.92 (2.11.2026)
+
+1. **Co wchodzi do gry:**
+    - Prośby Gildii: wycofana prośba znika z karty, a zostaje tylko czas do następnej. Za dary podziękowania idą od razu (zob. „Prośby Gildii: wycofana prośba znika”).
+    - Kamień węgielny Warowni w Obozie z Osadą, rysunek 436 A, z okienkiem postępu do Warowni (zob. „Kamień węgielny Warowni w Obozie”).
+    
+    Razem z tym idą notatki i pliki, których gra jeszcze nie używa:
+    - opisy jeźdźców drugich form;
+    - zasada, że animacje autor dostaje jako MP4;
+    - notatki o chodach drugich form.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:**
+    - Na tym komputerze przeszły wszystkie testy (851).
+    - Nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`).
+    - Kamień i jego okienko sprawdzono w przeglądarce na 390×844 i 1280×800.
+
+## Chody drugich form do oceny autora (2.11.2026)
+
+1. **Wybór wersji.** PixelLab narysował każdy chód w dwóch wersjach (`tools/animate-walks.mjs`, 8 klatek 128 × 128). Z każdej pary wybrana jest ta, w której broń nie znika w żadnej klatce i nic nie odpada od postaci. Na przykład:
+    - Nekromanta B, bo w A kostur znikał od drugiej klatki;
+    - Arcykapłanka B, bo w A kosmyk włosów odrywał się w szóstej klatce;
+    - Władczyni Piorunów B, bo w A przy łuku była plama;
+    - Pani Zimy B, bo w A kostur znikał w piątej klatce;
+    - Strzelczyni Wyborowa A, bo w B łuk znikał.
+    Królobójca, Strzelec Wyborowy i Nekromanta (mężczyźni) chodzą z nowych klatek startowych z profilu.
+2. **Kolory.** Każda klatka przechodzi przez `tools/walk-palette.py`, jak chody pierwszych form.
+3. **Do oceny.** 30 animacji poszło do autora w czacie, jedna po drugiej, jako 437.1–437.30. Najpierw poszły jako GIF-y, które się u autora nie odtwarzają. Autor: „Ale Ty mi to miales w mp4 podać zebym mogl obejrzec znowu zapomniales ze nie działa gif xD”. Poszły więc jeszcze raz jako MP4: 3× powiększone, 8 klatek na sekundę, sześć pętli. Zasada jest w `CLAUDE.md`.
+4. **Dalej:**
+    - odcienie skóry chodów (`tools/walk-tones.py`, poprawki w `tools/walk-tones.json`);
+    - jeźdźcy: opisy 30 drugich form na wierzchowcu są w `art/prompts.json` (rodzaj `riders`). Broń jest schowana: kostury i łuki na plecach, miecze i sztylety w pochwach, buławy, młoty i topory u pasa albo na plecach, tarcze na plecach. Retro Diffusion rysuje po dwie wersje, za około 11 USD.
+    Druga ewolucja wchodzi do gry dopiero z tym wszystkim (zob. „Druga ewolucja czeka na chody i jazdę”).
+
 ## Kamień węgielny Warowni w Obozie (2.11.2026)
 
 Autor (zrzut planszy Obozu z wolnym miejscem między Skrzynią Konta a Kopalnią): „tutaj w Obozie jest wolne miejsce... jakiś pomysł na to co z tym zrobić?”, a potem „435 A”.
@@ -3004,6 +3102,12 @@ Autor (zrzut planszy Obozu z wolnym miejscem między Skrzynią Konta a Kopalnią
 2. **Po stuknięciu** widać, ile brakuje do Warowni: ile budynków ma już najwyższy poziom (np. „3 z 10”) i poziom Obozu (np. „6 z 10”).
 3. **Później** w tym miejscu zaczyna się przemiana w Warownię: rusztowanie, potem kamienne mury.
 4. **Kolejność.** Najpierw grafika kamienia na planszę, do oceny autora, potem kod.
+5. **Rysunek: „436 A”.** Retro Diffusion narysował cztery wersje (rodzaj `camp`, `cornerstone-1` w `art/prompts.json`). Autor dostał dwie najlepsze przymierzone na planszy i wybrał A: granitowy blok z okrągłym, świecącym znakiem i drewnianym palikiem. Obrazek jest przycięty do zarysu, jak budynki (`src/client/art/camp/cornerstone-1.png`).
+6. **W grze od 0.0.92:**
+    - **Miejsce.** Kamień stoi na planszy z Osadą, w miejscu (262, 372) planszy. Ma wielkość średniego wyglądu budynku, a kolory i światło pory dnia takie jak budynki.
+    - **Bez Osady kamienia nie ma (brakujący szczegół).** Wolne miejsce jest tylko na wyższej planszy, a do Warowni liczą się wszystkie budynki, także Kwatery z Osady.
+    - **Okienko.** Po stuknięciu pokazuje nazwę, opis i dwa paski: „Budynki na najwyższym poziomie” (np. 3 / 10) i „Poziom Obozu” (np. 6 / 10). Gdy wszystko jest gotowe, dochodzi zdanie: „Obóz jest gotowy. Przemiana w Warownię zacznie się tutaj, gdy wejdzie do gry.”
+    - **Gdzie co jest.** Teksty są w `data/camp.json` (`cornerstone`), a liczy serwer.
 
 ## Prośby Gildii: wycofana prośba znika (2.11.2026)
 

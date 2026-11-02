@@ -1,5 +1,5 @@
 {
-  "$comment": "Poziom obozu (src/engine/camp.js). Obóz zaczyna od poziomu startLevel, bez budowy, i rośnie do maxLevel. Każdy poziom ponad pierwszy skraca budowy budynków z buildings.json: budują się o effect.perLevel szybciej za poziom, czyli na poziomie 2 o 10%, a na poziomie 10 o 90%. Rozwój obozu kosztuje samo złoto (costs od poziomu 2: base × growth^(poziom − 2)) i trwa minutes.levels[poziom − 1] minut, bez przyspieszenia. Zajmuje jedyne miejsce budowy w obozie, jak budynek, a serwer zapisuje go w tabeli buildings pod id obozu. Po maxLevel, gdy wszystkie budynki też mają swój najwyższy poziom, obóz będzie mógł stać się Warownią (evolution, DECISIONS.md, „Warownia: odpowiedzi autora 419–428”), na razie tylko zapowiedzianą. queue: ile budów obóz ma naraz, razem z trwającą; kolejne czekają w kolejce, opłacone przy dodaniu, i ruszają same, gdy skończy się poprzednia.",
+  "$comment": "Poziom obozu (src/engine/camp.js). Obóz zaczyna od poziomu startLevel, bez budowy, i rośnie do maxLevel. Każdy poziom ponad pierwszy skraca budowy budynków z buildings.json: budują się o effect.perLevel szybciej za poziom, czyli na poziomie 2 o 10%, a na poziomie 10 o 90%. Rozwój obozu kosztuje samo złoto (costs od poziomu 2: base × growth^(poziom − 2)) i trwa minutes.levels[poziom − 1] minut, bez przyspieszenia. Zajmuje jedyne miejsce budowy w obozie, jak budynek, a serwer zapisuje go w tabeli buildings pod id obozu. Po maxLevel, gdy wszystkie budynki też mają swój najwyższy poziom, obóz będzie mógł stać się Warownią (evolution, DECISIONS.md, „Warownia: odpowiedzi autora 419–428”), na razie tylko zapowiedzianą. cornerstone: Kamień węgielny Warowni na wolnym miejscu planszy z Osadą (DECISIONS.md, „Kamień węgielny Warowni w Obozie”); po stuknięciu pokazuje, ile budynków ma już najwyższy poziom (buildings) i poziom Obozu (camp), a gdy wszystko jest gotowe, ready. queue: ile budów obóz ma naraz, razem z trwającą; kolejne czekają w kolejce, opłacone przy dodaniu, i ruszają same, gdy skończy się poprzednia.",
   "id": "camp",
   "name": "Obóz",
   "description": "Polana na skraju puszczy, która z czasem stanie się warownią. Każdy poziom obozu przyspiesza budowę wszystkich budynków.",
@@ -15,5 +15,13 @@
   "costs": [{ "resource": "gold", "base": 500, "growth": 2, "fromLevel": 2 }],
   "minutes": { "levels": [1, 240, 480, 720, 1080, 1440, 2160, 2880, 3600, 4320] },
   "evolution": "Gdy Obóz i wszystkie jego budynki dojdą do najwyższego poziomu, Obóz będzie mógł stać się Warownią.",
+  "cornerstone": {
+    "name": "Kamień węgielny Warowni",
+    "label": "Kamień węgielny",
+    "text": "Duży kamień z wyrytym znakiem. Tu stanie Warownia, gdy Obóz i wszystkie jego budynki dojdą do najwyższego poziomu.",
+    "buildings": "Budynki na najwyższym poziomie",
+    "camp": "Poziom Obozu",
+    "ready": "Obóz jest gotowy. Przemiana w Warownię zacznie się tutaj, gdy wejdzie do gry."
+  },
   "queue": 3
 }

@@ -601,7 +601,21 @@ function campView(player, levels, now) {
   const campThen = plannedLevel(camp, player.buildings, queue);
   const following = campThen < camp.maxLevel ? campThen + 1 : null;
   const queued = (id) => queue.filter((entry) => entry.buildingId === id).map((entry) => entry.level);
+  // The Kamień węgielny Warowni: how many of the camp's buildings stand at
+  // their highest level, and the camp's own level, out of all.
+  const open = content.buildings.filter((building) => buildingOpen(building, player.row));
+  const finished = open.filter((building) => levels[building.id] >= building.maxLevel).length;
   return {
+    cornerstone: {
+      name: camp.cornerstone.name,
+      label: camp.cornerstone.label,
+      text: camp.cornerstone.text,
+      rows: [
+        { label: camp.cornerstone.buildings, done: finished, of: open.length },
+        { label: camp.cornerstone.camp, done: own, of: camp.maxLevel },
+      ],
+      ready: finished === open.length && own >= camp.maxLevel ? camp.cornerstone.ready : null,
+    },
     level: {
       id: camp.id,
       name: camp.name,

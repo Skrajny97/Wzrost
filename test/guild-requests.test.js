@@ -124,16 +124,21 @@ describe('the Prośby Gildii through the API', () => {
     );
     assert.equal((await give('druh', mine.id, 1)).data.error.code, 'closed');
     assert.equal((await give('mistrz', mine.id, 1)).data.error.code, 'own');
+    // A gift not thanked for lights the asker's dot of the Prośby.
+    assert.equal((await as('mistrz', 'GET', '/api/guild/todo')).data.todo.requests, true);
+    assert.equal((await as('druh', 'GET', '/api/guild/todo')).data.todo.requests, false);
     // Thanks: once a gift, and only from the one who asked.
     const thanked = await as('mistrz', 'POST', '/api/guild/requests/thank', { giftId: filled.gifts[0].id });
     assert.equal(thanked.status, 200);
     assert.equal(thanked.data.mine.gifts[0].thanked, true);
     assert.equal((await as('mistrz', 'POST', '/api/guild/requests/thank', { giftId: filled.gifts[0].id })).data.error.code, 'thanked');
     assert.equal((await as('druh', 'POST', '/api/guild/requests/thank', { giftId: filled.gifts[1].id })).data.error.code, 'no_gift');
+    assert.equal((await as('mistrz', 'POST', '/api/guild/requests/thank', { giftId: filled.gifts[1].id })).status, 200);
+    assert.equal((await as('mistrz', 'GET', '/api/guild/todo')).data.todo.requests, false);
     const { ranking } = (await as('druh', 'GET', '/api/guild/requests')).data;
     assert.deepEqual(
       ranking.map((one) => [one.name, one.pieces, one.thanks, one.own]),
-      [['Druh', 5, 1, true]],
+      [['Druh', 5, 2, true]],
     );
   });
 

@@ -82,7 +82,10 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
     ...partners.map((partner, index) => playerCombatant({ character: partner.character, equipped: partner.equipped, name: partner.name, area, id: `p${index + 1}` }, content)),
     ...companions.map((companion, index) => companionCombatant(companion, { area, id: `a${index + 1}` }, content)),
   ];
-  const enemies = encounterCombatants(plan.encounter, content);
+  // Alone on a floor (the Wieża Solo), the monsters have only a share of the
+  // late and end game's growth, as no companion helps (the author: 438.3 A).
+  const alone = partners.length === 0 && companions.length === 0;
+  const enemies = encounterCombatants(plan.encounter, content, { growth: alone ? content.balance.monsters.soloGrowth : 1 });
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
   const won = fight.won === true;
   const hpAfter = Math.max(0, fight.units.find((unit) => unit.id === player.id).hp);

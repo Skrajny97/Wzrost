@@ -42,6 +42,7 @@ import {
   guildChannelNews,
   guildNews,
   guildRead,
+  guildTodoNews,
   partyNews,
   onChatNews,
   privateRead,
@@ -73,7 +74,7 @@ const SECTION_KEY = 'insight-community-section';
 // The part whose tab opens the Gildia's own page (screens/guild.js).
 const GUILD_PAGE_SECTION = 'guilds';
 const SECTION_ICONS = { chat: 'chat', friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords' };
-const SECTION_NEWS = { chat: chatNews, friends: friendNews, party: partyNews, guilds: guildNews };
+const SECTION_NEWS = { chat: chatNews, friends: friendNews, party: partyNews, guilds: () => guildNews() || guildTodoNews() };
 
 export function mountCommunity(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Społeczność')(container, context);

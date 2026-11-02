@@ -10,6 +10,7 @@
 // container and gives { unmount() }, which takes it away.
 
 import { goldArt, timePointsArt } from './art.js';
+import { checkGuildTodo } from './chat-news.js';
 import { materialIcon } from './craft-table.js';
 import { fill, h, icon } from './dom.js';
 import { formatNumber, plural } from './format.js';
@@ -63,12 +64,14 @@ export function mountGuildTrials(container) {
   // An action answered with the Próby anew, its words in a toast.
   async function act(path, body) {
     const answer = await call('POST', path, body);
+    checkGuildTodo({ now: true });
     show(answer);
     if (answer.text) toast(answer.text);
   }
 
   async function claim(week, threshold) {
     const answer = await call('POST', '/api/guild/trials/claim', { week, threshold });
+    checkGuildTodo({ now: true });
     show(answer);
     toast(answer.chest.text);
   }

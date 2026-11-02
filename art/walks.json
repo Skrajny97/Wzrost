@@ -300,7 +300,7 @@
     "miracle-worker-male": {
       "start": "art/references/walks/start/miracle-worker-male.png",
       "pose": 2,
-      "description": "a young man healer with short black hair, a long white robe with a brown belt, an olive-yellow hooded mantle, brown shoes, a wooden shepherd staff with small white flowers in his right hand"
+      "description": "a young man healer with short black hair, a long white robe with a brown belt, an olive-yellow hooded mantle, brown shoes, a tall wooden shepherd staff with small white flowers held upright in his right hand at arm's length in front of him, its curled top high above his head and far from his face, nothing near his mouth"
     },
     "necromancer-female": {
       "start": "art/references/walks/start/necromancer-female.png",
@@ -325,7 +325,7 @@
     "thunder-lord-male": {
       "start": "art/references/walks/start/thunder-lord-male.png",
       "pose": 2,
-      "description": "a young blond man thunder lord with a silver circlet with a blue storm crystal, a long dark blue coat with silver lightning embroidery, silver pauldrons, leather bracers, a quiver on his back, brown boots, an ornate silver longbow with glowing blue runes in his right hand"
+      "description": "a young blond man thunder lord with a silver circlet with a blue storm crystal, a long dark blue coat with silver lightning embroidery, silver pauldrons, leather bracers, a quiver of arrows on his back, brown boots, one single ornate silver longbow with glowing blue runes held upright in his right hand at his side, only one bow, no second bow, no arrow on the string"
     },
     "winter-lord-female": {
       "start": "art/references/walks/start/winter-lord-female.png",
@@ -335,7 +335,7 @@
     "winter-lord-male": {
       "start": "art/references/walks/start/winter-lord-male.png",
       "pose": 2,
-      "description": "an old king of winter with white hair and a white beard, an ice crown, a long dark blue coat with white frost embroidery, a white fur mantle with ice pauldrons, dark boots, a sword at his hip and a staff topped with a big ice crystal in his right hand"
+      "description": "an old king of winter with white hair and a white beard, an ice crown, a long dark blue coat with white frost embroidery, a white fur mantle with ice pauldrons, dark boots, a tall staff topped with a big ice crystal held upright in his right hand, his left hand empty, no sword, no other weapon"
     },
     "kingslayer-male": {
       "start": "art/references/walks/start/kingslayer-male.png",

@@ -19,6 +19,7 @@ import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, g
 import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-beast.js';
 import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, takeGuildTrial } from './guild-trials.js';
 import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, thankForGuildGift } from './guild-requests.js';
+import { getGuildTodo } from './guild-todo.js';
 import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } from './guild-exchange.js';
 import { guildRanking } from './guild-fame.js';
 import { craftMaterials, salvageItem, sellMaterials, skipCrafting } from './crafting.js';
@@ -237,6 +238,7 @@ const routes = [
   ['POST', '/api/guild/beast/attack', attackGuildBeast],
   ['POST', '/api/guild/beast/claim', claimGuildBeastChest],
   // The Próby Gildii (guild-trials.js, 345 A) and the Prośby Gildii (guild-requests.js, 346 A).
+  ['GET', '/api/guild/todo', getGuildTodo],
   ['GET', '/api/guild/trials', getGuildTrials],
   ['POST', '/api/guild/trials/take', takeGuildTrial],
   ['POST', '/api/guild/trials/drop', dropGuildTrial],

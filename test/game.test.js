@@ -560,7 +560,9 @@ describe('hunts and reports', () => {
     const claims = [first, second].sort((a, b) => a.status - b.status);
     assert.equal(claims[0].status, 200);
     assert.equal(claims[1].status, 409);
-    assert.ok(['already_claimed', 'no_activity'].includes(claims[1].data.error.code));
+    // The one that loses the race finds the report claimed, the exploration
+    // gone, or the character changed under it (a 409 each way, no payout).
+    assert.ok(['already_claimed', 'no_activity', 'character_changed'].includes(claims[1].data.error.code), claims[1].data.error.code);
 
     const { report, character } = claims[0].data;
     assert.deepEqual([report.areaId, report.areaName, report.regionName], ['windfalls-edge', 'Skraj Wiatrołomów', 'Wiatrołomy']);
@@ -842,8 +844,29 @@ describe('camp', () => {
     const top = (await character()).camp.level;
     assert.deepEqual([top.level, top.next, top.effect], [10, null, 'Budowy szybsze o 90%']);
     assert.match(top.evolution, /Warownią/);
+    // The Kamień węgielny Warowni counts the buildings at their highest level
+    // and the camp's level; with all of them full it says the camp is ready.
+    const waiting = (await character()).camp.cornerstone;
+    assert.equal(waiting.name, 'Kamień węgielny Warowni');
+    assert.deepEqual(waiting.rows.map((row) => [row.done, row.of]), [[0, 9], [10, 10]]);
+    assert.equal(waiting.ready, null);
+    const ids = ['sawmill', 'quarry', 'mine', 'midas-lake', 'campfire', 'loot-shed', 'scrap-bench', 'anvil', 'craft-table'];
+    await (await db()).prepare("DELETE FROM buildings WHERE building_id != 'camp'").run();
+    for (const id of ids) await (await db()).prepare('INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, ?, 10, 0, 1 FROM characters').bind(id).run();
+    const ready = (await character()).camp.cornerstone;
+    assert.deepEqual(ready.rows.map((row) => row.done), [9, 10]);
+    assert.match(ready.ready, /Warownię/);
     await stock(10 ** 9, {});
     assert.equal((await build('camp')).data.error.code, 'max_level');
+  });
+
+  test('the strong inner regions say to go there with two companions (438.2 A)', async () => {
+    const { data } = await call('GET', '/api/content');
+    const areas = data.regions.flatMap((region) => region.areas);
+    const advice = (id) => areas.find((area) => area.id === id).companionsAdvice ?? null;
+    assert.equal(advice('drowned-forest'), null);
+    assert.match(advice('willow-isles'), /dwoma towarzyszami/);
+    assert.match(advice('old-diggings'), /dwoma towarzyszami/);
   });
 
   test('a building is paid in gold and resources and takes time', async () => {

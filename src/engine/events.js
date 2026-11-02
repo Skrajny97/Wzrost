@@ -374,7 +374,9 @@ export function resolveEvent(
   }
 
   const texts = content.texts;
-  const enemies = encounterCombatants({ members: outcome.foes.map((monsterId) => ({ monsterId, level: character.level })) }, content);
+  // The character fights an event's foes alone: they have only a share of
+  // the late and end game's growth (the author: 438.3 A).
+  const enemies = encounterCombatants({ members: outcome.foes.map((monsterId) => ({ monsterId, level: character.level })) }, content, { growth: content.balance.monsters.soloGrowth });
   const player = playerCombatant({ character, equipped, hp: hunt.hpEnd, name, area }, content);
   const ally = { ...player, hp: hunt.hpEnd, ...(outcome.speedBonus && { speed: player.speed * (1 + outcome.speedBonus) }) };
   const fight = simulateFight({ allies: [ally], enemies, rng, content, record: true, trait: area.trait, ambush: outcome.ambush === true });

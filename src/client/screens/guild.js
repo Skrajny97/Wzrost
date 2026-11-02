@@ -17,7 +17,7 @@
 // shown last on the device, or on "Gildia" outside a guild.
 
 import { placeArt } from '../art.js';
-import { guildSeen } from '../chat-news.js';
+import { checkGuildTodo, guildSeen, guildTodoNews, onChatNews } from '../chat-news.js';
 import { $, fill, h, icon } from '../dom.js';
 import { formatNumber } from '../format.js';
 import { mountGuildBeast } from '../guild-beast.js';
@@ -101,6 +101,9 @@ export function mountGuildPage(container, context) {
           },
           icon(TAB_ICONS[tab.id] ?? 'unknown', { size: 20, className: 'community-icon' }),
           h('span', { class: 'community-name', text: tab.name }),
+          // Something to do in this part: a trial to take, an attack or a
+          // chest, a gift to thank for (chat-news.js, guild-todo.js).
+          guildTodoNews(tab.id) && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'do zrobienia' }),
         ),
       ),
     );
@@ -108,10 +111,14 @@ export function mountGuildPage(container, context) {
   }
 
   show(firstTab(tabs, context?.params?.tab));
+  // The parts' dots follow what waits in the guild, asked for at once here.
+  const stopNews = onChatNews(render);
+  checkGuildTodo({ now: true });
   return {
     unmount() {
       part?.unmount();
       watcher?.disconnect();
+      stopNews();
     },
   };
 }

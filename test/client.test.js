@@ -135,7 +135,8 @@ test('every sprite on the list has its file at its size, and every class has its
     board: ['camp-1', 'camp-2', 'camp-3'],
     'board-tall': ['camp-1', 'camp-2', 'camp-3'],
     // The camp's buildings at their three looks.
-    camp: data('buildings').flatMap((building) => [1, 2, 3].map((tier) => `${building.id}-${tier}`)),
+    // The buildings' looks, and the Kamień węgielny Warowni (data/camp.json).
+    camp: [...data('buildings').flatMap((building) => [1, 2, 3].map((tier) => `${building.id}-${tier}`)), ...(data('camp').cornerstone ? ['cornerstone-1'] : [])],
     // Zielarstwo's herbs, Alchemia's potions, the professions' squares, the
     // places they work in, the Ewolucja's spring and the Wieże.
     herbs: data('professions').herbs.map((herb) => herb.id),

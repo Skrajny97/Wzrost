@@ -141,7 +141,7 @@ function cardTexts() {
 // with how much and how often, the most first (a character removed since
 // is left out; its damage stays off the bar); the character's own part;
 // the chests it may open; and the card's words.
-async function beastView(db, row, now) {
+export async function beastView(db, row, now) {
   const guild = await guildOf(db, row.id);
   const { current } = weeksAround(now);
   const day = questPeriod('daily', now, content).key;

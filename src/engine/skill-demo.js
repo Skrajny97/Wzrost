@@ -22,12 +22,27 @@ const EVOLVED = [
 // Kinds whose show needs a group of foes.
 const GROUP_KINDS = new Set(['sweep', 'whirl']);
 
+// The foes of a preview show a skill, not the balance: they come without
+// the growth of the late game and the end game (balance.monsters), which a
+// character in common gear and without companions would not stand long
+// enough to show its skill. Made once per content.
+const plainContents = new WeakMap();
+function plainMonsters(content) {
+  if (!plainContents.has(content)) {
+    const { lateGame, endGame } = content.balance.monsters;
+    const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0, hp: 0 }, endGame: { ...endGame, damage: 0, hp: 0 } };
+    plainContents.set(content, { ...content, balance: { ...content.balance, monsters } });
+  }
+  return plainContents.get(content);
+}
+
 // Who the skill is shown against: a group for a sweep, a front and a back
 // foe for a blow aimed at the back, a single strong foe otherwise.
 function foesFor(skill, content, level) {
   const groupFactors = content.balance.hunt.groupFactors;
+  const plain = plainMonsters(content);
   const foe = (monsterId, index, count, at = level - 2) =>
-    monsterCombatant({ monsterId, level: at, id: `e${index}`, groupFactor: groupFactors[count - 1] }, content);
+    monsterCombatant({ monsterId, level: at, id: `e${index}`, groupFactor: groupFactors[count - 1] }, plain);
   if (GROUP_KINDS.has(skill.kind) || skill.params.cloud || skill.params.splash) return ['wolf', 'wolf', 'fox'].map((id, index) => foe(id, index, 3));
   if (skill.params.target === 'back' || skill.params.pierce) return [foe('wolf', 0, 2), foe('crow', 1, 2)];
   if (WOUND_KINDS.has(skill.kind) || skill.kind === 'heal') return [foe('boar', 0, 1, level + 2)];
