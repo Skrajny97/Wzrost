@@ -1,5 +1,6 @@
 # Draws sprite drafts with Retro Diffusion (tools/generate-art.mjs), or the
 # walks animated by PixelLab (kind walks-pixellab, tools/animate-walks.mjs),
+# the mounts posed frame by frame (mounts-skeleton, tools/animate-mounts-skeleton.mjs),
 # and keeps them on the art-drafts branch for review. Run by hand from the
 # Actions tab or the API; it never deploys anything. Needs the
 # RETRO_DIFFUSION_API_KEY secret, and PIXELLAB_API_KEY for the walks.
@@ -38,6 +39,8 @@ on:
           - cosmetics
           - mounts
           - mounts-pixellab
+          - mounts-skeleton-estimate
+          - mounts-skeleton
           - riders
           - settlement
           - residents
@@ -99,6 +102,13 @@ jobs:
             args=(--ids "$IDS" --variants "$VARIANTS" --max-cost "$MAX_COST")
             if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
             node tools/animate-walks.mjs "${args[@]}"
+            exit
+          fi
+          if [ "$KIND" = "mounts-skeleton-estimate" ] || [ "$KIND" = "mounts-skeleton" ]; then
+            args=(--ids "$IDS" --variants "$VARIANTS" --max-cost "$MAX_COST")
+            if [ "$KIND" = "mounts-skeleton-estimate" ]; then args+=(--estimate); fi
+            if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+            node tools/animate-mounts-skeleton.mjs "${args[@]}"
             exit
           fi
           if [ "$KIND" = "mounts-pixellab" ]; then

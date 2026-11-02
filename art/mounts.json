@@ -5,18 +5,22 @@
   "mounts": {
     "pony": {
       "start": "art/references/mounts/pony.png",
+      "description": "a small stocky piebald pony, brown with white patches, a white blaze, a brown leather saddle on a dark red saddle cloth and a leather bridle with reins",
       "trot": { "draft": "pony-20261102T0429-549998924", "frames": [1, 2, 3, 4, 5, 6, 7, 8, 9], "seat": [41, 36], "fps": 8 }
     },
     "horse": {
       "start": "art/references/mounts/horse.png",
+      "description": "a bay riding horse with a black mane, tail and lower legs, a brown leather saddle on a dark red saddle cloth and a leather bridle with reins",
       "trot": { "draft": "horse-20261101T1743-167264084", "frames": [3, 4, 5, 6, 7, 8], "seat": [48, 42], "fps": 8 }
     },
     "steed": {
       "start": "art/references/mounts/steed.png",
+      "description": "a big steel-blue warhorse with a long black mane and tail, white socks, a dark leather saddle on a blue saddle cloth with silver trim and a bridle with silver studs",
       "trot": { "draft": "steed-20261102T0429-667845418", "frames": [1, 2, 3, 4, 5, 6], "seat": [57, 52], "fps": 8, "clean": [{ "box": [104, 4, 130, 24], "to": "3e4340" }] }
     },
     "sabertooth": {
       "start": "art/references/mounts/sabertooth.png",
+      "description": "a huge saber-toothed tiger with orange fur, black stripes and two long curved fangs, a dark leather saddle on a fur saddle cloth with bone trinkets and a leather bridle with reins",
       "action": "walking at a steady pace in place like a big cat, seen from the side and facing right, the four legs moving in a smooth seamless walk loop, the head and body swaying slightly, the tail swaying, the saddle and bridle stay in place",
       "trot": { "draft": "sabertooth-20261102T0533-1426611496", "frames": [2, 3, 4, 5, 6, 7, 8], "seat": [74, 33], "fps": 8 }
     }
