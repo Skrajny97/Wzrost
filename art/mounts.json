@@ -14,6 +14,10 @@
     "steed": {
       "start": "art/references/mounts/steed.png",
       "trot": { "draft": "steed-20261102T0429-667845418", "frames": [1, 2, 3, 4, 5, 6], "seat": [57, 52], "fps": 8, "clean": [{ "box": [104, 4, 130, 24], "to": "3e4340" }] }
+    },
+    "sabertooth": {
+      "start": "art/references/mounts/sabertooth.png",
+      "action": "walking at a steady pace in place like a big cat, seen from the side and facing right, the four legs moving in a smooth seamless walk loop, the head and body swaying slightly, the tail swaying, the saddle and bridle stay in place"
     }
   }
 }
