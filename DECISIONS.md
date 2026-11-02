@@ -2996,6 +2996,18 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.79 (2.11.2026)
+
+Zasada 365 A: skończony etap trafia do gry od razu.
+
+1. **Co wchodzi do gry:**
+    - wierzchowce ze Stajni kłusują w scenie Walki, a postać jedzie na nich w siodle, z jedną nogą po bliższej stronie (zob. sekcję niżej);
+    - Kuc, Koń wierzchowy i Rumak mają w Stajni swoje obrazki;
+    - przycisk „Usuń postać” w Ustawieniach (dawniej „Zacznij od nowa”), z wpisaniem imienia postaci.
+2. **Kłus.** Każdy wierzchowiec ma pętlę z klatek, które najgładziej przechodzą z ostatniej w pierwszą: Kuc 9 klatek, Koń i Rumak po 6, 8 klatek na sekundę. Siodło w każdej klatce znajduje `tools/ride-sheets.py`, a jeździec unosi się i opada razem z nim. Uszy Rumaka, które PixelLab zabarwił na czerwono, mają z powrotem kolor sierści. Arkusze i ich dane robi `tools/mount-trots.py` z wyborów w `art/mounts.json`. Przy wyłączonych animacjach scena stoi, jak przy chodzie.
+3. **Jeszcze nie w grze:** Próby i Prośby Gildii oraz ekran Bestii Gildii (serwer Bestii już jest, ale strona Gildii go jeszcze nie pokazuje), Sklep Systemu z ramkami, tłami i Tygrysem szablozębnym.
+4. **Przed wdrożeniem:** wszystkie testy (787) przechodzą, a nowa postać przeszła wprowadzenie do pierwszej wyprawy w przeglądarce na 390×844, 1366×768 i 1920×1080. Jazda konna i Stajnia sprawdzone w przeglądarce na 390×844.
+
 ## Wierzchowce, jeźdźcy, kosmetyki i „Usuń postać”: odpowiedzi autora 366–368 (2.11.2026)
 
 Autor: „366 C, 367 B, 368 C”, „Postacie powinny mieć tylko jedną nogę widoczną jadąc na wierzchowcu (bo drugą mają przewieszoną na drugą stronę siedząc)”, „nie te nogę usuwasz”, „ma znikać noga, która jest z drugiego boku wierzcha, ma być widoczna tylko jedna przednia”, „Co do kosmetyków to miałeś zrobić je wspólne dla wszystkich, a nie przemalować szatę jednej klasy. Ergo tylko ramki i tła wchodzą póki co do gry, wszystkie. Wraz z ramkami wchodzi opcja zmiany wyświetlanego koloru na czacie na ten z ramki”, „Do tego dorób jednego wierzchowca w formie kosmetyku za 1000 Punktów Systemu i niech wygląda jak tygrys szablozębny i tak się nazywa” i „Dodaj też opcję »Usuń postać«, bo jest tylko »Usuń konto«”.
