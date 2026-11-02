@@ -15,7 +15,7 @@
 // the bar the guild knocked off (chests). Pure: the seeds are the server's.
 
 import { simulateFight } from './combat.js';
-import { playerCombatant } from './combatant.js';
+import { combatantView, playerCombatant } from './combatant.js';
 import { addCounts, materialDrops, stackKey } from './crafting.js';
 import { championItemRarity, encounterCombatants } from './hunt.js';
 import { randomItem } from './items.js';
@@ -62,7 +62,7 @@ export function guildBeast({ seed, levels }, content) {
 // a side is down or after the most actions a fight has (combat.js). The
 // damage is the HP the beast lost, never more than it had (a draining blow
 // heals it during the fight). No XP, gold or loot. Returns the damage, the
-// HP left, whether the beast fell and the fight's lines.
+// HP left, whether the beast fell, the fight's lines and its playback.
 export function guildBeastFight({ character, equipped, name, beast, seed, trophies = {} }, content) {
   const area = content.areasById[beast.areaId];
   const player = playerCombatant({ character, equipped, name, area }, content);
@@ -81,6 +81,14 @@ export function guildBeastFight({ character, equipped, name, beast, seed, trophi
     won: fight.won,
     actions: fight.actions,
     log: fight.events.map((event) => event.text),
+    // The fight to play back in the arena, as a report's (the author: "Po
+    // Atakuj w Bestii Gildii niech pokaże się ta walka symulacja").
+    replay: {
+      won: fight.won,
+      allies: [combatantView(ally, beast.level, content)],
+      enemies: [combatantView(foe, character.level, content)],
+      events: fight.events,
+    },
   };
 }
 

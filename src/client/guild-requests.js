@@ -130,23 +130,45 @@ function fillAskSheet(body, view, ask, onAsked) {
   const start = () => Math.max(1, Math.min(rules.most, ask.need !== undefined ? ask.need - held(picked) : (ask.missing ?? 1)));
   const count = h('input', { type: 'number', id: 'guild-ask-count', class: 'trade-number', min: '1', max: String(rules.most), step: '1', inputmode: 'numeric', value: String(start()) });
   const goods = h('div', { class: 'guild-ask-goods' });
+  // The goods to pick as the game's own list (the author: "lista ta w
+  // prośbach Gildii musi być interfejsem w grze"): each with its picture,
+  // its name and how many the character holds, under the kind's heading
+  // when the list mixes kinds; the picked one marked.
+  const mixed = !(ask.rarity || ask.key);
+  const choice = (one) =>
+    h(
+      'button',
+      {
+        type: 'button',
+        class: 'guild-ask-choice',
+        'aria-pressed': String(one === picked),
+        onClick: () => {
+          picked = one;
+          count.value = String(start());
+          showGoods();
+        },
+      },
+      goodsLine(one),
+      h('span', { class: 'guild-ask-have', text: filled(texts.have, { have: formatNumber(held(one)) }) }),
+    );
   const showGoods = () => {
-    fill(goods, list.length === 1
-      ? h('p', { class: 'guild-ask-one' }, goodsLine(picked, h('span', { class: 'muted', text: ` · ${filled(texts.have, { have: formatNumber(held(picked)) })}` })))
-      : h(
-          'select',
-          {
-            id: 'guild-ask-goods',
-            class: 'guild-ask-select',
-            onChange: (event) => {
-              picked = list.find((one) => `${one.kind}|${one.key}` === event.currentTarget.value) ?? picked;
-              count.value = String(start());
-            },
-          },
-          list.map((one) =>
-            h('option', { value: `${one.kind}|${one.key}`, selected: one === picked, text: `${one.name}${ask.rarity || ask.key ? '' : ` (${texts.kindNames[one.kind]})`} · ${filled(texts.have, { have: formatNumber(held(one)) })}` }),
-          ),
-        ));
+    if (list.length === 1) {
+      fill(goods, h('p', { class: 'guild-ask-one' }, goodsLine(picked, h('span', { class: 'muted', text: ` · ${filled(texts.have, { have: formatNumber(held(picked)) })}` }))));
+      return;
+    }
+    const kinds = mixed ? ['material', 'herb', 'potion'] : [null];
+    fill(
+      goods,
+      h(
+        'div',
+        { class: 'guild-ask-picker', role: 'group', 'aria-label': texts.goods },
+        kinds.map((kind) => {
+          const some = kind ? list.filter((one) => one.kind === kind) : list;
+          if (some.length === 0) return null;
+          return [kind && h('p', { class: 'guild-ask-group', text: texts.kindGroups[kind] }), some.map(choice)];
+        }),
+      ),
+    );
   };
   showGoods();
   const send = h('button', {
@@ -166,7 +188,7 @@ function fillAskSheet(body, view, ask, onAsked) {
   fill(
     body,
     h('p', { class: 'sheet-text', text: texts.askLead }),
-    h('label', { class: 'field-label', for: list.length === 1 ? null : 'guild-ask-goods', text: texts.goods }),
+    h('p', { class: 'field-label', text: texts.goods }),
     goods,
     h('div', { class: 'trade-field' }, h('label', { for: 'guild-ask-count', class: 'trade-field-label', text: `${texts.count} (1–${rules.most})` }), count),
     h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }), send),

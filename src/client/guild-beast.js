@@ -9,11 +9,12 @@
 // answer (data/guilds.json, beast.texts). mountGuildBeast(container) adds
 // the card to the container and gives { unmount() }, which takes it away.
 
+import { createArena } from './arena.js';
 import { monsterSprite } from './art.js';
 import { fill, h } from './dom.js';
 import { dateTimeFormat, formatNumber, plural } from './format.js';
 import { activityFinished, call, onCharacterChange, state } from './state.js';
-import { howItWorks, toast, withButton } from './ui.js';
+import { howItWorks, openSheet, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 
@@ -57,6 +58,17 @@ export function mountGuildBeast(container) {
     last = answer.attack;
     opened = null;
     show(answer);
+    // The fight played back at once, as a report's (the author: "Po Atakuj
+    // w Bestii Gildii niech pokaże się ta walka symulacja").
+    if (answer.attack.fight) {
+      const arena = createArena(answer.attack.fight, { autoplay: 'now' });
+      const dialog = openSheet(
+        h('h2', { class: 'sheet-title', text: answer.texts.fightTitle }),
+        h('p', { class: 'sheet-text', text: [filled(answer.texts.lastAttack, { damage: formatNumber(answer.attack.damage) }), answer.attack.fell && answer.texts.fell].filter(Boolean).join(' ') }),
+        arena.element,
+      );
+      dialog.addEventListener('close', () => arena.stop(), { once: true });
+    }
     if (answer.attack.fell) toast(answer.texts.fell);
   }
 

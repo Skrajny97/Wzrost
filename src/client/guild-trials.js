@@ -264,7 +264,8 @@ export function mountGuildTrials(container) {
       fill(card, title(), h('p', { class: 'muted', text: texts.noGuild }), how);
       return;
     }
-    fill(card, title(), how, barPart(), previousPart(), takenPart(), boardPart(), membersPart());
+    // The board first (the author: "Tablicę prób w próbach daj na sam szczyt").
+    fill(card, title(), boardPart(), how, barPart(), previousPart(), takenPart(), membersPart());
   }
 
   call('GET', '/api/guild/trials')

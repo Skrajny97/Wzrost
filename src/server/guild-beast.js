@@ -194,8 +194,8 @@ export async function getGuildBeast(context) {
 // while the character is as read, has an attack left today and the beast
 // still stands: the hit, never more than the HP left then, and the HP it
 // takes off the bar, with who felled the beast and when. Answers with the
-// damage, the HP left, whether this hit felled it, the fight's lines and
-// the Bestia anew.
+// damage, the HP left, whether this hit felled it, the fight's lines, its
+// playback for the arena and the Bestia anew.
 export async function attackGuildBeast(context) {
   const { player } = await requireBeastPlayer(context);
   const { row } = player;
@@ -243,6 +243,7 @@ export async function attackGuildBeast(context) {
       fell: fight.damage >= hpBefore,
       won: fight.won,
       log: fight.log,
+      fight: fight.replay,
     },
     ...(await beastView(db, row, now)),
   });

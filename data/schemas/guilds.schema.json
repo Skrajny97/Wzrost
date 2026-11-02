@@ -649,6 +649,7 @@
             "askLead",
             "askWaiting",
             "kindNames",
+            "kindGroups",
             "goods",
             "count",
             "send",
@@ -789,6 +790,29 @@
               "additionalProperties": {
                 "type": "string",
                 "minLength": 1
+              }
+            },
+            "kindGroups": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "material",
+                "herb",
+                "potion"
+              ],
+              "properties": {
+                "material": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "herb": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "potion": {
+                  "type": "string",
+                  "minLength": 1
+                }
               }
             }
           },
