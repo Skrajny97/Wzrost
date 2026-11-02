@@ -1,0 +1,28 @@
+{
+  "id": "rokita-deep",
+  "payload": {
+    "prompt": "the darkest heart of a black swamp, a ring of old gnarled willows around a bottomless black pool, green devilish fire burning on the water, the silhouette of horns in the mist, night, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 3,
+    "seed": 709330862,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647310,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 22.95,
+    "request_id": "74097fee-5764-4553-b9ea-d6955540d056",
+    "outputs_retained_until": 1793733652,
+    "billing": {
+      "source": "balance",
+      "balance_left": 22.95,
+      "balance_charged": 0.54
+    }
+  }
+}

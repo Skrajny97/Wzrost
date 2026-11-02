@@ -1,0 +1,28 @@
+{
+  "id": "quaking-bog",
+  "payload": {
+    "prompt": "a quaking bog, a thin carpet of sphagnum moss over bottomless black holes, ripples spreading on the moss, dead grey birches, two glowing yellow eyes in the dark between them, low grey sky, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 128,
+    "height": 128,
+    "num_images": 3,
+    "seed": 328177565,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647249,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 23.49,
+    "request_id": "c1f51098-afd0-40d1-9092-1dd20728d8a3",
+    "outputs_retained_until": 1793733584,
+    "billing": {
+      "source": "balance",
+      "balance_left": 23.49,
+      "balance_charged": 0.54
+    }
+  }
+}
