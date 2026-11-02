@@ -1,0 +1,14 @@
+{
+  "id": "archmage-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man archmage of the elements, long brown hair and a short beard, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, an ornate layered robe in red, blue and gold with intricate embroidered runes, a high stiff collar, golden jewelry and a wide ornamented belt, holding a tall golden staff crowned with three glowing gems of fire, ice and lightning, the three elements only in the gems, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "references": [
+    "art/references/evolutions/archmage-female.png"
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

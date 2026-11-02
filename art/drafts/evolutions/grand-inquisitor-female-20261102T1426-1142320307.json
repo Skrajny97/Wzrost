@@ -1,0 +1,14 @@
+{
+  "id": "grand-inquisitor-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman grand inquisitor, stern face, dark hair tied back, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, epic and imposing, an ornate blackened steel plate armour engraved with golden sacred symbols, a tall stiff collar, a long crimson cape with a gold trim, a golden holy sigil on the chest, a heavy warhammer wreathed in white holy fire held in both hands, a chained glowing holy tome at the belt, far grander than a common inquisitor, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "references": [
+    "art/references/evolutions/grand-inquisitor-male.png"
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

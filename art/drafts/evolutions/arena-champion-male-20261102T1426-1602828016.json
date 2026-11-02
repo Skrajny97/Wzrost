@@ -1,0 +1,14 @@
+{
+  "id": "arena-champion-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "young man arena champion, athletic, short dark hair, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, a polished bronze helmet with a short red plume, the whole helmet and plume inside the image, an ornate gilded shoulder guard and arm guard on the sword arm, a bronze breastplate with a lion face, a skirt of red leather strips with gold edges, bronze greaves, a short red cape, holding a broad curved sword and a round bronze shield with a laurel wreath, proud stance, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "references": [
+    "art/references/evolutions/arena-champion-female.png"
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

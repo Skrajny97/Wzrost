@@ -1,0 +1,14 @@
+{
+  "id": "high-priest-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man high priest, golden hair, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, an ornate white and gold ceremonial robe with intricate gold embroidery and holy symbols, a tall golden mitre with a sun emblem, a long golden stole with patterns, golden rings and a pendant, holding a golden staff topped with a radiant sun disc, the whole sun disc inside the image, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "references": [
+    "art/references/evolutions/high-priest-female.png"
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

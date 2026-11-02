@@ -1,0 +1,14 @@
+{
+  "id": "necromancer-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man necromancer, pale and gaunt, long black hair, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, a tattered black robe with dark purple and bone-white trim, a hooded mantle, a necklace of small bones, holding a tall dark staff topped with a horned skull glowing with sickly green light, the whole staff and skull inside the image, faint green mist close to the hands, menacing, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "references": [
+    "art/references/evolutions/necromancer-female.png"
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
