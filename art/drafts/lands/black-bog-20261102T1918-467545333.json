@@ -1,0 +1,28 @@
+{
+  "id": "black-bog",
+  "payload": {
+    "prompt": "pixel art landscape, a vast black bog at dusk, pitch-black pools between dark alder thickets on stilt roots, old carved wooden idols leaning in the water, gnarled willows, a faint green mist low over the moss, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, browns and black-blues, no text, no border, no people, no animals in front",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 192,
+    "height": 96,
+    "num_images": 3,
+    "seed": 467545333,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647159,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 24.03,
+    "request_id": "070eb29c-b6f4-41df-b584-ac7038722664",
+    "outputs_retained_until": 1793733528,
+    "billing": {
+      "source": "balance",
+      "balance_left": 24.03,
+      "balance_charged": 0.54
+    }
+  }
+}
