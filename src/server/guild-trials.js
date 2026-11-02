@@ -234,7 +234,7 @@ function cardTexts() {
 // one it took; open, taken, done or locked and why), its trial with the
 // progress, the bar of this week and the chests of the last one still
 // waiting for it, who finished how many trials this week, and the words.
-async function trialsView(db, player, guild, now) {
+export async function trialsView(db, player, guild, now) {
   const { row } = player;
   const { current, previous } = weeksAround(now);
   const board = await boardOf(db, guild.id, now);

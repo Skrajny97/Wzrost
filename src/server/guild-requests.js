@@ -117,7 +117,7 @@ function cardTexts() {
 // openHours) with its gifts and thanks, when it may ask again, the goods it
 // knows to ask for, the week's Dobroczyńcy tygodnia (pieces given in the
 // guild since Monday, with the thanks they brought), and the words.
-async function requestsView(db, player, guild, now) {
+export async function requestsView(db, player, guild, now) {
   const { row } = player;
   const { most, waitHours, openHours } = rules();
   const week = questPeriod('weekly', now, content);

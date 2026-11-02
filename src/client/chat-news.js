@@ -28,6 +28,11 @@ let guild = null;
 let guildSeenId = 0;
 // Invitations to guilds waiting.
 let guildInvites = 0;
+// What waits in the character's guild (src/server/guild-todo.js): {trials,
+// beast, requests}, each true when there is something to do, or null.
+let guildTodo = null;
+let todoAskedAt = 0;
+const TODO_EVERY_MS = 60000;
 // The newest message read in each private conversation, by the other
 // character's id.
 let privateSeen = {};
@@ -65,10 +70,13 @@ export const chatNews = () => globalNews() || guildChannelNews() || conversation
 export const friendNews = () => open() && invites + gifts + unsent > 0;
 export const partyNews = () => open() && isUnlocked('party') && partyInvites > 0;
 export const guildNews = () => open() && guildInvites > 0;
+// Something to do in the guild: in its part `part` (trials, beast,
+// requests), or in any (the author: a trial not taken lights the dot).
+export const guildTodoNews = (part) => open() && Boolean(guild) && Boolean(guildTodo) && (part ? Boolean(guildTodo[part]) : Object.values(guildTodo).some(Boolean));
 export const liveTrade = () => (open() ? trade : null);
 // A proposal to this character, or a trade going on.
 export const tradeNews = () => Boolean(liveTrade()) && !(trade.state === 'proposed' && trade.proposer);
-export const communityNews = () => chatNews() || friendNews() || partyNews() || guildNews() || tradeNews();
+export const communityNews = () => chatNews() || friendNews() || partyNews() || guildNews() || guildTodoNews() || tradeNews();
 export const chatMuted = () => muted;
 
 // The tab's light in words, for a screen reader.
@@ -83,6 +91,8 @@ export const communityNewsText = () =>
         ? 'zaproszenie do drużyny czeka'
         : guildNews()
           ? 'zaproszenie do gildii czeka'
+          : guildTodoNews()
+            ? 'w gildii czeka coś do zrobienia'
           : invites > 0
         ? 'zaproszenie do znajomych czeka'
         : gifts > 0
@@ -105,6 +115,7 @@ const lights = () =>
     partyNews(),
     guildNews(),
     guild?.name,
+    JSON.stringify(guildTodo),
     trade && `${trade.id}:${trade.state}:${trade.proposer}`,
     ...conversations.map((entry) => `${entry.id}:${conversationNews(entry.id, entry.latest)}`),
   ].join();
@@ -254,6 +265,27 @@ export async function checkChat({ now = false } = {}) {
   });
   if (answer.seen) keep(null);
   if (answer.activityEndsAt !== undefined) activityListener?.(answer.activityEndsAt);
+  checkGuildTodo();
+}
+
+// Asks what waits in the character's guild, about once a minute unless
+// `now` is set (after an action in the guild), and only in a guild.
+export async function checkGuildTodo({ now = false } = {}) {
+  if (!open() || !guild) {
+    if (guildTodo) update(() => (guildTodo = null));
+    return;
+  }
+  if (!now && Date.now() - todoAskedAt < TODO_EVERY_MS) return;
+  todoAskedAt = Date.now();
+  let answer;
+  try {
+    answer = await request('GET', '/api/guild/todo');
+  } catch {
+    return;
+  }
+  update(() => {
+    guildTodo = answer.todo ?? null;
+  });
 }
 
 // The end of the character's activity, as each check hears it: a Drużyna's

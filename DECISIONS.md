@@ -2996,14 +2996,27 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Gildia: żółte kropki przy rzeczach do zrobienia (2.11.2026)
+
+Autor: „Jeśli zadna proba jest niewzieta z Prob gildii niech podswietla sie ikonka powiadomienia zolta kropką i podobnie inne rzeczy w Gildii do zrobienia”.
+
+1. **Gdzie świeci.** Kropka świeci na zakładce Społeczność, na części „Gildia” w Społeczności i na tej części strony Gildii, w której coś czeka:
+    - **Próby:** żadna próba nie jest wzięta, a na tablicy jest próba do wzięcia; albo czeka skrzynia prób do odebrania (z tego albo z zeszłego tygodnia);
+    - **Bestia:** zostały dziś ataki, a Bestia żyje; albo czeka jej skrzynia;
+    - **Prośby:** za dar do własnej prośby nie ma jeszcze podziękowania.
+2. **Wymiana bez kropki (brakujący szczegół).** W Wymianie nic nie czeka na gracza, bo oferty rozliczają się same.
+3. **Skąd gra wie.** Gra pyta serwer (`/api/guild/todo`) mniej więcej co minutę, gdy jest otwarta na ekranie, i od razu po akcji w Gildii. Serwer liczy to tak samo jak karty Prób, Bestii i Próśb.
+
 ## Wersja 0.0.93 (2.11.2026)
 
-1. **Co wchodzi do gry:** trudność po 50. poziomie według 438 B/A/A (zob. „Trudność po 50. poziomie: odpowiedzi autora 438”):
-    - krzywa B od 50 do 200;
-    - przy krainach od 66. poziomu zdanie o dwóch towarzyszach;
-    - w Wieży Solo, w walkach zdarzeń i w atakach na Bestię Gildii połowa wzrostu.
-    
-    Do 50. poziomu nic się nie zmienia. Razem z tym idą narzędzie `tools/difficulty-sim.mjs` i nowe opisy trzech chodów drugich form do narysowania od nowa.
+1. **Co wchodzi do gry:**
+    - trudność po 50. poziomie według 438 B/A/A (zob. „Trudność po 50. poziomie: odpowiedzi autora 438”):
+        - krzywa B od 50 do 200;
+        - przy krainach od 66. poziomu zdanie o dwóch towarzyszach;
+        - w Wieży Solo, w walkach zdarzeń i w atakach na Bestię Gildii połowa wzrostu;
+        - do 50. poziomu nic się nie zmienia;
+    - żółte kropki przy rzeczach do zrobienia w Gildii (zob. „Gildia: żółte kropki przy rzeczach do zrobienia”).
+     Razem z tym idą narzędzie `tools/difficulty-sim.mjs` i nowe opisy trzech chodów drugich form do narysowania od nowa.
 2. **Baza danych:** bez migracji.
 3. **Przed wdrożeniem:** zob. opis wersji w historii zmian.
 

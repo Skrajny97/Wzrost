@@ -160,6 +160,23 @@ describe('the Próby Gildii through the API', () => {
     assert.equal((await as('obcy', 'POST', '/api/guild/trials/take', { index: 0 })).data.error.code, 'no_guild');
   });
 
+  test('what waits in the guild lights its dots: a trial to take while none is taken, the beast, a gift to thank for; outside a guild nothing', async () => {
+    await as('mistrz', 'GET', '/api/guild/trials');
+    await setBoard([{ kind: 'explore', size: 0, roll: 0 }]);
+    const before = (await as('mistrz', 'GET', '/api/guild/todo')).data.todo;
+    assert.deepEqual([before.trials, before.requests], [true, false]);
+    // The beast's dot as its card has it: an attack left on a living beast,
+    // or a chest.
+    const beast = (await as('mistrz', 'GET', '/api/guild/beast')).data;
+    assert.equal(before.beast, Boolean(beast.beast && !beast.beast.fallen && beast.attacks.left > 0) || beast.chests.length > 0);
+    await as('mistrz', 'POST', '/api/guild/trials/take', { index: 0 });
+    assert.equal((await as('mistrz', 'GET', '/api/guild/todo')).data.todo.trials, false);
+    // The other member has not taken it.
+    assert.equal((await as('druh', 'GET', '/api/guild/todo')).data.todo.trials, true);
+    await player('obcy', 'Obcy');
+    assert.equal((await as('obcy', 'GET', '/api/guild/todo')).data.todo, null);
+  });
+
   test('one trial at a time, sized to the taker\'s level; a locked one says why; a dropped one loses its progress; a finished one is not taken again', async () => {
     await as('mistrz', 'GET', '/api/guild/trials');
     await setBoard([

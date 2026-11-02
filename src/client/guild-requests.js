@@ -12,6 +12,7 @@
 // the card to the container and gives { unmount() }, which takes it away.
 
 import { herbSprite, potionSprite } from './art.js';
+import { checkGuildTodo } from './chat-news.js';
 import { materialIcon } from './craft-table.js';
 import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber, plural } from './format.js';
@@ -249,6 +250,7 @@ export function mountGuildRequests(container) {
   // An action answered with the Prośby anew, its words in a toast.
   async function act(path, body) {
     const answer = await call('POST', path, body);
+    checkGuildTodo({ now: true });
     show(answer);
     if (answer.text) toast(answer.text);
   }
