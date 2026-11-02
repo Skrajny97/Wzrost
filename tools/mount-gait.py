@@ -25,8 +25,15 @@ hand there ("fix": {"LABEL": [x, y]} in pixels of the start frame), and
 "cross": true makes the two legs of a pair swing around one place, so they
 pass each other (the tiger stood with its hind legs apart and they never
 crossed). "stride", "lift", "bob" and "nod" size the steps (shares of a
-leg's length); "crouch", "roll" and "head_drop" make a big cat's walk (the
-author: the tiger walked like a horse). Writes art/mount-gaits.json.
+leg's length); "crouch", "roll" and "head_drop" lower the body and the head
+and rock the shoulders (the author saw that as a tiger stalking with broken
+legs). A big cat's walk ("pendulum"): the body is not lowered; the
+shoulder or hip stays as high as in the start frame while the leg reaches
+the paw and goes lower over a paw too far ahead or behind, as over a stilt,
+a hind paw standing a little "behind" the hip; "fold": a front leg stands
+on a straight wrist, its paw folding back under it while it swings (the
+estimate puts the front legs' middle joint halfway down; "fix" moves it to
+the wrist). Writes art/mount-gaits.json.
 """
 import json
 import math
@@ -102,10 +109,18 @@ def gait(points, size, spec):
             left, right = legs[f'{pair}_left'], legs[f'{pair}_right']
             tx = (base[f'LEFT {top}'][0] + base[f'RIGHT {top}'][0]) / 2
             # Halfway between where the paws stand and under the joint above,
-            # so a leg does not lean back the whole step.
-            x = ((left['rest'][0] + right['rest'][0]) / 2 + tx) / 2
-            y = max(left['rest'][1], right['rest'][1])
-            left['rest'] = right['rest'] = (x, y)
+            # so a leg does not lean back the whole step; under the joint
+            # for a big cat, so the body rises and falls evenly.
+            if spec.get('pendulum'):
+                # Each paw on its own ground line (the far legs stand higher
+                # in the picture), a front paw under the shoulder, a hind paw
+                # a little behind the hip ("behind", a share of the leg).
+                x = tx - (spec.get('behind', 0) * (left['upper'] + left['lower']) if pair == 'hind' else 0)
+                left['rest'], right['rest'] = (x, left['rest'][1]), (x, right['rest'][1])
+            else:
+                x = ((left['rest'][0] + right['rest'][0]) / 2 + tx) / 2
+                y = max(left['rest'][1], right['rest'][1])
+                left['rest'] = right['rest'] = (x, y)
             for side in ('LEFT', 'RIGHT'):
                 base[f'{side} {top}'] = (tx, base[f'{side} {top}'][1])
     length = sum(l['upper'] + l['lower'] for l in legs.values()) / 4
@@ -119,6 +134,8 @@ def gait(points, size, spec):
     crouch = spec.get('crouch', 0) * length
     roll = spec.get('roll', 0) * length
     head_drop = spec.get('head_drop', 0) * length
+    pendulum = spec.get('pendulum', False)
+    fold = spec.get('fold', False)
     out = []
     for i in range(frames):
         phi = i / frames
@@ -129,6 +146,7 @@ def gait(points, size, spec):
         frame = dict(base)
         for label, (x, y) in base.items():
             frame[label] = (x, y + dy + (head if label in HEAD else 0))
+        lifted = {}
         for leg, (top, mid, end) in LEGS.items():
             info = legs[leg]
             phase = (phi - PHASES[kind][leg]) % 1
@@ -136,16 +154,43 @@ def gait(points, size, spec):
             if roll:
                 tx, ty = frame[top]
                 frame[top] = (tx, ty - roll * math.cos(2 * math.pi * (phase - STANCE[kind] / 2)))
-            t = frame[top]
             e = (info['rest'][0] + fx, info['rest'][1] + fy)
+            longest = 0.97 * (info['upper'] + info['lower'])
+            if pendulum:
+                # The shoulder or hip stays as high as in the start frame
+                # while the leg reaches the paw, and goes lower when the paw
+                # is too far ahead or behind for it, as over a stilt (the
+                # front legs stand straight); while the paw swings it goes
+                # from where it was at the lift to where it will be at the
+                # touch.
+                tx = frame[top][0]
+                stilt = 0.995 * (info['upper'] + info['lower'])
+                over = lambda x: max(base[top][1], info['rest'][1] - math.sqrt(max(0.0, stilt * stilt - (x - tx) ** 2)))
+                if phase < STANCE[kind]:
+                    ty = over(e[0])
+                else:
+                    k = (phase - STANCE[kind]) / (1 - STANCE[kind])
+                    ty = over(info['rest'][0] - stride / 2) * (1 - k) + over(info['rest'][0] + stride / 2) * k
+                lifted[leg] = ty - base[top][1]
+                frame[top] = (tx, ty)
+                longest = stilt * 1.0001
+            t = frame[top]
             # The leg cannot stretch: a hoof too far for it rises a little,
             # as a hoof does when it rolls over at the end of a step.
-            longest = 0.97 * (info['upper'] + info['lower'])
             dx = e[0] - t[0]
             if math.hypot(dx, e[1] - t[1]) > longest:
                 e = (e[0], t[1] + math.sqrt(max(0.0, longest * longest - dx * dx)))
-            frame[mid] = reach(t, e, info['upper'], info['lower'], info['bend'])
+            bend = info['bend']
+            if fold and leg.startswith('front'):
+                bend = 1 if phase < STANCE[kind] else -1
+            frame[mid] = reach(t, e, info['upper'], info['lower'], bend)
             frame[end] = e
+        if pendulum:
+            # The neck and the head go up and down with the shoulders.
+            rise = (lifted['front_left'] + lifted['front_right']) / 2
+            for label in HEAD + ('NECK',):
+                if label in frame:
+                    frame[label] = (frame[label][0], frame[label][1] + rise)
         out.append(frame)
     def points_of(frame):
         return [
