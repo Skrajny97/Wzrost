@@ -1,13 +1,15 @@
 // Class evolutions (evolutions.js in the engine; DECISIONS.md, "Ewolucje:
-// budowa"): the choice at class level 50 of one of the two paths'
-// evolutions, for good. On the test version "Testuj ewolucję" takes any
-// evolution of the class at any class level and keeps the skills it had, so
-// the test can be undone. Like skills, an evolution is taken only at home,
-// and only if the character is as read (its version). After it the stat
+// budowa" and "Druga ewolucja klas"): the choice at class level 50 of one of
+// the two paths' evolutions, for good, and at class level 100 the one form
+// that evolution grows into. On the test version "Testuj ewolucję" takes
+// any evolution of the class, or the second form of the one the character
+// has, at any class level and keeps the skills it had, so the test can be
+// undone. Like skills, an evolution is taken only at home, and only if the
+// character is as read (its version). After the first evolution the stat
 // points can be reset once, for free, decided at once (decidePointsReset).
 // Where the deployment has the evolutions off (features.js) there are none.
 
-import { evolutionChoices, evolutionView, evolveBlock, evolvedSkills, spentPoints } from '../engine/index.js';
+import { evolutionChoices, evolutionOf, evolutionView, evolveBlock, evolvedSkills, nextFormOf, spentPoints } from '../engine/index.js';
 import { characterView, engineCharacter, loadPlayer, requireBuildPlayer, requireIdlePlayer } from './characters.js';
 import { content } from './content.js';
 import { evolutionsOn } from './features.js';
@@ -24,9 +26,12 @@ function requireTests(context, session) {
   if (!evolutionTestsFor(context.env, session.user.login)) throw new ApiError(403, 'no_tests', 'Test ewolucji działa tylko na wersji testowej.');
 }
 
-// POST /api/evolution { evolutionId, test }: take an evolution; `test` only
-// on the test version. With stat points spent, their free reset waits for
-// the player's decision.
+// POST /api/evolution { evolutionId, test }: take an evolution, or the
+// second form of the one the character has; `test` only on the test
+// version. With stat points spent, the first evolution's free reset waits
+// for the player's decision; a second form keeps the points as they are (a
+// reset still waiting stays). A test keeps the skills from before the
+// first test, so "Cofnij ewolucję" goes back to them.
 export async function takeEvolution(context) {
   requireEvolutions();
   const { session, player } = await requireBuildPlayer(context);
@@ -37,33 +42,32 @@ export async function takeEvolution(context) {
   const character = engineCharacter(player.row);
   const block = evolveBlock(character, evolutionId, content, { test });
   if (block) throw new ApiError(block.code === 'unknown_evolution' ? 400 : 409, block.code, block.message);
+  const target = content.evolutionsById[evolutionId];
+  const reset = target.from ? (player.row.evolution_reset ?? 0) : spentPoints(character) > 0 ? 1 : 0;
   const db = context.env.DB;
   const result = await db
     .prepare(
-      'UPDATE characters SET evolution = ?, skills = ?, evolution_undo = ?, evolution_reset = ?, version = version + 1 WHERE id = ? AND version = ? AND evolution IS NULL',
+      `UPDATE characters SET evolution = ?, skills = ?, evolution_undo = CASE WHEN ? THEN COALESCE(evolution_undo, skills) ELSE evolution_undo END,
+         evolution_reset = ?, version = version + 1
+       WHERE id = ? AND version = ? AND evolution IS ?`,
     )
-    .bind(
-      evolutionId,
-      JSON.stringify(evolvedSkills(evolutionId, content)),
-      test ? player.row.skills : null,
-      spentPoints(character) > 0 ? 1 : 0,
-      player.row.id,
-      player.row.version,
-    )
+    .bind(evolutionId, JSON.stringify(evolvedSkills(evolutionId, content)), test ? 1 : 0, reset, player.row.id, player.row.version, target.from ?? null)
     .run();
   if (result.meta.changes !== 1) throw conflict();
   const fresh = await loadPlayer(db, session.userId);
-  return json({ evolution: evolutionView(content.evolutionsById[evolutionId], content), character: characterView(fresh, context.now) });
+  return json({ evolution: evolutionView(target, content, character), character: characterView(fresh, context.now) });
 }
 
-// GET /api/evolution/test: every evolution of the class to try (test
-// version).
+// GET /api/evolution/test: every evolution of the class to try, or the
+// second form of the one the character has (test version).
 export async function testEvolutions(context) {
   requireEvolutions();
   const { session, player } = await requireIdlePlayer(context);
   requireTests(context, session);
   const character = engineCharacter(player.row);
-  return json({ evolutions: evolutionChoices(character, content, { all: true }).map((evolution) => evolutionView(evolution, content)) });
+  const current = evolutionOf(character, content);
+  const list = current ? [nextFormOf(current, content)].filter(Boolean) : evolutionChoices(character, content, { all: true });
+  return json({ evolutions: list.map((evolution) => evolutionView(evolution, content, character)) });
 }
 
 // POST /api/evolution/points { reset }: the free reset of the stat points
@@ -88,21 +92,43 @@ export async function decidePointsReset(context) {
   return json({ reset, character: characterView(fresh, context.now) });
 }
 
-// POST /api/evolution/undo: back to the class with the skills it had before
-// a test evolution, and the stat points if they were reset (test version).
+// Where "Cofnij ewolucję" goes back to: the evolution whose skills were
+// kept before the test (a first evolution taken for good, before a test of
+// its second form), or the class.
+function evolutionBefore(kept) {
+  const skills = JSON.parse(kept ?? '{}');
+  return Object.keys(skills).map((id) => content.skillsById[id]?.evolution).find(Boolean) ?? null;
+}
+
 // POST /api/evolution/test-level: on the test version the character at the
 // first evolution's class level at once (the author: "Zmień moją postać na
 // testowym by miała 50 poziom klasy, bo nie chce mi się przeklikiwać
 // tego"); a test evolution is undone first, so the evolution is then chosen
-// as in the game. A character that took one for good stays as it is.
+// as in the game. A character that took one for good stays as it is. With
+// ?level=100 (the second evolution's level), a character with a first
+// evolution, taken for good or tried, gets that class level and keeps it,
+// so its second form is then taken as in the game.
 export async function testClassLevel(context) {
   requireEvolutions();
   const { session, player } = await requireIdlePlayer(context);
   requireTests(context, session);
   const row = player.row;
-  if (row.evolution && !row.evolution_undo) throw new ApiError(409, 'evolved', 'Ta postać przeszła już ewolucję.');
-  const level = content.balance.progression.classEvolutionLevels[0];
+  const levels = content.balance.progression.classEvolutionLevels;
   const db = context.env.DB;
+  const asked = Number(new URL(context.request.url).searchParams.get('level'));
+  if (asked === levels[1]) {
+    const current = evolutionOf(engineCharacter(row), content);
+    if (!current || current.from) throw new ApiError(409, 'not_first', 'Najpierw potrzebna jest pierwsza ewolucja, bez drugiej.');
+    const raised = await db
+      .prepare('UPDATE characters SET class_level = MAX(class_level, ?), class_xp = 0, version = version + 1 WHERE id = ? AND version = ?')
+      .bind(asked, row.id, row.version)
+      .run();
+    if (raised.meta.changes !== 1) throw conflict();
+    const fresh = await loadPlayer(db, session.userId);
+    return json({ character: characterView(fresh, context.now) });
+  }
+  // What stays once the tests are undone: an evolution taken for good stays.
+  if (row.evolution_undo ? evolutionBefore(row.evolution_undo) : row.evolution) throw new ApiError(409, 'evolved', 'Ta postać przeszła już ewolucję.');
   const result = await db
     .prepare(
       `UPDATE characters SET class_level = MAX(class_level, ?), class_xp = 0,
@@ -111,13 +137,16 @@ export async function testClassLevel(context) {
          version = version + 1
        WHERE id = ? AND version = ?`,
     )
-    .bind(level, row.id, row.version)
+    .bind(levels[0], row.id, row.version)
     .run();
   if (result.meta.changes !== 1) throw conflict();
   const fresh = await loadPlayer(db, session.userId);
   return json({ character: characterView(fresh, context.now) });
 }
 
+// POST /api/evolution/undo: back to where the test started, the class or
+// the first evolution taken for good, with the skills it had then, and the
+// stat points if they were reset (test version).
 export async function undoEvolution(context) {
   requireEvolutions();
   const { session, player } = await requireBuildPlayer(context);
@@ -126,9 +155,9 @@ export async function undoEvolution(context) {
   const db = context.env.DB;
   const result = await db
     .prepare(
-      'UPDATE characters SET evolution = NULL, skills = evolution_undo, evolution_undo = NULL, points = COALESCE(points_undo, points), points_undo = NULL, evolution_reset = 0, version = version + 1 WHERE id = ? AND version = ?',
+      'UPDATE characters SET evolution = ?, skills = evolution_undo, evolution_undo = NULL, points = COALESCE(points_undo, points), points_undo = NULL, evolution_reset = 0, version = version + 1 WHERE id = ? AND version = ?',
     )
-    .bind(player.row.id, player.row.version)
+    .bind(evolutionBefore(player.row.evolution_undo), player.row.id, player.row.version)
     .run();
   if (result.meta.changes !== 1) throw conflict();
   const fresh = await loadPlayer(db, session.userId);

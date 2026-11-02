@@ -1,7 +1,7 @@
 // Game content bundled into the Worker from data/ (validated against
 // data/schemas before every deploy).
 
-import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, landBestiaryChest, meetingChances, ordinaryMaterial, regionDangers } from '../engine/index.js';
+import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, evolutionArt, landBestiaryChest, meetingChances, ordinaryMaterial, regionDangers } from '../engine/index.js';
 import { buildingOn, craftingOn, evolutionsOn, settlementOn } from './features.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
@@ -130,6 +130,11 @@ export function publicContent() {
     // picture behind the Ewolucja tab's heading.
     evolutionTexts: content.evolutionTexts,
     evolutionPlace: content.evolutionPlace,
+    // The art a second form and its skills take until they have their own
+    // (the first evolution's portrait, walk and ride; the icon, sound and
+    // look of the skill grown from, or of the first evolution's in its
+    // place): the page's art.js finds them by these ids.
+    evolutionArt: evolutionArt(content),
     // The picture behind the Gildia page's heading, once one is chosen.
     guildPlace: content.guilds.place ?? null,
     // The tabs of the Gildia page: its members, the Bestia, the Próby and
