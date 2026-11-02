@@ -10,7 +10,7 @@
 -- requester thanked for it, once.
 --
 -- A guild or a character that goes takes its requests and gifts along, and
--- a request that goes takes its gifts. The requests closed before the week
+-- a request that goes takes its gifts. The requests closed before last week
 -- began go with their gifts when a new request is made.
 CREATE TABLE guild_requests (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

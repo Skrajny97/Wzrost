@@ -89,6 +89,7 @@ import { toHex } from './encoding.js';
 import { evolutionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { forgeView } from './forge.js';
+import { trialProgress } from './guild-trials.js';
 import { counted, foreign, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
 import { stableView } from './stable.js';
@@ -284,7 +285,8 @@ function imbueView(player) {
   return {
     elements: imbue.elements.map(({ element, material }) => {
       const { stack, count } = imbueCost({ level: 1, rarity: 'common' }, element, content);
-      return { element, name: content.elementsById[element].name, material: content.materialsById[material].name, count, have: materials[stack] ?? 0 };
+      // `key`: the material's stack, for "Poproś gildię" (guild-requests.js).
+      return { element, name: content.elementsById[element].name, material: content.materialsById[material].name, key: stack, count, have: materials[stack] ?? 0 };
     }),
     items: items.map((item) => ({
       id: item.id,
@@ -691,8 +693,13 @@ export async function deliverSettlementOrder(context) {
   // The narrator's quests "Wykonaj N zleceń w Osadzie" (question 95).
   const quests = JSON.stringify(addQuestProgress(questsNow(player, context.now), { orders: 1 }));
   const db = context.env.DB;
+  // The Próby Gildii's trial too (guild-trials.js): set in the delivery's
+  // batch just before its save, under that save's own condition (`where`,
+  // about the character as read), so it moves only with the save, once for
+  // two taps at once (the week's order makes the same Osada for both).
+  const trial = (where) => trialProgress(db, row.id, { orders: 1 }, context.now, where);
   if (done.take.kind === 'craft') {
-    await deliverCrafted(db, player, done, { settlement: JSON.stringify(next), quests });
+    await deliverCrafted(db, player, done, { settlement: JSON.stringify(next), quests, trial });
     const after = await loadPlayer(db, session.userId);
     if (after.row.settlement !== JSON.stringify(next)) throw changed();
     return json({
@@ -706,14 +713,16 @@ export async function deliverSettlementOrder(context) {
     // saved whole, only if the character is as read.
     const taken = materialsTaken(done.take, goods.materials, content);
     const left = addCounts(goods.materials, Object.fromEntries(Object.entries(taken).map(([key, count]) => [key, -count])));
-    const result = await db
-      .prepare(
-        `UPDATE characters SET gold = gold + ?, system_points = system_points + ?, settlement = ?, quests = ?, materials = ?, version = version + 1
-         WHERE id = ? AND version = ? AND materials IS ?`,
-      )
-      .bind(done.gold, done.systemPoints, JSON.stringify(next), quests, JSON.stringify(left), row.id, row.version, row.materials)
-      .run();
-    if (result.meta.changes !== 1) throw changed();
+    const saved = await db.batch([
+      ...trial({ sql: '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT materials FROM characters WHERE id = ?) IS ?', binds: [row.id, row.version, row.id, row.materials] }),
+      db
+        .prepare(
+          `UPDATE characters SET gold = gold + ?, system_points = system_points + ?, settlement = ?, quests = ?, materials = ?, version = version + 1
+           WHERE id = ? AND version = ? AND materials IS ?`,
+        )
+        .bind(done.gold, done.systemPoints, JSON.stringify(next), quests, JSON.stringify(left), row.id, row.version, row.materials),
+    ]);
+    if (saved.at(-1).meta.changes !== 1) throw changed();
     const after = await loadPlayer(db, session.userId);
     return json({
       delivered: { gold: done.gold, systemPoints: done.systemPoints, reputation: done.reputation },
@@ -723,16 +732,21 @@ export async function deliverSettlementOrder(context) {
   }
   const column = COLUMNS[done.take.kind];
   const key = jsonPath(done.take.key);
-  const result = await db
-    .prepare(
-      `UPDATE characters SET gold = gold + ?, system_points = system_points + ?, settlement = ?, quests = ?,
-         ${column} = CASE WHEN json_extract(${column}, ?) > ? THEN json_set(${column}, ?, json_extract(${column}, ?) - ?) ELSE json_remove(${column}, ?) END,
-         version = version + 1
-       WHERE id = ? AND version = ? AND COALESCE(json_extract(${column}, ?), 0) >= ?`,
-    )
-    .bind(done.gold, done.systemPoints, JSON.stringify(next), quests, key, done.take.count, key, key, done.take.count, key, row.id, row.version, key, done.take.count)
-    .run();
-  if (result.meta.changes !== 1) throw changed();
+  const saved = await db.batch([
+    ...trial({
+      sql: `(SELECT version FROM characters WHERE id = ?) = ? AND COALESCE((SELECT json_extract(${column}, ?) FROM characters WHERE id = ?), 0) >= ?`,
+      binds: [row.id, row.version, key, row.id, done.take.count],
+    }),
+    db
+      .prepare(
+        `UPDATE characters SET gold = gold + ?, system_points = system_points + ?, settlement = ?, quests = ?,
+           ${column} = CASE WHEN json_extract(${column}, ?) > ? THEN json_set(${column}, ?, json_extract(${column}, ?) - ?) ELSE json_remove(${column}, ?) END,
+           version = version + 1
+         WHERE id = ? AND version = ? AND COALESCE(json_extract(${column}, ?), 0) >= ?`,
+      )
+      .bind(done.gold, done.systemPoints, JSON.stringify(next), quests, key, done.take.count, key, key, done.take.count, key, row.id, row.version, key, done.take.count),
+  ]);
+  if (saved.at(-1).meta.changes !== 1) throw changed();
   const after = await loadPlayer(db, session.userId);
   return json({
     delivered: { gold: done.gold, systemPoints: done.systemPoints, reputation: done.reputation },
@@ -743,18 +757,21 @@ export async function deliverSettlementOrder(context) {
 
 // Delivering the Warsztat's items: they leave the bag, the weakest first,
 // and the order pays, all of it or nothing. The payment goes only if the
-// character is as read and every item is still in the bag; the items go
-// only if that payment was saved (its new Osada is unique to it).
-async function deliverCrafted(db, player, done, { settlement, quests }) {
+// character is as read and every item is still in the bag, and the Próby
+// Gildii's `trial` (a function of that condition) only with it; the items
+// go only if that payment was saved (its new Osada is unique to it).
+async function deliverCrafted(db, player, done, { settlement, quests, trial = () => [] }) {
   const { row } = player;
   const ids = craftedFor(player.items, done.take.key, done.take.count, content).map((item) => item.id);
   if (ids.length < done.take.count) throw new ApiError(409, 'not_enough', 'Brakuje Ci jeszcze tego, o co proszą.');
   const list = ids.map(() => '?').join(', ');
+  const inBag = `(SELECT COUNT(*) FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${list})) = ?`;
   await db.batch([
+    ...trial({ sql: `(SELECT version FROM characters WHERE id = ?) = ? AND ${inBag}`, binds: [row.id, row.version, row.id, ...ids, ids.length] }),
     db
       .prepare(
         `UPDATE characters SET gold = gold + ?, system_points = system_points + ?, settlement = ?, quests = ?, version = version + 1
-         WHERE id = ? AND version = ? AND (SELECT COUNT(*) FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${list})) = ?`,
+         WHERE id = ? AND version = ? AND ${inBag}`,
       )
       .bind(done.gold, done.systemPoints, settlement, quests, row.id, row.version, row.id, ...ids, ids.length),
     db

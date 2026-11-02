@@ -42,3 +42,4 @@ export * from './tannery.js';
 export * from './names.js';
 export * from './towers.js';
 export * from './guild-beast.js';
+export * from './guild-trials.js';

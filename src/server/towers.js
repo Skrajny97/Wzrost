@@ -40,6 +40,7 @@ import { atomically, sameVersion } from './atomic.js';
 import { bagPlaces, characterView, engineCharacter, equippedItems, loadCharacter, loadPlayer, questsNow, requireNotExploring, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
+import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { soldGold } from './inventory.js';
 import { partyOf } from './parties.js';
@@ -255,6 +256,8 @@ export async function enterTower(context) {
         ...(healed !== null ? [healed, now] : []),
         row.id,
       ),
+    // The Próby Gildii's trial too: the creatures and the fight won (guild-trials.js).
+    ...trialProgress(db, row.id, { kills: huntKills(hunt, content), towerWins: won ? 1 : 0 }, now),
     ...(storedSold.length > 0 ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${storedSold.map(() => '?').join(', ')})`).bind(row.id, ...storedSold.map((item) => item.id))] : []),
   ]);
   const after = await loadPlayer(db, session.userId);

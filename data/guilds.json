@@ -149,6 +149,7 @@
       "members": "Wkład tygodnia",
       "capped": "do paska: {cap}",
       "empty": "W tym tygodniu nikt nie wykonał jeszcze próby.",
+      "noGuild": "Próby Gildii wykonuje cała gildia. Dołącz do gildii albo załóż własną.",
       "took": "Próba wzięta: {text}",
       "dropped": "Próba porzucona.",
       "opened": "Skrzynia otwarta: {contents}.",
@@ -171,7 +172,7 @@
     }
   },
   "requests": {
-    "$comment": "Prośby Gildii (src/server/guild-requests.js, src/client/guild-requests.js; DECISIONS.md, „Próby i Prośby Gildii”). Autor: „346 A”: pomoc materiałami. Członek gildii prosi o materiał, zioło albo miksturę (kinds), od 1 do most sztuk; przedmiotów i złota prosić nie można, żeby majątek nie przechodził między kontami. Naraz jedna otwarta prośba na postać; kolejną doda waitHours godzin po dodaniu poprzedniej. Prośba wisi, aż ktoś ją spełni, aż proszący ją wycofa albo przez openHours godzin. Inni członkowie dają ze swoich zapasów, kiedy chcą, najwyżej tyle, ile brakuje; sztuki trafiają od razu do proszącego (zioła i mikstury do plecaka, jeśli jest w nim miejsce), z imieniem dającego, a proszący raz dziękuje za każdy dar. Postacie jednego konta nic sobie nie dają. Dawanie nie daje złota ani nagród Systemu: liczy się do rankingu Dobroczyńcy tygodnia (sztuki dane od poniedziałku) i do Prób Gildii (rodzaj gifts). Encyklopedia nie zalicza danych sztuk, jak towarów z Wymiany. Prośby zamknięte przed początkiem tygodnia znikają razem z darami przy kolejnej prośbie. texts: słowa karty Próśb, okna prośby i odpowiedzi gry; {…} wypełnia gra.",
+    "$comment": "Prośby Gildii (src/server/guild-requests.js, src/client/guild-requests.js; DECISIONS.md, „Próby i Prośby Gildii”). Autor: „346 A”: pomoc materiałami. Członek gildii prosi o materiał, zioło albo miksturę (kinds), od 1 do most sztuk; przedmiotów i złota prosić nie można, żeby majątek nie przechodził między kontami. Naraz jedna otwarta prośba na postać; kolejną doda waitHours godzin po dodaniu poprzedniej. Prośba wisi, aż ktoś ją spełni, aż proszący ją wycofa albo przez openHours godzin. Inni członkowie dają ze swoich zapasów, kiedy chcą, najwyżej tyle, ile brakuje; sztuki trafiają od razu do proszącego (zioła i mikstury do plecaka, jeśli jest w nim miejsce), z imieniem dającego, a proszący raz dziękuje za każdy dar. Postacie jednego konta nic sobie nie dają. Dawanie nie daje złota ani nagród Systemu: liczy się do rankingu Dobroczyńcy tygodnia (sztuki dane od poniedziałku) i do Prób Gildii (rodzaj gifts). Encyklopedia nie zalicza danych sztuk, jak towarów z Wymiany. Prośby zamknięte przed początkiem poprzedniego tygodnia znikają razem z darami przy kolejnej prośbie. texts: słowa karty Próśb, okna prośby i odpowiedzi gry; {…} wypełnia gra.",
     "kinds": ["material", "herb", "potion"],
     "most": 10,
     "waitHours": 8,
@@ -209,6 +210,7 @@
       "waitNext": "Kolejną prośbę dodasz {at}.",
       "others": "Prośby członków",
       "empty": "Nikt z gildii o nic teraz nie prosi.",
+      "noGuild": "Prośby Gildii widzą i spełniają członkowie gildii. Dołącz do gildii albo załóż własną.",
       "left": "Brakuje: {left} z {count}",
       "have": "Masz: {have}",
       "give": "Daj",

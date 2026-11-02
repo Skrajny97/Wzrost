@@ -20,6 +20,7 @@ import {
 import { content } from './content.js';
 import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, requireUnworn, walletOf } from './characters.js';
 import { toHex } from './encoding.js';
+import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 
 // The scrapper's price for the stored `items`, summed in SQL over the items
@@ -260,6 +261,12 @@ export async function upgradeItem(context) {
          WHERE id = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
       )
       .bind(cost.gold, ore, ore, cost['iron-ore'], warded ? 1 : 0, taken, material, taken, material, material, taken, material, row.id, item.id, roll),
+    // An upgrade that came off moves the Próby Gildii's trial on, only with
+    // this roll saved (guild-trials.js).
+    ...trialProgress(db, row.id, { upgrades: outcome.result === 'success' ? 1 : 0 }, context.now, {
+      sql: "EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)",
+      binds: [item.id, roll],
+    }),
   ];
   if (outcome.result === 'broken') {
     statements.push(db.prepare("DELETE FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?").bind(item.id, roll));

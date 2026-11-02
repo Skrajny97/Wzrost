@@ -27,6 +27,7 @@ import { bagPlaces, characterView, currentHp, engineCharacter, equippedItems, lo
 import { toHex } from './encoding.js';
 import { professionsOn } from './features.js';
 import { assertion, raced } from './atomic.js';
+import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { herbsOf } from './professions-view.js';
 import { KEPT_REPORTS } from './reports.js';
@@ -198,6 +199,8 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
       db
         .prepare(`UPDATE characters SET quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${herbs.sql}, version = version + 1 WHERE id = ?`)
         .bind(row.quests, quests, ...sets.binds, ...herbs.binds, row.id),
+      // The Próby Gildii's trial too (guild-trials.js).
+      ...trialProgress(db, row.id, { herbs: found }, now),
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {

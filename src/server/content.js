@@ -130,6 +130,9 @@ export function publicContent() {
     evolutionPlace: content.evolutionPlace,
     // The picture behind the Gildia page's heading, once one is chosen.
     guildPlace: content.guilds.place ?? null,
+    // The words of "Poproś gildię", shown where pieces are missing, before
+    // the Prośby Gildii answer (src/client/guild-requests.js).
+    guildAsk: content.guilds.requests.texts.ask,
     giftTexts: content.giftTexts,
     elements: content.elements.map(({ id, name, resistance, color }) => ({ id, name, resistance, color })),
     effects: content.effects.map(({ id, name, color }) => ({ id, name, color })),

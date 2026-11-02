@@ -32,6 +32,7 @@ import { content } from './content.js';
 import { bagPlaces, characterView, craftingState, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, walletOf, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
+import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { craftingOn } from './features.js';
 import { addTo, insertWork, requireProfessions, workGains } from './professions.js';
@@ -275,6 +276,8 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
            WHERE id = ? AND ${ongoing}`,
         )
         .bind(row.quests, quests, ...sets.binds, ...back.flatMap((each) => each.binds), ...(scroll ? [done] : []), row.id, row.id, activity.started_at),
+      // The Próby Gildii's trial too (guild-trials.js).
+      ...trialProgress(db, row.id, { made: made.length }, now),
       // The items made go to the bag; the room was there at the start.
       ...made.map((item) => insertItem.bind(row.id, JSON.stringify(item), now)),
       end,

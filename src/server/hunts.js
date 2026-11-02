@@ -79,6 +79,7 @@ import { toHex } from './encoding.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { eventDraftsOn, eventsOn, settlementOn } from './features.js';
+import { trialProgress } from './guild-trials.js';
 import { soldGold } from './inventory.js';
 import { finishGathering } from './professions.js';
 import { herbsOf, knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
@@ -750,7 +751,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // inner regions the new class levels open. They are saved only as read,
   // so a reward claimed meanwhile is not undone.
   const opened = areasOpened(character.classLevel, applied.classLevel, content);
-  const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills: huntKills(hunt, content), minutes: activity.minutes, opened }));
+  const progress = { kills: huntKills(hunt, content), minutes: activity.minutes, opened };
+  const quests = JSON.stringify(addQuestProgress(questsNow(player, now), progress));
   const setMaterials = left.length
     ? `, materials = json_set(materials, ${left.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})`
     : '';
@@ -816,6 +818,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
           ...(settlementAfter ? [settlementAfter] : []),
           row.id,
         ),
+      // The Próby Gildii's trial too (guild-trials.js).
+      ...trialProgress(db, row.id, progress, now),
       // Bag items the scrapper bought: paid for above, while they were still there.
       ...(soldStored.length > 0
         ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${soldStored.map(() => '?').join(', ')})`).bind(row.id, ...soldStored)]
