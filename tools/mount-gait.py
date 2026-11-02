@@ -136,13 +136,20 @@ def gait(points, size, spec):
     head_drop = spec.get('head_drop', 0) * length
     pendulum = spec.get('pendulum', False)
     fold = spec.get('fold', False)
+    # A big cat's shoulder blade or hip sinks while its paw is in the air
+    # ("dip", shares of a leg's length, front and hind), and its head
+    # nods with each front step ("nod" in a walk with "pendulum"): the
+    # author saw the tiger's body and head not move at all.
+    dip = spec.get('dip', 0)
+    dip_front, dip_hind = (dip if isinstance(dip, list) else [dip, dip])
     out = []
     for i in range(frames):
         phi = i / frames
         # The body: lowest when a pair stands under it (trot), or a slight
         # sway with each step (walk).
         dy = bob * math.cos(2 * math.pi * phi * (2 if kind == 'trot' else 4)) + crouch
-        head = nod * math.sin(2 * math.pi * phi * 2) + head_drop
+        head = (0 if pendulum else nod * math.sin(2 * math.pi * phi * 2)) + head_drop
+        stepping = 0
         frame = dict(base)
         for label, (x, y) in base.items():
             frame[label] = (x, y + dy + (head if label in HEAD else 0))
@@ -171,6 +178,10 @@ def gait(points, size, spec):
                 else:
                     k = (phase - STANCE[kind]) / (1 - STANCE[kind])
                     ty = over(info['rest'][0] - stride / 2) * (1 - k) + over(info['rest'][0] + stride / 2) * k
+                    sink = math.sin(math.pi * k)
+                    ty += (dip_front if leg.startswith('front') else dip_hind) * length * sink
+                    if leg.startswith('front'):
+                        stepping += sink
                 lifted[leg] = ty - base[top][1]
                 frame[top] = (tx, ty)
                 longest = stilt * 1.0001
@@ -186,11 +197,12 @@ def gait(points, size, spec):
             frame[mid] = reach(t, e, info['upper'], info['lower'], bend)
             frame[end] = e
         if pendulum:
-            # The neck and the head go up and down with the shoulders.
+            # The neck and the head go up and down with the shoulders, the
+            # head lower still while a front paw swings.
             rise = (lifted['front_left'] + lifted['front_right']) / 2
             for label in HEAD + ('NECK',):
                 if label in frame:
-                    frame[label] = (frame[label][0], frame[label][1] + rise)
+                    frame[label] = (frame[label][0], frame[label][1] + rise + (nod * stepping if label in HEAD else 0))
         out.append(frame)
     def points_of(frame):
         return [
