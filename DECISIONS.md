@@ -2996,6 +2996,12 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wersja 0.0.89 (2.11.2026)
+
+1. **Co wchodzi do gry:** Aura Systemu, Aura Żaru i Świetliste ślady w Sklepie Systemu, z nowymi zakładkami Aury i Ślady (zob. sekcję niżej). Razem z nimi idą notatki i pliki z gałęzi roboczej, których gra jeszcze nie używa: 30 portretów drugiej ewolucji z maskami skóry i siedmioma odcieniami, opisy klatek startowych chodów drugich form oraz zasada numerów wersji po 0.0.99.
+2. **Baza danych:** bez migracji. Aura i ślady zapisują się w kosmetykach postaci, tak jak ramki.
+3. **Przed wdrożeniem:** wszystkie testy (848) przechodzą, a nowa postać przeszła w przeglądarce wprowadzenie do pierwszej wyprawy, na telefonie, na komputerze i na dużym monitorze (`tools/first-steps.cjs`). Aury i ślady sprawdzono w przeglądarce na 390×844 i 1280×800 w sklepie i na portrecie w zakładce Postać, a na telefonie także w scenie Walki i przy wyłączonych animacjach.
+
 ## Kosmetyki: Aura Systemu, Aura Żaru i Świetliste ślady (2.11.2026)
 
 Autor: „416 akcept”, „417 akcept”, „418 akcept”.
