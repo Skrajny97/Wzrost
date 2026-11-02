@@ -1,0 +1,30 @@
+{
+  "id": "dragonfly",
+  "payload": {
+    "prompt": "giant dragonfly, four long transparent wings veined in blue, a long segmented metallic blue-green body, huge green compound eyes, spiky legs, hovering, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 793930638,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793646068,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 33.75,
+    "request_id": "89fe2dda-a012-46d6-b6eb-df68ffefbbcd",
+    "outputs_retained_until": 1793732411,
+    "billing": {
+      "source": "balance",
+      "balance_left": 33.75,
+      "balance_charged": 0.54
+    }
+  }
+}

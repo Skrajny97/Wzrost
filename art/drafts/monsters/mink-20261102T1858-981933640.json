@@ -1,0 +1,30 @@
+{
+  "id": "mink",
+  "payload": {
+    "prompt": "dark brown mink, a sleek long-bodied weasel-like predator with glossy wet fur and a small white chin, sharp teeth bared, crouched to leap, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 981933640,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793646009,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 34.29,
+    "request_id": "17cb4b7e-1a0c-4ebc-9e6b-d9f0c7d14a97",
+    "outputs_retained_until": 1793732361,
+    "billing": {
+      "source": "balance",
+      "balance_left": 34.29,
+      "balance_charged": 0.54
+    }
+  }
+}

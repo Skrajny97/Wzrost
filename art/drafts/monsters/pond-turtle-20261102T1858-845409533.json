@@ -1,0 +1,30 @@
+{
+  "id": "pond-turtle",
+  "payload": {
+    "prompt": "large European pond turtle, a thick domed dark olive shell with small yellow speckles, overgrown with moss and algae, scaly clawed legs, a hooked beak-like jaw open, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 845409533,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793645958,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 34.83,
+    "request_id": "e4b8dd78-890f-465b-8e6f-ff2316b15154",
+    "outputs_retained_until": 1793732326,
+    "billing": {
+      "source": "balance",
+      "balance_left": 34.83,
+      "balance_charged": 0.54
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "water-spider",
+  "payload": {
+    "prompt": "water spider, a dark brown hairy spider holding a big silvery air bubble around its body, long legs, sharp fangs, on a water plant stem, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 720074195,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793646148,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 32.67,
+    "request_id": "bb0adb32-10be-405c-9045-fed8f354ef12",
+    "outputs_retained_until": 1793732500,
+    "billing": {
+      "source": "balance",
+      "balance_left": 32.67,
+      "balance_charged": 0.54
+    }
+  }
+}
