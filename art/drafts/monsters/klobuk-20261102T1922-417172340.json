@@ -1,0 +1,30 @@
+{
+  "id": "klobuk",
+  "payload": {
+    "prompt": "klobuk demon from Polish folklore, a bedraggled soaking-wet black hen with ruffled wet feathers and glowing yellow eyes, its long tail is a streaming trail of bright orange and yellow fire flames behind it like a comet, sparks around the flames, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 3,
+    "seed": 417172340,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793647392,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 22.41,
+    "request_id": "a9ca437b-5db4-45a7-9754-26fdf79c3ec1",
+    "outputs_retained_until": 1793733738,
+    "billing": {
+      "source": "balance",
+      "balance_left": 22.41,
+      "balance_charged": 0.54
+    }
+  }
+}
