@@ -1,0 +1,848 @@
+{
+  "id": "sabertooth",
+  "payload": {
+    "description": "a huge saber-toothed tiger with orange fur, black stripes and two long curved fangs, a dark leather saddle on a fur saddle cloth with bone trinkets and a leather bridle with reins",
+    "action": "walk",
+    "direction": "east",
+    "view": "side",
+    "first_frame": "art/references/mounts/sabertooth.png",
+    "first_frame_keypoints": [
+      {
+        "x": 0.9013,
+        "y": 0.313,
+        "label": "NOSE"
+      },
+      {
+        "x": 0.8679,
+        "y": 0.2315,
+        "label": "LEFT EYE"
+      },
+      {
+        "x": 0.8288,
+        "y": 0.2356,
+        "label": "RIGHT EYE"
+      },
+      {
+        "x": 0.8261,
+        "y": 0.1663,
+        "label": "LEFT EAR"
+      },
+      {
+        "x": 0.7647,
+        "y": 0.1826,
+        "label": "RIGHT EAR"
+      },
+      {
+        "x": 0.6867,
+        "y": 0.5331,
+        "label": "LEFT SHOULDER"
+      },
+      {
+        "x": 0.5752,
+        "y": 0.5372,
+        "label": "RIGHT SHOULDER"
+      },
+      {
+        "x": 0.6532,
+        "y": 0.7328,
+        "label": "LEFT ELBOW"
+      },
+      {
+        "x": 0.5808,
+        "y": 0.7655,
+        "label": "RIGHT ELBOW"
+      },
+      {
+        "x": 0.6588,
+        "y": 0.8918,
+        "label": "LEFT ARM"
+      },
+      {
+        "x": 0.6031,
+        "y": 0.9163,
+        "label": "RIGHT ARM"
+      },
+      {
+        "x": 0.3327,
+        "y": 0.5291,
+        "label": "LEFT HIP"
+      },
+      {
+        "x": 0.2379,
+        "y": 0.5087,
+        "label": "RIGHT HIP"
+      },
+      {
+        "x": 0.2881,
+        "y": 0.7328,
+        "label": "LEFT KNEE"
+      },
+      {
+        "x": 0.1543,
+        "y": 0.7328,
+        "label": "RIGHT KNEE"
+      },
+      {
+        "x": 0.2964,
+        "y": 0.8714,
+        "label": "LEFT LEG"
+      },
+      {
+        "x": 0.1487,
+        "y": 0.8837,
+        "label": "RIGHT LEG"
+      },
+      {
+        "x": 0.6309,
+        "y": 0.5352,
+        "label": "NECK"
+      }
+    ],
+    "keypoints": [
+      [
+        {
+          "x": 0.9013,
+          "y": 0.3187,
+          "label": "NOSE"
+        },
+        {
+          "x": 0.8679,
+          "y": 0.2372,
+          "label": "LEFT EYE"
+        },
+        {
+          "x": 0.8288,
+          "y": 0.2412,
+          "label": "RIGHT EYE"
+        },
+        {
+          "x": 0.8261,
+          "y": 0.172,
+          "label": "LEFT EAR"
+        },
+        {
+          "x": 0.7647,
+          "y": 0.1883,
+          "label": "RIGHT EAR"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5388,
+          "label": "LEFT SHOULDER"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5429,
+          "label": "RIGHT SHOULDER"
+        },
+        {
+          "x": 0.6634,
+          "y": 0.7389,
+          "label": "LEFT ELBOW"
+        },
+        {
+          "x": 0.6719,
+          "y": 0.7633,
+          "label": "RIGHT ELBOW"
+        },
+        {
+          "x": 0.6006,
+          "y": 0.8688,
+          "label": "LEFT ARM"
+        },
+        {
+          "x": 0.6473,
+          "y": 0.9133,
+          "label": "RIGHT ARM"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5347,
+          "label": "LEFT HIP"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5143,
+          "label": "RIGHT HIP"
+        },
+        {
+          "x": 0.2812,
+          "y": 0.7486,
+          "label": "LEFT KNEE"
+        },
+        {
+          "x": 0.1974,
+          "y": 0.735,
+          "label": "RIGHT KNEE"
+        },
+        {
+          "x": 0.3248,
+          "y": 0.8723,
+          "label": "LEFT LEG"
+        },
+        {
+          "x": 0.2158,
+          "y": 0.8837,
+          "label": "RIGHT LEG"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5408,
+          "label": "NECK"
+        }
+      ],
+      [
+        {
+          "x": 0.9013,
+          "y": 0.3225,
+          "label": "NOSE"
+        },
+        {
+          "x": 0.8679,
+          "y": 0.2409,
+          "label": "LEFT EYE"
+        },
+        {
+          "x": 0.8288,
+          "y": 0.245,
+          "label": "RIGHT EYE"
+        },
+        {
+          "x": 0.8261,
+          "y": 0.1757,
+          "label": "LEFT EAR"
+        },
+        {
+          "x": 0.7647,
+          "y": 0.192,
+          "label": "RIGHT EAR"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5275,
+          "label": "LEFT SHOULDER"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5316,
+          "label": "RIGHT SHOULDER"
+        },
+        {
+          "x": 0.6909,
+          "y": 0.7134,
+          "label": "LEFT ELBOW"
+        },
+        {
+          "x": 0.6555,
+          "y": 0.7571,
+          "label": "RIGHT ELBOW"
+        },
+        {
+          "x": 0.6512,
+          "y": 0.8616,
+          "label": "LEFT ARM"
+        },
+        {
+          "x": 0.62,
+          "y": 0.9024,
+          "label": "RIGHT ARM"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5234,
+          "label": "LEFT HIP"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.503,
+          "label": "RIGHT HIP"
+        },
+        {
+          "x": 0.2642,
+          "y": 0.7351,
+          "label": "LEFT KNEE"
+        },
+        {
+          "x": 0.1933,
+          "y": 0.7201,
+          "label": "RIGHT KNEE"
+        },
+        {
+          "x": 0.2975,
+          "y": 0.8654,
+          "label": "LEFT LEG"
+        },
+        {
+          "x": 0.1885,
+          "y": 0.8709,
+          "label": "RIGHT LEG"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5295,
+          "label": "NECK"
+        }
+      ],
+      [
+        {
+          "x": 0.9013,
+          "y": 0.3187,
+          "label": "NOSE"
+        },
+        {
+          "x": 0.8679,
+          "y": 0.2372,
+          "label": "LEFT EYE"
+        },
+        {
+          "x": 0.8288,
+          "y": 0.2412,
+          "label": "RIGHT EYE"
+        },
+        {
+          "x": 0.8261,
+          "y": 0.172,
+          "label": "LEFT EAR"
+        },
+        {
+          "x": 0.7647,
+          "y": 0.1883,
+          "label": "RIGHT EAR"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5388,
+          "label": "LEFT SHOULDER"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5429,
+          "label": "RIGHT SHOULDER"
+        },
+        {
+          "x": 0.6999,
+          "y": 0.718,
+          "label": "LEFT ELBOW"
+        },
+        {
+          "x": 0.6387,
+          "y": 0.771,
+          "label": "RIGHT ELBOW"
+        },
+        {
+          "x": 0.7018,
+          "y": 0.8771,
+          "label": "LEFT ARM"
+        },
+        {
+          "x": 0.5928,
+          "y": 0.9098,
+          "label": "RIGHT ARM"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5347,
+          "label": "LEFT HIP"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5143,
+          "label": "RIGHT HIP"
+        },
+        {
+          "x": 0.2475,
+          "y": 0.7414,
+          "label": "LEFT KNEE"
+        },
+        {
+          "x": 0.1734,
+          "y": 0.7104,
+          "label": "RIGHT KNEE"
+        },
+        {
+          "x": 0.2703,
+          "y": 0.8765,
+          "label": "LEFT LEG"
+        },
+        {
+          "x": 0.2236,
+          "y": 0.8424,
+          "label": "RIGHT LEG"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5408,
+          "label": "NECK"
+        }
+      ],
+      [
+        {
+          "x": 0.9013,
+          "y": 0.2923,
+          "label": "NOSE"
+        },
+        {
+          "x": 0.8679,
+          "y": 0.2108,
+          "label": "LEFT EYE"
+        },
+        {
+          "x": 0.8288,
+          "y": 0.2149,
+          "label": "RIGHT EYE"
+        },
+        {
+          "x": 0.8261,
+          "y": 0.1456,
+          "label": "LEFT EAR"
+        },
+        {
+          "x": 0.7647,
+          "y": 0.1619,
+          "label": "RIGHT EAR"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5275,
+          "label": "LEFT SHOULDER"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5316,
+          "label": "RIGHT SHOULDER"
+        },
+        {
+          "x": 0.6852,
+          "y": 0.7171,
+          "label": "LEFT ELBOW"
+        },
+        {
+          "x": 0.6216,
+          "y": 0.7595,
+          "label": "RIGHT ELBOW"
+        },
+        {
+          "x": 0.6745,
+          "y": 0.8755,
+          "label": "LEFT ARM"
+        },
+        {
+          "x": 0.5655,
+          "y": 0.8902,
+          "label": "RIGHT ARM"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5234,
+          "label": "LEFT HIP"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.503,
+          "label": "RIGHT HIP"
+        },
+        {
+          "x": 0.2312,
+          "y": 0.7222,
+          "label": "LEFT KNEE"
+        },
+        {
+          "x": 0.2023,
+          "y": 0.7277,
+          "label": "RIGHT KNEE"
+        },
+        {
+          "x": 0.243,
+          "y": 0.8603,
+          "label": "LEFT LEG"
+        },
+        {
+          "x": 0.2742,
+          "y": 0.8361,
+          "label": "RIGHT LEG"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5295,
+          "label": "NECK"
+        }
+      ],
+      [
+        {
+          "x": 0.9013,
+          "y": 0.3187,
+          "label": "NOSE"
+        },
+        {
+          "x": 0.8679,
+          "y": 0.2372,
+          "label": "LEFT EYE"
+        },
+        {
+          "x": 0.8288,
+          "y": 0.2412,
+          "label": "RIGHT EYE"
+        },
+        {
+          "x": 0.8261,
+          "y": 0.172,
+          "label": "LEFT EAR"
+        },
+        {
+          "x": 0.7647,
+          "y": 0.1883,
+          "label": "RIGHT EAR"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5388,
+          "label": "LEFT SHOULDER"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5429,
+          "label": "RIGHT SHOULDER"
+        },
+        {
+          "x": 0.6702,
+          "y": 0.7362,
+          "label": "LEFT ELBOW"
+        },
+        {
+          "x": 0.6763,
+          "y": 0.7614,
+          "label": "RIGHT ELBOW"
+        },
+        {
+          "x": 0.6473,
+          "y": 0.8918,
+          "label": "LEFT ARM"
+        },
+        {
+          "x": 0.6006,
+          "y": 0.8688,
+          "label": "RIGHT ARM"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5347,
+          "label": "LEFT HIP"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5143,
+          "label": "RIGHT HIP"
+        },
+        {
+          "x": 0.2153,
+          "y": 0.7227,
+          "label": "LEFT KNEE"
+        },
+        {
+          "x": 0.2593,
+          "y": 0.7668,
+          "label": "RIGHT KNEE"
+        },
+        {
+          "x": 0.2158,
+          "y": 0.8618,
+          "label": "LEFT LEG"
+        },
+        {
+          "x": 0.3248,
+          "y": 0.8837,
+          "label": "RIGHT LEG"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5408,
+          "label": "NECK"
+        }
+      ],
+      [
+        {
+          "x": 0.9013,
+          "y": 0.3225,
+          "label": "NOSE"
+        },
+        {
+          "x": 0.8679,
+          "y": 0.2409,
+          "label": "LEFT EYE"
+        },
+        {
+          "x": 0.8288,
+          "y": 0.245,
+          "label": "RIGHT EYE"
+        },
+        {
+          "x": 0.8261,
+          "y": 0.1757,
+          "label": "LEFT EAR"
+        },
+        {
+          "x": 0.7647,
+          "y": 0.192,
+          "label": "RIGHT EAR"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5275,
+          "label": "LEFT SHOULDER"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5316,
+          "label": "RIGHT SHOULDER"
+        },
+        {
+          "x": 0.6548,
+          "y": 0.7301,
+          "label": "LEFT ELBOW"
+        },
+        {
+          "x": 0.7072,
+          "y": 0.7309,
+          "label": "RIGHT ELBOW"
+        },
+        {
+          "x": 0.62,
+          "y": 0.881,
+          "label": "LEFT ARM"
+        },
+        {
+          "x": 0.6512,
+          "y": 0.8616,
+          "label": "RIGHT ARM"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5234,
+          "label": "LEFT HIP"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.503,
+          "label": "RIGHT HIP"
+        },
+        {
+          "x": 0.1999,
+          "y": 0.6972,
+          "label": "LEFT KNEE"
+        },
+        {
+          "x": 0.2468,
+          "y": 0.7521,
+          "label": "RIGHT KNEE"
+        },
+        {
+          "x": 0.1885,
+          "y": 0.8353,
+          "label": "LEFT LEG"
+        },
+        {
+          "x": 0.2975,
+          "y": 0.8837,
+          "label": "RIGHT LEG"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5295,
+          "label": "NECK"
+        }
+      ],
+      [
+        {
+          "x": 0.9013,
+          "y": 0.3187,
+          "label": "NOSE"
+        },
+        {
+          "x": 0.8679,
+          "y": 0.2372,
+          "label": "LEFT EYE"
+        },
+        {
+          "x": 0.8288,
+          "y": 0.2412,
+          "label": "RIGHT EYE"
+        },
+        {
+          "x": 0.8261,
+          "y": 0.172,
+          "label": "LEFT EAR"
+        },
+        {
+          "x": 0.7647,
+          "y": 0.1883,
+          "label": "RIGHT EAR"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5388,
+          "label": "LEFT SHOULDER"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5429,
+          "label": "RIGHT SHOULDER"
+        },
+        {
+          "x": 0.639,
+          "y": 0.7441,
+          "label": "LEFT ELBOW"
+        },
+        {
+          "x": 0.7036,
+          "y": 0.745,
+          "label": "RIGHT ELBOW"
+        },
+        {
+          "x": 0.5928,
+          "y": 0.8882,
+          "label": "LEFT ARM"
+        },
+        {
+          "x": 0.7018,
+          "y": 0.8993,
+          "label": "RIGHT ARM"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5347,
+          "label": "LEFT HIP"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5143,
+          "label": "RIGHT HIP"
+        },
+        {
+          "x": 0.1993,
+          "y": 0.7079,
+          "label": "LEFT KNEE"
+        },
+        {
+          "x": 0.2204,
+          "y": 0.7514,
+          "label": "RIGHT KNEE"
+        },
+        {
+          "x": 0.2236,
+          "y": 0.8424,
+          "label": "LEFT LEG"
+        },
+        {
+          "x": 0.2703,
+          "y": 0.8837,
+          "label": "RIGHT LEG"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5408,
+          "label": "NECK"
+        }
+      ],
+      [
+        {
+          "x": 0.9013,
+          "y": 0.2923,
+          "label": "NOSE"
+        },
+        {
+          "x": 0.8679,
+          "y": 0.2108,
+          "label": "LEFT EYE"
+        },
+        {
+          "x": 0.8288,
+          "y": 0.2149,
+          "label": "RIGHT EYE"
+        },
+        {
+          "x": 0.8261,
+          "y": 0.1456,
+          "label": "LEFT EAR"
+        },
+        {
+          "x": 0.7647,
+          "y": 0.1619,
+          "label": "RIGHT EAR"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5275,
+          "label": "LEFT SHOULDER"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5316,
+          "label": "RIGHT SHOULDER"
+        },
+        {
+          "x": 0.6227,
+          "y": 0.7328,
+          "label": "LEFT ELBOW"
+        },
+        {
+          "x": 0.6879,
+          "y": 0.7442,
+          "label": "RIGHT ELBOW"
+        },
+        {
+          "x": 0.5655,
+          "y": 0.8682,
+          "label": "LEFT ARM"
+        },
+        {
+          "x": 0.6745,
+          "y": 0.8972,
+          "label": "RIGHT ARM"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.5234,
+          "label": "LEFT HIP"
+        },
+        {
+          "x": 0.2853,
+          "y": 0.503,
+          "label": "RIGHT HIP"
+        },
+        {
+          "x": 0.2241,
+          "y": 0.7178,
+          "label": "LEFT KNEE"
+        },
+        {
+          "x": 0.2164,
+          "y": 0.7377,
+          "label": "RIGHT KNEE"
+        },
+        {
+          "x": 0.2742,
+          "y": 0.8361,
+          "label": "LEFT LEG"
+        },
+        {
+          "x": 0.243,
+          "y": 0.8837,
+          "label": "RIGHT LEG"
+        },
+        {
+          "x": 0.6309,
+          "y": 0.5295,
+          "label": "NECK"
+        }
+      ]
+    ],
+    "template_id": "lion",
+    "seed": 691947375,
+    "no_background": true
+  },
+  "usage": {
+    "type": "generations",
+    "generations": 3
+  },
+  "frames": 8
+}
