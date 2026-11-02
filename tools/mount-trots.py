@@ -26,8 +26,12 @@ A "trot" in art/mounts.json:
            pony's back between its rump and saddle): boxes [left, top,
            right, bottom) of the start frame, moved in each frame with the
            saddle; a clear pixel in one with the mount on both sides and
-           below takes the coat colour "coat", the "outline" where it meets
-           the clear above.
+           below takes the coat colour "coat" ("left": the colour of the
+           mount on the gap's left, not its outline), and the "outline",
+           if given, where it meets the clear above ("seam": the outline
+           on the gap's left, inside the mount now, takes the coat beside
+           it); a deep gap fills from the bottom up. The Stajnia's picture
+           takes the same patch.
 
     python3 -I tools/mount-trots.py [DRAFTS_DIR]
 
@@ -100,25 +104,57 @@ def patch(frame, rules, shift):
     px = frame.load()
     W, H = frame.size
     opaque = lambda x, y: 0 <= x < W and 0 <= y < H and px[x, y][3] >= 128
+    dx, dy = shift
+    original = frame.copy()
+    drawn = original.load()
     for rule in rules:
         x0, y0, x1, y1 = rule['box']
-        dx, dy = shift
+        x0, y0, x1, y1 = x0 + dx, y0 + dy, x1 + dx, y1 + dy
+
+        def coat(x, y):
+            # "left": the coat of the mount's part on the left of the gap
+            # (the rump's piebald goes on under the saddle), not its outline.
+            if rule['coat'] == 'left':
+                for k in range(1, x - x0 + 4):
+                    if 0 <= x - k < W:
+                        r, g, b, a = drawn[x - k, y]
+                        if a >= 128 and r * 299 + g * 587 + b * 114 >= 30000:
+                            return (r, g, b)
+                return walk.rgb(rule.get('fallback', '6c3820'))
+            return walk.rgb(rule['coat'])
+
         filled = []
-        for y in range(y0 + dy, y1 + dy):
-            for x in range(x0 + dx, x1 + dx):
-                if opaque(x, y) or not (0 <= x < W and 0 <= y < H):
-                    continue
-                left = any(opaque(x - k, y) for k in range(1, x - (x0 + dx) + 4))
-                right = any(opaque(x + k, y) for k in range(1, (x1 + dx) - x + 4))
-                below = any(opaque(x, y + k) for k in range(1, 6))
-                if left and right and below:
-                    filled.append((x, y))
-        coat, line = walk.rgb(rule['coat']), walk.rgb(rule['outline'])
-        for (x, y) in filled:
-            px[x, y] = (*coat, 255)
-        for (x, y) in filled:
-            if not opaque(x, y - 1):
-                px[x, y] = (*line, 255)
+        # A gap deeper than a few pixels (the pony's back behind the
+        # saddle) fills from the bottom up: each pass fills what has the
+        # mount on both sides and below, the pixels filled before counting.
+        while True:
+            found = []
+            for y in range(max(0, y0), min(H, y1)):
+                for x in range(max(0, x0), min(W, x1)):
+                    if opaque(x, y):
+                        continue
+                    left = any(opaque(x - k, y) for k in range(1, x - x0 + 4))
+                    right = any(opaque(x + k, y) for k in range(1, x1 - x + 4))
+                    below = any(opaque(x, y + k) for k in range(1, 6))
+                    if left and right and below:
+                        found.append((x, y))
+            if not found:
+                break
+            for (x, y) in found:
+                px[x, y] = (*coat(x, y), 255)
+            filled += found
+        if rule.get('seam'):
+            # The outline of the part on the gap's left (the rump's edge)
+            # is inside the mount now: it takes the coat next to it.
+            dark = lambda p: p[3] >= 128 and p[0] * 299 + p[1] * 587 + p[2] * 114 < 30000
+            for (x, y) in filled:
+                if x >= 2 and dark(drawn[x - 1, y]) and drawn[x - 2, y][3] >= 128 and not dark(drawn[x - 2, y]):
+                    px[x - 1, y] = drawn[x - 2, y][:3] + (255,)
+        if rule.get('outline'):
+            line = walk.rgb(rule['outline'])
+            for (x, y) in filled:
+                if not opaque(x, y - 1):
+                    px[x, y] = (*line, 255)
     return frame
 
 
@@ -146,6 +182,10 @@ def main():
         if trot.get('patch'):
             sx, sy = trot['seat'] if trot.get('seat_in') == 'start' else seats[0]
             frames = [patch(frame, trot['patch'], (x - sx, y - sy)) for frame, (x, y) in zip(frames, seats)]
+            # The Stajnia's picture is the start frame cut to the mount.
+            start = Image.open(os.path.join(ROOT, mount['start'])).convert('RGBA')
+            picture = patch(start.copy(), trot['patch'], (0, 0)).crop(start.getbbox())
+            picture.save(os.path.join(ROOT, 'src', 'client', 'art', 'mounts', f'{mount_id}.png'), optimize=True)
         sheet = Image.new('RGBA', (width * len(frames), height), (0, 0, 0, 0))
         for index, frame in enumerate(frames):
             sheet.alpha_composite(frame, (index * width, 0))
