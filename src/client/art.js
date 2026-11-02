@@ -56,6 +56,12 @@ export const SPRITES = {
       'barbarian-female', 'barbarian-male', 'gladiator-female', 'gladiator-male', 'storm-archer-female', 'storm-archer-male', 'hunter-female', 'hunter-male',
       'elementalist-female', 'elementalist-male', 'arcanist-female', 'arcanist-male', 'healer-female', 'healer-male', 'inquisitor-female', 'inquisitor-male',
       'poisoner-female', 'poisoner-male', 'night-dancer-female', 'night-dancer-male',
+      // The second forms at class level 100 (DECISIONS.md, „Druga ewolucja klas”).
+      'berserker-female', 'berserker-male', 'arena-champion-female', 'arena-champion-male', 'bastion-female', 'bastion-male', 'marksman-female',
+      'marksman-male', 'thunder-lord-female', 'thunder-lord-male', 'master-hunter-female', 'master-hunter-male', 'archmage-female', 'archmage-male',
+      'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
+      'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
+      'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
     ],
     faces: {
       'archer-female': 49, 'archer-male': 52, 'cleric-male': 49, 'shadow-male': 51, 'warrior-male': 50,
@@ -63,6 +69,11 @@ export const SPRITES = {
       'barbarian-female': 55, 'barbarian-male': 57, 'gladiator-female': 51, 'gladiator-male': 51, 'storm-archer-female': 46, 'storm-archer-male': 52, 'hunter-female': 51, 'hunter-male': 56,
       'elementalist-female': 53, 'arcanist-female': 47, 'arcanist-male': 52, 'healer-female': 46, 'healer-male': 45, 'inquisitor-female': 44, 'poisoner-female': 52, 'poisoner-male': 49,
       'night-dancer-female': 50, 'night-dancer-male': 47,
+      'berserker-female': 51, 'berserker-male': 50, 'arena-champion-female': 51, 'arena-champion-male': 52, 'bastion-female': 49, 'bastion-male': 46,
+      'marksman-female': 47, 'thunder-lord-female': 50, 'thunder-lord-male': 51, 'master-hunter-female': 52, 'master-hunter-male': 49,
+      'archmage-female': 49, 'archmage-male': 51, 'winter-lord-female': 51, 'winter-lord-male': 49, 'druid-female': 50, 'druid-male': 49,
+      'miracle-worker-female': 47, 'miracle-worker-male': 43, 'grand-inquisitor-female': 50, 'high-priest-female': 50, 'kingslayer-female': 55,
+      'kingslayer-male': 54, 'necromancer-female': 44, 'necromancer-male': 49, 'phantom-male': 45,
     },
     toned: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
     tonedEvolutions: [
@@ -70,6 +81,11 @@ export const SPRITES = {
       'barbarian-female', 'barbarian-male', 'gladiator-female', 'gladiator-male', 'storm-archer-female', 'storm-archer-male', 'hunter-female', 'hunter-male',
       'elementalist-female', 'elementalist-male', 'arcanist-female', 'arcanist-male', 'healer-female', 'healer-male', 'inquisitor-female', 'inquisitor-male',
       'poisoner-female', 'poisoner-male', 'night-dancer-female', 'night-dancer-male',
+      'berserker-female', 'berserker-male', 'arena-champion-female', 'arena-champion-male', 'bastion-female', 'bastion-male', 'marksman-female',
+      'marksman-male', 'thunder-lord-female', 'thunder-lord-male', 'master-hunter-female', 'master-hunter-male', 'archmage-female', 'archmage-male',
+      'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
+      'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
+      'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
     ],
   },
   items: {
