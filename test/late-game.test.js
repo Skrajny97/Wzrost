@@ -35,10 +35,10 @@ function assertRamp(stage, flatLevels, shares) {
   }
 }
 
-test('the stages as the author set them: from 50 to 100, and from 100 to 200', () => {
+test('the stages as they stand: from 50 to 100 (×3 at 100 against the +25% before), and from 100 to 200', () => {
   const { lateGame, endGame } = content.balance.monsters;
-  assert.deepEqual([lateGame.fromLevel, lateGame.toLevel, lateGame.damage, lateGame.hp], [50, 100, 0.25, 0.25]);
-  assert.deepEqual([endGame.fromLevel, endGame.toLevel, endGame.damage, endGame.hp], [100, 200, 0, 0]);
+  assert.deepEqual([lateGame.fromLevel, lateGame.toLevel, lateGame.damage, lateGame.hp], [50, 100, 2.75, 2.75]);
+  assert.deepEqual([endGame.fromLevel, endGame.toLevel, endGame.damage, endGame.hp], [100, 200, 0.35, 0.35]);
 });
 
 test('the late-game ramp: nothing up to 50, a half at 75, in full from 100', () => {
