@@ -5,7 +5,7 @@
 // relation with him and the Bractwo Kowali's reputation, up to his own
 // day's limit (tradePoints), as the Garbarnia's trade has its own.
 
-import { createRng, forgeDiscount, forgeTopRarity, itemName, knownStack, materialView, parseStack, questPeriod, raiseOffer, raiseRarity, scrollPrice, tradePoints } from '../engine/index.js';
+import { createRng, forgeDiscount, forgeTopRarity, itemName, knownStack, materialView, parseStack, questPeriod, raiseOffer, raiseRarity, scrollPrice, tradePoints, tradeView } from '../engine/index.js';
 import { characterView, loadPlayer, requirePlayer, requireUnworn, settlementBoard } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
@@ -42,7 +42,7 @@ export function forgeView(player, stored, now) {
     best: forgeTopRarity(relation, content) === forge().topRarity.at(-1),
     discount: forgeDiscount(reputation, content),
     // The relation and the reputation the trade gave today, of the day's limit.
-    trade: { today: stored.forgeTrade?.day === day ? stored.forgeTrade.points : 0, daily: forge().reputation.daily },
+    trade: tradeView(stored.forgeTrade, row.level, now, content, forge().reputation),
     items: player.items.map((item) => {
       const offer = raiseOffer(item, relation, reputation, content);
       // The materials of the item's rarity the character has enough of, as the

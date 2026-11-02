@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { buyCeiling, herbalistPremium, herbalistStock, saleGold, tradePoints } from '../src/engine/index.js';
+import { buyCeiling, herbalistPremium, herbalistStock, saleGold, tradePoints, tradeView } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -41,6 +41,33 @@ describe('the Chata zielarki in the engine', () => {
     assert.equal(tradePoints(per * 5, level, capped.trade, NOW + 120000, content).points, 0);
     // A new day starts the count again.
     assert.equal(tradePoints(per * 5, level, capped.trade, NOW + 86400000, content).points, 5);
+  });
+
+  test('small trades of a day add up to points: the gold short of a point waits for the next trade', () => {
+    // The author: "Kupiłem dwa materiały jednego typu i nie wzrosła relacja".
+    const level = 37;
+    const per = tuning.reputation.goldPerPointPerLevel * level;
+    const first = tradePoints(28, level, null, NOW, content);
+    assert.deepEqual([first.points, first.trade.points, first.trade.gold], [0, 0, 28]);
+    let trade = first.trade;
+    let points = 0;
+    for (let i = 0; i < 6; i++) {
+      const next = tradePoints(28, level, trade, NOW + i * 1000, content);
+      points += next.points;
+      trade = next.trade;
+    }
+    // 7 trades of 28 gold are 196, one point of 185, and 11 wait.
+    assert.equal(points, 1);
+    assert.equal(trade.gold, 7 * 28 - per);
+    // What the page says: the point so far, the gold a point takes and what is short.
+    const view = tradeView(trade, level, NOW, content);
+    assert.deepEqual(view, { today: 1, daily: tuning.reputation.daily, perPoint: per, toNext: per - (7 * 28 - per) });
+    // The gold waits only for the day: the next day starts from nothing.
+    assert.deepEqual(tradePoints(28, level, trade, NOW + 86400000, content).trade, { day: tradePoints(0, level, null, NOW + 86400000, content).trade.day, points: 0, gold: 28 });
+    // With the day's points all given, nothing is kept and nothing is short.
+    const full = tradePoints(per * 100 + 50, level, null, NOW, content);
+    assert.deepEqual([full.points, full.trade.gold], [tuning.reputation.daily, 0]);
+    assert.equal(tradeView(full.trade, level, NOW, content).toNext, null);
   });
 
   const { standings } = content.settlement;
@@ -126,7 +153,7 @@ describe('the Chata zielarki through the API', () => {
     }
     assert.equal(points, tuning.reputation.daily);
     const view = (await call('GET', '/api/settlement', { cookie })).data.settlement.herbalist;
-    assert.deepEqual(view.trade, { today: tuning.reputation.daily, daily: tuning.reputation.daily });
+    assert.deepEqual([view.trade.today, view.trade.daily, view.trade.toNext], [tuning.reputation.daily, tuning.reputation.daily, null]);
   });
 
   test('she sells herbs into the bag for gold, and the trade raises the relation as selling does', async () => {

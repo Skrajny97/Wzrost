@@ -13,13 +13,13 @@ import {
   materialPrice,
   materialView,
   parseStack,
-  questPeriod,
   relationDiscount,
   saleGold,
   tanneryPremium,
   tanneryStock,
   tannerTakes,
   tradePoints,
+  tradeView,
 } from '../engine/index.js';
 import { characterView, loadPlayer, requirePlayer, settlementBoard } from './characters.js';
 import { content } from './content.js';
@@ -69,7 +69,6 @@ export function tanneryView(player, stored, now) {
   const points = stored.relations[resident] ?? 0;
   const { premium, bonus, price } = tanneryPrices(player, stored, now);
   const materials = JSON.parse(player.row.materials ?? '{}');
-  const day = questPeriod('daily', now, content).key;
   const { goods: offered, next } = tanneryStock(points, content);
   return {
     premium,
@@ -79,7 +78,7 @@ export function tanneryView(player, stored, now) {
       .filter(([key, count]) => count > 0 && tannerTakes(key, content))
       .map(([key, count]) => ({ ...goodView(key, count, bonus), price: price(key) }))
       .sort((a, b) => rarityIndex(a.rarity) - rarityIndex(b.rarity) || a.name.localeCompare(b.name, 'pl')),
-    trade: { today: stored.tanneryTrade?.day === day ? stored.tanneryTrade.points : 0, daily: reputation.daily },
+    trade: tradeView(stored.tanneryTrade, player.row.level, now, content, reputation),
     shop: {
       goods: offered.map(({ key, price: cost }) => ({ ...goodView(key, 1), price: cost })),
       next: next && { standing: next.standing, count: next.goods.length },

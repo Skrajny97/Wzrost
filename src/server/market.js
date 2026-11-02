@@ -38,6 +38,7 @@ import {
   sellPrice,
   stackKey,
   tradePoints,
+  tradeView,
   wandererGoods,
 } from '../engine/index.js';
 import { bagPlaces, characterView, loadPlayer, requirePlayer } from './characters.js';
@@ -234,7 +235,7 @@ async function marketView(db, player, now) {
     mine: mine.results.map((offer) => offerView(offer, row.id)),
     parcels: parcels.results.map((parcel) => ({ id: parcel.id, reason: parcel.reason, goods: goodsView(parcel.kind, parcel.good, parcel.count, parcel.item) })),
     sellable: sellable(player),
-    trade: { today: stored.marketTrade?.day === day ? stored.marketTrade.points : 0, daily: reputation.daily },
+    trade: tradeView(stored.marketTrade, row.level, now, content, reputation),
     ...residentsView(player, stored, now),
   };
 }

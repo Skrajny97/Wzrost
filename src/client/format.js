@@ -30,6 +30,16 @@ export function plural(count, one, few, many) {
 
 export const countOf = (count, one, few, many) => `${formatNumber(count)} ${plural(count, one, few, many)}`;
 
+// The day's trade with a resident (Jagna, Wszebor, the kowal, the
+// Targowisko): the gold a point takes and what is still short of the next
+// one, as the trade's gold adds up through the day (the author: "Kupiłem
+// dwa materiały jednego typu i nie wzrosła relacja").
+export function tradePace(trade) {
+  if (!trade?.perPoint) return '';
+  if (trade.toNext === null) return ' Na dziś to już wszystkie punkty.';
+  return ` Punkt za każde ${formatNumber(trade.perPoint)} zł handlu, do następnego brakuje ${formatNumber(Math.ceil(trade.toNext))} zł.`;
+}
+
 // What the scrapper or Jagna pays for `count` pieces at `unit` gold a piece,
 // as the server counts it (saleGold in src/engine/items.js): rounded down,
 // at least a coin.

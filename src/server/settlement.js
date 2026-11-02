@@ -50,7 +50,6 @@ import {
   pathResetCost,
   potionPrice,
   propertyName,
-  questPeriod,
   regenPerMinute,
   reforgeBlock,
   reforgeChoices,
@@ -68,6 +67,7 @@ import {
   talkedToday,
   toldPieces,
   tradePoints,
+  tradeView,
   upgradedItem,
   upgradedOnCompanion,
   wearOnCompanion,
@@ -373,7 +373,6 @@ function herbalistView(player, stored, now) {
   const held = { herb: JSON.parse(player.row.herbs ?? '{}'), potion: JSON.parse(player.row.potions ?? '{}') };
   const goods = (kind, list) =>
     list.filter((good) => (held[kind][good.id] ?? 0) > 0).map((good) => ({ kind, id: good.id, name: good.name, count: held[kind][good.id], price: price(kind, good.id), scrap: scrap(kind, good.id) }));
-  const day = questPeriod('daily', now, content).key;
   const points = stored.relations[content.settlement.herbalist.resident] ?? 0;
   const { herbs, next } = herbalistStock(points, content);
   const { stack } = content.professionRules;
@@ -384,7 +383,7 @@ function herbalistView(player, stored, now) {
     // At her best price already: no "more with a better relation".
     best: premium >= Math.max(...content.settlement.herbalist.premium),
     goods: [...goods('herb', content.herbs), ...goods('potion', content.potions)],
-    trade: { today: stored.trade?.day === day ? stored.trade.points : 0, daily: content.settlement.herbalist.reputation.daily },
+    trade: tradeView(stored.trade, player.row.level, now, content),
     shop: {
       goods: herbs.map(({ id, price: cost }) => {
         const herb = content.herbsById[id];

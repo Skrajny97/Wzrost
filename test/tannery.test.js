@@ -157,7 +157,7 @@ describe('the Garbarnia through the API', () => {
     }
     assert.equal(points, tuning.reputation.daily);
     const view = (await call('GET', '/api/settlement', { cookie })).data.settlement;
-    assert.deepEqual(view.tannery.trade, { today: tuning.reputation.daily, daily: tuning.reputation.daily });
+    assert.deepEqual([view.tannery.trade.today, view.tannery.trade.daily, view.tannery.trade.toNext], [tuning.reputation.daily, tuning.reputation.daily, null]);
     assert.equal(view.herbalist.trade.today, 0);
     // Another service's save keeps the day's count.
     assert.equal((await call('POST', '/api/settlement/tavern', { cookie })).status, 200);

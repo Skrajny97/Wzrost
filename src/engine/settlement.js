@@ -571,14 +571,35 @@ export function relationDiscount(points, content) {
 
 // The reputation trade gives (120 A: the limit is on the reputation only):
 // a point for every goldPerPointPerLevel gold times the character's level,
-// at most `daily` a day. `stored` is the day's count so far ({ day, points
-// }); the answer has the points now and the day's count after them.
+// at most `daily` a day. `stored` is the day's count so far ({ day, points,
+// gold }); the answer has the points now and the day's count after them.
+// The gold short of the next point waits for the day's next trade, so small
+// trades add up (the author: "Kupiłem dwa materiały jednego typu i nie
+// wzrosła relacja"); with the day's points all given, none is kept.
 export function tradePoints(gold, level, stored, now, content, tuning = content.settlement.herbalist.reputation) {
-  const { goldPerPointPerLevel, daily } = tuning;
+  const { daily } = tuning;
+  const per = goldPerPoint(level, tuning);
   const day = questPeriod('daily', now, content).key;
-  const before = stored?.day === day ? stored.points : 0;
-  const points = Math.max(0, Math.min(daily - before, Math.floor(gold / (goldPerPointPerLevel * level))));
-  return { points, trade: { day, points: before + points } };
+  const today = stored?.day === day;
+  const before = today ? stored.points : 0;
+  const total = (today ? (stored.gold ?? 0) : 0) + Math.max(0, gold);
+  const points = Math.max(0, Math.min(daily - before, Math.floor(total / per)));
+  const left = before + points >= daily ? 0 : total - points * per;
+  return { points, trade: { day, points: before + points, gold: left } };
+}
+
+// The gold of trade a point takes at the character's level.
+export const goldPerPoint = (level, tuning) => tuning.goldPerPointPerLevel * level;
+
+// What the page says of the day's trade: the points so far out of the
+// limit, the gold a point takes, and the gold still short of the next one
+// (null with the day's points all given).
+export function tradeView(stored, level, now, content, tuning = content.settlement.herbalist.reputation) {
+  const day = questPeriod('daily', now, content).key;
+  const today = stored?.day === day;
+  const points = today ? stored.points : 0;
+  const per = goldPerPoint(level, tuning);
+  return { today: points, daily: tuning.daily, perPoint: per, toNext: points >= tuning.daily ? null : per - (today ? (stored.gold ?? 0) : 0) };
 }
 
 // The Zaklinaczka's zaklęcie żywiołu (part III, question 101 A): a weapon

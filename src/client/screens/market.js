@@ -9,7 +9,7 @@
 import { herbSprite, potionSprite } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { h, icon } from '../dom.js';
-import { countOf, formatDecimal, formatNumber } from '../format.js';
+import { countOf, formatDecimal, formatNumber, tradePace } from '../format.js';
 import { call, serverNow, state } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { compareTable, itemSummary } from './character.js';
@@ -538,7 +538,7 @@ export function mountMarket(holder) {
           { class: 'card market-intro', 'data-guide': 'market-intro' },
           howItWorks(`Licytacja trwa ${market.hours} godziny.`, [
             `Przebity gracz od razu dostaje złoto z powrotem, a Targowisko bierze ${Math.round(market.fee * 100)}% ceny sprzedaży.`,
-            `Handel daje reputację Kompanii Kupców, dziś ${market.trade.today} z ${market.trade.daily} pkt. Postacie z jednego konta nie kupują od siebie.`,
+            `Handel daje reputację Kompanii Kupców, dziś ${market.trade.today} z ${market.trade.daily} pkt.${tradePace(market.trade)} Postacie z jednego konta nie kupują od siebie.`,
           ]),
         ),
         h(

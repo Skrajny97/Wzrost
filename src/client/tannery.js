@@ -7,7 +7,7 @@
 // the scrapper. The Osada's place screen keeps the open tab as it redraws.
 
 import { h } from './dom.js';
-import { countOf, formatDecimal, formatNumber, saleGold } from './format.js';
+import { countOf, formatDecimal, formatNumber, saleGold, tradePace } from './format.js';
 import { call, state } from './state.js';
 import { closeSheet, openSheet, toast, withButton } from './ui.js';
 import { numberField, stackButton } from './screens/market.js';
@@ -18,7 +18,7 @@ const TABS = [
 ];
 
 // The trade's reputation today out of the day's limit, under both tabs.
-const tradeLine = (trade) => `Handel daje relację z nim i reputację Bractwa Łowców: dziś ${trade.today} z ${trade.daily} punktów.`;
+const tradeLine = (trade) => `Handel daje relację z nim i reputację Bractwa Łowców: dziś ${trade.today} z ${trade.daily} punktów.${tradePace(trade)}`;
 
 // A material he sells: as many pieces as the gold allows, typed in.
 // Materials take no place in the bag.

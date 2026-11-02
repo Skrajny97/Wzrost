@@ -2996,6 +2996,16 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Handel: drobne zakupy sumują się w ciągu dnia (2.11.2026)
+
+Autor (zrzut z Garbarni u Wszebora, 37. poziom): „Kupiłem dwa materiały jednego typu i nie wzrosła relacja.”
+
+1. **Przyczyna.** Handel daje punkt relacji i reputacji za każde 5 zł × poziom postaci (`goldPerPointPerLevel`), czyli na 37. poziomie za 185 zł. Gra liczyła to dla każdego zakupu osobno i gubiła resztę, więc dwie skóry po 14 zł (28 zł) nie dawały nic. Nawet dwadzieścia takich zakupów nie dałoby punktu.
+2. **Poprawka.** Złoto z handlu sumuje się przez cały dzień. Reszta, której brakuje do następnego punktu, czeka na kolejny zakup albo sprzedaż tego samego dnia. O północy dzień zaczyna się od zera, tak jak liczba punktów. Gdy postać ma już wszystkie punkty dnia, reszta nie jest zapisywana.
+3. **Dotyczy** wszystkich, u których handel daje relację albo reputację: Jagny, Wszebora, kowala i Targowiska.
+4. **Na stronie** przy punktach dnia stoi teraz, ile złota daje punkt i ile brakuje do następnego, np. „dziś 0 z 10 punktów. Punkt za każde 185 zł handlu, do następnego brakuje 157 zł.” Gdy punkty dnia są wyczerpane: „Na dziś to już wszystkie punkty.”
+5. **Baza danych:** bez migracji. Zapis dnia handlu (`trade`, `tanneryTrade`, `forgeTrade`, `marketTrade`) dostał pole `gold`, a starszy zapis bez niego liczy się jak 0.
+
 ## Warownia: odpowiedzi autora 419–428 (2.11.2026)
 
 Autor: „Zaplanujmy zatem Warownię może w miedzyczasie? Teksty, opisy..”, a potem: „419 A - tak, ale sprawdz czy gracz jest w stanie tyle zarobić w ogole sensownie, tez nie wiem czy wierzchowce nie są za drogie, nie wiem czy balans nie idzie na zbyt hard mimo gry na lata”, „420 […] A, ale 25% styknie chyba że stwierdzisz że to za mało”, „421. "jednym kliknięciem" - drobna poprawka i oczywiście A”, „422. Na razie rodziny i liczba stworów tak jak mówisz ale bedzie to rosnąć. i oczywiście A”, „423 […] i oczywiście A”, „424. A”, „425. A”, „426 […] i oczywiście A”, „427. A”, „428. A z nagraniem narratora od nowa, bo to chyba kwestia mówiona była.”

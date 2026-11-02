@@ -360,13 +360,10 @@ describe('the Targowisko through the API', () => {
     assert.equal(JSON.parse((await row('Kupiec')).parts)[part.key], 1);
     // Buying at his stall brings the relation with Gościwit, as many points
     // as the Kompania Kupców' reputation: a point for each 5 gold times the
-    // character's level in a purchase (278 A).
+    // character's level (278 A), the day's purchases added up.
     await act('Kupiec', 'resident', { from: 'merchant', id: good.id, count: tuning.merchant.stock - 3 });
     const perPoint = tuning.reputation.goldPerPointPerLevel * 25;
-    const expected = Math.min(
-      tuning.reputation.daily,
-      [good.price * 3, part.price, good.price * (tuning.merchant.stock - 3)].reduce((sum, value) => sum + Math.floor(value / perPoint), 0),
-    );
+    const expected = Math.min(tuning.reputation.daily, Math.floor((good.price * 3 + part.price + good.price * (tuning.merchant.stock - 3)) / perPoint));
     const stored = JSON.parse((await row('Kupiec')).settlement);
     assert.equal(stored.reputation.merchants, expected);
     assert.equal(stored.relations.merchant, expected);

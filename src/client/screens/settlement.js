@@ -12,7 +12,7 @@
 import { resourceArt, residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
-import { countOf, formatCountdown, formatDecimal, formatHours, formatMinutes, formatNumber, saleGold } from '../format.js';
+import { countOf, formatCountdown, formatDecimal, formatHours, formatMinutes, formatNumber, saleGold, tradePace } from '../format.js';
 import { leaveView, openView } from '../history.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
@@ -703,7 +703,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       h('h2', { class: 'section-title', text: 'Zioła Jagny' }),
       h('p', {
         class: 'muted',
-        text: `Jagna sprzedaje zioła drożej, niż je skupuje. ${shop.discount > 0 ? `Dzięki relacji z nią ceny są niższe o ${formatDecimal(shop.discount * 100)}%.` : 'Z lepszą relacją ceny będą niższe.'} Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.`,
+        text: `Jagna sprzedaje zioła drożej, niż je skupuje. ${shop.discount > 0 ? `Dzięki relacji z nią ceny są niższe o ${formatDecimal(shop.discount * 100)}%.` : 'Z lepszą relacją ceny będą niższe.'} Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.${tradePace(trade)}`,
       }),
       shop.goods.some((good) => good.fits < 1) && h('p', { class: 'region-warning', text: 'Plecak jest pełny. Zrób w nim miejsce, żeby kupić więcej ziół.' }),
       h(
@@ -806,7 +806,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       h('h2', { class: 'section-title', text: 'Skup ziół i mikstur' }),
       h('p', {
         class: 'muted',
-        text: `Jagna płaci o ${Math.round(premium * 100)}% więcej niż złomiarz${best ? '' : ', a z lepszą relacją jeszcze więcej'}. Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.`,
+        text: `Jagna płaci o ${Math.round(premium * 100)}% więcej niż złomiarz${best ? '' : ', a z lepszą relacją jeszcze więcej'}. Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.${tradePace(trade)}`,
       }),
       goods.length === 0
         ? h('p', { class: 'muted', text: 'W torbie nie ma ziół ani mikstur.' })
@@ -989,7 +989,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       ),
       h('p', {
         class: 'muted',
-        text: `${discount > 0 ? `Reputacja Bractwa Kowali obniża ceny kowala w złocie o ${formatDecimal(discount * 100)}%.` : 'Z lepszą reputacją Bractwa Kowali ceny kowala w złocie będą niższe.'} Handel daje relację z kowalem i reputację Bractwa Kowali: dziś ${trade.today} z ${trade.daily} punktów.`,
+        text: `${discount > 0 ? `Reputacja Bractwa Kowali obniża ceny kowala w złocie o ${formatDecimal(discount * 100)}%.` : 'Z lepszą reputacją Bractwa Kowali ceny kowala w złocie będą niższe.'} Handel daje relację z kowalem i reputację Bractwa Kowali: dziś ${trade.today} z ${trade.daily} punktów.${tradePace(trade)}`,
       }),
     );
   }
