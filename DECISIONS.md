@@ -3060,7 +3060,7 @@ Autor: „Zaplanujmy zatem Warownię może w miedzyczasie? Teksty, opisy..”, a
 9. **Teksty Obozu (428 A).**
     - Opis Obozu: „Polana na skraju puszczy, która z czasem stanie się warownią. Każdy poziom obozu przyspiesza budowę wszystkich budynków.”
     - Zapowiedź: „Gdy Obóz i wszystkie jego budynki dojdą do najwyższego poziomu, Obóz będzie mógł stać się Warownią.”
-    - Kwestia narratora `lead-camp` mówi o wiosce. Jej nowy tekst idzie do autora przed nagraniem (pytanie 429), a potem nagranie od nowa.
+    - Kwestia narratora `lead-camp` mówi teraz: „Żadna szanująca się postać nie pozbawi siebie opcji budowania obozu, a kto wie, może z czasem i całej warowni. Zajrzyjmy do Twojego obozu.” (429: „zgadzam sie na zmiane wioski na warownie”). ElevenLabs nagrał ją dwa razy tym samym głosem i modelem co resztę wprowadzenia (294 kredyty). Nagrania są przycięte za ostatnim słowem, wyrównane do −18 LUFS i zapisane w mono 56 kb/s. Autor wybrał wersję B (433 B).
     - Zdanie towarzysza o wiosce (`data/settlement.json`) też mówi już o warowni.
 10. **Kolejność** zostaje: druga ewolucja, potem Warownia, potem Górnictwo i Jubilerstwo. Grafiki Warowni powstaną po tekstach i pójdą do autora pojedynczo.
 
