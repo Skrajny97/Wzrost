@@ -14,6 +14,7 @@ import {
   bagStacks,
   campBonus,
   campLevels,
+  classNameOf,
   craftedFor,
   createRng,
   deliverBlock,
@@ -30,6 +31,7 @@ import {
   drawRumor,
   evolutionChangePrice,
   evolutionChanges,
+  evolutionName,
   evolvedSkills,
   goodStock,
   herbalistPremium,
@@ -151,14 +153,16 @@ export function settlementOf(row) {
 }
 
 // The change of evolution at the Pustelnik's, where the evolutions are on
-// and the character has one: its price and the evolutions it can go to.
+// and the character has one: its price and the evolutions it can go to,
+// by the names the character's look gives them. With a second form the
+// change goes to another path's second form.
 function evolutionChangeView(row, stored) {
   const character = engineCharacter(row);
   if (!evolutionsOn() || !character.evolution) return null;
   return {
     price: evolutionChangePrice(stored.evolutionChanges ?? 0, content),
-    current: content.evolutionsById[character.evolution].name,
-    choices: evolutionChanges(character, content).map(({ id, name }) => ({ id, name })),
+    current: classNameOf(character, content),
+    choices: evolutionChanges(character, content).map((evolution) => ({ id: evolution.id, name: evolutionName(evolution, character.appearance) })),
   };
 }
 

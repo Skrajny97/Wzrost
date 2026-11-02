@@ -28,14 +28,15 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   // mana, Krok cienia's speed, and the shelter of Zimowy oddech and Toksyny
   // (a share less of the damage of their element, blows and effects).
   const evolution = evolutionOf(character, content);
-  const feat = evolution ? { kind: evolution.trait.kind, ...evolution.trait.params } : null;
+  const feat = evolution ? { kind: evolution.trait.kind, name: evolution.trait.name, ...evolution.trait.params } : null;
   const manaMax = maxMana(totals.wisdom, character.classLevel, perClassLevel, balance);
   const resist = { ...bonuses.resist };
   if (feat?.kind === 'bulwark') {
     armor *= 1 + feat.armor;
     for (const element of Object.keys(resist)) resist[element] = Math.round(resist[element] * (1 + feat.resist));
   }
-  const shelter = { winter: 'frost', toxins: 'poison' }[feat?.kind];
+  // (Żniwo, the Nekromanta's trait grown from Toksyny, gives none.)
+  const shelter = feat?.resist ? { winter: 'frost', toxins: 'poison' }[feat.kind] : undefined;
   return {
     id,
     side,
