@@ -103,7 +103,7 @@ export function mountParty(container) {
       'section',
       { class: 'card party-companions', role: 'status' },
       h('p', { class: 'region-warning', text: view.companions.text }),
-      h('a', { class: 'link-button', href: '#/oboz/quarters', text: view.companions.link }),
+      h('a', { class: 'button button--world button--small', href: '#/oboz/quarters', text: view.companions.link }),
     );
   }
 
