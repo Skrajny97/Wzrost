@@ -333,3 +333,38 @@ test('the page asks for the character again when an action finds it out of date'
     state.character = null;
   }
 });
+
+// The Targowisko's filters (the author: "filtracja potrzebna w targowisku zeby
+// szukac itemy po kategoriach"): only the categories with goods, in the
+// order of the data, each with how many, and "Wszystko" once the chosen one
+// is empty.
+test("the Targowisko's filters show the categories with goods, in order, with how many", async () => {
+  const { ALL, categoriesOf, goodsCategory, inCategory, shownCategory } = await import('../src/client/categories.js');
+  const slots = JSON.parse(readFileSync(new URL('../data/slots.json', import.meta.url), 'utf8'));
+  const slotName = (id) => slots.find((slot) => slot.id === id).name;
+  const order = [...slots.map(({ id, name }) => ({ id, name })), { id: 'herb', name: 'Zioła' }, { id: 'material', name: 'Materiały' }];
+  const goods = [
+    { kind: 'item', item: { slot: 'weapon', name: 'Miecz' } },
+    { kind: 'herb', key: 'comfrey' },
+    { kind: 'item', item: { slot: 'head', name: 'Kaptur' } },
+    { kind: 'item', item: { slot: 'weapon', name: 'Topór' } },
+  ];
+  const categories = categoriesOf(goods, goodsCategory, order);
+  assert.deepEqual(
+    categories.map(({ id, name, count }) => [id, name, count]),
+    [
+      ['head', slotName('head'), 1],
+      ['weapon', slotName('weapon'), 2],
+      ['herb', 'Zioła', 1],
+    ],
+  );
+  // One category in the order of the list, or all of them.
+  assert.deepEqual(inCategory(goods, goodsCategory, 'weapon').map((one) => one.item.name), ['Miecz', 'Topór']);
+  assert.equal(inCategory(goods, goodsCategory, ALL), goods);
+  // The choice stays while its category has goods, and gives way after.
+  assert.equal(shownCategory('weapon', categories), 'weapon');
+  assert.equal(shownCategory(ALL, categories), ALL);
+  assert.equal(shownCategory('material', categories), ALL);
+  assert.equal(shownCategory('weapon', categoriesOf(goods.slice(1, 3), goodsCategory, order)), ALL);
+  assert.deepEqual(categoriesOf([], goodsCategory, order), []);
+});

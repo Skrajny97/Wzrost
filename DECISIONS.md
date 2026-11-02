@@ -2996,6 +2996,15 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Targowisko: filtry według kategorii (2.11.2026)
+
+Autor: „filtracja potrzebna w targowisku zeby szukac itemy po kategoriach, bo jak jest duzo w plecaku to lista przytłaczająca”.
+
+1. **Gdzie.** W oknie „Wystaw” nad rzeczami z plecaka i w zakładce „Oferty graczy” nad ofertami stoi rząd przycisków: najpierw „Wszystko”, potem każda kategoria, w której coś jest, z liczbą, np. „Broń 3”. Stuknięcie pokazuje tylko tę kategorię, a wybrany przycisk jest podświetlony. Przyciski układają się w tylu liniach, ile trzeba, więc na wąskim telefonie widać wszystkie, a strona nie przesuwa się na boki. Przy krótszej liście okno „Wystaw” nie maleje, więc przyciski zostają pod palcem.
+2. **Kategorie (brakujący szczegół).** Najpierw przedmioty według miejsca, z nazwami i w kolejności z `data/slots.json`: Hełm, Amulet, Pancerz, Rękawice, Buty, Broń, Druga ręka, Pierścień, Talizman. Amulet, Pierścień i Talizman zostają osobno, bez wspólnej „Biżuterii”, bo tak najprościej, a nazwy są te same co na karcie przedmiotu. Po nich Zioła, Mikstury, Materiały i Części.
+3. **Wybór (brakujący szczegół).** Wybrana kategoria zostaje, gdy Targowisko się odświeża i gdy okno „Wystaw” otwiera się znowu; każda z dwóch list ma swój wybór. Gdy w wybranej kategorii nic już nie ma, np. po wystawieniu ostatniego pierścienia, wraca „Wszystko”. Po wyjściu z Targowiska obie listy znów zaczynają od „Wszystko”.
+4. **Jedna kategoria.** Gdy wszystko na liście należy do jednej kategorii, przycisków nie ma, bo nie ma czego wybierać.
+
 ## Kod podarunkowy TIGER (2.11.2026)
 
 Autor: „przygotuj kod podarunkowy ważny tydzien "TIGER" dajacy 500 Punktów Systemu”.

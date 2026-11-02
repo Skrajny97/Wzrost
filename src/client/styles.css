@@ -9819,6 +9819,46 @@ a.profession-square:active {
   margin-top: 0;
 }
 
+/* The filters over the players' offers and over the goods to put up: a chip
+   for each category with goods, with how many, in as many lines as needed. */
+.market-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.market-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.market-filter[aria-pressed='true'] {
+  border-color: var(--system-line);
+  background: rgba(143, 227, 239, 0.12);
+  color: var(--system-text);
+}
+
+.market-filter-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+/* The list under them stands in the column as it did without them. */
+.market-filtered {
+  display: contents;
+}
+
 .market-list,
 .market-picks {
   display: grid;
