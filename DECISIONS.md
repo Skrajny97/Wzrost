@@ -2996,6 +2996,17 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Ceny Warowni i wierzchowców, trudność: odpowiedzi autora 430–432 (2.11.2026)
+
+Autor przy 419: „sprawdz czy gracz jest w stanie tyle zarobić w ogole sensownie, tez nie wiem czy wierzchowce nie są za drogie, nie wiem czy balans nie idzie na zbyt hard mimo gry na lata”. Po analizie: „430 A”, „431 A”, „432 A, jesli bierzesz pod uwage ekwipunek i towarzyszy, ludzie mowia ze jest za łatwo i tak” i „na pierwszych poziomach do 50ego może być łatwiej, ale pozniej curve trudnosci musi troche rosnac i od 100ego być mid mid”.
+
+1. **Zarobki (symulacja typowej postaci 5 klas, wyprawy 4-godzinne).** Złoto na godzinę wyprawy: 210 na 20. poziomie, 800 na 50., 1050 na 75., 1225 na 100. Godziny wypraw do poziomu: 8 do 20., 118 do 50., 331 do 75., 566 do 100. Do 100. poziomu postać zbiera około 536 000 złota, a sprzedaż przedmiotów dokłada około 6%. Pełny Obóz kosztuje 347 000 złota (same poziomy Obozu 255 500), a trzy wierzchowce 182 500.
+2. **Przemiana w Warownię (430 A):** 120 000 złota i zasoby, około 2 tygodni gry przy 8 godzinach wypraw dziennie. Długim celem są budynki Warowni.
+3. **Wierzchowce (431 A):** ceny bez zmian. Kuc to około 1,5 dnia gry, Koń około 5 dni, Rumak około 2 tygodni.
+4. **Trudność (432 A).** Symulacja typowej postaci bez towarzyszy pokazała 15% omdleń na 75. poziomie i około 30% na 90.–100. przy 4-godzinnych wyprawach w najnowszym regionie. Gracze z dobrym ekwipunkiem i towarzyszami mówią jednak, że gra jest za łatwa. Dokładniejsze sprawdzenie bierze więc pod uwagę ekwipunek ulepszany na Kowadle, rzadsze przedmioty, towarzyszy z Kwater, mikstury i ewolucje.
+    - Cel autora: do 50. poziomu może być łatwiej, potem krzywa trudności rośnie, a od 100. poziomu trudność jest średnia.
+    - Propozycje zmian z liczbami pójdą do autora pozycja po pozycji.
+
 ## Handel: drobne zakupy sumują się w ciągu dnia (2.11.2026)
 
 Autor (zrzut z Garbarni u Wszebora, 37. poziom): „Kupiłem dwa materiały jednego typu i nie wzrosła relacja.”
