@@ -13,7 +13,7 @@ export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
-  'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'guilds',
+  'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'guilds', 'cosmetics',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'core'];
@@ -669,6 +669,7 @@ function checkReferences(data) {
   errors.push(...checkSettlement(data, { rarities }));
   errors.push(...checkStable(data));
   errors.push(...checkTannery(data));
+  errors.push(...checkCosmetics(data));
   return errors;
 }
 
@@ -1179,5 +1180,32 @@ function checkTannery(data) {
   if (stock.length > standings.length) errors.push('settlement.json: tannery.sell.stock ma więcej liczb niż stopni');
   if (stock.some((share, index) => index > 0 && share < stock[index - 1])) errors.push('settlement.json: tannery.sell.stock nie może maleć ze stopniem');
   if (stock.at(-1) !== 1) errors.push('settlement.json: tannery.sell.stock na ostatnim stopniu musi być 1 (wszystkie materiały)');
+  return errors;
+}
+
+// The Sklep Systemu (data/cosmetics.json): a frame's and a background's
+// picture is there (art/cosmetics), a frame's window and the points of its
+// light lie inside its 120 × 160 picture, the light that needs points has
+// them, and a mount's look does not take the key of a Stajnia's mount, under
+// which its trot would stand in walk.mounts (animations.json).
+function checkCosmetics(data) {
+  const errors = [];
+  const FRAME = { width: 120, height: 160 };
+  const where = (id) => `cosmetics.json: ${id}`;
+  uniqueIds(errors, 'cosmetics', data.cosmetics.items);
+  const inside = ([x, y]) => x < FRAME.width && y < FRAME.height;
+  const mounts = new Set((data.settlement.stable?.mounts ?? []).map((mount) => mount.id));
+  for (const item of data.cosmetics.items) {
+    if (item.kind !== 'mountSkin' && !existsSync(new URL(`art/cosmetics/${item.art}.png`, CLIENT_DIR))) {
+      errors.push(`${where(item.id)}: brak obrazka src/client/art/cosmetics/${item.art}.png`);
+    }
+    if (item.kind === 'mountSkin' && (mounts.has(item.id) || mounts.has(item.art))) errors.push(`${where(item.id)} ma id albo obrazek wierzchowca ze Stajni`);
+    if (item.kind !== 'frame') continue;
+    const [left, top, right, bottom] = item.window;
+    if (!(left < right && top < bottom && inside([right, bottom]))) errors.push(`${where(item.id)}: okno ramki musi leżeć w obrazku ${FRAME.width} × ${FRAME.height}`);
+    const points = item.effect.points ?? [];
+    if (points.some((point) => !inside(point))) errors.push(`${where(item.id)}: punkt animacji poza obrazkiem ${FRAME.width} × ${FRAME.height}`);
+    if ((item.effect.kind === 'pulse') !== (points.length === 0)) errors.push(`${where(item.id)}: animacja ${item.effect.kind} ${item.effect.kind === 'pulse' ? 'nie ma punktów' : 'potrzebuje punktów'}`);
+  }
   return errors;
 }

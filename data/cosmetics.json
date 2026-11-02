@@ -1,0 +1,79 @@
+{
+  "$comment": "Sklep Systemu (src/engine/cosmetics.js, src/server/cosmetics.js, src/client/screens/shop.js; DECISIONS.md, „Sklep Systemu: ramki, tła i tygrys szablozębny”). Autor: „tylko ramki i tła wchodzą póki co do gry, wszystkie”, imię w kolorze ramki i wierzchowiec-kosmetyk „Tygrys szablozębny” za 1000 Punktów Systemu. Przedmioty zmieniają tylko wygląd i należą do postaci, która je kupiła, tak jak jej Punkty Systemu. kind: frame (ramka portretu), background (tło portretu za postacią, w miejsce lasu) albo mountSkin (wygląd wierzchowca ze Stajni w scenie Walki). price: cena w Punktach Systemu. art: obrazek bez .png, ramki i tła w src/client/art/cosmetics, wygląd wierzchowca w src/client/art/mounts, a jego kłus pod tym samym kluczem w walk.mounts (data/animations.json); bez nich gra pokazuje wierzchowca ze Stajni, a karta w sklepie jest bez obrazka. window: przezroczyste okno ramki w obrazku 120 × 160 jako [lewo, góra, prawo, dół] włącznie; tło i postać stoją w nim, pomniejszone. nameColor: kolor imienia postaci, gdy nosi ramkę i włączy „Kolor imienia jak ramka”. effect: animacja ramki: shine (pas światła po ramce i błyski w points), pulse (pulsująca poświata i jasna linia w dół ramki) albo fireflies (świetliki w points); points w pikselach obrazka 120 × 160. texts: słowa pod „Jak to działa?” w sklepie.",
+  "items": [
+    {
+      "id": "frame-gold",
+      "kind": "frame",
+      "name": "Złota ramka",
+      "description": "Rzeźbione złoto z rubinem w każdym rogu. Co kilka sekund przebiega po nim blask, a rubiny lśnią.",
+      "price": 300,
+      "art": "frame-gold",
+      "window": [25, 26, 94, 130],
+      "nameColor": "#ffd76a",
+      "effect": { "kind": "shine", "points": [[12, 13], [106, 13], [105, 141], [14, 141]] }
+    },
+    {
+      "id": "frame-system",
+      "kind": "frame",
+      "name": "Ramka Systemu",
+      "description": "Lodowobłękitne runy i kryształy Systemu. Ramka pulsuje zimnym światłem, a w dół przesuwa się po niej jasna linia.",
+      "price": 300,
+      "art": "frame-system",
+      "window": [24, 22, 95, 138],
+      "nameColor": "#8fe3ef",
+      "effect": { "kind": "pulse" }
+    },
+    {
+      "id": "frame-forest",
+      "kind": "frame",
+      "name": "Leśna ramka",
+      "description": "Korzenie, mech i muchomory. Wokół ramki krążą migoczące świetliki.",
+      "price": 250,
+      "art": "frame-forest",
+      "window": [24, 29, 96, 136],
+      "nameColor": "#7fd36b",
+      "effect": { "kind": "fireflies", "points": [[10, 30], [14, 90], [8, 140], [40, 12], [80, 8], [110, 40], [108, 100], [60, 150], [100, 148]] }
+    },
+    {
+      "id": "bg-spring",
+      "kind": "background",
+      "name": "Źródło Systemu",
+      "description": "Nocna polana ze źródłem, które lśni światłem Systemu.",
+      "price": 150,
+      "art": "bg-spring"
+    },
+    {
+      "id": "bg-tower",
+      "kind": "background",
+      "name": "Wieża",
+      "description": "Podnóże ogromnej wieży z runami Systemu, pod burzowym niebem.",
+      "price": 150,
+      "art": "bg-tower"
+    },
+    {
+      "id": "bg-camp",
+      "kind": "background",
+      "name": "Obóz nocą",
+      "description": "Ognisko i namiot w lesie, pod gwiaździstym niebem.",
+      "price": 150,
+      "art": "bg-camp"
+    },
+    {
+      "id": "sabertooth",
+      "kind": "mountSkin",
+      "name": "Tygrys szablozębny",
+      "description": "Postać jedzie na tygrysie szablozębnym zamiast na wierzchowcu ze Stajni. Zmienia się tylko wygląd: wyprawy skraca wierzchowiec ze Stajni, tak jak dotąd.",
+      "price": 1000,
+      "art": "sabertooth"
+    }
+  ],
+  "texts": {
+    "lead": "Za Punkty Systemu kupisz tu przedmioty, które zmieniają tylko wygląd.",
+    "rules": [
+      "Przedmiot należy do postaci, która go kupiła, tak jak jej Punkty Systemu.",
+      "Ramka i tło zdobią portret w zakładce Postać i na karcie postaci, którą widzą inni gracze.",
+      "Z założoną ramką imię postaci może mieć kolor ramki: na czacie, w Rankingu, u Znajomych, w Drużynie i w Gildii.",
+      "Tygrys szablozębny zmienia tylko wygląd wierzchowca ze Stajni, więc kupi go postać, która ma już wierzchowca."
+    ]
+  }
+}
