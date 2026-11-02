@@ -2996,6 +2996,53 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Warownia: odpowiedzi autora 419–428 (2.11.2026)
+
+Autor: „Zaplanujmy zatem Warownię może w miedzyczasie? Teksty, opisy..”, a potem: „419 A - tak, ale sprawdz czy gracz jest w stanie tyle zarobić w ogole sensownie, tez nie wiem czy wierzchowce nie są za drogie, nie wiem czy balans nie idzie na zbyt hard mimo gry na lata”, „420 […] A, ale 25% styknie chyba że stwierdzisz że to za mało”, „421. "jednym kliknięciem" - drobna poprawka i oczywiście A”, „422. Na razie rodziny i liczba stworów tak jak mówisz ale bedzie to rosnąć. i oczywiście A”, „423 […] i oczywiście A”, „424. A”, „425. A”, „426 […] i oczywiście A”, „427. A”, „428. A z nagraniem narratora od nowa, bo to chyba kwestia mówiona była.”
+
+1. **Przemiana Obozu w Warownię (419 A).**
+    - Warunek: Obóz ma 10. poziom, a każdy jego budynek swój najwyższy poziom. Kwatery mają tylko 2 poziomy, więc wystarczy im 2. (brakujący szczegół).
+    - Przemiana to budowa w obozie: zajmuje miejsce budowy, trwa 3 dni i kosztuje złoto oraz zasoby, wstępnie około 250 000 złota.
+    - Po przemianie plansza Obozu staje się Warownią: kamienne mury zamiast palisady. Stare budynki zostają i działają dalej. Wszystkie siedem budynków Warowni można stawiać od razu.
+    - Budynki Warowni kosztują złoto, drewno, kamień i rudę, więcej niż 10. poziom budynków obozu.
+    - Opis: „Kamienne mury w miejscu dawnej palisady. Budynki Warowni wzmacniają postać.”
+    - Ceny przemiany i budynków, a przy okazji ceny wierzchowców, sprawdza analiza zarobków graczy, o którą prosi autor.
+2. **Plac treningowy (420 A, 25%), 10 poziomów.**
+    - Opis autora: „Ubita ziemia, słomiane kukły i stojak z tępą bronią. System generuje Twojego klona, który trenuje za Ciebie. Raz dziennie daje XP klasy za trening, który odbywa się niezależnie, także w czasie wyprawy”.
+    - Raz dziennie, licząc od północy, przycisk „Trenuj”. Trening trwa godzinę na każdy poziom placu, czyli 1–10 godzin, i biegnie obok wyprawy albo profesji.
+    - Daje tyle XP klasy, ile 25% wyprawy tej samej długości na poziomie postaci.
+3. **Zbrojownia (421 A), 2 poziomy: 2 zestawy, potem 3.**
+    - Opis: „Stojaki na zbroje i broń, każdy z tabliczką. Zapisane zestawy ekwipunku zakłada się jednym kliknięciem.”
+    - Zestaw zapamiętuje to, co postać ma na sobie, pod nazwą nadaną przez gracza. Przełącza się go tam, gdzie wolno ręcznie zmieniać ekwipunek.
+    - Niezałożone przedmioty z zestawów wiszą na stojakach i nie zajmują miejsca w plecaku.
+4. **Sala trofeów (422 A), 10 poziomów.**
+    - Opis: „Łby, skóry i kły na ścianach długiej sali. Rodziny stworów poznane w Bestiariuszu dają premię do obrażeń przeciw nim.”
+    - Premia działa, gdy postać zna wszystkie stwory rodziny: +0,5% obrażeń na poziom Sali, do +5% przeciw całej rodzinie. Dodaje się do trofeów z Encyklopedii.
+    - Rodziny dziś: zwierzęta 24, duchy 23, ptaki 14, węże 10, owady 8, pająki 6, istoty z kamienia i bagien 3. Stworów będzie przybywać.
+    - Raz zdobyta premia zostaje, także gdy do rodziny dojdą nowe stwory (brakujący szczegół: ściana trofeów się nie opróżnia).
+5. **Strażnica (423 A), 5 poziomów.**
+    - Opis autora: „Wieża nad bramą, z której widać cały szlak. Przed wyprawą pokazuje szanse na elitę, czempiona i zdarzenie, a wyższe poziomy pozwalają tropić konkretnego stwora.”
+    - Na 1. poziomie przy wyborze miejsca i czasu wyprawy widać szanse na elitę, czempiona i zdarzenie.
+    - Od 2. poziomu postać wybiera przed wyprawą jednego stwora z danego miejsca i spotyka go częściej: o 40% na 2. poziomie i o 100% na 5., jak stwory z zadań.
+6. **Ołtarz Systemu (424 A, 425 A), 10 poziomów.**
+    - Opis: „Czarny kamień ze znakiem Systemu. Raz dziennie daje do wyboru jedno z trzech błogosławieństw na wyprawy.”
+    - Zawsze te same trzy: +10% XP, +10% złota albo +10% szans na rzadsze przedmioty.
+    - Błogosławieństwo działa przez godzinę wypraw na każdy poziom ołtarza, czyli do 10 godzin, jak mikstura na czas.
+7. **Szklarnia (426 A), 10 poziomów.**
+    - Opis autora: „Szklany dach na drewnianych żebrach, a pod nim grządki. Szklarnia sama hoduje i zbiera zioła, które postać zna z Zielarstwa.”
+    - Hoduje jedno zioło wybrane spośród znanych z Zielarstwa, które można zmienić w każdej chwili. Rośnie bez przerwy, jak drewno w Tartaku.
+    - Każdy poziom to pół godziny zbierania w Systemowym Zagajniku na dobę, czyli na 10. poziomie 5 godzin dziennie. Nie daje XP Zielarstwa.
+8. **Kapliczka (427 A), 10 poziomów.**
+    - Poprawka do 394: omdlenie nie zabiera łupów. Kończy wyprawę i zabiera połowę XP potrzebnego na poziom, a tylko w niektórych zdarzeniach część złota z wyprawy.
+    - Opis: „Kapliczka przy bramie, ze świecą, która nie gaśnie. Po omdleniu na wyprawie postać traci mniej doświadczenia.”
+    - Każdy poziom zmniejsza utratę XP po omdleniu o 5%, więc na 10. poziomie strata jest o połowę mniejsza.
+9. **Teksty Obozu (428 A).**
+    - Opis Obozu: „Polana na skraju puszczy, która z czasem stanie się warownią. Każdy poziom obozu przyspiesza budowę wszystkich budynków.”
+    - Zapowiedź: „Gdy Obóz i wszystkie jego budynki dojdą do najwyższego poziomu, Obóz będzie mógł stać się Warownią.”
+    - Kwestia narratora `lead-camp` mówi o wiosce. Jej nowy tekst idzie do autora przed nagraniem (pytanie 429), a potem nagranie od nowa.
+    - Zdanie towarzysza o wiosce (`data/settlement.json`) też mówi już o warowni.
+10. **Kolejność** zostaje: druga ewolucja, potem Warownia, potem Górnictwo i Jubilerstwo. Grafiki Warowni powstaną po tekstach i pójdą do autora pojedynczo.
+
 ## Statystyki: okno „Parametry dodatkowe” (2.11.2026)
 
 Autor przysłał zrzut czatu, w którym gracz pyta, czy gdzieś widać łączny pancerz; gra pokazywała tylko redukcję obrażeń w procentach. Autor: „Potrzebujemy takiego czegoś w statystykach gdzieś. Mozna zbudować jakies okno w statystykach <Parametry dodatkowe> albo coś w tym stylu”.
