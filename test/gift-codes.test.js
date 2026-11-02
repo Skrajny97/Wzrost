@@ -20,6 +20,18 @@ describe('gift codes in the engine', () => {
     assert.equal(giftCodeOf('JESTEMTESTEREM', Date.parse('2026-11-13T00:00:00+01:00'), [], content).reason, 'expired');
   });
 
+  test('TIGER gives 500 Punkty Systemu for a week from 3 November, to the end of 9 November in Warsaw', () => {
+    const tiger = content.giftCodes.find((gift) => gift.id === 'tiger-2026-11');
+    assert.equal(tiger.code, 'TIGER');
+    assert.deepEqual(tiger.rewards, { systemPoints: 500 });
+    assert.equal(giftCodeOf('tiger', Date.parse('2026-11-03T00:00:00+01:00'), [], content).gift, tiger);
+    assert.equal(giftCodeOf('TIGER', Date.parse('2026-11-09T23:59:00+01:00'), [], content).gift, tiger);
+    assert.equal(giftCodeOf('TIGER', Date.parse('2026-11-10T00:00:00+01:00'), [], content).reason, 'expired');
+    assert.equal(giftCodeOf('TIGER', Date.parse('2026-11-05T12:00:00+01:00'), ['tiger-2026-11'], content).reason, 'used');
+    assert.equal(giftCodeOf('TIGER', Date.parse('2026-11-05T12:00:00+01:00'), ['testers-2026-11'], content).gift, tiger);
+    assert.equal(giftRewardsText(tiger.rewards, content), 'Punkty Systemu +500');
+  });
+
   test('case, spaces and dashes do not matter; an unknown code, an ended one and one taken already give nothing', () => {
     assert.equal(normalCode(' jestem-testerem '), 'JESTEMTESTEREM');
     assert.equal(giftCodeOf('Jestem Testerem', before, [], content).gift, tester);

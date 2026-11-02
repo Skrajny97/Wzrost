@@ -1966,6 +1966,14 @@ describe('Stół rozbiórki', () => {
     assert.deepEqual([view.crafting.queue.length, view.bag.length], [0, 2]);
   });
 
+  test('"Rozbierz kilka" needs the Stół rozbiórki built in the camp', async () => {
+    const ids = [(await bagItem()).id, (await bagItem()).id];
+    const { status, data } = await salvageMany(ids);
+    assert.deepEqual([status, data.error.code], [409, 'no_table']);
+    const view = await character();
+    assert.deepEqual([view.crafting.pace, view.crafting.queue.length, view.bag.length], [0, 0, 2]);
+  });
+
   test('"Rozbierz kilka" twice at once makes the orders once', async () => {
     await tableAt(1);
     const ids = [(await bagItem()).id, (await bagItem()).id];

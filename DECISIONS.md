@@ -2996,6 +2996,35 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Kod podarunkowy TIGER (2.11.2026)
+
+Autor: „przygotuj kod podarunkowy ważny tydzien "TIGER" dajacy 500 Punktów Systemu”.
+
+1. **Kod** `TIGER` (`tiger-2026-11` w `data/gift-codes.json`): 500 Punktów Systemu, raz na konto, wpisywany w Ustawieniach jak JESTEMTESTEREM. Wielkość liter, spacje i myślniki nie mają znaczenia.
+2. **Tydzień (brakujący szczegół):** licząc od jutra, jak przy JESTEMTESTEREM, czyli od wdrożenia do końca poniedziałku 9.11.2026 czasu polskiego (`until` 10.11.2026 00:00 +01:00).
+3. Konto, które odebrało już JESTEMTESTEREM, odbierze też TIGER: każdy kod liczy się osobno.
+
+## „Rozbierz kilka” tylko ze Stołem rozbiórki (2.11.2026)
+
+Autor: „Pamietaj by ten przycisk nie działał jeśli ktoś nie ma Stołu do rozbiórki zbudowanego i w ogole ze to się łączy ze sobą”. Tak działa od 0.0.96: bez Stołu rozbiórki w obozie przycisku „Rozbierz kilka” w Plecaku nie ma, a serwer i tak odmawia („Najpierw zbuduj Stół rozbiórki w obozie.”). Rozbiórka idzie do kolejki tego stołu, a jego poziom decyduje, jakie rzadkości stół bierze i jak szybko pracuje. Nowy test sprawdza odmowę serwera bez stołu.
+
+## Pytania 479–496 (2.11.2026, w nocy)
+
+Autor nie mógł spać i poprosił o poranny materiał od razu („zacznij od chodów i jazdy”). Wysłane w czacie, każda pozycja z numerem:
+
+- 479.1–479.8: chody drugich form po poprawkach z 437 (Cudotwórca bez „fajki”, Władca Piorunów z jednym łukiem, Pan Zimy bez mieczy, przed i po czyszczeniu szarych pikseli u pięciu najgorszych; czyszczenie przeszło przez wszystkie 30 chodów);
+- 480.1–480.30: jazda wierzchem drugich form, wszystkie 30;
+- 439–461: Czarne Bagno (kraina z dwoma tłami do wyboru, pięć regionów, 17 stworów z materiałami), 462–465 Szumiący Bór, 466 trzecia ewolucja, 467–471 Sklep Play;
+- 481: czy zmienić zasadę „jednego materiału” w Kowadle; 482: czy długie wyprawy mają dawać rzadsze przedmioty;
+- 483–488: decyzje z przeglądu Wież; 489–496: plan wersji angielskiej;
+- ponownie 472, 476, 477 (wersje A są w grze od 0.0.97 i 0.0.98) i 478 (zdarzenia na długich wyprawach).
+
+## Wersja 0.0.99 (2.11.2026)
+
+1. **Co wchodzi do gry:** kod podarunkowy TIGER (500 Punktów Systemu do końca 9.11) i test, że „Rozbierz kilka” bez Stołu rozbiórki nic nie robi (zob. wyżej). Razem z tym idzie notatka o pytaniach 479–496.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (868 z 868) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków).
+
 ## Długie wyprawy opłacają się bardziej, elita częściej na długich (2.11.2026)
 
 Autor: „chodzi czy bardziej sie oplacaja krotkie wyprawy czy długie, bo powinny mimo wszystko długie w pewnym stopniu” i „i czy szansa na spotkanie elity jest wyższa w dłuższej wyprawie czy krótszej? bo powinna w dłuższej”.
