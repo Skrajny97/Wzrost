@@ -715,7 +715,7 @@ function openSettings() {
       }),
     h('button', { type: 'button', class: 'button button--world', onClick: changeCharacter, text: 'Zmień postać' }),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
-    h('button', { type: 'button', class: 'button button--danger', onClick: startOver, text: 'Zacznij od nowa' }),
+    h('button', { type: 'button', class: 'button button--danger', onClick: deleteCharacter, text: 'Usuń postać' }),
     h('button', { type: 'button', class: 'button button--danger', onClick: deleteAccount, text: 'Usuń konto' }),
   );
   request('GET', '/api/health')
@@ -1090,7 +1090,10 @@ async function repeatEvolutionTour() {
   }
 }
 
-async function startOver() {
+// "Usuń postać" (the author: "Dodaj też opcję »Usuń postać«, bo jest tylko
+// »Usuń konto«"; it was "Zacznij od nowa"): the character being played goes
+// for good after its name is typed in, as the login is for the account.
+async function deleteCharacter() {
   let others = 0;
   try {
     others = (await call('GET', '/api/characters')).characters.length - 1;
@@ -1098,13 +1101,15 @@ async function startOver() {
     toast(error.message);
     return;
   }
+  const { name } = state.character;
   const sure = await confirmAction({
-    title: 'Zacząć od nowa?',
-    text: `${state.character.name} zniknie na zawsze razem z przedmiotami, złotem i raportami. ${
+    title: 'Usunąć postać?',
+    text: `${name} zniknie na zawsze razem z przedmiotami, złotem i raportami. Tego nie da się cofnąć. ${
       others > 0 ? 'Konto i inne postacie zostają, a zaraz potem wybierzesz postać albo stworzysz nową.' : 'Konto zostaje, a zaraz potem stworzysz nową postać.'
     }`,
     confirmLabel: 'Usuń postać',
     danger: true,
+    typed: name,
   });
   if (!sure) return;
   try {

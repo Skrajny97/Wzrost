@@ -2996,6 +2996,19 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Wierzchowce, jeźdźcy, kosmetyki i „Usuń postać”: odpowiedzi autora 366–368 (2.11.2026)
+
+Autor: „366 C, 367 B, 368 C”, „Postacie powinny mieć tylko jedną nogę widoczną jadąc na wierzchowcu (bo drugą mają przewieszoną na drugą stronę siedząc)”, „nie te nogę usuwasz”, „ma znikać noga, która jest z drugiego boku wierzcha, ma być widoczna tylko jedna przednia”, „Co do kosmetyków to miałeś zrobić je wspólne dla wszystkich, a nie przemalować szatę jednej klasy. Ergo tylko ramki i tła wchodzą póki co do gry, wszystkie. Wraz z ramkami wchodzi opcja zmiany wyświetlanego koloru na czacie na ten z ramki”, „Do tego dorób jednego wierzchowca w formie kosmetyku za 1000 Punktów Systemu i niech wygląda jak tygrys szablozębny i tak się nazywa” i „Dodaj też opcję »Usuń postać«, bo jest tylko »Usuń konto«”.
+
+1. **Wierzchowce w Stajni:** Kuc to wersja C, Koń wierzchowy B, a Rumak C. Każdy ma w Stajni swój obrazek nad opisem.
+2. **Jeden widoczny bok.** Jeździec pokazuje tylko nogę po bliższej stronie wierzchowca. Postacie gry są narysowane w ujęciu trzy czwarte: patrzą w prawo, a pierś mają lekko zwróconą do patrzącego. W tym ujęciu bliższa noga jest ta z tyłu, po lewej. Noga z drugiego boku wystaje przed nią, po prawej, z kolanem, łydką i stopą trochę wyżej. Sprawdziła to makieta jeźdźca na koniu w dwóch ujęciach. Pierwsze cięcie usuwało nogę bliższą, i to był błąd.
+3. **Cięcie.** Dla każdego z 40 jeźdźców `tools/rider-legs.json` ma obrys nogi z drugiego boku (kolano, łydka i stopa), rysowany na powiększeniu piksel po pikselu. `tools/rider-legs.py` usuwa te piksele i dorysowuje kontur bliższej nogi tam, gdzie stykała się z dalszą. Usuwa też okruchy. Wodze, bicze, spódnice, płaszcze i szaty zostają. Przy długich szatach znika tylko druga stopa spod szaty.
+4. **Odcienie skóry** jeźdźców są zrobione od nowa z poprawionych obrazków (`tools/rider-tones.py`). Dwie nowe poprawki: Cień (kobieta) ma dopisany odcień skóry stóp i szyi, a hełm Gladiatora z brązu nie zmienia już koloru razem ze skórą.
+5. **Kosmetyki są wspólne dla wszystkich klas.** Przemalowane szaty jednej klasy (propozycja 361) odpadają. Do gry wchodzą wszystkie ramki i tła. Kto nosi ramkę, może też wyświetlać swoje imię na czacie w kolorze tej ramki.
+6. **Bez odpowiedzi, więc wybór polecany (363 A, 364 A):** karta cudzej postaci pokazuje duży portret z ramką i tłem. Ikona straganu w górnym pasku otwiera Sklep Systemu. Każdy przedmiot ma tam podgląd na własnej postaci, cenę i przycisk „Kup”, a kupiony ma „Załóż” i „Zdejmij”.
+7. **Tygrys szablozębny** to wierzchowiec-kosmetyk za 1000 Punktów Systemu. Zmienia tylko wygląd obecnego wierzchowca: skrócenie wypraw zostaje takie, jakie daje wierzchowiec ze Stajni.
+8. **„Usuń postać”.** W Ustawieniach był już przycisk „Zacznij od nowa”, który usuwał graną postać, ale jego nazwa tego nie mówiła. Teraz nazywa się „Usuń postać”. Okno pyta „Usunąć postać?”, a przycisk działa dopiero po wpisaniu imienia postaci, tak jak usunięcie konta po wpisaniu loginu. Konto i inne postacie zostają, a gra otwiera wybór postaci albo tworzenie nowej.
+
 ## Odpowiedź autora 365: etapy od razu w grze (1.11.2026)
 
 Autor: „to co na testowym dawaj na main od razu, bo nie chce mi sie używać testowego” i „365 A”.

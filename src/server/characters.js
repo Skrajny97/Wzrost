@@ -1359,7 +1359,7 @@ export async function setSkin(context) {
   return json({ character: characterView(updated, context.now) });
 }
 
-// "Zacznij od nowa": the character, its items, hunt, reports and messages in
+// "Usuń postać" (once "Zacznij od nowa"): the character, its items, hunt, reports and messages in
 // the chat are removed; the account stays, with its other characters, what
 // it hides in the chat and its silence there (chat.js), and the player
 // chooses another character or creates a new one.

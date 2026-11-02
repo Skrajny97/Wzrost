@@ -1,52 +1,83 @@
-"""Takes the far leg off each rider (the author: "Postacie powinny mieć
-tylko jedną nogę widoczną jadąc na wierzchowcu (bo drugą mają przewieszoną
-na drugą stronę siedząc)"). Retro Diffusion drew the riders squatting, both
-lower legs showing; the one behind (to the left: the riders face right) is
-cleared by the rectangles chosen by hand for each rider in
-tools/rider-legs.json ([left, top, right, bottom), right and bottom not
-included), with the slivers of its outline, and a dark outline is drawn
-along the cut where the near leg now meets the empty side.
+"""Takes the far leg off each rider (the author: "ma znikać noga, która jest
+z drugiego boku wierzcha, ma być widoczna tylko jedna przednia").
 
-    python3 -I tools/rider-legs.py tools/rider-legs.json DRAWN_DIR OUT_DIR
+Retro Diffusion drew the riders as if squatting, both legs showing, in the
+three-quarter view of all the game's figures: facing right, the chest
+turned a little towards the viewer. In that view the near leg (on the
+viewer's side of the mount) is the one further back, on the left, and the
+far one sticks out in front of it, to the right, with its knee, shin and
+foot a little higher. On a mount the far leg hangs on the other side and
+the mount's body hides it, so it goes: tools/rider-legs.json gives, rider
+by rider, the polygons (x, y of pixel corners) that hold it, drawn by hand
+on the pictures enlarged. A pixel goes when its centre lies inside one,
+unless the rider's "keep" lists it (reins drawn across the far knee); the
+entry is then {"cut": [polygons], "keep": [[x, y], ...]}. Then:
+- the near leg's side, where the far leg touched it, gets the rider's
+  outline colour, unless it is dark already;
+- specks the cut left behind, cut off from the figure, go too.
+
+    python3 -I tools/rider-legs.py tools/rider-legs.json DRAWN_DIR OUT_DIR [--check SHEET.png] [--ids a,b]
 
 DRAWN_DIR holds the riders as drawn (both legs); the skin tones are made
-after, from OUT_DIR (tools/rider-tones.py).
+after, from OUT_DIR (tools/rider-tones.py). --check draws a sheet of each
+rider as drawn, with what goes in red, and after.
 """
-import json, sys
-from PIL import Image
-cuts = json.load(open(sys.argv[1]))
-src_dir, out_dir = sys.argv[2], sys.argv[3]
-lum = lambda c: 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
-for name, rects in cuts.items():
-    im = Image.open(f'{src_dir}/{name}.png').convert('RGBA')
+import json
+import sys
+from collections import Counter, deque
+
+from PIL import Image, ImageDraw
+
+
+def lum(c):
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+
+def inside(px, py, poly):
+    hit = False
+    j = len(poly) - 1
+    for i in range(len(poly)):
+        (xi, yi), (xj, yj) = poly[i], poly[j]
+        if (yi > py) != (yj > py) and px < (xj - xi) * (py - yi) / (yj - yi) + xi:
+            hit = not hit
+        j = i
+    return hit
+
+
+def outline_colour(im):
     px = im.load()
     W, H = im.size
-    darks = sorted((px[x, y][:3] for y in range(H) for x in range(W) if px[x, y][3] >= 128), key=lum)
-    outline = darks[len(darks) // 50] if darks else (30, 24, 20)
+    edge = Counter()
+    for y in range(H):
+        for x in range(W):
+            if px[x, y][3] < 128:
+                continue
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nx, ny = x + dx, y + dy
+                if not (0 <= nx < W and 0 <= ny < H) or px[nx, ny][3] < 128:
+                    edge[px[x, y][:3]] += 1
+                    break
+    darkest = sorted(edge, key=lum)[: max(1, len(edge) // 8)]
+    return max(darkest, key=lambda c: edge[c])
+
+
+def cut(im, entry):
+    polygons, keep = (entry['cut'], {tuple(p) for p in entry.get('keep', [])}) if isinstance(entry, dict) else (entry, set())
+    im = im.copy()
+    px = im.load()
+    W, H = im.size
+    outline = outline_colour(im)
     cleared = set()
-    for x0, y0, x1, y1 in rects:
-        for y in range(y0, min(y1, H)):
-            for x in range(x0, min(x1, W)):
-                if px[x, y][3]:
-                    cleared.add((x, y))
+    for y in range(H):
+        for x in range(W):
+            if px[x, y][3] and (x, y) not in keep and any(inside(x + 0.5, y + 0.5, poly) for poly in polygons):
+                cleared.add((x, y))
                 px[x, y] = (0, 0, 0, 0)
-    # Slivers of the far leg's outline left of a cut (at most 2 px wide
-    # in a row, with nothing further left) go too.
-    for x0, y0, x1, y1 in rects:
-        for y in range(y0, min(y1, H)):
-            run = [x for x in range(max(0, x0 - 3), x0) if px[x, y][3]]
-            if run and (x0 - 3 < 0 or not px[x0 - 3, y][3]) and len(run) <= 2:
-                for x in run:
-                    cleared.add((x, y))
-                    px[x, y] = (0, 0, 0, 0)
-    # The near leg's side along the cut gets an outline.
     for (x, y) in cleared:
-        for dx in (1,):
-            q = (x + dx, y)
-            if 0 <= q[0] < W and px[q][3] >= 128 and (q not in cleared) and lum(px[q][:3]) > 60:
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            q = (x + dx, y + dy)
+            if 0 <= q[0] < W and 0 <= q[1] < H and q not in cleared and q not in keep and px[q][3] >= 128 and lum(px[q][:3]) > lum(outline) + 28:
                 px[q] = (*outline, 255)
-    # Specks the cut left behind, cut off from the figure.
-    from collections import deque
     seen, parts = set(), []
     for y in range(H):
         for x in range(W):
@@ -68,5 +99,43 @@ for name, rects in cuts.items():
         if len(part) < 12:
             for p in part:
                 px[p] = (0, 0, 0, 0)
-    im.save(f'{out_dir}/{name}.png')
-print('done', len(cuts))
+    return im, cleared
+
+
+def check_sheet(rows, out):
+    s, crop = 5, (12, 44, 62, 96)
+    cw, ch = (crop[2] - crop[0]) * s, (crop[3] - crop[1]) * s
+    sheet = Image.new('RGBA', (3 * (cw + 8) + 160, len(rows) * (ch + 8)), (88, 100, 84, 255))
+    d = ImageDraw.Draw(sheet)
+    for r, (name, drawn, cleared, after) in enumerate(rows):
+        marked = drawn.copy()
+        mp = marked.load()
+        for (x, y) in cleared:
+            c = mp[x, y]
+            mp[x, y] = ((c[0] + 3 * 255) // 4, c[1] // 4, c[2] // 4, 255)
+        for c, im in enumerate((drawn, marked, after)):
+            big = im.crop(crop).resize((cw, ch), Image.NEAREST)
+            sheet.alpha_composite(big, (160 + c * (cw + 8), r * (ch + 8)))
+        d.text((6, r * (ch + 8) + ch // 2), name, fill=(255, 245, 215, 255))
+    sheet.save(out)
+
+
+def main():
+    cuts = json.load(open(sys.argv[1], encoding='utf8'))
+    cuts.pop('$comment', None)
+    src_dir, out_dir = sys.argv[2], sys.argv[3]
+    args = sys.argv[4:]
+    ids = args[args.index('--ids') + 1].split(',') if '--ids' in args else sorted(cuts)
+    rows = []
+    for name in ids:
+        drawn = Image.open(f'{src_dir}/{name}.png').convert('RGBA')
+        after, cleared = cut(drawn, cuts[name])
+        after.save(f'{out_dir}/{name}.png')
+        rows.append((name, drawn, cleared, after))
+    if '--check' in args:
+        check_sheet(rows, args[args.index('--check') + 1])
+    print('done', len(rows))
+
+
+if __name__ == '__main__':
+    main()

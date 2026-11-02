@@ -471,7 +471,7 @@ export function narrate(hash = place) {
   place = hash;
   const read = state.character?.tutorial;
   if (!read || !state.content?.tutorial) {
-    // Without a character, as after "Zacznij od nowa", its lines go too.
+    // Without a character, as after "Usuń postać", its lines go too.
     if (!state.character) passedHere.clear();
     closeCard();
     stopLight();

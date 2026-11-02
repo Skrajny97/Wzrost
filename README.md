@@ -137,7 +137,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/character` | nowa postać: `name`, `classId`, `appearance` (`female` albo `male`); dostaje zapas na start i Punkty Czasu od narratora (409 `name_taken`, gdy imię nosi już inna postać, bez względu na wielkość liter) |
 | POST | `/api/character/appearance` | zmiana wyglądu: `appearance`; działa też podczas eksploracji |
 | POST | `/api/character/skin` | zmiana koloru skóry portretu: `skin` (id z `data/skins.json`); działa też podczas eksploracji (400 `invalid_skin`) |
-| DELETE | `/api/character` | „Zacznij od nowa”: usuwa postać z przedmiotami, raportami, wyprawą, obozem i Punktami Systemu |
+| DELETE | `/api/character` | „Usuń postać” (dawniej „Zacznij od nowa”): usuwa postać z przedmiotami, raportami, wyprawą, obozem i Punktami Systemu |
 | POST | `/api/character/points` | rozdanie punktów: `points`, np. `{ "strength": 2 }` |
 | POST | `/api/character/points/auto` | „Rozdaj według klasy” |
 | POST | `/api/character/points/reset` | darmowe zerowanie punktów (do poziomu 20) |
