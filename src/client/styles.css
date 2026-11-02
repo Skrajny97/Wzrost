@@ -6463,6 +6463,18 @@ a.camp-level-button {
   font-size: 14px;
 }
 
+/* The guild's members, folded under their count (screens/guild.js). */
+.guild-members-toggle {
+  padding: 6px 0;
+  cursor: pointer;
+  font-family: var(--font-world);
+  font-size: 17px;
+}
+
+.guild-members[open] > .guild-members-toggle {
+  margin-bottom: 8px;
+}
+
 .chat-blocked summary {
   cursor: pointer;
   font-family: var(--font-world);

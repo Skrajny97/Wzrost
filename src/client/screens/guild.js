@@ -244,11 +244,18 @@ function mountGuild(container) {
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'guild-title' },
-      h('h2', { class: 'card-title', id: 'guild-title' }, icon('banner', { size: 22 }), `${guild.name} [${guild.tag}] (${guild.members.length}/${guild.size})`),
+      h('h2', { class: 'card-title', id: 'guild-title' }, icon('banner', { size: 22 }), `${guild.name} [${guild.tag}]`),
+      // The members folded (the author: "lista członków Gildii powinna być
+      // rozwijana"), their count in sight.
       h(
-        'ul',
-        { class: 'friends-list' },
-        guild.members.map((member) => h('li', { class: 'friend' }, who(member, member.role !== 'member' && h('span', { class: 'party-leader', text: member.role === 'leader' ? 'Lider' : 'Zastępca' })), actions(member))),
+        'details',
+        { class: 'guild-members' },
+        h('summary', { class: 'guild-members-toggle', text: `Członkowie (${guild.members.length}/${guild.size})` }),
+        h(
+          'ul',
+          { class: 'friends-list' },
+          guild.members.map((member) => h('li', { class: 'friend' }, who(member, member.role !== 'member' && h('span', { class: 'party-leader', text: member.role === 'leader' ? 'Lider' : 'Zastępca' })), actions(member))),
+        ),
       ),
       h('p', { class: 'muted', text: 'Kanał gildii czeka w Czacie, w zakładce „Gildia”.' }),
     );
