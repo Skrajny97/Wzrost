@@ -7768,13 +7768,22 @@ a.profession-square:active {
 .scene-aura {
   filter: drop-shadow(0 0 2px var(--aura-glow)) drop-shadow(0 0 5px var(--aura-glow));
 }
-.scene-aura-motes {
+/* About the walker's body; two classes, so that the portrait's .aura-motes
+   (later in this file, filling its frame) does not pull it to the corner. */
+.aura-motes.scene-aura-motes {
   z-index: 3;
   inset: auto;
   left: calc(50% - 40px);
   bottom: 30px;
   width: 80px;
   height: 110px;
+}
+/* Riding: about the rider and the mount, in the ride's box. */
+.aura-motes.scene-aura-motes--ride {
+  left: calc(50% - var(--ride-width) / 2);
+  bottom: 18px;
+  width: var(--ride-width);
+  height: var(--ride-height);
 }
 /* The trail on the way (scenes.js footprints): a glowing footprint where a
    foot fell, drifting away with the path and fading; the far foot's a little

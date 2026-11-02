@@ -105,7 +105,10 @@ function lightWalker(stage, figure, { glow, spark, sparks }) {
   stage.style.setProperty('--aura-glow', glow);
   stage.style.setProperty('--aura-spark', spark);
   figure.classList.add('scene-aura');
-  const motes = h('div', { class: `scene-aura-motes aura-motes aura-motes--${sparks}` });
+  const riding = figure.classList.contains('scene-ride');
+  const motes = h('div', { class: `scene-aura-motes${riding ? ' scene-aura-motes--ride' : ''} aura-motes aura-motes--${sparks}` });
+  // Riding, the motes go about the rider and the mount, the ride's own box.
+  if (riding) for (const name of ['--ride-width', '--ride-height']) motes.style.setProperty(name, figure.style.getPropertyValue(name));
   for (let index = 0; index < 8; index += 1) {
     const mote = h('span');
     mote.style.left = `${20 + ((index * 37) % 60)}%`;
