@@ -1,0 +1,31 @@
+{
+  "id": "sabertooth",
+  "payload": {
+    "prompt": "a huge saber-toothed tiger used as a riding mount, orange fur with bold black stripes, two long curved saber fangs, a muscular body, a dark leather saddle with stirrups over a fur saddle cloth with bone trinkets, a leather bridle with reins around its neck, standing calmly, seen exactly from the side in profile facing right, full body from the ears to the paws, all four legs visible",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 160,
+    "height": 128,
+    "num_images": 3,
+    "seed": 674826179,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793593767,
+    "credit_cost": 3,
+    "balance_cost": 0.54,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 19.49,
+    "request_id": "908c2a57-2ceb-4615-9974-4306be906e23",
+    "outputs_retained_until": 1793680109,
+    "output_url_expires_at": 1793594667,
+    "billing": {
+      "source": "balance",
+      "balance_left": 19.49,
+      "balance_charged": 0.54
+    }
+  }
+}
