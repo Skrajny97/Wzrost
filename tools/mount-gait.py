@@ -33,7 +33,8 @@ the paw and goes lower over a paw too far ahead or behind, as over a stilt,
 a hind paw standing a little "behind" the hip; "fold": a front leg stands
 on a straight wrist, its paw folding back under it while it swings (the
 estimate puts the front legs' middle joint halfway down; "fix" moves it to
-the wrist). Writes art/mount-gaits.json.
+the wrist). "head_follow" and "head_forward" carry the head low, forward
+and still while the shoulders roll. Writes art/mount-gaits.json.
 """
 import json
 import math
@@ -142,6 +143,12 @@ def gait(points, size, spec):
     # author saw the tiger's body and head not move at all.
     dip = spec.get('dip', 0)
     dip_front, dip_hind = (dip if isinstance(dip, list) else [dip, dip])
+    # A prowling big cat holds its head low, forward and still while its
+    # shoulders roll under it (the author: the tiger walked like a lapdog):
+    # "head_follow" is the share of the shoulders' rise the head takes,
+    # "head_forward" moves the head forward (shares of a leg's length).
+    follow = spec.get('head_follow', 1)
+    forward = spec.get('head_forward', 0) * length
     out = []
     for i in range(frames):
         phi = i / frames
@@ -202,7 +209,11 @@ def gait(points, size, spec):
             rise = (lifted['front_left'] + lifted['front_right']) / 2
             for label in HEAD + ('NECK',):
                 if label in frame:
-                    frame[label] = (frame[label][0], frame[label][1] + rise + (nod * stepping if label in HEAD else 0))
+                    x, y = frame[label]
+                    if label in HEAD:
+                        frame[label] = (x + forward, y + rise * follow + nod * stepping)
+                    else:
+                        frame[label] = (x + forward / 2, y + rise + head_drop / 2)
         out.append(frame)
     def points_of(frame):
         return [
