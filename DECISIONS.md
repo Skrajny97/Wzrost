@@ -2996,6 +2996,12 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Bez „Możesz zamknąć grę” (2.11.2026)
+
+Autor: „usuń hasło »Możesz zamknąć grę« gdziekolwiek ono występuje i zamień na coś zastępczego utrzymującego gracza w grze”.
+
+1. **Nowa podpowiedź.** W czasie wyprawy i pracy w profesji pod licznikiem stoi teraz: „Raport będzie gotowy o 14:30. Do tego czasu rozbuduj obóz albo sprawdź zadania.” Obóz i zadania są dostępne od początku gry, więc podpowiedź pasuje na każdym poziomie. Innych miejsc z tym hasłem w grze nie było.
+
 ## Plan: druga ewolucja, Warownia i dwie nowe profesje (2.11.2026)
 
 Autor: „I oczywiście kolejna Ewolucja klasy na 100 poziomie”, „kolejną sprawą będzie rozwinięcie Obozu – uzależnione od wbicia wszystkich lvli budynków na 10 maksymalny poziom i rozwinięcia samego Poziomu Obozu na maksymalny. Wtedy Obóz będzie przekształcał się nie w Wioskę, jak wcześniej zakładaliśmy, a coś innego, bo jednak focus jest na rozwijanie postaci i Obóz oraz jego Ewolucja muszą być komplementarne” i „Następnie trzeba jeszcze zrobić ze dwie nowe Profesje”. Odpowiedzi 382–395:

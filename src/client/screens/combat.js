@@ -465,7 +465,7 @@ export function mountCombat(container, { params, navigate }) {
           ? [h('p', { class: 'system-hint', text: `Z wierzchowcem: ${formatWait(activity.endsAt - activity.startedAt)}.` })]
           : []),
         ...(activity.party ? [h('p', { class: 'system-hint', text: 'Wyprawa drużyny ma wspólny czas: przewinięcie skraca ją wszystkim.' })] : []),
-        h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
+        h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Do tego czasu rozbuduj obóz albo sprawdź zadania.` }),
       ),
       skipper.element,
       cancel,

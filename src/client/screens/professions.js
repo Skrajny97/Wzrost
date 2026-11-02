@@ -548,7 +548,7 @@ export function mountProfessions(container, { params, navigate }) {
         what,
         timer.countdown,
         h('div', { class: 'bar bar--system' }, timer.progress),
-        h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Możesz zamknąć grę.` }),
+        h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Do tego czasu rozbuduj obóz albo sprawdź zadania.` }),
       ),
       timer.skipper.element,
       cancel,
