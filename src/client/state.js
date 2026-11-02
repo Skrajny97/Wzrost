@@ -15,6 +15,9 @@ export const state = {
   // The report just claimed, until the player leaves it: it has the music
   // of its result (data/music.json "reports").
   freshReport: null,
+  // The tag of last week's best guild, in gold wherever a guild's tag shows
+  // (380 C; GET /api/character and the guilds' ranking, guild-fame.js).
+  championTag: null,
 };
 
 const listeners = new Set();
@@ -75,6 +78,7 @@ export async function call(method, path, body) {
     }
     throw error;
   }
+  if (data && Object.hasOwn(data, 'championTag')) state.championTag = data.championTag;
   if (data?.character && (action || actionsShown === shownBefore)) {
     if (action) actionsShown += 1;
     state.offset = data.character.serverTime - (sentAt + Date.now()) / 2;

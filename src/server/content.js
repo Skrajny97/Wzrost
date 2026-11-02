@@ -138,6 +138,9 @@ export function publicContent() {
     // The words of "Poproś gildię", shown where pieces are missing, before
     // the Prośby Gildii answer (src/client/guild-requests.js).
     guildAsk: content.guilds.requests.texts.ask,
+    // The Ranking's tabs and the periods of its "Gildie", and the words of
+    // the best guild of last week by its gold tag (guild-fame.js, 380 C).
+    guildFame: { tabs: content.guilds.fame.texts.tabs, periods: content.guilds.fame.texts.periods, champion: content.guilds.fame.texts.champion },
     // The Sklep Systemu (cosmetics.js): its cosmetics with their prices and
     // looks, for the shop and for every portrait and name that wears one,
     // and the words of its page.

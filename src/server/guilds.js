@@ -9,7 +9,8 @@
 // passes the lead to the first deputy, else to the member there longest,
 // and a guild nobody is in goes with its invitations and its channel. A
 // character that leaves or is removed gets back the pieces of its open
-// offers in the Wymiana (guild-exchange.js) at once.
+// offers in the Wymiana (guild-exchange.js) at once. The best guild of last
+// week says so on its page (guild-fame.js).
 
 import { blockedName, isUnlocked } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
@@ -17,6 +18,7 @@ import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
 import { offersReturned, settleOffers } from './guild-exchange.js';
+import { championFrom, championOf, championStatement } from './guild-fame.js';
 import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
 
@@ -62,10 +64,11 @@ export async function guildOf(db, characterId) {
 // founding one. The leader and the deputies get the friends they may
 // invite at a tap, those in no guild and not invited yet (the author: "Do
 // Gildii tez powinna być opcja zapraszania z pozycji ekranu Gildii").
+// `champion`: whether the guild was the best of last week (380 C).
 export async function guildView(db, characterId, now) {
   const guild = await guildOf(db, characterId);
   const inviting = guild !== null && guild.role !== 'member';
-  const [members, sent, invites, friends] = await db.batch([
+  const [members, sent, invites, friends, best] = await db.batch([
     db
       .prepare(
         `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, c.cosmetics, m.role, u.seen_at
@@ -92,6 +95,7 @@ export async function guildView(db, characterId, now) {
          ORDER BY o.name`,
       )
       .bind(characterId, characterId, characterId, inviting ? 1 : 0, guild?.id ?? 0),
+    championStatement(db, now),
   ]);
   const { onlineSeconds } = content.community.trade;
   const online = (row) => row.played === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000;
@@ -103,6 +107,7 @@ export async function guildView(db, characterId, now) {
       tag: guild.tag,
       size,
       role: guild.role,
+      champion: championFrom(best.results[0])?.id === guild.id,
       members: members.results.map((row) => ({
         id: row.id,
         name: row.name,
@@ -127,10 +132,12 @@ const answer = async (db, characterId, now, extra = {}) => json({ ...(await guil
 
 // GET /api/guild: the character's offers in the Wymiana whose time is up
 // give their pieces back first (guild-exchange.js), and the character comes
-// with the answer when they did.
+// with the answer when they did. The first look of a new week freezes the
+// Sława of the week before (guild-fame.js).
 export async function getGuild(context) {
   const { session, player } = await requireGuildPlayer(context);
   const db = context.env.DB;
+  await championOf(db, context.now);
   const settled = await settleOffers(db, player.row.id, context.now);
   return answer(db, player.row.id, context.now, settled ? { character: characterView(await loadPlayer(db, session.userId), context.now) } : {});
 }

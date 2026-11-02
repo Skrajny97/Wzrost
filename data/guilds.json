@@ -1,5 +1,5 @@
 {
-  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz. tabs: zakładki strony Gildii (#/gildia/<id>), po kolei: gildia z członkami, Bestia, Próby, Prośby Gildii i Wymiana.",
+  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz. tabs: zakładki strony Gildii (#/gildia/<id>), po kolei: gildia z członkami, Bestia, Próby, Prośby Gildii i Wymiana. fame: Sława gildii w tygodniu, ranking gildii i najlepsza gildia poprzedniego tygodnia.",
   "place": "guild-keep",
   "found": {
     "level": 30,
@@ -334,6 +334,31 @@
         "short": "Brakuje: {missing} {genitive}.",
         "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz."
       }
+    }
+  },
+  "fame": {
+    "$comment": "Ranking gildii: Sława tygodnia (src/server/guild-fame.js, screens/ranking.js; DECISIONS.md, „Ranking gildii: Sława tygodnia”). Autor: „379 A”, „380 C”, „381 A”. Tydzień jak przy zadaniach tygodniowych: od poniedziałku, od północy czasu polskiego. Sława gildii w tygodniu: beast.perPercent za każdy pełny 1% paska HP bestii tygodnia zbity przez gildię i beast.fell, gdy bestia padła; trials.perTrial za każdą próbę wykonaną w tygodniu, z jednej postaci najwyżej tyle prób, ile liczy pasek Prób (trials.cap Prób Gildii); requests.perPiece za każdą sztukę daną w tygodniu w Prośbach Gildii, z jednej postaci najwyżej requests.cap sztuk; exchange.perExchange za każdą ofertę Wymiany wziętą w tygodniu, z jednej biorącej postaci najwyżej exchange.cap wymian. Najpierw limity postaci, potem suma gildii. Pierwsze w nowym tygodniu spojrzenie na ranking gildii, stronę Gildii albo najlepszą gildię (każde wczytanie postaci) zapisuje raz Sławę poprzedniego tygodnia każdej gildii; „Od początku” to zapisane tygodnie i Sława tego tygodnia. Najlepsza gildia poprzedniego tygodnia (najwięcej Sławy, większej niż zero; przy remisie starsza gildia) ma przez cały tydzień złoty skrót wszędzie, gdzie skrót stoi, a jej strona Gildii mówi o tym słowami champion. texts: słowa Rankingu (zakładki, okresy, kolumny), opis pod „Jak to działa?” i strona Gildii; {…} wypełnia gra (pointForms: rzeczownik po liczbie punktów).",
+    "beast": { "perPercent": 1, "fell": 50 },
+    "trials": { "perTrial": 10 },
+    "requests": { "perPiece": 1, "cap": 30 },
+    "exchange": { "perExchange": 2, "cap": 10 },
+    "texts": {
+      "tabs": { "characters": "Postacie", "guilds": "Gildie" },
+      "periods": { "week": "Ten tydzień", "all": "Od początku" },
+      "lead": "Sława to punkty gildii za to, co członkowie robią razem. Tydzień zaczyna się w poniedziałek o północy.",
+      "how": [
+        "Bestia Gildii: {beastPercent} za każdy pełny 1% paska bestii tygodnia i {beastFell} za jej upadek.",
+        "Próby Gildii: {perTrial} za każdą wykonaną próbę. Z jednej postaci liczy się najwyżej {trialCap} prób, jak na pasku Prób.",
+        "Prośby Gildii: {perPiece} za każdą sztukę daną członkowi gildii. Z jednej postaci liczy się najwyżej {giftCap} sztuk.",
+        "Wymiana: {perExchange} za każdą wymianę. Z jednej postaci, która bierze oferty, liczy się najwyżej {exchangeCap} wymian.",
+        "„Od początku” to Sława wszystkich tygodni razem z tym.",
+        "Gildia z największą Sławą poprzedniego tygodnia ma przez cały tydzień złoty skrót. Przy remisie wygrywa starsza gildia."
+      ],
+      "pointForms": ["punkt", "punkty", "punktów"],
+      "columns": { "place": "#", "guild": "Gildia", "members": "Członkowie", "fame": "Sława" },
+      "own": "Twoja gildia: {place}. miejsce.",
+      "empty": "Nie ma jeszcze żadnej gildii.",
+      "champion": "Najlepsza gildia poprzedniego tygodnia"
     }
   }
 }

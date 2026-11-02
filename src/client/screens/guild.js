@@ -27,7 +27,7 @@ import { mountGuildTrials } from '../guild-trials.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, state } from '../state.js';
-import { confirmAction, framedName, toast, withButton } from '../ui.js';
+import { confirmAction, framedName, guildTag, toast, withButton } from '../ui.js';
 import { lockedScreen } from './locked.js';
 
 const PAGE = '#/gildia';
@@ -245,7 +245,10 @@ function mountGuild(container) {
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'guild-title' },
-      h('h2', { class: 'card-title', id: 'guild-title' }, icon('banner', { size: 22 }), `${guild.name} [${guild.tag}]`),
+      // The tag as beside the names, in gold for the best guild of last
+      // week, which its page names so (380 C).
+      h('h2', { class: 'card-title', id: 'guild-title' }, icon('banner', { size: 22 }), `${guild.name} `, guildTag(guild.tag)),
+      guild.champion && h('p', { class: 'guild-champion' }, icon('trophy', { size: 18 }), state.content.guildFame.champion),
       // The members folded (the author: "lista członków Gildii powinna być
       // rozwijana"), their count in sight.
       h(

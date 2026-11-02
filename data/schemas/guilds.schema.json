@@ -12,7 +12,8 @@
     "tabs",
     "trials",
     "requests",
-    "exchange"
+    "exchange",
+    "fame"
   ],
   "properties": {
     "$comment": {
@@ -233,6 +234,9 @@
     },
     "exchange": {
       "$ref": "#/definitions/exchange"
+    },
+    "fame": {
+      "$ref": "#/definitions/fame"
     }
   },
   "definitions": {
@@ -990,6 +994,208 @@
           "additionalProperties": {
             "type": "string",
             "minLength": 1
+          }
+        }
+      }
+    },
+    "fame": {
+      "description": "Ranking gildii: Sława tygodnia (src/server/guild-fame.js, src/client/screens/ranking.js).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beast",
+        "trials",
+        "requests",
+        "exchange",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "beast": {
+          "description": "Bestia Gildii: Sława za każdy pełny 1% paska bestii tygodnia i za jej upadek.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "perPercent",
+            "fell"
+          ],
+          "properties": {
+            "perPercent": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "fell": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "trials": {
+          "description": "Próby Gildii: Sława za każdą próbę wykonaną w tygodniu; limit postaci to trials.cap Prób.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "perTrial"
+          ],
+          "properties": {
+            "perTrial": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "requests": {
+          "description": "Prośby Gildii: Sława za każdą daną sztukę, z jednej postaci najwyżej cap sztuk.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "perPiece",
+            "cap"
+          ],
+          "properties": {
+            "perPiece": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "cap": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "exchange": {
+          "description": "Wymiana: Sława za każdą wziętą ofertę, z jednej biorącej postaci najwyżej cap wymian.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "perExchange",
+            "cap"
+          ],
+          "properties": {
+            "perExchange": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "cap": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tabs",
+            "periods",
+            "lead",
+            "how",
+            "pointForms",
+            "columns",
+            "own",
+            "empty",
+            "champion"
+          ],
+          "properties": {
+            "tabs": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "characters",
+                "guilds"
+              ],
+              "properties": {
+                "characters": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "guilds": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "periods": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "week",
+                "all"
+              ],
+              "properties": {
+                "week": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "all": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "lead": {
+              "type": "string",
+              "minLength": 1
+            },
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pointForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "columns": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "place",
+                "guild",
+                "members",
+                "fame"
+              ],
+              "properties": {
+                "place": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "guild": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "members": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "fame": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "own": {
+              "type": "string",
+              "pattern": "\\{place\\}"
+            },
+            "empty": {
+              "type": "string",
+              "minLength": 1
+            },
+            "champion": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         }
       }
