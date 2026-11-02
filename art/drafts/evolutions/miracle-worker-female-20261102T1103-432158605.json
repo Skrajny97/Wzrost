@@ -1,0 +1,30 @@
+{
+  "id": "miracle-worker-female",
+  "payload": {
+    "prompt": "young woman miracle healer, calm, black hair in a bun, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a white robe with a golden green mantle, a soft halo of light behind the head, holding a staff blossoming with white flowers and a gentle green glow at the top, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 432158605,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793617507,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 14.99,
+    "request_id": "4aceea1b-37d8-46f6-960d-4560835301d7",
+    "outputs_retained_until": 1793703868,
+    "billing": {
+      "source": "balance",
+      "balance_left": 14.99,
+      "balance_charged": 0.36
+    }
+  }
+}

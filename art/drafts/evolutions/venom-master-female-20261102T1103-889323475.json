@@ -1,0 +1,30 @@
+{
+  "id": "venom-master-female",
+  "payload": {
+    "prompt": "young woman venom mistress, sly, dark green hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a dark green hooded cloak, a leather corset with vials of green poison on the belt, a faint green mist around the hands, holding two curved daggers dripping green venom, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 889323475,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793617756,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 13.55,
+    "request_id": "1ae36ad1-0409-4316-a847-8a25a42b49df",
+    "outputs_retained_until": 1793704113,
+    "billing": {
+      "source": "balance",
+      "balance_left": 13.55,
+      "balance_charged": 0.36
+    }
+  }
+}

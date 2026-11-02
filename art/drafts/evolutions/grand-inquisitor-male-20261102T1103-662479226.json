@@ -1,0 +1,30 @@
+{
+  "id": "grand-inquisitor-male",
+  "payload": {
+    "prompt": "young man grand inquisitor, stern, short dark hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a long black and crimson coat over a steel breastplate, a heavy mace with a glowing white head in one hand and a chained iron book at the belt, stern stance, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 662479226,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793617558,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 14.63,
+    "request_id": "51a9b638-cd97-47e3-8240-7deebd414938",
+    "outputs_retained_until": 1793703909,
+    "billing": {
+      "source": "balance",
+      "balance_left": 14.63,
+      "balance_charged": 0.36
+    }
+  }
+}

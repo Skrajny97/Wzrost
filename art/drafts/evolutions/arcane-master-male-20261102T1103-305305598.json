@@ -1,0 +1,30 @@
+{
+  "id": "arcane-master-male",
+  "payload": {
+    "prompt": "young man arcane master, short black hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a deep purple robe with glowing violet runes, an open spellbook floating beside him, holding a staff topped with a floating violet crystal, faint violet light around the hands, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 96,
+    "height": 128,
+    "num_images": 2,
+    "seed": 305305598,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793617464,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 15.35,
+    "request_id": "a5a3048f-4507-4b20-88d1-5135466469f5",
+    "outputs_retained_until": 1793703820,
+    "billing": {
+      "source": "balance",
+      "balance_left": 15.35,
+      "balance_charged": 0.36
+    }
+  }
+}
