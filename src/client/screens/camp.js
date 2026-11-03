@@ -33,9 +33,12 @@ const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
 // The Skrzynia Konta stands on the board by the road out, across it from the
 // Stół rozbiórki, with a screen of its own like a building's
 // (screens/chest.js). On the taller board it moves down with the plots below
-// the Osada's band.
+// the Osada's band. It stands on the open grass at the end of its path in
+// every look of the ground: further right, the forest of the first look
+// reaches the glade (the author: "Tu gdzie Skrzynia Konta jest to brzydko
+// wygląda jeszcze").
 const CHEST = 'skrzynia-konta';
-const CHEST_SPOT = { x: 250, y: 418 };
+const CHEST_SPOT = { x: 238, y: 406 };
 // The Kamień węgielny Warowni on the board with the Osada, in its band across
 // the road from the Kwatery (the author's "435 A").
 const CORNERSTONE_SPOT = { x: 266, y: 418 };
