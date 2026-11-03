@@ -3011,6 +3011,17 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Uwagi gracza o układzie na komputerze (3.11.2026, pytania 505–508)
+
+Autor przesłał zrzut czatu gracza z 22. poziomu: „Sporo jest jeszcze miejsca na HUD'zie na PC. Może na stałe wyświetlać na pasku drewno, złoto, punkty czasu itp? Byłoby przydatne”, „I mam dziwne odczucie, że muszę scrollować widok obozu po 20 lvl, jak się wydłużył.”, „I fajnie jakby w HUD na PC po lewej stronie walka, profesje, osada itp były rozwijane tak jak postać z dodatkowymi skrótami” i „+ obóz dodany, w tym górnym HUD, wydaje się być mało intuicyjny”.
+
+Propozycje do decyzji autora, z zaznaczeniem na zrzutach obecnego układu:
+
+1. **505:** na wolnym miejscu górnego paska na komputerze na stałe drewno, kamień, ruda żelaza i przewinięcia.
+2. **506:** plansza Obozu z Osadą mieści się na komputerze na wysokość ekranu, bez przewijania.
+3. **507:** Walka, Profesje, Osada i Społeczność w menu po lewej rozwijane jak Postać, ze skrótami do swoich części.
+4. **508:** Obóz z górnego paska do menu po lewej, jako zwykła pozycja.
+
 ## Odpowiedzi autora 498–504 (3.11.2026)
 
 Autor: „501 B, ale do dorysowania bo brakuje sporo / 498 B / 499 ewolucja super / 502 miałeś używać PixelLab teraz jako głównego źródła obrazków również.. / 500.1 A / 500.2 A / 500.3 B / 500.4 B / 500.5 A / 500.6 B / 500.7 B ale nie ma nóg a ma być pełny kształt, całe ciało / 500.8 B / 500.9 A / 500.10 A / 500.11 A / 500.12 B / 500.13 B / 500.14 C brzydkie sprite'y / 500.15 A / 500.16 A / 500.17 C zbyt mało majestatyczny jak na czempiona / 503 A / 504 ważki śmierć do poprawy, bo to jakieś bąbelki wody a nie śmierć ważki wygenerowało się i bóle Rokity o wiele bardziej groźne horrorowe”.
