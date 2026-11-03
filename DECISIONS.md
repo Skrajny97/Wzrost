@@ -3011,13 +3011,14 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
-## Odpowiedzi autora 513, 514 i 500.7 (3.11.2026)
+## Odpowiedzi autora 513, 514 i 500.7, wszystko w PixelLab (3.11.2026)
 
-Autor: „514 wszystko A”, „poprawiony film git” i „500.7 A”.
+Autor: „514 wszystko A”, „poprawiony film git”, „500.7 A” i „wszystko rob w PixelLab teraz, RetroDiffusion bedzie awaryjnie”.
 
 1. **514 A:** nowe plansze obozu we wszystkich trzech wyglądach są przyjęte (zob. „Obóz: budowle na polanie, nie na drzewach”).
 2. **513 A:** poprawiony film promocyjny jest przyjęty: same nazwy klas w ewolucjach, każda nazwa sama, na środku, dłużej na ekranie.
-3. **500.7 A:** Suchotnik z PixelLab, pochylony i szeroki, wypełnia kadr jak inne stwory. Tym samym wszystkie 17 stworów Sosnowych Wydm (500.1–500.17) ma wybrane rysunki. Popielec (500.14 A) i Raróg (500.17 B) też pochodzą z PixelLab, reszta z Retro Diffusion. Następne są materiały, miejsca i kraina, rysowane w PixelLab, a tła w Retro Diffusion.
+3. **500.7 A:** Suchotnik z PixelLab, pochylony i szeroki, wypełnia kadr jak inne stwory. Tym samym wszystkie 17 stworów Sosnowych Wydm (500.1–500.17) ma wybrane rysunki. Popielec (500.14 A) i Raróg (500.17 B) też pochodzą z PixelLab, reszta z Retro Diffusion. Następne są materiały, miejsca i kraina, wszystkie rysowane w PixelLab (punkt 4).
+4. **Wszystko w PixelLab.** Od teraz PixelLab rysuje każdą grafikę, także tła: kartę krainy, kręgi miejsc, panoramę Walki i plansze. Retro Diffusion zostaje na awarię, gdy PixelLab czegoś nie umie albo nie działa, i wtedy raport mówi o tym wprost. Zmienia to „Retro Diffusion zostaje tylko dla grafik, których PixelLab nie robi” z punktu 4 w „Druga ewolucja: portrety z PixelLab”.
 
 ## Materiały tej samej rzadkości się sumują (481 B, 3.11.2026)
 
@@ -3851,7 +3852,7 @@ Autor: „uzupełniłem bilans w retrodiffusion ale oszczędzaj”, „A nie lep
 3. **Porównanie z Retro Diffusion.**
     - PixelLab, próba na Władcy Piorunów w obu wersjach: wszystkie 8 obrazków jest całych, 7–8 pikseli od krawędzi.
     - Retro Diffusion, trzecia runda (16 portretów po 3 wersje, 8,64 USD; na koncie zostaje 47,13 USD): ucięte są wszystkie wersje Druidki, Wielkiej Inkwizytorki, Arcykapłana, Nekromanty i Władczyni Piorunów. Przy Czempionie Areny, Władcy Piorunów i Arcymagu przekroczony był czas rysowania.
-4. **Od teraz** brakujące i poprawiane portrety rysuje PixelLab. Retro Diffusion zostaje tylko dla grafik, których PixelLab nie robi, i używany jest oszczędnie.
+4. **Od teraz** brakujące i poprawiane portrety rysuje PixelLab. Retro Diffusion zostaje tylko dla grafik, których PixelLab nie robi, i używany jest oszczędnie. Od 3.11.2026 Retro Diffusion jest tylko awaryjny (zob. „Odpowiedzi autora 513, 514 i 500.7, wszystko w PixelLab”).
 
 ## Druga ewolucja: odpowiedzi autora na pary portretów (2.11.2026)
 
