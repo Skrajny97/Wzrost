@@ -1,0 +1,17 @@
+{
+  "id": "wisp",
+  "tool": "pixellab generate-image-v2",
+  "description": "a small tame will-o'-the-wisp, a floating ball of pale blue spectral fire with a bright white core and a short flickering flame tail trailing to the left, no face, no body, no ground, glowing softly, the whole flame inside the image, isolated on a plain background, forest fantasy",
+  "style": "src/client/art/materials/rat-tail.png",
+  "references": [
+    {
+      "path": "art/references/pets/wisp.png",
+      "usage": "the same pale blue flame with its flickering tail, only drawn smaller"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

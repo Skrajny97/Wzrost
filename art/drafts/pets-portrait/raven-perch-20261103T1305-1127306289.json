@@ -1,0 +1,17 @@
+{
+  "id": "raven-perch",
+  "tool": "pixellab generate-image-v2",
+  "description": "a small tame black raven, a loyal animal companion, with glossy blue-black feathers and a strong black beak, perched upright with its wings folded, seen from the side in profile facing right, standing on its two feet, the whole bird inside the image, isolated bird on a plain background, forest fantasy",
+  "style": "src/client/art/materials/rat-tail.png",
+  "references": [
+    {
+      "path": "art/references/pets/raven-perch.png",
+      "usage": "the same perched raven, its pose, colours and look, only drawn smaller"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}
