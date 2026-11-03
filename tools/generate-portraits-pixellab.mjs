@@ -1,9 +1,11 @@
 // Draws portrait drafts with PixelLab's Pro image generation
 // (generate-image-v2; pixellab.ai), PixelLab being the main tool for the
 // game's art (DECISIONS.md, "Druga ewolucja: portrety z PixelLab" and
-// "Druga ewolucja: odpowiedzi autora na trzecią rundę portretów"). Each
-// prompt of a kind in art/prompts.json is drawn at the kind's size on a
-// transparent background, in the style of the kind's style image
+// "Druga ewolucja: odpowiedzi autora na trzecią rundę portretów"), and since
+// 3.11.2026 of every picture, backgrounds too ("wszystko w PixelLab"). Each
+// prompt of a kind in art/prompts.json is drawn at the kind's size, on a
+// transparent background unless the kind keeps its own (removeBackground:
+// false: the places' circles, the lands), in the style of the kind's style image
 // (pixellab.style: an approved picture, for its pixel size, outline, shading
 // and detail, not its colours; pixellab.styles[id] for one prompt of its
 // own, e.g. a broad creature that fills its frame), with up to four
@@ -106,7 +108,9 @@ async function draw(id, seed) {
     description: promptOf(id),
     image_size: { width, height },
     seed,
-    no_background: true,
+    // A kind drawn with its background (removeBackground: false, e.g. the
+    // places' circles and the lands) keeps it; every other is transparent.
+    no_background: kind.removeBackground !== false,
     ...(style && {
       style_image: reference(style),
       style_options: { color_palette: false, outline: true, detail: true, shading: true },

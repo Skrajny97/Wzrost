@@ -567,6 +567,9 @@
     "height": 128,
     "removeBackground": false,
     "references": [],
+    "pixellab": {
+      "style": "src/client/art/areas/rokita-deep.png"
+    },
     "prompts": {
       "windfalls-edge": "sparse grove of young birches and pines at the edge of an old forest, the first fallen tree trunks lying across the grass, a pale moon low in a dusky green sky, calm evening, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
       "fox-ravines": "sandy forest ravine with steep earthen banks full of fox burrows, tree roots hanging from the banks, an orange fox sitting at the bottom of the ravine, warm dusk light, centered composition for a round medallion frame, pixel art scene, muted dark forest palette of deep greens and browns, soft light, no text, no border, no people",
@@ -592,7 +595,12 @@
       "black-tarn": "a small round lake of pitch-black water in a peat bog, a floating carpet of moss at its edges, rings on the water where a big fish moves, dark terns flying over it, dusk, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
       "sunken-shrine": "an ancient Slavic pagan wooden temple sunk in a black bog, tall carved wooden idol pillars leaning out of dark water, a rotten palisade, old offerings of bones and amber on a stone, mist, night, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
       "quaking-bog": "a quaking bog, a thin carpet of sphagnum moss over bottomless black holes, ripples spreading on the moss, dead grey birches, two glowing yellow eyes in the dark between them, low grey sky, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
-      "rokita-deep": "the darkest heart of a black swamp, a ring of old gnarled willows around a bottomless black pool, green devilish fire burning on the water, the silhouette of horns in the mist, night, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people"
+      "rokita-deep": "the darkest heart of a black swamp, a ring of old gnarled willows around a bottomless black pool, green devilish fire burning on the water, the silhouette of horns in the mist, night, centered composition for a round medallion frame, pixel art scene, muted dark swamp palette of deep greens, browns and grey-blues, soft light, no text, no border, no people",
+      "heather-dunes": "rolling sand dunes overgrown with purple heather at dusk, a few lone crooked pines on the crests, wind-blown sand streaming off the dune tops, a dark hollow in the sand like an empty eye socket, centered composition for a round medallion frame, pixel art scene, muted palette of sandy ochres, heather purples and dark pine greens, soft light, no text, no border, no people",
+      "resin-pinewood": "a dense old pine forest, tall straight trunks bleeding thick golden resin that glows faintly, amber drops with trapped insects on the bark, a carpet of brown needles, hazy shafts of light, centered composition for a round medallion frame, pixel art scene, muted palette of dark pine greens, resin ambers and bark browns, soft light, no text, no border, no people",
+      "drifting-sands": "a sea of drifting sand between half-buried dead pines, a sand whirlwind rising, an old burial mound with a tilted standing stone on top, hot shimmering haze, centered composition for a round medallion frame, pixel art scene, muted palette of sandy ochres, bleached greys and dusty browns, soft light, no text, no border, no people",
+      "tar-pits": "old tar kilns in a pine forest, smoking earthen mounds, black pits of boiling tar, clay pots and barrels by a hut, low black smoke drifting between the pines, a few glowing embers, centered composition for a round medallion frame, pixel art scene, muted palette of tar blacks, ember oranges and dark pine greens, soft light, no text, no border, no people",
+      "burnt-forest": "a burnt pine forest, charred black trunks with glowing embers in their cracks, grey ash covering the ground, sparks rising into a red smoky sky, centered composition for a round medallion frame, pixel art scene, muted palette of charcoal blacks, ash greys and ember reds, soft light, no text, no border, no people"
     }
   },
   "lands": {
@@ -601,12 +609,16 @@
     "height": 96,
     "removeBackground": false,
     "references": [],
+    "pixellab": {
+      "style": "src/client/art/lands/black-bog.png"
+    },
     "prompts": {
       "windfalls": "pixel art landscape, a long belt of fallen and toppled trees at the edge of a primeval forest, upturned roots, a faint will-o-the-wisp light glowing in the thicket, dusk, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and browns, no text, no border, no people, no animals in front",
       "stone-glade": "pixel art landscape, a forest glade with a ring of moss-covered standing stones, the dark primeval forest rising beyond it, light mist, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and browns, no text, no border, no people, no animals in front",
       "backwaters": "pixel art landscape, a wide valley where an old river overflowed into the forest, reeds, beaver dams and dead trees standing in shallow water, mist over old willows, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, browns and grey-blues, no text, no border, no people, no animals in front",
       "peat-bogs": "pixel art landscape, a vast peat bog covered with moss and hummocks, black pools of water, low fumes and smoke over the peat, a few crooked pines, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, browns and rusty reds, no text, no border, no people, no animals in front",
-      "black-bog": "pixel art landscape, a vast black bog at dusk, pitch-black pools between dark alder thickets on stilt roots, old carved wooden idols leaning in the water, gnarled willows, a faint green mist low over the moss, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, browns and black-blues, no text, no border, no people, no animals in front"
+      "black-bog": "pixel art landscape, a vast black bog at dusk, pitch-black pools between dark alder thickets on stilt roots, old carved wooden idols leaning in the water, gnarled willows, a faint green mist low over the moss, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, browns and black-blues, no text, no border, no people, no animals in front",
+      "pine-dunes": "pixel art landscape, vast sand dunes overgrown with purple heather and old crooked pines, a dark pine forest on the horizon with thin smoke rising from tar kilns, far away a burnt stretch of black trunks, a pale hazy dusk sky, wide panorama for a dim background behind text, low contrast, muted palette of sandy ochres, dark pine greens and heather purples, no text, no border, no people, no animals in front"
     }
   },
   "logo": {

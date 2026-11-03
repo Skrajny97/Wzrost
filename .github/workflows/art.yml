@@ -1,7 +1,8 @@
 # Draws sprite drafts with Retro Diffusion (tools/generate-art.mjs), the
 # evolution portraits, the walks' start frames, the creatures, materials and
-# busts with PixelLab (kinds evolutions-, walk-starts-, monsters-, materials-
-# and residents-pixellab, "variants" are calls of four versions each,
+# busts, the places' circles and the lands with PixelLab (kinds evolutions-,
+# walk-starts-, monsters-, materials-, residents-, areas- and lands-pixellab,
+# "variants" are calls, of one to 64 versions each by size,
 # tools/generate-portraits-pixellab.mjs), or the
 # walks animated by PixelLab (kind walks-pixellab, tools/animate-walks.mjs),
 # the mounts posed frame by frame (mounts-skeleton, tools/animate-mounts-skeleton.mjs),
@@ -29,6 +30,8 @@ on:
           - materials-pixellab
           - residents-pixellab
           - walk-starts-pixellab
+          - areas-pixellab
+          - lands-pixellab
           - materials
           - resources
           - narrator
@@ -120,7 +123,7 @@ jobs:
             node tools/animate-mounts-skeleton.mjs "${args[@]}"
             exit
           fi
-          if [ "$KIND" = "evolutions-pixellab" ] || [ "$KIND" = "walk-starts-pixellab" ] || [ "$KIND" = "monsters-pixellab" ] || [ "$KIND" = "materials-pixellab" ] || [ "$KIND" = "residents-pixellab" ]; then
+          if [ "$KIND" = "evolutions-pixellab" ] || [ "$KIND" = "walk-starts-pixellab" ] || [ "$KIND" = "monsters-pixellab" ] || [ "$KIND" = "materials-pixellab" ] || [ "$KIND" = "residents-pixellab" ] || [ "$KIND" = "areas-pixellab" ] || [ "$KIND" = "lands-pixellab" ]; then
             args=(--kind "${KIND%-pixellab}" --ids "$IDS" --calls "$VARIANTS" --max-cost "$MAX_COST")
             if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
             node tools/generate-portraits-pixellab.mjs "${args[@]}"
