@@ -637,7 +637,8 @@
             "enum": [
               "material",
               "herb",
-              "potion"
+              "potion",
+              "mineral"
             ]
           }
         },
@@ -714,7 +715,8 @@
               "required": [
                 "material",
                 "herb",
-                "potion"
+                "potion",
+                "mineral"
               ],
               "properties": {
                 "material": {
@@ -726,6 +728,10 @@
                   "minLength": 1
                 },
                 "potion": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mineral": {
                   "type": "string",
                   "minLength": 1
                 }
@@ -814,7 +820,8 @@
               "required": [
                 "material",
                 "herb",
-                "potion"
+                "potion",
+                "mineral"
               ],
               "properties": {
                 "material": {
@@ -826,6 +833,10 @@
                   "minLength": 1
                 },
                 "potion": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mineral": {
                   "type": "string",
                   "minLength": 1
                 }

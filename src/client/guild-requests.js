@@ -11,7 +11,7 @@
 // (data/guilds.json, requests.texts). mountGuildRequests(container) adds
 // the card to the container and gives { unmount() }, which takes it away.
 
-import { herbSprite, potionSprite } from './art.js';
+import { herbSprite, mineralSprite, potionSprite } from './art.js';
 import { checkGuildTodo } from './chat-news.js';
 import { materialIcon } from './craft-table.js';
 import { fill, h, icon } from './dom.js';
@@ -22,18 +22,19 @@ import { call, state } from './state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
-const KINDS = ['material', 'herb', 'potion'];
+const KINDS = ['material', 'herb', 'potion', 'mineral'];
 const rarityOf = (id) => state.content.rarities.find((rarity) => rarity.id === id);
 
-// The picture of goods: a material's, a herb's or a potion's.
+// The picture of goods: a material's, a herb's, a potion's or a mineral's.
 function goodsArt(goods, size = 24) {
   if (goods.kind === 'material') return materialIcon(goods.materialId, size);
   if (goods.kind === 'herb') return herbSprite(goods.key) ?? icon('leaf', { size });
+  if (goods.kind === 'mineral') return mineralSprite(goods.key) ?? icon('ore', { size });
   return potionSprite(goods.key) ?? icon('flask', { size });
 }
 
-// Goods in one line: the picture and the name, in a material's rarity
-// colour.
+// Goods in one line: the picture and the name, in a material's or a
+// mineral's rarity colour.
 function goodsLine(goods, extra = null) {
   const rarity = rarityOf(goods.rarity);
   return h(
@@ -58,6 +59,7 @@ function held(goods) {
   const character = state.character;
   if (goods.kind === 'herb') return character.herbs?.find((one) => one.id === goods.key)?.count ?? 0;
   if (goods.kind === 'potion') return character.potions?.find((one) => one.id === goods.key)?.count ?? 0;
+  if (goods.kind === 'mineral') return character.minerals?.find((one) => one.id === goods.key)?.count ?? 0;
   return character.crafting?.materials.find((one) => one.key === goods.key)?.count ?? 0;
 }
 
@@ -125,12 +127,13 @@ function fillAskSheet(body, view, ask, onAsked) {
   if (view.waiting) return fill(body, h('p', { class: 'sheet-text', text: texts.askWaiting }), view.mine && h('p', { class: 'guild-mine-goods' }, goodsLine(view.mine.goods, h('span', { class: 'muted', text: ` × ${formatNumber(view.mine.count)}` }))), toCard());
   if (view.nextAt) return fill(body, h('p', { class: 'sheet-text', text: filled(texts.waitNext, { at: dateTimeFormat.format(new Date(view.nextAt)) }) }), toCard());
   // A list of all the goods known goes in the order shown: by kind, a
-  // material by its rarity, then by name.
+  // material or a mineral by its rarity, then by name.
   const mixed = !(ask.rarity || ask.key);
   const order = (id) => state.content.rarities.findIndex((one) => one.id === id);
+  const rarityOrdered = (kind) => kind === 'material' || kind === 'mineral';
   const list = mixed
     ? [...choices(view.known, ask)].sort(
-        (a, b) => KINDS.indexOf(a.kind) - KINDS.indexOf(b.kind) || (a.kind === 'material' ? order(a.rarity) - order(b.rarity) : 0) || a.name.localeCompare(b.name, 'pl'),
+        (a, b) => KINDS.indexOf(a.kind) - KINDS.indexOf(b.kind) || (rarityOrdered(a.kind) ? order(a.rarity) - order(b.rarity) : 0) || a.name.localeCompare(b.name, 'pl'),
       )
     : choices(view.known, ask);
   if (list.length === 0) return fill(body, h('p', { class: 'sheet-text', text: texts.noGoods }));

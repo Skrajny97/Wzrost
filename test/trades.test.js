@@ -142,6 +142,42 @@ describe('Wymiana', () => {
     assert.deepEqual([(await row('Ala')).gold, (await row('Ola')).gold], [530, 470]);
   });
 
+  // The author's 571 ("koniecznie"): the gems and ores of Górnictwo in the
+  // Wymiana too.
+  test('gems and ores go in a trade too, take no places in the bag and stay out of the Encyklopedia', async () => {
+    const stock = (name, minerals) => db().then((database) => database.prepare('UPDATE characters SET minerals = ? WHERE name = ?').bind(JSON.stringify(minerals), name).run());
+    const held = async (name) => {
+      const found = await (await db()).prepare('SELECT minerals, foreign_stacks, discovered FROM characters WHERE name = ?').bind(name).first();
+      return { minerals: JSON.parse(found.minerals), foreign: JSON.parse(found.foreign_stacks), discovered: JSON.parse(found.discovered) };
+    };
+    await stock('Ala', { sapphire: 2, 'silver-ore': 10 });
+    await stock('Ola', { quartz: 3 });
+    const id = await opened();
+    assert.equal((await trade(players.ala, 'offer', { id, offer: { minerals: { sapphire: 3 } } })).data.error.code, 'not_enough');
+    assert.equal((await trade(players.ala, 'offer', { id, offer: { minerals: { glass: 1 } } })).data.error.code, 'invalid_offer');
+    await trade(players.ala, 'offer', { id, offer: { minerals: { sapphire: 2, 'silver-ore': 4 } } });
+    const offered = await trade(players.ola, 'offer', { id, offer: { minerals: { quartz: 1 }, gold: 40 } });
+    assert.deepEqual(
+      offered.data.trade.theirs.minerals.map((stack) => [stack.id, stack.name, stack.rarity, stack.count]),
+      [
+        ['sapphire', 'Szafir', 'legendary', 2],
+        ['silver-ore', 'Srebrny kruszec', 'common', 4],
+      ],
+    );
+    const locked = await trade(players.ola, 'confirm', { id, version: offered.data.trade.version });
+    const done = await trade(players.ala, 'confirm', { id, version: locked.data.trade.version });
+    assert.equal(done.data.trade.state, 'done', JSON.stringify(done.data));
+    for (const cookie of [players.ala, players.ola]) await call('GET', '/api/character', { cookie });
+    const ala = await held('Ala');
+    const ola = await held('Ola');
+    assert.deepEqual(ala.minerals, { 'silver-ore': 6, quartz: 1 });
+    assert.deepEqual(ola.minerals, { quartz: 2, sapphire: 2, 'silver-ore': 4 });
+    assert.deepEqual(ola.foreign, { 'mineral:sapphire': 2, 'mineral:silver-ore': 4 });
+    // Ola's own quartz counts in the Encyklopedia, the sapphires from the trade do not.
+    assert.deepEqual([ola.discovered['mineral:quartz'], ola.discovered['mineral:sapphire']], [1, undefined]);
+    assert.equal(ala.discovered['mineral:quartz'], undefined);
+  });
+
   test('a confirmation is for the offers as seen, and a trade that lost its items moves nothing', async () => {
     const given = await inBag('Ala', amulet(3));
     const id = await opened();

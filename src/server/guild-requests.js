@@ -1,6 +1,7 @@
 // The Prośby Gildii (the author's 346 A; data/guilds.json `requests`;
 // DECISIONS.md, "Próby i Prośby Gildii"): a member short of a material, a
-// herb or a potion asks its guild for up to `most` pieces of it, and the
+// herb, a potion or a mineral of Górnictwo asks its guild for up to `most`
+// pieces of it, and the
 // request hangs on the guild's page until it is filled, taken back or its
 // time is up. The others give from their own stock whenever they like, up
 // to what is still missing; the pieces go straight to the one who asked,
@@ -36,24 +37,30 @@ const words = () => rules().texts;
 const errors = () => words().errors;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 const HOUR = 3600000;
-const COLUMNS = { material: 'materials', herb: 'herbs', potion: 'potions' };
+const COLUMNS = { material: 'materials', herb: 'herbs', potion: 'potions', mineral: 'minerals' };
 const jsonPath = (key) => `$."${key}"`;
 const changed = () => new ApiError(409, 'changed', errors().changed);
 const member = (context) => requireMember(context, errors());
 
-// Whether the game has the goods: a material at a rarity, a herb or a potion.
+// Whether the game has the goods: a material at a rarity, a herb, a potion
+// or a gem or an ore.
 function realGood(kind, key) {
   if (!rules().kinds.includes(kind) || typeof key !== 'string') return false;
   if (kind === 'material') return knownStack(key, content);
+  if (kind === 'mineral') return Object.hasOwn(content.mineralsById, key);
   return Object.hasOwn(kind === 'herb' ? content.herbsById : content.potionsById, key);
 }
 
 // Goods as the page shows them: the name, and for a material its rarity
-// and the material for its picture.
+// and the material for its picture, for a gem or an ore its rarity.
 function goodsView(kind, key) {
   if (kind === 'material') {
     const material = materialView(key, 0, content);
     return { kind, key, name: material.label.charAt(0).toUpperCase() + material.label.slice(1), rarity: material.rarity, materialId: material.materialId };
+  }
+  if (kind === 'mineral') {
+    const mineral = content.mineralsById[key];
+    return { kind, key, name: mineral?.name ?? key, rarity: mineral && (mineral.rarity ?? mineral.for[0]) };
   }
   return { kind, key, name: (kind === 'herb' ? content.herbsById[key] : content.potionsById[key])?.name ?? key };
 }
@@ -61,10 +68,11 @@ function goodsView(kind, key) {
 const stockOf = (row, kind, key) => JSON.parse(row[COLUMNS[kind]] ?? '{}')[key] ?? 0;
 
 // How many pieces of the goods the character's bag takes now: materials
-// take no place; herbs and potions fill the room left in their stack and
-// the free places, a stack to a place (storeStacks in the engine).
+// and minerals take no place; herbs and potions fill the room left in their
+// stack and the free places, a stack to a place (storeStacks in the engine).
+const roomless = (kind) => kind === 'material' || kind === 'mineral';
 function bagRoom(player, kind, key, now) {
-  if (kind === 'material') return Infinity;
+  if (roomless(kind)) return Infinity;
   const { stack } = content.professionRules;
   const free = Math.max(0, bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player));
   const have = stockOf(player.row, kind, key);
@@ -72,7 +80,8 @@ function bagRoom(player, kind, key, now) {
 }
 
 // The goods the character knows, to ask for: those in its Encyklopedia and
-// those it holds, materials first, then herbs and potions, each by name.
+// those it holds, materials first, then herbs, potions and minerals, each
+// by name.
 function knownGoods(row) {
   const pairs = new Map();
   const add = (kind, key) => {
@@ -212,7 +221,7 @@ export async function getGuildRequests(context) {
   return answer(db, player, guild, context.now);
 }
 
-// POST /api/guild/requests { kind: material | herb | potion, key, count }:
+// POST /api/guild/requests { kind: material | herb | potion | mineral, key, count }:
 // the character asks its guild for pieces of the goods, 1 to `most`; while
 // no request of its own hangs, `waitHours` after the last one was made, and
 // for herbs and potions only with room for them in the bag. A request of
@@ -308,7 +317,7 @@ export async function giveToGuildRequest(context) {
   const adds = counted(column, { [request.good]: count });
   const others = foreign({ [request.kind]: { [request.good]: count } });
   // Herbs and potions only while the asker's bag is as read, with the room.
-  const bag = request.kind !== 'material';
+  const bag = !roomless(request.kind);
   await atomically(
     db,
     [

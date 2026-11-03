@@ -149,6 +149,34 @@ describe('the Prośby Gildii through the API', () => {
     );
   });
 
+  // The author's 571 ("koniecznie"): the gems and ores of Górnictwo in the
+  // Prośby Gildii too.
+  test('a request for a gem or an ore: no room in the bag needed, the gift as goods of a trade', async () => {
+    assert.equal((await ask('mistrz', { kind: 'mineral', key: 'glass', count: 1 })).data.error.code, 'invalid_goods');
+    // The minerals known: those held and those in the Encyklopedia.
+    await setStacks('Mistrz', 'minerals', { amethyst: 1 });
+    await setStacks('Mistrz', 'discovered', { 'mineral:silver-ore': 1 });
+    const known = (await as('mistrz', 'GET', '/api/guild/requests')).data.known.filter((goods) => goods.kind === 'mineral');
+    assert.deepEqual(
+      known.map((goods) => [goods.key, goods.name, goods.rarity]),
+      [
+        ['amethyst', 'Ametyst', 'unique'],
+        ['silver-ore', 'Srebrny kruszec', 'common'],
+      ],
+    );
+    const made = await ask('mistrz', { kind: 'mineral', key: 'amethyst', count: 3 });
+    assert.equal(made.status, 200, JSON.stringify(made.data).slice(0, 300));
+    assert.deepEqual([made.data.mine.goods.name, made.data.mine.count], ['Ametyst', 3]);
+    await setStacks('Druh', 'minerals', { amethyst: 2 });
+    const offered = (await as('druh', 'GET', '/api/guild/requests')).data.requests[0];
+    assert.deepEqual([offered.goods.kind, offered.have, offered.give], ['mineral', 2, 2]);
+    const given = await give('druh', made.data.mine.id, 2);
+    assert.equal(given.status, 200, JSON.stringify(given.data).slice(0, 300));
+    assert.deepEqual(await stacks('Druh', 'minerals'), {});
+    assert.equal((await stacks('Mistrz', 'minerals')).amethyst, 3);
+    assert.equal((await stacks('Mistrz', 'foreign_stacks'))['mineral:amethyst'], 2);
+  });
+
   test('a gift moves the giver\'s trial of the Próby Gildii on, in the same batch', async () => {
     await as('druh', 'GET', '/api/guild/trials');
     await run('UPDATE guild_trial_boards SET trials = ?', JSON.stringify([{ kind: 'gifts', size: 0, roll: 0 }]));

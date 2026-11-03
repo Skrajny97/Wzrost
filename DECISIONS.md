@@ -3034,6 +3034,21 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.24 (3.11.2026)
+
+1. **Kamienie i kruszce w handlu (571):** na Targowisku, w Wymianie i w Prośbach Gildii (zob. „Kamienie i kruszce w handlu”).
+
+## Kamienie i kruszce w handlu (3.11.2026)
+
+Autor: „571 koniecznie”.
+
+1. **Targowisko.** Kamienie i kruszce wystawia się na sztuki, jak zioła i materiały, i mają w „Wystaw” oraz w ofertach własną kategorię „Minerały”. Karta podaje, ile płaci za sztukę złomiarz, i od którego poziomu Górnictwa się je kopie. Kupione i wygrane minerały nie zajmują miejsca w plecaku, więc odbiera się je zawsze, jak materiały.
+2. **Wymiana.** Minerały dochodzą do oferty w osobnej części „Minerały”, jak zioła, mikstury i materiały, najwyżej tyle, ile postać ma.
+3. **Prośby Gildii.** Można prosić o kamień albo kruszec, do 10 sztuk, jak o materiał. W oknie „Poproś gildię” jest zakładka „Minerały” z minerałami, które postać ma albo zna z Encyklopedii, ułożonymi według rzadkości. Minerały nie potrzebują miejsca w plecaku. Teksty Próśb mówią teraz „materiału, zioła, mikstury albo minerału”.
+4. (brakujący szczegół) **Encyklopedia.** Minerały z handlu (Targowisko, Wymiana, Prośby Gildii) liczą się jak inne towary od graczy: Encyklopedia zalicza tylko to, co postać sama wykopie (`foreign_stacks`, `ownDiscoveries` w `src/engine/encyclopedia.js`).
+5. (brakujący szczegół) Kupiec z Targowiska nie sprzedaje minerałów, a złomiarz płaci za nie po staremu.
+6. Testy: `test/market.test.js`, `test/trades.test.js` i `test/guild-requests.test.js` sprawdzają wystawienie, kupno i odbiór, wymianę oraz prośbę i dar.
+
 ## Wersja 0.1.23 (3.11.2026)
 
 1. **Rozebrana biżuteria odsłania swój wzór w Szlifierni**, jak przedmioty w Warsztacie (zob. „Jubilerstwo: wzory z rozbiórki biżuterii”).
@@ -3310,7 +3325,7 @@ Obie profesje otwierają się razem, od 25. poziomu postaci (531, 533). Na zakł
    - (brakujący szczegół) Nie zajmują miejsca w plecaku, jak materiały, więc nic nie przepada. Leżą w nowej zakładce plecaka „Minerały”, widocznej od otwarcia Górnictwa. Zakładki plecaka stoją wtedy po dwie w rzędzie.
    - Karta kamienia mówi, jaką rzadkość daje biżuterii i o ile wzmacnia przedmiot, a karta kruszcu, na oprawy jakiej biżuterii idzie. Złomiarz kupuje je na sztuki (−, +, „wszystkie”), z premią Skupu złomu. Można je też wyrzucić.
    - (brakujący szczegół) Ceny są jak u materiałów tych rzadkości: Kwarc 2 zł, Agat 4, Ametyst 8, Szmaragd 16, Szafir 32, Rubin 64 i Diament 128, a kruszce: srebrny 2, złoty 4 i gwiezdny 8. Sprzedaż całego urobku dodaje do złota z żył ok. 8% na 1. poziomie Górnictwa (postać na 25. poziomie), a przy wysokim Górnictwie 15–30%.
-   - (brakujący szczegół) Na razie kamieni i kruszców nie ma w Wymianie, na Targowisku ani w Prośbach Gildii.
+   - (brakujący szczegół) Na razie kamieni i kruszców nie ma w Wymianie, na Targowisku ani w Prośbach Gildii. Od wersji 0.1.24 są (zob. „Kamienie i kruszce w handlu”).
 5. **Biżuteria (536 A, 537 A).** Zakładka „Biżuteria” w Systemowej Szlifierni: rodzaj (Pierścień, Amulet, Talizman), wzór, kamień i od 1 do 5 sztuk.
    - Wzory odsłania poziom Jubilerstwa, jak w Warsztacie: pierwsza baza rodziny od 1. poziomu, Sygnet, Kaptorga i Otoczak od 10., Obrączka, Wisior i Kieł od 25., a Pierścień rodowy, Medalion i Bursztyn od 50.
    - Rzadkość wyznacza kamień: sztuka bierze 1 kamień swojej rzadkości i kruszec tej rzadkości (srebrny do unikalnej, złoty do legendarnej, gwiezdny wyżej). Kamień szlifuje się od tego poziomu Jubilerstwa, od którego Górnictwo go znajduje.

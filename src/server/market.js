@@ -46,10 +46,10 @@ import { bagPlaces, characterView, loadPlayer, requirePlayer } from './character
 import { content } from './content.js';
 import { assertion, atomically as atomicBatch, raced } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
-import { herbsOf, potionsOf } from './professions-view.js';
+import { herbsOf, mineralsOf, potionsOf } from './professions-view.js';
 import { requireOpen, settlementOf } from './settlement.js';
 
-const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', part: 'parts' };
+const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', part: 'parts', mineral: 'minerals' };
 const STACKS = Object.keys(COLUMNS);
 const tuning = () => content.settlement.market;
 const jsonPath = (key) => `$."${key}"`;
@@ -61,7 +61,8 @@ const atomically = (db, statements) => atomicBatch(db, statements, changed);
 // A stack's goods by kind and key, as a parcel or an offer shows them, with
 // what its card tells (the author: "bym mogl kliknac przedmiot i go
 // sprawdzić u kupca"): its description, what the scrapper pays for a piece
-// (`scrap`) and, for a herb, the Zielarstwo level that gathers it.
+// (`scrap`) and, for a herb, the Zielarstwo level that gathers it, for a
+// gem or an ore of Górnictwo, the level that digs it.
 function goodsView(kind, key, count, item) {
   if (kind === 'item') {
     const data = JSON.parse(item);
@@ -83,6 +84,10 @@ function goodsView(kind, key, count, item) {
   if (kind === 'potion') {
     const potion = content.potionsById[key];
     return { kind, key, count, name: potion?.name ?? key, description: potion?.description, scrap: potion && potionPrice(potion, content) };
+  }
+  if (kind === 'mineral') {
+    const mineral = content.mineralsById[key];
+    return { kind, key, count, name: mineral?.name ?? key, rarity: mineral && (mineral.rarity ?? mineral.for[0]), description: mineral?.description, scrap: mineral?.price, mineLevel: mineral?.level };
   }
   return { kind: 'gold', count };
 }
@@ -165,6 +170,7 @@ function knownGood(kind, key) {
   if (kind === 'herb') return Boolean(content.herbsById[key]);
   if (kind === 'potion') return Boolean(content.potionsById[key]);
   if (kind === 'part') return Boolean(content.partsById[key]);
+  if (kind === 'mineral') return Object.hasOwn(content.mineralsById, key);
   if (kind !== 'material') return false;
   const { materialId, rarityId } = parseStack(key);
   return Boolean(content.materialsById[materialId] && content.raritiesById[rarityId]);
@@ -178,7 +184,7 @@ function knownGood(kind, key) {
 function sellable(player, now) {
   const { row } = player;
   const sellBonus = campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
-  const stacks = { herb: herbsOf(row), potion: potionsOf(row), material: JSON.parse(row.materials ?? '{}'), part: JSON.parse(row.parts ?? '{}') };
+  const stacks = { herb: herbsOf(row), potion: potionsOf(row), material: JSON.parse(row.materials ?? '{}'), part: JSON.parse(row.parts ?? '{}'), mineral: mineralsOf(row) };
   const withBonus = (goods) => (typeof goods.scrap === 'number' ? { ...goods, scrap: goods.scrap * (1 + sellBonus) } : goods);
   return {
     items: player.items.filter((item) => !item.equippedSlot).map((item) => ({ id: item.id, ...itemView(item, content, { sellBonus }) })),
@@ -432,7 +438,7 @@ export function takenOff(column, taken) {
 // (ownDiscoveries in the engine), as those of the Wymiana do.
 export function foreign(adds) {
   const keyed = {};
-  for (const kind of ['herb', 'potion', 'material']) for (const [key, count] of Object.entries(adds[kind] ?? {})) keyed[`${kind}:${key}`] = count;
+  for (const kind of ['herb', 'potion', 'material', 'mineral']) for (const [key, count] of Object.entries(adds[kind] ?? {})) keyed[`${kind}:${key}`] = count;
   return counted('foreign_stacks', keyed);
 }
 
@@ -462,8 +468,9 @@ const stackPlaces = (counts, adds) => {
   return bagStacks(merged, content);
 };
 
-// POST /api/market/collect: everything waiting that fits: gold, materials
-// and parts always, items and herbs or potions while the bag has places.
+// POST /api/market/collect: everything waiting that fits: gold, materials,
+// parts and minerals always, items and herbs or potions while the bag has
+// places.
 // The trade's reputation comes with it.
 export async function collectParcels(context) {
   const { session, player, db } = await requireMarket(context);
@@ -473,7 +480,7 @@ export async function collectParcels(context) {
   if (parcels.length === 0) throw new ApiError(409, 'nothing', 'Nic tu na Ciebie nie czeka.');
   const free = bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player);
   const held = { herb: herbsOf(row), potion: potionsOf(row) };
-  const adds = { herb: {}, potion: {}, material: {}, part: {} };
+  const adds = { herb: {}, potion: {}, material: {}, part: {}, mineral: {} };
   const items = [];
   const taken = [];
   let gold = 0;
@@ -515,9 +522,19 @@ export async function collectParcels(context) {
     db
       .prepare(
         `UPDATE characters SET gold = gold + ?, herbs = ${changes.herb.sql}, potions = ${changes.potion.sql}, materials = ${changes.material.sql}, parts = ${changes.part.sql},
-           foreign_stacks = ${others.sql}, settlement = ?, version = version + 1 WHERE id = ?`,
+           minerals = ${changes.mineral.sql}, foreign_stacks = ${others.sql}, settlement = ?, version = version + 1 WHERE id = ?`,
       )
-      .bind(gold, ...changes.herb.binds, ...changes.potion.binds, ...changes.material.binds, ...changes.part.binds, ...others.binds, JSON.stringify(next), row.id),
+      .bind(
+        gold,
+        ...changes.herb.binds,
+        ...changes.potion.binds,
+        ...changes.material.binds,
+        ...changes.part.binds,
+        ...changes.mineral.binds,
+        ...others.binds,
+        JSON.stringify(next),
+        row.id,
+      ),
     ...items.map((item) => db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)').bind(row.id, JSON.stringify(item), now)),
     db.prepare(`DELETE FROM market_parcels WHERE character_id = ? AND id IN (${list})`).bind(row.id, ...taken),
   ]);

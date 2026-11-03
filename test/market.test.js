@@ -309,6 +309,30 @@ describe('the Targowisko through the API', () => {
     assert.equal((await act('Kramarka', 'collect', {})).data.error.code, 'nothing');
   });
 
+  // The author's 571 ("koniecznie"): the gems and ores of Górnictwo on the
+  // Targowisko too.
+  test('gems and ores go up as stacks, take no place in the bag and come from a trade, as the Encyklopedia sees them', async () => {
+    await (await db()).prepare(`UPDATE characters SET minerals = '{"emerald":4,"gold-ore":9}' WHERE name = 'Kramarka'`).run();
+    const view = await market('Kramarka');
+    const emerald = view.sellable.stacks.find((goods) => goods.kind === 'mineral' && goods.key === 'emerald');
+    assert.deepEqual([emerald.name, emerald.count, emerald.rarity, emerald.scrap, emerald.mineLevel], ['Szmaragd', 4, 'epic', 16, 25]);
+    assert.equal(view.sellable.stacks.find((goods) => goods.key === 'gold-ore').rarity, 'epic');
+    assert.equal((await act('Kramarka', 'list', { kind: 'mineral', key: 'emerald', count: 5, startPrice: 100, buyNow: null })).data.error.code, 'not_enough');
+    assert.equal((await act('Kramarka', 'list', { kind: 'mineral', key: 'nothing', count: 1, startPrice: 100, buyNow: null })).data.error.code, 'not_enough');
+    const listed = await act('Kramarka', 'list', { kind: 'mineral', key: 'emerald', count: 3, startPrice: 100, buyNow: 150 });
+    assert.equal(listed.status, 200, JSON.stringify(listed.data));
+    assert.deepEqual(JSON.parse((await row('Kramarka')).minerals), { emerald: 1, 'gold-ore': 9 });
+    const offer = (await market('Kupiec')).offers[0];
+    assert.deepEqual([offer.goods.kind, offer.goods.name, offer.goods.count], ['mineral', 'Szmaragd', 3]);
+    assert.equal((await act('Kupiec', 'buy', { offerId: offer.id })).status, 200);
+    const collected = await act('Kupiec', 'collect', {});
+    assert.equal(collected.status, 200, JSON.stringify(collected.data));
+    const buyer = await row('Kupiec');
+    assert.deepEqual(JSON.parse(buyer.minerals), { emerald: 3 });
+    assert.equal(JSON.parse(buyer.foreign_stacks)['mineral:emerald'], 3);
+    assert.equal(JSON.parse(buyer.discovered ?? '{}')['mineral:emerald'], undefined);
+  });
+
   test('"Kup teraz" sells at once and gives the leading bidder back their gold; an offer without bids goes back', async () => {
     const herb = content.herbs[1].id;
     await (await db()).prepare('UPDATE characters SET herbs = ? WHERE name = ?').bind(JSON.stringify({ [herb]: 5 }), 'Kramarka').run();

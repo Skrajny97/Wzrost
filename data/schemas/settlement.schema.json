@@ -406,7 +406,7 @@
         "testSeller": { "type": "string", "minLength": 1 },
         "resident": { "type": "string", "minLength": 1, "description": "Kupiec Targowiska: id mieszkańca. Zakupy u kupca dają relację z nim, tyle samo punktów co reputacji." },
         "testMinutes": { "type": "integer", "minimum": 1 },
-        "kinds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["item", "herb", "potion", "material", "part"] } },
+        "kinds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["item", "herb", "potion", "material", "part", "mineral"] } },
         "reputation": { "type": "object", "additionalProperties": false, "required": ["goldPerPointPerLevel", "daily"], "properties": { "goldPerPointPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "daily": { "type": "integer", "minimum": 0 } } },
         "merchant": {
           "type": "object",

@@ -1,6 +1,6 @@
 // The Wymiana (DECISIONS.md, "Wymiana"): two characters whose players are
-// both online trade items from their bags, herbs, potions, materials and
-// gold. One
+// both online trade items from their bags, herbs, potions, materials, the
+// gems and ores of Górnictwo and gold. One
 // proposes it on the other's sheet or in the Znajomi, and the other accepts
 // or turns it down. Both then put their offers together; once one confirms,
 // neither offer changes any more, and the other confirms too, when all of it
@@ -20,7 +20,7 @@ import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
-import { herbsOf, potionKnown, potionsOf } from './professions-view.js';
+import { herbsOf, mineralsOf, potionKnown, potionsOf } from './professions-view.js';
 
 const LIVE = ['proposed', 'open', 'locked'];
 // An ended trade stays a day, for its screen and the pause after proposals
@@ -33,8 +33,13 @@ const onlineSince = (now) => now - rules().onlineSeconds * 1000;
 const playedOnline = (row, now) => row?.role === 'player' && (row.seen_at ?? 0) >= onlineSince(now);
 const path = (id) => `$."${id}"`;
 
-// Materials (keys "materialId:rarityId") take no places in the bag.
-const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, materials: {} });
+// Materials (keys "materialId:rarityId") and minerals take no places in the
+// bag.
+const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, materials: {}, minerals: {} });
+// The stacks an offer holds, each kept in the characters' column of its name.
+const STACKS = ['herbs', 'potions', 'materials', 'minerals'];
+// A stack's key in the Encyklopedia's record of goods got in a trade.
+const FOREIGN = { herbs: 'herb', potions: 'potion', materials: 'material', minerals: 'mineral' };
 const offerOf = (raw) => ({ ...emptyOffer(), ...JSON.parse(raw || '{}') });
 const sideOf = (trade, characterId) => (trade.from_id === characterId ? 'from' : 'to');
 const offerColumn = (side) => (side === 'from' ? 'from_offer' : 'to_offer');
@@ -123,6 +128,13 @@ async function tradeView(db, trade, character, now) {
       .map(([key, count]) => {
         const { label, materialId, rarity, color } = materialView(key, count, content);
         return { id: key, materialId, label, rarity, color, count };
+      }),
+    minerals: Object.entries(offer.minerals)
+      .filter(([id]) => Object.hasOwn(content.mineralsById, id))
+      .map(([id, count]) => {
+        const mineral = content.mineralsById[id];
+        const rarity = mineral.rarity ?? mineral.for[0];
+        return { id, name: mineral.name, rarity, color: content.raritiesById[rarity].color, count };
       }),
   });
   const { proposalSeconds, idleMinutes } = rules();
@@ -222,8 +234,8 @@ export async function answerTrade(context) {
   return json({ trade: await tradeView(db, { ...trade, state: 'open', updated_at: now, version: trade.version + 1 }, character, now) });
 }
 
-// An offer as kept: gold, items from the bag (not worn), herbs, potions and
-// materials the character has, none of them more than it has.
+// An offer as kept: gold, items from the bag (not worn), herbs, potions,
+// materials and minerals the character has, none of them more than it has.
 function cleanOffer(raw, player) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
   const offer = emptyOffer();
@@ -245,6 +257,7 @@ function cleanOffer(raw, player) {
     ['herbs', herbsOf(player.row), named(content.herbsById)],
     ['potions', potionsOf(player.row), named(content.potionsById)],
     ['materials', JSON.parse(player.row.materials ?? '{}'), (key) => (knownStack(key, content) ? materialView(key, 0, content).label : null)],
+    ['minerals', mineralsOf(player.row), named(content.mineralsById)],
   ]) {
     const asked = raw[kind] ?? {};
     if (!asked || typeof asked !== 'object' || Array.isArray(asked)) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
@@ -258,7 +271,7 @@ function cleanOffer(raw, player) {
   return offer;
 }
 
-const isEmpty = (offer) => offer.gold === 0 && offer.items.length === 0 && ['herbs', 'potions', 'materials'].every((kind) => Object.keys(offer[kind]).length === 0);
+const isEmpty = (offer) => offer.gold === 0 && offer.items.length === 0 && STACKS.every((kind) => Object.keys(offer[kind]).length === 0);
 
 // POST /api/trade/offer {id, offer}: the character's offer, while neither
 // has confirmed the trade.
@@ -324,7 +337,7 @@ function exchange(db, trade, now, sides) {
       conditions.push('(SELECT gold FROM characters WHERE id = ?) >= ?');
       binds.push(id, offer.gold);
     }
-    for (const kind of ['herbs', 'potions', 'materials']) {
+    for (const kind of STACKS) {
       for (const [stack, count] of Object.entries(offer[kind])) {
         conditions.push(`COALESCE((SELECT json_extract(${kind}, ?) FROM characters WHERE id = ?), 0) >= ?`);
         binds.push(path(stack), id, count);
@@ -355,27 +368,23 @@ function exchange(db, trade, now, sides) {
       }
       return { sql, values };
     };
-    const herbs = change('herbs');
-    const potions = change('potions');
-    const materials = change('materials');
+    const changes = STACKS.map((kind) => [kind, change(kind)]);
     // The pieces got are from a trade, which the Encyklopedia leaves out
     // (ownDiscoveries in the engine).
     let foreign = 'foreign_stacks';
     const got = [];
-    for (const [kind, key] of [
-      ['herbs', 'herb'],
-      ['potions', 'potion'],
-      ['materials', 'material'],
-    ]) {
+    for (const kind of STACKS) {
       for (const [stack, count] of Object.entries(taker.offer[kind])) {
         foreign = `json_set(${foreign}, ?, COALESCE(json_extract(foreign_stacks, ?), 0) + ?)`;
-        got.push(path(`${key}:${stack}`), path(`${key}:${stack}`), count);
+        got.push(path(`${FOREIGN[kind]}:${stack}`), path(`${FOREIGN[kind]}:${stack}`), count);
       }
     }
     moves.push(
       db
-        .prepare(`UPDATE characters SET gold = gold + ?, herbs = ${herbs.sql}, potions = ${potions.sql}, materials = ${materials.sql}, foreign_stacks = ${foreign}, version = version + 1 WHERE id = ?`)
-        .bind(taker.offer.gold - giver.offer.gold, ...herbs.values, ...potions.values, ...materials.values, ...got, giver.id),
+        .prepare(
+          `UPDATE characters SET gold = gold + ?, ${changes.map(([kind, { sql }]) => `${kind} = ${sql}`).join(', ')}, foreign_stacks = ${foreign}, version = version + 1 WHERE id = ?`,
+        )
+        .bind(taker.offer.gold - giver.offer.gold, ...changes.flatMap(([, { values }]) => values), ...got, giver.id),
     );
   }
   const emptied = (kind) => `(SELECT COALESCE(json_group_object(key, value), '{}') FROM json_each(characters.${kind}) WHERE value > 0)`;
@@ -383,7 +392,7 @@ function exchange(db, trade, now, sides) {
     db.prepare(`SELECT CASE WHEN ${conditions.join(' AND ')} THEN 1 ELSE json(t.state) END AS ok FROM trades t WHERE t.id = ?`).bind(...binds, trade.id),
     db.prepare("UPDATE trades SET state = 'done', updated_at = ? WHERE id = ? AND state = 'locked' AND version = ?").bind(now, trade.id, trade.version),
     ...moves,
-    db.prepare(`UPDATE characters SET herbs = ${emptied('herbs')}, potions = ${emptied('potions')}, materials = ${emptied('materials')} WHERE id IN (?, ?)`).bind(one.id, two.id),
+    db.prepare(`UPDATE characters SET ${STACKS.map((kind) => `${kind} = ${emptied(kind)}`).join(', ')} WHERE id IN (?, ?)`).bind(one.id, two.id),
   ]);
 }
 

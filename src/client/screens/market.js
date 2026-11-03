@@ -7,7 +7,7 @@
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, so a redraw never asks the server again.
 
-import { herbSprite, potionSprite } from '../art.js';
+import { herbSprite, mineralSprite, potionSprite } from '../art.js';
 import { ALL, categoriesOf, goodsCategory, inCategory, shownCategory } from '../categories.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -21,9 +21,9 @@ const TABS = [
   ['mine', 'Moje'],
   ['residents', 'Mieszkańcy'],
 ];
-const KIND_NAMES = { herb: 'zioło', potion: 'mikstura', material: 'materiał', part: 'część' };
+const KIND_NAMES = { herb: 'zioło', potion: 'mikstura', material: 'materiał', part: 'część', mineral: 'minerał' };
 // The same kinds as the filters name them, in their order.
-const KIND_GROUPS = { herb: 'Zioła', potion: 'Mikstury', material: 'Materiały', part: 'Części' };
+const KIND_GROUPS = { herb: 'Zioła', potion: 'Mikstury', material: 'Materiały', part: 'Części', mineral: 'Minerały' };
 const REASONS = { won: 'wygrana licytacja', bought: 'kupione', returned: 'wraca do Ciebie', sold: 'zapłata za sprzedaż' };
 const rarityOf = (id) => state.content?.rarities?.find((rarity) => rarity.id === id);
 
@@ -43,6 +43,7 @@ function stackArt(goods, size = 24) {
   if (goods.kind === 'potion') return potionSprite(goods.key) ?? icon('flask', { size });
   if (goods.kind === 'material') return materialIcon(goods.material.materialId, size);
   if (goods.kind === 'part') return materialIcon(goods.key, size);
+  if (goods.kind === 'mineral') return mineralSprite(goods.key) ?? icon('ore', { size });
   return icon('coin', { size });
 }
 
@@ -71,12 +72,14 @@ function owned(goods) {
   if (goods.kind === 'potion') return character.potions?.find((one) => one.id === goods.key)?.count ?? 0;
   if (goods.kind === 'material') return character.crafting?.materials.find((one) => one.key === goods.key)?.count ?? 0;
   if (goods.kind === 'part') return character.crafting?.parts.find((one) => one.id === goods.key)?.count ?? 0;
+  if (goods.kind === 'mineral') return character.minerals?.find((one) => one.id === goods.key)?.count ?? 0;
   return 0;
 }
 
 // A stack's card (the author: "bym mogl kliknac przedmiot i go sprawdzić u
 // kupca"): its picture, what it is, what the scrapper pays for a piece, the
-// Zielarstwo level that gathers a herb, and how many the character has;
+// Zielarstwo level that gathers a herb, the Górnictwo level that digs a gem
+// or an ore, and how many the character has;
 // `actions` below, as the merchant's "Kup".
 function goodsSheet(goods, actions = null) {
   const rarity = rarityOf(goods.rarity);
@@ -102,6 +105,7 @@ function goodsSheet(goods, actions = null) {
         { class: 'item-properties' },
         goods.scrap !== undefined && goods.scrap !== null && h('li', { class: 'item-price', text: `U złomiarza: ${formatDecimal(goods.scrap)} złota za sztukę` }),
         goods.gatherLevel && h('li', { text: `Do zebrania w Zielarstwie od poziomu ${goods.gatherLevel}.` }),
+        goods.mineLevel && h('li', { text: `Do wydobycia w Górnictwie od poziomu ${goods.mineLevel}.` }),
         h('li', { text: `Masz: ${formatNumber(owned(goods))} szt.` }),
       ),
     ),
