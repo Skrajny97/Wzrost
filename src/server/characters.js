@@ -76,7 +76,7 @@ import {
   campLevel,
   xpToNext,
   buffLeft,
-  optionWindows,
+  storedBuffs,
   TIMED_KINDS,
   timedKind,
   cosmeticsOf,
@@ -258,35 +258,24 @@ const path = (id) => `$."${id}"`;
 // the Szlifiernia are no fights: the character rests meanwhile, as at home.
 export const restsDuring = (activity) => !activity || ['herbs', 'potions', 'items', 'minerals', 'jewels'].includes(activity.kind);
 
-// A character's buffs (potions.js). A speed potion drunk while its time
-// still passed everywhere keeps what it had left.
-export function buffsOf(row, now) {
-  const buffs = JSON.parse(row.buffs ?? '{}');
-  const { speed } = buffs;
-  if (speed && !Number.isFinite(speed.ms)) buffs.speed = { ms: Math.max(0, (speed.until ?? now) - now), bonus: speed.bonus };
-  return buffs;
-}
+// A character's buffs in fights (storedBuffs in potions.js): those kept in
+// time before 0.1.26 count as the fights of their minutes.
+export const buffsOf = (row, now) => storedBuffs(JSON.parse(row.buffs ?? '{}'), now, content);
 
-// The potions for a time drunk from the bag and the strengthenings of events
-// (the blue mushroom's) that still work (potions.js), by kind: the time of
-// explorations they have left, their bonus, the words for it and the first
-// potion of the kind for its picture. The time goes when a report is
-// claimed, so it stands still on an exploration; one started before 0.0.74
-// had it taken at its start, and runs down until `until` in it.
+// The strengthening potions drunk from the bag and the strengthenings of
+// events (the blue mushroom's) that still work (potions.js), by kind: the
+// fights of explorations they have left, their bonus, the words for it and
+// the first potion of the kind for its picture. The fights go when a report
+// is claimed, so they stay as they are on an exploration.
 function activeBuffs(player, now) {
   const buffs = buffsOf(player.row, now);
-  const options = player.activity?.kind === 'hunt' ? JSON.parse(player.activity.options ?? '{}') : {};
-  const windows = options.spend === 'claim' ? {} : optionWindows(options);
   const active = [];
   for (const kind of TIMED_KINDS) {
-    const window = windows[kind];
-    const ends = window ? player.activity.started_at + window.ms : 0;
-    const until = ends > now ? ends : null;
-    const ms = buffLeft(buffs, kind);
-    if (ms <= 0 && !until) continue;
-    const bonus = until ? window.bonus : buffs[kind].bonus;
+    const fights = buffLeft(buffs, kind);
+    if (fights <= 0) continue;
+    const { bonus } = buffs[kind];
     const potion = content.potions.find((one) => timedKind(one) === kind)?.id ?? null;
-    active.push({ kind, ms, until, bonus, label: content.potionUse.buffLabels[kind].replace('{bonus}', Math.round(bonus * 100)), potion });
+    active.push({ kind, fights, bonus, label: content.potionUse.buffLabels[kind].replace('{bonus}', Math.round(bonus * 100)), potion });
   }
   return active;
 }

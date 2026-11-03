@@ -6,3 +6,11 @@ export function say(texts, key, index, vars = {}) {
   const template = variants[index % variants.length];
   return template.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 }
+
+// A noun after a number, in Polish: 1, then 2–4 (but not 12–14), then the rest.
+export function countedForm(count, [one, few, many]) {
+  if (count === 1) return one;
+  const last = count % 10;
+  const tens = count % 100;
+  return last >= 2 && last <= 4 && (tens < 12 || tens > 14) ? few : many;
+}

@@ -6,7 +6,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import Ajv from 'ajv';
 import { fireBuilding, fireTrade } from '../src/engine/fire.js';
-import { TIMED_KINDS } from '../src/engine/potions.js';
+import { TIMED_KINDS, fightsText } from '../src/engine/potions.js';
 
 const DATA_DIR = new URL('../data/', import.meta.url);
 const CLIENT_DIR = new URL('../src/client/', import.meta.url);
@@ -772,6 +772,8 @@ function checkEvents(data, { monsters, rarities }) {
       if (!rewarding) errors.push(`events.json: ${where} ma nagrodę bez złota, przedmiotu, ziół, wzmocnienia, punktów, XP, reputacji i plotki`);
       if (outcome.gold !== undefined && !outcome.text.includes('{gold}')) errors.push(`events.json: ${where} potrzebuje {gold} w tekście`);
       if (outcome.itemRarities && !outcome.text.includes('{item}')) errors.push(`events.json: ${where} potrzebuje {item} w tekście`);
+      // A strengthening or a curse says for how many fights.
+      if (outcome.buff && !outcome.text.includes(fightsText(outcome.buff.fights, data.professions))) errors.push(`events.json: ${where} ma podać w tekście „${fightsText(outcome.buff.fights, data.professions)}”`);
       checkRarities(where, outcome.itemRarities);
       for (const id of Object.keys(outcome.herbs ?? {})) if (!herbs.has(id)) errors.push(`events.json: ${where} ma nieznane zioło "${id}"`);
       if (outcome.herbsKnown && !outcome.text.includes('{herbs}')) errors.push(`events.json: ${where} potrzebuje {herbs} w tekście`);
@@ -1107,15 +1109,15 @@ function checkBrewing(data, ids, effects, materialIds) {
       if (!potion.description.includes(`${Math.round(value * 100)}%`)) errors.push(`professions.json: opis mikstury ${potion.id} nie podaje ${Math.round(value * 100)}%`);
     }
     if (Object.keys(potion.effect).length !== 1) errors.push(`professions.json: mikstura ${potion.id} ma mieć jedno działanie`);
-    // A potion for a time is drunk from the bag and lasts its minutes; the
-    // others work by themselves in fights.
+    // A strengthening potion is drunk from the bag and lasts its number of
+    // fights; the others work by themselves in fights.
     const timed = TIMED_KINDS.some((kind) => kind in potion.effect);
-    if (timed !== ('minutes' in potion)) errors.push(`professions.json: minutes ma tylko mikstura na czas (${potion.id})`);
+    if (timed !== ('fights' in potion)) errors.push(`professions.json: fights ma tylko mikstura wzmacniająca (${potion.id})`);
     if (('poison' in potion.effect) !== ('dot' in potion)) errors.push(`professions.json: dot ma tylko mikstura z poison (${potion.id})`);
     if (potion.dot && !effects.has(potion.dot.effect)) errors.push(`professions.json: mikstura ${potion.id} ma nieznany efekt "${potion.dot.effect}"`);
     if (('cure' in potion.effect) !== ('cures' in potion)) errors.push(`professions.json: cures ma tylko odtrutka (${potion.id})`);
     if (potion.cures && !effects.has(potion.cures)) errors.push(`professions.json: mikstura ${potion.id} leczy nieznany efekt "${potion.cures}"`);
-    if (potion.minutes && !potion.description.includes(`${potion.minutes} minut`)) errors.push(`professions.json: opis mikstury ${potion.id} nie podaje ${potion.minutes} minut`);
+    if (potion.fights && !potion.description.includes(fightsText(potion.fights, data))) errors.push(`professions.json: opis mikstury ${potion.id} nie podaje „${fightsText(potion.fights, data)}”`);
   }
   const { healBelow, healBelowChoices } = data.potionUse;
   if (!healBelowChoices.includes(healBelow)) errors.push('professions.json: potionUse.healBelow musi być jednym z healBelowChoices');

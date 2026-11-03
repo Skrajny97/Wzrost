@@ -41,7 +41,6 @@ import {
   nextHuntUnlock,
   optionCost,
   optionLock,
-  optionWindows,
   potionsPerKind,
   questCreatures,
   questPeriod,
@@ -51,9 +50,8 @@ import {
   trophyBonuses,
   sellPrice,
   resolveEvent,
-  returnWindows,
   simulateHunt,
-  spendWindows,
+  spendFights,
   storeStacks,
   threatSamples,
   unknownCreatures,
@@ -321,16 +319,16 @@ export async function beginHunt(
     throw new ApiError(400, 'invalid_heal_below', 'Wybierz próg mikstury leczenia.');
   }
   const taken = takenPotions(player, potions, minutes);
-  // The potions for a time drunk before cover what they can of the
-  // exploration; their time is used up only when its report is claimed (the
-  // author: "bonusy wszelkie za picie mikstur itp. nie zużywają się na
-  // bieżąco, a po samej wyprawie / Odbierz raport zużywa czas mikstury"), so
-  // the start leaves them as they are. The claim covers the exploration with
-  // those at work then, drunk on the way too (claimWindows in potions.js);
-  // the windows kept here are a Drużyna's trip's, whose fights are the same
-  // for all who went.
+  // The strengthening potions drunk before cover the exploration's first
+  // fights, as many as theirs; they are used up only when its report is
+  // claimed (the author: "bonusy wszelkie za picie mikstur itp. nie zużywają
+  // się na bieżąco, a po samej wyprawie / Odbierz raport zużywa czas
+  // mikstury"), so the start leaves them as they are. The claim covers the
+  // exploration with those at work then, drunk on the way too (claimWindows
+  // in potions.js); the windows kept here are a Drużyna's trip's, whose
+  // fights are the same for all who went.
   const buffs = buffsOf(player.row, now);
-  const windows = buffWindows(buffs, minutes);
+  const windows = buffWindows(buffs);
   const timed = Object.keys(windows).length > 0;
   const unknown = trackUnknown ? unknownCreatures(area, JSON.parse(player.row.met ?? '[]')) : [];
   // The Encyklopedia's trophies for the creatures of this place, as at the
@@ -449,10 +447,8 @@ export async function beginHunt(
 
 // Calling the character back early gives nothing and costs nothing. A
 // brewing keeps the potions done and an order in the Warsztat the items
-// done, with their report (brewing.js, workshop.js). The potions for a time
-// lose none of theirs: it goes only with a report claimed (an exploration
-// started before 0.0.74 had it taken at its start and gets back what it did
-// not use).
+// done, with their report (brewing.js, workshop.js). The strengthening
+// potions lose none of their fights: they go only with a report claimed.
 export async function cancelHunt(context) {
   const { session, player } = await requirePlayer(context);
   const activity = player.activity;
@@ -473,15 +469,12 @@ export async function cancelHunt(context) {
   }
   // The potions set aside for the road come back to the bag.
   const options = JSON.parse(activity.options ?? '{}');
-  const windows = options.spend === 'claim' ? {} : optionWindows(options);
-  const used = context.now - activity.started_at;
-  const unused = Object.values(windows).some((window) => window.ms > used);
   const back = options.reserved ? options.potions ?? {} : {};
   const returning = Object.keys(back).length > 0;
-  // The potions and buffs written back are computed from the row read: the
-  // call holds only while the row is as read and the exploration still
-  // goes on, so a claim or a sale meanwhile is not undone (atomic.js). One
-  // called back from a Drużyna's trip leaves the others' fights (trips.js).
+  // The potions written back are computed from the row read: the call holds
+  // only while the row is as read and the exploration still goes on, so a
+  // claim or a sale meanwhile is not undone (atomic.js). One called back
+  // from a Drużyna's trip leaves the others' fights (trips.js).
   const trip = tripOf(activity);
   await atomically(db, [
     assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND EXISTS (SELECT 1 FROM activities WHERE character_id = ? AND started_at = ?)', [
@@ -491,16 +484,8 @@ export async function cancelHunt(context) {
       activity.started_at,
     ]),
     db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(player.row.id, activity.started_at),
-    ...(unused || returning
-      ? [
-          db
-            .prepare(`UPDATE characters SET ${[unused && 'buffs = ?', returning && 'potions = ?'].filter(Boolean).join(', ')}, version = version + 1 WHERE id = ?`)
-            .bind(
-              ...(unused ? [JSON.stringify(returnWindows(buffsOf(player.row, context.now), windows, used))] : []),
-              ...(returning ? [JSON.stringify(potionsBack(player.row, back, {}))] : []),
-              player.row.id,
-            ),
-        ]
+    ...(returning
+      ? [db.prepare('UPDATE characters SET potions = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify(potionsBack(player.row, back, {})), player.row.id)]
       : []),
     ...(trip ? [leaveTrip(db, trip, player.row)] : []),
   ]);
@@ -582,10 +567,11 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // for every member, as its leader leads them; what this member finds and
   // earns from its own seed (trips.js, simulateHunt).
   const trip = options.party?.seed && options.party.roster?.length > 0 ? options.party : null;
-  // The potions for a time at work now cover the exploration and use up its
-  // length of their time as the report is claimed, whenever they were drunk
-  // (potions.js); a trip's fights keep those it set out with.
-  const claimed = claimWindows(options, buffsOf(row, now), activity.minutes, Boolean(trip));
+  // The strengthening potions at work now cover the exploration's first
+  // fights and use up those they worked in as the report is claimed,
+  // whenever they were drunk (potions.js); a trip's fights keep those it set
+  // out with.
+  const claimed = claimWindows(options, buffsOf(row, now), Boolean(trip));
   let hunt = simulateHunt(
     {
       character,
@@ -784,10 +770,11 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // An event's buff joins those of the potions drunk before (the blue
   // mushroom), and its free stat points those of the levels.
   const reward = hunt.event?.reward;
-  // The potions for a time used up now, as the report is claimed, and an
-  // event's strengthening or curse added after that.
-  const spentBuffs = Object.keys(claimed.spend).length > 0 ? spendWindows(buffsOf(row, now), claimed.spend) : null;
-  const eventBuffs = reward?.buff ? addBuff(spentBuffs ?? buffsOf(row, now), reward.buff.kind, reward.buff.minutes * 60000, reward.buff.bonus) : spentBuffs;
+  // The fights of the strengthening potions used up now, as the report is
+  // claimed (those they worked in), and an event's strengthening or curse
+  // added after that, for its own fights.
+  const spentBuffs = claimed.spends && Object.values(hunt.buffFights ?? {}).some((count) => count > 0) ? spendFights(buffsOf(row, now), claimed.windows, hunt.buffFights) : null;
+  const eventBuffs = reward?.buff ? addBuff(spentBuffs ?? buffsOf(row, now), reward.buff.kind, reward.buff.fights, reward.buff.bonus) : spentBuffs;
   const eventPoints = reward?.points ?? 0;
   // An event's herbs that found their places.
   const storedHerbs = Object.entries(herbs.stored);

@@ -1433,6 +1433,8 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "fightForms",
+        "minutesPerFight",
         "healBelow",
         "healBelowChoices",
         "buffLabels",
@@ -1440,6 +1442,18 @@
       ],
       "description": "Picie mikstur: próg leczenia w walce i teksty walki oraz raportu.",
       "properties": {
+        "fightForms": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Walka po liczbie w bierniku (1, 2–4, 5 i więcej), do tekstów z {fights}: „przez 2 walki”."
+        },
+        "minutesPerFight": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Tyle minut dawnego czasu działania mikstury to jedna walka (przeliczenie wzmocnień zapisanych jeszcze w minutach)."
+        },
         "healBelow": {
           "type": "number",
           "exclusiveMinimum": 0,
@@ -1858,10 +1872,10 @@
               }
             }
           },
-          "minutes": {
+          "fights": {
             "type": "integer",
             "minimum": 1,
-            "description": "Mikstura na czas: tyle minut wypraw działa po wypiciu z plecaka (szybkość, pancerz, obrażenia, skupienie, olejek, ochrona przed magią)."
+            "description": "Mikstura wzmacniająca: przez tyle walk wypraw działa po wypiciu z plecaka (szybkość, pancerz, obrażenia, skupienie, olejek, ochrona przed magią); pół godziny dawnego czasu to 2 walki."
           },
           "cures": {
             "type": "string",

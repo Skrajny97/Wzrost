@@ -1,8 +1,8 @@
 // Potions on explorations: drunk in fights (a healing one below the mark, a
 // mana one when a skill lacks mana, an antidote when poisoned, a fern brew on
 // fainting, each kind once a fight and the strongest first), taken along and
-// counted in the threat, the potions for a time from the bag, and all of it
-// through the API.
+// counted in the threat, the strengthening potions from the bag, counted in
+// fights, and all of it through the API.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -16,11 +16,14 @@ import {
   drinkTimed,
   faintChances,
   fightPotions,
+  fightsText,
   monsterCombatant,
   playerCombatant,
   potionsPerKind,
   simulateFight,
   simulateHunt,
+  spendFights,
+  storedBuffs,
   threatSamples,
 } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
@@ -147,28 +150,32 @@ describe('potions in fights', () => {
     assert.ok(drunk > 0);
   });
 
-  test('a speed potion speeds up the fights of its minutes', () => {
+  test('a speed potion speeds up its number of the first fights', () => {
     const { character, equipped } = typicalCharacter('archer', 8, content);
-    const ms = 30 * 60000;
-    const hunt = simulateHunt({ character, equipped, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed: 'speed', speed: { bonus: 0.15, ms } }, content);
-    const fast = hunt.fights.filter((each) => each.t < ms);
-    assert.deepEqual(hunt.buffFights, { speed: fast.length });
-    const plain = simulateHunt({ character, equipped, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed: 'speed' }, content);
+    const input = { character, equipped, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed: 'speed' };
+    const hunt = simulateHunt({ ...input, buffs: { speed: { bonus: 0.15, fights: 2 } } }, content);
+    assert.ok(hunt.fights.length > 2, `${hunt.fights.length}`);
+    assert.deepEqual(hunt.buffFights, { speed: 2 });
+    const plain = simulateHunt(input, content);
     assert.ok(Math.abs(hunt.fights[0].allies[0].speed - plain.fights[0].allies[0].speed * 1.15) < 0.02);
-    const late = hunt.fights.find((each) => each.t >= ms);
-    if (late) assert.equal(late.allies[0].speed, plain.fights[0].allies[0].speed);
+    assert.ok(Math.abs(hunt.fights[1].allies[0].speed - plain.fights[0].allies[0].speed * 1.15) < 0.02);
+    assert.equal(hunt.fights[2].allies[0].speed, plain.fights[0].allies[0].speed);
+    // A window kept in time, by an exploration started before 0.1.26, works
+    // while its time lasts.
+    const ms = 30 * 60000;
+    const old = simulateHunt({ ...input, speed: { bonus: 0.15, ms } }, content);
+    assert.deepEqual(old.buffFights, { speed: old.fights.filter((each) => each.t < ms).length });
   });
 
-  test('the stoneskin brew, the focus draught and the aconite oil work in the fights of their minutes', () => {
+  test('the stoneskin brew, the focus draught and the aconite oil work in their fights', () => {
     const { character, equipped } = typicalCharacter('cleric', 30, content);
-    const ms = 30 * 60000;
     const input = { character, equipped, hp: 9999, name: 'Mira', areaId: 'mossy-boulders', minutes: 60, seed: 'wywary' };
     const plain = simulateHunt(input, content);
-    const brewed = simulateHunt({ ...input, buffs: { armor: { bonus: 0.15, ms }, focus: { bonus: 0.1, ms }, poison: { bonus: 0.5, ms: 60 * 60000 } } }, content);
-    const early = brewed.fights.filter((each) => each.t < ms).length;
+    const brewed = simulateHunt({ ...input, buffs: { armor: { bonus: 0.15, fights: 2 }, focus: { bonus: 0.1, fights: 2 }, poison: { bonus: 0.5, fights: 10 } } }, content);
+    const early = Math.min(2, brewed.fights.length);
     assert.deepEqual(brewed.buffFights, { armor: early, focus: early, poison: brewed.fights.length });
     assert.equal(brewed.fights[0].allies[0].armor, Math.round(plain.fights[0].allies[0].armor * 1.15));
-    const late = brewed.fights.find((each) => each.t >= ms);
+    const late = brewed.fights[2];
     if (late) assert.equal(late.allies[0].armor, plain.fights[0].allies[0].armor);
     // The oil poisons the foes now and then; the character alone never does.
     const poisons = (hunt) => hunt.fights.flatMap((each) => each.events).filter((event) => event.kind === 'effect' && event.actor === 'a0' && event.effect === 'Zatrucie').length;
@@ -181,47 +188,62 @@ describe('potions in fights', () => {
     assert.equal(after.maxHp, before.maxHp);
   });
 
-  test('a potion for a time lasts 30 minutes of explorations, each one more adds as many, a weaker one less', () => {
+  test('a strengthening potion lasts 2 fights of explorations, each one more adds as many, a weaker one less', () => {
     const speed = content.potionsById['lesser-speed'];
     const once = drinkTimed({}, speed);
-    assert.deepEqual(once.speed, { ms: 30 * 60000, bonus: 0.15 });
+    assert.deepEqual(once.speed, { fights: 2, bonus: 0.15 });
+    // Two potions, four fights (the author: "2 mikstury -> 4 walki").
+    assert.deepEqual(drinkTimed(once, speed).speed, { fights: 4, bonus: 0.15 });
     const thrice = drinkTimed(drinkTimed(once, speed), speed);
-    assert.equal(thrice.speed.ms, 90 * 60000);
-    // An exploration takes what it covers and gives back what it did not use.
-    assert.deepEqual(buffWindows(thrice, 60), { speed: { bonus: 0.15, ms: 60 * 60000 } });
-    assert.deepEqual(buffWindows(once, 60), { speed: { bonus: 0.15, ms: 30 * 60000 } });
-    assert.deepEqual(addBuff(once, 'speed', -30 * 60000), {});
-    assert.deepEqual(addBuff(addBuff(thrice, 'speed', -60 * 60000), 'speed', 20 * 60000, 0.15).speed, { ms: 50 * 60000, bonus: 0.15 });
-    assert.deepEqual(buffWindows({}, 60), {});
-    // Two strengths of one kind: the stronger bonus, the weaker one's
-    // minutes worth what they are at it, whichever comes first.
+    assert.equal(thrice.speed.fights, 6);
+    // An exploration is covered from its first fight as far as they go, and
+    // its claim takes off the fights they worked in.
+    assert.deepEqual(buffWindows(thrice), { speed: { bonus: 0.15, fights: 6 } });
+    assert.deepEqual(spendFights(thrice, buffWindows(thrice), { speed: 4 }), { speed: { fights: 2, bonus: 0.15 } });
+    assert.deepEqual(spendFights(thrice, buffWindows(thrice), { speed: 6 }), {});
+    assert.deepEqual(spendFights(thrice, buffWindows(thrice), {}), thrice);
+    assert.deepEqual(addBuff(once, 'speed', -2), {});
+    assert.deepEqual(buffWindows({}), {});
+    // Two strengths of one kind: the stronger bonus, the weaker one's fights
+    // worth what they are at it, to the nearest whole fight, whichever comes
+    // first.
     const greater = content.potionsById['greater-speed'];
-    const mixed = Math.round(30 * 60000 + (30 * 60000 * 0.15) / 0.35);
-    assert.deepEqual(drinkTimed(drinkTimed({}, greater), speed).speed, { ms: mixed, bonus: 0.35 });
-    assert.deepEqual(drinkTimed(once, greater).speed, { ms: mixed, bonus: 0.35 });
-    // Kinds keep their own time.
+    assert.deepEqual(drinkTimed(drinkTimed({}, greater), speed).speed, { fights: 3, bonus: 0.35 });
+    assert.deepEqual(drinkTimed(once, greater).speed, { fights: 3, bonus: 0.35 });
+    // Kinds keep their own fights.
     const both = drinkTimed(once, content.potionsById['stoneskin-brew']);
-    assert.deepEqual(both, { speed: { ms: 30 * 60000, bonus: 0.15 }, armor: { ms: 30 * 60000, bonus: 0.15 } });
-    assert.deepEqual(Object.keys(buffWindows(both, 15)), ['speed', 'armor']);
+    assert.deepEqual(both, { speed: { fights: 2, bonus: 0.15 }, armor: { fights: 2, bonus: 0.15 } });
+    assert.deepEqual(Object.keys(buffWindows(both)), ['speed', 'armor']);
+    // Kept in time before 0.1.26: a fight for each quarter of an hour, a
+    // part of one as a whole one; a speed potion's end from before 0.0.74 too.
+    assert.deepEqual(
+      storedBuffs({ speed: { ms: 30 * 60000, bonus: 0.15 }, armor: { ms: 20 * 60000, bonus: 0.15 }, focus: { ms: 0, bonus: 0.1 } }, 0, content),
+      { speed: { fights: 2, bonus: 0.15 }, armor: { fights: 2, bonus: 0.15 } },
+    );
+    assert.deepEqual(storedBuffs({ speed: { until: 50 * 60000, bonus: 0.15 } }, 5 * 60000, content), { speed: { fights: 3, bonus: 0.15 } });
+    assert.deepEqual(storedBuffs({ speed: { until: 1000, bonus: 0.15 } }, 5000, content), {});
+    assert.deepEqual(storedBuffs({ speed: { fights: 4, bonus: 0.25 } }, 0, content), { speed: { fights: 4, bonus: 0.25 } });
+    assert.deepEqual([1, 2, 4, 5, 12, 22].map((count) => fightsText(count, content)), ['1 walkę', '2 walki', '4 walki', '5 walk', '12 walk', '22 walki']);
   });
 
   test('a claim covers the exploration with the potions at work then, drunk on the way too', () => {
     const speed = content.potionsById['lesser-speed'];
     const twice = drinkTimed(drinkTimed({}, speed), speed);
-    const window = { speed: { bonus: 0.15, ms: 30 * 60000 } };
-    // Alone: those at work as the report is claimed, from its start, and the
-    // exploration's length of them used up, whether drunk before it set out,
-    // on the way or after it came back (the author's 3.11.2026 report).
-    assert.deepEqual(claimWindows({}, twice, 30), { windows: window, spend: window });
-    assert.deepEqual(claimWindows({ buffs: { speed: { bonus: 0.15, ms: 10 * 60000 } }, spend: 'claim' }, twice, 30), { windows: window, spend: window });
-    assert.deepEqual(claimWindows({}, {}, 30), { windows: {}, spend: {} });
+    const window = { speed: { bonus: 0.15, fights: 4 } };
+    // Alone: those at work as the report is claimed, from its first fight,
+    // and the fights they worked in used up, whether drunk before it set
+    // out, on the way or after it came back (the author's 3.11.2026 report).
+    assert.deepEqual(claimWindows({}, twice), { windows: window, spends: true });
+    assert.deepEqual(claimWindows({ buffs: { speed: { bonus: 0.15, fights: 1 } }, spend: 'claim' }, twice), { windows: window, spends: true });
+    assert.deepEqual(claimWindows({}, {}), { windows: {}, spends: true });
     // A Drużyna's trip keeps the windows it set out with.
-    const kept = { speed: { bonus: 0.15, ms: 10 * 60000 } };
-    assert.deepEqual(claimWindows({ buffs: kept, spend: 'claim' }, twice, 30, true), { windows: kept, spend: kept });
-    assert.deepEqual(claimWindows({}, twice, 30, true), { windows: {}, spend: {} });
+    const kept = { speed: { bonus: 0.15, fights: 1 } };
+    assert.deepEqual(claimWindows({ buffs: kept, spend: 'claim' }, twice, true), { windows: kept, spends: true });
+    assert.deepEqual(claimWindows({}, twice, true), { windows: {}, spends: true });
     // One started before 0.0.74 had its time taken at its start.
-    assert.deepEqual(claimWindows({ buffs: kept }, twice, 30), { windows: kept, spend: {} });
-    assert.deepEqual(claimWindows({ speed: kept.speed }, twice, 30), { windows: kept, spend: {} });
+    const old = { speed: { bonus: 0.15, ms: 10 * 60000 } };
+    assert.deepEqual(claimWindows({ buffs: old }, twice), { windows: old, spends: false });
+    assert.deepEqual(claimWindows({ speed: old.speed }, twice), { windows: old, spends: false });
   });
 
   test('healing potions taken along lower the chance of fainting', () => {
@@ -306,70 +328,73 @@ describe('potions through the API', () => {
     assert.equal(healed.data.character.potions[0].count, 4);
 
     const sped = await drink('lesser-speed');
-    assert.equal(sped.data.text, 'Postać wypija Mniejszą miksturę szybkości. Ruchy w walkach szybsze o 15% przez 30 min wypraw.');
-    assert.deepEqual(sped.data.character.buffs, [{ kind: 'speed', ms: 30 * 60000, until: null, bonus: 0.15, label: 'Szybkość: ruchy w walkach +15%', potion: 'lesser-speed' }]);
+    assert.equal(sped.data.text, 'Postać wypija Mniejszą miksturę szybkości. Ruchy szybsze o 15% przez 2 walki.');
+    assert.deepEqual(sped.data.character.buffs, [{ kind: 'speed', fights: 2, bonus: 0.15, label: 'Szybkość: ruchy w walkach +15%', potion: 'lesser-speed' }]);
     const again = await drink('lesser-speed');
-    assert.equal(again.data.text, 'Postać wypija Mniejszą miksturę szybkości. Ruchy w walkach szybsze o 15% przez 60 min wypraw.');
-    assert.equal(speedBuff(again.data.character).ms, 60 * 60000);
+    assert.equal(again.data.text, 'Postać wypija Mniejszą miksturę szybkości. Ruchy szybsze o 15% przez 4 walki.');
+    assert.equal(speedBuff(again.data.character).fights, 4);
     assert.equal(again.data.character.potions.find((potion) => potion.id === 'lesser-speed'), undefined);
 
-    // An exploration goes faster all along; its 30 minutes are used up only
-    // as its report is claimed (the author: "Odbierz raport zużywa czas
+    // An exploration is faster in as many fights; they are used up only as
+    // its report is claimed (the author: "Odbierz raport zużywa czas
     // mikstury"), and the rest waits for the next one.
     await set('hp = ?, hp_at = ?', maxHp, Date.now());
     await hunt({});
-    const during = speedBuff(await character());
-    assert.deepEqual([during.ms, during.until], [60 * 60000, null]);
+    assert.equal(speedBuff(await character()).fights, 4);
     await finish();
     const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
-    assert.deepEqual(report.summary.potions, [`Mikstura szybkości działała w walkach: ${report.fights.length} z ${report.fights.length}.`]);
-    assert.deepEqual(after.buffs, [{ kind: 'speed', ms: 30 * 60000, until: null, bonus: 0.15, label: 'Szybkość: ruchy w walkach +15%', potion: 'lesser-speed' }]);
+    const all = report.fights.length;
+    assert.deepEqual(report.summary.potions, [`Mikstura szybkości działała w walkach: ${Math.min(4, all)} z ${all}.`]);
+    assert.equal(speedBuff(after)?.fights ?? 0, Math.max(0, 4 - all));
 
     // A potion drunk on the way, or after the exploration came back and
     // before its report, works in its fights all the same, and the claim
-    // takes the exploration's 30 minutes off its time (the author: "Ten czas
-    // powinien schodzić dopiero po kliknięciu Odbierz raport i to w
-    // wysokości zadanej przed wyprawą, nawet jeśli mikstury zostały zażyte w
-    // czasie wyprawy lub na chwilę przed Odebraniem raportu").
-    // Several are drunk at once, as many as chosen, each adding its 30
-    // minutes, with no top (the author: "Niech nie bedzie maksymalnego limitu
-    // na trwanie bonusów typu z mikstur"); a healing potion goes one at a time.
+    // takes off the fights it worked in (the author: "Ten czas powinien
+    // schodzić dopiero po kliknięciu Odbierz raport i to w wysokości zadanej
+    // przed wyprawą, nawet jeśli mikstury zostały zażyte w czasie wyprawy lub
+    // na chwilę przed Odebraniem raportu"). Several are drunk at once, as
+    // many as chosen, each adding its 2 fights, with no top (the author:
+    // "Niech nie bedzie maksymalnego limitu na trwanie bonusów typu z
+    // mikstur"); a healing potion goes one at a time.
     await set(`buffs = '{}', potions = json_set(potions, '$."lesser-speed"', 5)`);
     await hunt({});
     const four = await call('POST', '/api/potions/drink', { cookie, body: { potionId: 'lesser-speed', count: 4 } });
-    assert.equal(four.data.text, 'Postać wypija 4 × Mniejsza mikstura szybkości. Ruchy w walkach szybsze o 15% przez 120 min wypraw.');
-    assert.equal(speedBuff(four.data.character).ms, 120 * 60000);
+    assert.equal(four.data.text, 'Postać wypija 4 × Mniejsza mikstura szybkości. Ruchy szybsze o 15% przez 8 walk.');
+    assert.equal(speedBuff(four.data.character).fights, 8);
     assert.equal(four.data.character.potions.find((potion) => potion.id === 'lesser-speed').count, 1);
     assert.equal((await call('POST', '/api/potions/drink', { cookie, body: { potionId: 'lesser-speed', count: 2 } })).data.error.code, 'invalid_count');
     await finish();
     const onTheWay = (await call('POST', '/api/hunts/claim', { cookie })).data;
-    assert.deepEqual(onTheWay.report.summary.potions, [`Mikstura szybkości działała w walkach: ${onTheWay.report.fights.length} z ${onTheWay.report.fights.length}.`]);
-    assert.equal(speedBuff(onTheWay.character).ms, 90 * 60000);
+    const fought = onTheWay.report.fights.length;
+    assert.deepEqual(onTheWay.report.summary.potions, [`Mikstura szybkości działała w walkach: ${fought} z ${fought}.`]);
+    assert.equal(speedBuff(onTheWay.character).fights, 8 - fought);
     await set(`buffs = '{}'`);
     await hunt({});
     await finish();
     assert.equal((await drink('lesser-speed')).status, 200);
     const before = (await call('POST', '/api/hunts/claim', { cookie })).data;
-    assert.deepEqual(before.report.summary.potions, [`Mikstura szybkości działała w walkach: ${before.report.fights.length} z ${before.report.fights.length}.`]);
-    assert.equal(speedBuff(before.character), undefined);
+    const met = before.report.fights.length;
+    assert.deepEqual(before.report.summary.potions, [`Mikstura szybkości działała w walkach: ${Math.min(2, met)} z ${met}.`]);
+    assert.equal(speedBuff(before.character)?.fights ?? 0, Math.max(0, 2 - met));
+
+    // Kept in time before 0.1.26: half an hour makes 2 fights.
     await set(`buffs = '{"speed":{"ms":1800000,"bonus":0.15}}'`);
+    assert.equal(speedBuff(await character()).fights, 2);
 
     // One called back uses up nothing.
     await hunt({});
-    assert.equal(speedBuff(await character()).ms, 30 * 60000);
     await call('POST', '/api/hunts/cancel', { cookie });
-    const back = speedBuff(await character());
-    assert.deepEqual([back.ms, back.until], [30 * 60000, null]);
+    assert.equal(speedBuff(await character()).fights, 2);
 
     // One started before 0.0.74 had its time taken at its start: its claim
     // takes nothing more.
     await hunt({});
     const database = await db();
     await database.prepare("UPDATE activities SET options = json_remove(options, '$.spend')").run();
-    await set(`buffs = '{"speed":{"ms":600000,"bonus":0.15}}'`);
+    await set(`buffs = '{"speed":{"fights":1,"bonus":0.15}}'`);
     await finish();
     await call('POST', '/api/hunts/claim', { cookie });
-    assert.equal(speedBuff(await character()).ms, 10 * 60000);
+    assert.equal(speedBuff(await character()).fights, 1);
   });
 
   test('the potions of later levels: what goes along, what is drunk or put on the blade', async () => {
@@ -386,22 +411,23 @@ describe('potions through the API', () => {
       ['fight_only', 'Ta mikstura działa sama na wyprawie.'],
       ['fight_only', 'Ta mikstura działa sama na wyprawie.'],
     ]);
-    assert.equal((await drink('stoneskin-brew')).data.text, 'Postać wypija Wywar kamiennej skóry. Pancerz większy o 15% przez 30 min wypraw.');
+    assert.equal((await drink('stoneskin-brew')).data.text, 'Postać wypija Wywar kamiennej skóry. Pancerz większy o 15% przez 2 walki.');
     const oiled = await drink('aconite-oil');
-    assert.equal(oiled.data.text, 'Postać nakłada Olejek z tojadu na broń. Przez 30 min wypraw każdy cios ma 50% szans na Zatrucie.');
-    assert.deepEqual(oiled.data.character.buffs.map(({ kind, ms, label }) => [kind, ms, label]), [
-      ['armor', 30 * 60000, 'Twarda skóra: pancerz +15%'],
-      ['poison', 30 * 60000, 'Trucizna na broni: 50% szans na Zatrucie przy ciosie'],
+    assert.equal(oiled.data.text, 'Postać nakłada Olejek z tojadu na broń. Przez 2 walki każdy cios ma 50% szans na Zatrucie.');
+    assert.deepEqual(oiled.data.character.buffs.map(({ kind, fights, label }) => [kind, fights, label]), [
+      ['armor', 2, 'Twarda skóra: pancerz +15%'],
+      ['poison', 2, 'Trucizna na broni: 50% szans na Zatrucie przy ciosie'],
     ]);
 
-    // A fern brew goes along one at a time; both kinds for a time work all
-    // through a 30-minute exploration.
+    // A fern brew goes along one at a time; both strengthening kinds work in
+    // the first 2 fights of a 30-minute exploration.
     assert.equal((await hunt({ potions: { 'fern-brew': 2 } })).data.error.code, 'invalid_potions');
     assert.equal((await hunt({ potions: { 'fern-brew': 1, antidote: 1 } })).status, 201);
     await finish();
     const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
     const all = report.fights.length;
-    assert.deepEqual(report.summary.potions.slice(-2), [`Wywar kamiennej skóry działał w walkach: ${all} z ${all}.`, `Olejek z tojadu działał w walkach: ${all} z ${all}.`]);
-    assert.deepEqual(after.buffs, []);
+    const worked = Math.min(2, all);
+    assert.deepEqual(report.summary.potions.slice(-2), [`Wywar kamiennej skóry działał w walkach: ${worked} z ${all}.`, `Olejek z tojadu działał w walkach: ${worked} z ${all}.`]);
+    assert.deepEqual(after.buffs.map(({ kind, fights }) => [kind, fights]), all >= 2 ? [] : [['armor', 2 - all], ['poison', 2 - all]]);
   });
 });

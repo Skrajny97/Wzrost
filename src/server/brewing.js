@@ -20,6 +20,7 @@ import {
   campLevels,
   catalystChance,
   drinkTimed,
+  fightsText,
   knownStack,
   mostPotions,
   parseStack,
@@ -252,11 +253,11 @@ export async function sellPotions(context) {
   return json({ sold: { count: taken.count, gold }, character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
 }
 
-// "Wypij" in the bag: a healing potion gives HP back now, and a potion for a
-// time works in the fights of its next minutes on explorations, added to
-// those still left (potions.js), as many at once as chosen, each adding its
-// minutes, with no top to the time (the author: "Niech nie bedzie
-// maksymalnego limitu na trwanie bonusów typu z mikstur"). A healing potion
+// "Wypij" in the bag: a healing potion gives HP back now, and a
+// strengthening potion works in its number of the next fights of
+// explorations, added to those still left (potions.js), as many at once as
+// chosen, each adding its fights, with no top to them (the author: "Niech nie
+// bedzie maksymalnego limitu na trwanie bonusów typu z mikstur"). A healing potion
 // is drunk one at a time. A mana potion, an antidote and the fern brew work
 // only by themselves in fights.
 export async function drinkPotion(context) {
@@ -292,7 +293,7 @@ export async function drinkPotion(context) {
     // long; several at once by their count, as a report counts potions.
     const key = `drunk${kind[0].toUpperCase()}${kind.slice(1)}`;
     const drunk = taken.count > 1 ? `${taken.count} × ${potion.name}` : potion.counted[0];
-    text = say(texts, key, 0, { potion: drunk, bonus: Math.round(buffs[kind].bonus * 100), minutes: Math.round(buffLeft(buffs, kind) / 60000) });
+    text = say(texts, key, 0, { potion: drunk, bonus: Math.round(buffs[kind].bonus * 100), fights: fightsText(buffLeft(buffs, kind), content) });
     // On a Drużyna's trip the fights are the same for all who went, as it
     // set out, so what is drunk on the way works from the next exploration
     // (claimWindows in potions.js).

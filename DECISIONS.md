@@ -3034,6 +3034,23 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.26 (3.11.2026)
+
+1. **Mikstury wzmacniające liczone w walkach, nie w minutach** (zob. „Mikstury liczone w walkach”).
+
+## Mikstury liczone w walkach (3.11.2026)
+
+Autor: „Zmieniamy model mikstur szybkości i inne buffy -> te trwające 0,5h niech dają bonus na 2 walki. Czyli nakładamy na ilość walk w wyprawie a nie na czas. (…) Czyli 2 mikstury -> 4 walki i tak będziemy to wyświetlać i opisywać, wszędzie.” i „Skalowanie możesz wymyślić sam.”
+
+1. **Walki zamiast minut.** Każda mikstura wzmacniająca (mikstury szybkości, Wywar kamiennej skóry, Wywar siły, Mikstura skupienia, Olejek z tojadu, Eliksir jemiołowy) działa przez 2 walki wypraw. Każda następna dodaje 2 walki, bez górnej granicy: 4 wypite naraz to 8 walk. Wzmocnienie działa od pierwszej walki wyprawy, w tylu walkach, ile mu zostało.
+2. **Zużycie przy „Odbierz raport”, jak dotąd.** Raport zabiera tyle walk, w ilu wzmocnienie zadziałało: wyprawa z 4 walkami przy 6 walkach mikstury zostawia 2 na następną. Zawrócona wyprawa niczego nie zużywa.
+3. **Wszędzie liczba walk:** opisy mikstur („na 2 walki. Każda kolejna dodaje następne 2 walki.”), komunikat po wypiciu („przez 4 walki”), „Aktywne bonusy” na Postaci i przed „Wyrusz” („jeszcze 4 walki”), znaczek mikstury na górnym pasku („4 walki”), teksty zdarzeń („przez 2 walki”) i raport („działała w walkach: 2 z 4”).
+4. (brakujący szczegół) **Skalowanie.** Kwadrans dawnego czasu to jedna walka (`potionUse.minutesPerFight`). Wzmocnienia i klątwy zdarzeń: pół godziny to 2 walki, godzina to 4 walki (wesele, chciwy skarb, klątwa Welesa). Wzmocnienia wypite przed tą wersją przeliczają się same przy pierwszym odczycie: każdy rozpoczęty kwadrans to walka (pół godziny to 2 walki, 20 minut też 2).
+5. (brakujący szczegół) **Dwie siły jednego rodzaju.** Zostaje silniejszy bonus, a walki słabszej mikstury przeliczają się na jego siłę, do najbliższej całej walki: 2 walki po 35% i 2 po 15% dają 3 walki po 35%. Walki silniejszego bonusu i właśnie wypitej mikstury zostają całe.
+6. (brakujący szczegół) **Wyprawa Drużyny** walczy z bonusami, z jakimi wyruszyła, jak dotąd, a raport każdej postaci zużywa jej walki, w których bonus zadziałał.
+7. Wyprawa 30-minutowa ma 4 walki, godzinna 6, dwugodzinna 8, a czterogodzinna 10. Jedna mikstura obejmuje więc połowę wyprawy 30-minutowej, a dwie całą. Na długich wyprawach mikstura działa dłużej niż dotąd: wcześniej pół godziny z czterech godzin obejmowało 1–2 walki z 10.
+8. Zapis: `fights` mikstur w `data/professions.json` i nagród `buff` w `data/events.json`, `fightForms` i `minutesPerFight` w `potionUse`, a w kodzie `storedBuffs`, `spendFights` i `fightsText` w `src/engine/potions.js`. Walidator sprawdza, że opis mikstury i tekst zdarzenia podają liczbę walk. Testy: `test/potions.test.js`, `test/events.test.js`, `test/roadside-events.test.js`.
+
 ## Wersja 0.1.25 (3.11.2026)
 
 1. **Zadania narratora z Górnictwem i Jubilerstwem (572)** (zob. „Zadania z Górnictwem i Jubilerstwem”).

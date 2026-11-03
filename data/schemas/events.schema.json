@@ -57,12 +57,12 @@
         "buff": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["kind", "bonus", "minutes"],
-          "description": "Nagroda: wzmocnienie jak po miksturze na czas (szybkość, pancerz, obrażenia albo skupienie) na tyle minut wypraw, albo klątwa (curse: obrażenia mniejsze o bonus).",
+          "required": ["kind", "bonus", "fights"],
+          "description": "Nagroda: wzmocnienie jak po miksturze wzmacniającej (szybkość, pancerz, obrażenia albo skupienie) na tyle walk wypraw, albo klątwa (curse: obrażenia mniejsze o bonus).",
           "properties": {
             "kind": { "enum": ["speed", "armor", "damage", "focus", "curse"] },
             "bonus": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
-            "minutes": { "type": "integer", "minimum": 1 }
+            "fights": { "type": "integer", "minimum": 1 }
           }
         },
         "points": { "type": "integer", "minimum": 1, "description": "Nagroda: tyle Wolnych Punktów Statystyk ponad te z poziomów." },

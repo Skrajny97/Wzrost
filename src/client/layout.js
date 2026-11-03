@@ -9,7 +9,7 @@
 
 import { encyclopediaArt, goldArt, narratorFace, resourceArt, timePointsArt } from './art.js';
 import { bestiaryReady } from './bestiary.js';
-import { activeBuffs, updateBonusTimes } from './bonuses.js';
+import { activeBuffs, fightsLeft } from './bonuses.js';
 import { communityNews, communityNewsText } from './chat-news.js';
 import { $, fill, h, icon } from './dom.js';
 import { formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
@@ -294,15 +294,14 @@ export function updateTopbar(now = serverNow()) {
   topbar.xp.set(character.xp, character.xpToNext);
   topbar.classXp.set(character.classXp, character.classXpToNext);
 
-  // Their time runs down only on an exploration, until `until`; the lists of
-  // them on Postać and before "Wyrusz" run down with it.
-  const buffs = activeBuffs(character, now);
-  const left = Math.max(0, ...buffs.map((buff) => buff.left));
-  updateBonusTimes(character, now);
+  // The strengthening potions at work: the most fights one has left (they
+  // go when a report is claimed).
+  const buffs = activeBuffs(character);
+  const left = Math.max(0, ...buffs.map((buff) => buff.fights));
   topbar.speed.hidden = !(left > 0);
   if (left > 0) {
-    topbar.speedTime.textContent = formatCountdown(left);
-    topbar.speed.setAttribute('aria-label', buffs.map((buff) => `${buff.label}, jeszcze ${formatCountdown(buff.left)} wypraw`).join('; '));
+    topbar.speedTime.textContent = fightsLeft(left);
+    topbar.speed.setAttribute('aria-label', buffs.map((buff) => `${buff.label}, jeszcze ${fightsLeft(buff.fights)}`).join('; '));
   }
 
   const activity = character.activity;

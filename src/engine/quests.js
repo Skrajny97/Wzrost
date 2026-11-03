@@ -23,6 +23,7 @@ import { easyPlace, encountersFor } from './hunt.js';
 import { randomItem } from './items.js';
 import { knownHerbs, professionState } from './professions.js';
 import { createRng } from './rng.js';
+import { countedForm } from './text.js';
 import { areasOpened, areaUnlocked } from './unlocks.js';
 
 export const QUEST_PERIODS = ['daily', 'weekly'];
@@ -479,13 +480,8 @@ export function chestItem({ level, classId, classLevel = 1 }, wornSlots, rng, co
   return randomItem(level, rng, content, { rarityId, filled: new Set(wornSlots), classId, maxClassLevel: classLevel, area });
 }
 
-// A noun after a number, in Polish: 1, then 2–4 (but not 12–14), then the rest.
-export function countedForm(count, [one, few, many]) {
-  if (count === 1) return one;
-  const last = count % 10;
-  const tens = count % 100;
-  return last >= 2 && last <= 4 && (tens < 12 || tens > 14) ? few : many;
-}
+// A noun after a number, in Polish (text.js).
+export { countedForm };
 
 // A quest's text: its kind's, with the count and the noun to go with it. A
 // creature the character has not met yet is "???", as on the list of

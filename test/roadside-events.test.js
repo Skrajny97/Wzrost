@@ -46,11 +46,11 @@ describe('the roadside events in the engine', () => {
   test('the beggar blesses for a few coins, Weles gives a point or curses, and the thief takes the purse instead', () => {
     const blessed = resolve(beggar, 'coins', 'beggar');
     assert.equal(blessed.spent, 60);
-    assert.deepEqual(blessed.event.reward.buff, { kind: 'armor', bonus: 0.1, minutes: 30 });
+    assert.deepEqual(blessed.event.reward.buff, { kind: 'armor', bonus: 0.1, fights: 2 });
     assert.match(blessed.event.option.text, /\(−60 złota\)/);
     const god = resolve(beggar, 'coins', 'veles');
     assert.deepEqual([god.spent, god.event.reward.points], [60, 1]);
-    assert.deepEqual(resolve(beggar, 'chase', 'veles').event.reward.buff, { kind: 'curse', bonus: 0.1, minutes: 60 });
+    assert.deepEqual(resolve(beggar, 'chase', 'veles').event.reward.buff, { kind: 'curse', bonus: 0.1, fights: 4 });
     assert.ok(['unique', 'epic'].includes(resolve(beggar, 'song', 'veles').items.at(-1).rarity));
     // A tenth of the purse, the character's gold with the exploration's, at
     // most 20 gold a level, and not the coins on top.
@@ -105,9 +105,9 @@ describe('the roadside events in the engine', () => {
     assert.ok(robbed.fights.at(-1).gold > plain.fights.at(-1).gold);
     const cursed = resolve(shrine, 'offerings', 'soul');
     assert.ok(cursed.gold > hunt.gold);
-    assert.deepEqual(cursed.event.reward.buff, { kind: 'curse', bonus: 0.1, minutes: 30 });
+    assert.deepEqual(cursed.event.reward.buff, { kind: 'curse', bonus: 0.1, fights: 2 });
     assert.equal(resolve(shrine, 'offerings', 'empty').event.reward.buff, undefined);
-    assert.deepEqual(resolve(shrine, 'pray', 'soul').event.reward.buff, { kind: 'focus', bonus: 0.1, minutes: 30 });
+    assert.deepEqual(resolve(shrine, 'pray', 'soul').event.reward.buff, { kind: 'focus', bonus: 0.1, fights: 2 });
   });
 
   test('the merchant comes only with the Osada and from level 20, and pays in its reputation', () => {
@@ -161,10 +161,10 @@ describe('the roadside events in the engine', () => {
     assert.match(duel.entries.at(-1).text, /Leszy kłania się nisko/);
   });
 
-  test('a curse weakens the blows in the explorations it covers', () => {
+  test('a curse weakens the blows in the fights it covers', () => {
     const start = { character, equipped, hp: 99999, name: 'Mira', areaId: 'lynx-ridge', minutes: 30, seed: 'klatwa' };
     const plain = simulateHunt(start, content);
-    const cursed = simulateHunt({ ...start, buffs: { curse: { bonus: 0.1, ms: 30 * 60000 } } }, content);
+    const cursed = simulateHunt({ ...start, buffs: { curse: { bonus: 0.1, fights: 4 } } }, content);
     assert.equal(cursed.buffFights.curse, cursed.fights.length);
     const firstBlow = (one) => {
       const fight = one.fights[0];

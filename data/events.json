@@ -235,32 +235,32 @@
               "name": "Zjedzenie: lekkość",
               "weight": 10,
               "kind": "reward",
-              "text": "Odgryzasz kawałek kapelusza. Nogi same rwą się do biegu, a każdy ruch przychodzi lekko (ruchy w walkach +25% przez 30 minut wypraw).",
-              "buff": { "kind": "speed", "bonus": 0.25, "minutes": 30 }
+              "text": "Odgryzasz kawałek kapelusza. Nogi same rwą się do biegu, a każdy ruch przychodzi lekko (ruchy w walkach +25% przez 2 walki).",
+              "buff": { "kind": "speed", "bonus": 0.25, "fights": 2 }
             },
             {
               "id": "armor",
               "name": "Zjedzenie: twarda skóra",
               "weight": 10,
               "kind": "reward",
-              "text": "Odgryzasz kawałek kapelusza. Skóra cierpnie i twardnieje jak kora starego dębu (pancerz +15% przez 30 minut wypraw).",
-              "buff": { "kind": "armor", "bonus": 0.15, "minutes": 30 }
+              "text": "Odgryzasz kawałek kapelusza. Skóra cierpnie i twardnieje jak kora starego dębu (pancerz +15% przez 2 walki).",
+              "buff": { "kind": "armor", "bonus": 0.15, "fights": 2 }
             },
             {
               "id": "damage",
               "name": "Zjedzenie: siła",
               "weight": 10,
               "kind": "reward",
-              "text": "Odgryzasz kawałek kapelusza. Po ramionach rozlewa się ciepło, a dłonie same zaciskają się na broni (obrażenia +10% przez 30 minut wypraw).",
-              "buff": { "kind": "damage", "bonus": 0.1, "minutes": 30 }
+              "text": "Odgryzasz kawałek kapelusza. Po ramionach rozlewa się ciepło, a dłonie same zaciskają się na broni (obrażenia +10% przez 2 walki).",
+              "buff": { "kind": "damage", "bonus": 0.1, "fights": 2 }
             },
             {
               "id": "focus",
               "name": "Zjedzenie: jasność umysłu",
               "weight": 10,
               "kind": "reward",
-              "text": "Odgryzasz kawałek kapelusza. Myśli stają się jasne i ostre jak szron o świcie (Intelekt i Mądrość +10% przez 30 minut wypraw).",
-              "buff": { "kind": "focus", "bonus": 0.1, "minutes": 30 }
+              "text": "Odgryzasz kawałek kapelusza. Myśli stają się jasne i ostre jak szron o świcie (Intelekt i Mądrość +10% przez 2 walki).",
+              "buff": { "kind": "focus", "bonus": 0.1, "fights": 2 }
             },
             {
               "id": "point",
@@ -304,8 +304,8 @@
           "outcomes": {
             "coins": {
               "kind": "reward",
-              "text": "Wrzucasz do kubka kilka monet (−{cost} złota). Dziad kreśli nad tobą znak i mamrocze błogosławieństwo. Krok staje się pewniejszy, a skóra twardsza (pancerz +10% przez 30 minut wypraw).",
-              "buff": { "kind": "armor", "bonus": 0.1, "minutes": 30 }
+              "text": "Wrzucasz do kubka kilka monet (−{cost} złota). Dziad kreśli nad tobą znak i mamrocze błogosławieństwo. Krok staje się pewniejszy, a skóra twardsza (pancerz +10% przez 2 walki).",
+              "buff": { "kind": "armor", "bonus": 0.1, "fights": 2 }
             },
             "song": {
               "kind": "reward",
@@ -333,8 +333,8 @@
             },
             "chase": {
               "kind": "reward",
-              "text": "Dziad prostuje się i nagle wydaje się wyższy od drzew: „Przeganiasz Welesa?”. Ziemia drży, a on rozpływa się we mgle. Ręce ciążą jak z ołowiu (klątwa: obrażenia −10% przez 60 minut wypraw).",
-              "buff": { "kind": "curse", "bonus": 0.1, "minutes": 60 }
+              "text": "Dziad prostuje się i nagle wydaje się wyższy od drzew: „Przeganiasz Welesa?”. Ziemia drży, a on rozpływa się we mgle. Ręce ciążą jak z ołowiu (klątwa: obrażenia −10% przez 4 walki).",
+              "buff": { "kind": "curse", "bonus": 0.1, "fights": 4 }
             }
           }
         },
@@ -391,8 +391,8 @@
           "outcomes": {
             "pray": {
               "kind": "reward",
-              "text": "Klękasz i modlisz się za tego, kto płacze. Płacz cichnie, a płomień świecy na chwilę jaśnieje złotem. Myśli stają się jasne i spokojne (Intelekt i Mądrość +10% przez 30 minut wypraw).",
-              "buff": { "kind": "focus", "bonus": 0.1, "minutes": 30 }
+              "text": "Klękasz i modlisz się za tego, kto płacze. Płacz cichnie, a płomień świecy na chwilę jaśnieje złotem. Myśli stają się jasne i spokojne (Intelekt i Mądrość +10% przez 2 walki).",
+              "buff": { "kind": "focus", "bonus": 0.1, "fights": 2 }
             },
             "exorcism": {
               "kind": "reward",
@@ -401,9 +401,9 @@
             },
             "offerings": {
               "kind": "reward",
-              "text": "Zgarniasz srebrne wota i monety (+{gold} złota). Płacz zmienia się w szept, od którego cierpnie skóra: dusza rzuca na ciebie klątwę (obrażenia −10% przez 30 minut wypraw).",
+              "text": "Zgarniasz srebrne wota i monety (+{gold} złota). Płacz zmienia się w szept, od którego cierpnie skóra: dusza rzuca na ciebie klątwę (obrażenia −10% przez 2 walki).",
               "gold": 2,
-              "buff": { "kind": "curse", "bonus": 0.1, "minutes": 30 }
+              "buff": { "kind": "curse", "bonus": 0.1, "fights": 2 }
             }
           }
         },
@@ -743,9 +743,9 @@
               "buff": {
                 "kind": "curse",
                 "bonus": 0.1,
-                "minutes": 30
+                "fights": 2
               },
-              "text": "Puszczasz zimną rączkę i zawracasz. Przez całą drogę czujesz na karku lodowaty oddech, a ręce robią się ciężkie jak z ołowiu (klątwa: obrażenia −10% przez 30 minut wypraw)."
+              "text": "Puszczasz zimną rączkę i zawracasz. Przez całą drogę czujesz na karku lodowaty oddech, a ręce robią się ciężkie jak z ołowiu (klątwa: obrażenia −10% przez 2 walki)."
             },
             "ask/camp": {
               "kind": "fight",
@@ -762,9 +762,9 @@
               "buff": {
                 "kind": "focus",
                 "bonus": 0.1,
-                "minutes": 30
+                "fights": 2
               },
-              "text": "Dziewczynka bierze jedzenie, ale go nie je. Uśmiecha się smutno: „Nikt mi dawno nic nie dał”. Rozwiewa się jak mgła, a ty zostajesz z dziwnym spokojem w sercu (skupienie +10% przez 30 minut wypraw)."
+              "text": "Dziewczynka bierze jedzenie, ale go nie je. Uśmiecha się smutno: „Nikt mi dawno nic nie dał”. Rozwiewa się jak mgła, a ty zostajesz z dziwnym spokojem w sercu (skupienie +10% przez 2 walki)."
             },
             "ask/go": {
               "kind": "none",
@@ -847,9 +847,9 @@
               "buff": {
                 "kind": "damage",
                 "bonus": 0.1,
-                "minutes": 60
+                "fights": 4
               },
-              "text": "Miód jest mocny i słodki. Tańczysz z druhnami do białego rana, a gdy wreszcie ruszasz w drogę, w żyłach wciąż szumi weselna zabawa (obrażenia +10% przez 60 minut wypraw)."
+              "text": "Miód jest mocny i słodki. Tańczysz z druhnami do białego rana, a gdy wreszcie ruszasz w drogę, w żyłach wciąż szumi weselna zabawa (obrażenia +10% przez 4 walki)."
             },
             "join/pour": {
               "kind": "none",
@@ -868,9 +868,9 @@
               "buff": {
                 "kind": "focus",
                 "bonus": 0.1,
-                "minutes": 30
+                "fights": 2
               },
-              "text": "Wychodzisz z krzaków przy wtórze śmiechów. Dostajesz kawał kołacza, miejsce przy ogniu i błogosławieństwo starej swatki (skupienie +10% przez 30 minut wypraw)."
+              "text": "Wychodzisz z krzaków przy wtórze śmiechów. Dostajesz kawał kołacza, miejsce przy ogniu i błogosławieństwo starej swatki (skupienie +10% przez 2 walki)."
             },
             "watch/cross": {
               "kind": "none",
@@ -1128,9 +1128,9 @@
               "buff": {
                 "kind": "curse",
                 "bonus": 0.1,
-                "minutes": 60
+                "fights": 4
               },
-              "text": "Skrzynia jest pełna złota. Gdy zanurzasz w nim dłonie, poszukiwacz zaczyna się śmiać, a połowa monet czernieje i rozsypuje się w węgle. Zostaje ci garść złota (+{gold} złota) i ciężar na sercu (klątwa: obrażenia −10% przez 60 minut wypraw)."
+              "text": "Skrzynia jest pełna złota. Gdy zanurzasz w nim dłonie, poszukiwacz zaczyna się śmiać, a połowa monet czernieje i rozsypuje się w węgle. Zostaje ci garść złota (+{gold} złota) i ciężar na sercu (klątwa: obrażenia −10% przez 4 walki)."
             },
             "dig/wait": {
               "kind": "none",
@@ -1141,9 +1141,9 @@
               "buff": {
                 "kind": "curse",
                 "bonus": 0.1,
-                "minutes": 30
+                "fights": 2
               },
-              "text": "W dziupli leży pożółkła czaszka z monetą w zębach. Gdy jej dotykasz, robi ci się zimno aż do szpiku (klątwa: obrażenia −10% przez 30 minut wypraw)."
+              "text": "W dziupli leży pożółkła czaszka z monetą w zębach. Gdy jej dotykasz, robi ci się zimno aż do szpiku (klątwa: obrażenia −10% przez 2 walki)."
             },
             "map/tracks": {
               "kind": "reward",

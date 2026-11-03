@@ -373,16 +373,17 @@ export function resourceBundle(area, total) {
 // regular encounters only, no chests among the finds, and the one treasure
 // is a plain weapon of its class after the first won fight. `potions`: the
 // potions taken along, by id, the healing one drunk below `healBelow`;
-// `buffs`: the potions for a time drunk before, by kind, each with its bonus
-// for the first `ms` of the exploration, and `speed` the same for a speed
-// potion alone, as explorations started before the other kinds kept it
+// `buffs`: the strengthening potions drunk, by kind, each with its bonus for
+// the exploration's first `fights` fights (or, kept in time by one started
+// before 0.1.26, for its first `ms`), and `speed` the same for a speed potion
+// alone, as explorations started before the other kinds kept it
 // (potions.js).
 export function simulateHunt(
   { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [] },
   content,
 ) {
   // A Drużyna's trip (src/server/trips.js) gives `roster`, its players in
-  // the trip's order, each with what it brought (its potions for a time and
+  // the trip's order, each with what it brought (its strengthening potions and
   // trophies, the leader's potions), and `seed`, the trip's: its timeline
   // and fights come out the same in every member's report (the author:
   // "postacie z drużyny mają inne raporty odbytych walk. To nie powinno mieć
@@ -539,12 +540,16 @@ export function simulateHunt(
       pace = odds();
     }
     const enemies = encounterCombatants(encounter, content);
-    // Each player as it fights now: its potions for a time still working,
-    // the potions it carries and its trophies.
+    // Each player as it fights now: its strengthening potions still working
+    // (in their number of the first fights; a window kept in time, of an
+    // exploration started before 0.1.26, while its time lasts), the potions
+    // it carries and its trophies.
     const players = fighters.map((fighter) => {
       const kit = fightPotions(fighter.left, fighter.healBelow ?? content.potionUse?.healBelow, content);
       const on = {};
-      for (const [kind, window] of Object.entries(fighter.windows)) if (event.t < window.ms) on[kind] = window.bonus;
+      for (const [kind, window] of Object.entries(fighter.windows)) {
+        if (Number.isFinite(window.fights) ? fights.length < window.fights : event.t < window.ms) on[kind] = window.bonus;
+      }
       for (const kind of Object.keys(on)) fighter.buffFights[kind] = (fighter.buffFights[kind] ?? 0) + 1;
       // Focus raises Intelekt and Mądrość, which the character's numbers grow from.
       const base = on.focus

@@ -294,8 +294,8 @@ describe('events', () => {
     assert.match(fainted.event.option.text, /\(−30 złota\)\.$/);
     assert.deepEqual(eaten('faint', 0).event.loss, { gold: 0 });
     assert.doesNotMatch(eaten('faint', 0).event.option.text, /złota/);
-    // A buff for 30 minutes of explorations, or a free stat point.
-    assert.deepEqual(eaten('damage').event.reward.buff, { kind: 'damage', bonus: 0.1, minutes: 30 });
+    // A buff for 2 fights of explorations, or a free stat point.
+    assert.deepEqual(eaten('damage').event.reward.buff, { kind: 'damage', bonus: 0.1, fights: 2 });
     assert.equal(eaten('point').event.reward.points, 1);
     assert.equal(eaten('point').gold, base.gold);
     assert.equal(resolveEvent({ hunt: base, event: mushroom, optionId: 'leave', character, equipped, name: 'Mira', seed }, content).gold, base.gold);
@@ -527,8 +527,8 @@ describe('events (API)', () => {
     assert.equal(view.freePoints, perLevel * (view.level - 1) + Math.floor(perLevel / 4) * (view.classLevel - 1) + 1 - 290);
     await eat('damage');
     assert.deepEqual(
-      (await character()).buffs.map(({ kind, ms, bonus }) => ({ kind, ms, bonus })),
-      [{ kind: 'damage', ms: 30 * 60000, bonus: 0.1 }],
+      (await character()).buffs.map(({ kind, fights, bonus }) => ({ kind, fights, bonus })),
+      [{ kind: 'damage', fights: 2, bonus: 0.1 }],
     );
     // A short exploration may bring no gold, and then loses none (the
     // engine's test checks both cases on fixed numbers).

@@ -507,8 +507,8 @@ export function mountCharacter(container) {
     const character = state.character;
     // On an exploration the HP is the report's: a healing potion waits.
     const exploring = character.activity?.kind === 'hunt' && entry.fight === 'heal';
-    // A potion for a time is drunk as many at once as chosen, each adding its
-    // minutes (brewing.js); a healing one, one at a time.
+    // A strengthening potion is drunk as many at once as chosen, each adding
+    // its fights (brewing.js); a healing one, one at a time.
     const timed = entry.drink && !entry.fight;
     let count = 1;
     const price = (amount) => saleGold(entry.price, amount);

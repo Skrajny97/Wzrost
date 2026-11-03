@@ -5,12 +5,15 @@
 // mana, an antidote the moment it is poisoned and the fern brew the moment it
 // faints, each kind at most once a fight and the strongest of a kind first
 // (combat.js). The fern brew saves the character once an exploration, so an
-// exploration takes one along at most. A potion for a time is drunk from the
-// bag instead (speed, armour, damage, focus, the aconite oil on the blade,
-// the mistletoe ward) and works in the fights of its minutes, which pass only
-// on explorations; each one drunk adds its minutes to those left, and an
-// exploration uses up its length of them as its report is claimed, whenever
-// they were drunk (claimWindows). Potions not drunk stay in the bag.
+// exploration takes one along at most. A strengthening potion is drunk from
+// the bag instead (speed, armour, damage, focus, the aconite oil on the
+// blade, the mistletoe ward) and works in its number of the next fights of
+// explorations (the author: "nakładamy na ilość walk w wyprawie a nie na
+// czas"); each one drunk adds its fights to those left, and an exploration
+// uses up the fights they worked in as its report is claimed, whenever they
+// were drunk (claimWindows). Potions not drunk stay in the bag.
+
+import { countedForm } from './text.js';
 
 // The kinds of a potion that works by itself in fights and of a potion for a
 // time, as keys of its effect; a curse of an event (the god chased off, the
@@ -43,37 +46,56 @@ export function fightPotions(left, healBelow, content) {
   return kit;
 }
 
-// The milliseconds of explorations the potions of a kind drunk still have.
-export const buffLeft = (buffs, kind) => (Number.isFinite(buffs?.[kind]?.ms) ? buffs[kind].ms : 0);
+// "2 walki", "1 walkę", "5 walk": a number of fights after "na" or "przez".
+export const fightsText = (count, content) => `${count} ${countedForm(count, content.potionUse.fightForms)}`;
 
-// Buffs with `ms` more of a kind's time at `bonus` (the kind's own when not
-// given), or less when below 0: a potion drunk adds its minutes to those
-// still left, an exploration takes what it covers and gives back what it did
-// not use. Potions of one kind but of two strengths keep the stronger bonus,
-// and the weaker one's minutes shrink to what they are worth at it: 30 minutes
-// at 35% and 30 at 15% make about 43 at 35%.
-export function addBuff(buffs, kind, ms, bonus) {
+// The fights of explorations the potions of a kind drunk still have.
+export const buffLeft = (buffs, kind) => (Number.isFinite(buffs?.[kind]?.fights) ? buffs[kind].fights : 0);
+
+// Buffs with `fights` more fights of a kind at `bonus` (the kind's own when
+// not given), or fewer when below 0: a potion drunk adds its fights to those
+// still left, a claimed report takes away those its potions worked in.
+// Potions of one kind but of two strengths keep the stronger bonus, and the
+// weaker one's fights shrink to what they are worth at it, to the nearest
+// whole fight: 2 fights at 35% and 2 at 15% make 3 at 35%. The fights at the
+// stronger bonus and those of the potion drunk stay whole.
+export function addBuff(buffs, kind, fights, bonus) {
   const { [kind]: before, ...rest } = buffs ?? {};
   const had = before?.bonus ?? 0;
   const strength = bonus ?? had;
   const top = Math.max(had, strength);
-  const left = top > 0 ? Math.round((buffLeft(buffs, kind) * had + ms * strength) / top) : 0;
-  return left > 0 ? { ...rest, [kind]: { ms: left, bonus: top } } : rest;
+  const left = top > 0 ? Math.round((buffLeft(buffs, kind) * had + fights * strength) / top) : 0;
+  return left > 0 ? { ...rest, [kind]: { fights: left, bonus: top } } : rest;
 }
 
-// Buffs after a potion for a time drunk from the bag.
+// Buffs after a strengthening potion drunk from the bag.
 export function drinkTimed(buffs, potion) {
   const kind = timedKind(potion);
-  return addBuff(buffs, kind, potion.minutes * 60000, potion.effect[kind]);
+  return addBuff(buffs, kind, potion.fights, potion.effect[kind]);
 }
 
-// What of an exploration of `minutes` the potions drunk before cover, from
-// its start, by kind: their bonus and milliseconds.
-export function buffWindows(buffs, minutes) {
+// Buffs as a character's row keeps them, in fights. Those kept in time before
+// 0.1.26 (milliseconds of explorations, or a speed potion's end from before
+// 0.0.74) count a fight for every `minutesPerFight` minutes, a part of one
+// as a whole one: the half hour of a potion makes its 2 fights.
+export function storedBuffs(stored, now, content) {
+  const perFight = content.potionUse.minutesPerFight * 60000;
+  const buffs = {};
+  for (const [kind, buff] of Object.entries(stored ?? {})) {
+    const ms = Number.isFinite(buff?.ms) ? buff.ms : Math.max(0, (buff?.until ?? now) - now);
+    const fights = Number.isFinite(buff?.fights) ? buff.fights : Math.ceil(ms / perFight);
+    if (fights > 0 && buff?.bonus > 0) buffs[kind] = { fights, bonus: buff.bonus };
+  }
+  return buffs;
+}
+
+// What the potions drunk cover of an exploration, from its first fight, by
+// kind: their bonus and fights.
+export function buffWindows(buffs) {
   const windows = {};
   for (const kind of TIMED_KINDS) {
     const left = buffLeft(buffs, kind);
-    if (left > 0) windows[kind] = { bonus: buffs[kind].bonus, ms: Math.min(left, minutes * 60000) };
+    if (left > 0) windows[kind] = { bonus: buffs[kind].bonus, fights: left };
   }
   return windows;
 }
@@ -82,38 +104,30 @@ export function buffWindows(buffs, minutes) {
 // potion's alone, as explorations started before the other kinds kept it.
 export const optionWindows = (options) => options?.buffs ?? (options?.speed ? { speed: options.speed } : {});
 
-// What of an exploration of `minutes` the potions for a time cover as its
-// report is claimed, and what of their time it uses up then (the author:
-// "Ten czas powinien schodzić dopiero po kliknięciu Odbierz raport i to w
-// wysokości zadanej przed wyprawą, nawet jeśli mikstury zostały zażyte w
-// czasie wyprawy lub na chwilę przed Odebraniem raportu"): those at work now
-// (`buffs`), drunk before it set out, on the way or after it came back, from
-// its start as far as their time goes. A Drużyna's trip (`fixed`) keeps the
-// windows it set out with, as its fights are the same for all who went, and
-// uses up those; one started before 0.0.74 had its time taken at its start,
-// so it keeps its windows and uses up nothing more.
-export function claimWindows(options, buffs, minutes, fixed = false) {
+// What the strengthening potions cover of an exploration as its report is
+// claimed, and whether the fights they work in are used up then (the author:
+// "Ten czas powinien schodzić dopiero po kliknięciu Odbierz raport ... nawet
+// jeśli mikstury zostały zażyte w czasie wyprawy lub na chwilę przed
+// Odebraniem raportu"): those at work now (`buffs`), drunk before it set out,
+// on the way or after it came back, from its first fight as far as their
+// fights go. A Drużyna's trip (`fixed`) keeps the windows it set out with,
+// as its fights are the same for all who went; one started before 0.0.74
+// had its time taken at its start, so it keeps its windows and uses up
+// nothing more.
+export function claimWindows(options, buffs, fixed = false) {
   const kept = optionWindows(options);
-  if (options?.spend !== 'claim' && Object.keys(kept).length > 0) return { windows: kept, spend: {} };
-  if (fixed) return { windows: kept, spend: kept };
-  const windows = buffWindows(buffs, minutes);
-  return { windows, spend: windows };
+  if (options?.spend !== 'claim' && Object.keys(kept).length > 0) return { windows: kept, spends: false };
+  return { windows: fixed ? kept : buffWindows(buffs), spends: true };
 }
 
-// Buffs less the time an exploration's windows cover, as it starts.
-export function spendWindows(buffs, windows) {
-  let after = buffs ?? {};
-  for (const [kind, window] of Object.entries(windows)) after = addBuff(after, kind, -window.ms, window.bonus);
-  return after;
-}
-
-// Buffs with the time back that the windows of an exploration called back
-// `used` milliseconds after its start did not use.
-export function returnWindows(buffs, windows, used) {
+// Buffs less the fights the strengthening potions worked in on an
+// exploration (`used` by kind: its report's buffFights), at the bonus of its
+// windows.
+export function spendFights(buffs, windows, used) {
   let after = buffs ?? {};
   for (const [kind, window] of Object.entries(windows)) {
-    const unused = Math.max(0, window.ms - used);
-    if (unused > 0) after = addBuff(after, kind, unused, window.bonus);
+    const count = used?.[kind] ?? 0;
+    if (count > 0) after = addBuff(after, kind, -count, window.bonus);
   }
   return after;
 }
