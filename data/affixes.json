@@ -128,7 +128,7 @@
     { "monster": "veles-serpent", "prefix": { "m": "Welesowy", "f": "Welesowa", "n": "Welesowe", "pl": "Welesowe" }, "suffix": "Węża Welesa" },
     { "monster": "pagan-priest", "prefix": { "m": "Pogański", "f": "Pogańska", "n": "Pogańskie", "pl": "Pogańskie" }, "suffix": "Żercy" },
     { "monster": "bog-demon", "suffix": "Bagiennika" },
-    { "monster": "tick", "prefix": { "m": "Kleszczowy", "f": "Kleszczowa", "n": "Kleszczowe", "pl": "Kleszczowe" }, "suffix": "Kleszcza" },
+    { "monster": "tick", "prefix": { "m": "Kleszczowy", "f": "Kleszczowa", "n": "Kleszczowe", "pl": "Kleszczowe" }, "suffix": "Wielkiego Kleszcza" },
     { "monster": "night-heron", "suffix": "Ślepowrona" },
     { "monster": "bies", "prefix": { "m": "Czarci", "f": "Czarcia", "n": "Czarcie", "pl": "Czarcie" }, "suffix": "Biesa" },
     { "monster": "black-goat", "prefix": { "m": "Kozi", "f": "Kozia", "n": "Kozie", "pl": "Kozie" }, "suffix": "Czarnego Kozła" },

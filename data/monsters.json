@@ -1639,8 +1639,8 @@
   },
   {
     "id": "tick",
-    "name": "Kleszcz",
-    "counted": ["kleszcza", "kleszcze", "kleszczy"],
+    "name": "Wielki Kleszcz",
+    "counted": ["wielkiego kleszcza", "wielkie kleszcze", "wielkich kleszczy"],
     "family": "spider",
     "position": "middle",
     "stats": {

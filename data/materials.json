@@ -98,7 +98,7 @@
     {"id": "veles-scale", "name": "Łuska Welesa", "gender": "f", "monster": "veles-serpent", "rarity": "epic", "description": "Wielka czarna łuska z ledwie widocznym złotym wzorem."},
     {"id": "bone-amulet", "name": "Kościany amulet", "gender": "m", "monster": "pagan-priest", "rarity": "epic", "description": "Stary amulet na rzemieniu, z wyrytym znakiem słońca."},
     {"id": "bog-lantern-eye", "name": "Oko bagiennika", "gender": "n", "monster": "bog-demon", "rarity": "unique", "description": "Okrągłe, żółte oko, które świeci w ciemności jak latarnia."},
-    {"id": "tick-shell", "name": "Pancerzyk kleszcza", "gender": "m", "monster": "tick", "rarity": "common", "description": "Twarda, rdzawobrązowa skorupka. Pusta w środku."},
+    {"id": "tick-shell", "name": "Pancerz wielkiego kleszcza", "gender": "m", "monster": "tick", "rarity": "common", "description": "Twarda, rdzawobrązowa skorupka. Pusta w środku."},
     {"id": "night-heron-plume", "name": "Pióropusz ślepowrona", "gender": "m", "monster": "night-heron", "rarity": "rare", "description": "Długie, cienkie, białe pióra z głowy ślepowrona."},
     {"id": "bies-horn", "name": "Róg biesa", "gender": "m", "monster": "bies", "rarity": "epic", "description": "Krótki, gruby, czarny róg z pękniętym czubkiem. Ciepły w dotyku."},
     {"id": "black-fleece", "name": "Czarne runo", "gender": "n", "monster": "black-goat", "rarity": "unique", "description": "Kępa skołtunionej, czarnej sierści, która pachnie siarką."},

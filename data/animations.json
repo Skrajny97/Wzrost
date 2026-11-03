@@ -20,7 +20,8 @@
       "windfalls": "art/scenes/lands/windfalls.png",
       "stone-glade": "art/scenes/lands/stone-glade.png",
       "backwaters": "art/scenes/lands/backwaters.png",
-      "peat-bogs": "art/scenes/lands/peat-bogs.png"
+      "peat-bogs": "art/scenes/lands/peat-bogs.png",
+      "black-bog": "art/scenes/lands/black-bog.png"
     },
     "landSpeed": 30,
     "pathSpeed": 94,

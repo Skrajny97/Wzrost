@@ -604,7 +604,7 @@
         "name": "Trzęsawisko",
         "minLevel": 116,
         "maxLevel": 120,
-        "description": "Cienki kożuch mchu nad bezdennymi oknami czarnej wody. Ziemia drży pod każdym krokiem, z mroku patrzą latarnie oczu bagiennika, w mchu czają się kleszcze, a o zmierzchu poluje ślepowron.",
+        "description": "Cienki kożuch mchu nad bezdennymi oknami czarnej wody. Ziemia drży pod każdym krokiem, z mroku patrzą latarnie oczu bagiennika, w mchu czają się wielkie kleszcze, a o zmierzchu poluje ślepowron.",
         "encounters": [
           { "weight": 18, "monsters": ["bog-demon"] },
           { "weight": 14, "monsters": ["tick"] },
