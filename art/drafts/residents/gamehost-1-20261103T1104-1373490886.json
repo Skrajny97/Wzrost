@@ -1,0 +1,12 @@
+{
+  "id": "gamehost-1",
+  "tool": "pixellab generate-image-v2",
+  "description": "a half-length portrait seen from a little further away, the whole figure from the top of the cap down to the belt inside the picture with empty space above the cap and at both sides, a cheerful sly slavic game-house host in his forties, a round face with a cunning smile and a short dark beard, a red felt cap with a feather, a fur-trimmed dark red waistcoat over a white linen shirt, gold rings on his fingers, holding a leather dice cup in one hand and two bone dice in the other in front of his chest, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+  "style": "src/client/art/residents/hermit.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

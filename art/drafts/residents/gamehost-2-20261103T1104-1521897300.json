@@ -1,0 +1,12 @@
+{
+  "id": "gamehost-2",
+  "tool": "pixellab generate-image-v2",
+  "description": "a half-length portrait seen from a little further away, the whole figure from the top of the hat down to the belt inside the picture with empty space above the hat and at both sides, a lean old slavic gambler who keeps the village game house, a long grey moustache and a sly wink, a tall fur hat, a dark green kaftan with gold embroidery, shuffling a small deck of painted cards in front of his chest, a pouch of coins on his belt, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+  "style": "src/client/art/residents/hermit.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
