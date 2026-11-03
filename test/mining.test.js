@@ -14,6 +14,7 @@ import {
   gemOf,
   generateItem,
   createRng,
+  drawQuests,
   heldDiscoveries,
   itemProperties,
   itemView,
@@ -34,11 +35,14 @@ import {
   notificationsDue,
   oreOf,
   professionStats,
+  questPeriod,
+  questText,
+  addQuestProgress,
   setMinutes,
   upgradedItem,
   veinGoldPerHour,
 } from '../src/engine/index.js';
-import { content } from './helpers/content.js';
+import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
 const near = (actual, expected, share) => assert.ok(Math.abs(actual - expected) <= expected * share, `${actual} is not within ${share * 100}% of ${expected}`);
@@ -203,6 +207,26 @@ describe('Górnictwo in the engine', () => {
     }
     const others = items.tiers.flatMap((tier) => tier.entries).filter((entry) => !jewelBases(content).some((base) => base.id === entry.id));
     assert.ok(others.every((entry) => !entry.sources.some((line) => line.startsWith('Szlifiernia'))));
+  });
+
+  // The author's 572 ("koniecznie"): the narrator's quests know Górnictwo
+  // and Jubilerstwo.
+  test('narrator quests ask for minerals and jewels only once their profession is open, and count them', () => {
+    const character = newCharacter('warrior', { level: 30 });
+    const drawn = (openProfessions, periodId) =>
+      Array.from({ length: 60 }, (_, index) => drawQuests(periodId, { character, hasTable: true, hasProfessions: true, hasCrafting: true, openProfessions, seed: `m${index}` }, content)).flat();
+    for (const periodId of ['daily', 'weekly']) assert.ok(!drawn(['herbalism', 'alchemy', 'crafting'], periodId).some((quest) => ['mineAny', 'jewelAny'].includes(quest.kind)));
+    const daily = drawn(['herbalism', 'alchemy', 'crafting', 'mining', 'jewelcrafting'], 'daily');
+    const mine = daily.find((quest) => quest.kind === 'mineAny');
+    const jewel = daily.find((quest) => quest.kind === 'jewelAny');
+    assert.deepEqual([questText(mine, content), questText(jewel, content)], ['Wydobądź łącznie 12 minerałów.', 'Wykonaj łącznie 2 sztuki biżuterii.']);
+    assert.ok(drawn(['mining', 'jewelcrafting'], 'weekly').some((quest) => quest.kind === 'mineAny'));
+    const quests = {
+      daily: { period: 'd', chest: false, quests: [{ kind: 'mineAny', count: 12, progress: 0, claimed: false }, { kind: 'jewelAny', count: 2, progress: 1, claimed: false }] },
+      weekly: { period: 'w', chest: false, quests: [] },
+    };
+    const moved = addQuestProgress(quests, { minerals: 5, jewels: 3 });
+    assert.deepEqual(moved.daily.quests.map((quest) => quest.progress), [5, 2]);
   });
 
   test('the end of a digging and of a work in the Szlifiernia come as phone notifications', () => {
@@ -455,6 +479,25 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     const thrown = await call('POST', '/api/minerals/discard', { cookie, body: { mineralId: 'silver-ore', count: 3 } });
     assert.deepEqual(minerals(thrown.data.character), { quartz: 2 });
     assert.equal((await call('POST', '/api/minerals/sell', { cookie, body: { mineralId: 'gold-ore', count: 1 } })).data.error.code, 'no_mineral');
+  });
+
+  test('the report of a digging moves the quest of minerals, and the jewels made move the quest of jewellery', async () => {
+    const now = Date.now();
+    const quest = (kind, count) => ({ kind, count, progress: 0, reward: { kind: 'gold', amount: 10 }, claimed: false });
+    const period = (periodId, quests) => ({ period: questPeriod(periodId, now, content).key, chest: false, quests, ...(periodId === 'weekly' && { scaled: true }) });
+    await set('quests = ?', JSON.stringify({ daily: period('daily', [quest('mineAny', 12), quest('jewelAny', 2)]), weekly: period('weekly', []) }));
+    assert.equal((await mine({ minutes: 60 })).status, 201);
+    await age(60);
+    const dug = (await claim()).data;
+    const found = dug.report.minerals.reduce((sum, mineral) => sum + mineral.count, 0);
+    const progress = (view, kind) => view.quests.daily.quests.find((one) => one.kind === kind).progress;
+    assert.equal(progress(dug.character, 'mineAny'), Math.min(12, found));
+    await set(`minerals = '{"quartz":2,"silver-ore":4}'`);
+    assert.equal((await jewel({ baseId: 'ring', rarity: 'common', count: 2 })).status, 201);
+    await age(60);
+    const made = (await claim()).data;
+    assert.equal(made.report.items.length, 2);
+    assert.equal(progress(made.character, 'jewelAny'), 2);
   });
 
   test('an order of jewels takes the gems and the ore at once and brings the jewels at the character level; stopped early, the rest comes back', async () => {

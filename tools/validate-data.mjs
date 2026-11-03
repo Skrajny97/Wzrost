@@ -1164,6 +1164,7 @@ function checkQuests(data, { resources, rarities }) {
       if (most.some((band, index) => index > 0 && band.fromClassLevel <= most[index - 1].fromClassLevel)) errors.push(`quests.json: progi most rodzaju ${kind.id} w ${period} nie rosną`);
     }
     if (kind.id === 'unlock' && !kind.untilClassLevel) errors.push('quests.json: rodzaj unlock nie ma untilClassLevel');
+    if (kind.profession && !data.professions.professions.some((profession) => profession.id === kind.profession)) errors.push(`quests.json: rodzaj ${kind.id} ma nieznaną profesję ${kind.profession}`);
   }
   for (const id of Object.keys(quests.rewards.resources)) {
     if (!resources.has(id)) errors.push(`quests.json: nagroda z nieznanym zasobem "${id}"`);

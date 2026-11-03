@@ -9,6 +9,7 @@
 // Systemu (`avatar` in the request).
 
 import {
+  addQuestProgress,
   bagCapacity,
   campLevels,
   craftJewels,
@@ -24,7 +25,7 @@ import {
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, currentHp, loadPlayer, requireNotExploring, requireWorker, workOf } from './characters.js';
+import { bagPlaces, characterView, currentHp, loadPlayer, questsNow, requireNotExploring, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
@@ -235,6 +236,8 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
     const minerals = addTo('minerals', returned);
     const insertItem = db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)');
     const jewels = (made.results ?? []).filter((result) => result.made).map((result) => result.item);
+    // The jewels that came out move the quests of jewellery (jewelAny).
+    const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { jewels: jewels.length }));
     let saved;
     try {
       saved = await db.batch([
@@ -247,8 +250,8 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
           .bind(row.id, key, 'jewels', now, JSON.stringify(summary), JSON.stringify(report)),
         trimReports(db, row.id, 'jewels'),
         db
-          .prepare(`UPDATE characters SET version = version + 1${sets.sql}${minerals.sql} WHERE id = ? AND ${ongoing}`)
-          .bind(...sets.binds, ...minerals.binds, row.id, row.id, activity.started_at),
+          .prepare(`UPDATE characters SET version = version + 1, quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${minerals.sql} WHERE id = ? AND ${ongoing}`)
+          .bind(row.quests, quests, ...sets.binds, ...minerals.binds, row.id, row.id, activity.started_at),
         // The gem goes into the item as it is now, so an upgrade meanwhile stays.
         ...(item ? [db.prepare("UPDATE items SET data = json_set(data, '$.gem', ?) WHERE id = ? AND character_id = ?").bind(made.set.gem, item.id, row.id)] : []),
         // The jewels made go to the bag; the room was there at the start.

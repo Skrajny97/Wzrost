@@ -62,7 +62,7 @@ function rewardChip(reward) {
 
 // The picture of a quest: the creature to beat (a shadow until met), or what
 // the work is done with.
-const QUEST_ICONS = { explore: 'swords', unlock: 'unlocked' };
+const QUEST_ICONS = { explore: 'swords', unlock: 'unlocked', mineAny: 'ore', jewelAny: 'ring' };
 
 function questArt(quest) {
   if (quest.kind === 'kill') {
@@ -88,6 +88,8 @@ const WAYS = {
   brewAny: '#/profesje/alchemia',
   make: '#/profesje/rzemieslnictwo',
   makeAny: '#/profesje/rzemieslnictwo',
+  mineAny: '#/profesje/gornictwo',
+  jewelAny: '#/profesje/jubilerstwo',
   orders: '#/osada/board',
 };
 

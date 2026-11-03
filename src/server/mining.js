@@ -5,9 +5,9 @@
 // character brings nothing, as from the Zagajnik. Minerals take no room in
 // the bag; they sell to the scrapper or go away.
 
-import { campBonus, campLevels, mineMinerals, miningMinutes, miningReport, professionOpen, professionState, professionUnlockLevel, saleGold } from '../engine/index.js';
+import { addQuestProgress, campBonus, campLevels, mineMinerals, miningMinutes, miningReport, professionOpen, professionState, professionUnlockLevel, saleGold } from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, currentHp, loadPlayer, requirePlayer, requireWorker, workOf } from './characters.js';
+import { characterView, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { assertion, raced } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
@@ -97,6 +97,9 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
     ...(avatar && { avatar: true }),
   };
   const minerals = addTo('minerals', mined.found);
+  // Every piece dug moves the quests of digging (mineAny), the Awatar's too,
+  // as its herbs move the gathering's.
+  const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { minerals: Object.values(mined.found).reduce((sum, count) => sum + count, 0) }));
   let results;
   try {
     results = await db.batch([
@@ -107,7 +110,9 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'minerals', now, JSON.stringify(summary), JSON.stringify(report)),
       trimReports(db, row.id, 'minerals'),
-      db.prepare(`UPDATE characters SET gold = gold + ?${sets.sql}${minerals.sql}, version = version + 1 WHERE id = ?`).bind(mined.gold, ...sets.binds, ...minerals.binds, row.id),
+      db
+        .prepare(`UPDATE characters SET gold = gold + ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${minerals.sql}, version = version + 1 WHERE id = ?`)
+        .bind(mined.gold, row.quests, quests, ...sets.binds, ...minerals.binds, row.id),
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {

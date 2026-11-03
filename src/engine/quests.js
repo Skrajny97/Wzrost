@@ -167,13 +167,16 @@ const questPotions = (character, content) =>
 // author: "by ktoś z wyższym levelem nie był wysyłany na niskolevelowe
 // potwory"): when its class opens nothing harder, or it has outgrown every
 // place, the other kinds remain.
-function questOptions(periodId, { character, hasTable, hasProfessions = false, hasCrafting = false, hasSettlement = false }, content) {
+function questOptions(periodId, { character, hasTable, hasProfessions = false, hasCrafting = false, hasSettlement = false, openProfessions = [] }, content) {
   const areas = questAreas(periodId, character, content);
   // Each creature of those places, as often as a fight of its place brings it.
   const perFight = new Map();
   for (const area of areas) for (const [target, share] of creaturesPerFight(area, character.level)) perFight.set(target, Math.max(perFight.get(target) ?? 0, share));
   return content.quests.kinds.flatMap((kind) => {
     if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions) || (kind.crafting && !hasCrafting) || (kind.settlement && !hasSettlement)) return [];
+    // A kind of one profession only once it is open (Górnictwo and
+    // Jubilerstwo from character level 25).
+    if (kind.profession && !openProfessions.includes(kind.profession)) return [];
     if ((kind.id === 'kill' || kind.id === 'killAny') && areas.length === 0) return [];
     // Regions to open: only for a new character, no more than open within
     // reach of its class level, and fewer as the class grows (`most`).
@@ -252,10 +255,10 @@ const newQuest = (option, periodId, character, rng, content, share = 1) => ({
 // A period's quests, drawn from `seed` for the character as it is: no
 // option twice, in the order of the kinds; a week's by the character's
 // level and the `days` of it left.
-export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed, days = 7 }, content) {
+export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed, days = 7 }, content) {
   const rng = createRng(seed);
   const share = periodId === 'weekly' ? weekShare(character.level, days, content) : 1;
-  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement }, content);
+  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions }, content);
   const drawn = [];
   while (drawn.length < content.quests.periods[periodId].count && options.length > 0) {
     const option = rng.weighted(options);
@@ -287,12 +290,12 @@ const lostQuest = (quest, periodId, character, content) =>
 // be done in the days left of it at `now`; with nothing left to draw, one of
 // a kind gone from the data goes too, so it does not keep the chest shut.
 // The other quests stay as they are, with their progress and rewards.
-function healedPeriod(period, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, now, content) {
+function healedPeriod(period, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed }, now, content) {
   const lost = (quest) => lostQuest(quest, periodId, character, content);
   if (!period.quests.some(lost)) return period;
   const gone = (quest) => !content.quests.kinds.some((kind) => kind.id === quest.kind && kind[periodId]);
   const asked = (option) => period.quests.some((quest) => !lost(quest) && quest.kind === option.kind.id && quest.target === option.target);
-  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement }, content).filter((option) => !asked(option));
+  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions }, content).filter((option) => !asked(option));
   return {
     ...period,
     quests: period.quests.flatMap((quest, index) => {
@@ -310,8 +313,8 @@ function healedPeriod(period, periodId, { character, hasTable, hasProfessions, h
 // the lost ones drawn anew), new ones once it has passed; a week marked
 // `scaled`, with the `days` left of it when drawn under way. `seed` is the
 // character's, `createdAt` the moment it came.
-export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed, createdAt }, now, content) {
-  const context = { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed };
+export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed, createdAt }, now, content) {
+  const context = { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed };
   return Object.fromEntries(
     QUEST_PERIODS.map((periodId) => {
       const { key, startsAt } = questPeriod(periodId, now, content);
@@ -357,14 +360,14 @@ function scaledWeek(period, character, createdAt, startsAt, content) {
 // others give way to quests the period does not ask for yet, others than
 // themselves while enough are left, a week's to be done in the days left of
 // it at `now`. Null when there is nothing to draw anew or it was done.
-export function rerolledQuests(quests, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, seed }, now, content) {
+export function rerolledQuests(quests, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed }, now, content) {
   const period = quests[periodId];
   if (period.rerolled || period.chest) return null;
   const replaced = (quest) => !quest.claimed && !questDone(quest);
   const count = period.quests.filter(replaced).length;
   if (count === 0) return null;
   const same = (option, quest) => quest.kind === option.kind.id && quest.target === option.target;
-  const options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement }, content).filter(
+  const options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions }, content).filter(
     (option) => !period.quests.some((quest) => !replaced(quest) && same(option, quest)),
   );
   const fresh = options.filter((option) => !period.quests.some((quest) => replaced(quest) && same(option, quest)));
@@ -406,9 +409,11 @@ export function huntKills(hunt, content) {
 // explored, materials `processed`, items `salvaged`, herbs gathered (`herbs`
 // by id, all of those found, also those the bag lost), potions brewed
 // (`potions` by id, the same way), items `made` in the Warsztat (only
-// those that came out), inner regions `opened` by new class levels and
-// `orders` delivered in the Osada. A quest stops at its count.
-export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, opened = 0, orders = 0 }) {
+// those that came out), `minerals` dug in the Kopalnia (all of them),
+// `jewels` made in the Szlifiernia (only those that came out), inner
+// regions `opened` by new class levels and `orders` delivered in the
+// Osada. A quest stops at its count.
+export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, minerals = 0, jewels = 0, opened = 0, orders = 0 }) {
   const total = (counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
   const gathered = total(herbs);
   const gain = {
@@ -424,6 +429,8 @@ export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 
     brewAny: () => total(potions),
     make: () => made,
     makeAny: () => made,
+    mineAny: () => minerals,
+    jewelAny: () => jewels,
     orders: () => orders,
   };
   return Object.fromEntries(

@@ -3034,6 +3034,29 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.25 (3.11.2026)
+
+1. **Zadania narratora z Górnictwem i Jubilerstwem (572)** (zob. „Zadania z Górnictwem i Jubilerstwem”).
+
+## Zadania z Górnictwem i Jubilerstwem (3.11.2026)
+
+Autor: „572 koniecznie”.
+
+1. **Dwa nowe rodzaje zadań**, dziennych i tygodniowych, od otwarcia swojej profesji (25. poziom postaci):
+   - „Wydobądź łącznie 12 minerałów.”, a tygodniowo 120 (według krzywej tygodnia). Liczą się wszystkie kamienie i kruszce z raportu Kopalni, także Awatara Systemu, jak zioła w Zielarstwie.
+   - „Wykonaj łącznie 2 sztuki biżuterii.”, a tygodniowo 12. Liczą się tylko udane sztuki. Nagroda jest dwa razy większa, jak za przedmioty z Warsztatu, a zadanie losuje się dwa razy rzadziej.
+2. (brakujący szczegół) **Liczby.** Godzina kopania na 1. poziomie Górnictwa daje ok. 7 minerałów (Kwarc i srebrny kruszec), więc zadanie dzienne to niecałe 2 godziny kopania. Sztuka biżuterii trwa na 1. poziomie pół godziny.
+3. Zadanie prowadzi do Kopalni albo Szlifierni, jak zadania z ziołami do Zagajnika.
+4. (brakujący szczegół) Oprawianie kamieni nie ma zadań, bo każdy nowy kamień niszczy poprzedni. Biżuteria liczy się tylko do swoich zadań, a nie do „Wykonaj… przedmiot” z Warsztatu, jak dotąd.
+5. Zapis: rodzaje `mineAny` i `jewelAny` w `data/quests.json` z polem `profession` (zadanie tylko z otwartą tą profesją), `openProfessions` w kontekście zadań (`questContext` w `src/server/characters.js`).
+
+## Odpowiedzi autora: 570 A i mikstury liczone w walkach (3.11.2026)
+
+Autor: „570 A, z tym że pamiętaj że skończą nam się prawdziwe nazwy i wtedy lekko abstrakcji możesz użyć”, a potem: „Zmieniamy model mikstur szybkości i inne buffy -> te trwające 0,5h niech dają bonus na 2 walki. Czyli nakładamy na ilość walk w wyprawie a nie na czas. To ułatwi myślę z czasem sprawę. Czyli 2 mikstury -> 4 walki i tak będziemy to wyświetlać i opisywać, wszędzie. Musisz to pozmieniać, też w nocy.” i „Skalowanie możesz wymyślić sam.”
+
+1. **570 A.** Wyższe Tiery przedmiotów: V od 75. i VI od 100. poziomu klasy, po 22 nowe bazy. Gdy zabraknie prawdziwych nazw, mogą być lekko abstrakcyjne. To najniższy priorytet nocy (575).
+2. **Mikstury liczone w walkach.** Wzmocnienia z mikstur działają przez określoną liczbę walk wyprawy, nie przez minuty: pół godziny działania to 2 walki, a 2 mikstury to 4 walki. Tak je opisuje cała gra. Skalowanie dłuższych mikstur poda sekcja tej zmiany, gdy wejdzie do gry.
+
 ## Wersja 0.1.24 (3.11.2026)
 
 1. **Kamienie i kruszce w handlu (571):** na Targowisku, w Wymianie i w Prośbach Gildii (zob. „Kamienie i kruszce w handlu”).
