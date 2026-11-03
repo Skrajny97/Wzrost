@@ -3011,6 +3011,20 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Odpowiedzi autora 542, 543.2, 544 i 545–547 (3.11.2026)
+
+Autor: „uruchamiaj tyle pomocników ile chcesz”, „542 tak”, „543.2 A”, „545.1 C / 545.2 C / 545.3 D / 545.4 C / 545.5 B / 545.6 A / 545.7 D / 545.8 A / 545.9 D / 545.10 A / 546.1 C / 546.2 B / 547.1 B / 547.2 C” oraz „do tego wdroż ten background muzykę jak się wejdzie do Salonu gier właśnie”.
+
+1. **Koło Fortuny (542).** Autor potwierdza odczytanie 542 C, które weszło do gry w 0.1.11.
+2. **Kwestie narratora o Salonie (543.2 A).** Nagrywam obie, o Loterii i o Kole Fortuny (`casino-lottery` i `casino-wheel` w `audio/prompts.json`). Autor wybiera nagrania na słuch, a potem powstaje rozdział narratora przy pierwszym wejściu do Salonu.
+3. **Pomocnicy (544).** Autor pozwala uruchomić tylu pomocników, ilu trzeba. Jeden wprowadza chowańce do gry, drugi buduje Górnictwo i Jubilerstwo.
+4. **Grafiki Górnictwa i Jubilerstwa** są w grze, wszystkie z PixelLab:
+   - kamienie (`src/client/art/minerals`): Kwarc C, Agat C, Ametyst D, Szmaragd C, Szafir B, Rubin A, Diament D;
+   - kruszce: srebrny A, złoty D, gwiezdny A;
+   - ikony profesji (`src/client/art/professions`): Górnictwo C, Jubilerstwo B;
+   - tła (`src/client/art/places`): Systemowa Kopalnia B, Systemowa Szlifiernia C.
+5. **Muzyka Salonu** gra po wejściu do Salonu Gier od 0.1.11 (zob. „Wersja 0.1.11”).
+
 ## Wersja 0.1.11 (3.11.2026)
 
 1. **Co wchodzi do gry:**

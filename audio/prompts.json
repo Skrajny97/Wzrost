@@ -862,7 +862,9 @@
       "tap-region-desktop": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Kliknij Wiatrołomy." },
       "tap-start-desktop": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Suwak stoi na trzydziestu minutach. Kliknij „Wyrusz”." },
       "wallet-desktop": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sam zobacz." },
-      "wallet-desktop-female": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sama zobacz." }
+      "wallet-desktop-female": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sama zobacz." },
+      "casino-lottery": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Szczęsny co dzień sprzedaje losy na Loterię. O północy System wyciąga jeden z nich, a jego właściciel zgarnia całą pulę." },
+      "casino-wheel": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Kołem Fortuny kręcisz za sto sztuk złota albo więcej, setkami. Wyższa stawka to cenniejsze nagrody, ale przegrana stawka przepada." }
     },
     "allLines": {
       "voice": "Narrator",
