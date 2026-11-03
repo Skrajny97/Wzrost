@@ -3011,6 +3011,19 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Przegląd pytań bez odpowiedzi (3.11.2026)
+
+Autor: „zanim napiszesz wiadomośc spraw wszystkie co napisałem bo na wiekszosc odpowiedziałem, poczekam upewnij się na co nie odpowiedzialem i zadaj te pytania ewentualnie w pełni jeszcze raz, bo jak mam szukac konkretnego punktu co niby pominąłem to mnie szlag trafia” i „516.8 D”.
+
+1. **Wynik.** Wszystkie wiadomości autora od 2.11 mają odpowiedzi, poza trzema pytaniami:
+   - 415, chowaniec Błędny ognik;
+   - 532, złoto z żył;
+   - 533, kamienie przed Jubilerstwem.
+
+   Te trzy wracają do autora w pełnym brzmieniu, a 415 także z grafiką.
+2. **Kolejność (530)** rozstrzygnęła się sama. Salon Gier już powstaje, więc Górnictwo idzie zaraz po nim.
+3. **Stała zasada.** Pytanie, które czeka na odpowiedź, wraca do autora w całości: z numerem, opisem, wariantami i grafiką. Nie wystarczy sam numer. Zasada trafiła do CLAUDE.md.
+
 ## Sosnowe Wydmy (poziomy 126–150, 3.11.2026)
 
 Pierwsza kraina Szumiącego Boru z dokumentu projektowego („nocne zasadzki, ataki na tył szyku”). Nazwy, ataki i materiały stworów zatwierdził autor (500). Grafiki i odgłosy też (516, 518, 520, 522), a ostatni materiał, Kamyk z wiru, autor wybrał tak: „516.8 D”.
@@ -3062,7 +3075,7 @@ Autor: „523 OK / 524 A / 525 A / 526 A / 527 A”, „517.1 B / 517.2 B / 517.
 1. **Salon Gier (523–526, 528, 529).** Gospodarzem jest Szczęsny. Loteria i Koło Fortuny mają zasady z wariantów A pytań 524–526 (zob. „Salon Gier w Osadzie: prośba autora”). Budynek to wersja H, czyli okrągła drewniana chata z kołem fortuny. Popiersie gospodarza to wersja C. Na planszy Osady wolno przesunąć inne budynki, żeby Salon się zmieścił. Salon buduje pomocnik w osobnej kopii repozytorium.
 2. **Wieże (527 A).** Czempion czeka co 25. piętro, gdy wejdzie szósta kraina (Sosnowe Wydmy). Przy pięciu krainach zostaje co 15. piętro: co 25. piętro trafiałoby wtedy zawsze w ten sam region.
 3. **Sosnowe Wydmy (518).** Kręgi miejsc: Wrzosowe Wydmy B, Żywiczny Bór C, Lotne Piaski B, Smolne Doły D, Pogorzelisko C. Do kompletu grafik brakowało tylko materiału Kamyk z wiru: autor wybrał „516.8 D” (zob. „Sosnowe Wydmy”).
-4. **Górnictwo i Jubilerstwo** otwierają się od 25. poziomu postaci (odpowiedź na 531). Wprowadzenie, czyli Samouczek, trzeba będzie przerobić dla nowych profesji. Pytania 530 (kolejność), 532 (złoto z żył) i 533 (kamienie przed Jubilerstwem) czekają na odpowiedź.
+4. **Górnictwo i Jubilerstwo** otwierają się od 25. poziomu postaci (odpowiedź na 531). Wprowadzenie, czyli Samouczek, trzeba będzie przerobić dla nowych profesji. Pytania 532 (złoto z żył) i 533 (kamienie przed Jubilerstwem) czekają na odpowiedź, a kolejność (530) rozstrzygnęła się sama (zob. „Przegląd pytań bez odpowiedzi”).
 
 ## Kod TIGER: przeniesienie na inną postać konta (3.11.2026)
 
