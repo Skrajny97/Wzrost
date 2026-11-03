@@ -1,0 +1,14 @@
+{
+  "id": "evolution-transform",
+  "payload": {
+    "text": "a magical transformation: a soft shimmering swell of bells and airy wordless voices rising for one and a half seconds, then one bright radiant burst of light, then sparkling chimes slowly fading out, fantasy video game evolution, no drums, no speech, no music",
+    "duration_seconds": 4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/evolution-transform-20261103T0713-0.mp3",
+    "audio/drafts/effects/evolution-transform-20261103T0713-1.mp3",
+    "audio/drafts/effects/evolution-transform-20261103T0713-2.mp3"
+  ],
+  "credits": 240
+}
