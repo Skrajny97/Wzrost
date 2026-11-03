@@ -479,10 +479,28 @@ export function mountCharacter(container) {
     const character = state.character;
     // On an exploration the HP is the report's: a healing potion waits.
     const exploring = character.activity?.kind === 'hunt' && entry.fight === 'heal';
+    // A potion for a time is drunk as many at once as chosen, each adding its
+    // minutes (brewing.js); a healing one, one at a time.
+    const timed = entry.drink && !entry.fight;
     let count = 1;
     const price = (amount) => saleGold(entry.price, amount);
     const value = h('output', { class: 'herb-count-value' });
     const sell = h('button', { type: 'button', class: 'button button--system' });
+    const drink =
+      entry.drink &&
+      entry.known !== false &&
+      h('button', {
+        type: 'button',
+        class: 'button button--system',
+        disabled: exploring,
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            const { text } = await call('POST', '/api/potions/drink', { potionId: entry.id, ...(timed && { count }) });
+            closeSheet();
+            playSound('potion');
+            toast(text);
+          }),
+      });
     const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
     const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
     const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(entry.count) });
@@ -490,6 +508,7 @@ export function mountCharacter(container) {
       count = Math.min(entry.count, Math.max(1, next));
       value.textContent = `${formatNumber(count)} szt.`;
       sell.textContent = `Sprzedaj za ${formatNumber(price(count))} złota`;
+      if (drink) drink.textContent = timed && count > 1 ? `${entry.verb} ${formatNumber(count)} szt.` : entry.verb;
       less.disabled = count === 1;
       more.disabled = count === entry.count;
     }
@@ -532,21 +551,7 @@ export function mountCharacter(container) {
         // for its recipe.
         entry.known === false && h('p', { class: 'region-warning', text: 'Tej mikstury nie użyjesz, póki nie poznasz jej receptury w Alchemii.' }),
         exploring && entry.known !== false && h('p', { class: 'muted', text: 'Leczyć się można po powrocie z wyprawy.' }),
-        entry.drink &&
-          entry.known !== false &&
-          h('button', {
-            type: 'button',
-            class: 'button button--system',
-            text: entry.verb,
-            disabled: exploring,
-            onClick: (event) =>
-              withButton(event.currentTarget, async () => {
-                const { text } = await call('POST', '/api/potions/drink', { potionId: entry.id });
-                closeSheet();
-                playSound('potion');
-                toast(text);
-              }),
-          }),
+        drink,
         h('div', { class: 'herb-count' }, less, value, more, all),
         h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: 'Wyrzuć' }), sell),
       ],

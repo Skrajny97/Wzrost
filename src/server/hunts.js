@@ -16,6 +16,7 @@ import {
   bagStacks,
   buffWindows,
   campBonus,
+  claimWindows,
   companionAfterHunt,
   companionGoes,
   campLevels,
@@ -319,10 +320,13 @@ export async function beginHunt(
   }
   const taken = takenPotions(player, potions, minutes);
   // The potions for a time drunk before cover what they can of the
-  // exploration; that much of their time is used up only when its report is
-  // claimed (the author: "bonusy wszelkie za picie mikstur itp. nie zużywają
-  // się na bieżąco, a po samej wyprawie / Odbierz raport zużywa czas
-  // mikstury"), so the start leaves them as they are (potions.js).
+  // exploration; their time is used up only when its report is claimed (the
+  // author: "bonusy wszelkie za picie mikstur itp. nie zużywają się na
+  // bieżąco, a po samej wyprawie / Odbierz raport zużywa czas mikstury"), so
+  // the start leaves them as they are. The claim covers the exploration with
+  // those at work then, drunk on the way too (claimWindows in potions.js);
+  // the windows kept here are a Drużyna's trip's, whose fights are the same
+  // for all who went.
   const buffs = buffsOf(player.row, now);
   const windows = buffWindows(buffs, minutes);
   const timed = Object.keys(windows).length > 0;
@@ -574,6 +578,10 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // for every member, as its leader leads them; what this member finds and
   // earns from its own seed (trips.js, simulateHunt).
   const trip = options.party?.seed && options.party.roster?.length > 0 ? options.party : null;
+  // The potions for a time at work now cover the exploration and use up its
+  // length of their time as the report is claimed, whenever they were drunk
+  // (potions.js); a trip's fights keep those it set out with.
+  const claimed = claimWindows(options, buffsOf(row, now), activity.minutes, Boolean(trip));
   let hunt = simulateHunt(
     {
       character,
@@ -600,7 +608,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       met: trip ? (trip.encounter.met ?? []) : JSON.parse(row.met ?? '[]'),
       potions: options.potions ?? {},
       healBelow: options.healBelow,
-      buffs: optionWindows(options),
+      buffs: claimed.windows,
       trophies: options.trophies ?? {},
     },
     content,
@@ -774,8 +782,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const reward = hunt.event?.reward;
   // The potions for a time used up now, as the report is claimed, and an
   // event's strengthening or curse added after that.
-  const claimWindows = options.spend === 'claim' ? optionWindows(options) : {};
-  const spentBuffs = Object.keys(claimWindows).length > 0 ? spendWindows(buffsOf(row, now), claimWindows) : null;
+  const spentBuffs = Object.keys(claimed.spend).length > 0 ? spendWindows(buffsOf(row, now), claimed.spend) : null;
   const eventBuffs = reward?.buff ? addBuff(spentBuffs ?? buffsOf(row, now), reward.buff.kind, reward.buff.minutes * 60000, reward.buff.bonus) : spentBuffs;
   const eventPoints = reward?.points ?? 0;
   // An event's herbs that found their places.

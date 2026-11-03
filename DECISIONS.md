@@ -3034,6 +3034,39 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.12 (3.11.2026)
+
+1. **Mikstury na czas** schodzą przy „Odbierz raport” także wtedy, gdy postać wypiła je w trakcie wyprawy albo tuż przed raportem, a „Wypij” w plecaku bierze wybraną liczbę sztuk (zob. „Mikstury na czas: czas schodzi przy »Odbierz raport«”).
+2. **Targowisko** bierze 1% ceny sprzedaży zamiast 5% (zob. „Targowisko: 1% ceny sprzedaży”).
+
+## Targowisko: 1% ceny sprzedaży (3.11.2026)
+
+Autor: „Niech Targowisko bierze 1% ceny sprzedaży.”
+
+1. **Prowizja** spada z 5% (239 A) do 1% ceny, za którą przedmiot się sprzedał. Liczy się ją jak dotąd w pełnych sztukach złota, w górę: przy cenie do 100 zł Targowisko bierze 1 zł, przy 101–200 zł 2 zł.
+2. **Oferty wystawione wcześniej** rozliczają się już po nowemu, bo prowizję liczy się przy sprzedaży.
+3. **Teksty w grze** („Przy sprzedaży Targowisko bierze 1% ceny”) biorą liczbę z danych, więc zmieniły się same.
+
+## Mikstury na czas: czas schodzi przy „Odbierz raport” (3.11.2026)
+
+Autor: „zbugowane są bonusy do szybkości źle pokazują raz wypije miksture w czasie wyprawy i mi nie zejdzie drugi raz wypije 4 na raz i mi wzrośnie o 30 minut czas użycia” oraz „chodzi o mniejszą miksture szybkości i im pdoobne, przyjrzyj się im. Ten czas powinien schodzić dopiero po kliknięciu Odbierz raport i to w wysokości zadanej przed wyprawą, nawet jeśli mikstury zostały zażyte w czasie wyprawy lub na chwilę przed Odebraniem raportu.”
+
+1. **Przyczyna.** Wyprawa ustalała przy wymarszu, ile czasu mikstur obejmie. Mikstura wypita w trakcie wyprawy albo po jej końcu, przed raportem, nie działała w jej walkach, a jej czas nie schodził przy raporcie. Na przykład cztery Mniejsze mikstury szybkości wypite w trakcie 30-minutowej wyprawy zostawiały po raporcie 120 minut zamiast 90.
+2. **Teraz.** Przy „Odbierz raport” wyprawa bierze mikstury działające w tej chwili: wypite przed wymarszem, w trakcie wyprawy i po powrocie. Ich bonus działa w walkach wyprawy od jej początku, a z ich czasu schodzi długość wyprawy wybrana przed wymarszem, najwyżej tyle, ile zostało. Do raportu czas stoi.
+3. **Wyprawa Drużyny.** Jej walki są wspólne dla wszystkich, którzy poszli, i ustala je wymarsz. Liczą się więc mikstury działające przy wymarszu i tylko ich czas schodzi przy raporcie. Mikstura wypita w trakcie takiej wyprawy działa od następnej, o czym mówi komunikat po wypiciu.
+4. **Odwołana wyprawa** nie zużywa czasu mikstur, jak dotąd.
+5. **Kilka naraz.** W oknie mikstury na czas „Wypij” bierze wybraną liczbę sztuk („Wypij 4 szt.”), a każda dodaje swoje minuty. Wcześniej przycisk wypijał jedną sztukę bez względu na liczbę wybraną do sprzedaży, więc „4 naraz” dawały tylko 30 minut. Miksturę leczenia pije się dalej po jednej.
+6. **Bez górnego limitu.** Autor: „Niech nie bedzie maksymalnego limitu na trwanie bonusów typu z mikstur, bo to też może powodowac błąd jesli jest taki limit.” Takiego limitu nie było i nie ma: każda wypita mikstura dodaje swoje minuty do pozostałych.
+
+## Odpowiedzi autora 550.3–550.5, 551 i 552 (3.11.2026)
+
+Autor: „550.3 D”, „550.4 B”, „550.5 D”, „552.1 A”, „552.2 B”, „552.3 B”, „552.4 B”, „552.5 żaden sie nie nadaje zbyt skrzeczące, wysokie, rażące i nieprzyjemne dla ucha” oraz „Animacje do Salonu są okey”.
+
+1. **Grafiki Salonu (PixelLab):** los Loterii D, strzałka nad Kołem B, tło Salonu D.
+2. **Animacje Salonu (551)** zostają takie jak na filmie.
+3. **Dźwięki Salonu (ElevenLabs):** kręcące się Koło A, wygrana B, przegrana B, los wpadający do bębna B.
+4. **Świst między scenami filmu (552.5):** żadna z trzech wersji. Powstają nowe: niższe, miękkie i ciepłe, bez wysokich tonów.
+
 ## Salon Gier: animacje, tło i kwestia o Kole (3.11.2026)
 
 Autor: „Trzeba zrobić animację jeszcze do koła fortuny wyświetlającą się na ekranie i do kupowania losu, żeby nadać temu estetyki”, „543.2 Drugie zdanie poprawka - "Wyższa stawka to wyższe nagrody, ale i większy ból po przegranej"”, „548.1 A, 548.2 wygenerowałeś zanim podałem poprawki, więc bedziesz musiał jeszcze raz” oraz „Zrób też tło do Salonu Gier”.

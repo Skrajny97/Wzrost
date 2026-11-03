@@ -206,6 +206,7 @@
       "drunkFocus": ["Postać wypija {potion}. Intelekt i Mądrość większe o {bonus}% przez {minutes} min wypraw."],
       "drunkPoison": ["Postać nakłada {potion} na broń. Przez {minutes} min wypraw każdy cios ma {bonus}% szans na Zatrucie."],
       "drunkWard": ["Postać wypija {potion}. Obrażenia od magii mniejsze o {bonus}% przez {minutes} min wypraw."],
+      "drunkTrip": ["Drużyna walczy w tej wyprawie tak, jak wyruszyła, więc ten bonus zadziała od następnej wyprawy."],
       "armorFights": ["Wywar kamiennej skóry działał w walkach: {fights} z {all}."],
       "damageFights": ["Wywar siły działał w walkach: {fights} z {all}."],
       "focusFights": ["Mikstura skupienia działała w walkach: {fights} z {all}."],
