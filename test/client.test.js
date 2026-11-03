@@ -215,6 +215,12 @@ test('every sprite on the list has its file at its size, and every class has its
     assert.ok(SPRITES.portraits.ids.includes(id), `faces: no portrait ${id}`);
     assert.ok(face > 24 && face < SPRITES.portraits.width - 24, `faces: ${id} at ${face}`);
   }
+  // Every portrait has its shoulder where a pet of the Sklep Systemu perches,
+  // left of the face, in the upper half of the portrait.
+  assert.deepEqual(Object.keys(SPRITES.portraits.perches).sort(), [...SPRITES.portraits.ids].sort());
+  for (const [id, [x, y]] of Object.entries(SPRITES.portraits.perches)) {
+    assert.ok(x > 16 && x < (SPRITES.portraits.faces[id] ?? SPRITES.portraits.width / 2) && y > 16 && y < SPRITES.portraits.height / 2, `perches: ${id} at ${x}, ${y}`);
+  }
 });
 
 // The Walka scene's riding (scenes.js ride): each mount's trot is a row of

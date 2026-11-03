@@ -8161,6 +8161,12 @@ a.profession-square:active {
   background: var(--land, none) 0 0 / var(--land-width) var(--land-height) repeat-x, var(--bg-deep);
   image-rendering: pixelated;
   animation: scene-land var(--land-duration) linear infinite;
+  /* Where the figures stand, the bottom of each one's box over the scene's:
+     the System's figure, the character's own walking frame and the ride. A
+     pet keeps to its figure's box (scenes.js companion). */
+  --figure-bottom: 22px;
+  --walker-bottom: 28px;
+  --ride-bottom: 18px;
 }
 @keyframes scene-land {
   to {
@@ -8185,11 +8191,18 @@ a.profession-square:active {
   position: absolute;
   z-index: 2;
   left: calc(50% - var(--frame) / 2);
-  bottom: 22px;
+  bottom: var(--figure-bottom);
 }
 /* The character's own figure has less room under its feet in the frame. */
 .scene-walker--own {
-  bottom: 28px;
+  bottom: var(--walker-bottom);
+}
+/* A pet on the way (scenes.js companion): its frames beside the figure, at
+   the place its data gives against the figure's box; in front of the figure,
+   or behind it, put before it. */
+.scene-pet {
+  position: absolute;
+  z-index: 2;
 }
 /* The aura on the way (scenes.js lightWalker): the walking figure, or the
    rider with the mount, in its light, and its motes about it. */
@@ -8209,7 +8222,7 @@ a.profession-square:active {
 /* Riding: about the rider and the mount, in the ride's box. */
 .aura-motes.scene-aura-motes--ride {
   left: calc(50% - var(--ride-width) / 2);
-  bottom: 18px;
+  bottom: var(--ride-bottom);
   width: var(--ride-width);
   height: var(--ride-height);
 }
@@ -8252,7 +8265,7 @@ a.profession-square:active {
   position: absolute;
   z-index: 2;
   left: calc(50% - var(--ride-width) / 2);
-  bottom: 18px;
+  bottom: var(--ride-bottom);
   width: var(--ride-width);
   height: var(--ride-height);
 }
@@ -11573,7 +11586,7 @@ a.profession-square:active {
   line-height: 1.2;
 }
 
-/* The Sklep Systemu (screens/shop.js): the Punkty Systemu, three tabs and a
+/* The Sklep Systemu (screens/shop.js): the Punkty Systemu, its tabs and a
    card for each cosmetic, its preview on the character's own portrait at
    the frames' own size, 120 × 160. */
 .shop-points {
@@ -11591,17 +11604,22 @@ a.profession-square:active {
   color: var(--system);
 }
 
-/* Five tabs in two rows: three over two, each row filling the width. */
+/* Six tabs in two rows, three over three, with a line between the rows and
+   none at the start of a row; narrower padding, so "Wierzchowiec" fits. */
 .shop-tabs {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.shop-tabs > * {
-  grid-column: span 2;
+.shop-tabs .segmented-option {
+  padding: 0 4px;
+}
+
+.shop-tabs > :nth-child(3n + 1) {
+  border-left: 0;
 }
 
 .shop-tabs > :nth-child(n + 4) {
-  grid-column: span 3;
+  border-top: 1px solid var(--system-line);
 }
 
 .shop-items {
@@ -11809,6 +11827,44 @@ a.profession-square:active {
 .calm .aura-motes span {
   animation: none;
   opacity: 0.7;
+}
+
+/* A pet on the portrait (cosmetics.js petLayer): a box where the figure is
+   drawn (as .portrait-art .sprite--portrait: 4% down, the 96 × 128 figure
+   contained in the rest, at its bottom), and in it the pet at its place,
+   in percent of the figure, its frames played in steps. With the
+   animations off it stands on its first frame. */
+.portrait-pet-space {
+  position: absolute;
+  inset: 4% 0 0;
+  container-type: size;
+  pointer-events: none;
+}
+
+.portrait-pet-figure {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: min(100cqw, 75cqh);
+  height: min(100cqh, 133.3333cqw);
+  translate: -50% 0;
+}
+
+.portrait-pet {
+  position: absolute;
+  background: var(--sheet) 0 0 / var(--sheet-width) 100% no-repeat;
+  image-rendering: pixelated;
+  animation: portrait-pet var(--duration) steps(var(--frames)) infinite;
+}
+
+@keyframes portrait-pet {
+  to {
+    background-position: var(--sheet-end) 0;
+  }
+}
+
+.calm .portrait-pet {
+  animation: none;
 }
 
 /* The frame over the portrait art, under the slots and the eye, and its

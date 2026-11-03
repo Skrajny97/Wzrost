@@ -1,11 +1,11 @@
 // The Sklep Systemu (src/server/cosmetics.js, src/engine/cosmetics.js): the
-// three frames, the three backgrounds, the Tygrys szablozębny, the two auras
-// and the glowing trail, bought for
+// three frames, the three backgrounds, the Tygrys szablozębny, the two auras,
+// the glowing trail and the three pets (chowańce), bought for
 // Punkty Systemu once each, never below none, a second quick tap buying
 // nothing more; the tiger only with a mount from the Stajnia. What is owned
-// is worn and taken off, and with a frame the name may take its colour in
-// the chat, the Ranking, the Znajomi, the Drużyna, the Gildia and on the
-// card another player sees.
+// is worn and taken off, one of a kind at a time, and with a frame the name
+// may take its colour in the chat, the Ranking, the Znajomi, the Drużyna,
+// the Gildia and on the card another player sees.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -17,7 +17,7 @@ import { useServer } from './helpers/server.js';
 const item = (id) => content.cosmeticsById[id];
 
 describe('the Sklep Systemu in the engine', () => {
-  test('all three frames and backgrounds, the tiger, the auras and the trail, at the prices set', () => {
+  test('all three frames and backgrounds, the tiger, the auras, the trail and the pets, at the prices set', () => {
     assert.deepEqual(
       content.cosmetics.map(({ id, kind, name, price }) => [id, kind, name, price]),
       [
@@ -31,6 +31,11 @@ describe('the Sklep Systemu in the engine', () => {
         ['aura-system', 'aura', 'Aura Systemu', 500],
         ['aura-ember', 'aura', 'Aura Żaru', 500],
         ['trail-light', 'trail', 'Świetliste ślady', 300],
+        // The pets (413, 414, "415 A"): the fox and the raven for 600 PS,
+        // the will-o'-the-wisp for 800.
+        ['fox', 'pet', 'Chowaniec: Lis', 600],
+        ['raven', 'pet', 'Chowaniec: Kruk', 600],
+        ['wisp', 'pet', 'Chowaniec: Błędny ognik', 800],
       ],
     );
     // A name in its frame's colour: gold brighter than the names' own gold.
@@ -41,7 +46,7 @@ describe('the Sklep Systemu in the engine', () => {
   });
 
   test('the stored state holds only what the data has, owned once, worn only when owned and of its kind', () => {
-    assert.deepEqual(cosmeticsOf(null, content), { owned: [], frame: null, background: null, mountSkin: null, aura: null, trail: null, nameFromFrame: false });
+    assert.deepEqual(cosmeticsOf(null, content), { owned: [], frame: null, background: null, mountSkin: null, aura: null, trail: null, pet: null, nameFromFrame: false });
     assert.deepEqual(cosmeticsOf({}, content), cosmeticsOf(null, content));
     const stored = {
       owned: ['frame-gold', 'frame-gold', 'nope', 'bg-camp', 'constructor'],
@@ -50,7 +55,7 @@ describe('the Sklep Systemu in the engine', () => {
       mountSkin: 'bg-camp',
       nameFromFrame: 'tak',
     };
-    assert.deepEqual(cosmeticsOf(stored, content), { owned: ['frame-gold', 'bg-camp'], frame: 'frame-gold', background: null, mountSkin: null, aura: null, trail: null, nameFromFrame: false });
+    assert.deepEqual(cosmeticsOf(stored, content), { owned: ['frame-gold', 'bg-camp'], frame: 'frame-gold', background: null, mountSkin: null, aura: null, trail: null, pet: null, nameFromFrame: false });
     assert.deepEqual(cosmeticsOf({ owned: 'frame-gold', frame: 'frame-gold' }, content).owned, []);
   });
 
@@ -96,6 +101,30 @@ describe('the Sklep Systemu in the engine', () => {
     assert.deepEqual(item('trail-light').trail, { color: '#8fe3ef' });
   });
 
+  test('a pet is worn in its own place, one at a time, only when owned, and needs no mount', () => {
+    const stored = { owned: ['fox', 'raven', 'aura-system'], pet: 'raven' };
+    assert.equal(wearBlock('pet', 'fox', stored, content), null);
+    assert.equal(wearBlock('pet', null, stored, content), null);
+    assert.equal(wearBlock('pet', 'wisp', stored, content).code, 'not_owned');
+    assert.equal(wearBlock('pet', 'aura-system', stored, content).code, 'invalid_cosmetic');
+    assert.equal(wearBlock('aura', 'fox', stored, content).code, 'invalid_cosmetic');
+    assert.equal(cosmeticsOf(stored, content).pet, 'raven');
+    // Worn only when owned and a pet.
+    assert.equal(cosmeticsOf({ owned: ['fox'], pet: 'wisp' }, content).pet, null);
+    assert.equal(cosmeticsOf({ owned: ['aura-system'], pet: 'aura-system' }, content).pet, null);
+    // Bought for its points, without a mount from the Stajnia.
+    assert.equal(cosmeticBlock('wisp', {}, { systemPoints: 800, mount: null }, content), null);
+    assert.equal(cosmeticBlock('wisp', {}, { systemPoints: 799, mount: null }, content).code, 'not_enough_points');
+    // Each walks in the Walka scene and sits on the portrait, as the data has them.
+    for (const id of ['fox', 'raven', 'wisp']) {
+      const { walk, foot, ride, portrait } = item(id).pet;
+      assert.deepEqual([walk.size, walk.frames, portrait.size, portrait.frames], [64, 8, 32, 8], id);
+      assert.ok(foot.edge && ride.edge, id);
+    }
+    // The wisp behind the character, the fox and the raven ahead of it.
+    assert.deepEqual(['fox', 'raven', 'wisp'].map((id) => [item(id).pet.foot.behind ?? false, item(id).pet.ride.behind ?? false]), [[false, false], [false, false], [true, true]]);
+  });
+
   test("the name takes the frame's colour only with a frame worn and the switch on", () => {
     const owned = ['frame-gold', 'frame-forest'];
     assert.equal(nameColor({ owned, frame: 'frame-gold' }, content), null);
@@ -127,7 +156,7 @@ describe('the Sklep Systemu through the API', () => {
 
   test('a new character owns nothing and wears nothing', async () => {
     const { character } = (await as('kupiec', 'GET', '/api/character')).data;
-    assert.deepEqual(character.cosmetics, { owned: [], frame: null, background: null, mountSkin: null, aura: null, trail: null, nameFromFrame: false });
+    assert.deepEqual(character.cosmetics, { owned: [], frame: null, background: null, mountSkin: null, aura: null, trail: null, pet: null, nameFromFrame: false });
     assert.equal(character.nameColor, null);
     // The page has the cosmetics and the words of the shop.
     const { cosmetics } = (await call('GET', '/api/content')).data;
@@ -216,6 +245,35 @@ describe('the Sklep Systemu through the API', () => {
     assert.equal((await wear('kupiec', 'background', null)).data.character.cosmetics.background, null);
     // Wearing costs nothing.
     assert.equal((await stored('Kupiec')).system_points, 1000 - 300 - 250 - 150);
+  });
+
+  test('a pet is bought and worn, one at a time, and the character and its card carry it', async () => {
+    await player('sasiad', 'Sasiad');
+    await points('Kupiec', 1400);
+    // No mount needed; worn only once owned.
+    assert.equal((await wear('kupiec', 'pet', 'fox')).data.error.code, 'not_owned');
+    const fox = await buy('kupiec', 'fox');
+    assert.equal(fox.status, 200, JSON.stringify(fox.data));
+    assert.deepEqual(fox.data.bought, { id: 'fox', name: 'Chowaniec: Lis', price: 600 });
+    assert.equal(fox.data.character.systemPoints, 800);
+    assert.equal(fox.data.character.cosmetics.pet, null);
+    assert.equal((await buy('kupiec', 'wisp')).data.character.systemPoints, 0);
+    assert.equal((await buy('kupiec', 'raven')).data.error.code, 'not_enough_points');
+    assert.equal((await wear('kupiec', 'pet', 'raven')).data.error.code, 'not_owned');
+    assert.equal((await wear('kupiec', 'aura', 'fox')).status, 400);
+
+    assert.equal((await wear('kupiec', 'pet', 'fox')).data.character.cosmetics.pet, 'fox');
+    // Another pet takes its place: one at a time.
+    const wisp = (await wear('kupiec', 'pet', 'wisp')).data.character.cosmetics;
+    assert.deepEqual([wisp.pet, wisp.owned], ['wisp', ['fox', 'wisp']]);
+    // The character as the page gets it, and its card for another player.
+    assert.equal((await as('kupiec', 'GET', '/api/character')).data.character.cosmetics.pet, 'wisp');
+    assert.equal((await as('sasiad', 'GET', '/api/profile/Kupiec')).data.profile.pet, 'wisp');
+    assert.equal((await as('kupiec', 'GET', '/api/profile/Sasiad')).data.profile.pet, null);
+    // Off, and the card shows none.
+    assert.equal((await wear('kupiec', 'pet', null)).data.character.cosmetics.pet, null);
+    assert.equal((await as('sasiad', 'GET', '/api/profile/Kupiec')).data.profile.pet, null);
+    assert.equal((await stored('Kupiec')).system_points, 0);
   });
 
   test("the name takes the frame's colour with the switch on, while a frame is worn", async () => {

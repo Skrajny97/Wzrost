@@ -1,11 +1,11 @@
 // The Sklep Systemu (src/server/cosmetics.js; DECISIONS.md, "Sklep Systemu:
 // ramki, tła i tygrys szablozębny"), from the stall in the top bar: frames,
-// backgrounds, auras, trails and the mount's look for Punkty Systemu, in
-// five tabs. Each shows itself on the character's own portrait, with what
-// else it wears (a trail behind the character walking on the path, the
-// mount's look its picture, once it has one), its words and its price.
-// "Kup" asks first; what is owned has "Załóż" or "Zdejmij" in its place. With
-// a frame worn, the switch "Kolor imienia jak ramka".
+// backgrounds, auras, trails, the mount's look and pets (chowańce) for
+// Punkty Systemu, in six tabs. Each shows itself on the character's own
+// portrait, with what else it wears (a trail behind the character walking on
+// the path, the mount's look its picture, once it has one), its words and
+// its price. "Kup" asks first; what is owned has "Załóż" or "Zdejmij" in its
+// place. With a frame worn, the switch "Kolor imienia jak ramka".
 
 import { mountArt, walkerSheet } from '../art.js';
 import { characterLook, portraitBox } from '../cosmetics.js';
@@ -23,6 +23,7 @@ const TABS = [
   { id: 'aury', kind: 'aura', name: 'Aury' },
   { id: 'slady', kind: 'trail', name: 'Ślady' },
   { id: 'wierzchowiec', kind: 'mountSkin', name: 'Wierzchowiec' },
+  { id: 'chowance', kind: 'pet', name: 'Chowańce' },
 ];
 
 export function mountShop(container, { params }) {
@@ -86,13 +87,14 @@ export function mountShop(container, { params }) {
   }
 
   // The item on the character's own portrait, with the frame, the
-  // background and the aura it wears besides; a trail behind the character
-  // on the path; the mount's look as its picture, or none while it has none.
+  // background, the aura and the pet it wears besides; a trail behind the
+  // character on the path; the mount's look as its picture, or none while it
+  // has none.
   function preview(item, character) {
     if (item.kind === 'mountSkin') return mountArt(item.art);
     if (item.kind === 'trail') return trailPreview(item, character);
-    const { frame, background, aura } = character.cosmetics;
-    return portraitBox(characterLook(character), { frame, background, aura, [item.kind]: item.id }, 'shop-preview');
+    const { frame, background, aura, pet } = character.cosmetics;
+    return portraitBox(characterLook(character), { frame, background, aura, pet, [item.kind]: item.id }, 'shop-preview');
   }
 
   // A trail as the Walka scene shows it: the character on a bit of the path,

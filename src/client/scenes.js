@@ -5,8 +5,8 @@
 // still. They take the light of the hour in Poland, and now and then show a
 // rare moment: a bird crossing the sky, steam from the cauldron, sparks from
 // the hammer, or the shadow of a creature of the place passing far away. On
-// the way the character's aura lights it, and its trail glows behind it (the
-// Sklep Systemu).
+// the way the character's aura lights it, its trail glows behind it and its
+// pet goes with it (the Sklep Systemu).
 
 import { herbSprite, itemSprite, monsterSprite, placeArt, potionSprite, riderFile, walkerSheet } from './art.js';
 import { cosmeticOf } from './cosmetics.js';
@@ -73,7 +73,8 @@ export function workScene(professionId, activity, { avatar = false } = {}) {
 
 // The Walka scene of an exploration under way: the character in its own look
 // and skin tone (or its evolution's), or the System's figure for a look not
-// drawn walking yet, in the light of its aura and with its trail behind.
+// drawn walking yet, in the light of its aura, with its trail behind and its
+// pet beside it.
 export function walkScene(activity) {
   const walk = config()?.walk;
   if (!walk) return null;
@@ -86,6 +87,8 @@ export function walkScene(activity) {
   if (aura) lightWalker(stage, figure, aura);
   const trail = cosmeticOf(worn?.trail)?.trail;
   if (trail) footprints(stage, trail, walk, figure.classList.contains('scene-ride'));
+  const pet = cosmeticOf(worn?.pet)?.pet;
+  if (pet) companion(figure, pet, figureBox(walk, figure, own));
   const land = walk.lands[activity.regionId];
   if (land) stage.style.setProperty('--land', `url("/${land}")`);
   stage.style.setProperty('--land-width', `${LAND.width * SCALE}px`);
@@ -159,6 +162,38 @@ function footprints(stage, { color }, walk, riding) {
       next();
     }, stride * 1000);
   next();
+}
+
+// The box the figure stands in on the way, as a pet takes it: its size in
+// pixels and the bottom it stands at over the scene's (in styles.css, on
+// .scene-walk): the ride's (the mount with the rider), the character's own
+// walking frame, or the System's figure.
+function figureBox(walk, figure, own) {
+  if (figure.classList.contains('scene-ride')) {
+    const pixels = (name) => Number.parseFloat(figure.style.getPropertyValue(name));
+    return { width: pixels('--ride-width'), height: pixels('--ride-height'), bottom: 'var(--ride-bottom)' };
+  }
+  const sheet = own ? walk.walker : walk.figure;
+  const size = sheet.size * (sheet.scale ?? SCALE);
+  return { width: size, height: size, bottom: own ? 'var(--walker-bottom)' : 'var(--figure-bottom)' };
+}
+
+// The pet worn on the way (the Sklep Systemu's chowaniec; the author:
+// "Zatwierdzam 540.1, 540.2 i 540.3"): its frames, drawn for the walking
+// frame's scale, where its place (pet.foot walking, pet.ride riding, in
+// data/cosmetics.json) puts them against the figure's box: across from the
+// box's front or back edge, and up from its bottom or down from its top; in
+// front of the figure, or behind it and the mount. With the animations off
+// it stands on its first frame, as the figure does.
+function companion(figure, { walk, foot, ride: riding }, box) {
+  const place = figure.classList.contains('scene-ride') ? riding : foot;
+  const element = frames({ ...walk, scale: 1 }, 'scene-pet');
+  const left = (place.edge === 'front' ? box.width / 2 : -box.width / 2) + place.x;
+  const rise = place.bottom ?? box.height - place.top - walk.size;
+  element.style.left = `calc(50% + ${left}px)`;
+  element.style.bottom = `calc(${box.bottom} + ${rise}px)`;
+  if (place.behind) figure.before(element);
+  else figure.after(element);
 }
 
 // With a mount from the Stajnia the character rides it (the author:
