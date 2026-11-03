@@ -1294,11 +1294,18 @@ test('the threat estimate for one inner region stays well within the CPU budget'
   // Below the levels of the place many kinds of fights are in doubt: the costliest case.
   const cases = [['shadow', 20], ['warrior', 15], ['mage', 26]].map(([classId, level]) => typicalCharacter(classId, level, content));
   for (const { character, equipped } of cases) faintChances({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content);
-  const started = performance.now();
-  for (let i = 0; i < 10; i++) {
-    for (const { character, equipped } of cases) faintChances({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content);
+  // The best of five rounds measures the warmed code (about 2 ms), not the compiling
+  // or a busy machine: the first round alone came close to the limit on an idle
+  // computer and went over it on a slow GitHub runner.
+  let best = Infinity;
+  for (let round = 0; round < 5; round++) {
+    const started = performance.now();
+    for (let i = 0; i < 10; i++) {
+      for (const { character, equipped } of cases) faintChances({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content);
+    }
+    best = Math.min(best, (performance.now() - started) / 30);
   }
-  assert.ok((performance.now() - started) / 30 < 6, 'the average estimate took too long');
+  assert.ok(best < 6, `the average estimate took too long: ${best.toFixed(2)} ms`);
 });
 
 describe('camp', () => {
