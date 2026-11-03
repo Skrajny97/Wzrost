@@ -1,0 +1,15 @@
+{
+  "id": "raven-fly",
+  "payload": {
+    "first_frame": "art/references/pets/raven-fly.png",
+    "action": "flying in place, seen from the side and facing right, both wings flapping fully up and down in a smooth seamless loop, the body bobbing slightly",
+    "frame_count": 8,
+    "seed": 578046761,
+    "no_background": true
+  },
+  "usage": {
+    "type": "generations",
+    "generations": 1
+  },
+  "frames": 9
+}

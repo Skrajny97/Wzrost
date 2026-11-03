@@ -1,0 +1,15 @@
+{
+  "id": "fox-trot",
+  "payload": {
+    "first_frame": "art/references/pets/fox-trot.png",
+    "action": "trotting at a steady pace in place, seen from the side and facing right, the four legs moving in a smooth seamless trot loop, the bushy tail swaying, the head bobbing slightly",
+    "frame_count": 8,
+    "seed": 395472398,
+    "no_background": true
+  },
+  "usage": {
+    "type": "generations",
+    "generations": 1
+  },
+  "frames": 9
+}
