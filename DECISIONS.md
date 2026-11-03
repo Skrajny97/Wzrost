@@ -3011,6 +3011,21 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Rozdział narratora: Wieże (515, 3.11.2026)
+
+Autor zapytał: „Czy do Wież robimy Samouczek? a może już mamy coś takiego?”. Były tylko komunikat Systemu na 50. poziomie postaci i wstęp na ekranie Wież pod „Jak to działa?”, bez rozdziału narratora. Autor: „515 wszystko OK”.
+
+1. **Kwestie (515.1–515.7), zatwierdzone słowo w słowo:**
+   - `towers-welcome` (karta): „Pięćdziesiąty poziom postaci… System otworzył przed Tobą Wieże.”
+   - `towers-lead` (prowadzi do zakładki Walka, części Wieże): „Wieże czekają w zakładce Walka. Zajrzyjmy tam.”
+   - `towers-entries` (licznik wejść): „Każde wejście to jedna walka, z wynikiem od razu. Walczysz z pełnym HP, ale bez mikstur.”
+   - `towers-solo` (Wieża Solo): „Każde piętro to stwory jednego regionu, po kolei przez wszystkie krainy. Najwyżej wejdziesz na piętro swojego poziomu.”
+   - `towers-floor` (co czeka na piętrze): „Po drodze czekają elity i czempioni, a co dziesiąte piętro za pierwsze zwycięstwo daje skrzynię Wieży.”
+   - `towers-party` (Wieża Drużyn): „Do Wieży Drużyn wejdziesz z jednym albo dwoma wędrowcami. Wolne miejsce zajmie towarzysz z Kwater.”
+   - `towers-ending` (karta): „Wejść masz kilkanaście na dzień, nowe od północy. Wieże pomogą Ci też uzupełnić dawne wpisy Bestiariusza.”
+2. **Kiedy.** Od 50. poziomu postaci, po raporcie, który go przyniósł, i gdy nie czeka żaden wcześniejszy rozdział, jak przy pozostałych rozdziałach. Postać, która ma już ten poziom, zobaczy rozdział raz. Da się go pominąć: „Objaśnienie pominięte. Wieże czekają w zakładce Walka.”
+3. **Nagrania:** głos narratora z ElevenLabs, po dwie wersje każdej kwestii do odsłuchu u autora. Rozdział wchodzi do gry po wyborze nagrań.
+
 ## Wersja 0.1.6 (3.11.2026)
 
 1. **Co wchodzi do gry:**
