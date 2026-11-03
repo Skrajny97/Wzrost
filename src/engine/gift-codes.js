@@ -11,13 +11,20 @@ export const normalCode = (typed) =>
     .replace(/[^A-Z0-9]/g, '');
 
 // The gift of a typed code, or why there is none: `unknown`, `expired`, or
-// `used` when the account (`used`: the ids of its codes) has it already.
-export function giftCodeOf(typed, now, used, content) {
+// `used` when the account (`used`: the ids of its codes) has it already. A
+// code given to one character (`for`: the key of its name, which the server
+// works out, characterKey in src/server/gift-codes.js) is unknown to every
+// other one; the same code can be given that way to several characters, one
+// entry each (the author: "na stałe może być ten kod, ale dostępny tylko dla
+// danej konkretnej postaci i tylko na moje polecenie").
+export function giftCodeOf(typed, now, used, content, characterKey = null) {
   const code = normalCode(typed);
-  const gift = code ? content.giftCodes.find((each) => each.code === code) : null;
-  if (!gift) return { reason: 'unknown' };
-  if (now >= Date.parse(gift.until)) return { reason: 'expired' };
-  if (used.includes(gift.id)) return { reason: 'used' };
+  const gifts = code ? content.giftCodes.filter((each) => each.code === code && (!each.for || each.for === characterKey)) : [];
+  if (gifts.length === 0) return { reason: 'unknown' };
+  const open = gifts.filter((each) => now < Date.parse(each.until));
+  if (open.length === 0) return { reason: 'expired' };
+  const gift = open.find((each) => !used.includes(each.id));
+  if (!gift) return { reason: 'used' };
   return { gift };
 }
 

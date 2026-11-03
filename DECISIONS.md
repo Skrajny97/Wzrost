@@ -3011,6 +3011,14 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Kod PC dla jednej postaci i odpowiedzi 500.7, 500.14, 500.17 (3.11.2026)
+
+Autor: „Przygotuj jednorazowy kod podarunkowy "PC" dla gracza […] 60 Punktów Czasu za zaangażowanie”, „Ogólnie na stałe może byc ten kod, ale dostępny tylko dla danej konkretnej postaci i tylko na moje polecenie przy takich sytuacjach”, „500.7 wyższa rozdzielczość potrzebna”, „500.14 A”, „500.17 B”.
+
+1. **Kod dla jednej postaci.** Wpis w `data/gift-codes.json` może mieć pole `for`: kod działa wtedy tylko dla jednej postaci, a dla każdej innej jest nieznany („Nie ma takiego kodu.”). Repozytorium jest publiczne, więc `for` to nie imię, tylko skrót SHA-256 imienia małymi literami (`characterKey` w `src/server/gift-codes.js`). Ten sam kod, np. PC, może dostać kilka postaci, każda swoim wpisem; jak każdy kod, działa raz na konto. Takie kody dodaję tylko na polecenie autora.
+2. **Kod PC:** 60 Punktów Czasu za zaangażowanie dla postaci wskazanej przez autora, do końca 16 listopada (`pc-2026-11-03-a`). Kody muszą mieć teraz co najmniej 2 znaki zamiast 4.
+3. **Popielec (500.14 A)** i **Raróg (500.17 B)** z PixelLab wybrane. **Suchotnik (500.7):** potrzebna wyższa rozdzielczość, czyli więcej szczegółów niż w 48 pikselach PixelLab; rysuję go jeszcze raz.
+
 ## Uwagi gracza o układzie na komputerze (3.11.2026, pytania 505–508)
 
 Autor przesłał zrzut czatu gracza z 22. poziomu: „Sporo jest jeszcze miejsca na HUD'zie na PC. Może na stałe wyświetlać na pasku drewno, złoto, punkty czasu itp? Byłoby przydatne”, „I mam dziwne odczucie, że muszę scrollować widok obozu po 20 lvl, jak się wydłużył.”, „I fajnie jakby w HUD na PC po lewej stronie walka, profesje, osada itp były rozwijane tak jak postać z dodatkowymi skrótami” i „+ obóz dodany, w tym górnym HUD, wydaje się być mało intuicyjny”.

@@ -1,5 +1,5 @@
 {
-  "$comment": "Kody podarunkowe (DECISIONS.md, „Kod podarunkowy”). Gracz wpisuje kod w Ustawieniach; wielkość liter, spacje i myślniki nie mają znaczenia. Każdy kod działa raz na konto, do chwili `until` (czas z przesunięciem, np. Warszawy). Nagrody idą do postaci: Punkty Systemu, Punkty Czasu, złoto i zasoby obozu po id z resources.json. Repozytorium jest publiczne, więc kod widać w tym pliku: kod dla wybranych osób trzeba by zapisywać inaczej.",
+  "$comment": "Kody podarunkowe (DECISIONS.md, „Kod podarunkowy”). Gracz wpisuje kod w Ustawieniach; wielkość liter, spacje i myślniki nie mają znaczenia. Każdy kod działa raz na konto, do chwili `until` (czas z przesunięciem, np. Warszawy). Nagrody idą do postaci: Punkty Systemu, Punkty Czasu, złoto i zasoby obozu po id z resources.json. Repozytorium jest publiczne, więc kod widać w tym pliku. Kod dla jednej postaci (`for`) ma zamiast jej imienia skrót SHA-256 imienia małymi literami; inne postacie go nie znają. Takie kody dodaje się tylko na polecenie autora (kod PC: za zaangażowanie).",
   "codes": [
     {
       "id": "testers-2026-11",
@@ -12,6 +12,13 @@
       "code": "TIGER",
       "until": "2026-11-10T00:00:00+01:00",
       "rewards": { "systemPoints": 500 }
+    },
+    {
+      "id": "pc-2026-11-03-a",
+      "code": "PC",
+      "for": "49097d632f6be096bcad4eb17c764e108612bd4d8211faafa3eebe2803896723",
+      "until": "2026-11-17T00:00:00+01:00",
+      "rewards": { "timePoints": 60 }
     }
   ],
   "texts": {

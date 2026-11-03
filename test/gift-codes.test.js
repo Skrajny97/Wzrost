@@ -4,7 +4,10 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
+import { createHash } from 'node:crypto';
+
 import { giftCodeOf, giftRewardsText, normalCode, withGiftResources } from '../src/engine/index.js';
+import { characterKey } from '../src/server/gift-codes.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -40,6 +43,40 @@ describe('gift codes in the engine', () => {
     assert.equal(giftCodeOf('JESTEMTESTEREM', before, ['testers-2026-11'], content).reason, 'used');
   });
 
+  // The key of a name as the server works it out (characterKey).
+  const key = (name) => createHash('sha256').update(name.normalize('NFC').trim().toLocaleLowerCase('pl')).digest('hex');
+
+  test('the server keys a name by its SHA-256 in small letters, so the data never holds the name', async () => {
+    assert.equal(await characterKey('Testowa'), key('Testowa'));
+    assert.equal(await characterKey(' TESTOWA '), key('testowa'));
+    assert.equal(await characterKey('Żółw'), key('żółw'));
+  });
+
+  test('a code given to one character is unknown to the others, and the same code can go to several characters', () => {
+    const at = Date.parse('2026-11-05T12:00:00+01:00');
+    const mine = { id: 'pc-test-a', code: 'PC', for: key('Testowa'), until: '2026-11-17T00:00:00+01:00', rewards: { timePoints: 60 } };
+    const theirs = { ...mine, id: 'pc-test-b', for: key('Inna') };
+    const world = { ...content, giftCodes: [mine, theirs] };
+    assert.equal(giftCodeOf('pc', at, [], world, key('Testowa')).gift, mine);
+    assert.equal(giftCodeOf('pc', at, [], world, key('Inna')).gift, theirs);
+    assert.equal(giftCodeOf('pc', at, [], world, key('Ktoś')).reason, 'unknown');
+    assert.equal(giftCodeOf('pc', at, [], world, null).reason, 'unknown');
+    assert.equal(giftCodeOf('pc', at, ['pc-test-a'], world, key('Testowa')).reason, 'used');
+    assert.equal(giftCodeOf('pc', Date.parse('2026-11-17T00:00:00+01:00'), [], world, key('Testowa')).reason, 'expired');
+  });
+
+  test('PC gives 60 Punkty Czasu to one chosen character only, until the end of 16 November in Warsaw', () => {
+    const pc = content.giftCodes.find((gift) => gift.id === 'pc-2026-11-03-a');
+    assert.equal(pc.code, 'PC');
+    assert.match(pc.for, /^[0-9a-f]{64}$/);
+    assert.deepEqual(pc.rewards, { timePoints: 60 });
+    assert.equal(pc.until, '2026-11-17T00:00:00+01:00');
+    assert.equal(giftRewardsText(pc.rewards, content), 'Punkty Czasu +60');
+    // Every code for one character is keyed, never named.
+    for (const gift of content.giftCodes.filter((each) => each.for)) assert.match(gift.for, /^[0-9a-f]{64}$/);
+    assert.equal(giftCodeOf('PC', Date.parse('2026-11-05T12:00:00+01:00'), [], content, key('Kodowiec')).reason, 'unknown');
+  });
+
   test('the rewards in words, and the resources added to what the character has', () => {
     assert.equal(giftRewardsText(tester.rewards, content), 'Punkty Systemu +100, Punkty Czasu +100, złoto +1000, drewno +100, kamień +100, ruda żelaza +100');
     assert.deepEqual(withGiftResources({ wood: 5 }, tester.rewards), { wood: 105, stone: 100, 'iron-ore': 100 });
@@ -59,6 +96,8 @@ describe('gift codes through the API', () => {
 
   test('the code gives its rewards to the character once per account, also after starting over', async () => {
     assert.equal((await call('POST', '/api/gift-code', { cookie, body: { code: 'niematakiego' } })).data.error.code, 'unknown_code');
+    // A code given to another character is unknown here.
+    assert.equal((await call('POST', '/api/gift-code', { cookie, body: { code: 'PC' } })).data.error.code, 'unknown_code');
     const start = await row();
     const taken = await call('POST', '/api/gift-code', { cookie, body: { code: 'jestem testerem' } });
     // The code ends on 13 November 2026; after that it answers so.
