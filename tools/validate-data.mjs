@@ -714,6 +714,7 @@ function checkReferences(data) {
   errors.push(...checkStable(data));
   errors.push(...checkTannery(data));
   errors.push(...checkCosmetics(data));
+  errors.push(...checkTowers(data));
   return errors;
 }
 
@@ -1231,6 +1232,35 @@ function checkTannery(data) {
   if (stock.length > standings.length) errors.push('settlement.json: tannery.sell.stock ma więcej liczb niż stopni');
   if (stock.some((share, index) => index > 0 && share < stock[index - 1])) errors.push('settlement.json: tannery.sell.stock nie może maleć ze stopniem');
   if (stock.at(-1) !== 1) errors.push('settlement.json: tannery.sell.stock na ostatnim stopniu musi być 1 (wszystkie materiały)');
+  return errors;
+}
+
+// The Wieże (src/engine/towers.js): floor f holds the inner region (f - 1)
+// mod the regions' number, so with the regions as they are the champion
+// floors must come round to every land's champion (342 A: "kolejno",
+// not the same two), and every region must have a usual floor, without
+// an elite or a champion, in some lap (484 A). A new land may break it:
+// with 30 regions every 15th floor met only two of them, as 30 is twice 15.
+function checkTowers(data) {
+  const errors = [];
+  const { championEvery, eliteEvery, eliteLapEvery } = data.towers.floors;
+  const areas = data.regions.flatMap((region) => region.areas);
+  const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+  const lap = areas.length * eliteLapEvery;
+  const champions = new Set();
+  const usual = new Set();
+  for (let floor = 1; floor <= (championEvery * lap) / gcd(championEvery, lap); floor++) {
+    const area = areas[(floor - 1) % areas.length];
+    const elite = floor % eliteEvery === 0 && Math.floor((floor - 1) / areas.length) % eliteLapEvery === 0;
+    if (floor % championEvery === 0 && area.champion) champions.add(area.champion);
+    else if (!elite && floor % championEvery !== 0) usual.add(area.id);
+  }
+  for (const area of areas) {
+    if (area.champion && !champions.has(area.champion)) {
+      errors.push(`towers.json: czempion ${area.champion} nie czeka na żadnym piętrze (co ${championEvery}. piętro przy ${areas.length} regionach, 342 A)`);
+    }
+    if (!usual.has(area.id)) errors.push(`towers.json: region ${area.id} nie ma w Wieżach zwykłego piętra (484 A)`);
+  }
   return errors;
 }
 

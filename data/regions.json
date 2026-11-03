@@ -643,5 +643,126 @@
         "champion": "rokita"
       }
     ]
+  },
+  {
+    "id": "pine-dunes",
+    "land": "Szumiący Bór",
+    "name": "Sosnowe Wydmy",
+    "minLevel": 126,
+    "maxLevel": 150,
+    "safe": false,
+    "description": "Pierwsza część Szumiącego Boru: wydmy porośnięte wrzosem i krzywymi sosnami. Dalej szumi żywiczny bór, lotne piaski zasypują i odsłaniają dawne kurhany, w dołach dymią smolarnie, a za nimi czernieje pogorzelisko, nad którym krąży ognisty raróg.",
+    "trait": {
+      "name": "Spiekota",
+      "description": "Oparzenie trwa o jeden ruch dłużej, u stworów i u postaci.",
+      "effectTicks": { "burning": 1 }
+    },
+    "elite": "noon-wraith",
+    "resources": { "wood": 6, "stone": 2, "iron-ore": 2 },
+    "areas": [
+      {
+        "id": "heather-dunes",
+        "name": "Wrzosowe Wydmy",
+        "minLevel": 126,
+        "maxLevel": 130,
+        "description": "Łagodne wydmy pod fioletowym kobiercem wrzosu, z pokręconymi sosnami na grzbietach. Spod piasku wyłania się piaskun, nad wrzosami snuje się wrzosowa mara, a o zmierzchu nisko nad ziemią przelatują lelki.",
+        "encounters": [
+          { "weight": 18, "monsters": ["sandman"] },
+          { "weight": 14, "monsters": ["heather-mare"] },
+          { "weight": 14, "monsters": ["nightjar", "nightjar"] },
+          { "weight": 12, "monsters": ["sandman", "nightjar"] },
+          { "weight": 12, "monsters": ["heather-mare", "heather-mare"] },
+          { "weight": 10, "monsters": ["sandman", "heather-mare"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["sandman", "heather-mare", "nightjar"] },
+          { "weight": 6, "monsters": ["sandman", "sandman"] },
+          { "weight": 6, "monsters": ["heather-mare", "nightjar", "nightjar"] }
+        ]
+      },
+      {
+        "id": "resin-pinewood",
+        "name": "Żywiczny Bór",
+        "minLevel": 131,
+        "maxLevel": 135,
+        "description": "Stary bór, w którym żywica spływa po pniach jak miód. Między sosnami człapie żywicznik, korę toczą korojady, a nocą wokół pni fruwają smolne ćmy.",
+        "encounters": [
+          { "weight": 18, "monsters": ["resin-golem"] },
+          { "weight": 14, "monsters": ["barkborer"] },
+          { "weight": 14, "monsters": ["tar-moth", "tar-moth"] },
+          { "weight": 12, "monsters": ["resin-golem", "tar-moth"] },
+          { "weight": 10, "monsters": ["barkborer", "barkborer"] },
+          { "weight": 10, "monsters": ["resin-golem", "barkborer"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["resin-golem", "barkborer", "tar-moth"] },
+          { "weight": 6, "monsters": ["resin-golem", "resin-golem"] },
+          { "weight": 6, "monsters": ["barkborer", "barkborer", "tar-moth"] }
+        ]
+      },
+      {
+        "id": "drifting-sands",
+        "name": "Lotne Piaski",
+        "minLevel": 136,
+        "maxLevel": 140,
+        "description": "Pustkowie, na którym wiatr przesypuje piasek z miejsca na miejsce i odsłania stare kurhany. Po wydmach błąkają się suchotniki, kręcą się piaskowe wiry, a z kurhanów wychodzą kurhanniki.",
+        "encounters": [
+          { "weight": 18, "monsters": ["drought-husk"] },
+          { "weight": 14, "monsters": ["sand-whirl"] },
+          { "weight": 14, "monsters": ["barrow-wight"] },
+          { "weight": 12, "monsters": ["drought-husk", "barrow-wight"] },
+          { "weight": 10, "monsters": ["sand-whirl", "barrow-wight"] },
+          { "weight": 10, "monsters": ["drought-husk", "sand-whirl"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["drought-husk", "sand-whirl", "barrow-wight"] },
+          { "weight": 6, "monsters": ["drought-husk", "drought-husk", "barrow-wight"] },
+          { "weight": 6, "monsters": ["sand-whirl", "barrow-wight", "barrow-wight"] }
+        ]
+      },
+      {
+        "id": "tar-pits",
+        "name": "Smolne Doły",
+        "minLevel": 141,
+        "maxLevel": 145,
+        "description": "Doły dawnych smolarzy, w których wciąż tli się drewno i bulgocze dziegieć. Duchy smolarzy pilnują swoich kotłów, w żarze skaczą węgliki, a nad dymem krążą latawce.",
+        "encounters": [
+          { "weight": 18, "monsters": ["tar-burner"] },
+          { "weight": 14, "monsters": ["charcoal-imp"] },
+          { "weight": 14, "monsters": ["latawiec"] },
+          { "weight": 12, "monsters": ["tar-burner", "latawiec"] },
+          { "weight": 10, "monsters": ["charcoal-imp", "charcoal-imp"] },
+          { "weight": 10, "monsters": ["tar-burner", "charcoal-imp"] },
+          { "weight": 8, "monsters": ["charcoal-imp", "latawiec"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["tar-burner", "charcoal-imp", "latawiec"] },
+          { "weight": 6, "monsters": ["tar-burner", "tar-burner"] },
+          { "weight": 6, "monsters": ["charcoal-imp", "charcoal-imp", "latawiec"] }
+        ]
+      },
+      {
+        "id": "burnt-forest",
+        "name": "Pogorzelisko",
+        "minLevel": 146,
+        "maxLevel": 150,
+        "description": "Las, który spłonął w jednej strasznej pożodze. Między czarnymi pniami chodzą zwęglaki i popielce, a iskrzaki nie dają zgasnąć ostatnim płomieniom. Tu gniazduje raróg, ognisty sokół z legend.",
+        "encounters": [
+          { "weight": 18, "monsters": ["charred-pine"] },
+          { "weight": 14, "monsters": ["ash-wraith"] },
+          { "weight": 14, "monsters": ["spark-swarm"] },
+          { "weight": 12, "monsters": ["charred-pine", "spark-swarm"] },
+          { "weight": 10, "monsters": ["ash-wraith", "ash-wraith"] },
+          { "weight": 10, "monsters": ["ash-wraith", "spark-swarm"] },
+          { "weight": 8, "monsters": ["charred-pine", "ash-wraith"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["charred-pine", "ash-wraith", "spark-swarm"] },
+          { "weight": 6, "monsters": ["charred-pine", "charred-pine"] },
+          { "weight": 6, "monsters": ["ash-wraith", "spark-swarm", "spark-swarm"] }
+        ],
+        "champion": "rarog"
+      }
+    ]
   }
 ]

@@ -1,8 +1,9 @@
 // The Wieże Systemu (src/engine/towers.js, src/server/towers.js): the floors
 // of a climb, the creatures of every land in turn at the floor's level,
 // elites on the fifth floors of every other lap of the regions and
-// champions on the fifteenth, every creature somewhere, the top open to a
-// party; an entry's fight and its pay, the champion's trophy only at the
+// champions every championEvery floors (the 25th since Sosnowe Wydmy),
+// champions of every land in turn, every creature somewhere, the top open
+// to a party; an entry's fight and its pay, the champion's trophy only at the
 // first win of its floor; and the towers through the API, from level 50,
 // with the entries of a day, the chest of a tenth floor once, the trophy
 // once, the Wieża Drużyn with a Drużyna, never on an exploration, and
@@ -11,9 +12,14 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { areaDangers, createRng, encountersFor, materialDrops, parseStack, towerArea, towerEliteFloor, towerFight, towerFloor, towerTop } from '../src/engine/index.js';
+import { areaDangers, autoDistribute, createRng, encountersFor, materialDrops, parseStack, towerArea, towerEliteFloor, towerFight, towerFloor, towerTop } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
+
+// A champion's floor: every championEvery floors (data/towers.json; 342 A
+// said the 15th, the 25th since the 30 regions of Sosnowe Wydmy).
+const CHAMPION = content.towers.floors.championEvery;
+const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
 
 describe('the Wieże Systemu', () => {
   test('the highest floor open is the lowest level in the party', () => {
@@ -34,18 +40,18 @@ describe('the Wieże Systemu', () => {
     assert.deepEqual(towerFloor(3, 'climb', content), floor);
   });
 
-  test('every fifth floor an elite only in every other lap of the regions (484 A), every fifteenth a champion in every lap (342 A), and elites now and then on other floors', () => {
+  test('every fifth floor an elite only in every other lap of the regions (484 A), a champion every championEvery floors in every lap (342 A), and elites now and then on other floors', () => {
     const lap = (floor) => Math.floor((floor - 1) / content.areas.length);
     for (let floor = 5; floor <= 400; floor += 5) {
       const { encounter } = towerFloor(floor, 'climb', content);
       const area = towerArea(floor, content);
       // The first lap as before, the next one without, and so on in turn.
       assert.equal(towerEliteFloor(floor, content), lap(floor) % 2 === 0, `floor ${floor}`);
-      if (floor % 15 === 0 && area.champion) assert.equal(encounter.members[0].monsterId, area.champion, `floor ${floor}`);
+      if (floor % CHAMPION === 0 && area.champion) assert.equal(encounter.members[0].monsterId, area.champion, `floor ${floor}`);
       else if (lap(floor) % 2 === 0 && area.elite) assert.equal(encounter.members[0].monsterId, area.elite, `floor ${floor}`);
     }
-    // A lap is as long as the inner regions are many (25 with the Czarne
-    // Bagno), so the floors of each lap follow from the data.
+    // A lap is as long as the inner regions are many (30 with Sosnowe
+    // Wydmy), so the floors of each lap follow from the data.
     const regions = content.areas.length;
     const fifths = (from, to) => Array.from({ length: to - from + 1 }, (_, index) => from + index).filter((floor) => floor % 5 === 0);
     assert.ok(fifths(1, regions).every((floor) => towerEliteFloor(floor, content)), 'the first lap keeps its elites');
@@ -54,7 +60,7 @@ describe('the Wieże Systemu', () => {
     assert.equal([1, 2, 3, 4, regions + 1, regions + 4, 2 * regions + 1].some((floor) => towerEliteFloor(floor, content)), false);
     // In the laps between, a fifth floor (not a champion's) is a usual floor
     // of its region: its creatures, an elite only now and then.
-    const usual = Array.from({ length: 400 }, (_, index) => index + 1).filter((floor) => floor % 5 === 0 && lap(floor) % 2 === 1 && floor % 15 !== 0);
+    const usual = Array.from({ length: 400 }, (_, index) => index + 1).filter((floor) => floor % 5 === 0 && lap(floor) % 2 === 1 && floor % CHAMPION !== 0);
     let elites = 0;
     for (const floor of usual) {
       for (let n = 0; n < 10; n++) {
@@ -68,19 +74,23 @@ describe('the Wieże Systemu', () => {
       }
     }
     assert.ok(elites > usual.length * 10 * 0.03 && elites < usual.length * 10 * 0.2, `${elites} of ${usual.length * 10}`);
-    // Champions of four lands, not of two (342 A).
-    const champions = new Set(Array.from({ length: 20 }, (_, index) => (index + 1) * 15).map((floor) => towerFloor(floor, 'climb', content).encounter).filter((encounter) => encounter.champion).map((encounter) => encounter.members[0].monsterId));
-    assert.ok(champions.size >= 4, [...champions].join(', '));
+    // Champions of every land in turn, not of two (342 A): with 30 regions
+    // every 15th floor would meet only the Wodnik and the Raróg.
+    const champions = new Set(Array.from({ length: 20 }, (_, index) => (index + 1) * CHAMPION).map((floor) => towerFloor(floor, 'climb', content).encounter).filter((encounter) => encounter.champion).map((encounter) => encounter.members[0].monsterId));
+    assert.deepEqual([...champions].sort(), content.areas.filter((area) => area.champion).map((area) => area.champion).sort());
     const others = Array.from({ length: 1000 }, (_, index) => index + 1).filter((floor) => floor % 5 !== 0);
     const random = others.filter((floor) => towerFloor(floor, 'climb', content).encounter.elite).length;
     assert.ok(random > others.length * 0.05 && random < others.length * 0.2, `${random}`);
   });
 
   test('every creature of every region comes on some floor, those of each land\'s last region too, as usual creatures (484 A)', () => {
-    // The first four laps of the regions, many climbs on each floor.
+    // The first four laps of the regions, or as many as the champions'
+    // floors take to come round to every region (five with 30 regions and
+    // every 25th floor), many climbs on each floor.
     const met = new Map(content.areas.map((area) => [area.id, new Set()]));
     const usual = new Map(content.areas.map((area) => [area.id, new Set()]));
-    for (let floor = 1; floor <= 4 * content.areas.length; floor++) {
+    const laps = Math.max(4, CHAMPION / gcd(CHAMPION, content.areas.length));
+    for (let floor = 1; floor <= laps * content.areas.length; floor++) {
       for (let n = 0; n < 40; n++) {
         const { areaId, encounter } = towerFloor(floor, `every${n}`, content);
         for (const { monsterId } of encounter.members) {
@@ -133,7 +143,7 @@ describe('an entry\'s fight', () => {
     // The same seed, the same fight.
     assert.deepEqual(towerFight({ character, equipped: [], name: 'Wspinacz', floor: 3, seed: 'a' }, content), won);
     // A champion floor: no champion's multiplier on the pay.
-    const champion = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 15, seed: 'b' }, content);
+    const champion = towerFight({ character, equipped: [], name: 'Wspinacz', floor: CHAMPION, seed: 'b' }, content);
     assert.equal(champion.fights[0].champion, true);
     const monster = content.monstersById[champion.fights[0].enemies[0].monsterId];
     const { xpBase, xpExponent } = content.balance.rewards;
@@ -142,20 +152,23 @@ describe('an entry\'s fight', () => {
   });
 
   test('a champion leaves its trophy only when asked (the first win of its floor in the tower), and then for certain; the rest of the pay the same (483 A)', () => {
-    const champion = towerFloor(15, 'any', content).encounter.members[0].monsterId;
+    const champion = towerFloor(CHAMPION, 'any', content).encounter.members[0].monsterId;
     assert.ok(content.monstersById[champion].champion);
     const trophy = content.materialsByMonster[champion].id;
     const pieces = (found) => Object.entries(found).filter(([key]) => parseStack(key).materialId === trophy).reduce((sum, [, count]) => sum + count, 0);
+    // With its points spent, as the game spends them, the character wins
+    // the first champion's floor (Rokita, at 25).
+    const climber = { ...character, points: autoDistribute(character, content) };
     for (let n = 0; n < 20; n++) {
-      const first = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 15, seed: `trofeum${n}`, championTrophy: true }, content);
+      const first = towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: CHAMPION, seed: `trofeum${n}`, championTrophy: true }, content);
       assert.equal(first.tower.won, true);
       assert.equal(first.tower.champion, true);
       assert.equal(pieces(first.materials), 1, JSON.stringify(first.materials));
-      const again = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 15, seed: `trofeum${n}`, championTrophy: false }, content);
+      const again = towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: CHAMPION, seed: `trofeum${n}`, championTrophy: false }, content);
       assert.equal(pieces(again.materials), 0, JSON.stringify(again.materials));
       assert.deepEqual([again.tower.won, again.xp, again.gold], [true, first.xp, first.gold]);
       // Not asked, none.
-      assert.equal(pieces(towerFight({ character, equipped: [], name: 'Wspinacz', floor: 15, seed: `trofeum${n}` }, content).materials), 0);
+      assert.equal(pieces(towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: CHAMPION, seed: `trofeum${n}` }, content).materials), 0);
     }
     // Elsewhere (an exploration, the Bestia Gildii) a champion leaves it by its chance, as before.
     const rng = createRng('czempion');
@@ -264,7 +277,7 @@ describe('the Wieże through the API', () => {
   });
 
   test('a champion\'s floor won the first time brings its trophy, a second win not; the page knows the floors won (483 A)', async () => {
-    const champion = towerFloor(15, 'any', content).encounter.members[0].monsterId;
+    const champion = towerFloor(CHAMPION, 'any', content).encounter.members[0].monsterId;
     const trophy = content.materialsByMonster[champion].id;
     const row = async () => (await db()).prepare('SELECT materials, towers FROM characters').first();
     const pieces = async () =>
@@ -272,22 +285,24 @@ describe('the Wieże through the API', () => {
         .filter(([key]) => parseStack(key).materialId === trophy)
         .reduce((sum, [, count]) => sum + count, 0);
     const solo = async () => (await as('wspinacz', 'GET', '/api/towers')).data.towers.towers.find((tower) => tower.id === 'solo');
+    // Its points spent, as the game spends them: it wins Rokita's floor (25).
+    await set('points = ?', JSON.stringify(autoDistribute(newCharacter('warrior', { level: 60, classLevel: 50 }), content)));
     assert.deepEqual((await solo()).champions, []);
     let first = null;
-    for (let i = 0; i < 5 && !first?.tower.won; i++) first = (await enter('wspinacz', { tower: 'solo', floor: 15 })).data.report;
+    for (let i = 0; i < 5 && !first?.tower.won; i++) first = (await enter('wspinacz', { tower: 'solo', floor: CHAMPION })).data.report;
     assert.equal(first.tower.won, true, 'the floor is won');
     assert.equal(first.fights[0].champion, true);
     assert.equal(await pieces(), 1);
-    assert.deepEqual((await solo()).champions, [15]);
+    assert.deepEqual((await solo()).champions, [CHAMPION]);
     let again = null;
-    for (let i = 0; i < 5 && !again?.tower.won; i++) again = (await enter('wspinacz', { tower: 'solo', floor: 15 })).data.report;
+    for (let i = 0; i < 5 && !again?.tower.won; i++) again = (await enter('wspinacz', { tower: 'solo', floor: CHAMPION })).data.report;
     assert.equal(again.tower.won, true);
     assert.ok(again.summary.xp > 0);
     assert.equal(await pieces(), 1);
-    assert.deepEqual(JSON.parse((await row()).towers).champions, { solo: [15] });
+    assert.deepEqual(JSON.parse((await row()).towers).champions, { solo: [CHAMPION] });
     // A floor lost is not won: its trophy still waits.
-    const lost = (await enter('wspinacz', { tower: 'solo', floor: 30 })).data.report;
-    assert.equal((await solo()).champions.includes(30), lost.tower.won);
+    const lost = (await enter('wspinacz', { tower: 'solo', floor: 2 * CHAMPION })).data.report;
+    assert.equal((await solo()).champions.includes(2 * CHAMPION), lost.tower.won);
   });
 
   test('the Dziennik keeps the towers\' reports apart from the others: each new report pushes out only the oldest of its own kind (486 A)', async () => {

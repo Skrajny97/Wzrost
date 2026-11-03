@@ -30,7 +30,12 @@
 // damage (`drain`: Wysysanie), and a monster may take more damage from an
 // element (`weak`). The place's trait may make an effect last longer
 // (`effectTicks`: Opary torfu). These draw random numbers only for a monster
-// that has them, so fights elsewhere stay as they were.
+// that has them, so fights elsewhere stay as they were. A monster may also
+// lie in wait (`ambush`, Zasadzka: the monsters move first, as in an
+// event's ambush), strike the one standing furthest back (an attack's
+// `target: "back"`, Atak na tył szyku: the same one draw as any monster's
+// choice of target) or burn the whole party (an effect's `all`, Ognista
+// nawałnica: one more chance for each other member).
 //
 // An evolved character (evolutions.js) brings its trait (`feat`) and the
 // evolution's skills. A stance wakes at the start of the character's move,
@@ -190,9 +195,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     }
   }
   for (const unit of units) unit.next = unit.interval * (0.5 + 0.5 * rng.next());
-  // An ambush (an event's, events.js): every enemy moves before the allies'
-  // first move. It draws no random numbers.
-  if (ambush) {
+  // An ambush (an event's, events.js, or Zasadzka, 464: a creature that lies
+  // in wait, `ambush` in monsters.json, wherever it fights): every enemy
+  // moves before the allies' first move. It draws no random numbers.
+  const lurker = enemies.find((unit) => unit.ambush);
+  if (ambush || lurker) {
     const last = Math.max(...units.filter((unit) => unit.side === 'enemy').map((unit) => unit.next));
     for (const unit of units) if (unit.side === 'ally') unit.next = Math.max(unit.next, last + 1);
   }
@@ -212,6 +219,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   const log = (event) => {
     if (record) events.push(event());
   };
+  // Zasadzka: the playback opens with the creature that lay in wait.
+  if (lurker) log(() => ({ t: 0, kind: 'ambush', actor: lurker.id, text: say(texts, 'ambush', 0, { actor: lurker.name }) }));
   const earliest = (list) =>
     list.reduce((best, unit) => {
       if (!best) return unit;
@@ -495,10 +504,21 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   // them.
   const challenger = (opponents) => opponents.find((unit) => unit.stances.some((stance) => stance.provoke));
 
+  // Those standing furthest back: the back row, or the row nearest to it
+  // while it is empty. A summon stands before its summoner, so it takes the
+  // blows meant for a summoner there, as it takes any (summonTakes).
+  const hindmost = (opponents) => {
+    const depth = Math.max(...opponents.map((unit) => DEPTH[unit.position] ?? 0));
+    return opponents.filter((unit) => (DEPTH[unit.position] ?? 0) === depth);
+  };
+
   const pickTarget = (actor, opponents) => {
     const taunt = evolving ? challenger(opponents) : null;
     if (taunt) return taunt;
-    return actor.side === 'ally' ? quickestKill(actor, opponents) : rng.weighted(opponents, weightOf);
+    if (actor.side === 'ally') return quickestKill(actor, opponents);
+    // Atak na tył szyku (463: a monster's attack with `target: "back"`):
+    // the one standing furthest back, by the same draw among equals.
+    return rng.weighted(actor.weapon.target === 'back' ? hindmost(opponents) : opponents, weightOf);
   };
 
   // An effect over time from a blow: the target's Will may keep it off, and
@@ -816,10 +836,18 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       if (healed > 0) log(() => ({ t, kind: 'drain', actor: actor.id, target: actor.id, amount: healed, hp: actor.hp, text: say(texts, 'lifesteal', actions, { actor: actor.name, amount: healed }) }));
       if (!move.counter) throwBack(target, actor, amount, absorbed, t);
     }
-    if (target.hp === 0 && fell(target, t, vars)) return;
-
+    // Ognista nawałnica (a monster's `dot.all`): the effect of its blow may
+    // land on every other member of the party as well, each with its own
+    // chance against its Will, even when the one struck has fallen.
     const dot = move.dot ?? weapon.dot;
+    const swept = dot?.all && !move.counter ? foesOf(actor).filter((foe) => foe !== target) : NO_SKILLS;
+    if (target.hp === 0 && fell(target, t, vars)) {
+      for (const foe of swept) applyDot(actor, foe, dot, raw, t, { ...vars, target: foe.name });
+      return;
+    }
+
     if (dot) applyDot(actor, target, dot, raw, t, vars);
+    for (const foe of swept) applyDot(actor, foe, dot, raw, t, { ...vars, target: foe.name });
     // Święty ogień: a spirit struck with sacrum burns.
     if (feat?.kind === 'zeal' && feat.burn && target.family === 'spirit' && (spread ?? [element]).includes(feat.element)) {
       applyDot(actor, target, { effect: 'burning', chance: 1, power: feat.burn, ticks: Math.round(feat.burnTicks) }, raw, t, vars);
@@ -864,10 +892,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   };
 
   // The opponent standing furthest back, the quickest kill among equals.
-  const furthestBack = (actor, opponents) => {
-    const depth = Math.max(...opponents.map((unit) => DEPTH[unit.position] ?? 0));
-    return pickTarget(actor, opponents.filter((unit) => (DEPTH[unit.position] ?? 0) === depth));
-  };
+  const furthestBack = (actor, opponents) => pickTarget(actor, hindmost(opponents));
 
   // The one standing right behind a unit (Przebijający strzał), if anyone.
   const behind = (target, opponents) => {

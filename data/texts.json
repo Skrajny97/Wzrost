@@ -89,6 +89,9 @@
     "{actor} wysysa {amount} HP.",
     "{actor} odzyskuje {amount} HP z rany."
   ],
+  "ambush": [
+    "Zasadzka! {actor} wyłania się znienacka i stwory ruszają pierwsze."
+  ],
   "weakness": [
     "Słaby punkt ({element}): +{percent}%."
   ],
