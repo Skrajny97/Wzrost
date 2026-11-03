@@ -1,0 +1,17 @@
+{
+  "id": "jewelcrafting",
+  "tool": "pixellab generate-image-v2",
+  "description": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, standing at a small wooden jeweller's workbench and pressing a shining gem against a round grinding wheel, bright sparks flying from the wheel, a gold ring, tools and a few small coloured gems on the bench, dark stone brick wall with an arch behind, the whole figure and the bench inside the frame",
+  "style": null,
+  "references": [
+    {
+      "path": "art/references/scenes/jewelcrafting-start-x2.png",
+      "usage": "this exact scene redrawn at double resolution: the same composition and camera, the same figure in the same pose and place, the same colours, light and objects; only finer pixel detail"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
