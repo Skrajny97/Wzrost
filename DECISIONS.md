@@ -3052,13 +3052,14 @@ Autor: „506 A / 505 A / 507 A / 508 A” (pytania w „Uwagi gracza o układzi
     - (brakujący szczegół) Obóz stoi trzeci, pod Walką, bo tam nie zepchnie go w dół rozwinięta lista Osady. Klawisze idą za menu: 1 Postać, 2 Walka, 3 Obóz, 4 Profesje, 5 Osada, 6 Społeczność.
 5. **Poprawka przy okazji.** Społeczność nie otwierała się postaci zrobionej przed wprowadzeniem narratora (bez listy jego kwestii): ekran rzucał błąd. Teraz otwiera się jak u innych.
 
-## Materiały i karta Sosnowych Wydm: wybory autora (516, 520, 3.11.2026)
+## Materiały, karta i odgłosy Sosnowych Wydm: wybory autora (516, 520, 522, 3.11.2026)
 
 Autor: „516.1 C, 516.2 C, 516.3 D, 516.4 B, 516.5 C, 516.7 C, 516.9 D, 516.11 C, 516.12 C, 516.13 D, 516.14 A, 516.15 D, 516.16 D, 516.17 D”. Wszystkie z PixelLab (`materials-pixellab`, 32 × 32, styl jak Szczurzy ogon).
 
 1. Wybrane: Szklisty piasek C, Wieczny wrzos C, Pióro lelka D, Grudka bursztynu B, Toczona kora C, Proch suchotnika C, Brązowy pierścień D, Żarzący węgielek C, Błona latawca C, Zwęglona szczapa D, Popiół zgliszcz A, Wieczna iskra D, Sierp południcy D, Pióro raroga D.
 2. Ćmi pył (516.6), Kamyk z wiru (516.8) i Dziegieć (516.10) PixelLab rysował jeszcze raz, bo za pierwszym razem ich nie oddał. Autor: „516.6 A”, „516.10 B”. Kamyka z wiru PixelLab odmówił, bo uznał jego opis („spiral groove”) za chroniony znak; rysuje go z innym opisem.
-3. **Karta krainy (520 A):** Sosnowe Wydmy z PixelLab, wersja A (`lands-pixellab`, 192 × 96, styl jak Czarne Bagno). Panorama sceny Walki powstaje z niej jak przy innych krainach (karta i jej lustro obok siebie, 384 × 96).
+3. **Odgłosy stworów (522):** autor: „522 zatwierdzam wszystkie odglosy nowych stworów”. Po dwie wersje bólu i śmierci każdego z 17 stworów z ElevenLabs (`voices` w `audio/prompts.json`), przerobione `tools/build-drafts.py` jak pozostałe, w grze z głośnością stworów Czarnego Bagna (ból 0,6, śmierć 0,7).
+4. **Karta krainy (520 A):** Sosnowe Wydmy z PixelLab, wersja A (`lands-pixellab`, 192 × 96, styl jak Czarne Bagno). Panorama sceny Walki powstaje z niej jak przy innych krainach (karta i jej lustro obok siebie, 384 × 96).
 
 ## Rozdział narratora: Wieże (515, 3.11.2026)
 
