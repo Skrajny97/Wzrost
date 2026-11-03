@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Odpowiedzi autora 554, 555 i 557 (3.11.2026)
+
+Autor: „554 B”, „555 Kopalnia: »Ścieżki schodzą głęboko pod puszczę, a w ścianach lśnią żyły kruszców. System odsłania kamienie dopiero wtedy, gdy uzna, że umiesz je wydobyć.« Reszta okey.” oraz „557.3 (Kopanie): »W Kopalni wydobędziesz kamienie szlachetne i kruszce. Po drodze Twój kilof trafi też na żyły złota.« - drobna poprawka”.
+
+1. **554 B:** przedmioty legendarne w Kole Fortuny tylko przy najwyższej stawce dnia (zob. niżej).
+2. **555:** opis Systemowej Kopalni w brzmieniu autora. Opis Systemowej Szlifierni i komunikaty o odblokowaniu Górnictwa i Jubilerstwa zostają takie, jak w propozycji.
+3. **557:** sześć kwestii rozdziału Górnictwa i Jubilerstwa idzie do nagrania, 557.3 w brzmieniu autora, reszta jak w propozycji. Autor wybiera nagrania na słuch, zanim rozdział wejdzie do gry razem z obiema profesjami.
+
 ## Koło Fortuny: przedmioty legendarne tylko przy najwyższej stawce (3.11.2026)
 
 Autor: „554 B” (pytanie: przedmioty legendarne tylko przy najwyższej stawce dnia).
