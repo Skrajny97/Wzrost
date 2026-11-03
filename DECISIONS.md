@@ -3011,6 +3011,18 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Wersja 0.1.5 (3.11.2026)
+
+1. **Co wchodzi do gry:**
+   - Wieże: trofeum czempiona tylko za pierwsze zwycięstwo piętra, stałe elity w co drugim okrążeniu, zapowiedź losowych elit, osobny limit raportów z Wież i próba gildii od poziomu postaci minus 10 (zob. „Wieże: odpowiedzi autora 483–486 i 488”);
+   - Bastion zadaje więcej, a broni się słabiej (zob. „Bastion: więcej obrażeń, mniej obrony”);
+   - Duch budowniczego przy Kamieniu węgielnym z popiersiem 501 A (zob. „Duch budowniczego przy Kamieniu węgielnym”);
+   - budowle obozu wejściem do ścieżek (zob. „Obóz: budowle wejściem do ścieżek”).
+2. **Sprawdzone:**
+   - pełne testy: 919 z 920. Nie przeszedł tylko test czasu oszacowania zagrożenia. Na tym komputerze mierzony czas leży na granicy limitu: przy małym obciążeniu ten test sam raz przechodzi, raz nie, a kod, który mierzy, się nie zmienił. GitHub i tak puszcza pełne testy przed wdrożeniem;
+   - przejście wprowadzenia na telefonie, komputerze i dużym monitorze (pierwsza wyprawa po 11 krokach);
+   - w przeglądarce na telefonie okienko Kamienia węgielnego z duchem i jego popiersiem oraz sprzedaż 17 sztuk drewna za 1 zł, bez błędów strony.
+
 ## Odpowiedzi autora 501, 504–508, plansza obozu i film (3.11.2026)
 
 Autor: „506 A / 505 A / 507 A / 508 A / 501 A / 504 OK”, „Teraz widze ze stół rozbiórki stoi na drzewach, weź ogólnie te plansze obozu i budynki ładnie popraw (i skoordynuj Samouczek)”, „w filmie za dużo opisów na zbyt krótki czas” i „w Ewolucjach daj tylko nazwy klas i wycentruj te napisy wszystkie, bo są nierówno”. Potem: „501 już pisałem że A”.
