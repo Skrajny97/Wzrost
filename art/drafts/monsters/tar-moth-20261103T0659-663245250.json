@@ -1,0 +1,30 @@
+{
+  "id": "tar-moth",
+  "payload": {
+    "prompt": "a huge menacing moth with tar-black wings covered in staring eye patterns, trailing grey poisonous dust, a furry body and long thin legs, wings spread, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 663245250,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689481,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 9.45,
+    "request_id": "25046618-b2b7-486a-bceb-0a3fcf36051c",
+    "outputs_retained_until": 1793775836,
+    "billing": {
+      "source": "balance",
+      "balance_left": 9.45,
+      "balance_charged": 0.36
+    }
+  }
+}

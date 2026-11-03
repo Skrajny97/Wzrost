@@ -1,0 +1,30 @@
+{
+  "id": "ash-wraith",
+  "payload": {
+    "prompt": "Popielec, a tall thin wraith of grey ash, flakes drifting off its body, a hollow face with two small ember eyes, very long arms ending in ash claws, eerie and menacing, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 858742619,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689819,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 6.57,
+    "request_id": "6632f7b4-9636-48fa-93ae-0176311d199d",
+    "outputs_retained_until": 1793776178,
+    "billing": {
+      "source": "balance",
+      "balance_left": 6.57,
+      "balance_charged": 0.36
+    }
+  }
+}

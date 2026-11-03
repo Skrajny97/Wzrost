@@ -1,0 +1,30 @@
+{
+  "id": "heather-mare",
+  "payload": {
+    "prompt": "Wrzosowa Mara, an eerie tall thin wraith woven from purple heather and dry twigs, a pale cracked wooden mask for a face with black empty eyes, long thorny fingers reaching forward, wisps of mist, menacing, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 895055137,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689281,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 10.89,
+    "request_id": "8da3eca1-4f17-4963-8a78-ae2c57639913",
+    "outputs_retained_until": 1793775638,
+    "billing": {
+      "source": "balance",
+      "balance_left": 10.89,
+      "balance_charged": 0.36
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "resin-golem",
+  "payload": {
+    "prompt": "Zywicznik, a lumbering golem of dripping golden amber resin with insects and pine needles trapped inside, glowing faintly from within, heavy round fists, a featureless head with two dark holes, menacing, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 714904845,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689400,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 10.17,
+    "request_id": "eecb6b13-7601-4c54-b1c2-1ce03444fbed",
+    "outputs_retained_until": 1793775729,
+    "billing": {
+      "source": "balance",
+      "balance_left": 10.17,
+      "balance_charged": 0.36
+    }
+  }
+}

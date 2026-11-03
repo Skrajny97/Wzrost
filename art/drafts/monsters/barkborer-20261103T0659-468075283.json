@@ -1,0 +1,30 @@
+{
+  "id": "barkborer",
+  "payload": {
+    "prompt": "Korojad, a writhing faceless humanoid made of thousands of black bark beetles, bored holes through its body, flakes of pine bark falling off, claw-like hands, eerie and menacing, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 468075283,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689434,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 9.81,
+    "request_id": "29068425-b3ef-480d-9b2c-55c669dde1e7",
+    "outputs_retained_until": 1793775801,
+    "billing": {
+      "source": "balance",
+      "balance_left": 9.81,
+      "balance_charged": 0.36
+    }
+  }
+}

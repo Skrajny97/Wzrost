@@ -1,0 +1,30 @@
+{
+  "id": "nightjar",
+  "payload": {
+    "prompt": "Lelek, a demonic nightjar bird with bark-patterned grey-brown feathers, an enormous gaping mouth with tiny needle teeth, glowing pale eyes, wide pointed wings spread as it swoops down, menacing, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 814399018,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689326,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 10.53,
+    "request_id": "b723e07c-2f2e-4806-bd00-08d449c487f4",
+    "outputs_retained_until": 1793775682,
+    "billing": {
+      "source": "balance",
+      "balance_left": 10.53,
+      "balance_charged": 0.36
+    }
+  }
+}

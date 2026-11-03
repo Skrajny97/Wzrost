@@ -1,0 +1,30 @@
+{
+  "id": "barrow-wight",
+  "payload": {
+    "prompt": "Kurhannik, the ghost of an ancient warrior risen from a burial mound, a rusted bronze crown, bones showing through tattered grey robes, a pale cold blue glow, a curved bronze sword, menacing, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 708005874,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689593,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 8.37,
+    "request_id": "46edbca9-65cb-42b0-945f-27eacfb7a43b",
+    "outputs_retained_until": 1793775953,
+    "billing": {
+      "source": "balance",
+      "balance_left": 8.37,
+      "balance_charged": 0.36
+    }
+  }
+}

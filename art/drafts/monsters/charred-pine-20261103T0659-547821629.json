@@ -1,0 +1,30 @@
+{
+  "id": "charred-pine",
+  "payload": {
+    "prompt": "Zweglak, a walking charred pine trunk on twisted root legs, deep cracks glowing with embers, burnt branches like claws, a hollow burning knot for a face, menacing, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 547821629,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689774,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 6.93,
+    "request_id": "21419375-a088-4396-9ed9-ee0a1efab414",
+    "outputs_retained_until": 1793776139,
+    "billing": {
+      "source": "balance",
+      "balance_left": 6.93,
+      "balance_charged": 0.36
+    }
+  }
+}

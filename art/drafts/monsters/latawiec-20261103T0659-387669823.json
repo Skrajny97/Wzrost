@@ -1,0 +1,30 @@
+{
+  "id": "latawiec",
+  "payload": {
+    "prompt": "Latawiec, a Slavic wind demon, a gaunt grey winged creature with tattered membrane wings, long hooked claws, a skull-like face with glowing eyes, swooping down, menacing, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 387669823,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689736,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 7.29,
+    "request_id": "e38f93bc-3303-4625-a790-a010ff5c81dc",
+    "outputs_retained_until": 1793776095,
+    "billing": {
+      "source": "balance",
+      "balance_left": 7.29,
+      "balance_charged": 0.36
+    }
+  }
+}

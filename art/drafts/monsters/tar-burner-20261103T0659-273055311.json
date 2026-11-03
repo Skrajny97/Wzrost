@@ -1,0 +1,30 @@
+{
+  "id": "tar-burner",
+  "payload": {
+    "prompt": "Smolarz, the ghost of an old tar burner made of dripping black tar, a smoking iron pot in his hands, burning orange eyes, a tattered leather apron, menacing, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 273055311,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689645,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 8.01,
+    "request_id": "acdc584b-4986-4bd4-9afe-f2e1036a1c98",
+    "outputs_retained_until": 1793775994,
+    "billing": {
+      "source": "balance",
+      "balance_left": 8.01,
+      "balance_charged": 0.36
+    }
+  }
+}

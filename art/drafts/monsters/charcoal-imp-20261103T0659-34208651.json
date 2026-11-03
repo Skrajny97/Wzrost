@@ -1,0 +1,30 @@
+{
+  "id": "charcoal-imp",
+  "payload": {
+    "prompt": "Weglik, a small hunched imp made of glowing charcoal lumps with cracks of orange embers, a jagged burning grin, smoke rising from its head, sharp claws, menacing, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 34208651,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689694,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 7.65,
+    "request_id": "411b3a36-91d5-4536-a3ef-ce95cd50e193",
+    "outputs_retained_until": 1793776048,
+    "billing": {
+      "source": "balance",
+      "balance_left": 7.65,
+      "balance_charged": 0.36
+    }
+  }
+}

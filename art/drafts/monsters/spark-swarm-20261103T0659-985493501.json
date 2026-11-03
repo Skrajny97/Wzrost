@@ -1,0 +1,30 @@
+{
+  "id": "spark-swarm",
+  "payload": {
+    "prompt": "Iskrzak, a swarm of glowing orange sparks forming the shape of a small fierce bird with a burning tail, an abstract fiery creature, menacing, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 985493501,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689868,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 6.21,
+    "request_id": "afc6b85e-2e19-4366-b3e2-db93cd1ba10b",
+    "outputs_retained_until": 1793776222,
+    "billing": {
+      "source": "balance",
+      "balance_left": 6.21,
+      "balance_charged": 0.36
+    }
+  }
+}

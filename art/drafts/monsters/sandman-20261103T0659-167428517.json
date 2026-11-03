@@ -1,0 +1,30 @@
+{
+  "id": "sandman",
+  "payload": {
+    "prompt": "Piaskun, a menacing hulking creature made of pouring golden sand rising out of a dune, two dark hollow eye pits and a wide jagged crack for a mouth, long arms of streaming sand, abstract eerie silhouette, full body, three-quarter view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 167428517,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689235,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 11.25,
+    "request_id": "74e74905-9a69-42a7-92d2-2fd3b81662f9",
+    "outputs_retained_until": 1793775597,
+    "billing": {
+      "source": "balance",
+      "balance_left": 11.25,
+      "balance_charged": 0.36
+    }
+  }
+}

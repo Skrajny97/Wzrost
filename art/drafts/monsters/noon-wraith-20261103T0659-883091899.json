@@ -1,0 +1,30 @@
+{
+  "id": "noon-wraith",
+  "payload": {
+    "prompt": "Poludnica, a Slavic noon demon, a tall pale woman in a long white linen dress, long loose white hair hiding her face, a curved iron sickle in her hand, heat shimmering around her, eerie and menacing, full body",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 2,
+    "seed": 883091899,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793689930,
+    "credit_cost": 2,
+    "balance_cost": 0.36,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 5.85,
+    "request_id": "37bc2fe0-182a-4522-9753-5360501ddd87",
+    "outputs_retained_until": 1793776269,
+    "billing": {
+      "source": "balance",
+      "balance_left": 5.85,
+      "balance_charged": 0.36
+    }
+  }
+}
