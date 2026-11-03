@@ -1,0 +1,12 @@
+{
+  "id": "bored-bark",
+  "tool": "pixellab generate-image-v2",
+  "description": "a curved piece of pine bark riddled with winding beetle tunnels and small holes, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

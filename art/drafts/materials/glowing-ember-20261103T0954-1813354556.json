@@ -1,0 +1,12 @@
+{
+  "id": "glowing-ember",
+  "tool": "pixellab generate-image-v2",
+  "description": "a small lump of charcoal glowing bright orange from within, with a tiny grinning crack, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

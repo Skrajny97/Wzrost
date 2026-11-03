@@ -1,0 +1,12 @@
+{
+  "id": "husk-dust",
+  "tool": "pixellab generate-image-v2",
+  "description": "a small heap of dry grey-brown dust with cracked clay flakes and a faint red glow inside, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

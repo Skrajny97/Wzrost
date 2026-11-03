@@ -1,0 +1,12 @@
+{
+  "id": "rarog-feather",
+  "tool": "pixellab generate-image-v2",
+  "description": "a long falcon flight feather made of living flames, orange and yellow, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

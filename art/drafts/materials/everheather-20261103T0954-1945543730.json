@@ -1,0 +1,12 @@
+{
+  "id": "everheather",
+  "tool": "pixellab generate-image-v2",
+  "description": "a single sprig of purple heather with tiny violet flowers glowing faintly, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}
