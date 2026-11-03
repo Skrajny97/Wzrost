@@ -161,6 +161,9 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
     family: monster.family,
     elite: Boolean(monster.elite),
     champion: Boolean(monster.champion),
+    // Zasadzka (464): a fight with this creature starts with the creatures'
+    // moves (combat.js).
+    ...(monster.ambush && { ambush: true }),
     groupFactor,
     position: position ?? monster.position,
     level,
@@ -179,6 +182,9 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
       // Ugrzęźnięcie and Wysysanie (combat.js).
       slow: monster.attack.slow,
       drain: monster.attack.drain,
+      // Atak na tył szyku (463): its blows go to the one standing furthest
+      // back (combat.js).
+      ...(monster.attack.target && { target: monster.attack.target }),
     },
     scalingValue: stat(monster.attack.scaling),
     damageScale: damageScale(stat(monster.attack.scaling), level, balance),

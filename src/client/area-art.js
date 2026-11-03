@@ -237,6 +237,45 @@ ${[[33, 100], [51, 100], [69, 100], [87, 100], [42, 84], [60, 84], [78, 84], [51
 <path d="M8 50 v6 M24 50 v6 M96 50 v6 M112 50 v6" stroke="#4a3d2c" stroke-width="2"></path>
 <path d="M44 118 C42 96 50 86 60 86 C70 86 78 96 76 118 Z" fill="#2b2219" stroke="${LINE}" stroke-width="0.8"></path>
 <circle cx="55" cy="96" r="1.8" fill="#c8d46a"></circle><circle cx="65" cy="96" r="1.8" fill="#c8d46a"></circle>`,
+
+  // Sosnowe Wydmy (126–150), until their drawn scenes come.
+  // Wrzosowe Wydmy: dunes in purple heather, a crooked pine on the crest.
+  'heather-dunes': `${SKY}
+<path d="M0 78 Q30 58 60 70 T120 64 V120 H0 Z" fill="#8a7350"></path>
+<path d="M0 96 Q40 80 80 92 T120 88 V120 H0 Z" fill="#6b5a3e"></path>
+<path d="M8 92 q4 -6 8 0 q4 -6 8 0 M40 100 q4 -6 8 0 q4 -6 8 0 M84 96 q4 -6 8 0 q4 -6 8 0" stroke="#9b5fa8" stroke-width="2.4" fill="none" stroke-linecap="round"></path>
+<path d="M78 66 C76 54 82 46 80 34 M80 44 C88 40 94 42 98 38 M79 52 C72 48 66 50 62 46" stroke="#3b4a30" stroke-width="3" fill="none" stroke-linecap="round"></path>
+<path d="M90 36 q8 -4 12 2 q-6 4 -12 -2 Z M58 44 q-8 -2 -10 4 q6 2 10 -4 Z" fill="#2f4a2a"></path>`,
+
+  // Żywiczny Bór: tall pines weeping amber resin.
+  'resin-pinewood': `${SKY}
+<path d="M0 92 Q60 84 120 92 V120 H0 Z" fill="#172014"></path>
+<path d="M22 96 V30 M58 98 V26 M96 96 V34" stroke="#6b4a2c" stroke-width="6" stroke-linecap="round"></path>
+<path d="M8 44 L22 16 L36 44 Z M12 58 L22 36 L32 58 Z M44 40 L58 10 L72 40 Z M48 54 L58 32 L68 54 Z M82 46 L96 20 L110 46 Z M86 60 L96 40 L106 60 Z" fill="#2f4a2a" stroke="${LINE}" stroke-width="0.8"></path>
+<ellipse cx="23" cy="72" rx="2" ry="3.2" fill="#e0a02a"></ellipse><ellipse cx="57" cy="78" rx="2.2" ry="3.4" fill="#e0a02a"></ellipse><ellipse cx="97" cy="70" rx="1.8" ry="3" fill="#e0a02a"></ellipse>`,
+
+  // Lotne Piaski: wind over open sand, an old barrow half bared.
+  'drifting-sands': `${SKY}
+<path d="M0 70 Q30 62 60 68 T120 62 V120 H0 Z" fill="#a08a5c"></path>
+<path d="M30 74 Q60 44 90 74 Z" fill="#6b5a3e" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M52 60 h16 M56 54 h8" stroke="#3a2e22" stroke-width="1.6"></path>
+<path d="M0 96 Q40 86 80 96 T120 92 V120 H0 Z" fill="#8a7350"></path>
+<path d="M6 40 q20 -6 34 0 M70 30 q20 -6 40 0 M20 54 q14 -4 26 0" stroke="#e7dcc2" stroke-width="1.2" fill="none" opacity="0.5" stroke-linecap="round"></path>`,
+
+  // Smolne Doły: earthen kilns smouldering in their pits, smoke above.
+  'tar-pits': `${NIGHT}
+<path d="M0 82 Q60 74 120 82 V120 H0 Z" fill="#221a14"></path>
+<path d="M14 92 Q34 62 54 92 Z M66 96 Q88 66 110 96 Z" fill="#2b2219" stroke="${LINE}" stroke-width="0.8"></path>
+<ellipse cx="34" cy="80" rx="5" ry="2" fill="#c0562b" opacity="0.85"></ellipse><ellipse cx="88" cy="84" rx="5" ry="2" fill="#c0562b" opacity="0.85"></ellipse>
+<path d="M34 70 C30 58 38 50 34 38 M88 74 C84 60 92 52 88 40" stroke="#5d6459" stroke-width="4" fill="none" opacity="0.5" stroke-linecap="round"></path>
+<ellipse cx="60" cy="108" rx="16" ry="4" fill="#0d0b09" stroke="#3a2e22" stroke-width="1"></ellipse>`,
+
+  // Pogorzelisko: black trunks of a burnt pine forest, embers in the ash.
+  'burnt-forest': `${NIGHT}
+<path d="M0 84 Q60 76 120 84 V120 H0 Z" fill="#2a2724"></path>
+<path d="M20 90 V30 M20 48 l-8 -8 M48 92 V22 M48 40 l7 -7 M84 90 V34 M84 52 l-7 -6 M104 92 V44" stroke="#120f0c" stroke-width="4" fill="none" stroke-linecap="round"></path>
+<circle cx="30" cy="100" r="1.6" fill="#ff8a3d"></circle><circle cx="66" cy="96" r="1.4" fill="#ff8a3d"></circle><circle cx="94" cy="104" r="1.8" fill="#ff8a3d"></circle>
+<path d="M58 30 q4 -6 8 0 M70 22 q3 -4 6 0" stroke="#ff8a3d" stroke-width="1" fill="none" opacity="0.7"></path>`,
 };
 
 // For a place without its own scene yet: a few trees.

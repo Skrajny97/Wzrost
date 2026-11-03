@@ -134,6 +134,23 @@
     { "monster": "black-goat", "prefix": { "m": "Kozi", "f": "Kozia", "n": "Kozie", "pl": "Kozie" }, "suffix": "Czarnego Kozła" },
     { "monster": "klobuk", "suffix": "Kłobuka" },
     { "monster": "mamuna", "suffix": "Mamuny" },
-    { "monster": "rokita", "prefix": { "m": "Diabelski", "f": "Diabelska", "n": "Diabelskie", "pl": "Diabelskie" }, "suffix": "Rokity" }
+    { "monster": "rokita", "prefix": { "m": "Diabelski", "f": "Diabelska", "n": "Diabelskie", "pl": "Diabelskie" }, "suffix": "Rokity" },
+    { "monster": "sandman", "prefix": { "m": "Piaskowy", "f": "Piaskowa", "n": "Piaskowe", "pl": "Piaskowe" }, "suffix": "Piaskuna" },
+    { "monster": "heather-mare", "prefix": { "m": "Wrzosowy", "f": "Wrzosowa", "n": "Wrzosowe", "pl": "Wrzosowe" }, "suffix": "Wrzosowej Mary" },
+    { "monster": "nightjar", "suffix": "Lelka" },
+    { "monster": "resin-golem", "prefix": { "m": "Żywiczny", "f": "Żywiczna", "n": "Żywiczne", "pl": "Żywiczne" }, "suffix": "Żywicznika" },
+    { "monster": "barkborer", "suffix": "Korojada" },
+    { "monster": "tar-moth", "suffix": "Smolnej Ćmy" },
+    { "monster": "drought-husk", "suffix": "Suchotnika" },
+    { "monster": "sand-whirl", "prefix": { "m": "Wirujący", "f": "Wirująca", "n": "Wirujące", "pl": "Wirujące" }, "suffix": "Piaskowego Wiru" },
+    { "monster": "barrow-wight", "prefix": { "m": "Kurhanowy", "f": "Kurhanowa", "n": "Kurhanowe", "pl": "Kurhanowe" }, "suffix": "Kurhannika" },
+    { "monster": "tar-burner", "prefix": { "m": "Smolny", "f": "Smolna", "n": "Smolne", "pl": "Smolne" }, "suffix": "Smolarza" },
+    { "monster": "charcoal-imp", "suffix": "Węglika" },
+    { "monster": "latawiec", "prefix": { "m": "Wichrowy", "f": "Wichrowa", "n": "Wichrowe", "pl": "Wichrowe" }, "suffix": "Latawca" },
+    { "monster": "charred-pine", "prefix": { "m": "Zwęglony", "f": "Zwęglona", "n": "Zwęglone", "pl": "Zwęglone" }, "suffix": "Zwęglaka" },
+    { "monster": "ash-wraith", "prefix": { "m": "Popielny", "f": "Popielna", "n": "Popielne", "pl": "Popielne" }, "suffix": "Popielca" },
+    { "monster": "spark-swarm", "prefix": { "m": "Iskrzący", "f": "Iskrząca", "n": "Iskrzące", "pl": "Iskrzące" }, "suffix": "Iskrzaka" },
+    { "monster": "noon-wraith", "suffix": "Południcy" },
+    { "monster": "rarog", "prefix": { "m": "Płomienny", "f": "Płomienna", "n": "Płomienne", "pl": "Płomienne" }, "suffix": "Raroga" }
   ]
 }

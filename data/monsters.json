@@ -1752,5 +1752,281 @@
     "resistances": { "fire": { "base": 35, "perLevel": 5 }, "poison": { "base": 25, "perLevel": 4 } },
     "weaknesses": { "sacred": 0.5 },
     "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "sandman",
+    "name": "Piaskun",
+    "counted": ["piaskuna", "piaskuny", "piaskunów"],
+    "family": "stone",
+    "position": "front",
+    "ambush": true,
+    "stats": {
+      "base": { "strength": 8, "dexterity": 4, "vitality": 8, "endurance": 6, "intellect": 1, "wisdom": 1, "perception": 4, "will": 5 },
+      "growth": { "strength": 2.7, "dexterity": 1, "vitality": 3.2, "endurance": 2.2, "perception": 0.8, "will": 1.2 }
+    },
+    "attack": { "name": "Zasypanie", "sound": "fist", "category": "physical", "scaling": "strength", "damageFactor": 0.48, "variance": 0.3, "slow": { "effect": "mired", "chance": 0.3, "slow": 0.4 } },
+    "hpFactor": 0.9,
+    "armorFactor": 0.45,
+    "resistances": { "earth": { "base": 25, "perLevel": 4 }, "poison": { "base": 20, "perLevel": 3 } },
+    "reward": { "xp": 1.05, "gold": 0.81 }
+  },
+  {
+    "id": "heather-mare",
+    "name": "Wrzosowa Mara",
+    "counted": ["wrzosową marę", "wrzosowe mary", "wrzosowych mar"],
+    "family": "spirit",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 3, "dexterity": 5, "vitality": 6, "endurance": 3, "intellect": 8, "wisdom": 5, "perception": 4, "will": 6 },
+      "growth": { "strength": 0.8, "dexterity": 1.5, "vitality": 2.8, "endurance": 1.2, "intellect": 2.7, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Duszący sen", "sound": "magic", "category": "magical", "element": "nature", "scaling": "intellect", "damageFactor": 0.4, "variance": 0.2, "slow": { "effect": "mired", "chance": 0.3, "slow": 0.35 } },
+    "hpFactor": 0.65,
+    "armorFactor": 0.3,
+    "resistances": { "nature": { "base": 25, "perLevel": 4 } },
+    "reward": { "xp": 0.94, "gold": 0.73 }
+  },
+  {
+    "id": "nightjar",
+    "name": "Lelek",
+    "counted": ["lelka", "lelki", "lelków"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 4, "dexterity": 8, "vitality": 4, "endurance": 2, "intellect": 1, "wisdom": 2, "perception": 8, "will": 3 },
+      "growth": { "strength": 1.6, "dexterity": 2.5, "vitality": 2, "endurance": 0.5, "perception": 2.2, "will": 0.6 }
+    },
+    "attack": { "name": "Nocny nalot", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.5, "variance": 0.25, "target": "back" },
+    "hpFactor": 0.45,
+    "armorFactor": 0.12,
+    "reward": { "xp": 0.82, "gold": 0.59 }
+  },
+  {
+    "id": "resin-golem",
+    "name": "Żywicznik",
+    "counted": ["żywicznika", "żywiczniki", "żywiczników"],
+    "family": "stone",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 7, "dexterity": 2, "vitality": 9, "endurance": 9, "intellect": 1, "wisdom": 1, "perception": 2, "will": 5 },
+      "growth": { "strength": 2.4, "dexterity": 0.5, "vitality": 3.2, "endurance": 3.4, "perception": 0.4, "will": 1.2 }
+    },
+    "attack": { "name": "Lepki uścisk", "sound": "fist", "category": "physical", "scaling": "strength", "damageFactor": 0.54, "variance": 0.2, "slow": { "effect": "mired", "chance": 0.35, "slow": 0.4 } },
+    "hpFactor": 0.9,
+    "armorFactor": 0.95,
+    "resistances": { "poison": { "base": 30, "perLevel": 4 }, "earth": { "base": 20, "perLevel": 3 } },
+    "reward": { "xp": 1.07, "gold": 0.8 }
+  },
+  {
+    "id": "barkborer",
+    "name": "Korojad",
+    "counted": ["korojada", "korojady", "korojadów"],
+    "family": "insect",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 4, "dexterity": 7, "vitality": 5, "endurance": 4, "intellect": 1, "wisdom": 1, "perception": 5, "will": 3 },
+      "growth": { "strength": 1.4, "dexterity": 2.2, "vitality": 2.4, "endurance": 1.2, "perception": 1.2, "will": 0.8 }
+    },
+    "attack": { "name": "Toczenie", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.5, "variance": 0.2, "dot": { "effect": "poisoned", "chance": 0.4, "power": 0.35, "ticks": 3 } },
+    "hpFactor": 0.6,
+    "armorFactor": 0.35,
+    "resistances": { "poison": { "base": 20, "perLevel": 3 } },
+    "reward": { "xp": 0.9, "gold": 0.68 }
+  },
+  {
+    "id": "tar-moth",
+    "name": "Smolna Ćma",
+    "counted": ["smolną ćmę", "smolne ćmy", "smolnych ciem"],
+    "family": "insect",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 6, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 4, "perception": 5, "will": 5 },
+      "growth": { "strength": 0.5, "dexterity": 1.8, "vitality": 2, "endurance": 0.6, "intellect": 2.7, "wisdom": 1, "will": 1.2 }
+    },
+    "attack": { "name": "Trujący pył", "sound": "magic", "category": "magical", "element": "poison", "scaling": "intellect", "damageFactor": 0.53, "variance": 0.2, "dot": { "effect": "poisoned", "chance": 0.4, "power": 0.35, "ticks": 3 } },
+    "hpFactor": 0.45,
+    "armorFactor": 0.08,
+    "resistances": { "poison": { "base": 25, "perLevel": 4 } },
+    "reward": { "xp": 0.82, "gold": 0.6 }
+  },
+  {
+    "id": "drought-husk",
+    "name": "Suchotnik",
+    "counted": ["suchotnika", "suchotniki", "suchotników"],
+    "family": "spirit",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 9, "dexterity": 4, "vitality": 8, "endurance": 6, "intellect": 1, "wisdom": 1, "perception": 4, "will": 6 },
+      "growth": { "strength": 3, "dexterity": 1, "vitality": 3.4, "endurance": 2, "perception": 0.7, "will": 1.4 }
+    },
+    "attack": { "name": "Wysuszenie", "sound": "claw", "category": "physical", "scaling": "strength", "damageFactor": 0.57, "variance": 0.25, "drain": 0.4 },
+    "hpFactor": 0.85,
+    "armorFactor": 0.5,
+    "resistances": { "fire": { "base": 20, "perLevel": 3 } },
+    "reward": { "xp": 1.07, "gold": 0.8 }
+  },
+  {
+    "id": "sand-whirl",
+    "name": "Piaskowy Wir",
+    "counted": ["piaskowy wir", "piaskowe wiry", "piaskowych wirów"],
+    "family": "spirit",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 7, "dexterity": 6, "vitality": 6, "endurance": 4, "intellect": 1, "wisdom": 1, "perception": 6, "will": 4 },
+      "growth": { "strength": 2.4, "dexterity": 1.8, "vitality": 2.6, "endurance": 1.4, "perception": 1.6, "will": 1 }
+    },
+    "attack": { "name": "Kamienne zęby", "sound": "bite", "category": "physical", "scaling": "strength", "damageFactor": 0.5, "variance": 0.6 },
+    "hpFactor": 0.7,
+    "armorFactor": 0.4,
+    "resistances": { "earth": { "base": 25, "perLevel": 4 } },
+    "reward": { "xp": 0.95, "gold": 0.7 }
+  },
+  {
+    "id": "barrow-wight",
+    "name": "Kurhannik",
+    "counted": ["kurhannika", "kurhanniki", "kurhanników"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 5, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 5, "perception": 5, "will": 6 },
+      "growth": { "strength": 0.5, "dexterity": 1.6, "vitality": 2.2, "endurance": 0.7, "intellect": 2.8, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Zew kurhanu", "sound": "magic", "category": "magical", "element": "frost", "scaling": "intellect", "damageFactor": 0.54, "variance": 0.25, "dot": { "effect": "chilled", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "resistances": { "frost": { "base": 25, "perLevel": 4 } },
+    "reward": { "xp": 0.88, "gold": 0.68 }
+  },
+  {
+    "id": "tar-burner",
+    "name": "Smolarz",
+    "counted": ["smolarza", "smolarze", "smolarzy"],
+    "family": "spirit",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 6, "dexterity": 3, "vitality": 9, "endurance": 6, "intellect": 8, "wisdom": 3, "perception": 4, "will": 6 },
+      "growth": { "strength": 1.6, "dexterity": 0.8, "vitality": 3.4, "endurance": 2.2, "intellect": 2.6, "wisdom": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Wrzący dziegieć", "sound": "magic", "category": "magical", "element": "fire", "scaling": "intellect", "damageFactor": 0.32, "variance": 0.25, "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.85,
+    "armorFactor": 0.5,
+    "resistances": { "fire": { "base": 30, "perLevel": 4 } },
+    "reward": { "xp": 1.09, "gold": 0.82 }
+  },
+  {
+    "id": "charcoal-imp",
+    "name": "Węglik",
+    "counted": ["węglika", "węgliki", "węglików"],
+    "family": "stone",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 7, "vitality": 5, "endurance": 4, "intellect": 1, "wisdom": 1, "perception": 5, "will": 4 },
+      "growth": { "strength": 1.6, "dexterity": 2.2, "vitality": 2.4, "endurance": 1.2, "perception": 1.2, "will": 1 }
+    },
+    "attack": { "name": "Żarzący skok", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.48, "variance": 0.25, "dot": { "effect": "burning", "chance": 0.35, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.6,
+    "armorFactor": 0.35,
+    "resistances": { "fire": { "base": 25, "perLevel": 4 } },
+    "reward": { "xp": 0.94, "gold": 0.69 }
+  },
+  {
+    "id": "latawiec",
+    "name": "Latawiec",
+    "counted": ["latawca", "latawce", "latawców"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 4, "dexterity": 8, "vitality": 4, "endurance": 2, "intellect": 1, "wisdom": 2, "perception": 8, "will": 4 },
+      "growth": { "strength": 1.6, "dexterity": 2.5, "vitality": 2, "endurance": 0.5, "perception": 2.2, "will": 0.8 }
+    },
+    "attack": { "name": "Szpony wichru", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.52, "variance": 0.25, "target": "back" },
+    "hpFactor": 0.48,
+    "armorFactor": 0.12,
+    "resistances": { "lightning": { "base": 20, "perLevel": 3 } },
+    "reward": { "xp": 0.87, "gold": 0.61 }
+  },
+  {
+    "id": "charred-pine",
+    "name": "Zwęglak",
+    "counted": ["zwęglaka", "zwęglaki", "zwęglaków"],
+    "family": "spirit",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 9, "dexterity": 2, "vitality": 9, "endurance": 8, "intellect": 1, "wisdom": 1, "perception": 3, "will": 6 },
+      "growth": { "strength": 3, "dexterity": 0.5, "vitality": 3.6, "endurance": 2.8, "perception": 0.5, "will": 1.4 }
+    },
+    "attack": { "name": "Zgniatający konar", "sound": "fist", "category": "physical", "scaling": "strength", "damageFactor": 0.55, "variance": 0.3 },
+    "hpFactor": 0.95,
+    "armorFactor": 0.7,
+    "resistances": { "fire": { "base": 30, "perLevel": 4 } },
+    "weaknesses": { "water": 0.5 },
+    "reward": { "xp": 1.06, "gold": 0.79 }
+  },
+  {
+    "id": "ash-wraith",
+    "name": "Popielec",
+    "counted": ["popielca", "popielce", "popielców"],
+    "family": "spirit",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 7, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 2, "perception": 6, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2.2, "vitality": 2.8, "endurance": 1, "perception": 1.6, "will": 1.2 }
+    },
+    "attack": { "name": "Popiół w oczy", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.5, "variance": 0.25, "slow": { "effect": "mired", "chance": 0.3, "slow": 0.35 } },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "resistances": { "fire": { "base": 25, "perLevel": 4 } },
+    "reward": { "xp": 0.94, "gold": 0.7 }
+  },
+  {
+    "id": "spark-swarm",
+    "name": "Iskrzak",
+    "counted": ["iskrzaka", "iskrzaki", "iskrzaków"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 6, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 4, "perception": 6, "will": 5 },
+      "growth": { "strength": 0.5, "dexterity": 1.8, "vitality": 2, "endurance": 0.6, "intellect": 2.8, "wisdom": 1, "will": 1.2 }
+    },
+    "attack": { "name": "Rój iskier", "sound": "magic", "category": "magical", "element": "fire", "scaling": "intellect", "damageFactor": 0.48, "variance": 0.25, "target": "back", "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.42,
+    "armorFactor": 0.08,
+    "resistances": { "fire": { "base": 30, "perLevel": 4 } },
+    "reward": { "xp": 0.84, "gold": 0.61 }
+  },
+  {
+    "id": "noon-wraith",
+    "name": "Południca",
+    "counted": ["południcę", "południce", "południc"],
+    "family": "spirit",
+    "position": "middle",
+    "elite": true,
+    "stats": {
+      "base": { "strength": 3, "dexterity": 6, "vitality": 7, "endurance": 4, "intellect": 9, "wisdom": 6, "perception": 5, "will": 7 },
+      "growth": { "strength": 1, "dexterity": 1.5, "vitality": 3.6, "endurance": 2, "intellect": 2.9, "wisdom": 1, "will": 1.5 }
+    },
+    "attack": { "name": "Udar południa", "sound": "magic", "category": "magical", "element": "fire", "scaling": "intellect", "damageFactor": 0.5, "variance": 0.2, "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3 }, "slow": { "effect": "mired", "chance": 0.25, "slow": 0.35 } },
+    "hpFactor": 1.1,
+    "armorFactor": 0.35,
+    "resistances": { "fire": { "base": 30, "perLevel": 4 }, "nature": { "base": 20, "perLevel": 3 } },
+    "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "rarog",
+    "name": "Raróg",
+    "counted": ["raroga", "rarogi", "rarogów"],
+    "family": "bird",
+    "position": "front",
+    "champion": true,
+    "stats": {
+      "base": { "strength": 6, "dexterity": 6, "vitality": 11, "endurance": 7, "intellect": 10, "wisdom": 6, "perception": 7, "will": 8 },
+      "growth": { "strength": 1.8, "dexterity": 1.4, "vitality": 4.4, "endurance": 2.8, "intellect": 2.3, "wisdom": 1, "will": 2 }
+    },
+    "attack": { "name": "Ognista nawałnica", "sound": "magic", "category": "magical", "element": "fire", "scaling": "intellect", "damageFactor": 0.3, "variance": 0.25, "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3, "all": true } },
+    "hpFactor": 1.65,
+    "armorFactor": 0.6,
+    "resistances": { "fire": { "base": 40, "perLevel": 5 } },
+    "weaknesses": { "frost": 0.4, "water": 0.4 },
+    "reward": { "xp": 1.0, "gold": 1.0 }
   }
 ]

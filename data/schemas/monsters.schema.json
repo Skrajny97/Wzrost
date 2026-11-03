@@ -21,6 +21,7 @@
       "position": { "enum": ["front", "middle", "back"] },
       "elite": { "type": "boolean" },
       "champion": { "type": "boolean", "description": "Czempion: najsilniejszy stwór regionu. Spotyka się go tylko w regionie wewnętrznym, który go wskazuje (champion w regions.json)." },
+      "ambush": { "type": "boolean", "description": "Zasadzka (464): walka, w której jest ten stwór, zaczyna się od ruchów stworów, wszystkich przed pierwszym ruchem drużyny, jak zasadzka w zdarzeniach." },
       "stats": {
         "type": "object",
         "additionalProperties": false,
@@ -51,9 +52,11 @@
               "effect": { "type": "string" },
               "chance": { "type": "number", "minimum": 0, "maximum": 1 },
               "power": { "type": "number", "exclusiveMinimum": 0 },
-              "ticks": { "type": "integer", "minimum": 1, "maximum": 10 }
+              "ticks": { "type": "integer", "minimum": 1, "maximum": 10 },
+              "all": { "type": "boolean", "description": "Na całą drużynę: efekt może dotknąć także każdego innego żywego członka drużyny, nie tylko trafionego, każdego z osobna (Ognista nawałnica Raroga)." }
             }
           },
+          "target": { "enum": ["back"], "description": "Atak na tył szyku (463): stwór bije postać stojącą najdalej z tyłu, a gdy tył jest pusty, najdalej z tyłu z żywych." },
           "slow": {
             "type": "object",
             "description": "Ugrzęźnięcie: z szansą chance (mniejszą o Wolę celu) następny ruch celu przychodzi później, 1 / (1 - slow) razy później.",
