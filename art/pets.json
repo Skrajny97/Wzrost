@@ -1,5 +1,5 @@
 {
-  "$comment": "Chowańce ze Sklepu Systemu w ruchu (tools/animate-mounts.mjs --config art/pets.json --group pets, PixelLab animate-with-text-v3; DECISIONS.md, „Odpowiedzi autora 415, 532 i 533”). start: wybrany szkic z art/drafts/pets (kind pets-pixellab), 64 × 64, przodem w prawo. fox-trot, raven-fly i wisp idą za postacią w scenie Walki, a fox-sit i raven-perch siedzą przy niej na portrecie. Autor: „musisz chowańce zaanimowac w PixelLab i dać do sprawdzenia”.",
+  "$comment": "Chowańce ze Sklepu Systemu w ruchu (tools/animate-mounts.mjs --config art/pets.json --group pets, PixelLab animate-with-text-v3; DECISIONS.md, „Odpowiedzi autora 415, 532 i 533”). start: wybrany szkic z art/drafts/pets (kind pets-pixellab), 64 × 64, przodem w prawo. fox-trot, raven-fly i wisp idą za postacią w scenie Walki, a fox-sit i raven-perch siedzą przy niej na portrecie. Autor: „musisz chowańce zaanimowac w PixelLab i dać do sprawdzenia”. Pozy na portret w jego skali (32 × 32, rodzaj pets-portrait) mają klucze z końcówką -portrait.",
   "action": "moving in place in a smooth seamless loop, seen from the side and facing right",
   "frames": 8,
   "pets": {
@@ -25,6 +25,21 @@
     },
     "wisp": {
       "start": "art/references/pets/wisp.png",
+      "description": "a small tame will-o'-the-wisp, a ball of pale blue spectral fire",
+      "action": "floating in place, bobbing gently up and down, the pale blue flame flickering and its flame tail swirling, a smooth seamless loop"
+    },
+    "fox-sit-portrait": {
+      "start": "art/references/pets/portrait/fox-sit.png",
+      "description": "a small friendly red fox sitting upright",
+      "action": "sitting still in place, seen from the side and facing right, breathing slowly, the bushy tail swaying gently and the ears twitching, a calm seamless idle loop"
+    },
+    "raven-perch-portrait": {
+      "start": "art/references/pets/portrait/raven-perch.png",
+      "description": "a small black raven perched with folded wings",
+      "action": "perched in place, seen from the side and facing right, the wings folded, turning its head a little and ruffling its feathers, a calm seamless idle loop"
+    },
+    "wisp-portrait": {
+      "start": "art/references/pets/portrait/wisp.png",
       "description": "a small tame will-o'-the-wisp, a ball of pale blue spectral fire",
       "action": "floating in place, bobbing gently up and down, the pale blue flame flickering and its flame tail swirling, a smooth seamless loop"
     }
