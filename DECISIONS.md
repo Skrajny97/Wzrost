@@ -3011,6 +3011,14 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Wersja 0.1.10 (3.11.2026)
+
+1. **Co wchodzi do gry:** Sosnowe Wydmy, szósta kraina (poziomy 126–150), z grafikami i odgłosami wybranymi przez autora. W Wieżach czempion czeka od teraz co 25. piętro (527 A). Zob. „Sosnowe Wydmy”.
+2. **Sprawdzone:**
+   - **Pełne testy:** 943 z 944. Nie przeszedł tylko test czasu oceny zagrożenia, bo w tym samym czasie na maszynie szły testy pomocnika od Salonu Gier. Na tym samym obciążeniu ten test trwa tyle samo na 0.1.9 (400–514 ms) i na tej wersji (395–477 ms), więc kraina gry nie spowolniła.
+   - **Wprowadzenie:** przechodzi na telefonie, komputerze i dużym monitorze.
+   - **W przeglądarce:** postać na 140. poziomie widzi Sosnowe Wydmy z kartą, opisem i Spiekotą oraz pięć kręgów miejsc. Pogorzelisko jest zamknięte do 145. poziomu klasy. Postać wyrusza na Lotne Piaski, a scena Walki ma panoramę krainy. Raport i Bestiariusz pokazują stwory krainy. Serwer podaje wszystkie 109 nowych plików, bez błędów strony.
+
 ## Przegląd pytań bez odpowiedzi (3.11.2026)
 
 Autor: „zanim napiszesz wiadomośc spraw wszystkie co napisałem bo na wiekszosc odpowiedziałem, poczekam upewnij się na co nie odpowiedzialem i zadaj te pytania ewentualnie w pełni jeszcze raz, bo jak mam szukac konkretnego punktu co niby pominąłem to mnie szlag trafia” i „516.8 D”.
