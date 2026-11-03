@@ -713,6 +713,7 @@ function checkReferences(data) {
   errors.push(...checkSettlement(data, { rarities }));
   errors.push(...checkStable(data));
   errors.push(...checkTannery(data));
+  errors.push(...checkCasino(data));
   errors.push(...checkCosmetics(data));
   return errors;
 }
@@ -1231,6 +1232,39 @@ function checkTannery(data) {
   if (stock.length > standings.length) errors.push('settlement.json: tannery.sell.stock ma więcej liczb niż stopni');
   if (stock.some((share, index) => index > 0 && share < stock[index - 1])) errors.push('settlement.json: tannery.sell.stock nie może maleć ze stopniem');
   if (stock.at(-1) !== 1) errors.push('settlement.json: tannery.sell.stock na ostatnim stopniu musi być 1 (wszystkie materiały)');
+  return errors;
+}
+
+// The Salon Gier (answers 523–526): its host lives in the Osada, in a place
+// on the board, with a greeting for each standing; a stake's chance stays a
+// chance up to the top stake; a prize is worth more than the top stake and
+// less than a win costs on average (1 / chancePerGold), so the Wheel never
+// gives back more gold than it takes; the rarities exist, and the words the
+// game fills in name their {…} and forms for a woman and a man ([a|b]).
+function checkCasino(data) {
+  const errors = [];
+  const { casino, residents, places, standings } = data.settlement;
+  if (!casino) return errors;
+  const host = residents.find((resident) => resident.id === casino.resident);
+  if (!host) errors.push(`settlement.json: casino.resident to nieznany mieszkaniec ${casino.resident}`);
+  else if (host.greetings.length !== standings.length) errors.push(`settlement.json: gospodarz Salonu ${host.id} musi mieć powitanie na każdy stopień relacji`);
+  if (!places.some((place) => place.resident === casino.resident)) errors.push(`settlement.json: gospodarz Salonu ${casino.resident} nie ma miejsca na planszy`);
+  const { wheel, lottery, texts } = casino;
+  if (wheel.minStake > wheel.maxStake) errors.push('settlement.json: casino.wheel.minStake nie może być większe niż maxStake');
+  if (wheel.maxStake * wheel.chancePerGold > 1) errors.push('settlement.json: szansa przy najwyższej stawce Koła nie może przekroczyć 100%');
+  if (wheel.prizeOver >= 1 / wheel.chancePerGold) errors.push('settlement.json: nagroda Koła musi być warta mniej niż średni koszt wygranej (1 / chancePerGold)');
+  if (wheel.prizeOver < wheel.maxStake) errors.push('settlement.json: nagroda Koła ma być warta więcej niż najwyższa stawka (autor: „co najmniej droższe niż 100 złota”)');
+  const rarities = data.rarities.map((rarity) => rarity.id);
+  if (!rarities.includes(wheel.itemRarity)) errors.push(`settlement.json: casino.wheel.itemRarity to nieznana rzadkość ${wheel.itemRarity}`);
+  for (const id of Object.keys(wheel.materialRarities)) if (!rarities.includes(id)) errors.push(`settlement.json: casino.wheel.materialRarities ma nieznaną rzadkość ${id}`);
+  if (lottery.base < 0 || lottery.ticket < 1) errors.push('settlement.json: casino.lottery potrzebuje ceny losu i bazy puli');
+  const needs = { lotteryAbout: ['ticket', 'base'], lotteryToday: ['pot', 'tickets'], lotteryBuy: ['ticket'], lotteryEarlier: ['date'], announce: ['name', 'gold'], wheelAbout: ['min', 'max', 'top'], wheelPoolAbout: ['over'], wheelStake: ['stake'], wheelChance: ['chance'], wheelSpin: ['stake'], won: ['prize'] };
+  for (const [key, words] of Object.entries(needs)) {
+    for (const word of words) if (!texts[key]?.includes(`{${word}}`)) errors.push(`settlement.json: casino.texts.${key} nie ma {${word}}`);
+  }
+  for (const line of Object.values(texts).flat()) {
+    if (line.replace(/\[[^[\]|]*\|[^[\]|]*\]/g, '').match(/[[\]|]/)) errors.push(`settlement.json: zła forma [kobieta|mężczyzna] w „${line}”`);
+  }
   return errors;
 }
 

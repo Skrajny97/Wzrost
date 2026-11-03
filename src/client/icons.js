@@ -42,6 +42,8 @@ export const ICONS = {
     path('M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1'),
   ],
   coin: [circle(12, 12, 8), circle(12, 12, 4)],
+  // A die: the Salon Gier in the Osada's part of the menu.
+  dice: [['rect', { x: 4, y: 4, width: 16, height: 16, rx: 3 }], solid('M9.4 8a1.4 1.4 0 1 1-2.8 0 1.4 1.4 0 0 1 2.8 0zM13.4 12a1.4 1.4 0 1 1-2.8 0 1.4 1.4 0 0 1 2.8 0zM17.4 16a1.4 1.4 0 1 1-2.8 0 1.4 1.4 0 0 1 2.8 0z')],
   eye: [path('M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'), circle(12, 12, 3)],
   'eye-off': [path('M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'), circle(12, 12, 3), path('M3 3l18 18')],
   lock: [['rect', { x: 5, y: 11, width: 14, height: 10, rx: 1 }], path('M8 11V8a4 4 0 0 1 8 0v3')],

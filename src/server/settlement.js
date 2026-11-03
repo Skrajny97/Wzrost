@@ -150,6 +150,8 @@ export function settlementOf(row) {
     ...(stored.forgeTrade && { forgeTrade: stored.forgeTrade }),
     // The Stajnia's mount, by its stage (stable.js).
     ...(stored.mount && { mount: stored.mount }),
+    // The Koło Fortuny's pool of the day in the Salon Gier (casino.js).
+    ...(stored.casino && { casino: stored.casino }),
     ...(stored.test && { test: true }),
   };
 }

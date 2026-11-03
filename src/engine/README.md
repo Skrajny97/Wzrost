@@ -27,6 +27,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `quests.js` | zadania dzienne i tygodniowe narratora |
 | `settlement.js`, `companions.js`, `market.js` | Osada: reputacja, relacje, Tablica zleceń, usługi mieszkańców, towarzysze i Targowisko |
 | `stable.js` | Stajnia w Osadzie: wierzchowce kupowane na stałe, po kolei, i krótsze czekanie na koniec wyprawy |
+| `casino.js` | Salon Gier w Osadzie: Loteria (los na dobę, pula i losowanie zwycięzcy) i Koło Fortuny (szansa ze stawki, dzienna pula nagród postaci i jej wartość) |
 | `tannery.js` | Garbarnia w Osadzie: skóry, które garbarz skupuje i sprzedaje |
 | `forge.js` | Kuźnia w Osadzie: Zwoje ochronne i przekucie przedmiotu na wyższą rzadkość |
 | `parties.js` | Drużyna: rozpiętość poziomów klas i kto zostaje w drużynie, gdy poziomy się rozjadą |

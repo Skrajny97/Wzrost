@@ -20,6 +20,7 @@ import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { companionCard } from '../companions.js';
 import { askGuildButton } from '../guild-requests.js';
+import { mountCasino } from '../casino.js';
 import { stableCard } from '../stable.js';
 import { tanneryCard } from '../tannery.js';
 import { itemSummary, piecesText } from './character.js';
@@ -63,6 +64,15 @@ export function mountSettlement(container, { params = {} } = {}) {
       market = { holder, ...mountMarket(holder) };
     } else market.refresh();
     return market.holder;
+  };
+  // The Salon Gier's games (casino.js), kept so too.
+  let casino = null;
+  const casinoPanel = () => {
+    if (!casino) {
+      const holder = h('div', { class: 'casino' });
+      casino = { holder, ...mountCasino(holder) };
+    } else casino.refresh();
+    return casino.holder;
   };
 
   async function load() {
@@ -1122,6 +1132,8 @@ export function mountSettlement(container, { params = {} } = {}) {
       place.id === 'market' && !place.soon && marketPanel(),
       // The Stajnia's mounts (327 A), under Mirosław's card.
       place.id === 'stable' && !place.soon && data.stable && stableCard(data.stable, apply),
+      // The Salon Gier's Loteria and Koło Fortuny (523–526), under Szczęsny's.
+      place.id === 'casino' && !place.soon && casinoPanel(),
     );
   }
 
@@ -1150,6 +1162,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       gone = true;
       clearTimeout(timer);
       market?.unmount();
+      casino?.unmount();
     },
   };
 }

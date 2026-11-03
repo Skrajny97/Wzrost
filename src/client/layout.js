@@ -407,7 +407,7 @@ function navButton(tab, active, onBack) {
 // cannot be pressed either. `ready` lights it with the gold dot its main
 // tab has for it (a report, news), as Statystyki under Postać.
 const PROFESSION_ICONS = { herbalism: 'leaf', alchemy: 'flask', crafting: 'hammer' };
-const PLACE_ICONS = { board: 'check', enchanter: 'skills', hermitage: 'hood', stable: 'beast', tavern: 'chat', market: 'coin', tannery: 'pouch', herbalist: 'leaf', forge: 'hammer' };
+const PLACE_ICONS = { board: 'check', enchanter: 'skills', hermitage: 'hood', stable: 'beast', tavern: 'chat', market: 'coin', tannery: 'pouch', herbalist: 'leaf', forge: 'hammer', casino: 'dice' };
 const PARTS = {
   // Eksploracja and Wieże, as over the Walka (screens/towers.js).
   walka: () => {

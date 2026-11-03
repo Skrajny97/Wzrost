@@ -208,7 +208,7 @@ export async function deleteAccount(context) {
     db.prepare(`DELETE FROM trades WHERE from_id IN (${characters}) OR to_id IN (${characters})`).bind(id, id),
     db.prepare(`DELETE FROM friends WHERE character_id IN (${characters}) OR friend_id IN (${characters})`).bind(id, id),
     db.prepare(`DELETE FROM gifts WHERE sender_id IN (${characters}) OR receiver_id IN (${characters})`).bind(id, id),
-    ...['reports', 'activities', 'avatar_activities', 'items', 'buildings'].map((table) =>
+    ...['reports', 'activities', 'avatar_activities', 'items', 'buildings', 'lottery_tickets'].map((table) =>
       db.prepare(`DELETE FROM ${table} WHERE character_id IN (${characters})`).bind(id),
     ),
     ...marketRemoval(db, characters, [id]),

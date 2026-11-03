@@ -118,8 +118,8 @@ export const stackButton = (goods, options, actions) =>
 // przedmiot to nie tylko pojawiają się dane przedmiotu, ale i otwiera
 // porównywarka z aktualnym przedmiotem"), and when the character can wear
 // it: from its Tier, as every item. `opened` keeps the unfolded ones by
-// `key` through the panel's redraws.
-function itemEntry(item, key, opened) {
+// `key` through the panel's redraws. The Salon Gier shows its prizes so too.
+export function itemEntry(item, key, opened) {
   const character = state.character;
   const usable = !item.classIds || item.classIds.includes(character.classId);
   const worn = character.equipment?.[item.slot] ?? null;
