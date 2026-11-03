@@ -60,9 +60,15 @@ export function ticketBlock({ gold, has }, content) {
 // The chance of a win, the same at every stake (542 C).
 export const wheelChance = (content) => tuning(content).wheel.chance;
 
-// What a win at `stake` costs on average: the stake over its chance (at 50%,
-// twice the stake). No prize of the stake is worth more.
+// What a win at `stake` costs on average: the stake over its chance (at 10%,
+// ten stakes).
 export const winCost = (stake, content) => stake / wheelChance(content);
+
+// The most a prize of `stake` is worth: `worthCap` stakes (two, as when the
+// chance was 50%), and never more than a win costs, so a lower chance makes
+// the Wheel give back less instead of bigger prizes (the author: "Koło
+// fortuny proszę znerfić mocno i dać 10% szans").
+export const prizeCap = (stake, content) => Math.min(winCost(stake, content), stake * tuning(content).wheel.worthCap);
 
 // The ordinary creatures' materials of the lands the character knows: the
 // lands (krainy) with an inner region open to its class, each with the
@@ -94,10 +100,10 @@ export function prizeWorth(prize, { sellBonus = 0, tanneryPremium = 0 } = {}, co
 
 // The rarity of an item prize at a stake and the character's level: the
 // rarest from itemRarity to topItemRarity worth more than the stake at the
-// character's scrapper and no more than a win costs; null when none is.
+// character's scrapper and no more than the prize cap; null when none is.
 export function itemPrizeRarity(level, sellBonus, stake, content) {
   const { itemRarity, topItemRarity } = tuning(content).wheel;
-  const most = winCost(stake, content);
+  const most = prizeCap(stake, content);
   const fitting = content.rarities.slice(rarityIndex(itemRarity, content), rarityIndex(topItemRarity, content) + 1).filter((rarity) => {
     const worth = sellPrice({ level, rarity: rarity.id }, content, sellBonus);
     return worth > stake && worth <= most;
@@ -117,13 +123,13 @@ export function wheelStakes(level, sellBonus, content) {
 
 // A material prize: pieces of `material` at the grade drawn (never below
 // its species' own rarity), the fewest worth more than the stake to the
-// character; null when they would be worth more than a win costs.
+// character; null when they would be worth more than the prize cap.
 function materialPrize(material, gradeId, bonuses, stake, content) {
   const rarityId = rarityIndex(material.rarity, content) > rarityIndex(gradeId, content) ? material.rarity : gradeId;
   const key = stackKey(material.id, rarityId);
   const piece = prizeWorth({ kind: 'material', key, count: 1 }, bonuses, content);
   const count = Math.floor(stake / piece) + 1;
-  return count * piece <= winCost(stake, content) ? { kind: 'material', key, count } : null;
+  return count * piece <= prizeCap(stake, content) ? { kind: 'material', key, count } : null;
 }
 
 // The pool of a stake (526 A: "każda postać ma własną pulę 5 nagród na

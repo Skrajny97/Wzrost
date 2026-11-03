@@ -1290,8 +1290,10 @@ function checkCasino(data) {
   if (!places.some((place) => place.resident === casino.resident)) errors.push(`settlement.json: gospodarz Salonu ${casino.resident} nie ma miejsca na planszy`);
   const { wheel, lottery, texts } = casino;
   // A prize is worth more than the stake and at most what a win costs on
-  // average (the stake over the chance), so the chance must stay under 100%.
+  // average (the stake over the chance), so the chance must stay under 100%;
+  // the prize cap in stakes no higher than that either.
   if (wheel.chance >= 1) errors.push('settlement.json: szansa Koła musi być mniejsza niż 100%, żeby nagroda mogła być warta więcej niż stawka');
+  else if (wheel.worthCap * wheel.chance > 1) errors.push('settlement.json: casino.wheel.worthCap nie może przekraczać 1 / chance, bo Koło oddawałoby średnio więcej, niż bierze');
   const rarities = data.rarities.map((rarity) => rarity.id);
   if (!rarities.includes(wheel.itemRarity)) errors.push(`settlement.json: casino.wheel.itemRarity to nieznana rzadkość ${wheel.itemRarity}`);
   if (!rarities.includes(wheel.topItemRarity)) errors.push(`settlement.json: casino.wheel.topItemRarity to nieznana rzadkość ${wheel.topItemRarity}`);

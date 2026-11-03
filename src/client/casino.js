@@ -21,9 +21,10 @@ import { salonArt } from './art.js';
 import { h } from './dom.js';
 import { formatDecimal, formatNumber } from './format.js';
 import { motionOn } from './motion.js';
+import { openProfile } from './profile.js';
 import { playSound } from './sound.js';
 import { call, serverNow, state } from './state.js';
-import { howItWorks, systemPanel, toast, withButton } from './ui.js';
+import { guildTag, howItWorks, systemPanel, toast, withButton } from './ui.js';
 import { itemEntry, stackButton } from './screens/market.js';
 
 // One of the Salon's texts with its {…} filled in: numbers as the game
@@ -155,6 +156,8 @@ export function mountCasino(holder) {
   // The last spin, for its words over the pool: { win, text, words }.
   let result = null;
   const opened = new Set();
+  // Whether today's players are unfolded, kept while the panel redraws.
+  let playersOpen = false;
 
   // The Salon as an answer brings it.
   function take(answer) {
@@ -230,6 +233,40 @@ export function mountCasino(holder) {
 
   // The last draw in a line: the System's words of it, and the character's
   // own win.
+  // Who plays today (the author: "Dodaj do loterii możliwość dla gracza,
+  // żeby widzieć kto bierze w niej udział"): folded under their count, in
+  // the order the tickets were bought, each name with its guild's tag and
+  // opening the character's card, as in the chat.
+  function players() {
+    const { texts, lottery } = casino;
+    if (lottery.players.length === 0) return null;
+    const fold = h(
+      'details',
+      {
+        class: 'how-more casino-players',
+        'data-guide': 'casino-players',
+        open: playersOpen,
+        onToggle: () => {
+          playersOpen = fold.open;
+        },
+      },
+      h('summary', { class: 'how-toggle', text: say(texts.lotteryPlayers, { tickets: lottery.players.length }) }),
+      h(
+        'ul',
+        { class: 'casino-player-list' },
+        lottery.players.map((player) =>
+          h(
+            'li',
+            {},
+            h('button', { type: 'button', class: 'link-button', text: player.name, onClick: () => openProfile(player.name) }),
+            player.guildTag && [' ', guildTag(player.guildTag)],
+          ),
+        ),
+      ),
+    );
+    return fold;
+  }
+
   function lastDraw() {
     const { texts } = casino;
     const { last } = casino.lottery;
@@ -266,6 +303,7 @@ export function mountCasino(holder) {
                 toast(texts.lotteryBought);
               }),
           }),
+      players(),
       lastDraw(),
       howItWorks(null, say(texts.lotteryAbout, { ticket: lottery.ticket, base: lottery.base })),
     );

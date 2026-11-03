@@ -3034,6 +3034,32 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.13 (3.11.2026)
+
+1. **Salon Gier na ekranie:** po „Kup los” los (550.3 D) wpada do bębna Loterii (550.2 B), a po zakręceniu Koło Fortuny (550.1 C) obraca się około 3 sekund pod strzałką (550.4 B) i staje na złotym klinie przy wygranej albo na karmazynowym przy przegranej (551: „Animacje do Salonu są okey”). Stuknięcie pomija animację, a przy wyłączonych „Animacjach” wynik jest od razu.
+2. **Dźwięki** Koła (552.1 A), wygranej (552.2 B), przegranej (552.3 B) i losu (552.4 B). Ich głośność jest wyrównana do reszty efektów gry (szczyt około −2 dB); przegrana B była nagrana bardzo cicho.
+3. **Tło Salonu** (550.5 D) stoi przygaszone za kartą Szczęsnego, jak miejsca profesji za swoimi kartami. Miejsce Osady może mieć takie tło w danych (`backdrop` w `data/settlement.json`).
+4. **Kwestie narratora** o Loterii (548.1 A) i o Kole (548.2 A): przy pierwszym wejściu do Salonu po rozdziale Osady narrator wskazuje zakładki obu gier.
+5. **Kto gra dziś w Loterii** (zob. „Loteria: kto gra dziś”).
+6. **Koło Fortuny: 10% szans** zamiast 50%, z nagrodami jak dotąd (zob. „Koło Fortuny: 10% szans”).
+
+## Koło Fortuny: 10% szans (3.11.2026)
+
+Autor: „Koło fortuny proszę znerfić mocno i dać 10% szans”, „Nastepnie sprawdzić balans tego koła fortuny” oraz „Potrzebny szybki nerf z wdrożeniem na main jeśli chodzi o koło fortuny”.
+
+1. **Szansa wygranej** to 10% przy każdej stawce (wcześniej 50%, 542 C).
+2. **Nagrody się nie zmieniają.** Dotąd nagroda była warta najwyżej tyle, ile średnio kosztuje wygrana (stawka podzielona przez szansę), czyli dwie stawki. Przy 10% ta reguła pozwoliłaby na nagrody warte dziesięć stawek, a to nie byłby nerf. Nowe pole `worthCap` trzyma górną granicę na dwóch stawkach, więc pule, stawki i przedmioty są takie jak dotąd, a Koło oddaje średnio najwyżej jedną piątą postawionego złota.
+3. **Dzisiejsze pule** zostają, bo nagrody liczą się tak samo; zmienia się tylko szansa przy następnych obrotach.
+4. **Balans** sprawdzam po wdrożeniu; wynik i propozycje trafią do autora.
+
+## Loteria: kto gra dziś (3.11.2026)
+
+Autor: „Dodaj do loterii możliwość dla gracza, żeby widzieć kto bierze w niej udział.”
+
+1. **Lista** stoi w zakładce Loterii pod dzisiejszą pulą, zwinięta pod nagłówkiem „Kto gra dziś (N)”. Pokazuje imiona postaci, które kupiły dziś los, w kolejności zakupu, ze skrótem gildii.
+2. **Stuknięcie imienia** otwiera kartę postaci, jak w czacie.
+3. (brakujący szczegół) Lista jest widoczna dla każdego, kto wejdzie do Salonu, także bez własnego losu, i znika o północy razem z losami po losowaniu.
+
 ## Wersja 0.1.12 (3.11.2026)
 
 1. **Mikstury na czas** schodzą przy „Odbierz raport” także wtedy, gdy postać wypiła je w trakcie wyprawy albo tuż przed raportem, a „Wypij” w plecaku bierze wybraną liczbę sztuk (zob. „Mikstury na czas: czas schodzi przy »Odbierz raport«”).
@@ -3065,7 +3091,7 @@ Autor: „550.3 D”, „550.4 B”, „550.5 D”, „552.1 A”, „552.2 B”
 1. **Grafiki Salonu (PixelLab):** los Loterii D, strzałka nad Kołem B, tło Salonu D.
 2. **Animacje Salonu (551)** zostają takie jak na filmie.
 3. **Dźwięki Salonu (ElevenLabs):** kręcące się Koło A, wygrana B, przegrana B, los wpadający do bębna B.
-4. **Świst między scenami filmu (552.5):** żadna z trzech wersji. Powstają nowe: niższe, miękkie i ciepłe, bez wysokich tonów.
+4. **Świst między scenami filmu (552.5):** żadna z trzech wersji. Nowe wersje D, E i F są niższe i miękkie, a autor wybrał „552.5 E”. Głębokie wersje (prawie sam bas) odpadły, bo na głośniku telefonu byłyby niemal niesłyszalne.
 
 ## Salon Gier: animacje, tło i kwestia o Kole (3.11.2026)
 

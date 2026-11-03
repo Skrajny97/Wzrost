@@ -303,12 +303,13 @@
         "wheel": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["name", "step", "maxSteps", "chance", "prizes", "itemChance", "itemRarity", "topItemRarity", "materialRarities"],
+          "required": ["name", "step", "maxSteps", "chance", "worthCap", "prizes", "itemChance", "itemRarity", "topItemRarity", "materialRarities"],
           "properties": {
             "name": { "type": "string", "minLength": 1 },
             "step": { "type": "integer", "minimum": 1, "description": "Najniższa stawka w złocie i krok, o który rośnie (542 C: 100 zł, setkami)." },
             "maxSteps": { "type": "integer", "minimum": 1, "description": "Najwyższa stawka to najwyżej tyle kroków." },
-            "chance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa wygranej, taka sama przy każdej stawce." },
+            "chance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa wygranej, taka sama przy każdej stawce (od 0.1.13 10%; autor: „Koło fortuny proszę znerfić mocno i dać 10% szans”)." },
+            "worthCap": { "type": "number", "exclusiveMinimum": 1, "description": "Nagroda jest warta najwyżej tyle stawek (2, jak przy dawnej szansie 50%), więc niższa szansa nie podnosi nagród. Nie więcej niż 1 / chance, żeby Koło nie oddawało średnio więcej, niż bierze." },
             "prizes": { "type": "integer", "minimum": 1, "description": "Ile nagród ma pula postaci na dobę przy każdej stawce." },
             "itemChance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa, że nagroda jest przedmiotem, gdy jakiś przedmiot się mieści." },
             "itemRarity": { "type": "string", "description": "Najniższa rzadkość przedmiotu w puli." },
@@ -358,7 +359,7 @@
         "texts": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["lotteryAbout", "lotteryToday", "lotteryBuy", "lotteryHas", "lotteryBought", "lotteryYesterday", "lotteryEarlier", "lotteryMine", "lotteryNone", "announce", "wheelAbout", "wheelPool", "wheelPoolAbout", "wheelStake", "wheelSpin", "wheelEmpty", "wheelWon", "wheelBag", "won", "lost", "win", "loss"],
+          "required": ["lotteryAbout", "lotteryToday", "lotteryBuy", "lotteryHas", "lotteryBought", "lotteryYesterday", "lotteryEarlier", "lotteryMine", "lotteryNone", "lotteryPlayers", "announce", "wheelAbout", "wheelPool", "wheelPoolAbout", "wheelStake", "wheelSpin", "wheelEmpty", "wheelWon", "wheelBag", "won", "lost", "win", "loss"],
           "properties": {
             "lotteryAbout": { "type": "string", "minLength": 1 },
             "lotteryToday": { "type": "string", "minLength": 1 },
@@ -369,6 +370,7 @@
             "lotteryEarlier": { "type": "string", "minLength": 1 },
             "lotteryMine": { "type": "string", "minLength": 1 },
             "lotteryNone": { "type": "string", "minLength": 1 },
+            "lotteryPlayers": { "type": "string", "minLength": 1, "description": "Nagłówek zwiniętej listy graczy, którzy kupili dziś los; {tickets} to ich liczba." },
             "announce": { "type": "string", "minLength": 1, "description": "Komunikat Systemu w czacie i w Salonie po losowaniu: {name} zwycięzcy, {gold} złota, [a|b] forma dla kobiety i dla mężczyzny." },
             "wheelAbout": { "type": "string", "minLength": 1 },
             "wheelPool": { "type": "string", "minLength": 1 },

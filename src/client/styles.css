@@ -10261,6 +10261,17 @@ a.profession-square:active {
   color: var(--system);
 }
 
+/* Today's players of the Loteria, folded under their count: the names in
+   a wrapped row, each with its guild's tag. */
+.casino-player-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
 .casino-last,
 .casino-result {
   display: grid;

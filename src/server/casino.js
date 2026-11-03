@@ -41,6 +41,7 @@ import { bagPlaces, characterView, engineCharacter, loadPlayer, requirePlayer } 
 import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
+import { guildTagSql } from './guilds.js';
 import { counted, foreign } from './market.js';
 import { requireOpen, settlementOf } from './settlement.js';
 
@@ -113,17 +114,24 @@ function prizeView(prize, won, bonuses) {
   };
 }
 
-// The Loteria for the page: today's tickets and pot, whether the character
-// has its ticket, and the last draw, with the System's words of it.
+// The Loteria for the page: today's tickets and pot, who holds them (the
+// author: "Dodaj do loterii możliwość dla gracza, żeby widzieć kto bierze w
+// niej udział"), in the order bought, with their guilds' tags, whether the
+// character has its ticket, and the last draw, with the System's words of
+// it.
 async function lotteryView(db, row, now) {
   const day = casinoDay(now, content);
   const yesterday = casinoDay(day.startsAt - 1, content).key;
-  const [count, mine, last] = await db.batch([
-    db.prepare('SELECT COUNT(*) AS count FROM lottery_tickets WHERE day = ?').bind(day.key),
-    db.prepare('SELECT 1 AS ok FROM lottery_tickets WHERE day = ? AND character_id = ?').bind(day.key, row.id),
+  const [holders, last] = await db.batch([
+    db
+      .prepare(
+        `SELECT t.character_id, c.name, ${guildTagSql('t.character_id')} AS guild_tag FROM lottery_tickets t JOIN characters c ON c.id = t.character_id
+         WHERE t.day = ? ORDER BY t.created_at, t.character_id`,
+      )
+      .bind(day.key),
     db.prepare('SELECT * FROM lottery_draws ORDER BY day DESC LIMIT 1'),
   ]);
-  const tickets = count.results[0].count;
+  const tickets = holders.results.length;
   const draw = last.results[0] ?? null;
   const { lottery } = tuning();
   return {
@@ -132,7 +140,8 @@ async function lotteryView(db, row, now) {
     base: lottery.base,
     tickets,
     pot: lotteryPot(tickets, content),
-    mine: mine.results.length > 0,
+    players: holders.results.map((holder) => ({ name: holder.name, guildTag: holder.guild_tag ?? null })),
+    mine: holders.results.some((holder) => holder.character_id === row.id),
     endsAt: day.endsAt,
     last: draw && { day: draw.day, yesterday: draw.day === yesterday, tickets: draw.tickets, pot: draw.pot, name: draw.name, text: announcement(draw), own: draw.character_id === row.id },
   };
