@@ -212,7 +212,7 @@
     "place": {
       "id": "system-mine",
       "name": "Systemowa Kopalnia",
-      "description": "Chodniki schodzą głęboko pod puszczę, a w ścianach lśnią żyły kruszców. System odsłania kamienie dopiero wtedy, gdy uzna, że umiesz je wydobyć."
+      "description": "Ścieżki schodzą głęboko pod puszczę, a w ścianach lśnią żyły kruszców. System odsłania kamienie dopiero wtedy, gdy uzna, że umiesz je wydobyć."
     },
     "minutes": { "min": 10, "step": 10, "max": 480 },
     "yieldPerLevel": 0.02,
