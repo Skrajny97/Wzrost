@@ -42,8 +42,21 @@
       "Piętro {floor} nie zostało zdobyte."
     ],
     "defeat": [
-      "System wyprowadza {target} z Wieży.",
-      "Walka przegrana. System wyprowadza {target} z Wieży."
+      "System wyprowadza z Wieży: {target}.",
+      "Walka przegrana. System wyprowadza z Wieży: {target}."
+    ],
+    "fightStart": [
+      "Przeciwnicy: {enemies}.",
+      "Na piętrze czekają: {enemies}.",
+      "Drzwi piętra się otwierają. W środku: {enemies}."
+    ],
+    "eliteStart": [
+      "Powietrze gęstnieje. Elita Wieży: {enemies}.",
+      "Piętro milknie. Elita Wieży: {enemies}."
+    ],
+    "championStart": [
+      "Posadzka drży pod ciężkimi krokami. Czempion Wieży: {enemies}.",
+      "Cała Wieża cichnie i czeka. Wychodzi czempion: {enemies}."
     ],
     "chest": [
       "Na tym piętrze czeka skrzynia Wieży. W środku: {item}."

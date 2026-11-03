@@ -41,13 +41,24 @@ describe('events', () => {
     assert.equal(eventFor({ hunt, seed, forced }, content), woman);
   });
 
-  test('the seed decides whether one comes: in a tenth of explorations from 30 minutes on, fewer of the shorter (338 A)', () => {
+  test('the seed decides whether one comes: a tenth at 30 minutes, fewer of the shorter (338 A), more of the longer up to a fifth at 4 hours (478)', () => {
+    const close = (minutes, expected) => assert.ok(Math.abs(eventChance(content, minutes) - expected) < 1e-9, `${minutes}: ${eventChance(content, minutes)}`);
     assert.equal(eventChance(content), 0.1);
-    assert.equal(eventChance(content, 240), 0.1);
-    assert.equal(eventChance(content, 15), 0.05);
-    assert.ok(Math.abs(eventChance(content, 1) - 0.1 / 30) < 1e-12);
-    // Never more events an hour than at the full length.
-    for (const minutes of [1, 5, 10, 15, 20, 30, 60, 240]) assert.ok((eventChance(content, minutes) * 60) / minutes <= (0.1 * 60) / 30 + 1e-12, String(minutes));
+    close(15, 0.05);
+    close(1, 0.1 / 30);
+    // The same step at each doubling: 10%, 13.3%, 16.7%, 20%, and never more.
+    close(60, 0.1 + 0.1 / 3);
+    close(120, 0.1 + 0.2 / 3);
+    close(240, 0.2);
+    close(480, 0.2);
+    let last = 0;
+    for (let minutes = 1; minutes <= 240; minutes += 1) {
+      const chance = eventChance(content, minutes);
+      assert.ok(chance >= last && chance <= 0.2 + 1e-12, String(minutes));
+      // Never more events an hour than at 30 minutes (338 A).
+      assert.ok((chance * 60) / minutes <= (0.1 * 60) / 30 + 1e-12, String(minutes));
+      last = chance;
+    }
     const seeds = Array.from({ length: 2000 }, (_, index) => `ziarno-${index}`);
     for (const minutes of [5, 30, 240]) {
       const hunt = { result: 'success', areaId: 'windfalls-edge', minutes };
@@ -59,7 +70,7 @@ describe('events', () => {
   });
 
   test('the wounded woman comes only where the Błędnica lives; a draft event only where drafts are on', () => {
-    const always = { ...content, events: { ...content.events, chance: 1 } };
+    const always = { ...content, events: { ...content.events, chance: 1, longChance: 1 } };
     // Apart from the events that come anywhere (their own tests).
     const regional = { ...always, events: { ...always.events, list: placed(always.events.list) } };
     const seeds = Array.from({ length: 40 }, (_, index) => `region-${index}`);
@@ -78,7 +89,7 @@ describe('events', () => {
   });
 
   test('every event is as likely as the others', () => {
-    const two = { ...content, events: { ...content.events, chance: 1, list: [woman, { ...woman, id: 'drugie' }] } };
+    const two = { ...content, events: { ...content.events, chance: 1, longChance: 1, list: [woman, { ...woman, id: 'drugie' }] } };
     const hunt = { result: 'success', areaId: 'windfalls-edge', minutes: 30 };
     const seeds = Array.from({ length: 2000 }, (_, index) => `rowne-${index}`);
     const share = seeds.filter((one) => eventFor({ hunt, seed: one }, two).id === 'drugie').length / seeds.length;
@@ -215,7 +226,7 @@ describe('events', () => {
     // A draft until the author approved it (0.0.48).
     const fern = content.eventsById['fern-flower'];
     // Without the events that come anywhere (their own tests).
-    const always = { ...content, events: { ...content.events, chance: 1, list: placed(content.events.list) } };
+    const always = { ...content, events: { ...content.events, chance: 1, longChance: 1, list: placed(content.events.list) } };
     const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
     const seeds = Array.from({ length: 30 }, (_, index) => `paproc-${index}`);
     assert.ok(seeds.every((one) => eventFor({ hunt: hunt('mossy-boulders'), seed: one }, always) === fern));
@@ -244,7 +255,7 @@ describe('events', () => {
   test('the fern flower without Licho comes in every region from level 26 but where the full one does, its blossom rarer', () => {
     const calm = content.eventsById['fern-flower-calm'];
     const full = content.eventsById['fern-flower'];
-    const always = { ...content, events: { ...content.events, chance: 1, list: placed(content.events.list) } };
+    const always = { ...content, events: { ...content.events, chance: 1, longChance: 1, list: placed(content.events.list) } };
     const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
     const seeds = Array.from({ length: 30 }, (_, index) => `spokoj-${index}`);
     const brought = (areaId) => new Set(seeds.map((one) => eventFor({ hunt: hunt(areaId), seed: one }, always)?.id));
@@ -265,7 +276,7 @@ describe('events', () => {
   test('the blue mushroom comes in any land on its background: eaten, it faints, strengthens or gives a free stat point', () => {
     // A draft until the author approved it (0.0.56).
     const mushroom = content.eventsById['blue-mushroom'];
-    const always = { ...content, events: { ...content.events, chance: 1 } };
+    const always = { ...content, events: { ...content.events, chance: 1, longChance: 1 } };
     const hunt = (areaId) => ({ result: 'success', areaId, minutes: 30 });
     // More events, so more explorations until the mushroom comes in each land.
     const seeds = Array.from({ length: 80 }, (_, index) => `grzyb-${index}`);

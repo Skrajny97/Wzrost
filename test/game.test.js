@@ -1735,6 +1735,7 @@ describe('Stół rozbiórki', () => {
   const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
   const craft = (body) => call('POST', '/api/craft/materials', { cookie, body });
   const salvage = (id) => call('POST', `/api/items/${id}/salvage`, { cookie });
+  const salvageMany = (ids) => call('POST', '/api/items/salvage', { cookie, body: { ids } });
   const tableAt = async (level) =>
     (await db())
       .prepare(
@@ -1915,6 +1916,101 @@ describe('Stół rozbiórki', () => {
     const view = await character();
     assert.equal(view.crafting.queue.length, 1);
     assert.equal(view.bag.length, 0);
+  });
+
+  test('"Rozbierz kilka": several items at once, one order for each kind of part, the parts and the time as one by one', async () => {
+    await tableAt(1);
+    const first = await bagItem('rare', 25);
+    const common = await bagItem('common', 3);
+    const second = await bagItem('rare', 25);
+    const { status, data } = await salvageMany([first.id, common.id, second.id]);
+    assert.equal(status, 200);
+    assert.equal(data.salvaged.count, 3);
+    assert.deepEqual(
+      data.salvaged.orders.map(({ part, parts }) => [part, parts]),
+      [
+        ['Rzemienie', 8],
+        ['Ścinki', 2],
+      ],
+    );
+    assert.equal(data.character.bag.length, 0);
+    const [straps, scraps] = data.character.crafting.queue;
+    // Two rare items in one order of 4 + 4 Rzemienie, 29 minutes each as one
+    // by one; the common one alone, with its name: 2 Ścinki, 5 minutes each,
+    // 10% faster.
+    assert.deepEqual([straps.name, straps.count, straps.parts, straps.endsAt - straps.startsAt], ['Przedmioty', 2, 8, 58 * 60000]);
+    assert.deepEqual([scraps.name, scraps.count, scraps.parts, scraps.endsAt - scraps.startsAt], [itemName(common.item, content), 1, 2, 9 * 60000]);
+    assert.equal(scraps.startsAt, straps.endsAt);
+    assert.equal((await salvageMany([first.id])).status, 404);
+    await wait(67);
+    const after = await character();
+    assert.deepEqual([parts(after, 'straps'), parts(after, 'scraps'), after.crafting.queue.length], [8, 2, 0]);
+  });
+
+  test('"Rozbierz kilka" takes all the marked items or none', async () => {
+    await tableAt(1);
+    const kept = await bagItem('rare', 25);
+    const worn = await bagItem('common', 3);
+    await call('POST', `/api/items/${worn.id}/equip`, { cookie });
+    const epic = await bagItem('epic', 10);
+    const refused = async (ids) => {
+      const { status, data } = await salvageMany(ids);
+      return [status, data.error.code];
+    };
+    assert.deepEqual(await refused([kept.id, worn.id]), [409, 'equipped']);
+    assert.deepEqual(await refused([kept.id, 999999]), [404, 'item_not_found']);
+    assert.deepEqual(await refused([kept.id, epic.id]), [409, 'too_rare']);
+    assert.deepEqual(await refused([]), [400, 'invalid_items']);
+    assert.deepEqual(await refused(['1']), [400, 'invalid_items']);
+    const view = await character();
+    assert.deepEqual([view.crafting.queue.length, view.bag.length], [0, 2]);
+  });
+
+  test('"Rozbierz kilka" needs the Stół rozbiórki built in the camp', async () => {
+    const ids = [(await bagItem()).id, (await bagItem()).id];
+    const { status, data } = await salvageMany(ids);
+    assert.deepEqual([status, data.error.code], [409, 'no_table']);
+    const view = await character();
+    assert.deepEqual([view.crafting.pace, view.crafting.queue.length, view.bag.length], [0, 0, 2]);
+  });
+
+  test('"Rozbierz kilka" twice at once makes the orders once', async () => {
+    await tableAt(1);
+    const ids = [(await bagItem()).id, (await bagItem()).id];
+    const taps = await Promise.all([salvageMany(ids), salvageMany(ids)]);
+    const [won, lost] = taps.sort((a, b) => a.status - b.status);
+    assert.equal(won.status, 200);
+    assert.ok([404, 409].includes(lost.status), `${lost.status}`);
+    const view = await character();
+    assert.deepEqual([view.crafting.queue.length, view.crafting.queue[0].count, view.bag.length], [1, 2, 0]);
+  });
+
+  test('"Rozbierz kilka" needs a place in the queue for each kind of part', async () => {
+    await tableAt(1);
+    // Nine orders waiting, each an hour more.
+    const hour = 3600000;
+    const waiting = Array.from({ length: 9 }, (_, index) => ({
+      id: `w${index}`,
+      kind: 'material',
+      key: 'wolf-pelt:common',
+      count: 1,
+      partId: 'scraps',
+      parts: 1,
+      bonus: 0,
+      startsAt: Date.now() + index * hour,
+      endsAt: Date.now() + (index + 1) * hour,
+    }));
+    await (await db()).prepare('UPDATE characters SET crafting = ?').bind(JSON.stringify(waiting)).run();
+    const rares = [(await bagItem('rare', 25)).id, (await bagItem('rare', 25)).id];
+    const common = (await bagItem('common', 3)).id;
+    const two = await salvageMany([...rares, common]);
+    assert.deepEqual([two.status, two.data.error.code], [409, 'queue_full']);
+    assert.match(two.data.error.message, /potrzebują ich: 2, a wolne miejsca w kolejce: 1/);
+    assert.equal((await salvageMany(rares)).status, 200);
+    const full = await salvageMany([common]);
+    assert.deepEqual([full.status, full.data.error.code], [409, 'queue_full']);
+    assert.match(full.data.error.message, /pełna/);
+    assert.equal((await character()).bag.length, 1);
   });
 
   test('a worn item cannot be taken apart; one in the bag can, also during an exploration, and the table works on', async () => {
@@ -2165,6 +2261,24 @@ describe('Zadania od narratora', () => {
     await call('POST', '/api/craft/materials', { cookie, body: { all: true } });
     const after = (await call('POST', `/api/items/${meta.last_row_id}/salvage`, { cookie })).data.character;
     assert.deepEqual(after.quests.daily.quests.map((entry) => [entry.progress, entry.done]), [[3, false], [1, true]]);
+  });
+
+  test('"Rozbierz kilka" counts every item taken apart', async () => {
+    const quests = await stored();
+    quests.daily.quests = [{ kind: 'salvage', count: 3, progress: 0, reward: { kind: 'gold', amount: 5 }, claimed: false }];
+    await store(quests);
+    const database = await db();
+    await database
+      .prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'craft-table', 1, 0, 1 FROM characters")
+      .run();
+    const ids = [];
+    for (const seed of ['pierwszy', 'drugi']) {
+      const item = generateItem({ baseId: 'helmet', level: 3, rarityId: 'common' }, createRng(seed), content);
+      const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(item)).run();
+      ids.push(meta.last_row_id);
+    }
+    const after = (await call('POST', '/api/items/salvage', { cookie, body: { ids } })).data.character;
+    assert.deepEqual(after.quests.daily.quests.map((entry) => [entry.progress, entry.done]), [[2, false]]);
   });
 
   test('a class level that opens an inner region counts toward "Odblokuj dostęp"', async () => {

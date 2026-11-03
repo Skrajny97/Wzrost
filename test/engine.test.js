@@ -65,6 +65,7 @@ import {
   craftPace,
   craftTable,
   createRng,
+  rollRarity,
   damageScale,
   earnedPoints,
   estimateThreat,
@@ -98,6 +99,7 @@ import {
   monsterCombatant,
   orderMaterials,
   orderSalvage,
+  orderSalvageMany,
   playerCombatant,
   randomItem,
   rarityUpChances,
@@ -641,6 +643,59 @@ describe('hunts', () => {
     assert.equal(pace(1).toughChance, 0);
     assert.ok(pace(30).toughChance < pace(120).toughChance && pace(120).toughChance < pace(240).toughChance);
     assert.ok(pace(15).eliteChance < pace(240).eliteChance);
+  });
+
+  test('a longer exploration finds unique and rarer items a little more often, at most a tenth more at four hours (482 B)', () => {
+    const tuning = content.balance.hunt;
+    const raised = (from) => content.rarities.slice(content.rarities.findIndex((rarity) => rarity.id === from)).map((rarity) => rarity.id);
+    assert.deepEqual(raised(tuning.uniqueLengthFrom), ['unique', 'epic', 'legendary', 'mythic', 'divine']);
+    // The draw: the same weights up to half an hour, the rarer ones x1.1 at
+    // four hours; common and rare items never gain.
+    const share = (unique) => {
+      const rng = createRng('rzadkie');
+      let count = 0;
+      for (let i = 0; i < 40000; i++) if (raised('unique').includes(rollRarity(rng, content, 1, unique))) count += 1;
+      return count / 40000;
+    };
+    const base = share(1);
+    const long = share(1.1);
+    assert.ok(long > base * 1.04 && long < base * 1.14, `${base} → ${long}`);
+    // The factor by length: 1 to half an hour, then the same step at each
+    // doubling, 1.1 at four hours and never more.
+    const factor = (minutes) => {
+      const pairs = tuning.uniqueLengthFactorByMinutes;
+      if (minutes <= pairs[0][0]) return pairs[0][1];
+      for (let i = 1; i < pairs.length; i++) {
+        const [m0, v0] = pairs[i - 1];
+        const [m1, v1] = pairs[i];
+        if (minutes <= m1) return v0 + ((v1 - v0) * Math.log(minutes / m0)) / Math.log(m1 / m0);
+      }
+      return pairs.at(-1)[1];
+    };
+    assert.deepEqual([factor(5), factor(30), factor(240), factor(480)], [1, 1, 1.1, 1.1]);
+    assert.ok(Math.abs(factor(60) - (1 + 0.1 / 3)) < 1e-9 && Math.abs(factor(120) - (1 + 0.2 / 3)) < 1e-9);
+  });
+
+  test('a longer exploration pays off more: from half an hour on, the elite, the champion and finds come more often in an hour', () => {
+    const pace = (minutes) => explorationPace(minutes, content);
+    // Meetings and finds a minute.
+    const elites = (minutes) => (pace(minutes).eliteChance * pace(minutes).fights) / minutes;
+    const champions = (minutes) => (pace(minutes).championChance * pace(minutes).fights) / minutes;
+    const finds = (minutes) => pace(minutes).finds / minutes;
+    const near = (a, b) => Math.abs(a - b) < 1e-12;
+    // Up to half an hour the same in an hour, as before.
+    for (const minutes of [1, 5, 15]) {
+      assert.ok(near(elites(minutes), elites(30)), `${minutes}`);
+      assert.ok(near(champions(minutes), champions(30)), `${minutes}`);
+      assert.ok(near(finds(minutes), finds(30)), `${minutes}`);
+    }
+    // Then more and more: twice the elites and champions and a fifth more
+    // finds in an hour of a four-hour exploration.
+    assert.ok(elites(30) < elites(60) && elites(60) < elites(120) && elites(120) < elites(240));
+    assert.ok(near(elites(240), 2 * elites(30)));
+    assert.ok(near(champions(240), 2 * champions(30)));
+    assert.ok(finds(30) < finds(60) && finds(60) < finds(240));
+    assert.ok(near(finds(240), 1.2 * finds(30)));
   });
 
   test('demanding encounters are stronger and leave more materials', () => {
@@ -1701,7 +1756,8 @@ describe('champions', () => {
     assert.ok(!areaDangers(content.areasById['viper-heaps'], content).some((danger) => danger.champion));
     // The rarest meeting of all: less often than the elite.
     const pace = explorationPace(60, content);
-    assert.equal(pace.championChance, content.balance.hunt.championChancePerFight * pace.timeFactor);
+    const longer = Object.fromEntries(content.balance.hunt.rareLengthFactorByMinutes)[60];
+    assert.equal(pace.championChance, content.balance.hunt.championChancePerFight * pace.timeFactor * longer);
     assert.ok(pace.championChance < pace.eliteChance);
   });
 
@@ -2062,6 +2118,25 @@ describe('Stół rozbiórki', () => {
     assert.equal(ordered, content.balance.crafting.queueLimit);
     assert.equal(Object.keys(state.materials).length, content.materials.length - ordered);
     for (let i = 1; i < state.queue.length; i++) assert.equal(state.queue[i].startsAt, state.queue[i - 1].endsAt);
+  });
+
+  test('several items taken apart at once: one order for each kind of part, its parts and minutes added up ("Rozbierz kilka")', () => {
+    const items = [
+      { rarity: 'rare', level: 25 },
+      { rarity: 'common', level: 3 },
+      { rarity: 'rare', level: 5, upgrade: 1 },
+    ];
+    const entries = items.map((item, index) => ({ item, name: `Przedmiot ${index}` }));
+    const state = orderSalvageMany(empty, entries, plain, 10 * MINUTE, rng(), content);
+    // 4 Rzemienie (32 minutes) and 3 (24); 2 Ścinki (10 minutes) after them.
+    assert.deepEqual(
+      state.queue.map((order) => [order.kind, order.name, order.count, order.rarity, order.partId, order.parts, order.startsAt / MINUTE, order.endsAt / MINUTE]),
+      [
+        ['item', undefined, 2, 'rare', 'straps', 7, 10, 66],
+        ['item', 'Przedmiot 1', undefined, 'common', 'scraps', 2, 66, 76],
+      ],
+    );
+    assert.deepEqual(settleCrafting(state, 76 * MINUTE).parts, { straps: 7, scraps: 2 });
   });
 
   test('taking an item apart gives more parts for a higher level and each upgrade', () => {

@@ -125,7 +125,8 @@ describe('potions in fights', () => {
     let drunk = 0;
     for (let i = 0; i < 20; i++) {
       const hunt = simulateHunt(
-        { character, equipped, hp: 9999, name: 'Mira', areaId: 'mossy-boulders', minutes: 60, seed: `w${i}`, potions: { 'lesser-healing': 2 }, healBelow: 0.4 },
+        // Drinking from 70% HP, so that some fights call for a potion.
+        { character, equipped, hp: 9999, name: 'Mira', areaId: 'mossy-boulders', minutes: 60, seed: `w${i}`, potions: { 'lesser-healing': 2 }, healBelow: 0.7 },
         content,
       );
       const used = hunt.potionsUsed['lesser-healing'] ?? 0;

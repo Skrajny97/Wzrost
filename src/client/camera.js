@@ -8,6 +8,7 @@
 // with the narrator makes it draw back, down to 0.6 times. With the
 // animations off it only scrolls, at once, and draws back at once too.
 
+import { desktopLayout } from './layout-mode.js';
 import { motionOn } from './motion.js';
 
 const CLOSEST = 1.25;
@@ -31,10 +32,11 @@ const screen = () => document.getElementById('screen');
 const ease = (done) => (1 - Math.cos(Math.PI * done)) / 2;
 const mix = (from, to, done) => from + (to - from) * done;
 
-// The window between the top bar and the bottom one.
+// The window between the top bar and the bottom one; on a computer the
+// menu is down the left, so the window reaches the bottom of the screen.
 function sight() {
   const top = document.getElementById('topbar')?.getBoundingClientRect().bottom ?? 0;
-  const bar = [...document.querySelectorAll('.nav')].find((nav) => !nav.hidden);
+  const bar = desktopLayout() ? null : [...document.querySelectorAll('.nav')].find((nav) => !nav.hidden);
   const bottom = bar ? bar.getBoundingClientRect().top : window.innerHeight;
   return { top: Math.max(0, top), bottom: Math.min(window.innerHeight, bottom), width: window.innerWidth };
 }
@@ -131,7 +133,9 @@ export function aim(elements, { zoom = true, travel = false, keep = 0, above = f
     to.point = { x: box.left + half.x, y: box.top + half.y };
     const across = natural(to.point, 0).x;
     let z = 1;
-    if (zoom && !element.querySelector(PINNED)) {
+    // A computer's screen is big enough: the camera only scrolls there,
+    // between the menu and the side column.
+    if (zoom && !desktopLayout() && !element.querySelector(PINNED)) {
       const fits = (height - keep - 2 * ROOM) / (2 * half.y);
       const most = Math.min((across - SIDE) / half.x, (bars.width - SIDE - across) / half.x, fits);
       back = whole && fits < 1;

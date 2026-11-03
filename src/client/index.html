@@ -130,8 +130,15 @@
   <div id="view-game" hidden>
     <header class="topbar" id="topbar"></header>
     <main class="screen screen--game" id="screen"></main>
-    <nav class="nav nav--main" id="nav-main" aria-label="Menu główne"></nav>
-    <nav class="nav nav--character" id="nav-character" aria-label="Nawigacja postaci" hidden></nav>
+    <!-- The bottom bars on a phone; on a computer the menu down the left,
+         the character's own tabs under its Postać (layout-mode.js). -->
+    <div class="menu" id="menu">
+      <p class="menu-brand" aria-hidden="true">Insight</p>
+      <nav class="nav nav--main" id="nav-main" aria-label="Menu główne"></nav>
+      <nav class="nav nav--character" id="nav-character" aria-label="Nawigacja postaci" hidden></nav>
+    </div>
+    <!-- On a computer: the narrator's quests and the chat (side.js). -->
+    <aside class="side" id="side" aria-label="Zadania i czat" hidden></aside>
   </div>
 
   <dialog class="sheet" id="sheet" aria-label="Szczegóły"></dialog>

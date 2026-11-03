@@ -2996,6 +2996,221 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Odpowiedzi autora 478–480 (3.11.2026)
+
+Autor: „478 Zdarzenia - dłuższa wyprawa ma mieć większą szansę max 20%, policz to dobrze”, chody 479.1–479.8 A poza „479.5 B (prawy górny róg łuku ma w pewnym momencie niepotrzebne szare piksele)” i jazda wierzchem 480.1–480.30 A poza:
+
+- 480.13 B (Arcymag Żywiołów): „zbyt wysoko ręce, nie wygląda jakby trzymał lejce”;
+- 480.17 B (Druid): „w ogole nie wyglada jakby siedział i był bokiem”;
+- 480.19 B (Cudotwórca): „dziwny wyraz twarzy i nie siedzi bokiem”;
+- 480.28 B (Nekromantka): „nie trzyma obiem rękami lejc i nie siedzi bokiem”;
+- 480.29 B (Widmo, mężczyzna): „ucięty sprite postaci”.
+
+Oraz: „Do Czarnego Bagna wroce później”.
+
+1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
+2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
+
+## Rzadsze przedmioty na dłuższych wyprawach (482 B, 3.11.2026)
+
+1. **Przedmioty z wyprawy** (znaleziska i skrzynia elity) wypadają w rzadkości unikalnej i rzadszych trochę częściej, im dłuższa wyprawa: do pół godziny bez zmian, potem o tyle samo przy każdym podwojeniu czasu, aż do wag razy 1,1 przy 4 godzinach (`uniqueLengthFactorByMinutes`, od rzadkości `uniqueLengthFrom` w `data/balance.json`). Pospolite i rzadkie nie zyskują.
+2. **Ile to daje:** przy 4 godzinach przedmiot jest unikalny albo rzadszy w ok. 8,7% przypadków zamiast 8,0%, czyli o ok. 9% częściej (najwyżej +10%, jak chciał autor); godzina +3%, 2 godziny +6%. Razem z większą liczbą znalezisk i elit na długich wyprawach (0.0.98) długa wyprawa daje wyraźnie więcej rzadkich przedmiotów na godzinę.
+3. Skrzynia czempiona ma swoją rzadkość i premii nie dostaje; Wieże też nie.
+
+## Odpowiedzi autora 439–497 (3.11.2026)
+
+Autor: „479.5 A / 439 A / 440 OK … 446 OK / 447 OK tylko popraw sprite'a bo piksele są zbędne lewy górny róg / 448 OK, tylko ucięty ogon / 449 OK / 450 OK / 451 OK, tylko zrób go bardziej czarnego / 452 OK, ale sprite totalnie ucięty musi być bardziej majestatyczny / 453 OK / 454 Ok / 455 zmień nazwę na Wielki Kleszcz / 456 OK / 457 B / 458 OK / 459 OK / 460 materiał do dokończenia bo ucięty / 461 OK / 462 OK / 463 OK, ale ryś był w Rysiej Grani, wiec out, nie moga sie potwory powtarzać / 464 OK / 465 B tylko zrób je bardziej abstrakcyjne groźne / 466 OK / 467 A / 468 OK / 469 OK / 470 OK / 471 B / 472 A / 476 i 477 wybrałeś sam i zatwierdzam / 478 B max 20% / 481 B / 482 B ale max +10% / 483 A / 484 A / 485 A / 486 A / 487 B / 488 A / 489 A / 490 A … 497 A”.
+
+1. **Chody drugich form:** wszystkie zatwierdzone (479.5 A). Z jazdy czeka jeszcze ocena pięciu narysowanych od nowa jeźdźców (480.13, 480.17, 480.19, 480.28, 480.29).
+2. **Czarne Bagno (439–461) zatwierdzone** z tłem A i poprawkami grafik: Ważka (447) bez zbędnych pikseli w lewym górnym rogu, Szczupak (448) z całym ogonem, Drewniany bożek (451) czarniejszy, Wąż Welesa (452) od nowa, cały w obrazku i bardziej majestatyczny, Róg biesa (457 B) narysowany od nowa, Warkocz mamuny (460) cały. Kleszcz nazywa się **Wielki Kleszcz** (455).
+3. **Szumiący Bór (462–465):** trzy krainy zatwierdzone (462). „Atak na tył szyku” (463) bez rysia, bo ryś był już w Rysiej Grani, a stwory się nie powtarzają. „Zasadzka” (464) zatwierdzona. Całą listę stworów z grafikami proponuję ja (465 B), w bardziej abstrakcyjnym i groźnym stylu.
+4. **Trzecia ewolucja (466):** nazwy i cechy zatwierdzone; grafiki później.
+5. **Sklep Play:** najpierw bez płatności (467 A); lista do zbudowania (468), kroki po stronie autora (469) i zasady płatności (470) zatwierdzone; przygotowania później, nie od razu (471 B).
+6. **Komputer:** jedna gra z dwoma układami (472 A); 476 A i 477 A zatwierdzone.
+7. **Zdarzenia (478 B, najwyżej 20%):** zrobione w 0.1.1.
+8. **Kowadło (481 B):** materiały tej samej rzadkości się sumują, w Kowadle, Kuźni i u Zaklinaczki.
+9. **Rzadkie przedmioty na długich wyprawach (482 B, najwyżej +10%):** szansa na unikalne i rzadsze rośnie z długością wyprawy, najwyżej o 10% przy 4 godzinach.
+10. **Wieże:** trofeum czempiona tylko za pierwsze zwycięstwo na piętrze (483 A); stałe elity co 5. piętro tylko w co drugim okrążeniu regionów, żeby w Wieżach pojawiały się wszystkie stwory (484 A); zdanie o losowych elitach we wstępie Wież (485 A); raporty z Wież z osobnym limitem w Dzienniku (486 A); skrzynie Bestiariusza zostają bez progu poziomu (487 B); próba gildii „Wygraj w Wieżach” liczy piętra od poziomu postaci minus 10 (488 A); trudność Wieży Solo zostaje jako wyzwanie (489 A).
+11. **Angielski (490–497, wszystko A):** zasada „polski + angielski (beta)”; najpierw tylko na testowej, do gotowych poziomów 1–25; sprawdza Claude i wyrywkowo autor; najpierw tekst, nagrania po zatwierdzeniu; miejsca, przedmioty i stwory tłumaczone, istoty słowiańskie w transkrypcji, imiona bez zmian; osobny kanał czatu po angielsku; język z telefonu i przełącznik PL | EN; zadania dzienne od północy w Polsce, pokazane w czasie gracza.
+
+## Poprawki chodu 479.5 i jeźdźców 480 (3.11.2026)
+
+1. **Strzelec Wyborowy (479.5).** W trzeciej klatce chodu nad górnym końcem łuku stała szara kreska (9 pikseli). Zniknęła z arkusza i z jego siedmiu odcieni skóry; reszta klatek bez zmian.
+2. **Pięciu jeźdźców (480.13, 480.17, 480.19, 480.28, 480.29)** narysowanych od nowa przez Retro Diffusion. Wzorem pozy nie jest już szary manekin, tylko zatwierdzony jeździec tej samej formy drugiej płci (Arcymagini, Druidka, Cudotwórczyni, Nekromanta, Widmo kobieta), który siedzi bokiem i trzyma wodze nisko obiema rękami (`art/references/riders/<id>-start.png`). Wygląd daje portret postaci. Z czterech wersji każdego wybrana ta, która najlepiej siedzi bokiem i ma spokojną twarz w profilu.
+3. Dalsza noga znika jak u jeźdźca-wzoru (pod szatą tylko dalsza stopa, u Widma cała noga). Odcienie skóry obejmują tylko twarz i dłonie; Arcymag i Nekromantka mają dopisane kolory swojej skóry, bo portret ich nie podpowiedział.
+4. Wszystko leży w gałęzi drugiej ewolucji i czeka na ocenę autora (filmy MP4 wysłane pojedynczo). Druga ewolucja wejdzie do gry, gdy zatwierdzone będą wszystkie chody i jazda.
+
+## Zdarzenia częściej na dłuższych wyprawach (478, 3.11.2026)
+
+1. **Szansa na zdarzenie** po wyprawie zakończonej zgodnie z planem: do pół godziny jak dotąd (pół godziny 10%, krótsza proporcjonalnie mniej, 338 A), a dłużej rośnie o tyle samo przy każdym podwojeniu czasu: godzina 13,3%, 2 godziny 16,7%, 4 godziny 20% (`longChance` i `longChanceMinutes` w `data/events.json`). Więcej niż 20% nie ma.
+2. **„Policz to dobrze”:** test sprawdza każdą minutę od 1 do 240. Szansa nigdy nie maleje z długością wyprawy i nie przekracza 20%, a na godzinę żadna wyprawa nie daje więcej zdarzeń niż półgodzinna (20% na godzinę), więc krótkich wypraw dalej nie opłaca się klepać dla zdarzeń (338 A). Na godzinę: pół godziny 20%, godzina 13,3%, 2 godziny 8,3%, 4 godziny 5%.
+3. **Na 8 godzin wypraw** wychodzi: same półgodzinne 1,6 zdarzenia (bez zmian), same godzinne ok. 1,1 (było 0,8), same 2-godzinne ok. 0,7 (było 0,4), same 4-godzinne 0,4 (było 0,2).
+4. **Długość** to ta wybrana przy wyruszeniu: wierzchowiec ze Stajni skraca tylko czekanie, więc szansy nie zmniejsza. Szybkie i Błyskawiczne Polowania jak dotąd zdarzeń nie mają.
+
+## Wersja 0.1.1 (3.11.2026)
+
+1. **Co wchodzi do gry:** zdarzenia częściej na dłuższych wyprawach (478, zob. wyżej). Razem z tym idą notatka o odpowiedziach 479–480 i nowe opisy pięciu jeźdźców do rysowania (z zatwierdzonym jeźdźcem drugiej płci jako wzorem pozy), których gra jeszcze nie używa.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (869 z 869) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków).
+
+## Układ na komputer: delikatne tła i gradienty (2.11.2026)
+
+Autor o makietach i układzie na komputer: „Makieta bardzo szeroka brakuje czasem teł jakichś delikatnych albo gradientów ale wygląda git to na komputer”. Szerokości zostają, dochodzi światło i głębia, tylko w układzie komputera (telefon bez zmian):
+
+1. **Kolumna gry.** Nad nią słaba poświata Systemu z góry i ciepła z dołu, a brzegi strony są odrobinę ciemniejsze. Światło stoi w miejscu, gdy strona się przewija. Sama kolumna jest od góry lekko rozjaśniona, więc puste miejsce pod krótszą treścią nie jest płaskie.
+2. **Menu i kolumna zadań i czatu.** Ciemnieją ku dołowi od jaśniejszej, ciepłej (menu) albo chłodnej (zadania i czat) góry, z miękkim cieniem od strony gry.
+3. **Górny pasek** to lekko oświetlony pas z linią Systemu, która gaśnie na końcach. Napis „Insight” w menu ma złote podkreślenie.
+
+## Targowisko: filtry według kategorii (2.11.2026)
+
+Autor: „filtracja potrzebna w targowisku zeby szukac itemy po kategoriach, bo jak jest duzo w plecaku to lista przytłaczająca”.
+
+1. **Gdzie.** W oknie „Wystaw” nad rzeczami z plecaka i w zakładce „Oferty graczy” nad ofertami stoi rząd przycisków: najpierw „Wszystko”, potem każda kategoria, w której coś jest, z liczbą, np. „Broń 3”. Stuknięcie pokazuje tylko tę kategorię, a wybrany przycisk jest podświetlony. Przyciski układają się w tylu liniach, ile trzeba, więc na wąskim telefonie widać wszystkie, a strona nie przesuwa się na boki. Przy krótszej liście okno „Wystaw” nie maleje, więc przyciski zostają pod palcem.
+2. **Kategorie (brakujący szczegół).** Najpierw przedmioty według miejsca, z nazwami i w kolejności z `data/slots.json`: Hełm, Amulet, Pancerz, Rękawice, Buty, Broń, Druga ręka, Pierścień, Talizman. Amulet, Pierścień i Talizman zostają osobno, bez wspólnej „Biżuterii”, bo tak najprościej, a nazwy są te same co na karcie przedmiotu. Po nich Zioła, Mikstury, Materiały i Części.
+3. **Wybór (brakujący szczegół).** Wybrana kategoria zostaje, gdy Targowisko się odświeża i gdy okno „Wystaw” otwiera się znowu; każda z dwóch list ma swój wybór. Gdy w wybranej kategorii nic już nie ma, np. po wystawieniu ostatniego pierścienia, wraca „Wszystko”. Po wyjściu z Targowiska obie listy znów zaczynają od „Wszystko”.
+4. **Jedna kategoria.** Gdy wszystko na liście należy do jednej kategorii, przycisków nie ma, bo nie ma czego wybierać.
+
+## Wersja 0.1.0 (3.11.2026)
+
+Po 0.0.99 numeracja idzie dalej od 0.1.0, jak ustalił autor.
+
+1. **Co wchodzi do gry:** filtry kategorii na Targowisku i delikatne tła i gradienty w układzie na komputer (zob. wyżej).
+2. **Baza danych:** bez migracji.
+3. **Test ceny u Gościwita.** Pierwsze wdrożenie 0.1.0 zatrzymało się na teście „lepsza relacja z Gościwitem obniża jego ceny”, choć gra liczy dobrze. Test brał pierwsze zioło dnia, a 3.11 kosztuje ono 8 zł: 10% rabatu, zaokrąglone w górę, nic nie zmienia, więc cena zostaje ta sama (tak wypada w ok. 7% dni). Test bierze teraz najdroższy towar dnia poza częściami, na którym rabat widać każdego dnia (sprawdzone na dwa lata naprzód). Kod gry bez zmian.
+4. **Narzędzie przejścia wprowadzenia** (`tools/first-steps.cjs`) daje postaciom imiona z zegara („Start” i 9 cyfr) zamiast losowych „Start1000”–„Start9999”: w lokalnej bazie po dziesiątkach przejść imię się powtórzyło i tworzenie postaci zwróciło 409.
+5. **Przed wdrożeniem:** pełne testy (869 z 869) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków); filtry w przeglądarce na telefonach 390×844 i 360×780 i na komputerze 1440×900 (wybór, liczby, brak przesuwania na boki, wybór po odświeżeniu, powrót do „Wszystko”, reset po wyjściu); tła na komputerze 1920×1080 i 1366×768 (Walka, Postać, Obóz, Społeczność).
+
+## Kod podarunkowy TIGER (2.11.2026)
+
+Autor: „przygotuj kod podarunkowy ważny tydzien "TIGER" dajacy 500 Punktów Systemu”.
+
+1. **Kod** `TIGER` (`tiger-2026-11` w `data/gift-codes.json`): 500 Punktów Systemu, raz na konto, wpisywany w Ustawieniach jak JESTEMTESTEREM. Wielkość liter, spacje i myślniki nie mają znaczenia.
+2. **Tydzień (brakujący szczegół):** licząc od jutra, jak przy JESTEMTESTEREM, czyli od wdrożenia do końca poniedziałku 9.11.2026 czasu polskiego (`until` 10.11.2026 00:00 +01:00).
+3. Konto, które odebrało już JESTEMTESTEREM, odbierze też TIGER: każdy kod liczy się osobno.
+
+## „Rozbierz kilka” tylko ze Stołem rozbiórki (2.11.2026)
+
+Autor: „Pamietaj by ten przycisk nie działał jeśli ktoś nie ma Stołu do rozbiórki zbudowanego i w ogole ze to się łączy ze sobą”. Tak działa od 0.0.96: bez Stołu rozbiórki w obozie przycisku „Rozbierz kilka” w Plecaku nie ma, a serwer i tak odmawia („Najpierw zbuduj Stół rozbiórki w obozie.”). Rozbiórka idzie do kolejki tego stołu, a jego poziom decyduje, jakie rzadkości stół bierze i jak szybko pracuje. Nowy test sprawdza odmowę serwera bez stołu.
+
+## Pytania 479–497 (2.11.2026, w nocy)
+
+Autor nie mógł spać i poprosił o poranny materiał od razu („zacznij od chodów i jazdy”). Wysłane w czacie, każda pozycja z numerem:
+
+- 479.1–479.8: chody drugich form po poprawkach z 437 (Cudotwórca bez „fajki”, Władca Piorunów z jednym łukiem, Pan Zimy bez mieczy, przed i po czyszczeniu szarych pikseli u pięciu najgorszych; czyszczenie przeszło przez wszystkie 30 chodów);
+- 480.1–480.30: jazda wierzchem drugich form, wszystkie 30;
+- 439–461: Czarne Bagno (kraina z dwoma tłami do wyboru, pięć regionów, 17 stworów z materiałami), 462–465 Szumiący Bór, 466 trzecia ewolucja, 467–471 Sklep Play;
+- 481: czy zmienić zasadę „jednego materiału” w Kowadle; 482: czy długie wyprawy mają dawać rzadsze przedmioty;
+- 483–489: decyzje z przeglądu Wież (trofea czempionów, 16 stworów poza Wieżami, losowe elity, Dziennik, skrzynie Bestiariusza, próba gildii na 1. piętrze, trudność Wieży Solo); 490–497: plan wersji angielskiej;
+- ponownie 472, 476, 477 (wersje A są w grze od 0.0.97 i 0.0.98) i 478 (zdarzenia na długich wyprawach).
+
+## Wersja 0.0.99 (2.11.2026)
+
+1. **Co wchodzi do gry:** kod podarunkowy TIGER (500 Punktów Systemu do końca 9.11) i test, że „Rozbierz kilka” bez Stołu rozbiórki nic nie robi (zob. wyżej). Razem z tym idzie notatka o pytaniach 479–497.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (868 z 868) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków).
+
+## Długie wyprawy opłacają się bardziej, elita częściej na długich (2.11.2026)
+
+Autor: „chodzi czy bardziej sie oplacaja krotkie wyprawy czy długie, bo powinny mimo wszystko długie w pewnym stopniu” i „i czy szansa na spotkanie elity jest wyższa w dłuższej wyprawie czy krótszej? bo powinna w dłuższej”.
+
+1. **Jak było** (symulacja `tools/difficulty-sim.mjs`, gracz z towarzyszami i gracz realistyczny, poziomy 30, 50 i 75, wyprawa 4-godzinna wobec półgodzinnej): na godzinę o 16–21% więcej XP i o 11–12% więcej złota (lekka premia za długość i częstsze wymagające spotkania), tyle samo przedmiotów, elit i czempionów, a zdarzeń ośmiokrotnie mniej, bo zdarzenie przychodzi z szansą 10% na wyprawę. Szansa na elitę na jedną wyprawę rosła z długością (pół godziny ok. 1,5%, 4 godziny ok. 12%), ale na godzinę była ta sama.
+2. **Zmiana (brakujący szczegół w kierunku wskazanym przez autora).** Od pół godziny elita i czempion przychodzą na godzinę coraz częściej: godzina ×1,25, 2 godziny ×1,5, 4 godziny ×2 (`rareLengthFactorByMinutes`). Znaleziska (skrzynie skarbów i złoto) też: godzina ×1,05, 2 godziny ×1,1, 4 godziny ×1,2 (`findLengthFactorByMinutes`). Pomiędzy wartości rosną płynnie. Do pół godziny bez zmian, więc procenty w Bestiariuszu, liczone dla wyprawy półgodzinnej, zostają takie same.
+3. **Jak jest:** 4-godzinna wyprawa daje na godzinę o 18–24% więcej XP i o 21–23% więcej złota niż półgodzinna, ok. 20% więcej przedmiotów i dwa razy więcej elit i czempionów. Elita na jedną wyprawę: pół godziny ok. 1,5%, godzina ok. 3,8%, 2 godziny ok. 9%, 4 godziny ok. 24% (wcześniej 1,5%, 3%, 6% i 12%); czempion o połowę rzadziej. Omdlenia: 0% na poziomach 30 i 50, na 75 przy 4 godzinach 1,1% → 2,0% u gracza z towarzyszami i 0% u realistycznego.
+4. **Zdarzenia zostają przy 10% na wyprawę**, jak ustalił autor („10% wypraw”, 338 A). Czy długie wyprawy mają mieć ich więcej, to pytanie do autora w porannym raporcie.
+
+## Układ na komputer, drugi etap (2.11.2026)
+
+Według 476 A i 477 A (przyjęte przed snem autora, zob. „Osobny wygląd na komputer: plan i pytania 472–477”):
+
+1. **Przedmiot pod myszą (477 A).** Na komputerze najechanie myszą na przedmiot w plecaku albo na postaci pokazuje obok małą kartę: nazwę, rzadkość, miejsce, poziom i Tier, właściwości, cenę u złomiarza i zdanie „Lepiej / Gorzej / Coś za coś”, bez klikania (`src/client/item-tip.js`). Kliknięcie, klawisz albo przewinięcie chowa kartę.
+2. **Klawisze 1–5 (477 A).** Otwierają główne zakładki jak menu z lewej: 1 Postać, 2 Walka, 3 Profesje, 4 Osada, 5 Społeczność (`src/client/keys.js`). Nie działają przy pisaniu (czat, pola), nad otwartym oknem ani z Ctrl, Alt, Shift i Cmd. Esc zamyka okna sam (okna przeglądarki).
+3. **Walka (476 A).** Krainy stoją po dwie obok siebie, w szerszej kolumnie (do 1120 px).
+4. **Obóz i Osada (476 A).** Plansze są większe (do 720 px szerokości zamiast 560); budynki stoją w procentach planszy, więc rosną razem z nią.
+
+## Wersja 0.0.98 (2.11.2026)
+
+1. **Co wchodzi do gry:** długie wyprawy opłacają się bardziej, a elita i czempion przychodzą na nich częściej, oraz drugi etap układu na komputer: karta przedmiotu pod myszą, klawisze 1–5, krainy po dwie w Walce i większe plansze Obozu i Osady (zob. wyżej). Test mikstur na wyprawie pije teraz od 70% HP, bo ze zmianą losowania jego 20 wypraw przy progu 40% nie wypiło ani jednej mikstury.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (866 z 866) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków); w przeglądarce karta przedmiotu pod myszą, klawisze 1–5 (także że nie przełączają przy pisaniu w czacie), krainy po dwie i większe plansze; symulacje długości wypraw przed zmianą i po niej (zob. wyżej).
+
+## Układ na komputer, pierwszy etap (2.11.2026)
+
+Według 473 A, 474 A i 475 A (zob. niżej „Osobny wygląd na komputer: plan i pytania 472–477”):
+
+1. **Wykrywanie (473 A).** Układ komputera włącza się sam w oknie od 1100 px szerokości z myszą; telefon i tablet dostają układ telefonu. Na ekranie od 1000 px (albo gdy wybrano coś innego niż „Sam”) Ustawienia mają „Układ ekranu: Sam / Telefon / Komputer”, zapamiętany w tej przeglądarce. Strona nosi układ jako `data-layout` (`src/client/layout-mode.js`), a style komputera działają tylko pod `:root[data-layout='desktop']`, więc układ telefonu się nie zmienia.
+2. **Menu z boku (474 A).** Główne zakładki w kolumnie z lewej, z napisem „Insight” u góry; pod „Postać” jej zakładki (Statystyki, Umiejętności, Ewolucja, Rdzeń), bez „Powrót”. Górny pasek w jednej linii, a na ekranie węższym niż 1500 px w dwóch (poziomy, złoto i obóz z wyprawą w pierwszej, cztery paski w drugiej).
+3. **Prawa kolumna (474 A).** Zadania narratora na pergaminie, te same co pod twarzą narratora (zakładki, skrzynia, „Odbierz”, „Odbierz wszystkie”, „Przelosuj zadania”), i czat z zakładkami kanałów i polem do pisania. Czat pojawia się razem ze Społecznością; wcześniej kolumna mówi, na którym poziomie się otworzy. Na ekranie węższym niż 1280 px kolumny nie ma, a zadania i czat są tam, gdzie na telefonie (`src/client/side.js`).
+4. **Okna na środku (475 A).** Karty przedmiotów, pytania i inne okna stoją na środku ekranu (do 560 px szerokości), zamykane krzyżykiem, Esc albo kliknięciem obok.
+5. **Gra na środku.** Ekrany jak na telefonie, w szerszej kolumnie (do 760 px). Postać ma już swoje kolumny: postać w ramie obok plecaka. Kamera narratora na komputerze tylko przewija, bez przybliżania. Kolejne ekrany dostają swoje kolumny po kolei (476 A), a wygody myszy i klawiatury przyjdą w następnych wersjach (477 A).
+
+## Wersja 0.0.97 (2.11.2026)
+
+1. **Co wchodzi do gry:** układ na komputer, pierwszy etap (zob. wyżej).
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (865 z 865), przejście wprowadzenia na telefonie (układ telefonu) oraz na komputerze 1366×768 i 1920×1080 (już w układzie komputera), po 11 kroków; w przeglądarce wszystkie główne ekrany w układzie komputera (bez błędów strony), przełącznik „Układ ekranu” w obie strony i telefon 390×844 bez zmian.
+
+## Osobny wygląd na komputer: plan i pytania 472–477 (2.11.2026)
+
+Autor: „zaimplementowałeś też GUI z telefonu bezpośrednio na pc a musi być kompletnie osobne, jakoś to na pewno da się ustawić i wykrywać”. Zmienia to dotychczasową zasadę z przeglądu na komputerze (górny pasek i menu trzymają się kolumny telefonu). Plan z makietami (prawdziwa gra z nałożonym szkicem układu, `scratchpad`, nie w grze) poszedł do autora jako pytania, z zaleceniami:
+
+- 472: jedna gra, dwa układy (A), a nie osobna aplikacja (B);
+- 473: wykrywanie samo (szeroki ekran od ok. 1100 px i mysz) z przełącznikiem „Układ ekranu: Sam / Telefon / Komputer” w Ustawieniach (A), tylko samo (B) albo osobny adres (C);
+- 474: trzy kolumny, menu, gra, zadania i czat (A), albo dwie (B);
+- 475: okna na środku (A) albo panel z prawej (B);
+- 476: najpierw szkielet dla wszystkich ekranów, potem ekran po ekranie (A), albo najpierw cała Postać (B);
+- 477: od razu podpowiedzi po najechaniu myszą, Esc i klawisze 1–5 (A), albo później (B).
+
+Autor: „473 A / 474 A / 475 A”, a o 476 i 477: „nie napisałeś o co chodzi” (opisy tych dwóch pytań do autora nie dotarły). Wysłane jeszcze raz, dokładniej; 472 bez odpowiedzi, przyjęte A, bo 473–475 A do tego pasują, z prośbą o znak, jeśli ma być inaczej. Ustalone więc:
+
+1. **Wykrywanie (473 A).** Układ komputera sam na szerokim ekranie (od ok. 1100 px) z myszą, telefon i tablet w układzie telefonu; w Ustawieniach „Układ ekranu: Sam / Telefon / Komputer”, zapamiętany na urządzeniu.
+2. **Trzy kolumny (474 A).** Menu z lewej (pod „Postać” jej zakładki), gra na środku, z prawej zadania narratora i czat; na mniejszym laptopie prawa kolumna chowa się pod przycisk.
+3. **Okna na środku (475 A).** Karty przedmiotów i inne okna na środku ekranu, zamykane Esc albo kliknięciem obok.
+
+Autor przed snem: „dobra ja musze spać, zrób to wszystko dobrze i porządnie”. Przyjęte więc zalecane 476 A (najpierw szkielet dla wszystkich ekranów, potem ekran po ekranie) i 477 A (podpowiedzi po najechaniu myszą, Esc, klawisze 1–5) oraz 472 A. Aplikacja ze Sklepu Play zostaje przy układzie telefonu.
+
+## Plecak: „Rozbierz kilka” (2.11.2026)
+
+Autor: „Trzeba tez zrobic przycisk "Rozbierz kilka" w Plecaku tak by można bylo zaznaczać które chcemy (i możemy) przedmioty i dać do rozbiórki”.
+
+1. **Przycisk.** Pod tytułem Plecaka, obok „Sprzedaj zbędne”, gdy w obozie stoi Stół rozbiórki, a w plecaku są przedmioty. Oba przyciski są teraz w osobnym rzędzie pod tytułem, żeby zmieściły się na wąskim telefonie.
+2. **Zaznaczanie.** Okno pokazuje przedmioty z plecaka jak w Plecaku: dotknięcie zaznacza przedmiot (obwódka i znaczek ✓), drugie dotknięcie odznacza. Przedmioty rzadkości, której stół jeszcze nie bierze, są przyciemnione i nie da się ich zaznaczyć („i możemy”). Założonych przedmiotów w plecaku nie ma, więc nie ma ich też tu. Ulepszone przedmioty i lepsze od założonych można zaznaczyć, ale mają swoje znaczki (+N, strzałka), a pytanie „Rozebrać przedmioty?” podaje, ile wśród zaznaczonych jest ulepszonych.
+3. **Suma zawsze na widoku.** Na dole okna jest, ile przedmiotów zaznaczono, jakie części zrobi z nich stół i w jakim czasie, oraz przycisk „Rozbierz (N)”. Po „Anuluj” w pytaniu okno wraca z tymi samymi zaznaczeniami.
+4. **Kolejka stołu (brakujący szczegół).** Przedmioty, z których powstaje ten sam rodzaj części, idą jednym zleceniem, w kolejce opisanym jako „Przedmioty ×N”. Kilka przedmiotów zajmuje więc tyle miejsc w kolejce, ile jest rodzajów części, a nie po jednym na przedmiot (kolejka mieści 10 zleceń). Części i czas są takie same jak przy rozbieraniu po jednym. Gdy w kolejce brakuje miejsca na wszystkie rodzaje części, okno mówi to przed rozbiórką i nic się nie dzieje.
+5. **Wszystko albo nic.** Gdy któregoś z zaznaczonych przedmiotów nie ma już w plecaku (np. po drugim dotknięciu na innym urządzeniu), nic się nie rozbiera. Zadania narratora i Próby Gildii liczą każdy rozebrany przedmiot. Wzory do Warsztatu odsłaniają się tak jak przy rozbiórce jednego przedmiotu, każdy raz.
+
+## Wersja 0.0.96 (2.11.2026)
+
+1. **Co wchodzi do gry:** „Rozbierz kilka” w Plecaku (zob. wyżej).
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (865 z 865), przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków) i „Rozbierz kilka” w przeglądarce na telefonie 390×844 i 360×640 (zaznaczanie, suma na dole, pytanie, rozbiórka trzech przedmiotów jednym zleceniem).
+
+## Wieże: przegląd i poprawki tekstów (2.11.2026)
+
+Autor: „Rozumiem, że Wieże śmigają bez problemu? Możesz sie im przyjrzeć też.” Przegląd kodu, symulacje i równoczesne wejścia na żywym serwerze: testy Wież przechodzą, nic się nie wywraca, trzy równoczesne wejścia nie dają podwójnych wejść ani skrzyń, wejście w czasie wyprawy jest zablokowane, piętra do 500 działają. Poprawione od razu, bo to błędy, a nie decyzje:
+
+1. **Zdanie porażki po polsku.** „System wyprowadza {target} z Wieży” stawiało imię w mianowniku tam, gdzie polski chce biernika („wyprowadza Jagna”). Teraz imię stoi po dwukropku: „System wyprowadza z Wieży: Jagna.”
+2. **Własne zdania początku walki.** Piętra zaczynały się zdaniami z wypraw („Z zarośli wychodzą…”, „Cały las cichnie…”). Wieże mają swoje (`fightStart`, `eliteStart`, `championStart` w `data/towers.json`): „Na piętrze czekają: …”, „Piętro milknie. Elita Wieży: …”, „Cała Wieża cichnie i czeka. Wychodzi czempion: …”.
+3. **Test połowy wzrostu w pojedynkę (438.3).** Sprawdza, że w Wieży Solo stwory od 50. poziomu mają mniej HP niż przy partnerze (na 100. piętrze ok. 63%, na 140. ok. 59%), a do 50. tyle samo.
+4. **Narzędzie** `tools/difficulty-sim.mjs` nie wywraca się już od 100. poziomu klasy, gdy w grze nie ma drugiej ewolucji (pierwsza forma zostaje).
+
+Do decyzji autora (pytania w porannym raporcie): czempioni na niskich piętrach dają boskie trofea w ok. 90% wejść, czyli ok. 13 dziennie (wyprawy: jeden czempion na 33–66 h); 16 stworów ostatnich regionów każdej krainy nigdy nie pojawia się w Wieżach, bo ich piętra to zawsze elita albo czempion; losowe elity na zwykłych piętrach (10%) nie są zapowiadane; raporty z Wież wypychają raporty wypraw z Dziennika (wspólne 50); skrzynie Bestiariusza bez progu poziomu.
+
+## Kowadło: „jeden materiał”, nie suma materiałów (2.11.2026)
+
+Autor przysłał dwa zrzuty: w Plecaku kilka unikalnych (niebieskich) materiałów, a na karcie przedmiotu unikalnego +5 Kowadło pisze „Brakuje: 1 szt. materiału (unikalny)”. Tak działa ustalona zasada: ulepszenie od +6 bierze kilka sztuk **jednego** materiału o rzadkości przedmiotu (+6 dwie sztuki, +7 trzy i tak dalej), a różne materiały tej samej rzadkości się nie sumują. Dwa różne unikalne materiały po jednej sztuce nie wystarczą na +6. Teksty tego nie mówiły, więc teraz mówią:
+
+1. Podpowiedź pod Kowadłem: „To ulepszenie bierze też 2 szt. jednego materiału tej samej rzadkości co przedmiot. Różne materiały się nie sumują.”
+2. „Brakuje” po „Ulepsz”: „1 szt. jednego materiału (unikalny): to ulepszenie bierze 2 szt. tego samego materiału”.
+3. Komunikat serwera przy próbie bez materiału mówi tak samo („jednego materiału”).
+
+Sama zasada się nie zmienia: tak samo biorą Kuźnia (339 A: „5 sztuk jednego materiału obecnej rzadkości przedmiotu, jak Kowadło”) i Zaklinaczka, a Prośby Gildii proszą o sztuki jednego materiału.
+
+## Wersja 0.0.95 (2.11.2026)
+
+1. **Co wchodzi do gry:** poprawki Wież z przeglądu (zob. wyżej): zdanie porażki, własne zdania początku walki, test połowy wzrostu i narzędzie symulacji. Teksty Kowadła o jednym materiale (zob. wyżej).
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (859 z 859) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (`tools/first-steps.cjs`, po 11 kroków do pierwszej wyprawy).
+
 ## Zadania od narratora: „Odbierz wszystkie” zawsze na widoku (2.11.2026)
 
 Autor: „przez Przelosowanie zadań chowa sie troche klawisz »Odbierz wszystko«”. Na telefonach o niższym ekranie (sprawdzone 360×640 i 412×732) pięć zadań, „Przelosuj zadania” i zdanie o skrzyni nie mieściły się na pergaminie, więc rząd „Odbierz wszystkie” i „Zwiń” na dole strony wypadał poza widok (o 93–205 px) i trzeba było go przewinąć.

@@ -9,11 +9,12 @@ import { characterLook, portraitLayers } from '../cosmetics.js';
 import { MATERIALS_HINT, craft, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { askGuildButton } from '../guild-requests.js';
-import { formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, saleGold, timeFormat } from '../format.js';
+import { countOf, formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, saleGold, timeFormat } from '../format.js';
 import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { playSound } from '../sound.js';
 import { call, costShortfall, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
 import { scrapperSheet } from '../scrapper.js';
+import { itemTip, setTipRenderer } from '../item-tip.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemLink, systemPanel, toast, withButton } from '../ui.js';
 
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
@@ -133,11 +134,21 @@ export function mountCharacter(container) {
         tag: character.guildTag,
         nameColor: character.nameColor,
       }),
-      // What works on the character now, over its figure (the author).
-      bonusList(character),
-      h('div', { class: 'portrait-wrap' }, frame),
-      systemPanel(...characterMessage(character, busy)),
-      bagSection(character.bag),
+      // On a computer the figure and the bag side by side (styles.css); on
+      // a phone these wrappers have no box of their own.
+      h(
+        'div',
+        { class: 'character-columns' },
+        h(
+          'div',
+          { class: 'character-figure' },
+          // What works on the character now, over its figure (the author).
+          bonusList(character),
+          h('div', { class: 'portrait-wrap' }, frame),
+          systemPanel(...characterMessage(character, busy)),
+        ),
+        bagSection(character.bag),
+      ),
     );
   }
 
@@ -167,18 +178,21 @@ export function mountCharacter(container) {
         icon(SLOT_ICONS[slot.id], { size: 24 }),
       );
     }
-    return h(
-      'button',
-      {
-        type: 'button',
-        class: 'slot',
-        'data-guide': `slot-${slot.id}`,
-        vars: { '--rarity': item.color },
-        'aria-label': `${slot.name}: ${itemTitle(item)}, ${item.rarityName}`,
-        onClick: () => itemSheet(item, { equipped: true }),
-      },
-      itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
-      upgradeBadge(item),
+    return itemTip(
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'slot',
+          'data-guide': `slot-${slot.id}`,
+          vars: { '--rarity': item.color },
+          'aria-label': `${slot.name}: ${itemTitle(item)}, ${item.rarityName}`,
+          onClick: () => itemSheet(item, { equipped: true }),
+        },
+        itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
+        upgradeBadge(item),
+      ),
+      item,
     );
   }
 
@@ -218,10 +232,8 @@ export function mountCharacter(container) {
         'div',
         { class: 'bag-head' },
         h('h2', { class: 'section-title', id: 'bag-title' }, 'Plecak ', count),
-        // The scrapper's sale by the handful, without going to the camp (320 A).
-        bag.some((item) => !(item.upgrade > 0)) &&
-          h('button', { type: 'button', class: 'button button--world button--small bag-sell', text: 'Sprzedaj zbędne', onClick: scrapperSheet }),
       ),
+      bagActions(bag),
       h(
         'div',
         { class: 'segmented bag-tabs', role: 'group', 'aria-label': 'Zawartość plecaka' },
@@ -230,6 +242,21 @@ export function mountCharacter(container) {
         tab('parts', partCount > 0 ? `Części (${formatNumber(partCount)})` : 'Części'),
       ),
       (grids[bagTab] ?? grids.items)(),
+    );
+  }
+
+  // Under the bag's title: the scrapper's sale by the handful, without going
+  // to the camp (320 A), and taking several items apart on the Stół
+  // rozbiórki, once it stands.
+  function bagActions(bag) {
+    const sell = bag.some((item) => !(item.upgrade > 0));
+    const salvage = state.character.crafting.pace > 0 && bag.some((item) => item.salvage);
+    if (!sell && !salvage) return null;
+    return h(
+      'div',
+      { class: 'bag-actions' },
+      sell && h('button', { type: 'button', class: 'button button--world button--small', text: 'Sprzedaj zbędne', onClick: scrapperSheet }),
+      salvage && h('button', { type: 'button', class: 'button button--world button--small', text: 'Rozbierz kilka', onClick: () => salvageManySheet() }),
     );
   }
 
@@ -416,20 +443,23 @@ export function mountCharacter(container) {
         h(
           'li',
           {},
-          h(
-            'button',
-            {
-              type: 'button',
-              class: 'slot slot--bag',
-              vars: { '--rarity': item.color },
-              'aria-label': [itemTitle(item), item.rarityName, item.slotName, `poziom ${item.level}`, verdictMark(item.verdict) && VERDICTS[item.verdict].text]
-                .filter(Boolean)
-                .join(', '),
-              onClick: () => itemSheet(item, { equipped: false }),
-            },
-            itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
-            verdictMark(item.verdict, { tile: true }),
-            upgradeBadge(item),
+          itemTip(
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'slot slot--bag',
+                vars: { '--rarity': item.color },
+                'aria-label': [itemTitle(item), item.rarityName, item.slotName, `poziom ${item.level}`, verdictMark(item.verdict) && VERDICTS[item.verdict].text]
+                  .filter(Boolean)
+                  .join(', '),
+                onClick: () => itemSheet(item, { equipped: false }),
+              },
+              itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
+              verdictMark(item.verdict, { tile: true }),
+              upgradeBadge(item),
+            ),
+            item,
           ),
         ),
       ),
@@ -731,6 +761,116 @@ function salvageSection(item, busy) {
   );
 }
 
+// "Rozbierz kilka" (the author: "zaznaczać które chcemy (i możemy)
+// przedmioty i dać do rozbiórki"): the bag's items in a grid, a tap marks
+// one, and one call takes the marked ones apart. Items of a rarity the Stół
+// rozbiórki does not take yet stay dim. Each kind of part takes one place in
+// the table's queue; the parts and the time are as one by one. Back from
+// the question "Rozebrać?", the marks are still there.
+function salvageManySheet(marked = new Set()) {
+  const { crafting } = state.character;
+  const bag = state.character.bag.filter((item) => item.salvage);
+  const takes = (item) => item.salvage.minutes !== null;
+  const room = Math.max(0, crafting.limit - crafting.queue.length);
+  const chosen = () => bag.filter((item) => marked.has(item.id));
+  // The parts the items make, by kind: [name, { color, count }].
+  const partsOf = (items) => {
+    const parts = new Map();
+    for (const { salvage } of items) parts.set(salvage.part, { color: salvage.color, count: (parts.get(salvage.part)?.count ?? 0) + salvage.parts });
+    return [...parts];
+  };
+  const minutesOf = (items) => items.reduce((sum, item) => sum + item.salvage.minutes, 0);
+  const summary = h('p', { class: 'sheet-text', role: 'status' });
+  const roomNote = h('p', { class: 'region-warning', hidden: true });
+  const takeApart = h('button', { type: 'button', class: 'button button--world', onClick: (event) => go(event.currentTarget) });
+  const update = () => {
+    const items = chosen();
+    const parts = partsOf(items);
+    fill(
+      summary,
+      items.length === 0
+        ? 'Nic jeszcze nie zaznaczono.'
+        : [
+            `Zaznaczone: ${formatNumber(items.length)}. Stół zrobi z nich: `,
+            parts.map(([part, { color, count }], index) => [
+              index > 0 && ', ',
+              h('span', { class: 'item-name', vars: { '--rarity': color }, text: `${part} ×${formatNumber(count)}` }),
+            ]),
+            `, w ${formatMinutes(minutesOf(items))}.`,
+          ],
+    );
+    const tooMany = parts.length > room;
+    roomNote.hidden = !tooMany;
+    roomNote.textContent =
+      room === 0
+        ? 'Kolejka stołu jest pełna. Poczekaj, aż skończy się pierwsze zlecenie.'
+        : `Każda rzadkość części to osobne zlecenie stołu. Zaznaczone potrzebują ich: ${parts.length}, a wolne miejsca w kolejce: ${room}.`;
+    takeApart.textContent = items.length > 0 ? `Rozbierz (${formatNumber(items.length)})` : 'Rozbierz';
+    takeApart.disabled = items.length === 0 || tooMany;
+  };
+  const tile = (item) => {
+    const button = h(
+      'button',
+      {
+        type: 'button',
+        class: 'slot slot--bag salvage-pick',
+        vars: { '--rarity': item.color },
+        disabled: !takes(item),
+        'aria-pressed': String(marked.has(item.id)),
+        'aria-label': [itemTitle(item), item.rarityName, item.slotName, `poziom ${item.level}`, `daje: ${item.salvage.part} ×${item.salvage.parts}`].join(', '),
+        onClick: () => {
+          if (marked.has(item.id)) marked.delete(item.id);
+          else marked.add(item.id);
+          button.setAttribute('aria-pressed', String(marked.has(item.id)));
+          update();
+        },
+      },
+      itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
+      verdictMark(item.verdict, { tile: true }),
+      upgradeBadge(item),
+      h('span', { class: 'salvage-check', 'aria-hidden': 'true' }, icon('check', { size: 14 })),
+    );
+    return h('li', {}, button);
+  };
+  const go = async (button) => {
+    const items = chosen();
+    const upgraded = items.filter((item) => item.upgrade > 0).length;
+    const patterns = [...new Set(items.map((item) => item.salvage.pattern).filter(Boolean))];
+    const sure = await confirmAction({
+      title: 'Rozebrać przedmioty?',
+      text: `${countOf(items.length, 'przedmiot', 'przedmioty', 'przedmiotów')} ${plural(items.length, 'zniknie', 'znikną', 'zniknie')} z plecaka, a stół zrobi z nich: ${partsOf(items)
+        .map(([part, { count }]) => `${part} ×${formatNumber(count)}`)
+        .join(', ')}, w ${formatMinutes(minutesOf(items))}.${upgraded > 0 ? ` Ulepszone wśród nich: ${formatNumber(upgraded)}.` : ''}${
+        patterns.length > 0 ? ` System odsłoni Ci wzory w Warsztacie: ${patterns.join(', ')}.` : ''
+      }`,
+      confirmLabel: 'Rozbierz',
+    });
+    if (!sure) {
+      salvageManySheet(marked);
+      return;
+    }
+    await withButton(button, async () => {
+      const { salvaged } = await call('POST', '/api/items/salvage', { ids: items.map((item) => item.id) });
+      playSound('build');
+      const ready = Math.max(...salvaged.orders.map((order) => order.endsAt));
+      toast(
+        `Na stole: ${countOf(salvaged.count, 'przedmiot', 'przedmioty', 'przedmiotów')}. ${salvaged.orders
+          .map((order) => `${order.part} ×${formatNumber(order.parts)}`)
+          .join(', ')} będą gotowe o ${timeFormat.format(new Date(ready))}.${salvaged.patterns.length > 0 ? ` Nowe wzory w Warsztacie: ${salvaged.patterns.join(', ')}.` : ''}`,
+      );
+    });
+  };
+  const dim = bag.some((item) => !takes(item));
+  openSheet(
+    h('h2', { class: 'sheet-title', text: 'Rozbierz kilka' }),
+    h('p', { class: 'sheet-text', text: 'Dotknij przedmiotów, które Stół rozbiórki ma rozebrać. Drugie dotknięcie odznacza.' }),
+    h('ul', { class: 'bag-grid salvage-grid' }, bag.map(tile)),
+    dim && h('p', { class: 'muted', text: 'Przyciemnionych stół jeszcze nie bierze: ich rzadkość wymaga wyższego poziomu Stołu rozbiórki.' }),
+    h('div', { class: 'salvage-bar' }, summary, roomNote, takeApart),
+  );
+  update();
+}
+
 // The card of a character's item after an upgrade: open again with the
 // Kowadło unfolded, or closed when the item broke.
 function reopenOwned(done) {
@@ -855,7 +995,7 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
       materialLine,
     ),
     picker,
-    need && !chosen && h('p', { class: 'system-hint', text: `To ulepszenie bierze też ${formatNumber(need.count)} szt. materiału tej samej rzadkości co przedmiot.` }),
+    need && !chosen && h('p', { class: 'system-hint', text: `To ulepszenie bierze też ${formatNumber(need.count)} szt. jednego materiału tej samej rzadkości co przedmiot. Różne materiały się nie sumują.` }),
     // One material of the item's rarity, from the guild (346 A).
     need && !chosen && askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }),
     h('p', { class: 'muted', text: risk }),
@@ -896,7 +1036,7 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
   // czego brakuje jeśli nie da się ulepszyć").
   const nearest = need && !chosen ? ((state.character.crafting?.materials ?? []).filter((material) => material.rarity === need.rarity).sort((a, b) => b.count - a.count)[0] ?? null) : null;
   const rarityName = need ? (state.content.rarities.find((rarity) => rarity.id === need.rarity)?.name ?? need.rarity) : '';
-  const lacking = [...costShortfall(next.cost), need && !chosen && `${formatNumber(need.count - (nearest?.count ?? 0))} szt. materiału (${rarityName})`].filter(Boolean);
+  const lacking = [...costShortfall(next.cost), need && !chosen && `${formatNumber(need.count - (nearest?.count ?? 0))} szt. jednego materiału (${rarityName}): to ulepszenie bierze ${formatNumber(need.count)} szt. tego samego materiału`].filter(Boolean);
   const note = h('p', { class: 'region-warning', role: 'status', hidden: true });
   // The material the try lacks, from the guild (346 A), under what is
   // missing once "Ulepsz" says it.
@@ -1006,6 +1146,17 @@ export function itemDetails(item, { small = false } = {}) {
     ),
   );
 }
+
+// The small card of an item under the mouse on a computer (item-tip.js,
+// 477 A): its name, kind and properties, and what wearing it changes.
+setTipRenderer((item) =>
+  h(
+    'div',
+    {},
+    itemDetails(item, { small: true }),
+    VERDICTS[item.verdict] && h('p', { class: `item-tip-verdict item-tip-verdict--${item.verdict}`, text: VERDICTS[item.verdict].line }),
+  ),
+);
 
 // The System's words over the bag, with the way to where they point.
 function characterMessage(character, busy) {

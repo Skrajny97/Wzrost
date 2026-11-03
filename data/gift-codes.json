@@ -6,6 +6,12 @@
       "code": "JESTEMTESTEREM",
       "until": "2026-11-13T00:00:00+01:00",
       "rewards": { "systemPoints": 100, "timePoints": 100, "gold": 1000, "resources": { "wood": 100, "stone": 100, "iron-ore": 100 } }
+    },
+    {
+      "id": "tiger-2026-11",
+      "code": "TIGER",
+      "until": "2026-11-10T00:00:00+01:00",
+      "rewards": { "systemPoints": 500 }
     }
   ],
   "texts": {

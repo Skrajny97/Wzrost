@@ -9825,6 +9825,46 @@ a.profession-square:active {
   margin-top: 0;
 }
 
+/* The filters over the players' offers and over the goods to put up: a chip
+   for each category with goods, with how many, in as many lines as needed. */
+.market-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.market-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.market-filter[aria-pressed='true'] {
+  border-color: var(--system-line);
+  background: rgba(143, 227, 239, 0.12);
+  color: var(--system-text);
+}
+
+.market-filter-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+/* The list under them stands in the column as it did without them. */
+.market-filtered {
+  display: contents;
+}
+
 .market-list,
 .market-picks {
   display: grid;
@@ -10028,9 +10068,64 @@ a.profession-square:active {
   gap: 10px;
 }
 
-.bag-sell {
-  flex: none;
+/* Under the bag's title: "Sprzedaj zbędne" and "Rozbierz kilka". */
+.bag-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bag-actions .button {
+  flex: 1 1 0;
   width: auto;
+  min-width: max-content;
+}
+
+/* "Rozbierz kilka" (character.js): the bag's items to mark, a tick on the
+   marked ones, and the sum with "Rozbierz" kept in sight at the bottom. */
+.salvage-grid {
+  padding: 6px 0 0 6px;
+}
+
+.salvage-pick[aria-pressed='true'] {
+  box-shadow: 0 0 0 2px var(--system);
+}
+
+.salvage-pick:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.salvage-check {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--system);
+  color: var(--bg-deep);
+}
+
+.salvage-pick[aria-pressed='true'] .salvage-check {
+  display: flex;
+}
+
+.salvage-bar {
+  position: sticky;
+  /* Down over the sheet's own bottom padding, which a stuck bar keeps
+     clear of. */
+  bottom: calc(-20px - env(safe-area-inset-bottom));
+  z-index: 1;
+  display: grid;
+  gap: 10px;
+  margin: 0 calc(-1 * var(--gutter)) calc(-20px - env(safe-area-inset-bottom));
+  padding: 12px var(--gutter) calc(20px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--bark-line);
+  background: var(--surface);
 }
 
 /* The Zaklinaczka's hints on the affixes (settlement.js). */
@@ -11315,4 +11410,436 @@ a.profession-square:active {
 
 .calm .portrait-frame--pulse .portrait-frame-art {
   filter: drop-shadow(0 0 1.5cqw rgba(143, 227, 239, 0.7));
+}
+
+/* The menu's wrapper has no box of its own on a phone, where the two bars
+   stay at the bottom; the computer's menu down the left (below). */
+.menu {
+  display: contents;
+}
+
+.menu-brand {
+  display: none;
+}
+
+/* The computer's own layout (layout-mode.js; the author: "musi być
+   kompletnie osobne"): the menu down the left with the character's tabs
+   under its Postać, the top bar in one line, the game in the middle, the
+   narrator's quests and the chat on the right (474 A), and windows in the
+   middle of the screen (475 A). Nothing here touches the phone's layout. */
+:root[data-layout='desktop'] {
+  --nav-height: 0px;
+  --menu-width: 236px;
+  --side-width: 360px;
+}
+
+/* Delicate light on the computer (the author: "brakuje czasem teł jakichś
+   delikatnych albo gradientów"): over the game's column a faint glow of the
+   System from above and a warm one from below, the page's edges a little
+   darker; the menu and the side column darken downwards from a lit top. The
+   light stays put while the page scrolls. */
+:root[data-layout='desktop'] body {
+  --game-middle: calc(var(--menu-width) + (100% - var(--menu-width) - var(--side-width)) / 2);
+  background-image:
+    radial-gradient(ellipse 46% 55% at var(--game-middle) 0%, rgba(143, 227, 239, 0.09), transparent 72%),
+    radial-gradient(ellipse 52% 45% at var(--game-middle) 100%, rgba(201, 161, 74, 0.075), transparent 72%),
+    radial-gradient(ellipse 75% 85% at var(--game-middle) 45%, transparent 50%, rgba(0, 0, 0, 0.38) 100%),
+    repeating-linear-gradient(125deg, transparent 0 6px, rgba(37, 48, 31, 0.45) 6px 7px);
+  background-attachment: fixed;
+}
+
+:root[data-layout='desktop'] #view-game:not([hidden]) {
+  display: grid;
+  grid-template-columns: var(--menu-width) minmax(0, 1fr) var(--side-width);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas:
+    'menu top top'
+    'menu main side';
+  min-height: 100vh;
+}
+
+:root[data-layout='desktop'] .topbar {
+  grid-area: top;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(280px, 380px);
+  align-items: center;
+  gap: 28px;
+  padding: 10px 28px;
+  border-bottom-color: transparent;
+  background:
+    linear-gradient(90deg, rgba(201, 161, 74, 0.05), transparent 35%, transparent 65%, rgba(143, 227, 239, 0.05)),
+    linear-gradient(180deg, #131a10, var(--bg-deep));
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
+}
+
+:root[data-layout='desktop'] .topbar::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line), rgba(143, 227, 239, 0.32) 50%, var(--line));
+  pointer-events: none;
+}
+
+:root[data-layout='desktop'] .topbar-row {
+  gap: 18px;
+}
+
+:root[data-layout='desktop'] .meters {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 18px;
+}
+
+:root[data-layout='desktop'] .menu {
+  grid-area: menu;
+  position: sticky;
+  top: 0;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100vh;
+  padding: 20px 14px;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+  background:
+    radial-gradient(120% 30% at 0% 0%, rgba(201, 161, 74, 0.1), transparent 70%),
+    radial-gradient(100% 35% at 50% 100%, rgba(143, 227, 239, 0.045), transparent 70%),
+    linear-gradient(180deg, #161d12 0%, var(--bg-deep) 45%, #0a0d08 100%);
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-layout='desktop'] .menu-brand {
+  display: block;
+  order: 0;
+  margin: 0 0 18px 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, rgba(201, 161, 74, 0.45), transparent 85%) 1;
+  text-shadow: 0 0 18px rgba(201, 161, 74, 0.25);
+  color: var(--accent);
+  font-family: var(--font-world);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* The main tabs as the menu's own rows, Postać first with the character's
+   tabs right under it. */
+:root[data-layout='desktop'] #nav-main {
+  display: contents;
+}
+
+:root[data-layout='desktop'] #nav-main > .nav-item {
+  order: 3;
+}
+
+:root[data-layout='desktop'] #nav-main > .nav-item[href='#/postac'] {
+  order: 1;
+}
+
+:root[data-layout='desktop'] #nav-character:not([hidden]) {
+  order: 2;
+  position: static;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  height: auto;
+  margin: 2px 0 8px 22px;
+  padding: 0 0 0 10px;
+  border: 0;
+  border-left: 1px solid var(--bark-line);
+  background: none;
+}
+
+/* "Powrót" is not needed with the whole menu in sight. */
+:root[data-layout='desktop'] #nav-character button.nav-item {
+  display: none;
+}
+
+:root[data-layout='desktop'] .menu .nav-item {
+  flex: none;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 14px;
+  height: 50px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font-size: 18px;
+}
+
+:root[data-layout='desktop'] #nav-character .nav-item {
+  height: 40px;
+  font-size: 16px;
+}
+
+:root[data-layout='desktop'] .menu .nav-hint {
+  margin-left: auto;
+}
+
+:root[data-layout='desktop'] .nav--main .nav-item[aria-current='page'] {
+  box-shadow: inset 3px 0 0 var(--system);
+}
+
+:root[data-layout='desktop'] .nav--character .nav-item[aria-current='page'] {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+:root[data-layout='desktop'] .menu .nav-item:hover {
+  background: rgba(143, 227, 239, 0.06);
+  color: var(--text);
+}
+
+/* The game: for now each screen as on a phone, in a wider column; the
+   screens get their own columns one by one. */
+:root[data-layout='desktop'] .screen--game {
+  grid-area: main;
+  max-width: 760px;
+  padding: 24px 32px 48px;
+  background: radial-gradient(50% 70% at 50% 0%, rgba(36, 48, 30, 0.55), rgba(36, 48, 30, 0.2) 60%, transparent);
+}
+
+/* The side column, under the top bar while the page scrolls. */
+:root[data-layout='desktop'] .side:not([hidden]) {
+  grid-area: side;
+  position: sticky;
+  top: var(--topbar-height, 72px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: calc(100vh - var(--topbar-height, 72px));
+  padding: 16px;
+  overflow: hidden;
+  border-left: 1px solid var(--line);
+  background:
+    radial-gradient(110% 28% at 100% 0%, rgba(143, 227, 239, 0.06), transparent 70%),
+    radial-gradient(100% 30% at 50% 100%, rgba(201, 161, 74, 0.05), transparent 70%),
+    linear-gradient(180deg, #141a10 0%, var(--bg-deep) 50%, #0a0d08 100%);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+}
+
+.side .side-quests {
+  flex: 0 1 auto;
+  max-height: 55%;
+  overflow-y: auto;
+  border-radius: 4px;
+  color: #33281c;
+}
+
+.side .quests-page {
+  max-height: none;
+  overflow: visible;
+}
+
+.side-chat {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.side-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.side-chat-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.side .chat-room {
+  min-height: 100%;
+}
+
+.side .chat-footer:has(.chat-form) {
+  bottom: 0;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.side-note {
+  margin: 0;
+}
+
+/* The line to write in gives way in the narrow column, "Wyślij" stays. */
+.side .chat-form {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.side .chat-form input {
+  width: 0;
+}
+
+/* Windows in the middle of the screen (475 A). */
+:root[data-layout='desktop'] .sheet {
+  inset: 0;
+  width: min(560px, calc(100vw - 64px));
+  max-width: 560px;
+  height: fit-content;
+  max-height: 88vh;
+  margin: auto;
+  border: 1px solid var(--bark-line);
+  border-radius: 8px;
+}
+
+/* The stats' bar of points to confirm, over the game only. */
+:root[data-layout='desktop'] .pending-bar {
+  right: var(--side-width);
+  left: var(--menu-width);
+}
+
+/* Three choices side by side ("Układ ekranu"). */
+.segmented--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* A laptop's narrower screen: the top bar in two lines, the four meters
+   across the whole second one. */
+@media (max-width: 1499px) {
+  :root[data-layout='desktop'] .topbar {
+    grid-template-columns: auto minmax(0, 1fr);
+    row-gap: 8px;
+  }
+
+  :root[data-layout='desktop'] .topbar .meters {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+
+  :root[data-layout='desktop'] .activity-row {
+    justify-self: end;
+    width: min(100%, 420px);
+  }
+
+  :root[data-layout='desktop'] {
+    --side-width: 320px;
+  }
+
+  :root[data-layout='desktop'] .screen--game {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+
+  :root[data-layout='desktop'] .character-columns {
+    grid-template-columns: 360px minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+
+/* Narrower still, the side column gives way to the game: the quests unroll
+   from the narrator's face and the chat is in the Społeczność, as on a
+   phone (side.js). */
+@media (max-width: 1279px) {
+  :root[data-layout='desktop'] #view-game:not([hidden]) {
+    grid-template-columns: var(--menu-width) minmax(0, 1fr);
+    grid-template-areas:
+      'menu top'
+      'menu main';
+  }
+
+  :root[data-layout='desktop'] .side {
+    display: none !important;
+  }
+
+  :root[data-layout='desktop'] {
+    --side-width: 0px;
+  }
+
+  :root[data-layout='desktop'] .pending-bar {
+    right: 0;
+  }
+}
+
+/* Postać: the figure in its frame and the bag, one under the other on a
+   phone (the wrappers have no box), side by side on a computer. */
+.character-columns,
+.character-figure {
+  display: contents;
+}
+
+:root[data-layout='desktop'] .screen--game:has(.character-columns) {
+  max-width: 1120px;
+}
+
+:root[data-layout='desktop'] .character-columns {
+  display: grid;
+  grid-template-columns: 420px minmax(0, 1fr);
+  align-items: start;
+  gap: 32px;
+}
+
+:root[data-layout='desktop'] .character-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+:root[data-layout='desktop'] .character-columns > .bag {
+  min-width: 0;
+}
+
+/* The item under the mouse on a computer (item-tip.js, 477 A). */
+.item-tip {
+  position: fixed;
+  z-index: 60;
+  max-width: 300px;
+  padding: 10px 12px;
+  border: 1px solid var(--bark-line);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.97);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.item-tip .item-title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.item-tip .item-properties {
+  margin: 6px 0 0;
+}
+
+.item-tip-verdict {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.item-tip-verdict--better {
+  color: var(--leaf);
+}
+
+.item-tip-verdict--worse {
+  color: var(--danger);
+}
+
+/* Walka on a computer: the lands two by two in a wider column (476 A). */
+:root[data-layout='desktop'] .screen--game:has(.stack > .region-card) {
+  max-width: 1120px;
+}
+
+:root[data-layout='desktop'] .stack:has(> .region-card) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+:root[data-layout='desktop'] .stack:has(> .region-card) > :not(.region-card) {
+  grid-column: 1 / -1;
+}
+
+/* Obóz and Osada on a computer: bigger boards (476 A); their places stand
+   in percents of the board, so they grow with it. */
+:root[data-layout='desktop'] .camp-board,
+:root[data-layout='desktop'] .settlement-map {
+  max-width: 720px;
 }

@@ -35,7 +35,7 @@ async function account(page) {
     { login },
   );
   if (signed !== 200) throw new Error(`Logowanie zwróciło ${signed}.`);
-  const character = await page.evaluate(async () => (await fetch('/api/character', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: `Start${Math.floor(Math.random() * 9000 + 1000)}`, classId: 'warrior', appearance: 'female' }) })).status);
+  const character = await page.evaluate(async () => (await fetch('/api/character', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: `Start${String(Date.now()).slice(-9)}`, classId: 'warrior', appearance: 'female' }) })).status);
   if (character !== 201) throw new Error(`Tworzenie postaci zwróciło ${character}.`);
 }
 

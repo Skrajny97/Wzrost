@@ -62,15 +62,20 @@ export function explorationPace(minutes, content) {
   const tuning = content.balance.hunt;
   const fights = tuning.fightsByMinutes.filter(([from]) => from <= minutes).at(-1)?.[1] ?? 1;
   const timeFactor = minutes / fights / tuning.minutesPerFightReference;
+  // A longer exploration pays off more (the author: "powinny mimo wszystko
+  // długie w pewnym stopniu"): from half an hour on, the elite and the
+  // champion come more often in an hour (the author: "szansa na spotkanie
+  // elity ... powinna w dłuższej"), and so do the finds.
+  const rare = byMinutes(tuning.rareLengthFactorByMinutes, minutes);
   return {
     fights,
     timeFactor,
     toughChance: byMinutes(tuning.toughChanceByMinutes, minutes),
-    // The elite and the champion keep their rate per hour, so each fight of a
-    // long exploration meets them more often.
-    eliteChance: Math.min(1, tuning.eliteChancePerFight * timeFactor),
-    championChance: Math.min(1, tuning.championChancePerFight * timeFactor),
-    finds: minutes / tuning.findIntervalMinutes,
+    // The elite and the champion come by the hour, so each fight of a long
+    // exploration meets them more often, and more often still for its length.
+    eliteChance: Math.min(1, tuning.eliteChancePerFight * timeFactor * rare),
+    championChance: Math.min(1, tuning.championChancePerFight * timeFactor * rare),
+    finds: (minutes / tuning.findIntervalMinutes) * byMinutes(tuning.findLengthFactorByMinutes, minutes),
     // The author (166): "nie może być więcej walk w krótkiej wyprawie niż w
     // długiej", with a light bonus for the length.
     lengthBonus: byMinutes(tuning.lengthBonusByMinutes, minutes),
@@ -457,7 +462,10 @@ export function simulateHunt(
   const filled = new Set(equipped.map((item) => item.slot));
   const otherClass = content.balance.items.otherClass;
   const otherClassShare = character.level >= otherClass.fromLevel ? otherClass.share : 0;
-  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare };
+  // A longer exploration finds unique and rarer items a little more often
+  // (482 B, at most +10% at four hours).
+  const uniqueBonus = byMinutes(tuning.uniqueLengthFactorByMinutes, minutes);
+  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare, uniqueBonus };
   const hpStart = me.hp;
   let result = 'success';
   let endedAt = durationMs; // a faint or an escape ends the exploration early

@@ -14,6 +14,7 @@ import { SYSTEM_POINTS_ICON } from './icons.js';
 import { anyClaimable, showQuests } from './quests.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
 import { meter } from './ui.js';
+import { desktopLayout } from './layout-mode.js';
 
 // A profession's work, by the kind of its activity: its screen and its name
 // in the top bar.
@@ -367,13 +368,16 @@ export function updateNav({ kind, active, onBack }) {
   else shop?.removeAttribute('aria-current');
   const main = $('#nav-main');
   const character = $('#nav-character');
-  main.hidden = kind !== 'main';
+  // On a computer the main menu stays down the left, with the character's
+  // own tabs under its Postać while they are open (474 A).
+  const desktop = desktopLayout();
+  main.hidden = kind !== 'main' && !desktop;
   character.hidden = kind !== 'character';
   // A tab whose part the deployment has off (no unlock in the content, as
   // the Ewolucja in the live game) is not there.
   const characterTabs = CHARACTER_TABS.filter((tab) => !tab.unlock || unlockInfo(tab.unlock));
-  if (kind === 'main') fill(main, ...MAIN_TABS.map((tab) => navButton(tab, active)));
-  else fill(character, ...characterTabs.map((tab) => navButton(tab, active, onBack)));
+  if (kind === 'main' || desktop) fill(main, ...MAIN_TABS.map((tab) => navButton(tab, kind === 'main' ? active : 'postac')));
+  if (kind === 'character') fill(character, ...characterTabs.map((tab) => navButton(tab, active, onBack)));
   updateNavTimers();
 }
 

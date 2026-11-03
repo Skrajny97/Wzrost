@@ -33,10 +33,20 @@ import { createRng } from './rng.js';
 import { say } from './text.js';
 
 // The chance an exploration of `minutes` that ended as planned brings an
-// event: the full `chance` from fullChanceMinutes on, a share of it below,
-// so a short exploration brings events no more often per hour than a long
-// one (the author's 338 A: very short explorations farmed them).
-export const eventChance = (content, minutes = content.events.fullChanceMinutes) => content.events.chance * Math.min(1, minutes / content.events.fullChanceMinutes);
+// event: `chance` at fullChanceMinutes and a share of it below, so a very
+// short exploration brings no more events an hour than one of
+// fullChanceMinutes (the author's 338 A: very short explorations farmed
+// them); above, more and more the longer it is, up to longChance at
+// longChanceMinutes (478: "dłuższa wyprawa ma mieć większą szansę max
+// 20%"), the same step at each doubling of the time: 10% at half an hour,
+// 13.3% at an hour, 16.7% at two, 20% at four. An hour of a long
+// exploration still brings fewer events than an hour of short ones.
+export function eventChance(content, minutes = content.events.fullChanceMinutes) {
+  const { chance, fullChanceMinutes, longChance, longChanceMinutes } = content.events;
+  if (minutes <= fullChanceMinutes) return chance * (minutes / fullChanceMinutes);
+  const step = Math.min(1, Math.log(minutes / fullChanceMinutes) / Math.log(longChanceMinutes / fullChanceMinutes));
+  return chance + (longChance - chance) * step;
+}
 
 // The events that can come after an exploration of an inner region: those
 // that name it among their `areas`, or any region when they name none (the

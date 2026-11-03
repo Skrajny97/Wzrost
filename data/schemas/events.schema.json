@@ -3,7 +3,7 @@
   "title": "Zdarzenia na końcu wyprawy",
   "type": "object",
   "additionalProperties": false,
-  "required": ["chance", "fullChanceMinutes", "texts", "list", "foes"],
+  "required": ["chance", "fullChanceMinutes", "longChance", "longChanceMinutes", "texts", "list", "foes"],
   "definitions": {
     "outcome": {
       "type": "object",
@@ -129,7 +129,9 @@
   "properties": {
     "$comment": { "type": "string" },
     "chance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa na zdarzenie po wyprawie zakończonej zgodnie z planem." },
-    "fullChanceMinutes": { "type": "integer", "minimum": 1, "description": "Od tylu minut wyprawy szansa na zdarzenie jest pełna; krótsza wyprawa ma ją proporcjonalnie mniejszą (338 A)." },
+    "fullChanceMinutes": { "type": "integer", "minimum": 1, "description": "Przy tylu minutach wyprawy szansa na zdarzenie to chance; krótsza wyprawa ma ją proporcjonalnie mniejszą (338 A)." },
+    "longChance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Największa szansa na zdarzenie, przy wyprawie od longChanceMinutes minut (478: najwyżej 20%)." },
+    "longChanceMinutes": { "type": "integer", "minimum": 1, "description": "Od tylu minut szansa to longChance; pomiędzy fullChanceMinutes a tym czasem rośnie tak samo przy każdym podwojeniu czasu." },
     "texts": {
       "type": "object",
       "additionalProperties": false,

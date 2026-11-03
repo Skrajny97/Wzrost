@@ -1,14 +1,16 @@
 // The Targowisko in the Osada (src/server/market.js, questions 237–242): the
 // players' offers as auctions, the character's own offers with "Wystaw" and
 // what waits to be collected, and the residents' offers: the merchant's
-// goods of the day and the wandering trader on his day of the week.
+// goods of the day and the wandering trader on his day of the week. The
+// players' offers and the goods to put up have filters by category.
 //
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, so a redraw never asks the server again.
 
 import { herbSprite, potionSprite } from '../art.js';
+import { ALL, categoriesOf, goodsCategory, inCategory, shownCategory } from '../categories.js';
 import { materialIcon } from '../craft-table.js';
-import { h, icon } from '../dom.js';
+import { fill, h, icon } from '../dom.js';
 import { countOf, formatDecimal, formatNumber, tradePace } from '../format.js';
 import { call, serverNow, state } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, systemPanel, toast, withButton } from '../ui.js';
@@ -20,6 +22,8 @@ const TABS = [
   ['residents', 'Mieszkańcy'],
 ];
 const KIND_NAMES = { herb: 'zioło', potion: 'mikstura', material: 'materiał', part: 'część' };
+// The same kinds as the filters name them, in their order.
+const KIND_GROUPS = { herb: 'Zioła', potion: 'Mikstury', material: 'Materiały', part: 'Części' };
 const REASONS = { won: 'wygrana licytacja', bought: 'kupione', returned: 'wraca do Ciebie', sold: 'zapłata za sprzedaż' };
 const rarityOf = (id) => state.content?.rarities?.find((rarity) => rarity.id === id);
 
@@ -145,6 +149,52 @@ function itemEntry(item, key, opened) {
   ];
 }
 
+// The categories of goods in their order: the items by their slot, named as
+// in the data (data/slots.json), then the stacks by their kind.
+const goodsCategories = () => [
+  ...state.content.slots.map(({ id, name }) => ({ id, name })),
+  ...Object.entries(KIND_GROUPS).map(([id, name]) => ({ id, name })),
+];
+
+// Chips over a long list of goods that show one category of them at a time
+// (the author: "filtracja potrzebna w targowisku zeby szukac itemy po
+// kategoriach, bo jak jest duzo w plecaku to lista przytłaczająca"):
+// "Wszystko" first, then each category with something in the list, with how
+// many; no chips while there is only one. `filter.id` keeps the choice
+// through the panel's redraws and the sheet opened again, and gives way to
+// "Wszystko" once its category is empty. `draw` makes the list of the goods
+// shown, drawn anew in place under the chips.
+function filtered(entries, categoryOf, filter, draw) {
+  const categories = categoriesOf(entries, categoryOf, goodsCategories());
+  filter.id = shownCategory(filter.id, categories);
+  const list = h('div', { class: 'market-filtered' }, draw(inCategory(entries, categoryOf, filter.id)));
+  if (categories.length < 2) return list;
+  const options = [{ id: ALL, name: 'Wszystko', count: entries.length }, ...categories];
+  const chips = options.map(({ id, name, count }) =>
+    h(
+      'button',
+      {
+        type: 'button',
+        class: 'market-filter',
+        'aria-pressed': String(id === filter.id),
+        onClick: (event) => {
+          if (id === filter.id) return;
+          filter.id = id;
+          chips.forEach((chip, index) => chip.setAttribute('aria-pressed', String(options[index].id === id)));
+          // A sheet keeps its height for a shorter list, so that the chips
+          // stay where the finger is.
+          const body = event.currentTarget.closest('.sheet-body');
+          if (body) body.style.minHeight = `${body.parentElement.clientHeight}px`;
+          fill(list, draw(inCategory(entries, categoryOf, id)));
+        },
+      },
+      name,
+      ' ',
+      h('span', { class: 'market-filter-count', text: formatNumber(count) }),
+    ),
+  );
+  return [h('div', { class: 'market-filters', role: 'group', 'aria-label': 'Kategoria towaru' }, chips), list];
+}
 
 // A whole number typed into a sheet, from `least` to `most`; an optional
 // one may stay empty.
@@ -170,6 +220,9 @@ export function mountMarket(holder) {
   let timer = null;
   let gone = false;
   const opened = new Set();
+  // The category chosen over the players' offers and over the goods to put
+  // up, for this visit to the Targowisko.
+  const filters = { offers: { id: ALL }, sellable: { id: ALL } };
   // The times left on the screen, moved on each half minute in place.
   let clocks = [];
   const clock = (at) => {
@@ -301,12 +354,22 @@ export function mountMarket(holder) {
   function listSheet() {
     const { items, stacks } = market.sellable;
     const choose = (goods) => h('button', { type: 'button', class: 'button button--world button--small', text: 'Wybierz', onClick: () => priceSheet(goods) });
+    // The bag's items as goods, so that the filters sort them with the stacks.
+    const goods = [...items.map((item) => ({ kind: 'item', item })), ...stacks];
+    const picks = (shown) => {
+      const bag = shown.filter((one) => one.kind === 'item');
+      const others = shown.filter((one) => one.kind !== 'item');
+      return [
+        bag.length > 0 && h('ul', { class: 'market-picks' }, bag.map(({ item }) => h('li', { class: 'market-pick' }, itemSummary(item), choose({ kind: 'item', itemId: item.id, name: item.name, count: 1 })))),
+        others.length > 0 && h('ul', { class: 'market-picks' }, others.map((stack) => h('li', { class: 'market-pick' }, stackLine(stack), choose(stack)))),
+      ];
+    };
     openSheet(
       h('h2', { class: 'sheet-title', text: 'Wystaw na Targowisku' }),
       h('p', { class: 'sheet-text', text: `Oferta trwa ${market.hours} godziny. Przy sprzedaży Targowisko bierze ${Math.round(market.fee * 100)}% ceny.` }),
-      items.length + stacks.length === 0 && h('p', { class: 'muted', text: 'W plecaku nie ma nic do wystawienia. Założonych przedmiotów się nie wystawia.' }),
-      items.length > 0 && h('ul', { class: 'market-picks' }, items.map((item) => h('li', { class: 'market-pick' }, itemSummary(item), choose({ kind: 'item', itemId: item.id, name: item.name, count: 1 })))),
-      stacks.length > 0 && h('ul', { class: 'market-picks' }, stacks.map((stack) => h('li', { class: 'market-pick' }, stackLine(stack), choose(stack)))),
+      goods.length === 0
+        ? h('p', { class: 'muted', text: 'W plecaku nie ma nic do wystawienia. Założonych przedmiotów się nie wystawia.' })
+        : filtered(goods, goodsCategory, filters.sellable, picks),
     );
   }
 
@@ -505,6 +568,8 @@ export function mountMarket(holder) {
       load();
       return;
     }
+    // The offers drawn anew under a filter left their old clocks behind.
+    clocks = clocks.filter(({ element }) => element.isConnected);
     for (const { element, at } of clocks) element.textContent = left(at);
     timer = setTimeout(tick, 30000);
   }
@@ -525,7 +590,7 @@ export function mountMarket(holder) {
       tab === 'offers'
         ? market.offers.length === 0
           ? h('p', { class: 'muted', text: 'Nikt nic teraz nie wystawia.' })
-          : h('ul', { class: 'stack market-list' }, market.offers.map(offerCard))
+          : filtered(market.offers, (offer) => goodsCategory(offer.goods), filters.offers, (shown) => h('ul', { class: 'stack market-list' }, shown.map(offerCard)))
         : tab === 'mine'
           ? mineTab()
           : residentsTab();

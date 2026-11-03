@@ -113,7 +113,8 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
 
   const enemyList = enemies.map((enemy) => `${enemy.name} (poz. ${enemy.level})`).join(', ');
   const start = plan.encounter.champion ? 'championStart' : plan.encounter.elite ? 'eliteStart' : 'fightStart';
-  const lines = [say(content.texts, start, floor, { enemies: enemyList })];
+  // The towers' own words for the start, not the forest's and the road's.
+  const lines = [say(texts, start, floor, { enemies: enemyList })];
   if (won) {
     lines.push(say(content.texts, 'victory', floor), `+${xp} XP, +${gold} złota.`);
     if (Object.keys(materials).length > 0) lines.push(say(content.texts, 'materials', floor, { materials: materialsText(materials, content) }));

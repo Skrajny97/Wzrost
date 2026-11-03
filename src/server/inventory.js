@@ -225,7 +225,7 @@ export function upgradePlan(player, item, body, now) {
   const need = view.next.materials;
   const stack = need ? upgradeStack(player.row, need, body.material) : null;
   if (need && !stack) {
-    throw new ApiError(409, 'no_material', `To ulepszenie bierze też ${need.count} szt. materiału tej samej rzadkości co przedmiot (${content.raritiesById[need.rarity].name}).`);
+    throw new ApiError(409, 'no_material', `To ulepszenie bierze też ${need.count} szt. jednego materiału tej samej rzadkości co przedmiot (${content.raritiesById[need.rarity].name}).`);
   }
   return { view, cost, warded, stack, taken: stack ? need.count : 0 };
 }

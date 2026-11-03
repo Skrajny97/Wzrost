@@ -406,6 +406,10 @@
         "toughChanceByMinutes",
         "lengthBonusByMinutes",
         "restBonusByMinutes",
+        "rareLengthFactorByMinutes",
+        "findLengthFactorByMinutes",
+        "uniqueLengthFactorByMinutes",
+        "uniqueLengthFrom",
         "toughLevelBonus",
         "findIntervalMinutes",
         "eliteChancePerFight",
@@ -510,6 +514,53 @@
             }
           },
           "description": "Pary [minuty, odpoczynek]: o tyle więcej brakującego HP wraca po każdej wygranej walce dłuższej wyprawy, bo ma więcej walk (pytanie 166 B); między parami rośnie z logarytmem czasu."
+        },
+        "rareLengthFactorByMinutes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "description": "Pary [minuty, mnożnik]: ile razy częściej na godzinę dłuższa wyprawa spotyka elitę i czempiona (autor: szansa na elitę ma być wyższa w dłuższej wyprawie); między parami rośnie z logarytmem czasu."
+        },
+        "findLengthFactorByMinutes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "description": "Pary [minuty, mnożnik]: ile razy więcej znalezisk na godzinę daje dłuższa wyprawa (autor: długie wyprawy mają się opłacać bardziej); między parami rośnie z logarytmem czasu."
+        },
+        "uniqueLengthFactorByMinutes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "description": "Pary [minuty, mnożnik]: o ile częściej przedmiot z wyprawy wypada w rzadkości od uniqueLengthFrom w górę, gdy wyprawa jest dłuższa (482 B: najwyżej +10%); między parami rośnie z logarytmem czasu."
+        },
+        "uniqueLengthFrom": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Od tej rzadkości (id z rarities.json) w górę działa uniqueLengthFactorByMinutes: unikalne i rzadsze."
         },
         "toughLevelBonus": {
           "type": "integer",

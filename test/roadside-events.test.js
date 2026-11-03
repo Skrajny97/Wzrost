@@ -111,7 +111,7 @@ describe('the roadside events in the engine', () => {
   });
 
   test('the merchant comes only with the Osada and from level 20, and pays in its reputation', () => {
-    const always = { ...content, events: { ...content.events, chance: 1, list: [merchant] } };
+    const always = { ...content, events: { ...content.events, chance: 1, longChance: 1, list: [merchant] } };
     const at = (areaId) => ({ result: 'success', areaId, minutes: 30 });
     assert.equal(eventFor({ hunt: at('lynx-ridge'), seed }, always), null);
     assert.equal(eventFor({ hunt: at('lynx-ridge'), seed, forced: merchant.id }, always), null);
