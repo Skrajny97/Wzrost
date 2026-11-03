@@ -3013,8 +3013,14 @@ Oraz: „Do Czarnego Bagna wroce później”.
 
 ## Wersja 0.1.4 (3.11.2026)
 
-1. **Co wchodzi do gry:** Czarne Bagno, kraina na poziomach 101–125 (zob. niżej „Czarne Bagno wchodzi do gry” i „Czarne Bagno: poziomy 101–125”).
-2. **Sprawdzone:** TESTS.
+1. **Co wchodzi do gry:**
+   - Czarne Bagno, kraina na poziomach 101–125, ze stworami, materiałami i odgłosami stworów (zob. niżej „Czarne Bagno wchodzi do gry” i „Czarne Bagno: poziomy 101–125”);
+   - przemiana w świetle przed ceremonią każdej ewolucji (499), z dźwiękiem wybranym przez autora (503 A);
+   - kody podarunkowe dla jednej postaci i kod PC (zob. „Kod PC dla jednej postaci…”).
+2. **Sprawdzone:**
+   - pełne testy gałęzi bagna przed scaleniem: 896 z 898. Test obrazków regionów wymagał szkicu zastępczego także od miejsc z prawdziwym rysunkiem; po poprawce testy klienta przechodzą (14 z 14). Test czasu oszacowania zagrożenia nie mieścił się w limicie przy obciążeniu komputera ok. 27 na 4 rdzeniach i tak samo nie mieścił się na niezmienionym kodzie gry (ok. 18 ms czasu procesora na oszacowanie w obu), więc to obciążenie, nie bagno; GitHub i tak puszcza pełne testy przed wdrożeniem;
+   - po scaleniu: testy kodów, danych i klienta 24 z 24 i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (pierwsza wyprawa po 11 krokach);
+   - w przeglądarce: postać na 101. poziomie wyruszyła do Czarnego Olsu, raport ze stworami bagna, wszystkie obrazki wczytane, bez błędów strony; przemiana sprawdzona na zrzutach z gry.
 
 ## Czarne Bagno wchodzi do gry (3.11.2026)
 
