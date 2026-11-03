@@ -38,6 +38,9 @@ KINDS = {
     # A skill as it wakes or strikes: up to 1.4 s, without the rumble a phone
     # cannot play, lifted where it plays, a little quieter than a blow.
     'skill': {'longest': 1.4, 'chain': 'highpass=f=150,highpass=f=150,equalizer=f=1500:t=q:w=1.2:g=4,equalizer=f=3500:t=q:w=1:g=2,lowpass=f=13000', 'tail': 35, 'rms': -17},
+    # The evolution's transformation: a swell, a burst and a long shimmering
+    # fade, kept whole up to 4 s, without the rumble, a little quieter.
+    'swell': {'longest': 4.0, 'chain': 'highpass=f=120,highpass=f=120,lowpass=f=14000', 'tail': 45, 'rms': -19},
 }
 
 # Output name: (draft file under SRC, kind).
@@ -50,6 +53,8 @@ SOUNDS = {
     'magic-2': ('effects/magic-20261024T1252-1.mp3', 'spark'),
     # The chest of the narrator's quests (quests.js).
     'chest-1': ('effects/chest-coins-20261025T1130-1.mp3', 'coins'),
+    # The transformation at an evolution (evolution.js), the author's 503 A.
+    'evolution-transform-1': ('effects/evolution-transform-20261103T0713-0.mp3', 'swell'),
 }
 # The takes kept from the newest draft of a voice that has more than two,
 # chosen by measure: the least rumble below 300 Hz, the fewest clicks (a cry,
