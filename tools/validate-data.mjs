@@ -1298,6 +1298,8 @@ function checkCasino(data) {
   if (!rarities.includes(wheel.itemRarity)) errors.push(`settlement.json: casino.wheel.itemRarity to nieznana rzadkość ${wheel.itemRarity}`);
   if (!rarities.includes(wheel.topItemRarity)) errors.push(`settlement.json: casino.wheel.topItemRarity to nieznana rzadkość ${wheel.topItemRarity}`);
   else if (rarities.indexOf(wheel.topItemRarity) < rarities.indexOf(wheel.itemRarity)) errors.push('settlement.json: casino.wheel.topItemRarity nie może być niższa niż itemRarity');
+  if (!rarities.includes(wheel.belowTopItemRarity)) errors.push(`settlement.json: casino.wheel.belowTopItemRarity to nieznana rzadkość ${wheel.belowTopItemRarity}`);
+  else if (rarities.indexOf(wheel.belowTopItemRarity) < rarities.indexOf(wheel.itemRarity) || rarities.indexOf(wheel.belowTopItemRarity) > rarities.indexOf(wheel.topItemRarity)) errors.push('settlement.json: casino.wheel.belowTopItemRarity musi leżeć od itemRarity do topItemRarity');
   for (const id of Object.keys(wheel.materialRarities)) if (!rarities.includes(id)) errors.push(`settlement.json: casino.wheel.materialRarities ma nieznaną rzadkość ${id}`);
   if (lottery.base < 0 || lottery.ticket < 1) errors.push('settlement.json: casino.lottery potrzebuje ceny losu i bazy puli');
   const needs = { lotteryAbout: ['ticket', 'base'], lotteryToday: ['pot', 'tickets'], lotteryBuy: ['ticket'], lotteryEarlier: ['date'], announce: ['name', 'gold'], wheelAbout: ['step', 'chance'], wheelPool: ['stake', 'left', 'all'], wheelStake: ['stake', 'chance'], wheelSpin: ['stake'], won: ['prize'] };

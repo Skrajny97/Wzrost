@@ -21,6 +21,7 @@ import {
   dayStakes,
   generateItem,
   itemPrizeRarity,
+  stakeItemRarity,
   knownLandMaterials,
   lotteryPot,
   lotteryWinner,
@@ -142,6 +143,27 @@ describe('the Salon Gier in the engine', () => {
     assert.equal(itemPrizeRarity(25, 1, 100, content), 'unique');
   });
 
+  test("legendary items wait only in the pool of the character's top stake (554 B), every lower stake has items up to epic", () => {
+    // At level 25 the stakes are 100, 200 and 300 zł: an epic item fits at
+    // 100 zł, a legendary one (400 zł) at 200 and 300 zł, and 200 zł is not
+    // the top, so its pool has materials alone.
+    assert.deepEqual([100, 200, 300].map((stake) => stakeItemRarity(25, 0, stake, content)), ['epic', null, 'legendary']);
+    // At level 50, up to 700 zł: legendary items (800 zł) at the top alone.
+    assert.deepEqual([100, 200, 300, 400, 500, 600, 700].map((stake) => stakeItemRarity(50, 0, stake, content)), ['unique', 'epic', 'epic', null, null, null, 'legendary']);
+    for (const [level, bonus] of [[25, 0], [40, 0.3], [80, 0], [150, 1]]) {
+      const stakes = wheelStakes(level, bonus, content);
+      for (const stake of stakes.slice(0, -1)) assert.notEqual(stakeItemRarity(level, bonus, stake, content), 'legendary', `${level} ${stake}`);
+      assert.equal(stakeItemRarity(level, bonus, stakes.at(-1), content), 'legendary', String(level));
+      // The pools hold just that.
+      const basis = { ...character(level), sellBonus: bonus, tanneryPremium: 0 };
+      for (const stake of stakes) {
+        const rarities = new Set(wheelPrizes(basis, 'legendarne', stake, '2026-11-03', content).filter((prize) => prize.kind === 'item').map((prize) => prize.item.rarity));
+        if (stake === stakes.at(-1)) assert.deepEqual([...rarities], ['legendary']);
+        else assert.ok(!rarities.has('legendary'), `${level} ${stake}`);
+      }
+    }
+  });
+
   test('the stakes go in hundreds from 100 zł to the highest with an item prize, so they grow with the level', () => {
     assert.deepEqual(wheelStakes(25, 0, content), [100, 200, 300]);
     assert.deepEqual(wheelStakes(30, 0, content), [100, 200, 300, 400]);
@@ -189,7 +211,7 @@ describe('the Salon Gier in the engine', () => {
         const basis = { ...character(level), ...bonuses };
         const stakes = wheelStakes(level, bonuses.sellBonus, content);
         for (const stake of new Set([stakes[0], stakes[Math.floor(stakes.length / 2)], stakes.at(-1)])) {
-          const rarity = itemPrizeRarity(level, bonuses.sellBonus, stake, content);
+          const rarity = stakeItemRarity(level, bonuses.sellBonus, stake, content);
           let items = 0;
           for (let i = 0; i < 20; i += 1) {
             const prizes = wheelPrizes(basis, `postac:${i}`, stake, '2026-11-03', content);

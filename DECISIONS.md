@@ -3034,6 +3034,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Koło Fortuny: przedmioty legendarne tylko przy najwyższej stawce (3.11.2026)
+
+Autor: „554 B” (pytanie: przedmioty legendarne tylko przy najwyższej stawce dnia).
+
+1. **Przedmioty legendarne** czekają tylko w puli najwyższej stawki postaci. Pule niższych stawek mają przedmioty najwyżej epickie (nowe pole `belowTopItemRarity`). Najwyższa stawka liczy się jak dotąd: to najwyższa, przy której pasuje jeszcze przedmiot do legendarnego włącznie.
+2. **Stawka bez pasującego przedmiotu** ma w puli same materiały. Na 25. poziomie postaci: przy 100 zł przedmioty epickie, przy 200 zł same materiały, przy 300 zł przedmioty legendarne. Na 50. poziomie przedmioty legendarne są tylko przy 700 zł, a stawki od 400 do 600 zł mają same materiały.
+3. (brakujący szczegół) **Opis pul** w Salonie mówi o tym jednym zdaniem: „Przedmioty legendarne czekają tylko w puli najwyższej stawki.”
+4. (brakujący szczegół) **Dzisiejsze pule** liczą się od nowa przy każdym zajrzeniu, więc zasada działa od razu po wdrożeniu. Zmieniają się tylko pule niższych stawek, w których były przedmioty legendarne. Wygrane nagrody zostają u graczy, a wygrane miejsca w puli dalej się liczą.
+
 ## Wersja 0.1.14 (3.11.2026)
 
 1. **Chowańce** w Sklepie Systemu: Lis i Kruk po 600 PS, Błędny ognik za 800 PS. Chowaniec idzie z postacią w scenie Walki, pieszo i wierzchem, i jest przy niej na portrecie (zob. „Chowańce w grze”). Autor: „553 zatwierdzam wszystko do gry”.

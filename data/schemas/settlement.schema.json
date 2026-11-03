@@ -303,7 +303,7 @@
         "wheel": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["name", "step", "maxSteps", "chance", "worthCap", "prizes", "itemChance", "itemRarity", "topItemRarity", "materialRarities"],
+          "required": ["name", "step", "maxSteps", "chance", "worthCap", "prizes", "itemChance", "itemRarity", "topItemRarity", "belowTopItemRarity", "materialRarities"],
           "properties": {
             "name": { "type": "string", "minLength": 1 },
             "step": { "type": "integer", "minimum": 1, "description": "Najniższa stawka w złocie i krok, o który rośnie (542 C: 100 zł, setkami)." },
@@ -313,7 +313,8 @@
             "prizes": { "type": "integer", "minimum": 1, "description": "Ile nagród ma pula postaci na dobę przy każdej stawce." },
             "itemChance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa, że nagroda jest przedmiotem, gdy jakiś przedmiot się mieści." },
             "itemRarity": { "type": "string", "description": "Najniższa rzadkość przedmiotu w puli." },
-            "topItemRarity": { "type": "string", "description": "Najwyższa rzadkość przedmiotu w puli; najwyższa stawka to ta, przy której pasuje jeszcze przedmiot tej rzadkości." },
+            "topItemRarity": { "type": "string", "description": "Najwyższa rzadkość przedmiotu w puli, tylko przy najwyższej stawce postaci; najwyższa stawka to ta, przy której pasuje jeszcze przedmiot tej rzadkości." },
+            "belowTopItemRarity": { "type": "string", "description": "Najwyższa rzadkość przedmiotu w pulach niższych stawek niż najwyższa (554 B: legendarne przedmioty tylko przy najwyższej stawce dnia)." },
             "materialRarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }, "description": "Rzadkości materiałów w puli z wagami losowania." }
           }
         },

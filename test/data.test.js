@@ -67,6 +67,8 @@ test('the validator catches broken references and schema errors', () => {
   assert.deepEqual(validateData(casino), [
     'settlement.json: szansa Koła musi być mniejsza niż 100%, żeby nagroda mogła być warta więcej niż stawka',
     'settlement.json: casino.wheel.topItemRarity nie może być niższa niż itemRarity',
+    // The lower stakes' rarest (epic) is now above the top stake's.
+    'settlement.json: casino.wheel.belowTopItemRarity musi leżeć od itemRarity do topItemRarity',
     'settlement.json: casino.wheel.materialRarities ma nieznaną rzadkość golden',
     'settlement.json: casino.texts.announce nie ma {gold}',
   ]);
