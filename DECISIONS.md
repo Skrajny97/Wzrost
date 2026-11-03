@@ -3034,6 +3034,22 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.27 (3.11.2026)
+
+1. **Dźwięki Szlifierni (573)** (zob. „Dźwięki Szlifierni”).
+
+## Dźwięki Szlifierni (3.11.2026)
+
+Autor: „573 koniecznie i możesz wstępnie wprowadzić na czuja, jutro poprawię najwyżej”.
+
+1. **Trzy nowe dźwięki** grają przy pierwszym czytaniu raportu Szlifierni, jak dźwięki Warsztatu:
+    - wyrób biżuterii: szlifowanie kamienia na kole i jeden jasny brzęk (`jewel`);
+    - nieudana sztuka: pęknięcie kamienia i rozsypane okruchy (`jewel-fail`). Gdy coś się udało, a coś pękło, pęknięcie gra po szlifowaniu;
+    - oprawa kamienia w przedmiot: dwa kliknięcia szczypiec i dźwięczne „ping” (`gem-set`). Oprawa, która nie doszła do skutku (kamień wrócił do plecaka), nie ma dźwięku.
+2. **Wybór na czuja.** ElevenLabs nagrał po 4 wersje każdego dźwięku (`audio/prompts.json`, 480 kredytów). Do gry weszły wersje, których kształt najlepiej pasuje do opisu: szum szlifowania z brzękiem na końcu, pęknięcie z trzaskiem na początku, dwa kliknięcia i dzwoniący ton. Dwie inne wersje każdego dźwięku czekają na wybór autora (577.1–577.3).
+3. **Obróbka** jak przy innych efektach z ElevenLabs (`tools/build-drafts.py`, rodzaje `jewel` i `crack`): bez dudnienia poniżej 150 Hz, od pierwszego dźwięku do wygaśnięcia, najwyżej 1,6 s (pęknięcie 1,1 s), z tą samą głośnością. Pęknięcie ma niższy pułap (`limit`), bo jego ostry trzask w MP3 wychodził ponad pełną skalę. Dźwięki są jasne, więc w grze grają ciszej od ciosów: 0,6 (szlifowanie, oprawa) i 0,8 (pęknięcie).
+4. `tools/build-drafts.py` buduje teraz na życzenie tylko wybrane dźwięki (`ONLY=jewel-1,gem-set-1`), a reszta plików zostaje bez zmian.
+
 ## Wersja 0.1.26 (3.11.2026)
 
 1. **Mikstury wzmacniające liczone w walkach, nie w minutach** (zob. „Mikstury liczone w walkach”).
@@ -3356,9 +3372,9 @@ Obie profesje otwierają się razem, od 25. poziomu postaci (531, 533). Na zakł
    - Każdy kamień jest dwa razy rzadszy od poprzedniego, a sztuka biżuterii o rzadkość wyżej trwa dwa razy dłużej. Godzina kopania starcza więc mniej więcej na godzinę wyrobu biżuterii każdej rzadkości (na 1. poziomie obu profesji).
    - O urobku decyduje poziom Górnictwa w chwili odbioru raportu, jak w Zielarstwie.
 3. **Żyły złota (532 A).** Dają średnio połowę złota, które przynosi godzina wyprawy na poziomie postaci z początku kopania (`veins` w `data/professions.json`).
-   - Złoto z godziny wyprawy zmierzyłem w `tools/difficulty-sim.mjs` (gracz realistyczny, godzinne wyprawy w najnowszym miejscu poziomu, 200 wypraw na klasę): 25. poziom 340 zł, 30. 390, 35. 420, 40. 540, 45. 670, 50. 760, 60. 760, 70. 910, 80. 1040, 90. 1170, 100. 1390, 110. 1540, 125. 1790 i 150. 2140. Między tymi poziomami liczy się liniowo, a za 150. w proporcji do poziomu.
+   - Złoto z godziny wyprawy pochodzi z pomiaru w `tools/difficulty-sim.mjs` (gracz realistyczny, godzinne wyprawy w najnowszym miejscu poziomu, 200 wypraw na klasę): 25. poziom 340 zł, 30. 390, 35. 420, 40. 540, 45. 670, 50. 760, 60. 760, 70. 910, 80. 1040, 90. 1170, 100. 1390, 110. 1540, 125. 1790 i 150. 2140. Między tymi poziomami liczy się liniowo, a za 150. w proporcji do poziomu.
    - Żyły dają więc ok. 170 zł na godzinę na 25. poziomie, 195 na 30., 270 na 40., 380 na 50., 520 na 80., 695 na 100. i 1070 na 150.
-   - `tools/simulate.mjs` daje na 25.–60. poziomie to samo (np. 342 zł/h na 25.), ale od 75. jego postać bez towarzyszy mdleje na każdej wyprawie, więc pomiar wziąłem z `tools/difficulty-sim.mjs`.
+   - `tools/simulate.mjs` daje na 25.–60. poziomie to samo (np. 342 zł/h na 25.), ale od 75. jego postać bez towarzyszy mdleje na każdej wyprawie, więc pomiar pochodzi z `tools/difficulty-sim.mjs`.
    - (brakujący szczegół) Żył jest średnio 2 na godzinę, a każda daje połowę złota z godziny, ±50%. Krótkie kopanie bywa więc bez żyły, a raport mówi wtedy: „Tym razem bez żył złota.”.
    - Awatar Systemu kopie także w czasie wyprawy postaci, a złoto i urobek trafiają do postaci.
 4. **Kamienie i kruszce w plecaku (533 A).**
@@ -3401,7 +3417,7 @@ Obie profesje otwierają się razem, od 25. poziomu postaci (531, 533). Na zakł
 
 1. **Co wchodzi do gry:**
    - Salon Gier w Osadzie, z Loterią i Kołem Fortuny według 542 C (zob. „Salon Gier: budowa” oraz „Salon Gier: odpowiedzi autora 542 i 543”). Rozdział narratora o Salonie dojdzie po zatwierdzeniu kwestii 543.
-   - Muzyka Salonu Gier od autora („tutaj background do salonu gier”). Utwór ma 144 s i gra w Salonie zamiast muzyki Osady (`settlement:casino` w `data/music.json`). Głośność wyrównałem do pozostałych utworów (−16 LUFS), a plik zapisałem tak jak inne (MP3 44,1 kHz, ok. 130 kb/s, bez okładki).
+   - Muzyka Salonu Gier od autora („tutaj background do salonu gier”). Utwór ma 144 s i gra w Salonie zamiast muzyki Osady (`settlement:casino` w `data/music.json`). Głośność jest wyrównana do pozostałych utworów (−16 LUFS), a plik zapisany tak jak inne (MP3 44,1 kHz, ok. 130 kb/s, bez okładki).
    - Spełniona prośba w Prośbach Gildii znika po podziękowaniach (zob. „Prośby Gildii: spełniona prośba znika”).
 2. **Sprawdzone:**
    - **Pełne testy:** 967 z 968. Nie przeszedł tylko test czasu oceny zagrożenia (292 ms), bo w tym czasie w przeglądarce szło wprowadzenie. Sam, bez obciążenia, przechodzi (110 ms).
@@ -3941,7 +3957,7 @@ Autor: „439 A / 440 OK … 461 OK” z poprawkami grafik, a po poprawkach „4
 
 1. **Grafiki.** Wszystkie 17 stworów z materiałami, kręgi pięciu miejsc, kraina z tłem A (439 A) i panorama sceny Walki. Poprawki po ocenie autora: Ważka bez zbędnych pikseli w lewym górnym rogu (447), Szczupak z całym ogonem (448), czarniejszy Drewniany bożek (451), Wąż Welesa narysowany od nowa, cały i bardziej majestatyczny (452), nowy Róg biesa (457) i cały Warkocz mamuny (460). Wybory i poprawki zapisuje `picks.json` roboczego skryptu `install.py`.
 2. **Wielki Kleszcz (455).** Kleszcz nazywa się Wielki Kleszcz, w Bestiariuszu i w nazwach przedmiotów („… Wielkiego Kleszcza”). Brakujący szczegół: jego materiał to Pancerz wielkiego kleszcza zamiast Pancerzyka kleszcza, a opis Trzęsawiska mówi o wielkich kleszczach, żeby nazwy do siebie pasowały.
-3. **Dźwięki stworów.** Autor: „Też do wszystkich stworów trzeba wygenerować”. Stwory czterech pierwszych krain miały już odgłosy bólu i śmierci, brakowało ich tylko 17 stworom Czarnego Bagna. Mają je teraz z ElevenLabs (`voices` w `audio/prompts.json`), po dwie wersje grane na zmianę, przerobione `tools/build-drafts.py` jak pozostałe. Autor dostał film z odsłuchem (504) i przyjął wszystko poza dwoma nagraniami: „ważki śmierć do poprawy, bo to jakieś bąbelki wody a nie śmierć ważki” i „bóle Rokity o wiele bardziej groźne horrorowe”. Te dwa nagrałem od nowa (gasnące bzyczenie skrzydeł bez wody; groźny, piekielny ryk) i wysłałem do odsłuchu; wchodzą do gry od razu, bo zastępują odrzucone, a jeśli nie spodobają się autorowi, wymienię je w następnej wersji. Stwory kolejnych krain dostaną odgłosy razem z grafikami.
+3. **Dźwięki stworów.** Autor: „Też do wszystkich stworów trzeba wygenerować”. Stwory czterech pierwszych krain miały już odgłosy bólu i śmierci, brakowało ich tylko 17 stworom Czarnego Bagna. Mają je teraz z ElevenLabs (`voices` w `audio/prompts.json`), po dwie wersje grane na zmianę, przerobione `tools/build-drafts.py` jak pozostałe. Autor dostał film z odsłuchem (504) i przyjął wszystko poza dwoma nagraniami: „ważki śmierć do poprawy, bo to jakieś bąbelki wody a nie śmierć ważki” i „bóle Rokity o wiele bardziej groźne horrorowe”. Te dwa są nagrane od nowa (gasnące bzyczenie skrzydeł bez wody; groźny, piekielny ryk) i poszły do odsłuchu; wchodzą do gry od razu, bo zastępują odrzucone, a jeśli nie spodobają się autorowi, następna wersja je wymieni. Stwory kolejnych krain dostaną odgłosy razem z grafikami.
 ## Kod PC dla jednej postaci i odpowiedzi 500.7, 500.14, 500.17 (3.11.2026)
 
 Autor: „Przygotuj jednorazowy kod podarunkowy "PC" dla gracza […] 60 Punktów Czasu za zaangażowanie”, „Ogólnie na stałe może byc ten kod, ale dostępny tylko dla danej konkretnej postaci i tylko na moje polecenie przy takich sytuacjach”, „500.7 wyższa rozdzielczość potrzebna”, „500.14 A”, „500.17 B”.
@@ -4400,7 +4416,7 @@ Autor (zrzut „Futro żbika × 10, Dane: 0 z 10. Wycofana.”): „Wycofane pro
 Autor, po pierwszych klatkach chodów drugich form (434.1–434.15): „To jak chcesz wdrażać ewolucje bez chodów i jazdy? nie moze tak być mistrzu”, „pierwsze klatki to ciul, przerysuj tych mezczyzn i wdrażaj później jak animacje beda git, tylko mi je pokażesz, pamietaj ze tam też są odcienie skory” i „niby mozesz wdrazac czesciami bez tego, bo nikt nie dobił jeszcze 50tego nawet, ale informuj na przyszłość o takich rzeczach”.
 
 1. **Druga ewolucja wchodzi do gry razem z grafiką.** Kod drugiej ewolucji jest scalony i przechodzi testy (878), ale do gry trafi dopiero z chodami 30 drugich form, z jazdą wierzchem na każdym wierzchowcu i z siedmioma odcieniami skóry, tak jak przy pierwszych ewolucjach.
-2. **Pierwsze klatki bez oceny autora.** Autor ocenia chody jako gotowe animacje. Pierwsze klatki dobiera się samemu: trzech mężczyzn (Strzelec Wyborowy, Królobójca, Nekromanta) rysuje się od nowa, bo stali przodem.
+2. **Pierwsze klatki bez oceny autora.** Autor ocenia chody jako gotowe animacje. Pierwsze klatki dobiera się bez autora: trzech mężczyzn (Strzelec Wyborowy, Królobójca, Nekromanta) rysuje się od nowa, bo stali przodem.
 3. **Na przyszłość:** przed wdrożeniem czegoś bez pełnej grafiki trzeba to autorowi powiedzieć (zasada w `CLAUDE.md`).
 
 ## Sprawdzenie po wdrożeniu czeka dłużej (2.11.2026)
@@ -5879,7 +5895,7 @@ Autor: „chciałbym dorobić w miedzyczasie opcje wyswietlania ile w grze jest 
     - **Truciciel: wersja D.** Autor: „Wybrałem wersję D Truciciela, ale z tego co widziałem to portret Truciciela nie wygląda dobrze”. W grze jest chód D, z pustymi rękami, i jego klatka startowa `poisoner-male-empty.png` w `art/walks.json`. Portret zostaje do decyzji autora (214).
     - **Inkwizytorka bez kadzielnicy w chodzie.** Skoro chód może różnić się od portretu, jej klatka startowa traci kadzielnicę, dym i łańcuchy, a lewa dłoń zostaje pusta. PixelLab animuje ją w 3 wersjach, niezależnie od wyboru portretu (213).
     - **Nowe portrety: „213 A 214 A”.** Inkwizytorka ma portret z Retro Diffusion ze zdobionym złotym krzyżem uniesionym w lewej dłoni i buzdyganem w prawej, bez kadzielnicy. Truciciel ma portret z jednym sztyletem ostrzem w dół wzdłuż nogi i pustą lewą dłonią. Oba portrety mają odcienie skóry z nowych masek (`tools/evolution-tones.json`: twarz i obie dłonie, krzyż zostaje złoty), a popiersia centrują się na twarzy (`faces`).
-    - Autor: „Po zrobieniu chodu 213 A i 214 A robisz wdrożenie”. Klatki startowe chodów powstają z nowych portretów, PixelLab robi po 3 wersje, a najlepszą, bez latających przedmiotów i drugiego sztyletu, wybieram sam. Potem idzie wdrożenie 0.0.64.
+    - Autor: „Po zrobieniu chodu 213 A i 214 A robisz wdrożenie”. Klatki startowe chodów powstają z nowych portretów, PixelLab robi po 3 wersje, a najlepsza, bez latających przedmiotów i drugiego sztyletu, idzie dalej bez oceny autora. Potem idzie wdrożenie 0.0.64.
     - **Ostatnie dwa chody.** Inkwizytorka: wersja A z trzech. Krzyż stoi uniesiony z przodu we wszystkich klatkach, a buzdygan chodzi z bliższą ręką. W wersji C krzyż skakał z biodra do góry. Truciciel: wersja A z trzech. W B i C sztylet znikał na dwie klatki, a w A był jeden w każdej klatce, poza pierwszą, gdzie przednia dłoń trzymała drugie ostrze. To ostrze leżało na tle, więc jest usunięte ręcznie. Krzyż ma kolory twarzy, więc `tools/walk-tones.py` nie bierze za skórę niczego tuż przy jego złocie (`near_not`, tylko zwarte grupy tych kolorów, nie pojedyncze piksele w oku).
         - Inkwizytorka: „Kadzidło lata jak szalone w obydwu wersjach zmienia pozycje, nie jest trzymane, jest proboem chyba z klatką startową zatem albo i portretem z którego można to kadzidlo wywalić ewentualnie i dać złoty krzyż albo coś”. Kadzielnica wisi na łańcuchu, więc w każdej klatce PixelLab ustawia ją inaczej. Portret dostaje do wyboru (211) wersję bez kadzielnicy albo ze złotym krzyżem trzymanym pionowo w lewej pięści. Klatka startowa i chód powstają po wyborze autora.
     - **Nowe chody w grze (na wersji testowej).** 37 wybranych chodów zastępuje dawne. Elementalista i Truciciel mają do wyboru autora pierwszą z trzech nowych wersji, a Inkwizytorka do czasu poprawki swoją dawną wersję A. Chód to 8 klatek po 128 × 128 w tempie 8 klatek na sekundę, czyli pełny krok w sekundę (205), w skali 1:1: postać ma około 115 pikseli wysokości, dawna miała 72 (autor: „Postac moze byc wieksza, mniejsza, zobaczymy”). Stopy stoją na ścieżce tam, gdzie stały dawne. Ścieżka przesuwa się o 94 piksele na sekundę, tyle co stopa na ziemi w szkielecie (47 pikseli w pół sekundy), więc stopy nie ślizgają się. Tło przesuwa się o 30 pikseli na sekundę (dotąd ścieżka 60, a tło 20). Postać Systemu, czyli wygląd bez własnego chodu, zostaje bez zmian (`walk.walker` i `walk.figure` w `data/animations.json`).
@@ -5888,7 +5904,7 @@ Autor: „chciałbym dorobić w miedzyczasie opcje wyswietlania ile w grze jest 
     - Próba PixelLab (198–201): Wojowniczka i Inkwizytor po dwie wersje, każda animacja za 3 generacje (razem 12 z 2000). Cztery klatki kosztują tyle samo co osiem, bo PixelLab liczy czas generowania: 3 klatki to 2 generacje, a 8 klatek to 3.
     - Autor: „199 tak, 201 tak, 202 tak, 203 tak”. Wojowniczka i Inkwizytor mają chody z PixelLab w wersjach B (199, 201).
     - **8 klatek (202).** Chód gra cztery pozy kluczowe szkieletu, a po każdej pozę w połowie drogi do następnej, liczoną kąt po kącie. W grze pójdzie 16 klatek na sekundę, więc z tą samą prędkością co 4 klatki po 8 na sekundę. Przykład (204) czeka na ocenę autora.
-    - **Pozostałe 38 postaci (203).** Retro Diffusion rysuje każdą raz, w 2 wersjach, a opis mówi, co trzyma prawa, bliższa ręka, a co lewa, tak jak na portrecie (`art/prompts.json` i `art/walks.json`). Lepszą wersję klatki startowej wybieram sam, a PixelLab animuje każdą postać w 2 wersjach. Najpierw idzie 10 postaci z różnymi przedmiotami w rękach, potem reszta.
+    - **Pozostałe 38 postaci (203).** Retro Diffusion rysuje każdą raz, w 2 wersjach, a opis mówi, co trzyma prawa, bliższa ręka, a co lewa, tak jak na portrecie (`art/prompts.json` i `art/walks.json`). Lepsza wersja klatki startowej idzie dalej bez oceny autora, a PixelLab animuje każdą postać w 2 wersjach. Najpierw idzie 10 postaci z różnymi przedmiotami w rękach, potem reszta.
     - Autor: „204 tak / ale wolniej niech chodzi, mniejsze FPS w grze”. Wszystkie chody mają 8 klatek, a w grze idą wolniej niż teraz: 8 klatek na sekundę, czyli pełny krok w sekundę (autor: „205 tak”). Tempo to jedna liczba w `data/animations.json`. Chód Wojowniczki to przykład z 204.
 5. **Raz, a dobrze.** Autor: „I pamietaj ze lepiej raz zainwestowac dobrze niz po troche i slaby efekt miec na końcu”. Przy wyborze narzędzia, planu albo liczby wersji liczy się efekt końcowy: lepsze narzędzie albo więcej wersji do wyboru od razu, zamiast poprawek po kawałku. Krótka próba do oceny autora i tak idzie przed każdą dużą partią.
 

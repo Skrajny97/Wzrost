@@ -41,6 +41,13 @@ KINDS = {
     # The evolution's transformation: a swell, a burst and a long shimmering
     # fade, kept whole up to 4 s, without the rumble, a little quieter.
     'swell': {'longest': 4.0, 'chain': 'highpass=f=120,highpass=f=120,lowpass=f=14000', 'tail': 45, 'rms': -19},
+    # The Szlifiernia's work (573): a gem ground and set down, or set into an
+    # item, whole up to 1.6 s; a gem cracking, its snap and splinters up to
+    # 1.1 s, the snap held lower (`limit`), as its sharp edge overshoots full
+    # scale in the MP3. Bright sounds, so quieter than a blow, about as loud
+    # as the Salon's.
+    'jewel': {'longest': 1.6, 'chain': 'highpass=f=150,highpass=f=150,lowpass=f=12000', 'tail': 40, 'rms': -21},
+    'crack': {'longest': 1.1, 'chain': 'highpass=f=150,highpass=f=150,lowpass=f=12000', 'tail': 40, 'rms': -21, 'limit': 0.62},
 }
 
 # Output name: (draft file under SRC, kind).
@@ -55,6 +62,12 @@ SOUNDS = {
     'chest-1': ('effects/chest-coins-20261025T1130-1.mp3', 'coins'),
     # The transformation at an evolution (evolution.js), the author's 503 A.
     'evolution-transform-1': ('effects/evolution-transform-20261103T0713-0.mp3', 'swell'),
+    # The Szlifiernia's reports (573, picked by their pictures: the whirr
+    # with one clink at its end, the snap first and the splinters after, two
+    # clicks and a ringing ping).
+    'jewel-1': ('effects/jewel-20261103T2227-3.mp3', 'jewel'),
+    'jewel-fail-1': ('effects/jewel-fail-20261103T2227-0.mp3', 'crack'),
+    'gem-set-1': ('effects/gem-set-20261103T2227-1.mp3', 'jewel'),
 }
 # The takes kept from the newest draft of a voice that has more than two,
 # chosen by measure: the least rumble below 300 Hz, the fewest clicks (a cry,
@@ -160,8 +173,12 @@ def span(samples, tail, longest):
     return start / SR, (end - start) / SR
 
 
+# ONLY=<name>,<name> builds just those (the others stay as they are).
+only = set(filter(None, os.environ.get('ONLY', '').split(',')))
 report = []
 for name, (draft, kind) in SOUNDS.items():
+    if only and name not in only:
+        continue
     settings = KINDS[kind]
     source = os.path.join(SRC, draft)
     filtered = decode(source, settings['chain'])
@@ -171,7 +188,7 @@ for name, (draft, kind) in SOUNDS.items():
     fade = length * 0.4
     chain = (f"{settings['chain']},atrim=start={start:.3f}:duration={length:.3f},asetpts=PTS-STARTPTS,"
              f"afade=t=in:d=0.003,afade=t=out:st={length - fade:.3f}:d={fade:.3f},"
-             f"volume={gain:.2f}dB,alimiter=limit=0.89:level=false")
+             f"volume={gain:.2f}dB,alimiter=limit={settings.get('limit', 0.89)}:level=false")
     out = os.path.join(OUT, f'{name}.mp3')
     result = run(['ffmpeg', '-v', 'error', '-y', '-i', source, '-ac', '1', '-ar', str(SR), '-af', chain,
                   '-c:a', 'libmp3lame', '-b:a', '96k', '-map_metadata', '-1', out], text=True)

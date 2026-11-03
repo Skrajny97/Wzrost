@@ -23,8 +23,10 @@ const capitalized = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 const RESULT_CLASS = { success: 'result--success', fainted: 'result--fainted', escaped: 'result--escaped' };
 const FIGHT_RESULTS = { true: 'wygrana', false: 'przegrana', null: 'odwrót' };
 const SWIPE_DISTANCE = 60;
-// The failed work cracks once the hammer's blows have rung out.
+// The failed work cracks once the hammer's blows have rung out, and a gem
+// once the grinding has.
 const CRAFT_FAIL_AFTER_MS = 1400;
+const JEWEL_FAIL_AFTER_MS = 1200;
 
 // Playback data of a fight. Reports from before every fight was kept have it
 // only for the key fight.
@@ -89,7 +91,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       fill(container, ...work(report, heading, findSheet));
       // The cauldron bubbles once over a finished brewing, and the hammer
       // strikes over an order of the Warsztat: the work that cracked after
-      // the items that came out.
+      // the items that came out. The Szlifiernia grinds its jewels and
+      // cracks the failed ones after them, or sets a gem into an item.
       if (report.kind === 'potions' && firstPlayback) playSound('brew');
       // The veins' gold rings as the scrapper's coins do.
       if (report.kind === 'minerals' && report.gold > 0 && firstPlayback) playSound('coin');
@@ -97,6 +100,15 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         const made = report.items.length > 0 || report.scrolls > 0;
         if (made) playSound('craft');
         if (report.failed > 0) setTimeout(() => playSound('craft-fail'), made ? CRAFT_FAIL_AFTER_MS : 0);
+      }
+      if (report.kind === 'jewels' && firstPlayback) {
+        if (report.set) {
+          if (report.set.item) playSound('gem-set');
+        } else {
+          const made = report.items.length > 0;
+          if (made) playSound('jewel');
+          if (report.failed > 0) setTimeout(() => playSound('jewel-fail'), made ? JEWEL_FAIL_AFTER_MS : 0);
+        }
       }
       if (report.system.length > 0 && firstPlayback) playSound('system');
       firstPlayback = false;
