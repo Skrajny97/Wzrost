@@ -1,12 +1,13 @@
 // The Sklep Systemu's look (data/cosmetics.json; src/server/cosmetics.js): a
 // portrait on the background worn, in place of the forest, and in the frame
 // worn, with the frame's light, on Postać, in the shop's previews and on the
-// card another player sees, and the aura worn lighting the figure. In a
-// frame the background and the figure stand in its window, smaller. The
-// game's switch of animations stills the light (.calm in styles.css). A name
-// in its frame's colour is ui.js framedName.
+// card another player sees, the aura worn lighting the figure and the pet
+// worn (chowaniec) at its feet or on its shoulder. In a frame the background,
+// the figure and the pet stand in its window, smaller. The game's switch of
+// animations stills the light and the pet (.calm in styles.css). A name in
+// its frame's colour is ui.js framedName.
 
-import { cosmeticArt, portraitSprite } from './art.js';
+import { cosmeticArt, portraitPerch, portraitSprite, SPRITES } from './art.js';
 import { h } from './dom.js';
 import { portrait } from './portraits.js';
 import { state } from './state.js';
@@ -39,9 +40,9 @@ export const characterLook = (character) => ({
 
 // The layers of a portrait of `look` ({ classId, appearance, skin,
 // evolution }): the forest, or the background worn, with the figure over it,
-// lit by the aura worn; with a frame worn, these two in its window and the
-// frame over them.
-export function portraitLayers(look, { frame = null, background = null, aura = null } = {}) {
+// lit by the aura worn, and the pet worn by the figure; with a frame worn,
+// all this in its window and the frame over it.
+export function portraitLayers(look, { frame = null, background = null, aura = null, pet = null } = {}) {
   const figure = portraitSprite(look.classId, look.appearance, { skin: look.skin, evolution: look.evolution });
   const back = cosmeticArt(cosmeticOf(background)?.art);
   // A look without its figure keeps the drawn stand-in, with its own forest.
@@ -55,6 +56,8 @@ export function portraitLayers(look, { frame = null, background = null, aura = n
   const art = h('div', { class: 'portrait-art' }, scenery, figure);
   const lit = cosmeticOf(aura)?.aura;
   if (figure && lit) light(art, figure, lit);
+  const kept = cosmeticOf(pet)?.pet;
+  if (kept) art.append(petLayer(kept.portrait, look));
   const framed = cosmeticOf(frame);
   const layer = framed && frameLayer(framed);
   if (!layer) return [art];
@@ -134,4 +137,32 @@ export function light(art, figure, { glow, spark, sparks }) {
     motes.append(mote);
   });
   art.append(motes);
+}
+
+// A pet on the portrait (the Sklep Systemu's chowaniec; the author: "541.1,
+// 541.2, 541.3 A wszystko"): its frames at its place in the figure's own
+// pixels (pet.portrait in data/cosmetics.json), counted from the portrait's
+// corner, or from the shoulder of the portrait of `look` where a pet
+// perches (anchor "shoulder"; art.js portraitPerch), in a box standing where
+// the figure is drawn (.sprite--portrait), so the pet keeps its place on a
+// portrait of any size and in a frame's window. Its frames play in steps,
+// as the scenes' sheets do; with the animations off it stands on the first.
+function petLayer({ file, size, frames, fps, x, y, anchor }, look) {
+  const { width, height } = SPRITES.portraits;
+  const [fromX, fromY] = anchor === 'shoulder' ? portraitPerch(look.classId, look.appearance, look.evolution) : [0, 0];
+  const pet = h('span', { class: 'portrait-pet' });
+  Object.assign(pet.style, {
+    left: `${((fromX + x) / width) * 100}%`,
+    top: `${((fromY + y) / height) * 100}%`,
+    width: `${(size / width) * 100}%`,
+    height: `${(size / height) * 100}%`,
+  });
+  pet.style.setProperty('--sheet', `url("/${file}")`);
+  pet.style.setProperty('--sheet-width', `${frames * 100}%`);
+  // A background's position in percent moves it by that part of what it is
+  // wider than the box: the last frame is at 100%, one frame further at this.
+  pet.style.setProperty('--sheet-end', `${frames > 1 ? (frames / (frames - 1)) * 100 : 0}%`);
+  pet.style.setProperty('--frames', String(frames));
+  pet.style.setProperty('--duration', `${frames / fps}s`);
+  return h('div', { class: 'portrait-pet-space' }, h('div', { class: 'portrait-pet-figure' }, pet));
 }

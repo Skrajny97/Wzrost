@@ -3101,6 +3101,25 @@ Autor: „542 C skalowanie złota wraz z dostępnymi wygranymi, ale można nic n
    - Zasady obu gier są pod „Jak to działa?”.
    - Po zmianie stawki pula nowej stawki przychodzi z serwera. Do tej chwili stara jest przygaszona, a przycisk „Zakręć Kołem” czeka.
 
+## Chowańce w grze (3.11.2026)
+
+Autor: „413 akcept”, „414 akcept”, „415 A”, „Zatwierdzam 540.1, 540.2 i 540.3” i „541.1, 541.2, 541.3 A wszystko” (zob. „Chowańce: odpowiedzi autora 540 i 541” niżej).
+
+1. **Sklep Systemu.** Nowa zakładka „Chowańce” (`pet` w `data/cosmetics.json`): Chowaniec: Lis i Chowaniec: Kruk po 600 PS oraz Chowaniec: Błędny ognik za 800 PS. Sześć zakładek stoi w dwóch rzędach po trzy: Ramki, Tła i Aury nad Śladami, Wierzchowcem i Chowańcami. Karta chowańca pokazuje go na portrecie własnej postaci, z założoną ramką, tłem i aurą. „Kup”, „Załóż” i „Zdejmij” działają jak przy innych kosmetykach. Postać ma przy sobie jednego chowańca naraz: założenie drugiego zdejmuje pierwszego.
+   - (brakujący szczegół) Chowaniec nie potrzebuje wierzchowca ze Stajni.
+   - (brakujący szczegół) Podgląd każdego przedmiotu na portrecie pokazuje też założonego chowańca, tak jak założoną ramkę, tło i aurę.
+   - Opisy chowańców i zdanie pod „Jak to działa?” to propozycja do poprawy przez autora.
+2. **Scena Walki.** Zatwierdzone animacje (8 klatek, 8 na sekundę, w skali chodu postaci) idą razem z postacią: lis kłusuje przed nią po ziemi, kruk leci przed nią na wysokości głowy, a ognik unosi się za nią. Pieszo stoją tak jak w zatwierdzonym filmie: lewy brzeg klatki lisa 92 px od lewego brzegu klatki chodu, z łapami na linii stóp postaci; kruk 96 px od niego i 6 px nad górą klatki chodu; ognik 26 px za nią i 2 px pod górą klatki, schowany za postacią.
+   - (brakujący szczegół) Konno lis idzie po ziemi przed pyskiem wierzchowca, kruk leci przed jeźdźcem na wysokości jego głowy, a ognik unosi się za wierzchowcem, na wysokości głowy i ramion jeźdźca. Miejsca liczą się od przodu albo tyłu pudełka jazdy (wierzchowiec z jeźdźcem) i od jego dołu albo góry, więc te same liczby pasują do Kuca, Konia wierzchowego, Rumaka i Tygrysa szablozębnego (sprawdzone na zrzutach). Przy tygrysie ognik leci za końcem jego długiego ogona, więc dalej od jeźdźca niż przy koniach.
+   - (brakujący szczegół) Przy figurze Systemu (wygląd bez chodu) chowaniec stoi tak samo względem jej pudełka.
+   - (brakujący szczegół) Aura nie świeci na chowańcu, a chowaniec nie zostawia śladów.
+3. **Portret.** Lis siedzi u stóp postaci, kruk na jej barku za głową, a ognik unosi się przy drugim ramieniu: w zakładce Postać, w podglądach w sklepie i na karcie postaci, którą widzą inni gracze, także w oknie ramki. Chowaniec jest przed postacią, a w zakładce Postać przygasa razem z nią, gdy widać sloty ekwipunku.
+   - (brakujący szczegół) Bark jest na każdym portrecie gdzie indziej, a stałe miejsce z filmu (zrobionego na portrecie barbarzyńcy) zasłaniało twarz drobniejszym postaciom. Każdy z 70 portretów ma więc wybrane na oko miejsce na barku za głową (`perches` w `src/client/art.js`). Kruk siada tam stopami, a ognik leci w tej samej odległości od tego miejsca co w filmie. Na portrecie barbarzyńcy oba są dokładnie tam, gdzie w filmie. Lis siedzi na każdym portrecie w tym samym miejscu u stóp, jak w filmie.
+4. **Przy wyłączonych animacjach** chowaniec stoi na pierwszej klatce, w scenie i na portrecie.
+5. **Bez migracji bazy.** Chowaniec to nowe miejsce w stanie kosmetyków postaci (`pet`), a karta postaci podaje go innym graczom.
+6. **Zapis.** Arkusze leżą bez zmian w `src/client/art/pets`: `fox-trot`, `raven-fly` i `wisp` po 8 klatek 64 × 64 oraz `fox-portrait`, `raven-portrait` i `wisp-portrait` po 8 klatek 32 × 32. Miejsca są w danych (`pet.foot`, `pet.ride` i `pet.portrait`), a pola opisują `$comment` w `data/cosmetics.json` i `data/schemas/cosmetics.schema.json`. Walidator sprawdza, że arkusze są i mają tyle klatek, ile podają dane. Scenę rysuje `src/client/scenes.js` (`companion`), a portret `src/client/cosmetics.js` (`petLayer`).
+7. **Sprawdzone w przeglądarce** na telefonie (390×844) i komputerze (1366×768): zakładka Chowańce, zakup przyciskiem, każdy chowaniec pieszo i na czterech wierzchowcach, przy figurze Systemu, na portrecie bez ramki i w Złotej ramce, na karcie postaci i przy wyłączonych animacjach, bez błędów strony i brakujących grafik. Wprowadzenie przechodzi (`tools/first-steps.cjs`).
+
 ## Chowańce: odpowiedzi autora 540 i 541 (3.11.2026)
 
 Autor: „Zatwierdzam 540.1, 540.2 i 540.3 udały się te animacje” i „541.1, 541.2, 541.3 A wszystko”.

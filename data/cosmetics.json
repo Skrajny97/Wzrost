@@ -1,5 +1,5 @@
 {
-  "$comment": "Sklep Systemu (src/engine/cosmetics.js, src/server/cosmetics.js, src/client/screens/shop.js; DECISIONS.md, „Sklep Systemu: ramki, tła i tygrys szablozębny”). Autor: „tylko ramki i tła wchodzą póki co do gry, wszystkie”, imię w kolorze ramki i wierzchowiec-kosmetyk „Tygrys szablozębny” za 1000 Punktów Systemu. Przedmioty zmieniają tylko wygląd i należą do postaci, która je kupiła, tak jak jej Punkty Systemu. kind: frame (ramka portretu), background (tło portretu za postacią, w miejsce lasu) albo mountSkin (wygląd wierzchowca ze Stajni w scenie Walki), aura (światło wokół postaci na portrecie i w scenie Walki) albo trail (świecące ślady za postacią w scenie Walki); autor: „416 akcept”, „417 akcept”, „418 akcept”. price: cena w Punktach Systemu. art: obrazek bez .png, ramki i tła w src/client/art/cosmetics, wygląd wierzchowca w src/client/art/mounts, a jego kłus pod tym samym kluczem w walk.mounts (data/animations.json); bez nich gra pokazuje wierzchowca ze Stajni, a karta w sklepie jest bez obrazka. window: przezroczyste okno ramki w obrazku 120 × 160 jako [lewo, góra, prawo, dół] włącznie; tło i postać stoją w nim, pomniejszone. nameColor: kolor imienia postaci, gdy nosi ramkę i włączy „Kolor imienia jak ramka”. effect: animacja ramki: shine (pas światła po ramce i błyski w points), pulse (pulsująca poświata i jasna linia w dół ramki) albo fireflies (świetliki w points); points w pikselach obrazka 120 × 160. aura: glow (kolor poświaty wokół sylwetki), spark (kolor drobinek) i sparks (drift: drobinki krążą wokół postaci, rise: iskry lecą w górę). trail: color (kolor śladów). Aura i ślady nie mają obrazka (art): rysuje je gra. texts: słowa pod „Jak to działa?” w sklepie.",
+  "$comment": "Sklep Systemu (src/engine/cosmetics.js, src/server/cosmetics.js, src/client/screens/shop.js; DECISIONS.md, „Sklep Systemu: ramki, tła i tygrys szablozębny”). Autor: „tylko ramki i tła wchodzą póki co do gry, wszystkie”, imię w kolorze ramki i wierzchowiec-kosmetyk „Tygrys szablozębny” za 1000 Punktów Systemu. Przedmioty zmieniają tylko wygląd i należą do postaci, która je kupiła, tak jak jej Punkty Systemu. kind: frame (ramka portretu), background (tło portretu za postacią, w miejsce lasu) albo mountSkin (wygląd wierzchowca ze Stajni w scenie Walki), aura (światło wokół postaci na portrecie i w scenie Walki) albo trail (świecące ślady za postacią w scenie Walki); autor: „416 akcept”, „417 akcept”, „418 akcept”. price: cena w Punktach Systemu. art: obrazek bez .png, ramki i tła w src/client/art/cosmetics, wygląd wierzchowca w src/client/art/mounts, a jego kłus pod tym samym kluczem w walk.mounts (data/animations.json); bez nich gra pokazuje wierzchowca ze Stajni, a karta w sklepie jest bez obrazka. window: przezroczyste okno ramki w obrazku 120 × 160 jako [lewo, góra, prawo, dół] włącznie; tło i postać stoją w nim, pomniejszone. nameColor: kolor imienia postaci, gdy nosi ramkę i włączy „Kolor imienia jak ramka”. effect: animacja ramki: shine (pas światła po ramce i błyski w points), pulse (pulsująca poświata i jasna linia w dół ramki) albo fireflies (świetliki w points); points w pikselach obrazka 120 × 160. aura: glow (kolor poświaty wokół sylwetki), spark (kolor drobinek) i sparks (drift: drobinki krążą wokół postaci, rise: iskry lecą w górę). trail: color (kolor śladów). Aura i ślady nie mają obrazka (art): rysuje je gra. kind pet: chowaniec (lis, kruk i błędny ognik; autor: „413 akcept”, „414 akcept”, „415 A”, a animacje: „Zatwierdzam 540.1, 540.2 i 540.3”, „541.1, 541.2, 541.3 A wszystko”), który idzie z postacią w scenie Walki i jest przy niej na portrecie. Nie ma obrazka (art), tylko arkusze klatek w src/client/art/pets (pet.walk i pet.portrait: file, size: bok klatki w pikselach, frames: klatki w jednym rzędzie, przodem w prawo, fps: klatki na sekundę). pet.walk: arkusz w scenie Walki, w skali 1, jak chód postaci. pet.foot (postać idzie) i pet.ride (postać jedzie na wierzchowcu ze Stajni): miejsce klatki chowańca przy pudełku postaci w scenie Walki, czyli przy klatce jej chodu (128 × 128), przy figurze Systemu (96 × 96) albo przy pudełku jazdy, w którym są wierzchowiec i jeździec (szerokość kłusa wierzchowca, a wysokość od kopyt do głowy jeźdźca). edge: front (przód pudełka, po prawej) albo back (tył, po lewej); x: o ile pikseli w prawo od tego brzegu leży lewy brzeg klatki chowańca (ujemny: w lewo); bottom: o ile pikseli nad dołem pudełka leży dół klatki (ujemny: niżej) albo top: o ile pikseli pod górą pudełka leży góra klatki (ujemny: wyżej); behind: true, gdy chowaniec jest za postacią i wierzchowcem, a bez niego jest przed nimi. pet.portrait: arkusz na portrecie (klatki w pikselach portretu 96 × 128) i lewy górny róg klatki (x, y) w pikselach portretu, liczony od lewego górnego rogu portretu albo, z anchor: shoulder, od miejsca na barku za głową postaci, innego na każdym portrecie (perches w src/client/art.js; na portrecie barbarzyńcy z filmu, który autor zatwierdził, to 45, 30). Chowaniec trzyma więc swoje miejsce na portrecie każdej wielkości i w oknie ramki. Przy wyłączonych animacjach chowaniec stoi na pierwszej klatce. texts: słowa pod „Jak to działa?” w sklepie.",
   "items": [
     {
       "id": "frame-gold",
@@ -89,6 +89,45 @@
       "description": "Za postacią w scenie Walki zostają świecące ślady, które powoli gasną.",
       "price": 300,
       "trail": { "color": "#8fe3ef" }
+    },
+    {
+      "id": "fox",
+      "kind": "pet",
+      "name": "Chowaniec: Lis",
+      "description": "Rudy lis biegnie przy postaci w scenie Walki, a na portrecie siedzi u jej stóp.",
+      "price": 600,
+      "pet": {
+        "walk": { "file": "art/pets/fox-trot.png", "size": 64, "frames": 8, "fps": 8 },
+        "foot": { "edge": "front", "x": -36, "bottom": -10 },
+        "ride": { "edge": "front", "x": -14, "bottom": -10 },
+        "portrait": { "file": "art/pets/fox-portrait.png", "size": 32, "frames": 8, "fps": 8, "x": 66, "y": 98 }
+      }
+    },
+    {
+      "id": "raven",
+      "kind": "pet",
+      "name": "Chowaniec: Kruk",
+      "description": "Czarny kruk leci przed postacią w scenie Walki, a na portrecie siada jej na ramieniu.",
+      "price": 600,
+      "pet": {
+        "walk": { "file": "art/pets/raven-fly.png", "size": 64, "frames": 8, "fps": 8 },
+        "foot": { "edge": "front", "x": -32, "top": -6 },
+        "ride": { "edge": "front", "x": -28, "top": -4 },
+        "portrait": { "file": "art/pets/raven-portrait.png", "size": 32, "frames": 8, "fps": 8, "anchor": "shoulder", "x": -15, "y": -26 }
+      }
+    },
+    {
+      "id": "wisp",
+      "kind": "pet",
+      "name": "Chowaniec: Błędny ognik",
+      "description": "Oswojony błędny ognik unosi się za postacią w scenie Walki, a na portrecie świeci błękitnym światłem przy jej ramieniu.",
+      "price": 800,
+      "pet": {
+        "walk": { "file": "art/pets/wisp.png", "size": 64, "frames": 8, "fps": 8 },
+        "foot": { "edge": "back", "x": -26, "top": 2, "behind": true },
+        "ride": { "edge": "back", "x": -40, "top": 6, "behind": true },
+        "portrait": { "file": "art/pets/wisp-portrait.png", "size": 32, "frames": 8, "fps": 8, "anchor": "shoulder", "x": 25, "y": -24 }
+      }
     }
   ],
   "texts": {
@@ -98,7 +137,8 @@
       "Ramka i tło zdobią portret w zakładce Postać i na karcie postaci, którą widzą inni gracze.",
       "Z założoną ramką imię postaci może mieć kolor ramki: na czacie, w Rankingu, u Znajomych, w Drużynie i w Gildii.",
       "Wierzchowiec zmienia tylko wygląd kupionego ze Stajni, więc kupi go postać, która ma już wierzchowca.",
-      "Aura świeci wokół postaci na portrecie, na karcie postaci i w scenie Walki. Świetliste ślady zostają za postacią w scenie Walki, także za jej wierzchowcem."
+      "Aura świeci wokół postaci na portrecie, na karcie postaci i w scenie Walki. Świetliste ślady zostają za postacią w scenie Walki, także za jej wierzchowcem.",
+      "Chowaniec towarzyszy postaci na portrecie, na karcie postaci i w scenie Walki, także przy jej wierzchowcu. Postać ma przy sobie jednego chowańca naraz."
     ]
   }
 }
