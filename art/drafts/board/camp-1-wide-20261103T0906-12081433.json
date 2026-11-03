@@ -1,0 +1,29 @@
+{
+  "id": "camp-1-wide",
+  "payload": {
+    "prompt": "top-down pixel art game map seen straight from above, a very large empty forest clearing for a village builder game, soft green grass with small flowers, clover and a few grey stones covering almost the whole picture, the open grass reaching close to all four edges of the picture, no trees and no bushes inside, muted natural colours, no buildings, no paths, no water, no people, only a thin line of dark green pine and oak treetops along the very edges of the picture, a few sharpened wooden stakes stuck in the grass here and there near the edges",
+    "prompt_style": "rd_plus__topdown_map",
+    "width": 320,
+    "height": 352,
+    "num_images": 3,
+    "seed": 12081433,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793696805,
+    "credit_cost": 21,
+    "balance_cost": 0.18,
+    "output_urls": [],
+    "model": "rd_plus",
+    "remaining_credits": 0,
+    "remaining_balance": 5.31,
+    "request_id": "d0890d62-a0a3-4342-bd46-f0d632962a50",
+    "outputs_retained_until": 1793783189,
+    "output_url_expires_at": 1793697705,
+    "billing": {
+      "source": "balance",
+      "balance_left": 5.31,
+      "balance_charged": 0.18
+    }
+  }
+}
