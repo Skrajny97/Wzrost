@@ -1,5 +1,6 @@
 {
   "$comment": "Poprawki odcieni skóry jeźdźców (tools/rider-tones.py), jak tools/walk-tones.json dla chodów: only = jedyne prostokąty [lewo, góra, prawo, dół] obrazka 64 × 96, w których kolory skóry są skórą (twarz, dłonie, odsłonięte stopy); add = kolory skóry, których portret nie podpowiedział; not = prostokąty, w których nic nie jest skórą (hełm z brązu); drop = kolory, które nigdy nie są skórą (rude włosy); pixels = pojedyncze piksele skóry pod klatką \"0\" (blask na nosie, cień palców).",
+  "assassin-male": { "add": ["715037"], "only": [[26, 14, 38, 22]] },
   "sniper-female": { "add": ["eeab88", "ad846b"], "only": [[26, 13, 42, 30]] },
   "cleric-male": { "only": [[22, 19, 41, 39], [23, 44, 47, 59]] },
   "cleric-female": { "only": [[22, 12, 40, 36], [25, 39, 51, 55], [26, 72, 47, 90]] },

@@ -3034,6 +3034,22 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.19 (3.11.2026)
+
+1. **Odcienie skóry Skrytobójcy na wierzchowcu:** jeździec Skrytobójcy (mężczyzny) dostał wszystkie siedem odcieni. Wcześniej miał je tylko z nazwy, bo pliki były takie jak narysowany (zob. „Odcienie skóry: sprawdzenie wszystkich wyglądów”).
+
+## Odcienie skóry: sprawdzenie wszystkich wyglądów (3.11.2026)
+
+Autor: „566 nie chce mi sie tego sprawdzać, chce zebys to zrobil czy odcienie na wszystkich ewolucjach postaci są zrobione” i „włącznie z chodami i jazdami bo moglismy pominąć”.
+
+1. **Co sprawdzono.** 70 wyglądów: 5 klas, 15 pierwszych ewolucji i 15 drugich form, obie płci. Każdy ma portret, chód i jazdę wierzchem w 7 przekolorowanych odcieniach, razem 1470 plików.
+   - Każdy plik istnieje i ma rozmiar narysowanego.
+   - Każdy zmienia skórę, w chodzie w każdej klatce, i to w stronę swojego odcienia: ciemne ciemnieją, Blada jaśnieje, Szara szarzeje, Żółta żółknie.
+   - Sprawdzenie robi skrypt na wszystkich plikach, a wątpliwe przypadki są obejrzane na powiększonych zestawieniach.
+2. **Pominięty był jeden plik: Skrytobójca (mężczyzna) na wierzchowcu.** Skórę widać u niego tylko w wąskim pasku nad maską, a narzędzie (`tools/rider-tones.py`) jej nie rozpoznało, więc 7 odcieni było takich jak narysowany. `tools/rider-tones.json` wskazuje teraz kolor skóry i miejsce czoła, a odcienie są poprawione.
+3. **Twarze w maskach.** Skrytobójca i Królobójca mają twarz zasłoniętą, więc odcień zmienia tylko skórę przy oczach. Tak ma być.
+4. **„Jasna” to skóra, jaką narysował generator.** Bywa więc ciemniejsza niż sama „Jasna”: u Berserkera (czerwonawa) wyraźnie ciemniejsza od „Śniadej”. W wielu chodach (Burzowa Łuczniczka, Władca Piorunów, Strzelec Wyborowy i inne) wygląda prawie jak „Śniada”. Pytanie 567: czy „Jasna” ma być wszędzie tą samą jasną skórą, przekolorowaną jak pozostałe odcienie, tak jak już jest u Widma.
+
 ## Wersja 0.1.18 (3.11.2026)
 
 1. **Górnictwo i Jubilerstwo** od 25. poziomu postaci, obie naraz (zob. „Górnictwo i Jubilerstwo: odpowiedzi autora 534–539”, „Górnictwo i Jubilerstwo: budowa” oraz „Górnictwo i Jubilerstwo: rozdział narratora i sceny pracy”).
