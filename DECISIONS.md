@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Odpowiedzi autora 557 (nagrania), 558 i 559 (3.11.2026)
+
+Autor: „558 C”, „559 G”, „557.1 B”, „557.2 A”, „557.3 B”, „557.4 B”, „557.5 A” i „557.6 B”.
+
+1. **Sceny pracy (PixelLab):** pierwsza klatka Kopalni to wersja C (ludek uderza kilofem w żyłę złota, lecą iskry), a Szlifierni wersja G (ludek szlifuje kamień na tarczy pod łukiem ciemnego muru). Obie leżą w `art/references/scenes/` i idą do animacji w PixelLab (`art/scenes.json`, rodzaj `scenes-animate`). Autor ocenia animacje jako MP4, zanim profesje wejdą do gry.
+2. **Nagrania narratora:** rozdział Górnictwa i Jubilerstwa dostaje nagrania 557.1 B, 557.2 A, 557.3 B, 557.4 B, 557.5 A i 557.6 B, przycięte 0,3 s po ostatnim słowie, w tej samej jakości co reszta kwestii (mono, 56 kb/s).
+
 ## Wersja 0.1.16 (3.11.2026)
 
 1. **Stół rozbiórki:** karta materiału przerabia tyle sztuk, ile wybrano, choćby jedną, a ekran stołu ma zakładki Materiały, Przedmioty, Kolejka i Części, z zaznaczaniem kilku materiałów i rozbiórką przedmiotów z plecaka (zob. „Stół rozbiórki: liczba sztuk, zaznaczanie i zakładki”).
