@@ -3011,6 +3011,55 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Górnictwo i Jubilerstwo: odpowiedzi autora 534–539 (3.11.2026)
+
+Autor: „534 A”, „535 A, albo i więcej”, „536 A, ale biżuteria to też talizmany i amulety”, „537 A”, „538 A”, „539 A”.
+
+1. **Statystyki (534 A).** Każdy poziom Górnictwa daje +1 do Witalności i Wytrzymałości, a każdy poziom Jubilerstwa +1 do Woli i Percepcji. Każda statystyka gry ma teraz swoją profesję.
+2. **Kamienie (535 A).** Jest siedem kamieni, po jednym na rzadkość. Górnictwo znajduje je od tych samych poziomów, od których Rzemieślnictwo robi przedmioty tej rzadkości:
+   - Kwarc: pospolity, od 1. poziomu;
+   - Agat: rzadki, od 5.;
+   - Ametyst: unikalny, od 15.;
+   - Szmaragd: epicki, od 25.;
+   - Szafir: legendarny, od 40.;
+   - Rubin: mityczny, od 60.;
+   - Diament: boski, od 80.
+
+   Autor dopuszcza więcej kamieni („albo i więcej”). Mogą dojść później, np. przy nowych krainach.
+3. **Kruszce (536 A).** Biżuteria to pierścienie, amulety i talizmany. Każda potrzebuje kruszcu:
+   - srebrnego, od 1. poziomu Górnictwa: na rzadkość pospolitą, rzadką i unikalną;
+   - złotego, od 25.: na epicką i legendarną;
+   - gwiezdnego, od 60.: na mityczną i boską.
+4. **Wyrób biżuterii (537 A).** Jubilerstwo robi pierścienie, amulety i talizmany tak, jak Rzemieślnictwo robi resztę ekwipunku:
+   - wzory odsłania poziom profesji;
+   - rzadkość wyrobu wyznacza kamień tej rzadkości, a do tego potrzeba kruszcu i czasu pracy;
+   - wyrób może się nie udać;
+   - gotowa biżuteria ma poziom postaci i przyrostki od poznanych stworów.
+5. **Oprawianie (538 A).** W przedmiocie z dowolnego miejsca ekwipunku może tkwić jeden kamień:
+   - Kamień podnosi wszystkie statystyki przedmiotu o procent, tym większy, im rzadszy kamień (na start: Kwarc 5%, a Diament 35%; liczby sprawdzi symulacja).
+   - Nowy kamień niszczy poprzedni.
+   - Oprawianie to praca w Jubilerstwie. Kamień można oprawić od tego poziomu Jubilerstwa, od którego Górnictwo go znajduje.
+6. **Miejsca (539 A).** Górnictwo pracuje w Systemowej Kopalni (395 A), a Jubilerstwo w Systemowej Szlifierni.
+7. **Wcześniej ustalone:**
+   - obie profesje od 25. poziomu postaci (531) i razem w grze;
+   - żyły złota dają średnio połowę złota z wyprawy na tym samym poziomie postaci (532 A);
+   - kamienie i kruszce można trzymać albo sprzedać, w Plecaku, tak jak materiały (533 A, brakujący szczegół: bez nowego mieszkańca);
+   - Awatar Systemu pracuje w nich jak w innych profesjach;
+   - nowy rozdział narratora na 25. poziomie postaci (teksty do zatwierdzenia przed nagraniem).
+8. **Grafiki:** PixelLab rysuje szkice 7 kamieni, 3 kruszców, Systemowej Kopalni, Systemowej Szlifierni i ikon obu profesji. Autor ocenia je po jednym.
+
+## Salon Gier: odpowiedzi autora 542 i 543 (3.11.2026)
+
+Autor: „542 C skalowanie złota wraz z dostępnymi wygranymi, ale można nic nie trafić i stracić. Przez to nigdy nie zarobisz więcej, chyba że masz farta dużo. 100 złotych to start, ale można grać więcej co 100 złotych i zmienia to dostępną pulę.” oraz „543 Koło Fortuny zgodnie z tym co wyżej napisałem w 542 inaczej musi brzmieć”.
+
+1. **Koło Fortuny po 542 C (brakujący szczegół: najprostsze odczytanie):**
+   - Stawka wynosi 100 zł i więcej, zawsze setkami: 100, 200, 300 zł i dalej.
+   - Szansa na wygraną to zawsze 50%.
+   - Każda stawka ma własną dzienną pulę 5 nagród. Każda nagroda jest warta więcej niż stawka i najwyżej jej dwa razy tyle, więc średnio Koło oddaje mniej, niż bierze, a zarobić można tylko z dużym szczęściem.
+   - Najwyższa stawka to najwyższa setka, przy której w puli zmieści się choć jeden przedmiot dla postaci („skalowanie złota wraz z dostępnymi wygranymi”).
+   - Dzięki temu przedmioty są w puli na każdym poziomie, także po 100. Zastępuje to stawkę od 1 do 100 zł z szansą równą połowie stawki (525 A).
+2. **Kwestie narratora (543).** Kwestia o Loterii zostaje. Kwestia o Kole Fortuny ma nowe brzmienie, zgodne z 542 C, i czeka na zatwierdzenie autora.
+
 ## Chowańce: odpowiedzi autora 540 i 541 (3.11.2026)
 
 Autor: „Zatwierdzam 540.1, 540.2 i 540.3 udały się te animacje” i „541.1, 541.2, 541.3 A wszystko”.
