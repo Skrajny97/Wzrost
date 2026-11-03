@@ -83,7 +83,7 @@ import { takenBefore, trialProgress } from './guild-trials.js';
 import { soldGold } from './inventory.js';
 import { finishGathering } from './professions.js';
 import { herbsOf, knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
-import { KEPT_REPORTS } from './reports.js';
+import { trimReports } from './reports.js';
 import { leaveTrip, tripOf } from './trips.js';
 import { finishCrafting } from './workshop.js';
 
@@ -794,9 +794,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, `${row.id}:${activity.started_at}`, 'hunt', now, JSON.stringify(summary), JSON.stringify(report)),
       // A report keeps every fight (about 40 KB for 4 hours), so only those the journal shows stay.
-      db
-        .prepare('DELETE FROM reports WHERE character_id = ? AND id NOT IN (SELECT id FROM reports WHERE character_id = ? ORDER BY id DESC LIMIT ?)')
-        .bind(row.id, row.id, KEPT_REPORTS),
+      trimReports(db, row.id, 'hunt'),
       ...hunt.items.flatMap((item, index) =>
         soldFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)],
       ),

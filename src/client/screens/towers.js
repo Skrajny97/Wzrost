@@ -1,8 +1,10 @@
 // The Wieże in the Walka (src/server/towers.js), from character level 50:
 // the entries left today and each tower with its floors. The floor is
 // picked with the slider or − and +; the card shows its inner region, its
-// level and what waits there (an elite, a champion, the tower's chest not
-// taken yet), who climbs beside the character in the Wieża Drużyn, and
+// level and what waits there (an elite of every fifth floor in every other
+// lap of the regions, a champion with its trophy while its floor is not
+// won yet, the tower's chest not taken yet), who climbs beside the
+// character in the Wieża Drużyn, and
 // "Wejdź", whose report opens at once. While the character is on an
 // exploration, or its report waits, the towers wait for it (towers.js). The
 // floor picked is remembered on this device. Over each card its tower,
@@ -83,7 +85,7 @@ export function mountTowers(container, { navigate }) {
         h('p', { class: 'towers-entries', text: `Wejścia na dziś: ${view.left} z ${view.perDay}. Nowe od północy.` }),
         howItWorks(
           'Wejście to jedna walka na wybranym piętrze, z wynikiem od razu.',
-          `Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. Co ${view.eliteEvery}. piętro czeka elita, co ${view.championEvery}. czempion, a co ${view.chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży.`,
+          `Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. ${eliteText()} Na zwykłych piętrach czasem czeka elita. Co ${view.championEvery}. piętro czeka czempion, a co ${view.chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.`,
         ),
       ),
       exploring() && systemPanel(exploring(), activityFinished(state.character.activity) && systemLink('#/walka', 'Odbierz raport')),
@@ -104,6 +106,20 @@ export function mountTowers(container, { navigate }) {
   // The floor a tower's card starts at: the one picked before, else the
   // next above the highest won, within the floors open.
   const floorOf = (tower) => Math.min(tower.top, Math.max(1, Number.isInteger(picks[tower.id]) ? picks[tower.id] : tower.best + 1));
+
+  // Whether a floor is in a lap of the regions with the elites of every
+  // eliteEvery floor: one lap in eliteLapEvery, from the first (the
+  // author: 484 A; towerEliteFloor in the engine).
+  const eliteLap = (floor) => Math.floor((floor - 1) / view.cycle.length) % (view.eliteLapEvery ?? 1) === 0;
+
+  // The intro's words on those elites, with the floors of their first laps.
+  function eliteText() {
+    const every = view.eliteLapEvery ?? 1;
+    if (every <= 1) return `Co ${view.eliteEvery}. piętro czeka elita.`;
+    const lap = view.cycle.length;
+    const floors = [0, 1, 2].map((index) => `${index * every * lap + 1}–${index * every * lap + lap}`).join(', ');
+    return `Co ${view.eliteEvery}. piętro czeka elita, ale tylko w co ${every === 2 ? 'drugim' : `${every}.`} okrążeniu regionów: na piętrach ${floors} i tak dalej.`;
+  }
 
   function towerCard(tower) {
     let floor = floorOf(tower);
@@ -138,9 +154,14 @@ export function mountTowers(container, { navigate }) {
       savePicks(picks);
       const place = view.cycle[(floor - 1) % view.cycle.length];
       const champion = floor % view.championEvery === 0;
-      const elite = floor % view.eliteEvery === 0;
+      const elite = floor % view.eliteEvery === 0 && eliteLap(floor);
       const chest = floor % view.chestEvery === 0 && !tower.chests.includes(floor);
-      const waits = [champion && place.champion ? 'czempion' : (champion || elite) && place.elite ? 'elita' : null, chest && 'skrzynia Wieży'].filter(Boolean);
+      // A champion leaves its trophy only at the first win of its floor (483 A).
+      const trophy = !(tower.champions ?? []).includes(floor);
+      const waits = [
+        champion && place.champion ? (trophy ? 'czempion i jego trofeum' : 'czempion') : (champion || elite) && place.elite ? 'elita' : null,
+        chest && 'skrzynia Wieży',
+      ].filter(Boolean);
       fill(
         details,
         h('span', { class: 'area-circle tower-circle' }, areaArt(place.id)),

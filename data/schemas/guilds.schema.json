@@ -344,6 +344,11 @@
         "step": {
           "type": "integer",
           "minimum": 1
+        },
+        "levelsBelow": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Wygrana w Wieży liczy się tylko na piętrze najwyżej tyle poziomów poniżej poziomu postaci (autor: 488 A)."
         }
       }
     },

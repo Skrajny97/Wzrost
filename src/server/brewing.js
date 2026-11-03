@@ -39,7 +39,7 @@ import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, insertWork, requireProfessions, takeFromBag, workGains } from './professions.js';
 import { herbsOf, potionKnown, potionsOf } from './professions-view.js';
-import { KEPT_REPORTS } from './reports.js';
+import { trimReports } from './reports.js';
 import { say } from '../engine/text.js';
 
 // A brewing of `count` potions of the recipe chosen, from now on, by the
@@ -203,9 +203,7 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'potions', now, JSON.stringify(summary), JSON.stringify(report)),
-      db
-        .prepare('DELETE FROM reports WHERE character_id = ? AND id NOT IN (SELECT id FROM reports WHERE character_id = ? ORDER BY id DESC LIMIT ?)')
-        .bind(row.id, row.id, KEPT_REPORTS),
+      trimReports(db, row.id, 'potions'),
       db
         .prepare(
           `UPDATE characters SET quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${herbsBack.sql}${catalystsBack.sql}${potions.sql}, version = version + 1

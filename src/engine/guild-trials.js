@@ -64,6 +64,22 @@ export function trialText(kindId, count, content) {
   return kind.text.replace('{count}', String(count)).replace('{noun}', countedForm(count, kind.counted));
 }
 
+// The lowest floor whose win counts for a trial of the Wieże for a
+// character of `level`: at most the kind's levelsBelow levels below it, so
+// a high character does not do the trial on the first floor (the author:
+// 488 A); any floor when the kind sets no such limit.
+export function trialTowerFloor(level, content) {
+  const below = trialKind('towers', content)?.levelsBelow;
+  return Number.isInteger(below) ? Math.max(1, level - below) : 1;
+}
+
+// A trial's note under its words, or null: its kind's, with the lowest
+// floor that counts for a character of `level` ({floor}, trialTowerFloor).
+export function trialNote(kindId, level, content) {
+  const note = trialKind(kindId, content)?.note;
+  return note ? note.replace('{floor}', String(trialTowerFloor(level, content))) : null;
+}
+
 // Why the character cannot take a trial of a kind yet, or null. `access`
 // says, for each part of the game a kind needs (`requires`), whether the
 // character has it (true), not yet (false) or whether the game has it not
@@ -80,8 +96,9 @@ export function trialLock(kindId, access, content) {
 // quests count (addQuestProgress: creatures beaten, minutes explored,
 // materials processed and items salvaged on the Stół rozbiórki, herbs
 // gathered, potions brewed, the Warsztat's items, the Osada's orders) and
-// what they do not: tower fights won, the Kowadło's upgrades that came off
-// and the pieces given in the Prośby Gildii. Only the kinds it moves on.
+// what they do not: tower fights won (on the floors trialTowerFloor lets
+// count, as the server says), the Kowadło's upgrades that came off and the
+// pieces given in the Prośby Gildii. Only the kinds it moves on.
 export function trialGains({ kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, orders = 0, towerWins = 0, upgrades = 0, gifts = 0 }) {
   const total = (counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
   const gains = {

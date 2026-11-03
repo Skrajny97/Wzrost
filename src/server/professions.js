@@ -30,7 +30,7 @@ import { assertion, raced } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { herbsOf } from './professions-view.js';
-import { KEPT_REPORTS } from './reports.js';
+import { trimReports } from './reports.js';
 
 // A JSON path for an id with a hyphen.
 const path = (id) => `$."${id}"`;
@@ -194,9 +194,7 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'herbs', now, JSON.stringify(summary), JSON.stringify(report)),
-      db
-        .prepare('DELETE FROM reports WHERE character_id = ? AND id NOT IN (SELECT id FROM reports WHERE character_id = ? ORDER BY id DESC LIMIT ?)')
-        .bind(row.id, row.id, KEPT_REPORTS),
+      trimReports(db, row.id, 'herbs'),
       db
         .prepare(`UPDATE characters SET quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${herbs.sql}, version = version + 1 WHERE id = ?`)
         .bind(row.quests, quests, ...sets.binds, ...herbs.binds, row.id),

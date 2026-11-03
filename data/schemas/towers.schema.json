@@ -26,9 +26,10 @@
     "floors": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["eliteEvery", "eliteChance", "championEvery"],
+      "required": ["eliteEvery", "eliteLapEvery", "eliteChance", "championEvery"],
       "properties": {
         "eliteEvery": { "type": "integer", "minimum": 1 },
+        "eliteLapEvery": { "type": "integer", "minimum": 1, "description": "Stałe elity co eliteEvery piętro tylko w co eliteLapEvery okrążeniu regionów, od pierwszego (1: w każdym)." },
         "eliteChance": { "type": "number", "minimum": 0, "maximum": 1 },
         "championEvery": { "type": "integer", "minimum": 1 }
       }

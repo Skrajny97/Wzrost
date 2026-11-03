@@ -21,7 +21,8 @@
     "account",
     "quickHunt",
     "flashHunt",
-    "parties"
+    "parties",
+    "journal"
   ],
   "properties": {
     "combat": {
@@ -1275,6 +1276,16 @@
         "size": { "type": "integer", "minimum": 2 },
         "xpCost": { "type": "number", "minimum": 0, "maximum": 0.5 },
         "classSpread": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "journal": {
+      "type": "object",
+      "description": "Dziennik (src/server/reports.js): ile najnowszych raportów zostaje. towerReports: raporty z Wież, liczone osobno, żeby walki w Wieżach nie wypychały raportów wypraw (autor: 486 A); reports: wszystkie pozostałe, czyli wyprawy i profesje. Starsze raporty ponad liczbę znikają przy zapisie nowego raportu ze swojej grupy.",
+      "additionalProperties": false,
+      "required": ["reports", "towerReports"],
+      "properties": {
+        "reports": { "type": "integer", "minimum": 1 },
+        "towerReports": { "type": "integer", "minimum": 1 }
       }
     }
   }

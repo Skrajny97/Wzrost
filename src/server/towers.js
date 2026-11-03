@@ -12,7 +12,8 @@
 // można było robić natychmiastowych Wież w trakcie Wypraw (bo może to
 // zmienić stan Postaci przed ukończeniem Wyprawy)"). A win pays as a fight of an exploration and writes the
 // creatures into the Bestiariusz; a floor of every chestEvery won the
-// first time in a tower brings the tower's chest. Everything is saved in
+// first time in a tower brings the tower's chest, and a champion's floor
+// won the first time there its trophy (483 A). Everything is saved in
 // one batch only while the character is as read (atomic.js).
 
 import {
@@ -34,6 +35,7 @@ import {
   sellPrice,
   towerArea,
   towerFight,
+  trialTowerFloor,
   trophyBonuses,
 } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
@@ -44,7 +46,7 @@ import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { soldGold } from './inventory.js';
 import { partyOf } from './parties.js';
-import { KEPT_REPORTS } from './reports.js';
+import { trimReports } from './reports.js';
 
 const rules = () => content.towers;
 const path = (key) => `$."${key}"`;
@@ -56,8 +58,10 @@ function requireUnlocked(row) {
 }
 
 // The character's record of the towers: the day and the entries used on
-// it, the highest floor won in each tower and the floors whose chest it
-// has taken there.
+// it, the highest floor won in each tower, the floors whose chest it has
+// taken there and the champions' floors it has won there, whose trophy
+// comes only with the first win (the author: 483 A; a record from before
+// has none, so each champion's floor brings its trophy once more).
 function recordOf(row) {
   let stored;
   try {
@@ -65,7 +69,7 @@ function recordOf(row) {
   } catch {
     stored = {};
   }
-  return { day: stored.day ?? null, used: stored.used ?? 0, best: stored.best ?? {}, chests: stored.chests ?? {} };
+  return { day: stored.day ?? null, used: stored.used ?? 0, best: stored.best ?? {}, chests: stored.chests ?? {}, champions: stored.champions ?? {} };
 }
 
 const entriesUsed = (record, now) => (record.day === questPeriod('daily', now, content).key ? record.used : 0);
@@ -90,8 +94,8 @@ async function climbersFor(db, player, tower) {
 
 // The towers for the page: the entries left today, the order of the
 // inner regions the floors go through, and each tower with its highest
-// floor open, the highest won, the chests taken and who climbs with the
-// character.
+// floor open, the highest won, the chests taken, the champions' floors won
+// (their trophies taken) and who climbs with the character.
 async function towersView(db, player, now) {
   const row = player.row;
   const record = recordOf(row);
@@ -101,6 +105,7 @@ async function towersView(db, player, now) {
     left: Math.max(0, entries.perDay - entriesUsed(record, now)),
     chestEvery,
     eliteEvery: rules().floors.eliteEvery,
+    eliteLapEvery: rules().floors.eliteLapEvery,
     championEvery: rules().floors.championEvery,
     cycle: content.areas.map((area) => ({ id: area.id, name: area.name, regionName: area.regionName, elite: Boolean(area.elite), champion: Boolean(area.champion) })),
     towers: await Promise.all(
@@ -113,6 +118,7 @@ async function towersView(db, player, now) {
           top: climbers.top,
           best: record.best[tower.id] ?? 0,
           chests: record.chests[tower.id] ?? [],
+          champions: record.champions[tower.id] ?? [],
           partners: climbers.partners.map((partner) => ({ name: partner.name, level: partner.level })),
           companions: climbers.companions.map((companion) => companion.name),
           missing: climbers.missing,
@@ -156,11 +162,14 @@ export async function enterTower(context) {
   const equipped = equippedItems(player);
   const taken = record.chests[tower.id] ?? [];
   const chest = floor % rules().chestEvery === 0 && !taken.includes(floor);
+  // A champion's trophy only at the first win of its floor in this tower.
+  const beaten = record.champions[tower.id] ?? [];
+  const championTrophy = !beaten.includes(floor);
   const area = towerArea(floor, content);
   // The Encyklopedia's trophies for the creatures of the floor's region.
   const trophies = trophyBonuses(JSON.parse(row.discovered ?? '{}'), content, areaDangers(area, content).map((danger) => danger.monsterId));
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const hunt = towerFight({ character, equipped, name: row.name, floor, seed, partners: climbers.partners, companions: climbers.companions, trophies, chest }, content);
+  const hunt = towerFight({ character, equipped, name: row.name, floor, seed, partners: climbers.partners, companions: climbers.companions, trophies, chest, championTrophy }, content);
   const won = hunt.tower.won;
   const applied = applyHunt(character, hunt, content);
 
@@ -211,6 +220,7 @@ export async function enterTower(context) {
     used: used + 1,
     best: { ...record.best, [tower.id]: won ? Math.max(record.best[tower.id] ?? 0, floor) : (record.best[tower.id] ?? 0) },
     chests: { ...record.chests, [tower.id]: won && chest ? [...taken, floor].sort((a, b) => a - b) : taken },
+    champions: { ...record.champions, [tower.id]: won && hunt.tower.champion && championTrophy ? [...beaten, floor].sort((a, b) => a - b) : beaten },
   };
   // The creatures fought join those the character has met (the Bestiariusz).
   const met = [...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))])];
@@ -229,9 +239,7 @@ export async function enterTower(context) {
     db
       .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
       .bind(row.id, `${row.id}:tower:${seed}`, 'tower', now, JSON.stringify(summary), JSON.stringify(report)),
-    db
-      .prepare('DELETE FROM reports WHERE character_id = ? AND id NOT IN (SELECT id FROM reports WHERE character_id = ? ORDER BY id DESC LIMIT ?)')
-      .bind(row.id, row.id, KEPT_REPORTS),
+    trimReports(db, row.id, 'tower'),
     ...hunt.items.flatMap((item, index) => (soldFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)])),
     db
       .prepare(
@@ -256,8 +264,10 @@ export async function enterTower(context) {
         ...(healed !== null ? [healed, now] : []),
         row.id,
       ),
-    // The Próby Gildii's trial too: the creatures and the fight won (guild-trials.js).
-    ...trialProgress(db, row.id, { kills: huntKills(hunt, content), towerWins: won ? 1 : 0 }, now),
+    // The Próby Gildii's trial too: the creatures and the fight won, on a
+    // floor at most so many levels below the character (guild-trials.js;
+    // the author: 488 A).
+    ...trialProgress(db, row.id, { kills: huntKills(hunt, content), towerWins: won && hunt.tower.level >= trialTowerFloor(row.level, content) ? 1 : 0 }, now),
     ...(storedSold.length > 0 ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${storedSold.map(() => '?').join(', ')})`).bind(row.id, ...storedSold.map((item) => item.id))] : []),
   ]);
   const after = await loadPlayer(db, session.userId);

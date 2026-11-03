@@ -86,13 +86,15 @@ function raisedRarity(rarityId, steps, content) {
 // stands for, the group factor and a demanding encounter. So the material
 // comes at the same rate per hour whatever the length, and a fight that
 // stands for many can leave more than one. A champion is a trophy: it
-// leaves its own material almost always, one piece, whatever the length.
-export function materialDrops(monsterId, level, weight, rng, content) {
+// leaves its own material almost always, one piece, whatever the length;
+// `trophy` settles it instead of the chance, one piece for certain (true)
+// or none (false), as in the Wieże (towers.js).
+export function materialDrops(monsterId, level, weight, rng, content, trophy = null) {
   const material = content.materialsByMonster[monsterId];
   const found = {};
   if (!material) return found;
   const count = content.monstersById[monsterId]?.champion
-    ? Number(rng.chance(content.balance.rewards.championMaterialChance))
+    ? Number(trophy ?? rng.chance(content.balance.rewards.championMaterialChance))
     : countEvents(content.raritiesById[material.rarity].materialChance * weight, rng);
   const chances = rarityUpChances(level, content);
   for (let i = 0; i < count; i++) {

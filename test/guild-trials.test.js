@@ -3,7 +3,8 @@
 // and drawn from the guild and the week; one trial at a time, sized to the
 // taker's level, locked while its part of the game is shut; what an action
 // brings (an exploration, the Stół rozbiórki, the Kowadło, a Wieża, an
-// order of the Osada) moves it on only with that action's own save; the bar
+// order of the Osada) moves it on only with that action's own save, a
+// Wieża's fight only on a floor near the character's level; the bar
 // of finished trials with thresholds from the members active when the board
 // was drawn and each member's trials up to the cap; and the chests, once and
 // only for those who finished a trial that week.
@@ -11,12 +12,14 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { drawTrialBoard, questPeriod, trialChest, trialCount, trialGains, trialLock, trialPoints, trialText, trialThresholds, weekShare } from '../src/engine/index.js';
+import { drawTrialBoard, questPeriod, trialChest, trialCount, trialGains, trialLock, trialNote, trialPoints, trialText, trialThresholds, trialTowerFloor, weekShare } from '../src/engine/index.js';
 import { trialProgress } from '../src/server/guild-trials.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
 const rules = content.guilds.trials;
+// Stat points that win a usual floor of the Wieże at level 60 almost always.
+const STRONG = { strength: 300, vitality: 300, endurance: 300 };
 
 describe('the Próby Gildii', () => {
   test('a board is drawn from its seed: the same guild and week, the same board; no kind and size twice', () => {
@@ -60,6 +63,19 @@ describe('the Próby Gildii', () => {
     assert.equal(trialLock('towers', { towers: false }, content), `Wieże otworzą się na ${content.unlocksById.towers.level}. poziomie postaci.`);
     assert.equal(trialLock('process', { table: false }, content), rules.locks.table);
     assert.equal(trialLock('orders', { settlement: 'off' }, content), rules.locks.off);
+  });
+
+  test('a tower win counts only on a floor at most levelsBelow levels below the character (488 A); the note says from which floor', () => {
+    assert.equal(rules.kinds.find((kind) => kind.id === 'towers').levelsBelow, 10);
+    assert.equal(trialTowerFloor(60, content), 50);
+    assert.equal(trialTowerFloor(50, content), 40);
+    assert.equal(trialTowerFloor(5, content), 1);
+    assert.equal(trialNote('towers', 60, content), 'Liczą się piętra od 50. w górę.');
+    assert.equal(trialNote('towers', 73, content), 'Liczą się piętra od 63. w górę.');
+    // Other notes as they are, and none where a kind has none.
+    assert.equal(trialNote('makeAny', 60, content), rules.kinds.find((kind) => kind.id === 'makeAny').note);
+    assert.equal(trialNote('explore', 60, content), null);
+    assert.equal(trialNote('gone', 60, content), null);
   });
 
   test('what an action brings, by kind: the quests\' counts and the towers, the Kowadło and the gifts besides', () => {
@@ -444,11 +460,37 @@ describe('the Próby Gildii through the API', () => {
     assert.equal(upgraded.status, 200, JSON.stringify(upgraded.data).slice(0, 300));
     assert.equal(await progress(), upgraded.data.upgrade.result === 'success' ? 1 : 0);
 
-    // A fight won in a Wieża.
+    // A fight won in a Wieża, on a floor near the character's level (488 A),
+    // by a character strong enough for it.
     await take(3);
-    const entered = await as('mistrz', 'POST', '/api/towers/enter', { tower: 'solo', floor: 1 });
+    await run('UPDATE characters SET points = ? WHERE id = ?', JSON.stringify(STRONG), id);
+    const entered = await as('mistrz', 'POST', '/api/towers/enter', { tower: 'solo', floor: 51 });
     assert.equal(entered.status, 200, JSON.stringify(entered.data).slice(0, 300));
     assert.equal(await progress(), entered.data.report.tower.won ? 1 : 0);
+  });
+
+  test('a fight won in a Wieża moves a trial on only on a floor at most 10 levels below the character, as its note says (488 A)', async () => {
+    const id = await idOf('Mistrz');
+    await run('UPDATE characters SET level = 60, class_level = 50, points = ? WHERE id = ?', JSON.stringify(STRONG), id);
+    await as('mistrz', 'GET', '/api/guild/trials');
+    await setBoard([{ kind: 'towers', size: 0, roll: 0 }]);
+    const board = (await as('mistrz', 'GET', '/api/guild/trials')).data;
+    assert.equal(board.trials[0].note, 'Liczą się piętra od 50. w górę.');
+    const taken = await as('mistrz', 'POST', '/api/guild/trials/take', { index: 0 });
+    assert.equal(taken.status, 200, JSON.stringify(taken.data).slice(0, 300));
+    assert.equal(taken.data.taken.note, 'Liczą się piętra od 50. w górę.');
+    await run("UPDATE guild_trials SET count = 100 WHERE state = 'active'");
+    const progress = async () => (await first("SELECT progress FROM guild_trials WHERE state = 'active'")).progress;
+    // The first floor, won with ease: it counts for nothing.
+    const low = await as('mistrz', 'POST', '/api/towers/enter', { tower: 'solo', floor: 1 });
+    assert.equal(low.status, 200, JSON.stringify(low.data).slice(0, 300));
+    assert.equal(low.data.report.tower.won, true);
+    assert.equal(await progress(), 0);
+    // A floor 9 levels below the character, won: it counts.
+    let won = null;
+    for (let i = 0; i < 8 && !won; i++) won = (await as('mistrz', 'POST', '/api/towers/enter', { tower: 'solo', floor: 51 })).data.report.tower.won ? true : null;
+    assert.equal(won, true, 'the floor is won');
+    assert.equal(await progress(), 1);
   });
 });
 

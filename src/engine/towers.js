@@ -6,9 +6,14 @@
 // round again after the last, at level f, so the climb leads through the
 // creatures of every land at the character's level (the author: "Pomoże to
 // uzupełniać zaległe Bestiariusze po Ewolucji Klasy by się nie cofać").
-// Every eliteEvery floor waits the region's elite, and others now and then
-// (eliteChance; "Elity mogą częściej"), every championEvery floor its
-// champion (an elite where the region has none). The highest floor open is
+// Every eliteEvery floor waits the region's elite, but only in every
+// eliteLapEvery lap of the regions (the author: 484 A), so in the laps
+// between those floors are their region's usual ones and every creature
+// comes in the towers; on the usual floors an elite now and then
+// (eliteChance; "Elity mogą częściej"), and every championEvery floor, in
+// every lap, its champion (an elite where the region has none). The
+// champion leaves its trophy only at the first win of its floor in a tower
+// (483 A, the server knows). The highest floor open is
 // the character's level, a party's its lowest member's ("Maksymalny
 // odblokowany stopień Wieży bedzie na poziomie najniższego w Drużynie").
 // Pure: the seed is the server's.
@@ -33,6 +38,17 @@ export function towerArea(floor, content) {
   return areas[(floor - 1) % areas.length];
 }
 
+// Whether floor `floor` has its region's elite for certain: every
+// eliteEvery floor of every eliteLapEvery lap of the inner regions, from
+// the first lap (floors 1–20 with 20 regions), so in the laps between,
+// those floors are their region's usual ones (the author: "stałe elity co
+// 5. piętro tylko w co drugim okrążeniu regionów", 484 A).
+export function towerEliteFloor(floor, content) {
+  const { floors } = content.towers;
+  const lap = Math.floor((floor - 1) / content.areas.length);
+  return floor % floors.eliteEvery === 0 && lap % floors.eliteLapEvery === 0;
+}
+
 // What waits on floor `floor` of a climb with `seed`: the region, the level
 // and the encounter, as the hunt's encounters are (hunt.js), regular,
 // elite or champion. A regular one is of those the floor's level lets come
@@ -42,7 +58,7 @@ export function towerFloor(floor, seed, content) {
   const area = towerArea(floor, content);
   const rng = createRng(`${seed}:floor:${floor}`);
   const champion = floor % floors.championEvery === 0 && area.champion;
-  const elite = !champion && (floor % floors.eliteEvery === 0 || floor % floors.championEvery === 0 || rng.chance(floors.eliteChance)) && area.elite;
+  const elite = !champion && (towerEliteFloor(floor, content) || floor % floors.championEvery === 0 || rng.chance(floors.eliteChance)) && area.elite;
   if (champion) return { floor, level: floor, areaId: area.id, encounter: { elite: false, champion: true, members: [{ monsterId: area.champion, level: floor }] } };
   if (elite) return { floor, level: floor, areaId: area.id, encounter: { elite: true, members: [{ monsterId: area.elite, level: floor }] } };
   const open = encountersFor(area, floor);
@@ -59,12 +75,14 @@ export function towerFloor(floor, seed, content) {
 // creatures' materials, the elite and the champion as a regular creature
 // (no multipliers of the explorations, so the entries are no way to farm
 // them), and the companions and the other players take their shares of
-// the XP as on an exploration. A win of a chestEvery floor the first time
-// in this tower (`chest`, the server knows) brings the tower's chest: an
-// item of the character's class it can wear, of the floor's level and a
-// champion's rarity. Returns a hunt of one fight, for applyHunt and
-// huntReport, with `tower`.
-export function towerFight({ character, equipped, name, floor, seed, partners = [], companions = [], trophies = {}, chest = false }, content) {
+// the XP as on an exploration. A champion leaves its trophy (its material)
+// only at the first win of its floor in this tower (`championTrophy`, the
+// server knows; the author: 483 A), and then for certain, else none. A
+// win of a chestEvery floor the first time in this tower (`chest`, the
+// server knows) brings the tower's chest: an item of the character's
+// class it can wear, of the floor's level and a champion's rarity. Returns
+// a hunt of one fight, for applyHunt and huntReport, with `tower`.
+export function towerFight({ character, equipped, name, floor, seed, partners = [], companions = [], trophies = {}, chest = false, championTrophy = false }, content) {
   const plan = towerFloor(floor, seed, content);
   const area = content.areasById[plan.areaId];
   const rng = createRng(`${seed}:fight`);
@@ -101,7 +119,7 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
       const monster = content.monstersById[enemy.monsterId];
       fightXp += monsterXp({ ...monster, elite: false, champion: false }, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(character.level, enemy.level, content);
       fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * enemy.groupFactor * lengthed;
-      materials = addCounts(materials, materialDrops(enemy.monsterId, enemy.level, enemy.groupFactor * pace.timeFactor * moreMaterials, rng, content));
+      materials = addCounts(materials, materialDrops(enemy.monsterId, enemy.level, enemy.groupFactor * pace.timeFactor * moreMaterials, rng, content, championTrophy));
     }
     xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * lengthed * partyXp);
     gold = Math.round(fightGold);

@@ -36,7 +36,7 @@ import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { craftingOn } from './features.js';
 import { addTo, insertWork, requireProfessions, workGains } from './professions.js';
-import { KEPT_REPORTS } from './reports.js';
+import { trimReports } from './reports.js';
 import { say } from '../engine/text.js';
 
 // A share of what an order took, by id: for `of` items out of `count`.
@@ -267,9 +267,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'items', now, JSON.stringify(summary), JSON.stringify(report)),
-      db
-        .prepare('DELETE FROM reports WHERE character_id = ? AND id NOT IN (SELECT id FROM reports WHERE character_id = ? ORDER BY id DESC LIMIT ?)')
-        .bind(row.id, row.id, KEPT_REPORTS),
+      trimReports(db, row.id, 'items'),
       db
         .prepare(
           `UPDATE characters SET quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${back.map((each) => each.sql).join('')}${scroll ? ', scrolls = scrolls + ?' : ''}, version = version + 1

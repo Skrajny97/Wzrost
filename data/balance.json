@@ -203,5 +203,6 @@
     "minutes": 10,
     "refillHours": 12
   },
-  "parties": { "size": 3, "xpCost": 0.045, "classSpread": 5 }
+  "parties": { "size": 3, "xpCost": 0.045, "classSpread": 5 },
+  "journal": { "reports": 50, "towerReports": 50 }
 }

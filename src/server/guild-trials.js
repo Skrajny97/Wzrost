@@ -25,6 +25,7 @@ import {
   trialGains,
   trialKind,
   trialLock,
+  trialNote,
   trialPoints,
   trialText,
   trialThresholds,
@@ -262,13 +263,13 @@ export async function trialsView(db, player, guild, now) {
       const lock = trialLock(trial.kind, access, content);
       const state = done.has(index) ? 'done' : taken?.trial === index ? 'taken' : lock ? 'locked' : 'open';
       const count = state === 'done' ? done.get(index).count : state === 'taken' ? taken.count : trialCount(trial, character, content);
-      return [{ index, kind: trial.kind, text: trialText(trial.kind, count, content), note: kind.note ?? null, count, state, lock: state === 'locked' ? lock : null }];
+      return [{ index, kind: trial.kind, text: trialText(trial.kind, count, content), note: trialNote(trial.kind, row.level, content), count, state, lock: state === 'locked' ? lock : null }];
     }),
     taken: taken && {
       index: taken.trial,
       kind: taken.kind,
       text: trialText(taken.kind, taken.count, content),
-      note: trialKind(taken.kind, content).note ?? null,
+      note: trialNote(taken.kind, row.level, content),
       count: taken.count,
       progress: taken.progress,
     },
