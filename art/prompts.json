@@ -1202,6 +1202,32 @@
       }
     }
   },
+  "scenes-hd": {
+    "$comment": "Sceny pracy Kopalni i Szlifierni od nowa w 256 × 256, dwa razy dokładniej niż 128 (autor o animacjach 560 i 561: „niska rozdzielczosc i mala dokładność śmietnik”). Odniesieniem jest klatka wybrana przez autora (558 C, 559 G), powiększona dwa razy: ta sama scena, kadr i kolory, narysowane drobniej.",
+    "width": 256,
+    "height": 256,
+    "removeBackground": false,
+    "prompts": {
+      "mining": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands and feet, seen from the side facing right, swinging a pickaxe into a rough dark rock wall of a mine tunnel with bright gold ore veins and small sparkling gems, sparks flying at the point of impact, a small heap of broken stones at its feet, a lantern hanging from a wooden beam with warm glow, wooden mine supports, dark cave, the whole figure and the wall inside the frame",
+      "jewelcrafting": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, standing at a small wooden jeweller's workbench and pressing a shining gem against a round grinding wheel, bright sparks flying from the wheel, a gold ring, tools and a few small coloured gems on the bench, dark stone brick wall with an arch behind, the whole figure and the bench inside the frame"
+    },
+    "pixellab": {
+      "references": {
+        "mining": [
+          {
+            "path": "art/references/scenes/mining-start-x2.png",
+            "usage": "this exact scene redrawn at double resolution: the same composition and camera, the same figure in the same pose and place, the same colours, light and objects; only finer pixel detail"
+          }
+        ],
+        "jewelcrafting": [
+          {
+            "path": "art/references/scenes/jewelcrafting-start-x2.png",
+            "usage": "this exact scene redrawn at double resolution: the same composition and camera, the same figure in the same pose and place, the same colours, light and objects; only finer pixel detail"
+          }
+        ]
+      }
+    }
+  },
   "salon-small": {
     "$comment": "Salon Gier: los Loterii (leci do bębna, gdy postać go kupi) i strzałka nad Kołem Fortuny. Styl budynku Salonu (528 H).",
     "width": 64,
