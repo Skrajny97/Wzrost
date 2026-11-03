@@ -1,0 +1,17 @@
+{
+  "id": "casino-lottery",
+  "payload": {
+    "text": "Szczęsny co dzień sprzedaje losy na Loterię. O północy System wyciąga jeden z nich, a jego właściciel zgarnia całą pulę. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/casino-lottery-20261103T1445-0.mp3",
+    "audio/drafts/narration/casino-lottery-20261103T1445-1.mp3"
+  ],
+  "credits": 258
+}

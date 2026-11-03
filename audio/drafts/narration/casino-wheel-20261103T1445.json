@@ -1,0 +1,17 @@
+{
+  "id": "casino-wheel",
+  "payload": {
+    "text": "Kołem Fortuny kręcisz za sto sztuk złota albo więcej, setkami. Wyższa stawka to cenniejsze nagrody, ale przegrana stawka przepada. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/casino-wheel-20261103T1445-0.mp3",
+    "audio/drafts/narration/casino-wheel-20261103T1445-1.mp3"
+  ],
+  "credits": 278
+}
