@@ -40,6 +40,7 @@
           "x": { "type": "number", "minimum": 0, "maximum": 100 },
           "y": { "type": "number", "minimum": 0, "maximum": 100 },
           "resident": { "$ref": "#/definitions/id" },
+          "backdrop": { "$ref": "#/definitions/id", "description": "Wnętrze miejsca (src/client/art/places), przygaszone za kartą mieszkańca, tak jak miejsca profesji za swoimi kartami." },
           "soon": { "type": "boolean", "description": "Miejsce widać na planszy, ale otwiera się w kolejnej części." },
           "flip": { "type": "boolean", "description": "Obrazek budynku odbity w poziomie, żeby wejściem patrzył na główną drogę (autor: „zrób też rotate/odbicia lustrzane budynków tak by byly skierowane ich obrazki w stronę drogi głównej”)." }
         }

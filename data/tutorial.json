@@ -991,6 +991,24 @@
       "voice": "audio/narration/settlement-stable-party.mp3"
     },
     {
+      "id": "settlement-casino-lottery",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Szczęsny co dzień sprzedaje losy na Loterię. O północy System wyciąga jeden z nich, a jego właściciel zgarnia całą pulę."
+      ],
+      "voice": "audio/narration/settlement-casino-lottery.mp3"
+    },
+    {
+      "id": "settlement-casino-wheel",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Kołem Fortuny kręcisz za sto sztuk złota albo więcej, setkami. Wyższa stawka to wyższe nagrody, ale i większy ból po przegranej."
+      ],
+      "voice": "audio/narration/settlement-casino-wheel.mp3"
+    },
+    {
       "id": "settlement-quarters",
       "kind": "point",
       "chapter": "settlement",

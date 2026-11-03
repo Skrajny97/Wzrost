@@ -257,12 +257,13 @@ export const SPRITES = {
     size: 48,
     ids: ['herbalism', 'alchemy', 'crafting'],
   },
-  // The places where professions work, dim behind their cards, and the
-  // Ewolucja tab's spring behind its heading, 192×96.
+  // The places where professions work, dim behind their cards, the
+  // Ewolucja tab's spring behind its heading, and the Osada's rooms behind
+  // their residents' cards (the Salon Gier's), 192×96.
   places: {
     width: 192,
     height: 96,
-    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep'],
+    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall'],
   },
   // The events at the end of an exploration (data/events.json): the people
   // met, 96×128, and the scenes behind them, 192×96, filled in as they are
