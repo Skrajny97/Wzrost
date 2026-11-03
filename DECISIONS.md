@@ -3044,7 +3044,7 @@ Autor: „571 koniecznie”, „572 koniecznie”, „573 koniecznie i możesz w
 
 1. **571, kamienie i kruszce w handlu:** na Targowisku, w Wymianie i w Prośbach Gildii. Obowiązkowo.
 2. **572, zadania z Górnictwem i Jubilerstwem:** zadania narratora z kopaniem i biżuterią. Obowiązkowo.
-3. **573, dźwięki Jubilerstwa:** szlifowanie i oprawianie kamienia. Obowiązkowo. Wersje wybieram sam i od razu wprowadzam do gry, a rano autor poprawi wybór na słuch.
+3. **573, dźwięki Jubilerstwa:** szlifowanie i oprawianie kamienia. Obowiązkowo. Wersje wybieram bez czekania na odsłuch i od razu wprowadzam do gry, a rano autor poprawi wybór na słuch.
 4. **574, Warownia:** można, bez pośpiechu, po pozycjach obowiązkowych.
 5. **575, nowe przedmioty Tierów V i VI:** najniższy priorytet. Pytanie 570 (wyższe czy pośrednie Tiery) wciąż czeka na odpowiedź.
 6. **576, przegląd kodu na koniec nocy:** obowiązkowo.
