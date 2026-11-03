@@ -3011,6 +3011,16 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Chowańce: odpowiedzi autora 540 i 541 (3.11.2026)
+
+Autor: „Zatwierdzam 540.1, 540.2 i 540.3 udały się te animacje” i „541.1, 541.2, 541.3 A wszystko”.
+
+1. **Animacje zatwierdzone.** Wszystkie są z PixelLab, po 8 klatek:
+   - w scenie Walki (540): lis w kłusie, kruk w locie i błędny ognik;
+   - na portrecie (541): lis u stóp postaci, kruk na jej ramieniu i ognik przy ramieniu.
+2. **Film do rolki.** Autor: „Sklej te animacje chochlików w 10-sekundowy filmik na przyszłość dokleję do rolki jakiejś w przyszłości nic nie dawaj więcej”. Trzy sceny z chowańcami tworzą jeden film MP4: 10 s, z płynnymi przejściami, bez napisów.
+3. **Do gry** chowańce wchodzą razem z ich miejscem w scenie Walki, na portrecie i w Sklepie Systemu.
+
 ## Salon Gier: budowa (3.11.2026, odpowiedzi 523–526, 528, 529)
 
 Odpowiedzi autora na pytania z wpisu „Salon Gier w Osadzie: prośba autora”: 523 OK, 524 A, 525 A, 526 A, a przy grafikach 528 H i 529 C. O planszy autor: „Możesz przesuwać budynki żeby Salon Gier zmieścić”.
