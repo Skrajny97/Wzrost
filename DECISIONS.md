@@ -2996,6 +2996,34 @@ Autor: „243 A / 244 A / 245 A / 246 A / 247 B -> musi wyglądać trochę dosto
 3. **Zdarzenia.** Kupiec (251), Leszy (252) i portret Upiora (254 A) są zatwierdzone. Portret Leszego do pojedynku to główna postać zmniejszona do 48 px, z cienkim ciemnym konturem (259 czeka na ocenę).
 4. **Kwatery (253 A).** Wyglądy budynku są zatwierdzone. Plansza obozu zostanie powiększona jak plansza Osady, żeby zmieściły się Kwatery i kolejne budynki.
 
+## Odpowiedzi autora 478–480 (3.11.2026)
+
+Autor: „478 Zdarzenia - dłuższa wyprawa ma mieć większą szansę max 20%, policz to dobrze”, chody 479.1–479.8 A poza „479.5 B (prawy górny róg łuku ma w pewnym momencie niepotrzebne szare piksele)” i jazda wierzchem 480.1–480.30 A poza:
+
+- 480.13 B (Arcymag Żywiołów): „zbyt wysoko ręce, nie wygląda jakby trzymał lejce”;
+- 480.17 B (Druid): „w ogole nie wyglada jakby siedział i był bokiem”;
+- 480.19 B (Cudotwórca): „dziwny wyraz twarzy i nie siedzi bokiem”;
+- 480.28 B (Nekromantka): „nie trzyma obiem rękami lejc i nie siedzi bokiem”;
+- 480.29 B (Widmo, mężczyzna): „ucięty sprite postaci”.
+
+Oraz: „Do Czarnego Bagna wroce później”.
+
+1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
+2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
+
+## Zdarzenia częściej na dłuższych wyprawach (478, 3.11.2026)
+
+1. **Szansa na zdarzenie** po wyprawie zakończonej zgodnie z planem: do pół godziny jak dotąd (pół godziny 10%, krótsza proporcjonalnie mniej, 338 A), a dłużej rośnie o tyle samo przy każdym podwojeniu czasu: godzina 13,3%, 2 godziny 16,7%, 4 godziny 20% (`longChance` i `longChanceMinutes` w `data/events.json`). Więcej niż 20% nie ma.
+2. **„Policz to dobrze”:** test sprawdza każdą minutę od 1 do 240. Szansa nigdy nie maleje z długością wyprawy i nie przekracza 20%, a na godzinę żadna wyprawa nie daje więcej zdarzeń niż półgodzinna (20% na godzinę), więc krótkich wypraw dalej nie opłaca się klepać dla zdarzeń (338 A). Na godzinę: pół godziny 20%, godzina 13,3%, 2 godziny 8,3%, 4 godziny 5%.
+3. **Na 8 godzin wypraw** wychodzi: same półgodzinne 1,6 zdarzenia (bez zmian), same godzinne ok. 1,1 (było 0,8), same 2-godzinne ok. 0,7 (było 0,4), same 4-godzinne 0,4 (było 0,2).
+4. **Długość** to ta wybrana przy wyruszeniu: wierzchowiec ze Stajni skraca tylko czekanie, więc szansy nie zmniejsza. Szybkie i Błyskawiczne Polowania jak dotąd zdarzeń nie mają.
+
+## Wersja 0.1.1 (3.11.2026)
+
+1. **Co wchodzi do gry:** zdarzenia częściej na dłuższych wyprawach (478, zob. wyżej). Razem z tym idą notatka o odpowiedziach 479–480 i nowe opisy pięciu jeźdźców do rysowania (z zatwierdzonym jeźdźcem drugiej płci jako wzorem pozy), których gra jeszcze nie używa.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy (869 z 869) i przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków).
+
 ## Układ na komputer: delikatne tła i gradienty (2.11.2026)
 
 Autor o makietach i układzie na komputer: „Makieta bardzo szeroka brakuje czasem teł jakichś delikatnych albo gradientów ale wygląda git to na komputer”. Szerokości zostają, dochodzi światło i głębia, tylko w układzie komputera (telefon bez zmian):
