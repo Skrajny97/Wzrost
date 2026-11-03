@@ -1,0 +1,15 @@
+{
+  "id": "jewelcrafting-hd-a2",
+  "payload": {
+    "first_frame": "art/references/scenes/jewelcrafting-hd-a.png",
+    "action": "pressing the gem against the spinning grinding wheel in a smooth seamless loop: both glowing hands stay on the gem at the wheel the whole time, the wheel turns, bright sparks fly from the wheel in every frame, the figure barely moves, the bench with its ring, tools and gems and the stone wall stay still",
+    "frame_count": 8,
+    "seed": 1000668676,
+    "no_background": false
+  },
+  "usage": {
+    "type": "usd",
+    "usd": 0.021285136971208783
+  },
+  "frames": 9
+}
