@@ -1,6 +1,7 @@
 // The scrapper's sale by the handful: every item in the bag up to a rarity,
-// from a report or at the Skup złomu. Worn and upgraded items stay; an
-// upgraded one sells alone, from its card in the bag.
+// from a report or at the Skup złomu. Worn and upgraded items stay, and so
+// do those with a gem set in them; such an item sells alone, from its card
+// in the bag.
 
 import { h } from './dom.js';
 import { countOf, formatNumber } from './format.js';
@@ -8,7 +9,7 @@ import { call, state } from './state.js';
 import { confirmAction, openSheet, toast } from './ui.js';
 
 export function scrapperSheet() {
-  const bag = state.character.bag.filter((item) => !(item.upgrade > 0));
+  const bag = state.character.bag.filter((item) => !(item.upgrade > 0) && !item.gem);
   const rarities = state.content.rarities;
   const rank = (item) => rarities.findIndex((rarity) => rarity.id === item.rarity);
   openSheet(
@@ -34,7 +35,7 @@ export function scrapperSheet() {
         );
       }),
     ),
-    h('p', { class: 'muted', text: 'Założone i ulepszone przedmioty zostają. Ulepszone sprzedasz bezpośrednio z pozycji plecaka.' }),
+    h('p', { class: 'muted', text: 'Założone i ulepszone przedmioty oraz te z kamieniem zostają. Sprzedasz je bezpośrednio z pozycji plecaka.' }),
   );
 }
 

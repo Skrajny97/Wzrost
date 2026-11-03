@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import {
+  bagOverflow,
   craftJewels,
   encyclopediaView,
   explorationGold,
@@ -237,6 +238,11 @@ describe('Jubilerstwo in the engine', () => {
     assert.deepEqual(upgradedItem({ ...item, gem: 'nothing' }, content).damage, plain.damage);
   });
 
+  test('an item with a gem is kept as an upgraded one when the bag overflows', () => {
+    const plain = { base: 'ring', slot: 'ring', level: 30, rarity: 'common', affixes: [] };
+    assert.deepEqual(bagOverflow([{ ...plain, id: 1, gem: 'quartz' }, { ...plain, id: 2 }], 1, 'warrior', content), [1]);
+  });
+
   test('setting takes 15 minutes for Kwarc, twice as long a rarity up, quicker with the level', () => {
     assert.deepEqual(['quartz', 'agate', 'emerald'].map((gem) => setMinutes(gem, 1, content)), [15, 30, 120]);
     assert.equal(setMinutes('diamond', 80, content), 480);
@@ -435,6 +441,18 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.deepEqual(minerals(await character()), {});
     assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).data.report, null);
     assert.deepEqual(minerals(await character()), { quartz: 1 });
+  });
+
+  test('"Sprzedaj zbędne" keeps an item with a gem, as an upgraded one', async () => {
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    const ring = { base: 'ring', slot: 'ring', level: 25, rarity: 'common', affixes: [], implicit: { stat: 'perception', value: 5 } };
+    for (const data of [ring, { ...ring, gem: 'quartz' }]) {
+      await database.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, 0)').bind(id, JSON.stringify(data)).run();
+    }
+    const sold = await call('POST', '/api/items/sell', { cookie, body: { maxRarity: 'divine' } });
+    assert.equal(sold.data.sold.count, 1);
+    assert.deepEqual(sold.data.character.bag.map((item) => item.gem?.id ?? null), ['quartz']);
   });
 
   test('the Awatar Systemu digs while the character explores and brings the minerals and the gold, without XP or levels', async () => {

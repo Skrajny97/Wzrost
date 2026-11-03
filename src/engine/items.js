@@ -194,14 +194,15 @@ export function sellPrice(item, content, bonus = 0) {
 }
 
 // When the bag holds more than its places, the scrapper buys the weakest
-// items: those the class cannot use first, upgraded ones last, then by rarity
+// items: those the class cannot use first, upgraded ones and those with a
+// gem set in them (Jubilerstwo) last, then by rarity
 // and level, a new find before an item already in the bag (it has an id).
 // Returns the indices of the items to sell.
 export function bagOverflow(items, capacity, classId, content) {
   const extra = items.length - capacity;
   if (extra <= 0) return [];
   const usable = (item) => (canUse(item.base, classId, content) ? 1 : 0);
-  const upgraded = (item) => (item.upgrade > 0 ? 1 : 0);
+  const upgraded = (item) => (item.upgrade > 0 || item.gem ? 1 : 0);
   const kept = (item) => (item.id === undefined ? 0 : 1);
   return items
     .map((item, index) => ({ item, index }))

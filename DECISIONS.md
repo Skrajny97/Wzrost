@@ -3063,6 +3063,7 @@ Obie profesje otwierają się razem, od 25. poziomu postaci (531, 533). Na zakł
    - (brakujący szczegół) Kamień schodzi z plecaka na początku pracy. Przerwane oprawianie oddaje kamień, bez raportu. Gdy przy odbiorze przedmiotu już nie ma, kamień wraca do plecaka, a raport to mówi.
    - (brakujący szczegół) Ekran oprawia kamień w przedmiot, który postać nosi, a serwer przyjmuje też przedmiot z plecaka. Założony przedmiot czeka w czasie wyprawy, jak na Kowadle.
    - (brakujący szczegół) Złomiarz nie dopłaca za kamień w przedmiocie. Kamień idzie razem z przedmiotem przy sprzedaży, w Wymianie i na Targowisku.
+   - (brakujący szczegół) Przedmiot z kamieniem jest chroniony jak ulepszony: „Sprzedaj zbędne” go nie sprzedaje, a przy pełnym plecaku po wyprawie złomiarz bierze go ostatni. Sprzedaż i rozbiórka z karty przedmiotu mówią, że kamień przepadnie.
 7. **Krótkie opisy.** Karty Kopalni i Szlifierni mają krótki opis miejsca, a zasady są zwinięte pod „Jak to działa?”, jak w Salonie Gier. Rozwinięte stoją na ciemnym tle, żeby dało się je czytać na obrazku miejsca.
 8. **Encyklopedia.** Nowa zakładka „Minerały” ma 10 wpisów: skąd je wziąć i do czego służą. Progi to 3, 6 i 10 odkryć, ze skrzyniami jak w innych zakładkach. Siedem zakładek stoi po trzy i cztery w rzędzie.
 9. **Bez sceny pracy.** Obie profesje nie mają jeszcze animacji oczekiwania, więc karta pracy jest bez sceny (`workScene` zwraca null). Walidator nie wymaga już sceny dla każdej profesji.

@@ -259,7 +259,7 @@ export function mountCharacter(container) {
   // to the camp (320 A), and taking several items apart on the Stół
   // rozbiórki, once it stands.
   function bagActions(bag) {
-    const sell = bag.some((item) => !(item.upgrade > 0));
+    const sell = bag.some((item) => !(item.upgrade > 0) && !item.gem);
     const salvage = state.character.crafting.pace > 0 && bag.some((item) => item.salvage);
     if (!sell && !salvage) return null;
     return h(
@@ -725,7 +725,9 @@ export function itemSheet(item, { equipped, anvil = false }) {
     const button = event.currentTarget;
     const sure = await confirmAction({
       title: 'Sprzedać przedmiot?',
-      text: `Złomiarz kupi: ${itemTitle(item)} za ${formatNumber(item.price)} złota.${item.upgrade > 0 ? ' W tej cenie jest też część złota wydanego na ulepszenia.' : ''}`,
+      text: `Złomiarz kupi: ${itemTitle(item)} za ${formatNumber(item.price)} złota.${item.upgrade > 0 ? ' W tej cenie jest też część złota wydanego na ulepszenia.' : ''}${
+        item.gem ? ` Kamień w nim przepadnie: ${item.gem.name}.` : ''
+      }`,
       confirmLabel: 'Sprzedaj',
     });
     if (!sure) return;
@@ -841,7 +843,7 @@ function salvageSection(item, busy) {
       title: 'Rozebrać przedmiot?',
       text: `${itemTitle(item)} zniknie, a stół zrobi z niego: ${salvage.part} ×${salvage.parts}, w ${formatMinutes(salvage.minutes)}.${
         salvage.pattern ? ` System odsłoni Ci wzór w Warsztacie: ${salvage.pattern}.` : ''
-      }`,
+      }${item.gem ? ` Kamień w nim przepadnie: ${item.gem.name}.` : ''}`,
       confirmLabel: 'Rozbierz',
     });
     if (!sure) return;
@@ -943,12 +945,13 @@ function salvageManySheet(marked = new Set()) {
   const go = async (button) => {
     const items = chosen();
     const upgraded = items.filter((item) => item.upgrade > 0).length;
+    const gems = items.filter((item) => item.gem).length;
     const patterns = [...new Set(items.map((item) => item.salvage.pattern).filter(Boolean))];
     const sure = await confirmAction({
       title: 'Rozebrać przedmioty?',
       text: `${countOf(items.length, 'przedmiot', 'przedmioty', 'przedmiotów')} ${plural(items.length, 'zniknie', 'znikną', 'zniknie')} z plecaka, a stół zrobi z nich: ${partsOf(items)
         .map(([part, { count }]) => `${part} ×${formatNumber(count)}`)
-        .join(', ')}, w ${formatMinutes(minutesOf(items))}.${upgraded > 0 ? ` Ulepszone wśród nich: ${formatNumber(upgraded)}.` : ''}${
+        .join(', ')}, w ${formatMinutes(minutesOf(items))}.${upgraded > 0 ? ` Ulepszone wśród nich: ${formatNumber(upgraded)}.` : ''}${gems > 0 ? ` Z kamieniem wśród nich: ${formatNumber(gems)}.` : ''}${
         patterns.length > 0 ? ` System odsłoni Ci wzory w Warsztacie: ${patterns.join(', ')}.` : ''
       }`,
       confirmLabel: 'Rozbierz',
