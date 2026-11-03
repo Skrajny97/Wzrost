@@ -891,7 +891,7 @@
       "kind": "point",
       "chapter": "settlement",
       "text": [
-        "Na Targowisku gracze licytują swoje towary. Licytacja trwa dobę, a przebity gracz od razu odzyskuje złoto."
+        "Na Targowisku gracze licytują swoje towary. Licytacja trwa od godziny do doby, a przebity gracz od razu odzyskuje złoto."
       ],
       "voice": "audio/narration/settlement-market-offers.mp3"
     },

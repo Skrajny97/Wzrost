@@ -98,10 +98,11 @@ describe('character creation', () => {
     assert.equal(changed.status, 200);
     assert.equal(changed.data.character.skin, 'golden');
     assert.equal((await call('POST', '/api/character/skin', { cookie, body: { skin: 'green' } })).status, 400);
-    // The tones reach the screen with their dots; one is the portrait as drawn.
+    // The tones reach the screen with their dots; none is the portrait as
+    // drawn any more, Jasna is recoloured as the others are (the author: "567 A").
     const { skins } = (await call('GET', '/api/content')).data;
     assert.ok(skins.tones.some((tone) => tone.id === skins.default));
-    assert.equal(skins.tones.filter((tone) => tone.drawn).length, 1);
+    assert.equal(skins.tones.filter((tone) => tone.drawn).length, 0);
   });
 
   test('without a chosen skin tone the character starts in the default one', async () => {

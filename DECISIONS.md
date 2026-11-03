@@ -3047,7 +3047,7 @@ Autor: „567 A” i „568 A”.
    - Narysowany obrazek jest już tylko źródłem dla odcieni.
    - W każdym wyglądzie Blada jest teraz jaśniejsza od Jasnej, a Jasna od Śniadej.
 2. (brakujący szczegół) **Widmo (mężczyzna) na wierzchowcu** ma skórę z jednego, jasnego koloru, więc jego odcienie biorą górną połowę rampy (`span` w `tools/rider-tones.json`). Inaczej nowa Jasna wychodziła u niego ciemniejsza od narysowanej.
-3. **Kwestia narratora o Targowisku (568 A)** dostaje nowe brzmienie: „Na Targowisku gracze licytują swoje towary. Licytacja trwa od godziny do doby, a przebity gracz od razu odzyskuje złoto.” Nagrane wersje czekają na wybór autora.
+3. **Kwestia narratora o Targowisku (568 A)** dostaje nowe brzmienie: „Na Targowisku gracze licytują swoje towary. Licytacja trwa od godziny do doby, a przebity gracz od razu odzyskuje złoto.” Autor wybrał nagranie A („569 A”), przycięte 0,3 s po ostatnim słowie, w jakości reszty kwestii (mono, 56 kb/s).
 
 ## Wersja 0.1.20 (3.11.2026)
 
