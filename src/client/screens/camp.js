@@ -6,7 +6,8 @@
 // Production buildings fill a store the player collects, from a bubble on the
 // board or on the building's screen, at the Ognisko the fire spirit trades
 // gold for resources a few times a day, and at the Skup złomu the scrap
-// dealer sells crafting parts. Opened with the camp button in the top bar.
+// dealer sells crafting parts. Opened with the camp button in the top bar,
+// on a computer with the camp's tab in the menu (508 A).
 
 import { materialSprite, resourceArt } from '../art.js';
 import { BOARD_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, cornerstoneArt, plotArt } from '../camp-art.js';
@@ -18,6 +19,7 @@ import { playSound } from '../sound.js';
 import { call, costShortfall, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, guided, meter, openSheet, systemPanel, toast, withButton } from '../ui.js';
+import { desktopLayout, onLayoutChange } from '../layout-mode.js';
 import { scrapperSheet } from '../scrapper.js';
 import { itemSheet, itemSummary } from './character.js';
 import { mountChest } from './chest.js';
@@ -294,8 +296,27 @@ function mountBoard(container, backHash) {
       running && constructionPanel(running, ticks),
       queuePanel(),
     );
+    fitBoard();
     tick(serverNow());
   }
+
+  // On a computer the board fits the screen's height, shrunk evenly (506 A;
+  // the player: "muszę scrollować widok obozu po 20 lvl, jak się
+  // wydłużył"): as wide as its shape allows in the room from its top down
+  // to the screen's bottom, past the page's own margin there. styles.css
+  // keeps it between the narrowest phone's board and its usual width.
+  function fitBoard() {
+    const board = container.querySelector('.camp-board');
+    if (!board || !desktopLayout()) return;
+    const page = container.closest('.screen--game');
+    const below = page ? parseFloat(getComputedStyle(page).paddingBottom) || 0 : 0;
+    const room = window.innerHeight - (board.getBoundingClientRect().top + window.scrollY) - below;
+    board.style.setProperty('--board-fit', `${Math.floor((room * BOARD_WIDTH) / boardHeight(tall()))}px`);
+  }
+  window.addEventListener('resize', fitBoard);
+  const stopLayout = onLayoutChange(fitBoard);
+  // The page's letters, loaded after the first look, may move the board.
+  document.fonts?.ready.then(fitBoard);
 
   // The materials for building: gold and Punkty Systemu are in the top bar.
   function materials() {
@@ -477,7 +498,14 @@ function mountBoard(container, backHash) {
   }
 
   render();
-  return { update: render, tick };
+  return {
+    update: render,
+    tick,
+    unmount() {
+      window.removeEventListener('resize', fitBoard);
+      stopLayout();
+    },
+  };
 }
 
 // A building's screen. Building comes first, at the top, so nobody scrolls

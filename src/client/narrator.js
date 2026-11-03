@@ -253,8 +253,10 @@ const BEATS = {
     above: true,
     when: (hash, read) => hash === '#/postac/statystyki' && read.has('stats') && freePoints(),
   },
+  // The tent in the top bar on a phone, the camp's tab in the menu on a
+  // computer (508 A); the one not shown is not lit.
   'lead-camp': {
-    place: '.camp-button',
+    place: '.camp-button, #nav-main > .nav-item[href="#/oboz"]',
     when: (hash, read) => read.has('character') && !read.has('camp') && !freePoints() && !hash.startsWith('#/oboz'),
   },
   camp: { place: mark('camp-stock'), when: onBoard },
