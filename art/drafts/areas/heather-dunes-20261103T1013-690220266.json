@@ -1,0 +1,12 @@
+{
+  "id": "heather-dunes",
+  "tool": "pixellab generate-image-v2",
+  "description": "rolling sand dunes overgrown with purple heather at dusk, a few lone crooked pines on the crests, wind-blown sand streaming off the dune tops, a dark hollow in the sand like an empty eye socket, centered composition for a round medallion frame, pixel art scene, muted palette of sandy ochres, heather purples and dark pine greens, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

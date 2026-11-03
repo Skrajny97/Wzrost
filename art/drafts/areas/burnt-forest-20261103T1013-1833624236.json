@@ -1,0 +1,12 @@
+{
+  "id": "burnt-forest",
+  "tool": "pixellab generate-image-v2",
+  "description": "a burnt pine forest, charred black trunks with glowing embers in their cracks, grey ash covering the ground, sparks rising into a red smoky sky, centered composition for a round medallion frame, pixel art scene, muted palette of charcoal blacks, ash greys and ember reds, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

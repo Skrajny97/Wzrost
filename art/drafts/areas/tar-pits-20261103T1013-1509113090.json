@@ -1,0 +1,12 @@
+{
+  "id": "tar-pits",
+  "tool": "pixellab generate-image-v2",
+  "description": "old tar kilns in a pine forest, smoking earthen mounds, black pits of boiling tar, clay pots and barrels by a hut, low black smoke drifting between the pines, a few glowing embers, centered composition for a round medallion frame, pixel art scene, muted palette of tar blacks, ember oranges and dark pine greens, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

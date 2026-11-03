@@ -1,0 +1,12 @@
+{
+  "id": "drifting-sands",
+  "tool": "pixellab generate-image-v2",
+  "description": "a sea of drifting sand between half-buried dead pines, a sand whirlwind rising, an old burial mound with a tilted standing stone on top, hot shimmering haze, centered composition for a round medallion frame, pixel art scene, muted palette of sandy ochres, bleached greys and dusty browns, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
