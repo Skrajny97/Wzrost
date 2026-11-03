@@ -1,0 +1,12 @@
+{
+  "id": "casino-1",
+  "tool": "pixellab generate-image-v2",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, made of logs, planks, thatch and wooden shingles, no stone houses and no tiled roofs, standing directly on bare ground with no ground tile, base or platform under it, the village game house: a two-storey log house with a carved wooden wheel of fortune hanging over the door, a painted sign with three dice, red cloth awnings over the windows, lanterns by the door, a barrel used as a table with dice on it outside, warm light in the small windows",
+  "style": "src/client/art/settlement/tavern.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
