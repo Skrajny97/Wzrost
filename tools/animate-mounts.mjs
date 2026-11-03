@@ -6,6 +6,8 @@
 // (kind mounts-pixellab), which keeps the drafts on the art-drafts branch,
 // each frame as a PNG of its own (-1, -2…):
 //   node tools/animate-mounts.mjs --ids pony,horse --variants 2 --max-cost 1 [--dry-run]
+// The Sklep Systemu's pets move the same way, from their own list (kind
+// pets-animate: --config art/pets.json --group pets --out art/drafts/pets-animate).
 // The run stops before its animations could cost more than --max-cost
 // dollars (one is a few generations of PixelLab, at most JOB_USD).
 
@@ -20,6 +22,11 @@ const JOB_USD = 0.1;
 
 const { values } = parseArgs({
   options: {
+    config: { type: 'string', default: 'art/mounts.json' },
+    group: { type: 'string', default: 'mounts' },
+    out: { type: 'string', default: 'art/drafts/mounts-pixellab' },
+    title: { type: 'string', default: 'Animacje wierzchowców (PixelLab)' },
+    label: { type: 'string', default: 'Wierzchowiec' },
     ids: { type: 'string', default: 'all' },
     variants: { type: 'string', default: '1' },
     'max-cost': { type: 'string', default: '1' },
@@ -39,10 +46,11 @@ function summary(markdown) {
 const token = process.env.PIXELLAB_API_KEY;
 if (!token) fail('Brak sekretu PIXELLAB_API_KEY. Dodaj klucz PixelLab w ustawieniach repozytorium.');
 
-const config = JSON.parse(readFileSync('art/mounts.json', 'utf8'));
-const ids = values.ids === 'all' ? Object.keys(config.mounts) : values.ids.split(',').map((id) => id.trim()).filter(Boolean);
-const unknown = ids.filter((id) => !config.mounts[id]);
-if (unknown.length) fail(`Brak wierzchowca w art/mounts.json: ${unknown.join(', ')}.`);
+const config = JSON.parse(readFileSync(values.config, 'utf8'));
+const animals = config[values.group] ?? {};
+const ids = values.ids === 'all' ? Object.keys(animals) : values.ids.split(',').map((id) => id.trim()).filter(Boolean);
+const unknown = ids.filter((id) => !animals[id]);
+if (unknown.length) fail(`Brak w ${values.config} (${values.group}): ${unknown.join(', ')}.`);
 const variants = Math.max(1, Math.min(4, Number(values.variants) || 1));
 const maxCost = Number(values['max-cost']);
 if (!(maxCost > 0)) fail('--max-cost musi być dodatnią kwotą w dolarach.');
@@ -64,7 +72,7 @@ async function request(method, path, body) {
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function animate(id, seed) {
-  const mount = config.mounts[id];
+  const mount = animals[id];
   const body = {
     first_frame: { type: 'base64', base64: readFileSync(mount.start).toString('base64'), format: 'png' },
     action: mount.action ?? config.action,
@@ -91,7 +99,7 @@ async function animate(id, seed) {
   throw new Error(`animacja trwa zbyt długo (zadanie ${job.background_job_id})`);
 }
 
-const outDir = 'art/drafts/mounts-pixellab';
+const outDir = values.out;
 mkdirSync(outDir, { recursive: true });
 const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 13);
 const lines = [];
@@ -100,7 +108,7 @@ const jobs = ids.flatMap((id) => Array.from({ length: variants }, () => id)).sli
 const skipped = ids.length * variants - jobs.length;
 
 if (values['dry-run']) {
-  for (const id of jobs) lines.push(`| ${id} | do zrobienia (start: ${config.mounts[id].start}) |`);
+  for (const id of jobs) lines.push(`| ${id} | do zrobienia (start: ${animals[id].start}) |`);
 } else {
   const queue = [...jobs];
   async function worker() {
@@ -111,7 +119,7 @@ if (values['dry-run']) {
         const { state, body } = await animate(id, seed);
         const images = state.last_response?.images ?? [];
         images.forEach((image, index) => writeFileSync(`${outDir}/${id}-${stamp}-${seed}-${index + 1}.png`, Buffer.from(image.base64, 'base64')));
-        const sent = { ...body, first_frame: config.mounts[id].start };
+        const sent = { ...body, first_frame: animals[id].start };
         writeFileSync(`${outDir}/${id}-${stamp}-${seed}.json`, `${JSON.stringify({ id, payload: sent, usage: state.usage ?? null, frames: images.length }, null, 2)}\n`);
         const usage = state.usage ? `${state.usage.type === 'usd' ? `${Number(state.usage.usd).toFixed(3)} USD` : JSON.stringify(state.usage)}` : '';
         lines.push(`| ${id} | ${images.length} klatek ${usage} |`);
@@ -126,9 +134,9 @@ if (values['dry-run']) {
 
 summary(
   [
-    `## Animacje wierzchowców (PixelLab)${values['dry-run'] ? ' (tylko sprawdzenie)' : ''}`,
+    `## ${values.title}${values['dry-run'] ? ' (tylko sprawdzenie)' : ''}`,
     '',
-    '| Wierzchowiec | Wynik |',
+    `| ${values.label} | Wynik |`,
     '| --- | --- |',
     ...lines,
     ...(skipped ? ['', `Pominięte, bo przekroczyłyby limit ${maxCost} USD: ${skipped}.`] : []),

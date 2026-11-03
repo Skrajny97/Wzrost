@@ -7,6 +7,7 @@
 # tools/generate-portraits-pixellab.mjs), or the
 # walks animated by PixelLab (kind walks-pixellab, tools/animate-walks.mjs),
 # the mounts posed frame by frame (mounts-skeleton, tools/animate-mounts-skeleton.mjs),
+# the Sklep Systemu's pets animated by PixelLab (pets-animate, tools/animate-mounts.mjs),
 # and keeps them on the art-drafts branch for review. Run by hand from the
 # Actions tab or the API; it never deploys anything. Needs the
 # RETRO_DIFFUSION_API_KEY secret, and PIXELLAB_API_KEY for the walks.
@@ -35,6 +36,7 @@ on:
           - lands-pixellab
           - settlement-pixellab
           - pets-pixellab
+          - pets-animate
           - materials
           - resources
           - narrator
@@ -130,6 +132,12 @@ jobs:
             args=(--kind "${KIND%-pixellab}" --ids "$IDS" --calls "$VARIANTS" --max-cost "$MAX_COST")
             if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
             node tools/generate-portraits-pixellab.mjs "${args[@]}"
+            exit
+          fi
+          if [ "$KIND" = "pets-animate" ]; then
+            args=(--config art/pets.json --group pets --out art/drafts/pets-animate --title "Animacje chowańców (PixelLab)" --label Chowaniec --ids "$IDS" --variants "$VARIANTS" --max-cost "$MAX_COST")
+            if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+            node tools/animate-mounts.mjs "${args[@]}"
             exit
           fi
           if [ "$KIND" = "mounts-pixellab" ]; then

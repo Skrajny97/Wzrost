@@ -1,0 +1,32 @@
+{
+  "$comment": "Chowańce ze Sklepu Systemu w ruchu (tools/animate-mounts.mjs --config art/pets.json --group pets, PixelLab animate-with-text-v3; DECISIONS.md, „Odpowiedzi autora 415, 532 i 533”). start: wybrany szkic z art/drafts/pets (kind pets-pixellab), 64 × 64, przodem w prawo. fox-trot, raven-fly i wisp idą za postacią w scenie Walki, a fox-sit i raven-perch siedzą przy niej na portrecie. Autor: „musisz chowańce zaanimowac w PixelLab i dać do sprawdzenia”.",
+  "action": "moving in place in a smooth seamless loop, seen from the side and facing right",
+  "frames": 8,
+  "pets": {
+    "fox-trot": {
+      "start": "art/references/pets/fox-trot.png",
+      "description": "a friendly tame red fox with a white chest, black legs and a bushy white-tipped tail",
+      "action": "trotting at a steady pace in place, seen from the side and facing right, the four legs moving in a smooth seamless trot loop, the bushy tail swaying, the head bobbing slightly"
+    },
+    "fox-sit": {
+      "start": "art/references/pets/fox-sit.png",
+      "description": "the same friendly red fox sitting upright",
+      "action": "sitting still in place, seen from the side and facing right, breathing slowly, the bushy tail swaying gently and the ears twitching, a calm seamless idle loop"
+    },
+    "raven-fly": {
+      "start": "art/references/pets/raven-fly.png",
+      "description": "a tame black raven with glossy blue-black feathers",
+      "action": "flying in place, seen from the side and facing right, both wings flapping fully up and down in a smooth seamless loop, the body bobbing slightly"
+    },
+    "raven-perch": {
+      "start": "art/references/pets/raven-perch.png",
+      "description": "the same black raven perched with folded wings",
+      "action": "perched in place, seen from the side and facing right, the wings folded, turning its head a little and ruffling its feathers, a calm seamless idle loop"
+    },
+    "wisp": {
+      "start": "art/references/pets/wisp.png",
+      "description": "a small tame will-o'-the-wisp, a ball of pale blue spectral fire",
+      "action": "floating in place, bobbing gently up and down, the pale blue flame flickering and its flame tail swirling, a smooth seamless loop"
+    }
+  }
+}
