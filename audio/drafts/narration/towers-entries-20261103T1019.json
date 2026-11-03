@@ -1,0 +1,17 @@
+{
+  "id": "towers-entries",
+  "payload": {
+    "text": "Każde wejście to jedna walka, z wynikiem od razu. Walczysz z pełnym HP, ale bez mikstur. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/towers-entries-20261103T1019-0.mp3",
+    "audio/drafts/narration/towers-entries-20261103T1019-1.mp3"
+  ],
+  "credits": 194
+}

@@ -1,0 +1,17 @@
+{
+  "id": "towers-solo",
+  "payload": {
+    "text": "Każde piętro to stwory jednego regionu, po kolei przez wszystkie krainy. Najwyżej wejdziesz na piętro swojego poziomu. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/towers-solo-20261103T1019-0.mp3",
+    "audio/drafts/narration/towers-solo-20261103T1019-1.mp3"
+  ],
+  "credits": 254
+}
