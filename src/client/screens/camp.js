@@ -5,10 +5,13 @@
 // counts once its time has passed.
 // Production buildings fill a store the player collects, from a bubble on the
 // board or on the building's screen, at the Ognisko the fire spirit trades
-// gold for resources a few times a day, and at the Skup złomu the scrap
-// dealer sells crafting parts. Opened with the camp button in the top bar.
+// gold for resources a few times a day, at the Skup złomu the scrap dealer
+// sells crafting parts, and with the Osada the Duch budowniczego at the
+// Kamień węgielny buys resources for gold. Opened with the camp button in
+// the top bar.
 
 import { materialSprite, resourceArt } from '../art.js';
+import { spiritPart, spiritSaleSheet } from '../builder-spirit.js';
 import { BOARD_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, cornerstoneArt, plotArt } from '../camp-art.js';
 import { craftTableSection, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -60,8 +63,12 @@ const campOf = () => state.character.camp.level;
 const tall = () => Boolean(state.character.settlementOpen);
 
 // The Kamień węgielny Warowni's window: what it is and how many buildings
-// stand at their highest level, and the camp's level, out of all.
-function cornerstoneSheet(stone) {
+// stand at their highest level, and the camp's level, out of all; below,
+// the Duch budowniczego, who buys the camp's resources (builder-spirit.js).
+// It shows the character as it is now, so a sale's window comes back to it
+// with the new numbers.
+function cornerstoneSheet() {
+  const stone = state.character.camp.cornerstone;
   openSheet(
     h('h2', { class: 'sheet-title', text: stone.name }),
     h('p', { class: 'muted cornerstone-text', text: stone.text }),
@@ -71,6 +78,7 @@ function cornerstoneSheet(stone) {
       stone.rows.map((row) => meter({ label: row.label, value: row.done, max: row.of, kind: 'cornerstone' }).element),
     ),
     stone.ready && h('p', { class: 'system-hint', text: stone.ready }),
+    stone.spirit && spiritPart(stone.spirit, (good) => spiritSaleSheet(stone.spirit, good, cornerstoneSheet)),
   );
 }
 
@@ -371,7 +379,7 @@ function mountBoard(container, backHash) {
       },
       h(
         'button',
-        { type: 'button', class: 'camp-plot camp-cornerstone', 'data-guide': 'plot-cornerstone', 'aria-label': stone.name, onClick: () => cornerstoneSheet(stone) },
+        { type: 'button', class: 'camp-plot camp-cornerstone', 'data-guide': 'plot-cornerstone', 'aria-label': stone.name, onClick: () => cornerstoneSheet() },
         cornerstoneArt(),
         h('span', { class: 'camp-plot-label' }, h('span', { text: stone.label })),
       ),

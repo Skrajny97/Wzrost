@@ -4587,6 +4587,37 @@ a.camp-level-button {
   background: var(--gold);
 }
 
+/* The Duch budowniczego below the stone's bars, apart from them by a line:
+   his bust (once drawn), name and words, each resource with its picture
+   beside its name, and "wszystkie" and "nadmiar" under a sale's slider. */
+.builder-spirit {
+  display: grid;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--bark-line);
+}
+
+.builder-spirit .settlement-resident-head {
+  margin-bottom: 0;
+}
+
+.builder-spirit .settlement-resident-head p {
+  margin: 0 0 6px;
+}
+
+.builder-spirit-good {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.builder-spirit-quick {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  margin: 0;
+}
+
 /* The name and level under a plot; it may reach past the plot's width, and
    stays above the pictures of the plots around it. */
 .camp-plot-label {

@@ -10,7 +10,7 @@ import { openEncyclopediaChest, readEncyclopedia } from './encyclopedia.js';
 import { decidePointsReset, takeEvolution, testClassLevel, testEvolutions, undoEvolution } from './evolutions.js';
 import { redeemGiftCode } from './gift-codes.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
-import { buyParts, cancelBuilding, collectProduction, exchangeResources, startBuilding, tradeAtFire } from './camp.js';
+import { buyParts, cancelBuilding, collectProduction, exchangeResources, sellToSpirit, startBuilding, tradeAtFire } from './camp.js';
 import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendGift } from './community.js';
 import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
@@ -166,6 +166,8 @@ const routes = [
   ['POST', '/api/camp/trade', tradeAtFire],
   ['POST', '/api/camp/buy', buyParts],
   ['POST', '/api/camp/exchange', exchangeResources],
+  // The Duch budowniczego at the Kamień węgielny Warowni (camp.js).
+  ['POST', '/api/camp/sell', sellToSpirit],
   ['GET', '/api/settlement', getSettlement],
   ['POST', '/api/settlement/deliver', deliverSettlementOrder],
   ['POST', '/api/settlement/reject', rejectSettlementOrder],

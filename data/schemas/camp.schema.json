@@ -59,14 +59,47 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["name", "label", "text", "buildings", "camp", "ready"],
-      "description": "Kamień węgielny Warowni na planszy z Osadą: jego nazwa, podpis na planszy, opis, nazwy dwóch rzędów postępu i zdanie, gdy wszystko jest gotowe.",
+      "description": "Kamień węgielny Warowni na planszy z Osadą: jego nazwa, podpis na planszy, opis, nazwy dwóch rzędów postępu i zdanie, gdy wszystko jest gotowe; spirit: duch budowniczego, który skupuje przy nim zasoby obozu.",
       "properties": {
         "name": { "type": "string", "minLength": 1 },
         "label": { "type": "string", "minLength": 1 },
         "text": { "type": "string", "minLength": 1 },
         "buildings": { "type": "string", "minLength": 1 },
         "camp": { "type": "string", "minLength": 1 },
-        "ready": { "type": "string", "minLength": 1 }
+        "ready": { "type": "string", "minLength": 1 },
+        "spirit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["art", "name", "line", "lot", "gold", "texts"],
+          "description": "Duch budowniczego: popiersie (art, plik w src/client/art/residents), imię, jedna kwestia i skup zasobów obozu: gold złota za lot sztuk każdego zasobu, w dół do pełnej monety.",
+          "properties": {
+            "art": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+            "name": { "type": "string", "minLength": 1 },
+            "line": { "type": "string", "minLength": 1 },
+            "lot": { "type": "integer", "minimum": 1, "description": "Ile sztuk kosztuje cena z gold." },
+            "gold": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": { "type": "integer", "minimum": 1 },
+              "description": "Złoto za lot sztuk, po id zasobu z resources.json."
+            },
+            "texts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["price", "need", "least", "sold", "unknown", "amount", "notEnough", "locked"],
+              "properties": {
+                "price": { "type": "string", "pattern": "\\{gold\\}.*\\{lot\\}", "description": "Cena przy zasobie; {gold}: złoto, {lot}: za ile sztuk." },
+                "need": { "type": "string", "pattern": "\\{count\\}", "description": "Ile sztuk zasobu potrzeba jeszcze na budowy obozu." },
+                "least": { "type": "string", "pattern": "\\{count\\}", "description": "Najmniej sztuk, za które duch płaci 1 zł; także odmowa serwera." },
+                "sold": { "type": "string", "pattern": "\\{gold\\}", "description": "Komunikat po sprzedaży." },
+                "unknown": { "type": "string", "minLength": 1 },
+                "amount": { "type": "string", "minLength": 1 },
+                "notEnough": { "type": "string", "minLength": 1 },
+                "locked": { "type": "string", "minLength": 1, "description": "Odmowa bez Osady: bez niej kamienia nie ma." }
+              }
+            }
+          }
+        }
       }
     },
     "queue": { "type": "integer", "minimum": 1, "maximum": 10, "description": "Ile budów obóz ma naraz, razem z trwającą; reszta czeka w kolejce." }

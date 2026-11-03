@@ -5,9 +5,11 @@
 // another (characters.js: settleBuilds). Production buildings fill a store
 // that the player collects, the Ognisko's fire spirit trades gold for
 // resources a few times a day, the scrap dealer at the Skup złomu sells
-// crafting parts, and at the Stół rozbiórki one resource goes for another.
+// crafting parts, at the Stół rozbiórki one resource goes for another, and
+// the Duch budowniczego at the Kamień węgielny buys resources for gold.
 
 import {
+  builderSpirit,
   buildMinutes,
   buildingLevel,
   buildsUnderWay,
@@ -33,10 +35,12 @@ import {
   shopBought,
   shopBuilding,
   shopDay,
+  spiritGold,
+  spiritSaleBlock,
   upgradeCost,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { buildQueue, buildingOpen, characterView, currentHp, gainSql, loadPlayer, requirePlayer, restsDuring, walletOf } from './characters.js';
+import { buildQueue, buildingOpen, characterView, currentHp, gainSql, loadPlayer, requirePlayer, restsDuring, settlementOpen, walletOf } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
@@ -334,6 +338,39 @@ export async function exchangeResources(context) {
   return json({
     exchanged: { from, to, given, amount },
     character: characterView(await loadPlayer(db, session.userId), now),
+  });
+}
+
+// The Duch budowniczego at the Kamień węgielny Warowni (the author: "Niech
+// przy Kamieniu czuwa duch budowniczego, który za zasoby płaci złotem"):
+// `amount` pieces of a camp resource for gold, rounded down
+// (builder-spirit.js). The stone stands only with the Osada, so does he.
+// Like the rest of the camp he buys also while the character is away; the
+// sale brings no relation or reputation, as he lives in no place of the
+// Osada. Saved only if the character is as seen here and still has the
+// pieces, so two taps at once sell once.
+export async function sellToSpirit(context) {
+  const { session, player } = await requirePlayer(context);
+  const spirit = builderSpirit(content);
+  if (!spirit) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  const row = player.row;
+  if (!settlementOpen(row)) throw new ApiError(403, 'locked', spirit.texts.locked);
+  const { resource, amount } = await readJson(context.request);
+  const block = spiritSaleBlock({ resources: walletOf(row), resource, amount }, content);
+  if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
+  const gold = spiritGold(resource, amount, content);
+  const db = context.env.DB;
+  const result = await db
+    .prepare(
+      `UPDATE characters SET gold = gold + ?, resources = json_set(resources, ?, json_extract(resources, ?) - ?), version = version + 1
+       WHERE id = ? AND version = ? AND COALESCE(json_extract(resources, ?), 0) >= ?`,
+    )
+    .bind(gold, path(resource), path(resource), amount, row.id, row.version, path(resource), amount)
+    .run();
+  if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
+  return json({
+    sold: { resource, amount, gold },
+    character: characterView(await loadPlayer(db, session.userId), context.now),
   });
 }
 

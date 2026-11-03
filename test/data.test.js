@@ -43,6 +43,15 @@ test('the validator catches broken references and schema errors', () => {
     'events.json: wounded-woman ma nieznany region wewnętrzny "nowhere"',
   ]);
 
+  // The Duch budowniczego buys known resources only, each for less than the
+  // fire spirit sells a piece of it at the Ognisko's top level.
+  const spirit = structuredClone(loadData());
+  spirit.camp.cornerstone.spirit.gold = { ...spirit.camp.cornerstone.spirit.gold, 'iron-ore': 500, clay: 1 };
+  assert.deepEqual(validateData(spirit), [
+    'camp.json: duch budowniczego płaci za "iron-ore" co najmniej tyle, ile duch ognia bierze za sztukę',
+    'camp.json: duch budowniczego skupuje nieznany zasób "clay"',
+  ]);
+
   const broken = structuredClone(loadData());
   broken.rarities[0].color = 'grey';
   assert.match(validateData(broken)[0], /^rarities\.json\/0\/color: must match pattern/);

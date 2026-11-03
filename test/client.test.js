@@ -136,9 +136,10 @@ test('every sprite on the list has its file at its size, and every class has its
     skills: [...data('skills'), ...data('evolutions').skills].map((skill) => skill.id),
     // The figures the evolutions' summoning skills put in fights.
     summons: data('evolutions').skills.filter((skill) => skill.kind === 'summon').map((skill) => skill.id),
-    // The Osada's places and torch, its residents' busts and its board.
+    // The Osada's places and torch, its residents' busts and its board; the
+    // Duch budowniczego at the Kamień węgielny has a bust like theirs.
     settlement: [...data('settlement').places.map((place) => place.id), ...(data('settlement').torches?.length ? ['torch', 'torch-off'] : [])],
-    residents: data('settlement').residents.map((resident) => resident.id),
+    residents: [...data('settlement').residents.map((resident) => resident.id), ...(data('camp').cornerstone?.spirit ? [data('camp').cornerstone.spirit.art] : [])],
     // The companions' busts, one for each class and look.
     companions: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     'companion-portraits': data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
@@ -382,4 +383,111 @@ test("the Targowisko's filters show the categories with goods, in order, with ho
   assert.equal(shownCategory('material', categories), ALL);
   assert.equal(shownCategory('weapon', categoriesOf(goods.slice(1, 3), goodsCategory, order)), ALL);
   assert.deepEqual(categoriesOf([], goodsCategory, order), []);
+});
+
+// Just enough of the page's DOM for what dom.js builds (h, icon): elements
+// with a tag, a class, attributes, text and children, found again by a test.
+function fakeDocument() {
+  class FakeNode {
+    constructor(tag) {
+      this.tagName = tag.toUpperCase();
+      this.childNodes = [];
+      this.attributes = {};
+      this.dataset = {};
+      this.className = '';
+      this.style = { setProperty() {} };
+      this.listeners = {};
+    }
+    append(...nodes) {
+      this.childNodes.push(...nodes);
+    }
+    replaceChildren(...nodes) {
+      this.childNodes = nodes;
+    }
+    setAttribute(name, value) {
+      this.attributes[name] = String(value);
+    }
+    addEventListener(type, listener) {
+      (this.listeners[type] ??= []).push(listener);
+    }
+    get textContent() {
+      return this.childNodes.map((node) => (typeof node === 'string' ? node : node.textContent)).join('');
+    }
+    set textContent(text) {
+      this.childNodes = [String(text)];
+    }
+    // The elements below this one that `match`, in order.
+    find(match) {
+      return this.childNodes.flatMap((node) => (typeof node === 'string' ? [] : [...(match(node) ? [node] : []), ...node.find(match)]));
+    }
+  }
+  const saved = { Node: globalThis.Node, document: globalThis.document };
+  globalThis.Node = FakeNode;
+  globalThis.document = { createElement: (tag) => new FakeNode(tag), createElementNS: (namespace, tag) => new FakeNode(tag) };
+  return () => {
+    for (const [name, value] of Object.entries(saved)) {
+      if (value === undefined) delete globalThis[name];
+      else globalThis[name] = value;
+    }
+  };
+}
+
+// The Duch budowniczego's bust comes later, once the author approves it
+// (residents/builder-spirit.png): until it is on the art list, his part of
+// the Kamień węgielny's window stands without it, with all the rest.
+test("the Duch budowniczego's part of the stone's window works without his bust", async () => {
+  const { SPRITES, residentBust } = await import('../src/client/art.js');
+  const { saleRange, spiritGold, spiritPart, surplusOf } = await import('../src/client/builder-spirit.js');
+  const camp = JSON.parse(readFileSync(new URL('../data/camp.json', import.meta.url), 'utf8'));
+  const data = camp.cornerstone.spirit;
+  const spirit = {
+    art: data.art,
+    name: data.name,
+    line: data.line,
+    lot: data.lot,
+    texts: data.texts,
+    goods: [
+      { id: 'wood', name: 'Drewno', have: 5000, gold: data.gold.wood, least: Math.ceil(data.lot / data.gold.wood), need: 3200 },
+      { id: 'stone', name: 'Kamień', have: 3, gold: data.gold.stone, least: Math.ceil(data.lot / data.gold.stone), need: 0 },
+      { id: 'iron-ore', name: 'Ruda żelaza', have: 0, gold: data.gold['iron-ore'], least: Math.ceil(data.lot / data.gold['iron-ore']), need: 0 },
+    ],
+  };
+  const restore = fakeDocument();
+  try {
+    const listed = SPRITES.residents.ids.includes(spirit.art);
+    if (!listed) assert.equal(residentBust(spirit.art), null);
+    const sold = [];
+    const part = spiritPart(spirit, (good) => sold.push(good.id));
+    const text = part.textContent;
+    // His bust only once it is on the list, never an empty frame.
+    assert.equal(part.find((node) => node.className === 'settlement-resident-bust').length, listed ? 1 : 0);
+    assert.ok(text.includes(spirit.name) && text.includes(spirit.line), text);
+    const rows = part.find((node) => node.tagName === 'LI');
+    assert.equal(rows.length, 3);
+    // The price of each, what the builds still need only where they need
+    // some, and why too few pieces cannot be sold.
+    assert.match(rows[0].textContent, new RegExp(`${data.gold.wood} zł za ${data.lot} szt\\.`));
+    assert.match(rows[0].textContent, /potrzeba jeszcze 3\s?200 szt\./);
+    assert.doesNotMatch(rows[1].textContent, /potrzeba/);
+    assert.match(rows[1].textContent, new RegExp(`Za mniej niż ${spirit.goods[1].least} szt\\.`));
+    assert.doesNotMatch(rows[2].textContent, /Za mniej/);
+    const buttons = rows.map((row) => row.find((node) => node.tagName === 'BUTTON')[0]);
+    assert.deepEqual(buttons.map((button) => button.textContent), ['Sprzedaj', 'Sprzedaj', 'Sprzedaj']);
+    assert.deepEqual(buttons.map((button) => 'disabled' in button.attributes), [false, true, true]);
+    buttons[0].listeners.click[0]();
+    assert.deepEqual(sold, ['wood']);
+  } finally {
+    restore();
+  }
+  // The sale's numbers as the server counts them: from the fewest pieces
+  // that bring a coin to all, rounded down, and the surplus over the need.
+  const [wood, stone] = spirit.goods;
+  assert.deepEqual(saleRange(wood), { least: wood.least, most: 5000 });
+  assert.equal(saleRange(stone), null);
+  assert.equal(spiritGold(wood, data.lot, wood.least), 1);
+  assert.equal(spiritGold(wood, data.lot, wood.least - 1), 0);
+  assert.equal(spiritGold(wood, data.lot, 1800), Math.floor((1800 * data.gold.wood) / data.lot));
+  assert.equal(surplusOf(wood), 1800);
+  assert.equal(surplusOf({ ...wood, need: 0 }), null);
+  assert.equal(surplusOf({ ...wood, need: 4995 }), null);
 });

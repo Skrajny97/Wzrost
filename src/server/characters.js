@@ -7,9 +7,11 @@ import {
   areaFor,
   autoDistribute,
   bagCapacity,
+  builderSpirit,
   buildsUnderWay,
   campBonus,
   campLevels,
+  campNeeds,
   canUse,
   classNameOf,
   classXpToNext,
@@ -63,6 +65,7 @@ import {
   shopOffer,
   skillsView,
   spentPoints,
+  spiritLeast,
   pointSources,
   statEffects,
   unlockedFeatures,
@@ -395,7 +398,7 @@ const settlementTest = (row) => settlementOn() && JSON.parse(row.settlement ?? '
 
 // Whether the character has the Osada: where the deployment has it on, from
 // its level, or opened by "Testuj Osadę".
-const settlementOpen = (row) =>
+export const settlementOpen = (row) =>
   settlementOn() && Boolean(content.settlement) && (row.level >= content.unlocksById.settlement.level || settlementTest(row));
 
 // A camp building of the Osada's (the Kwatery, `settlement` in
@@ -615,6 +618,7 @@ function campView(player, levels, now) {
         { label: camp.cornerstone.camp, done: own, of: camp.maxLevel },
       ],
       ready: finished === open.length && own >= camp.maxLevel ? camp.cornerstone.ready : null,
+      spirit: spiritView(player, open, queue),
     },
     level: {
       id: camp.id,
@@ -687,6 +691,34 @@ function campView(player, levels, now) {
         exchange: building.exchange && level > 0 ? exchangeView(building, level) : null,
       };
     }),
+  };
+}
+
+// The Duch budowniczego at the Kamień węgielny Warowni (builder-spirit.js):
+// who he is and, for each resource he buys, what the character has, his
+// gold for a lot of pieces, the fewest pieces that bring a coin, and what
+// the camp's builds not paid yet still need of it (`open`: the buildings
+// the character has), so the page can tell the surplus. Null where the
+// game has no spirit.
+function spiritView(player, open, queue) {
+  const spirit = builderSpirit(content);
+  if (!spirit) return null;
+  const wallet = walletOf(player.row);
+  const needs = campNeeds(open, player.buildings, queue, content);
+  return {
+    art: spirit.art,
+    name: spirit.name,
+    line: spirit.line,
+    lot: spirit.lot,
+    texts: { price: spirit.texts.price, need: spirit.texts.need, least: spirit.texts.least, sold: spirit.texts.sold },
+    goods: Object.entries(spirit.gold).map(([id, gold]) => ({
+      id,
+      name: content.resourcesById[id].name,
+      have: wallet[id] ?? 0,
+      gold,
+      least: spiritLeast(id, content),
+      need: needs[id] ?? 0,
+    })),
   };
 }
 

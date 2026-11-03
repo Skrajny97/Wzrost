@@ -5,6 +5,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import Ajv from 'ajv';
+import { fireBuilding, fireTrade } from '../src/engine/fire.js';
 import { TIMED_KINDS } from '../src/engine/potions.js';
 
 const DATA_DIR = new URL('../data/', import.meta.url);
@@ -523,6 +524,19 @@ function checkReferences(data) {
   if (data.buildings.filter((building) => building.trade).length > 1) errors.push('buildings.json: wymianę złota (trade) może mieć tylko jeden budynek');
   if (data.buildings.filter((building) => building.shop).length > 1) errors.push('buildings.json: sprzedaż części (shop) może mieć tylko jeden budynek');
   if (data.buildings.filter((building) => building.exchange).length > 1) errors.push('buildings.json: wymianę zasobów (exchange) może mieć tylko jeden budynek');
+  // The Duch budowniczego at the Kamień węgielny (src/engine/builder-spirit.js)
+  // buys the camp's resources only, each for less than the fire spirit sells a
+  // piece of it at the Ognisko's top level (the design: "Najwyższa cena skupu
+  // u dowolnego NPC musi być niższa od najniższej ceny sprzedaży"), so gold
+  // never grows from buying and selling back.
+  const spirit = data.camp.cornerstone?.spirit;
+  const fire = fireBuilding(data);
+  for (const [id, gold] of Object.entries(spirit?.gold ?? {})) {
+    if (!resources.has(id)) errors.push(`camp.json: duch budowniczego skupuje nieznany zasób "${id}"`);
+    else if (fire?.trade.resources.includes(id) && gold / spirit.lot >= fireTrade(fire.maxLevel, data).unitGold) {
+      errors.push(`camp.json: duch budowniczego płaci za "${id}" co najmniej tyle, ile duch ognia bierze za sztukę`);
+    }
+  }
 
   for (const position of Object.keys(data.balance.combat.targetWeights)) {
     if (!POSITIONS.includes(position)) errors.push(`balance.json: nieznana pozycja "${position}"`);

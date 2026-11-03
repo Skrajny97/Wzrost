@@ -18,6 +18,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `unlocks.js` | kolejność odblokowań samouczka, długości wypraw i regiony wewnętrzne otwierane poziomem klasy |
 | `camp.js` | obóz: poziomy budynków w czasie, koszty i czasy budowy, premie (odpoczynek, plecak, ceny złomiarza), magazyny budynków produkcyjnych i zbieranie |
 | `exchange.js`, `fire.js`, `shop.js` | wymiana zasobów przy Stole rozbiórki, duch Ogniska (złoto na zasoby) i lada Skupu złomu (części za złoto) |
+| `builder-spirit.js` | duch budowniczego przy Kamieniu węgielnym: skup zasobów obozu za złoto i to, czego budowy obozu jeszcze potrzebują |
 | `skills.js`, `evolutions.js`, `skill-demo.js` | umiejętności klas, ewolucje klas i podgląd animacji umiejętności dla autora |
 | `potions.js` | mikstury na wyprawach: kiedy postać je pije |
 | `professions.js`, `brewing.js`, `workshop.js`, `crafting.js` | profesje: Zielarstwo, Alchemia, Rzemieślnictwo oraz materiały i Stół rozbiórki |
