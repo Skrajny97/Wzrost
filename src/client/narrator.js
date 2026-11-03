@@ -31,6 +31,7 @@ import { duckMusic } from './music.js';
 import { rod, roll, stopRoll } from './parchment.js';
 import { narrationWaits, narratorVoiceOn, playNarration, playSound, preloadNarration, stopNarration } from './sound.js';
 import { activityFinished, call, isUnlocked, state } from './state.js';
+import { desktopLayout } from './layout-mode.js';
 import { toast } from './ui.js';
 
 const running = () => Boolean(state.character.activity) && !activityFinished(state.character.activity);
@@ -634,7 +635,10 @@ function skipping(line) {
 // class, and for a female look its female version, with that version's own
 // recording (none until it is recorded).
 function told(line) {
-  const own = line.classes?.[state.character?.classId] ?? line;
+  const forClass = line.classes?.[state.character?.classId] ?? line;
+  // On a computer a line may say it otherwise (519: "Kliknij" for
+  // "Stuknij", the resources in the top bar).
+  const own = (desktopLayout() && forClass.desktop) || forClass;
   const female = own.female && state.character?.appearance === 'female';
   return { ...line, text: female ? own.female.text : own.text, voice: female ? own.female.voice : own.voice };
 }

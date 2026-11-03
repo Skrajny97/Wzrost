@@ -689,7 +689,8 @@ function checkReferences(data) {
     for (const id of Object.keys(line.classes ?? {})) {
       if (!classIds.has(id)) errors.push(`tutorial.json: ${line.id} ma tekst dla nieznanej klasy "${id}"`);
     }
-    for (const told of [line, ...Object.values(line.classes ?? {})]) {
+    // Its computer version too (519), with its own recordings.
+    for (const told of [line, line.desktop, ...Object.values(line.classes ?? {})].filter(Boolean)) {
       for (const voice of [told.voice, told.female?.voice]) {
         if (voice && !existsSync(new URL(voice, CLIENT_DIR))) errors.push(`tutorial.json: brak pliku src/client/${voice}`);
       }

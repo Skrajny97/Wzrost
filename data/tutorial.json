@@ -91,7 +91,11 @@
       "text": [
         "Stuknij Wiatrołomy."
       ],
-      "voice": "audio/narration/tap-region.mp3"
+      "voice": "audio/narration/tap-region.mp3",
+      "desktop": {
+        "text": ["Kliknij Wiatrołomy."],
+        "voice": "audio/narration/tap-region-desktop.mp3"
+      }
     },
     {
       "id": "tap-area",
@@ -135,7 +139,11 @@
       "text": [
         "Suwak stoi na trzydziestu minutach. Stuknij „Wyrusz”."
       ],
-      "voice": "audio/narration/tap-start.mp3"
+      "voice": "audio/narration/tap-start.mp3",
+      "desktop": {
+        "text": ["Suwak stoi na trzydziestu minutach. Kliknij „Wyrusz”."],
+        "voice": "audio/narration/tap-start-desktop.mp3"
+      }
     },
     {
       "id": "skip",
@@ -378,6 +386,14 @@
       "female": {
         "text": ["Przy okazji – w tym miejscu możesz sprawdzić swój stan złota i Punkty Systemu, a po kliknięciu – resztę zasobów wraz z Punktami Czasu. Sama zobacz."],
         "voice": "audio/narration/wallet-female.mp3"
+      },
+      "desktop": {
+        "text": ["Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sam zobacz."],
+        "voice": "audio/narration/wallet-desktop.mp3",
+        "female": {
+          "text": ["Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sama zobacz."],
+          "voice": "audio/narration/wallet-desktop-female.mp3"
+        }
       }
     },
     {
