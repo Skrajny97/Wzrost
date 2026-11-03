@@ -1,0 +1,15 @@
+{
+  "id": "jewel",
+  "payload": {
+    "text": "a jeweller grinds a small gemstone on a hand-turned stone wheel: a short dry scraping whirr, then the polished gem is set down on a wooden table with one small bright crystal clink, close up, no echo, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/jewel-20261103T2227-0.mp3",
+    "audio/drafts/effects/jewel-20261103T2227-1.mp3",
+    "audio/drafts/effects/jewel-20261103T2227-2.mp3",
+    "audio/drafts/effects/jewel-20261103T2227-3.mp3"
+  ],
+  "credits": 160
+}

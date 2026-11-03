@@ -1,0 +1,15 @@
+{
+  "id": "gem-set",
+  "payload": {
+    "text": "a jeweller sets a gemstone into a silver ring: three tiny precise metallic clicks of small pliers pressing the prongs, then one soft clear crystal ping, close up, dry, no echo, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/gem-set-20261103T2227-0.mp3",
+    "audio/drafts/effects/gem-set-20261103T2227-1.mp3",
+    "audio/drafts/effects/gem-set-20261103T2227-2.mp3",
+    "audio/drafts/effects/gem-set-20261103T2227-3.mp3"
+  ],
+  "credits": 144
+}

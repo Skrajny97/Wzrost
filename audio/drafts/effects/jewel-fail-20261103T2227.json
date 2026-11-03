@@ -1,0 +1,15 @@
+{
+  "id": "jewel-fail",
+  "payload": {
+    "text": "a small gemstone cracks with one sharp glassy snap and a few tiny crystal splinters scatter onto a wooden table, close up, dry, no echo, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/jewel-fail-20261103T2227-0.mp3",
+    "audio/drafts/effects/jewel-fail-20261103T2227-1.mp3",
+    "audio/drafts/effects/jewel-fail-20261103T2227-2.mp3",
+    "audio/drafts/effects/jewel-fail-20261103T2227-3.mp3"
+  ],
+  "credits": 120
+}
