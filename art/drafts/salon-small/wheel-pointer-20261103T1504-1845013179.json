@@ -1,0 +1,12 @@
+{
+  "id": "wheel-pointer",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art, a small ornate brass pointer arrow pointing straight down, medieval style, a round rivet at its top, no text, transparent background, centered",
+  "style": "src/client/art/settlement/casino.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 16
+}
