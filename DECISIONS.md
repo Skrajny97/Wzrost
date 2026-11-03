@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Warownia i Tier V: szkice do oceny (4.11.2026)
+
+Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
+
+1. **Budynki Warowni (574).** PixelLab narysował po 4 wersje siedmiu budynków według zatwierdzonych opisów (419–428), w stylu budynków obozu (`fortress` w `art/prompts.json`, rodzaj `fortress-pixellab` w procesie „Grafiki (szkice)”). Szkice czekają na ocenę autora, pozycja po pozycji (578.1–578.7). Do gry nic z Warowni nie wejdzie bez grafik i odpowiedzi.
+2. **Pytania przed kodem Warowni:** gdzie na planszy stanie siedem nowych budynków (579), czy błogosławieństwo Ołtarza liczy się w walkach, jak mikstury od 0.1.26 (580), i czy budynek Warowni ma jeden wygląd na wszystkie poziomy (581).
+3. **Tier V (575).** Propozycja 22 nowych baz od 75. poziomu klasy, po jednej w każdej rodzinie. Liczby wynikają z zasady wcześniejszych Tierów: współczynnik pierwszej bazy razy 1,20, zaokrąglony w górę do setnych (Miecz 1,2, Karabela 1,44), a premia półtora raza większa niż w Tierze IV (Koncerz 23–36, Karabela 34–54). Ikony rysuje PixelLab (`items-pixellab`). Nazwy, liczby i ikony czekają na autora; Tier VI przyjdzie po nich.
+
 ## Wersja 0.1.28 (4.11.2026)
 
 1. **Poprawki z przeglądu kodu (576)** przy oprawianiu kamieni (zob. „Przegląd kodu (4.11.2026, w grze od 0.1.28)”).
