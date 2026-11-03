@@ -2,7 +2,10 @@
 // narrator's quests, HP and mana, character and class XP, gold and Punkty
 // Systemu with the camp's resources, the camp, current activity with the
 // Encyklopedia beside it) and the two bottom bars, the main menu and the
-// character bar with its own background.
+// character bar with its own background. On a computer the menu runs down
+// the left, with the camp among its tabs and each open part of the game's
+// shortcuts under its tab, and the top bar shows the camp's resources and
+// the Punkty Czasu beside the gold (505–508 A).
 
 import { encyclopediaArt, goldArt, narratorFace, resourceArt, timePointsArt } from './art.js';
 import { bestiaryReady } from './bestiary.js';
@@ -12,16 +15,17 @@ import { $, fill, h, icon } from './dom.js';
 import { formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
 import { SYSTEM_POINTS_ICON } from './icons.js';
 import { anyClaimable, showQuests } from './quests.js';
+import { SECTION_ICONS, SECTION_NEWS, sectionHash } from './screens/community.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
 import { meter } from './ui.js';
 import { desktopLayout } from './layout-mode.js';
 
-// A profession's work, by the kind of its activity: its screen and its name
-// in the top bar.
+// A profession's work, by the kind of its activity: its screen, its name
+// in the top bar and the profession doing it.
 const WORK_SCREENS = {
-  herbs: { href: '#/profesje/zielarstwo', label: 'ZIELARSTWO' },
-  potions: { href: '#/profesje/alchemia', label: 'ALCHEMIA' },
-  items: { href: '#/profesje/rzemieslnictwo', label: 'RZEMIEŚLNICTWO' },
+  herbs: { href: '#/profesje/zielarstwo', label: 'ZIELARSTWO', profession: 'herbalism' },
+  potions: { href: '#/profesje/alchemia', label: 'ALCHEMIA', profession: 'alchemy' },
+  items: { href: '#/profesje/rzemieslnictwo', label: 'RZEMIEŚLNICTWO', profession: 'crafting' },
 };
 
 const MAIN_TABS = [
@@ -33,6 +37,12 @@ const MAIN_TABS = [
 ];
 // The Dziennik is at the top of the settings (app.js); the Społeczność took
 // its place in the bar.
+
+// On a computer the camp is a tab of the menu like the others, under Walka
+// (508 A; the player: "obóz dodany, w tym górnym HUD, wydaje się być mało
+// intuicyjny"); on a phone it stays the tent in the top bar.
+const CAMP_TAB = { id: 'oboz', label: 'Obóz', icon: 'tent', href: '#/oboz' };
+const DESKTOP_TABS = [...MAIN_TABS.slice(0, 2), CAMP_TAB, ...MAIN_TABS.slice(2)];
 
 const CHARACTER_TABS = [
   { id: 'back', label: 'Powrót', icon: 'back' },
@@ -48,6 +58,9 @@ let topbar = null;
 // the two numbers start in one column (the author: the coin "wielkościowo i
 // pozycją zbliżona do Punktów Systemu").
 const TOPBAR_ICON = 20;
+// The resources' pictures never go under 24 px (art.js), so the Punkty
+// Czasu's hourglass beside them has that size too.
+const STOCK_ICON = 24;
 
 export function buildTopbar(onSettings) {
   const level = h('span', { class: 'badge badge--system' });
@@ -66,6 +79,17 @@ export function buildTopbar(onSettings) {
   // (the parts have their tab in the backpack); a dot when a chest waits
   // there or in a Bestiariusz.
   const encyclopedia = h('a', { class: 'encyclopedia-button', href: '#/encyklopedia', 'aria-label': 'Encyklopedia' }, encyclopediaArt(28));
+  // On a computer the camp's resources and the Punkty Czasu stand beside the
+  // gold, always in sight (505 A; the player: "Sporo jest jeszcze miejsca na
+  // HUD'zie na PC"); on a phone they wait in the list under it, and
+  // styles.css hides them there. A tap on them opens the list too.
+  const stock = [
+    ...state.content.resources.map((resource) => ({ id: resource.id, name: resource.name, art: resourceArt(resource.id, STOCK_ICON) })),
+    { id: 'time', name: 'Punkty Czasu', art: timePointsArt(STOCK_ICON) },
+  ].map((entry) => {
+    const value = h('span', { class: 'gold-stock-value' });
+    return { ...entry, value, element: h('span', { class: `gold-stock gold-stock--${entry.id}`, title: entry.name }, entry.art, value) };
+  });
   const goldButton = h(
     'button',
     {
@@ -76,8 +100,9 @@ export function buildTopbar(onSettings) {
       'aria-controls': 'wallet-list',
       onClick: () => showWallet(wallet.hidden),
     },
-    h('span', { class: 'gold-row' }, goldArt(TOPBAR_ICON), gold),
-    h('span', { class: 'points' }, icon(SYSTEM_POINTS_ICON, { size: TOPBAR_ICON }), points),
+    h('span', { class: 'gold-row', title: 'Złoto' }, goldArt(TOPBAR_ICON), gold),
+    h('span', { class: 'points', title: 'Punkty Systemu' }, icon(SYSTEM_POINTS_ICON, { size: TOPBAR_ICON }), points),
+    stock.map((entry) => entry.element),
   );
   // The narrator waits with his quests between the levels and the gold.
   const quests = h(
@@ -142,6 +167,7 @@ export function buildTopbar(onSettings) {
     quests,
     gold,
     points,
+    stock,
     goldButton,
     wallet,
     timeNote,
@@ -227,9 +253,18 @@ export function updateTopbar(now = serverNow()) {
   topbar.classLevel.setAttribute('aria-label', `${character.className} ${character.classLevel}`);
   topbar.gold.textContent = formatShort(character.gold);
   topbar.points.textContent = formatShort(character.systemPoints);
+  // The resources and the Punkty Czasu beside the gold on a computer, the
+  // hourglass saying under the mouse when the next point comes.
+  const time = timePointsNow(character, now);
+  const stocked = topbar.stock.map((entry) => {
+    const amount = entry.id === 'time' ? time.points : (character.resources[entry.id] ?? 0);
+    entry.value.textContent = formatShort(amount);
+    if (entry.id === 'time') entry.element.title = `${entry.name}: +1 za ${formatCountdown(time.nextAt - now)}`;
+    return `, ${entry.name}: ${formatNumber(amount)}`;
+  });
   topbar.goldButton.setAttribute(
     'aria-label',
-    `Złoto: ${formatNumber(character.gold)}, Punkty Systemu: ${formatNumber(character.systemPoints)}. Zasoby`,
+    `Złoto: ${formatNumber(character.gold)}, Punkty Systemu: ${formatNumber(character.systemPoints)}${desktopLayout() ? stocked.join('') : ''}. Zasoby`,
   );
   if (!topbar.wallet.hidden) refreshWallet(now);
   // A dot on the settings when players' bug reports wait for the author.
@@ -244,16 +279,13 @@ export function updateTopbar(now = serverNow()) {
   const waiting = anyClaimable(character);
   topbar.quests.classList.toggle('quest-button--ready', waiting);
   topbar.quests.setAttribute('aria-label', waiting ? 'Zadania od narratora, nagrody do odebrania' : 'Zadania od narratora');
-  // The camp shows the time left of the building being upgraded.
-  const building = character.camp.construction;
-  const busy = Boolean(building) && now < building.endsAt;
-  // A dot when a production building's store is full and waits.
-  const ready = fullStores(character, now).length > 0;
-  topbar.camp.classList.toggle('camp-button--busy', busy);
-  topbar.camp.classList.toggle('camp-button--ready', ready);
-  topbar.campLabel.textContent = busy ? formatCountdown(building.endsAt - now) : 'Obóz';
-  const labels = [busy && `budowa: ${building.name}`, ready && 'pełny magazyn'].filter(Boolean);
-  topbar.camp.setAttribute('aria-label', labels.length > 0 ? `Obóz, ${labels.join(', ')}` : 'Obóz');
+  // The camp shows the time left of the building being upgraded, and a dot
+  // when a production building's store is full and waits.
+  const camp = campNow(now);
+  topbar.camp.classList.toggle('camp-button--busy', camp.busy);
+  topbar.camp.classList.toggle('camp-button--ready', camp.ready);
+  topbar.campLabel.textContent = camp.busy ? formatCountdown(camp.building.endsAt - now) : CAMP_TAB.label;
+  topbar.camp.setAttribute('aria-label', camp.said);
   updateNavTimers(now);
   topbar.hp.set(currentHp(character, now), character.maxHp);
   topbar.mana.set(character.mana, character.maxMana);
@@ -318,6 +350,15 @@ function tabTime(id, now = serverNow()) {
   const ready = (Boolean(work) && !running) || (Boolean(avatar) && activityFinished(avatar, now));
   return { work, running, ready };
 }
+// The build under way in the camp and whether a production building's
+// store is full and waits: the tent in the top bar shows both on a phone,
+// the camp's tab in the menu on a computer.
+function campNow(now = serverNow()) {
+  const building = state.character.camp.construction;
+  const busy = Boolean(building) && now < building.endsAt;
+  const ready = fullStores(state.character, now).length > 0;
+  return { building, busy, ready, said: [CAMP_TAB.label, busy && `budowa: ${building.name}`, ready && 'pełny magazyn'].filter(Boolean).join(', ') };
+}
 const WAITING = {
   postac: () => pointsWaiting() || skillsWaiting() || evolutionWaiting(),
   stats: pointsWaiting,
@@ -327,8 +368,9 @@ const WAITING = {
   osada: settlementWaiting,
   walka: () => tabTime('walka').ready,
   profesje: () => tabTime('profesje').ready,
+  oboz: () => Boolean(state.character) && campNow().ready,
 };
-const WAITING_TEXTS = { walka: 'raport czeka', profesje: 'raport czeka', evolution: 'ewolucja czeka', osada: 'zlecenie czeka' };
+const WAITING_TEXTS = { walka: 'raport czeka', profesje: 'raport czeka', evolution: 'ewolucja czeka', osada: 'zlecenie czeka', oboz: 'pełny magazyn' };
 function waitingText(id) {
   if (id === 'spolecznosc') return communityNewsText();
   if (WAITING_TEXTS[id]) return WAITING_TEXTS[id];
@@ -355,8 +397,95 @@ function navButton(tab, active, onBack) {
   return h('a', { ...props, href: tab.href }, children);
 }
 
-export function updateNav({ kind, active, onBack }) {
-  // The camp's tab is the tent in the top bar.
+// The shortcuts under a tab of the computer's menu while its part of the
+// game is open, as the character's tabs stand under Postać (507 A; the
+// player: "fajnie jakby w HUD na PC po lewej stronie walka, profesje,
+// osada itp były rozwijane tak jak postać z dodatkowymi skrótami"): the
+// screen's own tabs or places, in their order. Each is { id, label, icon,
+// href, lock, ready }: `lock` names, in a few words, what one the game does
+// not open yet waits for; it is no link then, as its tab on the screen
+// cannot be pressed either. `ready` lights it with the gold dot its main
+// tab has for it (a report, news), as Statystyki under Postać.
+const PROFESSION_ICONS = { herbalism: 'leaf', alchemy: 'flask', crafting: 'hammer' };
+const PLACE_ICONS = { board: 'check', enchanter: 'skills', hermitage: 'hood', stable: 'beast', tavern: 'chat', market: 'coin', tannery: 'pouch', herbalist: 'leaf', forge: 'hammer' };
+const PARTS = {
+  // Eksploracja and Wieże, as over the Walka (screens/towers.js).
+  walka: () => {
+    const towers = unlockInfo('towers');
+    return [
+      { id: 'explore', label: 'Eksploracja', icon: 'beast', href: '#/walka', ready: tabTime('walka').ready, readyText: 'raport czeka' },
+      towers && { id: 'towers', label: 'Wieże', icon: 'evolution', href: '#/wieze', lock: !isUnlocked('towers') && `poz. ${towers.level}` },
+    ];
+  },
+  // The professions as their squares on the tab (screens/professions.js),
+  // a work's report lighting its own.
+  profesje: () => {
+    const professions = state.character.professions;
+    if (!professions) return [];
+    const now = serverNow();
+    const done = [state.character.activity, professions.avatar?.activity].filter((work) => WORK_SCREENS[work?.kind] && activityFinished(work, now));
+    return professions.list.map((profession) => {
+      const screen = Object.values(WORK_SCREENS).find((one) => one.profession === profession.id);
+      return (
+        screen && {
+          id: screen.href.split('/').pop(),
+          label: profession.name,
+          icon: PROFESSION_ICONS[profession.id] ?? 'leaf',
+          href: screen.href,
+          lock: profession.soon ? 'wkrótce' : profession.locked && `poz. ${profession.unlockLevel}`,
+          ready: done.some((work) => WORK_SCREENS[work.kind] === screen),
+          readyText: 'raport czeka',
+        }
+      );
+    });
+  },
+  // The places of the Osada's board (data/settlement.json).
+  osada: () =>
+    state.character.settlementOpen
+      ? (state.content.settlementPlaces ?? []).map((place) => ({ id: place.id, label: place.name, icon: PLACE_ICONS[place.id] ?? 'house', href: `#/osada/${place.id}`, lock: place.soon && 'wkrótce' }))
+      : [],
+  // The parts of the Społeczność, as its tabs (screens/community.js), each
+  // with the light of its news.
+  spolecznosc: () =>
+    isUnlocked('community')
+      ? state.content.community.sections.map((section) => ({
+          id: section.id,
+          label: section.name,
+          icon: SECTION_ICONS[section.id] ?? 'unknown',
+          href: sectionHash(section.id),
+          lock: section.soon && 'wkrótce',
+          ready: Boolean(SECTION_NEWS[section.id]?.()),
+          readyText: 'nowe',
+        }))
+      : [],
+};
+
+function partItem(part, current) {
+  const children = [
+    h('span', { class: 'nav-icon' }, icon(part.icon), part.lock && icon('lock', { size: 12, className: 'nav-lock' })),
+    h('span', { class: 'nav-label', text: part.label }),
+    part.lock && h('span', { class: 'nav-hint', text: part.lock }),
+  ];
+  const props = {
+    class: ['nav-item', part.lock && 'nav-item--locked', part.ready && 'nav-item--ready'].filter(Boolean).join(' '),
+    'aria-label': part.lock ? `${part.label}, zablokowane (${part.lock})` : part.ready ? `${part.label}, ${part.readyText}` : part.label,
+  };
+  if (part.lock) return h('span', { ...props, 'aria-disabled': 'true' }, children);
+  return h('a', { ...props, href: part.href, 'aria-current': part.id === current ? 'page' : undefined }, children);
+}
+
+// The shortcuts under the tab lit, or nothing while its part is closed.
+function partsList(tab, current) {
+  const parts = (PARTS[tab.id]?.() ?? []).filter(Boolean);
+  if (parts.length === 0) return null;
+  return h('div', { class: 'nav-parts', role: 'group', 'aria-label': tab.label }, parts.map((part) => partItem(part, current)));
+}
+
+// `part` is the part of the game shown on the screen (app.js): the
+// shortcut lit under its tab on a computer.
+export function updateNav({ kind, active, part = null, onBack }) {
+  // The camp's tab is the tent in the top bar, on a computer its tab in the
+  // menu.
   const camp = $('.camp-button');
   if (active === 'oboz') camp?.setAttribute('aria-current', 'page');
   else camp?.removeAttribute('aria-current');
@@ -369,24 +498,29 @@ export function updateNav({ kind, active, onBack }) {
   const main = $('#nav-main');
   const character = $('#nav-character');
   // On a computer the main menu stays down the left, with the character's
-  // own tabs under its Postać while they are open (474 A).
+  // own tabs under its Postać while they are open (474 A), and the
+  // shortcuts of another part of the game under its tab (507 A).
   const desktop = desktopLayout();
   main.hidden = kind !== 'main' && !desktop;
   character.hidden = kind !== 'character';
   // A tab whose part the deployment has off (no unlock in the content, as
   // the Ewolucja in the live game) is not there.
   const characterTabs = CHARACTER_TABS.filter((tab) => !tab.unlock || unlockInfo(tab.unlock));
-  if (kind === 'main' || desktop) fill(main, ...MAIN_TABS.map((tab) => navButton(tab, kind === 'main' ? active : 'postac')));
+  if (desktop) {
+    const lit = kind === 'main' ? active : 'postac';
+    fill(main, ...DESKTOP_TABS.map((tab) => [navButton(tab, lit), tab.id === lit && partsList(tab, part)]));
+  } else if (kind === 'main') fill(main, ...MAIN_TABS.map((tab) => navButton(tab, active)));
   if (kind === 'character') fill(character, ...characterTabs.map((tab) => navButton(tab, active, onBack)));
   updateNavTimers();
 }
 
 // The time left of the exploration on the Walka tab and of the work in a
 // profession on the Profesje tab, and their dots once a report waits. A tab
-// still locked keeps its level.
+// still locked keeps its level. On a computer the camp's tab counts a build
+// down too, and has its dot while a store is full.
 export function updateNavTimers(now = serverNow()) {
   for (const [id, tab] of Object.entries(TIMED)) {
-    const item = $(`#nav-main .nav-item[href="#/${id}"]`);
+    const item = $(`#nav-main > .nav-item[href="#/${id}"]`);
     const label = item && $('.nav-label', item);
     if (!label || item.classList.contains('nav-item--locked')) continue;
     const { work, running, ready } = tabTime(id, now);
@@ -395,5 +529,13 @@ export function updateNavTimers(now = serverNow()) {
     label.textContent = running ? formatCountdown(work.endsAt - now) : tab.label;
     item.setAttribute('aria-label', [tab.label, running && `${tab.doing}: ${label.textContent}`, ready && 'raport czeka'].filter(Boolean).join(', '));
   }
+  const camp = $(`#nav-main > .nav-item[href="${CAMP_TAB.href}"]`);
+  const label = camp && $('.nav-label', camp);
+  if (!label || !state.character) return;
+  const { building, busy, ready, said } = campNow(now);
+  camp.classList.toggle('nav-item--busy', busy);
+  camp.classList.toggle('nav-item--ready', ready);
+  label.textContent = busy ? formatCountdown(building.endsAt - now) : CAMP_TAB.label;
+  camp.setAttribute('aria-label', said);
 }
 

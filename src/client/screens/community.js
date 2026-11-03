@@ -2,9 +2,11 @@
 // the part shown, picks one of its parts (data/community.json): the Czat,
 // the Znajomi with their daily Upominek (friends.js), the Ranking postaci
 // (ranking.js), the Drużyna (party.js) and the Gildia (guild.js).
-// It opens on the part with news (chat-news.js), else on the one last shown
-// on the device; while the narrator has not shown the chat's rules yet
-// (narrator.js), on the Czat. News in a part not shown lights the folded
+// It opens on the part its address names (#/spolecznosc/znajomi, from the
+// shortcuts in the computer's menu), else on the part with news
+// (chat-news.js), else on the one last shown on the device; while the
+// narrator has not shown the chat's rules yet (narrator.js), on the Czat
+// unless the address names another. News in a part not shown lights the folded
 // list too. By the list a bell mutes the Globalny's light on the tab. Under
 // it waits a Wymiana proposed or going on (trade.js).
 //
@@ -73,15 +75,24 @@ const untilText = (until) => (until >= FOREVER ? 'na stałe' : `do ${dateTimeFor
 const SECTION_KEY = 'insight-community-section';
 // The part whose tab opens the Gildia's own page (screens/guild.js).
 const GUILD_PAGE_SECTION = 'guilds';
-const SECTION_ICONS = { chat: 'chat', friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords' };
-const SECTION_NEWS = { chat: chatNews, friends: friendNews, party: partyNews, guilds: () => guildNews() || guildTodoNews() };
+// The parts' icons and lights of news, also for their shortcuts under
+// Społeczność in the computer's menu (layout.js).
+export const SECTION_ICONS = { chat: 'chat', friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords' };
+export const SECTION_NEWS = { chat: chatNews, friends: friendNews, party: partyNews, guilds: () => guildNews() || guildTodoNews() };
+// The address that opens the tab at a part (app.js), for those shortcuts;
+// the Gildia has its page.
+const SECTION_SLUGS = { chat: 'czat', friends: 'znajomi', ranking: 'ranking', party: 'druzyna' };
+export const sectionHash = (id) => (id === GUILD_PAGE_SECTION ? '#/gildia' : SECTION_SLUGS[id] ? `#/spolecznosc/${SECTION_SLUGS[id]}` : '#/spolecznosc');
 
 export function mountCommunity(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Społeczność')(container, context);
   const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking, party: mountParty };
   const sections = state.content.community.sections;
   const asked = takeConversation();
-  let current = asked ? 'chat' : firstSection(sections);
+  // A part named in the address (a shortcut in the computer's menu), when
+  // it is open.
+  const named = Object.keys(SECTION_SLUGS).find((id) => SECTION_SLUGS[id] === context.params?.section && sections.some((section) => section.id === id && !section.soon));
+  let current = asked ? 'chat' : (named ?? firstSection(sections));
   let part = null;
   const body = h('div', { class: 'community-body' });
   const picker = sectionPicker(sections, () => current, show);
@@ -111,6 +122,8 @@ export function mountCommunity(container, context) {
     } catch {
       // Remembered for this visit only.
     }
+    // Its shortcut lights in the computer's menu (app.js).
+    context.setPart?.(id);
     part?.unmount();
     fill(body);
     fill(picker.bar);
@@ -140,7 +153,9 @@ export function mountCommunity(container, context) {
 }
 
 function firstSection(sections) {
-  if (!state.character.tutorial.includes('community-rules')) return 'chat';
+  // A character made before the narrator's introduction has no list of his
+  // lines (null) and never hears the chat's rules from him.
+  if (state.character.tutorial && !state.character.tutorial.includes('community-rules')) return 'chat';
   const open = sections.filter((section) => !section.soon && section.id !== GUILD_PAGE_SECTION).map((section) => section.id);
   const news = open.find((id) => SECTION_NEWS[id]?.());
   if (news) return news;

@@ -54,6 +54,13 @@ describe('content', () => {
     assert.equal(data.unlocks.find((unlock) => unlock.id === 'skills').classLevel, 10);
     assert.match(data.elements.find((element) => element.id === 'fire').color, /^#[0-9a-f]{6}$/);
   });
+
+  // The shortcuts under the Osada in the computer's menu (507 A) name its
+  // places as its board does.
+  test("names the Osada's places for the computer's menu", async () => {
+    const { data } = await call('GET', '/api/content');
+    assert.deepEqual(data.settlementPlaces, content.settlement.places.map(({ id, name }) => ({ id, name })));
+  });
 });
 
 describe('character creation', () => {

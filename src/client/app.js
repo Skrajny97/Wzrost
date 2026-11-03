@@ -9,9 +9,9 @@ import { countOf } from './format.js';
 import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
 import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
-import { layoutChoice, layoutOffered, onLayoutChange, setLayoutChoice } from './layout-mode.js';
+import { desktopLayout, layoutChoice, layoutOffered, onLayoutChange, setLayoutChoice } from './layout-mode.js';
 import { updateSide } from './side.js';
-// The computer's keys 1–5 for the main tabs (477 A).
+// The computer's keys 1–6 for the main tabs (477 A, 508 A).
 import './keys.js';
 import { showQuests, watchQuests } from './quests.js';
 import { offerNameNotice, offerRename, openNameChange } from './rename.js';
@@ -57,30 +57,34 @@ const views = {
   game: $('#view-game'),
 };
 
+// `part`: the part of its tab a screen shows, whose shortcut lights under
+// the tab in the computer's menu (layout.js, 507 A); the Społeczność tells
+// its own, as its tabs change (setPart).
 const ROUTES = [
   // Walka, a region, an inner region of it.
-  { pattern: /^#\/walka(?:\/(?<region>[a-z0-9-]+)(?:\/(?<area>[a-z0-9-]+))?)?$/, nav: 'main', tab: 'walka', mount: mountCombat },
-  { pattern: /^#\/wieze$/, nav: 'main', tab: 'walka', mount: mountTowers },
+  { pattern: /^#\/walka(?:\/(?<region>[a-z0-9-]+)(?:\/(?<area>[a-z0-9-]+))?)?$/, nav: 'main', tab: 'walka', part: () => 'explore', mount: mountCombat },
+  { pattern: /^#\/wieze$/, nav: 'main', tab: 'walka', part: () => 'towers', mount: mountTowers },
   { pattern: /^#\/postac$/, nav: 'character', tab: 'equipment', mount: mountCharacter },
   { pattern: /^#\/postac\/statystyki$/, nav: 'character', tab: 'stats', mount: mountStats },
   { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', music: 'skills', mount: mountSkills },
   { pattern: /^#\/postac\/ewolucja$/, nav: 'character', tab: 'evolution', music: 'skills', mount: mountEvolution },
   { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: lockedScreen('core', 'Rdzeń') },
   // Profesje, or one profession's screen (Zielarstwo).
-  { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', music: 'professions', mount: mountProfessions },
+  { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', part: ({ profession }) => profession, music: 'professions', mount: mountProfessions },
   // The Osada's board, or one of its places.
-  { pattern: /^#\/osada(?:\/(?<place>[a-z0-9-]+))?$/, nav: 'main', tab: 'osada', mount: mountSettlement },
-  { pattern: /^#\/spolecznosc$/, nav: 'main', tab: 'spolecznosc', mount: mountCommunity },
+  { pattern: /^#\/osada(?:\/(?<place>[a-z0-9-]+))?$/, nav: 'main', tab: 'osada', part: ({ place }) => place, mount: mountSettlement },
+  // The Społeczność, or one of its parts (the computer menu's shortcuts).
+  { pattern: /^#\/spolecznosc(?:\/(?<section>[a-z]+))?$/, nav: 'main', tab: 'spolecznosc', mount: mountCommunity },
   // The Gildia's own page, from its tab in the Społeczność, at one of its
   // tabs (data/guilds.json, tabs).
-  { pattern: /^#\/gildia(?:\/(?<tab>[a-z]+))?$/, nav: 'main', tab: null, lit: 'spolecznosc', mount: mountGuildPage },
+  { pattern: /^#\/gildia(?:\/(?<tab>[a-z]+))?$/, nav: 'main', tab: null, lit: 'spolecznosc', part: () => 'guilds', mount: mountGuildPage },
   // A Wymiana with another player's character, from the Społeczność.
   { pattern: /^#\/wymiana$/, nav: 'main', tab: null, lit: 'spolecznosc', mount: mountTrade },
   { pattern: /^#\/dziennik(?:\/(?<tab>system))?$/, nav: 'main', tab: 'dziennik', mount: mountJournal },
   { pattern: /^#\/raport\/(?<id>\d+)$/, nav: 'main', tab: null, mount: mountReport },
-  // The camp opens from the top bar: the board, or one building.
-  // The camp is a tab of its own, in the top bar (`lit`), but not one to
-  // come back to with "Powrót".
+  // The camp opens from the top bar (on a computer from its tab in the
+  // menu): the board, or one building. The camp is a tab of its own
+  // (`lit`), but not one to come back to with "Powrót".
   { pattern: /^#\/oboz(?:\/(?<building>[a-z0-9-]+))?$/, nav: 'main', tab: null, lit: 'oboz', music: 'camp', mount: mountCamp },
   // The Encyklopedia, from its book in the top bar, at one of its tabs.
   { pattern: /^#\/encyklopedia(?:\/(?<tab>[a-z]+))?$/, nav: 'main', tab: null, lit: 'encyklopedia', mount: mountEncyclopedia },
@@ -91,7 +95,7 @@ const ROUTES = [
 ];
 const HOME = '#/walka';
 
-let current = null; // { route, screen }
+let current = null; // { route, screen, view: { part } }
 let lastMainHash = HOME;
 let lastMainTab = 'walka';
 let lastTabHash = HOME; // the last tab of the main menu, where a report's "Powrót" leads
@@ -389,8 +393,16 @@ function route() {
   clear($('#screen')).append(container);
   window.scrollTo(0, 0);
   const params = match.groups ?? {};
-  const screen = candidate.mount(container, { params, navigate, backHash: lastTabHash }) ?? {};
-  current = { route: candidate, screen };
+  // The part shown, which a screen with tabs of its own may change; the
+  // computer's menu lights its shortcut.
+  const view = { part: candidate.part?.(params) ?? null };
+  const setPart = (id) => {
+    if (view.part === id) return;
+    view.part = id;
+    if (current?.view === view && desktopLayout()) renderNav();
+  };
+  const screen = candidate.mount(container, { params, navigate, backHash: lastTabHash, setPart }) ?? {};
+  current = { route: candidate, screen, view };
   // An inner region or a region can have its own music, and so can the camp
   // and the tabs with a music place (Umiejętności, Profesje). A report opened
   // right after its exploration plays the music of its result once; opened
@@ -412,6 +424,7 @@ function renderNav() {
   updateNav({
     kind: active.nav,
     active: active.nav === 'main' ? active.lit ?? active.tab ?? lastMainTab : active.tab,
+    part: current.view.part,
     // "Powrót": from stats, skills or the Core to the equipment, from there to the main menu.
     onBack: () => navigate(active.tab === 'equipment' ? lastMainHash : '#/postac'),
   });

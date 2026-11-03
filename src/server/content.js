@@ -194,6 +194,9 @@ export function publicContent() {
     unlocks: content.unlocks.map(({ id, name, level, classLevel, condition }) => ({ id, name, level, classLevel, condition })),
     resources: content.resources.map(({ id, name, genitive, description, system }) => ({ id, name, genitive, description, system: Boolean(system) })),
     buildings: content.buildings.filter(buildingOn).map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
+    // The places of the Osada's board, for their shortcuts under the Osada
+    // in the computer's menu (src/client/layout.js).
+    settlementPlaces: (content.settlement?.places ?? []).map(({ id, name, soon }) => ({ id, name, ...(soon && { soon: true }) })),
     // With the family of the creature that leaves it, for its icon, and
     // `trophy` for an elite's or a champion's, which no order for any
     // materials takes ("Poproś gildię", src/client/guild-requests.js).
