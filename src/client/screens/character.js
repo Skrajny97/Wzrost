@@ -867,7 +867,7 @@ function salvageManySheet(marked = new Set()) {
   const dim = bag.some((item) => !takes(item));
   openSheet(
     h('h2', { class: 'sheet-title', text: 'Rozbierz kilka' }),
-    h('p', { class: 'sheet-text', text: 'Dotknij przedmiotów, które Stół rozbiórki ma rozebrać. Drugie dotknięcie odznacza.' }),
+    h('p', { class: 'sheet-text', text: 'Wybierz przedmioty, które Stół rozbiórki ma rozebrać. Ponowny wybór odznacza przedmiot.' }),
     h('ul', { class: 'bag-grid salvage-grid' }, bag.map(tile)),
     dim && h('p', { class: 'muted', text: 'Przyciemnionych stół jeszcze nie bierze: ich rzadkość wymaga wyższego poziomu Stołu rozbiórki.' }),
     h('div', { class: 'salvage-bar' }, summary, roomNote, takeApart),

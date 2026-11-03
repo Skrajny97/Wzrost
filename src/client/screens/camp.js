@@ -301,7 +301,7 @@ function mountBoard(container, backHash) {
         campLevelButton(running),
       ),
       nothingBuilt &&
-        h('p', { class: 'system-hint camp-hint', text: 'Dotknij pustego placu, żeby zobaczyć koszt budowy. Zasoby znajdziesz na eksploracjach.' }),
+        h('p', { class: 'system-hint camp-hint', text: 'Wybierz pusty plac, żeby zobaczyć koszt budowy. Zasoby znajdziesz na eksploracjach.' }),
       running && constructionPanel(running, ticks),
       queuePanel(),
     );
@@ -603,7 +603,7 @@ function mountBuilding(container, id) {
         class: 'muted',
         text:
           building.level > 0
-            ? `Dotknij przedmiotu, żeby go ulepszyć. Kowadło ulepsza do +${building.level}.`
+            ? `Wybierz przedmiot, żeby go ulepszyć. Kowadło ulepsza do +${building.level}.`
             : 'Zbuduj Kowadło, żeby ulepszać przedmioty. Ulepszysz je tu albo z karty przedmiotu w plecaku.',
       }),
       items.length === 0

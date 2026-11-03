@@ -85,7 +85,7 @@ export function mountSkills(container) {
     return h(
       'section',
       { class: 'skill-paths', 'aria-label': 'Umiejętności ewolucji' },
-      view.points > 0 && raisable && systemPanel(`Masz ${skillPoints(view.points)}. Dotknij umiejętności ewolucji, żeby dodać punkt. Każdy poziom klasy do ${view.lastPointLevel}. daje jeden.`),
+      view.points > 0 && raisable && systemPanel(`Masz ${skillPoints(view.points)}. Wybierz umiejętność ewolucji, żeby dodać punkt. Każdy poziom klasy do ${view.lastPointLevel}. daje jeden.`),
       pool.options.map((skill) =>
         h(
           'section',
@@ -144,7 +144,7 @@ export function mountSkills(container) {
       'section',
       { class: 'skill-paths', 'aria-label': 'Ścieżki rozwoju' },
       panel,
-      pointsNote && systemPanel(`Masz ${skillPoints(view.points)}. Dotknij umiejętności, żeby dodać punkt.`),
+      pointsNote && systemPanel(`Masz ${skillPoints(view.points)}. Wybierz umiejętność, żeby dodać punkt.`),
       [...pool.options].sort((a, b) => (PATH_ORDER[a.state] ?? 2) - (PATH_ORDER[b.state] ?? 2)).map((skill) => pathSection(skill, pool, view, busy)),
     );
   }

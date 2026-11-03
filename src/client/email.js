@@ -81,7 +81,7 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
     text.textContent = `Ostatni krok: potwierdź adres e-mail. Na adres ${state.user.email} został wysłany link, który otworzy konto. Za potwierdzenie dostaniesz ${pointsText()}.`;
   };
   describe();
-  if (unsent) showError('Nie udało się wysłać maila. Stuknij „Wyślij link ponownie”.');
+  if (unsent) showError('Nie udało się wysłać maila. Naciśnij „Wyślij link ponownie”.');
 
   // Back from the mail app: the page looks whether the link was opened.
   const check = async (quiet) => {
