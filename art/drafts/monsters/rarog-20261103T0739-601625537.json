@@ -1,0 +1,12 @@
+{
+  "id": "rarog",
+  "tool": "pixellab generate-image-v2",
+  "description": "Rarog, the legendary Slavic fire falcon king, a huge majestic bird of living flame with enormous wings spread wide, a crown-like crest of fire on its head, long burning tail feathers, fierce burning golden eyes, regal and terrifying, the whole bird inside the picture, full body",
+  "style": "src/client/art/monsters/strzyga.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

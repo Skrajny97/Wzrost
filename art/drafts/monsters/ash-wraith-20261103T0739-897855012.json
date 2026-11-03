@@ -1,0 +1,12 @@
+{
+  "id": "ash-wraith",
+  "tool": "pixellab generate-image-v2",
+  "description": "Popielec, a tall menacing wraith made of grey ash and charred embers, a hunched thin body, very long arms ending in claws, two small glowing ember eyes in a hollow face, flakes of ash drifting off it, nothing else in the picture, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}
