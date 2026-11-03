@@ -263,8 +263,31 @@
       "greaves": "pair of polished steel greaves with round knee plates and leather straps, single inventory item icon",
       "medallion": "round golden medallion with an embossed sun face, on a thick gold chain, single inventory item icon",
       "family-ring": "heavy silver ring with a large oval engraved bezel showing a family crest, single inventory item icon",
-      "amber-charm": "a polished golden amber stone with a tiny insect trapped inside, hanging on a leather cord, single inventory item icon"
-    }
+      "amber-charm": "a polished golden amber stone with a tiny insect trapped inside, hanging on a leather cord, single inventory item icon",
+      "karabela": "an ornate polish noble sabre with a gently curved blade, a cross guard and an eagle-head pommel inlaid with gold, the hilt wrapped in red leather, diagonal, single inventory item icon",
+      "halberd": "a halberd: a long dark wooden shaft with a broad steel axe blade, a back spike and a sharp spear point at the top, diagonal, single inventory item icon",
+      "handjar": "a handjar dagger with a long forward-curving single-edged blade, a bone grip with flared ears at the pommel and gold inlay, diagonal, single inventory item icon",
+      "tatar-bow": "a short tatar composite bow strongly recurved at the tips, layered horn and sinew painted dark red with gold bands, a taut string, diagonal, single inventory item icon",
+      "scepter": "a royal mage scepter: a short golden rod topped with a crown-shaped head holding a glowing violet crystal, small runes along the rod, diagonal, single inventory item icon",
+      "monstrance": "a golden monstrance on a short handle: a radiant sunburst of golden rays around a small round glass window with white light, diagonal, single inventory item icon",
+      "hussar-shield": "a polish hussar shield: a tall teardrop-shaped shield painted red with a white eagle, a polished steel rim and rivets, single inventory item icon",
+      "hunting-quiver": "a hunter's quiver of dark leather trimmed with wolf fur and a brass buckle, full of arrows with long grey and brown feathers, single inventory item icon",
+      "stiletto": "a stiletto: a very thin needle-like triangular steel blade, a small round guard and a black grip with silver wire, diagonal, single inventory item icon",
+      "crystal-ball": "a fortune-telling crystal ball glowing with swirling blue mist inside, held in a dark bronze claw stand, single inventory item icon",
+      "turban": "a wrapped turban of deep blue silk with a jewelled brooch and a white heron feather at the front, single inventory item icon",
+      "hussar-helmet": "a polish hussar helmet: a polished steel szyszak with a ridged dome, a long nose guard, plated neck guard and cheek plates, brass trim, single inventory item icon",
+      "zupan": "a polish noble zupan: a long dark green silk coat with a row of small gold buttons down the front and a high collar, folded, single inventory item icon",
+      "hussar-armor": "polish hussar armour: a polished steel breastplate with a brass cross, shoulder plates and a leopard pelt over one shoulder, single inventory item icon",
+      "delia": "a delia: a long noble cloak of crimson velvet lined and collared with brown fur, gold clasps at the chest, glowing faint runes on the hem, single inventory item icon",
+      "infula": "a tall white and gold bishop's infula with two pointed peaks, embroidered crosses and two ribbons hanging from the back, single inventory item icon",
+      "alb": "a long white priest's alb robe with golden embroidered hems and a gold cord belt, folded, single inventory item icon",
+      "knight-gloves": "a pair of knight's gauntlets of articulated polished steel plates over dark leather, brass edges, single inventory item icon",
+      "riding-boots": "a pair of tall red leather riding boots with pointed toes, steel spurs and gold stitching, single inventory item icon",
+      "necklace": "a necklace of linked gold plates set with red garnets and a large central emerald, single inventory item icon",
+      "crown-ring": "a massive gold ring with a tiny crown on top set with a deep blue sapphire, single inventory item icon",
+      "aurochs-horn": "a curved aurochs horn talisman bound with silver bands and hung on a leather cord, carved runes along it, single inventory item icon"
+    },
+    "pixellab": { "style": "src/client/art/items/estoc.png" }
   },
   "resources": {
     "style": "rd_pro__fantasy",
