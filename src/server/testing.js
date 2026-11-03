@@ -201,6 +201,10 @@ export const repeatSettlementTour = (context) => repeatChapter(context, 'settlem
 // comes while the class has its evolutions to choose from.
 export const repeatEvolutionTour = (context) => repeatChapter(context, 'evolution');
 
+// The Wieże chapter from the start: only its lines are unread again. It
+// comes from character level 50, when the towers open.
+export const repeatTowersTour = (context) => repeatChapter(context, 'towers');
+
 // A chapter's lines unread again, with `reset` (SQL assignments) done too.
 async function repeatChapter(context, chapterId, reset = '') {
   await requireTester(context);

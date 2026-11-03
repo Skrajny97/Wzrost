@@ -1764,6 +1764,39 @@ describe('Time Points and the narrator', () => {
     assert.deepEqual(again.data.character.tutorial, before);
   });
 
+  test('the Wieże chapter (515) comes after the Ewolucja, and test mode starts it again', async () => {
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once;
+    const lines = tutorial.lines.filter((line) => line.chapter === 'towers');
+    assert.deepEqual(
+      lines.map((line) => [line.id, line.kind]),
+      [
+        ['towers-welcome', 'card'],
+        ['towers-lead', 'lead'],
+        ['towers-entries', 'point'],
+        ['towers-solo', 'point'],
+        ['towers-floor', 'point'],
+        ['towers-party', 'point'],
+        ['towers-ending', 'card'],
+      ],
+    );
+    // The author's words, as approved: "515 wszystko OK".
+    assert.equal(lines[0].text[0], 'Pięćdziesiąty poziom postaci… System otworzył przed Tobą Wieże.');
+    assert.equal(lines.at(-1).text[0], 'Wejść masz kilkanaście na dzień, nowe od północy. Wieże pomogą Ci też uzupełnić dawne wpisy Bestiariusza.');
+    const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
+    assert.ok(at('towers-welcome') > at('evolution-ending'));
+    assert.deepEqual(tutorial.chapters.towers, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Wieże czekają w zakładce Walka.' });
+    const chapter = lines.filter(kept).map((line) => line.id);
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    await see({ skip: true });
+    const before = (await see({ skip: true, chapter: 'skills' })).data.character.tutorial;
+    const read = (await see({ skip: true, chapter: 'towers' })).data.character.tutorial;
+    assert.deepEqual(read, [...before, ...chapter]);
+    const again = await call('POST', '/api/test/towers-tour', { cookie });
+    assert.equal(again.status, 200);
+    assert.deepEqual(again.data.character.tutorial, before);
+  });
+
   test('test mode starts the Społeczność chapter again', async () => {
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });

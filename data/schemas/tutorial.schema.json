@@ -280,7 +280,8 @@
               "community",
               "crafting",
               "settlement",
-              "evolution"
+              "evolution",
+              "towers"
             ],
             "description": "Część po wprowadzeniu, do której należy kwestia (chapters). Jej kwestie przychodzą dopiero po zakończeniu wprowadzenia, w swoim momencie gry."
           },

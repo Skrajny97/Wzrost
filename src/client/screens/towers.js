@@ -82,7 +82,7 @@ export function mountTowers(container, { navigate }) {
       h(
         'section',
         { class: 'card towers-intro' },
-        h('p', { class: 'towers-entries', text: `Wejścia na dziś: ${view.left} z ${view.perDay}. Nowe od północy.` }),
+        h('p', { class: 'towers-entries', 'data-guide': 'towers-entries', text: `Wejścia na dziś: ${view.left} z ${view.perDay}. Nowe od północy.` }),
         howItWorks(
           'Wejście to jedna walka na wybranym piętrze, z wynikiem od razu.',
           `Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. ${eliteText()} Na zwykłych piętrach czasem czeka elita. Co ${view.championEvery}. piętro czeka czempion, a co ${view.chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.`,
@@ -123,7 +123,9 @@ export function mountTowers(container, { navigate }) {
 
   function towerCard(tower) {
     let floor = floorOf(tower);
-    const details = h('div', { class: 'tower-floor' });
+    // The narrator's Wieże chapter points at the cards and at what waits on
+    // the Wieża Solo's floor (narrator.js).
+    const details = h('div', { class: 'tower-floor', 'data-guide': `tower-${tower.id}-floor` });
     const slider = h('input', {
       type: 'range',
       min: '1',
@@ -187,7 +189,7 @@ export function mountTowers(container, { navigate }) {
         : null);
     return h(
       'section',
-      { class: 'card tower-card', 'aria-label': tower.name },
+      { class: 'card tower-card', 'data-guide': `tower-${tower.id}`, 'aria-label': tower.name },
       head,
       h('p', { class: 'muted', text: `Otwarte piętra: 1–${formatNumber(tower.top)}. Najwyżej zdobyte: ${tower.best > 0 ? `piętro ${formatNumber(tower.best)}` : 'jeszcze żadne'}.` }),
       climbers && h('p', { class: tower.missing ? 'tower-missing' : 'muted', text: climbers }),

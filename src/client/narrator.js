@@ -18,8 +18,9 @@
 // moment of the game: the Umiejętności at class level 10, the Profesje at
 // character level 10, never before the Umiejętności, the Społeczność at
 // character level 5, after both when they wait, the Rzemieślnictwo at
-// character level 15, the Osada at character level 20 and the Ewolucja at
-// class level 50, each after all the earlier ones. A chapter's own "Pomiń"
+// character level 15, the Osada at character level 20, the Ewolucja at
+// class level 50 and the Wieże at character level 50, each after all the
+// earlier ones. A chapter's own "Pomiń"
 // passes only that chapter, and a line can be told for each class
 // (`classes`).
 
@@ -164,6 +165,29 @@ const evolutionHere = (hash, read) => onEvolution(hash) && evolutionTour(hash, r
 // From the character's other screens, which the lead opens, on to the Ewolucja.
 const evolutionTrip = (hash, read) =>
   hash.startsWith('#/postac') && !onEvolution(hash) && evolutionTour(hash, read) && !read.has('evolution-choice') ? '#/postac/ewolucja' : null;
+
+// The Wieże chapter (515): once the towers open (character level 50), after
+// the report that brought it there and only when no other chapter waits.
+// Not on the character's screens either. It leads to the Walka tab, from
+// where the narrator itself opens the Wieże, points at the entries, the
+// Wieża Solo, what waits on its floor and the Wieża Drużyn, and ends there.
+const onTowers = (hash) => hash === '#/wieze';
+const evolutionWaiting = (read) => isUnlocked('evolution') && (state.character.evolution?.choices.length ?? 0) > 0 && !read.has('evolution-ending');
+const towersDue = (hash, read) =>
+  isUnlocked('towers') &&
+  !onReport(hash) &&
+  !onCharacter(hash) &&
+  !skillsWaiting(read) &&
+  !professionsWaiting(read) &&
+  !communityWaiting(read) &&
+  !craftingWaiting(read) &&
+  !settlementWaiting(read) &&
+  !evolutionWaiting(read) &&
+  !read.has('towers-ending');
+const towersTour = (hash, read) => towersDue(hash, read) && read.has('towers-welcome');
+const towersHere = (hash, read) => onTowers(hash) && towersTour(hash, read);
+// From the Walka tab, which the lead opens, on to the Wieże.
+const towersTrip = (hash, read) => (hash === '#/walka' && towersTour(hash, read) && !read.has('towers-entries') ? '#/wieze' : null);
 // From the chat only right after its rules, so a later visit stays there.
 const quickHuntTrip = (hash, read, passed) =>
   ((onCommunity(hash) && passed === 'community-rules') || hash.startsWith('#/walka')) &&
@@ -370,6 +394,17 @@ const BEATS = {
   'evolution-choice': { place: mark('evolution-choice'), go: evolutionTrip, when: evolutionHere },
   'evolution-points': { when: evolutionHere },
   'evolution-ending': { when: evolutionHere },
+  // The Wieże chapter, after all the others (515).
+  'towers-welcome': { when: towersDue },
+  'towers-lead': {
+    place: '#nav-main > .nav-item[href="#/walka"]',
+    when: (hash, read) => towersTour(hash, read) && hash !== '#/walka' && !onTowers(hash) && !read.has('towers-entries'),
+  },
+  'towers-entries': { place: mark('towers-entries'), go: towersTrip, when: towersHere },
+  'towers-solo': { place: mark('tower-solo'), when: towersHere },
+  'towers-floor': { place: mark('tower-solo-floor'), when: towersHere },
+  'towers-party': { place: mark('tower-party'), when: towersHere },
+  'towers-ending': { when: towersHere },
 };
 
 let place = '#/walka';
