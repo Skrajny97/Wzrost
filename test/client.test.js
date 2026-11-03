@@ -254,6 +254,20 @@ test("the narrator's quests sit in the top bar, where his line points", () => {
   for (const path of ['/api/quests/claim', '/api/quests/claim-all', '/api/quests/chest']) assert.ok(quests.includes(`'${path}'`), path);
 });
 
+// On a computer the camp is a tab of the menu under Walka, with no tent in
+// the top bar (508 A): the narrator's lead to the camp lights that tab
+// there and the tent on a phone, and the keys 1–6 follow the menu.
+test('on a computer the camp is a tab of the menu, where the narrator leads', () => {
+  const layout = readFileSync(join(CLIENT, 'layout.js'), 'utf8');
+  assert.match(layout, /const CAMP_TAB = \{ id: 'oboz', label: 'Obóz', icon: 'tent', href: '#\/oboz' \};/);
+  assert.match(layout, /const DESKTOP_TABS = \[\.\.\.MAIN_TABS\.slice\(0, 2\), CAMP_TAB, \.\.\.MAIN_TABS\.slice\(2\)\];/);
+  assert.match(readFileSync(join(CLIENT, 'styles.css'), 'utf8'), /:root\[data-layout='desktop'\] \.camp-button \{\s*display: none;/);
+  const beats = /const BEATS = \{([\s\S]*?)\n\};/.exec(readFileSync(join(CLIENT, 'narrator.js'), 'utf8'))[1];
+  assert.match(beats, /'lead-camp': \{\s*place: '\.camp-button, #nav-main > \.nav-item\[href="#\/oboz"\]'/);
+  const keys = readFileSync(join(CLIENT, 'keys.js'), 'utf8');
+  assert.match(keys, /const TABS = \['#\/postac', '#\/walka', '#\/oboz', '#\/profesje', '#\/osada', '#\/spolecznosc'\];/);
+});
+
 test('the page can be added to the home screen as an app', () => {
   const html = readFileSync(join(CLIENT, 'index.html'), 'utf8');
   assert.match(html, /<link rel="manifest" href="\/manifest\.webmanifest">/);

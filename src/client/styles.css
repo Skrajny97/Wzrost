@@ -800,6 +800,12 @@ button {
   color: var(--system);
 }
 
+/* The camp's resources and the Punkty Czasu beside the gold: on a computer
+   only (505 A, below); on a phone they wait in the list under it. */
+.gold-stock {
+  display: none;
+}
+
 /* Narrow phones: a little tighter, so the level badges keep their room. */
 @media (max-width: 374px) {
   .gold {
@@ -11730,9 +11736,11 @@ a.profession-square:active {
 
 /* The computer's own layout (layout-mode.js; the author: "musi być
    kompletnie osobne"): the menu down the left with the character's tabs
-   under its Postać, the top bar in one line, the game in the middle, the
-   narrator's quests and the chat on the right (474 A), and windows in the
-   middle of the screen (475 A). Nothing here touches the phone's layout. */
+   under its Postać, the other tabs' shortcuts under theirs (507 A) and the
+   camp among them (508 A), the top bar with the camp's resources by the
+   gold (505 A), the game in the middle, the narrator's quests and the chat
+   on the right (474 A), and windows in the middle of the screen (475 A).
+   Nothing here touches the phone's layout. */
 :root[data-layout='desktop'] {
   --nav-height: 0px;
   --menu-width: 236px;
@@ -11796,6 +11804,43 @@ a.profession-square:active {
 :root[data-layout='desktop'] .meters {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   column-gap: 18px;
+}
+
+/* The gold over Punkty Systemu and beside them the camp's resources and the
+   Punkty Czasu, always in sight (505 A): one button, which still opens the
+   list with the time to the next Punkt Czasu. */
+:root[data-layout='desktop'] .gold {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto;
+  align-content: center;
+  align-items: center;
+  column-gap: 18px;
+  row-gap: 2px;
+  padding: 0 8px;
+  border-radius: 6px;
+}
+
+:root[data-layout='desktop'] .gold:not([aria-expanded='true']):hover {
+  background: rgba(143, 227, 239, 0.06);
+}
+
+:root[data-layout='desktop'] .gold-stock {
+  display: flex;
+  grid-row: span 2;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+:root[data-layout='desktop'] .gold-stock--time {
+  color: var(--time);
+}
+
+/* The camp is a tab of the menu on a computer (508 A), not the tent here. */
+:root[data-layout='desktop'] .camp-button {
+  display: none;
 }
 
 :root[data-layout='desktop'] .menu {
@@ -11896,6 +11941,40 @@ a.profession-square:active {
 :root[data-layout='desktop'] .menu .nav-item:hover {
   background: rgba(143, 227, 239, 0.06);
   color: var(--text);
+}
+
+/* The shortcuts of the part of the game open, under its tab, as the
+   character's tabs under Postać (507 A); one the game does not open yet is
+   no link. */
+:root[data-layout='desktop'] #nav-main > .nav-parts {
+  order: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 8px 22px;
+  padding: 0 0 0 10px;
+  border-left: 1px solid var(--bark-line);
+}
+
+:root[data-layout='desktop'] .nav-parts .nav-item {
+  height: 40px;
+  font-size: 16px;
+}
+
+/* A long name, as "Pracownia Zaklinaczki", on two lines rather than cut. */
+:root[data-layout='desktop'] .nav-parts .nav-label {
+  white-space: normal;
+}
+
+:root[data-layout='desktop'] .nav-parts .nav-item[aria-current='page'] {
+  background: var(--bark-active);
+  box-shadow: inset 3px 0 0 var(--accent);
+  color: var(--text);
+}
+
+:root[data-layout='desktop'] .nav-parts .nav-item[aria-disabled='true']:hover {
+  background: none;
+  color: var(--text-muted);
 }
 
 /* The game: for now each screen as on a phone, in a wider column; the
@@ -12005,9 +12084,11 @@ a.profession-square:active {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-/* A laptop's narrower screen: the top bar in two lines, the four meters
-   across the whole second one. */
-@media (max-width: 1499px) {
+/* The top bar in two lines, the four meters across the whole second one,
+   but on a very wide screen: with the camp's resources by the gold (505 A)
+   one line left the meters too narrow for their numbers (before them, from
+   1500 px). */
+@media (max-width: 2199px) {
   :root[data-layout='desktop'] .topbar {
     grid-template-columns: auto minmax(0, 1fr);
     row-gap: 8px;
@@ -12022,7 +12103,10 @@ a.profession-square:active {
     justify-self: end;
     width: min(100%, 420px);
   }
+}
 
+/* A laptop's narrower screen: a narrower side column. */
+@media (max-width: 1499px) {
   :root[data-layout='desktop'] {
     --side-width: 320px;
   }
@@ -12055,6 +12139,12 @@ a.profession-square:active {
 
   :root[data-layout='desktop'] {
     --side-width: 0px;
+  }
+
+  /* The resources two over two, as the gold over Punkty Systemu, so the
+     current activity keeps its room in the first line. */
+  :root[data-layout='desktop'] .gold-stock {
+    grid-row: auto;
   }
 
   :root[data-layout='desktop'] .pending-bar {
@@ -12148,4 +12238,11 @@ a.profession-square:active {
 :root[data-layout='desktop'] .camp-board,
 :root[data-layout='desktop'] .settlement-map {
   max-width: 720px;
+}
+
+/* The camp's board fits the screen's height, shrunk evenly (506 A): as
+   wide as screens/camp.js measured room for, never narrower than on the
+   narrowest phone. */
+:root[data-layout='desktop'] .camp-board {
+  max-width: min(720px, max(288px, var(--board-fit, 720px)));
 }
