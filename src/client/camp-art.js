@@ -467,7 +467,8 @@ const PATHS = [
   'M180 330 Q152 330 128 336',
   'M188 330 Q214 330 238 336',
   'M180 424 Q164 424 150 428',
-  'M188 424 Q206 424 222 428',
+  // To the Skrzynia Konta (screens/camp.js), ending under the chest.
+  'M188 410 Q210 410 234 412',
 ].join(' ');
 const TALL_PATHS = `${stretchPoints(PATHS, true)} M180 424 Q156 424 134 428 M188 424 Q212 424 230 428`;
 const paths = (edge, middle, extra = '', tall = false) => {
