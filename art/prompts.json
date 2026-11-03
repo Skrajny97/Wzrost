@@ -1185,6 +1185,23 @@
     },
     "pixellab": { "style": "src/client/art/settlement/casino.png" }
   },
+  "scenes": {
+    "$comment": "Sceny pracy w Systemowej Kopalni i Systemowej Szlifierni (autor: „Systemowa Szlifiernia i Kopalnia musza być zanimowane z tym niebieskim ludkiem podobnie jak w Alchemii i Rzemieślnictwie itp.”): pierwsza klatka, którą potem PixelLab animuje, z tą samą postacią w ciemnym płaszczu z kapturem, ze świecącą błękitną twarzą i dłońmi, co w scenach Zielarstwa, Alchemii i Rzemieślnictwa (src/client/art/scenes), na własnym tle jak one.",
+    "width": 128,
+    "height": 128,
+    "removeBackground": false,
+    "prompts": {
+      "mining": "pixel art scene with one single character: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands and feet, seen from the side facing right, raising a pickaxe over its shoulder to strike a rough dark rock wall of a mine tunnel with veins of gold ore and a few small sparkling gems in it, a small heap of broken stones at its feet, a lantern on a wooden beam, dark cave, the whole figure and the wall inside the frame",
+      "jewelcrafting": "pixel art scene with one single character: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, standing at a small wooden jeweller's workbench and pressing a shining gem against a round grinding wheel on the bench, a gold ring and a few small coloured gems on the bench, a candle, dark stone workshop, the whole figure and the bench inside the frame"
+    },
+    "pixellab": {
+      "style": "art/references/scenes/crafting-0.png",
+      "references": {
+        "mining": [{ "path": "art/references/scenes/crafting-0.png", "usage": "the same small hooded figure: its dark navy cloak, its glowing ice-blue face, hands and feet, its size in the frame, the dark backdrop and the pixel style; only the work and the place are new" }],
+        "jewelcrafting": [{ "path": "art/references/scenes/alchemy-0.png", "usage": "the same small hooded figure: its dark navy cloak, its glowing ice-blue face and hands, its size in the frame, the dark stone backdrop and the pixel style; only the work and the place are new" }]
+      }
+    }
+  },
   "salon-small": {
     "$comment": "Salon Gier: los Loterii (leci do bębna, gdy postać go kupi) i strzałka nad Kołem Fortuny. Styl budynku Salonu (528 H).",
     "width": 64,
