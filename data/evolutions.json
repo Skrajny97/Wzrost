@@ -170,7 +170,7 @@
       "name": "Bastion",
       "description": "Żywa twierdza. Za jego tarczą cała drużyna może odetchnąć.",
       "growth": { "strength": 5, "endurance": 2, "vitality": 2 },
-      "trait": { "name": "Twierdza", "text": "+20% pancerza i odporności, wrogowie jeszcze częściej biją w Bastion niż w resztę drużyny, a 10% ciosów zatrzymuje tarcza.", "kind": "bulwark", "params": { "armor": 0.2, "resist": 0.2, "aggro": 3, "block": 0.1 } },
+      "trait": { "name": "Twierdza", "text": "+15% pancerza i odporności, wrogowie jeszcze częściej biją w Bastion niż w resztę drużyny, a 5% ciosów zatrzymuje tarcza.", "kind": "bulwark", "params": { "armor": 0.15, "resist": 0.15, "aggro": 3, "block": 0.05 } },
       "skills": ["unbending", "shield-wall"]
     },
     {
@@ -736,7 +736,7 @@
       "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, odzyskuje {heal%} maks. HP i na {turns} swoich ruchów zyskuje {armor%} pancerza więcej. W tym czasie odbija {reflect%} przyjętych obrażeń.",
       "kind": "guard",
       "mana": 16,
-      "params": { "below": 0.9, "heal": [0.35, 0.5], "armor": [3.0, 4.0], "turns": [8, 10], "reflect": [1.0, 2.0] }
+      "params": { "below": 0.9, "heal": [0.08, 0.12], "armor": [0.25, 0.5], "turns": [8, 10], "reflect": [2.0, 3.0] }
     },
     {
       "id": "shield-wall",
@@ -748,7 +748,7 @@
       "kind": "stance",
       "mana": 16,
       "cooldown": 5,
-      "params": { "turns": 4, "wall": [1.0, 1.8], "words": "stanceWall" }
+      "params": { "turns": 4, "wall": [0.5, 1.0], "words": "stanceWall" }
     },
     {
       "id": "heart-shot",
