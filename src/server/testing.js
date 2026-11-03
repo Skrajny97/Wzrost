@@ -205,6 +205,11 @@ export const repeatEvolutionTour = (context) => repeatChapter(context, 'evolutio
 // comes from character level 50, when the towers open.
 export const repeatTowersTour = (context) => repeatChapter(context, 'towers');
 
+// The Górnictwo and Jubilerstwo chapter from the start: only its lines are
+// unread again, and the professions keep their levels. It comes from
+// character level 25, when both open.
+export const repeatMiningTour = (context) => repeatChapter(context, 'mining');
+
 // A chapter's lines unread again, with `reset` (SQL assignments) done too.
 async function repeatChapter(context, chapterId, reset = '') {
   await requireTester(context);

@@ -1597,6 +1597,8 @@ export function mountProfessions(container, { params, navigate }) {
           type: 'button',
           class: 'segmented-option',
           'aria-pressed': jewelTab === id,
+          // The narrator's Górnictwo chapter points at the Oprawianie tab.
+          'data-guide': `jewel-tab-${id}`,
           onClick: () => {
             jewelTab = id;
             render();

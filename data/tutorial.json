@@ -40,6 +40,10 @@
     "towers": {
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Wieże czekają w zakładce Walka."
+    },
+    "mining": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Górnictwo i Jubilerstwo czekają w zakładce Profesje."
     }
   },
   "lines": [
@@ -1130,6 +1134,48 @@
         "Wejść masz kilkanaście na dzień, nowe od północy. Wieże pomogą Ci też uzupełnić dawne wpisy Bestiariusza."
       ],
       "voice": "audio/narration/towers-ending.mp3"
+    },
+    {
+      "id": "mining-welcome",
+      "kind": "card",
+      "chapter": "mining",
+      "text": ["Dwudziesty piąty poziom postaci… System otworzył przed Tobą Górnictwo i Jubilerstwo."],
+      "voice": "audio/narration/mining-welcome.mp3"
+    },
+    {
+      "id": "mining-lead",
+      "kind": "lead",
+      "chapter": "mining",
+      "text": ["Systemowa Kopalnia i Systemowa Szlifiernia czekają w zakładce Profesje. Zajrzyjmy tam."],
+      "voice": "audio/narration/mining-lead.mp3"
+    },
+    {
+      "id": "mining-dig",
+      "kind": "point",
+      "chapter": "mining",
+      "text": ["W Kopalni wydobędziesz kamienie szlachetne i kruszce. Po drodze Twój kilof trafi też na żyły złota."],
+      "voice": "audio/narration/mining-dig.mp3"
+    },
+    {
+      "id": "mining-jewels",
+      "kind": "point",
+      "chapter": "mining",
+      "text": ["W Szlifierni zrobisz z nich pierścienie, amulety i talizmany. Rzadkość biżuterii zależy od kamienia."],
+      "voice": "audio/narration/mining-jewels.mp3"
+    },
+    {
+      "id": "mining-setting",
+      "kind": "point",
+      "chapter": "mining",
+      "text": ["Kamień możesz też oprawić w przedmiot, który nosisz. Wzmocni wszystkie jego liczby."],
+      "voice": "audio/narration/mining-setting.mp3"
+    },
+    {
+      "id": "mining-ending",
+      "kind": "card",
+      "chapter": "mining",
+      "text": ["Rzadsze kamienie leżą głębiej. Każdy nowy poziom Górnictwa odsłoni Ci kolejne."],
+      "voice": "audio/narration/mining-ending.mp3"
     }
   ]
 }

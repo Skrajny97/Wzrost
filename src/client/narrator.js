@@ -19,8 +19,8 @@
 // character level 10, never before the Umiejętności, the Społeczność at
 // character level 5, after both when they wait, the Rzemieślnictwo at
 // character level 15, the Osada at character level 20, the Ewolucja at
-// class level 50 and the Wieże at character level 50, each after all the
-// earlier ones. A chapter's own "Pomiń"
+// class level 50, the Wieże at character level 50 and the Górnictwo with
+// the Jubilerstwo at character level 25, each after all the earlier ones. A chapter's own "Pomiń"
 // passes only that chapter, and a line can be told for each class
 // (`classes`).
 
@@ -189,6 +189,34 @@ const towersTour = (hash, read) => towersDue(hash, read) && read.has('towers-wel
 const towersHere = (hash, read) => onTowers(hash) && towersTour(hash, read);
 // From the Walka tab, which the lead opens, on to the Wieże.
 const towersTrip = (hash, read) => (hash === '#/walka' && towersTour(hash, read) && !read.has('towers-entries') ? '#/wieze' : null);
+// The Górnictwo chapter (557): once Górnictwo and Jubilerstwo open
+// (character level 25), after the report that brought it there and only
+// when no other chapter waits. Not on the character's screens either. It
+// leads to the Profesje tab, from where the narrator itself opens the
+// Systemowa Kopalnia and points at the digging, then opens the Systemowa
+// Szlifiernia, points at its jewellery and at its Oprawianie tab, and ends
+// there.
+const onMine = (hash) => hash === '#/profesje/gornictwo';
+const onLapidary = (hash) => hash === '#/profesje/jubilerstwo';
+const towersWaiting = (read) => isUnlocked('towers') && !read.has('towers-ending');
+const miningDue = (hash, read) =>
+  isUnlocked('mining') &&
+  !onReport(hash) &&
+  !onCharacter(hash) &&
+  !skillsWaiting(read) &&
+  !professionsWaiting(read) &&
+  !communityWaiting(read) &&
+  !craftingWaiting(read) &&
+  !settlementWaiting(read) &&
+  !evolutionWaiting(read) &&
+  !towersWaiting(read) &&
+  !read.has('mining-ending');
+const miningTour = (hash, read) => miningDue(hash, read) && read.has('mining-welcome');
+const atLapidary = (hash, read) => onLapidary(hash) && miningTour(hash, read) && read.has('mining-dig');
+// From the Profesje tab, which the lead opens, on to the Kopalnia, and from
+// there, after its digging, on to the Szlifiernia.
+const mineTrip = (hash, read) => (hash === '#/profesje' && miningTour(hash, read) && !read.has('mining-dig') ? '#/profesje/gornictwo' : null);
+const lapidaryTrip = (hash, read) => ((hash === '#/profesje' || onMine(hash)) && miningTour(hash, read) && read.has('mining-dig') ? '#/profesje/jubilerstwo' : null);
 // From the chat only right after its rules, so a later visit stays there.
 const quickHuntTrip = (hash, read, passed) =>
   ((onCommunity(hash) && passed === 'community-rules') || hash.startsWith('#/walka')) &&
@@ -410,6 +438,17 @@ const BEATS = {
   'towers-floor': { place: mark('tower-solo-floor'), when: towersHere },
   'towers-party': { place: mark('tower-party'), when: towersHere },
   'towers-ending': { when: towersHere },
+  // The Górnictwo and Jubilerstwo chapter, after all the others (557). The
+  // lead shows wherever else the player is, so a chapter left halfway goes on.
+  'mining-welcome': { when: miningDue },
+  'mining-lead': {
+    place: '.nav-item[href="#/profesje"]',
+    when: (hash, read) => miningTour(hash, read) && hash !== '#/profesje' && !onMine(hash) && !onLapidary(hash),
+  },
+  'mining-dig': { place: mark('mining-form'), go: mineTrip, when: (hash, read) => onMine(hash) && miningTour(hash, read) },
+  'mining-jewels': { place: mark('jewel-patterns'), go: lapidaryTrip, when: atLapidary },
+  'mining-setting': { place: mark('jewel-tab-set'), go: lapidaryTrip, when: atLapidary },
+  'mining-ending': { go: lapidaryTrip, when: atLapidary },
 };
 
 let place = '#/walka';
