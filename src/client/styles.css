@@ -4633,13 +4633,16 @@ a.camp-level-button {
   left: 50%;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 2px 7px;
+  /* Smaller on a narrow board (the board is the container, cqw), so the
+     names of neighbouring places do not run into each other, e.g. on a
+     computer, where the board with the Osada fits the screen's height. */
+  gap: clamp(3px, 1.4cqw, 5px);
+  padding: 2px clamp(4px, 2cqw, 7px);
   transform: translate(-50%, -9px);
   background: rgba(13, 17, 11, 0.86);
   border: 1px solid var(--bark-line);
   font-family: var(--font-system);
-  font-size: 12px;
+  font-size: clamp(10px, 3.35cqw, 12px);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -12245,4 +12248,12 @@ a.profession-square:active {
    narrowest phone. */
 :root[data-layout='desktop'] .camp-board {
   max-width: min(720px, max(288px, var(--board-fit, 720px)));
+}
+
+/* On a computer the camp's resources stand in the top bar (505 A), so the
+   row of them over the board goes, and the board with the Osada fits a
+   1366 x 768 screen (506 A); the narrator points at the top bar's instead
+   (narrator.js, camp). */
+:root[data-layout='desktop'] .camp-materials {
+  display: none;
 }
