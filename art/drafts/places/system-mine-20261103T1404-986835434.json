@@ -1,0 +1,12 @@
+{
+  "id": "system-mine",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the entrance of an old mine in a rocky hillside, wooden support beams, a mine cart on rails leading into the dark tunnel, hanging lanterns, faint ice-blue glowing crystal shards in the rock and luminous blue lines along the rails, wide panorama for a dim background behind text, low contrast, muted dark palette of greys and browns with ice-blue accents, no text, no border, no people, no animals",
+  "style": "src/client/art/places/system-grove.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}
