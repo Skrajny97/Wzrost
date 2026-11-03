@@ -3011,6 +3011,39 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Sosnowe Wydmy (poziomy 126–150, 3.11.2026)
+
+Pierwsza kraina Szumiącego Boru z dokumentu projektowego („nocne zasadzki, ataki na tył szyku”). Nazwy, ataki i materiały stworów zatwierdził autor (500). Grafiki i odgłosy też (516, 518, 520, 522), a ostatni materiał, Kamyk z wiru, autor wybrał tak: „516.8 D”.
+
+1. **Kraina i miejsca.** Pięć miejsc:
+   - Wrzosowe Wydmy (126–130);
+   - Żywiczny Bór (131–135);
+   - Lotne Piaski (136–140);
+   - Smolne Doły (141–145);
+   - Pogorzelisko (146–150).
+
+   Piętnaście stworów, elita Południca i czempion Raróg. Cecha krainy to Spiekota: oparzenie trwa o jeden ruch dłużej, tak jak Opary torfu w Torfowych Mszarach.
+2. **Zasadzka (464).** Walka ze stworem oznaczonym jako zasadzka (Piaskun) zaczyna się od ruchu wszystkich stworów, jak zasadzka w zdarzeniu. Działa wszędzie, gdzie Piaskun walczy:
+   - na wyprawach i w drużynie;
+   - w Wieżach i w zdarzeniach;
+   - przy bestii gildii i w ocenie zagrożenia.
+
+   Odtworzenie walki zaczyna się od zdania z texts.json.
+3. **Atak na tył szyku (463).** Atak oznaczony `target: "back"` (Lelek, Latawiec, Iskrzak) trafia tego, kto stoi najdalej z tyłu, a gdy tył jest pusty, rząd przed nim.
+4. **Ognista nawałnica Raroga.** Oparzenie z jego ciosu może trafić każdego członka drużyny. To najprostszy odpowiednik ciosu w całą drużynę, którego stwory dotąd nie miały.
+5. **Wieże (527 A).** Przy 30 regionach czempion co 15. piętro trafiałby tylko na Wodnika i Raroga, więc czeka co 25. piętro. Walidator pilnuje pięter czempionów przy każdej nowej krainie.
+6. **Liczby.** Ciosy stworów, czempiona i nagrody dobrano w tools/difficulty-sim.mjs do krzywej trudności (stwory Rokitowego Bezdna na tych poziomach).
+   - Realistyczny gracz zdobywa na godzinę XP i złoto w granicach 2,1% krzywej i nie mdleje.
+   - Gracz okazjonalny z towarzyszami mdleje rzadziej, niż przewiduje krzywa, a w każdym kolejnym miejscu trochę częściej.
+7. **Grafiki (PixelLab).** Wszystkie wybrał autor:
+   - 17 stworów (500);
+   - 17 materiałów (516: 516.1 C, 516.2 C, 516.3 D, 516.4 B, 516.5 C, 516.6 A, 516.7 C, 516.8 D, 516.9 D, 516.10 B, 516.11 C, 516.12 C, 516.13 D, 516.14 A, 516.15 D, 516.16 D, 516.17 D);
+   - kręgi miejsc (518: B, C, B, D, C);
+   - karta krainy (520 A), z której powstaje też panorama w Walce.
+
+   Kamyk z wiru to wersja D z trzeciej tury szkiców: obły kamyk z jasnymi pasami.
+8. **Odgłosy.** Każdy stwór ma po dwa nagrania krzyku przy trafieniu i dwa przy śmierci (522, zatwierdzone wszystkie).
+
 ## Wersja 0.1.9 (3.11.2026)
 
 1. **Co wchodzi do gry:**
@@ -3028,7 +3061,7 @@ Autor: „523 OK / 524 A / 525 A / 526 A / 527 A”, „517.1 B / 517.2 B / 517.
 
 1. **Salon Gier (523–526, 528, 529).** Gospodarzem jest Szczęsny. Loteria i Koło Fortuny mają zasady z wariantów A pytań 524–526 (zob. „Salon Gier w Osadzie: prośba autora”). Budynek to wersja H, czyli okrągła drewniana chata z kołem fortuny. Popiersie gospodarza to wersja C. Na planszy Osady wolno przesunąć inne budynki, żeby Salon się zmieścił. Salon buduje pomocnik w osobnej kopii repozytorium.
 2. **Wieże (527 A).** Czempion czeka co 25. piętro, gdy wejdzie szósta kraina (Sosnowe Wydmy). Przy pięciu krainach zostaje co 15. piętro: co 25. piętro trafiałoby wtedy zawsze w ten sam region.
-3. **Sosnowe Wydmy (518).** Kręgi miejsc: Wrzosowe Wydmy B, Żywiczny Bór C, Lotne Piaski B, Smolne Doły D, Pogorzelisko C. Do kompletu grafik brakuje tylko materiału Kamyk z wiru (516.8).
+3. **Sosnowe Wydmy (518).** Kręgi miejsc: Wrzosowe Wydmy B, Żywiczny Bór C, Lotne Piaski B, Smolne Doły D, Pogorzelisko C. Do kompletu grafik brakowało tylko materiału Kamyk z wiru: autor wybrał „516.8 D” (zob. „Sosnowe Wydmy”).
 4. **Górnictwo i Jubilerstwo** otwierają się od 25. poziomu postaci (odpowiedź na 531). Wprowadzenie, czyli Samouczek, trzeba będzie przerobić dla nowych profesji. Pytania 530 (kolejność), 532 (złoto z żył) i 533 (kamienie przed Jubilerstwem) czekają na odpowiedź.
 
 ## Kod TIGER: przeniesienie na inną postać konta (3.11.2026)

@@ -36,6 +36,8 @@ export const SPRITES = {
       'upior', 'leshy',
       // Czarne Bagno (101–125) from 3.11.2026.
       'pond-turtle', 'mink', 'dragonfly', 'pike', 'water-spider', 'black-tern', 'wooden-idol', 'veles-serpent', 'pagan-priest', 'bog-demon', 'tick', 'night-heron', 'bies', 'black-goat', 'klobuk', 'mamuna', 'rokita',
+      // Sosnowe Wydmy (126–150) from 3.11.2026.
+      'sandman', 'heather-mare', 'nightjar', 'resin-golem', 'barkborer', 'tar-moth', 'drought-husk', 'sand-whirl', 'barrow-wight', 'tar-burner', 'charcoal-imp', 'latawiec', 'charred-pine', 'ash-wraith', 'spark-swarm', 'noon-wraith', 'rarog',
     ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved,
@@ -131,6 +133,7 @@ export const SPRITES = {
       'phantasm-shard', 'black-grouse-feather', 'diving-beetle-shell', 'little-owl-feather', 'zmij-scale', 'fume-ember',
       'mine-lantern', 'rat-tail',
       'turtle-shell', 'mink-fur', 'dragonfly-wing', 'pike-teeth', 'silver-bubble', 'tern-feather', 'bog-oak', 'veles-scale', 'bone-amulet', 'bog-lantern-eye', 'tick-shell', 'night-heron-plume', 'bies-horn', 'black-fleece', 'klobuk-feather', 'mamuna-braid', 'cyrograf',
+      'glassy-sand', 'everheather', 'nightjar-feather', 'amber-lump', 'bored-bark', 'moth-dust', 'husk-dust', 'whirl-pebble', 'bronze-ring', 'birch-tar', 'glowing-ember', 'latawiec-membrane', 'charred-splinter', 'ruin-ash', 'everspark', 'noon-sickle', 'rarog-feather',
     ],
   },
   // The skills of the classes (data/skills.json), 48×48.
@@ -182,13 +185,14 @@ export const SPRITES = {
       'reed-beds', 'beaver-dams', 'drowned-forest', 'willow-isles', 'old-riverbed', 'crane-meadows', 'leech-pools', 'sundew-field', 'smoldering-peat',
       'old-diggings',
       'black-alder-carr', 'black-tarn', 'sunken-shrine', 'quaking-bog', 'rokita-deep',
+      'heather-dunes', 'resin-pinewood', 'drifting-sands', 'tar-pits', 'burnt-forest',
     ],
   },
   // The lands' wide scenes, dim behind the text of their cards, 192×96.
   lands: {
     width: 192,
     height: 96,
-    ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs', 'black-bog'],
+    ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs', 'black-bog', 'pine-dunes'],
   },
   // The camp's buildings, <building>-<look> for the looks of levels 1–3, 4–7
   // and 8–10, 128×96 (camp-art.js keeps a vector drawing for a look without
