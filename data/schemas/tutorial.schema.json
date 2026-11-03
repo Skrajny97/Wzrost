@@ -213,7 +213,14 @@
               "evolution-lead",
               "evolution-choice",
               "evolution-points",
-              "evolution-ending"
+              "evolution-ending",
+              "towers-welcome",
+              "towers-lead",
+              "towers-entries",
+              "towers-solo",
+              "towers-floor",
+              "towers-party",
+              "towers-ending"
             ]
           },
           "kind": {
