@@ -496,6 +496,7 @@
     "brew": { "files": ["audio/sfx/brew-1.mp3"], "gain": 0.6 },
     "craft": { "files": ["audio/sfx/craft-1.mp3"], "gain": 0.7 },
     "craft-fail": { "files": ["audio/sfx/craft-fail-1.mp3"], "gain": 0.7 },
-    "potion": { "files": ["audio/sfx/potion-1.mp3"], "gain": 0.7 }
+    "potion": { "files": ["audio/sfx/potion-1.mp3"], "gain": 0.7 },
+    "evolution-transform": { "files": ["audio/sfx/evolution-transform-1.mp3"], "gain": 0.8 }
   }
 }

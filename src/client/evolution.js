@@ -85,7 +85,8 @@ export async function chooseEvolution(button, evolution, { test = false } = {}) 
 // animations off there is no scene. Returns the scene and a promise kept
 // when the change is over.
 const TRANSFORM_MS = 3600;
-const TRANSFORM_SOUND_MS = 550;
+// The recordings swell to their loudest about 0.85 s in, met by the flash.
+const TRANSFORM_SOUND_MS = 1250;
 
 function transformation(fromId, toId) {
   const { classId, appearance, skin } = state.character ?? {};

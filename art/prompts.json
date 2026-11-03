@@ -5,6 +5,12 @@
     "width": 48,
     "height": 48,
     "references": [],
+    "pixellab": {
+      "style": "src/client/art/monsters/strzyga.png",
+      "references": {
+        "drought-husk": [{ "path": "art/references/monsters/drought-husk-b.png", "usage": "the creature's look chosen by the author: the same gaunt cracked husk, face and colours, but drawn whole, standing on both legs and feet" }]
+      }
+    },
     "prompts": {
       "wolf": "lean grey wolf with amber eyes, snarling, full body, three-quarter view",
       "alpha-wolf": "huge dark grey alpha wolf with a scarred muzzle, glowing red eyes and raised hackles, full body, three-quarter view",
@@ -120,17 +126,17 @@
       "resin-golem": "Zywicznik, a lumbering golem of dripping golden amber resin with insects and pine needles trapped inside, glowing faintly from within, heavy round fists, a featureless head with two dark holes, menacing, full body, three-quarter view",
       "barkborer": "Korojad, a writhing faceless humanoid made of thousands of black bark beetles, bored holes through its body, flakes of pine bark falling off, claw-like hands, eerie and menacing, full body",
       "tar-moth": "a huge menacing moth with tar-black wings covered in staring eye patterns, trailing grey poisonous dust, a furry body and long thin legs, wings spread, full body",
-      "drought-husk": "Suchotnik, a gaunt desiccated husk of a man with cracked skin like dry clay, empty eye sockets with a faint red glow, dust falling from its joints, long bony fingers, menacing, full body, three-quarter view",
+      "drought-husk": "Suchotnik, a gaunt desiccated husk of a man standing on two thin bony legs with bare feet, the whole body from the head to the feet inside the picture, cracked skin like dry clay, empty eye sockets with a faint red glow, dust falling from its joints, long bony fingers, menacing, full body, three-quarter view",
       "sand-whirl": "a menacing spinning column of sand and dust with a ring of jagged stone teeth inside it, small stones orbiting around, an abstract living whirlwind creature, full body",
       "barrow-wight": "Kurhannik, the ghost of an ancient warrior risen from a burial mound, a rusted bronze crown, bones showing through tattered grey robes, a pale cold blue glow, a curved bronze sword, menacing, full body",
       "tar-burner": "Smolarz, the ghost of an old tar burner made of dripping black tar, a smoking iron pot in his hands, burning orange eyes, a tattered leather apron, menacing, full body, three-quarter view",
       "charcoal-imp": "Weglik, a small hunched imp made of glowing charcoal lumps with cracks of orange embers, a jagged burning grin, smoke rising from its head, sharp claws, menacing, full body",
       "latawiec": "Latawiec, a Slavic wind demon, a gaunt grey winged creature with tattered membrane wings, long hooked claws, a skull-like face with glowing eyes, swooping down, menacing, full body",
       "charred-pine": "Zweglak, a walking charred pine trunk on twisted root legs, deep cracks glowing with embers, burnt branches like claws, a hollow burning knot for a face, menacing, full body",
-      "ash-wraith": "Popielec, a tall thin wraith of grey ash, flakes drifting off its body, a hollow face with two small ember eyes, very long arms ending in ash claws, eerie and menacing, full body",
+      "ash-wraith": "Popielec, a tall menacing wraith made of grey ash and charred embers, a hunched thin body, very long arms ending in claws, two small glowing ember eyes in a hollow face, flakes of ash drifting off it, nothing else in the picture, full body, three-quarter view",
       "spark-swarm": "Iskrzak, a swarm of glowing orange sparks forming the shape of a small fierce bird with a burning tail, an abstract fiery creature, menacing, full body",
       "noon-wraith": "Poludnica, a Slavic noon demon, a tall pale woman in a long white linen dress, long loose white hair hiding her face, a curved iron sickle in her hand, heat shimmering around her, eerie and menacing, full body",
-      "rarog": "Rarog, a legendary Slavic fire falcon, a great bird made of living flame, wings of fire spread wide, burning golden eyes, sparks and embers trailing, majestic and menacing, full body"
+      "rarog": "Rarog, the legendary Slavic fire falcon king, a huge majestic bird of living flame with enormous wings spread wide, a crown-like crest of fire on its head, long burning tail feathers, fierce burning golden eyes, regal and terrifying, the whole bird inside the picture, full body"
     }
   },
   "portraits": {
@@ -273,6 +279,9 @@
     "width": 32,
     "height": 32,
     "references": [],
+    "pixellab": {
+      "style": "src/client/art/materials/rat-tail.png"
+    },
     "prompts": {
       "wolf-pelt": "folded grey wolf pelt with coarse fur, single inventory item icon",
       "fox-pelt": "folded red fox pelt with a bushy white-tipped tail, single inventory item icon",
@@ -996,6 +1005,12 @@
     "width": 96,
     "height": 128,
     "references": [],
+    "pixellab": {
+      "style": "src/client/art/residents/hermit.png",
+      "references": {
+        "builder-spirit-2": [{ "path": "art/references/residents/builder-spirit-b.png", "usage": "the spirit chosen by the author: the same bald old stonemason with the long white moustache, the wooden mallet on his shoulder and the pale grey-blue ghostly look, drawn complete, with the whole head, both shoulders and the chest, nothing missing" }]
+      }
+    },
     "prompts": {
       "headman-1": "an old village headman, broad grey beard and grey hair, kind but stern eyes, weathered face, a fur-trimmed brown wool coat over a linen shirt, a carved wooden staff of office, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
       "headman-2": "a sturdy grey-haired village elder with a long moustache and short beard, a red embroidered sash over a heavy sheepskin coat, a wooden seal hanging on a cord, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
@@ -1056,7 +1071,7 @@
       "groom-1": "a young stable master with a friendly grin, tousled straw-blond hair, a sheepskin vest over a linen shirt, holding a horse bridle, a wisp of hay on his shoulder, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
       "groom-2": "a lean middle-aged horse keeper with a weathered kind face and a short grey beard, a felt hat, a long brown coat, a coiled lead rope in his hand, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
       "builder-spirit-1": "the ghost of an old master builder, a translucent pale blue glowing figure, a long wispy white beard, a leather apron with a mason's hammer and chisel, holding a wooden carpenter's square, kind tired eyes glowing softly, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
-      "builder-spirit-2": "a pale ghostly old stonemason, a semi-transparent misty grey-blue figure, a bald head with a long white moustache, a wooden mallet resting on his shoulder, a dusty stone-cutter's apron, a faint light from within, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted colours"
+      "builder-spirit-2": "a pale ghostly old stonemason, a semi-transparent misty grey-blue figure, a bald head with a long white moustache, a wooden mallet resting on his shoulder, a dusty stone-cutter's apron, a faint light from within, the whole head, both shoulders and the chest drawn complete, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted colours"
     }
   },
   "walks": {

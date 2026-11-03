@@ -3023,6 +3023,35 @@ Autor: „439 A / 440 OK … 461 OK” z poprawkami grafik, a po poprawkach „4
 1. **Grafiki.** Wszystkie 17 stworów z materiałami, kręgi pięciu miejsc, kraina z tłem A (439 A) i panorama sceny Walki. Poprawki po ocenie autora: Ważka bez zbędnych pikseli w lewym górnym rogu (447), Szczupak z całym ogonem (448), czarniejszy Drewniany bożek (451), Wąż Welesa narysowany od nowa, cały i bardziej majestatyczny (452), nowy Róg biesa (457) i cały Warkocz mamuny (460). Wybory i poprawki zapisuje `picks.json` roboczego skryptu `install.py`.
 2. **Wielki Kleszcz (455).** Kleszcz nazywa się Wielki Kleszcz, w Bestiariuszu i w nazwach przedmiotów („… Wielkiego Kleszcza”). Brakujący szczegół: jego materiał to Pancerz wielkiego kleszcza zamiast Pancerzyka kleszcza, a opis Trzęsawiska mówi o wielkich kleszczach, żeby nazwy do siebie pasowały.
 3. **Dźwięki stworów.** Autor: „Też do wszystkich stworów trzeba wygenerować”. Stwory czterech pierwszych krain miały już odgłosy bólu i śmierci, brakowało ich tylko 17 stworom Czarnego Bagna. Mają je teraz z ElevenLabs (`voices` w `audio/prompts.json`), po dwie wersje grane na zmianę, przerobione `tools/build-drafts.py` jak pozostałe. Autor dostał film z odsłuchem (504) i przyjął wszystko poza dwoma nagraniami: „ważki śmierć do poprawy, bo to jakieś bąbelki wody a nie śmierć ważki” i „bóle Rokity o wiele bardziej groźne horrorowe”. Te dwa nagrałem od nowa (gasnące bzyczenie skrzydeł bez wody; groźny, piekielny ryk) i wysłałem do odsłuchu; wchodzą do gry od razu, bo zastępują odrzucone, a jeśli nie spodobają się autorowi, wymienię je w następnej wersji. Stwory kolejnych krain dostaną odgłosy razem z grafikami.
+## Kod PC dla jednej postaci i odpowiedzi 500.7, 500.14, 500.17 (3.11.2026)
+
+Autor: „Przygotuj jednorazowy kod podarunkowy "PC" dla gracza […] 60 Punktów Czasu za zaangażowanie”, „Ogólnie na stałe może byc ten kod, ale dostępny tylko dla danej konkretnej postaci i tylko na moje polecenie przy takich sytuacjach”, „500.7 wyższa rozdzielczość potrzebna”, „500.14 A”, „500.17 B”.
+
+1. **Kod dla jednej postaci.** Wpis w `data/gift-codes.json` może mieć pole `for`: kod działa wtedy tylko dla jednej postaci, a dla każdej innej jest nieznany („Nie ma takiego kodu.”). Repozytorium jest publiczne, więc `for` to nie imię, tylko skrót SHA-256 imienia małymi literami (`characterKey` w `src/server/gift-codes.js`). Ten sam kod, np. PC, może dostać kilka postaci, każda swoim wpisem; jak każdy kod, działa raz na konto. Takie kody dodaję tylko na polecenie autora.
+2. **Kod PC:** 60 Punktów Czasu za zaangażowanie dla postaci wskazanej przez autora, do końca 16 listopada (`pc-2026-11-03-a`). Kody muszą mieć teraz co najmniej 2 znaki zamiast 4.
+3. **Popielec (500.14 A)** i **Raróg (500.17 B)** z PixelLab wybrane. **Suchotnik (500.7):** potrzebna wyższa rozdzielczość, czyli więcej szczegółów niż w 48 pikselach PixelLab; rysuję go jeszcze raz.
+
+## Uwagi gracza o układzie na komputerze (3.11.2026, pytania 505–508)
+
+Autor przesłał zrzut czatu gracza z 22. poziomu: „Sporo jest jeszcze miejsca na HUD'zie na PC. Może na stałe wyświetlać na pasku drewno, złoto, punkty czasu itp? Byłoby przydatne”, „I mam dziwne odczucie, że muszę scrollować widok obozu po 20 lvl, jak się wydłużył.”, „I fajnie jakby w HUD na PC po lewej stronie walka, profesje, osada itp były rozwijane tak jak postać z dodatkowymi skrótami” i „+ obóz dodany, w tym górnym HUD, wydaje się być mało intuicyjny”.
+
+Propozycje do decyzji autora, z zaznaczeniem na zrzutach obecnego układu:
+
+1. **505:** na wolnym miejscu górnego paska na komputerze na stałe drewno, kamień, ruda żelaza i przewinięcia.
+2. **506:** plansza Obozu z Osadą mieści się na komputerze na wysokość ekranu, bez przewijania.
+3. **507:** Walka, Profesje, Osada i Społeczność w menu po lewej rozwijane jak Postać, ze skrótami do swoich części.
+4. **508:** Obóz z górnego paska do menu po lewej, jako zwykła pozycja.
+
+## Odpowiedzi autora 498–504 (3.11.2026)
+
+Autor: „501 B, ale do dorysowania bo brakuje sporo / 498 B / 499 ewolucja super / 502 miałeś używać PixelLab teraz jako głównego źródła obrazków również.. / 500.1 A / 500.2 A / 500.3 B / 500.4 B / 500.5 A / 500.6 B / 500.7 B ale nie ma nóg a ma być pełny kształt, całe ciało / 500.8 B / 500.9 A / 500.10 A / 500.11 A / 500.12 B / 500.13 B / 500.14 C brzydkie sprite'y / 500.15 A / 500.16 A / 500.17 C zbyt mało majestatyczny jak na czempiona / 503 A / 504 ważki śmierć do poprawy, bo to jakieś bąbelki wody a nie śmierć ważki wygenerowało się i bóle Rokity o wiele bardziej groźne horrorowe”.
+
+1. **Grafiki rysuje PixelLab (502).** Tak już postanowiono 2.11.2026 („Głównym narzędziem do grafik jest PixelLab”), a rysunki Sosnowych Wydm i ducha budowniczego poszły przez pomyłkę do Retro Diffusion. Od teraz stwory, materiały i popiersia też rysuje PixelLab (rodzaje `monsters-pixellab`, `materials-pixellab` i `residents-pixellab` w przebiegu „Grafiki (szkice)”). Retro Diffusion zostaje dla teł i tego, czego PixelLab nie zrobi. Doładowanie Retro Diffusion jest niepotrzebne.
+2. **Duch budowniczego (501 B).** Wybrany kamieniarz z pobijakiem, ale do dorysowania, bo brakuje mu sporej części postaci. PixelLab rysuje go od nowa w całości, z wybranym rysunkiem jako wzorem.
+3. **Bastion (498 B):** trochę więcej obrażeń kosztem części obrony.
+4. **Przemiana przy ewolucji (499, 503 A):** zatwierdzona, z dźwiękiem w wersji A.
+5. **Stwory Sosnowych Wydm (500):** Piaskun A, Wrzosowa Mara A, Lelek B, Żywicznik B, Korojad A, Smolna Ćma B, Piaskowy Wir B, Kurhannik A, Smolarz A, Węglik A, Latawiec B, Zwęglak B, Iskrzak A, Południca A. Od nowa, w PixelLab: Suchotnik (500.7 B, ale z nogami, cały), Popielec (500.14, brzydkie rysunki) i Raróg (500.17, za mało majestatyczny jak na czempiona).
+6. **Odgłosy Czarnego Bagna (504):** do nagrania od nowa śmierć Ważki (wyszły bąbelki wody) i ból Rokity, o wiele groźniejszy, jak z horroru. Reszta zostaje.
 
 ## Odpowiedzi autora 447–460 i dwie nowe prośby (3.11.2026)
 

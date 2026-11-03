@@ -12,6 +12,15 @@ import { ApiError, json, readJson } from './http.js';
 
 const usedText = () => content.giftTexts.used;
 
+// The key of a character's name for a code given to it alone: the SHA-256 of
+// the name in small letters, in hex. The repository is public, so the data
+// keeps this key instead of the name.
+export async function characterKey(name) {
+  const bytes = new TextEncoder().encode(String(name ?? '').normalize('NFC').trim().toLocaleLowerCase('pl'));
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
 // POST /api/gift-code { code }
 export async function redeemGiftCode(context) {
   const { session, player } = await requirePlayer(context);
@@ -19,7 +28,7 @@ export async function redeemGiftCode(context) {
   const db = context.env.DB;
   const texts = content.giftTexts;
   const { results } = await db.prepare('SELECT gift_id FROM gift_codes_used WHERE user_id = ?').bind(session.userId).all();
-  const found = giftCodeOf(body.code, context.now, results.map((row) => row.gift_id), content);
+  const found = giftCodeOf(body.code, context.now, results.map((row) => row.gift_id), content, await characterKey(player.row.name));
   if (found.reason === 'unknown') throw new ApiError(404, 'unknown_code', texts.unknown);
   if (found.reason === 'expired') throw new ApiError(400, 'expired_code', texts.expired);
   if (found.reason === 'used') throw new ApiError(409, 'used_code', usedText());
