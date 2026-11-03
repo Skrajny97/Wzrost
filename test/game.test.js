@@ -1764,6 +1764,17 @@ describe('Time Points and the narrator', () => {
     assert.deepEqual(again.data.character.tutorial, before);
   });
 
+  test('three lines of the introduction say it otherwise on a computer (519)', async () => {
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    const line = (id) => tutorial.lines.find((one) => one.id === id);
+    assert.deepEqual(line('tap-region').desktop.text, ['Kliknij Wiatrołomy.']);
+    assert.deepEqual(line('tap-start').desktop.text, ['Suwak stoi na trzydziestu minutach. Kliknij „Wyrusz”.']);
+    assert.match(line('wallet').desktop.text[0], /a tuż obok resztę zasobów wraz z Punktami Czasu\. Sam zobacz\.$/);
+    assert.match(line('wallet').desktop.female.text[0], /Sama zobacz\.$/);
+    // The phone keeps its own words.
+    assert.deepEqual(line('tap-region').text, ['Stuknij Wiatrołomy.']);
+  });
+
   test('the Wieże chapter (515) comes after the Ewolucja, and test mode starts it again', async () => {
     const { tutorial } = (await call('GET', '/api/content')).data;
     const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once;
