@@ -3011,6 +3011,25 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Obóz: budowle wejściem do ścieżek (3.11.2026)
+
+Autor, ze zrzutem planszy obozu: „Tartak trzeba obrócić o 90 stopni by był zwrócony w stronę ścieżki, tak samo wszystkie inne budowle, wejścia w strone ścieżek”.
+
+1. **Jak.** Budowle są narysowane z ukosa, więc obrazek odbity w poziomie pokazuje budynek obrócony o ćwierć obrotu: wejście, które patrzyło w lewo w dół, patrzy w prawo w dół. Tak samo odwróciliśmy budynki Osady (zob. „Osada: budynki przodem do drogi”). Odbija się sam obrazek, bez napisu i bez zmiany miejsca na planszy. Odbite wyglądy wymienia `MIRRORED` w `src/client/camp-art.js`, obok miejsc budowli na planszy. Ekran budynku i szary obrazek na pustym placu pokazują budynek tak samo jak plansza.
+2. **Które.**
+   - Tartak we wszystkich trzech wyglądach: wejściem patrzył w las, a ścieżka przychodzi od Ogniska z prawej.
+   - Magazyn we wszystkich trzech wyglądach.
+   - Kwatery w dwóch pierwszych wyglądach. Trzeci, dom z bali, ma drzwi od strony ścieżki.
+   - Skup złomu i Stół rozbiórki w środkowym wyglądzie (poziomy 4–7).
+3. **Bez zmian:**
+   - Kowadło stoi na końcu ścieżki biegnącej prosto w górę, więc patrzy na nią w każdym wyglądzie.
+   - Kamieniołom, Staw Midasa i Kopalnia oraz pozostałe wyglądy już patrzyły wejściem do ścieżki.
+   - Ognisko jest okrągłe.
+   - Kamień węgielny nie ma wejścia ani ścieżki.
+4. **Sprawdzone:**
+   - zrzuty planszy przed i po zmianie, na poziomach budowli 2, 5 i 9 oraz na planszy z poziomami jak na zrzucie autora;
+   - test, że odbite są dokładnie te wyglądy.
+
 ## Wersja 0.1.4 (3.11.2026)
 
 1. **Co wchodzi do gry:**

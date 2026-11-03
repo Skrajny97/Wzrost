@@ -72,6 +72,19 @@ test('every inner region has its picture', async () => {
   assert.deepEqual(areas.filter((id) => !SPRITES.areas.ids.includes(id) && !areaArtIds.includes(id)), []);
 });
 
+test('a camp building whose entrance faces away from its path is mirrored towards it', async () => {
+  const art = await import('../src/client/camp-art.js');
+  // The author: "Tartak trzeba obrócić o 90 stopni by był zwrócony w stronę
+  // ścieżki, tak samo wszystkie inne budowle, wejścia w strone ścieżek".
+  const turned = (id, level) => art.plotMarkup(id, { level }).includes('transform="matrix(-1 0 0 1 100 0)"');
+  for (const level of [1, 5, 9]) assert.ok(turned('sawmill', level), `the Tartak at level ${level}`);
+  assert.ok(turned('loot-shed', 5) && turned('quarters', 1) && turned('scrap-bench', 5) && turned('craft-table', 5));
+  assert.ok(art.mirrored('quarters', 2) && !art.mirrored('quarters', 3));
+  assert.ok(!turned('anvil', 9) && !turned('quarry', 5) && !turned('mine', 5) && !turned('campfire', 5) && !turned('scrap-bench', 9));
+  // A plot nobody has built on yet shows the same turn in grey.
+  assert.ok(turned('sawmill', 0));
+});
+
 test('every building has its picture and a plot on the camp board, apart from the others', async () => {
   const art = await import('../src/client/camp-art.js');
   const all = JSON.parse(readFileSync(new URL('../data/buildings.json', import.meta.url), 'utf8'));

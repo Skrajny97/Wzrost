@@ -550,9 +550,25 @@ const blend = (id, grey = false) => `<filter id="${id}" x="-10%" y="-10%" width=
 <feMerge><feMergeNode in="halo"></feMergeNode><feMergeNode in="body"></feMergeNode></feMerge>
 </filter>`;
 
+// The looks drawn with their door or open side away from the path to their
+// plot. They are mirrored, which in this three-quarter view turns a building
+// a quarter round, so that every entrance faces its path (the author:
+// "Tartak trzeba obrócić o 90 stopni by był zwrócony w stronę ścieżki, tak
+// samo wszystkie inne budowle, wejścia w strone ścieżek"). The Kowadło, whose
+// path comes from straight below, the Kamieniołom, Staw Midasa, the Kopalnia
+// and the round Ognisko face theirs already, as do the looks not named here.
+const MIRRORED = {
+  sawmill: [1, 2, 3],
+  'loot-shed': [1, 2, 3],
+  quarters: [1, 2],
+  'craft-table': [2],
+  'scrap-bench': [2],
+};
+export const mirrored = (buildingId, tier) => Boolean(MIRRORED[buildingId]?.includes(tier));
+
 // A building's look: its picture, standing on the bottom of the plot over its
 // soft shadow, or its vector stand-in. The picture's address is one of the fixed
-// ones in art.js.
+// ones in art.js. A mirrored look turns about the plot's middle.
 function look(buildingId, tier, grey = false, size = ART_SIZES[tier - 1]) {
   const src = campArt(buildingId, tier);
   if (!src) return (BUILDINGS[buildingId] ?? BUILDINGS.campfire)[tier - 1]();
@@ -560,9 +576,10 @@ function look(buildingId, tier, grey = false, size = ART_SIZES[tier - 1]) {
   const height = 78 * size;
   filters += 1;
   const id = `camp-blend-${filters}`;
+  const turn = mirrored(buildingId, tier) ? ' transform="matrix(-1 0 0 1 100 0)"' : '';
   return `${blend(id, grey)}<filter id="${id}-shadow" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="1.8"></feGaussianBlur></filter>
 <ellipse cx="50" cy="75" rx="${(width * 0.46).toFixed(1)}" ry="${(3.5 + 3 * size).toFixed(1)}" fill="#0b0f09" opacity="0.55" filter="url(#${id}-shadow)"></ellipse>
-<image href="${src}" x="${((100 - width) / 2).toFixed(1)}" y="${(78 - height).toFixed(1)}" width="${width.toFixed(1)}" height="${height.toFixed(1)}" preserveAspectRatio="xMidYMax meet" filter="url(#${id})"></image>`;
+<image href="${src}" x="${((100 - width) / 2).toFixed(1)}" y="${(78 - height).toFixed(1)}" width="${width.toFixed(1)}" height="${height.toFixed(1)}" preserveAspectRatio="xMidYMax meet"${turn} filter="url(#${id})"></image>`;
 }
 
 // The markup of a plot: the building at its level, an empty plot with a faint
