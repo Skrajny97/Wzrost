@@ -1,0 +1,17 @@
+{
+  "id": "tap-region-desktop",
+  "payload": {
+    "text": "Kliknij Wiatrołomy. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/tap-region-desktop-20261103T1056-0.mp3",
+    "audio/drafts/narration/tap-region-desktop-20261103T1056-1.mp3"
+  ],
+  "credits": 56
+}

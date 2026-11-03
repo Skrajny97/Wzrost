@@ -1,0 +1,17 @@
+{
+  "id": "wallet-desktop",
+  "payload": {
+    "text": "Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sam zobacz. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/wallet-desktop-20261103T1056-0.mp3",
+    "audio/drafts/narration/wallet-desktop-20261103T1056-1.mp3"
+  ],
+  "credits": 280
+}
