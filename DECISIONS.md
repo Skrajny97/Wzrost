@@ -3011,6 +3011,17 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Wersja 0.1.11 (3.11.2026)
+
+1. **Co wchodzi do gry:**
+   - Salon Gier w Osadzie, z Loterią i Kołem Fortuny według 542 C (zob. „Salon Gier: budowa” oraz „Salon Gier: odpowiedzi autora 542 i 543”). Rozdział narratora o Salonie dojdzie po zatwierdzeniu kwestii 543.
+   - Muzyka Salonu Gier od autora („tutaj background do salonu gier”). Utwór ma 144 s i gra w Salonie zamiast muzyki Osady (`settlement:casino` w `data/music.json`). Głośność wyrównałem do pozostałych utworów (−16 LUFS), a plik zapisałem tak jak inne (MP3 44,1 kHz, ok. 130 kb/s, bez okładki).
+   - Spełniona prośba w Prośbach Gildii znika po podziękowaniach (zob. „Prośby Gildii: spełniona prośba znika”).
+2. **Sprawdzone:**
+   - **Pełne testy:** 967 z 968. Nie przeszedł tylko test czasu oceny zagrożenia (292 ms), bo w tym czasie w przeglądarce szło wprowadzenie. Sam, bez obciążenia, przechodzi (110 ms).
+   - **Wprowadzenie:** przechodzi na telefonie, komputerze i dużym monitorze.
+   - **W przeglądarce, na telefonie i komputerze:** postać na 30. poziomie otwiera Salon na zakładce Loterii i kupuje los. W zakładce Koła stawki idą od 100 do 400 zł. Po „+” przychodzi pula stawki 200 zł, a zakręcenie ją zmienia („zostało 4 z 5”). Zasady rozwijają się pod „Jak to działa?”. W Salonie gra jego muzyka, a na planszy Osady muzyka Osady. Strona nie zgłasza błędów i nie brakuje żadnych obrazków.
+
 ## Prośby Gildii: spełniona prośba znika (3.11.2026)
 
 Autor, ze zrzutem ekranu własnej prośby („Dane: 2 z 2. Spełniona.”, „Podziękowano”): „spelnione prośby nie znikają”.

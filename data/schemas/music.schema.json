@@ -23,7 +23,7 @@
     "default": { "type": "string", "description": "Utwór dla ekranów bez własnego." },
     "places": {
       "type": "object",
-      "description": "Id miejsca (regionu, regionu wewnętrznego, camp, albo zakładki: skills to Umiejętności, professions to Profesje) → id utworu. Region wewnętrzny bez wpisu gra utwór swojego regionu.",
+      "description": "Id miejsca (regionu, regionu wewnętrznego, camp, albo zakładki: skills to Umiejętności, professions to Profesje, settlement to Osada, a settlement:<id> to miejsce Osady, np. settlement:casino to Salon Gier) → id utworu. Region wewnętrzny bez wpisu gra utwór swojego regionu, a miejsce Osady bez wpisu muzykę Osady.",
       "additionalProperties": { "type": "string" }
     },
     "reports": {

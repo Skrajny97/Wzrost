@@ -27,6 +27,10 @@ test('the validator catches broken references and schema errors', () => {
   assert.deepEqual(validateData(music), ['music.json: raport success ma nieznany utwór fanfare']);
   music.music.reports = { draw: 'victory-v1' };
   assert.match(validateData(music)[0], /^music\.json\/reports: must be equal to one of the allowed values/);
+  // A place of the Osada with its own music (the Salon Gier's) is one of its places.
+  const placed = structuredClone(loadData());
+  placed.music.places['settlement:nowhere'] = 'casino-v1';
+  assert.deepEqual(validateData(placed), ['music.json: nieznane miejsce settlement:nowhere']);
 
   // Every creature has a name for affixes, and a suffix of an older item has
   // a creature or a text to go by.

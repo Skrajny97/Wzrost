@@ -92,8 +92,9 @@ export function mountSettlement(container, { params = {} } = {}) {
       failure = error;
     }
     if (gone) return;
-    // The Osada's own music (the author's, question 78 A), once it is open.
-    if (data) setMusicPlace(['settlement']);
+    // The Osada's own music (the author's, question 78 A), once it is open,
+    // or a place's own, as the Salon Gier's (the author's of 3.11.2026).
+    if (data) setMusicPlace(placeId ? [`settlement:${placeId}`, 'settlement'] : ['settlement']);
     render();
   }
 

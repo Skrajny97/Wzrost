@@ -620,14 +620,23 @@ function checkReferences(data) {
   if (hours[0] !== 0 || hours.some((hour, i) => i > 0 && hour <= hours[i - 1])) errors.push('animations.json: dayParts od godziny 0, rosnąco');
 
   // Music: files that exist, places that are regions, inner regions, the
-  // camp, a tab with music (src/client/app.js: the routes' music) or the
-  // Osada (its screen sets it once open), and report tracks that exist.
+  // camp, a tab with music (src/client/app.js: the routes' music), the
+  // Osada or one of its places (settlement:<id>; its screen sets them once
+  // open), and report tracks that exist.
   const tracks = uniqueIds(errors, 'music', data.music.tracks);
   for (const track of data.music.tracks) {
     if (!existsSync(new URL(track.file, CLIENT_DIR))) errors.push(`music.json: brak pliku src/client/${track.file}`);
   }
   if (!tracks.has(data.music.default)) errors.push(`music.json: nieznany utwór domyślny ${data.music.default}`);
-  const places = new Set(['camp', 'skills', 'professions', 'evolution', 'settlement', ...data.regions.flatMap((region) => [region.id, ...region.areas.map((area) => area.id)])]);
+  const places = new Set([
+    'camp',
+    'skills',
+    'professions',
+    'evolution',
+    'settlement',
+    ...data.settlement.places.map((place) => `settlement:${place.id}`),
+    ...data.regions.flatMap((region) => [region.id, ...region.areas.map((area) => area.id)]),
+  ]);
   for (const [place, track] of Object.entries(data.music.places)) {
     if (!places.has(place)) errors.push(`music.json: nieznane miejsce ${place}`);
     if (!tracks.has(track)) errors.push(`music.json: ${place} ma nieznany utwór ${track}`);
