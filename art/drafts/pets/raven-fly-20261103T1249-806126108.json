@@ -1,0 +1,17 @@
+{
+  "id": "raven-fly",
+  "tool": "pixellab generate-image-v2",
+  "description": "a tame black raven, a loyal animal companion, with glossy blue-black feathers and a strong black beak, flying, seen from the side in profile facing right, both wings spread wide mid-flap, the whole bird with both wingtips inside the image, isolated bird on a plain background, forest fantasy",
+  "style": "src/client/art/monsters/fox.png",
+  "references": [
+    {
+      "path": "src/client/art/monsters/crow.png",
+      "usage": "the bird's look the author approved: the same black raven, its blue-black feathers, beak and wings"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 16
+}

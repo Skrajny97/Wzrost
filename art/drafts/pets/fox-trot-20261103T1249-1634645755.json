@@ -1,0 +1,17 @@
+{
+  "id": "fox-trot",
+  "tool": "pixellab generate-image-v2",
+  "description": "a friendly tame red fox, a loyal animal companion, with a white chest, black legs and a bushy white-tipped tail, seen from the side in profile facing right, trotting mid-stride with one front paw raised, the whole fox from the ears to the tip of the tail inside the image, isolated animal on a plain background, forest fantasy",
+  "style": "src/client/art/monsters/fox.png",
+  "references": [
+    {
+      "path": "src/client/art/monsters/fox.png",
+      "usage": "the fox's look the author approved: the same red fox, its colours, white chest, black legs and white-tipped tail, only tame and friendly"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 16
+}

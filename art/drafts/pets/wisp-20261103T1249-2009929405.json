@@ -1,0 +1,17 @@
+{
+  "id": "wisp",
+  "tool": "pixellab generate-image-v2",
+  "description": "a small tame will-o'-the-wisp, a floating ball of pale blue spectral fire with a bright white core and a short flickering flame tail trailing to the left, no face, no body, no stones and no ground, glowing softly, the whole flame inside the image with room around it, isolated on a plain background, forest fantasy",
+  "style": "src/client/art/monsters/fox.png",
+  "references": [
+    {
+      "path": "src/client/art/monsters/will-o-wisp.png",
+      "usage": "the flame's look the author approved: the same pale blue ball of spectral fire with its flickering tail; only the flame, without the stones and the ground"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 16
+}
