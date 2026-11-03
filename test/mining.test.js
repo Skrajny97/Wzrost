@@ -141,15 +141,67 @@ describe('Górnictwo in the engine', () => {
     assert.deepEqual(found, { 'mineral:quartz': 1, 'mineral:silver-ore': 1 });
     const { minerals } = encyclopediaView({ discovered: found, claimed: [], met: [] }, content);
     assert.deepEqual([minerals.found, minerals.all], [2, 10]);
+    const entries = minerals.tiers.flatMap((tier) => tier.entries);
     assert.deepEqual(
-      minerals.entries.slice(0, 2).map((entry) => [entry.name, entry.sources]),
+      entries.slice(0, 2).map((entry) => [entry.name, entry.sources]),
       [
-        ['Kwarc', ['Górnictwo: od 1. poziomu, w Kopalni.', 'Daje biżuterii rzadkość: pospolity. Oprawiony podnosi wszystkie liczby przedmiotu o 5%.']],
-        ['Srebrny kruszec', ['Górnictwo: od 1. poziomu, w Kopalni.', 'Idzie na oprawy biżuterii rzadkości: pospolity, rzadki, unikalny.']],
+        [
+          'Kwarc',
+          ['Górnictwo: od 1. poziomu, w Kopalni.', 'Jubilerstwo: od 1. poziomu, w Szlifierni.', 'Daje biżuterii rzadkość: pospolity. Oprawiony podnosi wszystkie liczby przedmiotu o 5%.'],
+        ],
+        ['Srebrny kruszec', ['Górnictwo: od 1. poziomu, w Kopalni.', 'Jubilerstwo: od 1. poziomu, w Szlifierni.', 'Idzie na oprawy biżuterii rzadkości: pospolity, rzadki, unikalny.']],
       ],
     );
-    assert.deepEqual(minerals.entries.at(-1).name, '???');
+    assert.deepEqual(entries.at(-1).name, '???');
+    assert.deepEqual(entries.at(-1).sources, ['Górnictwo: od 80. poziomu, w Kopalni.', 'Jubilerstwo: od 80. poziomu, w Szlifierni.']);
     assert.deepEqual(minerals.chests.map((chest) => chest.need), [3, 6, 10]);
+  });
+
+  // The author: "elementy z Górnictwa i Jubilerstwa musza korespondować z
+  // Encyklopedią i miec swoje zakladki lub na przyklad Amulety i Pierścienie
+  // być w Tierach odpowiednich" (3.11.2026).
+  test('the Encyklopedia: gems and ores in tiers by the level of Górnictwo, as the herbs by Zielarstwo', () => {
+    const { minerals } = encyclopediaView({ discovered: {}, claimed: [], met: [], levels: { level: 60, classLevel: 60, professions: { mining: { level: 40, xp: 0 } } } }, content);
+    assert.deepEqual(
+      minerals.tiers.map((tier) => [tier.name, tier.range, tier.current, tier.entries.map((entry) => content.mineralsById[entry.id].name)]),
+      [
+        ['Tier I', 'poziomy 1–25', false, ['Kwarc', 'Srebrny kruszec', 'Agat', 'Ametyst', 'Szmaragd', 'Złoty kruszec']],
+        ['Tier II', 'poziomy 26–50', true, ['Szafir']],
+        ['Tier III', 'poziomy 51–75', false, ['Rubin', 'Gwiezdny kruszec']],
+        ['Tier IV', 'poziomy 76–100', false, ['Diament']],
+      ],
+    );
+  });
+
+  test('the Encyklopedia: every jewel stands in the Tier its Szlifiernia pattern opens at, and says so', () => {
+    const { items } = encyclopediaView({ discovered: {}, claimed: [], met: [] }, content);
+    const tierOf = new Map(items.tiers.flatMap((tier) => tier.entries.map((entry) => [entry.id, tier])));
+    const rows = jewelBases(content).map((base) => {
+      const tier = tierOf.get(base.id);
+      const set = tier.sets.find((each) => each.bases.includes(base.id));
+      return [base.name, tier.name, set.name, tier.entries.find((entry) => entry.id === base.id).sources.find((line) => line.startsWith('Szlifiernia'))];
+    });
+    assert.deepEqual(rows, [
+      ['Amulet', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
+      ['Kaptorga', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
+      ['Wisior', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
+      ['Medalion', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
+      ['Pierścień', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
+      ['Sygnet', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
+      ['Obrączka', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
+      ['Pierścień rodowy', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
+      ['Talizman', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
+      ['Otoczak', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
+      ['Kieł', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
+      ['Bursztyn', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
+    ]);
+    // A jewel's card names the same Tier, and no Warsztat base says Szlifiernia.
+    for (const base of jewelBases(content)) {
+      const item = generateItem({ baseId: base.id, rarityId: 'common', level: 60 }, createRng(base.id), content);
+      assert.equal(itemView(item, content).tier, tierOf.get(base.id).name, base.id);
+    }
+    const others = items.tiers.flatMap((tier) => tier.entries).filter((entry) => !jewelBases(content).some((base) => base.id === entry.id));
+    assert.ok(others.every((entry) => !entry.sources.some((line) => line.startsWith('Szlifiernia'))));
   });
 
   test('the end of a digging and of a work in the Szlifiernia come as phone notifications', () => {

@@ -3034,6 +3034,30 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.22 (3.11.2026)
+
+1. **Encyklopedia zgodna z Górnictwem i Jubilerstwem.** Minerały stoją w Tierach, a wpis biżuterii mówi, od którego poziomu Jubilerstwa Szlifiernia zna jej wzór (zob. „Encyklopedia: Górnictwo i Jubilerstwo”).
+
+## Encyklopedia: Górnictwo i Jubilerstwo (3.11.2026)
+
+Autor: „Pamietaj ze elementy z Górnictwa i Jubilerstwa musza korespondować z Encyklopedią i miec swoje zakladki lub na przyklad Amulety i Pierścienie być w Tierach odpowiednich itp itd”.
+
+1. **Biżuteria w Tierach.** Wszystkie 12 baz biżuterii stało już w zakładce Przedmioty, w zestawie „Dodatki” tego Tieru, od którego poziomu klasy się je zakłada. Od tego samego poziomu Jubilerstwa Szlifiernia odsłania ich wzór, a karta przedmiotu podaje ten sam Tier:
+   - Tier I: Amulet, Pierścień i Talizman (wzór od 1. poziomu);
+   - Tier II: Kaptorga, Sygnet i Otoczak (od 10.);
+   - Tier III: Wisior, Obrączka i Kieł (od 25.);
+   - Tier IV: Medalion, Pierścień rodowy i Bursztyn (od 50.).
+2. **Skąd biżuteria.** Wpis biżuterii podawał tylko wyprawy. Teraz mówi też „Szlifiernia: wzór od 10. poziomu Jubilerstwa.”, tak jak wpisy z Warsztatu mówią „Warsztat: wzór od 10. poziomu Rzemieślnictwa.”.
+3. **Minerały w Tierach.** Zakładka „Minerały” dzieli się teraz na Tiery według poziomu Górnictwa, tak jak Zioła według poziomu Zielarstwa, a Mikstury według poziomu Alchemii:
+   - Tier I (poziomy 1–25): Kwarc, Srebrny kruszec, Agat, Ametyst, Szmaragd i Złoty kruszec;
+   - Tier II (26–50): Szafir;
+   - Tier III (51–75): Rubin i Gwiezdny kruszec;
+   - Tier IV (76–100): Diament.
+   Na wejściu rozwinięty jest Tier poziomu Górnictwa postaci. Odkryte minerały mają kolor swojej rzadkości, jak dotąd.
+4. (brakujący szczegół) **Do czego minerał.** Wpis kamienia i kruszcu mówi oprócz „Górnictwo: od 25. poziomu, w Kopalni.” także „Jubilerstwo: od 25. poziomu, w Szlifierni.”: od tego poziomu Jubilerstwa kamień się szlifuje i oprawia, a kruszec idzie na oprawy.
+5. (brakujący szczegół) Zakładki zostają te same: Minerały to zakładka Górnictwa, a biżuteria należy do Przedmiotów, bo to ekwipunek jak inne. Zestawy, progi i skrzynie się nie zmieniają, więc otwarte skrzynie zostają otwarte.
+6. `test/mining.test.js` pilnuje, żeby każda baza biżuterii stała w Tierze swojego wzoru, z linią o Szlifierni i tym samym Tierem na karcie, a minerały w Tierach poziomu Górnictwa.
+
 ## Wersja 0.1.21 (3.11.2026)
 
 1. **Odcień „Jasna” wszędzie tą samą jasną skórą** (567 A): każdy wygląd, na portrecie, w chodzie i na wierzchowcu (zob. „Odpowiedzi autora 567 i 568”).

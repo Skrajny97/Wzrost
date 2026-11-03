@@ -13,6 +13,7 @@
 import { knownStack } from './crafting.js';
 import { areaDangers } from './hunt.js';
 import { baseClasses, baseClassLevel } from './items.js';
+import { jewelBases, jewelPatternLevel } from './jewelcraft.js';
 import { professionState } from './professions.js';
 import { shopLevelFor } from './shop.js';
 import { say } from './text.js';
@@ -233,7 +234,9 @@ function tierHeadings(content, byClassLevel) {
 // base.
 const firstAreaTo = (level, content) => content.regions.flatMap((region) => region.areas).find((area) => area.maxLevel >= level) ?? null;
 
-function itemEntry(base, discovered, content, patterns) {
+// `patterns` and `jewels`: the bases the Warsztat and the Szlifiernia make
+// (their ids).
+function itemEntry(base, discovered, content, patterns, jewels) {
   const best = discovered[`item:${base.id}`] ?? 0;
   const classes = baseClasses(base.id, content);
   const classLevel = baseClassLevel(base.id, content);
@@ -251,6 +254,7 @@ function itemEntry(base, discovered, content, patterns) {
       classes ? text(content, classes.length > 1 ? 'itemClasses' : 'itemClass', { classes: names }) : text(content, 'itemAnyClass'),
       classLevel > 1 && text(content, 'itemWear', { level: classLevel }),
       patterns.has(base.id) && text(content, 'itemPattern', { level: patternLevel(base, content) }),
+      jewels.has(base.id) && text(content, 'itemJewelPattern', { level: jewelPatternLevel(base, content) }),
       best > 0 && text(content, 'itemBest', { rarity: content.rarities[best - 1].name }),
     ].filter(Boolean),
   };
@@ -344,7 +348,8 @@ function partEntry(part, discovered, content) {
   };
 }
 
-// A gem or an ore of Górnictwo: where it is dug from, and what a gem gives
+// A gem or an ore of Górnictwo: where it is dug from, from which level of
+// Jubilerstwo it is cut and set (its `level` too), and what a gem gives
 // jewellery and an item it is set in, or which jewellery an ore sets.
 function mineralEntry(mineral, discovered, content) {
   const found = Boolean(discovered[`mineral:${mineral.id}`]);
@@ -354,9 +359,11 @@ function mineralEntry(mineral, discovered, content) {
     found,
     name: found ? mineral.name : text(content, 'unknown'),
     rarity: mineral.rarity ?? mineral.for[0],
+    level: mineral.level,
     description: found ? mineral.description : null,
     sources: [
       text(content, 'mineralMine', { level: mineral.level }),
+      text(content, 'mineralCraft', { level: mineral.level }),
       found && mineral.kind === 'gem' && text(content, 'mineralGem', { rarity: content.raritiesById[mineral.rarity].name, percent: Math.round(mineral.setBonus * 100) }),
       found && mineral.kind === 'ore' && text(content, 'mineralOre', { rarities: rarityNames(mineral.for) }),
     ].filter(Boolean),
@@ -364,8 +371,8 @@ function mineralEntry(mineral, discovered, content) {
 }
 
 // The tier a character is in on each tab, to unfold first: items by its
-// class level, potions and herbs by the level of their profession, and
-// materials by its level. None without `levels`.
+// class level, potions, herbs and minerals by the level of their profession,
+// and materials by its level. None without `levels`.
 function currentTiers(levels, content) {
   if (!levels) return {};
   const { tiers } = content.encyclopedia;
@@ -374,6 +381,7 @@ function currentTiers(levels, content) {
     items: tiers.reduce((found, tier, index) => (levels.classLevel >= tier.classLevel ? index : found), 0),
     potions: levelTier(profession(content.brewing.profession), content),
     herbs: levelTier(profession(content.gathering.profession), content),
+    minerals: levelTier(profession(content.mining.profession), content),
     materials: levelTier(levels.level, content),
   };
 }
@@ -399,6 +407,7 @@ export function encyclopediaView({ discovered, claimed, met, levels = null }, co
     chest: entry.chest,
   });
   const patterns = new Set(craftableBases(content).map((base) => base.id));
+  const jewels = new Set(jewelBases(content).map((base) => base.id));
   const ranges = creatureRanges(content);
   const fromEvents = eventHerbs(content);
   const byTier = (entries, tierOf, headings, tab) =>
@@ -407,7 +416,7 @@ export function encyclopediaView({ discovered, claimed, met, levels = null }, co
       .filter((tier) => tier.entries.length > 0);
   const count = (entries) => ({ found: entries.filter((entry) => entry.found).length, all: entries.length });
 
-  const items = content.bases.map((base) => ({ ...itemEntry(base, discovered, content, patterns), tier: baseTier(base.id, content) }));
+  const items = content.bases.map((base) => ({ ...itemEntry(base, discovered, content, patterns, jewels), tier: baseTier(base.id, content) }));
   const potions = [...content.potions].sort((a, b) => a.level - b.level).map((potion) => potionEntry(potion, discovered, content));
   const herbs = [...content.herbs].sort((a, b) => a.level - b.level).map((herb) => herbEntry(herb, discovered, content, fromEvents));
   const materials = content.materials
@@ -442,6 +451,6 @@ export function encyclopediaView({ discovered, claimed, met, levels = null }, co
       chests: tabChests('materials'),
     },
     parts: { ...count(parts), entries: parts, chests: tabChests('parts') },
-    minerals: { ...count(minerals), entries: minerals, chests: tabChests('minerals') },
+    minerals: { ...count(minerals), tiers: byTier(minerals, (entry) => levelTier(entry.level, content), tierHeadings(content, false), 'minerals'), chests: tabChests('minerals') },
   };
 }

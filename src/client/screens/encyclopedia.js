@@ -119,7 +119,7 @@ export function mountEncyclopedia(container, { params }) {
       herbs: () => tieredTab('herbs'),
       materials: materialsTab,
       parts: () => flatTab('parts'),
-      minerals: () => flatTab('minerals'),
+      minerals: () => tieredTab('minerals', true),
     };
     fill(body, (views[tab] ?? itemsTab)());
   }
@@ -289,12 +289,16 @@ export function mountEncyclopedia(container, { params }) {
     ];
   }
 
-  function tieredTab(kind) {
+  // A tab in tiers by the level of its profession: the potions, the herbs,
+  // and Górnictwo's gems and ores (`byRarity`: in the colour of their rarity
+  // once discovered).
+  function tieredTab(kind, byRarity = false) {
     const part = book[kind];
+    const color = (entry) => (byRarity && entry.found ? rarityColor(entry.rarity) : null);
     return [
       summary(part),
       countChests(kind, part.chests),
-      part.tiers.map((tier) => tierSection(kind, part.tiers, tier, false, h('ul', { class: 'bag-grid' }, tier.entries.map((entry) => tile(kind, entry))))),
+      part.tiers.map((tier) => tierSection(kind, part.tiers, tier, false, h('ul', { class: 'bag-grid' }, tier.entries.map((entry) => tile(kind, entry, color(entry)))))),
     ];
   }
 
@@ -315,7 +319,7 @@ export function mountEncyclopedia(container, { params }) {
     ];
   }
 
-  // A tab without tiers: the parts, and Górnictwo's gems and ores.
+  // A tab without tiers: the parts.
   function flatTab(kind) {
     const part = book[kind];
     return [summary(part), countChests(kind, part.chests), h('ul', { class: 'bag-grid' }, part.entries.map((entry) => tile(kind, entry, entry.found ? rarityColor(entry.rarity) : null)))];

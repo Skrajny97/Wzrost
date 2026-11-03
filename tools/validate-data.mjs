@@ -1049,8 +1049,8 @@ function checkWorkshop(data, ids) {
 // every tab once, and the sentences the engine says.
 const ENCYCLOPEDIA_TEXTS = [
   'accessories', 'tierItems', 'tierItemsFirst', 'tierLevels', 'itemDrop', 'itemDropAny', 'itemClasses', 'itemClass', 'itemAnyClass',
-  'itemOtherClasses', 'itemWear', 'itemPattern', 'itemBest', 'potionRecipe', 'potionHerbs', 'potionCatalyst', 'herbGather', 'herbEvent',
-  'materialDrop', 'materialGrades', 'trophyNeeds', 'trophyWon', 'partTable', 'partExchange', 'partShop', 'mineralMine', 'mineralGem', 'mineralOre', 'unknown',
+  'itemOtherClasses', 'itemWear', 'itemPattern', 'itemJewelPattern', 'itemBest', 'potionRecipe', 'potionHerbs', 'potionCatalyst', 'herbGather', 'herbEvent',
+  'materialDrop', 'materialGrades', 'trophyNeeds', 'trophyWon', 'partTable', 'partExchange', 'partShop', 'mineralMine', 'mineralCraft', 'mineralGem', 'mineralOre', 'unknown',
 ];
 
 function checkEncyclopedia(data) {
