@@ -3011,6 +3011,16 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Wersja 0.1.6 (3.11.2026)
+
+1. **Co wchodzi do gry:**
+   - nowe plansze obozu (514 A): każda budowla stoi na polanie, a nie na drzewach, plansze są dłuższe, wyglądy 2 i 3 mają nowe tła, a ścieżki i Skrzynia Konta stoją na nowo (zob. „Obóz: budowle na polanie, nie na drzewach”);
+   - materiały tej samej rzadkości sumują się na Kowadle, w Kuźni i u Zaklinaczki (481 B; zob. „Materiały tej samej rzadkości się sumują”).
+2. **Sprawdzone:**
+   - pełne testy: 926 z 926;
+   - przejście wprowadzenia na telefonie, komputerze i dużym monitorze (pierwsza wyprawa po 11 krokach);
+   - obchód narratora po obozie na nowych planszach, na telefonie i komputerze: każde wskazane miejsce jest całe na ekranie, a obchód kończy się budową Ogniska.
+
 ## Odpowiedzi autora 513, 514 i 500.7, wszystko w PixelLab (3.11.2026)
 
 Autor: „514 wszystko A”, „poprawiony film git”, „500.7 A” i „wszystko rob w PixelLab teraz, RetroDiffusion bedzie awaryjnie”.
