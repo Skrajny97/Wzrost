@@ -6361,6 +6361,29 @@ a.camp-level-button {
   background: rgba(143, 227, 239, 0.06);
 }
 
+/* A message of the System (the Loteria's result): its cold glass and
+   letters, under [ SYSTEM ]. */
+.chat-message--system {
+  border-color: var(--system-line);
+  background: var(--system-fill);
+}
+
+.chat-system {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.chat-message--system .chat-text {
+  color: var(--system-text);
+  font-family: var(--font-system);
+}
+
 /* The name shows the character; the text of someone else's message opens
    its sheet. */
 .chat-name,
@@ -10214,6 +10237,57 @@ a.profession-square:active {
   align-self: center;
   color: var(--system);
   font-weight: 600;
+}
+
+/* The Salon Gier (casino.js): the Loteria and the Koło Fortuny, each a card
+   under Szczęsny's; today's pot and the stake's chance in the System's
+   letters, the last draw as the System said it, the prizes won dimmed. */
+.casino-game p,
+.casino-last p,
+.casino-result p {
+  margin: 0;
+}
+
+.casino-pot,
+.casino-chance,
+.casino-result-text {
+  font-family: var(--font-system);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.casino-chance {
+  text-align: center;
+  color: var(--system);
+}
+
+.casino-last,
+.casino-result {
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--system-line);
+  background: var(--system-fill);
+}
+
+.casino-announce {
+  color: var(--system-text);
+  font-family: var(--font-system);
+}
+
+.casino-own,
+.casino-result--win .casino-result-text {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.casino-pool-title {
+  margin: 4px 0 0;
+  font-size: 17px;
+}
+
+.casino-prize--won {
+  opacity: 0.55;
 }
 
 .market-pick {

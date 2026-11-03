@@ -289,17 +289,19 @@ export const SPRITES = {
   // place's id, each cut to its outline, the Targowisko in the middle the
   // largest, and the torch that stands in a few places on it, burning and
   // put out; the residents' busts, 96×128; and the board's ground, twice
-  // as tall as the camp's, which scrolls with the page.
+  // as tall as the camp's, which scrolls with the page. The Salon Gier
+  // (`casino`, 528 H) and its host Szczęsny (`gamehost`, 529 C) are drawn
+  // in PixelLab.
   settlement: {
     width: 192,
     height: 144,
     fit: true,
-    ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist', 'forge', 'tannery', 'stable', 'torch', 'torch-off'],
+    ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist', 'forge', 'tannery', 'stable', 'casino', 'torch', 'torch-off'],
   },
   residents: {
     width: 96,
     height: 128,
-    ids: ['headman', 'enchantress', 'hermit', 'innkeeper', 'herbalist', 'merchant', 'smith', 'tanner', 'groom', 'builder-spirit'],
+    ids: ['headman', 'enchantress', 'hermit', 'innkeeper', 'herbalist', 'merchant', 'smith', 'tanner', 'groom', 'gamehost', 'builder-spirit'],
   },
   // The companions hired in the Karczma: a bust for each class and look,
   // other faces than the players' portraits (question 107 B), cut off the

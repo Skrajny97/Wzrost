@@ -1479,6 +1479,8 @@ export function characterRemoval(db, id, now) {
     db.prepare('DELETE FROM avatar_activities WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM items WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
+    // Its tickets of the Loteria not drawn yet (casino.js).
+    db.prepare('DELETE FROM lottery_tickets WHERE character_id = ?').bind(id),
     ...marketRemoval(db, '?', [id]),
     ...partyRemoval(db, '?', [id]),
     ...guildRemoval(db, '?', [id], now),

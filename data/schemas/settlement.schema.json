@@ -280,6 +280,73 @@
         }
       }
     },
+    "casino": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Salon Gier (prośba autora z 3.11.2026, odpowiedzi 523–526; src/engine/casino.js): gospodarz (resident) prowadzi Loterię (lottery) i Koło Fortuny (wheel). Opis zasad w $comment bloku w data/settlement.json.",
+      "required": ["resident", "relationGain", "lottery", "wheel", "texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "resident": { "type": "string", "description": "Gospodarz Salonu: id mieszkańca, przy którym rośnie relacja o relationGain za każdy los Loterii." },
+        "relationGain": { "type": "integer", "minimum": 0 },
+        "lottery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "ticket", "base"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "ticket": { "type": "integer", "minimum": 1, "description": "Cena losu w złocie; cała trafia do puli." },
+            "base": { "type": "integer", "minimum": 0, "description": "Złoto od Systemu w puli, gdy dzień ma choć jeden los." }
+          }
+        },
+        "wheel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "minStake", "maxStake", "chancePerGold", "prizes", "prizeOver", "itemChance", "itemRarity", "materialRarities"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "minStake": { "type": "integer", "minimum": 1 },
+            "maxStake": { "type": "integer", "minimum": 1 },
+            "chancePerGold": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa wygranej za każdą sztukę złota stawki." },
+            "prizes": { "type": "integer", "minimum": 1, "description": "Ile nagród ma pula postaci na dobę." },
+            "prizeOver": { "type": "number", "minimum": 0, "description": "Każda nagroda jest warta dla postaci więcej niż tyle złota." },
+            "itemChance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa, że nagroda jest przedmiotem, gdy jakiś przedmiot się mieści." },
+            "itemRarity": { "type": "string", "description": "Najniższa rzadkość przedmiotu w puli." },
+            "materialRarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }, "description": "Rzadkości materiałów w puli z wagami losowania." }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lotteryAbout", "lotteryToday", "lotteryBuy", "lotteryHas", "lotteryBought", "lotteryYesterday", "lotteryEarlier", "lotteryMine", "lotteryNone", "announce", "wheelAbout", "wheelPool", "wheelPoolAbout", "wheelStake", "wheelChance", "wheelSpin", "wheelEmpty", "wheelWon", "wheelBag", "won", "lost", "win", "loss"],
+          "properties": {
+            "lotteryAbout": { "type": "string", "minLength": 1 },
+            "lotteryToday": { "type": "string", "minLength": 1 },
+            "lotteryBuy": { "type": "string", "minLength": 1 },
+            "lotteryHas": { "type": "string", "minLength": 1 },
+            "lotteryBought": { "type": "string", "minLength": 1 },
+            "lotteryYesterday": { "type": "string", "minLength": 1 },
+            "lotteryEarlier": { "type": "string", "minLength": 1 },
+            "lotteryMine": { "type": "string", "minLength": 1 },
+            "lotteryNone": { "type": "string", "minLength": 1 },
+            "announce": { "type": "string", "minLength": 1, "description": "Komunikat Systemu w czacie i w Salonie po losowaniu: {name} zwycięzcy, {gold} złota, [a|b] forma dla kobiety i dla mężczyzny." },
+            "wheelAbout": { "type": "string", "minLength": 1 },
+            "wheelPool": { "type": "string", "minLength": 1 },
+            "wheelPoolAbout": { "type": "string", "minLength": 1 },
+            "wheelStake": { "type": "string", "minLength": 1 },
+            "wheelChance": { "type": "string", "minLength": 1 },
+            "wheelSpin": { "type": "string", "minLength": 1 },
+            "wheelEmpty": { "type": "string", "minLength": 1 },
+            "wheelWon": { "type": "string", "minLength": 1 },
+            "wheelBag": { "type": "string", "minLength": 1 },
+            "won": { "type": "string", "minLength": 1 },
+            "lost": { "type": "string", "minLength": 1 },
+            "win": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "Słowa gospodarza po wygranej." },
+            "loss": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "Słowa gospodarza po przegranej." }
+          }
+        }
+      }
+    },
     "tavern": { "type": "object", "additionalProperties": false, "required": ["resident", "relationGain", "mugGoldPerLevel", "rumor"], "properties": { "resident": { "type": "string", "description": "Karczmarz: id mieszkańca, przy którym rośnie relacja o relationGain za kufel." }, "relationGain": { "type": "integer", "minimum": 0 }, "mugGoldPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "rumor": { "type": "object", "additionalProperties": false, "required": ["factor", "newest", "lines"], "properties": { "factor": { "type": "number", "minimum": 1 }, "newest": { "type": "integer", "minimum": 1 }, "lines": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } } } },
     "market": {
       "type": "object",
