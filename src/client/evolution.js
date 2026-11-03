@@ -8,11 +8,13 @@
 // class, or the second form of the one the character has, at any level and
 // can undo the test.
 
-import { portraitSprite } from './art.js';
+import { placeArt, portraitSprite } from './art.js';
 import { h } from './dom.js';
 import { formatNumber } from './format.js';
+import { motionOn } from './motion.js';
 import { setMusicPlace } from './music.js';
 import { narratorIdle } from './narrator.js';
+import { playSound } from './sound.js';
 import { call, state, unlockInfo } from './state.js';
 import { afterSheet, closeSheet, confirmAction, openDecision, openSheet, toast, withButton } from './ui.js';
 
@@ -65,18 +67,85 @@ export async function chooseEvolution(button, evolution, { test = false } = {}) 
     confirmLabel: next ? t.accept : 'Wybieram',
   });
   if (!sure) return;
+  // The form the character has before: its first evolution, or the class.
+  const from = state.character?.evolution?.current?.id ?? null;
   await withButton(button, async () => {
     const result = await call('POST', '/api/evolution', { evolutionId: evolution.id, test });
-    ceremony(result.evolution);
+    ceremony(result.evolution, { from });
   });
 }
 
-// The ceremony: the System's words over the evolution's music, which gives
-// way to the tab's own once the sheet closes.
-export function ceremony(evolution) {
+// The transformation (the author: "efekt i transformację z jasnym światłem i
+// zmianą postaci po wybraniu danej drogi", and on the test film "super
+// animacja ewolucji, dodaj jeszcze efekt dźwiękowy"): the form the character
+// had stands in the System's spring, light gathers on it, a white flash, and
+// the new form stands in its place. Its sound (`evolution-transform` in
+// data/sounds.json) rises with the light. The scene stays behind the
+// ceremony's sheet and goes with it. A tap skips to the end; with the game's
+// animations off there is no scene. Returns the scene and a promise kept
+// when the change is over.
+const TRANSFORM_MS = 3600;
+const TRANSFORM_SOUND_MS = 550;
+
+function transformation(fromId, toId) {
+  const { classId, appearance, skin } = state.character ?? {};
+  const form = (id) => classId && portraitSprite(classId, appearance, { skin, evolution: id ?? undefined });
+  const before = form(fromId);
+  const after = form(toId);
+  if (!motionOn() || !before || !after) return null;
+  // Each form with a white copy over it: the light whitens it by the copy.
+  const layer = (img, which) => {
+    const white = img.cloneNode();
+    white.classList.add('evo-transform__white');
+    return h('div', { class: `evo-transform__form evo-transform__form--${which}` }, img, white);
+  };
+  const motes = Array.from({ length: 22 }, () => {
+    const x = Math.random();
+    const y = 0.15 + Math.random() * 0.7;
+    return h('span', {
+      class: 'evo-transform__mote',
+      style: { left: `${(x * 100).toFixed(1)}%`, top: `${(y * 100).toFixed(1)}%`, animationDelay: `${(Math.random() * 0.4).toFixed(2)}s` },
+      vars: { '--tx': `${Math.round((0.5 - x) * innerWidth)}px`, '--ty': `${Math.round((0.42 - y) * innerHeight)}px` },
+    });
+  });
+  const sparks = Array.from({ length: 16 }, (_, index) => {
+    const angle = (index / 16) * Math.PI * 2 + Math.random() * 0.3;
+    const reach = 90 + Math.random() * 90;
+    return h('span', { class: 'evo-transform__spark', vars: { '--bx': `${Math.round(Math.cos(angle) * reach)}px`, '--by': `${Math.round(Math.sin(angle) * reach - 40)}px` } });
+  });
+  const spring = placeArt('system-spring');
+  const scene = h(
+    'div',
+    { class: 'evo-transform', 'aria-hidden': 'true' },
+    spring && h('div', { class: 'evo-transform__spring', style: { backgroundImage: `url(${spring})` } }),
+    h('div', { class: 'evo-transform__rays' }),
+    h('div', { class: 'evo-transform__figure' }, layer(before, 'before'), layer(after, 'after')),
+    h('div', { class: 'evo-transform__motes' }, motes, sparks),
+    h('div', { class: 'evo-transform__flash' }),
+  );
+  document.body.append(scene);
+  const sound = setTimeout(() => playSound('evolution-transform'), TRANSFORM_SOUND_MS);
+  const done = new Promise((resolve) => {
+    const end = () => {
+      clearTimeout(timer);
+      scene.classList.add('evo-transform--done');
+      resolve();
+    };
+    const timer = setTimeout(end, TRANSFORM_MS);
+    scene.addEventListener('pointerdown', end, { once: true });
+  });
+  return { scene, done, stop: () => (clearTimeout(sound), scene.remove()) };
+}
+
+// The ceremony: the change in light, then the System's words over the
+// evolution's music, which gives way to the tab's own once the sheet closes.
+// `from`: the form the character had (its first evolution's id, or null).
+export async function ceremony(evolution, { from = null } = {}) {
   const t = texts();
   setMusicPlace(['evolution']);
-  openSheet(
+  const change = transformation(from, evolution.id);
+  if (change) await change.done;
+  const dialog = openSheet(
     h(
       'div',
       { class: 'evolution-ceremony' },
@@ -87,7 +156,11 @@ export function ceremony(evolution) {
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--system', onClick: closeSheet, text: 'Dalej' })),
     ),
   );
+  // Over the new form, the sheet dims the page less.
+  if (change) dialog.classList.add('sheet--transform');
   afterSheet(() => {
+    dialog.classList.remove('sheet--transform');
+    change?.stop();
     setMusicPlace(/^#\/postac\/(umiejetnosci|ewolucja)/.test(location.hash) ? ['skills'] : []);
     offerPointsReset();
   });

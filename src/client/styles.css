@@ -7049,6 +7049,281 @@ button.skill-row {
   font-size: 26px;
 }
 
+/* The transformation at an evolution (evolution.js): the old form in the
+   System's spring, light gathering on it, a white flash and the new form in
+   its place; then the ceremony's sheet over the new form, dimming it less.
+   3.6 s in all; the end state is the one a tap skips to. */
+.evo-transform {
+  --evo: 3.6s;
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  overflow: hidden;
+  background: radial-gradient(60% 45% at 50% 42%, #1d241c, #0c0f0b 70%);
+  cursor: pointer;
+}
+
+.evo-transform__spring {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: max(100vw, 640px);
+  aspect-ratio: 2 / 1;
+  transform: translate(-50%, -62%);
+  background-size: cover;
+  background-position: center;
+  image-rendering: pixelated;
+  opacity: 0.5;
+  mask-image: linear-gradient(transparent, #000 25%, #000 62%, transparent);
+  -webkit-mask-image: linear-gradient(transparent, #000 25%, #000 62%, transparent);
+}
+
+.evo-transform__rays {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 180vmax;
+  height: 180vmax;
+  margin: -90vmax 0 0 -90vmax;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 238, 190, 0.38) 0deg 5deg, transparent 5deg 25.7deg);
+  mask-image: radial-gradient(circle, #000 0 8%, transparent 42%);
+  -webkit-mask-image: radial-gradient(circle, #000 0 8%, transparent 42%);
+  opacity: 0;
+  animation:
+    evo-rays var(--evo) ease-in-out forwards,
+    evo-spin 14s linear infinite;
+}
+
+.evo-transform__figure {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: min(288px, 66vw);
+  aspect-ratio: 96 / 128;
+  transform: translate(-50%, -50%);
+}
+
+.evo-transform__form {
+  position: absolute;
+  inset: 0;
+}
+
+.evo-transform__form img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.evo-transform__form img.evo-transform__white {
+  filter: brightness(0) invert(1);
+  opacity: 0;
+}
+
+.evo-transform__form--before {
+  animation: evo-before var(--evo) ease-in forwards;
+}
+
+.evo-transform__form--before .evo-transform__white {
+  animation: evo-whiten var(--evo) ease-in forwards;
+}
+
+.evo-transform__form--after {
+  opacity: 0;
+  animation: evo-after var(--evo) ease-out forwards;
+}
+
+.evo-transform__form--after .evo-transform__white {
+  opacity: 1;
+  animation: evo-unwhiten var(--evo) ease-out forwards;
+}
+
+.evo-transform__mote,
+.evo-transform__spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #ffefc0;
+  box-shadow: 0 0 6px 1px rgba(255, 226, 150, 0.8);
+  opacity: 0;
+}
+
+.evo-transform__mote {
+  animation: evo-mote var(--evo) ease-in forwards;
+}
+
+.evo-transform__spark {
+  left: 50%;
+  top: 42%;
+  animation: evo-spark var(--evo) ease-out forwards;
+}
+
+.evo-transform__flash {
+  position: absolute;
+  inset: 0;
+  background: #fffaf0;
+  opacity: 0;
+  pointer-events: none;
+  animation: evo-flash var(--evo) ease-out forwards;
+}
+
+.evo-transform--done .evo-transform__rays,
+.evo-transform--done .evo-transform__form,
+.evo-transform--done .evo-transform__form img,
+.evo-transform--done .evo-transform__mote,
+.evo-transform--done .evo-transform__spark,
+.evo-transform--done .evo-transform__flash {
+  animation: none;
+}
+
+.evo-transform--done .evo-transform__rays {
+  opacity: 0.18;
+}
+
+.evo-transform--done .evo-transform__form--before,
+.evo-transform--done .evo-transform__form img.evo-transform__white,
+.evo-transform--done .evo-transform__mote,
+.evo-transform--done .evo-transform__spark,
+.evo-transform--done .evo-transform__flash {
+  opacity: 0;
+}
+
+.evo-transform--done .evo-transform__form--after {
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgba(255, 230, 160, 0.55));
+}
+
+.sheet.sheet--transform::backdrop {
+  background: rgba(5, 8, 4, 0.25);
+}
+
+@keyframes evo-rays {
+  0%,
+  12% {
+    opacity: 0;
+  }
+  55% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.18;
+  }
+}
+
+@keyframes evo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes evo-before {
+  0%,
+  15% {
+    opacity: 1;
+    filter: drop-shadow(0 0 2px rgba(255, 230, 160, 0.3));
+  }
+  55% {
+    opacity: 1;
+    filter: drop-shadow(0 0 16px rgba(255, 244, 210, 1));
+  }
+  58%,
+  100% {
+    opacity: 0;
+    filter: drop-shadow(0 0 16px rgba(255, 244, 210, 1));
+  }
+}
+
+@keyframes evo-whiten {
+  0%,
+  25% {
+    opacity: 0;
+  }
+  55%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes evo-after {
+  0%,
+  57% {
+    opacity: 0;
+    filter: drop-shadow(0 0 16px rgba(255, 244, 210, 1));
+  }
+  60% {
+    opacity: 1;
+    filter: drop-shadow(0 0 16px rgba(255, 244, 210, 1));
+  }
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(255, 230, 160, 0.55));
+  }
+}
+
+@keyframes evo-unwhiten {
+  0%,
+  62% {
+    opacity: 1;
+  }
+  89%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes evo-mote {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  12% {
+    opacity: 0.8;
+  }
+  52% {
+    opacity: 1;
+    transform: translate(calc(var(--tx) * 0.92), calc(var(--ty) * 0.92));
+  }
+  57%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty));
+  }
+}
+
+@keyframes evo-spark {
+  0%,
+  58% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  62% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--bx), var(--by));
+  }
+}
+
+@keyframes evo-flash {
+  0%,
+  52% {
+    opacity: 0;
+  }
+  58%,
+  63% {
+    opacity: 1;
+  }
+  85%,
+  100% {
+    opacity: 0;
+  }
+}
+
 /* The free reset of the stat points after an evolution (evolution.js): the
    warning in gold, "zalecane" over "Zeruj", the way to keep them below. */
 .evolution-reset-pool {
