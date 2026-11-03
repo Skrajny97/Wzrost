@@ -44,11 +44,14 @@ describe('the Wieże Systemu', () => {
       if (floor % 15 === 0 && area.champion) assert.equal(encounter.members[0].monsterId, area.champion, `floor ${floor}`);
       else if (lap(floor) % 2 === 0 && area.elite) assert.equal(encounter.members[0].monsterId, area.elite, `floor ${floor}`);
     }
-    assert.deepEqual(
-      [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70].filter((floor) => towerEliteFloor(floor, content)),
-      [5, 10, 15, 20, 45, 50, 55, 60],
-    );
-    assert.equal([1, 2, 3, 4, 21, 24, 26].some((floor) => towerEliteFloor(floor, content)), false);
+    // A lap is as long as the inner regions are many (25 with the Czarne
+    // Bagno), so the floors of each lap follow from the data.
+    const regions = content.areas.length;
+    const fifths = (from, to) => Array.from({ length: to - from + 1 }, (_, index) => from + index).filter((floor) => floor % 5 === 0);
+    assert.ok(fifths(1, regions).every((floor) => towerEliteFloor(floor, content)), 'the first lap keeps its elites');
+    assert.ok(fifths(regions + 1, 2 * regions).every((floor) => !towerEliteFloor(floor, content)), 'the second lap has none');
+    assert.ok(fifths(2 * regions + 1, 3 * regions).every((floor) => towerEliteFloor(floor, content)), 'the third lap has them again');
+    assert.equal([1, 2, 3, 4, regions + 1, regions + 4, 2 * regions + 1].some((floor) => towerEliteFloor(floor, content)), false);
     // In the laps between, a fifth floor (not a champion's) is a usual floor
     // of its region: its creatures, an elite only now and then.
     const usual = Array.from({ length: 400 }, (_, index) => index + 1).filter((floor) => floor % 5 === 0 && lap(floor) % 2 === 1 && floor % 15 !== 0);

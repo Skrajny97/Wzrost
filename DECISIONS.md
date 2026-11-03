@@ -3011,6 +3011,101 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Odpowiedzi autora 501, 504–508, plansza obozu i film (3.11.2026)
+
+Autor: „506 A / 505 A / 507 A / 508 A / 501 A / 504 OK”, „Teraz widze ze stół rozbiórki stoi na drzewach, weź ogólnie te plansze obozu i budynki ładnie popraw (i skoordynuj Samouczek)”, „w filmie za dużo opisów na zbyt krótki czas” i „w Ewolucjach daj tylko nazwy klas i wycentruj te napisy wszystkie, bo są nierówno”. Potem: „501 już pisałem że A”.
+
+1. **501 A:** popiersie Ducha budowniczego to wersja A z PixelLab, z pobijakiem opartym z tyłu na ramieniu (zob. „Duch budowniczego przy Kamieniu węgielnym”).
+2. **504 OK:** nowe nagrania śmierci Ważki i bólu Rokity zostają w grze (weszły z 0.1.4).
+3. **505–508 A:** górny pasek i menu na komputerze, wszystkie cztery propozycje (zob. „Uwagi gracza o układzie na komputerze”). Robi je pomocnik na osobnej gałęzi; wejdą osobnym etapem.
+4. **Plansza obozu.** Budowle mają stać na polanie, nie na drzewach, na każdej planszy (każdy wygląd ziemi, z Osadą i bez), a Samouczek ma wskazywać je tak samo po zmianie. Osobny etap po 0.1.5.
+5. **Film:** mniej napisów, dłużej na ekranie. „W Ewolucjach” rozumiem jako sceny ewolucji w filmie: tylko nazwy klas, wyśrodkowane, bez okna Systemu z opisem.
+
+## Wieże: odpowiedzi autora 483–486 i 488 (3.11.2026)
+
+Odpowiedzi na pytania z przeglądu Wież (zob. „Wieże: przegląd i poprawki tekstów” i „Pytania 479–497”): 483 A, 484 A, 485 A, 486 A i 488 A.
+
+1. **Trofeum czempiona tylko za pierwsze zwycięstwo piętra (483 A).**
+   - Czempion zostawia trofeum, czyli swój materiał, tylko przy pierwszej wygranej swojego piętra w danej wieży, i wtedy na pewno. Na wyprawie szansa wynosi 90%, a tu zostawiałaby co dziesiąte piętro bez trofeum na zawsze (brakujący szczegół).
+   - Każda wieża liczy swoje piętra osobno, jak przy skrzyni Wieży (brakujący szczegół).
+   - Kolejne wygrane tego piętra płacą XP, złotem i materiałami jak dotąd, tylko bez trofeum.
+   - Zapis Wież postaci pamięta piętra z czempionem już wygrane (`champions` w `characters.towers`, bez migracji). Zapis sprzed zmiany nie ma tej listy, więc każde piętro z czempionem da trofeum jeszcze raz.
+   - Karta piętra pisze „Czeka: czempion i jego trofeum”, dopóki trofeum czeka, a potem „Czeka: czempion”. Wstęp Wież mówi: „Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.”
+   - Na wyprawach i w Bestii Gildii bez zmian. Zmienia to punkt 6 „Wieże Systemu i Gildia” („czempion zostawia swoje materiały jak na wyprawie”).
+2. **Stałe elity co 5. piętro tylko w co drugim okrążeniu regionów (484 A).**
+   - Okrążenie ma tyle pięter, ile jest regionów wewnętrznych: od Czarnego Bagna 25. W pierwszym okrążeniu (piętra 1–25) co 5. piętro czeka elita jak dotąd, w drugim (26–50) te piętra są zwykłymi piętrami swojego regionu, w trzecim (51–75) znowu czeka elita i tak dalej na zmianę (`eliteLapEvery` w `data/towers.json`). Kolejna kraina wydłuży okrążenie sama.
+   - Na tych piętrach, jak na każdym zwykłym, elita trafia się czasem (10%).
+   - Czempion zostaje co 15. piętro w każdym okrążeniu, a skrzynia co 10. piętro, bo reguła z nimi nie koliduje.
+   - Piętra ze skrzynią w okrążeniach bez elit, na których nie czeka czempion, są teraz zwykłymi piętrami, więc ich skrzynię łatwiej zdobyć.
+   - Zwykłe stwory ostatnich regionów krain walczą teraz w zwykłych walkach: z Serca Uroczyska od 35. piętra, ze Starego Koryta od 40., z Rokitowego Bezdna od 50., z Dziczej Głuszy od 80. i ze Starego Wyrobiska od 95. (piętra 30 i 45 należą do czempionów).
+   - Brakujący szczegół: okrążenia liczą się od pierwszego, z elitami, żeby początek Wież został jak dotąd.
+3. **Zapowiedź losowych elit (485 A).** Wstęp Wież pod „Jak to działa?” ma zdanie „Na zwykłych piętrach czasem czeka elita.”, zaraz po zdaniu o elitach. To zdanie podaje piętra z danych, dziś: „Co 5. piętro czeka elita, ale tylko w co drugim okrążeniu regionów: na piętrach 1–25, 51–75, 101–125 i tak dalej.” Wstęp to tekst na ekranie Wież (`src/client/screens/towers.js`), bez nagrania narratora.
+4. **Osobny limit raportów z Wież (486 A).**
+   - Dziennik trzyma 50 najnowszych raportów z Wież i osobno 50 najnowszych pozostałych: wypraw i profesji, które jak dotąd dzielą jeden limit (`journal` w `data/balance.json`).
+   - Nowy raport usuwa najstarszy raport tylko ze swojej grupy, więc walki w Wieżach nie wypychają już raportów wypraw.
+   - Dziennik pokazuje obie grupy razem, od najnowszego, czyli do 100 raportów.
+5. **Próba gildii „Wygraj w Wieżach N walk” (488 A).**
+   - Wygrana liczy się tylko na piętrze co najwyżej 10 poziomów poniżej poziomu postaci w chwili wejścia (`levelsBelow` w `data/guilds.json`).
+   - Tak samo w Wieży Drużyn, gdzie przy dużo niższym partnerze takie piętro może być poza zasięgiem.
+   - Pod próbą stoi dopisek z najniższym takim piętrem dla tej postaci, np. „Liczą się piętra od 50. w górę.” (brakujący szczegół: gracz widzi, czemu wygrana na niskim piętrze nic nie daje).
+   - Próba „Pokonaj łącznie N stworów” liczy stwory z Wież jak dotąd.
+6. **Baza danych:** bez migracji.
+7. **Sprawdzone:**
+   - nowe testy: każdy stwór każdego regionu trafia się na jakimś piętrze, a zwykłe stwory w zwykłej walce; elity zmieniają się co okrążenie, liczone z liczby regionów; trofeum tylko za pierwszą wygraną, w silniku i przez API; osobne limity Dziennika; próba gildii tylko od poziomu postaci minus 10;
+   - w przeglądarce na telefonie i komputerze: wstęp Wież, karty pięter, wejście na 15. piętro z trofeum i drugie bez niego, Dziennik i dopisek próby w Gildii.
+
+## Bastion: więcej obrażeń, mniej obrony (498 B, 3.11.2026)
+
+Autor: „498 B”. Bastion zadaje więcej, a płaci za to częścią obrony. Zmieniły się tylko liczby w `data/evolutions.json` i opis Twierdzy; opisy umiejętności same podają nowe liczby.
+
+1. **Twierdza:** +15% pancerza i odporności (było +20%), tarcza zatrzymuje 5% ciosów (było 10%). Wrogowie dalej częściej biją w Bastion niż w resztę drużyny.
+2. **Nieugięty** działa jak dotąd raz na walkę, poniżej 90% HP, przez 8–10 ruchów.
+   - Odzyskuje 8–12% maks. HP. Było 35–50%, ale przy progu 90% większość leczenia i tak przepadała.
+   - Pancerz rośnie o 25–50% (było o 300–400%).
+   - Odbija 200–300% przyjętych obrażeń (było 100–200%). Ciosy dochodzą teraz do Bastionu, więc odbicie staje się prawdziwymi obrażeniami.
+3. **Mur tarcz:** cała drużyna ma przez 4 ruchy o 50–100% więcej pancerza (było o 100–180%).
+4. **Wyniki symulacji.**
+   - Ustawienia jak w punkcie 13 „Drugiej ewolucji klas” i w teście: 4-godzinne wyprawy w miejscu o 8 poziomów trudniejszym, postacie 90. i 100. poziomu, stwory jak przy ustawianiu drugich form, po 2000 wypraw na wiersz (`simulateCharacter` z `tools/evolution-sim.mjs`).
+   - Bastion zadaje o 22–23% mniej niż Strażnik z Wyzwaniem (było o 43% mniej), a przyjmuje o 24–25% mniej (było o 46–47% mniej).
+   - Kończy wyprawy z 74–75% HP wobec 66–67% u Strażnika (było 79–82%), więc przewaga spada z 13–14 do 7–8 punktów.
+   - Mdleje w 11% wypraw wobec 19–20% u Strażnika (było 9–12%).
+   - Walczy 1,2 raza dłużej niż Strażnik (było 1,7 raza).
+5. **Czemu Strażnik mdleje częściej niż w punkcie 13 (8–11%).** Od 0.0.98 elita i czempion przychodzą na 4-godzinnej wyprawie dwa razy częściej. Bez tej zmiany ta sama próba daje Strażnikowi 9–10% omdleń i 73–75% HP, jak w punkcie 13.
+6. **Test** „każda dalsza postać mdleje rzadziej albo kończy wyprawy z wyraźnie większym HP niż jej pierwsza ewolucja” przechodzi: Bastion mdleje w 5 z 40 wypraw i kończy je z 73% HP, Strażnik w 13 z 40 i z 58% HP (wcześniej Bastion: 3 omdlenia i 82%).
+7. **Z towarzyszami** (gracz realistyczny z `tools/difficulty-sim.mjs` jako Strażnik i jako Bastion, 4-godzinne wyprawy w najnowszym regionie na poziomach 100, 110 i 125): nikt nie mdleje. Bastion kończy wyprawy z 93–95% HP (było 96–97%), a Strażnik z 85–88%.
+8. **Nieugięty a zasada z punktu 5** (liczby nowej umiejętności na 1. poziomie mniej więcej jak umiejętności pierwszej ewolucji na 45.). Leczenie (8% wobec 20%) i pancerz (+25% wobec +300% Niezłomnego) są teraz niższe, bo odbicie działa tylko wtedy, gdy ciosy dochodzą. Przy pancerzu +300–400% nawet dwa razy większe odbicie podnosiło obrażenia Bastionu tylko o 4 punkty procentowe. W zamian Nieugięty budzi się już przy 90% HP, trwa dłużej i odbija dziesięć razy więcej niż Niezłomny.
+
+## Duch budowniczego przy Kamieniu węgielnym (3.11.2026)
+
+Autor: „Zrobilibyśmy też opcję sprzedaży nadmiaru zasobów w Kamieniu Węgielnym. Niech przy Kamieniu czuwa duch budowniczego, który za zasoby płaci złotem”, a o popiersiu: „501 B, ale do dorysowania bo brakuje sporo”, potem „501 A”.
+
+1. **Gdzie.** W okienku Kamienia węgielnego, pod paskami postępu, czuwa Duch budowniczego: popiersie, imię i kwestia „Nadmiar drewna, kamienia i rudy kupię za złoto.” Niżej stoją drewno, kamień i ruda żelaza: ile ich postać ma, cena i przycisk „Sprzedaj”. Kamień stoi tylko z Osadą, więc duch też. Bez Osady serwer odmawia: „Duch budowniczego pojawi się w Obozie razem z Osadą.”
+2. **Popiersie.** Wersja A z PixelLab (501 A): duch starego budowniczego z wąsami, w fartuchu, z drewnianym pobijakiem opartym z tyłu na ramieniu, dorysowany w całości na wzór szkicu B, który autor wybrał wcześniej (`src/client/art/residents/builder-spirit.png`).
+3. **Ceny.** Za 100 sztuk duch płaci: drewno 6 zł, kamień 9 zł, ruda żelaza 12 zł (`cornerstone.spirit` w `data/camp.json`). Cena nie zależy od poziomu postaci ani obozu.
+4. **Sprzedaż.**
+   - „Sprzedaj” otwiera okno jak u Jagny. Na start wybrana jest najmniejsza liczba sztuk, za którą duch płaci.
+   - Liczbę zmienia suwak z przyciskami − i +, jak u ducha ognia, oraz przycisk „wszystkie”. Gdy budowy czegoś jeszcze potrzebują, jest też „nadmiar”: tyle sztuk, ile postać ma ponad tę potrzebę.
+   - Przycisk sprzedaży mówi, ile duch zapłaci, np. „Sprzedaj za 15 zł”. Po sprzedaży wraca okienko Kamienia z nowymi liczbami, a komunikat mówi: „Duch budowniczego płaci 15 zł.” „Anuluj” też wraca do okienka.
+5. **Zaokrąglanie (brakujący szczegół).**
+   - Złoto liczy się w dół do pełnej monety, jak przy innych sprzedażach, więc sprzedaż po trochu nigdy nie daje więcej niż całość naraz.
+   - Sztuka jest warta mniej niż 1 zł, więc nie obowiązuje tu zasada „najmniej 1 zł” z Jagny i złomiarza: inaczej sprzedaż po jednej sztuce dawałaby 1 zł za sztukę.
+   - Duch bierze co najmniej tyle sztuk, ile daje 1 zł: 17 drewna, 12 kamienia albo 9 rudy. Przy mniejszej liczbie okienko i serwer mówią: „Za mniej niż 17 szt. duch nic nie zapłaci.”
+6. **Nadmiar.**
+   - Przy każdym zasobie stoi, ile go jeszcze potrzebują budowy obozu, np. „Na rozbudowę Obozu potrzeba jeszcze 3200 szt.”.
+   - Liczą się wszystkie poziomy budynków (także Kwater) i samego Obozu do najwyższego, bez budowy trwającej i budów w kolejce, bo te są już opłacone. Nowy obóz z Osadą potrzebuje razem 41 373 drewna, 14 630 kamienia i 7970 rudy.
+   - Gdy wszystko ma najwyższy poziom, tego zdania nie ma. Duch i tak kupi tyle, ile gracz wybierze. Liczy serwer, z tych samych kosztów co budowy.
+7. **Bez relacji i reputacji.** Duch nie mieszka w Osadzie, więc sprzedaż nie daje relacji, reputacji ani punktów handlu dnia. Duch kupuje też w czasie wyprawy, jak reszta obozu (duch ognia, lada złomiarza, wymiana przy Stole rozbiórki).
+8. **Ile to daje.**
+   - Symulacja gracza realistycznego z `tools/difficulty-sim.mjs` na 100. poziomie: 600 wypraw 4-godzinnych pięciu klas w Starym Wyrobisku (96–100), z Tartakiem, Kamieniołomem i Kopalnią na 10. poziomie.
+   - Godzina wyprawy daje 1624 zł oraz 137,7 drewna, 206,4 kamienia i 344,2 rudy. Budynki dają 60 drewna, 40 kamienia i 30 rudy na godzinę przez całą dobę.
+   - Dzień z 8 godzinami wypraw: 2542 drewna × 0,06 zł + 2612 kamienia × 0,09 zł + 3473 rudy × 0,12 zł = 152 + 235 + 417 = 804 zł wobec 12 996 zł z wypraw, czyli +6,2%.
+   - Gdy postać najpierw zamieni wszystko na rudę przy Stole rozbiórki na 10. poziomie (1 za 1): 1035 zł, czyli +8,0%.
+   - Wyprawy przez całą dobę: +4,9%, a jako ruda +6,0%. Gracz słabiej wyposażony (modele `low` i `casualcomp`, omdlenia na 24–48% wypraw): +6,6–7,1%, a jako ruda +8,5–9,3%.
+   - To dodatek, jak sprzedaż przedmiotów (ok. 6%, zob. „Ceny Warowni i wierzchowców, trudność: odpowiedzi autora 430–432”), a nie główne źródło złota. Test sprawdza ten sam rachunek na mniejszej próbie.
+9. **Bez zarabiania na odkupie.** Złoto na zasoby zamienia tylko duch ognia, najtaniej po 5 zł za sztukę (Ognisko na 10. poziomie), czyli ponad 40 razy drożej, niż płaci duch budowniczego. Tablica zleceń płaci ok. 3,2 zł za sztukę, ale tylko za kilkadziesiąt sztuk w zleceniu. Sklep Systemu, Targowisko, Wymiana między graczami i Prośby Gildii nie sprzedają zasobów. Walidator danych pilnuje, żeby duch płacił za sztukę mniej, niż bierze duch ognia.
+10. **Serwer.** `POST /api/camp/sell` (`resource`, `amount`): cała liczba sztuk od 1 do tylu, ile postać ma, tylko z Osadą. Zapis idzie jednym zapytaniem, gdy postać się nie zmieniła, więc dwa stuknięcia naraz sprzedają raz. Zasady są w `src/engine/builder-spirit.js`, okno w `src/client/builder-spirit.js`.
+11. **Teksty** ducha i okna to propozycja do poprawy przez autora (`cornerstone.spirit.line` i `texts` w `data/camp.json`). Baza danych bez migracji.
+
 ## Obóz: budowle wejściem do ścieżek (3.11.2026)
 
 Autor, ze zrzutem planszy obozu: „Tartak trzeba obrócić o 90 stopni by był zwrócony w stronę ścieżki, tak samo wszystkie inne budowle, wejścia w strone ścieżek”.
@@ -3131,14 +3226,14 @@ Plan „Druga ewolucja, Warownia i dwie nowe profesje” (punkt 1: 382 A, 383 A,
     - Lodowa zbroja to osłona z many, jak Osłona many, poniżej 85% HP. Każdy, czyj cios zatrzyma, zwalnia.
     - Boska ochrona raz na walkę, poniżej 75% HP, daje każdemu w drużynie osłonę z części jego maks. HP. Wielkie namaszczenie powiększa premie Chóru i Boskiej ochrony, bo Arcykapłan nie ma już Błogosławieństwa.
     - Zniknięcie: przez ruch żaden cios nie trafia postaci, a jej następny cios jest krytyczny i silniejszy o 10–40%. Ta liczba jest dopisana, żeby umiejętność rosła z poziomem.
-    - Twierdza zatrzymuje tarczą 10% ciosów, także zaklęć, a odtwarzanie walki pokazuje „blok”.
+    - Twierdza zatrzymuje tarczą 10% ciosów, także zaklęć, a odtwarzanie walki pokazuje „blok”. Teraz 5%: zob. „Bastion: więcej obrażeń, mniej obrony (498 B, 3.11.2026)”.
     - Gromowe groty spowalniają trafionego iskrą o 30%.
     - Wieczna zima wychładza każdym zaklęciem mrozu.
     - Święty ogień podpala trafionego sakrum ducha: przez 3 ruchy traci po 20% ciosu.
     - Łaska zdejmuje wszystkie złe efekty i wzmacnia też leczenie Aury życia.
     - Widmowy krok dodaje 5 pkt proc. uniku ponad zwykły limit.
 13. **Balans.** `tools/evolution-sim.mjs --second` porównuje pierwszą ewolucję z umiejętnościami po 45 z jej dalszą postacią na tym samym poziomie klasy. Wyprawa ma stałą liczbę walk, więc siła widać w bezpieczeństwie. W miejscu o 8 poziomów trudniejszym, na 4-godzinnych wyprawach postaci 90. poziomu, dalsze postacie mdleją w 0–12% wypraw, a pierwsze ewolucje w 0–81%. Dalsze postacie kończą wyprawy z 67–99% HP, a pierwsze ewolucje z 20–91%. Każda dalsza postać mdleje rzadziej albo kończy wyprawy z wyraźnie większym HP niż jej pierwsza ewolucja, co sprawdza test.
-    - Bastion zadaje o 35–45% mniej niż Strażnik z Wyzwaniem, ale przyjmuje o 40–45% mniej. Mdleje tak samo albo rzadziej (8% wobec 8% na 90. poziomie postaci, 7% wobec 11% na 100.) i kończy wyprawy z 82–84% HP zamiast 73–75%. Jego obrażenia to głównie odbicie Nieugiętego. To pytanie do autora, czy Bastion ma zostać tak obronny.
+    - Bastion zadaje o 35–45% mniej niż Strażnik z Wyzwaniem, ale przyjmuje o 40–45% mniej. Mdleje tak samo albo rzadziej (8% wobec 8% na 90. poziomie postaci, 7% wobec 11% na 100.) i kończy wyprawy z 82–84% HP zamiast 73–75%. Jego obrażenia to głównie odbicie Nieugiętego. To pytanie do autora, czy Bastion ma zostać tak obronny. Autor wybrał 498 B: zob. „Bastion: więcej obrażeń, mniej obrony (498 B, 3.11.2026)”.
     - Cudotwórca i Arcykapłan zadają mniej więcej tyle co przed ewolucją, ale prawie nie mdleją: 1–3% wypraw wobec 10–14%.
 14. **Teksty do oceny autora.** Zdania fabularne pod nazwami 30 umiejętności i nowe zdania zakładki Ewolucja są robocze.
 15. **Migracja bazy:** brak. Postać trzyma w `evolution` swoją najnowszą postać, a pierwsza ewolucja wynika z `from`.

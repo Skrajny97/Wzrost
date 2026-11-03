@@ -294,7 +294,7 @@ export const SPRITES = {
   residents: {
     width: 96,
     height: 128,
-    ids: ['headman', 'enchantress', 'hermit', 'innkeeper', 'herbalist', 'merchant', 'smith', 'tanner', 'groom'],
+    ids: ['headman', 'enchantress', 'hermit', 'innkeeper', 'herbalist', 'merchant', 'smith', 'tanner', 'groom', 'builder-spirit'],
   },
   // The companions hired in the Karczma: a bust for each class and look,
   // other faces than the players' portraits (question 107 B), cut off the
