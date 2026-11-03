@@ -858,7 +858,11 @@
       "towers-solo": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Każde piętro to stwory jednego regionu, po kolei przez wszystkie krainy. Najwyżej wejdziesz na piętro swojego poziomu." },
       "towers-floor": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Po drodze czekają elity i czempioni, a co dziesiąte piętro za pierwsze zwycięstwo daje skrzynię Wieży." },
       "towers-party": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Do Wieży Drużyn wejdziesz z jednym albo dwoma wędrowcami. Wolne miejsce zajmie towarzysz z Kwater." },
-      "towers-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Wejść masz kilkanaście na dzień, nowe od północy. Wieże pomogą Ci też uzupełnić dawne wpisy Bestiariusza." }
+      "towers-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Wejść masz kilkanaście na dzień, nowe od północy. Wieże pomogą Ci też uzupełnić dawne wpisy Bestiariusza." },
+      "tap-region-desktop": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Kliknij Wiatrołomy." },
+      "tap-start-desktop": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Suwak stoi na trzydziestu minutach. Kliknij „Wyrusz”." },
+      "wallet-desktop": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sam zobacz." },
+      "wallet-desktop-female": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sama zobacz." }
     },
     "allLines": {
       "voice": "Narrator",
