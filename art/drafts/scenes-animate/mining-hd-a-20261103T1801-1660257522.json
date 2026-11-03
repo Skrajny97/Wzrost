@@ -1,0 +1,15 @@
+{
+  "id": "mining-hd-a",
+  "payload": {
+    "first_frame": "art/references/scenes/mining-hd-a.png",
+    "action": "swinging the pickaxe in a smooth seamless loop: raising it over the shoulder and striking the gold vein in the rock wall, small sparks and stone chips flying at each strike, the lantern flickering softly, the tunnel and the wall staying still",
+    "frame_count": 8,
+    "seed": 1660257522,
+    "no_background": false
+  },
+  "usage": {
+    "type": "usd",
+    "usd": 0.022807426763905417
+  },
+  "frames": 9
+}
